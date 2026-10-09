@@ -14,6 +14,8 @@
 #include "gameplay/interactions/FinaleSequence.h"
 #include "gameplay/interactions/InteractionState.h"
 #include "gameplay/items/LanternPendulum.h"
+#include "gameplay/simulation/CombatPresentation.h"
+#include "gameplay/simulation/CombatInputTiming.h"
 #include "gameplay/simulation/GameplayEvent.h"
 
 namespace horde::gameplay::simulation
@@ -28,6 +30,8 @@ struct SkeletonEnemySnapshot
     float z = -4.65f;
     float facingRadians = 0.0f;
     float animationTime = 0.0f;
+    // Presentation-only idle sample offset; combat/action clocks stay exact.
+    float idlePhaseSeconds = 0.0f;
     float damageFlash = 0.0f;
     std::int32_t health = 1;
     EnemyAnimation animation = EnemyAnimation::Walking;
@@ -44,6 +48,10 @@ struct SimulationSnapshot
 {
     std::uint64_t tickIndex = 0;
     std::uint64_t inputPublicationSequence = 0;
+    // Diagnostic observation of the coherent publication consumed by this
+    // snapshot, including zero-tick and pause synchronization frames.
+    float inputMoveForward = 0.0f;
+    float inputMoveStrafe = 0.0f;
     std::uint64_t lastConsumedAttackSequence = 0;
     std::uint64_t lastConsumedParrySequence = 0;
     std::uint64_t lastConsumedDodgeSequence = 0;
@@ -94,6 +102,8 @@ struct SimulationSnapshot
     EnemyRosterSnapshot enemyRoster{};
     CombatSnapshot swordCombat{};
     PlayerCombatSnapshot playerCombat{};
+    CombatPresentationSnapshot combatPresentation{};
+    CombatInputTimingSnapshot combatInputTiming{};
     LichSnapshot lich{};
     PlayerVitalsSnapshot playerVitals{};
 
@@ -111,6 +121,8 @@ struct SimulationSnapshot
     std::size_t eventsEmittedThisFrame = 0;
     horde::gameplay::items::PlayerMountProfile playerMountProfile =
         horde::gameplay::items::PlayerMountProfile::LegacyViewRelative;
+    // True only during the automatic pre-encounter draw's temporary defense lockout.
+    bool automaticSwordDrawBlocksDefense = false;
 };
 
 } // namespace horde::gameplay::simulation

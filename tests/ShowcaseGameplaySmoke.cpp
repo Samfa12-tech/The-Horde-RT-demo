@@ -1,3 +1,4 @@
+#include <array>
 #include <cmath>
 #include <iostream>
 #include <string>
@@ -265,12 +266,12 @@ int main()
           "selected encounter death must be recorded");
     director.Update(4.0f, -15.0f);
     check(director.Snapshot().selectedEnemy == EnemyKind::Skeleton &&
-          director.Snapshot().encounters[0].resetGeneration == initialSkeletonGeneration + 1,
-          "return crossing must reset and reselect skeleton");
+          director.Snapshot().encounters[0].resetGeneration == initialSkeletonGeneration,
+          "return crossing must reselect the existing skeleton attempt");
     director.Update(-5.5f, -15.2f);
-    check(director.Snapshot().encounters[1].status == EncounterStatus::Active &&
-          director.Snapshot().encounters[1].resetGeneration == firstLichGeneration + 1,
-          "re-entering skylight side must reset lich");
+    check(director.Snapshot().encounters[1].status == EncounterStatus::Dead &&
+          director.Snapshot().encounters[1].resetGeneration == firstLichGeneration,
+          "re-entering skylight side must preserve terminal lich defeat");
     director.Reset();
     check(director.Snapshot().selectedEnemy == EnemyKind::Skeleton &&
           director.Snapshot().encounters[0].resetGeneration == 1,
@@ -279,6 +280,7 @@ int main()
     LichEncounter lich;
     lich.Update(0.05f, -33.7f, -15.2f, true, false);
     check(lich.Snapshot().phase == LichPhase::Dormant, "lich must remain dormant before finale activation");
+    lich.ImportCombatCheckpoint();
     const float maintainStartX = lich.Snapshot().x;
     const float maintainStartZ = lich.Snapshot().z;
     int repositionFrames = 0;
@@ -326,6 +328,7 @@ int main()
     LichEncounter dyingLich;
     check(!dyingLich.TryAcceptPlayerHit(dyingLich.Snapshot().x, dyingLich.Snapshot().z),
           "dormant lich must reject player hits");
+    dyingLich.ImportCombatCheckpoint();
     dyingLich.Update(0.01f, dyingLich.Snapshot().x, dyingLich.Snapshot().z, true, true);
     const float closeHitX = dyingLich.Snapshot().x;
     const float closeHitZ = dyingLich.Snapshot().z;
@@ -402,7 +405,7 @@ int main()
           dyingLich.Snapshot().finaleEndingPhase == FinaleEndingPhase::Inactive,
           "encounter reset must restore health, lockout, recoil, and all finale progression");
 
-    lich.Reset();
+    lich.ImportCombatCheckpoint();
     bool sawVisibleDamage = false;
     float minY = lich.Snapshot().y;
     float maxY = lich.Snapshot().y;
@@ -420,24 +423,91 @@ int main()
     check(maxY - minY > 0.05f, "active lich must visibly hover");
 
     LichEncounter chestCollisionLich;
-    bool lichEnteredChest = false;
+    chestCollisionLich.ImportCombatCheckpoint();
+    bool lichEnteredFinaleProp = false;
     constexpr float lichCollisionRadius = 0.34f;
     const RouteRect chestWithLichClearance{
         kRewardChestCollisionRect.minX - lichCollisionRadius,
         kRewardChestCollisionRect.maxX + lichCollisionRadius,
         kRewardChestCollisionRect.minZ - lichCollisionRadius,
         kRewardChestCollisionRect.maxZ + lichCollisionRadius};
+    bool keeperStuckNearFinaleProps = false;
+    int stationaryNearPropFrames = 0;
+    float previousKeeperX = chestCollisionLich.Snapshot().x;
+    float previousKeeperZ = chestCollisionLich.Snapshot().z;
     for (int i = 0; i < 3600; ++i)
     {
         const auto& snapshot = chestCollisionLich.Update(
             1.0f / 60.0f, -36.40f, -15.15f, true, true);
-        lichEnteredChest = lichEnteredChest ||
+        lichEnteredFinaleProp = lichEnteredFinaleProp ||
             Contains(chestWithLichClearance, snapshot.x, snapshot.z);
+        bool nearFinaleProp = Contains(chestWithLichClearance, snapshot.x, snapshot.z);
+        for (const RouteRect& stand : kKeeperTorchStandCollisionRects)
+        {
+            const RouteRect expandedStand{
+                stand.minX - lichCollisionRadius,
+                stand.maxX + lichCollisionRadius,
+                stand.minZ - lichCollisionRadius,
+                stand.maxZ + lichCollisionRadius};
+            const RouteRect nearStand{
+                expandedStand.minX - 0.20f,
+                expandedStand.maxX + 0.20f,
+                expandedStand.minZ - 0.20f,
+                expandedStand.maxZ + 0.20f};
+            nearFinaleProp = nearFinaleProp || Contains(nearStand, snapshot.x, snapshot.z);
+            lichEnteredFinaleProp = lichEnteredFinaleProp || Contains(expandedStand, snapshot.x, snapshot.z);
+        }
+        if (std::hypot(snapshot.x - previousKeeperX, snapshot.z - previousKeeperZ) <= 0.00001f &&
+            nearFinaleProp)
+        {
+            ++stationaryNearPropFrames;
+            keeperStuckNearFinaleProps = keeperStuckNearFinaleProps ||
+                stationaryNearPropFrames >= 30;
+        }
+        else
+        {
+            stationaryNearPropFrames = 0;
+        }
+        previousKeeperX = snapshot.x;
+        previousKeeperZ = snapshot.z;
     }
-    check(!lichEnteredChest,
-          "the moving lich must respect the reward chest's physical footprint");
+    check(!lichEnteredFinaleProp,
+          "the moving Keeper must respect the reward chest and both stand footprints");
+    check(!keeperStuckNearFinaleProps,
+          "the moving Keeper must slide and recover near the rear chest/stand spacing");
 
-    lich.Reset();
+    // The Keeper is a moving encounter actor with a slightly larger body
+    // clearance than the player. Exercise its real fixed-step orbit/charge/
+    // recovery steering near each flank torch and verify every published pose.
+    bool keeperEnteredStand = false;
+    constexpr float keeperCollisionRadius = 0.34f;
+    for (const RouteRect& stand : kKeeperTorchStandCollisionRects)
+    {
+        const RouteRect standWithKeeperClearance{
+            stand.minX - keeperCollisionRadius,
+            stand.maxX + keeperCollisionRadius,
+            stand.minZ - keeperCollisionRadius,
+            stand.maxZ + keeperCollisionRadius};
+        for (float playerX = -36.40f; playerX <= -30.90f; playerX += 0.50f)
+        {
+            for (float playerZ = -17.90f; playerZ <= -12.50f; playerZ += 0.50f)
+            {
+                LichEncounter standCollisionLich;
+                standCollisionLich.ImportCombatCheckpoint();
+                for (int i = 0; i < 600; ++i)
+                {
+                    const auto& snapshot = standCollisionLich.Update(
+                        1.0f / 60.0f, playerX, playerZ, true, true);
+                    keeperEnteredStand = keeperEnteredStand ||
+                        Contains(standWithKeeperClearance, snapshot.x, snapshot.z);
+                }
+            }
+        }
+    }
+    check(!keeperEnteredStand,
+          "real Keeper orbit, charge, and recovery movement must respect both stand bases across the finale");
+
+    lich.ImportCombatCheckpoint();
     bool sawOccludedDamage = false;
     for (int i = 0; i < 400; ++i)
     {
@@ -445,7 +515,7 @@ int main()
             lich.Update(0.01f, -33.7f, -15.2f, false, true).damagePulse;
     }
     check(!sawOccludedDamage, "occluded staff charge must not damage player");
-    lich.Reset();
+    lich.ImportCombatCheckpoint();
     bool sawOutOfRangeDamage = false;
     for (int i = 0; i < 100; ++i)
     {

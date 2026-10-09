@@ -1,0 +1,626 @@
+{
+  "schema": 1,
+  "sourceCommit": "406777388e01cb702fff4475e2aa18ddb14a0353",
+  "sourceTree": "823ad707f8d7c2afe15011fef5c50d1fcd564800",
+  "androidDebug": {
+    "sha256": "51fbde779f52e972d9520a8dccfa6b7c1b2526d324c9cc2a7dd6681d7c89f577",
+    "bytes": 138462962,
+    "installedBaseSha256": "51fbde779f52e972d9520a8dccfa6b7c1b2526d324c9cc2a7dd6681d7c89f577",
+    "benchmarkTimingMotion": "Off"
+  },
+  "windowsDebug": {
+    "sha256": "cd789e49b2b0b710cd9566b9edce3f5529ed898718859b2c81f324b9d3a8118e",
+    "bytes": 11572224,
+    "buildPassed": true,
+    "physicalUIReview": false
+  },
+  "defaults": {
+    "android": {
+      "scale": 50,
+      "water": "Mobile",
+      "fire": "Mobile",
+      "glass": false,
+      "shadow": "Current",
+      "cap": 30,
+      "mist": true,
+      "dust": "Off"
+    },
+    "desktop": {
+      "scale": 100,
+      "water": "High",
+      "fire": "High",
+      "glass": true,
+      "shadow": "Current",
+      "cap": 30,
+      "mist": true,
+      "dust": "Off"
+    }
+  },
+  "ordinaryManualExperimentalChoices": [
+    33,
+    40
+  ],
+  "outputAndUiResolutionUnchanged": true,
+  "checks": {
+    "java": {
+      "suites": 38,
+      "tests": 252,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "lintDebug": true,
+    "fourAbiDebugBuild": true,
+    "windowsDebugBuild": true,
+    "elf16KiB": [
+      {
+        "file": "lib/arm64-v8a/libhorde_rt_probe_android.so",
+        "PT_LOAD_alignments": [
+          16384,
+          16384,
+          16384
+        ],
+        "sha256": "64c26367db014d95bccc3f211ed0b068bece7faa1dee4321c3ac3fcab7521bb0"
+      },
+      {
+        "file": "lib/armeabi-v7a/libhorde_rt_probe_android.so",
+        "PT_LOAD_alignments": [
+          16384,
+          16384,
+          16384
+        ],
+        "sha256": "15452aaf3a1c5df7a065536b433a12b2596928a1d12788a218f42f650657bf5f"
+      },
+      {
+        "file": "lib/x86/libhorde_rt_probe_android.so",
+        "PT_LOAD_alignments": [
+          16384,
+          16384,
+          16384
+        ],
+        "sha256": "68f7da3e30b899ca27e862f11ec0444c5661daec5719f848d38d1d40b54a1ff4"
+      },
+      {
+        "file": "lib/x86_64/libhorde_rt_probe_android.so",
+        "PT_LOAD_alignments": [
+          16384,
+          16384,
+          16384
+        ],
+        "sha256": "c3aec0407e07061f8a75524a134e9f1934176648f787f2ca4164ddd60295544e"
+      }
+    ],
+    "zip16KiBAlignment": true,
+    "unchangedRuntimeAssetCount": 94,
+    "changedRuntimeAssets": 0,
+    "affectedHostSuitesPassed": [
+      "graphics_settings",
+      "graphics_scale_min33",
+      "graphics_scale_legacy50",
+      "graphics_preview",
+      "graphics_windows_persistence",
+      "desktop_controller_input",
+      "windows_glass_graphics_contract"
+    ],
+    "actualCMakeAdmissionMatrixPassed": true
+  },
+  "device": {
+    "model": "SM-S948B",
+    "android": "16",
+    "backend": "RayTracingPipeline",
+    "evidenceClass": "exact normal Debug install, owned native menu choices and ACK/Restore",
+    "observedPreviewAckThenRestoreScales": [
+      33,
+      40
+    ],
+    "savedBeforeAfter": {
+      "scale": 50,
+      "water": "Mobile",
+      "fire": "Mobile",
+      "glass": true,
+      "shadow": "Current",
+      "mist": true,
+      "dust": "Low",
+      "cap": 30
+    },
+    "confirmedGraphicsUnchanged": true,
+    "pendingFalse": true,
+    "installSettingsAndMenuMixByteIdentical": true,
+    "afterPreviewMenuMixByteIdentical": true,
+    "automatedSessionStopped": true,
+    "entryReopenedForOwnerManualPlay": true,
+    "performanceMeasured": false,
+    "physicalComputeCheckForThisApk": false
+  },
+  "runtimeCI": {
+    "aggregatePassed": 12,
+    "aggregateTotal": 12,
+    "pushRun": 37835135971,
+    "pullRequestRun": 37835142352
+  },
+  "retainedFailures": [
+    "First RED runner used wrong CWD and matched no tests; corrected RED run has3 expected admission failures.",
+    "First host command named non-existent Windows target; corrected target builds.",
+    "New scale fixture expected corrupted101 to clamp50; corrected to established100 upper clamp, two failed suites rerun pass.",
+    "Details deliberately disabled during Keep/Restore confirmation; no touch",
+    "Settings BACK offscreen after successful restored50 verification; no touch; owned app stopped and entry reopened"
+  ],
+  "limits": [
+    "No sustained FPS, thermal plateau, power or memory claim",
+    "No new ordinary-play owner quality decision yet",
+    "No new physical controller matrix, Windows appearance or audio/haptic pass",
+    "No upscaler implemented; any temporal-upscaling proposal needs a bounded decision"
+  ],
+  "assets": [
+    {
+      "file": "assets/ASSET_LICENSES.md",
+      "bytes": 39474,
+      "sha256": "eba19cce05e30d0a4346695708cafd49c109453fcc663b0d347aaaafac47e159"
+    },
+    {
+      "file": "assets/LICENSE",
+      "bytes": 1084,
+      "sha256": "92fb459d916765a0b3f725ff881b3821423aa504af6db1ff38130a26b0bce700"
+    },
+    {
+      "file": "assets/LICENSE_SCOPE.md",
+      "bytes": 4998,
+      "sha256": "61b716ffefcbfeb9f833d3f6b315f1ad0dcef7fa2eb7f47118425b0ab28f6c6a"
+    },
+    {
+      "file": "assets/THIRD_PARTY_NOTICES/cgltf-LICENSE.txt",
+      "bytes": 1073,
+      "sha256": "49aa274374181a398d96848be001e1773b6929119e4dd9600c4a281012171154"
+    },
+    {
+      "file": "assets/audio/filmcow/enemy_fall.wav",
+      "bytes": 184964,
+      "sha256": "be5bb75fd09a4d24313a32b23d70a92d3c7ab81b5b838231be17fa92e952b217"
+    },
+    {
+      "file": "assets/audio/filmcow/equipment/asset.manifest.json",
+      "bytes": 1503,
+      "sha256": "b84eeef9402cebc0140996e25a819d8b47a1032b1eb5691fc95a926d09daa28d"
+    },
+    {
+      "file": "assets/audio/filmcow/equipment/sword_draw.wav",
+      "bytes": 41972,
+      "sha256": "a70dcbcf7d627f8ebec641a33c144f64682771c715f0bfc819fd2f8d981713ce"
+    },
+    {
+      "file": "assets/audio/filmcow/equipment/sword_sheath.wav",
+      "bytes": 67558,
+      "sha256": "0f38fe0560c91aa1b97de84a01787d70d490832f727684ca402e9dfcf4ff2aaf"
+    },
+    {
+      "file": "assets/audio/filmcow/lich_charge.wav",
+      "bytes": 115166,
+      "sha256": "37d8fc97f20a64737970459d3cbcb6f6d1894e730dc0b7f6021c535492f4cf30"
+    },
+    {
+      "file": "assets/audio/filmcow/lich_fall.wav",
+      "bytes": 119688,
+      "sha256": "b953f591c317a00b687073e78d0328fbdd3994c4eae34e77c0ec6a20ce1c520a"
+    },
+    {
+      "file": "assets/audio/filmcow/lich_hurt.wav",
+      "bytes": 24218,
+      "sha256": "020be6ff7e8bfd14aa946ee72e31f4a66230097e23fba98b0ddf5bf4672e8488"
+    },
+    {
+      "file": "assets/audio/filmcow/lich_impact.wav",
+      "bytes": 131984,
+      "sha256": "5e7672daa9a7248d022756faf2998221c3cbc6ab4a4193114f66e080bfdd83f0"
+    },
+    {
+      "file": "assets/audio/filmcow/menu_toggle.wav",
+      "bytes": 71640,
+      "sha256": "9d511866154c859d3250229a9cbc03948e57afab833a2dd68bbd25b61bb27e08"
+    },
+    {
+      "file": "assets/audio/filmcow/player_step_1.wav",
+      "bytes": 49172,
+      "sha256": "cdaaa9c321e6f4fbf12757fdc20633d4b8f0be30b127038d3cfe0581a8dea0fb"
+    },
+    {
+      "file": "assets/audio/filmcow/player_step_2.wav",
+      "bytes": 32146,
+      "sha256": "261413fb6c185f9e7038a980fc7b124ef9bc7f6f93b258ed83d1d76eb7b9883e"
+    },
+    {
+      "file": "assets/audio/filmcow/skeleton_attack.wav",
+      "bytes": 143684,
+      "sha256": "81eabe7c1bb196f1df5876419a85348128df2d864f79857c18849091218df11e"
+    },
+    {
+      "file": "assets/audio/filmcow/skeleton_step_1.wav",
+      "bytes": 50584,
+      "sha256": "78ede28cebbad2b61e8a373c45d072ab719fb69a3cf103e57ea7c926c06c176e"
+    },
+    {
+      "file": "assets/audio/filmcow/skeleton_step_2.wav",
+      "bytes": 52210,
+      "sha256": "e4a080064fdccd821096d9b42dcb312f0fb40ac8227242999b904602a4786122"
+    },
+    {
+      "file": "assets/audio/filmcow/sword_hit_1.wav",
+      "bytes": 54870,
+      "sha256": "11ba4ca02139ed59bbb71b901603314fe3772e29827a8b368f463fd33f8ab76f"
+    },
+    {
+      "file": "assets/audio/filmcow/sword_hit_2.wav",
+      "bytes": 59462,
+      "sha256": "372c2f83656c7fe6b1098c9fe1565cd43f0c42a5fa927d3d8deb3a562d7ed57b"
+    },
+    {
+      "file": "assets/audio/filmcow/sword_swing_1.wav",
+      "bytes": 38782,
+      "sha256": "1007af0e6b21cbfea341032e55c7944b4fdd097f55979679840c77745f3db267"
+    },
+    {
+      "file": "assets/audio/filmcow/sword_swing_2.wav",
+      "bytes": 44712,
+      "sha256": "ded16a59e6760342cc90c0e7fedacbd061ce1c661f6226ecb63ad98ebd672bf3"
+    },
+    {
+      "file": "assets/audio/filmcow/ui_back.wav",
+      "bytes": 32364,
+      "sha256": "b26df842011ae1813ce4d2129a099e1db449f56325fa1b2770f3380c160c219e"
+    },
+    {
+      "file": "assets/audio/filmcow/ui_select.wav",
+      "bytes": 36878,
+      "sha256": "37483938d3d68e6309e881e1d32bb976e2744743f3869b0bca7a8b6e217e1f33"
+    },
+    {
+      "file": "assets/audio/menu/asset.manifest.json",
+      "bytes": 4668,
+      "sha256": "4a99707ffccde3acdf1ad1758f4f189e24bd00ecc5c999b2fd7e34d077a62289"
+    },
+    {
+      "file": "assets/audio/menu/menu_chain.wav",
+      "bytes": 96044,
+      "sha256": "cb53cefe152ea118fdee6cf6c9beedd3e516a483041a7832981489a7eb04697f"
+    },
+    {
+      "file": "assets/audio/menu/menu_room.wav",
+      "bytes": 384044,
+      "sha256": "9aa9a9631f7dbaf724ecd46bfbbea17142af20497299a83db08055751c7cc361"
+    },
+    {
+      "file": "assets/audio/music/what-the-dark-keeps/asset.manifest.json",
+      "bytes": 5099,
+      "sha256": "672f2321b2fb429cffe9d61119103a1aa3565f355391a162497f741eec9d6e29"
+    },
+    {
+      "file": "assets/audio/music/what-the-dark-keeps/runtime/A-body.wav",
+      "bytes": 2304044,
+      "sha256": "8c6201afb7129775ded6696c5819f4e592202d1b0f33f755b9d4f408f2e81556"
+    },
+    {
+      "file": "assets/audio/music/what-the-dark-keeps/runtime/A-tail.wav",
+      "bytes": 576044,
+      "sha256": "a7459fc656b1520be5fad2b9e11cec314d62cdf0164abdb2fda53d619d7b962c"
+    },
+    {
+      "file": "assets/audio/music/what-the-dark-keeps/runtime/B-body.wav",
+      "bytes": 2304044,
+      "sha256": "27944d203f9453b7ff9edb2bfd653bac524d4da4db4a000f76115fb4810dd3b5"
+    },
+    {
+      "file": "assets/audio/music/what-the-dark-keeps/runtime/B-tail.wav",
+      "bytes": 576044,
+      "sha256": "7a437a4641f4b99d8b21db934ece9bb3a9c4d0464fea37eb94a2841d70f3132f"
+    },
+    {
+      "file": "assets/audio/music/what-the-dark-keeps/runtime/C-body.wav",
+      "bytes": 576044,
+      "sha256": "3ce3a8ea381c3e81c0b34841df3f1d8d236a5ef335f594001553a400b65accb3"
+    },
+    {
+      "file": "assets/audio/music/what-the-dark-keeps/runtime/C-tail.wav",
+      "bytes": 576044,
+      "sha256": "ec3650bd450cebe9985c1d4d4b59749debe34301f9f9e889171d0e49a316c89c"
+    },
+    {
+      "file": "assets/audio/music/what-the-dark-keeps/runtime/D-body.wav",
+      "bytes": 2304044,
+      "sha256": "4398311b5870e614ffe611950264e370cf819f8d323aafe291816f38e36bf4c6"
+    },
+    {
+      "file": "assets/audio/music/what-the-dark-keeps/runtime/D-tail.wav",
+      "bytes": 576044,
+      "sha256": "14550157b1a3fbf44f3d1a4dda424223475a7a0a9975b0361687bb2031f7ec50"
+    },
+    {
+      "file": "assets/audio/music/what-the-dark-keeps/runtime/E-body.wav",
+      "bytes": 2304044,
+      "sha256": "ddeb175cb27a3bf1e3ee1e0677a2bf6fb8c2fe8c6fd62a68e32c19bc06378f03"
+    },
+    {
+      "file": "assets/audio/music/what-the-dark-keeps/runtime/E-tail.wav",
+      "bytes": 576044,
+      "sha256": "0ed95cbf3d301692c5fb9909a681df7c6d3bd6716d6dd8af6638b3bc761fc2a2"
+    },
+    {
+      "file": "assets/audio/music/what-the-dark-keeps/runtime/F-body.wav",
+      "bytes": 2304044,
+      "sha256": "158f015c3ffbb12169eb088206751f56fbed799e0b3dea3ab4496124634b441d"
+    },
+    {
+      "file": "assets/audio/music/what-the-dark-keeps/runtime/F-tail.wav",
+      "bytes": 576044,
+      "sha256": "a4fdc4b38c8a1e7240cfad5ac364063ec8c6f27f9baefc2d2e6110a8a4429c21"
+    },
+    {
+      "file": "assets/audio/music/what-the-dark-keeps/runtime/G-body.wav",
+      "bytes": 1152044,
+      "sha256": "ab2dbe31c735cbeec11d09eaa308e5faee793a891c34b67f5f50f6b33af25736"
+    },
+    {
+      "file": "assets/audio/music/what-the-dark-keeps/runtime/G-tail.wav",
+      "bytes": 576044,
+      "sha256": "c51b9851ac32e34c57e586f154d3ee1d5f2d138b9c0f21b2c983618905a42609"
+    },
+    {
+      "file": "assets/audio/music/what-the-dark-keeps/runtime/H-body.wav",
+      "bytes": 2304044,
+      "sha256": "58ac260bd18204e9fb1aeb01aab9229de6830032f1d4be3d30b9527fde1fe6ae"
+    },
+    {
+      "file": "assets/audio/music/what-the-dark-keeps/runtime/H-tail.wav",
+      "bytes": 576044,
+      "sha256": "9e50268573d85733333e10304a0e9faf8d23545e510723035aef1b9d8b0238bf"
+    },
+    {
+      "file": "assets/audio/pixabay/chest_open.wav",
+      "bytes": 479276,
+      "sha256": "788b1c31c504c8eea9e5316c87859013aba6a49f205e0e4a66b181aafbdfb4a6"
+    },
+    {
+      "file": "assets/audio/pixabay/chest_unlock.wav",
+      "bytes": 36908,
+      "sha256": "a1dae01adb6534a2e1504f0d5bc41abff0305e619264dff0339577d4d5b2d808"
+    },
+    {
+      "file": "assets/audio/pixabay/keeper-asset.manifest.json",
+      "bytes": 4447,
+      "sha256": "17b5ccbc1e7c9f0d369624c13219201a52997ec1cd753f31c3760ab16755ab1d"
+    },
+    {
+      "file": "assets/audio/pixabay/keeper_come_closer.wav",
+      "bytes": 275418,
+      "sha256": "7a79e79aa4ebee4920d11f28f9ca140ac1e22b3c5cec2352ee159e0ba117a719"
+    },
+    {
+      "file": "assets/audio/pixabay/keeper_i_sense_you.wav",
+      "bytes": 248684,
+      "sha256": "b476d7c672cbfce30a38c02f31978d0024f16c658ce2fd8cb716cbf91a994418"
+    },
+    {
+      "file": "assets/audio/pixabay/skeleton_falling_bones.wav",
+      "bytes": 193964,
+      "sha256": "66ee82dcab110f14ff7685eb60fa3b0caed32765c6b07f8b654433cd5c97efc9"
+    },
+    {
+      "file": "assets/audio/pixabay/skeleton_idle_rattle.wav",
+      "bytes": 120044,
+      "sha256": "8ac138628c744ab3a3df130abb415b11803145063932b4e6956414d010b504ea"
+    },
+    {
+      "file": "assets/audio/pixabay/torch_extinguish.wav",
+      "bytes": 100268,
+      "sha256": "ef2e85d4219cce2e5789d6326755909f59e302bd26bc2dbd8f3e39c270614ab8"
+    },
+    {
+      "file": "assets/audio/pixabay/waterfall-core.manifest.json",
+      "bytes": 1384,
+      "sha256": "3ae7492f4703314b67c96383a745a0e885128d2332ff9e0aaace58e20310078c"
+    },
+    {
+      "file": "assets/audio/pixabay/waterfall_core_loop.wav",
+      "bytes": 2208044,
+      "sha256": "5bb82801f0cff75c56f07993fad128bf1dee2a9876d032c808b8033a135fbad3"
+    },
+    {
+      "file": "assets/models/enemies/meshy/lich_placeholder_merged_animations_v01.glb",
+      "bytes": 14940452,
+      "sha256": "049979a83aca55358f54af8d3af1f7d518607bef634474a4ef015bfdff947a42"
+    },
+    {
+      "file": "assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb",
+      "bytes": 31568152,
+      "sha256": "340a8a354bd57a8167da84fc26ccdfe03c5ef536195e260cd27c24e0059de6db"
+    },
+    {
+      "file": "assets/models/player/runtime/asset.manifest.json",
+      "bytes": 1582,
+      "sha256": "556f8b4f4f7509ee9cb6d8350d5bb79dd430a7544d923d88051794f18ab61141"
+    },
+    {
+      "file": "assets/models/player/runtime/clip-manifest.json",
+      "bytes": 1011,
+      "sha256": "1f8075bd1ff97010685172176535482f2b6fc262cc0f5c1daf63e5e8222f648d"
+    },
+    {
+      "file": "assets/models/player/runtime/gothic-traveller-lod0.runtime.glb",
+      "bytes": 2568508,
+      "sha256": "46a88dac9dd569117be5a17a35540fecf3e0e6026d3ad404dd5fdbc85a9ad54f"
+    },
+    {
+      "file": "assets/models/player/viewmodel/runtime/asset.manifest.json",
+      "bytes": 1009,
+      "sha256": "7dd3749f9e4153eace88dd849a20ab344f89ebbc111d27c35dde44476b86cd28"
+    },
+    {
+      "file": "assets/models/player/viewmodel/runtime/gothic-traveller-viewmodel.runtime.glb",
+      "bytes": 1228828,
+      "sha256": "eaa0db3abb8ff2dae616247054c190031a08c542dd95396cc6dc1e18a7462488"
+    },
+    {
+      "file": "assets/models/props/runtime/asset.manifest.json",
+      "bytes": 706,
+      "sha256": "b96c47284c0de4197f69836aafe25f4c307b724fcd5b29b34d3010ce9e8f733f"
+    },
+    {
+      "file": "assets/models/props/runtime/dielectric-fixture/asset.manifest.json",
+      "bytes": 517,
+      "sha256": "65a7cc8c20506541f0b04165de6117868e201a95a500571c826bef27a8f4ad20"
+    },
+    {
+      "file": "assets/models/props/runtime/dielectric-fixture/closed-glass-lod0.runtime.glb",
+      "bytes": 1848,
+      "sha256": "843fd245da61352a124e3de03f4ccf01923a293afedee2ed73b65a8a18eebf5b"
+    },
+    {
+      "file": "assets/models/props/runtime/gothic-chest-base/asset.manifest.json",
+      "bytes": 758,
+      "sha256": "4c187fa4b45eca1001137027d38e0cd20f86927b0ffb9ca3bc12905c55c892a2"
+    },
+    {
+      "file": "assets/models/props/runtime/gothic-chest-base/gothic-chest-base-lod0.runtime.glb",
+      "bytes": 288856,
+      "sha256": "b65e6e5c5e8c69ea4695c16e0085bdaa0209f5f963bc0af75eda5174354a04f2"
+    },
+    {
+      "file": "assets/models/props/runtime/gothic-chest-lid/asset.manifest.json",
+      "bytes": 702,
+      "sha256": "22c0701f4b1402c616cd56f6996ab0b4d2ad2d5979d204797d52dc540e887efb"
+    },
+    {
+      "file": "assets/models/props/runtime/gothic-chest-lid/gothic-chest-lid-lod0.runtime.glb",
+      "bytes": 208204,
+      "sha256": "cd0db348fad0939197f36a02e14f87abd15e7284c6701b1db1e679c8f7af03e2"
+    },
+    {
+      "file": "assets/models/props/runtime/gothic-hand-torch-lod0.runtime.glb",
+      "bytes": 280040,
+      "sha256": "b1a2078c78d54dae548b89e20168c9922c7dfe33851d47f3d98e7ff1e7c14b8d"
+    },
+    {
+      "file": "assets/models/props/runtime/player-rag-torch/asset.manifest.json",
+      "bytes": 830,
+      "sha256": "5316b2072008da441024cda1153f725f5afcd7d366f3a5b89dece98ec74617aa"
+    },
+    {
+      "file": "assets/models/props/runtime/player-rag-torch/rag-torch-player-lod0.runtime.glb",
+      "bytes": 267672,
+      "sha256": "476cb05a8f11f1af917a0cfa29610cc03f23522478a366f6cf2cf49b906db74d"
+    },
+    {
+      "file": "assets/models/props/runtime/player-sword-scabbard/asset.manifest.json",
+      "bytes": 758,
+      "sha256": "75e030f75e5dea9baa1732ce7efed67a1dd40e79c7203a2319d3f0e08044319e"
+    },
+    {
+      "file": "assets/models/props/runtime/player-sword-scabbard/player-sword-scabbard-lod0.runtime.glb",
+      "bytes": 15128,
+      "sha256": "d23c2b0711f53ce7608e68945ee7c38dd4eb1dc06ad5e33e58acc26c5bc0eaf5"
+    },
+    {
+      "file": "assets/models/props/runtime/player-sword-scabbard/processing-receipt.json",
+      "bytes": 10052,
+      "sha256": "3d257b3cd2cfcd4f169ae962ef86e28d8b252351a1fbccd29a06d03d35e56541"
+    },
+    {
+      "file": "assets/models/props/runtime/reward-lantern-body/asset.manifest.json",
+      "bytes": 1115,
+      "sha256": "3c6352dc4fb1680e3aa3684294008bbbb189295ca1d5b8145c0f23e704c55e35"
+    },
+    {
+      "file": "assets/models/props/runtime/reward-lantern-body/reward-lantern-body-lod0.runtime.glb",
+      "bytes": 658308,
+      "sha256": "34a2522f2027d3fb04b77480cc929d36c5a19c6e0f33bf3fa0f0ae0959c99ec4"
+    },
+    {
+      "file": "assets/models/props/runtime/reward-lantern-ring/asset.manifest.json",
+      "bytes": 713,
+      "sha256": "c4f840ec9375628a6638ecaefaeff8868ecb0578c519589c48680c5726515860"
+    },
+    {
+      "file": "assets/models/props/runtime/reward-lantern-ring/reward-lantern-ring-lod0.runtime.glb",
+      "bytes": 76716,
+      "sha256": "75bf4f0d7c64c67848f08f1b2fb5b802527160c79def7f71ca964bdcf72799f5"
+    },
+    {
+      "file": "assets/models/weapons/runtime/asset.manifest.json",
+      "bytes": 695,
+      "sha256": "c6203d4af94a74f317c826d6821f2b12c5b3e2316f3c2de58ef4f76a444ac980"
+    },
+    {
+      "file": "assets/models/weapons/runtime/gothic-arming-sword-rh-lod0.runtime.glb",
+      "bytes": 621220,
+      "sha256": "477ff6c53c4b407bc16e9e84d16aaf47dc72131b812debf2b92d0ab2fcfab5c1"
+    },
+    {
+      "file": "assets/models/world/runtime/collapsed-entry/asset.manifest.json",
+      "bytes": 742,
+      "sha256": "952e1920fbc60646154d0424556c2935a18e7cf882866a9fe9f4f45ef38be623"
+    },
+    {
+      "file": "assets/models/world/runtime/collapsed-entry/collapsed-entry-lod0.runtime.glb",
+      "bytes": 652980,
+      "sha256": "c67471b522c92f354d9a5880dea6e48b4f22b5095207841c35c95b5cfc75c4d4"
+    },
+    {
+      "file": "assets/textures/environment/runtime/asset.manifest.json",
+      "bytes": 1497,
+      "sha256": "a5d000dee15f75b53869324474a5a71619f575678d2098fe07dbbea190eee0d8"
+    },
+    {
+      "file": "assets/textures/environment/runtime/night-storm.android.ktx2",
+      "bytes": 80128,
+      "sha256": "f833b77867e7b3c01659f5e9ef38834e4a0e5b967cd077023157eb682feb7cec"
+    },
+    {
+      "file": "assets/textures/meshy/lich_placeholder_v01/base-color-2048-astc6x6.ktx2",
+      "bytes": 1871648,
+      "sha256": "dc2cfb44f7929c4d85f3a85b3785296da9db607f04b727d64eafc85b47283e46"
+    },
+    {
+      "file": "assets/textures/meshy/lich_placeholder_v01/emissive-2048-astc6x6.ktx2",
+      "bytes": 1871648,
+      "sha256": "679e84d1b7797414aeaafe3268ebac756f734e3546e399b94ec5bec69d354f13"
+    },
+    {
+      "file": "assets/textures/polyhaven/mobile_1k/arm-array-512-astc6x6.ktx2",
+      "bytes": 591904,
+      "sha256": "63fc20bf503a676a56c83ee1d530451619624aa54078de6370240888cd1eb44d"
+    },
+    {
+      "file": "assets/textures/polyhaven/mobile_1k/diff-array-512-astc6x6.ktx2",
+      "bytes": 591904,
+      "sha256": "6333b5cd2ce594115e116b5ec676262ce77d578ea7a1147612f430bfcd10c73a"
+    },
+    {
+      "file": "assets/textures/polyhaven/mobile_1k/normal-array-512-astc4x4.ktx2",
+      "bytes": 1310944,
+      "sha256": "0223134ecdd64d9b897cb38c80bb5f9c86720910aaff917d6005be9ea77048bb"
+    },
+    {
+      "file": "assets/textures/props/runtime/asset.manifest.json",
+      "bytes": 12356,
+      "sha256": "d01d4be1c68b24c340fe930e23cf0af3197a00f93e86c98010f5fc38d45f619e"
+    },
+    {
+      "file": "assets/textures/props/runtime/base-color.android.ktx2",
+      "bytes": 8768496,
+      "sha256": "8ec835e988441ab533b77cc25ac9f2dbd83e91a36f614c0cdbed21a035e7c856"
+    },
+    {
+      "file": "assets/textures/props/runtime/emissive.android.ktx2",
+      "bytes": 626752,
+      "sha256": "da5ee0baa4e6b84280a1b9ae077954c4658a4e7fff1da03212d220d282f9542a"
+    },
+    {
+      "file": "assets/textures/props/runtime/normal.android.ktx2",
+      "bytes": 19574256,
+      "sha256": "8b830b88a95b8a3eedbbb7555c5ef61046bd3280730fd25dc817b217decfdf3c"
+    },
+    {
+      "file": "assets/textures/props/runtime/orm.android.ktx2",
+      "bytes": 8768496,
+      "sha256": "81ef2a8bb533d27f5609a6e36852a7c5d31a9d51a4b7ccf6d1622a31ba0d8744"
+    }
+  ]
+}

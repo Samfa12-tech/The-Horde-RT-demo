@@ -46,8 +46,42 @@ try {
     }
 
     $definition = Get-Content -LiteralPath (Join-Path $repoRoot "src\vulkan\raytracing\RtSceneAbi.def") -Raw | ConvertFrom-Json
-    if ($definition.schema -ne 1 -or $definition.bindings.dielectricDiagnostics -ne 22) {
-        throw "RT scene ABI schema/binding-22 contract changed."
+    $capacityCpu = Get-Content -LiteralPath $portableCpuPath -Raw
+    if ($definition.capacities.instanceMetadata -ne 24 -or $definition.capacities.tlasInstances -ne 26 -or
+        $definition.capacities.staticAssets -ne 12 -or
+        $capacityCpu -notmatch 'kRtTlasInstanceCapacity = 26u;' -or
+        $capacityCpu -notmatch 'kRtInstanceMetadataCapacity = 24u;' -or
+        $capacityCpu -notmatch 'kRtStaticAssetCapacity = 12u;' -or
+        $capacityCpu -notmatch 'kRtActiveFireEmitterCapacity = 4u;' -or
+        $capacityCpu -notmatch 'kRtFireEmitterCapacity = 4u;') {
+        throw 'Generated owners must distinguish26 TLAS instances from24 metadata records, admit12 generic static assets, and retain four fire storage records.'
+    }
+    foreach ($case in @(
+        @{ name = 'tlasInstances'; value = 21 },
+        @{ name = 'tlasInstances'; value = 257 },
+        @{ name = 'tlasInstances'; value = 24.5 },
+        @{ name = 'tlasInstances'; value = '24' },
+        @{ name = 'staticAssets'; value = 0 },
+        @{ name = 'activeFireEmitters'; value = 5 }
+    )) {
+        $invalidCapacity = Get-Content -LiteralPath $lfDefinitionPath -Raw | ConvertFrom-Json
+        $invalidCapacity.capacities.($case.name) = $case.value
+        $invalidCapacityPath = Join-Path $temporaryRoot 'invalid-capacity.def'
+        $invalidCapacity | ConvertTo-Json -Depth 32 | Set-Content -LiteralPath $invalidCapacityPath
+        $capacityRejected = $false
+        try {
+            & (Join-Path $repoRoot 'tools/generate-rt-scene-abi.ps1') -DefinitionPath $invalidCapacityPath `
+                -CpuOutputPath $portableCpuPath -GlslOutputPath $portableGlslPath
+        } catch {
+            if ($_.Exception.Message -notmatch '^RT scene ABI (capacity|owner capacities)') { throw }
+            $capacityRejected = $true
+        }
+        if (-not $capacityRejected) { throw 'Invalid physical owner/fire capacity was admitted.' }
+    }
+    if ($definition.schema -ne 1 -or $definition.bindings.dielectricDiagnostics -ne 22 -or
+        $definition.bindings.environmentTexture -ne 25 -or
+        $generatedGlsl -notmatch 'binding = 25\) uniform sampler2D rtEnvironmentTexture;') {
+        throw "RT scene ABI schema/binding22/environment25 contract changed."
     }
     $diagnosticRecord = @($definition.records | Where-Object name -eq 'RtDielectricDiagnostics')
     if ($diagnosticRecord.Count -ne 1 -or $diagnosticRecord[0].size -ne 176 -or

@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Horde 1.6.2 Graphics — owner review prototype</title>
+<style>
+:root{color-scheme:dark;--iron:#181b1d;--slate:#24272a;--ink:#f2e9d8;--muted:#aab4b8;--amber:#e0aa4c}
+*{box-sizing:border-box}body{margin:0;background:#101213;color:var(--ink);font:16px/1.45 "Segoe UI",sans-serif}
+main{max-width:1200px;margin:auto;padding:24px}header{display:flex;justify-content:space-between;align-items:center;gap:20px;margin-bottom:20px}
+h1{font-size:25px;font-weight:600;margin:0}small,p{color:var(--muted)}header small{max-width:420px}section{background:var(--slate);padding:20px;border:1px solid #465056;border-radius:3px}
+.columns{display:grid;grid-template-columns:minmax(350px,1fr) minmax(350px,1.2fr);gap:20px}.stack>*+*{margin-top:14px}
+label{display:block;margin-bottom:8px}input{width:100%;accent-color:var(--amber)}button,select{background:var(--iron);color:var(--ink);border:1px solid #667279;border-radius:2px;min-height:42px;padding:8px 12px;font:inherit;cursor:pointer}
+button:hover{border-color:var(--amber)}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--amber);outline-offset:3px}button:disabled{opacity:.45;cursor:default}.row{display:flex;gap:10px}.row>*{flex:1}.primary{background:#433824;border-color:var(--amber)}.notice{border-left:3px solid var(--amber);padding-left:12px;color:var(--ink)}
+.viewport{height:260px;display:flex;align-items:center;justify-content:center;text-align:center;background:#121517;border:1px dashed #617077;color:var(--muted);padding:24px}.viewport p{max-width:330px}
+.telemetry{font-size:14px}dl{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin:10px 0}dd{margin:0;text-align:right;color:var(--muted)}.history{height:76px;display:flex;align-items:flex-end;gap:3px;padding:10px 0;border-bottom:1px solid #617077}.history i{width:8px;background:#96a8ad;height:30px}.history i.transition{background:var(--amber);height:60px}.muted{font-size:13px;color:var(--muted)}footer{margin-top:20px;color:var(--muted)}
+@media(max-width:780px){main{padding:14px}.columns{grid-template-columns:1fr}header{align-items:flex-start;flex-direction:column}.viewport{height:220px}}
+</style>
+<main>
+<header><h1>Graphics</h1><small>UI prototype for owner review. It runs no renderer and supplies no measured performance or visual acceptance evidence.</small></header>
+<div class="columns">
+<section class="stack">
+<label>Preset <select id="preset"><option>Accepted baseline</option><option>Reduced effects</option><option>Custom</option></select></label>
+<label>Requested internal scale: <strong id="scaleText">100%</strong><input id="scale" type="range" min="50" max="100" value="100"></label>
+<div class="row"><label>Water <select id="water"><option>Off</option><option>Mobile</option><option selected>High</option></select></label><label>Fire detail <select id="fire"><option>Mobile — 4 steps</option><option selected>High — 10 steps</option></select></label></div>
+<p>Effective resolution and backend are unavailable in this UI prototype. The native page reads actual renderer dimensions after presentation.</p>
+<p>Physical glass follows the compiled optical profile. Mobile builds omit panes; High builds retain physical panes. Water and fire choices are independent.</p>
+<p>Cost: not yet measured for this candidate. Changing fire detail preserves light strength.</p>
+<div class="row"><button class="primary" id="apply">Apply draft</button><button id="keep" disabled>Keep</button><button id="revert">Revert</button></div>
+<div class="row"><button id="reset">Reset graphics draft</button><button id="back">Back</button></div>
+<p class="notice" id="status" aria-live="polite">Draft edits leave saved graphics unchanged. Apply requires an RT-produced presentation in the native application.</p>
+</section>
+<section class="stack">
+<div class="viewport"><p>The native production RT viewport appears here. Authored preview composition needs an actual RTX capture and owner acceptance; this prototype substitutes no scene art.</p></div>
+<div class="row"><button id="pause">Pause preview</button><select aria-label="Preview view" id="camera"><option>Overview</option><option>Materials</option><option>Glass</option><option>Water</option><option>Skeleton</option><option>Mirror</option></select></div>
+<div class="row"><button id="motion">Motion test: off</button><button id="timeline">Reset preview timeline</button></div>
+<div class="telemetry"><strong>Preview scene performance</strong> · cap 30 Hz
+<dl><dt>RT successful presents/s</dt><dd>Unavailable</dd><dt>Loop interval</dt><dd>Unavailable</dd><dt>CPU render call</dt><dd>Unavailable</dd><dt>GPU work</dt><dd>Unavailable</dd><dt>Tracked scene allocations</dt><dd>Unavailable</dd></dl>
+<div class="history" aria-label="Illustrative history layout, not measurements"><i></i><i></i><i></i><i></i><i class="transition"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+<p class="muted">Illustrative graph layout. Native history retains unsmoothed loop intervals; amber marks transitions. Allocation categories may overlap. Budget/residency are unavailable. Successful swapchain presentations are not scanout FPS. Preview performance does not predict sustained full-game performance.</p></div>
+</section>
+</div>
+<footer>Iron/slate surfaces · restrained amber focus and confirmation · native implementation retains keyboard/controller navigation and DPI scaling. Audio, touch, lifecycle and rendered visual acceptance remain open.</footer>
+</main>
+<script>
+const by=id=>document.getElementById(id);let saved={scale:100,water:2,fire:1},pending=null,deadline=0;
+const draft=()=>({scale:+by('scale').value,water:by('water').selectedIndex,fire:by('fire').selectedIndex});
+function show(value){by('scale').value=value.scale;by('water').selectedIndex=value.water;by('fire').selectedIndex=value.fire;by('scaleText').textContent=value.scale+'%';by('preset').selectedIndex=value.scale===100&&value.water===2&&value.fire===1?0:value.scale===100&&value.water===1&&value.fire===0?1:2}
+function status(text){by('status').textContent=text}
+function revert(){pending=null;by('keep').disabled=true;show(saved);status('Last confirmed draft restored in this UI prototype.')}
+for(const id of ['scale','water','fire'])by(id).addEventListener('input',()=>{show(draft());status('Graphics draft changed. Saved selection remains unchanged.')});
+by('preset').onchange=()=>{if(by('preset').selectedIndex<2)show(by('preset').selectedIndex===0?{scale:100,water:2,fire:1}:{scale:100,water:1,fire:0})};
+by('reset').onclick=()=>{show({scale:100,water:2,fire:1});status('Accepted baseline staged. Apply and Keep are required to save.')};
+by('apply').onclick=()=>{pending=draft();deadline=Date.now()+15000;by('keep').disabled=false;status('Prototype confirmation state. Native Keep becomes available only after an RT-produced frame succeeds.')};
+by('keep').onclick=()=>{if(pending){saved=pending;pending=null;by('keep').disabled=true;status('Selection confirmed in prototype memory. No native preferences were written.')}};
+by('revert').onclick=revert;by('back').onclick=()=>{revert();status('Back restores the confirmed selection before leaving Graphics in the native application.')};
+by('pause').onclick=()=>by('pause').textContent=by('pause').textContent==='Pause preview'?'Resume preview':'Pause preview';
+by('motion').onclick=()=>by('motion').textContent=by('motion').textContent.endsWith('off')?'Motion test: on':'Motion test: off';
+by('timeline').onclick=()=>status('Prototype reset action. Native reset starts a deterministic preview timeline and a fresh performance scope.');
+let lastTick=Date.now();setInterval(()=>{const now=Date.now();if(document.hidden&&pending)deadline+=now-lastTick;lastTick=now;if(pending&&now>=deadline)revert()},100);
+</script></html>

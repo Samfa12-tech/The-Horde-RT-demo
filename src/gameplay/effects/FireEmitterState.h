@@ -11,7 +11,7 @@ namespace horde::gameplay::effects
 {
 
 inline constexpr std::size_t kFireEmitterCapacity = 4u;
-inline constexpr std::size_t kActiveFireEmitterCapacity = 2u;
+inline constexpr std::size_t kActiveFireEmitterCapacity = 4u;
 
 enum class FireEmitterParentObject : std::uint32_t
 {
@@ -76,6 +76,7 @@ struct FireEmitterCheckpoint
 };
 
 FireEmitterState MakeOpeningTorchFireEmitter();
+FireEmitterState MakeWorldTorchFireEmitter(std::uint32_t stableId, std::uint32_t seed);
 void ResetFireEmitter(FireEmitterState& state);
 void StepFireEmitterFixed(FireEmitterState& state,
                           const FireEmitterFixedStepInput& input,

@@ -1,0 +1,13 @@
+# Low fire and independent shadow investigation
+
+This is the bounded investigation outcome, not an implemented quality tier or a measured saving. Existing Mobile/High fire choices and whole Authored/Max workloads remain truthful. No default, emitter energy, camera, render scale or shading path was reduced.
+
+The shared volume integrator uses Mobile four integration steps/one reflected-fire budget and High ten/two. Showcase already includes an eight-triangle physical emissive torch core in its existing BLAS, decoded through the shared emitter state. Compact preview currently lacks that appended core. The imported reward lantern core still uses authored material emission. Simply disabling volume would therefore remove the preview flame and could leave the lantern visibly bright after its shared light fades. That does not meet the requested mesh/flame/light/glass/reflection coherence.
+
+A safe future Low implementation needs a generic shared-emitter core path for Showcase, compact preview and reward lantern before it can suppress volumetric integration, smoke and embers. It must retain genuine finite hardware RT light visibility, extinction, ordered transmission and reflected emissive hits. Historical primitive-specific colours and separately phased flame/light flicker are unsuitable for restoration. No historical FPS is admitted as a saving for this unimplemented path.
+
+Independent shadow quality also requires a distinct setting and benchmark identity. High+Max currently uses four contributing primary local/fire samples; Mobile+Max uses two; primary sky uses two and secondary visibility stays one. Max also changes other workload terms, including mist. Its cost is not isolated shadow cost. Primary water-interface lighting has a separate bounded policy and must not be silently included in the opaque-primary sample claim.
+
+The existing push constants consume Vulkan's required minimum 128-byte capacity. A bounded proposed encoding is `preset + (shadowChoice << 2)` in the current integral workload field, retaining existing default bytes. This requires validated CPU encoding and decoding before every GLSL workload comparison, plus all shader/catalog/admission checks and separate phone/RTX quality-cost evidence. Adding an unreviewed field or reusing an unrelated material slot would be unsafe.
+
+These findings disposition the agreed investigation. Low fire and a separately exposed shadow selector remain implementation choices for owner review, with no performance promise or working-menu claim. Existing High+Max remains available with its whole-workload label. Parallax, optional vendor upscalers, detail normals and LOD experiments retain their existing deferrals.

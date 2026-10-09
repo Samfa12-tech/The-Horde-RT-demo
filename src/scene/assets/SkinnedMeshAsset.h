@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <memory>
+#include <span>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -87,10 +88,12 @@ struct SkinnedArmIkTarget
     // Bounded [0, pi/4] allowance when fitting an overreaching chain. The
     // existing maximum axial stretch still takes precedence over this pose.
     float preferredElbowFlexionRadians = 0.0f;
+    float poseWeight = 1.0f;
 };
 
 struct SkinnedPlayerSockets
 {
+    SkinnedNodeTransform hips{};
     SkinnedNodeTransform leftHand{};
     SkinnedNodeTransform rightHand{};
     SkinnedNodeTransform leftGrip{};
@@ -158,6 +161,12 @@ public:
                                float& minimumY,
                                std::string& diagnostic) const;
     bool HasNode(std::string_view name) const;
+    static constexpr std::size_t kMaximumNodeTransformBatchSize = 32u;
+    bool NodeTransforms(SkinnedClip clip,
+                        float timeSeconds,
+                        std::span<const std::string_view> nodeNames,
+                        std::span<SkinnedNodeTransform> outputs,
+                        std::string& diagnostic) const;
     bool NodeTransform(SkinnedClip clip,
                        float timeSeconds,
                        std::string_view nodeName,

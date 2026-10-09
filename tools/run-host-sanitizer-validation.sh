@@ -5,6 +5,8 @@ set -euo pipefail
 hordeBuild=build/host-sanitizer-ci
 hordeFlags='-O1 -g -fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer'
 hordeTargets=(
+  horde_rt_retirement_owner_tests
+  horde_rt_pipeline_cache_seed_tests
   pocket_audio_native_pcm_tests
   horde_rt_simulation_timing_tests
   horde_rt_simulation_gameplay_tests

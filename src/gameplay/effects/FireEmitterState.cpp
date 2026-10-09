@@ -115,6 +115,19 @@ FireEmitterState MakeOpeningTorchFireEmitter()
     return {};
 }
 
+FireEmitterState MakeWorldTorchFireEmitter(const std::uint32_t stableId,
+                                         const std::uint32_t seed)
+{
+    FireEmitterState state = MakeOpeningTorchFireEmitter();
+    state.stableId = stableId;
+    state.seed = seed;
+    state.parentObject = FireEmitterParentObject::WorldObject;
+    state.strength = 0.0f;
+    state.zone = ShowcaseZone::Finale;
+    SanitizeAuthoredState(state);
+    return state;
+}
+
 void ResetFireEmitter(FireEmitterState& state)
 {
     const std::uint32_t stableId = state.stableId;

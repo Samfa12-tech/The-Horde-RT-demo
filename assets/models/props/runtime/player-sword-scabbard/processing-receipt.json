@@ -1,0 +1,250 @@
+{
+  "schema": 1,
+  "status": "candidate-review-pending",
+  "provenance": {
+    "geometry": "Original assistant-authored Blender sheath mesh authored locally from measured production sword bounds; no external mesh, paid generation, or third-party input.",
+    "maps": "Deterministic original procedural PBR maps from tools/generate-sword-scabbard-textures.py; packed in the authoring .blend by tools/author-player-sword-scabbard.py.",
+    "licenceStatus": "No blanket MIT, CC0, Meshy, or other licence assigned; applicable user/service rights remain unchanged."
+  },
+  "source": {
+    "blend": {
+      "path": "assets/models/props/source/player-sword-scabbard/player-sword-scabbard.blend",
+      "bytes": 2610404,
+      "sha256": "f16ab39377a9bda664878e1622f29650bfe5df32dd1045949e023faa3d29eb8e"
+    },
+    "glb": {
+      "path": "assets/models/props/source/player-sword-scabbard/player-sword-scabbard-lod0.glb",
+      "bytes": 15128,
+      "sha256": "d23c2b0711f53ce7608e68945ee7c38dd4eb1dc06ad5e33e58acc26c5bc0eaf5"
+    },
+    "maps": [
+      {
+        "path": "assets/textures/props/source/sword-scabbard/sword-scabbard-base-color.png",
+        "bytes": 988231,
+        "sha256": "a7c90b55592d3f5aad5cdcf85d44cd85ac9d3811b7f0daf8ac5f151f6733e1a9"
+      },
+      {
+        "path": "assets/textures/props/source/sword-scabbard/sword-scabbard-normal.png",
+        "bytes": 1523006,
+        "sha256": "ee42bf70f0873d1f5cf8aaac2b0d913af96ed8cc754e18b5ed4826374fade835"
+      },
+      {
+        "path": "assets/textures/props/source/sword-scabbard/sword-scabbard-orm.png",
+        "bytes": 5352,
+        "sha256": "45123bcaf49892f3943ed6c61e09dc030772f6ef18d1f174026a588ad1a2594e"
+      },
+      {
+        "path": "assets/textures/props/source/sword-scabbard/sword-scabbard-roughness.png",
+        "bytes": 3167,
+        "sha256": "dbff460786e1328b5f03a7d1246d49e9468380f171943f95d7b6d0b3c7a7e2cb"
+      },
+      {
+        "path": "assets/textures/props/source/sword-scabbard/sword-scabbard-metallic.png",
+        "bytes": 3159,
+        "sha256": "ea882fb1b475b2318a80266d2f12d7d0c390f49ff5f8a0097730b731fec34ad3"
+      }
+    ]
+  },
+  "runtime": {
+    "glb": {
+      "path": "assets/models/props/runtime/player-sword-scabbard/player-sword-scabbard-lod0.runtime.glb",
+      "bytes": 15128,
+      "sha256": "d23c2b0711f53ce7608e68945ee7c38dd4eb1dc06ad5e33e58acc26c5bc0eaf5"
+    },
+    "geometry": {
+      "vertices": 220,
+      "indices": 912,
+      "triangles": 304,
+      "primitives": 1,
+      "materials": 1,
+      "maxAttributes": 4
+    },
+    "runtimeValidator": {
+      "version": "2.0.0-dev.3.10",
+      "errors": 0,
+      "warnings": 0,
+      "hints": 0
+    },
+    "material": "One generic static-PBR material; atlas layer 13 LeatherIron; base color, tangent normal, ORM; no emissive texture.",
+    "atlasManifest": {
+      "path": "assets/textures/props/runtime/asset.manifest.json",
+      "bytes": 12356,
+      "sha256": "d01d4be1c68b24c340fe930e23cf0af3197a00f93e86c98010f5fc38d45f619e"
+    },
+    "textureArrays": {
+      "base-color.windows.ktx2": {
+        "path": "assets/textures/props/runtime/base-color.windows.ktx2",
+        "bytes": 78294160,
+        "sha256": "849103d8a02c3f947549eb4c5cdebe40d6f671522d68a28af16264a5e25caa8b"
+      },
+      "base-color.android.ktx2": {
+        "path": "assets/textures/props/runtime/base-color.android.ktx2",
+        "bytes": 8768496,
+        "sha256": "8ec835e988441ab533b77cc25ac9f2dbd83e91a36f614c0cdbed21a035e7c856"
+      },
+      "normal.windows.ktx2": {
+        "path": "assets/textures/props/runtime/normal.windows.ktx2",
+        "bytes": 78294160,
+        "sha256": "ebbc7dfae582c0efe91c37f9ab9108d33aecacdc88071d797b37e55b42601c65"
+      },
+      "normal.android.ktx2": {
+        "path": "assets/textures/props/runtime/normal.android.ktx2",
+        "bytes": 19574256,
+        "sha256": "8b830b88a95b8a3eedbbb7555c5ef61046bd3280730fd25dc817b217decfdf3c"
+      },
+      "orm.windows.ktx2": {
+        "path": "assets/textures/props/runtime/orm.windows.ktx2",
+        "bytes": 78294160,
+        "sha256": "43b10b4f1684ce3269ebedf096d426b679d12e442d5567c2f02b99d619720e82"
+      },
+      "orm.android.ktx2": {
+        "path": "assets/textures/props/runtime/orm.android.ktx2",
+        "bytes": 8768496,
+        "sha256": "81ef2a8bb533d27f5609a6e36852a7c5d31a9d51a4b7ccf6d1622a31ba0d8744"
+      }
+    },
+    "atlasGrowthReceipt": {
+      "externalReceipt": "../rag-torch-intake-20261007/atlas/growth-receipt.json",
+      "sha256": "1e2727239f86674a5ac1f742fc7eb6644d3e31a84e0ba86b36d238eca875b791",
+      "beforeLayers": 13,
+      "afterLayers": 14,
+      "resolution": 1024,
+      "mipLevels": 11,
+      "platformBudgets": {
+        "windows": {
+          "containerGrowthBytes": 16777212,
+          "mipPayloadGrowthBytes": 16777212,
+          "beforeMipPayloadBytes": 223696160,
+          "afterMipPayloadBytes": 240473372
+        },
+        "android": {
+          "containerGrowthBytes": 2650704,
+          "mipPayloadGrowthBytes": 2650704,
+          "beforeMipPayloadBytes": 35085440,
+          "afterMipPayloadBytes": 37736144
+        }
+      },
+      "allExistingLayerMipPayloadsByteIdentical": true,
+      "emissiveArraysByteIdentical": true
+    }
+  },
+  "engine": {
+    "route": "Generic static PBR; appended static asset index 11, metadata23, TLAS instance25. Existing asset and physical indices remain stable.",
+    "bodyAttachment": "One Hips-derived scabbard world transform; standard primary, shadow, and reflection TLAS masks. Same sword mesh remains the sole held sword instance and follows the shared hand-to-Hips transform blend.",
+    "activation": "Sword stow production flags remain false.",
+    "additionalFixedBufferBytes": {
+      "instanceMetadata": 32,
+      "tlasInstance": 64,
+      "primitiveMetadata": 16,
+      "material": 128,
+      "staticVertexRecords": 14080,
+      "staticIndexRecords": 3648
+    },
+    "gpuBlasAllocation": "Not measured; no driver/GPU build or runtime capture is claimed."
+  },
+  "processing": {
+    "pipeline": "tools/author-player-sword-scabbard.py; Blender 5.2 glTF export; tools/run-gltf-validator.mjs; tools/validate-dielectric-topology.py; existing 14-layer prop atlas reused without texture rebuild",
+    "runtimeResolution": 1024,
+    "androidFormats": {
+      "baseColor": "ASTC_6x6_SRGB_BLOCK",
+      "normal": "ASTC_4x4_UNORM_BLOCK",
+      "orm": "ASTC_6x6_UNORM_BLOCK"
+    },
+    "windowsFormats": {
+      "baseColor": "R8G8B8A8_SRGB",
+      "normal": "R8G8B8A8_UNORM",
+      "orm": "R8G8B8A8_UNORM"
+    },
+    "decimation": "Not applied: authored source is 304 triangles, within 400-triangle budget."
+  },
+  "costDisclosure": {
+    "encodedRuntimeArrayGrowthBytes": {
+      "windows": 16777212,
+      "android": 2650704
+    },
+    "formatDerivedMipPayloadGrowthBytes": {
+      "windows": 16777212,
+      "android": 2650704
+    },
+    "windowsFullBaseNormalOrmArraysBytes": 234882480,
+    "androidFullBaseNormalOrmArraysBytes": 37111248,
+    "disclosure": "Full 14-layer arrays are packaged. Growth is the cost of one new layer across base/normal/ORM; these are encoded and format-derived mip bytes, not measured GPU allocation, residency, or performance."
+  },
+  "acceptanceGaps": [
+    "No rendered visual, Vulkan driver, GPU residency/performance, Android device, route playtest, or owner acceptance is claimed.",
+    "The weapon has been checked in 25 Idle and 25 Walking sampled poses, but continuous animation-time contact and route obstruction testing remain open; the shared stow production flags remain false.",
+    "The offline nearest surface gap is a sampled witness, not an exhaustive continuous or edge-edge separation proof."
+  ],
+  "geometryValidation": {
+    "axisCorrection": "Original Blender mesh long axis changed from +Y to +Z so Blender glTF export produces runtime +Y. The runtime mesh node has identity TRS; no compensating transform. UV layout, source PNGs, material, atlas layers, and triangle/vertex counts are unchanged.",
+    "runtimeBoundsMetres": {
+      "min": [
+        -0.044,
+        0.3,
+        -0.0225
+      ],
+      "max": [
+        0.044,
+        1.074,
+        0.0225
+      ]
+    },
+    "khronosValidator": {
+      "version": "2.0.0-dev.3.10",
+      "sourceErrors": 0,
+      "sourceWarnings": 0,
+      "runtimeErrors": 0,
+      "runtimeWarnings": 0
+    },
+    "offlineFullMeshBodyCheck": {
+      "tool": "Blender 5.2 headless --disable-autoexec",
+      "clips": [
+        "Idle",
+        "Walking"
+      ],
+      "samplesPerClip": 25,
+      "bodyTriangles": 27815,
+      "swordTriangles": 11499,
+      "scabbardTriangles": 304,
+      "runtimeHipsSampling": "GLTF node/accessor sampling with SkinnedMeshAsset time wrapping, linear vector interpolation and normalized-linear quaternion interpolation; PlayerRenderSlot axes orthonormalization",
+      "triangleOverlapPairs": {
+        "idle": 0,
+        "walking": 0
+      },
+      "minimumGroundClearanceMetres": {
+        "idle": 0.1751895,
+        "walking": 0.1218895
+      },
+      "minimumGapTo1p35mCeilingMetres": {
+        "idle": 1.1622758,
+        "walking": 1.1525546
+      },
+      "minimumGapTo0p82mCeilingPlaneMetres": {
+        "idle": 0.6322758,
+        "walking": 0.6225546
+      },
+      "minimumSampledBodySurfaceGapMetres": {
+        "idle": 0.1195867,
+        "walking": 0.0202677
+      },
+      "walkingClosestSampleWitness": {
+        "clip": "Walking",
+        "frame": 5,
+        "weaponSample": 9697,
+        "bodyTriangle": 17297,
+        "distanceMetres": 0.02026774175465107,
+        "weaponPointModel": [
+          -0.1831514984,
+          -0.0168865807,
+          -0.2890741825
+        ],
+        "bodyPointModel": [
+          -0.1653055549,
+          -0.00777372299,
+          -0.2860312462
+        ]
+      },
+      "limitations": "No triangle intersections were found at sampled poses. Nearest distance is a witnessed upper bound from vertex/triangle-centroid and body-vertex BVH queries, not exhaustive edge-edge minimum separation; no runtime GPU, device, or owner visual acceptance is claimed."
+    }
+  }
+}

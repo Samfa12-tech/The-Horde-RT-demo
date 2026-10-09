@@ -214,6 +214,8 @@ int main()
     owner.Reset();
 
     bool started = false;
+    bool releaseCancelledExchange = false;
+    bool cancellationObserved = false;
     unsigned slowAttempt = 0u;
     WindowsPlaytestExchange slow = [&](const std::string_view request,
         const std::chrono::steady_clock::time_point, const HANDLE cancellationEvent) {
@@ -225,8 +227,14 @@ int main()
         if (slowAttempt == 1u)
         {
             lock.unlock();
-            WaitForSingleObject(cancellationEvent, 2000u);
+            const DWORD cancellationResult = WaitForSingleObject(cancellationEvent, 2000u);
             lock.lock();
+            cancellationObserved = cancellationResult == WAIT_OBJECT_0;
+            wake.notify_all();
+            // Hold the transport explicitly so the main thread can observe
+            // outstanding ownership. Scheduler speed must not decide whether
+            // this supposedly in-flight exchange has already drained.
+            wake.wait_for(lock, std::chrono::seconds(2), [&] { return releaseCancelledExchange; });
             return WindowsPlaytestHttpResponse{202,
                 "{\"ok\":true,\"id\":\"random_report_8f21\",\"status\":\"accepted\"}"};
         }
@@ -236,11 +244,23 @@ int main()
     Check(cancelled.Begin(nullptr, frozen, "fresh-token-two"), "cancellable attempt starts");
     {
         std::unique_lock lock(mutex);
-        wake.wait_for(lock, std::chrono::seconds(1), [&] { return started; });
+        Check(wake.wait_for(lock, std::chrono::seconds(1), [&] { return started; }),
+            "cancellable transport entered the held exchange before cancellation");
     }
+    const auto cancelStart = std::chrono::steady_clock::now();
     cancelled.CancelAttempt();
+    const auto cancelElapsed = std::chrono::steady_clock::now() - cancelStart;
+    Check(cancelElapsed < std::chrono::milliseconds(120), "cancel signals within 120 ms without waiting for transport drain");
     Check(cancelled.ReportId() == id && cancelled.IsBusy(),
         "cancel is nonblocking and keeps frozen report ID until exchange drains");
+    Check(!cancelled.CanRetry(), "retry cannot overlap a cancelled transport that still owns the frozen request");
+    {
+        std::unique_lock lock(mutex);
+        Check(wake.wait_for(lock, std::chrono::seconds(1), [&] { return cancellationObserved; }),
+            "held exchange actually observed the cancellation event");
+        releaseCancelledExchange = true;
+        wake.notify_all();
+    }
     Check(WaitIdle(cancelled) && cancelled.CanRetry() &&
         cancelled.LastResult() == WindowsPlaytestSubmissionResult::Uncertain,
         "cancelled late acceptance is suppressed and remains retryable with same identity");

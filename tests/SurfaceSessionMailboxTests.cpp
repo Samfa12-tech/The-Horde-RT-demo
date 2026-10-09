@@ -84,8 +84,95 @@ struct FakeWindow
 
 using Mailbox = SurfaceSessionMailbox<FakeWindow>;
 constexpr auto kWaitLimit = std::chrono::seconds(3);
+constexpr auto kParkObservation = std::chrono::milliseconds(25);
 static_assert(!std::is_copy_constructible_v<FakeWindow>);
 static_assert(std::is_move_constructible_v<FakeWindow>);
+
+struct AsyncWaiters
+{
+    explicit AsyncWaiters(Mailbox& mailbox, const std::uint64_t generation)
+    {
+        render = std::thread([this, &mailbox, generation]
+        {
+            {
+                std::lock_guard lock(mutex);
+                renderEntered = true;
+            }
+            changed.notify_all();
+            mailbox.WaitWhileSuspended(generation);
+            {
+                std::lock_guard lock(mutex);
+                renderReturned = true;
+            }
+            changed.notify_all();
+        });
+        taker = std::thread([this, &mailbox]
+        {
+            {
+                std::lock_guard lock(mutex);
+                takeEntered = true;
+            }
+            changed.notify_all();
+            auto action = mailbox.Take();
+            {
+                std::lock_guard lock(mutex);
+                takeReturned = true;
+                takeHadAction = action.has_value();
+                takeHadRequest = action && action->request.has_value();
+                takeGeneration = action ? action->generation : 0u;
+            }
+            changed.notify_all();
+        });
+    }
+
+    bool WaitUntilParked()
+    {
+        std::unique_lock lock(mutex);
+        const bool entered = changed.wait_for(lock, kWaitLimit, [&] {
+            return renderEntered && takeEntered;
+        });
+        if (!entered) return false;
+        changed.wait_for(lock, kParkObservation, [&] { return renderReturned || takeReturned; });
+        return !renderReturned && !takeReturned;
+    }
+
+    bool WaitUntilReturned()
+    {
+        std::unique_lock lock(mutex);
+        return changed.wait_for(lock, kWaitLimit, [&] { return renderReturned && takeReturned; });
+    }
+
+    bool WaitUntilRenderReturned()
+    {
+        std::unique_lock lock(mutex);
+        return changed.wait_for(lock, kWaitLimit, [&] { return renderReturned; });
+    }
+
+    bool TakeRemainsBlocked()
+    {
+        std::unique_lock lock(mutex);
+        changed.wait_for(lock, kParkObservation, [&] { return takeReturned; });
+        return !takeReturned;
+    }
+
+    void Join()
+    {
+        if (render.joinable()) render.join();
+        if (taker.joinable()) taker.join();
+    }
+
+    std::mutex mutex;
+    std::condition_variable changed;
+    bool renderEntered = false;
+    bool renderReturned = false;
+    bool takeEntered = false;
+    bool takeReturned = false;
+    bool takeHadAction = false;
+    bool takeHadRequest = false;
+    std::uint64_t takeGeneration = 0u;
+    std::thread render;
+    std::thread taker;
+};
 
 void TestPendingSupersededAndLatestWins()
 {
@@ -289,6 +376,179 @@ void TestCloseWakesTake()
     taker.join();
     Check(takeReturned, "Close causes Take to return no action");
 }
+
+void TestColdPendingGenerationCanBeSuspended()
+{
+    auto ledger = std::make_shared<ReleaseLedger>();
+    Mailbox mailbox;
+    const auto generation = mailbox.Start(FakeWindow{ledger, 9});
+    Check(generation != 0 && mailbox.SetSuspended(generation, true),
+          "pending cold generation can be suspended");
+    Check(mailbox.IsSuspended(generation) && mailbox.State(generation) == 0u,
+          "cold suspension preserves starting status");
+
+    auto action = mailbox.Take();
+    Check(action && action->generation == generation && action->request && action->request->id == 9,
+          "suspension does not prevent native owner from taking its lifecycle action");
+    AsyncWaiters waiters(mailbox, generation);
+    Check(waiters.WaitUntilParked(), "render waiter parks on a suspended cold generation");
+    Check(mailbox.SetSuspended(generation, false), "cold generation can resume");
+    const bool renderReturned = waiters.WaitUntilRenderReturned();
+    Check(waiters.TakeRemainsBlocked(), "resume does not wake Take with a lifecycle action");
+    mailbox.Close();
+    const bool allReturned = waiters.WaitUntilReturned();
+    if (!allReturned) mailbox.Close();
+    waiters.Join();
+    Check(renderReturned && allReturned, "resume releases render; Close releases the still-blocked Take");
+    {
+        std::lock_guard lock(waiters.mutex);
+        Check(!waiters.takeHadAction && waiters.takeGeneration == 0u,
+              "suspend/resume creates no extra lifecycle action");
+    }
+    action.reset();
+    mailbox.Close();
+    Check(ledger->Count(9) == 1, "cold request ownership still releases exactly once");
+}
+
+void TestSameGenerationSuspendResumePreservesPresentedState()
+{
+    auto ledger = std::make_shared<ReleaseLedger>();
+    Mailbox mailbox;
+    const auto generation = mailbox.Start(FakeWindow{ledger, 10});
+    auto action = mailbox.Take();
+    Check(action && mailbox.Publish(generation, 1u), "active generation publishes presented state");
+    Check(mailbox.SetSuspended(generation, true) && mailbox.IsSuspended(generation),
+          "current presented generation suspends");
+
+    AsyncWaiters waiters(mailbox, generation);
+    Check(waiters.WaitUntilParked(), "render waiter and native owner Take waiter park");
+    Check(mailbox.State(generation) == 1u && mailbox.State() == 1u,
+          "suspension preserves same-generation presented status");
+    Check(mailbox.SetSuspended(generation, false), "same generation resumes without replacement");
+    const bool renderReturned = waiters.WaitUntilRenderReturned();
+    const bool takeStillBlocked = waiters.TakeRemainsBlocked();
+    Check(renderReturned && takeStillBlocked, "resume wakes render but creates no Take action");
+    {
+        std::lock_guard lock(waiters.mutex);
+        Check(!waiters.takeHadAction && waiters.takeGeneration == 0u,
+              "suspend and resume do not enqueue a native owner action");
+    }
+    Check(mailbox.IsCurrent(generation) && !mailbox.IsSuspended(generation) &&
+          mailbox.State(generation) == 1u,
+          "resume keeps the generation and its presented status intact");
+    Check(mailbox.Stop(generation), "presented generation stops after resume");
+    const bool allReturned = waiters.WaitUntilReturned();
+    if (!allReturned) mailbox.Close();
+    waiters.Join();
+    Check(allReturned, "Stop wakes the still-blocked Take waiter");
+    {
+        std::lock_guard lock(waiters.mutex);
+        Check(waiters.takeHadAction && !waiters.takeHadRequest &&
+              waiters.takeGeneration != generation && mailbox.State() == 0u,
+          "only Stop produces the next empty lifecycle action and clears readiness");
+    }
+    action.reset();
+    mailbox.Close();
+    Check(ledger->Count(10) == 1, "presented request ownership releases exactly once");
+}
+
+void TestStaleGenerationCannotResumeReplacement()
+{
+    auto ledger = std::make_shared<ReleaseLedger>();
+    Mailbox mailbox;
+    const auto oldGeneration = mailbox.Start(FakeWindow{ledger, 11});
+    auto oldAction = mailbox.Take();
+    Check(mailbox.Stop(oldGeneration), "old generation stops before replacement");
+    auto stopAction = mailbox.Take();
+    const auto newGeneration = mailbox.Start(FakeWindow{ledger, 12});
+    auto newAction = mailbox.Take();
+    Check(newAction && newAction->generation == newGeneration && newGeneration != oldGeneration,
+          "replacement starts with a distinct current generation");
+    Check(mailbox.Publish(newGeneration, 2u) && mailbox.SetSuspended(newGeneration, true),
+          "replacement publishes status and suspends");
+
+    AsyncWaiters waiters(mailbox, newGeneration);
+    Check(waiters.WaitUntilParked(), "replacement render and Take waiters park");
+    Check(!mailbox.SetSuspended(oldGeneration, false) && mailbox.IsSuspended(newGeneration),
+          "stale old token cannot resume the newer suspended generation");
+    Check(!mailbox.Publish(oldGeneration, 1u) && mailbox.State(newGeneration) == 2u,
+          "stale readiness publication cannot resurrect or overwrite replacement status");
+    Check(mailbox.SetSuspended(newGeneration, false), "current generation resumes normally");
+    const bool renderReturned = waiters.WaitUntilRenderReturned();
+    const bool takeStillBlocked = waiters.TakeRemainsBlocked();
+    Check(renderReturned && takeStillBlocked && mailbox.State(newGeneration) == 2u,
+          "current resume wakes render, preserves status, and creates no Take action");
+    mailbox.Close();
+    const bool allReturned = waiters.WaitUntilReturned();
+    if (!allReturned) mailbox.Close();
+    waiters.Join();
+    Check(allReturned, "Close releases the still-blocked Take waiter");
+    {
+        std::lock_guard lock(waiters.mutex);
+        Check(!waiters.takeHadAction, "stale resume attempt does not create a lifecycle action");
+    }
+    mailbox.Close();
+    oldAction.reset();
+    stopAction.reset();
+    newAction.reset();
+    Check(ledger->Count(11) == 1 && ledger->Count(12) == 1,
+          "replacement request ownership releases exactly once");
+}
+
+enum class WakeAction
+{
+    Stop,
+    Replace,
+    Close,
+};
+
+void TestLifecycleChangeWakesBothWaiters(const WakeAction wakeAction, const char* label, const int newId)
+{
+    auto ledger = std::make_shared<ReleaseLedger>();
+    Mailbox mailbox;
+    const auto generation = mailbox.Start(FakeWindow{ledger, newId});
+    auto action = mailbox.Take();
+    Check(mailbox.SetSuspended(generation, true), "current generation suspends before lifecycle wake test");
+    AsyncWaiters waiters(mailbox, generation);
+    Check(waiters.WaitUntilParked(), "render and Take waiters park before lifecycle change");
+
+    std::uint64_t replacementGeneration = 0u;
+    if (wakeAction == WakeAction::Stop)
+        Check(mailbox.Stop(generation), "Stop cancels the suspended generation");
+    else if (wakeAction == WakeAction::Replace)
+        replacementGeneration = mailbox.Start(FakeWindow{ledger, newId + 100});
+    else
+        mailbox.Close();
+
+    const bool returned = waiters.WaitUntilReturned();
+    if (!returned) mailbox.Close();
+    waiters.Join();
+    Check(returned, label);
+    Check(!mailbox.IsSuspended(generation), "lifecycle change clears current suspension");
+    {
+        std::lock_guard lock(waiters.mutex);
+        if (wakeAction == WakeAction::Close)
+            Check(!waiters.takeHadAction, "Close wakes Take with no action");
+        else
+            Check(waiters.takeHadAction, "Stop or Start wakes Take with a lifecycle action");
+        if (wakeAction == WakeAction::Stop)
+            Check(!waiters.takeHadRequest && waiters.takeGeneration != generation,
+                  "Stop wakes Take with an empty next-generation action");
+        if (wakeAction == WakeAction::Replace)
+            Check(waiters.takeHadRequest && waiters.takeGeneration == replacementGeneration,
+                  "replacement wakes Take with the newest request");
+    }
+    if (wakeAction == WakeAction::Replace)
+    {
+        Check(replacementGeneration != 0u && !mailbox.IsSuspended(replacementGeneration),
+              "Start replacement clears suspension for the new generation");
+    }
+    action.reset();
+    mailbox.Close();
+    Check(ledger->Count(newId) == 1, "old request releases exactly once after lifecycle wake");
+    if (wakeAction == WakeAction::Replace)
+        Check(ledger->Count(newId + 100) == 1, "replacement request releases exactly once");
+}
 }
 
 int main()
@@ -298,5 +558,14 @@ int main()
     TestStaleStatusRejectedAcrossRestart();
     TestBlockedInitializationDoesNotBlockStopOrStart();
     TestCloseWakesTake();
+    TestColdPendingGenerationCanBeSuspended();
+    TestSameGenerationSuspendResumePreservesPresentedState();
+    TestStaleGenerationCannotResumeReplacement();
+    TestLifecycleChangeWakesBothWaiters(WakeAction::Stop,
+        "Stop wakes render and Take waiters", 20);
+    TestLifecycleChangeWakesBothWaiters(WakeAction::Replace,
+        "Start replacement wakes render and Take waiters", 30);
+    TestLifecycleChangeWakesBothWaiters(WakeAction::Close,
+        "Close wakes render and Take waiters", 40);
     return passed ? 0 : 1;
 }

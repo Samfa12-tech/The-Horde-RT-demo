@@ -1,0 +1,103 @@
+{
+  "sourceCommit": "fa5f46a7cf01e2492593dc26ad1c50883ab18280",
+  "sourceTree": "120b9007d2cc6aef4d1a3d43cbf16a8518de6639",
+  "testOnlyFollowup": "45bd4d401e738390e4352bfc16786a5800aee1ac",
+  "apk": {
+    "sha256": "38f5abab55163be0e548a22927a51921dd8d31cd58825838bd6eaf0dff69bf8a",
+    "bytes": 138463040,
+    "installedBaseMatches": true
+  },
+  "windowsExecutable": {
+    "sha256": "822d6a46bf80e651757416c1a75356410d2b3dd92dbad0641ca9f4f90d20fac7",
+    "bytes": 11569664,
+    "newRuntimeListeningCheck": false
+  },
+  "assetRoster": {
+    "entries": 95,
+    "added": [
+      "assets/audio/menu/asset.manifest.json",
+      "assets/audio/menu/menu_chain.wav",
+      "assets/audio/menu/menu_flame.wav",
+      "assets/audio/menu/menu_room.wav"
+    ],
+    "changed": [
+      "assets/ASSET_LICENSES.md"
+    ],
+    "unchanged": 90,
+    "menuHashes": {
+      "assets/audio/menu/menu_chain.wav": "6c85d6c97a21e9de69100b9969dd8f844af927b229ee91bf585c42b4d0ae146d",
+      "assets/audio/menu/asset.manifest.json": "63563578dd68f4f244a3b8f82435fe1517dccb8be19306956c551b1ceb597eca",
+      "assets/audio/menu/menu_flame.wav": "d4f6d11b9c12c4628daeb7624775da64a834a143e643acff0d6b35b8c375c0be",
+      "assets/audio/menu/menu_room.wav": "9aa9a9631f7dbaf724ecd46bfbbea17142af20497299a83db08055751c7cc361"
+    }
+  },
+  "automated": {
+    "java": {
+      "tests": 239,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "javaClasses": 37,
+    "affectedHostTests": 5,
+    "affectedHostSeconds": 9.75,
+    "assetAdmissionCases": 149,
+    "lint": true,
+    "fourAbiDebugBuild": true,
+    "windowsBuild": true,
+    "zipalign16KiB": true
+  },
+  "phone": {
+    "model": "SM-S948B",
+    "android": "16",
+    "backend": "Pipeline",
+    "window": "1440x2980",
+    "rtDispatch": "720x1490",
+    "ordinaryMenuRoute": [
+      "launch",
+      "Settings",
+      "Back",
+      "More",
+      "Back",
+      "Home",
+      "return",
+      "Play",
+      "pause"
+    ],
+    "menuLoopStarts": 4,
+    "chainStarts": 7,
+    "ownedStops": 11,
+    "savedSfxVolume": 0.7,
+    "changedPreferenceEntries": 0,
+    "ownedAppStopped": true,
+    "submittedHandlesOnly": true
+  },
+  "eventsSha256": "77cadf8733257016856c57e8cf44f329cd4ea228463a595984dff62fb6b1944e",
+  "gates": {
+    "ownerListening": "Historical fa5 balance rejected; Settings/More and Play fade accepted. Owner saved Flame0/Room7/Chain21 on exact7e tuning build, then requested flame removal; see tuning-receipt.json.",
+    "windowsAudibleForeground": "pending",
+    "phonePhysicalCompetingFocus": "pending",
+    "seamlessMusicHandover": "deferred",
+    "sustainedPerformance": "pending; no inference from menu logs",
+    "independentAudit": "pending",
+    "releaseApproval": "pending"
+  },
+  "sourceCi": {
+    "originalPush": 37753804182,
+    "originalPr": 37753811742,
+    "aggregateSuccess": 6,
+    "aggregateFailed": 6,
+    "failure": "Stale 26/27 closed-roster count; 93/94 Linux,103/104 MSVC pass; corrected by test-only followup",
+    "correctedPush": 37755429268,
+    "correctedPr": 37755436548,
+    "correctedStatus": "11 success / 1 failed: Android push fails SDK CMake3.22.1 archive unzip before build; PR6/6 success. Both failure logs retained; no product change made to hide the SDK failure."
+  },
+  "ownerFeedback": {
+    "runtime": "fa5f46a7",
+    "navigation": "Settings and More fine",
+    "playFade": "nice",
+    "mix": "Room bed much too loud/white-noise-like; flame and chain difficult to hear",
+    "nextRequest": "Separate live Flame/Room/Chain sliders and Save mix"
+  },
+  "ownerTuningReceipt": "tuning-receipt.json"
+}

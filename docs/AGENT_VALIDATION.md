@@ -41,10 +41,10 @@ tools not provisioned by this compiler lane. This is additive MSVC coverage, not
 a replacement for the separate full Windows tooling/shader gate. Keep that scope
 and the workflow's fail-on-empty-test behaviour explicit in validation reports.
 
-The additive `selected-host-sanitizers` Ubuntu24.04 lane runs the finite15-target
+The additive `selected-host-sanitizers` Ubuntu24.04 lane runs the finite target
 roster in `tools/run-host-sanitizer-validation.sh` with Clang ASan/UBSan on both
 compile and link, frame pointers, fail-fast diagnostics and leak detection. It
-covers shared simulation, animation/grips, physical math, Core/Horde PCM ownership,
+covers context-retirement ownership, shared simulation, animation/grips, physical math, Core/Horde PCM ownership,
 worker/mailbox and consent-bounded reporting contracts. Each required CTest
 registration is selected individually with `--no-tests=error`; a missing fixture
 cannot silently shrink coverage. This is CPU memory/undefined-behavior evidence,

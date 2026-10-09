@@ -1,0 +1,64 @@
+{
+  "source": "7766ea3a992e2e758c5edaaee1b1d753d660c987",
+  "tree": "3710e061fc1ee53099e22fec8465dcf18325d72e",
+  "artifacts": {
+    "apk": {
+      "file": "app-debug.apk",
+      "bytes": 138462962,
+      "sha256": "516f1ace49dedab29ed266a0b1b7ef92e9bcbbc855818be81ce36a492dabb748",
+      "abis": [
+        "arm64-v8a",
+        "armeabi-v7a",
+        "x86",
+        "x86_64"
+      ]
+    },
+    "windowsExe": {
+      "file": "HordeLanternRT.exe",
+      "bytes": 11571712,
+      "sha256": "04ded713f1240e66e0aeb86b88624b20c81afdbafb08b93795f377149751884f"
+    }
+  },
+  "runtimeAssetsUnchanged": 94,
+  "checks": {
+    "androidTests": 243,
+    "androidClasses": 38,
+    "androidFailures": 0,
+    "lintDebug": "pass",
+    "windowsBuild": "pass",
+    "hostTestsPassed": [
+      "horde_rt_simulation_gameplay_tests",
+      "horde_rt_showcase_gameplay_smoke",
+      "horde_rt_desktop_controller_input_tests"
+    ]
+  },
+  "audioHapticManualRevalidationRequired": false,
+  "model": "SM-S948B",
+  "android": "16",
+  "package": "com.samfa12.hordelanternrt.debug",
+  "installedApkPullbackMatches": true,
+  "ownedAppStopped": true,
+  "gamePreferenceFilesChanged": 0,
+  "frameworkPreferenceChange": "Android ActivityThread IDS launch bookkeeping; no game preference keys changed.",
+  "phoneEvidence": {
+    "scope": "Normal Play; three full red hearts; visible TextView text empty; accessible Vitality 3 of 3. Hollow states and future maximum are automated bitmap/HUD evidence, not physical damage or upgrade acceptance.",
+    "rawScreenshotSha256": "f2ee145705afb027222c85bd3100e2297e8ea14963d3e4ee3fdaaaa26076a451",
+    "cropPixels": [
+      48,
+      180,
+      400,
+      360
+    ],
+    "cropSha256": "7809f6d0ed973160e3abc86b02be5d6202798613ddd3266d5ccff979325ef032",
+    "physicalWindowsVisualInspection": "not run for this HUD checkpoint",
+    "physicalScreenReaderSpokenOutput": "not checked"
+  },
+  "runtimeCiSnapshot": {
+    "head": "7766ea3a992e2e758c5edaaee1b1d753d660c987",
+    "counts": {
+      "SUCCESS": 10,
+      "IN_PROGRESS": 2
+    },
+    "jobs": 12
+  }
+}

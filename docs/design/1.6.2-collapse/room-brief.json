@@ -1,0 +1,75 @@
+{
+  "schema": "game-room.room-brief.v1",
+  "roomId": "horde-collapse-162",
+  "family": "gameplay-room",
+  "purpose": "Static blocked former entry with rubble and a dark stair remnant; preserve live forward route and spawn.",
+  "runtimeSurface": "Native Vulkan hardware RT; Android first-class and Windows RTX validation. No baked scene lighting.",
+  "boundsMeters": [
+    3.84,
+    3.15,
+    12.82
+  ],
+  "hero": {
+    "id": "collapse",
+    "role": "Impasse caused by fractured matching masonry and grounded interlocked boulders",
+    "reservedBoundsMeters": [
+      3.7,
+      2.3,
+      2.95
+    ]
+  },
+  "symmetry": {
+    "mode": "none",
+    "order": 1,
+    "appliesTo": [],
+    "exceptions": [
+      "Settled collapse deliberately asymmetric; preserve original corridor walls and gallery."
+    ]
+  },
+  "circulation": {
+    "description": "Live collision remains z<=3.4. Reserve spawn x0/z1.85 plus existing gallery and skeleton space; remnants behind cap are inaccessible.",
+    "minimumClearanceMeters": 1.44
+  },
+  "productionCamera": {
+    "viewport": [
+      960,
+      540
+    ],
+    "location": [
+      0,
+      0.7,
+      1.85
+    ],
+    "target": [
+      0,
+      0.25,
+      4.4
+    ],
+    "verticalFovDegrees": 60
+  },
+  "performanceBudget": {
+    "maxSceneTriangles": 10000,
+    "maxVLowBytes": 2000000,
+    "maxHighTextureBytes": 6000000
+  },
+  "creditBudget": {
+    "maximumCredits": 0,
+    "approvalRequired": true
+  },
+  "environment": {
+    "type": "none",
+    "identity": "",
+    "source": "",
+    "assignmentKey": ""
+  },
+  "artifacts": {
+    "floorPlan": "plans/lower-room.png",
+    "reflectedCeilingPlan": "plans/reflected-ceiling.png",
+    "planMetadata": "plan-metadata.json",
+    "wallElevations": [
+      "plans/rear-elevation.png"
+    ],
+    "visualTarget": "layout-contact-sheet.png",
+    "openingContactSheet": "opening-contact-sheet.png"
+  }
+}

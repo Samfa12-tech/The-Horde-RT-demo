@@ -15,12 +15,14 @@ final class HordeMusicPlayback implements AutoCloseable {
     private static final String TAG = "HordeLanternMusic";
     private static final int FRAMES = 480;
     private static final int MAX_BUFFER_FRAMES = 12000; // 250ms maximum, music only; SFX independent.
+    private static final int CONTROL_FIELDS = 5;
     private final Object controlLock = new Object();
     private final Context context;
     private final MusicAudioFocus audioFocus;
     private final Thread worker;
     private boolean stopped = false;
     private boolean suspended = true;
+    private boolean ambienceEligible;
     private int volume = 70;
 
     HordeMusicPlayback(Context context, int volume) {
@@ -43,11 +45,22 @@ final class HordeMusicPlayback implements AutoCloseable {
         synchronized (controlLock) {
             if (stopped) return;
             suspended = value;
-            focusEligible = !suspended;
+            focusEligible = !suspended || ambienceEligible;
             controlLock.notifyAll(); // Worker pauses without flushing accepted PCM.
         }
         audioFocus.setEligible(focusEligible);
     }
+    // One OS focus request serves foreground menu SFX while music remains paused.
+    void setAmbienceEligible(boolean value) {
+        final boolean eligible;
+        synchronized (controlLock) {
+            if (stopped) return;
+            ambienceEligible = value;
+            eligible = !suspended || ambienceEligible;
+        }
+        audioFocus.setEligible(eligible);
+    }
+    void setOnFocusChanged(Runnable listener) { audioFocus.setOnFocusChanged(listener); }
     void setVolumePercent(int value) {
         synchronized (controlLock) {
             if (stopped) return;
@@ -55,6 +68,8 @@ final class HordeMusicPlayback implements AutoCloseable {
             controlLock.notifyAll(); // Worker applies backend volume on its next control pass.
         }
     }
+    // Ambience shares the existing volatile OS-focus gate; it never requests focus.
+    boolean isAudioFocusGranted() { return audioFocus.isGranted(); }
     @Override public void close() {
         synchronized (controlLock) {
             stopped = true;
@@ -95,6 +110,25 @@ final class HordeMusicPlayback implements AutoCloseable {
             throw new IllegalStateException("PCM queue outside platform minimum/250ms bound: " + frames);
         return frames;
     }
+    // A single nativePoll tuple carries the presentation envelope alongside the
+    // owning session epoch/cursor. Saved user volume remains an independent int.
+    static float applyOutputGain(AudioTrack output, int userVolume, long[] control, float appliedGain) {
+        if (control == null || control.length != CONTROL_FIELDS ||
+                (control[0] != 0L && control[0] != 1L) ||
+                (control[2] != 0L && control[2] != 1L) ||
+                (control[4] & ~0xffffffffL) != 0L || userVolume < 0 || userVolume > 100)
+            throw new IllegalStateException("Invalid native music output control");
+        final float presentationGain = Float.intBitsToFloat((int) control[4]);
+        if (!Float.isFinite(presentationGain) || presentationGain < 0.0f || presentationGain > 1.0f)
+            throw new IllegalStateException("Invalid native music presentation gain");
+        final float effectiveGain = (userVolume / 100.0f) * presentationGain;
+        if (Float.compare(effectiveGain, appliedGain) != 0) {
+            final int result = output.setVolume(effectiveGain);
+            if (result != AudioTrack.SUCCESS)
+                throw new IllegalStateException("PCM volume update failed: " + result);
+        }
+        return effectiveGain;
+    }
     private void run() {
         long nativeHandle = 0L;
         AudioTrack output = null;
@@ -107,33 +141,29 @@ final class HordeMusicPlayback implements AutoCloseable {
             output = createOutput(minimumBytes);
             if (output.getState() != AudioTrack.STATE_INITIALIZED) throw new IllegalStateException("PCM output not initialized");
             final int capacity = queueCapacityFrames(output, minimumBytes);
-            int appliedVolume = -1;
+            float appliedGain = -1.0f;
             Log.i(TAG, "PCM ready48k stereo; queue capacity=" + capacity +
                     "frames minimumBytes=" + minimumBytes +
                     " allocatedFrames=" + output.getBufferCapacityInFrames() +
                     " sampleRate=" + output.getSampleRate());
             final float[] pcm = new float[FRAMES * 2];
-            final long[] control = new long[4]; // available, restartEpoch, suspended, generatedFrames
+            // available, restartEpoch, suspended, generatedFrames, float32 gain bits
+            final long[] control = new long[CONTROL_FIELDS];
             long epoch = -1L, submitted = 0L, rawPrevious = 0L, wraps = 0L, consumed = 0L;
             long generated = 0L, reportedPeriods = 0L;
             int offset = pcm.length; // No pending block.
             boolean playing = false;
             while (true) {
                 final boolean externallySuspended;
+                final int requestedVolume;
                 synchronized (controlLock) {
                     if (stopped) break;
                     externallySuspended = isSuspended(suspended, audioFocus.isGranted());
-                }
-                final int requestedVolume;
-                synchronized (controlLock) { requestedVolume = volume; }
-                if (requestedVolume != appliedVolume) {
-                    final int volumeResult = output.setVolume(requestedVolume / 100.0f);
-                    if (volumeResult != 0)
-                        throw new IllegalStateException("PCM volume update failed: " + volumeResult);
-                    appliedVolume = requestedVolume;
+                    requestedVolume = volume;
                 }
                 if (!nativePoll(nativeHandle, externallySuspended, control))
                     throw new IllegalStateException("Music input/cursor contract failed (including copied-event overflow)");
+                appliedGain = applyOutputGain(output, requestedVolume, control, appliedGain);
                 if (control[0] == 0L) { waitForControl(); continue; }
                 if (control[1] != epoch) {
                     output.pause(); output.flush(); // Only explicit session restart discards old queue.

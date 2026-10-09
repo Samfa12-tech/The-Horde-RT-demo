@@ -66,19 +66,38 @@
     <TextView
         android:id="@+id/vitality_status"
         android:layout_width="wrap_content"
-        android:layout_height="32dp"
-        android:layout_gravity="top|center_horizontal"
-        android:layout_marginTop="62dp"
-        android:background="#B30D0B09"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|start"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:background="#B3151719"
         android:gravity="center"
-        android:maxLines="1"
-        android:minWidth="132dp"
+        android:maxLines="2"
+        android:minWidth="0dp"
         android:paddingStart="14dp"
         android:paddingEnd="14dp"
-        android:text="@string/vitality_full"
-        android:textColor="#FFD07A"
-        android:textSize="11sp"
+        android:contentDescription="@string/vitality_initial_accessibility"
+        android:textColor="#F2E9D8"
+        android:textSize="12sp"
         android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/keeper_reveal_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center_horizontal"
+        android:layout_marginTop="104dp"
+        android:maxWidth="300dp"
+        android:padding="8dp"
+        android:background="#B3151719"
+        android:text="@string/keeper_reveal_title"
+        android:textColor="#F2E9D8"
+        android:textSize="22sp"
+        android:fontFamily="serif"
+        android:gravity="center"
+        android:importantForAccessibility="yes"
+        android:accessibilityLiveRegion="polite"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/developer_overlay"
@@ -97,6 +116,21 @@
         android:padding="8dp"
         android:textColor="#D8F0D0"
         android:textSize="8sp"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/controller_prompt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_margin="16dp"
+        android:padding="8dp"
+        android:background="#B3151719"
+        android:textColor="#F2E9D8"
+        android:textSize="12sp"
+        android:maxLines="4"
+        android:gravity="center"
+        android:focusable="false"
         android:visibility="gone" />
 
     <Button
@@ -147,6 +181,25 @@
         android:textStyle="bold" />
 
     <Button
+        android:id="@+id/dodge_button"
+        android:autoSizeMaxTextSize="17sp"
+        android:autoSizeMinTextSize="10sp"
+        android:autoSizeStepGranularity="1sp"
+        android:autoSizeTextType="uniform"
+        android:layout_width="104dp"
+        android:layout_height="72dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="116dp"
+        android:includeFontPadding="false"
+        android:maxLines="1"
+        android:paddingTop="0dp"
+        android:paddingBottom="0dp"
+        android:text="@string/dodge"
+        android:textSize="17sp"
+        android:textStyle="bold" />
+
+    <Button
         android:id="@+id/toggle_held_light_pose_button"
         android:autoSizeMaxTextSize="17sp"
         android:autoSizeMinTextSize="9sp"
@@ -156,7 +209,7 @@
         android:layout_height="60dp"
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="164dp"
-        android:layout_marginBottom="116dp"
+        android:layout_marginBottom="200dp"
         android:includeFontPadding="false"
         android:maxLines="1"
         android:paddingTop="0dp"
@@ -176,7 +229,7 @@
         android:layout_height="60dp"
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="24dp"
-        android:layout_marginBottom="116dp"
+        android:layout_marginBottom="200dp"
         android:includeFontPadding="false"
         android:maxLines="2"
         android:paddingTop="0dp"

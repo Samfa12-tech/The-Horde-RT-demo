@@ -24,7 +24,8 @@ inline constexpr float kPlayerBootGroundingSafetyMetres = 0.00025f;
 
 struct PlayerRouteMasks
 {
-    std::array<std::uint8_t, kRtInstanceMetadataCapacity> instanceMasks{};
+    // Masks belong to physical TLAS instances, which may alias metadata.
+    std::array<std::uint8_t, kRtTlasInstanceCapacity> instanceMasks{};
 };
 
 PlayerRouteMasks BuildPlayerRouteMasks(PlayerRenderRoute route,
@@ -33,7 +34,7 @@ PlayerRouteMasks BuildPlayerRouteMasks(PlayerRenderRoute route,
 // A primary-visible world remainder is valid only with the matching per-instance
 // primitive filter. Never accept full-body primary visibility as a viewmodel.
 bool HasDedicatedPlayerPrimaryOwnership(
-    const std::array<std::uint8_t, kRtInstanceMetadataCapacity>& masks,
+    const std::array<std::uint8_t, kRtTlasInstanceCapacity>& masks,
     std::uint32_t worldBodyInstanceFlags);
 
 // The imported player is authored +Z forward with anatomical Left on +X.
@@ -126,6 +127,20 @@ bool ResolvePlayerHeldItemVisuals(
     const horde::gameplay::items::HeldItemTransform& worldFromRightHandBone,
     horde::gameplay::items::HeldItemStates& renderItems,
     std::string& diagnostic);
+bool ResolvePlayerHeldItemVisuals(
+    const horde::gameplay::items::HeldItemStates& authoritativeItems,
+    const horde::gameplay::items::HeldItemTransform& worldFromLeftGrip,
+    const horde::gameplay::items::HeldItemTransform& worldFromRightGrip,
+    const horde::gameplay::items::HeldItemTransform& worldFromBodyStow,
+    horde::gameplay::items::HeldItemStates& renderItems,
+    std::string& diagnostic);
+
+// Blend a solved arm's free carry toward an item Grip in the same coordinate
+// frame. Item attachment remains separate; releasing a grip never releases IK.
+horde::gameplay::animation::PlayerArmIkTarget BlendPlayerArmGripTarget(
+    const horde::gameplay::animation::PlayerArmIkTarget& freeCarry,
+    const horde::gameplay::items::HeldItemTransform& itemGrip,
+    float gripBlend);
 
 struct PlayerGripAgreement
 {
@@ -199,10 +214,23 @@ public:
     bool ShoulderCenter(const horde::gameplay::animation::PlayerAnimationSnapshot& animation,
                         std::array<float, 3u>& center,
                         std::string& diagnostic) const;
+    bool AnimatedHipsWorldTransform(
+        const horde::gameplay::animation::PlayerAnimationSnapshot& animation,
+        const PlayerModelWorldBasis& basis,
+        const std::array<float, 3u>& rootWorld,
+        horde::gameplay::items::HeldItemTransform& worldFromHips,
+        std::string& diagnostic) const;
     bool ResolveHeldItemVisuals(
         const horde::gameplay::items::HeldItemStates& authoritativeItems,
         const horde::gameplay::items::HeldItemTransform& worldFromLeftGrip,
         const horde::gameplay::items::HeldItemTransform& worldFromRightGrip,
+        horde::gameplay::items::HeldItemStates& renderItems,
+        std::string& diagnostic);
+    bool ResolveHeldItemVisuals(
+        const horde::gameplay::items::HeldItemStates& authoritativeItems,
+        const horde::gameplay::items::HeldItemTransform& worldFromLeftGrip,
+        const horde::gameplay::items::HeldItemTransform& worldFromRightGrip,
+        const horde::gameplay::items::HeldItemTransform& worldFromBodyStow,
         horde::gameplay::items::HeldItemStates& renderItems,
         std::string& diagnostic);
     float BootGroundingOffsetMetres(
@@ -223,6 +251,10 @@ public:
         return uniqueTangents_;
     }
     const horde::scene::SkinnedPlayerSockets& BoneSockets() const { return sockets_; }
+    const horde::gameplay::items::HeldItemTransform& LeftHandFromGripSocket() const
+    {
+        return leftHandFromGripSocket_;
+    }
     // Consume only after successful PreparePose, before the next pose update.
     const horde::scene::SkinnedPlayerPose& SolvedPose() const { return solvedPose_; }
     float LeftSocketErrorMetres() const { return leftSocketErrorMetres_; }

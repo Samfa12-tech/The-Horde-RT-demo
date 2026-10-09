@@ -140,8 +140,24 @@ int main()
         PlayerAnimationInput carryInput;
         carryInput.heldItemKinematics = items::EvaluateHeldItemKinematics({});
         carryState.StepFixed(carryInput, 0.0f);
+        const auto emptyHand = carryState.Snapshot();
+        if (!Require(emptyHand.leftIk.preferredElbowFlexionRadians == 0.0f,
+                     "an empty hand must keep the neutral chain reach")) return 1;
+        carryInput.carryingOriginalTorch = true;
+        carryState.StepFixed(carryInput, 0.0f);
+        const auto ordinaryTorch = carryState.Snapshot();
+        if (!Require(Near(ordinaryTorch.leftIk.preferredElbowFlexionRadians,
+                          10.0f * .01745329252f) &&
+                     ordinaryTorch.leftIk.target == carryInput.heldItemKinematics.leftHandLocal &&
+                     ordinaryTorch.leftIk.pole == emptyHand.leftIk.pole &&
+                     ordinaryTorch.leftIk.gripX == carryInput.heldItemKinematics.leftGripXInView &&
+                     ordinaryTorch.leftIk.gripY == carryInput.heldItemKinematics.leftGripYInView &&
+                     ordinaryTorch.leftIk.gripZ == carryInput.heldItemKinematics.leftGripZInView,
+                     "ordinary held Torch adds preferred bend while preserving its Grip, pole, and target")) return 1;
+        carryInput.carryingOriginalTorch = false;
+        carryState.StepFixed(carryInput, 0.0f);
         if (!Require(carryState.Snapshot().leftIk.preferredElbowFlexionRadians == 0.0f,
-                     "ordinary torch must preserve its existing chain stretch")) return 1;
+                     "releasing the original Torch must restore neutral chain reach")) return 1;
         carryInput.carryingRewardLantern = true;
         carryState.StepFixed(carryInput, 0.0f);
         const auto neutral = carryState.Snapshot();
@@ -503,6 +519,10 @@ int main()
     const auto& authoritative = simulation.Snapshot();
     if (!Require(authoritative.playerAnimation.combatLayer.action ==
                      PlayerUpperBodyAction::Sword &&
+                 authoritative.interaction.heldLightKind == interactions::HeldLightKind::Torch &&
+                 authoritative.torchFailure.heldByPlayer &&
+                 Near(authoritative.playerAnimation.leftIk.preferredElbowFlexionRadians,
+                      10.0f * .01745329252f) &&
                  authoritative.playerAnimation.leftIk.target ==
                      authoritative.heldItemKinematics.leftHandLocal &&
                  authoritative.playerAnimation.rightIk.target ==
@@ -590,14 +610,21 @@ int main()
     duplicateMasks[10] = 0x04u;
     auto fullBodyMasks = remainderMasks.instanceMasks;
     fullBodyMasks[kPlayerWorldBodyInstanceIndex] |= 0x04u;
+    auto worldTorchMasks = remainderMasks.instanceMasks;
+    worldTorchMasks[23u] = 0x01u;
+    worldTorchMasks[24u] = 0x01u;
     if (!Require(HasDedicatedPlayerPrimaryOwnership(viewmodelMasks.instanceMasks, staticPlayerFlag) &&
                  HasDedicatedPlayerPrimaryOwnership(remainderMasks.instanceMasks, remainderPlayerFlags) &&
+                 HasDedicatedPlayerPrimaryOwnership(worldTorchMasks, remainderPlayerFlags) &&
+                 remainderMasks.instanceMasks.size() == kRtTlasInstanceCapacity &&
+                 remainderMasks.instanceMasks[23u] == 0u &&
+                 remainderMasks.instanceMasks[24u] == 0u &&
                  !HasDedicatedPlayerPrimaryOwnership(remainderMasks.instanceMasks, staticPlayerFlag) &&
                  !HasDedicatedPlayerPrimaryOwnership(viewmodelMasks.instanceMasks, remainderPlayerFlags) &&
                  !HasDedicatedPlayerPrimaryOwnership(remainderMasks.instanceMasks, 0u) &&
                  !HasDedicatedPlayerPrimaryOwnership(duplicateMasks, remainderPlayerFlags) &&
                  !HasDedicatedPlayerPrimaryOwnership(fullBodyMasks, remainderPlayerFlags),
-                 "capture ownership rejects missing filters, full-body primary and duplicate procedural arms")) return 1;
+                 "physical-instance capture ownership preserves world torch aliases and rejects missing filters, full-body primary and duplicate procedural arms")) return 1;
     if (!Require(remainderMasks.instanceMasks[kPlayerWorldBodyInstanceIndex] ==
                      (0x10u | kPlayerBodyRemainderPrimaryMask) &&
                  remainderMasks.instanceMasks[kPlayerViewmodelInstanceIndex] == kPlayerViewmodelPrimaryMask &&
@@ -741,19 +768,31 @@ int main()
     rightBone[12] = 0.38f;
     rightBone[13] = 0.18f;
     rightBone[14] = 0.81f;
-    HeldItemStates renderItems{};
     std::string socketDiagnostic;
+    HeldItemTransform expectedRagItem{};
+    HeldItemTransform expectedSwordItem{};
+    if (!Require(ComposeWorldFromItem(leftBone, PlayerRagTorchGripSocketTransform(),
+                                      expectedRagItem, socketDiagnostic) &&
+                 ComposeWorldFromItem(rightBone, SwordGripSocketTransform(),
+                                      expectedSwordItem, socketDiagnostic),
+                 "imported Rag and sword Grip transforms must be rigid before render composition"))
+        return 1;
+    HeldItemStates renderItems{};
     if (!Require(ResolvePlayerHeldItemVisuals(authoritativeItems, leftBone, rightBone,
                                                renderItems, socketDiagnostic) &&
-                 Near(renderItems[0].worldFromItem[12], leftBone[12]) &&
-                 Near(renderItems[0].worldFromItem[13], leftBone[13] - 0.24f) &&
-                 Near(renderItems[1].worldFromItem[12], rightBone[12]) &&
-                 Near(renderItems[1].worldFromItem[13], rightBone[13] - 0.135f),
-                 "attached held-item visuals must compose from final LeftHand/RightHand bone sockets"))
+                 MeasureTransformAgreement(expectedRagItem,
+                                            renderItems[0].worldFromItem).positionErrorMetres <= 1e-6f &&
+                 MeasureTransformAgreement(expectedRagItem,
+                                            renderItems[0].worldFromItem).orientationErrorRadians <= 1e-6f &&
+                 MeasureTransformAgreement(expectedSwordItem,
+                                            renderItems[1].worldFromItem).positionErrorMetres <= 1e-6f &&
+                 MeasureTransformAgreement(expectedSwordItem,
+                                            renderItems[1].worldFromItem).orientationErrorRadians <= 1e-6f,
+                 "player Rag and sword visuals must compose their authored Grips from final hand sockets"))
         return 1;
     HeldItemStates gripAlignedItems = MakeDefaultHeldItemStates();
     if (!Require(ComposeWorldFromItem(
-                     leftBone, OriginalTorchGripSocketTransform(),
+                     leftBone, PlayerRagTorchGripSocketTransform(),
                      gripAlignedItems[0].worldFromItem, socketDiagnostic) &&
                  ComposeWorldFromItem(
                      rightBone, SwordGripSocketTransform(),

@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "target": "Horde Lantern RT menu audio candidate",
+  "sourceHashes": {
+    "room": "102b22009583699ae35f9a84f14f4a37cef0d667d34ecbf692d19bdbe190692c",
+    "chain": "9a0309023d9182298ae41c0bc3e8872ed33e0ebbf83df4fbfdabafc8fea2f947"
+  },
+  "sourcePolicy": "Private original sources stay local and outside Git/packages. Only the two bounded runtime derivatives and provenance manifest are written. No standalone audio-library distribution.",
+  "generator": "tools/prepare-menu-ambience.py",
+  "ffmpegVersion": "ffmpeg version 9.0-full_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers",
+  "assets": [
+    {
+      "id": "filteredroomaircandidate",
+      "runtimeFile": "menu_room.wav",
+      "runtimeSha256": "9aa9a9631f7dbaf724ecd46bfbbea17142af20497299a83db08055751c7cc361",
+      "runtimeBytes": 384044,
+      "sampleRate": 48000,
+      "channels": 1,
+      "bitsPerSample": 16,
+      "frames": 192000,
+      "durationSeconds": 4.0,
+      "rmsDbfs": -30.0,
+      "peakDbfs": -18.3179,
+      "sourceFile": "FilmCow Recorded SFX/ambience - air conditioner.wav",
+      "sourceSha256": "102b22009583699ae35f9a84f14f4a37cef0d667d34ecbf692d19bdbe190692c",
+      "sourceBytes": 9281552,
+      "creator": "FilmCow",
+      "sourceUrl": "https://filmcow.itch.io/filmcow-sfx",
+      "license": "FilmCow custom royalty-free license; not CC0",
+      "licenseTerms": "Personal and commercial project use permitted; national-government, law-enforcement, and SPLC/CAHN-designated hate-group uses prohibited; do not claim authorship or resell.",
+      "processing": {
+        "decode": "FFmpeg 9, mono 48 kHz PCM16",
+        "cropSourceSeconds": [
+          4.5,
+          9.0
+        ],
+        "filters": [
+          "notch 100 Hz, Q5, -18 dB",
+          "notch 200 Hz, Q5, -10 dB",
+          "highpass 140 Hz",
+          "lowpass 700 Hz"
+        ],
+        "cyclicCrossfadeFrames": 24000,
+        "loopFrames": 192000,
+        "targetRmsDbfs": -30.0,
+        "peakCeilingDbfs": -9.0,
+        "appliedGainDb": 12.4176,
+        "preGain": {
+          "frames": 192000,
+          "durationSeconds": 4.0,
+          "rmsDbfs": -42.4176,
+          "peakDbfs": -30.7363
+        }
+      },
+      "limitations": "Strongly filtered mechanical air-conditioner source with measured 100/200 Hz tonal components. Owner selected Room7% on 7e6662c6; this is not a claim of recorded natural room tone. Final revised package and Windows listening remain separate checks."
+    },
+    {
+      "id": "metalcreakswingcandidate",
+      "runtimeFile": "menu_chain.wav",
+      "runtimeSha256": "cb53cefe152ea118fdee6cf6c9beedd3e516a483041a7832981489a7eb04697f",
+      "runtimeBytes": 96044,
+      "sampleRate": 48000,
+      "channels": 1,
+      "bitsPerSample": 16,
+      "frames": 48000,
+      "durationSeconds": 1.0,
+      "rmsDbfs": -28.3457,
+      "peakDbfs": -11.9999,
+      "sourceFile": "irhouen-metal-creaks-189729.mp3",
+      "sourceSha256": "9a0309023d9182298ae41c0bc3e8872ed33e0ebbf83df4fbfdabafc8fea2f947",
+      "sourceBytes": 1020656,
+      "creator": "Irhouen",
+      "sourceUrl": "https://pixabay.com/sound-effects/film-special-effects-metal-creaks-189729/",
+      "license": "Pixabay Content License",
+      "licenseTerms": "Modified game use permitted; standalone distribution of the source audio is prohibited.",
+      "voluntaryCredit": "Metal Creaks by Irhouen via Pixabay",
+      "processing": {
+        "decode": "FFmpeg 9, mono 48 kHz PCM16",
+        "selection": "Authored 4.1-5.1 second crop covering measured isolated creak activity at 4.2-4.6 seconds, ending before the next event. One bounded cue; owner listening pending.",
+        "sourceCropFrames": [
+          196800,
+          244800
+        ],
+        "sourceCropSeconds": [
+          4.1,
+          5.1
+        ],
+        "sourceWindowStats": {
+          "frames": 48000,
+          "durationSeconds": 1.0,
+          "rmsDbfs": -41.8842,
+          "peakDbfs": -25.5531
+        },
+        "edgeFadeFrames": {
+          "in": 960,
+          "out": 5760
+        },
+        "targetPeakDbfs": -12.0,
+        "appliedGainDb": 13.5531
+      },
+      "limitations": "Owner-requested Irhouen replacement, replacing the earlier Hammy01 chain. One measured isolated creak event; no assertion of listening acceptance. Existing 21% relative gain and actual lantern-turn timing retained for owner audition; final phone/Windows listening remain separate checks."
+    }
+  ],
+  "ownerListeningAcceptance": "Room7%/Chain21% selected and saved on 7e6662c6 with SFX70%; rejected flame removed. Owner requested Irhouen replacement on 8 October; its cue character/level requires a separate listening check."
+}

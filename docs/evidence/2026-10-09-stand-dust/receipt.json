@@ -1,0 +1,107 @@
+{
+  "sourceCommit": "ac97da914e0578b4dc04f0428fa9ee49922783f9",
+  "sourceTree": "781e2c23bc6fc6be3167b1c4e0a7058d86cacfd7",
+  "apkSha256": "90a80a31d88f7f758fdb9587c7917a0a61f1c1257f237df0debb58e66df40593",
+  "apkBytes": 138462962,
+  "windowsExeSha256": "29608d38a259045aecab318ef9f9d6f45d63ad6e0a30a4202102b8dcfcbf629a",
+  "windowsExeBytes": 11572736,
+  "nativePayload": [
+    {
+      "entry": "lib/arm64-v8a/libhorde_rt_probe_android.so",
+      "bytes": 4559232,
+      "sha256": "f081c0f01915db0f8bd1bcb1dc649389f5b097c7e4fda16c853caf3ce917fa4f"
+    },
+    {
+      "entry": "lib/armeabi-v7a/libhorde_rt_probe_android.so",
+      "bytes": 4011688,
+      "sha256": "a1a1c9a400cb91552382b7193db45781aef382d18b301832be076e3b1c54237b"
+    },
+    {
+      "entry": "lib/x86/libhorde_rt_probe_android.so",
+      "bytes": 4963808,
+      "sha256": "e9d690a92d3c488c880665d94f0c30f410f8ef63477bc736dbe31c5937bc97be"
+    },
+    {
+      "entry": "lib/x86_64/libhorde_rt_probe_android.so",
+      "bytes": 4716192,
+      "sha256": "f75a4c41f950d2537d90d302b0e18b176ded8055166fde16c69a44d6688b5e07"
+    }
+  ],
+  "closedAndroidAssetAdmission": true,
+  "manifestOrientation": "fullUser=13; configChanges=orientation|screenSize|keyboard|keyboardHidden|navigation",
+  "productionSigned": false,
+  "device": {
+    "model": "SM-S948B",
+    "android": "16",
+    "evidenceClass": "exact-install-and-normal-entry-only",
+    "installedBaseMatches": true,
+    "settingsByteIdentical": true,
+    "menuMixByteIdentical": true
+  },
+  "checks": {
+    "hostSuites": 7,
+    "hostSeconds": 24.74,
+    "androidTests": 256,
+    "androidSuites": 39,
+    "lint": true,
+    "androidFourAbiBuild": true,
+    "windowsBuild": true,
+    "zip16KiBAligned": true,
+    "packagedAssetsUnchangedFrom8edca4bb": true,
+    "packagedAssetEntries": 94
+  },
+  "sourceCheckpoints": {
+    "standCollision": "634fa7c5",
+    "freshResetDustLow": "4f599f06",
+    "acousticPreservation": "ac97da91",
+    "acceptedWater": "8edca4bb"
+  },
+  "defaults": {
+    "freshAndroid": "50%, Mobile water/fire, Glass Off, Current shadows, cap30, Mist On, Dust Low",
+    "freshDesktop": "100%, High water/fire, Glass On, Current shadows, cap30, Mist On, Dust Low",
+    "savedAndLegacy": "Saved Off/Low/Standard/custom remain authoritative; historical and genuine legacy defaults stay Off"
+  },
+  "logs": [
+    {
+      "name": "stand-dust-audio-integrated-host-build-private.log",
+      "sha256": "aff76fd3fc5905be27237e1031bf499ca670bfbcd7ada1ae7fe7090a696e3b63"
+    },
+    {
+      "name": "stand-dust-audio-integrated-host-tests-private.log",
+      "sha256": "4d1d4c45aebd4ce93a6d722e9da95ef2d61f4c79c366f3bb6c4bc2103b1206d6"
+    },
+    {
+      "name": "stand-dust-audio-integrated-android-build-private.log",
+      "sha256": "b97fdcca5394011737de4e27fc5f77d5aa3e24b97d41e99a67aa89a8c1797ee8"
+    },
+    {
+      "name": "stand-acoustic-before-tests-private.log",
+      "sha256": "e82a8d48c92d0939ffca66e93c2cfccf6434e64035cda693f5ded0d373724379"
+    },
+    {
+      "name": "dust-low-default-before-private.log",
+      "sha256": "2a28e688911b78b1a7691973593959ca55c10f0cffb7029b9fcb0269f061a09b"
+    },
+    {
+      "name": "dust-low-default-java-after-private.log",
+      "sha256": "236c4e9b0319512b27a6f1a0933bd01f2fc8682a8a1840b50e7a5e7224842963"
+    }
+  ],
+  "ci": {
+    "source": "ac97da914e0578b4dc04f0428fa9ee49922783f9",
+    "pushRun": 37847101238,
+    "prRun": 37847110165,
+    "status": "12/12 aggregate success",
+    "jobs": 12,
+    "independentAuditCompleted": false
+  },
+  "ownerStandCollisionAccepted": true,
+  "sustainedPerformanceVerified": false,
+  "independentAuditCompleted": false,
+  "ownerStandCollisionObservation": {
+    "date": "2026-10-09",
+    "source": "ac97da91",
+    "statement": "Working well, as intended, after the prompted player/Keeper torch-stand check",
+    "class": "owner ordinary phone playtest; not an instrumented moving-route trace"
+  }
+}

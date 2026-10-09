@@ -1,0 +1,49 @@
+{
+  "sourceCommit": "7e6662c6fe2906787fdd645bfbcf4474eb2e60bd",
+  "sourceTree": "c7bcc2c7d38a1009146523ea7492fb7fc865d8f2",
+  "apk": {
+    "sha256": "19a275c587d2065b8064fbd760048e816e062d7725b5547a77926bd5bcb998a4",
+    "bytes": 138463040,
+    "installedBaseMatches": true
+  },
+  "windowsExecutable": {
+    "sha256": "38188c6c866c25ce6767167cd4e0502b29955e6375d0ae65c07787fb56777432",
+    "bytes": 11569664,
+    "ownerListening": false
+  },
+  "device": "SM-S948B",
+  "androidVersion": 16,
+  "savedMixPercent": {
+    "flame": 0,
+    "room": 7,
+    "chain": 21
+  },
+  "savedSfxPercent": 70,
+  "separateDevelopmentPreferenceFile": true,
+  "mainPreferenceChanges": 0,
+  "ownerDecision": "Remove rejected flame entirely; retain saved Room7/Chain21 balance.",
+  "assetRoster": {
+    "entries": 95,
+    "byteIdenticalToFa5": true
+  },
+  "androidTests": {
+    "tests": 240,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "androidTestClasses": 37,
+  "menuMixCases": 7,
+  "affectedHostTests": 5,
+  "affectedHostSeconds": 5.59,
+  "sourceCi": {
+    "push": 37757772653,
+    "pr": 37757778958,
+    "aggregateSuccess": 12,
+    "aggregateFailure": 0
+  },
+  "limits": [
+    "Listening selection applies to this phone/source/package. Revised flame-free package requires its own install verification.",
+    "Windows listening and competing Android audio-focus remain physical gates."
+  ]
+}

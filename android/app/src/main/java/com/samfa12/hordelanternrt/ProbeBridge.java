@@ -32,19 +32,48 @@ public final class ProbeBridge {
     /** Returns an accepted request token, not renderer readiness; zero is failure. */
     public static native long startDiagnosticSurface(android.view.Surface surface, String baseDirectory);
     public static native void stopDiagnosticSurface(long generation);
+    /** Suspend owner work on a still-valid surface; Stop still retires its resources. */
+    public static native boolean setDiagnosticSurfaceSuspended(long generation, boolean suspended);
     public static native int getSurfaceRuntimeState(long generation);
     public static native void setViewControls(float yaw, float pitch, float torchLightStrength, float moveStrafe, float moveForward);
     public static native void requestAttack();
     public static native void requestParry();
+    public static native void requestDodge();
     public static native void requestInteract();
     public static native void requestToggleHeldLightPose();
     public static native void requestRouteReset();
     public static native int getPlayerVitality();
+    // Low 32 bits: current vitality; high 32 bits: maximum, from one simulation snapshot.
+    public static native long getPlayerVitalityState();
     public static native int getPlayerLifePhase();
     public static native int getFinaleEndingPhase();
+    public static native float getKeeperRevealTitleOpacity();
     public static native int getContextualControlState();
     public static native int retryEncounter();
     public static native void setSimulationPaused(boolean paused);
+    public static native void setGraphicsSettings(int scale, int water, int fire, int cap, boolean glass, int shadow, boolean mistEnabled, int dustQuality);
+    public static native void beginGraphicsEdit(int scale, int water, int fire, int cap, boolean glass, int shadow, boolean mistEnabled, int dustQuality);
+    public static native long applyGraphicsSettings(int scale, int water, int fire, int cap, boolean glass, int shadow, boolean mistEnabled, int dustQuality, long generation);
+    public static native long compareGraphicsPreview(int scale, int water, int fire, int cap, boolean glass, int shadow, boolean mistEnabled, int dustQuality, long generation);
+    public static native long revertGraphicsSettings(long generation);
+    public static native boolean confirmGraphicsSettings(long serial, long generation);
+    public static native long advanceGraphicsConfirmation(double seconds, boolean foreground, long generation);
+    // Coherent render-owner snapshot: serial, generation, edit state, effective
+    // scale/water/fire/cap, internal W/H, output W/H, optics, backend, presented,
+    // reason bits, requested scale/water/fire/cap, scene, effective/requested glass.
+    // effective/requested shadow appended at22/23; mist24/25; dust26/27. Exactly28 fields; unknown extents stay zero.
+    public static native long[] getGraphicsSnapshot();
+    public static native void setGraphicsPreview(boolean enabled, boolean paused, boolean motion,
+            int camera, boolean resetTimeline, long generation);
+    // Entry menu requests are ephemeral. State is a coherent five-word snapshot:
+    // generation, profile(Showcase/Preview/Entry), phase, fade permille, presented.
+    public static native void setEntryMenu(boolean enabled, boolean sidePage,
+            boolean reducedMotion, boolean play, long generation);
+    public static native long[] getEntryMenuState();
+    public static native long[] getMenuAmbienceState();
+    // epoch,presents/s,loop ms,CPU ms,GPU ms (-1 unavailable),tracked device/host bytes,
+    // transition count,sample count, then loop-ms/transition pairs (at most128).
+    public static native double[] getGraphicsPreviewPerformance();
     public static native void setRenderScale(float scale);
     public static native void setWaterQuality(int quality);
     public static native void setRtSceneTuning(float waterfallWidthScale,
@@ -67,9 +96,21 @@ public final class ProbeBridge {
     public static native boolean requestDebugCheckpoint(int checkpointId);
     public static native boolean requestDebugCaptureCheckpoint(int checkpointId);
     public static native boolean requestDebugRouteReplay();
+    public static native boolean requestDebugMotionEvidence(String scenario, String runId);
+    public static native int getDebugMotionEvidenceStatus();
+    public static native boolean finishDebugMotionEvidence();
     public static native boolean requestBenchmark();
+    // UUID.randomUUID() and Build.MODEL supplied by ordinary UI. Legacy run ID stays empty.
+    public static native boolean requestBenchmarkWithSummaryId(String summaryRunUuid, String rawModel);
+    public static native String getReadyBenchmarkSummaryRunId();
+    // Local preparation only: first status byte then exact bounded UTF8 JSON on Ready(0).
+    // Cooling: 0 unknown, 1 none declared, 2 external declared; hardware defaults off.
+    public static native byte[] prepareBenchmarkSummaryReport(String expectedRunUuid, String reportUuid,
+            String capturedAtUtc, boolean consentToPrepare, boolean includeBasicHardware, int declaredCooling);
     public static native boolean requestBenchmarkWithId(String runId);
     public static native boolean requestBenchmarkWithIdAndWorkload(String runId, String workload);
+    public static native boolean requestBenchmarkMotionValidation(String runId, String scenario);
+    public static native void finishBenchmarkMotionValidation();
     public static native void cancelBenchmark();
     public static native int getBenchmarkStatus();
     public static native String getBenchmarkProgress();

@@ -30,6 +30,11 @@ final class PlaytestReportSubmission {
     static final int MAX_RESPONSE_BYTES = 8 * 1024;
     static final int TIMEOUT_MILLIS = 10_000;
     static final int MAX_ATTEMPT_MILLIS = 30_000;
+    static final int MAX_BENCHMARK_LOCAL_BYTES = 16 * 1024;
+    static final int MAX_BENCHMARK_SUBMISSION_BYTES = 20 * 1024;
+    // Exact compatible private service admission/deployment is unproven. A
+    // prepared offline wrapper never enables any benchmark network attempt.
+    private static final boolean BENCHMARK_SUMMARY_LIVE_SEND_ENABLED = false;
 
     enum State { DRAFT, READY, IN_FLIGHT, RETRYABLE, QUEUED, SENT, CONFLICT, REJECTED, CANCELLED }
     enum ResultCode {
@@ -76,6 +81,7 @@ final class PlaytestReportSubmission {
     private String reportId;
     private long generation;
     private ActiveCall active;
+    private boolean benchmarkSummary;
 
     PlaytestReportSubmission(Executor executor, Transport transport) {
         this(executor, transport, REAL_TIMEOUTS, CLEANUP_EXECUTOR::execute);
@@ -97,6 +103,7 @@ final class PlaytestReportSubmission {
     synchronized State state() { return state; }
     synchronized long attempt() { return generation; }
     synchronized String reportId() { return reportId; }
+    static boolean benchmarkSummarySendAvailable() { return BENCHMARK_SUMMARY_LIVE_SEND_ENABLED; }
 
     synchronized boolean begin(byte[] prepared, boolean explicitConsent) {
         if (!explicitConsent || state != State.DRAFT || prepared == null || prepared.length < 3 ||
@@ -120,6 +127,38 @@ final class PlaytestReportSubmission {
         return true;
     }
 
+    /**
+     * Offline typed admission from the native-approved local owner. Remote
+     * consent is separate from preparation; no parsing/reserialization, token,
+     * screenshot or current renderer data enters the wrapper. The same UI thread
+     * that owns review must call this method before closing/editing its owner.
+     */
+    synchronized boolean beginBenchmarkSummary(BenchmarkSummaryReview review, boolean explicitRemoteConsent) {
+        if (!explicitRemoteConsent || state != State.DRAFT || review == null || !review.isPrepared()) return false;
+        final String id = review.reportId();
+        final byte[] local = review.exactJsonBytes();
+        if (!BenchmarkSummaryReview.validUuid(id) || local == null || local.length < 2 ||
+                local.length > MAX_BENCHMARK_LOCAL_BYTES || local[0] != '{' || local[local.length - 1] != '}') return false;
+        byte[] consent = ",\"consentToSubmit\":true}".getBytes(StandardCharsets.UTF_8);
+        long length = (long)local.length - 1 + consent.length;
+        if (length > MAX_BENCHMARK_SUBMISSION_BYTES) return false;
+        byte[] wrapper = Arrays.copyOf(local, (int)length);
+        System.arraycopy(consent, 0, wrapper, local.length - 1, consent.length);
+        frozenJson = wrapper;
+        reportId = id;
+        benchmarkSummary = true;
+        ++generation;
+        state = State.READY;
+        return true;
+    }
+
+    boolean beginBenchmarkSummary(BenchmarkSummaryReview review) { return beginBenchmarkSummary(review, false); }
+
+    /** Memory-only clone for offline review. This is not a transport capability. */
+    synchronized byte[] benchmarkSummaryJsonForOfflineReview() {
+        return benchmarkSummary && frozenJson != null ? frozenJson.clone() : null;
+    }
+
     synchronized long retry() {
         if (state != State.RETRYABLE || frozenJson == null) return -1L;
         ++generation;
@@ -133,8 +172,10 @@ final class PlaytestReportSubmission {
         final byte[] body;
         final ActiveCall activeCall;
         synchronized (this) {
+            if (benchmarkSummary && !BENCHMARK_SUMMARY_LIVE_SEND_ENABLED) return false;
             if (state != State.READY || requestedAttempt != generation || !validToken(freshToken)) return false;
-            body = buildRequest(frozenJson, freshToken);
+            body = buildRequest(frozenJson, freshToken,
+                    benchmarkSummary ? MAX_BENCHMARK_SUBMISSION_BYTES : MAX_SUBMISSION_BYTES);
             if (body == null) return false;
             state = State.IN_FLIGHT;
             activeCall = new ActiveCall(requestedAttempt, body);
@@ -301,7 +342,7 @@ final class PlaytestReportSubmission {
         return true;
     }
 
-    private static byte[] buildRequest(byte[] frozen, String token) {
+    private static byte[] buildRequest(byte[] frozen, String token, int maximumBytes) {
         if (frozen == null || frozen.length < 2 || frozen[frozen.length - 1] != '}' || !validToken(token)) return null;
         StringBuilder escaped = new StringBuilder(token.length() + 2);
         for (int i = 0; i < token.length(); ++i) {
@@ -311,7 +352,7 @@ final class PlaytestReportSubmission {
         }
         byte[] suffix = (",\"turnstileToken\":\"" + escaped + "\"}").getBytes(StandardCharsets.UTF_8);
         long length = (long) frozen.length - 1 + suffix.length;
-        if (length > MAX_SUBMISSION_BYTES) return null;
+        if (length > maximumBytes) return null;
         byte[] request = Arrays.copyOf(frozen, (int) length);
         System.arraycopy(suffix, 0, request, frozen.length - 1, suffix.length);
         return request;

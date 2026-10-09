@@ -1,7 +1,9 @@
+#include "gameplay/CorridorCollision.h"
 #include "gameplay/DevelopmentCheckpoints.h"
 #include "gameplay/DevelopmentCheckpointSimulation.h"
 #include "gameplay/ShowcaseCheckpoints.h"
 #include "vulkan/raytracing/DevelopmentStaticAssetPolicy.h"
+#include "platform/windows/WindowsCaptureContracts.h"
 
 #include <cmath>
 #include <cstdint>
@@ -63,10 +65,204 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 47u,
-          "forty-seven isolated render-development checkpoints include eleven dedicated viewmodel poses");
-    Check(FindDevelopmentCheckpoint(147) == nullptr && FindDevelopmentCheckpoint(148) == nullptr,
-          "withdrawn extreme-down studies must not define the normal player acceptance matrix");
+    Check(kDevelopmentCheckpoints.size() == 68u,
+          "development registry retains prior views and admits bounded water-lighting views");
+    Check(FindDevelopmentCheckpoint(164) == nullptr,
+          "development lookup rejects IDs beyond the admitted samples");
+    const auto* torchParry = FindDevelopmentCheckpoint("player-torch-parry-clearance");
+    simulation::GameSimulation stagedTorchParry;
+    DevelopmentCheckpointStageEvidence torchParryEvidence{};
+    Check(torchParry != nullptr && torchParry->id == 160 &&
+              FindDevelopmentCheckpoint(160) == torchParry &&
+              FindShowcaseCheckpoint("player-torch-parry-clearance") == nullptr &&
+              torchParry->baseShowcaseCheckpointId == 2 && !torchParry->stagesWaterfallGuards &&
+              !torchParry->usesProductionRewardProps && !torchParry->usesGlassFixture &&
+              StageDevelopmentCheckpointSimulation(stagedTorchParry, *torchParry, &torchParryEvidence) &&
+              stagedTorchParry.Snapshot().playerCombat.action == PlayerCombatAction::ParryActive &&
+              stagedTorchParry.Snapshot().interaction.heldLightKind == interactions::HeldLightKind::Torch &&
+              torchParryEvidence.actionTime >= 0.10f && torchParryEvidence.consumedParryEdges == 1u &&
+              torchParryEvidence.consumedAttackEdges == 0u &&
+              torchParryEvidence.playerDamagedEvents == 0u && stagedTorchParry.Events().Empty(),
+          "torch-parry capture consumes one real shared command and freezes ordinary torch carry without encounter/reward overrides");
+    for (int index = 0; index < 3; ++index)
+    {
+        const std::array<std::string_view, 3> names{
+            "waterfall-guards-entry", "waterfall-guards-walk-early", "waterfall-guards-walk-later"};
+        const auto* guard = FindDevelopmentCheckpoint(153 + index);
+        Check(guard != nullptr && FindDevelopmentCheckpoint(names[index]) == guard &&
+              guard->baseShowcaseCheckpointId == 2 && guard->stagesWaterfallGuards &&
+              guard->waterfallGuardFixedTicks == (index == 0 ? 0u : index == 1 ? 6u : 18u) &&
+              IsWaterfallSkeletonRoom(guard->cameraX, guard->cameraZ),
+              "guard preview registry resolves bounded room samples without altering release checkpoints");
+    }
+    for (int id=156;id<=159;++id) {
+        const auto* dust=FindDevelopmentCheckpoint(id);
+        Check(dust && dust->name.starts_with("dust-") && !dust->usesGlassFixture &&
+            !dust->stagesWaterfallGuards && dust->combatPose==DevelopmentCombatPose::Rest,
+            "dust cameras remain developer-only framing with ordinary simulation state");
+    }
+    for (std::size_t first = 0u; first < kDevelopmentCheckpoints.size(); ++first)
+    {
+        for (std::size_t second = first + 1u; second < kDevelopmentCheckpoints.size(); ++second)
+            Check(kDevelopmentCheckpoints[first].id != kDevelopmentCheckpoints[second].id &&
+                      kDevelopmentCheckpoints[first].name != kDevelopmentCheckpoints[second].name,
+                  "development names and IDs must remain unique across old and new capture requests");
+    }
+    std::int32_t layoutId = 147;
+    for (const auto name : {"layout-c-wall-panel", "layout-d-entry-breach",
+                           "layout-a-waterfall-own-hole", "layout-b-large-skylight",
+                           "layout-e-finale-opening"})
+    {
+        const auto* layout = FindDevelopmentCheckpoint(name);
+        Check(layout != nullptr && layout->id == layoutId &&
+                  FindDevelopmentCheckpoint(layoutId) == layout &&
+                  FindShowcaseCheckpoint(name) == nullptr && FindShowcaseCheckpoint(layoutId) == nullptr,
+              "layout identity names and IDs belong only to the development registry");
+        if (layout != nullptr)
+        {
+            Check(layout->baseShowcaseCheckpointId == (layoutId == 151 ? 11 : 2) &&
+                      layout->combatPose == DevelopmentCombatPose::Rest &&
+                      !layout->usesGlassFixture && !layout->usesProductionRewardProps &&
+                      !layout->productionLanternGlassOnly && !layout->stagesUnlockedChest &&
+                      layout->rewardPose == DevelopmentRewardPose::None &&
+                      std::isfinite(layout->pitch) && layout->pitch >= -0.32f && layout->pitch <= 0.28f,
+                  "layout proof uses the ordinary rest state and accepted camera pitch without reward/glass overrides");
+            simulation::GameSimulation stagedLayout;
+            DevelopmentCheckpointStageEvidence layoutEvidence{};
+            StepFixedObservationCounter layoutSteps{};
+            const DevelopmentCheckpointStepFixedObservation observer{
+                &layoutSteps, BeginObservedStepFixed, CompleteObservedStepFixed};
+            Check(StageDevelopmentCheckpointSimulation(stagedLayout, *layout, &layoutEvidence, &observer) &&
+                      stagedLayout.Snapshot().playerX == layout->cameraX &&
+                      stagedLayout.Snapshot().playerZ == layout->cameraZ &&
+                      stagedLayout.Snapshot().playerYawRadians == layout->yaw &&
+                      stagedLayout.Snapshot().playerPitchRadians == layout->pitch &&
+                      layoutSteps.started == 1u && layoutSteps.completed == 1u &&
+                      !layoutSteps.active && !layoutSteps.invalidPairing &&
+                      layoutEvidence.action == PlayerCombatAction::Idle &&
+                      layoutEvidence.consumedAttackEdges == 0u && layoutEvidence.consumedParryEdges == 0u &&
+                      stagedLayout.Events().Empty(),
+                  "layout capture stages exactly one ordinary zero-delta pose update with coherent player state and no combat edges");
+            if (layoutId != 151)
+                Check(stagedLayout.Snapshot().torchLightStrength > 0.0f,
+                      "C/D/A/B layout views retain the fresh torch instead of inheriting the later torch-loss checkpoint");
+        }
+        ++layoutId;
+    }
+    for (const std::string_view name : {"wall-panel-bottom", "wall-panel-bottom-left", "wall-panel-bottom-right"})
+    {
+        const auto* bottom = FindDevelopmentCheckpoint(name);
+        simulation::GameSimulation stagedBottom;
+        Check(bottom != nullptr && bottom->baseShowcaseCheckpointId == 2 &&
+                  bottom->pitch == -0.32f && bottom->combatPose == DevelopmentCombatPose::Rest &&
+                  !bottom->usesGlassFixture && !bottom->usesProductionRewardProps &&
+                  !bottom->stagesWaterfallGuards && bottom->primaryArmsMayBeOutsideFrame &&
+                  FindShowcaseCheckpoint(bottom->id) == nullptr &&
+                  StageDevelopmentCheckpointSimulation(stagedBottom, *bottom) &&
+                  stagedBottom.Snapshot().playerX == bottom->cameraX &&
+                  stagedBottom.Snapshot().playerZ == bottom->cameraZ &&
+                  stagedBottom.Snapshot().torchLightStrength > 0.0f && stagedBottom.Events().Empty(),
+              "grate-bottom inspections retain ordinary zero-delta torch state and remain Debug-only");
+    }
+    const auto* levelPanel = FindDevelopmentCheckpoint("layout-c-wall-panel");
+    const auto* upwardPanel = FindDevelopmentCheckpoint("layout-c-wall-panel-upward");
+    using horde::platform::windows::HasExpectedPlayerCaptureVisibility;
+    for (const std::string_view name : {"water-torch-near", "water-torch-far",
+                                       "water-torch-oblique", "water-torch-catchment"})
+    {
+        const auto* water = FindDevelopmentCheckpoint(name);
+        Check(water && water->baseShowcaseCheckpointId == 2 &&
+              water->primaryArmsMayBeOutsideFrame && !water->stagesWaterfallGuards &&
+              IsShowcasePlayerPositionWalkable(water->cameraX, water->cameraZ),
+              "water inspection is a legal ordinary torch checkpoint without encounter seed");
+        if (water)
+        {
+            simulation::GameSimulation staged(simulation::ProductionGameSimulationConfig());
+            Check(StageDevelopmentCheckpointSimulation(staged, *water), "water checkpoint stages shared authority");
+            Check(staged.Snapshot().walkTime == 0.0f && staged.Snapshot().torchLightStrength == 1.8f,
+                  "water camera freezes animation while retaining the actual torch strength");
+        }
+    }
+    for (const auto& capture : kDevelopmentCheckpoints)
+        Check(capture.primaryArmsMayBeOutsideFrame == (capture.id == 152 || (capture.id >= 161 && capture.id <= 163) || (capture.id >= 180 && capture.id <= 183)),
+              "only explicit upper/lower level inspection views declare cropped primary arms");
+    Check(!HasExpectedPlayerCaptureVisibility(true, true, true, 0u, false) &&
+              HasExpectedPlayerCaptureVisibility(true, true, true, 1u, false) &&
+              HasExpectedPlayerCaptureVisibility(true, true, false, 0u, false) &&
+              HasExpectedPlayerCaptureVisibility(true, true, true, 0u, true),
+          "declared cropping permits zero arm pixels while ordinary measured captures still require them");
+    for (const bool cropped : {false, true})
+        Check(!HasExpectedPlayerCaptureVisibility(false, true, true, 1u, cropped) &&
+                  !HasExpectedPlayerCaptureVisibility(true, false, true, 1u, cropped) &&
+                  !HasExpectedPlayerCaptureVisibility(false, false, false, 0u, cropped),
+              "cropping cannot admit legacy ownership or a hidden primary player instance");
+    Check(levelPanel != nullptr && levelPanel->id == 147 && levelPanel->pitch == 0.0f &&
+              upwardPanel != nullptr && upwardPanel->id == 152 &&
+              FindDevelopmentCheckpoint(152) == upwardPanel &&
+              FindShowcaseCheckpoint(152) == nullptr &&
+              FindShowcaseCheckpoint("layout-c-wall-panel-upward") == nullptr &&
+              upwardPanel->baseShowcaseCheckpointId == levelPanel->baseShowcaseCheckpointId &&
+              upwardPanel->cameraX == levelPanel->cameraX &&
+              levelPanel->cameraZ == -10.60f && upwardPanel->cameraZ == -9.45f &&
+              upwardPanel->yaw == levelPanel->yaw &&
+              upwardPanel->pitch == 0.28f &&
+              upwardPanel->combatPose == DevelopmentCombatPose::Rest &&
+              !upwardPanel->usesGlassFixture && !upwardPanel->usesProductionRewardProps &&
+              !upwardPanel->productionLanternGlassOnly && !upwardPanel->stagesUnlockedChest &&
+              upwardPanel->rewardPose == DevelopmentRewardPose::None,
+          "upward C152 changes only approach Z and legal pitch from C147 and cannot enter the shipping route registry");
+    if (levelPanel != nullptr && upwardPanel != nullptr)
+    {
+        float approachX = upwardPanel->cameraX;
+        float approachZ = upwardPanel->cameraZ;
+        ResolveCorridorPlayerCollision(levelPanel->cameraX, levelPanel->cameraZ, approachX, approachZ);
+        Check(IsShowcasePlayerPositionWalkable(levelPanel->cameraX, levelPanel->cameraZ) &&
+                  IsShowcasePlayerPositionWalkable(upwardPanel->cameraX, upwardPanel->cameraZ) &&
+                  approachX == upwardPanel->cameraX && approachZ == upwardPanel->cameraZ,
+              "the production radius-aware swept collision permits C147 to approach C152 without crossing masonry");
+        simulation::GameSimulation levelSimulation;
+        simulation::GameSimulation upwardSimulation;
+        DevelopmentCheckpointStageEvidence stageEvidence{};
+        StepFixedObservationCounter stepCount{};
+        const DevelopmentCheckpointStepFixedObservation observer{
+            &stepCount, BeginObservedStepFixed, CompleteObservedStepFixed};
+        const bool levelStaged = StageDevelopmentCheckpointSimulation(levelSimulation, *levelPanel);
+        const bool upwardStaged = StageDevelopmentCheckpointSimulation(
+            upwardSimulation, *upwardPanel, &stageEvidence, &observer);
+        const auto& level = levelSimulation.Snapshot();
+        const auto& upward = upwardSimulation.Snapshot();
+        Check(levelStaged && upwardStaged && upward.playerX == level.playerX &&
+                  upward.playerZ == upwardPanel->cameraZ && level.playerZ == levelPanel->cameraZ &&
+                  upward.playerYawRadians == level.playerYawRadians &&
+                  upward.playerPitchRadians == 0.28f && stepCount.started == 1u &&
+                  stepCount.completed == 1u && !stepCount.active && !stepCount.invalidPairing &&
+                  stageEvidence.action == PlayerCombatAction::Idle &&
+                  stageEvidence.consumedAttackEdges == 0u && stageEvidence.consumedParryEdges == 0u &&
+                  upwardSimulation.Events().Empty(),
+              "C152 stages one coherent zero-delta shared pose at the effective legal maximum without combat commands");
+        Check(levelStaged && upwardStaged && upward.tickIndex == level.tickIndex &&
+                  upward.zone == level.zone && upward.activeEnemyId == level.activeEnemyId &&
+                  upward.torchFailure.phase == level.torchFailure.phase &&
+                  upward.fireEmitterCount == level.fireEmitterCount && upward.fireEmitterCount == 3u &&
+                  upward.fireEmitters[0].stableId == level.fireEmitters[0].stableId &&
+                  upward.fireEmitters[0].seed == level.fireEmitters[0].seed &&
+                  upward.fireEmitters[0].phase == level.fireEmitters[0].phase &&
+                  upward.fireEmitters[0].fuel == level.fireEmitters[0].fuel,
+              "C152 keeps C147's authored encounter and actual fire timeline while held transforms respond to the nearer upward pose");
+        for (std::size_t index = 1u; index < 3u; ++index)
+        {
+            const auto& levelFlank = level.fireEmitters[index];
+            const auto& upwardFlank = upward.fireEmitters[index];
+            Check(levelFlank.stableId == index + 2u && upwardFlank.stableId == levelFlank.stableId &&
+                      upwardFlank.parentObject == effects::FireEmitterParentObject::WorldObject &&
+                      levelFlank.strength == 0.0f && upwardFlank.strength == 0.0f &&
+                      upwardFlank.seed == levelFlank.seed && upwardFlank.phase == levelFlank.phase &&
+                      upwardFlank.fuel == levelFlank.fuel &&
+                      upwardFlank.worldFromFlame == levelFlank.worldFromFlame &&
+                      upwardFlank.worldFromLight == levelFlank.worldFromLight,
+                  "C147/C152 retain dark world flank IDs3/4 and identical sockets despite the nearer upward camera");
+        }
+    }
     int viewmodelId = 136;
     for (const auto name : {"player-viewmodel-grips", "player-viewmodel-forward",
                            "player-viewmodel-downward-cut", "player-viewmodel-upward-slice",

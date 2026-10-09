@@ -13,6 +13,7 @@ include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtVersion.cmake")
 include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtRaygenArtifacts.cmake")
 include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtRaygenPolicy.cmake")
 include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtStagedPrimary.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/benchmark_scale_policy.cmake")
 include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtSources.cmake")
 include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtPocketAudioCore.cmake")
 horde_rt_add_pocket_audio_core("${HORDE_RT_REPO_ROOT}" OFF)
@@ -28,6 +29,7 @@ add_library(horde_rt_probe_android
     SHARED
     android_probe_bridge.cpp
     android_music_playback.cpp
+    android_ambience_playback.cpp
     "${HORDE_RT_REPO_ROOT}/src/ui/DiagnosticOverlay.cpp"
     ${HORDE_RT_ANDROID_CORE_SOURCES}
 )
@@ -42,14 +44,33 @@ horde_rt_attach_staged_primary(horde_rt_probe_android "${HORDE_RT_REPO_ROOT}")
 
 target_compile_features(horde_rt_probe_android PRIVATE cxx_std_20)
 target_compile_definitions(horde_rt_probe_android PRIVATE
+    HORDE_RT_MIN_RENDER_SCALE_PERCENT=${HORDE_RT_MIN_RENDER_SCALE_PERCENT}
     HORDE_RT_DISPLAY_VERSION="${HORDE_RT_DISPLAY_VERSION}"
     HORDE_RT_PACKAGE_VERSION="${HORDE_RT_PACKAGE_VERSION}"
     HORDE_RT_BUILD_ID="${HORDE_RT_BUILD_ID}"
 )
+target_compile_definitions(horde_rt_probe_android PRIVATE
+    HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION=$<BOOL:${HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION}>)
+target_compile_definitions(horde_rt_probe_android PRIVATE
+    HORDE_RT_ANDROID_MOTION_VALIDATION=$<BOOL:${HORDE_RT_ANDROID_MOTION_VALIDATION}>)
+if(HORDE_RT_ANDROID_BENCHMARK_VALIDATION AND HORDE_RT_MIN_RENDER_SCALE_PERCENT STREQUAL "33")
+    target_compile_definitions(horde_rt_probe_android PRIVATE HORDE_RT_BENCHMARK_SCALE_VALIDATION=1)
+endif()
 if(HORDE_RT_DEBUG_CHECKPOINTS)
+    if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+        message(FATAL_ERROR "Android motion/checkpoint evidence is restricted to Debug builds.")
+    endif()
+    target_sources(horde_rt_probe_android PRIVATE
+        "${HORDE_RT_REPO_ROOT}/src/gameplay/validation/MotionEvidenceScenario.cpp"
+        "${HORDE_RT_REPO_ROOT}/src/telemetry/MotionEvidenceLedger.cpp")
     target_compile_definitions(horde_rt_probe_android PRIVATE
         HORDE_RT_DEBUG_CHECKPOINTS=1
     )
+endif()
+if(HORDE_RT_ANDROID_MOTION_VALIDATION)
+    target_sources(horde_rt_probe_android PRIVATE
+        "${HORDE_RT_REPO_ROOT}/src/gameplay/validation/MotionEvidenceScenario.cpp"
+        "${HORDE_RT_REPO_ROOT}/src/telemetry/MotionEvidenceLedger.cpp")
 endif()
 if(HORDE_RT_DEBUG_VIEWMODEL_CANDIDATE)
     target_compile_definitions(horde_rt_probe_android PRIVATE HORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=1)

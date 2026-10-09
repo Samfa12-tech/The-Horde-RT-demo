@@ -149,6 +149,7 @@ void RtPipelineBundle::RebindDestroyContext(void* user,
 
 void RtPipelineBundle::Reset() noexcept
 {
+    const bool cachedPipelineObjects = static_cast<bool>(compiledPipelineLease_);
     if (destroyApi_.Complete()) {
         for (std::size_t index = strategies_.size(); index-- > 0u;) {
             auto& strategy = strategies_[index];
@@ -161,13 +162,25 @@ void RtPipelineBundle::Reset() noexcept
             } else {
                 strategy.shaderBindingTable = {};
             }
-            destroyApi_.destroyPipeline(destroyApi_.user, strategy.pipeline,
-                                        strategy.artifact.key.material);
+            if (cachedPipelineObjects) {
+                strategy.pipeline = VK_NULL_HANDLE;
+            } else {
+                destroyApi_.destroyPipeline(destroyApi_.user, strategy.pipeline,
+                                            strategy.artifact.key.material);
+            }
         }
-        destroyApi_.destroyPipelineLayout(destroyApi_.user, pipelineLayout);
+        if (cachedPipelineObjects) {
+            pipelineLayout = VK_NULL_HANDLE;
+        } else {
+            destroyApi_.destroyPipelineLayout(destroyApi_.user, pipelineLayout);
+        }
         descriptorSet = VK_NULL_HANDLE;
         destroyApi_.destroyDescriptorPool(destroyApi_.user, descriptorPool);
-        destroyApi_.destroyDescriptorSetLayout(destroyApi_.user, descriptorSetLayout);
+        if (cachedPipelineObjects) {
+            descriptorSetLayout = VK_NULL_HANDLE;
+        } else {
+            destroyApi_.destroyDescriptorSetLayout(destroyApi_.user, descriptorSetLayout);
+        }
         destroyApi_.destroyBuffer(destroyApi_.user, destroyApi_.gpuResources,
                                   diagnosticBuffer, RtPipelineOwnedBuffer::Diagnostics);
     } else {
@@ -185,13 +198,15 @@ void RtPipelineBundle::Reset() noexcept
     preflight_ = {};
     strategies_ = {};
     destroyApi_ = {};
+    compiledPipelineLease_ = {};
+    reusedCompiledPipelines_ = false;
     diagnosticAvailability_ = RtDiagnosticAvailability::Unavailable;
     selected_ = false;
 }
 
 bool RtPipelineBundle::HasLiveResources() const noexcept
 {
-    if (descriptorSetLayout != VK_NULL_HANDLE || descriptorPool != VK_NULL_HANDLE ||
+    if (compiledPipelineLease_ || descriptorSetLayout != VK_NULL_HANDLE || descriptorPool != VK_NULL_HANDLE ||
         descriptorSet != VK_NULL_HANDLE || pipelineLayout != VK_NULL_HANDLE ||
         diagnosticBuffer.buffer != VK_NULL_HANDLE || diagnosticBuffer.memory != VK_NULL_HANDLE) {
         return true;
@@ -298,6 +313,8 @@ void RtPipelineBundle::MoveFrom(RtPipelineBundle&& other) noexcept
     preflight_ = std::exchange(other.preflight_, RtPipelineBundlePreflight{});
     strategies_ = std::exchange(other.strategies_, {});
     destroyApi_ = std::exchange(other.destroyApi_, {});
+    compiledPipelineLease_ = std::move(other.compiledPipelineLease_);
+    reusedCompiledPipelines_ = std::exchange(other.reusedCompiledPipelines_, false);
     diagnosticAvailability_ = std::exchange(
         other.diagnosticAvailability_, RtDiagnosticAvailability::Unavailable);
     selected_ = std::exchange(other.selected_, false);
@@ -321,6 +338,7 @@ bool BuildRtPipelineBundleResources(RtPipelineBundle& bundle,
     }
     const bool rayTracingPipeline = executionBackend ==
         horde::vulkan::RtExecutionBackend::RayTracingPipeline;
+    bool usingCachedPipelineObjects = false;
     VkShaderModule missModule = VK_NULL_HANDLE;
     VkShaderModule hitModule = VK_NULL_HANDLE;
     VkShaderModule entryModule = VK_NULL_HANDLE;
@@ -338,8 +356,31 @@ bool BuildRtPipelineBundleResources(RtPipelineBundle& bundle,
         return false;
     };
 
-    if (!api.createDescriptorSetLayout(api.user, bundle.preflight_.descriptorIo,
-                                       bundle.descriptorSetLayout, diagnostic) ||
+    if (api.borrowCompiledObjects != nullptr) {
+        RtBundleCompiledPipelineLease lease{};
+        RtBundleCompiledPipelineObjects objects{};
+        if (api.borrowCompiledObjects(api.user, bundle.preflight_, lease, objects)) {
+            if (!lease || objects.pipelines[0] == VK_NULL_HANDLE ||
+                objects.pipelines[1] == VK_NULL_HANDLE ||
+                objects.pipelineLayout == VK_NULL_HANDLE ||
+                objects.descriptorSetLayout == VK_NULL_HANDLE) {
+                bundle.compiledPipelineLease_ = std::move(lease);
+                diagnostic = "Compiled pipeline borrow callback returned incomplete cached objects.";
+                return fail();
+            }
+            bundle.compiledPipelineLease_ = std::move(lease);
+            bundle.Strategy(RtMaterialStrategy::OpaqueFast).pipeline = objects.pipelines[0];
+            bundle.Strategy(RtMaterialStrategy::GenericDielectric).pipeline = objects.pipelines[1];
+            bundle.pipelineLayout = objects.pipelineLayout;
+            bundle.descriptorSetLayout = objects.descriptorSetLayout;
+            usingCachedPipelineObjects = true;
+            bundle.reusedCompiledPipelines_ = true;
+        }
+    }
+
+    if ((!usingCachedPipelineObjects &&
+         !api.createDescriptorSetLayout(api.user, bundle.preflight_.descriptorIo,
+                                        bundle.descriptorSetLayout, diagnostic)) ||
         !api.createDescriptorPool(api.user, bundle.preflight_.descriptorIo,
                                   bundle.descriptorPool, diagnostic) ||
         !api.allocateDescriptorSet(api.user, bundle.descriptorPool,
@@ -354,27 +395,30 @@ bool BuildRtPipelineBundleResources(RtPipelineBundle& bundle,
         bundle.diagnosticAvailability_ = RtDiagnosticAvailability::Available;
     }
     if (!api.writeDescriptors(api.user, bundle, diagnostic) ||
-        !api.createPipelineLayout(api.user, bundle.descriptorSetLayout,
-                                  bundle.pipelineLayout, diagnostic)) {
+        (!usingCachedPipelineObjects &&
+         !api.createPipelineLayout(api.user, bundle.descriptorSetLayout,
+                                   bundle.pipelineLayout, diagnostic))) {
         return fail();
     }
-    if (rayTracingPipeline &&
+    if (!usingCachedPipelineObjects && rayTracingPipeline &&
         !api.createSharedShaderModules(
             api.user, missModule, hitModule, diagnostic)) {
         return fail();
     }
 
-    for (const RtMaterialStrategy material :
-         {RtMaterialStrategy::OpaqueFast, RtMaterialStrategy::GenericDielectric}) {
-        auto& strategy = bundle.Strategy(material);
-        if (!api.createEntryShaderModule(api.user, strategy.artifact,
-                                         entryModule, diagnostic) ||
-            !api.createStrategyPipeline(api.user, material, entryModule,
-                                        missModule, hitModule, bundle.pipelineLayout,
-                                        strategy.pipeline, diagnostic)) {
-            return fail();
+    if (!usingCachedPipelineObjects) {
+        for (const RtMaterialStrategy material :
+             {RtMaterialStrategy::OpaqueFast, RtMaterialStrategy::GenericDielectric}) {
+            auto& strategy = bundle.Strategy(material);
+            if (!api.createEntryShaderModule(api.user, strategy.artifact,
+                                             entryModule, diagnostic) ||
+                !api.createStrategyPipeline(api.user, material, entryModule,
+                                            missModule, hitModule, bundle.pipelineLayout,
+                                            strategy.pipeline, diagnostic)) {
+                return fail();
+            }
+            destroyModule(entryModule);
         }
-        destroyModule(entryModule);
     }
     destroyModule(hitModule);
     destroyModule(missModule);
@@ -388,6 +432,22 @@ bool BuildRtPipelineBundleResources(RtPipelineBundle& bundle,
                                        diagnostic)) {
                 return fail();
             }
+        }
+    }
+    if (!usingCachedPipelineObjects && api.publishCompiledObjects != nullptr) {
+        RtBundleCompiledPipelineObjects candidate{};
+        candidate.pipelines = {
+            bundle.Strategy(RtMaterialStrategy::OpaqueFast).pipeline,
+            bundle.Strategy(RtMaterialStrategy::GenericDielectric).pipeline};
+        candidate.pipelineLayout = bundle.pipelineLayout;
+        candidate.descriptorSetLayout = bundle.descriptorSetLayout;
+        RtBundleCompiledPipelineLease lease{};
+        if (api.publishCompiledObjects(api.user, bundle.preflight_, candidate, lease)) {
+            if (!lease) {
+                diagnostic = "Compiled pipeline publish callback accepted objects without a cache lease.";
+                return fail();
+            }
+            bundle.compiledPipelineLease_ = std::move(lease);
         }
     }
     diagnostic.clear();

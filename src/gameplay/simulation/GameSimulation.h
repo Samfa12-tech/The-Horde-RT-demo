@@ -14,10 +14,28 @@
 #include "gameplay/interactions/FinaleSequence.h"
 #include "gameplay/interactions/InteractionState.h"
 #include "gameplay/items/LanternPendulum.h"
+#include "gameplay/simulation/CombatPresentation.h"
+#include "gameplay/simulation/CombatInputTiming.h"
 #include "gameplay/simulation/FixedStepRunner.h"
 #include "gameplay/simulation/GameplayEvent.h"
 #include "gameplay/simulation/InputSnapshot.h"
 #include "gameplay/simulation/SimulationSnapshot.h"
+
+namespace horde::gameplay::validation
+{
+class MotionEvidenceScenario;
+}
+
+namespace horde::gameplay::simulation { class GameSimulation; }
+namespace horde::gameplay
+{
+struct DevelopmentCheckpoint;
+struct DevelopmentCheckpointStageEvidence;
+struct DevelopmentCheckpointStepFixedObservation;
+bool StageDevelopmentCheckpointSimulation(simulation::GameSimulation&,
+    const DevelopmentCheckpoint&, DevelopmentCheckpointStageEvidence*,
+    const DevelopmentCheckpointStepFixedObservation*);
+}
 
 namespace horde::gameplay::simulation
 {
@@ -31,33 +49,52 @@ struct GameSimulationConfig
     float movementSpeedMetresPerSecond = 1.9f;
     horde::gameplay::items::PlayerMountProfile playerMountProfile =
         horde::gameplay::items::PlayerMountProfile::LegacyViewRelative;
+    // Historical fixtures remain ready-handed. Applications opt into the
+    // shared BodyStow transition and repaired anatomical hand pose below.
+    bool swordStartsStowed = false;
+    bool waterfallSkeletonEncounter = false;
 };
 
 // Keep the historical constructor configuration available for deterministic
-// legacy fixtures. Applications explicitly select the owner-accepted profile.
+// legacy fixtures. Applications select the accepted profile, waterfall guards,
+// and shared stowed-start/draw-on-encounter behavior.
 inline constexpr GameSimulationConfig ProductionGameSimulationConfig()
 {
     GameSimulationConfig config;
     config.playerMountProfile = horde::gameplay::items::PlayerMountProfile::AnatomicalBody;
+    config.waterfallSkeletonEncounter = true;
+    config.swordStartsStowed = true;
     return config;
 }
+
+enum class PausedInputPolicy
+{
+    DiscardAllCommands,
+    PreserveWorldCommands,
+};
 
 class GameSimulation
 {
 public:
     explicit GameSimulation(GameSimulationConfig config = {});
 
+    // Supply the current logical render-view aspect from the surface owner.
+    // Call on the simulation owner thread before advancing fixed steps.
+    void SetPresentationAspect(float logicalViewAspect);
+
     std::uint32_t AdvanceFrame(const InputSnapshot& input,
                                double frameDeltaSeconds,
-                               std::uint64_t inputPublicationSequence = 0u);
+                               std::uint64_t inputPublicationSequence = 0u,
+                               std::uint64_t ownerAdvanceSteadyNs = 0u);
     void StepFixed(const InputSnapshot& input,
                    float fixedDeltaSeconds = static_cast<float>(FixedStepRunner::kFixedDeltaSeconds),
                    std::uint64_t inputPublicationSequence = 0u);
-    // Owner-thread lifecycle barrier: acknowledges the most recent coherent
-    // paused publication without running gameplay or buffering any edge for
-    // the first resumed fixed tick.
+    // Owner-thread barrier: real lifecycle transitions discard every stale edge.
+    // Ordinary menu transitions may retain explicit reset/retry commands for
+    // the owner to apply, while still discarding all combat/interaction edges.
     void SynchronizePausedInput(const InputSnapshot& input,
-                                std::uint64_t inputPublicationSequence = 0u);
+                                std::uint64_t inputPublicationSequence = 0u,
+                                PausedInputPolicy policy = PausedInputPolicy::DiscardAllCommands);
 
     void ResetRoute();
     void RetryEncounter();
@@ -75,28 +112,71 @@ public:
     const FixedStepRunner& Timing() const { return fixedStepRunner_; }
 
 private:
+    friend class horde::gameplay::validation::MotionEvidenceScenario;
+    friend bool horde::gameplay::StageDevelopmentCheckpointSimulation(GameSimulation&,
+        const horde::gameplay::DevelopmentCheckpoint&,
+        horde::gameplay::DevelopmentCheckpointStageEvidence*,
+        const horde::gameplay::DevelopmentCheckpointStepFixedObservation*);
+    // The motion evidence scenario is the only owner allowed to scope this
+    // opt-in config around an ordinary checkpoint reset.
+    bool BeginMotionEvidenceEquipmentSeed();
+    void EndMotionEvidenceEquipmentSeed();
+
+    void StepFixedTick(const InputSnapshot& input, float fixedDeltaSeconds,
+                       std::uint64_t inputPublicationSequence,
+                       bool activateTimestampedEdges = true);
     static EntityId EntityForEnemy(EnemyKind kind);
-    void IngestCommands(const InputSnapshot& input);
+    void IngestCommands(const InputSnapshot& input, bool ingestCombatEdges = true);
+    void ScheduleTimestampedCombatEdges(const InputSnapshot& input,
+                                        double frameDeltaSeconds,
+                                        std::uint64_t ownerAdvanceSteadyNs,
+                                        std::uint64_t inputPublicationSequence);
+    void ActivateScheduledCombatEdges();
+    void ClearScheduledCombatEdges(bool discardAndConsume);
+    void AddCombatTimingTrace(const CombatInputEdge& edge,
+                              std::uint64_t publicationSequence,
+                              std::uint64_t targetTick,
+                              CombatInputTimingDisposition disposition);
+    void MarkCombatTimingConsumed(CombatInputEdgeKind kind,
+                                  std::uint64_t oldConsumed,
+                                  std::uint64_t newConsumed);
+    void LinkCombatTimingSemanticEvent(CombatInputEdgeKind kind,
+                                       std::uint64_t commandSequence,
+                                       std::uint64_t eventSequence,
+                                       std::uint64_t eventTick);
     bool ConsumeWorldCommand();
     bool ApplyCheckpoint(std::int32_t checkpointId, bool isRetry);
     void UpdateMovement(const InputSnapshot& input, float deltaSeconds);
     void UpdateEncounters(const InputSnapshot& input, float deltaSeconds);
     void UpdateRewardSequence(float deltaSeconds, bool commandsAvailable);
     void ResolveHeldItems();
+    bool SwordDefenseReady() const;
+    bool SwordDrawBlocksDefense() const;
+    bool RequestSwordDraw(std::int32_t reasonPayload, bool blocksDefenseDuringDraw);
+    void ResetSwordEquipment();
+    void ClearQueuedDrawAttack();
+    void AdvanceSwordEquipment(float fixedDeltaSeconds);
+    void EmitSwordAttachmentChange();
     void ResolvePlayerAnimation(float fixedDeltaSeconds);
     void ResolveFireEmitters(float fixedDeltaSeconds);
-    void Emit(GameplayEventType type,
-              EntityId source,
-              EntityId target,
-              float x,
-              float z,
-              float intensity = 1.0f,
-              std::int32_t payload = 0);
+    std::uint64_t Emit(GameplayEventType type,
+                       EntityId source,
+                       EntityId target,
+                       float x,
+                       float z,
+                       float intensity = 1.0f,
+                       std::int32_t payload = 0);
     void RefreshSnapshot(const InputSnapshot& input);
 
     GameSimulationConfig config_{};
+    float presentationAspect_ = 1.0f;
+    bool presentationPoseDirty_ = false;
+    bool motionEvidenceEquipmentSeedActive_ = false;
+    bool motionEvidencePreviousSwordStartsStowed_ = false;
+    bool motionEvidencePreviousWaterfallSkeletonEncounter_ = false;
     FixedStepRunner fixedStepRunner_{};
     BoundedGameplayEventQueue events_{};
+    CombatPresentationTimeline combatPresentation_{};
     SimulationSnapshot snapshot_{};
     InputSnapshot lastInput_{};
 
@@ -111,6 +191,9 @@ private:
     PlayerVitals playerVitals_{};
     TravelFootstepCadence playerFootsteps_{};
     std::array<PlayerFootstepCadence, kSkeletonEnemyCapacity> enemyFootsteps_{};
+    std::array<double, kSkeletonEnemyCapacity> skeletonIncidentalIdleSeconds_{};
+    std::array<double, kSkeletonEnemyCapacity> skeletonIncidentalNextSeconds_{{12.0, 18.0}};
+    double skeletonIncidentalSpacingSeconds_ = 0.0;
     CombatSnapshot combatSnapshot_{};
     TorchFailureSnapshot torchFailureSnapshot_{};
     horde::gameplay::items::HeldItemStates heldItems_ =
@@ -120,7 +203,7 @@ private:
     std::array<horde::gameplay::effects::FireEmitterState,
                horde::gameplay::effects::kFireEmitterCapacity> fireEmitters_{{
         horde::gameplay::effects::MakeOpeningTorchFireEmitter()}};
-    std::size_t fireEmitterCount_ = 1u;
+    std::size_t fireEmitterCount_ = 3u;
     EnemyKind activeEnemyKind_ = EnemyKind::Skeleton;
 
     float playerX_ = 0.0f;
@@ -162,6 +245,27 @@ private:
     float dodgeCooldownRemainingSeconds_ = 0.0f;
     bool finaleCompletionEmitted_ = false;
     bool lanternPendulumResetPending_ = true;
+    bool skeletonIdlePhasesEnabled_ = true;
+    bool waterfallWarningEmitted_ = false;
+    bool automaticSwordDrawBlocksDefense_ = false;
+    bool lichAttackEligible_ = false;
+    std::uint64_t lichRevealAttackSequenceFloor_ = 0u;
+    struct ScheduledCombatEdge
+    {
+        CombatInputEdge edge{};
+        std::uint64_t targetTick = 0u;
+        std::uint64_t publicationSequence = 0u;
+    };
+    std::array<ScheduledCombatEdge, kCombatInputEdgeHistoryCapacity> scheduledCombatEdges_{};
+    std::uint32_t scheduledCombatEdgeCount_ = 0u;
+    std::array<std::uint64_t, 3u> overflowCombatCommandCounts_{};
+    std::array<std::uint64_t, 3u> overflowCombatTargetTicks_{};
+    float overflowDodgeForward_ = 0.0f;
+    float overflowDodgeStrafe_ = 0.0f;
+    std::uint64_t previousOwnerAdvanceSteadyNs_ = 0u;
+    std::uint64_t parrySourceCommandSequence_ = 0u;
+    bool queuedDrawAttack_ = false;
+    std::uint64_t queuedDrawAttackCommandSequence_ = 0u;
 };
 
 } // namespace horde::gameplay::simulation

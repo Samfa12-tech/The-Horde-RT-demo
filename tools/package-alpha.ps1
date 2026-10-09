@@ -36,7 +36,10 @@ function Find-LatestVersionedTool {
 
 $repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
 . (Join-Path $PSScriptRoot "music-asset-policy.ps1")
+. (Join-Path $PSScriptRoot "third-party-notice-policy.ps1")
+. (Join-Path $PSScriptRoot "horde-1.6.2-asset-policy.ps1")
 $null = Assert-HordeMusicAssets -RepositoryRoot $repoRoot
+$null = Assert-Horde162Assets -RepositoryRoot $repoRoot
 $outputFull = [IO.Path]::GetFullPath($OutputRoot)
 $allowedRoot = [IO.Path]::GetFullPath((Join-Path $repoRoot "releases\candidates"))
 $allowedPrefix = $allowedRoot.TrimEnd([IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
@@ -113,7 +116,7 @@ try {
 }
 $windowsBinaryText = [Text.Encoding]::ASCII.GetString([IO.File]::ReadAllBytes($windowsExe))
 foreach ($creditMarker in @(
-    "credits and licences", "Hotstrike Studio", "FilmCow", "Meshy", "DRAGON-STUDIO", "Pixabay",
+    "credits and licences", "cgltf by Johannes Kuhlmann", "THIRD_PARTY_NOTICES/cgltf-LICENSE.txt", "Hotstrike Studio", "FilmCow", "Meshy", "DRAGON-STUDIO", "Pixabay",
     "Production Gothic arming sword created with Meshy; runtime processing by Samfa12/Codex",
     "Production medieval hand torch created with Meshy; runtime processing by Samfa12/Codex"
     "Historical-Gothic traveller/fighter and viewmodel gauntlets created with Meshy; runtime processing and animation integration by Samfa12/Codex"
@@ -141,6 +144,7 @@ $releaseNotes = $releaseNoteMatches[0].FullName
 Copy-Item -LiteralPath $windowsExe -Destination (Join-Path $windowsStage "HordeLanternRT.exe")
 Copy-Item -LiteralPath (Join-Path $repoRoot "release\windows\README.txt") -Destination (Join-Path $windowsStage "README.txt")
 Copy-Item -LiteralPath (Join-Path $repoRoot "ASSET_LICENSES.md") -Destination (Join-Path $windowsStage "ASSET_LICENSES.md")
+Copy-HordeThirdPartyNotices -RepositoryRoot $repoRoot -PackageRoot $windowsStage
 Copy-Item -LiteralPath $releaseNotes -Destination (Join-Path $windowsStage "ALPHA_RELEASE_NOTES.md")
 
 $lichLicenceEvidence = @(
@@ -163,6 +167,8 @@ $assetCopies = @(
     @{ Source = "assets\models\weapons\runtime\gothic-arming-sword-rh-lod0.runtime.glb"; Destination = "assets\models\weapons\runtime" },
     @{ Source = "assets\models\props\runtime\asset.manifest.json"; Destination = "assets\models\props\runtime" },
     @{ Source = "assets\models\props\runtime\gothic-hand-torch-lod0.runtime.glb"; Destination = "assets\models\props\runtime" },
+    @{ Source = "assets\models\props\runtime\player-rag-torch\asset.manifest.json"; Destination = "assets\models\props\runtime\player-rag-torch" },
+    @{ Source = "assets\models\props\runtime\player-rag-torch\rag-torch-player-lod0.runtime.glb"; Destination = "assets\models\props\runtime\player-rag-torch" },
     @{ Source = "assets\models\props\runtime\dielectric-fixture\asset.manifest.json"; Destination = "assets\models\props\runtime\dielectric-fixture" },
     @{ Source = "assets\models\props\runtime\dielectric-fixture\closed-glass-lod0.runtime.glb"; Destination = "assets\models\props\runtime\dielectric-fixture" },
     @{ Source = "assets\models\props\runtime\gothic-chest-base\asset.manifest.json"; Destination = "assets\models\props\runtime\gothic-chest-base" },
@@ -192,15 +198,15 @@ foreach ($copy in $assetCopies) {
 $audioDestination = Join-Path $windowsStage "assets\audio\filmcow"
 New-Item -ItemType Directory -Force -Path $audioDestination | Out-Null
 Copy-Item -Path (Join-Path $repoRoot "assets\audio\filmcow\*.wav") -Destination $audioDestination
-$pixabayAudioDestination = Join-Path $windowsStage "assets\audio\pixabay"
-New-Item -ItemType Directory -Force -Path $pixabayAudioDestination | Out-Null
-Copy-Item -Path (Join-Path $repoRoot "assets\audio\pixabay\*.wav") -Destination $pixabayAudioDestination
+$null = Copy-Horde162RuntimeAssets -RepositoryRoot $repoRoot -AssetRoot (Join-Path $windowsStage "assets") -Platform Windows
 $null = Copy-HordeMusicRuntimeAssets -RepositoryRoot $repoRoot -AssetRoot (Join-Path $windowsStage "assets")
 
 $windowsZip = Join-Path $outputFull "$baseName-Windows-x64.zip"
 if (Test-Path -LiteralPath $windowsZip) { Remove-Item -LiteralPath $windowsZip -Force }
 Compress-Archive -Path (Join-Path $windowsStage "*") -DestinationPath $windowsZip -CompressionLevel Optimal
 $null = Assert-HordeMusicPackage -RepositoryRoot $repoRoot -ArchivePath $windowsZip
+Assert-HordeThirdPartyNoticesPackage -RepositoryRoot $repoRoot -ArchivePath $windowsZip -Platform Windows
+Assert-Horde162Package -RepositoryRoot $repoRoot -ArchivePath $windowsZip -Platform Windows
 
 Push-Location (Join-Path $repoRoot "android")
 try {
@@ -214,6 +220,8 @@ $debugApk = Join-Path $repoRoot "android\app\build\outputs\apk\debug\app-debug.a
 $debugCandidate = Join-Path $outputFull "$baseName-Android-preview-debug-signed.apk"
 Copy-Item -LiteralPath $debugApk -Destination $debugCandidate -Force
 $null = Assert-HordeMusicPackage -RepositoryRoot $repoRoot -ArchivePath $debugCandidate
+Assert-HordeThirdPartyNoticesPackage -RepositoryRoot $repoRoot -ArchivePath $debugCandidate -Platform Android
+Assert-Horde162Package -RepositoryRoot $repoRoot -ArchivePath $debugCandidate -Platform Android
 
 $signedRelease = Join-Path $repoRoot "android\app\build\outputs\apk\release\app-release.apk"
 $unsignedRelease = Join-Path $repoRoot "android\app\build\outputs\apk\release\app-release-unsigned.apk"
@@ -231,6 +239,8 @@ if ($releaseSigningConfigured -and (Test-Path -LiteralPath $signedRelease)) {
     throw "No unsigned Android release APK was produced."
 }
 $null = Assert-HordeMusicPackage -RepositoryRoot $repoRoot -ArchivePath $androidCandidate
+Assert-HordeThirdPartyNoticesPackage -RepositoryRoot $repoRoot -ArchivePath $androidCandidate -Platform Android
+Assert-Horde162Package -RepositoryRoot $repoRoot -ArchivePath $androidCandidate -Platform Android
 
 $androidSdkRoot = if (-not [string]::IsNullOrWhiteSpace($env:ANDROID_HOME)) {
     $env:ANDROID_HOME
@@ -245,7 +255,7 @@ $zipalign = Find-LatestVersionedTool -Root $androidBuildTools -RelativeToolPath 
 $androidResources = (& $aapt2 dump resources $androidCandidate 2>&1 | Out-String)
 if ($LASTEXITCODE -ne 0) { throw "Failed to inspect Android resources in $androidCandidate" }
 foreach ($creditMarker in @(
-    "string/credits_body", "Hotstrike Studio", "FilmCow", "Meshy", "DRAGON-STUDIO", "Pixabay",
+    "string/credits_body", "cgltf by Johannes Kuhlmann", "THIRD_PARTY_NOTICES/cgltf-LICENSE.txt", "Hotstrike Studio", "FilmCow", "Meshy", "DRAGON-STUDIO", "Pixabay",
     "Production Gothic arming sword created with Meshy; runtime processing by Samfa12/Codex",
     "Production medieval hand torch created with Meshy; runtime processing by Samfa12/Codex"
     "Historical-Gothic traveller/fighter and viewmodel gauntlets created with Meshy; runtime processing and animation integration by Samfa12/Codex"
@@ -258,7 +268,7 @@ foreach ($creditMarker in @(
 }
 
 & (Join-Path $repoRoot "tools\test-held-item-package-contract.ps1") `
-    -AndroidApkPath $androidCandidate -WindowsZipPath $windowsZip
+    -AndroidApkPath $androidCandidate -WindowsZipPath $windowsZip -RequireHorde162World
 if ($LASTEXITCODE -ne 0) { throw "Held-item package attribution contract failed." }
 $androidManifest = (& $aapt2 dump xmltree --file AndroidManifest.xml $androidCandidate 2>&1 | Out-String)
 if ($LASTEXITCODE -ne 0) { throw "Failed to inspect the Android manifest in $androidCandidate" }
@@ -269,8 +279,11 @@ if ($androidManifest -notmatch "versionName[^\r\n]*=`"$escapedVersion`"") {
 if ($androidManifest -notmatch "versionCode[^\r\n]*=$VersionCode(?:\s|$)") {
     throw "Android candidate does not contain versionCode $VersionCode."
 }
-if ($androidManifest -notmatch 'screenOrientation[^\r\n]*=7(?:\s|$)') {
-    throw "Android candidate is not locked to sensorPortrait (screenOrientation=7)."
+if ($androidManifest -notmatch 'screenOrientation[^\r\n]*=13(?:\s|$)') {
+    throw "Android candidate must support portrait/landscape with the user's rotation preference (fullUser=13)."
+}
+if ($androidManifest -notmatch 'configChanges[^\r\n]*=(?:0x0*4f0|1264)(?:\s|$)') {
+    throw "Android candidate must retain the Activity/session across orientation, screen-size and controller keyboard/navigation changes."
 }
 
 & $zipalign -c -P 16 -v 4 $androidCandidate | Out-Null
@@ -283,7 +296,8 @@ $apkArchive = [IO.Compression.ZipFile]::OpenRead($androidCandidate)
 try {
     $apkEntryNames = @($apkArchive.Entries | ForEach-Object FullName)
     foreach ($requiredAudio in @(
-        'assets/audio/pixabay/waterfall_loop.wav',
+        'assets/audio/pixabay/waterfall_core_loop.wav',
+        'assets/audio/pixabay/waterfall-core.manifest.json',
         'assets/audio/pixabay/chest_unlock.wav',
         'assets/audio/pixabay/chest_open.wav',
         'assets/audio/pixabay/torch_extinguish.wav')) {
@@ -296,6 +310,19 @@ try {
         'assets/models/weapons/runtime/gothic-arming-sword-rh-lod0.runtime.glb',
         'assets/models/props/runtime/asset.manifest.json',
         'assets/models/props/runtime/gothic-hand-torch-lod0.runtime.glb',
+        'assets/models/props/runtime/player-rag-torch/asset.manifest.json',
+        'assets/models/props/runtime/player-rag-torch/rag-torch-player-lod0.runtime.glb',
+        'assets/models/props/runtime/player-sword-scabbard/asset.manifest.json',
+        'assets/models/props/runtime/player-sword-scabbard/processing-receipt.json',
+        'assets/models/props/runtime/player-sword-scabbard/player-sword-scabbard-lod0.runtime.glb',
+        'assets/audio/menu/menu_room.wav',
+        'assets/audio/menu/menu_chain.wav',
+        'assets/audio/menu/asset.manifest.json',
+        'assets/audio/filmcow/equipment/asset.manifest.json',
+        'assets/audio/filmcow/equipment/sword_draw.wav',
+        'assets/audio/filmcow/equipment/sword_sheath.wav',
+        'assets/models/world/runtime/collapsed-entry/asset.manifest.json',
+        'assets/models/world/runtime/collapsed-entry/collapsed-entry-lod0.runtime.glb',
         'assets/models/props/runtime/dielectric-fixture/asset.manifest.json',
         'assets/models/props/runtime/dielectric-fixture/closed-glass-lod0.runtime.glb',
         'assets/models/props/runtime/gothic-chest-base/asset.manifest.json',
@@ -365,6 +392,8 @@ try {
         "HordeLanternRT.exe",
         "README.txt",
         "ASSET_LICENSES.md",
+        "LICENSE",
+        "LICENSE_SCOPE.md",
         "assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb",
         "assets/models/enemies/meshy/lich_placeholder_merged_animations_v01.glb",
         "assets/textures/meshy/lich_placeholder_v01/base-color-2048-rgba8.ktx2",
@@ -374,6 +403,19 @@ try {
         "assets/models/weapons/runtime/gothic-arming-sword-rh-lod0.runtime.glb",
         "assets/models/props/runtime/asset.manifest.json",
         "assets/models/props/runtime/gothic-hand-torch-lod0.runtime.glb",
+        "assets/models/props/runtime/player-rag-torch/asset.manifest.json",
+        "assets/models/props/runtime/player-rag-torch/rag-torch-player-lod0.runtime.glb",
+        "assets/models/props/runtime/player-sword-scabbard/asset.manifest.json",
+        "assets/models/props/runtime/player-sword-scabbard/processing-receipt.json",
+        "assets/models/props/runtime/player-sword-scabbard/player-sword-scabbard-lod0.runtime.glb",
+        "assets/audio/menu/menu_room.wav",
+        "assets/audio/menu/menu_chain.wav",
+        "assets/audio/menu/asset.manifest.json",
+        "assets/audio/filmcow/equipment/asset.manifest.json",
+        "assets/audio/filmcow/equipment/sword_draw.wav",
+        "assets/audio/filmcow/equipment/sword_sheath.wav",
+        "assets/models/world/runtime/collapsed-entry/asset.manifest.json",
+        "assets/models/world/runtime/collapsed-entry/collapsed-entry-lod0.runtime.glb",
         "assets/models/props/runtime/dielectric-fixture/asset.manifest.json",
         "assets/models/props/runtime/dielectric-fixture/closed-glass-lod0.runtime.glb",
         "assets/models/props/runtime/gothic-chest-base/asset.manifest.json",

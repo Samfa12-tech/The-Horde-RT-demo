@@ -153,7 +153,7 @@ inline bool AudioSegmentIntersectsRect(float startX,
 
 inline bool IsRouteAudioObstructed(float listenerX, float listenerZ, float emitterX, float emitterZ)
 {
-    for (const RouteRect& obstacle : kShowcaseSolidObstacles)
+    for (const RouteRect& obstacle : kShowcaseMasonryObstacles)
     {
         if (AudioSegmentIntersectsRect(listenerX, listenerZ, emitterX, emitterZ, obstacle))
         {

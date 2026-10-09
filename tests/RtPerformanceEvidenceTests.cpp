@@ -338,6 +338,11 @@ RtRecordedSceneEvidence MakeRecordedScene(const RtSceneFrameEvidence& evidence)
     RtRecordedSceneEvidence recorded{};
     recorded.pipeline = evidence.pipeline;
     recorded.resources = evidence.resources;
+    recorded.shadowQuality = evidence.shadowQuality;
+    recorded.fireQuality = evidence.fireQuality;
+    recorded.fireLighting = evidence.fireLighting;
+    recorded.actualUploadedMistEnabled = evidence.actualUploadedMistEnabled;
+    recorded.actualUploadedDustQuality = evidence.actualUploadedDustQuality;
     recorded.player = evidence.player;
     recorded.player.primaryPixelCountAvailable = false;
     recorded.player.primaryPixelCount = 0u;
@@ -991,8 +996,16 @@ void TestLifecycleAssociationAndTransactions(TestContext& context)
     context.Check(lifecycle.BeginRecord(0u, 101u, attemptA), "record A must begin");
     context.Check(attemptA.recordAttemptSerial == 1u && attemptA.recordSerial == 0u,
                   "Begin must allocate a unique attempt but no successful-record serial");
-    const RtSceneFrameEvidence sceneA = MakeSceneEvidence(
+    RtSceneFrameEvidence sceneA = MakeSceneEvidence(
         context, RtInstrumentationMode::Diagnostic, RtMaterialStrategy::OpaqueFast, 'a', 1'000u);
+    sceneA.shadowQuality = RtShadowQualityEvidence{RtShadowMode::Lower, 1u, 1u, 0u};
+    sceneA.fireQuality = RtFireQualityEvidence{RtFireQuality::Low, 2u, 1u};
+    sceneA.actualUploadedMistEnabled = true;
+    sceneA.actualUploadedDustQuality = horde::graphics::DustQuality::Low;
+    sceneA.fireLighting = RtFireLightingEvidence{};
+    sceneA.fireLighting->count = 2u;
+    sceneA.fireLighting->emitters[0] = {3u, {{-32.5f, 0.85f, -16.5f, 0.5f}}, {{1.0f, 0.5f, 0.25f, 0.5f}}};
+    sceneA.fireLighting->emitters[1] = {4u, {{-31.5f, 0.85f, -13.5f, 0.75f}}, {{1.0f, 0.5f, 0.25f, 0.75f}}};
     RtFrameToken recordedA{};
     context.Check(lifecycle.FinishRecord(attemptA, MakeRecordedScene(sceneA), recordedA),
                   "record A must finish");
@@ -1008,8 +1021,13 @@ void TestLifecycleAssociationAndTransactions(TestContext& context)
     RtFrameToken attemptB{};
     context.Check(lifecycle.BeginRecord(1u, 202u, attemptB),
                   "record B may begin in another fixed slot while A awaits completion");
-    const RtSceneFrameEvidence sceneB = MakeSceneEvidence(
+    RtSceneFrameEvidence sceneB = MakeSceneEvidence(
         context, RtInstrumentationMode::Diagnostic, RtMaterialStrategy::GenericDielectric, 'c', 2'000u);
+    sceneB.shadowQuality = RtShadowQualityEvidence{RtShadowMode::Higher, 4u, 2u, 0u};
+    sceneB.fireQuality = RtFireQualityEvidence{RtFireQuality::High, 10u, 2u};
+    sceneB.actualUploadedMistEnabled = false;
+    sceneB.actualUploadedDustQuality = horde::graphics::DustQuality::Standard;
+    sceneB.fireLighting = RtFireLightingEvidence{}; // actual empty upload, not legacy absence
     RtFrameToken recordedB{};
     context.Check(lifecycle.FinishRecord(attemptB, MakeRecordedScene(sceneB), recordedB),
                   "record B must finish");
@@ -1055,6 +1073,16 @@ void TestLifecycleAssociationAndTransactions(TestContext& context)
                       completedA.dielectric.counters[0] == 1u &&
                       completedA.gpu.durationNanoseconds == 11'000'000u,
                   "completed A must contain only A identity, scene, diagnostic and GPU sentinels");
+    context.Check(completedA.scene.shadowQuality == sceneA.shadowQuality &&
+                      completedA.scene.fireQuality == sceneA.fireQuality &&
+                      completedA.scene.actualUploadedMistEnabled == sceneA.actualUploadedMistEnabled &&
+                      completedA.scene.actualUploadedDustQuality == sceneA.actualUploadedDustQuality &&
+                      completedA.scene.actualUploadedMistEnabled != sceneB.actualUploadedMistEnabled &&
+                      completedA.scene.fireLighting == sceneA.fireLighting &&
+                      completedA.scene.fireLighting != sceneB.fireLighting &&
+                      completedA.scene.shadowQuality != sceneB.shadowQuality &&
+                      completedA.scene.fireQuality != sceneB.fireQuality,
+                  "record B uploaded quality must not contaminate A owning completion");
     context.Check(completedA.scene.pipeline.activeStrategy != sceneB.pipeline.activeStrategy &&
                       completedA.scene.resources.bufferCount != sceneB.resources.bufferCount &&
                       completedA.scene.player.primaryPixelCount != sceneB.player.primaryPixelCount &&
@@ -1085,6 +1113,21 @@ void TestLifecycleAssociationAndTransactions(TestContext& context)
     context.Check(!lifecycle.AttachPresentation(submittedB, RtPresentationOutcome::Presented) &&
                       SameBytes(beforeInvalid, lifecycle),
                   "duplicate present attachment must be transactionally rejected");
+    RtLifecyclePublishedState dustPublication{};
+    dustPublication.running=true;dustPublication.presented=true;dustPublication.hasCompletedEvidence=true;
+    dustPublication.sceneEpoch=submittedA.frame.sceneEpoch;
+    dustPublication.measurementGeneration=submittedA.frame.measurementGeneration;
+    dustPublication.completedEvidence=completedA;
+    dustPublication.completedEvidence.presentation.outcome=RtPresentationOutcome::Presented;
+    dustPublication.completedEvidence.presentation.lastSuccessfulPresentSubmissionSerial=submittedA.submissionSerial;
+    context.Check(CurrentCompletedDustQuality(dustPublication)==horde::graphics::DustQuality::Low,
+        "Dust ACK is owned by the completed and presented A submission");
+    auto staleDust=dustPublication;++staleDust.sceneEpoch;
+    context.Check(!CurrentCompletedDustQuality(staleDust),"stale scene cannot ACK Dust");
+    staleDust=dustPublication;staleDust.completedEvidence.identity.completionSerial=0;
+    context.Check(!CurrentCompletedDustQuality(staleDust),"uncompleted upload cannot ACK Dust");
+    staleDust=dustPublication;staleDust.completedEvidence.scene.actualUploadedDustQuality=static_cast<horde::graphics::DustQuality>(3);
+    context.Check(!CurrentCompletedDustQuality(staleDust),"invalid owning Dust enum rejected");
     RtPerformanceEvidenceSnapshot completedB{};
     context.Check(lifecycle.CompleteFence(
                       submittedB,
@@ -1097,6 +1140,9 @@ void TestLifecycleAssociationAndTransactions(TestContext& context)
                       completedB),
                   "failed-present submission may still publish matching completed diagnostics");
     context.Check(completedB.presentation.outcome == RtPresentationOutcome::Failed &&
+                      completedB.scene.actualUploadedMistEnabled == sceneB.actualUploadedMistEnabled &&
+                      completedB.scene.actualUploadedDustQuality == sceneB.actualUploadedDustQuality &&
+                      completedB.scene.fireLighting == sceneB.fireLighting &&
                       !completedB.benchmarkEligible &&
                       completedB.presentation.lastSuccessfulPresentSubmissionSerial ==
                           submittedA.submissionSerial,
@@ -2420,6 +2466,139 @@ void TestNoAllocationAndOneWayIsolation(TestContext& context)
                   "serializer failure must remain a one-way observer with no deterministic side effect");
 }
 
+void TestUploadedFireLightingEvidence(TestContext& context)
+{
+    auto snapshot = MakeSnapshot(context, RtInstrumentationMode::Shipping);
+    RtEvidenceValidationError error{};
+    std::string json;
+    context.Check(SerializeRtPerformanceEvidenceJson(snapshot, json, error) &&
+                  json.find("fireLighting") == std::string::npos,
+                  "historical missing fire upload must not become an invented empty selection");
+    RtFireLightingEvidence lights{};
+    lights.count = 4u;
+    const std::array<std::uint32_t, 4u> ids{{1u, 3u, 4u, 2u}};
+    for (std::size_t index = 0u; index < ids.size(); ++index)
+        lights.emitters[index] = {ids[index], {{-32.5f + static_cast<float>(index), 0.85f, -15.5f, 0.5f}},
+                                 {{1.0f, 0.5f, 0.25f, 0.5f}}};
+    snapshot.scene.fireLighting = lights;
+    std::ostringstream hostile;
+    hostile << std::hex << std::showpos << std::showbase << std::uppercase << std::scientific;
+    const auto oldFlags = hostile.flags();
+    const auto oldPrecision = hostile.precision();
+    WriteRtFireLightingEvidenceJson(hostile, lights);
+    context.Check(hostile.str().find("\"stableId\":3") != std::string::npos &&
+                  hostile.str().find("+0.") == std::string::npos && hostile.str().find("0X") == std::string::npos &&
+                  hostile.flags() == oldFlags && hostile.precision() == oldPrecision,
+                  "shared light JSON is valid independent of caller formatting and restores its flags");
+    context.Check(SerializeRtPerformanceEvidenceJson(snapshot, json, error) &&
+                  json.find("\"fireLighting\":{\"count\":4") != std::string::npos &&
+                  json.find("\"stableId\":3") != std::string::npos &&
+                  json.find("\"stableId\":4") != std::string::npos,
+                  "four exact independent uploaded IDs survive the owning JSON projection");
+    for (unsigned corruption = 0u; corruption < 11u; ++corruption)
+    {
+        auto invalid = lights;
+        switch (corruption)
+        {
+        case 0u: invalid.count = 5u; break;
+        case 1u: invalid.emitters[0].stableId = 0u; break;
+        case 2u: invalid.emitters[1].stableId = invalid.emitters[0].stableId; break;
+        case 3u: invalid.emitters[0].positionStrength[0] = std::numeric_limits<float>::quiet_NaN(); break;
+        case 4u: invalid.emitters[0].colourIntensity[0] = std::numeric_limits<float>::infinity(); break;
+        case 5u: invalid.emitters[0].colourIntensity[1] = -0.5f; break;
+        case 6u: invalid.emitters[0].positionStrength[3] = 0.0f; break;
+        case 7u: invalid.emitters[0].colourIntensity[3] = 0.75f; break;
+        case 8u: invalid.emitters[0].colourIntensity = {{0.0f, 0.0f, 0.0f, 0.5f}}; break;
+        case 9u: invalid.count = 3u; break; // nonzero unused ID/data
+        case 10u: invalid.count = 0u; invalid.emitters = {}; invalid.emitters[3].positionStrength[0] = 1.0f; break;
+        }
+        snapshot.scene.fireLighting = invalid;
+        const auto before = snapshot;
+        json = "unchanged";
+        const bool rejected = !ValidateRtPerformanceEvidence(snapshot, error) &&
+            !SerializeRtPerformanceEvidenceJson(snapshot, json, error);
+        bool lightingUnchanged = snapshot.scene.fireLighting.has_value() &&
+            snapshot.scene.fireLighting->count == before.scene.fireLighting->count;
+        for (std::size_t index = 0u; index < lights.emitters.size() && lightingUnchanged; ++index)
+        {
+            const auto& old = before.scene.fireLighting->emitters[index];
+            const auto& current = snapshot.scene.fireLighting->emitters[index];
+            // Compare numeric object representations explicitly: the invalid
+            // NaN fixture cannot use float equality, and struct padding is not evidence.
+            lightingUnchanged = old.stableId == current.stableId &&
+                std::memcmp(old.positionStrength.data(), current.positionStrength.data(), sizeof(float) * 4u) == 0 &&
+                std::memcmp(old.colourIntensity.data(), current.colourIntensity.data(), sizeof(float) * 4u) == 0;
+        }
+        context.Check(rejected && json.empty() && lightingUnchanged &&
+                      snapshot.identity.submitted.submissionSerial == before.identity.submitted.submissionSerial &&
+                      snapshot.identity.completionSerial == before.identity.completionSerial &&
+                      snapshot.identity.submitted.frame.sceneEpoch == before.identity.submitted.frame.sceneEpoch &&
+                      snapshot.identity.submitted.frame.recordSerial == before.identity.submitted.frame.recordSerial &&
+                      snapshot.identity.submitted.frame.simulationTick == before.identity.submitted.frame.simulationTick &&
+                      snapshot.presentation.outcome == before.presentation.outcome &&
+                      snapshot.cpuBenchmarkEligible == before.cpuBenchmarkEligible &&
+                      snapshot.benchmarkEligible == before.benchmarkEligible,
+                      "invalid lighting prefix cannot serialize or mutate owning evidence");
+    }
+    snapshot.scene.fireLighting = RtFireLightingEvidence{};
+    context.Check(SerializeRtPerformanceEvidenceJson(snapshot, json, error) &&
+                  json.find("\"fireLighting\":{\"count\":0") != std::string::npos,
+                  "successful zero-light upload remains explicitly present with a zeroed suffix");
+    RtEvidenceLifecycle lifecycle;
+    RtLifecycleResetEffects effects;
+    RtLifecycleSeeds seeds;
+    seeds.sceneEpoch = 1u;
+    seeds.measurementGeneration = 1u;
+    context.Check(lifecycle.Initialise(seeds, 1u, RtSampleStatus::CompiledOut, RtSampleStatus::Disabled, effects),
+                  "fire record-rejection fixture initializes ordinary ownership");
+    RtFrameToken attempt{}, recorded{};
+    context.Check(lifecycle.BeginRecord(0u, 1u, attempt), "fire record-rejection fixture begins");
+    auto invalidRecord = MakeRecordedScene(snapshot.scene);
+    invalidRecord.fireLighting->emitters[3].stableId = 4u;
+    const auto beforeRecord = lifecycle;
+    context.Check(!lifecycle.FinishRecord(attempt, invalidRecord, recorded) && SameBytes(beforeRecord, lifecycle),
+                  "bad uploaded suffix cannot claim successful command recording or change the owner");
+    context.Check(lifecycle.FinishRecord(attempt, MakeRecordedScene(snapshot.scene), recorded),
+                  "the retained attempt can accept a subsequently valid exact empty upload");
+}
+
+void TestUploadedQualityEvidence(TestContext& context)
+{
+    auto snapshot = MakeSnapshot(context, RtInstrumentationMode::Shipping);
+    RtEvidenceValidationError error{};
+    std::string json;
+    context.Check(SerializeRtPerformanceEvidenceJson(snapshot, json, error) &&
+        json.find("shadowQuality") == std::string::npos && json.find("fireQuality") == std::string::npos,
+        "legacy absent uploads must not acquire fabricated default budgets");
+    for (const auto fire : {RtFireQualityEvidence{RtFireQuality::Low, 2u, 1u},
+         RtFireQualityEvidence{RtFireQuality::Mobile, 4u, 1u}, RtFireQualityEvidence{RtFireQuality::High, 10u, 2u}})
+    {
+        snapshot.scene.fireQuality = fire;
+        context.Check(ValidateRtPerformanceEvidence(snapshot, error), "all three exact uploaded fire budgets admitted");
+        snapshot.scene.fireQuality->volumeSteps++;
+        context.Check(!ValidateRtPerformanceEvidence(snapshot, error), "wrong uploaded fire steps rejected");
+    }
+    snapshot.scene.fireQuality = RtFireQualityEvidence{RtFireQuality::Low, 2u, 1u};
+    snapshot.scene.shadowQuality = RtShadowQualityEvidence{RtShadowMode::Higher, 4u, 2u, 0u};
+    context.Check(SerializeRtPerformanceEvidenceJson(snapshot, json, error) &&
+        json.find("\"localPrimarySamples\":4") != std::string::npos &&
+        json.find("\"quality\":\"Low\"") != std::string::npos &&
+        json.find("\"reflectedVolumeSteps\":2") != std::string::npos,
+        "serialized budgets are copied owning values and genuine reflected evaluations");
+    snapshot.scene.pipeline.dielectricQuality = RtDielectricQuality::Mobile;
+    context.Check(!ValidateRtPerformanceEvidence(snapshot, error), "Mobile cannot certify High four-sample shadow budget");
+    snapshot.scene.pipeline.dielectricQuality = RtDielectricQuality::High;
+    context.Check(ValidateRtPerformanceEvidence(snapshot, error), "High exact higher shadow budget admitted");
+    snapshot.scene.shadowQuality->reserved = 1u;
+    context.Check(!ValidateRtPerformanceEvidence(snapshot, error), "nonzero shadow reserved word rejected");
+    snapshot.scene.shadowQuality = RtShadowQualityEvidence{static_cast<RtShadowMode>(255u), 1u, 1u, 0u};
+    context.Check(!ValidateRtPerformanceEvidence(snapshot, error), "unknown shadow mode rejected");
+    snapshot.scene.shadowQuality = RtShadowQualityEvidence{RtShadowMode::DiagnosticLegacy, 4u, 2u, 0u};
+    context.Check(ValidateRtPerformanceEvidence(snapshot, error), "explicit legacy Max resolved budget remains named");
+    snapshot.scene.shadowQuality = RtShadowQualityEvidence{RtShadowMode::Current, 1u, 1u, 0u};
+    snapshot.scene.fireQuality = RtFireQualityEvidence{static_cast<RtFireQuality>(255u), 2u, 1u};
+    context.Check(!ValidateRtPerformanceEvidence(snapshot, error), "unknown fire tier rejected");
+}
 } // namespace
 
 int main()
@@ -2427,6 +2606,8 @@ int main()
     TestContext context;
     TestExecutionModeEvidence(context);
     TestFixedTextAndEnums(context);
+    TestUploadedQualityEvidence(context);
+    TestUploadedFireLightingEvidence(context);
     TestStageAccumulatorAndConversion(context);
     TestSharedDurationStatistics(context);
     TestExternalStageSampleCollectionCore(context);

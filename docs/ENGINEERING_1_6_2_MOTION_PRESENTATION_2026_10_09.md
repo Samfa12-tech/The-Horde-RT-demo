@@ -1,0 +1,52 @@
+# 1.6.2 isolated motion and actual-presentation evidence — 9 October 2026
+
+**Later ordinary-menu checkpoint:** [40677738](ENGINEERING_1_6_2_EXPERIMENTAL_SCALES_2026_10_09.md) exposes 33/40 as manual experiments while keeping fresh/reset 50%. The min50 ordinary-artifact statements below describe the sealed a6439e0b snapshot. Its motion measurements and hashes are not replaced.
+
+The existing fixed-route benchmark advances its authored replay by one simulation step per rendered frame. Its actual image-presentation intervals remain valid for that declared workload, but it cannot establish ordinary movement/combat timing. Preserve the earlier 75% results and the [warm 50% observation](ENGINEERING_1_6_2_MOBILE_QUALITY_MEASUREMENTS.md) in their original scope.
+
+Runtime `a6439e0b5998adefb7fdd87ea316132bc928549c` adds an explicitly admitted isolated Shipping/Mobile motion-validation path. Ordinary Debug/release keep minimum 50% and this feature Off. The isolated opt-in requires benchmark admission, actual `VK_GOOGLE_display_timing`, minimum33, non-Debug compilation and the unchanged Mobile shaders/assets; staged shader and viewmodel experiments are excluded. Existing menu controls expose 33/40 as experiments; no default is lowered.
+
+## Authority and bounded evidence
+
+The adapter reuses `MotionEvidenceScenario`, the current InputMailbox owner/admission lock and the normal `GameSimulation.AdvanceFrame` branch with raw monotonic input-owner delta and existing 60 Hz catch-up. Harness axes and timestamped command edges modify that one consumed input tuple; there is no second simulation, authoritative per-frame player-pose replay or fixed-render-delta override. Real UI/input intervention, changed profile/resources or suspension fail the run. One existing checkpoint seed is allowed; ordinary mechanics produce the subsequent poses/events. This does not measure human input latency.
+
+Each state retains wall time, input publication/commands, tick, pose, semantic events, ticks per frame and catch-up overruns. Exact submitted/completed RT identities bind those states to the actual presentation collector. Settings include native `DispatchExtent()` traced dimensions and full water/fire/glass/shadow/cap/mist/dust tuple. Milestone storage-image readbacks retain their exact RT/state row and actual extent, and are streamed from the app-owned private directory into a fresh run-owned external export with bounded counts, lengths and paths.
+
+Limits remain 30 seconds to arm, 120 seconds scenario wall time, 16,384 state/RT rows, 1,024 events, 64 readbacks, 32,768 timing rows and 256 pending presents. At terminal completion a maximum two-second owner poll yields every 10 ms, submits no new frames and never forces a dummy presentation. Missing timestamps, adverse counters, cancelled work or lost lifecycle ownership remain invalid. Existing failed-GPU-idle ownership is preserved.
+
+The [separate strict offline analyzer](../tools/analyze_android_motion_present_timing.py) checks schema/admission, counter baseline and deltas, exact state/RT/presentation joins, image metadata, contiguous presentation/record/submission identities and increasing actual timestamps. Earlier startup rows are excluded; missing/interleaved rows, outstanding IDs and mixed resource scopes fail. It accepts only a single continuous scope for interval statistics: a retry scenario's retained multi-scope evidence does not become one unified pacing pass. It reports real inter-present intervals and preserves catch-up overruns. Readback and collection overhead are part of these short instrumented observations. Neither GPU reciprocal time, a median nor this harness closes sustained FPS or owner appearance/feel gates.
+
+## Exact artifacts and checks
+
+[Sanitized receipt](evidence/2026-10-09-motion-presentation/receipt.json) records tree `03781313c18939bd19b0fafab9462660564d6081` and both sealed packages:
+
+- Isolated benchmark APK: `d305f4ab8d3d61f57620f6fcd2eb40db4fce4aa0b76a6c90e44cfbcfb91cff73` (121,553,614 bytes), non-debuggable, version `1.6.2-benchmark`.
+- Ordinary Debug APK: `ccf1aeb2130881be658b2bd30680812959f11c91a01ff561d5530cd53195d222` (138,462,962 bytes), not installed at this checkpoint.
+
+All four ABI builds and 16 KiB ELF/benchmark ZIP alignment pass. All 94 runtime assets match the accepted earlier package byte-for-byte. Android Debug and isolated benchmark each pass 249 tests in 38 suites, with zero failures/errors/skips; both lint checks pass. Three affected host suites (Android motion policy, shared motion scenario/ledger, presentation collector), 13 new offline fixtures, nine unchanged standard-route analyzer fixtures and the actual Gradle/CMake admission matrix pass.
+
+Runtime CI is **12/12** aggregate success: [push 37791531274](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/37791531274), [PR 37791538576](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/37791538576). The earlier analyzer checkpoint separately passes 12/12. Initial fixture/build-admission failures and their corrected reruns are preserved in the private logs and receipt; none is a persistence failure or phone controller pass.
+
+## Controlled phone cohort and owner decision
+
+The intended SM-S948B / Android 16 is verified connected. The sealed isolated APK is installed with pulled-base hash matching `d305f4ab8d3d61f57620f6fcd2eb40db4fce4aa0b76a6c90e44cfbcfb91cff73`. Three `motion-waterfall-equipment-v1` runs use the same phone, APK, real RayTracingPipeline, portrait 1440×2980 output, Mobile water/fire, Glass Off, Current shadows, cap 30, Mist On and Dust Off. Only render scale changes. Cap 30 has its existing **menu/preview** scope, not a gameplay 30 FPS limiter. UI stays at native resolution.
+
+| Run | Scale / actual traced extent | Joined frames / intervals | Actual-present span | Presented-image rate | Median / p 95 / max interval |
+| --- | --- | --- | --- | --- | --- |
+| `mobile50-motion02` |50% /720×1490|161 /160|6.587500205 s|24.288424/s|37.500053 /66.666667 /79.166667 ms|
+| `mobile40-motion01` |40% /576×1192|205 /204|6.537500154 s|31.204588/s|29.166719 /49.999948 /66.666615 ms|
+| `mobile33-motion01` |33% /475×983|304 /303|6.562500205 s|46.171427/s|16.666719 /37.500000 /62.500000 ms|
+
+All three pass the strict exact-state/RT/presentation joins, retain 13 owning milestone images each, have no unresolved timing identities or adverse collector-counter deltas, and record no catch-up overruns. There are 125/97/49 intervals above the analyzer's explicit 33.333 ms threshold respectively and none above 250 ms. Native raw timing rows and wrapped-margin exclusions remain intact. These are short instrumented moving observations, including collection/readback overhead; the rates and medians do **not** establish sustained 30 FPS.
+
+Fresh typed current-HAL admission requires framework status 0, AP/BAT/SKIN starting ceilings 31.5/29.5/32.5°C and all three sensors within 1.5°C of the accepted 50% start. Starts are 28.0/27.5/29.2°C (50),28.6/27.8/29.6°C (40),28.0/27.4/29.1°C (33); sampled ends are 36.7/29.7/33.0,36.6/29.8/33.1,37.0/29.4/32.9°C. Matching these starts does not establish throughout-run thermal or GPU-clock parity. Endpoint memory snapshots are not peak VRAM or leak evidence; USB battery current does not supply reliable game/system watts.
+
+The [cohort receipt](evidence/2026-10-09-motion-presentation/cohort-receipt.json) retains report/image hashes, settings, exact counters, intervals, thermal observations and limits. Earlier `mobile50-motion01` is refused **before app launch** at 38.2/34.6/36.2°C; status 0 alone does not admit it. The first 33% setup stops before Use while disabled; a finite readiness wait resolves that harness guard without changing acknowledgements/timeouts. A stale Power Shell exit-code check stops the first 50% video wrapper before recording; the corrected invocation succeeds. None is a settings-persistence failure.
+
+Three separate phone recordings produce inspected gameplay-only clips `phone-50pct-motion.mp4`, `phone-40pct-motion.mp4`, `phone-33pct-motion.mp4`, cropped at native 1440×2980 and trimmed without interpolating frames. Their exact source/output hashes are in the cohort receipt; the encoded clips are retained in the local sealed artifact's `owner-quality-review` directory. Screen recording is excluded from the timing cohort. Clips show the controlled approach, draw, attack and parry, not human input latency/audio acceptance. The scenario stops before blade/guard contact, disables damage and pre-drenches the torch for inspection; it does not cover the full route or expensive Keeper/reward overlap.
+
+After viewing the three moving clips, the owner chooses **“33% is acceptable; test it next.”** This is appearance acceptance for further sustained testing, not a final profile or sustained-performance pass. Fresh/reset Android remains **50% /Mobile /Glass Off /Current /cap 30 /Mist On**, Dust Off; desktop and existing custom settings are unchanged.
+
+The isolated **historical**75% /Mobile /Glass On /Current /cap 30 /Mist On /Dust Off save is restored through normal Use → exact native ACK → enabled Keep, with requested/saved/effective 1080×2235 verified. Primary game settings and accepted menu mix are byte-identical before/after the entire comparison; owned apps and recorders are stopped. Restoring that separate historical save does not change normal 50% defaults.
+
+**Keep** the optional measurement support. The owner subsequently requests 33% and 40% as experimental choices in the normal Graphics menu for manual testing; a larger automated sustained-capture extension is deferred so it does not hold up development. The choices must retain normal Use/Keep/Restore and actual traced extents, with 50% still the phone default. The next ordinary APK/menu check is a separate implementation checkpoint. Any upscaling proposal needs its own bounded decision and evidence. Ordinary sustained play/display pacing, expensive Keeper/reward overlap, reliable power/memory interpretation, broader moving/secondary-view and physical checks, Eric's independent audit and final release approval stay open. The [contact-region witness](ENGINEERING_1_6_2_CONTACT_REGIONS_2026_10_09.md) is separate test-only evidence. Dust shafts, seamless music handover and closed renderer experiments remain deferred; no release, merge, signing or tag is performed.

@@ -1,4 +1,5 @@
 #pragma once
+#include "graphics/DustQuality.h"
 
 #include <array>
 #include <cstddef>
@@ -88,6 +89,13 @@ struct RtExpectedFrameRecord
     // or a later observer. An uncompleted row has no active-strategy evidence.
     bool hasActiveStrategy = false;
     RtMaterialStrategy activeStrategy = RtMaterialStrategy::OpaqueFast;
+    // Exact uploaded policy copied from this row's validated owning completion.
+    std::optional<RtShadowQualityEvidence> shadowQuality{};
+    std::optional<RtFireQualityEvidence> fireQuality{};
+    std::optional<RtFireLightingEvidence> fireLighting{};
+    // Owning successful upload only; absence is historical/unavailable, false is Off.
+    std::optional<bool> actualUploadedMistEnabled{};
+    std::optional<horde::graphics::DustQuality> actualUploadedDustQuality{};
     // Copied from the validated owning completion, never the latest observer.
     // An unavailable/Shipping sample is distinct from an available all-zero one.
     bool hasDiagnosticCounters = false;

@@ -1,0 +1,74 @@
+{
+  "schema": "game-room.layout.v1",
+  "roomId": "horde-collapse-162",
+  "units": "meters",
+  "surfaces": [
+    {
+      "id": "existing-chamber",
+      "bounds": [
+        -1.85,
+        -0.95,
+        -6.4,
+        1.85,
+        1.35,
+        3.4
+      ],
+      "unchanged": true
+    },
+    {
+      "id": "rear-remnant-sealed-substrate",
+      "bounds": [
+        -1.4,
+        -0.95,
+        3.4,
+        1.4,
+        2.2,
+        6.35
+      ],
+      "proposal": true
+    }
+  ],
+  "instances": [
+    {
+      "id": "dominant-left",
+      "assetId": "boulder-study"
+    },
+    {
+      "id": "dominant-right",
+      "assetId": "boulder-study"
+    },
+    {
+      "id": "upper-interlocked",
+      "assetId": "boulder-study"
+    },
+    {
+      "id": "tilted-lintel",
+      "assetId": "broken-lintel-study"
+    },
+    {
+      "id": "fallen-left",
+      "assetId": "broken-dressed-stone-study"
+    },
+    {
+      "id": "fallen-right",
+      "assetId": "broken-dressed-stone-study"
+    },
+    {
+      "id": "masonry-interlock",
+      "assetId": "broken-dressed-stone-study"
+    }
+  ],
+  "productionCamera": {
+    "location": [
+      0,
+      0,
+      0
+    ],
+    "target": [
+      0,
+      0,
+      0
+    ],
+    "verticalFovDegrees": 60
+  }
+}

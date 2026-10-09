@@ -232,6 +232,25 @@ public final class MusicAudioFocusTest {
         assertSame(recorded.listener, shadow.getLastAbandonedAudioFocusListener());
     }
 
+    @org.junit.Test
+    public void menuSfxGateIsNotifiedImmediatelyOnFocusLossAndReturn() {
+        MusicAudioFocus focus = newFocus();
+        java.util.ArrayList<Boolean> changes = new java.util.ArrayList<>();
+        focus.setOnFocusChanged(() -> changes.add(focus.isGranted()));
+        focus.setEligible(true);
+        assertEquals(java.util.Arrays.asList(true), changes);
+        AudioManager.OnAudioFocusChangeListener listener = shadowAudioManager().getLastAudioFocusRequest().listener;
+        listener.onAudioFocusChange(AudioManager.AUDIOFOCUS_LOSS_TRANSIENT);
+        assertEquals(java.util.Arrays.asList(true, false), changes);
+        listener.onAudioFocusChange(AudioManager.AUDIOFOCUS_GAIN);
+        assertEquals(java.util.Arrays.asList(true, false, true), changes);
+        focus.setEligible(false);
+        assertEquals(java.util.Arrays.asList(true, false, true, false), changes);
+        listener.onAudioFocusChange(AudioManager.AUDIOFOCUS_GAIN);
+        assertEquals(4, changes.size()); // Abandoned callback cannot restart ambience.
+        focus.close();
+    }
+
     private static MusicAudioFocus newFocus() {
         Context context = RuntimeEnvironment.getApplication();
         return new MusicAudioFocus(context, new Handler(Looper.getMainLooper()));

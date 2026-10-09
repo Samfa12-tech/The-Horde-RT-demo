@@ -2,6 +2,27 @@
 
 This file records locked decisions for the native Vulkan hardware ray-tracing demo.
 
+## 1.6.2 defaults and release hold - 2026-10-05
+
+The owner selects fresh-install and staged Reset Defaults on Android at 50%
+resolution, Mobile water/fire, cap 30, Glass Off, Current shadows and Mist On.
+Preserve valid confirmed/custom/legacy/pending settings and the historical
+Accepted 1.6.1 Android 75%/Glass On baseline. Reset stages a draft; Use these
+settings then Keep and save confirms it. Windows remains 100%/High water/fire/
+Glass On/Current/Mist On/cap 30. Mist Off skips real ground-mist visibility and
+integration while preserving fire, smoke, electricity, lighting and gameplay.
+Missing old mist defaults to On. Current transport and Linear filtering remain.
+
+Retain the ordinary mobile mirror because the closed stone comparison found no
+useful repeatable saving; desktop and High retention are explicit requirements.
+These choices establish no sustained 30 FPS or final-tuple savings claim.
+
+The owner now prioritizes tightening after the weekly reset and further review.
+Hold merging, production signing, tagging and publication. No additional
+optimization experiment or long run starts during the pause. See the
+[pause checkpoint](docs/ENGINEERING_1_6_2_PAUSE_2026_10_05.md) and
+[final graphics evidence](docs/ENGINEERING_1_6_2_FINAL_GRAPHICS.md).
+
 ## Showcase Alpha 1.6.1 publication and acceptance — 2026-10-03
 
 Owner authorised signing/freezing, then publication, normal main integration and
@@ -367,3 +388,14 @@ Important technical finding:
 - Publish Android's first performance sample after 30 frames so diagnostics do not appear broken; retain 120-frame steady-state updates afterward.
 - Treat 125% as the completed live Windows DPI validation for this refresh. Explicit 100%/150% repeats remain a non-blocking later compatibility check.
 - Do not rewrite public Git history until Hotstrike answers the explicit permission request or the owner chooses history remediation.
+
+## Normal 1.6.2 waterfall guard placement — 2026-10-08
+
+The owner directs the existing two skeletons to guard the waterfall room from
+left/right lanes facing arrival, with distinct walk phases. Candidate `6282ab66`
+enables that authored placement in normal applications, independently of the
+still-gated sword-stow presentation. Shared reset/retry/checkpoint import retains
+the same pair and location even when the selected encounter is the Keeper.
+Legacy default-config capture fixtures retain their historical behavior. Host
+route/Keeper/reward and frozen RT checkpoint evidence pass; current moving and
+phone acceptance remain separate. No new enemies, health rules or adventure scope.

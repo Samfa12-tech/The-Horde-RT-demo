@@ -23,6 +23,7 @@ using horde::gameplay::effects::StepFireEmitterFixed;
 using horde::gameplay::items::HeldItemTransform;
 using horde::gameplay::items::IdentityHeldItemTransform;
 using horde::vulkan::raytracing::BuildFireEmitterUpload;
+using horde::vulkan::raytracing::ResolveFireEmitterQuality;
 using horde::vulkan::raytracing::FireEmitterQuality;
 using horde::vulkan::raytracing::FireEmitterSelectionContext;
 using horde::vulkan::raytracing::FireEmitterTuning;
@@ -153,12 +154,13 @@ bool TestStableCameraAndZoneSelection()
         emitters, {{0.0f, 1.0f, 0.0f}, ShowcaseZone::Opening, 10.0f},
         {}, FireEmitterQuality::Mobile, upload, diagnostic);
     return Require(built, "bounded emitter upload must accept four configured emitters") &&
-           Require(upload.activeCount == 2u,
-                   "CPU selection must expose no more than two active emitters") &&
-           Require(upload.selectedStableIds[0] == 20u && upload.selectedStableIds[1] == 40u,
-                   "selection must choose the two nearest matching-zone emitters then publish stable-ID order") &&
-           Require(upload.emitters[0].identity[0] == 20u &&
-                       upload.emitters[1].identity[0] == 40u,
+           Require(upload.activeCount == 3u,
+                   "CPU selection must retain every eligible emitter while excluding the other zone") &&
+           Require(upload.selectedStableIds[0] == 10u && upload.selectedStableIds[1] == 20u &&
+                       upload.selectedStableIds[2] == 40u,
+                   "selection must publish all matching-zone emitters in stable-ID order") &&
+           Require(upload.emitters[0].identity[0] == 10u &&
+                       upload.emitters[1].identity[0] == 20u && upload.emitters[2].identity[0] == 40u,
                    "GPU records must retain the selected emitters' stable identities");
 }
 
@@ -174,13 +176,14 @@ bool TestDistanceTieBreaksByStableEmitterId()
         emitters, {{0.0f, 1.0f, 0.0f}, ShowcaseZone::Opening, 4.0f},
         {}, FireEmitterQuality::High, upload, diagnostic);
     return Require(built, "equal-distance selection must build") &&
-           Require(upload.activeCount == 2u,
-                   "equal-distance selection must retain the bounded two-emitter budget") &&
-           Require(upload.selectedStableIds[0] == 7u && upload.selectedStableIds[1] == 9u,
-                   "distance ties must be resolved by stable emitter ID independent of input order");
+           Require(upload.activeCount == 3u,
+                   "equal-distance selection must retain all three eligible emitters") &&
+           Require(upload.selectedStableIds[0] == 7u && upload.selectedStableIds[1] == 9u &&
+                       upload.selectedStableIds[2] == 11u,
+                   "equal-distance emitters publish stable emitter ID order independent of input order");
 }
 
-bool TestNearEqualDistancesStillSelectTheExactlyNearestEmitters()
+bool TestDistanceBoundaryIsExactBeforeStablePublication()
 {
     std::array<FireEmitterState, 3u> emitters{{
         Emitter(10u, 1.0000004f, ShowcaseZone::Opening),
@@ -189,13 +192,26 @@ bool TestNearEqualDistancesStillSelectTheExactlyNearestEmitters()
     FireEmitterUpload upload;
     std::string diagnostic;
     const bool built = BuildFireEmitterUpload(
-        emitters, {{0.0f, 1.0f, 0.0f}, ShowcaseZone::Opening, 4.0f},
+        emitters, {{0.0f, 1.0f, 0.0f}, ShowcaseZone::Opening, 1.0f},
         {}, FireEmitterQuality::High, upload, diagnostic);
     return Require(built, "near-equal emitter selection must build") &&
-           Require(upload.activeCount == 2u,
-                   "near-equal selection must retain the bounded two-emitter budget") &&
-           Require(upload.selectedStableIds[0] == 20u && upload.selectedStableIds[1] == 30u,
-                   "sub-micrometre distance differences must select the exactly nearest emitters before stable-ID publication");
+           Require(upload.activeCount == 1u && upload.selectedStableIds[0] == 30u,
+                   "sub-micrometre distance differences must exclude sources beyond the exact distance boundary");
+}
+
+bool TestAllFourEligibleEmittersRemainActive()
+{
+    const std::array<FireEmitterState, 4u> emitters{{
+        Emitter(4u, 3.0f, ShowcaseZone::Finale), Emitter(1u, 0.0f, ShowcaseZone::Finale),
+        Emitter(3u, 2.0f, ShowcaseZone::Finale), Emitter(0x4c414e54u, 1.0f, ShowcaseZone::Finale)}};
+    FireEmitterUpload upload;
+    std::string diagnostic;
+    return Require(BuildFireEmitterUpload(emitters, {{0.0f, 1.0f, 0.0f}, ShowcaseZone::Finale, 10.0f},
+                                           {}, FireEmitterQuality::Mobile, upload, diagnostic),
+                   "four eligible original/reward/world sources must fit the admitted fire capacity") &&
+           Require(upload.activeCount == 4u &&
+                       upload.selectedStableIds == std::array<std::uint32_t, 4u>{{1u, 3u, 4u, 0x4c414e54u}},
+                   "four-source budget must never silently discard an otherwise eligible light");
 }
 
 bool TestTorchExtinguishZerosStrengthWithoutChangingTransforms()
@@ -310,6 +326,41 @@ bool TestQualityChangesOnlyBoundedRayBudgets()
                    "quality-specific GPU differences must be limited to explicit bounded budgets");
 }
 
+bool TestLowChangesOnlyIntegrationBudgets()
+{
+    const std::array<FireEmitterState, 3u> emitters{{Emitter(3u,2.0f,ShowcaseZone::Opening),
+        Emitter(1u,0.0f,ShowcaseZone::Opening),Emitter(2u,1.0f,ShowcaseZone::Opening)}};
+    FireEmitterUpload mobile{}, low{}, high{};
+    std::string diagnostic;
+    bool ok = BuildFireEmitterUpload(emitters, {{0,1,0},ShowcaseZone::Opening,10}, {}, FireEmitterQuality::Mobile,mobile,diagnostic) &&
+        BuildFireEmitterUpload(emitters, {{0,1,0},ShowcaseZone::Opening,10}, {}, FireEmitterQuality::Low,low,diagnostic) &&
+        BuildFireEmitterUpload(emitters, {{0,1,0},ShowcaseZone::Opening,10}, {}, FireEmitterQuality::High,high,diagnostic);
+    ok &= Require(low.activeCount == mobile.activeCount && low.selectedStableIds == mobile.selectedStableIds &&
+                  high.selectedStableIds == mobile.selectedStableIds, "Low preserves real nearest stable emitter selection");
+    for (std::size_t index=0; index<low.activeCount; ++index)
+    {
+        auto reduced = low.emitters[index];
+        const auto ordinary = mobile.emitters[index];
+        ok &= Require(reduced.identity[2] == 2u && reduced.identity[3] == 1u &&
+                      ordinary.identity[2] == 4u && ordinary.identity[3] == 1u &&
+                      high.emitters[index].identity[2] == 10u && high.emitters[index].identity[3] == 2u,
+                      "Low actually reduces primary/reflected field integrations to2 versus4/4 and10/8");
+        reduced.identity = ordinary.identity;
+        ok &= Require(reduced.worldFromLocal0 == ordinary.worldFromLocal0 && reduced.worldFromLocal1 == ordinary.worldFromLocal1 &&
+                      reduced.worldFromLocal2 == ordinary.worldFromLocal2 && reduced.worldFromLocal3 == ordinary.worldFromLocal3 &&
+                      reduced.lightPositionStrength == ordinary.lightPositionStrength && reduced.colourIntensity == ordinary.colourIntensity &&
+                      reduced.shape == ordinary.shape && reduced.animation == ordinary.animation && reduced.smokeEmbers == ordinary.smokeEmbers &&
+                      reduced.identity == ordinary.identity, "Low changes no socket/phase/radiance/smoke/seed/shape state");
+    }
+    ok &= Require(ResolveFireEmitterQuality(horde::graphics::FireDetail::Low) == FireEmitterQuality::Low &&
+                  ResolveFireEmitterQuality(horde::graphics::FireDetail::Mobile) == FireEmitterQuality::Mobile &&
+                  ResolveFireEmitterQuality(horde::graphics::FireDetail::High) == FireEmitterQuality::High,
+                  "all persisted fire choices have distinct exhaustive renderer mappings");
+    ok &= Require(!BuildFireEmitterUpload(emitters, {{0,1,0},ShowcaseZone::Opening,10}, {},
+                      static_cast<FireEmitterQuality>(99u),low,diagnostic), "invalid renderer tier rejected before upload");
+    return ok;
+}
+
 bool TestHardCapacityRejectsFifthEmitter()
 {
     std::array<FireEmitterState, 5u> emitters{{
@@ -327,6 +378,76 @@ bool TestHardCapacityRejectsFifthEmitter()
                    "capacity rejection must be precise and actionable");
 }
 
+bool TestCarriedTorchScalePreservesEnergyAndWorldIndependence()
+{
+    auto torch = Emitter(1u, 0.0f, ShowcaseZone::Finale);
+    auto world = Emitter(3u, 1.0f, ShowcaseZone::Finale);
+    world.parentObject = horde::gameplay::effects::FireEmitterParentObject::WorldObject;
+    const auto budget = horde::vulkan::raytracing::ResolveFireEmitterQualityBudget(FireEmitterQuality::Mobile);
+    bool ok = true;
+    for (const float carriedScale : {0.0f, 1.8f, 2.4f})
+    {
+        for (const float globalScale : {0.25f, 1.0f, 4.0f})
+        {
+            const auto legacy = horde::vulkan::raytracing::PackFireEmitterGpu(
+                torch, {carriedScale * globalScale, 1.0f, 1.0f}, budget);
+            const auto separated = horde::vulkan::raytracing::PackFireEmitterGpu(
+                torch, {globalScale, 1.0f, 1.0f, carriedScale}, budget);
+            const auto independent = horde::vulkan::raytracing::PackFireEmitterGpu(
+                world, {globalScale, 1.0f, 1.0f, carriedScale}, budget);
+            const auto worldBaseline = horde::vulkan::raytracing::PackFireEmitterGpu(
+                world, {globalScale, 1.0f, 1.0f}, budget);
+            ok &= Require(legacy.colourIntensity == separated.colourIntensity &&
+                          legacy.lightPositionStrength == separated.lightPositionStrength,
+                          "carried torch combined-clamp energy must remain byte-exact above intensity one");
+            ok &= Require(independent.colourIntensity == worldBaseline.colourIntensity &&
+                          independent.lightPositionStrength == worldBaseline.lightPositionStrength,
+                          "world torch radiance must be independent of carried torch loss/fade/intensity");
+        }
+    }
+    FireEmitterUpload upload{};
+    std::string diagnostic;
+    const std::array<FireEmitterState, 2u> sources{{torch, world}};
+    ok &= Require(BuildFireEmitterUpload(sources, {{0,1,0},ShowcaseZone::Finale,10},
+                      {1,1,1,0}, FireEmitterQuality::Mobile, upload, diagnostic) &&
+                  upload.activeCount == 1u && upload.selectedStableIds[0] == 3u &&
+                  upload.selectedStableIds[1] == 0u && upload.emitters[1].identity[0] == 0u,
+                  "actual zero packed carried source must leave a dense world-light prefix and zero unused slots");
+    return ok;
+}
+
+bool TestCheckedRewardAppendPreservesAllExistingLights()
+{
+    FireEmitterUpload upload{};
+    std::string diagnostic;
+    const std::array<FireEmitterState, 3u> configured{{
+        Emitter(1u,0.0f,ShowcaseZone::Finale), Emitter(3u,1.0f,ShowcaseZone::Finale),
+        Emitter(4u,2.0f,ShowcaseZone::Finale)}};
+    auto lantern = Emitter(0x4c414e54u,3.0f,ShowcaseZone::Finale);
+    lantern.parentObject = horde::gameplay::effects::FireEmitterParentObject::RewardLantern;
+    bool ok = Require(BuildFireEmitterUpload(configured, {{0,1,0},ShowcaseZone::Finale,10},
+                           {},FireEmitterQuality::Mobile,upload,diagnostic), "three source prefix must build");
+    ok &= Require(horde::vulkan::raytracing::AppendFireEmitterUpload(lantern, {},
+                      FireEmitterQuality::Mobile,upload,diagnostic) && upload.activeCount == 4u &&
+                  upload.selectedStableIds == std::array<std::uint32_t,4u>{{1u,3u,4u,0x4c414e54u}},
+                  "reward append must consume the free fourth slot without replacing opening/flank lights");
+    const auto ids = upload.selectedStableIds;
+    const auto strength = upload.emitters[3].lightPositionStrength;
+    auto fifth = Emitter(99u,4.0f,ShowcaseZone::Finale);
+    ok &= Require(!horde::vulkan::raytracing::AppendFireEmitterUpload(fifth, {},
+                      FireEmitterQuality::Mobile,upload,diagnostic) && upload.activeCount == 4u &&
+                  upload.selectedStableIds == ids && upload.emitters[3].lightPositionStrength == strength,
+                  "full append must fail without overwriting an important active source");
+    ok &= Require(!horde::vulkan::raytracing::AppendFireEmitterUpload(lantern, {},
+                      FireEmitterQuality::Mobile,upload,diagnostic) && upload.selectedStableIds == ids,
+                  "duplicate reward identity must fail without mutating the packed prefix");
+    fifth.strength = 0.0f;
+    ok &= Require(horde::vulkan::raytracing::AppendFireEmitterUpload(fifth, {},
+                      FireEmitterQuality::Mobile,upload,diagnostic) && upload.activeCount == 4u &&
+                  upload.selectedStableIds == ids, "inactive optional source must consume no slot");
+    return ok;
+}
+
 } // namespace
 
 int main()
@@ -336,13 +457,17 @@ int main()
     ok &= TestResetAndCheckpointImportRestoreExactState();
     ok &= TestStableCameraAndZoneSelection();
     ok &= TestDistanceTieBreaksByStableEmitterId();
-    ok &= TestNearEqualDistancesStillSelectTheExactlyNearestEmitters();
+    ok &= TestDistanceBoundaryIsExactBeforeStablePublication();
+    ok &= TestAllFourEligibleEmittersRemainActive();
     ok &= TestTorchExtinguishZerosStrengthWithoutChangingTransforms();
     ok &= TestAuthoredTorchUsesPlausibleWarmBlackBodyColour();
     ok &= TestActualPivotAccelerationDrivesBoundedMotionResponse();
     ok &= TestRenderDeliveryEquivalenceAt30_60_120Hz();
     ok &= TestQualityChangesOnlyBoundedRayBudgets();
+    ok &= TestLowChangesOnlyIntegrationBudgets();
     ok &= TestHardCapacityRejectsFifthEmitter();
+    ok &= TestCarriedTorchScalePreservesEnergyAndWorldIndependence();
+    ok &= TestCheckedRewardAppendPreservesAllExistingLights();
     if (!ok) return 1;
     std::cout << "Fire emitter deterministic state, motion, selection, and budget contracts passed\n";
     return 0;

@@ -1,0 +1,15 @@
+# 1.6.2 package admission checkpoint
+
+The shared `tools/horde-1.6.2-asset-policy.ps1` validates actual runtime WAV/KTX bytes, format and canonical manifest semantics, then enforces a closed platform roster in stages and ZIP/APK archives. It accepts Debug APKs without a release/signing requirement. Windows retains its admitted full waterfall loop; Android admits only the stereo core loop and its manifest. Both admit the four Keeper/skeleton cues, three existing Pixabay cues, Keeper manifest, their own 512x256 environment variant and shared environment manifest. Source images and the other platform's texture/audio are rejected.
+
+`package-alpha.ps1` and `run-foundation-validation.ps1` now copy the explicit Windows roster and validate both platform archives. No packaging, signing, foundation run or device action was invoked for this slice. All CI LFS fetch/checkout rosters include the five new WAVs and both runtime environment variants; source PNGs remain excluded. Canonical assets are validated against pinned runtime sizes/hashes, while manifest bytes compare with the current checkout to preserve line-ending portability.
+
+Evidence: the five affected PowerShell scripts parse successfully, and `tests/Horde162AssetPolicyTests.ps1` passes 18 positive/negative cases, including missing/corrupt assets and manifests, duplicate entries, foreign source/audio and the other platform's payload. One CMake fixture registration was added without configuring or building the native tree. Android owner will apply the same read-only helper to its final Debug APK; the lead owns final Debug ZIP packaging and acceptance. Existing music and complete third-party notice policies remain separate required checks.
+
+Next action: final Debug ZIP/APK byte admission after the lead's exact candidate rebuild. Audio listening, visual review, actual RT/device evidence and release gates are not inferred from package admission.
+
+## Integrated collapse/props follow-up
+
+Approved world GLB/manifest and selected-platform props manifest plus four arrays are now a closed package roster. Canonical source checks bind both platform variants, exact manifest bytes, layers/mips/formats and hashes; no source images or foreign platform payload may enter packages. Initial Windows CI exposed missing bounded props LFS checkout; Linux CI exposed manifest newline conversion. Byte-preserving attributes retain admitted742B/10743B manifests and their existing pins; workflow fetch/checkout correction is required before current CI acceptance. This is an actual checkout defect, not a device regression.
+
+Current exact Windows Release64f24a6f... archive is137366831B, SHA25640b9b453e3a784f4c60bf9d7b9170099ae4eb7a18dea2147708e382ef1c26ec7;83 file entries match staging hashes and complete notices/closed rosters pass. Current sealed Android aa742240... is123732711B and its380 source runtime inputs match before/after. Both are unpublishable development validation artifacts; owner appearance/audio and performance acceptance remain separate.

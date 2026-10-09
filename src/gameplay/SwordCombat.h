@@ -6,6 +6,7 @@
 #include <cstddef>
 #include <cstdint>
 
+#include "gameplay/CombatTimeline.h"
 #include "gameplay/CorridorCollision.h"
 
 namespace horde::gameplay
@@ -120,7 +121,9 @@ public:
         Reset();
     }
 
-    void Reset(std::size_t combatantCount = kSkeletonCombatantCapacity)
+    void Reset(std::size_t combatantCount = kSkeletonCombatantCapacity,
+               const RoutePosition spawnCenter = {0.0f, -4.65f},
+               const std::array<SkeletonSpawnPose, kSkeletonCombatantCapacity>* spawnLayout = nullptr)
     {
         combatantCount_ = std::clamp<std::size_t>(combatantCount, 1u, kSkeletonCombatantCapacity);
         combatants_ = {};
@@ -131,13 +134,23 @@ public:
             combatant.animation = EnemyAnimation::Dead;
             combatant.walkAnimationHold = 0.0f;
         }
-        combatants_[0].x = combatantCount_ == 1u ? 0.0f : -0.75f;
-        combatants_[0].z = -4.65f;
-        combatants_[1].x = 0.75f;
-        combatants_[1].z = -4.65f;
+        combatants_[0].x = combatantCount_ == 1u ? spawnCenter.x : spawnCenter.x - 0.75f;
+        combatants_[0].z = spawnCenter.z;
+        combatants_[1].x = spawnCenter.x + 0.75f;
+        combatants_[1].z = spawnCenter.z;
         for (std::size_t index = 0u; index < combatantCount_; ++index)
         {
             Combatant& combatant = combatants_[index];
+            if (spawnLayout != nullptr)
+            {
+                const SkeletonSpawnPose& pose = (*spawnLayout)[index];
+                combatant.x = pose.position.x;
+                combatant.z = pose.position.z;
+                combatant.facing = pose.facingRadians;
+                combatant.animationTime = pose.walkingAnimationPhaseSeconds;
+                combatant.walkingAnimationPhaseSeconds = pose.walkingAnimationPhaseSeconds;
+                combatant.hasAuthoredWalkingPhase = true;
+            }
             combatant.action = EnemyCombatAction::Locomotion;
             combatant.health = 1;
             combatant.walkAnimationHold = kWalkAnimationHold;
@@ -170,6 +183,20 @@ public:
     void RequestParry()
     {
         parryQueued_ = true;
+    }
+
+    // Presentation holds cancel the player's current and buffered actions
+    // without resetting enemy health, attack ownership or encounter progress.
+    void CancelPlayerActions()
+    {
+        attackQueued_ = false;
+        parryQueued_ = false;
+        successfulParryEndsNextTick_ = false;
+        player_ = {};
+        snapshot_.player = player_;
+        snapshot_.playerAttackPulse = false;
+        snapshot_.playerAttackCut = PlayerAttackCut::None;
+        snapshot_.swordSwingRadians = 0.0f;
     }
 
     bool CanAcceptPlayerAction() const
@@ -231,7 +258,11 @@ public:
         return targetIndex;
     }
 
-    const CombatSnapshot& Update(float deltaSeconds, float playerX, float playerZ, float playerYaw)
+    const CombatSnapshot& Update(float deltaSeconds, float playerX, float playerZ,
+                                 float playerYaw,
+                                 const bool useExplicitArenaGate = false,
+                                 const bool explicitArenaGate = false,
+                                 const bool waterfallNav = false)
     {
         deltaSeconds = std::clamp(deltaSeconds, 0.0f, 0.05f);
         snapshot_.playerAttackPulse = false;
@@ -268,8 +299,17 @@ public:
         UpdatePlayerAction(deltaSeconds, playerX, playerZ, playerYaw);
 
         const ShowcaseZone playerZone = QueryShowcaseZone(playerX, playerZ);
-        const bool playerInsideEnemyArena = playerZone == ShowcaseZone::Opening ||
-                                            playerZone == ShowcaseZone::SkeletonRoom;
+        const bool playerInsideEnemyArena = useExplicitArenaGate
+            ? explicitArenaGate
+            : (playerZone == ShowcaseZone::Opening ||
+               playerZone == ShowcaseZone::SkeletonRoom);
+        const bool playerWithinLeash = waterfallNav &&
+            IsWaterfallSkeletonRoom(playerX, playerZ);
+        // Once a Waterfall attacker is engaged, retreat within the room does
+        // not erase its windup or aggro token. Leaving the room ends pursuit;
+        // its nav boundary still prevents a pull back across the wetline.
+        const bool combatArenaActive = playerInsideEnemyArena ||
+            (playerWithinLeash && attackerIndex_ >= 0);
 
         std::array<float, kSkeletonCombatantCapacity> distances{};
         const std::array<RoutePosition, kSkeletonCombatantCapacity> previousPositions{{
@@ -282,14 +322,14 @@ public:
             const float toPlayerX = playerX - combatant.x;
             const float toPlayerZ = playerZ - combatant.z;
             distances[index] = std::hypot(toPlayerX, toPlayerZ);
-            if (combatant.health > 0 && playerInsideEnemyArena && distances[index] > 0.0001f)
+            if (combatant.health > 0 && combatArenaActive && distances[index] > 0.0001f)
             {
                 // The staged skeleton's authored forward direction is +Z.
                 combatant.facing = std::atan2(toPlayerX, toPlayerZ);
             }
         }
 
-        SelectAttacker(distances, playerInsideEnemyArena);
+        SelectAttacker(distances, combatArenaActive);
         for (std::size_t index = 0; index < combatantCount_; ++index)
         {
             UpdateCombatant(index,
@@ -297,10 +337,11 @@ public:
                             playerX,
                             playerZ,
                             distances[index],
-                            playerInsideEnemyArena,
-                            playerYaw);
+                            combatArenaActive,
+                            playerYaw,
+                            waterfallNav);
         }
-        ResolveCombatantSeparation(previousPositions);
+        ResolveCombatantSeparation(previousPositions, waterfallNav);
         PublishSnapshot();
         return snapshot_;
     }
@@ -315,6 +356,8 @@ private:
         float facing = 0.0f;
         float phaseTime = 0.0f;
         float animationTime = 0.0f;
+        float walkingAnimationPhaseSeconds = 0.0f;
+        bool hasAuthoredWalkingPhase = false;
         float damageFlash = 0.0f;
         float walkAnimationHold = kWalkAnimationHold;
         std::int32_t health = 1;
@@ -333,6 +376,7 @@ private:
         {
             player_.reaction = CombatReaction::None;
         }
+        const float previousActionTime = player_.actionTime;
         player_.actionTime += deltaSeconds;
         switch (player_.action)
         {
@@ -341,12 +385,15 @@ private:
             {
                 player_.action = PlayerCombatAction::SwingActive;
                 player_.actionTime -= kSwingWindupDuration;
+            }
+            break;
+        case PlayerCombatAction::SwingActive:
+            if (previousActionTime < kDownwardContactTime && player_.actionTime >= kDownwardContactTime)
+            {
                 snapshot_.playerAttackPulse = true;
                 snapshot_.playerAttackCut = PlayerAttackCut::DownwardCut;
                 ResolveSwordHit(playerX, playerZ, playerYaw);
             }
-            break;
-        case PlayerCombatAction::SwingActive:
             if (player_.comboQueued &&
                 player_.actionTime >= kDownwardCutTravelDuration)
             {
@@ -375,12 +422,15 @@ private:
             {
                 player_.action = PlayerCombatAction::UpwardSliceActive;
                 player_.actionTime -= kUpwardSliceWindupDuration;
+            }
+            break;
+        case PlayerCombatAction::UpwardSliceActive:
+            if (previousActionTime < kUpwardContactTime && player_.actionTime >= kUpwardContactTime)
+            {
                 snapshot_.playerAttackPulse = true;
                 snapshot_.playerAttackCut = PlayerAttackCut::UpwardSlice;
                 ResolveSwordHit(playerX, playerZ, playerYaw);
             }
-            break;
-        case PlayerCombatAction::UpwardSliceActive:
             if (player_.actionTime >= kUpwardSliceActiveDuration)
             {
                 player_.action = PlayerCombatAction::UpwardSliceRecovery;
@@ -540,7 +590,8 @@ private:
                          float playerZ,
                          float distance,
                          bool playerInsideEnemyArena,
-                         float playerYaw)
+                         float playerYaw,
+                         bool waterfallNav)
     {
         Combatant& combatant = combatants_[index];
         combatant.phaseTime += deltaSeconds;
@@ -589,18 +640,35 @@ private:
             }
             else if (distance > kEnemyAttackRange)
             {
+                const bool wasWalking = combatant.animation == EnemyAnimation::Walking;
                 const float step = std::min(distance - kEnemyAttackRange, kEnemyWalkSpeed * deltaSeconds);
                 float proposedX = combatant.x + (playerX - combatant.x) /
                                   std::max(distance, 0.0001f) * step;
                 float proposedZ = combatant.z + (playerZ - combatant.z) /
                                   std::max(distance, 0.0001f) * step;
-                ResolveSkeletonEnemyCollision(combatant.x, combatant.z, proposedX, proposedZ);
+                if (waterfallNav)
+                {
+                    ResolveWaterfallSkeletonEnemyCollision(
+                        combatant.x, combatant.z, proposedX, proposedZ);
+                }
+                else
+                {
+                    ResolveSkeletonEnemyCollision(
+                        combatant.x, combatant.z, proposedX, proposedZ);
+                }
                 const bool moved = std::abs(proposedX - combatant.x) > 0.00001f ||
                                    std::abs(proposedZ - combatant.z) > 0.00001f;
                 combatant.x = proposedX;
                 combatant.z = proposedZ;
                 if (moved)
                 {
+                    if (!wasWalking && combatant.hasAuthoredWalkingPhase)
+                    {
+                        // Re-enter the authored gait phase after waiting or
+                        // leaving the arena. This presentation clock is kept
+                        // separate from the zero-based combat/action clocks.
+                        combatant.animationTime = combatant.walkingAnimationPhaseSeconds + deltaSeconds;
+                    }
                     combatant.walkAnimationHold = kWalkAnimationHold;
                 }
                 combatant.animation = combatant.walkAnimationHold > 0.0f
@@ -671,8 +739,16 @@ private:
     }
 
     void ResolveCombatantSeparation(
-        const std::array<RoutePosition, kSkeletonCombatantCapacity>& previousPositions)
+        const std::array<RoutePosition, kSkeletonCombatantCapacity>& previousPositions,
+        const bool waterfallNav)
     {
+        const auto sweep = [waterfallNav](const RoutePosition previous,
+                                          const RoutePosition proposed)
+        {
+            return waterfallNav
+                ? IsWaterfallSkeletonWalkableSweep(previous, proposed)
+                : IsSkeletonEnemyWalkableSweep(previous, proposed);
+        };
         Combatant& first = combatants_[0];
         Combatant& second = combatants_[1];
         if (combatantCount_ < 2u || (first.health <= 0 && second.health <= 0))
@@ -696,7 +772,7 @@ private:
         {
             const float targetX = first.x + unitX * kMinimumSeparation;
             const float targetZ = first.z + unitZ * kMinimumSeparation;
-            if (IsSkeletonEnemyWalkableSweep({second.x, second.z}, {targetX, targetZ}))
+            if (sweep({second.x, second.z}, {targetX, targetZ}))
             {
                 second.x = targetX;
                 second.z = targetZ;
@@ -712,7 +788,7 @@ private:
         {
             const float targetX = second.x - unitX * kMinimumSeparation;
             const float targetZ = second.z - unitZ * kMinimumSeparation;
-            if (IsSkeletonEnemyWalkableSweep({first.x, first.z}, {targetX, targetZ}))
+            if (sweep({first.x, first.z}, {targetX, targetZ}))
             {
                 first.x = targetX;
                 first.z = targetZ;
@@ -728,8 +804,8 @@ private:
         const float firstZ = first.z - unitZ * correction;
         const float secondX = second.x + unitX * correction;
         const float secondZ = second.z + unitZ * correction;
-        if (IsSkeletonEnemyWalkableSweep({first.x, first.z}, {firstX, firstZ}) &&
-            IsSkeletonEnemyWalkableSweep({second.x, second.z}, {secondX, secondZ}))
+        if (sweep({first.x, first.z}, {firstX, firstZ}) &&
+            sweep({second.x, second.z}, {secondX, secondZ}))
         {
             first.x = firstX;
             first.z = firstZ;
@@ -742,7 +818,7 @@ private:
         // B fixed and move A. Both routes remain deterministic and world-valid.
         const float pushedSecondX = first.x + unitX * kMinimumSeparation;
         const float pushedSecondZ = first.z + unitZ * kMinimumSeparation;
-        if (IsSkeletonEnemyWalkableSweep({second.x, second.z}, {pushedSecondX, pushedSecondZ}))
+        if (sweep({second.x, second.z}, {pushedSecondX, pushedSecondZ}))
         {
             second.x = pushedSecondX;
             second.z = pushedSecondZ;
@@ -750,7 +826,7 @@ private:
         }
         const float pushedFirstX = second.x - unitX * kMinimumSeparation;
         const float pushedFirstZ = second.z - unitZ * kMinimumSeparation;
-        if (IsSkeletonEnemyWalkableSweep({first.x, first.z}, {pushedFirstX, pushedFirstZ}))
+        if (sweep({first.x, first.z}, {pushedFirstX, pushedFirstZ}))
         {
             first.x = pushedFirstX;
             first.z = pushedFirstZ;
@@ -818,6 +894,7 @@ private:
 public:
     static constexpr float kSwingWindupDuration = 0.18f;
     static constexpr float kDownwardCutTravelDuration = 0.16f;
+    static constexpr float kDownwardContactTime = CombatTimeline::kPlayerDownwardContactSeconds;
     static constexpr float kSwingActiveDuration = 0.42f;
     static constexpr float kSwingRecoveryDuration = 0.22f;
     static constexpr float kSwordDuration = kSwingWindupDuration + kSwingActiveDuration + kSwingRecoveryDuration;
@@ -827,6 +904,9 @@ public:
     static constexpr float kDownwardSwingAmplitude = 0.58f;
     static constexpr float kUpwardSliceWindupDuration = 0.10f;
     static constexpr float kUpwardSliceActiveDuration = 0.18f;
+    static constexpr float kUpwardContactTime = CombatTimeline::kPlayerUpwardContactSeconds;
+    static_assert(kDownwardContactTime < kDownwardCutTravelDuration &&
+                  kUpwardContactTime < kUpwardSliceActiveDuration);
     static constexpr float kUpwardSliceRecoveryDuration = 0.24f;
     static constexpr float kUpwardSliceEndRadians = 0.18f;
     static constexpr float kPlayerHitRange = 1.72f;
@@ -834,9 +914,12 @@ public:
     static constexpr float kParryStartupDuration = 0.04f;
     static constexpr float kParryActiveDuration = 0.22f;
     static constexpr float kParryRecoveryDuration = 0.24f;
-    static constexpr float kEnemyAttackWindupDuration = 1.12f;
-    static constexpr float kEnemyAttackActiveDuration = 0.18f;
-    static constexpr float kEnemyAttackRecoveryDuration = 1.50f;
+    static constexpr float kEnemyAttackWindupDuration =
+        CombatTimeline::kSkeletonAttackWindupSeconds;
+    static constexpr float kEnemyAttackActiveDuration =
+        CombatTimeline::kSkeletonAttackActiveSeconds;
+    static constexpr float kEnemyAttackRecoveryDuration =
+        CombatTimeline::kSkeletonAttackRecoverySeconds;
     static constexpr float kEnemyStaggerDuration = 0.80f;
 
 private:

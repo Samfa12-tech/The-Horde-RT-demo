@@ -1,0 +1,216 @@
+{
+  "schema": 2,
+  "reviewDate": "2026-10-09",
+  "reviewScope": "PR 18 whole-diff review and exact-candidate technical evidence; independent audit packet, not self-certification",
+  "candidate": {
+    "sourceCommit": "db62032d9ab54ebaa5bd12d17dc7e987fc8f54c9",
+    "tree": "bccbfe9469c69c0657b4f99c06a22c8c145dba28",
+    "hostRunId": "20261009-092225",
+    "hostResult": "pass",
+    "cleanBeforeAfter": true,
+    "windowsDebugTests": {
+      "passed": 144,
+      "total": 144,
+      "seconds": 1482.69
+    },
+    "windowsReleaseTests": {
+      "passed": 144,
+      "total": 144,
+      "seconds": 963.58
+    },
+    "fixedPipelineCaptures": 13,
+    "androidDebugShippingAndLint": "pass",
+    "hostStages": {
+      "passed": 7,
+      "total": 7
+    },
+    "ci": {
+      "pushRun": 37852998306,
+      "prRun": 37853004515,
+      "passedJobs": 12,
+      "totalJobs": 12
+    },
+    "seal": {
+      "sha256": "01f73b34dfb935dc4f29f1bb239a6481266caf81491e2632d108297fa6de7535",
+      "complete": true,
+      "artifactsSha256": "01f73b34dfb935dc4f29f1bb239a6481266caf81491e2632d108297fa6de7535"
+    }
+  },
+  "artifacts": {
+    "androidDebugInspectionApk": {
+      "sha256": "25af2fc1895eca03c03feac2b955d410d0759a2834e27d9e1dafd3d24eda8ca3",
+      "bytes": 123889887
+    },
+    "androidShippingUnsignedUnpublishableApk": {
+      "sha256": "4f0fccec7cfe247f71c87852605b7c040f3213794758fdac5ff7d55236ea6ec4",
+      "bytes": 121049362
+    },
+    "windowsReleaseUnpublishableZip": {
+      "sha256": "3fc8f065f900d28d529883f7b2681b6303940be9cdc1ed589425a92be69778bd",
+      "bytes": 145572438
+    },
+    "windowsDebugInspectionExe": {
+      "sha256": "4095f2b669657540637e81a19fe98b57dec5ae14c31adcce809aa34a73dc6e37",
+      "bytes": 11572736
+    },
+    "productionSigned": false,
+    "releaseAuthorizedInSeal": false
+  },
+  "androidDeviceEvidence": {
+    "install": "sealed Debug APK installed and pulled back byte-for-byte; main settings and menu mix unchanged",
+    "portraitSettingsGraphics": {
+      "result": "pass",
+      "receiptSha256": "6eed58be9be99759f49b17c8a3e2766812704c0ffe69dd9cbb542b01ca761fb0",
+      "fontScale": 1.7,
+      "dialogsDismissed": true,
+      "preferencesUnchanged": true,
+      "appStopped": true
+    },
+    "secondaryNavigation": {
+      "result": "pass",
+      "cases": 20,
+      "receiptSha256": "1d1ff96e20f50d89254b60abd86a4ca69471931aecc6d111750b374d89864b60",
+      "preferencesUnchanged": true,
+      "reportConsentUnchecked": true,
+      "appStopped": true
+    },
+    "landscapeAccessibilityHome": {
+      "result": "pass_with_scope_limits",
+      "receiptSha256": "aa2494f8225925c841f0e0f09990657c8ede04095a65ab1b0edd9c28fff0a0a4",
+      "sourceAndApkMatchSeal": true,
+      "systemAnimatorScaleDuringRoute": 0,
+      "systemSettingsRestored": true,
+      "preferencesUnchanged": true,
+      "appStopped": true,
+      "homeReturnOrientation": "portrait",
+      "homeReturnSurfaceGeneration": 3,
+      "homeEntryPresented": true,
+      "bothLandscapeDirectionsCurrentPass": false,
+      "appReducedMotionPreferenceExplicitlyTested": false
+    }
+  },
+  "movingPhoneRuns": {
+    "summary": "evidence/2026-10-09-final-review/motion-summary.json",
+    "allUseSealedDebugApk": true,
+    "allCompleted": true,
+    "allExactJoinsVerified": true,
+    "allPreferencesUnchanged": true,
+    "allOwnedAppsStopped": true,
+    "runs": [
+      {
+        "scenario": "waterfall-equipment",
+        "backend": "RayTracingPipeline",
+        "frames": 151,
+        "seconds": 6.53333333,
+        "ledgerSha256": "3e872ea9fdf2498c7f17a902674631d4a042b0c85640f5f5af0165c9369c6983"
+      },
+      {
+        "scenario": "waterfall-equipment",
+        "backend": "RayQueryCompute",
+        "frames": 162,
+        "seconds": 6.55,
+        "ledgerSha256": "ba8c078fc56dc6b5c9fb1169e520a156ee058bcc53d3ca8b6a7688891935abb4"
+      },
+      {
+        "scenario": "torch-drench",
+        "backend": "RayTracingPipeline",
+        "frames": 215,
+        "seconds": 9.23333333,
+        "ledgerSha256": "d572a1006ad7f293dacc3f7e784a7c222000ca357ec3aafb07f2947709f1c0d7"
+      },
+      {
+        "scenario": "torch-drench",
+        "backend": "RayQueryCompute",
+        "frames": 227,
+        "seconds": 9.23333333,
+        "ledgerSha256": "a74b72d6715e6c565289b96f5d113e76d730b1eabbed4cfad5ffe594d9792d76"
+      }
+    ],
+    "evidenceLimit": "intrusive harness readbacks; no owner-feel, touch-latency, scanout, displayed/sustained FPS, thermal/power, or full-game performance certification"
+  },
+  "windowsMovingAttempt": {
+    "result": "not_armed",
+    "exitCode": 1,
+    "activationAccepted": false,
+    "foregroundVerified": false,
+    "motionFrames": 0,
+    "validationErrorMarkers": 0,
+    "retried": false,
+    "evidenceLimit": "setup/foreground failure; not a renderer failure or passing motion run"
+  },
+  "wholePrStaticReview": {
+    "result": "no_new_actionable_defect_found",
+    "scope": "whole PR 18 source diff against origin/main",
+    "notRuntimeEvidence": true
+  },
+  "ownerDisposition": {
+    "approved": [
+      "controller",
+      "audio and haptics",
+      "touch rotations",
+      "menu",
+      "dust appearance",
+      "waterfall appearance",
+      "stand collision"
+    ],
+    "deferred": [
+      "long sustained-phone programme",
+      "combat precision-contact correction",
+      "shafts",
+      "walking-arm wiggle",
+      "music handover"
+    ]
+  },
+  "releaseState": {
+    "goalComplete": false,
+    "merged": false,
+    "androidSigned": false,
+    "androidItchPublished": false,
+    "windowsItchPublished": false,
+    "ownerAuthorization": "conditional on goal completion",
+    "independentEricAudit": "not performed; packet is not self-certification"
+  },
+  "firstRun": {
+    "sourceCommit": "60ed8448c07990d3d2ccf60c5ad2e5b283630444",
+    "runId": "20261009-084719",
+    "mode": "Host",
+    "result": "fail",
+    "cleanBeforeAfter": true,
+    "debugTests": {
+      "pass": 142,
+      "fail": 2,
+      "total": 144
+    },
+    "failures": [
+      "horde_rt_raygen_variant_manifest_tests",
+      "horde_rt_raygen_variant_artifact_tests"
+    ],
+    "laterStages": "not run",
+    "ci": {
+      "pushRun": 37849259409,
+      "prRun": 37849265911,
+      "passedJobs": 12,
+      "totalJobs": 12
+    }
+  },
+  "fixtureCommit": "612a8e66eccbbc6d811709e31ac7520c035d4e19",
+  "focusedFixtureReruns": {
+    "manifest": "pass",
+    "firstArtifact": "failed at additional stale OpaqueFast pin",
+    "correctedArtifact": "pass",
+    "scope": "focused runs on working diff before commit, not later immutable candidate"
+  },
+  "privateEvidenceSha256": {
+    "firstSummary": "99f6274d978ba5e177648e20287b5ce2bb57d2efeb24963408c9b4ed88ee20d6",
+    "firstLog": "e9a10802636d31f84eb16f3e1427c2ba2af264f552beb310ebb7d53d9c27b830",
+    "firstFocusedLog": "16409b802f329815a1ec3d935e7158ded018ea117ae934e81eb26c1de04f3ebc",
+    "correctedArtifactLog": "b72037fcb0fcd06c732c2f6731fe238a7ebf75f103404431b8fd3218065a3e89"
+  },
+  "technicalEvidenceLimits": [
+    "Windows foreground refused current moving scenario; retained as not armed",
+    "Not every moving world-body/shadow/mirror view exposed by bounded camera scenarios",
+    "No physical end-to-end latency or sustained30FPS certification",
+    "Errors/unsupported-device handling has affected host checks, no invented unsupported phone result",
+    "Signed Shipping runtime and actual downloaded itch artifacts remain separate post-completion release gates"
+  ]
+}

@@ -1,7 +1,6 @@
 #include "vulkan/raytracing/CharacterRenderSlot.h"
 #include "vulkan/raytracing/RtSceneRecordObservation.h"
-
-#include "gameplay/ShowcaseRoute.h"
+#include "scene/SkeletonRenderPose.h"
 
 #include <algorithm>
 #include <cmath>
@@ -19,112 +18,6 @@ constexpr std::array<std::uint32_t, 40u> kLichStaffEmissiveVertices{{
     19154u, 19174u, 19792u, 20010u, 20011u, 20012u, 20385u, 20387u,
     20388u, 20389u, 20390u, 20625u, 20845u, 20846u, 21255u, 25309u}};
 
-// A parry arrives at the skeleton attack contact pose.  There is no separate
-// stagger asset, so use the authored post-contact recovery as a short,
-// deterministic recoil/recovery motion rather than freezing the mesh for the
-// full gameplay stagger.  These are renderer-only sampling bounds; gameplay
-// remains authoritative for the 800 ms Staggered action.
-constexpr float kSkeletonAttackContactTime = 1.20f;
-constexpr float kSkeletonAttackRecoveryEndTime = 2.80f;
-constexpr float kSkeletonStaggerDuration = 0.80f;
-
-float SmoothStep01(const float value)
-{
-    const float clamped = std::clamp(value, 0.0f, 1.0f);
-    return clamped * clamped * (3.0f - 2.0f * clamped);
-}
-
-float SkeletonStaggerRecoil(const float actionTime)
-{
-    // The parry reads as a sharp, early knockback, then has enough time to
-    // settle before gameplay releases the attack token at 800 ms.
-    constexpr float kImpactDuration = 0.14f;
-    const float elapsed = std::clamp(actionTime, 0.0f, kSkeletonStaggerDuration);
-    if (elapsed <= kImpactDuration)
-    {
-        return SmoothStep01(elapsed / kImpactDuration);
-    }
-    return 1.0f - SmoothStep01((elapsed - kImpactDuration) /
-                               (kSkeletonStaggerDuration - kImpactDuration));
-}
-
-horde::scene::SkeletonClip SkeletonClipForAction(
-    horde::gameplay::EnemyCombatAction action,
-    horde::gameplay::EnemyAnimation animation)
-{
-    using Action = horde::gameplay::EnemyCombatAction;
-    if (animation == horde::gameplay::EnemyAnimation::Dead)
-    {
-        return horde::scene::SkeletonClip::Dead;
-    }
-    switch (action)
-    {
-    case Action::AttackWindup:
-    case Action::AttackActive:
-    case Action::AttackRecovery:
-    case Action::Staggered:
-        return horde::scene::SkeletonClip::Attack;
-    case Action::Dead:
-        return horde::scene::SkeletonClip::Dead;
-    case Action::Locomotion:
-    default:
-        return animation == horde::gameplay::EnemyAnimation::Walking
-            ? horde::scene::SkeletonClip::Walking
-            : horde::scene::SkeletonClip::Idle;
-    }
-}
-
-float SkeletonTimeForAction(horde::gameplay::EnemyCombatAction action,
-                            horde::gameplay::EnemyAnimation animation,
-                            float actionTime,
-                            float animationTime,
-                            float deadClipDuration)
-{
-    using Action = horde::gameplay::EnemyCombatAction;
-    if (animation == horde::gameplay::EnemyAnimation::Dead && deadClipDuration > 0.0f)
-    {
-        return std::min(animationTime, deadClipDuration);
-    }
-    switch (action)
-    {
-    case Action::AttackWindup:
-        return std::clamp(actionTime, 0.0f, 1.12f);
-    case Action::AttackActive:
-        return 1.12f + std::clamp(actionTime, 0.0f, 0.18f);
-    case Action::AttackRecovery:
-        return 1.30f + std::clamp(actionTime, 0.0f, 1.50f);
-    case Action::Staggered:
-        return kSkeletonAttackContactTime +
-               (kSkeletonAttackRecoveryEndTime - kSkeletonAttackContactTime) *
-                   std::clamp(actionTime / kSkeletonStaggerDuration, 0.0f, 1.0f);
-    case Action::Dead:
-        return deadClipDuration > 0.0f ? std::min(animationTime, deadClipDuration) : animationTime;
-    case Action::Locomotion:
-    default:
-        return animationTime * 0.90f;
-    }
-}
-
-VkTransformMatrixKHR SkeletonInstanceTransform(
-    const horde::gameplay::simulation::SkeletonEnemySnapshot& skeleton)
-{
-    const float recoil = skeleton.action == horde::gameplay::EnemyCombatAction::Staggered
-        ? SkeletonStaggerRecoil(skeleton.actionTime)
-        : 0.0f;
-    const float x = skeleton.x - std::sin(skeleton.facingRadians) * recoil * 0.20f;
-    const float z = skeleton.z - std::cos(skeleton.facingRadians) * recoil * 0.20f;
-    const float facingRadians = skeleton.facingRadians;
-    const float enemyCos = std::cos(facingRadians);
-    const float enemySin = std::sin(facingRadians);
-    const float lean = -0.30f * recoil;
-    const float leanCos = std::cos(lean);
-    const float leanSin = std::sin(lean);
-    return {{
-        enemyCos, enemySin * leanSin, enemySin * leanCos, x,
-        0.0f, leanCos, -leanSin, horde::gameplay::kRouteFloorWorldY + recoil * 0.055f,
-        -enemySin, enemyCos * leanSin, enemyCos * leanCos, z}};
-}
-
 VkTransformMatrixKHR LichInstanceTransform(const horde::gameplay::LichSnapshot& lich)
 {
     const float hitRecoil = std::clamp(lich.hitRecoil, 0.0f, 1.0f);
@@ -133,7 +26,7 @@ VkTransformMatrixKHR LichInstanceTransform(const horde::gameplay::LichSnapshot& 
     const float activeZ = lich.z - std::cos(lich.facingRadians) * hitRecoil * 0.18f;
     const float yawCos = std::cos(lich.facingRadians);
     const float yawSin = std::sin(lich.facingRadians);
-    const float lean = -0.17f * hitRecoil;
+    const float lean = lich.presentationTiltRadians - 0.17f * hitRecoil;
     const float leanCos = std::cos(lean);
     const float leanSin = std::sin(lean);
     return {{
@@ -181,10 +74,14 @@ CharacterFramePlan EvaluateCharacterFramePlan(
     {
         const auto& source = skeletons[skeletonIndex];
         auto& destination = plan.skeletons[skeletonIndex];
-        destination.clip = SkeletonClipForAction(source.action, source.animation);
-        destination.time = SkeletonTimeForAction(
-            source.action, source.animation, source.actionTime, source.animationTime, skeletonDeadClipDuration);
-        destination.transform = SkeletonInstanceTransform(source);
+        const horde::scene::SkeletonRenderPose pose =
+            horde::scene::EvaluateSkeletonRenderPose(source, skeletonDeadClipDuration);
+        destination.clip = pose.clip;
+        destination.time = pose.time;
+        destination.transform = {{
+            {pose.transform[0], pose.transform[1], pose.transform[2], pose.transform[3]},
+            {pose.transform[4], pose.transform[5], pose.transform[6], pose.transform[7]},
+            {pose.transform[8], pose.transform[9], pose.transform[10], pose.transform[11]}}};
         destination.poseBucket = static_cast<std::uint32_t>(plan.skeletonPoseBucketCount);
         for (std::size_t previousIndex = 0u; previousIndex < skeletonIndex; ++previousIndex)
         {
@@ -215,7 +112,8 @@ bool CharacterPoseNeedsRefresh(const int requestedClip,
 
 bool CharacterRenderSlot::LoadAssets(const std::string& skeletonAssetPath,
                                      const std::string& lichAssetPath,
-                                     std::string& diagnostic)
+                                     std::string& diagnostic,
+                                     const bool skeletonOnly)
 {
     if (!skeletonModel_.LoadCombatClips(skeletonAssetPath, diagnostic))
     {
@@ -226,6 +124,15 @@ bool CharacterRenderSlot::LoadAssets(const std::string& skeletonAssetPath,
     {
         diagnostic = "The skeleton Dead clip has no usable duration.";
         return false;
+    }
+    skeletonOnly_ = skeletonOnly;
+    if (skeletonOnly_)
+    {
+        lichModel_ = {};
+        std::vector<horde::scene::TexturedSkinnedRtVertex>{}.swap(lichSkinnedVertices_);
+        std::vector<horde::scene::SkinnedRtVertex>{}.swap(skeletonSkinnedVertices_[1]);
+        diagnostic.clear();
+        return true;
     }
     return lichModel_.LoadClips(
         lichAssetPath, horde::scene::LichPlaceholderClipSet(), diagnostic);
@@ -238,6 +145,11 @@ bool CharacterRenderSlot::PrepareInitialGeometry(std::string& diagnostic)
     {
         if (diagnostic.empty()) diagnostic = "Skeleton produced no skinned vertices.";
         return false;
+    }
+    if (skeletonOnly_)
+    {
+        diagnostic.clear();
+        return true;
     }
     skeletonSkinnedVertices_[1] = skeletonSkinnedVertices_[0];
     if (!lichModel_.SkinTextured(horde::scene::SkinnedClip::Idle, 0.0f, lichSkinnedVertices_, diagnostic) ||
@@ -280,6 +192,12 @@ bool CharacterRenderSlot::CacheFramePlan(
     const horde::gameplay::LichSnapshot& lich,
     std::string& diagnostic)
 {
+    if (skeletonOnly_ && (skeletonCount > 1u ||
+        roster.selectedEnemy != horde::gameplay::EnemyKind::Skeleton))
+    {
+        diagnostic = "Skeleton-only CharacterRenderSlot admits one skeleton and no lich.";
+        return false;
+    }
     if (skeletonCount > kMaximumActiveSkeletons)
     {
         diagnostic = "CharacterRenderSlot supports at most two active skeletons; the frame exceeded that limit.";

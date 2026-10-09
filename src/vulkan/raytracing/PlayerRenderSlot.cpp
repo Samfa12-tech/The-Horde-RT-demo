@@ -2,6 +2,7 @@
 #include "vulkan/raytracing/RtSceneRecordObservation.h"
 
 #include "gameplay/ShowcaseRoute.h"
+#include "gameplay/items/HeldItemKinematics.h"
 
 #include <algorithm>
 #include <cmath>
@@ -11,7 +12,7 @@ namespace horde::vulkan::raytracing
 {
 
 bool HasDedicatedPlayerPrimaryOwnership(
-    const std::array<std::uint8_t, kRtInstanceMetadataCapacity>& masks,
+    const std::array<std::uint8_t, kRtTlasInstanceCapacity>& masks,
     std::uint32_t worldBodyInstanceFlags)
 {
     const bool remainderOnly = (worldBodyInstanceFlags &
@@ -336,18 +337,52 @@ bool ResolvePlayerHeldItemVisuals(
     horde::gameplay::items::HeldItemStates& renderItems,
     std::string& diagnostic)
 {
+    if (authoritativeItems[1].id == horde::gameplay::items::HeldItemId::Sword &&
+        (authoritativeItems[1].visualStowBlend > 0.0f ||
+         authoritativeItems[1].parentMode ==
+             horde::gameplay::items::HeldItemParentMode::BodyStow))
+    {
+        diagnostic = "Stowed sword visual requires the animated Hips mount transform.";
+        return false;
+    }
+    return ResolvePlayerHeldItemVisuals(authoritativeItems, worldFromLeftHandBone,
+        worldFromRightHandBone, horde::gameplay::items::IdentityHeldItemTransform(),
+        renderItems, diagnostic);
+}
+
+bool ResolvePlayerHeldItemVisuals(
+    const horde::gameplay::items::HeldItemStates& authoritativeItems,
+    const horde::gameplay::items::HeldItemTransform& worldFromLeftHandBone,
+    const horde::gameplay::items::HeldItemTransform& worldFromRightHandBone,
+    const horde::gameplay::items::HeldItemTransform& worldFromBodyStow,
+    horde::gameplay::items::HeldItemStates& renderItems,
+    std::string& diagnostic)
+{
     using namespace horde::gameplay::items;
     renderItems = authoritativeItems;
     for (HeldItemState& item : renderItems)
     {
+        if (item.detached ||
+            item.parentMode == HeldItemParentMode::AuthoredWorldTrajectory ||
+            item.parentMode == HeldItemParentMode::WorldObject)
+            continue;
         // Once a held item detaches, GameSimulation's authored trajectory
         // remains the sole transform authority. Only attached visuals consume
         // the final rig socket; semantic light/audio state is unchanged.
+        if (item.id == HeldItemId::Sword &&
+            (item.visualStowBlend > 0.0f ||
+             item.parentMode == HeldItemParentMode::BodyStow))
+        {
+            item.worldFromItem = BlendHeldItemTransformsAtGrip(
+                worldFromBodyStow, item.worldFromItem,
+                SwordGripSocketTransform(), 1.0f - item.visualStowBlend);
+            continue;
+        }
         if (item.parentMode != HeldItemParentMode::HandSocket) continue;
         const HeldItemTransform& worldFromHand = SelectHandSocketTransform(
             item.hand, worldFromLeftHandBone, worldFromRightHandBone);
         const HeldItemTransform itemFromGrip = item.id == HeldItemId::OriginalTorch
-            ? OriginalTorchGripSocketTransform()
+            ? PlayerRagTorchGripSocketTransform()
             : SwordGripSocketTransform();
         if (!ComposeWorldFromItem(worldFromHand, itemFromGrip,
                                   item.worldFromItem, diagnostic))
@@ -364,7 +399,7 @@ PlayerGripAgreement MeasurePlayerGripAgreement(
     using namespace horde::gameplay::items;
     const HeldItemTransform itemFromGrip = authoritativeItem.id ==
             HeldItemId::OriginalTorch
-        ? OriginalTorchGripSocketTransform()
+        ? PlayerRagTorchGripSocketTransform()
         : SwordGripSocketTransform();
     const HeldItemTransform intendedGrip = MultiplyHeldItemTransforms(
         authoritativeItem.worldFromItem, itemFromGrip);
@@ -553,19 +588,16 @@ float PlayerRenderSlot::BootGroundingOffsetMetres(
 bool PlayerRenderSlot::DeriveAssetGripSockets(std::string& diagnostic)
 {
     using namespace horde::gameplay::items;
-    horde::scene::SkinnedNodeTransform namedLeftHand{};
-    horde::scene::SkinnedNodeTransform namedLeftGrip{};
-    horde::scene::SkinnedNodeTransform namedRightHand{};
-    horde::scene::SkinnedNodeTransform namedRightGrip{};
-    if (!asset_.NodeTransform(horde::scene::SkinnedClip::Idle, 0.0f,
-                              "LeftHand", namedLeftHand, diagnostic) ||
-        !asset_.NodeTransform(horde::scene::SkinnedClip::Idle, 0.0f,
-                              "LeftGrip", namedLeftGrip, diagnostic) ||
-        !asset_.NodeTransform(horde::scene::SkinnedClip::Idle, 0.0f,
-                              "RightHand", namedRightHand, diagnostic) ||
-        !asset_.NodeTransform(horde::scene::SkinnedClip::Idle, 0.0f,
-                              "RightGrip", namedRightGrip, diagnostic))
+    constexpr std::array<std::string_view, 4u> names{{
+        "LeftHand", "LeftGrip", "RightHand", "RightGrip"}};
+    std::array<horde::scene::SkinnedNodeTransform, 4u> pose{};
+    if (!asset_.NodeTransforms(horde::scene::SkinnedClip::Idle, 0.0f,
+                               names, pose, diagnostic))
         return false;
+    const auto& namedLeftHand = pose[0];
+    const auto& namedLeftGrip = pose[1];
+    const auto& namedRightHand = pose[2];
+    const auto& namedRightGrip = pose[3];
 
     // Preserve anatomical identity end to end. The renderer's proper
     // model-to-world rotation maps model +X (anatomical Left) to gameplay
@@ -605,6 +637,27 @@ bool PlayerRenderSlot::ResolveHeldItemVisuals(
     horde::gameplay::items::HeldItemStates& renderItems,
     std::string& diagnostic)
 {
+    if (authoritativeItems[1].id == horde::gameplay::items::HeldItemId::Sword &&
+        (authoritativeItems[1].visualStowBlend > 0.0f ||
+         authoritativeItems[1].parentMode ==
+             horde::gameplay::items::HeldItemParentMode::BodyStow))
+    {
+        diagnostic = "Stowed sword visual requires the animated Hips mount transform.";
+        return false;
+    }
+    return ResolveHeldItemVisuals(authoritativeItems, worldFromLeftGrip,
+        worldFromRightGrip, horde::gameplay::items::IdentityHeldItemTransform(),
+        renderItems, diagnostic);
+}
+
+bool PlayerRenderSlot::ResolveHeldItemVisuals(
+    const horde::gameplay::items::HeldItemStates& authoritativeItems,
+    const horde::gameplay::items::HeldItemTransform& worldFromLeftGrip,
+    const horde::gameplay::items::HeldItemTransform& worldFromRightGrip,
+    const horde::gameplay::items::HeldItemTransform& worldFromBodyStow,
+    horde::gameplay::items::HeldItemStates& renderItems,
+    std::string& diagnostic)
+{
     using namespace horde::gameplay::items;
     if (!stableGripBasesReady_)
     {
@@ -612,17 +665,32 @@ bool PlayerRenderSlot::ResolveHeldItemVisuals(
         return false;
     }
     if (!ValidateHeldItemSocketTransform(worldFromLeftGrip, diagnostic) ||
-        !ValidateHeldItemSocketTransform(worldFromRightGrip, diagnostic))
+        !ValidateHeldItemSocketTransform(worldFromRightGrip, diagnostic) ||
+        !ValidateHeldItemSocketTransform(worldFromBodyStow, diagnostic))
         return false;
     finalWorldFromLeftGrip_ = worldFromLeftGrip;
     if (!ResolvePlayerHeldItemVisuals(
         authoritativeItems, worldFromLeftGrip, worldFromRightGrip,
+        worldFromBodyStow,
         renderItems, diagnostic))
         return false;
     leftGripAgreement_ = MeasurePlayerGripAgreement(
         authoritativeItems[0], renderItems[0]);
-    rightGripAgreement_ = MeasurePlayerGripAgreement(
-        authoritativeItems[1], renderItems[1]);
+    if (authoritativeItems[1].visualGripBlend >= 0.999f &&
+        (authoritativeItems[1].visualStowBlend > 0.0f ||
+         authoritativeItems[1].parentMode == HeldItemParentMode::BodyStow))
+    {
+        const HeldItemTransform renderedSwordGrip = MultiplyHeldItemTransforms(
+            renderItems[1].worldFromItem, SwordGripSocketTransform());
+        rightGripAgreement_ = MeasureTransformAgreement(
+            renderedSwordGrip, worldFromRightGrip);
+    }
+    else
+    {
+        rightGripAgreement_ = authoritativeItems[1].visualGripBlend >= 0.999f
+            ? MeasurePlayerGripAgreement(authoritativeItems[1], renderItems[1])
+            : PlayerGripAgreement{};
+    }
     if (leftGripAgreement_.positionErrorMetres > kPlayerGripSocketToleranceMetres ||
         rightGripAgreement_.positionErrorMetres > kPlayerGripSocketToleranceMetres ||
         leftGripAgreement_.orientationErrorRadians > kPlayerGripOrientationToleranceRadians ||
@@ -637,6 +705,23 @@ bool PlayerRenderSlot::ResolveHeldItemVisuals(
     }
     diagnostic.clear();
     return true;
+}
+
+horde::gameplay::animation::PlayerArmIkTarget BlendPlayerArmGripTarget(
+    const horde::gameplay::animation::PlayerArmIkTarget& freeCarry,
+    const HeldItemTransform& itemGrip,
+    const float gripBlend)
+{
+    auto result = freeCarry;
+    const auto freeGrip = TransformFromAxes(freeCarry.gripX, freeCarry.gripY,
+                                           freeCarry.gripZ, freeCarry.target);
+    const auto grip = horde::gameplay::items::BlendHeldItemTransforms(
+        freeGrip, itemGrip, gripBlend);
+    result.target = {{grip[12], grip[13], grip[14]}};
+    result.gripX = {{grip[0], grip[1], grip[2]}};
+    result.gripY = {{grip[4], grip[5], grip[6]}};
+    result.gripZ = {{grip[8], grip[9], grip[10]}};
+    return result;
 }
 
 bool PlayerRenderSlot::PreparePose(
@@ -679,6 +764,7 @@ bool PlayerRenderSlot::PreparePose(
         horde::scene::SkinnedArmIkTarget result;
         result.pole = source.pole;
         result.preferredElbowFlexionRadians = source.preferredElbowFlexionRadians;
+        result.poseWeight = source.poseWeight;
         result.shoulder = source.shoulder;
         result.shoulderTargetEnabled = false;
         // PresentableTinyRtScene converts the gameplay view frame through the
@@ -739,8 +825,13 @@ bool PlayerRenderSlot::PreparePose(
     };
     leftSocketErrorMetres_ = socketError(sockets_.leftGrip, animation.leftIk);
     rightSocketErrorMetres_ = socketError(sockets_.rightGrip, animation.rightIk);
+    // The right arm stays solved while its target moves between empty carry
+    // and the item Grip. Partial diagnostic IK weights still permit an
+    // intentionally unsolved pose; production targets keep the strict bound.
+    const bool rightGripFullyEngaged = animation.rightIk.poseWeight >= 0.999f;
     if (leftSocketErrorMetres_ > kPlayerGripSocketToleranceMetres ||
-        rightSocketErrorMetres_ > kPlayerGripSocketToleranceMetres)
+        (rightGripFullyEngaged &&
+         rightSocketErrorMetres_ > kPlayerGripSocketToleranceMetres))
     {
         diagnostic = "Skinned player palm Grip socket exceeded the 15 mm grip tolerance: left=" +
                      std::to_string(leftSocketErrorMetres_) + " right=" +
@@ -782,16 +873,59 @@ bool PlayerRenderSlot::ShoulderCenter(
         animation.locomotionClip == horde::gameplay::animation::PlayerLocomotionClip::Walk
         ? horde::scene::SkinnedClip::Walking
         : horde::scene::SkinnedClip::Idle;
-    horde::scene::SkinnedNodeTransform left{};
-    horde::scene::SkinnedNodeTransform right{};
-    if (!asset_.NodeTransform(clip, animation.locomotionTime, "LeftArm", left,
-                              diagnostic) ||
-        !asset_.NodeTransform(clip, animation.locomotionTime, "RightArm", right,
-                              diagnostic))
+    constexpr std::array<std::string_view, 2u> names{{"LeftArm", "RightArm"}};
+    std::array<horde::scene::SkinnedNodeTransform, 2u> pose{};
+    if (!asset_.NodeTransforms(clip, animation.locomotionTime, names, pose,
+                               diagnostic))
         return false;
+    const auto& left = pose[0];
+    const auto& right = pose[1];
     center = {{(left[12] + right[12]) * 0.5f,
                (left[13] + right[13]) * 0.5f,
                (left[14] + right[14]) * 0.5f}};
+    diagnostic.clear();
+    return true;
+}
+
+bool PlayerRenderSlot::AnimatedHipsWorldTransform(
+    const horde::gameplay::animation::PlayerAnimationSnapshot& animation,
+    const PlayerModelWorldBasis& basis,
+    const std::array<float, 3u>& rootWorld,
+    horde::gameplay::items::HeldItemTransform& worldFromHips,
+    std::string& diagnostic) const
+{
+    if (!asset_.IsLoaded())
+    {
+        diagnostic = "Player Hips mount requires the loaded runtime rig.";
+        return false;
+    }
+    const auto clip = animation.locomotionClip ==
+            horde::gameplay::animation::PlayerLocomotionClip::Walk
+        ? horde::scene::SkinnedClip::Walking : horde::scene::SkinnedClip::Idle;
+    horde::scene::SkinnedNodeTransform hips{};
+    if (!asset_.NodeTransform(clip, animation.locomotionTime, "Hips", hips,
+                              diagnostic))
+        return false;
+    const auto axisToWorld = [&basis](const std::array<float, 3u>& axis) {
+        return Normalise(PlayerModelVectorToWorld(basis, axis));
+    };
+    Vec3 x = axisToWorld({{hips[0], hips[1], hips[2]}});
+    const Vec3 rawY = axisToWorld({{hips[4], hips[5], hips[6]}});
+    Vec3 y = Normalise(Subtract(rawY, Scale(x, Dot(rawY, x))));
+    Vec3 z = Normalise(Cross(x, y));
+    const Vec3 rawZ = axisToWorld({{hips[8], hips[9], hips[10]}});
+    if (Dot(z, rawZ) < 0.0f)
+    {
+        y = Scale(y, -1.0f);
+        z = Scale(z, -1.0f);
+    }
+    const Vec3 offset = PlayerModelVectorToWorld(
+        basis, {{hips[12], hips[13], hips[14]}});
+    const Vec3 position = Add(rootWorld, offset);
+    worldFromHips = TransformFromAxes(x, y, z, position);
+    if (!horde::gameplay::items::ValidateHeldItemSocketTransform(
+            worldFromHips, diagnostic))
+        return false;
     diagnostic.clear();
     return true;
 }

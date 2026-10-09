@@ -51,9 +51,14 @@ struct DevelopmentCheckpoint
     float rewardTorsionAngleRadians = 0.0f;
     float rewardTorsionAngularVelocity = 0.0f;
     bool stagesUnlockedChest = false;
+    // Capture framing only; dedicated modelled primary ownership stays mandatory.
+    bool primaryArmsMayBeOutsideFrame = false;
+    // Explicit development capture only; production encounter defaults stay unchanged.
+    bool stagesWaterfallGuards = false;
+    std::uint32_t waterfallGuardFixedTicks = 0u;
 };
 
-inline constexpr std::array<DevelopmentCheckpoint, 47u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 68u> kDevelopmentCheckpoints{{
     {100, "pbr-sword-closeup", 0, 0.0f, 1.85f, 0.0f, -0.18f},
     {101, "pbr-torch-fire", 0, 0.0f, 1.85f, 0.0f, -0.14f},
     {102, "player-body-grips", 0, 0.0f, 1.85f, 0.0f, -0.32f},
@@ -185,6 +190,86 @@ inline constexpr std::array<DevelopmentCheckpoint, 47u> kDevelopmentCheckpoints{
      -1.57079632679f, 0.28f,
      DevelopmentCombatPose::Rest, false, 1.0f, {{0.72f, 0.90f, 1.0f}}, 2.4f,
      true, false, DevelopmentRewardPose::HeldHigh},
+    // Source-anchored layout identity views; fresh checkpoint two keeps the
+    // ordinary held torch/player state for C/D/A/B without fixture overrides.
+    // A farther stand-off reduces ordinary wall-clearance retraction in this
+    // level identity view; native arm ownership/visibility stays capture-gated.
+    {147, "layout-c-wall-panel", 2, 2.55f, -10.60f, 3.14159265359f, 0.0f},
+    {148, "layout-d-entry-breach", 2, 0.0f, -2.55f, 0.0f, 0.28f},
+    // The legal upward view shows A's lower aperture and deep inner wall;
+    // its 5.6 m rim is beyond this camera's accepted pitch/FOV, unlike B.
+    {149, "layout-a-waterfall-own-hole", 2, -1.15f, -15.20f, -1.57079632679f, 0.28f},
+    {150, "layout-b-large-skylight", 2, -6.50f, -15.20f, 1.57079632679f, 0.28f},
+    {151, "layout-e-finale-opening", 11, -35.30f, -15.20f, 1.57079632679f, 0.28f},
+    // C147's authored state, with a radius-safe nearer approach and maximum
+    // legal upward pitch. This admits a partial upper/lintel enclosure view;
+    // the 4.10 m rim remains beyond the production camera's vertical FOV.
+    {.id = 152,
+     .name = "layout-c-wall-panel-upward",
+     .baseShowcaseCheckpointId = 2,
+     .cameraX = 2.55f,
+     .cameraZ = -9.45f,
+     .yaw = 3.14159265359f,
+     .pitch = 0.28f,
+     .primaryArmsMayBeOutsideFrame = true},
+    {.id = 153,
+     .name = "waterfall-guards-entry",
+     .baseShowcaseCheckpointId = 2,
+     .cameraX = -3.00f,
+     .cameraZ = -15.20f,
+     .yaw = -1.57079632679f,
+     .pitch = -0.06f,
+     .stagesWaterfallGuards = true},
+    {.id = 154,
+     .name = "waterfall-guards-walk-early",
+     .baseShowcaseCheckpointId = 2,
+     .cameraX = -3.45f,
+     .cameraZ = -15.20f,
+     .yaw = -1.57079632679f,
+     .pitch = -0.06f,
+     .stagesWaterfallGuards = true,
+     .waterfallGuardFixedTicks = 6u},
+    {.id = 155,
+     .name = "waterfall-guards-walk-later",
+     .baseShowcaseCheckpointId = 2,
+     .cameraX = -3.45f,
+     .cameraZ = -15.20f,
+     .yaw = -1.57079632679f,
+     .pitch = -0.06f,
+     .stagesWaterfallGuards = true,
+     .waterfallGuardFixedTicks = 18u},
+    {156, "dust-box-front", 0, 0.0f, -0.25f, 0.0f, 0.14f},
+    {157, "dust-box-oblique", 0, 0.10f, -0.25f, 0.06f, 0.14f},
+    {158, "dust-ellipsoid", 2, -3.85f, -15.20f, -1.57079632679f, 0.14f},
+    {159, "dust-box-wall", 0, 0.0f, -0.25f, 0.70f, -0.08f},
+    // Real shared parry at the owner-reported waterfall stance, without the
+    // separate encounter/equipment seed used by the staged guard previews.
+    {160, "player-torch-parry-clearance", 2, 0.495964f, -15.143019f, -1.561293f, -0.04f,
+     DevelopmentCombatPose::ParryActive},
+    // Ordinary legal views of the first-bend grate's floor and two returns.
+    // These inspect level geometry; dedicated primary ownership still applies.
+    {.id = 161, .name = "wall-panel-bottom", .baseShowcaseCheckpointId = 2,
+     .cameraX = 2.575f, .cameraZ = -10.20f, .yaw = 3.14159265359f,
+     .pitch = -0.32f, .primaryArmsMayBeOutsideFrame = true},
+    {.id = 162, .name = "wall-panel-bottom-left", .baseShowcaseCheckpointId = 2,
+     .cameraX = 1.75f, .cameraZ = -10.10f, .yaw = 2.646f,
+     .pitch = -0.32f, .primaryArmsMayBeOutsideFrame = true},
+    {.id = 163, .name = "wall-panel-bottom-right", .baseShowcaseCheckpointId = 2,
+     .cameraX = 3.40f, .cameraZ = -10.10f, .yaw = 3.637f,
+     .pitch = -0.32f, .primaryArmsMayBeOutsideFrame = true},
+    // Frozen water-interface lighting inspections; no scene/equipment override.
+    {.id = 180, .name = "water-torch-near", .baseShowcaseCheckpointId = 2,
+     .cameraX = -1.15f, .cameraZ = -15.20f, .yaw = -1.57079632679f,
+     .pitch = -0.16f, .primaryArmsMayBeOutsideFrame = true},
+    {.id = 181, .name = "water-torch-far", .baseShowcaseCheckpointId = 2,
+     .cameraX = 2.00f, .cameraZ = -15.20f, .yaw = -1.57079632679f,
+     .pitch = -0.10f, .primaryArmsMayBeOutsideFrame = true},
+    {.id = 182, .name = "water-torch-oblique", .baseShowcaseCheckpointId = 2,
+     .cameraX = 0.00f, .cameraZ = -14.30f, .yaw = -1.18055f,
+     .pitch = -0.20f, .primaryArmsMayBeOutsideFrame = true},
+    {.id = 183, .name = "water-torch-catchment", .baseShowcaseCheckpointId = 2,
+     .cameraX = -0.80f, .cameraZ = -15.85f, .yaw = -1.94055f,
+     .pitch = -0.32f, .primaryArmsMayBeOutsideFrame = true},
 }};
 
 constexpr const DevelopmentCheckpoint* FindDevelopmentCheckpoint(std::string_view name)

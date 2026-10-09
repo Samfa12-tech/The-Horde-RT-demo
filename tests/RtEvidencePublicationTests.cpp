@@ -330,6 +330,75 @@ void TestCanonicalCompletedEvidence()
     }
 }
 
+void TestCompletedFireLightingProjection()
+{
+    auto completed = MakeCompletedEvidence(RtInstrumentationMode::Shipping);
+    completed.scene.fireLighting = RtFireLightingEvidence{};
+    completed.scene.fireLighting->count = 2u;
+    completed.scene.fireLighting->emitters[0] = {3u, {{-32.5f, 0.85f, -16.5f, 0.5f}}, {{1.0f, 0.5f, 0.25f, 0.5f}}};
+    completed.scene.fireLighting->emitters[1] = {4u, {{-31.5f, 0.85f, -13.5f, 0.75f}}, {{1.0f, 0.5f, 0.25f, 0.75f}}};
+    auto publication = MakePublished(completed);
+    completed.scene.fireLighting = RtFireLightingEvidence{};
+    std::string json, text, reason;
+    Check(SerializeRtEvidencePublication(publication, true, json, text, reason) &&
+          json.find("\"fireLighting\":{\"count\":2") != std::string::npos &&
+          json.find("\"stableId\":4") != std::string::npos,
+          "capability publication exposes actual completed owning fire lights rather than the current upload");
+    publication.hasCompletedEvidence = false;
+    Check(SerializeRtEvidencePublication(publication, true, json, text, reason) &&
+          json.find("\"completedFrame\":null") != std::string::npos &&
+          json.find("fireLighting") == std::string::npos,
+          "a pending completion cannot certify the stored/current fire selection");
+    publication = MakePublished(completed);
+    publication.completedEvidence.scene.fireLighting->emitters[3].stableId = 4u;
+    Check(!SerializeRtEvidencePublication(publication, true, json, text, reason) &&
+          json.find("\"completedFrame\":null") != std::string::npos &&
+          json.find("fireLighting") == std::string::npos,
+          "invalid completed fire suffix fails capability publication without exposing a light claim");
+}
+
+void TestCompletedMistAdmission()
+{
+    auto completed = MakeCompletedEvidence(RtInstrumentationMode::Shipping);
+    auto publication = MakePublished(completed);
+    std::string json, text, reason;
+    Check(!CurrentCompletedMistEnabled(publication).has_value() &&
+        SerializeRtEvidencePublication(publication, true, json, text, reason) &&
+        json.find("actualUploadedMistEnabled") == std::string::npos,
+        "historical absent mist upload is unavailable rather than a guessed default");
+    for (const bool enabled : {true, false})
+    {
+        completed.scene.actualUploadedMistEnabled = enabled;
+        publication = MakePublished(completed);
+        // A later upload cannot alter the retained completed fact.
+        completed.scene.actualUploadedMistEnabled = !enabled;
+        Check(CurrentCompletedMistEnabled(publication) == std::optional<bool>{enabled} &&
+            SerializeRtEvidencePublication(publication, true, json, text, reason) &&
+            json.find(enabled ? "\"actualUploadedMistEnabled\":true" : "\"actualUploadedMistEnabled\":false") != std::string::npos &&
+            text.find(enabled ? "Owning uploaded mist: On" : "Owning uploaded mist: Off") != std::string::npos,
+            "current owning mist On and Off survive publication independently of a later desired/uploaded value");
+        for (unsigned invalid = 0u; invalid < 10u; ++invalid)
+        {
+            auto stale = publication;
+            switch (invalid)
+            {
+            case 0u: stale.running = false; break;
+            case 1u: stale.presented = false; break;
+            case 2u: stale.hasCompletedEvidence = false; break;
+            case 3u: ++stale.sceneEpoch; break;
+            case 4u: ++stale.measurementGeneration; break;
+            case 5u: stale.completedEvidence.identity.completionSerial = 0u; break;
+            case 6u: stale.completedEvidence.presentation.outcome = RtPresentationOutcome::Failed; break;
+            case 7u: ++stale.completedEvidence.presentation.lastSuccessfulPresentSubmissionSerial; break;
+            case 8u: stale.completedEvidence.scene.shadowQuality = RtShadowQualityEvidence{RtShadowMode::Current, 1u, 1u, 1u}; break;
+            case 9u: stale.completedEvidence.identity.submitted.submissionSerial = 0u; break;
+            }
+            Check(!CurrentCompletedMistEnabled(stale).has_value(),
+                "pending/stopped/stale/failed/malformed owning packet cannot acknowledge either mist state");
+        }
+    }
+}
+
 void TestCurrentLifecycleDiffersFromHistoricalFrame()
 {
     const RtPerformanceEvidenceSnapshot completed =
@@ -500,6 +569,8 @@ int main()
     TestPendingAndRecreatedPublication();
     TestObserverUnavailable();
     TestCanonicalCompletedEvidence();
+    TestCompletedFireLightingProjection();
+    TestCompletedMistAdmission();
     TestCurrentLifecycleDiffersFromHistoricalFrame();
     TestPreviousGenerationIsPendingNotError();
     TestInvalidPublications();

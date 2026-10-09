@@ -3,12 +3,15 @@
 #include "vulkan/raytracing/RtSceneRecordObservation.h"
 #include "vulkan/raytracing/RtExecutionPolicy.h"
 #include "vulkan/raytracing/TlasInstanceRefresh.h"
+#include "vulkan/raytracing/RtDescriptorSetLayoutBindings.h"
+#include "gameplay/effects/KeeperTorchLighting.h"
 
 #include <algorithm>
 #include <array>
 #include <cctype>
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -60,7 +63,7 @@ bool Require(const bool condition, const std::string_view message)
 bool CheckTlasInstanceRefresh()
 {
     using horde::vulkan::raytracing::RequiresTlasInstanceRebuild;
-    std::array<VkAccelerationStructureInstanceKHR, 21u> built{};
+    std::array<VkAccelerationStructureInstanceKHR, horde::vulkan::raytracing::PresentableTinyRtScene::kTlasInstanceCount> built{};
     for (std::size_t i = 0u; i < built.size(); ++i)
     {
         built[i].instanceCustomIndex = static_cast<std::uint32_t>(i);
@@ -163,6 +166,229 @@ namespace horde::vulkan::raytracing
 
 struct PresentableTinyRtSceneObservationTestAccess
 {
+    static bool CheckMistControlsAndLifetime()
+    {
+        bool ok = true;
+        for (const auto shadow : {std::optional<horde::graphics::ShadowQuality>{},
+                                  std::optional{horde::graphics::ShadowQuality::Lower},
+                                  std::optional{horde::graphics::ShadowQuality::Current},
+                                  std::optional{horde::graphics::ShadowQuality::Higher}})
+        for (const auto workload : {RtWorkloadPreset::Lean, RtWorkloadPreset::Authored, RtWorkloadPreset::Max})
+        for (const bool high : {false, true})
+        {
+            const auto defaultOn = ResolveRtQualityControls(shadow, workload, high);
+            const auto explicitOn = ResolveRtQualityControls(shadow, workload, high, true);
+            const auto off = ResolveRtQualityControls(shadow, workload, high, false);
+            ok &= defaultOn && explicitOn && off && defaultOn->controls == explicitOn->controls &&
+                  defaultOn->controls[3] == 0u && off->controls[3] == 1u;
+            for (std::size_t index = 0u; index < 3u; ++index)
+                ok &= defaultOn->controls[index] == off->controls[index];
+            ok &= ResolveUploadedMistEnabled(*defaultOn) == true && ResolveUploadedMistEnabled(*off) == false;
+            auto unknown = *off; unknown.controls[3] = 6u;
+            ok &= !ResolveUploadedMistEnabled(unknown).has_value();
+        }
+        PresentableTinyRtScene scene;
+        ok &= scene.MistEnabled() && !scene.UploadedMistEnabled().has_value();
+        ok &= scene.DustQuality() == horde::graphics::DustQuality::Off && !scene.UploadedDustQuality();
+        scene.SetDustQuality(horde::graphics::DustQuality::Standard);
+        scene.SetMistEnabled(false);
+        ok &= !scene.MistEnabled() && !scene.UploadedMistEnabled().has_value();
+        scene.uploadedQualityControls_ = *ResolveRtQualityControls(
+            horde::graphics::ShadowQuality::Current, RtWorkloadPreset::Authored, false, false, horde::graphics::DustQuality::Low);
+        scene.uploadedQualityControlsValid_ = true;
+        scene.SetMistEnabled(true);
+        ok &= scene.MistEnabled() && scene.UploadedMistEnabled() == false;
+        ok &= scene.UploadedDustQuality() == horde::graphics::DustQuality::Low;
+        PresentableTinyRtScene moved(std::move(scene));
+        ok &= moved.MistEnabled() && moved.UploadedMistEnabled() == false &&
+              scene.MistEnabled() && !scene.UploadedMistEnabled().has_value();
+        ok &= moved.DustQuality() == horde::graphics::DustQuality::Standard &&
+            moved.UploadedDustQuality() == horde::graphics::DustQuality::Low && scene.DustQuality() == horde::graphics::DustQuality::Off;
+        moved.SetMistEnabled(false);
+        PresentableTinyRtScene assigned;
+        assigned = std::move(moved);
+        ok &= !assigned.MistEnabled() && assigned.UploadedMistEnabled() == false &&
+              moved.MistEnabled() && !moved.UploadedMistEnabled().has_value();
+        assigned.Destroy();
+        ok &= assigned.DustQuality() == horde::graphics::DustQuality::Off && !assigned.UploadedDustQuality();
+        ok &= assigned.MistEnabled() && !assigned.UploadedMistEnabled().has_value();
+        return ok;
+    }
+
+    static bool CheckKeeperTorchBodyAliases()
+    {
+        PresentableTinyRtScene scene;
+        scene.worldTorchBodyBlas_.address = 0xB0D1u;
+        scene.torchBlas_.address = 0xF1A0u; // Distinct owner contains the held emissive core.
+        std::array<VkAccelerationStructureInstanceKHR, PresentableTinyRtScene::kTlasInstanceCount> instances{};
+        instances[0].mask = 0x01u;
+        instances[0].flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
+        instances[0].accelerationStructureReference = 0x1234u;
+        instances[PresentableTinyRtScene::kPlayerSwordScabbardInstanceIndex].instanceCustomIndex =
+            PresentableTinyRtScene::kPlayerSwordScabbardMetadataIndex;
+        instances[PresentableTinyRtScene::kPlayerSwordScabbardInstanceIndex].mask = 0u;
+        instances[PresentableTinyRtScene::kPlayerSwordScabbardInstanceIndex].flags =
+            VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
+        instances[PresentableTinyRtScene::kPlayerSwordScabbardInstanceIndex].accelerationStructureReference = 0x5CA8u;
+        instances[PresentableTinyRtScene::kPlayerSwordScabbardInstanceIndex].transform.matrix[0][3] = 1.25f;
+        const auto original = instances;
+        scene.ApplyKeeperTorchBodyInstances(instances);
+        bool ok = true;
+        for (std::size_t index = 0u; index < PresentableTinyRtScene::kKeeperTorchInstanceCount; ++index)
+        {
+            const auto& instance = instances[PresentableTinyRtScene::kKeeperTorchFirstTlasInstance + index];
+            const auto& anchor = horde::gameplay::effects::kKeeperTorchAnchors[index];
+            ok &= instance.instanceCustomIndex == 1u && instance.instanceCustomIndex < kRtInstanceMetadataCapacity &&
+                  instance.mask == 0x01u && instance.accelerationStructureReference == 0xB0D1u &&
+                  instance.accelerationStructureReference != scene.torchBlas_.address &&
+                  instance.transform.matrix[0][3] == anchor.position[0] &&
+                  instance.transform.matrix[1][3] == anchor.position[1] &&
+                  instance.transform.matrix[2][3] == anchor.position[2] &&
+                  instance.transform.matrix[0][0] == 1.0f && instance.transform.matrix[1][1] == 1.0f &&
+                  instance.transform.matrix[2][2] == 1.0f;
+        }
+        // Keeper physical slots23/24 keep aliasing old torch metadata1. The
+        // independent player Rag torch owns metadata22 at held TLAS slot1,
+        // while the scabbard at slot25 keeps its own metadata23/BLAS. Compare
+        // every non-Keeper TLAS slot; the metadata capacity includes slot23
+        // and therefore is not a valid prefix length for this ownership check.
+        for (std::size_t index = 0u; index < instances.size(); ++index)
+        {
+            if (index == PresentableTinyRtScene::kKeeperTorchFirstTlasInstance ||
+                index == PresentableTinyRtScene::kKeeperTorchFirstTlasInstance + 1u)
+            {
+                continue;
+            }
+            ok &= std::memcmp(&instances[index], &original[index], sizeof(instances[index])) == 0;
+        }
+        instances[0].mask = 0u;
+        scene.ApplyKeeperTorchBodyInstances(instances);
+        ok &= instances[23].mask == 0u && instances[24].mask == 0u &&
+              std::memcmp(&instances[PresentableTinyRtScene::kPlayerSwordScabbardInstanceIndex],
+                          &original[PresentableTinyRtScene::kPlayerSwordScabbardInstanceIndex],
+                          sizeof(instances[0])) == 0;
+        scene.worldTorchBodyBlas_ = {};
+        scene.torchBlas_ = {};
+        return ok;
+    }
+
+    static void MarkFireUpload(PresentableTinyRtScene& scene)
+    {
+        scene.uploadedFireEmitters_ = {};
+        scene.uploadedFireEmitters_.activeCount = 2u;
+        for (std::size_t index = 0u; index < 2u; ++index)
+        {
+            const auto id = static_cast<std::uint32_t>(3u + index);
+            scene.uploadedFireEmitters_.selectedStableIds[index] = id;
+            scene.uploadedFireEmitters_.emitters[index].identity[0] = id;
+            scene.uploadedFireEmitters_.emitters[index].lightPositionStrength = {{-35.5f,0.99f,-16.325f,0.8f}};
+            scene.uploadedFireEmitters_.emitters[index].colourIntensity = {{1.0f,0.5f,0.1f,0.8f}};
+        }
+        scene.uploadedFireEmittersValid_ = true;
+    }
+    static bool CheckPersistentReadback()
+    {
+        PresentableTinyRtScene scene; // No Vulkan device: a remap would be invalid.
+        std::array<std::uint8_t, 8u> uploaded{11, 23, 37, 41, 53, 67, 79, 83};
+        RtGpuBuffer buffer;
+        buffer.memory = FakeHandle<VkDeviceMemory>(0xCAFEu);
+        buffer.size = uploaded.size();
+        buffer.mappedWriteData = uploaded.data();
+        buffer.memoryPropertyFlags = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+                                     VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+        std::array<std::uint8_t, 4u> output{};
+        std::string diagnostic = "stale";
+        bool ok = Require(scene.ReadBuffer(buffer, 2u, output.data(), output.size(),
+                                           "fixture", diagnostic) &&
+                          output == std::array<std::uint8_t, 4u>{37, 41, 53, 67} &&
+                          diagnostic.empty(), "persistent read uses exact offset bytes");
+        uploaded[7] = 97;
+        ok &= Require(scene.ReadBuffer(buffer, 4u, output.data(), output.size(),
+                                       "fixture", diagnostic) && output[3] == 97 &&
+                      buffer.mappedWriteData == uploaded.data(),
+                      "repeat read observes current bytes and preserves mapping ownership");
+        const auto reject = [&](VkDeviceSize offset, VkDeviceSize count, void* destination)
+        {
+            output.fill(0xABu);
+            return !scene.ReadBuffer(buffer, offset, destination, count, "fixture", diagnostic) &&
+                   !diagnostic.empty() &&
+                   std::all_of(output.begin(), output.end(), [](auto v) { return v == 0xABu; });
+        };
+        ok &= Require(reject(5u, 4u, output.data()) &&
+                      reject(~VkDeviceSize{0u}, 1u, output.data()) &&
+                      reject(0u, 0u, output.data()) && reject(0u, 1u, nullptr),
+                      "invalid reads fail without touching destination or Vulkan");
+        buffer.memoryPropertyFlags = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT;
+        ok &= Require(reject(0u, 1u, output.data()), "noncoherent mapping fails closed");
+        buffer.memoryPropertyFlags = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+        ok &= Require(reject(0u, 1u, output.data()), "nonvisible mapping fails closed");
+        buffer.memory = VK_NULL_HANDLE;
+        ok &= Require(reject(0u, 1u, output.data()), "missing owner memory fails closed");
+        return ok;
+    }
+
+    static bool CheckGlassVisibility(PresentableTinyRtScene& scene, bool enabled)
+    {
+        scene.glassEnabled_ = enabled;
+        scene.dielectricFixtureBlas_.address = 0xD1E1u;
+        std::array<VkAccelerationStructureInstanceKHR, 4u> instances{};
+        instances[0].instanceCustomIndex = 9u;
+        instances[0].accelerationStructureReference = scene.dielectricFixtureBlas_.address;
+        instances[0].mask = 0xFFu;
+        // The procedural arm can have the same custom index. Its own BLAS,
+        // lantern mixed body, and ordinary opaque world must remain admitted.
+        instances[1].instanceCustomIndex = 9u;
+        instances[1].accelerationStructureReference = 0xA2A2u;
+        instances[1].mask = 0x04u;
+        instances[2].instanceCustomIndex = 8u;
+        instances[2].accelerationStructureReference = 0x1A17u;
+        instances[2].mask = 0x01u;
+        instances[3].instanceCustomIndex = 0u;
+        instances[3].accelerationStructureReference = 0xB1A5u;
+        instances[3].mask = 0xFFu;
+        const auto before = instances;
+        for (const auto profile : {RtSceneProfile::Showcase, RtSceneProfile::GraphicsPreview})
+        {
+            scene.sceneProfile_ = profile;
+            instances = before;
+            scene.ApplyGlassFixtureVisibility(instances);
+            for (unsigned rayBit = 0u; rayBit < 8u; ++rayBit)
+                if (((instances[0].mask & (1u << rayBit)) != 0u) != enabled) return false;
+            if (instances[0].accelerationStructureReference != before[0].accelerationStructureReference ||
+                instances[0].instanceCustomIndex != 9u) return false;
+            for (std::size_t index = 1u; index < instances.size(); ++index)
+                if (instances[index].mask != before[index].mask ||
+                    instances[index].accelerationStructureReference != before[index].accelerationStructureReference)
+                    return false;
+            // A later frame/RT Lab can request all-ray visibility again; Off
+            // must enforce zero anew, retaining the immutable resource owner.
+            instances[0].mask = 0xFFu;
+            scene.ApplyGlassFixtureVisibility(instances);
+            if (instances[0].mask != (enabled ? 0xFFu : 0u)) return false;
+        }
+        scene.dielectricFixtureBlas_.address = 0u;
+        return true;
+    }
+
+    static void AdmitPreviewInventoryFixture(PresentableTinyRtScene& scene)
+    {
+        // Synthetic admitted owner: public topology getters intentionally
+        // require readiness. No device is bound, so this fixture never invokes
+        // Vulkan; allocation inventory remains independently observable.
+        scene.ready_ = true;
+        scene.uploadedQualityControls_ = {{2u, 4u, 2u, 0u}};
+        scene.uploadedFireQuality_ = FireEmitterQuality::Low;
+        scene.uploadedQualityControlsValid_ = true;
+        MarkFireUpload(scene);
+        scene.sceneProfile_ = RtSceneProfile::GraphicsPreview;
+        scene.tlasInstanceCount_ = 7u;
+        scene.tlas_.handle = FakeHandle<VkAccelerationStructureKHR>(0x987u);
+        scene.environmentTexture_.memory = FakeHandle<VkDeviceMemory>(0x988u);
+        scene.environmentTexture_.allocationSize = 768u;
+        scene.environmentTexture_.memoryPropertyFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
+        scene.environmentTexture_.mipLevels = 10u;
+    }
+
     static void MarkTlasDefinitions(PresentableTinyRtScene& scene)
     {
         scene.tlasInstanceDefinitionsValid_ = true;
@@ -210,7 +436,7 @@ struct PresentableTinyRtSceneObservationTestAccess
 
         for (RtGpuBuffer* buffer : std::array{
                  &scene.vertexBuffer_, &scene.indexBuffer_, &scene.transformBuffer_,
-                 &scene.instanceBuffer_, &scene.heldLightBuffer_, &scene.fireEmitterBuffer_,
+                 &scene.instanceBuffer_, &scene.heldLightBuffer_, &scene.fireEmitterBuffer_, &scene.qualityControlsBuffer_,
                  &scene.worldSurfaceBuffer_, &scene.staticVertexBuffer_,
                  &scene.worldPlayerVertexBuffer_, &scene.viewmodelVertexBuffer_,
                  &scene.staticIndexBuffer_, &scene.staticGeometryTransformBuffer_,
@@ -222,18 +448,23 @@ struct PresentableTinyRtSceneObservationTestAccess
         for (RtAccelerationStructure* accelerationStructure :
              std::array{
                  &scene.blas_, &scene.waterfallBlas_, &scene.finaleRoofBlas_,
-                 &scene.torchBlas_, &scene.swordBlas_, &scene.gothicChestBaseBlas_,
+                 &scene.torchBlas_, &scene.worldTorchBodyBlas_, &scene.swordBlas_,
+                 &scene.playerSwordScabbardBlas_, &scene.gothicChestBaseBlas_,
                  &scene.gothicChestLidBlas_, &scene.rewardLanternRingBlas_,
                  &scene.rewardLanternBodyBlas_, &scene.dielectricFixtureBlas_,
                  &scene.playerBodyBlas_, &scene.playerLimbBlas_,
-                 &scene.skinnedPlayerBlas_, &scene.viewmodelBlas_})
+                 &scene.skinnedPlayerBlas_, &scene.viewmodelBlas_, &scene.collapseBlas_})
         {
             populateBlas(*accelerationStructure);
         }
         populateBuffer(scene.skinnedPlayerBlasUpdateScratch_);
         populateBuffer(scene.viewmodelBlasUpdateScratch_);
         scene.ready_ = true;
+        scene.uploadedQualityControls_ = {{2u, 4u, 2u, 0u}};
+        scene.uploadedFireQuality_ = FireEmitterQuality::Low;
+        scene.uploadedQualityControlsValid_ = true;
         populateBlas(scene.tlas_);
+        MarkFireUpload(scene);
         populateBuffer(scene.tlasUpdateScratch_);
 
         for (std::size_t bucket = 0u;
@@ -262,6 +493,7 @@ struct PresentableTinyRtSceneObservationTestAccess
 
         scene.storageImage_ = FakeHandle<VkImage>(next++);
         scene.storageImageMemory_ = FakeHandle<VkDeviceMemory>(next++);
+        scene.storageImageView_ = FakeHandle<VkImageView>(next++);
         scene.storageImageAllocationSize_ = 128u;
         scene.storageImageMemoryPropertyFlags_ =
             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
@@ -496,7 +728,7 @@ struct PresentableTinyRtSceneOutputResizeTestAccess
 
         for (const RtGpuBuffer* buffer : std::array{
                  &scene.vertexBuffer_, &scene.indexBuffer_, &scene.transformBuffer_,
-                 &scene.instanceBuffer_, &scene.heldLightBuffer_, &scene.fireEmitterBuffer_,
+                 &scene.instanceBuffer_, &scene.heldLightBuffer_, &scene.fireEmitterBuffer_, &scene.qualityControlsBuffer_,
                  &scene.worldSurfaceBuffer_, &scene.staticVertexBuffer_,
                  &scene.worldPlayerVertexBuffer_, &scene.viewmodelVertexBuffer_,
                  &scene.staticIndexBuffer_, &scene.staticGeometryTransformBuffer_,
@@ -513,7 +745,7 @@ struct PresentableTinyRtSceneOutputResizeTestAccess
                  &scene.gothicChestLidBlas_, &scene.rewardLanternRingBlas_,
                  &scene.rewardLanternBodyBlas_, &scene.dielectricFixtureBlas_,
                  &scene.playerBodyBlas_, &scene.playerLimbBlas_,
-                 &scene.skinnedPlayerBlas_, &scene.viewmodelBlas_, &scene.tlas_})
+                 &scene.skinnedPlayerBlas_, &scene.viewmodelBlas_, &scene.collapseBlas_, &scene.tlas_})
         {
             addAs(*as);
         }
@@ -785,7 +1017,42 @@ int main()
 {
     using namespace horde::vulkan::raytracing;
 
-    bool ok = true;
+    bool ok = PresentableTinyRtSceneObservationTestAccess::CheckPersistentReadback();
+    ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckMistControlsAndLifetime(),
+                  "mist control must preserve default-On/shadow policy and distinguish requested from owned uploaded state");
+    ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckKeeperTorchBodyAliases(),
+                  "two physical world torch slots must share dark body geometry and valid static metadata aliases");
+    for (const auto instrumentation : {RtInstrumentation::Diagnostic, RtInstrumentation::Shipping})
+    {
+        const auto contract = TryMakeRtDescriptorIoContract(instrumentation);
+        for (const auto backend : {horde::vulkan::RtExecutionBackend::RayTracingPipeline,
+                                  horde::vulkan::RtExecutionBackend::RayQueryCompute})
+        {
+            const auto policy = TryMakeRtExecutionPolicy(backend);
+            const auto layout = TryMakeRtDescriptorSetLayoutBindings(*contract,
+                policy->pushConstantStages, policy->shaderStage);
+            const auto count = instrumentation == RtInstrumentation::Diagnostic ? 27u : 26u;
+            ok &= Require(layout && layout->count == count,
+                          "both real backend layouts must fit the full Diagnostic/Shipping rosters");
+            if (!layout) continue;
+            ok &= Require(layout->values[count - 1u].binding == 26u &&
+                          layout->values[count - 1u].descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+                          "the final quality-control descriptor must survive layout construction");
+            for (std::uint32_t i = 0u; i < count; ++i)
+                ok &= Require(layout->values[i].binding == contract->bindings[i].binding &&
+                              layout->values[i].descriptorCount == 1u &&
+                              layout->values[i].stageFlags == (i == 0u ? policy->pushConstantStages : policy->shaderStage),
+                              "actual layout roster and backend stage ownership must be preserved");
+        }
+        auto malformed = *contract;
+        malformed.bindingCount = static_cast<std::uint32_t>(malformed.bindings.size() + 1u);
+        ok &= Require(!TryMakeRtDescriptorSetLayoutBindings(malformed, VK_SHADER_STAGE_COMPUTE_BIT, VK_SHADER_STAGE_COMPUTE_BIT),
+                      "oversized descriptor count must fail before any array access");
+        malformed = *contract;
+        malformed.bindings[0].kind = static_cast<RtDescriptorResourceKind>(999u);
+        ok &= Require(!TryMakeRtDescriptorSetLayoutBindings(malformed, VK_SHADER_STAGE_COMPUTE_BIT, VK_SHADER_STAGE_COMPUTE_BIT),
+                      "unknown resource kind must not silently become a storage descriptor");
+    }
     ok &= CheckTlasInstanceRefresh();
     ok &= PresentableTinyRtSceneOutputResizeTestAccess::RunTests();
     const auto pipelinePolicy = TryMakeRtExecutionPolicy(
@@ -1031,8 +1298,58 @@ int main()
     ok &= Require(notReadyStages.Abort(),
                   "not-ready record observation attempt did not abort");
 
+    PresentableTinyRtScene previewInventoryScene;
+    ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckGlassVisibility(previewInventoryScene, true),
+                  "Glass On must preserve fixture, mixed lantern body and procedural arm ray admission");
+    ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckGlassVisibility(previewInventoryScene, false),
+                  "Glass Off masks the fixture on all ray bits for either profile and repeated frame requests");
+    PresentableTinyRtSceneObservationTestAccess::AdmitPreviewInventoryFixture(previewInventoryScene);
+    const auto previewInventory = previewInventoryScene.ResourceInventory();
+    ok &= Require(previewInventory.tlasInstanceCount == 7u &&
+                      previewInventory.topLevelAccelerationStructureCount == 1u &&
+                      previewInventory.bufferCount == 0u && previewInventory.memoryAllocationCount == 1u &&
+                      previewInventory.deviceLocalBytes == 768u && previewInventory.hostVisibleBytes == 0u,
+                  "preview evidence must use admitted topology and actual environment allocation");
+    PresentableTinyRtScene movedPreview(std::move(previewInventoryScene));
+    ok &= Require(movedPreview.IsReady() && !movedPreview.GlassEnabled() && previewInventoryScene.GlassEnabled() &&
+                      movedPreview.Profile() == RtSceneProfile::GraphicsPreview && movedPreview.TlasInstanceCount() == 7u &&
+                      movedPreview.ResourceInventory().tlasInstanceCount == previewInventory.tlasInstanceCount &&
+                      movedPreview.ResourceInventory().memoryAllocationCount == previewInventory.memoryAllocationCount &&
+                      movedPreview.ResourceInventory().deviceLocalBytes == previewInventory.deviceLocalBytes &&
+                      !previewInventoryScene.IsReady() && previewInventoryScene.TlasInstanceCount() == 0u &&
+                      previewInventoryScene.ResourceInventory().topLevelAccelerationStructureCount == 0u &&
+                      previewInventoryScene.ResourceInventory().memoryAllocationCount == 0u,
+                  "preview topology and panorama allocation must move to exactly one owner");
+    PresentableTinyRtScene assignedPreview;
+    assignedPreview = std::move(movedPreview);
+    ok &= Require(assignedPreview.IsReady() && !assignedPreview.GlassEnabled() && movedPreview.GlassEnabled() &&
+                      assignedPreview.Profile() == RtSceneProfile::GraphicsPreview &&
+                      assignedPreview.TlasInstanceCount() == 7u &&
+                      assignedPreview.ResourceInventory().tlasInstanceCount == previewInventory.tlasInstanceCount &&
+                      assignedPreview.ResourceInventory().memoryAllocationCount == previewInventory.memoryAllocationCount &&
+                      assignedPreview.ResourceInventory().deviceLocalBytes == previewInventory.deviceLocalBytes &&
+                      !movedPreview.IsReady() && movedPreview.TlasInstanceCount() == 0u &&
+                      movedPreview.ResourceInventory().topLevelAccelerationStructureCount == 0u &&
+                      movedPreview.ResourceInventory().memoryAllocationCount == 0u,
+                  "preview move assignment must retain one ready topology and panorama allocation owner");
+
     PresentableTinyRtScene scene;
     PresentableTinyRtSceneObservationTestAccess::Populate(scene);
+#ifndef NDEBUG
+    const auto originalHandles = scene.CaptureResourceHandles();
+    ok &= Require(originalHandles.ready &&
+                      originalHandles.bottomLevelAccelerationStructures.size() == 20u &&
+                      originalHandles.topLevelAccelerationStructures.size() == 1u &&
+                      originalHandles.pipelines.size() == 2u &&
+                      originalHandles.shaderBindingTableBuffers.size() == 2u &&
+                      originalHandles.descriptorSets.size() == 1u &&
+                      originalHandles.textureImages.size() == 9u &&
+                      originalHandles.outputImage != 0u &&
+                      originalHandles.outputMemory != 0u &&
+                      originalHandles.outputView != 0u &&
+                      scene.CaptureResourceHandles() == originalHandles,
+                  "Debug identity snapshot must include all actual owners and be read-only");
+#endif
     RtDiagnosticCounterPayload completedDiagnostic{};
     for (std::size_t index = 0u; index < completedDiagnostic.counters.size(); ++index)
     {
@@ -1044,31 +1361,47 @@ int main()
                       scene.PrimaryRewardBodyPixelCount() == 41u,
                   "legacy getters must project one explicitly published completed record");
     const auto diagnostic = scene.ResourceInventory();
-    ok &= Require(diagnostic.bufferCount == 45u &&
-                      diagnostic.memoryAllocationCount == 55u &&
-                      diagnostic.bottomLevelAccelerationStructureCount == 17u &&
-                      scene.BlasCount() == 17u &&
+    ok &= Require(diagnostic.bufferCount == 49u &&
+                      diagnostic.memoryAllocationCount == 59u &&
+                      diagnostic.bottomLevelAccelerationStructureCount == 20u &&
+                      scene.BlasCount() == 20u &&
                       diagnostic.topLevelAccelerationStructureCount == 1u &&
-                      diagnostic.tlasInstanceCount == 21u &&
+                      diagnostic.tlasInstanceCount == 26u &&
                       diagnostic.pipelineCount == 2u &&
                       diagnostic.shaderBindingTableCount == 2u &&
                       diagnostic.descriptorSetCount == 1u,
                   "live inventory must include direct, character, image, and both SBT owners");
-    ok &= Require(diagnostic.hostVisibleBytes == 3008u &&
-                      diagnostic.deviceLocalBytes == 4160u,
+    ok &= Require(diagnostic.hostVisibleBytes == 3264u &&
+                      diagnostic.deviceLocalBytes == 4416u,
                   "host-visible and device-local bytes must use inclusive allocation classes");
 
     PresentableTinyRtSceneObservationTestAccess::RemoveDiagnosticBuffer(scene);
     const auto shipping = scene.ResourceInventory();
-    ok &= Require(shipping.bufferCount == 44u &&
-                      shipping.memoryAllocationCount == 54u &&
-                      shipping.hostVisibleBytes == 2944u &&
-                      shipping.deviceLocalBytes == 4096u,
+    ok &= Require(shipping.bufferCount == 48u &&
+                      shipping.memoryAllocationCount == 58u &&
+                      shipping.hostVisibleBytes == 3200u &&
+                      shipping.deviceLocalBytes == 4352u,
                   "inventory must count only a genuinely live Diagnostic buffer");
 
     PresentableTinyRtSceneObservationTestAccess::MarkTlasDefinitions(scene);
     PresentableTinyRtSceneObservationTestAccess::MarkPendingTlasDefinitions(scene);
     PresentableTinyRtScene moved(std::move(scene));
+#ifndef NDEBUG
+    const auto movedHandles = moved.CaptureResourceHandles();
+    const auto relinquishedHandles = scene.CaptureResourceHandles();
+    ok &= Require(movedHandles == originalHandles &&
+                      !relinquishedHandles.ready &&
+                      relinquishedHandles.bottomLevelAccelerationStructures.empty() &&
+                      relinquishedHandles.topLevelAccelerationStructures.empty() &&
+                      relinquishedHandles.pipelines.empty() &&
+                      relinquishedHandles.shaderBindingTableBuffers.empty() &&
+                      relinquishedHandles.descriptorSets.empty() &&
+                      relinquishedHandles.textureImages.empty() &&
+                      relinquishedHandles.outputImage == 0u &&
+                      relinquishedHandles.outputMemory == 0u &&
+                      relinquishedHandles.outputView == 0u,
+                  "Debug opaque identities must transfer to exactly one owner on move");
+#endif
     ok &= Require(!PresentableTinyRtSceneObservationTestAccess::HasTlasDefinitions(scene) &&
                       PresentableTinyRtSceneObservationTestAccess::HasTlasDefinitions(moved),
                   "TLAS definition cache must follow its sole scene owner on move");
@@ -1083,13 +1416,26 @@ int main()
     PresentableTinyRtScene emptyScene;
     PresentableTinyRtSceneObservationTestAccess::MarkTlasDefinitions(emptyScene);
     PresentableTinyRtSceneObservationTestAccess::MarkPendingTlasDefinitions(emptyScene);
+    PresentableTinyRtSceneObservationTestAccess::MarkFireUpload(emptyScene);
     emptyScene.Destroy();
+    ok &= Require(!emptyScene.HasUploadedFireEmitters() && emptyScene.UploadedFireEmitters().activeCount == 0u,
+                  "no-device destruction must invalidate and clear the last raw fire upload");
     emptyScene.NotifyFrameSubmitted();
     ok &= Require(!PresentableTinyRtSceneObservationTestAccess::HasTlasDefinitions(emptyScene),
                   "even partial/no-device destruction must invalidate cached TLAS definitions");
     const auto movedFrom = scene.ResourceInventory();
     const auto movedTo = moved.ResourceInventory();
-    ok &= Require(scene.BlasCount() == 0u && moved.BlasCount() == 17u &&
+    ok &= Require(moved.HasUploadedFireEmitters() && !scene.HasUploadedFireEmitters() &&
+                      moved.UploadedFireEmitters().activeCount == 2u &&
+                      moved.UploadedFireEmitters().selectedStableIds[0] == 3u &&
+                      moved.UploadedFireEmitters().selectedStableIds[1] == 4u &&
+                      scene.UploadedFireEmitters().activeCount == 0u,
+                  "packed raw fire upload must move to exactly one owner without becoming a frame ACK");
+    ok &= Require(moved.HasUploadedQualityControls() && !scene.HasUploadedQualityControls() &&
+                      moved.QualityControls().controls == std::array<std::uint32_t, 4u>{{2u, 4u, 2u, 0u}} &&
+                      moved.UploadedFireQuality() == horde::vulkan::raytracing::FireEmitterQuality::Low,
+                  "actual uploaded policy must transfer to exactly one owner with its buffer");
+    ok &= Require(scene.BlasCount() == 0u && moved.BlasCount() == 20u &&
                       movedFrom.bufferCount == 0u &&
                       movedFrom.memoryAllocationCount == 0u &&
                       movedFrom.hostVisibleBytes == 0u &&

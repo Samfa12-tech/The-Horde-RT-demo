@@ -64,6 +64,49 @@ struct ControllerTriggerLatch
     bool rightHeld = false;
 };
 
+enum class ControllerPollDisposition
+{
+    Suppress,
+    Reseed,
+    Deliver,
+};
+
+struct ControllerFocusLatch
+{
+    bool focused = false;
+    bool baselineSeeded = false;
+
+    void LoseFocus()
+    {
+        focused = false;
+        baselineSeeded = false;
+    }
+
+    void CompleteReseed()
+    {
+        if (focused)
+        {
+            baselineSeeded = true;
+        }
+    }
+
+    ControllerPollDisposition Observe(const bool foreground)
+    {
+        if (!foreground)
+        {
+            LoseFocus();
+            return ControllerPollDisposition::Suppress;
+        }
+        if (!focused)
+        {
+            focused = true;
+            baselineSeeded = false;
+        }
+        return baselineSeeded ? ControllerPollDisposition::Deliver
+                              : ControllerPollDisposition::Reseed;
+    }
+};
+
 struct ControllerView
 {
     float yawRadians = 0.0f;
@@ -318,6 +361,16 @@ inline ControllerActionEdges UpdateXInputTriggerEdges(
     latch.leftHeld = leftNow;
     latch.rightHeld = rightNow;
     return edges;
+}
+
+inline void SeedXInputTriggerLatch(
+    const std::uint8_t leftTrigger,
+    const std::uint8_t rightTrigger,
+    ControllerTriggerLatch& latch)
+{
+    constexpr std::uint8_t pressThreshold = 30u;
+    latch.leftHeld = leftTrigger > pressThreshold;
+    latch.rightHeld = rightTrigger > pressThreshold;
 }
 
 } // namespace horde::platform::windows

@@ -5,12 +5,16 @@ set(HORDE_RT_CORE_RELATIVE_SOURCES
     telemetry/RtEvidencePublication.cpp
     telemetry/RtBenchmarkEvidenceRun.cpp
     telemetry/RtBenchmarkEvidenceReport.cpp
+    telemetry/BenchmarkSummary.cpp
+    audio/AmbiencePcmLoop.cpp
     audio/MusicDirector.cpp
     audio/MusicPcmStream.cpp
     audio/MusicPcmWave.cpp
     audio/MusicPcmAssetBank.cpp
     audio/MusicPlaybackSession.cpp
     reporting/PlaytestReport.cpp
+    reporting/BenchmarkSummaryReport.cpp
+    reporting/BenchmarkSummarySubmission.cpp
     reporting/PlaytestSubmission.cpp
     gameplay/simulation/GameSimulation.cpp
     gameplay/animation/PlayerAnimationState.cpp

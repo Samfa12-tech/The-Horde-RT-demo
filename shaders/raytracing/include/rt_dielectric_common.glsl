@@ -174,7 +174,7 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
     vec3 reflectionDirection = reflect(rayDirection, surfaceNormal);
     vec3 reflected = skyColor(reflectionDirection);
     bool fireRayReflectionOwned = controls.waterQuality >= 1.5;
-    if (controls.waterQuality >= 1.5)
+    if (fireRayReflectionOwned)
     {
         HitInfo reflectedHit = traceScene(h.position + geometricNormal * 0.006,
                                           reflectionDirection, 12.0, 0x37u,
@@ -213,10 +213,12 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
         ? pow(max(dot(surfaceNormal, localHalf), 0.0), 14.0) : 0.0;
     bool genericTransmissionActive = genericTransmissionEnabled();
     vec3 localInterfaceTransmittance = localStrength > 0.001
-        ? sceneShadowTransmittanceMask(offsetRayOrigin(h, localDirection),
-                                  localDirection, localDistance - 0.02, 0x35u)
+        ? (primaryLocalShadowSamples() > 1
+            ? areaLightTransmittance(h, localPosition, true)
+            : sceneShadowTransmittanceMask(offsetRayOrigin(h, localDirection),
+                                  localDirection, localDistance - 0.02, 0x35u))
         : vec3(0.0);
-    int skySample = int((HORDE_RT_PIXEL_ID.x + HORDE_RT_PIXEL_ID.y) & 1u);
+    int skySample = areaShadowSampleIndex();
     vec3 skyDirection;
     float skyDistance;
     vec3 skyRadiance;
@@ -226,6 +228,19 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
     vec3 skyInterfaceTransmittance = sceneShadowTransmittanceMask(
         offsetRayOrigin(h, skyDirection), skyDirection,
         skyDistance - 0.02, 0x35u) * skyGain;
+    if (primarySkyShadowSamples() > 1)
+    {
+        vec3 secondDirection;
+        float secondDistance;
+        vec3 secondRadiance;
+        float secondGain;
+        activeSkyLight(h.position, 1 - skySample, secondDirection, secondDistance,
+                       secondRadiance, secondGain);
+        skyInterfaceTransmittance = 0.5 * (skyInterfaceTransmittance +
+            sceneShadowTransmittanceMask(offsetRayOrigin(h, secondDirection), secondDirection,
+                secondDistance - 0.02, 0x35u) * secondGain);
+        skyRadiance = 0.5 * (skyRadiance + secondRadiance);
+    }
     float localInterfaceVisibility = localInterfaceTransmittance.x;
     float skyInterfaceVisibility = skyInterfaceTransmittance.x;
     float skyHighlight = pow(max(dot(surfaceNormal,
@@ -237,11 +252,25 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
         : localColor * localInterfaceTransmittance
             * (localHighlight * 3.2 + runoffLocalHighlight * 1.15)
             * localStrength / (1.0 + localDistanceSquared * 0.58);
+    float surfaceTurbulence = clamp(length(surfaceNormal - exitSurfaceNormal) * 5.0, 0.0, 1.0);
+    // Entrained micro-bubbles are what make a real falling stream visible at
+    // near-normal incidence. Keep this single-scattering term low and confined
+    // to actual water geometry; the background remains dominant and refracted.
+    float breakup = clamp(0.56
+        + sin(h.position.y * 7.3 - controls.time * 5.1) * 0.27
+        + sin(h.position.y * 13.7 + h.position.z * 17.0
+              - controls.time * 8.4) * 0.17, 0.0, 1.0);
+    float entrainedAir = runoff ? 0.004
+        : 0.010 + pow(breakup, 3.0) * 0.028 + surfaceTurbulence * 0.010;
+    // Clear water has no opaque-surface fire diffuse lobe. Only its existing
+    // entrained-air fraction scatters direct fire light; keep the specular lobe
+    // and ordinary opaque lighting on transmitted/reflected scenery unchanged.
+    h.base = vec3(entrainedAir);
     interfaceLight += fireEmitterDirectLighting(
-        h, rayDirection, false, !fireRayReflectionOwned);
-    interfaceLight += !genericTransmissionActive
-        ? skyRadiance * skyHighlight * skyInterfaceVisibility * 0.10
-        : skyRadiance * skyInterfaceTransmittance * skyHighlight * 0.10;
+        h, rayDirection, true, !fireRayReflectionOwned);
+    // The legacy path returns replicated scalar visibility; the generic path
+    // returns RGB transmittance. Both use the same interface expression.
+    interfaceLight += skyRadiance * skyInterfaceTransmittance * skyHighlight * 0.10;
     if (runoff && h.position.x > -2.88)
     {
         float impactDistance = length(h.position.xz - vec2(-2.32, -15.26));
@@ -256,17 +285,7 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
                 + localColor * localInterfaceTransmittance * localStrength * 0.24;
         interfaceLight += impactLight * (impactCrest * 0.12 + impactCore * 0.045);
     }
-    float surfaceTurbulence = clamp(length(surfaceNormal - exitSurfaceNormal) * 5.0, 0.0, 1.0);
     vec3 surfaceRadiance = mix(transmitted, reflected, fresnel) + interfaceLight;
-    // Entrained micro-bubbles are what make a real falling stream visible at
-    // near-normal incidence. Keep this single-scattering term low and confined
-    // to actual water geometry; the background remains dominant and refracted.
-    float breakup = clamp(0.56
-        + sin(h.position.y * 7.3 - controls.time * 5.1) * 0.27
-        + sin(h.position.y * 13.7 + h.position.z * 17.0
-              - controls.time * 8.4) * 0.17, 0.0, 1.0);
-    float entrainedAir = runoff ? 0.004
-        : 0.010 + pow(breakup, 3.0) * 0.028 + surfaceTurbulence * 0.010;
     vec3 scatteringRadiance = !genericTransmissionActive
         ? skyRadiance * skyInterfaceVisibility * 0.38
             + localColor * localStrength * localInterfaceVisibility * 0.18
@@ -305,7 +324,7 @@ vec3 shadeOpaquePrimary(HitInfo h, vec3 rayDirection)
     float skyDiffuse;
     vec3 localLightColor;
     float localLightStrength;
-    vec3 color = shadeOpaqueDirect(h, rayDirection, maxWorkload, !fireRayReflectionOwned,
+    vec3 color = shadeOpaqueDirect(h, rayDirection, true, !fireRayReflectionOwned,
                                    localVisibility, skyVisibility, skyDiffuse,
                                    localLightColor, localLightStrength);
     // Keep the one RT bounce deterministic. The previous time-varying hemisphere sample was the main source of shimmer.

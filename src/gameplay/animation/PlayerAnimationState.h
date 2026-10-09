@@ -66,6 +66,8 @@ struct PlayerAnimationSnapshot
     horde::gameplay::CombatReaction reaction = horde::gameplay::CombatReaction::None;
     float reactionTime = 0.0f;
     float lanternPoseBlend = 0.0f;
+    float swordStowBlend = 0.0f;
+    float swordHandGripBlend = 1.0f;
     PlayerArmIkTarget leftIk{};
     PlayerArmIkTarget rightIk{};
     PlayerVisibilityFlags visibility{};
@@ -83,6 +85,7 @@ struct PlayerAnimationInput
     bool carryingRewardLantern = false;
     float lanternForwardAngleRadians = 0.0f;
     float lanternStrafeAngleRadians = 0.0f;
+    bool carryingOriginalTorch = false;
 };
 
 PlayerLocomotionClip MapPlayerLocomotionClip(float locomotionBlend);

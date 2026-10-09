@@ -533,6 +533,17 @@ void TestActiveStrategyComesFromEachOwningCompletion(TestContext& context)
         2u, 79u, 89u, 1u, 1'000'000u, RtSampleStatus::Valid, 2'000'000u);
     generic.scene.pipeline.activeStrategy = RtMaterialStrategy::GenericDielectric;
     generic.scene.pipeline.active = generic.scene.pipeline.genericDielectric;
+    opaque.scene.shadowQuality = RtShadowQualityEvidence{RtShadowMode::Lower, 1u, 1u, 0u};
+    opaque.scene.fireQuality = RtFireQualityEvidence{RtFireQuality::Low, 2u, 1u};
+    generic.scene.shadowQuality = RtShadowQualityEvidence{RtShadowMode::Higher, 2u, 2u, 0u};
+    generic.scene.fireQuality = RtFireQualityEvidence{RtFireQuality::High, 10u, 2u};
+    opaque.scene.actualUploadedMistEnabled = true;
+    generic.scene.actualUploadedMistEnabled = false;
+    opaque.scene.fireLighting = RtFireLightingEvidence{};
+    generic.scene.fireLighting = RtFireLightingEvidence{};
+    generic.scene.fireLighting->count = 2u;
+    generic.scene.fireLighting->emitters[0] = {3u, {{-32.5f, 0.85f, -16.5f, 0.5f}}, {{1.0f, 0.5f, 0.25f, 0.5f}}};
+    generic.scene.fireLighting->emitters[1] = {4u, {{-31.5f, 0.85f, -13.5f, 0.75f}}, {{1.0f, 0.5f, 0.25f, 0.75f}}};
     ExpectAndBind(context, run, {1u, 2u}, opaque);
     ExpectAndBind(context, run, {2u, 2u}, generic);
     context.Check(run.Complete(opaque) && run.Complete(generic) &&
@@ -541,15 +552,35 @@ void TestActiveStrategyComesFromEachOwningCompletion(TestContext& context)
     // A later observer/snapshot mutation must not relabel an earlier GPU frame.
     generic.scene.pipeline.activeStrategy = RtMaterialStrategy::OpaqueFast;
     generic.scene.pipeline.active = generic.scene.pipeline.opaqueFast;
+    generic.scene.shadowQuality = opaque.scene.shadowQuality;
+    generic.scene.fireQuality = opaque.scene.fireQuality;
+    generic.scene.fireLighting = opaque.scene.fireLighting;
+    generic.scene.actualUploadedMistEnabled = opaque.scene.actualUploadedMistEnabled;
     const std::string json = BuildRtBenchmarkEvidenceJson(run);
     context.Check(ArrayObjectWith(json, "\"index\": 0").find(
                       "\"activeStrategy\": \"opaque-fast\"") != std::string::npos &&
                       ArrayObjectWith(json, "\"index\": 1").find(
                       "\"activeStrategy\": \"generic-dielectric\"") != std::string::npos,
                   "active strategy must describe each owning completed frame, not the loaded pair or latest observer");
+    context.Check(ArrayObjectWith(json, "\"index\": 0").find("\"quality\": \"Low\"") != std::string::npos &&
+        ArrayObjectWith(json, "\"index\": 1").find("\"quality\": \"High\"") != std::string::npos &&
+        ArrayObjectWith(json, "\"index\": 1").find("\"localPrimarySamples\": 2") != std::string::npos,
+        "report row quality comes from each immutable completed owning upload");
+    context.Check(ArrayObjectWith(json, "\"index\": 0").find("\"actualUploadedMistEnabled\": true") != std::string::npos &&
+        ArrayObjectWith(json, "\"index\": 1").find("\"actualUploadedMistEnabled\": false") != std::string::npos &&
+        ArrayObjectWith(json, "\"index\": 2").find("actualUploadedMistEnabled") == std::string::npos,
+        "mist report rows retain owning On/Off and cannot fabricate pending-row defaults");
+    context.Check(ArrayObjectWith(json, "\"index\": 0").find("\"fireLighting\": {\"count\":0") != std::string::npos &&
+        ArrayObjectWith(json, "\"index\": 1").find("\"fireLighting\": {\"count\":2") != std::string::npos &&
+        ArrayObjectWith(json, "\"index\": 1").find("\"stableId\":4") != std::string::npos,
+        "reports retain each owning selected fire prefix despite subsequent current-state changes");
     context.Check(ArrayObjectWith(json, "\"index\": 2").find(
                       "\"activeStrategy\": null") != std::string::npos,
                   "an unavailable completion must not be mislabeled as default OpaqueFast");
+    context.Check(ArrayObjectWith(json, "\"index\": 2").find("shadowQuality") == std::string::npos &&
+        ArrayObjectWith(json, "\"index\": 2").find("fireQuality") == std::string::npos &&
+        ArrayObjectWith(json, "\"index\": 2").find("fireLighting") == std::string::npos,
+        "uncompleted row cannot acquire default quality controls");
 }
 
 void TestDiagnosticCounterRowsPreserveAvailability(TestContext& context)

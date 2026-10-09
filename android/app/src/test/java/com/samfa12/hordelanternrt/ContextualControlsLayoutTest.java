@@ -79,10 +79,14 @@ public final class ContextualControlsLayoutTest {
                 "player-viewmodel-lantern-high", "player-viewmodel-lantern-low",
                 "player-viewmodel-lantern-low-parry",
                 "player-viewmodel-lantern-low-look-down",
-                "player-viewmodel-lantern-high-look-up"
+                "player-viewmodel-lantern-high-look-up",
+                "layout-c-wall-panel", "layout-d-entry-breach",
+                "layout-a-waterfall-own-hole", "layout-b-large-skylight",
+                "layout-e-finale-opening"
         };
         final int[] ids = {100, 101, 102, 114, 116, 117, 118, 119, 134, 135,
-                136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146};
+                136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146,
+                147, 148, 149, 150, 151};
         for (int index = 0; index < names.length; ++index) {
             assertEquals("debug capture name must reach its native checkpoint",
                          ids[index], MainActivity.checkpointId(names[index]));
@@ -141,11 +145,13 @@ public final class ContextualControlsLayoutTest {
         final Button toggle = root.findViewById(R.id.toggle_held_light_pose_button);
         final Button attack = root.findViewById(R.id.attack_button);
         final Button parry = root.findViewById(R.id.parry_button);
+        final Button dodge = root.findViewById(R.id.dodge_button);
         interact.setVisibility(View.VISIBLE);
         interact.setText(R.string.chest_locked_until_lich_defeated);
         toggle.setVisibility(View.VISIBLE);
         attack.setVisibility(View.VISIBLE);
         parry.setVisibility(View.VISIBLE);
+        dodge.setVisibility(View.VISIBLE);
         toggle.setText(R.string.lower_lantern);
 
         final int width = 320;
@@ -154,7 +160,7 @@ public final class ContextualControlsLayoutTest {
                      View.MeasureSpec.makeMeasureSpec(height, View.MeasureSpec.EXACTLY));
         root.layout(0, 0, width, height);
 
-        final Button[] buttons = {interact, toggle, attack, parry};
+        final Button[] buttons = {interact, toggle, attack, parry, dodge};
         for (final Button button : buttons) {
             assertNotNull("real text layout must be produced", button.getLayout());
             final int expectedLines = button == interact ? 2 : 1;
@@ -180,6 +186,8 @@ public final class ContextualControlsLayoutTest {
                     Rect.intersects(bounds(interact), bounds(attack)));
         assertFalse("RAISE/LOWER must not overload or overlap PARRY",
                     Rect.intersects(bounds(toggle), bounds(parry)));
+        for(int i=0;i<buttons.length;++i) for(int j=i+1;j<buttons.length;++j)
+            assertFalse("reserved touch slots must not overlap",Rect.intersects(bounds(buttons[i]),bounds(buttons[j])));
 
         final Bitmap rendered = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         root.draw(new Canvas(rendered));

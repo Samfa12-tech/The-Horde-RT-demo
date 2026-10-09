@@ -1,0 +1,192 @@
+{
+  "source": "6c8ecc39e63f17d4716da0d8f6e994cb872831a5",
+  "sourceTree": "fb032369288002ac9f5baed2051a9ef1bbc9faa1",
+  "executableSha256": "a87067220a1ab80ff1cb421f321ade19c4d4ac5f79c7b856a60f054ebb2ae5c2",
+  "framePngMeshJoins": 26,
+  "meshHashJoins": 52,
+  "records": [
+    {
+      "backend": "RayTracingPipeline",
+      "checkpoint": "opening",
+      "submissionSerial": 12,
+      "pngSha256": "1b37b1d2989acd2d9c7d3e9eff92873b5e295295b09629e2e46825d47e494a03",
+      "primaryPlayerPixels": 6401
+    },
+    {
+      "backend": "RayTracingPipeline",
+      "checkpoint": "skeleton",
+      "submissionSerial": 24,
+      "pngSha256": "07641ea6899057f3d3f36af93c6bee5db56be10073384bac44b9e2b8b6e921a1",
+      "primaryPlayerPixels": 5686
+    },
+    {
+      "backend": "RayTracingPipeline",
+      "checkpoint": "worst-bend",
+      "submissionSerial": 36,
+      "pngSha256": "64ad8dfcc98c67637d22bdb726906a511a205afa0cc199c60bbe984ab5b37c57",
+      "primaryPlayerPixels": 6400
+    },
+    {
+      "backend": "RayTracingPipeline",
+      "checkpoint": "lantern-drop",
+      "submissionSerial": 48,
+      "pngSha256": "17119cbf97ad35b2a6e15c770e7d6ef17580cb085a2f4b169ef56e904d6aaebf",
+      "primaryPlayerPixels": 5943
+    },
+    {
+      "backend": "RayTracingPipeline",
+      "checkpoint": "skylight",
+      "submissionSerial": 60,
+      "pngSha256": "ba050ce05739715db6cbb4c7ffa34ca546c1ff6ac8fe07ca132bef0eb98f5f25",
+      "primaryPlayerPixels": 1950
+    },
+    {
+      "backend": "RayTracingPipeline",
+      "checkpoint": "yellow",
+      "submissionSerial": 72,
+      "pngSha256": "4a1fc99ee6c73249d2c740342e8d18d012a0828bda1e54636958494937540558",
+      "primaryPlayerPixels": 1945
+    },
+    {
+      "backend": "RayTracingPipeline",
+      "checkpoint": "blue",
+      "submissionSerial": 84,
+      "pngSha256": "f95a90ffc17b9107e6193c91d0ff309913307bb5128f9e13823cc35592f0d8fb",
+      "primaryPlayerPixels": 1945
+    },
+    {
+      "backend": "RayTracingPipeline",
+      "checkpoint": "red",
+      "submissionSerial": 96,
+      "pngSha256": "5b59cb625d4b2c2701c3c9dcbbba34aee7b306dd50f9cc457d47bb4a320f4055",
+      "primaryPlayerPixels": 1945
+    },
+    {
+      "backend": "RayTracingPipeline",
+      "checkpoint": "green",
+      "submissionSerial": 108,
+      "pngSha256": "2ff0bd0bfad1b31e23ba8a1ecfa0804af4f1b71e266b85ebbcee6c6fe14d3f8b",
+      "primaryPlayerPixels": 1945
+    },
+    {
+      "backend": "RayTracingPipeline",
+      "checkpoint": "mirror",
+      "submissionSerial": 120,
+      "pngSha256": "ea7b4dc5851c423b814ab4e64f3657420ad4a3b63b926c39aaf42bd6db8d6be6",
+      "primaryPlayerPixels": 1945
+    },
+    {
+      "backend": "RayTracingPipeline",
+      "checkpoint": "lich",
+      "submissionSerial": 132,
+      "pngSha256": "33e4015ac601127ac9cabd19dcc3a73f2e6fdc7388c234483ef2f27a4b3de41c",
+      "primaryPlayerPixels": 913
+    },
+    {
+      "backend": "RayTracingPipeline",
+      "checkpoint": "finale-roof",
+      "submissionSerial": 144,
+      "pngSha256": "05ba96b710542458b137137ae86ac8c8eb3019cccb618893aef433d1c91c0e65",
+      "primaryPlayerPixels": 62163
+    },
+    {
+      "backend": "RayTracingPipeline",
+      "checkpoint": "two-enemy-combat",
+      "submissionSerial": 156,
+      "pngSha256": "6d815201918d12f30099bd75e29a8064df9baabd930f690ab9a474968b3b181b",
+      "primaryPlayerPixels": 6401
+    },
+    {
+      "backend": "RayQueryCompute",
+      "checkpoint": "opening",
+      "submissionSerial": 12,
+      "pngSha256": "4e00b804061fa219e4050c4674be6dba63ff4d64ba633d65e1c29b7637ebef9d",
+      "primaryPlayerPixels": 6401
+    },
+    {
+      "backend": "RayQueryCompute",
+      "checkpoint": "skeleton",
+      "submissionSerial": 24,
+      "pngSha256": "47bf19a84d4290366a4e98975a7fe23837899b09f27d9143e339ad36a4b6bba8",
+      "primaryPlayerPixels": 5686
+    },
+    {
+      "backend": "RayQueryCompute",
+      "checkpoint": "worst-bend",
+      "submissionSerial": 36,
+      "pngSha256": "d93f62bdb66e5e86938ac25d7d282844adf821d457dde7193f78888431ac1537",
+      "primaryPlayerPixels": 6400
+    },
+    {
+      "backend": "RayQueryCompute",
+      "checkpoint": "lantern-drop",
+      "submissionSerial": 48,
+      "pngSha256": "3ae6b561be155b7b9947f85033eecdaceb63d1b3bea7f346507ae1d00b2111d9",
+      "primaryPlayerPixels": 5943
+    },
+    {
+      "backend": "RayQueryCompute",
+      "checkpoint": "skylight",
+      "submissionSerial": 60,
+      "pngSha256": "fc58a57aefeaec60ac32cee2987048d01ef5ec89c04fa349288f15b572358d23",
+      "primaryPlayerPixels": 1950
+    },
+    {
+      "backend": "RayQueryCompute",
+      "checkpoint": "yellow",
+      "submissionSerial": 72,
+      "pngSha256": "69fc99d88f0181886cd76e9277be8bdbf92ff5a4da0df93c05400d7dcb6ff7f9",
+      "primaryPlayerPixels": 1945
+    },
+    {
+      "backend": "RayQueryCompute",
+      "checkpoint": "blue",
+      "submissionSerial": 84,
+      "pngSha256": "b624f52e2fb587d372216f6cbcaf12bdaa29bbf8fb9874c5a466207148486a86",
+      "primaryPlayerPixels": 1945
+    },
+    {
+      "backend": "RayQueryCompute",
+      "checkpoint": "red",
+      "submissionSerial": 96,
+      "pngSha256": "4fb84052de1165555f3b35b91be9a9bcfc10b01af20308290a379456234009be",
+      "primaryPlayerPixels": 1945
+    },
+    {
+      "backend": "RayQueryCompute",
+      "checkpoint": "green",
+      "submissionSerial": 108,
+      "pngSha256": "c10e6c570bc2457cb3035cc5a24c983cd288c3226bc9a2124443abc29a66e2d3",
+      "primaryPlayerPixels": 1945
+    },
+    {
+      "backend": "RayQueryCompute",
+      "checkpoint": "mirror",
+      "submissionSerial": 120,
+      "pngSha256": "91ab72468b1f618e9c6aac840dfd1835d686eb64c7fd0572c4a10127c4e279db",
+      "primaryPlayerPixels": 1945
+    },
+    {
+      "backend": "RayQueryCompute",
+      "checkpoint": "lich",
+      "submissionSerial": 132,
+      "pngSha256": "9958944d3f886512ff9a0d0438053d9ba54496fca9be287431edc358f00e689a",
+      "primaryPlayerPixels": 913
+    },
+    {
+      "backend": "RayQueryCompute",
+      "checkpoint": "finale-roof",
+      "submissionSerial": 144,
+      "pngSha256": "e6bf6c37cbb4f89722455a4f6f19f333a086155eb0ed15733298682b82c36f7d",
+      "primaryPlayerPixels": 62163
+    },
+    {
+      "backend": "RayQueryCompute",
+      "checkpoint": "two-enemy-combat",
+      "submissionSerial": 156,
+      "pngSha256": "92e06bc09b8196f3ec9458da3962a46472e2744204126a6b9569f1835ef42ac7",
+      "primaryPlayerPixels": 6401
+    }
+  ],
+  "scope": "Frozen native RT presentation and actual uploaded meshes; not motion, phone, owner or sustained-performance acceptance"
+}

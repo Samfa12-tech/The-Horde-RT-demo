@@ -1,8 +1,11 @@
 #pragma once
+#include "graphics/DustQuality.h"
 
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <iosfwd>
+#include <optional>
 #include <span>
 #include <string>
 #include <string_view>
@@ -114,6 +117,52 @@ enum class RtWaterQuality : std::uint8_t
     Mobile,
     High,
 };
+
+enum class RtShadowMode : std::uint8_t { Lower, Current, Higher, DiagnosticLegacy };
+enum class RtFireQuality : std::uint8_t { Mobile, High, Low };
+
+// Optional only for historical/non-reporting callers. Present records describe
+// successful owning uploads, never requested settings or guessed defaults.
+struct RtShadowQualityEvidence
+{
+    RtShadowMode mode = RtShadowMode::Current;
+    std::uint32_t localPrimarySamples = 1u;
+    std::uint32_t skyPrimarySamples = 1u;
+    std::uint32_t reserved = 0u;
+    bool operator==(const RtShadowQualityEvidence&) const = default;
+};
+struct RtFireQualityEvidence
+{
+    RtFireQuality quality = RtFireQuality::Mobile;
+    std::uint32_t volumeSteps = 4u;
+    std::uint32_t reflectionSamples = 1u;
+    bool operator==(const RtFireQualityEvidence&) const = default;
+};
+inline constexpr std::size_t kRtFireLightingEvidenceCapacity = 4u;
+struct RtFireLightEvidence
+{
+    std::uint32_t stableId = 0u;
+    std::array<float, 4u> positionStrength{};
+    std::array<float, 4u> colourIntensity{};
+    bool operator==(const RtFireLightEvidence&) const = default;
+};
+// Optional absence is historical/unavailable, distinct from an uploaded empty
+// active prefix. Exact packed owning upload; unused entries are wholly zero.
+struct RtFireLightingEvidence
+{
+    std::uint32_t count = 0u;
+    std::array<RtFireLightEvidence, kRtFireLightingEvidenceCapacity> emitters{};
+    bool operator==(const RtFireLightingEvidence&) const = default;
+};
+[[nodiscard]] bool ValidRtFireLightingEvidence(const RtFireLightingEvidence& evidence) noexcept;
+// Call only after canonical evidence validation. This projects the retained
+// upload and restores stream formatting; it never reads current scene state.
+void WriteRtFireLightingEvidenceJson(std::ostream& output, const RtFireLightingEvidence& evidence);
+[[nodiscard]] const char* RtShadowModeName(RtShadowMode mode) noexcept;
+[[nodiscard]] const char* RtFireQualityName(RtFireQuality quality) noexcept;
+[[nodiscard]] bool ValidRtShadowQualityEvidence(const RtShadowQualityEvidence& evidence,
+                                              RtDielectricQuality compiledQuality) noexcept;
+[[nodiscard]] bool ValidRtFireQualityEvidence(const RtFireQualityEvidence& evidence) noexcept;
 
 [[nodiscard]] const char* RtSampleStatusName(RtSampleStatus status) noexcept;
 [[nodiscard]] const char* RtPresentationOutcomeName(RtPresentationOutcome outcome) noexcept;
@@ -302,6 +351,12 @@ struct RtRecordedSceneEvidence
     RtResourceInventory resources{};
     RtPlayerDiagnostics player{};
     RtDispatchEvidence dispatch{};
+    std::optional<RtShadowQualityEvidence> shadowQuality{};
+    std::optional<RtFireQualityEvidence> fireQuality{};
+    std::optional<RtFireLightingEvidence> fireLighting{};
+    // Owning successful upload only; absence is historical/unavailable, false is Off.
+    std::optional<bool> actualUploadedMistEnabled{};
+    std::optional<horde::graphics::DustQuality> actualUploadedDustQuality{};
 };
 
 struct RtSceneFrameEvidence
@@ -311,6 +366,12 @@ struct RtSceneFrameEvidence
     RtPlayerDiagnostics player{};
     RtStageFrameSample stages{};
     RtDispatchEvidence dispatch{};
+    std::optional<RtShadowQualityEvidence> shadowQuality{};
+    std::optional<RtFireQualityEvidence> fireQuality{};
+    std::optional<RtFireLightingEvidence> fireLighting{};
+    // Owning successful upload only; absence is historical/unavailable, false is Off.
+    std::optional<bool> actualUploadedMistEnabled{};
+    std::optional<horde::graphics::DustQuality> actualUploadedDustQuality{};
 };
 
 struct RtDiagnosticEvidence
@@ -539,6 +600,14 @@ struct RtLifecyclePublishedState
     bool hasCompletedEvidence = false;
     RtPerformanceEvidenceSnapshot completedEvidence{};
 };
+
+// Settings admission reads this completed owning fact, then compares it to the
+// current successful scene upload. Requested state is never an acknowledgment.
+[[nodiscard]] std::optional<horde::graphics::DustQuality> CurrentCompletedDustQuality(
+    const RtLifecyclePublishedState& publication) noexcept;
+
+[[nodiscard]] std::optional<bool> CurrentCompletedMistEnabled(
+    const RtLifecyclePublishedState& publication) noexcept;
 
 class RtEvidenceLifecycle
 {

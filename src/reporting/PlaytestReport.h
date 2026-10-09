@@ -141,6 +141,8 @@ struct PlaytestReportAttempt
 };
 
 struct PreparedPlaytestSubmission;
+class PreparedBenchmarkSummaryReport;
+class PreparedBenchmarkSummarySubmission;
 
 // UI/platform-owner seam for a synchronous transport callback. Retry explicitly
 // reuses identical ID/JSON bytes; Cancel invalidates the token so a late result
@@ -153,6 +155,12 @@ public:
     // Remote envelopes have their own bounded attachment cap. This does not
     // relax the 16KiB local-export/typed-report contract.
     [[nodiscard]] bool BeginSubmission(const PreparedPlaytestSubmission& submission,
+        PlaytestReportAttempt& attempt);
+    // Local-only typed schema2 prototype. No verification or endpoint admission.
+    [[nodiscard]] bool BeginBenchmarkSummary(const PreparedBenchmarkSummaryReport& report,
+        PlaytestReportAttempt& attempt);
+    // Offline typed remote-consent wrapper state only, not endpoint admission.
+    [[nodiscard]] bool BeginBenchmarkSummarySubmission(const PreparedBenchmarkSummarySubmission& submission,
         PlaytestReportAttempt& attempt);
     [[nodiscard]] bool Retry(PlaytestReportAttempt& attempt);
     [[nodiscard]] bool Complete(std::uint64_t token, PlaytestReportDeliveryResult result) noexcept;

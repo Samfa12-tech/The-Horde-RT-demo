@@ -30,3 +30,7 @@ keystore.properties
 releases/candidates/
 assets/textures/meshy/**/*.rgba
 docs/validation/horde_alpha_*.png
+# Private owner authoring reviews are delivered in Library or inspected locally.
+# Their source scripts and sanitized decision records remain versioned.
+docs/design/**/*.png
+docs/design/**/*.blend

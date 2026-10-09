@@ -65,22 +65,46 @@ HWND WaitForForm(const DWORD thread)
 
 LRESULT Send(HWND window, const UINT message, const WPARAM value = 0, const LPARAM argument = 0)
 {
+    const DWORD senderThread = GetCurrentThreadId();
+    const DWORD ownerThread = GetWindowThreadProcessId(window, nullptr);
+    const auto started = std::chrono::steady_clock::now();
     DWORD_PTR result = 0;
     if (SendMessageTimeoutW(window, message, value, argument, SMTO_ABORTIFHUNG, 2000, &result) == 0)
     {
         const DWORD error = GetLastError();
+        const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::steady_clock::now() - started).count();
+        // Query state only: never read note text, send another control message,
+        // retry the timed-out operation or change the UI owner's focus.
+        GUITHREADINFO info{};
+        info.cbSize = sizeof(info);
+        const bool hasGuiInfo = ownerThread != 0 && GetGUIThreadInfo(ownerThread, &info) != FALSE;
+        const DWORD guiInfoError = ownerThread == 0 ? ERROR_INVALID_THREAD_ID :
+            hasGuiInfo ? ERROR_SUCCESS : GetLastError();
         std::cerr << "native control message timed out; phase=" << currentPhase.load()
                   << " hwnd=" << window << " controlId=" << GetDlgCtrlID(window)
                   << " message=0x" << std::hex << message << std::dec
-                  << " error=" << error << '\n';
+                  << " error=" << error << " senderThread=" << senderThread
+                  << " ownerThread=" << ownerThread << " elapsedMs=" << elapsed
+                  << " enabled=" << (IsWindowEnabled(window) != FALSE)
+                  << " visible=" << (IsWindowVisible(window) != FALSE)
+                  << " guiInfoAvailable=" << hasGuiInfo << " guiInfoError=" << guiInfoError;
+        if (hasGuiInfo)
+        {
+            std::cerr << " guiFlags=0x" << std::hex << info.flags << std::dec
+                      << " active=" << info.hwndActive << " focus=" << info.hwndFocus
+                      << " capture=" << info.hwndCapture;
+        }
+        std::cerr << '\n';
         passed.store(false);
     }
     return static_cast<LRESULT>(result);
 }
 
 void ClickExport(HWND form) { Send(form, WM_COMMAND, MAKEWPARAM(111, BN_CLICKED)); }
-void SetNote(HWND form, const wchar_t* text)
+void SetNote(HWND form, const wchar_t* text, const char* phase)
 {
+    SetPhase(phase);
     Send(GetDlgItem(form, 106), WM_SETTEXT, 0, reinterpret_cast<LPARAM>(text));
 }
 
@@ -108,7 +132,7 @@ int main()
         const HWND form = WaitForForm(thread);
         Defaults(form, false);
         if (!form) return;
-        SetNote(form, L"Steps to reproduce");
+        SetNote(form, L"Steps to reproduce", "note-only initial note edit");
         ClickExport(form);
         Check(exports.load() == 0, "category/impact or consent omission reached destination");
         Send(GetDlgItem(form, 102), CB_SETCURSEL, 1);
@@ -116,16 +140,16 @@ int main()
         ClickExport(form);
         Check(exports.load() == 0, "unchecked export consent reached destination");
         Send(GetDlgItem(form, 107), BM_SETCHECK, BST_CHECKED);
-        SetNote(form, L"test@example.invalid");
+        SetNote(form, L"test@example.invalid", "note-only rejected-input note edit");
         ClickExport(form);
         Check(exports.load() == 0, "private-content rejection reached destination");
-        SetNote(form, L"Walk.\r\nThen parry. \u9f8d \U0001f525");
+        SetNote(form, L"Walk.\r\nThen parry. \u9f8d \U0001f525", "note-only approved Unicode note edit");
         SetPhase("note-only approved export and retry");
         ClickExport(form);
         Check(exports.load() == 1, "approved note-only export did not reach injected destination once");
         Check(!IsWindowEnabled(GetDlgItem(form, 106)), "approved note did not freeze for retry");
         // Even programmatically changing a disabled edit cannot change frozen JSON.
-        SetNote(form, L"later mutation");
+        SetNote(form, L"later mutation", "note-only frozen retry edit");
         ClickExport(form);
         Check(exports.load() == 2, "explicit retry did not reach destination");
         PostMessageW(form, WM_CLOSE, 0, 0);
@@ -154,7 +178,7 @@ int main()
         if (!form) return;
         Send(GetDlgItem(form, 102), CB_SETCURSEL, 1);
         Send(GetDlgItem(form, 104), CB_SETCURSEL, 2);
-        SetNote(form, L"Explicit context test");
+        SetNote(form, L"Explicit context test", "explicit-context note edit");
         Send(GetDlgItem(form, 107), BM_SETCHECK, BST_CHECKED);
         Send(GetDlgItem(form, 108), BM_SETCHECK, BST_CHECKED);
         ClickExport(form);

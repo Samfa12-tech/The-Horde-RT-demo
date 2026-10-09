@@ -1,14 +1,18 @@
 #pragma once
+#include "scene/atmosphere/IndoorDust.h"
 
 #include <array>
 #include <cstdint>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
+#include <span>
 
 #include <vulkan/vulkan.h>
 
 #include "gameplay/SwordCombat.h"
+#include "graphics/RtPresentationTransform.h"
 #include "gameplay/ShowcaseGameplay.h"
 #include "gameplay/items/HeldItemKinematics.h"
 #include "gameplay/items/HeldItemState.h"
@@ -25,10 +29,13 @@
 #include "vulkan/raytracing/RtPipelineBundle.h"
 #include "vulkan/raytracing/RtExecutionPolicy.h"
 #include "vulkan/raytracing/RtSceneTuning.h"
+#include "vulkan/raytracing/RtSceneProfile.h"
 #include "vulkan/raytracing/RtStaticMeshSlot.h"
 #ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
 #include "vulkan/raytracing/experimental/StagedPrimaryPass.h"
 #endif
+
+namespace horde::graphics { class GraphicsPreviewSession; class EntryMenuSession; }
 
 namespace horde::vulkan::raytracing
 {
@@ -42,6 +49,18 @@ struct RtDiagnosticCounterPayload;
     const RtPipelineVariantArtifact& opaqueFast,
     const RtPipelineVariantArtifact& genericDielectric,
     horde::telemetry::RtPipelineEvidenceIdentity& identity) noexcept;
+
+// Read-only provenance of an already selected strategy. No policy request or
+// shader words cross the platform boundary through this metadata snapshot.
+struct RtSelectedPipelineArtifactMetadata
+{
+    std::string_view canonicalKey;
+    std::string_view artifactPath;
+    std::string_view spirvSha256;
+    std::string_view includeSha256;
+    std::size_t expectedWordCount;
+    bool hasDiagnosticsBinding;
+};
 
 enum class WaterQuality : std::uint32_t
 {
@@ -68,6 +87,8 @@ struct RtSceneFrameInputs
     std::uint64_t tickIndex = 0u;
     float cameraYaw = 0.0f;
     float cameraPitch = 0.0f;
+    horde::graphics::RtPresentationTransform presentationTransform =
+        horde::graphics::RtPresentationTransform::Identity;
     float torchLightStrength = 1.0f;
     float walkTime = 0.0f;
     float cameraX = 0.0f;
@@ -75,6 +96,11 @@ struct RtSceneFrameInputs
     float walkAmount = 0.0f;
     float outputExposure = 0.92f;
     WaterQuality waterQuality = WaterQuality::High;
+    // Legacy fixtures inherit water detail; Graphics always supplies a real tier.
+    std::optional<FireEmitterQuality> fireDetail;
+    // Absence is the explicitly retained diagnostic LegacyWorkload policy.
+    std::optional<horde::graphics::ShadowQuality> shadowQuality;
+    bool previewMotion = false;
     RtSceneTuning tuning{};
     horde::gameplay::CombatSnapshot combat{};
     horde::gameplay::PlayerCombatSnapshot playerCombat{};
@@ -105,6 +131,60 @@ struct RtSceneFrameInputs
 class PresentableTinyRtScene
 {
 public:
+    struct InitialisationStageMeasurement
+    {
+        std::string_view name{};
+        // Steady-clock elapsed time on the initializing CPU thread, not GPU time.
+        std::uint64_t cpuNanoseconds = 0u;
+        bool attempted = false;
+        bool succeeded = false;
+    };
+    struct InitialisationPipelineMeasurement
+    {
+        std::string_view strategy{};
+        RtExecutionBackend backend = RtExecutionBackend::Unsupported;
+        VkResult result = VK_NOT_READY;
+        std::uint64_t cpuNanoseconds = 0u;
+        bool attempted = false;
+        bool pipelineCacheWasNull = false;
+    };
+    struct InitialisationSbtMeasurement
+    {
+        std::string_view strategy{};
+        std::uint64_t cpuNanoseconds = 0u;
+        bool attempted = false;
+        bool succeeded = false;
+    };
+    struct InitialisationMeasurements
+    {
+        std::vector<InitialisationStageMeasurement> stages;
+        std::vector<InitialisationPipelineMeasurement> pipelines;
+        std::vector<InitialisationSbtMeasurement> shaderBindingTables;
+        // From immediately after the prior-resource Destroy through return;
+        // failed-attempt cleanup is included, initial prior-resource cleanup is not.
+        std::uint64_t totalCpuNanoseconds = 0u;
+        bool succeeded = false;
+    };
+
+#ifndef NDEBUG
+    // Process-local opaque identities, read on the render owner thread after
+    // completion. No device addresses, resource contents or ownership transfer.
+    struct ResourceHandleSnapshot
+    {
+        bool ready = false;
+        std::vector<std::uint64_t> bottomLevelAccelerationStructures;
+        std::vector<std::uint64_t> topLevelAccelerationStructures;
+        std::vector<std::uint64_t> pipelines;
+        std::vector<std::uint64_t> shaderBindingTableBuffers;
+        std::vector<std::uint64_t> descriptorSets;
+        std::vector<std::uint64_t> textureImages;
+        std::uint64_t outputImage = 0u;
+        std::uint64_t outputMemory = 0u;
+        std::uint64_t outputView = 0u;
+        bool operator==(const ResourceHandleSnapshot&) const = default;
+    };
+    [[nodiscard]] ResourceHandleSnapshot CaptureResourceHandles() const;
+#endif
     struct StorageImageCapture
     {
         std::uint32_t width = 0u;
@@ -113,10 +193,22 @@ public:
         std::vector<std::uint8_t> rgba;
     };
 
-    // Baseline without the optional development viewmodel. Live reports count owners.
-    static constexpr std::uint32_t kBlasCount = 16u;
+    // Maximum including the optional development viewmodel. Live reports count owners.
+    static constexpr std::uint32_t kBlasCount = 20u;
+    static constexpr std::uint32_t kCollapseInstanceIndex = 21u;
+    static constexpr std::uint32_t kPlayerTorchInstanceIndex = 22u;
+    static constexpr std::uint32_t kPlayerSwordScabbardMetadataIndex = 23u;
+    static constexpr std::uint32_t kPlayerSwordScabbardInstanceIndex = 25u;
     static constexpr std::uint32_t kTlasCount = 1u;
-    static constexpr std::uint32_t kTlasInstanceCount = kRtInstanceMetadataCapacity;
+    static constexpr std::uint32_t kTlasInstanceCount = kRtTlasInstanceCapacity;
+    // Keep the two existing Keeper body instances at their original TLAS slots.
+    // Their custom index remains the old torch metadata index1.
+    static constexpr std::uint32_t kKeeperTorchFirstTlasInstance = 23u;
+    static constexpr std::uint32_t kKeeperTorchInstanceCount = 2u;
+    static_assert(kKeeperTorchFirstTlasInstance + kKeeperTorchInstanceCount ==
+                  kPlayerSwordScabbardInstanceIndex);
+    static_assert(kPlayerSwordScabbardMetadataIndex < kRtInstanceMetadataCapacity);
+    static_assert(kTlasInstanceCount == kPlayerSwordScabbardInstanceIndex + 1u);
 
     PresentableTinyRtScene() = default;
     ~PresentableTinyRtScene();
@@ -140,11 +232,57 @@ public:
                     std::string& diagnostic,
                     const std::string& developmentStaticAssetDirectory = {},
                     const std::string& productionAssetRoot = {},
-                    RtExecutionBackend executionBackend = RtExecutionBackend::RayTracingPipeline);
+                    RtExecutionBackend executionBackend = RtExecutionBackend::RayTracingPipeline,
+                    RtSceneProfile sceneProfile = RtSceneProfile::Showcase,
+                    bool glassEnabled = true,
+                    VkPipelineCache pipelineCache = VK_NULL_HANDLE,
+                    RtBundleCompiledPipelineCache* compiledPipelineCache = nullptr);
 
     void Destroy();
 
     bool IsReady() const { return ready_; }
+    // CPU-side timings for the most recent Initialise attempt. Failed attempts
+    // retain partial measurements across cleanup until the next attempt begins.
+    const InitialisationMeasurements& InitialiseMeasurements() const noexcept
+    {
+        return initialiseMeasurements_;
+    }
+    bool ReusedCompiledPipelines() const noexcept
+    {
+        return pipelineBundle_.ReusedCompiledPipelines();
+    }
+    RtSceneProfile Profile() const { return sceneProfile_; }
+    bool GlassEnabled() const { return glassEnabled_; }
+    void SetMistEnabled(const bool enabled) noexcept { mistEnabled_ = enabled; }
+    bool MistEnabled() const noexcept { return mistEnabled_; }
+    void SetDustQuality(horde::graphics::DustQuality quality) noexcept {
+        if (quality == dustQuality_) return;
+        dustQuality_ = quality;
+        dustCache_.Invalidate();
+        dustWork_ = {};
+    }
+    horde::graphics::DustQuality DustQuality() const noexcept { return dustQuality_; }
+    std::optional<horde::graphics::DustQuality> UploadedDustQuality() const noexcept {
+        return uploadedQualityControlsValid_ ? ResolveUploadedDustQuality(uploadedQualityControls_) : std::nullopt;
+    }
+    horde::scene::atmosphere::DustWork DustWork() const noexcept { return dustWork_; }
+
+    // Raw successful upload only; owning completion/presentation is separate.
+    std::optional<bool> UploadedMistEnabled() const noexcept
+    {
+        return uploadedQualityControlsValid_
+            ? ResolveUploadedMistEnabled(uploadedQualityControls_) : std::nullopt;
+    }
+    const RtQualityControlsGpu& QualityControls() const noexcept { return uploadedQualityControls_; }
+    bool HasUploadedQualityControls() const noexcept { return uploadedQualityControlsValid_; }
+    FireEmitterQuality UploadedFireQuality() const noexcept { return uploadedFireQuality_; }
+    // Raw last successful scene upload, not a completed-frame/presentation ACK.
+    const FireEmitterUpload& UploadedFireEmitters() const noexcept { return uploadedFireEmitters_; }
+    bool HasUploadedFireEmitters() const noexcept { return uploadedFireEmittersValid_; }
+    bool ConfigurePreviewFireSockets(horde::graphics::GraphicsPreviewSession& session,
+                                     std::string& diagnostic) const;
+    bool ConfigureEntryMenu(horde::graphics::EntryMenuSession& session,
+                            std::string& diagnostic) const;
     RtExecutionBackend ExecutionBackend() const
     {
         return pipelineBundle_.HasSelection() ? pipelineBundle_.Request().executionBackend
@@ -157,7 +295,7 @@ public:
         return ready_ ? static_cast<std::uint32_t>(ResourceInventory().bottomLevelAccelerationStructureCount) : 0u;
     }
     std::uint32_t TlasCount() const { return ready_ ? kTlasCount : 0u; }
-    std::uint32_t TlasInstanceCount() const { return ready_ ? kTlasInstanceCount : 0u; }
+    std::uint32_t TlasInstanceCount() const { return ready_ ? tlasInstanceCount_ : 0u; }
     std::size_t SkeletonPoseBucketCount() const { return characterSlot_.SkeletonPoseBucketCount(); }
     std::uint32_t PlayerSkinCadenceHz() const { return 60u; }
     std::uint64_t PlayerSkinUpdateCount() const { return playerSkinUpdateCount_; }
@@ -339,6 +477,19 @@ public:
 #endif
         return pipelineBundle_.OpaqueFastKey();
     }
+    [[nodiscard]] std::optional<RtSelectedPipelineArtifactMetadata>
+    SelectedPipelineArtifactMetadata(RtMaterialStrategy strategy) const noexcept
+    {
+#ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
+        if (stagedPrimary_) return std::nullopt;
+#endif
+        if (!pipelineBundle_.HasSelection() ||
+            (strategy != RtMaterialStrategy::OpaqueFast && strategy != RtMaterialStrategy::GenericDielectric))
+            return std::nullopt;
+        const auto& artifact = pipelineBundle_.Strategy(strategy).artifact;
+        return RtSelectedPipelineArtifactMetadata{artifact.canonicalKey, artifact.artifactPath,
+            artifact.spirvSha256, artifact.includeSha256, artifact.expectedWordCount, artifact.hasDiagnosticsBinding};
+    }
     std::string_view SelectedGenericDielectricKey() const
     {
 #ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
@@ -499,6 +650,7 @@ private:
         VkImageView view = VK_NULL_HANDLE;
         VkDeviceSize allocationSize = 0u;
         VkMemoryPropertyFlags memoryPropertyFlags = 0u;
+        std::uint32_t mipLevels = 0u;
     };
 
     bool InitialiseWithOrchestration(
@@ -516,7 +668,12 @@ private:
         std::string& diagnostic,
         const std::string& developmentStaticAssetDirectory,
         const std::string& productionAssetRoot,
-        const InitialiseOrchestrationApi& api);
+        const InitialiseOrchestrationApi& api,
+        RtSceneProfile sceneProfile = RtSceneProfile::Showcase,
+        bool glassEnabled = true,
+        VkPipelineCache pipelineCache = VK_NULL_HANDLE,
+        RtBundleCompiledPipelineCache* compiledPipelineCache = nullptr);
+    void ApplyGlassFixtureVisibility(std::span<VkAccelerationStructureInstanceKHR> instances) const;
     bool ContinueInitialiseAfterPreflight(
         VkFormat presentationFormat,
         const std::string& skeletonAssetPath,
@@ -555,17 +712,38 @@ private:
                        std::uint32_t height,
                        std::uint32_t layers,
                        TextureArray& texture,
-                       std::string& diagnostic);
+                       std::string& diagnostic,
+                       std::span<const std::uint32_t> sourceLayers = {},
+                       VkImageViewType viewType = VK_IMAGE_VIEW_TYPE_2D_ARRAY);
     bool SupportsTextureArrayFormat(VkFormat format) const;
     bool CreateMaterialTextures(const std::string& directory, std::string& diagnostic);
+    bool CreateEnvironmentTexture(const std::string& productionRoot, std::string& diagnostic);
     bool CreateLichTextures(const std::string& directory, std::string& diagnostic);
     bool LoadStaticHeldItemAssets(const std::string& developmentDirectory,
                                   const std::string& productionAssetRoot,
                                   std::string& diagnostic);
     bool CreateStaticMeshResources(std::string& diagnostic);
+    bool LoadPreviewStaticAssets(const std::string& productionAssetRoot,
+                                 std::string& diagnostic);
+    bool ResolvePreviewPropTransforms(std::string& diagnostic);
+    bool BuildPreviewAccelerationStructures(std::string& diagnostic);
+    bool BuildProfileAccelerationStructure(
+        std::span<const VkAccelerationStructureGeometryKHR> geometries,
+        std::span<const VkAccelerationStructureBuildRangeInfoKHR> ranges,
+        VkAccelerationStructureTypeKHR type, VkBuildAccelerationStructureFlagsKHR flags,
+        AccelerationStructure& out, Buffer* retainedScratch,
+        std::string& diagnostic);
+    bool UpdatePreviewInstances(VkCommandBuffer commandBuffer,
+                                const RtSceneFrameInputs& frame,
+                                std::string& diagnostic,
+                                RtSceneRecordObservation* observation);
     const Buffer& VertexBufferForRole(RtGeometryRole role) const;
     bool BuildAccelerationStructures(std::string& diagnostic);
+    bool CreateScratchBuffer(VkDeviceSize usableSize, Buffer& out,
+                             std::string& diagnostic) const;
     bool CreateSelectedPipelineBundle(std::string& diagnostic);
+    [[nodiscard]] std::optional<RtCompiledPipelineKey> MakeCompiledPipelineKey(
+        const RtPipelineBundlePreflight& preflight) const;
     [[nodiscard]] bool CapturePipelineEvidenceIdentity() noexcept;
     bool CreateBundleDescriptorSetLayout(const RtDescriptorIoContract& contract,
                                          VkDescriptorSetLayout& out,
@@ -604,6 +782,8 @@ private:
                                 const RtSceneFrameInputs& frame,
                                 std::string& diagnostic,
                                 RtSceneRecordObservation* observation = nullptr);
+    void ApplyKeeperTorchBodyInstances(
+        std::array<VkAccelerationStructureInstanceKHR, kTlasInstanceCount>& instances) const;
     bool RunOneTimeCommands(void (*record)(VkCommandBuffer, void*), void* userData, std::string& diagnostic) const;
     void DestroyBuffer(Buffer& buffer) const;
     void DestroyAccelerationStructure(AccelerationStructure& accelerationStructure);
@@ -616,6 +796,10 @@ private:
     VkDevice device_ = VK_NULL_HANDLE;
     VkQueue queue_ = VK_NULL_HANDLE;
     VkCommandPool commandPool_ = VK_NULL_HANDLE;
+    // Borrowed from the logical-device owner; never destroyed by this scene.
+    VkPipelineCache pipelineCache_ = VK_NULL_HANDLE;
+    // Device-owned cache; leases held by pipelineBundle_ cover all scene use.
+    RtBundleCompiledPipelineCache* compiledPipelineCache_ = nullptr;
     VkExtent2D dispatchExtent_{};
     bool presentationUsesBgra_ = false;
     bool scaledBlitSupported_ = false;
@@ -631,6 +815,8 @@ private:
     TextureArray materialDiffuse_;
     TextureArray materialNormal_;
     TextureArray materialArm_;
+    TextureArray environmentTexture_;
+    VkSampler environmentSampler_ = VK_NULL_HANDLE;
     TextureArray lichBaseColor_;
     TextureArray lichEmissive_;
     TextureArray staticBaseColor_;
@@ -650,6 +836,12 @@ private:
     bool tlasPendingDefinitionsValid_ = false;
     Buffer heldLightBuffer_;
     Buffer fireEmitterBuffer_;
+    Buffer qualityControlsBuffer_;
+    RtQualityControlsGpu uploadedQualityControls_{};
+    FireEmitterQuality uploadedFireQuality_ = FireEmitterQuality::Mobile;
+    FireEmitterUpload uploadedFireEmitters_{};
+    bool uploadedFireEmittersValid_ = false;
+    bool uploadedQualityControlsValid_ = false;
     Buffer worldSurfaceBuffer_;
     Buffer staticVertexBuffer_;
     Buffer worldPlayerVertexBuffer_;
@@ -663,12 +855,15 @@ private:
     AccelerationStructure waterfallBlas_;
     AccelerationStructure finaleRoofBlas_;
     AccelerationStructure torchBlas_;
+    AccelerationStructure worldTorchBodyBlas_;
     AccelerationStructure swordBlas_;
+    AccelerationStructure playerSwordScabbardBlas_;
     AccelerationStructure gothicChestBaseBlas_;
     AccelerationStructure gothicChestLidBlas_;
     AccelerationStructure rewardLanternRingBlas_;
     AccelerationStructure rewardLanternBodyBlas_;
     AccelerationStructure dielectricFixtureBlas_;
+    AccelerationStructure collapseBlas_;
     AccelerationStructure playerBodyBlas_;
     AccelerationStructure playerLimbBlas_;
     AccelerationStructure skinnedPlayerBlas_;
@@ -678,10 +873,26 @@ private:
     AccelerationStructure tlas_;
     Buffer tlasUpdateScratch_;
     RtGpuResources gpuResources_;
+    RtSceneProfile sceneProfile_ = RtSceneProfile::Showcase;
+    bool glassEnabled_ = true;
+    bool mistEnabled_ = true;
+    horde::graphics::DustQuality dustQuality_ = horde::graphics::DustQuality::Off;
+    horde::scene::atmosphere::DustWork dustWork_{};
+    horde::scene::atmosphere::DustFrameCache dustCache_{};
+    bool WriteDustQuality(const RtQualityControlsGpu&, const RtSceneFrameInputs&, std::string&, RtSceneRecordObservation*);
+    std::vector<RtMaterialGpu> sceneMaterials_;
+    std::uint32_t worldMaterialBase_ = 0u;
+    std::uint32_t tlasInstanceCount_ = kTlasInstanceCount;
+    std::array<horde::gameplay::items::HeldItemTransform, 5u> previewTransforms_{};
+    std::array<horde::gameplay::effects::FireEmitterFixedStepInput, 2u> previewFireInputs_{};
+    VkDeviceSize scratchAddressAlignment_ = 0u;
     CharacterRenderSlot characterSlot_;
     PlayerRenderSlot playerRenderSlot_;
     horde::scene::assets::StaticMeshAsset developmentStaticAsset_;
+    horde::scene::assets::StaticMeshAsset collapseStaticAsset_;
     horde::scene::assets::StaticMeshAsset productionTorchAsset_;
+    horde::scene::assets::StaticMeshAsset playerTorchAsset_;
+    horde::scene::assets::StaticMeshAsset playerSwordScabbardAsset_;
     horde::scene::assets::StaticMeshAsset productionPlayerAsset_;
     horde::scene::assets::StaticMeshAsset viewmodelAsset_;
     horde::scene::SkinnedMeshAsset viewmodelSkin_;
@@ -793,6 +1004,7 @@ private:
     PFN_vkGetBufferDeviceAddressKHR vkGetBufferDeviceAddressKHR_ = nullptr;
 
     bool ready_ = false;
+    InitialisationMeasurements initialiseMeasurements_{};
 };
 
 } // namespace horde::vulkan::raytracing

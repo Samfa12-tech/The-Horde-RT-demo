@@ -1,0 +1,26 @@
+[
+  {
+    "file": "portrait-parry-pipeline.png",
+    "bytes": 1221441,
+    "sha256": "8583521cd30b935038f4904100640dea944aa6cc41ea03df6dc1bcd5f8009e31",
+    "conversion": "RGBA images converted losslessly to PNG; UI screenshots copied unchanged"
+  },
+  {
+    "file": "portrait-attack-compute.png",
+    "bytes": 1214797,
+    "sha256": "3d7fa5a58db7becd59690d50ef2455942d6e85c0f7f4e3f1cad881fb5dcde450",
+    "conversion": "RGBA images converted losslessly to PNG; UI screenshots copied unchanged"
+  },
+  {
+    "file": "landscape-menu-reduced-motion.png",
+    "bytes": 3523065,
+    "sha256": "6564939c832e9662d9c882a0b448023ba2422cb8e01f7d945e277eedbcbf6930",
+    "conversion": "RGBA images converted losslessly to PNG; UI screenshots copied unchanged"
+  },
+  {
+    "file": "landscape-preview.png",
+    "bytes": 3534370,
+    "sha256": "2fe690df3345351bfab2789ef4f8f7d09bb86fd067118045a06131564e8d5ca2",
+    "conversion": "RGBA images converted losslessly to PNG; UI screenshots copied unchanged"
+  }
+]

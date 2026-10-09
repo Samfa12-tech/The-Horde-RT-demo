@@ -39,11 +39,24 @@ enum class GameplayEventType : std::uint8_t
     ChestOpened,
     LanternClaimed,
     TorchExtinguished,
+    // Append only: Android's compact transport preserves the existing IDs.
+    KeeperRevealStarted,
+    KeeperWarning,
+    KeeperCombatReady,
+    SkeletonIncidental,
+    PlayerSwordDrawStarted,
+    PlayerSwordAttachmentChanged,
+    SkeletonEncounterWarning,
 };
+
+inline constexpr std::size_t kGameplayEventTypeCount =
+    static_cast<std::size_t>(GameplayEventType::SkeletonEncounterWarning) + 1u;
 
 struct GameplayEvent
 {
     std::uint64_t sequence = 0;
+    // Authoritative fixed-step simulation tick that emitted this event.
+    std::uint64_t tickIndex = 0;
     GameplayEventType type = GameplayEventType::PlayerFootstep;
     EntityId source = EntityId::Invalid;
     EntityId target = EntityId::Invalid;

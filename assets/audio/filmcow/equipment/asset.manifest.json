@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "target": "1.6.2",
+  "source": "FilmCow Recorded SFX; owner-supplied local archive",
+  "license": "FilmCow custom royalty-free licence; not CC0",
+  "licenseTerms": "https://filmcow.itch.io/filmcow-sfx",
+  "licenseChecked": "2026-10-07",
+  "processing": "tools/import-filmcow-sfx.ps1; mono 48 kHz integer PCM24 to PCM16; source duration, pitch and amplitude retained; no normalization",
+  "timing": "One-shot on shared PlayerSwordAttachmentChanged semantic edge; draw-start/input do not duplicate it; lifecycle transport is discarded on surface teardown",
+  "acceptance": "Candidate game-ready derivatives; in-game owner listening and audible waterfall warning remain pending",
+  "assets": [
+    {
+      "sourceFilename": "dagger unsheath 1.wav",
+      "sourceSha256": "4aaa2a326513ea03c396617b8ec7e9388d5f7e0c17e489d698ad3e5af24c622b",
+      "runtimePath": "sword_draw.wav",
+      "sha256": "a70dcbcf7d627f8ebec641a33c144f64682771c715f0bfc819fd2f8d981713ce",
+      "bytes": 41972,
+      "sampleRate": 48000,
+      "channels": 1,
+      "bitsPerSample": 16,
+      "frames": 20964
+    },
+    {
+      "sourceFilename": "dagger sheath 1.wav",
+      "sourceSha256": "3723e2ca6c31289f746dba9a75c85ba25170e66a2c1356a1de72f9268842f89e",
+      "runtimePath": "sword_sheath.wav",
+      "sha256": "0f38fe0560c91aa1b97de84a01787d70d490832f727684ca402e9dfcf4ff2aaf",
+      "bytes": 67558,
+      "sampleRate": 48000,
+      "channels": 1,
+      "bitsPerSample": 16,
+      "frames": 33757
+    }
+  ]
+}

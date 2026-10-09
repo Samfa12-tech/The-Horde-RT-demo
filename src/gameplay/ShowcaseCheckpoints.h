@@ -50,6 +50,24 @@ inline constexpr std::array<ShowcaseCheckpoint, 13> kShowcaseCheckpoints{{
     {12, "two-enemy-combat", 0.0f, -3.50f, 0.0f, 0.0f, ShowcaseZone::SkeletonRoom, ShowcaseCheckpointPreset::TwoSkeletonCombat},
 }};
 
+// Keep historical comparison poses intact while measuring the production pair
+// in its actual authored room. The import and platform evidence metadata use
+// this same route-aware value; resolving it never advances the simulation.
+constexpr ShowcaseCheckpoint ShowcaseCheckpointForEncounter(
+    ShowcaseCheckpoint checkpoint, const bool waterfallSkeletonEncounter)
+{
+    if (waterfallSkeletonEncounter &&
+        checkpoint.preset == ShowcaseCheckpointPreset::TwoSkeletonCombat)
+    {
+        checkpoint.x = -3.00f;
+        checkpoint.z = kWaterfallSkeletonPairCenter.z;
+        checkpoint.yaw = -kHalfPi;
+        checkpoint.pitch = -0.06f;
+        checkpoint.expectedZone = ShowcaseZone::SkylightChamber;
+    }
+    return checkpoint;
+}
+
 constexpr const ShowcaseCheckpoint* FindShowcaseCheckpoint(std::int32_t id)
 {
     for (const ShowcaseCheckpoint& checkpoint : kShowcaseCheckpoints)
@@ -113,7 +131,7 @@ inline void AdvanceLichToActive(ShowcaseCheckpointState& state, const ShowcaseCh
 {
     state.enemyDirector.Update(checkpoint.x, checkpoint.z);
     state.activeEnemyKind = state.enemyDirector.Snapshot().selectedEnemy;
-    state.lichEncounter.Reset();
+    state.lichEncounter.ImportCombatCheckpoint();
     state.lichEncounter.Update(0.05f, checkpoint.x, checkpoint.z, true, true);
 }
 

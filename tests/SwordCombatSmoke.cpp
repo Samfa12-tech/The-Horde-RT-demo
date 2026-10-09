@@ -1,9 +1,61 @@
+#include <array>
 #include <cmath>
 #include <cstdint>
 #include <iostream>
 
 #include "gameplay/ShowcaseGameplay.h"
 #include "gameplay/SwordCombat.h"
+
+namespace
+{
+bool ContactPartitionsStayOrdered()
+{
+    using namespace horde::gameplay;
+    const std::array<std::array<float, 3>, 6> partitions{{
+        {{1.0f / 120.0f, 1.0f / 120.0f, 1.0f / 120.0f}},
+        {{1.0f / 60.0f, 1.0f / 60.0f, 1.0f / 60.0f}},
+        {{1.0f / 30.0f, 1.0f / 30.0f, 1.0f / 30.0f}},
+        {{0.05f, 0.05f, 0.05f}},
+        {{0.01f, 0.01f, 0.01f}},
+        {{0.003f, 0.05f, 0.017f}},
+    }};
+    for (const auto& partition : partitions)
+    {
+        SwordCombat combat;
+        if (combat.RequestAttack() != PlayerAttackCut::DownwardCut) return false;
+        int downwardPulses = 0, upwardPulses = 0;
+        bool comboQueued = false;
+        for (std::size_t tick = 0; tick < 300u; ++tick)
+        {
+            if (!comboQueued && combat.Snapshot().player.action == PlayerCombatAction::SwingActive &&
+                combat.Snapshot().player.actionTime >= 0.05f)
+                comboQueued = combat.RequestAttack() == PlayerAttackCut::UpwardSlice;
+            const float step = partition[tick % partition.size()];
+            const auto snapshot = combat.Update(step, 0.0f, 1.85f, 0.0f);
+            if (snapshot.playerAttackPulse)
+            {
+                const bool downward = snapshot.playerAttackCut == PlayerAttackCut::DownwardCut;
+                const float contact = downward ? SwordCombat::kDownwardContactTime : SwordCombat::kUpwardContactTime;
+                if (snapshot.player.action != (downward ? PlayerCombatAction::SwingActive : PlayerCombatAction::UpwardSliceActive) ||
+                    snapshot.player.actionTime < contact || snapshot.player.actionTime > contact + step + 0.000001f)
+                    return false;
+                if (downward) ++downwardPulses;
+                else
+                {
+                    if (downwardPulses != 1) return false;
+                    ++upwardPulses;
+                }
+            }
+            const auto zero = combat.Update(0.0f, 0.0f, 1.85f, 0.0f);
+            if (zero.playerAttackPulse || zero.player.action != snapshot.player.action ||
+                zero.player.actionTime != snapshot.player.actionTime) return false;
+        }
+        if (!comboQueued || downwardPulses != 1 || upwardPulses != 1 ||
+            combat.Snapshot().player.action != PlayerCombatAction::Idle) return false;
+    }
+    return true;
+}
+}
 
 int main()
 {
@@ -150,11 +202,30 @@ int main()
     actionTimeline.Update(0.01f, 0.0f, 1.85f, 0.0f);
     const bool swingEnteredActive = actionTimeline.Snapshot().player.action ==
         horde::gameplay::PlayerCombatAction::SwingActive &&
-        actionTimeline.Snapshot().playerAttackPulse;
+        !actionTimeline.Snapshot().playerAttackPulse;
+    bool noEarlyDownwardContact = true;
+    int downwardContactPulses = 0;
+    float downwardContactTime = -1.0f;
+    // Ten 10ms float additions may sit just below 100ms. Admit the next
+    // update, while checking the measured action time and once-only pulse.
+    for (int tick = 0; tick < 11; ++tick)
+    {
+        actionTimeline.Update(0.01f, 0.0f, 1.85f, 0.0f);
+        if (actionTimeline.Snapshot().playerAttackPulse)
+        {
+            ++downwardContactPulses;
+            downwardContactTime = actionTimeline.Snapshot().player.actionTime;
+            noEarlyDownwardContact &= downwardContactTime >=
+                horde::gameplay::SwordCombat::kDownwardContactTime;
+        }
+    }
+    const bool downwardContactDuringStroke = noEarlyDownwardContact &&
+        downwardContactPulses == 1 && downwardContactTime <=
+            horde::gameplay::SwordCombat::kDownwardContactTime + 0.01001f;
     // The accepted combo window holds the completed downward impact through
     // 420 ms so a human second press can chain the upward slice. With no second
     // press, the legacy single-cut path enters recovery at that exact boundary.
-    for (int tick = 0; tick < 43; ++tick)
+    for (int tick = 0; tick < 32; ++tick)
     {
         actionTimeline.Update(0.01f, 0.0f, 1.85f, 0.0f);
     }
@@ -174,6 +245,7 @@ int main()
     const auto firstCut = comboTimeline.RequestAttack();
     int downwardPulses = 0;
     int upwardPulses = 0;
+    bool contactsDuringBothStrokes = true;
     bool queuedDuringActive = false;
     bool continuousComboTransition = true;
     float previousSwordRadians = comboTimeline.Snapshot().swordSwingRadians;
@@ -192,6 +264,9 @@ int main()
         const auto& snapshot = comboTimeline.Update(0.01f, 0.0f, 1.85f, 0.0f);
         if (snapshot.playerAttackPulse)
         {
+            contactsDuringBothStrokes &= snapshot.player.actionTime >=
+                (snapshot.playerAttackCut == horde::gameplay::PlayerAttackCut::DownwardCut ?
+                    horde::gameplay::SwordCombat::kDownwardContactTime : horde::gameplay::SwordCombat::kUpwardContactTime);
             downwardPulses += snapshot.playerAttackCut ==
                 horde::gameplay::PlayerAttackCut::DownwardCut ? 1 : 0;
             upwardPulses += snapshot.playerAttackCut ==
@@ -297,7 +372,7 @@ int main()
     stagger.RequestAttack();
     const auto& riposte = stagger.Update(dt, -0.75f, -3.20f, 0.0f);
     const bool immediateRiposte = riposte.player.action ==
-        horde::gameplay::PlayerCombatAction::SwingWindup;
+        horde::gameplay::PlayerCombatAction::SwingWindup && !riposte.playerAttackPulse;
     for (int tick = 0; tick < 94; ++tick)
     {
         const auto& snapshot = stagger.Update(dt, -0.75f, -3.20f, 0.0f);
@@ -335,7 +410,8 @@ int main()
         lateSucceeded = lateSucceeded || snapshot.parriedAttackerIndex >= 0;
     }
     const bool lateParryFailed = lateSawDamage && lateRequested && !lateSucceeded;
-    if (!exactSpawns || !exactHistoricalSpawn || !strictNearestSelection ||
+    const bool contactPartitions = ContactPartitionsStayOrdered();
+    if (!contactPartitions || !exactSpawns || !exactHistoricalSpawn || !strictNearestSelection ||
         !sawSwing || !sawDeath || !deadPersisted || !singleTargetHit ||
         !clearedPair || !pairPersistsDead || !resetPair || !maintainedSeparation ||
         !oneAttackToken || !sawDamage ||
@@ -343,7 +419,8 @@ int main()
         acceptedPlayerHits != horde::gameplay::PlayerVitals::kMaxVitality ||
         attackedPlayer.Snapshot().phase != horde::gameplay::PlayerLifePhase::Dead ||
         repeatedPlayerHitPulse || !stayedInsideArena || !idledBeyondDoor || idleWalkTransitions > 2 ||
-        !swingStillWindup || !swingEnteredActive || !swingEnteredRecovery || !swingFinished ||
+        !swingStillWindup || !swingEnteredActive || !downwardContactDuringStroke ||
+        !contactsDuringBothStrokes || !swingEnteredRecovery || !swingFinished ||
         !rearSwingMissed || !bothIdsParry || !failedParriesDamage ||
         !tokenHeldThroughStagger || !immediateRiposte || !staggerNearlyComplete ||
         !staggerCompletedAtEightTenths || !lateParryFailed || !comboFinished ||
@@ -361,6 +438,8 @@ int main()
                   << " acceptedPlayerHits=" << acceptedPlayerHits
                   << " idleWalkTransitions=" << idleWalkTransitions
                   << " phases=" << swingStillWindup << swingEnteredActive << swingEnteredRecovery << swingFinished
+                  << " strokeContact=" << downwardContactDuringStroke << contactsDuringBothStrokes
+                  << " partitions=" << contactPartitions
                   << " rearMiss=" << rearSwingMissed << " bothParry=" << bothIdsParry
                   << " failedParries=" << failedParriesDamage << " tokenHeld=" << tokenHeldThroughStagger
                   << " riposte=" << immediateRiposte << " staggerEdge=" << staggerNearlyComplete

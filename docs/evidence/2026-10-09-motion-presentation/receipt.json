@@ -1,0 +1,166 @@
+{
+  "source": "a6439e0b5998adefb7fdd87ea316132bc928549c",
+  "tree": "03781313c18939bd19b0fafab9462660564d6081",
+  "versionIdMeaning": "Native buildId remains package version 1.6.2; source comes from immutable seal and installed binary hash, not a renamed timing/version field.",
+  "artifacts": {
+    "benchmark": {
+      "file": "app-benchmark.apk",
+      "bytes": 121553614,
+      "sha256": "d305f4ab8d3d61f57620f6fcd2eb40db4fce4aa0b76a6c90e44cfbcfb91cff73",
+      "all94AssetsMatchAccepted": true,
+      "libraries": {
+        "lib/arm64-v8a/libhorde_rt_probe_android.so": {
+          "sha256": "06b59c009374371f13cc9c84e93e4091caf6ee143ddca989a6deb02ff5412088",
+          "loadAlignmentBytes": [
+            16384,
+            16384,
+            16384
+          ]
+        },
+        "lib/armeabi-v7a/libhorde_rt_probe_android.so": {
+          "sha256": "5c6a572b89efae3fb8f09d9f2f8c66ac33d7669c2f94eeef10db687e8bc97677",
+          "loadAlignmentBytes": [
+            16384,
+            16384,
+            16384
+          ]
+        },
+        "lib/x86/libhorde_rt_probe_android.so": {
+          "sha256": "ec8ed1a406d494d1c8007c76fc014d7e171b26046c1a5793e7ae7b5dc4662745",
+          "loadAlignmentBytes": [
+            16384,
+            16384,
+            16384
+          ]
+        },
+        "lib/x86_64/libhorde_rt_probe_android.so": {
+          "sha256": "ab50f5d527ea95f5801793ad3f690bec2768b53b3a8cef0f4e11d6b5c44a0fc8",
+          "loadAlignmentBytes": [
+            16384,
+            16384,
+            16384
+          ]
+        }
+      }
+    },
+    "debug": {
+      "file": "app-debug.apk",
+      "bytes": 138462962,
+      "sha256": "ccf1aeb2130881be658b2bd30680812959f11c91a01ff561d5530cd53195d222",
+      "all94AssetsMatchAccepted": true,
+      "libraries": {
+        "lib/arm64-v8a/libhorde_rt_probe_android.so": {
+          "sha256": "9f0852f9eb09c2828e34e4fd53d2c3652462f3c910c6980957253d68cba3e403",
+          "loadAlignmentBytes": [
+            16384,
+            16384,
+            16384
+          ]
+        },
+        "lib/armeabi-v7a/libhorde_rt_probe_android.so": {
+          "sha256": "8f23ad0549cbf50155f587787daf4a59bfe54327b290afeb41347cf9311d2148",
+          "loadAlignmentBytes": [
+            16384,
+            16384,
+            16384
+          ]
+        },
+        "lib/x86/libhorde_rt_probe_android.so": {
+          "sha256": "83d0e33f8a776f155f35a6bd7f059fd18ed7ea858c947e730d7470cb359754fb",
+          "loadAlignmentBytes": [
+            16384,
+            16384,
+            16384
+          ]
+        },
+        "lib/x86_64/libhorde_rt_probe_android.so": {
+          "sha256": "4b598a7ecb3b1c0f1b098e4ebcbb541322cd3329f8e734051c45288a2519a1ab",
+          "loadAlignmentBytes": [
+            16384,
+            16384,
+            16384
+          ]
+        }
+      }
+    }
+  },
+  "policy": {
+    "benchmark": "Shipping/Mobile, min33, present timing/motion opt-in ON; non-debuggable; Debug checkpoints/viewmodel/staged primary Off",
+    "ordinaryDebug": "Diagnostic/Mobile, min50, isolated motion/present timing Off"
+  },
+  "checks": {
+    "androidDebugTests": 249,
+    "androidBenchmarkTests": 249,
+    "javaFailuresErrorsSkips": 0,
+    "lint": "both passed",
+    "host": "3/3 motion-policy/scenario/collector",
+    "pythonMotion": "13 passed",
+    "admission": "CMake and actual Gradle matrix passed"
+  },
+  "ci": {
+    "source": {
+      "aggregate": "12/12 success",
+      "push": 37791531274,
+      "pullRequest": 37791538576
+    },
+    "analyzer": {
+      "source": "729c2bec0d94dee291fb5a07ea9539fa1be32ddf",
+      "aggregate": "12/12 success",
+      "push": 37788814616,
+      "pullRequest": 37788822454
+    }
+  },
+  "phone": {
+    "model": "SM-S948B",
+    "android": "16",
+    "package": "com.samfa12.hordelanternrt.benchmark",
+    "installedBaseMatchesSeal": true,
+    "primaryGameAppReinstalled": false,
+    "primaryGameplayPreferencesAndMenuMix": "byte-identical",
+    "originalIsolatedSave": {
+      "scale": 75,
+      "water": "Mobile",
+      "fire": "Mobile",
+      "glass": true,
+      "shadow": "Current",
+      "cap": 30,
+      "mist": true,
+      "dust": "Off"
+    },
+    "temporaryComparisonSave": {
+      "scale": 50,
+      "water": "Mobile",
+      "fire": "Mobile",
+      "glass": false,
+      "shadow": "Current",
+      "cap": 30,
+      "mist": true,
+      "dust": "Off"
+    },
+    "saveMethod": "Normal native controls: reset draft to mobile defaults, Use, exact native acknowledgement, enabled Keep.",
+    "motionMeasurement": "not launched: first starting-state guard rejected warm phone",
+    "failedPrelaunch": {
+      "runId": "mobile50-motion01",
+      "frameworkStatus": 0,
+      "currentHalCelsius": {
+        "AP": 38.2,
+        "BAT": 34.6,
+        "SKIN": 36.2
+      },
+      "ceilingsCelsius": {
+        "AP": 31.5,
+        "BAT": 29.5,
+        "SKIN": 32.5
+      },
+      "launchOwned": false
+    },
+    "ownedAppsStopped": true
+  },
+  "failuresPreserved": [
+    "First valid-motion Java fixture omitted mandatory adverse counters; corrected, no guard weakened.",
+    "First opt-in Gradle evaluation referenced viewmodelCandidate before declaration; corrected, min33 viewmodel guard retained.",
+    "Two benchmark Graphics fixtures assumed ordinary minimum50; now assert separate experimental33/40 variants and Experimental labelling.",
+    "First 50% phone starting-state admission rejected all three HAL temperatures before launch."
+  ],
+  "scope": "Build/host/admission/install/setup checkpoint only. No completed 50/40/33 motion cohort, sustained FPS, thermal plateau, reliable power, owner quality acceptance, independent Eric audit or release."
+}

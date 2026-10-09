@@ -1,0 +1,68 @@
+{
+  "eligible": true,
+  "reportSha256": "be357fe1ec46ba6150e7116307e49785d4dab698208025d4be30129f494102ce",
+  "settings": {
+    "schema": 2,
+    "result": "complete",
+    "status": "complete",
+    "measuredFrames": 600,
+    "runId": "present-timing-2a408613-lantern01",
+    "timestampUtc": "2026-10-08T11:48:33Z",
+    "build": "1.6.2",
+    "shader": "opaqueFast:shipping_mobile_opaque_fast@b3da473c5760f5394eac56ab802cc9f84ec78d75899cedf90a215f6198bee9be|genericDielectric:shipping_mobile_generic_dielectric@cb8c41ae5a54c68c9c5ab39e78402737ce4efce802ea1b3e5f7db364e676a7f9",
+    "gpu": "Adreno (TM) 840",
+    "vulkanApi": "1.4.295",
+    "rtMode": "RayTracingPipeline",
+    "executionBackend": "RayTracingPipeline",
+    "presentMode": "MAILBOX",
+    "workload": "lantern-held-high-v1",
+    "simulationPolicy": "frozen-authored-snapshot",
+    "renderScalePercent": 75,
+    "internalExtent": {
+      "width": 1080,
+      "height": 2235
+    },
+    "presentationExtent": {
+      "width": 1440,
+      "height": 2980
+    },
+    "lapsCompleted": 2,
+    "lapsRequested": 2,
+    "routeTraversalComplete": false,
+    "workloadComplete": true
+  },
+  "scope": {
+    "measurementGeneration": 6,
+    "sceneEpoch": 2,
+    "surfaceGeneration": 1,
+    "swapchainSerial": 1,
+    "matchedCompletedFrames": 600,
+    "matchedTimingRows": 600,
+    "acceptedTimingRows": 1201,
+    "intervalCount": 599,
+    "durationNanoseconds": 55604168156,
+    "firstActualPresentTimeNanoseconds": 889892269361459,
+    "lastActualPresentTimeNanoseconds": 889947873529615
+  },
+  "intervalsNanoseconds": {
+    "median": 91666667,
+    "p90NearestRank": 95833334,
+    "p95NearestRank": 95833385,
+    "maximum": 100000000,
+    "over33333000Nanoseconds": 599,
+    "over250000000Nanoseconds": 0
+  },
+  "observedPresentedImageRatePerSecond": 10.772574,
+  "collector": {
+    "queryCalls": 2114,
+    "acceptedPresents": 1201,
+    "incompleteQueries": 6,
+    "queryCpuWallNanoseconds": 29262824,
+    "presentMarginAtLeast2Pow63CountIgnored": 600
+  },
+  "limits": [
+    "Observed inter-present intervals and rate describe only this matched short measured span.",
+    "Not sustained performance, scanout completion, photons, or CPU/GPU reciprocal timing.",
+    "presentMargin is preserved only as an anomaly count and is excluded from all metrics."
+  ]
+}

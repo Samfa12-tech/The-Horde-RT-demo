@@ -19,6 +19,8 @@ using horde::platform::windows::LegacyAxisSample;
 using horde::platform::windows::LegacyRightStickAxes;
 using horde::platform::windows::ControllerActionEdges;
 using horde::platform::windows::ControllerTriggerLatch;
+using horde::platform::windows::ControllerPollDisposition;
+using horde::platform::windows::ControllerFocusLatch;
 using horde::platform::windows::LegacyControllerIdentity;
 using horde::platform::windows::MapLegacyControllerEdges;
 using horde::platform::windows::MapLegacyControllerMenuEdges;
@@ -110,6 +112,34 @@ int main()
                   finaleRewardCapture.requireSwordPixels &&
                   !finaleRewardCapture.permitsCompleteWallRetraction);
 
+    using namespace horde::gameplay::items;
+    HeldItemState stableStow;
+    stableStow.id = HeldItemId::Sword;
+    stableStow.hand = HeldHand::RightHand;
+    stableStow.parentMode = HeldItemParentMode::BodyStow;
+    stableStow.visualStowBlend = 1.0f;
+    stableStow.visualGripBlend = 0.0f;
+    const auto stowPolicy = ClaimedRewardCapturePolicy("finale-roof",
+        horde::platform::windows::IsCaptureSwordFullyStowed(stableStow));
+    Require(stowPolicy.requirePlayerPixels && stowPolicy.requireRewardBodyPixels &&
+            stowPolicy.requireRewardRingPixels && !stowPolicy.requireSwordPixels &&
+            !stowPolicy.permitsCompleteWallRetraction,
+            "fully stowed sword only changes sword primary visibility, preserving reward proof");
+    for (unsigned invalid = 0; invalid < 7; ++invalid)
+    {
+        auto other = stableStow;
+        if (invalid == 0) other.transition.active = true;
+        if (invalid == 1) other.visualStowBlend = 0.9f;
+        if (invalid == 2) other.visualGripBlend = 0.1f;
+        if (invalid == 3) other.parentMode = HeldItemParentMode::HandSocket;
+        if (invalid == 4) other.detached = true;
+        if (invalid == 5) other.id = HeldItemId::OriginalTorch;
+        if (invalid == 6) other.hand = HeldHand::LeftHand;
+        Require(ClaimedRewardCapturePolicy("finale-roof",
+                    horde::platform::windows::IsCaptureSwordFullyStowed(other)).requireSwordPixels,
+                "held, partial, moving or invalid stow must not waive held-sword visibility");
+    }
+
     using horde::gameplay::interactions::ChestRewardPrompt;
     Require(WindowsChestPromptText(ChestRewardPrompt::Locked) ==
                 "LOCKED | DEFEAT THE LICH" &&
@@ -161,6 +191,38 @@ int main()
         .productId = 0x0204u,
         .productName = "Microsoft PC-joystick driver",
     };
+
+    ControllerFocusLatch focusLatch{};
+    Require(focusLatch.Observe(true) == ControllerPollDisposition::Reseed,
+            "first focused controller poll must seed held inputs without delivering them");
+    focusLatch.CompleteReseed();
+    Require(focusLatch.Observe(true) == ControllerPollDisposition::Deliver,
+            "controller input must deliver after its initial focused baseline");
+    Require(focusLatch.Observe(false) == ControllerPollDisposition::Suppress &&
+                focusLatch.Observe(false) == ControllerPollDisposition::Suppress,
+            "unfocused controller polls must suppress delivery");
+    Require(focusLatch.Observe(true) == ControllerPollDisposition::Reseed,
+            "focus return must reseed held controller buttons before delivery");
+    focusLatch.CompleteReseed();
+    Require(focusLatch.Observe(true) == ControllerPollDisposition::Deliver,
+            "controller delivery must resume after the focus-return baseline is seeded");
+    const std::uint32_t heldButtons = 0x0803u;
+    Require(!MapLegacyControllerEdges(heldButtons, heldButtons, capturedBackbone).Any() &&
+                !MapLegacyControllerMenuEdges(
+                    heldButtons, heldButtons, 18000u, 18000u, capturedBackbone).Any(),
+            "buttons held through focus return must not become gameplay or menu presses");
+    Require(!MapLegacyControllerEdges(0u, heldButtons, capturedBackbone).Any() &&
+                MapLegacyControllerEdges(heldButtons, 0u, capturedBackbone).Any() &&
+                MapLegacyControllerMenuEdges(
+                    heldButtons, 0u, 65535u, 65535u, capturedBackbone).Any(),
+            "release then repress after focus return must produce fresh gameplay and menu edges");
+    ControllerTriggerLatch focusTriggerLatch{};
+    horde::platform::windows::SeedXInputTriggerLatch(0u, 255u, focusTriggerLatch);
+    Require(!UpdateXInputTriggerEdges(0u, 255u, focusTriggerLatch).Any(),
+            "a trigger held through focus return must be seeded without a gameplay action");
+    UpdateXInputTriggerEdges(0u, 0u, focusTriggerLatch);
+    Require(UpdateXInputTriggerEdges(0u, 255u, focusTriggerLatch).attackPressed,
+            "a trigger released then pressed after focus return must produce a fresh action");
 
     // Owner-captured WinMM evidence for VID 358A / PID 0204: the physical
     // right stick moves Z/R while U/V remain fixed at zero. The generic

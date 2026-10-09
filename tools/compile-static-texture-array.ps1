@@ -9,7 +9,8 @@ param(
     [Parameter(Mandatory = $true)][ValidateSet("srgb", "linear")][string]$Transfer,
     [int]$Width = 512,
     [int]$Height = 512,
-    [string]$KtxPath = ""
+    [string]$KtxPath = "",
+    [ValidateSet("", "bt709")][string]$AssignPrimaries = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -30,9 +31,14 @@ if ([string]::IsNullOrWhiteSpace($KtxPath)) {
 if (-not (Test-Path -LiteralPath $KtxPath)) { throw "KTX-Software 4.4.2 is required for runtime texture compilation." }
 $resolvedOutput = [IO.Path]::GetFullPath($OutputPath)
 New-Item -ItemType Directory -Path (Split-Path -Parent $resolvedOutput) -Force | Out-Null
+$metadataOptions = @()
+if (-not [string]::IsNullOrWhiteSpace($AssignPrimaries)) {
+    # Assignment records declared primaries; it never converts source pixels.
+    $metadataOptions = @("--assign-primaries", $AssignPrimaries)
+}
 & $KtxPath create --testrun --format $Format --layers $resolvedInputs.Count `
     --width $Width --height $Height --generate-mipmap --assign-tf $Transfer `
-    @resolvedInputs $resolvedOutput
+    @metadataOptions @resolvedInputs $resolvedOutput
 if ($LASTEXITCODE -ne 0) { throw "KTX2 array compilation failed for $resolvedOutput." }
 & $KtxPath validate $resolvedOutput
 if ($LASTEXITCODE -ne 0) { throw "KTX2 validation failed for $resolvedOutput." }

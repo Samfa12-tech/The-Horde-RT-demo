@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <array>
 #include <cmath>
 #include <cstddef>
@@ -19,6 +20,13 @@ struct RoutePosition
 {
     float x;
     float z;
+};
+
+struct SkeletonSpawnPose
+{
+    RoutePosition position;
+    float facingRadians;
+    float walkingAnimationPhaseSeconds;
 };
 
 struct RouteRect
@@ -48,6 +56,39 @@ inline constexpr float kPlayerCollisionRadius = 0.24f;
 inline constexpr RoutePosition kPlayerSpawn{0.0f, 1.85f};
 inline constexpr RoutePosition kSkeletonRoomCenter{0.0f, -4.8f};
 inline constexpr RoutePosition kSkylightChamberCenter{-5.5f, -15.2f};
+inline constexpr RouteRect kWaterfallSkeletonRoomBounds{-8.5f, -2.5f, -18.0f, -12.4f};
+// The Waterfall encounter stages the existing pair in the west-side room.
+// This inset arena stays west of the x=-2.5 route boundary/wetline.
+inline constexpr RoutePosition kWaterfallSkeletonPairCenter = kSkylightChamberCenter;
+// The approach crosses the wetline westbound from +X. In that heading, the
+// player's right side is -Z. Keep the authored guard order stable: Skeleton A
+// holds the right lane and Skeleton B the left, both facing the arrival side.
+// The shipped skeleton Walking clip is 1.033 s; its 0.90 locomotion rate makes
+// B's 0.65 s phase a 0.585 s sample offset, just over half a gait cycle.
+inline constexpr std::array<SkeletonSpawnPose, 2> kWaterfallSkeletonGuardSpawns{{
+    {{kWaterfallSkeletonPairCenter.x, kWaterfallSkeletonPairCenter.z - 0.75f},
+     1.57079632679f, 0.0f},
+    {{kWaterfallSkeletonPairCenter.x, kWaterfallSkeletonPairCenter.z + 0.75f},
+     1.57079632679f, 0.65f},
+}};
+inline constexpr float kWaterfallSkeletonArenaRadius = 2.30f;
+inline constexpr float kWaterfallSwordCueRadius = 6.0f;
+
+inline bool IsWaterfallSkeletonArena(float x, float z)
+{
+    return std::hypot(x - kWaterfallSkeletonPairCenter.x,
+                      z - kWaterfallSkeletonPairCenter.z) <=
+           kWaterfallSkeletonArenaRadius;
+}
+
+inline constexpr bool IsWaterfallSkeletonRoom(float x, float z)
+{
+    return x >= kWaterfallSkeletonRoomBounds.minX &&
+           x <= kWaterfallSkeletonRoomBounds.maxX &&
+           z >= kWaterfallSkeletonRoomBounds.minZ &&
+           z <= kWaterfallSkeletonRoomBounds.maxZ;
+}
+
 inline constexpr std::array<RoutePosition, 4> kTorchBayCenters{{
     {-11.0f, -15.2f},
     {-16.0f, -15.2f},
@@ -56,6 +97,30 @@ inline constexpr std::array<RoutePosition, 4> kTorchBayCenters{{
 }};
 inline constexpr RoutePosition kTransmissionThresholdCenter{-29.5f, -15.2f};
 inline constexpr RoutePosition kFinaleCenter{-33.7f, -15.2f};
+// Keeper presentation stays on the entrance-to-reward axis. The live retry is
+// on the arrival side; historical capture checkpoint positions stay separate.
+inline constexpr RoutePosition kKeeperStagingPosition{-34.70f, -15.20f};
+inline constexpr RoutePosition kKeeperRetryPosition{-31.20f, -15.20f};
+inline constexpr RouteRect kKeeperArrivalThreshold{-31.65f, -30.50f, -16.55f, -13.85f};
+inline constexpr float kKeeperPresentationCollisionRadius = 0.65f;
+// The two authored Keeper torch stands are also physical route obstacles.
+// Renderer anchors consume these same centers; the measured square bases are
+// 0.32 m wide in world X/Z.
+inline constexpr float kKeeperTorchStandBaseHalfExtent = 0.16f;
+inline constexpr std::array<RoutePosition, 2> kKeeperTorchStandCenters{{
+    {kKeeperStagingPosition.x - 0.80f, kKeeperStagingPosition.z - 1.15f},
+    {kKeeperStagingPosition.x - 0.80f, kKeeperStagingPosition.z + 1.15f},
+}};
+inline constexpr std::array<RouteRect, 2> kKeeperTorchStandCollisionRects{{
+    {kKeeperTorchStandCenters[0].x - kKeeperTorchStandBaseHalfExtent,
+     kKeeperTorchStandCenters[0].x + kKeeperTorchStandBaseHalfExtent,
+     kKeeperTorchStandCenters[0].z - kKeeperTorchStandBaseHalfExtent,
+     kKeeperTorchStandCenters[0].z + kKeeperTorchStandBaseHalfExtent},
+    {kKeeperTorchStandCenters[1].x - kKeeperTorchStandBaseHalfExtent,
+     kKeeperTorchStandCenters[1].x + kKeeperTorchStandBaseHalfExtent,
+     kKeeperTorchStandCenters[1].z - kKeeperTorchStandBaseHalfExtent,
+     kKeeperTorchStandCenters[1].z + kKeeperTorchStandBaseHalfExtent},
+}};
 // The reward is staged against the rear wall of the lich/finale room, clear of
 // the combat centre and with a walkable 1.30 m interaction stand-off to its
 // east. The production chest's audited 1.02 x 0.654 m base is rotated by
@@ -76,7 +141,7 @@ inline constexpr std::array<RouteRect, 9> kShowcaseWalkableRects{{
     {0.0f, 4.8f, -11.2f, -8.8f},        // Shadow corridor: east.
     {3.6f, 6.0f, -15.2f, -10.0f},       // Shadow corridor: south.
     {-2.5f, 4.8f, -16.4f, -14.0f},      // Shadow corridor: west.
-    {-8.5f, -2.5f, -18.0f, -12.4f},     // Skylight chamber.
+    kWaterfallSkeletonRoomBounds,       // Skylight / Waterfall room.
     {-28.5f, -8.5f, -16.8f, -13.6f},    // Four five-metre torch bays.
     {-30.5f, -28.5f, -16.8f, -13.6f},   // Transmission threshold.
     {-36.9f, -30.5f, -18.4f, -12.0f},   // Finale room.
@@ -84,15 +149,26 @@ inline constexpr std::array<RouteRect, 9> kShowcaseWalkableRects{{
 
 // The gallery and arch posts are retained from the original chamber. The two
 // far-wall returns enforce the framed 1.8 m doorway at z=-6.4.
-// Static masonry/acoustic obstacles. The reward chest remains a separate
-// physical collider because positional sound emitted from its centre must not
-// be classified as crossing a wall.
-inline constexpr std::array<RouteRect, 5> kShowcaseSolidObstacles{{
+// Full-height masonry used by the existing heightless acoustic approximation.
+// Low props must not acquire wall attenuation or self-occlude positional cues.
+inline constexpr std::array<RouteRect, 5> kShowcaseMasonryObstacles{{
     {-10.0f, -0.72f, 0.05f, 2.35f},
     {-1.20f, -0.78f, -3.55f, -3.25f},
     {0.78f, 1.20f, -3.55f, -3.25f},
     {-1.85f, -0.90f, -6.50f, -6.30f},
     {0.90f, 1.85f, -6.50f, -6.30f},
+}};
+
+// Movement additionally respects the low Keeper stand bases. The reward chest
+// retains its separate existing movement collider.
+inline constexpr std::array<RouteRect, 7> kShowcaseSolidObstacles{{
+    kShowcaseMasonryObstacles[0],
+    kShowcaseMasonryObstacles[1],
+    kShowcaseMasonryObstacles[2],
+    kShowcaseMasonryObstacles[3],
+    kShowcaseMasonryObstacles[4],
+    kKeeperTorchStandCollisionRects[0],
+    kKeeperTorchStandCollisionRects[1],
 }};
 
 constexpr bool Contains(const RouteRect& rect, float x, float z)
@@ -142,6 +218,38 @@ inline void ResolveMovementAgainstRect(const RouteRect& rect,
     }
 }
 
+// A small staged actor needs the same swept clearance on a walk or dodge.
+// Stop at the first contact, retaining the tangent component of ordinary
+// movement; the route/chest solver still owns the outer walkable envelope.
+inline void ResolveMovementAgainstCircle(RoutePosition centre, float radius,
+                                         float previousX, float previousZ,
+                                         float& proposedX, float& proposedZ)
+{
+    const float moveX = proposedX - previousX;
+    const float moveZ = proposedZ - previousZ;
+    const float offsetX = previousX - centre.x;
+    const float offsetZ = previousZ - centre.z;
+    const float lengthSquared = moveX * moveX + moveZ * moveZ;
+    if (lengthSquared < 0.00000001f) return;
+    const float closest = std::clamp(-(offsetX * moveX + offsetZ * moveZ) / lengthSquared, 0.0f, 1.0f);
+    const float closeX = offsetX + closest * moveX;
+    const float closeZ = offsetZ + closest * moveZ;
+    if (closeX * closeX + closeZ * closeZ >= radius * radius) return;
+    const float along = offsetX * moveX + offsetZ * moveZ;
+    const float discriminant = along * along - lengthSquared *
+        (offsetX * offsetX + offsetZ * offsetZ - radius * radius);
+    const float contact = std::clamp((-along - std::sqrt(std::max(0.0f, discriminant))) / lengthSquared, 0.0f, 1.0f);
+    const float hitX = previousX + contact * moveX;
+    const float hitZ = previousZ + contact * moveZ;
+    const float normalX = (hitX - centre.x) / radius;
+    const float normalZ = (hitZ - centre.z) / radius;
+    const float remainingX = (1.0f - contact) * moveX;
+    const float remainingZ = (1.0f - contact) * moveZ;
+    const float inward = std::min(0.0f, remainingX * normalX + remainingZ * normalZ);
+    proposedX = hitX + remainingX - inward * normalX;
+    proposedZ = hitZ + remainingZ - inward * normalZ;
+}
+
 constexpr ShowcaseZone QueryShowcaseZone(float x, float z)
 {
     if (Contains({-1.85f, 1.85f, -3.25f, 3.4f}, x, z))
@@ -188,6 +296,14 @@ constexpr ShowcaseZone QueryShowcaseZone(float x, float z)
         return ShowcaseZone::Finale;
     }
     return ShowcaseZone::Outside;
+}
+
+constexpr bool HasReachedKeeperArrivalThreshold(float x, float z)
+{
+    // Testing the arrival plane also handles one fixed step crossing the whole
+    // shallow trigger strip. Only the actual finale room can satisfy it.
+    return x <= kKeeperArrivalThreshold.maxX &&
+           QueryShowcaseZone(x, z) == ShowcaseZone::Finale;
 }
 
 constexpr const char* ShowcaseZoneName(ShowcaseZone zone)

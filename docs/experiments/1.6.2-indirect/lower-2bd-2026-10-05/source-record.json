@@ -1,0 +1,498 @@
+{
+  "schemaVersion": 1,
+  "basisCommit": "2bdad1327eb1d4fedee9e9e223a3054536717749",
+  "scope": "Inactive source-only backup of optional prototype; no build hooks or runtime adoption",
+  "candidateSourcePatchSha256": "14793a7c95ee5554fbf490814fb2c83425a7f93283147b036b64a6b3363465cd",
+  "rawCandidateSourceZipSha256": "42f80d3118da32a8e1facc96e15c7d3594aa798ea5875cf424c15bd44a21b881",
+  "sourceFiles": [
+    {
+      "path": "src/reporting/BenchmarkSummaryReport.cpp",
+      "baseSha256": "20de56d6cee42072c5f47220b00687d621bee9adf060d28cfd58e500fd945ea2",
+      "candidateSha256": "8e6b7b67cc530427dcd3474afae0de3cb93872eb376972da769a4eaeef2a50ae",
+      "bytes": 10800,
+      "actualGitBlobSha256": "20de56d6cee42072c5f47220b00687d621bee9adf060d28cfd58e500fd945ea2",
+      "recordedCopyBasisRawMatchesGitBlob": true,
+      "canonicalPatchCandidateSha256": "4aac9fd7e600fbce4daabbb0ab6f720937e850210b446ade748c33fae3ebdee9"
+    },
+    {
+      "path": "src/telemetry/BenchmarkSummary.cpp",
+      "baseSha256": "078402771cb2231b81e63b1e2f6b838c91eb4573db7a9fbb865ccfcb808639dd",
+      "candidateSha256": "e6f5c9a9dec748ecf22be9bcd971e9d94355df5eba15c206741d6a3a1d6de92a",
+      "bytes": 13848,
+      "actualGitBlobSha256": "078402771cb2231b81e63b1e2f6b838c91eb4573db7a9fbb865ccfcb808639dd",
+      "recordedCopyBasisRawMatchesGitBlob": true,
+      "canonicalPatchCandidateSha256": "177792ae75093b5cdbcce27f344661322ca3c6a28d3face7301ced450925e2c6"
+    },
+    {
+      "path": "src/telemetry/BenchmarkSummary.h",
+      "baseSha256": "8aaed6f41522b7435bdda54df916bca52c12fb34ddfc876dc1bebea7994d6920",
+      "candidateSha256": "bb1a1e64f9da4ee06af28a04252cc32bc34431cb34851be0c65773832166d728",
+      "bytes": 4128,
+      "actualGitBlobSha256": "8aaed6f41522b7435bdda54df916bca52c12fb34ddfc876dc1bebea7994d6920",
+      "recordedCopyBasisRawMatchesGitBlob": true,
+      "canonicalPatchCandidateSha256": "9bef16702249f3f8180af904fd3cc98c19b7489338d8dc5db76fc16c33e94671"
+    },
+    {
+      "path": "src/telemetry/RtBenchmarkEvidenceReport.cpp",
+      "baseSha256": "cb41087fed3158a1b2ad4da14d3b4b4af833d54be209b352805d524a7301cea4",
+      "candidateSha256": "ed87254b8ce5c449959a1f2d292a84186c52a0593c2c1ec386a72b92c842b897",
+      "bytes": 25226,
+      "actualGitBlobSha256": "59030286a4a1385f89411fcd17ead4bfcf85339cccd1385c0d9b6652e52942a0",
+      "recordedCopyBasisRawMatchesGitBlob": false,
+      "canonicalPatchCandidateSha256": "ea1f3881b788ba8a346fd7c4aab28efdc57222d37e68da025406cf120b97cda9"
+    },
+    {
+      "path": "src/telemetry/RtBenchmarkEvidenceRun.cpp",
+      "baseSha256": "a98f341b2452caec8a61d8ecf99d300339eb04cc1584bf0140c4fe820988c171",
+      "candidateSha256": "0a4c74ce27c4a7f2cf1c188dc81d6d84c6dc2c1cd30019549e14623264d0ca93",
+      "bytes": 28751,
+      "actualGitBlobSha256": "69875ab6dc1bccafdae7317441f31250f0dda478a10feb30b36d30c0026716d9",
+      "recordedCopyBasisRawMatchesGitBlob": false,
+      "canonicalPatchCandidateSha256": "d61a50eba84f2be165bb259491c2c42701dcd4aeab7cd397f71f8742f28f9a26"
+    },
+    {
+      "path": "src/telemetry/RtBenchmarkEvidenceRun.h",
+      "baseSha256": "7b843b677339c4b473dc3cb988d3b9f59fe5992cd2f38df48cce1a03209f0d4c",
+      "candidateSha256": "cd541ed0d4182157827b00ddfb3d84a392a19943f5ac2b766d00ebdfcf939272",
+      "bytes": 9735,
+      "actualGitBlobSha256": "2c9db7b4dc33075aad84dbcbcbf2b3430b6819316adb33b0f9cc5a3211bae41a",
+      "recordedCopyBasisRawMatchesGitBlob": false,
+      "canonicalPatchCandidateSha256": "c095b4b218ff01b09b3f34aa984fa78cd15a0dd9b2308eee46583eed18c01d3d"
+    },
+    {
+      "path": "src/telemetry/RtPerformanceEvidence.cpp",
+      "baseSha256": "5531c42ddf4b72da95424c7da6c3d5f1d948e456b7b500d41361c54466896018",
+      "candidateSha256": "d1a6cae5a9c06501d8d2caa71a46ce8f868e3025044337ddd863810f52ed7407",
+      "bytes": 68165,
+      "actualGitBlobSha256": "5111031462e849a774e2fec7aaa56ab0c7a553d57af7cbad70c2b15a73bd069f",
+      "recordedCopyBasisRawMatchesGitBlob": false,
+      "canonicalPatchCandidateSha256": "fa89b7995688c4690834b5cd3d24e2ea503cf8227f6a267921fc24d3cda10175"
+    },
+    {
+      "path": "src/telemetry/RtPerformanceEvidence.h",
+      "baseSha256": "220903a7e0a3fc1c3f410bc87af048e7a70383dc9144be267c242f301b87861c",
+      "candidateSha256": "1dff5ab391229becbe65f9c3614d5196dab6aad7b438cd87c3723b59954490d5",
+      "bytes": 23923,
+      "actualGitBlobSha256": "a50359cb27f3d7ae8430bfed2919ddadd758cdc9d6cdd1cbd6e675eeb6e2e676",
+      "recordedCopyBasisRawMatchesGitBlob": false,
+      "canonicalPatchCandidateSha256": "5a655cc44f90697cc1109ebd9540cfb2c0ae94a9700ca3af764dadd7b586d73f"
+    },
+    {
+      "path": "src/platform/windows/DiagnosticWindow.cpp",
+      "baseSha256": "5fdc49b556296faf6fe1a18c86586646f2f3dc40d8bb8da37603a29f3cf778f5",
+      "candidateSha256": "065a6cfc48c01ab8f496a1cc4935ee9078730a4074ed64f01c22322b9a81bbb5",
+      "bytes": 410295,
+      "actualGitBlobSha256": "5fdc49b556296faf6fe1a18c86586646f2f3dc40d8bb8da37603a29f3cf778f5",
+      "recordedCopyBasisRawMatchesGitBlob": true,
+      "canonicalPatchCandidateSha256": "a05d9d21a1072c07ea7e76110f4e2b39243da94fb62d08846bc348dea0191b12"
+    },
+    {
+      "path": "src/platform/windows/WindowsBenchmarkLaunch.h",
+      "baseSha256": "c71da0be3b94c84031319f31b9e8e301fed7d5f0839017a6783e10f2f23e46c9",
+      "candidateSha256": "00025dff352c43ee11ab1398191a41bebe96a2892c89af38446e65fdd140e1e5",
+      "bytes": 10077,
+      "actualGitBlobSha256": "34a04f94392d366dcdf52e9ac09d465c2d6bcb64a6d0e7f1a350b94efebb2bcc",
+      "recordedCopyBasisRawMatchesGitBlob": false,
+      "canonicalPatchCandidateSha256": "e57cb18e014da5828583ae96cc30fc3dee0fb9bd8b6d8184e0976111c1bc4557"
+    },
+    {
+      "path": "src/platform/windows/WindowsBenchmarkSummaryReview.inl",
+      "baseSha256": "38d73212bb635d9ea18625d8b4b786223380807dea0930cb1e3efb6aa8e011e1",
+      "candidateSha256": "73a68d50bc3083204225b3a92d1bb0136939367b5caa78bd474cf950c854f8ad",
+      "bytes": 29313,
+      "actualGitBlobSha256": "96e68c17e740b7b73d26b691f11f21755abece1aaa3a1004ea83db6344001acd",
+      "recordedCopyBasisRawMatchesGitBlob": false,
+      "canonicalPatchCandidateSha256": "4e5a0cc8bd8df4439e0bf88e3c02ef86981ae3b043020fa0a262e5298c12a428"
+    },
+    {
+      "path": "src/platform/windows/WindowsGraphicsPreviewCapture.inl",
+      "baseSha256": "9daf45579c559ef3c785d472856ffe2929c474ff68e466778227535208b2fcfe",
+      "candidateSha256": "e0e0ce0ff70cedc50b661f71e8fe67d67a1b20b73fc384d5f199976e755307aa",
+      "bytes": 31050,
+      "actualGitBlobSha256": "2f5fb19ae09bd9511ce433af1c9b1f71c7c8051b96f984cdb3567328fde31fc0",
+      "recordedCopyBasisRawMatchesGitBlob": false,
+      "canonicalPatchCandidateSha256": "350df1205564d86fffb887f884a15f6db2cb3ab00e1b8d1b5c66bb3734e2be14"
+    },
+    {
+      "path": "src/vulkan/raytracing/PresentableTinyRtScene.cpp",
+      "baseSha256": "466f2dd83a25877e14ed1097f283be773cf7068d9fbbb244db549ef444fc66fc",
+      "candidateSha256": "059c9ab86e14c28dd2943d82c0faac6bd3652b85956f3f77e84719d173cd8a14",
+      "bytes": 396402,
+      "actualGitBlobSha256": "741449f3e7f888a8ab26f499ecb2cb12ef08bbe5508136286c7030cfdd563ca0",
+      "recordedCopyBasisRawMatchesGitBlob": false,
+      "canonicalPatchCandidateSha256": "5e1e78bbba1cff8e7a3c9666570a0f814c8e8b2b73897069967fe3cb110bdef6"
+    },
+    {
+      "path": "src/vulkan/raytracing/PresentableTinyRtScene.h",
+      "baseSha256": "717290a6b6bf47218498c461c6fb3ff87981474bd958b30b369d7faebc0758ad",
+      "candidateSha256": "b2c0184de78889ec7293eae61c42fb5b704ea793ac22e82caf595dcf31138a15",
+      "bytes": 42834,
+      "actualGitBlobSha256": "717290a6b6bf47218498c461c6fb3ff87981474bd958b30b369d7faebc0758ad",
+      "recordedCopyBasisRawMatchesGitBlob": true,
+      "canonicalPatchCandidateSha256": "923e914f3efa3e3ffc94e1b4e4fa92390958fd53a76dad6f495301ef25c18eea"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtSceneAbi.def",
+      "baseSha256": "e5b42a1614d97025e75e12d3cdb063095fdd67215e1cd45d77366c2920307ed1",
+      "candidateSha256": "ff7d977c15337fc2347a51ffeb7a5291157da731db31d59b0f10324e8190c65c",
+      "bytes": 8857,
+      "actualGitBlobSha256": "e5b42a1614d97025e75e12d3cdb063095fdd67215e1cd45d77366c2920307ed1",
+      "recordedCopyBasisRawMatchesGitBlob": true,
+      "canonicalPatchCandidateSha256": "57c7593133c5bbbf1a9bec49f7cf112c1c90eda03ad39be52b9a2cbd5229a1a8"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtSceneTuning.h",
+      "baseSha256": "3ae1764c6850e774b1065ac333102c7cc63fb6f85102ffa6f6c6badcfba2ee45",
+      "candidateSha256": "7efa0203fccf949f986f894638c8122a7c02e48e66728c8292a7c067860d3500",
+      "bytes": 5541,
+      "actualGitBlobSha256": "3ae1764c6850e774b1065ac333102c7cc63fb6f85102ffa6f6c6badcfba2ee45",
+      "recordedCopyBasisRawMatchesGitBlob": true,
+      "canonicalPatchCandidateSha256": "ba2b7e9c025138e3a17c25439027409081868eadc42b887e76731f6ce39f9525"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_dielectric_common.glsl",
+      "baseSha256": "d5a9fa6b08bd8e1d8017c039bd9f7116df0e2a4b2d841945fd7130db6a82134a",
+      "candidateSha256": "256c6f0cf7cc8569740e95fa8315574cf2980e5e4e86f5ee6f8897be87bfa353",
+      "bytes": 20197,
+      "actualGitBlobSha256": "d5a9fa6b08bd8e1d8017c039bd9f7116df0e2a4b2d841945fd7130db6a82134a",
+      "recordedCopyBasisRawMatchesGitBlob": true,
+      "canonicalPatchCandidateSha256": "c65f7e98a14923c6a6ae708a18a713d066dd890f15ffb28b7ea2d35acad26d79"
+    },
+    {
+      "path": "tools/raygen-variant-budgets.json",
+      "baseSha256": "0f130f8f1e50623772bf857561adafee23e730e2691c35e31cb6455df4b258ba",
+      "candidateSha256": "4ade23464d9ce99d754157fcc57e4d5ca25cd54a71a9b7d397b308634bd6a0c2",
+      "bytes": 6425,
+      "actualGitBlobSha256": "db5f05b2e8bbbb4c387e0a4cda51fe3556d7442543786693a3933be57c043aec",
+      "recordedCopyBasisRawMatchesGitBlob": false,
+      "canonicalPatchCandidateSha256": "74f1c5c203d8bc54aa2889861b37a4804580683362bffd7f86beccc6b5bdf1a3"
+    },
+    {
+      "path": "tests/BenchmarkSummaryReportTests.cpp",
+      "baseSha256": "eadb87d82c723153b9056c8f30477ece068e615ab4ddd25f10a146b8da08386c",
+      "candidateSha256": "7787b1708ff7ac8728d3da0a5544a31129e757ca369c46566f982e8a16ab5a5f",
+      "bytes": 28635,
+      "actualGitBlobSha256": "eadb87d82c723153b9056c8f30477ece068e615ab4ddd25f10a146b8da08386c",
+      "recordedCopyBasisRawMatchesGitBlob": true,
+      "canonicalPatchCandidateSha256": "7787b1708ff7ac8728d3da0a5544a31129e757ca369c46566f982e8a16ab5a5f"
+    },
+    {
+      "path": "tests/RaygenVariantArtifactTests.ps1",
+      "baseSha256": "6ee58398a7087e2b82be57e730c1b3b376d826840679f84a6b7bf821da09ca80",
+      "candidateSha256": "e03ece68695e4b5f6fa2d4b1a1f1ff9b29016d6e58394647a35d5dc48d0f225d",
+      "bytes": 53958,
+      "actualGitBlobSha256": "0ad7a4c9ac9bfe8fba25bfc87147083813c327b75d149620047ca8a3cc4a2f14",
+      "recordedCopyBasisRawMatchesGitBlob": false,
+      "canonicalPatchCandidateSha256": "d734f996cddd5e0e7914f82a51cc89f9285b1ffe483ed82991109e8d4aa4d43b"
+    },
+    {
+      "path": "tests/RaygenVariantManifestTests.ps1",
+      "baseSha256": "2db3b0fa3a18e7b7c045a3d2dcac34a73d328e4cddcfe29cab031915d6f49a31",
+      "candidateSha256": "a31613fc36cba863a8bbf2f9a7257bff6ca617c3ce20bda8dbf85a857910ded5",
+      "bytes": 27597,
+      "actualGitBlobSha256": "8349bec5a0353e2ec42322015feb26f5cfea895cb14ac836a69fd5691bcebf8f",
+      "recordedCopyBasisRawMatchesGitBlob": false,
+      "canonicalPatchCandidateSha256": "53f64419575a9ba9f7557880e1410b96edbe6bca9b46604faea7dc31c20cdd0b"
+    },
+    {
+      "path": "tests/RtSceneResourceInventoryTests.cpp",
+      "baseSha256": "d4c2e9c954720523951072710d8404bb51127177f124d4d67f0e759f1a104732",
+      "candidateSha256": "05e1df5d7745bfc2a595f9d845d258f91a91f409ba8cfaa04906b5885b8ae44f",
+      "bytes": 82825,
+      "actualGitBlobSha256": "72cd33b05d8ec8eef85952259e3b19db8304fa3158eb6e52a6d85b5de5d255fb",
+      "recordedCopyBasisRawMatchesGitBlob": false,
+      "canonicalPatchCandidateSha256": "23bb36c0b54eb4b72e84b0045b1353f81e69120b9f1f6febe260037c25ea511d"
+    },
+    {
+      "path": "tests/WindowsBenchmarkLaunchTests.cpp",
+      "baseSha256": "4e0042aee3754a49381447c8938daf04016bdeecffa0b63f868c7225f4e3fdd2",
+      "candidateSha256": "0e52d7562cd30e411b5fc10910e7a97cd3153c56fc7aa8bd47f50fad3d1f9ab6",
+      "bytes": 14776,
+      "actualGitBlobSha256": "052ea4c7dbbedc3d2f57660e8cdd21ab6ef9b2345ed44860d69cf97ac5ca807b",
+      "recordedCopyBasisRawMatchesGitBlob": false,
+      "canonicalPatchCandidateSha256": "d69ee9e16adf87f174a9d2b572267e1aa8ca7daa7c91de65d998d5f005c80bb2"
+    },
+    {
+      "path": "android/app/build.gradle",
+      "baseSha256": "cf387b7d56f53d125c6a2c5d77f713976fff898538086ee7f5942e3107016a19",
+      "candidateSha256": "0812a4df02da4ba2367dd324abed3df3cc74ad4fe53ea196c8318b4c98ccd45f",
+      "bytes": 29166,
+      "actualGitBlobSha256": "cba6a540c72a3d3126034a6bd8d8840df68a67c28688dd9e96ea75aa5b2c9d3e",
+      "recordedCopyBasisRawMatchesGitBlob": false,
+      "canonicalPatchCandidateSha256": "7d3453c3ed0ae807c5a136f3fda79dc714f8347f5c970227dd9bfd446966b1ca"
+    },
+    {
+      "path": "android/app/src/main/cpp/android_probe_bridge.cpp",
+      "baseSha256": "14188685830864482ef436bf02632fa49eb67231d201e053863ada3c399c3c05",
+      "candidateSha256": "a47e90e296bb30951394752fb3331a00cdb208f2c8e552fb5b54117f1c4451cb",
+      "bytes": 256292,
+      "actualGitBlobSha256": "14188685830864482ef436bf02632fa49eb67231d201e053863ada3c399c3c05",
+      "recordedCopyBasisRawMatchesGitBlob": true,
+      "canonicalPatchCandidateSha256": "a68e9f2b5cb0f5f1994f0b34c1ec5e38aebd1188e6450ee78ccd355f74092153"
+    },
+    {
+      "path": "android/app/src/main/cpp/CMakeLists.txt",
+      "baseSha256": "f2f8177f300db0e5184e89bc5b97583cffbd397a23cc3b2d7fcb7b3824859564",
+      "candidateSha256": "0b44cd9a15db1238fdeda4ffda76a48768edc5721db183b260ff8d166d9753b5",
+      "bytes": 4356,
+      "actualGitBlobSha256": "e5ed1fe68336b514aff450cc902002f00ffc63b70ebc94b2ed1f93150d5ef657",
+      "recordedCopyBasisRawMatchesGitBlob": false,
+      "canonicalPatchCandidateSha256": "22f3cdc39ed9abe2e302e46eeefc344d1cbfeb6b810778d5f92f79878edeaf8c"
+    },
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java",
+      "baseSha256": "eecee7748bb0af0f8b55ae28b28b79c3a30b23dba0f1f5cf697718d30433bde8",
+      "candidateSha256": "3e576f805379d676b0daae8c9a316466d55d4296403721d964797527308171a5",
+      "bytes": 256123,
+      "actualGitBlobSha256": "b7c28f3e5f0cc32bbe9ce60a7def94cd344b6d7bfd0ba469f90085f790526928",
+      "recordedCopyBasisRawMatchesGitBlob": false,
+      "canonicalPatchCandidateSha256": "2f59b628e897c2571a6f6fc6e9887bb1d7fdbb370c57282639733864f0bf9c37"
+    },
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/ProbeBridge.java",
+      "baseSha256": "b378b64f268169efc58788be31db84ce7c0d87f0927d7eac9ba9e5309fa80d36",
+      "candidateSha256": "d86b075d47aba349007a29eb4de8f9f7122440d8023e9d9233c9afc60b89d61b",
+      "bytes": 7552,
+      "actualGitBlobSha256": "b378b64f268169efc58788be31db84ce7c0d87f0927d7eac9ba9e5309fa80d36",
+      "recordedCopyBasisRawMatchesGitBlob": true,
+      "canonicalPatchCandidateSha256": "1df24412e9fe203a2f93ed92e764c31511cf4eed4d929da06855fb1d1ad0eeaa"
+    },
+    {
+      "path": "CMakeLists.txt",
+      "baseSha256": "abdc064b3fc55bf2d440084ec717ab92e3011c655f71dd41cf8d5be24d96f1f6",
+      "candidateSha256": "d2df6d269548d25594ce969476659eb2add6d672cf5c0f79056993505ab38a6b",
+      "bytes": 70051,
+      "actualGitBlobSha256": "76832ffcaf81429f4823afd6dd41b67745e0091ca2b78cdc05bbd176de3975e4",
+      "recordedCopyBasisRawMatchesGitBlob": false,
+      "canonicalPatchCandidateSha256": "11951d1850e94648ace496d44e30d99976be1a95f46a3c8382e8e991f336ae6b"
+    },
+    {
+      "path": "src/telemetry/RtIndirectLightingTrialAck.h",
+      "sha256": "8f464356b5cfc60dfb4df36e36ebf4314e9b1d0e59a59ac22e4a735d0bb774a2",
+      "bytes": 1151,
+      "canonicalPatchCandidateSha256": "cce05a8d86c44bf6105b084b8f51193e35a5291290c207f978ff699b5f65a255"
+    },
+    {
+      "path": "src/platform/windows/WindowsIndirectLightingTrialLaunch.h",
+      "sha256": "28bd74541b56b9e8bd055532ac2cf0f709b94dcf513b6734a9e1c7007709a9b9",
+      "bytes": 1672,
+      "canonicalPatchCandidateSha256": "15b5b3776e31803fb1f076231eac354238d5ab1a70c00236578f734babd0ed0e"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtIndirectLightingTrial.h",
+      "sha256": "c6ff94cf58b95a406fc1899b45bdd1219f5d0c1b673f9b17944a3a3babe45570",
+      "bytes": 2341,
+      "canonicalPatchCandidateSha256": "18c0f45d424619f03424740c0a17c8e07c232f9695c2fd09ddeea520dbeeabab"
+    },
+    {
+      "path": "tests/RtIndirectLightingTrialTests.cpp",
+      "sha256": "b64fb5b6169428498660313aa8ee23537ccb7cc980d6c7d4d198cea617304b13",
+      "bytes": 9472,
+      "canonicalPatchCandidateSha256": "6e12a8396b4cc36cc36b3f0b095db744643fa4a1c79918374957d365b4ec15eb"
+    },
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/IndirectLightingTrialIntent.java",
+      "sha256": "e322f221bff9b348f0683a070811a06ac8b3872c08b8da0c4ae29195540b0532",
+      "bytes": 974,
+      "canonicalPatchCandidateSha256": "7a7d3f55c6adb001d7f66527b93dd15cc75fe72cac3faf1bd99bcdf1c7025d17"
+    },
+    {
+      "path": "android/app/src/test/java/com/samfa12/hordelanternrt/IndirectLightingTrialIntentTest.java",
+      "sha256": "85d010cabd31cc4684a20002d477a5551005de4f2155d623519ba4a030c9d022",
+      "bytes": 1774,
+      "canonicalPatchCandidateSha256": "85d010cabd31cc4684a20002d477a5551005de4f2155d623519ba4a030c9d022"
+    }
+  ],
+  "derivedFilesExcludedFromPatch": [
+    {
+      "path": "src/vulkan/raytracing/MinimalLegacyRayGenShader.inc",
+      "baseSha256": "ee09c8df2e3aaa5c0695ca76d0f133a3e17e0db67f7b7d0273195c5ac239deb7",
+      "candidateSha256": "1fafe3b2e91cb92687f4298d66bf562c60b1617f6dd85814889c1dc9b11370db",
+      "bytes": 1908740
+    },
+    {
+      "path": "src/vulkan/raytracing/MinimalRayGenShader.inc",
+      "baseSha256": "cb3fdd0dde788b6c5d203f94b658ebed030f7a042f6215aa88a55733a58934d7",
+      "candidateSha256": "401d740564d46171d98acc06429b2e0c90f98e5bd480b106b9080263dfc651ba",
+      "bytes": 933202
+    },
+    {
+      "path": "src/vulkan/raytracing/RtPipelineVariantCatalog.generated.h",
+      "baseSha256": "a20151e1b495380a02376ae25ecb542278705db6378b38e64e378a71d386e0c6",
+      "candidateSha256": "f3e0ea8497acab0161eec5c5d331afb1af09337a760bd9332b2952c01c2b94bf",
+      "bytes": 4575
+    },
+    {
+      "path": "src/vulkan/raytracing/RtRayQueryVariantCatalog.generated.h",
+      "baseSha256": "22fa478ef87ca3999b3b71f09d55fce73768ff9eb67c1d68cb5c20a0b3d7b050",
+      "candidateSha256": "cf27968793241439ad76d0653a7a3db48b80cc64f39ee03d57b6eb814889d967",
+      "bytes": 4820
+    },
+    {
+      "path": "src/vulkan/raytracing/RtSceneAbi.generated.h",
+      "baseSha256": "77e2225fb6532d9ee7e1c37d087002d4a627fa33a1736ee26b8acac7231f7f8f",
+      "candidateSha256": "00f509a9126ce0124dc26e051350532784da633349e1a0b51115c466371a7dd6",
+      "bytes": 14504
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/diagnostic_high_generic_dielectric.inc",
+      "baseSha256": "cb3d30ae8fbee74478668ac83bbb228e4eced540d3682103432462ff576e2b87",
+      "candidateSha256": "a74c14e6aa569f23288852ace2858884d74ae1b8eabea919d65f87db75787dba",
+      "bytes": 936772
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/diagnostic_high_opaque_fast.inc",
+      "baseSha256": "93d6e41b447857285d9066211fc5480df3ed4967a72d147060e79d9cd22c949e",
+      "candidateSha256": "5d33430006f7d186c43e2ec700395e0d5cde1b8a135acf12b32772dceabe1242",
+      "bytes": 1919146
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/diagnostic_mobile_generic_dielectric.inc",
+      "baseSha256": "e1accf8108688a17785c89ecee774c8f373bb634781d6f18b673f3dbfe6460fc",
+      "candidateSha256": "dd37693fc00a11df546dd764c41b1f4d8cd4ad9b2596c67547edb54c60398a6c",
+      "bytes": 931763
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/diagnostic_mobile_opaque_fast.inc",
+      "baseSha256": "7b91013ec0994ff142e451d74938b8ac4a670b531120cfe4010f648cc9833488",
+      "candidateSha256": "b069ac60e1ec7970630b0543be785908e143599e22087ed2161b25dc0439e26c",
+      "bytes": 1908793
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_high_generic_dielectric.inc",
+      "baseSha256": "6f1da36c7b0dca3a5c093d232501f4f3bbe07de11d7cbfc1daaa06e8d2398e0f",
+      "candidateSha256": "d238ca667fbec60e3e6d51652e8c689735db08de3f45c2787dda49aa482013a2",
+      "bytes": 937539
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_high_opaque_fast.inc",
+      "baseSha256": "9a59f871407f07853fb27ae1f54f0ddc1fef14e8985c0586caddc40582592550",
+      "candidateSha256": "beb3951b26b02379f886fc30ec62a8ea4f708b1327960b9827b2ebb2a64f1b27",
+      "bytes": 1922652
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_mobile_generic_dielectric.inc",
+      "baseSha256": "5ff7fce98df326e396013c42517666b428f1d34a20b94fca1b8a5499907cc0a1",
+      "candidateSha256": "dc52f07fe785b8434e807167e394ca7ccb5e669c2b1407668ff7515f91dd52b5",
+      "bytes": 932530
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_mobile_opaque_fast.inc",
+      "baseSha256": "e742afb61110e3cb35b528e785d281db93958bdfccb66d1f3b58ac9a3252baef",
+      "candidateSha256": "886f4605056f0458ca2736fc73e8c92aea4da7148f21e8930a5ddc347d356676",
+      "bytes": 1912299
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_shipping_high_generic_dielectric.inc",
+      "baseSha256": "1056ccd047df77d55b81767b4d21412807682822895d7e5ac300e3971e020941",
+      "candidateSha256": "bc4383b0f1b4b5315873d2adee9a9e69eb7318a2aea61beb61dbbd28cdd9adc2",
+      "bytes": 907742
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_shipping_high_opaque_fast.inc",
+      "baseSha256": "92b07fd2ca79482748593478214429d7c8b9c4368ad375896636db9ec5367ef0",
+      "candidateSha256": "1fe15e44fb613269231893f6ab2d6a6923d39be4197cc8f79d954cd171a4c563",
+      "bytes": 1908355
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_shipping_mobile_generic_dielectric.inc",
+      "baseSha256": "558b8137deaa2df2b67334cb9fa0703ec583d2a38dac459b6543a5d426e4d1a7",
+      "candidateSha256": "a9907f2b4892e24d39c611c3d16a2f9d82d2a84d37d8637090d3b3e9403d0d33",
+      "bytes": 902733
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_shipping_mobile_opaque_fast.inc",
+      "baseSha256": "1d92a849258a7613587bc4f75e7f63f648da60e9016a120c90a89de697d209ad",
+      "candidateSha256": "b26542ed62e654003633d25fc9301c0ead960f417ed73032143eef467db5393b",
+      "bytes": 1898002
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/shipping_high_generic_dielectric.inc",
+      "baseSha256": "e44216e9dc3368e11b621f4493e4218ecf75cb1af4ab202e4ee59e061301649c",
+      "candidateSha256": "44128a97ed663baee24fe1f143368dce3a62031ca4fb87f47c17f46dff25ad12",
+      "bytes": 906975
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/shipping_high_opaque_fast.inc",
+      "baseSha256": "2cb67e942b35a9a867a7f56615355e11049abf73cc88331bc99db7860e09df80",
+      "candidateSha256": "f765f1f761a2cf7df4bd3fde9b25f7aab021ad9d706f83f518961872dd5a694a",
+      "bytes": 1904849
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/shipping_mobile_generic_dielectric.inc",
+      "baseSha256": "f4d65b45e05693c9d65e4724541550c266c9e4754c25096a4c6d590d65025e84",
+      "candidateSha256": "ac4cbf05f371671903bd88965c743380f30a43d0d5e35817db6ce76b0e902cbf",
+      "bytes": 901970
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/shipping_mobile_opaque_fast.inc",
+      "baseSha256": "00ae6179e5732e6cc1d1433af361d0eda9db7544355031e87a55dd284f34f54f",
+      "candidateSha256": "1fe363c10155880a9ee7ec08d310f37187509a18f093c7e52edba79769e97a98",
+      "bytes": 1894496
+    },
+    {
+      "path": "shaders/raytracing/minimal.legacy.rgen.spv",
+      "baseSha256": "03ea945a0316ae54baba5b12f9273091f56b4670249c88f6c16bd9ea9267903d",
+      "candidateSha256": "fcb95b87ee161edcba6db11789b1da370c5668e133dfed832e7a77c31bb791db",
+      "bytes": 565524
+    },
+    {
+      "path": "shaders/raytracing/minimal.rgen.spv",
+      "baseSha256": "015213b72ce2d468c720212290a5f4985165d3cd8e26cf48d7d7fbe907bf68a0",
+      "candidateSha256": "23e96de1191610bcfd9b6adc8685affaba712a0987fe8d9ec12f0cab31ba9926",
+      "bytes": 276476
+    },
+    {
+      "path": "shaders/raytracing/include/rt_scene_abi.generated.glsl",
+      "baseSha256": "3643cd3a445292a3d4568115169f05b024a6e3eea09ffbb27c3ecf2da6a31cba",
+      "candidateSha256": "90336c8674d4327e649e39df123f0e92cc2f7578ea964db97b9d02b3a8261344",
+      "bytes": 6714
+    },
+    {
+      "path": "tools/raygen-variant-catalog.json",
+      "baseSha256": "0e1f83bdcb8ee57e5d5b8956122c2a11861cb906fee0cb182ce5faacdff34cec",
+      "candidateSha256": "402737ea6728a5a4fc5b655fa55f336b697c75d0aa3cc7ea2a5b2ecc3fcc0834",
+      "bytes": 33642
+    },
+    {
+      "path": "tools/rayquery-variant-catalog.json",
+      "baseSha256": "496640bbed5dd32d5ed188134b365adaf59585c0522800a737bba1c6e396aeaa",
+      "candidateSha256": "b48e0a4f9d79ecf7dfa42988b6403f9a2da1fdb43c841b1dcdc3d943bf40a4f6",
+      "bytes": 37795
+    }
+  ],
+  "canonicalPatchNormalizedRoundtripVerified": true,
+  "rawCandidateZipRoundtripVerified": true,
+  "recordedCopyBasisRawHashDifferences": [
+    "src/telemetry/RtBenchmarkEvidenceReport.cpp",
+    "src/telemetry/RtBenchmarkEvidenceRun.cpp",
+    "src/telemetry/RtBenchmarkEvidenceRun.h",
+    "src/telemetry/RtPerformanceEvidence.cpp",
+    "src/telemetry/RtPerformanceEvidence.h",
+    "src/platform/windows/WindowsBenchmarkLaunch.h",
+    "src/platform/windows/WindowsBenchmarkSummaryReview.inl",
+    "src/platform/windows/WindowsGraphicsPreviewCapture.inl",
+    "src/vulkan/raytracing/PresentableTinyRtScene.cpp",
+    "tools/raygen-variant-budgets.json",
+    "tests/RaygenVariantArtifactTests.ps1",
+    "tests/RaygenVariantManifestTests.ps1",
+    "tests/RtSceneResourceInventoryTests.cpp",
+    "tests/WindowsBenchmarkLaunchTests.cpp",
+    "android/app/build.gradle",
+    "android/app/src/main/cpp/CMakeLists.txt",
+    "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java",
+    "CMakeLists.txt"
+  ],
+  "runnablePacketReceiptSha256": "b54057e24a572e560014dd52c2f59a9df5a64921632c24e3a219dfee010da599",
+  "staticAdmissionReceiptSha256": "2ec87e52d944102892724bf6c83ec6b2cd632fb1643143e3e44da9c311f4c44e",
+  "limitations": [
+    "Canonical LF patch explicitly targets actual Git2bd blobs; recorded copy-basis raw hashes are separate and some differ",
+    "Raw ZIP matches admitted candidate bytes; patch/applied Windows files are compared after CRLF-to-LF normalization, without raw line-ending equality claim",
+    "New Keeper scene absent; rebase and new hardware evidence required before adoption",
+    "Generated ABI/banks/catalogs/SPIR-V excluded; regenerate and check recorded hashes with pinned tools",
+    "Prototype finite budget changes are archived only; ordinary main budgets unchanged",
+    "Private phone reports/IDs/UI snapshots/raw images/local paths excluded"
+  ],
+  "candidateSourcePatchGzipSha256": "fd5e22e92e333b1930c97f66782dcfabaa664e9982f1ccf9da00830073521eb9",
+  "patchStoredCompressedToPreserveUnifiedContextWhitespace": true
+}

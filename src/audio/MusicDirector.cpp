@@ -39,6 +39,29 @@ bool IsActualTorchFailure(const SimulationSnapshot& snapshot) noexcept
            snapshot.torchFailure.phase == TorchFailurePhase::Settled;
 }
 
+float ResolveRevealGain(const SimulationSnapshot& snapshot) noexcept
+{
+    if (!snapshot.playerAlive || snapshot.finale.lichDefeated ||
+        snapshot.finale.phase != FinaleSequencePhase::Inactive ||
+        !gameplay::IsKeeperRevealing(snapshot.lich.revealPhase))
+        return 1.0f;
+    const float elapsed = snapshot.lich.revealElapsedSeconds;
+    if (!std::isfinite(elapsed)) return 1.0f;
+    const auto smooth = [](float value) {
+        value = std::clamp(value, 0.0f, 1.0f);
+        return value * value * (3.0f - 2.0f * value);
+    };
+    if (snapshot.lich.revealPhase == gameplay::KeeperRevealPhase::RetryRecognition)
+    {
+        // Recognition starts and ends at unity, without a retry volume pop.
+        const float down = smooth(elapsed / 0.35f);
+        const float up = smooth((elapsed - 0.55f) / 0.45f);
+        return 1.0f - 0.18f * down * (1.0f - up);
+    }
+    return 1.0f - 0.28f * smooth(elapsed / 0.75f) *
+        (1.0f - smooth((elapsed - 4.5f) / 1.5f));
+}
+
 } // namespace
 
 MusicSelection MusicDirector::Update(
@@ -265,6 +288,10 @@ MusicSelection MusicDirector::Update(
     finalePhaseInitialized_ = true;
     previousFinalePhase_ = finalePhase;
 
+    // Reveal time is fixed-step gameplay time. A paused/background adapter
+    // keeps the last envelope rather than accumulating wall-clock duck time.
+    if (!suspended) revealGain_ = ResolveRevealGain(snapshot);
+
     if (forceDiscontinuity_)
     {
         discontinuity = true;
@@ -279,6 +306,7 @@ MusicSelection MusicDirector::Update(
         .clockValid = clockValid,
         .positionSeconds = positionSeconds_,
         .revision = revision_,
+        .revealGain = revealGain_,
     };
 }
 
@@ -313,6 +341,7 @@ void MusicDirector::ResetSession(const bool resetEventSequence) noexcept
     finalePhaseInitialized_ = false;
     skylightHReached_ = false;
     forceDiscontinuity_ = true;
+    revealGain_ = 1.0f;
 }
 
 void MusicDirector::SetCue(const MusicCue cue,
@@ -363,6 +392,12 @@ MusicCue MusicDirector::ResolvePersistentBed(
     if (snapshot.finale.lichDefeated || snapshot.lich.phase == LichPhase::Dead)
     {
         return MusicCue::F;
+    }
+    if (gameplay::IsKeeperRevealing(snapshot.lich.revealPhase))
+    {
+        // Awakening remains on the accepted post-torch exploration bed. The
+        // existing combat cue starts only at the safe combat handoff.
+        return MusicCue::D;
     }
     if (snapshot.activeEnemyKind == EnemyKind::Lich &&
         (snapshot.lich.phase == LichPhase::MaintainingRange ||

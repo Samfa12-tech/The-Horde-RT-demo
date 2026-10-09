@@ -1,0 +1,72 @@
+{
+  "sourceCommit": "f448edaa32bdada5c111c312d224b721a0b7012c",
+  "sourceTree": "3511a5cdfc3869674857c73538961d481ad1b756",
+  "apk": {
+    "sha256": "7be44c8b64a624ff1a2b612aab131ba10af949278cee25db5c0a6efd98bfdbb2",
+    "bytes": 138462962,
+    "installedBaseMatches": true
+  },
+  "windowsExecutable": {
+    "sha256": "44ab044f8e6b34aa3dc69caef7f5e627a9ad17c170899ec033ac296ffce2fc13",
+    "bytes": 11569152,
+    "ownerListening": false
+  },
+  "assetRoster": {
+    "entries": 94,
+    "removed": "assets/audio/menu/menu_flame.wav",
+    "changed": [
+      "assets/ASSET_LICENSES.md",
+      "assets/audio/menu/asset.manifest.json"
+    ],
+    "unchangedSince7e": 92
+  },
+  "relativeMixPercent": {
+    "room": 7,
+    "chain": 21
+  },
+  "ownerSelectionReceipt": "tuning-receipt.json",
+  "javaTests": {
+    "tests": 240,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "javaClasses": 37,
+  "affectedHostTests": 5,
+  "affectedHostSeconds": 7.84,
+  "closedAssetCases": 145,
+  "phone": {
+    "model": "SM-S948B",
+    "androidVersion": 16,
+    "evidenceClass": "Exact Debug installed-base hash and bounded ordinary UI/native/SoundPool-handle observation",
+    "mainPreferenceChanges": 0,
+    "twoNativeSliders": 2,
+    "staleFlameTuningKeyRemoved": true,
+    "savedMixPreserved": true,
+    "roomLoopStarts": 1,
+    "chainStarts": 14,
+    "savedSfxPercent": 70,
+    "roomSubmittedGain": 0.049,
+    "chainSubmittedGain": 0.147,
+    "menuStopsAfterFinalFadeMs": 35,
+    "showcasePresentedAfterMenuStopsMs": 288,
+    "ownedAppStopped": true
+  },
+  "eventsSha256": "d1e5ed21b455327494be8ee8bb3ee9a80357a75a944f888a0170cf3640ffb78a",
+  "sourceCi": {
+    "push": 37760369692,
+    "pr": 37760377530,
+    "aggregateSuccess": 12,
+    "aggregateFailure": 0
+  },
+  "supersedingOwnerRequest": "Replace Hammy01 chain with supplied Irhouen Metal Creaks189729; this receipt retains the completed flame-free old-chain checkpoint.",
+  "gates": {
+    "replacementListening": "pending on next source/package",
+    "windowsListening": "pending",
+    "physicalCompetingFocus": "pending",
+    "seamlessMusicHandover": "deferred",
+    "sustainedPerformance": "pending",
+    "independentAudit": "pending",
+    "releaseApproval": "pending"
+  }
+}

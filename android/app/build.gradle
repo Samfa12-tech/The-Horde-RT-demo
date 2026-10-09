@@ -56,6 +56,31 @@ if (!(hordeVersionCode instanceof Integer) || hordeVersionCode < 1) {
 def runtimeAssetsDir = layout.buildDirectory.dir('generated/runtimeAssets')
 def validationUnsigned = System.getenv('HORDE_VALIDATION_UNSIGNED') == '1'
 def hordeBenchmarkValidation = providers.gradleProperty('hordeBenchmarkValidation').orNull == 'true'
+def hordePresentTimingValidationProperty = providers.gradleProperty('hordePresentTimingValidation').orNull
+if (hordePresentTimingValidationProperty != null && !(hordePresentTimingValidationProperty in ['true', 'false'])) {
+    throw new GradleException('hordePresentTimingValidation must be true or false.')
+}
+def hordePresentTimingValidation = hordePresentTimingValidationProperty == 'true'
+if (hordePresentTimingValidation && !hordeBenchmarkValidation) {
+    throw new GradleException('hordePresentTimingValidation requires the isolated Shipping/Mobile benchmark package.')
+}
+def hordeBenchmarkMotionValidationProperty = providers.gradleProperty('hordeBenchmarkMotionValidation').orNull
+if (hordeBenchmarkMotionValidationProperty != null && !(hordeBenchmarkMotionValidationProperty in ['true', 'false'])) {
+    throw new GradleException('hordeBenchmarkMotionValidation must be true or false.')
+}
+def hordeBenchmarkMotionValidation = hordeBenchmarkMotionValidationProperty == 'true'
+if (hordeBenchmarkMotionValidation && (!hordeBenchmarkValidation || !hordePresentTimingValidation)) {
+    throw new GradleException('hordeBenchmarkMotionValidation requires isolated benchmark validation and VK_GOOGLE_display_timing.')
+}
+def hordeBenchmarkMinRenderScaleProperty = providers.gradleProperty('hordeBenchmarkMinRenderScale').orNull
+if (hordeBenchmarkMinRenderScaleProperty != null &&
+    (!hordeBenchmarkValidation || hordeBenchmarkMinRenderScaleProperty != '33')) {
+    throw new GradleException('hordeBenchmarkMinRenderScale=33 requires explicit isolated Shipping/Mobile benchmark validation.')
+}
+def hordeBenchmarkMinRenderScale = hordeBenchmarkMinRenderScaleProperty == '33' ? 33 : 50
+if (hordeBenchmarkMotionValidation && hordeBenchmarkMinRenderScale != 33) {
+    throw new GradleException('hordeBenchmarkMotionValidation requires hordeBenchmarkMinRenderScale=33 for matched 50/40/33 captures.')
+}
 def hordeStagedPrimaryDebugValidationProperty = providers.gradleProperty('hordeStagedPrimaryDebugValidation').orNull
 if (hordeStagedPrimaryDebugValidationProperty != null && !(hordeStagedPrimaryDebugValidationProperty in ['true', 'false'])) {
     throw new GradleException('hordeStagedPrimaryDebugValidation must be true or false.')
@@ -122,6 +147,9 @@ if (hordeStagedPrimaryDebugValidation && (!hordeStagedPrimaryShaderDir ||
 if (hordeStagedPrimaryTiming && (!hordeBenchmarkValidation || !hordeStagedPrimaryShaderDir)) {
     throw new GradleException('hordeStagedPrimaryTiming=true requires the explicit staged benchmark shader directory.')
 }
+if (hordeBenchmarkMotionValidation && (hordeStagedPrimaryShaderDir || hordeStagedPrimaryTiming)) {
+    throw new GradleException('hordeBenchmarkMotionValidation excludes staged shader and viewmodel experiments.')
+}
 def hordeRtOverridePresent = { String value -> value != null && !value.isEmpty() }
 if (hordeRtOverridePresent(hordeRtInstrumentationOverride) != hordeRtOverridePresent(hordeRtDielectricQualityOverride)) {
     throw new GradleException('hordeRtInstrumentationOverride and hordeRtDielectricQualityOverride must be supplied together.')
@@ -148,7 +176,8 @@ def hordeRtNativePolicyArguments = { String defaultInstrumentation ->
             "-DHORDE_RT_ANDROID_DEFAULT_DIELECTRIC_QUALITY=${quality}",
             '-DHORDE_RT_STAGED_PRIMARY_SHADER_DIR=',
             '-DHORDE_RT_STAGED_PRIMARY_DEFAULT=OFF',
-            '-DHORDE_RT_STAGED_PRIMARY_TIMING=OFF']
+            '-DHORDE_RT_STAGED_PRIMARY_TIMING=OFF',
+            '-DHORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION=OFF']
 }
 def hordeRtBenchmarkStagedPrimaryArguments = [
     "-DHORDE_RT_STAGED_PRIMARY_SHADER_DIR=${hordeStagedPrimaryShaderDir ?: ''}",
@@ -165,6 +194,11 @@ def hordeRtDebugStagedPrimaryArguments = hordeStagedPrimaryDebugValidation ? [
 // this overlay, and its separate application id prevents stale private-file assets.
 def viewmodelCandidatePath = providers.gradleProperty('hordeViewmodelCandidateDir').orNull
 def viewmodelCandidate = viewmodelCandidatePath ? file(viewmodelCandidatePath).canonicalFile : null
+if (hordeBenchmarkMinRenderScale == 33 &&
+    (hordeStagedPrimaryShaderDirProperty != null || hordeStagedPrimaryDebugValidation ||
+     hordeStagedPrimaryTiming || viewmodelCandidate)) {
+    throw new GradleException('Experimental 33/40 percent scales require the unchanged Shipping/Mobile benchmark shaders and accepted player assets.')
+}
 if (hordeStagedPrimaryDebugValidation && viewmodelCandidate) {
     throw new GradleException('Staged execution investigation must preserve the accepted player assets, not a viewmodel asset overlay.')
 }
@@ -308,6 +342,13 @@ tasks.register('prepareRuntimeAssets', Sync) {
         include 'models/weapons/runtime/gothic-arming-sword-rh-lod0.runtime.glb'
         include 'models/props/runtime/asset.manifest.json'
         include 'models/props/runtime/gothic-hand-torch-lod0.runtime.glb'
+        include 'models/props/runtime/player-rag-torch/asset.manifest.json'
+        include 'models/props/runtime/player-rag-torch/rag-torch-player-lod0.runtime.glb'
+        include 'models/props/runtime/player-sword-scabbard/asset.manifest.json'
+        include 'models/props/runtime/player-sword-scabbard/player-sword-scabbard-lod0.runtime.glb'
+        include 'models/props/runtime/player-sword-scabbard/processing-receipt.json'
+        include 'models/world/runtime/collapsed-entry/asset.manifest.json'
+        include 'models/world/runtime/collapsed-entry/collapsed-entry-lod0.runtime.glb'
         include 'models/props/runtime/dielectric-fixture/asset.manifest.json'
         include 'models/props/runtime/dielectric-fixture/closed-glass-lod0.runtime.glb'
         include 'models/props/runtime/gothic-chest-base/asset.manifest.json'
@@ -323,18 +364,43 @@ tasks.register('prepareRuntimeAssets', Sync) {
         include 'models/player/runtime/gothic-traveller-lod0.runtime.glb'
         include 'models/player/viewmodel/runtime/asset.manifest.json'
         include 'models/player/viewmodel/runtime/gothic-traveller-viewmodel.runtime.glb'
-        include 'textures/props/runtime/*.android.ktx2'
+        include 'textures/props/runtime/base-color.android.ktx2'
+        include 'textures/props/runtime/normal.android.ktx2'
+        include 'textures/props/runtime/orm.android.ktx2'
+        include 'textures/props/runtime/emissive.android.ktx2'
         include 'textures/props/runtime/asset.manifest.json'
+        include 'audio/menu/menu_room.wav'
+        include 'audio/menu/menu_chain.wav'
+        include 'audio/menu/asset.manifest.json'
         include 'audio/filmcow/*.wav'
-        include 'audio/pixabay/waterfall_loop.wav'
+        include 'audio/filmcow/equipment/sword_draw.wav'
+        include 'audio/filmcow/equipment/sword_sheath.wav'
+        include 'audio/filmcow/equipment/asset.manifest.json'
+        include 'audio/pixabay/waterfall_core_loop.wav'
+        include 'audio/pixabay/waterfall-core.manifest.json'
         include 'audio/pixabay/chest_unlock.wav'
         include 'audio/pixabay/chest_open.wav'
         include 'audio/pixabay/torch_extinguish.wav'
+        include 'audio/pixabay/keeper_i_sense_you.wav'
+        include 'audio/pixabay/keeper_come_closer.wav'
+        include 'audio/pixabay/skeleton_idle_rattle.wav'
+        include 'audio/pixabay/skeleton_falling_bones.wav'
+        include 'audio/pixabay/keeper-asset.manifest.json'
+        include 'textures/environment/runtime/night-storm.android.ktx2'
+        include 'textures/environment/runtime/asset.manifest.json'
         include 'audio/music/what-the-dark-keeps/asset.manifest.json'
         include 'audio/music/what-the-dark-keeps/runtime/*.wav'
     }
     from('../..') {
         include 'ASSET_LICENSES.md'
+        // Original software MIT grant and its exclusions travel together.
+        include 'LICENSE'
+        include 'LICENSE_SCOPE.md'
+    }
+    from('../../third_party/cgltf') {
+        include 'LICENSE'
+        rename 'LICENSE', 'cgltf-LICENSE.txt'
+        into 'THIRD_PARTY_NOTICES'
     }
     into runtimeAssetsDir
 }
@@ -351,12 +417,15 @@ android {
         versionCode hordeVersionCode.intValue()
         versionName hordeVersionName
         buildConfigField 'boolean', 'VIEWMODEL_CANDIDATE', 'false'
+        buildConfigField 'boolean', 'MOTION_VALIDATION', 'false'
+        buildConfigField 'int', 'MIN_RENDER_SCALE_PERCENT', '33'
         resValue 'string', 'alpha_version', "SHOWCASE · ALPHA ${hordeVersionName}"
 
         externalNativeBuild {
             cmake {
                 cppFlags '-std=c++20'
                 arguments '-DANDROID_STL=c++_static'
+                arguments '-DHORDE_RT_ANDROID_BENCHMARK_VALIDATION=OFF', '-DHORDE_RT_MIN_RENDER_SCALE_PERCENT=33'
             }
         }
     }
@@ -418,9 +487,15 @@ android {
                 debuggable false
                 jniDebuggable false
                 signingConfig signingConfigs.debug
+                buildConfigField 'int', 'MIN_RENDER_SCALE_PERCENT', hordeBenchmarkMinRenderScale.toString()
+                buildConfigField 'boolean', 'MOTION_VALIDATION', hordeBenchmarkMotionValidation ? 'true' : 'false'
                 externalNativeBuild {
                     cmake {
-                        arguments "-DHORDE_RT_STAGED_PRIMARY_SHADER_DIR=${hordeStagedPrimaryShaderDir ?: ''}",
+                        arguments '-DHORDE_RT_ANDROID_BENCHMARK_VALIDATION=ON',
+                            "-DHORDE_RT_MIN_RENDER_SCALE_PERCENT=${hordeBenchmarkMinRenderScale}",
+                            "-DHORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION=${hordePresentTimingValidation ? 'ON' : 'OFF'}",
+                            "-DHORDE_RT_ANDROID_MOTION_VALIDATION=${hordeBenchmarkMotionValidation ? 'ON' : 'OFF'}",
+                            "-DHORDE_RT_STAGED_PRIMARY_SHADER_DIR=${hordeStagedPrimaryShaderDir ?: ''}",
                             "-DHORDE_RT_STAGED_PRIMARY_DEFAULT=${hordeStagedPrimaryShaderDir ? 'ON' : 'OFF'}",
                             "-DHORDE_RT_STAGED_PRIMARY_TIMING=${hordeStagedPrimaryTiming ? 'ON' : 'OFF'}"
                     }
@@ -468,6 +543,9 @@ tasks.register('printHordeRtPolicyForTest') {
             ? (hordeRtNativePolicyArguments('Shipping') + hordeRtBenchmarkStagedPrimaryArguments).join('|')
             : 'unavailable; set hordeBenchmarkValidation=true'))
         println("benchmarkValidation=${hordeBenchmarkValidation}")
+        println("debugMinRenderScale=33|releaseMinRenderScale=33|benchmarkMinRenderScale=${hordeBenchmarkMinRenderScale}")
+        println("ordinaryPresentTiming=OFF|benchmarkPresentTiming=${hordePresentTimingValidation ? 'ON' : 'OFF'}")
+        println("benchmarkMotionValidation=${hordeBenchmarkMotionValidation ? 'ON' : 'OFF'}")
         println("stagedPrimaryDebugValidation=${hordeStagedPrimaryDebugValidation}")
         println("stagedPrimaryShaderDir=${hordeStagedPrimaryShaderDir ?: ''}")
     }

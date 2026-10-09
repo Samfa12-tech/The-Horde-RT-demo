@@ -1,0 +1,114 @@
+{
+  "sourceCommit": "ddd5a453f7adb4e34fca7ff72e43a064eb84428a",
+  "sourceTree": "9e8f8ffadb187f8bc098d171ffe6a4d22268715f",
+  "apk": {
+    "sha256": "1ab10e1c547e12e3f2e0bd2df77dd820c858b7279a04d1852d59a159f173eee0",
+    "bytes": 138462962,
+    "installedBaseMatches": true
+  },
+  "windowsExecutable": {
+    "sha256": "3030e4c2c0c78222febb3ee4171f967e55f69f32940c4d01ff0037d9b01fda00",
+    "bytes": 11569152,
+    "ownerListening": false
+  },
+  "replacement": {
+    "creator": "Irhouen",
+    "sourceUrl": "https://pixabay.com/sound-effects/film-special-effects-metal-creaks-189729/",
+    "sourceSha256": "9a0309023d9182298ae41c0bc3e8872ed33e0ebbf83df4fbfdabafc8fea2f947",
+    "cropSeconds": [
+      4.1,
+      5.1
+    ],
+    "sampleRate": 48000,
+    "channels": 1,
+    "frames": 48000,
+    "peakTargetDbfs": -12,
+    "runtimeSha256": "cb53cefe152ea118fdee6cf6c9beedd3e516a483041a7832981489a7eb04697f",
+    "originalPackaged": false,
+    "flameRuntimePresent": false,
+    "ownerListening": "Accepted: Keep this sound and level, on exact ddd5a453 phone APK."
+  },
+  "relativeMixPercent": {
+    "room": 7,
+    "chain": 21
+  },
+  "mainSettingsWrittenByChange": false,
+  "assetRoster": {
+    "entries": 94,
+    "changedSinceF448": [
+      "assets/ASSET_LICENSES.md",
+      "assets/audio/menu/asset.manifest.json",
+      "assets/audio/menu/menu_chain.wav"
+    ],
+    "unchangedSinceF448": 91,
+    "manifestByteIdenticalToF448": true,
+    "nativeAndDexByteIdenticalToF448": true
+  },
+  "javaTests": {
+    "tests": 240,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "javaClasses": 37,
+  "affectedHostTests": 5,
+  "affectedHostSeconds": 0.22,
+  "closedAssetCases": 145,
+  "lintAndFourAbiAssembly": "pass",
+  "windowsBuild": "pass",
+  "closedPackageAnd16KiBAlignment": "pass",
+  "phone": {
+    "model": "SM-S948B",
+    "androidVersion": 16,
+    "evidenceClass": "Exact Debug installed-base hash; ordinary presented Entry; positive SoundPool handles, not new audible acceptance",
+    "mainInstallPreferenceChanges": 0,
+    "ownerSavedMixAtLaunch": {
+      "room": 7,
+      "chain": 21
+    },
+    "roomLoopStarts": 1,
+    "chainStartsInBoundedStartup": 3,
+    "roomSubmittedGain": 0.049,
+    "chainSubmittedGain": 0.147,
+    "roomStartsAfterEntryPresentationMs": 15,
+    "successiveCueGapsMs": [
+      14822,
+      14764
+    ],
+    "ownedAppOpenForRequestedListening": false,
+    "automationTouchesAfterListeningRequest": 0,
+    "ownedAppStoppedAfterFeedback": true,
+    "mainPreferenceChangesThroughOwnerListening": 0
+  },
+  "inheritedBehaviourEvidence": "Same native/Dex payload as f448; its ordinary two-slider Save/Play-fade observations remain bound to that previous package. They are not replayed or relabelled as a replacement-cue audible pass.",
+  "eventsSha256": "5a733fef7f91a85069f597b2bf768989d5db86fe47d4ed12c19db0c43516961d",
+  "sourceCi": {
+    "push": 37762230943,
+    "pr": 37762237692,
+    "aggregateSuccess": 12,
+    "aggregateFailure": 0,
+    "observedUtc": "2026-10-08T10:26:59.387250+00:00"
+  },
+  "remaining": [
+    "Windows listening",
+    "Physical competing Android audio focus",
+    "Sustained phone quality/pacing/thermal/power/memory",
+    "Final integrated candidate",
+    "Eric independent audit",
+    "Release approval"
+  ],
+  "deferred": [
+    "Seamless music handover",
+    "Dust shafts",
+    "Minor torch walking-arm wiggle"
+  ],
+  "releaseOrMerge": false,
+  "ownerFeedback": {
+    "sourceCommit": "ddd5a453f7adb4e34fca7ff72e43a064eb84428a",
+    "apkSha256": "1ab10e1c547e12e3f2e0bd2df77dd820c858b7279a04d1852d59a159f173eee0",
+    "decision": "Keep this sound and level",
+    "roomPercent": 7,
+    "creakPercent": 21,
+    "scope": "This phone menu cue character/level; no Windows, physical competing-focus, haptic or sustained-performance acceptance implied."
+  }
+}

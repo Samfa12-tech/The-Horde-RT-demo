@@ -79,7 +79,8 @@ public:
 
     bool LoadAssets(const std::string& skeletonAssetPath,
                     const std::string& lichAssetPath,
-                    std::string& diagnostic);
+                    std::string& diagnostic,
+                    bool skeletonOnly = false);
     bool PrepareInitialGeometry(std::string& diagnostic);
     bool CacheFramePlan(const std::array<horde::gameplay::simulation::SkeletonEnemySnapshot,
                                          horde::gameplay::simulation::kSkeletonEnemyCapacity>& skeletons,
@@ -137,6 +138,7 @@ private:
     std::size_t skeletonPoseBucketCount_ = 0u;
     float skeletonDeadClipDuration_ = 0.0f;
     CharacterFramePlan cachedFramePlan_{};
+    bool skeletonOnly_ = false;
 };
 
 } // namespace horde::vulkan::raytracing

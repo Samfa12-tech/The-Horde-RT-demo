@@ -13,26 +13,287 @@
     "gothic-chest-lid.ChestWood",
     "gothic-chest-lid.BlackIron",
     "reward-lantern-ring.BlackIron",
-    "reward-lantern-body.BlackIron"
+    "reward-lantern-body.BlackIron",
+    "collapsed-entry/Boulder01Rock",
+    "collapsed-entry/MedievalWall02",
+    "rag-torch-player/RagTorch_Atlas",
+    "player-sword-scabbard/LeatherIron"
   ],
   "layerCounts": {
-    "baseColor": 10,
-    "normal": 10,
-    "orm": 10,
+    "baseColor": 14,
+    "normal": 14,
+    "orm": 14,
     "emissive": 1
   },
+  "sourceLayers": [
+    {
+      "layer": 0,
+      "baseColor": {
+        "path": "assets/textures/props/source/static-array-1k/sword-base-color.png",
+        "bytes": 2161738,
+        "sha256": "96bdf325e14273cf6a33ae54867a4809ea916596c223c790a9c4fa8ebcc30bce"
+      },
+      "normal": {
+        "path": "assets/textures/props/source/static-array-1k/sword-normal.png",
+        "bytes": 1940639,
+        "sha256": "fa57b9346b38a6b20c92e084735cfc001a5449f635400984e74cbdf6dae483a9"
+      },
+      "orm": {
+        "path": "assets/textures/props/source/static-array-1k/sword-orm.png",
+        "bytes": 986191,
+        "sha256": "c6ba0139b11372fff054ff7e8ac519ddd62f475f602b89db59b677e75dd5a424"
+      }
+    },
+    {
+      "layer": 1,
+      "baseColor": {
+        "path": "assets/textures/props/source/static-array-1k/torch-base-color.png",
+        "bytes": 693589,
+        "sha256": "0c10aa85be74b377c019b453a280030b8d4c05ebea9f33d01834235cbc9a1b77"
+      },
+      "normal": {
+        "path": "assets/textures/props/source/static-array-1k/torch-normal.png",
+        "bytes": 1197875,
+        "sha256": "e1062d92e09285fd4bf26cb083eadf23aef9448538b804095dbe6f1c146158e8"
+      },
+      "orm": {
+        "path": "assets/textures/props/source/static-array-1k/torch-orm.png",
+        "bytes": 676947,
+        "sha256": "0c177ef9fdacd717fdde1071a97d16880a4b0e3635c425d0576ecebe5da95a01"
+      }
+    },
+    {
+      "layer": 2,
+      "baseColor": {
+        "path": "assets/textures/props/source/static-array-1k/player-base-color.png",
+        "bytes": 2124689,
+        "sha256": "2879df8e5913528f173f2c42972862fbd62e76607bc5f199f279a6da3b2ed0e7"
+      },
+      "normal": {
+        "path": "assets/textures/props/source/static-array-1k/player-normal.png",
+        "bytes": 2518053,
+        "sha256": "b4b314df0cc59e5a40f1e11c8a1e3577e1eccce9a5bd2eea46696647f00e7187"
+      },
+      "orm": {
+        "path": "assets/textures/props/source/static-array-1k/player-orm.png",
+        "bytes": 1364632,
+        "sha256": "0cfb62b92fab7176c15ecd66b997a3304f8ab61f28e0a39b71546a66f78bb3d3"
+      }
+    },
+    {
+      "layer": 3,
+      "baseColor": {
+        "path": "assets/textures/props/source/static-array-1k/player-gauntlet-base-color.png",
+        "bytes": 1172980,
+        "sha256": "8c3973ad314b15790957baea6234d7dc19ce5ee701b2024e82cc9652fa167b77"
+      },
+      "normal": {
+        "path": "assets/textures/props/source/static-array-1k/player-gauntlet-normal.png",
+        "bytes": 1560112,
+        "sha256": "b01e29fbafd1b68a3bf0b469bebc03672a495dca02f077162c69dae78947e512"
+      },
+      "orm": {
+        "path": "assets/textures/props/source/static-array-1k/player-gauntlet-orm.png",
+        "bytes": 923227,
+        "sha256": "d1ad61026aadda406f8a1e49676d8c5bd01947d02c52a4e4ae001c8924ff8f58"
+      }
+    },
+    {
+      "layer": 4,
+      "baseColor": {
+        "path": "assets/textures/props/source/chest-wood-base-color.png",
+        "bytes": 204630,
+        "sha256": "bee7f831234a81bfd4e06db501adb49f566ebac601ad6eb42255a23d2824e2d7"
+      },
+      "normal": {
+        "path": "assets/textures/props/source/chest-wood-normal.png",
+        "bytes": 130035,
+        "sha256": "5225309ca33f2c12c0d26d5e156d935b9108fb8d6c617cda4100886cd8c506d2"
+      },
+      "orm": {
+        "path": "assets/textures/props/source/chest-wood-orm.png",
+        "bytes": 116485,
+        "sha256": "55fa9ef60a1f03bc00bbe3b75c9e112481e430a9a3b07eb3492621452ec5a2c3"
+      }
+    },
+    {
+      "layer": 5,
+      "baseColor": {
+        "path": "assets/textures/props/source/chest-iron-base-color.png",
+        "bytes": 367948,
+        "sha256": "111cbaff8a81af61a293b0a60783ad8f3eab4268c527d270d3541ad17eac8a5b"
+      },
+      "normal": {
+        "path": "assets/textures/props/source/chest-iron-normal.png",
+        "bytes": 770066,
+        "sha256": "d9d30ac28b250e788d13e3d92c135dbe3642268b1203e7b648457f97843fd119"
+      },
+      "orm": {
+        "path": "assets/textures/props/source/chest-iron-orm.png",
+        "bytes": 301106,
+        "sha256": "8b2177749e6856d0c4db77e39b0d48566e287583b6efb1afe6e6a1c65455c9ad"
+      }
+    },
+    {
+      "layer": 6,
+      "baseColor": {
+        "path": "assets/textures/props/source/chest-wood-base-color.png",
+        "bytes": 204630,
+        "sha256": "bee7f831234a81bfd4e06db501adb49f566ebac601ad6eb42255a23d2824e2d7"
+      },
+      "normal": {
+        "path": "assets/textures/props/source/chest-wood-normal.png",
+        "bytes": 130035,
+        "sha256": "5225309ca33f2c12c0d26d5e156d935b9108fb8d6c617cda4100886cd8c506d2"
+      },
+      "orm": {
+        "path": "assets/textures/props/source/chest-wood-orm.png",
+        "bytes": 116485,
+        "sha256": "55fa9ef60a1f03bc00bbe3b75c9e112481e430a9a3b07eb3492621452ec5a2c3"
+      }
+    },
+    {
+      "layer": 7,
+      "baseColor": {
+        "path": "assets/textures/props/source/chest-iron-base-color.png",
+        "bytes": 367948,
+        "sha256": "111cbaff8a81af61a293b0a60783ad8f3eab4268c527d270d3541ad17eac8a5b"
+      },
+      "normal": {
+        "path": "assets/textures/props/source/chest-iron-normal.png",
+        "bytes": 770066,
+        "sha256": "d9d30ac28b250e788d13e3d92c135dbe3642268b1203e7b648457f97843fd119"
+      },
+      "orm": {
+        "path": "assets/textures/props/source/chest-iron-orm.png",
+        "bytes": 301106,
+        "sha256": "8b2177749e6856d0c4db77e39b0d48566e287583b6efb1afe6e6a1c65455c9ad"
+      }
+    },
+    {
+      "layer": 8,
+      "baseColor": {
+        "path": "assets/textures/props/source/lantern-iron-base-color.png",
+        "bytes": 580266,
+        "sha256": "ffd57a75754bc1d9af8d4f7f8195e10866819f05a60d99e0cd1a37106bec1ec2"
+      },
+      "normal": {
+        "path": "assets/textures/props/source/lantern-iron-normal.png",
+        "bytes": 769655,
+        "sha256": "d4857ea48706b6764c7551b4e1fd07087b22a62810a6b3f38d4e6162025ae193"
+      },
+      "orm": {
+        "path": "assets/textures/props/source/lantern-iron-orm.png",
+        "bytes": 301251,
+        "sha256": "c2f8a5c8eff1837c355862e40b83e667a5f652dce0436f2a44354a9c6e0c5f9a"
+      }
+    },
+    {
+      "layer": 9,
+      "baseColor": {
+        "path": "assets/textures/props/source/lantern-iron-base-color.png",
+        "bytes": 580266,
+        "sha256": "ffd57a75754bc1d9af8d4f7f8195e10866819f05a60d99e0cd1a37106bec1ec2"
+      },
+      "normal": {
+        "path": "assets/textures/props/source/lantern-iron-normal.png",
+        "bytes": 769655,
+        "sha256": "d4857ea48706b6764c7551b4e1fd07087b22a62810a6b3f38d4e6162025ae193"
+      },
+      "orm": {
+        "path": "assets/textures/props/source/lantern-iron-orm.png",
+        "bytes": 301251,
+        "sha256": "c2f8a5c8eff1837c355862e40b83e667a5f652dce0436f2a44354a9c6e0c5f9a"
+      }
+    },
+    {
+      "layer": 10,
+      "baseColor": {
+        "path": "assets/textures/props/source/collapsed-entry/boulder01-base-color.png",
+        "bytes": 2297056,
+        "sha256": "fc8f868aaabe94b50906911f3212d7ca84c5296403049feac7ef25ba22ed4e3c"
+      },
+      "normal": {
+        "path": "assets/textures/props/source/collapsed-entry/boulder01-normal.png",
+        "bytes": 2574169,
+        "sha256": "65070b8fe4b9f1d029411558c4aa9c5a7f5dd93fd6b06b38ce35b893d61af65b"
+      },
+      "orm": {
+        "path": "assets/textures/props/source/collapsed-entry/boulder01-orm.png",
+        "bytes": 1561263,
+        "sha256": "732f1c63ede2f5af04e736487fbe3d3ab49066ec9ec7c59bdc52825bb03140cc"
+      }
+    },
+    {
+      "layer": 11,
+      "baseColor": {
+        "path": "assets/textures/props/source/collapsed-entry/medieval-wall02-base-color.png",
+        "bytes": 1777108,
+        "sha256": "8e45c274021d9f83f0f65e5f950df875b27efbceaa54d786ddd9bbc4fcbe0d15"
+      },
+      "normal": {
+        "path": "assets/textures/props/source/collapsed-entry/medieval-wall02-normal.png",
+        "bytes": 2503251,
+        "sha256": "cc076a2019d06816a58d6d61244354cac5d79c5c2259f78f7ef417a25792943c"
+      },
+      "orm": {
+        "path": "assets/textures/props/source/collapsed-entry/medieval-wall02-orm.png",
+        "bytes": 1771080,
+        "sha256": "68e68c8c66fd61b1a0143e77cb0a21a3ed8101dee47402e5d1f75c002cccb68e"
+      }
+    },
+    {
+      "layer": 12,
+      "baseColor": {
+        "path": "assets/textures/props/source/rag-torch-v01/base-color.png",
+        "bytes": 1692832,
+        "sha256": "6a2175298335623e7a0b3d6b0e15c146e986b79396a1c4a8d30dbaecaa953cc1"
+      },
+      "normal": {
+        "path": "assets/textures/props/source/rag-torch-v01/normal.png",
+        "bytes": 1154127,
+        "sha256": "7a4a305b9396f0cc45b21663f12d964e340921615ce4a45bf2fd277581554b16"
+      },
+      "orm": {
+        "path": "assets/textures/props/source/rag-torch-v01/orm.png",
+        "bytes": 1344491,
+        "sha256": "4127575d615a8b868f3b98b586bfc625cbc8ef6fecfbd6678e4b978076e26834"
+      }
+    },
+    {
+      "layer": 13,
+      "baseColor": {
+        "path": "assets/textures/props/source/sword-scabbard/sword-scabbard-base-color.png",
+        "bytes": 988231,
+        "sha256": "a7c90b55592d3f5aad5cdcf85d44cd85ac9d3811b7f0daf8ac5f151f6733e1a9"
+      },
+      "normal": {
+        "path": "assets/textures/props/source/sword-scabbard/sword-scabbard-normal.png",
+        "bytes": 1523006,
+        "sha256": "ee42bf70f0873d1f5cf8aaac2b0d913af96ed8cc754e18b5ed4826374fade835"
+      },
+      "orm": {
+        "path": "assets/textures/props/source/sword-scabbard/sword-scabbard-orm.png",
+        "bytes": 5352,
+        "sha256": "45123bcaf49892f3943ed6c61e09dc030772f6ef18d1f174026a588ad1a2594e"
+      }
+    }
+  ],
+  "normalConvention": "linear glTF/OpenGL +Y; existing generated-mipmap filter unchanged; runtime renormalizes mapped normals",
+  "colorPrimaries": "BT709/sRGB assigned metadata only, no pixel conversion",
+  "ormConvention": "R ambient occlusion, G roughness, B metallic; source ARM is already this channel order",
   "android": {
     "baseColor": {
       "format": "ASTC_6x6_SRGB_BLOCK",
-      "sha256": "e6934fca4a3452d5d5c239f2fc8d0047d5364c044543867ff002c9421edd5335"
+      "sha256": "8ec835e988441ab533b77cc25ac9f2dbd83e91a36f614c0cdbed21a035e7c856"
     },
     "normal": {
       "format": "ASTC_4x4_UNORM_BLOCK",
-      "sha256": "049c73a52c8c69a02dbbbc01c3bfdba18ab3782efd0e06b1afc20e3d5e6b3776"
+      "sha256": "8b830b88a95b8a3eedbbb7555c5ef61046bd3280730fd25dc817b217decfdf3c"
     },
     "orm": {
       "format": "ASTC_6x6_UNORM_BLOCK",
-      "sha256": "8f431b7e03d63f2bcda36518daa29d68280b6af9fa188a787a86a77594e33c01"
+      "sha256": "81ef2a8bb533d27f5609a6e36852a7c5d31a9d51a4b7ccf6d1622a31ba0d8744"
     },
     "emissive": {
       "format": "ASTC_6x6_SRGB_BLOCK",
@@ -42,20 +303,20 @@
   "windows": {
     "baseColor": {
       "format": "R8G8B8A8_SRGB",
-      "sha256": "459aee2320b09248c975463f0540015ff3c9cd1341e598687c883a7547e69df3"
+      "sha256": "849103d8a02c3f947549eb4c5cdebe40d6f671522d68a28af16264a5e25caa8b"
     },
     "normal": {
       "format": "R8G8B8A8_UNORM",
-      "sha256": "22876139676970909c2284223031850bf6852482e9e41885c58ada408cbf97f0"
+      "sha256": "ebbc7dfae582c0efe91c37f9ab9108d33aecacdc88071d797b37e55b42601c65"
     },
     "orm": {
       "format": "R8G8B8A8_UNORM",
-      "sha256": "85eea39067c5c9382727b885618379f9c43e49ae9b1a390756ad001f14b7a132"
+      "sha256": "43b10b4f1684ce3269ebedf096d426b679d12e442d5567c2f02b99d619720e82"
     },
     "emissive": {
       "format": "R8G8B8A8_SRGB",
       "sha256": "c642d3972a14bf477d88f2ecb34ffc177ad4dc6308dfe8f507af6033c292dd56"
     }
   },
-  "licenceStatus": "Meshy outputs distributed conservatively under CC BY 4.0; attribution in ASSET_LICENSES.md"
+  "licenceStatus": "Existing Meshy outputs conservatively CC BY 4.0; collapsed-entry Boulder01 and MedievalWall02 CC0; RagTorch_Atlas and player sword scabbard are original assistant-authored geometry/maps with no blanket licence assigned; provenance in ASSET_LICENSES.md"
 }

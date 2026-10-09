@@ -102,6 +102,12 @@ The reviewed sword source and processed runtime LOD now prove the generic GLB/PB
 
 At zero vitality, `RETRY ENCOUNTER` restores the current encounter, `RESTART ROUTE` returns to the opening, and Back/`Esc` cannot resume a dead player.
 
+The **1.6.2 draft PR18 branch** also implements standard Android gamepad input
+and native menu navigation, with touch fallback and portrait/both landscape
+layouts. Its physical phone/controller acceptance is still pending; this is not
+a claim about the released Android package or every Backbone model. See the
+[exact source, mappings, host checks and outstanding matrix](docs/ENGINEERING_1_6_2_ANDROID_CONTROLLER_2026_10_08.md).
+
 ## Current validation
 
 The [engineering completion reconciliation](docs/ENGINEERING_1_6_1_COMPLETION_REPORT.md)

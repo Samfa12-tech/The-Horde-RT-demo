@@ -2,7 +2,8 @@
 param(
     [Parameter(Mandatory = $true)]
     [string]$AndroidApkPath,
-    [string]$WindowsZipPath = ""
+    [string]$WindowsZipPath = "",
+    [switch]$RequireHorde162World
 )
 
 $ErrorActionPreference = "Stop"
@@ -31,6 +32,9 @@ $requiredAttributionMarkers = @(
     "01a03f74-7501-7164-8113-53ba917fc66d",
     "CC BY 4.0"
 )
+if ($RequireHorde162World) {
+    $requiredAttributionMarkers += @('https://polyhaven.com/a/boulder_01', 'https://polyhaven.com/a/medieval_wall_02')
+}
 
 function Test-HeldItemPackage {
     param(
@@ -64,9 +68,26 @@ function Test-HeldItemPackage {
             "$AssetPrefix/textures/props/runtime/asset.manifest.json",
             $LicenceEntry
         )
+        if ($RequireHorde162World) {
+            $requiredEntries += @("$AssetPrefix/models/world/runtime/collapsed-entry/asset.manifest.json",
+                                  "$AssetPrefix/models/world/runtime/collapsed-entry/collapsed-entry-lod0.runtime.glb")
+        }
         foreach ($required in $requiredEntries) {
             if ($entries -cnotcontains $required) {
                 throw "Held-item package contract missing exact entry '$required' in $resolved"
+            }
+        }
+        if ($RequireHorde162World) {
+            foreach ($relative in @('asset.manifest.json', 'collapsed-entry-lod0.runtime.glb')) {
+                $name = "$AssetPrefix/models/world/runtime/collapsed-entry/$relative"
+                $matches = @($archive.Entries | Where-Object { $_.FullName -ceq $name })
+                if ($matches.Count -ne 1) { throw "Collapsed-entry package must contain exactly one '$name'." }
+                $source = Join-Path (Split-Path -Parent $PSScriptRoot) "assets/models/world/runtime/collapsed-entry/$relative"
+                if ($matches[0].Length -ne (Get-Item -LiteralPath $source).Length) { throw "Collapsed-entry package byte/hash mismatch: $name" }
+                $sha = [Security.Cryptography.SHA256]::Create(); $stream = $matches[0].Open()
+                try { $actual = [BitConverter]::ToString($sha.ComputeHash($stream)).Replace('-', '') }
+                finally { $stream.Dispose(); $sha.Dispose() }
+                if ($actual -cne (Get-FileHash -LiteralPath $source -Algorithm SHA256).Hash) { throw "Collapsed-entry package byte/hash mismatch: $name" }
             }
         }
         # A ZIP entry alone is not an admitted runtime asset. Fresh isolated

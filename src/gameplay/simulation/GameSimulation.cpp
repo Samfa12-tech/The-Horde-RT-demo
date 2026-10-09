@@ -6,6 +6,7 @@
 
 #include "gameplay/CorridorCollision.h"
 #include "gameplay/ShowcaseCheckpoints.h"
+#include "gameplay/effects/KeeperTorchLighting.h"
 
 namespace horde::gameplay::simulation
 {
@@ -26,6 +27,29 @@ float FiniteOr(float value, float fallback)
 std::uint64_t SequenceDelta(std::uint64_t newer, std::uint64_t older)
 {
     return newer >= older ? newer - older : 0u;
+}
+
+std::uint64_t SequenceFor(const SimulationCommandSequences& commands,
+                          const CombatInputEdgeKind kind)
+{
+    switch (kind)
+    {
+    case CombatInputEdgeKind::Attack: return commands.attack;
+    case CombatInputEdgeKind::Parry: return commands.parry;
+    case CombatInputEdgeKind::Dodge: return commands.dodge;
+    }
+    return 0u;
+}
+
+std::size_t CombatKindIndex(const CombatInputEdgeKind kind)
+{
+    switch (kind)
+    {
+    case CombatInputEdgeKind::Attack: return 0u;
+    case CombatInputEdgeKind::Parry: return 1u;
+    case CombatInputEdgeKind::Dodge: return 2u;
+    }
+    return 0u;
 }
 
 EntityId SkeletonEntity(std::size_t index)
@@ -49,10 +73,22 @@ GameSimulation::GameSimulation(GameSimulationConfig config)
         playerZ_ = kPlayerSpawn.z;
     }
     config_.movementSpeedMetresPerSecond = std::max(0.0f, config_.movementSpeedMetresPerSecond);
+    for (std::size_t index = 0u; index < effects::kKeeperTorchAnchors.size(); ++index)
+    {
+        const auto& anchor = effects::kKeeperTorchAnchors[index];
+        fireEmitters_[index + 1u] = effects::MakeWorldTorchFireEmitter(anchor.stableId, anchor.seed);
+    }
     enemyDirector_.Reset();
     activeEnemyKind_ = enemyDirector_.Snapshot().selectedEnemy;
+    if (config_.waterfallSkeletonEncounter)
+    {
+        swordCombat_.Reset(kSkeletonEnemyCapacity, kWaterfallSkeletonPairCenter,
+                           &kWaterfallSkeletonGuardSpawns);
+        combatSnapshot_ = swordCombat_.Snapshot();
+    }
     combatSnapshot_ = swordCombat_.Snapshot();
     torchFailureSnapshot_ = torchFailure_.Snapshot();
+    ResetSwordEquipment();
     ResolveHeldItems();
     lanternPendulum_.Reset(
         heldItemFixedStepState_.worldFromLeftHand,
@@ -64,14 +100,37 @@ GameSimulation::GameSimulation(GameSimulationConfig config)
 
 std::uint32_t GameSimulation::AdvanceFrame(const InputSnapshot& input,
                                            double frameDeltaSeconds,
-                                           std::uint64_t inputPublicationSequence)
+                                           std::uint64_t inputPublicationSequence,
+                                           std::uint64_t ownerAdvanceSteadyNs)
 {
     lastInput_ = input;
     inputPublicationSequence_ = inputPublicationSequence;
+    const bool presentationWasActive = combatPresentation_.Snapshot().parrySuccessActive;
+    combatPresentation_.AdvanceFrame(frameDeltaSeconds, input.paused);
     const std::size_t eventsBeforeFrame = events_.Size();
     snapshot_.eventsEmittedThisTick = 0u;
     snapshot_.eventsEmittedThisFrame = 0u;
-    IngestCommands(input);
+    if (ownerAdvanceSteadyNs != 0u)
+    {
+        ScheduleTimestampedCombatEdges(input, frameDeltaSeconds,
+                                       ownerAdvanceSteadyNs,
+                                       inputPublicationSequence);
+        previousOwnerAdvanceSteadyNs_ = std::max(previousOwnerAdvanceSteadyNs_,
+                                                  ownerAdvanceSteadyNs);
+        IngestCommands(input, false);
+    }
+    else
+    {
+        if (previousOwnerAdvanceSteadyNs_ != 0u)
+        {
+            ClearScheduledCombatEdges(true);
+            pendingAttackCommands_ = 0u;
+            pendingParryCommands_ = 0u;
+            pendingDodgeCommands_ = 0u;
+        }
+        previousOwnerAdvanceSteadyNs_ = 0u;
+        IngestCommands(input);
+    }
     if (ConsumeWorldCommand())
     {
         RefreshSnapshot(input);
@@ -82,11 +141,13 @@ std::uint32_t GameSimulation::AdvanceFrame(const InputSnapshot& input,
     }
     if (input.paused)
     {
-        lastConsumedAttackSequence_ += pendingAttackCommands_;
+        ClearQueuedDrawAttack();
+        ClearScheduledCombatEdges(true);
+        lastConsumedAttackSequence_ = std::max(lastConsumedAttackSequence_, latestAttackSequence_);
         pendingAttackCommands_ = 0u;
-        lastConsumedParrySequence_ += pendingParryCommands_;
+        lastConsumedParrySequence_ = std::max(lastConsumedParrySequence_, latestParrySequence_);
         pendingParryCommands_ = 0u;
-        lastConsumedDodgeSequence_ += pendingDodgeCommands_;
+        lastConsumedDodgeSequence_ = std::max(lastConsumedDodgeSequence_, latestDodgeSequence_);
         pendingDodgeCommands_ = 0u;
         lastConsumedInteractSequence_ += pendingInteractCommands_;
         pendingInteractCommands_ = 0u;
@@ -110,8 +171,18 @@ std::uint32_t GameSimulation::AdvanceFrame(const InputSnapshot& input,
         input.paused,
         [this, &input, inputPublicationSequence](float fixedDeltaSeconds)
         {
-            StepFixed(input, fixedDeltaSeconds, inputPublicationSequence);
+            StepFixedTick(input, fixedDeltaSeconds, inputPublicationSequence);
         });
+    // Ticked frames already resolved the final pose. Refresh only when a
+    // zero-tick frame ages or cancels an existing presentation envelope.
+    if (ticks == 0u && (presentationWasActive || presentationPoseDirty_))
+    {
+        // Synchronize zero-tick/paused frames to current input and viewport
+        // without advancing a simulation step.
+        ResolveHeldItems();
+        ResolvePlayerAnimation(0.0f);
+    }
+    presentationPoseDirty_ = false;
     RefreshSnapshot(input);
     snapshot_.simulationTicksThisFrame = ticks;
     snapshot_.fixedStepAccumulatorSeconds = fixedStepRunner_.AccumulatorSeconds();
@@ -126,6 +197,16 @@ void GameSimulation::StepFixed(const InputSnapshot& input,
                                float fixedDeltaSeconds,
                                std::uint64_t inputPublicationSequence)
 {
+    // Direct deterministic stepping is also a valid presentation boundary.
+    combatPresentation_.AdvanceFrame(fixedDeltaSeconds, input.paused);
+    StepFixedTick(input, fixedDeltaSeconds, inputPublicationSequence, false);
+}
+
+void GameSimulation::StepFixedTick(const InputSnapshot& input,
+                                   float fixedDeltaSeconds,
+                                   std::uint64_t inputPublicationSequence,
+                                   const bool activateTimestampedEdges)
+{
     fixedDeltaSeconds = std::clamp(fixedDeltaSeconds, 0.0f, 0.05f);
     lastInput_ = input;
     inputPublicationSequence_ = inputPublicationSequence;
@@ -134,6 +215,8 @@ void GameSimulation::StepFixed(const InputSnapshot& input,
     snapshot_.eventsEmittedThisTick = 0u;
 
     IngestCommands(input);
+    if (activateTimestampedEdges)
+        ActivateScheduledCombatEdges();
     if (ConsumeWorldCommand())
     {
         RefreshSnapshot(input);
@@ -146,11 +229,18 @@ void GameSimulation::StepFixed(const InputSnapshot& input,
     const bool playerAlive = playerVitals_.Snapshot().phase == PlayerLifePhase::Alive;
     if (input.paused || !playerAlive)
     {
-        lastConsumedAttackSequence_ += pendingAttackCommands_;
+        ClearQueuedDrawAttack();
+        if (!playerAlive && heldItems_[1].transition.active)
+        {
+            horde::gameplay::items::InterruptHeldItemTransition(heldItems_[1], tickIndex_);
+            automaticSwordDrawBlocksDefense_ = false;
+        }
+        ClearScheduledCombatEdges(true);
+        lastConsumedAttackSequence_ = std::max(lastConsumedAttackSequence_, latestAttackSequence_);
         pendingAttackCommands_ = 0u;
-        lastConsumedParrySequence_ += pendingParryCommands_;
+        lastConsumedParrySequence_ = std::max(lastConsumedParrySequence_, latestParrySequence_);
         pendingParryCommands_ = 0u;
-        lastConsumedDodgeSequence_ += pendingDodgeCommands_;
+        lastConsumedDodgeSequence_ = std::max(lastConsumedDodgeSequence_, latestDodgeSequence_);
         pendingDodgeCommands_ = 0u;
         lastConsumedInteractSequence_ += pendingInteractCommands_;
         pendingInteractCommands_ = 0u;
@@ -162,6 +252,7 @@ void GameSimulation::StepFixed(const InputSnapshot& input,
     {
         walkTime_ += fixedDeltaSeconds;
         UpdateMovement(input, fixedDeltaSeconds);
+        AdvanceSwordEquipment(fixedDeltaSeconds);
         const bool torchWasTriggered = torchFailureSnapshot_.triggered;
         torchFailureSnapshot_ = torchFailure_.Update(fixedDeltaSeconds,
                                            playerX_,
@@ -223,6 +314,13 @@ void GameSimulation::StepFixed(const InputSnapshot& input,
 
     if (wasAlive && playerVitals_.Snapshot().phase != PlayerLifePhase::Alive)
     {
+        ClearQueuedDrawAttack();
+        if (heldItems_[1].transition.active)
+        {
+            horde::gameplay::items::InterruptHeldItemTransition(heldItems_[1], tickIndex_);
+            automaticSwordDrawBlocksDefense_ = false;
+        }
+        ClearScheduledCombatEdges(true);
         pendingAttackCommands_ = 0u;
         pendingParryCommands_ = 0u;
         pendingDodgeCommands_ = 0u;
@@ -236,10 +334,15 @@ void GameSimulation::StepFixed(const InputSnapshot& input,
 }
 
 void GameSimulation::SynchronizePausedInput(const InputSnapshot& input,
-                                            const std::uint64_t inputPublicationSequence)
+                                            const std::uint64_t inputPublicationSequence,
+                                            const PausedInputPolicy policy)
 {
     lastInput_ = input;
     lastInput_.paused = true;
+    ClearQueuedDrawAttack();
+    combatPresentation_.Reset();
+    ClearScheduledCombatEdges(false);
+    previousOwnerAdvanceSteadyNs_ = 0u;
     inputPublicationSequence_ = std::max(inputPublicationSequence_,
                                          inputPublicationSequence);
 
@@ -255,10 +358,22 @@ void GameSimulation::SynchronizePausedInput(const InputSnapshot& input,
                 lastConsumedParrySequence_);
     synchronize(input.commands.dodge, latestDodgeSequence_,
                 lastConsumedDodgeSequence_);
-    synchronize(input.commands.routeReset, latestRouteResetSequence_,
-                lastConsumedRouteResetSequence_);
-    synchronize(input.commands.retry, latestRetrySequence_,
-                lastConsumedRetrySequence_);
+    if (policy == PausedInputPolicy::PreserveWorldCommands)
+    {
+        pendingRouteResetCommands_ += SequenceDelta(input.commands.routeReset, latestRouteResetSequence_);
+        pendingRetryCommands_ += SequenceDelta(input.commands.retry, latestRetrySequence_);
+        latestRouteResetSequence_ = std::max(latestRouteResetSequence_, input.commands.routeReset);
+        latestRetrySequence_ = std::max(latestRetrySequence_, input.commands.retry);
+    }
+    else
+    {
+        synchronize(input.commands.routeReset, latestRouteResetSequence_,
+                    lastConsumedRouteResetSequence_);
+        synchronize(input.commands.retry, latestRetrySequence_,
+                    lastConsumedRetrySequence_);
+        pendingRouteResetCommands_ = 0u;
+        pendingRetryCommands_ = 0u;
+    }
     synchronize(input.commands.interact, latestInteractSequence_,
                 lastConsumedInteractSequence_);
     synchronize(input.commands.toggleHeldLightPose,
@@ -268,8 +383,6 @@ void GameSimulation::SynchronizePausedInput(const InputSnapshot& input,
     pendingAttackCommands_ = 0u;
     pendingParryCommands_ = 0u;
     pendingDodgeCommands_ = 0u;
-    pendingRouteResetCommands_ = 0u;
-    pendingRetryCommands_ = 0u;
     pendingInteractCommands_ = 0u;
     pendingToggleHeldLightPoseCommands_ = 0u;
     pendingDodgeForward_ = 0.0f;
@@ -292,6 +405,30 @@ void GameSimulation::SynchronizePausedInput(const InputSnapshot& input,
     snapshot_.catchUpOverrunCount = fixedStepRunner_.OverrunCount();
     snapshot_.eventsEmittedThisTick = 0u;
     snapshot_.eventsEmittedThisFrame = 0u;
+    ResolveHeldItems();
+    ResolvePlayerAnimation(0.0f);
+    RefreshSnapshot(lastInput_);
+}
+
+void GameSimulation::SetPresentationAspect(const float logicalViewAspect)
+{
+    const float aspect = std::isfinite(logicalViewAspect) && logicalViewAspect > 0.0f
+        ? std::clamp(logicalViewAspect, 0.25f, 4.0f)
+        : 1.0f;
+    if (aspect == presentationAspect_)
+    {
+        return;
+    }
+
+    presentationAspect_ = aspect;
+    presentationPoseDirty_ = true;
+    // Viewport changes affect only presentation kinematics. Re-resolve the
+    // shared hand/item/animation pose immediately so zero-tick, paused, and
+    // imported-checkpoint frames publish a coherent pose without advancing
+    // simulation time or any gameplay authority.
+    ResolveHeldItems();
+    ResolvePlayerAnimation(0.0f);
+    RefreshSnapshot(lastInput_);
 }
 
 void GameSimulation::ResetRoute()
@@ -312,11 +449,25 @@ void GameSimulation::ResetRoute()
     playerPitchRadians_ = std::clamp(FiniteOr(config_.playerStartPitchRadians, 0.0f),
                                      kMinimumPitch,
                                      kMaximumPitch);
-    swordCombat_.Reset(kSkeletonEnemyCapacity);
+    swordCombat_.Reset(kSkeletonEnemyCapacity,
+        config_.waterfallSkeletonEncounter
+            ? kWaterfallSkeletonPairCenter
+            : RoutePosition{0.0f, -4.65f},
+        config_.waterfallSkeletonEncounter
+            ? &kWaterfallSkeletonGuardSpawns
+            : nullptr);
+    waterfallWarningEmitted_ = false;
+    ResetSwordEquipment();
+    combatPresentation_.Reset();
+    skeletonIdlePhasesEnabled_ = true;
     combatSnapshot_ = swordCombat_.Update(0.0f,
                                            playerX_,
                                            playerZ_,
-                                           playerYawRadians_);
+                                           playerYawRadians_,
+                                           config_.waterfallSkeletonEncounter,
+                                           config_.waterfallSkeletonEncounter &&
+                                               IsWaterfallSkeletonArena(playerX_, playerZ_),
+                                           config_.waterfallSkeletonEncounter);
     playerAnimationState_.Reset();
     ResolveHeldItems();
     lanternPendulum_.Reset(
@@ -324,7 +475,8 @@ void GameSimulation::ResetRoute()
         heldItemFixedStepState_.kinematics.rewardLanternPresentationYawRadians);
     lanternPendulumResetPending_ = true;
     ResolvePlayerAnimation(0.0f);
-    horde::gameplay::effects::ResetFireEmitter(fireEmitters_[0]);
+    for (std::size_t index = 0u; index < fireEmitterCount_; ++index)
+        horde::gameplay::effects::ResetFireEmitter(fireEmitters_[index]);
     ResolveFireEmitters(0.0f);
     RefreshSnapshot(lastInput_);
 }
@@ -339,6 +491,38 @@ bool GameSimulation::ApplyShowcaseCheckpoint(std::int32_t checkpointId, bool cou
     return ApplyCheckpoint(checkpointId, countAsRetry);
 }
 
+bool GameSimulation::BeginMotionEvidenceEquipmentSeed()
+{
+    if (motionEvidenceEquipmentSeedActive_ ||
+        config_.playerMountProfile != horde::gameplay::items::PlayerMountProfile::AnatomicalBody)
+        return false;
+
+    motionEvidencePreviousSwordStartsStowed_ = config_.swordStartsStowed;
+    motionEvidencePreviousWaterfallSkeletonEncounter_ = config_.waterfallSkeletonEncounter;
+    config_.swordStartsStowed = true;
+    config_.waterfallSkeletonEncounter = true;
+    if (!ApplyShowcaseCheckpoint(2, false))
+    {
+        config_.swordStartsStowed = motionEvidencePreviousSwordStartsStowed_;
+        config_.waterfallSkeletonEncounter = motionEvidencePreviousWaterfallSkeletonEncounter_;
+        return false;
+    }
+    motionEvidenceEquipmentSeedActive_ = true;
+    return true;
+}
+
+void GameSimulation::EndMotionEvidenceEquipmentSeed()
+{
+    if (!motionEvidenceEquipmentSeedActive_) return;
+    config_.swordStartsStowed = motionEvidencePreviousSwordStartsStowed_;
+    config_.waterfallSkeletonEncounter = motionEvidencePreviousWaterfallSkeletonEncounter_;
+    motionEvidenceEquipmentSeedActive_ = false;
+    // Reset through the shared route path so temporary equipment and guards do
+    // not leak into ordinary play. The route reset preserves monotonic floors.
+    ResetRoute();
+    ClearEvents();
+}
+
 void GameSimulation::ImportRewardCheckpoint(
     const horde::gameplay::interactions::ChestRewardSnapshot& chestReward,
     const horde::gameplay::interactions::InteractionState& interaction,
@@ -346,11 +530,13 @@ void GameSimulation::ImportRewardCheckpoint(
     const horde::gameplay::interactions::LanternPendulumSnapshot* pendulum)
 {
     events_.Clear();
+    combatPresentation_.Reset();
     chestRewardSequence_.Import(chestReward);
     interactionState_ = interaction;
     finaleSequence_.Import(finale);
     pendingInteractCommands_ = 0u;
     pendingToggleHeldLightPoseCommands_ = 0u;
+    ClearQueuedDrawAttack();
     finaleCompletionEmitted_ =
         finaleSequence_.Snapshot().endingPhase ==
         horde::gameplay::interactions::FinaleEndingPhase::Complete;
@@ -374,6 +560,12 @@ void GameSimulation::ImportRewardCheckpoint(
 
 void GameSimulation::ResetTiming()
 {
+    ClearScheduledCombatEdges(true);
+    previousOwnerAdvanceSteadyNs_ = 0u;
+    pendingAttackCommands_ = 0u;
+    pendingParryCommands_ = 0u;
+    pendingDodgeCommands_ = 0u;
+    ClearQueuedDrawAttack();
     fixedStepRunner_.ResetAccumulator();
 }
 
@@ -395,25 +587,30 @@ EntityId GameSimulation::EntityForEnemy(EnemyKind kind)
     }
 }
 
-void GameSimulation::IngestCommands(const InputSnapshot& input)
+void GameSimulation::IngestCommands(const InputSnapshot& input, const bool ingestCombatEdges)
 {
-    pendingAttackCommands_ += SequenceDelta(input.commands.attack, latestAttackSequence_);
-    pendingParryCommands_ += SequenceDelta(input.commands.parry, latestParrySequence_);
-    const std::uint64_t dodgeDelta = SequenceDelta(input.commands.dodge, latestDodgeSequence_);
-    if (dodgeDelta > 0u)
+    if (ingestCombatEdges)
     {
-        pendingDodgeCommands_ += dodgeDelta;
+        pendingAttackCommands_ = SaturatingAdd(
+            pendingAttackCommands_, SequenceDelta(input.commands.attack, latestAttackSequence_));
+        pendingParryCommands_ = SaturatingAdd(
+            pendingParryCommands_, SequenceDelta(input.commands.parry, latestParrySequence_));
+    }
+    const std::uint64_t dodgeDelta = SequenceDelta(input.commands.dodge, latestDodgeSequence_);
+    if (ingestCombatEdges && dodgeDelta > 0u)
+    {
+        pendingDodgeCommands_ = SaturatingAdd(pendingDodgeCommands_, dodgeDelta);
         // Capture the coherent left-stick publication associated with the
         // button edge; releasing the stick before the next fixed tick cannot
         // change the requested dodge direction.
         pendingDodgeForward_ = std::clamp(FiniteOr(input.moveForward, 0.0f), -1.0f, 1.0f);
         pendingDodgeStrafe_ = std::clamp(FiniteOr(input.moveStrafe, 0.0f), -1.0f, 1.0f);
     }
-    pendingRouteResetCommands_ += SequenceDelta(input.commands.routeReset, latestRouteResetSequence_);
-    pendingRetryCommands_ += SequenceDelta(input.commands.retry, latestRetrySequence_);
-    pendingInteractCommands_ += SequenceDelta(input.commands.interact, latestInteractSequence_);
-    pendingToggleHeldLightPoseCommands_ += SequenceDelta(
-        input.commands.toggleHeldLightPose, latestToggleHeldLightPoseSequence_);
+    pendingRouteResetCommands_ = SaturatingAdd(pendingRouteResetCommands_, SequenceDelta(input.commands.routeReset, latestRouteResetSequence_));
+    pendingRetryCommands_ = SaturatingAdd(pendingRetryCommands_, SequenceDelta(input.commands.retry, latestRetrySequence_));
+    pendingInteractCommands_ = SaturatingAdd(pendingInteractCommands_, SequenceDelta(input.commands.interact, latestInteractSequence_));
+    pendingToggleHeldLightPoseCommands_ = SaturatingAdd(pendingToggleHeldLightPoseCommands_, SequenceDelta(
+        input.commands.toggleHeldLightPose, latestToggleHeldLightPoseSequence_));
     latestAttackSequence_ = std::max(latestAttackSequence_, input.commands.attack);
     latestParrySequence_ = std::max(latestParrySequence_, input.commands.parry);
     latestDodgeSequence_ = std::max(latestDodgeSequence_, input.commands.dodge);
@@ -422,6 +619,377 @@ void GameSimulation::IngestCommands(const InputSnapshot& input)
     latestInteractSequence_ = std::max(latestInteractSequence_, input.commands.interact);
     latestToggleHeldLightPoseSequence_ = std::max(
         latestToggleHeldLightPoseSequence_, input.commands.toggleHeldLightPose);
+}
+
+void GameSimulation::AddCombatTimingTrace(
+    const CombatInputEdge& edge,
+    const std::uint64_t publicationSequence,
+    const std::uint64_t targetTick,
+    const CombatInputTimingDisposition disposition)
+{
+    CombatInputTimingSnapshot& timing = snapshot_.combatInputTiming;
+    const std::uint32_t index = timing.nextTraceIndex;
+    if (timing.traceCount == kCombatInputTimingTraceCapacity)
+    {
+        timing.traceOverwriteCount = SaturatingAdd(timing.traceOverwriteCount, 1u);
+    }
+    else
+    {
+        ++timing.traceCount;
+    }
+    timing.traces[index] = {
+        edge.kind, disposition, CombatInputTimingStatus::Scheduled,
+        edge.commandSequence, 1u, 0u, edge.steadyTimeNanoseconds,
+        publicationSequence, targetTick, 0u, 0u, 0u};
+    timing.nextTraceIndex =
+        (index + 1u) % static_cast<std::uint32_t>(kCombatInputTimingTraceCapacity);
+}
+
+void GameSimulation::ScheduleTimestampedCombatEdges(
+    const InputSnapshot& input,
+    const double frameDeltaSeconds,
+    const std::uint64_t ownerAdvanceSteadyNs,
+    const std::uint64_t publicationSequence)
+{
+    snapshot_.combatInputTiming.inputHistoryOverwriteCount = input.combatEdgeHistory.overwriteCount;
+    const std::array<CombatInputEdgeKind, 3u> kinds{{
+        CombatInputEdgeKind::Attack,
+        CombatInputEdgeKind::Parry,
+        CombatInputEdgeKind::Dodge}};
+    std::array<std::uint64_t, 3u> latest{{
+        latestAttackSequence_, latestParrySequence_, latestDodgeSequence_}};
+    std::array<std::uint64_t, 3u> deltas{};
+    std::array<std::array<CombatInputEdge, kCombatInputEdgeHistoryCapacity>, 3u> found{};
+    std::array<std::uint32_t, 3u> foundCount{};
+    std::array<bool, 3u> covered{};
+    for (std::size_t kindIndex = 0u; kindIndex < kinds.size(); ++kindIndex)
+    {
+        deltas[kindIndex] = SequenceDelta(SequenceFor(input.commands, kinds[kindIndex]),
+                                          latest[kindIndex]);
+        covered[kindIndex] = deltas[kindIndex] == 0u;
+    }
+
+    const CombatInputEdgeHistory& history = input.combatEdgeHistory;
+    const std::uint32_t count = std::min<std::uint32_t>(
+        history.count, static_cast<std::uint32_t>(kCombatInputEdgeHistoryCapacity));
+    const std::uint32_t oldest = (history.nextIndex +
+        static_cast<std::uint32_t>(kCombatInputEdgeHistoryCapacity) - count) %
+        static_cast<std::uint32_t>(kCombatInputEdgeHistoryCapacity);
+    for (std::uint32_t offset = 0u; offset < count; ++offset)
+    {
+        const CombatInputEdge& edge = history.edges[
+            (oldest + offset) % static_cast<std::uint32_t>(kCombatInputEdgeHistoryCapacity)];
+        for (std::size_t kindIndex = 0u; kindIndex < kinds.size(); ++kindIndex)
+        {
+            if (edge.kind == kinds[kindIndex] &&
+                edge.commandSequence > latest[kindIndex] &&
+                edge.commandSequence <= SequenceFor(input.commands, kinds[kindIndex]) &&
+                foundCount[kindIndex] < kCombatInputEdgeHistoryCapacity)
+            {
+                found[kindIndex][foundCount[kindIndex]++] = edge;
+            }
+        }
+    }
+
+    if (previousOwnerAdvanceSteadyNs_ != 0u)
+    {
+        for (std::size_t kindIndex = 0u; kindIndex < kinds.size(); ++kindIndex)
+        {
+            if (deltas[kindIndex] == 0u || deltas[kindIndex] >
+                kCombatInputEdgeHistoryCapacity || foundCount[kindIndex] != deltas[kindIndex])
+                continue;
+            std::uint64_t expected = latest[kindIndex];
+            bool sequenceComplete = true;
+            for (std::uint32_t i = 0u; i < foundCount[kindIndex]; ++i)
+            {
+                if (expected == UINT64_MAX || found[kindIndex][i].commandSequence != ++expected)
+                {
+                    sequenceComplete = false;
+                    break;
+                }
+            }
+            covered[kindIndex] = sequenceComplete;
+        }
+    }
+
+    std::array<CombatInputEdge, kCombatInputEdgeHistoryCapacity> ordered{};
+    std::uint32_t orderedCount = 0u;
+    for (std::size_t kindIndex = 0u; kindIndex < kinds.size(); ++kindIndex)
+    {
+        if (covered[kindIndex] && previousOwnerAdvanceSteadyNs_ != 0u)
+        {
+            for (std::uint32_t i = 0u; i < foundCount[kindIndex]; ++i)
+                ordered[orderedCount++] = found[kindIndex][i];
+        }
+        else if (deltas[kindIndex] != 0u)
+        {
+            const CombatInputTimingDisposition disposition = previousOwnerAdvanceSteadyNs_ == 0u
+                ? CombatInputTimingDisposition::FirstTimestampFallback
+                : CombatInputTimingDisposition::MissingMetadataFallback;
+            CombatInputEdge fallback{};
+            fallback.kind = kinds[kindIndex];
+            fallback.commandSequence = SequenceFor(input.commands, kinds[kindIndex]);
+            fallback.steadyTimeNanoseconds = 0u;
+            std::uint64_t fallbackTarget = SaturatingAdd(tickIndex_, 1u);
+            bool followsScheduledEdge = overflowCombatCommandCounts_[kindIndex] > 0u;
+            if (followsScheduledEdge)
+                fallbackTarget = std::max(fallbackTarget,
+                    overflowCombatTargetTicks_[kindIndex]);
+            for (std::uint32_t queued = 0u; queued < scheduledCombatEdgeCount_; ++queued)
+            {
+                if (scheduledCombatEdges_[queued].edge.kind == kinds[kindIndex])
+                {
+                    followsScheduledEdge = true;
+                    fallbackTarget = std::max(fallbackTarget,
+                        scheduledCombatEdges_[queued].targetTick);
+                }
+            }
+            AddCombatTimingTrace(fallback, publicationSequence,
+                                 fallbackTarget, disposition);
+            CombatInputTimingTrace& trace = snapshot_.combatInputTiming.traces[
+                (snapshot_.combatInputTiming.nextTraceIndex + kCombatInputTimingTraceCapacity - 1u) %
+                kCombatInputTimingTraceCapacity];
+            trace.commandCount = deltas[kindIndex];
+            snapshot_.combatInputTiming.timestampFallbackCount = SaturatingAdd(
+                snapshot_.combatInputTiming.timestampFallbackCount, deltas[kindIndex]);
+            if (followsScheduledEdge)
+            {
+                overflowCombatCommandCounts_[kindIndex] = SaturatingAdd(
+                    overflowCombatCommandCounts_[kindIndex], deltas[kindIndex]);
+                overflowCombatTargetTicks_[kindIndex] = fallbackTarget;
+                if (kinds[kindIndex] == CombatInputEdgeKind::Dodge)
+                {
+                    overflowDodgeForward_ = std::clamp(FiniteOr(input.moveForward, 0.0f), -1.0f, 1.0f);
+                    overflowDodgeStrafe_ = std::clamp(FiniteOr(input.moveStrafe, 0.0f), -1.0f, 1.0f);
+                }
+            }
+            else if (kinds[kindIndex] == CombatInputEdgeKind::Attack)
+            {
+                pendingAttackCommands_ = SaturatingAdd(pendingAttackCommands_, deltas[kindIndex]);
+            }
+            else if (kinds[kindIndex] == CombatInputEdgeKind::Parry)
+            {
+                pendingParryCommands_ = SaturatingAdd(pendingParryCommands_, deltas[kindIndex]);
+            }
+            else
+            {
+                pendingDodgeCommands_ = SaturatingAdd(pendingDodgeCommands_, deltas[kindIndex]);
+                pendingDodgeForward_ = std::clamp(FiniteOr(input.moveForward, 0.0f), -1.0f, 1.0f);
+                pendingDodgeStrafe_ = std::clamp(FiniteOr(input.moveStrafe, 0.0f), -1.0f, 1.0f);
+            }
+        }
+    }
+
+    // The history is globally ordered; a tiny insertion sort is bounded by 32.
+    for (std::uint32_t i = 1u; i < orderedCount; ++i)
+    {
+        const CombatInputEdge value = ordered[i];
+        std::uint32_t j = i;
+        while (j > 0u && ordered[j - 1u].order > value.order)
+        {
+            ordered[j] = ordered[j - 1u];
+            --j;
+        }
+        ordered[j] = value;
+    }
+
+    const double acceptedDelta = std::isfinite(frameDeltaSeconds)
+        ? std::clamp(frameDeltaSeconds, 0.0,
+                     FixedStepRunner::kMaximumFrameContributionSeconds)
+        : 0.0;
+    const double projected = fixedStepRunner_.AccumulatorSeconds() + acceptedDelta;
+    const double projectedSteps = std::floor(
+        (projected + 1.0e-12) / FixedStepRunner::kFixedDeltaSeconds);
+    const std::uint32_t ticksProduced = static_cast<std::uint32_t>(std::clamp(
+        projectedSteps, 0.0,
+        static_cast<double>(FixedStepRunner::kMaximumStepsPerAdvance)));
+
+    for (std::uint32_t i = 0u; i < orderedCount; ++i)
+    {
+        const CombatInputEdge& edge = ordered[i];
+        const CombatInputScheduleResult schedule = ScheduleCombatInputEdge(
+            edge.steadyTimeNanoseconds, previousOwnerAdvanceSteadyNs_,
+            ownerAdvanceSteadyNs, frameDeltaSeconds,
+            fixedStepRunner_.AccumulatorSeconds(), tickIndex_, ticksProduced);
+        std::uint64_t targetTick = schedule.targetTick;
+        for (std::uint32_t queued = 0u; queued < scheduledCombatEdgeCount_; ++queued)
+        {
+            const ScheduledCombatEdge& earlier = scheduledCombatEdges_[queued];
+            if (earlier.edge.kind == edge.kind &&
+                earlier.edge.commandSequence < edge.commandSequence)
+                targetTick = std::max(targetTick, earlier.targetTick);
+        }
+        const std::size_t kindIndex = CombatKindIndex(edge.kind);
+        if (overflowCombatCommandCounts_[kindIndex] > 0u)
+            targetTick = std::max(targetTick, overflowCombatTargetTicks_[kindIndex]);
+
+        CombatInputTimingDisposition disposition = schedule.disposition;
+        if (scheduledCombatEdgeCount_ < scheduledCombatEdges_.size())
+        {
+            scheduledCombatEdges_[scheduledCombatEdgeCount_++] = {
+                edge, targetTick, publicationSequence};
+            AddCombatTimingTrace(edge, publicationSequence, targetTick, disposition);
+        }
+        else
+        {
+            disposition = CombatInputTimingDisposition::QueueOverflowFallback;
+            const std::size_t kindIndex = CombatKindIndex(edge.kind);
+            for (std::uint32_t queued = 0u; queued < scheduledCombatEdgeCount_; ++queued)
+            {
+                if (scheduledCombatEdges_[queued].edge.kind == edge.kind)
+                    targetTick = std::max(targetTick, scheduledCombatEdges_[queued].targetTick);
+            }
+            if (overflowCombatCommandCounts_[kindIndex] > 0u)
+                targetTick = std::max(targetTick, overflowCombatTargetTicks_[kindIndex]);
+            AddCombatTimingTrace(edge, publicationSequence,
+                                 targetTick, disposition);
+            overflowCombatCommandCounts_[kindIndex] = SaturatingAdd(
+                overflowCombatCommandCounts_[kindIndex], 1u);
+            overflowCombatTargetTicks_[kindIndex] = targetTick;
+            if (edge.kind == CombatInputEdgeKind::Dodge)
+            {
+                overflowDodgeForward_ = edge.moveForward;
+                overflowDodgeStrafe_ = edge.moveStrafe;
+            }
+            snapshot_.combatInputTiming.timestampFallbackCount = SaturatingAdd(
+                snapshot_.combatInputTiming.timestampFallbackCount, 1u);
+        }
+    }
+    std::uint64_t scheduledCount = scheduledCombatEdgeCount_;
+    for (const std::uint64_t count : overflowCombatCommandCounts_)
+        scheduledCount = SaturatingAdd(scheduledCount, count);
+    snapshot_.combatInputTiming.scheduledEdgeCount = static_cast<std::uint32_t>(
+        std::min<std::uint64_t>(scheduledCount, UINT32_MAX));
+}
+
+void GameSimulation::ActivateScheduledCombatEdges()
+{
+    std::uint32_t retained = 0u;
+    for (std::uint32_t i = 0u; i < scheduledCombatEdgeCount_; ++i)
+    {
+        const ScheduledCombatEdge& scheduled = scheduledCombatEdges_[i];
+        if (scheduled.targetTick > tickIndex_)
+        {
+            scheduledCombatEdges_[retained++] = scheduled;
+            continue;
+        }
+        if (scheduled.edge.kind == CombatInputEdgeKind::Attack)
+            pendingAttackCommands_ = SaturatingAdd(pendingAttackCommands_, 1u);
+        else if (scheduled.edge.kind == CombatInputEdgeKind::Parry)
+            pendingParryCommands_ = SaturatingAdd(pendingParryCommands_, 1u);
+        else
+        {
+            pendingDodgeCommands_ = SaturatingAdd(pendingDodgeCommands_, 1u);
+            pendingDodgeForward_ = scheduled.edge.moveForward;
+            pendingDodgeStrafe_ = scheduled.edge.moveStrafe;
+        }
+    }
+    for (std::size_t kindIndex = 0u; kindIndex < overflowCombatCommandCounts_.size(); ++kindIndex)
+    {
+        const std::uint64_t count = overflowCombatCommandCounts_[kindIndex];
+        if (count == 0u || overflowCombatTargetTicks_[kindIndex] > tickIndex_)
+            continue;
+        if (kindIndex == CombatKindIndex(CombatInputEdgeKind::Attack))
+            pendingAttackCommands_ = SaturatingAdd(pendingAttackCommands_, count);
+        else if (kindIndex == CombatKindIndex(CombatInputEdgeKind::Parry))
+            pendingParryCommands_ = SaturatingAdd(pendingParryCommands_, count);
+        else
+        {
+            pendingDodgeCommands_ = SaturatingAdd(pendingDodgeCommands_, count);
+            pendingDodgeForward_ = overflowDodgeForward_;
+            pendingDodgeStrafe_ = overflowDodgeStrafe_;
+        }
+        overflowCombatCommandCounts_[kindIndex] = 0u;
+        overflowCombatTargetTicks_[kindIndex] = 0u;
+    }
+    scheduledCombatEdgeCount_ = retained;
+    std::uint64_t scheduledCount = retained;
+    for (const std::uint64_t count : overflowCombatCommandCounts_)
+        scheduledCount = SaturatingAdd(scheduledCount, count);
+    snapshot_.combatInputTiming.scheduledEdgeCount = static_cast<std::uint32_t>(
+        std::min<std::uint64_t>(scheduledCount, UINT32_MAX));
+}
+
+void GameSimulation::ClearScheduledCombatEdges(const bool discardAndConsume)
+{
+    parrySourceCommandSequence_ = 0u;
+    for (std::uint32_t i = 0u; i < snapshot_.combatInputTiming.traceCount; ++i)
+    {
+        const std::uint32_t index = (snapshot_.combatInputTiming.nextTraceIndex +
+            static_cast<std::uint32_t>(kCombatInputTimingTraceCapacity) -
+            snapshot_.combatInputTiming.traceCount + i) %
+            static_cast<std::uint32_t>(kCombatInputTimingTraceCapacity);
+        CombatInputTimingTrace& trace = snapshot_.combatInputTiming.traces[index];
+        if (trace.status == CombatInputTimingStatus::Scheduled)
+            trace.status = CombatInputTimingStatus::Discarded;
+    }
+    if (discardAndConsume)
+    {
+        lastConsumedAttackSequence_ = std::max(lastConsumedAttackSequence_, latestAttackSequence_);
+        lastConsumedParrySequence_ = std::max(lastConsumedParrySequence_, latestParrySequence_);
+        lastConsumedDodgeSequence_ = std::max(lastConsumedDodgeSequence_, latestDodgeSequence_);
+    }
+    scheduledCombatEdgeCount_ = 0u;
+    scheduledCombatEdges_.fill({});
+    overflowCombatCommandCounts_.fill(0u);
+    overflowCombatTargetTicks_.fill(0u);
+    snapshot_.combatInputTiming.scheduledEdgeCount = 0u;
+}
+
+void GameSimulation::MarkCombatTimingConsumed(const CombatInputEdgeKind kind,
+                                               const std::uint64_t oldConsumed,
+                                               const std::uint64_t newConsumed)
+{
+    if (newConsumed <= oldConsumed)
+        return;
+    for (std::uint32_t i = 0u; i < snapshot_.combatInputTiming.traceCount; ++i)
+    {
+        const std::uint32_t index = (snapshot_.combatInputTiming.nextTraceIndex +
+            static_cast<std::uint32_t>(kCombatInputTimingTraceCapacity) -
+            snapshot_.combatInputTiming.traceCount + i) %
+            static_cast<std::uint32_t>(kCombatInputTimingTraceCapacity);
+        CombatInputTimingTrace& trace = snapshot_.combatInputTiming.traces[index];
+        if (trace.kind != kind || trace.status != CombatInputTimingStatus::Scheduled)
+            continue;
+        const std::uint64_t rangeStart = trace.commandCount > trace.commandSequence
+            ? 1u : trace.commandSequence - trace.commandCount + 1u;
+        const std::uint64_t overlapStart = std::max(
+            rangeStart, SaturatingAdd(oldConsumed, 1u));
+        const std::uint64_t overlapEnd = std::min(trace.commandSequence, newConsumed);
+        if (overlapEnd >= overlapStart)
+        {
+            trace.consumedCount = SaturatingAdd(
+                trace.consumedCount, overlapEnd - overlapStart + 1u);
+            trace.actualTick = tickIndex_;
+            if (trace.consumedCount >= trace.commandCount)
+                trace.status = CombatInputTimingStatus::Consumed;
+        }
+    }
+}
+
+void GameSimulation::LinkCombatTimingSemanticEvent(
+    const CombatInputEdgeKind kind,
+    const std::uint64_t commandSequence,
+    const std::uint64_t eventSequence,
+    const std::uint64_t eventTick)
+{
+    if (commandSequence == 0u || eventSequence == 0u)
+        return;
+    for (std::uint32_t i = 0u; i < snapshot_.combatInputTiming.traceCount; ++i)
+    {
+        const std::uint32_t index = (snapshot_.combatInputTiming.nextTraceIndex +
+            static_cast<std::uint32_t>(kCombatInputTimingTraceCapacity) -
+            snapshot_.combatInputTiming.traceCount + i) %
+            static_cast<std::uint32_t>(kCombatInputTimingTraceCapacity);
+        CombatInputTimingTrace& trace = snapshot_.combatInputTiming.traces[index];
+        if (trace.kind == kind && trace.commandCount == 1u &&
+            trace.commandSequence == commandSequence)
+        {
+            trace.semanticEventSequence = eventSequence;
+            trace.semanticEventTick = eventTick;
+            return;
+        }
+    }
 }
 
 bool GameSimulation::ConsumeWorldCommand()
@@ -451,7 +1019,13 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
         return false;
     }
 
+    const auto encounterCheckpoint = ShowcaseCheckpointForEncounter(
+        *checkpoint, config_.waterfallSkeletonEncounter);
+    checkpoint = &encounterCheckpoint;
+    ClearScheduledCombatEdges(true);
+
     events_.Clear();
+    combatPresentation_.Reset();
     ShowcaseCheckpointState state = BuildShowcaseCheckpointState(*checkpoint);
     playerX_ = checkpoint->x;
     playerZ_ = checkpoint->z;
@@ -463,9 +1037,27 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
     torchFailureSnapshot_ = torchFailure_.Snapshot();
     horde::gameplay::items::ImportHeldItemCheckpoint(
         heldItems_, torchFailureSnapshot_.heldByPlayer, tickIndex_);
+    ResetSwordEquipment();
+    waterfallWarningEmitted_ = false;
     enemyDirector_ = state.enemyDirector;
-    activeEnemyKind_ = state.activeEnemyKind;
+    if (config_.waterfallSkeletonEncounter && IsWaterfallSkeletonRoom(playerX_, playerZ_))
+        enemyDirector_.Update(playerX_, playerZ_, EnemyKind::Skeleton);
+    activeEnemyKind_ = enemyDirector_.Snapshot().selectedEnemy;
     lichEncounter_ = state.lichEncounter;
+    if (isRetry && checkpoint->preset == ShowcaseCheckpointPreset::LichActive)
+    {
+        playerX_ = kKeeperRetryPosition.x;
+        playerZ_ = kKeeperRetryPosition.z;
+        playerYawRadians_ = -1.57079632679f;
+        playerPitchRadians_ = 0.0f;
+        lichEncounter_.BeginRetryRecognition();
+    }
+    skeletonIdlePhasesEnabled_ = isRetry;
+    skeletonIncidentalIdleSeconds_.fill(0.0f);
+    skeletonIncidentalNextSeconds_ = {{12.0f, 18.0f}};
+    skeletonIncidentalSpacingSeconds_ = 0.0f;
+    lichAttackEligible_ = false;
+    lichRevealAttackSequenceFloor_ = latestAttackSequence_;
     chestRewardSequence_ = state.chestRewardSequence;
     finaleSequence_ = state.finaleSequence;
     interactionState_ = state.interactionState;
@@ -477,11 +1069,26 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
             horde::gameplay::interactions::HeldLightKind::None;
     }
     const bool pairCheckpoint = checkpoint->preset == ShowcaseCheckpointPreset::TwoSkeletonCombat;
-    swordCombat_.Reset((isRetry || pairCheckpoint) ? kSkeletonEnemyCapacity : 1u);
+    // Explicit reset/retry/import owns the whole encounter state. Keep the
+    // authored pair in its room even when a bay/Keeper checkpoint currently
+    // selects the Lich; later room selection does not respawn enemies.
+    const bool productionSkeletonEncounter = config_.waterfallSkeletonEncounter;
+    const RoutePosition combatSpawnCenter = productionSkeletonEncounter
+        ? kWaterfallSkeletonPairCenter
+        : RoutePosition{0.0f, -4.65f};
+    swordCombat_.Reset(productionSkeletonEncounter
+                           ? kSkeletonEnemyCapacity
+                           : ((isRetry || pairCheckpoint) ? kSkeletonEnemyCapacity : 1u),
+                       combatSpawnCenter,
+                       productionSkeletonEncounter ? &kWaterfallSkeletonGuardSpawns : nullptr);
     combatSnapshot_ = swordCombat_.Update(0.0f,
                                            playerX_,
                                            playerZ_,
-                                           playerYawRadians_);
+                                           playerYawRadians_,
+                                           config_.waterfallSkeletonEncounter,
+                                           config_.waterfallSkeletonEncounter &&
+                                               IsWaterfallSkeletonArena(playerX_, playerZ_),
+                                           config_.waterfallSkeletonEncounter);
     const bool lichHasLineOfSight = !IsRouteAudioObstructed(playerX_,
                                                              playerZ_,
                                                              lichEncounter_.Snapshot().x,
@@ -503,9 +1110,9 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
     // arrived with it is still consumed exactly once. Advancing the consumed
     // sequences prevents pause/Home/ending polling from replaying a discarded
     // attack after the imported world state resumes.
-    lastConsumedAttackSequence_ += pendingAttackCommands_;
-    lastConsumedParrySequence_ += pendingParryCommands_;
-    lastConsumedDodgeSequence_ += pendingDodgeCommands_;
+    lastConsumedAttackSequence_ = std::max(lastConsumedAttackSequence_, latestAttackSequence_);
+    lastConsumedParrySequence_ = std::max(lastConsumedParrySequence_, latestParrySequence_);
+    lastConsumedDodgeSequence_ = std::max(lastConsumedDodgeSequence_, latestDodgeSequence_);
     lastConsumedInteractSequence_ += pendingInteractCommands_;
     lastConsumedToggleHeldLightPoseSequence_ += pendingToggleHeldLightPoseCommands_;
     pendingAttackCommands_ = 0u;
@@ -529,7 +1136,8 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
         heldItemFixedStepState_.kinematics.rewardLanternPresentationYawRadians);
     lanternPendulumResetPending_ = true;
     ResolvePlayerAnimation(0.0f);
-    horde::gameplay::effects::ResetFireEmitter(fireEmitters_[0]);
+    for (std::size_t index = 0u; index < fireEmitterCount_; ++index)
+        horde::gameplay::effects::ResetFireEmitter(fireEmitters_[index]);
     ResolveFireEmitters(0.0f);
     RefreshSnapshot(lastInput_);
     snapshot_.eventsEmittedThisTick = 0u;
@@ -539,6 +1147,8 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
 void GameSimulation::ResolveHeldItems()
 {
     std::string diagnostic;
+    const PlayerCombatSnapshot presentationCombat =
+        combatPresentation_.PlayerCombatForPresentation(combatSnapshot_.player);
     const horde::gameplay::items::HeldItemFixedStepInput input{
         playerX_,
         playerZ_,
@@ -547,15 +1157,111 @@ void GameSimulation::ResolveHeldItems()
         walkTime_,
         walkVisualAmount_,
         torchFailureSnapshot_,
-        combatSnapshot_.player,
+        presentationCombat,
         combatSnapshot_.swordSwingRadians,
         interactionState_,
-        config_.playerMountProfile};
+        config_.playerMountProfile,
+        &heldItems_[1],
+        presentationAspect_};
+    // Simulation owns the transition/visual blend. Kinematics keeps a stable
+    // hand-endpoint matrix for gameplay; PlayerRenderSlot composes its single
+    // rendered matrix from that endpoint and the animated Hips mount.
+    const horde::gameplay::items::HeldItemState swordAuthority = heldItems_[1];
+    auto resolvedItems = heldItems_;
     // Every socket contract is a checked rigid transform. A failure would
     // indicate a source-code contract violation; preserve the last immutable
     // state rather than publishing a renderer-authored fallback.
     horde::gameplay::items::ResolveHeldItemsFixedStep(
-        heldItems_, input, tickIndex_, heldItemFixedStepState_, diagnostic);
+        resolvedItems, input, tickIndex_, heldItemFixedStepState_, diagnostic);
+    heldItems_[0] = resolvedItems[0];
+    heldItems_[1] = swordAuthority;
+    heldItems_[1].worldFromItem = resolvedItems[1].worldFromItem;
+    heldItems_[1].worldFromDetach = resolvedItems[1].worldFromDetach;
+    heldItems_[1].detachTick = resolvedItems[1].detachTick;
+}
+
+bool GameSimulation::SwordDefenseReady() const
+{
+    const horde::gameplay::items::HeldItemState& sword = heldItems_[1];
+    return sword.id == horde::gameplay::items::HeldItemId::Sword &&
+           !sword.detached &&
+           sword.parentMode == horde::gameplay::items::HeldItemParentMode::HandSocket &&
+           !sword.transition.active;
+}
+
+bool GameSimulation::SwordDrawBlocksDefense() const
+{
+    const horde::gameplay::items::HeldItemState& sword = heldItems_[1];
+    return automaticSwordDrawBlocksDefense_ && sword.transition.active &&
+           sword.transition.kind == horde::gameplay::items::HeldItemTransitionKind::Draw;
+}
+
+bool GameSimulation::RequestSwordDraw(const std::int32_t reasonPayload,
+                                     const bool blocksDefenseDuringDraw)
+{
+    using namespace horde::gameplay::items;
+    if (!config_.swordStartsStowed || SwordDefenseReady())
+        return false;
+
+    HeldItemState& sword = heldItems_[1];
+    const HeldItemTransitionRequestResult request = RequestHeldItemTransition(
+        sword, HeldItemTransitionKind::Draw, tickIndex_);
+    if (request.status != HeldItemTransitionRequestStatus::Started &&
+        request.status != HeldItemTransitionRequestStatus::InterruptedAndStarted)
+    {
+        return false;
+    }
+    automaticSwordDrawBlocksDefense_ = blocksDefenseDuringDraw;
+    Emit(GameplayEventType::PlayerSwordDrawStarted,
+         EntityId::Player,
+         EntityId::Invalid,
+         playerX_,
+         playerZ_,
+         1.0f,
+         reasonPayload);
+    return true;
+}
+
+void GameSimulation::ResetSwordEquipment()
+{
+    using namespace horde::gameplay::items;
+    HeldItemState& sword = heldItems_[1];
+    const std::uint64_t sequence = sword.transition.semanticEdgeSequence;
+    sword = MakeHeldItemState(
+        HeldItemId::Sword, HeldHand::RightHand,
+        config_.swordStartsStowed ? HeldItemParentMode::BodyStow
+                                  : HeldItemParentMode::HandSocket);
+    sword.transition.semanticEdgeSequence = sequence;
+    automaticSwordDrawBlocksDefense_ = false;
+    ClearQueuedDrawAttack();
+}
+
+void GameSimulation::ClearQueuedDrawAttack()
+{
+    queuedDrawAttack_ = false;
+    queuedDrawAttackCommandSequence_ = 0u;
+}
+
+void GameSimulation::AdvanceSwordEquipment(const float fixedDeltaSeconds)
+{
+    const horde::gameplay::items::HeldItemTransitionAdvanceResult result =
+        horde::gameplay::items::AdvanceHeldItemTransition(
+            heldItems_[1], tickIndex_, fixedDeltaSeconds, false);
+    if (result.attachmentChanged)
+        EmitSwordAttachmentChange();
+    if (!heldItems_[1].transition.active)
+        automaticSwordDrawBlocksDefense_ = false;
+}
+
+void GameSimulation::EmitSwordAttachmentChange()
+{
+    Emit(GameplayEventType::PlayerSwordAttachmentChanged,
+         EntityId::Player,
+         EntityId::Invalid,
+         playerX_,
+         playerZ_,
+         1.0f,
+         static_cast<std::int32_t>(heldItems_[1].parentMode));
 }
 
 void GameSimulation::UpdateRewardSequence(const float deltaSeconds,
@@ -639,6 +1345,10 @@ void GameSimulation::UpdateRewardSequence(const float deltaSeconds,
 
 void GameSimulation::ResolvePlayerAnimation(const float fixedDeltaSeconds)
 {
+    const bool carryingOriginalTorch =
+        interactionState_.heldLightKind ==
+            horde::gameplay::interactions::HeldLightKind::Torch &&
+        torchFailureSnapshot_.heldByPlayer;
     const float leftArmWeight = interactionState_.heldLightKind ==
         horde::gameplay::interactions::HeldLightKind::RewardLantern
         ? 1.0f
@@ -646,13 +1356,15 @@ void GameSimulation::ResolvePlayerAnimation(const float fixedDeltaSeconds)
     playerAnimationState_.StepFixed(
         {walkVisualAmount_,
          walkTime_,
-         combatSnapshot_.player,
+         combatPresentation_.PlayerCombatForPresentation(combatSnapshot_.player),
          heldItemFixedStepState_.kinematics,
          leftArmWeight,
          interactionState_.heldLightKind == horde::gameplay::interactions::HeldLightKind::RewardLantern,
          lanternPendulum_.Snapshot().forwardAngleRadians,
-         lanternPendulum_.Snapshot().strafeAngleRadians},
+         lanternPendulum_.Snapshot().strafeAngleRadians,
+         carryingOriginalTorch},
         fixedDeltaSeconds);
+
 }
 
 void GameSimulation::ResolveFireEmitters(const float fixedDeltaSeconds)
@@ -665,6 +1377,23 @@ void GameSimulation::ResolveFireEmitters(const float fixedDeltaSeconds)
          1.0f,
          QueryShowcaseZone(playerX_, playerZ_)},
         fixedDeltaSeconds);
+
+    // Resolve after the existing encounter update: the triggering reveal tick
+    // publishes its event, movement hold and both flames in the same snapshot.
+    // Death is still visible after health reaches zero, including the earlier
+    // chest unlock. Only the actual Dead clip completion extinguishes them.
+    const auto& keeper = lichEncounter_.Snapshot();
+    const float strength = keeper.revealStarted && !keeper.deathAnimationComplete ? 1.0f : 0.0f;
+    for (std::size_t index = 0u; index < effects::kKeeperTorchAnchors.size(); ++index)
+    {
+        const auto worldFromItem = effects::KeeperTorchWorldFromItem(effects::kKeeperTorchAnchors[index]);
+        effects::StepFireEmitterFixed(
+            fireEmitters_[index + 1u],
+            {items::MultiplyHeldItemTransforms(worldFromItem, items::OriginalTorchFlameSocketTransform()),
+             items::MultiplyHeldItemTransforms(worldFromItem, items::OriginalTorchLightSocketTransform()),
+             strength, 1.0f, ShowcaseZone::Finale},
+            fixedDeltaSeconds);
+    }
 }
 
 void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSeconds)
@@ -678,9 +1407,27 @@ void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSecon
 
     dodgeCooldownRemainingSeconds_ = std::max(
         0.0f, dodgeCooldownRemainingSeconds_ - deltaSeconds);
+    if (IsKeeperRevealing(lichEncounter_.Snapshot().revealPhase))
+    {
+        // Looking and lifecycle commands remain responsive. Translation and
+        // dodge edges cannot escape or queue behind the presentation hold.
+        const std::uint64_t oldDodgeConsumed = lastConsumedDodgeSequence_;
+        lastConsumedDodgeSequence_ = SaturatingAdd(lastConsumedDodgeSequence_, pendingDodgeCommands_);
+        MarkCombatTimingConsumed(CombatInputEdgeKind::Dodge, oldDodgeConsumed,
+                                 lastConsumedDodgeSequence_);
+        pendingDodgeCommands_ = 0u;
+        dodgeRemainingSeconds_ = 0.0f;
+        snapshot_.playerTravelledThisTick = 0.0f;
+        walkVisualAmount_ = 0.0f;
+        playerFootsteps_.Reset();
+        return;
+    }
     if (pendingDodgeCommands_ > 0u)
     {
-        lastConsumedDodgeSequence_ += pendingDodgeCommands_;
+        const std::uint64_t oldDodgeConsumed = lastConsumedDodgeSequence_;
+        lastConsumedDodgeSequence_ = SaturatingAdd(lastConsumedDodgeSequence_, pendingDodgeCommands_);
+        MarkCombatTimingConsumed(CombatInputEdgeKind::Dodge, oldDodgeConsumed,
+                                 lastConsumedDodgeSequence_);
         pendingDodgeCommands_ = 0u;
         if (dodgeRemainingSeconds_ <= 0.0f && dodgeCooldownRemainingSeconds_ <= 0.0f)
         {
@@ -745,6 +1492,14 @@ void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSecon
                         config_.movementSpeedMetresPerSecond * deltaSeconds;
         }
         ResolveCorridorPlayerCollision(previousX, previousZ, playerX_, playerZ_);
+        const LichSnapshot& keeper = lichEncounter_.Snapshot();
+        if (!keeper.revealComplete && keeper.phase != LichPhase::Dead)
+        {
+            ResolveMovementAgainstCircle({keeper.x, keeper.z},
+                kKeeperPresentationCollisionRadius + kPlayerCollisionRadius,
+                previousX, previousZ, playerX_, playerZ_);
+            ResolveCorridorPlayerCollision(previousX, previousZ, playerX_, playerZ_);
+        }
     }
 
     const float travelled = std::hypot(playerX_ - previousX, playerZ_ - previousZ);
@@ -767,26 +1522,114 @@ void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSecon
 
 void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSeconds)
 {
-    enemyDirector_.Update(playerX_, playerZ_);
+    const auto encounterOverride = config_.waterfallSkeletonEncounter &&
+        IsWaterfallSkeletonRoom(playerX_, playerZ_)
+            ? EnemyKind::Skeleton : EnemyKind::None;
+    enemyDirector_.Update(playerX_, playerZ_, encounterOverride);
     const EnemyKind selectedEnemy = enemyDirector_.Snapshot().selectedEnemy;
     if (selectedEnemy != activeEnemyKind_)
     {
         activeEnemyKind_ = selectedEnemy;
-        playerVitals_.ResetForEncounter();
+        if (!lichEncounter_.Snapshot().revealStarted)
+            playerVitals_.ResetForEncounter();
         retryCheckpoint_ = activeEnemyKind_ == EnemyKind::Lich ? 9 : 0;
-        if (activeEnemyKind_ == EnemyKind::Skeleton)
+        // Opening enemies and the keeper persist through route selection.
+        // Only explicit reset/retry/checkpoint import may initialise them.
+    }
+
+    if (config_.waterfallSkeletonEncounter &&
+        activeEnemyKind_ == EnemyKind::Skeleton && !SwordDefenseReady())
+    {
+        const float distanceToWaterfall = std::hypot(
+            playerX_ - kWaterfallSkeletonPairCenter.x,
+            playerZ_ - kWaterfallSkeletonPairCenter.z);
+        const bool inEarlyCueRange = distanceToWaterfall <= kWaterfallSwordCueRadius;
+        const bool canSeeEncounter = !IsRouteAudioObstructed(
+            playerX_, playerZ_,
+            kWaterfallSkeletonPairCenter.x, kWaterfallSkeletonPairCenter.z);
+        if (inEarlyCueRange && canSeeEncounter && !waterfallWarningEmitted_)
         {
-            // The opening enemies persist across route selection changes. Only
-            // an explicit retry, route reset, or checkpoint import respawns them.
+            Emit(GameplayEventType::SkeletonEncounterWarning,
+                 EntityId::SkeletonA,
+                 EntityId::Player,
+                 kWaterfallSkeletonPairCenter.x,
+                 kWaterfallSkeletonPairCenter.z,
+                 0.72f);
+            waterfallWarningEmitted_ = true;
         }
-        else if (activeEnemyKind_ == EnemyKind::Lich)
+        if ((inEarlyCueRange && canSeeEncounter) ||
+            IsWaterfallSkeletonArena(playerX_, playerZ_))
         {
-            lichEncounter_.Reset();
+            // Semantic event only; audio selection remains an application
+            // mapping decision. Arena fallback covers an occluded approach.
+            RequestSwordDraw(3, true);
         }
     }
 
-    const bool parryAvailable = swordCombat_.CanAcceptParry();
+    const bool finaleActive = QueryShowcaseZone(playerX_, playerZ_) == ShowcaseZone::Finale;
+    const auto& keeperBeforeActions = lichEncounter_.Snapshot();
+    const bool keeperHoldsActions = IsKeeperRevealing(keeperBeforeActions.revealPhase) ||
+        (!keeperBeforeActions.revealStarted && activeEnemyKind_ == EnemyKind::Lich &&
+         finaleActive && torchFailureSnapshot_.phase == TorchFailurePhase::Settled &&
+         HasReachedKeeperArrivalThreshold(playerX_, playerZ_));
+    if (keeperHoldsActions)
+    {
+        // Include the triggering and final reveal ticks, so neither an old cut
+        // nor any buffered input becomes a swing at the combat boundary.
+        const std::uint64_t oldAttackConsumed = lastConsumedAttackSequence_;
+        lastConsumedAttackSequence_ = SaturatingAdd(lastConsumedAttackSequence_, pendingAttackCommands_);
+        MarkCombatTimingConsumed(CombatInputEdgeKind::Attack, oldAttackConsumed,
+                                 lastConsumedAttackSequence_);
+        pendingAttackCommands_ = 0u;
+        const std::uint64_t oldParryConsumed = lastConsumedParrySequence_;
+        lastConsumedParrySequence_ = SaturatingAdd(lastConsumedParrySequence_, pendingParryCommands_);
+        MarkCombatTimingConsumed(CombatInputEdgeKind::Parry, oldParryConsumed,
+                                 lastConsumedParrySequence_);
+        pendingParryCommands_ = 0u;
+        dodgeRemainingSeconds_ = 0.0f;
+        swordCombat_.CancelPlayerActions();
+        lichAttackEligible_ = false;
+        lichRevealAttackSequenceFloor_ = latestAttackSequence_;
+    }
+    const bool parryAvailable = SwordDefenseReady() && swordCombat_.CanAcceptParry();
     bool playerActionAccepted = false;
+    const auto acceptAttack = [&](const std::uint64_t commandSequence)
+    {
+        if (!SwordDefenseReady())
+            return false;
+        const PlayerAttackCut acceptedCut = swordCombat_.RequestAttack();
+        if (acceptedCut == PlayerAttackCut::None)
+            return false;
+        if (acceptedCut == PlayerAttackCut::DownwardCut)
+        {
+            lichAttackEligible_ = lichEncounter_.Snapshot().revealComplete &&
+                commandSequence > lichRevealAttackSequenceFloor_;
+        }
+        else
+        {
+            lichAttackEligible_ = lichAttackEligible_ &&
+                lichEncounter_.Snapshot().revealComplete &&
+                commandSequence > lichRevealAttackSequenceFloor_;
+        }
+        const std::uint64_t eventSequence = Emit(
+            GameplayEventType::PlayerSwing,
+            EntityId::Player,
+            EntityId::Invalid,
+            playerX_,
+            playerZ_,
+            1.0f,
+            static_cast<std::int32_t>(acceptedCut));
+        LinkCombatTimingSemanticEvent(CombatInputEdgeKind::Attack,
+                                     commandSequence,
+                                     eventSequence, tickIndex_);
+        return true;
+    };
+    if (queuedDrawAttack_ && SwordDefenseReady() && !keeperHoldsActions)
+    {
+        const std::uint64_t queuedSequence = queuedDrawAttackCommandSequence_;
+        ClearQueuedDrawAttack();
+        playerActionAccepted = acceptAttack(queuedSequence);
+    }
     if (pendingAttackCommands_ > 0u)
     {
         // Consume one monotonic edge per fixed tick. A coherent publication
@@ -794,30 +1637,44 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
         // collapsing the whole delta into one RequestAttack silently erased
         // the upward continuation.
         --pendingAttackCommands_;
-        ++lastConsumedAttackSequence_;
-        if (swordCombat_.CanAcceptAttack())
+        const std::uint64_t oldAttackConsumed = lastConsumedAttackSequence_;
+        lastConsumedAttackSequence_ = SaturatingAdd(lastConsumedAttackSequence_, 1u);
+        MarkCombatTimingConsumed(CombatInputEdgeKind::Attack, oldAttackConsumed,
+                                 lastConsumedAttackSequence_);
+        if (!SwordDefenseReady())
         {
-            const PlayerAttackCut acceptedCut = swordCombat_.RequestAttack();
-            if (acceptedCut != PlayerAttackCut::None)
+            RequestSwordDraw(1, false);
+            const auto& draw = heldItems_[1].transition;
+            if (!queuedDrawAttack_ && draw.active &&
+                draw.kind == horde::gameplay::items::HeldItemTransitionKind::Draw)
             {
-                playerActionAccepted = true;
-                Emit(GameplayEventType::PlayerSwing,
-                     EntityId::Player,
-                     EntityId::Invalid,
-                     playerX_,
-                     playerZ_,
-                     1.0f,
-                     static_cast<std::int32_t>(acceptedCut));
+                queuedDrawAttack_ = true;
+                queuedDrawAttackCommandSequence_ = lastConsumedAttackSequence_;
             }
+        }
+        else if (!playerActionAccepted)
+        {
+            playerActionAccepted = acceptAttack(lastConsumedAttackSequence_);
         }
     }
     if (pendingParryCommands_ > 0u)
     {
-        lastConsumedParrySequence_ += pendingParryCommands_;
+        const std::uint64_t oldParryConsumed = lastConsumedParrySequence_;
+        lastConsumedParrySequence_ = SaturatingAdd(lastConsumedParrySequence_, pendingParryCommands_);
+        MarkCombatTimingConsumed(CombatInputEdgeKind::Parry, oldParryConsumed,
+                                 lastConsumedParrySequence_);
         pendingParryCommands_ = 0u;
-        if (parryAvailable && !playerActionAccepted)
+        if (!SwordDefenseReady())
+        {
+            if (!playerActionAccepted)
+                RequestSwordDraw(2, false);
+            // Consume and discard this edge. A parry pressed before the hand
+            // attachment edge cannot become a later, buffered defense.
+        }
+        else if (parryAvailable && !playerActionAccepted)
         {
             swordCombat_.RequestParry();
+            parrySourceCommandSequence_ = lastConsumedParrySequence_;
         }
     }
 
@@ -825,8 +1682,14 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
     combatSnapshot_ = swordCombat_.Update(deltaSeconds,
                                            playerX_,
                                            playerZ_,
-                                           playerYawRadians_);
+                                           playerYawRadians_,
+                                           config_.waterfallSkeletonEncounter,
+                                           config_.waterfallSkeletonEncounter &&
+                                               IsWaterfallSkeletonArena(playerX_, playerZ_),
+                                           config_.waterfallSkeletonEncounter);
     EntityId skeletonDamageSource = EntityId::Invalid;
+    skeletonIncidentalSpacingSeconds_ = std::max(
+        0.0, skeletonIncidentalSpacingSeconds_ - deltaSeconds);
     for (std::size_t index = 0u; index < combatSnapshot_.combatantCount; ++index)
     {
         const SkeletonCombatantSnapshot& previous = previousSkeletons[index];
@@ -861,11 +1724,17 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
         }
         if (current.parrySuccessPulse)
         {
-            Emit(GameplayEventType::PlayerParrySucceeded,
-                 EntityId::Player,
-                 entity,
-                 current.x,
+            const std::uint64_t eventSequence = Emit(
+                GameplayEventType::PlayerParrySucceeded,
+                EntityId::Player,
+                entity,
+                current.x,
                  current.z);
+            combatPresentation_.BeginParrySuccess(eventSequence, tickIndex_, entity);
+            LinkCombatTimingSemanticEvent(CombatInputEdgeKind::Parry,
+                                         parrySourceCommandSequence_,
+                                         eventSequence, tickIndex_);
+            parrySourceCommandSequence_ = 0u;
         }
         const bool skeletonWalking = activeEnemyKind_ == EnemyKind::Skeleton &&
                                      current.animation == EnemyAnimation::Walking;
@@ -877,26 +1746,70 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
                  current.x,
                  current.z);
         }
+        const bool incidentalEligible = skeletonIdlePhasesEnabled_ &&
+            activeEnemyKind_ == EnemyKind::Skeleton && current.health > 0 &&
+            current.action == EnemyCombatAction::Locomotion &&
+            current.animation == EnemyAnimation::Idle;
+        if (incidentalEligible)
+        {
+            // Sparse semantic cues share simulation/lifecycle ownership with
+            // combat. Idle accumulation never changes walking/contact clocks.
+            skeletonIncidentalIdleSeconds_[index] += deltaSeconds;
+            if (skeletonIncidentalSpacingSeconds_ <= 0.000001 &&
+                skeletonIncidentalIdleSeconds_[index] + 0.000001 >=
+                    skeletonIncidentalNextSeconds_[index])
+            {
+                Emit(GameplayEventType::SkeletonIncidental, entity,
+                     EntityId::Invalid, current.x, current.z, 0.30f);
+                skeletonIncidentalNextSeconds_[index] =
+                    skeletonIncidentalIdleSeconds_[index] + 28.0f;
+                skeletonIncidentalSpacingSeconds_ = 6.0f;
+            }
+        }
     }
     if (activeEnemyKind_ == EnemyKind::Skeleton && combatSnapshot_.encounterComplete)
     {
         enemyDirector_.MarkSelectedDead();
     }
 
-    const bool finaleActive = QueryShowcaseZone(playerX_, playerZ_) == ShowcaseZone::Finale;
-    const LichPhase previousLichPhase = lichEncounter_.Snapshot().phase;
+    const LichSnapshot previousLich = lichEncounter_.Snapshot();
+    const LichPhase previousLichPhase = previousLich.phase;
+    if (!previousLich.revealComplete)
+    {
+        lichAttackEligible_ = false;
+        lichRevealAttackSequenceFloor_ = latestAttackSequence_;
+    }
     const bool lineOfSight = !IsRouteAudioObstructed(playerX_,
                                                       playerZ_,
                                                       lichEncounter_.Snapshot().x,
                                                       lichEncounter_.Snapshot().z);
     const LichSnapshot& lich = lichEncounter_.Update(
-        activeEnemyKind_ == EnemyKind::Lich ? deltaSeconds : 0.0f,
+        activeEnemyKind_ == EnemyKind::Lich || IsKeeperRevealing(previousLich.revealPhase) ||
+            previousLich.phase == LichPhase::Dead ? deltaSeconds : 0.0f,
         playerX_,
         playerZ_,
         lineOfSight,
-        activeEnemyKind_ == EnemyKind::Lich && finaleActive);
+        activeEnemyKind_ == EnemyKind::Lich && finaleActive,
+        torchFailureSnapshot_.phase == TorchFailurePhase::Settled &&
+            HasReachedKeeperArrivalThreshold(playerX_, playerZ_));
 
-    if (activeEnemyKind_ == EnemyKind::Lich && combatSnapshot_.playerAttackPulse &&
+    if (!previousLich.revealStarted && lich.revealStarted)
+    {
+        Emit(GameplayEventType::KeeperRevealStarted, EntityId::Lich, EntityId::Player, lich.x, lich.z);
+    }
+    if (previousLich.revealPhase == KeeperRevealPhase::Awakening &&
+        (lich.revealPhase == KeeperRevealPhase::Warning || lich.revealPhase == KeeperRevealPhase::Ready))
+    {
+        Emit(GameplayEventType::KeeperWarning, EntityId::Lich, EntityId::Player, lich.x, lich.z);
+    }
+    if (!previousLich.revealComplete && lich.revealComplete)
+    {
+        lichAttackEligible_ = false;
+        lichRevealAttackSequenceFloor_ = latestAttackSequence_;
+        Emit(GameplayEventType::KeeperCombatReady, EntityId::Lich, EntityId::Player, lich.x, lich.z);
+    }
+
+    if (activeEnemyKind_ == EnemyKind::Lich && lichAttackEligible_ && combatSnapshot_.playerAttackPulse &&
         SwordCombat::IsPlayerTargetInRangeCone(playerX_,
                                                 playerZ_,
                                                 playerYawRadians_,
@@ -945,7 +1858,10 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
     const bool playerDamagePulse =
         (activeEnemyKind_ == EnemyKind::Skeleton && skeletonDamageSource != EntityId::Invalid) ||
         (activeEnemyKind_ == EnemyKind::Lich && lichEncounter_.Snapshot().damagePulse);
-    if (input.damageEnabled && playerDamagePulse)
+    const bool keeperRevealInvulnerable = IsKeeperRevealing(previousLich.revealPhase) ||
+        IsKeeperRevealing(lich.revealPhase);
+    if (input.damageEnabled && playerDamagePulse && !keeperRevealInvulnerable &&
+        !SwordDrawBlocksDefense())
     {
         const PlayerDamageResult damageResult = playerVitals_.TryApplyDamage();
         if (damageResult == PlayerDamageResult::Damaged)
@@ -960,6 +1876,7 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
         }
         if (damageResult == PlayerDamageResult::Killed)
         {
+            combatPresentation_.Reset();
             retryCheckpoint_ = activeEnemyKind_ == EnemyKind::Lich ? 9 : 0;
             pendingAttackCommands_ = 0u;
             Emit(GameplayEventType::PlayerKilled,
@@ -978,15 +1895,16 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
     }
 }
 
-void GameSimulation::Emit(GameplayEventType type,
-                          EntityId source,
-                          EntityId target,
-                          float x,
-                          float z,
-                          float intensity,
-                          std::int32_t payload)
+std::uint64_t GameSimulation::Emit(GameplayEventType type,
+                                   EntityId source,
+                                   EntityId target,
+                                   float x,
+                                   float z,
+                                   float intensity,
+                                   std::int32_t payload)
 {
     GameplayEvent event;
+    event.tickIndex = tickIndex_;
     event.type = type;
     event.source = source;
     event.target = target;
@@ -997,13 +1915,16 @@ void GameSimulation::Emit(GameplayEventType type,
     event.listenerYawRadians = playerYawRadians_;
     event.intensity = intensity;
     event.payload = payload;
-    events_.Push(event);
+    const std::uint64_t sequence = events_.NextSequence();
+    return events_.Push(event) ? sequence : 0u;
 }
 
 void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
 {
     snapshot_.tickIndex = tickIndex_;
     snapshot_.inputPublicationSequence = inputPublicationSequence_;
+    snapshot_.inputMoveForward = input.moveForward;
+    snapshot_.inputMoveStrafe = input.moveStrafe;
     snapshot_.lastConsumedAttackSequence = lastConsumedAttackSequence_;
     snapshot_.lastConsumedParrySequence = lastConsumedParrySequence_;
     snapshot_.lastConsumedDodgeSequence = lastConsumedDodgeSequence_;
@@ -1038,6 +1959,7 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
         target.z = source.z;
         target.facingRadians = source.facingRadians;
         target.animationTime = source.animationTime;
+        target.idlePhaseSeconds = skeletonIdlePhasesEnabled_ && index == 1u ? 0.73f : 0.0f;
         target.damageFlash = source.damageFlash;
         target.health = source.health;
         target.animation = source.animation;
@@ -1076,12 +1998,20 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.rewardLanternWorldFromHinge = heldItemFixedStepState_.worldFromLeftHand;
     snapshot_.torchFailure = torchFailureSnapshot_;
     snapshot_.heldItems = heldItems_;
+    snapshot_.automaticSwordDrawBlocksDefense = SwordDrawBlocksDefense();
     snapshot_.heldItemKinematics = heldItemFixedStepState_.kinematics;
     snapshot_.playerAnimation = playerAnimationState_.Snapshot();
     snapshot_.heldLight = heldItemFixedStepState_.light;
     snapshot_.enemyRoster = enemyDirector_.Snapshot();
     snapshot_.swordCombat = combatSnapshot_;
     snapshot_.playerCombat = combatSnapshot_.player;
+    snapshot_.combatPresentation = combatPresentation_.Snapshot();
+    snapshot_.combatInputTiming.inputHistoryOverwriteCount = input.combatEdgeHistory.overwriteCount;
+    std::uint64_t scheduledCombatCount = scheduledCombatEdgeCount_;
+    for (const std::uint64_t count : overflowCombatCommandCounts_)
+        scheduledCombatCount = SaturatingAdd(scheduledCombatCount, count);
+    snapshot_.combatInputTiming.scheduledEdgeCount = static_cast<std::uint32_t>(
+        std::min<std::uint64_t>(scheduledCombatCount, UINT32_MAX));
     snapshot_.lich = lichEncounter_.Snapshot();
     snapshot_.lich.finaleSkylightOpenProgress = snapshot_.finale.skylightOpenProgress;
     snapshot_.lich.finaleDawnRevealProgress = snapshot_.finale.dawnRevealProgress;

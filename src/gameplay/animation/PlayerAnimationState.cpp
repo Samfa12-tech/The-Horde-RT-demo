@@ -108,6 +108,10 @@ void PlayerAnimationState::StepFixed(const PlayerAnimationInput& input,
         snapshot_.lanternPoseBlend,
         std::clamp(FiniteOr(input.lanternPoseTarget, 0.0f), 0.0f, 1.0f),
         fixedDeltaSeconds * kLanternPoseBlendRatePerSecond);
+    snapshot_.swordStowBlend = std::clamp(
+        FiniteOr(input.heldItemKinematics.swordStowBlend, 0.0f), 0.0f, 1.0f);
+    snapshot_.swordHandGripBlend = std::clamp(
+        FiniteOr(input.heldItemKinematics.swordHandGripBlend, 1.0f), 0.0f, 1.0f);
     snapshot_.leftIk.shoulder = input.heldItemKinematics.leftShoulderLocal;
     snapshot_.leftIk.target = input.heldItemKinematics.leftHandLocal;
     // A conventional first-person carry drops each upper arm beside the
@@ -133,6 +137,12 @@ void PlayerAnimationState::StepFixed(const PlayerAnimationInput& input,
             (22.0f + 3.0f * gait + 5.0f * forward + 2.0f * swordLift) * radiansPerDegree;
         snapshot_.leftIk.pole[0] += 0.10f * strafe;
     }
+    else if (input.carryingOriginalTorch)
+    {
+        // Leave a small preferred bend so ordinary torch carry does not sit
+        // directly on the two-bone solver's straight-reach stretch boundary.
+        snapshot_.leftIk.preferredElbowFlexionRadians = 10.0f * 0.01745329252f;
+    }
     snapshot_.leftIk.gripX = input.heldItemKinematics.leftGripXInView;
     snapshot_.leftIk.gripY = input.heldItemKinematics.leftGripYInView;
     snapshot_.leftIk.gripZ = input.heldItemKinematics.leftGripZInView;
@@ -146,6 +156,10 @@ void PlayerAnimationState::StepFixed(const PlayerAnimationInput& input,
     snapshot_.rightIk.gripX = swordGrip.edgeDirection;
     snapshot_.rightIk.gripY = swordGrip.bladeAxis;
     snapshot_.rightIk.gripZ = swordGrip.flatNormal;
+    // Releasing the sword changes the hand's target, not ownership of the arm.
+    // Keep the shared empty-hand carry visible instead of dropping back to the
+    // imported clip's out-of-view arm rest.
+    snapshot_.rightIk.poseWeight = 1.0f;
 }
 
 void PlayerAnimationState::Reset()

@@ -1,0 +1,941 @@
+{
+  "schema": 1,
+  "runtimeSource": "a6439e0b5998adefb7fdd87ea316132bc928549c",
+  "runtimeTree": "03781313c18939bd19b0fafab9462660564d6081",
+  "apkSha256": "d305f4ab8d3d61f57620f6fcd2eb40db4fce4aa0b76a6c90e44cfbcfb91cff73",
+  "device": {
+    "model": "SM-S948B",
+    "android": "16"
+  },
+  "runs": [
+    {
+      "runId": "mobile50-motion02",
+      "reportSha256": "601faa09ac92d081781c76022cba3d984f65ebf89c5175db4ea37b55987b83b1",
+      "actualSettings": {
+        "scalePercent": 50,
+        "width": 1440,
+        "height": 2980,
+        "internalWidth": 720,
+        "internalHeight": 1490,
+        "backend": "RayTracingPipeline",
+        "water": 1,
+        "fire": 0,
+        "cap": 30,
+        "glass": false,
+        "shadow": 1,
+        "mist": true,
+        "dust": 0
+      },
+      "analysis": {
+        "eligible": true,
+        "reportSha256": "601faa09ac92d081781c76022cba3d984f65ebf89c5175db4ea37b55987b83b1",
+        "runId": "mobile50-motion02",
+        "workload": "motion-waterfall-equipment-v1",
+        "buildId": "1.6.2",
+        "settings": {
+          "scalePercent": 50,
+          "width": 1440,
+          "height": 2980,
+          "internalWidth": 720,
+          "internalHeight": 1490,
+          "backend": "RayTracingPipeline",
+          "water": 1,
+          "fire": 0,
+          "cap": 30,
+          "glass": false,
+          "shadow": 1,
+          "mist": true,
+          "dust": 0
+        },
+        "scope": {
+          "surfaceGeneration": 1,
+          "sceneEpoch": 2,
+          "measurementGeneration": 5,
+          "matchedCompletedFrames": 161,
+          "intervalCount": 160,
+          "durationNanoseconds": 6587500205,
+          "setupPresentationRowsExcluded": 2
+        },
+        "intervalsNanoseconds": {
+          "median": 37500053,
+          "p90NearestRank": 54166719,
+          "p95NearestRank": 66666667,
+          "maximum": 79166667,
+          "over33333000Nanoseconds": 125,
+          "over250000000Nanoseconds": 0
+        },
+        "observedPresentedImageRatePerSecond": 24.288424,
+        "simulation": {
+          "stateRows": 161,
+          "eventRows": 16,
+          "ticksThisFrameMaximum": 5,
+          "catchUpOverrunCountFirst": 0,
+          "catchUpOverrunCountLast": 0,
+          "catchUpOverrunDelta": 0
+        },
+        "collector": {
+          "runCounterDelta": {
+            "preparedPresents": 162,
+            "acceptedPresents": 162,
+            "rejectedPresents": 0,
+            "invalidRegistrations": 0,
+            "invalidMetadata": 0,
+            "pendingCapacityExhausted": 0,
+            "queryCalls": 326,
+            "queryErrors": 0,
+            "incompleteQueries": 0,
+            "zeroPresentTimestamps": 0,
+            "zeroPresentIds": 0,
+            "unknownPresentIds": 0,
+            "duplicateTimings": 0,
+            "rowCapacityExhausted": 0,
+            "missingOnRebind": 0,
+            "missingOnUnbind": 0,
+            "abandonedPreparedPresents": 0
+          },
+          "queryCpuWallNanoseconds": 2530365,
+          "presentMarginAtLeast2Pow63CountIgnored": 161
+        },
+        "limits": [
+          "Short harness-generated moving scenario with milestone RT readbacks; total instrumentation affects pacing.",
+          "One continuous resource scope; retry/rotation/lifecycle discontinuities require separate evidence.",
+          "Actual inter-present intervals; not sustained FPS, scanout, photons, GPU reciprocal time, touch latency or owner acceptance.",
+          "Trace extents are native resource observations; this analyzer does not certify appearance, thermals or power."
+        ]
+      },
+      "beforeCurrentHal": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 28.0,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 27.5,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 29.2,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "startingAdmission": {
+        "admitted": true,
+        "reasons": [],
+        "requiredFrameworkStatus": 0,
+        "maximumDeltaCelsius": 1.5,
+        "sensorCeilingsCelsius": {
+          "AP": 31.5,
+          "BAT": 29.5,
+          "SKIN": 32.5
+        },
+        "referenceCompared": false
+      },
+      "afterCurrentHal": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 36.7,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 29.7,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 33.0,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "imageCount": 13,
+      "capturedBytes": 55785600,
+      "imageReceipts": [
+        {
+          "file": "android-motion-mobile50-motion02-0.rgba",
+          "width": 720,
+          "height": 1490,
+          "stateRow": 0,
+          "rtRow": 0,
+          "bytes": 4291200,
+          "sha256": "564ba0b3d6d79a6993136b964df5df007bd4860988192e19205fa15e57467c9a"
+        },
+        {
+          "file": "android-motion-mobile50-motion02-1.rgba",
+          "width": 720,
+          "height": 1490,
+          "stateRow": 59,
+          "rtRow": 59,
+          "bytes": 4291200,
+          "sha256": "a81a504d5e02325b9223addd5a0ed867ccc29e85ccc7ece57c543d9d2254c159"
+        },
+        {
+          "file": "android-motion-mobile50-motion02-2.rgba",
+          "width": 720,
+          "height": 1490,
+          "stateRow": 114,
+          "rtRow": 114,
+          "bytes": 4291200,
+          "sha256": "18df4d5509ce6e5cd80e437b4358e88140ee74f9defd2bdbc12b9d1fce87f7e1"
+        },
+        {
+          "file": "android-motion-mobile50-motion02-3.rgba",
+          "width": 720,
+          "height": 1490,
+          "stateRow": 126,
+          "rtRow": 126,
+          "bytes": 4291200,
+          "sha256": "2a1c2637884fb9bd4449b8fa1799bf0595d1556d7cf2c1f1482952bfa5c74aa4"
+        },
+        {
+          "file": "android-motion-mobile50-motion02-4.rgba",
+          "width": 720,
+          "height": 1490,
+          "stateRow": 128,
+          "rtRow": 128,
+          "bytes": 4291200,
+          "sha256": "617862ab3b76d8815b5e38c43d05a11ea928042d91d118d9031e2d48ad42cfe6"
+        },
+        {
+          "file": "android-motion-mobile50-motion02-5.rgba",
+          "width": 720,
+          "height": 1490,
+          "stateRow": 130,
+          "rtRow": 130,
+          "bytes": 4291200,
+          "sha256": "a63bd591c58a386d3080924f5f11bd091cb3a97f15dca10207ab10e212d62d10"
+        },
+        {
+          "file": "android-motion-mobile50-motion02-6.rgba",
+          "width": 720,
+          "height": 1490,
+          "stateRow": 131,
+          "rtRow": 131,
+          "bytes": 4291200,
+          "sha256": "c0872dd72bef86251acd14e054feec285bfc7c72674f540b29f0c987484e3847"
+        },
+        {
+          "file": "android-motion-mobile50-motion02-7.rgba",
+          "width": 720,
+          "height": 1490,
+          "stateRow": 133,
+          "rtRow": 133,
+          "bytes": 4291200,
+          "sha256": "53c9e516ef8a08b25924657206dddb26bd1dd4a1ebfb489761e8dc9579ff883d"
+        },
+        {
+          "file": "android-motion-mobile50-motion02-8.rgba",
+          "width": 720,
+          "height": 1490,
+          "stateRow": 135,
+          "rtRow": 135,
+          "bytes": 4291200,
+          "sha256": "7bb89c1200b23c60c883cd6421e48334611cfa38bcb82ace6d36f9fbfec934ab"
+        },
+        {
+          "file": "android-motion-mobile50-motion02-9.rgba",
+          "width": 720,
+          "height": 1490,
+          "stateRow": 137,
+          "rtRow": 137,
+          "bytes": 4291200,
+          "sha256": "90773a91b49c7fbca9b80466445c28ccae6db9954381a1dff885bf0c58bd4505"
+        },
+        {
+          "file": "android-motion-mobile50-motion02-10.rgba",
+          "width": 720,
+          "height": 1490,
+          "stateRow": 150,
+          "rtRow": 150,
+          "bytes": 4291200,
+          "sha256": "313d0643bdbd294d51dfd61afc731dee6c6897a63f185d0a06be6da8b00cba12"
+        },
+        {
+          "file": "android-motion-mobile50-motion02-11.rgba",
+          "width": 720,
+          "height": 1490,
+          "stateRow": 153,
+          "rtRow": 153,
+          "bytes": 4291200,
+          "sha256": "9057610ebb72b3c92006f71a2c026dcd0322986e5dc7128c8fccdd6e36f71075"
+        },
+        {
+          "file": "android-motion-mobile50-motion02-12.rgba",
+          "width": 720,
+          "height": 1490,
+          "stateRow": 160,
+          "rtRow": 160,
+          "bytes": 4291200,
+          "sha256": "19c9583992e3cfe4d828cc4fac12741dd5447684cb047f990b1ed9caba5b0495"
+        }
+      ],
+      "simulationComplete": true,
+      "isolation": {
+        "secondSimulation": false,
+        "fixedDeltaOverride": false,
+        "phaseForced": false,
+        "preferencesWritten": false,
+        "ownerAcceptance": false,
+        "timingScope": "moving scenario with RT readbacks and actual image presentation timestamps; not sustained, scanout, or photons"
+      }
+    },
+    {
+      "runId": "mobile40-motion01",
+      "reportSha256": "0a951081dfce821c0e4fc42c9eaf7f64fb866db9b991d886c020b5d8423e181c",
+      "actualSettings": {
+        "scalePercent": 40,
+        "width": 1440,
+        "height": 2980,
+        "internalWidth": 576,
+        "internalHeight": 1192,
+        "backend": "RayTracingPipeline",
+        "water": 1,
+        "fire": 0,
+        "cap": 30,
+        "glass": false,
+        "shadow": 1,
+        "mist": true,
+        "dust": 0
+      },
+      "analysis": {
+        "eligible": true,
+        "reportSha256": "0a951081dfce821c0e4fc42c9eaf7f64fb866db9b991d886c020b5d8423e181c",
+        "runId": "mobile40-motion01",
+        "workload": "motion-waterfall-equipment-v1",
+        "buildId": "1.6.2",
+        "settings": {
+          "scalePercent": 40,
+          "width": 1440,
+          "height": 2980,
+          "internalWidth": 576,
+          "internalHeight": 1192,
+          "backend": "RayTracingPipeline",
+          "water": 1,
+          "fire": 0,
+          "cap": 30,
+          "glass": false,
+          "shadow": 1,
+          "mist": true,
+          "dust": 0
+        },
+        "scope": {
+          "surfaceGeneration": 1,
+          "sceneEpoch": 2,
+          "measurementGeneration": 5,
+          "matchedCompletedFrames": 205,
+          "intervalCount": 204,
+          "durationNanoseconds": 6537500154,
+          "setupPresentationRowsExcluded": 2
+        },
+        "intervalsNanoseconds": {
+          "median": 29166719,
+          "p90NearestRank": 41666666,
+          "p95NearestRank": 49999948,
+          "maximum": 66666615,
+          "over33333000Nanoseconds": 97,
+          "over250000000Nanoseconds": 0
+        },
+        "observedPresentedImageRatePerSecond": 31.204588,
+        "simulation": {
+          "stateRows": 205,
+          "eventRows": 16,
+          "ticksThisFrameMaximum": 4,
+          "catchUpOverrunCountFirst": 0,
+          "catchUpOverrunCountLast": 0,
+          "catchUpOverrunDelta": 0
+        },
+        "collector": {
+          "runCounterDelta": {
+            "preparedPresents": 206,
+            "acceptedPresents": 206,
+            "rejectedPresents": 0,
+            "invalidRegistrations": 0,
+            "invalidMetadata": 0,
+            "pendingCapacityExhausted": 0,
+            "queryCalls": 414,
+            "queryErrors": 0,
+            "incompleteQueries": 0,
+            "zeroPresentTimestamps": 0,
+            "zeroPresentIds": 0,
+            "unknownPresentIds": 0,
+            "duplicateTimings": 0,
+            "rowCapacityExhausted": 0,
+            "missingOnRebind": 0,
+            "missingOnUnbind": 0,
+            "abandonedPreparedPresents": 0
+          },
+          "queryCpuWallNanoseconds": 3279220,
+          "presentMarginAtLeast2Pow63CountIgnored": 205
+        },
+        "limits": [
+          "Short harness-generated moving scenario with milestone RT readbacks; total instrumentation affects pacing.",
+          "One continuous resource scope; retry/rotation/lifecycle discontinuities require separate evidence.",
+          "Actual inter-present intervals; not sustained FPS, scanout, photons, GPU reciprocal time, touch latency or owner acceptance.",
+          "Trace extents are native resource observations; this analyzer does not certify appearance, thermals or power."
+        ]
+      },
+      "beforeCurrentHal": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 28.6,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 27.8,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 29.6,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "startingAdmission": {
+        "admitted": true,
+        "reasons": [],
+        "requiredFrameworkStatus": 0,
+        "maximumDeltaCelsius": 1.5,
+        "sensorCeilingsCelsius": {
+          "AP": 31.5,
+          "BAT": 29.5,
+          "SKIN": 32.5
+        },
+        "referenceCompared": true
+      },
+      "afterCurrentHal": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 36.6,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 29.8,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 33.1,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "imageCount": 13,
+      "capturedBytes": 35702784,
+      "imageReceipts": [
+        {
+          "file": "android-motion-mobile40-motion01-0.rgba",
+          "width": 576,
+          "height": 1192,
+          "stateRow": 0,
+          "rtRow": 0,
+          "bytes": 2746368,
+          "sha256": "9f9e31597506ba4a3dbccbf9ad6f4794b64353f7c1f221151df0b8f73fe4f46f"
+        },
+        {
+          "file": "android-motion-mobile40-motion01-1.rgba",
+          "width": 576,
+          "height": 1192,
+          "stateRow": 75,
+          "rtRow": 75,
+          "bytes": 2746368,
+          "sha256": "f7975357afed0f622c0e4f0dc87e05411289deddd5b2817ac0a3320ff5927941"
+        },
+        {
+          "file": "android-motion-mobile40-motion01-2.rgba",
+          "width": 576,
+          "height": 1192,
+          "stateRow": 144,
+          "rtRow": 144,
+          "bytes": 2746368,
+          "sha256": "c5768a880bf30c4658ebed05cbf990beddd06b4dff4bbd40c38be40aaa2463a8"
+        },
+        {
+          "file": "android-motion-mobile40-motion01-3.rgba",
+          "width": 576,
+          "height": 1192,
+          "stateRow": 160,
+          "rtRow": 160,
+          "bytes": 2746368,
+          "sha256": "d5dfdaf21180204d66e09fb3d56975c66638c7a59d5a4f2393a1370792758128"
+        },
+        {
+          "file": "android-motion-mobile40-motion01-4.rgba",
+          "width": 576,
+          "height": 1192,
+          "stateRow": 162,
+          "rtRow": 162,
+          "bytes": 2746368,
+          "sha256": "176e4de3d33d4064658bbe1271dac3cc18c14bb21c6c5010ebb01f7268b7f368"
+        },
+        {
+          "file": "android-motion-mobile40-motion01-5.rgba",
+          "width": 576,
+          "height": 1192,
+          "stateRow": 164,
+          "rtRow": 164,
+          "bytes": 2746368,
+          "sha256": "b8da701c3d8e416fa360b5d88e7b591ea81330b1276150710fb8cfa9cd3ad410"
+        },
+        {
+          "file": "android-motion-mobile40-motion01-6.rgba",
+          "width": 576,
+          "height": 1192,
+          "stateRow": 167,
+          "rtRow": 167,
+          "bytes": 2746368,
+          "sha256": "c4a5b767eeb8c70852528ce05220a0011aa8f83406a98fdb5c4ee97d06cf0e98"
+        },
+        {
+          "file": "android-motion-mobile40-motion01-7.rgba",
+          "width": 576,
+          "height": 1192,
+          "stateRow": 169,
+          "rtRow": 169,
+          "bytes": 2746368,
+          "sha256": "af078e1208cb1e177c22571e4833873e574797e23725c44af25bbf8e5e72282f"
+        },
+        {
+          "file": "android-motion-mobile40-motion01-8.rgba",
+          "width": 576,
+          "height": 1192,
+          "stateRow": 171,
+          "rtRow": 171,
+          "bytes": 2746368,
+          "sha256": "316427006381fbc0529aa6e788b682dfc4132f442f26f624a456f83fb8b19c5d"
+        },
+        {
+          "file": "android-motion-mobile40-motion01-9.rgba",
+          "width": 576,
+          "height": 1192,
+          "stateRow": 175,
+          "rtRow": 175,
+          "bytes": 2746368,
+          "sha256": "e0fce29fd5d24b6b81ce5f74e9dcc550d00721297ae92215887b9ee0604180c8"
+        },
+        {
+          "file": "android-motion-mobile40-motion01-10.rgba",
+          "width": 576,
+          "height": 1192,
+          "stateRow": 191,
+          "rtRow": 191,
+          "bytes": 2746368,
+          "sha256": "f66680f896fde796f1fc8ea4c59cb8ab949ba30ae32d0073e795386dcf775333"
+        },
+        {
+          "file": "android-motion-mobile40-motion01-11.rgba",
+          "width": 576,
+          "height": 1192,
+          "stateRow": 194,
+          "rtRow": 194,
+          "bytes": 2746368,
+          "sha256": "a6a07f933a3834b545e167d5d9761a3d9a3bdc00fa7a079e3c70408080b91589"
+        },
+        {
+          "file": "android-motion-mobile40-motion01-12.rgba",
+          "width": 576,
+          "height": 1192,
+          "stateRow": 204,
+          "rtRow": 204,
+          "bytes": 2746368,
+          "sha256": "730dd8101a3062db06b7117936a3dcebde7f4fde9fa905e48da3a41502704f54"
+        }
+      ],
+      "simulationComplete": true,
+      "isolation": {
+        "secondSimulation": false,
+        "fixedDeltaOverride": false,
+        "phaseForced": false,
+        "preferencesWritten": false,
+        "ownerAcceptance": false,
+        "timingScope": "moving scenario with RT readbacks and actual image presentation timestamps; not sustained, scanout, or photons"
+      }
+    },
+    {
+      "runId": "mobile33-motion01",
+      "reportSha256": "90e0f31a8b6964de8d2d6dd8829b42705ee0679b75a3ed49de44d8255614d1b2",
+      "actualSettings": {
+        "scalePercent": 33,
+        "width": 1440,
+        "height": 2980,
+        "internalWidth": 475,
+        "internalHeight": 983,
+        "backend": "RayTracingPipeline",
+        "water": 1,
+        "fire": 0,
+        "cap": 30,
+        "glass": false,
+        "shadow": 1,
+        "mist": true,
+        "dust": 0
+      },
+      "analysis": {
+        "eligible": true,
+        "reportSha256": "90e0f31a8b6964de8d2d6dd8829b42705ee0679b75a3ed49de44d8255614d1b2",
+        "runId": "mobile33-motion01",
+        "workload": "motion-waterfall-equipment-v1",
+        "buildId": "1.6.2",
+        "settings": {
+          "scalePercent": 33,
+          "width": 1440,
+          "height": 2980,
+          "internalWidth": 475,
+          "internalHeight": 983,
+          "backend": "RayTracingPipeline",
+          "water": 1,
+          "fire": 0,
+          "cap": 30,
+          "glass": false,
+          "shadow": 1,
+          "mist": true,
+          "dust": 0
+        },
+        "scope": {
+          "surfaceGeneration": 1,
+          "sceneEpoch": 2,
+          "measurementGeneration": 5,
+          "matchedCompletedFrames": 304,
+          "intervalCount": 303,
+          "durationNanoseconds": 6562500205,
+          "setupPresentationRowsExcluded": 2
+        },
+        "intervalsNanoseconds": {
+          "median": 16666719,
+          "p90NearestRank": 33333334,
+          "p95NearestRank": 37500000,
+          "maximum": 62500000,
+          "over33333000Nanoseconds": 49,
+          "over250000000Nanoseconds": 0
+        },
+        "observedPresentedImageRatePerSecond": 46.171427,
+        "simulation": {
+          "stateRows": 304,
+          "eventRows": 16,
+          "ticksThisFrameMaximum": 4,
+          "catchUpOverrunCountFirst": 0,
+          "catchUpOverrunCountLast": 0,
+          "catchUpOverrunDelta": 0
+        },
+        "collector": {
+          "runCounterDelta": {
+            "preparedPresents": 305,
+            "acceptedPresents": 305,
+            "rejectedPresents": 0,
+            "invalidRegistrations": 0,
+            "invalidMetadata": 0,
+            "pendingCapacityExhausted": 0,
+            "queryCalls": 586,
+            "queryErrors": 0,
+            "incompleteQueries": 0,
+            "zeroPresentTimestamps": 0,
+            "zeroPresentIds": 0,
+            "unknownPresentIds": 0,
+            "duplicateTimings": 0,
+            "rowCapacityExhausted": 0,
+            "missingOnRebind": 0,
+            "missingOnUnbind": 0,
+            "abandonedPreparedPresents": 0
+          },
+          "queryCpuWallNanoseconds": 3289747,
+          "presentMarginAtLeast2Pow63CountIgnored": 303
+        },
+        "limits": [
+          "Short harness-generated moving scenario with milestone RT readbacks; total instrumentation affects pacing.",
+          "One continuous resource scope; retry/rotation/lifecycle discontinuities require separate evidence.",
+          "Actual inter-present intervals; not sustained FPS, scanout, photons, GPU reciprocal time, touch latency or owner acceptance.",
+          "Trace extents are native resource observations; this analyzer does not certify appearance, thermals or power."
+        ]
+      },
+      "beforeCurrentHal": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 28.0,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 27.4,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 29.1,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "startingAdmission": {
+        "admitted": true,
+        "reasons": [],
+        "requiredFrameworkStatus": 0,
+        "maximumDeltaCelsius": 1.5,
+        "sensorCeilingsCelsius": {
+          "AP": 31.5,
+          "BAT": 29.5,
+          "SKIN": 32.5
+        },
+        "referenceCompared": true
+      },
+      "afterCurrentHal": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 37.0,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 29.4,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 32.9,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "imageCount": 13,
+      "capturedBytes": 24280100,
+      "imageReceipts": [
+        {
+          "file": "android-motion-mobile33-motion01-0.rgba",
+          "width": 475,
+          "height": 983,
+          "stateRow": 0,
+          "rtRow": 0,
+          "bytes": 1867700,
+          "sha256": "6b387dab596a62fb319af832040f5835f51327f1e84876f449f05e9a6c78af36"
+        },
+        {
+          "file": "android-motion-mobile33-motion01-1.rgba",
+          "width": 475,
+          "height": 983,
+          "stateRow": 120,
+          "rtRow": 120,
+          "bytes": 1867700,
+          "sha256": "dcbfd803f6407fd5bd3049a97e2e3a40d53584482fdf92340dc14afb20015fcd"
+        },
+        {
+          "file": "android-motion-mobile33-motion01-2.rgba",
+          "width": 475,
+          "height": 983,
+          "stateRow": 230,
+          "rtRow": 230,
+          "bytes": 1867700,
+          "sha256": "e210e6929d1425a3636a25ed9edb9d16030ae939432cc2cdd4837b408819efdd"
+        },
+        {
+          "file": "android-motion-mobile33-motion01-3.rgba",
+          "width": 475,
+          "height": 983,
+          "stateRow": 250,
+          "rtRow": 250,
+          "bytes": 1867700,
+          "sha256": "77e5daa2f88237df723674584ffb703408cfc5e40e627c9340a2479f62349de2"
+        },
+        {
+          "file": "android-motion-mobile33-motion01-4.rgba",
+          "width": 475,
+          "height": 983,
+          "stateRow": 253,
+          "rtRow": 253,
+          "bytes": 1867700,
+          "sha256": "d96bfe954bc7286d874ebc75caad4cffb70e7c832b3339a500ee38c1e605013f"
+        },
+        {
+          "file": "android-motion-mobile33-motion01-5.rgba",
+          "width": 475,
+          "height": 983,
+          "stateRow": 256,
+          "rtRow": 256,
+          "bytes": 1867700,
+          "sha256": "81b91bfe4fcf0f06c0de9cf4a9f51f01feeb7fcd41e9b565087e8c2c9e064d9f"
+        },
+        {
+          "file": "android-motion-mobile33-motion01-6.rgba",
+          "width": 475,
+          "height": 983,
+          "stateRow": 259,
+          "rtRow": 259,
+          "bytes": 1867700,
+          "sha256": "e664d30d022e5c02dbaa16f4ebb8fc6d35108c6e119787f058cb4c87a17eb004"
+        },
+        {
+          "file": "android-motion-mobile33-motion01-7.rgba",
+          "width": 475,
+          "height": 983,
+          "stateRow": 262,
+          "rtRow": 262,
+          "bytes": 1867700,
+          "sha256": "fd5882ceed35e4f93fdd65de3691ad1385929d729e7fcf410813927d06e479f4"
+        },
+        {
+          "file": "android-motion-mobile33-motion01-8.rgba",
+          "width": 475,
+          "height": 983,
+          "stateRow": 264,
+          "rtRow": 264,
+          "bytes": 1867700,
+          "sha256": "95f161ec71ebaf57b62c5c766c96268d3d393df918025e42ad6cafa14c9a8897"
+        },
+        {
+          "file": "android-motion-mobile33-motion01-9.rgba",
+          "width": 475,
+          "height": 983,
+          "stateRow": 268,
+          "rtRow": 268,
+          "bytes": 1867700,
+          "sha256": "e8953b522f0473111a6ce94e4e417783e0f30d0ea0f9e862c139fb45fa91309f"
+        },
+        {
+          "file": "android-motion-mobile33-motion01-10.rgba",
+          "width": 475,
+          "height": 983,
+          "stateRow": 288,
+          "rtRow": 288,
+          "bytes": 1867700,
+          "sha256": "95d6d6931cf686b2bad50e6bc4ae6cdd6c0a40a9501c65d66934abd1a6734d65"
+        },
+        {
+          "file": "android-motion-mobile33-motion01-11.rgba",
+          "width": 475,
+          "height": 983,
+          "stateRow": 291,
+          "rtRow": 291,
+          "bytes": 1867700,
+          "sha256": "f2da458d8cc73509a8c0561e8ce2e7aa14608ff3c648f5ac72d4b3e7458dec4d"
+        },
+        {
+          "file": "android-motion-mobile33-motion01-12.rgba",
+          "width": 475,
+          "height": 983,
+          "stateRow": 303,
+          "rtRow": 303,
+          "bytes": 1867700,
+          "sha256": "94b7b6e3ea26995111c91d44425216962a843965078f5c11e6e00a974805fe87"
+        }
+      ],
+      "simulationComplete": true,
+      "isolation": {
+        "secondSimulation": false,
+        "fixedDeltaOverride": false,
+        "phaseForced": false,
+        "preferencesWritten": false,
+        "ownerAcceptance": false,
+        "timingScope": "moving scenario with RT readbacks and actual image presentation timestamps; not sustained, scanout, or photons"
+      }
+    }
+  ],
+  "comparison": "Same allocated phone, APK, RayTracingPipeline, 1440x2980 portrait output, waterfall-equipment-v1, full Mobile water/fire GlassOff Current cap30 MistOn DustOff tuple; only requested/traced resolution changes. Fresh typed current-HAL starts status0, ceilings and all sensors within1.5C of first accepted start.",
+  "limits": [
+    "6.54-6.59-second short generated-motion scenario with13 RT readbacks per run; instrumentation/readback copies and collection affect pacing.",
+    "Starts matched, not governor/GPU-clock or throughout-run thermal parity; no causal energy claim.",
+    "No sustained30FPS, whole route, expensive Keeper/reward overlap, UI/native HUD acceptance, physical latency or power/peak-memory claim.",
+    "cap30 controls menu/preview; it is not a gameplay30FPS cap.",
+    "Raw wrapped margins excluded from metrics; actual timestamps and exact identities are retained.",
+    "This scenario stops in front of the guards for draw/attack/parry; it does not establish blade/enemy contact."
+  ],
+  "ownerReviewClips": [
+    {
+      "scale": 50,
+      "sourceRunId": "video50-motion01",
+      "sourceVideoSha256": "30a315d49a0aa200b3b70f4d12e65dd41c32b7cf24d83b185d067634f35944f8",
+      "outputFile": "phone-50pct-motion.mp4",
+      "outputSha256": "7e39f67597b6d8fc0ca9ed6449268e63498bd28e33e92ce872683eab6124e86e",
+      "outputBytes": 17021176,
+      "trimStartSeconds": 14.35,
+      "trimEndSeconds": 20.6,
+      "crop": [
+        0,
+        140,
+        1440,
+        2980
+      ],
+      "durationSeconds": 6.322981,
+      "method": "Visual inspection-selected gameplay span; h264 re-encode, native-sized crop, no frame interpolation/audio, original variable presentation sampling retained. This is encoded appearance review, not RT frame/presentation timing or input/audio acceptance."
+    },
+    {
+      "scale": 40,
+      "sourceRunId": "video40-motion01",
+      "sourceVideoSha256": "df71f054689845cd05e203cd941c17def22656eb7cd9647456a944b32b10d8c2",
+      "outputFile": "phone-40pct-motion.mp4",
+      "outputSha256": "e637a36dcc6913fcf40b2651622b9be80aa3fd86711965d8af38cb9690924848",
+      "outputBytes": 17964142,
+      "trimStartSeconds": 14.35,
+      "trimEndSeconds": 20.6,
+      "crop": [
+        0,
+        140,
+        1440,
+        2980
+      ],
+      "durationSeconds": 6.225,
+      "method": "Visual inspection-selected gameplay span; h264 re-encode, native-sized crop, no frame interpolation/audio, original variable presentation sampling retained. This is encoded appearance review, not RT frame/presentation timing or input/audio acceptance."
+    },
+    {
+      "scale": 33,
+      "sourceRunId": "video33-motion01",
+      "sourceVideoSha256": "866474d657064fad890e4f6d207c0dff7e89b9afa60e3c0e35fe72eb9f4771d1",
+      "outputFile": "phone-33pct-motion.mp4",
+      "outputSha256": "550519c73990c30122cbcabdd73e9d5baa4e01d13727f7e7467759dc3b66311d",
+      "outputBytes": 19860523,
+      "trimStartSeconds": 13.95,
+      "trimEndSeconds": 20.3,
+      "crop": [
+        0,
+        140,
+        1440,
+        2980
+      ],
+      "durationSeconds": 6.325,
+      "method": "Visual inspection-selected gameplay span; h264 re-encode, native-sized crop, no frame interpolation/audio, original variable presentation sampling retained. This is encoded appearance review, not RT frame/presentation timing or input/audio acceptance."
+    }
+  ],
+  "ownerDecision": "Owner accepts 33percent appearance for further sustained testing after the three encoded moving clips; practical sustained30FPS, complete-route quality and final profile acceptance remain open. Fresh/reset phone default remains50percent.",
+  "restoration": {
+    "isolatedHistoricalSave": "75percent Mobile GlassOn Current cap30 MistOn DustOff restored through normal Use exact native ACK enabled Keep; requested/saved/effective1080x2235 verified.",
+    "primarySettingsAndAcceptedMenuMix": "byte-identical before/after cohort",
+    "ownedAppsAndRecorder": "stopped"
+  },
+  "retainedFailures": [
+    "mobile50-motion01 refused warm current-HAL state before launch; no metrics.",
+    "First33percent setup touched draft only, then guarded Use refused while disabled; no trial/save; corrected bounded readiness wait preserved normal ACK/Keep.",
+    "50percent video wrapper stopped after successful native save because stale PowerShell LASTEXITCODE was checked; recorder not launched until corrected invocation."
+  ],
+  "nextStep": "Owner requests ordinary Graphics menu33/40 experimental choices for manual testing, default50preserved. Sustained capture extension deferred; no upscaler implemented or selected."
+}

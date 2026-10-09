@@ -98,7 +98,13 @@ foreach ($publishedVersion in @('1.6.0', '1.6.1', '1.6.1-alpha.1', '1.6.1+rebuil
 }
 if (Test-HordeReleaseVersionIsPublished -Version '1.6.2') { throw 'An unpublished version was classified as published.' }
 Assert-PolicyFailure { Assert-HordeReleaseVersionIsMutable -Version '1.6.2' -VersionCode 9 } 'greater than'
-Assert-PolicyFailure { Assert-HordeReleaseVersionIsMutable -Version '1.6.2' -VersionCode 10 } 'active root contract'
+$activeIdentity = Get-HordeSourceIdentity -RepoRoot (Join-Path $PSScriptRoot '..')
+$unmatchedVersion = if ($activeIdentity.Version -eq '1.6.2') { '1.6.3' } else { '1.6.2' }
+Assert-PolicyFailure { Assert-HordeReleaseVersionIsMutable -Version $unmatchedVersion -VersionCode 10 } 'active root contract'
+# A current unpublished identity is a policy query, without packaging or signing.
+if (-not (Test-HordeReleaseVersionIsPublished -Version $activeIdentity.Version)) {
+    Assert-HordeReleaseVersionIsMutable -Version $activeIdentity.Version -VersionCode $activeIdentity.VersionCode
+}
 # These real entry points must reject before build, key access/prompt, Butler
 # lookup, or output cleanup. Deliberately missing paths must never be reached.
 Assert-PolicyFailure { & (Join-Path $PSScriptRoot '..\tools\package-alpha.ps1') -Version '1.6.1' -VersionCode 9 } 'immutable'

@@ -13,7 +13,10 @@ param(
 $ErrorActionPreference = "Stop"
 $repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
 . (Join-Path $PSScriptRoot "music-asset-policy.ps1")
+. (Join-Path $PSScriptRoot "third-party-notice-policy.ps1")
+. (Join-Path $PSScriptRoot "horde-1.6.2-asset-policy.ps1")
 $null = Assert-HordeMusicAssets -RepositoryRoot $repoRoot
+$null = Assert-Horde162Assets -RepositoryRoot $repoRoot
 . (Join-Path $PSScriptRoot "version-contract.ps1")
 $sourceIdentity = Get-HordeSourceIdentity -RepoRoot $repoRoot
 $outputRootFull = [IO.Path]::GetFullPath($OutputRoot)
@@ -256,6 +259,7 @@ function Write-ValidationPackage {
     Copy-Item -LiteralPath $WindowsExe -Destination (Join-Path $windowsStage "HordeLanternRT.exe")
     Copy-Item -LiteralPath (Join-Path $repoRoot "release\windows\README.txt") -Destination (Join-Path $windowsStage "README.txt")
     Copy-Item -LiteralPath (Join-Path $repoRoot "ASSET_LICENSES.md") -Destination (Join-Path $windowsStage "ASSET_LICENSES.md")
+    Copy-HordeThirdPartyNotices -RepositoryRoot $repoRoot -PackageRoot $windowsStage
     $releaseNoteMatches = @(Get-ChildItem -LiteralPath (Join-Path $repoRoot "docs") -Filter "*RELEASE_NOTES*.md" -File |
         Where-Object {
             $text = Get-Content -LiteralPath $_.FullName -Raw
@@ -307,9 +311,7 @@ function Write-ValidationPackage {
     $audioDestination = Join-Path $windowsStage "assets\audio\filmcow"
     New-Item -ItemType Directory -Force -Path $audioDestination | Out-Null
     Copy-Item -Path (Join-Path $repoRoot "assets\audio\filmcow\*.wav") -Destination $audioDestination
-    $pixabayAudioDestination = Join-Path $windowsStage "assets\audio\pixabay"
-    New-Item -ItemType Directory -Force -Path $pixabayAudioDestination | Out-Null
-    Copy-Item -Path (Join-Path $repoRoot "assets\audio\pixabay\*.wav") -Destination $pixabayAudioDestination
+    $null = Copy-Horde162RuntimeAssets -RepositoryRoot $repoRoot -AssetRoot (Join-Path $windowsStage "assets") -Platform Windows
     $null = Copy-HordeMusicRuntimeAssets -RepositoryRoot $repoRoot -AssetRoot (Join-Path $windowsStage "assets")
     Compress-Archive -Path (Join-Path $windowsStage "*") -DestinationPath $windowsZip -CompressionLevel Optimal
     Copy-Item -LiteralPath $AndroidApk -Destination $androidValidationApk
@@ -346,6 +348,8 @@ function Test-ValidationPackages {
         "assets/models/weapons/runtime/gothic-arming-sword-rh-lod0.runtime.glb",
         "assets/models/props/runtime/asset.manifest.json",
         "assets/models/props/runtime/gothic-hand-torch-lod0.runtime.glb",
+        "assets/models/world/runtime/collapsed-entry/asset.manifest.json",
+        "assets/models/world/runtime/collapsed-entry/collapsed-entry-lod0.runtime.glb",
         "assets/models/props/runtime/dielectric-fixture/asset.manifest.json",
         "assets/models/props/runtime/dielectric-fixture/closed-glass-lod0.runtime.glb",
         "assets/models/props/runtime/gothic-chest-base/asset.manifest.json",
@@ -369,6 +373,8 @@ function Test-ValidationPackages {
         "assets/audio/pixabay/chest_open.wav",
         "assets/audio/pixabay/torch_extinguish.wav"))
     $null = Assert-HordeMusicPackage -RepositoryRoot $repoRoot -ArchivePath $windowsZip
+    $null = Assert-Horde162Package -RepositoryRoot $repoRoot -ArchivePath $windowsZip -Platform Windows
+    Assert-HordeThirdPartyNoticesPackage -RepositoryRoot $repoRoot -ArchivePath $windowsZip -Platform Windows
     foreach ($forbidden in @("/source/", "/high/", "runtime-development", "gothic_arming_sword", "models/props/meshy/production-", ".processing.json", ".android.ktx2")) {
         if (@($entries | Where-Object { $_ -like "*$forbidden*" }).Count -ne 0) {
             throw "Windows validation zip contains forbidden development static asset content: $forbidden"
@@ -384,6 +390,8 @@ function Test-ValidationPackages {
         "assets/models/weapons/runtime/gothic-arming-sword-rh-lod0.runtime.glb",
         "assets/models/props/runtime/asset.manifest.json",
         "assets/models/props/runtime/gothic-hand-torch-lod0.runtime.glb",
+        "assets/models/world/runtime/collapsed-entry/asset.manifest.json",
+        "assets/models/world/runtime/collapsed-entry/collapsed-entry-lod0.runtime.glb",
         "assets/models/props/runtime/dielectric-fixture/asset.manifest.json",
         "assets/models/props/runtime/dielectric-fixture/closed-glass-lod0.runtime.glb",
         "assets/models/props/runtime/gothic-chest-base/asset.manifest.json",
@@ -407,11 +415,14 @@ function Test-ValidationPackages {
         "assets/ASSET_LICENSES.md",
         "assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb",
         "assets/models/enemies/meshy/lich_placeholder_merged_animations_v01.glb",
-        "assets/audio/pixabay/waterfall_loop.wav",
+        "assets/audio/pixabay/waterfall_core_loop.wav",
+        "assets/audio/pixabay/waterfall-core.manifest.json",
         "assets/audio/pixabay/chest_unlock.wav",
         "assets/audio/pixabay/chest_open.wav",
         "assets/audio/pixabay/torch_extinguish.wav"))
     $null = Assert-HordeMusicPackage -RepositoryRoot $repoRoot -ArchivePath $androidValidationApk
+    $null = Assert-Horde162Package -RepositoryRoot $repoRoot -ArchivePath $androidValidationApk -Platform Android
+    Assert-HordeThirdPartyNoticesPackage -RepositoryRoot $repoRoot -ArchivePath $androidValidationApk -Platform Android
     foreach ($forbidden in @("/source/", "/high/", "runtime-development", "gothic_arming_sword", "models/props/meshy/production-", ".processing.json", ".windows.ktx2")) {
         if (@($entries | Where-Object { $_ -like "*$forbidden*" }).Count -ne 0) {
             throw "Android validation APK contains forbidden development static asset content: $forbidden"
@@ -445,7 +456,7 @@ function Test-ValidationPackages {
         if ($resources -notmatch [regex]::Escape($marker)) { throw "Android validation APK lacks credit marker: $marker" }
     }
     & (Join-Path $PSScriptRoot "test-held-item-package-contract.ps1") `
-        -AndroidApkPath $androidValidationApk -WindowsZipPath $windowsZip
+        -AndroidApkPath $androidValidationApk -WindowsZipPath $windowsZip -RequireHorde162World
     if ($LASTEXITCODE -ne 0) { throw "Held-item validation package contract failed." }
     $manifest = (& $aapt2 dump xmltree --file AndroidManifest.xml $androidValidationApk 2>&1 | Out-String)
     if ($LASTEXITCODE -ne 0) { throw "aapt2 could not inspect Android validation manifest." }
@@ -454,7 +465,8 @@ function Test-ValidationPackages {
         'package="com\.samfa12\.hordelanternrt"',
         "versionName[^\r\n]*=`"$escapedSourceVersion`"",
         "versionCode[^\r\n]*=$($script:sourceVersionCode)(?:\s|$)",
-        'screenOrientation[^\r\n]*=7(?:\s|$)')) {
+        'screenOrientation[^\r\n]*=13(?:\s|$)',
+        'configChanges[^\r\n]*=(?:0x0*4f0|1264)(?:\s|$)')) {
         if ($manifest -notmatch $pattern) { throw "Android validation manifest failed required pattern: $pattern" }
     }
     & $zipalign -c -P 16 -v 4 $androidValidationApk | Out-Null
@@ -840,6 +852,8 @@ try {
                 $androidValidationApk,
                 (Join-Path $repoRoot "assets\models\enemies\meshy\skeleton_biped_merged_animations_v01.glb"),
                 (Join-Path $repoRoot "assets\models\enemies\meshy\lich_placeholder_merged_animations_v01.glb"),
+                (Join-Path $repoRoot "assets\models\world\runtime\collapsed-entry\asset.manifest.json"),
+                (Join-Path $repoRoot "assets\models\world\runtime\collapsed-entry\collapsed-entry-lod0.runtime.glb"),
                 (Join-Path $repoRoot "assets\textures\polyhaven\mobile_1k\diff-array-512-astc6x6.ktx2"),
                 (Join-Path $repoRoot "assets\textures\polyhaven\mobile_1k\normal-array-512-astc4x4.ktx2"),
                 (Join-Path $repoRoot "assets\textures\polyhaven\mobile_1k\arm-array-512-astc6x6.ktx2"),

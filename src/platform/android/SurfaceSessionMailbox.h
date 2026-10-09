@@ -34,8 +34,9 @@ public:
             superseded.swap(pending_);
             pending_.emplace(std::move(request));
             changed_ = true;
+            suspended_ = false;
         }
-        ready_.notify_one();
+        ready_.notify_all();
         return generation;
     }
 
@@ -48,8 +49,9 @@ public:
             if (!AdvanceGeneration()) closed_ = true; // Never wrap identities.
             superseded.swap(pending_);
             changed_ = true;
+            suspended_ = false;
         }
-        ready_.notify_one();
+        ready_.notify_all();
         return true;
     }
 
@@ -61,8 +63,9 @@ public:
             closed_ = true;
             (void)AdvanceGeneration();
             superseded.swap(pending_);
+            suspended_ = false;
         }
-        ready_.notify_one();
+        ready_.notify_all();
     }
 
     std::optional<Action> Take()
@@ -79,6 +82,35 @@ public:
     bool IsCurrent(const std::uint64_t generation) const
     {
         return generation != 0 && (state_.load(std::memory_order_acquire) >> 2u) == generation;
+    }
+
+    // Suspension belongs to the current surface generation, but does not
+    // create a lifecycle action or alter its published runtime status.
+    bool SetSuspended(const std::uint64_t generation, const bool suspended)
+    {
+        {
+            std::lock_guard lock(mutex_);
+            if (closed_ || generation == 0 || generation != generation_) return false;
+            suspended_ = suspended;
+        }
+        ready_.notify_all();
+        return true;
+    }
+
+    bool IsSuspended(const std::uint64_t generation) const
+    {
+        std::lock_guard lock(mutex_);
+        return !closed_ && generation != 0 && generation == generation_ && suspended_;
+    }
+
+    // Render-owner wait only. It performs no lifecycle or Vulkan work and
+    // returns when resumed, cancelled/replaced, or closed.
+    void WaitWhileSuspended(const std::uint64_t generation)
+    {
+        std::unique_lock lock(mutex_);
+        ready_.wait(lock, [this, generation] {
+            return closed_ || generation == 0 || generation != generation_ || !suspended_;
+        });
     }
 
     // Generation and runtime status share one atomic: a stale completion cannot
@@ -115,12 +147,13 @@ private:
         state_.store(generation_ << 2u, std::memory_order_release);
         return true;
     }
-    std::mutex mutex_;
+    mutable std::mutex mutex_;
     std::condition_variable ready_;
     std::optional<Request> pending_;
     std::uint64_t generation_ = 0;
     bool changed_ = false;
     bool closed_ = false;
+    bool suspended_ = false;
     std::atomic<std::uint64_t> state_{0};
 };
 }

@@ -1,4 +1,5 @@
 #include "reporting/PlaytestSubmission.h"
+#include "reporting/BenchmarkSummarySubmission.h"
 
 #include <iostream>
 #include <vector>
@@ -61,6 +62,123 @@ PlaytestReportInput Input()
     input.impact = PlaytestReportImpact::MinorFriction;
     input.consentToSubmit = true;
     return input;
+}
+
+void BenchmarkSummarySubmissionChecks()
+{
+    using namespace horde::telemetry;
+    using namespace horde::gameplay;
+    // Real bounded route/evidence owners supply the typed builder. No arbitrary
+    // ready-status JSON fixture bypasses its privacy/population admission.
+    ShowcaseBenchmarkRun benchmark;
+    RtBenchmarkEvidenceRun evidence;
+    benchmark.Start(2u, BenchmarkWorkload::LanternHeldHigh);
+    Check(evidence.Start(kLanternBenchmarkFramesPerLap), "summary evidence owner allocated");
+    std::uint64_t serial = 0u;
+    bool armed = false;
+    while (benchmark.IsRunning())
+    {
+        const auto advance = benchmark.Advance();
+        if (benchmark.CurrentLap() == 2u)
+        {
+            if (!armed) { Check(evidence.ArmMeasurement(3u,8u), "summary measured scope armed"); armed = true; }
+            ++serial;
+            RtPerformanceEvidenceSnapshot s;
+            s.identity.submitted.frame = {3u,8u,serial,serial,1000u+serial,0u};
+            s.identity.submitted.submissionSerial = serial; s.identity.completionSerial = serial;
+            auto& p = s.scene.pipeline;
+            p.executionMode = RtExecutionMode::RayTracingPipeline;
+            p.instrumentation = RtInstrumentationMode::Shipping;
+            p.dielectricQuality = RtDielectricQuality::Mobile; p.waterQuality = RtWaterQuality::Mobile;
+            p.activeStrategy = RtMaterialStrategy::OpaqueFast;
+            Check(AssignRtFixedText(p.bundleKey,"shipping_mobile_pair"), "summary fixture bundle key");
+            Check(AssignRtFixedText(p.opaqueFast.key,"shipping_mobile_opaque"), "summary fixture opaque key");
+            Check(AssignRtFixedText(p.opaqueFast.sha256,std::string(64u,'a')), "summary fixture opaque hash");
+            Check(AssignRtFixedText(p.genericDielectric.key,"shipping_mobile_generic"), "summary fixture generic key");
+            Check(AssignRtFixedText(p.genericDielectric.sha256,std::string(64u,'b')), "summary fixture generic hash");
+            p.active = p.opaqueFast;
+            s.scene.stages.status = RtSampleStatus::Valid;
+            for (auto& stage : s.scene.stages.values) { stage.durationNanoseconds = 1000u; stage.operationCount = 1u; }
+            s.scene.stages.values[RtStageIndex(RtStage::Skin)].durationNanoseconds = 2000u;
+            s.scene.stages.values[RtStageIndex(RtStage::Skin)].operationCount = 2u;
+            s.scene.stages.values[RtStageIndex(RtStage::WholeFrameCycle)].durationNanoseconds = 10'000'000u;
+            s.scene.dispatch.sceneReady = s.scene.dispatch.rtDispatchRecorded = s.scene.dispatch.swapchainCopyRecorded = true;
+            s.dielectric.status = RtSampleStatus::CompiledOut; s.gpu.status = RtSampleStatus::Disabled;
+            s.presentation.outcome = RtPresentationOutcome::Presented;
+            s.presentation.lastSuccessfulPresentSubmissionSerial = serial;
+            s.cpuBenchmarkEligible = s.benchmarkEligible = true;
+            const auto index = evidence.ExpectFrame({static_cast<std::uint32_t>(advance.replay.zone),2u});
+            Check(index.has_value(), "summary exact lap/zone expectation retained");
+            if (index)
+            {
+                Check(evidence.BindSubmitted(*index,s.identity.submitted), "summary exact submitted owner bound");
+                Check(evidence.Complete(s), "summary completed owner accepted");
+            }
+        }
+        benchmark.RecordFrame(16.0,true);
+    }
+    Check(benchmark.Passed() && evidence.RecordOwnerDrainResult(true) && evidence.Finalize(),
+        "summary only prepared after real route/final owning drain");
+    BenchmarkSummaryConfiguration c;
+    c.sceneEpoch = 3u; c.measurementGeneration = 8u;
+    c.metadata.buildIdentity = "1.6.2-offline-fixture";
+    c.metadata.shaderIdentity = "opaqueFast:shipping_mobile_opaque@" + std::string(64u,'a') +
+        "|genericDielectric:shipping_mobile_generic@" + std::string(64u,'b');
+    c.metadata.executionBackend = "RayTracingPipeline"; c.metadata.presentMode = "FIFO";
+    c.metadata.materialEncoding = "RGBA8 raw fallback";
+    c.metadata.legacyFrameTimingScope = "windows-render-plus-rtlab-telemetry";
+    c.metadata.internalWidth = c.metadata.presentationWidth = 960u;
+    c.metadata.internalHeight = c.metadata.presentationHeight = 540u;
+    constexpr std::string_view run = "11111111-1111-4111-8111-111111111111";
+    constexpr std::string_view report = "22222222-2222-4222-9222-222222222222";
+    const auto summary = CaptureBenchmarkSummary(benchmark,evidence,c,c,run);
+    const auto local = PrepareBenchmarkSummaryReport(summary,{true,false,report,"2026-10-04T12:00:00Z"});
+    Check(local.IsReady(), "actual native typed local summary ready");
+    const std::string literal(local.Json());
+    const auto noConsent = PrepareBenchmarkSummarySubmission(local);
+    Check(noConsent.Status() == BenchmarkSummarySubmissionStatus::ConsentRequired &&
+        noConsent.Json().empty() && noConsent.LocalJson().empty() && noConsent.ReportId().empty(),
+        "local preparation approval never implies remote consent");
+    Check(!PrepareBenchmarkSummarySubmission(PreparedBenchmarkSummaryReport{},true).IsReady(),
+        "unprepared summary cannot enter typed remote wrapper");
+    const auto prepared = PrepareBenchmarkSummarySubmission(local,true);
+    const std::string expected = literal.substr(0u,literal.size()-1u) + ",\"consentToSubmit\":true}";
+    Check(prepared.IsReady() && prepared.ReportId() == local.ReportId() && prepared.LocalJson() == literal &&
+        prepared.Json() == expected && local.Json() == literal &&
+        prepared.Json().find("turnstileToken") == std::string_view::npos &&
+        literal.find("consentToSubmit") == std::string::npos,
+        "disclosed outer remote consent alone added without reserializing local bytes or ID");
+    const auto request = BuildBenchmarkSummarySubmissionRequest(prepared,"one\\\"token");
+    const auto retryRequest = BuildBenchmarkSummarySubmissionRequest(prepared,"fresh-token");
+    Check(request == expected.substr(0u,expected.size()-1u) + ",\"turnstileToken\":\"one\\\\\\\"token\"}" &&
+        request != retryRequest && prepared.Json() == expected && prepared.LocalJson() == literal,
+        "escaped one-use verification changes request only, not approved literal/wrapper");
+    for (const auto token : {std::string{},std::string(2049u,'x'),std::string("bad\n"),std::string("\xff")})
+        Check(BuildBenchmarkSummarySubmissionRequest(prepared,token).empty(), "summary token malformed/overflow rejected");
+    Check(BuildBenchmarkSummarySubmissionRequest(noConsent,"token").empty(), "unconsented request construction rejected");
+    Check(BuildBenchmarkSummarySubmissionRequest(prepared,std::string(2048u,'"')).size() <=
+        kBenchmarkSummarySubmissionMaxBytes &&
+        !BuildBenchmarkSummarySubmissionRequest(prepared,std::string(2048u,'"')).empty(),
+        "maximum escaped token for typed fixture remains within20KiB");
+    PlaytestReportDelivery owner;
+    PlaytestReportAttempt attempt;
+    Check(owner.BeginBenchmarkSummarySubmission(prepared,attempt) && attempt.json == expected &&
+        attempt.reportId == report, "shared local attempt owner admits typed approved wrapper");
+    Check(!owner.BeginBenchmarkSummarySubmission(prepared,attempt), "duplicate typed summary attempt rejected");
+    const auto firstToken = attempt.token;
+    Check(owner.Complete(firstToken,PlaytestReportDeliveryResult::RetryableFailure) && owner.Retry(attempt) &&
+        attempt.json == expected && attempt.reportId == report &&
+        !owner.Complete(firstToken,PlaytestReportDeliveryResult::Accepted),
+        "explicit summary retry retains exact frozen ID/body and invalidates stale completion");
+    owner.Cancel();
+    Check(!owner.Complete(attempt.token,PlaytestReportDeliveryResult::Accepted) && !owner.Retry(attempt),
+        "cancelled typed summary owner rejects late acceptance and automatic retry");
+    Check(prepared.LocalJson() == literal && local.Json() == literal, "local Copy/Save bytes survive attempt cancellation");
+    c.metadata.buildIdentity = "password=private-value";
+    const auto sensitive = CaptureBenchmarkSummary(benchmark,evidence,c,c,run);
+    const auto rejected = PrepareBenchmarkSummaryReport(sensitive,{true,false,report,"2026-10-04T12:00:00Z"});
+    Check(!rejected.IsReady() && !PrepareBenchmarkSummarySubmission(rejected,true).IsReady(),
+        "existing native text/privacy rejection preserved by typed wrapper");
 }
 } // namespace
 
@@ -197,5 +315,6 @@ int main(const int argc, char** argv)
     Check(prepared.IsReady() && prepared.json.find("\"includeDiagnostics\":true") != std::string::npos &&
         prepared.json.find("\"rtPresented\":false") != std::string::npos,
         "opted-in owned context retains honest false presentation evidence");
+    BenchmarkSummarySubmissionChecks();
     return passed ? 0 : 1;
 }

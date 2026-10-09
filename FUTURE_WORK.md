@@ -6,6 +6,13 @@ scope and explicit deferrals. The September13 sequence below and September11
 compatibility design are historical planning context, not remaining1.6.1 gates
 or current publication restrictions. No later release is automatically authorised.
 
+## Later stone geometry polish - owner feedback, October5
+
+Consider restrained rounding of harsh stone-wall corners for a more natural
+masonry appearance. This is future polish, outside1.6.2: no bevels, collision
+changes, new geometry or additional validation are included in the current
+Keeper-lighting and performance work.
+
 ## Historical September13 sequence
 
 1. Reconcile lean branch guidance and current plans/evidence.

@@ -26,7 +26,7 @@ public final class BenchmarkAutomationIntentTest {
             assertThrows(IllegalArgumentException.class,
                     () -> MainActivity.benchmarkAutomationRequestId(request(id)));
         }
-        for (String key : new String[]{"horde.debug.scale", "horde.debug.checkpoint",
+        for (String key : new String[]{"horde.debug.scale", "horde.debug.dust", "horde.debug.checkpoint",
                 "horde.debug.capture", "horde_require_rayquery_compute"}) {
             assertThrows(IllegalArgumentException.class,
                     () -> MainActivity.benchmarkAutomationRequestId(request("valid").putExtra(key, "value")));
@@ -48,5 +48,28 @@ public final class BenchmarkAutomationIntentTest {
         }
         assertThrows(IllegalArgumentException.class, () -> MainActivity.benchmarkAutomationWorkload(
                 request("valid").putExtra("horde.benchmark.workload", 7)));
+    }
+
+    @Test public void motionScenarioIsSeparateOptInAndCannotMixWithFixedPoseOrDebugInput() {
+        final Intent motion = request("safe-run-1").putExtra("horde.benchmark.motion", "keeper-retry-reward");
+        if (!BuildConfig.MOTION_VALIDATION) {
+            assertThrows(IllegalArgumentException.class,
+                    () -> MainActivity.benchmarkAutomationMotionScenario(motion));
+            return;
+        }
+        assertEquals("keeper-retry-reward", MainActivity.benchmarkAutomationMotionScenario(motion));
+        assertEquals("motion-keeper-retry-reward-v1", MainActivity.benchmarkAutomationWorkload(motion));
+        for (String scenario : new String[]{"keeper-first-entry", "torch-low-opening", "shaft-up",
+                "waterfall-equipment", "torch-drench"}) {
+            assertEquals(scenario, MainActivity.benchmarkAutomationMotionScenario(
+                    request("safe-run-1").putExtra("horde.benchmark.motion", scenario)));
+        }
+        assertThrows(IllegalArgumentException.class, () -> MainActivity.benchmarkAutomationMotionScenario(
+                request("safe-run-1").putExtra("horde.benchmark.motion", "unknown")));
+        assertThrows(IllegalArgumentException.class, () -> MainActivity.benchmarkAutomationMotionScenario(
+                request("safe-run-1").putExtra("horde.benchmark.motion", "keeper-retry-reward")
+                        .putExtra("horde.benchmark.workload", "showcase-route-v1")));
+        assertThrows(IllegalArgumentException.class, () -> MainActivity.benchmarkAutomationRequestId(
+                motion.putExtra("horde.debug.motion", "keeper-retry-reward")));
     }
 }
