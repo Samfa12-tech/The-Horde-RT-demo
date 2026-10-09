@@ -118,6 +118,8 @@ public class MainActivity extends Activity {
     private static final String LICH_ASSET = "models/enemies/meshy/lich_placeholder_merged_animations_v01.glb";
     private static final String LICH_FILE = "lich_placeholder_merged_animations_v01.glb";
     private static final String EXTRA_DEBUG_CHECKPOINT = "horde.debug.checkpoint";
+    private static final int DEBUG_COMBAT_PRACTICE_PARRY = 1;
+    private static final int DEBUG_COMBAT_PRACTICE_DODGE = 2;
     private static final String EXTRA_DEBUG_CAPTURE = "horde.debug.capture";
     private static final String EXTRA_DEBUG_REPLAY = "horde.debug.replay";
     private static final String EXTRA_DEBUG_MOTION = "horde.debug.motion";
@@ -201,6 +203,8 @@ public class MainActivity extends Activity {
     private static final int PLATFORM_EVENT_SKELETON_INCIDENTAL = 20;
     private static final int PLATFORM_EVENT_PLAYER_SWORD_ATTACHMENT_CHANGED = 22;
     private static final int PLATFORM_EVENT_SKELETON_ENCOUNTER_WARNING = 23;
+    private static final int PLATFORM_EVENT_PARRY_PREPARE_CUE = 24;
+    private static final int PLATFORM_EVENT_LICH_DISCHARGE_WARNING = 25;
     private static final int EQUIPMENT_AUDIO_SWORD_DRAW = 1;
     private static final int EQUIPMENT_AUDIO_SWORD_SHEATH = 2;
     private static final int ENTITY_LICH = 3;
@@ -242,6 +246,10 @@ public class MainActivity extends Activity {
     private final ArrayList<AlertDialog> controllerDialogs = new ArrayList<>();
     private final Set<AlertDialog> controllerFocusedDialogs = new HashSet<>();
     private TextView controllerPrompt;
+    private TextView combatTeachingPrompt;
+    private String combatTeachingFadeText = "";
+    private int combatTeachingFadeOpacity;
+    private long combatTeachingFadeStartedAtMs;
     private final InputManager.InputDeviceListener controllerDevices = new InputManager.InputDeviceListener() {
         @Override public void onInputDeviceAdded(int deviceId) { /* Connection alone never takes over touch. */ }
         @Override public void onInputDeviceChanged(int deviceId) {
@@ -316,6 +324,7 @@ public class MainActivity extends Activity {
     private int enemyStepVariant;
     private int diagnosticsRefreshTick;
     private int pendingDebugCheckpoint = -1;
+    private int pendingDebugCombatPractice = -1;
     private boolean pendingDebugCapture;
     private boolean pendingDebugReplay;
     private String pendingDebugMotion, pendingDebugMotionId;
@@ -492,6 +501,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         lastAppliedConfiguration = new Configuration(getResources().getConfiguration());
         preferences = getSharedPreferences(PREFS, MODE_PRIVATE);
+        applyCombatTeachingOptions(CombatTeachingPreferences.read(preferences));
         rtLabUnlocked = preferences.getBoolean(PREF_RT_LAB_UNLOCKED, false);
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         ProbeBridge.resetRtSceneTuning();
@@ -523,6 +533,7 @@ public class MainActivity extends Activity {
         toggleHeldLightPoseButton = findViewById(R.id.toggle_held_light_pose_button);
         vitalityStatus = findViewById(R.id.vitality_status);
         controllerPrompt = findViewById(R.id.controller_prompt);
+        combatTeachingPrompt = findViewById(R.id.combat_teaching_prompt);
         inputManager = (InputManager)getSystemService(Context.INPUT_SERVICE);
         if (inputManager != null) inputManager.registerInputDeviceListener(controllerDevices, handler);
         keeperRevealTitle = findViewById(R.id.keeper_reveal_title);
@@ -2482,6 +2493,63 @@ public class MainActivity extends Activity {
         attachPanel(panel);
     }
 
+    private void applyCombatTeachingOptions(CombatTeachingPreferences.Values values) {
+        ProbeBridge.setCombatTeachingOptions(values.enabled, values.slowdown);
+    }
+
+    private void updateCombatTeachingPrompt(int surfaceState) {
+        if (combatTeachingPrompt == null) return;
+        final long packed = ProbeBridge.getCombatTeachingState();
+        final String text = CombatTeachingPreferences.prompt(packed);
+        final boolean allowed = resumed && surfaceStarted && surfaceState == 1 &&
+                preferences.getBoolean("show_hud", true) &&
+                !menuVisible && !diagnosticsVisible && !graphicsVisible && !rtLabVisible &&
+                !playtestReportVisible && !benchmarkRunning && !debugCaptureUiSuppressed &&
+                !deathOverlayVisible && !endingOverlayVisible;
+        final boolean reducedMotion = isReducedMotionEnabled();
+        if (!allowed || reducedMotion && text.isEmpty()) {
+            combatTeachingFadeText = "";
+            combatTeachingFadeOpacity = 0;
+            combatTeachingFadeStartedAtMs = 0L;
+            combatTeachingPrompt.setText("");
+            combatTeachingPrompt.setContentDescription("");
+            combatTeachingPrompt.setVisibility(View.GONE);
+            return;
+        }
+        if (!text.isEmpty()) {
+            combatTeachingFadeText = text;
+            combatTeachingFadeOpacity = (int) ((packed >>> 40) & 0xffL);
+            combatTeachingFadeStartedAtMs = 0L;
+            combatTeachingPrompt.setText(text);
+            combatTeachingPrompt.setContentDescription(text.replace('\n', ' '));
+            combatTeachingPrompt.setAlpha(CombatTeachingPreferences.alpha(
+                    combatTeachingFadeOpacity, reducedMotion));
+            combatTeachingPrompt.setVisibility(View.VISIBLE);
+            return;
+        }
+        if (combatTeachingFadeText.isEmpty()) {
+            combatTeachingPrompt.setVisibility(View.GONE);
+            return;
+        }
+        final long now = SystemClock.uptimeMillis();
+        if (combatTeachingFadeStartedAtMs == 0L) combatTeachingFadeStartedAtMs = now;
+        final int fadeOpacity = CombatTeachingPreferences.fadeAlpha(combatTeachingFadeOpacity,
+                now - combatTeachingFadeStartedAtMs, reducedMotion);
+        if (fadeOpacity == 0) {
+            combatTeachingFadeText = "";
+            combatTeachingFadeOpacity = 0;
+            combatTeachingFadeStartedAtMs = 0L;
+            combatTeachingPrompt.setText("");
+            combatTeachingPrompt.setContentDescription("");
+            combatTeachingPrompt.setVisibility(View.GONE);
+            return;
+        }
+        combatTeachingPrompt.setText(combatTeachingFadeText);
+        combatTeachingPrompt.setContentDescription(combatTeachingFadeText.replace('\n', ' '));
+        combatTeachingPrompt.setAlpha(CombatTeachingPreferences.alpha(fadeOpacity, false));
+        combatTeachingPrompt.setVisibility(View.VISIBLE);
+    }
+
     private void showSettings() {
         interfaceVisible=false;
         entryMenuPanel = null;
@@ -2518,6 +2586,47 @@ public class MainActivity extends Activity {
         addSlider(panel, getString(R.string.look_sensitivity), preferences.getInt("look_sensitivity", 100), 50, 175,
                 value -> preferences.edit().putInt("look_sensitivity", value).apply());
 
+        final CombatTeachingPreferences.Values teaching = CombatTeachingPreferences.read(preferences);
+        addBody(panel, getString(R.string.combat_teaching_description));
+        final CheckBox teachingEnabled = new CheckBox(this);
+        teachingEnabled.setText(R.string.combat_teaching);
+        teachingEnabled.setTextColor(0xFFFFE5BA);
+        teachingEnabled.setButtonTintList(HordeUiTokens.label(HordeUiTokens.BRASS));
+        teachingEnabled.setTextSize(16);
+        teachingEnabled.setChecked(teaching.enabled);
+        teachingEnabled.setMinHeight(dp(48));
+        teachingEnabled.setOnCheckedChangeListener((buttonView, checked) -> {
+            final CombatTeachingPreferences.Values next = new CombatTeachingPreferences.Values(
+                    checked, CombatTeachingPreferences.read(preferences).slowdown);
+            CombatTeachingPreferences.save(preferences, next);
+            applyCombatTeachingOptions(next);
+        });
+        panel.addView(teachingEnabled, matchWrap());
+
+        final CheckBox teachingSlowdown = new CheckBox(this);
+        teachingSlowdown.setText(R.string.combat_teaching_slowdown);
+        teachingSlowdown.setTextColor(0xFFFFE5BA);
+        teachingSlowdown.setButtonTintList(HordeUiTokens.label(HordeUiTokens.BRASS));
+        teachingSlowdown.setTextSize(16);
+        teachingSlowdown.setChecked(teaching.slowdown);
+        teachingSlowdown.setMinHeight(dp(48));
+        teachingSlowdown.setOnCheckedChangeListener((buttonView, checked) -> {
+            final CombatTeachingPreferences.Values next = new CombatTeachingPreferences.Values(
+                    CombatTeachingPreferences.read(preferences).enabled, checked);
+            CombatTeachingPreferences.save(preferences, next);
+            applyCombatTeachingOptions(next);
+        });
+        panel.addView(teachingSlowdown, matchWrap());
+        addMenuButtonRow(panel, getString(R.string.combat_teaching_skip),
+                ProbeBridge::requestCombatTeachingSkip,
+                getString(R.string.combat_teaching_replay), () -> {
+                    final CombatTeachingPreferences.Values current = CombatTeachingPreferences.read(preferences);
+                    final CombatTeachingPreferences.Values next = new CombatTeachingPreferences.Values(true, current.slowdown);
+                    CombatTeachingPreferences.save(preferences, next);
+                    applyCombatTeachingOptions(next);
+                    ProbeBridge.requestCombatTeachingReplay();
+                });
+
         final CheckBox hapticsEnabled = new CheckBox(this);
         hapticsEnabled.setText(R.string.haptics_enabled);
         hapticsEnabled.setTextColor(0xFFFFE5BA);
@@ -2546,7 +2655,10 @@ public class MainActivity extends Activity {
                 getString(R.string.reset_non_graphics), () -> {
                     preferences.edit().putBoolean("sfx_enabled", true).putInt("sfx_volume", 70)
                             .putInt(PREF_MUSIC_VOLUME, 70).putInt("look_sensitivity", 100)
-                            .putBoolean("haptics_enabled", true).putBoolean("show_hud", true).apply();
+                            .putBoolean("haptics_enabled", true).putBoolean("show_hud", true)
+                            .putBoolean(CombatTeachingPreferences.ENABLED, true)
+                            .putBoolean(CombatTeachingPreferences.SLOWDOWN, false).apply();
+                    applyCombatTeachingOptions(CombatTeachingPreferences.read(preferences));
                     if (musicPlayback != null) musicPlayback.setVolumePercent(70);
                     InterfacePreferences.reset(preferences);
                     applyInterfacePresentation();
@@ -4446,6 +4558,7 @@ public class MainActivity extends Activity {
                     finishBenchmarkAutomation(3);
                 }
                 final int state = ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration);
+                updateCombatTeachingPrompt(state);
                 if (debugMotionActive) {
                     final int motionStatus = ProbeBridge.getDebugMotionEvidenceStatus();
                     if (motionStatus == 3 || motionStatus == 4) {
@@ -4543,6 +4656,14 @@ public class MainActivity extends Activity {
                             }
                         } else if (!ProbeBridge.requestDebugCheckpoint(checkpoint)) {
                             Log.e(TAG, "Debug checkpoint request rejected: " + checkpoint);
+                        }
+                        debugAutomationAutostart = false;
+                    } else if (pendingDebugCombatPractice >= 0) {
+                        final int enemyKind = pendingDebugCombatPractice;
+                        pendingDebugCombatPractice = -1;
+                        clearTouchState();
+                        if (!ProbeBridge.requestDebugCombatPractice(enemyKind)) {
+                            Log.e(TAG, "Debug combat practice request rejected: " + enemyKind);
                         }
                         debugAutomationAutostart = false;
                     } else if (pendingDebugReplay) {
@@ -4676,6 +4797,18 @@ public class MainActivity extends Activity {
                             break;
                         case PLATFORM_EVENT_ENEMY_ATTACK_STARTED:
                             playSpatialSound("skeleton_attack", 0.22f, stereoGains, verticalMetadata);
+                            break;
+                        case PLATFORM_EVENT_PARRY_PREPARE_CUE:
+                            if (!menuVisible && !diagnosticsVisible && !graphicsVisible &&
+                                    !deathOverlayVisible && !endingOverlayVisible) {
+                                playSpatialSound("sword_hit_1", 0.18f, stereoGains, verticalMetadata);
+                            }
+                            break;
+                        case PLATFORM_EVENT_LICH_DISCHARGE_WARNING:
+                            if (!menuVisible && !diagnosticsVisible && !graphicsVisible &&
+                                    !deathOverlayVisible && !endingOverlayVisible) {
+                                playSpatialSound("skeleton_attack", 0.16f, stereoGains, verticalMetadata);
+                            }
                             break;
                         case PLATFORM_EVENT_ENEMY_HIT:
                             if (targetEntity == ENTITY_LICH) {
@@ -4901,6 +5034,12 @@ public class MainActivity extends Activity {
         }
     }
 
+    static int combatPracticeKind(final String name) {
+        if ("combat-practice-parry".equals(name)) return DEBUG_COMBAT_PRACTICE_PARRY;
+        if ("combat-practice-dodge".equals(name)) return DEBUG_COMBAT_PRACTICE_DODGE;
+        return -1;
+    }
+
     static boolean enablesVerticalProofFeedback(final boolean debugBuild, final int checkpoint) {
         return debugBuild && (checkpoint == 170 || checkpoint == 171);
     }
@@ -4979,7 +5118,9 @@ public class MainActivity extends Activity {
             return;
         }
         final int requestedScale = admittedDebugRenderScale(intent);
-        final int requestedCheckpoint = checkpointId(intent.getStringExtra(EXTRA_DEBUG_CHECKPOINT));
+        final String requestedCheckpointName = intent.getStringExtra(EXTRA_DEBUG_CHECKPOINT);
+        final int requestedPractice = combatPracticeKind(requestedCheckpointName);
+        final int requestedCheckpoint = requestedPractice >= 0 ? -1 : checkpointId(requestedCheckpointName);
         selectVerticalProofFeedbackCheckpoint(requestedCheckpoint);
         final boolean requestedReplay = intent.getBooleanExtra(EXTRA_DEBUG_REPLAY, false);
         final boolean requestedCapture = intent.getBooleanExtra(EXTRA_DEBUG_CAPTURE, false);
@@ -5001,6 +5142,12 @@ public class MainActivity extends Activity {
         final boolean motionRequested = requestedMotion != null && requestedMotionId != null &&
                 requestedCheckpoint < 0 && !requestedReplay && !requestedCapture && !hasRtLabIntent &&
                 !intent.hasExtra(EXTRA_BENCHMARK_RUN_ID);
+        if (requestedPractice >= 0 && (requestedCapture || requestedReplay || hasRtLabIntent ||
+                intent.hasExtra(EXTRA_BENCHMARK_RUN_ID) || motionRequested)) {
+            Log.w(TAG, "Rejected combat practice combined with capture, benchmark, replay, RT lab, or motion work.");
+            clearVerticalProofFeedbackSelection();
+            return;
+        }
         final int requestedDustQuality = admittedDebugDustQuality(intent, true, requestedCheckpoint,
                 requestedCapture, requestedReplay, hasRtLabIntent, motionRequested);
         if (requestedDustQuality >= 0) {
@@ -5066,13 +5213,18 @@ public class MainActivity extends Activity {
             pendingDebugCheckpoint = requestedCheckpoint;
             pendingDebugCapture = requestedCapture;
             pendingDebugReplay = false;
+        } else if (requestedPractice >= 0) {
+            pendingDebugCombatPractice = requestedPractice;
+            pendingDebugCheckpoint = -1;
+            pendingDebugCapture = false;
+            pendingDebugReplay = false;
         } else if (requestedReplay) {
             pendingDebugReplay = true;
             pendingDebugCheckpoint = -1;
             pendingDebugCapture = false;
         }
         debugAutomationAutostart = intent.getBooleanExtra(EXTRA_DEBUG_AUTOSTART, false) ||
-                requestedCheckpoint >= 0 || requestedReplay || motionRequested;
+                requestedCheckpoint >= 0 || requestedPractice >= 0 || requestedReplay || motionRequested;
         if (debugAutomationAutostart) {
             Log.i(TAG, "Accepted debug automation intent: checkpoint=" + requestedCheckpoint +
                     " capture=" + requestedCapture + " replay=" + requestedReplay + " scale=" + requestedScale +

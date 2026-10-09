@@ -78,6 +78,7 @@ CharacterFramePlan EvaluateCharacterFramePlan(
             horde::scene::EvaluateSkeletonRenderPose(source, skeletonDeadClipDuration);
         destination.clip = pose.clip;
         destination.time = pose.time;
+        destination.forceCurrentCombatPose = source.forceCurrentCombatPose;
         destination.transform = {{
             {pose.transform[0], pose.transform[1], pose.transform[2], pose.transform[3]},
             {pose.transform[4], pose.transform[5], pose.transform[6], pose.transform[7]},
@@ -104,9 +105,11 @@ bool CharacterPoseNeedsRefresh(const int requestedClip,
                                const float requestedTime,
                                const int lastClip,
                                const float lastTime,
-                               const float updateInterval)
+                               const float updateInterval,
+                               const bool forceCurrentCombatPose)
 {
     return requestedClip != lastClip || lastTime < 0.0f || requestedTime < lastTime ||
+           (forceCurrentCombatPose && requestedTime != lastTime) ||
            (requestedTime - lastTime) >= updateInterval;
 }
 
@@ -240,10 +243,16 @@ bool CharacterRenderSlot::PrepareFrame(
                 return false;
             }
             const int clipIndex = static_cast<int>(representative->clip);
+            const bool forceCurrentCombatPose = std::any_of(
+                framePlan.skeletons.begin(), framePlan.skeletons.begin() + framePlan.skeletonCount,
+                [bucket](const SkeletonRenderPlan& skeleton) {
+                    return skeleton.poseBucket == bucket && skeleton.forceCurrentCombatPose;
+                });
             if (!CharacterPoseNeedsRefresh(clipIndex,
                                            representative->time,
                                            lastSkeletonClips_[bucket],
-                                           lastSkeletonUpdateTimes_[bucket]))
+                                           lastSkeletonUpdateTimes_[bucket], 1.0f / 30.0f,
+                                           forceCurrentCombatPose))
             {
                 continue;
             }

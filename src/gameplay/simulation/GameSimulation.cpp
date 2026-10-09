@@ -80,13 +80,19 @@ GameSimulation::GameSimulation(GameSimulationConfig config)
         const auto& anchor = effects::kKeeperTorchAnchors[index];
         fireEmitters_[index + 1u] = effects::MakeWorldTorchFireEmitter(anchor.stableId, anchor.seed);
     }
+    combatTeaching_.Reset(config_.combatFoundation1_7);
+    lichEncounter_.SetReadableCombat(CurrentCombatRules());
     enemyDirector_.Reset();
     activeEnemyKind_ = enemyDirector_.Snapshot().selectedEnemy;
     if (config_.waterfallSkeletonEncounter)
     {
         swordCombat_.Reset(kSkeletonEnemyCapacity, kWaterfallSkeletonPairCenter,
-                           &kWaterfallSkeletonGuardSpawns);
+                           &kWaterfallSkeletonGuardSpawns, CurrentCombatRules() ? 2 : 1);
         combatSnapshot_ = swordCombat_.Snapshot();
+    }
+    else if (CurrentCombatRules())
+    {
+        swordCombat_.Reset(kSkeletonEnemyCapacity, {0.0f, -4.65f}, nullptr, 2);
     }
     combatSnapshot_ = swordCombat_.Snapshot();
     torchFailureSnapshot_ = torchFailure_.Snapshot();
@@ -143,6 +149,8 @@ std::uint32_t GameSimulation::AdvanceFrame(const InputSnapshot& input,
     }
     if (input.paused)
     {
+        combatContactTrace_.Clear();
+        gameplayTimeScale_ = 1.0f;
         ClearQueuedDrawAttack();
         ClearScheduledCombatEdges(true);
         lastConsumedAttackSequence_ = std::max(lastConsumedAttackSequence_, latestAttackSequence_);
@@ -163,6 +171,7 @@ std::uint32_t GameSimulation::AdvanceFrame(const InputSnapshot& input,
         pendingClearRunIntentCommands_ = 0u;
         ClearRunIntent();
         dodgeRemainingSeconds_ = 0.0f;
+        CancelCombatTransients();
         walkVisualAmount_ = 0.0f;
         snapshot_.playerTravelledThisTick = 0.0f;
         playerFootsteps_.Reset();
@@ -233,6 +242,13 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
         return;
     }
 
+    combatTeaching_.Update(CurrentCombatRules() && input.tutorialEnabled,
+        input.tutorialSlowdownEnabled, input.paused ||
+            playerVitals_.Snapshot().phase != PlayerLifePhase::Alive ||
+            IsKeeperRevealing(lichEncounter_.Snapshot().revealPhase),
+        combatSnapshot_, lichEncounter_.Snapshot(), activeEnemyKind_);
+    gameplayTimeScale_ = combatTeaching_.Snapshot().simulationTimeScale;
+    fixedDeltaSeconds *= gameplayTimeScale_;
     const bool wasAlive = playerVitals_.Snapshot().phase == PlayerLifePhase::Alive;
     playerVitals_.Update(fixedDeltaSeconds);
     const bool playerAlive = playerVitals_.Snapshot().phase == PlayerLifePhase::Alive;
@@ -263,6 +279,7 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
         pendingClearRunIntentCommands_ = 0u;
         ClearRunIntent();
         dodgeRemainingSeconds_ = 0.0f;
+        CancelCombatTransients();
     }
     if (!input.paused && playerAlive)
     {
@@ -287,6 +304,7 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
         UpdateEncounters(input, fixedDeltaSeconds);
         UpdateRewardSequence(fixedDeltaSeconds, true);
         ResolveHeldItems();
+        RecordSwordContactTrace();
         if (interactionState_.heldLightKind ==
             horde::gameplay::interactions::HeldLightKind::RewardLantern)
         {
@@ -345,6 +363,7 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
         pendingInteractCommands_ = 0u;
         pendingToggleHeldLightPoseCommands_ = 0u;
         dodgeRemainingSeconds_ = 0.0f;
+        CancelCombatTransients();
     }
 
     RefreshSnapshot(input);
@@ -357,6 +376,7 @@ void GameSimulation::SynchronizePausedInput(const InputSnapshot& input,
 {
     lastInput_ = input;
     lastInput_.paused = true;
+    combatContactTrace_.Clear();
     ClearQueuedDrawAttack();
     combatPresentation_.Reset();
     ClearScheduledCombatEdges(false);
@@ -378,6 +398,10 @@ void GameSimulation::SynchronizePausedInput(const InputSnapshot& input,
                 lastConsumedDodgeSequence_);
     if (policy == PausedInputPolicy::PreserveWorldCommands)
     {
+        pendingTutorialSkipCommands_ = SaturatingAdd(pendingTutorialSkipCommands_,
+            SequenceDelta(input.commands.tutorialSkip, latestTutorialSkipSequence_));
+        pendingTutorialReplayCommands_ = SaturatingAdd(pendingTutorialReplayCommands_,
+            SequenceDelta(input.commands.tutorialReplay, latestTutorialReplaySequence_));
         pendingRouteResetCommands_ += SequenceDelta(input.commands.routeReset, latestRouteResetSequence_);
         pendingRetryCommands_ += SequenceDelta(input.commands.retry, latestRetrySequence_);
         latestRouteResetSequence_ = std::max(latestRouteResetSequence_, input.commands.routeReset);
@@ -391,7 +415,11 @@ void GameSimulation::SynchronizePausedInput(const InputSnapshot& input,
                     lastConsumedRetrySequence_);
         pendingRouteResetCommands_ = 0u;
         pendingRetryCommands_ = 0u;
+        pendingTutorialSkipCommands_ = 0u;
+        pendingTutorialReplayCommands_ = 0u;
     }
+    latestTutorialSkipSequence_ = std::max(latestTutorialSkipSequence_, input.commands.tutorialSkip);
+    latestTutorialReplaySequence_ = std::max(latestTutorialReplaySequence_, input.commands.tutorialReplay);
     synchronize(input.commands.interact, latestInteractSequence_,
                 lastConsumedInteractSequence_);
     synchronize(input.commands.toggleHeldLightPose,
@@ -412,6 +440,7 @@ void GameSimulation::SynchronizePausedInput(const InputSnapshot& input,
     pendingDodgeForward_ = 0.0f;
     pendingDodgeStrafe_ = 0.0f;
     dodgeRemainingSeconds_ = 0.0f;
+    CancelCombatTransients();
     ClearRunIntent();
     walkVisualAmount_ = 0.0f;
     playerFootsteps_.Reset();
@@ -546,7 +575,9 @@ void GameSimulation::SetDevelopmentSupportFixture(bool enabled, std::uint64_t ge
 
 void GameSimulation::ResetRoute()
 {
-    if (!ApplyShowcaseCheckpoint(0, false))
+    legacyCombatCheckpoint_ = false;
+    combatTeaching_.Reset(config_.combatFoundation1_7 && lastInput_.tutorialEnabled);
+    if (!ApplyCheckpoint(0, false))
     {
         return;
     }
@@ -573,7 +604,7 @@ void GameSimulation::ResetRoute()
             : RoutePosition{0.0f, -4.65f},
         config_.waterfallSkeletonEncounter
             ? &kWaterfallSkeletonGuardSpawns
-            : nullptr);
+            : nullptr, CurrentCombatRules() ? 2 : 1);
     waterfallWarningEmitted_ = false;
     ResetSwordEquipment();
     combatPresentation_.Reset();
@@ -601,12 +632,25 @@ void GameSimulation::ResetRoute()
 
 void GameSimulation::RetryEncounter()
 {
-    ApplyShowcaseCheckpoint(retryCheckpoint_, true);
+    legacyCombatCheckpoint_ = false;
+    ApplyCheckpoint(retryCheckpoint_, true);
 }
 
 bool GameSimulation::ApplyShowcaseCheckpoint(std::int32_t checkpointId, bool countAsRetry)
 {
+    // Frozen evidence imports retain their historical contact/durability/cast rules.
+    if (FindShowcaseCheckpoint(checkpointId) == nullptr) return false;
+    legacyCombatCheckpoint_ = true;
     return ApplyCheckpoint(checkpointId, countAsRetry);
+}
+
+void GameSimulation::BeginCombatPractice(EnemyKind encounter)
+{
+    legacyCombatCheckpoint_ = false;
+    combatTeaching_.Reset(config_.combatFoundation1_7 && lastInput_.tutorialEnabled);
+    ApplyCheckpoint(encounter == EnemyKind::Lich ? 9 : 12,
+                    encounter == EnemyKind::Lich);
+    RefreshSnapshot(lastInput_);
 }
 
 bool GameSimulation::BeginMotionEvidenceEquipmentSeed()
@@ -649,6 +693,9 @@ void GameSimulation::ImportRewardCheckpoint(
 {
     events_.Clear();
     combatPresentation_.Reset();
+    dodgeRemainingSeconds_ = 0.0f;
+    CancelCombatTransients();
+    combatContactTrace_.Clear();
     const bool wasRaised = playerSupport_.worldY != kRouteFloorWorldY;
     if(config_.developmentWorldRoute) { worldRoute_.Invalidate(); playerX_=worldRoute_.safeX; playerZ_=worldRoute_.safeZ; }
     ResetPlayerSupport();
@@ -736,6 +783,12 @@ void GameSimulation::IngestCommands(const InputSnapshot& input, const bool inges
         SequenceDelta(input.commands.runToggle, latestRunToggleSequence_));
     pendingClearRunIntentCommands_ = SaturatingAdd(pendingClearRunIntentCommands_,
         SequenceDelta(input.commands.clearRunIntent, latestClearRunIntentSequence_));
+    pendingTutorialSkipCommands_ = SaturatingAdd(pendingTutorialSkipCommands_,
+        SequenceDelta(input.commands.tutorialSkip, latestTutorialSkipSequence_));
+    pendingTutorialReplayCommands_ = SaturatingAdd(pendingTutorialReplayCommands_,
+        SequenceDelta(input.commands.tutorialReplay, latestTutorialReplaySequence_));
+    latestTutorialSkipSequence_ = std::max(latestTutorialSkipSequence_, input.commands.tutorialSkip);
+    latestTutorialReplaySequence_ = std::max(latestTutorialReplaySequence_, input.commands.tutorialReplay);
     latestAttackSequence_ = std::max(latestAttackSequence_, input.commands.attack);
     latestParrySequence_ = std::max(latestParrySequence_, input.commands.parry);
     latestDodgeSequence_ = std::max(latestDodgeSequence_, input.commands.dodge);
@@ -1134,8 +1187,20 @@ bool GameSimulation::ConsumeWorldCommand()
     {
         --pendingRetryCommands_;
         ++lastConsumedRetrySequence_;
-        ApplyCheckpoint(retryCheckpoint_, true);
+        RetryEncounter();
         return true;
+    }
+    if (pendingTutorialReplayCommands_ > 0u)
+    {
+        pendingTutorialReplayCommands_ = 0u;
+        pendingTutorialSkipCommands_ = 0u;
+        ResetRoute();
+        return true;
+    }
+    if (pendingTutorialSkipCommands_ > 0u)
+    {
+        pendingTutorialSkipCommands_ = 0u;
+        combatTeaching_.Skip();
     }
     return false;
 }
@@ -1148,6 +1213,9 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
         return false;
     }
 
+    pendingTutorialReplayCommands_ = 0u;
+    pendingTutorialSkipCommands_ = 0u;
+    gameplayTimeScale_ = 1.0f;
     ClearRunIntent();
     const auto encounterCheckpoint = ShowcaseCheckpointForEncounter(
         *checkpoint, config_.waterfallSkeletonEncounter);
@@ -1156,6 +1224,7 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
 
     events_.Clear();
     ResetPlayerSupport();
+    combatContactTrace_.Clear();
     combatPresentation_.Reset();
     ShowcaseCheckpointState state = BuildShowcaseCheckpointState(*checkpoint);
     playerX_ = checkpoint->x;
@@ -1181,6 +1250,7 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
         enemyDirector_.Update(playerX_, playerZ_, EnemyKind::Skeleton);
     activeEnemyKind_ = enemyDirector_.Snapshot().selectedEnemy;
     lichEncounter_ = state.lichEncounter;
+    lichEncounter_.SetReadableCombat(CurrentCombatRules());
     if (isRetry && !config_.developmentWorldRoute && checkpoint->preset == ShowcaseCheckpointPreset::LichActive)
     {
         playerX_ = kKeeperRetryPosition.x;
@@ -1217,7 +1287,8 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
                            ? kSkeletonEnemyCapacity
                            : ((isRetry || pairCheckpoint) ? kSkeletonEnemyCapacity : 1u),
                        combatSpawnCenter,
-                       productionSkeletonEncounter ? &kWaterfallSkeletonGuardSpawns : nullptr);
+                       productionSkeletonEncounter ? &kWaterfallSkeletonGuardSpawns : nullptr,
+                       CurrentCombatRules() ? 2 : 1);
     combatSnapshot_ = swordCombat_.Update(0.0f,
                                            playerX_,
                                            playerZ_,
@@ -1258,6 +1329,7 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
     pendingInteractCommands_ = 0u;
     pendingToggleHeldLightPoseCommands_ = 0u;
     dodgeRemainingSeconds_ = 0.0f;
+    CancelCombatTransients();
     dodgeCooldownRemainingSeconds_ = 0.0f;
     retryCheckpoint_ = activeEnemyKind_ == EnemyKind::Lich ? 9 : 0;
     finaleCompletionEmitted_ = false;
@@ -1316,6 +1388,43 @@ void GameSimulation::ResolveHeldItems()
     heldItems_[1].worldFromItem = resolvedItems[1].worldFromItem;
     heldItems_[1].worldFromDetach = resolvedItems[1].worldFromDetach;
     heldItems_[1].detachTick = resolvedItems[1].detachTick;
+}
+
+void GameSimulation::RecordSwordContactTrace()
+{
+    if (!CurrentCombatRules()) return;
+    const auto action = combatSnapshot_.player.action;
+    const auto cut = action == PlayerCombatAction::SwingActive
+        ? PlayerAttackCut::DownwardCut
+        : action == PlayerCombatAction::UpwardSliceActive
+            ? PlayerAttackCut::UpwardSlice : PlayerAttackCut::None;
+    if (cut == PlayerAttackCut::None) return;
+    CombatContactSample sample;
+    sample.tick = tickIndex_;
+    sample.attackId = combatSnapshot_.activePlayerAttackId;
+    sample.commandSequence = currentCutCommandSequence_;
+    sample.consumedTick = currentCutConsumedTick_;
+    sample.cut = cut; sample.phase = action;
+    sample.phaseSeconds = combatSnapshot_.player.actionTime;
+    sample.supportWorldY = playerSupport_.worldY;
+    sample.target = swordHitTargetThisTick_;
+    sample.semanticEventSequence = swordHitEventThisTick_;
+    sample.outcome = swordHitEventThisTick_ != 0
+        ? CombatContactOutcome::AcceptedSwordContact : CombatContactOutcome::NoContact;
+    if (sample.target == EntityId::Lich)
+    {
+        sample.targetX = lichEncounter_.Snapshot().x;
+        sample.targetZ = lichEncounter_.Snapshot().z;
+    }
+    else if (sample.target == EntityId::SkeletonA || sample.target == EntityId::SkeletonB)
+    {
+        const auto index = sample.target == EntityId::SkeletonA ? 0u : 1u;
+        sample.targetX = combatSnapshot_.combatants[index].x;
+        sample.targetZ = combatSnapshot_.combatants[index].z;
+    }
+    sample.hasSwordTransform = true;
+    sample.worldFromSword = heldItems_[1].worldFromItem;
+    combatContactTrace_.Push(sample);
 }
 
 bool GameSimulation::SwordDefenseReady() const
@@ -1584,6 +1693,7 @@ void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSecon
                                  lastConsumedDodgeSequence_);
         pendingDodgeCommands_ = 0u;
         dodgeRemainingSeconds_ = 0.0f;
+        CancelCombatTransients();
         ClearRunIntent();
         snapshot_.playerTravelledThisTick = 0.0f;
         walkVisualAmount_ = 0.0f;
@@ -1617,6 +1727,9 @@ void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSecon
             dodgeDirectionX_ = forwardX * forward + rightX * strafe;
             dodgeDirectionZ_ = forwardZ * forward + rightZ * strafe;
             dodgeRemainingSeconds_ = kDodgeDurationSeconds;
+            dodgeProtectionAccepted_ = CurrentCombatRules();
+            acceptedDodgeSequence_ = lastConsumedDodgeSequence_;
+            acceptedDodgeConsumedTick_ = tickIndex_;
             dodgeCooldownRemainingSeconds_ = kDodgeCooldownSeconds;
             ClearRunIntent();
         }
@@ -1639,6 +1752,8 @@ void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSecon
         playerX_ = FiniteOr(input.authoritativePlayerX, playerX_);
         playerZ_ = FiniteOr(input.authoritativePlayerZ, playerZ_);
         playerMovementSpeed_ = 0.0f;
+        dodgeRemainingSeconds_ = 0.0f;
+        CancelCombatTransients();
     }
     else
     {
@@ -1738,8 +1853,64 @@ void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSecon
     }
 }
 
+bool GameSimulation::CurrentCombatRules() const
+{
+    return config_.combatFoundation1_7 && !legacyCombatCheckpoint_;
+}
+
+void GameSimulation::CancelCombatTransients()
+{
+    dodgeProtectionAccepted_ = false;
+    keeperRepelRemainingSeconds_ = 0.0f;
+    combatTeaching_.CancelTransient();
+    currentCutCommandSequence_ = currentCutConsumedTick_ = 0;
+    queuedUpCutCommandSequence_ = queuedUpCutConsumedTick_ = 0;
+    swordHitTargetThisTick_ = EntityId::Invalid;
+    swordHitEventThisTick_ = 0;
+}
+
+void GameSimulation::BeginKeeperRepel()
+{
+    const auto& keeper = lichEncounter_.Snapshot();
+    const float dx = playerX_ - keeper.x, dz = playerZ_ - keeper.z;
+    const float distance = std::hypot(dx, dz);
+    keeperRepelDirectionX_ = distance > 0.0001f ? dx / distance : -std::sin(playerYawRadians_);
+    keeperRepelDirectionZ_ = distance > 0.0001f ? dz / distance : std::cos(playerYawRadians_);
+    keeperRepelRemainingSeconds_ = LichEncounter::kRepelDuration;
+    keeperRepelTravelledMetres_ = 0.0f;
+    ClearRunIntent(); // Dodge/parry and looking remain available.
+}
+
+void GameSimulation::ApplyKeeperRepel(float deltaSeconds)
+{
+    if (keeperRepelRemainingSeconds_ <= 0.0f) return;
+    if (!CurrentCombatRules() || lichEncounter_.Snapshot().phase == LichPhase::Dead ||
+        playerVitals_.Snapshot().phase != PlayerLifePhase::Alive)
+    { keeperRepelRemainingSeconds_ = 0.0f; return; }
+    const float seconds = std::min(deltaSeconds, keeperRepelRemainingSeconds_);
+    const float stepDistance = LichEncounter::kRepelDistance * seconds / LichEncounter::kRepelDuration;
+    const float oldX = playerX_, oldZ = playerZ_, oldY = playerSupport_.worldY;
+    const auto previousWorldRoute = worldRoute_;
+    playerX_ += keeperRepelDirectionX_ * stepDistance;
+    playerZ_ += keeperRepelDirectionZ_ * stepDistance;
+    ResolveMovementCollision(oldX, oldZ);
+    ResolvePlayerSupport();
+    // Repel cannot force a support transition, fall, or height snap.
+    if (!playerSupport_.grounded || std::abs(playerSupport_.worldY - oldY) > 0.0001f)
+    {
+        playerX_ = oldX; playerZ_ = oldZ;
+        worldRoute_ = previousWorldRoute;
+        ResolvePlayerSupport();
+    }
+    const float travelled = std::hypot(playerX_ - oldX, playerZ_ - oldZ);
+    keeperRepelTravelledMetres_ += travelled;
+    snapshot_.playerTravelledThisTick += travelled;
+    keeperRepelRemainingSeconds_ = std::max(0.0f, keeperRepelRemainingSeconds_ - seconds);
+}
+
 void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSeconds)
 {
+    ApplyKeeperRepel(deltaSeconds);
     const auto encounterOverride = config_.waterfallSkeletonEncounter &&
         IsWaterfallSkeletonRoom(playerX_, playerZ_)
             ? EnemyKind::Skeleton : EnemyKind::None;
@@ -1805,6 +1976,7 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
                                  lastConsumedParrySequence_);
         pendingParryCommands_ = 0u;
         dodgeRemainingSeconds_ = 0.0f;
+        CancelCombatTransients();
         swordCombat_.CancelPlayerActions();
         lichAttackEligible_ = false;
         lichRevealAttackSequenceFloor_ = latestAttackSequence_;
@@ -1820,11 +1992,18 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
             return false;
         if (acceptedCut == PlayerAttackCut::DownwardCut)
         {
+            currentCutCommandSequence_ = commandSequence;
+            currentCutConsumedTick_ = tickIndex_;
+            queuedUpCutCommandSequence_ = queuedUpCutConsumedTick_ = 0;
             lichAttackEligible_ = lichEncounter_.Snapshot().revealComplete &&
                 commandSequence > lichRevealAttackSequenceFloor_;
         }
         else
         {
+            // A buffered continuation must not relabel the still-running
+            // downward cut. Promote its source only when the upward cut starts.
+            queuedUpCutCommandSequence_ = commandSequence;
+            queuedUpCutConsumedTick_ = tickIndex_;
             lichAttackEligible_ = lichAttackEligible_ &&
                 lichEncounter_.Snapshot().revealComplete &&
                 commandSequence > lichRevealAttackSequenceFloor_;
@@ -1897,6 +2076,8 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
     }
 
     const auto previousSkeletons = combatSnapshot_.combatants;
+    swordHitTargetThisTick_ = EntityId::Invalid;
+    swordHitEventThisTick_ = 0;
     combatSnapshot_ = swordCombat_.Update(deltaSeconds,
                                            playerX_,
                                            playerZ_,
@@ -1906,6 +2087,15 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
                                                IsWaterfallSkeletonArena(playerX_, playerZ_),
                                            config_.waterfallSkeletonEncounter);
     EntityId skeletonDamageSource = EntityId::Invalid;
+    if (queuedUpCutCommandSequence_ != 0 &&
+        (combatSnapshot_.player.action == PlayerCombatAction::UpwardSliceWindup ||
+         combatSnapshot_.player.action == PlayerCombatAction::UpwardSliceActive ||
+         combatSnapshot_.player.action == PlayerCombatAction::UpwardSliceRecovery))
+    {
+        currentCutCommandSequence_ = queuedUpCutCommandSequence_;
+        currentCutConsumedTick_ = queuedUpCutConsumedTick_;
+        queuedUpCutCommandSequence_ = queuedUpCutConsumedTick_ = 0;
+    }
     skeletonIncidentalSpacingSeconds_ = std::max(
         0.0, skeletonIncidentalSpacingSeconds_ - deltaSeconds);
     for (std::size_t index = 0u; index < combatSnapshot_.combatantCount; ++index)
@@ -1923,25 +2113,36 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
                  current.x,
                  current.z);
         }
-        if (activeEnemyKind_ == EnemyKind::Skeleton && previous.health > 0 && current.health <= 0)
+        if (activeEnemyKind_ == EnemyKind::Skeleton && current.health < previous.health)
         {
-            Emit(GameplayEventType::EnemyHit,
+            swordHitTargetThisTick_ = entity;
+            swordHitEventThisTick_ = Emit(GameplayEventType::EnemyHit,
                  EntityId::Player,
                  entity,
                  current.x,
                  current.z);
+        }
+        if (activeEnemyKind_ == EnemyKind::Skeleton && previous.health > 0 && current.health <= 0)
+        {
             Emit(GameplayEventType::EnemyDefeated,
                  EntityId::Player,
                  entity,
                  current.x,
                  current.z);
         }
+        if (CurrentCombatRules() && activeEnemyKind_ == EnemyKind::Skeleton &&
+            current.action == EnemyCombatAction::AttackWindup &&
+            previous.actionTime < CombatTimeline::kSkeletonAttackWindupSeconds - 0.26f &&
+            current.actionTime >= CombatTimeline::kSkeletonAttackWindupSeconds - 0.26f)
+            Emit(GameplayEventType::ParryPrepareCue, entity, EntityId::Player,
+                 current.x, current.z, 0.45f);
         if (current.playerHitPulse)
         {
             skeletonDamageSource = entity;
         }
         if (current.parrySuccessPulse)
         {
+            if (CurrentCombatRules()) combatTeaching_.ParrySucceeded();
             const std::uint64_t eventSequence = Emit(
                 GameplayEventType::PlayerParrySucceeded,
                 EntityId::Player,
@@ -2035,13 +2236,17 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
                                                 lich.z) &&
         lichEncounter_.TryAcceptPlayerHit(playerX_, playerZ_))
     {
-        Emit(GameplayEventType::EnemyHit,
+        swordHitTargetThisTick_ = EntityId::Lich;
+        swordHitEventThisTick_ = Emit(GameplayEventType::EnemyHit,
              EntityId::Player,
              EntityId::Lich,
              lich.x,
              lich.z);
+        if (CurrentCombatRules() && lichEncounter_.Snapshot().phase == LichPhase::Repelling)
+            BeginKeeperRepel();
         if (lichEncounter_.Snapshot().phase == LichPhase::Dead)
         {
+            keeperRepelRemainingSeconds_ = 0.0f;
             Emit(GameplayEventType::LichDefeated,
                  EntityId::Player,
                  EntityId::Lich,
@@ -2064,6 +2269,10 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
              lich.z,
              lich.staffLightStrength);
     }
+    if (CurrentCombatRules() && activeEnemyKind_ == EnemyKind::Lich &&
+        lichEncounter_.Snapshot().dischargeWarningPulse)
+        Emit(GameplayEventType::LichDischargeWarning, EntityId::Lich, EntityId::Player,
+             lich.x, lich.z, 0.45f);
     if (activeEnemyKind_ == EnemyKind::Lich && lichEncounter_.Snapshot().damagePulse)
     {
         Emit(GameplayEventType::LichImpact,
@@ -2081,10 +2290,45 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
     if (input.damageEnabled && playerDamagePulse && !keeperRevealInvulnerable &&
         !SwordDrawBlocksDefense())
     {
-        const PlayerDamageResult damageResult = playerVitals_.TryApplyDamage();
+        const bool dodgeProtected = CurrentCombatRules() &&
+            DodgeProtectionWindow::Contains(kDodgeDurationSeconds - dodgeRemainingSeconds_,
+                dodgeProtectionAccepted_ && dodgeRemainingSeconds_ > 0.0f);
+        PlayerDamageResult damageResult = PlayerDamageResult::Ignored;
+        CombatContactSample damageSample;
+        damageSample.tick = tickIndex_;
+        if (dodgeRemainingSeconds_ > 0 && dodgeProtectionAccepted_)
+        {
+            damageSample.commandSequence = acceptedDodgeSequence_;
+            damageSample.consumedTick = acceptedDodgeConsumedTick_;
+        }
+        damageSample.phase = combatSnapshot_.player.action;
+        damageSample.phaseSeconds = combatSnapshot_.player.actionTime;
+        damageSample.target = activeEnemyKind_ == EnemyKind::Skeleton
+            ? skeletonDamageSource : EntityId::Lich;
+        damageSample.supportWorldY = playerSupport_.worldY;
+        damageSample.dodgeElapsedSeconds = dodgeRemainingSeconds_ > 0
+            ? kDodgeDurationSeconds - dodgeRemainingSeconds_ : 0;
+        damageSample.targetX = activeEnemyKind_ == EnemyKind::Lich ? lich.x : playerX_;
+        damageSample.targetZ = activeEnemyKind_ == EnemyKind::Lich ? lich.z : playerZ_;
+        damageSample.outcome = CombatContactOutcome::PostHitProtected;
+        if (dodgeProtected)
+        {
+            damageSample.outcome = CombatContactOutcome::DodgeProtected;
+            ++dodgeProtectedHitCount_;
+            if (playerVitals_.Snapshot().invulnerabilityRemaining <= 0.00001f)
+                combatTeaching_.DodgeSucceeded();
+        }
+        else if (CurrentCombatRules() && combatTeaching_.Snapshot().safePractice)
+        {
+            damageSample.outcome = CombatContactOutcome::PracticeMiss;
+            combatTeaching_.PracticeMiss();
+        }
+        else
+            damageResult = playerVitals_.TryApplyDamage();
         if (damageResult == PlayerDamageResult::Damaged)
         {
-            Emit(GameplayEventType::PlayerDamaged,
+            damageSample.outcome = CombatContactOutcome::DamageAccepted;
+            damageSample.semanticEventSequence = Emit(GameplayEventType::PlayerDamaged,
                  activeEnemyKind_ == EnemyKind::Skeleton
                      ? skeletonDamageSource
                      : EntityForEnemy(activeEnemyKind_),
@@ -2097,7 +2341,8 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
             combatPresentation_.Reset();
             retryCheckpoint_ = activeEnemyKind_ == EnemyKind::Lich ? 9 : 0;
             pendingAttackCommands_ = 0u;
-            Emit(GameplayEventType::PlayerKilled,
+            damageSample.outcome = CombatContactOutcome::DamageAccepted;
+            damageSample.semanticEventSequence = Emit(GameplayEventType::PlayerKilled,
                  activeEnemyKind_ == EnemyKind::Skeleton
                      ? skeletonDamageSource
                      : EntityForEnemy(activeEnemyKind_),
@@ -2105,8 +2350,14 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
                  playerX_,
                  playerZ_);
         }
+        if (CurrentCombatRules()) combatContactTrace_.Push(damageSample);
     }
 
+    combatTeaching_.Update(CurrentCombatRules() && input.tutorialEnabled,
+        input.tutorialSlowdownEnabled, input.paused ||
+            playerVitals_.Snapshot().phase != PlayerLifePhase::Alive ||
+            IsKeeperRevealing(lichEncounter_.Snapshot().revealPhase),
+        combatSnapshot_, lichEncounter_.Snapshot(), activeEnemyKind_);
     if (activeEnemyKind_ == EnemyKind::Lich && lichEncounter_.Snapshot().deathAnimationComplete)
     {
         enemyDirector_.MarkSelectedDead();
@@ -2141,6 +2392,7 @@ std::uint64_t GameSimulation::Emit(GameplayEventType type,
 void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
 {
     snapshot_.tickIndex = tickIndex_;
+    snapshot_.combatContactTrace = combatContactTrace_;
     snapshot_.inputPublicationSequence = inputPublicationSequence_;
     snapshot_.inputMoveForward = input.moveForward;
     snapshot_.inputMoveStrafe = input.moveStrafe;
@@ -2175,6 +2427,17 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.walkAmount = walkVisualAmount_;
     snapshot_.torchLightStrength = std::clamp(FiniteOr(input.torchLightStrength, 1.8f), 0.65f, 2.4f);
     snapshot_.dodgeActive = dodgeRemainingSeconds_ > 0.0f;
+    snapshot_.dodgeElapsedSeconds = snapshot_.dodgeActive
+        ? kDodgeDurationSeconds - dodgeRemainingSeconds_ : 0.0f;
+    snapshot_.modernCombatRules = CurrentCombatRules();
+    snapshot_.dodgeInvulnerable = CurrentCombatRules() && DodgeProtectionWindow::Contains(
+        snapshot_.dodgeElapsedSeconds, dodgeProtectionAccepted_ && snapshot_.dodgeActive);
+    snapshot_.acceptedDodgeSequence = acceptedDodgeSequence_;
+    snapshot_.dodgeProtectedHitCount = dodgeProtectedHitCount_;
+    snapshot_.combatTeaching = combatTeaching_.Snapshot();
+    snapshot_.keeperRepelRemainingSeconds = keeperRepelRemainingSeconds_;
+    snapshot_.keeperRepelTravelledMetres = keeperRepelTravelledMetres_;
+    snapshot_.gameplayTimeScale = gameplayTimeScale_;
     snapshot_.runActive = runActive_;
     snapshot_.runToggleActive = runToggleActive_;
     snapshot_.dodgeCooldownRemainingSeconds = dodgeCooldownRemainingSeconds_;
@@ -2206,6 +2469,10 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
         target.dead = source.health <= 0;
         target.playerHitPulse = source.playerHitPulse;
         target.parrySuccessPulse = source.parrySuccessPulse;
+        target.forceCurrentCombatPose = CurrentCombatRules() &&
+            ((source.action != EnemyCombatAction::Locomotion && source.action != EnemyCombatAction::Dead) ||
+             combatSnapshot_.player.action == PlayerCombatAction::SwingActive ||
+             combatSnapshot_.player.action == PlayerCombatAction::UpwardSliceActive);
     }
     snapshot_.activeEnemyId = EntityForEnemy(activeEnemyKind_);
     if (activeEnemyKind_ == EnemyKind::Skeleton)

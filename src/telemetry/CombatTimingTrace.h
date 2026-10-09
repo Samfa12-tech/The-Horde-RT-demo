@@ -4,6 +4,7 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <cmath>
 #include <ostream>
 
 #include "gameplay/simulation/SimulationSnapshot.h"
@@ -22,6 +23,11 @@ public:
     bool HasReportable(const horde::gameplay::simulation::SimulationSnapshot& state) const
     {
         if (rows_ == kMaximumRows) return false;
+        for (std::uint32_t offset = 0; offset < state.combatContactTrace.count; ++offset)
+        {
+            const auto& sample = ContactAt(state.combatContactTrace, offset);
+            if (sample.sequence > reportedContactSequence_) return true;
+        }
         for (std::uint32_t offset = 0u; offset < state.combatInputTiming.traceCount; ++offset)
         {
             const auto& trace = At(state.combatInputTiming, offset);
@@ -72,10 +78,75 @@ public:
             reportedSemanticEvents_[kind] = std::max(reportedSemanticEvents_[kind], trace.semanticEventSequence);
             ++rows_;
         }
+        for (std::uint32_t offset = 0; offset < state.combatContactTrace.count && rows_ < kMaximumRows; ++offset)
+        {
+            const auto& sample = ContactAt(state.combatContactTrace, offset);
+            if (sample.sequence <= reportedContactSequence_) continue;
+            output << "{\"type\":\"combat-contact\",\"sample\":" << sample.sequence
+                << ",\"generation\":" << state.combatContactTrace.generation
+                << ",\"overwrittenSamples\":" << state.combatContactTrace.overwritten
+                << ",\"command\":" << sample.commandSequence
+                << ",\"consumedTick\":" << sample.consumedTick
+                << ",\"attackId\":" << sample.attackId << ",\"cut\":" << static_cast<unsigned>(sample.cut)
+                << ",\"contactSampleTick\":" << sample.tick
+                << ",\"phase\":" << static_cast<unsigned>(sample.phase)
+                << ",\"phaseSeconds\":" << sample.phaseSeconds
+                << ",\"target\":" << static_cast<unsigned>(sample.target)
+                << ",\"outcome\":" << static_cast<unsigned>(sample.outcome)
+                << ",\"semanticEvent\":" << sample.semanticEventSequence
+                << ",\"supportWorldY\":" << sample.supportWorldY
+                << ",\"dodgeElapsedSeconds\":" << sample.dodgeElapsedSeconds
+                << ",\"separationMetres\":";
+            if (sample.hasSeparation && std::isfinite(sample.separationMetres))
+                output << sample.separationMetres; else output << "null";
+            output << ",\"bladeStart\":";
+            WritePoint(output, sample.bladeStart, sample.hasBlade);
+            output << ",\"bladeEnd\":";
+            WritePoint(output, sample.bladeEnd, sample.hasBlade);
+            output << ",\"fixedStepSwordMatrix\":";
+            if (sample.hasSwordTransform && std::all_of(sample.worldFromSword.begin(),
+                sample.worldFromSword.end(), [](float value){ return std::isfinite(value); }))
+            {
+                output << '[';
+                for (std::size_t component = 0; component < sample.worldFromSword.size(); ++component)
+                {
+                    if (component) output << ',';
+                    output << sample.worldFromSword[component];
+                }
+                output << ']';
+            }
+            else output << "null";
+            output << ",\"targetXZ\":[" << sample.targetX << ',' << sample.targetZ << ']'
+                << ",\"poseTick\":" << state.tickIndex
+                << ",\"sampleTickWasPresented\":" << (sample.tick == state.tickIndex ? "true" : "false")
+                // A hit can replace the target pose with stagger/death on this
+                // same tick. Joining the RT frame is not proof that the
+                // pre-resolution contact geometry was displayed unchanged.
+                << ",\"targetReactionMayReplaceContactPose\":"
+                << (sample.outcome == gameplay::simulation::CombatContactOutcome::AcceptedSwordContact ? "true" : "false")
+                << ",\"sceneEpoch\":" << submitted.frame.sceneEpoch
+                << ",\"record\":" << submitted.frame.recordSerial
+                << ",\"submission\":" << submitted.submissionSerial
+                << ",\"presentCallAcceptedNs\":" << presentAcceptedNs
+                << ",\"displayTimeMeasured\":false}\n";
+            reportedContactSequence_ = sample.sequence;
+            ++rows_;
+        }
         return rows_ - previousRows;
     }
 
 private:
+    static void WritePoint(std::ostream& output, const std::array<float,3>& point, bool valid)
+    {
+        if (!valid || !std::all_of(point.begin(),point.end(),[](float value){return std::isfinite(value);}))
+        { output << "null"; return; }
+        output << '[' << point[0] << ',' << point[1] << ',' << point[2] << ']';
+    }
+    static const horde::gameplay::simulation::CombatContactSample& ContactAt(
+        const horde::gameplay::simulation::CombatContactTraceSnapshot& trace, std::uint32_t offset)
+    {
+        return trace.samples[(trace.nextIndex + trace.kCapacity - trace.count + offset) % trace.kCapacity];
+    }
     static const horde::gameplay::simulation::CombatInputTimingTrace& At(
         const horde::gameplay::simulation::CombatInputTimingSnapshot& timing, std::uint32_t offset)
     {
@@ -85,5 +156,6 @@ private:
     std::array<std::uint64_t, 3u> reportedCommands_{};
     std::array<std::uint64_t, 3u> reportedSemanticEvents_{};
     std::uint32_t rows_ = 0u;
+    std::uint64_t reportedContactSequence_ = 0;
 };
 } // namespace horde::telemetry

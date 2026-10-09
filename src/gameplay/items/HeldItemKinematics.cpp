@@ -406,7 +406,8 @@ HeldSwordPose EvaluateHeldSwordPose(const PlayerCombatSnapshot& playerCombat,
                                    const float swordSwingRadians,
                                    const float heldPropDepth,
                                    const bool bulkyLeftHandCarry,
-                                   const float idleTimeSeconds)
+                                   const float idleTimeSeconds,
+                                   const bool readableCombatPose)
 {
     float parryBlend = 0.0f;
     switch (playerCombat.action)
@@ -440,7 +441,7 @@ HeldSwordPose EvaluateHeldSwordPose(const PlayerCombatSnapshot& playerCombat,
     // right-side cut through all windup/active/recovery phases, not a rendered
     // prop offset: this same grip pose drives the sword hand/arm IK and item.
     // Vertical/depth travel, combat timing and the free-torch arc are unchanged.
-    const float cutInward = bulkyLeftHandCarry ? 0.18f : 0.78f;
+    const float cutInward = (bulkyLeftHandCarry || readableCombatPose) ? 0.18f : 0.78f;
     // Move the shared rest target by only millimetres. Existing smooth
     // windup/recovery and parry envelopes blend from/to this target; active
     // cut/guard positions, angles, timers and gameplay hit tests stay authored.
@@ -812,7 +813,7 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
     }
     const HeldSwordPose sword = EvaluateHeldSwordPose(
         input.playerCombat, input.swordSwingRadians, swordPropDepth, rewardLantern,
-        input.walkTime);
+        input.walkTime, input.readableCombatPose);
 
     HeldItemKinematicsState result;
     // Props move the hand effector only. Keep the calibrated clavicle/shoulder
@@ -1167,7 +1168,7 @@ bool ResolveHeldItemsFixedStep(HeldItemStates& items,
         input.playerMountProfile,
         input.playerPitchRadians,
         input.logicalViewAspect,
-        input.playerSupportWorldY,input.developmentWorldRoute});
+        input.playerSupportWorldY,input.developmentWorldRoute,input.readableCombatPose});
     if (input.swordItemState != nullptr &&
         input.swordItemState->id == HeldItemId::Sword)
     {

@@ -5,6 +5,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "gameplay/FeedbackTiming.h"
@@ -72,6 +73,15 @@ int main()
     using horde::gameplay::simulation::GameplayEvent;
     using horde::gameplay::simulation::GameplayEventType;
     using horde::gameplay::simulation::EntityId;
+    for (const auto [type, expectedId] : {
+             std::pair{GameplayEventType::ParryPrepareCue, 24u},
+             std::pair{GameplayEventType::LichDischargeWarning, 25u}})
+    {
+        GameplayEvent warning{};
+        warning.type = type;
+        check((horde::platform::android::PackGameplayEventMetadata(warning) & 0xffu) == expectedId,
+              "appended combat teaching event keeps its compact Android type byte");
+    }
     check(NearlyEqual(GameplayEvent{}.listenerY, kShowcaseEyeWorldY),
           "event listener Y must default to the showcase eye baseline");
     const GameplayEvent legacyEventAggregate{

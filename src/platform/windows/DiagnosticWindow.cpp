@@ -85,6 +85,8 @@
 #include "platform/windows/WindowsOutputResizeLaunch.h"
 #include "platform/windows/WindowsMotionEvidenceLaunch.h"
 #include "platform/windows/WindowsMotionEvidenceCapture.h"
+#include "platform/windows/WindowsCombatPracticeLaunch.h"
+#include "platform/windows/WindowsCombatTeachingPrompt.h"
 #if defined(_DEBUG)
 #include "gameplay/validation/MotionEvidenceScenario.h"
 #include "telemetry/MotionEvidenceLedger.h"
@@ -214,6 +216,7 @@ constexpr int kRtLabGlassIorSliderId = 158;
 constexpr int kRtLabGlassRoughnessLabelId = 159;
 constexpr int kRtLabGlassRoughnessSliderId = 160;
 constexpr int kChestPromptControlId = 161;
+constexpr int kCombatTeachingPromptId = 212;
 constexpr int kMusicVolumeLabelId = 162;
 constexpr int kMusicVolumeSliderId = 163;
 constexpr int kReportProblemButtonId = 164;
@@ -231,6 +234,10 @@ constexpr int kMenuCreditsId = 2023;
 constexpr int kMenuDeveloperOverlayId = 2024;
 constexpr int kMenuCheckUpdatesId = 2025;
 constexpr int kMenuReportProblemId = 2026;
+constexpr int kMenuTeachingEnabledId = 2030;
+constexpr int kMenuTeachingSlowdownId = 2031;
+constexpr int kMenuTeachingSkipId = 2032;
+constexpr int kMenuTeachingReplayId = 2033;
 constexpr int kAppIconId = 1;
 constexpr UINT kDefaultDpi = 96u;
 constexpr char kUiFontProperty[] = "HordeLanternRtUiFont";
@@ -385,6 +392,14 @@ struct VulkanSurfaceContext
     std::string developmentCheckpoint;
     std::string lastRtFrameError;
     bool controlsEnabled = false;
+    bool combatTeachingEnabled = true;
+    bool combatTeachingSlowdown = false;
+    bool reducedMotionEnabled = false;
+    std::string combatTeachingFadeText;
+    unsigned char combatTeachingFadeOpacity = 0u;
+    std::uint64_t combatTeachingFadeStartedAtMs = 0u;
+    std::uint64_t combatTeachingSkipSequence = 0u;
+    std::uint64_t combatTeachingReplaySequence = 0u;
     bool simulationPaused = true;
     bool pauseMenuVisible = true;
     bool settingsVisible = false;
@@ -549,6 +564,8 @@ struct VulkanSurfaceContext
     bool developmentVerticalProof = false;
     bool developmentWorldRoute = false;
     bool stagedWorldPreparation = false;
+    bool developmentCombatPractice = false;
+    bool developmentKeeperPractice = false;
     horde::gameplay::ShowcaseBenchmarkRun benchmark;
     horde::vulkan::raytracing::RtWorkloadPreset benchmarkRequestedRtPreset =
         horde::vulkan::raytracing::RtWorkloadPreset::Authored;
@@ -597,6 +614,15 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
     }
     std::vector<std::wstring_view> argumentViews;
     for (int index = 1; index < argumentCount; ++index) argumentViews.emplace_back(arguments[index]);
+    const auto combatPractice = horde::platform::windows::ParseWindowsCombatPracticeLaunch(argumentViews,
+#if defined(_DEBUG)
+        true
+#else
+        false
+#endif
+    );
+    if (!combatPractice.error.empty())
+    { options.error = combatPractice.error; LocalFree(arguments); return options; }
     const auto mistLaunch = horde::platform::windows::ParseWindowsMistCaptureLaunch(argumentViews,
 #if defined(_DEBUG)
         true
@@ -987,6 +1013,8 @@ void LoadSettings(VulkanSurfaceContext& context)
         static_cast<int>(GetPrivateProfileIntA("audio", "musicVolume", 70, path.c_str())), 0, 100);
     const int sensitivity = std::clamp(static_cast<int>(GetPrivateProfileIntA("controls", "lookSensitivity", 100, path.c_str())), 60, 150);
     context.mouseSensitivity = static_cast<float>(sensitivity) / 100.0f;
+    context.combatTeachingEnabled = GetPrivateProfileIntA("controls", "combatTeaching", 1, path.c_str()) != 0;
+    context.combatTeachingSlowdown = GetPrivateProfileIntA("controls", "combatTeachingSlowdown", 0, path.c_str()) != 0;
     const int renderScale = horde::graphics::ClampGraphicsRenderScalePercent(
         static_cast<int>(GetPrivateProfileIntA("display", "renderScale", 100, path.c_str())));
     context.renderScale = static_cast<float>(renderScale) / 100.0f;
@@ -1111,6 +1139,10 @@ void SaveSettings(const VulkanSurfaceContext& context)
     WritePrivateProfileStringA("audio", "musicVolume", musicVolume.c_str(), path.c_str());
     const std::string sensitivity = std::to_string(static_cast<int>(std::round(context.mouseSensitivity * 100.0f)));
     WritePrivateProfileStringA("controls", "lookSensitivity", sensitivity.c_str(), path.c_str());
+    WritePrivateProfileStringA("controls", "combatTeaching",
+                               context.combatTeachingEnabled ? "1" : "0", path.c_str());
+    WritePrivateProfileStringA("controls", "combatTeachingSlowdown",
+                               context.combatTeachingSlowdown ? "1" : "0", path.c_str());
     // Ordinary Audio/Controls saves must never persist an unconfirmed Graphics candidate.
     const std::string renderScale = std::to_string(context.savedGraphics.renderScalePercent);
     WritePrivateProfileStringA("display", "renderScale", renderScale.c_str(), path.c_str());
@@ -1759,6 +1791,9 @@ void DrainGameplayEvents(VulkanSurfaceContext& context)
         case GameplayEventType::EnemyAttackStarted:
             PlayPositionalSoundEffect(context, "skeleton_attack.wav", 0.85f, event);
             break;
+        case GameplayEventType::ParryPrepareCue:
+            PlayPositionalSoundEffect(context, "sword_hit_1.wav", 0.22f, event);
+            break;
         case GameplayEventType::EnemyHit:
             if (event.target == EntityId::Lich)
             {
@@ -1782,6 +1817,9 @@ void DrainGameplayEvents(VulkanSurfaceContext& context)
             break;
         case GameplayEventType::LichImpact:
             PlayPositionalSoundEffect(context, "lich_impact.wav", 0.55f, event);
+            break;
+        case GameplayEventType::LichDischargeWarning:
+            PlayPositionalSoundEffect(context, "skeleton_attack.wav", 0.20f, event);
             break;
         case GameplayEventType::LichDefeated:
             PlayPositionalSoundEffect(context, "lich_fall.wav", 0.36f, event);
@@ -2234,6 +2272,70 @@ bool MeasurementPausedByUi(const VulkanSurfaceContext& context)
            context.diagnosticsVisible || context.benchmarkReportVisible;
 }
 
+void RefreshCombatTeachingPrompt(VulkanSurfaceContext& context)
+{
+    HWND prompt = GetDlgItem(context.windowHandle, kCombatTeachingPromptId);
+    if (!prompt) return;
+    const auto& teaching = context.simulation.Snapshot().combatTeaching;
+    const std::string text = horde::platform::windows::CombatTeachingPromptText(teaching);
+    const bool eligible = context.controlsEnabled && !MeasurementPausedByUi(context) &&
+        !context.benchmarkReportVisible && !context.benchmark.IsRunning() &&
+        !context.deathOverlayVisible && !context.endingOverlayVisible && !context.rtLabVisible;
+    if (!eligible)
+    {
+        context.combatTeachingFadeText.clear();
+        context.combatTeachingFadeOpacity = 0u;
+        context.combatTeachingFadeStartedAtMs = 0u;
+        SetWindowTextA(prompt, "");
+        SetLayeredWindowAttributes(prompt, 0u, 0u, LWA_ALPHA);
+        SetControlVisible(context.windowHandle, kCombatTeachingPromptId, false);
+        return;
+    }
+
+    if (!text.empty())
+    {
+        context.combatTeachingFadeText = text;
+        context.combatTeachingFadeOpacity = horde::platform::windows::CombatTeachingPromptAlpha(
+            teaching.promptOpacity, context.reducedMotionEnabled);
+        context.combatTeachingFadeStartedAtMs = 0u;
+        SetWindowTextA(prompt, text.c_str());
+        SetLayeredWindowAttributes(prompt, 0u, context.combatTeachingFadeOpacity, LWA_ALPHA);
+        SetControlVisible(context.windowHandle, kCombatTeachingPromptId, true);
+        return;
+    }
+
+    if (context.combatTeachingFadeText.empty() || context.reducedMotionEnabled)
+    {
+        context.combatTeachingFadeText.clear();
+        context.combatTeachingFadeOpacity = 0u;
+        context.combatTeachingFadeStartedAtMs = 0u;
+        SetWindowTextA(prompt, "");
+        SetLayeredWindowAttributes(prompt, 0u, 0u, LWA_ALPHA);
+        SetControlVisible(context.windowHandle, kCombatTeachingPromptId, false);
+        return;
+    }
+
+    const std::uint64_t now = GetTickCount64();
+    if (context.combatTeachingFadeStartedAtMs == 0u)
+        context.combatTeachingFadeStartedAtMs = now;
+    const unsigned char alpha = horde::platform::windows::CombatTeachingPromptFadeAlpha(
+        context.combatTeachingFadeOpacity, now - context.combatTeachingFadeStartedAtMs,
+        context.reducedMotionEnabled);
+    if (alpha == 0u)
+    {
+        context.combatTeachingFadeText.clear();
+        context.combatTeachingFadeOpacity = 0u;
+        context.combatTeachingFadeStartedAtMs = 0u;
+        SetWindowTextA(prompt, "");
+        SetLayeredWindowAttributes(prompt, 0u, 0u, LWA_ALPHA);
+        SetControlVisible(context.windowHandle, kCombatTeachingPromptId, false);
+        return;
+    }
+    SetWindowTextA(prompt, context.combatTeachingFadeText.c_str());
+    SetLayeredWindowAttributes(prompt, 0u, alpha, LWA_ALPHA);
+    SetControlVisible(context.windowHandle, kCombatTeachingPromptId, true);
+}
+
 void ApplyOverlayState(VulkanSurfaceContext& context)
 {
     const bool pauseVisible = context.pauseMenuVisible && !context.settingsVisible &&
@@ -2327,6 +2429,18 @@ void ApplyOverlayState(VulkanSurfaceContext& context)
                       !pauseVisible && !context.settingsVisible && !context.diagnosticsVisible &&
                           !context.benchmarkReportVisible && !context.benchmark.IsRunning() &&
                           !context.rtLabVisible);
+    RefreshCombatTeachingPrompt(context);
+    if (HMENU menu = GetMenu(context.windowHandle))
+    {
+        if (HMENU demo = GetSubMenu(menu, 0))
+            if (HMENU teaching = GetSubMenu(demo, 2))
+            {
+                CheckMenuItem(teaching, kMenuTeachingEnabledId,
+                              MF_BYCOMMAND | (context.combatTeachingEnabled ? MF_CHECKED : MF_UNCHECKED));
+                CheckMenuItem(teaching, kMenuTeachingSlowdownId,
+                              MF_BYCOMMAND | (context.combatTeachingSlowdown ? MF_CHECKED : MF_UNCHECKED));
+            }
+    }
 #if defined(_DEBUG)
     SetControlVisible(context.windowHandle, kDeveloperOverlayId,
                        context.developerOverlayVisible && !pauseVisible && !context.benchmarkReportVisible &&
@@ -4029,6 +4143,10 @@ void UpdateDesktopSceneControls(
     input.commands.toggleHeldLightPose = context.toggleHeldLightPoseSequence;
     input.commands.runToggle = context.runToggleSequence;
     input.commands.clearRunIntent = context.clearRunIntentSequence;
+    input.tutorialEnabled = context.combatTeachingEnabled;
+    input.tutorialSlowdownEnabled = context.combatTeachingSlowdown;
+    input.commands.tutorialSkip = context.combatTeachingSkipSequence;
+    input.commands.tutorialReplay = context.combatTeachingReplaySequence;
     input.runHeld = context.runHeld || context.controllerRunHeld;
     input.hasAuthoritativePlayerPose = false;
     input.moveForward = (context.forwardHeld ? 1.0f : 0.0f) -
@@ -4104,6 +4222,10 @@ void UpdateDesktopSceneControls(
         input.commands.toggleHeldLightPose = context.toggleHeldLightPoseSequence;
         input.commands.runToggle = context.runToggleSequence;
         input.commands.clearRunIntent = context.clearRunIntentSequence;
+        input.tutorialEnabled = context.combatTeachingEnabled;
+        input.tutorialSlowdownEnabled = context.combatTeachingSlowdown;
+        input.commands.tutorialSkip = context.combatTeachingSkipSequence;
+        input.commands.tutorialReplay = context.combatTeachingReplaySequence;
         input.runHeld = false;
         if (advance.replay.waypointReached || advance.lapStarted || advance.finished)
         {
@@ -4132,6 +4254,7 @@ void UpdateDesktopSceneControls(
                                     timestampedPlayerInput ? rawDeltaSeconds : context.frameDeltaSeconds,
                                     ++context.inputPublicationSequence,
                                     timestampedPlayerInput ? ownerAdvanceSteadyNs : 0u);
+    RefreshCombatTeachingPrompt(context);
     simulationScope.Complete(1u);
 #if defined(_DEBUG)
     if (context.nativeMotionValidation)
@@ -6931,6 +7054,10 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
             { context.developmentWorldRoute = true; context.stagedWorldPreparation = true; }
             if (std::wstring_view(entryArguments[argument]) == L"--development-vertical-proof")
                 context.developmentVerticalProof = true;
+            if (std::wstring_view(entryArguments[argument]) == L"--development-combat-practice")
+            { context.developmentCombatPractice = true; context.entryMenuVisible = false; }
+            if (std::wstring_view(entryArguments[argument]) == L"--development-keeper-practice")
+            { context.developmentKeeperPractice = true; context.entryMenuVisible = false; }
 #endif
             if (std::wstring_view(entryArguments[argument]) == L"--entry-menu-slice")
                 context.entryMenuVisible = !unattendedBenchmark;
@@ -6938,12 +7065,13 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         LocalFree(entryArguments);
     }
     if (context.developmentVerticalProof || context.developmentWorldRoute) context.entryMenuVisible = false;
+    BOOL animations = TRUE;
+    if (SystemParametersInfoA(SPI_GETCLIENTAREAANIMATION, 0, &animations, 0))
+        context.reducedMotionEnabled = !animations;
     if (context.entryMenuVisible)
     {
         context.sceneProfile = horde::vulkan::raytracing::RtSceneProfile::EntryMenu;
-        BOOL animations = TRUE;
-        if (SystemParametersInfoA(SPI_GETCLIENTAREAANIMATION, 0, &animations, 0))
-            context.entryMenu.SetReducedMotion(!animations);
+        context.entryMenu.SetReducedMotion(context.reducedMotionEnabled);
     }
     context.graphicsPreviewCapture = graphicsPreviewCapture;
     context.outputResizeValidation = outputResizeValidation;
@@ -6985,6 +7113,10 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         context.stagedWorldPreparation = proof != nullptr && proof->stagedWorldPreparation;
     }
     if (!graphicsPreviewCapture && !outputResizeValidation && !context.nativeMotionValidation) LoadSettings(context);
+    if (context.developmentCombatPractice)
+        context.simulation.BeginCombatPractice(horde::gameplay::EnemyKind::Skeleton);
+    else if (context.developmentKeeperPractice)
+        context.simulation.BeginCombatPractice(horde::gameplay::EnemyKind::Lich);
     if (captureDirectory != nullptr && captureDustQuality.has_value())
         context.requestedDustQuality = *captureDustQuality;
 #if defined(_DEBUG)
@@ -7609,6 +7741,7 @@ void ApplyDpiScaledFonts(HWND window)
     for (const int id : {kHudControlId,
                          kVitalityHudControlId,
                          kChestPromptControlId,
+                         kCombatTeachingPromptId,
                          kPauseTitleId,
                          kEndingBodyId,
                          kResumeButtonId,
@@ -7833,6 +7966,14 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
                    promptWidth,
                    ScaleForDpi(window, 34),
                    TRUE);
+    }
+    if (HWND prompt = GetDlgItem(window, kCombatTeachingPromptId))
+    {
+        const int promptWidth = std::min(ScaleForDpi(window, 700),
+                                         std::max(ScaleForDpi(window, 320),
+                                                  width - ScaleForDpi(window, 48)));
+        MoveWindow(prompt, (width - promptWidth) / 2, ScaleForDpi(window, 72),
+                   promptWidth, ScaleForDpi(window, 76), TRUE);
     }
 #if defined(_DEBUG)
     if (HWND developerOverlay = GetDlgItem(window, kDeveloperOverlayId))
@@ -8105,6 +8246,7 @@ void ShowControlsHelp(HWND window)
                 "Left mouse drag  360 camera look\n"
                 "Right mouse or Space  Swing sword\n"
                 "Q  Parry skeleton strike\n"
+                "C + movement direction  Dodge\n"
                 "E  Interact    F  Raise / lower claimed lantern\n"
                 "Controller left stick  Move and strafe\n"
                 "Controller right stick  Camera look\n"
@@ -8428,12 +8570,39 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 commandId != kResumeButtonId && commandId != kRestartButtonId &&
                 commandId != kRtLabButtonId && commandId != kRtLabBackButtonId &&
                 commandId != kMenuRestartId && commandId != kExitButtonId &&
-                commandId != kMenuExitId)
+                commandId != kMenuExitId && commandId != kMenuTeachingEnabledId &&
+                commandId != kMenuTeachingSlowdownId && commandId != kMenuTeachingSkipId &&
+                commandId != kMenuTeachingReplayId)
             {
                 return 0;
             }
             switch (commandId)
             {
+            case kMenuTeachingEnabledId:
+                sceneContext->combatTeachingEnabled = !sceneContext->combatTeachingEnabled;
+                SaveSettings(*sceneContext);
+                ApplyOverlayState(*sceneContext);
+                PlaySoundEffect(*sceneContext, "ui_select.wav");
+                return 0;
+            case kMenuTeachingSlowdownId:
+                sceneContext->combatTeachingSlowdown = !sceneContext->combatTeachingSlowdown;
+                SaveSettings(*sceneContext);
+                ApplyOverlayState(*sceneContext);
+                PlaySoundEffect(*sceneContext, "ui_select.wav");
+                return 0;
+            case kMenuTeachingSkipId:
+                if (sceneContext->combatTeachingSkipSequence != UINT64_MAX)
+                    ++sceneContext->combatTeachingSkipSequence;
+                PlaySoundEffect(*sceneContext, "ui_select.wav");
+                return 0;
+            case kMenuTeachingReplayId:
+                sceneContext->combatTeachingEnabled = true;
+                SaveSettings(*sceneContext);
+                if (sceneContext->combatTeachingReplaySequence != UINT64_MAX)
+                    ++sceneContext->combatTeachingReplaySequence;
+                ApplyOverlayState(*sceneContext);
+                PlaySoundEffect(*sceneContext, "ui_select.wav");
+                return 0;
             case kEntryMoreButtonId:
                 sceneContext->entryMoreVisible = true;
                 sceneContext->entryMenu.ShowSidePage(true);
@@ -9017,6 +9186,11 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 PublishDesktopCombatEdge(*sceneContext, horde::gameplay::simulation::CombatInputEdgeKind::Parry);
                 return 0;
             }
+            if (!sceneContext->simulationPaused && wParam == 'C' && (lParam & (1ll << 30)) == 0)
+            {
+                PublishDesktopCombatEdge(*sceneContext, horde::gameplay::simulation::CombatInputEdgeKind::Dodge);
+                return 0;
+            }
             if (!sceneContext->simulationPaused && wParam == 'E' &&
                 (lParam & (1ll << 30)) == 0)
             {
@@ -9403,6 +9577,13 @@ HMENU CreateApplicationMenu()
     HMENU demo = CreatePopupMenu();
     AppendMenuA(demo, MF_STRING, kMenuPauseId, "&Pause\tEsc");
     AppendMenuA(demo, MF_STRING, kMenuRestartId, "&Restart route\tR");
+    HMENU teaching = CreatePopupMenu();
+    AppendMenuA(teaching, MF_STRING | MF_CHECKED, kMenuTeachingEnabledId, "Optional combat lesson");
+    AppendMenuA(teaching, MF_STRING, kMenuTeachingSlowdownId, "Ease time during lesson");
+    AppendMenuA(teaching, MF_SEPARATOR, 0, nullptr);
+    AppendMenuA(teaching, MF_STRING, kMenuTeachingSkipId, "Skip this lesson");
+    AppendMenuA(teaching, MF_STRING, kMenuTeachingReplayId, "Replay opening lesson");
+    AppendMenuA(demo, MF_POPUP, reinterpret_cast<UINT_PTR>(teaching), "Combat &lesson");
     AppendMenuA(demo, MF_SEPARATOR, 0, nullptr);
     AppendMenuA(demo, MF_STRING, kMenuExitId, "E&xit");
     AppendMenuA(bar, MF_POPUP, reinterpret_cast<UINT_PTR>(demo), "&Demo");
@@ -9626,6 +9807,13 @@ int CreateAndShowWindow(const std::string& diagnosticText,
 
     createStatic(kHudControlId, kHudStartingText, SS_LEFT | SS_CENTERIMAGE | SS_NOTIFY);
     createStatic(kVitalityHudControlId, "Vitality 3 of 3", SS_OWNERDRAW);
+    if (HWND prompt = createStatic(kCombatTeachingPromptId, "", SS_CENTER | SS_NOPREFIX))
+    {
+        SetWindowLongPtrA(prompt, GWL_EXSTYLE,
+            GetWindowLongPtrA(prompt, GWL_EXSTYLE) | WS_EX_LAYERED);
+        SetLayeredWindowAttributes(prompt, 0u, 255u, LWA_ALPHA);
+        ShowWindow(prompt, SW_HIDE);
+    }
     if (HWND prompt = createStatic(kChestPromptControlId, "", SS_CENTER | SS_CENTERIMAGE))
     {
         ShowWindow(prompt, SW_HIDE);

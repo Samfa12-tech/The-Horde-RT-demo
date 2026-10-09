@@ -57,6 +57,9 @@ struct GameSimulationConfig
     bool waterfallSkeletonEncounter = false;
     bool developmentSupportFixture = false;
     bool developmentWorldRoute = false;
+    // Current development gameplay; legacy constructor/capture fixtures retain
+    // their authored rules unless the live application profile selects this.
+    bool combatFoundation1_7 = false;
 };
 
 // Keep the historical constructor configuration available for deterministic
@@ -68,6 +71,7 @@ inline constexpr GameSimulationConfig ProductionGameSimulationConfig()
     config.playerMountProfile = horde::gameplay::items::PlayerMountProfile::AnatomicalBody;
     config.waterfallSkeletonEncounter = true;
     config.swordStartsStowed = true;
+    config.combatFoundation1_7 = true;
     return config;
 }
 
@@ -108,6 +112,7 @@ public:
     void ResetRoute();
     void RetryEncounter();
     bool ApplyShowcaseCheckpoint(std::int32_t checkpointId, bool countAsRetry = false);
+    void BeginCombatPractice(EnemyKind encounter);
     void ImportRewardCheckpoint(
         const horde::gameplay::interactions::ChestRewardSnapshot& chestReward,
         const horde::gameplay::interactions::InteractionState& interaction,
@@ -160,9 +165,14 @@ private:
     void ResetPlayerSupport();
     void UpdateMovement(const InputSnapshot& input, float deltaSeconds);
     void ClearRunIntent();
+    bool CurrentCombatRules() const;
+    void CancelCombatTransients();
+    void BeginKeeperRepel();
+    void ApplyKeeperRepel(float deltaSeconds);
     void UpdateEncounters(const InputSnapshot& input, float deltaSeconds);
     void UpdateRewardSequence(float deltaSeconds, bool commandsAvailable);
     void ResolveHeldItems();
+    void RecordSwordContactTrace();
     bool SwordDefenseReady() const;
     bool SwordDrawBlocksDefense() const;
     bool RequestSwordDraw(std::int32_t reasonPayload, bool blocksDefenseDuringDraw);
@@ -190,6 +200,26 @@ private:
     FixedStepRunner fixedStepRunner_{};
     BoundedGameplayEventQueue events_{};
     CombatPresentationTimeline combatPresentation_{};
+    CombatTeaching combatTeaching_{};
+    CombatContactTraceSnapshot combatContactTrace_{};
+    std::uint64_t currentCutCommandSequence_ = 0, currentCutConsumedTick_ = 0;
+    std::uint64_t queuedUpCutCommandSequence_ = 0, queuedUpCutConsumedTick_ = 0;
+    EntityId swordHitTargetThisTick_ = EntityId::Invalid;
+    std::uint64_t swordHitEventThisTick_ = 0;
+    bool legacyCombatCheckpoint_ = false;
+    bool dodgeProtectionAccepted_ = false;
+    float gameplayTimeScale_ = 1.0f;
+    std::uint64_t acceptedDodgeSequence_ = 0u;
+    std::uint64_t acceptedDodgeConsumedTick_ = 0u;
+    std::uint64_t dodgeProtectedHitCount_ = 0u;
+    float keeperRepelRemainingSeconds_ = 0.0f;
+    float keeperRepelDirectionX_ = 0.0f;
+    float keeperRepelDirectionZ_ = 0.0f;
+    float keeperRepelTravelledMetres_ = 0.0f;
+    std::uint64_t latestTutorialSkipSequence_ = 0u;
+    std::uint64_t latestTutorialReplaySequence_ = 0u;
+    std::uint64_t pendingTutorialSkipCommands_ = 0u;
+    std::uint64_t pendingTutorialReplayCommands_ = 0u;
     SimulationSnapshot snapshot_{};
     InputSnapshot lastInput_{};
 

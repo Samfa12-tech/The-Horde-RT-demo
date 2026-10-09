@@ -1904,7 +1904,8 @@ int main()
           waterfallEncounter->Snapshot().activeSkeletonCount == 2u &&
           stagedPair[0].id == EntityId::SkeletonA &&
           stagedPair[1].id == EntityId::SkeletonB &&
-          stagedPair[0].health == 1 && stagedPair[1].health == 1 &&
+          waterfallEncounter->Snapshot().modernCombatRules &&
+          stagedPair[0].health == 2 && stagedPair[1].health == 2 &&
           NearlyEqual(stagedPair[0].x, kWaterfallSkeletonPairCenter.x) &&
           NearlyEqual(stagedPair[1].x, kWaterfallSkeletonPairCenter.x) &&
           NearlyEqual(stagedPair[0].z, kWaterfallSkeletonPairCenter.z - 0.75f) &&
@@ -1926,7 +1927,8 @@ int main()
     check(waterfallReset->Snapshot().skeletonEnemyCount == 2u &&
           resetWaterfallGuards[0].id == EntityId::SkeletonA &&
           resetWaterfallGuards[1].id == EntityId::SkeletonB &&
-          resetWaterfallGuards[0].health == 1 && resetWaterfallGuards[1].health == 1 &&
+          waterfallReset->Snapshot().modernCombatRules &&
+          resetWaterfallGuards[0].health == 2 && resetWaterfallGuards[1].health == 2 &&
           NearlyEqual(resetWaterfallGuards[0].x, kWaterfallSkeletonPairCenter.x) &&
           NearlyEqual(resetWaterfallGuards[1].x, kWaterfallSkeletonPairCenter.x) &&
           NearlyEqual(resetWaterfallGuards[0].z, kWaterfallSkeletonPairCenter.z - 0.75f) &&

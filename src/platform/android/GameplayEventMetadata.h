@@ -7,6 +7,10 @@
 
 namespace horde::platform::android
 {
+static_assert(static_cast<std::uint8_t>(gameplay::simulation::GameplayEventType::SkeletonEncounterWarning) == 23u);
+static_assert(static_cast<std::uint8_t>(gameplay::simulation::GameplayEventType::ParryPrepareCue) == 24u);
+static_assert(static_cast<std::uint8_t>(gameplay::simulation::GameplayEventType::LichDischargeWarning) == 25u);
+
 // Existing type/source/target/sequence fields retain their positions. The
 // previously unused byte 24 carries a selected semantic cue, not truncated
 // arbitrary event payload. Stereo gains and vertical metadata have their own

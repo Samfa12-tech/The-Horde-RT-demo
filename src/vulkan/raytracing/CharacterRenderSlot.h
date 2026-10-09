@@ -42,6 +42,7 @@ struct SkeletonRenderPlan
     float time = 0.0f;
     VkTransformMatrixKHR transform{};
     std::uint32_t poseBucket = 0u;
+    bool forceCurrentCombatPose = false;
 };
 
 struct CharacterFramePlan
@@ -59,7 +60,8 @@ bool CharacterPoseNeedsRefresh(int requestedClip,
                                float requestedTime,
                                int lastClip,
                                float lastTime,
-                               float updateInterval = 1.0f / 30.0f);
+                               float updateInterval = 1.0f / 30.0f,
+                               bool forceCurrentCombatPose = false);
 
 CharacterFramePlan EvaluateCharacterFramePlan(
     const std::array<horde::gameplay::simulation::SkeletonEnemySnapshot,

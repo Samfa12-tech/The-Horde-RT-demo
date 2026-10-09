@@ -38,6 +38,11 @@
     <string name="swing">SWING</string>
     <string name="parry">PARRY</string>
     <string name="dodge">DODGE</string>
+    <string name="combat_teaching">Optional parry and dodge lesson</string>
+    <string name="combat_teaching_slowdown">Ease time during the lesson</string>
+    <string name="combat_teaching_skip">Skip this lesson</string>
+    <string name="combat_teaching_replay">Replay opening lesson</string>
+    <string name="combat_teaching_description">Two skeletons teach parrying, then the Keeper teaches dodging. Move and look remain live. You can retry safely, skip, or replay the opening lesson here.</string>
     <string name="interact">INTERACT</string>
     <string name="chest_locked_until_lich_defeated">LOCKED\nSLAY LICH</string>
     <string name="open_chest">OPEN CHEST</string>

@@ -65,6 +65,7 @@ struct HeldItemKinematicsInput
     // established route-floor camera and held-item world positions.
     float playerSupportWorldY = kRouteFloorWorldY;
     bool developmentWorldRoute = false;
+    bool readableCombatPose = false;
 };
 
 struct HeldSwordPose
@@ -134,6 +135,7 @@ struct HeldItemFixedStepInput
     // positional aggregate initializers.
     float playerSupportWorldY = kRouteFloorWorldY;
     bool developmentWorldRoute = false;
+    bool readableCombatPose = false;
 };
 
 inline constexpr float kHeldItemSpreadStartAspect = 1.0f;
@@ -176,7 +178,8 @@ HeldSwordPose EvaluateHeldSwordPose(const PlayerCombatSnapshot& playerCombat,
                                    float swordSwingRadians,
                                    float heldPropDepth,
                                    bool bulkyLeftHandCarry = false,
-                                   float idleTimeSeconds = 0.0f);
+                                   float idleTimeSeconds = 0.0f,
+                                   bool readableCombatPose = false);
 
 std::array<float, 3u> EvaluateSwordBladeAxisInView(float inwardRadians,
                                                    float forwardRadians);

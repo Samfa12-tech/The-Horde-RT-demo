@@ -42,6 +42,11 @@ public final class ProbeBridge {
     public static native void requestAttack();
     public static native void requestParry();
     public static native void requestDodge();
+    public static native void setCombatTeachingOptions(boolean enabled, boolean slowdown);
+    public static native void requestCombatTeachingSkip();
+    public static native void requestCombatTeachingReplay();
+    /** Packed immutable teaching snapshot published by the simulation owner. */
+    public static native long getCombatTeachingState();
     public static native void requestInteract();
     public static native void requestToggleHeldLightPose();
     public static native void requestRouteReset();
@@ -97,6 +102,8 @@ public final class ProbeBridge {
     public static native void setGpuTimingEnabled(boolean enabled);
     public static native void setRequiredRayQueryCompute(boolean required);
     public static native boolean requestDebugCheckpoint(int checkpointId);
+    /** Debug-only live practice request; applied on the simulation owner thread. 1=parry, 2=Keeper. */
+    public static native boolean requestDebugCombatPractice(int enemyKind);
     public static native boolean requestDebugCaptureCheckpoint(int checkpointId);
     public static native boolean requestDebugRouteReplay();
     public static native boolean requestDebugMotionEvidence(String scenario, String runId);
