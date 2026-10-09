@@ -1,0 +1,254 @@
+{
+  "recordedUtc": "2026-10-09T02:47:58.949424+00:00",
+  "branch": "codex/horde-1.7-wp0-torch-diagnostic",
+  "setup": {
+    "checkpoint": "4a28ec7ebd089c53ac354bbb83f65525c6e49c65",
+    "runtimeBaseline": "1c28d0563a897dc72d410bdb2b61723e66ed92af",
+    "testSourceBlob": "cc6aefb5884e9307a39e97f33ee809f8053a1174",
+    "testSourceSha256": "4e048f7452a4adcf67f84c84fc762c8cbbd378d486e83b2ac8f4f6128ce9ebae",
+    "unchangedExe": {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp0-torch-diagnostic\\build\\presets\\windows-x64-debug\\Debug\\horde_rt_final_held_torch_clearance_tests.exe",
+      "sha256": "28f83cd9ab32916c08249ff77fbb29fc9f8af5853003f956d2a18264e35905c2",
+      "bytes": 4099072
+    },
+    "configureCommand": "cmake --preset windows-x64-debug",
+    "buildCommand": "cmake --build --preset windows-x64-debug --target horde_rt_final_held_torch_clearance_tests --parallel 2",
+    "inputs": [
+      {
+        "path": "assets/models/player/runtime/gothic-traveller-lod0.runtime.glb",
+        "gitBlob": "1e3b6b9e70b0cde462be82cb29e189de8e70a1dc",
+        "sha256": "46a88dac9dd569117be5a17a35540fecf3e0e6026d3ad404dd5fdbc85a9ad54f",
+        "bytes": 2568508,
+        "lfsBinaryVerified": true,
+        "pointer": false,
+        "matchesRetainedWp0WorkingInput": true
+      },
+      {
+        "path": "assets/models/player/viewmodel/runtime/gothic-traveller-viewmodel.runtime.glb",
+        "gitBlob": "c7e1aac731318f850e0de3240fb86f0fe87a31a4",
+        "sha256": "eaa0db3abb8ff2dae616247054c190031a08c542dd95396cc6dc1e18a7462488",
+        "bytes": 1228828,
+        "lfsBinaryVerified": true,
+        "pointer": false,
+        "matchesRetainedWp0WorkingInput": true
+      },
+      {
+        "path": "assets/models/props/runtime/player-rag-torch/asset.manifest.json",
+        "gitBlob": "3d2428f0ac92ff5091af289e776a7413c86930ad",
+        "sha256": "5316b2072008da441024cda1153f725f5afcd7d366f3a5b89dece98ec74617aa",
+        "bytes": 830,
+        "lfsBinaryVerified": false,
+        "pointer": false,
+        "matchesRetainedWp0WorkingInput": true
+      },
+      {
+        "path": "assets/models/props/runtime/player-rag-torch/rag-torch-player-lod0.runtime.glb",
+        "gitBlob": "d346246a9c3c517803fbbcb19cefef748062173f",
+        "sha256": "476cb05a8f11f1af917a0cfa29610cc03f23522478a366f6cf2cf49b906db74d",
+        "bytes": 267672,
+        "lfsBinaryVerified": true,
+        "pointer": false,
+        "matchesRetainedWp0WorkingInput": true
+      },
+      {
+        "path": "assets/models/world/runtime/collapsed-entry/asset.manifest.json",
+        "gitBlob": "0451e198bfd31c3662e14db3fea0912512f31f10",
+        "sha256": "952e1920fbc60646154d0424556c2935a18e7cf882866a9fe9f4f45ef38be623",
+        "bytes": 742,
+        "lfsBinaryVerified": false,
+        "pointer": false,
+        "matchesRetainedWp0WorkingInput": true
+      },
+      {
+        "path": "assets/models/world/runtime/collapsed-entry/collapsed-entry-lod0.runtime.glb",
+        "gitBlob": "adb9b1cf063e47b5ebfb2a1741521b1e23017a5a",
+        "sha256": "c67471b522c92f354d9a5880dea6e48b4f22b5095207841c35c95b5cfc75c4d4",
+        "bytes": 652980,
+        "lfsBinaryVerified": true,
+        "pointer": false,
+        "matchesRetainedWp0WorkingInput": true
+      },
+      {
+        "path": "assets/models/player/runtime/clip-manifest.json",
+        "gitBlob": "7c9b0d75e74a8f2ffabb2e092951d23205aefe53",
+        "sha256": "1f8075bd1ff97010685172176535482f2b6fc262cc0f5c1daf63e5e8222f648d",
+        "bytes": 1011,
+        "lfsBinaryVerified": false,
+        "pointer": false,
+        "matchesRetainedWp0WorkingInput": true
+      }
+    ],
+    "registeredTest": {
+      "backtrace": 1,
+      "command": [
+        "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp0-torch-diagnostic/build/presets/windows-x64-debug/Debug/horde_rt_final_held_torch_clearance_tests.exe",
+        "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp0-torch-diagnostic"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_final_held_torch_clearance_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp0-torch-diagnostic/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    "environment": {
+      "diagnostic": {
+        "cmakeCacheFields": {
+          "CMAKE_CXX_FLAGS_DEBUG": "/Zi /Ob0 /Od /RTC1",
+          "CMAKE_GENERATOR": "Visual Studio 17 2022",
+          "CMAKE_GENERATOR_INSTANCE": "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools",
+          "Vulkan_INCLUDE_DIR": "C:/VulkanSDK/1.4.350.0/Include"
+        },
+        "compilerVersion": "19.44.35227.0",
+        "compiler": "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe"
+      },
+      "wp0": {
+        "cmakeCacheFields": {
+          "CMAKE_CXX_FLAGS_DEBUG": "/Zi /Ob0 /Od /RTC1",
+          "CMAKE_GENERATOR": "Visual Studio 17 2022",
+          "CMAKE_GENERATOR_INSTANCE": "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools",
+          "Vulkan_INCLUDE_DIR": "C:/VulkanSDK/1.4.350.0/Include"
+        },
+        "compilerVersion": "19.44.35227.0",
+        "compiler": "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe"
+      }
+    },
+    "observedDifferences": [
+      "Fresh diagnostic worktree and fresh focused-only build instead of WP0 full build/matrix; executable bytes are identified separately",
+      "All seven inspected input identities match the retained WP0 working inputs; four LFS binaries hydrated locally without fetch in this fresh worktree",
+      "Pinned WebView2 developer SDK reused locally from WP0 and verified by configure; no download or Runtime installation",
+      "Focused test in isolation rather than following41 full-suite tests; machine load, cache, thermal, antivirus and resource-history differences were not controlled or measured"
+    ],
+    "retainedWp0Exe": {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp0-readiness\\build\\presets\\windows-x64-debug\\Debug\\horde_rt_final_held_torch_clearance_tests.exe",
+      "sha256": "f57c0c0c49a7ff3196d7d4a594b37840300c4f077e01dffa16c4688d6ff5a1d0",
+      "bytes": 4098560
+    },
+    "retainedWp0Registration": {
+      "backtrace": 1,
+      "command": [
+        "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp0-readiness/build/presets/windows-x64-debug/Debug/horde_rt_final_held_torch_clearance_tests.exe",
+        "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp0-readiness"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_final_held_torch_clearance_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp0-readiness/build/presets/windows-x64-debug"
+        }
+      ]
+    }
+  },
+  "sourceIdentityCompared": {
+    "src": "5a231727932730303f42258146395483466636a3",
+    "shaders": "7c0ac10b9e8cd4d138dcca357de1158e12d1ae4c",
+    "assets": "7bea3ea7f8edcecfa87c18da0256d96f47842d2c",
+    "CMakeLists.txt": "57813d991578202a75ea50fcafa4c82141e12713",
+    "CMakePresets.json": "79e418f63ab9f93071f379bfeede06b264ed68cc",
+    "tests/FinalHeldTorchClearanceTests.cpp": "cc6aefb5884e9307a39e97f33ee809f8053a1174"
+  },
+  "originalWp0": {
+    "ctestExitCode": 8,
+    "testResult": "Timeout",
+    "testSeconds": 180.03,
+    "fullLogPath": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp0-readiness\\reports\\wp0\\ctest-debug.log",
+    "fullLogSha256": "a14f3045ced4da8c59a6c6c5f7b570da413a77a4f232c5c4db5ef72888e56e9e",
+    "notRewritten": true
+  },
+  "unchangedReproduction": {
+    "exitCode": 0,
+    "wallSeconds": 168.9125202,
+    "command": "ctest --preset windows-x64-debug --timeout 180 --output-on-failure -R '^horde_rt_final_held_torch_clearance_tests$'",
+    "ctestTestSeconds": 168.85,
+    "ctestTotalSeconds": 168.86,
+    "fullSweep": true,
+    "subset": false,
+    "assertionFailures": 0
+  },
+  "coverage": {
+    "legacyPoses": 1475,
+    "roofGridPoses": 1296,
+    "roofTransientPoses": 336,
+    "entryPoses": 180,
+    "totalPoses": 3287,
+    "roofAndEntrySkinnedPoses": 1812,
+    "viewmodelVerticesPerSkinnedPose": 15855,
+    "viewmodelVertexPoseVisits": 28729260,
+    "structuralUndersideTriangles": 118,
+    "planeSamples": 3178,
+    "diskSamples": 57970
+  },
+  "instrumentationAdded": false,
+  "stageTimingsAvailable": false,
+  "longerOrSubsetInvocationRun": false,
+  "originalTimeoutPolicyChanged": false,
+  "wholeMatrixRun": false,
+  "outcome": "Original gate passes this unchanged focused run. WP0 timeout cause remains unproven; no failed assertion or runtime defect established.",
+  "recommendation": "Proceed with the separately reviewed vertical-proof scope; retain original test coverage and 180-second policy. No harness/environment or runtime repair is supported by this single passing reproduction.",
+  "limits": [
+    "Only one unchanged focused reproduction, not repeatability or machine-load certification",
+    "No asset-load/rig/clearance/skinning stage breakdown because timeout did not reproduce and conditional instrumentation was not activated",
+    "Substantial Debug CPU geometry/rig work completes in this run; cannot assign WP0 timeout to any particular work stage, resource history or environment factor",
+    "No physical RT, device mutation, release or owner-feel evidence"
+  ],
+  "evidenceLogs": [
+    {
+      "path": "docs/evidence/2026-10-09-wp0-torch-diagnostic/build-unchanged.txt",
+      "bytes": 2989,
+      "sha256": "b7c8219ce010859fdf30790a55d0566c52b125630dec7cbb0c525bfa2f093a5a"
+    },
+    {
+      "path": "docs/evidence/2026-10-09-wp0-torch-diagnostic/cmake-version.txt",
+      "bytes": 97,
+      "sha256": "02282b1eefbb0dd98bd4578caa8861cc2de062ebcbef435bace0359683bbfa57"
+    },
+    {
+      "path": "docs/evidence/2026-10-09-wp0-torch-diagnostic/configure.txt",
+      "bytes": 1496,
+      "sha256": "ee36298379ef808f5812cafed7cab9fd35b9e14cc7aef6f31041ea0cc845c96e"
+    },
+    {
+      "path": "docs/evidence/2026-10-09-wp0-torch-diagnostic/ctest-version.txt",
+      "bytes": 97,
+      "sha256": "a1f1a612ac841f12ccc139b534f734d054a3c12b13186dc706bc385b662fa1ac"
+    },
+    {
+      "path": "docs/evidence/2026-10-09-wp0-torch-diagnostic/unchanged-ctest.txt",
+      "bytes": 355,
+      "sha256": "ea0cfd5f0cccd6080969616d69169cdd6b70394f98c0a86e07c471143d338f2c"
+    },
+    {
+      "path": "docs/evidence/2026-10-09-wp0-torch-diagnostic/unchanged-test-output.txt",
+      "bytes": 1802,
+      "sha256": "c2f4db695cc81e641ffb6d82c5cf28e7619c96d17d8bd5ded0537cd054103ac5"
+    },
+    {
+      "path": "docs/evidence/2026-10-09-wp0-torch-diagnostic/wp0-timeout-excerpt.txt",
+      "bytes": 163,
+      "sha256": "d04f568fd3d157ecf0e221ae7ec63d8a8b1276ca0eaead67fe4114f6d300f78a"
+    }
+  ],
+  "protectedRuntimeAndTestIdentityMatches1c28d056": true,
+  "finalReview": {
+    "allowedChangedPaths": [
+      "docs/evidence/2026-10-09-wp0-torch-diagnostic/build-unchanged.txt",
+      "docs/evidence/2026-10-09-wp0-torch-diagnostic/cmake-version.txt",
+      "docs/evidence/2026-10-09-wp0-torch-diagnostic/configure.txt",
+      "docs/evidence/2026-10-09-wp0-torch-diagnostic/ctest-version.txt",
+      "docs/evidence/2026-10-09-wp0-torch-diagnostic/receipt.json",
+      "docs/evidence/2026-10-09-wp0-torch-diagnostic/unchanged-ctest.txt",
+      "docs/evidence/2026-10-09-wp0-torch-diagnostic/unchanged-test-output.txt",
+      "docs/evidence/2026-10-09-wp0-torch-diagnostic/wp0-timeout-excerpt.txt",
+      "docs/superpowers/plans/2026-10-09-horde-1.7-wp0-torch-diagnostic.md"
+    ],
+    "documentationOnly": true,
+    "protectedSourceTestAndPolicyDiffEmpty": true,
+    "retainedWp0ReceiptAndLogsUnmodified": true,
+    "readinessWorktreeCleanAtCheckpoint": true,
+    "primaryChangesPreserved": true,
+    "reportLocalLinksPass": true
+  }
+}
