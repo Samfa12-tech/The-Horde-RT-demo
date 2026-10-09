@@ -4,7 +4,8 @@
 
 namespace horde::gameplay::simulation
 {
-enum class PlayerSupportId : std::uint32_t { RouteFloor = 1, ProofRamp = 2, ProofPlatform = 3 };
+enum class PlayerSupportId : std::uint32_t { RouteFloor = 1, ProofRamp = 2, ProofPlatform = 3, WorldRouteFirst = 100, WorldRouteStep = 120 };
+enum class SupportSurface : std::uint32_t { Stone, Earth, Wood };
 // Resident validation fixture only. No general stair/slope/jump policy.
 inline constexpr float kProofSupportHalfWidth = 0.70f;
 inline constexpr float kProofSupportBackZ = -0.20f;
@@ -16,6 +17,7 @@ struct PlayerSupportResolution
     float worldY = kRouteFloorWorldY;
     PlayerSupportId id = PlayerSupportId::RouteFloor;
     bool grounded = true;
+    SupportSurface surface = SupportSurface::Stone;
 };
 inline PlayerSupportResolution ResolveDevelopmentPlayerSupport(
     float x, float z, bool enabled, std::uint64_t generation, std::uint64_t expectedGeneration)

@@ -1,5 +1,6 @@
 #pragma once
 #include "scene/atmosphere/IndoorDust.h"
+#include "scene/DevelopmentWorldGeometry.h"
 
 #include <array>
 #include <cstdint>
@@ -243,6 +244,9 @@ public:
 
     // Set before Initialise; geometry admission is explicit and development-only.
     void SetDevelopmentSupportFixture(bool enabled) { developmentSupportFixture_ = enabled; }
+    void SetDevelopmentWorldRoute(bool enabled, bool staged = false) { developmentWorldRoute_=enabled; stagedWorldPreparation_=staged; }
+    horde::gameplay::simulation::ZoneReadiness WorldZoneReadiness(horde::gameplay::simulation::WorldZoneToken token) const;
+    const horde::scene::DevelopmentWorldGeometry& WorldRouteGeometry() const { return worldRouteGeometry_; }
     bool IsReady() const { return ready_; }
     // CPU-side timings for the most recent Initialise attempt. Failed attempts
     // retain partial measurements across cleanup until the next attempt begins.
@@ -877,6 +881,9 @@ private:
     Buffer tlasUpdateScratch_;
     RtGpuResources gpuResources_;
     bool developmentSupportFixture_ = false;
+    bool developmentWorldRoute_ = false;
+    bool stagedWorldPreparation_ = false;
+    horde::scene::DevelopmentWorldGeometry worldRouteGeometry_{};
     RtSceneProfile sceneProfile_ = RtSceneProfile::Showcase;
     bool glassEnabled_ = true;
     bool mistEnabled_ = true;

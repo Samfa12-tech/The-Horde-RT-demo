@@ -82,6 +82,7 @@
 #include "telemetry/RtBenchmarkEvidenceRun.h"
 #include "telemetry/RtEvidencePublication.h"
 #include "vulkan/raytracing/SimulationFrameAdapter.h"
+#include "vulkan/raytracing/DevelopmentWorldSceneAdapter.h"
 #if HORDE_RT_STAGED_PRIMARY_TIMING
 #include "vulkan/raytracing/experimental/StagedPrimaryProfile.h"
 #endif
@@ -374,6 +375,10 @@ struct SwapchainContext
     bool productionRewardPropsRequested = false;
     bool productionLanternGlassOnly = false;
     bool developmentSupportFixture = false;
+    bool developmentWorldRoute = false;
+    bool stagedWorldPreparation = false;
+    std::optional<bool> developmentWorldRouteOverride;
+    std::optional<bool> stagedWorldPreparationOverride;
     std::optional<bool> developmentSupportFixtureOverride;
     std::optional<std::int32_t> preparedFixtureCheckpointId;
     bool preparedFixtureCheckpointIsCapture = false;
@@ -1943,6 +1948,8 @@ void ApplyBenchmarkCheckpoint(
     context.developmentSupportFixture =
         gGameSimulation.Snapshot().developmentSupportFixture;
     context.developmentSupportFixtureOverride.reset();
+    context.developmentWorldRouteOverride.reset();
+    context.stagedWorldPreparationOverride.reset();
     if (context.rtFrameEvidenceInitialised)
     {
         (void)context.rtFrameEvidence.ApplyEvent(
@@ -1994,6 +2001,8 @@ void ApplyCaptureCheckpoint(
     context.developmentSupportFixture =
         gGameSimulation.Snapshot().developmentSupportFixture;
     context.developmentSupportFixtureOverride.reset();
+    context.developmentWorldRouteOverride.reset();
+    context.stagedWorldPreparationOverride.reset();
     if (context.rtFrameEvidenceInitialised)
     {
         (void)context.rtFrameEvidence.ApplyEvent(
@@ -2732,6 +2741,7 @@ bool ReleaseSwapchainResources(SwapchainContext& context)
 #endif
     context.gpuFrameTimingTotalMs = 0.0;
     context.gpuFrameTimingSampleCount = 0u;
+    gGameSimulation.InvalidateWorldZoneReadiness();
     context.rtScene.Destroy();
 
     if (context.commandPool != VK_NULL_HANDLE)
@@ -3013,6 +3023,9 @@ bool InitialiseRtSceneForSwapchain(SwapchainContext& context)
     context.developmentSupportFixture = context.developmentSupportFixtureOverride.has_value()
         ? *context.developmentSupportFixtureOverride
         : gGameSimulation.Snapshot().developmentSupportFixture;
+    context.developmentWorldRoute=context.developmentWorldRouteOverride.value_or(gGameSimulation.Snapshot().developmentWorldRoute);
+    context.stagedWorldPreparation=context.stagedWorldPreparationOverride.value_or(gGameSimulation.Snapshot().stagedWorldPreparation);
+    context.rtScene.SetDevelopmentWorldRoute(context.developmentWorldRoute,context.stagedWorldPreparation);
     context.rtScene.SetDevelopmentSupportFixture(context.developmentSupportFixture);
     const bool initialised = context.rtScene.Initialise(context.instance,
                                     context.physicalDevice,
@@ -3163,7 +3176,7 @@ void RecordDevelopmentSupportFixtureRebuildFailure(
 bool RebuildDevelopmentSupportFixtureOnOwner(
     SwapchainContext& context,
     const std::int32_t checkpointId,
-    const bool requestedFixture)
+    const bool requestedFixture, const bool requestedWorld = false, const bool stagedWorld = false)
 {
     if (!context.useRtPath || !context.rtScene.IsReady())
     {
@@ -3171,7 +3184,7 @@ bool RebuildDevelopmentSupportFixtureOnOwner(
             context, checkpointId, requestedFixture, "scene-not-ready", VK_NOT_READY);
         return false;
     }
-    if (context.developmentSupportFixture == requestedFixture)
+    if (context.developmentSupportFixture == requestedFixture && context.developmentWorldRoute == requestedWorld && context.stagedWorldPreparation == stagedWorld)
         return true;
     if (!ConsumePendingImageAcquire(context))
     {
@@ -3218,6 +3231,8 @@ bool RebuildDevelopmentSupportFixtureOnOwner(
 
     context.rtScene.Destroy();
     context.developmentSupportFixtureOverride = requestedFixture;
+    context.developmentWorldRouteOverride=requestedWorld;
+    context.stagedWorldPreparationOverride=stagedWorld;
     if (!InitialiseRtSceneForSwapchain(context))
     {
         // Initialization can submit uploads before failing. Do not fall back
@@ -3276,7 +3291,9 @@ bool PrepareFixtureChangingCheckpointOnOwner(
         selection.development->developmentSupportFixture;
     // Ordinary selections and transitions between checkpoints using the same
     // fixture retain their established RenderFrame staging/observation path.
-    if (context.developmentSupportFixture == requestedFixture)
+    const bool requestedWorld=selection.development && selection.development->developmentWorldRoute;
+    const bool stagedWorld=selection.development && selection.development->stagedWorldPreparation;
+    if (context.developmentSupportFixture == requestedFixture && context.developmentWorldRoute == requestedWorld && context.stagedWorldPreparation == stagedWorld)
         return true;
 
     std::atomic<std::int32_t>& selectedRequest = isCapture
@@ -3297,7 +3314,7 @@ bool PrepareFixtureChangingCheckpointOnOwner(
     }
 
     if (!RebuildDevelopmentSupportFixtureOnOwner(
-            context, selection.checkpoint.id, requestedFixture))
+            context, selection.checkpoint.id, requestedFixture, requestedWorld, stagedWorld))
     {
         std::int32_t expectedCapture = requestedCaptureCheckpoint;
         (void)gCaptureCheckpointRequested.compare_exchange_strong(
@@ -4049,6 +4066,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                 std::memory_order_release);
         }
         const horde::vulkan::raytracing::RtSceneTuning rtLabTuning = gRtLabState.Snapshot();
+        horde::vulkan::raytracing::PublishDevelopmentWorldReadiness(gGameSimulation,context.rtScene);
         horde::vulkan::raytracing::RtSceneFrameInputs frameInputs;
         if (context.sceneProfile == horde::vulkan::raytracing::RtSceneProfile::GraphicsPreview)
         {
@@ -5828,6 +5846,33 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_setViewControls(JNIEnv*, jclass, jfl
         std::clamp(static_cast<float>(torchLightStrength), 0.65f, 2.4f);
     gInputPublisherState.moveStrafe = std::clamp(static_cast<float>(moveStrafe), -1.0f, 1.0f);
     gInputPublisherState.moveForward = std::clamp(static_cast<float>(moveForward), -1.0f, 1.0f);
+    PublishInputLocked();
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_setRunHeld(JNIEnv*, jclass, jboolean held)
+{
+    std::lock_guard<std::mutex> lock(gInputPublisherMutex);
+    gInputPublisherState.runHeld = held == JNI_TRUE;
+    PublishInputLocked();
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_requestToggleRun(JNIEnv*, jclass)
+{
+    std::lock_guard<std::mutex> lock(gInputPublisherMutex);
+    if (gInputPublisherState.commands.runToggle != UINT64_MAX)
+        ++gInputPublisherState.commands.runToggle;
+    PublishInputLocked();
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_clearRunIntent(JNIEnv*, jclass)
+{
+    std::lock_guard<std::mutex> lock(gInputPublisherMutex);
+    gInputPublisherState.runHeld = false;
+    if (gInputPublisherState.commands.clearRunIntent != UINT64_MAX)
+        ++gInputPublisherState.commands.clearRunIntent;
     PublishInputLocked();
 }
 

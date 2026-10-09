@@ -2,6 +2,7 @@
 
 #include "gameplay/CorridorCollision.h"
 #include "scene/ShowcaseOverheadGeometry.h"
+#include "scene/DevelopmentWorldGeometry.h"
 
 #include <algorithm>
 #include <cmath>
@@ -175,6 +176,7 @@ float TorchOverheadLowering(const Vec3& gripWorld, const Vec3& viewUp,
     for (const auto& volume : horde::scene::kShowcaseSkylightGrid) include(volume);
     for (const auto& volume : horde::scene::kShowcaseImportedOverheadVolumes) include(volume);
     include(horde::scene::kShowcaseCollapseRoofSeam);
+    include(horde::scene::kDevelopmentRouteRoof);
     return lowering;
 }
 
@@ -251,6 +253,7 @@ float SwordOverheadLowering(const Vec3& gripWorld,
     includeVolumes(horde::scene::kShowcaseCeilingPatches);
     includeVolumes(horde::scene::kShowcaseSkylightGrid);
     includeVolumes(horde::scene::kShowcaseImportedOverheadVolumes);
+    includeVolumes(std::array<horde::scene::OverheadVolume,1>{{horde::scene::kDevelopmentRouteRoof}});
     includeVolumes(std::array<horde::scene::OverheadVolume, 1u>{{
         horde::scene::kShowcaseCollapseRoofSeam}});
     return lowering;
@@ -350,14 +353,17 @@ float ComputePlayerTorchOverheadLowering(
 float ComputeRewardLanternForwardClearance(const float cameraX,
                                            const float cameraZ,
                                            const float forwardX,
-                                           const float forwardZ)
+                                           const float forwardZ, const bool developmentWorldRoute)
 {
+    const auto walkable=[&](float x,float z) { return developmentWorldRoute ?
+        horde::gameplay::simulation::ProjectWorldRoute(x,z).distance <=
+            horde::gameplay::simulation::kWorldRouteHalfWidth-horde::gameplay::kPlayerCollisionRadius : IsShowcaseHeldPropPositionWalkable(x,z); };
     if (!std::isfinite(cameraX) || !std::isfinite(cameraZ) ||
         !std::isfinite(forwardX) || !std::isfinite(forwardZ))
         return 0.0f;
     const float forwardLength = std::hypot(forwardX, forwardZ);
     if (forwardLength <= 0.000001f ||
-        !IsShowcaseHeldPropPositionWalkable(cameraX, cameraZ))
+        !walkable(cameraX, cameraZ))
         return 0.0f;
     const float unitForwardX = forwardX / forwardLength;
     const float unitForwardZ = forwardZ / forwardLength;
@@ -368,7 +374,7 @@ float ComputeRewardLanternForwardClearance(const float cameraX,
          static_cast<int>(kMaximumClearance / kSearchStride); ++step)
     {
         const float distance = static_cast<float>(step) * kSearchStride;
-        if (IsShowcaseHeldPropPositionWalkable(
+        if (walkable(
                 cameraX + unitForwardX * distance,
                 cameraZ + unitForwardZ * distance))
         {
@@ -384,7 +390,7 @@ float ComputeRewardLanternForwardClearance(const float cameraX,
         for (int refinement = 0; refinement < 14; ++refinement)
         {
             const float midpoint = 0.5f * (lastWalkable + blocked);
-            if (IsShowcaseHeldPropPositionWalkable(
+            if (walkable(
                     cameraX + unitForwardX * midpoint,
                     cameraZ + unitForwardZ * midpoint))
                 lastWalkable = midpoint;
@@ -700,7 +706,7 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
     const float forwardX = std::sin(input.cameraYawRadians);
     const float forwardZ = -std::cos(input.cameraYawRadians);
     const float forwardClearance = ComputeRewardLanternForwardClearance(
-        input.cameraX, input.cameraZ, forwardX, forwardZ);
+        input.cameraX, input.cameraZ, forwardX, forwardZ, input.developmentWorldRoute);
     // All rigid hand props share the continuous collision clearance. The
     // legacy 7.5 cm sampled helper produced a visible one-tick sword/forearm
     // jump while approaching a wall and could feed a discontinuous pose into
@@ -1161,7 +1167,7 @@ bool ResolveHeldItemsFixedStep(HeldItemStates& items,
         input.playerMountProfile,
         input.playerPitchRadians,
         input.logicalViewAspect,
-        input.playerSupportWorldY});
+        input.playerSupportWorldY,input.developmentWorldRoute});
     if (input.swordItemState != nullptr &&
         input.swordItemState->id == HeldItemId::Sword)
     {

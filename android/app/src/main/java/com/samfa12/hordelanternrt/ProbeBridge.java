@@ -36,6 +36,9 @@ public final class ProbeBridge {
     public static native boolean setDiagnosticSurfaceSuspended(long generation, boolean suspended);
     public static native int getSurfaceRuntimeState(long generation);
     public static native void setViewControls(float yaw, float pitch, float torchLightStrength, float moveStrafe, float moveForward);
+    public static native void setRunHeld(boolean held);
+    public static native void requestToggleRun();
+    public static native void clearRunIntent();
     public static native void requestAttack();
     public static native void requestParry();
     public static native void requestDodge();

@@ -717,6 +717,9 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     pipelineBundle_.RebindDestroyContext(this, &gpuResources_);
     scratchAddressAlignment_ = std::exchange(other.scratchAddressAlignment_, 0u);
     developmentSupportFixture_ = std::exchange(other.developmentSupportFixture_, false);
+    developmentWorldRoute_=std::exchange(other.developmentWorldRoute_,false);
+    stagedWorldPreparation_=std::exchange(other.stagedWorldPreparation_,false);
+    worldRouteGeometry_=std::move(other.worldRouteGeometry_);
     sceneProfile_ = std::exchange(other.sceneProfile_, RtSceneProfile::Showcase);
     glassEnabled_ = std::exchange(other.glassEnabled_, true);
     mistEnabled_ = std::exchange(other.mistEnabled_, true);
@@ -1019,8 +1022,22 @@ bool PresentableTinyRtScene::ContinueInitialiseAfterPreflight(
     return true;
 }
 
+horde::gameplay::simulation::ZoneReadiness PresentableTinyRtScene::WorldZoneReadiness(
+    horde::gameplay::simulation::WorldZoneToken token) const
+{
+    using namespace horde::gameplay::simulation;
+    if(token.generation==0 || static_cast<std::size_t>(token.zone)>=kWorldZones.size() || !developmentWorldRoute_)
+        return ZoneReadiness::Unprepared;
+    // ready_ is set only after real uploads, completed one-time BLAS/TLAS builds
+    // and the selected pipeline bundle succeed. No platform declares GPU readiness.
+    if(!ready_ || !worldRouteGeometry_.valid || vertexBuffer_.memory==VK_NULL_HANDLE ||
+        indexBuffer_.memory==VK_NULL_HANDLE || blas_.handle==VK_NULL_HANDLE || tlas_.handle==VK_NULL_HANDLE)
+        return ZoneReadiness::Preparing;
+    return ZoneReadiness::Ready;
+}
 void PresentableTinyRtScene::Destroy()
 {
+    worldRouteGeometry_ = {}; // Release CPU batches with the renderer-owned scene.
     pipelineCache_ = VK_NULL_HANDLE; // Borrowed device cache remains owned by the platform context.
     uploadedQualityControls_ = {};
     uploadedFireQuality_ = FireEmitterQuality::Mobile;
@@ -3231,6 +3248,17 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         addWorldTriangle({{kProofSupportHalfWidth, kRouteFloorWorldY, kProofSupportGroundZ}},
                          {{kProofSupportHalfWidth, kRouteFloorWorldY, kProofSupportTopZ}},
                          {{kProofSupportHalfWidth, y, kProofSupportTopZ}}, SurfaceWetCobble, SurfaceRight);
+    }
+    if(developmentWorldRoute_)
+    {
+        worldRouteGeometry_=horde::scene::PrepareDevelopmentWorldGeometry(stagedWorldPreparation_);
+        if(!worldRouteGeometry_.valid) { diagnostic="Development world route preparation failed finite geometry admission."; return false; }
+        for(const auto& triangle:worldRouteGeometry_.triangles)
+        {
+            const auto vertex=[](const auto& p) { return Vertex{{p[0],p[1],p[2]}}; };
+            addWorldTriangle(vertex(triangle.points[0]),vertex(triangle.points[1]),vertex(triangle.points[2]),
+                static_cast<SurfaceMaterial>(triangle.material),static_cast<SurfaceNormal>(triangle.normal));
+        }
     }
     // The exported collapse excludes its inspection floor. Continue the same
     // ordinary dungeon floor under the sealed, non-walkable stairwell instead.

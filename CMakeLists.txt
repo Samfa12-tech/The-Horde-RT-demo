@@ -392,6 +392,9 @@ if(BUILD_TESTING)
     add_test(NAME horde_rt_motion_evidence_scenario_tests COMMAND horde_rt_motion_evidence_scenario_tests)
 
     if(HORDE_RT_BUILD_VULKAN_TARGETS)
+        add_executable(horde_rt_world_route_foundation_tests tests/WorldRouteFoundationTests.cpp)
+        target_link_libraries(horde_rt_world_route_foundation_tests PRIVATE horde_rt_probe_core)
+        add_test(NAME horde_rt_world_route_foundation_tests COMMAND horde_rt_world_route_foundation_tests)
         add_executable(horde_rt_vertical_support_tests tests/VerticalSupportTests.cpp)
         target_link_libraries(horde_rt_vertical_support_tests PRIVATE horde_rt_probe_core)
         add_test(NAME horde_rt_vertical_support_tests COMMAND horde_rt_vertical_support_tests)
@@ -399,6 +402,11 @@ if(BUILD_TESTING)
         target_link_libraries(horde_rt_held_item_vertical_support_rig_tests PRIVATE horde_rt_probe_core)
         add_test(NAME horde_rt_held_item_vertical_support_rig_tests
             COMMAND horde_rt_held_item_vertical_support_rig_tests ${CMAKE_CURRENT_SOURCE_DIR})
+
+        add_executable(horde_rt_player_directional_rig_tests tests/PlayerDirectionalRigTests.cpp)
+        target_link_libraries(horde_rt_player_directional_rig_tests PRIVATE horde_rt_probe_core)
+        add_test(NAME horde_rt_player_directional_rig_tests
+            COMMAND horde_rt_player_directional_rig_tests ${CMAKE_CURRENT_SOURCE_DIR})
 
         add_executable(horde_rt_final_held_torch_clearance_tests tests/FinalHeldTorchClearanceTests.cpp)
         target_link_libraries(horde_rt_final_held_torch_clearance_tests PRIVATE horde_rt_probe_core)

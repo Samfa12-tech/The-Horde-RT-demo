@@ -1670,36 +1670,114 @@ int main()
           directionalDodge.Snapshot().lastConsumedDodgeSequence == 1u,
           "re-reading one dodge sequence must not repeat movement");
 
-    GameSimulation diagonalDodge;
+    auto legacyWalk = std::make_unique<GameSimulation>();
+    InputSnapshot walkInput;
+    walkInput.damageEnabled = false;
+    walkInput.moveForward = 1.0f;
+    legacyWalk->StepFixed(walkInput);
+    check(NearlyEqual(legacyWalk->Snapshot().playerMovementSpeedMetresPerSecond, 1.9f),
+          "ordinary no-run movement retains its exact legacy 1.9 m/s response");
+    for (int tick = 0; tick < 60; ++tick) legacyWalk->StepFixed(walkInput);
+    check(NearlyEqual(legacyWalk->Snapshot().playerMovementSpeedMetresPerSecond, 1.9f) &&
+          NearlyEqual(legacyWalk->Snapshot().movementForward, 1.0f),
+          "ordinary forward walking settles at the unchanged 1.9 m/s legacy speed");
+
+    auto runToggle = std::make_unique<GameSimulation>();
+    InputSnapshot runInput;
+    runInput.damageEnabled = false;
+    runInput.moveForward = 1.0f;
+    runInput.commands.runToggle = 1u;
+    runToggle->StepFixed(runInput);
+    check(runToggle->Snapshot().runToggleActive && runToggle->Snapshot().runActive &&
+          runToggle->Snapshot().playerMovementSpeedMetresPerSecond > 0.0f &&
+          runToggle->Snapshot().playerMovementSpeedMetresPerSecond < 3.2f,
+          "run toggle engages through smooth acceleration rather than an instant speed jump");
+    runInput.commands.runToggle = 0u;
+    for (int tick = 0; tick < 30; ++tick) runToggle->StepFixed(runInput);
+    check(NearlyEqual(runToggle->Snapshot().playerMovementSpeedMetresPerSecond, 3.2f) &&
+          runToggle->Snapshot().runActive,
+          "toggled run settles at its bounded 3.2 m/s movement speed");
+    runInput.paused = true;
+    runToggle->SynchronizePausedInput(runInput);
+    runInput.paused = false;
+    runToggle->StepFixed(runInput);
+    check(!runToggle->Snapshot().runToggleActive && !runToggle->Snapshot().runActive,
+          "pause synchronization clears run intent without replaying it on resume");
+
+    auto heldRunPause = std::make_unique<GameSimulation>();
+    InputSnapshot heldRunInput{};
+    heldRunInput.damageEnabled = false;
+    heldRunInput.moveForward = 1.0f;
+    heldRunInput.runHeld = true;
+    heldRunPause->StepFixed(heldRunInput);
+    heldRunInput.paused = true;
+    heldRunPause->SynchronizePausedInput(heldRunInput);
+    heldRunInput.paused = false;
+    heldRunPause->StepFixed(heldRunInput);
+    check(!heldRunPause->Snapshot().runActive && !heldRunPause->Snapshot().runToggleActive,
+          "a held run key cannot restore run automatically after pausing");
+    heldRunInput.runHeld = false;
+    heldRunPause->StepFixed(heldRunInput);
+    heldRunInput.runHeld = true;
+    heldRunPause->StepFixed(heldRunInput);
+    check(heldRunPause->Snapshot().runActive,
+          "run hold becomes available again only after release and a fresh press");
+
+    auto diagonalWalk = std::make_unique<GameSimulation>();
+    InputSnapshot diagonalWalkInput;
+    diagonalWalkInput.damageEnabled = false;
+    diagonalWalkInput.moveForward = 1.0f;
+    diagonalWalkInput.moveStrafe = 1.0f;
+    for (int tick = 0; tick < 60; ++tick) diagonalWalk->StepFixed(diagonalWalkInput);
+    check(NearlyEqual(diagonalWalk->Snapshot().playerMovementSpeedMetresPerSecond, 1.9f) &&
+          NearlyEqual(diagonalWalk->Snapshot().playerTravelledThisTick,
+                      1.9f / 60.0f, 0.0001f),
+          "diagonal walking is normalized so it cannot exceed cardinal walking speed");
+
+    auto runDodge = std::make_unique<GameSimulation>();
+    InputSnapshot runDodgeInput;
+    runDodgeInput.damageEnabled = false;
+    runDodgeInput.moveForward = 1.0f;
+    runDodgeInput.commands.runToggle = 1u;
+    runDodgeInput.commands.dodge = 1u;
+    for (int tick = 0; tick < 12; ++tick) runDodge->StepFixed(runDodgeInput);
+    const float runDodgeDistance = std::hypot(
+        runDodge->Snapshot().playerX - kPlayerSpawn.x,
+        runDodge->Snapshot().playerZ - kPlayerSpawn.z);
+    check(runDodgeDistance > 0.82f && runDodgeDistance < 0.98f &&
+          !runDodge->Snapshot().runToggleActive,
+          "run intent is cancelled by dodge and never multiplies authored dodge distance");
+
+    auto diagonalDodge = std::make_unique<GameSimulation>();
     InputSnapshot diagonalDodgeInput;
     diagonalDodgeInput.damageEnabled = false;
     diagonalDodgeInput.moveForward = 1.0f;
     diagonalDodgeInput.moveStrafe = 1.0f;
     diagonalDodgeInput.commands.dodge = 1u;
-    diagonalDodge.StepFixed(diagonalDodgeInput);
+    diagonalDodge->StepFixed(diagonalDodgeInput);
     diagonalDodgeInput.moveForward = 0.0f;
     diagonalDodgeInput.moveStrafe = 0.0f;
     for (int tick = 1; tick < 12; ++tick)
     {
-        diagonalDodge.StepFixed(diagonalDodgeInput);
+        diagonalDodge->StepFixed(diagonalDodgeInput);
     }
     const float diagonalDistance = std::hypot(
-        diagonalDodge.Snapshot().playerX - kPlayerSpawn.x,
-        diagonalDodge.Snapshot().playerZ - kPlayerSpawn.z);
+        diagonalDodge->Snapshot().playerX - kPlayerSpawn.x,
+        diagonalDodge->Snapshot().playerZ - kPlayerSpawn.z);
     check(diagonalDistance > 0.82f && diagonalDistance < 0.98f,
           "diagonal left-stick dodge direction must be normalized");
 
-    GameSimulation neutralDodge;
+    auto neutralDodge = std::make_unique<GameSimulation>();
     InputSnapshot neutralDodgeInput;
     neutralDodgeInput.damageEnabled = false;
     neutralDodgeInput.yawRadians = 1.57079632679f;
     neutralDodgeInput.commands.dodge = 1u;
     for (int tick = 0; tick < 12; ++tick)
     {
-        neutralDodge.StepFixed(neutralDodgeInput);
+        neutralDodge->StepFixed(neutralDodgeInput);
     }
-    check(neutralDodge.Snapshot().playerX > kPlayerSpawn.x + 0.82f &&
-          std::abs(neutralDodge.Snapshot().playerZ - kPlayerSpawn.z) < 0.04f,
+    check(neutralDodge->Snapshot().playerX > kPlayerSpawn.x + 0.82f &&
+          std::abs(neutralDodge->Snapshot().playerZ - kPlayerSpawn.z) < 0.04f,
           "neutral-stick dodge must fall back to current facing");
 
     GameSimulation collisionDodge(GameSimulationConfig{.playerStartX = 1.65f,

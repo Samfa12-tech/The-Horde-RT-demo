@@ -21,6 +21,7 @@
 #include "gameplay/simulation/InputSnapshot.h"
 #include "gameplay/simulation/SimulationSnapshot.h"
 #include "gameplay/simulation/DevelopmentSupportFixture.h"
+#include "gameplay/simulation/DevelopmentWorldRoute.h"
 
 namespace horde::gameplay::validation
 {
@@ -55,6 +56,7 @@ struct GameSimulationConfig
     bool swordStartsStowed = false;
     bool waterfallSkeletonEncounter = false;
     bool developmentSupportFixture = false;
+    bool developmentWorldRoute = false;
 };
 
 // Keep the historical constructor configuration available for deterministic
@@ -100,6 +102,9 @@ public:
 
     // Owner-thread development control; invalidates previous support immediately.
     void SetDevelopmentSupportFixture(bool enabled, std::uint64_t generation);
+    void SetDevelopmentWorldRoute(bool enabled, bool stagedPreparation = false);
+    bool PublishWorldZoneReadiness(WorldZoneToken token, ZoneReadiness readiness);
+    void InvalidateWorldZoneReadiness();
     void ResetRoute();
     void RetryEncounter();
     bool ApplyShowcaseCheckpoint(std::int32_t checkpointId, bool countAsRetry = false);
@@ -151,8 +156,10 @@ private:
     bool ConsumeWorldCommand();
     bool ApplyCheckpoint(std::int32_t checkpointId, bool isRetry);
     void ResolvePlayerSupport();
+    void ResolveMovementCollision(float previousX, float previousZ);
     void ResetPlayerSupport();
     void UpdateMovement(const InputSnapshot& input, float deltaSeconds);
+    void ClearRunIntent();
     void UpdateEncounters(const InputSnapshot& input, float deltaSeconds);
     void UpdateRewardSequence(float deltaSeconds, bool commandsAvailable);
     void ResolveHeldItems();
@@ -213,13 +220,20 @@ private:
     EnemyKind activeEnemyKind_ = EnemyKind::Skeleton;
 
     PlayerSupportResolution playerSupport_{};
+    WorldRouteState worldRoute_{};
+    bool stagedWorldPreparation_ = false;
     std::uint64_t supportGeneration_ = 1u;
     float playerX_ = 0.0f;
     float playerZ_ = 1.85f;
     float playerYawRadians_ = 0.0f;
     float playerPitchRadians_ = -0.05f;
     float walkTime_ = 0.0f;
+    float walkCycleTime_ = 0.0f;
     float walkVisualAmount_ = 0.0f;
+    float playerMovementSpeed_ = 0.0f;
+    bool runToggleActive_ = false;
+    bool runActive_ = false;
+    bool runInputBlockedUntilRelease_ = false;
     std::int32_t retryCheckpoint_ = 0;
     std::uint32_t retryGeneration_ = 0u;
     std::uint64_t tickIndex_ = 0u;
@@ -231,6 +245,8 @@ private:
     std::uint64_t latestRetrySequence_ = 0u;
     std::uint64_t latestInteractSequence_ = 0u;
     std::uint64_t latestToggleHeldLightPoseSequence_ = 0u;
+    std::uint64_t latestRunToggleSequence_ = 0u;
+    std::uint64_t latestClearRunIntentSequence_ = 0u;
     std::uint64_t lastConsumedAttackSequence_ = 0u;
     std::uint64_t lastConsumedParrySequence_ = 0u;
     std::uint64_t lastConsumedDodgeSequence_ = 0u;
@@ -238,6 +254,8 @@ private:
     std::uint64_t lastConsumedRetrySequence_ = 0u;
     std::uint64_t lastConsumedInteractSequence_ = 0u;
     std::uint64_t lastConsumedToggleHeldLightPoseSequence_ = 0u;
+    std::uint64_t lastConsumedRunToggleSequence_ = 0u;
+    std::uint64_t lastConsumedClearRunIntentSequence_ = 0u;
     std::uint64_t pendingAttackCommands_ = 0u;
     std::uint64_t pendingParryCommands_ = 0u;
     std::uint64_t pendingDodgeCommands_ = 0u;
@@ -245,6 +263,8 @@ private:
     std::uint64_t pendingRetryCommands_ = 0u;
     std::uint64_t pendingInteractCommands_ = 0u;
     std::uint64_t pendingToggleHeldLightPoseCommands_ = 0u;
+    std::uint64_t pendingRunToggleCommands_ = 0u;
+    std::uint64_t pendingClearRunIntentCommands_ = 0u;
     float pendingDodgeForward_ = 0.0f;
     float pendingDodgeStrafe_ = 0.0f;
     float dodgeDirectionX_ = 0.0f;

@@ -104,6 +104,7 @@
 #include "vulkan/raytracing/RtFrameEvidenceCoordinator.h"
 #include "vulkan/raytracing/RtDeviceEnablePlan.h"
 #include "vulkan/raytracing/SimulationFrameAdapter.h"
+#include "vulkan/raytracing/DevelopmentWorldSceneAdapter.h"
 #if HORDE_RT_STAGED_PRIMARY_TIMING
 #include "vulkan/raytracing/experimental/StagedPrimaryProfile.h"
 #endif
@@ -285,8 +286,10 @@ struct ShowcaseCaptureRecord
     std::string completedFrameEvidenceJson;
     std::string viewmodelGeometryFile;
     std::string viewmodelGeometrySha256;
+    horde::platform::windows::CapturedPlayerGeometryEvidence viewmodelGeometryEvidence{};
     std::string playerWorldBodyGeometryFile;
     std::string playerWorldBodyGeometrySha256;
+    horde::platform::windows::CapturedPlayerGeometryEvidence worldBodyGeometryEvidence{};
     horde::graphics::DustQuality actualUploadedDustQuality = horde::graphics::DustQuality::Off;
     horde::scene::atmosphere::DustWork dustWork{};
     std::uint32_t width = 0u;
@@ -297,6 +300,15 @@ struct ShowcaseCaptureRecord
         instanceMasks{};
     bool playerPrimaryVisible = false;
     bool primaryArmsMayBeOutsideFrame = false;
+    bool primaryArmsCeilingRetracted = false;
+    float playerSupportWorldY = 0.0f;
+    float playerHeightDelta = 0.0f;
+    std::uint8_t playerSupportId = 0u;
+    std::uint8_t heldLightKind = 0u;
+    float swordStowBlend = 0.0f;
+    float swordHandGripBlend = 0.0f;
+    float torchOverheadLoweringMetres = 0.0f;
+    float torchOverheadRetractionMetres = 0.0f;
     std::uint32_t playerWorldBodyInstanceFlags = 0u;
     std::uint32_t primaryTorchPixels = 0u;
     std::uint32_t primarySwordPixels = 0u;
@@ -463,6 +475,10 @@ struct VulkanSurfaceContext
     bool backwardHeld = false;
     bool leftHeld = false;
     bool rightHeld = false;
+    bool runHeld = false;
+    bool controllerRunHeld = false;
+    bool controllerRunBlockedUntilRelease = false;
+    bool runToggleKeyDown = false;
     bool mouseLookActive = false;
     bool mouseCursorHidden = false;
     POINT mouseRestorePosition{};
@@ -515,6 +531,8 @@ struct VulkanSurfaceContext
     std::uint64_t retrySequence = 0u;
     std::uint64_t interactSequence = 0u;
     std::uint64_t toggleHeldLightPoseSequence = 0u;
+    std::uint64_t runToggleSequence = 0u;
+    std::uint64_t clearRunIntentSequence = 0u;
     int playerSwingVariant = 0;
     horde::gameplay::DelayedGameplayFeedbackQueue delayedFeedback;
     // Legacy mirrors retained only for Win32 overlays, capture manifests, and
@@ -529,6 +547,8 @@ struct VulkanSurfaceContext
     horde::gameplay::EnemyKind debugEnemyOverride = horde::gameplay::EnemyKind::None;
     uint32_t debugValidationPoint = 0u;
     bool developmentVerticalProof = false;
+    bool developmentWorldRoute = false;
+    bool stagedWorldPreparation = false;
     horde::gameplay::ShowcaseBenchmarkRun benchmark;
     horde::vulkan::raytracing::RtWorkloadPreset benchmarkRequestedRtPreset =
         horde::vulkan::raytracing::RtWorkloadPreset::Authored;
@@ -853,6 +873,62 @@ bool Sha256File(const std::filesystem::path& path, std::string& hexDigest, std::
     output << std::hex << std::setfill('0');
     for (const std::uint8_t byte : digest) output << std::setw(2) << static_cast<unsigned int>(byte);
     hexDigest = output.str();
+    diagnostic.clear();
+    return true;
+}
+
+bool ValidateCapturedObjGeometry(const std::filesystem::path& path,
+                                 horde::platform::windows::CapturedPlayerGeometryEvidence& evidence,
+                                 std::string& diagnostic)
+{
+    evidence.allVertexPositionsFinite = false;
+    evidence.vertexCount = 0u;
+    evidence.faceCount = 0u;
+    std::ifstream input(path, std::ios::binary);
+    if (!input)
+    {
+        diagnostic = "Captured player geometry could not be reopened.";
+        return false;
+    }
+
+    std::string line;
+    while (std::getline(input, line))
+    {
+        if (line.starts_with("v "))
+        {
+            std::istringstream values(line.substr(2u));
+            values.imbue(std::locale::classic());
+            float x = 0.0f;
+            float y = 0.0f;
+            float z = 0.0f;
+            if (!(values >> x >> y >> z) || !std::isfinite(x) ||
+                !std::isfinite(y) || !std::isfinite(z))
+            {
+                diagnostic = "Captured player geometry has a malformed or non-finite vertex.";
+                return false;
+            }
+            ++evidence.vertexCount;
+        }
+        else if (line.starts_with("f "))
+        {
+            std::istringstream indices(line.substr(2u));
+            std::string index;
+            std::size_t corners = 0u;
+            while (indices >> index) ++corners;
+            if (corners < 3u)
+            {
+                diagnostic = "Captured player geometry has a malformed face.";
+                return false;
+            }
+            ++evidence.faceCount;
+        }
+    }
+    if (input.bad() || evidence.vertexCount < 3u || evidence.faceCount == 0u)
+    {
+        diagnostic = "Captured player geometry is empty or incomplete.";
+        return false;
+    }
+    evidence.allVertexPositionsFinite = true;
     diagnostic.clear();
     return true;
 }
@@ -3319,6 +3395,18 @@ bool HasDeviceExtension(VkPhysicalDevice physicalDevice, const char* extensionNa
 
 void ClearDesktopInput(VulkanSurfaceContext& context)
 {
+    const auto& runSnapshot = context.simulation.Snapshot();
+    if (context.controllerRunHeld)
+        context.controllerRunBlockedUntilRelease = true;
+    if (context.runHeld || context.controllerRunHeld || runSnapshot.runToggleActive ||
+        runSnapshot.runActive)
+    {
+        if (context.clearRunIntentSequence != UINT64_MAX)
+            ++context.clearRunIntentSequence;
+    }
+    context.runHeld = false;
+    context.controllerRunHeld = false;
+    context.runToggleKeyDown = false;
     context.forwardHeld = false;
     context.backwardHeld = false;
     context.leftHeld = false;
@@ -3640,6 +3728,7 @@ void PollDesktopController(VulkanSurfaceContext& context)
         context.controllerFocusLatch.Observe(GetForegroundWindow() == context.windowHandle);
     if (pollDisposition == horde::platform::windows::ControllerPollDisposition::Suppress)
     {
+        context.controllerRunHeld = false;
         context.controllerForward = 0.0f;
         context.controllerStrafe = 0.0f;
         context.controllerLookHorizontal = 0.0f;
@@ -3682,6 +3771,7 @@ void PollDesktopController(VulkanSurfaceContext& context)
     const bool xinputConnected = xinputUser.has_value();
     if (!xinputConnected)
     {
+        context.controllerRunHeld = false;
         context.xInputUserIndex.reset();
         JOYINFOEX legacy{};
         const auto pollLegacy = [&legacy](const UINT joystick)
@@ -3815,6 +3905,9 @@ void PollDesktopController(VulkanSurfaceContext& context)
         HandleControllerMenuEdges(context, menuEdges);
         return;
     }
+    const bool rightShoulderHeld = (state.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) != 0u;
+    if (!rightShoulderHeld) context.controllerRunBlockedUntilRelease = false;
+    context.controllerRunHeld = rightShoulderHeld && !context.controllerRunBlockedUntilRelease;
     if (context.xInputUserIndex != xinputUser)
     {
         context.previousControllerButtons = 0u;
@@ -3934,6 +4027,9 @@ void UpdateDesktopSceneControls(
     input.commands.retry = context.retrySequence;
     input.commands.interact = context.interactSequence;
     input.commands.toggleHeldLightPose = context.toggleHeldLightPoseSequence;
+    input.commands.runToggle = context.runToggleSequence;
+    input.commands.clearRunIntent = context.clearRunIntentSequence;
+    input.runHeld = context.runHeld || context.controllerRunHeld;
     input.hasAuthoritativePlayerPose = false;
     input.moveForward = (context.forwardHeld ? 1.0f : 0.0f) -
                         (context.backwardHeld ? 1.0f : 0.0f) + context.controllerForward;
@@ -4006,6 +4102,9 @@ void UpdateDesktopSceneControls(
         input.commands.retry = context.retrySequence;
         input.commands.interact = context.interactSequence;
         input.commands.toggleHeldLightPose = context.toggleHeldLightPoseSequence;
+        input.commands.runToggle = context.runToggleSequence;
+        input.commands.clearRunIntent = context.clearRunIntentSequence;
+        input.runHeld = false;
         if (advance.replay.waypointReached || advance.lapStarted || advance.finished)
         {
             UpdateBenchmarkHud(context);
@@ -4106,6 +4205,11 @@ bool SetDesktopMovementKey(VulkanSurfaceContext& context, const WPARAM key, cons
         return true;
     case 'D':
         context.rightHeld = held;
+        return true;
+    case VK_SHIFT:
+    case VK_LSHIFT:
+    case VK_RSHIFT:
+        context.runHeld = held;
         return true;
     default:
         return false;
@@ -4612,6 +4716,7 @@ bool ReleaseSwapchainResources(VulkanSurfaceContext& ctx)
 #endif
     ctx.gpuFrameTimingTotalMs = 0.0;
     ctx.gpuFrameTimingSampleCount = 0u;
+    ctx.simulation.InvalidateWorldZoneReadiness();
     ctx.rtScene.Destroy();
 
     if (ctx.commandPool != VK_NULL_HANDLE)
@@ -4754,6 +4859,7 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx, const bool startup
 #endif
     const VkExtent2D renderExtent = ScaledRenderExtent(ctx.swapchainExtent, ctx.renderScale);
     std::string diagnostic;
+    ctx.rtScene.SetDevelopmentWorldRoute(ctx.developmentWorldRoute,ctx.stagedWorldPreparation);
     ctx.rtScene.SetDevelopmentSupportFixture(ctx.developmentVerticalProof &&
         ctx.sceneProfile == horde::vulkan::raytracing::RtSceneProfile::Showcase);
     if (!ctx.rtScene.Initialise(ctx.instance,
@@ -5402,6 +5508,7 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         }
         if (!ctx.graphicsPreviewCapture && !ctx.outputResizeValidation && !ctx.nativeMotionValidation) PublishMusicPlayback(ctx);
         if (!previewFrame && !ctx.outputResizeValidation) DrainGameplayEvents(ctx);
+        horde::vulkan::raytracing::PublishDevelopmentWorldReadiness(ctx.simulation,ctx.rtScene);
         horde::vulkan::raytracing::RtSceneFrameInputs frameInputs =
             horde::vulkan::raytracing::BuildRtSceneFrameInputs(
                 simulation, ctx.outputExposure, ctx.waterQuality, ctx.rtSceneTuning,
@@ -5986,6 +6093,19 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
                  << (capture.playerPrimaryVisible ? "true" : "false")
                  << ", \"primaryArmsMayBeOutsideFrame\": "
                  << (capture.primaryArmsMayBeOutsideFrame ? "true" : "false")
+                 << ", \"primaryArmsCeilingRetracted\": "
+                 << (capture.primaryArmsCeilingRetracted ? "true" : "false")
+                 << ", \"verticalProofPoseWitness\": {\"supportWorldY\": "
+                 << capture.playerSupportWorldY << ", \"heightDelta\": "
+                 << capture.playerHeightDelta << ", \"supportId\": "
+                 << static_cast<unsigned>(capture.playerSupportId)
+                 << ", \"heldLightKind\": " << static_cast<unsigned>(capture.heldLightKind)
+                 << ", \"swordStowBlend\": " << capture.swordStowBlend
+                 << ", \"swordHandGripBlend\": " << capture.swordHandGripBlend
+                 << ", \"torchOverheadLoweringMetres\": "
+                 << capture.torchOverheadLoweringMetres
+                 << ", \"torchOverheadRetractionMetres\": "
+                 << capture.torchOverheadRetractionMetres << "}"
                  << ", \"playerWorldBodyInstanceFlags\": " << capture.playerWorldBodyInstanceFlags
                  << ", \"instanceMasks\": [";
         for (std::size_t mask = 0u; mask < capture.instanceMasks.size(); ++mask)
@@ -6034,12 +6154,20 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
                  << (capture.viewmodelGeometryFile.empty() ? "false" : "true")
                  << ", \"space\": \"model\", \"source\": \"cpu-upload\", \"file\": \""
                  << JsonEscape(capture.viewmodelGeometryFile) << "\", \"sha256\": \""
-                 << capture.viewmodelGeometrySha256 << "\"},\n"
+                 << capture.viewmodelGeometrySha256 << "\", \"finiteVerticesValidated\": "
+                 << (capture.viewmodelGeometryEvidence.allVertexPositionsFinite ? "true" : "false")
+                 << ", \"finiteVertexCount\": "
+                 << capture.viewmodelGeometryEvidence.vertexCount << ", \"faceCount\": "
+                 << capture.viewmodelGeometryEvidence.faceCount << "},\n"
                  << "      \"playerWorldBodyGeometry\": {\"available\": "
                  << (capture.playerWorldBodyGeometryFile.empty() ? "false" : "true")
                  << ", \"space\": \"model\", \"source\": \"cpu-upload\", \"file\": \""
                  << JsonEscape(capture.playerWorldBodyGeometryFile) << "\", \"sha256\": \""
-                 << capture.playerWorldBodyGeometrySha256 << "\"},\n"
+                 << capture.playerWorldBodyGeometrySha256 << "\", \"finiteVerticesValidated\": "
+                 << (capture.worldBodyGeometryEvidence.allVertexPositionsFinite ? "true" : "false")
+                 << ", \"finiteVertexCount\": "
+                 << capture.worldBodyGeometryEvidence.vertexCount << ", \"faceCount\": "
+                 << capture.worldBodyGeometryEvidence.faceCount << "},\n"
                  << "      \"pngSha256\": \"" << capture.pngSha256 << "\"\n"
                  << "    }" << (index + 1u == captures.size() ? "\n" : ",\n");
     }
@@ -6203,6 +6331,15 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
                 completedFrame, completedFrameJson, captureEvidenceError))
             return fail(std::string("Checkpoint '") + checkpoint.name +
                         "' completed-frame evidence failed canonical validation.");
+        const bool completedRtDispatch = context.useRtPath &&
+            completedFrame.scene.dispatch.sceneReady &&
+            completedFrame.scene.dispatch.rtDispatchRecorded &&
+            completedFrame.scene.dispatch.swapchainCopyRecorded;
+        const bool completedRtPresentation = capturePublication.presented &&
+            completedFrame.presentation.outcome == horde::telemetry::RtPresentationOutcome::Presented &&
+            completedIdentity.submissionSerial != 0u &&
+            completedIdentity.submissionSerial ==
+                completedFrame.presentation.lastSuccessfulPresentSubmissionSerial;
 
         horde::vulkan::raytracing::PresentableTinyRtScene::StorageImageCapture image;
         std::string diagnostic;
@@ -6210,6 +6347,10 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         {
             return fail(std::string("Checkpoint '") + checkpoint.name + "' readback failed: " + diagnostic);
         }
+        const std::uint64_t expectedStorageImageBytes =
+            static_cast<std::uint64_t>(image.width) * image.height * 4u;
+        const bool rtStorageImageCopied = image.width != 0u && image.height != 0u &&
+            expectedStorageImageBytes == image.rgba.size();
 
         std::ostringstream filename;
         filename << std::setw(2) << std::setfill('0') << checkpoint.id << '-' << checkpoint.name << ".png";
@@ -6227,6 +6368,14 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         const horde::gameplay::simulation::SimulationSnapshot& simulation = context.simulation.Snapshot();
         record.camera = {simulation.playerX, simulation.playerZ,
                          simulation.playerYawRadians, simulation.playerPitchRadians};
+        record.torchOverheadLoweringMetres = simulation.heldItemKinematics.torchOverheadLowering;
+        record.torchOverheadRetractionMetres = simulation.heldItemKinematics.torchOverheadRetraction;
+        record.playerSupportWorldY = simulation.playerSupportWorldY;
+        record.playerHeightDelta = simulation.playerHeightDelta;
+        record.playerSupportId = static_cast<std::uint8_t>(simulation.playerSupportId);
+        record.heldLightKind = static_cast<std::uint8_t>(simulation.interaction.heldLightKind);
+        record.swordStowBlend = simulation.heldItemKinematics.swordStowBlend;
+        record.swordHandGripBlend = simulation.heldItemKinematics.swordHandGripBlend;
         record.torchFailurePhase = horde::gameplay::TorchFailurePhaseName(simulation.torchFailure.phase);
         record.selectedEnemy = horde::gameplay::EnemyKindName(simulation.enemyRoster.selectedEnemy);
         record.lichPhase = horde::gameplay::LichPhaseName(simulation.lich.phase);
@@ -6278,11 +6427,75 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
             simulation.chestReward.phase == horde::gameplay::interactions::ChestRewardPhase::Locked;
         const bool dedicatedPlayerOwnership = horde::vulkan::raytracing::HasDedicatedPlayerPrimaryOwnership(
             record.instanceMasks, record.playerWorldBodyInstanceFlags);
+        const bool verticalProofRaisedCandidate = development != nullptr && development->id == 171u &&
+            development->name == "vertical-proof-raised" &&
+            !development->primaryArmsMayBeOutsideFrame;
+        const auto capturePlayerGeometry = [&]() -> bool
+        {
+            record.viewmodelGeometryFile = std::filesystem::path(record.filename).replace_extension(".obj").string();
+            const auto geometryPath = outputDirectory / record.viewmodelGeometryFile;
+            if (!context.rtScene.CaptureViewmodelMesh(geometryPath.string(), diagnostic))
+            {
+                fail(std::string("Checkpoint '") + checkpoint.name + "' geometry capture failed: " + diagnostic);
+                return false;
+            }
+            record.viewmodelGeometryEvidence.currentUploadCaptured = true;
+            if ((verticalProofRaisedCandidate &&
+                 !ValidateCapturedObjGeometry(geometryPath, record.viewmodelGeometryEvidence, diagnostic)) ||
+                !Sha256File(geometryPath, record.viewmodelGeometrySha256, diagnostic))
+            {
+                fail(std::string("Checkpoint '") + checkpoint.name + "' geometry capture failed: " + diagnostic);
+                return false;
+            }
+
+            record.playerWorldBodyGeometryFile =
+                std::filesystem::path(record.filename).replace_extension(".player-world-body.obj").string();
+            const auto worldBodyGeometryPath = outputDirectory / record.playerWorldBodyGeometryFile;
+            if (!context.rtScene.CapturePlayerWorldBodyMesh(worldBodyGeometryPath.string(), diagnostic))
+            {
+                fail(std::string("Checkpoint '") + checkpoint.name +
+                     "' world-body geometry capture failed: " + diagnostic);
+                return false;
+            }
+            record.worldBodyGeometryEvidence.currentUploadCaptured = true;
+            if ((verticalProofRaisedCandidate &&
+                 !ValidateCapturedObjGeometry(worldBodyGeometryPath,
+                                              record.worldBodyGeometryEvidence, diagnostic)) ||
+                !Sha256File(worldBodyGeometryPath,
+                            record.playerWorldBodyGeometrySha256, diagnostic))
+            {
+                fail(std::string("Checkpoint '") + checkpoint.name +
+                     "' world-body geometry capture failed: " + diagnostic);
+                return false;
+            }
+            return true;
+        };
+        if (viewmodelCapture && verticalProofRaisedCandidate && !capturePlayerGeometry())
+            return 1;
+        const horde::platform::windows::VerticalProofRaisedCaptureEvidence ceilingRetractionEvidence{
+            .checkpointId = development == nullptr ? 0u : development->id,
+            .checkpointName = development == nullptr ? std::string_view{} : development->name,
+            .checkpointAllowsCroppedArms = development != nullptr &&
+                development->primaryArmsMayBeOutsideFrame,
+            .simulation = &simulation,
+            .completedRtDispatch = completedRtDispatch,
+            .completedRtPresentation = completedRtPresentation,
+            .rtStorageImageCopied = rtStorageImageCopied,
+            .dedicatedPlayerOwnership = dedicatedPlayerOwnership,
+            .primaryPlayerVisible = record.playerPrimaryVisible,
+            .primaryPixelCounterAvailable = diagnosticPixelCountersAvailable,
+            .primaryArmPixels = record.primaryPlayerPixels,
+            .viewmodelGeometry = record.viewmodelGeometryEvidence,
+            .worldBodyGeometry = record.worldBodyGeometryEvidence};
+        record.primaryArmsCeilingRetracted =
+            horde::platform::windows::AdmitsVerticalProofRaisedCeilingRetraction(
+                ceilingRetractionEvidence);
         if (viewmodelCapture && !inspectionCapture &&
             !horde::platform::windows::HasExpectedPlayerCaptureVisibility(
                 dedicatedPlayerOwnership, record.playerPrimaryVisible,
                 diagnosticPixelCountersAvailable, record.primaryPlayerPixels,
-                record.primaryArmsMayBeOutsideFrame))
+                record.primaryArmsMayBeOutsideFrame,
+                &ceilingRetractionEvidence))
         {
             return fail("Dedicated viewmodel capture lacks modelled primary arms or contains legacy/full-body primary ownership: dedicated=" +
                         std::to_string(dedicatedPlayerOwnership) + ", visible=" +
@@ -6361,25 +6574,8 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         {
             return fail(std::string("Checkpoint '") + checkpoint.name + "' hash failed: " + diagnostic);
         }
-        if (viewmodelCapture)
-        {
-            record.viewmodelGeometryFile = std::filesystem::path(record.filename).replace_extension(".obj").string();
-            const auto geometryPath = outputDirectory / record.viewmodelGeometryFile;
-            if (!context.rtScene.CaptureViewmodelMesh(geometryPath.string(), diagnostic) ||
-                !Sha256File(geometryPath, record.viewmodelGeometrySha256, diagnostic))
-                return fail(std::string("Checkpoint '") + checkpoint.name + "' geometry capture failed: " + diagnostic);
-
-            record.playerWorldBodyGeometryFile =
-                std::filesystem::path(record.filename).replace_extension(".player-world-body.obj").string();
-            const auto worldBodyGeometryPath =
-                outputDirectory / record.playerWorldBodyGeometryFile;
-            if (!context.rtScene.CapturePlayerWorldBodyMesh(
-                    worldBodyGeometryPath.string(), diagnostic) ||
-                !Sha256File(worldBodyGeometryPath,
-                            record.playerWorldBodyGeometrySha256, diagnostic))
-                return fail(std::string("Checkpoint '") + checkpoint.name +
-                            "' world-body geometry capture failed: " + diagnostic);
-        }
+        if (viewmodelCapture && record.viewmodelGeometryFile.empty() && !capturePlayerGeometry())
+            return 1;
         captures.push_back(std::move(record));
         std::cout << "Captured " << checkpoint.name << " -> " << pngPath << '\n';
     }
@@ -6729,6 +6925,10 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         for (int argument = 1; argument < entryArgumentCount; ++argument)
         {
 #if defined(_DEBUG)
+            if (std::wstring_view(entryArguments[argument]) == L"--development-world-route")
+                context.developmentWorldRoute = true;
+            if (std::wstring_view(entryArguments[argument]) == L"--development-world-route-staged")
+            { context.developmentWorldRoute = true; context.stagedWorldPreparation = true; }
             if (std::wstring_view(entryArguments[argument]) == L"--development-vertical-proof")
                 context.developmentVerticalProof = true;
 #endif
@@ -6737,7 +6937,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         }
         LocalFree(entryArguments);
     }
-    if (context.developmentVerticalProof) context.entryMenuVisible = false;
+    if (context.developmentVerticalProof || context.developmentWorldRoute) context.entryMenuVisible = false;
     if (context.entryMenuVisible)
     {
         context.sceneProfile = horde::vulkan::raytracing::RtSceneProfile::EntryMenu;
@@ -6762,6 +6962,14 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
                                  horde::gameplay::simulation::ProductionGameSimulationConfig());
     if (context.developmentVerticalProof)
         context.simulation.SetDevelopmentSupportFixture(true, 1u);
+    if(context.developmentWorldRoute)
+    {
+        context.simulation.SetDevelopmentWorldRoute(true,context.stagedWorldPreparation);
+        context.cameraX=context.simulation.Snapshot().playerX;
+        context.cameraZ=context.simulation.Snapshot().playerZ;
+        context.cameraYaw=context.simulation.Snapshot().playerYawRadians;
+        context.cameraPitch=context.simulation.Snapshot().playerPitchRadians;
+    }
     // The former opt-in argument remains compatible with recorded capture
     // commands; every normal application now uses this accepted profile.
     (void)anatomicalPlayerMount;
@@ -6773,6 +6981,8 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         context.developmentCheckpoint = *developmentCheckpoint;
         const auto* proof = horde::gameplay::FindDevelopmentCheckpoint(*developmentCheckpoint);
         context.developmentVerticalProof = proof != nullptr && proof->developmentSupportFixture;
+        context.developmentWorldRoute = proof != nullptr && proof->developmentWorldRoute;
+        context.stagedWorldPreparation = proof != nullptr && proof->stagedWorldPreparation;
     }
     if (!graphicsPreviewCapture && !outputResizeValidation && !context.nativeMotionValidation) LoadSettings(context);
     if (captureDirectory != nullptr && captureDustQuality.has_value())
@@ -7891,6 +8101,7 @@ void ShowControlsHelp(HWND window)
 {
     MessageBoxA(window,
                 "WASD  Move and strafe\n"
+                "Shift  Hold to run    Caps Lock  Toggle run\n"
                 "Left mouse drag  360 camera look\n"
                 "Right mouse or Space  Swing sword\n"
                 "Q  Parry skeleton strike\n"
@@ -8818,6 +9029,14 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 ++sceneContext->toggleHeldLightPoseSequence;
                 return 0;
             }
+            if (!sceneContext->simulationPaused && wParam == VK_CAPITAL &&
+                (lParam & (1ll << 30)) == 0)
+            {
+                sceneContext->runToggleKeyDown = true;
+                if (sceneContext->runToggleSequence != UINT64_MAX)
+                    ++sceneContext->runToggleSequence;
+                return 0;
+            }
             if (!sceneContext->simulationPaused && SetDesktopMovementKey(*sceneContext, wParam, true))
             {
                 return 0;
@@ -8826,6 +9045,8 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         break;
     case WM_KEYUP:
     case WM_SYSKEYUP:
+        if (sceneContext && wParam == VK_CAPITAL)
+            sceneContext->runToggleKeyDown = false;
         if (sceneContext && sceneContext->controlsEnabled && SetDesktopMovementKey(*sceneContext, wParam, false))
         {
             return 0;

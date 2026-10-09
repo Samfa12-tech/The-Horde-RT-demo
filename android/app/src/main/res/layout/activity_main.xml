@@ -143,6 +143,18 @@
         android:textSize="12sp" />
 
     <Button
+        android:id="@+id/run_button"
+        android:layout_width="104dp"
+        android:layout_height="72dp"
+        android:layout_gravity="bottom|start"
+        android:layout_marginStart="24dp"
+        android:layout_marginBottom="32dp"
+        android:maxLines="1"
+        android:text="@string/run"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <Button
         android:id="@+id/parry_button"
         android:autoSizeMaxTextSize="17sp"
         android:autoSizeMinTextSize="10sp"

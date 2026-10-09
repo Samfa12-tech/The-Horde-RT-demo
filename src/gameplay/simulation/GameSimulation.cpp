@@ -18,6 +18,8 @@ constexpr float kMaximumPitch = 0.28f;
 constexpr float kDodgeDurationSeconds = 0.20f;
 constexpr float kDodgeDistanceMetres = 0.90f;
 constexpr float kDodgeCooldownSeconds = 0.55f;
+constexpr float kRunSpeedMetresPerSecond = 3.2f;
+constexpr float kMovementAccelerationMetresPerSecondSquared = 8.0f;
 
 float FiniteOr(float value, float fallback)
 {
@@ -153,6 +155,13 @@ std::uint32_t GameSimulation::AdvanceFrame(const InputSnapshot& input,
         pendingInteractCommands_ = 0u;
         lastConsumedToggleHeldLightPoseSequence_ += pendingToggleHeldLightPoseCommands_;
         pendingToggleHeldLightPoseCommands_ = 0u;
+        lastConsumedRunToggleSequence_ = std::max(
+            lastConsumedRunToggleSequence_, latestRunToggleSequence_);
+        lastConsumedClearRunIntentSequence_ = std::max(
+            lastConsumedClearRunIntentSequence_, latestClearRunIntentSequence_);
+        pendingRunToggleCommands_ = 0u;
+        pendingClearRunIntentCommands_ = 0u;
+        ClearRunIntent();
         dodgeRemainingSeconds_ = 0.0f;
         walkVisualAmount_ = 0.0f;
         snapshot_.playerTravelledThisTick = 0.0f;
@@ -246,11 +255,19 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
         pendingInteractCommands_ = 0u;
         lastConsumedToggleHeldLightPoseSequence_ += pendingToggleHeldLightPoseCommands_;
         pendingToggleHeldLightPoseCommands_ = 0u;
+        lastConsumedRunToggleSequence_ = std::max(
+            lastConsumedRunToggleSequence_, latestRunToggleSequence_);
+        lastConsumedClearRunIntentSequence_ = std::max(
+            lastConsumedClearRunIntentSequence_, latestClearRunIntentSequence_);
+        pendingRunToggleCommands_ = 0u;
+        pendingClearRunIntentCommands_ = 0u;
+        ClearRunIntent();
         dodgeRemainingSeconds_ = 0.0f;
     }
     if (!input.paused && playerAlive)
     {
         walkTime_ += fixedDeltaSeconds;
+        walkCycleTime_ += fixedDeltaSeconds;
         UpdateMovement(input, fixedDeltaSeconds);
         AdvanceSwordEquipment(fixedDeltaSeconds);
         const bool torchWasTriggered = torchFailureSnapshot_.triggered;
@@ -314,6 +331,7 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
 
     if (wasAlive && playerVitals_.Snapshot().phase != PlayerLifePhase::Alive)
     {
+        ClearRunIntent();
         ClearQueuedDrawAttack();
         if (heldItems_[1].transition.active)
         {
@@ -379,15 +397,22 @@ void GameSimulation::SynchronizePausedInput(const InputSnapshot& input,
     synchronize(input.commands.toggleHeldLightPose,
                 latestToggleHeldLightPoseSequence_,
                 lastConsumedToggleHeldLightPoseSequence_);
+    synchronize(input.commands.runToggle, latestRunToggleSequence_,
+                lastConsumedRunToggleSequence_);
+    synchronize(input.commands.clearRunIntent, latestClearRunIntentSequence_,
+                lastConsumedClearRunIntentSequence_);
 
     pendingAttackCommands_ = 0u;
     pendingParryCommands_ = 0u;
     pendingDodgeCommands_ = 0u;
     pendingInteractCommands_ = 0u;
     pendingToggleHeldLightPoseCommands_ = 0u;
+    pendingRunToggleCommands_ = 0u;
+    pendingClearRunIntentCommands_ = 0u;
     pendingDodgeForward_ = 0.0f;
     pendingDodgeStrafe_ = 0.0f;
     dodgeRemainingSeconds_ = 0.0f;
+    ClearRunIntent();
     walkVisualAmount_ = 0.0f;
     playerFootsteps_.Reset();
     for (PlayerFootstepCadence& cadence : enemyFootsteps_)
@@ -437,8 +462,72 @@ void GameSimulation::ResetPlayerSupport()
 }
 void GameSimulation::ResolvePlayerSupport()
 {
+    if (config_.developmentWorldRoute)
+    {
+        const auto support=ResolveWorldRouteSupport(playerX_,playerZ_);
+        const auto projection=ProjectWorldRoute(playerX_,playerZ_);
+        const auto zone=projection.valid?ZoneForRouteSegment(projection.segment):WorldZoneId::TombExterior;
+        playerSupport_ = worldRoute_.readiness[static_cast<std::size_t>(zone)] == ZoneReadiness::Ready ? support : worldRoute_.safeSupport;
+        // Reconstruction retains only the last admitted support. Movement is
+        // blocked until the renderer completes the new resource generation.
+        return;
+    }
     playerSupport_ = ResolveDevelopmentPlayerSupport(playerX_, playerZ_,
         config_.developmentSupportFixture, supportGeneration_, supportGeneration_);
+}
+void GameSimulation::ResolveMovementCollision(float previousX, float previousZ)
+{
+    if (!config_.developmentWorldRoute)
+    {
+        ResolveCorridorPlayerCollision(previousX,previousZ,playerX_,playerZ_);
+        return;
+    }
+    auto projection=ProjectWorldRoute(playerX_,playerZ_);
+    if (projection.valid && projection.distance > kWorldRouteHalfWidth-kPlayerCollisionRadius)
+    {
+        const float scale=(kWorldRouteHalfWidth-kPlayerCollisionRadius)/projection.distance;
+        playerX_=projection.x+(playerX_-projection.x)*scale;
+        playerZ_=projection.z+(playerZ_-projection.z)*scale;
+        projection=ProjectWorldRoute(playerX_,playerZ_);
+    }
+    const auto support=ResolveWorldRouteSupport(playerX_,playerZ_);
+    const auto zone=projection.valid?ZoneForRouteSegment(projection.segment):WorldZoneId::TombExterior;
+    const bool valid=projection.valid && support.grounded &&
+        worldRoute_.readiness[static_cast<std::size_t>(zone)]==ZoneReadiness::Ready &&
+        std::abs(support.worldY-playerSupport_.worldY)<=kWorldRouteMaximumStep;
+    worldRoute_.blocked=!valid;
+    if(!valid)
+    {
+        playerX_=worldRoute_.safeX; playerZ_=worldRoute_.safeZ;
+        ++worldRoute_.rollbackCount;
+    }
+    else
+    {
+        worldRoute_.current=zone;
+        worldRoute_.safeX=playerX_; worldRoute_.safeZ=playerZ_; worldRoute_.safeSupport=support;
+    }
+}
+void GameSimulation::SetDevelopmentWorldRoute(bool enabled, bool stagedPreparation)
+{
+    config_.developmentWorldRoute=enabled;
+    stagedWorldPreparation_=stagedPreparation;
+    worldRoute_.Invalidate();
+    if(enabled) { playerX_=worldRoute_.safeX; playerZ_=worldRoute_.safeZ; playerYawRadians_=3.14159265359f; }
+    else { playerX_=config_.playerStartX; playerZ_=config_.playerStartZ; playerYawRadians_=config_.playerStartYawRadians; }
+    ResetPlayerSupport(); ClearEvents(); ResolveHeldItems(); ResolvePlayerAnimation(0);
+    ResolveFireEmitters(0); RefreshSnapshot(lastInput_);
+}
+bool GameSimulation::PublishWorldZoneReadiness(WorldZoneToken token, ZoneReadiness readiness)
+{
+    if(!config_.developmentWorldRoute || !worldRoute_.Publish(token,readiness)) return false;
+    RefreshSnapshot(lastInput_); return true;
+}
+void GameSimulation::InvalidateWorldZoneReadiness()
+{
+    if(!config_.developmentWorldRoute) return;
+    worldRoute_.Invalidate(true); playerX_=worldRoute_.safeX; playerZ_=worldRoute_.safeZ;
+    playerSupport_=worldRoute_.safeSupport; ClearRunIntent(); ClearEvents(); ResolveHeldItems(); ResolvePlayerAnimation(0);
+    ResolveFireEmitters(0); RefreshSnapshot(lastInput_);
 }
 void GameSimulation::SetDevelopmentSupportFixture(bool enabled, std::uint64_t generation)
 {
@@ -462,14 +551,19 @@ void GameSimulation::ResetRoute()
         return;
     }
 
-    playerX_ = FiniteOr(config_.playerStartX, kPlayerSpawn.x);
-    playerZ_ = FiniteOr(config_.playerStartZ, kPlayerSpawn.z);
-    if (!IsShowcasePlayerPositionWalkable(playerX_, playerZ_))
-    {
-        playerX_ = kPlayerSpawn.x;
-        playerZ_ = kPlayerSpawn.z;
+    if(config_.developmentWorldRoute) {
+        playerX_=worldRoute_.safeX;playerZ_=worldRoute_.safeZ;
+        playerYawRadians_=3.14159265359f;
+    } else {
+        playerX_ = FiniteOr(config_.playerStartX, kPlayerSpawn.x);
+        playerZ_ = FiniteOr(config_.playerStartZ, kPlayerSpawn.z);
+        if (!IsShowcasePlayerPositionWalkable(playerX_, playerZ_))
+        {
+            playerX_ = kPlayerSpawn.x;
+            playerZ_ = kPlayerSpawn.z;
+        }
+        playerYawRadians_ = FiniteOr(config_.playerStartYawRadians, 0.0f);
     }
-    playerYawRadians_ = FiniteOr(config_.playerStartYawRadians, 0.0f);
     playerPitchRadians_ = std::clamp(FiniteOr(config_.playerStartPitchRadians, 0.0f),
                                      kMinimumPitch,
                                      kMaximumPitch);
@@ -556,6 +650,7 @@ void GameSimulation::ImportRewardCheckpoint(
     events_.Clear();
     combatPresentation_.Reset();
     const bool wasRaised = playerSupport_.worldY != kRouteFloorWorldY;
+    if(config_.developmentWorldRoute) { worldRoute_.Invalidate(); playerX_=worldRoute_.safeX; playerZ_=worldRoute_.safeZ; }
     ResetPlayerSupport();
     chestRewardSequence_.Import(chestReward);
     interactionState_ = interaction;
@@ -637,6 +732,10 @@ void GameSimulation::IngestCommands(const InputSnapshot& input, const bool inges
     pendingInteractCommands_ = SaturatingAdd(pendingInteractCommands_, SequenceDelta(input.commands.interact, latestInteractSequence_));
     pendingToggleHeldLightPoseCommands_ = SaturatingAdd(pendingToggleHeldLightPoseCommands_, SequenceDelta(
         input.commands.toggleHeldLightPose, latestToggleHeldLightPoseSequence_));
+    pendingRunToggleCommands_ = SaturatingAdd(pendingRunToggleCommands_,
+        SequenceDelta(input.commands.runToggle, latestRunToggleSequence_));
+    pendingClearRunIntentCommands_ = SaturatingAdd(pendingClearRunIntentCommands_,
+        SequenceDelta(input.commands.clearRunIntent, latestClearRunIntentSequence_));
     latestAttackSequence_ = std::max(latestAttackSequence_, input.commands.attack);
     latestParrySequence_ = std::max(latestParrySequence_, input.commands.parry);
     latestDodgeSequence_ = std::max(latestDodgeSequence_, input.commands.dodge);
@@ -645,6 +744,10 @@ void GameSimulation::IngestCommands(const InputSnapshot& input, const bool inges
     latestInteractSequence_ = std::max(latestInteractSequence_, input.commands.interact);
     latestToggleHeldLightPoseSequence_ = std::max(
         latestToggleHeldLightPoseSequence_, input.commands.toggleHeldLightPose);
+    latestRunToggleSequence_ = std::max(latestRunToggleSequence_,
+                                        input.commands.runToggle);
+    latestClearRunIntentSequence_ = std::max(latestClearRunIntentSequence_,
+        input.commands.clearRunIntent);
 }
 
 void GameSimulation::AddCombatTimingTrace(
@@ -1045,6 +1148,7 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
         return false;
     }
 
+    ClearRunIntent();
     const auto encounterCheckpoint = ShowcaseCheckpointForEncounter(
         *checkpoint, config_.waterfallSkeletonEncounter);
     checkpoint = &encounterCheckpoint;
@@ -1058,7 +1162,13 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
     playerZ_ = checkpoint->z;
     playerYawRadians_ = checkpoint->yaw;
     playerPitchRadians_ = checkpoint->pitch;
+    if(config_.developmentWorldRoute)
+    {
+        worldRoute_.Invalidate(); playerX_=worldRoute_.safeX; playerZ_=worldRoute_.safeZ;
+        playerYawRadians_=3.14159265359f;
+    }
     walkTime_ = 0.0f;
+    walkCycleTime_ = 0.0f;
     walkVisualAmount_ = 0.0f;
     torchFailure_ = state.torchFailure;
     torchFailureSnapshot_ = torchFailure_.Snapshot();
@@ -1071,7 +1181,7 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
         enemyDirector_.Update(playerX_, playerZ_, EnemyKind::Skeleton);
     activeEnemyKind_ = enemyDirector_.Snapshot().selectedEnemy;
     lichEncounter_ = state.lichEncounter;
-    if (isRetry && checkpoint->preset == ShowcaseCheckpointPreset::LichActive)
+    if (isRetry && !config_.developmentWorldRoute && checkpoint->preset == ShowcaseCheckpointPreset::LichActive)
     {
         playerX_ = kKeeperRetryPosition.x;
         playerZ_ = kKeeperRetryPosition.z;
@@ -1190,7 +1300,7 @@ void GameSimulation::ResolveHeldItems()
         config_.playerMountProfile,
         &heldItems_[1],
         presentationAspect_,
-        playerSupport_.worldY};
+        playerSupport_.worldY,config_.developmentWorldRoute};
     // Simulation owns the transition/visual blend. Kinematics keeps a stable
     // hand-endpoint matrix for gameplay; PlayerRenderSlot composes its single
     // rendered matrix from that endpoint and the animated Hips mount.
@@ -1383,7 +1493,7 @@ void GameSimulation::ResolvePlayerAnimation(const float fixedDeltaSeconds)
         : 1.0f - std::clamp(torchFailureSnapshot_.leftArmLowerBlend, 0.0f, 1.0f);
     playerAnimationState_.StepFixed(
         {walkVisualAmount_,
-         walkTime_,
+         walkCycleTime_,
          combatPresentation_.PlayerCombatForPresentation(combatSnapshot_.player),
          heldItemFixedStepState_.kinematics,
          leftArmWeight,
@@ -1424,6 +1534,20 @@ void GameSimulation::ResolveFireEmitters(const float fixedDeltaSeconds)
     }
 }
 
+void GameSimulation::ClearRunIntent()
+{
+    runToggleActive_ = false;
+    runActive_ = false;
+    playerMovementSpeed_ = 0.0f;
+    runInputBlockedUntilRelease_ = true;
+    pendingRunToggleCommands_ = 0u;
+    pendingClearRunIntentCommands_ = 0u;
+    lastConsumedRunToggleSequence_ = std::max(
+        lastConsumedRunToggleSequence_, latestRunToggleSequence_);
+    lastConsumedClearRunIntentSequence_ = std::max(
+        lastConsumedClearRunIntentSequence_, latestClearRunIntentSequence_);
+}
+
 void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSeconds)
 {
     playerYawRadians_ = FiniteOr(input.yawRadians, playerYawRadians_);
@@ -1432,6 +1556,21 @@ void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSecon
                                      kMaximumPitch);
     const float previousX = playerX_;
     const float previousZ = playerZ_;
+
+    if (!input.runHeld)
+        runInputBlockedUntilRelease_ = false;
+    if (pendingClearRunIntentCommands_ > 0u)
+    {
+        ClearRunIntent();
+    }
+    else if (pendingRunToggleCommands_ > 0u)
+    {
+        if ((pendingRunToggleCommands_ & 1u) != 0u)
+            runToggleActive_ = !runToggleActive_;
+        lastConsumedRunToggleSequence_ = SaturatingAdd(
+            lastConsumedRunToggleSequence_, pendingRunToggleCommands_);
+        pendingRunToggleCommands_ = 0u;
+    }
 
     dodgeCooldownRemainingSeconds_ = std::max(
         0.0f, dodgeCooldownRemainingSeconds_ - deltaSeconds);
@@ -1445,6 +1584,7 @@ void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSecon
                                  lastConsumedDodgeSequence_);
         pendingDodgeCommands_ = 0u;
         dodgeRemainingSeconds_ = 0.0f;
+        ClearRunIntent();
         snapshot_.playerTravelledThisTick = 0.0f;
         walkVisualAmount_ = 0.0f;
         playerFootsteps_.Reset();
@@ -1478,14 +1618,27 @@ void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSecon
             dodgeDirectionZ_ = forwardZ * forward + rightZ * strafe;
             dodgeRemainingSeconds_ = kDodgeDurationSeconds;
             dodgeCooldownRemainingSeconds_ = kDodgeCooldownSeconds;
+            ClearRunIntent();
         }
     }
+
+    // A combat action takes priority over run intent. A held key must be
+    // released before it can request run again after the action completes.
+    const bool actionInterruptsRun = input.hasAuthoritativePlayerPose ||
+        combatSnapshot_.player.action != PlayerCombatAction::Idle;
+    if (actionInterruptsRun)
+        ClearRunIntent();
+
+    const bool runRequested = !runInputBlockedUntilRelease_ &&
+        (runToggleActive_ || input.runHeld) && !actionInterruptsRun;
+    runActive_ = false;
 
     float movementIntent = 0.0f;
     if (input.hasAuthoritativePlayerPose)
     {
         playerX_ = FiniteOr(input.authoritativePlayerX, playerX_);
         playerZ_ = FiniteOr(input.authoritativePlayerZ, playerZ_);
+        playerMovementSpeed_ = 0.0f;
     }
     else
     {
@@ -1497,6 +1650,7 @@ void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSecon
             playerZ_ += dodgeDirectionZ_ * dodgeSpeed * dodgeStepSeconds;
             dodgeRemainingSeconds_ = std::max(0.0f, dodgeRemainingSeconds_ - dodgeStepSeconds);
             movementIntent = 1.0f;
+            playerMovementSpeed_ = 0.0f;
         }
         else
         {
@@ -1504,7 +1658,7 @@ void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSecon
             float strafe = std::clamp(FiniteOr(input.moveStrafe, 0.0f), -1.0f, 1.0f);
             const float magnitude = std::sqrt(forward * forward + strafe * strafe);
             movementIntent = std::min(1.0f, magnitude);
-            if (magnitude > 1.0f)
+            if (magnitude > 0.0001f)
             {
                 forward /= magnitude;
                 strafe /= magnitude;
@@ -1514,29 +1668,64 @@ void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSecon
             const float forwardZ = -std::cos(playerYawRadians_);
             const float rightX = std::cos(playerYawRadians_);
             const float rightZ = std::sin(playerYawRadians_);
-            playerX_ += (forwardX * forward + rightX * strafe) *
-                        config_.movementSpeedMetresPerSecond * deltaSeconds;
-            playerZ_ += (forwardZ * forward + rightZ * strafe) *
-                        config_.movementSpeedMetresPerSecond * deltaSeconds;
+            const float maximumSpeed = runRequested
+                ? kRunSpeedMetresPerSecond
+                : config_.movementSpeedMetresPerSecond;
+            const float targetSpeed = magnitude > 0.001f
+                ? maximumSpeed * std::min(1.0f, magnitude)
+                : 0.0f;
+            const bool rampMovement = runRequested || config_.developmentWorldRoute ||
+                playerMovementSpeed_ > config_.movementSpeedMetresPerSecond;
+            if (rampMovement)
+            {
+                playerMovementSpeed_ += std::clamp(
+                    targetSpeed - playerMovementSpeed_,
+                    -kMovementAccelerationMetresPerSecondSquared * deltaSeconds,
+                     kMovementAccelerationMetresPerSecondSquared * deltaSeconds);
+            }
+            else
+            {
+                // Keep ordinary, no-run 1.6.2 movement timing exact. Smooth
+                // ramps are limited to the new run transition and opted-in
+                // development route; coming down from run remains smooth.
+                playerMovementSpeed_ = targetSpeed;
+            }
+            movementIntent = maximumSpeed > 0.001f
+                ? std::clamp(playerMovementSpeed_ / maximumSpeed, 0.0f, 1.0f)
+                : std::min(1.0f, magnitude); // Existing stationary pose diagnostics retain walk intent.
+            const float travelledStep = playerMovementSpeed_ * deltaSeconds;
+            playerX_ += (forwardX * forward + rightX * strafe) * travelledStep;
+            playerZ_ += (forwardZ * forward + rightZ * strafe) * travelledStep;
         }
-        ResolveCorridorPlayerCollision(previousX, previousZ, playerX_, playerZ_);
+        ResolveMovementCollision(previousX, previousZ);
         const LichSnapshot& keeper = lichEncounter_.Snapshot();
-        if (!keeper.revealComplete && keeper.phase != LichPhase::Dead)
+        if (!config_.developmentWorldRoute &&
+            !keeper.revealComplete && keeper.phase != LichPhase::Dead)
         {
             ResolveMovementAgainstCircle({keeper.x, keeper.z},
                 kKeeperPresentationCollisionRadius + kPlayerCollisionRadius,
                 previousX, previousZ, playerX_, playerZ_);
-            ResolveCorridorPlayerCollision(previousX, previousZ, playerX_, playerZ_);
+            ResolveMovementCollision(previousX, previousZ);
         }
     }
 
     ResolvePlayerSupport();
     const float travelled = std::hypot(playerX_ - previousX, playerZ_ - previousZ);
+    if (!input.hasAuthoritativePlayerPose && dodgeRemainingSeconds_ <= 0.0f &&
+        (runRequested || config_.developmentWorldRoute ||
+         playerMovementSpeed_ > config_.movementSpeedMetresPerSecond))
+    {
+        const float walkSpeed = std::max(config_.movementSpeedMetresPerSecond, 0.001f);
+        // Phase follows collision-resolved path length. Blocked commanded
+        // speed cannot create a faster leg stride against a wall.
+        walkCycleTime_ += travelled / walkSpeed - deltaSeconds;
+    }
     if (input.hasAuthoritativePlayerPose)
     {
         movementIntent = travelled > 0.00001f ? 1.0f : 0.0f;
     }
     snapshot_.playerTravelledThisTick = travelled;
+    runActive_ = runRequested && travelled > 0.00001f && dodgeRemainingSeconds_ <= 0.0f;
     const float blend = std::clamp(deltaSeconds * 8.0f, 0.0f, 1.0f);
     walkVisualAmount_ += (movementIntent - walkVisualAmount_) * blend;
     if (playerFootsteps_.Update(travelled, movementIntent > 0.02f))
@@ -1963,20 +2152,31 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.lastConsumedInteractSequence = lastConsumedInteractSequence_;
     snapshot_.lastConsumedToggleHeldLightPoseSequence =
         lastConsumedToggleHeldLightPoseSequence_;
+    snapshot_.lastConsumedRunToggleSequence = lastConsumedRunToggleSequence_;
+    snapshot_.lastConsumedClearRunIntentSequence = lastConsumedClearRunIntentSequence_;
+    snapshot_.developmentWorldRoute=config_.developmentWorldRoute;
+    snapshot_.stagedWorldPreparation=stagedWorldPreparation_;
+    snapshot_.worldRoute=worldRoute_;
+    snapshot_.playerSupportSurface=playerSupport_.surface;
     snapshot_.playerSupportWorldY = playerSupport_.worldY;
     snapshot_.playerHeightDelta = PlayerHeightDelta(playerSupport_.worldY);
     snapshot_.playerSupportId = playerSupport_.id;
     snapshot_.playerGrounded = playerSupport_.grounded;
-    snapshot_.playerSupportGeneration = supportGeneration_;
+    snapshot_.playerSupportGeneration = config_.developmentWorldRoute ? worldRoute_.generation : supportGeneration_;
     snapshot_.developmentSupportFixture = config_.developmentSupportFixture;
     snapshot_.playerX = playerX_;
     snapshot_.playerZ = playerZ_;
     snapshot_.playerYawRadians = playerYawRadians_;
     snapshot_.playerPitchRadians = playerPitchRadians_;
+    snapshot_.movementForward = FiniteOr(input.moveForward, 0.0f);
+    snapshot_.movementStrafe = FiniteOr(input.moveStrafe, 0.0f);
+    snapshot_.playerMovementSpeedMetresPerSecond = playerMovementSpeed_;
     snapshot_.walkTime = walkTime_;
     snapshot_.walkAmount = walkVisualAmount_;
     snapshot_.torchLightStrength = std::clamp(FiniteOr(input.torchLightStrength, 1.8f), 0.65f, 2.4f);
     snapshot_.dodgeActive = dodgeRemainingSeconds_ > 0.0f;
+    snapshot_.runActive = runActive_;
+    snapshot_.runToggleActive = runToggleActive_;
     snapshot_.dodgeCooldownRemainingSeconds = dodgeCooldownRemainingSeconds_;
     snapshot_.zone = QueryShowcaseZone(playerX_, playerZ_);
     snapshot_.activeEnemyKind = activeEnemyKind_;

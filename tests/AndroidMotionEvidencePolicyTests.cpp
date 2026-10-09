@@ -35,11 +35,14 @@ bool SameInput(const InputSnapshot& left, const InputSnapshot& right)
         left.authoritativePlayerZ == right.authoritativePlayerZ && left.paused == right.paused &&
         left.damageEnabled == right.damageEnabled &&
         left.hasAuthoritativePlayerPose == right.hasAuthoritativePlayerPose &&
+        left.runHeld == right.runHeld &&
         left.commands.attack == right.commands.attack && left.commands.parry == right.commands.parry &&
         left.commands.dodge == right.commands.dodge &&
         left.commands.routeReset == right.commands.routeReset &&
         left.commands.retry == right.commands.retry && left.commands.interact == right.commands.interact &&
         left.commands.toggleHeldLightPose == right.commands.toggleHeldLightPose &&
+        left.commands.runToggle == right.commands.runToggle &&
+        left.commands.clearRunIntent == right.commands.clearRunIntent &&
         SameHistory(left.combatEdgeHistory, right.combatEdgeHistory);
 }
 }

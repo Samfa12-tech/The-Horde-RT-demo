@@ -1,5 +1,6 @@
 #pragma once
 #include "gameplay/simulation/DevelopmentSupportFixture.h"
+#include "gameplay/simulation/DevelopmentWorldRoute.h"
 
 #include <array>
 #include <cstddef>
@@ -60,7 +61,13 @@ struct SimulationSnapshot
     std::uint64_t lastConsumedRetrySequence = 0;
     std::uint64_t lastConsumedInteractSequence = 0;
     std::uint64_t lastConsumedToggleHeldLightPoseSequence = 0;
+    std::uint64_t lastConsumedRunToggleSequence = 0;
+    std::uint64_t lastConsumedClearRunIntentSequence = 0;
 
+    bool developmentWorldRoute = false;
+    bool stagedWorldPreparation = false;
+    WorldRouteState worldRoute{};
+    SupportSurface playerSupportSurface = SupportSurface::Stone;
     float playerSupportWorldY = horde::gameplay::kRouteFloorWorldY;
     float playerHeightDelta = 0.0f;
     PlayerSupportId playerSupportId = PlayerSupportId::RouteFloor;
@@ -72,11 +79,16 @@ struct SimulationSnapshot
     float playerYawRadians = 0.0f;
     float playerPitchRadians = -0.05f;
     float playerTravelledThisTick = 0.0f;
+    float movementForward = 0.0f;
+    float movementStrafe = 0.0f;
+    float playerMovementSpeedMetresPerSecond = 0.0f;
     float walkTime = 0.0f;
     float walkAmount = 0.0f;
     float torchLightStrength = 1.8f;
     float dodgeCooldownRemainingSeconds = 0.0f;
     bool dodgeActive = false;
+    bool runActive = false;
+    bool runToggleActive = false;
 
     ShowcaseZone zone = ShowcaseZone::Opening;
     EnemyKind activeEnemyKind = EnemyKind::Skeleton;

@@ -147,6 +147,7 @@ InputSnapshot MotionEvidenceScenario::BuildInput(const SimulationSnapshot& state
     InputSnapshot input = published;
     input.moveForward = input.moveStrafe = 0.0f;
     input.hasAuthoritativePlayerPose = false;
+    input.runHeld = false;
     input.authoritativePlayerX = input.authoritativePlayerZ = 0.0f;
     input.damageEnabled = KeeperScenario(scenario_);
     input.torchLightStrength = 1.8f;
@@ -161,6 +162,16 @@ InputSnapshot MotionEvidenceScenario::BuildInput(const SimulationSnapshot& state
     merge(commands_.retry, published.commands.retry, state.lastConsumedRetrySequence);
     merge(commands_.interact, published.commands.interact, state.lastConsumedInteractSequence);
     merge(commands_.toggleHeldLightPose, published.commands.toggleHeldLightPose, state.lastConsumedToggleHeldLightPoseSequence);
+    merge(commands_.runToggle, published.commands.runToggle, state.lastConsumedRunToggleSequence);
+    merge(commands_.clearRunIntent, published.commands.clearRunIntent,
+          state.lastConsumedClearRunIntentSequence);
+    if (!runClearSent_)
+    {
+        const std::uint64_t runClearBase = std::max(
+            commands_.clearRunIntent, state.lastConsumedClearRunIntentSequence);
+        commands_.clearRunIntent = runClearBase == UINT64_MAX ? runClearBase : runClearBase + 1u;
+        runClearSent_ = true;
+    }
     if (now < latestWall_ || now < startWall_) Fail("Monotonic motion clock regressed.");
     else if (startWall_ != 0u && now - startWall_ > kMaximumWallNanoseconds) Fail("Motion evidence wall deadline exceeded.");
     latestWall_ = std::max(latestWall_, now);

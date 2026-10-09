@@ -277,7 +277,9 @@ public class MainActivity extends Activity {
     private Button attackButton;
     private Button parryButton;
     private Button dodgeButton;
+    private Button runButton;
     private PressActionButton swingTouch, dodgeTouch;
+    private boolean runToggleEnabled;
     private Button interactButton;
     private Button toggleHeldLightPoseButton;
     private boolean parryRequestedOnTouchDown;
@@ -515,6 +517,8 @@ public class MainActivity extends Activity {
         attackButton = findViewById(R.id.attack_button);
         parryButton = findViewById(R.id.parry_button);
         dodgeButton = findViewById(R.id.dodge_button);
+        runButton = findViewById(R.id.run_button);
+        runButton.setVisibility(View.GONE);
         interactButton = findViewById(R.id.interact_button);
         toggleHeldLightPoseButton = findViewById(R.id.toggle_held_light_pose_button);
         vitalityStatus = findViewById(R.id.vitality_status);
@@ -528,6 +532,7 @@ public class MainActivity extends Activity {
         styleActionButton(attackButton, 0xDD5B210D, 0xFFFFE0A3);
         styleActionButton(parryButton, 0xDD263B42, 0xFFE5F7FF);
         styleActionButton(interactButton, 0xDD5C4216, 0xFFFFE5A8);
+        styleActionButton(runButton, 0xDD5C4216, 0xFFFFE5A8);
         styleActionButton(toggleHeldLightPoseButton, 0xDD173E34, 0xFFE2FFF0);
         applyInterfacePresentation();
         findViewById(R.id.root).setOnApplyWindowInsetsListener((view,insets) -> {
@@ -787,6 +792,7 @@ public class MainActivity extends Activity {
                 return true;
             }
             if (action == MotionEvent.ACTION_CANCEL) {
+                clearRunIntent();
                 if (swingTouch != null) swingTouch.cancel();
                 if (dodgeTouch != null) dodgeTouch.cancel();
                 TouchControlState.cancelGesture(activePointers, viewControls);
@@ -840,6 +846,7 @@ public class MainActivity extends Activity {
         attackButton.setVisibility(View.GONE);
         parryButton.setVisibility(View.GONE);
         if (dodgeButton != null) dodgeButton.setVisibility(View.GONE);
+        if (runButton != null) runButton.setVisibility(View.GONE);
         menuButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
@@ -921,6 +928,7 @@ public class MainActivity extends Activity {
         attackButton.setVisibility(View.GONE);
         parryButton.setVisibility(View.GONE);
         if (dodgeButton != null) dodgeButton.setVisibility(View.GONE);
+        if (runButton != null) runButton.setVisibility(View.GONE);
         menuButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
@@ -1294,6 +1302,7 @@ public class MainActivity extends Activity {
         attackButton.setVisibility(View.GONE);
         parryButton.setVisibility(View.GONE);
         if (dodgeButton != null) dodgeButton.setVisibility(View.GONE);
+        if (runButton != null) runButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.VISIBLE);
         vitalityStatus.setVisibility(View.GONE);
         rtStatus.setText(R.string.benchmark_starting);
@@ -1443,6 +1452,7 @@ public class MainActivity extends Activity {
         attackButton.setVisibility(View.GONE);
         parryButton.setVisibility(View.GONE);
         if (dodgeButton != null) dodgeButton.setVisibility(View.GONE);
+        if (runButton != null) runButton.setVisibility(View.GONE);
         menuButton.setVisibility(View.GONE);
         developerOverlay.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
@@ -3836,10 +3846,18 @@ public class MainActivity extends Activity {
     }
 
     private void setGameplayPaused(boolean paused) {
+        if (paused) clearRunIntent();
         if (paused) suspendAndResetWaterfall(); // Same generation retains the Core cursor.
         if (musicPlayback != null) musicPlayback.setSuspended(paused || !resumed ||
                 !surfaceStarted || ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) != 1);
         ProbeBridge.setSimulationPaused(paused); // Existing JNI mailbox authority unchanged.
+    }
+
+    private void clearRunIntent() {
+        runToggleEnabled = false;
+        if (runButton != null) runButton.setText(R.string.run);
+        try { ProbeBridge.clearRunIntent(); }
+        catch (RuntimeException | LinkageError ignored) { /* Lifecycle cleanup is best effort. */ }
     }
 
     private void showDiagnostics(final boolean errorState) {
@@ -3854,6 +3872,7 @@ public class MainActivity extends Activity {
         attackButton.setVisibility(View.GONE);
         parryButton.setVisibility(View.GONE);
         if (dodgeButton != null) dodgeButton.setVisibility(View.GONE);
+        if (runButton != null) runButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
         developerOverlay.setVisibility(View.GONE);
@@ -3875,6 +3894,7 @@ public class MainActivity extends Activity {
     }
 
     private void resetRoute() {
+        clearRunIntent();
         ++delayedGameplayFeedbackGeneration;
         clearVerticalProofFeedbackSelection();
         suspendAndResetWaterfall();
@@ -3891,6 +3911,7 @@ public class MainActivity extends Activity {
     }
 
     private void updateVitalityHud(final int vitality, final int maximum) {
+        if (vitality <= 0) clearRunIntent();
         final int safeMaximum = Math.max(0, maximum);
         final int safeVitality = Math.max(0, Math.min(safeMaximum, vitality));
         lastPlayerVitality = safeVitality;
@@ -3914,6 +3935,7 @@ public class MainActivity extends Activity {
         attackButton.setVisibility(View.GONE);
         parryButton.setVisibility(View.GONE);
         if (dodgeButton != null) dodgeButton.setVisibility(View.GONE);
+        if (runButton != null) runButton.setVisibility(View.GONE);
         menuButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
@@ -3940,6 +3962,7 @@ public class MainActivity extends Activity {
         attackButton.setVisibility(View.GONE);
         parryButton.setVisibility(View.GONE);
         if (dodgeButton != null) dodgeButton.setVisibility(View.GONE);
+        if (runButton != null) runButton.setVisibility(View.GONE);
         menuButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
@@ -3986,6 +4009,7 @@ public class MainActivity extends Activity {
         attackButton.setVisibility(View.GONE);
         parryButton.setVisibility(View.GONE);
         if (dodgeButton != null) dodgeButton.setVisibility(View.GONE);
+        if (runButton != null) runButton.setVisibility(View.GONE);
         menuButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
@@ -4460,11 +4484,17 @@ public class MainActivity extends Activity {
                     final boolean showHud = preferences.getBoolean("show_hud", true);
                     if (!menuVisible && !benchmarkRunning && !debugCaptureUiSuppressed)
                         rtStatus.setVisibility(showHud && InterfacePreferences.read(preferences).routineStatus ? View.VISIBLE : View.GONE);
-                    if (!debugCaptureUiSuppressed && !menuVisible && !benchmarkRunning && showHud &&
-                            lifePhase == PLAYER_ALIVE && !controllerMode) {
+                    final boolean showGameplayActions = !debugCaptureUiSuppressed &&
+                            !menuVisible && !diagnosticsVisible && !benchmarkRunning &&
+                            !endingOverlayVisible && showHud && lifePhase == PLAYER_ALIVE &&
+                            !controllerMode;
+                    if (showGameplayActions) {
                         attackButton.setVisibility(View.VISIBLE);
                         parryButton.setVisibility(View.VISIBLE);
                         dodgeButton.setVisibility(View.VISIBLE);
+                        if (runButton != null) runButton.setVisibility(View.VISIBLE);
+                    } else if (runButton != null) {
+                        runButton.setVisibility(View.GONE);
                     }
                     updateContextualControls(!debugCaptureUiSuppressed && !menuVisible &&
                             !diagnosticsVisible && !benchmarkRunning && !endingOverlayVisible &&
@@ -4478,6 +4508,7 @@ public class MainActivity extends Activity {
                         attackButton.setVisibility(View.GONE);
                         parryButton.setVisibility(View.GONE);
                         if (dodgeButton != null) dodgeButton.setVisibility(View.GONE);
+                        if (runButton != null) runButton.setVisibility(View.GONE);
                     }
                     if (lifePhase == PLAYER_DEAD && !debugMotionActive) showDeathOverlay();
                     if (finaleEndingPhase == FINALE_ENDING_COMPLETE && !benchmarkRunning && !debugMotionActive &&
@@ -4527,6 +4558,7 @@ public class MainActivity extends Activity {
                 } else if (state == 2) {
                     layoutRtStatus(false);
                     updateContextualControls(false);
+                    if (runButton != null) runButton.setVisibility(View.GONE);
                     rtStatus.setText(R.string.rt_unsupported);
                     rtStatus.setContentDescription(getString(R.string.rt_unsupported));
                     rtStatus.setTextColor(0xFFFF8A7A);
@@ -4537,6 +4569,7 @@ public class MainActivity extends Activity {
                 } else if (state == 3) {
                     layoutRtStatus(false);
                     updateContextualControls(false);
+                    if (runButton != null) runButton.setVisibility(View.GONE);
                     rtStatus.setText(R.string.rt_error);
                     rtStatus.setContentDescription(getString(R.string.rt_error));
                     rtStatus.setTextColor(0xFFFF8A7A);
@@ -4546,6 +4579,7 @@ public class MainActivity extends Activity {
                     }
                 } else {
                     updateContextualControls(false);
+                    if (runButton != null) runButton.setVisibility(View.GONE);
                     rtStatus.setText(R.string.rt_starting);
                 }
 
@@ -4567,6 +4601,7 @@ public class MainActivity extends Activity {
                         attackButton.setVisibility(View.GONE);
                         parryButton.setVisibility(View.GONE);
                         if (dodgeButton != null) dodgeButton.setVisibility(View.GONE);
+                        if (runButton != null) runButton.setVisibility(View.GONE);
                         updateContextualControls(false);
                         vitalityStatus.setVisibility(View.GONE);
                     } else if (benchmarkStatus == 2 || benchmarkStatus == 3) {
@@ -4850,6 +4885,8 @@ public class MainActivity extends Activity {
             case "dust-ellipsoid": return 158;
             case "dust-box-wall": return 159;
             case "player-torch-parry-clearance": return 160;
+            case "world-route": return 190;
+            case "world-route-staged": return 191;
             case "vertical-proof-ground": return 170;
             case "vertical-proof-raised": return 171;
             case "layout-c-wall-panel-upward": return 152;
@@ -5094,6 +5131,7 @@ public class MainActivity extends Activity {
         attackButton.setVisibility(View.GONE);
         parryButton.setVisibility(View.GONE);
         if (dodgeButton != null) dodgeButton.setVisibility(View.GONE);
+        if (runButton != null) runButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
         developerOverlay.setVisibility(View.GONE);
@@ -5539,11 +5577,24 @@ public class MainActivity extends Activity {
 
     private void pushViewControls() {
         ProbeBridge.setViewControls(viewControls[0], viewControls[1], viewControls[2], viewControls[7], viewControls[8]);
+        ProbeBridge.setRunHeld(controllerMode && controllerInput.runHeld());
     }
 
     private void configureGameplayActionButtons() {
-        swingTouch = new PressActionButton(attackButton, this::canSendGameplayAction, ProbeBridge::requestAttack);
-        dodgeTouch = new PressActionButton(dodgeButton, this::canSendGameplayAction, ProbeBridge::requestDodge);
+        swingTouch = new PressActionButton(attackButton, this::canSendGameplayAction, () -> {
+            clearRunIntent();
+            ProbeBridge.requestAttack();
+        });
+        dodgeTouch = new PressActionButton(dodgeButton, this::canSendGameplayAction, () -> {
+            clearRunIntent();
+            ProbeBridge.requestDodge();
+        });
+        runButton.setOnClickListener(view -> {
+            if (!canSendGameplayAction()) return;
+            runToggleEnabled = !runToggleEnabled;
+            runButton.setText(runToggleEnabled ? R.string.running : R.string.run);
+            ProbeBridge.requestToggleRun();
+        });
         interactButton.setOnClickListener(view -> {
             if (menuVisible || diagnosticsVisible || deathOverlayVisible ||
                     endingOverlayVisible || ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) != 1) return;
@@ -5560,6 +5611,7 @@ public class MainActivity extends Activity {
                 return;
             }
             if (!canSendGameplayAction()) return;
+            clearRunIntent();
             ProbeBridge.requestParry();
         });
         parryButton.setOnTouchListener((view, event) -> {
@@ -5570,6 +5622,7 @@ public class MainActivity extends Activity {
                     parryRequestedOnTouchDown = true;
                     view.setPressed(true);
                     if (canSendGameplayAction()) {
+                        clearRunIntent();
                         ProbeBridge.requestParry();
                     }
                     return true;
@@ -5629,6 +5682,7 @@ public class MainActivity extends Activity {
         controllerWindowFocused=focused;
         currentControllerDialog();
         if (!focused) {
+            clearRunIntent();
             stopMenuAmbience();
             suspendControllerInput(false);
             if(surfaceView!=null && interactButton!=null && toggleHeldLightPoseButton!=null)clearTouchGesture();
@@ -5736,6 +5790,8 @@ public class MainActivity extends Activity {
         else if(canSendGameplayAction()) {
             viewControls[7]=controllerInput.moveStrafe(); viewControls[8]=controllerInput.moveForward();
             pushViewControls(); // A directional Dodge sees the same coherent axes publication.
+            if((result.actions & (AndroidControllerInput.SWING | AndroidControllerInput.PARRY |
+                    AndroidControllerInput.DODGE))!=0)clearRunIntent();
             if((result.actions & AndroidControllerInput.SWING)!=0)ProbeBridge.requestAttack();
             if((result.actions & AndroidControllerInput.PARRY)!=0)ProbeBridge.requestParry();
             if((result.actions & AndroidControllerInput.DODGE)!=0)ProbeBridge.requestDodge();
@@ -5794,6 +5850,7 @@ public class MainActivity extends Activity {
         final boolean playing=canSendGameplayAction() && !debugCaptureUiSuppressed;
         final int actions=hud && playing && !controllerMode?View.VISIBLE:View.GONE;
         for(Button button:new Button[]{attackButton,parryButton,dodgeButton})if(button!=null)button.setVisibility(actions);
+        if(runButton!=null)runButton.setVisibility(actions);
         if(menuButton!=null)menuButton.setVisibility(hud && playing && !controllerMode?View.VISIBLE:View.GONE);
         if(vitalityStatus!=null)vitalityStatus.setVisibility(hud && playing && lastPlayerLifePhase==PLAYER_ALIVE?View.VISIBLE:View.GONE);
         if(interactButton!=null && toggleHeldLightPoseButton!=null)updateContextualControls(hud && playing);
@@ -5821,6 +5878,7 @@ public class MainActivity extends Activity {
     private void clearTouchGesture() {
         if (swingTouch != null) swingTouch.cancel();
         if (dodgeTouch != null) dodgeTouch.cancel();
+        clearRunIntent();
         TouchControlState.clear(activePointers, viewControls);
         parryTouchActive = false;
         parryRequestedOnTouchDown = false;
@@ -6158,6 +6216,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onPause() {
+        clearRunIntent();
         clearTouchState();
         handler.removeCallbacks(refreshEntryMenu);
         if (entryMenuEnabled) {

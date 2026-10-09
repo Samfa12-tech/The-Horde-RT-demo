@@ -64,6 +64,7 @@ struct HeldItemKinematicsInput
     // Absolute support surface under the player. The default preserves the
     // established route-floor camera and held-item world positions.
     float playerSupportWorldY = kRouteFloorWorldY;
+    bool developmentWorldRoute = false;
 };
 
 struct HeldSwordPose
@@ -132,6 +133,7 @@ struct HeldItemFixedStepInput
     // Absolute support surface under the player; appended to preserve existing
     // positional aggregate initializers.
     float playerSupportWorldY = kRouteFloorWorldY;
+    bool developmentWorldRoute = false;
 };
 
 inline constexpr float kHeldItemSpreadStartAspect = 1.0f;
@@ -216,7 +218,7 @@ float ComputePlayerTorchOverheadLowering(
 float ComputeRewardLanternForwardClearance(float cameraX,
                                            float cameraZ,
                                            float forwardX,
-                                           float forwardZ);
+                                           float forwardZ, bool developmentWorldRoute = false);
 
 HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput& input);
 
