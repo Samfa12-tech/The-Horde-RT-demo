@@ -1,6 +1,8 @@
 # Horde Lantern RT - Current and Future Work
 
-Current status, 2026-10-03:1.6.1 is published and normally merged to main. The
+Current status, 2026-10-09: 1.6.2/code10 is published on itch and as a [non-draft GitHub prerelease](https://github.com/Samfa12-tech/The-Horde-RT-demo/releases/tag/v1.6.2), and the runtime is normally merged to main. [Signed validation and canonical GitHub plan](docs/SHOWCASE_ALPHA_1_6_2_RELEASE_VALIDATION_2026-10-09.md), [publication receipt](docs/evidence/2026-10-09-release-publication/README.md) and [GitHub closeout](docs/evidence/2026-10-09-github-release/README.md) identify the current release. The full graphics menu and accepted tomb polish are shipped within the recorded limits. Fresh/reset mobile defaults stay 50%, Dust Low; 33%/40% are experimental. Forgiving combat, walking-arm wiggle, shafts, seamless music handover and long sustained phone testing remain deferred. Issue #19 is owner-closed as completed; no independent reproduction is claimed here. Future 1.7 work has separate scope and authority.
+
+Historical status, 2026-10-03: 1.6.1 was published and normally merged to main. The
 [completion report](docs/ENGINEERING_1_6_1_COMPLETION_REPORT.md) records accepted
 scope and explicit deferrals. The September13 sequence below and September11
 compatibility design are historical planning context, not remaining1.6.1 gates
@@ -21,7 +23,9 @@ Keeper-lighting and performance work.
 4. Run targeted checks during implementation. Only after the full feature set is complete, run the comprehensive Windows/Android/device/release candidate matrix and fix regressions.
 5. Request the owner's release decision; no automatic publishing. Later campaign milestones remain outside this engineering pass.
 
-## 1.6.2 graphics options — owner decision, October3
+## Historical 1.6.2 graphics options plan - owner decision, October3
+
+The accepted 1.6.2 Graphics menu is now shipped; the original plan below retains its 1.6.1 baseline and does not queue another implementation pass.
 
 Owner accepts the measured1.6.1 performance as-is and plans a full graphics-options
 menu for1.6.2. Keep existing controls/default75% and authored Mobile/High profiles

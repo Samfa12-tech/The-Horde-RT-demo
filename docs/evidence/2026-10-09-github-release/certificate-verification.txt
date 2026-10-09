@@ -1,0 +1,17 @@
+Verifies
+Verified using v1 scheme (JAR signing): false
+Verified using v2 scheme (APK Signature Scheme v2): true
+Verified using v3 scheme (APK Signature Scheme v3): true
+Verified using v3.1 scheme (APK Signature Scheme v3.1): false
+Verified using v4 scheme (APK Signature Scheme v4): false
+Verified for SourceStamp: false
+Number of signers: 1
+Signer #1 certificate DN: CN=Samfa12, OU=Games, O=Samfa12, C=AU
+Signer #1 certificate SHA-256 digest: 8245277a11bca5576f116724507f799d6f4c178ce5fbb7e3981415c9e6b3c245
+Signer #1 certificate SHA-1 digest: f6278ba9d75e22d69283ceedfa3629dcc0058cfb
+Signer #1 certificate MD5 digest: e866725568e1523f94335e36d829ae7e
+Signer #1 key algorithm: RSA
+Signer #1 key size (bits): 4096
+Signer #1 public key SHA-256 digest: d1801fc3dede3772bd92cdae4345e3ef31ac0659fead4a0ff7d375ec39363cdd
+Signer #1 public key SHA-1 digest: dd469478da697253568d9550db63fde62f798274
+Signer #1 public key MD5 digest: 1fbfc1c92fce26cd444f7c37d5d0479e

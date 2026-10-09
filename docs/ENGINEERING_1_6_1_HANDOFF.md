@@ -1,5 +1,7 @@
 # 1.6.1 release closeout handoff
 
+**Historical 1.6.1 handoff:** the current release is 1.6.2; use [its handoff](ENGINEERING_1_6_2_HANDOFF.md) and [signed validation](SHOWCASE_ALPHA_1_6_2_RELEASE_VALIDATION_2026-10-09.md). The facts and actions below retain their October 3 scope.
+
 Updated 2026-10-03. Released1.6.1 is integrated on `main`; the engineering branch
 is retained as reviewed history. Release/main integration and scoped cleanup
 are complete within the explicit owner deferrals. See [programme scope](ENGINEERING_1_6_1_PLAN.md)
