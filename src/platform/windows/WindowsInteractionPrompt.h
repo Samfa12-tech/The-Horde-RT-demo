@@ -30,11 +30,11 @@ constexpr std::string_view WindowsChestPromptText(
     case ChestRewardPrompt::Locked:
         return "LOCKED | DEFEAT THE LICH";
     case ChestRewardPrompt::OpenChest:
-        return "PRESS E / A TO OPEN CHEST";
+        return "LEFT-CLICK / A TO OPEN CHEST";
     case ChestRewardPrompt::Opening:
         return "OPENING...";
     case ChestRewardPrompt::ClaimLantern:
-        return "PRESS E / A TO TAKE LANTERN";
+        return "LEFT-CLICK / A TO TAKE LANTERN";
     case ChestRewardPrompt::Unlocking:
         return "THE LICH'S SEAL IS BREAKING...";
     default:

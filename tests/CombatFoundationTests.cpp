@@ -417,10 +417,10 @@ void RouteMeleeOcclusion() {
               clearBefore.swordCombat.combatants[1].health-1,
           "actual forgiving combat consumer still accepts a clear-side route hit");
 
-    // This is a seeded regression through the real forgiving SwordCombat
-    // consumer at route coordinates. Production route reachability for these
-    // poses is not established by this fixture. The geometry oracle proves
-    // that the segment crosses masonry; it does not supply combat hit authority.
+    // These are seeded legal-pose regressions through the same forgiving
+    // SwordCombat consumer. Production route reachability for these exact
+    // combinations is not established by this fixture. The route query only
+    // decides whether authored masonry blocks contact.
     constexpr float playerZ=-6.80f, yawNorth=3.14159265359f;
     const auto probe=[&](const char* caseName,const float playerX,
                         const float targetX,const float targetZ) {
@@ -435,42 +435,106 @@ void RouteMeleeOcclusion() {
             {{-1.0f,-4.65f},0.0f,0.0f},
         }};
         SwordCombat combat;
-        combat.Reset(kSkeletonEnemyCapacity,{0.0f,-4.65f},&spawns,2);
+        combat.Reset(1u,{0.0f,-4.65f},&spawns,2);
         combat.RequestAttack();
-        bool hit=false, actualTargetLineObstructed=false;
-        bool actualPlayerPoseLegal=false, actualTargetPoseLegal=false;
-        int contactTick=0;
-        float actualTargetX=targetX, actualTargetZ=targetZ;
+        bool hitThroughMasonry=false;
         for(int tick=1;tick<=40;++tick) {
+            // Keep the seeded target stationary to isolate the route fixture;
+            // player melee admission still runs on every active-window tick.
             const auto& state=combat.Update(1.0f/60.0f,playerX,playerZ,yawNorth,
-                                            true,true,false);
-            if(state.combatants[0].health==1) {
-                hit=true; contactTick=tick;
-                actualTargetX=state.combatants[0].x;
-                actualTargetZ=state.combatants[0].z;
-                actualPlayerPoseLegal=IsShowcasePlayerPositionWalkable(playerX,playerZ);
-                actualTargetPoseLegal=IsSkeletonEnemyPositionWalkable(actualTargetX,actualTargetZ);
-                actualTargetLineObstructed=IsRouteAudioObstructed(
-                    playerX,playerZ,actualTargetX,actualTargetZ);
-                break;
-            }
+                                            true,false,false);
+            hitThroughMasonry=hitThroughMasonry || state.combatants[0].health<2;
         }
-        if(hit && actualTargetLineObstructed) {
-            std::cerr<<"KNOWN DEFECT: forgiving sword consumer accepted "<<caseName
-                     <<" contact at attackTick="<<contactTick<<" player=("<<playerX<<','
-                     <<playerZ<<") actualTarget=("<<actualTargetX<<','<<actualTargetZ
-                     <<") distance="<<std::hypot(actualTargetX-playerX,
-                                                   actualTargetZ-playerZ)<<'\n';
-        }
-        Check(obstructed && hit && actualTargetLineObstructed &&
-              actualPlayerPoseLegal && actualTargetPoseLegal,
-              "diagnostic records an accepted hit through route masonry at legal actual poses");
+        Check(!hitThroughMasonry,
+              caseName);
     };
-    probe("straight-wall",.96f,.96f,-5.95f);
-    probe("oblique-wall",.96f,1.55f,-6.06f);
+    probe("straight wall blocks forgiving sword contact",.96f,.96f,-5.95f);
+    probe("oblique wall blocks forgiving sword contact",.96f,1.55f,-6.06f);
     // At the south face z=-6.50, this segment crosses x=0.955405:
     // 55 mm inside the west/south corner of the authored return (x=0.90).
-    probe("corner-edge",.55f,1.55f,-6.06f);
+    probe("corner edge blocks forgiving sword contact",.55f,1.55f,-6.06f);
+
+    // The same full-height masonry rejection applies to incoming melee/parry;
+    // a close enemy may wind up across the return but cannot damage through it.
+    const std::array<SkeletonSpawnPose,kSkeletonEnemyCapacity> incomingSpawns{{
+        {{.96f,-5.95f},yawNorth,0.0f}, {{-1.0f,-4.65f},0.0f,0.0f},
+    }};
+    SwordCombat incoming;
+    incoming.Reset(1u,{0.0f,-4.65f},&incomingSpawns,2);
+    bool sawIncomingActive=false, incomingWallHit=false, incomingWallParry=false;
+    for(int tick=0;tick<120;++tick) {
+        if(incoming.Snapshot().combatants[0].action==EnemyCombatAction::AttackWindup)
+            incoming.RequestParry();
+        const auto& state=incoming.Update(1.0f/60.0f,.96f,playerZ,yawNorth,true,true,false);
+        sawIncomingActive=sawIncomingActive || state.combatants[0].action==EnemyCombatAction::AttackActive;
+        incomingWallHit=incomingWallHit || state.combatants[0].playerHitPulse;
+        incomingWallParry=incomingWallParry || state.combatants[0].parrySuccessPulse;
+    }
+    Check(sawIncomingActive && !incomingWallHit && !incomingWallParry,
+          "incoming melee cannot damage or parry through full-height masonry");
+
+    // Moving combatants are rechecked at their current published pose. The
+    // seed is intentionally allowed to pursue; any accepted hit must occur
+    // only after the target has moved into a clear route segment.
+    const float movingPlayerX=.96f, movingPlayerZ=-7.40f;
+    const float movingTargetX=1.55f, movingTargetZ=-6.06f;
+    const std::array<SkeletonSpawnPose,kSkeletonEnemyCapacity> movingSpawns{{
+        {{movingTargetX,movingTargetZ},yawNorth,0.0f},
+        {{-1.0f,-4.65f},0.0f,0.0f},
+    }};
+    SwordCombat moving;
+    moving.Reset(1u,{0.0f,-4.65f},&movingSpawns,2);
+    moving.RequestAttack();
+    Check(IsShowcasePlayerPositionWalkable(movingPlayerX,movingPlayerZ) &&
+          IsRouteAudioObstructed(movingPlayerX,movingPlayerZ,movingTargetX,movingTargetZ),
+          "moving occlusion fixture starts legal with a masonry-blocked line");
+    const float initialTargetX=moving.Snapshot().combatants[0].x;
+    const float initialTargetZ=moving.Snapshot().combatants[0].z;
+    bool movingContactWasClear=true;
+    bool activeWhileBlocked=false;
+    int previousHealth=moving.Snapshot().combatants[0].health;
+    for(int tick=1;tick<=60;++tick) {
+        const auto previousTarget=moving.Snapshot().combatants[0];
+        const auto& state=moving.Update(1.0f/60.0f,movingPlayerX,movingPlayerZ,yawNorth,
+                                        true,true,false);
+        const auto& target=state.combatants[0];
+        Check(IsSkeletonEnemyPositionWalkable(target.x,target.z),
+              "moving occlusion target remains on the supported skeleton route");
+        if(IsRouteAudioObstructed(movingPlayerX,movingPlayerZ,previousTarget.x,previousTarget.z) &&
+           (state.player.action==PlayerCombatAction::SwingActive ||
+            state.player.action==PlayerCombatAction::UpwardSliceActive))
+            activeWhileBlocked=true;
+        if(target.health<previousHealth)
+            movingContactWasClear=movingContactWasClear &&
+                !IsRouteAudioObstructed(movingPlayerX,movingPlayerZ,
+                                        previousTarget.x,previousTarget.z);
+        previousHealth=target.health;
+    }
+    Check(std::hypot(moving.Snapshot().combatants[0].x-initialTargetX,
+                     moving.Snapshot().combatants[0].z-initialTargetZ)>0.01f,
+          "moving occlusion target advances under ordinary skeleton navigation");
+    Check(activeWhileBlocked && previousHealth==2 && movingContactWasClear,
+          "active swing rejects a moving target while route masonry blocks contact");
+    const std::array<SkeletonSpawnPose,kSkeletonEnemyCapacity> clearMovingSpawns{{
+        {{.40f,-5.60f},yawNorth,0.0f}, {{-1.0f,-4.65f},0.0f,0.0f},
+    }};
+    SwordCombat clearMoving;
+    clearMoving.Reset(1u,{0.0f,-4.65f},&clearMovingSpawns,2);
+    clearMoving.RequestAttack();
+    bool clearMovingHit=false;
+    for(int tick=1;tick<=40;++tick) {
+        const auto before=clearMoving.Snapshot().combatants[0];
+        const auto& state=clearMoving.Update(1.0f/60.0f,.40f,-7.10f,yawNorth,true,true,false);
+        if(state.combatants[0].health<before.health) {
+            clearMovingHit=true;
+            Check(!IsRouteAudioObstructed(.40f,-7.10f,before.x,before.z),
+                  "moving clear-side contact checks the actual pre-navigation pose");
+        }
+    }
+    Check(clearMovingHit && clearMoving.Snapshot().combatants[0].health==1 &&
+          std::hypot(clearMoving.Snapshot().combatants[0].x-.40f,
+                     clearMoving.Snapshot().combatants[0].z+5.60f)>.01f,
+          "clear moving target advances and receives exactly one forgiving hit");
 }
 int main() {
     WindowAndLifecycle(); TeachingContract(); KeeperContract(); ActualIncomingHits(); DeliveryRates(); CoherentSlowdown();

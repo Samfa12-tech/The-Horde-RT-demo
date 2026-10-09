@@ -1,6 +1,8 @@
 #include "platform/windows/DesktopControllerInput.h"
 #include "platform/windows/WindowsCaptureContracts.h"
 #include "platform/windows/WindowsInteractionPrompt.h"
+#include "platform/windows/WindowsGameplayInput.h"
+#include "gameplay/simulation/GameSimulation.h"
 #include "platform/windows/WindowsRtLabState.h"
 
 #include <cstdlib>
@@ -144,10 +146,10 @@ int main()
     Require(WindowsChestPromptText(ChestRewardPrompt::Locked) ==
                 "LOCKED | DEFEAT THE LICH" &&
             WindowsChestPromptText(ChestRewardPrompt::OpenChest) ==
-                "PRESS E / A TO OPEN CHEST" &&
+                "LEFT-CLICK / A TO OPEN CHEST" &&
             WindowsChestPromptText(ChestRewardPrompt::Opening) == "OPENING..." &&
             WindowsChestPromptText(ChestRewardPrompt::ClaimLantern) ==
-                "PRESS E / A TO TAKE LANTERN" &&
+                "LEFT-CLICK / A TO TAKE LANTERN" &&
             WindowsChestPromptText(ChestRewardPrompt::Unlocking) ==
                 "THE LICH'S SEAL IS BREAKING..." &&
             WindowsChestPromptText(ChestRewardPrompt::None).empty(),
@@ -448,6 +450,82 @@ int main()
                 windowsSource.substr(overlayStateBegin, overlayStateEnd - overlayStateBegin)
                         .find("UpdateChestPrompt(context);") != std::string::npos,
             "synchronous Windows overlay transitions must hide the chest prompt without waiting for another rendered frame");
+
+    using horde::platform::windows::DesktopClickAction;
+    using horde::platform::windows::DesktopKeyAction;
+    using horde::platform::windows::ResolveDesktopLeftClick;
+    using horde::platform::windows::ResolveDesktopGameplayKey;
+    Require(ResolveDesktopLeftClick(true, false, ChestRewardPrompt::OpenChest) == DesktopClickAction::AcquireCapture &&
+            ResolveDesktopLeftClick(true, false, ChestRewardPrompt::None) == DesktopClickAction::AcquireCapture,
+            "initial focus/capture click never publishes interaction or attack");
+    Require(ResolveDesktopLeftClick(false, true, ChestRewardPrompt::OpenChest) == DesktopClickAction::Ignore &&
+            ResolveDesktopLeftClick(false, false, ChestRewardPrompt::None) == DesktopClickAction::Ignore,
+            "menu, pause and lost gameplay ownership clicks are ignored");
+    Require(ResolveDesktopLeftClick(true, true, ChestRewardPrompt::None) == DesktopClickAction::Attack &&
+            ResolveDesktopLeftClick(true, true, ChestRewardPrompt::OpenChest, true) == DesktopClickAction::Interact &&
+            ResolveDesktopLeftClick(true, true, ChestRewardPrompt::ClaimLantern, true) == DesktopClickAction::Interact &&
+            ResolveDesktopLeftClick(true, true, ChestRewardPrompt::Opening) == DesktopClickAction::Ignore &&
+            ResolveDesktopLeftClick(true, true, ChestRewardPrompt::Locked) == DesktopClickAction::Ignore &&
+            ResolveDesktopLeftClick(true, true, ChestRewardPrompt::Unlocking) == DesktopClickAction::Ignore,
+            "captured click chooses exactly one action and non-action chest prompts never swing");
+    Require(ResolveDesktopLeftClick(true,true,ChestRewardPrompt::None,true)==DesktopClickAction::Interact &&
+            ResolveDesktopLeftClick(true,true,ChestRewardPrompt::OpenChest,false)==DesktopClickAction::Ignore,
+            "displayed stale prompt stays an interaction; newly eligible unseen prompt never swings");
+    Require(ResolveDesktopGameplayKey(0x20u,true,false,false)==DesktopKeyAction::Dodge &&
+            ResolveDesktopGameplayKey('Q',true,false,false)==DesktopKeyAction::Parry &&
+            ResolveDesktopGameplayKey('E',true,false,true)==DesktopKeyAction::ToggleLantern &&
+            ResolveDesktopGameplayKey('E',true,false,false)==DesktopKeyAction::None &&
+            ResolveDesktopGameplayKey('C',true,false,true)==DesktopKeyAction::None &&
+            ResolveDesktopGameplayKey('F',true,false,true)==DesktopKeyAction::None,
+            "Space/Q/E have new Windows mapping, claimed-only lantern and retired C/F mappings");
+    for (const unsigned key : {0x20u, unsigned('Q'), unsigned('E')})
+        Require(ResolveDesktopGameplayKey(key,false,false,true)==DesktopKeyAction::None &&
+                ResolveDesktopGameplayKey(key,true,true,true)==DesktopKeyAction::None,
+                "menu Space and auto-repeated gameplay keys do not generate edges");
+
+    // Route the native click decision into the real authoritative consumer.
+    // Eligibility can change after the snapshot used to select the intent.
+    using namespace horde::gameplay::simulation;
+    using namespace horde::gameplay::interactions;
+    GameSimulation staleClick;
+    ChestRewardSnapshot unlocked;
+    unlocked.phase=ChestRewardPhase::ClosedUnlocked;
+    staleClick.ImportRewardCheckpoint(unlocked, {}, {});
+    InputSnapshot staleInput;
+    staleInput.damageEnabled=false;
+    const auto intent=ResolveDesktopLeftClick(true,true,staleClick.Snapshot().chestPrompt,true);
+    if(intent==DesktopClickAction::Interact) ++staleInput.commands.interact;
+    if(intent==DesktopClickAction::Attack) ++staleInput.commands.attack;
+    staleClick.StepFixed(staleInput); // actual spawn is out of reward range
+    Require(staleClick.Snapshot().lastConsumedInteractSequence==1u &&
+            staleClick.Snapshot().lastConsumedAttackSequence==0u &&
+            staleClick.Snapshot().chestReward.phase==ChestRewardPhase::ClosedUnlocked,
+            "stale contextual intent is authoritatively rejected without fallback swing");
+    staleClick.StepFixed(staleInput);
+    Require(staleClick.Snapshot().lastConsumedInteractSequence==1u &&
+            staleClick.Snapshot().lastConsumedAttackSequence==0u,
+            "one mouse edge is not repeated on subsequent fixed ticks");
+    staleInput.commands.attack=2; staleInput.commands.parry=2; staleInput.commands.dodge=2;
+    staleInput.commands.interact=2; staleInput.commands.toggleHeldLightPose=2;
+    staleClick.SynchronizePausedInput(staleInput);
+    staleClick.StepFixed(staleInput);
+    Require(staleClick.Snapshot().lastConsumedAttackSequence==2u &&
+            staleClick.Snapshot().lastConsumedDodgeSequence==2u &&
+            !staleClick.Snapshot().swordCombat.playerAttackPulse &&
+            staleClick.Snapshot().chestReward.phase==ChestRewardPhase::ClosedUnlocked,
+            "capture/focus/pause cancellation discards queued edges before resume");
+    const auto mouseBegin=windowsSource.rfind("    case WM_LBUTTONDOWN:");
+    const auto mouseEnd=windowsSource.find("    case WM_MOUSEMOVE:",mouseBegin);
+    const auto mouseSection=windowsSource.substr(mouseBegin,mouseEnd-mouseBegin);
+    const auto rightBegin=mouseSection.find("    case WM_RBUTTONDOWN:");
+    Require(mouseSection.find("ResolveDesktopLeftClick(")!=std::string::npos &&
+            mouseSection.find("sceneContext->chestInteractionPromptPresented")!=std::string::npos &&
+            rightBegin!=std::string::npos &&
+            mouseSection.substr(rightBegin).find("PublishDesktopCombatEdge")==std::string::npos &&
+            windowsSource.find("ResolveDesktopGameplayKey(")!=std::string::npos &&
+            windowsSource.find("DiscardDesktopPendingCommands(*sceneContext)")!=std::string::npos &&
+            windowsSource.find("(wParam == VK_RETURN || wParam == VK_SPACE)")!=std::string::npos,
+            "native owner wires tested admission, reserved right mouse, cancellation and menu Space");
 
     ControllerTriggerLatch triggerLatch{};
     const ControllerActionEdges firstTriggers = UpdateXInputTriggerEdges(0u, 255u, triggerLatch);

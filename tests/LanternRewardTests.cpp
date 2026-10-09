@@ -9,6 +9,7 @@
 #include "gameplay/simulation/GameSimulation.h"
 #include "gameplay/simulation/InputMailbox.h"
 #include "vulkan/raytracing/ChestGuidanceLight.h"
+#include "vulkan/raytracing/PlayerFrameLight.h"
 
 namespace
 {
@@ -85,18 +86,27 @@ int main()
     ChestRewardSnapshot guidanceUnlocked;
     guidanceUnlocked.phase = ChestRewardPhase::ClosedUnlocked;
     const auto unlockedGuidance = ResolveChestGuidanceLight(guidanceUnlocked);
+    ChestRewardSnapshot guidanceOpening;
+    guidanceOpening.phase = ChestRewardPhase::Opening;
+    const auto openingGuidance = ResolveChestGuidanceLight(guidanceOpening);
+    ChestRewardSnapshot guidanceLanternAvailable;
+    guidanceLanternAvailable.phase = ChestRewardPhase::LanternAvailable;
+    const auto availableGuidance = ResolveChestGuidanceLight(guidanceLanternAvailable);
     ChestRewardSnapshot guidanceClaimed;
     guidanceClaimed.phase = ChestRewardPhase::LanternClaimed;
     const auto claimedGuidance = ResolveChestGuidanceLight(guidanceClaimed);
     Check(lockedGuidance.strength == 0.0f && pendingGuidance.strength == 0.0f,
           "the chest guidance light must remain dark throughout the two-second sealed pause");
     Check(unlockedGuidance.strength > 0.0f &&
-              claimedGuidance.strength == unlockedGuidance.strength &&
+              openingGuidance.strength == unlockedGuidance.strength &&
+              availableGuidance.strength == unlockedGuidance.strength &&
+              claimedGuidance.strength == 0.0f &&
               NearlyEqual(unlockedGuidance.position[0], kRewardChestInteractionPosition.x) &&
               NearlyEqual(unlockedGuidance.position[2], kRewardChestInteractionPosition.z) &&
               unlockedGuidance.position[1] > 0.80f &&
               unlockedGuidance.position[1] < 1.35f,
-          "unlock must activate one stable overhead world-space light above the physical chest");
+          "the chest spotlight must stay on from unlock through the exposed reward and turn off on claim");
+
 
     InputSnapshot publication;
     publication.commands.attack = 7u;
@@ -250,6 +260,30 @@ int main()
     Check(promptSimulation.Snapshot().chestPrompt == ChestRewardPrompt::OpenChest,
           "the immutable simulation snapshot must publish the unlocked action prompt");
 
+    ChestRewardSnapshot availableChest;
+    availableChest.phase = ChestRewardPhase::LanternAvailable;
+    availableChest.lidOpenProgress = 1.0f;
+    GameSimulation claimedLightSimulation(promptConfig);
+    claimedLightSimulation.ImportRewardCheckpoint(availableChest, noTorch, defeatedFinale);
+    InputSnapshot claimLightInput;
+    claimLightInput.damageEnabled = false;
+    claimLightInput.hasAuthoritativePlayerPose = true;
+    claimLightInput.authoritativePlayerX = promptQuery.playerX;
+    claimLightInput.authoritativePlayerZ = promptQuery.playerZ;
+    claimLightInput.yawRadians = promptQuery.playerYawRadians;
+    claimLightInput.commands.interact = 1u;
+    claimedLightSimulation.StepFixed(claimLightInput);
+    const auto claimedLightSnapshot = claimedLightSimulation.Snapshot();
+    const auto independentHeldLight =
+        horde::vulkan::raytracing::BuildPlayerFrameLight(
+            {0.0f, 1.0f, 0.0f, 1.8f}, claimedLightSnapshot.playerSupportWorldY);
+    Check(claimedLightSnapshot.chestReward.phase == ChestRewardPhase::LanternClaimed &&
+              claimedLightSnapshot.interaction.heldLightKind == HeldLightKind::RewardLantern &&
+              ResolveChestGuidanceLight(claimedLightSnapshot.chestReward).strength == 0.0f,
+          "a successful simulation claim must extinguish the chest spotlight while equipping the reward lantern");
+    Check(independentHeldLight.positionStrength[3] == 1.8f,
+          "the separate binding-20 held-light payload must retain its independent positive strength");
+
     GameSimulation lockedEdgeSimulation(promptConfig);
     InputSnapshot lockedEdgeInput;
     lockedEdgeInput.damageEnabled = false;
@@ -396,6 +430,7 @@ int main()
     Check(importReset.Snapshot().chestReward.phase == ChestRewardPhase::Locked &&
               importReset.Snapshot().finale.phase == FinaleSequencePhase::Inactive &&
               importReset.Snapshot().interaction.heldLightKind == HeldLightKind::Torch &&
+              ResolveChestGuidanceLight(importReset.Snapshot().chestReward).strength == 0.0f &&
               importReset.Events().Empty(),
           "route reset must clear imported reward/finale state and stale semantic events");
 
@@ -405,6 +440,7 @@ int main()
     Check(retryReset.Snapshot().chestReward.phase == ChestRewardPhase::Locked &&
               retryReset.Snapshot().finale.phase == FinaleSequencePhase::Inactive &&
               retryReset.Snapshot().interaction.heldLightKind == HeldLightKind::Torch &&
+              ResolveChestGuidanceLight(retryReset.Snapshot().chestReward).strength == 0.0f &&
               retryReset.Events().Empty(),
           "retry must restore route-local reward authority without replaying semantic events");
 

@@ -2229,6 +2229,7 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
     }
 
     if (activeEnemyKind_ == EnemyKind::Lich && lichAttackEligible_ && combatSnapshot_.playerAttackPulse &&
+        !IsRouteAudioObstructed(playerX_, playerZ_, lich.x, lich.z) &&
         SwordCombat::IsPlayerTargetInRangeCone(playerX_,
                                                 playerZ_,
                                                 playerYawRadians_,

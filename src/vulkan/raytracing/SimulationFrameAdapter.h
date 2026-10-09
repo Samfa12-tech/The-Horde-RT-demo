@@ -4,15 +4,10 @@
 #include "graphics/EntryMenuScene.h"
 #include "graphics/GraphicsPreviewSession.h"
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
+#include "vulkan/raytracing/PlayerFrameLight.h"
 
 namespace horde::vulkan::raytracing
 {
-// The exact binding20 payload consumed by both real primary-ray backends.
-inline RtHeldLightGpu BuildPlayerFrameLight(const std::array<float, 4>& physicalLight,
-                                            float supportWorldY)
-{
-    return {physicalLight, {horde::gameplay::simulation::PlayerHeightDelta(supportWorldY), 0, 0, 0}};
-}
 RtSceneFrameInputs BuildEntryMenuFrameInputs(const horde::graphics::EntryMenuSession &session,
                                              float outputExposure, FireEmitterQuality fireDetail,
                                              horde::graphics::ShadowQuality shadowQuality);

@@ -10,6 +10,7 @@
 
 #include "gameplay/CombatTimeline.h"
 #include "gameplay/CorridorCollision.h"
+#include "gameplay/SpatialAudio.h"
 
 namespace horde::gameplay
 {
@@ -262,7 +263,8 @@ public:
             const Combatant& combatant = combatants_[index];
             const float distance = std::hypot(combatant.x - playerX, combatant.z - playerZ);
             if (combatant.health <= 0 ||
-                !IsPlayerTargetInRangeCone(playerX, playerZ, playerYaw, combatant.x, combatant.z))
+                !IsPlayerTargetInRangeCone(playerX, playerZ, playerYaw, combatant.x, combatant.z) ||
+                IsRouteAudioObstructed(playerX, playerZ, combatant.x, combatant.z))
             {
                 continue;
             }
@@ -383,7 +385,12 @@ public:
                       combatants_[static_cast<std::size_t>(*targetId)].health > 0 &&
                       combatants_[static_cast<std::size_t>(*targetId)].action !=
                           EnemyCombatAction::Dead));
-                if (targetExists)
+                const bool targetVisible = targetExists &&
+                    (*targetId == 2 || !IsRouteAudioObstructed(
+                        playerX, playerZ,
+                        combatants_[static_cast<std::size_t>(*targetId)].x,
+                        combatants_[static_cast<std::size_t>(*targetId)].z));
+                if (targetVisible)
                 {
                     contactResolvedAttackId_ = activePlayerAttackId_;
                     snapshot_.playerContactPulse = true;
@@ -795,7 +802,8 @@ private:
         {
             combatant.action = EnemyCombatAction::AttackActive;
             combatant.phaseTime -= kEnemyAttackWindupDuration;
-            const bool inRange = distance <= kEnemyDamageRange;
+            const bool inRange = distance <= kEnemyDamageRange &&
+                !IsRouteAudioObstructed(playerX, playerZ, combatant.x, combatant.z);
             if (inRange && player_.action == PlayerCombatAction::ParryActive &&
                 IsPlayerTargetInRangeCone(playerX, playerZ, playerYaw, combatant.x, combatant.z))
             {

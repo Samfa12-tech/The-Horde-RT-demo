@@ -72,7 +72,7 @@ int main()
     const auto dodge = CombatTeachingPromptText(teaching);
     check(dodge.find("<-- DODGE NOW -->") != std::string::npos &&
               dodge.find("######") != std::string::npos && dodge.find("MOVE/LOOK LIVE") != std::string::npos &&
-              dodge.find("DODGE: C + A/D") != std::string::npos,
+              dodge.find("DODGE: SPACE + A/D") != std::string::npos,
           "dodge uses directional motion cue and bounded full progress");
     teaching.promptOpacity = 0.0f;
     check(CombatTeachingPromptText(teaching).empty(), "zero-opacity cue hides the banner");

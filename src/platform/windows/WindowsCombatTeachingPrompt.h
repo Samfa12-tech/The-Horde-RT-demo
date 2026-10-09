@@ -65,7 +65,7 @@ inline std::string CombatTeachingPromptText(
     for (int index = 0; index < 6; ++index) bar.push_back(index < filled ? '#' : '-');
     std::string text = "COMBAT LESSON [" + bar + "]\r\n" + lesson;
     if (teaching.slowdownActive) text += "  |  TIME EASED";
-    text += "\r\nPARRY: Q  |  DODGE: C + A/D  |  MOVE/LOOK LIVE  |  RETRY SAFE";
+    text += "\r\nPARRY: Q  |  DODGE: SPACE + A/D  |  MOVE/LOOK LIVE  |  RETRY SAFE";
     return text;
 }
 } // namespace horde::platform::windows

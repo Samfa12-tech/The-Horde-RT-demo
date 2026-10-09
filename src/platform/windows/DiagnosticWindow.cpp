@@ -94,6 +94,7 @@
 #include "platform/windows/WindowsBenchmarkLaunch.h"
 #include "platform/windows/WindowsMistCaptureLaunch.h"
 #include "platform/windows/WindowsInteractionPrompt.h"
+#include "platform/windows/WindowsGameplayInput.h"
 #include "platform/windows/WindowsGitHubReleaseUpdate.h"
 #include "platform/windows/WindowsRtLabState.h"
 #include "vulkan/GpuFrameTimer.h"
@@ -495,6 +496,7 @@ struct VulkanSurfaceContext
     bool controllerRunBlockedUntilRelease = false;
     bool runToggleKeyDown = false;
     bool mouseLookActive = false;
+    bool chestInteractionPromptPresented = false;
     bool mouseCursorHidden = false;
     POINT mouseRestorePosition{};
     POINT lastMousePosition{};
@@ -589,6 +591,7 @@ bool WriteReportFile(const std::filesystem::path& path, const std::string& data)
 bool SaveGraphicsRecord(const VulkanSurfaceContext& context,
                         const horde::graphics::GraphicsPersistenceRecord& record);
 void ClearDesktopInput(VulkanSurfaceContext& context);
+void DiscardDesktopPendingCommands(VulkanSurfaceContext& context);
 void UpdateVitalityHud(VulkanSurfaceContext& context);
 void UpdateChestPrompt(VulkanSurfaceContext& context);
 int ScaleForDpi(HWND window, int logicalPixels);
@@ -2208,6 +2211,7 @@ void UpdateVitalityHud(VulkanSurfaceContext& context)
 
 void UpdateChestPrompt(VulkanSurfaceContext& context)
 {
+    context.chestInteractionPromptPresented = false;
     HWND promptControl = GetDlgItem(context.windowHandle, kChestPromptControlId);
     if (promptControl == nullptr)
     {
@@ -2227,12 +2231,33 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
          .endingOverlayVisible = context.endingOverlayVisible,
          .benchmarkRunning = context.benchmark.IsRunning(),
          .captureMode = GetPropA(context.windowHandle, kCaptureModeProperty) != nullptr});
+    context.chestInteractionPromptPresented = visible &&
+        (context.simulation.Snapshot().chestPrompt == horde::gameplay::interactions::ChestRewardPrompt::OpenChest ||
+         context.simulation.Snapshot().chestPrompt == horde::gameplay::interactions::ChestRewardPrompt::ClaimLantern);
     if (visible)
     {
         SetWindowTextA(promptControl, std::string(text).c_str());
         InvalidateRect(promptControl, nullptr, TRUE);
     }
     ShowWindow(promptControl, visible ? SW_SHOWNA : SW_HIDE);
+}
+
+bool IsDesktopGameplayAvailable(const VulkanSurfaceContext& context)
+{
+    return context.controlsEnabled && !context.graphicsVisible &&
+        context.simulation.Snapshot().playerVitals.phase == horde::gameplay::PlayerLifePhase::Alive &&
+        horde::platform::windows::ShouldShowWindowsChestPrompt(
+            horde::gameplay::interactions::ChestRewardPrompt::OpenChest,
+            {.simulationPaused = context.simulationPaused,
+             .pauseMenuVisible = context.pauseMenuVisible,
+             .settingsVisible = context.settingsVisible,
+             .diagnosticsVisible = context.diagnosticsVisible,
+             .benchmarkReportVisible = context.benchmarkReportVisible,
+             .rtLabVisible = context.rtLabVisible,
+             .deathOverlayVisible = context.deathOverlayVisible,
+             .endingOverlayVisible = context.endingOverlayVisible,
+             .benchmarkRunning = context.benchmark.IsRunning(),
+             .captureMode = GetPropA(context.windowHandle, kCaptureModeProperty) != nullptr});
 }
 
 bool IsPlayerDamageEnabled(const VulkanSurfaceContext& context)
@@ -2463,6 +2488,7 @@ void ApplyOverlayState(VulkanSurfaceContext& context)
     {
         context.benchmarkEvidence.Cancel();
         ClearDesktopInput(context);
+        DiscardDesktopPendingCommands(context);
     }
     // Overlay transitions are synchronous. Re-evaluate here so a chest prompt
     // cannot survive for one rendered frame beneath pause, death, finale, lab,
@@ -3548,6 +3574,19 @@ void ClearDesktopInput(VulkanSurfaceContext& context)
     {
         ReleaseCapture();
     }
+}
+
+void DiscardDesktopPendingCommands(VulkanSurfaceContext& context)
+{
+    auto input = context.simulationInput;
+    input.commands = {context.attackSequence, context.parrySequence, context.dodgeSequence,
+        context.routeResetSequence, context.retrySequence, context.interactSequence,
+        context.toggleHeldLightPoseSequence, context.runToggleSequence, context.clearRunIntentSequence,
+        context.combatTeachingSkipSequence, context.combatTeachingReplaySequence};
+    input.runHeld = false;
+    input.moveForward = input.moveStrafe = 0.0f;
+    context.simulation.SynchronizePausedInput(input, 0u,
+        horde::gameplay::simulation::PausedInputPolicy::PreserveWorldCommands);
 }
 
 std::vector<HWND> VisibleControllerMenuControls(const VulkanSurfaceContext& context)
@@ -8243,11 +8282,11 @@ void ShowControlsHelp(HWND window)
     MessageBoxA(window,
                 "WASD  Move and strafe\n"
                 "Shift  Hold to run    Caps Lock  Toggle run\n"
-                "Left mouse drag  360 camera look\n"
-                "Right mouse or Space  Swing sword\n"
+                "Click once to capture mouse; then free look\n"
+                "Left mouse  Swing / indicated chest interaction\n"
                 "Q  Parry skeleton strike\n"
-                "C + movement direction  Dodge\n"
-                "E  Interact    F  Raise / lower claimed lantern\n"
+                "Space + movement direction  Dodge (neutral: forward)\n"
+                "E  Raise / lower claimed lantern    Right mouse  Reserved\n"
                 "Controller left stick  Move and strafe\n"
                 "Controller right stick  Camera look\n"
                 "RT  Attack    LT  Parry    B / Circle  Dodge\n"
@@ -8997,7 +9036,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                     NavigateControllerMenu(*sceneContext, wParam == VK_RIGHT ? 1 : -1);
                 return 0;
             }
-            if (sceneContext->simulationPaused && wParam == VK_RETURN &&
+            if (sceneContext->simulationPaused && (wParam == VK_RETURN || wParam == VK_SPACE) &&
                 (GetKeyState(VK_MENU) & 0x8000) == 0 && (lParam & (1ll << 30)) == 0)
             {
                 if (HWND focused = GetFocus()) SendMessageA(focused, BM_CLICK, 0, 0);
@@ -9013,6 +9052,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
             }
             if (wParam == VK_ESCAPE)
             {
+                if ((lParam & (1ll << 30)) != 0) return 0;
                 if (sceneContext->graphicsVisible && sceneContext->graphicsEdit)
                 {
                     sceneContext->graphicsCloseAfterRevert = true;
@@ -9176,34 +9216,27 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 ToggleFullscreen(*sceneContext);
                 return 0;
             }
-            if (!sceneContext->simulationPaused && wParam == VK_SPACE && (lParam & (1ll << 30)) == 0)
+            using horde::platform::windows::DesktopKeyAction;
+            const DesktopKeyAction keyAction = horde::platform::windows::ResolveDesktopGameplayKey(
+                static_cast<unsigned>(wParam),
+                IsDesktopGameplayAvailable(*sceneContext) && GetFocus() == hWnd && GetForegroundWindow() == hWnd &&
+                    (GetKeyState(VK_MENU) & 0x8000) == 0,
+                (lParam & (1ll << 30)) != 0,
+                sceneContext->simulation.Snapshot().chestReward.phase ==
+                    horde::gameplay::interactions::ChestRewardPhase::LanternClaimed);
+            if (keyAction == DesktopKeyAction::Dodge || keyAction == DesktopKeyAction::Parry)
             {
-                PublishDesktopCombatEdge(*sceneContext, horde::gameplay::simulation::CombatInputEdgeKind::Attack);
+                PublishDesktopCombatEdge(*sceneContext, keyAction == DesktopKeyAction::Dodge
+                    ? horde::gameplay::simulation::CombatInputEdgeKind::Dodge
+                    : horde::gameplay::simulation::CombatInputEdgeKind::Parry);
                 return 0;
             }
-            if (!sceneContext->simulationPaused && wParam == 'Q' && (lParam & (1ll << 30)) == 0)
-            {
-                PublishDesktopCombatEdge(*sceneContext, horde::gameplay::simulation::CombatInputEdgeKind::Parry);
-                return 0;
-            }
-            if (!sceneContext->simulationPaused && wParam == 'C' && (lParam & (1ll << 30)) == 0)
-            {
-                PublishDesktopCombatEdge(*sceneContext, horde::gameplay::simulation::CombatInputEdgeKind::Dodge);
-                return 0;
-            }
-            if (!sceneContext->simulationPaused && wParam == 'E' &&
-                (lParam & (1ll << 30)) == 0)
-            {
-                ++sceneContext->interactSequence;
-                return 0;
-            }
-            if (!sceneContext->simulationPaused && wParam == 'F' &&
-                (lParam & (1ll << 30)) == 0)
+            if (keyAction == DesktopKeyAction::ToggleLantern)
             {
                 ++sceneContext->toggleHeldLightPoseSequence;
                 return 0;
             }
-            if (!sceneContext->simulationPaused && wParam == VK_CAPITAL &&
+            if (IsDesktopGameplayAvailable(*sceneContext) && wParam == VK_CAPITAL &&
                 (lParam & (1ll << 30)) == 0)
             {
                 sceneContext->runToggleKeyDown = true;
@@ -9211,7 +9244,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                     ++sceneContext->runToggleSequence;
                 return 0;
             }
-            if (!sceneContext->simulationPaused && SetDesktopMovementKey(*sceneContext, wParam, true))
+            if (IsDesktopGameplayAvailable(*sceneContext) && SetDesktopMovementKey(*sceneContext, wParam, true))
             {
                 return 0;
             }
@@ -9227,43 +9260,55 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         }
         break;
     case WM_LBUTTONDOWN:
-        if (sceneContext && sceneContext->controlsEnabled && !sceneContext->simulationPaused &&
-            sceneContext->simulation.Snapshot().playerVitals.phase == horde::gameplay::PlayerLifePhase::Alive &&
-            !sceneContext->benchmark.IsRunning())
+        if (sceneContext)
         {
-            SetFocus(hWnd);
-            SetCapture(hWnd);
-            GetCursorPos(&sceneContext->mouseRestorePosition);
-            ShowCursor(FALSE);
-            sceneContext->mouseCursorHidden = true;
-            sceneContext->mouseLookActive = true;
-            RECT clientRect{};
-            GetClientRect(hWnd, &clientRect);
-            POINT centre{(clientRect.right - clientRect.left) / 2, (clientRect.bottom - clientRect.top) / 2};
-            sceneContext->lastMousePosition = centre;
-            POINT screenCentre = centre;
-            ClientToScreen(hWnd, &screenCentre);
-            RECT screenRect{clientRect};
-            ClientToScreen(hWnd, reinterpret_cast<POINT*>(&screenRect.left));
-            ClientToScreen(hWnd, reinterpret_cast<POINT*>(&screenRect.right));
-            ClipCursor(&screenRect);
-            SetCursorPos(screenCentre.x, screenCentre.y);
+            using horde::platform::windows::DesktopClickAction;
+            const DesktopClickAction clickAction = horde::platform::windows::ResolveDesktopLeftClick(
+                IsDesktopGameplayAvailable(*sceneContext),
+                sceneContext->mouseLookActive && GetCapture() == hWnd && GetFocus() == hWnd &&
+                    GetForegroundWindow() == hWnd,
+                sceneContext->simulation.Snapshot().chestPrompt,
+                sceneContext->chestInteractionPromptPresented);
+            if (clickAction == DesktopClickAction::AcquireCapture)
+            {
+                SetFocus(hWnd);
+                SetCapture(hWnd);
+                GetCursorPos(&sceneContext->mouseRestorePosition);
+                ShowCursor(FALSE);
+                sceneContext->mouseCursorHidden = true;
+                sceneContext->mouseLookActive = true;
+                RECT clientRect{};
+                GetClientRect(hWnd, &clientRect);
+                POINT centre{(clientRect.right - clientRect.left) / 2, (clientRect.bottom - clientRect.top) / 2};
+                sceneContext->lastMousePosition = centre;
+                POINT screenCentre = centre;
+                ClientToScreen(hWnd, &screenCentre);
+                RECT screenRect{clientRect};
+                ClientToScreen(hWnd, reinterpret_cast<POINT*>(&screenRect.left));
+                ClientToScreen(hWnd, reinterpret_cast<POINT*>(&screenRect.right));
+                ClipCursor(&screenRect);
+                SetCursorPos(screenCentre.x, screenCentre.y);
+                // The capture/focus click is consumed even if acquisition fails.
+                if (GetCapture() != hWnd || GetFocus() != hWnd || GetForegroundWindow() != hWnd)
+                    ClearDesktopInput(*sceneContext);
+            }
+            else if (clickAction == DesktopClickAction::Interact)
+            {
+                ++sceneContext->interactSequence;
+            }
+            else if (clickAction == DesktopClickAction::Attack)
+            {
+                PublishDesktopCombatEdge(*sceneContext, horde::gameplay::simulation::CombatInputEdgeKind::Attack);
+            }
             return 0;
         }
         break;
     case WM_RBUTTONDOWN:
-        if (sceneContext && sceneContext->controlsEnabled && !sceneContext->simulationPaused &&
-            sceneContext->simulation.Snapshot().playerVitals.phase == horde::gameplay::PlayerLifePhase::Alive &&
-            !sceneContext->benchmark.IsRunning())
-        {
-            PublishDesktopCombatEdge(*sceneContext, horde::gameplay::simulation::CombatInputEdgeKind::Attack);
-            return 0;
-        }
-        break;
+        // Reserved: no capture, interaction or attack.
+        return 0;
     case WM_MOUSEMOVE:
-        if (sceneContext && sceneContext->controlsEnabled && !sceneContext->simulationPaused &&
-            sceneContext->simulation.Snapshot().playerVitals.phase == horde::gameplay::PlayerLifePhase::Alive &&
-            !sceneContext->benchmark.IsRunning() && sceneContext->mouseLookActive)
+        if (sceneContext && IsDesktopGameplayAvailable(*sceneContext) && sceneContext->mouseLookActive &&
+            GetCapture() == hWnd && GetFocus() == hWnd && GetForegroundWindow() == hWnd)
         {
             const POINT currentMousePosition{
                 static_cast<LONG>(static_cast<short>(LOWORD(lParam))),
@@ -9286,20 +9331,20 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
     case WM_CAPTURECHANGED:
         if (sceneContext && sceneContext->controlsEnabled)
         {
-            ClearDesktopInput(*sceneContext);
+            ClearDesktopInput(*sceneContext); DiscardDesktopPendingCommands(*sceneContext);
             return 0;
         }
         break;
     case WM_KILLFOCUS:
         if (sceneContext && sceneContext->controlsEnabled)
         {
-            ClearDesktopInput(*sceneContext);
+            ClearDesktopInput(*sceneContext); DiscardDesktopPendingCommands(*sceneContext);
         }
         break;
     case WM_ACTIVATEAPP:
         if (sceneContext)
         {
-            if (wParam == FALSE) { sceneContext->controllerFocusLatch.LoseFocus(); StopMenuAmbience(*sceneContext); }
+            if (wParam == FALSE) { ClearDesktopInput(*sceneContext); DiscardDesktopPendingCommands(*sceneContext); sceneContext->controllerFocusLatch.LoseFocus(); StopMenuAmbience(*sceneContext); }
             PublishMusicPlayback(*sceneContext, wParam == FALSE);
         }
         if (sceneContext && wParam == FALSE && sceneContext->benchmark.IsRunning())
@@ -9310,7 +9355,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
     case WM_ACTIVATE:
         if (sceneContext)
         {
-            if (LOWORD(wParam) == WA_INACTIVE) { sceneContext->controllerFocusLatch.LoseFocus(); StopMenuAmbience(*sceneContext); }
+            if (LOWORD(wParam) == WA_INACTIVE) { ClearDesktopInput(*sceneContext); DiscardDesktopPendingCommands(*sceneContext); sceneContext->controllerFocusLatch.LoseFocus(); StopMenuAmbience(*sceneContext); }
             PublishMusicPlayback(*sceneContext, LOWORD(wParam) == WA_INACTIVE);
         }
         break;
