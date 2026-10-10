@@ -41,7 +41,7 @@ public final class CombatTeachingPreferencesTest {
     }
 
     @Test public void promptsUseShapeAndMotionCuesWithBoundedProgressAndSafeControls() {
-        long parryNow = 2L | (2L << 3) | (1L << 10) | (99L << 16) | (0xffL << 40);
+        long parryNow = 2L | (2L << 3) | (1L << 10) | (0xffL << 16) | (0xffL << 40);
         String prompt = CombatTeachingPreferences.prompt(parryNow);
         assertTrue(prompt.contains("PRESS PARRY"));
         assertTrue(prompt.contains("raise guard before the strike"));
@@ -65,6 +65,30 @@ public final class CombatTeachingPreferencesTest {
         assertTrue(prompt.contains("KEEPER CHARGING"));
         assertTrue(prompt.contains("staff glow build"));
         assertFalse(prompt.contains("draw back"));
+    }
+
+    @Test public void nativeNormalizedProgressBytesMapAcrossTheSixMarkBar() {
+        int[] nativeBytes = {0, 64, 128, 191, 255};
+        String[] expectedBars = {"[------]", "[##----]", "[###---]", "[####--]", "[######]"};
+        for (int i = 0; i < nativeBytes.length; ++i) {
+            long packed = 1L | (4L << 3) | (1L << 10) |
+                    ((long) nativeBytes[i] << 16) | (0xffL << 40);
+            assertTrue("native normalized byte " + nativeBytes[i],
+                    CombatTeachingPreferences.prompt(packed).contains(expectedBars[i]));
+        }
+    }
+
+    @Test public void timelyRefreshIsLimitedToVisibleKeeperChargeAndRecoveryCues() {
+        for (int cue : new int[]{4, 5, 6}) {
+            long active = (cue << 3) | (1L << 10) | (0xffL << 40);
+            assertTrue(CombatTeachingPreferences.needsTimelyRefresh(active));
+        }
+        assertFalse(CombatTeachingPreferences.needsTimelyRefresh(
+                (2L << 3) | (1L << 10) | (0xffL << 40)));
+        assertFalse(CombatTeachingPreferences.needsTimelyRefresh(
+                (5L << 3) | (0xffL << 40)));
+        assertFalse(CombatTeachingPreferences.needsTimelyRefresh(
+                (5L << 3) | (1L << 10)));
     }
 
     @Test public void disabledAndSkippedStatesHaveNoActiveCuePrompt() {

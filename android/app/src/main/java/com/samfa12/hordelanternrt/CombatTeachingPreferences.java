@@ -44,12 +44,19 @@ final class CombatTeachingPreferences {
         final int progress = (int) ((state >>> 16) & 0xffL);
         final String lesson = cueText(cue, stage, source, parryLearned, dodgeLearned);
         if (lesson.isEmpty()) return "";
-        final int marks = Math.max(0, Math.min(6, (progress * 6 + 50) / 100));
+        final int marks = (progress * 6 + 127) / 255;
         final StringBuilder bar = new StringBuilder(6);
         for (int i = 0; i < 6; ++i) bar.append(i < marks ? '#' : '-');
         return "COMBAT TEACHING  [" + bar + "]\n" + lesson +
                 (slowed ? "  ·  TIME EASED" : "") +
                 "\nParry: tap / LT  ·  Dodge: tap / B  ·  Move/look live · Retry safe";
+    }
+
+    static boolean needsTimelyRefresh(long state) {
+        final boolean enabled = (state & (1L << 10)) != 0;
+        final int opacity = (int) ((state >>> 40) & 0xffL);
+        final int cue = (int) ((state >>> 3) & 0xfL);
+        return enabled && opacity > 0 && cue >= 4 && cue <= 6;
     }
 
     static float alpha(int opacity, boolean reducedMotion) {

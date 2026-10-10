@@ -435,9 +435,209 @@ bool ResolveRigAndAttachments(const SimulationSnapshot& source,
     return true;
 }
 
+int RunAdversarialRescueCases(PlayerRenderSlot& playerSlot,
+    const horde::scene::assets::StaticMeshAsset& rewardRing,
+    const horde::scene::assets::StaticMeshAsset& rewardBody)
+{
+    std::string diagnostic;
+    std::uint64_t poseSerial=1;
+    InputSnapshot input; input.damageEnabled=false;
+    const auto setupClaimed = [&](GameSimulation& sim) {
+        Check(sim.ApplyShowcaseCheckpoint(11), "review fixture requires actual Keeper victory");
+        const auto victory=sim.Snapshot();
+        sim.SetDevelopmentRescueJourney(true);
+        sim.ImportRewardCheckpoint(victory.chestReward,victory.interaction,victory.finale);
+        for(int tick=0;tick<420 && !sim.Snapshot().rescue.ropeReady;++tick) sim.StepFixed(input);
+        Check(sim.Snapshot().rescue.ropeReady, "review fixture requires physical rope deployment");
+        Check(sim.PublishWorldZoneReadiness({sim.Snapshot().worldRoute.generation,WorldZoneId::TombExterior},
+              ZoneReadiness::Ready), "review fixture destination admission failed");
+    };
+    const auto beginAscent = [&](GameSimulation& sim) {
+        InputSnapshot edge; edge.damageEnabled=false; edge.commands.interact=1;
+        sim.StepFixed(edge);
+        Check(sim.Snapshot().rescue.equipmentStowed, "review fixture interaction did not commit");
+        return edge;
+    };
+    const auto completeAscent = [&](GameSimulation& sim, InputSnapshot edge) {
+        for(int tick=0;tick<1400 && sim.Snapshot().rescue.equipmentStowed;++tick) sim.StepFixed(edge);
+        Check(sim.Snapshot().rescue.phase==Phase::UpperSafe, "review fixture did not reach UpperSafe");
+    };
+    const auto retainsIdlePose = [&](GameSimulation& sim, const char* label) {
+        const auto original=sim.Snapshot();
+        sim.InvalidateWorldZoneReadiness();
+        const auto& recovered=sim.Snapshot();
+        Check(original.playerX==recovered.playerX && original.playerZ==recovered.playerZ &&
+              original.playerSupportWorldY==recovered.playerSupportWorldY &&
+              original.playerSupportId==recovered.playerSupportId,label);
+        Check(original.chestReward.phase==recovered.chestReward.phase &&
+              original.rescue.lanternClaimed==recovered.rescue.lanternClaimed &&
+              recovered.worldRoute.generation>original.worldRoute.generation,
+              "finding1: idle recovery preserves ownership and advances readiness generation");
+    };
+    // Finding 1: actual simulation reconstruction entry, before any ownership.
+    GameSimulation preClaim;
+    preClaim.SetDevelopmentRescueJourney(true);
+    input.moveForward=1;
+    for(int tick=0;tick<30;++tick) preClaim.StepFixed(input);
+    input.moveForward=0;
+    const auto before=preClaim.Snapshot();
+    const auto stale=WorldZoneToken{before.worldRoute.generation,WorldZoneId::TombExterior};
+    preClaim.InvalidateWorldZoneReadiness();
+    const auto after=preClaim.Snapshot();
+    std::cout<<"finding1 before="<<before.playerX<<','<<before.playerSupportWorldY<<','<<before.playerZ
+             <<" after="<<after.playerX<<','<<after.playerSupportWorldY<<','<<after.playerZ
+             <<" generation="<<before.worldRoute.generation<<"->"<<after.worldRoute.generation<<'\n';
+    Check(before.playerX==after.playerX && before.playerZ==after.playerZ &&
+          before.playerSupportWorldY==after.playerSupportWorldY && before.playerSupportId==after.playerSupportId,
+          "finding1: pre-claim reconstruction must retain ordinary player pose/support");
+    Check(before.chestReward.phase==after.chestReward.phase && !after.rescue.lanternClaimed &&
+          before.lich.phase==after.lich.phase && before.lich.health==after.lich.health,
+          "finding1: reconstruction must preserve pre-claim progression");
+    Check(after.worldRoute.generation>before.worldRoute.generation &&
+          !preClaim.PublishWorldZoneReadiness(stale,ZoneReadiness::Ready),
+          "finding1: reconstruction must reject prior-generation completion");
+
+    GameSimulationConfig config;
+    config.playerStartX=kLowerLanding.x; config.playerStartZ=kLowerLanding.z;
+    config.playerMountProfile=PlayerMountProfile::AnatomicalBody;
+    GameSimulation claimedIdle(config);setupClaimed(claimedIdle);
+    InputSnapshot idleMove;idleMove.damageEnabled=false;idleMove.yawRadians=0;idleMove.moveStrafe=1;
+    for(int tick=0;tick<6;++tick) claimedIdle.StepFixed(idleMove);
+    retainsIdlePose(claimedIdle,"finding1: claimed lower-side idle recovery must retain pose/support");
+    GameSimulation upperIdle(config);setupClaimed(upperIdle);
+    auto upperEdge=beginAscent(upperIdle);completeAscent(upperIdle,upperEdge);
+    upperEdge.moveStrafe=1;
+    for(int tick=0;tick<6;++tick) upperIdle.StepFixed(upperEdge);
+    retainsIdlePose(upperIdle,"finding1: released exterior idle recovery must retain pose/support");
+    GameSimulation activeRecovery(config);setupClaimed(activeRecovery);
+    auto recoveryEdge=beginAscent(activeRecovery);
+    for(int tick=0;tick<30;++tick) activeRecovery.StepFixed(recoveryEdge);
+    activeRecovery.InvalidateWorldZoneReadiness();
+    Check(activeRecovery.Snapshot().rescue.phase==Phase::LowerSafe &&
+          activeRecovery.Snapshot().playerX==kLowerLanding.x &&
+          activeRecovery.Snapshot().playerZ==kLowerLanding.z,
+          "finding1 control: interrupted first ascent rolls back to the lower safe side");
+    GameSimulation descendingRecovery(config);setupClaimed(descendingRecovery);
+    auto descentEdge=beginAscent(descendingRecovery);completeAscent(descendingRecovery,descentEdge);
+    ++descentEdge.commands.interact;descendingRecovery.StepFixed(descentEdge);
+    for(int tick=0;tick<30;++tick) descendingRecovery.StepFixed(descentEdge);
+    Check(descendingRecovery.Snapshot().rescue.equipmentStowed,
+          "finding1 control: return descent must own recovery fixture");
+    descendingRecovery.InvalidateWorldZoneReadiness();
+    Check(descendingRecovery.Snapshot().rescue.phase==Phase::UpperSafe &&
+          descendingRecovery.Snapshot().playerX==kExteriorLanding.x &&
+          descendingRecovery.Snapshot().playerZ==kExteriorLanding.z &&
+          descendingRecovery.Snapshot().rescue.lanternClaimed,
+          "finding1 control: interrupted descent retains reward and exterior safe side");
+    Check(!RescueExteriorMovementClear(kExteriorLanding.x,kExteriorLanding.z,
+          kExteriorLanding.x,std::numeric_limits<float>::quiet_NaN(),kUpperSupportWorldY,kPlayerCollisionRadius),
+          "finding2 negative: nonfinite exterior movement is rejected");
+    Check(!RescueExteriorMovementClear(-35.35f,-13.25f,-34.80f,-14.05f,
+          kUpperSupportWorldY,kPlayerCollisionRadius) &&
+          !RescueExteriorMovementClear(-32.05f,-13.25f,-32.60f,-14.05f,
+          kUpperSupportWorldY,kPlayerCollisionRadius),
+          "finding2: swept oblique coping corner crossings are blocked");
+    Check(RescueExteriorMovementClear(-34.7f,-12.8f,-32.7f,-12.8f,
+          kUpperSupportWorldY,kPlayerCollisionRadius) &&
+          RescueExteriorMovementClear(kExteriorLanding.x,-12.8f,kExteriorLanding.x,-13.0f,
+          kUpperSupportWorldY,kPlayerCollisionRadius),
+          "finding2 positive: movement on the clear landing remains available");
+    // Finding 2: complete the actual route before ordinary movement/dodge.
+    for(float approachOffset:{-1.10f,0.0f,1.10f}) for(bool dodge:{false,true}) {
+        GameSimulation sim(config); setupClaimed(sim);
+        auto edge=beginAscent(sim); completeAscent(sim,edge);
+        const float targetX=kExteriorLanding.x+approachOffset;
+        edge.yawRadians=0;
+        for(int tick=0;tick<100 && std::abs(sim.Snapshot().playerX-targetX)>.004f;++tick) {
+            edge.moveStrafe=std::clamp((targetX-sim.Snapshot().playerX)/.06f,-1.0f,1.0f);
+            sim.StepFixed(edge);
+        }
+        edge.moveStrafe=0;
+        Check(std::abs(sim.Snapshot().playerX-targetX)<.01f,
+              "finding2: clear exterior-side movement must remain available");
+        edge.yawRadians=0; edge.moveForward=dodge?0.0f:1.0f;
+        if(dodge) ++edge.commands.dodge;
+        bool crossed=false;float minZ=sim.Snapshot().playerZ;
+        for(int tick=0;tick<100;++tick) {
+            sim.StepFixed(edge);const auto& s=sim.Snapshot();
+            minZ=std::min(minZ,s.playerZ);
+            crossed=crossed || (s.playerZ<kCopingZMax+.20f-.001f &&
+                s.playerZ>kCopingZMin-.20f && s.playerSupportWorldY<kCopingTopWorldY+.04f);
+        }
+        std::cout<<"finding2 offset="<<approachOffset<<' '<<(dodge?"dodge":"walk")<<" minZ="<<minZ
+                 <<" support="<<sim.Snapshot().playerSupportWorldY<<" copingPenetration="<<crossed<<'\n';
+        Check(!crossed, "finding2: ordinary exterior movement must not enter closed coping");
+        const float blockedZ=sim.Snapshot().playerZ;
+        edge.moveForward=-1; // Back out onto retained safe landing.
+        for(int tick=0;tick<8;++tick) sim.StepFixed(edge);
+        Check(sim.Snapshot().playerZ>blockedZ && sim.Snapshot().playerGrounded,
+              "finding2: a coping rejection must allow clear-side backtracking");
+    }
+    // Finding 6: approach through normal movement, then check every actual rig pose.
+    for(float offset:{-.74f,.74f}) {
+        GameSimulation sim(config);setupClaimed(sim);
+        InputSnapshot move;move.damageEnabled=false;move.yawRadians=0;
+        const float target=kLowerLanding.x+offset;
+        for(int tick=0;tick<100 && std::abs(sim.Snapshot().playerX-target)>.004f;++tick) {
+            move.moveStrafe=std::clamp((target-sim.Snapshot().playerX)/.06f,-1.0f,1.0f);
+            sim.StepFixed(move);
+        }
+        move.moveStrafe=0;
+        const auto start=sim.Snapshot();
+        Check(std::abs(start.playerX-target)<.01f, "finding6: off-center fixture was not reached by input");
+        move.commands.interact=1;sim.StepFixed(move);
+        Check(sim.Snapshot().rescue.phase==Phase::ApproachAscent,
+              "finding6: eligible off-center approach did not commit");
+        float maxOffset=0;unsigned poses=0,rigFailures=0;bool loaded=false;
+        for(int tick=0;tick<1400 && sim.Snapshot().rescue.equipmentStowed;++tick) {
+            sim.StepFixed(move);const auto& s=sim.Snapshot();
+            if(s.rescue.phase==Phase::Ascent) {
+                loaded=true;maxOffset=std::max(maxOffset,std::abs(s.playerX-kLowerLanding.x));
+            }
+            if(s.rescue.equipmentStowed) {
+                ++poses;
+                if(!ResolveRigAndAttachments(s,++poseSerial,playerSlot,rewardRing,rewardBody,diagnostic)) {
+                    if(rigFailures==0) std::cerr<<"finding6 offset="<<offset<<" first rig rejection: "<<diagnostic<<'\n';
+                    ++rigFailures;++failures;++cases;
+                }
+            }
+        }
+        std::cout<<"finding6 approachX="<<start.playerX<<" maximumLoadedOffset="<<maxOffset
+                 <<" rigPoses="<<poses<<" rigRejections="<<rigFailures<<'\n';
+        Check(loaded && sim.Snapshot().rescue.phase==Phase::UpperSafe,
+              "finding6: complete offset ascent must reach safe exterior");
+        // Report root drift without inventing an additional rig tolerance:
+        // actual imported arm reach and the existing 15 mm grip admission
+        // above determine whether every loaded pose is acceptable.
+    }
+    // Finding 7: focus/capture synchronization followed by an UNPAUSED zero tick.
+    GameSimulation focus(config);setupClaimed(focus);
+    auto edge=beginAscent(focus);
+    for(int tick=0;tick<20;++tick) focus.StepFixed(edge);
+    Check(focus.Snapshot().rescue.equipmentStowed, "finding7: focus fixture must be loaded");
+    focus.SynchronizePausedInput(edge);
+    Check(focus.AdvanceFrame(edge,1.0/120.0)==0, "finding7: sub-tick recovery unexpectedly advanced time");
+    const auto& s=focus.Snapshot();
+    const auto expected=interactions::ComposeLanternPendulumBodyTransform(s.rewardLanternWorldFromHinge,
+        s.lanternPendulum.forwardAngleRadians,s.lanternPendulum.strafeAngleRadians,
+        s.lanternPendulum.torsionAngleRadians,s.heldItemKinematics.rewardLanternPresentationYawRadians);
+    const float error=Distance({expected[12],expected[13],expected[14]},
+        {s.lanternPendulum.worldFromBody[12],s.lanternPendulum.worldFromBody[13],s.lanternPendulum.worldFromBody[14]});
+    std::cout<<"finding7 subTickHipBodyError="<<error<<" ticks="<<s.simulationTicksThisFrame<<'\n';
+    Check(error<.0001f, "finding7: unpaused zero-tick frame must retain one hip/body lantern authority");
+    const auto adapted=BuildRtSceneFrameInputs(s,.92f,WaterQuality::High);
+    Check(adapted.rewardLanternWorldFromHinge==s.rewardLanternWorldFromHinge &&
+          adapted.lanternPendulum.worldFromBody==s.lanternPendulum.worldFromBody,
+          "finding7: actual adapter must retain coherent transforms");
+    if(!ResolveRigAndAttachments(s,++poseSerial,playerSlot,rewardRing,rewardBody,diagnostic))
+        Check(false,"finding7: actual rig/socket consumers rejected sub-tick recovery");
+    std::cout<<"Adversarial rescue cases="<<cases<<" failures="<<failures<<'\n';
+    return failures?1:0;
+}
+
 } // namespace
 
-int main()
+int main(int argc,char** argv)
 {
     const auto root = FindRepoRoot();
     if (root.empty())
@@ -463,6 +663,9 @@ int main()
         std::cerr << "FAIL: admitted player/reward static GLBs: " << diagnostic << '\n';
         return 1;
     }
+
+    if(argc==2 && std::string_view(argv[1])=="--adversarial-regression")
+        return RunAdversarialRescueCases(playerSlot,rewardRing,rewardBody);
 
     GameSimulationConfig config;
     config.playerStartX = kLowerLanding.x;

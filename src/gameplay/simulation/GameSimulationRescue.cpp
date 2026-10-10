@@ -26,11 +26,16 @@ void GameSimulation::SetDevelopmentRescueJourney(bool enabled) {
     ResolvePlayerAnimation(0);ResolveFireEmitters(0);RefreshSnapshot(lastInput_);
 }
 void GameSimulation::RecoverRescueJourney() {
+    // Only traversal owns a rollback destination. Ordinary play (including
+    // pre-claim play) retains the simulation's current support and zone.
+    const bool traversalOwned=rescueTraversal_.IsActive();
     rescueTraversal_.RecoverForReconstruction();RestoreRescueEquipment();worldRoute_.Invalidate(true);
     const auto& s=rescueTraversal_.Snapshot();
-    playerX_=s.playerPosition.x;playerZ_=s.playerPosition.z;
-    playerSupport_={s.supportWorldY,static_cast<PlayerSupportId>(130),true};
-    worldRoute_.current=s.exteriorSide?WorldZoneId::TombExterior:WorldZoneId::Dungeon;
+    if(traversalOwned) {
+        playerX_=s.playerPosition.x;playerZ_=s.playerPosition.z;
+        playerSupport_={s.supportWorldY,static_cast<PlayerSupportId>(130),true};
+        worldRoute_.current=s.exteriorSide?WorldZoneId::TombExterior:WorldZoneId::Dungeon;
+    }
     worldRoute_.safeX=playerX_;worldRoute_.safeZ=playerZ_;worldRoute_.safeSupport=playerSupport_;
     ClearRunIntent();CancelCombatTransients();ClearScheduledCombatEdges(true);ClearEvents();
     SynchronizePausedInput(lastInput_);ResolveHeldItems();ResolvePlayerAnimation(0);

@@ -220,6 +220,7 @@ public class MainActivity extends Activity {
     private static final int HAPTIC_FATAL = 2;
     private static final int HAPTIC_PARRY = 3;
     private static final long ENEMY_IMPACT_FALL_DELAY_MILLISECONDS = 140L;
+    private static final long COMBAT_TEACHING_PROMPT_REFRESH_MILLISECONDS = 32L;
     private static final int CONTEXTUAL_INTERACT = 1;
     private static final int CONTEXTUAL_RAISE = 2;
     private static final int CONTEXTUAL_LOWER = 4;
@@ -739,6 +740,8 @@ public class MainActivity extends Activity {
     }
 
     private void stopSurface() {
+        cancelCombatTeachingPromptPoll();
+        clearCombatTeachingPrompt();
         stopMenuAmbience();
         setBenchmarkStatusExpanded(false);
         if (musicPlayback != null) musicPlayback.setSuspended(true);
@@ -2500,8 +2503,8 @@ public class MainActivity extends Activity {
         ProbeBridge.setCombatTeachingOptions(values.enabled, values.slowdown);
     }
 
-    private void updateCombatTeachingPrompt(int surfaceState) {
-        if (combatTeachingPrompt == null) return;
+    private boolean updateCombatTeachingPrompt(int surfaceState) {
+        if (combatTeachingPrompt == null) return false;
         final long packed = ProbeBridge.getCombatTeachingState();
         final String text = CombatTeachingPreferences.prompt(packed);
         final boolean allowed = resumed && surfaceStarted && surfaceState == 1 &&
@@ -2511,13 +2514,8 @@ public class MainActivity extends Activity {
                 !deathOverlayVisible && !endingOverlayVisible;
         final boolean reducedMotion = isReducedMotionEnabled();
         if (!allowed || reducedMotion && text.isEmpty()) {
-            combatTeachingFadeText = "";
-            combatTeachingFadeOpacity = 0;
-            combatTeachingFadeStartedAtMs = 0L;
-            combatTeachingPrompt.setText("");
-            combatTeachingPrompt.setContentDescription("");
-            combatTeachingPrompt.setVisibility(View.GONE);
-            return;
+            clearCombatTeachingPrompt();
+            return false;
         }
         if (!text.isEmpty()) {
             combatTeachingFadeText = text;
@@ -2528,11 +2526,11 @@ public class MainActivity extends Activity {
             combatTeachingPrompt.setAlpha(CombatTeachingPreferences.alpha(
                     combatTeachingFadeOpacity, reducedMotion));
             combatTeachingPrompt.setVisibility(View.VISIBLE);
-            return;
+            return CombatTeachingPreferences.needsTimelyRefresh(packed);
         }
         if (combatTeachingFadeText.isEmpty()) {
             combatTeachingPrompt.setVisibility(View.GONE);
-            return;
+            return false;
         }
         final long now = SystemClock.uptimeMillis();
         if (combatTeachingFadeStartedAtMs == 0L) combatTeachingFadeStartedAtMs = now;
@@ -2545,12 +2543,58 @@ public class MainActivity extends Activity {
             combatTeachingPrompt.setText("");
             combatTeachingPrompt.setContentDescription("");
             combatTeachingPrompt.setVisibility(View.GONE);
-            return;
+            return false;
         }
         combatTeachingPrompt.setText(combatTeachingFadeText);
         combatTeachingPrompt.setContentDescription(combatTeachingFadeText.replace('\n', ' '));
         combatTeachingPrompt.setAlpha(CombatTeachingPreferences.alpha(fadeOpacity, false));
         combatTeachingPrompt.setVisibility(View.VISIBLE);
+        return true;
+    }
+
+    private boolean combatTeachingPromptPollScheduled;
+    private final Runnable combatTeachingPromptPoll = new Runnable() {
+        @Override public void run() {
+            combatTeachingPromptPollScheduled = false;
+            if (!resumed || !surfaceAvailable || !surfaceStarted || surfaceRequestGeneration == 0) {
+                clearCombatTeachingPrompt();
+                return;
+            }
+            final int state;
+            try {
+                state = ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration);
+            } catch (final RuntimeException | LinkageError unavailable) {
+                clearCombatTeachingPrompt();
+                return;
+            }
+            if (state != 1) {
+                clearCombatTeachingPrompt();
+                return;
+            }
+            if (updateCombatTeachingPrompt(state)) scheduleCombatTeachingPromptPoll();
+        }
+    };
+
+    private void scheduleCombatTeachingPromptPoll() {
+        if (combatTeachingPromptPollScheduled) return;
+        combatTeachingPromptPollScheduled = true;
+        handler.postDelayed(combatTeachingPromptPoll,
+                COMBAT_TEACHING_PROMPT_REFRESH_MILLISECONDS);
+    }
+
+    private void cancelCombatTeachingPromptPoll() {
+        handler.removeCallbacks(combatTeachingPromptPoll);
+        combatTeachingPromptPollScheduled = false;
+    }
+
+    private void clearCombatTeachingPrompt() {
+        combatTeachingFadeText = "";
+        combatTeachingFadeOpacity = 0;
+        combatTeachingFadeStartedAtMs = 0L;
+        if (combatTeachingPrompt == null) return;
+        combatTeachingPrompt.setText("");
+        combatTeachingPrompt.setContentDescription("");
+        combatTeachingPrompt.setVisibility(View.GONE);
     }
 
     private void showSettings() {
@@ -4561,7 +4605,6 @@ public class MainActivity extends Activity {
                     finishBenchmarkAutomation(3);
                 }
                 final int state = ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration);
-                updateCombatTeachingPrompt(state);
                 if (debugMotionActive) {
                     final int motionStatus = ProbeBridge.getDebugMotionEvidenceStatus();
                     if (motionStatus == 3 || motionStatus == 4) {
@@ -4571,6 +4614,8 @@ public class MainActivity extends Activity {
                     }
                 }
                 surfaceStarted = resumed && surfaceAvailable && surfaceRequestGeneration != 0 && state == 1;
+                if (updateCombatTeachingPrompt(state)) scheduleCombatTeachingPromptPoll();
+                else cancelCombatTeachingPromptPoll();
                 if (musicPlayback != null) musicPlayback.setSuspended(!resumed || !surfaceStarted ||
                         state != 1 || menuVisible || diagnosticsVisible || debugMotionActive || pendingDebugMotion != null);
                 if (state == 1) {
@@ -6406,6 +6451,8 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onPause() {
+        cancelCombatTeachingPromptPoll();
+        clearCombatTeachingPrompt();
         clearRunIntent();
         clearTouchState();
         handler.removeCallbacks(refreshEntryMenu);

@@ -450,9 +450,6 @@ void GameSimulation::SynchronizePausedInput(const InputSnapshot& input,
     for (PlayerFootstepCadence& cadence : enemyFootsteps_)
         cadence.Reset();
     fixedStepRunner_.ResetAccumulator();
-    lanternPendulum_.Reset(
-        heldItemFixedStepState_.worldFromLeftHand,
-        heldItemFixedStepState_.kinematics.rewardLanternPresentationYawRadians);
     lanternPendulumResetPending_ = true;
     events_.Clear();
 
@@ -463,7 +460,12 @@ void GameSimulation::SynchronizePausedInput(const InputSnapshot& input,
     snapshot_.eventsEmittedThisTick = 0u;
     snapshot_.eventsEmittedThisFrame = 0u;
     ResolveHeldItems();
+    // Focus/capture synchronization can be followed by an unpaused zero-tick
+    // frame. Publish the same physical hip/hand authority as the next tick.
+    lanternPendulum_.Reset(RescueLanternHinge(),
+        heldItemFixedStepState_.kinematics.rewardLanternPresentationYawRadians);
     ResolvePlayerAnimation(0.0f);
+    ResolveFireEmitters(0.0f);
     RefreshSnapshot(lastInput_);
 }
 
@@ -518,7 +520,9 @@ void GameSimulation::ResolveMovementCollision(float previousX, float previousZ)
         const auto p=ProjectWorldRoute(playerX_,playerZ_);
         const auto zone=p.valid&&p.distance<=kWorldRouteHalfWidth?ZoneForRouteSegment(p.segment):WorldZoneId::TombExterior;
         const bool ready=worldRoute_.readiness[static_cast<std::size_t>(zone)]==ZoneReadiness::Ready;
-        if(!support.grounded||!ready||std::abs(support.worldY-playerSupport_.worldY)>kWorldRouteMaximumStep) {
+        const bool clear=horde::gameplay::traversal::RescueExteriorMovementClear(
+            previousX,previousZ,playerX_,playerZ_,playerSupport_.worldY,kPlayerCollisionRadius);
+        if(!support.grounded||!ready||!clear||std::abs(support.worldY-playerSupport_.worldY)>kWorldRouteMaximumStep) {
             playerX_=previousX;playerZ_=previousZ;worldRoute_.blocked=true;++worldRoute_.rollbackCount;
         } else {
             worldRoute_.safeX=playerX_;worldRoute_.safeZ=playerZ_;worldRoute_.safeSupport=support;worldRoute_.current=zone;worldRoute_.blocked=false;

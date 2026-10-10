@@ -633,6 +633,15 @@ void RescueTraversal::AdvanceMotion()
             snapshot_.supportWorldY=support;
             snapshot_.phase=ascent?Phase::Ascent:Phase::Descent;
             snapshot_.ropeHandsActive=ascent;
+            if(ascent) {
+                // Approach relinquished the request-time offset. Couple the
+                // loaded root to the current solved grips at the admitted
+                // landing, not to the discarded off-centre request pose.
+                gripReferencePlayerPosition_=snapshot_.playerPosition;
+                gripReferenceWorld_=Mul(Add(
+                    Sample(snapshot_.ropeNodes,snapshot_.grippingRopeNodeIndices[0]),
+                    Sample(snapshot_.ropeNodes,snapshot_.grippingRopeNodeIndices[1])),0.5f);
+            }
             snapshot_.sawAscent=ascent||snapshot_.sawAscent;
             snapshot_.sawDescent=!ascent||snapshot_.sawDescent;
             motorTicks_=0u;

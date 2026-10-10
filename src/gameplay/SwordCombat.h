@@ -693,7 +693,6 @@ private:
             target.action = EnemyCombatAction::Staggered;
             target.phaseTime = 0.0f;
             target.animationTime = 0.0f;
-            attackerIndex_ = -1;
         }
     }
 
@@ -734,6 +733,7 @@ private:
 
         const bool ownsAttackToken = attackerIndex_ == static_cast<std::int32_t>(index);
         if (!ownsAttackToken && combatant.action != EnemyCombatAction::Locomotion &&
+            combatant.action != EnemyCombatAction::Staggered &&
             combatant.action != EnemyCombatAction::Dead)
         {
             combatant.action = EnemyCombatAction::Locomotion;
@@ -835,21 +835,22 @@ private:
         if (combatant.action == EnemyCombatAction::AttackRecovery &&
             combatant.phaseTime >= kEnemyAttackRecoveryDuration)
         {
-            FinishEnemyAction(combatant);
+            FinishEnemyAction(combatant, ownsAttackToken);
         }
         if (combatant.action == EnemyCombatAction::Staggered &&
             combatant.phaseTime >= kEnemyStaggerDuration)
         {
-            FinishEnemyAction(combatant);
+            FinishEnemyAction(combatant, ownsAttackToken);
         }
     }
 
-    void FinishEnemyAction(Combatant& combatant)
+    void FinishEnemyAction(Combatant& combatant, const bool ownsAttackToken)
     {
         combatant.action = EnemyCombatAction::Locomotion;
         combatant.phaseTime = 0.0f;
         combatant.animationTime = 0.0f;
-        attackerIndex_ = -1;
+        if (ownsAttackToken)
+            attackerIndex_ = -1;
     }
 
     void ResolveCombatantSeparation(

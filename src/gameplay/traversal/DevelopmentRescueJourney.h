@@ -58,6 +58,32 @@ inline simulation::PlayerSupportResolution RescueExteriorSupport(float x,float z
     if(contains) return {kUpperSupportWorldY,static_cast<PlayerSupportId>(131),true};
     return ResolveWorldRouteSupport(x,z);
 }
+inline bool RescueExteriorMovementClear(float fromX,float fromZ,float toX,float toZ,
+                                        float supportY,float radius) {
+    if(!std::isfinite(fromX)||!std::isfinite(fromZ)||!std::isfinite(toX)||
+       !std::isfinite(toZ)||!std::isfinite(supportY)||!std::isfinite(radius)||radius<=0)
+        return false;
+    // Sweep the conservative horizontal capsule envelope through the actual
+    // retained blockout boxes. Geometry at/below the feet is support, and
+    // geometry above the baseline body height is not an obstacle. This does
+    // not add a general step/fall solver or apply to the traversal handoff.
+    for(const auto& box:horde::scene::kRescueBlockoutBoxes) {
+        if(box.maximum[1]<=supportY+.001f ||
+           box.minimum[1]>=supportY+(kShowcaseEyeWorldY-kRouteFloorWorldY)) continue;
+        float enter=0.0f,leave=1.0f;
+        const auto axis=[&](float from,float to,float minimum,float maximum) {
+            const float delta=to-from;
+            if(std::abs(delta)<1e-7f) return from>=minimum && from<=maximum;
+            float a=(minimum-from)/delta,b=(maximum-from)/delta;
+            if(a>b) std::swap(a,b);
+            enter=std::max(enter,a);leave=std::min(leave,b);
+            return enter<=leave;
+        };
+        if(axis(fromX,toX,box.minimum[0]-radius,box.maximum[0]+radius) &&
+           axis(fromZ,toZ,box.minimum[2]-radius,box.maximum[2]+radius)) return false;
+    }
+    return true;
+}
 inline bool AtRopeEndpoint(float x,float z,bool exterior) {
     const auto p=exterior?kExteriorLanding:kLowerLanding;
     return std::isfinite(x)&&std::isfinite(z)&&

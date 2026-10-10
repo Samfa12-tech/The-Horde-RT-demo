@@ -394,6 +394,171 @@ void OutgoingTraceContract() {
     Check(sim.Snapshot().combatContactTrace.count==0,
           "lifecycle cancellation cannot replay old contact observations");
 }
+void NonfatalPairHitPreservesIndependentActions() {
+    constexpr float playerStartX=-4.5f, playerStartZ=-15.3f;
+    constexpr float yawTowardB=-2.275290391f;
+    const std::array<SkeletonSpawnPose,kSkeletonCombatantCapacity> spawns{{
+        {{-5.5f,-15.95f},0.0f,0.0f}, {{-5.5f,-14.45f},0.0f,0.0f},
+    }};
+    {
+        SwordCombat combat;
+        combat.Reset(kSkeletonCombatantCapacity,{-5.5f,-15.2f},&spawns,2);
+        const CombatSnapshot* state=nullptr;
+        for(int tick=0;tick<6;++tick)
+            state=&combat.Update(1.0f/60.0f,playerStartX,playerStartZ,yawTowardB,true,true,true);
+        Check(state->attackerIndex==0 &&
+              state->combatants[0].action==EnemyCombatAction::AttackWindup,
+              "direct production-pair SwordCombat fixture acquires A's windup");
+        combat.RequestAttack();
+        bool hitB=false;
+        for(int tick=0;tick<40;++tick) {
+            state=&combat.Update(1.0f/60.0f,playerStartX,playerStartZ,yawTowardB,true,true,true);
+            if(state->combatants[1].health==1) { hitB=true; break; }
+        }
+        Check(hitB,"direct production-pair SwordCombat accepts a forgiving nonfatal hit on B");
+        if(hitB) {
+            Check(state->combatants[1].action==EnemyCombatAction::Staggered &&
+                  state->combatants[1].reaction==CombatReaction::Hit,
+                  "direct pair hit preserves B stagger while A remains nearer");
+            Check(state->attackerIndex==0 &&
+                  state->combatants[0].action==EnemyCombatAction::AttackWindup,
+                  "direct pair hit preserves A's ongoing attack token");
+            bool bStaggerCompleted=false;
+            for(int tick=0;tick<55;++tick) {
+                state=&combat.Update(1.0f/60.0f,playerStartX,playerStartZ,
+                                     yawTowardB,true,true,true);
+                if(state->combatants[1].action!=EnemyCombatAction::Staggered) {
+                    bStaggerCompleted=true;
+                    break;
+                }
+                Check(state->attackerIndex==0 &&
+                      state->combatants[0].action!=EnemyCombatAction::Locomotion,
+                      "B's independent stagger cannot interrupt A before completion");
+            }
+            Check(bStaggerCompleted && state->attackerIndex==0 &&
+                  state->combatants[0].action!=EnemyCombatAction::Locomotion,
+                  "finishing non-owner B stagger cannot release A's active token");
+        }
+        combat.Reset(kSkeletonCombatantCapacity,{-5.5f,-15.2f},&spawns,2);
+        Check(combat.Snapshot().attackerIndex==-1 &&
+              combat.Snapshot().combatants[0].health==2 &&
+              combat.Snapshot().combatants[1].health==2,
+              "pair reset clears ownership and restores both combatants");
+    }
+    const auto lethalPairHit=[&](const bool targetB) {
+        SwordCombat combat;
+        combat.Reset(kSkeletonCombatantCapacity,{-5.5f,-15.2f},&spawns,1);
+        const float aimYaw=targetB ? yawTowardB : -0.994421107f;
+        const CombatSnapshot* state=nullptr;
+        for(int tick=0;tick<6;++tick)
+            state=&combat.Update(1.0f/60.0f,playerStartX,playerStartZ,
+                                 aimYaw,true,true,true);
+        const std::int32_t targetIndex=targetB ? 1 : 0;
+        Check(state->attackerIndex==0 &&
+              state->combatants[0].action==EnemyCombatAction::AttackWindup,
+              "lethal compatibility fixture begins with A owning its windup");
+        combat.RequestAttack();
+        bool targetDied=false;
+        for(int tick=0;tick<40;++tick) {
+            state=&combat.Update(1.0f/60.0f,playerStartX,playerStartZ,
+                                 aimYaw,true,true,true);
+            if(state->combatants[targetIndex].health==0) {
+                targetDied=true;
+                break;
+            }
+        }
+        Check(targetDied,"legacy one-hit pair attack still kills its selected target");
+        if(targetDied && targetB) {
+            Check(state->combatants[1].action==EnemyCombatAction::Dead &&
+                  state->attackerIndex==0 &&
+                  state->combatants[0].action==EnemyCombatAction::AttackWindup,
+                  "killing non-owner B leaves A's live windup token intact");
+        } else if(targetDied) {
+            Check(state->combatants[0].action==EnemyCombatAction::Dead &&
+                  state->attackerIndex==1 &&
+                  state->combatants[1].action==EnemyCombatAction::AttackWindup,
+                  "killing token owner A releases it for live B");
+        }
+    };
+    lethalPairHit(true);
+    lethalPairHit(false);
+    const auto runCase=[&](const bool moveNearerB) {
+        auto config=ProductionGameSimulationConfig();
+        config.swordStartsStowed=false;
+        config.playerStartX=playerStartX;
+        config.playerStartZ=playerStartZ;
+        config.playerStartYawRadians=yawTowardB;
+        GameSimulation sim(config); InputSnapshot input; input.tutorialEnabled=false;
+        input.yawRadians=yawTowardB;
+
+        // Production Waterfall spawns put A at (-5.5,-15.95) and B at
+        // (-5.5,-14.45). A starts nearer and owns the windup. In one case,
+        // ordinary movement makes B nearer before a forgiving aimed hit.
+        sim.StepFixed(input);
+        auto state=sim.Snapshot();
+        Check(state.swordCombat.combatantCount==2 &&
+              state.swordCombat.combatants[0].health==2 &&
+              state.swordCombat.combatants[1].health==2,
+              "production pair fixture starts with both modern skeletons at two health");
+        Check(state.swordCombat.attackerIndex==0 &&
+              state.swordCombat.combatants[0].action==EnemyCombatAction::AttackWindup,
+              "A acquires the live attack token before B is contacted");
+
+        if(moveNearerB) {
+            input.moveForward=1.0f;
+            for(int tick=0;tick<10;++tick) sim.StepFixed(input);
+            input.moveForward=0.0f;
+            state=sim.Snapshot();
+            const auto& pair=state.swordCombat.combatants;
+            Check(std::hypot(state.playerX-pair[1].x,state.playerZ-pair[1].z)<
+                  std::hypot(state.playerX-pair[0].x,state.playerZ-pair[0].z),
+                  "ordinary movement reaches the branch where B is nearest while A winds up");
+            Check(state.swordCombat.attackerIndex==0 &&
+                  pair[0].action==EnemyCombatAction::AttackWindup,
+                  "A retains its active windup while the player moves toward B");
+        }
+
+        input.commands.attack=1;
+        bool hitB=false;
+        for(int tick=0;tick<40;++tick) {
+            sim.StepFixed(input);
+            state=sim.Snapshot();
+            hitB=hitB || state.swordCombat.combatants[1].health==1;
+            if(hitB) break;
+        }
+        Check(hitB,"live GameSimulation caller accepts the forgiving nonfatal hit on B");
+        if(hitB) {
+            const auto& pair=state.swordCombat.combatants;
+            Check(pair[1].action==EnemyCombatAction::Staggered &&
+                  pair[1].reaction==CombatReaction::Hit,
+                  moveNearerB
+                    ? "when B becomes nearest, its nonfatal hit keeps the stagger"
+                    : "when A remains nearest, B keeps its nonfatal stagger");
+            Check(state.swordCombat.attackerIndex==0 &&
+                  pair[0].action==EnemyCombatAction::AttackWindup &&
+                  pair[0].actionTime>0.0f,
+                  moveNearerB
+                    ? "hitting nearer B cannot cancel A's owned windup"
+                    : "hitting B cannot cancel A's owned windup when A remains nearest");
+            if(!moveNearerB) {
+                bool bStaggerCompleted=false;
+                for(int tick=0;tick<55;++tick) {
+                    sim.StepFixed(input);
+                    state=sim.Snapshot();
+                    if(state.swordCombat.combatants[1].action!=EnemyCombatAction::Staggered) {
+                        bStaggerCompleted=true;
+                        break;
+                    }
+                }
+                Check(bStaggerCompleted && state.swordCombat.attackerIndex==0 &&
+                      state.swordCombat.combatants[0].action!=EnemyCombatAction::Locomotion,
+                      "live B stagger completion preserves A's active token");
+            }
+        }
+    };
+    runCase(false);
+    runCase(true);
+}
 void RouteMeleeOcclusion() {
     auto config=Rules(); config.waterfallSkeletonEncounter=false;
     config.playerStartX=.40f; config.playerStartZ=-6.20f;
@@ -540,6 +705,7 @@ int main() {
     WindowAndLifecycle(); TeachingContract(); KeeperContract(); ActualIncomingHits(); DeliveryRates(); CoherentSlowdown();
     IntegratedKeeperRepelAndReward();
     OutgoingTraceContract();
+    NonfatalPairHitPreservesIndependentActions();
     RouteMeleeOcclusion();
     LiveParryAndRiposte();
     std::cout<<"combat foundation checks="<<checks<<" failures="<<failures<<'\n';
