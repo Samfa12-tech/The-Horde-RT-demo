@@ -225,6 +225,9 @@ public class MainActivity extends Activity {
     private static final int CONTEXTUAL_LOWER = 4;
     private static final int CHEST_PROMPT_SHIFT = 3;
     private static final int CHEST_PROMPT_MASK = 7 << CHEST_PROMPT_SHIFT;
+    private static final int RESCUE_PROMPT_SHIFT = 6;
+    private static final int RESCUE_PROMPT_MASK = 7 << RESCUE_PROMPT_SHIFT;
+    private static final int CONTEXTUAL_RESCUE_MODE = 1 << 9;
     private static final int CHEST_PROMPT_NONE = 0;
     private static final int CHEST_PROMPT_LOCKED = 1;
     private static final int CHEST_PROMPT_OPEN = 2;
@@ -5020,6 +5023,7 @@ public class MainActivity extends Activity {
             case "player-torch-parry-clearance": return 160;
             case "world-route": return 190;
             case "world-route-staged": return 191;
+            case "rescue-journey-start": return 192;
             case "vertical-proof-ground": return 170;
             case "vertical-proof-raised": return 171;
             case "layout-c-wall-panel-upward": return 152;
@@ -5292,6 +5296,7 @@ public class MainActivity extends Activity {
 
     static float[] developmentCheckpointViewPose(final int checkpoint) {
         switch (checkpoint) {
+            case 192: return new float[]{3.1415927f, -0.05f};
             case 136: return new float[]{0.0f, -0.32f};
             case 137: return new float[]{0.0f, -0.05f};
             case 138: return new float[]{0.0f, -0.28f};
@@ -6047,6 +6052,39 @@ public class MainActivity extends Activity {
             return;
         }
         final int contextualState = ProbeBridge.getContextualControlState();
+        if ((contextualState & CONTEXTUAL_RESCUE_MODE) != 0) {
+            final int rescuePrompt = (contextualState & RESCUE_PROMPT_MASK) >> RESCUE_PROMPT_SHIFT;
+            final String label;
+            switch (rescuePrompt) {
+                case 1: label = "Climb rescue rope"; break;
+                case 2: label = "Descend rescue rope"; break;
+                case 3: label = "Preparing rescue route…"; break;
+                case 4: label = "Traversing rescue rope…"; break;
+                default: label = ""; break;
+            }
+            final boolean enabled = (contextualState & CONTEXTUAL_INTERACT) != 0;
+            if (label.isEmpty()) {
+                interactButton.setVisibility(View.GONE);
+            } else {
+                interactButton.setText(label);
+                interactButton.setContentDescription(label);
+                interactButton.setEnabled(enabled);
+                interactButton.setVisibility(controllerMode ? View.GONE : View.VISIBLE);
+            }
+            if (controllerPrompt != null) {
+                if (controllerMode) {
+                    final String prompt = getString(R.string.controller_play_prompts) +
+                            (label.isEmpty() ? "" : "\n" + (enabled ? "A: " : "") + label);
+                    controllerPrompt.setText(prompt);
+                    controllerPrompt.setContentDescription(prompt);
+                    controllerPrompt.setVisibility(View.VISIBLE);
+                } else {
+                    controllerPrompt.setVisibility(View.GONE);
+                }
+            }
+            toggleHeldLightPoseButton.setVisibility(View.GONE);
+            return;
+        }
         final int chestPrompt = (contextualState & CHEST_PROMPT_MASK) >> CHEST_PROMPT_SHIFT;
         final boolean interactEnabled = (contextualState & CONTEXTUAL_INTERACT) != 0;
         final int interactLabel;

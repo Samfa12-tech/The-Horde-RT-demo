@@ -1,6 +1,7 @@
 #pragma once
 #include "scene/atmosphere/IndoorDust.h"
 #include "scene/DevelopmentWorldGeometry.h"
+#include "gameplay/traversal/RescueTraversal.h"
 
 #include <array>
 #include <cstdint>
@@ -85,6 +86,9 @@ PlayerWeaponRenderPose EvaluatePlayerWeaponRenderPose(
 
 struct RtSceneFrameInputs
 {
+    bool developmentRescueJourney = false;
+    bool retainedWorkloadSkeleton = false;
+    horde::gameplay::traversal::RescueTraversalSnapshot rescue{};
     float playerSupportWorldY = horde::gameplay::kRouteFloorWorldY;
     std::uint64_t tickIndex = 0u;
     float cameraYaw = 0.0f;
@@ -244,6 +248,7 @@ public:
 
     // Set before Initialise; geometry admission is explicit and development-only.
     void SetDevelopmentSupportFixture(bool enabled) { developmentSupportFixture_ = enabled; }
+    void SetDevelopmentRescueJourney(bool enabled) { developmentRescueJourney_=enabled; }
     void SetDevelopmentWorldRoute(bool enabled, bool staged = false) { developmentWorldRoute_=enabled; stagedWorldPreparation_=staged; }
     horde::gameplay::simulation::ZoneReadiness WorldZoneReadiness(horde::gameplay::simulation::WorldZoneToken token) const;
     const horde::scene::DevelopmentWorldGeometry& WorldRouteGeometry() const { return worldRouteGeometry_; }
@@ -883,6 +888,12 @@ private:
     bool developmentSupportFixture_ = false;
     bool developmentWorldRoute_ = false;
     bool stagedWorldPreparation_ = false;
+    bool developmentRescueJourney_ = false;
+    Buffer rescueWorldUpdateScratch_;
+    std::vector<std::array<float,3>> rescueWorldVertices_;
+    std::size_t rescueRopeVertexOffset_ = 0;
+    std::uint32_t rescueWorldPrimitiveCount_ = 0;
+    std::uint32_t rescueWorldMaxVertex_ = 0;
     horde::scene::DevelopmentWorldGeometry worldRouteGeometry_{};
     RtSceneProfile sceneProfile_ = RtSceneProfile::Showcase;
     bool glassEnabled_ = true;

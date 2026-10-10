@@ -22,6 +22,7 @@
 #include "gameplay/simulation/SimulationSnapshot.h"
 #include "gameplay/simulation/DevelopmentSupportFixture.h"
 #include "gameplay/simulation/DevelopmentWorldRoute.h"
+#include "gameplay/traversal/DevelopmentRescueJourney.h"
 
 namespace horde::gameplay::validation
 {
@@ -57,6 +58,7 @@ struct GameSimulationConfig
     bool waterfallSkeletonEncounter = false;
     bool developmentSupportFixture = false;
     bool developmentWorldRoute = false;
+    bool developmentRescueJourney = false;
     // Current development gameplay; legacy constructor/capture fixtures retain
     // their authored rules unless the live application profile selects this.
     bool combatFoundation1_7 = false;
@@ -107,6 +109,7 @@ public:
     // Owner-thread development control; invalidates previous support immediately.
     void SetDevelopmentSupportFixture(bool enabled, std::uint64_t generation);
     void SetDevelopmentWorldRoute(bool enabled, bool stagedPreparation = false);
+    void SetDevelopmentRescueJourney(bool enabled);
     bool PublishWorldZoneReadiness(WorldZoneToken token, ZoneReadiness readiness);
     void InvalidateWorldZoneReadiness();
     void ResetRoute();
@@ -172,6 +175,14 @@ private:
     void UpdateEncounters(const InputSnapshot& input, float deltaSeconds);
     void UpdateRewardSequence(float deltaSeconds, bool commandsAvailable);
     void ResolveHeldItems();
+    bool UsesRescueExterior() const;
+    void StepRescueJourney(bool paused);
+    bool TryRescueInteraction();
+    void RecoverRescueJourney();
+    void ApplyRescuePresentation();
+    void RestoreRescueEquipment();
+    void PublishRescueSnapshot();
+    horde::gameplay::items::HeldItemTransform RescueLanternHinge() const;
     void RecordSwordContactTrace();
     bool SwordDefenseReady() const;
     bool SwordDrawBlocksDefense() const;
@@ -251,6 +262,11 @@ private:
 
     PlayerSupportResolution playerSupport_{};
     WorldRouteState worldRoute_{};
+    horde::gameplay::traversal::RescueTraversal rescueTraversal_{};
+    float rescueOpeningSeconds_ = 0.0f;
+    bool rescueMovementSuppressedThisTick_ = false;
+    bool rescueSavedSwordValid_=false;
+    horde::gameplay::items::HeldItemState rescueSavedSword_{};
     bool stagedWorldPreparation_ = false;
     std::uint64_t supportGeneration_ = 1u;
     float playerX_ = 0.0f;

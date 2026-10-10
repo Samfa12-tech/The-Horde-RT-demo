@@ -1,11 +1,14 @@
 #include "vulkan/raytracing/RtSceneRecordObservation.h"
 
+#include <algorithm>
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <initializer_list>
 #include <iostream>
 #include <string_view>
 #include <type_traits>
+#include <vector>
 
 namespace
 {
@@ -159,5 +162,93 @@ int main()
     ok &= Require(!abortObservation.healthy && reversedAccumulator.Active() &&
                       reversedAccumulator.Abort(),
                   "unhealthy renderer observation scratch must remain abortable");
+
+    using namespace horde::vulkan::raytracing;
+    RtSceneCommandObservation sixBlasCommands{};
+    RtSceneRecordObservation sixBlasObservation{};
+    sixBlasObservation.commands = &sixBlasCommands;
+    std::vector<RtSceneCommandEvent> actualCommands;
+    ExecuteObservedRtSceneCommand(&sixBlasObservation, RtSceneCommandEvent::HostWriteBarrier,
+        [&]() { actualCommands.push_back(RtSceneCommandEvent::HostWriteBarrier); });
+    const std::array<bool, 6u> sixRequested{{true, true, true, true, true, true}};
+    const std::uint64_t sixUpdates = ExecuteObservedDynamicBlasCommands(
+        &sixBlasObservation, sixRequested,
+        [&](const std::size_t index) {
+            // The command callback precedes its observation event.
+            if (index == 0u)
+                ok &= Require(sixBlasCommands.BlasUpdateCount() == 0u,
+                    "six-producer batch records the first Vulkan command before observing it");
+            actualCommands.push_back(RtSceneCommandEvent::BlasUpdate);
+        },
+        [&]() {
+            ok &= Require(sixBlasCommands.BlasUpdateCount() == 6u &&
+                              sixBlasCommands.ValidCompleted() == false,
+                          "one dependency callback follows all six actual BLAS updates");
+            actualCommands.push_back(RtSceneCommandEvent::BlasToTlasBarrier);
+        });
+    ExecuteObservedTlasUpdateCommands(
+        &sixBlasObservation,
+        [&]() { actualCommands.push_back(RtSceneCommandEvent::TlasUpdate); },
+        [&]() { actualCommands.push_back(RtSceneCommandEvent::TlasToTraceBarrier); });
+    ExecuteObservedTraceCopyCommands(
+        &sixBlasObservation,
+        [&]() { actualCommands.push_back(RtSceneCommandEvent::Trace); },
+        [&]() { actualCommands.push_back(RtSceneCommandEvent::CopyOrBlit); });
+    constexpr std::array<RtSceneCommandEvent, 12u> expectedSixCommands{{
+        RtSceneCommandEvent::HostWriteBarrier,
+        RtSceneCommandEvent::BlasUpdate, RtSceneCommandEvent::BlasUpdate,
+        RtSceneCommandEvent::BlasUpdate, RtSceneCommandEvent::BlasUpdate,
+        RtSceneCommandEvent::BlasUpdate, RtSceneCommandEvent::BlasUpdate,
+        RtSceneCommandEvent::BlasToTlasBarrier,
+        RtSceneCommandEvent::TlasUpdate, RtSceneCommandEvent::TlasToTraceBarrier,
+        RtSceneCommandEvent::Trace, RtSceneCommandEvent::CopyOrBlit,
+    }};
+    ok &= Require(sixUpdates == 6u && actualCommands.size() == expectedSixCommands.size() &&
+                      std::equal(actualCommands.begin(), actualCommands.end(),
+                                 expectedSixCommands.begin()) &&
+                      sixBlasObservation.healthy && sixBlasCommands.ValidCompleted() &&
+                      sixBlasCommands.BlasUpdateCount() == 6u &&
+                      sixBlasCommands.TlasUpdateCount() == 1u &&
+                      sixBlasCommands.TraceCount() == 1u &&
+                      sixBlasCommands.CopyCount() == 1u,
+                  "six real BLAS callbacks share one ordered BLAS-to-TLAS barrier and fit observation capacity");
+
+    RtSceneCommandObservation missingBarrierCommands{};
+    for (const auto event : {RtSceneCommandEvent::HostWriteBarrier,
+                             RtSceneCommandEvent::BlasUpdate,
+                             RtSceneCommandEvent::BlasUpdate,
+                             RtSceneCommandEvent::BlasUpdate,
+                             RtSceneCommandEvent::BlasUpdate,
+                             RtSceneCommandEvent::BlasUpdate,
+                             RtSceneCommandEvent::BlasUpdate,
+                             RtSceneCommandEvent::TlasUpdate,
+                             RtSceneCommandEvent::TlasToTraceBarrier,
+                             RtSceneCommandEvent::Trace,
+                             RtSceneCommandEvent::CopyOrBlit})
+        (void)missingBarrierCommands.Note(event);
+    ok &= Require(!missingBarrierCommands.ValidCompleted(),
+                  "six producer observations reject a missing BLAS-to-TLAS dependency");
+
+    RtSceneCommandObservation reorderedCommands{};
+    for (const auto event : {RtSceneCommandEvent::HostWriteBarrier,
+                             RtSceneCommandEvent::BlasUpdate,
+                             RtSceneCommandEvent::BlasToTlasBarrier,
+                             RtSceneCommandEvent::BlasUpdate,
+                             RtSceneCommandEvent::TlasUpdate,
+                             RtSceneCommandEvent::TlasToTraceBarrier,
+                             RtSceneCommandEvent::Trace,
+                             RtSceneCommandEvent::CopyOrBlit})
+        (void)reorderedCommands.Note(event);
+    ok &= Require(!reorderedCommands.ValidCompleted(),
+                  "six producer observations reject a BLAS update recorded after its dependency");
+
+    RtSceneCommandObservation overflowCommands{};
+    RtSceneRecordObservation overflowObservation{};
+    overflowObservation.commands = &overflowCommands;
+    for (const auto event : expectedSixCommands)
+        ObserveRtSceneCommand(&overflowObservation, event);
+    ObserveRtSceneCommand(&overflowObservation, RtSceneCommandEvent::BlasUpdate);
+    ok &= Require(!overflowObservation.healthy && !overflowCommands.ValidCompleted(),
+                  "a thirteenth observed command overflows the fixed twelve-event capacity");
     return ok ? 0 : 1;
 }

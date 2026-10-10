@@ -17,6 +17,8 @@ set(HORDE_RT_CORE_RELATIVE_SOURCES
     reporting/BenchmarkSummarySubmission.cpp
     reporting/PlaytestSubmission.cpp
     gameplay/simulation/GameSimulation.cpp
+    gameplay/simulation/GameSimulationRescue.cpp
+    gameplay/traversal/RescueTraversal.cpp
     gameplay/animation/PlayerAnimationState.cpp
     gameplay/animation/PlayerIkTargets.cpp
     gameplay/effects/FireEmitterState.cpp

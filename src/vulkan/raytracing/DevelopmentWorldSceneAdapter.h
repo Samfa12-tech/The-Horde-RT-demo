@@ -10,7 +10,7 @@ inline void PublishDevelopmentWorldReadiness(
 {
     using namespace horde::gameplay::simulation;
     const auto snapshot=simulation.Snapshot();
-    if(!snapshot.developmentWorldRoute) return;
+    if(!snapshot.developmentWorldRoute && !snapshot.developmentRescueJourney) return;
     for(std::size_t i=1;i<kWorldZones.size();++i)
     {
         if(snapshot.worldRoute.readiness[i]!=ZoneReadiness::Unprepared &&

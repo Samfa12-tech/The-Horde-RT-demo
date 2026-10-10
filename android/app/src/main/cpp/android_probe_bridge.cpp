@@ -378,9 +378,11 @@ struct SwapchainContext
     bool developmentSupportFixture = false;
     bool developmentWorldRoute = false;
     bool stagedWorldPreparation = false;
+    bool developmentRescueJourney = false;
     std::optional<bool> developmentWorldRouteOverride;
     std::optional<bool> stagedWorldPreparationOverride;
     std::optional<bool> developmentSupportFixtureOverride;
+    std::optional<bool> developmentRescueJourneyOverride;
     std::optional<std::int32_t> preparedFixtureCheckpointId;
     bool preparedFixtureCheckpointIsCapture = false;
     float glassDepthScale = 1.0f;
@@ -939,21 +941,28 @@ void PublishSimulationUiState()
     using horde::gameplay::interactions::ChestRewardPrompt;
     using horde::gameplay::interactions::HeldLightKind;
     using horde::gameplay::interactions::HeldLightPose;
-    contextualControls |= static_cast<int>(simulation.chestPrompt) << 3;
-    if (simulation.chestPrompt == ChestRewardPrompt::OpenChest ||
-        simulation.chestPrompt == ChestRewardPrompt::ClaimLantern)
+    using horde::gameplay::traversal::RescuePrompt;
+    if (simulation.developmentRescueJourney && simulation.rescuePrompt != RescuePrompt::None)
     {
-        contextualControls |= 1;
+        contextualControls |= 1 << 9;
+        contextualControls |= static_cast<int>(simulation.rescuePrompt) << 6;
+        if (simulation.rescuePrompt == RescuePrompt::Climb || simulation.rescuePrompt == RescuePrompt::Descend)
+            contextualControls |= 1;
     }
-    if (simulation.interaction.heldLightKind == HeldLightKind::RewardLantern)
+    else
     {
-        if (simulation.interaction.heldLightPose == HeldLightPose::Low)
+        contextualControls |= static_cast<int>(simulation.chestPrompt) << 3;
+        if (simulation.chestPrompt == ChestRewardPrompt::OpenChest ||
+            simulation.chestPrompt == ChestRewardPrompt::ClaimLantern)
         {
-            contextualControls |= 2;
+            contextualControls |= 1;
         }
-        else if (simulation.interaction.heldLightPose == HeldLightPose::High)
+        if (simulation.interaction.heldLightKind == HeldLightKind::RewardLantern)
         {
-            contextualControls |= 4;
+            if (simulation.interaction.heldLightPose == HeldLightPose::Low)
+                contextualControls |= 2;
+            else if (simulation.interaction.heldLightPose == HeldLightPose::High)
+                contextualControls |= 4;
         }
     }
     gContextualControlState.store(contextualControls, std::memory_order_release);
@@ -1713,6 +1722,10 @@ void ApplyDebugCheckpointSimulation(
     const bool replacedQueue = gGameSimulation.Snapshot().playerMountProfile != config.playerMountProfile;
     if (replacedQueue)
         gGameSimulation = horde::gameplay::simulation::GameSimulation(config);
+    const bool rescueJourneyCheckpoint = selection.development != nullptr &&
+        selection.development->id == 192;
+    if (gGameSimulation.Snapshot().developmentRescueJourney && !rescueJourneyCheckpoint)
+        gGameSimulation.SetDevelopmentRescueJourney(false);
     horde::platform::android::ResetMusicSession(replacedQueue);
     if (selection.development != nullptr)
     {
@@ -1741,9 +1754,16 @@ void ApplyDebugCheckpointSimulation(
                         timing.activeScope.reset();
                     }
                 }};
-        const bool staged = horde::gameplay::StageDevelopmentCheckpointSimulation(
-            gGameSimulation, *selection.development, &evidence,
-            observation != nullptr ? &stepObservation : nullptr);
+        // This checkpoint is a journey-mode start, not a world-route debug
+        // teleport. Preserve the normal dungeon start and let the journey
+        // authority place the player at its lower safe landing.
+        const bool staged = rescueJourneyCheckpoint
+            ? gGameSimulation.ApplyShowcaseCheckpoint(selection.simulationCheckpointId)
+            : horde::gameplay::StageDevelopmentCheckpointSimulation(
+                gGameSimulation, *selection.development, &evidence,
+                observation != nullptr ? &stepObservation : nullptr);
+        if (rescueJourneyCheckpoint)
+            gGameSimulation.SetDevelopmentRescueJourney(true);
         if (selection.development->combatPose ==
             horde::gameplay::DevelopmentCombatPose::ParryActive)
         {
@@ -2017,6 +2037,7 @@ void ApplyBenchmarkCheckpoint(
     context.developmentSupportFixtureOverride.reset();
     context.developmentWorldRouteOverride.reset();
     context.stagedWorldPreparationOverride.reset();
+    context.developmentRescueJourneyOverride.reset();
     if (context.rtFrameEvidenceInitialised)
     {
         (void)context.rtFrameEvidence.ApplyEvent(
@@ -2071,6 +2092,7 @@ void ApplyCaptureCheckpoint(
     context.developmentSupportFixtureOverride.reset();
     context.developmentWorldRouteOverride.reset();
     context.stagedWorldPreparationOverride.reset();
+    context.developmentRescueJourneyOverride.reset();
     if (context.rtFrameEvidenceInitialised)
     {
         (void)context.rtFrameEvidence.ApplyEvent(
@@ -3093,9 +3115,14 @@ bool InitialiseRtSceneForSwapchain(SwapchainContext& context)
     context.developmentSupportFixture = context.developmentSupportFixtureOverride.has_value()
         ? *context.developmentSupportFixtureOverride
         : gGameSimulation.Snapshot().developmentSupportFixture;
-    context.developmentWorldRoute=context.developmentWorldRouteOverride.value_or(gGameSimulation.Snapshot().developmentWorldRoute);
+    context.developmentWorldRoute=context.developmentWorldRouteOverride.value_or(
+        gGameSimulation.Snapshot().developmentWorldRoute ||
+        gGameSimulation.Snapshot().developmentRescueJourney);
+    context.developmentRescueJourney=context.developmentRescueJourneyOverride.value_or(
+        gGameSimulation.Snapshot().developmentRescueJourney);
     context.stagedWorldPreparation=context.stagedWorldPreparationOverride.value_or(gGameSimulation.Snapshot().stagedWorldPreparation);
     context.rtScene.SetDevelopmentWorldRoute(context.developmentWorldRoute,context.stagedWorldPreparation);
+    context.rtScene.SetDevelopmentRescueJourney(context.developmentRescueJourney);
     context.rtScene.SetDevelopmentSupportFixture(context.developmentSupportFixture);
     const bool initialised = context.rtScene.Initialise(context.instance,
                                     context.physicalDevice,
@@ -3254,7 +3281,9 @@ bool RebuildDevelopmentSupportFixtureOnOwner(
             context, checkpointId, requestedFixture, "scene-not-ready", VK_NOT_READY);
         return false;
     }
-    if (context.developmentSupportFixture == requestedFixture && context.developmentWorldRoute == requestedWorld && context.stagedWorldPreparation == stagedWorld)
+    if (context.developmentSupportFixture == requestedFixture && context.developmentWorldRoute == requestedWorld &&
+        context.stagedWorldPreparation == stagedWorld &&
+        context.developmentRescueJourney == context.developmentRescueJourneyOverride.value_or(context.developmentRescueJourney))
         return true;
     if (!ConsumePendingImageAcquire(context))
     {
@@ -3362,9 +3391,12 @@ bool PrepareFixtureChangingCheckpointOnOwner(
         selection.development->developmentSupportFixture;
     // Ordinary selections and transitions between checkpoints using the same
     // fixture retain their established RenderFrame staging/observation path.
-    const bool requestedWorld=selection.development && selection.development->developmentWorldRoute;
+    const bool requestedWorld=selection.development &&
+        (selection.development->developmentWorldRoute || selection.development->id == 192);
+    const bool requestedRescueJourney=selection.development && selection.development->id == 192;
     const bool stagedWorld=selection.development && selection.development->stagedWorldPreparation;
-    if (context.developmentSupportFixture == requestedFixture && context.developmentWorldRoute == requestedWorld && context.stagedWorldPreparation == stagedWorld)
+    if (context.developmentSupportFixture == requestedFixture && context.developmentWorldRoute == requestedWorld &&
+        context.stagedWorldPreparation == stagedWorld && context.developmentRescueJourney == requestedRescueJourney)
         return true;
 
     std::atomic<std::int32_t>& selectedRequest = isCapture
@@ -3386,9 +3418,11 @@ bool PrepareFixtureChangingCheckpointOnOwner(
     gDebugCheckpointInProgress.store(true, std::memory_order_release);
     admissionLock.unlock();
 
+    context.developmentRescueJourneyOverride=requestedRescueJourney;
     if (!RebuildDevelopmentSupportFixtureOnOwner(
             context, selection.checkpoint.id, requestedFixture, requestedWorld, stagedWorld))
     {
+        context.developmentRescueJourneyOverride.reset();
         std::int32_t expectedCapture = requestedCaptureCheckpoint;
         (void)gCaptureCheckpointRequested.compare_exchange_strong(
             expectedCapture, -1, std::memory_order_acq_rel, std::memory_order_acquire);

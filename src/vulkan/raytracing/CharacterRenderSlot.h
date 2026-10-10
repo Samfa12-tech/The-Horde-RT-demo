@@ -48,6 +48,7 @@ struct SkeletonRenderPlan
 struct CharacterFramePlan
 {
     bool selectedLich = false;
+    bool retainedWorkloadSkeleton = false;
     horde::scene::SkinnedClip lichClip = horde::scene::SkinnedClip::Idle;
     float lichTime = 0.0f;
     VkTransformMatrixKHR lichTransform{};
@@ -69,7 +70,7 @@ CharacterFramePlan EvaluateCharacterFramePlan(
     std::size_t skeletonCount,
     const horde::gameplay::EnemyRosterSnapshot& roster,
     const horde::gameplay::LichSnapshot& lich,
-    float skeletonDeadClipDuration);
+    float skeletonDeadClipDuration, bool retainedWorkloadSkeleton = false);
 
 class CharacterRenderSlot
 {
@@ -89,7 +90,7 @@ public:
                         std::size_t skeletonCount,
                         const horde::gameplay::EnemyRosterSnapshot& roster,
                         const horde::gameplay::LichSnapshot& lich,
-                        std::string& diagnostic);
+                        std::string& diagnostic, bool retainedWorkloadSkeleton = false);
     bool PrepareFrame(const std::array<horde::gameplay::simulation::SkeletonEnemySnapshot,
                                        horde::gameplay::simulation::kSkeletonEnemyCapacity>& skeletons,
                       std::size_t skeletonCount,
@@ -97,7 +98,7 @@ public:
                       const horde::gameplay::LichSnapshot& lich,
                       const RtGpuResources& resources,
                       std::string& diagnostic,
-                      RtSceneRecordObservation* observation = nullptr);
+                      RtSceneRecordObservation* observation = nullptr, bool retainedWorkloadSkeleton = false);
 
     std::array<VkAccelerationStructureInstanceKHR, kMaximumActiveSkeletons> BuildActiveInstances() const;
     std::array<float, 3u> LichStaffWorldPosition(const horde::gameplay::LichSnapshot& lich) const;

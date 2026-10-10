@@ -1,6 +1,7 @@
 #pragma once
 #include "gameplay/simulation/DevelopmentSupportFixture.h"
 #include "gameplay/simulation/DevelopmentWorldRoute.h"
+#include "gameplay/traversal/DevelopmentRescueJourney.h"
 
 #include <array>
 #include <cstddef>
@@ -49,6 +50,7 @@ struct SkeletonEnemySnapshot
     // Contact/readability proofs must skin the exact published combat pose.
     // Ordinary locomotion and frozen evidence retain the existing 30Hz policy.
     bool forceCurrentCombatPose = false;
+    float worldY = horde::gameplay::kRouteFloorWorldY;
 };
 
 struct SimulationSnapshot
@@ -73,6 +75,9 @@ struct SimulationSnapshot
     bool developmentWorldRoute = false;
     bool stagedWorldPreparation = false;
     WorldRouteState worldRoute{};
+    bool developmentRescueJourney = false;
+    horde::gameplay::traversal::RescueTraversalSnapshot rescue{};
+    horde::gameplay::traversal::RescuePrompt rescuePrompt = horde::gameplay::traversal::RescuePrompt::None;
     SupportSurface playerSupportSurface = SupportSurface::Stone;
     float playerSupportWorldY = horde::gameplay::kRouteFloorWorldY;
     float playerHeightDelta = 0.0f;

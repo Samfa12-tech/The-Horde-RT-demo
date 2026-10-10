@@ -114,6 +114,16 @@ public final class ContextualControlsLayoutTest {
     }
 
     @Test
+    public void rescueJourneyCheckpointRestoresLiveOpeningView() {
+        assertEquals(192, MainActivity.checkpointId("rescue-journey-start"));
+        final float[] view = MainActivity.developmentCheckpointViewPose(192);
+        assertNotNull(view);
+        assertEquals(3.1415927f, view[0], 0.000001f);
+        assertEquals(-0.05f, view[1], 0.000001f);
+        assertEquals(-1, MainActivity.checkpointId("rescue-journey-ground"));
+    }
+
+    @Test
     public void updaterComparesDebugCandidatesUsingThePublishedBaseVersion() {
         assertEquals("1.5.2", MainActivity.installedUpdateVersion("1.5.2-debug"));
         assertEquals("1.5.2-alpha.1", MainActivity.installedUpdateVersion("1.5.2-alpha.1"));

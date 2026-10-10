@@ -180,7 +180,7 @@ std::uint32_t GameSimulation::AdvanceFrame(const InputSnapshot& input,
             cadence.Reset();
         }
         lanternPendulum_.Reset(
-            heldItemFixedStepState_.worldFromLeftHand,
+            RescueLanternHinge(),
             heldItemFixedStepState_.kinematics.rewardLanternPresentationYawRadians);
         lanternPendulumResetPending_ = true;
     }
@@ -285,7 +285,9 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
     {
         walkTime_ += fixedDeltaSeconds;
         walkCycleTime_ += fixedDeltaSeconds;
-        UpdateMovement(input, fixedDeltaSeconds);
+        StepRescueJourney(fixedDeltaSeconds<=0);
+        if (!rescueMovementSuppressedThisTick_)
+            UpdateMovement(input, fixedDeltaSeconds);
         AdvanceSwordEquipment(fixedDeltaSeconds);
         const bool torchWasTriggered = torchFailureSnapshot_.triggered;
         torchFailureSnapshot_ = torchFailure_.Update(fixedDeltaSeconds,
@@ -311,21 +313,21 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
             if (lanternPendulumResetPending_)
             {
                 lanternPendulum_.Reset(
-                    heldItemFixedStepState_.worldFromLeftHand,
+                    RescueLanternHinge(),
                     heldItemFixedStepState_.kinematics.rewardLanternPresentationYawRadians);
                 lanternPendulumResetPending_ = false;
             }
             else
             {
                 lanternPendulum_.StepFixed(
-                    heldItemFixedStepState_.worldFromLeftHand, fixedDeltaSeconds,
+                    RescueLanternHinge(), fixedDeltaSeconds,
                     heldItemFixedStepState_.kinematics.rewardLanternPresentationYawRadians);
             }
         }
         else
         {
             lanternPendulum_.Reset(
-                heldItemFixedStepState_.worldFromLeftHand,
+                RescueLanternHinge(),
                 heldItemFixedStepState_.kinematics.rewardLanternPresentationYawRadians);
             lanternPendulumResetPending_ = true;
         }
@@ -334,6 +336,7 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
     }
     else
     {
+        StepRescueJourney(true);
         snapshot_.playerTravelledThisTick = 0.0f;
         walkVisualAmount_ = 0.0f;
         playerFootsteps_.Reset();
@@ -342,7 +345,7 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
             cadence.Reset();
         }
         lanternPendulum_.Reset(
-            heldItemFixedStepState_.worldFromLeftHand,
+            RescueLanternHinge(),
             heldItemFixedStepState_.kinematics.rewardLanternPresentationYawRadians);
         lanternPendulumResetPending_ = true;
     }
@@ -491,6 +494,10 @@ void GameSimulation::ResetPlayerSupport()
 }
 void GameSimulation::ResolvePlayerSupport()
 {
+    if (config_.developmentRescueJourney && rescueTraversal_.IsActive()) return;
+    if (UsesRescueExterior()) {
+        playerSupport_ = horde::gameplay::traversal::RescueExteriorSupport(playerX_,playerZ_); return;
+    }
     if (config_.developmentWorldRoute)
     {
         const auto support=ResolveWorldRouteSupport(playerX_,playerZ_);
@@ -506,6 +513,18 @@ void GameSimulation::ResolvePlayerSupport()
 }
 void GameSimulation::ResolveMovementCollision(float previousX, float previousZ)
 {
+    if (UsesRescueExterior()) {
+        const auto support=horde::gameplay::traversal::RescueExteriorSupport(playerX_,playerZ_);
+        const auto p=ProjectWorldRoute(playerX_,playerZ_);
+        const auto zone=p.valid&&p.distance<=kWorldRouteHalfWidth?ZoneForRouteSegment(p.segment):WorldZoneId::TombExterior;
+        const bool ready=worldRoute_.readiness[static_cast<std::size_t>(zone)]==ZoneReadiness::Ready;
+        if(!support.grounded||!ready||std::abs(support.worldY-playerSupport_.worldY)>kWorldRouteMaximumStep) {
+            playerX_=previousX;playerZ_=previousZ;worldRoute_.blocked=true;++worldRoute_.rollbackCount;
+        } else {
+            worldRoute_.safeX=playerX_;worldRoute_.safeZ=playerZ_;worldRoute_.safeSupport=support;worldRoute_.current=zone;worldRoute_.blocked=false;
+        }
+        return;
+    }
     if (!config_.developmentWorldRoute)
     {
         ResolveCorridorPlayerCollision(previousX,previousZ,playerX_,playerZ_);
@@ -548,11 +567,12 @@ void GameSimulation::SetDevelopmentWorldRoute(bool enabled, bool stagedPreparati
 }
 bool GameSimulation::PublishWorldZoneReadiness(WorldZoneToken token, ZoneReadiness readiness)
 {
-    if(!config_.developmentWorldRoute || !worldRoute_.Publish(token,readiness)) return false;
+    if((!config_.developmentWorldRoute && !config_.developmentRescueJourney) || !worldRoute_.Publish(token,readiness)) return false;
     RefreshSnapshot(lastInput_); return true;
 }
 void GameSimulation::InvalidateWorldZoneReadiness()
 {
+    if(config_.developmentRescueJourney) { RecoverRescueJourney(); return; }
     if(!config_.developmentWorldRoute) return;
     worldRoute_.Invalidate(true); playerX_=worldRoute_.safeX; playerZ_=worldRoute_.safeZ;
     playerSupport_=worldRoute_.safeSupport; ClearRunIntent(); ClearEvents(); ResolveHeldItems(); ResolvePlayerAnimation(0);
@@ -575,6 +595,7 @@ void GameSimulation::SetDevelopmentSupportFixture(bool enabled, std::uint64_t ge
 
 void GameSimulation::ResetRoute()
 {
+    if(config_.developmentRescueJourney) { rescueSavedSwordValid_=false;rescueTraversal_.Reset();rescueOpeningSeconds_=0;worldRoute_.Invalidate(); }
     legacyCombatCheckpoint_ = false;
     combatTeaching_.Reset(config_.combatFoundation1_7 && lastInput_.tutorialEnabled);
     if (!ApplyCheckpoint(0, false))
@@ -632,6 +653,7 @@ void GameSimulation::ResetRoute()
 
 void GameSimulation::RetryEncounter()
 {
+    if(config_.developmentRescueJourney && rescueTraversal_.Snapshot().claimCount) { RecoverRescueJourney();return; }
     legacyCombatCheckpoint_ = false;
     ApplyCheckpoint(retryCheckpoint_, true);
 }
@@ -701,6 +723,15 @@ void GameSimulation::ImportRewardCheckpoint(
     ResetPlayerSupport();
     chestRewardSequence_.Import(chestReward);
     interactionState_ = interaction;
+    if(config_.developmentRescueJourney) {
+        RestoreRescueEquipment();rescueTraversal_.Reset();worldRoute_.Invalidate();worldRoute_.current=WorldZoneId::Dungeon;
+        rescueOpeningSeconds_=0;
+        if(chestReward.phase==interactions::ChestRewardPhase::LanternClaimed) {
+            rescueTraversal_.NotifyLanternClaimed();rescueTraversal_.DeployOwned();rescueOpeningSeconds_=1;
+            playerX_=traversal::kLowerLanding.x;playerZ_=traversal::kLowerLanding.z;
+        }
+        ResetPlayerSupport();
+    }
     finaleSequence_.Import(finale);
     pendingInteractCommands_ = 0u;
     pendingToggleHeldLightPoseCommands_ = 0u;
@@ -1361,8 +1392,9 @@ void GameSimulation::ResolveHeldItems()
     const horde::gameplay::items::HeldItemFixedStepInput input{
         playerX_,
         playerZ_,
-        playerYawRadians_,
-        playerPitchRadians_,
+        config_.developmentRescueJourney && rescueTraversal_.Snapshot().equipmentStowed
+            ?rescueTraversal_.Snapshot().bodyYawRadians:playerYawRadians_,
+        config_.developmentRescueJourney && rescueTraversal_.Snapshot().equipmentStowed ?0.0f:playerPitchRadians_,
         walkTime_,
         walkVisualAmount_,
         torchFailureSnapshot_,
@@ -1372,7 +1404,7 @@ void GameSimulation::ResolveHeldItems()
         config_.playerMountProfile,
         &heldItems_[1],
         presentationAspect_,
-        playerSupport_.worldY,config_.developmentWorldRoute};
+        playerSupport_.worldY,config_.developmentWorldRoute || UsesRescueExterior()};
     // Simulation owns the transition/visual blend. Kinematics keeps a stable
     // hand-endpoint matrix for gameplay; PlayerRenderSlot composes its single
     // rendered matrix from that endpoint and the animated Hips mount.
@@ -1388,6 +1420,7 @@ void GameSimulation::ResolveHeldItems()
     heldItems_[1].worldFromItem = resolvedItems[1].worldFromItem;
     heldItems_[1].worldFromDetach = resolvedItems[1].worldFromDetach;
     heldItems_[1].detachTick = resolvedItems[1].detachTick;
+    ApplyRescuePresentation();
 }
 
 void GameSimulation::RecordSwordContactTrace()
@@ -1531,6 +1564,9 @@ void GameSimulation::UpdateRewardSequence(const float deltaSeconds,
         {
             continue;
         }
+        if(config_.developmentRescueJourney && chestRewardSequence_.Snapshot().phase == ChestRewardPhase::LanternClaimed) {
+            (void)TryRescueInteraction(); continue;
+        }
         const ChestRewardAction action = chestRewardSequence_.TryInteract(query);
         if (action == ChestRewardAction::OpeningStarted)
         {
@@ -1544,6 +1580,7 @@ void GameSimulation::UpdateRewardSequence(const float deltaSeconds,
         {
             EquipRewardLantern(interactionState_);
             finaleSequence_.NotifyLanternClaimed();
+            if(config_.developmentRescueJourney) { rescueTraversal_.NotifyLanternClaimed();rescueTraversal_.DeployOwned(); }
             Emit(GameplayEventType::LanternClaimed,
                  EntityId::Player,
                  EntityId::RewardLantern,
@@ -1577,7 +1614,7 @@ void GameSimulation::UpdateRewardSequence(const float deltaSeconds,
     AdvanceHeldLightPose(interactionState_, deltaSeconds);
     finaleSequence_.Update(deltaSeconds);
 
-    if (finaleSequence_.Snapshot().endingPhase ==
+    if (!config_.developmentRescueJourney && finaleSequence_.Snapshot().endingPhase ==
             horde::gameplay::interactions::FinaleEndingPhase::Complete &&
         !finaleCompletionEmitted_)
     {
@@ -2500,7 +2537,7 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.retryGeneration = retryGeneration_;
     snapshot_.paused = input.paused;
     snapshot_.playerAlive = playerVitals_.Snapshot().phase == PlayerLifePhase::Alive;
-    snapshot_.finaleComplete = finaleSequence_.Snapshot().endingPhase ==
+    snapshot_.finaleComplete = !config_.developmentRescueJourney && finaleSequence_.Snapshot().endingPhase ==
         horde::gameplay::interactions::FinaleEndingPhase::Complete;
     snapshot_.interaction = interactionState_;
     snapshot_.chestReward = chestRewardSequence_.Snapshot();
@@ -2508,7 +2545,7 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
         playerX_, playerZ_, playerYawRadians_});
     snapshot_.finale = finaleSequence_.Snapshot();
     snapshot_.lanternPendulum = lanternPendulum_.Snapshot();
-    snapshot_.rewardLanternWorldFromHinge = heldItemFixedStepState_.worldFromLeftHand;
+    snapshot_.rewardLanternWorldFromHinge = RescueLanternHinge();
     snapshot_.torchFailure = torchFailureSnapshot_;
     snapshot_.heldItems = heldItems_;
     snapshot_.automaticSwordDrawBlocksDefense = SwordDrawBlocksDefense();
@@ -2539,6 +2576,7 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.queuedEventCount = events_.Size();
     snapshot_.eventQueueHighWaterMark = events_.HighWaterMark();
     snapshot_.eventQueueOverflowCount = events_.OverflowCount();
+    PublishRescueSnapshot();
 }
 
 } // namespace horde::gameplay::simulation

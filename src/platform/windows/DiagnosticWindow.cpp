@@ -497,6 +497,7 @@ struct VulkanSurfaceContext
     bool runToggleKeyDown = false;
     bool mouseLookActive = false;
     bool chestInteractionPromptPresented = false;
+    bool rescueInteractionPromptPresented = false;
     bool mouseCursorHidden = false;
     POINT mouseRestorePosition{};
     POINT lastMousePosition{};
@@ -566,6 +567,7 @@ struct VulkanSurfaceContext
     bool developmentVerticalProof = false;
     bool developmentWorldRoute = false;
     bool stagedWorldPreparation = false;
+    bool developmentRescueJourney = false;
     bool developmentCombatPractice = false;
     bool developmentKeeperPractice = false;
     horde::gameplay::ShowcaseBenchmarkRun benchmark;
@@ -2212,16 +2214,15 @@ void UpdateVitalityHud(VulkanSurfaceContext& context)
 void UpdateChestPrompt(VulkanSurfaceContext& context)
 {
     context.chestInteractionPromptPresented = false;
+    context.rescueInteractionPromptPresented = false;
     HWND promptControl = GetDlgItem(context.windowHandle, kChestPromptControlId);
     if (promptControl == nullptr)
     {
         return;
     }
-    const std::string_view text = horde::platform::windows::WindowsChestPromptText(
-        context.simulation.Snapshot().chestPrompt);
-    const bool visible = horde::platform::windows::ShouldShowWindowsChestPrompt(
-        context.simulation.Snapshot().chestPrompt,
-        {.simulationPaused = context.simulationPaused,
+    const auto& snapshot = context.simulation.Snapshot();
+    const horde::platform::windows::WindowsChestPromptVisibility visibility{
+         .simulationPaused = context.simulationPaused,
          .pauseMenuVisible = context.pauseMenuVisible,
          .settingsVisible = context.settingsVisible,
          .diagnosticsVisible = context.diagnosticsVisible,
@@ -2230,10 +2231,37 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
          .deathOverlayVisible = context.deathOverlayVisible,
          .endingOverlayVisible = context.endingOverlayVisible,
          .benchmarkRunning = context.benchmark.IsRunning(),
-         .captureMode = GetPropA(context.windowHandle, kCaptureModeProperty) != nullptr});
-    context.chestInteractionPromptPresented = visible &&
-        (context.simulation.Snapshot().chestPrompt == horde::gameplay::interactions::ChestRewardPrompt::OpenChest ||
-         context.simulation.Snapshot().chestPrompt == horde::gameplay::interactions::ChestRewardPrompt::ClaimLantern);
+         .captureMode = GetPropA(context.windowHandle, kCaptureModeProperty) != nullptr};
+    const bool rescueJourney = snapshot.developmentRescueJourney &&
+        snapshot.rescuePrompt != horde::gameplay::traversal::RescuePrompt::None;
+    const bool visible = rescueJourney
+        ? !visibility.simulationPaused && !visibility.pauseMenuVisible && !visibility.settingsVisible &&
+          !visibility.diagnosticsVisible && !visibility.benchmarkReportVisible && !visibility.rtLabVisible &&
+          !visibility.deathOverlayVisible && !visibility.endingOverlayVisible && !visibility.benchmarkRunning &&
+          !visibility.captureMode && snapshot.rescuePrompt != horde::gameplay::traversal::RescuePrompt::None
+        : horde::platform::windows::ShouldShowWindowsChestPrompt(snapshot.chestPrompt, visibility);
+    std::string_view text;
+    if (rescueJourney)
+    {
+        using horde::gameplay::traversal::RescuePrompt;
+        switch (snapshot.rescuePrompt)
+        {
+        case RescuePrompt::Climb: text = "RESCUE ROPE | LEFT-CLICK TO CLIMB"; break;
+        case RescuePrompt::Descend: text = "RESCUE ROPE | LEFT-CLICK TO DESCEND"; break;
+        case RescuePrompt::Preparing: text = "RESCUE ROUTE PREPARING..."; break;
+        case RescuePrompt::Traversing: text = "TRAVERSING RESCUE ROPE..."; break;
+        default: break;
+        }
+        context.rescueInteractionPromptPresented = visible &&
+            (snapshot.rescuePrompt == RescuePrompt::Climb || snapshot.rescuePrompt == RescuePrompt::Descend);
+    }
+    else
+    {
+        text = horde::platform::windows::WindowsChestPromptText(snapshot.chestPrompt);
+        context.chestInteractionPromptPresented = visible &&
+            (snapshot.chestPrompt == horde::gameplay::interactions::ChestRewardPrompt::OpenChest ||
+             snapshot.chestPrompt == horde::gameplay::interactions::ChestRewardPrompt::ClaimLantern);
+    }
     if (visible)
     {
         SetWindowTextA(promptControl, std::string(text).c_str());
@@ -5021,7 +5049,9 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx, const bool startup
 #endif
     const VkExtent2D renderExtent = ScaledRenderExtent(ctx.swapchainExtent, ctx.renderScale);
     std::string diagnostic;
-    ctx.rtScene.SetDevelopmentWorldRoute(ctx.developmentWorldRoute,ctx.stagedWorldPreparation);
+    const bool rescueJourney = ctx.simulation.Snapshot().developmentRescueJourney;
+    ctx.rtScene.SetDevelopmentWorldRoute(ctx.developmentWorldRoute || rescueJourney,ctx.stagedWorldPreparation);
+    ctx.rtScene.SetDevelopmentRescueJourney(rescueJourney);
     ctx.rtScene.SetDevelopmentSupportFixture(ctx.developmentVerticalProof &&
         ctx.sceneProfile == horde::vulkan::raytracing::RtSceneProfile::Showcase);
     if (!ctx.rtScene.Initialise(ctx.instance,
@@ -7087,6 +7117,10 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         for (int argument = 1; argument < entryArgumentCount; ++argument)
         {
 #if defined(_DEBUG)
+            if (std::wstring_view(entryArguments[argument]) == L"--development-rescue-journey")
+            { context.developmentRescueJourney = true; context.entryMenuVisible = false; }
+            if (std::wstring_view(entryArguments[argument]) == L"--development-rescue-journey-staged")
+            { context.developmentRescueJourney = true; context.stagedWorldPreparation = true; context.entryMenuVisible = false; }
             if (std::wstring_view(entryArguments[argument]) == L"--development-world-route")
                 context.developmentWorldRoute = true;
             if (std::wstring_view(entryArguments[argument]) == L"--development-world-route-staged")
@@ -7103,7 +7137,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         }
         LocalFree(entryArguments);
     }
-    if (context.developmentVerticalProof || context.developmentWorldRoute) context.entryMenuVisible = false;
+    if (context.developmentVerticalProof || context.developmentWorldRoute || context.developmentRescueJourney) context.entryMenuVisible = false;
     BOOL animations = TRUE;
     if (SystemParametersInfoA(SPI_GETCLIENTAREAANIMATION, 0, &animations, 0))
         context.reducedMotionEnabled = !animations;
@@ -7127,9 +7161,14 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         context.simulation = horde::gameplay::simulation::GameSimulation(
             explicitComparison ? horde::gameplay::simulation::GameSimulationConfig{} :
                                  horde::gameplay::simulation::ProductionGameSimulationConfig());
+    if (context.developmentRescueJourney)
+    {
+        context.simulation.SetDevelopmentRescueJourney(true);
+        context.developmentWorldRoute = true; // Scene route only; simulation route owns no teleport.
+    }
     if (context.developmentVerticalProof)
         context.simulation.SetDevelopmentSupportFixture(true, 1u);
-    if(context.developmentWorldRoute)
+    if(context.developmentWorldRoute && !context.developmentRescueJourney)
     {
         context.simulation.SetDevelopmentWorldRoute(true,context.stagedWorldPreparation);
         context.cameraX=context.simulation.Snapshot().playerX;
@@ -9263,12 +9302,29 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         if (sceneContext)
         {
             using horde::platform::windows::DesktopClickAction;
-            const DesktopClickAction clickAction = horde::platform::windows::ResolveDesktopLeftClick(
-                IsDesktopGameplayAvailable(*sceneContext),
-                sceneContext->mouseLookActive && GetCapture() == hWnd && GetFocus() == hWnd &&
-                    GetForegroundWindow() == hWnd,
-                sceneContext->simulation.Snapshot().chestPrompt,
-                sceneContext->chestInteractionPromptPresented);
+            const auto& snapshot = sceneContext->simulation.Snapshot();
+            const bool capturedAndFocused = sceneContext->mouseLookActive && GetCapture() == hWnd &&
+                GetFocus() == hWnd && GetForegroundWindow() == hWnd;
+            DesktopClickAction clickAction;
+            if (snapshot.developmentRescueJourney &&
+                (snapshot.rescuePrompt != horde::gameplay::traversal::RescuePrompt::None ||
+                 sceneContext->rescueInteractionPromptPresented))
+            {
+                // Rescue mode owns every click. A stale/disabled rescue prompt
+                // is consumed without falling through to the attack action.
+                clickAction = !IsDesktopGameplayAvailable(*sceneContext) ? DesktopClickAction::Ignore :
+                    !capturedAndFocused ? DesktopClickAction::AcquireCapture :
+                    sceneContext->rescueInteractionPromptPresented &&
+                    (snapshot.rescuePrompt == horde::gameplay::traversal::RescuePrompt::Climb ||
+                     snapshot.rescuePrompt == horde::gameplay::traversal::RescuePrompt::Descend)
+                        ? DesktopClickAction::Interact : DesktopClickAction::Ignore;
+            }
+            else
+            {
+                clickAction = horde::platform::windows::ResolveDesktopLeftClick(
+                    IsDesktopGameplayAvailable(*sceneContext), capturedAndFocused,
+                    snapshot.chestPrompt, sceneContext->chestInteractionPromptPresented);
+            }
             if (clickAction == DesktopClickAction::AcquireCapture)
             {
                 SetFocus(hWnd);

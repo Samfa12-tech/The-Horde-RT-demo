@@ -96,7 +96,9 @@ private:
         return count;
     }
 
-    std::array<RtSceneCommandEvent, 10u> events_{};
+    // Six batched BLAS producers plus host write, one BLAS dependency, TLAS,
+    // TLAS dependency, trace, and copy are twelve events at maximum.
+    std::array<RtSceneCommandEvent, 12u> events_{};
     std::size_t size_ = 0u;
     bool overflowed_ = false;
 };
