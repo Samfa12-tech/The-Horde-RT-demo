@@ -144,23 +144,32 @@ int main() {
     }
     std::cerr<<"route blocked at "<<sim.Snapshot().playerX<<","<<sim.Snapshot().playerZ<<" toward "<<destination.x<<","<<destination.z<<'\n';return false;
    };
-   // These positive CPU tokens are harness inputs. Real renderer admission is
-   // separately guarded above and cannot be inferred from this host traversal.
-   for(std::size_t i=1;i<kRescueConnector.size();++i) check(walkTo(kRescueConnector[i]),"actual simulation connector walk failed");
    const auto edge=sim.Snapshot();input.moveForward=1;input.yawRadians=std::atan2(5.0f,-7.0f);
-   for(int tick=0;tick<20;++tick)sim.StepFixed(input);
+   auto lastSafe=edge;
+   for(int tick=0;tick<120;++tick) {
+    sim.StepFixed(input);
+    if(sim.Snapshot().worldRoute.blocked) break;
+    check(OnRescueLanding(sim.Snapshot().playerX,sim.Snapshot().playerZ) &&
+          sim.Snapshot().worldRoute.current==WorldZoneId::TombExterior,
+          "unready forest permits movement only on the actually ready landing");
+    lastSafe=sim.Snapshot();
+   }
    std::cout<<"unready-edge start="<<edge.playerX<<","<<edge.playerZ<<" end="<<sim.Snapshot().playerX<<","<<sim.Snapshot().playerZ
             <<" blocked="<<sim.Snapshot().worldRoute.blocked<<'\n';
-   check(sim.Snapshot().worldRoute.blocked && std::hypot(sim.Snapshot().playerX-edge.playerX,sim.Snapshot().playerZ-edge.playerZ)<.15f,
+   check(sim.Snapshot().worldRoute.blocked &&
+         sim.Snapshot().playerX==lastSafe.playerX && sim.Snapshot().playerZ==lastSafe.playerZ &&
+         OnRescueLanding(sim.Snapshot().playerX,sim.Snapshot().playerZ),
        "unprepared forest crossing escaped its last safe side");
    for(auto zone:{WorldZoneId::ForestApproach,WorldZoneId::Lookout})
     check(sim.PublishWorldZoneReadiness({sim.Snapshot().worldRoute.generation,zone},ZoneReadiness::Ready),"current forest host token rejected");
-   for(std::size_t i=3;i<kWorldRoutePoints.size();++i)check(walkTo(kWorldRoutePoints[i]),"actual simulation night route forward failed");
+   // These positive CPU tokens are harness inputs. Real renderer admission is
+   // separately guarded above and cannot be inferred from this host traversal.
+   for(std::size_t i=1;i<kRescueConnector.size();++i) check(walkTo(kRescueConnector[i]),"actual simulation rescue-to-clue trail walk failed");
+   check(walkTo(kWorldRoutePoints.back()),"actual simulation lookout approach failed");
    check(sim.Snapshot().worldRoute.current==WorldZoneId::Lookout,"journey did not reach lookout");
    const auto lookout=sim.Snapshot();input.moveForward=0;input.runHeld=false;input.paused=true;
    check(sim.AdvanceFrame(input,.25)==0 && sim.Snapshot().playerX==lookout.playerX,"paused route publication moved the lookout");input.paused=false;
    for(std::size_t i=kWorldRoutePoints.size()-1;i-->2;)check(walkTo(kWorldRoutePoints[i]),"actual simulation lookout backtrack failed");
-   for(std::size_t i=kRescueConnector.size()-1;i-->0;)check(walkTo(kRescueConnector[i]),"actual simulation shaft backtrack failed");
    input.moveForward=0;input.runHeld=false;
   }
   ++input.commands.interact;sim.StepFixed(input);
@@ -190,12 +199,29 @@ int main() {
        sim.Snapshot().rescue.ropeNodes==paidRopeBeforeRetry,
        "logical retry lost or replayed the already paid-out rope deployment");
  sim.ResetRoute();check(!sim.Snapshot().rescue.ropeDeployed && sim.Snapshot().rescue.claimCount==0,"new route kept stale deployment");
- auto resident=horde::scene::PrepareDevelopmentWorldGeometry(false),staged=horde::scene::PrepareDevelopmentWorldGeometry(true);
+ auto resident=horde::scene::PrepareDevelopmentWorldGeometry(false,true),staged=horde::scene::PrepareDevelopmentWorldGeometry(true,true);
  horde::scene::AppendRescueJourneyGeometry(resident);horde::scene::AppendRescueJourneyGeometry(staged);
  check(resident.valid&&staged.valid&&resident.triangles.size()==staged.triangles.size(),"combined geometry failed admission");
- check(resident.triangles.size()==934+horde::scene::kOutdoorEffectMarkerTriangleCount+
-       horde::scene::kRescueAnchorCollarTriangleCount,
-       "region markers were not included as separately counted original geometry");
+ check(resident.triangles.size()==horde::scene::PrepareDevelopmentWorldGeometry(false,true).triangles.size()+
+       (horde::scene::kRescueBlockoutBoxes.size()+2)*12+420+
+       horde::scene::kOutdoorEffectMarkerTriangleCount,
+       "combined real scene is missing counted rim, anchor, tree or placeholder contributors");
+ check(!RescueExteriorSupport(-33.7f,-15.2f).grounded,
+       "wooded terrain incorrectly closes the actual rope shaft aperture");
+ for(const auto& triangle:resident.triangles) {
+    // A vertical ray through the open shaft must not hit route-bank triangles
+    // between the lower room and the rim. Actual rim boxes are outside this ray.
+    const auto a=triangle.points[0],b=triangle.points[1],c=triangle.points[2];
+    const float den=(b[2]-c[2])*(a[0]-c[0])+(c[0]-b[0])*(a[2]-c[2]);
+    if(std::abs(den)<1e-6f)continue;
+    const float u=((b[2]-c[2])*(-33.7f-c[0])+(c[0]-b[0])*(-15.2f-c[2]))/den;
+    const float v=((c[2]-a[2])*(-33.7f-c[0])+(a[0]-c[0])*(-15.2f-c[2]))/den;
+    if(u>=0&&v>=0&&u+v<=1) {
+       const float y=u*a[1]+v*b[1]+(1-u-v)*c[1];
+       check(y<kLowerSupportWorldY||y>kUpperSupportWorldY,
+             "actual combined terrain triangles obstruct the open shaft");
+    }
+ }
  for(const auto& marker:horde::scene::kOutdoorEffectRegionMarkers)
   check(!marker.effectImplemented && std::string_view(marker.label).find("NOT IMPLEMENTED")!=std::string_view::npos,
         "geometry marker falsely declared an implemented outdoor effect");

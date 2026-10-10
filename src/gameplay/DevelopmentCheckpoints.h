@@ -63,10 +63,10 @@ struct DevelopmentCheckpoint
 
 inline constexpr std::array<DevelopmentCheckpoint, 73u> kDevelopmentCheckpoints{{
     {.id = 190, .name = "world-route", .baseShowcaseCheckpointId = 0,
-     .cameraX = 40.0f, .cameraZ = -8.0f, .yaw = 3.14159265359f, .pitch = -0.05f,
+     .cameraX = -33.7f, .cameraZ = -20.8f, .yaw = 3.14159265359f, .pitch = -0.05f,
      .developmentWorldRoute = true},
     {.id = 191, .name = "world-route-staged", .baseShowcaseCheckpointId = 0,
-     .cameraX = 40.0f, .cameraZ = -8.0f, .yaw = 3.14159265359f, .pitch = -0.05f,
+     .cameraX = -33.7f, .cameraZ = -20.8f, .yaw = 3.14159265359f, .pitch = -0.05f,
      .developmentWorldRoute = true, .stagedWorldPreparation = true},
     {.id = 192, .name = "rescue-journey-start", .baseShowcaseCheckpointId = 0,
      .cameraX = 0.0f, .cameraZ = 1.85f, .yaw = 3.14159265359f, .pitch = -0.05f},

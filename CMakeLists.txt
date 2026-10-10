@@ -140,7 +140,7 @@ set(HORDE_RT_SOURCE_FILES)
 foreach(source IN LISTS HORDE_RT_CORE_RELATIVE_SOURCES)
     list(APPEND HORDE_RT_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/${source}")
 endforeach()
-list(FILTER HORDE_RT_SOURCE_FILES EXCLUDE REGEX "/(audio/(AmbiencePcmLoop|MusicDirector|MusicPcmStream|MusicPcmWave|MusicPcmAssetBank|MusicPlaybackSession)|reporting/(PlaytestReport|PlaytestSubmission)|gameplay/(simulation/GameSimulation(Rescue)?|traversal/RescueTraversal|animation/(PlayerAnimationState|PlayerIkTargets)|effects/FireEmitterState|interactions/(InteractionState|ChestRewardSequence|FinaleSequence)|items/(HeldItemState|HeldItemKinematics|HeldLightState|LanternPendulum)))\\.cpp$")
+list(FILTER HORDE_RT_SOURCE_FILES EXCLUDE REGEX "/(audio/(AmbiencePcmLoop|MusicDirector|MusicPcmStream|MusicPcmWave|MusicPcmAssetBank|MusicPlaybackSession)|reporting/(PlaytestReport|PlaytestSubmission)|gameplay/(simulation/GameSimulation(Rescue|Dialogue)?|traversal/RescueTraversal|animation/(PlayerAnimationState|PlayerIkTargets)|effects/FireEmitterState|interactions/(InteractionState|ChestRewardSequence|FinaleSequence)|items/(HeldItemState|HeldItemKinematics|HeldLightState|LanternPendulum)))\\.cpp$")
 
 add_library(horde_gameplay_simulation STATIC
     src/audio/AmbiencePcmLoop.cpp
@@ -155,6 +155,7 @@ add_library(horde_gameplay_simulation STATIC
     src/gameplay/simulation/GameSimulation.cpp
     src/gameplay/effects/WaterContact.cpp
     src/gameplay/simulation/GameSimulationRescue.cpp
+    src/gameplay/simulation/GameSimulationDialogue.cpp
     src/gameplay/traversal/RescueTraversal.cpp
     src/gameplay/animation/PlayerAnimationState.cpp
     src/gameplay/animation/PlayerIkTargets.cpp
@@ -175,6 +176,9 @@ target_compile_features(horde_gameplay_simulation PUBLIC cxx_std_20)
 target_link_libraries(horde_gameplay_simulation PUBLIC pocket_audio_native_pcm)
 
 if(BUILD_TESTING)
+    add_executable(horde_rt_chapter_dialogue_tests tests/ChapterDialogueTests.cpp)
+    target_link_libraries(horde_rt_chapter_dialogue_tests PRIVATE horde_gameplay_simulation)
+    add_test(NAME horde_rt_chapter_dialogue_tests COMMAND horde_rt_chapter_dialogue_tests)
     add_executable(horde_rt_combat_foundation_tests tests/CombatFoundationTests.cpp)
     target_link_libraries(horde_rt_combat_foundation_tests PRIVATE horde_gameplay_simulation)
     add_test(NAME horde_rt_combat_foundation_tests COMMAND horde_rt_combat_foundation_tests)

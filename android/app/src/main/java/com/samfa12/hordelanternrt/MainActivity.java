@@ -16,6 +16,7 @@ import android.content.pm.ApplicationInfo;
 import android.graphics.Color;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.ColorDrawable;
@@ -99,6 +100,13 @@ public class MainActivity extends Activity {
     private static final String TAG = "HordeLanternAudio";
     private static final String PREFS = "horde_lantern_alpha_settings";
     private static final String PREF_MUSIC_VOLUME = "music_volume";
+    private static final String PREF_CHAPTER_SUBTITLES = "chapter_subtitles_enabled";
+    private static final String PREF_CHAPTER_SUBTITLE_SIZE = "chapter_subtitle_size_percent";
+    private static final String PREF_CHAPTER_SUBTITLE_POSITION = "chapter_subtitle_position";
+    private static final String PREF_CHAPTER_VOICE_VOLUME = "chapter_voice_volume";
+    static final int SUBTITLE_POSITION_AUTO = 0;
+    static final int SUBTITLE_POSITION_TOP = 1;
+    static final int SUBTITLE_POSITION_BOTTOM = 2;
     static final String PREF_RENDER_SCALE = "render_scale";
     static final int DEFAULT_ANDROID_RT_RENDER_SCALE_PERCENT = 75;
     private static final String PREF_RT_LAB_UNLOCKED = "rt_lab_unlocked";
@@ -255,6 +263,19 @@ public class MainActivity extends Activity {
     private final Set<AlertDialog> controllerFocusedDialogs = new HashSet<>();
     private TextView controllerPrompt;
     private TextView combatTeachingPrompt;
+    private FrameLayout appRoot;
+    private LinearLayout chapterSubtitlePanel;
+    private ScrollView chapterSubtitleScroll;
+    private TextView chapterSubtitleText;
+    private TextView chapterSubtitleOverflow;
+    private Button chapterDialogueSkipButton;
+    private long chapterSubtitleGeneration = Long.MIN_VALUE;
+    private long chapterDialogueSkipPendingGeneration = Long.MIN_VALUE;
+    private int chapterAutoPosition = -1;
+    private long chapterVoiceGeneration = Long.MIN_VALUE;
+    private int chapterVoiceStream;
+    private boolean chapterVoicePaused;
+    private boolean chapterSubtitleOverflowReported;
     private String combatTeachingFadeText = "";
     private int combatTeachingFadeOpacity;
     private long combatTeachingFadeStartedAtMs;
@@ -542,6 +563,8 @@ public class MainActivity extends Activity {
         vitalityStatus = findViewById(R.id.vitality_status);
         controllerPrompt = findViewById(R.id.controller_prompt);
         combatTeachingPrompt = findViewById(R.id.combat_teaching_prompt);
+        appRoot = findViewById(R.id.root);
+        createChapterDialogueOverlay();
         inputManager = (InputManager)getSystemService(Context.INPUT_SERVICE);
         if (inputManager != null) inputManager.registerInputDeviceListener(controllerDevices, handler);
         keeperRevealTitle = findViewById(R.id.keeper_reveal_title);
@@ -556,8 +579,11 @@ public class MainActivity extends Activity {
         applyInterfacePresentation();
         findViewById(R.id.root).setOnApplyWindowInsetsListener((view,insets) -> {
             if(menuVisible) applyInterfacePresentation(); // Never move an action under a held finger.
+            reflowChapterDialoguePlacement();
             return insets;
         });
+        appRoot.addOnLayoutChangeListener((view, left, top, right, bottom,
+                oldLeft, oldTop, oldRight, oldBottom) -> reflowChapterDialoguePlacement());
         styleActionButton(diagnosticsBack, 0xCC211B15, 0xFFFFD28A);
         menuButton.setContentDescription(getString(R.string.menu));
         attackButton.setContentDescription(getString(R.string.swing));
@@ -2599,6 +2625,379 @@ public class MainActivity extends Activity {
         }
     };
 
+    private void createChapterDialogueOverlay() {
+        if (appRoot == null) return;
+        chapterSubtitlePanel = new LinearLayout(this);
+        chapterSubtitlePanel.setOrientation(LinearLayout.VERTICAL);
+        chapterSubtitlePanel.setPadding(dp(16), dp(12), dp(16), dp(8));
+        chapterSubtitlePanel.setClickable(false);
+        chapterSubtitlePanel.setFocusable(false);
+        final GradientDrawable background = new GradientDrawable();
+        background.setColor(0xEE151719);
+        background.setCornerRadius(dp(4));
+        background.setStroke(dp(1), HordeUiTokens.BRASS);
+        chapterSubtitlePanel.setBackground(background);
+
+        chapterSubtitleScroll = new ScrollView(this);
+        chapterSubtitleScroll.setFillViewport(true);
+        chapterSubtitleScroll.setVerticalScrollBarEnabled(false);
+        chapterSubtitleScroll.setOverScrollMode(View.OVER_SCROLL_IF_CONTENT_SCROLLS);
+        chapterSubtitleText = new TextView(this);
+        chapterSubtitleText.setTextColor(0xFFF2E9D8);
+        chapterSubtitleText.setTypeface(Typeface.SERIF);
+        chapterSubtitleText.setGravity(Gravity.CENTER);
+        chapterSubtitleText.setIncludeFontPadding(true);
+        chapterSubtitleText.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_YES);
+        chapterSubtitleText.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
+        chapterSubtitleScroll.addView(chapterSubtitleText, new ScrollView.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        chapterSubtitlePanel.addView(chapterSubtitleScroll,
+                new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        chapterSubtitleOverflow = new TextView(this);
+        chapterSubtitleOverflow.setText("Subtitle needs more room. Scroll to read the full line.");
+        chapterSubtitleOverflow.setTextColor(0xFFFFD28A);
+        chapterSubtitleOverflow.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        chapterSubtitleOverflow.setGravity(Gravity.CENTER);
+        chapterSubtitleOverflow.setVisibility(View.GONE);
+        chapterSubtitlePanel.addView(chapterSubtitleOverflow,
+                new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        chapterDialogueSkipButton = new Button(this);
+        chapterDialogueSkipButton.setText("Skip line");
+        chapterDialogueSkipButton.setContentDescription("Skip this dialogue line");
+        chapterDialogueSkipButton.setMinHeight(dp(44));
+        styleActionButton(chapterDialogueSkipButton, 0xCC1A1713, 0xFFFFD28A);
+        final LinearLayout.LayoutParams skipParams = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        skipParams.gravity = Gravity.END;
+        chapterSubtitlePanel.addView(chapterDialogueSkipButton, skipParams);
+        chapterDialogueSkipButton.setOnClickListener(view -> {
+            chapterDialogueSkipPendingGeneration = chapterSubtitleGeneration;
+            try { ProbeBridge.requestChapterDialogueSkip(); }
+            catch (RuntimeException | LinkageError unavailable) {
+                Log.w(TAG, "Dialogue skip request was unavailable.");
+            }
+            stopChapterVoice();
+        });
+        chapterSubtitlePanel.setVisibility(View.GONE);
+        appRoot.addView(chapterSubtitlePanel, new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+    }
+
+    static int resolveChapterSubtitlePosition(int preferred, int topRoom, int bottomRoom,
+            int requiredHeight) {
+        if (preferred == SUBTITLE_POSITION_TOP || preferred == SUBTITLE_POSITION_BOTTOM)
+            return preferred;
+        if (topRoom >= requiredHeight) return SUBTITLE_POSITION_TOP;
+        if (bottomRoom >= requiredHeight) return SUBTITLE_POSITION_BOTTOM;
+        return SUBTITLE_POSITION_TOP;
+    }
+
+    static int clampChapterSubtitleSize(int percent) {
+        return Math.max(80, Math.min(160, percent));
+    }
+
+    static int chapterSubtitleViewportHeight(int selectedRoom, int fixedChromeHeight,
+            int minimumTextHeight) {
+        final int available = selectedRoom - fixedChromeHeight;
+        return available >= minimumTextHeight ? available : 0;
+    }
+
+    static boolean chapterSubtitleLimitationFits(int selectedRoom, int labelHeight,
+            int verticalPadding) {
+        return selectedRoom >= labelHeight + verticalPadding;
+    }
+
+    private void updateChapterDialoguePresentation(int surfaceState) {
+        if (chapterSubtitlePanel == null) return;
+        final long[] state;
+        final String text;
+        try {
+            state = ProbeBridge.getChapterDialogueState();
+            if (state == null || state.length != 5) {
+                chapterSubtitlePanel.setVisibility(View.GONE);
+                pauseChapterVoice(true);
+                return;
+            }
+            text = ProbeBridge.getChapterDialogueText(state[1]);
+        } catch (RuntimeException | LinkageError unavailable) {
+            chapterSubtitlePanel.setVisibility(View.GONE);
+            pauseChapterVoice(true);
+            return;
+        }
+        final long[] confirm;
+        try { confirm = ProbeBridge.getChapterDialogueState(); }
+        catch (RuntimeException | LinkageError unavailable) { pauseChapterVoice(true); return; }
+        if (confirm == null || confirm.length != 5 || state[1] != confirm[1] ||
+                (state[0] > 0 && (text == null || text.isEmpty()))) {
+            // The render owner published between JNI reads. Wait one poll for a coherent pair.
+            chapterSubtitlePanel.setVisibility(View.GONE);
+            pauseChapterVoice(true);
+            return;
+        }
+        final int line = (int) state[0];
+        if (line <= 0 || text == null || text.isEmpty()) {
+            chapterSubtitlePanel.setVisibility(View.GONE);
+            chapterSubtitleGeneration = Long.MIN_VALUE;
+            chapterDialogueSkipPendingGeneration = Long.MIN_VALUE;
+            chapterAutoPosition = -1;
+            stopChapterVoice();
+            chapterSubtitleText.setText("");
+            chapterSubtitleScroll.scrollTo(0, 0);
+            chapterSubtitleOverflow.setText("Subtitle exceeds the selected safe area; scroll to read the full line.");
+            chapterSubtitlePanel.setPadding(dp(16), dp(12), dp(16), dp(8));
+            chapterSubtitleScroll.setVisibility(View.VISIBLE);
+            chapterSubtitleOverflow.setVisibility(View.GONE);
+            chapterDialogueSkipButton.setVisibility(View.VISIBLE);
+            return;
+        }
+        final long generation = state[1];
+        if (chapterDialogueSkipPendingGeneration != generation)
+            chapterDialogueSkipPendingGeneration = Long.MIN_VALUE;
+        final boolean hiddenByUi = !resumed || !surfaceStarted || surfaceState != 1 || menuVisible ||
+                diagnosticsVisible || graphicsVisible || rtLabVisible || benchmarkRunning ||
+                playtestReportVisible || deathOverlayVisible || endingOverlayVisible || debugMotionActive;
+        final boolean paused = state[4] != 0 || hiddenByUi;
+        if (chapterDialogueSkipPendingGeneration == generation) {
+            stopChapterVoice();
+            chapterVoiceGeneration = generation;
+        } else updateChapterVoice(line, generation, paused);
+        final boolean subtitles = preferences.getBoolean(PREF_CHAPTER_SUBTITLES, true);
+        chapterSubtitleText.setVisibility(subtitles ? View.VISIBLE : View.GONE);
+        chapterDialogueSkipButton.setVisibility(View.VISIBLE);
+        if (chapterSubtitleGeneration != generation) {
+            chapterSubtitleGeneration = generation;
+            chapterAutoPosition = -1;
+            chapterSubtitleOverflowReported = false;
+            chapterSubtitleText.setText(text);
+            chapterSubtitleText.setContentDescription(text.replace('\n', ' '));
+            chapterSubtitleScroll.scrollTo(0, 0);
+            final int size = clampChapterSubtitleSize(
+                    preferences.getInt(PREF_CHAPTER_SUBTITLE_SIZE, 100));
+            chapterSubtitleText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20.0f * size / 100.0f);
+        }
+        chapterSubtitlePanel.setVisibility(hiddenByUi ? View.GONE : View.VISIBLE);
+        if (!hiddenByUi) reflowChapterDialoguePlacement();
+    }
+
+    private void updateChapterVoice(int line, long generation, boolean paused) {
+        // SoundPool has no playback-completion callback. The shared Director advances
+        // from its measured line duration; this UI never fabricates a completion event.
+        if (generation != chapterVoiceGeneration) {
+            stopChapterVoice();
+            chapterVoicePaused = paused;
+            if (paused || soundPool == null) return;
+            final String key = line == 1 ? "keeper_i_sense_you" :
+                    (line == 2 ? "keeper_come_closer" : null);
+            if (key == null) {
+                chapterVoiceGeneration = generation;
+                return;
+            }
+            final Integer soundId = sounds.get(key);
+            if (soundId == null) return;
+            synchronized (loadedSounds) { if (!loadedSounds.contains(soundId)) return; }
+            final long gains = ProbeBridge.getChapterDialogueStereoGains(generation);
+            final float voiceGain = preferences.getInt(PREF_CHAPTER_VOICE_VOLUME, 70) / 100.0f;
+            final float left = clamp(Float.intBitsToFloat((int) gains), 0.0f, 1.0f);
+            final float right = clamp(Float.intBitsToFloat((int) (gains >>> 32)), 0.0f, 1.0f);
+            chapterVoiceStream = soundPool.play(soundId, voiceGain * left, voiceGain * right,
+                    2, 0, 1.0f);
+            chapterVoiceGeneration = generation;
+            if (chapterVoiceStream == 0) Log.w(TAG, "Chapter voice playback could not start.");
+            return;
+        }
+        if (chapterVoiceStream != 0 && chapterVoicePaused != paused) {
+            if (paused) soundPool.pause(chapterVoiceStream);
+            else soundPool.resume(chapterVoiceStream);
+            chapterVoicePaused = paused;
+        }
+        if (chapterVoiceStream != 0 && !paused) {
+            final long gains = ProbeBridge.getChapterDialogueStereoGains(generation);
+            final float voiceGain = preferences.getInt(PREF_CHAPTER_VOICE_VOLUME, 70) / 100.0f;
+            final float left = clamp(Float.intBitsToFloat((int) gains), 0.0f, 1.0f);
+            final float right = clamp(Float.intBitsToFloat((int) (gains >>> 32)), 0.0f, 1.0f);
+            soundPool.setVolume(chapterVoiceStream, voiceGain * left, voiceGain * right);
+        }
+    }
+
+    private void pauseChapterVoice(boolean paused) {
+        if (chapterVoiceStream == 0 || soundPool == null || chapterVoicePaused == paused) return;
+        if (paused) soundPool.pause(chapterVoiceStream);
+        else soundPool.resume(chapterVoiceStream);
+        chapterVoicePaused = paused;
+    }
+
+    private void stopChapterVoice() {
+        if (chapterVoiceStream != 0 && soundPool != null) soundPool.stop(chapterVoiceStream);
+        chapterVoiceStream = 0;
+        chapterVoicePaused = false;
+        chapterVoiceGeneration = Long.MIN_VALUE;
+    }
+
+    private void reflowChapterDialoguePlacement() {
+        if (chapterSubtitlePanel == null || appRoot == null ||
+                chapterSubtitlePanel.getVisibility() != View.VISIBLE) return;
+        final int width = appRoot.getWidth();
+        final int height = appRoot.getHeight();
+        if (width <= 0 || height <= 0) return;
+        final int side = dp(18);
+        final int insetTop;
+        final int insetBottom;
+        if (Build.VERSION.SDK_INT >= 23 && appRoot.getRootWindowInsets() != null) {
+            final WindowInsets insets = appRoot.getRootWindowInsets();
+            insetTop = insets.getSystemWindowInsetTop();
+            insetBottom = insets.getSystemWindowInsetBottom();
+        } else { insetTop = 0; insetBottom = 0; }
+        int topStart = insetTop + dp(8);
+        int bottomEnd = height - insetBottom - dp(8);
+        final int divider = topStart + Math.max(0, bottomEnd - topStart) * 55 / 100;
+        final View[] topObstacles = {rtStatus, vitalityStatus, keeperRevealTitle,
+                developerOverlay, menuButton};
+        final View[] bottomObstacles = {controllerPrompt, attackButton, parryButton,
+                dodgeButton, interactButton, runButton};
+        for (View obstacle : topObstacles) {
+            final Rect rect = visibleRectInRoot(obstacle);
+            if (rect != null && rect.top < divider)
+                topStart = Math.max(topStart, rect.bottom + dp(8));
+        }
+        for (View obstacle : bottomObstacles) {
+            final Rect rect = visibleRectInRoot(obstacle);
+            if (rect != null && rect.bottom > divider)
+                bottomEnd = Math.min(bottomEnd, rect.top - dp(8));
+        }
+        final int panelWidth = Math.max(dp(80), width - side * 2);
+        chapterSubtitlePanel.setPadding(dp(16), dp(12), dp(16), dp(8));
+        chapterSubtitleScroll.setVisibility(View.VISIBLE);
+        chapterDialogueSkipButton.setVisibility(View.VISIBLE);
+        chapterSubtitleOverflow.setVisibility(View.GONE);
+        chapterSubtitleOverflow.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        chapterSubtitleOverflow.setMaxLines(Integer.MAX_VALUE);
+        final LinearLayout.LayoutParams naturalTextParams =
+                (LinearLayout.LayoutParams) chapterSubtitleScroll.getLayoutParams();
+        if (naturalTextParams.height != ViewGroup.LayoutParams.WRAP_CONTENT) {
+            naturalTextParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+            chapterSubtitleScroll.setLayoutParams(naturalTextParams);
+        }
+        chapterSubtitlePanel.measure(View.MeasureSpec.makeMeasureSpec(panelWidth, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+        final int requiredHeight = chapterSubtitlePanel.getMeasuredHeight();
+        final int topRoom = Math.max(0, divider - topStart);
+        final int bottomRoom = Math.max(0, bottomEnd - divider);
+        final int preferred = Math.max(SUBTITLE_POSITION_AUTO, Math.min(SUBTITLE_POSITION_BOTTOM,
+                preferences.getInt(PREF_CHAPTER_SUBTITLE_POSITION, SUBTITLE_POSITION_AUTO)));
+        int selected;
+        if (preferred == SUBTITLE_POSITION_AUTO) {
+            if (chapterAutoPosition < 0)
+                chapterAutoPosition = resolveChapterSubtitlePosition(preferred, topRoom, bottomRoom,
+                        requiredHeight);
+            selected = chapterAutoPosition;
+        } else selected = resolveChapterSubtitlePosition(preferred, topRoom, bottomRoom, requiredHeight);
+        final boolean overflow = selected == SUBTITLE_POSITION_TOP ? requiredHeight > topRoom :
+                requiredHeight > bottomRoom;
+        final int selectedRoom = selected == SUBTITLE_POSITION_TOP ? topRoom : bottomRoom;
+        final LinearLayout.LayoutParams textParams =
+                (LinearLayout.LayoutParams) chapterSubtitleScroll.getLayoutParams();
+        boolean limitationOnly = false;
+        if (overflow) {
+            chapterSubtitleOverflow.setText("Subtitle exceeds this safe area; scroll to read the full line.");
+            chapterSubtitleOverflow.setVisibility(View.VISIBLE);
+            chapterDialogueSkipButton.setVisibility(View.VISIBLE);
+            chapterDialogueSkipButton.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+                    View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+            chapterSubtitleOverflow.measure(View.MeasureSpec.makeMeasureSpec(panelWidth -
+                            chapterSubtitlePanel.getPaddingLeft() - chapterSubtitlePanel.getPaddingRight(),
+                            View.MeasureSpec.EXACTLY),
+                    View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+            final int fixedChromeHeight = chapterSubtitlePanel.getPaddingTop() +
+                    chapterSubtitlePanel.getPaddingBottom() + chapterDialogueSkipButton.getMeasuredHeight() +
+                    chapterSubtitleOverflow.getMeasuredHeight();
+            final int viewportHeight = chapterSubtitleViewportHeight(selectedRoom, fixedChromeHeight, dp(32));
+            if (viewportHeight > 0) {
+                chapterSubtitleScroll.setVisibility(View.VISIBLE);
+                if (textParams.height != viewportHeight) {
+                    textParams.height = viewportHeight;
+                    chapterSubtitleScroll.setLayoutParams(textParams);
+                }
+                chapterSubtitlePanel.setContentDescription(chapterSubtitleText.getContentDescription() +
+                        ". Subtitle exceeds the selected safe area; full text is retained and scrollable.");
+            } else {
+                limitationOnly = true;
+                chapterSubtitlePanel.setPadding(dp(8), dp(4), dp(8), dp(4));
+                chapterSubtitleScroll.setVisibility(View.GONE);
+                chapterDialogueSkipButton.setVisibility(View.GONE);
+                chapterSubtitleOverflow.setText("Subtitle controls do not fit here.");
+                chapterSubtitleOverflow.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+                chapterSubtitleOverflow.setMaxLines(2);
+                chapterSubtitleOverflow.measure(View.MeasureSpec.makeMeasureSpec(panelWidth - dp(16),
+                                View.MeasureSpec.EXACTLY),
+                        View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+                final int limitationHeight = chapterSubtitleOverflow.getMeasuredHeight();
+                if (chapterSubtitleLimitationFits(selectedRoom, limitationHeight, dp(8))) {
+                    chapterSubtitlePanel.setContentDescription(chapterSubtitleText.getContentDescription() +
+                            ". Subtitle controls do not fit the selected safe area.");
+                } else {
+                    chapterSubtitlePanel.setVisibility(View.GONE);
+                    chapterSubtitlePanel.setContentDescription(chapterSubtitleText.getContentDescription() +
+                            ". Subtitle controls do not fit the selected safe area; no room is available to display a notice.");
+                }
+            }
+            if (!chapterSubtitleOverflowReported) {
+                Log.w(TAG, "CHAPTER_SUBTITLE_SAFE_AREA_OVERFLOW generation=" + chapterSubtitleGeneration +
+                        " position=" + selected + " requiredDp=" + (requiredHeight / getResources().getDisplayMetrics().density) +
+                        " limitationOnly=" + (limitationOnly ? 1 : 0));
+                chapterSubtitleOverflowReported = true;
+            }
+        } else {
+            chapterSubtitlePanel.setPadding(dp(16), dp(12), dp(16), dp(8));
+            chapterSubtitleScroll.setVisibility(View.VISIBLE);
+            chapterSubtitleOverflow.setText("Subtitle exceeds this safe area; scroll to read the full line.");
+            chapterSubtitleOverflow.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+            chapterSubtitleOverflow.setMaxLines(Integer.MAX_VALUE);
+            chapterSubtitleOverflow.setVisibility(View.GONE);
+            chapterDialogueSkipButton.setVisibility(View.VISIBLE);
+            if (textParams.height != ViewGroup.LayoutParams.WRAP_CONTENT) {
+                textParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                chapterSubtitleScroll.setLayoutParams(textParams);
+            }
+            chapterSubtitlePanel.setContentDescription(chapterSubtitleText.getContentDescription());
+        }
+        final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) chapterSubtitlePanel.getLayoutParams();
+        final int topMargin = selected == SUBTITLE_POSITION_TOP ? topStart : 0;
+        final int bottomMargin = selected == SUBTITLE_POSITION_BOTTOM ? height - bottomEnd : 0;
+        final int gravity = selected == SUBTITLE_POSITION_BOTTOM ? Gravity.BOTTOM : Gravity.TOP;
+        if (params.width == ViewGroup.LayoutParams.MATCH_PARENT &&
+                params.height == ViewGroup.LayoutParams.WRAP_CONTENT && params.gravity == gravity &&
+                params.leftMargin == side && params.rightMargin == side &&
+                params.topMargin == topMargin && params.bottomMargin == bottomMargin) return;
+        params.width = ViewGroup.LayoutParams.MATCH_PARENT;
+        params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+        params.gravity = gravity;
+        params.leftMargin = side;
+        params.rightMargin = side;
+        params.topMargin = topMargin;
+        params.bottomMargin = bottomMargin;
+        chapterSubtitlePanel.setLayoutParams(params);
+        if (limitationOnly && chapterSubtitlePanel.getVisibility() == View.VISIBLE) {
+            chapterSubtitlePanel.measure(View.MeasureSpec.makeMeasureSpec(panelWidth, View.MeasureSpec.EXACTLY),
+                    View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+            if (chapterSubtitlePanel.getMeasuredHeight() > selectedRoom)
+                chapterSubtitlePanel.setVisibility(View.GONE);
+        }
+    }
+
+    private Rect visibleRectInRoot(View view) {
+        if (view == null || view.getVisibility() != View.VISIBLE || !view.isShown()) return null;
+        final Rect rect = new Rect();
+        if (!view.getGlobalVisibleRect(rect)) return null;
+        final int[] rootLocation = new int[2];
+        appRoot.getLocationOnScreen(rootLocation);
+        rect.offset(-rootLocation[0], -rootLocation[1]);
+        return rect;
+    }
+
     private void scheduleCombatTeachingPromptPoll() {
         if (combatTeachingPromptPollScheduled) return;
         combatTeachingPromptPollScheduled = true;
@@ -2645,6 +3044,53 @@ public class MainActivity extends Activity {
 
         addSlider(panel, getString(R.string.sfx_volume), preferences.getInt("sfx_volume", 70), 0, 100,
                 value -> preferences.edit().putInt("sfx_volume", value).apply());
+        addSlider(panel, "Chapter voice", preferences.getInt(PREF_CHAPTER_VOICE_VOLUME, 70), 0, 100,
+                value -> preferences.edit().putInt(PREF_CHAPTER_VOICE_VOLUME, value).apply());
+        addBody(panel, "Chapter subtitles");
+        final CheckBox subtitlesEnabled = new CheckBox(this);
+        subtitlesEnabled.setText("Show subtitles");
+        subtitlesEnabled.setTextColor(0xFFFFE5BA);
+        subtitlesEnabled.setButtonTintList(HordeUiTokens.label(HordeUiTokens.BRASS));
+        subtitlesEnabled.setTextSize(16);
+        subtitlesEnabled.setChecked(preferences.getBoolean(PREF_CHAPTER_SUBTITLES, true));
+        subtitlesEnabled.setMinHeight(dp(48));
+        subtitlesEnabled.setOnCheckedChangeListener((buttonView, checked) ->
+                preferences.edit().putBoolean(PREF_CHAPTER_SUBTITLES, checked).apply());
+        panel.addView(subtitlesEnabled, matchWrap());
+        addSlider(panel, "Subtitle size", clampChapterSubtitleSize(
+                        preferences.getInt(PREF_CHAPTER_SUBTITLE_SIZE, 100)), 80, 160,
+                value -> {
+                    final int size = clampChapterSubtitleSize(value);
+                    preferences.edit().putInt(PREF_CHAPTER_SUBTITLE_SIZE, size).apply();
+                    if (chapterSubtitleText != null) chapterSubtitleText.setTextSize(
+                            TypedValue.COMPLEX_UNIT_SP, 20.0f * size / 100.0f);
+                    reflowChapterDialoguePlacement();
+                });
+        final TextView positionLabel = new TextView(this);
+        positionLabel.setText("Subtitle position");
+        positionLabel.setTextColor(HordeUiTokens.PARCHMENT);
+        positionLabel.setTextSize(15);
+        positionLabel.setPadding(0, dp(8), 0, dp(2));
+        panel.addView(positionLabel, matchWrap());
+        final Spinner subtitlePosition = new Spinner(this);
+        final String[] positionNames = {"Auto", "Top", "Bottom"};
+        final ArrayAdapter<String> positionAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_item, positionNames);
+        positionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        subtitlePosition.setAdapter(positionAdapter);
+        subtitlePosition.setContentDescription("Subtitle position: Auto, Top, or Bottom");
+        subtitlePosition.setSelection(Math.max(SUBTITLE_POSITION_AUTO, Math.min(SUBTITLE_POSITION_BOTTOM,
+                preferences.getInt(PREF_CHAPTER_SUBTITLE_POSITION, SUBTITLE_POSITION_AUTO))));
+        subtitlePosition.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+            @Override public void onItemSelected(android.widget.AdapterView<?> parent, View view,
+                    int position, long id) {
+                preferences.edit().putInt(PREF_CHAPTER_SUBTITLE_POSITION, position).apply();
+                chapterAutoPosition = -1;
+                reflowChapterDialoguePlacement();
+            }
+            @Override public void onNothingSelected(android.widget.AdapterView<?> parent) { }
+        });
+        panel.addView(subtitlePosition, matchWrap());
         addSlider(panel, getString(R.string.music_volume), musicVolumePercent(), 0, 100,
                 value -> {
                     final int clamped = Math.max(0, Math.min(100, value));
@@ -2725,6 +3171,10 @@ public class MainActivity extends Activity {
         addMenuButtonRow(panel,
                 getString(R.string.reset_non_graphics), () -> {
                     preferences.edit().putBoolean("sfx_enabled", true).putInt("sfx_volume", 70)
+                            .putBoolean(PREF_CHAPTER_SUBTITLES, true)
+                            .putInt(PREF_CHAPTER_SUBTITLE_SIZE, 100)
+                            .putInt(PREF_CHAPTER_SUBTITLE_POSITION, SUBTITLE_POSITION_AUTO)
+                            .putInt(PREF_CHAPTER_VOICE_VOLUME, 70)
                             .putInt(PREF_MUSIC_VOLUME, 70).putInt("look_sensitivity", 100)
                             .putBoolean("haptics_enabled", true).putBoolean("show_hud", true)
                             .putBoolean(CombatTeachingPreferences.ENABLED, true)
@@ -4638,6 +5088,7 @@ public class MainActivity extends Activity {
                     }
                 }
                 surfaceStarted = resumed && surfaceAvailable && surfaceRequestGeneration != 0 && state == 1;
+                updateChapterDialoguePresentation(state);
                 if (updateCombatTeachingPrompt(state)) scheduleCombatTeachingPromptPoll();
                 else cancelCombatTeachingPromptPoll();
                 if (musicPlayback != null) musicPlayback.setSuspended(!resumed || !surfaceStarted ||
@@ -4953,10 +5404,11 @@ public class MainActivity extends Activity {
                             }
                             break;
                         case PLATFORM_EVENT_KEEPER_REVEAL_STARTED:
-                            playSpatialSound("keeper_i_sense_you", 0.36f, stereoGains, verticalMetadata);
+                            // Chapter dialogue owns the admitted Keeper lines now.
+                            // Consume this legacy gameplay event without duplicating playback.
                             break;
                         case PLATFORM_EVENT_KEEPER_WARNING:
-                            playSpatialSound("keeper_come_closer", 0.36f, stereoGains, verticalMetadata);
+                            // See PLATFORM_EVENT_KEEPER_REVEAL_STARTED.
                             break;
                         case PLATFORM_EVENT_KEEPER_COMBAT_READY:
                             // Readiness has no separate admitted sound; title polls the snapshot.
@@ -6497,6 +6949,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onPause() {
+        pauseChapterVoice(true);
         cancelCombatTeachingPromptPoll();
         clearCombatTeachingPrompt();
         clearRunIntent();
@@ -6591,6 +7044,7 @@ public class MainActivity extends Activity {
         stopSurface();
         if (menuAmbience != null) { menuAmbience.close(); menuAmbience = null; }
         if (soundPool != null) soundPool.release();
+        chapterVoiceStream = 0;
         if (waterfallPlayback != null) { waterfallPlayback.close(); waterfallPlayback = null; }
         super.onDestroy();
     }

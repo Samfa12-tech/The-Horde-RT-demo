@@ -21,6 +21,7 @@ struct SimulationCommandSequences
     std::uint64_t clearRunIntent = 0;
     std::uint64_t tutorialSkip = 0;
     std::uint64_t tutorialReplay = 0;
+    std::uint64_t dialogueSkip = 0;
 };
 
 enum class CombatInputEdgeKind : std::uint8_t
@@ -77,6 +78,8 @@ struct InputSnapshot
     bool runHeld = false;
     bool tutorialEnabled = true;
     bool tutorialSlowdownEnabled = false;
+    std::uint32_t dialogueCompletionLine = 0;
+    std::uint64_t dialogueCompletionGeneration = 0;
     SimulationCommandSequences commands{};
     CombatInputEdgeHistory combatEdgeHistory{};
 };

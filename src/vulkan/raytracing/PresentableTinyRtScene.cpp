@@ -3304,7 +3304,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     }
     if(developmentWorldRoute_)
     {
-        worldRouteGeometry_=horde::scene::PrepareDevelopmentWorldGeometry(stagedWorldPreparation_);
+        worldRouteGeometry_=horde::scene::PrepareDevelopmentWorldGeometry(stagedWorldPreparation_,developmentRescueJourney_);
         if(developmentRescueJourney_) horde::scene::AppendRescueJourneyGeometry(worldRouteGeometry_);
         if(!worldRouteGeometry_.valid) { diagnostic="Development world route preparation failed finite geometry admission."; return false; }
         for(const auto& triangle:worldRouteGeometry_.triangles)

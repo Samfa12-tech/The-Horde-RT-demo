@@ -11,8 +11,8 @@ struct OutdoorEffectRegionMarker {
 // Original solid M/F letter markers. Their triangles measure only blockout
 // geometry; they are neither mist/fireflies nor evidence of those effects' cost.
 inline constexpr std::array<OutdoorEffectRegionMarker,2> kOutdoorEffectRegionMarkers{{
-    {"M: OUTDOOR MIST NOT IMPLEMENTED",{61.0f,.55f,13.0f},false},
-    {"F: FIREFLIES NOT IMPLEMENTED",{59.0f,-.55f,28.0f},false}}};
+    {"M: OUTDOOR MIST NOT IMPLEMENTED",{61.0f+horde::gameplay::simulation::kWorldPlanTranslateX,.55f,13.0f+horde::gameplay::simulation::kWorldPlanTranslateZ},false},
+    {"F: FIREFLIES NOT IMPLEMENTED",{59.0f+horde::gameplay::simulation::kWorldPlanTranslateX,-.55f,28.0f+horde::gameplay::simulation::kWorldPlanTranslateZ},false}}};
 inline constexpr std::size_t kOutdoorEffectMarkerTriangleCount=76;
 // Original blockout fitting joins the solver's clear underside attachment to
 // the retained cantilever. It is geometry, not a renderer-only rope anchor.
@@ -22,7 +22,7 @@ inline constexpr std::size_t kRescueAnchorCollarTriangleCount=12;
 inline void AppendRescueJourneyGeometry(DevelopmentWorldGeometry& out) {
     const auto preparationBegin=std::chrono::steady_clock::now();
     const auto previousBytes=out.triangles.capacity()*sizeof(DevelopmentWorldTriangle);
-    out.triangles.reserve(out.triangles.size()+kRescueBlockoutBoxes.size()*12+12+8+420+kOutdoorEffectMarkerTriangleCount+kRescueAnchorCollarTriangleCount);
+    out.triangles.reserve(out.triangles.size()+kRescueBlockoutBoxes.size()*12+12+420+kOutdoorEffectMarkerTriangleCount+kRescueAnchorCollarTriangleCount);
     out.peakPreparationCpuBytes=std::max(out.peakPreparationCpuBytes,
         previousBytes+out.triangles.capacity()*sizeof(DevelopmentWorldTriangle));
     using P=std::array<float,3>; using namespace horde::gameplay::simulation;
@@ -42,15 +42,13 @@ inline void AppendRescueJourneyGeometry(DevelopmentWorldGeometry& out) {
     for(const auto& b:kRescueBlockoutBoxes) box(b);
     box(kRescueBlockoutLanding);
     box(kRescueAnchorCollar);
-    horde::gameplay::traversal::VisitRescueConnectorTriangles([&](const auto& t) {
-        out.triangles.push_back({t,0,0,WorldZoneId::TombExterior});
-    });
     // Original faceted silhouettes at three distances. These are a measurement
     // workload, not admitted final forest art or a capacity certification.
     for(unsigned band=0;band<3;++band) for(unsigned i=0;i<5;++i) {
-        const float x=44+band*16.0f+(i%2? -6.0f:6.0f), z=7+band*12.0f+i*2.5f;
-        const float floor=band==0?1.45f:band==1?-.55f:-.25f;
-        box({{{x-.16f,floor,z-.16f}},{{x+.16f,floor+4,z+.16f}},0});
+        const auto& trunk=WorldRouteSilhouetteTrunks()[band*5+i];
+        const float x=(trunk.minimum[0]+trunk.maximum[0])*.5f,z=(trunk.minimum[2]+trunk.maximum[2])*.5f;
+        const float floor=trunk.minimum[1]+.12f;
+        box({trunk.minimum,trunk.maximum,0});
         const float radius=1.2f+band*.2f;
         for(unsigned ring=0;ring<2;++ring) for(unsigned side=0;side<8;++side) {
             const float a=side*.7853981634f,b=(side+1)*.7853981634f;

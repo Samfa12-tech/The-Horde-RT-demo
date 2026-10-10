@@ -114,6 +114,7 @@ std::uint32_t GameSimulation::AdvanceFrame(const InputSnapshot& input,
 {
     lastInput_ = input;
     inputPublicationSequence_ = inputPublicationSequence;
+    if(input.paused) { chapterDialogue_.Pause(); chapterSkipFloor_=std::max(chapterSkipFloor_,input.commands.dialogueSkip); }
     const bool presentationWasActive = combatPresentation_.Snapshot().parrySuccessActive;
     combatPresentation_.AdvanceFrame(frameDeltaSeconds, input.paused);
     const std::size_t eventsBeforeFrame = events_.Size();
@@ -227,6 +228,7 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
                                    const bool activateTimestampedEdges)
 {
     fixedDeltaSeconds = std::clamp(fixedDeltaSeconds, 0.0f, 0.05f);
+    const float dialogueDeltaSeconds = fixedDeltaSeconds;
     lastInput_ = input;
     inputPublicationSequence_ = inputPublicationSequence;
     ++tickIndex_;
@@ -370,6 +372,9 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
         CancelCombatTransients();
     }
 
+    // Speech duration follows the unscaled active fixed-step clock. Combat,
+    // movement and poses still share the teaching time scale; pause freezes both.
+    UpdateChapterDialogue(input,dialogueDeltaSeconds);
     RefreshSnapshot(input);
     snapshot_.eventsEmittedThisTick = events_.Size() - eventsBefore;
 }
@@ -383,6 +388,8 @@ void GameSimulation::SynchronizePausedInput(const InputSnapshot& input,
     combatContactTrace_.Clear();
     ClearQueuedDrawAttack();
     combatPresentation_.Reset();
+    chapterDialogue_.Pause();
+    chapterSkipFloor_=std::max(chapterSkipFloor_,input.commands.dialogueSkip);
     ClearScheduledCombatEdges(false);
     previousOwnerAdvanceSteadyNs_ = 0u;
     inputPublicationSequence_ = std::max(inputPublicationSequence_,
@@ -519,10 +526,14 @@ void GameSimulation::ResolveMovementCollision(float previousX, float previousZ)
     if (UsesRescueExterior()) {
         const auto support=horde::gameplay::traversal::RescueExteriorSupport(playerX_,playerZ_);
         const auto p=ProjectWorldRoute(playerX_,playerZ_);
-        const auto zone=p.valid&&p.distance<=kWorldRouteHalfWidth?ZoneForRouteSegment(p.segment):WorldZoneId::TombExterior;
+        const auto zone=support.id==static_cast<PlayerSupportId>(130)?WorldZoneId::TombExterior:
+            (p.valid&&p.distance<=kWorldRouteHalfWidth?ZoneForRouteSegment(p.segment):WorldZoneId::TombExterior);
         const bool ready=worldRoute_.readiness[static_cast<std::size_t>(zone)]==ZoneReadiness::Ready;
         const bool clear=horde::gameplay::traversal::RescueExteriorMovementClear(
-            previousX,previousZ,playerX_,playerZ_,playerSupport_.worldY,kPlayerCollisionRadius);
+            previousX,previousZ,playerX_,playerZ_,playerSupport_.worldY,kPlayerCollisionRadius) &&
+            WorldRouteBlockoutMovementClear(previousX,previousZ,playerX_,playerZ_,playerSupport_.worldY,kPlayerCollisionRadius,true) &&
+            (support.id==static_cast<PlayerSupportId>(130) ||
+             WorldRouteTerrainMovementClear(previousX,previousZ,playerX_,playerZ_,playerSupport_.worldY,kPlayerCollisionRadius));
         if(!support.grounded||!ready||!clear||std::abs(support.worldY-playerSupport_.worldY)>kWorldRouteMaximumStep) {
             playerX_=previousX;playerZ_=previousZ;worldRoute_.blocked=true;++worldRoute_.rollbackCount;
         } else {
@@ -540,16 +551,11 @@ void GameSimulation::ResolveMovementCollision(float previousX, float previousZ)
         return;
     }
     auto projection=ProjectWorldRoute(playerX_,playerZ_);
-    if (projection.valid && projection.distance > kWorldRouteHalfWidth-kPlayerCollisionRadius)
-    {
-        const float scale=(kWorldRouteHalfWidth-kPlayerCollisionRadius)/projection.distance;
-        playerX_=projection.x+(playerX_-projection.x)*scale;
-        playerZ_=projection.z+(playerZ_-projection.z)*scale;
-        projection=ProjectWorldRoute(playerX_,playerZ_);
-    }
     const auto support=ResolveWorldRouteSupport(playerX_,playerZ_);
     const auto zone=projection.valid?ZoneForRouteSegment(projection.segment):WorldZoneId::TombExterior;
     const bool valid=projection.valid && support.grounded &&
+        WorldRouteTerrainMovementClear(previousX,previousZ,playerX_,playerZ_,playerSupport_.worldY,kPlayerCollisionRadius) &&
+        WorldRouteBlockoutMovementClear(previousX,previousZ,playerX_,playerZ_,playerSupport_.worldY,kPlayerCollisionRadius) &&
         worldRoute_.readiness[static_cast<std::size_t>(zone)]==ZoneReadiness::Ready &&
         std::abs(support.worldY-playerSupport_.worldY)<=kWorldRouteMaximumStep;
     worldRoute_.blocked=!valid;
@@ -604,6 +610,7 @@ void GameSimulation::SetDevelopmentSupportFixture(bool enabled, std::uint64_t ge
 
 void GameSimulation::ResetRoute()
 {
+    chapterDialogue_.Reset();chapterCompanion_.Reset();chapterFirstExterior_=false;chapterVisibleRaise_=0;
     if(config_.developmentRescueJourney) { rescueSavedSwordValid_=false;rescueTraversal_.Reset();rescueOpeningSeconds_=0;worldRoute_.Invalidate(); }
     legacyCombatCheckpoint_ = false;
     combatTeaching_.Reset(config_.combatFoundation1_7 && lastInput_.tutorialEnabled);
@@ -723,6 +730,7 @@ void GameSimulation::ImportRewardCheckpoint(
     const horde::gameplay::interactions::LanternPendulumSnapshot* pendulum)
 {
     events_.Clear();
+    chapterDialogue_.Reset(true);chapterVisibleRaise_=0;
     combatPresentation_.Reset();
     dodgeRemainingSeconds_ = 0.0f;
     CancelCombatTransients();
@@ -1253,6 +1261,7 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
         return false;
     }
 
+    chapterDialogue_.Reset(checkpointId!=0);chapterVisibleRaise_=0;
     pendingTutorialReplayCommands_ = 0u;
     pendingTutorialSkipCommands_ = 0u;
     gameplayTimeScale_ = 1.0f;
@@ -2273,11 +2282,21 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
     if (!previousLich.revealStarted && lich.revealStarted)
     {
         Emit(GameplayEventType::KeeperRevealStarted, EntityId::Lich, EntityId::Player, lich.x, lich.z);
+        if(CurrentCombatRules()) {
+            dialogue::Context c;c.listener={playerX_,kShowcaseEyeWorldY+PlayerHeightDelta(playerSupport_.worldY),playerZ_};
+            c.yaw=playerYawRadians_;
+            chapterDialogue_.Request(dialogue::Line::KeeperSense,{lich.x,lich.y,lich.z},c);
+        }
     }
     if (previousLich.revealPhase == KeeperRevealPhase::Awakening &&
         (lich.revealPhase == KeeperRevealPhase::Warning || lich.revealPhase == KeeperRevealPhase::Ready))
     {
         Emit(GameplayEventType::KeeperWarning, EntityId::Lich, EntityId::Player, lich.x, lich.z);
+        if(CurrentCombatRules()) {
+            dialogue::Context c;c.listener={playerX_,kShowcaseEyeWorldY+PlayerHeightDelta(playerSupport_.worldY),playerZ_};
+            c.yaw=playerYawRadians_;
+            chapterDialogue_.Request(dialogue::Line::KeeperCloser,{lich.x,lich.y,lich.z},c);
+        }
     }
     if (!previousLich.revealComplete && lich.revealComplete)
     {
@@ -2461,6 +2480,8 @@ std::uint64_t GameSimulation::Emit(GameplayEventType type,
 
 void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
 {
+    snapshot_.chapterDialogue=chapterDialogue_.State();
+    snapshot_.chapterCompanion=chapterCompanion_.State();
     snapshot_.tickIndex = tickIndex_;
     snapshot_.combatContactTrace = combatContactTrace_;
     snapshot_.inputPublicationSequence = inputPublicationSequence_;

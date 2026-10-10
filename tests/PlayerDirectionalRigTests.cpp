@@ -338,6 +338,21 @@ int main(int argc, char** argv)
     if (!Require(worldGeometry.valid &&
                  horde::scene::ValidateDevelopmentWorldGeometry(worldGeometry),
                  "directional rig route proof requires valid prepared world geometry")) return 1;
+    // The rebased rescue route shares X/Z with retained dungeon roof planes.
+    // At F01 the player stands above those solids, so they are not ceilings
+    // for either hand prop. Keep the measured torch/sword envelope solvers and
+    // all socket tolerances active; only support-relative ownership changes.
+    HeldItemKinematicsInput aboveDungeonRoof{};
+    aboveDungeonRoof.cameraX = kWorldRoutePoints[2].x;
+    aboveDungeonRoof.cameraZ = kWorldRoutePoints[2].z;
+    aboveDungeonRoof.cameraYawRadians = 0.0f;
+    aboveDungeonRoof.playerSupportWorldY = kWorldRoutePoints[2].y;
+    aboveDungeonRoof.developmentWorldRoute = true;
+    aboveDungeonRoof.playerMountProfile = PlayerMountProfile::AnatomicalBody;
+    const auto aboveRoofPose = EvaluateHeldItemKinematics(aboveDungeonRoof);
+    if (!Require(Near(aboveRoofPose.torchOverheadLowering, 0.0f, 0.000001f) &&
+                 Near(aboveRoofPose.swordOverheadLowering, 0.0f, 0.000001f),
+                 "dungeon roofs below rebased F01 support do not lower exterior held props")) return 1;
     auto routeConfig = ProductionGameSimulationConfig();
     auto routeSimulation = std::make_unique<GameSimulation>(routeConfig);
     routeSimulation->SetDevelopmentWorldRoute(true);
@@ -354,8 +369,15 @@ int main(int argc, char** argv)
     InputSnapshot routeInput{};
     routeInput.damageEnabled = false;
     routeInput.yawRadians = 3.14159265359f;
+    // The playable rescue route starts at F01. Segment 0 and its low-roof
+    // step laboratory remain separately covered by the support/clearance
+    // fixtures; they are excluded from the actual rescue-scene mesh.
+    routeInput.hasAuthoritativePlayerPose = true;
+    routeInput.authoritativePlayerX = kWorldRoutePoints[2].x;
+    routeInput.authoritativePlayerZ = kWorldRoutePoints[2].z;
+    routeSimulation->StepFixed(routeInput);
+    routeInput.hasAuthoritativePlayerPose = false;
     routeInput.moveForward = 1.0f;
-    bool sawStepSupport = false;
     bool sawRaisedSlope = false;
     std::uint64_t routePoseSamples = 0u;
     auto inspectRoutePose = [&]() {
@@ -366,7 +388,9 @@ int main(int argc, char** argv)
         if (!PrepareRenderedPose(rig, snapshot, rigTick++, updated, diagnostic,
                                  &items, &light))
         {
-            std::cerr << "World-route pose rejected: " << diagnostic << '\n';
+            std::cerr << "World-route pose rejected tick=" << snapshot.tickIndex
+                      << " root=" << snapshot.playerX << "," << snapshot.playerSupportWorldY
+                      << "," << snapshot.playerZ << ": " << diagnostic << '\n';
             return false;
         }
         if (!updated || !rig.SolvedPose().IsValid() || rig.UniqueVertices().empty() ||
@@ -407,6 +431,11 @@ int main(int argc, char** argv)
             const auto& before = routeSimulation->Snapshot();
             if (std::hypot(target.x - before.playerX, target.z - before.playerZ) < 0.035f)
                 return true;
+            const float dx = target.x - before.playerX;
+            const float dz = target.z - before.playerZ;
+            routeInput.yawRadians = std::atan2(dx, -dz) +
+                (forward < 0.0f ? 3.14159265359f : 0.0f);
+            routeInput.moveForward = forward * std::min(1.0f, std::hypot(dx, dz) / 0.05f);
             routeSimulation->StepFixed(routeInput);
             const auto& snapshot = routeSimulation->Snapshot();
             if (!snapshot.playerGrounded ||
@@ -418,10 +447,8 @@ int main(int argc, char** argv)
                           << " y=" << snapshot.playerSupportWorldY << '\n';
                 return false;
             }
-            sawStepSupport |= snapshot.playerSupportId == PlayerSupportId::WorldRouteStep &&
-                Near(snapshot.playerHeightDelta, 0.12f, 0.002f);
             sawRaisedSlope |= snapshot.playerSupportWorldY > kRouteFloorWorldY + 1.0f &&
-                snapshot.playerSupportSurface == SupportSurface::Stone;
+                snapshot.playerSupportWorldY < kWorldRoutePoints[2].y - 0.05f;
             if (tick % 20u == 19u || snapshot.playerSupportId != previousSupportId)
             {
                 if (!inspectRoutePose()) return false;
@@ -434,23 +461,21 @@ int main(int argc, char** argv)
                   << " target=" << target.x << ',' << target.z << '\n';
         return false;
     };
-    if (!Require(walkRouteTo(kWorldRoutePoints[2], 1.0f),
-                 "real-rig route travel must reach the sloped raised support")) return 1;
-    if (!Require(sawStepSupport && sawRaisedSlope &&
-                 Near(routeSimulation->Snapshot().playerSupportWorldY,
-                      kWorldRoutePoints[2].y, 0.03f) &&
-                 routeSimulation->Snapshot().playerSupportSurface == SupportSurface::Stone,
-                 "real-rig route travel must resolve both the 12 cm step and raised slope")) return 1;
-    if (!Require(walkRouteTo(kWorldRoutePoints[0], -1.0f),
-                 "real-rig route travel must return to the ground support")) return 1;
+    if (!inspectRoutePose()) return 1;
+    for (std::size_t waypoint = 3; waypoint <= 4; ++waypoint)
+        if (!Require(walkRouteTo(kWorldRoutePoints[waypoint], 1.0f),
+                     "real-rig route travel must reach actual exterior terrain")) return 1;
+    if (!Require(sawRaisedSlope && routePoseSamples >= 10u,
+                 "real-rig exterior route must sample supported slopes with strict grips")) return 1;
+    for (std::size_t waypoint = 4; waypoint-- > 2;)
+        if (!Require(walkRouteTo(kWorldRoutePoints[waypoint], -1.0f),
+                     "real-rig backward travel must return to the physical rescue landing")) return 1;
     if (!Require(Near(routeSimulation->Snapshot().playerSupportWorldY,
-                      kWorldRoutePoints[0].y, 0.002f) &&
-                 Near(routeSimulation->Snapshot().playerHeightDelta, 0.0f, 0.002f) &&
-                 routeSimulation->Snapshot().playerSupportSurface == SupportSurface::Stone &&
-                 routePoseSamples >= 10u,
-                 "real-rig route return must finish grounded after bounded grip samples")) return 1;
+                      kWorldRoutePoints[2].y, 0.03f) &&
+                 routeSimulation->Snapshot().playerGrounded && routePoseSamples >= 20u,
+                 "real-rig route return must finish on F01 after bounded grip samples")) return 1;
     if (!inspectRoutePose())
-        return Require(false, "returned ground pose retains real equipment and light attachments") ? 0 : 1;
+        return Require(false, "returned F01 pose retains real equipment and light attachments") ? 0 : 1;
 
     std::cout << "Directional runtime rig, aim independence, run stride, dodge disposition, route support poses, and attachment sockets passed; dedicated run/back/strafe/dodge clips remain absent; route_pose_samples="
               << routePoseSamples << " GPU_cost=not-measured.\n";

@@ -45,6 +45,14 @@ public final class ProbeBridge {
     public static native void setCombatTeachingOptions(boolean enabled, boolean slowdown);
     public static native void requestCombatTeachingSkip();
     public static native void requestCombatTeachingReplay();
+    /** Coherent immutable chapter dialogue publication: line, generation, elapsed/duration ms, paused. */
+    public static native long[] getChapterDialogueState();
+    /** Speaker and exact catalog text from the same render-owner publication. */
+    public static native String getChapterDialogueText(long generation);
+    /** Packed Float left/right planar gains from the shared spatial-audio model. */
+    public static native long getChapterDialogueStereoGains(long generation);
+    /** Distinct monotonic gameplay command; never aliases attack/interact. */
+    public static native void requestChapterDialogueSkip();
     /** Packed immutable teaching snapshot published by the simulation owner. */
     public static native long getCombatTeachingState();
     public static native void requestInteract();

@@ -6,7 +6,11 @@
 
 namespace horde::scene
 {
-inline constexpr OverheadVolume kDevelopmentRouteRoof = RectangularOverhead(38.8f,-8,41.2f,-5,1.02f,1.22f);
+inline constexpr OverheadVolume kDevelopmentRouteRoof = RectangularOverhead(
+    38.8f+horde::gameplay::simulation::kWorldPlanTranslateX,
+    -8+horde::gameplay::simulation::kWorldPlanTranslateZ,
+    41.2f+horde::gameplay::simulation::kWorldPlanTranslateX,
+    -5+horde::gameplay::simulation::kWorldPlanTranslateZ,1.02f,1.22f);
 struct DevelopmentWorldTriangle
 {
     std::array<std::array<float,3>,3> points;
@@ -43,7 +47,7 @@ inline bool ValidateDevelopmentWorldGeometry(const DevelopmentWorldGeometry& geo
 // Same triangles consumed by the real world BLAS and the native contract tests.
 // Staged CPU batches retain their off-camera contributors until final admission;
 // no frustum-based residency or simulated GPU cost is introduced here.
-inline DevelopmentWorldGeometry PrepareDevelopmentWorldGeometry(bool staged)
+inline DevelopmentWorldGeometry PrepareDevelopmentWorldGeometry(bool staged,bool rescueJourney=false)
 {
     using namespace horde::gameplay::simulation;
     using Point = std::array<float,3>;
@@ -66,38 +70,49 @@ inline DevelopmentWorldGeometry PrepareDevelopmentWorldGeometry(bool staged)
         const auto stageBegin=std::chrono::steady_clock::now();
         const auto owner=static_cast<WorldZoneId>(zone);
         VisitWorldRouteSurfaceTriangles([&](const auto& points,std::size_t segment) {
-            if(ZoneForRouteSegment(segment)==owner)
+            if(ZoneForRouteSegment(segment)==owner && (!rescueJourney||segment>=1))
                 out.triangles.push_back({points,zone==1?1u:3u,0u,owner});
         });
-        if (zone==1)
+        VisitWorldRouteTerrainShellTriangles([&](const auto& points,std::size_t segment,std::uint32_t normal) {
+            if(ZoneForRouteSegment(segment)==owner && (!rescueJourney||segment>=1))
+                out.triangles.push_back({points,zone==1?1u:3u,normal,owner});
+        });
+        if (zone==1 && !rescueJourney)
         {
-            box({39.35f,horde::gameplay::kRouteFloorWorldY,-7},{40.65f,horde::gameplay::kRouteFloorWorldY+.12f,-6},0,owner);
-            box({38.8f,1.02f,-8},{41.2f,1.22f,-5},0,owner);
-            box({38.45f,-.95f,-8},{38.8f,1.22f,-5},2,owner);
-            box({41.2f,-.95f,-8},{41.55f,1.22f,-5},2,owner);
+            box({39.35f+kWorldPlanTranslateX,horde::gameplay::kRouteFloorWorldY,-7+kWorldPlanTranslateZ},
+                {40.65f+kWorldPlanTranslateX,horde::gameplay::kRouteFloorWorldY+.12f,-6+kWorldPlanTranslateZ},0,owner);
+            box({38.8f+kWorldPlanTranslateX,1.02f,-8+kWorldPlanTranslateZ},
+                {41.2f+kWorldPlanTranslateX,1.22f,-5+kWorldPlanTranslateZ},0,owner);
+            box({38.45f+kWorldPlanTranslateX,-.95f,-8+kWorldPlanTranslateZ},
+                {38.8f+kWorldPlanTranslateX,1.22f,-5+kWorldPlanTranslateZ},2,owner);
+            box({41.2f+kWorldPlanTranslateX,-.95f,-8+kWorldPlanTranslateZ},
+                {41.55f+kWorldPlanTranslateX,1.22f,-5+kWorldPlanTranslateZ},2,owner);
         }
-        else
+        else if (zone!=1)
         {
-            for(std::size_t i=zone==2?2:5;i<(zone==2?5:7);++i)
-            {
-                const auto p=kWorldRoutePoints[i];
-                // Owned opaque boxes only, no acquired tree art/cutout assets.
-                for(float side : {-1.0f,1.0f})
-                {
-                    const float x=p.x+side*3.5f,z=p.z;
-                    box({x-.18f,p.y-.3f,z-.18f},{x+.18f,p.y+4,z+.18f},0,owner);
-                    box({x-1.1f,p.y+2.6f,z-1.1f},{x+1.1f,p.y+5,z+1.1f},2,owner);
-                }
+            for(const auto& obstacle:WorldRouteBlockoutBoxes())
+                if(ZoneForRouteSegment(obstacle.segment)==owner)
+                    box(obstacle.minimum,obstacle.maximum,obstacle.material,owner);
+        }
+        if(zone==1 && rescueJourney) {
+            const auto& top=WorldRouteSurfaceTriangles();
+            for(std::size_t lane=0;lane<6;++lane) {
+                const auto a=top[(6+lane)*2].points[0],b=top[(6+lane)*2+1].points[2];
+                quad(a,b,{b[0],-5,b[2]},{a[0],-5,a[2]},1u,5u,owner);
             }
         }
         if(zone==3)
         {
-            // Bellwether B01..B04 at pinned east/north/up coordinates; closed,
-            // nonplayable shell. There is deliberately no support path to town.
-            box({153, -11.15f,116},{175,-4.15f,132},0,owner);
-            box({141, -2.55f,62},{159,9.45f,86},0,owner);
-            box({101,-10.75f,125},{117,-4.75f,137},2,owner);
-            box({97,-6.95f,103},{113,-.95f,117},0,owner);
+            // Bellwether B01..B04 receive the same documented XY translation
+            // as F01..F04. They remain closed, real geometry with no support.
+            box({153+kWorldPlanTranslateX, -11.15f,116+kWorldPlanTranslateZ},
+                {175+kWorldPlanTranslateX,-4.15f,132+kWorldPlanTranslateZ},0,owner);
+            box({141+kWorldPlanTranslateX, -2.55f,62+kWorldPlanTranslateZ},
+                {159+kWorldPlanTranslateX,9.45f,86+kWorldPlanTranslateZ},0,owner);
+            box({101+kWorldPlanTranslateX,-10.75f,125+kWorldPlanTranslateZ},
+                {117+kWorldPlanTranslateX,-4.75f,137+kWorldPlanTranslateZ},2,owner);
+            box({97+kWorldPlanTranslateX,-6.95f,103+kWorldPlanTranslateZ},
+                {113+kWorldPlanTranslateX,-.95f,117+kWorldPlanTranslateZ},0,owner);
         }
         out.zoneCpuNanoseconds[zone]=std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::steady_clock::now()-stageBegin).count();
         // Staged preparation owns an actual temporary batch for validation before

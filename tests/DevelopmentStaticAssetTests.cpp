@@ -78,7 +78,7 @@ int main()
               stagedWorldRoute != nullptr && stagedWorldRoute->id == 191 &&
               FindDevelopmentCheckpoint(191) == stagedWorldRoute &&
               stagedWorldRoute->developmentWorldRoute && stagedWorldRoute->stagedWorldPreparation &&
-              worldRoute->cameraX == 40.0f && worldRoute->cameraZ == -8.0f &&
+              worldRoute->cameraX == -33.7f && worldRoute->cameraZ == -20.8f &&
               stagedWorldRoute->cameraX == worldRoute->cameraX &&
               stagedWorldRoute->cameraZ == worldRoute->cameraZ &&
               FindShowcaseCheckpoint("world-route") == nullptr &&

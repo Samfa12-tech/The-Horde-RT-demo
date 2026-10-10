@@ -78,6 +78,8 @@
 #include "gameplay/LanternBenchmarkScenario.h"
 #include "gameplay/ShowcaseGameplay.h"
 #include "gameplay/SpatialAudio.h"
+#include "gameplay/dialogue/ChapterDialogue.h"
+#include "gameplay/dialogue/SubtitleLayout.h"
 #include "gameplay/SwordCombat.h"
 #include "gameplay/simulation/GameSimulation.h"
 #include "platform/windows/DesktopControllerInput.h"
@@ -96,6 +98,7 @@
 #include "platform/windows/WindowsMistCaptureLaunch.h"
 #include "platform/windows/WindowsInteractionPrompt.h"
 #include "platform/windows/WindowsGameplayInput.h"
+#include "platform/windows/WindowsChapterDialogue.h"
 #include "platform/windows/WindowsGitHubReleaseUpdate.h"
 #include "platform/windows/WindowsRtLabState.h"
 #include "vulkan/GpuFrameTimer.h"
@@ -221,6 +224,14 @@ constexpr int kChestPromptControlId = 161;
 constexpr int kCombatTeachingPromptId = 212;
 constexpr int kMusicVolumeLabelId = 162;
 constexpr int kMusicVolumeSliderId = 163;
+constexpr int kSettingsMoreId = 213;
+constexpr int kVoiceVolumeLabelId = 214;
+constexpr int kVoiceVolumeSliderId = 215;
+constexpr int kSubtitlesButtonId = 216;
+constexpr int kSubtitleSizeLabelId = 217;
+constexpr int kSubtitleSizeSliderId = 218;
+constexpr int kSubtitlePositionButtonId = 219;
+constexpr int kChapterSubtitleId = 221;
 constexpr int kReportProblemButtonId = 164;
 constexpr int kMenuPauseId = 2001;
 constexpr int kMenuRestartId = 2002;
@@ -246,6 +257,7 @@ constexpr char kUiFontProperty[] = "HordeLanternRtUiFont";
 constexpr char kEntryTitleFontProperty[] = "HordeLanternRtEntryTitleFont";
 constexpr char kEntryPlaqueFontProperty[] = "HordeLanternRtEntryPlaqueFont";
 constexpr char kCombatTeachingPromptFontProperty[] = "HordeLanternRtCombatTeachingPromptFont";
+constexpr char kSubtitleFontProperty[] = "HordeLanternRtSubtitleFont";
 constexpr char kGraphicsInfoFontProperty[] = "HordeLanternRtGraphicsInfoFont";
 constexpr char kMonoFontProperty[] = "HordeLanternRtMonoFont";
 constexpr char kDeveloperFontProperty[] = "HordeLanternRtDeveloperFont";
@@ -485,6 +497,23 @@ struct VulkanSurfaceContext
 #endif
     int sfxVolumePercent = 100;
     int musicVolumePercent = 70;
+    int voiceVolumePercent = 70;
+    int subtitleSizePercent = 100;
+    int appliedSubtitleFontPixels = 0;
+    horde::gameplay::dialogue::SubtitlePosition subtitlePosition =
+        horde::gameplay::dialogue::SubtitlePosition::Auto;
+    bool subtitlesEnabled = true;
+    bool settingsDialoguePage = false;
+    std::uint64_t dialogueSkipSequence = 0u;
+    std::uint32_t dialogueCompletionLine = 0u;
+    std::uint64_t dialogueCompletionGeneration = 0u;
+    horde::gameplay::dialogue::Line presentedDialogueLine = horde::gameplay::dialogue::Line::None;
+    std::uint64_t presentedDialogueGeneration = 0u;
+    horde::platform::windows::SubtitlePlacementLatch subtitlePlacementLatch{};
+    std::uint32_t playingDialogueLine = 0u;
+    std::uint64_t playingDialogueGeneration = 0u;
+    std::uint64_t lastChapterPresentationAckTick = 0u;
+    std::uint64_t lastChapterPresentationAckGeneration = 0u;
     std::unique_ptr<horde::platform::windows::WindowsMusicPlayback> musicPlayback;
     std::uint64_t musicResetToken = 0u;
     int musicLastLoggedGate = -1;
@@ -1019,6 +1048,13 @@ void LoadSettings(VulkanSurfaceContext& context)
         configuredSfxVolume, legacySfxEnabled);
     context.musicVolumePercent = std::clamp(
         static_cast<int>(GetPrivateProfileIntA("audio", "musicVolume", 70, path.c_str())), 0, 100);
+    context.voiceVolumePercent = std::clamp(
+        static_cast<int>(GetPrivateProfileIntA("audio", "voiceVolume", 70, path.c_str())), 0, 100);
+    context.subtitlesEnabled = GetPrivateProfileIntA("subtitles", "enabled", 1, path.c_str()) != 0;
+    context.subtitleSizePercent = std::clamp(
+        static_cast<int>(GetPrivateProfileIntA("subtitles", "size", 100, path.c_str())), 80, 160);
+    context.subtitlePosition = static_cast<horde::gameplay::dialogue::SubtitlePosition>(
+        std::clamp(static_cast<int>(GetPrivateProfileIntA("subtitles", "position", 0, path.c_str())), 0, 2));
     const int sensitivity = std::clamp(static_cast<int>(GetPrivateProfileIntA("controls", "lookSensitivity", 100, path.c_str())), 60, 150);
     context.mouseSensitivity = static_cast<float>(sensitivity) / 100.0f;
     context.combatTeachingEnabled = GetPrivateProfileIntA("controls", "combatTeaching", 1, path.c_str()) != 0;
@@ -1145,6 +1181,13 @@ void SaveSettings(const VulkanSurfaceContext& context)
                                context.sfxVolumePercent > 0 ? "1" : "0", path.c_str());
     const std::string musicVolume = std::to_string(context.musicVolumePercent);
     WritePrivateProfileStringA("audio", "musicVolume", musicVolume.c_str(), path.c_str());
+    const std::string voiceVolume = std::to_string(std::clamp(context.voiceVolumePercent, 0, 100));
+    WritePrivateProfileStringA("audio", "voiceVolume", voiceVolume.c_str(), path.c_str());
+    WritePrivateProfileStringA("subtitles", "enabled", context.subtitlesEnabled ? "1" : "0", path.c_str());
+    const std::string subtitleSize = std::to_string(std::clamp(context.subtitleSizePercent, 80, 160));
+    WritePrivateProfileStringA("subtitles", "size", subtitleSize.c_str(), path.c_str());
+    const std::string subtitlePosition = std::to_string(static_cast<int>(context.subtitlePosition));
+    WritePrivateProfileStringA("subtitles", "position", subtitlePosition.c_str(), path.c_str());
     const std::string sensitivity = std::to_string(static_cast<int>(std::round(context.mouseSensitivity * 100.0f)));
     WritePrivateProfileStringA("controls", "lookSensitivity", sensitivity.c_str(), path.c_str());
     WritePrivateProfileStringA("controls", "combatTeaching",
@@ -1178,6 +1221,9 @@ bool PlayXAudioFile(const std::filesystem::path& path,
                     float leftGain,
                     float rightGain,
                     int sfxVolumePercent);
+void SetControlVisible(HWND window, int id, bool visible);
+bool MeasurementPausedByUi(const VulkanSurfaceContext& context);
+void ReplaceFontProperty(HWND window, const char* propertyName, HFONT font);
 
 void PlaySoundEffect(const VulkanSurfaceContext& context, const char* filename)
 {
@@ -1234,6 +1280,10 @@ public:
             engine_ = nullptr;
             return;
         }
+        const HRESULT unityResult = masteringVoice_->SetVolume(1.0f);
+        if (FAILED(unityResult))
+            LogWindowsAudio("mastering voice unity gain could not be confirmed, HRESULT=" +
+                            std::to_string(static_cast<long>(unityResult)));
         XAUDIO2_VOICE_DETAILS details{};
         masteringVoice_->GetVoiceDetails(&details);
         outputChannels_ = std::max(1u, details.InputChannels);
@@ -1268,6 +1318,11 @@ public:
             it->voice->GetState(&state, XAUDIO2_VOICE_NOSAMPLESPLAYED);
             if (state.BuffersQueued == 0u)
             {
+                if (it->dialogueLine != 0u)
+                {
+                    completedDialogueLine_ = it->dialogueLine;
+                    completedDialogueGeneration_ = it->dialogueGeneration;
+                }
                 if (!completedVoiceLogged_)
                 {
                     completedVoiceLogged_ = true;
@@ -1283,28 +1338,19 @@ public:
         }
     }
 
-    bool SetMasterVolumePercent(const int percent)
+    std::pair<std::uint32_t, std::uint64_t> TakeDialogueCompletion()
     {
-        if (masteringVoice_ == nullptr)
-        {
-            LogFailureOnce("XAudio2 mastering voice unavailable while applying SFX volume");
-            return false;
-        }
-        const HRESULT result = masteringVoice_->SetVolume(
-            horde::audio::SfxVolumeLinearGain(percent));
-        if (FAILED(result))
-        {
-            LogFailureOnce("mastering voice SetVolume failed, HRESULT=" +
-                           std::to_string(static_cast<long>(result)));
-            return false;
-        }
-        return true;
+        const auto completion = std::pair{completedDialogueLine_, completedDialogueGeneration_};
+        completedDialogueLine_ = 0u;
+        completedDialogueGeneration_ = 0u;
+        return completion;
     }
 
     bool StartOrUpdateLoop(const std::string_view key,
                            const std::filesystem::path& path,
                            float leftGain,
-                           float rightGain)
+                           float rightGain,
+                           const float sourceVolume = 1.0f)
     {
         if (engine_ == nullptr || masteringVoice_ == nullptr)
         {
@@ -1315,7 +1361,9 @@ public:
         {
             if (active.loopKey == key)
             {
-                return SetVoiceMatrix(active.voice, leftGain, rightGain, path);
+                const bool matrixOk = SetVoiceMatrix(active.voice, leftGain, rightGain, path);
+                const HRESULT volumeResult = active.voice->SetVolume(std::clamp(sourceVolume, 0.0f, 1.0f));
+                return matrixOk && SUCCEEDED(volumeResult);
             }
         }
 
@@ -1334,6 +1382,12 @@ public:
             return false;
         }
         if (!SetVoiceMatrix(voice, leftGain, rightGain, path))
+        {
+            voice->DestroyVoice();
+            return false;
+        }
+        const HRESULT volumeResult = voice->SetVolume(std::clamp(sourceVolume, 0.0f, 1.0f));
+        if (FAILED(volumeResult))
         {
             voice->DestroyVoice();
             return false;
@@ -1358,7 +1412,7 @@ public:
             voice->DestroyVoice();
             return false;
         }
-        activeVoices_.push_back({voice, wave, path.filename().string(), std::string(key)});
+        activeVoices_.push_back({voice, wave, path.filename().string(), std::string(key), 0u, 0u});
         LogWindowsAudio("positional loop started: " + path.filename().string());
         return true;
     }
@@ -1381,14 +1435,41 @@ public:
         }
     }
 
+    void PauseDialogue(const bool paused)
+    {
+        for (auto& active : activeVoices_)
+            if (active.dialogueLine != 0u)
+            {
+                if (paused) (void)active.voice->Stop();
+                else (void)active.voice->Start();
+            }
+    }
+
     void UpdateOwnedGain(const std::string_view key, const float gain)
     {
         for (auto &active : activeVoices_)
             if (active.loopKey == key) SetVoiceMatrix(active.voice, gain, gain, active.filename);
     }
 
+    void SetDialogueVolume(const int percent)
+    {
+        const float gain = horde::platform::windows::WindowsDialogueSourceGain(percent);
+        for (auto& active : activeVoices_)
+            if (active.dialogueLine != 0u) (void)active.voice->SetVolume(gain);
+    }
+
+    void SetSfxVolume(const int percent)
+    {
+        const float gain = horde::audio::SfxVolumeLinearGain(percent);
+        for (auto& active : activeVoices_)
+            if (active.dialogueLine == 0u) (void)active.voice->SetVolume(gain);
+    }
+
     bool Play(const std::filesystem::path& path, float leftGain, float rightGain,
-              const std::string_view ownedKey = {})
+              const std::string_view ownedKey = {},
+              const std::uint32_t dialogueLine = 0u,
+              const std::uint64_t dialogueGeneration = 0u,
+              const float sourceVolume = 1.0f)
     {
         if (engine_ == nullptr || masteringVoice_ == nullptr)
         {
@@ -1435,6 +1516,14 @@ public:
             voice->DestroyVoice();
             return false;
         }
+        const HRESULT volumeResult = voice->SetVolume(std::clamp(sourceVolume, 0.0f, 1.0f));
+        if (FAILED(volumeResult))
+        {
+            LogFailureOnce("source voice SetVolume failed, HRESULT=" +
+                           std::to_string(static_cast<long>(volumeResult)) + ": " + path.string());
+            voice->DestroyVoice();
+            return false;
+        }
 
         const XAUDIO2_BUFFER buffer{
             0u,
@@ -1457,7 +1546,8 @@ public:
             return false;
         }
         const std::string filename = path.filename().string();
-        activeVoices_.push_back({voice, wave, filename, std::string(ownedKey)});
+        activeVoices_.push_back({voice, wave, filename, std::string(ownedKey),
+                                 dialogueLine, dialogueGeneration});
         if (!successfulVoiceLogged_)
         {
             successfulVoiceLogged_ = true;
@@ -1481,6 +1571,8 @@ private:
         std::shared_ptr<const LoadedWave> wave;
         std::string filename;
         std::string loopKey;
+        std::uint32_t dialogueLine = 0u;
+        std::uint64_t dialogueGeneration = 0u;
     };
 
     bool SetVoiceMatrix(IXAudio2SourceVoice* voice,
@@ -1610,6 +1702,8 @@ private:
     std::string lastFailure_;
     bool successfulVoiceLogged_ = false;
     bool completedVoiceLogged_ = false;
+    std::uint32_t completedDialogueLine_ = 0u;
+    std::uint64_t completedDialogueGeneration_ = 0u;
 };
 
 PositionalAudioEngine& SpatialAudioEngine()
@@ -1624,21 +1718,192 @@ bool PlayXAudioFile(const std::filesystem::path& path,
                     const int sfxVolumePercent)
 {
     PositionalAudioEngine& engine = SpatialAudioEngine();
-    if (!engine.SetMasterVolumePercent(sfxVolumePercent)) return false;
-    return engine.Play(path,
-                       std::clamp(leftGain, 0.0f, 1.0f),
-                       std::clamp(rightGain, 0.0f, 1.0f));
+    return engine.Play(path, std::clamp(leftGain, 0.0f, 1.0f),
+                       std::clamp(rightGain, 0.0f, 1.0f), {}, 0u, 0u,
+                       horde::platform::windows::WindowsSfxSourceGain(1.0f, sfxVolumePercent));
+}
+
+void UpdateChapterDialogueAudio(VulkanSurfaceContext& context)
+{
+    using horde::gameplay::dialogue::Line;
+    const auto& dialogue = context.simulation.Snapshot().chapterDialogue;
+    const auto line = dialogue.line;
+    const auto lineId = static_cast<std::uint32_t>(line);
+    if (line == Line::None)
+    {
+        if (context.playingDialogueLine != 0u)
+            SpatialAudioEngine().StopLoop("chapter_dialogue");
+        context.playingDialogueLine = 0u;
+        context.playingDialogueGeneration = 0u;
+        return;
+    }
+    const bool paused = dialogue.paused || !context.controlsEnabled ||
+        GetForegroundWindow() != context.windowHandle;
+    SpatialAudioEngine().PauseDialogue(paused);
+    if (paused) return;
+    if (context.playingDialogueLine == lineId &&
+        context.playingDialogueGeneration == dialogue.generation) return;
+    SpatialAudioEngine().StopLoop("chapter_dialogue");
+    context.playingDialogueLine = 0u;
+    context.playingDialogueGeneration = 0u;
+    const auto& spec = horde::gameplay::dialogue::Spec(line);
+    if (spec.audio == nullptr || spec.audio[0] == '\0') return;
+    const std::filesystem::path path = ResolveAssetRoot() / spec.audio;
+    if (!std::filesystem::exists(path))
+    {
+        LogWindowsAudio("chapter line audio unavailable; subtitle remains active: " + path.string());
+        return;
+    }
+    const auto gains = horde::gameplay::CalculateSpatialAudio(
+        {dialogue.source.x, dialogue.source.z, .36f, 1.0f, 14.0f, dialogue.source.y},
+        {dialogue.listener.x, dialogue.listener.z, dialogue.listenerYaw, dialogue.listener.y});
+    if (gains.left <= 0.0f && gains.right <= 0.0f) return;
+    if (SpatialAudioEngine().Play(path, gains.left, gains.right,
+            "chapter_dialogue", lineId, dialogue.generation,
+            horde::platform::windows::WindowsDialogueSourceGain(context.voiceVolumePercent)))
+    {
+        context.playingDialogueLine = lineId;
+        context.playingDialogueGeneration = dialogue.generation;
+    }
+}
+
+void RefreshChapterSubtitle(VulkanSurfaceContext& context)
+{
+    HWND subtitle = GetDlgItem(context.windowHandle, kChapterSubtitleId);
+    if (subtitle == nullptr) return;
+    const auto& dialogue = context.simulation.Snapshot().chapterDialogue;
+    if (!context.subtitlesEnabled || dialogue.line == horde::gameplay::dialogue::Line::None ||
+        dialogue.paused || !context.controlsEnabled || MeasurementPausedByUi(context))
+    {
+        SetControlVisible(context.windowHandle, kChapterSubtitleId, false);
+        return;
+    }
+    const auto& spec = horde::gameplay::dialogue::Spec(dialogue.line);
+    if (context.presentedDialogueLine != dialogue.line ||
+        context.presentedDialogueGeneration != dialogue.generation)
+    {
+        context.presentedDialogueLine = dialogue.line;
+        context.presentedDialogueGeneration = dialogue.generation;
+        context.subtitlePlacementLatch.active = false;
+    }
+    RECT client{};
+    GetClientRect(context.windowHandle, &client);
+    const int width = std::max(0, static_cast<int>(client.right - client.left));
+    const int height = std::max(0, static_cast<int>(client.bottom - client.top));
+    const int fontPixels = ScaleForDpi(context.windowHandle,
+        std::max(16, 22 * context.subtitleSizePercent / 100));
+    if (fontPixels != context.appliedSubtitleFontPixels)
+    {
+        HFONT font = CreateFontA(-fontPixels, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
+            ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY,
+            DEFAULT_PITCH | FF_ROMAN, "Georgia");
+        if (font)
+        {
+            SendMessageA(subtitle, WM_SETFONT, reinterpret_cast<WPARAM>(font), TRUE);
+            ReplaceFontProperty(context.windowHandle, kSubtitleFontProperty, font);
+            context.appliedSubtitleFontPixels = fontPixels;
+        }
+    }
+    std::string text = std::string(spec.speaker) + "\r\n" + spec.text +
+        "\r\n\r\n[TAB / X: SKIP]";
+    const int subtitleWidth = std::max(0, std::min(900,
+        width - 2 * ScaleForDpi(context.windowHandle, 24)));
+    HDC measureDc = GetDC(context.windowHandle);
+    RECT measured{0, 0, subtitleWidth, 0};
+    const HFONT measureFont = reinterpret_cast<HFONT>(SendMessageA(subtitle, WM_GETFONT, 0, 0));
+    const HGDIOBJ oldMeasureFont = measureDc && measureFont ? SelectObject(measureDc, measureFont) : nullptr;
+    if (measureDc) DrawTextA(measureDc, text.c_str(), -1, &measured,
+        DT_CALCRECT | DT_WORDBREAK | DT_NOPREFIX);
+    if (measureDc && oldMeasureFont && oldMeasureFont != HGDI_ERROR)
+        SelectObject(measureDc, oldMeasureFont);
+    if (measureDc) ReleaseDC(context.windowHandle, measureDc);
+    const int measuredLineHeight = std::max(1, fontPixels + ScaleForDpi(context.windowHandle, 6));
+    const int wrappedLines = std::max(1, static_cast<int>((measured.bottom + measuredLineHeight - 1) / measuredLineHeight));
+    const int topReserved = ScaleForDpi(context.windowHandle, 164);
+    const int bottomReserved = ScaleForDpi(context.windowHandle, 128);
+    horde::gameplay::dialogue::SubtitleRequest request;
+    request.width = width;
+    request.height = height;
+    request.margin = ScaleForDpi(context.windowHandle, 24);
+    request.topReserved = topReserved;
+    request.bottomReserved = bottomReserved;
+    request.fontPixels = fontPixels;
+    request.lines = wrappedLines;
+    request.position = context.subtitlePosition;
+    request.touch = false;
+    if ((!context.subtitlePlacementLatch.active ||
+         context.subtitlePlacementLatch.preference != context.subtitlePosition) && request.position ==
+        horde::gameplay::dialogue::SubtitlePosition::Auto)
+    {
+        auto topRequest = request;
+        topRequest.position = horde::gameplay::dialogue::SubtitlePosition::Top;
+        auto bottomRequest = request;
+        bottomRequest.position = horde::gameplay::dialogue::SubtitlePosition::Bottom;
+        const auto top = horde::gameplay::dialogue::LayoutSubtitle(topRequest);
+        const auto bottom = horde::gameplay::dialogue::LayoutSubtitle(bottomRequest);
+        const auto collisionCount = [&](const horde::gameplay::dialogue::SubtitleLayout& candidate)
+        {
+            const RECT subtitleRect{candidate.x, candidate.y,
+                candidate.x + candidate.width, candidate.y + candidate.height};
+            int collisions = 0;
+            for (const int controlId : {kHudControlId, kVitalityHudControlId,
+                                        kCombatTeachingPromptId, kChestPromptControlId})
+            {
+                HWND control = GetDlgItem(context.windowHandle, controlId);
+                if (control == nullptr || !IsWindowVisible(control)) continue;
+                RECT bounds{};
+                GetWindowRect(control, &bounds);
+                MapWindowPoints(HWND_DESKTOP, context.windowHandle,
+                    reinterpret_cast<POINT*>(&bounds), 2);
+                RECT overlap{};
+                if (IntersectRect(&overlap, &subtitleRect, &bounds)) ++collisions;
+            }
+            return collisions;
+        };
+        if ((!bottom.fits && top.fits) ||
+            (collisionCount(bottom) > collisionCount(top)))
+            request.position = horde::gameplay::dialogue::SubtitlePosition::Top;
+        else
+            request.position = horde::gameplay::dialogue::SubtitlePosition::Bottom;
+    }
+    auto layout = horde::gameplay::dialogue::LayoutSubtitle(request);
+    layout = horde::platform::windows::ResolveWindowsSubtitleLayout(
+        request, dialogue.generation, context.subtitlePlacementLatch, context.subtitlePosition);
+    if (!layout.fits)
+    {
+        text = "SUBTITLE TOO LARGE - ENLARGE WINDOW OR LOWER TEXT SIZE";
+        request.lines = 2;
+        request.fontPixels = std::min(fontPixels, ScaleForDpi(context.windowHandle, 16));
+        if (request.fontPixels != context.appliedSubtitleFontPixels)
+        {
+            if (HFONT font = CreateFontA(-request.fontPixels, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
+                    ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY,
+                    DEFAULT_PITCH | FF_ROMAN, "Georgia"))
+            {
+                SendMessageA(subtitle, WM_SETFONT, reinterpret_cast<WPARAM>(font), TRUE);
+                ReplaceFontProperty(context.windowHandle, kSubtitleFontProperty, font);
+                context.appliedSubtitleFontPixels = request.fontPixels;
+            }
+        }
+        layout = horde::platform::windows::ResolveWindowsSubtitleLayout(
+            request, dialogue.generation, context.subtitlePlacementLatch, context.subtitlePosition);
+        if (!layout.fits)
+        {
+            SetControlVisible(context.windowHandle, kChapterSubtitleId, false);
+            return;
+        }
+    }
+    SetWindowTextA(subtitle, text.c_str());
+    MoveWindow(subtitle, layout.x, layout.y, layout.width, layout.height, TRUE);
+    SetControlVisible(context.windowHandle, kChapterSubtitleId, true);
+    SetWindowPos(subtitle, HWND_TOP, 0, 0, 0, 0,
+        SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
 }
 
 void UpdateWaterfallAmbience(const VulkanSurfaceContext& context)
 {
     constexpr std::string_view loopKey = "waterfall";
     PositionalAudioEngine& engine = SpatialAudioEngine();
-    if (!engine.SetMasterVolumePercent(context.sfxVolumePercent))
-    {
-        engine.StopLoop(loopKey);
-        return;
-    }
     if (context.sfxVolumePercent <= 0 || context.simulationPaused)
     {
         engine.StopLoop(loopKey);
@@ -1656,7 +1921,8 @@ void UpdateWaterfallAmbience(const VulkanSurfaceContext& context)
         engine.StopLoop(loopKey);
         return;
     }
-    engine.StartOrUpdateLoop(loopKey, path, gains.left, gains.right);
+    const float sfxGain = horde::platform::windows::WindowsSfxSourceGain(1.0f, context.sfxVolumePercent);
+    engine.StartOrUpdateLoop(loopKey, path, gains.left, gains.right, sfxGain);
 }
 
 void StopMenuAmbience(VulkanSurfaceContext& context)
@@ -1676,18 +1942,18 @@ void UpdateMenuAmbience(VulkanSurfaceContext& context)
         context.sfxVolumePercent > 0 && menu.fade < 1.0f;
     if (!audible) { StopMenuAmbience(context); return; }
     auto &engine = SpatialAudioEngine();
-    if (!engine.SetMasterVolumePercent(context.sfxVolumePercent)) { StopMenuAmbience(context); return; }
     const float envelope = std::clamp(1.0f - menu.fade, 0.0f, 1.0f);
+    const float sfxGain = horde::platform::windows::WindowsSfxSourceGain(1.0f, context.sfxVolumePercent);
     const auto root = ResolveAssetRoot() / "audio/menu";
     engine.StartOrUpdateLoop("menu_room", root / "menu_room.wav",
-        horde::audio::kMenuRoomGain * envelope, horde::audio::kMenuRoomGain * envelope);
+        horde::audio::kMenuRoomGain * envelope, horde::audio::kMenuRoomGain * envelope, sfxGain);
     // Existing keyed native voice ownership handles the one-shot too: mute,
     // focus loss and Play can cancel it independently of gameplay SFX.
     if (context.menuCreakDelivery.Observe(menu.tick, menu.chainCreakSerial, true))
     {
         engine.StopLoop("menu_chain");
         engine.Play(root / "menu_chain.wav", horde::audio::kMenuChainGain * envelope,
-                    horde::audio::kMenuChainGain * envelope, "menu_chain");
+                    horde::audio::kMenuChainGain * envelope, "menu_chain", 0u, 0u, sfxGain);
     }
     else
         engine.UpdateOwnedGain("menu_chain", horde::audio::kMenuChainGain * envelope);
@@ -1847,11 +2113,7 @@ void DrainGameplayEvents(VulkanSurfaceContext& context)
             PlayPositionalSoundEffect(context, "keeper_death.wav", 0.36f, event, "pixabay");
             break;
         case GameplayEventType::KeeperRevealStarted:
-            PlayPositionalSoundEffect(context, "keeper_i_sense_you.wav", 0.36f, event, "pixabay");
-            break;
         case GameplayEventType::KeeperWarning:
-            PlayPositionalSoundEffect(context, "keeper_come_closer.wav", 0.36f, event, "pixabay");
-            break;
         case GameplayEventType::KeeperCombatReady:
             break;
         case GameplayEventType::SkeletonIncidental:
@@ -1969,6 +2231,9 @@ const char* GraphicsDustName(const horde::graphics::DustQuality quality)
 void UpdateSettingsLabels(VulkanSurfaceContext& context)
 {
     const auto graphicsDraft = context.graphicsEdit ? context.graphicsEdit->Draft() : context.savedGraphics;
+    if (HWND title = GetDlgItem(context.windowHandle, kSettingsTitleId))
+        SetWindowTextA(title, context.settingsDialoguePage
+            ? "SETTINGS  |  AUDIO & SUBTITLES" : "SETTINGS  |  SAVED BESIDE THE DEMO");
     if (HWND label = GetDlgItem(context.windowHandle, kSfxVolumeLabelId))
     {
         const std::string text = "SFX VOLUME: " + std::to_string(context.sfxVolumePercent) + "%";
@@ -2015,6 +2280,22 @@ void UpdateSettingsLabels(VulkanSurfaceContext& context)
     if (HWND slider = GetDlgItem(context.windowHandle, kMusicVolumeSliderId))
     {
         SendMessageA(slider, TBM_SETPOS, TRUE, static_cast<LPARAM>(context.musicVolumePercent));
+    }
+    if (HWND label = GetDlgItem(context.windowHandle, kVoiceVolumeLabelId))
+        SetWindowTextA(label, ("VOICE VOLUME: " + std::to_string(context.voiceVolumePercent) + "%").c_str());
+    if (HWND slider = GetDlgItem(context.windowHandle, kVoiceVolumeSliderId))
+        SendMessageA(slider, TBM_SETPOS, TRUE, context.voiceVolumePercent);
+    if (HWND button = GetDlgItem(context.windowHandle, kSubtitlesButtonId))
+        SetWindowTextA(button, context.subtitlesEnabled ? "SUBTITLES: ON" : "SUBTITLES: OFF");
+    if (HWND label = GetDlgItem(context.windowHandle, kSubtitleSizeLabelId))
+        SetWindowTextA(label, ("SUBTITLE TEXT SIZE: " + std::to_string(context.subtitleSizePercent) + "%").c_str());
+    if (HWND slider = GetDlgItem(context.windowHandle, kSubtitleSizeSliderId))
+        SendMessageA(slider, TBM_SETPOS, TRUE, context.subtitleSizePercent);
+    if (HWND button = GetDlgItem(context.windowHandle, kSubtitlePositionButtonId))
+    {
+        const char* position = context.subtitlePosition == horde::gameplay::dialogue::SubtitlePosition::Top ? "TOP" :
+            context.subtitlePosition == horde::gameplay::dialogue::SubtitlePosition::Bottom ? "BOTTOM" : "AUTO";
+        SetWindowTextA(button, (std::string("SUBTITLE POSITION: ") + position).c_str());
     }
     if (HWND preset = GetDlgItem(context.windowHandle, kGraphicsPresetButtonId))
     {
@@ -2452,12 +2733,20 @@ void ApplyOverlayState(VulkanSurfaceContext& context)
                       pauseVisible && rtLabAccess && !context.deathOverlayVisible);
     for (const int id : {kSettingsTitleId, kSfxVolumeLabelId, kSfxVolumeSliderId,
                           kSensitivityButtonId, kMusicVolumeLabelId, kMusicVolumeSliderId,
-                          kFullscreenButtonId, kGraphicsOpenButtonId})
+                          kFullscreenButtonId, kGraphicsOpenButtonId, kVoiceVolumeLabelId,
+                          kVoiceVolumeSliderId, kSubtitlesButtonId, kSubtitleSizeLabelId,
+                          kSubtitleSizeSliderId, kSubtitlePositionButtonId, kSettingsMoreId})
     {
-        SetControlVisible(context.windowHandle, id, context.settingsVisible && !context.graphicsVisible);
+        const bool dialogueControl = id == kVoiceVolumeLabelId || id == kVoiceVolumeSliderId ||
+            id == kSubtitlesButtonId || id == kSubtitleSizeLabelId || id == kSubtitleSizeSliderId ||
+            id == kSubtitlePositionButtonId;
+        SetControlVisible(context.windowHandle, id, context.settingsVisible && !context.graphicsVisible &&
+            (dialogueControl == context.settingsDialoguePage));
     }
     SetControlVisible(context.windowHandle, kSettingsTitleId, context.settingsVisible);
     SetControlVisible(context.windowHandle, kSettingsBackButtonId, context.settingsVisible);
+    if (HWND page = GetDlgItem(context.windowHandle, kSettingsMoreId))
+        SetWindowTextA(page, context.settingsDialoguePage ? "BACK TO GENERAL SETTINGS" : "AUDIO & SUBTITLES...");
     for (const int id : {kWaterQualityButtonId, kRenderScaleLabelId, kRenderScaleSliderId,
                          kGraphicsPresetButtonId, kGraphicsFireButtonId, kGraphicsShadowButtonId, kGraphicsGlassButtonId, kGraphicsMistButtonId, kGraphicsApplyButtonId,
                          kGraphicsDustButtonId,
@@ -3627,7 +3916,8 @@ void DiscardDesktopPendingCommands(VulkanSurfaceContext& context)
     input.commands = {context.attackSequence, context.parrySequence, context.dodgeSequence,
         context.routeResetSequence, context.retrySequence, context.interactSequence,
         context.toggleHeldLightPoseSequence, context.runToggleSequence, context.clearRunIntentSequence,
-        context.combatTeachingSkipSequence, context.combatTeachingReplaySequence};
+        context.combatTeachingSkipSequence, context.combatTeachingReplaySequence,
+        context.dialogueSkipSequence};
     input.runHeld = false;
     input.moveForward = input.moveStrafe = 0.0f;
     context.simulation.SynchronizePausedInput(input, 0u,
@@ -3655,6 +3945,11 @@ std::vector<HWND> VisibleControllerMenuControls(const VulkanSurfaceContext& cont
         kRenderScaleSliderId,
         kSfxVolumeSliderId,
         kMusicVolumeSliderId,
+        kVoiceVolumeSliderId,
+        kSubtitleSizeSliderId,
+        kSubtitlesButtonId,
+        kSubtitlePositionButtonId,
+        kSettingsMoreId,
         kFullscreenButtonId,
         kSettingsBackButtonId,
         kGraphicsPresetButtonId,
@@ -3855,6 +4150,21 @@ bool AdjustFocusedControllerSlider(VulkanSurfaceContext& context, const bool inc
         UpdateRtLabLabels(context);
         return true;
     }
+    if (id == kSubtitlesButtonId)
+    {
+        context.subtitlesEnabled = !context.subtitlesEnabled;
+        UpdateSettingsLabels(context);
+        SaveSettings(context);
+        return true;
+    }
+    if (id == kSubtitlePositionButtonId)
+    {
+        const int next = (static_cast<int>(context.subtitlePosition) + (increase ? 1 : 2)) % 3;
+        context.subtitlePosition = static_cast<horde::gameplay::dialogue::SubtitlePosition>(next);
+        UpdateSettingsLabels(context);
+        SaveSettings(context);
+        return true;
+    }
     horde::platform::windows::RtLabControlRange range =
         horde::platform::windows::RtLabControlRange::DoublePercent;
     bool rtLabSlider = true;
@@ -3878,7 +4188,8 @@ bool AdjustFocusedControllerSlider(VulkanSurfaceContext& context, const bool inc
     default: rtLabSlider = false; break;
     }
     if (!rtLabSlider && id != kRenderScaleSliderId && id != kSfxVolumeSliderId &&
-        id != kMusicVolumeSliderId) return false;
+        id != kMusicVolumeSliderId && id != kVoiceVolumeSliderId &&
+        id != kSubtitleSizeSliderId) return false;
     const int current = static_cast<int>(SendMessageA(focused, TBM_GETPOS, 0, 0));
     const int next = rtLabSlider
         ? horde::platform::windows::StepRtLabControl(current, increase, range)
@@ -3886,7 +4197,9 @@ bool AdjustFocusedControllerSlider(VulkanSurfaceContext& context, const bool inc
                ? horde::graphics::GraphicsRenderScaleSliderPositionFromPercent(
                      horde::graphics::StepGraphicsRenderScalePercent(
                          horde::graphics::GraphicsRenderScalePercentFromSliderPosition(current), increase))
-               : horde::platform::windows::StepControllerAudioVolume(current, increase));
+               : id == kSubtitleSizeSliderId
+                   ? std::clamp(current + (increase ? 5 : -5), 80, 160)
+                   : horde::platform::windows::StepControllerAudioVolume(current, increase));
     if (next != current)
     {
         SendMessageA(focused, TBM_SETPOS, TRUE, next);
@@ -4242,6 +4555,10 @@ void PollDesktopController(VulkanSurfaceContext& context)
         if (triggerEdges.parryPressed) PublishDesktopCombatEdge(context, horde::gameplay::simulation::CombatInputEdgeKind::Parry);
         if ((pressed & XINPUT_GAMEPAD_B) != 0u) PublishDesktopCombatEdge(context, horde::gameplay::simulation::CombatInputEdgeKind::Dodge);
         if ((pressed & XINPUT_GAMEPAD_A) != 0u) ++context.interactSequence;
+        if ((pressed & XINPUT_GAMEPAD_X) != 0u &&
+            context.simulation.Snapshot().chapterDialogue.line != horde::gameplay::dialogue::Line::None &&
+            context.dialogueSkipSequence != UINT64_MAX)
+            ++context.dialogueSkipSequence;
         if ((pressed & XINPUT_GAMEPAD_Y) != 0u) ++context.toggleHeldLightPoseSequence;
     }
     const WORD uiPressed = state.Gamepad.wButtons & ~context.previousXInputUiButtons;
@@ -4319,6 +4636,9 @@ void UpdateDesktopSceneControls(
     input.tutorialSlowdownEnabled = context.combatTeachingSlowdown;
     input.commands.tutorialSkip = context.combatTeachingSkipSequence;
     input.commands.tutorialReplay = context.combatTeachingReplaySequence;
+    input.commands.dialogueSkip = context.dialogueSkipSequence;
+    input.dialogueCompletionLine = context.dialogueCompletionLine;
+    input.dialogueCompletionGeneration = context.dialogueCompletionGeneration;
     input.runHeld = context.runHeld || context.controllerRunHeld;
     input.waterfallWidthScale = horde::vulkan::raytracing::ClampRtSceneTuning(
         context.rtSceneTuning).waterfallWidthScale;
@@ -4400,6 +4720,9 @@ void UpdateDesktopSceneControls(
         input.tutorialSlowdownEnabled = context.combatTeachingSlowdown;
         input.commands.tutorialSkip = context.combatTeachingSkipSequence;
         input.commands.tutorialReplay = context.combatTeachingReplaySequence;
+        input.commands.dialogueSkip = context.dialogueSkipSequence;
+        input.dialogueCompletionLine = context.dialogueCompletionLine;
+        input.dialogueCompletionGeneration = context.dialogueCompletionGeneration;
         input.runHeld = false;
         if (advance.replay.waypointReached || advance.lapStarted || advance.finished)
         {
@@ -4428,6 +4751,12 @@ void UpdateDesktopSceneControls(
                                     timestampedPlayerInput ? rawDeltaSeconds : context.frameDeltaSeconds,
                                     ++context.inputPublicationSequence,
                                     timestampedPlayerInput ? ownerAdvanceSteadyNs : 0u);
+    if (context.dialogueCompletionGeneration != 0u &&
+        context.simulation.Snapshot().chapterDialogue.generation != context.dialogueCompletionGeneration)
+    {
+        context.dialogueCompletionLine = 0u;
+        context.dialogueCompletionGeneration = 0u;
+    }
     RefreshCombatTeachingPrompt(context);
     simulationScope.Complete(1u);
 #if defined(_DEBUG)
@@ -5779,7 +6108,17 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
     if (useRtFrame)
     {
         if (!ctx.graphicsPreviewCapture && !ctx.outputResizeValidation && !ctx.nativeMotionValidation)
+        {
             SpatialAudioEngine().Update();
+            const auto completion = SpatialAudioEngine().TakeDialogueCompletion();
+            const auto& activeDialogue = ctx.simulation.Snapshot().chapterDialogue;
+            if (completion.first != 0u && completion.first == static_cast<std::uint32_t>(activeDialogue.line) &&
+                completion.second == activeDialogue.generation)
+            {
+                ctx.dialogueCompletionLine = completion.first;
+                ctx.dialogueCompletionGeneration = completion.second;
+            }
+        }
         const bool frozenDevelopmentCheckpoint =
             ctx.simulationPaused && ctx.frameDeltaSeconds == 0.0f &&
             !ctx.developmentCheckpoint.empty();
@@ -5794,6 +6133,8 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         if (!previewFrame && !ctx.outputResizeValidation && !ctx.nativeMotionValidation) UpdateWaterfallAmbience(ctx);
         const horde::gameplay::simulation::SimulationSnapshot& simulation =
             ctx.simulation.Snapshot();
+        UpdateChapterDialogueAudio(ctx);
+        RefreshChapterSubtitle(ctx);
         UpdateChestPrompt(ctx);
         if (!previewFrame && !ctx.outputResizeValidation && !ctx.nativeMotionValidation && simulation.playerVitals.phase == horde::gameplay::PlayerLifePhase::Dead)
         {
@@ -6059,6 +6400,22 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         evidenceFrame ? &observation : nullptr,
         horde::telemetry::RtStage::PresentCall);
     const VkResult presentResult = vkQueuePresentKHR(ctx.graphicsQueue, &presentInfo);
+    if (useRtFrame && presentResult == VK_SUCCESS && acquireResult == VK_SUCCESS &&
+        ctx.rtScene.Profile() == horde::vulkan::raytracing::RtSceneProfile::Showcase)
+    {
+        horde::telemetry::RtSubmittedFrameIdentity committed{};
+        const auto& current = ctx.simulation.Snapshot();
+        if (ctx.rtFrameEvidence.TryGetCommittedIdentity(ctx.currentFrame, committed) &&
+            committed.frame.simulationTick == current.tickIndex &&
+            (ctx.lastChapterPresentationAckTick != current.tickIndex ||
+             ctx.lastChapterPresentationAckGeneration != current.chapterDialogue.generation) &&
+            ctx.simulation.AcknowledgeChapterPresentation(
+                current.tickIndex, current.chapterDialogue.generation))
+        {
+            ctx.lastChapterPresentationAckTick = current.tickIndex;
+            ctx.lastChapterPresentationAckGeneration = current.chapterDialogue.generation;
+        }
+    }
 #if !defined(NDEBUG)
     if (evidenceFrame && useRtFrame && presentResult == VK_SUCCESS && acquireResult != VK_SUBOPTIMAL_KHR &&
         ctx.rtScene.Profile() == horde::vulkan::raytracing::RtSceneProfile::Showcase &&
@@ -8029,6 +8386,15 @@ void ApplyDpiScaledFonts(HWND window)
             SendMessageA(prompt, WM_SETFONT, reinterpret_cast<WPARAM>(teachingPromptFont), TRUE);
         ReplaceFontProperty(window, kCombatTeachingPromptFontProperty, teachingPromptFont);
     }
+    HFONT subtitleFont = CreateFontA(-ScaleForDpi(window, 22), 0, 0, 0, FW_NORMAL,
+        FALSE, FALSE, FALSE, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
+        CLEARTYPE_QUALITY, DEFAULT_PITCH | FF_ROMAN, "Georgia");
+    if (subtitleFont)
+    {
+        if (HWND subtitle = GetDlgItem(window, kChapterSubtitleId))
+            SendMessageA(subtitle, WM_SETFONT, reinterpret_cast<WPARAM>(subtitleFont), TRUE);
+        ReplaceFontProperty(window, kSubtitleFontProperty, subtitleFont);
+    }
 
     if (HWND edit = GetDlgItem(window, kEditControlId))
     {
@@ -8063,6 +8429,13 @@ void ApplyDpiScaledFonts(HWND window)
                          kBenchmarkReviewStatsButtonId,
                          kBenchmarkBackButtonId,
                          kSettingsTitleId,
+                         kSettingsMoreId,
+                         kVoiceVolumeLabelId,
+                         kVoiceVolumeSliderId,
+                         kSubtitlesButtonId,
+                         kSubtitleSizeLabelId,
+                         kSubtitleSizeSliderId,
+                         kSubtitlePositionButtonId,
                          kSfxVolumeLabelId,
                          kSfxVolumeSliderId,
                          kSensitivityButtonId,
@@ -8185,6 +8558,7 @@ void ReleaseDpiScaledFonts(HWND window)
     for (const char* propertyName : {kUiFontProperty, kMonoFontProperty, kDeveloperFontProperty,
                                    kGraphicsInfoFontProperty, kEntryTitleFontProperty,
                                    kCombatTeachingPromptFontProperty,
+                                   kSubtitleFontProperty,
                                    kEntryPlaqueFontProperty})
     {
         if (HFONT font = reinterpret_cast<HFONT>(RemovePropA(window, propertyName)))
@@ -8372,9 +8746,35 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
     const bool entrySettings = layoutContext && layoutContext->entryMenuVisible &&
                                !layoutContext->graphicsVisible;
     const int settingsButtonHeight = entrySettings ? ScaleForDpi(window, 48) : buttonHeight;
+    if (layoutContext && layoutContext->settingsVisible && layoutContext->settingsDialoguePage &&
+        !layoutContext->graphicsVisible)
+    {
+        const int pageTotal = titleHeight + 2 * (labelHeight + sliderHeight + gap) +
+            4 * (settingsButtonHeight + gap) + ScaleForDpi(window, 18);
+        y = std::max(ScaleForDpi(window, 12), (height - pageTotal) / 2);
+        MoveWindow(GetDlgItem(window, kSettingsTitleId), pauseX, y, buttonWidth, titleHeight, TRUE);
+        y += titleAdvance;
+        MoveWindow(GetDlgItem(window, kVoiceVolumeLabelId), pauseX, y, buttonWidth, labelHeight, TRUE);
+        y += labelHeight;
+        MoveWindow(GetDlgItem(window, kVoiceVolumeSliderId), pauseX, y, buttonWidth, sliderHeight, TRUE);
+        y += sliderHeight + gap;
+        MoveWindow(GetDlgItem(window, kSubtitlesButtonId), pauseX, y, buttonWidth, settingsButtonHeight, TRUE);
+        y += settingsButtonHeight + gap;
+        MoveWindow(GetDlgItem(window, kSubtitleSizeLabelId), pauseX, y, buttonWidth, labelHeight, TRUE);
+        y += labelHeight;
+        MoveWindow(GetDlgItem(window, kSubtitleSizeSliderId), pauseX, y, buttonWidth, sliderHeight, TRUE);
+        y += sliderHeight + gap;
+        MoveWindow(GetDlgItem(window, kSubtitlePositionButtonId), pauseX, y, buttonWidth, settingsButtonHeight, TRUE);
+        y += settingsButtonHeight + gap;
+        MoveWindow(GetDlgItem(window, kSettingsMoreId), pauseX, y, buttonWidth, settingsButtonHeight, TRUE);
+        y += settingsButtonHeight + gap;
+        MoveWindow(GetDlgItem(window, kSettingsBackButtonId), pauseX, y, buttonWidth, settingsButtonHeight, TRUE);
+    }
+    else
+    {
     const int sliderRows = entrySettings ? 2 : 3;
-    const int settingsTotal = titleHeight + 4 * settingsButtonHeight +
-        sliderRows * labelHeight + sliderRows * sliderHeight + 7 * gap;
+    const int settingsTotal = titleHeight + 5 * settingsButtonHeight +
+        sliderRows * labelHeight + sliderRows * sliderHeight + 8 * gap;
     y = std::max(ScaleForDpi(window, entrySettings ? 12 : 54), (height - settingsTotal) / 2);
     if (HWND title = GetDlgItem(window, kSettingsTitleId)) MoveWindow(title, pauseX, y, buttonWidth, titleHeight, TRUE);
     y += titleAdvance;
@@ -8404,6 +8804,12 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
     {
         if (HWND control = GetDlgItem(window, id)) MoveWindow(control, pauseX, y, buttonWidth, settingsButtonHeight, TRUE);
         y += settingsButtonHeight + gap;
+    }
+    if (HWND page = GetDlgItem(window, kSettingsMoreId))
+    {
+        MoveWindow(page, pauseX, y, buttonWidth, settingsButtonHeight, TRUE);
+        y += settingsButtonHeight + gap;
+    }
     }
 
     if (layoutContext != nullptr && layoutContext->graphicsVisible)
@@ -8560,6 +8966,7 @@ void ShowControlsHelp(HWND window)
                 "Controller right stick  Camera look\n"
                 "RT  Attack    LT  Parry    B / Circle  Dodge\n"
                 "A  Interact    Y  Raise / lower claimed lantern\n"
+                "Tab  Skip current chapter line    X  Skip line\n"
                 "D-pad  Navigate menus    A  Select    B / Circle  Back\n"
                 "Menu / Start  Pause / resume\n"
                 "Esc  Pause / resume\n"
@@ -8669,10 +9076,12 @@ void OpenSettings(VulkanSurfaceContext& context)
     if (!context.simulationPaused) ShowPauseMenu(context, true);
     context.pauseMenuVisible = true;
     context.settingsVisible = true;
+    context.settingsDialoguePage = false;
     context.graphicsVisible = false;
     context.diagnosticsVisible = false;
     context.benchmarkReportVisible = false;
     ApplyOverlayState(context);
+    UpdateSettingsLabels(context);
     PlaySoundEffect(context, "ui_select.wav");
     SetFocus(GetDlgItem(context.windowHandle, kSfxVolumeSliderId));
 }
@@ -8790,12 +9199,29 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         {
             sceneContext->sfxVolumePercent = horde::audio::ClampSfxVolumePercent(
                 static_cast<int>(SendMessageA(reinterpret_cast<HWND>(lParam), TBM_GETPOS, 0, 0)));
-            (void)SpatialAudioEngine().SetMasterVolumePercent(sceneContext->sfxVolumePercent);
+            SpatialAudioEngine().SetSfxVolume(sceneContext->sfxVolumePercent);
             UpdateSettingsLabels(*sceneContext);
             if (LOWORD(wParam) != TB_THUMBTRACK)
             {
                 SaveSettings(*sceneContext);
             }
+            return 0;
+        }
+        if (sceneContext && reinterpret_cast<HWND>(lParam) == GetDlgItem(hWnd, kVoiceVolumeSliderId))
+        {
+            sceneContext->voiceVolumePercent = std::clamp(
+                static_cast<int>(SendMessageA(reinterpret_cast<HWND>(lParam), TBM_GETPOS, 0, 0)), 0, 100);
+            SpatialAudioEngine().SetDialogueVolume(sceneContext->voiceVolumePercent);
+            UpdateSettingsLabels(*sceneContext);
+            if (LOWORD(wParam) != TB_THUMBTRACK) SaveSettings(*sceneContext);
+            return 0;
+        }
+        if (sceneContext && reinterpret_cast<HWND>(lParam) == GetDlgItem(hWnd, kSubtitleSizeSliderId))
+        {
+            sceneContext->subtitleSizePercent = std::clamp(
+                static_cast<int>(SendMessageA(reinterpret_cast<HWND>(lParam), TBM_GETPOS, 0, 0)), 80, 160);
+            UpdateSettingsLabels(*sceneContext);
+            if (LOWORD(wParam) != TB_THUMBTRACK) SaveSettings(*sceneContext);
             return 0;
         }
         if (sceneContext && reinterpret_cast<HWND>(lParam) == GetDlgItem(hWnd, kMusicVolumeSliderId))
@@ -9221,6 +9647,29 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 PlaySoundEffect(*sceneContext, "ui_back.wav");
                 SetFocus(GetDlgItem(hWnd, kResumeButtonId));
                 return 0;
+            case kSettingsMoreId:
+                sceneContext->settingsDialoguePage = !sceneContext->settingsDialoguePage;
+                ApplyOverlayState(*sceneContext);
+                UpdateSettingsLabels(*sceneContext);
+                {
+                    RECT client{};
+                    GetClientRect(hWnd, &client);
+                    LayoutOverlayControls(hWnd, client.right, client.bottom);
+                }
+                SetFocus(GetDlgItem(hWnd, sceneContext->settingsDialoguePage
+                    ? kVoiceVolumeSliderId : kSfxVolumeSliderId));
+                return 0;
+            case kSubtitlesButtonId:
+                sceneContext->subtitlesEnabled = !sceneContext->subtitlesEnabled;
+                UpdateSettingsLabels(*sceneContext);
+                SaveSettings(*sceneContext);
+                return 0;
+            case kSubtitlePositionButtonId:
+                sceneContext->subtitlePosition = static_cast<horde::gameplay::dialogue::SubtitlePosition>(
+                    (static_cast<int>(sceneContext->subtitlePosition) + 1) % 3);
+                UpdateSettingsLabels(*sceneContext);
+                SaveSettings(*sceneContext);
+                return 0;
             case kMenuAboutId:
                 MessageBoxA(hWnd,
                             kAboutText,
@@ -9322,6 +9771,14 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 (GetKeyState(VK_MENU) & 0x8000) == 0 && (lParam & (1ll << 30)) == 0)
             {
                 if (HWND focused = GetFocus()) SendMessageA(focused, BM_CLICK, 0, 0);
+                return 0;
+            }
+            if (!sceneContext->simulationPaused && wParam == VK_TAB &&
+                (GetKeyState(VK_MENU) & 0x8000) == 0 && (lParam & (1ll << 30)) == 0 &&
+                sceneContext->simulation.Snapshot().chapterDialogue.line != horde::gameplay::dialogue::Line::None)
+            {
+                if (sceneContext->dialogueSkipSequence != UINT64_MAX)
+                    ++sceneContext->dialogueSkipSequence;
                 return 0;
             }
             if (sceneContext->simulation.Snapshot().playerVitals.phase != horde::gameplay::PlayerLifePhase::Alive)
@@ -9706,6 +10163,28 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
     case WM_DRAWITEM:
     {
         const auto* item = reinterpret_cast<const DRAWITEMSTRUCT*>(lParam);
+        if (item && item->CtlID == kChapterSubtitleId)
+        {
+            const bool highContrast = NativeUiUsesHighContrast();
+            static HBRUSH darkCreamPlaque = CreateSolidBrush(RGB(24, 22, 18));
+            static HBRUSH brassBorder = CreateSolidBrush(RGB(157, 124, 72));
+            FillRect(item->hDC, &item->rcItem,
+                highContrast ? GetSysColorBrush(COLOR_WINDOW) : darkCreamPlaque);
+            FrameRect(item->hDC, &item->rcItem,
+                highContrast ? GetSysColorBrush(COLOR_WINDOWTEXT) : brassBorder);
+            RECT textRect = item->rcItem;
+            InflateRect(&textRect, -ScaleForDpi(hWnd, 14), -ScaleForDpi(hWnd, 9));
+            const HFONT font = reinterpret_cast<HFONT>(SendMessageA(item->hwndItem, WM_GETFONT, 0, 0));
+            const HGDIOBJ previousFont = font ? SelectObject(item->hDC, font) : nullptr;
+            SetTextColor(item->hDC, highContrast ? GetSysColor(COLOR_WINDOWTEXT) : RGB(248, 236, 207));
+            SetBkMode(item->hDC, TRANSPARENT);
+            char text[768]{};
+            GetWindowTextA(item->hwndItem, text, static_cast<int>(sizeof(text)));
+            DrawTextA(item->hDC, text, -1, &textRect,
+                DT_CENTER | DT_VCENTER | DT_WORDBREAK | DT_NOPREFIX);
+            if (previousFont && previousFont != HGDI_ERROR) SelectObject(item->hDC, previousFont);
+            return TRUE;
+        }
         if (item && item->CtlID == kCombatTeachingPromptId)
         {
             const bool highContrast = NativeUiUsesHighContrast();
@@ -9941,6 +10420,13 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         }
         COLORREF textColor = RGB(242, 233, 216);
         const int controlId = GetDlgCtrlID(reinterpret_cast<HWND>(lParam));
+        if (controlId == kChapterSubtitleId)
+        {
+            SetTextColor(dc, RGB(248, 236, 207));
+            SetBkColor(dc, RGB(24, 22, 18));
+            static HBRUSH subtitlePlaque = CreateSolidBrush(RGB(24, 22, 18));
+            return reinterpret_cast<LRESULT>(subtitlePlaque);
+        }
         if (controlId == kGraphicsInfoId || controlId == kGraphicsPreviewTelemetryId)
         {
             SetTextColor(dc, RGB(242, 233, 216));
@@ -10297,6 +10783,27 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     SendMessageA(musicVolumeSlider, TBM_SETRANGE, TRUE, MAKELPARAM(0, 100));
     SendMessageA(musicVolumeSlider, TBM_SETTICFREQ, 10, 0);
     SendMessageA(musicVolumeSlider, TBM_SETPOS, TRUE, 70);
+    createButton(kSettingsMoreId, "AUDIO & SUBTITLES...");
+    createStatic(kVoiceVolumeLabelId, "VOICE VOLUME: 70%", SS_CENTER | SS_CENTERIMAGE);
+    HWND voiceVolumeSlider = CreateWindowExA(0, TRACKBAR_CLASSA, "",
+        WS_CHILD | WS_VISIBLE | WS_TABSTOP | TBS_AUTOTICKS, 0, 0, 100, 38, hWnd,
+        reinterpret_cast<HMENU>(static_cast<INT_PTR>(kVoiceVolumeSliderId)), instance, nullptr);
+    InstallControllerFocusOutline(voiceVolumeSlider);
+    SendMessageA(voiceVolumeSlider, TBM_SETRANGE, TRUE, MAKELPARAM(0, 100));
+    SendMessageA(voiceVolumeSlider, TBM_SETTICFREQ, 10, 0);
+    SendMessageA(voiceVolumeSlider, TBM_SETPOS, TRUE, 70);
+    createButton(kSubtitlesButtonId, "SUBTITLES: ON");
+    createStatic(kSubtitleSizeLabelId, "SUBTITLE TEXT SIZE: 100%", SS_CENTER | SS_CENTERIMAGE);
+    HWND subtitleSizeSlider = CreateWindowExA(0, TRACKBAR_CLASSA, "",
+        WS_CHILD | WS_VISIBLE | WS_TABSTOP | TBS_AUTOTICKS, 0, 0, 100, 38, hWnd,
+        reinterpret_cast<HMENU>(static_cast<INT_PTR>(kSubtitleSizeSliderId)), instance, nullptr);
+    InstallControllerFocusOutline(subtitleSizeSlider);
+    SendMessageA(subtitleSizeSlider, TBM_SETRANGE, TRUE, MAKELPARAM(80, 160));
+    SendMessageA(subtitleSizeSlider, TBM_SETTICFREQ, 10, 0);
+    SendMessageA(subtitleSizeSlider, TBM_SETPOS, TRUE, 100);
+    createButton(kSubtitlePositionButtonId, "SUBTITLE POSITION: AUTO");
+    createStatic(kChapterSubtitleId, "", SS_OWNERDRAW | SS_NOTIFY);
+    SetControlVisible(hWnd, kChapterSubtitleId, false);
     createButton(kFullscreenButtonId, "DISPLAY: WINDOWED");
     createButton(kSettingsBackButtonId, "BACK");
 

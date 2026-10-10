@@ -372,12 +372,14 @@ int main()
             return start == std::string::npos || stop == std::string::npos
                 ? std::string{} : source.substr(start, stop - start);
         };
-        check(windowsSource.find("masteringVoice_->SetVolume(") != std::string::npos &&
+        check(windowsSource.find("masteringVoice_->SetVolume(1.0f)") != std::string::npos &&
               windowsSource.find("SfxVolumeLinearGain(percent)") != std::string::npos &&
-              windowsSource.find("engine.SetMasterVolumePercent(sfxVolumePercent)") != std::string::npos &&
-              windowsSource.find("engine.SetMasterVolumePercent(context.sfxVolumePercent)") != std::string::npos &&
+              windowsSource.find("WindowsSfxSourceGain(1.0f, sfxVolumePercent)") != std::string::npos &&
+              windowsSource.find("WindowsSfxSourceGain(1.0f, context.sfxVolumePercent)") != std::string::npos &&
+              windowsSource.find("if (active.dialogueLine == 0u) (void)active.voice->SetVolume(gain)") != std::string::npos &&
+              windowsSource.find("if (active.dialogueLine != 0u) (void)active.voice->SetVolume(gain)") != std::string::npos &&
               windowsSource.find("PlaySoundA(") == std::string::npos,
-              "Windows centered/positional/loop SFX must use independent master gain without an unscaled fallback");
+              "Windows centered/positional/loop SFX must use its own source gain, separate from dialogue, without an unscaled fallback");
         check(windowsSource.find("14.0f, event.worldY}") != std::string::npos &&
               windowsSource.find("event.listenerYawRadians, event.listenerY}") != std::string::npos &&
               androidBridgeSource.find("14.0f, event.worldY}") != std::string::npos &&

@@ -148,7 +148,8 @@ float DistanceToOverheadFootprint(const horde::scene::OverheadVolume& volume,
 }
 
 float TorchOverheadLowering(const Vec3& gripWorld, const Vec3& viewUp,
-                           const Vec3& viewForward)
+                           const Vec3& viewForward,
+                           const float playerSupportWorldY = horde::gameplay::kRouteFloorWorldY)
 {
     // A world-down response leaves the complete horizontal envelope unchanged.
     // Include the long tilted torch as well as its cage and animated fire;
@@ -161,6 +162,11 @@ float TorchOverheadLowering(const Vec3& gripWorld, const Vec3& viewUp,
     constexpr float anticipationDistance = 0.65f;
     float lowering = 0.0f;
     const auto include = [&](const horde::scene::OverheadVolume& volume) {
+        // A retained dungeon ceiling below the current route support is not
+        // an obstruction to a player standing above it. Sword clearance uses
+        // the same support-relative roof rule and retains its full blade sweep.
+        if (volume.topY <= playerSupportWorldY)
+            return;
         const float required = std::max(0.0f,
             highestY + kHeldTorchOverheadGap -
                 horde::scene::MinimumOverheadBottomY(volume, gripWorld[0], gripWorld[2], radius));
@@ -934,7 +940,8 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
             Add(Scale(viewRight, result.leftHandLocal[0]),
                 Add(Scale(viewUp, result.leftHandLocal[1]),
                     Scale(viewForward, result.leftHandLocal[2]))));
-        const float initialLowering = TorchOverheadLowering(gripWorld, viewUp, viewForward);
+        const float initialLowering = TorchOverheadLowering(gripWorld, viewUp, viewForward,
+            input.playerSupportWorldY);
         // A low grip held at the full forward extension can exceed the
         // anatomical arm's reach. Start from a continuous roof-driven retreat,
         // then minimize the imported wrist's shoulder distance with a small
@@ -952,7 +959,8 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
                 gripWorld, Scale(horizontalForward, -candidateRetraction));
             candidateLowering = candidateRetraction == 0.0f
                 ? initialLowering
-                : TorchOverheadLowering(candidateGrip, viewUp, viewForward);
+                : TorchOverheadLowering(candidateGrip, viewUp, viewForward,
+                    input.playerSupportWorldY);
             return Vec3{{baseLeftHandLocal[0],
                 baseLeftHandLocal[1] - candidateRetraction *
                     (horizontalForward[0] * viewUp[0] + horizontalForward[2] * viewUp[2]) -

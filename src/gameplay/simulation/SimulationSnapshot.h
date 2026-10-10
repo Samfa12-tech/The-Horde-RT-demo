@@ -1,5 +1,7 @@
 #pragma once
 #include "gameplay/effects/WaterContact.h"
+#include "gameplay/dialogue/ChapterDialogue.h"
+#include "gameplay/dialogue/CompanionRouteFixture.h"
 #include "gameplay/simulation/DevelopmentSupportFixture.h"
 #include "gameplay/simulation/DevelopmentWorldRoute.h"
 #include "gameplay/traversal/DevelopmentRescueJourney.h"
@@ -56,6 +58,8 @@ struct SkeletonEnemySnapshot
 
 struct SimulationSnapshot
 {
+    horde::gameplay::dialogue::Snapshot chapterDialogue{};
+    horde::gameplay::dialogue::CompanionSnapshot chapterCompanion{};
     std::uint64_t tickIndex = 0;
     CombatContactTraceSnapshot combatContactTrace{};
     std::uint64_t inputPublicationSequence = 0;

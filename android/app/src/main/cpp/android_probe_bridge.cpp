@@ -58,6 +58,7 @@
 #include "gameplay/ShowcaseCheckpoints.h"
 #include "gameplay/ShowcaseReplay.h"
 #include "gameplay/SpatialAudio.h"
+#include "gameplay/dialogue/ChapterDialogue.h"
 #include "gameplay/SwordCombat.h"
 #include "gameplay/simulation/GameSimulation.h"
 #include "gameplay/simulation/BoundedTransportQueue.h"
@@ -719,6 +720,9 @@ std::atomic<int> gFinaleEndingPhase{static_cast<int>(horde::gameplay::FinaleEndi
 std::atomic<int> gContextualControlState{0};
 std::atomic<std::uint64_t> gWaterfallStereoGains{0u};
 std::atomic<std::uint64_t> gCombatTeachingUiState{0u};
+std::mutex gChapterDialogueUiMutex;
+horde::gameplay::dialogue::Snapshot gChapterDialogueUiSnapshot{};
+std::string gChapterDialogueUiText;
 std::mutex gDebugRequestAdmissionMutex;
 
 horde::platform::android::DebugRequestAdmissionState ReadDebugRequestAdmissionStateLocked()
@@ -924,6 +928,15 @@ void PublishSimulationUiState()
         ((static_cast<std::uint64_t>(teaching.practiceMisses) & 0xffu) << 24u) |
         (clampByte(teaching.promptOpacity) << 40u);
     gCombatTeachingUiState.store(teachingState, std::memory_order_release);
+    {
+        std::lock_guard<std::mutex> lock(gChapterDialogueUiMutex);
+        gChapterDialogueUiSnapshot = simulation.chapterDialogue;
+        const auto& line = horde::gameplay::dialogue::Spec(simulation.chapterDialogue.line);
+        gChapterDialogueUiText = simulation.chapterDialogue.line ==
+                horde::gameplay::dialogue::Line::None
+            ? std::string{}
+            : std::string(line.speaker) + "\n" + line.text;
+    }
     if ((teaching.stage == horde::gameplay::simulation::TutorialStage::Complete ||
          teaching.stage == horde::gameplay::simulation::TutorialStage::Skipped) &&
         gCombatPracticeActive.load(std::memory_order_acquire))
@@ -3658,6 +3671,9 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
     }
 
     const bool useRtFrame = context.useRtPath && context.rtScene.IsReady();
+    std::uint64_t submittedDialogueTick = 0u;
+    std::uint64_t submittedDialogueGeneration = 0u;
+    bool showcaseDialogueFrame = false;
     horde::vulkan::raytracing::RtSceneRecordObservation observation{};
     const bool evidenceFrame = useRtFrame && context.rtFrameEvidenceInitialised &&
         context.rtFrameEvidence.BeginFrame(context.currentFrame, observation);
@@ -4260,13 +4276,19 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
         }
         else
         {
+            const horde::gameplay::simulation::SimulationSnapshot& renderedSimulation =
+                gGameSimulation.Snapshot();
             frameInputs =
                 horde::vulkan::raytracing::BuildRtSceneFrameInputs(
-                    gGameSimulation.Snapshot(),
+                    renderedSimulation,
                     context.outputExposure,
                     static_cast<horde::vulkan::raytracing::WaterQuality>(
                         static_cast<int>(context.graphicsSettings.waterQuality)),
                     rtLabTuning);
+            submittedDialogueTick = renderedSimulation.tickIndex;
+            submittedDialogueGeneration = renderedSimulation.chapterDialogue.generation;
+            showcaseDialogueFrame = context.sceneProfile ==
+                horde::vulkan::raytracing::RtSceneProfile::Showcase;
             frameInputs.fireDetail = horde::vulkan::raytracing::ResolveFireEmitterQuality(context.graphicsSettings.fireDetail);
             frameInputs.shadowQuality = context.graphicsSettings.shadowQuality;
             frameInputs.playerRenderRoute = context.playerRenderRoute;
@@ -4595,6 +4617,22 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
     if (presentResult != VK_SUCCESS)
     {
         return false;
+    }
+
+    if (useRtFrame && evidenceFrame && acquireResult == VK_SUCCESS &&
+        presentResult == VK_SUCCESS && showcaseDialogueFrame &&
+        gSurfaceSessions.IsCurrent(context.surfaceGeneration))
+    {
+        horde::telemetry::RtSubmittedFrameIdentity committed{};
+        const auto& current = gGameSimulation.Snapshot();
+        if (context.rtFrameEvidence.TryGetCommittedIdentity(context.currentFrame, committed) &&
+            committed.frame.simulationTick == submittedDialogueTick &&
+            submittedDialogueTick == current.tickIndex &&
+            submittedDialogueGeneration == current.chapterDialogue.generation)
+        {
+            (void)gGameSimulation.AcknowledgeChapterPresentation(
+                submittedDialogueTick, submittedDialogueGeneration);
+        }
     }
 
     rtFramePresented = useRtFrame;
@@ -6113,6 +6151,58 @@ extern "C" JNIEXPORT jlong JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_getCombatTeachingState(JNIEnv*, jclass)
 {
     return static_cast<jlong>(gCombatTeachingUiState.load(std::memory_order_acquire));
+}
+
+extern "C" JNIEXPORT jlongArray JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_getChapterDialogueState(JNIEnv* env, jclass)
+{
+    jlong state[5]{};
+    {
+        std::lock_guard<std::mutex> lock(gChapterDialogueUiMutex);
+        const auto& snapshot = gChapterDialogueUiSnapshot;
+        state[0] = static_cast<jlong>(snapshot.line);
+        state[1] = static_cast<jlong>(snapshot.generation);
+        state[2] = static_cast<jlong>(std::max(0.0f, snapshot.elapsed) * 1000.0f + 0.5f);
+        state[3] = static_cast<jlong>(std::max(0.0f, snapshot.duration) * 1000.0f + 0.5f);
+        state[4] = snapshot.paused ? 1 : 0;
+    }
+    jlongArray result = env->NewLongArray(5);
+    if (result != nullptr) env->SetLongArrayRegion(result, 0, 5, state);
+    return result;
+}
+
+extern "C" JNIEXPORT jstring JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_getChapterDialogueText(JNIEnv* env, jclass, jlong generation)
+{
+    std::lock_guard<std::mutex> lock(gChapterDialogueUiMutex);
+    if (static_cast<jlong>(gChapterDialogueUiSnapshot.generation) != generation)
+        return env->NewStringUTF("");
+    return env->NewStringUTF(gChapterDialogueUiText.c_str());
+}
+
+extern "C" JNIEXPORT jlong JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_getChapterDialogueStereoGains(JNIEnv*, jclass, jlong generation)
+{
+    horde::gameplay::dialogue::Snapshot snapshot;
+    {
+        std::lock_guard<std::mutex> lock(gChapterDialogueUiMutex);
+        snapshot = gChapterDialogueUiSnapshot;
+    }
+    if (snapshot.line == horde::gameplay::dialogue::Line::None ||
+        static_cast<jlong>(snapshot.generation) != generation) return 0;
+    const auto gains = horde::gameplay::CalculateSpatialAudio(
+        {snapshot.source.x, snapshot.source.z, 0.36f, 1.0f, 14.0f, snapshot.source.y},
+        {snapshot.listener.x, snapshot.listener.z, snapshot.listenerYaw, snapshot.listener.y});
+    return static_cast<jlong>(PackStereoGains(gains.left, gains.right));
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_requestChapterDialogueSkip(JNIEnv*, jclass)
+{
+    std::lock_guard<std::mutex> lock(gInputPublisherMutex);
+    if (gInputPublisherState.commands.dialogueSkip != UINT64_MAX)
+        ++gInputPublisherState.commands.dialogueSkip;
+    PublishInputLocked();
 }
 
 extern "C" JNIEXPORT void JNICALL

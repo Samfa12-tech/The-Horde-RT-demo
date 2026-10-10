@@ -124,6 +124,10 @@ public:
         const horde::gameplay::interactions::LanternPendulumSnapshot* pendulum = nullptr);
     void ResetTiming();
     void ClearEvents();
+    // Render-owner confirmation after a successful matching Showcase present.
+    // A CPU pose, upload or dispatch alone cannot acknowledge the reunion.
+    bool AcknowledgeChapterPresentation(std::uint64_t simulationTick,
+        std::uint64_t dialogueGeneration);
 
     const SimulationSnapshot& Snapshot() const { return snapshot_; }
     const BoundedGameplayEventQueue& Events() const { return events_; }
@@ -203,6 +207,7 @@ private:
                          std::int32_t payload = 0,
                          float worldY = 0.0f);
     void RefreshSnapshot(const InputSnapshot& input);
+    void UpdateChapterDialogue(const InputSnapshot& input,float fixedSeconds);
 
     GameSimulationConfig config_{};
     float presentationAspect_ = 1.0f;
@@ -234,6 +239,10 @@ private:
     std::uint64_t pendingTutorialSkipCommands_ = 0u;
     std::uint64_t pendingTutorialReplayCommands_ = 0u;
     SimulationSnapshot snapshot_{};
+    horde::gameplay::dialogue::Director chapterDialogue_{};
+    horde::gameplay::dialogue::CompanionRouteFixture chapterCompanion_{};
+    std::uint64_t chapterSkipFloor_=0,chapterVisibleRaise_=0;
+    bool chapterFirstExterior_=false;
     InputSnapshot lastInput_{};
 
     TorchFailureSequence torchFailure_{};
