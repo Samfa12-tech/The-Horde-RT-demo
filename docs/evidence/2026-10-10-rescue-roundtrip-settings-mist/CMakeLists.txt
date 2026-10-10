@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 3.20)
+project(RopeMistProbe LANGUAGES CXX)
+add_executable(rope_mist_probe probe.cpp "${HORDE_SOURCE}/src/gameplay/traversal/RescueTraversal.cpp")
+target_include_directories(rope_mist_probe PRIVATE "${HORDE_SOURCE}/src")
+target_compile_features(rope_mist_probe PRIVATE cxx_std_20)

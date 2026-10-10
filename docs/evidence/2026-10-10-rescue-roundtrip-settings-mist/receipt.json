@@ -1,0 +1,159 @@
+{
+  "schema": 1,
+  "source_commit": "5104be14b170a89b7f6b84b932fb40ca9add9f1f",
+  "starting_checkpoint": "2f39f803a88a4825a3cf72886703635543d2d970",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "tested_owner_candidate": {
+    "source": "d40d75b349c146d9096a768b393705ccc2f9f0fc",
+    "evidence_checkpoint": "2f39f803a88a4825a3cf72886703635543d2d970",
+    "exe_sha256": "2e842b0b4fad29e0156c9d0fc4248739b1b67432d84eb808e225c22eece67521",
+    "arguments": [
+      "--development-rescue-journey",
+      "--development-keeper-practice"
+    ],
+    "started_utc": "2026-10-10T04:49:22.854182+00:00",
+    "finished_utc": "2026-10-10T04:51:39.193239+00:00",
+    "exit_code": 0,
+    "gpu_class": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "driver": "raw 2559295488 (vendor-specific)",
+    "vulkan": "1.4.341",
+    "rt_scene_presented": true,
+    "completed_frame_presented": true,
+    "internal_render_resolution": {
+      "width": 1232,
+      "height": 803
+    },
+    "pipeline": {
+      "executionBackend": "RayTracingPipeline",
+      "instrumentation": "diagnostic",
+      "dielectricQuality": "high",
+      "bundleKey": "diagnostic_high_pair",
+      "opaqueFast": {
+        "key": "diagnostic_high_opaque_fast",
+        "sha256": "2417de5cadd3e753a081ae8f2e26bdc7cfe30d8c02758e8247bda0fa927a5fdd"
+      },
+      "genericDielectric": {
+        "key": "diagnostic_high_generic_dielectric",
+        "sha256": "223706ea208242f34770b919e14a8a6ae1391ff187820325d9759fc28dee6795"
+      },
+      "activeStrategy": "generic-dielectric",
+      "activeKey": "diagnostic_high_generic_dielectric",
+      "activeSha256": "223706ea208242f34770b919e14a8a6ae1391ff187820325d9759fc28dee6795",
+      "waterQuality": "high"
+    },
+    "shadow": {
+      "mode": "higher",
+      "localPrimarySamples": 4,
+      "skyPrimarySamples": 2,
+      "reserved": 0
+    },
+    "fire": {
+      "quality": "High",
+      "volumeSteps": 10,
+      "reflectionSamples": 2,
+      "reflectedVolumeSteps": 8
+    },
+    "mist_enabled": true,
+    "dust": 2,
+    "lantern_light": {
+      "stableId": 1279348308,
+      "positionStrength": [
+        -33.4996758,
+        0.0909200311,
+        -16.7447662,
+        0.686399996
+      ],
+      "colourIntensity": [
+        1,
+        0.426759988,
+        0.0815246254,
+        0.686399996
+      ]
+    },
+    "private_log_hashes": {
+      "stderr.private.log": "012f3e5313d320bbed3e40d04ebe5b6b21f15d137ce196e380bb89f7916077ed",
+      "stdout.private.log": "7cdf3ffee33186dfb10accf105725a784a0065f3a607960dbb236ef71b5f5df4",
+      "vulkan_capability_report.json": "e149c675b14967d530afd053e1e71ea8a6c4f2d4ef0524e130d58bc1f18ed0fe",
+      "vulkan_capability_report.txt": "5c01d32f3d839c832add0168599eddbf0a754f58ad8c9d5e81a628a3788751be",
+      "windows_audio.log": "1e0cae688571448eca2afcec59f7a62600104fa47aa4c157db08aa217b3b2a56",
+      "windows_showcase_timing.csv": "2e8bb89cf280d9d46410babe5caf52531c1ccded6db093fc33059dbd7d72ba8c"
+    }
+  },
+  "owner_observations": {
+    "evidence_class": "owner report; not automated route capture",
+    "roundtrip_no_crash": "PASS",
+    "equipment_and_light_attachment": "PASS",
+    "sword_restored": "PASS",
+    "graphics_controller_navigation": "PASS",
+    "lantern_return_pose": "UNCONFIRMED: owner could not recall stashed/raised pose",
+    "rope_mist_visual": "FAIL: artifact remains; correct ground shadow and mist band follow pushed rope",
+    "settings_down_order": "FAIL on tested candidate: Graphics skipped in favor of SFX"
+  },
+  "correction": {
+    "changed_paths": [
+      "src/platform/windows/DiagnosticWindow.cpp",
+      "tests/DesktopControllerInputTests.cpp"
+    ],
+    "behavior": "Visible Settings focus order matches native rows: Sensitivity, Graphics, SFX, Music, Fullscreen, Back",
+    "debug_tests": "8/8 PASS",
+    "release_tests": "7/7 PASS",
+    "agent_release_controller_test": "1/1 PASS",
+    "retained_failed_attempts": [
+      "settings-nav-build-20261010-01: duplicate test-local variable names, corrected",
+      "settings-nav-debug-build-20261010-01: output filename used as target, corrected to registered target"
+    ],
+    "new_windows_artifacts": {
+      "debug": {
+        "sha256": "692c69e6618c1bf1ba4a66f361616fb9aca0f2129ec7ef00ffbc7b724b6eec70",
+        "bytes": 11913728,
+        "owner_acceptance": "NOT RUN on this Settings-only rebuild"
+      },
+      "release": {
+        "sha256": "d4056b229f4a3b1886f9c51fbaa9d61f294221d927e93d02e3b0d84ab9461973",
+        "bytes": 4174848,
+        "owner_acceptance": "NOT RUN on this Settings-only rebuild"
+      }
+    }
+  },
+  "source_identities": {
+    "shaders/raytracing/include/rt_atmosphere.glsl": {
+      "sha256": "36ddb178dcfe0076715d810f77df932ea87bb7dce01e9bba6b3d4bc41475b9c7",
+      "git_blob": "8dbe73e13aadb209aa7712f5cf41fc28fbc82673",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/2f39f803a88a4825a3cf72886703635543d2d970/shaders/raytracing/include/rt_atmosphere.glsl"
+    },
+    "shaders/raytracing/include/rt_lighting.glsl": {
+      "sha256": "7a060aa3808e179b21c69ce730173bbdfca18b0a8ff9195109986513ca0d9dd1",
+      "git_blob": "4f2e63b58847e763af27b0a313c96fc830a32028",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/2f39f803a88a4825a3cf72886703635543d2d970/shaders/raytracing/include/rt_lighting.glsl"
+    },
+    "shaders/raytracing/include/rt_scene_abi.glsl": {
+      "sha256": "467b95c024fcee6e0fb2224680f9555c944c705a6984b14afbd8f071e8ae4577",
+      "git_blob": "9d01430219962609639d82eb3d3a77324af94f40",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/2f39f803a88a4825a3cf72886703635543d2d970/shaders/raytracing/include/rt_scene_abi.glsl"
+    },
+    "src/gameplay/traversal/RescueTraversal.cpp": {
+      "sha256": "01360a7ed1b11966c4b2b96d001f9461868c282e2cb6cbacb3c0d571ba977b4f",
+      "git_blob": "6846100af4ca0b78d942c0745c5b581b9f3b3b5c",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/2f39f803a88a4825a3cf72886703635543d2d970/src/gameplay/traversal/RescueTraversal.cpp"
+    },
+    "src/scene/RescueJourneyGeometry.h": {
+      "sha256": "39c922d57668779d9f208a38cc23177a82f32e5659e8507a21dd05435bf70869",
+      "git_blob": "939badb9ac09507a7231a49f16c82783f17e5dce",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/2f39f803a88a4825a3cf72886703635543d2d970/src/scene/RescueJourneyGeometry.h"
+    },
+    "src/gameplay/simulation/GameSimulationRescue.cpp": {
+      "sha256": "912782d12497a3df3e128f9753866deb7715c576e3db5cdd4003d52fd4ad4b49",
+      "git_blob": "10457e3ef1598c0123d68082ce0ea33a74a791f3",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/2f39f803a88a4825a3cf72886703635543d2d970/src/gameplay/simulation/GameSimulationRescue.cpp"
+    }
+  },
+  "analysis": "mist-visibility-subset.json",
+  "remaining_gates": [
+    "Mist source-isolated exact-candidate GPU captures and rendering correction",
+    "Lantern return pose owner confirmation",
+    "Settings navigation owner check on new executable",
+    "Android, RayQueryCompute, lifecycle and audio/haptic gates retain prior pending scope"
+  ],
+  "audio_haptic_manual_revalidation_required": false,
+  "preservation": "No shader, ABI, budget, rope/rig/gameplay, Android mapping, asset or timeout changes. No game/device launch. Original receipts untouched."
+}

@@ -1,0 +1,8 @@
+Internal ctest changing into directory: <repo>/build/presets/windows-x64-release
+Test project <repo>/build/presets/windows-x64-release
+    Start 126: horde_rt_desktop_controller_input_tests
+1/1 Test #126: horde_rt_desktop_controller_input_tests ...   Passed    1.06 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   1.08 sec
