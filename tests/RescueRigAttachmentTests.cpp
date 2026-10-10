@@ -182,6 +182,52 @@ bool MakeRescueRigPose(const RtSceneFrameInputs& frame,
     return true;
 }
 
+// Exercise the ordinary renderer's restored-hand path as well as the rope
+// override. The first supported exterior frame previously escaped this test.
+bool PrepareRestoredRig(const SimulationSnapshot& source, PlayerRenderSlot& slot,
+                        std::string& diagnostic)
+{
+    const auto frame = BuildRtSceneFrameInputs(source, 0.92f);
+    auto animation = frame.playerAnimation;
+    const float yaw = frame.cameraYaw;
+    const Vec3 right{{std::cos(yaw), 0.0f, std::sin(yaw)}};
+    const Vec3 bodyForward{{std::sin(yaw), 0.0f, -std::cos(yaw)}};
+    const auto basis = BuildPlayerModelWorldBasis(right, bodyForward);
+    const float vertical = -0.05f + frame.cameraPitch;
+    const float inverseLength = 1.0f / std::sqrt(1.0f + vertical * vertical);
+    const Vec3 forward{{bodyForward[0] * inverseLength, vertical * inverseLength,
+                         bodyForward[2] * inverseLength}};
+    const Vec3 up{{-right[2] * forward[1],
+                   right[2] * forward[0] - right[0] * forward[2],
+                   right[0] * forward[1]}};
+    const Vec3 eye{{frame.cameraX, PlayerEyeWorldY(frame.playerSupportWorldY), frame.cameraZ}};
+    const Vec3 root = GroundPlayerRootOnRouteFloor(eye, frame.playerSupportWorldY,
+                                                  slot.BootGroundingOffsetMetres(animation));
+    const auto vectorToModel = [&](const Vec3& local) {
+        return WorldVectorToPlayerModel(basis, {{right[0]*local[0]+up[0]*local[1]+forward[0]*local[2],
+            right[1]*local[0]+up[1]*local[1]+forward[1]*local[2],
+            right[2]*local[0]+up[2]*local[1]+forward[2]*local[2]}});
+    };
+    for (auto* arm : {&animation.leftIk, &animation.rightIk}) {
+        const auto pointToModel = [&](const Vec3& point) {
+            auto result = vectorToModel(point);
+            const auto offset = WorldVectorToPlayerModel(basis,
+                {{eye[0]-root[0], eye[1]-root[1], eye[2]-root[2]}});
+            for (std::size_t axis=0; axis<3; ++axis) result[axis]+=offset[axis];
+            return result;
+        };
+        arm->shoulder=pointToModel(arm->shoulder);
+        arm->target=pointToModel(arm->target);
+        arm->pole=vectorToModel(arm->pole);
+        arm->gripX=vectorToModel(arm->gripX);
+        arm->gripY=vectorToModel(arm->gripY);
+        arm->gripZ=vectorToModel(arm->gripZ);
+    }
+    bool updated=false;
+    return slot.PreparePose(animation, source.tickIndex, PlayerCpuSkinCadence::Hz60,
+                            updated, diagnostic);
+}
+
 Transform WorldGripFromSnapshot(const RescueTraversalSnapshot& rescue,
                                 const std::size_t hand)
 {
@@ -506,6 +552,30 @@ int main()
               simulation.Snapshot().rescue.exteriorSide,
           "pull-up must finish on the exterior support");
 
+    const auto sampleRestored = [&] {
+        ++samples;
+        Check(!simulation.Snapshot().rescue.equipmentStowed &&
+                  simulation.Snapshot().playerAnimation.swordStowBlend == 0.0f &&
+                  simulation.Snapshot().playerAnimation.swordHandGripBlend == 1.0f,
+              "restored drawn sword must return to the ordinary hand target");
+        if (!PrepareRestoredRig(simulation.Snapshot(), playerSlot, diagnostic)) {
+            std::cerr << "FAIL: restored ordinary rig: " << diagnostic << '\n';
+            Check(false, "first restored supported pose must satisfy actual palm socket tolerance");
+        } else {
+            Check(playerSlot.LeftSocketErrorMetres() <= kPlayerGripSocketToleranceMetres &&
+                  playerSlot.RightSocketErrorMetres() <= kPlayerGripSocketToleranceMetres,
+                  "restored hand sockets must preserve the unchanged 15 mm tolerance");
+        }
+    };
+    sampleRestored();
+    for (const float yaw : {0.0f, 1.5707963f, 3.1415927f, -1.5707963f}) {
+        for (const float pitch : {-0.32f, 0.0f, 0.28f}) {
+            input.yawRadians=yaw; input.pitchRadians=pitch;
+            simulation.StepFixed(input);
+            sampleRestored();
+        }
+    }
+
     const WorldZoneToken descentToken{
         simulation.Snapshot().worldRoute.generation, WorldZoneId::Dungeon};
     simulation.PublishWorldZoneReadiness(descentToken, ZoneReadiness::Ready);
@@ -536,6 +606,7 @@ int main()
     Check(simulation.Snapshot().heldItems[0].detached &&
               simulation.Snapshot().heldItems[0].worldFromItem == torchWorldFromItemAtStart,
           "restoring traversal ownership must preserve the already dropped torch trajectory");
+    sampleRestored();
 
     std::cout << "Rescue rig attachment cases=" << cases
               << " failures=" << failures << " sampled_poses=" << samples

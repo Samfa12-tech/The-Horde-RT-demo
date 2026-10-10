@@ -183,7 +183,8 @@ float TorchOverheadLowering(const Vec3& gripWorld, const Vec3& viewUp,
 float SwordOverheadLowering(const Vec3& gripWorld,
                             const Vec3& bladeAxisWorld,
                             const Vec3& edgeAxisWorld,
-                            const Vec3& flatAxisWorld)
+                            const Vec3& flatAxisWorld,
+                            const float playerSupportWorldY)
 {
     // Bounds are measured from the imported production sword GLB after its
     // exact Grip socket is removed: blade-long +Y [-0.135, 0.915], sharpened
@@ -229,6 +230,11 @@ float SwordOverheadLowering(const Vec3& gripWorld,
     const auto includeVolumes = [&](const auto& volumes) {
         for (const auto& volume : volumes)
         {
+            // An authored roof wholly below the player's support is a floor
+            // on this level, not an overhead constraint. Keep all above-foot
+            // roofs active, including low clearance and the legacy route.
+            if (volume.topY <= playerSupportWorldY)
+                continue;
             if (DistanceToOverheadFootprint(volume, gripWorld[0], gripWorld[2]) >
                 horizontalReach + anticipationDistance)
                 continue;
@@ -881,7 +887,8 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
             initialGripWorld,
             ViewVectorToWorld(basis.bladeAxis, viewRight, viewUp, viewForward),
             ViewVectorToWorld(basis.edgeDirection, viewRight, viewUp, viewForward),
-            ViewVectorToWorld(basis.flatNormal, viewRight, viewUp, viewForward));
+            ViewVectorToWorld(basis.flatNormal, viewRight, viewUp, viewForward),
+            input.playerSupportWorldY);
         // Lowering can pull a long blade beyond the imported body's arm reach.
         // Retreat the whole grip toward the camera along horizontal forward;
         // this also moves the blade clear of a lintel footprint when possible.
@@ -897,7 +904,8 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
             gripWorld,
             ViewVectorToWorld(basis.bladeAxis, viewRight, viewUp, viewForward),
             ViewVectorToWorld(basis.edgeDirection, viewRight, viewUp, viewForward),
-            ViewVectorToWorld(basis.flatNormal, viewRight, viewUp, viewForward));
+            ViewVectorToWorld(basis.flatNormal, viewRight, viewUp, viewForward),
+            input.playerSupportWorldY);
         // Lower the actual right-hand target in world space. ResolveHeldItems
         // uses this same state for arm IK and sword socket composition, so the
         // RT geometry, shadows, and reflections remain on the corrected frame.

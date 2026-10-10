@@ -1,6 +1,7 @@
 #include "platform/windows/DiagnosticWindow.h"
 #include "platform/windows/WindowsMusicPlayback.h"
 #include "platform/windows/WindowsMusicFocus.h"
+#include "platform/windows/GraphicsMenuNavigation.h"
 #include "platform/windows/WindowsPlaytestReport.h"
 #include "platform/windows/WindowsRemotePlaytestReport.h"
 #include "audio/SfxVolume.h"
@@ -3740,6 +3741,57 @@ void NavigateControllerMenu(VulkanSurfaceContext& context, const int direction)
         PlaySoundEffect(context, "ui_select.wav");
 }
 
+void NavigateGraphicsMenu(VulkanSurfaceContext& context,
+                          const horde::platform::windows::GraphicsMenuDirection direction)
+{
+    if (!context.graphicsVisible)
+    {
+        const bool backwards = direction == horde::platform::windows::GraphicsMenuDirection::Up ||
+                               direction == horde::platform::windows::GraphicsMenuDirection::Left;
+        NavigateControllerMenu(context, backwards ? -1 : 1);
+        return;
+    }
+
+    const std::vector<HWND> controls = VisibleControllerMenuControls(context);
+    if (controls.empty()) return;
+
+    std::vector<horde::platform::windows::GraphicsMenuRect> rectangles;
+    rectangles.reserve(controls.size());
+    for (const HWND control : controls)
+    {
+        RECT bounds{};
+        GetWindowRect(control, &bounds);
+        rectangles.push_back({bounds.left, bounds.top, bounds.right, bounds.bottom});
+    }
+
+    const HWND focused = GetFocus();
+    const auto found = std::find(controls.begin(), controls.end(), focused);
+    std::size_t currentIndex = 0u;
+    if (found != controls.end())
+    {
+        currentIndex = static_cast<std::size_t>(std::distance(controls.begin(), found));
+    }
+    else
+    {
+        // When the panel first receives navigation, start at its top-left
+        // control instead of inheriting focus from an obscured settings item.
+        for (std::size_t index = 1u; index < rectangles.size(); ++index)
+        {
+            if (rectangles[index].top < rectangles[currentIndex].top ||
+                (rectangles[index].top == rectangles[currentIndex].top &&
+                 rectangles[index].left < rectangles[currentIndex].left))
+                currentIndex = index;
+        }
+    }
+
+    const auto neighbor = horde::platform::windows::FindGraphicsMenuNeighbor(
+        rectangles, currentIndex, direction);
+    if (!neighbor) return;
+    SetFocus(controls[*neighbor]);
+    if (horde::platform::windows::ShouldPlayControllerMenuSound(context.rtLabVisible))
+        PlaySoundEffect(context, "ui_select.wav");
+}
+
 void CancelControllerMenu(VulkanSurfaceContext& context)
 {
     int command = context.entryMenuVisible ? kEntryBackButtonId : kResumeButtonId;
@@ -3854,16 +3906,29 @@ void HandleControllerMenuEdges(
     {
         if (!AdjustFocusedControllerSlider(context, edges.increase))
         {
+            if (context.graphicsVisible)
+            {
+                NavigateGraphicsMenu(context, edges.increase
+                    ? horde::platform::windows::GraphicsMenuDirection::Right
+                    : horde::platform::windows::GraphicsMenuDirection::Left);
+                return;
+            }
             NavigateControllerMenu(context, edges.increase ? 1 : -1);
         }
     }
     else if (edges.previous)
     {
-        NavigateControllerMenu(context, -1);
+        if (context.graphicsVisible)
+            NavigateGraphicsMenu(context, horde::platform::windows::GraphicsMenuDirection::Up);
+        else
+            NavigateControllerMenu(context, -1);
     }
     else if (edges.next)
     {
-        NavigateControllerMenu(context, 1);
+        if (context.graphicsVisible)
+            NavigateGraphicsMenu(context, horde::platform::windows::GraphicsMenuDirection::Down);
+        else
+            NavigateControllerMenu(context, 1);
     }
     else if (edges.confirm)
     {
@@ -7590,6 +7655,19 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
                 CompleteBenchmark(context, capabilities, textReportPath.parent_path());
             }
             renderFailed = true;
+            // The dialog directs the owner to reports. Persist the actual
+            // record failure before waiting for dismissal; stderr alone is
+            // unavailable in an ordinary GUI launch.
+            const auto& failedSnapshot = context.simulation.Snapshot();
+            std::ostringstream failureReport;
+            failureReport << "RT render loop stopped: "
+                << (context.lastRtFrameError.empty() ? "No detailed frame error available." : context.lastRtFrameError)
+                << "\nSimulation tick: " << failedSnapshot.tickIndex
+                << "\nPlayer support world Y: " << failedSnapshot.playerSupportWorldY
+                << "\nRescue phase: " << static_cast<unsigned>(failedSnapshot.rescue.phase)
+                << "\nRescue equipment stowed: " << failedSnapshot.rescue.equipmentStowed << '\n';
+            (void)WriteReportFile(textReportPath.parent_path() / "windows_render_failure.txt",
+                                  failureReport.str());
             if (!unattendedBenchmark) MessageBoxA(hWnd,
                         "The native RT render loop stopped unexpectedly. Check the reports folder for diagnostics.",
                         "Horde Lantern RT - renderer stopped",
@@ -9154,7 +9232,12 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
             if (sceneContext->simulationPaused && (wParam == VK_UP || wParam == VK_DOWN) &&
                 (lParam & (1ll << 30)) == 0)
             {
-                NavigateControllerMenu(*sceneContext, wParam == VK_UP ? -1 : 1);
+                if (sceneContext->graphicsVisible)
+                    NavigateGraphicsMenu(*sceneContext, wParam == VK_UP
+                        ? horde::platform::windows::GraphicsMenuDirection::Up
+                        : horde::platform::windows::GraphicsMenuDirection::Down);
+                else
+                    NavigateControllerMenu(*sceneContext, wParam == VK_UP ? -1 : 1);
                 return 0;
             }
             if (sceneContext->rtLabVisible &&
@@ -9170,7 +9253,14 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 (lParam & (1ll << 30)) == 0)
             {
                 if (!AdjustFocusedControllerSlider(*sceneContext, wParam == VK_RIGHT))
-                    NavigateControllerMenu(*sceneContext, wParam == VK_RIGHT ? 1 : -1);
+                {
+                    if (sceneContext->graphicsVisible)
+                        NavigateGraphicsMenu(*sceneContext, wParam == VK_RIGHT
+                            ? horde::platform::windows::GraphicsMenuDirection::Right
+                            : horde::platform::windows::GraphicsMenuDirection::Left);
+                    else
+                        NavigateControllerMenu(*sceneContext, wParam == VK_RIGHT ? 1 : -1);
+                }
                 return 0;
             }
             if (sceneContext->simulationPaused && (wParam == VK_RETURN || wParam == VK_SPACE) &&

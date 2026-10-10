@@ -1,4 +1,5 @@
 #include "platform/windows/DesktopControllerInput.h"
+#include "platform/windows/GraphicsMenuNavigation.h"
 #include "platform/windows/WindowsCaptureContracts.h"
 #include "platform/windows/WindowsInteractionPrompt.h"
 #include "platform/windows/WindowsGameplayInput.h"
@@ -13,6 +14,7 @@
 #include <sstream>
 #include <string>
 #include <string_view>
+#include <vector>
 
 namespace
 {
@@ -41,6 +43,9 @@ using horde::platform::windows::WrapRtLabFocus;
 using horde::platform::windows::ShouldPlayControllerMenuSound;
 using horde::platform::windows::WindowsChestPromptText;
 using horde::platform::windows::ClaimedRewardCapturePolicy;
+using horde::platform::windows::FindGraphicsMenuNeighbor;
+using horde::platform::windows::GraphicsMenuDirection;
+using horde::platform::windows::GraphicsMenuRect;
 
 void Require(const bool condition, const std::string_view message)
 {
@@ -84,6 +89,54 @@ std::string ReadWindowsSource()
 
 int main()
 {
+    const std::vector<GraphicsMenuRect> graphicsRows{
+        {0, 0, 600, 36},       // full-width preset
+        {0, 44, 104, 80},      // glass
+        {112, 44, 216, 80},    // mist
+        {224, 44, 368, 80},    // dust
+        {0, 88, 600, 126},     // render-scale trackbar
+        {0, 134, 190, 170},    // water
+        {198, 134, 388, 170},  // fire
+        {396, 134, 600, 170},  // shadow
+        {0, 178, 190, 214},    // apply
+        {198, 178, 388, 214},  // keep
+        {396, 178, 600, 214},  // revert
+        {0, 222, 296, 258},    // defaults
+        {304, 222, 600, 258},  // back
+        {620, 600, 900, 636},  // distant preview control column
+    };
+    Require(FindGraphicsMenuNeighbor(graphicsRows, 0, GraphicsMenuDirection::Down) == 3u,
+            "graphics down must enter the right-aligned toggle nearest the full-width preset center");
+    Require(FindGraphicsMenuNeighbor(graphicsRows, 1, GraphicsMenuDirection::Right) == 2u &&
+            FindGraphicsMenuNeighbor(graphicsRows, 3, GraphicsMenuDirection::Down) == 4u,
+            "graphics horizontal and vertical navigation must follow adjacent control rectangles");
+    Require(FindGraphicsMenuNeighbor(graphicsRows, 9, GraphicsMenuDirection::Right) == 10u,
+            "right from Keep must select the same-row Revert control");
+    Require(FindGraphicsMenuNeighbor(graphicsRows, 12, GraphicsMenuDirection::Right) == 10u,
+            "right from Back must select the nearby Revert diagonal instead of the distant preview column");
+    Require(FindGraphicsMenuNeighbor(graphicsRows, 3, GraphicsMenuDirection::Right) == 7u,
+            "right from Dust must reach the nearest in-cone diagonal Shadow control, not the preset above");
+    const std::vector<GraphicsMenuRect> previewOffsetRows{
+        {620, 300, 700, 340},  // current preview control
+        {640, 440, 720, 476},  // lower preview control, slightly offset but same column
+        {705, 390, 785, 426},  // closer vertically, but a diagonal beside the column
+    };
+    Require(FindGraphicsMenuNeighbor(previewOffsetRows, 0, GraphicsMenuDirection::Down) == 1u,
+            "down must prefer the slightly offset same-column preview control over a nearer diagonal row");
+    const std::vector<GraphicsMenuRect> filteredControls{
+        {0, 0, 100, 36},      // focused, enabled, visible control
+        {112, 0, 212, 36},    // enabled, visible next control
+    };
+    Require(FindGraphicsMenuNeighbor(filteredControls, 0, GraphicsMenuDirection::Right) == 1u,
+            "the prefiltered focus list must navigate to its next enabled and visible control");
+    const std::vector<GraphicsMenuRect> diagonalOutsideCone{
+        {0, 0, 20, 20},
+        {-100, 21, -80, 41},
+    };
+    Require(FindGraphicsMenuNeighbor(diagonalOutsideCone, 0, GraphicsMenuDirection::Down) == std::nullopt &&
+            FindGraphicsMenuNeighbor(diagonalOutsideCone, 0, GraphicsMenuDirection::Right) == std::nullopt,
+            "spatial navigation must stay put at boundaries and reject unrelated diagonal controls");
+
     constexpr auto ordinaryLanternCapture =
         ClaimedRewardCapturePolicy("lantern-held-high");
     constexpr auto maximumWallCapture =
@@ -440,6 +493,38 @@ int main()
     Require(windowsSource.find("WrapRtLabFocus(index, direction, controls.size())") != std::string::npos &&
             windowsSource.find("ShouldPlayControllerMenuSound(context.rtLabVisible)") != std::string::npos,
             "production RT Lab focus and silent navigation must use the behavior-tested seams");
+    const std::size_t graphicsNavigationBegin = windowsSource.find("void NavigateGraphicsMenu(");
+    const std::size_t graphicsNavigationEnd = windowsSource.find("void CancelControllerMenu(", graphicsNavigationBegin);
+    const std::size_t visibleControlsBegin = windowsSource.find("std::vector<HWND> VisibleControllerMenuControls(");
+    const std::size_t visibleControlsEnd = windowsSource.find("void NavigateControllerMenu(", visibleControlsBegin);
+    const std::size_t keyboardTabBegin = windowsSource.find("sceneContext->simulationPaused && wParam == VK_TAB");
+    const std::size_t keyboardTabEnd = windowsSource.find("wParam == VK_UP || wParam == VK_DOWN", keyboardTabBegin);
+    const std::size_t keyboardHorizontalBegin = windowsSource.find(
+        "if (sceneContext->simulationPaused && (wParam == VK_LEFT || wParam == VK_RIGHT)");
+    const std::size_t keyboardHorizontalEnd = windowsSource.find(
+        "if (sceneContext->simulationPaused && (wParam == VK_RETURN || wParam == VK_SPACE)",
+        keyboardHorizontalBegin);
+    Require(graphicsNavigationBegin != std::string::npos && graphicsNavigationEnd != std::string::npos &&
+            windowsSource.substr(graphicsNavigationBegin, graphicsNavigationEnd - graphicsNavigationBegin)
+                    .find("FindGraphicsMenuNeighbor(") != std::string::npos &&
+            windowsSource.find("NavigateGraphicsMenu(*sceneContext") != std::string::npos &&
+            visibleControlsBegin != std::string::npos && visibleControlsEnd != std::string::npos &&
+            windowsSource.substr(visibleControlsBegin, visibleControlsEnd - visibleControlsBegin)
+                    .find("IsWindowEnabled(control)") != std::string::npos &&
+            windowsSource.substr(visibleControlsBegin, visibleControlsEnd - visibleControlsBegin)
+                    .find("IsWindowVisible(control)") != std::string::npos &&
+            keyboardHorizontalBegin != std::string::npos && keyboardHorizontalEnd != std::string::npos &&
+            windowsSource.substr(keyboardHorizontalBegin, keyboardHorizontalEnd - keyboardHorizontalBegin)
+                    .find("AdjustFocusedControllerSlider") <
+            windowsSource.substr(keyboardHorizontalBegin, keyboardHorizontalEnd - keyboardHorizontalBegin)
+                    .find("NavigateGraphicsMenu") &&
+            keyboardTabBegin != std::string::npos && keyboardTabEnd != std::string::npos &&
+            windowsSource.substr(keyboardTabBegin, keyboardTabEnd - keyboardTabBegin)
+                    .find("NavigateControllerMenu(*sceneContext,") != std::string::npos &&
+            windowsSource.substr(keyboardTabBegin, keyboardTabEnd - keyboardTabBegin)
+                    .find("(GetKeyState(VK_SHIFT) & 0x8000) != 0 ? -1 : 1") != std::string::npos &&
+            windowsSource.find("WrapRtLabFocus(index, direction, controls.size())") != std::string::npos,
+            "graphics arrow navigation must use spatial control bounds while Tab retains the cyclic menu path");
     const std::size_t labCommandsBegin = windowsSource.find("case kRtLabButtonId:");
     const std::size_t labCommandsEnd = windowsSource.find("case kDiagnosticsButtonId:", labCommandsBegin);
     const std::size_t labFunctionsBegin = windowsSource.find("void OpenRtLab(");
