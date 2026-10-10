@@ -1,0 +1,257 @@
+[
+  {
+    "path": "android-all-abi-identities.json",
+    "bytes": 4658,
+    "sha256": "579ffa94878ae5877dd18a7a4cea8861be8d281f32f93087b8259bf9ceb3ceb9"
+  },
+  {
+    "path": "android-validation.md",
+    "bytes": 3712,
+    "sha256": "880a22027b3cc7f623444b597fe9af082f90cea3e4bf58f6d82a704fdec52286"
+  },
+  {
+    "path": "package-inspections.json",
+    "bytes": 15401,
+    "sha256": "68f2d1d0bcfe6891ae9537df1ef901faa8e281fb0c221b46aff40300c660f04e"
+  },
+  {
+    "path": "pre-fix-tracked-tests.patch",
+    "bytes": 20115,
+    "sha256": "143e47f9912a4bd65a56a530141bc95d6c73e53b7fba0a7abd0a3326ae262a05"
+  },
+  {
+    "path": "receipt.json",
+    "bytes": 14016,
+    "sha256": "1d9f9fe3a4fd6b3af3081c41a15a8e9965725666b7c6783da489df9a4397ea8d"
+  },
+  {
+    "path": "review-android-arm64-debug-package-01.log",
+    "bytes": 3565,
+    "sha256": "3b81b0561a6bbeb7e842f5d33ee0a4d9edb9e44e7614e6473fb651c398e3c9d4"
+  },
+  {
+    "path": "review-android-arm64-release-package-01.log",
+    "bytes": 3564,
+    "sha256": "a44bacbbd60186fbe1026d027a4ea9f28e6ef7cad16e99dd2e89d91d8af8645b"
+  },
+  {
+    "path": "review-android-cue-diagnostic-20261010.log",
+    "bytes": 2126,
+    "sha256": "ea03f0255b7640545a9b2b356a3d9a74d1490c7396006fcf245e3bbcebccb273"
+  },
+  {
+    "path": "review-android-teaching-baseline-20261010.log",
+    "bytes": 4773,
+    "sha256": "c1d336b467d45661d036ed139c3505e23f6033a6a71b8c3a06101fc068e465e7"
+  },
+  {
+    "path": "review-android-teaching-baseline-escalated-20261010.log",
+    "bytes": 2399,
+    "sha256": "482a78836a8dd5c8a135cda4358bb51555f308108acc3a782a4e35eaf229827b"
+  },
+  {
+    "path": "review-android-teaching-baseline-final-20261010.log",
+    "bytes": 2289,
+    "sha256": "87345629774dc2e925d233c0ed6ce839c984075004016a2a0f1eead80ca4cba4"
+  },
+  {
+    "path": "review-android-teaching-baseline-reproduced-20261010.log",
+    "bytes": 2289,
+    "sha256": "8941f6fd81447cfc4c21d9f9e956034702b712e5121b78ee08f99a694bac48f8"
+  },
+  {
+    "path": "review-android-teaching-fix-full-unit-20261010.log",
+    "bytes": 1873,
+    "sha256": "3d951a2fc5bba201f333b2a7c0d8480ed3fcf0cd1c8c6319e26d691465bd66da"
+  },
+  {
+    "path": "review-android-teaching-fix-targeted-20261010.log",
+    "bytes": 1527,
+    "sha256": "424a5f8b0a92c9365ce5abf9f72f9cfde9184ff24393ea26135497ce64eaefb9"
+  },
+  {
+    "path": "review-android-validation-20261010.log",
+    "bytes": 7829,
+    "sha256": "55269a240a70e66d40ec8214cafd0e75887102e229fa229368eacd4317ef6165"
+  },
+  {
+    "path": "review-artifact-isolated-retry-01.log",
+    "bytes": 6212,
+    "sha256": "00a2887c6cc00569f05b9c14ffe2d3055ac2b7a121f265a02959badef1d5236f"
+  },
+  {
+    "path": "review-combat-direct-diagnostic-build.log",
+    "bytes": 472,
+    "sha256": "466b6c4e9a566af1e4a1327d1ed9f805d1174fd30ba742e1a2dba2b69c6d8cb1"
+  },
+  {
+    "path": "review-combat-direct-diagnostic-red.log",
+    "bytes": 2237,
+    "sha256": "8a2f2797cd6cc2765658565467fdd8a1e5c9317e4c9b6233a698620575641e44"
+  },
+  {
+    "path": "review-combat-fix-green-test.log",
+    "bytes": 1020,
+    "sha256": "35f89488b8bda37ba22d5d93c5a3e21a89e392d3247369a5edda5953789260db"
+  },
+  {
+    "path": "review-combat-fix-release-build.log",
+    "bytes": 728,
+    "sha256": "4a1c16cde64def1b660337b11ee39a69d899054325c14feff1514dc0d331acc3"
+  },
+  {
+    "path": "review-combat-production-input-build.log",
+    "bytes": 472,
+    "sha256": "466b6c4e9a566af1e4a1327d1ed9f805d1174fd30ba742e1a2dba2b69c6d8cb1"
+  },
+  {
+    "path": "review-combat-production-input-red.log",
+    "bytes": 1469,
+    "sha256": "7cb7e7d61c23703e4b6e89900a8e444b4c21d9f8b0225c0e30ce8312b6645271"
+  },
+  {
+    "path": "review-combat-red-ctest.log",
+    "bytes": 1563,
+    "sha256": "8cbae040d625940f5661111f8b2abe3bf5981f46a3271c9a992304c5d1c2e1ac"
+  },
+  {
+    "path": "review-combat-red-yaw-fixed.log",
+    "bytes": 1563,
+    "sha256": "712eab827c16dccb844a5afb8c2d3886330aa6846248843723029ed635248fda"
+  },
+  {
+    "path": "review-combat-release-build-escalated.log",
+    "bytes": 472,
+    "sha256": "466b6c4e9a566af1e4a1327d1ed9f805d1174fd30ba742e1a2dba2b69c6d8cb1"
+  },
+  {
+    "path": "review-combat-release-build-retry.log",
+    "bytes": 54,
+    "sha256": "85eab98f60309279259b6eca2d891addf8e61575ecd55a740f64e277993bf901"
+  },
+  {
+    "path": "review-combat-release-build-yaw-fix.log",
+    "bytes": 472,
+    "sha256": "466b6c4e9a566af1e4a1327d1ed9f805d1174fd30ba742e1a2dba2b69c6d8cb1"
+  },
+  {
+    "path": "review-combat-release-build.log",
+    "bytes": 54,
+    "sha256": "85eab98f60309279259b6eca2d891addf8e61575ecd55a740f64e277993bf901"
+  },
+  {
+    "path": "review-debug-committed-build-01.log",
+    "bytes": 17339,
+    "sha256": "d8fae60ccb7461cadcc46528d1f7413dcbb8a290fabf1edf32a66aa318bf1656"
+  },
+  {
+    "path": "review-debug-configure-01.log",
+    "bytes": 597,
+    "sha256": "ba61d27b502a3d98975dbcd2cce905e4ad96f464a85e5e349ed20b873f7cd765"
+  },
+  {
+    "path": "review-debug-contract-tests-01.log",
+    "bytes": 42430,
+    "sha256": "54f12f97ff9effc846b8fdb1e85c5a90ba1cc093eebb47c4e0144d4e2b37e4ae"
+  },
+  {
+    "path": "review-debug-native-tests-01.log",
+    "bytes": 28339,
+    "sha256": "0895025692feac969b4a11a0ff2758f8d42cf87c7193c068e27339065215f08a"
+  },
+  {
+    "path": "review-debug-original-torch-01.log",
+    "bytes": 1654,
+    "sha256": "04f611a4be888b3bd542d935cc008567bc0cebff4d5e24e58f6458f936ab3db6"
+  },
+  {
+    "path": "review-package-debug-01.log",
+    "bytes": 1565,
+    "sha256": "579f0dd1d6050bfbac1eba2d5514b989cd21ab54cf9836198e5bbaccecd0078a"
+  },
+  {
+    "path": "review-package-release-01.log",
+    "bytes": 1560,
+    "sha256": "3672099cb7f18c74927849ff8579cbea9ec4ea470d216d894a50583ef4c63c45"
+  },
+  {
+    "path": "review-release-committed-build-01.log",
+    "bytes": 17851,
+    "sha256": "bfebbc4d44f4cf7800ba25884018fb2304de93d9175d2840ee2fba067cc009d4"
+  },
+  {
+    "path": "review-release-native-tests-01.log",
+    "bytes": 28504,
+    "sha256": "624c03297dec849cdb53ac23f282888c24c5744635f0d5ed44c86b1c8cb2f839"
+  },
+  {
+    "path": "review-release-original-torch-01.log",
+    "bytes": 1666,
+    "sha256": "3d73cbab273012ff5da38824bce79f83a220106cacc842eb8783e52882829288"
+  },
+  {
+    "path": "review-root-build-green-01.log",
+    "bytes": 973,
+    "sha256": "3c29c1fa95194f7b817def76064c2909b36365fee8bdb643a26f05e21bcbbb9c"
+  },
+  {
+    "path": "review-root-build-red-01.log",
+    "bytes": 1493,
+    "sha256": "8093c2eddd7d90484075faf63b5e5749a8660a03ed9fe1cd6dcd7fe693cf9cdc"
+  },
+  {
+    "path": "review-root-build-red-02.log",
+    "bytes": 589,
+    "sha256": "2f9bdc6006c88ff8db99c9073cf38e862dbd05236ad2408b2eb076c07e3380b0"
+  },
+  {
+    "path": "review-root-build-red-03.log",
+    "bytes": 589,
+    "sha256": "2f9bdc6006c88ff8db99c9073cf38e862dbd05236ad2408b2eb076c07e3380b0"
+  },
+  {
+    "path": "review-root-build-red-04.log",
+    "bytes": 589,
+    "sha256": "2f9bdc6006c88ff8db99c9073cf38e862dbd05236ad2408b2eb076c07e3380b0"
+  },
+  {
+    "path": "review-root-configure-release-01.log",
+    "bytes": 599,
+    "sha256": "80a216699186ac0176fab618d9f4db4b25f418b6390779837bbf023cc7671e20"
+  },
+  {
+    "path": "review-root-green-01.log",
+    "bytes": 1860,
+    "sha256": "53ceb0f3352700c138221b05f4b3f3f89a8a09b29794ca7d72efa9e59e1bffd7"
+  },
+  {
+    "path": "review-root-red-01.log",
+    "bytes": 77294,
+    "sha256": "25335fd1ec6c47d22a0e33f4e1e0939eaa856fee7d8b747fe39020fa7b2e6528"
+  },
+  {
+    "path": "review-root-red-02.log",
+    "bytes": 77284,
+    "sha256": "a8a981cae286f3653e344d49c100557b969b5594953872c02b2a576a30a59f52"
+  },
+  {
+    "path": "review-root-red-03.log",
+    "bytes": 78508,
+    "sha256": "c67839f1fce44b528b34410a47c1201f2084c19ca53859443e8619108fb3c8bd"
+  },
+  {
+    "path": "review-windows-debug-build-01.log",
+    "bytes": 31214,
+    "sha256": "78ad7519b2903ae19640a850424d5a4fe93a7c3ca300e1184d9eb1ee148da478"
+  },
+  {
+    "path": "review-windows-release-build-01.log",
+    "bytes": 30993,
+    "sha256": "742073045d516eac0d6813ccd4ebd541cf3210b840b6bf121eee190a5ac223b5"
+  },
+  {
+    "path": "runs.jsonl",
+    "bytes": 44979,
+    "sha256": "e9dd83d5df6f1748baebc16b12bbbf012fe45e2726deb60cf039ed617e316182"
+  }
+]
