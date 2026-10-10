@@ -7826,7 +7826,7 @@ HFONT CreateGraphicsButtonFitFont(HWND window, HDC dc, HFONT currentFont,
         static_cast<int>(std::abs(fontDescription.lfHeight)));
     const int minimumHeight = std::max(1, ScaleForDpi(window, 9));
     int candidateHeight = std::max(minimumHeight,
-        MulDiv(originalHeight, availableWidth, std::max(1, measured.cx)));
+        MulDiv(originalHeight, availableWidth, std::max(1, static_cast<int>(measured.cx))));
     while (candidateHeight >= minimumHeight)
     {
         LOGFONTA fittedDescription = fontDescription;
