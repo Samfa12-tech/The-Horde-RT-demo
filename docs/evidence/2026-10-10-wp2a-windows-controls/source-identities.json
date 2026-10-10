@@ -1,0 +1,112 @@
+{
+  "source_commit": "214c40c69266e35485f5945bd5db599c8bee7a1c",
+  "starting_commit": "ba7caf656246f8b74f8343b21909b1d16dfa3d98",
+  "files": [
+    {
+      "path": "CMakeLists.txt",
+      "git_blob": "6c3cb61800cfaca7102080ce54aa69b09d1ea35b",
+      "git_content_sha256": "46c5a77da522cc44b61efc995b8a3afe74f51733732737f0ba7c391f57d265e8",
+      "compiled_working_file_sha256": "9896e7491400ff81cdb0b26f6f36415bba1453983a42449b13ddd0c4616b8a92",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/214c40c69266e35485f5945bd5db599c8bee7a1c/CMakeLists.txt"
+    },
+    {
+      "path": "src/gameplay/SwordCombat.h",
+      "git_blob": "a4c72db3adf5e58907d9ba367bf9e6a99489113a",
+      "git_content_sha256": "f241f622cc13e0783b5b26e084774b1fda6273742c4bf517cd957173458234cf",
+      "compiled_working_file_sha256": "e6ac08cc126bbb5cbeabb8d7d75b85febb62fb842fe191b7dc4a86cf406bd243",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/214c40c69266e35485f5945bd5db599c8bee7a1c/src/gameplay/SwordCombat.h"
+    },
+    {
+      "path": "src/gameplay/simulation/GameSimulation.cpp",
+      "git_blob": "ba6aaa3d5d5be9db4b44330e92a7345f6a072ba5",
+      "git_content_sha256": "0757b68f77c5de547e8e715a99abb1b93036a948b9977ecde5d0b8e5bfb920a1",
+      "compiled_working_file_sha256": "ab350c23d799038bcd86ebb64a7b729976d20a11e6a9d99bd949aded6d098232",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/214c40c69266e35485f5945bd5db599c8bee7a1c/src/gameplay/simulation/GameSimulation.cpp"
+    },
+    {
+      "path": "src/platform/windows/DiagnosticWindow.cpp",
+      "git_blob": "93613276d1ffa0b6bcb22342b6641ad5256ff87d",
+      "git_content_sha256": "186e75013a4b7f9f214c64e30bbc755213f4a59e4a6b29ee3468cdae91cdd209",
+      "compiled_working_file_sha256": "b8e278ee0f47ab831a1fec861d8e9e5d56edf1564f7961a8681bc081d5273a77",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/214c40c69266e35485f5945bd5db599c8bee7a1c/src/platform/windows/DiagnosticWindow.cpp"
+    },
+    {
+      "path": "src/platform/windows/README.md",
+      "git_blob": "1e41478ce70ba4e0a135cd12de126d27b23760f0",
+      "git_content_sha256": "8a2e7618f64840906ba159f59546f9403ed8e2650c673ab900556376bb9f4270",
+      "compiled_working_file_sha256": "336dcbf929e12ae7ab945334eb7059a0be223c22d018f44fe03e7829f729fa62",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/214c40c69266e35485f5945bd5db599c8bee7a1c/src/platform/windows/README.md"
+    },
+    {
+      "path": "src/platform/windows/WindowsCombatTeachingPrompt.h",
+      "git_blob": "0e468a9a188a5a3e999073a4892748d4540f662c",
+      "git_content_sha256": "abe067b3df124ba75666931b1a88f08a2823193b11a368eb9dfcad31ef8239ad",
+      "compiled_working_file_sha256": "92f5959364e7a046c8e6c5c43cc9f683f39ac1fb4eeb8c496618d0087ec71104",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/214c40c69266e35485f5945bd5db599c8bee7a1c/src/platform/windows/WindowsCombatTeachingPrompt.h"
+    },
+    {
+      "path": "src/platform/windows/WindowsGameplayInput.h",
+      "git_blob": "b32d7aa664d742f0b1373cccbd61d57ba8e5b38e",
+      "git_content_sha256": "37881222ba0196dc0625c1531c2d481087f9e25c92366ccff5c7706624e86c90",
+      "compiled_working_file_sha256": "c398cbbba9315a67351358047f04b32d6b047c614e256cb8b47cfd34fab31a59",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/214c40c69266e35485f5945bd5db599c8bee7a1c/src/platform/windows/WindowsGameplayInput.h"
+    },
+    {
+      "path": "src/platform/windows/WindowsInteractionPrompt.h",
+      "git_blob": "30dff8b5182740594d9a9d672d72b0f9cdf4a3b4",
+      "git_content_sha256": "7e9ddb864a4471055d39c85c688d660b8aa972ef940757d1e1fbd2f3878720dd",
+      "compiled_working_file_sha256": "50a59d985bf666c93cb826560fea1e3fc0f075a86e714ea182e1a0a4922e8496",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/214c40c69266e35485f5945bd5db599c8bee7a1c/src/platform/windows/WindowsInteractionPrompt.h"
+    },
+    {
+      "path": "src/vulkan/raytracing/ChestGuidanceLight.h",
+      "git_blob": "cbee4c8248058adc02bfbaf5dc6264a5c150bda8",
+      "git_content_sha256": "0387c1965a4f7db6af2d81405fce3a0a3706c4ffc2254c4149a28055c6d8b921",
+      "compiled_working_file_sha256": "78e47c133ef15839e40db2cf8e9b5fe5fc53d110a83bbe0b5e899f9146205c9d",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/214c40c69266e35485f5945bd5db599c8bee7a1c/src/vulkan/raytracing/ChestGuidanceLight.h"
+    },
+    {
+      "path": "src/vulkan/raytracing/PlayerFrameLight.h",
+      "git_blob": "eab7ad90656ae80e8f535078d0b002b354a74827",
+      "git_content_sha256": "20247f56e99ef9731d44d4f708ede672554a958c80134499b3847e649d6bd122",
+      "compiled_working_file_sha256": "20247f56e99ef9731d44d4f708ede672554a958c80134499b3847e649d6bd122",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/214c40c69266e35485f5945bd5db599c8bee7a1c/src/vulkan/raytracing/PlayerFrameLight.h"
+    },
+    {
+      "path": "src/vulkan/raytracing/SimulationFrameAdapter.h",
+      "git_blob": "08db130e4bdf43258fabce806d9a94a312aab82f",
+      "git_content_sha256": "f7078e2e685172894f9f2ba4c125019efb78ae22bbabefcccbcc9491e85bee90",
+      "compiled_working_file_sha256": "1dbde52f1b73c233cbef2ba146e448d01fcbe1be87688cd2d657e78d274e86d0",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/214c40c69266e35485f5945bd5db599c8bee7a1c/src/vulkan/raytracing/SimulationFrameAdapter.h"
+    },
+    {
+      "path": "tests/CombatFoundationTests.cpp",
+      "git_blob": "75b3aa759b997591d18e16a92fa102ea9db10111",
+      "git_content_sha256": "14aad8701d00280baa5df7cd559d0176d60b97e1b74081c577de8c17a29ce201",
+      "compiled_working_file_sha256": "c0fc983e32280cd193613d8e1b95d26a3559d76d3cdaf63625cccbedb497af7d",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/214c40c69266e35485f5945bd5db599c8bee7a1c/tests/CombatFoundationTests.cpp"
+    },
+    {
+      "path": "tests/DesktopControllerInputTests.cpp",
+      "git_blob": "8c4817ebd443d92eacb1ab6c01b4d8f2a2f0a667",
+      "git_content_sha256": "6ee1893e451d7c7760e9189e7542a6ad97101a865e5f9b75a7dcf8b24dd2aebe",
+      "compiled_working_file_sha256": "714705b1940511860238e38b5007bac6f5aa04d8807422b9417750a6e39ec473",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/214c40c69266e35485f5945bd5db599c8bee7a1c/tests/DesktopControllerInputTests.cpp"
+    },
+    {
+      "path": "tests/LanternRewardTests.cpp",
+      "git_blob": "cefc962011421be25e89c7bef66cfae92f701cfd",
+      "git_content_sha256": "b42752470ebcfdd65941b7a7451d874363e7c6b01399a3aa4ecd8e2893e268c6",
+      "compiled_working_file_sha256": "f8098da0b9eae025f711bc2c8df4dcef1120432acc85dd47d52a4d92d0ac2931",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/214c40c69266e35485f5945bd5db599c8bee7a1c/tests/LanternRewardTests.cpp"
+    },
+    {
+      "path": "tests/WindowsCombatPracticeLaunchTests.cpp",
+      "git_blob": "a36d15a0a05ef6c8573dbdef8fa80f6d8566494e",
+      "git_content_sha256": "34e9b7237220fbccc6e580009ba3ce4749a30734af2133ee8b4a28ac3d622b99",
+      "compiled_working_file_sha256": "29a72b89fe1349b4cd5b7f84aa05506c810f00505d318b5d210d59da8f1f57ac",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/214c40c69266e35485f5945bd5db599c8bee7a1c/tests/WindowsCombatPracticeLaunchTests.cpp"
+    }
+  ],
+  "note": "Builds ran on the starting HEAD plus recorded dirty diffs before the identical normalized source tree was committed. Git canonical content and compiled working-file line endings are identified separately. Final displayed-prompt guard changes only Windows source/tests; Android and torch/shared-rig inputs were unchanged by it."
+}

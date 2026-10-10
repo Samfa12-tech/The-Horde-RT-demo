@@ -38,6 +38,11 @@
     <string name="swing">SWING</string>
     <string name="parry">PARRY</string>
     <string name="dodge">DODGE</string>
+    <string name="combat_teaching">Optional parry and dodge lesson</string>
+    <string name="combat_teaching_slowdown">Ease time during the lesson</string>
+    <string name="combat_teaching_skip">Skip this lesson</string>
+    <string name="combat_teaching_replay">Replay opening lesson</string>
+    <string name="combat_teaching_description">Two skeletons teach parrying, then the Keeper teaches dodging. Move and look remain live. You can retry safely, skip, or replay the opening lesson here.</string>
     <string name="interact">INTERACT</string>
     <string name="chest_locked_until_lich_defeated">LOCKED\nSLAY LICH</string>
     <string name="open_chest">OPEN CHEST</string>
@@ -111,7 +116,7 @@
     <string name="report_copy_failed">The benchmark report could not be copied.</string>
     <string name="report_saved">Benchmark report saved.</string>
     <string name="report_save_failed">The benchmark report could not be saved.</string>
-    <string name="controls_help">LEFT HALF\nDrag to walk and strafe\n\nRIGHT HALF\nDrag for 360° camera look\n\nSWING\nPress Swing to attack\n\nPARRY\nPress Parry to deflect a skeleton strike\n\nDODGE\nPress to evade in your movement direction; standing still dodges forward\n\nINTERACT\nShows the chest state nearby; tap when enabled\n\nRAISE / LOWER\nAppears while carrying the reward lantern\n\nMENU / BACK\nPause, restart, settings and diagnostics</string>
+    <string name="controls_help">LEFT HALF\nDrag to walk and strafe\n\nRIGHT HALF\nDrag for 360° camera look\n\nRUN\nTap Run to toggle a faster pace. Running has no stamina cost.\n\nSWING\nPress Swing to attack\n\nPARRY\nPress Parry to deflect a skeleton strike\n\nDODGE\nPress to evade in your movement direction; standing still dodges forward\n\nINTERACT\nShows the chest state nearby; tap when enabled\n\nRAISE / LOWER\nAppears while carrying the reward lantern\n\nMENU / BACK\nPause, restart, settings and diagnostics</string>
     <string name="sfx_enabled">Sound effects</string>
     <string name="haptics_enabled">Vibration / haptics</string>
     <string name="sfx_volume">SFX volume</string>
@@ -219,6 +224,8 @@
     <string name="benchmark_summary_edit">Edit choices (requires new consent)</string>
     <string name="benchmark_summary_unavailable">A complete matching benchmark summary is unavailable. Nothing was prepared or sent.</string>
     <string name="benchmark_summary_picker_pending">Finish or dismiss the previous document picker before saving another report.</string>
-    <string name="controller_help">Controller: left stick moves; right stick looks. Right trigger or X swings; left trigger parries; B dodges; A interacts; Y raises or lowers the lantern; Start opens the menu. In menus, D-pad or left stick selects, A confirms, B goes back, and left/right adjusts a focused slider. These are Android button names; physical labels vary by controller. Touch restores touch controls. Unplugging the active controller pauses play.</string>
+    <string name="controller_help">Controller: left stick moves; right stick looks. Right trigger or X swings; left trigger parries; B dodges; hold R1 to run; A interacts; Y raises or lowers the lantern; Start opens the menu. In menus, D-pad or left stick selects, A confirms, B goes back, and left/right adjusts a focused slider. These are Android button names; physical labels vary by controller. Touch restores touch controls. Unplugging the active controller pauses play.</string>
+    <string name="run">RUN</string>
+    <string name="running">RUNNING</string>
     <string name="controller_play_prompts">Swing: RT / X · Parry: LT · Dodge: B · Menu: Start</string>
 </resources>

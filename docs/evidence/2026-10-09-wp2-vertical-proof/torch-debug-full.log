@@ -1,0 +1,30 @@
+UpdateCTestConfiguration  from :C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/DartConfiguration.tcl
+UpdateCTestConfiguration  from :C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/DartConfiguration.tcl
+Parse Config file:C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/DartConfiguration.tcl
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 44
+    Start 44: horde_rt_final_held_torch_clearance_tests
+
+44: Test command: "C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-debug\Debug\horde_rt_final_held_torch_clearance_tests.exe" "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof"
+44: Working Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+44: Test timeout computed to be: 180
+44: worst-bend targetGripY=0.330294 finalGripY=0.330294 flameY=0.892789 lightY=0.870196 finalMainEnvelopeHeadroom=0.0494097 root=4.2,-0.949749,-10
+44: clearance viewport aspect=1
+44: imported structural underside triangles=118 planeSamples=3178 diskSamples=57970
+44: new roof final rig cases=1812 actualViewmodelVerticesPerPose=15855 skinnedRoofCases=1812 worstHeadroom=0.0323757 worstPoseXZ=-0.58,-4.3 yaw/pitch=1.5708,0 walk=10.07 action=8 target/finalGripY=0.348713,0.348714
+44: limiting worldPoint=-0.0634497,1.31762,-4.33031 roofY=1.35 sharedY=1.35
+44: actual final rig cases=3287 worstHeadroom=0.0323757 maxGripError=0.0118211 failures=0
+1/1 Test #44: horde_rt_final_held_torch_clearance_tests ...   Passed  168.70 sec
+
+The following tests passed:
+	horde_rt_final_held_torch_clearance_tests
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) = 168.71 sec

@@ -1,0 +1,355 @@
+[
+  {
+    "path": ".github/workflows/shared-simulation-host.yml",
+    "git_blob": "2e8262675bc82b90373d3bf137f416c0a033db3b",
+    "git_source_commit": "f01d02dcc77efc27993b2c8b273915667993da57",
+    "immutable_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f01d02dcc77efc27993b2c8b273915667993da57/.github/workflows/shared-simulation-host.yml",
+    "hydrated_bytes": 20797,
+    "hydrated_sha256": "ea2d2085ad2c5d9c963cef7fdfb5b69aa5b8f86fd9dfe36bdbc53775b3460b66"
+  },
+  {
+    "path": "ASSET_LICENSES.md",
+    "git_blob": "5090a9eb8d3fae49fa5796915dbd1037e990a74b",
+    "git_source_commit": "f01d02dcc77efc27993b2c8b273915667993da57",
+    "immutable_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f01d02dcc77efc27993b2c8b273915667993da57/ASSET_LICENSES.md",
+    "hydrated_bytes": 40662,
+    "hydrated_sha256": "e2a9a6d51e42f2342c4e42980983c8a7b9b3fcd883a007645a907174b3afeb7c"
+  },
+  {
+    "path": "CMakeLists.txt",
+    "git_blob": "e44e1eadf94bc1da60ddb00e4968663029963702",
+    "git_source_commit": "f01d02dcc77efc27993b2c8b273915667993da57",
+    "immutable_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f01d02dcc77efc27993b2c8b273915667993da57/CMakeLists.txt",
+    "hydrated_bytes": 82269,
+    "hydrated_sha256": "db026fdee8a78a12fd472a49e809cb339d3cbde455bb021da3131a60a909b7de"
+  },
+  {
+    "path": "android/app/src/main/cpp/android_probe_bridge.cpp",
+    "git_blob": "193771e2060a62258126671288dbe60f55dd8e19",
+    "git_source_commit": "f01d02dcc77efc27993b2c8b273915667993da57",
+    "immutable_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f01d02dcc77efc27993b2c8b273915667993da57/android/app/src/main/cpp/android_probe_bridge.cpp",
+    "hydrated_bytes": 346846,
+    "hydrated_sha256": "e250c94e145a0a13dfdb2fa53b911880dd24360459093c66efcf4d33d7229540"
+  },
+  {
+    "path": "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java",
+    "git_blob": "437e8f7cbe2661e443f890f8464f8e33dd52db99",
+    "git_source_commit": "f01d02dcc77efc27993b2c8b273915667993da57",
+    "immutable_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f01d02dcc77efc27993b2c8b273915667993da57/android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java",
+    "hydrated_bytes": 365320,
+    "hydrated_sha256": "6b9abcd73011df38476739bdaf6a2be9d91e00369003004db981133f056a807a"
+  },
+  {
+    "path": "android/app/src/test/java/com/samfa12/hordelanternrt/ContextualControlsLayoutTest.java",
+    "git_blob": "b684fb7a390f01c432965176b8af2a92cf395a32",
+    "git_source_commit": "f01d02dcc77efc27993b2c8b273915667993da57",
+    "immutable_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f01d02dcc77efc27993b2c8b273915667993da57/android/app/src/test/java/com/samfa12/hordelanternrt/ContextualControlsLayoutTest.java",
+    "hydrated_bytes": 10960,
+    "hydrated_sha256": "8687591e42cf99c8993c3ad05d06a27a5ae3998671b18d40353c890f5cd541bb"
+  },
+  {
+    "path": "assets/source/development-rescue/README.md",
+    "git_blob": "da98d6fac87e914bbe0f2dc0008fa8c86626be09",
+    "git_source_commit": "f01d02dcc77efc27993b2c8b273915667993da57",
+    "immutable_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f01d02dcc77efc27993b2c8b273915667993da57/assets/source/development-rescue/README.md",
+    "hydrated_bytes": 1303,
+    "hydrated_sha256": "8f87a897784ecc9bd01026282dc1b5141b2c6dbc3619a2f98aa866acc78273a3"
+  },
+  {
+    "path": "assets/source/development-rescue/asset.manifest.json",
+    "git_blob": "556b4127c3efab53e111a53d07f05a252c1d7a2d",
+    "git_source_commit": "f01d02dcc77efc27993b2c8b273915667993da57",
+    "immutable_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f01d02dcc77efc27993b2c8b273915667993da57/assets/source/development-rescue/asset.manifest.json",
+    "hydrated_bytes": 534,
+    "hydrated_sha256": "fb2b69dafb4f09cbfd3cfd759d0c9c568849d2b2bb4af4062c64f3fa31135da9"
+  },
+  {
+    "path": "assets/source/development-rescue/blender-run.log",
+    "git_blob": "7951f33851450ebd4ff60db68806d1fbc93e2b8d",
+    "git_source_commit": "f01d02dcc77efc27993b2c8b273915667993da57",
+    "immutable_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f01d02dcc77efc27993b2c8b273915667993da57/assets/source/development-rescue/blender-run.log",
+    "hydrated_bytes": 1342,
+    "hydrated_sha256": "146c91bb2cf40bfaad2ba5bccf9d9d728bd371d620ae1b4c8ba96594ce78eb0f"
+  },
+  {
+    "path": "assets/source/development-rescue/rescue-shaft-blockout.blend",
+    "git_blob": "8efb64d875511a55b1f1b20e78a56bcd8a90a1fd",
+    "git_source_commit": "f01d02dcc77efc27993b2c8b273915667993da57",
+    "immutable_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f01d02dcc77efc27993b2c8b273915667993da57/assets/source/development-rescue/rescue-shaft-blockout.blend",
+    "hydrated_bytes": 99436,
+    "hydrated_sha256": "1f0e5b16b0479c3df63430c9e5112cb3aebb64c3d6e78089eec3c8bd8257f2be"
+  },
+  {
+    "path": "assets/source/development-rescue/rescue-shaft-blockout.glb",
+    "git_blob": "c801bf0d9510e69fd6a16ba3e4ee7a826520fe3e",
+    "git_source_commit": "f01d02dcc77efc27993b2c8b273915667993da57",
+    "immutable_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f01d02dcc77efc27993b2c8b273915667993da57/assets/source/development-rescue/rescue-shaft-blockout.glb",
+    "hydrated_bytes": 17116,
+    "hydrated_sha256": "0baca6df9d2756e07f8948a097253a17855f947d9024ab41dd799670caffae98"
+  },
+  {
+    "path": "assets/source/development-rescue/rescue-shaft-roundtrip.glb",
+    "git_blob": "1a5d56abd99c3bab8ae2b4cc707532c787d85bb8",
+    "git_source_commit": "f01d02dcc77efc27993b2c8b273915667993da57",
+    "immutable_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f01d02dcc77efc27993b2c8b273915667993da57/assets/source/development-rescue/rescue-shaft-roundtrip.glb",
+    "hydrated_bytes": 17124,
+    "hydrated_sha256": "6dcd2e1e5f915b0c4fce411cb537ecc2072c4fe5dfb32f9e67bcb9abcf5485a9"
+  },
+  {
+    "path": "assets/source/development-rescue/source-manifest.json",
+    "git_blob": "4d82f880917a627267217eecd85b2105553d32af",
+    "git_source_commit": "f01d02dcc77efc27993b2c8b273915667993da57",
+    "immutable_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f01d02dcc77efc27993b2c8b273915667993da57/assets/source/development-rescue/source-manifest.json",
+    "hydrated_bytes": 3840,
+    "hydrated_sha256": "9ec9f9c90a8157f48bf9e77fc6748cf37e71d96e970410fb6f02c21b63f3d7d1"
+  },
+  {
+    "path": "cmake/HordeRtSources.cmake",
+    "git_blob": "7ef00361617f4e6adaff4e6f3829d6c10415808b",
+    "git_source_commit": "f01d02dcc77efc27993b2c8b273915667993da57",
+    "immutable_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f01d02dcc77efc27993b2c8b273915667993da57/cmake/HordeRtSources.cmake",
+    "hydrated_bytes": 2431,
+    "hydrated_sha256": "a6baf69be21e5e048cba6717a16ece3042e3aa11fa22179d704cb21099b04976"
+  },
+  {
+    "path": "docs/superpowers/plans/2026-10-10-horde-1.7-development-rescue-journey.md",
+    "git_blob": "cfda603561e452674d99905bb5eaa81e201b2a1d",
+    "git_source_commit": "f01d02dcc77efc27993b2c8b273915667993da57",
+    "immutable_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f01d02dcc77efc27993b2c8b273915667993da57/docs/superpowers/plans/2026-10-10-horde-1.7-development-rescue-journey.md",
+    "hydrated_bytes": 15200,
+    "hydrated_sha256": "87b3f96c3fe2d6a83fa8da5adb3a6218a61a546596543a1cb1a54d2d2a33b8eb",
+    "hydrated_note": "Final evidence prose follows the immutable candidate Git blob; no runtime change."
+  },
+  {
+    "path": "src/gameplay/DevelopmentCheckpoints.h",
+    "git_blob": "cf12a53706e088518e5b5ef35d26874e4997df9c",
+    "git_source_commit": "f01d02dcc77efc27993b2c8b273915667993da57",
+    "immutable_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f01d02dcc77efc27993b2c8b273915667993da57/src/gameplay/DevelopmentCheckpoints.h",
+    "hydrated_bytes": 16472,
+    "hydrated_sha256": "2e414e215f312acd6f46b745ae6b3f0b76b2a15b813e81b3f6acbf5d2c823ddc"
+  },
+  {
+    "path": "src/gameplay/simulation/GameSimulation.cpp",
+    "git_blob": "add82700c058400a559306600bc4acb0a82ce937",
+    "git_source_commit": "f01d02dcc77efc27993b2c8b273915667993da57",
+    "immutable_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f01d02dcc77efc27993b2c8b273915667993da57/src/gameplay/simulation/GameSimulation.cpp",
+    "hydrated_bytes": 119069,
+    "hydrated_sha256": "f9ebc6ffb1a0740d16d29871c8f2383fa582571fab66ebdf35610336ec0dbdf6"
+  },
+  {
+    "path": "src/gameplay/simulation/GameSimulation.h",
+    "git_blob": "233cb4bd8f47730e2e146afe2a4508d133f1df32",
+    "git_source_commit": "f01d02dcc77efc27993b2c8b273915667993da57",
+    "immutable_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f01d02dcc77efc27993b2c8b273915667993da57/src/gameplay/simulation/GameSimulation.h",
+    "hydrated_bytes": 16424,
+    "hydrated_sha256": "92dbcfd1fe4c7be82ccb8cc88cabe01e78e8d0e87bc4e266276e884aad395804"
+  },
+  {
+    "path": "src/gameplay/simulation/GameSimulationRescue.cpp",
+    "git_blob": "cedbf55f19902ff4ab5fd4554f3432ceac8696a0",
+    "git_source_commit": "f01d02dcc77efc27993b2c8b273915667993da57",
+    "immutable_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f01d02dcc77efc27993b2c8b273915667993da57/src/gameplay/simulation/GameSimulationRescue.cpp",
+    "hydrated_bytes": 9362,
+    "hydrated_sha256": "737bc6e10b1abf3789cd75e083ea1352c57895c82a3e6fb500b5c4200c3bdff5"
+  },
+  {
+    "path": "src/gameplay/simulation/SimulationSnapshot.h",
+    "git_blob": "6cc9eca0ab8fc3e3a22c06910b1f04edc7b5226b",
+    "git_source_commit": "f01d02dcc77efc27993b2c8b273915667993da57",
+    "immutable_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f01d02dcc77efc27993b2c8b273915667993da57/src/gameplay/simulation/SimulationSnapshot.h",
+    "hydrated_bytes": 7201,
+    "hydrated_sha256": "4296dec2620b60be60e6f90e62405df37ea515f31a0209c9deee43c24c001146"
+  },
+  {
+    "path": "src/gameplay/traversal/DevelopmentRescueJourney.h",
+    "git_blob": "2cbdcbd9a9c236f25c438cfc969d1d01326f0d76",
+    "git_source_commit": "f01d02dcc77efc27993b2c8b273915667993da57",
+    "immutable_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f01d02dcc77efc27993b2c8b273915667993da57/src/gameplay/traversal/DevelopmentRescueJourney.h",
+    "hydrated_bytes": 4146,
+    "hydrated_sha256": "3255bf598a29abf5447710a3a8d03e4a4a8aef85eefaa5656bc064a1c8a7267e"
+  },
+  {
+    "path": "src/gameplay/traversal/RescueTraversal.cpp",
+    "git_blob": "e8f7dbd26d83f98bcafaaab5deddfc982db0d15a",
+    "git_source_commit": "f01d02dcc77efc27993b2c8b273915667993da57",
+    "immutable_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f01d02dcc77efc27993b2c8b273915667993da57/src/gameplay/traversal/RescueTraversal.cpp",
+    "hydrated_bytes": 26689,
+    "hydrated_sha256": "6e984bae8a998fa77818ffe1f211d64368e48db12b8ff57a6e73820b69308aeb"
+  },
+  {
+    "path": "src/gameplay/traversal/RescueTraversal.h",
+    "git_blob": "361d445f1e41da0f35b822204bb6d729ad87be1b",
+    "git_source_commit": "f01d02dcc77efc27993b2c8b273915667993da57",
+    "immutable_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f01d02dcc77efc27993b2c8b273915667993da57/src/gameplay/traversal/RescueTraversal.h",
+    "hydrated_bytes": 5573,
+    "hydrated_sha256": "aa64f3423854564000290573fec9d0ff2398ccdea17c53fac449702fa636e10e"
+  },
+  {
+    "path": "src/platform/windows/DiagnosticWindow.cpp",
+    "git_blob": "b8ac026e44cee887cd0e9b1f7cf739fd0200bc74",
+    "git_source_commit": "f01d02dcc77efc27993b2c8b273915667993da57",
+    "immutable_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f01d02dcc77efc27993b2c8b273915667993da57/src/platform/windows/DiagnosticWindow.cpp",
+    "hydrated_bytes": 503636,
+    "hydrated_sha256": "c3dd8425b2151d06b2b9e7c532cc4912c371a565d0b1fbc77ffcac90c495d2be"
+  },
+  {
+    "path": "src/scene/RescueBlockoutGeometry.h",
+    "git_blob": "1e1fc13041cf1aeac95285db0c98eff71a8a2654",
+    "git_source_commit": "f01d02dcc77efc27993b2c8b273915667993da57",
+    "immutable_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f01d02dcc77efc27993b2c8b273915667993da57/src/scene/RescueBlockoutGeometry.h",
+    "hydrated_bytes": 2562,
+    "hydrated_sha256": "9df555689aed2350ae81d9d97f55f913017efbb3137695f5511c4acf9adab299"
+  },
+  {
+    "path": "src/scene/RescueJourneyGeometry.h",
+    "git_blob": "237967b3b9fde00ec87b83744bce2f14bac927df",
+    "git_source_commit": "f01d02dcc77efc27993b2c8b273915667993da57",
+    "immutable_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f01d02dcc77efc27993b2c8b273915667993da57/src/scene/RescueJourneyGeometry.h",
+    "hydrated_bytes": 5984,
+    "hydrated_sha256": "e49580840a57cfe94874b5e56955cdee35fa99a8c30684995e441e4463ad7011"
+  },
+  {
+    "path": "src/scene/SkeletonRenderPose.h",
+    "git_blob": "ed961141c6a960c16dee98c315941fb5333ac957",
+    "git_source_commit": "f01d02dcc77efc27993b2c8b273915667993da57",
+    "immutable_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f01d02dcc77efc27993b2c8b273915667993da57/src/scene/SkeletonRenderPose.h",
+    "hydrated_bytes": 5607,
+    "hydrated_sha256": "d372866b12e145b19becb464065399fe9622d90f007619a5db6837dfecb83426"
+  },
+  {
+    "path": "src/vulkan/raytracing/CharacterRenderSlot.cpp",
+    "git_blob": "1d280b77926cb2ab3bcbd7eef82786d5af44e120",
+    "git_source_commit": "f01d02dcc77efc27993b2c8b273915667993da57",
+    "immutable_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f01d02dcc77efc27993b2c8b273915667993da57/src/vulkan/raytracing/CharacterRenderSlot.cpp",
+    "hydrated_bytes": 17933,
+    "hydrated_sha256": "ac02b266eb1cb4ae45e70ba57b714060959d50c48474ccf9ef54736bb31a9543"
+  },
+  {
+    "path": "src/vulkan/raytracing/CharacterRenderSlot.h",
+    "git_blob": "cfd681cfe3ccb80cb244e0c4795ecd35089ac2cb",
+    "git_source_commit": "f01d02dcc77efc27993b2c8b273915667993da57",
+    "immutable_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f01d02dcc77efc27993b2c8b273915667993da57/src/vulkan/raytracing/CharacterRenderSlot.h",
+    "hydrated_bytes": 6541,
+    "hydrated_sha256": "9d9ceaad6674db1691f528353b7f7adbc290f7f0dc586b1806ed3f2a83622e5e"
+  },
+  {
+    "path": "src/vulkan/raytracing/DevelopmentWorldSceneAdapter.h",
+    "git_blob": "0a92e378ddf3381b9de9c9fa47d1f320c0c743ef",
+    "git_source_commit": "f01d02dcc77efc27993b2c8b273915667993da57",
+    "immutable_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f01d02dcc77efc27993b2c8b273915667993da57/src/vulkan/raytracing/DevelopmentWorldSceneAdapter.h",
+    "hydrated_bytes": 1096,
+    "hydrated_sha256": "105a5beba8b33c26dea202e30b3ce02e29848bcb8ed7b3cbe1bcf15a6b662218"
+  },
+  {
+    "path": "src/vulkan/raytracing/PresentableTinyRtScene.cpp",
+    "git_blob": "ccbfb024fe05f8e8450c16d49823b679aefc027c",
+    "git_source_commit": "f01d02dcc77efc27993b2c8b273915667993da57",
+    "immutable_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f01d02dcc77efc27993b2c8b273915667993da57/src/vulkan/raytracing/PresentableTinyRtScene.cpp",
+    "hydrated_bytes": 437211,
+    "hydrated_sha256": "50bf680d0655636cde08eeb7ac9f29f5921a7cfa2af2b0635eb8ce6fcacc5c8c"
+  },
+  {
+    "path": "src/vulkan/raytracing/PresentableTinyRtScene.h",
+    "git_blob": "41d0dfe8b468293a8edbe5c25b17c1dd36a6b476",
+    "git_source_commit": "f01d02dcc77efc27993b2c8b273915667993da57",
+    "immutable_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f01d02dcc77efc27993b2c8b273915667993da57/src/vulkan/raytracing/PresentableTinyRtScene.h",
+    "hydrated_bytes": 49964,
+    "hydrated_sha256": "bfd07116a9c43aaa6caa64bfc30c84df8dbbb701adcf0faa4a9916a2b5dba984"
+  },
+  {
+    "path": "src/vulkan/raytracing/RescuePlayerRig.h",
+    "git_blob": "ac7c0973f3cfc91363bf39bdb408f50e92a2b6cb",
+    "git_source_commit": "f01d02dcc77efc27993b2c8b273915667993da57",
+    "immutable_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f01d02dcc77efc27993b2c8b273915667993da57/src/vulkan/raytracing/RescuePlayerRig.h",
+    "hydrated_bytes": 5228,
+    "hydrated_sha256": "4eebb6d47ba4a30b980e1313c0d1474220ed8d03acfc5776f691c834003488b8"
+  },
+  {
+    "path": "src/vulkan/raytracing/RtSceneRecordObservation.h",
+    "git_blob": "367b92a6b976f5b8c05d8edd17bb98eb7c8523bf",
+    "git_source_commit": "f01d02dcc77efc27993b2c8b273915667993da57",
+    "immutable_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f01d02dcc77efc27993b2c8b273915667993da57/src/vulkan/raytracing/RtSceneRecordObservation.h",
+    "hydrated_bytes": 9660,
+    "hydrated_sha256": "9e81234b93dfbc38bcbfc1854a61f9818ddb7ca0601214ba4cd72377c006aa1c"
+  },
+  {
+    "path": "src/vulkan/raytracing/SimulationFrameAdapter.cpp",
+    "git_blob": "1bc2908b4701fd9d41bf9287b2b628f6d5cc9138",
+    "git_source_commit": "f01d02dcc77efc27993b2c8b273915667993da57",
+    "immutable_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f01d02dcc77efc27993b2c8b273915667993da57/src/vulkan/raytracing/SimulationFrameAdapter.cpp",
+    "hydrated_bytes": 7565,
+    "hydrated_sha256": "d531342bdd31292ec929e6220ab25f189826057579a8b490dadc4d6803438926"
+  },
+  {
+    "path": "tests/DevelopmentStaticAssetTests.cpp",
+    "git_blob": "0d1c82fb5bf835eaa83f4c9e033f3b290a0c2bd2",
+    "git_source_commit": "f01d02dcc77efc27993b2c8b273915667993da57",
+    "immutable_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f01d02dcc77efc27993b2c8b273915667993da57/tests/DevelopmentStaticAssetTests.cpp",
+    "hydrated_bytes": 55810,
+    "hydrated_sha256": "65bf06a3a93e4bfd4163fb4cd2253458da23699d65c76aa85e61fa0de7215eb8"
+  },
+  {
+    "path": "tests/RescueBlockoutImportTests.cpp",
+    "git_blob": "c7ccd25d60104b54385e9b7ab2aaa1848c0086f5",
+    "git_source_commit": "f01d02dcc77efc27993b2c8b273915667993da57",
+    "immutable_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f01d02dcc77efc27993b2c8b273915667993da57/tests/RescueBlockoutImportTests.cpp",
+    "hydrated_bytes": 18238,
+    "hydrated_sha256": "a890b3cd990a9c4f4f888ea6b9b69fc44b983124a98a95723d8acf8673ff4091"
+  },
+  {
+    "path": "tests/RescueBlockoutSourceAdmissionTests.py",
+    "git_blob": "fb3c0f910107cf5209c6a56a34a3d1aa45fe04a4",
+    "git_source_commit": "f01d02dcc77efc27993b2c8b273915667993da57",
+    "immutable_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f01d02dcc77efc27993b2c8b273915667993da57/tests/RescueBlockoutSourceAdmissionTests.py",
+    "hydrated_bytes": 2315,
+    "hydrated_sha256": "6c9f9b50bfae73b04bd4e547c215c2a1200561530f5c62562b9b27b8d0c22927"
+  },
+  {
+    "path": "tests/RescueJourneyIntegrationTests.cpp",
+    "git_blob": "6cc15ef3ebfcef61bd0dd70bf934ac5c04532370",
+    "git_source_commit": "f01d02dcc77efc27993b2c8b273915667993da57",
+    "immutable_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f01d02dcc77efc27993b2c8b273915667993da57/tests/RescueJourneyIntegrationTests.cpp",
+    "hydrated_bytes": 14802,
+    "hydrated_sha256": "f056eaf81aa40fbeb62607eb088f3bd8b986c51b13648012ad01ea282b433191"
+  },
+  {
+    "path": "tests/RescueRigAttachmentTests.cpp",
+    "git_blob": "df916d014df6aca9fb309572b0b4dd0d8faa10f8",
+    "git_source_commit": "f01d02dcc77efc27993b2c8b273915667993da57",
+    "immutable_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f01d02dcc77efc27993b2c8b273915667993da57/tests/RescueRigAttachmentTests.cpp",
+    "hydrated_bytes": 24833,
+    "hydrated_sha256": "887397e6eb8ab3688f2ed535ca9f45c079002f7fa2b8c956239ecb88411b8556"
+  },
+  {
+    "path": "tests/RescueTraversalTests.cpp",
+    "git_blob": "05e367582cf00ee19c61f9b28811e813cccd3300",
+    "git_source_commit": "f01d02dcc77efc27993b2c8b273915667993da57",
+    "immutable_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f01d02dcc77efc27993b2c8b273915667993da57/tests/RescueTraversalTests.cpp",
+    "hydrated_bytes": 27544,
+    "hydrated_sha256": "894a3ec65b7717f129dd5992a037693e9c26e6bd518505befb8a8211c8796fd5"
+  },
+  {
+    "path": "tests/RtSceneRecordObservationTests.cpp",
+    "git_blob": "00f8ba69a926035878d3431246f40b53e2d471c5",
+    "git_source_commit": "f01d02dcc77efc27993b2c8b273915667993da57",
+    "immutable_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f01d02dcc77efc27993b2c8b273915667993da57/tests/RtSceneRecordObservationTests.cpp",
+    "hydrated_bytes": 12129,
+    "hydrated_sha256": "82c7b9ade4c696fc0e14c0106ba6a7c84da55522928b817f3316e77a3068c7b2"
+  },
+  {
+    "path": "tests/SimulationGameplayTests.cpp",
+    "git_blob": "3aa21105de89ece003a7e1a0b59269ec5253f67f",
+    "git_source_commit": "f01d02dcc77efc27993b2c8b273915667993da57",
+    "immutable_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f01d02dcc77efc27993b2c8b273915667993da57/tests/SimulationGameplayTests.cpp",
+    "hydrated_bytes": 138344,
+    "hydrated_sha256": "40040930b9a4d49ae76eaf9900f5294611e75a8c2138bdda88ddbd6daaf39695"
+  },
+  {
+    "path": "tools/author-rescue-blockout.py",
+    "git_blob": "575545ffcfa209ea6fa171a620d1820b47f06cf0",
+    "git_source_commit": "f01d02dcc77efc27993b2c8b273915667993da57",
+    "immutable_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f01d02dcc77efc27993b2c8b273915667993da57/tools/author-rescue-blockout.py",
+    "hydrated_bytes": 12672,
+    "hydrated_sha256": "cd9fa0047b597ab95e8712f3619cbf249eba331aac9db911598fcc12dab7837e"
+  }
+]

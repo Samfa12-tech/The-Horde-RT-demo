@@ -183,12 +183,17 @@ void Run(MotionScenario kind, int rate, const char* receiptPath)
 
 void TestEquipmentEventAdmission()
 {
-    // The observer must preserve newly appended ordinary equipment events.
+    // The observer must preserve appended equipment and teaching cue events.
     // These are observer-only fixtures, not manufactured gameplay evidence.
+    static_assert(static_cast<unsigned>(GameplayEventType::ParryPrepareCue) == 24u);
+    static_assert(static_cast<unsigned>(GameplayEventType::LichDischargeWarning) == 25u);
     for (const auto type : {GameplayEventType::PlayerSwordDrawStarted,
                             GameplayEventType::PlayerSwordAttachmentChanged,
                             GameplayEventType::SkeletonEncounterWarning,
-                            static_cast<GameplayEventType>(24u)})
+                            GameplayEventType::ParryPrepareCue,
+                            GameplayEventType::LichDischargeWarning,
+                            static_cast<GameplayEventType>(kGameplayEventTypeCount),
+                            static_cast<GameplayEventType>(255u)})
     {
         GameSimulation simulation(ProductionGameSimulationConfig());
         MotionEvidenceScenario scenario;
@@ -199,19 +204,44 @@ void TestEquipmentEventAdmission()
         const std::array<GameplayEvent, 1u> events{{{.sequence = 1u, .tickIndex = 1u, .type = type}}};
         scenario.ObserveAdvance(simulation.Snapshot(), events);
         const bool accepted = ledger.AppendState(2u, simulation.Snapshot(), {}, scenario, events);
-        const bool known = type != static_cast<GameplayEventType>(24u);
+        const bool known = static_cast<std::size_t>(type) < kGameplayEventTypeCount;
         Check(accepted == known && scenario.Failed() != known,
-              "draw, attachment and waterfall warning events admitted; unknown event rejected");
+              "equipment and both teaching cues admitted; first unknown and byte-boundary events rejected");
         if (known && accepted && !scenario.Failed())
         {
             Check(scenario.EventCounts()[static_cast<std::size_t>(type)] == 1u &&
                   ledger.Events().size() == 1u && ledger.Events()[0].event.type == type,
-                  "new equipment event retained exactly once with its original type");
+                  "equipment or teaching cue retained exactly once with its original type");
             scenario.ObserveAdvance(simulation.Snapshot(), events);
             Check(scenario.Failed() && !ledger.AppendState(3u, simulation.Snapshot(), {}, scenario, events),
-                  "duplicate equipment event remains rejected");
+                  "duplicate equipment or teaching cue remains rejected");
         }
     }
+
+    GameSimulation simulation(ProductionGameSimulationConfig());
+    MotionEvidenceScenario scenario;
+    MotionEvidenceLedger ledger;
+    Check(scenario.Begin(MotionScenario::TorchLowOpening, simulation, 1u) &&
+          ledger.Begin("ordered_teaching_cues", MotionScenario::TorchLowOpening),
+          "ordered cue observer fixture admitted");
+    const std::array<GameplayEvent, 3u> cues{{
+        {.sequence=1u, .tickIndex=1u, .type=GameplayEventType::ParryPrepareCue},
+        {.sequence=2u, .tickIndex=1u, .type=GameplayEventType::LichDischargeWarning},
+        {.sequence=3u, .tickIndex=2u, .type=GameplayEventType::ParryPrepareCue}}};
+    scenario.ObserveAdvance(simulation.Snapshot(), cues);
+    Check(!scenario.Failed() && ledger.AppendState(2u, simulation.Snapshot(), {}, scenario, cues) &&
+          ledger.Events().size()==3u &&
+          scenario.EventCounts()[static_cast<std::size_t>(GameplayEventType::ParryPrepareCue)]==2u &&
+          scenario.EventCounts()[static_cast<std::size_t>(GameplayEventType::LichDischargeWarning)]==1u,
+          "repeated valid cues retain every event in sequence rather than merging types");
+    for (std::size_t i=0; i<ledger.Events().size() && i<cues.size(); ++i)
+        Check(ledger.Events()[i].event.sequence==cues[i].sequence &&
+              ledger.Events()[i].event.type==cues[i].type,
+              "mixed teaching cue sequence and identity preserved");
+    const std::array<GameplayEvent, 1u> stale{{cues[1]}};
+    scenario.ObserveAdvance(simulation.Snapshot(), stale);
+    Check(scenario.Failed() && !ledger.AppendState(3u, simulation.Snapshot(), {}, scenario, stale) &&
+          ledger.Events().size()==3u, "out-of-order cue cannot append after the accepted sequence");
 }
 
 void TestSwordTransitionLedgerIsolation()

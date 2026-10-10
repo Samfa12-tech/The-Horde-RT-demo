@@ -1,0 +1,167 @@
+{
+  "source_candidate": "0eb665900c9efc95c443beada4c418776092cbe3",
+  "task_start_head": "9a7a9ce0b83a3a5d479cf9283fe75410442bcc57",
+  "commands": [
+    {
+      "target": "custody",
+      "argv": [
+        "git",
+        "ls-remote",
+        "origin",
+        "refs/heads/codex/horde-1.7-wp2-vertical-proof"
+      ],
+      "expected_observed_sha": "9a7a9ce0b83a3a5d479cf9283fe75410442bcc57",
+      "exit": 0
+    },
+    {
+      "target": "phone inventory",
+      "argv": [
+        "<adb>",
+        "devices",
+        "-l"
+      ],
+      "exit": 0,
+      "serials_published": false
+    },
+    {
+      "target": "package metadata",
+      "argv": [
+        "<aapt>",
+        "dump",
+        "badging",
+        "<candidate.apk>"
+      ],
+      "exit": 0
+    },
+    {
+      "target": "signatures",
+      "argv": [
+        "<apksigner>",
+        "verify",
+        "--print-certs",
+        "<candidate/installed.apk>"
+      ],
+      "exit": 0,
+      "certificate_subjects_published": false
+    },
+    {
+      "target": "installed inspection",
+      "argv": [
+        "<adb>",
+        "-s",
+        "<selected-device>",
+        "shell",
+        "pm",
+        "path",
+        "<actual-horde-package>"
+      ],
+      "note": "Debug initially absent, pm path exit1; production path exit0. First inventory helper incorrectly asserted Debug was installed and stopped before mutation; corrected read-only inventory verified absence."
+    },
+    {
+      "target": "approved installation",
+      "argv": [
+        "<adb>",
+        "-s",
+        "<selected-device>",
+        "install",
+        "<candidate.apk>"
+      ],
+      "exit": 0,
+      "outer_seconds": 9.125,
+      "no_replace_or_downgrade_flags": true
+    },
+    {
+      "target": "candidate pullback",
+      "argv": [
+        "<adb>",
+        "-s",
+        "<selected-device>",
+        "pull",
+        "<resolved-installed-apk-path>",
+        "<private-candidate-pullback.apk>"
+      ],
+      "exit": 0,
+      "sha256": "1bd0611a6a25030c7025e49e181e186aff441a1e4f8ef52081afa5532bd4886c"
+    },
+    {
+      "target": "Windows static ground",
+      "argv": [
+        "<verified-exe>",
+        "--capture-showcase",
+        "<fresh-windows-ground-dir>",
+        "--development-checkpoint",
+        "vertical-proof-ground"
+      ],
+      "cwd": "<repo>",
+      "exit": 0,
+      "outer_seconds": 55.89100000000326
+    },
+    {
+      "target": "Windows interactive",
+      "argv": [
+        "<verified-exe>",
+        "--development-vertical-proof"
+      ],
+      "cwd": "<repo>",
+      "result": "launched; current presented report sampled; normal own-window close requested after control blocker",
+      "duration_not_recorded": true
+    },
+    {
+      "target": "Android ordinary launch",
+      "argv": [
+        "<adb>",
+        "-s",
+        "<selected-device>",
+        "shell",
+        "am",
+        "start",
+        "-W",
+        "-n",
+        "com.samfa12.hordelanternrt.debug/com.samfa12.hordelanternrt.MainActivity"
+      ],
+      "exit": 0,
+      "duration_not_recorded": true
+    },
+    {
+      "target": "Android report",
+      "argv": [
+        "<adb>",
+        "-s",
+        "<selected-device>",
+        "shell",
+        "run-as",
+        "com.samfa12.hordelanternrt.debug",
+        "cat",
+        "files/reports/vulkan_capability_report.json"
+      ],
+      "exit": 0
+    },
+    {
+      "target": "Android visual safety guard",
+      "argv": [
+        "<adb>",
+        "-s",
+        "<selected-device>",
+        "shell",
+        "dumpsys",
+        "window",
+        "windows"
+      ],
+      "result": "candidate foreground not verified; no screencap collected; private window content not published"
+    },
+    {
+      "target": "release preservation",
+      "argv": [
+        "<adb>",
+        "-s",
+        "<selected-device>",
+        "shell",
+        "sha256sum",
+        "<resolved-release-apk-path>"
+      ],
+      "exit": 0,
+      "observed_sha256": "cc4de768cf9ca2a409984a24888399e9c518363c359b3a9947d1ed0350c254e8"
+    }
+  ],
+  "timing_policy": "Only actually recorded timings are included; unrecorded outer times are not invented. No test/build rerun and no benchmark/debug combination."
+}

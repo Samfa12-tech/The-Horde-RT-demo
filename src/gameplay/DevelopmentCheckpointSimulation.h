@@ -49,6 +49,13 @@ inline bool StageDevelopmentCheckpointSimulation(
         return false;
     }
 
+    if(checkpoint.developmentWorldRoute || gameSimulation.Snapshot().developmentWorldRoute)
+        gameSimulation.SetDevelopmentWorldRoute(checkpoint.developmentWorldRoute,checkpoint.stagedWorldPreparation);
+
+    if (checkpoint.developmentSupportFixture || gameSimulation.Snapshot().developmentSupportFixture)
+        gameSimulation.SetDevelopmentSupportFixture(checkpoint.developmentSupportFixture,
+            gameSimulation.Snapshot().playerSupportGeneration + 1u);
+
     const auto stepFixed = [&](const simulation::InputSnapshot& input,
                                const float fixedDeltaSeconds,
                                const std::uint64_t inputPublicationSequence)

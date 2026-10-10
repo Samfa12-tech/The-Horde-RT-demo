@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "start_head": "1bd73dae7dbfad7a7c9aff133a4f14680d2015db",
+  "source_generated_candidate": "0eb665900c9efc95c443beada4c418776092cbe3",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "owner_hands_return": "PASS scoped direct owner report",
+  "historical_static_171": "FAIL retained",
+  "separate_look_turn_descend": "NOT separately reported",
+  "proposal": "Test-only exact yaw0/aspect16:9 rig clearance/attachment/recovery case, pending parent review",
+  "implementation_or_test_edits": 0,
+  "tests_executed": 0,
+  "files": {
+    ".gitattributes": "592c981c9e122e89d47ac35231e70f53ab7f21bf5c93d4e50c34242f4be57068",
+    "owner-observation.json": "c5ac3125b7b9fdedbbe27055f45c51daf17c00a461ab3b9efededbf0ab292ab0",
+    "source-review.json": "ec817090f2ce7c3c36fdc819fc2dc128cb8ba3c824f377e3f66441497436b1e9"
+  },
+  "report_sha256": "12c1ecd2b204881746295d1a754c49b2048ee8a102d5682dc011efe20575a4bb",
+  "hash_encoding": "exact evidence bytes; report Git LF"
+}

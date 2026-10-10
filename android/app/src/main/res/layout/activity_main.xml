@@ -143,6 +143,40 @@
         android:textSize="12sp" />
 
     <Button
+        android:id="@+id/run_button"
+        android:layout_width="104dp"
+        android:layout_height="72dp"
+        android:layout_gravity="bottom|start"
+        android:layout_marginStart="24dp"
+        android:layout_marginBottom="32dp"
+        android:maxLines="1"
+        android:text="@string/run"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/combat_teaching_prompt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center_horizontal"
+        android:layout_marginTop="148dp"
+        android:background="#D90D0B09"
+        android:fontFamily="monospace"
+        android:gravity="center"
+        android:maxWidth="520dp"
+        android:paddingStart="14dp"
+        android:paddingTop="9dp"
+        android:paddingEnd="14dp"
+        android:paddingBottom="9dp"
+        android:textColor="#FFF2E9D8"
+        android:textSize="11sp"
+        android:importantForAccessibility="yes"
+        android:accessibilityLiveRegion="polite"
+        android:clickable="false"
+        android:focusable="false"
+        android:visibility="gone" />
+
+    <Button
         android:id="@+id/parry_button"
         android:autoSizeMaxTextSize="17sp"
         android:autoSizeMinTextSize="10sp"

@@ -143,7 +143,7 @@ inline SkeletonRenderPose EvaluateSkeletonRenderPose(
     const float leanSine = std::sin(lean);
     pose.transform = {{
         cosine, sine * leanSine, sine * leanCosine, x,
-        0.0f, leanCosine, -leanSine, gameplay::kRouteFloorWorldY + recoil * 0.055f,
+        0.0f, leanCosine, -leanSine, skeleton.worldY + recoil * 0.055f,
         -sine, cosine * leanSine, cosine * leanCosine, z}};
     return pose;
 }

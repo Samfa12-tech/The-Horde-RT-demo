@@ -1,0 +1,18 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  1>Checking Build System
+  Building Custom Rule <repo>/reports/frozen-mist/owner-weights/harness/CMakeLists.txt
+  DiagnosticWindow.cpp
+  Provider.cpp
+  DiagnosticWindowMain.cpp
+  WindowsGitHubReleaseUpdate.cpp
+  WindowsPlaytestReport.cpp
+  WindowsRemotePlaytestReport.cpp
+  WindowsPlaytestScreenshot.cpp
+  WindowsPlaytestSubmission.cpp
+  WindowsPlaytestVerification.cpp
+  DiagnosticOverlay.cpp
+  MotionEvidenceScenario.cpp
+  MotionEvidenceLedger.cpp
+  Generating Code...
+  frozen_mist.vcxproj -> <repo>\reports\frozen-mist\owner-weights\build\Debug\frozen_mist.exe

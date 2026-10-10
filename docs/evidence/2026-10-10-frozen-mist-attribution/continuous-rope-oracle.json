@@ -1,0 +1,1007 @@
+{
+  "scope": "CPU analytic shadow cones of the actual 176 frozen rope triangles, point aperture light, selected unobstructed-floor camera rays. Independent geometric explanation, not Vulkan presentation or a production sampling change. Per-ray agreement with GPU midpoint/six-sample masks explicitly controls validity.",
+  "density_time": 10.0000191,
+  "accepted_rays": 32,
+  "rejected_rays": 0,
+  "rows": [
+    {
+      "quality": "current",
+      "category": "midpoint-band",
+      "pixel": [
+        780,
+        550
+      ],
+      "aperture_index": 0,
+      "medium_t": [
+        1.0901557596202114,
+        3.5975140669232966
+      ],
+      "rope_shadow_intervals_t": [
+        [
+          2.2722928626765233,
+          2.3502553482351747
+        ]
+      ],
+      "shadowed_length": 0.07796248555865137,
+      "midpoint_rope_gpu": 1.0,
+      "gpu_six_sample_rope_mask": 0,
+      "cpu_six_sample_rope_mask": 0,
+      "discrete_hardware_agreement": true,
+      "weighted_rope_fraction": {
+        "6": 0.0,
+        "64": 0.029883585485297914,
+        "256": 0.030096716373833238,
+        "1024": 0.030044859903369303,
+        "4096": 0.02979078352868913
+      }
+    },
+    {
+      "quality": "current",
+      "category": "midpoint-band",
+      "pixel": [
+        838,
+        574
+      ],
+      "aperture_index": 0,
+      "medium_t": [
+        1.0660225441927753,
+        3.5178744546806042
+      ],
+      "rope_shadow_intervals_t": [
+        [
+          2.2368407537868378,
+          2.3305920534805655
+        ]
+      ],
+      "shadowed_length": 0.09375129969372775,
+      "midpoint_rope_gpu": 1.0,
+      "gpu_six_sample_rope_mask": 0,
+      "cpu_six_sample_rope_mask": 0,
+      "discrete_hardware_agreement": true,
+      "weighted_rope_fraction": {
+        "6": 0.0,
+        "64": 0.032119856355477504,
+        "256": 0.039793344428488295,
+        "1024": 0.03884360202167043,
+        "4096": 0.03910393179697782
+      }
+    },
+    {
+      "quality": "current",
+      "category": "midpoint-band",
+      "pixel": [
+        889,
+        591
+      ],
+      "aperture_index": 0,
+      "medium_t": [
+        1.0652591835505538,
+        3.515355364519136
+      ],
+      "rope_shadow_intervals_t": [
+        [
+          2.2200966103314874,
+          2.3264985957408095
+        ]
+      ],
+      "shadowed_length": 0.10640198540932211,
+      "midpoint_rope_gpu": 0.9999999403953552,
+      "gpu_six_sample_rope_mask": 0,
+      "cpu_six_sample_rope_mask": 0,
+      "discrete_hardware_agreement": true,
+      "weighted_rope_fraction": {
+        "6": 0.0,
+        "64": 0.046120187895488496,
+        "256": 0.04250318443738005,
+        "1024": 0.04239568597553906,
+        "4096": 0.042878087220752946
+      }
+    },
+    {
+      "quality": "current",
+      "category": "midpoint-band",
+      "pixel": [
+        912,
+        606
+      ],
+      "aperture_index": 0,
+      "medium_t": [
+        1.0497643082804835,
+        3.464222275272587
+      ],
+      "rope_shadow_intervals_t": [
+        [
+          2.2279082194676687,
+          2.3405910100963676
+        ]
+      ],
+      "shadowed_length": 0.1126827906286989,
+      "midpoint_rope_gpu": 1.0,
+      "gpu_six_sample_rope_mask": 0,
+      "cpu_six_sample_rope_mask": 0,
+      "discrete_hardware_agreement": true,
+      "weighted_rope_fraction": {
+        "6": 0.0,
+        "64": 0.0459869341580112,
+        "256": 0.046502709414784675,
+        "1024": 0.04547449737933656,
+        "4096": 0.04621685537984155
+      }
+    },
+    {
+      "quality": "current",
+      "category": "midpoint-band",
+      "pixel": [
+        947,
+        619
+      ],
+      "aperture_index": 0,
+      "medium_t": [
+        1.0520544300034227,
+        3.471779677084701
+      ],
+      "rope_shadow_intervals_t": [
+        [
+          2.2303146164827785,
+          2.351348320558765
+        ]
+      ],
+      "shadowed_length": 0.12103370407598657,
+      "midpoint_rope_gpu": 1.0,
+      "gpu_six_sample_rope_mask": 0,
+      "cpu_six_sample_rope_mask": 0,
+      "discrete_hardware_agreement": true,
+      "weighted_rope_fraction": {
+        "6": 0.0,
+        "64": 0.0447582283220634,
+        "256": 0.045287646292841786,
+        "1024": 0.04819219045378437,
+        "4096": 0.04815878394351979
+      }
+    },
+    {
+      "quality": "current",
+      "category": "midpoint-band",
+      "pixel": [
+        967,
+        631
+      ],
+      "aperture_index": 0,
+      "medium_t": [
+        1.0444688031188554,
+        3.446747107946902
+      ],
+      "rope_shadow_intervals_t": [
+        [
+          2.2403385519658157,
+          2.3665875315852456
+        ]
+      ],
+      "shadowed_length": 0.12624897961942994,
+      "midpoint_rope_gpu": 1.0,
+      "gpu_six_sample_rope_mask": 0,
+      "cpu_six_sample_rope_mask": 0,
+      "discrete_hardware_agreement": true,
+      "weighted_rope_fraction": {
+        "6": 0.0,
+        "64": 0.04550179507488425,
+        "256": 0.053110896253272095,
+        "1024": 0.051366010324328804,
+        "4096": 0.05107323442462077
+      }
+    },
+    {
+      "quality": "current",
+      "category": "midpoint-band",
+      "pixel": [
+        1047,
+        641
+      ],
+      "aperture_index": 0,
+      "medium_t": [
+        1.1018031678435392,
+        3.635950514703216
+      ],
+      "rope_shadow_intervals_t": [
+        [
+          2.2405515039085713,
+          2.3827135905600536
+        ]
+      ],
+      "shadowed_length": 0.14216208665148233,
+      "midpoint_rope_gpu": 1.0,
+      "gpu_six_sample_rope_mask": 0,
+      "cpu_six_sample_rope_mask": 0,
+      "discrete_hardware_agreement": true,
+      "weighted_rope_fraction": {
+        "6": 0.0,
+        "64": 0.04107938813792035,
+        "256": 0.04795245371291859,
+        "1024": 0.04982269906416238,
+        "4096": 0.04916013160478685
+      }
+    },
+    {
+      "quality": "current",
+      "category": "midpoint-band",
+      "pixel": [
+        1050,
+        664
+      ],
+      "aperture_index": 0,
+      "medium_t": [
+        1.056262846653411,
+        3.4856674522619664
+      ],
+      "rope_shadow_intervals_t": [
+        [
+          2.2708620823847445,
+          2.4163881416464426
+        ]
+      ],
+      "shadowed_length": 0.14552605926169804,
+      "midpoint_rope_gpu": 1.0,
+      "gpu_six_sample_rope_mask": 0,
+      "cpu_six_sample_rope_mask": 0,
+      "discrete_hardware_agreement": true,
+      "weighted_rope_fraction": {
+        "6": 0.0,
+        "64": 0.05963953312119095,
+        "256": 0.05558934045919746,
+        "1024": 0.056609571524933455,
+        "4096": 0.05686510024720355
+      }
+    },
+    {
+      "quality": "current",
+      "category": "sample-local-continuation",
+      "pixel": [
+        940,
+        450
+      ],
+      "aperture_index": 0,
+      "medium_t": [
+        1.7187363310192099,
+        5.67182998723764
+      ],
+      "rope_shadow_intervals_t": [
+        [
+          2.046946451927585,
+          2.151628876725776
+        ]
+      ],
+      "shadowed_length": 0.10468242479819123,
+      "midpoint_rope_gpu": 0.0,
+      "gpu_six_sample_rope_mask": 1,
+      "cpu_six_sample_rope_mask": 1,
+      "discrete_hardware_agreement": true,
+      "weighted_rope_fraction": {
+        "6": 0.009924049095551668,
+        "64": 0.0025695828983089497,
+        "256": 0.002375223500995494,
+        "1024": 0.0023203261129966504,
+        "4096": 0.00235014297184188
+      }
+    },
+    {
+      "quality": "current",
+      "category": "sample-local-continuation",
+      "pixel": [
+        915,
+        513
+      ],
+      "aperture_index": 0,
+      "medium_t": [
+        1.3426111803697838,
+        4.4306169693324255
+      ],
+      "rope_shadow_intervals_t": [
+        [
+          2.1105567212271343,
+          2.2151625862267843
+        ]
+      ],
+      "shadowed_length": 0.10460586499964997,
+      "midpoint_rope_gpu": 0.0,
+      "gpu_six_sample_rope_mask": 2,
+      "cpu_six_sample_rope_mask": 2,
+      "discrete_hardware_agreement": true,
+      "weighted_rope_fraction": {
+        "6": 0.1156369144142347,
+        "64": 0.02316524912074511,
+        "256": 0.023151949120022264,
+        "1024": 0.024589858933250157,
+        "4096": 0.024949306373577465
+      }
+    },
+    {
+      "quality": "current",
+      "category": "sample-local-continuation",
+      "pixel": [
+        850,
+        556
+      ],
+      "aperture_index": 0,
+      "medium_t": [
+        1.1254458997604342,
+        3.7139715313340482
+      ],
+      "rope_shadow_intervals_t": [
+        [
+          2.200191515214257,
+          2.29501838655087
+        ]
+      ],
+      "shadowed_length": 0.09482687133661338,
+      "midpoint_rope_gpu": 0.0,
+      "gpu_six_sample_rope_mask": 4,
+      "cpu_six_sample_rope_mask": 4,
+      "discrete_hardware_agreement": true,
+      "weighted_rope_fraction": {
+        "6": 0.14961936660602448,
+        "64": 0.029314113964542032,
+        "256": 0.03631870644459252,
+        "1024": 0.0345042744581803,
+        "4096": 0.03405066960885034
+      }
+    },
+    {
+      "quality": "current",
+      "category": "sample-local-continuation",
+      "pixel": [
+        976,
+        600
+      ],
+      "aperture_index": 0,
+      "medium_t": [
+        1.1260300305177107,
+        3.7158991628653046
+      ],
+      "rope_shadow_intervals_t": [
+        [
+          2.1961206765690515,
+          2.3206253905078507
+        ]
+      ],
+      "shadowed_length": 0.12450471393879914,
+      "midpoint_rope_gpu": 0.0,
+      "gpu_six_sample_rope_mask": 4,
+      "cpu_six_sample_rope_mask": 4,
+      "discrete_hardware_agreement": true,
+      "weighted_rope_fraction": {
+        "6": 0.1361623912245384,
+        "64": 0.054621757945910315,
+        "256": 0.04096984190709604,
+        "1024": 0.04176654400585339,
+        "4096": 0.041995556604823174
+      }
+    },
+    {
+      "quality": "current",
+      "category": "sample-local-continuation",
+      "pixel": [
+        952,
+        638
+      ],
+      "aperture_index": 0,
+      "medium_t": [
+        1.016197852999934,
+        3.3534529709939047
+      ],
+      "rope_shadow_intervals_t": [
+        [
+          2.255852462275743,
+          2.3800248673504103
+        ]
+      ],
+      "shadowed_length": 0.12417240507466731,
+      "midpoint_rope_gpu": 0.0,
+      "gpu_six_sample_rope_mask": 8,
+      "cpu_six_sample_rope_mask": 8,
+      "discrete_hardware_agreement": true,
+      "weighted_rope_fraction": {
+        "6": 0.18614352278500298,
+        "64": 0.048270681261172066,
+        "256": 0.05261858220001189,
+        "1024": 0.05574217648134777,
+        "4096": 0.0551961454671937
+      }
+    },
+    {
+      "quality": "current",
+      "category": "sample-local-continuation",
+      "pixel": [
+        994,
+        670
+      ],
+      "aperture_index": 0,
+      "medium_t": [
+        0.9924014173543647,
+        3.274924732049963
+      ],
+      "rope_shadow_intervals_t": [
+        [
+          2.289191579750895,
+          2.425277368633846
+        ]
+      ],
+      "shadowed_length": 0.13608578888295098,
+      "midpoint_rope_gpu": 0.0,
+      "gpu_six_sample_rope_mask": 8,
+      "cpu_six_sample_rope_mask": 8,
+      "discrete_hardware_agreement": true,
+      "weighted_rope_fraction": {
+        "6": 0.17595454385614617,
+        "64": 0.06834054767734424,
+        "256": 0.06919578997821023,
+        "1024": 0.06605231463652805,
+        "4096": 0.06600427825649502
+      }
+    },
+    {
+      "quality": "current",
+      "category": "sample-local-continuation",
+      "pixel": [
+        1049,
+        699
+      ],
+      "aperture_index": 0,
+      "medium_t": [
+        0.9911433372486225,
+        3.2707730676315676
+      ],
+      "rope_shadow_intervals_t": [
+        [
+          2.3205756579891994,
+          2.4705140375702337
+        ]
+      ],
+      "shadowed_length": 0.1499383795810343,
+      "midpoint_rope_gpu": 0.0,
+      "gpu_six_sample_rope_mask": 8,
+      "cpu_six_sample_rope_mask": 8,
+      "discrete_hardware_agreement": true,
+      "weighted_rope_fraction": {
+        "6": 0.17048410160276092,
+        "64": 0.08940412651943987,
+        "256": 0.0755259308863144,
+        "1024": 0.07576644390926134,
+        "4096": 0.07490199472317796
+      }
+    },
+    {
+      "quality": "current",
+      "category": "sample-local-continuation",
+      "pixel": [
+        1028,
+        730
+      ],
+      "aperture_index": 0,
+      "medium_t": [
+        0.925171834941261,
+        3.053067106375648
+      ],
+      "rope_shadow_intervals_t": [
+        [
+          2.3732962466319543,
+          2.5238254708780077
+        ]
+      ],
+      "shadowed_length": 0.15052922424605342,
+      "midpoint_rope_gpu": 0.0,
+      "gpu_six_sample_rope_mask": 16,
+      "cpu_six_sample_rope_mask": 16,
+      "discrete_hardware_agreement": true,
+      "weighted_rope_fraction": {
+        "6": 0.27751990145793404,
+        "64": 0.09411909384266517,
+        "256": 0.10464871680432314,
+        "1024": 0.10497643493423053,
+        "4096": 0.10538383879707405
+      }
+    },
+    {
+      "quality": "higher",
+      "category": "midpoint-band",
+      "pixel": [
+        780,
+        550
+      ],
+      "aperture_index": 0,
+      "medium_t": [
+        1.0901557596202114,
+        3.5975140669232966
+      ],
+      "rope_shadow_intervals_t": [
+        [
+          2.2722928626765233,
+          2.3502553482351747
+        ]
+      ],
+      "shadowed_length": 0.07796248555865137,
+      "midpoint_rope_gpu": 1.0,
+      "gpu_six_sample_rope_mask": 0,
+      "cpu_six_sample_rope_mask": 0,
+      "discrete_hardware_agreement": true,
+      "weighted_rope_fraction": {
+        "6": 0.0,
+        "64": 0.029883585485297914,
+        "256": 0.030096716373833238,
+        "1024": 0.030044859903369303,
+        "4096": 0.02979078352868913
+      }
+    },
+    {
+      "quality": "higher",
+      "category": "midpoint-band",
+      "pixel": [
+        848,
+        574
+      ],
+      "aperture_index": 0,
+      "medium_t": [
+        1.0739231980216855,
+        3.5439466127521237
+      ],
+      "rope_shadow_intervals_t": [
+        [
+          2.2273427121660356,
+          2.3233270200231027
+        ]
+      ],
+      "shadowed_length": 0.09598430785706702,
+      "midpoint_rope_gpu": 1.0,
+      "gpu_six_sample_rope_mask": 0,
+      "cpu_six_sample_rope_mask": 0,
+      "discrete_hardware_agreement": true,
+      "weighted_rope_fraction": {
+        "6": 0.0,
+        "64": 0.031192455865782537,
+        "256": 0.035257843762009675,
+        "1024": 0.0391765114054189,
+        "4096": 0.03894328983245272
+      }
+    },
+    {
+      "quality": "higher",
+      "category": "midpoint-band",
+      "pixel": [
+        892,
+        591
+      ],
+      "aperture_index": 0,
+      "medium_t": [
+        1.0678832407584928,
+        3.5240147534501824
+      ],
+      "rope_shadow_intervals_t": [
+        [
+          2.218162813442019,
+          2.325197416425616
+        ]
+      ],
+      "shadowed_length": 0.1070346029835969,
+      "midpoint_rope_gpu": 0.9999999403953552,
+      "gpu_six_sample_rope_mask": 0,
+      "cpu_six_sample_rope_mask": 0,
+      "discrete_hardware_agreement": true,
+      "weighted_rope_fraction": {
+        "6": 0.0,
+        "64": 0.04620306857610571,
+        "256": 0.04214100624878929,
+        "1024": 0.042143127377379144,
+        "4096": 0.04284825499383158
+      }
+    },
+    {
+      "quality": "higher",
+      "category": "midpoint-band",
+      "pixel": [
+        909,
+        606
+      ],
+      "aperture_index": 0,
+      "medium_t": [
+        1.0471130517353855,
+        3.455473128527414
+      ],
+      "rope_shadow_intervals_t": [
+        [
+          2.2295721988329755,
+          2.3416469407901586
+        ]
+      ],
+      "shadowed_length": 0.11207474195718303,
+      "midpoint_rope_gpu": 1.0,
+      "gpu_six_sample_rope_mask": 0,
+      "cpu_six_sample_rope_mask": 0,
+      "discrete_hardware_agreement": true,
+      "weighted_rope_fraction": {
+        "6": 0.0,
+        "64": 0.04590324440227523,
+        "256": 0.046924796352759285,
+        "1024": 0.045763662332518606,
+        "4096": 0.04651066458100441
+      }
+    },
+    {
+      "quality": "higher",
+      "category": "midpoint-band",
+      "pixel": [
+        938,
+        619
+      ],
+      "aperture_index": 0,
+      "medium_t": [
+        1.0437840680871895,
+        3.4444874823046074
+      ],
+      "rope_shadow_intervals_t": [
+        [
+          2.2339789052748795,
+          2.353252305503224
+        ]
+      ],
+      "shadowed_length": 0.11927340022834443,
+      "midpoint_rope_gpu": 1.0,
+      "gpu_six_sample_rope_mask": 0,
+      "cpu_six_sample_rope_mask": 0,
+      "discrete_hardware_agreement": true,
+      "weighted_rope_fraction": {
+        "6": 0.0,
+        "64": 0.046533596718799856,
+        "256": 0.0501456501472646,
+        "1024": 0.049114880631210056,
+        "4096": 0.04882311174991952
+      }
+    },
+    {
+      "quality": "higher",
+      "category": "midpoint-band",
+      "pixel": [
+        1016,
+        630
+      ],
+      "aperture_index": 0,
+      "medium_t": [
+        1.094676615823253,
+        3.612432892642886
+      ],
+      "rope_shadow_intervals_t": [
+        [
+          2.228598971194439,
+          2.363871967007906
+        ]
+      ],
+      "shadowed_length": 0.13527299581346686,
+      "midpoint_rope_gpu": 1.0,
+      "gpu_six_sample_rope_mask": 0,
+      "cpu_six_sample_rope_mask": 0,
+      "discrete_hardware_agreement": true,
+      "weighted_rope_fraction": {
+        "6": 0.0,
+        "64": 0.04160528373478047,
+        "256": 0.04856436060457697,
+        "1024": 0.04777178294658262,
+        "4096": 0.047808504612222094
+      }
+    },
+    {
+      "quality": "higher",
+      "category": "midpoint-band",
+      "pixel": [
+        1048,
+        641
+      ],
+      "aperture_index": 0,
+      "medium_t": [
+        1.1028426880225697,
+        3.639380931351398
+      ],
+      "rope_shadow_intervals_t": [
+        [
+          2.2405149754101026,
+          2.382855146771581
+        ]
+      ],
+      "shadowed_length": 0.14234017136147825,
+      "midpoint_rope_gpu": 1.0,
+      "gpu_six_sample_rope_mask": 0,
+      "cpu_six_sample_rope_mask": 0,
+      "discrete_hardware_agreement": true,
+      "weighted_rope_fraction": {
+        "6": 0.0,
+        "64": 0.04112901472077194,
+        "256": 0.04801026627260164,
+        "1024": 0.049731567069151175,
+        "4096": 0.049303437472807805
+      }
+    },
+    {
+      "quality": "higher",
+      "category": "midpoint-band",
+      "pixel": [
+        1050,
+        664
+      ],
+      "aperture_index": 0,
+      "medium_t": [
+        1.056262846653411,
+        3.4856674522619664
+      ],
+      "rope_shadow_intervals_t": [
+        [
+          2.2708620823847445,
+          2.4163881416464426
+        ]
+      ],
+      "shadowed_length": 0.14552605926169804,
+      "midpoint_rope_gpu": 1.0,
+      "gpu_six_sample_rope_mask": 0,
+      "cpu_six_sample_rope_mask": 0,
+      "discrete_hardware_agreement": true,
+      "weighted_rope_fraction": {
+        "6": 0.0,
+        "64": 0.05963953312119095,
+        "256": 0.05558934045919746,
+        "1024": 0.056609571524933455,
+        "4096": 0.05686510024720355
+      }
+    },
+    {
+      "quality": "higher",
+      "category": "sample-local-continuation",
+      "pixel": [
+        940,
+        450
+      ],
+      "aperture_index": 0,
+      "medium_t": [
+        1.7187363310192099,
+        5.67182998723764
+      ],
+      "rope_shadow_intervals_t": [
+        [
+          2.046946451927585,
+          2.151628876725776
+        ]
+      ],
+      "shadowed_length": 0.10468242479819123,
+      "midpoint_rope_gpu": 0.0,
+      "gpu_six_sample_rope_mask": 1,
+      "cpu_six_sample_rope_mask": 1,
+      "discrete_hardware_agreement": true,
+      "weighted_rope_fraction": {
+        "6": 0.009924049095551668,
+        "64": 0.0025695828983089497,
+        "256": 0.002375223500995494,
+        "1024": 0.0023203261129966504,
+        "4096": 0.00235014297184188
+      }
+    },
+    {
+      "quality": "higher",
+      "category": "sample-local-continuation",
+      "pixel": [
+        960,
+        512
+      ],
+      "aperture_index": 0,
+      "medium_t": [
+        1.4036148940718645,
+        4.631929227916697
+      ],
+      "rope_shadow_intervals_t": [
+        [
+          2.0989390865364537,
+          2.212055289296237
+        ]
+      ],
+      "shadowed_length": 0.1131162027597834,
+      "midpoint_rope_gpu": 0.0,
+      "gpu_six_sample_rope_mask": 2,
+      "cpu_six_sample_rope_mask": 2,
+      "discrete_hardware_agreement": true,
+      "weighted_rope_fraction": {
+        "6": 0.12750039698163157,
+        "64": 0.021527141496103117,
+        "256": 0.023881283965670106,
+        "1024": 0.02329884555260044,
+        "4096": 0.02396212404738974
+      }
+    },
+    {
+      "quality": "higher",
+      "category": "sample-local-continuation",
+      "pixel": [
+        884,
+        555
+      ],
+      "aperture_index": 0,
+      "medium_t": [
+        1.1593021069891585,
+        3.8256970170577005
+      ],
+      "rope_shadow_intervals_t": [
+        [
+          2.174258405770813,
+          2.2762356585264976
+        ]
+      ],
+      "shadowed_length": 0.10197725275568459,
+      "midpoint_rope_gpu": 0.0,
+      "gpu_six_sample_rope_mask": 4,
+      "cpu_six_sample_rope_mask": 4,
+      "discrete_hardware_agreement": true,
+      "weighted_rope_fraction": {
+        "6": 0.15540297227289335,
+        "64": 0.0415750563378101,
+        "256": 0.03465013289146343,
+        "1024": 0.03390891299141837,
+        "4096": 0.03411623488107038
+      }
+    },
+    {
+      "quality": "higher",
+      "category": "sample-local-continuation",
+      "pixel": [
+        973,
+        600
+      ],
+      "aperture_index": 0,
+      "medium_t": [
+        1.122928724981658,
+        3.7056648544251383
+      ],
+      "rope_shadow_intervals_t": [
+        [
+          2.196774834378301,
+          2.3207142848965163
+        ]
+      ],
+      "shadowed_length": 0.1239394505182152,
+      "midpoint_rope_gpu": 0.0,
+      "gpu_six_sample_rope_mask": 4,
+      "cpu_six_sample_rope_mask": 4,
+      "discrete_hardware_agreement": true,
+      "weighted_rope_fraction": {
+        "6": 0.13563922366364514,
+        "64": 0.041752218883526544,
+        "256": 0.0444773163306313,
+        "1024": 0.04197295694125083,
+        "4096": 0.04217278999256941
+      }
+    },
+    {
+      "quality": "higher",
+      "category": "sample-local-continuation",
+      "pixel": [
+        950,
+        638
+      ],
+      "aperture_index": 0,
+      "medium_t": [
+        1.0144202460186387,
+        3.3475868678575065
+      ],
+      "rope_shadow_intervals_t": [
+        [
+          2.256668286267109,
+          2.3804515103503587
+        ]
+      ],
+      "shadowed_length": 0.12378322408324971,
+      "midpoint_rope_gpu": 0.0,
+      "gpu_six_sample_rope_mask": 8,
+      "cpu_six_sample_rope_mask": 8,
+      "discrete_hardware_agreement": true,
+      "weighted_rope_fraction": {
+        "6": 0.18594285463702695,
+        "64": 0.04821045564898336,
+        "256": 0.056928531146140604,
+        "1024": 0.055996249802731435,
+        "4096": 0.05521312088511955
+      }
+    },
+    {
+      "quality": "higher",
+      "category": "sample-local-continuation",
+      "pixel": [
+        994,
+        670
+      ],
+      "aperture_index": 0,
+      "medium_t": [
+        0.9924014173543647,
+        3.274924732049963
+      ],
+      "rope_shadow_intervals_t": [
+        [
+          2.289191579750895,
+          2.425277368633846
+        ]
+      ],
+      "shadowed_length": 0.13608578888295098,
+      "midpoint_rope_gpu": 0.0,
+      "gpu_six_sample_rope_mask": 8,
+      "cpu_six_sample_rope_mask": 8,
+      "discrete_hardware_agreement": true,
+      "weighted_rope_fraction": {
+        "6": 0.17595454385614617,
+        "64": 0.06834054767734424,
+        "256": 0.06919578997821023,
+        "1024": 0.06605231463652805,
+        "4096": 0.06600427825649502
+      }
+    },
+    {
+      "quality": "higher",
+      "category": "sample-local-continuation",
+      "pixel": [
+        954,
+        699
+      ],
+      "aperture_index": 0,
+      "medium_t": [
+        0.9116800834495503,
+        3.008544325708258
+      ],
+      "rope_shadow_intervals_t": [
+        [
+          2.352234222681596,
+          2.4844660928623137
+        ]
+      ],
+      "shadowed_length": 0.1322318701807177,
+      "midpoint_rope_gpu": 0.0,
+      "gpu_six_sample_rope_mask": 16,
+      "cpu_six_sample_rope_mask": 16,
+      "discrete_hardware_agreement": true,
+      "weighted_rope_fraction": {
+        "6": 0.278486353975276,
+        "64": 0.09478680421040427,
+        "256": 0.09480524430702879,
+        "1024": 0.09615203412529864,
+        "4096": 0.09548269566019851
+      }
+    },
+    {
+      "quality": "higher",
+      "category": "sample-local-continuation",
+      "pixel": [
+        1029,
+        730
+      ],
+      "aperture_index": 0,
+      "medium_t": [
+        0.9259855515238549,
+        3.0557523711431247
+      ],
+      "rope_shadow_intervals_t": [
+        [
+          2.373001354556333,
+          2.5237117665000763
+        ]
+      ],
+      "shadowed_length": 0.15071041194374324,
+      "midpoint_rope_gpu": 0.0,
+      "gpu_six_sample_rope_mask": 16,
+      "cpu_six_sample_rope_mask": 16,
+      "discrete_hardware_agreement": true,
+      "weighted_rope_fraction": {
+        "6": 0.27754012772470155,
+        "64": 0.1148836928543947,
+        "256": 0.10466801257593916,
+        "1024": 0.104674517445543,
+        "4096": 0.10540496524303883
+      }
+    }
+  ],
+  "limitations": [
+    "Selected clear-floor depth premise, not a captured actual primary scene-depth map",
+    "All selected rays use aperture point 0; not finite-area mixture or point1 validation",
+    "CPU rope-only cones omit other occluders",
+    "Density relies on zero dawn enforced by copied StageFrozenMist guard",
+    "Discrete hardware agreement supports classification, not whole-volume or GPU-quality acceptance"
+  ]
+}

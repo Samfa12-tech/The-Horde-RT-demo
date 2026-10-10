@@ -5,6 +5,8 @@
 #include <cstdint>
 #include <span>
 
+#include "gameplay/ShowcaseRoute.h"
+
 namespace horde::gameplay::simulation
 {
 
@@ -47,10 +49,12 @@ enum class GameplayEventType : std::uint8_t
     PlayerSwordDrawStarted,
     PlayerSwordAttachmentChanged,
     SkeletonEncounterWarning,
+    ParryPrepareCue,
+    LichDischargeWarning,
 };
 
 inline constexpr std::size_t kGameplayEventTypeCount =
-    static_cast<std::size_t>(GameplayEventType::SkeletonEncounterWarning) + 1u;
+    static_cast<std::size_t>(GameplayEventType::LichDischargeWarning) + 1u;
 
 struct GameplayEvent
 {
@@ -69,6 +73,9 @@ struct GameplayEvent
     float listenerYawRadians = 0.0f;
     float intensity = 1.0f;
     std::int32_t payload = 0;
+    // Appended so positional event aggregates keep their existing layout.
+    // The event-time eye baseline is replaced by Emit when route support is known.
+    float listenerY = horde::gameplay::kShowcaseEyeWorldY;
 };
 
 class BoundedGameplayEventQueue

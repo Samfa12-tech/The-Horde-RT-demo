@@ -1,0 +1,307 @@
+{
+  "candidateHead": "0eb665900c9efc95c443beada4c418776092cbe3",
+  "unsignedReleaseBuild": true,
+  "gradleLane": "offline assembleDebug assembleRelease lintDebug lintRelease plus PlayerDebugCheckpointTest, EquipmentAudioFeedbackTest, SurfaceSuspensionLifecycleTest",
+  "lint": {
+    "debug": "passed",
+    "release": "passed"
+  },
+  "tests": [
+    {
+      "name": "PlayerDebugCheckpointTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": true
+    },
+    {
+      "name": "EquipmentAudioFeedbackTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": true
+    },
+    {
+      "name": "SurfaceSuspensionLifecycleTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": true
+    }
+  ],
+  "packages": [
+    {
+      "variant": "debug",
+      "apk": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "bytes": 128769627,
+      "sha256": "1bd0611a6a25030c7025e49e181e186aff441a1e4f8ef52081afa5532bd4886c"
+    },
+    {
+      "variant": "release-unsigned",
+      "apk": "android/app/build/outputs/apk/release/app-release-unsigned.apk",
+      "bytes": 121091466,
+      "sha256": "301eea931fb4f502caac634fb0ca05ee47e083d2fd716d87b9cddbbd1312b881"
+    }
+  ],
+  "libraryChecks": [
+    {
+      "abi": "arm64-v8a",
+      "apkEntry": "lib/arm64-v8a/libhorde_rt_probe_android.so",
+      "apkEntryBytes": 4567872,
+      "apkEntrySha256": "b88eb2d8d4cddb4e319dd515a439904b92306afd8715c0e9e3b63d0a1e1deca8",
+      "strippedLibrary": "android/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/arm64-v8a/libhorde_rt_probe_android.so",
+      "strippedBytes": 4567872,
+      "strippedSha256": "b88eb2d8d4cddb4e319dd515a439904b92306afd8715c0e9e3b63d0a1e1deca8",
+      "entryMatchesStripped": true,
+      "elfClass": "ELF64",
+      "elfData": "2's complement, little endian",
+      "elfMachine": "AArch64",
+      "loadAlignments": [
+        "0x4000",
+        "0x4000",
+        "0x4000"
+      ],
+      "loadAlignment16KiB": true
+    },
+    {
+      "abi": "armeabi-v7a",
+      "apkEntry": "lib/armeabi-v7a/libhorde_rt_probe_android.so",
+      "apkEntryBytes": 4019880,
+      "apkEntrySha256": "4f4cba5d1d773ff3f618e4a85348c46a06b391c9d3f92d1c3685241e170e55e3",
+      "strippedLibrary": "android/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/armeabi-v7a/libhorde_rt_probe_android.so",
+      "strippedBytes": 4019880,
+      "strippedSha256": "4f4cba5d1d773ff3f618e4a85348c46a06b391c9d3f92d1c3685241e170e55e3",
+      "entryMatchesStripped": true,
+      "elfClass": "ELF32",
+      "elfData": "2's complement, little endian",
+      "elfMachine": "ARM",
+      "loadAlignments": [
+        "0x4000",
+        "0x4000",
+        "0x4000"
+      ],
+      "loadAlignment16KiB": true
+    },
+    {
+      "abi": "x86",
+      "apkEntry": "lib/x86/libhorde_rt_probe_android.so",
+      "apkEntryBytes": 4973936,
+      "apkEntrySha256": "48daec5f5eb690036a7298625deecee5d3a749cedbd398885e5231aeddf00ac6",
+      "strippedLibrary": "android/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/x86/libhorde_rt_probe_android.so",
+      "strippedBytes": 4973936,
+      "strippedSha256": "48daec5f5eb690036a7298625deecee5d3a749cedbd398885e5231aeddf00ac6",
+      "entryMatchesStripped": true,
+      "elfClass": "ELF32",
+      "elfData": "2's complement, little endian",
+      "elfMachine": "Intel 80386",
+      "loadAlignments": [
+        "0x4000",
+        "0x4000",
+        "0x4000"
+      ],
+      "loadAlignment16KiB": true
+    },
+    {
+      "abi": "x86_64",
+      "apkEntry": "lib/x86_64/libhorde_rt_probe_android.so",
+      "apkEntryBytes": 4725088,
+      "apkEntrySha256": "a74773b9dcb66d05c39787fef72dd7f466df5db28d5c262d1981685c6c581052",
+      "strippedLibrary": "android/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/x86_64/libhorde_rt_probe_android.so",
+      "strippedBytes": 4725088,
+      "strippedSha256": "a74773b9dcb66d05c39787fef72dd7f466df5db28d5c262d1981685c6c581052",
+      "entryMatchesStripped": true,
+      "elfClass": "ELF64",
+      "elfData": "2's complement, little endian",
+      "elfMachine": "Advanced Micro Devices X86-64",
+      "loadAlignments": [
+        "0x4000",
+        "0x4000",
+        "0x4000"
+      ],
+      "loadAlignment16KiB": true
+    },
+    {
+      "abi": "arm64-v8a",
+      "apkEntry": "lib/arm64-v8a/libhorde_rt_probe_android.so",
+      "apkEntryBytes": 4378152,
+      "apkEntrySha256": "d926c93bc1f739b0acc88721d22be412deb83422af368d4d1b82aa1cbf9e1b46",
+      "strippedLibrary": "android/app/build/intermediates/stripped_native_libs/release/stripReleaseDebugSymbols/out/lib/arm64-v8a/libhorde_rt_probe_android.so",
+      "strippedBytes": 4378152,
+      "strippedSha256": "d926c93bc1f739b0acc88721d22be412deb83422af368d4d1b82aa1cbf9e1b46",
+      "entryMatchesStripped": true,
+      "elfClass": "ELF64",
+      "elfData": "2's complement, little endian",
+      "elfMachine": "AArch64",
+      "loadAlignments": [
+        "0x4000",
+        "0x4000",
+        "0x4000"
+      ],
+      "loadAlignment16KiB": true
+    },
+    {
+      "abi": "armeabi-v7a",
+      "apkEntry": "lib/armeabi-v7a/libhorde_rt_probe_android.so",
+      "apkEntryBytes": 3865076,
+      "apkEntrySha256": "0d5939b353576601f2a6ae0d1bdf12fee20ee5d931c32254127e5b13ecf21795",
+      "strippedLibrary": "android/app/build/intermediates/stripped_native_libs/release/stripReleaseDebugSymbols/out/lib/armeabi-v7a/libhorde_rt_probe_android.so",
+      "strippedBytes": 3865076,
+      "strippedSha256": "0d5939b353576601f2a6ae0d1bdf12fee20ee5d931c32254127e5b13ecf21795",
+      "entryMatchesStripped": true,
+      "elfClass": "ELF32",
+      "elfData": "2's complement, little endian",
+      "elfMachine": "ARM",
+      "loadAlignments": [
+        "0x4000",
+        "0x4000",
+        "0x4000"
+      ],
+      "loadAlignment16KiB": true
+    },
+    {
+      "abi": "x86",
+      "apkEntry": "lib/x86/libhorde_rt_probe_android.so",
+      "apkEntryBytes": 4741276,
+      "apkEntrySha256": "913c261750313dc7b8f78ee2d1528f367a6ab6dda0b655aa04cd0dfde7a2b6ac",
+      "strippedLibrary": "android/app/build/intermediates/stripped_native_libs/release/stripReleaseDebugSymbols/out/lib/x86/libhorde_rt_probe_android.so",
+      "strippedBytes": 4741276,
+      "strippedSha256": "913c261750313dc7b8f78ee2d1528f367a6ab6dda0b655aa04cd0dfde7a2b6ac",
+      "entryMatchesStripped": true,
+      "elfClass": "ELF32",
+      "elfData": "2's complement, little endian",
+      "elfMachine": "Intel 80386",
+      "loadAlignments": [
+        "0x4000",
+        "0x4000",
+        "0x4000"
+      ],
+      "loadAlignment16KiB": true
+    },
+    {
+      "abi": "x86_64",
+      "apkEntry": "lib/x86_64/libhorde_rt_probe_android.so",
+      "apkEntryBytes": 4526120,
+      "apkEntrySha256": "a22d79203758fc717d2d9e681ca2422afb0c54887422f83ef9efd987c7208a58",
+      "strippedLibrary": "android/app/build/intermediates/stripped_native_libs/release/stripReleaseDebugSymbols/out/lib/x86_64/libhorde_rt_probe_android.so",
+      "strippedBytes": 4526120,
+      "strippedSha256": "a22d79203758fc717d2d9e681ca2422afb0c54887422f83ef9efd987c7208a58",
+      "entryMatchesStripped": true,
+      "elfClass": "ELF64",
+      "elfData": "2's complement, little endian",
+      "elfMachine": "Advanced Micro Devices X86-64",
+      "loadAlignments": [
+        "0x4000",
+        "0x4000",
+        "0x4000"
+      ],
+      "loadAlignment16KiB": true
+    }
+  ],
+  "arm64ShaderPackageScans": [
+    {
+      "variant": "debug",
+      "inspector": "tools/InspectAndroidRtPipelineBundlePackage.ps1",
+      "externalValidation": "spirv-val and spirv-dis passed",
+      "strippedSha256": "b88eb2d8d4cddb4e319dd515a439904b92306afd8715c0e9e3b63d0a1e1deca8",
+      "packagedSha256": "b88eb2d8d4cddb4e319dd515a439904b92306afd8715c0e9e3b63d0a1e1deca8",
+      "semanticKeys": [
+        "diagnostic_mobile_generic_dielectric",
+        "diagnostic_mobile_opaque_fast",
+        "rayquery_compute_diagnostic_mobile_generic_dielectric",
+        "rayquery_compute_diagnostic_mobile_opaque_fast"
+      ],
+      "modules": [
+        {
+          "backend": "RayQueryCompute",
+          "executionModel": "GLCompute",
+          "sha256": "a48b9bb85102c62a1695d62b98ed4cdd4075d2343b1366e79e9e42e7f26aa945",
+          "words": 148406,
+          "rayQueryCapability": true,
+          "rayQueryInitializations": 27
+        },
+        {
+          "backend": "RayQueryCompute",
+          "executionModel": "GLCompute",
+          "sha256": "c26dd2ce36c68f02ef22df49e3f08a7612f80a0a84d8cd696a474af667f85451",
+          "words": 73677,
+          "rayQueryCapability": true,
+          "rayQueryInitializations": 2
+        },
+        {
+          "backend": "RayTracingPipeline",
+          "executionModel": "RayGenerationKHR",
+          "sha256": "d50c9d0e5bb65f5dd8ccf6f63ea81ca0952cc24f4883c8be21c02b4805ad5af3",
+          "words": 148105,
+          "rayQueryCapability": true,
+          "rayQueryInitializations": 27
+        },
+        {
+          "backend": "RayTracingPipeline",
+          "executionModel": "RayGenerationKHR",
+          "sha256": "70afd1988fe149b35857616520df843a670f3f59c921957d4fdc0a17c657cf42",
+          "words": 73615,
+          "rayQueryCapability": true,
+          "rayQueryInitializations": 2
+        }
+      ]
+    },
+    {
+      "variant": "release-unsigned",
+      "inspector": "tools/InspectAndroidRtPipelineBundlePackage.ps1",
+      "externalValidation": "spirv-val and spirv-dis passed",
+      "strippedSha256": "d926c93bc1f739b0acc88721d22be412deb83422af368d4d1b82aa1cbf9e1b46",
+      "packagedSha256": "d926c93bc1f739b0acc88721d22be412deb83422af368d4d1b82aa1cbf9e1b46",
+      "semanticKeys": [
+        "shipping_mobile_generic_dielectric",
+        "shipping_mobile_opaque_fast",
+        "rayquery_compute_shipping_mobile_generic_dielectric",
+        "rayquery_compute_shipping_mobile_opaque_fast"
+      ],
+      "modules": [
+        {
+          "backend": "RayQueryCompute",
+          "executionModel": "GLCompute",
+          "sha256": "d05eec30c1fbdc256a34856c1a87f8f5789137ea79d04027bcaa059259565e64",
+          "words": 147347,
+          "rayQueryCapability": true,
+          "rayQueryInitializations": 27
+        },
+        {
+          "backend": "RayQueryCompute",
+          "executionModel": "GLCompute",
+          "sha256": "72b03e6bce4b3800a686a106290647af078a119c5da38c7d4cce870477df86d0",
+          "words": 71470,
+          "rayQueryCapability": true,
+          "rayQueryInitializations": 2
+        },
+        {
+          "backend": "RayTracingPipeline",
+          "executionModel": "RayGenerationKHR",
+          "sha256": "ae779d534970ecb0c2e21289c07ddde58f239ea1906e36d7046323f4b7f249d9",
+          "words": 147046,
+          "rayQueryCapability": true,
+          "rayQueryInitializations": 27
+        },
+        {
+          "backend": "RayTracingPipeline",
+          "executionModel": "RayGenerationKHR",
+          "sha256": "009e1b37a9b3459ca3c1d900a0741c6bc6041288f759d2367e07fd7542889c9a",
+          "words": 71408,
+          "rayQueryCapability": true,
+          "rayQueryInitializations": 2
+        }
+      ]
+    }
+  ],
+  "coverageLimit": "All-ABI checks establish APK-entry-to-stripped-library SHA-256 identity and ELF headers/LOAD alignment only. Pipeline and RayQuery SPIR-V package inspection was ARM64-only.",
+  "rawLogs": [
+    "reports/shader-budget-admission/android-gradle.log",
+    "reports/shader-budget-admission/android-debug-arm64-package.log",
+    "reports/shader-budget-admission/android-release-arm64-package.log"
+  ],
+  "originalBuildLaneTestTaskStatus": "UP-TO-DATE; original selected XMLs were prior results.",
+  "freshSelectedJavaTask": "Executed separately with task-specific --rerun; 14 passed, zero failures/errors/skips. See android-fresh-java-evidence.json."
+}

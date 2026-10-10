@@ -230,3 +230,7 @@ The existing Pixabay licence/provenance applies to this integrated derivative;
 it is excluded from Windows runtime packaging. Exact-candidate repeated-loop
 listening and Android output/lifecycle acceptance remain pending. The change is
 not evidence that the former MediaPlayer issue was reproduced or diagnosed.
+
+### Original development rescue blockout (1.7 journey)
+
+`assets/source/development-rescue/` contains original shaft, coping, lid and landing geometry authored locally from `src/scene/RescueBlockoutGeometry.h` through installed Blender 5.2. No third-party geometry was acquired. Editable Blender and GLB roundtrip sources remain outside runtime packaging; the renderer consumes the verified shared geometry recipe. Existing Poly Haven CC0 DryStone (world layer 0) and MossyStone (layer 2) maps retain their original attribution and exact byte identities in the source manifest. Native import and source admission are engineering checks, not artistic/device acceptance or new redistribution rights. The temporary outdoor skeleton reuses the already-admitted runtime model and its existing licence entry; it is a render workload witness, not Kit or a new enemy roster entry. Outstanding Hotstrike/Meshy public redistribution questions remain unresolved.

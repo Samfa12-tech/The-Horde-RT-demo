@@ -1,0 +1,473 @@
+{
+  "schema": 1,
+  "recorded_utc": "2026-10-10T01:14:53.610869+00:00",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "pull_request": "https://github.com/Samfa12-tech/The-Horde-RT-demo/pull/27",
+  "starting_source": "2c83515d38f84f91510f61ab30f94c8b216565db",
+  "runtime_candidate": "1a0205efcb423a3df527f617cf2fe48034116cb3",
+  "test_corrections": [
+    "8cc0b9a7a197293764f353ce5e4995aaae06f05a",
+    "f01d02dcc77efc27993b2c8b273915667993da57"
+  ],
+  "status": {
+    "host_package": "READY",
+    "physical_device": "NOT VERIFIED",
+    "owner_audio_haptic": "PENDING",
+    "wp3_budget_acceptance": "OPEN",
+    "exact_final_commit_ci": "Verify externally after this evidence commit; no recursive self identity."
+  },
+  "constraints": {
+    "shader_abi_budgets_unchanged": true,
+    "original_torch_test_and_180_seconds_unchanged": true,
+    "no_game_or_device_launch": true,
+    "no_new_asset_acquisition": true,
+    "production_demo_preserved": true,
+    "no_merge_release_signing": true
+  },
+  "source_provenance": "source-path-manifest.json",
+  "artifacts": "candidate-artifacts.json",
+  "shader_identities": "shader-identities.json",
+  "android_package_coverage": {
+    "all_four_abis": "Build Debug/unsigned Release, exact packaged/stripped ELF identities and alignment verified.",
+    "shader_payload_inspection": "ARM64 only, Diagnostic/Mobile and Shipping/Mobile, Pipeline and Query.",
+    "catalogue_freshness": "All eight Pipeline and eight Query plus compatibility, host compile/validation only."
+  },
+  "host_results": {
+    "focused_journey": {
+      "passed": 6,
+      "traversal_checks": 23587,
+      "integration_checks": 19397,
+      "rig_checks": 15438,
+      "actual_rig_poses": 912,
+      "complete_traversal_cycles": 2
+    },
+    "debug_selected": {
+      "initial_passed": 52,
+      "initial_failed": 1,
+      "selected": 53,
+      "failure": "MSVC test-fixture stack overflow; test-only correction; same registered test now passes.",
+      "rerun": "simulation-heap-debug-final.log"
+    },
+    "release_selected": {
+      "passed": 48,
+      "failed": 0
+    },
+    "registry": "Initial local/CI outdated registry count failed; corrected explicit rescue 192 plus unknown 193/name and shipping negatives; registered Debug/Release pass.",
+    "java": {
+      "suites": 40,
+      "tests": 269,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "final_refresh": "Unchanged JVM inputs cached; first run executed checks."
+    },
+    "android": "Four ABI Debug/unsigned Release and regular lintDebug/lintRelease pass; no installed candidate or device inference."
+  },
+  "torch": {
+    "historical_base": {
+      "test_seconds": 168.67,
+      "deadline_seconds": 180,
+      "margin_seconds": 11.33,
+      "status": "Historical, not this job."
+    },
+    "fresh_debug": {
+      "test_seconds": 171.46,
+      "ctest_total_seconds": 171.47,
+      "outer_seconds": 171.50415929999872,
+      "margin_seconds": 8.54,
+      "exit_code": 0,
+      "log": "torch-debug-final.log"
+    },
+    "fresh_release": {
+      "test_seconds": 15.31,
+      "ctest_total_seconds": 15.33,
+      "outer_seconds": 15.360867499999586,
+      "exit_code": 0,
+      "log": "torch-release-final.log"
+    },
+    "coverage": {
+      "poses": 3287,
+      "roof_skinned_poses": 1812,
+      "plane_samples": 3178,
+      "disk_samples": 57970,
+      "failures": 0
+    },
+    "qualification": "One pass does not establish repeatability/performance headroom. Debug run overlapped documentation only; native/source inputs unchanged."
+  },
+  "approved_compromise": "M/F original geometry markers only; retain real dungeon mist. No outdoor effects/cost admission. Later representative combined physical measurement required.",
+  "cpu_comparison": {
+    "resident_ns": 204200,
+    "staged_ns": 190900,
+    "retained_bytes_each": 48480,
+    "peak_old_new_capacity_bytes_each": 71232,
+    "route_triangles": 1010,
+    "marker_triangles_included": 76,
+    "rope_triangles_separate": 176,
+    "lid_triangles_separate": 12,
+    "conclusion": "Single CPU vector preparation sample; both modes GPU resident; not GPU cost/residency policy."
+  },
+  "preserved_failures": [
+    {
+      "label": "configure-debug",
+      "exit_code": 1,
+      "log": "./configure-debug.log"
+    },
+    {
+      "label": "build-debug-first",
+      "exit_code": 1,
+      "log": "./build-debug-first.log"
+    },
+    {
+      "label": "build-debug-integration",
+      "exit_code": 1,
+      "log": "./build-debug-integration.log"
+    },
+    {
+      "label": "rescue-input-red",
+      "exit_code": 8,
+      "log": "./rescue-input-red.log"
+    },
+    {
+      "label": "build-debug-rescue-green",
+      "exit_code": 1,
+      "log": "./build-debug-rescue-green.log"
+    },
+    {
+      "label": "build-debug-rescue-rig-fix",
+      "exit_code": 1,
+      "log": "./build-debug-rescue-rig-fix.log"
+    },
+    {
+      "label": "build-debug-rescue-syntax-final",
+      "exit_code": 1,
+      "log": "./build-debug-rescue-syntax-final.log"
+    },
+    {
+      "label": "rescue-focused-current",
+      "exit_code": 8,
+      "log": "./rescue-focused-current.log"
+    },
+    {
+      "label": "rescue-handoff-current",
+      "exit_code": 8,
+      "log": "./rescue-handoff-current.log"
+    },
+    {
+      "label": "rescue-ownership",
+      "exit_code": 8,
+      "log": "./rescue-ownership.log"
+    },
+    {
+      "label": "build-debug-regrip",
+      "exit_code": 1,
+      "log": "./build-debug-regrip.log"
+    },
+    {
+      "label": "build-debug-repeat-fix",
+      "exit_code": 1,
+      "log": "./build-debug-repeat-fix.log"
+    },
+    {
+      "label": "rescue-regrip",
+      "exit_code": 8,
+      "log": "./rescue-regrip.log"
+    },
+    {
+      "label": "rescue-regrip-interval",
+      "exit_code": 8,
+      "log": "./rescue-regrip-interval.log"
+    },
+    {
+      "label": "rescue-final-regrip",
+      "exit_code": 8,
+      "log": "./rescue-final-regrip.log"
+    },
+    {
+      "label": "android-journey-build",
+      "exit_code": 1,
+      "log": "./android-journey-build.log"
+    },
+    {
+      "label": "rope-regrip-diagnosis",
+      "exit_code": 8,
+      "log": "./rope-regrip-diagnosis.log"
+    },
+    {
+      "label": "affected-debug-source-checkpoint",
+      "exit_code": 8,
+      "log": "./affected-debug-source-checkpoint.log"
+    },
+    {
+      "label": "registry-red-local",
+      "exit_code": 8,
+      "log": "./registry-red-local.log"
+    },
+    {
+      "label": "affected-debug-regex-corrected",
+      "exit_code": 8,
+      "log": "./affected-debug-regex-corrected.log"
+    },
+    {
+      "label": "simulation-gameplay-crash-reproduction",
+      "exit_code": 3221225725,
+      "log": "./simulation-gameplay-crash-reproduction.log"
+    }
+  ],
+  "run_identity_qualification": "Each row retains start/end HEAD, diff identity and changed-during-run flag. Native inputs remain runtime_candidate after two test-only corrections. Public logs are resanitized, with public/local sanitized hashes kept separately. Original raw logs remain private. Source manifest Git blobs refer to f01d02; hydrated report bytes include subsequent documented evidence edits; GLB Git blobs are LFS pointers.",
+  "pending": [
+    "Windows/Android exact-backend successful RT presentation and paired ground/raised captures",
+    "Repeat rope travel with physical hands/equipment/flame/light, roof/wall clearance and retained secondary contributors",
+    "Windows focus/resize/restart and Android orientation/background/surface/non-destructive reconstruction",
+    "Owner audio/haptic feel",
+    "Actual outdoor mist/fireflies and representative final combined GPU workload/budgets",
+    "Dedicated directional/climbing clips",
+    "Existing temporary actor redistribution entitlement remains unresolved; local reuse is not new rights",
+    "Arbitrary 3D shaft sword occlusion and deferred mesh calibration remain unproven"
+  ],
+  "log_manifest": [
+    {
+      "path": "./configure-debug.log",
+      "sha256": "f43612c31e263a7c6db9b70b5f67aaab9abc19cf5d26ce70471b01cdf95e856f"
+    },
+    {
+      "path": "./configure-debug-fixed.log",
+      "sha256": "19c53f5964b9a4f294f7ad5909a578ecf071022ad36c685ba3d088af78602eaf"
+    },
+    {
+      "path": "./build-debug-first.log",
+      "sha256": "3da986a18524f0490833a3112e5ff56ffe81cc64cb1fcc5e2b5390e9878d094b"
+    },
+    {
+      "path": "./configure-debug-integration.log",
+      "sha256": "6958e70e9281d6453e6b8699db62e9bc605d54ce5fd009e79052cf8d6f18034c"
+    },
+    {
+      "path": "./build-debug-integration.log",
+      "sha256": "ef59eb2d8e9ab0139d5731787837c0fd5c15009267960d461cce0d15495cf825"
+    },
+    {
+      "path": "./build-debug-import-fixed.log",
+      "sha256": "c104bd6b41c7993548f825707832e35646dc8e221b68cd2822948b4ddfc4ac09"
+    },
+    {
+      "path": "./rescue-integration-first.log",
+      "sha256": "120aee8312a0241456e18fad76c296025ce0ddb6edf627db824659182191ba02"
+    },
+    {
+      "path": "./build-rescue-input-red.log",
+      "sha256": "4dddeaa76de1d4bfa2cd5c20761caaea3370d6dbe0d8de0eb16b968c5c044bde"
+    },
+    {
+      "path": "./rescue-input-red.log",
+      "sha256": "88eec54af3267130055e40eba85998a0f14c761a4cde2d286505cff6319bc333"
+    },
+    {
+      "path": "./configure-debug-rig.log",
+      "sha256": "09eda9a26e9056b91ebad817328e598c91f9bf17832a52da4b4c8077ebbc248e"
+    },
+    {
+      "path": "./build-debug-rescue-green.log",
+      "sha256": "4ad0d4b55a0182b5d19daf0592cad9e4f8d2abef23f642b421872a3d199872c0"
+    },
+    {
+      "path": "./build-debug-rescue-rig-fix.log",
+      "sha256": "fa94444ef435908115bfb83150a505d8056b302c54f5f71d9bb5d374e3cffc4d"
+    },
+    {
+      "path": "./build-debug-rescue-syntax-final.log",
+      "sha256": "5418ff1e889981c58aa0edc3f0885783c5967024eb4e01cdfc0543d580ab46ef"
+    },
+    {
+      "path": "./build-debug-rescue-ready.log",
+      "sha256": "7f88d3d4d603cfb64a998a01d7fa81a1399186ed0e05f2cc858c5ecdf536751f"
+    },
+    {
+      "path": "./rescue-focused-current.log",
+      "sha256": "ae0ab3e5382172456f787904305957409eccf250ea6d9b83487b00f0c199ab26"
+    },
+    {
+      "path": "./build-debug-handoff-host.log",
+      "sha256": "b98f40d6d3be49fe9aaa6a3350d5a2b327d239a731240b26154478bb293904d8"
+    },
+    {
+      "path": "./rescue-handoff-current.log",
+      "sha256": "2bb0bd90cc6ba9607a95b09174e5091234f26b1859700848c9d15392e7917efa"
+    },
+    {
+      "path": "./build-debug-ownership.log",
+      "sha256": "3a136f7bdf191ba7fc732ee0bca483c6bddcc03bd2c8bad3deeef9c91fc4dfa1"
+    },
+    {
+      "path": "./rescue-ownership.log",
+      "sha256": "cf91ba2c4ba06358ba7060cbea4c33c191ddd981678f7782bd3efc779a57d41b"
+    },
+    {
+      "path": "./registered-tests.log",
+      "sha256": "7a53b707814c86ee776c6bf7f769bea5feef857e0af9ab8402dbb7025c2d19b0"
+    },
+    {
+      "path": "./build-debug-regrip.log",
+      "sha256": "22f6f3066b22444656ab35d85cf1a2a1ab09b7223e6308ef565a275c369ae77e"
+    },
+    {
+      "path": "./build-debug-repeat-fix.log",
+      "sha256": "c91337854dff2a2fd108d9b2fa398d306470f0377720a5f6908657950a911bd1"
+    },
+    {
+      "path": "./build-debug-repeat-declaration.log",
+      "sha256": "8c1fe61eed94c3e18cbc00a1fabe856f41d40c924632886feafc999d02b1f346"
+    },
+    {
+      "path": "./rescue-regrip.log",
+      "sha256": "9661314437471bb27af043389652016ad78eabc2e8a4a872c53cedbbde11abf9"
+    },
+    {
+      "path": "./build-debug-regrip-interval.log",
+      "sha256": "b9762c4ede15fabde3c2c60150edc43c3a60069b20b49616ee9b955019813154"
+    },
+    {
+      "path": "./rescue-regrip-interval.log",
+      "sha256": "f8689b71ae5b3eb74676a0b86a6c969a44581e506b22e99b842100a6fe16f1ad"
+    },
+    {
+      "path": "./build-debug-final-regrip.log",
+      "sha256": "38201f8996095ddd9139dcbf88c2512a3489c929bd4cef3fa7329a17af81ef5c"
+    },
+    {
+      "path": "./rescue-final-regrip.log",
+      "sha256": "886b4f7288630bf3275e01598d134e63c681d6b35122ad3aefd2f3c014fbf058"
+    },
+    {
+      "path": "./android-journey-build.log",
+      "sha256": "9a2eb1e824c8f49b34fc8463daf8b2a26b21a50966634774d94061bce208b18e"
+    },
+    {
+      "path": "./rope-regrip-diagnosis-build.log",
+      "sha256": "6dbbff191093b62a516780fe0bfcc18a026337075313ca1108a638b7bb41ed9b"
+    },
+    {
+      "path": "./rope-regrip-diagnosis.log",
+      "sha256": "3a990e4c659e3135091b868cd573e882ad0a913599d246d60d860e77f8148a4b"
+    },
+    {
+      "path": "./configure-release-journey.log",
+      "sha256": "fdbd6de36f66027f972363474e9a2570a4edf1bcef17fc0dbf331cac36492e06"
+    },
+    {
+      "path": "./rope-regrip-scaled-build.log",
+      "sha256": "b0814d866a82accd5c07265a6b886a3436c0802cb4d8c712adc8235fc598855e"
+    },
+    {
+      "path": "./rope-regrip-scaled-test.log",
+      "sha256": "b64f56262715a4c441f81eef1728bddb7900892e355188f5b20826ccce8c324b"
+    },
+    {
+      "path": "./android-journey-build-path-corrected.log",
+      "sha256": "f2512ae978d13b98ae8cac3bc362c25164faad04daa4d27a70b5730a941adb55"
+    },
+    {
+      "path": "./rope-regrip-rig-build.log",
+      "sha256": "ffff65f55ee1da73a8375c3d8bd817167e59656acbb6042e08af182c251db970"
+    },
+    {
+      "path": "./build-debug-journey-final.log",
+      "sha256": "4d6e66ed5fb7d4d36c61960d8236c5ea687203123369cf0ae5c483a57ee084ca"
+    },
+    {
+      "path": "./rescue-green-candidate.log",
+      "sha256": "d3ed1aa34b3b1a42367b43c23e8e62b17674b8c03ed3a7cd0ba6fd4df653db35"
+    },
+    {
+      "path": "./build-debug-source-checkpoint.log",
+      "sha256": "082d083b7495335f23e71a95fd8242d9611d41af06b2b577165dc98586f453c5"
+    },
+    {
+      "path": "./affected-debug-source-checkpoint.log",
+      "sha256": "945daef18a873db057aa6f2b7dabdf2d2b0b1a62d8e757b6e0afb702a58071dc"
+    },
+    {
+      "path": "./build-release-source-checkpoint.log",
+      "sha256": "b6459141098ef34d02037b2ae99695540f2f2100afb0f8554a30923c04b230cc"
+    },
+    {
+      "path": "./android-source-checkpoint.log",
+      "sha256": "4202182b9c25a615e128bc7dabc374fb526b84564bf64325aea710aad204a701"
+    },
+    {
+      "path": "./android-all-abi-identities.log",
+      "sha256": "f46b2be24f7c47f346372e6e1885874b9c83da2c2b02b2f73a92a67fd0a55ef9"
+    },
+    {
+      "path": "./android-release-arm64-package.log",
+      "sha256": "487ab3f22a59e27b5c4484fb4be3e250bdee00dcefe6a8704a6a845efbb3c85a"
+    },
+    {
+      "path": "./android-debug-arm64-package.log",
+      "sha256": "d29dd3c906e8ba57f5db0df72b7528508b66d2b39cb51bf0d922edca4674ba59"
+    },
+    {
+      "path": "./registry-red-local.log",
+      "sha256": "823d4ae394bbf8598e08b11003f426cc8c4f9717bc4e7db74b3fe5ee58e7af32"
+    },
+    {
+      "path": "./registry-build-debug.log",
+      "sha256": "bf101dc08652a4b903b1315d7f21dddf026ee2f360cb17a7d7276ea1756232fb"
+    },
+    {
+      "path": "./registry-build-release.log",
+      "sha256": "a403cf761a5b23838e793b7c906f3b459847217401dff3d1c3c8f6288661f6be"
+    },
+    {
+      "path": "./affected-release-source-checkpoint.log",
+      "sha256": "2ddd1921774ff0752ac2a5a5c4519432381c0f89e8a4a44a244b89c6f243f948"
+    },
+    {
+      "path": "./registry-direct-debug.log",
+      "sha256": "ef2dee52b4648d3d11aa6efc3880df640d4a59002a18f0c0c77395a6e6c203d5"
+    },
+    {
+      "path": "./registry-direct-release.log",
+      "sha256": "ef2dee52b4648d3d11aa6efc3880df640d4a59002a18f0c0c77395a6e6c203d5"
+    },
+    {
+      "path": "./registry-registered-release.log",
+      "sha256": "45a96db140596b9f08680743a371f310b9f1fbf5488422fab6159aa7d047affd"
+    },
+    {
+      "path": "./affected-debug-regex-corrected.log",
+      "sha256": "cf640b58f2960608f6193075e1a89449a0c340c93956b45796b9819da1362270"
+    },
+    {
+      "path": "./simulation-gameplay-crash-reproduction.log",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "path": "./registry-registered-debug.log",
+      "sha256": "ea6f3dacaa05444acf4945317f7895a1a4718b12b71777831253a46fb83e2393"
+    },
+    {
+      "path": "./simulation-heap-build-debug.log",
+      "sha256": "29e0cff351f06c15a049f313331f2501fc9087576d35699c7569bd4f02445bd1"
+    },
+    {
+      "path": "./simulation-heap-debug-final.log",
+      "sha256": "5a5e5b2f32cbe47a3c6f9db57a311db4ef2cb0b70f23e7a98ecb9b8eca5e5eb9"
+    },
+    {
+      "path": "./simulation-heap-build-release.log",
+      "sha256": "838cf5dc7e7c218dc76c6b648501d16adf48aa58c7acbed681e6ed38e3a96151"
+    },
+    {
+      "path": "./simulation-heap-release-final.log",
+      "sha256": "0c7b35641ecbc1d1303b62a30fd4fad5e0d1921a2adcfa09f008004366bea304"
+    },
+    {
+      "path": "./torch-debug-final.log",
+      "sha256": "1026f2c59d42996b4fa168cebc3c19ac84159ce523b4e7df8ca1ec53a594b2d2"
+    },
+    {
+      "path": "./torch-release-final.log",
+      "sha256": "e307b5398ad7936924f7702e0c0510805f5ba3ea78a0fb1be7f385cd98073597"
+    }
+  ]
+}

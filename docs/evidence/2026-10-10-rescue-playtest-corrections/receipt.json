@@ -1,0 +1,280 @@
+{
+  "source_commit": "53347791b0bd1331219651b01ea3012bafcab26d",
+  "previous_checkpoint": "64a98f718c76aeaa27ad2658c7cc4004948e28de",
+  "feature_source_commit": "b9f85e11f3580d1a821a8e1cf3d529b1e6f496d2",
+  "windows_type_correction": "53347791b0bd1331219651b01ea3012bafcab26d",
+  "status": "HOST/PACKAGE-READY; physical visual blocker remains open",
+  "device_verified": false,
+  "owner_audio_haptic_acceptance": "PENDING",
+  "audio_haptic_manual_revalidation_required": true,
+  "WP3_budget_acceptance": "OPEN",
+  "player_general_falling_gravity": "NOT IMPLEMENTED",
+  "rope_gravity_m_per_s2": -9.81,
+  "prethrow_voice_subtitle_interval_seconds": 2.0,
+  "Kit_voice_subtitle_integration": "LATER; no added on-screen warning",
+  "unchanged": [
+    "shader source",
+    "shader ABI",
+    "generated shader packages/catalogues",
+    "frozen budgets",
+    "assets",
+    "production default scene/route",
+    "original full torch test and 180-second gate",
+    "historical evidence",
+    "Android mappings"
+  ],
+  "required_runs": [
+    {
+      "label": "playtest-build-debug-corrected",
+      "source_head": "53347791b0bd1331219651b01ea3012bafcab26d",
+      "exit_code": 0,
+      "elapsed_seconds": 14.951737800001865,
+      "log": "./playtest-build-debug-corrected.log",
+      "log_sha256": "0da0865e4d35e6333d98305d982aa4a259fe6b0e287bd286a8fd9fe7e7052e17",
+      "source_unchanged_during_run": true
+    },
+    {
+      "label": "playtest-build-release-corrected",
+      "source_head": "53347791b0bd1331219651b01ea3012bafcab26d",
+      "exit_code": 0,
+      "elapsed_seconds": 15.628862700003083,
+      "log": "./playtest-build-release-corrected.log",
+      "log_sha256": "1b7f2d2249a47bfadf3f605d79292a34c795d7e3305d27727800b9496f84168a",
+      "source_unchanged_during_run": true
+    },
+    {
+      "label": "playtest-android-build",
+      "source_head": "b9f85e11f3580d1a821a8e1cf3d529b1e6f496d2",
+      "exit_code": 0,
+      "elapsed_seconds": 149.90568840000196,
+      "log": "./playtest-android-build.log",
+      "log_sha256": "2395d83f0c16c7934fd1931888898a1f1b1709ab3f0b42969f9cfc72836ad733",
+      "source_unchanged_during_run": true
+    },
+    {
+      "label": "playtest-android-final-source",
+      "source_head": "53347791b0bd1331219651b01ea3012bafcab26d",
+      "exit_code": 0,
+      "elapsed_seconds": 3.2601805000012973,
+      "log": "./playtest-android-final-source.log",
+      "log_sha256": "dbd034740c66caf55e71b6a390da1dd26cd2e13d843b0b40e84e146ecbd0dfa2",
+      "source_unchanged_during_run": true
+    },
+    {
+      "label": "playtest-affected-debug",
+      "source_head": "53347791b0bd1331219651b01ea3012bafcab26d",
+      "exit_code": 0,
+      "elapsed_seconds": 810.4964710000058,
+      "log": "./playtest-affected-debug.log",
+      "log_sha256": "dc2eb9cb84069f4fb1b2fd072e0dfd1006532169f8084f4196c9fa6fb43d4a43",
+      "source_unchanged_during_run": true
+    },
+    {
+      "label": "playtest-affected-release",
+      "source_head": "53347791b0bd1331219651b01ea3012bafcab26d",
+      "exit_code": 0,
+      "elapsed_seconds": 273.60780749999685,
+      "log": "./playtest-affected-release.log",
+      "log_sha256": "6210077c8de30cd1d383787b53e1e175f9ccfd168f9368d569c6fadf01ebc660",
+      "source_unchanged_during_run": true
+    },
+    {
+      "label": "playtest-torch-debug",
+      "source_head": "53347791b0bd1331219651b01ea3012bafcab26d",
+      "exit_code": 0,
+      "elapsed_seconds": 169.77036389999557,
+      "log": "./playtest-torch-debug.log",
+      "log_sha256": "a156945e84521f54b57c992aa58fb26623841c478867ff26a3f35ee0c2b4ad01",
+      "source_unchanged_during_run": true
+    },
+    {
+      "label": "playtest-torch-release",
+      "source_head": "53347791b0bd1331219651b01ea3012bafcab26d",
+      "exit_code": 0,
+      "elapsed_seconds": 14.76784719999705,
+      "log": "./playtest-torch-release.log",
+      "log_sha256": "54967eb66dd048458583357b4cf352de9e521b29320c92821c5770ff21ffb3a9",
+      "source_unchanged_during_run": true
+    },
+    {
+      "label": "playtest-android-debug-arm64-package",
+      "source_head": "53347791b0bd1331219651b01ea3012bafcab26d",
+      "exit_code": 0,
+      "elapsed_seconds": 32.09041649999563,
+      "log": "./playtest-android-debug-arm64-package.log",
+      "log_sha256": "58385ec0600017d93837bf6c76823bf515423c547d93f10294ef3346179ee8fd",
+      "source_unchanged_during_run": true
+    },
+    {
+      "label": "playtest-android-release-arm64-package",
+      "source_head": "53347791b0bd1331219651b01ea3012bafcab26d",
+      "exit_code": 0,
+      "elapsed_seconds": 32.206052399997134,
+      "log": "./playtest-android-release-arm64-package.log",
+      "log_sha256": "95bea50c6eff18dce0011348d18a7ecc05ae5dd98edbae4a6f10960a549653c6",
+      "source_unchanged_during_run": true
+    },
+    {
+      "label": "playtest-all-abi-identities",
+      "source_head": "53347791b0bd1331219651b01ea3012bafcab26d",
+      "exit_code": 0,
+      "elapsed_seconds": 0.7482918000023346,
+      "log": "./playtest-all-abi-identities.log",
+      "log_sha256": "f46b2be24f7c47f346372e6e1885874b9c83da2c2b02b2f73a92a67fd0a55ef9",
+      "source_unchanged_during_run": true
+    },
+    {
+      "label": "playtest-pipeline-freshness-absolute",
+      "source_head": "64a98f718c76aeaa27ad2658c7cc4004948e28de",
+      "exit_code": 0,
+      "elapsed_seconds": 56.74636410000676,
+      "log": "./playtest-pipeline-freshness-absolute.log",
+      "log_sha256": "3f692835f02e13eb2e3105178ec79da87f0df290a417a97d550a1fba1e46a206",
+      "source_unchanged_during_run": false
+    },
+    {
+      "label": "playtest-query-freshness",
+      "source_head": "64a98f718c76aeaa27ad2658c7cc4004948e28de",
+      "exit_code": 0,
+      "elapsed_seconds": 38.70068409999658,
+      "log": "./playtest-query-freshness.log",
+      "log_sha256": "e99dd0241ff280c0a52ed30a3fa79fa3651d357f253b56c31e2a002a96abfada",
+      "source_unchanged_during_run": true
+    },
+    {
+      "label": "playtest-shader-catalog-adapter",
+      "source_head": "64a98f718c76aeaa27ad2658c7cc4004948e28de",
+      "exit_code": 0,
+      "elapsed_seconds": 14.44153510000615,
+      "log": "./playtest-shader-catalog-adapter.log",
+      "log_sha256": "359cc7dcf5d4ed04eb4981a4c93826f746f2e506f698e2e1e9c553b9973c4bf9",
+      "source_unchanged_during_run": true
+    }
+  ],
+  "selected_ctest_counts": {
+    "Debug": 54,
+    "Release": 46
+  },
+  "configuration_independent_checks": "Eight PowerShell shader/generator/policy/GDI checks run in Debug once; excluded from Release repetition. Existing per-test policies unchanged.",
+  "torch": {
+    "debug": {
+      "test_seconds": 169.73,
+      "outer_seconds": 169.77036389999557,
+      "gate_seconds": 180,
+      "margin_seconds": 10.27,
+      "coverage": {
+        "poses": 3287,
+        "roof_entry_skinned_poses": 1812,
+        "plane_samples": 3178,
+        "disk_samples": 57970
+      }
+    },
+    "release": {
+      "test_seconds": 14.72,
+      "outer_seconds": 14.76784719999705,
+      "gate_seconds": 180,
+      "margin_seconds": 165.28,
+      "coverage": {
+        "poses": 3287,
+        "roof_entry_skinned_poses": 1812,
+        "plane_samples": 3178,
+        "disk_samples": 57970
+      }
+    }
+  },
+  "historical_torch_debug": {
+    "test_seconds": 171.46,
+    "margin_seconds": 8.54,
+    "source_commit": "1a0205efcb423a3df527f617cf2fe48034116cb3"
+  },
+  "traversal": {
+    "checks": 89973,
+    "failures": 0,
+    "max_root_step_m": 0.0250017,
+    "max_landing_root_step_m": 0.0193812
+  },
+  "integration": {
+    "checks": 19443,
+    "failures": 0,
+    "retained_triangles": 1022
+  },
+  "rig": {
+    "checks": 16427,
+    "failures": 0,
+    "sampled_poses": 941,
+    "max_left_reach_m": 0.61258,
+    "max_right_reach_m": 0.619561
+  },
+  "graphics": {
+    "GDI_checks": 515,
+    "DPI": [
+      96,
+      120,
+      144,
+      192
+    ],
+    "logical_client_widths": [
+      760,
+      900,
+      1232
+    ],
+    "physical_GUI_acceptance": "PENDING"
+  },
+  "android_build_provenance": "Four-ABI native packages built at b9f85e11. The only later source change is a Windows GDI cast; final-source Gradle refresh passed with unchanged outputs and cached Java/lint results. No installation.",
+  "android_shader_inspection": "Actual stripped library and exact APK entry: ARM64 ONLY, Debug Diagnostic/Mobile and unsigned Release Shipping/Mobile.",
+  "all_ABI_inspection": "All four ABIs each configuration: APK entry/stripped bytes, ELF machine/class and 16KiB LOAD alignment. This is not all-ABI shader inspection.",
+  "failed_runs_retained": [
+    "playtest-rescue-build",
+    "playtest-rescue-build-corrected",
+    "playtest-rescue-focused-tests",
+    "playtest-rope-agent-debug-focused",
+    "playtest-rope-agent-debug-focused2",
+    "playtest-rope-agent-approach-tests",
+    "playtest-pipeline-freshness",
+    "playtest-rope-agent-reach-tests",
+    "playtest-rope-agent-nodes",
+    "playtest-rope-agent-anchor-tests",
+    "playtest-rope-agent-gripselect-tests",
+    "playtest-rope-agent-climbdiag",
+    "playtest-rope-agent-climbdiag2",
+    "playtest-rope-agent-anchorhands",
+    "playtest-rope-agent-handoff-tests",
+    "playtest-rope-agent-rimalign-tests",
+    "rope-first-divergence-build",
+    "rope-first-divergence",
+    "rope-first-divergence-trace",
+    "rope-contact-trace",
+    "rope-grip-cadence",
+    "rope-pre-request-contact",
+    "rope-contact-continuity",
+    "rope-contact-velocity-fix",
+    "rope-contact-continuity-final",
+    "rope-final-contact-projection",
+    "rope-final-contact-diagnostics",
+    "rope-final-attachments",
+    "rope-anchor-clearance-diagnostic",
+    "rope-anchor-stand-off",
+    "rope-support-first-stand-off",
+    "rope-anchor-032",
+    "playtest-rope-annulus",
+    "playtest-rope-annulus036",
+    "playtest-rope-roottrace",
+    "playtest-rope-annulus-build",
+    "playtest-parent-final-build",
+    "playtest-parent-final-tests",
+    "playtest-build-debug",
+    "playtest-build-release"
+  ],
+  "mist_shadow": "Owner-reported thin stripe/broad angular band retained. Actual rope topology/winding/facet normal metadata corrected. Broad volumetric band cause and visual correction remain unproven; matched exact-candidate physical reproduction/retest needed.",
+  "remaining_physical_gates": [
+    "Windows/Android exact-candidate Pipeline/Query successful RT presentation",
+    "two-way rope/player contact appearance",
+    "equipment/physical-light coherence",
+    "mist shadow and off-camera contributions",
+    "Windows focus/resize/restart and controller hotplug",
+    "Android lifecycle/orientations/surface/reconstruction",
+    "owner listening/haptics",
+    "sustained combined workload and outdoor effects"
+  ],
+  "publication": "Source and evidence commits separate. Final pushed evidence SHA and CI results verified externally; no recursive self-commit identity."
+}

@@ -1,0 +1,19 @@
+{
+  "task_title": "Horde 1.7 WP2 physical acceptance",
+  "repository_root": "<existing-primary>",
+  "worktree": "<existing-primary>/.worktrees/horde-1.7-wp2-vertical-proof",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "start_local_head": "d94e57910af1628248ce247f0b50b6ebf6308470",
+  "start_remote_head": "d94e57910af1628248ce247f0b50b6ebf6308470",
+  "initial_wp2_status": "clean",
+  "prior_executor_title": "Prepare The Horde 1.7 WP0",
+  "prior_executor_status": "idle",
+  "competing_process_naming_worktree_found": false,
+  "primary_head": "c3c15d3243492c8338e37ce8312b14e62e118a0b",
+  "primary_unrelated_work": "preserved",
+  "repository_local_agents_skill_directory": "Absent in both primary checkout and WP2; primary .github/skills contains specification workflows not applicable to this physical-evidence pass.",
+  "source_generated_candidate": "0eb665900c9efc95c443beada4c418776092cbe3",
+  "source_shader_abi_budget_test_asset_default_diff_from_candidate": [],
+  "desktop_sidebar_project_association": "Not claimed",
+  "startup": "Default command sandbox failed during setup; approved read-only local execution succeeded. No clone or new worktree."
+}

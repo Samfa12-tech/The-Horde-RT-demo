@@ -20,6 +20,9 @@
 #include "gameplay/simulation/GameplayEvent.h"
 #include "gameplay/simulation/InputSnapshot.h"
 #include "gameplay/simulation/SimulationSnapshot.h"
+#include "gameplay/simulation/DevelopmentSupportFixture.h"
+#include "gameplay/simulation/DevelopmentWorldRoute.h"
+#include "gameplay/traversal/DevelopmentRescueJourney.h"
 
 namespace horde::gameplay::validation
 {
@@ -53,6 +56,12 @@ struct GameSimulationConfig
     // shared BodyStow transition and repaired anatomical hand pose below.
     bool swordStartsStowed = false;
     bool waterfallSkeletonEncounter = false;
+    bool developmentSupportFixture = false;
+    bool developmentWorldRoute = false;
+    bool developmentRescueJourney = false;
+    // Current development gameplay; legacy constructor/capture fixtures retain
+    // their authored rules unless the live application profile selects this.
+    bool combatFoundation1_7 = false;
 };
 
 // Keep the historical constructor configuration available for deterministic
@@ -64,6 +73,7 @@ inline constexpr GameSimulationConfig ProductionGameSimulationConfig()
     config.playerMountProfile = horde::gameplay::items::PlayerMountProfile::AnatomicalBody;
     config.waterfallSkeletonEncounter = true;
     config.swordStartsStowed = true;
+    config.combatFoundation1_7 = true;
     return config;
 }
 
@@ -96,9 +106,16 @@ public:
                                 std::uint64_t inputPublicationSequence = 0u,
                                 PausedInputPolicy policy = PausedInputPolicy::DiscardAllCommands);
 
+    // Owner-thread development control; invalidates previous support immediately.
+    void SetDevelopmentSupportFixture(bool enabled, std::uint64_t generation);
+    void SetDevelopmentWorldRoute(bool enabled, bool stagedPreparation = false);
+    void SetDevelopmentRescueJourney(bool enabled);
+    bool PublishWorldZoneReadiness(WorldZoneToken token, ZoneReadiness readiness);
+    void InvalidateWorldZoneReadiness();
     void ResetRoute();
     void RetryEncounter();
     bool ApplyShowcaseCheckpoint(std::int32_t checkpointId, bool countAsRetry = false);
+    void BeginCombatPractice(EnemyKind encounter);
     void ImportRewardCheckpoint(
         const horde::gameplay::interactions::ChestRewardSnapshot& chestReward,
         const horde::gameplay::interactions::InteractionState& interaction,
@@ -146,10 +163,27 @@ private:
                                        std::uint64_t eventTick);
     bool ConsumeWorldCommand();
     bool ApplyCheckpoint(std::int32_t checkpointId, bool isRetry);
+    void ResolvePlayerSupport();
+    void ResolveMovementCollision(float previousX, float previousZ);
+    void ResetPlayerSupport();
     void UpdateMovement(const InputSnapshot& input, float deltaSeconds);
+    void ClearRunIntent();
+    bool CurrentCombatRules() const;
+    void CancelCombatTransients();
+    void BeginKeeperRepel();
+    void ApplyKeeperRepel(float deltaSeconds);
     void UpdateEncounters(const InputSnapshot& input, float deltaSeconds);
     void UpdateRewardSequence(float deltaSeconds, bool commandsAvailable);
     void ResolveHeldItems();
+    bool UsesRescueExterior() const;
+    void StepRescueJourney(bool paused);
+    bool TryRescueInteraction();
+    void RecoverRescueJourney();
+    void ApplyRescuePresentation();
+    void RestoreRescueEquipment();
+    void PublishRescueSnapshot();
+    horde::gameplay::items::HeldItemTransform RescueLanternHinge() const;
+    void RecordSwordContactTrace();
     bool SwordDefenseReady() const;
     bool SwordDrawBlocksDefense() const;
     bool RequestSwordDraw(std::int32_t reasonPayload, bool blocksDefenseDuringDraw);
@@ -177,6 +211,26 @@ private:
     FixedStepRunner fixedStepRunner_{};
     BoundedGameplayEventQueue events_{};
     CombatPresentationTimeline combatPresentation_{};
+    CombatTeaching combatTeaching_{};
+    CombatContactTraceSnapshot combatContactTrace_{};
+    std::uint64_t currentCutCommandSequence_ = 0, currentCutConsumedTick_ = 0;
+    std::uint64_t queuedUpCutCommandSequence_ = 0, queuedUpCutConsumedTick_ = 0;
+    EntityId swordHitTargetThisTick_ = EntityId::Invalid;
+    std::uint64_t swordHitEventThisTick_ = 0;
+    bool legacyCombatCheckpoint_ = false;
+    bool dodgeProtectionAccepted_ = false;
+    float gameplayTimeScale_ = 1.0f;
+    std::uint64_t acceptedDodgeSequence_ = 0u;
+    std::uint64_t acceptedDodgeConsumedTick_ = 0u;
+    std::uint64_t dodgeProtectedHitCount_ = 0u;
+    float keeperRepelRemainingSeconds_ = 0.0f;
+    float keeperRepelDirectionX_ = 0.0f;
+    float keeperRepelDirectionZ_ = 0.0f;
+    float keeperRepelTravelledMetres_ = 0.0f;
+    std::uint64_t latestTutorialSkipSequence_ = 0u;
+    std::uint64_t latestTutorialReplaySequence_ = 0u;
+    std::uint64_t pendingTutorialSkipCommands_ = 0u;
+    std::uint64_t pendingTutorialReplayCommands_ = 0u;
     SimulationSnapshot snapshot_{};
     InputSnapshot lastInput_{};
 
@@ -206,12 +260,26 @@ private:
     std::size_t fireEmitterCount_ = 3u;
     EnemyKind activeEnemyKind_ = EnemyKind::Skeleton;
 
+    PlayerSupportResolution playerSupport_{};
+    WorldRouteState worldRoute_{};
+    horde::gameplay::traversal::RescueTraversal rescueTraversal_{};
+    float rescueOpeningSeconds_ = 0.0f;
+    bool rescueMovementSuppressedThisTick_ = false;
+    bool rescueSavedSwordValid_=false;
+    horde::gameplay::items::HeldItemState rescueSavedSword_{};
+    bool stagedWorldPreparation_ = false;
+    std::uint64_t supportGeneration_ = 1u;
     float playerX_ = 0.0f;
     float playerZ_ = 1.85f;
     float playerYawRadians_ = 0.0f;
     float playerPitchRadians_ = -0.05f;
     float walkTime_ = 0.0f;
+    float walkCycleTime_ = 0.0f;
     float walkVisualAmount_ = 0.0f;
+    float playerMovementSpeed_ = 0.0f;
+    bool runToggleActive_ = false;
+    bool runActive_ = false;
+    bool runInputBlockedUntilRelease_ = false;
     std::int32_t retryCheckpoint_ = 0;
     std::uint32_t retryGeneration_ = 0u;
     std::uint64_t tickIndex_ = 0u;
@@ -223,6 +291,8 @@ private:
     std::uint64_t latestRetrySequence_ = 0u;
     std::uint64_t latestInteractSequence_ = 0u;
     std::uint64_t latestToggleHeldLightPoseSequence_ = 0u;
+    std::uint64_t latestRunToggleSequence_ = 0u;
+    std::uint64_t latestClearRunIntentSequence_ = 0u;
     std::uint64_t lastConsumedAttackSequence_ = 0u;
     std::uint64_t lastConsumedParrySequence_ = 0u;
     std::uint64_t lastConsumedDodgeSequence_ = 0u;
@@ -230,6 +300,8 @@ private:
     std::uint64_t lastConsumedRetrySequence_ = 0u;
     std::uint64_t lastConsumedInteractSequence_ = 0u;
     std::uint64_t lastConsumedToggleHeldLightPoseSequence_ = 0u;
+    std::uint64_t lastConsumedRunToggleSequence_ = 0u;
+    std::uint64_t lastConsumedClearRunIntentSequence_ = 0u;
     std::uint64_t pendingAttackCommands_ = 0u;
     std::uint64_t pendingParryCommands_ = 0u;
     std::uint64_t pendingDodgeCommands_ = 0u;
@@ -237,6 +309,8 @@ private:
     std::uint64_t pendingRetryCommands_ = 0u;
     std::uint64_t pendingInteractCommands_ = 0u;
     std::uint64_t pendingToggleHeldLightPoseCommands_ = 0u;
+    std::uint64_t pendingRunToggleCommands_ = 0u;
+    std::uint64_t pendingClearRunIntentCommands_ = 0u;
     float pendingDodgeForward_ = 0.0f;
     float pendingDodgeStrafe_ = 0.0f;
     float dodgeDirectionX_ = 0.0f;

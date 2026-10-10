@@ -1,0 +1,40 @@
+UpdateCTestConfiguration  from :<repo>/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/build/presets/windows-x64-release/DartConfiguration.tcl
+Parse Config file:<repo>/build/presets/windows-x64-release/DartConfiguration.tcl
+Test project <repo>/build/presets/windows-x64-release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 24
+    Start 24: horde_rt_combat_foundation_tests
+
+24: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_combat_foundation_tests.exe"
+24: Working Directory: <repo>/build/presets/windows-x64-release
+24: Test timeout computed to be: 30
+24: FAIL: direct pair hit preserves B stagger while A remains nearer
+24: FAIL: live GameSimulation caller accepts the forgiving nonfatal hit on B
+24: pair hit diagnostic moved=0 player=-4.5,-15.3 yaw=0 B=-5.47528,-14.471 health=2 playerAction=3 actionTime=0.0666668 owner=0 enemy=1
+24: FAIL: ordinary movement reaches the branch where B is nearest while A winds up
+24: FAIL: live GameSimulation caller accepts the forgiving nonfatal hit on B
+24: pair hit diagnostic moved=1 player=-4.5,-15.6167 yaw=0 B=-5.32736,-14.64 health=2 playerAction=3 actionTime=0.0666668 owner=0 enemy=1
+24: combat foundation checks=498 failures=4
+1/1 Test #24: horde_rt_combat_foundation_tests ...***Failed    1.40 sec
+FAIL: direct pair hit preserves B stagger while A remains nearer
+FAIL: live GameSimulation caller accepts the forgiving nonfatal hit on B
+pair hit diagnostic moved=0 player=-4.5,-15.3 yaw=0 B=-5.47528,-14.471 health=2 playerAction=3 actionTime=0.0666668 owner=0 enemy=1
+FAIL: ordinary movement reaches the branch where B is nearest while A winds up
+FAIL: live GameSimulation caller accepts the forgiving nonfatal hit on B
+pair hit diagnostic moved=1 player=-4.5,-15.6167 yaw=0 B=-5.32736,-14.64 health=2 playerAction=3 actionTime=0.0666668 owner=0 enemy=1
+combat foundation checks=498 failures=4
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   1.41 sec
+
+The following tests FAILED:
+	 24 - horde_rt_combat_foundation_tests (Failed)
+Errors while running CTest

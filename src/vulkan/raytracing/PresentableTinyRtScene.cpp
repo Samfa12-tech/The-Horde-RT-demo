@@ -1,5 +1,8 @@
+#include "vulkan/raytracing/RescuePlayerRig.h"
+#include "scene/RescueJourneyGeometry.h"
 #include "scene/ShowcaseIndoorDust.h"
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
+#include "vulkan/raytracing/SimulationFrameAdapter.h"
 #include "graphics/EntryMenuScene.h"
 #include "graphics/GraphicsPreviewSession.h"
 #include "vulkan/raytracing/ChestGuidanceLight.h"
@@ -715,6 +718,17 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     gpuResources_.Bind(physicalDevice_, device_, vkDestroyAccelerationStructureKHR_, vkGetBufferDeviceAddressKHR_);
     pipelineBundle_.RebindDestroyContext(this, &gpuResources_);
     scratchAddressAlignment_ = std::exchange(other.scratchAddressAlignment_, 0u);
+    developmentSupportFixture_ = std::exchange(other.developmentSupportFixture_, false);
+    developmentWorldRoute_=std::exchange(other.developmentWorldRoute_,false);
+    developmentRescueJourney_=std::exchange(other.developmentRescueJourney_,false);
+    rescueWorldUpdateScratch_=std::exchange(other.rescueWorldUpdateScratch_,Buffer{});
+    rescueWorldVertices_=std::move(other.rescueWorldVertices_);
+    rescueWorldSurfaceCodes_=std::move(other.rescueWorldSurfaceCodes_);
+    rescueRopeVertexOffset_=std::exchange(other.rescueRopeVertexOffset_,0);
+    rescueWorldPrimitiveCount_=std::exchange(other.rescueWorldPrimitiveCount_,0);
+    rescueWorldMaxVertex_=std::exchange(other.rescueWorldMaxVertex_,0);
+    stagedWorldPreparation_=std::exchange(other.stagedWorldPreparation_,false);
+    worldRouteGeometry_=std::move(other.worldRouteGeometry_);
     sceneProfile_ = std::exchange(other.sceneProfile_, RtSceneProfile::Showcase);
     glassEnabled_ = std::exchange(other.glassEnabled_, true);
     mistEnabled_ = std::exchange(other.mistEnabled_, true);
@@ -1017,8 +1031,25 @@ bool PresentableTinyRtScene::ContinueInitialiseAfterPreflight(
     return true;
 }
 
+horde::gameplay::simulation::ZoneReadiness PresentableTinyRtScene::WorldZoneReadiness(
+    horde::gameplay::simulation::WorldZoneToken token) const
+{
+    using namespace horde::gameplay::simulation;
+    if(token.generation==0 || static_cast<std::size_t>(token.zone)>=kWorldZones.size() || !developmentWorldRoute_)
+        return ZoneReadiness::Unprepared;
+    // ready_ is set only after real uploads, completed one-time BLAS/TLAS builds
+    // and the selected pipeline bundle succeed. No platform declares GPU readiness.
+    if(!ready_ || !worldRouteGeometry_.valid || vertexBuffer_.memory==VK_NULL_HANDLE ||
+        indexBuffer_.memory==VK_NULL_HANDLE || blas_.handle==VK_NULL_HANDLE || tlas_.handle==VK_NULL_HANDLE)
+        return ZoneReadiness::Preparing;
+    if(developmentRescueJourney_ && (rescueWorldUpdateScratch_.buffer==VK_NULL_HANDLE ||
+        rescueWorldVertices_.empty() || rescueWorldPrimitiveCount_==0 ||
+        rescueWorldSurfaceCodes_.size()!=rescueWorldPrimitiveCount_)) return ZoneReadiness::Preparing;
+    return ZoneReadiness::Ready;
+}
 void PresentableTinyRtScene::Destroy()
 {
+    worldRouteGeometry_ = {}; // Release CPU batches with the renderer-owned scene.
     pipelineCache_ = VK_NULL_HANDLE; // Borrowed device cache remains owned by the platform context.
     uploadedQualityControls_ = {};
     uploadedFireQuality_ = FireEmitterQuality::Mobile;
@@ -1056,6 +1087,9 @@ void PresentableTinyRtScene::Destroy()
     compiledPipelineCache_ = nullptr;
     DestroyAccelerationStructure(tlas_);
     DestroyBuffer(tlasUpdateScratch_);
+    DestroyBuffer(rescueWorldUpdateScratch_);
+    rescueWorldVertices_.clear();
+    rescueWorldSurfaceCodes_.clear();
     characterSlot_.DestroyGpuResources(gpuResources_);
     DestroyBuffer(skinnedPlayerBlasUpdateScratch_);
     DestroyBuffer(viewmodelBlasUpdateScratch_);
@@ -1277,7 +1311,7 @@ horde::telemetry::RtResourceInventory PresentableTinyRtScene::ResourceInventory(
              &staticVertexBuffer_, &worldPlayerVertexBuffer_, &viewmodelVertexBuffer_,
              &staticIndexBuffer_, &staticGeometryTransformBuffer_,
              &instanceMetadataBuffer_, &primitiveMetadataBuffer_, &materialMetadataBuffer_,
-             &skinnedPlayerBlasUpdateScratch_, &viewmodelBlasUpdateScratch_, &tlas_.backing, &tlasUpdateScratch_})
+             &skinnedPlayerBlasUpdateScratch_, &viewmodelBlasUpdateScratch_, &rescueWorldUpdateScratch_, &tlas_.backing, &tlasUpdateScratch_})
     {
         AccumulateRtGpuBuffer(inventory, *buffer);
     }
@@ -3212,6 +3246,36 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
                     box.footprint[3][0], box.topY, box.footprint[3][1], SurfaceMossyStone);
     };
     addWorldQuad({{-1.85f, kRouteFloorWorldY, 3.4f}}, {{1.85f, kRouteFloorWorldY, 3.4f}}, {{1.85f, kRouteFloorWorldY, -6.4f}}, {{-1.85f, kRouteFloorWorldY, -6.4f}}, SurfaceWetCobble, SurfaceUp);
+    if (developmentSupportFixture_)
+    {
+        using namespace horde::gameplay::simulation;
+        const float y = kRouteFloorWorldY + kProofSupportHeight;
+        addWorldBox(-kProofSupportHalfWidth, kRouteFloorWorldY, kProofSupportBackZ,
+                    kProofSupportHalfWidth, y, kProofSupportTopZ, SurfaceWetCobble);
+        addWorldQuad({{-kProofSupportHalfWidth, kRouteFloorWorldY, kProofSupportGroundZ}},
+                     {{kProofSupportHalfWidth, kRouteFloorWorldY, kProofSupportGroundZ}},
+                     {{kProofSupportHalfWidth, y, kProofSupportTopZ}},
+                     {{-kProofSupportHalfWidth, y, kProofSupportTopZ}},
+                     SurfaceWetCobble, SurfaceUp);
+        addWorldTriangle({{-kProofSupportHalfWidth, kRouteFloorWorldY, kProofSupportTopZ}},
+                         {{-kProofSupportHalfWidth, kRouteFloorWorldY, kProofSupportGroundZ}},
+                         {{-kProofSupportHalfWidth, y, kProofSupportTopZ}}, SurfaceWetCobble, SurfaceLeft);
+        addWorldTriangle({{kProofSupportHalfWidth, kRouteFloorWorldY, kProofSupportGroundZ}},
+                         {{kProofSupportHalfWidth, kRouteFloorWorldY, kProofSupportTopZ}},
+                         {{kProofSupportHalfWidth, y, kProofSupportTopZ}}, SurfaceWetCobble, SurfaceRight);
+    }
+    if(developmentWorldRoute_)
+    {
+        worldRouteGeometry_=horde::scene::PrepareDevelopmentWorldGeometry(stagedWorldPreparation_);
+        if(developmentRescueJourney_) horde::scene::AppendRescueJourneyGeometry(worldRouteGeometry_);
+        if(!worldRouteGeometry_.valid) { diagnostic="Development world route preparation failed finite geometry admission."; return false; }
+        for(const auto& triangle:worldRouteGeometry_.triangles)
+        {
+            const auto vertex=[](const auto& p) { return Vertex{{p[0],p[1],p[2]}}; };
+            addWorldTriangle(vertex(triangle.points[0]),vertex(triangle.points[1]),vertex(triangle.points[2]),
+                static_cast<SurfaceMaterial>(triangle.material),static_cast<SurfaceNormal>(triangle.normal));
+        }
+    }
     // The exported collapse excludes its inspection floor. Continue the same
     // ordinary dungeon floor under the sealed, non-walkable stairwell instead.
     addWorldQuad({{-1.92f, kRouteFloorWorldY, 17.48f}}, {{1.92f, kRouteFloorWorldY, 17.48f}},
@@ -3692,7 +3756,23 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
                  {{-36.72f, 0.68f, -13.96f}}, {{-36.72f, -0.44f, -13.96f}},
                  SurfaceMirror, SurfaceRight);
 
+    if(developmentRescueJourney_) {
+        rescueRopeVertexOffset_=vertices.size();
+        horde::gameplay::traversal::RescueTraversal initial;
+        const auto rope=horde::scene::RescueRopeTriangleVertices(initial.Snapshot());
+        for(std::size_t i=0;i<rope.size();i+=3) {
+            auto p=rope[i],q=rope[i+1],r=rope[i+2];
+            // Undeployed full topology remains below the closed lower floor.
+            p[1]-=8;q[1]-=8;r[1]-=8;
+            addWorldTriangle(Vertex{{p[0],p[1],p[2]}},Vertex{{q[0],q[1],q[2]}},Vertex{{r[0],r[1],r[2]}},SurfaceDryStone,
+                static_cast<SurfaceNormal>(horde::scene::RescueRopeTriangleNormalCode(p,q,r)));
+        }
+        rescueWorldSurfaceCodes_=worldSurfaceCodes;
+        rescueWorldVertices_.clear();
+        for(const auto& vertex:vertices) rescueWorldVertices_.push_back({vertex.position[0],vertex.position[1],vertex.position[2]});
+    }
     const std::uint32_t sceneIndexCount = static_cast<std::uint32_t>(indices.size());
+    rescueWorldPrimitiveCount_=sceneIndexCount/3u;
     if (worldSurfaceCodes.size() != sceneIndexCount / 3u)
     {
         diagnostic = "World surface metadata does not match the world triangle count.";
@@ -3708,7 +3788,10 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     // Closed-position sliding roof slab. Its TLAS transform moves west after
     // the lich's death animation, physically exposing the sky to primary and
     // visibility rays rather than fading a ceiling texture away.
-    addBox(-34.90f, 1.30f, -16.60f, -32.50f, 1.42f, -13.80f);
+    if(developmentRescueJourney_) {
+        const auto& lid=horde::scene::kRescueBlockoutLid;
+        addBox(lid.minimum[0],lid.minimum[1],lid.minimum[2],lid.maximum[0],lid.maximum[1],lid.maximum[2]);
+    } else addBox(-34.90f, 1.30f, -16.60f, -32.50f, 1.42f, -13.80f);
     const std::uint32_t finaleRoofIndexCount = static_cast<std::uint32_t>(indices.size());
 
     // The production torch body comes through the generic static GLB/PBR slot.
@@ -3917,7 +4000,9 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
 
     VkAccelerationStructureBuildGeometryInfoKHR blasBuildInfo{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR};
     blasBuildInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
-    blasBuildInfo.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR;
+    blasBuildInfo.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR |
+        (developmentRescueJourney_?VK_BUILD_ACCELERATION_STRUCTURE_ALLOW_UPDATE_BIT_KHR:0);
+    rescueWorldMaxVertex_=static_cast<std::uint32_t>(vertices.size()-1);
     blasBuildInfo.geometryCount = 1u;
     blasBuildInfo.pGeometries = &blasGeometry;
 
@@ -3945,6 +4030,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         return false;
     }
 
+    if(developmentRescueJourney_ && !CreateScratchBuffer(blasSizes.updateScratchSize,rescueWorldUpdateScratch_,diagnostic)) return false;
     Buffer blasScratch;
     if (!CreateScratchBuffer(blasSizes.buildScratchSize, blasScratch, diagnostic))
     {
@@ -5741,12 +5827,13 @@ bool PresentableTinyRtScene::UpdatePreviewInstances(VkCommandBuffer commandBuffe
     if (!BuildFireEmitterUpload(
             std::span<const horde::gameplay::effects::FireEmitterState>(emitters).first(
                 emitterCount),
-            {{frame.cameraX, kShowcaseEyeWorldY, frame.cameraZ}, frame.zone, 24.0f},
+            {{frame.cameraX, horde::gameplay::simulation::PlayerEyeWorldY(frame.playerSupportWorldY), frame.cameraZ}, frame.zone, 24.0f},
             {tuning.fireStrengthScale, tuning.fireTurbulenceScale, tuning.fireSmokeScale},
             fireDetail, fire, diagnostic))
         return false;
     const auto& lightTransform = previewFireInputs_[0].worldFromLight;
-    const RtHeldLightGpu light{{lightTransform[12], lightTransform[13], lightTransform[14], frame.torchLightStrength}};
+    const RtHeldLightGpu light = BuildPlayerFrameLight(
+        {lightTransform[12], lightTransform[13], lightTransform[14], frame.torchLightStrength}, frame.playerSupportWorldY);
     auto metadata = staticMeshSlot_.InstanceMetadata();
     if (!glassEnabled_) metadata[9u].flags = 0u;
     auto materials = sceneMaterials_;
@@ -5998,9 +6085,11 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         return Vec3{v[0] / length, v[1] / length, v[2] / length};
     };
     const Vec3 worldUp{0.0f, 1.0f, 0.0f};
-    const Vec3 eye{cameraX, kShowcaseEyeWorldY, cameraZ};
-    const Vec3 bodyForward{std::sin(cameraYaw), 0.0f, -std::cos(cameraYaw)};
-    const Vec3 bodyRight{std::cos(cameraYaw), 0.0f, std::sin(cameraYaw)};
+    const Vec3 eye{cameraX, horde::gameplay::simulation::PlayerEyeWorldY(frame.playerSupportWorldY), cameraZ};
+    const float bodyYaw=frame.developmentRescueJourney && frame.rescue.equipmentStowed
+        ?frame.rescue.bodyYawRadians:cameraYaw;
+    const Vec3 bodyForward{std::sin(bodyYaw), 0.0f, -std::cos(bodyYaw)};
+    const Vec3 bodyRight{std::cos(bodyYaw), 0.0f, std::sin(bodyYaw)};
     const horde::gameplay::LowerBodyPoseState lowerBodyPose =
         horde::gameplay::EvaluateLowerBodyPose(walkTime, walkAmount);
     const float torsoCos = std::cos(lowerBodyPose.torsoTwistRadians);
@@ -6103,7 +6192,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             intendedShoulderCenter,
             PlayerModelVectorToWorld(playerModelBasis, rigShoulderCenter));
         skinnedPlayerRootWorld = GroundPlayerRootOnRouteFloor(
-            shoulderAnchoredRootWorld, kRouteFloorWorldY,
+            shoulderAnchoredRootWorld, frame.playerSupportWorldY,
             playerRenderSlot_.BootGroundingOffsetMetres(
                 frame.playerAnimation));
         if (frame.playerMountProfile == horde::gameplay::items::PlayerMountProfile::AnatomicalBody)
@@ -6112,7 +6201,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             // beneath the player, not at the old view-relative .40 m shoulder
             // plane behind which the camera saw the character's back.
             skinnedPlayerRootWorld = GroundPlayerRootOnRouteFloor(
-                animatedBodyOrigin, kRouteFloorWorldY,
+                animatedBodyOrigin, frame.playerSupportWorldY,
                 playerRenderSlot_.BootGroundingOffsetMetres(frame.playerAnimation));
         }
         const auto worldPointToPlayer = [&subtract, &playerModelBasis,
@@ -6190,6 +6279,10 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             }
             rigAnimation.rightIk = BlendPlayerArmGripTarget(
                 rigAnimation.rightIk, itemGrip, frame.playerAnimation.swordHandGripBlend);
+        }
+        if(frame.developmentRescueJourney && frame.rescue.equipmentStowed &&
+            !ApplyRescueRopeRigTargets(rigAnimation,frame.rescue,playerModelBasis,skinnedPlayerRootWorld,eye)) {
+            diagnostic="Rescue rope rig mapping rejected nonfinite authority.";return false;
         }
         if (!playerRenderSlot_.PreparePose(rigAnimation, frame.tickIndex,
                                            playerCpuSkinCadence_, updateSkinnedPlayer,
@@ -6317,7 +6410,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                                      lich,
                                      gpuResources_,
                                      diagnostic,
-                                     observation))
+                                     observation,frame.retainedWorkloadSkeleton))
     {
         return false;
     }
@@ -6537,9 +6630,11 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                 diagnostic = "Claimed reward lantern requires the final skinned left Grip transform.";
                 return false;
             }
+            const auto carryGrip=frame.developmentRescueJourney && frame.rescue.equipmentStowed
+                ?frame.rewardLanternWorldFromHinge:finalSkinnedLeftGrip;
             RewardLanternVisualTransforms rewardVisuals;
             if (!ComposeClaimedRewardLanternVisuals(
-                    finalSkinnedLeftGrip,
+                    carryGrip,
                     ringGrip->world,
                     ringHinge->world,
                     frame.rewardLanternWorldFromHinge,
@@ -6553,12 +6648,10 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                 rewardVisuals.worldFromBody, uniformScale(lanternScale));
             rewardLanternGripAgreement_ = rewardVisuals.gripAgreement;
             rewardLanternAuthorityAgreement_ = MeasureTransformAgreement(
-                frame.rewardLanternWorldFromHinge, finalSkinnedLeftGrip);
+                frame.rewardLanternWorldFromHinge, carryGrip);
             const auto finalRingGrip = horde::gameplay::items::MultiplyHeldItemTransforms(
                 rewardVisuals.worldFromRing, ringGrip->world);
-            rewardLanternFinalGripPosition_ = {{finalSkinnedLeftGrip[12],
-                                                finalSkinnedLeftGrip[13],
-                                                finalSkinnedLeftGrip[14]}};
+            rewardLanternFinalGripPosition_ = {{carryGrip[12],carryGrip[13],carryGrip[14]}};
             rewardLanternRingGripPosition_ = {{finalRingGrip[12],
                                                finalRingGrip[13],
                                                finalRingGrip[14]}};
@@ -6700,11 +6793,11 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             renderFireEmitters[emitter].worldFromLight = renderedTorchLight.worldFromLight;
         }
     }
-    RtHeldLightGpu heldLightGpu{{
+    RtHeldLightGpu heldLightGpu = BuildPlayerFrameLight({
         renderedTorchLight.worldFromLight[12],
         renderedTorchLight.worldFromLight[13],
         renderedTorchLight.worldFromLight[14],
-        frame.heldLight.active ? frame.torchLightStrength : 0.0f}};
+        frame.heldLight.active ? frame.torchLightStrength : 0.0f}, frame.playerSupportWorldY);
     if (productionLanternVisible)
     {
         heldLightGpu.positionStrength = {{
@@ -6729,7 +6822,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             std::span<const horde::gameplay::effects::FireEmitterState>(
                 renderFireEmitters.data(),
                 std::min(frame.fireEmitterCount, renderFireEmitters.size())),
-            {{frame.cameraX, kShowcaseEyeWorldY, frame.cameraZ},
+            {{frame.cameraX, horde::gameplay::simulation::PlayerEyeWorldY(frame.playerSupportWorldY), frame.cameraZ},
              frame.zone, 24.0f},
             fireTuning,
             fireQuality,
@@ -6875,6 +6968,32 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         }
     }
 
+    const bool updateRescueWorldBlas = developmentRescueJourney_ && frame.developmentRescueJourney;
+    if(updateRescueWorldBlas) {
+        const auto rope=horde::scene::RescueRopeTriangleVertices(frame.rescue);
+        if(rescueRopeVertexOffset_+rope.size()!=rescueWorldVertices_.size()) {
+            diagnostic="Rescue rope topology changed after world BLAS admission.";return false;
+        }
+        for(std::size_t i=0;i<rope.size();++i) {
+            auto p=rope[i];if(!frame.rescue.ropeDeployed) p[1]-=8;
+            rescueWorldVertices_[rescueRopeVertexOffset_+i]=p;
+        }
+        if(!WriteBuffer(vertexBuffer_,rescueWorldVertices_.data(),rescueWorldVertices_.size()*sizeof(rescueWorldVertices_[0]),
+            "rescue world vertex update",diagnostic,observation)) return false;
+        if(rescueWorldSurfaceCodes_.size()!=rescueWorldPrimitiveCount_ ||
+           rescueWorldSurfaceCodes_.size()*sizeof(rescueWorldSurfaceCodes_[0])!=worldSurfaceBuffer_.size ||
+           rope.size()/3>rescueWorldPrimitiveCount_) {
+            diagnostic="Rescue rope surface metadata no longer matches admitted primitives.";return false;
+        }
+        const auto first=rescueWorldPrimitiveCount_-rope.size()/3;
+        for(std::size_t i=0;i<rope.size();i+=3)
+            rescueWorldSurfaceCodes_[first+i/3]=(rescueWorldSurfaceCodes_[first+i/3]&~0xff00u) |
+                (horde::scene::RescueRopeTriangleNormalCode(rope[i],rope[i+1],rope[i+2])<<8u);
+        // Positions and their matching facet metadata share the existing host
+        // write barrier/fence before BLAS update, TLAS build and ray traversal.
+        if(!WriteBuffer(worldSurfaceBuffer_,rescueWorldSurfaceCodes_.data(),worldSurfaceBuffer_.size,
+            "rescue rope surface update",diagnostic,observation)) return false;
+    }
     VkMemoryBarrier hostWriteBarrier{VK_STRUCTURE_TYPE_MEMORY_BARRIER};
     hostWriteBarrier.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT;
     hostWriteBarrier.dstAccessMask = VK_ACCESS_ACCELERATION_STRUCTURE_READ_BIT_KHR |
@@ -6896,8 +7015,9 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                                  nullptr);
         });
 
-    const std::array<bool, 5u> requestedBlasWork{{
-        updateSkinnedPlayer, updateSkeletonPose0, updateSkeletonPose1, updateLich, updateViewmodel}};
+    const std::array<bool, 6u> requestedBlasWork{{
+        updateRescueWorldBlas, updateSkinnedPlayer, updateSkeletonPose0,
+        updateSkeletonPose1, updateLich, updateViewmodel}};
     const std::uint64_t blasWorkInvocationCount = static_cast<std::uint64_t>(
         std::count(requestedBlasWork.begin(), requestedBlasWork.end(), true));
     RtSceneStageScope blasRefitScope(
@@ -7022,10 +7142,40 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         vkCmdBuildAccelerationStructuresKHR_(commandBuffer, 1u, &lichUpdateInfo, lichRanges);
     };
 
+    const auto recordRescueWorldBlas = [&]() noexcept
+    {
+        VkAccelerationStructureGeometryKHR geometry{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR};
+        geometry.geometryType=VK_GEOMETRY_TYPE_TRIANGLES_KHR;
+        geometry.flags=VK_GEOMETRY_OPAQUE_BIT_KHR;
+        auto& triangles=geometry.geometry.triangles;
+        triangles.sType=VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR;
+        triangles.vertexFormat=VK_FORMAT_R32G32B32_SFLOAT;
+        triangles.vertexData.deviceAddress=vertexBuffer_.address;
+        triangles.vertexStride=sizeof(std::array<float,3>);
+        triangles.maxVertex=rescueWorldMaxVertex_;
+        triangles.indexType=VK_INDEX_TYPE_UINT32;
+        triangles.indexData.deviceAddress=indexBuffer_.address;
+        triangles.transformData.deviceAddress=transformBuffer_.address;
+        VkAccelerationStructureBuildGeometryInfoKHR info{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR};
+        info.type=VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
+        info.flags=VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR|
+                   VK_BUILD_ACCELERATION_STRUCTURE_ALLOW_UPDATE_BIT_KHR;
+        info.mode=VK_BUILD_ACCELERATION_STRUCTURE_MODE_UPDATE_KHR;
+        info.srcAccelerationStructure=blas_.handle;
+        info.dstAccelerationStructure=blas_.handle;
+        info.geometryCount=1;
+        info.pGeometries=&geometry;
+        info.scratchData.deviceAddress=rescueWorldUpdateScratch_.AlignedAddress();
+        VkAccelerationStructureBuildRangeInfoKHR range{};
+        range.primitiveCount=rescueWorldPrimitiveCount_;
+        const VkAccelerationStructureBuildRangeInfoKHR* ranges[]={&range};
+        vkCmdBuildAccelerationStructuresKHR_(commandBuffer,1,&info,ranges);
+    };
+
     const DynamicBlasToTlasDependency blasToTlasDependency =
         BuildDynamicBlasToTlasDependency({
-            requestedBlasWork[0] || requestedBlasWork[4], requestedBlasWork[1],
-            requestedBlasWork[2], requestedBlasWork[3]});
+            requestedBlasWork[0] || requestedBlasWork[1] || requestedBlasWork[5],
+            requestedBlasWork[2], requestedBlasWork[3], requestedBlasWork[4]});
     const auto recordBlasToTlasBarrier = [&]() noexcept
     {
         VkMemoryBarrier dynamicBlasBuildBarrier{VK_STRUCTURE_TYPE_MEMORY_BARRIER};
@@ -7047,11 +7197,12 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         [&](const std::size_t index) {
             switch (index)
             {
-            case 0u: recordPlayerBlas(kPlayerWorldBodyInstanceIndex, skinnedPlayerBlas_, skinnedPlayerBlasUpdateScratch_); break;
-            case 1u: recordSkeletonBlas(0u); break;
-            case 2u: recordSkeletonBlas(1u); break;
-            case 3u: recordLichBlas(); break;
-            case 4u: recordPlayerBlas(kPlayerViewmodelInstanceIndex, viewmodelBlas_, viewmodelBlasUpdateScratch_); break;
+            case 0u: recordRescueWorldBlas(); break;
+            case 1u: recordPlayerBlas(kPlayerWorldBodyInstanceIndex, skinnedPlayerBlas_, skinnedPlayerBlasUpdateScratch_); break;
+            case 2u: recordSkeletonBlas(0u); break;
+            case 3u: recordSkeletonBlas(1u); break;
+            case 4u: recordLichBlas(); break;
+            case 5u: recordPlayerBlas(kPlayerViewmodelInstanceIndex, viewmodelBlas_, viewmodelBlasUpdateScratch_); break;
             default: break;
             }
         },
@@ -7134,7 +7285,7 @@ bool PresentableTinyRtScene::WriteDustQuality(const RtQualityControlsGpu& qualit
     using namespace horde::scene::atmosphere;
     const float step=frame.walkTime*6.2f;
     DustCamera camera{{frame.cameraX+std::sin(step*0.5f)*0.035f*frame.walkAmount,
-        0.70f+std::abs(std::sin(step))*0.035f*frame.walkAmount,frame.cameraZ},
+        horde::gameplay::simulation::PlayerEyeWorldY(frame.playerSupportWorldY)+std::abs(std::sin(step))*0.035f*frame.walkAmount,frame.cameraZ},
         frame.cameraYaw,frame.cameraPitch+std::sin(step)*0.012f*frame.walkAmount,
         float(dispatchExtent_.width)/float(std::max(dispatchExtent_.height,1u))};
     const auto rotation=static_cast<unsigned>(frame.presentationTransform)&3u;

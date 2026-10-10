@@ -140,3 +140,8 @@ The final implementation handoff should cover the following gates at the accepte
 No builds, benchmarks, artwork, recordings or runtime tests are delivered by this documentation task. Application versions, release channels and public packages remain unchanged; publication requires separate owner authorisation and the normal release gates.
 
 **Audio/haptic manual revalidation required: NO for this documentation-only update.** When implementation changes dialogue, ambience, spatialisation or feedback, classify the exact work package under the existing change-triggered rule; those affected changes will require the relevant manual check.
+
+
+## WP0 boundary reference — 9 October 2026
+
+The [latest pinned 1.8 plan](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/superpowers/plans/2026-09-11-village-hub-1.8.0.md) is retained externally with verified blob/link custody. Gate6 is one playable arrival-to-tavern stress slice **after accepted 1.7**. No hub/interiors/crowds/services/quests are added to 1.7; it shows only a nonplayable distant real-geometry shell. Later Kit injury/town recovery and the latest English bank supersede incompatible old escort implications. This reference adds no implementation permission.

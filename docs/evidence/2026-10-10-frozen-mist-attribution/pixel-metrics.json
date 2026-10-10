@@ -1,0 +1,158 @@
+[
+  {
+    "pair": [
+      "midpoint-all-5",
+      "midpoint-sky-2"
+    ],
+    "changed_pixels": 1,
+    "extrema": [
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        1
+      ],
+      [
+        0,
+        0
+      ]
+    ],
+    "mean_abs_rgb": [
+      0.0,
+      1.0108198153030033e-06,
+      0.0
+    ]
+  },
+  {
+    "pair": [
+      "midpoint-all-5",
+      "midpoint-lantern-2"
+    ],
+    "changed_pixels": 356522,
+    "extrema": [
+      [
+        0,
+        39
+      ],
+      [
+        0,
+        50
+      ],
+      [
+        0,
+        66
+      ]
+    ],
+    "mean_abs_rgb": [
+      2.9266650223997672,
+      3.960228283547088,
+      5.598248653588006
+    ]
+  },
+  {
+    "pair": [
+      "midpoint-all-5",
+      "sample-local-all-2"
+    ],
+    "changed_pixels": 130010,
+    "extrema": [
+      [
+        0,
+        28
+      ],
+      [
+        0,
+        36
+      ],
+      [
+        0,
+        49
+      ]
+    ],
+    "mean_abs_rgb": [
+      0.48300306480568,
+      0.6454185602691207,
+      0.9024033251928644
+    ]
+  },
+  {
+    "pair": [
+      "midpoint-sky-2",
+      "sample-local-sky-2"
+    ],
+    "changed_pixels": 130010,
+    "extrema": [
+      [
+        0,
+        28
+      ],
+      [
+        0,
+        36
+      ],
+      [
+        0,
+        49
+      ]
+    ],
+    "mean_abs_rgb": [
+      0.48300306480568,
+      0.645419571088936,
+      0.9024033251928644
+    ]
+  },
+  {
+    "pair": [
+      "midpoint-lantern-2",
+      "sample-local-lantern-2"
+    ],
+    "changed_pixels": 0,
+    "extrema": [
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ]
+    ],
+    "mean_abs_rgb": [
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "pair": [
+      "sample-local-all-2",
+      "sample-local-sky-2"
+    ],
+    "changed_pixels": 0,
+    "extrema": [
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ]
+    ],
+    "mean_abs_rgb": [
+      0.0,
+      0.0,
+      0.0
+    ]
+  }
+]

@@ -1,0 +1,77 @@
+{
+  "sdk": "<vulkan-sdk>",
+  "engine": "<ps7>/pwsh.exe",
+  "tools": [
+    {
+      "path": "<vulkan-sdk>\\Bin\\glslangValidator.exe",
+      "sha256": "afd12a24c54137ab6169bc71458ecd58a1b1b2891345a7f2f5ec8e1f22e948d7",
+      "version_argv": [
+        "<vulkan-sdk>\\Bin\\glslangValidator.exe",
+        "--version"
+      ],
+      "exit_status": 0,
+      "version": "Glslang Version: 11:16.2.0\nESSL Version: OpenGL ES GLSL 3.20 glslang Khronos. 16.2.0\nGLSL Version: 4.60 glslang Khronos. 16.2.0\nSPIR-V Version 0x00010600, Revision 1\nGLSL.std.450 Version 100, Revision 1\nKhronos Tool ID 8\nSPIR-V Generator Version 11\nGL_KHR_vulkan_glsl version 100\nARB_GL_gl_spirv version 100\n"
+    },
+    {
+      "path": "<vulkan-sdk>\\Bin\\spirv-opt.exe",
+      "sha256": "ba03c9c7762a32155fd3800fef1a6cd8ca75b49e68f73e48bc96e1e911768f47",
+      "version_argv": [
+        "<vulkan-sdk>\\Bin\\spirv-opt.exe",
+        "--version"
+      ],
+      "exit_status": 0,
+      "version": "SPIRV-Tools v2026.2 v2026.2.rc2-1-g2ec8457a\n\n"
+    },
+    {
+      "path": "<vulkan-sdk>\\Bin\\spirv-val.exe",
+      "sha256": "556f42595acb5c144f94eb6c15f8e5b75b412bac7b326f828725b3368767afa7",
+      "version_argv": [
+        "<vulkan-sdk>\\Bin\\spirv-val.exe",
+        "--version"
+      ],
+      "exit_status": 0,
+      "version": "SPIRV-Tools v2026.2 v2026.2.rc2-1-g2ec8457a\nTargets:\n  SPIR-V 1.0\n  SPIR-V 1.1\n  SPIR-V 1.2\n  SPIR-V 1.3\n  SPIR-V 1.4\n  SPIR-V 1.5\n  SPIR-V 1.6\n  SPIR-V 1.2 (under OpenCL 2.2 Full Profile semantics)\n  SPIR-V 1.0 (under Vulkan 1.0 semantics)\n  SPIR-V 1.3 (under Vulkan 1.1 semantics)\n  SPIR-V 1.4 (under Vulkan 1.1 semantics)\n  SPIR-V 1.5 (under Vulkan 1.2 semantics)\n  SPIR-V 1.6 (under Vulkan 1.3 semantics) SPIR-V 1.6 (under Vulkan 1.4 semantics)\n"
+    },
+    {
+      "path": "<vulkan-sdk>\\Bin\\spirv-dis.exe",
+      "sha256": "1848582c22f378a22c330cd8e4d9c97aeca1bd79c2b15a3a5e2eeb89dfa93d64",
+      "version_argv": [
+        "<vulkan-sdk>\\Bin\\spirv-dis.exe",
+        "--version"
+      ],
+      "exit_status": 0,
+      "version": "SPIRV-Tools v2026.2 v2026.2.rc2-1-g2ec8457a\nTarget: SPIR-V 1.5\n"
+    }
+  ],
+  "strategies": {
+    "GenericRetained": {
+      "glslang": [
+        "-V",
+        "--target-env",
+        "vulkan1.2",
+        "-S",
+        "rgen"
+      ],
+      "spirv_opt": [
+        "--eliminate-dead-functions",
+        "--eliminate-dead-code-aggressive",
+        "--simplify-instructions",
+        "--eliminate-dead-branches",
+        "--cfg-cleanup"
+      ]
+    },
+    "LegacyInlined": {
+      "glslang": [
+        "-V",
+        "--target-env",
+        "vulkan1.2",
+        "-Os",
+        "-S",
+        "rgen"
+      ],
+      "spirv_opt": [
+        "-O"
+      ]
+    }
+  }
+}

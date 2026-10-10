@@ -35,7 +35,7 @@ import java.time.Duration;
 public class AndroidControllerIntegrationTest {
     @Implements(value=ProbeBridge.class,isInAndroidSdk=false)
     public static class Bridge {
-        static float x,z,yaw,pitch; static int attacks,parries,dodges,interacts,lanterns;
+        static float x,z,yaw,pitch; static int attacks,parries,dodges,interacts,lanterns,runToggles,runClears;
         static boolean paused; static int context,retries;
         @Implementation protected static void __staticInitializer__() {}
         @Implementation protected static int getSurfaceRuntimeState(long generation){return 1;}
@@ -50,6 +50,9 @@ public class AndroidControllerIntegrationTest {
         @Implementation protected static void requestDodge(){dodges++;}
         @Implementation protected static void requestInteract(){interacts++;}
         @Implementation protected static void requestToggleHeldLightPose(){lanterns++;}
+        @Implementation protected static void requestToggleRun(){runToggles++;}
+        @Implementation protected static void clearRunIntent(){runClears++;}
+        @Implementation protected static void setRunHeld(boolean held){}
     }
     private MainActivity a;
     static Field field(String name)throws Exception {Field f=MainActivity.class.getDeclaredField(name);f.setAccessible(true);return f;}
@@ -59,7 +62,7 @@ public class AndroidControllerIntegrationTest {
     }
     private Button button(String name)throws Exception{return (Button)field(name).get(a);}
     @Before public void setup()throws Exception {
-        Bridge.attacks=Bridge.parries=Bridge.dodges=Bridge.interacts=Bridge.lanterns=Bridge.context=0;
+        Bridge.attacks=Bridge.parries=Bridge.dodges=Bridge.interacts=Bridge.lanterns=Bridge.runToggles=Bridge.runClears=Bridge.context=0;
         Bridge.x=Bridge.z=Bridge.yaw=Bridge.pitch=0;
         a=Robolectric.buildActivity(MainActivity.class).get();
         a.setContentView(R.layout.activity_main);
@@ -67,13 +70,28 @@ public class AndroidControllerIntegrationTest {
         set("preferences",a.getSharedPreferences("controller-integration",Context.MODE_PRIVATE));
         a.getSharedPreferences("controller-integration",Context.MODE_PRIVATE).edit().clear().apply();
         set("resumed",true);set("menuVisible",false);
-        String[] names={"menuButton","attackButton","parryButton","dodgeButton","interactButton","toggleHeldLightPoseButton"};
-        int[] ids={R.id.menu_button,R.id.attack_button,R.id.parry_button,R.id.dodge_button,R.id.interact_button,R.id.toggle_held_light_pose_button};
+        String[] names={"menuButton","attackButton","parryButton","dodgeButton","runButton","interactButton","toggleHeldLightPoseButton"};
+        int[] ids={R.id.menu_button,R.id.attack_button,R.id.parry_button,R.id.dodge_button,R.id.run_button,R.id.interact_button,R.id.toggle_held_light_pose_button};
         for(int i=0;i<names.length;i++)set(names[i],a.findViewById(ids[i]));
         set("diagnosticsPanel",a.findViewById(R.id.diagnostics_panel));set("developerOverlay",a.findViewById(R.id.developer_overlay));
         set("vitalityStatus",a.findViewById(R.id.vitality_status));set("rtStatus",a.findViewById(R.id.rt_status));
         set("controllerPrompt",a.findViewById(R.id.controller_prompt));
         call("configureGameplayActionButtons",new Class<?>[]{});
+    }
+    @Test public void runButtonTogglesSharedIntentAndLifecycleCleanupResetsIt()throws Exception {
+        call("refreshControllerHud",new Class<?>[]{});
+        Button run=button("runButton");
+        assertEquals(View.VISIBLE,run.getVisibility());
+        assertEquals(a.getString(R.string.run),run.getText().toString());
+        run.performClick();
+        assertEquals(1,Bridge.runToggles);
+        assertEquals(a.getString(R.string.running),run.getText().toString());
+        call("clearTouchState",new Class<?>[]{});
+        assertEquals("touch cancellation clears native run intent",1,Bridge.runClears);
+        assertEquals(a.getString(R.string.run),run.getText().toString());
+        set("menuVisible",true);
+        run.performClick();
+        assertEquals("hidden menu state cannot create a run edge",1,Bridge.runToggles);
     }
     private KeyEvent key(int action,int code,int repeat) {
         ShadowSystemClock.advanceBy(Duration.ofMillis(2)); long now=SystemClock.uptimeMillis();
@@ -101,7 +119,7 @@ public class AndroidControllerIntegrationTest {
         android.content.SharedPreferences p=a.getSharedPreferences("controller-integration",Context.MODE_PRIVATE);
         p.edit().putBoolean("show_hud",true).putInt("interface_opacity",73).apply();java.util.Map<String,?> before=p.getAll();
         press(KeyEvent.KEYCODE_BUTTON_X);
-        for(String name:new String[]{"attackButton","parryButton","dodgeButton","menuButton","interactButton","toggleHeldLightPoseButton"})assertEquals(name,View.GONE,button(name).getVisibility());
+        for(String name:new String[]{"attackButton","parryButton","dodgeButton","runButton","menuButton","interactButton","toggleHeldLightPoseButton"})assertEquals(name,View.GONE,button(name).getVisibility());
         assertEquals(View.VISIBLE,((TextView)field("vitalityStatus").get(a)).getVisibility());
         TextView prompt=(TextView)field("controllerPrompt").get(a);
         assertEquals(View.VISIBLE,prompt.getVisibility());assertTrue(prompt.getText().toString().contains("A:"));

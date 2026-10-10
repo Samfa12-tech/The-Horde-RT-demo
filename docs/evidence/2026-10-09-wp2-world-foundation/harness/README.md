@@ -1,0 +1,9 @@
+# Recorded local harness inputs
+
+The all-ABI helper is archived as evidence. It is not a new supported production tool. The actual repository CTest registrations, presets, package inspectors and their argv remain authoritative. The other local orchestration wrappers are identified by SHA-256 in source provenance; their expanded tool argv and selections are in the ledger.
+
+`android-all-abi-package-check.ps1` uses the current repository working directory and existing SDK/NDK, checks APK-entry/library identity and ELF layout, and does not install or interact with a device. Its inspection is not all-ABI shader verification. The ephemeral wrappers remain in ignored local reports; they are not required to run the recorded repository commands from the repository root.
+
+This reused helper's summary-writing section still contains a historical `0eb66590` candidate label and three-class Java summary. Those labels are not current-candidate evidence. The public `android-packages.json` metadata was reconciled to d85a3cd1 using independently rehashed current APK/library entries, the full current 262-test JUnit XML set, and the actual current Gradle/lint logs. The helper's binary/ELF checks are the all-ABI gate; the full Java and lint results come from their separately recorded runs. The archived helper has not been rewritten to pretend those original labels were current.
+
+The ledger records failures and successful corrections. The first duplicate `native-debug-build` row's log was overwritten before unique suffixes were added; that row is explicitly unavailable and is not a gate. Other raw private logs stayed local. Public logs omit personal root paths. Source manifests are actual file SHA-256 identities; the source-provenance file adds immutable Git blob identities. Runtime candidate and test-only supplement are distinct from the later evidence commit.

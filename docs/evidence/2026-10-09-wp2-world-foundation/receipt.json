@@ -1,0 +1,115 @@
+{
+  "schema": 1,
+  "status": "HOST/PACKAGE-READY",
+  "starting_commit": "3b8ab9f6e4bb0ae8a0d57a5765ed0cbc947b5dfe",
+  "runtime_candidate_commit": "d85a3cd1246e22c91d166eb3e43b90112d121cb0",
+  "test_supplement_commit": "fbf7db6b10c6137c2697b66ae08f9279fc8511cd",
+  "device_verified": false,
+  "owner_audio_haptic_acceptance": "PENDING",
+  "manual_audio_haptic_required": "YES: movement cadence and support/event-time heights are affected; prior candidate owner observations are historical only",
+  "no_game_or_device_launches": true,
+  "results": {
+    "native_debug": {
+      "passed": 58,
+      "failed": 0,
+      "ctest_seconds": 291.82
+    },
+    "native_release": {
+      "passed": 58,
+      "failed": 0,
+      "ctest_seconds": 195.62
+    },
+    "directional_route_debug": {
+      "passed": 1,
+      "poses": 32,
+      "ctest_seconds": 4.98
+    },
+    "directional_route_release": {
+      "passed": 1,
+      "poses": 32,
+      "ctest_seconds": 1.74
+    },
+    "world_route": {
+      "checks": 16388,
+      "failures": 0,
+      "directions": 2
+    },
+    "shader_abi_freshness": {
+      "passed": 5,
+      "failed": 0
+    },
+    "windows_debug_policy_package": {
+      "passed": 5,
+      "failed": 0
+    },
+    "windows_release_policy_package": {
+      "passed": 3,
+      "failed": 0
+    },
+    "android_java": {
+      "tests": 262,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "android_lint": {
+      "debug": "passed",
+      "release": "passed"
+    },
+    "android_native_build_abis": [
+      "arm64-v8a",
+      "armeabi-v7a",
+      "x86",
+      "x86_64"
+    ],
+    "android_package_inspection": "SPIR-V inspection ARM64 only; all four ABIs checked APK-entry identity and ELF LOAD layout"
+  },
+  "torch": {
+    "original_test_source_unchanged": true,
+    "timeout_seconds": 180,
+    "debug_test_seconds": 167.43,
+    "debug_total_seconds": 167.45,
+    "debug_outer_seconds": 167.5907944,
+    "debug_margin_seconds": 12.57,
+    "release_test_seconds": 14.67,
+    "release_total_seconds": 14.68,
+    "release_outer_seconds": 14.8131273,
+    "poses": 3287,
+    "roof_skinned_poses": 1812,
+    "plane_samples": 3178,
+    "disk_samples": 57970,
+    "failures": 0,
+    "worst_headroom_metres": 0.0323757,
+    "threshold_metres": 0.03,
+    "historical_receipts_unchanged": true,
+    "single_pass_not_repeatability_or_GPU_acceptance": true
+  },
+  "blockout": {
+    "triangles": 350,
+    "surface_triangles": 14,
+    "resident_cpu_ns": 95500,
+    "staged_cpu_ns": 109000,
+    "resident_retained_cpu_bytes": 22752,
+    "staged_peak_cpu_bytes": 32880,
+    "comparison": "single host CPU preparation run; both native modes retain all geometry in one resident GPU scene; GPU preparation/overlap/retirement costs unmeasured"
+  },
+  "open_gates": [
+    "fresh paired clear-view and raised checkpoint171 GPU captures on exact executable/backend",
+    "Windows and Android Pipeline/RayQuery presentation, route and equipment/light acceptance",
+    "off-camera shadow/reflection/transmission checks",
+    "Windows focus/resize/restart and Android rotation/background/surface/process reconstruction",
+    "owner sound/haptic acceptance",
+    "dedicated backward/strafe/run/dodge clips",
+    "GPU resident-versus-staged measurements; no production outdoor capacity claim"
+  ],
+  "evidence_files": [
+    "runs.jsonl",
+    "source-provenance.json",
+    "windows-packages.json",
+    "android-packages.json",
+    "unchanged-shader-identities.json",
+    "selected-debug.json",
+    "selected-release.json",
+    "fixture-identities.json"
+  ]
+}

@@ -1,0 +1,51 @@
+[
+  {
+    "path": "assets/models/player/runtime/gothic-traveller-lod0.runtime.glb",
+    "bytes": 2568508,
+    "sha256": "46a88dac9dd569117be5a17a35540fecf3e0e6026d3ad404dd5fdbc85a9ad54f",
+    "git_blob": "1e3b6b9e70b0cde462be82cb29e189de8e70a1dc",
+    "hydrated": true
+  },
+  {
+    "path": "assets/models/player/viewmodel/runtime/gothic-traveller-viewmodel.runtime.glb",
+    "bytes": 1228828,
+    "sha256": "eaa0db3abb8ff2dae616247054c190031a08c542dd95396cc6dc1e18a7462488",
+    "git_blob": "c7e1aac731318f850e0de3240fb86f0fe87a31a4",
+    "hydrated": true
+  },
+  {
+    "path": "assets/models/player/runtime/clip-manifest.json",
+    "bytes": 1011,
+    "sha256": "1f8075bd1ff97010685172176535482f2b6fc262cc0f5c1daf63e5e8222f648d",
+    "git_blob": "7c9b0d75e74a8f2ffabb2e092951d23205aefe53",
+    "hydrated": true
+  },
+  {
+    "path": "assets/models/props/runtime/player-rag-torch/asset.manifest.json",
+    "bytes": 830,
+    "sha256": "5316b2072008da441024cda1153f725f5afcd7d366f3a5b89dece98ec74617aa",
+    "git_blob": "3d2428f0ac92ff5091af289e776a7413c86930ad",
+    "hydrated": true
+  },
+  {
+    "path": "assets/models/props/runtime/player-rag-torch/rag-torch-player-lod0.runtime.glb",
+    "bytes": 267672,
+    "sha256": "476cb05a8f11f1af917a0cfa29610cc03f23522478a366f6cf2cf49b906db74d",
+    "git_blob": "d346246a9c3c517803fbbcb19cefef748062173f",
+    "hydrated": true
+  },
+  {
+    "path": "assets/models/world/runtime/collapsed-entry/asset.manifest.json",
+    "bytes": 742,
+    "sha256": "952e1920fbc60646154d0424556c2935a18e7cf882866a9fe9f4f45ef38be623",
+    "git_blob": "0451e198bfd31c3662e14db3fea0912512f31f10",
+    "hydrated": true
+  },
+  {
+    "path": "assets/models/world/runtime/collapsed-entry/collapsed-entry-lod0.runtime.glb",
+    "bytes": 652980,
+    "sha256": "c67471b522c92f354d9a5880dea6e48b4f22b5095207841c35c95b5cfc75c4d4",
+    "git_blob": "adb9b1cf063e47b5ebfb2a1741521b1e23017a5a",
+    "hydrated": true
+  }
+]

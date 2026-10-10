@@ -1,0 +1,47 @@
+[
+  {
+    "path": "assets",
+    "git_object": "7bea3ea7f8edcecfa87c18da0256d96f47842d2c",
+    "unchanged": true
+  },
+  {
+    "path": "VERSION",
+    "git_object": "fdd3be6df54a88720553509b7a545f73294a867e",
+    "unchanged": true
+  },
+  {
+    "path": "CMakePresets.json",
+    "git_object": "79e418f63ab9f93071f379bfeede06b264ed68cc",
+    "unchanged": true
+  },
+  {
+    "path": "tests/FinalHeldTorchClearanceTests.cpp",
+    "git_object": "cc6aefb5884e9307a39e97f33ee809f8053a1174",
+    "unchanged": true
+  },
+  {
+    "path": "docs/evidence/2026-10-09-wp0-torch-diagnostic",
+    "git_object": "d0bf5c269c3762beae9cf1c973f30a5dd6bdd5a2",
+    "unchanged": true
+  },
+  {
+    "path": "docs/superpowers/plans/2026-10-09-horde-1.7-wp0-torch-diagnostic.md",
+    "git_object": "92be9a7ce2cf259959fbef6128bafa4e39663770",
+    "unchanged": true
+  },
+  {
+    "path": "docs/superpowers/plans/2026-10-09-horde-1.7-wp0-baseline-results.json",
+    "git_object": "ec899922b1c98fb4f2a74588d9568811077541a5",
+    "unchanged": true
+  },
+  {
+    "path": "tools/raygen-variant-budgets.json",
+    "git_object": "3ad61860ede5cccb8a2d1c6a5ce9b21062bb39a0",
+    "unchanged": true
+  },
+  {
+    "path": "tools/raygen-variant-catalog.json",
+    "git_object": "0a7bb45381877ba30142854e8c420e0a16ed0d1d",
+    "unchanged": true
+  }
+]

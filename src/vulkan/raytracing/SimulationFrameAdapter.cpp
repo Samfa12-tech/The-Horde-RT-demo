@@ -98,10 +98,13 @@ RtSceneFrameInputs BuildRtSceneFrameInputs(
     RtSceneFrameInputs frame;
     frame.playerRenderRoute = kProductionPlayerRenderRoute;
     frame.tickIndex = simulation.tickIndex;
+    frame.developmentRescueJourney = simulation.developmentRescueJourney;
+    frame.rescue = simulation.rescue;
     frame.cameraYaw = simulation.playerYawRadians;
     frame.cameraPitch = simulation.playerPitchRadians;
     frame.torchLightStrength = simulation.torchLightStrength * simulation.torchFailure.flameStrength;
     frame.walkTime = simulation.walkTime;
+    frame.playerSupportWorldY = simulation.playerSupportWorldY;
     frame.cameraX = simulation.playerX;
     frame.cameraZ = simulation.playerZ;
     frame.walkAmount = simulation.walkAmount;
@@ -127,14 +130,29 @@ RtSceneFrameInputs BuildRtSceneFrameInputs(
     frame.lanternPendulum = simulation.lanternPendulum;
     frame.rewardLanternWorldFromHinge = simulation.rewardLanternWorldFromHinge;
     frame.roster = simulation.enemyRoster;
+    if(simulation.developmentRescueJourney && simulation.rescue.exteriorSide) {
+        // Render-only admitted skeleton workload; no AI, enemy registration,
+        // attack target or Kit identity. Existing two waterfall guards persist.
+        frame.retainedWorkloadSkeleton=true;
+        frame.roster.selectedEnemy=horde::gameplay::EnemyKind::Lich;
+        frame.skeletonEnemyCount=1;
+        auto& actor=frame.skeletonEnemies[0];actor={};
+        actor.x=47;actor.z=7;actor.worldY=1.45f;
+        actor.animation=horde::gameplay::EnemyAnimation::Walking;
+        actor.animationTime=simulation.walkTime;
+    }
     frame.lich = simulation.lich;
     frame.zone = simulation.zone;
     frame.fireEmitters = simulation.fireEmitters;
     frame.fireEmitterCount = simulation.fireEmitterCount;
-    frame.lich.finaleSkylightOpenProgress = ResolveRtFinaleRoofOpen(
-        simulation.lich.finaleSkylightOpenProgress, frame.tuning);
-    frame.lich.finaleDawnRevealProgress = ResolveRtFinaleDawnReveal(
-        simulation.lich.finaleDawnRevealProgress, frame.tuning);
+    // A live rescue opening is authoritative collision/progression state.
+    // Legacy RT Lab dawn/roof inspection overrides cannot close its admitted
+    // physical traversal or turn this authored night into the demo finale.
+    frame.lich.finaleSkylightOpenProgress = simulation.developmentRescueJourney
+        ? simulation.lich.finaleSkylightOpenProgress
+        : ResolveRtFinaleRoofOpen(simulation.lich.finaleSkylightOpenProgress, frame.tuning);
+    frame.lich.finaleDawnRevealProgress = simulation.developmentRescueJourney
+        ? 0.0f : ResolveRtFinaleDawnReveal(simulation.lich.finaleDawnRevealProgress, frame.tuning);
     return frame;
 }
 

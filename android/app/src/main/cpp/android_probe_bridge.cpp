@@ -67,6 +67,7 @@
 #include "platform/android/SurfaceSessionMailbox.h"
 #include "platform/android/SurfacePresentationPolicy.h"
 #include "platform/android/GameplayEventMetadata.h"
+#include "platform/android/AndroidDebugRequestAdmission.h"
 #include "update/GitHubReleaseUpdater.h"
 #include "vulkan/GpuFrameTimer.h"
 #include "vulkan/PipelineCacheSeed.h"
@@ -82,6 +83,7 @@
 #include "telemetry/RtBenchmarkEvidenceRun.h"
 #include "telemetry/RtEvidencePublication.h"
 #include "vulkan/raytracing/SimulationFrameAdapter.h"
+#include "vulkan/raytracing/DevelopmentWorldSceneAdapter.h"
 #if HORDE_RT_STAGED_PRIMARY_TIMING
 #include "vulkan/raytracing/experimental/StagedPrimaryProfile.h"
 #endif
@@ -373,6 +375,16 @@ struct SwapchainContext
     bool glassFixtureRequested = false;
     bool productionRewardPropsRequested = false;
     bool productionLanternGlassOnly = false;
+    bool developmentSupportFixture = false;
+    bool developmentWorldRoute = false;
+    bool stagedWorldPreparation = false;
+    bool developmentRescueJourney = false;
+    std::optional<bool> developmentWorldRouteOverride;
+    std::optional<bool> stagedWorldPreparationOverride;
+    std::optional<bool> developmentSupportFixtureOverride;
+    std::optional<bool> developmentRescueJourneyOverride;
+    std::optional<std::int32_t> preparedFixtureCheckpointId;
+    bool preparedFixtureCheckpointIsCapture = false;
     float glassDepthScale = 1.0f;
     std::array<float, 3u> glassAttenuationColor{{0.72f, 0.90f, 1.0f}};
     float glassAttenuationDistance = 2.4f;
@@ -684,8 +696,13 @@ std::atomic<bool> gRtLabUnlockEligible{false};
 std::atomic<float> gRtLabGpuFrameTimeMs{0.0f};
 std::atomic<std::uint64_t> gRtLabGpuSampleCount{0u};
 std::atomic<std::int32_t> gBenchmarkCheckpointRequested{-1};
+std::atomic<bool> gDebugCheckpointInProgress{false};
+std::atomic<std::int32_t> gCombatPracticeRequested{-1};
+std::atomic<bool> gCombatPracticeActive{false};
 std::atomic<std::int32_t> gCaptureCheckpointRequested{-1};
+std::atomic<bool> gDebugCaptureActive{false};
 std::atomic<bool> gRouteReplayRequested{false};
+std::atomic<bool> gDebugRouteReplayInProgress{false};
 std::atomic<bool> gInAppBenchmarkRequested{false};
 std::atomic<bool> gInAppBenchmarkCancelRequested{false};
 std::atomic<int> gInAppBenchmarkStatus{0}; // 0 idle, 1 running, 2 complete, 3 failed/cancelled.
@@ -701,11 +718,49 @@ std::atomic<int> gFinaleEndingPhase{static_cast<int>(horde::gameplay::FinaleEndi
 // compact contextual UI view to the Java thread; Java only chooses labels.
 std::atomic<int> gContextualControlState{0};
 std::atomic<std::uint64_t> gWaterfallStereoGains{0u};
+std::atomic<std::uint64_t> gCombatTeachingUiState{0u};
+std::mutex gDebugRequestAdmissionMutex;
+
+horde::platform::android::DebugRequestAdmissionState ReadDebugRequestAdmissionStateLocked()
+{
+    horde::platform::android::DebugRequestAdmissionState state;
+    state.surfaceReady = gSurfaceSessions.State() == 1;
+    state.practicePending = gCombatPracticeRequested.load(std::memory_order_acquire) != -1 ||
+        gCombatPracticeActive.load(std::memory_order_acquire);
+    state.checkpointPending = gBenchmarkCheckpointRequested.load(std::memory_order_acquire) != -1;
+    state.fixtureCheckpointActive = gDebugCheckpointInProgress.load(std::memory_order_acquire);
+    state.capturePending = gCaptureCheckpointRequested.load(std::memory_order_acquire) != -1 ||
+        gDebugCaptureActive.load(std::memory_order_acquire);
+    state.replayPending = gRouteReplayRequested.load(std::memory_order_acquire) ||
+        gDebugRouteReplayInProgress.load(std::memory_order_acquire);
+    state.benchmarkPendingOrActive = gInAppBenchmarkRequested.load(std::memory_order_acquire) ||
+        gInAppBenchmarkStatus.load(std::memory_order_acquire) == 1;
+#if (defined(HORDE_RT_DEBUG_CHECKPOINTS) && !defined(NDEBUG)) || HORDE_RT_ANDROID_MOTION_VALIDATION
+    state.motionPendingOrActive = gMotionStatus.load(std::memory_order_acquire) != 0;
+#endif
+    {
+        std::lock_guard<std::mutex> graphicsLock(gGraphicsMutex);
+        state.entryModeActive = gEntryControls.enabled || gEntryControls.play;
+    }
+    {
+        std::lock_guard<std::mutex> reportLock(gReportMutex);
+        state.capturePending = state.capturePending ||
+            gPlaytestCapture.state != PlaytestCaptureRequest::State::Empty;
+    }
+    return state;
+}
+
+bool CanQueueCompetingDebugRequestLocked()
+{
+    return horde::platform::android::CanRequestCompetingDebugMode(
+        ReadDebugRequestAdmissionStateLocked());
+}
 
 struct PlatformGameplayEvent
 {
     std::uint64_t metadata = 0u;
     std::uint64_t stereoGains = 0u;
+    std::uint64_t verticalMetadata = 0u;
 };
 
 constexpr std::size_t kPlatformGameplayEventCapacity = 128u;
@@ -815,13 +870,15 @@ std::uint64_t PlatformGameplayEventOverflowCount()
 void EnqueuePlatformGameplayEvent(const horde::gameplay::simulation::GameplayEvent& event)
 {
     const horde::gameplay::SpatialAudioGains gains = horde::gameplay::CalculateSpatialAudio(
-        {event.worldX, event.worldZ, std::max(0.0f, event.intensity), 1.0f, 14.0f},
-        {event.listenerX, event.listenerZ, event.listenerYawRadians});
+        {event.worldX, event.worldZ, std::max(0.0f, event.intensity), 1.0f, 14.0f, event.worldY},
+        {event.listenerX, event.listenerZ, event.listenerYawRadians, event.listenerY});
     const std::uint64_t metadata = horde::platform::android::PackGameplayEventMetadata(event);
+    const std::uint64_t verticalMetadata =
+        horde::platform::android::PackGameplayEventVerticalMetadata(event);
 
     std::lock_guard<std::mutex> lock(gPlatformGameplayEventMutex);
     const bool enqueued = gPlatformGameplayEvents.Push(
-        {metadata, PackStereoGains(gains.left, gains.right)});
+        {metadata, PackStereoGains(gains.left, gains.right), verticalMetadata});
 #if defined(HORDE_RT_DEBUG_CHECKPOINTS)
     if (event.type == horde::gameplay::simulation::GameplayEventType::PlayerSwing)
     {
@@ -848,6 +905,29 @@ void PublishSimulationUiState()
 {
     const horde::gameplay::simulation::SimulationSnapshot& simulation = gGameSimulation.Snapshot();
     const horde::gameplay::PlayerVitalsSnapshot& vitals = simulation.playerVitals;
+    const auto& teaching = simulation.combatTeaching;
+    const auto clampByte = [](const float value) -> std::uint64_t
+    {
+        if (!std::isfinite(value)) return 0u;
+        return static_cast<std::uint64_t>(std::clamp(value, 0.0f, 1.0f) * 255.0f + 0.5f);
+    };
+    const std::uint64_t teachingState =
+        (static_cast<std::uint64_t>(teaching.stage) & 0x7u) |
+        ((static_cast<std::uint64_t>(teaching.cue) & 0xfu) << 3u) |
+        ((static_cast<std::uint64_t>(teaching.source) & 0x7u) << 7u) |
+        (static_cast<std::uint64_t>(teaching.enabled) << 10u) |
+        (static_cast<std::uint64_t>(teaching.parryLearned) << 11u) |
+        (static_cast<std::uint64_t>(teaching.dodgeLearned) << 12u) |
+        (static_cast<std::uint64_t>(teaching.safePractice) << 13u) |
+        (static_cast<std::uint64_t>(teaching.slowdownActive) << 14u) |
+        (clampByte(teaching.cueProgress) << 16u) |
+        ((static_cast<std::uint64_t>(teaching.practiceMisses) & 0xffu) << 24u) |
+        (clampByte(teaching.promptOpacity) << 40u);
+    gCombatTeachingUiState.store(teachingState, std::memory_order_release);
+    if ((teaching.stage == horde::gameplay::simulation::TutorialStage::Complete ||
+         teaching.stage == horde::gameplay::simulation::TutorialStage::Skipped) &&
+        gCombatPracticeActive.load(std::memory_order_acquire))
+        gCombatPracticeActive.store(false, std::memory_order_release);
     gKeeperTitleOpacity.store(std::clamp(simulation.lich.titleOpacity, 0.0f, 1.0f), std::memory_order_release);
     gPlayerVitalityState.store(
         (static_cast<std::uint64_t>(static_cast<std::uint32_t>(vitals.maxVitality)) << 32u) |
@@ -861,21 +941,28 @@ void PublishSimulationUiState()
     using horde::gameplay::interactions::ChestRewardPrompt;
     using horde::gameplay::interactions::HeldLightKind;
     using horde::gameplay::interactions::HeldLightPose;
-    contextualControls |= static_cast<int>(simulation.chestPrompt) << 3;
-    if (simulation.chestPrompt == ChestRewardPrompt::OpenChest ||
-        simulation.chestPrompt == ChestRewardPrompt::ClaimLantern)
+    using horde::gameplay::traversal::RescuePrompt;
+    if (simulation.developmentRescueJourney && simulation.rescuePrompt != RescuePrompt::None)
     {
-        contextualControls |= 1;
+        contextualControls |= 1 << 9;
+        contextualControls |= static_cast<int>(simulation.rescuePrompt) << 6;
+        if (simulation.rescuePrompt == RescuePrompt::Climb || simulation.rescuePrompt == RescuePrompt::Descend)
+            contextualControls |= 1;
     }
-    if (simulation.interaction.heldLightKind == HeldLightKind::RewardLantern)
+    else
     {
-        if (simulation.interaction.heldLightPose == HeldLightPose::Low)
+        contextualControls |= static_cast<int>(simulation.chestPrompt) << 3;
+        if (simulation.chestPrompt == ChestRewardPrompt::OpenChest ||
+            simulation.chestPrompt == ChestRewardPrompt::ClaimLantern)
         {
-            contextualControls |= 2;
+            contextualControls |= 1;
         }
-        else if (simulation.interaction.heldLightPose == HeldLightPose::High)
+        if (simulation.interaction.heldLightKind == HeldLightKind::RewardLantern)
         {
-            contextualControls |= 4;
+            if (simulation.interaction.heldLightPose == HeldLightPose::Low)
+                contextualControls |= 2;
+            else if (simulation.interaction.heldLightPose == HeldLightPose::High)
+                contextualControls |= 4;
         }
     }
     gContextualControlState.store(contextualControls, std::memory_order_release);
@@ -1479,6 +1566,7 @@ void StartInAppBenchmark(SwapchainContext& context)
     context.benchmarkSampling = false;
     context.routeReplayActive = false;
     context.captureActive = false;
+    gDebugCaptureActive.store(false, std::memory_order_release);
     context.capturePresentedFrames = 0u;
     context.benchmarkExpectedFrame.reset();
     horde::gameplay::BenchmarkWorkload requestedWorkload =
@@ -1634,6 +1722,10 @@ void ApplyDebugCheckpointSimulation(
     const bool replacedQueue = gGameSimulation.Snapshot().playerMountProfile != config.playerMountProfile;
     if (replacedQueue)
         gGameSimulation = horde::gameplay::simulation::GameSimulation(config);
+    const bool rescueJourneyCheckpoint = selection.development != nullptr &&
+        selection.development->id == 192;
+    if (gGameSimulation.Snapshot().developmentRescueJourney && !rescueJourneyCheckpoint)
+        gGameSimulation.SetDevelopmentRescueJourney(false);
     horde::platform::android::ResetMusicSession(replacedQueue);
     if (selection.development != nullptr)
     {
@@ -1662,9 +1754,16 @@ void ApplyDebugCheckpointSimulation(
                         timing.activeScope.reset();
                     }
                 }};
-        const bool staged = horde::gameplay::StageDevelopmentCheckpointSimulation(
-            gGameSimulation, *selection.development, &evidence,
-            observation != nullptr ? &stepObservation : nullptr);
+        // This checkpoint is a journey-mode start, not a world-route debug
+        // teleport. Preserve the normal dungeon start and let the journey
+        // authority place the player at its lower safe landing.
+        const bool staged = rescueJourneyCheckpoint
+            ? gGameSimulation.ApplyShowcaseCheckpoint(selection.simulationCheckpointId)
+            : horde::gameplay::StageDevelopmentCheckpointSimulation(
+                gGameSimulation, *selection.development, &evidence,
+                observation != nullptr ? &stepObservation : nullptr);
+        if (rescueJourneyCheckpoint)
+            gGameSimulation.SetDevelopmentRescueJourney(true);
         if (selection.development->combatPose ==
             horde::gameplay::DevelopmentCombatPose::ParryActive)
         {
@@ -1692,6 +1791,12 @@ void ApplyDebugCheckpointSimulation(
                 evidence.actionTime);
         }
         return;
+    }
+    const auto& currentSimulation = gGameSimulation.Snapshot();
+    if (currentSimulation.developmentSupportFixture)
+    {
+        gGameSimulation.SetDevelopmentSupportFixture(
+            false, currentSimulation.playerSupportGeneration + 1u);
     }
     gGameSimulation.ApplyShowcaseCheckpoint(selection.simulationCheckpointId);
     if (selection.checkpoint.id == selection.simulationCheckpointId)
@@ -1927,6 +2032,12 @@ void ApplyBenchmarkCheckpoint(
 {
     const auto& checkpoint = selection.checkpoint;
     ApplyDebugCheckpointSimulation(selection, observation);
+    context.developmentSupportFixture =
+        gGameSimulation.Snapshot().developmentSupportFixture;
+    context.developmentSupportFixtureOverride.reset();
+    context.developmentWorldRouteOverride.reset();
+    context.stagedWorldPreparationOverride.reset();
+    context.developmentRescueJourneyOverride.reset();
     if (context.rtFrameEvidenceInitialised)
     {
         (void)context.rtFrameEvidence.ApplyEvent(
@@ -1954,6 +2065,7 @@ void ApplyBenchmarkCheckpoint(
     }
     context.routeReplayActive = false;
     context.captureActive = false;
+    gDebugCaptureActive.store(false, std::memory_order_release);
     context.capturePresentedFrames = 0u;
     context.benchmarkSampling = true;
     ++context.benchmarkGeneration;
@@ -1975,6 +2087,12 @@ void ApplyCaptureCheckpoint(
 {
     const auto& checkpoint = selection.checkpoint;
     ApplyDebugCheckpointSimulation(selection, observation);
+    context.developmentSupportFixture =
+        gGameSimulation.Snapshot().developmentSupportFixture;
+    context.developmentSupportFixtureOverride.reset();
+    context.developmentWorldRouteOverride.reset();
+    context.stagedWorldPreparationOverride.reset();
+    context.developmentRescueJourneyOverride.reset();
     if (context.rtFrameEvidenceInitialised)
     {
         (void)context.rtFrameEvidence.ApplyEvent(
@@ -2001,6 +2119,7 @@ void ApplyCaptureCheckpoint(
     context.routeReplayActive = false;
     context.benchmarkSampling = false;
     context.captureActive = true;
+    gDebugCaptureActive.store(true, std::memory_order_release);
     context.capturePresentedFrames = 0u;
     ++context.benchmarkGeneration;
     ResetBenchmarkTiming(context);
@@ -2033,6 +2152,7 @@ void ApplyRouteReplay(SwapchainContext& context)
     context.glassAttenuationDistance = 2.4f;
     context.benchmarkSampling = false;
     context.captureActive = false;
+    gDebugCaptureActive.store(false, std::memory_order_release);
     context.capturePresentedFrames = 0u;
     context.routeReplay.Reset();
     context.routeReplayActive = true;
@@ -2713,6 +2833,7 @@ bool ReleaseSwapchainResources(SwapchainContext& context)
 #endif
     context.gpuFrameTimingTotalMs = 0.0;
     context.gpuFrameTimingSampleCount = 0u;
+    gGameSimulation.InvalidateWorldZoneReadiness();
     context.rtScene.Destroy();
 
     if (context.commandPool != VK_NULL_HANDLE)
@@ -2991,6 +3112,18 @@ bool InitialiseRtSceneForSwapchain(SwapchainContext& context)
 
     const VkExtent2D renderExtent = ScaledRenderExtent(context.swapchainExtent, context.renderScale);
     std::string diagnostic;
+    context.developmentSupportFixture = context.developmentSupportFixtureOverride.has_value()
+        ? *context.developmentSupportFixtureOverride
+        : gGameSimulation.Snapshot().developmentSupportFixture;
+    context.developmentWorldRoute=context.developmentWorldRouteOverride.value_or(
+        gGameSimulation.Snapshot().developmentWorldRoute ||
+        gGameSimulation.Snapshot().developmentRescueJourney);
+    context.developmentRescueJourney=context.developmentRescueJourneyOverride.value_or(
+        gGameSimulation.Snapshot().developmentRescueJourney);
+    context.stagedWorldPreparation=context.stagedWorldPreparationOverride.value_or(gGameSimulation.Snapshot().stagedWorldPreparation);
+    context.rtScene.SetDevelopmentWorldRoute(context.developmentWorldRoute,context.stagedWorldPreparation);
+    context.rtScene.SetDevelopmentRescueJourney(context.developmentRescueJourney);
+    context.rtScene.SetDevelopmentSupportFixture(context.developmentSupportFixture);
     const bool initialised = context.rtScene.Initialise(context.instance,
                                     context.physicalDevice,
                                     context.device,
@@ -3116,6 +3249,195 @@ bool RecreateSwapchain(SwapchainContext& context)
     context.entryWarmFrames = kMaxFramesInFlight;
     PublishEntryState(context, false);
     return restored;
+}
+
+bool InitialiseRtSceneForSwapchain(SwapchainContext& context);
+
+void RecordDevelopmentSupportFixtureRebuildFailure(
+    SwapchainContext& context,
+    const std::int32_t checkpointId,
+    const bool requestedFixture,
+    const char* phase,
+    const VkResult result)
+{
+    context.capabilities.rtScene.presented = false;
+    {
+        std::lock_guard lock(gReportMutex);
+        gLatestBenchmarkProgress = "CHECKPOINT FAILED: vertical support fixture RT rebuild";
+    }
+    __android_log_print(ANDROID_LOG_ERROR, kTag,
+        "HORDE_VERTICAL_SUPPORT_FIXTURE_REBUILD checkpoint=%d requested=%d phase=%s result=%d presented=0",
+        checkpointId, requestedFixture ? 1 : 0, phase, static_cast<int>(result));
+}
+
+bool RebuildDevelopmentSupportFixtureOnOwner(
+    SwapchainContext& context,
+    const std::int32_t checkpointId,
+    const bool requestedFixture, const bool requestedWorld = false, const bool stagedWorld = false)
+{
+    if (!context.useRtPath || !context.rtScene.IsReady())
+    {
+        RecordDevelopmentSupportFixtureRebuildFailure(
+            context, checkpointId, requestedFixture, "scene-not-ready", VK_NOT_READY);
+        return false;
+    }
+    if (context.developmentSupportFixture == requestedFixture && context.developmentWorldRoute == requestedWorld &&
+        context.stagedWorldPreparation == stagedWorld &&
+        context.developmentRescueJourney == context.developmentRescueJourneyOverride.value_or(context.developmentRescueJourney))
+        return true;
+    if (!ConsumePendingImageAcquire(context))
+    {
+        RecordDevelopmentSupportFixtureRebuildFailure(
+            context, checkpointId, requestedFixture, "acquire-retirement", VK_ERROR_UNKNOWN);
+        return false;
+    }
+
+    context.entryHandoff.BeginLoad();
+    PublishEntryState(context, false);
+    gSurfaceSessions.Publish(context.surfaceGeneration, 0);
+    const VkResult idleResult = vkDeviceWaitIdle(context.device);
+    const bool evidenceCompleted = CompleteRtEvidenceAfterDeviceIdle(context, idleResult);
+    if (idleResult != VK_SUCCESS || !evidenceCompleted)
+    {
+        context.entryHandoff.FailLoad();
+        PublishEntryState(context, false);
+        RecordDevelopmentSupportFixtureRebuildFailure(
+            context, checkpointId, requestedFixture, "device-idle", idleResult);
+        return false;
+    }
+    const VkResult commandPoolResetResult = vkResetCommandPool(context.device, context.commandPool, 0);
+    if (commandPoolResetResult != VK_SUCCESS)
+    {
+        context.entryHandoff.FailLoad();
+        PublishEntryState(context, false);
+        RecordDevelopmentSupportFixtureRebuildFailure(
+            context, checkpointId, requestedFixture, "command-pool-reset", commandPoolResetResult);
+        return false;
+    }
+
+    CancelActiveInAppBenchmark(context);
+    context.gpuFrameTimer.ResetAfterDeviceIdle();
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+    context.stagedPassTimer.ResetAfterDeviceIdle();
+#endif
+    if (context.rtFrameEvidenceInitialised && !context.rtFrameEvidence.Recreate(
+            horde::telemetry::RtResourceResetReason::DiagnosticResourceReplacement,
+            CurrentInitialGpuEvidenceStatus(context)))
+    {
+        (void)context.rtFrameEvidence.Destroy();
+        context.rtFrameEvidenceInitialised = false;
+    }
+
+    context.rtScene.Destroy();
+    context.developmentSupportFixtureOverride = requestedFixture;
+    context.developmentWorldRouteOverride=requestedWorld;
+    context.stagedWorldPreparationOverride=stagedWorld;
+    if (!InitialiseRtSceneForSwapchain(context))
+    {
+        // Initialization can submit uploads before failing. Do not fall back
+        // to the old fixture or continue with mismatched gameplay geometry.
+        const VkResult rebuildIdleResult = vkDeviceWaitIdle(context.device);
+        const bool rebuildEvidenceCompleted =
+            CompleteRtEvidenceAfterDeviceIdle(context, rebuildIdleResult);
+        if (rebuildIdleResult == VK_SUCCESS && rebuildEvidenceCompleted &&
+            vkResetCommandPool(context.device, context.commandPool, 0) == VK_SUCCESS)
+        {
+            context.rtScene.Destroy();
+        }
+        context.entryHandoff.FailLoad();
+        PublishEntryState(context, false);
+        RecordDevelopmentSupportFixtureRebuildFailure(
+            context, checkpointId, requestedFixture, "scene-initialize", rebuildIdleResult);
+        return false;
+    }
+
+    context.capabilities.rtScene.presented = false;
+    context.capturePresentedFrames = 0u;
+    context.timingFrameCount = 0u;
+    context.timingFenceMs = context.timingRecordMs = 0.0;
+    context.timingPresentMs = context.timingTotalMs = 0.0;
+    context.gpuFrameTimingTotalMs = 0.0;
+    context.gpuFrameTimingSampleCount = 0u;
+    RefreshGpuTimingTelemetry(context);
+    context.entryHandoff.EndLoad();
+    PublishEntryState(context, false);
+    __android_log_print(ANDROID_LOG_INFO, kTag,
+        "HORDE_VERTICAL_SUPPORT_FIXTURE_REBUILD checkpoint=%d requested=%d phase=complete result=%d presented=0",
+        checkpointId, requestedFixture ? 1 : 0, static_cast<int>(VK_SUCCESS));
+    return true;
+}
+
+bool PrepareFixtureChangingCheckpointOnOwner(
+    SwapchainContext& context, bool& sceneTransition)
+{
+    if (context.sceneProfile != horde::vulkan::raytracing::RtSceneProfile::Showcase ||
+        !context.useRtPath || !context.rtScene.IsReady() ||
+        context.inAppBenchmark.IsRunning())
+        return true;
+
+    std::unique_lock<std::mutex> admissionLock(gDebugRequestAdmissionMutex);
+    const std::int32_t requestedCaptureCheckpoint =
+        gCaptureCheckpointRequested.load(std::memory_order_acquire);
+    const std::int32_t requestedCheckpoint =
+        gBenchmarkCheckpointRequested.load(std::memory_order_acquire);
+
+    DebugCheckpointSelection selection;
+    const bool isCapture = ResolveDebugCheckpoint(requestedCaptureCheckpoint, selection);
+    const bool isBenchmark = !isCapture && ResolveDebugCheckpoint(requestedCheckpoint, selection);
+    if (!isCapture && !isBenchmark)
+        return true;
+
+    const bool requestedFixture = selection.development != nullptr &&
+        selection.development->developmentSupportFixture;
+    // Ordinary selections and transitions between checkpoints using the same
+    // fixture retain their established RenderFrame staging/observation path.
+    const bool requestedWorld=selection.development &&
+        (selection.development->developmentWorldRoute || selection.development->id == 192);
+    const bool requestedRescueJourney=selection.development && selection.development->id == 192;
+    const bool stagedWorld=selection.development && selection.development->stagedWorldPreparation;
+    if (context.developmentSupportFixture == requestedFixture && context.developmentWorldRoute == requestedWorld &&
+        context.stagedWorldPreparation == stagedWorld && context.developmentRescueJourney == requestedRescueJourney)
+        return true;
+
+    std::atomic<std::int32_t>& selectedRequest = isCapture
+        ? gCaptureCheckpointRequested : gBenchmarkCheckpointRequested;
+    std::int32_t expectedRequest = isCapture
+        ? requestedCaptureCheckpoint : requestedCheckpoint;
+    if (!selectedRequest.compare_exchange_strong(
+            expectedRequest, -1, std::memory_order_acq_rel, std::memory_order_acquire))
+        return true;
+
+    // Capture has always taken precedence when both checkpoint mailboxes were
+    // populated at the RenderFrame boundary. Retire only the value we observed.
+    if (isCapture && requestedCheckpoint >= 0)
+    {
+        std::int32_t expectedBenchmark = requestedCheckpoint;
+        (void)gBenchmarkCheckpointRequested.compare_exchange_strong(
+            expectedBenchmark, -1, std::memory_order_acq_rel, std::memory_order_acquire);
+    }
+    gDebugCheckpointInProgress.store(true, std::memory_order_release);
+    admissionLock.unlock();
+
+    context.developmentRescueJourneyOverride=requestedRescueJourney;
+    if (!RebuildDevelopmentSupportFixtureOnOwner(
+            context, selection.checkpoint.id, requestedFixture, requestedWorld, stagedWorld))
+    {
+        context.developmentRescueJourneyOverride.reset();
+        std::int32_t expectedCapture = requestedCaptureCheckpoint;
+        (void)gCaptureCheckpointRequested.compare_exchange_strong(
+            expectedCapture, -1, std::memory_order_acq_rel, std::memory_order_acquire);
+        std::int32_t expectedBenchmark = requestedCheckpoint;
+        (void)gBenchmarkCheckpointRequested.compare_exchange_strong(
+            expectedBenchmark, -1, std::memory_order_acq_rel, std::memory_order_acquire);
+        gRouteReplayRequested.store(false, std::memory_order_release);
+        gDebugCheckpointInProgress.store(false, std::memory_order_release);
+        return false;
+    }
+
+    context.preparedFixtureCheckpointId = selection.checkpoint.id;
+    context.preparedFixtureCheckpointIsCapture = isCapture;
+    sceneTransition = true;
+    return true;
 }
 
 horde::vulkan::PipelineCacheSeed::DeviceIdentity PipelineCacheDeviceIdentity(
@@ -3493,14 +3815,45 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                 gInAppBenchmarkStatus.store(3, std::memory_order_release);
             }
 
-            const std::int32_t requestedCheckpoint =
-                gBenchmarkCheckpointRequested.exchange(-1, std::memory_order_acq_rel);
-            const std::int32_t requestedCaptureCheckpoint =
-                gCaptureCheckpointRequested.exchange(-1, std::memory_order_acq_rel);
+            std::int32_t requestedCheckpoint = -1;
+            std::int32_t requestedCaptureCheckpoint = -1;
+            std::int32_t requestedCombatPractice = -1;
+            {
+                std::lock_guard<std::mutex> admissionLock(gDebugRequestAdmissionMutex);
+                if (!context.preparedFixtureCheckpointId.has_value() || context.inAppBenchmark.IsRunning())
+                {
+                    requestedCheckpoint =
+                        gBenchmarkCheckpointRequested.exchange(-1, std::memory_order_acq_rel);
+                    requestedCaptureCheckpoint =
+                        gCaptureCheckpointRequested.exchange(-1, std::memory_order_acq_rel);
+                    requestedCombatPractice =
+                        gCombatPracticeRequested.exchange(-1, std::memory_order_acq_rel);
+                    if (requestedCheckpoint >= 0 || requestedCaptureCheckpoint >= 0)
+                        gDebugCheckpointInProgress.store(true, std::memory_order_release);
+                    if (requestedCombatPractice >= 0)
+                        gCombatPracticeActive.store(true, std::memory_order_release);
+                }
+            }
             if (!context.inAppBenchmark.IsRunning())
             {
                 DebugCheckpointSelection selection;
-                if (ResolveDebugCheckpoint(requestedCaptureCheckpoint, selection))
+                if (context.preparedFixtureCheckpointId.has_value())
+                {
+                    if (ResolveDebugCheckpoint(
+                            *context.preparedFixtureCheckpointId, selection))
+                    {
+                        if (context.preparedFixtureCheckpointIsCapture)
+                            ApplyCaptureCheckpoint(
+                                context, selection, evidenceFrame ? &observation : nullptr);
+                        else
+                            ApplyBenchmarkCheckpoint(
+                                context, selection, evidenceFrame ? &observation : nullptr);
+                    }
+                    context.preparedFixtureCheckpointId.reset();
+                    context.preparedFixtureCheckpointIsCapture = false;
+                    gDebugCheckpointInProgress.store(false, std::memory_order_release);
+                }
+                else if (ResolveDebugCheckpoint(requestedCaptureCheckpoint, selection))
                 {
                     ApplyCaptureCheckpoint(
                         context, selection, evidenceFrame ? &observation : nullptr);
@@ -3510,15 +3863,47 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                     ApplyBenchmarkCheckpoint(
                         context, selection, evidenceFrame ? &observation : nullptr);
                 }
-                if (gRouteReplayRequested.exchange(false, std::memory_order_acq_rel))
+                if (requestedCheckpoint >= 0 || requestedCaptureCheckpoint >= 0)
+                    gDebugCheckpointInProgress.store(false, std::memory_order_release);
+                else if (requestedCombatPractice == 1 || requestedCombatPractice == 2)
+                {
+                    std::lock_guard<std::mutex> admissionLock(gDebugRequestAdmissionMutex);
+                    const auto admission = ReadDebugRequestAdmissionStateLocked();
+                    if (!admission.entryModeActive &&
+                        gCombatPracticeActive.load(std::memory_order_acquire))
+                    {
+                        gGameSimulation.BeginCombatPractice(
+                            requestedCombatPractice == 1
+                                ? horde::gameplay::EnemyKind::Skeleton
+                                : horde::gameplay::EnemyKind::Lich);
+                    }
+                    else
+                    {
+                        gCombatPracticeActive.store(false, std::memory_order_release);
+                    }
+                }
+                bool requestedRouteReplay = false;
+                {
+                    std::lock_guard<std::mutex> admissionLock(gDebugRequestAdmissionMutex);
+                    requestedRouteReplay = gRouteReplayRequested.exchange(false, std::memory_order_acq_rel);
+                    if (requestedRouteReplay)
+                        gDebugRouteReplayInProgress.store(true, std::memory_order_release);
+                }
+                if (requestedRouteReplay)
                 {
                     ApplyRouteReplay(context);
+                    std::lock_guard<std::mutex> admissionLock(gDebugRequestAdmissionMutex);
+                    gDebugRouteReplayInProgress.store(false, std::memory_order_release);
                 }
             }
             else
             {
                 gRouteReplayRequested.store(false, std::memory_order_release);
                 gCaptureCheckpointRequested.store(-1, std::memory_order_release);
+                gCombatPracticeRequested.store(-1, std::memory_order_release);
+                context.preparedFixtureCheckpointId.reset();
+                context.preparedFixtureCheckpointIsCapture = false;
+                gDebugCheckpointInProgress.store(false, std::memory_order_release);
             }
 
             // Accepted Stop and world commands have one publication/admission
@@ -3562,6 +3947,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                 context.benchmarkSampling = false;
                 context.routeReplayActive = false;
                 context.captureActive = false;
+                gDebugCaptureActive.store(false, std::memory_order_release);
                 context.capturePresentedFrames = 0u;
             }
             if (context.rtFrameEvidenceInitialised && routeResetPending)
@@ -3829,6 +4215,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                 std::memory_order_release);
         }
         const horde::vulkan::raytracing::RtSceneTuning rtLabTuning = gRtLabState.Snapshot();
+        horde::vulkan::raytracing::PublishDevelopmentWorldReadiness(gGameSimulation,context.rtScene);
         horde::vulkan::raytracing::RtSceneFrameInputs frameInputs;
         if (context.sceneProfile == horde::vulkan::raytracing::RtSceneProfile::GraphicsPreview)
         {
@@ -4657,6 +5044,15 @@ void SwapchainRenderLoop()
             continue;
         }
 #endif
+        if (!PrepareFixtureChangingCheckpointOnOwner(gSwapchainContext, sceneTransition))
+        {
+            gSwapchainContext.entryHandoff.FailLoad();
+            PublishEntryState(gSwapchainContext, false);
+            gSurfaceSessions.Publish(gSwapchainContext.surfaceGeneration, 3);
+            __android_log_print(ANDROID_LOG_ERROR, kTag,
+                "Diagnostic surface stopped after vertical support fixture checkpoint failure.");
+            break;
+        }
         horde::graphics::ForegroundPauseRenderInput pauseCadenceInput{};
         pauseCadenceInput.foreground = true; // A live swapchain owner exists only for the foreground surface.
         pauseCadenceInput.paused = measurementPaused;
@@ -4892,6 +5288,8 @@ bool StartSurfaceInternal(ANativeWindow* window,
         }
     } cleanup{context};
     context.capabilities = capabilities;
+    context.developmentSupportFixture =
+        gGameSimulation.Snapshot().developmentSupportFixture;
     context.reportDirectory = reportDirectory;
     const auto startupGraphics = ReadRequestedGraphics();
     context.graphicsSettings = startupGraphics.requested;
@@ -5059,6 +5457,14 @@ bool StartSurfaceInternal(ANativeWindow* window,
 
 void StopSurfaceInternal()
 {
+    {
+        std::lock_guard<std::mutex> admissionLock(gDebugRequestAdmissionMutex);
+        gCombatPracticeRequested.store(-1, std::memory_order_release);
+        gCombatPracticeActive.store(false, std::memory_order_release);
+        gDebugCheckpointInProgress.store(false, std::memory_order_release);
+        gDebugRouteReplayInProgress.store(false, std::memory_order_release);
+        gDebugCaptureActive.store(false, std::memory_order_release);
+    }
     if (gInAppBenchmarkStatus.load(std::memory_order_acquire) == 1)
     {
         gInAppBenchmarkStatus.store(3, std::memory_order_release);
@@ -5398,6 +5804,8 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestPlaytestCapture(JNIEnv*, jcla
 {
     if (screenshotConsent != JNI_TRUE || !gSwapchainRunning.load(std::memory_order_acquire) ||
         gSurfaceSessions.State() != 1) return 0;
+    std::lock_guard<std::mutex> admissionLock(gDebugRequestAdmissionMutex);
+    if (!CanQueueCompetingDebugRequestLocked()) return 0;
     std::lock_guard<std::mutex> lock(gReportMutex);
     if (gPlaytestCapture.state != PlaytestCaptureRequest::State::Empty ||
         gPlaytestCaptureNextToken == static_cast<std::uint64_t>(std::numeric_limits<jlong>::max())) return 0;
@@ -5601,6 +6009,33 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_setViewControls(JNIEnv*, jclass, jfl
 }
 
 extern "C" JNIEXPORT void JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_setRunHeld(JNIEnv*, jclass, jboolean held)
+{
+    std::lock_guard<std::mutex> lock(gInputPublisherMutex);
+    gInputPublisherState.runHeld = held == JNI_TRUE;
+    PublishInputLocked();
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_requestToggleRun(JNIEnv*, jclass)
+{
+    std::lock_guard<std::mutex> lock(gInputPublisherMutex);
+    if (gInputPublisherState.commands.runToggle != UINT64_MAX)
+        ++gInputPublisherState.commands.runToggle;
+    PublishInputLocked();
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_clearRunIntent(JNIEnv*, jclass)
+{
+    std::lock_guard<std::mutex> lock(gInputPublisherMutex);
+    gInputPublisherState.runHeld = false;
+    if (gInputPublisherState.commands.clearRunIntent != UINT64_MAX)
+        ++gInputPublisherState.commands.clearRunIntent;
+    PublishInputLocked();
+}
+
+extern "C" JNIEXPORT void JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_requestAttack(JNIEnv*, jclass)
 {
     std::lock_guard<std::mutex> lock(gInputPublisherMutex);
@@ -5640,6 +6075,41 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestDodge(JNIEnv*, jclass)
             horde::vulkan::raytracing::ReadRtSceneSteadyClock(nullptr));
     }
     PublishInputLocked();
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_setCombatTeachingOptions(
+    JNIEnv*, jclass, jboolean enabled, jboolean slowdown)
+{
+    std::lock_guard<std::mutex> lock(gInputPublisherMutex);
+    gInputPublisherState.tutorialEnabled = enabled == JNI_TRUE;
+    gInputPublisherState.tutorialSlowdownEnabled = slowdown == JNI_TRUE;
+    PublishInputLocked();
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_requestCombatTeachingSkip(JNIEnv*, jclass)
+{
+    std::lock_guard<std::mutex> lock(gInputPublisherMutex);
+    if (gInputPublisherState.commands.tutorialSkip != UINT64_MAX)
+        ++gInputPublisherState.commands.tutorialSkip;
+    PublishInputLocked();
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_requestCombatTeachingReplay(JNIEnv*, jclass)
+{
+    std::lock_guard<std::mutex> lock(gInputPublisherMutex);
+    gInputPublisherState.tutorialEnabled = true;
+    if (gInputPublisherState.commands.tutorialReplay != UINT64_MAX)
+        ++gInputPublisherState.commands.tutorialReplay;
+    PublishInputLocked();
+}
+
+extern "C" JNIEXPORT jlong JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_getCombatTeachingState(JNIEnv*, jclass)
+{
+    return static_cast<jlong>(gCombatTeachingUiState.load(std::memory_order_acquire));
 }
 
 extern "C" JNIEXPORT void JNICALL
@@ -5770,14 +6240,29 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_setEntryMenu(
 {
     if (generation < 0 || (generation != 0 &&
         !gSurfaceSessions.IsCurrent(static_cast<std::uint64_t>(generation)))) return;
+    std::lock_guard<std::mutex> admissionLock(gDebugRequestAdmissionMutex);
+    const bool nextEnabled = enabled == JNI_TRUE;
+    const bool nextPlay = nextEnabled && play == JNI_TRUE;
     std::lock_guard lock(gGraphicsMutex);
     if (generation != 0 && !gSurfaceSessions.IsCurrent(static_cast<std::uint64_t>(generation))) return;
     // Zero is only a pre-surface launch/recovery request. A live generation
     // must use its accepted identity, including cancellation of a Play fade.
     if (generation == 0 && gEntryState[0] > 0 &&
         gSurfaceSessions.IsCurrent(static_cast<std::uint64_t>(gEntryState[0]))) return;
-    const bool nextEnabled = enabled == JNI_TRUE;
-    const bool nextPlay = nextEnabled && play == JNI_TRUE;
+    if (nextEnabled)
+    {
+        // Entry takes precedence over a queued/active developer lesson. If it
+        // interrupts an active lesson, send the normal monotonic skip command
+        // so simulation restores ordinary clocks and protection coherently.
+        gCombatPracticeRequested.store(-1, std::memory_order_release);
+        if (gCombatPracticeActive.load(std::memory_order_acquire))
+        {
+            std::lock_guard<std::mutex> inputLock(gInputPublisherMutex);
+            if (gInputPublisherState.commands.tutorialSkip != UINT64_MAX)
+                ++gInputPublisherState.commands.tutorialSkip;
+            PublishInputLocked();
+        }
+    }
     const bool retryFailedEntry = generation != 0 && nextPlay && !gEntryControls.play &&
         gEntryState[0] == generation && gEntryState[2] == 4;
     if (nextEnabled != gEntryControls.enabled || (gEntryControls.play && !nextPlay) || retryFailedEntry)
@@ -6173,6 +6658,9 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestDebugMotionEvidence(
     const std::string id(idText);
     env->ReleaseStringUTFChars(runId, idText);
     if (!admitted || !horde::platform::android::AndroidMotionRunIdValid(id)) return JNI_FALSE;
+    std::lock_guard<std::mutex> admissionLock(gDebugRequestAdmissionMutex);
+    if (!horde::platform::android::CanRequestCombatPractice(
+            ReadDebugRequestAdmissionStateLocked())) return JNI_FALSE;
     std::lock_guard<std::mutex> lock(gMotionRequestMutex);
     if (gMotionStatus.load(std::memory_order_acquire) != 0) return JNI_FALSE;
     gMotionRequestedScenario = scenario; gMotionRequestedId = id;
@@ -6193,10 +6681,31 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestDebugCheckpoint(JNIEnv*, jcla
     {
         return JNI_FALSE;
     }
+    std::lock_guard<std::mutex> admissionLock(gDebugRequestAdmissionMutex);
+    if (gSurfaceSessions.State() != 1 || !CanQueueCompetingDebugRequestLocked()) return JNI_FALSE;
     gBenchmarkCheckpointRequested.store(static_cast<std::int32_t>(checkpointId), std::memory_order_release);
     return JNI_TRUE;
 #else
     (void)checkpointId;
+    return JNI_FALSE;
+#endif
+}
+
+extern "C" JNIEXPORT jboolean JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_requestDebugCombatPractice(
+    JNIEnv*, jclass, jint enemyKind)
+{
+#if defined(HORDE_RT_DEBUG_CHECKPOINTS)
+    if (enemyKind != static_cast<jint>(horde::gameplay::EnemyKind::Skeleton) &&
+        enemyKind != static_cast<jint>(horde::gameplay::EnemyKind::Lich))
+        return JNI_FALSE;
+    std::lock_guard<std::mutex> admissionLock(gDebugRequestAdmissionMutex);
+    const auto state = ReadDebugRequestAdmissionStateLocked();
+    if (!horde::platform::android::CanRequestCombatPractice(state)) return JNI_FALSE;
+    gCombatPracticeRequested.store(static_cast<std::int32_t>(enemyKind), std::memory_order_release);
+    return JNI_TRUE;
+#else
+    (void)enemyKind;
     return JNI_FALSE;
 #endif
 }
@@ -6212,6 +6721,9 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestDebugCaptureCheckpoint(JNIEnv
     {
         return JNI_FALSE;
     }
+    std::lock_guard<std::mutex> admissionLock(gDebugRequestAdmissionMutex);
+    if (!CanQueueCompetingDebugRequestLocked() ||
+        gInAppBenchmarkStatus.load(std::memory_order_acquire) == 1) return JNI_FALSE;
     gCaptureCheckpointRequested.store(static_cast<std::int32_t>(checkpointId), std::memory_order_release);
     return JNI_TRUE;
 #else
@@ -6224,6 +6736,9 @@ extern "C" JNIEXPORT jboolean JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_requestDebugRouteReplay(JNIEnv*, jclass)
 {
 #if defined(HORDE_RT_DEBUG_CHECKPOINTS)
+    std::lock_guard<std::mutex> admissionLock(gDebugRequestAdmissionMutex);
+    if (!horde::platform::android::CanRequestCombatPractice(
+            ReadDebugRequestAdmissionStateLocked())) return JNI_FALSE;
     gRouteReplayRequested.store(true, std::memory_order_release);
     return JNI_TRUE;
 #else
@@ -6234,6 +6749,8 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestDebugRouteReplay(JNIEnv*, jcl
 extern "C" JNIEXPORT jboolean JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_requestBenchmark(JNIEnv*, jclass)
 {
+    std::lock_guard<std::mutex> admissionLock(gDebugRequestAdmissionMutex);
+    if (!CanQueueCompetingDebugRequestLocked()) return JNI_FALSE;
     std::lock_guard<std::mutex> lock(gReportMutex);
     if (gSurfaceSessions.State() != 1 ||
         gInAppBenchmarkStatus.load(std::memory_order_acquire) == 1)
@@ -6263,7 +6780,9 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestBenchmarkWithId(
     if (!std::all_of(id.begin(), id.end(), [](const char c) {
             return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') ||
                 (c >= '0' && c <= '9') || c == '-' || c == '_';
-        })) return JNI_FALSE;
+    })) return JNI_FALSE;
+    std::lock_guard<std::mutex> admissionLock(gDebugRequestAdmissionMutex);
+    if (!CanQueueCompetingDebugRequestLocked()) return JNI_FALSE;
     std::lock_guard<std::mutex> lock(gReportMutex);
     if (gSurfaceSessions.State() != 1 ||
         gInAppBenchmarkStatus.load(std::memory_order_acquire) == 1) return JNI_FALSE;
@@ -6305,6 +6824,8 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestBenchmarkWithIdAndWorkload(
     if (!horde::gameplay::ParseBenchmarkWorkload(workloadNameUtf8, workload)) {
         return JNI_FALSE;
     }
+    std::lock_guard<std::mutex> admissionLock(gDebugRequestAdmissionMutex);
+    if (!CanQueueCompetingDebugRequestLocked()) return JNI_FALSE;
     std::lock_guard<std::mutex> lock(gReportMutex);
     if (gSurfaceSessions.State() != 1 ||
         gInAppBenchmarkStatus.load(std::memory_order_acquire) == 1) return JNI_FALSE;
@@ -6346,6 +6867,9 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestBenchmarkMotionValidation(
         })) return JNI_FALSE;
     horde::gameplay::validation::MotionScenario scenario{};
     if (!horde::gameplay::validation::ParseMotionScenario(scenarioUtf8, scenario)) return JNI_FALSE;
+    std::lock_guard<std::mutex> admissionLock(gDebugRequestAdmissionMutex);
+    if (!horde::platform::android::CanRequestCombatPractice(
+            ReadDebugRequestAdmissionStateLocked())) return JNI_FALSE;
     {
         std::lock_guard<std::mutex> reportLock(gReportMutex);
         if (gSurfaceSessions.State() != 1 || gInAppBenchmarkStatus.load(std::memory_order_acquire) == 1)
@@ -6413,6 +6937,8 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestBenchmarkWithSummaryId(
         if (!ReadBenchmarkSummaryText(env, summaryRunUuid, 36u, uuid) ||
             !horde::telemetry::IsBenchmarkSummaryUuid(uuid) ||
             !ReadBenchmarkSummaryText(env, rawModel, 128u, model)) return JNI_FALSE;
+        std::lock_guard<std::mutex> admissionLock(gDebugRequestAdmissionMutex);
+        if (!CanQueueCompetingDebugRequestLocked()) return JNI_FALSE;
         std::lock_guard<std::mutex> lock(gReportMutex);
         if (gSurfaceSessions.State() != 1 || gInAppBenchmarkStatus.load(std::memory_order_acquire) == 1)
             return JNI_FALSE;
@@ -6529,11 +7055,12 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_drainPlatformEvents(JNIEnv* env, jcl
     std::vector<jlong> packed;
     {
         std::lock_guard<std::mutex> lock(gPlatformGameplayEventMutex);
-        packed.reserve(gPlatformGameplayEvents.Size() * 2u);
+        packed.reserve(gPlatformGameplayEvents.Size() * 3u);
         for (const PlatformGameplayEvent& event : gPlatformGameplayEvents.Values())
         {
             packed.push_back(static_cast<jlong>(event.metadata));
             packed.push_back(static_cast<jlong>(event.stereoGains));
+            packed.push_back(static_cast<jlong>(event.verticalMetadata));
 #if defined(HORDE_RT_DEBUG_CHECKPOINTS)
             if ((event.metadata & 0xffu) == static_cast<std::uint64_t>(
                     horde::gameplay::simulation::GameplayEventType::PlayerSwing))

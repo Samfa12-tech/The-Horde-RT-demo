@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "complete": true,
+  "source": "rt-storage-image",
+  "sceneOnly": true,
+  "overlaysIncluded": false,
+  "settlingFrames": 12,
+  "fixedAnimationTimeSeconds": 0.000000,
+  "buildId": "1.6.2",
+  "playerMountProfile": "AnatomicalBody",
+  "executionBackend": "RayTracingPipeline",
+  "selectedRtPipelineBundle": {"opaqueFast": {"key": "diagnostic_high_opaque_fast", "sha256": "2417de5cadd3e753a081ae8f2e26bdc7cfe30d8c02758e8247bda0fa927a5fdd"}, "genericDielectric": {"key": "diagnostic_high_generic_dielectric", "sha256": "223706ea208242f34770b919e14a8a6ae1391ff187820325d9759fc28dee6795"}},
+  "device": {
+    "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "vendorId": 4318,
+    "deviceId": 11672
+  },
+  "presentation": {
+    "renderScale": 1.000000,
+    "dispatchWidth": 960,
+    "dispatchHeight": 540,
+    "swapchainWidth": 960,
+    "swapchainHeight": 540,
+    "swapchainFormat": 44
+  },
+  "timing": {
+    "sampleCount": 12,
+    "overallMedianMs": 6.061200,
+    "overallMeanMs": 20.147792,
+    "gpuRtCommandBuffer": {"valid": true, "latestMs": 0.896768, "averageMs": 1.109509, "sampleCount": 12, "timestampValidBits": 64, "timestampPeriodNanoseconds": 1.000000}
+  },
+  "staticRtAsset": {"enabled": true, "vertexBytes": 6924416, "indexBytes": 996108, "materialBytes": 2816, "instanceMetadataBytes": 768, "primitiveMetadataBytes": 384, "textureBytes": 240473372, "descriptorCount": 9, "blasBytes": 1060096, "blasBuildMilliseconds": 1.566800, "swordBlasBytes": 717696, "swordBlasBuildMilliseconds": 0.757200, "torchBlasBytes": 342400, "torchBlasBuildMilliseconds": 0.809600, "productionPropBlasBytes": 1195008, "productionPropBlasBuildMilliseconds": 4.965700},
+  "dielectricDiagnostics": {"availability": "Available", "available": true, "transportOverflowCount": 0, "shadowOverflowCount": 0, "secondaryDielectricRejectCount": 0, "unclosedVolumeCount": 0, "primaryUnclosedVolumeCount": 0, "shadowUnclosedVolumeCount": 0, "productionPaneStackFailureCount": 0, "productionPaneSecondaryOriginCount": 0, "productionPaneSecondaryTerminalCount": 0, "productionPaneSecondarySameMediumCount": 0, "productionPaneSecondaryDifferentMediumCount": 0},
+  "dielectricReasonDiagnostics": {"availability": "Available", "available": true, "secondaryNearSelfHitCount": 0, "primaryOpenMissCount": 0, "primaryOpenOpaqueCount": 0, "primaryMismatchedExitCount": 0, "primaryInterfaceBudgetCount": 0, "primaryVolumeBudgetCount": 0, "shadowOpenMissCount": 0, "shadowMismatchedExitCount": 0, "primaryTirCount": 0, "primaryInterfaceBudgetOpenVolumeCount": 0, "primaryInterfaceBudgetClosedVolumeCount": 0, "shadowMismatchEmptyCount": 0, "shadowImplicitOriginExitCount": 0, "secondaryDielectricTerminalCount": 0, "primaryTirTerminationCount": 0, "shadowFiniteEndpointVolumeCount": 0, "primaryOpenOpaqueSameInstanceDifferentMaterialCount": 0, "primaryOpenOpaqueAfterTirCount": 0, "primaryOpenOpaqueTerminalInstanceMask": 0, "primaryOpenOpaqueVolumeInstanceMask": 0, "primaryOpenOpaqueTerminalMaterialMask": 0, "primaryClosedVolumeAbsorptionCount": 0, "primaryCertifiedClosedVolumeRecoveryCount": 0, "shadowCertifiedClosedVolumeRecoveryCount": 0, "certifiedClosedVolumeRecoveryReasonMask": 0, "primaryTorchPixelCount": 0, "primarySwordPixelCount": 0, "primaryPlayerPixelCount": 6401, "primaryRewardRingPixelCount": 0, "primaryRewardBodyPixelCount": 0},
+  "error": null,
+  "captures": [
+    {
+      "id": 170,
+      "checkpoint": "vertical-proof-ground",
+      "preset": "fresh",
+      "zone": "opening",
+      "camera": {"x": 0.000000, "z": 1.850000, "yaw": 0.000000, "pitch": -0.050000},
+      "requestedCamera": {"x": 0.000000, "z": 1.850000, "yaw": 0.000000, "pitch": -0.050000},
+      "state": {"torchFailurePhase": "held", "selectedEnemy": "skeleton", "lichPhase": "dormant", "finaleSkylightOpenProgress": 0.000000},
+      "width": 960,
+      "height": 540,
+      "honestlyPresentedRtFrame": true,
+      "completedFrame": {"schema":1,"identity":{"sceneEpoch":2,"measurementGeneration":1,"recordAttemptSerial":12,"recordSerial":12,"submissionSerial":12,"completionSerial":12,"simulationTick":1,"frameSlot":0},"pipeline":{"executionBackend":"RayTracingPipeline","instrumentation":"diagnostic","dielectricQuality":"high","bundleKey":"diagnostic_high_pair","opaqueFast":{"key":"diagnostic_high_opaque_fast","sha256":"2417de5cadd3e753a081ae8f2e26bdc7cfe30d8c02758e8247bda0fa927a5fdd"},"genericDielectric":{"key":"diagnostic_high_generic_dielectric","sha256":"223706ea208242f34770b919e14a8a6ae1391ff187820325d9759fc28dee6795"},"activeStrategy":"opaque-fast","activeKey":"diagnostic_high_opaque_fast","activeSha256":"2417de5cadd3e753a081ae8f2e26bdc7cfe30d8c02758e8247bda0fa927a5fdd","waterQuality":"high"},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"shadowQuality":{"mode":"current","localPrimarySamples":1,"skyPrimarySamples":1,"reserved":0},"fireQuality":{"quality":"High","volumeSteps":10,"reflectionSamples":2,"reflectedVolumeSteps":8},"actualUploadedDustQuality":0,"actualUploadedMistEnabled":true,"fireLighting":{"count":1,"emitters":[{"stableId":1,"positionStrength":[-0.200803846,0.86847508,1.22327971,1.58399999],"colourIntensity":[1,0.454960018,0.0977689177,1.58399999]},{"stableId":0,"positionStrength":[0,0,0,0],"colourIntensity":[0,0,0,0]},{"stableId":0,"positionStrength":[0,0,0,0],"colourIntensity":[0,0,0,0]},{"stableId":0,"positionStrength":[0,0,0,0],"colourIntensity":[0,0,0,0]}]},"resources":{"bufferCount":49,"memoryAllocationCount":60,"bottomLevelAccelerationStructureCount":20,"topLevelAccelerationStructureCount":1,"tlasInstanceCount":26,"pipelineCount":2,"shaderBindingTableCount":2,"descriptorSetCount":1,"hostVisibleBytes":11167104,"deviceLocalBytes":306666912},"player":{"skinCadenceHz":60,"skinUpdateCount":1,"maximumSocketErrorMicrometres":10,"primaryPixelCountAvailable":true,"primaryPixelCount":6401,"primaryVisible":true},"dielectric":{"status":"valid","available":true,"compiled":true,"completedSubmissionSerial":12,"readCount":12,"resetCount":12,"counters":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6401,0,0],"detail":"Diagnostic counters were collected after the owning fence."},"gpu":{"status":"valid","available":true,"completedSubmissionSerial":12,"wholeRtGpuMs":0.896768,"timestampValidBits":64,"timestampPeriodPicoseconds":1000,"sampleCount":12,"unavailableResultCount":0,"errorCount":0,"detail":"GPU RT command-buffer timing is available."},"stages":{"status":"valid","simulationStepCpuMs":0.000000,"skinCpuMs":0.000000,"playerSkinCpuMs":0.000000,"characterSkinCpuMs":0.000000,"dynamicUploadCpuMs":0.000600,"blasRefitRecordCpuMs":0.000000,"tlasUpdateRecordCpuMs":0.026700,"traceCopyRecordCpuMs":0.033200,"frameFenceWaitCpuMs":0.004400,"imageAcquireCpuMs":0.005900,"queueSubmitCpuMs":0.042200,"presentCallCpuMs":4.612000,"wholeFrameCycleCpuMs":6.025200,"workInvocationCounts":[0,0,0,0,6,0,1,1,1,1,1,1,1],"byteCounts":[0,0,0,0,6704,0,0,0,0,0,0,0,0],"operationCounts":[0,0,0,0,6,0,0,0,1,1,1,1,1]},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":12,"finalIdleCompletion":true},"cpuBenchmarkEligible":true,"benchmarkEligible":true}
+,
+      "indoorDust": {"requestedQuality": 0, "actualUploadedQuality": 0, "cpuWork": {"admittedZones": 0, "generatedMotes": 0, "projectedMotes": 0, "tileReferences": 0, "overflowReferences": 0}},
+      "visibility": {"playerPrimaryVisible": true, "primaryArmsMayBeOutsideFrame": false, "playerWorldBodyInstanceFlags": 9, "instanceMasks": [1, 2, 1, 2, 144, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 1, 1, 64, 1, 0, 1, 1, 54], "diagnostics": {"availability": "Available", "available": true}, "primaryPixels": {"torch": 0, "sword": 0, "player": 6401, "rewardRing": 0, "rewardBody": 0}, "rewardGrip": {"positionErrorMetres": 0.000000, "orientationErrorRadians": 0.000000, "authorityPositionErrorMetres": 0.000000, "authorityOrientationErrorRadians": 0.000000, "finalGripPosition": [0.000000, 0.000000, 0.000000], "ringGripPosition": [0.000000, 0.000000, 0.000000], "bodyPosition": [0.000000, 0.000000, 0.000000]}},
+      "timing": {"sampleCount": 12, "medianMs": 6.061200, "meanMs": 20.147792},
+      "outputRedBlueSwapAppliedAndNormalised": true,
+      "pixelFormat": "RGBA8",
+      "file": "170-vertical-proof-ground.png",
+      "viewmodelGeometry": {"available": true, "space": "model", "source": "cpu-upload", "file": "170-vertical-proof-ground.obj", "sha256": "8ccfe71c0e099788a611834f209dee5488481b32247f2860b6da92cecc25eb62"},
+      "playerWorldBodyGeometry": {"available": true, "space": "model", "source": "cpu-upload", "file": "170-vertical-proof-ground.player-world-body.obj", "sha256": "82077f5c8c21cbb0f81a4c82c950844a7ab303786cabcc8dbcb1b5dfb72d3fe2"},
+      "pngSha256": "c98c411559e38314ccaf5941ac429016504c7d7419c7b4facf55a49465c02a43"
+    }
+  ]
+}

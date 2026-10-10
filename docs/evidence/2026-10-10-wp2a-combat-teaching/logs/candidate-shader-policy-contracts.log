@@ -1,0 +1,153 @@
+UpdateCTestConfiguration  from :<repo>/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Parse Config file:<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Test project <repo>/build/presets/windows-x64-debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 21
+    Start 21: horde_rt_raygen_artifact_ownership_tests
+
+21: Test command: "C:\Program Files\PowerShell\7\pwsh.exe" "-NoProfile" "-File" "<repo>/tests/RaygenArtifactOwnershipTests.ps1"
+21: Working Directory: <repo>/build/presets/windows-x64-debug
+21: Test timeout computed to be: 1500
+21: Raygen artifact ownership preserves the exact compute counterpart set and exposes unknown files.
+1/7 Test #21: horde_rt_raygen_artifact_ownership_tests ...   Passed    0.59 sec
+test 81
+    Start 81: horde_rt_scene_abi_generator_tests
+
+81: Test command: "C:\Program Files\PowerShell\7\pwsh.exe" "-NoProfile" "-File" "<repo>/tests/RtSceneAbiGeneratorTests.ps1"
+81: Working Directory: <repo>/build/presets/windows-x64-debug
+81: Test timeout computed to be: 120
+81: Generated RT scene ABI CPU/GLSL outputs (28b93432456a17b0b700a64632113bd1692a1eccf3bf6a3d4d430d655c61cd2f).
+81: RT scene ABI generated outputs are current (28b93432456a17b0b700a64632113bd1692a1eccf3bf6a3d4d430d655c61cd2f).
+81: RT scene ABI generated outputs are current (28b93432456a17b0b700a64632113bd1692a1eccf3bf6a3d4d430d655c61cd2f).
+81: Generated RT scene ABI CPU/GLSL outputs (28b93432456a17b0b700a64632113bd1692a1eccf3bf6a3d4d430d655c61cd2f).
+81: RT scene ABI generator layout, freshness, and negative-staleness contracts passed
+2/7 Test #81: horde_rt_scene_abi_generator_tests .........   Passed    0.73 sec
+test 82
+    Start 82: horde_rt_raygen_compiler_strategy_tests
+
+82: Test command: "C:\Program Files\PowerShell\7\pwsh.exe" "-NoProfile" "-File" "<repo>/tests/RaygenCompilerStrategyTests.ps1"
+82: Working Directory: <repo>/build/presets/windows-x64-debug
+82: Test timeout computed to be: 600
+82: <temporary-workspace>
+82: Generated <temporary-workspace>
+82: Source dependency SHA-256: fd1ecfed52a9f94c146c3f490ad8441c17fb6c4c399e5257d7a5d20c783e91b7; embedded include SHA-256 before generation: 48c920b5ed71dca2ca3b000bc25ccf0c77693af0982c553d79e91c892d004713
+82: SPIR-V bytes: 294904; words: 73726; instructions: 17577; branch operations: 974; loops: 20; selection merges: 413; SHA-256: fd9db8f8134acf2c9f8096bc2542a7df5703cba4726f6d61a99a8990dc7fad4b
+82: Raygen optimizer shape: functions=83; calls=261; ray-query sites=2
+82: <temporary-workspace>
+82: Generated <temporary-workspace>
+82: Source dependency SHA-256: ad4ff3b66c000719071db63a202a1a3582f27183a98ebb3379be3cebf9cb3e19; embedded include SHA-256 before generation: 5394aa6748bc8b99d833d7fadbd81b9560ce29b5c69abaf0d6b6b1186142061f
+82: SPIR-V bytes: 592420; words: 148105; instructions: 32874; branch operations: 4579; loops: 80; selection merges: 1850; SHA-256: f56d90debd2f6e82c52b01638ea92a23ff41149cf8a9bae4997774b6146d0683
+82: Raygen optimizer shape: functions=1; calls=0; ray-query sites=27
+82: <temporary-workspace>
+82: Raygen check artifacts: <temporary-workspace>
+82: Source dependency SHA-256: fd1ecfed52a9f94c146c3f490ad8441c17fb6c4c399e5257d7a5d20c783e91b7; embedded include SHA-256: 48c920b5ed71dca2ca3b000bc25ccf0c77693af0982c553d79e91c892d004713
+82: SPIR-V bytes: 294904; words: 73726; instructions: 17577; branch operations: 974; loops: 20; selection merges: 413; SHA-256: fd9db8f8134acf2c9f8096bc2542a7df5703cba4726f6d61a99a8990dc7fad4b
+82: Raygen optimizer shape: functions=83; calls=261; ray-query sites=2
+82: Embedded raygen SPIR-V words match the compiled shader.
+82: <temporary-workspace>
+82: Raygen check artifacts: <temporary-workspace>
+82: Source dependency SHA-256: ad4ff3b66c000719071db63a202a1a3582f27183a98ebb3379be3cebf9cb3e19; embedded include SHA-256: 5394aa6748bc8b99d833d7fadbd81b9560ce29b5c69abaf0d6b6b1186142061f
+82: SPIR-V bytes: 592420; words: 148105; instructions: 32874; branch operations: 4579; loops: 80; selection merges: 1850; SHA-256: f56d90debd2f6e82c52b01638ea92a23ff41149cf8a9bae4997774b6146d0683
+82: Raygen optimizer shape: functions=1; calls=0; ray-query sites=27
+82: Embedded raygen SPIR-V words match the compiled shader.
+82: <temporary-workspace>
+82: Raygen check artifacts: <temporary-workspace>
+82: Source dependency SHA-256: fd1ecfed52a9f94c146c3f490ad8441c17fb6c4c399e5257d7a5d20c783e91b7; embedded include SHA-256: 48c920b5ed71dca2ca3b000bc25ccf0c77693af0982c553d79e91c892d004713
+82: SPIR-V bytes: 294904; words: 73726; instructions: 17577; branch operations: 974; loops: 20; selection merges: 413; SHA-256: fd9db8f8134acf2c9f8096bc2542a7df5703cba4726f6d61a99a8990dc7fad4b
+82: Raygen optimizer shape: functions=83; calls=261; ray-query sites=2
+82: Embedded raygen SPIR-V words match the compiled shader.
+82: <temporary-workspace>
+82: Raygen check artifacts: <temporary-workspace>
+82: Source dependency SHA-256: ad4ff3b66c000719071db63a202a1a3582f27183a98ebb3379be3cebf9cb3e19; embedded include SHA-256: 5394aa6748bc8b99d833d7fadbd81b9560ce29b5c69abaf0d6b6b1186142061f
+82: SPIR-V bytes: 592420; words: 148105; instructions: 32874; branch operations: 4579; loops: 80; selection merges: 1850; SHA-256: f56d90debd2f6e82c52b01638ea92a23ff41149cf8a9bae4997774b6146d0683
+82: Raygen optimizer shape: functions=1; calls=0; ray-query sites=27
+82: Embedded raygen SPIR-V words match the compiled shader.
+82: Raygen compiler retained the measured generic function strategy (294904 bytes, 17577 instructions, 2 ray-query sites) and the audited fully inlined legacy path.
+3/7 Test #82: horde_rt_raygen_compiler_strategy_tests ....   Passed   30.67 sec
+test 83
+    Start 83: horde_rt_raygen_variant_manifest_tests
+
+83: Test command: "C:\Program Files\PowerShell\7\pwsh.exe" "-NoProfile" "-File" "<repo>/tests/RaygenVariantManifestTests.ps1"
+83: Working Directory: <repo>/build/presets/windows-x64-debug
+83: Test timeout computed to be: 600
+83: <temporary-workspace>
+83: Raygen variant shipping_mobile_generic_dielectric: 285632 bytes; functions=83; calls=261; ray-query sites=2; dependency SHA-256=f95f347812f32154079cb48b1a412a9c346df59c26d02d8ffaaeda5f6222db4f
+83: <temporary-workspace>
+83: Raygen variant shipping_mobile_generic_dielectric: 285632 bytes; functions=83; calls=261; ray-query sites=2; dependency SHA-256=f95f347812f32154079cb48b1a412a9c346df59c26d02d8ffaaeda5f6222db4f
+83: Raygen variant manifest and temporary compiler matrix passed.
+4/7 Test #83: horde_rt_raygen_variant_manifest_tests .....   Passed   42.06 sec
+test 85
+    Start 85: horde_rt_rayquery_compute_shader_tests
+
+85: Test command: "C:\Program Files\PowerShell\7\pwsh.exe" "-NoProfile" "-File" "<repo>/tests/ValidateRayQueryComputeShader.ps1"
+85: Working Directory: <repo>/build/presets/windows-x64-debug
+85: Test timeout computed to be: 180
+85: RayQuery compute variant rayquery_compute_diagnostic_high_generic_dielectric: bytes=296208; functions=83; calls=264; ray-query sites=2; atomics=41; SPIR-V SHA-256=5f51a1b5175b29db3b5fb34eaa784fe3322607059b190fa770cd7835e3cef760
+85: RayQuery compute variant rayquery_compute_diagnostic_high_opaque_fast: bytes=596724; functions=1; calls=0; ray-query sites=29; atomics=5; SPIR-V SHA-256=6728cadff8b1dc2bc7d18d370b1bf6ccff1533908efd587a77e3848b7b940f95
+85: RayQuery compute variant rayquery_compute_diagnostic_mobile_generic_dielectric: bytes=294708; functions=83; calls=261; ray-query sites=2; atomics=41; SPIR-V SHA-256=c26dd2ce36c68f02ef22df49e3f08a7612f80a0a84d8cd696a474af667f85451
+85: RayQuery compute variant rayquery_compute_diagnostic_mobile_opaque_fast: bytes=593624; functions=1; calls=0; ray-query sites=27; atomics=5; SPIR-V SHA-256=a48b9bb85102c62a1695d62b98ed4cdd4075d2343b1366e79e9e42e7f26aa945
+85: RayQuery compute variant rayquery_compute_shipping_high_generic_dielectric: bytes=287380; functions=83; calls=264; ray-query sites=2; atomics=0; SPIR-V SHA-256=cf819ead8266e755bc3c783380f983a7a0d3e0e338834234cb643f78a65ef1bb
+85: RayQuery compute variant rayquery_compute_shipping_high_opaque_fast: bytes=592488; functions=1; calls=0; ray-query sites=29; atomics=0; SPIR-V SHA-256=f21fb2fe7acf6991d43ba697cc40ca05460e844b0be5c6e5d1e0bd5dcc193ee5
+85: RayQuery compute variant rayquery_compute_shipping_mobile_generic_dielectric: bytes=285880; functions=83; calls=261; ray-query sites=2; atomics=0; SPIR-V SHA-256=72b03e6bce4b3800a686a106290647af078a119c5da38c7d4cce870477df86d0
+85: RayQuery compute variant rayquery_compute_shipping_mobile_opaque_fast: bytes=589388; functions=1; calls=0; ray-query sites=27; atomics=0; SPIR-V SHA-256=d05eec30c1fbdc256a34856c1a87f8f5789137ea79d04027bcaa059259565e64
+85: Frozen RayQuery compute artifacts, provenance catalog, and generated adapter match a fresh eight-mode compilation.
+85: Hardware RayQuery compute frozen shader conformance passed for all eight policy modes.
+5/7 Test #85: horde_rt_rayquery_compute_shader_tests .....   Passed   36.78 sec
+test 86
+    Start 86: horde_rt_pipeline_policy_fence_tests
+
+86: Test command: "C:\Program Files\PowerShell\7\pwsh.exe" "-NoProfile" "-File" "<repo>/tests/RtPipelinePolicyFenceTests.ps1" "-CmakeExecutable" "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe"
+86: Working Directory: <repo>/build/presets/windows-x64-debug
+86: Test timeout computed to be: 300
+86: Generated RT catalog adapter is current.
+86: -- Building for: Visual Studio 17 2022
+86: -- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.26300.
+86: -- The CXX compiler identification is MSVC 19.44.35227.0
+86: -- Detecting CXX compiler ABI info
+86: -- Detecting CXX compiler ABI info - done
+86: -- Check for working CXX compiler: C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe - skipped
+86: -- Detecting CXX compile features
+86: -- Detecting CXX compile features - done
+86: Generated RT catalog adapter is current.
+86: -- Strict non-contracted asset-transform arithmetic enabled for GltfDocument.cpp and StaticMeshAsset.cpp: /fp:strict
+86: -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+86: -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+86: -- Looking for pthread_create in pthreads
+86: -- Looking for pthread_create in pthreads - not found
+86: -- Looking for pthread_create in pthread
+86: -- Looking for pthread_create in pthread - not found
+86: -- Found Threads: TRUE
+86: -- Legacy torch-failure identifiers were rejected by the configured MSVC compiler.
+86: -- Horde Lantern RT: configuring shared host gameplay tests without Vulkan targets.
+86: -- Configuring done (17.1s)
+86: -- Generating done (1.2s)
+86: -- Build files have been written to: <temporary-workspace>
+86: RT provider policy and ownership behavior contracts passed.
+6/7 Test #86: horde_rt_pipeline_policy_fence_tests .......   Passed   54.13 sec
+test 90
+    Start 90: horde_rt_pipeline_policy_execution_tests
+
+90: Test command: "C:\Program Files\PowerShell\7\pwsh.exe" "-NoProfile" "-File" "<repo>/tests/RtPipelinePolicyExecutionTests.ps1" "-CmakeExecutable" "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe" "-GradleExecutable" "<repo>/android/gradlew.bat"
+90: Working Directory: <repo>/build/presets/windows-x64-debug
+90: Test timeout computed to be: 300
+90: Executable CMake and Gradle RT policy contracts passed.
+7/7 Test #90: horde_rt_pipeline_policy_execution_tests ...   Passed   70.35 sec
+
+The following tests passed:
+	horde_rt_raygen_artifact_ownership_tests
+	horde_rt_scene_abi_generator_tests
+	horde_rt_raygen_compiler_strategy_tests
+	horde_rt_raygen_variant_manifest_tests
+	horde_rt_rayquery_compute_shader_tests
+	horde_rt_pipeline_policy_fence_tests
+	horde_rt_pipeline_policy_execution_tests
+
+100% tests passed, 0 tests failed out of 7
+
+Total Test time (real) = 235.34 sec

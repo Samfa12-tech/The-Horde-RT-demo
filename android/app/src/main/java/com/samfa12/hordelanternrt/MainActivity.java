@@ -118,6 +118,8 @@ public class MainActivity extends Activity {
     private static final String LICH_ASSET = "models/enemies/meshy/lich_placeholder_merged_animations_v01.glb";
     private static final String LICH_FILE = "lich_placeholder_merged_animations_v01.glb";
     private static final String EXTRA_DEBUG_CHECKPOINT = "horde.debug.checkpoint";
+    private static final int DEBUG_COMBAT_PRACTICE_PARRY = 1;
+    private static final int DEBUG_COMBAT_PRACTICE_DODGE = 2;
     private static final String EXTRA_DEBUG_CAPTURE = "horde.debug.capture";
     private static final String EXTRA_DEBUG_REPLAY = "horde.debug.replay";
     private static final String EXTRA_DEBUG_MOTION = "horde.debug.motion";
@@ -201,6 +203,8 @@ public class MainActivity extends Activity {
     private static final int PLATFORM_EVENT_SKELETON_INCIDENTAL = 20;
     private static final int PLATFORM_EVENT_PLAYER_SWORD_ATTACHMENT_CHANGED = 22;
     private static final int PLATFORM_EVENT_SKELETON_ENCOUNTER_WARNING = 23;
+    private static final int PLATFORM_EVENT_PARRY_PREPARE_CUE = 24;
+    private static final int PLATFORM_EVENT_LICH_DISCHARGE_WARNING = 25;
     private static final int EQUIPMENT_AUDIO_SWORD_DRAW = 1;
     private static final int EQUIPMENT_AUDIO_SWORD_SHEATH = 2;
     private static final int ENTITY_LICH = 3;
@@ -216,11 +220,15 @@ public class MainActivity extends Activity {
     private static final int HAPTIC_FATAL = 2;
     private static final int HAPTIC_PARRY = 3;
     private static final long ENEMY_IMPACT_FALL_DELAY_MILLISECONDS = 140L;
+    private static final long COMBAT_TEACHING_PROMPT_REFRESH_MILLISECONDS = 32L;
     private static final int CONTEXTUAL_INTERACT = 1;
     private static final int CONTEXTUAL_RAISE = 2;
     private static final int CONTEXTUAL_LOWER = 4;
     private static final int CHEST_PROMPT_SHIFT = 3;
     private static final int CHEST_PROMPT_MASK = 7 << CHEST_PROMPT_SHIFT;
+    private static final int RESCUE_PROMPT_SHIFT = 6;
+    private static final int RESCUE_PROMPT_MASK = 7 << RESCUE_PROMPT_SHIFT;
+    private static final int CONTEXTUAL_RESCUE_MODE = 1 << 9;
     private static final int CHEST_PROMPT_NONE = 0;
     private static final int CHEST_PROMPT_LOCKED = 1;
     private static final int CHEST_PROMPT_OPEN = 2;
@@ -242,6 +250,10 @@ public class MainActivity extends Activity {
     private final ArrayList<AlertDialog> controllerDialogs = new ArrayList<>();
     private final Set<AlertDialog> controllerFocusedDialogs = new HashSet<>();
     private TextView controllerPrompt;
+    private TextView combatTeachingPrompt;
+    private String combatTeachingFadeText = "";
+    private int combatTeachingFadeOpacity;
+    private long combatTeachingFadeStartedAtMs;
     private final InputManager.InputDeviceListener controllerDevices = new InputManager.InputDeviceListener() {
         @Override public void onInputDeviceAdded(int deviceId) { /* Connection alone never takes over touch. */ }
         @Override public void onInputDeviceChanged(int deviceId) {
@@ -277,7 +289,9 @@ public class MainActivity extends Activity {
     private Button attackButton;
     private Button parryButton;
     private Button dodgeButton;
+    private Button runButton;
     private PressActionButton swingTouch, dodgeTouch;
+    private boolean runToggleEnabled;
     private Button interactButton;
     private Button toggleHeldLightPoseButton;
     private boolean parryRequestedOnTouchDown;
@@ -314,6 +328,7 @@ public class MainActivity extends Activity {
     private int enemyStepVariant;
     private int diagnosticsRefreshTick;
     private int pendingDebugCheckpoint = -1;
+    private int pendingDebugCombatPractice = -1;
     private boolean pendingDebugCapture;
     private boolean pendingDebugReplay;
     private String pendingDebugMotion, pendingDebugMotionId;
@@ -321,6 +336,8 @@ public class MainActivity extends Activity {
     private boolean debugAutomationAutostart;
     private boolean developerOverlayVisible;
     private boolean debugCaptureUiSuppressed;
+    private int verticalProofFeedbackCheckpoint = -1;
+    private int verticalProofFeedbackDiagnosticCount;
     private boolean benchmarkRunning;
     private boolean benchmarkStatusExpanded;
     private boolean benchmarkReportVisible;
@@ -488,6 +505,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         lastAppliedConfiguration = new Configuration(getResources().getConfiguration());
         preferences = getSharedPreferences(PREFS, MODE_PRIVATE);
+        applyCombatTeachingOptions(CombatTeachingPreferences.read(preferences));
         rtLabUnlocked = preferences.getBoolean(PREF_RT_LAB_UNLOCKED, false);
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         ProbeBridge.resetRtSceneTuning();
@@ -513,10 +531,13 @@ public class MainActivity extends Activity {
         attackButton = findViewById(R.id.attack_button);
         parryButton = findViewById(R.id.parry_button);
         dodgeButton = findViewById(R.id.dodge_button);
+        runButton = findViewById(R.id.run_button);
+        runButton.setVisibility(View.GONE);
         interactButton = findViewById(R.id.interact_button);
         toggleHeldLightPoseButton = findViewById(R.id.toggle_held_light_pose_button);
         vitalityStatus = findViewById(R.id.vitality_status);
         controllerPrompt = findViewById(R.id.controller_prompt);
+        combatTeachingPrompt = findViewById(R.id.combat_teaching_prompt);
         inputManager = (InputManager)getSystemService(Context.INPUT_SERVICE);
         if (inputManager != null) inputManager.registerInputDeviceListener(controllerDevices, handler);
         keeperRevealTitle = findViewById(R.id.keeper_reveal_title);
@@ -526,6 +547,7 @@ public class MainActivity extends Activity {
         styleActionButton(attackButton, 0xDD5B210D, 0xFFFFE0A3);
         styleActionButton(parryButton, 0xDD263B42, 0xFFE5F7FF);
         styleActionButton(interactButton, 0xDD5C4216, 0xFFFFE5A8);
+        styleActionButton(runButton, 0xDD5C4216, 0xFFFFE5A8);
         styleActionButton(toggleHeldLightPoseButton, 0xDD173E34, 0xFFE2FFF0);
         applyInterfacePresentation();
         findViewById(R.id.root).setOnApplyWindowInsetsListener((view,insets) -> {
@@ -718,6 +740,8 @@ public class MainActivity extends Activity {
     }
 
     private void stopSurface() {
+        cancelCombatTeachingPromptPoll();
+        clearCombatTeachingPrompt();
         stopMenuAmbience();
         setBenchmarkStatusExpanded(false);
         if (musicPlayback != null) musicPlayback.setSuspended(true);
@@ -785,6 +809,7 @@ public class MainActivity extends Activity {
                 return true;
             }
             if (action == MotionEvent.ACTION_CANCEL) {
+                clearRunIntent();
                 if (swingTouch != null) swingTouch.cancel();
                 if (dodgeTouch != null) dodgeTouch.cancel();
                 TouchControlState.cancelGesture(activePointers, viewControls);
@@ -838,6 +863,7 @@ public class MainActivity extends Activity {
         attackButton.setVisibility(View.GONE);
         parryButton.setVisibility(View.GONE);
         if (dodgeButton != null) dodgeButton.setVisibility(View.GONE);
+        if (runButton != null) runButton.setVisibility(View.GONE);
         menuButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
@@ -919,6 +945,7 @@ public class MainActivity extends Activity {
         attackButton.setVisibility(View.GONE);
         parryButton.setVisibility(View.GONE);
         if (dodgeButton != null) dodgeButton.setVisibility(View.GONE);
+        if (runButton != null) runButton.setVisibility(View.GONE);
         menuButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
@@ -1292,6 +1319,7 @@ public class MainActivity extends Activity {
         attackButton.setVisibility(View.GONE);
         parryButton.setVisibility(View.GONE);
         if (dodgeButton != null) dodgeButton.setVisibility(View.GONE);
+        if (runButton != null) runButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.VISIBLE);
         vitalityStatus.setVisibility(View.GONE);
         rtStatus.setText(R.string.benchmark_starting);
@@ -1441,6 +1469,7 @@ public class MainActivity extends Activity {
         attackButton.setVisibility(View.GONE);
         parryButton.setVisibility(View.GONE);
         if (dodgeButton != null) dodgeButton.setVisibility(View.GONE);
+        if (runButton != null) runButton.setVisibility(View.GONE);
         menuButton.setVisibility(View.GONE);
         developerOverlay.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
@@ -2470,6 +2499,104 @@ public class MainActivity extends Activity {
         attachPanel(panel);
     }
 
+    private void applyCombatTeachingOptions(CombatTeachingPreferences.Values values) {
+        ProbeBridge.setCombatTeachingOptions(values.enabled, values.slowdown);
+    }
+
+    private boolean updateCombatTeachingPrompt(int surfaceState) {
+        if (combatTeachingPrompt == null) return false;
+        final long packed = ProbeBridge.getCombatTeachingState();
+        final String text = CombatTeachingPreferences.prompt(packed);
+        final boolean allowed = resumed && surfaceStarted && surfaceState == 1 &&
+                preferences.getBoolean("show_hud", true) &&
+                !menuVisible && !diagnosticsVisible && !graphicsVisible && !rtLabVisible &&
+                !playtestReportVisible && !benchmarkRunning && !debugCaptureUiSuppressed &&
+                !deathOverlayVisible && !endingOverlayVisible;
+        final boolean reducedMotion = isReducedMotionEnabled();
+        if (!allowed || reducedMotion && text.isEmpty()) {
+            clearCombatTeachingPrompt();
+            return false;
+        }
+        if (!text.isEmpty()) {
+            combatTeachingFadeText = text;
+            combatTeachingFadeOpacity = (int) ((packed >>> 40) & 0xffL);
+            combatTeachingFadeStartedAtMs = 0L;
+            combatTeachingPrompt.setText(text);
+            combatTeachingPrompt.setContentDescription(text.replace('\n', ' '));
+            combatTeachingPrompt.setAlpha(CombatTeachingPreferences.alpha(
+                    combatTeachingFadeOpacity, reducedMotion));
+            combatTeachingPrompt.setVisibility(View.VISIBLE);
+            return CombatTeachingPreferences.needsTimelyRefresh(packed);
+        }
+        if (combatTeachingFadeText.isEmpty()) {
+            combatTeachingPrompt.setVisibility(View.GONE);
+            return false;
+        }
+        final long now = SystemClock.uptimeMillis();
+        if (combatTeachingFadeStartedAtMs == 0L) combatTeachingFadeStartedAtMs = now;
+        final int fadeOpacity = CombatTeachingPreferences.fadeAlpha(combatTeachingFadeOpacity,
+                now - combatTeachingFadeStartedAtMs, reducedMotion);
+        if (fadeOpacity == 0) {
+            combatTeachingFadeText = "";
+            combatTeachingFadeOpacity = 0;
+            combatTeachingFadeStartedAtMs = 0L;
+            combatTeachingPrompt.setText("");
+            combatTeachingPrompt.setContentDescription("");
+            combatTeachingPrompt.setVisibility(View.GONE);
+            return false;
+        }
+        combatTeachingPrompt.setText(combatTeachingFadeText);
+        combatTeachingPrompt.setContentDescription(combatTeachingFadeText.replace('\n', ' '));
+        combatTeachingPrompt.setAlpha(CombatTeachingPreferences.alpha(fadeOpacity, false));
+        combatTeachingPrompt.setVisibility(View.VISIBLE);
+        return true;
+    }
+
+    private boolean combatTeachingPromptPollScheduled;
+    private final Runnable combatTeachingPromptPoll = new Runnable() {
+        @Override public void run() {
+            combatTeachingPromptPollScheduled = false;
+            if (!resumed || !surfaceAvailable || !surfaceStarted || surfaceRequestGeneration == 0) {
+                clearCombatTeachingPrompt();
+                return;
+            }
+            final int state;
+            try {
+                state = ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration);
+            } catch (final RuntimeException | LinkageError unavailable) {
+                clearCombatTeachingPrompt();
+                return;
+            }
+            if (state != 1) {
+                clearCombatTeachingPrompt();
+                return;
+            }
+            if (updateCombatTeachingPrompt(state)) scheduleCombatTeachingPromptPoll();
+        }
+    };
+
+    private void scheduleCombatTeachingPromptPoll() {
+        if (combatTeachingPromptPollScheduled) return;
+        combatTeachingPromptPollScheduled = true;
+        handler.postDelayed(combatTeachingPromptPoll,
+                COMBAT_TEACHING_PROMPT_REFRESH_MILLISECONDS);
+    }
+
+    private void cancelCombatTeachingPromptPoll() {
+        handler.removeCallbacks(combatTeachingPromptPoll);
+        combatTeachingPromptPollScheduled = false;
+    }
+
+    private void clearCombatTeachingPrompt() {
+        combatTeachingFadeText = "";
+        combatTeachingFadeOpacity = 0;
+        combatTeachingFadeStartedAtMs = 0L;
+        if (combatTeachingPrompt == null) return;
+        combatTeachingPrompt.setText("");
+        combatTeachingPrompt.setContentDescription("");
+        combatTeachingPrompt.setVisibility(View.GONE);
+    }
+
     private void showSettings() {
         interfaceVisible=false;
         entryMenuPanel = null;
@@ -2506,6 +2633,47 @@ public class MainActivity extends Activity {
         addSlider(panel, getString(R.string.look_sensitivity), preferences.getInt("look_sensitivity", 100), 50, 175,
                 value -> preferences.edit().putInt("look_sensitivity", value).apply());
 
+        final CombatTeachingPreferences.Values teaching = CombatTeachingPreferences.read(preferences);
+        addBody(panel, getString(R.string.combat_teaching_description));
+        final CheckBox teachingEnabled = new CheckBox(this);
+        teachingEnabled.setText(R.string.combat_teaching);
+        teachingEnabled.setTextColor(0xFFFFE5BA);
+        teachingEnabled.setButtonTintList(HordeUiTokens.label(HordeUiTokens.BRASS));
+        teachingEnabled.setTextSize(16);
+        teachingEnabled.setChecked(teaching.enabled);
+        teachingEnabled.setMinHeight(dp(48));
+        teachingEnabled.setOnCheckedChangeListener((buttonView, checked) -> {
+            final CombatTeachingPreferences.Values next = new CombatTeachingPreferences.Values(
+                    checked, CombatTeachingPreferences.read(preferences).slowdown);
+            CombatTeachingPreferences.save(preferences, next);
+            applyCombatTeachingOptions(next);
+        });
+        panel.addView(teachingEnabled, matchWrap());
+
+        final CheckBox teachingSlowdown = new CheckBox(this);
+        teachingSlowdown.setText(R.string.combat_teaching_slowdown);
+        teachingSlowdown.setTextColor(0xFFFFE5BA);
+        teachingSlowdown.setButtonTintList(HordeUiTokens.label(HordeUiTokens.BRASS));
+        teachingSlowdown.setTextSize(16);
+        teachingSlowdown.setChecked(teaching.slowdown);
+        teachingSlowdown.setMinHeight(dp(48));
+        teachingSlowdown.setOnCheckedChangeListener((buttonView, checked) -> {
+            final CombatTeachingPreferences.Values next = new CombatTeachingPreferences.Values(
+                    CombatTeachingPreferences.read(preferences).enabled, checked);
+            CombatTeachingPreferences.save(preferences, next);
+            applyCombatTeachingOptions(next);
+        });
+        panel.addView(teachingSlowdown, matchWrap());
+        addMenuButtonRow(panel, getString(R.string.combat_teaching_skip),
+                ProbeBridge::requestCombatTeachingSkip,
+                getString(R.string.combat_teaching_replay), () -> {
+                    final CombatTeachingPreferences.Values current = CombatTeachingPreferences.read(preferences);
+                    final CombatTeachingPreferences.Values next = new CombatTeachingPreferences.Values(true, current.slowdown);
+                    CombatTeachingPreferences.save(preferences, next);
+                    applyCombatTeachingOptions(next);
+                    ProbeBridge.requestCombatTeachingReplay();
+                });
+
         final CheckBox hapticsEnabled = new CheckBox(this);
         hapticsEnabled.setText(R.string.haptics_enabled);
         hapticsEnabled.setTextColor(0xFFFFE5BA);
@@ -2534,7 +2702,10 @@ public class MainActivity extends Activity {
                 getString(R.string.reset_non_graphics), () -> {
                     preferences.edit().putBoolean("sfx_enabled", true).putInt("sfx_volume", 70)
                             .putInt(PREF_MUSIC_VOLUME, 70).putInt("look_sensitivity", 100)
-                            .putBoolean("haptics_enabled", true).putBoolean("show_hud", true).apply();
+                            .putBoolean("haptics_enabled", true).putBoolean("show_hud", true)
+                            .putBoolean(CombatTeachingPreferences.ENABLED, true)
+                            .putBoolean(CombatTeachingPreferences.SLOWDOWN, false).apply();
+                    applyCombatTeachingOptions(CombatTeachingPreferences.read(preferences));
                     if (musicPlayback != null) musicPlayback.setVolumePercent(70);
                     InterfacePreferences.reset(preferences);
                     applyInterfacePresentation();
@@ -3834,10 +4005,18 @@ public class MainActivity extends Activity {
     }
 
     private void setGameplayPaused(boolean paused) {
+        if (paused) clearRunIntent();
         if (paused) suspendAndResetWaterfall(); // Same generation retains the Core cursor.
         if (musicPlayback != null) musicPlayback.setSuspended(paused || !resumed ||
                 !surfaceStarted || ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) != 1);
         ProbeBridge.setSimulationPaused(paused); // Existing JNI mailbox authority unchanged.
+    }
+
+    private void clearRunIntent() {
+        runToggleEnabled = false;
+        if (runButton != null) runButton.setText(R.string.run);
+        try { ProbeBridge.clearRunIntent(); }
+        catch (RuntimeException | LinkageError ignored) { /* Lifecycle cleanup is best effort. */ }
     }
 
     private void showDiagnostics(final boolean errorState) {
@@ -3852,6 +4031,7 @@ public class MainActivity extends Activity {
         attackButton.setVisibility(View.GONE);
         parryButton.setVisibility(View.GONE);
         if (dodgeButton != null) dodgeButton.setVisibility(View.GONE);
+        if (runButton != null) runButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
         developerOverlay.setVisibility(View.GONE);
@@ -3873,7 +4053,9 @@ public class MainActivity extends Activity {
     }
 
     private void resetRoute() {
+        clearRunIntent();
         ++delayedGameplayFeedbackGeneration;
+        clearVerticalProofFeedbackSelection();
         suspendAndResetWaterfall();
         endingOverlayVisible = false;
         endingOverlayDismissed = false;
@@ -3888,6 +4070,7 @@ public class MainActivity extends Activity {
     }
 
     private void updateVitalityHud(final int vitality, final int maximum) {
+        if (vitality <= 0) clearRunIntent();
         final int safeMaximum = Math.max(0, maximum);
         final int safeVitality = Math.max(0, Math.min(safeMaximum, vitality));
         lastPlayerVitality = safeVitality;
@@ -3911,6 +4094,7 @@ public class MainActivity extends Activity {
         attackButton.setVisibility(View.GONE);
         parryButton.setVisibility(View.GONE);
         if (dodgeButton != null) dodgeButton.setVisibility(View.GONE);
+        if (runButton != null) runButton.setVisibility(View.GONE);
         menuButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
@@ -3937,6 +4121,7 @@ public class MainActivity extends Activity {
         attackButton.setVisibility(View.GONE);
         parryButton.setVisibility(View.GONE);
         if (dodgeButton != null) dodgeButton.setVisibility(View.GONE);
+        if (runButton != null) runButton.setVisibility(View.GONE);
         menuButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
@@ -3983,6 +4168,7 @@ public class MainActivity extends Activity {
         attackButton.setVisibility(View.GONE);
         parryButton.setVisibility(View.GONE);
         if (dodgeButton != null) dodgeButton.setVisibility(View.GONE);
+        if (runButton != null) runButton.setVisibility(View.GONE);
         menuButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
@@ -4384,6 +4570,7 @@ public class MainActivity extends Activity {
         if (retryPending) {
             return;
         }
+        clearVerticalProofFeedbackSelection();
         final int checkpoint = ProbeBridge.retryEncounter();
         if (checkpoint < 0) {
             Toast.makeText(this, R.string.retry_unavailable, Toast.LENGTH_LONG).show();
@@ -4427,6 +4614,8 @@ public class MainActivity extends Activity {
                     }
                 }
                 surfaceStarted = resumed && surfaceAvailable && surfaceRequestGeneration != 0 && state == 1;
+                if (updateCombatTeachingPrompt(state)) scheduleCombatTeachingPromptPoll();
+                else cancelCombatTeachingPromptPoll();
                 if (musicPlayback != null) musicPlayback.setSuspended(!resumed || !surfaceStarted ||
                         state != 1 || menuVisible || diagnosticsVisible || debugMotionActive || pendingDebugMotion != null);
                 if (state == 1) {
@@ -4456,11 +4645,17 @@ public class MainActivity extends Activity {
                     final boolean showHud = preferences.getBoolean("show_hud", true);
                     if (!menuVisible && !benchmarkRunning && !debugCaptureUiSuppressed)
                         rtStatus.setVisibility(showHud && InterfacePreferences.read(preferences).routineStatus ? View.VISIBLE : View.GONE);
-                    if (!debugCaptureUiSuppressed && !menuVisible && !benchmarkRunning && showHud &&
-                            lifePhase == PLAYER_ALIVE && !controllerMode) {
+                    final boolean showGameplayActions = !debugCaptureUiSuppressed &&
+                            !menuVisible && !diagnosticsVisible && !benchmarkRunning &&
+                            !endingOverlayVisible && showHud && lifePhase == PLAYER_ALIVE &&
+                            !controllerMode;
+                    if (showGameplayActions) {
                         attackButton.setVisibility(View.VISIBLE);
                         parryButton.setVisibility(View.VISIBLE);
                         dodgeButton.setVisibility(View.VISIBLE);
+                        if (runButton != null) runButton.setVisibility(View.VISIBLE);
+                    } else if (runButton != null) {
+                        runButton.setVisibility(View.GONE);
                     }
                     updateContextualControls(!debugCaptureUiSuppressed && !menuVisible &&
                             !diagnosticsVisible && !benchmarkRunning && !endingOverlayVisible &&
@@ -4474,6 +4669,7 @@ public class MainActivity extends Activity {
                         attackButton.setVisibility(View.GONE);
                         parryButton.setVisibility(View.GONE);
                         if (dodgeButton != null) dodgeButton.setVisibility(View.GONE);
+                        if (runButton != null) runButton.setVisibility(View.GONE);
                     }
                     if (lifePhase == PLAYER_DEAD && !debugMotionActive) showDeathOverlay();
                     if (finaleEndingPhase == FINALE_ENDING_COMPLETE && !benchmarkRunning && !debugMotionActive &&
@@ -4510,6 +4706,14 @@ public class MainActivity extends Activity {
                             Log.e(TAG, "Debug checkpoint request rejected: " + checkpoint);
                         }
                         debugAutomationAutostart = false;
+                    } else if (pendingDebugCombatPractice >= 0) {
+                        final int enemyKind = pendingDebugCombatPractice;
+                        pendingDebugCombatPractice = -1;
+                        clearTouchState();
+                        if (!ProbeBridge.requestDebugCombatPractice(enemyKind)) {
+                            Log.e(TAG, "Debug combat practice request rejected: " + enemyKind);
+                        }
+                        debugAutomationAutostart = false;
                     } else if (pendingDebugReplay) {
                         pendingDebugReplay = false;
                         viewControls[0] = 0.0f;
@@ -4523,6 +4727,7 @@ public class MainActivity extends Activity {
                 } else if (state == 2) {
                     layoutRtStatus(false);
                     updateContextualControls(false);
+                    if (runButton != null) runButton.setVisibility(View.GONE);
                     rtStatus.setText(R.string.rt_unsupported);
                     rtStatus.setContentDescription(getString(R.string.rt_unsupported));
                     rtStatus.setTextColor(0xFFFF8A7A);
@@ -4533,6 +4738,7 @@ public class MainActivity extends Activity {
                 } else if (state == 3) {
                     layoutRtStatus(false);
                     updateContextualControls(false);
+                    if (runButton != null) runButton.setVisibility(View.GONE);
                     rtStatus.setText(R.string.rt_error);
                     rtStatus.setContentDescription(getString(R.string.rt_error));
                     rtStatus.setTextColor(0xFFFF8A7A);
@@ -4542,6 +4748,7 @@ public class MainActivity extends Activity {
                     }
                 } else {
                     updateContextualControls(false);
+                    if (runButton != null) runButton.setVisibility(View.GONE);
                     rtStatus.setText(R.string.rt_starting);
                 }
 
@@ -4563,6 +4770,7 @@ public class MainActivity extends Activity {
                         attackButton.setVisibility(View.GONE);
                         parryButton.setVisibility(View.GONE);
                         if (dodgeButton != null) dodgeButton.setVisibility(View.GONE);
+                        if (runButton != null) runButton.setVisibility(View.GONE);
                         updateContextualControls(false);
                         vitalityStatus.setVisibility(View.GONE);
                     } else if (benchmarkStatus == 2 || benchmarkStatus == 3) {
@@ -4600,9 +4808,10 @@ public class MainActivity extends Activity {
                 // the new surface resumes.
                 if (resumed && surfaceStarted && state == 1) {
                     final long[] platformEvents = ProbeBridge.drainPlatformEvents();
-                    for (int eventIndex = 0; !debugMotionActive && eventIndex + 1 < platformEvents.length; eventIndex += 2) {
+                    for (int eventIndex = 0; !debugMotionActive && eventIndex + 2 < platformEvents.length; eventIndex += 3) {
                     final long metadata = platformEvents[eventIndex];
                     final long stereoGains = platformEvents[eventIndex + 1];
+                    final long verticalMetadata = platformEvents[eventIndex + 2];
                     final int eventType = (int) (metadata & 0xffL);
                     final int targetEntity = (int) ((metadata >>> 16) & 0xffL);
                     final int equipmentAudioCue = (int) ((metadata >>> 24) & 0xffL);
@@ -4610,7 +4819,8 @@ public class MainActivity extends Activity {
                     switch (eventType) {
                         case PLATFORM_EVENT_PLAYER_FOOTSTEP:
                             playSpatialSound((playerStepVariant++ & 1) == 0 ?
-                                    "player_step_1" : "player_step_2", 0.45f, stereoGains);
+                                    "player_step_1" : "player_step_2", 0.45f,
+                                    stereoGains, verticalMetadata);
                             break;
                         case PLATFORM_EVENT_PLAYER_SWING:
                             if (isDebuggableApp()) {
@@ -4618,7 +4828,8 @@ public class MainActivity extends Activity {
                                         " sound=1 haptic=1");
                             }
                             playSpatialSound((swingVariant++ & 1) == 0 ?
-                                    "sword_swing_1" : "sword_swing_2", 0.28f, stereoGains);
+                                    "sword_swing_1" : "sword_swing_2", 0.28f,
+                                    stereoGains, verticalMetadata);
                             performHaptic(HAPTIC_SWING);
                             break;
                         case PLATFORM_EVENT_PLAYER_DAMAGED:
@@ -4629,19 +4840,33 @@ public class MainActivity extends Activity {
                             break;
                         case PLATFORM_EVENT_ENEMY_FOOTSTEP:
                             playSpatialSound((enemyStepVariant++ & 1) == 0 ?
-                                    "skeleton_step_1" : "skeleton_step_2", 0.11f, stereoGains);
+                                    "skeleton_step_1" : "skeleton_step_2", 0.11f,
+                                    stereoGains, verticalMetadata);
                             break;
                         case PLATFORM_EVENT_ENEMY_ATTACK_STARTED:
-                            playSpatialSound("skeleton_attack", 0.22f, stereoGains);
+                            playSpatialSound("skeleton_attack", 0.22f, stereoGains, verticalMetadata);
+                            break;
+                        case PLATFORM_EVENT_PARRY_PREPARE_CUE:
+                            if (!menuVisible && !diagnosticsVisible && !graphicsVisible &&
+                                    !deathOverlayVisible && !endingOverlayVisible) {
+                                playSpatialSound("sword_hit_1", 0.18f, stereoGains, verticalMetadata);
+                            }
+                            break;
+                        case PLATFORM_EVENT_LICH_DISCHARGE_WARNING:
+                            if (!menuVisible && !diagnosticsVisible && !graphicsVisible &&
+                                    !deathOverlayVisible && !endingOverlayVisible) {
+                                playSpatialSound("skeleton_attack", 0.16f, stereoGains, verticalMetadata);
+                            }
                             break;
                         case PLATFORM_EVENT_ENEMY_HIT:
                             if (targetEntity == ENTITY_LICH) {
                                 // The hurt source includes its own impact; layering the
                                 // fencing hit masks the short vocal reaction.
-                                playSpatialSound("lich_hurt", 0.82f, stereoGains);
+                                playSpatialSound("lich_hurt", 0.82f, stereoGains, verticalMetadata);
                             } else {
                                 playSpatialSound((swingVariant & 1) == 0 ?
-                                        "sword_hit_1" : "sword_hit_2", 0.32f, stereoGains);
+                                        "sword_hit_1" : "sword_hit_2", 0.32f,
+                                        stereoGains, verticalMetadata);
                             }
                             break;
                         case PLATFORM_EVENT_ENEMY_DEFEATED:
@@ -4651,36 +4876,38 @@ public class MainActivity extends Activity {
                             handler.postDelayed(
                                     () -> {
                                         if (feedbackGeneration == delayedGameplayFeedbackGeneration) {
-                                            playSpatialSound("skeleton_falling_bones", 0.24f, stereoGains);
+                                            playSpatialSound("skeleton_falling_bones", 0.24f,
+                                                    stereoGains, verticalMetadata);
                                         }
                                     },
                                     ENEMY_IMPACT_FALL_DELAY_MILLISECONDS);
                             break;
                         case PLATFORM_EVENT_LICH_CHARGE_STARTED:
-                            playSpatialSound("lich_charge", 0.38f, stereoGains);
+                            playSpatialSound("lich_charge", 0.38f, stereoGains, verticalMetadata);
                             break;
                         case PLATFORM_EVENT_LICH_IMPACT:
-                            playSpatialSound("lich_impact", 0.55f, stereoGains);
+                            playSpatialSound("lich_impact", 0.55f, stereoGains, verticalMetadata);
                             break;
                         case PLATFORM_EVENT_LICH_DEFEATED:
-                            playSpatialSound("lich_fall", 0.28f, stereoGains);
+                            playSpatialSound("lich_fall", 0.28f, stereoGains, verticalMetadata);
                             break;
                         case PLATFORM_EVENT_CHEST_UNLOCKED:
-                            playSpatialSound("chest_unlock", 0.82f, stereoGains);
+                            playSpatialSound("chest_unlock", 0.82f, stereoGains, verticalMetadata);
                             break;
                         case PLATFORM_EVENT_CHEST_OPENED:
-                            playSpatialSound("chest_open", 1.0f, stereoGains);
+                            playSpatialSound("chest_open", 1.0f, stereoGains, verticalMetadata);
                             break;
                         case PLATFORM_EVENT_TORCH_EXTINGUISHED:
-                            playSpatialSound("torch_extinguish", 0.78f, stereoGains);
+                            playSpatialSound("torch_extinguish", 0.78f, stereoGains, verticalMetadata);
                             break;
                         case PLATFORM_EVENT_SKELETON_INCIDENTAL:
-                            playSpatialSound("skeleton_idle_rattle", 0.10f, stereoGains);
+                            playSpatialSound("skeleton_idle_rattle", 0.10f, stereoGains, verticalMetadata);
                             break;
                         case PLATFORM_EVENT_SKELETON_ENCOUNTER_WARNING:
                             if (!menuVisible && !diagnosticsVisible && !graphicsVisible &&
                                     !deathOverlayVisible && !endingOverlayVisible) {
-                                playSpatialSound("skeleton_idle_rattle", 0.22f, stereoGains);
+                                playSpatialSound("skeleton_idle_rattle", 0.22f,
+                                        stereoGains, verticalMetadata);
                             }
                             break;
                         case PLATFORM_EVENT_PLAYER_SWORD_ATTACHMENT_CHANGED:
@@ -4694,16 +4921,16 @@ public class MainActivity extends Activity {
                             }
                             break;
                         case PLATFORM_EVENT_KEEPER_REVEAL_STARTED:
-                            playSpatialSound("keeper_i_sense_you", 0.36f, stereoGains);
+                            playSpatialSound("keeper_i_sense_you", 0.36f, stereoGains, verticalMetadata);
                             break;
                         case PLATFORM_EVENT_KEEPER_WARNING:
-                            playSpatialSound("keeper_come_closer", 0.36f, stereoGains);
+                            playSpatialSound("keeper_come_closer", 0.36f, stereoGains, verticalMetadata);
                             break;
                         case PLATFORM_EVENT_KEEPER_COMBAT_READY:
                             // Readiness has no separate admitted sound; title polls the snapshot.
                             break;
                         case PLATFORM_EVENT_PLAYER_PARRY_SUCCEEDED:
-                            playSpatialSound("sword_hit_2", 0.46f, stereoGains);
+                            playSpatialSound("sword_hit_2", 0.46f, stereoGains, verticalMetadata);
                             performHaptic(HAPTIC_PARRY);
                             break;
                         default:
@@ -4839,6 +5066,11 @@ public class MainActivity extends Activity {
             case "dust-ellipsoid": return 158;
             case "dust-box-wall": return 159;
             case "player-torch-parry-clearance": return 160;
+            case "world-route": return 190;
+            case "world-route-staged": return 191;
+            case "rescue-journey-start": return 192;
+            case "vertical-proof-ground": return 170;
+            case "vertical-proof-raised": return 171;
             case "layout-c-wall-panel-upward": return 152;
             case "wall-panel-bottom": return 161;
             case "wall-panel-bottom-left": return 162;
@@ -4849,6 +5081,27 @@ public class MainActivity extends Activity {
             case "water-torch-catchment": return 183;
             default: return -1;
         }
+    }
+
+    static int combatPracticeKind(final String name) {
+        if ("combat-practice-parry".equals(name)) return DEBUG_COMBAT_PRACTICE_PARRY;
+        if ("combat-practice-dodge".equals(name)) return DEBUG_COMBAT_PRACTICE_DODGE;
+        return -1;
+    }
+
+    static boolean enablesVerticalProofFeedback(final boolean debugBuild, final int checkpoint) {
+        return debugBuild && (checkpoint == 170 || checkpoint == 171);
+    }
+
+    private void selectVerticalProofFeedbackCheckpoint(final int checkpoint) {
+        verticalProofFeedbackCheckpoint = enablesVerticalProofFeedback(isDebuggableApp(), checkpoint)
+                ? checkpoint : -1;
+        verticalProofFeedbackDiagnosticCount = 0;
+    }
+
+    private void clearVerticalProofFeedbackSelection() {
+        verticalProofFeedbackCheckpoint = -1;
+        verticalProofFeedbackDiagnosticCount = 0;
     }
 
     static int admittedDebugDustQuality(final Intent intent, final boolean debuggable,
@@ -4902,15 +5155,22 @@ public class MainActivity extends Activity {
         final boolean requireRayQueryCompute =
                 shouldRequireRayQueryCompute(isDebuggableApp(), intent);
         ProbeBridge.setRequiredRayQueryCompute(requireRayQueryCompute);
-        if (intent == null) return;
+        if (intent == null) {
+            clearVerticalProofFeedbackSelection();
+            return;
+        }
         if (!isDebuggableApp()) {
+            clearVerticalProofFeedbackSelection();
             if (intent.getBooleanExtra(EXTRA_DEBUG_CAPTURE, false)) {
                 Log.w(TAG, "Rejected debug capture intent in a non-debuggable build.");
             }
             return;
         }
         final int requestedScale = admittedDebugRenderScale(intent);
-        final int requestedCheckpoint = checkpointId(intent.getStringExtra(EXTRA_DEBUG_CHECKPOINT));
+        final String requestedCheckpointName = intent.getStringExtra(EXTRA_DEBUG_CHECKPOINT);
+        final int requestedPractice = combatPracticeKind(requestedCheckpointName);
+        final int requestedCheckpoint = requestedPractice >= 0 ? -1 : checkpointId(requestedCheckpointName);
+        selectVerticalProofFeedbackCheckpoint(requestedCheckpoint);
         final boolean requestedReplay = intent.getBooleanExtra(EXTRA_DEBUG_REPLAY, false);
         final boolean requestedCapture = intent.getBooleanExtra(EXTRA_DEBUG_CAPTURE, false);
         final String requestedMotion = intent.getStringExtra(EXTRA_DEBUG_MOTION);
@@ -4931,6 +5191,12 @@ public class MainActivity extends Activity {
         final boolean motionRequested = requestedMotion != null && requestedMotionId != null &&
                 requestedCheckpoint < 0 && !requestedReplay && !requestedCapture && !hasRtLabIntent &&
                 !intent.hasExtra(EXTRA_BENCHMARK_RUN_ID);
+        if (requestedPractice >= 0 && (requestedCapture || requestedReplay || hasRtLabIntent ||
+                intent.hasExtra(EXTRA_BENCHMARK_RUN_ID) || motionRequested)) {
+            Log.w(TAG, "Rejected combat practice combined with capture, benchmark, replay, RT lab, or motion work.");
+            clearVerticalProofFeedbackSelection();
+            return;
+        }
         final int requestedDustQuality = admittedDebugDustQuality(intent, true, requestedCheckpoint,
                 requestedCapture, requestedReplay, hasRtLabIntent, motionRequested);
         if (requestedDustQuality >= 0) {
@@ -4996,13 +5262,18 @@ public class MainActivity extends Activity {
             pendingDebugCheckpoint = requestedCheckpoint;
             pendingDebugCapture = requestedCapture;
             pendingDebugReplay = false;
+        } else if (requestedPractice >= 0) {
+            pendingDebugCombatPractice = requestedPractice;
+            pendingDebugCheckpoint = -1;
+            pendingDebugCapture = false;
+            pendingDebugReplay = false;
         } else if (requestedReplay) {
             pendingDebugReplay = true;
             pendingDebugCheckpoint = -1;
             pendingDebugCapture = false;
         }
         debugAutomationAutostart = intent.getBooleanExtra(EXTRA_DEBUG_AUTOSTART, false) ||
-                requestedCheckpoint >= 0 || requestedReplay || motionRequested;
+                requestedCheckpoint >= 0 || requestedPractice >= 0 || requestedReplay || motionRequested;
         if (debugAutomationAutostart) {
             Log.i(TAG, "Accepted debug automation intent: checkpoint=" + requestedCheckpoint +
                     " capture=" + requestedCapture + " replay=" + requestedReplay + " scale=" + requestedScale +
@@ -5061,6 +5332,7 @@ public class MainActivity extends Activity {
         attackButton.setVisibility(View.GONE);
         parryButton.setVisibility(View.GONE);
         if (dodgeButton != null) dodgeButton.setVisibility(View.GONE);
+        if (runButton != null) runButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
         developerOverlay.setVisibility(View.GONE);
@@ -5069,6 +5341,7 @@ public class MainActivity extends Activity {
 
     static float[] developmentCheckpointViewPose(final int checkpoint) {
         switch (checkpoint) {
+            case 192: return new float[]{3.1415927f, -0.05f};
             case 136: return new float[]{0.0f, -0.32f};
             case 137: return new float[]{0.0f, -0.05f};
             case 138: return new float[]{0.0f, -0.28f};
@@ -5290,6 +5563,18 @@ public class MainActivity extends Activity {
         playSound(key, mixGain, left, right);
     }
 
+    private void playSpatialSound(final String key, final float mixGain,
+            final long packedStereoGains, final long verticalMetadata) {
+        // Y is diagnostic metadata only; playback still uses the established planar gains.
+        playSpatialSound(key, mixGain, packedStereoGains);
+        if (verticalProofFeedbackCheckpoint < 0 || verticalProofFeedbackDiagnosticCount >= 64) return;
+        final float sourceY = Float.intBitsToFloat((int) verticalMetadata);
+        final float listenerY = Float.intBitsToFloat((int) (verticalMetadata >>> 32));
+        Log.i(TAG, "HORDE_VERTICAL_FEEDBACK checkpoint=" + verticalProofFeedbackCheckpoint +
+                " sourceY=" + sourceY + " listenerY=" + listenerY);
+        ++verticalProofFeedbackDiagnosticCount;
+    }
+
     private void playSound(final String key, final float mixGain, final float leftScale, final float rightScale) {
         if (soundPool == null || !preferences.getBoolean("sfx_enabled", true)) return;
         final Integer soundId = sounds.get(key);
@@ -5494,11 +5779,24 @@ public class MainActivity extends Activity {
 
     private void pushViewControls() {
         ProbeBridge.setViewControls(viewControls[0], viewControls[1], viewControls[2], viewControls[7], viewControls[8]);
+        ProbeBridge.setRunHeld(controllerMode && controllerInput.runHeld());
     }
 
     private void configureGameplayActionButtons() {
-        swingTouch = new PressActionButton(attackButton, this::canSendGameplayAction, ProbeBridge::requestAttack);
-        dodgeTouch = new PressActionButton(dodgeButton, this::canSendGameplayAction, ProbeBridge::requestDodge);
+        swingTouch = new PressActionButton(attackButton, this::canSendGameplayAction, () -> {
+            clearRunIntent();
+            ProbeBridge.requestAttack();
+        });
+        dodgeTouch = new PressActionButton(dodgeButton, this::canSendGameplayAction, () -> {
+            clearRunIntent();
+            ProbeBridge.requestDodge();
+        });
+        runButton.setOnClickListener(view -> {
+            if (!canSendGameplayAction()) return;
+            runToggleEnabled = !runToggleEnabled;
+            runButton.setText(runToggleEnabled ? R.string.running : R.string.run);
+            ProbeBridge.requestToggleRun();
+        });
         interactButton.setOnClickListener(view -> {
             if (menuVisible || diagnosticsVisible || deathOverlayVisible ||
                     endingOverlayVisible || ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) != 1) return;
@@ -5515,6 +5813,7 @@ public class MainActivity extends Activity {
                 return;
             }
             if (!canSendGameplayAction()) return;
+            clearRunIntent();
             ProbeBridge.requestParry();
         });
         parryButton.setOnTouchListener((view, event) -> {
@@ -5525,6 +5824,7 @@ public class MainActivity extends Activity {
                     parryRequestedOnTouchDown = true;
                     view.setPressed(true);
                     if (canSendGameplayAction()) {
+                        clearRunIntent();
                         ProbeBridge.requestParry();
                     }
                     return true;
@@ -5584,6 +5884,7 @@ public class MainActivity extends Activity {
         controllerWindowFocused=focused;
         currentControllerDialog();
         if (!focused) {
+            clearRunIntent();
             stopMenuAmbience();
             suspendControllerInput(false);
             if(surfaceView!=null && interactButton!=null && toggleHeldLightPoseButton!=null)clearTouchGesture();
@@ -5691,6 +5992,8 @@ public class MainActivity extends Activity {
         else if(canSendGameplayAction()) {
             viewControls[7]=controllerInput.moveStrafe(); viewControls[8]=controllerInput.moveForward();
             pushViewControls(); // A directional Dodge sees the same coherent axes publication.
+            if((result.actions & (AndroidControllerInput.SWING | AndroidControllerInput.PARRY |
+                    AndroidControllerInput.DODGE))!=0)clearRunIntent();
             if((result.actions & AndroidControllerInput.SWING)!=0)ProbeBridge.requestAttack();
             if((result.actions & AndroidControllerInput.PARRY)!=0)ProbeBridge.requestParry();
             if((result.actions & AndroidControllerInput.DODGE)!=0)ProbeBridge.requestDodge();
@@ -5749,6 +6052,7 @@ public class MainActivity extends Activity {
         final boolean playing=canSendGameplayAction() && !debugCaptureUiSuppressed;
         final int actions=hud && playing && !controllerMode?View.VISIBLE:View.GONE;
         for(Button button:new Button[]{attackButton,parryButton,dodgeButton})if(button!=null)button.setVisibility(actions);
+        if(runButton!=null)runButton.setVisibility(actions);
         if(menuButton!=null)menuButton.setVisibility(hud && playing && !controllerMode?View.VISIBLE:View.GONE);
         if(vitalityStatus!=null)vitalityStatus.setVisibility(hud && playing && lastPlayerLifePhase==PLAYER_ALIVE?View.VISIBLE:View.GONE);
         if(interactButton!=null && toggleHeldLightPoseButton!=null)updateContextualControls(hud && playing);
@@ -5776,6 +6080,7 @@ public class MainActivity extends Activity {
     private void clearTouchGesture() {
         if (swingTouch != null) swingTouch.cancel();
         if (dodgeTouch != null) dodgeTouch.cancel();
+        clearRunIntent();
         TouchControlState.clear(activePointers, viewControls);
         parryTouchActive = false;
         parryRequestedOnTouchDown = false;
@@ -5792,6 +6097,39 @@ public class MainActivity extends Activity {
             return;
         }
         final int contextualState = ProbeBridge.getContextualControlState();
+        if ((contextualState & CONTEXTUAL_RESCUE_MODE) != 0) {
+            final int rescuePrompt = (contextualState & RESCUE_PROMPT_MASK) >> RESCUE_PROMPT_SHIFT;
+            final String label;
+            switch (rescuePrompt) {
+                case 1: label = "Climb rescue rope"; break;
+                case 2: label = "Descend rescue rope"; break;
+                case 3: label = "Preparing rescue route…"; break;
+                case 4: label = "Traversing rescue rope…"; break;
+                default: label = ""; break;
+            }
+            final boolean enabled = (contextualState & CONTEXTUAL_INTERACT) != 0;
+            if (label.isEmpty()) {
+                interactButton.setVisibility(View.GONE);
+            } else {
+                interactButton.setText(label);
+                interactButton.setContentDescription(label);
+                interactButton.setEnabled(enabled);
+                interactButton.setVisibility(controllerMode ? View.GONE : View.VISIBLE);
+            }
+            if (controllerPrompt != null) {
+                if (controllerMode) {
+                    final String prompt = getString(R.string.controller_play_prompts) +
+                            (label.isEmpty() ? "" : "\n" + (enabled ? "A: " : "") + label);
+                    controllerPrompt.setText(prompt);
+                    controllerPrompt.setContentDescription(prompt);
+                    controllerPrompt.setVisibility(View.VISIBLE);
+                } else {
+                    controllerPrompt.setVisibility(View.GONE);
+                }
+            }
+            toggleHeldLightPoseButton.setVisibility(View.GONE);
+            return;
+        }
         final int chestPrompt = (contextualState & CHEST_PROMPT_MASK) >> CHEST_PROMPT_SHIFT;
         final boolean interactEnabled = (contextualState & CONTEXTUAL_INTERACT) != 0;
         final int interactLabel;
@@ -6091,7 +6429,11 @@ public class MainActivity extends Activity {
     protected void onNewIntent(final Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
-        if (!consumeBenchmarkAutomationIntent(intent, false)) consumeDebugAutomationIntent(intent);
+        if (consumeBenchmarkAutomationIntent(intent, false)) {
+            clearVerticalProofFeedbackSelection();
+        } else {
+            consumeDebugAutomationIntent(intent);
+        }
         if (entryMenuEnabled && (debugAutomationAutostart || debugCaptureUiSuppressed ||
                 pendingDebugCheckpoint >= 0 || pendingDebugCapture || pendingDebugReplay ||
                 benchmarkAutomationId != null || debugRtLabAccess)) {
@@ -6109,6 +6451,9 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onPause() {
+        cancelCombatTeachingPromptPoll();
+        clearCombatTeachingPrompt();
+        clearRunIntent();
         clearTouchState();
         handler.removeCallbacks(refreshEntryMenu);
         if (entryMenuEnabled) {

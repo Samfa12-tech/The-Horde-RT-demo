@@ -1,0 +1,512 @@
+[
+  {
+    "path": "reports/frozen-mist/quality/shaders/midpoint-all/shader.spv",
+    "bytes": 295960,
+    "sha256": "223706ea208242f34770b919e14a8a6ae1391ff187820325d9759fc28dee6795"
+  },
+  {
+    "path": "reports/frozen-mist/quality/shaders/midpoint-all/shader.spvasm",
+    "bytes": 875531,
+    "sha256": "43d31ef48e5f23c81d020af2d64e69f59691a84d7b3a1d25f4a90d2ccc189450"
+  },
+  {
+    "path": "reports/frozen-mist/quality/shaders/midpoint-all/source.rgen",
+    "bytes": 199794,
+    "sha256": "e0083cd342a123b1aa92cd24892484290d44a1180ace9cebcc80de153e9e23ef"
+  },
+  {
+    "path": "reports/frozen-mist/quality/shaders/midpoint-all/unoptimized.spv",
+    "bytes": 296528,
+    "sha256": "45a45fe10b9918841e72bfc11ffe0b3cd77aab7a06e808d00a8c716cb1be1a32"
+  },
+  {
+    "path": "reports/frozen-mist/quality/shaders/midpoint-all/words.inc",
+    "bytes": 998866,
+    "sha256": "5021657a2dfa54b03e1e79c598a18dbfff74571127b6f4e3bc63b41dd76df2e4"
+  },
+  {
+    "path": "reports/frozen-mist/quality/shaders/midpoint-lantern/shader.spv",
+    "bytes": 293912,
+    "sha256": "41ec3eea66114e1a7d2f7b1e09e1017c66c215aa39612781bbb88db67d53e975"
+  },
+  {
+    "path": "reports/frozen-mist/quality/shaders/midpoint-lantern/shader.spvasm",
+    "bytes": 869234,
+    "sha256": "41fa849bc415f25cd1cfc29589974dc62c753cea90fcc269eee570f90cbc1e73"
+  },
+  {
+    "path": "reports/frozen-mist/quality/shaders/midpoint-lantern/source.rgen",
+    "bytes": 199029,
+    "sha256": "64f046eb9df866172b30c45821fddd8bd7fe4df391ba65280991db1024b2ecae"
+  },
+  {
+    "path": "reports/frozen-mist/quality/shaders/midpoint-lantern/unoptimized.spv",
+    "bytes": 294480,
+    "sha256": "94dbe35c431c8dac274a82ae1e9ebd5d2bd68ef3a9ff37f11fc4cb06dd6b8d6e"
+  },
+  {
+    "path": "reports/frozen-mist/quality/shaders/midpoint-lantern/words.inc",
+    "bytes": 991954,
+    "sha256": "81802675454c18b33f4bd01d725d079451c96254f6525fea9f79b562f58b4963"
+  },
+  {
+    "path": "reports/frozen-mist/quality/shaders/midpoint-sky/shader.spv",
+    "bytes": 292648,
+    "sha256": "81b7a1e3a58ccd5c8ca1542be767a57925908cd944ba20646b5190301409b7d7"
+  },
+  {
+    "path": "reports/frozen-mist/quality/shaders/midpoint-sky/shader.spvasm",
+    "bytes": 865469,
+    "sha256": "95935ab298edc87d0b18a30a997c6a1356335d85f785ee4ab7b08748ad2da936"
+  },
+  {
+    "path": "reports/frozen-mist/quality/shaders/midpoint-sky/source.rgen",
+    "bytes": 198752,
+    "sha256": "10722d2bde93c5ec3fb1542771921a6b203423a85904d5451c8ec87519035025"
+  },
+  {
+    "path": "reports/frozen-mist/quality/shaders/midpoint-sky/unoptimized.spv",
+    "bytes": 293200,
+    "sha256": "1a699460b41264583ceb2cffde0af8fc8dd19b487db906a366d683983b0cb487"
+  },
+  {
+    "path": "reports/frozen-mist/quality/shaders/midpoint-sky/words.inc",
+    "bytes": 987690,
+    "sha256": "3b3bcc280c7ae5ba5677b0c0a58cf84ef87c36e2c3023522496b2ff729b9354e"
+  },
+  {
+    "path": "reports/frozen-mist/quality/shaders/sample-local-all/shader.spv",
+    "bytes": 295832,
+    "sha256": "0603ab67ccebc408017f8be80b4b42379f02911509b5f635cc9417a8a831e82a"
+  },
+  {
+    "path": "reports/frozen-mist/quality/shaders/sample-local-all/shader.spvasm",
+    "bytes": 875195,
+    "sha256": "65d36204d3184a4392bb48a87e6d3703a1ad5a487f4dfed1e936a9bbdb7dacbe"
+  },
+  {
+    "path": "reports/frozen-mist/quality/shaders/sample-local-all/source.rgen",
+    "bytes": 199899,
+    "sha256": "9472d889a62d37a0657b33cfc96ca9659aeecf634d0857b6be706739d9f1cdd0"
+  },
+  {
+    "path": "reports/frozen-mist/quality/shaders/sample-local-all/unoptimized.spv",
+    "bytes": 296400,
+    "sha256": "402c5a0d1ea1e0eaeb897768544485dfacc690e6fa1e43fb534e7221a8fae2ea"
+  },
+  {
+    "path": "reports/frozen-mist/quality/shaders/sample-local-all/words.inc",
+    "bytes": 998434,
+    "sha256": "d5193d925606d79895a297f132e66245d5bcda0d8f239650d9b9dc1aa972093b"
+  },
+  {
+    "path": "reports/frozen-mist/quality/shaders/sample-local-lantern/shader.spv",
+    "bytes": 293784,
+    "sha256": "3cd4cd0d86abc417ff893373ed600563c78267229ea31c2316e936a0ce26bf6f"
+  },
+  {
+    "path": "reports/frozen-mist/quality/shaders/sample-local-lantern/shader.spvasm",
+    "bytes": 868901,
+    "sha256": "fbc57a89c6e2e3fc8cef4e7585e02063baeef48bfcaa6af3e864dfddec4271a1"
+  },
+  {
+    "path": "reports/frozen-mist/quality/shaders/sample-local-lantern/source.rgen",
+    "bytes": 199134,
+    "sha256": "ec908fc5a58a921c744127dfda5ba2dc10ccb313e414268fcfaf0c83a5d737ac"
+  },
+  {
+    "path": "reports/frozen-mist/quality/shaders/sample-local-lantern/unoptimized.spv",
+    "bytes": 294352,
+    "sha256": "867e3e84891606c0b935ee72d53e3549ee1b2ec8030379085c23995d696c499b"
+  },
+  {
+    "path": "reports/frozen-mist/quality/shaders/sample-local-lantern/words.inc",
+    "bytes": 991522,
+    "sha256": "9c382ba6d14aff15bd9107a6bdea1ae4baaa9d9a728c00575ed2b419b1042dac"
+  },
+  {
+    "path": "reports/frozen-mist/quality/shaders/sample-local-sky/shader.spv",
+    "bytes": 292520,
+    "sha256": "be20163adfaa33ceb563b0580bdbe977df3b1a9d5348522ae5acf6850c098edb"
+  },
+  {
+    "path": "reports/frozen-mist/quality/shaders/sample-local-sky/shader.spvasm",
+    "bytes": 865135,
+    "sha256": "2753f542952cf9458d043734c683c56a628e70a285d75711d920ccd7faf2b809"
+  },
+  {
+    "path": "reports/frozen-mist/quality/shaders/sample-local-sky/source.rgen",
+    "bytes": 198857,
+    "sha256": "f3ab0dec7b3b1af7123d77597194951097a3ecdb351dc6d5f418802a1bdfee45"
+  },
+  {
+    "path": "reports/frozen-mist/quality/shaders/sample-local-sky/unoptimized.spv",
+    "bytes": 293072,
+    "sha256": "be189ccb68376ca8a105923883ace4f83afc8fd28e213ecbbd0832ae947c9081"
+  },
+  {
+    "path": "reports/frozen-mist/quality/shaders/sample-local-sky/words.inc",
+    "bytes": 987258,
+    "sha256": "515b53a231b5b24cb9378f9c26923ee95c5779071922fe8649fb34440b56c952"
+  },
+  {
+    "path": "reports/frozen-mist/quality/shaders/midpoint-all/src/vulkan/raytracing/variants/diagnostic_high_generic_dielectric.inc",
+    "bytes": 998866,
+    "sha256": "5021657a2dfa54b03e1e79c598a18dbfff74571127b6f4e3bc63b41dd76df2e4"
+  },
+  {
+    "path": "reports/frozen-mist/quality/shaders/midpoint-lantern/src/vulkan/raytracing/variants/diagnostic_high_generic_dielectric.inc",
+    "bytes": 991954,
+    "sha256": "81802675454c18b33f4bd01d725d079451c96254f6525fea9f79b562f58b4963"
+  },
+  {
+    "path": "reports/frozen-mist/quality/shaders/midpoint-sky/src/vulkan/raytracing/variants/diagnostic_high_generic_dielectric.inc",
+    "bytes": 987690,
+    "sha256": "3b3bcc280c7ae5ba5677b0c0a58cf84ef87c36e2c3023522496b2ff729b9354e"
+  },
+  {
+    "path": "reports/frozen-mist/quality/shaders/sample-local-all/src/vulkan/raytracing/variants/diagnostic_high_generic_dielectric.inc",
+    "bytes": 998434,
+    "sha256": "d5193d925606d79895a297f132e66245d5bcda0d8f239650d9b9dc1aa972093b"
+  },
+  {
+    "path": "reports/frozen-mist/quality/shaders/sample-local-lantern/src/vulkan/raytracing/variants/diagnostic_high_generic_dielectric.inc",
+    "bytes": 991522,
+    "sha256": "9c382ba6d14aff15bd9107a6bdea1ae4baaa9d9a728c00575ed2b419b1042dac"
+  },
+  {
+    "path": "reports/frozen-mist/quality/shaders/sample-local-sky/src/vulkan/raytracing/variants/diagnostic_high_generic_dielectric.inc",
+    "bytes": 987258,
+    "sha256": "515b53a231b5b24cb9378f9c26923ee95c5779071922fe8649fb34440b56c952"
+  },
+  {
+    "path": "reports/frozen-mist/owner-view/shaders/midpoint-all/shader.spv",
+    "bytes": 295960,
+    "sha256": "223706ea208242f34770b919e14a8a6ae1391ff187820325d9759fc28dee6795"
+  },
+  {
+    "path": "reports/frozen-mist/owner-view/shaders/midpoint-all/shader.spvasm",
+    "bytes": 875531,
+    "sha256": "43d31ef48e5f23c81d020af2d64e69f59691a84d7b3a1d25f4a90d2ccc189450"
+  },
+  {
+    "path": "reports/frozen-mist/owner-view/shaders/midpoint-all/source.rgen",
+    "bytes": 199794,
+    "sha256": "e0083cd342a123b1aa92cd24892484290d44a1180ace9cebcc80de153e9e23ef"
+  },
+  {
+    "path": "reports/frozen-mist/owner-view/shaders/midpoint-all/unoptimized.spv",
+    "bytes": 296528,
+    "sha256": "45a45fe10b9918841e72bfc11ffe0b3cd77aab7a06e808d00a8c716cb1be1a32"
+  },
+  {
+    "path": "reports/frozen-mist/owner-view/shaders/midpoint-all/words.inc",
+    "bytes": 998866,
+    "sha256": "5021657a2dfa54b03e1e79c598a18dbfff74571127b6f4e3bc63b41dd76df2e4"
+  },
+  {
+    "path": "reports/frozen-mist/owner-view/shaders/midpoint-lantern/shader.spv",
+    "bytes": 293912,
+    "sha256": "41ec3eea66114e1a7d2f7b1e09e1017c66c215aa39612781bbb88db67d53e975"
+  },
+  {
+    "path": "reports/frozen-mist/owner-view/shaders/midpoint-lantern/shader.spvasm",
+    "bytes": 869234,
+    "sha256": "41fa849bc415f25cd1cfc29589974dc62c753cea90fcc269eee570f90cbc1e73"
+  },
+  {
+    "path": "reports/frozen-mist/owner-view/shaders/midpoint-lantern/source.rgen",
+    "bytes": 199029,
+    "sha256": "64f046eb9df866172b30c45821fddd8bd7fe4df391ba65280991db1024b2ecae"
+  },
+  {
+    "path": "reports/frozen-mist/owner-view/shaders/midpoint-lantern/unoptimized.spv",
+    "bytes": 294480,
+    "sha256": "94dbe35c431c8dac274a82ae1e9ebd5d2bd68ef3a9ff37f11fc4cb06dd6b8d6e"
+  },
+  {
+    "path": "reports/frozen-mist/owner-view/shaders/midpoint-lantern/words.inc",
+    "bytes": 991954,
+    "sha256": "81802675454c18b33f4bd01d725d079451c96254f6525fea9f79b562f58b4963"
+  },
+  {
+    "path": "reports/frozen-mist/owner-view/shaders/midpoint-sky/shader.spv",
+    "bytes": 292648,
+    "sha256": "81b7a1e3a58ccd5c8ca1542be767a57925908cd944ba20646b5190301409b7d7"
+  },
+  {
+    "path": "reports/frozen-mist/owner-view/shaders/midpoint-sky/shader.spvasm",
+    "bytes": 865469,
+    "sha256": "95935ab298edc87d0b18a30a997c6a1356335d85f785ee4ab7b08748ad2da936"
+  },
+  {
+    "path": "reports/frozen-mist/owner-view/shaders/midpoint-sky/source.rgen",
+    "bytes": 198752,
+    "sha256": "10722d2bde93c5ec3fb1542771921a6b203423a85904d5451c8ec87519035025"
+  },
+  {
+    "path": "reports/frozen-mist/owner-view/shaders/midpoint-sky/unoptimized.spv",
+    "bytes": 293200,
+    "sha256": "1a699460b41264583ceb2cffde0af8fc8dd19b487db906a366d683983b0cb487"
+  },
+  {
+    "path": "reports/frozen-mist/owner-view/shaders/midpoint-sky/words.inc",
+    "bytes": 987690,
+    "sha256": "3b3bcc280c7ae5ba5677b0c0a58cf84ef87c36e2c3023522496b2ff729b9354e"
+  },
+  {
+    "path": "reports/frozen-mist/owner-view/shaders/sample-local-all/shader.spv",
+    "bytes": 295832,
+    "sha256": "0603ab67ccebc408017f8be80b4b42379f02911509b5f635cc9417a8a831e82a"
+  },
+  {
+    "path": "reports/frozen-mist/owner-view/shaders/sample-local-all/shader.spvasm",
+    "bytes": 875195,
+    "sha256": "65d36204d3184a4392bb48a87e6d3703a1ad5a487f4dfed1e936a9bbdb7dacbe"
+  },
+  {
+    "path": "reports/frozen-mist/owner-view/shaders/sample-local-all/source.rgen",
+    "bytes": 199899,
+    "sha256": "9472d889a62d37a0657b33cfc96ca9659aeecf634d0857b6be706739d9f1cdd0"
+  },
+  {
+    "path": "reports/frozen-mist/owner-view/shaders/sample-local-all/unoptimized.spv",
+    "bytes": 296400,
+    "sha256": "402c5a0d1ea1e0eaeb897768544485dfacc690e6fa1e43fb534e7221a8fae2ea"
+  },
+  {
+    "path": "reports/frozen-mist/owner-view/shaders/sample-local-all/words.inc",
+    "bytes": 998434,
+    "sha256": "d5193d925606d79895a297f132e66245d5bcda0d8f239650d9b9dc1aa972093b"
+  },
+  {
+    "path": "reports/frozen-mist/owner-view/shaders/sample-local-lantern/shader.spv",
+    "bytes": 293784,
+    "sha256": "3cd4cd0d86abc417ff893373ed600563c78267229ea31c2316e936a0ce26bf6f"
+  },
+  {
+    "path": "reports/frozen-mist/owner-view/shaders/sample-local-lantern/shader.spvasm",
+    "bytes": 868901,
+    "sha256": "fbc57a89c6e2e3fc8cef4e7585e02063baeef48bfcaa6af3e864dfddec4271a1"
+  },
+  {
+    "path": "reports/frozen-mist/owner-view/shaders/sample-local-lantern/source.rgen",
+    "bytes": 199134,
+    "sha256": "ec908fc5a58a921c744127dfda5ba2dc10ccb313e414268fcfaf0c83a5d737ac"
+  },
+  {
+    "path": "reports/frozen-mist/owner-view/shaders/sample-local-lantern/unoptimized.spv",
+    "bytes": 294352,
+    "sha256": "867e3e84891606c0b935ee72d53e3549ee1b2ec8030379085c23995d696c499b"
+  },
+  {
+    "path": "reports/frozen-mist/owner-view/shaders/sample-local-lantern/words.inc",
+    "bytes": 991522,
+    "sha256": "9c382ba6d14aff15bd9107a6bdea1ae4baaa9d9a728c00575ed2b419b1042dac"
+  },
+  {
+    "path": "reports/frozen-mist/owner-view/shaders/sample-local-sky/shader.spv",
+    "bytes": 292520,
+    "sha256": "be20163adfaa33ceb563b0580bdbe977df3b1a9d5348522ae5acf6850c098edb"
+  },
+  {
+    "path": "reports/frozen-mist/owner-view/shaders/sample-local-sky/shader.spvasm",
+    "bytes": 865135,
+    "sha256": "2753f542952cf9458d043734c683c56a628e70a285d75711d920ccd7faf2b809"
+  },
+  {
+    "path": "reports/frozen-mist/owner-view/shaders/sample-local-sky/source.rgen",
+    "bytes": 198857,
+    "sha256": "f3ab0dec7b3b1af7123d77597194951097a3ecdb351dc6d5f418802a1bdfee45"
+  },
+  {
+    "path": "reports/frozen-mist/owner-view/shaders/sample-local-sky/unoptimized.spv",
+    "bytes": 293072,
+    "sha256": "be189ccb68376ca8a105923883ace4f83afc8fd28e213ecbbd0832ae947c9081"
+  },
+  {
+    "path": "reports/frozen-mist/owner-view/shaders/sample-local-sky/words.inc",
+    "bytes": 987258,
+    "sha256": "515b53a231b5b24cb9378f9c26923ee95c5779071922fe8649fb34440b56c952"
+  },
+  {
+    "path": "reports/frozen-mist/owner-view/shaders/midpoint-all/src/vulkan/raytracing/variants/diagnostic_high_generic_dielectric.inc",
+    "bytes": 998866,
+    "sha256": "5021657a2dfa54b03e1e79c598a18dbfff74571127b6f4e3bc63b41dd76df2e4"
+  },
+  {
+    "path": "reports/frozen-mist/owner-view/shaders/midpoint-lantern/src/vulkan/raytracing/variants/diagnostic_high_generic_dielectric.inc",
+    "bytes": 991954,
+    "sha256": "81802675454c18b33f4bd01d725d079451c96254f6525fea9f79b562f58b4963"
+  },
+  {
+    "path": "reports/frozen-mist/owner-view/shaders/midpoint-sky/src/vulkan/raytracing/variants/diagnostic_high_generic_dielectric.inc",
+    "bytes": 987690,
+    "sha256": "3b3bcc280c7ae5ba5677b0c0a58cf84ef87c36e2c3023522496b2ff729b9354e"
+  },
+  {
+    "path": "reports/frozen-mist/owner-view/shaders/sample-local-all/src/vulkan/raytracing/variants/diagnostic_high_generic_dielectric.inc",
+    "bytes": 998434,
+    "sha256": "d5193d925606d79895a297f132e66245d5bcda0d8f239650d9b9dc1aa972093b"
+  },
+  {
+    "path": "reports/frozen-mist/owner-view/shaders/sample-local-lantern/src/vulkan/raytracing/variants/diagnostic_high_generic_dielectric.inc",
+    "bytes": 991522,
+    "sha256": "9c382ba6d14aff15bd9107a6bdea1ae4baaa9d9a728c00575ed2b419b1042dac"
+  },
+  {
+    "path": "reports/frozen-mist/owner-view/shaders/sample-local-sky/src/vulkan/raytracing/variants/diagnostic_high_generic_dielectric.inc",
+    "bytes": 987258,
+    "sha256": "515b53a231b5b24cb9378f9c26923ee95c5779071922fe8649fb34440b56c952"
+  },
+  {
+    "path": "reports/frozen-mist/owner-weights/shaders/midpoint-loss/shader.spv",
+    "bytes": 295620,
+    "sha256": "a5237901fa7d400ec1192825517a2847442ad04f92bf614b3b5362da2b5baa99"
+  },
+  {
+    "path": "reports/frozen-mist/owner-weights/shaders/midpoint-loss/shader.spvasm",
+    "bytes": 874413,
+    "sha256": "2347b97b47783bfb4b0e5732586f22741d3ab58eaa237d273d0b2d7433c5e730"
+  },
+  {
+    "path": "reports/frozen-mist/owner-weights/shaders/midpoint-loss/source.rgen",
+    "bytes": 200104,
+    "sha256": "11f878283883c90a08ec583a5b823495c77ae4387f1002343986b353830edee2"
+  },
+  {
+    "path": "reports/frozen-mist/owner-weights/shaders/midpoint-loss/unoptimized.spv",
+    "bytes": 296064,
+    "sha256": "259f333a8f36afce70521ae870fde5eb9d341b3132ac431bc52193d6384b9396"
+  },
+  {
+    "path": "reports/frozen-mist/owner-weights/shaders/midpoint-loss/words.inc",
+    "bytes": 997721,
+    "sha256": "e0a70515f9abfd59fff2de676b2ebd7e42f168d6ec3dd875a65488920647f2b8"
+  },
+  {
+    "path": "reports/frozen-mist/owner-weights/shaders/sample-local-loss/shader.spv",
+    "bytes": 295492,
+    "sha256": "f7bf7ff3dc20eb7753fcfb88edcf3b24a3cf70737aa03856a0b26c4e30212a68"
+  },
+  {
+    "path": "reports/frozen-mist/owner-weights/shaders/sample-local-loss/shader.spvasm",
+    "bytes": 874079,
+    "sha256": "fbc61824a633a9cd3ed999507d6cf1eafdb8905864bcad8eed3bc7bae735df16"
+  },
+  {
+    "path": "reports/frozen-mist/owner-weights/shaders/sample-local-loss/source.rgen",
+    "bytes": 200107,
+    "sha256": "7b453efb0ec9b0531a04353ba2abd4855771167b5378110eadc04a96f22d3991"
+  },
+  {
+    "path": "reports/frozen-mist/owner-weights/shaders/sample-local-loss/unoptimized.spv",
+    "bytes": 295936,
+    "sha256": "c1d30fa2580c05103baf5ad40fe3c890bd5b214a4c325f7d5d653b2c99203088"
+  },
+  {
+    "path": "reports/frozen-mist/owner-weights/shaders/sample-local-loss/words.inc",
+    "bytes": 997289,
+    "sha256": "870dcd1a925acc229a5e83448f3eb5332089b53cd8ccc5df3cb2c33b9e0d60e6"
+  },
+  {
+    "path": "reports/frozen-mist/owner-weights/shaders/sample-local-masks/shader.spv",
+    "bytes": 294948,
+    "sha256": "941f81b71c0ebf0efdb66a6943faf6fb7e0f0c4fa16a304513517649dada8f1b"
+  },
+  {
+    "path": "reports/frozen-mist/owner-weights/shaders/sample-local-masks/shader.spvasm",
+    "bytes": 872453,
+    "sha256": "8f783078667310d009897a0ed24c0b946df5815d4ae9b4f202108ab64e09e005"
+  },
+  {
+    "path": "reports/frozen-mist/owner-weights/shaders/sample-local-masks/source.rgen",
+    "bytes": 199969,
+    "sha256": "13aad41bba3c18341b30a7c527cfe326d8fe16b63ebdff4329020d2b01f4ac8d"
+  },
+  {
+    "path": "reports/frozen-mist/owner-weights/shaders/sample-local-masks/unoptimized.spv",
+    "bytes": 295436,
+    "sha256": "dd5283a0e5a80b5a6b928d584ef60d18a52986903df40365f17ccaa13571eaf8"
+  },
+  {
+    "path": "reports/frozen-mist/owner-weights/shaders/sample-local-masks/words.inc",
+    "bytes": 995453,
+    "sha256": "2ee25ab5479bb75b563e8e68b036e88f647e1bc681c1ec2bc4f79c0a95343dd1"
+  },
+  {
+    "path": "reports/frozen-mist/owner-weights/shaders/sample-local-rope-loss/shader.spv",
+    "bytes": 295492,
+    "sha256": "1986d8550e3102bd25d2d9545a1050b59037b3ea5e85d59a3b432bb19e3b8850"
+  },
+  {
+    "path": "reports/frozen-mist/owner-weights/shaders/sample-local-rope-loss/shader.spvasm",
+    "bytes": 874079,
+    "sha256": "d6b8aecd4c21a7e140908b312e2c11da039f22ddbc6d5d91fd7e5266b6dc34c9"
+  },
+  {
+    "path": "reports/frozen-mist/owner-weights/shaders/sample-local-rope-loss/source.rgen",
+    "bytes": 200107,
+    "sha256": "5b5bb6786647b223c6e9b73968b2217962c7213d741110fd3f28c086095cfc43"
+  },
+  {
+    "path": "reports/frozen-mist/owner-weights/shaders/sample-local-rope-loss/unoptimized.spv",
+    "bytes": 295936,
+    "sha256": "f6fae1fe2068ed7a6f3c9c556f749ef55ec7e57c76d30e2d91a479cea14e2bed"
+  },
+  {
+    "path": "reports/frozen-mist/owner-weights/shaders/sample-local-rope-loss/words.inc",
+    "bytes": 997289,
+    "sha256": "d5112611024a595fcb6685ae3d15c9802117218b1f81bd173bccd4831bf7feae"
+  },
+  {
+    "path": "reports/frozen-mist/owner-weights/shaders/midpoint-loss/src/vulkan/raytracing/variants/diagnostic_high_generic_dielectric.inc",
+    "bytes": 997721,
+    "sha256": "e0a70515f9abfd59fff2de676b2ebd7e42f168d6ec3dd875a65488920647f2b8"
+  },
+  {
+    "path": "reports/frozen-mist/owner-weights/shaders/sample-local-loss/src/vulkan/raytracing/variants/diagnostic_high_generic_dielectric.inc",
+    "bytes": 997289,
+    "sha256": "870dcd1a925acc229a5e83448f3eb5332089b53cd8ccc5df3cb2c33b9e0d60e6"
+  },
+  {
+    "path": "reports/frozen-mist/owner-weights/shaders/sample-local-masks/src/vulkan/raytracing/variants/diagnostic_high_generic_dielectric.inc",
+    "bytes": 995453,
+    "sha256": "2ee25ab5479bb75b563e8e68b036e88f647e1bc681c1ec2bc4f79c0a95343dd1"
+  },
+  {
+    "path": "reports/frozen-mist/owner-weights/shaders/sample-local-rope-loss/src/vulkan/raytracing/variants/diagnostic_high_generic_dielectric.inc",
+    "bytes": 997289,
+    "sha256": "d5112611024a595fcb6685ae3d15c9802117218b1f81bd173bccd4831bf7feae"
+  },
+  {
+    "path": "reports/frozen-mist/owner-midpoint-rope/shaders/midpoint-rope-loss/shader.spv",
+    "bytes": 295620,
+    "sha256": "6516794d54a35151c0cb33a1d76bfea939f9d57ab182cee16a81925ecb47c2ad"
+  },
+  {
+    "path": "reports/frozen-mist/owner-midpoint-rope/shaders/midpoint-rope-loss/shader.spvasm",
+    "bytes": 874413,
+    "sha256": "71070fc5da41374bf489db2b9e6146ce59d35c0c43a7fc98c6ea4f2c2e1b65da"
+  },
+  {
+    "path": "reports/frozen-mist/owner-midpoint-rope/shaders/midpoint-rope-loss/source.rgen",
+    "bytes": 200104,
+    "sha256": "5394caa14963bb4ce717b0ec9369b5212d9b0c08f28f08eccfc887022dba5195"
+  },
+  {
+    "path": "reports/frozen-mist/owner-midpoint-rope/shaders/midpoint-rope-loss/unoptimized.spv",
+    "bytes": 296064,
+    "sha256": "160666fe32f4c4753e2abf83b5cb4160c1313ea12debd127a1382991246a119d"
+  },
+  {
+    "path": "reports/frozen-mist/owner-midpoint-rope/shaders/midpoint-rope-loss/words.inc",
+    "bytes": 997721,
+    "sha256": "6b0bdf73402d5815295c3f051d877748c66b063181bdd95f1f8267c27da982c4"
+  },
+  {
+    "path": "reports/frozen-mist/owner-midpoint-rope/shaders/midpoint-rope-loss/src/vulkan/raytracing/variants/diagnostic_high_generic_dielectric.inc",
+    "bytes": 997721,
+    "sha256": "6b0bdf73402d5815295c3f051d877748c66b063181bdd95f1f8267c27da982c4"
+  }
+]

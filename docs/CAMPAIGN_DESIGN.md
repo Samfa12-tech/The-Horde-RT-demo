@@ -1,3 +1,36 @@
+# CAMPAIGN DESIGN — WP0 custody and reconciliation
+
+Reconciled 9 October 2026. The complete latest document is retained as an [immutable external planning reference](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/CAMPAIGN_DESIGN.md), verified against its Git blob in the [source manifest](superpowers/plans/2026-10-09-horde-1.7-wp0-source-manifest.json). This local summary imports no runtime or source assets. Read with the [reconciled master](superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md) and [item dispositions](superpowers/plans/2026-10-09-horde-1.7-wp0-runtime-reconciliation.md).
+
+Silent player and loyal Kit; the latest English JSON overrides older draft prose for authoring. Kit unseen early wall-panel call and renewed rescue contact remain; Kit has no Keeper knowledge. One night and distant-only Bellwether preserve 1.7 bounds. Later injury/recovery, services, peer Abbey/Foundry, Court and treasury remain later scope.
+
+References to queued 1.6.2 guards, equipment, openings, base UI/hearts and graphics in the original are historical: retain the accepted main implementation, not old missing-work claims. Rights/cost/recording/runtime/device gates remain open where stated. Exact trail/asset counts are planning proposals, not certified budgets.
+
+## Section-by-section source custody
+
+| Pinned section | Custody |
+|---|---|
+| <a id="approved-regional-geography"></a>Approved regional geography | [Immutable source](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/CAMPAIGN_DESIGN.md#L7) |
+| <a id="dialogue-authoring-draft"></a>Dialogue authoring draft | [Immutable source](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/CAMPAIGN_DESIGN.md#L10) |
+| Identity and pillars | [Immutable source](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/CAMPAIGN_DESIGN.md#L13) |
+| <a id="reusing-briarhold-models"></a>Reusing Briarhold models | [Immutable source](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/CAMPAIGN_DESIGN.md#L21) |
+| Campaign structure | [Immutable source](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/CAMPAIGN_DESIGN.md#L26) |
+| Prologue, rescue and forest | [Immutable source](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/CAMPAIGN_DESIGN.md#L33) |
+| The village and recurring cast | [Immutable source](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/CAMPAIGN_DESIGN.md#L42) |
+| Three complementary improvement areas | [Immutable source](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/CAMPAIGN_DESIGN.md#L55) |
+| The three dungeons | [Immutable source](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/CAMPAIGN_DESIGN.md#L63) |
+| Drowned Abbey | [Immutable source](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/CAMPAIGN_DESIGN.md#L66) |
+| Ashen Foundry | [Immutable source](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/CAMPAIGN_DESIGN.md#L74) |
+| Glass Court | [Immutable source](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/CAMPAIGN_DESIGN.md#L81) |
+| Spoilers: the lantern, king and ending | [Immutable source](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/CAMPAIGN_DESIGN.md#L87) |
+| Voice and player character | [Immutable source](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/CAMPAIGN_DESIGN.md#L96) |
+| Existing-demo polish and milestone ownership | [Immutable source](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/CAMPAIGN_DESIGN.md#L104) |
+| <a id="earned-ballad-and-everyday-village-life--7-october-2026"></a>Earned ballad and everyday village life — 7 October 2026 | [Immutable source](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/CAMPAIGN_DESIGN.md#L112) |
+
+## Previous main text — historical context
+
+The following retains the previous main document. Use the pinned source and WP0 reconciliation above for newer future decisions; this is not current runtime evidence or permission to start later work.
+
 # The Horde — Campaign, Characters and Progression
 **Owner-approved creative direction: 30 September 2026.** Planning, not implemented content or release authority. Read with [ROADMAP.md](ROADMAP.md). This document supersedes older statements that the Horde's nature, dungeon order and final mystery are entirely undecided. Concrete encounters, scripts, balance and technical solutions still require scoped design and testing.
 

@@ -152,9 +152,10 @@
       ]
     },
     {
-      "name": "RtHeldLightGpu", "alignment": 16, "size": 16,
+      "name": "RtHeldLightGpu", "alignment": 16, "size": 32,
       "fields": [
-        { "name": "positionStrength", "type": "float4", "offset": 0 }
+        { "name": "positionStrength", "type": "float4", "offset": 0 },
+        { "name": "playerTransform", "type": "float4", "offset": 16, "comment": "x: authoritative support height delta from legacy -0.95 floor; yzw reserved zero. Shared camera transform, independent of physical light position." }
       ]
     },
     {

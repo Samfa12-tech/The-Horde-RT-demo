@@ -1,0 +1,6 @@
+2026-10-10T00:54:11.3998337Z  66/101 Test  #66: horde_rt_development_static_asset_tests .................***Failed    0.00 sec
+2026-10-10T00:54:11.3999064Z FAIL: development registry retains prior views plus bounded water-lighting and world-route views
+2026-10-10T00:54:11.3999848Z FAIL: development lookup still rejects IDs beyond the appended route views
+2026-10-10T00:54:11.4000267Z 2 development static asset assertion(s) failed
+2026-10-10T00:55:19.4335524Z 99% tests passed, 1 tests failed out of 101
+2026-10-10T00:55:19.4339279Z 	 66 - horde_rt_development_static_asset_tests (Failed)

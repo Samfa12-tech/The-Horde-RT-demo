@@ -547,6 +547,11 @@ int main()
                   "pose did not refresh at the 30 Hz boundary");
     ok &= Require(CharacterPoseNeedsRefresh(2, 1.0f, 1, 1.0f), "clip change did not refresh");
     ok &= Require(CharacterPoseNeedsRefresh(1, 0.5f, 1, 1.0f), "time rewind did not refresh");
+    ok &= Require(CharacterPoseNeedsRefresh(1, 1.0f + interval * 0.25f, 1, 1.0f,
+                                          interval, true),
+                  "contact proof must skin the current published combat pose below the ordinary interval");
+    ok &= Require(!CharacterPoseNeedsRefresh(1, 1.0f, 1, 1.0f, interval, true),
+                  "repeated presentation of the same combat pose must not force another skin/refit");
 
     {
         CharacterRenderSlot slot;

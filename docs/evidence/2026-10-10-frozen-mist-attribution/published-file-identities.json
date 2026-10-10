@@ -1,0 +1,1640 @@
+{
+  "class_": "Exact published payloads; text LF; PNG lossless LFS payload, not Git pointer. Ledger excludes its own hash.",
+  "files": [
+    {
+      "path": "docs/superpowers/plans/2026-10-10-frozen-rope-mist-attribution.md",
+      "bytes": 22528,
+      "sha256": "5305e61aa5361a9219f4c059c8400f25344d8eda3e09c7511ab8783731664484"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/attribution.json",
+      "bytes": 1761,
+      "sha256": "21afe32f187fc7334c438ea43b89ef877e8a41f79bd6a132baeb8ac204674fb1"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/captures/midpoint-all/192-rescue-journey-start.png",
+      "bytes": 881389,
+      "sha256": "af2b58d5c5672d3158a9d6f117f996d3c33ed31550af5fb5b0eb3cae2373e32b"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/captures/midpoint-all/capture-manifest.json",
+      "bytes": 3718,
+      "sha256": "d4ac041a6679fba2edb5815f250de9b07fc6da3611ce7ff1a80c5abdf38d8664"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/captures/midpoint-all/capture.log",
+      "bytes": 2754,
+      "sha256": "b1afcf469c07cb7386c2b57882f6249c691157a95a053ed3ac04027213955355"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/captures/midpoint-all/completed-frame.json",
+      "bytes": 3327,
+      "sha256": "5302a0b5e9a98e12b90ac740d37ea322c56fa5039dad9630eb12d64bf19b1fe4"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/captures/midpoint-all/frozen-state.json",
+      "bytes": 20524,
+      "sha256": "60bb3521a8f670d872d19442e4a39ae084b9f28ae32dc3eb366ae4d608f675d6"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/captures/midpoint-lantern/192-rescue-journey-start.png",
+      "bytes": 884146,
+      "sha256": "3de42e472a49b318a82d96d67e74ba03806b53dcc43efd9959bedf06b2c86b2c"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/captures/midpoint-lantern/capture-manifest.json",
+      "bytes": 3718,
+      "sha256": "57805fa962d952ae4928431f2ae85777afbf52c998973b9e8563d5235e9d3bd0"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/captures/midpoint-lantern/capture.log",
+      "bytes": 2754,
+      "sha256": "a3a6166daee1ff40e8a1edc2e0278962103de9d79745fff0c78c49fc1725814d"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/captures/midpoint-lantern/completed-frame.json",
+      "bytes": 3327,
+      "sha256": "2190f58871d6b61e3f81c096442d8b673cf6cd175cf7fdb2884da66f34ed66e4"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/captures/midpoint-lantern/frozen-state.json",
+      "bytes": 20524,
+      "sha256": "60bb3521a8f670d872d19442e4a39ae084b9f28ae32dc3eb366ae4d608f675d6"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/captures/midpoint-sky/192-rescue-journey-start.png",
+      "bytes": 881388,
+      "sha256": "93913599e7e2f6f9549b0e88513f8163715d91604fd89c8cbbb0d2c2a782c399"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/captures/midpoint-sky/capture-manifest.json",
+      "bytes": 3718,
+      "sha256": "4ca789585ea8c18b5d012b5cb875d2f425e4b98487f8d01faf0606ccf05d64ce"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/captures/midpoint-sky/capture.log",
+      "bytes": 2754,
+      "sha256": "6a7f1d7987e834e4fc4d9a0db6b1e5e18368f3a37d6035fb1d1c965f56b9c271"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/captures/midpoint-sky/completed-frame.json",
+      "bytes": 3327,
+      "sha256": "02dfde9768990943d01d22ed2978da3482b2b056d1d6b1acd0fcc4f6f3a3337d"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/captures/midpoint-sky/frozen-state.json",
+      "bytes": 20524,
+      "sha256": "60bb3521a8f670d872d19442e4a39ae084b9f28ae32dc3eb366ae4d608f675d6"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/captures/sample-local-all/192-rescue-journey-start.png",
+      "bytes": 882450,
+      "sha256": "7f490b33fe345294e58450fdca66064bf755744567721d3363d177a0a6bb48b3"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/captures/sample-local-all/capture-manifest.json",
+      "bytes": 3718,
+      "sha256": "a861dd378bd621ebd30701cdd10e1810e18fa79e9fadf343215ca81a2c7089e5"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/captures/sample-local-all/capture.log",
+      "bytes": 2752,
+      "sha256": "d22e6cdcbfc971b748e96ff7c45f2da01250103afe7062ec267f6c6d58e47184"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/captures/sample-local-all/completed-frame.json",
+      "bytes": 3328,
+      "sha256": "37a68d44c9bbdf7918186346dc63a557e2f0b455161e00e00cec2cf08f5fe3a3"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/captures/sample-local-all/frozen-state.json",
+      "bytes": 20524,
+      "sha256": "60bb3521a8f670d872d19442e4a39ae084b9f28ae32dc3eb366ae4d608f675d6"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/captures/sample-local-lantern/192-rescue-journey-start.png",
+      "bytes": 884146,
+      "sha256": "3de42e472a49b318a82d96d67e74ba03806b53dcc43efd9959bedf06b2c86b2c"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/captures/sample-local-lantern/capture-manifest.json",
+      "bytes": 3718,
+      "sha256": "105e8a3e6325eafd85e12143589909a85d5c050564da2450bf2fd5e03bf1cfb2"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/captures/sample-local-lantern/capture.log",
+      "bytes": 2754,
+      "sha256": "8b5cad8c74776a58b8946395678a04d4fc6ea4e2f7a23ae0ac55b3cf646dcea2"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/captures/sample-local-lantern/completed-frame.json",
+      "bytes": 3327,
+      "sha256": "9204f796f108d16b08cfb50a3fa1e088391757838f520d760820a1f4207448a8"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/captures/sample-local-lantern/frozen-state.json",
+      "bytes": 20524,
+      "sha256": "60bb3521a8f670d872d19442e4a39ae084b9f28ae32dc3eb366ae4d608f675d6"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/captures/sample-local-sky/192-rescue-journey-start.png",
+      "bytes": 882450,
+      "sha256": "7f490b33fe345294e58450fdca66064bf755744567721d3363d177a0a6bb48b3"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/captures/sample-local-sky/capture-manifest.json",
+      "bytes": 3718,
+      "sha256": "2d0f848df5a2a52b1a109eeda932106e6bf27ba063f5c15c89ba34a5db85858e"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/captures/sample-local-sky/capture.log",
+      "bytes": 2753,
+      "sha256": "587225ef74c222cc0a92501905f2f76864f0bdae159b73c21fe92974ef522348"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/captures/sample-local-sky/completed-frame.json",
+      "bytes": 3327,
+      "sha256": "573ec18a2b466ab9094444f4abfae9b6403709e556555093c3c869262e7d7b3c"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/captures/sample-local-sky/frozen-state.json",
+      "bytes": 20524,
+      "sha256": "60bb3521a8f670d872d19442e4a39ae084b9f28ae32dc3eb366ae4d608f675d6"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/comparison/current-higher-frozen.png",
+      "bytes": 2315746,
+      "sha256": "a77d726fa9317bef7b24c8dd85b0e661cf80cba0107634e132f4ef7c534fce70"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/comparison/higher-0-difference-x8.png",
+      "bytes": 118825,
+      "sha256": "3ecd4c1a4a1058a91aca4428f7d9d0dda669929dba8b64f111abe3dff1fc96f2"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/comparison/higher-1-difference-x8.png",
+      "bytes": 118828,
+      "sha256": "ad62a3ad7c7472e018695c89701ac2208862b8e37285ed62154129bec85df8fa"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/comparison/higher-2-difference-x8.png",
+      "bytes": 2957,
+      "sha256": "604cc6ed2b6d0b70c0b480717e10590f5790c2dc975f1632f1f47bddc2eb16ab"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/comparison/higher-comparison-roi.png",
+      "bytes": 1208008,
+      "sha256": "5ffb87746dfcb1fea4cc003739bfb49f1c92a7a09b885fb4f9c73f2f70f08f9d"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/comparison/owner-view-current-higher.png",
+      "bytes": 2583613,
+      "sha256": "b2f61a73ba2c546c23d9680ad6cbd8cd9d041086c0a94d025d37810508e3fa47"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/comparison/rope-band-comparison.png",
+      "bytes": 104324,
+      "sha256": "26ec89d089b24d9be295c129b8ca1de3f1991f9dcace67b3ab8685bb666f2dad"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/comparison/rope-hardware-footprint.png",
+      "bytes": 4251,
+      "sha256": "1b6a373b6728be757c3bfd52f1a2a8b088f9c2964b5fca33899c5dddb4097b87"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/comparison/weighted-current.png",
+      "bytes": 109807,
+      "sha256": "dac2f9fb7e3c04af16b798c271e58f9eaa2d80f96ace3f17abfac0e333c3a641"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/comparison/weighted-higher.png",
+      "bytes": 59949,
+      "sha256": "f7bba3ff933b7505cbd334e79ad6a0f047781377b15ed77cad93c071463c4f75"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/continuous-rope-oracle.json",
+      "bytes": 25620,
+      "sha256": "e8ad3f937d7ebcefe1c9caca26c6affa81be7c9bf9d323cbb07d4ab049dee45a"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/derivation-corrections.json",
+      "bytes": 976,
+      "sha256": "ad32651f8433d107783c1b9fc5e5e787b2f3e5d9083f6ed7e5ccbe10010c45b4"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-midpoint-rope/current-midpoint-rope-loss/192-rescue-journey-start.png",
+      "bytes": 15874,
+      "sha256": "211e25cf08a4514c9f8ca2c2f2d32b444d534afc7d159ec33cbd740395701aa1"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-midpoint-rope/current-midpoint-rope-loss/capture-manifest.json",
+      "bytes": 3703,
+      "sha256": "15a117f665d43a112019922bd492cc1131f215b950a8c9e834c8ed7bad316868"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-midpoint-rope/current-midpoint-rope-loss/capture.log",
+      "bytes": 2787,
+      "sha256": "e916ee3ae55c4d0c0dc3e2747acc3dec7b9946a9fba5b493a6e8acfb95229508"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-midpoint-rope/current-midpoint-rope-loss/completed-frame.json",
+      "bytes": 3320,
+      "sha256": "540ebc87b01b4b98894a8ec22f258ab0fcf86aa39ecb29f229b511c284ccb73b"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-midpoint-rope/current-midpoint-rope-loss/frozen-state.json",
+      "bytes": 20532,
+      "sha256": "f503e5e493db759af1cb7dd1ee029c56fb2a4f999a3bab8d522c05e17d36d479"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-midpoint-rope/current-midpoint-rope-loss/geometry-state.json",
+      "bytes": 119,
+      "sha256": "45ffe80f495ad2f1a97fa33f876b1be8e959128c16b35c0488697371c9478dfa"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-midpoint-rope/higher-midpoint-rope-loss/192-rescue-journey-start.png",
+      "bytes": 14044,
+      "sha256": "ef7fb18afb887cf6b0523fdb4d437aaf2508736dcf693ccf702bf802b9c4d3dd"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-midpoint-rope/higher-midpoint-rope-loss/capture-manifest.json",
+      "bytes": 3706,
+      "sha256": "3607a7fd2c11381705ad9f4d83dd1933be01160ccf97b67f17dbf562fca51bf8"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-midpoint-rope/higher-midpoint-rope-loss/capture.log",
+      "bytes": 2788,
+      "sha256": "fe9d31c86a2faf4030dc2e54b19e5321725e4cc55f0851d22d2542b652a8e6a6"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-midpoint-rope/higher-midpoint-rope-loss/completed-frame.json",
+      "bytes": 3321,
+      "sha256": "f178a348050141fa1f8ad36d0a38cbca191d2d162144ae3bd2e828429a461a64"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-midpoint-rope/higher-midpoint-rope-loss/frozen-state.json",
+      "bytes": 20532,
+      "sha256": "f503e5e493db759af1cb7dd1ee029c56fb2a4f999a3bab8d522c05e17d36d479"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-midpoint-rope/higher-midpoint-rope-loss/geometry-state.json",
+      "bytes": 119,
+      "sha256": "45ffe80f495ad2f1a97fa33f876b1be8e959128c16b35c0488697371c9478dfa"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/current-midpoint-all/192-rescue-journey-start.png",
+      "bytes": 1276558,
+      "sha256": "10c34a19ec2930da516af08007c67e39fb288540d91747143f773b3c2b02e1e5"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/current-midpoint-all/capture-manifest.json",
+      "bytes": 3703,
+      "sha256": "4e6180e5682c1892fd24b4829383d298a9cc6e02be15dabe095e48613fdf1756"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/current-midpoint-all/capture.log",
+      "bytes": 2769,
+      "sha256": "b9038992fff9fcb04e20632fdb7aaa5dc06bc6bfddb917e15ee6a5bd0421fb92"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/current-midpoint-all/completed-frame.json",
+      "bytes": 3319,
+      "sha256": "d25e17464e40d621e28d99788300dde2b72572d62706ff623d49e1dc61e75faf"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/current-midpoint-all/frozen-state.json",
+      "bytes": 20532,
+      "sha256": "f503e5e493db759af1cb7dd1ee029c56fb2a4f999a3bab8d522c05e17d36d479"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/current-midpoint-lantern/192-rescue-journey-start.png",
+      "bytes": 1278577,
+      "sha256": "ec0c0427e6445bb2ca8fe70947e6f184421a8eb08ed5e31a094625bf6b9d24cf"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/current-midpoint-lantern/capture-manifest.json",
+      "bytes": 3703,
+      "sha256": "ecbc9bda86f1af789599cb02de93fbaf2c9d9656502b97862a8ec95f7e514460"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/current-midpoint-lantern/capture.log",
+      "bytes": 2770,
+      "sha256": "59587427142756293d5b0f213a2c42060c451e7adb0260203247c1e2316c08d4"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/current-midpoint-lantern/completed-frame.json",
+      "bytes": 3320,
+      "sha256": "04ab57394aeaee547d35f7bd7b5bd650dcba58db594e5365e286ae7a67293797"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/current-midpoint-lantern/frozen-state.json",
+      "bytes": 20532,
+      "sha256": "f503e5e493db759af1cb7dd1ee029c56fb2a4f999a3bab8d522c05e17d36d479"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/current-midpoint-sky/192-rescue-journey-start.png",
+      "bytes": 1276556,
+      "sha256": "62795340bd46a2db9c4f5aba468c9f4ee29a0624b694c7a57274f8602f6b653e"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/current-midpoint-sky/capture-manifest.json",
+      "bytes": 3703,
+      "sha256": "cc09670468cd1b5ab22354d60439582fe64a07389fc170bee75f2b98b3432c19"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/current-midpoint-sky/capture.log",
+      "bytes": 2770,
+      "sha256": "599fce1ffee307e2ebb1a1626a0db2fc194374baa71568567bad5e2cf507978b"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/current-midpoint-sky/completed-frame.json",
+      "bytes": 3319,
+      "sha256": "d090fb2b864dbb5acc0c9e96f008f12006f7afe9f87975f30f18c3f248c7ba27"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/current-midpoint-sky/frozen-state.json",
+      "bytes": 20532,
+      "sha256": "f503e5e493db759af1cb7dd1ee029c56fb2a4f999a3bab8d522c05e17d36d479"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/current-sample-local-all/192-rescue-journey-start.png",
+      "bytes": 1275783,
+      "sha256": "587371cf1b0ba4f213ffba8e19270ecdf3eea8fe8682ad57f5f946b241ee1df4"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/current-sample-local-all/capture-manifest.json",
+      "bytes": 3704,
+      "sha256": "e5961470cf60e4a530b4272afbc2adaf3acc004784123494d9731177dbfbe424"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/current-sample-local-all/capture.log",
+      "bytes": 2770,
+      "sha256": "16318576dfed725b3d47fffb50a0a2b56fb5c45a5e10869912c44d518d559737"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/current-sample-local-all/completed-frame.json",
+      "bytes": 3321,
+      "sha256": "06ee4fe63d32ba7f26cbbdbcd232aabfd9320ce2e3985df7e1693f279218d4d1"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/current-sample-local-all/frozen-state.json",
+      "bytes": 20532,
+      "sha256": "f503e5e493db759af1cb7dd1ee029c56fb2a4f999a3bab8d522c05e17d36d479"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/current-sample-local-lantern/192-rescue-journey-start.png",
+      "bytes": 1278577,
+      "sha256": "ec0c0427e6445bb2ca8fe70947e6f184421a8eb08ed5e31a094625bf6b9d24cf"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/current-sample-local-lantern/capture-manifest.json",
+      "bytes": 3704,
+      "sha256": "0fe8df3e575719ccc2274bf885101b629b564b20393990b3bf1e2e5132da9eb9"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/current-sample-local-lantern/capture.log",
+      "bytes": 2769,
+      "sha256": "d5f327860eaa925dd35a1a80b095f7354bc924405860c8a6e531d8fa3d7a244b"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/current-sample-local-lantern/completed-frame.json",
+      "bytes": 3321,
+      "sha256": "9df3f966ec57b43db7838755e8472b0ee80338107b6c5934b3e7da8a0e2c8da9"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/current-sample-local-lantern/frozen-state.json",
+      "bytes": 20532,
+      "sha256": "f503e5e493db759af1cb7dd1ee029c56fb2a4f999a3bab8d522c05e17d36d479"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/current-sample-local-sky/192-rescue-journey-start.png",
+      "bytes": 1275783,
+      "sha256": "587371cf1b0ba4f213ffba8e19270ecdf3eea8fe8682ad57f5f946b241ee1df4"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/current-sample-local-sky/capture-manifest.json",
+      "bytes": 3703,
+      "sha256": "d282d7b64d92cd21ccd0fda9b5957a94ad9e956a178e18b91655f1caff8efbd7"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/current-sample-local-sky/capture.log",
+      "bytes": 2769,
+      "sha256": "4678dd3ee5df3f321cb4b1ae31255fe777bc91aa1acff0c217337f0d0f4f17d0"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/current-sample-local-sky/completed-frame.json",
+      "bytes": 3320,
+      "sha256": "9b74802e676ac2281ae49c98d9302669beff510855738f03e1273913a6c87b77"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/current-sample-local-sky/frozen-state.json",
+      "bytes": 20532,
+      "sha256": "f503e5e493db759af1cb7dd1ee029c56fb2a4f999a3bab8d522c05e17d36d479"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/higher-midpoint-all/192-rescue-journey-start.png",
+      "bytes": 921386,
+      "sha256": "88a5311fb9cd1535b445aba99fb64ef0db48aab5114554b9030811d2bcfd5cc8"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/higher-midpoint-all/capture-manifest.json",
+      "bytes": 3706,
+      "sha256": "c11afbbbc530f4200684013470b5db41055f6c6b42f4d0c65684da23d0187e32"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/higher-midpoint-all/capture.log",
+      "bytes": 2769,
+      "sha256": "48125fed51a14a6c6d7e88437e5005ba7c02ec1c6766f2fd229bba964b9f7098"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/higher-midpoint-all/completed-frame.json",
+      "bytes": 3322,
+      "sha256": "802656edf70097715451ca3cd91d8b880701b56cca6e23f76f2a76336059d293"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/higher-midpoint-all/frozen-state.json",
+      "bytes": 20532,
+      "sha256": "f503e5e493db759af1cb7dd1ee029c56fb2a4f999a3bab8d522c05e17d36d479"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/higher-midpoint-lantern/192-rescue-journey-start.png",
+      "bytes": 928865,
+      "sha256": "a3f47e8a7397ec6eb02ec4e4962606ef573fa9d71e08427a621417aa369c6814"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/higher-midpoint-lantern/capture-manifest.json",
+      "bytes": 3706,
+      "sha256": "eceb283deacced88a47c84f90088a9a00e2a4d6fc4a14f47abd443a72ddcabc8"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/higher-midpoint-lantern/capture.log",
+      "bytes": 2770,
+      "sha256": "29c4cd833f7b9cdf0c20b6938549ca10c5f92ec8af6f956102798ac7f894ce7b"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/higher-midpoint-lantern/completed-frame.json",
+      "bytes": 3321,
+      "sha256": "f8143cf807d7428ab6cead559fbbf71dcc2ac3651af16fa7d99be99a07882175"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/higher-midpoint-lantern/frozen-state.json",
+      "bytes": 20532,
+      "sha256": "f503e5e493db759af1cb7dd1ee029c56fb2a4f999a3bab8d522c05e17d36d479"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/higher-midpoint-sky/192-rescue-journey-start.png",
+      "bytes": 921386,
+      "sha256": "2cf36a92ebd69d5302182d3ad6c211fcbf9bc49b7f8ba2b247475601e38e8d4c"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/higher-midpoint-sky/capture-manifest.json",
+      "bytes": 3706,
+      "sha256": "52e46b7c8abf5ee44e01f57857319de88f8116c956d9c71d53aad47f5bbc7626"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/higher-midpoint-sky/capture.log",
+      "bytes": 2768,
+      "sha256": "0d1592a5f97553862cd52cf2b673fa8d3937d7510537c72583eb42d834efa15f"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/higher-midpoint-sky/completed-frame.json",
+      "bytes": 3321,
+      "sha256": "575a30557b1baf8aa4235027fd8090e21b910ffbc73d741e01acf6c60f4b89ec"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/higher-midpoint-sky/frozen-state.json",
+      "bytes": 20532,
+      "sha256": "f503e5e493db759af1cb7dd1ee029c56fb2a4f999a3bab8d522c05e17d36d479"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/higher-sample-local-all/192-rescue-journey-start.png",
+      "bytes": 922202,
+      "sha256": "9f84b69a62f7ab07a08440a31c4d1c65120990e8502967b9585f8fb74d4db702"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/higher-sample-local-all/capture-manifest.json",
+      "bytes": 3706,
+      "sha256": "3c2bad8914bae36e9a002f85b079a27ba7776c21283f0984fc45fcf1c192d625"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/higher-sample-local-all/capture.log",
+      "bytes": 2769,
+      "sha256": "3885e9d248b930ef5129b9fa4d1ab1e9b107f4b9ee792a35d1bd53ab11b2b61f"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/higher-sample-local-all/completed-frame.json",
+      "bytes": 3321,
+      "sha256": "7c803c388327dc3c880ae2ea23c003e4343dab4151d220a724a338da999f2b2c"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/higher-sample-local-all/frozen-state.json",
+      "bytes": 20532,
+      "sha256": "f503e5e493db759af1cb7dd1ee029c56fb2a4f999a3bab8d522c05e17d36d479"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/higher-sample-local-lantern/192-rescue-journey-start.png",
+      "bytes": 928865,
+      "sha256": "a3f47e8a7397ec6eb02ec4e4962606ef573fa9d71e08427a621417aa369c6814"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/higher-sample-local-lantern/capture-manifest.json",
+      "bytes": 3706,
+      "sha256": "b484c666499c98ed5a4b99810e216a49eaba9189efecaf4f7120008892ccb82b"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/higher-sample-local-lantern/capture.log",
+      "bytes": 2770,
+      "sha256": "3fca508caa8bbe1cb1d522fea99016aa3d80106cf8b70fae3ef7754d4e9dfa7c"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/higher-sample-local-lantern/completed-frame.json",
+      "bytes": 3321,
+      "sha256": "2176019ad7f4a7b3d6403affed66b14c49f7fab0bb55400e6001f8e298ca6e09"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/higher-sample-local-lantern/frozen-state.json",
+      "bytes": 20532,
+      "sha256": "f503e5e493db759af1cb7dd1ee029c56fb2a4f999a3bab8d522c05e17d36d479"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/higher-sample-local-sky/192-rescue-journey-start.png",
+      "bytes": 922202,
+      "sha256": "9f84b69a62f7ab07a08440a31c4d1c65120990e8502967b9585f8fb74d4db702"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/higher-sample-local-sky/capture-manifest.json",
+      "bytes": 3706,
+      "sha256": "d453c4f50fa58fa8ae14bae808e1488a45d9de10201060f0dca61801b322fe79"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/higher-sample-local-sky/capture.log",
+      "bytes": 2770,
+      "sha256": "a722ce1242dceb570613eaa0f1a45ed276293c1e161f2c8eec5f3c1b24b25090"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/higher-sample-local-sky/completed-frame.json",
+      "bytes": 3321,
+      "sha256": "1bc9abb406da5c02020080bc1f955df77bdb7e526c96280a3684823f8683a90c"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-view/higher-sample-local-sky/frozen-state.json",
+      "bytes": 20532,
+      "sha256": "f503e5e493db759af1cb7dd1ee029c56fb2a4f999a3bab8d522c05e17d36d479"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/current-midpoint-loss/192-rescue-journey-start.png",
+      "bytes": 195146,
+      "sha256": "2e15890186daaa99880f1789b270bbb505276bf36dfa261cdf728ea8f38dd78e"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/current-midpoint-loss/capture-manifest.json",
+      "bytes": 3703,
+      "sha256": "52d23b90321d274031faeccb6a3f00596c1816079805723d20c5876789a3aff4"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/current-midpoint-loss/capture.log",
+      "bytes": 2775,
+      "sha256": "1556fa36a1edbbac15be11a75195704c09e2ffc038d591135b71021cb21e3c52"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/current-midpoint-loss/completed-frame.json",
+      "bytes": 3319,
+      "sha256": "44914e9d329ccfbf4ad241e5a69b10819c18e3d29a97d4c4a1b05036959e9f0d"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/current-midpoint-loss/frozen-state.json",
+      "bytes": 20532,
+      "sha256": "f503e5e493db759af1cb7dd1ee029c56fb2a4f999a3bab8d522c05e17d36d479"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/current-midpoint-loss/geometry-state.json",
+      "bytes": 119,
+      "sha256": "45ffe80f495ad2f1a97fa33f876b1be8e959128c16b35c0488697371c9478dfa"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/current-sample-local-loss/192-rescue-journey-start.png",
+      "bytes": 1081741,
+      "sha256": "600e4a9158a75cea3e8cbb2e8af027f34373e322d0205d45e773df6b73c9ba0c"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/current-sample-local-loss/capture-manifest.json",
+      "bytes": 3703,
+      "sha256": "b9bb54d245ad192b978769cb2e87bc67e7bb38ca85a466744daa93f98c462b84"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/current-sample-local-loss/capture.log",
+      "bytes": 2775,
+      "sha256": "dc9e38515adcf9f9fb8823a0d7f6c9cadfd1de2d0368a947f518a0c7c2c2998a"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/current-sample-local-loss/completed-frame.json",
+      "bytes": 3319,
+      "sha256": "87a10aa99f6c203d1b341812aaab9044d0dcba732ec068ae883b4b3c9ee88b90"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/current-sample-local-loss/frozen-state.json",
+      "bytes": 20532,
+      "sha256": "f503e5e493db759af1cb7dd1ee029c56fb2a4f999a3bab8d522c05e17d36d479"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/current-sample-local-loss/geometry-state.json",
+      "bytes": 119,
+      "sha256": "45ffe80f495ad2f1a97fa33f876b1be8e959128c16b35c0488697371c9478dfa"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/current-sample-local-masks/192-rescue-journey-start.png",
+      "bytes": 52661,
+      "sha256": "08c4735e9878ddccad8f53cf283018247bf04290a41aff8ef0244c7e455f0e28"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/current-sample-local-masks/capture-manifest.json",
+      "bytes": 3703,
+      "sha256": "b3b0a47d67fd76106e9e1eb8495337a587cfa62fd1d080ddf459334d99a48149"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/current-sample-local-masks/capture.log",
+      "bytes": 2776,
+      "sha256": "feae433444861508d9a1f70ea4bfb31e59f31caf337101770aafbfe5a24ef32d"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/current-sample-local-masks/completed-frame.json",
+      "bytes": 3319,
+      "sha256": "360cb9a8ceb9127eeec97577d08ca7a2ff62474ef17e8b19fdd40f10f4f02026"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/current-sample-local-masks/frozen-state.json",
+      "bytes": 20532,
+      "sha256": "f503e5e493db759af1cb7dd1ee029c56fb2a4f999a3bab8d522c05e17d36d479"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/current-sample-local-masks/geometry-state.json",
+      "bytes": 119,
+      "sha256": "45ffe80f495ad2f1a97fa33f876b1be8e959128c16b35c0488697371c9478dfa"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/current-sample-local-rope-loss/192-rescue-journey-start.png",
+      "bytes": 245530,
+      "sha256": "c284452d674b08d74d0e8dad1862885fa2842884fda9511fe751dec4dfd93d05"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/current-sample-local-rope-loss/capture-manifest.json",
+      "bytes": 3703,
+      "sha256": "c078ef8b76301820763fee733c5fd5f31f8978aef04ab6f7cda9a6f2b8c13fd5"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/current-sample-local-rope-loss/capture.log",
+      "bytes": 2776,
+      "sha256": "eaf2bad99108c9251a1d029c0f4135011b0abe2b6317d53b4a7b25fbd0536c5c"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/current-sample-local-rope-loss/completed-frame.json",
+      "bytes": 3320,
+      "sha256": "86d05f9c4e0e5e2e7c186e2ba46da503b827a4a030c5225cf3d07482f48efa48"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/current-sample-local-rope-loss/frozen-state.json",
+      "bytes": 20532,
+      "sha256": "f503e5e493db759af1cb7dd1ee029c56fb2a4f999a3bab8d522c05e17d36d479"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/current-sample-local-rope-loss/geometry-state.json",
+      "bytes": 119,
+      "sha256": "45ffe80f495ad2f1a97fa33f876b1be8e959128c16b35c0488697371c9478dfa"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/higher-midpoint-loss/192-rescue-journey-start.png",
+      "bytes": 242635,
+      "sha256": "069adccd44001946125df733139bdba941748f2e6c2f545ccf05266bbc3b966b"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/higher-midpoint-loss/capture-manifest.json",
+      "bytes": 3706,
+      "sha256": "cbe134b3fa3b9da4ce87eefd8ce1028e2f08a40605c684e7a5175bc93a2668f7"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/higher-midpoint-loss/capture.log",
+      "bytes": 2776,
+      "sha256": "a3bd9113bba33793d27892ac057456d6014b0258594ac6addb5666bde4b57080"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/higher-midpoint-loss/completed-frame.json",
+      "bytes": 3321,
+      "sha256": "b95ed74c8eca38f349b2b400c0bdccf59bafe487acc0b8a3fa4f926ec4a42802"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/higher-midpoint-loss/frozen-state.json",
+      "bytes": 20532,
+      "sha256": "f503e5e493db759af1cb7dd1ee029c56fb2a4f999a3bab8d522c05e17d36d479"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/higher-midpoint-loss/geometry-state.json",
+      "bytes": 119,
+      "sha256": "45ffe80f495ad2f1a97fa33f876b1be8e959128c16b35c0488697371c9478dfa"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/higher-sample-local-loss/192-rescue-journey-start.png",
+      "bytes": 1188088,
+      "sha256": "e25c6ed459ef35ac7326f4621fbb1db1528a8bc10ecdcdfe7c5a9f4375ec231b"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/higher-sample-local-loss/capture-manifest.json",
+      "bytes": 3706,
+      "sha256": "d372c7ad88e1387d2160f807f01b07ac3d0fdbd76a6f7f43c3bfdd04394c0d65"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/higher-sample-local-loss/capture.log",
+      "bytes": 2776,
+      "sha256": "431ded70296be7cbc37bcf2ff657ca828b9098f6304beedb326fb577a67088b2"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/higher-sample-local-loss/completed-frame.json",
+      "bytes": 3321,
+      "sha256": "43d6b5f581c9a8571104805db0aa53ab7bfe10705fb2d6a03d74a10070cb1e47"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/higher-sample-local-loss/frozen-state.json",
+      "bytes": 20532,
+      "sha256": "f503e5e493db759af1cb7dd1ee029c56fb2a4f999a3bab8d522c05e17d36d479"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/higher-sample-local-loss/geometry-state.json",
+      "bytes": 119,
+      "sha256": "45ffe80f495ad2f1a97fa33f876b1be8e959128c16b35c0488697371c9478dfa"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/higher-sample-local-masks/192-rescue-journey-start.png",
+      "bytes": 24608,
+      "sha256": "1fa60272d08a69dc401b2685eaf02cc3aeb73075664d7dfc72b5be714ae5217b"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/higher-sample-local-masks/capture-manifest.json",
+      "bytes": 3706,
+      "sha256": "67ed036cc5a1e1403a9b6cd2c46c4f37a7cbafc346bc031273489f787de1aaea"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/higher-sample-local-masks/capture.log",
+      "bytes": 2776,
+      "sha256": "03ebe62ccce261895320db9659587a5057246ea3dd31d118888b5f6267d424a5"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/higher-sample-local-masks/completed-frame.json",
+      "bytes": 3321,
+      "sha256": "e0bd901b12b066ef021474917c48078fcf9613b3dd7c47aec0d19e7bcb300264"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/higher-sample-local-masks/frozen-state.json",
+      "bytes": 20532,
+      "sha256": "f503e5e493db759af1cb7dd1ee029c56fb2a4f999a3bab8d522c05e17d36d479"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/higher-sample-local-masks/geometry-state.json",
+      "bytes": 119,
+      "sha256": "45ffe80f495ad2f1a97fa33f876b1be8e959128c16b35c0488697371c9478dfa"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/higher-sample-local-rope-loss/192-rescue-journey-start.png",
+      "bytes": 158026,
+      "sha256": "df475964d38bc2583c17ee96d34e97c0fe3a6b08912bff0ba935fe266274700e"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/higher-sample-local-rope-loss/capture-manifest.json",
+      "bytes": 3706,
+      "sha256": "b1d502a4f106c2d21fe931324267132387a786e6fa860fa1c2e225310b03bce7"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/higher-sample-local-rope-loss/capture.log",
+      "bytes": 2775,
+      "sha256": "cfaa3b8cef308fdd2041850129526a4e86f43d2a53ab5862bf5bc31656e8c7e3"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/higher-sample-local-rope-loss/completed-frame.json",
+      "bytes": 3322,
+      "sha256": "479f47d4e8fe88921223640df591a91d0131c133ca6b5cc5df39560b6924e02b"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/higher-sample-local-rope-loss/frozen-state.json",
+      "bytes": 20532,
+      "sha256": "f503e5e493db759af1cb7dd1ee029c56fb2a4f999a3bab8d522c05e17d36d479"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/owner-weights/higher-sample-local-rope-loss/geometry-state.json",
+      "bytes": 119,
+      "sha256": "45ffe80f495ad2f1a97fa33f876b1be8e959128c16b35c0488697371c9478dfa"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/current-midpoint-all/192-rescue-journey-start.png",
+      "bytes": 1168198,
+      "sha256": "77d97d0508f229508654a2cae5a55eb343ff7dfe951d3f6355f3c4f3e9757924"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/current-midpoint-all/capture-manifest.json",
+      "bytes": 3719,
+      "sha256": "5d2cdb629793803d686c9f4a6ba7f486c4ebe2de548ba471eb3c0534952659cf"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/current-midpoint-all/capture.log",
+      "bytes": 2770,
+      "sha256": "8f7eb74df9cda8d10c04cf795deaddeb631d52e1e65995732d2136a0e41d1a8f"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/current-midpoint-all/completed-frame.json",
+      "bytes": 3329,
+      "sha256": "fcad31af6d9bb903d589989f85def8520b4259ad14ecf15abd79f9cdf4b758de"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/current-midpoint-all/frozen-state.json",
+      "bytes": 20524,
+      "sha256": "60bb3521a8f670d872d19442e4a39ae084b9f28ae32dc3eb366ae4d608f675d6"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/current-midpoint-lantern/192-rescue-journey-start.png",
+      "bytes": 1198456,
+      "sha256": "e02e1e81e59be49ed268f63c4e8e47cb2920ab22009528f86f46b78d298d17f2"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/current-midpoint-lantern/capture-manifest.json",
+      "bytes": 3719,
+      "sha256": "d4eb65ada094d2d7247b19995d10763bc9653e2cf2680d0c9972a88f0e207788"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/current-midpoint-lantern/capture.log",
+      "bytes": 2772,
+      "sha256": "5ad91b4824e03e7777b61bfc92be67bd7a5e204bb0d8c985f075e80f97224439"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/current-midpoint-lantern/completed-frame.json",
+      "bytes": 3329,
+      "sha256": "2e904bd9d13e0c7f0be800a486a232c41135c0c80e163cc2628ccba38cc8d623"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/current-midpoint-lantern/frozen-state.json",
+      "bytes": 20524,
+      "sha256": "60bb3521a8f670d872d19442e4a39ae084b9f28ae32dc3eb366ae4d608f675d6"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/current-midpoint-sky/192-rescue-journey-start.png",
+      "bytes": 1168198,
+      "sha256": "77d97d0508f229508654a2cae5a55eb343ff7dfe951d3f6355f3c4f3e9757924"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/current-midpoint-sky/capture-manifest.json",
+      "bytes": 3719,
+      "sha256": "69072bd64e01d316f62492b689310bb46b3c4ac3aa83962bbe82e79f5d4347e6"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/current-midpoint-sky/capture.log",
+      "bytes": 2772,
+      "sha256": "01aaca1ac4326a23515122a1b027b468f9f39b0056c317314fdc87f5641ea53c"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/current-midpoint-sky/completed-frame.json",
+      "bytes": 3329,
+      "sha256": "35ce8b89863f2647fd2c3093c567cbeffe3e59c1bfd19d16cfaf6f7cbceb28b4"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/current-midpoint-sky/frozen-state.json",
+      "bytes": 20524,
+      "sha256": "60bb3521a8f670d872d19442e4a39ae084b9f28ae32dc3eb366ae4d608f675d6"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/current-sample-local-all/192-rescue-journey-start.png",
+      "bytes": 1173360,
+      "sha256": "5f05d8753b07e2597d79e52cada934e39688a7e1b7531d57f3df8955467f6c6e"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/current-sample-local-all/capture-manifest.json",
+      "bytes": 3720,
+      "sha256": "2e7725e9db40d7e69abaf1432ddad1a43525b3b5c05bfa245d10e09cb28ec2f4"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/current-sample-local-all/capture.log",
+      "bytes": 2772,
+      "sha256": "6046b5c07928f35bc8d7d537132e74a3044be84b7bfb51630c8c923177318267"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/current-sample-local-all/completed-frame.json",
+      "bytes": 3329,
+      "sha256": "c9e27ed879147816dc0e13fa51cf28efdd281793af22f7e8c87b3888d3dcb8e4"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/current-sample-local-all/frozen-state.json",
+      "bytes": 20524,
+      "sha256": "60bb3521a8f670d872d19442e4a39ae084b9f28ae32dc3eb366ae4d608f675d6"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/current-sample-local-lantern/192-rescue-journey-start.png",
+      "bytes": 1198456,
+      "sha256": "e02e1e81e59be49ed268f63c4e8e47cb2920ab22009528f86f46b78d298d17f2"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/current-sample-local-lantern/capture-manifest.json",
+      "bytes": 3719,
+      "sha256": "7426c9ad41156b5bd5a6dd0578b001138abbe857b65dbd4aaec48ba7dcfa2e56"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/current-sample-local-lantern/capture.log",
+      "bytes": 2772,
+      "sha256": "5ab6b69a830a7828c6823ba323f7fe09714b9886608a66e628b526b9de770666"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/current-sample-local-lantern/completed-frame.json",
+      "bytes": 3329,
+      "sha256": "b0dda4de146da1084a5b01f8c161f3ec0b8ee5acc52c22c4f1a277bc1240acb5"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/current-sample-local-lantern/frozen-state.json",
+      "bytes": 20524,
+      "sha256": "60bb3521a8f670d872d19442e4a39ae084b9f28ae32dc3eb366ae4d608f675d6"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/current-sample-local-sky/192-rescue-journey-start.png",
+      "bytes": 1173360,
+      "sha256": "5f05d8753b07e2597d79e52cada934e39688a7e1b7531d57f3df8955467f6c6e"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/current-sample-local-sky/capture-manifest.json",
+      "bytes": 3719,
+      "sha256": "7d92e8aedb1a663cb8b99d3033fca7fb73552e6fce6c3e64791a6abf54d7bf49"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/current-sample-local-sky/capture.log",
+      "bytes": 2772,
+      "sha256": "d94931d2d8ec17382bc7b4037d265aebb0386deb48b973cce02d79213f9d3dba"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/current-sample-local-sky/completed-frame.json",
+      "bytes": 3330,
+      "sha256": "36f41f381a440757c11f947994f2b435c9aa8a1f48d30bc4345e9c5ca26b73c1"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/current-sample-local-sky/frozen-state.json",
+      "bytes": 20524,
+      "sha256": "60bb3521a8f670d872d19442e4a39ae084b9f28ae32dc3eb366ae4d608f675d6"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/higher-midpoint-all/192-rescue-journey-start.png",
+      "bytes": 881389,
+      "sha256": "af2b58d5c5672d3158a9d6f117f996d3c33ed31550af5fb5b0eb3cae2373e32b"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/higher-midpoint-all/capture-manifest.json",
+      "bytes": 3718,
+      "sha256": "d583d5813f2fe423a5cd08be071fb1fa0137c55c5f7edc76226d5d48bbce2e85"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/higher-midpoint-all/capture.log",
+      "bytes": 2771,
+      "sha256": "2356c74597bf897b5dd30a4fb58e1454bb44b4e085cc4863096b8aa1eb10a876"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/higher-midpoint-all/completed-frame.json",
+      "bytes": 3327,
+      "sha256": "0be7c88e826466057cb0d3139683523e1478596d82107efe703d91030023962b"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/higher-midpoint-all/frozen-state.json",
+      "bytes": 20524,
+      "sha256": "60bb3521a8f670d872d19442e4a39ae084b9f28ae32dc3eb366ae4d608f675d6"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/higher-midpoint-lantern/192-rescue-journey-start.png",
+      "bytes": 884146,
+      "sha256": "3de42e472a49b318a82d96d67e74ba03806b53dcc43efd9959bedf06b2c86b2c"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/higher-midpoint-lantern/capture-manifest.json",
+      "bytes": 3718,
+      "sha256": "821039bd61feaf6a35bdb9b3656fccf602f2b1e6eaf6b4357f50803a7849d0ad"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/higher-midpoint-lantern/capture.log",
+      "bytes": 2771,
+      "sha256": "d0134afe7914852d2001b429bdfb6a19a4df3dd6cb3c1be369612b8aeff560e2"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/higher-midpoint-lantern/completed-frame.json",
+      "bytes": 3327,
+      "sha256": "4b44f5d1a061f4f0cdb77768fbc32f86b9481b2e07a5afe5f14cfe7713400774"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/higher-midpoint-lantern/frozen-state.json",
+      "bytes": 20524,
+      "sha256": "60bb3521a8f670d872d19442e4a39ae084b9f28ae32dc3eb366ae4d608f675d6"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/higher-midpoint-sky/192-rescue-journey-start.png",
+      "bytes": 881388,
+      "sha256": "93913599e7e2f6f9549b0e88513f8163715d91604fd89c8cbbb0d2c2a782c399"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/higher-midpoint-sky/capture-manifest.json",
+      "bytes": 3718,
+      "sha256": "bc9980ebdc238e08dc5e6fe5428f42a21759dc8e257714f17adfdab913c65034"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/higher-midpoint-sky/capture.log",
+      "bytes": 2769,
+      "sha256": "25ad3722f65126a6edf8b9f9c2832d2af1f4eb11ac57c5eeb2976dd0426d7075"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/higher-midpoint-sky/completed-frame.json",
+      "bytes": 3327,
+      "sha256": "e39ff82c5f63a205ec60e42d35331dc1c59772889d159892e2074b772a2f7d73"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/higher-midpoint-sky/frozen-state.json",
+      "bytes": 20524,
+      "sha256": "60bb3521a8f670d872d19442e4a39ae084b9f28ae32dc3eb366ae4d608f675d6"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/higher-sample-local-all/192-rescue-journey-start.png",
+      "bytes": 882450,
+      "sha256": "7f490b33fe345294e58450fdca66064bf755744567721d3363d177a0a6bb48b3"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/higher-sample-local-all/capture-manifest.json",
+      "bytes": 3718,
+      "sha256": "ac41962c91ef3c6004800c87798f197a6dc737a65955632e7d85d38a73946b7a"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/higher-sample-local-all/capture.log",
+      "bytes": 2772,
+      "sha256": "3927dd4ff742dd039e4b39ecb304a35d10b421ae8c66d02877b388a93fbcc297"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/higher-sample-local-all/completed-frame.json",
+      "bytes": 3329,
+      "sha256": "978dedaac65cd7cac44cbb3e75e70d6ca6e931b938411b2bfdfbbea81efc3fb3"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/higher-sample-local-all/frozen-state.json",
+      "bytes": 20524,
+      "sha256": "60bb3521a8f670d872d19442e4a39ae084b9f28ae32dc3eb366ae4d608f675d6"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/higher-sample-local-lantern/192-rescue-journey-start.png",
+      "bytes": 884146,
+      "sha256": "3de42e472a49b318a82d96d67e74ba03806b53dcc43efd9959bedf06b2c86b2c"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/higher-sample-local-lantern/capture-manifest.json",
+      "bytes": 3718,
+      "sha256": "0b52aa0f7d352750cf421122b16746e4af629655b81cb7e056398abb481b4313"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/higher-sample-local-lantern/capture.log",
+      "bytes": 2772,
+      "sha256": "ced28390e8bc04b80fe9a85140711f9ee0ca7ea43f3f7a35779686ec5280c4a1"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/higher-sample-local-lantern/completed-frame.json",
+      "bytes": 3327,
+      "sha256": "0a44ad76864750aadc53bfb2e30599be833a906d7ae2f689db6e974c5ddf6ee8"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/higher-sample-local-lantern/frozen-state.json",
+      "bytes": 20524,
+      "sha256": "60bb3521a8f670d872d19442e4a39ae084b9f28ae32dc3eb366ae4d608f675d6"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/higher-sample-local-sky/192-rescue-journey-start.png",
+      "bytes": 882450,
+      "sha256": "7f490b33fe345294e58450fdca66064bf755744567721d3363d177a0a6bb48b3"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/higher-sample-local-sky/capture-manifest.json",
+      "bytes": 3718,
+      "sha256": "bfc79a13dec1ec520ef4957a40b27f3219a77f09a7404d0ba957699a9c04d582"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/higher-sample-local-sky/capture.log",
+      "bytes": 2772,
+      "sha256": "f663677e724ac1c3958b628293d7f163d46b9e3fe7b11f5ed7685be78c820618"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/higher-sample-local-sky/completed-frame.json",
+      "bytes": 3327,
+      "sha256": "5a217081f2c722f170fb2fb6c4ac9863139fc694e53779432ca62eb8dfd547a5"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension/quality/higher-sample-local-sky/frozen-state.json",
+      "bytes": 20524,
+      "sha256": "60bb3521a8f670d872d19442e4a39ae084b9f28ae32dc3eb366ae4d608f675d6"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension-identities.json",
+      "bytes": 30143,
+      "sha256": "acecc54c71c73398c10003ceb190c182b0390470ca8241f7117bf9ed9d1ffb7b"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension-retained-shader-identities.json",
+      "bytes": 20846,
+      "sha256": "949394634e998be42e7fbb476faa60e857a441702afff8fa7ef5eff4db0f5350"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/extension-runs.jsonl",
+      "bytes": 78639,
+      "sha256": "3d7d706f5ec65507ee70161833c8aaa2a353a12f529b10d1b67311014cfcebeb"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/input-identities.json",
+      "bytes": 4413,
+      "sha256": "f544dbfe8411b589931149afdb9093929159a97ea0b1f1f95f0752ee214ecbee"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/baseline-compile.log",
+      "bytes": 286,
+      "sha256": "121c5d43bc24d7f49a1b09f996410403fd50eb42ff53fe2da8f72691649979b5"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/build-9.log",
+      "bytes": 194,
+      "sha256": "ebc04c16a1e24fc82990e6081d02de13a7eeffd6877227a38f282be87cad4278"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/configure-9.log",
+      "bytes": 199,
+      "sha256": "ba90ca14128f97f3d16467a102d4e137f5a2e80851a7a852f5811b0b959dfeae"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/extension/owner-midpoint-rope/build.log",
+      "bytes": 633,
+      "sha256": "21251ccabe9075b5d6b61d7fb8dc026028c662b7d93d98a259b49f1d2a668265"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/extension/owner-midpoint-rope/configure.log",
+      "bytes": 709,
+      "sha256": "5d4afdc0e92ff240be85c985f94e7cce8eff845c9c0be186096afe77535d913e"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/extension/owner-midpoint-rope/midpoint-rope-loss-compile.log",
+      "bytes": 86,
+      "sha256": "eaf4227c7b96fc2497bc27db41652866cf2151bec97162d3042fd0e4c7dfd2bc"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/extension/owner-midpoint-rope/midpoint-rope-loss-disassemble.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/extension/owner-midpoint-rope/midpoint-rope-loss-optimize.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/extension/owner-midpoint-rope/midpoint-rope-loss-validate.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/extension/owner-view/build.log",
+      "bytes": 615,
+      "sha256": "73c94b8f05ddcb581eb3cf6b75a13fce62cea65ddc6c2334f593de8d3e949bc8"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/extension/owner-view/configure.log",
+      "bytes": 700,
+      "sha256": "b936bd016a0d404a5d4c5f8a7bb43a46b706d35a74520d6e96bcc34cc5f3d87e"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/extension/owner-weights/build.log",
+      "bytes": 621,
+      "sha256": "30d62d1ced5b411b422ecc68d7d7d842f893ae87b76abc54564d489f1b47082a"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/extension/owner-weights/configure.log",
+      "bytes": 703,
+      "sha256": "7520d55c724f2ba8cd8a8b3110459ec9c3d9b25f29b7d106e46a37196fd7bf37"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/extension/owner-weights/midpoint-loss-compile.log",
+      "bytes": 75,
+      "sha256": "147781b634cabc3ae2f6dde7c324d7f550b9992f0af1aec4eb15f2400a8fa94b"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/extension/owner-weights/midpoint-loss-disassemble.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/extension/owner-weights/midpoint-loss-optimize.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/extension/owner-weights/midpoint-loss-validate.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/extension/owner-weights/sample-local-loss-compile.log",
+      "bytes": 79,
+      "sha256": "7e5cd0ece33e31bc093c8b5cd3951412790c05f8048229c8144539d62f19da66"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/extension/owner-weights/sample-local-loss-disassemble.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/extension/owner-weights/sample-local-loss-optimize.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/extension/owner-weights/sample-local-loss-validate.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/extension/owner-weights/sample-local-masks-compile.log",
+      "bytes": 80,
+      "sha256": "a419b7e6b0ac03bf90589a75c5a357e96a8fd8c2caafc088107f27121bb0fe00"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/extension/owner-weights/sample-local-masks-disassemble.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/extension/owner-weights/sample-local-masks-optimize.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/extension/owner-weights/sample-local-masks-validate.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/extension/owner-weights/sample-local-rope-loss-compile.log",
+      "bytes": 84,
+      "sha256": "b1b44303507c1c6da4cd410ddcb55a9e58beedcab9609f22ff5b7fbdb0690ae7"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/extension/owner-weights/sample-local-rope-loss-disassemble.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/extension/owner-weights/sample-local-rope-loss-optimize.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/extension/owner-weights/sample-local-rope-loss-validate.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/extension/quality/build.log",
+      "bytes": 609,
+      "sha256": "6022d4d3694a3d8b1b3a9d39ee5c452515ae61d79853fffc6a6c5f4457ff750b"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/extension/quality/configure.log",
+      "bytes": 697,
+      "sha256": "fda763ef5fb03da68d3f0a8c8af9afae9b0764879337bc68602312541c18b055"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/midpoint-all-compile.log",
+      "bytes": 60,
+      "sha256": "6a24d9401f249a7130f61c236273168b8e8ffbe7e5eaea3e3d8b573ce5722a3c"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/midpoint-all-disassemble.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/midpoint-all-optimize.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/midpoint-all-validate.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/midpoint-lantern-compile.log",
+      "bytes": 64,
+      "sha256": "7b3b2e9fd8eb758c65a0b3713df638c39c20bea692a54c9f55a27052e7d4a80f"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/midpoint-lantern-disassemble.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/midpoint-lantern-optimize.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/midpoint-lantern-validate.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/midpoint-sky-compile.log",
+      "bytes": 60,
+      "sha256": "2d9971d83eed6e24660568335990a5f57f729f0e6f188931cdf4ee606a35e18e"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/midpoint-sky-disassemble.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/midpoint-sky-optimize.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/midpoint-sky-validate.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/production-matrix.log",
+      "bytes": 2280,
+      "sha256": "3129c5eaa00c2ad278b273fd039af0d8d52c371b849d27a194f6473b064bed93"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/records-baseline-compile.log",
+      "bytes": 294,
+      "sha256": "656b3fccd60065a019ac05307624e4006701252675b78198d987ad92a348098f"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/records-build-2.log",
+      "bytes": 309,
+      "sha256": "f3276662e8f619cbe9d156a6c79f57b063041ee6e90668ddd19d8cce2f3d08be"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/records-configure-2.log",
+      "bytes": 207,
+      "sha256": "50de36d65140410d80810070f7f2cd50b9f1e71a3a29bf39f0c09022eb9bc440"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/sample-local-all-compile.log",
+      "bytes": 64,
+      "sha256": "7b9f2550abb0f2fcdf74c63016d82d40dfe457dc8b24864fc27033b159adab23"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/sample-local-all-disassemble.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/sample-local-all-optimize.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/sample-local-all-validate.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/sample-local-lantern-compile.log",
+      "bytes": 68,
+      "sha256": "22b719998ca950ee4490a0c7c81e4925aff33cead4d7b428715649bc9fc3bcdb"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/sample-local-lantern-disassemble.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/sample-local-lantern-optimize.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/sample-local-lantern-validate.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/sample-local-sky-compile.log",
+      "bytes": 64,
+      "sha256": "1b27db7ec35be06d08c339494f2ca0a262a305c92376cc36e4b59e6b23915e23"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/sample-local-sky-disassemble.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/sample-local-sky-optimize.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/logs/sample-local-sky-validate.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/owner-reference-identities.json",
+      "bytes": 729,
+      "sha256": "31de5d3064e1e01033659ed6856341707e41979a3623621b29725d91764685e0"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/owner-view-comparison.json",
+      "bytes": 11746,
+      "sha256": "26259169f74957816e6207bdafd2afbbdb4f184c1ab8609708505c0d0a20bca3"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/pixel-metrics.json",
+      "bytes": 2000,
+      "sha256": "d2b1d1c6758ba6a57f0e668970d4eec204bfb5053c553c0a3542d0647575feb8"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/publication-checks.json",
+      "bytes": 664,
+      "sha256": "cd18bf98b7f70d000213c02b58028cd28fbb400991e458cb230f7cf170677fd2"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/quality-comparison.json",
+      "bytes": 11629,
+      "sha256": "1d34946e01854a879c389f2fb88fc4dd458928a966e0efbd09c0d52ac07393e6"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/query-record-input-identities.json",
+      "bytes": 4542,
+      "sha256": "faef7977daee672a2f9e956ab257bb2c3165e75722a941a32498c86f818ae5d9"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/query-record-runs.json",
+      "bytes": 2314,
+      "sha256": "686483c682f25ac5ef858218eebc7faa6157f7277b2617783a29cdae2b15b673"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/query-records/midpoint-lantern-query-records/192-rescue-journey-start.png",
+      "bytes": 11818,
+      "sha256": "59de6a97c701eaf140c6658805e5622f3a86a4bfaa42b9160885acade69ba73c"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/query-records/midpoint-lantern-query-records/capture-manifest.json",
+      "bytes": 3718,
+      "sha256": "08fd237307b10b81bba68a1d2549dd8baa236f117ad42f3599b716bc93732233"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/query-records/midpoint-lantern-query-records/capture.log",
+      "bytes": 2772,
+      "sha256": "9c89d3453dc6f138f66facfdef02c557ade23f7a7dc21b6c2440ddabeb848efb"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/query-records/midpoint-lantern-query-records/completed-frame.json",
+      "bytes": 3327,
+      "sha256": "e451e168cc713b383e0f9d517635b0bbb286055c2dffc0c0db57a95f6222a02c"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/query-records/midpoint-lantern-query-records/frozen-state.json",
+      "bytes": 20524,
+      "sha256": "60bb3521a8f670d872d19442e4a39ae084b9f28ae32dc3eb366ae4d608f675d6"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/query-records/midpoint-lantern-query-records/geometry-state.json",
+      "bytes": 119,
+      "sha256": "45ffe80f495ad2f1a97fa33f876b1be8e959128c16b35c0488697371c9478dfa"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/query-records/midpoint-sky-query-records/192-rescue-journey-start.png",
+      "bytes": 19866,
+      "sha256": "298aded9311d15779e9f8bdf4ec97c584b70ffad6ea98a2077c3b445ecda4205"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/query-records/midpoint-sky-query-records/capture-manifest.json",
+      "bytes": 3718,
+      "sha256": "94ecfd1c5ad3b5dda5dc9289223eaf4513f3dc38020f60f1b5730d0aab1d1ba7"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/query-records/midpoint-sky-query-records/capture.log",
+      "bytes": 2772,
+      "sha256": "b0a49d2d280a98c6d0a956eae7d9d8df449641ad5d6026ea4163353ca09f3021"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/query-records/midpoint-sky-query-records/completed-frame.json",
+      "bytes": 3327,
+      "sha256": "8187af7046daef9a413758367b4189834deb75ca535240207ee914baf384d95f"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/query-records/midpoint-sky-query-records/frozen-state.json",
+      "bytes": 20524,
+      "sha256": "60bb3521a8f670d872d19442e4a39ae084b9f28ae32dc3eb366ae4d608f675d6"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/query-records/midpoint-sky-query-records/geometry-state.json",
+      "bytes": 119,
+      "sha256": "45ffe80f495ad2f1a97fa33f876b1be8e959128c16b35c0488697371c9478dfa"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/receipt.json",
+      "bytes": 7126,
+      "sha256": "b42e299d6e0f44d86a8f54d4a7732d512369c78660a1349af6d6ee3b1d3bacc9"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/reproduce/analyse-quality.py",
+      "bytes": 2958,
+      "sha256": "ec19241e29af8b6455192e3346c7cfb43c1e65c944875deb7c29dfbd90a56019"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/reproduce/analyse-weights.py",
+      "bytes": 4892,
+      "sha256": "3ff1f0e29853c6065632280f4c244aad12ac6bb5a3ec3d01bed4d07d1a66492c"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/reproduce/capture-records.py",
+      "bytes": 1964,
+      "sha256": "d3ddb8f7e9a658269a0041a6f418d32d6065375574d1b92aaef8cce4306f399e"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/reproduce/capture.py",
+      "bytes": 1956,
+      "sha256": "19514f8a28fd426126f5ad3b2ec9af831bbc073ed5d635eaa227774f83a50453"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/reproduce/continuous-rope-oracle.py",
+      "bytes": 5509,
+      "sha256": "a4ea147834274d8ff1cb04cf315018ca64201f0bbc201be5950cd9770c6fa371"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/reproduce/create-owner-view.py",
+      "bytes": 1272,
+      "sha256": "78ac36cc038f4211c261982da88fad851828f80910196dfa1821f0e91ec51034"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/reproduce/create-quality.py",
+      "bytes": 1884,
+      "sha256": "f9db6471c5157d64a395f0da24bcd2ede543091df759685641ce1c27c383b171"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/reproduce/measure-reference.py",
+      "bytes": 4208,
+      "sha256": "b8a3253ff41bc4cd0266975f1aa147b4108535a8c07a2053523466bf4595b6cf"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/reproduce/prepare-records.py",
+      "bytes": 18504,
+      "sha256": "30b40e767c4dd8cfcd7db0fe8e73c8972d4be22d74e621d148f22ce6e2fdd8f9"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/reproduce/prepare-weights.py",
+      "bytes": 6617,
+      "sha256": "bbc48512b8fc47d7908abc9c102bb1ad3245a5af9110989505833493430e1689"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/reproduce/prepare.py",
+      "bytes": 15472,
+      "sha256": "698a3d4163c43fb31daa61536aacbfeea451b21e36b6af2c0b7965a2b39fc3fd"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/reproduce/verify-evidence.py",
+      "bytes": 7827,
+      "sha256": "59fc529b844c9f22ccc82ca71833dbfebbbb05687e8f41e134e6c188b5d02743"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/retained-attempts.json",
+      "bytes": 4547,
+      "sha256": "7a1db0f58f88f090c62c7cd7392471383bd8495c67e29a063e244f0a24f9900a"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/retained-shader-identities.json",
+      "bytes": 21185,
+      "sha256": "53e855afbfa6ef5894ba0bff3d228ca406bd38de687345c63e804fdf06dfc39f"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/runs.jsonl",
+      "bytes": 7648,
+      "sha256": "e5de172c74211b4f18e15e44f00254b5d88d104b8a714ac23aba3b2df28f68fc"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/sample-local-full-metrics.json",
+      "bytes": 38455,
+      "sha256": "0e8dd4390104516010856c7e9c4177a92eafbd000f743f1ce172c02dc398855d"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/shader-metrics.json",
+      "bytes": 3569,
+      "sha256": "164238d48f538b297f1d594110e90aea859babc83d9b9af53c00be6c1a4ec2fe"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/source-identities.json",
+      "bytes": 3827,
+      "sha256": "80938a10a18cfad4ee63e43eb8f3f4e30173e67b667335800c119cbf752c8516"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/toolchain.json",
+      "bytes": 1729,
+      "sha256": "822b50ca167df01e6232ca4d597e9f6c338e184327c52a176bd455a749b24b05"
+    },
+    {
+      "path": "docs/evidence/2026-10-10-frozen-mist-attribution/weighted-shadow-metrics.json",
+      "bytes": 4917,
+      "sha256": "4e43c2e480445e1a1b0851b7eb2ee28ad689d73edab416414c1cb989c70d2a81"
+    }
+  ]
+}

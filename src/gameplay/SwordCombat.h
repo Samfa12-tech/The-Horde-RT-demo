@@ -5,9 +5,12 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
+#include <functional>
+#include <optional>
 
 #include "gameplay/CombatTimeline.h"
 #include "gameplay/CorridorCollision.h"
+#include "gameplay/SpatialAudio.h"
 
 namespace horde::gameplay
 {
@@ -92,6 +95,10 @@ struct CombatSnapshot
     PlayerCombatSnapshot player{};
     bool playerAttackPulse = false;
     PlayerAttackCut playerAttackCut = PlayerAttackCut::None;
+    bool playerContactPulse = false;
+    PlayerAttackCut playerContactCut = PlayerAttackCut::None;
+    std::uint64_t playerContactAttackId = 0u;
+    std::int32_t playerContactTargetId = -1;
     std::int32_t parriedAttackerIndex = -1;
 
     // Compatibility view of Skeleton A. New consumers should use combatants.
@@ -108,7 +115,14 @@ struct CombatSnapshot
     std::size_t aliveCount = kSkeletonCombatantCapacity;
     std::int32_t attackerIndex = -1;
     bool encounterComplete = false;
+    std::uint64_t activePlayerAttackId = 0u;
 };
+
+using PlayerSwordContactEvaluator = std::function<std::optional<std::int32_t>(
+    const PlayerCombatSnapshot& player,
+    PlayerAttackCut cut,
+    std::uint64_t attackId,
+    const CombatSnapshot& currentCombat)>;
 
 // A bounded two-enemy encounter. Rendering consumes only this immutable
 // snapshot; hit tests, deterministic attack ownership, collision, and encounter
@@ -123,7 +137,8 @@ public:
 
     void Reset(std::size_t combatantCount = kSkeletonCombatantCapacity,
                const RoutePosition spawnCenter = {0.0f, -4.65f},
-               const std::array<SkeletonSpawnPose, kSkeletonCombatantCapacity>* spawnLayout = nullptr)
+               const std::array<SkeletonSpawnPose, kSkeletonCombatantCapacity>* spawnLayout = nullptr,
+               const std::int32_t initialHealth = 1)
     {
         combatantCount_ = std::clamp<std::size_t>(combatantCount, 1u, kSkeletonCombatantCapacity);
         combatants_ = {};
@@ -152,7 +167,7 @@ public:
                 combatant.hasAuthoredWalkingPhase = true;
             }
             combatant.action = EnemyCombatAction::Locomotion;
-            combatant.health = 1;
+            combatant.health = std::max(1, initialHealth);
             combatant.walkAnimationHold = kWalkAnimationHold;
             combatant.animation = EnemyAnimation::Walking;
         }
@@ -161,6 +176,9 @@ public:
         parryQueued_ = false;
         player_ = {};
         successfulParryEndsNextTick_ = false;
+        nextPlayerAttackId_ = 1u;
+        activePlayerAttackId_ = 0u;
+        contactResolvedAttackId_ = 0u;
         attackerIndex_ = -1;
         PublishSnapshot();
     }
@@ -245,7 +263,8 @@ public:
             const Combatant& combatant = combatants_[index];
             const float distance = std::hypot(combatant.x - playerX, combatant.z - playerZ);
             if (combatant.health <= 0 ||
-                !IsPlayerTargetInRangeCone(playerX, playerZ, playerYaw, combatant.x, combatant.z))
+                !IsPlayerTargetInRangeCone(playerX, playerZ, playerYaw, combatant.x, combatant.z) ||
+                IsRouteAudioObstructed(playerX, playerZ, combatant.x, combatant.z))
             {
                 continue;
             }
@@ -262,11 +281,16 @@ public:
                                  float playerYaw,
                                  const bool useExplicitArenaGate = false,
                                  const bool explicitArenaGate = false,
-                                 const bool waterfallNav = false)
+                                 const bool waterfallNav = false,
+                                 const PlayerSwordContactEvaluator& contactEvaluator = {})
     {
         deltaSeconds = std::clamp(deltaSeconds, 0.0f, 0.05f);
         snapshot_.playerAttackPulse = false;
         snapshot_.playerAttackCut = PlayerAttackCut::None;
+        snapshot_.playerContactPulse = false;
+        snapshot_.playerContactCut = PlayerAttackCut::None;
+        snapshot_.playerContactAttackId = 0u;
+        snapshot_.playerContactTargetId = -1;
         snapshot_.parriedAttackerIndex = -1;
         if (successfulParryEndsNextTick_)
         {
@@ -287,6 +311,7 @@ public:
             {
                 player_.action = PlayerCombatAction::SwingWindup;
                 player_.actionTime = 0.0f;
+                activePlayerAttackId_ = nextPlayerAttackId_++;
             }
             else if (parryQueued_)
             {
@@ -296,7 +321,8 @@ public:
         }
         attackQueued_ = false;
         parryQueued_ = false;
-        UpdatePlayerAction(deltaSeconds, playerX, playerZ, playerYaw);
+        UpdatePlayerAction(deltaSeconds, playerX, playerZ, playerYaw,
+                           !contactEvaluator);
 
         const ShowcaseZone playerZone = QueryShowcaseZone(playerX, playerZ);
         const bool playerInsideEnemyArena = useExplicitArenaGate
@@ -343,6 +369,44 @@ public:
         }
         ResolveCombatantSeparation(previousPositions, waterfallNav);
         PublishSnapshot();
+        if (contactEvaluator && activePlayerAttackId_ != 0u &&
+            activePlayerAttackId_ != contactResolvedAttackId_)
+        {
+            const PlayerAttackCut activeCut = ActivePlayerAttackCut();
+            if (activeCut != PlayerAttackCut::None)
+            {
+                const std::optional<std::int32_t> targetId = contactEvaluator(
+                    player_, activeCut, activePlayerAttackId_, snapshot_);
+                // Stable skeleton IDs are 0/1. ID 2 is reserved for the shared
+                // encounter keeper so its caller can use the same sampled pose.
+                const bool targetExists = targetId && *targetId >= 0 &&
+                    (*targetId == 2 ||
+                     (*targetId < static_cast<std::int32_t>(combatantCount_) &&
+                      combatants_[static_cast<std::size_t>(*targetId)].health > 0 &&
+                      combatants_[static_cast<std::size_t>(*targetId)].action !=
+                          EnemyCombatAction::Dead));
+                const bool targetVisible = targetExists &&
+                    (*targetId == 2 || !IsRouteAudioObstructed(
+                        playerX, playerZ,
+                        combatants_[static_cast<std::size_t>(*targetId)].x,
+                        combatants_[static_cast<std::size_t>(*targetId)].z));
+                if (targetVisible)
+                {
+                    contactResolvedAttackId_ = activePlayerAttackId_;
+                    snapshot_.playerContactPulse = true;
+                    snapshot_.playerContactCut = activeCut;
+                    snapshot_.playerContactAttackId = activePlayerAttackId_;
+                    snapshot_.playerContactTargetId = *targetId;
+                    if (*targetId < static_cast<std::int32_t>(combatantCount_))
+                        ApplyPlayerSwordContact(*targetId);
+                    PublishSnapshot();
+                    snapshot_.playerContactPulse = true;
+                    snapshot_.playerContactCut = activeCut;
+                    snapshot_.playerContactAttackId = activePlayerAttackId_;
+                    snapshot_.playerContactTargetId = *targetId;
+                }
+            }
+        }
         return snapshot_;
     }
 
@@ -369,7 +433,8 @@ private:
         bool parrySuccessPulse = false;
     };
 
-    void UpdatePlayerAction(float deltaSeconds, float playerX, float playerZ, float playerYaw)
+    void UpdatePlayerAction(float deltaSeconds, float playerX, float playerZ, float playerYaw,
+                            const bool allowLegacySwordHit)
     {
         player_.reactionTime = std::max(0.0f, player_.reactionTime - deltaSeconds);
         if (player_.reactionTime <= 0.0f)
@@ -392,7 +457,8 @@ private:
             {
                 snapshot_.playerAttackPulse = true;
                 snapshot_.playerAttackCut = PlayerAttackCut::DownwardCut;
-                ResolveSwordHit(playerX, playerZ, playerYaw);
+                if (allowLegacySwordHit)
+                    ResolveSwordHit(playerX, playerZ, playerYaw);
             }
             if (player_.comboQueued &&
                 player_.actionTime >= kDownwardCutTravelDuration)
@@ -404,6 +470,7 @@ private:
                 player_.comboQueued = false;
                 player_.action = PlayerCombatAction::UpwardSliceWindup;
                 player_.actionTime = 0.0f;
+                activePlayerAttackId_ = nextPlayerAttackId_++;
             }
             else if (player_.actionTime >= kSwingActiveDuration)
             {
@@ -429,7 +496,8 @@ private:
             {
                 snapshot_.playerAttackPulse = true;
                 snapshot_.playerAttackCut = PlayerAttackCut::UpwardSlice;
-                ResolveSwordHit(playerX, playerZ, playerYaw);
+                if (allowLegacySwordHit)
+                    ResolveSwordHit(playerX, playerZ, playerYaw);
             }
             if (player_.actionTime >= kUpwardSliceActiveDuration)
             {
@@ -571,6 +639,11 @@ private:
             return;
         }
         Combatant& target = combatants_[static_cast<std::size_t>(targetIndex)];
+        if (target.health > 1)
+        {
+            ApplyPlayerSwordContact(targetIndex);
+            return;
+        }
         target.health = 0;
         target.action = EnemyCombatAction::Dead;
         target.phaseTime = 0.0f;
@@ -581,6 +654,45 @@ private:
         if (attackerIndex_ == targetIndex)
         {
             attackerIndex_ = -1;
+        }
+    }
+
+    PlayerAttackCut ActivePlayerAttackCut() const
+    {
+        if (player_.action == PlayerCombatAction::SwingActive)
+            return PlayerAttackCut::DownwardCut;
+        if (player_.action == PlayerCombatAction::UpwardSliceActive)
+            return PlayerAttackCut::UpwardSlice;
+        return PlayerAttackCut::None;
+    }
+
+    void ApplyPlayerSwordContact(const std::int32_t targetIndex)
+    {
+        if (targetIndex < 0 || targetIndex >= static_cast<std::int32_t>(combatantCount_))
+            return;
+        Combatant& target = combatants_[static_cast<std::size_t>(targetIndex)];
+        if (target.health <= 0 || target.action == EnemyCombatAction::Dead)
+            return;
+        target.health = std::max(0, target.health - 1);
+        target.damageFlash = 1.0f;
+        target.reaction = CombatReaction::Hit;
+        target.reactionTime = 1.0f;
+        // A contact is the player's hit edge, never an incoming enemy hit.
+        target.playerHitPulse = false;
+        if (target.health == 0)
+        {
+            target.action = EnemyCombatAction::Dead;
+            target.phaseTime = 0.0f;
+            target.animationTime = 0.0f;
+            target.animation = EnemyAnimation::Dead;
+            if (attackerIndex_ == targetIndex)
+                attackerIndex_ = -1;
+        }
+        else
+        {
+            target.action = EnemyCombatAction::Staggered;
+            target.phaseTime = 0.0f;
+            target.animationTime = 0.0f;
         }
     }
 
@@ -621,6 +733,7 @@ private:
 
         const bool ownsAttackToken = attackerIndex_ == static_cast<std::int32_t>(index);
         if (!ownsAttackToken && combatant.action != EnemyCombatAction::Locomotion &&
+            combatant.action != EnemyCombatAction::Staggered &&
             combatant.action != EnemyCombatAction::Dead)
         {
             combatant.action = EnemyCombatAction::Locomotion;
@@ -689,7 +802,8 @@ private:
         {
             combatant.action = EnemyCombatAction::AttackActive;
             combatant.phaseTime -= kEnemyAttackWindupDuration;
-            const bool inRange = distance <= kEnemyDamageRange;
+            const bool inRange = distance <= kEnemyDamageRange &&
+                !IsRouteAudioObstructed(playerX, playerZ, combatant.x, combatant.z);
             if (inRange && player_.action == PlayerCombatAction::ParryActive &&
                 IsPlayerTargetInRangeCone(playerX, playerZ, playerYaw, combatant.x, combatant.z))
             {
@@ -721,21 +835,22 @@ private:
         if (combatant.action == EnemyCombatAction::AttackRecovery &&
             combatant.phaseTime >= kEnemyAttackRecoveryDuration)
         {
-            FinishEnemyAction(combatant);
+            FinishEnemyAction(combatant, ownsAttackToken);
         }
         if (combatant.action == EnemyCombatAction::Staggered &&
             combatant.phaseTime >= kEnemyStaggerDuration)
         {
-            FinishEnemyAction(combatant);
+            FinishEnemyAction(combatant, ownsAttackToken);
         }
     }
 
-    void FinishEnemyAction(Combatant& combatant)
+    void FinishEnemyAction(Combatant& combatant, const bool ownsAttackToken)
     {
         combatant.action = EnemyCombatAction::Locomotion;
         combatant.phaseTime = 0.0f;
         combatant.animationTime = 0.0f;
-        attackerIndex_ = -1;
+        if (ownsAttackToken)
+            attackerIndex_ = -1;
     }
 
     void ResolveCombatantSeparation(
@@ -848,6 +963,23 @@ private:
         snapshot_.combatantCount = combatantCount_;
         snapshot_.attackerIndex = attackerIndex_;
         snapshot_.player = player_;
+        switch (player_.action)
+        {
+        case PlayerCombatAction::SwingWindup:
+        case PlayerCombatAction::SwingActive:
+        case PlayerCombatAction::SwingRecovery:
+        case PlayerCombatAction::UpwardSliceWindup:
+        case PlayerCombatAction::UpwardSliceActive:
+        case PlayerCombatAction::UpwardSliceRecovery:
+            snapshot_.activePlayerAttackId = activePlayerAttackId_;
+            break;
+        case PlayerCombatAction::Idle:
+        case PlayerCombatAction::ParryStartup:
+        case PlayerCombatAction::ParryActive:
+        case PlayerCombatAction::ParryRecovery:
+            snapshot_.activePlayerAttackId = 0u;
+            break;
+        }
         snapshot_.playerHitPulse = false;
         for (std::size_t index = 0; index < snapshot_.combatants.size(); ++index)
         {
@@ -940,6 +1072,9 @@ private:
     bool parryQueued_ = false;
     bool successfulParryEndsNextTick_ = false;
     PlayerCombatSnapshot player_{};
+    std::uint64_t nextPlayerAttackId_ = 1u;
+    std::uint64_t activePlayerAttackId_ = 0u;
+    std::uint64_t contactResolvedAttackId_ = 0u;
     std::int32_t attackerIndex_ = -1;
 };
 

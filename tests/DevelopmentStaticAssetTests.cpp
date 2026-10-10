@@ -9,6 +9,7 @@
 #include <cstdint>
 #include <filesystem>
 #include <iostream>
+#include <limits>
 #include <string>
 #include <string_view>
 
@@ -65,10 +66,38 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 68u,
-          "development registry retains prior views and admits bounded water-lighting views");
+    Check(kDevelopmentCheckpoints.size() == 73u,
+          "development registry retains prior views plus bounded water-lighting, world-route and rescue views");
     Check(FindDevelopmentCheckpoint(164) == nullptr,
-          "development lookup rejects IDs beyond the admitted samples");
+          "development lookup preserves the unassigned gap before later bounded additions");
+    const auto* worldRoute = FindDevelopmentCheckpoint("world-route");
+    const auto* stagedWorldRoute = FindDevelopmentCheckpoint("world-route-staged");
+    Check(worldRoute != nullptr && worldRoute->id == 190 &&
+              FindDevelopmentCheckpoint(190) == worldRoute &&
+              worldRoute->developmentWorldRoute && !worldRoute->stagedWorldPreparation &&
+              stagedWorldRoute != nullptr && stagedWorldRoute->id == 191 &&
+              FindDevelopmentCheckpoint(191) == stagedWorldRoute &&
+              stagedWorldRoute->developmentWorldRoute && stagedWorldRoute->stagedWorldPreparation &&
+              worldRoute->cameraX == 40.0f && worldRoute->cameraZ == -8.0f &&
+              stagedWorldRoute->cameraX == worldRoute->cameraX &&
+              stagedWorldRoute->cameraZ == worldRoute->cameraZ &&
+              FindShowcaseCheckpoint("world-route") == nullptr &&
+              FindShowcaseCheckpoint("world-route-staged") == nullptr,
+          "the appended world-route views remain bounded debug-only entries with stable name and ID lookup");
+    const auto* rescueJourney = FindDevelopmentCheckpoint("rescue-journey-start");
+    Check(rescueJourney != nullptr && rescueJourney->id == 192 &&
+              FindDevelopmentCheckpoint(192) == rescueJourney &&
+              rescueJourney->baseShowcaseCheckpointId == 0 &&
+              rescueJourney->cameraX == 0.0f && rescueJourney->cameraZ == 1.85f &&
+              rescueJourney->yaw == 3.14159265359f && rescueJourney->pitch == -0.05f &&
+              !rescueJourney->developmentWorldRoute && !rescueJourney->stagedWorldPreparation &&
+              !rescueJourney->developmentSupportFixture &&
+              FindShowcaseCheckpoint(192) == nullptr &&
+              FindShowcaseCheckpoint("rescue-journey-start") == nullptr,
+          "rescue entry retains the ordinary lower start and is absent from release checkpoints");
+    Check(FindDevelopmentCheckpoint(193) == nullptr &&
+              FindDevelopmentCheckpoint("rescue-journey-unknown") == nullptr,
+          "development lookup still rejects IDs and names beyond the appended rescue entry");
     const auto* torchParry = FindDevelopmentCheckpoint("player-torch-parry-clearance");
     simulation::GameSimulation stagedTorchParry;
     DevelopmentCheckpointStageEvidence torchParryEvidence{};
@@ -191,6 +220,125 @@ int main()
               HasExpectedPlayerCaptureVisibility(true, true, false, 0u, false) &&
               HasExpectedPlayerCaptureVisibility(true, true, true, 0u, true),
           "declared cropping permits zero arm pixels while ordinary measured captures still require them");
+    using horde::gameplay::simulation::PlayerSupportId;
+    using horde::gameplay::simulation::SimulationSnapshot;
+    using horde::gameplay::items::HeldItemId;
+    using horde::gameplay::items::HeldItemParentMode;
+    using horde::gameplay::items::HeldHand;
+    SimulationSnapshot raisedCapture{};
+    raisedCapture.developmentSupportFixture = true;
+    raisedCapture.playerGrounded = true;
+    raisedCapture.playerSupportId = PlayerSupportId::ProofPlatform;
+    raisedCapture.playerSupportWorldY = horde::gameplay::kRouteFloorWorldY +
+        horde::gameplay::simulation::kProofSupportHeight;
+    raisedCapture.playerHeightDelta = horde::gameplay::simulation::kProofSupportHeight;
+    raisedCapture.playerX = 0.0f;
+    raisedCapture.playerZ = 0.0f;
+    raisedCapture.playerYawRadians = 0.0f;
+    raisedCapture.playerPitchRadians = -0.05f;
+    raisedCapture.interaction.heldLightKind = horde::gameplay::interactions::HeldLightKind::Torch;
+    raisedCapture.heldItems[1] = horde::gameplay::items::MakeHeldItemState(
+        HeldItemId::Sword, HeldHand::RightHand, HeldItemParentMode::BodyStow);
+    raisedCapture.heldItems[1].visualStowBlend = 1.0f;
+    raisedCapture.heldItems[1].visualGripBlend = 0.0f;
+    raisedCapture.heldItemKinematics.swordStowBlend = 1.0f;
+    raisedCapture.heldItemKinematics.swordHandGripBlend = 0.0f;
+    raisedCapture.heldItemKinematics.torchOverheadLowering = 0.333987f;
+    raisedCapture.heldItemKinematics.torchOverheadRetraction = 0.200392f;
+    using horde::platform::windows::VerticalProofRaisedCaptureEvidence;
+    VerticalProofRaisedCaptureEvidence raisedAdmission;
+    raisedAdmission.checkpointId = 171u;
+    raisedAdmission.checkpointName = "vertical-proof-raised";
+    raisedAdmission.simulation = &raisedCapture;
+    raisedAdmission.completedRtDispatch = true;
+    raisedAdmission.completedRtPresentation = true;
+    raisedAdmission.rtStorageImageCopied = true;
+    raisedAdmission.dedicatedPlayerOwnership = true;
+    raisedAdmission.primaryPlayerVisible = true;
+    raisedAdmission.primaryPixelCounterAvailable = true;
+    raisedAdmission.viewmodelGeometry = {true, true, 34304u, 11424u};
+    raisedAdmission.worldBodyGeometry = {true, true, 34304u, 11424u};
+    Check(horde::platform::windows::AdmitsVerticalProofRaisedCeilingRetraction(raisedAdmission) &&
+              HasExpectedPlayerCaptureVisibility(true, true, true, 0u, false, &raisedAdmission),
+          "the combined exact-pose, RT, ownership and finite-geometry admission permits only its proven zero-arm capture");
+    const auto rejectsAdmission = [](const VerticalProofRaisedCaptureEvidence& evidence)
+    {
+        return !horde::platform::windows::AdmitsVerticalProofRaisedCeilingRetraction(evidence) &&
+            !HasExpectedPlayerCaptureVisibility(true, true, true, 0u, false, &evidence);
+    };
+    auto invalidAdmission = raisedAdmission;
+    invalidAdmission.checkpointId = 170u;
+    Check(rejectsAdmission(invalidAdmission), "combined capture admission rejects the wrong checkpoint ID");
+    invalidAdmission = raisedAdmission;
+    invalidAdmission.checkpointName = "vertical-proof-ground";
+    Check(rejectsAdmission(invalidAdmission), "combined capture admission rejects a wrong checkpoint name");
+    invalidAdmission = raisedAdmission;
+    invalidAdmission.checkpointAllowsCroppedArms = true;
+    Check(rejectsAdmission(invalidAdmission), "ceiling retraction does not become a cropped-checkpoint declaration");
+    invalidAdmission = raisedAdmission;
+    invalidAdmission.completedRtDispatch = false;
+    Check(rejectsAdmission(invalidAdmission), "combined capture admission rejects missing completed RT dispatch evidence");
+    invalidAdmission = raisedAdmission;
+    invalidAdmission.completedRtPresentation = false;
+    Check(rejectsAdmission(invalidAdmission), "combined capture admission rejects missing successful RT presentation");
+    invalidAdmission = raisedAdmission;
+    invalidAdmission.rtStorageImageCopied = false;
+    Check(rejectsAdmission(invalidAdmission), "combined capture admission rejects missing RT image readback");
+    invalidAdmission = raisedAdmission;
+    invalidAdmission.dedicatedPlayerOwnership = false;
+    Check(rejectsAdmission(invalidAdmission), "combined capture admission rejects missing dedicated ownership masks");
+    invalidAdmission = raisedAdmission;
+    invalidAdmission.viewmodelGeometry.currentUploadCaptured = false;
+    Check(rejectsAdmission(invalidAdmission), "combined capture admission rejects missing viewmodel geometry");
+    invalidAdmission = raisedAdmission;
+    invalidAdmission.worldBodyGeometry.vertexCount = 0u;
+    Check(rejectsAdmission(invalidAdmission), "combined capture admission rejects empty world-body geometry");
+    invalidAdmission = raisedAdmission;
+    invalidAdmission.viewmodelGeometry.allVertexPositionsFinite = false;
+    Check(rejectsAdmission(invalidAdmission), "combined capture admission rejects non-finite viewmodel geometry");
+    invalidAdmission = raisedAdmission;
+    invalidAdmission.worldBodyGeometry.faceCount = 0u;
+    Check(rejectsAdmission(invalidAdmission), "combined capture admission rejects geometry with no faces");
+    SimulationSnapshot invalidSnapshot = raisedCapture;
+    invalidSnapshot.playerSupportId = PlayerSupportId::RouteFloor;
+    invalidAdmission = raisedAdmission;
+    invalidAdmission.simulation = &invalidSnapshot;
+    Check(rejectsAdmission(invalidAdmission), "combined capture admission rejects a changed support surface");
+    invalidSnapshot = raisedCapture;
+    invalidSnapshot.interaction.heldLightKind = horde::gameplay::interactions::HeldLightKind::None;
+    invalidAdmission = raisedAdmission;
+    invalidAdmission.simulation = &invalidSnapshot;
+    Check(rejectsAdmission(invalidAdmission), "combined capture admission rejects changed equipment");
+    invalidSnapshot = raisedCapture;
+    invalidSnapshot.heldItemKinematics.torchOverheadLowering = 0.0f;
+    invalidAdmission = raisedAdmission;
+    invalidAdmission.simulation = &invalidSnapshot;
+    Check(rejectsAdmission(invalidAdmission), "combined capture admission rejects inactive ceiling lowering");
+    invalidSnapshot = raisedCapture;
+    invalidSnapshot.heldItemKinematics.torchOverheadRetraction = 0.0f;
+    invalidAdmission = raisedAdmission;
+    invalidAdmission.simulation = &invalidSnapshot;
+    Check(rejectsAdmission(invalidAdmission), "combined capture admission rejects inactive ceiling retreat");
+    invalidSnapshot = raisedCapture;
+    invalidSnapshot.heldItemKinematics.torchOverheadRetraction =
+        std::numeric_limits<float>::quiet_NaN();
+    invalidAdmission = raisedAdmission;
+    invalidAdmission.simulation = &invalidSnapshot;
+    Check(rejectsAdmission(invalidAdmission), "combined capture admission rejects non-finite ceiling retreat");
+    invalidSnapshot = raisedCapture;
+    invalidSnapshot.heldItemKinematics.torchOverheadLowering =
+        std::numeric_limits<float>::quiet_NaN();
+    invalidAdmission = raisedAdmission;
+    invalidAdmission.simulation = &invalidSnapshot;
+    Check(rejectsAdmission(invalidAdmission), "combined capture admission rejects non-finite ceiling lowering");
+    invalidAdmission = raisedAdmission;
+    invalidAdmission.primaryArmPixels = 1u;
+    Check(!horde::platform::windows::AdmitsVerticalProofRaisedCeilingRetraction(invalidAdmission) &&
+              HasExpectedPlayerCaptureVisibility(true, true, true, 1u, false, &invalidAdmission),
+          "a visible arm pixel uses the ordinary capture path without invoking the zero-pixel exception");
+    Check(!HasExpectedPlayerCaptureVisibility(false, true, true, 0u, false, &raisedAdmission) &&
+              !HasExpectedPlayerCaptureVisibility(true, false, true, 0u, false, &raisedAdmission),
+          "combined evidence cannot bypass ownership or primary-instance visibility");
     for (const bool cropped : {false, true})
         Check(!HasExpectedPlayerCaptureVisibility(false, true, true, 1u, cropped) &&
                   !HasExpectedPlayerCaptureVisibility(true, false, true, 1u, cropped) &&

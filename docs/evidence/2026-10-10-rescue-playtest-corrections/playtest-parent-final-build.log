@@ -1,0 +1,20 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-debug\pocket-audio-core-native\Debug\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_gameplay_simulation.lib
+  DesktopControllerInputTests.cpp
+<repo>\tests\DesktopControllerInputTests.cpp(345,36): error C2065: 'windowsSource': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_desktop_controller_input_tests.vcxproj]
+<repo>\tests\DesktopControllerInputTests.cpp(345,16): error C2737: 'legacyAcquisition': const object must be initialized [<repo>\build\presets\windows-x64-debug\horde_rt_desktop_controller_input_tests.vcxproj]
+<repo>\tests\DesktopControllerInputTests.cpp(346,39): error C2065: 'windowsSource': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_desktop_controller_input_tests.vcxproj]
+<repo>\tests\DesktopControllerInputTests.cpp(346,98): error C3536: 'legacyAcquisition': cannot be used before it is initialized [<repo>\build\presets\windows-x64-debug\horde_rt_desktop_controller_input_tests.vcxproj]
+<repo>\tests\DesktopControllerInputTests.cpp(346,16): error C2737: 'legacyAcquisitionEnd': const object must be initialized [<repo>\build\presets\windows-x64-debug\horde_rt_desktop_controller_input_tests.vcxproj]
+<repo>\tests\DesktopControllerInputTests.cpp(347,36): error C2065: 'windowsSource': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_desktop_controller_input_tests.vcxproj]
+<repo>\tests\DesktopControllerInputTests.cpp(347,16): error C2737: 'xinputAcquisition': const object must be initialized [<repo>\build\presets\windows-x64-debug\horde_rt_desktop_controller_input_tests.vcxproj]
+<repo>\tests\DesktopControllerInputTests.cpp(348,39): error C2065: 'windowsSource': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_desktop_controller_input_tests.vcxproj]
+<repo>\tests\DesktopControllerInputTests.cpp(348,99): error C3536: 'xinputAcquisition': cannot be used before it is initialized [<repo>\build\presets\windows-x64-debug\horde_rt_desktop_controller_input_tests.vcxproj]
+<repo>\tests\DesktopControllerInputTests.cpp(348,16): error C2737: 'xinputAcquisitionEnd': const object must be initialized [<repo>\build\presets\windows-x64-debug\horde_rt_desktop_controller_input_tests.vcxproj]
+<repo>\tests\DesktopControllerInputTests.cpp(349,55): error C3536: 'legacyAcquisitionEnd': cannot be used before it is initialized [<repo>\build\presets\windows-x64-debug\horde_rt_desktop_controller_input_tests.vcxproj]
+<repo>\tests\DesktopControllerInputTests.cpp(350,55): error C3536: 'xinputAcquisitionEnd': cannot be used before it is initialized [<repo>\build\presets\windows-x64-debug\horde_rt_desktop_controller_input_tests.vcxproj]
+<repo>\tests\DesktopControllerInputTests.cpp(352,13): error C2065: 'windowsSource': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_desktop_controller_input_tests.vcxproj]
+<repo>\tests\DesktopControllerInputTests.cpp(354,13): error C2065: 'windowsSource': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_desktop_controller_input_tests.vcxproj]
+<repo>\tests\DesktopControllerInputTests.cpp(356,13): error C2065: 'windowsSource': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_desktop_controller_input_tests.vcxproj]

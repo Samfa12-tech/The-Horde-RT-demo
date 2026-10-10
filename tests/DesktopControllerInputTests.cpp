@@ -1,15 +1,20 @@
 #include "platform/windows/DesktopControllerInput.h"
+#include "platform/windows/GraphicsMenuNavigation.h"
 #include "platform/windows/WindowsCaptureContracts.h"
 #include "platform/windows/WindowsInteractionPrompt.h"
+#include "platform/windows/WindowsGameplayInput.h"
+#include "gameplay/simulation/GameSimulation.h"
 #include "platform/windows/WindowsRtLabState.h"
 
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <memory>
 #include <sstream>
 #include <string>
 #include <string_view>
+#include <vector>
 
 namespace
 {
@@ -38,6 +43,9 @@ using horde::platform::windows::WrapRtLabFocus;
 using horde::platform::windows::ShouldPlayControllerMenuSound;
 using horde::platform::windows::WindowsChestPromptText;
 using horde::platform::windows::ClaimedRewardCapturePolicy;
+using horde::platform::windows::FindGraphicsMenuNeighbor;
+using horde::platform::windows::GraphicsMenuDirection;
+using horde::platform::windows::GraphicsMenuRect;
 
 void Require(const bool condition, const std::string_view message)
 {
@@ -81,6 +89,54 @@ std::string ReadWindowsSource()
 
 int main()
 {
+    const std::vector<GraphicsMenuRect> graphicsRows{
+        {0, 0, 600, 36},       // full-width preset
+        {0, 44, 104, 80},      // glass
+        {112, 44, 216, 80},    // mist
+        {224, 44, 368, 80},    // dust
+        {0, 88, 600, 126},     // render-scale trackbar
+        {0, 134, 190, 170},    // water
+        {198, 134, 388, 170},  // fire
+        {396, 134, 600, 170},  // shadow
+        {0, 178, 190, 214},    // apply
+        {198, 178, 388, 214},  // keep
+        {396, 178, 600, 214},  // revert
+        {0, 222, 296, 258},    // defaults
+        {304, 222, 600, 258},  // back
+        {620, 600, 900, 636},  // distant preview control column
+    };
+    Require(FindGraphicsMenuNeighbor(graphicsRows, 0, GraphicsMenuDirection::Down) == 3u,
+            "graphics down must enter the right-aligned toggle nearest the full-width preset center");
+    Require(FindGraphicsMenuNeighbor(graphicsRows, 1, GraphicsMenuDirection::Right) == 2u &&
+            FindGraphicsMenuNeighbor(graphicsRows, 3, GraphicsMenuDirection::Down) == 4u,
+            "graphics horizontal and vertical navigation must follow adjacent control rectangles");
+    Require(FindGraphicsMenuNeighbor(graphicsRows, 9, GraphicsMenuDirection::Right) == 10u,
+            "right from Keep must select the same-row Revert control");
+    Require(FindGraphicsMenuNeighbor(graphicsRows, 12, GraphicsMenuDirection::Right) == 10u,
+            "right from Back must select the nearby Revert diagonal instead of the distant preview column");
+    Require(FindGraphicsMenuNeighbor(graphicsRows, 3, GraphicsMenuDirection::Right) == 7u,
+            "right from Dust must reach the nearest in-cone diagonal Shadow control, not the preset above");
+    const std::vector<GraphicsMenuRect> previewOffsetRows{
+        {620, 300, 700, 340},  // current preview control
+        {640, 440, 720, 476},  // lower preview control, slightly offset but same column
+        {705, 390, 785, 426},  // closer vertically, but a diagonal beside the column
+    };
+    Require(FindGraphicsMenuNeighbor(previewOffsetRows, 0, GraphicsMenuDirection::Down) == 1u,
+            "down must prefer the slightly offset same-column preview control over a nearer diagonal row");
+    const std::vector<GraphicsMenuRect> filteredControls{
+        {0, 0, 100, 36},      // focused, enabled, visible control
+        {112, 0, 212, 36},    // enabled, visible next control
+    };
+    Require(FindGraphicsMenuNeighbor(filteredControls, 0, GraphicsMenuDirection::Right) == 1u,
+            "the prefiltered focus list must navigate to its next enabled and visible control");
+    const std::vector<GraphicsMenuRect> diagonalOutsideCone{
+        {0, 0, 20, 20},
+        {-100, 21, -80, 41},
+    };
+    Require(FindGraphicsMenuNeighbor(diagonalOutsideCone, 0, GraphicsMenuDirection::Down) == std::nullopt &&
+            FindGraphicsMenuNeighbor(diagonalOutsideCone, 0, GraphicsMenuDirection::Right) == std::nullopt,
+            "spatial navigation must stay put at boundaries and reject unrelated diagonal controls");
+
     constexpr auto ordinaryLanternCapture =
         ClaimedRewardCapturePolicy("lantern-held-high");
     constexpr auto maximumWallCapture =
@@ -144,10 +200,10 @@ int main()
     Require(WindowsChestPromptText(ChestRewardPrompt::Locked) ==
                 "LOCKED | DEFEAT THE LICH" &&
             WindowsChestPromptText(ChestRewardPrompt::OpenChest) ==
-                "PRESS E / A TO OPEN CHEST" &&
+                "LEFT-CLICK / A TO OPEN CHEST" &&
             WindowsChestPromptText(ChestRewardPrompt::Opening) == "OPENING..." &&
             WindowsChestPromptText(ChestRewardPrompt::ClaimLantern) ==
-                "PRESS E / A TO TAKE LANTERN" &&
+                "LEFT-CLICK / A TO TAKE LANTERN" &&
             WindowsChestPromptText(ChestRewardPrompt::Unlocking) ==
                 "THE LICH'S SEAL IS BREAKING..." &&
             WindowsChestPromptText(ChestRewardPrompt::None).empty(),
@@ -328,6 +384,33 @@ int main()
     Require(pitchedView.pitchRadians <= 0.28f && pitchedView.pitchRadians > 0.27f,
             "right-stick pitch must advance and retain the authored clamp");
 
+    // Owner's read-only paused L3 capture: button 14, mask 0x2000.
+    Require(horde::platform::windows::LegacyRunTogglePressed(0x2000u, 0u, capturedBackbone) &&
+            !horde::platform::windows::LegacyRunTogglePressed(0x2000u, 0x2000u, capturedBackbone) &&
+            !horde::platform::windows::LegacyRunTogglePressed(0u, 0x2000u, capturedBackbone) &&
+            !horde::platform::windows::LegacyRunTogglePressed(0x0800u, 0u, capturedBackbone) &&
+            !horde::platform::windows::LegacyRunTogglePressed(0x2000u, 0u, LegacyControllerIdentity{}),
+            "captured L3 toggles once; hold/release/menu/unknown layouts cannot toggle run");
+    Require(horde::platform::windows::XInputRunTogglePressed(0x0040u, 0u) &&
+            !horde::platform::windows::XInputRunTogglePressed(0x0040u, 0x0040u) &&
+            !horde::platform::windows::XInputRunTogglePressed(0x0080u, 0u),
+            "XInput L3 uses a single edge and never maps right-stick click to run");
+    const std::string windowsSource = ReadWindowsSource();
+    const auto legacyAcquisition = windowsSource.find("if (context.legacyJoystickId != joystick ||");
+    const auto legacyAcquisitionEnd = windowsSource.find("context.legacyJoystickId = joystick;", legacyAcquisition);
+    const auto xinputAcquisition = windowsSource.find("if (context.xInputUserIndex != xinputUser)");
+    const auto xinputAcquisitionEnd = windowsSource.find("context.xInputUserIndex = xinputUser;", xinputAcquisition);
+    Require(legacyAcquisition != std::string::npos && legacyAcquisitionEnd != std::string::npos &&
+            xinputAcquisition != std::string::npos && xinputAcquisitionEnd != std::string::npos,
+            "both actual native device-acquisition paths must remain inspectable");
+    Require(windowsSource.substr(legacyAcquisition, legacyAcquisitionEnd - legacyAcquisition).find(
+                "context.previousLegacyControllerButtons = legacy.dwButtons;") != std::string::npos &&
+            windowsSource.substr(xinputAcquisition, xinputAcquisitionEnd - xinputAcquisition).find(
+                "context.previousControllerButtons = state.Gamepad.wButtons;") != std::string::npos &&
+            windowsSource.substr(xinputAcquisition, xinputAcquisitionEnd - xinputAcquisition).find(
+                "SeedXInputTriggerLatch(") != std::string::npos,
+            "native acquisition must seed held buttons/triggers before mapping gameplay edges");
+
     // Exact Backbone menu topology: D-pad is a WinMM POV hat and the standard
     // A/B/Menu fields occupy buttons 1/2/12. All are edge-triggered.
     const auto dpadDown = MapLegacyControllerMenuEdges(
@@ -374,7 +457,6 @@ int main()
                 0x0800u, 0x0800u, 65535u, 65535u, capturedBackbone).Any(),
             "held menu/start must not rapidly pause and resume");
 
-    const std::string windowsSource = ReadWindowsSource();
     Require(windowsSource.find("ControllerFocusOutlineSubclass") != std::string::npos &&
             windowsSource.find("SetWindowSubclass") != std::string::npos &&
             windowsSource.find("WM_SETFOCUS") != std::string::npos &&
@@ -411,6 +493,82 @@ int main()
     Require(windowsSource.find("WrapRtLabFocus(index, direction, controls.size())") != std::string::npos &&
             windowsSource.find("ShouldPlayControllerMenuSound(context.rtLabVisible)") != std::string::npos,
             "production RT Lab focus and silent navigation must use the behavior-tested seams");
+    const std::size_t graphicsNavigationBegin = windowsSource.find("void NavigateGraphicsMenu(");
+    const std::size_t graphicsNavigationEnd = windowsSource.find("void CancelControllerMenu(", graphicsNavigationBegin);
+    const std::size_t menuRosterBegin = windowsSource.find("std::vector<HWND> VisibleControllerMenuControls(");
+    const std::size_t menuRosterEnd = windowsSource.find("void NavigateControllerMenu(", menuRosterBegin);
+    const std::size_t settingsLayoutBegin = windowsSource.find("const bool entrySettings =");
+    const std::size_t graphicsLayoutBegin = windowsSource.find(
+        "if (layoutContext != nullptr && layoutContext->graphicsVisible)", settingsLayoutBegin);
+    const std::size_t settingsOverlayStateBegin = windowsSource.find("void ApplyOverlayState(");
+    const std::size_t settingsOverlayStateEnd = windowsSource.find("void ShowPauseMenu(", settingsOverlayStateBegin);
+    const std::size_t visibleControlsBegin = windowsSource.find("std::vector<HWND> VisibleControllerMenuControls(");
+    const std::size_t visibleControlsEnd = windowsSource.find("void NavigateControllerMenu(", visibleControlsBegin);
+    const std::size_t keyboardTabBegin = windowsSource.find("sceneContext->simulationPaused && wParam == VK_TAB");
+    const std::size_t keyboardTabEnd = windowsSource.find("wParam == VK_UP || wParam == VK_DOWN", keyboardTabBegin);
+    const std::size_t keyboardHorizontalBegin = windowsSource.find(
+        "if (sceneContext->simulationPaused && (wParam == VK_LEFT || wParam == VK_RIGHT)");
+    const std::size_t keyboardHorizontalEnd = windowsSource.find(
+        "if (sceneContext->simulationPaused && (wParam == VK_RETURN || wParam == VK_SPACE)",
+        keyboardHorizontalBegin);
+    Require(graphicsNavigationBegin != std::string::npos && graphicsNavigationEnd != std::string::npos &&
+            windowsSource.substr(graphicsNavigationBegin, graphicsNavigationEnd - graphicsNavigationBegin)
+                    .find("FindGraphicsMenuNeighbor(") != std::string::npos &&
+            windowsSource.find("NavigateGraphicsMenu(*sceneContext") != std::string::npos &&
+            visibleControlsBegin != std::string::npos && visibleControlsEnd != std::string::npos &&
+            windowsSource.substr(visibleControlsBegin, visibleControlsEnd - visibleControlsBegin)
+                    .find("IsWindowEnabled(control)") != std::string::npos &&
+            windowsSource.substr(visibleControlsBegin, visibleControlsEnd - visibleControlsBegin)
+                    .find("IsWindowVisible(control)") != std::string::npos &&
+            keyboardHorizontalBegin != std::string::npos && keyboardHorizontalEnd != std::string::npos &&
+            windowsSource.substr(keyboardHorizontalBegin, keyboardHorizontalEnd - keyboardHorizontalBegin)
+                    .find("AdjustFocusedControllerSlider") <
+            windowsSource.substr(keyboardHorizontalBegin, keyboardHorizontalEnd - keyboardHorizontalBegin)
+                    .find("NavigateGraphicsMenu") &&
+            keyboardTabBegin != std::string::npos && keyboardTabEnd != std::string::npos &&
+            windowsSource.substr(keyboardTabBegin, keyboardTabEnd - keyboardTabBegin)
+                    .find("NavigateControllerMenu(*sceneContext,") != std::string::npos &&
+            windowsSource.substr(keyboardTabBegin, keyboardTabEnd - keyboardTabBegin)
+                    .find("(GetKeyState(VK_SHIFT) & 0x8000) != 0 ? -1 : 1") != std::string::npos &&
+            windowsSource.find("WrapRtLabFocus(index, direction, controls.size())") != std::string::npos,
+            "graphics arrow navigation must use spatial control bounds while Tab retains the cyclic menu path");
+    Require(menuRosterBegin != std::string::npos && menuRosterEnd != std::string::npos &&
+            settingsLayoutBegin != std::string::npos && graphicsLayoutBegin != std::string::npos &&
+            settingsOverlayStateBegin != std::string::npos &&
+            settingsOverlayStateEnd != std::string::npos,
+            "Settings navigation order and both native layout modes must remain inspectable");
+    const std::string_view menuRoster(
+        windowsSource.data() + menuRosterBegin, menuRosterEnd - menuRosterBegin);
+    const auto rosterPosition = [&menuRoster](const std::string_view control) {
+        return menuRoster.find(control);
+    };
+    Require(rosterPosition("kSensitivityButtonId") < rosterPosition("kGraphicsOpenButtonId") &&
+            rosterPosition("kGraphicsOpenButtonId") < rosterPosition("kSfxVolumeSliderId") &&
+            rosterPosition("kSfxVolumeSliderId") < rosterPosition("kMusicVolumeSliderId") &&
+            rosterPosition("kMusicVolumeSliderId") < rosterPosition("kFullscreenButtonId") &&
+            rosterPosition("kFullscreenButtonId") < rosterPosition("kSettingsBackButtonId"),
+            "entry and pause Settings controller order must follow Sensitivity, Graphics, audio, Fullscreen, Back");
+    const std::string_view settingsLayout(
+        windowsSource.data() + settingsLayoutBegin, graphicsLayoutBegin - settingsLayoutBegin);
+    const std::string_view overlayState(
+        windowsSource.data() + settingsOverlayStateBegin,
+        settingsOverlayStateEnd - settingsOverlayStateBegin);
+    const std::size_t secondSettingsRowLoop = settingsLayout.find(
+        "for (const int id : {kSensitivityButtonId, kWaterQualityButtonId})");
+    const std::size_t graphicsRowPosition = settingsLayout.find(
+        "MoveWindow(graphics, pauseX, y - settingsButtonHeight - gap");
+    const std::size_t effectsLabelPosition = settingsLayout.find("GetDlgItem(window, kSfxVolumeLabelId)");
+    Require(settingsLayout.find("const int settingsButtonHeight = entrySettings ?") != std::string_view::npos &&
+            secondSettingsRowLoop != std::string_view::npos &&
+            secondSettingsRowLoop < graphicsRowPosition &&
+            graphicsRowPosition != std::string_view::npos &&
+            graphicsRowPosition < effectsLabelPosition &&
+            settingsLayout.find("if (!entrySettings)", graphicsRowPosition) != std::string_view::npos &&
+            overlayState.find("kFullscreenButtonId, kGraphicsOpenButtonId") != std::string_view::npos &&
+            overlayState.find("context.settingsVisible && !context.graphicsVisible") != std::string_view::npos &&
+            overlayState.find("kWaterQualityButtonId, kRenderScaleLabelId, kRenderScaleSliderId") != std::string_view::npos &&
+            overlayState.find("SetControlVisible(context.windowHandle, id, context.graphicsVisible)") != std::string_view::npos,
+            "Graphics must occupy the second Settings row in entry/pause layouts while graphics-only controls stay hidden");
     const std::size_t labCommandsBegin = windowsSource.find("case kRtLabButtonId:");
     const std::size_t labCommandsEnd = windowsSource.find("case kDiagnosticsButtonId:", labCommandsBegin);
     const std::size_t labFunctionsBegin = windowsSource.find("void OpenRtLab(");
@@ -449,6 +607,83 @@ int main()
                         .find("UpdateChestPrompt(context);") != std::string::npos,
             "synchronous Windows overlay transitions must hide the chest prompt without waiting for another rendered frame");
 
+    using horde::platform::windows::DesktopClickAction;
+    using horde::platform::windows::DesktopKeyAction;
+    using horde::platform::windows::ResolveDesktopLeftClick;
+    using horde::platform::windows::ResolveDesktopGameplayKey;
+    Require(ResolveDesktopLeftClick(true, false, ChestRewardPrompt::OpenChest) == DesktopClickAction::AcquireCapture &&
+            ResolveDesktopLeftClick(true, false, ChestRewardPrompt::None) == DesktopClickAction::AcquireCapture,
+            "initial focus/capture click never publishes interaction or attack");
+    Require(ResolveDesktopLeftClick(false, true, ChestRewardPrompt::OpenChest) == DesktopClickAction::Ignore &&
+            ResolveDesktopLeftClick(false, false, ChestRewardPrompt::None) == DesktopClickAction::Ignore,
+            "menu, pause and lost gameplay ownership clicks are ignored");
+    Require(ResolveDesktopLeftClick(true, true, ChestRewardPrompt::None) == DesktopClickAction::Attack &&
+            ResolveDesktopLeftClick(true, true, ChestRewardPrompt::OpenChest, true) == DesktopClickAction::Interact &&
+            ResolveDesktopLeftClick(true, true, ChestRewardPrompt::ClaimLantern, true) == DesktopClickAction::Interact &&
+            ResolveDesktopLeftClick(true, true, ChestRewardPrompt::Opening) == DesktopClickAction::Ignore &&
+            ResolveDesktopLeftClick(true, true, ChestRewardPrompt::Locked) == DesktopClickAction::Attack &&
+            ResolveDesktopLeftClick(true, true, ChestRewardPrompt::Unlocking) == DesktopClickAction::Ignore,
+            "captured click chooses one action; locked hint preserves attack and busy chest phases consume clicks");
+    Require(ResolveDesktopLeftClick(true,true,ChestRewardPrompt::None,true)==DesktopClickAction::Interact &&
+            ResolveDesktopLeftClick(true,true,ChestRewardPrompt::OpenChest,false)==DesktopClickAction::Ignore &&
+            ResolveDesktopLeftClick(true,true,ChestRewardPrompt::Locked,true)==DesktopClickAction::Interact,
+            "stale displayed prompt stays interaction even after reset locks chest; unseen eligibility never swings");
+    Require(ResolveDesktopGameplayKey(0x20u,true,false,false)==DesktopKeyAction::Dodge &&
+            ResolveDesktopGameplayKey('Q',true,false,false)==DesktopKeyAction::Parry &&
+            ResolveDesktopGameplayKey('E',true,false,true)==DesktopKeyAction::ToggleLantern &&
+            ResolveDesktopGameplayKey('E',true,false,false)==DesktopKeyAction::None &&
+            ResolveDesktopGameplayKey('C',true,false,true)==DesktopKeyAction::None &&
+            ResolveDesktopGameplayKey('F',true,false,true)==DesktopKeyAction::None,
+            "Space/Q/E have new Windows mapping, claimed-only lantern and retired C/F mappings");
+    for (const unsigned key : {0x20u, unsigned('Q'), unsigned('E')})
+        Require(ResolveDesktopGameplayKey(key,false,false,true)==DesktopKeyAction::None &&
+                ResolveDesktopGameplayKey(key,true,true,true)==DesktopKeyAction::None,
+                "menu Space and auto-repeated gameplay keys do not generate edges");
+
+    // Route the native click decision into the real authoritative consumer.
+    // Eligibility can change after the snapshot used to select the intent.
+    using namespace horde::gameplay::simulation;
+    using namespace horde::gameplay::interactions;
+    GameSimulation staleClick;
+    ChestRewardSnapshot unlocked;
+    unlocked.phase=ChestRewardPhase::ClosedUnlocked;
+    staleClick.ImportRewardCheckpoint(unlocked, {}, {});
+    InputSnapshot staleInput;
+    staleInput.damageEnabled=false;
+    const auto intent=ResolveDesktopLeftClick(true,true,staleClick.Snapshot().chestPrompt,true);
+    if(intent==DesktopClickAction::Interact) ++staleInput.commands.interact;
+    if(intent==DesktopClickAction::Attack) ++staleInput.commands.attack;
+    staleClick.StepFixed(staleInput); // actual spawn is out of reward range
+    Require(staleClick.Snapshot().lastConsumedInteractSequence==1u &&
+            staleClick.Snapshot().lastConsumedAttackSequence==0u &&
+            staleClick.Snapshot().chestReward.phase==ChestRewardPhase::ClosedUnlocked,
+            "stale contextual intent is authoritatively rejected without fallback swing");
+    staleClick.StepFixed(staleInput);
+    Require(staleClick.Snapshot().lastConsumedInteractSequence==1u &&
+            staleClick.Snapshot().lastConsumedAttackSequence==0u,
+            "one mouse edge is not repeated on subsequent fixed ticks");
+    staleInput.commands.attack=2; staleInput.commands.parry=2; staleInput.commands.dodge=2;
+    staleInput.commands.interact=2; staleInput.commands.toggleHeldLightPose=2;
+    staleClick.SynchronizePausedInput(staleInput);
+    staleClick.StepFixed(staleInput);
+    Require(staleClick.Snapshot().lastConsumedAttackSequence==2u &&
+            staleClick.Snapshot().lastConsumedDodgeSequence==2u &&
+            !staleClick.Snapshot().swordCombat.playerAttackPulse &&
+            staleClick.Snapshot().chestReward.phase==ChestRewardPhase::ClosedUnlocked,
+            "capture/focus/pause cancellation discards queued edges before resume");
+    const auto mouseBegin=windowsSource.rfind("    case WM_LBUTTONDOWN:");
+    const auto mouseEnd=windowsSource.find("    case WM_MOUSEMOVE:",mouseBegin);
+    const auto mouseSection=windowsSource.substr(mouseBegin,mouseEnd-mouseBegin);
+    const auto rightBegin=mouseSection.find("    case WM_RBUTTONDOWN:");
+    Require(mouseSection.find("ResolveDesktopLeftClick(")!=std::string::npos &&
+            mouseSection.find("sceneContext->chestInteractionPromptPresented")!=std::string::npos &&
+            rightBegin!=std::string::npos &&
+            mouseSection.substr(rightBegin).find("PublishDesktopCombatEdge")==std::string::npos &&
+            windowsSource.find("ResolveDesktopGameplayKey(")!=std::string::npos &&
+            windowsSource.find("DiscardDesktopPendingCommands(*sceneContext)")!=std::string::npos &&
+            windowsSource.find("(wParam == VK_RETURN || wParam == VK_SPACE)")!=std::string::npos,
+            "native owner wires tested admission, reserved right mouse, cancellation and menu Space");
+
     ControllerTriggerLatch triggerLatch{};
     const ControllerActionEdges firstTriggers = UpdateXInputTriggerEdges(0u, 255u, triggerLatch);
     Require(firstTriggers.attackPressed && !firstTriggers.parryPressed,
@@ -459,6 +694,30 @@ int main()
     const ControllerActionEdges leftTrigger = UpdateXInputTriggerEdges(255u, 0u, triggerLatch);
     Require(!leftTrigger.attackPressed && leftTrigger.parryPressed,
             "XInput LT threshold crossing must parry once");
+
+    // Deliver the measured physical L3 edge through the shared fixed-step
+    // command path, including held/reseed and lifecycle intent cancellation.
+    auto runSimulation=std::make_unique<horde::gameplay::simulation::GameSimulation>();
+    horde::gameplay::simulation::InputSnapshot runInput;
+    runInput.damageEnabled=false;runInput.moveForward=1;
+    std::uint32_t previousL3=0;
+    for(int tick=0;tick<12;++tick) {
+        if(horde::platform::windows::LegacyRunTogglePressed(0x2000u,previousL3,capturedBackbone))
+            ++runInput.commands.runToggle;
+        previousL3=0x2000u;runSimulation->StepFixed(runInput);
+    }
+    Require(runInput.commands.runToggle==1 && runSimulation->Snapshot().runToggleActive &&
+            runSimulation->Snapshot().runActive,"L3 held over twelve ticks creates one running intent");
+    runInput.paused=true;runSimulation->StepFixed(runInput);
+    Require(!runSimulation->Snapshot().runToggleActive&&!runSimulation->Snapshot().runActive,
+            "pause cancels controller run and keeps gameplay frozen");
+    runInput.paused=false;runSimulation->StepFixed(runInput);
+    Require(!runSimulation->Snapshot().runToggleActive,
+            "same held/reseed L3 counter cannot restore running after pause");
+    runInput.commands.runToggle=2;runSimulation->StepFixed(runInput);
+    Require(runSimulation->Snapshot().runToggleActive,"a fresh deliberate L3 edge can run again");
+    ++runInput.commands.clearRunIntent;runSimulation->StepFixed(runInput);
+    Require(!runSimulation->Snapshot().runToggleActive,"focus/traversal intent cancellation consumes the existing run toggle");
 
     std::cout << "Desktop controller input tests passed\n";
     return EXIT_SUCCESS;

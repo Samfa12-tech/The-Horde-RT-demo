@@ -17,6 +17,10 @@ struct SimulationCommandSequences
     std::uint64_t retry = 0;
     std::uint64_t interact = 0;
     std::uint64_t toggleHeldLightPose = 0;
+    std::uint64_t runToggle = 0;
+    std::uint64_t clearRunIntent = 0;
+    std::uint64_t tutorialSkip = 0;
+    std::uint64_t tutorialReplay = 0;
 };
 
 enum class CombatInputEdgeKind : std::uint8_t
@@ -66,6 +70,11 @@ struct InputSnapshot
     bool paused = false;
     bool damageEnabled = true;
     bool hasAuthoritativePlayerPose = false;
+    // Holds run only while a physical key/controller button remains down.
+    // The Android HUD uses the monotonic runToggle edge instead.
+    bool runHeld = false;
+    bool tutorialEnabled = true;
+    bool tutorialSlowdownEnabled = false;
     SimulationCommandSequences commands{};
     CombatInputEdgeHistory combatEdgeHistory{};
 };

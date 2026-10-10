@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "date_local": "2026-10-10",
+  "timezone": "Australia/Sydney",
+  "evidence_class": "owner report from manual Windows development-route playtest",
+  "starting_checkpoint": "00edea8916f960c0ccd4930834789e302e4ea9c3",
+  "runtime_candidate_commit": "d85a3cd1246e22c91d166eb3e43b90112d121cb0",
+  "artifact": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+  "artifact_sha256": "56c669a0945ace96be29773e22fc4bd8f257abc69a93ca4031c5292f0a9f512e",
+  "configuration": "Windows Debug",
+  "packaged_profile": "Diagnostic High",
+  "launch_arguments": ["--development-world-route"],
+  "launch_verified": true,
+  "launch_verification": "Artifact hash matched the existing receipt; process remained running and created the game window. No automated input was issued.",
+  "owner_quote": "it all works without issue and looks great",
+  "owner_reported_route_result": "PASS: no functional issue reported; positive visual assessment",
+  "individual_checklist_cases_enumerated": false,
+  "actual_selected_backend": "NOT RECORDED",
+  "rt_presentation_diagnostics_collected": false,
+  "new_captures_collected": false,
+  "host_package_ready": true,
+  "device_verified_complete": false,
+  "owner_audio_haptic_acceptance": "PENDING: this report did not specifically describe listening or vibration checks",
+  "remaining_gates": [
+    "Fresh paired clear-view and raised checkpoint171 captures on the same exact executable and verified backend",
+    "Windows Pipeline and RayQuery exact-backend RT presentation and detailed equipment/light/secondary-contribution evidence",
+    "Windows focus/resize/recovery/restart and stale input/frame/event checks",
+    "Android exact-candidate physical backend, route, equipment/light and lifecycle acceptance",
+    "Explicit owner audio/haptic observations on this candidate"
+  ],
+  "runtime_shader_abi_assets_budgets_tests_unchanged": true,
+  "historical_evidence_preserved": true
+}

@@ -401,6 +401,7 @@ MusicCue MusicDirector::ResolvePersistentBed(
     }
     if (snapshot.activeEnemyKind == EnemyKind::Lich &&
         (snapshot.lich.phase == LichPhase::MaintainingRange ||
+         snapshot.lich.phase == LichPhase::Repelling ||
          snapshot.lich.phase == LichPhase::Charging ||
          snapshot.lich.phase == LichPhase::Recovering))
     {

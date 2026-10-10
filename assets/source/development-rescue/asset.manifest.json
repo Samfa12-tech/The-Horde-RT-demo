@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "asset": "development-rescue-shaft-blockout",
+  "metresPerUnit": 1.0,
+  "coordinateSystem": {
+    "up": "+Y",
+    "forward": "+Z"
+  },
+  "budgets": {
+    "maxVertices": 400,
+    "maxIndices": 600,
+    "maxPrimitives": 4,
+    "maxMaterials": 2,
+    "maxTextureLayersPerKind": 2
+  },
+  "lods": [
+    {
+      "name": "lod0",
+      "maxTriangles": 200
+    }
+  ],
+  "requiredSockets": [],
+  "runtimeTextureProfile": {
+    "android": "astc",
+    "windows": "rgba8",
+    "mipmapped": true
+  },
+  "materialOverrides": []
+}

@@ -596,7 +596,7 @@ void TestHeldLightGpuAbiAppendsWithoutChangingReleasedBindings()
     Check(horde::vulkan::raytracing::kRtBindingInstanceMetadata == 11u &&
               horde::vulkan::raytracing::kRtBindingEmissiveTextures == 19u &&
               horde::vulkan::raytracing::kRtBindingHeldLight == 20u &&
-              sizeof(horde::vulkan::raytracing::RtHeldLightGpu) == 16u,
+              sizeof(horde::vulkan::raytracing::RtHeldLightGpu) == 32u,
           "held light GPU state must append at binding 20 without changing bindings 0-19");
 }
 

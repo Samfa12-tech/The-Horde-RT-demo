@@ -1,0 +1,72 @@
+{
+  "review_head": "1bd73dae7dbfad7a7c9aff133a4f14680d2015db",
+  "source_generated_candidate": "0eb665900c9efc95c443beada4c418776092cbe3",
+  "files": [
+    {
+      "path": "src/gameplay/DevelopmentCheckpoints.h",
+      "git_blob": "e536b998b9ae81707144bf0f1ab55238c0013a8d",
+      "sha256": "776bfce3cef207a2c527007cc674d2550c33f31cc6cef0ccf58f083ec2b38e2c"
+    },
+    {
+      "path": "src/gameplay/DevelopmentCheckpointSimulation.h",
+      "git_blob": "1c43f86b899407a462257fd322d7674c5b7f6def",
+      "sha256": "5cadfe537cfe8dd5da5f859bc52f6c61ccd4288faf42b96a2b8b8d3eeadc9826"
+    },
+    {
+      "path": "src/gameplay/items/HeldItemKinematics.h",
+      "git_blob": "7a18f566f7073868666e45ab225d0131d5a6abc3",
+      "sha256": "e88c48b053c70e32f7c42ef254f8be34281647a8bcb0a89bb861fc02269e7f07"
+    },
+    {
+      "path": "src/gameplay/items/HeldItemKinematics.cpp",
+      "git_blob": "407c28bfc84431751910bd589a4be35b98b716f7",
+      "sha256": "3795df1eca0879a19a5a43511663f9dbbb757b163eb143467bd84470f7d538dc"
+    },
+    {
+      "path": "src/platform/windows/WindowsCaptureContracts.h",
+      "git_blob": "887874023eaf1c97d15b4ff210da62c4ee10fdab",
+      "sha256": "8f63ca608d6f24853ddab5b3f1c952ba9ce5cf4e987c2f7c0c37bbc0572ccb46"
+    },
+    {
+      "path": "src/platform/windows/DiagnosticWindow.cpp",
+      "git_blob": "07c6af94a9c84094fa41ef494a55146575e64b8c",
+      "sha256": "931b478c759979f4d37083ae4b86c3d906f705ec5a53ffa7cd9029ca3f41bf5d"
+    },
+    {
+      "path": "tests/HeldItemVerticalSupportRigTests.cpp",
+      "git_blob": "44dbff20e69827e1ab1a4cee12ab3a5e4d0f6b49",
+      "sha256": "411c1d0cc8afc6a9b1f57c1b4114ebc99c1443d203bff0209dcbaac96ca298de"
+    },
+    {
+      "path": "tests/DevelopmentStaticAssetTests.cpp",
+      "git_blob": "03d3bc0e772bcb6fc33c617a66b469c5ac145f1c",
+      "sha256": "ef4ca2dde6d2db5fdb811e5a354c7e8aff815f24e17f24a0292822b3e9ccbb0d"
+    }
+  ],
+  "findings": {
+    "checkpoint_171": {
+      "x": 0,
+      "z": 0,
+      "yaw": 0,
+      "pitch": -0.05,
+      "support_fixture": true,
+      "primaryArmsMayBeOutsideFrame": false
+    },
+    "existing_host_roof_case": {
+      "x": 0,
+      "z": 0,
+      "yaw": 3.14159265,
+      "pitch": -0.05,
+      "logicalViewAspect": 1.0,
+      "both_floor_and_raised": true
+    },
+    "windows_static_capture_aspect": 1.7777777777777777,
+    "shared_clearance": "World-down and camera-side retreat alter shared hand target; IK/item/flame/light consume that target. No independent light offset.",
+    "visibility_gate": "Dedicated ownership and primary-visible instance are mandatory; available counters require nonzero arm pixels unless explicitly declared cropping. 171 currently has no cropping declaration.",
+    "current_history": "Ground PASS; raised FAIL twice, identical PNGs; owner now separately says hands return. No modified gate or inferred root-cause proof."
+  },
+  "recommended_implementation_first": "Tests/HeldItemVerticalSupportRigTests.cpp only: add exact shared-staged yaw-0/aspect-16:9 raised fixture and clearance/recovery/attachment/negative controls; retain existing yaw-pi and open-space tests.",
+  "gate_changes_now": "none",
+  "test_changes_now": "none",
+  "new_test_execution": "NOT RUN; proposal for parent review"
+}

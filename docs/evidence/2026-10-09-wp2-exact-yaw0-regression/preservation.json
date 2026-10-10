@@ -1,0 +1,14 @@
+{
+  "protected_diff": [],
+  "original_main_open_space_and_yaw_pi_assertion_block_sha256": "560fe2d2d134a843e453a09b3ebd95c4489643488eaf004753c32e6d055a922b",
+  "original_assertion_block_preserved": true,
+  "test_registration_and_deadline_files_unchanged": true,
+  "validation_timeout_seconds": 180,
+  "original_torch_sweep_unchanged_and_not_rerun": true,
+  "game_exe_sha256": "6cf04484c5711c822b173b9256173311928027f92b681104c456eca5d0da9e03",
+  "local_android_apk_sha256": "1bd0611a6a25030c7025e49e181e186aff441a1e4f8ef52081afa5532bd4886c",
+  "new_game_or_device_launches_input_or_prompts": false,
+  "prior_GPU_raised_captures": "FAIL retained; not rerun or relabelled",
+  "prior_owner_hands_return": "Scoped owner report retained; no new owner testing",
+  "primary_unrelated_work": "preserved"
+}

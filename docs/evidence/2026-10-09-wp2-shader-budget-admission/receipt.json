@@ -1,0 +1,165 @@
+{
+  "schema": 1,
+  "status": "HOST/PACKAGE-READY",
+  "host_package_ready": true,
+  "device_verified": false,
+  "owner_audio_haptic_acceptance": "PENDING",
+  "manual_audio_haptic_required": "YES inherited from the integrated vertical proof; this package/policy admission changes no audio semantics",
+  "source_candidate_commit": "0eb665900c9efc95c443beada4c418776092cbe3",
+  "starting_local_remote_commit": "876e47e867361f59e81486f33d5482d16089ae9e",
+  "budget_admission": "Only 24 approved numeric ceilings; exactly measured cost; no extra headroom; not GPU performance/visual acceptance",
+  "source_runtime_shader_abi_gameplay_unchanged": true,
+  "prototype_integrated": false,
+  "pipeline_published_keys": 8,
+  "query_current_verified_keys": 8,
+  "query_compatibility_outputs_unchanged": true,
+  "host_results": {
+    "shader_abi_registered": {
+      "passed": 5,
+      "failed": 0
+    },
+    "one_unit_low_rejections": 24,
+    "rollback_fault_positions": [
+      9,
+      5
+    ],
+    "windows_debug_native": {
+      "passed": 54,
+      "failed": 0
+    },
+    "windows_release_native": {
+      "passed": 54,
+      "failed": 0
+    },
+    "windows_debug_policy_package": {
+      "passed": 5,
+      "failed": 0
+    },
+    "windows_release_package": {
+      "passed": 3,
+      "failed": 0
+    },
+    "android_four_abi_builds": "Debug and unsigned Release passed",
+    "android_lint": "Debug/Release lint tasks passed using cached analysis/report subtasks for unchanged inputs; lint-vital tasks skipped in unsigned validation",
+    "android_initial_java": "UP-TO-DATE; historical results, not fresh tests",
+    "android_fresh_java": {
+      "passed": 14,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "task_specific_rerun": true
+    },
+    "torch_full": [
+      {
+        "configuration": "debug",
+        "test_seconds": 167.1,
+        "outer_seconds": 167.16058379999595,
+        "timeout_seconds": 180,
+        "margin_seconds": 12.9,
+        "poses": 3287,
+        "roof_entry_skinned_poses": 1812,
+        "plane_samples": 3178,
+        "disk_samples": 57970,
+        "failures": 0,
+        "executable_sha256": "b16aa368eb079482f3303b6cc40800b122108465c0791d3121323142b7958946",
+        "source_git_blob": "cc6aefb5884e9307a39e97f33ee809f8053a1174",
+        "unchanged_test_source": true
+      },
+      {
+        "configuration": "release",
+        "test_seconds": 16.26,
+        "outer_seconds": 16.31987130001653,
+        "timeout_seconds": 180,
+        "margin_seconds": 163.74,
+        "poses": 3287,
+        "roof_entry_skinned_poses": 1812,
+        "plane_samples": 3178,
+        "disk_samples": 57970,
+        "failures": 0,
+        "executable_sha256": "5cfc175b1fa6b7d1ded0b7734f350789751c9466176a673228fb8bbb002186e1",
+        "source_git_blob": "cc6aefb5884e9307a39e97f33ee809f8053a1174",
+        "unchanged_test_source": true
+      }
+    ]
+  },
+  "package_coverage": {
+    "windows": "Both exact EXEs: selected High policy, 2 Pipeline + 2 Query modules; external validation, excluded bundles, negative controls and registration passed",
+    "android_arm64": "Both exact APK entries and stripped libraries: selected Mobile policy, 2 Pipeline + 2 Query modules, external validation passed",
+    "android_other_abis": "armeabi-v7a/x86/x86_64 APK-entry/library hashes, ABI ELF headers and all LOAD alignments passed; no SPIR-V scan on these ABIs"
+  },
+  "retained_setup_failures": [
+    "compatibility-generic",
+    "compatibility-opaque",
+    "android-all-abi-check"
+  ],
+  "historical_torch": {
+    "starting_checkpoint_seconds": 168.7,
+    "margin_seconds": 11.3,
+    "original_wp0_timeout_seconds": 180.03,
+    "diagnostic_focused_pass_seconds": 168.85,
+    "class": "historical receipts remain unchanged; current passes do not prove timeout cause or repeatability"
+  },
+  "unverified_gates": [
+    "Windows Pipeline and Query actual RT-produced successful presentation",
+    "Android Pipeline and Query actual RT-produced successful presentation",
+    "both height directions/look/body/hands/equipment/light/legacy/off-camera secondary behavior on devices",
+    "Windows focus/resize/recovery/restart",
+    "Android pause/background/resume/rotation/surface loss/recreation/non-destructive process reconstruction",
+    "device stale generation/input/event rejection",
+    "owner listening/haptic acceptance"
+  ],
+  "privacy": "New public evidence contains sanitized text only. Repository/tool/user/temp aliases replace personal paths; original raw logs remain ignored locally. No device operations or identifiers, credentials or secrets were collected. Raw and sanitized log hashes are separate.",
+  "final_self_commit_hash": null,
+  "files": {
+    "android-all-abi-check-retry.log": "81fd6eb4e19ef95ef267a7425686dc9f38861a66e55bc7b8edd788f1d89d4f58",
+    "android-all-abi-check.log": "3ff843e095312835071e2670b4b7aac42b42d5d1e0f9719acaa7615749300932",
+    "android-debug-arm64-package.log": "13588792a49e99982d785879d7bf12278a438956cbb61c68e6aaec72273663a7",
+    "android-fresh-java-evidence.json": "00b19f2f6e127150dabb9727954904c07eb931141e30690bc49c4f6373259efe",
+    "android-fresh-java-evidence.log": "ad9edba52ebc1d7220946180b1eeef7e6c0e6e62c5112a64d42d9dccde4fab53",
+    "android-fresh-selected-java-tests.log": "e3e90689af6b2d1eb54d213324554c33f3e3e83aadd4ca1798a828721bcc297c",
+    "android-gradle-test-task-help.log": "ee826a60677ffe3a867cb38bbfd9162da78198116db8265f3e04789bb473c9ec",
+    "android-gradle.log": "6b45d10ba1d3d76f36bba1954ffb7101a47567f4f511af4c7238f8742368ff7a",
+    "android-package-evidence.json": "a5a90377ba0b2c95cc1f9e58cd6585969aadb8f30855d6d4980adba45450cee4",
+    "android-release-arm64-package.log": "1ff54cbb2b36c3e25238af8d71eb2f1639f7ebbb5a1ebe7159bd20746a3fc7ac",
+    "approved-budget-delta.json": "ca69c09ad7802023e2ce4d03771cbd322f1268d6f7b2e05174d519463ca1ca32",
+    "capture-windows-package-identities.log": "a2daf709785ecf64fb66012b86561ecd96eb4ad884284b3967df5f3052c7bdec",
+    "catalog-check-one-low-rollback.log": "f56d60ed790020430df73a3fe4608f57b1189fe0e93227847d26416be9c8b1f4",
+    "compatibility-generic-corrected.log": "170eef05983cffcaa8632aa60366d3d584a2caa6bcd2cc43dd19356761980251",
+    "compatibility-generic.log": "931baf5f8ae15cd3091c745448f384f55aab90759e4033368f8fc68d70276f2d",
+    "compatibility-opaque-corrected.log": "b72077e196de53c94315f881aefb92d55c1ffd0077d8a6aa8a9ab4eed2e66ec0",
+    "compatibility-opaque.log": "931baf5f8ae15cd3091c745448f384f55aab90759e4033368f8fc68d70276f2d",
+    "configure-debug.log": "7538c2b2084ebf2029bb36af72adf8538ac9e6ec4bc6d54c1875689e42327dbd",
+    "configure-release.log": "2195c11cae8a8646015d47f3649f77fae1a211ac6fe41c8499b112bd6035617a",
+    "custody-and-scope.json": "931b74307b41059b3d381bc61fc1db0f80f1171f88ee98bdf8700a13fc160ec2",
+    "derived-witness-deltas.json": "50cb6e511d680c9c5b3ebb7739840c252cfc1696fc809831ef331d984f167f71",
+    "full-metrics-and-packages.json": "b83cb7efe1da27e740fda6e42f9078a300c97146fbad7e92f585d08d589c1423",
+    "log-identities.json": "39730c2dff4bb03b5c120556ca9036405c9a5b1cef2265f103ab284e03a5e128",
+    "native-debug-build.log": "d68b5caf4bbb14d50b48884bd5dfcf10184d951eff65573b8066e817d4c19648",
+    "native-debug-test.log": "d6930c42ef1ced40809a2bffe417584eefc0f8b6d4a5b847a253de2b03e53041",
+    "native-release-build.log": "28e0aa95ccb73e50a7803e735556e9d2994b66dc86c97cf6b38114dd2d896a1e",
+    "native-release-test.log": "d8bfc3b6daf18c61e2163a2fe242453e1c3b034cb9568810c81d989da8d7ffc9",
+    "one-unit-low-fixtures.json": "811927427efd1965113ac8ebd05a8e207c24e2c47705e0214f130dd25a9a9e8e",
+    "pipeline-adapter-check.log": "359cc7dcf5d4ed04eb4981a4c93826f746f2e506f698e2e1e9c553b9973c4bf9",
+    "pipeline-adapter.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "pipeline-freeze.log": "6e77261baae4020133fcb3d68a191088fcf23a210f6fe284b4f48003fb9ec40d",
+    "prepare-derived-gates.log": "211088c0a9bd2a87dfb1f1d5c3b6b657cf9d25f6eff43febc3ced90cf8672872",
+    "rayquery-current-check.log": "e99dd0241ff280c0a52ed30a3fa79fa3651d357f253b56c31e2a002a96abfada",
+    "recorded-toolchain-verified.json": "cc31811227900bd2736850be3106965b8a8f44481280aa0fb2d0b3aea331e810",
+    "reproduce-matrix.log": "9f77db527069d3eb4cd67ce69bd357c5d6ced5d0de96a56684899918f514dfab",
+    "runs.jsonl": "af70a657111c259cb60823c90d44f2b9db0ec2dbb98aaa1f74114836c1c9a936",
+    "selected-native-checks.json": "5d2a5a57afed78886b08a51d6a7a479624f74c67ad7011b893e07de94d991815",
+    "shader-contracts.log": "03bbbffb472e1f40b56c1f3ef142ccb27710c9980933c805ec4a5f92bf4058d5",
+    "source-to-package-provenance.json": "ecab70e5d84a784cbc0814c1ca0c9ebf2a7125d669bfe651c1f30a4a4eb10860",
+    "torch-debug-full.log": "7daf1af645a23ea6d70f0122d1de7bc4e9b41e694657434c985eb0a9f2921416",
+    "torch-fresh-results.json": "769b9b05ba20b659e09009b921f6ebc0aaf9f812639b66ec06a0ae437de3ad9a",
+    "torch-release-full.log": "6f5b560474b255ce05e8a14e4c7e320d1f0eac416055a77f6d08d2ab7d3357df",
+    "verify-and-admit.log": "9f4690336dcefd9906c45b3441f36c0488b740b489bb63a585be3de742fe2b4c",
+    "windows-debug-package-detail.log": "4cc5e0d2a00baf2b1da416d138e33e041d72dfd9f2875b7c5905c9b83c7696ae",
+    "windows-debug-policy-package.log": "243897521ecae5d72a03cc97857c50f8bd30895060266a9f1db338251f6844b4",
+    "windows-package-identities.json": "8e70fd8f67af72a05d523485db50c721c8c6e5ffaecd7113dfda031806df04c9",
+    "windows-release-package-detail.log": "ecaabc855b3a47e6d24dd4b040c81c3e091ee5f9338cd546221d5a8e09f03dc4",
+    "windows-release-package.log": "1de1f5517641b58812329f6268f87eaea27bbfe40ba010ec8740ac8f951e180a",
+    ".gitattributes": "70c106ceb8f659e14d53c6da972c24dc477351b1996bea4244f057bd1bb85f51",
+    "final-integrity.json": "2fdb89b38b9953bea53ed6684ee61e817f2b5ba7cb7360b22820bbbebea2ec35"
+  }
+}

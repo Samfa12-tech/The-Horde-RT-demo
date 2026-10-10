@@ -4,6 +4,7 @@
 #include "graphics/EntryMenuScene.h"
 #include "graphics/GraphicsPreviewSession.h"
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
+#include "vulkan/raytracing/PlayerFrameLight.h"
 
 namespace horde::vulkan::raytracing
 {

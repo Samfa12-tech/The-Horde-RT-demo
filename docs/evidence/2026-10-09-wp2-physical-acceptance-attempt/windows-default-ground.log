@@ -1,0 +1,55 @@
+=== Horde RT Diagnostic Window ===
+Probe initialisation: OK
+
+Backend: Vulkan
+RT mode: RayTracingPipeline
+Execution backend: Unsupported
+GPU name: NVIDIA GeForce RTX 5050 Laptop GPU
+Vendor ID: 4318
+Device ID: 11672
+Driver version: raw 2559295488 (vendor-specific)
+Driver properties available: yes
+Driver ID: 4
+Driver name: NVIDIA
+Driver info: 610.47
+Driver conformance version: 1.4.3.3
+Vulkan API version: 1.4.341
+VK_KHR_acceleration_structure: yes
+VK_KHR_ray_tracing_pipeline: yes
+VK_KHR_ray_query: yes
+VK_KHR_buffer_device_address: yes
+VK_KHR_deferred_host_operations: yes
+Internal render resolution: N/A
+FPS / frame time: N/A
+GPU RT command-buffer time: N/A (Not initialised)
+RT scene status: Not attempted
+RT scene geometry: Complete Horde showcase route with sequential animated skeleton and staff-lit lich
+RT scene dispatch resolution: N/A
+RT scene presented: no
+RT EVIDENCE PUBLICATION version=1
+Observer: unavailable
+Lifecycle: N/A
+Diagnostic status: unavailable
+GPU status: unavailable
+Completed frame: N/A (observer-unavailable)
+Diagnostics:
+- Inspecting candidate 1
+- Driver version: raw 2559295488 (vendor-specific)
+- Vulkan API version: 1.4.341
+- Driver properties: available
+- Optional VK_KHR_swapchain_maintenance1 advertised: yes
+- Optional VK_EXT_swapchain_maintenance1 advertised: yes
+- Optional swapchainMaintenance1 feature: yes; query only, not logical-device enablement.
+- RT capability mode: RayTracingPipeline
+- Internal render resolution: not measured yet.
+- FPS / frame time: not measured yet.
+
+
+Stored report (text): "<repo>\\build\\presets\\windows-x64-debug\\Debug\\reports\\vulkan_capability_report.txt"
+Stored report (json): "<repo>\\build\\presets\\windows-x64-debug\\Debug\\reports\\vulkan_capability_report.json"
+HORDE_PIPELINE_CACHE_CREATE attempted=1 result=0 available=1
+PBR material encoding: RGBA8 raw fallback + raw RGBA8 KTX2 lich
+RT render scale 100%: 960x540 -> 960x540
+Development static RT asset: vertexBytes=6924416, indexBytes=996108, materialBytes=2816, instanceMetadataBytes=768, primitiveMetadataBytes=384, descriptors=9, textureBytes=240473372, blasBytes=1060096, blasBuildMs=2.5677, swordBlasBytes=717696, swordBlasBuildMs=1.7506, torchBlasBytes=342400, torchBlasBuildMs=0.8171, productionPropBlasBytes=1195008, productionPropBlasBuildMs=8.1779
+Captured vertical-proof-ground -> "<repo>\\reports\\wp2-physical-acceptance-20261009\\windows-default-ground\\170-vertical-proof-ground.png"
+Captured all 1 showcase checkpoints to "<repo>\\reports\\wp2-physical-acceptance-20261009\\windows-default-ground"

@@ -305,3 +305,12 @@ Village final name/layout and supporting character names (avoid Mara); precise t
 This update preserves the owner's 11 September campaign direction and records the 30 September 1.6.2 sequencing, demo-polish and asset-reuse additions the 1 October material-depth foundation, and the 2 October grouped post-release audit, graphics-menu and measured reduced-effects plan. It implements no gameplay, changes no package/release identity, generates no assets, authorises no paid work and publishes no build.
 
 **Audio/haptic manual revalidation required: NO — documentation only; runtime and semantic inputs are unchanged.**
+
+
+## 1.7 WP0 preparation checkpoint — 9 October 2026
+
+1.6.2 is published and frozen on current main `1c28d056`; retain the technical-review and verified publication evidence above with their separate scopes. PR16's future authority is pinned at `d37f16381311c6e620f0c4a9d01c1cce83260dc8`, retained through the [reconciled master](superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md), [execution log](superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0-execution-log.md), and [source/link manifest](superpowers/plans/2026-10-09-horde-1.7-wp0-source-manifest.json). The complete [pinned future roadmap](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/ROADMAP.md) remains external; older prospective 1.6.2 prose does not restart released work.
+
+Keep WP0 → WP1 → WP2 → WP2a → WP3–WP10. Reuse implemented simulation/timestamp/input/combat/parry/equipment/two guards/theme/hearts/native touch/menu/graphics/adaptive music; residual contact is owner-accepted release debt, not permission for a WP0 patch. Genuine future scope includes real height, baseline short dodge protection, accessible teaching, unseen wall-grate Kit, same-night bidirectional screen-free rope rescue, measured forest/lookout and distant-only town. Gate6 is the later 1.8 arrival-to-tavern stress slice, after accepted 1.7. Source archive assets, dialogue banks, art references and later enemies are not automatically admitted.
+
+[One early-WP2 vertical-transform proposal](superpowers/plans/2026-10-09-horde-1.7-vertical-transform-proposal.md) is ready for owner scope review. This job stops at the WP0 documentation checkpoint. No campaign runtime slice, release, production or PR merge is authorized here.

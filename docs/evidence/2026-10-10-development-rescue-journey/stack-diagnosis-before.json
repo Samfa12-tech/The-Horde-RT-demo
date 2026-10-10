@@ -1,0 +1,27 @@
+{
+  "runtime_source_commit": "1a0205efcb423a3df527f617cf2fe48034116cb3",
+  "reproduction_test_commit": "8cc0b9a7a197293764f353ce5e4995aaae06f05a",
+  "process_exit_decimal": 3221225725,
+  "exception_hex": "0xC00000FD",
+  "local_sdk_status_name": "STATUS_STACK_OVERFLOW",
+  "msvc_debug_main_frame_bytes": 840776,
+  "observed_large_helper_frame_bytes": 181528,
+  "exe_pe_stack_reserve_bytes": 1048576,
+  "exe_pe_stack_commit_bytes": 4096,
+  "conclusion": "STATUS_STACK_OVERFLOW is consistent with measured nested fixture stack pressure. No crash call stack was captured; the exact nested failing call is not established. No runtime stack flag or acceptance change.",
+  "disassembly_raw_sha256": "c6ee3184442c50e95a7798bf06276539b48d53494dac24465e953fb0962efd95",
+  "main_prologue": [
+    "main:",
+    "  0000000000000740: push        rsi",
+    "  0000000000000742: push        rdi",
+    "  0000000000000743: mov         eax,0CD448h",
+    "  0000000000000748: call        __chkstk",
+    "  000000000000074D: sub         rsp,rax",
+    "  0000000000000750: lea         rdi,[rsp+30h]",
+    "  0000000000000755: mov         ecx,33506h",
+    "  000000000000075A: mov         eax,0CCCCCCCCh",
+    "  000000000000075F: rep stos    dword ptr [rdi]",
+    "  0000000000000761: mov         rax,qword ptr [__security_cookie]",
+    "  0000000000000768: xor         rax,rsp"
+  ]
+}

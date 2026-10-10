@@ -1,6 +1,7 @@
 #include "telemetry/CombatTimingTrace.h"
 
 #include <iostream>
+#include <cmath>
 #include <sstream>
 
 int main()
@@ -59,5 +60,51 @@ int main()
     for (const char character : output.str()) if (character == '\n') ++rows;
     pass &= check(rows == horde::telemetry::CombatTimingTrace::kMaximumRows && !reporter.HasReportable(state),
         "Diagnostic output must stop at its fixed session bound.");
+    {
+        horde::telemetry::CombatTimingTrace contacts;
+        SimulationSnapshot contactState;
+        contactState.tickIndex = 90;
+        CombatContactSample sample;
+        sample.tick = 88; sample.commandSequence = 7; sample.consumedTick = 80;
+        sample.attackId = 5; sample.phase = horde::gameplay::PlayerCombatAction::SwingActive;
+        sample.cut = horde::gameplay::PlayerAttackCut::DownwardCut;
+        sample.outcome = CombatContactOutcome::AcceptedSwordContact;
+        sample.target = EntityId::SkeletonA; sample.semanticEventSequence = 21;
+        sample.phaseSeconds = .12f; sample.hasBlade = true;
+        sample.bladeStart = {.1f,.2f,.3f}; sample.bladeEnd = {.4f,.5f,.6f};
+        sample.hasSeparation = true; sample.separationMetres = -.001f;
+        contactState.combatContactTrace.Push(sample);
+        const auto frozenContactState = contactState;
+        contactState.combatContactTrace.samples[0].targetX = 2.0f;
+        pass &= check(frozenContactState.combatContactTrace.samples[0].targetX == 0.0f &&
+            contactState.combatContactTrace.samples.size() == CombatContactTraceSnapshot::kCapacity,
+            "bounded heap-backed contact samples remain independently owned in immutable snapshot copies");
+        identity.frame.simulationTick = 89;
+        std::ostringstream contactOutput;
+        pass &= check(contacts.WriteAcceptedPresent(contactOutput,contactState,identity,2000,true)==0,
+            "contact observations cannot join the wrong owning rendered snapshot");
+        identity.frame.simulationTick = 90;
+        pass &= check(contacts.WriteAcceptedPresent(contactOutput,contactState,identity,2000,false)==0,
+            "unaccepted present never promotes contact evidence");
+        pass &= check(contacts.WriteAcceptedPresent(contactOutput,contactState,identity,2000,true)==1,
+            "a real owning present can join bounded contact history");
+        const auto contactText=contactOutput.str();
+        pass &= check(contactText.find("\"contactSampleTick\":88")!=std::string::npos &&
+            contactText.find("\"poseTick\":90")!=std::string::npos &&
+            contactText.find("\"sampleTickWasPresented\":false")!=std::string::npos &&
+            contactText.find("\"targetReactionMayReplaceContactPose\":true")!=std::string::npos &&
+            contactText.find("\"attackId\":5")!=std::string::npos &&
+            contactText.find("\"semanticEvent\":21")!=std::string::npos,
+            "catch-up preserves input/cut/contact/result identity without claiming a skipped pose was displayed");
+        contactState.combatContactTrace.Clear();
+        sample.tick = 90; sample.bladeStart[0]=NAN; sample.separationMetres=NAN;
+        contactState.combatContactTrace.Push(sample);
+        pass &= check(contacts.WriteAcceptedPresent(contactOutput,contactState,identity,2010,true)==1 &&
+            contactOutput.str().find("\"separationMetres\":null")!=std::string::npos &&
+            contactOutput.str().find("\"bladeStart\":null")!=std::string::npos,
+            "new generations retain monotonic identity and nonfinite samples remain unavailable");
+        pass &= check(contacts.WriteAcceptedPresent(contactOutput,contactState,identity,2020,true)==0,
+            "repeated present polling cannot duplicate a contact row");
+    }
     return pass ? 0 : 1;
 }

@@ -56,9 +56,26 @@ struct DevelopmentCheckpoint
     // Explicit development capture only; production encounter defaults stay unchanged.
     bool stagesWaterfallGuards = false;
     std::uint32_t waterfallGuardFixedTicks = 0u;
+    bool developmentSupportFixture = false;
+    bool developmentWorldRoute = false;
+    bool stagedWorldPreparation = false;
 };
 
-inline constexpr std::array<DevelopmentCheckpoint, 68u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 73u> kDevelopmentCheckpoints{{
+    {.id = 190, .name = "world-route", .baseShowcaseCheckpointId = 0,
+     .cameraX = 40.0f, .cameraZ = -8.0f, .yaw = 3.14159265359f, .pitch = -0.05f,
+     .developmentWorldRoute = true},
+    {.id = 191, .name = "world-route-staged", .baseShowcaseCheckpointId = 0,
+     .cameraX = 40.0f, .cameraZ = -8.0f, .yaw = 3.14159265359f, .pitch = -0.05f,
+     .developmentWorldRoute = true, .stagedWorldPreparation = true},
+    {.id = 192, .name = "rescue-journey-start", .baseShowcaseCheckpointId = 0,
+     .cameraX = 0.0f, .cameraZ = 1.85f, .yaw = 3.14159265359f, .pitch = -0.05f},
+    {.id = 170, .name = "vertical-proof-ground", .baseShowcaseCheckpointId = 0,
+     .cameraX = 0.0f, .cameraZ = 1.85f, .yaw = 0.0f, .pitch = -0.05f,
+     .developmentSupportFixture = true},
+    {.id = 171, .name = "vertical-proof-raised", .baseShowcaseCheckpointId = 0,
+     .cameraX = 0.0f, .cameraZ = 0.0f, .yaw = 0.0f, .pitch = -0.05f,
+     .developmentSupportFixture = true},
     {100, "pbr-sword-closeup", 0, 0.0f, 1.85f, 0.0f, -0.18f},
     {101, "pbr-torch-fire", 0, 0.0f, 1.85f, 0.0f, -0.14f},
     {102, "player-body-grips", 0, 0.0f, 1.85f, 0.0f, -0.32f},

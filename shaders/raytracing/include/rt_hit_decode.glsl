@@ -209,7 +209,7 @@ void materialForPrimitive(int primitive,
     }
     if (instance >= 4 && instance <= 16)
     {
-        normal = normalize(vec3(controls.cameraX, 0.75, controls.cameraZ) - p);
+        normal = normalize(vec3(controls.cameraX, 0.75 + rtHeldLight.value.playerTransform.x, controls.cameraZ) - p);
         geometricNormal = normal;
         if (instance == 4)
         {

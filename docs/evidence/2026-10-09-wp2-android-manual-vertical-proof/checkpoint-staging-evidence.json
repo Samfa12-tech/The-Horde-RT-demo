@@ -1,0 +1,23 @@
+{
+  "reported_checkpoint": "vertical-proof-ground",
+  "reported_status": "complete",
+  "captureStableFrames": 0,
+  "presented": true,
+  "executionBackend": "RayTracingPipeline",
+  "initial_staged_player": {
+    "x": 0.0,
+    "z": 1.85,
+    "yaw": 0.0,
+    "pitch": -0.05,
+    "vitality": 3,
+    "maxVitality": 3,
+    "lifePhase": "alive",
+    "damageEnabled": false
+  },
+  "renderScale": 0.5,
+  "internalExtent": {
+    "width": 720,
+    "height": 1490
+  },
+  "checkpoint_sampler": "Existing noncapture requestDebugCheckpoint calls ApplyBenchmarkCheckpoint internally, starts its finite checkpoint sampler and returns to live simulation on completion. No benchmark-run-id or capture/replay mode was combined with this launch. Native state complete was sampled before the owner report; postmanual simulation is unpaused. This is not a sustained-performance result."
+}

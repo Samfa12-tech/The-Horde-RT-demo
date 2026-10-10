@@ -1,0 +1,9 @@
+{
+  "report_relative_links_checked": 12,
+  "raw_log_hashes_verified": 30,
+  "source_paths_verified": 45,
+  "input_pointer_and_lfs_identities_verified": true,
+  "historical_preservation": true,
+  "status_claims_match_unresolved_shader_gate": true,
+  "report_sha256": "cc4424b3da58af8e44be6e2d7341f7861baced37489911b522e47d78a624ca4c"
+}

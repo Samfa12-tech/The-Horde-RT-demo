@@ -481,6 +481,7 @@ enum class LichPhase
     Charging,
     Recovering,
     Dead,
+    Repelling,
 };
 
 enum class KeeperRevealPhase : std::uint8_t
@@ -526,6 +527,7 @@ struct LichSnapshot
     float finaleDawnRevealProgress = 0.0f;
     int health = 3;
     bool damagePulse = false;
+    bool dischargeWarningPulse = false;
     bool hitPulse = false;
     bool deathAnimationComplete = false;
     FinaleEndingPhase finaleEndingPhase = FinaleEndingPhase::Inactive;
@@ -534,6 +536,7 @@ struct LichSnapshot
 class LichEncounter
 {
 public:
+    void SetReadableCombat(bool enabled) { readableCombat_ = enabled; }
     LichEncounter() { Reset(); }
 
     const LichSnapshot& Update(float deltaSeconds, float playerX, float playerZ,
@@ -542,6 +545,7 @@ public:
     {
         deltaSeconds = std::clamp(deltaSeconds, 0.0f, 0.05f);
         snapshot_.damagePulse = false;
+        snapshot_.dischargeWarningPulse = false;
         snapshot_.hitCooldownRemaining = std::max(0.0f, snapshot_.hitCooldownRemaining - deltaSeconds);
         hitPulseTime_ = std::max(0.0f, hitPulseTime_ - deltaSeconds);
         snapshot_.hitPulse = hitPulseTime_ > 0.0f;
@@ -618,6 +622,15 @@ public:
 
         switch (snapshot_.phase)
         {
+        case LichPhase::Repelling:
+            snapshot_.staffLightStrength = kStaffLightStart;
+            if (snapshot_.phaseTime + 0.00001f >= kRepelDuration)
+            {
+                snapshot_.phase = LichPhase::Charging;
+                snapshot_.phaseTime = 0.0f;
+                dischargeWarningEmitted_ = false;
+            }
+            break;
         case LichPhase::MaintainingRange:
             snapshot_.staffLightStrength = 0.0f;
             if (snapshot_.phaseTime >= kMinimumRepositionDuration &&
@@ -626,6 +639,7 @@ public:
                 snapshot_.phase = LichPhase::Charging;
                 snapshot_.phaseTime = 0.0f;
                 snapshot_.staffLightStrength = kStaffLightStart;
+                dischargeWarningEmitted_ = false;
             }
             break;
         case LichPhase::Charging:
@@ -633,6 +647,12 @@ public:
             const float charge = std::clamp(snapshot_.phaseTime / kChargeDuration, 0.0f, 1.0f);
             snapshot_.staffLightStrength = kStaffLightStart +
                                            (kStaffLightPeak - kStaffLightStart) * charge;
+            if (readableCombat_ && !legacyCapture_ && !dischargeWarningEmitted_ &&
+                snapshot_.phaseTime + 0.00001f >= kChargeDuration - kDischargeWarningLead)
+            {
+                snapshot_.dischargeWarningPulse = true;
+                dischargeWarningEmitted_ = true;
+            }
             if (snapshot_.phaseTime + 0.00001f >= kChargeDuration)
             {
                 snapshot_.damagePulse = staffHasLineOfSight && distance <= kAttackRange;
@@ -682,6 +702,17 @@ public:
         {
             BeginDeath();
         }
+        else if (readableCombat_ && !legacyCapture_)
+        {
+            // Interrupt an old cast on each accepted nonfatal hit. The owner
+            // resolves bounded knockback; this phase never carries pulse damage.
+            snapshot_.phase = LichPhase::Repelling;
+            snapshot_.phaseTime = 0.0f;
+            snapshot_.damagePulse = false;
+            snapshot_.dischargeWarningPulse = false;
+            dischargeWarningEmitted_ = false;
+            snapshot_.staffLightStrength = kStaffLightStart;
+        }
         return true;
     }
 
@@ -696,6 +727,7 @@ public:
         hitRecoilTime_ = 0.0f;
         combatTime_ = 0.0f;
         legacyCapture_ = false;
+        dischargeWarningEmitted_ = false;
     }
 
     // Authored deterministic captures deliberately bypass the live reveal and
@@ -729,6 +761,9 @@ public:
     const LichSnapshot& Snapshot() const { return snapshot_; }
 
     static constexpr float kChargeDuration = 1.20f;
+    static constexpr float kRepelDuration = 0.30f;
+    static constexpr float kRepelDistance = 1.00f;
+    static constexpr float kDischargeWarningLead = 0.30f;
     static constexpr float kRecoveryDuration = 1.80f;
     static constexpr float kDeathAnimationDuration = 2.967f;
     static constexpr float kFinaleSkylightOpenDuration =
@@ -749,6 +784,8 @@ public:
     static constexpr float kRevealRise = 0.25f;
 
 private:
+    bool readableCombat_ = false;
+    bool dischargeWarningEmitted_ = false;
     static float SmoothStep(float value)
     {
         value = std::clamp(value, 0.0f, 1.0f);
@@ -820,6 +857,8 @@ private:
         snapshot_.animationTime = 0.0f;
         snapshot_.staffLightStrength = 0.0f;
         snapshot_.damagePulse = false;
+        snapshot_.dischargeWarningPulse = false;
+        dischargeWarningEmitted_ = false;
         snapshot_.deathAnimationComplete = false;
         snapshot_.finaleSkylightOpenProgress = 0.0f;
         snapshot_.finaleDawnRevealProgress = 0.0f;

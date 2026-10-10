@@ -2759,3 +2759,72 @@ Both real hardware RT backends pass short waterfall-equipment and torch-drench s
 Ordinary portrait Entry/Settings/Graphics/details/preview/choices/scrolling/Back at font scale1.7, Controls/Credits/unchecked report-consent routes pass without saving settings, preparing or sending reports. A separate landscape Entry/Settings/Graphics/details/live-preview/Back check runs with system reduced motion active. Real initial loading and Home/re-entry are captured; Home return presents a new portrait surface generation3. Original free rotation/animator scale1 and all app preferences are restored, and the owned app stops. Opposite landscape and BB-51 comfort remain owner-reported on their original exact builds with runtime continuity established; this automated leg does not relabel them as new physical acceptance.
 
 Evidence class: exact local Debug installation, actual RT frame/readback ledger and bounded ordinary native UI/lifecycle observation. No sustained30FPS, thermal/power/memory, controller latency, untested hardware or owner-audio claim follows. Current source is runtime-identical to owner-accepted `ac97da91`; the long sustained programme and precise contact correction are explicitly owner-deferred. [Public receipts, selected actual images, failures and audit limits](ENGINEERING_1_6_2_FINAL_REVIEW_2026_10_09.md).
+
+
+## 9 October WP2 height proof — partial exact-candidate physical attempt
+
+SM-S948B / Android16 API36 / Adreno840, Vulkan1.4.295 driver raw2150932499
+(compilerE031.50.19.18). Source/generated candidate
+`0eb665900c9efc95c443beada4c418776092cbe3`; exact Debug APK and installed
+pullback SHA-256
+`1bd0611a6a25030c7025e49e181e186aff441a1e4f8ef52081afa5532bd4886c`.
+Read-only inventory identified the existing release; the owner approved adding
+the separate `.debug` package with separate development certificate/data.
+The release APK rehash remains unchanged. No uninstall/downgrade/data clear
+or signature bypass occurred.
+
+Ordinary no-fixture EntryMenu reports actual Pipeline Diagnostic/Mobile
+completed-frame dispatch/copy/successful presentation (serial29), with exact
+fresh catalogue pair hashes. Evidence class: exact installed local Debug bytes
+and native completed/presented-frame diagnostics only. Candidate foreground
+was not safely verified for a phone screenshot; visual acceptance is NOT RUN.
+The bounded pass stopped at Windows foreground/input access before continuous
+vertical traversal, Query, equipment/event-height and lifecycle checks.
+Full vertical DEVICE-VERIFIED remains NO; owner listening/haptics PENDING.
+No sustained performance, matched legacy-route, other backend or other-device
+acceptance follows. [Partial receipt and control blocker](superpowers/plans/2026-10-09-horde-1.7-wp2-physical-acceptance-attempt.md).
+
+
+### 9 October WP2 — owner-operated Android Pipeline ramp proof
+
+Same authorised SM-S948B/Android16 API36 and exact installed Debug APK
+`1bd0611a6a25030c7025e49e181e186aff441a1e4f8ef52081afa5532bd4886c`,
+source/generated candidate `0eb665900c9efc95c443beada4c418776092cbe3`.
+No reinstall. Existing noncapture vertical-proof-ground launch followed owner
+unlock/foreground response; current-focus and resumed-activity verification
+passed before capture. Pipeline Diagnostic/Mobile genuine completed/presented
+frames and inspected game-only stills are current technical evidence.
+56 selected feedback records transport listener-eye Y0.70 through ramp values
+to1.05. The owner separately reports up/back ramp traversal works, equipment
+remains attached with roof compensation, Swing/Parry are fine, and sound and
+vibration are normal. Immediate height snap at the step/edge, with no gravity,
+is retained as an observed fixture limitation; no source change followed.
+
+Evidence class: exact physical candidate native frame/event evidence plus direct
+owner-operated short portrait manual report. Scoped Android Pipeline check passes
+with the step-snap limitation. Full vertical DEVICE-VERIFIED remains NO: Windows,
+Query, lifecycle/rotation/recovery, all gear/secondary contributors and delayed
+fall/cancellation gates remain pending. Short Swing/Parry listening/haptic report
+does not certify those broader gates. [Manual report and separate evidence classes](superpowers/plans/2026-10-09-horde-1.7-wp2-android-manual-vertical-proof.md).
+
+
+### 9 October WP2 continuation - bounded Android Query presentation
+
+Same authorized SM-S948B / Android16 API36, exact installed Debug APK
+`1bd0611a6a25030c7025e49e181e186aff441a1e4f8ef52081afa5532bd4886c`,
+source/generated candidate `0eb665900c9efc95c443beada4c418776092cbe3`.
+Read-only package hashing confirms the separate release is unchanged; no reinstall.
+The supported explicit Query live-ground launch is followed by fresh current-focus
+and resumed-activity guards and post-launch native report timestamps. Query
+completion/presentation serial10606 joins true RT dispatch/copy/presentation,
+matching package/catalog Diagnostic/Mobile modules and actual BLAS/TLAS resources.
+
+Evidence class: exact local installed Debug bytes and current native hardware
+Query completed/presented-frame diagnostics only. No input, screenshot, manual
+Query traversal, owner listening or lifecycle acceptance occurred. The existing
+Pipeline owner ramp/attachment/roof and short normal Swing/Parry sound/vibration
+report remains preserved, including instant step-height snap. Windows raised
+static capture fails its arm-pixel gate twice and is stopped for review. Owner
+absence is not acceptance; manual and lifecycle gates need his return. Full
+DEVICE-VERIFIED remains NO. No other device or sustained-performance claim.
+[Continuation report and exact evidence](superpowers/plans/2026-10-09-horde-1.7-wp2-acceptance-continuation.md).

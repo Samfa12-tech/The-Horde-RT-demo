@@ -1,0 +1,245 @@
+{
+  "start_commit": "3b8ab9f6e4bb0ae8a0d57a5765ed0cbc947b5dfe",
+  "runtime_candidate_commit": "d85a3cd1246e22c91d166eb3e43b90112d121cb0",
+  "test_supplement_commit": "fbf7db6b10c6137c2697b66ae08f9279fc8511cd",
+  "test_only_supplement": true,
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "changed_paths": [
+    {
+      "path": "CMakeLists.txt",
+      "git_blob": "ca7886ed69338ac8d37400a30d50f27ecb07fb70",
+      "working_file_sha256": "4a21945cc8a2b73286148eb1f3cee7ac775f384d715b0476b8f8cd70f84ea653",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/fbf7db6b10c6137c2697b66ae08f9279fc8511cd/CMakeLists.txt"
+    },
+    {
+      "path": "android/app/src/main/cpp/android_probe_bridge.cpp",
+      "git_blob": "8ef85086b13c68c93209d0228780aa4775498194",
+      "working_file_sha256": "bef580f731eccb801058cdb49b2dd230022f70ced69291c1860a89df5fe22a23",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/fbf7db6b10c6137c2697b66ae08f9279fc8511cd/android/app/src/main/cpp/android_probe_bridge.cpp"
+    },
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/AndroidControllerInput.java",
+      "git_blob": "c8e761d09de32afd16c53b02cb404d692d80562e",
+      "working_file_sha256": "35e5f2cf90636bfb99584b8a60a52ddc2c228ac53d9064a3c3047c70ad0340f9",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/fbf7db6b10c6137c2697b66ae08f9279fc8511cd/android/app/src/main/java/com/samfa12/hordelanternrt/AndroidControllerInput.java"
+    },
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java",
+      "git_blob": "be643efd255e41bdd5b9b6c68758b8bb06e5c3ac",
+      "working_file_sha256": "b7a330e1701ea16df8d7fdd4c77807fbeb854db801a8ea9252fd64b0ff6e55de",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/fbf7db6b10c6137c2697b66ae08f9279fc8511cd/android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java"
+    },
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/ProbeBridge.java",
+      "git_blob": "c85c3e9a45c8b5e0131a76d05cf9ef23b4b5ed97",
+      "working_file_sha256": "e59e35a1cd526ca18aca7bb0bbb2d85a099cd9c34407df1d48755cd504ca4d9f",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/fbf7db6b10c6137c2697b66ae08f9279fc8511cd/android/app/src/main/java/com/samfa12/hordelanternrt/ProbeBridge.java"
+    },
+    {
+      "path": "android/app/src/main/res/layout/activity_main.xml",
+      "git_blob": "f24ed12400207c5208ddff212220fb4931e82533",
+      "working_file_sha256": "426c06dfd47bce932f4d317e3633665565b2f891da9868909a25ce5e725c27f2",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/fbf7db6b10c6137c2697b66ae08f9279fc8511cd/android/app/src/main/res/layout/activity_main.xml"
+    },
+    {
+      "path": "android/app/src/main/res/values/strings.xml",
+      "git_blob": "519093c1fc659ea2b6ea4658af20142b1e2ef42a",
+      "working_file_sha256": "dda0be29cf7ac5169405b3c5294b01a8034c179b51a49b2b0ea6350e23c255bc",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/fbf7db6b10c6137c2697b66ae08f9279fc8511cd/android/app/src/main/res/values/strings.xml"
+    },
+    {
+      "path": "android/app/src/test/java/com/samfa12/hordelanternrt/AndroidControllerInputTest.java",
+      "git_blob": "de57be3c956ef694b40e88664eaf41c716333fad",
+      "working_file_sha256": "e8364e5af84e44f10f733f69b05e1a3d85bb3a3db65deb8cf50984e7e8bb1e28",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/fbf7db6b10c6137c2697b66ae08f9279fc8511cd/android/app/src/test/java/com/samfa12/hordelanternrt/AndroidControllerInputTest.java"
+    },
+    {
+      "path": "android/app/src/test/java/com/samfa12/hordelanternrt/AndroidControllerIntegrationTest.java",
+      "git_blob": "1b46211bda68fd73f5b526f221bdc944085d71a7",
+      "working_file_sha256": "48629b5532889132af21430ca3a8c23450805625cc2d11a3f78b4d5a13815b58",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/fbf7db6b10c6137c2697b66ae08f9279fc8511cd/android/app/src/test/java/com/samfa12/hordelanternrt/AndroidControllerIntegrationTest.java"
+    },
+    {
+      "path": "android/app/src/test/java/com/samfa12/hordelanternrt/GameplayTouchCancellationTest.java",
+      "git_blob": "4e2b69260f3bb0a869359d6eabba33b69488829e",
+      "working_file_sha256": "687ef4b2c8628091232c1882e0a7cf33537362f5cbf1a1c1faeaac6bd972e3d6",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/fbf7db6b10c6137c2697b66ae08f9279fc8511cd/android/app/src/test/java/com/samfa12/hordelanternrt/GameplayTouchCancellationTest.java"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-10-09-horde-1.7-wp2-movement-disposition.md",
+      "git_blob": "29c924095da7ac0820d0da5c2c61d32922f1f0e0",
+      "working_file_sha256": "cb6ed755d719849f7581746b4fbae1976d0d3856a281cf528c35d23c6504afb2",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/fbf7db6b10c6137c2697b66ae08f9279fc8511cd/docs/superpowers/plans/2026-10-09-horde-1.7-wp2-movement-disposition.md"
+    },
+    {
+      "path": "src/gameplay/DevelopmentCheckpointSimulation.h",
+      "git_blob": "94cf687361174efd50de882ce2807045043416b8",
+      "working_file_sha256": "fc0682d976b040686b4ae934d773d10bdbb0a362167da6872627a4839fb0499a",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/fbf7db6b10c6137c2697b66ae08f9279fc8511cd/src/gameplay/DevelopmentCheckpointSimulation.h"
+    },
+    {
+      "path": "src/gameplay/DevelopmentCheckpoints.h",
+      "git_blob": "ded316b0029dcdbce03dfef525c085aaf2d7af6d",
+      "working_file_sha256": "b0435a9cb855b453aff5761c646763c118f2af7d9d2ca93a5de942a839a8b139",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/fbf7db6b10c6137c2697b66ae08f9279fc8511cd/src/gameplay/DevelopmentCheckpoints.h"
+    },
+    {
+      "path": "src/gameplay/items/HeldItemKinematics.cpp",
+      "git_blob": "ab425d65a13b58afe94549e40b78750b582e0dad",
+      "working_file_sha256": "a5e565e0a2d02016305c84937ec32343be364ee9b3a76d326c0c4e48e4ad2780",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/fbf7db6b10c6137c2697b66ae08f9279fc8511cd/src/gameplay/items/HeldItemKinematics.cpp"
+    },
+    {
+      "path": "src/gameplay/items/HeldItemKinematics.h",
+      "git_blob": "90ef929ffe4d98f6424cab70f5aaf630779c164c",
+      "working_file_sha256": "108c6b1016086b8613b7a26402becf9421ecccde014db87e2e16a3da1d369579",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/fbf7db6b10c6137c2697b66ae08f9279fc8511cd/src/gameplay/items/HeldItemKinematics.h"
+    },
+    {
+      "path": "src/gameplay/simulation/DevelopmentSupportFixture.h",
+      "git_blob": "f334d1ec384cfa055106d3d2ca9d764c9d643dd5",
+      "working_file_sha256": "406ed690aaef8c0f568e3510215aca597850fd37e752e030f0249b9a51661f9f",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/fbf7db6b10c6137c2697b66ae08f9279fc8511cd/src/gameplay/simulation/DevelopmentSupportFixture.h"
+    },
+    {
+      "path": "src/gameplay/simulation/DevelopmentWorldRoute.h",
+      "git_blob": "6e0a09c2e7c2fe5bc08732c2453614c702cb0d2c",
+      "working_file_sha256": "81f70d8044332e13b168f206f07cec4def8d450acd88e4bb27242c5ea0a220d9",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/fbf7db6b10c6137c2697b66ae08f9279fc8511cd/src/gameplay/simulation/DevelopmentWorldRoute.h"
+    },
+    {
+      "path": "src/gameplay/simulation/GameSimulation.cpp",
+      "git_blob": "705cc76c423ed0bf0e6213f19b3dd68035738cc9",
+      "working_file_sha256": "fcd98774498a4c7a40e9cddc0a1a7ec998d8c6a1dabe46982e00a44e9c7baac1",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/fbf7db6b10c6137c2697b66ae08f9279fc8511cd/src/gameplay/simulation/GameSimulation.cpp"
+    },
+    {
+      "path": "src/gameplay/simulation/GameSimulation.h",
+      "git_blob": "3cb9e32f6aab0d1d4b8045333f335e7df69086ad",
+      "working_file_sha256": "96396f976481578c5a087df8e68f10eb183f1c56361d79d0276ef122966753eb",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/fbf7db6b10c6137c2697b66ae08f9279fc8511cd/src/gameplay/simulation/GameSimulation.h"
+    },
+    {
+      "path": "src/gameplay/simulation/InputSnapshot.h",
+      "git_blob": "0831a293c4f01cc3d6f7a3edbf7c5cabb446ecea",
+      "working_file_sha256": "7f9729d70f97540df51ad34d2f3a681773b587ba68ced5092436f77c7cef275f",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/fbf7db6b10c6137c2697b66ae08f9279fc8511cd/src/gameplay/simulation/InputSnapshot.h"
+    },
+    {
+      "path": "src/gameplay/simulation/SimulationSnapshot.h",
+      "git_blob": "85817f45afa9178acc0c046d91eef50a84026c5b",
+      "working_file_sha256": "397f8555cd004e5f41aa3ff58cfa2043bd03a7e9516c8653a9b570d580f49913",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/fbf7db6b10c6137c2697b66ae08f9279fc8511cd/src/gameplay/simulation/SimulationSnapshot.h"
+    },
+    {
+      "path": "src/gameplay/validation/MotionEvidenceScenario.cpp",
+      "git_blob": "bc2e33e6717e15c8719e292fc4645cb15b31d057",
+      "working_file_sha256": "de814c9b2b50f7781b3e52b48219ef68f6ab46ca033a2c0aa876093d5774501c",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/fbf7db6b10c6137c2697b66ae08f9279fc8511cd/src/gameplay/validation/MotionEvidenceScenario.cpp"
+    },
+    {
+      "path": "src/gameplay/validation/MotionEvidenceScenario.h",
+      "git_blob": "30d21d7a2df61539c5d566f430c0bc9433162a76",
+      "working_file_sha256": "b4f72bda4511927f186f54582c8c7c17d01ddee103960a566bfc35d9fa02fa99",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/fbf7db6b10c6137c2697b66ae08f9279fc8511cd/src/gameplay/validation/MotionEvidenceScenario.h"
+    },
+    {
+      "path": "src/platform/windows/DiagnosticWindow.cpp",
+      "git_blob": "6df9f15b3882bc4231becef01143acc1fa9a4776",
+      "working_file_sha256": "f61c53195506f2f5508c557913b6f6134cbe8548b4d3fdc8e516f0d3d87fef68",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/fbf7db6b10c6137c2697b66ae08f9279fc8511cd/src/platform/windows/DiagnosticWindow.cpp"
+    },
+    {
+      "path": "src/platform/windows/WindowsCaptureContracts.h",
+      "git_blob": "f82d236b4dcbb916de49a287ced6529e2dfbab95",
+      "working_file_sha256": "d09e944c88fbc7253506eea2b8e3172d399bd6f8ab1e1f160160ce73987329ab",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/fbf7db6b10c6137c2697b66ae08f9279fc8511cd/src/platform/windows/WindowsCaptureContracts.h"
+    },
+    {
+      "path": "src/scene/DevelopmentWorldGeometry.h",
+      "git_blob": "7b28581e2deb11cfc5f44128e3943f4ddfc2375d",
+      "working_file_sha256": "e890a1c5a6e96e335a935b722bcb734cf1d080bb5f9761fa821445d385791181",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/fbf7db6b10c6137c2697b66ae08f9279fc8511cd/src/scene/DevelopmentWorldGeometry.h"
+    },
+    {
+      "path": "src/vulkan/raytracing/DevelopmentWorldSceneAdapter.h",
+      "git_blob": "6bb72a921bbf149a28962103f6e60756d4836869",
+      "working_file_sha256": "a7427c28be066ec6960e4f248c44ad33236268e2fe92781940a15f4dca861b44",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/fbf7db6b10c6137c2697b66ae08f9279fc8511cd/src/vulkan/raytracing/DevelopmentWorldSceneAdapter.h"
+    },
+    {
+      "path": "src/vulkan/raytracing/PresentableTinyRtScene.cpp",
+      "git_blob": "f07a5b708d408231304a2a87ca30a5a613a77cf7",
+      "working_file_sha256": "fef02b7b676288381fb13a4b73deacaff1df31f5a51f4540b6f5ab74ae770598",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/fbf7db6b10c6137c2697b66ae08f9279fc8511cd/src/vulkan/raytracing/PresentableTinyRtScene.cpp"
+    },
+    {
+      "path": "src/vulkan/raytracing/PresentableTinyRtScene.h",
+      "git_blob": "113f31a10d081fc16abe3a28fac36ca930556015",
+      "working_file_sha256": "4d8f14e053aa99e5fca0d65e7fc585f512e52b33184946521e56c5af7a6bc812",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/fbf7db6b10c6137c2697b66ae08f9279fc8511cd/src/vulkan/raytracing/PresentableTinyRtScene.h"
+    },
+    {
+      "path": "tests/AndroidMotionEvidencePolicyTests.cpp",
+      "git_blob": "274419a7a4476f1246915ef5612c229340e84f16",
+      "working_file_sha256": "36fd2614aaa21d910dcddad3074828d2e56343be60e5d5e797fbe7111db7c336",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/fbf7db6b10c6137c2697b66ae08f9279fc8511cd/tests/AndroidMotionEvidencePolicyTests.cpp"
+    },
+    {
+      "path": "tests/DevelopmentStaticAssetTests.cpp",
+      "git_blob": "ad33bf25cb0ac59749eabf57fcf57895afbe6478",
+      "working_file_sha256": "7229b67cdf7aecfc279bf12cf78fdddebb8fa7ddd415dc9764e1298fd92087d3",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/fbf7db6b10c6137c2697b66ae08f9279fc8511cd/tests/DevelopmentStaticAssetTests.cpp"
+    },
+    {
+      "path": "tests/InputMailboxStress.cpp",
+      "git_blob": "27117c33d13a234d7e262406f19ed4b44b4541e2",
+      "working_file_sha256": "ce08c3a12b03d61c215c0262c4bef0c916c36efb6124a2aece444786c2183e45",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/fbf7db6b10c6137c2697b66ae08f9279fc8511cd/tests/InputMailboxStress.cpp"
+    },
+    {
+      "path": "tests/PlayerDirectionalRigTests.cpp",
+      "git_blob": "71ad0e44c35b524aa99135c27b3f5f9b0ab59157",
+      "working_file_sha256": "053b274b601b2cc59b7d5169c49ef918778fbbb13dcd3cbd5c0e5df25cb3113d",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/fbf7db6b10c6137c2697b66ae08f9279fc8511cd/tests/PlayerDirectionalRigTests.cpp"
+    },
+    {
+      "path": "tests/SimulationGameplayTests.cpp",
+      "git_blob": "a2dd65179670ec6d1b087005923d03c97d89d44a",
+      "working_file_sha256": "45dbc1e332c1a1f4e23abb229ec2cb073c33007cd1272dcfbb246231b90feb5e",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/fbf7db6b10c6137c2697b66ae08f9279fc8511cd/tests/SimulationGameplayTests.cpp"
+    },
+    {
+      "path": "tests/WorldRouteFoundationTests.cpp",
+      "git_blob": "3d5783d8cc836757e6a9396e87456bf8d310a1d7",
+      "working_file_sha256": "f48db9b495512af69fb059552bbb013d85c0a0b67abe3f0dab44b15f224c84f8",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/fbf7db6b10c6137c2697b66ae08f9279fc8511cd/tests/WorldRouteFoundationTests.cpp"
+    }
+  ],
+  "protected_paths_unchanged": [
+    "assets",
+    "shaders",
+    "src/shaders",
+    "src/vulkan/raytracing/RtSceneAbi.def",
+    "tools/raygen-variant-budgets.json",
+    "tools/raygen-variant-catalog.json",
+    "tools/rayquery-variant-catalog.json",
+    "tests/FinalHeldTorchClearanceTests.cpp",
+    "docs/AGENT_ENGINE_CONTRACTS.md",
+    "docs/AGENT_VALIDATION.md",
+    "ASSET_LICENSES.md",
+    "README.md",
+    "release"
+  ],
+  "toolchain": {
+    "windows": "Visual Studio 2022 BuildTools MSVC 19.44.35227.0; existing windows-x64-debug/release presets",
+    "powershell": "registered PowerShell 7.6.6",
+    "java": "Eclipse Adoptium JDK 21.0.11",
+    "android": "Gradle 8.11.1 / Android SDK 34 / NDK 26.1.10909125, offline; HORDE_VALIDATION_UNSIGNED=1"
+  },
+  "harness_sha256": {
+    "run.py": "29a0d0fd3e595b1028242bc4354e99f55651411362c91eefff8cd2793bc84557",
+    "native_lane.py": "83526194df7268070ec8cdab8895dd332397c1ef6cc1974f6b1c282066114f7e",
+    "android-all-abi-package-check.ps1": "fa0263fe284a8450ad4b5e305937e503568d8110f4d09e7b88cde23d25a24165"
+  }
+}

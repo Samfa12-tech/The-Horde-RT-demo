@@ -1,0 +1,25 @@
+{
+  "starting_head": "876e47e867361f59e81486f33d5482d16089ae9e",
+  "starting_remote": "876e47e867361f59e81486f33d5482d16089ae9e",
+  "candidate_source_commit": "0eb665900c9efc95c443beada4c418776092cbe3",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "working_directory": "<repo>",
+  "source_change_paths": [
+    "src/vulkan/raytracing/RtPipelineVariantCatalog.generated.h",
+    "src/vulkan/raytracing/variants/diagnostic_high_generic_dielectric.inc",
+    "src/vulkan/raytracing/variants/diagnostic_high_opaque_fast.inc",
+    "src/vulkan/raytracing/variants/diagnostic_mobile_generic_dielectric.inc",
+    "src/vulkan/raytracing/variants/diagnostic_mobile_opaque_fast.inc",
+    "src/vulkan/raytracing/variants/shipping_high_generic_dielectric.inc",
+    "src/vulkan/raytracing/variants/shipping_high_opaque_fast.inc",
+    "src/vulkan/raytracing/variants/shipping_mobile_generic_dielectric.inc",
+    "src/vulkan/raytracing/variants/shipping_mobile_opaque_fast.inc",
+    "tests/RaygenVariantArtifactTests.ps1",
+    "tools/raygen-variant-budgets.json",
+    "tools/raygen-variant-catalog.json"
+  ],
+  "protected_source_abi_gameplay_shader_unchanged": true,
+  "no_archived_prototype_integration": true,
+  "primary_checkout_ref": "c3c15d3243492c8338e37ce8312b14e62e118a0b",
+  "unrelated_work": "Primary modified licence/memory state and untracked work preserved; no writes to other worktrees. Readiness and diagnostic worktrees preserved. No reset, clean, stash, merge, rebase, force-push or PR."
+}

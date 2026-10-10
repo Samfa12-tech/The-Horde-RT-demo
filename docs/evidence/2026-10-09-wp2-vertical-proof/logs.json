@@ -1,0 +1,152 @@
+[
+  {
+    "path": "abi-generation.log",
+    "sha256": "47cc5a9aacf5136ec4254dcdecff07df237075b9436acf5431805ba9c1873222",
+    "bytes": 109
+  },
+  {
+    "path": "affected-debug.log",
+    "sha256": "6a4bc0b6210dc0589bd27954c089e7b6ab898bbed5d1e4426a841e932b2d5fee",
+    "bytes": 3300
+  },
+  {
+    "path": "affected-release.log",
+    "sha256": "8dd7fb19281a5e4544defc4f62b072dbafc6a8f9001a3d1d0d24dd7e172ac18f",
+    "bytes": 3302
+  },
+  {
+    "path": "android-debug.log",
+    "sha256": "6c592c96aa9787eaddd51c2b0ebcbf24f8e6587b86ce2397fcd5577121ac319b",
+    "bytes": 3806
+  },
+  {
+    "path": "android-final-hydrated.log",
+    "sha256": "8dc9a84d2c92d0597e662716df625f14b81b6618ffd8702b807090e120951839",
+    "bytes": 6550
+  },
+  {
+    "path": "android-final.log",
+    "sha256": "f583c90fd0c283987608189bd7afcf9d49fb83fe6262648f8aae5482b734d0be",
+    "bytes": 6052
+  },
+  {
+    "path": "android-identities.log",
+    "sha256": "2249fe7f344fdb3c347993fb7a9d11b94798a4973c42efba82c137eb6294932a",
+    "bytes": 4984
+  },
+  {
+    "path": "build-debug-affected.log",
+    "sha256": "4c706cfc4409da3a9b30ba219aa8c67812beddbb06960607fcc960be3df019e8",
+    "bytes": 21370
+  },
+  {
+    "path": "build-debug-final.log",
+    "sha256": "b05fd67049b1774e701048026e2092d1b6894623941bbda91479ecc3a28beb4f",
+    "bytes": 4795
+  },
+  {
+    "path": "build-debug-identities.log",
+    "sha256": "e41a0b5ffd47b82526091c1ee0b483192aa7c33a7b088d43e31f895cb5d7c58a",
+    "bytes": 1890
+  },
+  {
+    "path": "build-debug-initial.log",
+    "sha256": "4a5d302ebe1447918e60b155771997150a5a2152515d3f65404a6814530270a6",
+    "bytes": 5140
+  },
+  {
+    "path": "build-debug-proof.log",
+    "sha256": "8c38d86e4433c8ea8c2b84da51c221c6478f23d2936d82ad7b2c0d55b8dde273",
+    "bytes": 3378
+  },
+  {
+    "path": "build-release-affected.log",
+    "sha256": "70bcf47c0648a99ebc5fdeea4000efaa5a9cb72343ed127e1d119db9b720ac73",
+    "bytes": 21486
+  },
+  {
+    "path": "build-release-final.log",
+    "sha256": "370c93b61bb63f2ef8be77a328c1c5e85e2c1a9b499b76768affaf90a337f8b1",
+    "bytes": 14966
+  },
+  {
+    "path": "build-release-identities.log",
+    "sha256": "eddac568f89bf2df647e8fbd2d592436c492675cd495e28c2eb92704c24dc39a",
+    "bytes": 1926
+  },
+  {
+    "path": "configure-debug.log",
+    "sha256": "4a872070ab6e7b507923185274e1fe0c3b15cf8dbce2da10593ad513e30bdc50",
+    "bytes": 1494
+  },
+  {
+    "path": "configure-release.log",
+    "sha256": "18c2615746d1a60f041e52be5557fa90b42a5352332326a453eab07355dcef7a",
+    "bytes": 1474
+  },
+  {
+    "path": "proof-debug-final.log",
+    "sha256": "f0a03b36e9126293b40172877c17cdb0e058e4def4c9088e3feace0d732017b4",
+    "bytes": 3556
+  },
+  {
+    "path": "proof-debug-first.log",
+    "sha256": "08c2a5085b7ac583140747e8ae7051e9aa61398402e20900f9519999581c3952",
+    "bytes": 485
+  },
+  {
+    "path": "rayquery-freshness-final.log",
+    "sha256": "18c6b8d8d38e74f54762960f6df3569ce851a629cd1ca67a7eb7f7bbde65fa2d",
+    "bytes": 340
+  },
+  {
+    "path": "rayquery-generation.log",
+    "sha256": "9674fe55fe6e49a129ad7c5daef59cddd9a0cc87398907d2fb41ae83768a7d0d",
+    "bytes": 1867
+  },
+  {
+    "path": "rayquery-pwsh-generation.log",
+    "sha256": "4f91591e35f9c82a4e9277188fee2bdadcc480b0720bdd3a34583207ec01fac9",
+    "bytes": 1875
+  },
+  {
+    "path": "resource-identities-debug.log",
+    "sha256": "444f3f11bb9a5529f47d5e89f1182871bfbed64029d8e3f96efb2430b048978e",
+    "bytes": 344
+  },
+  {
+    "path": "resource-identities-release.log",
+    "sha256": "e8f104bde3d2c366a296354143eea0b28236ce1d50e63bd7bc3f3cd12ed08511",
+    "bytes": 346
+  },
+  {
+    "path": "shader-compat-generation.log",
+    "sha256": "55c71f1c21f0412886b99c8b9cd4a88e0a9899c3bfbef19f225e0172d118aeb5",
+    "bytes": 1466
+  },
+  {
+    "path": "shader-contracts-reconciled.log",
+    "sha256": "8c1b89f0002d341d40baa5f0de85c7f34e781cecc9d8a7a6a42c1fd4ccec0440",
+    "bytes": 5993
+  },
+  {
+    "path": "shader-contracts.log",
+    "sha256": "e483bcf0fa139c85569e1d25a29cc92099f52b4799f81b1d28b7018a2da3ff7c",
+    "bytes": 3907
+  },
+  {
+    "path": "shader-freeze-failure.txt",
+    "sha256": "bcc82765dff4bb4fa7c796fee808b71037bb38e9822cd27a67fc8571ea5befe7",
+    "bytes": 428
+  },
+  {
+    "path": "shader-freeze.log",
+    "sha256": "e58174ffaeb820042791ec3b87616cc6fb82967173eaa54ff6d27343c1c4d5f1",
+    "bytes": 2648
+  },
+  {
+    "path": "torch-debug-full.log",
+    "sha256": "0789075560a76fdf6fc4ad813ddf8b23f67730d437508f70625866fa89c2ae65",
+    "bytes": 2186
+  }
+]

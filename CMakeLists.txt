@@ -140,7 +140,7 @@ set(HORDE_RT_SOURCE_FILES)
 foreach(source IN LISTS HORDE_RT_CORE_RELATIVE_SOURCES)
     list(APPEND HORDE_RT_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/${source}")
 endforeach()
-list(FILTER HORDE_RT_SOURCE_FILES EXCLUDE REGEX "/(audio/(AmbiencePcmLoop|MusicDirector|MusicPcmStream|MusicPcmWave|MusicPcmAssetBank|MusicPlaybackSession)|reporting/(PlaytestReport|PlaytestSubmission)|gameplay/(simulation/GameSimulation|animation/(PlayerAnimationState|PlayerIkTargets)|effects/FireEmitterState|interactions/(InteractionState|ChestRewardSequence|FinaleSequence)|items/(HeldItemState|HeldItemKinematics|HeldLightState|LanternPendulum)))\\.cpp$")
+list(FILTER HORDE_RT_SOURCE_FILES EXCLUDE REGEX "/(audio/(AmbiencePcmLoop|MusicDirector|MusicPcmStream|MusicPcmWave|MusicPcmAssetBank|MusicPlaybackSession)|reporting/(PlaytestReport|PlaytestSubmission)|gameplay/(simulation/GameSimulation(Rescue)?|traversal/RescueTraversal|animation/(PlayerAnimationState|PlayerIkTargets)|effects/FireEmitterState|interactions/(InteractionState|ChestRewardSequence|FinaleSequence)|items/(HeldItemState|HeldItemKinematics|HeldLightState|LanternPendulum)))\\.cpp$")
 
 add_library(horde_gameplay_simulation STATIC
     src/audio/AmbiencePcmLoop.cpp
@@ -153,6 +153,8 @@ add_library(horde_gameplay_simulation STATIC
     src/reporting/PlaytestSubmission.cpp
     src/reporting/BenchmarkSummarySubmission.cpp
     src/gameplay/simulation/GameSimulation.cpp
+    src/gameplay/simulation/GameSimulationRescue.cpp
+    src/gameplay/traversal/RescueTraversal.cpp
     src/gameplay/animation/PlayerAnimationState.cpp
     src/gameplay/animation/PlayerIkTargets.cpp
     src/gameplay/effects/FireEmitterState.cpp
@@ -172,6 +174,10 @@ target_compile_features(horde_gameplay_simulation PUBLIC cxx_std_20)
 target_link_libraries(horde_gameplay_simulation PUBLIC pocket_audio_native_pcm)
 
 if(BUILD_TESTING)
+    add_executable(horde_rt_combat_foundation_tests tests/CombatFoundationTests.cpp)
+    target_link_libraries(horde_rt_combat_foundation_tests PRIVATE horde_gameplay_simulation)
+    add_test(NAME horde_rt_combat_foundation_tests COMMAND horde_rt_combat_foundation_tests)
+    set_tests_properties(horde_rt_combat_foundation_tests PROPERTIES TIMEOUT 30)
     add_executable(horde_rt_held_item_transition_tests tests/HeldItemTransitionTests.cpp)
     target_link_libraries(horde_rt_held_item_transition_tests PRIVATE horde_gameplay_simulation)
     add_test(NAME horde_rt_held_item_transition_tests COMMAND horde_rt_held_item_transition_tests)
@@ -381,9 +387,15 @@ if(BUILD_TESTING)
     add_executable(horde_rt_windows_motion_evidence_launch_tests tests/WindowsMotionEvidenceLaunchTests.cpp)
     target_include_directories(horde_rt_windows_motion_evidence_launch_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     add_test(NAME horde_rt_windows_motion_evidence_launch_tests COMMAND horde_rt_windows_motion_evidence_launch_tests)
+    add_executable(horde_rt_windows_combat_practice_launch_tests tests/WindowsCombatPracticeLaunchTests.cpp)
+    target_include_directories(horde_rt_windows_combat_practice_launch_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    add_test(NAME horde_rt_windows_combat_practice_launch_tests COMMAND horde_rt_windows_combat_practice_launch_tests)
     add_executable(horde_rt_android_motion_evidence_policy_tests tests/AndroidMotionEvidencePolicyTests.cpp)
     target_include_directories(horde_rt_android_motion_evidence_policy_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     add_test(NAME horde_rt_android_motion_evidence_policy_tests COMMAND horde_rt_android_motion_evidence_policy_tests)
+    add_executable(horde_rt_android_debug_request_admission_tests tests/AndroidDebugRequestAdmissionTests.cpp)
+    target_include_directories(horde_rt_android_debug_request_admission_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    add_test(NAME horde_rt_android_debug_request_admission_tests COMMAND horde_rt_android_debug_request_admission_tests)
     add_executable(horde_rt_motion_evidence_scenario_tests tests/MotionEvidenceScenarioTests.cpp
         src/gameplay/validation/MotionEvidenceScenario.cpp src/telemetry/MotionEvidenceLedger.cpp
         src/telemetry/RtPerformanceEvidence.cpp)
@@ -392,6 +404,22 @@ if(BUILD_TESTING)
     add_test(NAME horde_rt_motion_evidence_scenario_tests COMMAND horde_rt_motion_evidence_scenario_tests)
 
     if(HORDE_RT_BUILD_VULKAN_TARGETS)
+        add_executable(horde_rt_world_route_foundation_tests tests/WorldRouteFoundationTests.cpp)
+        target_link_libraries(horde_rt_world_route_foundation_tests PRIVATE horde_rt_probe_core)
+        add_test(NAME horde_rt_world_route_foundation_tests COMMAND horde_rt_world_route_foundation_tests)
+        add_executable(horde_rt_vertical_support_tests tests/VerticalSupportTests.cpp)
+        target_link_libraries(horde_rt_vertical_support_tests PRIVATE horde_rt_probe_core)
+        add_test(NAME horde_rt_vertical_support_tests COMMAND horde_rt_vertical_support_tests)
+        add_executable(horde_rt_held_item_vertical_support_rig_tests tests/HeldItemVerticalSupportRigTests.cpp)
+        target_link_libraries(horde_rt_held_item_vertical_support_rig_tests PRIVATE horde_rt_probe_core)
+        add_test(NAME horde_rt_held_item_vertical_support_rig_tests
+            COMMAND horde_rt_held_item_vertical_support_rig_tests ${CMAKE_CURRENT_SOURCE_DIR})
+
+        add_executable(horde_rt_player_directional_rig_tests tests/PlayerDirectionalRigTests.cpp)
+        target_link_libraries(horde_rt_player_directional_rig_tests PRIVATE horde_rt_probe_core)
+        add_test(NAME horde_rt_player_directional_rig_tests
+            COMMAND horde_rt_player_directional_rig_tests ${CMAKE_CURRENT_SOURCE_DIR})
+
         add_executable(horde_rt_final_held_torch_clearance_tests tests/FinalHeldTorchClearanceTests.cpp)
         target_link_libraries(horde_rt_final_held_torch_clearance_tests PRIVATE horde_rt_probe_core)
         add_test(NAME horde_rt_final_held_torch_clearance_tests
@@ -832,6 +860,8 @@ if(BUILD_TESTING)
     target_include_directories(horde_rt_waterfall_production_route_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     target_link_libraries(horde_rt_waterfall_production_route_tests PRIVATE horde_gameplay_simulation)
     add_test(NAME horde_rt_waterfall_production_route_tests COMMAND horde_rt_waterfall_production_route_tests)
+    add_test(NAME horde_rt_waterfall_legacy_route_tests
+        COMMAND horde_rt_waterfall_production_route_tests --legacy-contact-policy)
 
     add_executable(horde_rt_music_director_tests tests/MusicDirectorTests.cpp)
     target_include_directories(horde_rt_music_director_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
@@ -988,6 +1018,7 @@ if(BUILD_TESTING)
 
     add_executable(horde_rt_desktop_controller_input_tests tests/DesktopControllerInputTests.cpp)
     target_include_directories(horde_rt_desktop_controller_input_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_link_libraries(horde_rt_desktop_controller_input_tests PRIVATE horde_gameplay_simulation)
     add_test(NAME horde_rt_desktop_controller_input_tests COMMAND horde_rt_desktop_controller_input_tests)
     set_tests_properties(horde_rt_desktop_controller_input_tests PROPERTIES
         WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -1232,4 +1263,39 @@ if(HORDE_RT_BUILD_VULKAN_TARGETS)
     message(STATUS "Horde Lantern RT: Vulkan capability probe and Windows diagnostic targets are available; Android builds from android/.")
 else()
     message(STATUS "Horde Lantern RT: configuring shared host gameplay tests without Vulkan targets.")
+endif()
+
+if(BUILD_TESTING)
+    add_executable(horde_rt_rescue_traversal_tests tests/RescueTraversalTests.cpp)
+    target_link_libraries(horde_rt_rescue_traversal_tests PRIVATE horde_gameplay_simulation)
+    add_test(NAME horde_rt_rescue_traversal_tests COMMAND horde_rt_rescue_traversal_tests)
+    add_executable(horde_rt_rescue_blockout_import_tests tests/RescueBlockoutImportTests.cpp)
+    target_include_directories(horde_rt_rescue_blockout_import_tests PRIVATE src third_party)
+    target_sources(horde_rt_rescue_blockout_import_tests PRIVATE
+        src/scene/assets/StaticMeshAsset.cpp src/scene/assets/AssetManifest.cpp src/scene/assets/AssetValidation.cpp src/scene/assets/GltfDocument.cpp)
+    target_compile_definitions(horde_rt_rescue_blockout_import_tests PRIVATE HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
+    add_test(NAME horde_rt_rescue_blockout_import_tests COMMAND horde_rt_rescue_blockout_import_tests)
+endif()
+
+if(BUILD_TESTING AND TARGET horde_rt_probe_core)
+    add_executable(horde_rt_rescue_journey_integration_tests tests/RescueJourneyIntegrationTests.cpp)
+    target_link_libraries(horde_rt_rescue_journey_integration_tests PRIVATE horde_rt_probe_core)
+    add_test(NAME horde_rt_rescue_journey_integration_tests COMMAND horde_rt_rescue_journey_integration_tests)
+endif()
+
+if(BUILD_TESTING)
+    find_package(Python3 COMPONENTS Interpreter QUIET)
+    if(Python3_Interpreter_FOUND)
+        add_test(NAME horde_rt_rescue_source_admission_tests COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/RescueBlockoutSourceAdmissionTests.py)
+    endif()
+endif()
+
+if(BUILD_TESTING AND TARGET horde_rt_probe_core)
+    add_executable(horde_rt_rescue_rig_attachment_tests tests/RescueRigAttachmentTests.cpp)
+    target_link_libraries(horde_rt_rescue_rig_attachment_tests PRIVATE horde_rt_probe_core)
+    target_compile_definitions(horde_rt_rescue_rig_attachment_tests PRIVATE HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
+    add_test(NAME horde_rt_rescue_rig_attachment_tests COMMAND horde_rt_rescue_rig_attachment_tests)
+    add_test(NAME horde_rt_rescue_adversarial_regression_tests COMMAND horde_rt_rescue_rig_attachment_tests --adversarial-regression)
+    set_tests_properties(horde_rt_rescue_adversarial_regression_tests PROPERTIES TIMEOUT 180)
+    set_tests_properties(horde_rt_rescue_rig_attachment_tests PROPERTIES TIMEOUT 180)
 endif()

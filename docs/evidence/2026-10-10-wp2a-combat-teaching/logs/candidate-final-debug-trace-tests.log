@@ -1,0 +1,62 @@
+UpdateCTestConfiguration  from :<repo>/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Parse Config file:<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Test project <repo>/build/presets/windows-x64-debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 24
+    Start  24: horde_rt_combat_foundation_tests
+
+24: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_combat_foundation_tests.exe"
+24: Working Directory: <repo>/build/presets/windows-x64-debug
+24: Test timeout computed to be: 30
+24: combat foundation checks=405 failures=0
+1/5 Test  #24: horde_rt_combat_foundation_tests ............   Passed    5.27 sec
+test 26
+    Start  26: horde_rt_combat_timing_trace_tests
+
+26: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_combat_timing_trace_tests.exe"
+26: Working Directory: <repo>/build/presets/windows-x64-debug
+26: Test timeout computed to be: 1500
+2/5 Test  #26: horde_rt_combat_timing_trace_tests ..........   Passed    3.98 sec
+test 101
+    Start 101: horde_rt_simulation_gameplay_tests
+
+101: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_simulation_gameplay_tests.exe"
+101: Working Directory: <repo>/build/presets/windows-x64-debug
+101: Test timeout computed to be: 1500
+101: lich/chest delayed finale events hits/defeat/unlock=3/1/1 phase=1 pending=0 time=0 sequence=8/9
+101: open shaft actual X/Z=-5.5/-14.5 mount torch lowering/left Y legacy=0/-0.41 anatomical=0/-0.31
+101: Shared simulation command, event, seam-persistence, and retry tests passed.
+3/5 Test #101: horde_rt_simulation_gameplay_tests ..........   Passed    7.17 sec
+test 102
+    Start 102: horde_rt_waterfall_production_route_tests
+
+102: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_waterfall_production_route_tests.exe"
+102: Working Directory: <repo>/build/presets/windows-x64-debug
+102: Test timeout computed to be: 1500
+102: Waterfall production route passed: stowed cold start/reset/checkpoint/retry, first-room isolation, real fixed-step route and encounter draw/retreat cases, four bays, and Keeper arrival.
+4/5 Test #102: horde_rt_waterfall_production_route_tests ...   Passed    5.66 sec
+test 103
+    Start 103: horde_rt_waterfall_legacy_route_tests
+
+103: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_waterfall_production_route_tests.exe" "--legacy-contact-policy"
+103: Working Directory: <repo>/build/presets/windows-x64-debug
+103: Test timeout computed to be: 1500
+103: Waterfall production route passed: stowed cold start/reset/checkpoint/retry, first-room isolation, real fixed-step route and encounter draw/retreat cases, four bays, and Keeper arrival.
+5/5 Test #103: horde_rt_waterfall_legacy_route_tests .......   Passed    1.02 sec
+
+The following tests passed:
+	horde_rt_combat_foundation_tests
+	horde_rt_combat_timing_trace_tests
+	horde_rt_simulation_gameplay_tests
+	horde_rt_waterfall_production_route_tests
+	horde_rt_waterfall_legacy_route_tests
+
+100% tests passed, 0 tests failed out of 5
+
+Total Test time (real) =  23.12 sec

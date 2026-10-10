@@ -38,6 +38,26 @@ public final class AndroidControllerInputTest {
         assertFalse(input.key(key(1, KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_BUTTON_THUMBL, 0, 18), 18).handled);
     }
 
+    @Test public void rightShoulderHoldsRunAndAlwaysClearsOnReleaseOrSuspend() {
+        AndroidControllerInput input = new AndroidControllerInput();
+        AndroidControllerInput.Result down = input.key(
+                key(14, KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_BUTTON_R1, 0, 10), 10);
+        assertTrue(down.handled);
+        assertTrue(input.runHeld());
+        assertTrue(input.key(key(14, KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_BUTTON_R1, 1, 11), 11).handled);
+        assertTrue(input.runHeld());
+        input.key(key(14, KeyEvent.ACTION_UP, KeyEvent.KEYCODE_BUTTON_R1, 0, 12), 12);
+        assertFalse(input.runHeld());
+
+        input.key(key(14, KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_BUTTON_R1, 0, 13), 13);
+        assertTrue(input.runHeld());
+        input.suspend();
+        assertFalse(input.runHeld());
+        assertEquals(0, input.key(
+                key(14, KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_BUTTON_R1, 0, 13), 20).actions);
+        assertFalse(input.runHeld());
+    }
+
     @Test public void triggerAxesUseHysteresisAndDeduplicateTheirDigitalRepresentations() {
         AndroidControllerInput input = new AndroidControllerInput();
         input.motion(motion(4, 1, 0, 0, 0, 0, 0, 0), 1); // neutral baseline

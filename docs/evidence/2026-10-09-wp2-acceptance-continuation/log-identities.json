@@ -1,0 +1,170 @@
+[
+  {
+    "logical_label": "android-activity-guard",
+    "raw_sha256": "ac6ca6026b3c8d371b7710321035d8adc3a5b5c7bf360defadef8e889b4aa8b0",
+    "raw_bytes": 83417,
+    "raw_retained": "ignored local reports; not published",
+    "selected_public_file": null,
+    "selected_public_sha256": null
+  },
+  {
+    "logical_label": "android-component",
+    "raw_sha256": "adceb8adacc9fa9c0c2227413667c3bb5b1930ed98d279fe2463a1e1a6dec718",
+    "raw_bytes": 159,
+    "raw_retained": "ignored local reports; not published",
+    "selected_public_file": null,
+    "selected_public_sha256": null
+  },
+  {
+    "logical_label": "android-debug-hash",
+    "raw_sha256": "304c45b4779c34987a0b400ad5f1080ad305c3e5d784a297a0762d223defdc8e",
+    "raw_bytes": 179,
+    "raw_retained": "ignored local reports; not published",
+    "selected_public_file": null,
+    "selected_public_sha256": null
+  },
+  {
+    "logical_label": "android-debug-path",
+    "raw_sha256": "cb1905499507ba74a1958045dcacc779d1db6c70a66c77bb8ba43bc906949fd9",
+    "raw_bytes": 121,
+    "raw_retained": "ignored local reports; not published",
+    "selected_public_file": null,
+    "selected_public_sha256": null
+  },
+  {
+    "logical_label": "android-devices",
+    "raw_sha256": "bc86f0b39f03ef808de4d6531bafc96ab8171aa6c923f81d4fffb921a38c30b6",
+    "raw_bytes": 123,
+    "raw_retained": "ignored local reports; not published",
+    "selected_public_file": null,
+    "selected_public_sha256": null
+  },
+  {
+    "logical_label": "android-model",
+    "raw_sha256": "98356a87915195243b52051adb466ab4f0ae0013a716215a1d8715684e2904d1",
+    "raw_bytes": 18,
+    "raw_retained": "ignored local reports; not published",
+    "selected_public_file": null,
+    "selected_public_sha256": null
+  },
+  {
+    "logical_label": "android-query-current-capability-mtime",
+    "raw_sha256": "64c159417528e8549b6a16ea11962390cd7ecbe0e8f22adb566e0ddf5627845b",
+    "raw_bytes": 20,
+    "raw_retained": "ignored local reports; not published",
+    "selected_public_file": null,
+    "selected_public_sha256": null
+  },
+  {
+    "logical_label": "android-query-current-capability",
+    "raw_sha256": "c402baaa93beb03f4378b3cfec0bdfe04437cb98013f7e4727f43a121102c600",
+    "raw_bytes": 5903,
+    "raw_retained": "ignored local reports; not published",
+    "selected_public_file": null,
+    "selected_public_sha256": null
+  },
+  {
+    "logical_label": "android-query-current-state-mtime",
+    "raw_sha256": "dccae2d63d705d1c1d073695896a197ae0c9f5311c351241ba6c6bc545b27df7",
+    "raw_bytes": 20,
+    "raw_retained": "ignored local reports; not published",
+    "selected_public_file": null,
+    "selected_public_sha256": null
+  },
+  {
+    "logical_label": "android-query-current-state",
+    "raw_sha256": "7594daa6621a32ab847bfb2c7ed9be642b7a58071e65324a47d8c77610055d86",
+    "raw_bytes": 7673,
+    "raw_retained": "ignored local reports; not published",
+    "selected_public_file": null,
+    "selected_public_sha256": null
+  },
+  {
+    "logical_label": "android-query-fresh-activity",
+    "raw_sha256": "15cc88f2ec633c4084d200a3e89d5a392788cdc8282fcce2021b357cb8e4ae10",
+    "raw_bytes": 83434,
+    "raw_retained": "ignored local reports; not published",
+    "selected_public_file": null,
+    "selected_public_sha256": null
+  },
+  {
+    "logical_label": "android-query-fresh-window",
+    "raw_sha256": "68f724e620a8dcc1d539ad5cecea63760db8851fd0664e27b74640f569be0d5f",
+    "raw_bytes": 102816,
+    "raw_retained": "ignored local reports; not published",
+    "selected_public_file": null,
+    "selected_public_sha256": null
+  },
+  {
+    "logical_label": "android-query-launch",
+    "raw_sha256": "51abc08f8160adc3f0cdb8eb0c1e06b8f4ab5ed8fdcf4bbb935e3b0a4609dd2b",
+    "raw_bytes": 291,
+    "raw_retained": "ignored local reports; not published",
+    "selected_public_file": null,
+    "selected_public_sha256": null
+  },
+  {
+    "logical_label": "android-query-native-capability",
+    "raw_sha256": "b434e62ad11ab4df8ee65242cba694c7ab05b88b0cd5fa70820e93ef87eabcbf",
+    "raw_bytes": 2552,
+    "raw_retained": "ignored local reports; not published",
+    "selected_public_file": null,
+    "selected_public_sha256": null
+  },
+  {
+    "logical_label": "android-release-hash",
+    "raw_sha256": "def6c7747bd2dd5d135e67b8fe9dc282622522a0119a3f5f30e73c6d1a88728a",
+    "raw_bytes": 173,
+    "raw_retained": "ignored local reports; not published",
+    "selected_public_file": null,
+    "selected_public_sha256": null
+  },
+  {
+    "logical_label": "android-release-path",
+    "raw_sha256": "c43c2cc1036cbd5af1fa911d11ad3bd2da4a7d00bacab005ca7a3fe6f19284fb",
+    "raw_bytes": 115,
+    "raw_retained": "ignored local reports; not published",
+    "selected_public_file": null,
+    "selected_public_sha256": null
+  },
+  {
+    "logical_label": "android-user",
+    "raw_sha256": "e242191c20901f9339dbe55107f93488844a4c11e272ccbdf878d7c6f35c6615",
+    "raw_bytes": 11,
+    "raw_retained": "ignored local reports; not published",
+    "selected_public_file": null,
+    "selected_public_sha256": null
+  },
+  {
+    "logical_label": "android-window-guard",
+    "raw_sha256": "f6a086336c8ef1da4cc28a6fa934286cdb8c05d326ab92e6f457fd256a832588",
+    "raw_bytes": 104577,
+    "raw_retained": "ignored local reports; not published",
+    "selected_public_file": null,
+    "selected_public_sha256": null
+  },
+  {
+    "logical_label": "windows-pipeline-ground",
+    "raw_sha256": "022155116e8017222b9428c7daf250300889fc73e87f6d443bff25a5aed26937",
+    "raw_bytes": 2945,
+    "raw_retained": "ignored local reports; not published",
+    "selected_public_file": "windows-pipeline-ground-selected.log",
+    "selected_public_sha256": "e3278e58b9f0d587c84269cb63e8cc90084d63968897542c3928197f07bed149"
+  },
+  {
+    "logical_label": "windows-pipeline-raised",
+    "raw_sha256": "d42651dbd03c35a09b2d69f9836e84b5c64f56a618f7c17550934981847fe4c2",
+    "raw_bytes": 2680,
+    "raw_retained": "ignored local reports; not published",
+    "selected_public_file": "windows-pipeline-raised-selected.log",
+    "selected_public_sha256": "54edcad13bf1801113f54e0eb03ecd35948c817610a95c4670a2bf4345c645c5"
+  },
+  {
+    "logical_label": "windows-pipeline-raised-retry",
+    "raw_sha256": "a6fe3486cb37ab460dbac22907887867f04ad6ebafec047481b2515431a0b8b3",
+    "raw_bytes": 2679,
+    "raw_retained": "ignored local reports; not published",
+    "selected_public_file": "windows-pipeline-raised-retry-selected.log",
+    "selected_public_sha256": "54edcad13bf1801113f54e0eb03ecd35948c817610a95c4670a2bf4345c645c5"
+  }
+]

@@ -1,9 +1,11 @@
 #include <cmath>
+#include <bit>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "gameplay/FeedbackTiming.h"
@@ -71,6 +73,25 @@ int main()
     using horde::gameplay::simulation::GameplayEvent;
     using horde::gameplay::simulation::GameplayEventType;
     using horde::gameplay::simulation::EntityId;
+    for (const auto [type, expectedId] : {
+             std::pair{GameplayEventType::ParryPrepareCue, 24u},
+             std::pair{GameplayEventType::LichDischargeWarning, 25u}})
+    {
+        GameplayEvent warning{};
+        warning.type = type;
+        check((horde::platform::android::PackGameplayEventMetadata(warning) & 0xffu) == expectedId,
+              "appended combat teaching event keeps its compact Android type byte");
+    }
+    check(NearlyEqual(GameplayEvent{}.listenerY, kShowcaseEyeWorldY),
+          "event listener Y must default to the showcase eye baseline");
+    const GameplayEvent legacyEventAggregate{
+        41u, 7u, GameplayEventType::EnemyHit, EntityId::Player, EntityId::SkeletonA,
+        1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 0.25f, 0.5f, 9};
+    check(legacyEventAggregate.payload == 9 &&
+          NearlyEqual(legacyEventAggregate.worldY, 2.0f) &&
+          NearlyEqual(legacyEventAggregate.listenerYawRadians, 0.25f) &&
+          NearlyEqual(legacyEventAggregate.listenerY, kShowcaseEyeWorldY),
+          "appended listener Y must preserve legacy positional event aggregate fields and default");
     GameplayEvent equipmentEvent{};
     equipmentEvent.type = GameplayEventType::PlayerSwordDrawStarted;
     equipmentEvent.source = EntityId::Player;
@@ -111,6 +132,19 @@ int main()
     const SpatialAudioGains left = CalculateSpatialAudio({-1.0f, 0.0f}, origin);
     check(NearlyEqual(left.pan, -1.0f) && NearlyEqual(left.left, 1.0f) && left.right <= 0.0001f,
           "left emitter must pan fully left");
+
+    const SpatialAudioGains zeroVerticalOffset = CalculateSpatialAudio(
+        {0.0f, -1.0f, 1.0f, 1.0f, 14.0f, 0.70f},
+        {0.0f, 0.0f, 0.0f, 0.70f});
+    const SpatialAudioGains nonzeroVerticalOffset = CalculateSpatialAudio(
+        {0.0f, -1.0f, 1.0f, 1.0f, 14.0f, -3.0f},
+        {0.0f, 0.0f, 0.0f, 0.70f});
+    check(NearlyEqual(zeroVerticalOffset.left, nonzeroVerticalOffset.left) &&
+          NearlyEqual(zeroVerticalOffset.right, nonzeroVerticalOffset.right) &&
+          NearlyEqual(zeroVerticalOffset.distance, nonzeroVerticalOffset.distance) &&
+          NearlyEqual(zeroVerticalOffset.pan, nonzeroVerticalOffset.pan) &&
+          zeroVerticalOffset.obstructed == nonzeroVerticalOffset.obstructed,
+          "Y metadata must preserve the current planar distance, pan, obstruction and stereo gains");
 
     horde::gameplay::simulation::GameplayEvent earlierEvent;
     earlierEvent.worldX = 2.0f;
@@ -192,7 +226,9 @@ int main()
     fallA.source = horde::gameplay::simulation::EntityId::Player;
     fallA.target = horde::gameplay::simulation::EntityId::SkeletonA;
     fallA.worldX = -0.75f;
+    fallA.worldY = -0.35f;
     fallA.listenerX = 1.0f;
+    fallA.listenerY = 0.57f;
     horde::gameplay::simulation::GameplayEvent fallB = fallA;
     fallB.sequence = 42u;
     fallB.target = horde::gameplay::simulation::EntityId::SkeletonB;
@@ -208,8 +244,9 @@ int main()
     check(delayedFeedback.DrainDue(1140u, [&playedFalls](const auto& event) { playedFalls.push_back(event); }) == 1u &&
           delayedFeedback.Size() == 1u && playedFalls.size() == 1u &&
           playedFalls[0].sequence == 41u && playedFalls[0].target == horde::gameplay::simulation::EntityId::SkeletonA &&
-          NearlyEqual(playedFalls[0].worldX, -0.75f) && NearlyEqual(playedFalls[0].listenerX, 1.0f),
-          "due fall feedback must retain exact ordered entity/source/listener event data");
+          NearlyEqual(playedFalls[0].worldX, -0.75f) && NearlyEqual(playedFalls[0].worldY, -0.35f) &&
+          NearlyEqual(playedFalls[0].listenerX, 1.0f) && NearlyEqual(playedFalls[0].listenerY, 0.57f),
+          "due fall feedback must retain exact ordered entity/source/listener tuple including both heights");
     check(delayedFeedback.DrainDue(1141u, [&playedFalls](const auto& event) { playedFalls.push_back(event); }) == 1u &&
           delayedFeedback.Size() == 0u && playedFalls.size() == 2u && playedFalls[1].sequence == 42u,
           "repeated same-type fall events must remain distinct through delayed playback");
@@ -241,6 +278,58 @@ int main()
     check(saturatedFeedback.OverflowCount() == 1u &&
           saturatedFeedback.HighWaterMark() == DelayedGameplayFeedbackQueue::kCapacity,
           "draining delayed feedback must preserve permanent overflow diagnostics");
+
+    fallA.worldY = -1.125f;
+    fallA.listenerY = 0.625f;
+    const std::uint64_t verticalMetadata =
+        horde::platform::android::PackGameplayEventVerticalMetadata(fallA);
+    check(std::bit_cast<float>(static_cast<std::uint32_t>(verticalMetadata)) == -1.125f &&
+          std::bit_cast<float>(static_cast<std::uint32_t>(verticalMetadata >> 32u)) == 0.625f,
+          "Android vertical tuple word must preserve sourceY and listenerY bit-exactly");
+
+    struct CompactGameplayEventTuple
+    {
+        std::uint64_t eventMetadata = 0u;
+        std::uint64_t stereoGains = 0u;
+        std::uint64_t verticalMetadata = 0u;
+    };
+    horde::gameplay::simulation::BoundedTransportQueue<CompactGameplayEventTuple, 128u>
+        compactGameplayEvents;
+    bool compactAccepted = true;
+    for (std::size_t index = 0u; index < 128u; ++index)
+    {
+        fallA.sequence = index + 1u;
+        fallA.worldY = static_cast<float>(index) * 0.01f;
+        fallA.listenerY = 0.70f + static_cast<float>(index) * 0.001f;
+        compactAccepted = compactAccepted && compactGameplayEvents.Push({
+            horde::platform::android::PackGameplayEventMetadata(fallA),
+            index,
+            horde::platform::android::PackGameplayEventVerticalMetadata(fallA)});
+    }
+    const CompactGameplayEventTuple lastAcceptedTuple = compactGameplayEvents[127u];
+    bool compactOrderingPreserved = compactGameplayEvents.Size() == 128u;
+    for (std::size_t index = 0u; index < compactGameplayEvents.Size(); ++index)
+    {
+        const CompactGameplayEventTuple& tuple = compactGameplayEvents[index];
+        compactOrderingPreserved = compactOrderingPreserved &&
+            (tuple.eventMetadata >> 32u) == index + 1u &&
+            std::bit_cast<float>(static_cast<std::uint32_t>(tuple.verticalMetadata)) ==
+                static_cast<float>(index) * 0.01f &&
+            std::bit_cast<float>(static_cast<std::uint32_t>(tuple.verticalMetadata >> 32u)) ==
+                0.70f + static_cast<float>(index) * 0.001f;
+    }
+    fallA.sequence = 999u;
+    check(compactAccepted && !compactGameplayEvents.Push({
+              horde::platform::android::PackGameplayEventMetadata(fallA), 999u,
+              horde::platform::android::PackGameplayEventVerticalMetadata(fallA)}) &&
+          compactGameplayEvents.Size() == 128u && compactGameplayEvents.OverflowCount() == 1u &&
+          compactOrderingPreserved &&
+          (lastAcceptedTuple.eventMetadata >> 32u) == 128u &&
+          std::bit_cast<float>(static_cast<std::uint32_t>(lastAcceptedTuple.verticalMetadata)) ==
+              127.0f * 0.01f &&
+          std::bit_cast<float>(static_cast<std::uint32_t>(lastAcceptedTuple.verticalMetadata >> 32u)) ==
+              0.70f + 127.0f * 0.001f,
+          "Android 128-entry compact tuple queue must drop only the newest and retain earlier ordered Y metadata");
 
     DelayedGameplayFeedbackQueue cancelledFeedback;
     check(cancelledFeedback.Enqueue(fallA, 3000u),
@@ -288,6 +377,11 @@ int main()
               windowsSource.find("engine.SetMasterVolumePercent(context.sfxVolumePercent)") != std::string::npos &&
               windowsSource.find("PlaySoundA(") == std::string::npos,
               "Windows centered/positional/loop SFX must use independent master gain without an unscaled fallback");
+        check(windowsSource.find("14.0f, event.worldY}") != std::string::npos &&
+              windowsSource.find("event.listenerYawRadians, event.listenerY}") != std::string::npos &&
+              androidBridgeSource.find("14.0f, event.worldY}") != std::string::npos &&
+              androidBridgeSource.find("event.listenerYawRadians, event.listenerY}") != std::string::npos,
+              "both native positional-audio consumers must pass source and event-time listener Y metadata");
         check(windowsSource.find("PlayAmbientSoundEffect(context, clip, horde::audio::kPlayerFootstepCueGain)") !=
                   std::string::npos &&
               windowsSource.find("GetPrivateProfileIntA(\"audio\", \"sfxVolume\"") != std::string::npos &&
@@ -295,8 +389,9 @@ int main()
               windowsSource.find("kSfxVolumeSliderId") != std::string::npos &&
               windowsSource.find("kSfxButtonId") == std::string::npos,
               "Windows must persist a separate SFX slider and quiet player footsteps without another primary toggle");
-        check(androidSource.find("\"player_step_1\" : \"player_step_2\", 0.45f, stereoGains)") !=
+        check(androidSource.find("\"player_step_1\" : \"player_step_2\", 0.45f,") !=
                   std::string::npos &&
+              androidSource.find("stereoGains, verticalMetadata)") != std::string::npos &&
               androidSource.find("addSlider(panel, getString(R.string.sfx_volume)") != std::string::npos &&
               androidSource.find("preferences.edit().putInt(\"sfx_volume\", value).apply()") != std::string::npos,
               "Android must preserve its independent SFX slider and quieter steps with unchanged event-time stereo gains");
@@ -315,11 +410,16 @@ int main()
               androidSource.find("ENEMY_IMPACT_FALL_DELAY_MILLISECONDS") != std::string::npos &&
               androidSource.find("ENEMY_IMPACT_FALL_DELAY_MILLISECONDS = 140L") != std::string::npos &&
               androidSource.find("feedbackGeneration == delayedGameplayFeedbackGeneration") != std::string::npos &&
-              androidSource.find("playSpatialSound(\"skeleton_falling_bones\", 0.24f, stereoGains)") != std::string::npos,
+              androidSource.find("playSpatialSound(\"skeleton_falling_bones\", 0.24f,") != std::string::npos &&
+              androidSource.find("stereoGains, verticalMetadata);") != std::string::npos,
               "Android must retain the authored fall delay and cancel stale lifecycle feedback");
         check(androidBridgeSource.find("BoundedTransportQueue<") != std::string::npos &&
               androidBridgeSource.find("gPlatformGameplayEvents.Push(") != std::string::npos &&
-              androidBridgeSource.find("PlatformGameplayEventOverflowCount()") != std::string::npos,
+              androidBridgeSource.find("PlatformGameplayEventOverflowCount()") != std::string::npos &&
+              androidBridgeSource.find("event.verticalMetadata") != std::string::npos &&
+              androidBridgeSource.find("Size() * 3u") != std::string::npos &&
+              androidSource.find("eventIndex += 3") != std::string::npos &&
+              androidSource.find("platformEvents[eventIndex + 2]") != std::string::npos,
               "Android must retain bounded ordered event transport with visible overflow");
         const std::size_t androidStopBegin =
             androidBridgeSource.find("void StopSurfaceInternal()");

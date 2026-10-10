@@ -1,0 +1,57 @@
+{
+  "shaders/raytracing/include/rt_atmosphere.glsl": {
+    "worktree_sha256": "36ddb178dcfe0076715d810f77df932ea87bb7dce01e9bba6b3d4bc41475b9c7",
+    "git_blob": "8dbe73e13aadb209aa7712f5cf41fc28fbc82673",
+    "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f2a095fcf85520d63aebc1a48547cf4a453e97ba/shaders/raytracing/include/rt_atmosphere.glsl"
+  },
+  "shaders/raytracing/include/rt_lighting.glsl": {
+    "worktree_sha256": "7a060aa3808e179b21c69ce730173bbdfca18b0a8ff9195109986513ca0d9dd1",
+    "git_blob": "4f2e63b58847e763af27b0a313c96fc830a32028",
+    "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f2a095fcf85520d63aebc1a48547cf4a453e97ba/shaders/raytracing/include/rt_lighting.glsl"
+  },
+  "shaders/raytracing/include/rt_frame.glsl": {
+    "worktree_sha256": "6541ff4011f3051ed89752c04de6beb2af90a002011b705f63c96fdf8ab835b2",
+    "git_blob": "c299a32452da9c24220f2aa13ed925cc43537c0f",
+    "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f2a095fcf85520d63aebc1a48547cf4a453e97ba/shaders/raytracing/include/rt_frame.glsl"
+  },
+  "src/vulkan/raytracing/PresentableTinyRtScene.cpp": {
+    "worktree_sha256": "22fec6b48f3632c5edc995cc1930cd02d8762392c05fe07bb6ac007c5397f0e5",
+    "git_blob": "23f14ea6a7aeb798cfb6d0b6370d993dd973e997",
+    "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f2a095fcf85520d63aebc1a48547cf4a453e97ba/src/vulkan/raytracing/PresentableTinyRtScene.cpp"
+  },
+  "src/gameplay/traversal/RescueTraversal.cpp": {
+    "worktree_sha256": "f0150ad603bc7d8a6eeddc1a32acdcfbd3eb9cdd90aaac04a2402a064ed09ebb",
+    "git_blob": "3516cc16d62ab840d7cc5d0e348a8a124cf66dcf",
+    "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f2a095fcf85520d63aebc1a48547cf4a453e97ba/src/gameplay/traversal/RescueTraversal.cpp"
+  },
+  "src/scene/RescueJourneyGeometry.h": {
+    "worktree_sha256": "39c922d57668779d9f208a38cc23177a82f32e5659e8507a21dd05435bf70869",
+    "git_blob": "939badb9ac09507a7231a49f16c82783f17e5dce",
+    "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f2a095fcf85520d63aebc1a48547cf4a453e97ba/src/scene/RescueJourneyGeometry.h"
+  },
+  "tools/compile-raygen.ps1": {
+    "worktree_sha256": "11147f647ed10a8ee4b606157229e588a3bde71017072a7bc5f9132702d7ce7e",
+    "git_blob": "01c0571af4f357a05e6d25e39984f0a30207903c",
+    "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f2a095fcf85520d63aebc1a48547cf4a453e97ba/tools/compile-raygen.ps1"
+  },
+  "tools/raygen-variants.json": {
+    "worktree_sha256": "d615c29c129cf8f3495ae8c1b9d46476979dbdf23003d690c6416f8eae45fca5",
+    "git_blob": "4fc8e115e92dfd237bacd076d2227b646343bf44",
+    "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f2a095fcf85520d63aebc1a48547cf4a453e97ba/tools/raygen-variants.json"
+  },
+  "tools/raygen-variant-budgets.json": {
+    "worktree_sha256": "56936479b2d202dbdb9393ba94b66a1b0bc12d490b700d8af4c63de3460e53bf",
+    "git_blob": "90d40a313084dca95055ed2ea32a231da9d0b9bb",
+    "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f2a095fcf85520d63aebc1a48547cf4a453e97ba/tools/raygen-variant-budgets.json"
+  },
+  "tools/raygen-variant-catalog.json": {
+    "worktree_sha256": "388953d0a643a68c8d63753ed5841d0cec02888c9836740f187e37562908494c",
+    "git_blob": "6bfa9f24a91189835b05567d4b30cf79b4ddb9ec",
+    "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f2a095fcf85520d63aebc1a48547cf4a453e97ba/tools/raygen-variant-catalog.json"
+  },
+  "tests/FinalHeldTorchClearanceTests.cpp": {
+    "worktree_sha256": "4e048f7452a4adcf67f84c84fc762c8cbbd378d486e83b2ac8f4f6128ce9ebae",
+    "git_blob": "cc6aefb5884e9307a39e97f33ee809f8053a1174",
+    "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/f2a095fcf85520d63aebc1a48547cf4a453e97ba/tests/FinalHeldTorchClearanceTests.cpp"
+  }
+}
