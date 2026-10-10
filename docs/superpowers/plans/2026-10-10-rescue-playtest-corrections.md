@@ -44,6 +44,8 @@ Complete sanitized argv/cwd/source identities, elapsed times, exit statuses and 
 
 The large repeated-failure log is stored as lossless `.log.gz`; its ledger row records both compressed-file and uncompressed sanitized-payload hashes. Decompression was verified byte-for-byte against the retained complete local sanitized log. No failures or repeated messages were removed.
 
+The source manifest distinguishes local compiler-input bytes from canonical Git content bytes, whose line endings can differ under the existing Windows checkout policy. Immutable blob IDs/URLs and `git_content_sha256` identify repository content; `working_input_sha256` identifies the actual local input. Every committed log was read back from Git and matched its recorded file hash.
+
 ## Prepared owner check
 
 From the existing worktree, verify the Debug EXE hash below and launch only when authorized:
