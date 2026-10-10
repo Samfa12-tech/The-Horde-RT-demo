@@ -1,0 +1,40 @@
+{
+  "evidence_reference": "3cac217f78bd000925a534823f7076c5fc186090",
+  "tools": [
+    {
+      "tool": "glslangValidator.exe",
+      "sha256": "afd12a24c54137ab6169bc71458ecd58a1b1b2891345a7f2f5ec8e1f22e948d7"
+    },
+    {
+      "tool": "spirv-opt.exe",
+      "sha256": "ba03c9c7762a32155fd3800fef1a6cd8ca75b49e68f73e48bc96e1e911768f47"
+    },
+    {
+      "tool": "spirv-val.exe",
+      "sha256": "556f42595acb5c144f94eb6c15f8e5b75b412bac7b326f828725b3368767afa7"
+    },
+    {
+      "tool": "spirv-dis.exe",
+      "sha256": "1848582c22f378a22c330cd8e4d9c97aeca1bd79c2b15a3a5e2eeb89dfa93d64"
+    }
+  ],
+  "budget_sha256": "56936479b2d202dbdb9393ba94b66a1b0bc12d490b700d8af4c63de3460e53bf",
+  "prototype_metrics_sha256": "a95bb3dbd2a1710ed18f244e72167b773f6d05129a7b68f01be05bc9449dd33e",
+  "compiler_script_sha256": "11147f647ed10a8ee4b606157229e588a3bde71017072a7bc5f9132702d7ce7e",
+  "passes": {
+    "GenericRetained": [
+      "--eliminate-dead-functions",
+      "--eliminate-dead-code-aggressive",
+      "--simplify-instructions",
+      "--eliminate-dead-branches",
+      "--cfg-cleanup"
+    ],
+    "LegacyInlined": [
+      "-O"
+    ]
+  },
+  "original_experiment_script_sha256": "daf5194838ddfd99828acec9995db04535be9047f22c0a8d25f412c2e9c0d079",
+  "reconciliation": "Metrics unchanged; diagnostics presence corrected from SPIR-V decoration, without recompilation.",
+  "final_reproduction_script_sha256": "e82599be2a69b907dce3f8e73b86d38800579053267b46d0505eb8dbbb063a25",
+  "intermediate_reconciled_script_sha256": "21e0f2cd2058c98dc599f4d8db6b17f7d055efe7771947276a27c682bd1b3ce2"
+}

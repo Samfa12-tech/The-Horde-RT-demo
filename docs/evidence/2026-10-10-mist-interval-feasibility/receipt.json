@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "outcome": "DEFER; strict CPU cell and unchanged static admission blocked",
+  "evidence_reference": "3cac217f78bd000925a534823f7076c5fc186090",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "experimental_only": true,
+  "production_adoption": false,
+  "production_budgets_changed": false,
+  "protected_inputs": [
+    {
+      "path": "tools/raygen-variant-budgets.json",
+      "normalized_sha256": "4aa8d03c291c4ecc2278f62f7ba31cb2d50b2973852ecd320af02955a434803a",
+      "matches_reference": true
+    },
+    {
+      "path": "tools/raygen-variants.json",
+      "normalized_sha256": "39276571a06644307dd36db0cf7265b7ee43e5bfc912932be06bb0503b34e30d",
+      "matches_reference": true
+    },
+    {
+      "path": "tools/raygen-variant-catalog.json",
+      "normalized_sha256": "03f75d2e907cb25a3acfc537e9976ceef44bf53f0b831959ea5f53207818b278",
+      "matches_reference": true
+    },
+    {
+      "path": "tools/compile-raygen.ps1",
+      "normalized_sha256": "2d919bdb6ad03ed4b67e7691ffb1547801268d09df0794c658ea2f59054debcf",
+      "matches_reference": true
+    },
+    {
+      "path": "src/vulkan/raytracing/RtSceneAbi.def",
+      "normalized_sha256": "5c24150c5db47efa8767f20d4d0fd2a5f1036dab41c154d4c4b44f6228c6d767",
+      "matches_reference": true
+    },
+    {
+      "path": "tools/rayquery-variant-catalog.json",
+      "normalized_sha256": "a9b77a393f8b66c2c93738e2210e0896a8189b2f3ecc7c0ed912a221c79f10a2",
+      "matches_reference": true
+    },
+    {
+      "path": "src/vulkan/raytracing/RtPipelineVariantCatalog.generated.h",
+      "normalized_sha256": "effc06b4a1ec185a2a89f6baf2c9f05187447a784bd73e1c6f3d1b5e5c46fa95",
+      "matches_reference": true
+    }
+  ],
+  "high_variants_compiled": [
+    "diagnostic_high_generic_dielectric",
+    "diagnostic_high_opaque_fast"
+  ],
+  "other_six_variants": "NOT RUN; two initial structural gates fail",
+  "compiler_validation": "PASS both High candidates and surface-only module",
+  "strict_correctness": "FAIL three aperture-one cell schedule checks; synthetic/endpoints/ordered schedule controls pass",
+  "surface_only_module": "BYTE IDENTICAL to historical module; no new GPU pixels",
+  "gpu_endpoint_readback": "NOT RUN",
+  "sustained_windows_cost": "NOT RUN; static gate failed",
+  "dynamic_update_cost": "NOT RUN",
+  "android": "NOT RUN",
+  "rayquery_compute": "NOT RUN",
+  "owner_mist_visual_acceptance": "PENDING",
+  "source_references": {
+    "reference": "https://github.com/Samfa12-tech/The-Horde-RT-demo/tree/3cac217f78bd000925a534823f7076c5fc186090",
+    "reference_report": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/3cac217f78bd000925a534823f7076c5fc186090/docs/superpowers/plans/2026-10-10-horde-1.7-mist-interval-prototype.md"
+  },
+  "attached_review_sha256": "dfde32cecc62f0af463f9a9cc7d9582de8006a6dedd69f383b2b182397d92edd",
+  "artifacts": {
+    "artifact-manifest.json": "3931c240bca7aca6222fbb92cd1c7e2fd7fdf8564997db8c50e86d1d38f2e314",
+    "correctness-final.json": "7a227388a796034f66b87b4d6299b74cfff1d576ab3e92638b72b2e45c047d6e",
+    "correctness-final.log": "0523255c8b7f44c3ce50c74d3ad93e02d1e5ddd05b5bccc86a51be791325350e",
+    "correctness-final.md": "8b14ed86643ec4a129c871be1fbb3f041cbe4d061881955ce9cb7c63312fb593",
+    "correctness-superseded-bound.json": "60010e3ef4401e8ceb3ff47690954a1f67eb7a0430a5be26a962ae10ec737f82",
+    "full-metrics.json": "ca3d650e7b5cabc58c68083d8c99d62fbe05df86226dab3614cbc1075c6e7735",
+    "GPU_PROBE_DESIGN.md": "a623bbf4551425c7e2c82ce80a3e2f48149feaa4c66dac89f649143fe831fbf6",
+    "initial-scanner-metrics.json": "a450ec3d88a90b9ec1126f2cbeceafc81e9d290b57c260bd5f31afac2f01b229",
+    "input-identities.json": "3be9429b4ac139ee0413887abdd134d49ac8251b06628b69399e25bc6e37a0db",
+    "methodology-and-failures.json": "de35ae521c2c9cb3c7f86ee9dbcf3c67bfc3ba5298b36c0b94a459f11de34443",
+    "owner-playtest-observations.json": "91cdb1154cb0f35969b74a307c4456f35af0fed3a82063c39e2daeefc8336b26",
+    "README.md": "a38d098bfbf536dc04e1fe1da20e2f80ce0d95d06c9e9e1f0765fe7ddcf18bf6",
+    "runs.jsonl": "387dc23bedc825135339c630bf54b53450f7e5c76aaba85289399609d5f47dfb",
+    "static-artifacts.zip": "b58631ba4ea8a236dbf7374e738a494ae5cf49e6288a9d3d90c072edf00f80a1",
+    "surface-module-preservation.json": "7eb03acbf6856ee573ed59182ffb4b59805247d6e603af17e09e71c93532da03"
+  },
+  "final_commit_identity": "Reported externally after commit/push; no recursive self identity"
+}

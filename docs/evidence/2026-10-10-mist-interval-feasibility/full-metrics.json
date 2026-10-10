@@ -1,0 +1,199 @@
+[
+  {
+    "key": "diagnostic_high_generic_dielectric",
+    "source_sha256": "08c78ce3d2f89b50e9df3dcfaf9a4b79f9cbb4ac3bfb9b67e285da33fca5a939",
+    "raw_spirv_sha256": "f935339a8cb48b7ed4d7ccbde419357aa5d2855a3474e5868271028d64a0505d",
+    "spirv_sha256": "ac79e56ce3fd2d62af9dab3d78b2b1951a93ef91a64fe4dcce3a8973750dd18c",
+    "disassembly_sha256": "0a6b5bc4446e707476ba931720daf717940984f5da5bf371688d85bfafaaea3d",
+    "metrics": {
+      "instructions": 17700,
+      "branchOperations": 1057,
+      "loops": 28,
+      "selectionMerges": 434,
+      "functions": 85,
+      "functionCalls": 237,
+      "rayQueryInitializations": 3,
+      "atomicInstructions": 41,
+      "bytes": 296100,
+      "words": 74025
+    },
+    "measured_exact": {
+      "instrumentation": "Diagnostic",
+      "quality": "High",
+      "material": "GenericDielectric",
+      "strategy": "GenericRetained",
+      "shippingAllowed": false,
+      "atomicInstructions": 41,
+      "hasDiagnosticsBinding": true,
+      "driverSafeFullyInlined": false,
+      "boundedGenericFunctionsRetained": true
+    },
+    "excess": {
+      "bytes": 140,
+      "words": 35,
+      "instructions": 51,
+      "branchOperations": 71,
+      "loops": 7,
+      "selectionMerges": 18,
+      "functions": 2,
+      "rayQueryInitializations": 1
+    },
+    "exact_violations": {},
+    "before": {
+      "name": "diagnostic_high_generic_dielectric-interval",
+      "source_sha256": "4f91cf541d929d324cfeaf12eed0bc021bab23167e292e34b22a13f1da0b2903",
+      "spirv_sha256": "eb3db3611c9c9bb58d395ceec61420a5f034d950b4acac5627b4120f384eefb3",
+      "include_sha256": "61b4b45e9cc401541839cb24c5627966343b73421fc66793ee72003703b827ec",
+      "bytes": 305592,
+      "words": 76398,
+      "instructions": 18291,
+      "branchOperations": 1065,
+      "loops": 27,
+      "selectionMerges": 441,
+      "functions": 85,
+      "functionCalls": 267,
+      "rayQueryInitializations": 3,
+      "atomicInstructions": 41,
+      "key": "diagnostic_high_generic_dielectric",
+      "excess": {
+        "bytes": 9632,
+        "words": 2408,
+        "instructions": 642,
+        "branchOperations": 79,
+        "loops": 6,
+        "selectionMerges": 25,
+        "functions": 2,
+        "functionCalls": 3,
+        "rayQueryInitializations": 1
+      },
+      "measured_exact_contract": {
+        "instrumentation": "Diagnostic",
+        "quality": "High",
+        "material": "GenericDielectric",
+        "strategy": "GenericRetained",
+        "shippingAllowed": false,
+        "atomicInstructions": 41,
+        "hasDiagnosticsBinding": true,
+        "driverSafeFullyInlined": false,
+        "boundedGenericFunctionsRetained": true
+      },
+      "exact_violations": {},
+      "extra_diagnostic_bindings": [
+        28,
+        29
+      ]
+    },
+    "delta_from_prototype": {
+      "instructions": -591,
+      "branchOperations": -8,
+      "loops": 1,
+      "selectionMerges": -7,
+      "functions": 0,
+      "functionCalls": -30,
+      "rayQueryInitializations": 0,
+      "atomicInstructions": 0,
+      "bytes": -9492
+    },
+    "generic_third_query_site": "UNRESOLVED; cone AS initialization remains distinct",
+    "classification_correction": "Initial evidence scanner incorrectly matched a variable name; corrected by reflected Binding 22. Original full-metrics.json retained, shader bytes unchanged."
+  },
+  {
+    "key": "diagnostic_high_opaque_fast",
+    "source_sha256": "56e258320a5f923602ca992fb92707b3d836e343b58cd41a41ee69bfda4f32ae",
+    "raw_spirv_sha256": "244bc78c7c8bd88c5de0738db8691dd686e1e12e841f42f808b400dd7f94ed50",
+    "spirv_sha256": "8d2b1cde8da33d71d7aee5349a3de56012156ee8b9c34d2ab3613aa4a0276630",
+    "disassembly_sha256": "994dba3207c3c9e3852da1c0b5faa1c85df156d03796f64b602fe09d38ace79b",
+    "metrics": {
+      "instructions": 30724,
+      "branchOperations": 4363,
+      "loops": 76,
+      "selectionMerges": 1749,
+      "functions": 1,
+      "functionCalls": 0,
+      "rayQueryInitializations": 30,
+      "atomicInstructions": 5,
+      "bytes": 553184,
+      "words": 138296
+    },
+    "measured_exact": {
+      "instrumentation": "Diagnostic",
+      "quality": "High",
+      "material": "OpaqueFast",
+      "strategy": "LegacyInlined",
+      "shippingAllowed": false,
+      "atomicInstructions": 5,
+      "hasDiagnosticsBinding": true,
+      "driverSafeFullyInlined": false,
+      "boundedGenericFunctionsRetained": false
+    },
+    "excess": {
+      "rayQueryInitializations": 1
+    },
+    "exact_violations": {
+      "driverSafeFullyInlined": {
+        "expected": true,
+        "observed": false
+      }
+    },
+    "before": {
+      "name": "diagnostic_high_opaque_fast-interval",
+      "source_sha256": "908270b0a2248c93eddc6cc8a98a782ba4eb347eb44ffb07205eb48a1013832a",
+      "spirv_sha256": "06693ecdba888aea688bea1c1f5e83442703b6e7c8968a8604e97bd2b9ae7ffe",
+      "include_sha256": "6aa01d41ffa0f09dcdd13e6ad4e04657b7582b66380fe6177a6eed4d2fc7bf74",
+      "bytes": 610812,
+      "words": 152703,
+      "instructions": 33955,
+      "branchOperations": 4779,
+      "loops": 105,
+      "selectionMerges": 1906,
+      "functions": 1,
+      "functionCalls": 0,
+      "rayQueryInitializations": 30,
+      "atomicInstructions": 5,
+      "key": "diagnostic_high_opaque_fast",
+      "excess": {
+        "bytes": 15292,
+        "words": 3823,
+        "instructions": 888,
+        "branchOperations": 164,
+        "loops": 21,
+        "selectionMerges": 46,
+        "rayQueryInitializations": 1
+      },
+      "measured_exact_contract": {
+        "instrumentation": "Diagnostic",
+        "quality": "High",
+        "material": "OpaqueFast",
+        "strategy": "LegacyInlined",
+        "shippingAllowed": false,
+        "atomicInstructions": 5,
+        "hasDiagnosticsBinding": true,
+        "driverSafeFullyInlined": false,
+        "boundedGenericFunctionsRetained": false
+      },
+      "exact_violations": {
+        "driverSafeFullyInlined": {
+          "expected": true,
+          "observed": false
+        }
+      },
+      "extra_diagnostic_bindings": [
+        28,
+        29
+      ]
+    },
+    "delta_from_prototype": {
+      "instructions": -3231,
+      "branchOperations": -416,
+      "loops": -29,
+      "selectionMerges": -157,
+      "functions": 0,
+      "functionCalls": 0,
+      "rayQueryInitializations": 0,
+      "atomicInstructions": 0,
+      "bytes": -57628
+    },
+    "generic_third_query_site": "UNRESOLVED; cone AS initialization remains distinct",
+    "classification_correction": "Initial evidence scanner incorrectly matched a variable name; corrected by reflected Binding 22. Original full-metrics.json retained, shader bytes unchanged."
+  }
+]

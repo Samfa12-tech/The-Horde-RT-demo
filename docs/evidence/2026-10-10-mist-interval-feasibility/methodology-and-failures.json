@@ -1,0 +1,50 @@
+{
+  "original_strict_cell_discriminator": 2e-05,
+  "final_gate": "FAIL; original discriminator retained",
+  "intermediate_runs": [
+    {
+      "classification": "agent-reported; original raw JSON/log unavailable because output file was overwritten",
+      "method": "unsuffixed depth capture, simplified cell edges, fixed 2e-5 coverage threshold",
+      "source": 1,
+      "pixel": [
+        465,
+        286
+      ],
+      "deltas_2_6_8": [
+        0.0007716443,
+        0.0023148807,
+        0.0030254823
+      ],
+      "outcome": "FAIL"
+    },
+    {
+      "classification": "agent-reported; original raw JSON/log unavailable because output file was overwritten",
+      "method": "simplified cell edges",
+      "source": 1,
+      "pixel": [
+        465,
+        286
+      ],
+      "deltas_2_6_8": [
+        0.0007696949,
+        0.0023345511,
+        0.0031126009
+      ],
+      "outcome": "FAIL"
+    },
+    {
+      "classification": "retained temporary report; not accepted as correctness gate",
+      "method": "verified depth-3, projected shader cell edges, substituted endpoint-derived bound",
+      "report_sha256": "60010e3ef4401e8ceb3ff47690954a1f67eb7a0430a5be26a962ae10ec737f82",
+      "outcome": "PASS under larger derived bound; REJECTED as replacement acceptance criterion"
+    }
+  ],
+  "final": {
+    "method": "verified depth-3, projected shader cell edges, fixed 2e-5 threshold",
+    "raw_report": "correctness-final.json",
+    "outcome": "FAIL three aperture-one schedule checks"
+  },
+  "retention_correction": "Final runner chooses an unused numbered output; subsequent failures/passes will not replace earlier reports.",
+  "static_scanner_correction": "Initial hasDiagnosticsBinding scanner matched an incorrect variable name. Reflected SPIR-V Binding 22 is present in both modules; reconciled metrics correct this classification without recompilation. Initial scanner report remains preserved.",
+  "multi_interval_roundoff_note": "2*max_endpoint_error/cell_length contextual bound applies only to this roster (one interval in every nonempty union). General disjoint-union analysis must sum endpoint errors. Neither bound replaces fixed cell acceptance."
+}

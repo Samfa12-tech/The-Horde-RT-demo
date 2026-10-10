@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "cases": [
+    {
+      "name": "aperture-0-overlap-disconnected-thin",
+      "selected_aperture": 0,
+      "candidates": [
+        {"aperture": 0, "interval": [4.0, 5.0]},
+        {"aperture": 0, "interval": [1.0, 2.0]},
+        {"aperture": 0, "interval": [1.5, 2.5]},
+        {"aperture": 0, "interval": [3.0, 3.125]},
+        {"aperture": 1, "interval": [8.0, 9.0]}
+      ],
+      "expected_raw": [[4.0, 5.0], [1.0, 2.0], [1.5, 2.5], [3.0, 3.125]],
+      "cells": [[0.0, 1.0], [1.0, 2.0], [2.0, 3.0], [2.5, 3.0], [3.0, 4.0], [4.0, 5.0], [5.0, 6.0]]
+    },
+    {
+      "name": "aperture-1-source-filtered-displaced",
+      "selected_aperture": 1,
+      "candidates": [
+        {"aperture": 0, "interval": [1.0, 2.0]},
+        {"aperture": 1, "interval": [4.0, 5.0]},
+        {"aperture": 0, "interval": [4.0, 5.0]},
+        {"aperture": 1, "interval": [1.0, 2.0]},
+        {"aperture": 1, "interval": [1.5, 2.5]}
+      ],
+      "expected_raw": [[4.0, 5.0], [1.0, 2.0], [1.5, 2.5]],
+      "cells": [[0.0, 1.0], [1.0, 2.0], [2.0, 3.0], [3.0, 4.0], [4.0, 5.0], [5.0, 6.0]]
+    },
+    {
+      "name": "raw-64-accepted",
+      "selected_aperture": 0,
+      "generated": {"selected_raw": 64},
+      "cells": [[0.0, 1.0], [126.0, 127.0], [126.5, 127.5], [128.0, 129.0]]
+    },
+    {
+      "name": "raw-65-rejected",
+      "selected_aperture": 0,
+      "expected_status": "rejected-raw-capacity",
+      "generated": {"selected_raw": 65}
+    },
+    {
+      "name": "callbacks-512-accepted-64-selected",
+      "selected_aperture": 0,
+      "generated": {"selected_raw": 64, "other_aperture_callbacks": 448},
+      "cells": [[0.0, 1.0], [126.0, 127.0], [128.0, 129.0]]
+    },
+    {
+      "name": "callbacks-513-rejected-before-source-filter",
+      "selected_aperture": 0,
+      "expected_status": "rejected-callback-capacity",
+      "generated": {"selected_raw": 64, "other_aperture_callbacks": 449}
+    }
+  ]
+}

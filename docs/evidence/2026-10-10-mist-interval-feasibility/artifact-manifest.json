@@ -1,0 +1,160 @@
+{
+  "archive_sha256": "b58631ba4ea8a236dbf7374e738a494ae5cf49e6288a9d3d90c072edf00f80a1",
+  "files": [
+    {
+      "path": "common-cell-surface/compile.log",
+      "bytes": 13,
+      "sha256": "666e67c27f8b14ff007c95083f3f797dad7cf39d3a1e8c3302a8d3c7abf5493a"
+    },
+    {
+      "path": "common-cell-surface/disassemble.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "common-cell-surface/optimize.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "common-cell-surface/raw.spv",
+      "bytes": 239964,
+      "sha256": "5fce92f3a8fabc2c4550e01e1d696f842bf44810dd3d032675de8d917f9d620d"
+    },
+    {
+      "path": "common-cell-surface/shader.spv",
+      "bytes": 238796,
+      "sha256": "fe32e68a44981532b723d9c29d1a9c251afe34755a450817f451efee4b1a6528"
+    },
+    {
+      "path": "common-cell-surface/shader.spvasm",
+      "bytes": 703732,
+      "sha256": "311c0161d2f9e7aa5f64799770c824cfd2a10abe5c67f776fcc15444f2d77be1"
+    },
+    {
+      "path": "common-cell-surface/source.rgen",
+      "bytes": 200329,
+      "sha256": "fe610e35234b27494de161b6bb83be17378624ec805e52489ecad5f7e2a22c81"
+    },
+    {
+      "path": "common-cell-surface/validate.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "diagnostic_high_generic_dielectric/compile.log",
+      "bytes": 13,
+      "sha256": "666e67c27f8b14ff007c95083f3f797dad7cf39d3a1e8c3302a8d3c7abf5493a"
+    },
+    {
+      "path": "diagnostic_high_generic_dielectric/disassemble.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "diagnostic_high_generic_dielectric/optimize.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "diagnostic_high_generic_dielectric/query-sites.json",
+      "bytes": 587,
+      "sha256": "0e49a1edabe66355b89628363c0ec62c39cc7b37a384c9e380c6ee9d1984f8a0"
+    },
+    {
+      "path": "diagnostic_high_generic_dielectric/raw.spv",
+      "bytes": 296644,
+      "sha256": "f935339a8cb48b7ed4d7ccbde419357aa5d2855a3474e5868271028d64a0505d"
+    },
+    {
+      "path": "diagnostic_high_generic_dielectric/shader.spv",
+      "bytes": 296100,
+      "sha256": "ac79e56ce3fd2d62af9dab3d78b2b1951a93ef91a64fe4dcce3a8973750dd18c"
+    },
+    {
+      "path": "diagnostic_high_generic_dielectric/shader.spvasm",
+      "bytes": 874151,
+      "sha256": "0a6b5bc4446e707476ba931720daf717940984f5da5bf371688d85bfafaaea3d"
+    },
+    {
+      "path": "diagnostic_high_generic_dielectric/source.rgen",
+      "bytes": 201333,
+      "sha256": "08c78ce3d2f89b50e9df3dcfaf9a4b79f9cbb4ac3bfb9b67e285da33fca5a939"
+    },
+    {
+      "path": "diagnostic_high_generic_dielectric/validate.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "diagnostic_high_opaque_fast/compile.log",
+      "bytes": 13,
+      "sha256": "666e67c27f8b14ff007c95083f3f797dad7cf39d3a1e8c3302a8d3c7abf5493a"
+    },
+    {
+      "path": "diagnostic_high_opaque_fast/disassemble.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "diagnostic_high_opaque_fast/optimize.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "diagnostic_high_opaque_fast/query-sites.json",
+      "bytes": 5307,
+      "sha256": "4210b1fcc014005ea6979e95f46fe18a45f4377db67121514db047eea26955ec"
+    },
+    {
+      "path": "diagnostic_high_opaque_fast/raw.spv",
+      "bytes": 769744,
+      "sha256": "244bc78c7c8bd88c5de0738db8691dd686e1e12e841f42f808b400dd7f94ed50"
+    },
+    {
+      "path": "diagnostic_high_opaque_fast/shader.spv",
+      "bytes": 553184,
+      "sha256": "8d2b1cde8da33d71d7aee5349a3de56012156ee8b9c34d2ab3613aa4a0276630"
+    },
+    {
+      "path": "diagnostic_high_opaque_fast/shader.spvasm",
+      "bytes": 1496503,
+      "sha256": "994dba3207c3c9e3852da1c0b5faa1c85df156d03796f64b602fe09d38ace79b"
+    },
+    {
+      "path": "diagnostic_high_opaque_fast/source.rgen",
+      "bytes": 201333,
+      "sha256": "56e258320a5f923602ca992fb92707b3d836e343b58cd41a41ee69bfda4f32ae"
+    },
+    {
+      "path": "diagnostic_high_opaque_fast/validate.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "full-metrics-reconciled.json",
+      "bytes": 6618,
+      "sha256": "ca3d650e7b5cabc58c68083d8c99d62fbe05df86226dab3614cbc1075c6e7735"
+    },
+    {
+      "path": "full-metrics.json",
+      "bytes": 6424,
+      "sha256": "a450ec3d88a90b9ec1126f2cbeceafc81e9d290b57c260bd5f31afac2f01b229"
+    },
+    {
+      "path": "input-identities-reconciled.json",
+      "bytes": 1476,
+      "sha256": "22c3731b099d4c56f6c8de42fd194a7814262ff993e9f27e280de295ab8731f3"
+    },
+    {
+      "path": "input-identities.json",
+      "bytes": 1241,
+      "sha256": "30cce4a63683b49166f21882a1ef47b9848cf3b6a70a8ed8f861de0fc4c37de1"
+    },
+    {
+      "path": "surface-module-preservation.json",
+      "bytes": 1248,
+      "sha256": "7eb03acbf6856ee573ed59182ffb4b59805247d6e603af17e09e71c93532da03"
+    }
+  ]
+}
