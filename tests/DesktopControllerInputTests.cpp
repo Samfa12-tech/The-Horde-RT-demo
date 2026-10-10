@@ -495,6 +495,13 @@ int main()
             "production RT Lab focus and silent navigation must use the behavior-tested seams");
     const std::size_t graphicsNavigationBegin = windowsSource.find("void NavigateGraphicsMenu(");
     const std::size_t graphicsNavigationEnd = windowsSource.find("void CancelControllerMenu(", graphicsNavigationBegin);
+    const std::size_t menuRosterBegin = windowsSource.find("std::vector<HWND> VisibleControllerMenuControls(");
+    const std::size_t menuRosterEnd = windowsSource.find("void NavigateControllerMenu(", menuRosterBegin);
+    const std::size_t settingsLayoutBegin = windowsSource.find("const bool entrySettings =");
+    const std::size_t graphicsLayoutBegin = windowsSource.find(
+        "if (layoutContext != nullptr && layoutContext->graphicsVisible)", settingsLayoutBegin);
+    const std::size_t settingsOverlayStateBegin = windowsSource.find("void ApplyOverlayState(");
+    const std::size_t settingsOverlayStateEnd = windowsSource.find("void ShowPauseMenu(", settingsOverlayStateBegin);
     const std::size_t visibleControlsBegin = windowsSource.find("std::vector<HWND> VisibleControllerMenuControls(");
     const std::size_t visibleControlsEnd = windowsSource.find("void NavigateControllerMenu(", visibleControlsBegin);
     const std::size_t keyboardTabBegin = windowsSource.find("sceneContext->simulationPaused && wParam == VK_TAB");
@@ -525,6 +532,43 @@ int main()
                     .find("(GetKeyState(VK_SHIFT) & 0x8000) != 0 ? -1 : 1") != std::string::npos &&
             windowsSource.find("WrapRtLabFocus(index, direction, controls.size())") != std::string::npos,
             "graphics arrow navigation must use spatial control bounds while Tab retains the cyclic menu path");
+    Require(menuRosterBegin != std::string::npos && menuRosterEnd != std::string::npos &&
+            settingsLayoutBegin != std::string::npos && graphicsLayoutBegin != std::string::npos &&
+            settingsOverlayStateBegin != std::string::npos &&
+            settingsOverlayStateEnd != std::string::npos,
+            "Settings navigation order and both native layout modes must remain inspectable");
+    const std::string_view menuRoster(
+        windowsSource.data() + menuRosterBegin, menuRosterEnd - menuRosterBegin);
+    const auto rosterPosition = [&menuRoster](const std::string_view control) {
+        return menuRoster.find(control);
+    };
+    Require(rosterPosition("kSensitivityButtonId") < rosterPosition("kGraphicsOpenButtonId") &&
+            rosterPosition("kGraphicsOpenButtonId") < rosterPosition("kSfxVolumeSliderId") &&
+            rosterPosition("kSfxVolumeSliderId") < rosterPosition("kMusicVolumeSliderId") &&
+            rosterPosition("kMusicVolumeSliderId") < rosterPosition("kFullscreenButtonId") &&
+            rosterPosition("kFullscreenButtonId") < rosterPosition("kSettingsBackButtonId"),
+            "entry and pause Settings controller order must follow Sensitivity, Graphics, audio, Fullscreen, Back");
+    const std::string_view settingsLayout(
+        windowsSource.data() + settingsLayoutBegin, graphicsLayoutBegin - settingsLayoutBegin);
+    const std::string_view overlayState(
+        windowsSource.data() + settingsOverlayStateBegin,
+        settingsOverlayStateEnd - settingsOverlayStateBegin);
+    const std::size_t secondSettingsRowLoop = settingsLayout.find(
+        "for (const int id : {kSensitivityButtonId, kWaterQualityButtonId})");
+    const std::size_t graphicsRowPosition = settingsLayout.find(
+        "MoveWindow(graphics, pauseX, y - settingsButtonHeight - gap");
+    const std::size_t effectsLabelPosition = settingsLayout.find("GetDlgItem(window, kSfxVolumeLabelId)");
+    Require(settingsLayout.find("const int settingsButtonHeight = entrySettings ?") != std::string_view::npos &&
+            secondSettingsRowLoop != std::string_view::npos &&
+            secondSettingsRowLoop < graphicsRowPosition &&
+            graphicsRowPosition != std::string_view::npos &&
+            graphicsRowPosition < effectsLabelPosition &&
+            settingsLayout.find("if (!entrySettings)", graphicsRowPosition) != std::string_view::npos &&
+            overlayState.find("kFullscreenButtonId, kGraphicsOpenButtonId") != std::string_view::npos &&
+            overlayState.find("context.settingsVisible && !context.graphicsVisible") != std::string_view::npos &&
+            overlayState.find("kWaterQualityButtonId, kRenderScaleLabelId, kRenderScaleSliderId") != std::string_view::npos &&
+            overlayState.find("SetControlVisible(context.windowHandle, id, context.graphicsVisible)") != std::string_view::npos,
+            "Graphics must occupy the second Settings row in entry/pause layouts while graphics-only controls stay hidden");
     const std::size_t labCommandsBegin = windowsSource.find("case kRtLabButtonId:");
     const std::size_t labCommandsEnd = windowsSource.find("case kDiagnosticsButtonId:", labCommandsBegin);
     const std::size_t labFunctionsBegin = windowsSource.find("void OpenRtLab(");
