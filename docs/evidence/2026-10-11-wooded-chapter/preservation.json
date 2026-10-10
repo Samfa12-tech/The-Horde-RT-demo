@@ -1,0 +1,184 @@
+{
+  "protected": [
+    {
+      "path": "tools/raygen-variant-budgets.json",
+      "sameBlobAsBase": true
+    },
+    {
+      "path": "tools/raygen-variant-catalog.json",
+      "sameBlobAsBase": true
+    },
+    {
+      "path": "tools/rayquery-variant-catalog.json",
+      "sameBlobAsBase": true
+    },
+    {
+      "path": "tests/FinalHeldTorchClearanceTests.cpp",
+      "sameBlobAsBase": true
+    },
+    {
+      "path": "src/vulkan/raytracing/RtPipelineVariantCatalog.generated.h",
+      "sameBlobAsBase": true
+    },
+    {
+      "path": "src/vulkan/raytracing/RtRayQueryVariantCatalog.generated.h",
+      "sameBlobAsBase": true
+    },
+    {
+      "path": "src/vulkan/raytracing/RtSceneAbi.generated.h",
+      "sameBlobAsBase": true
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/diagnostic_high_generic_dielectric.inc",
+      "sameBlobAsBase": true
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/diagnostic_high_opaque_fast.inc",
+      "sameBlobAsBase": true
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/diagnostic_mobile_generic_dielectric.inc",
+      "sameBlobAsBase": true
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/diagnostic_mobile_opaque_fast.inc",
+      "sameBlobAsBase": true
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_high_generic_dielectric.inc",
+      "sameBlobAsBase": true
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_high_opaque_fast.inc",
+      "sameBlobAsBase": true
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_mobile_generic_dielectric.inc",
+      "sameBlobAsBase": true
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_mobile_opaque_fast.inc",
+      "sameBlobAsBase": true
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_shipping_high_generic_dielectric.inc",
+      "sameBlobAsBase": true
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_shipping_high_opaque_fast.inc",
+      "sameBlobAsBase": true
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_shipping_mobile_generic_dielectric.inc",
+      "sameBlobAsBase": true
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_shipping_mobile_opaque_fast.inc",
+      "sameBlobAsBase": true
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/shipping_high_generic_dielectric.inc",
+      "sameBlobAsBase": true
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/shipping_high_opaque_fast.inc",
+      "sameBlobAsBase": true
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/shipping_mobile_generic_dielectric.inc",
+      "sameBlobAsBase": true
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/shipping_mobile_opaque_fast.inc",
+      "sameBlobAsBase": true
+    },
+    {
+      "path": "shaders/README.md",
+      "sameBlobAsBase": true
+    },
+    {
+      "path": "shaders/raytracing/README.md",
+      "sameBlobAsBase": true
+    },
+    {
+      "path": "shaders/raytracing/experimental/staged_primary_record.glsl",
+      "sameBlobAsBase": true
+    },
+    {
+      "path": "shaders/raytracing/include/rt_atmosphere.glsl",
+      "sameBlobAsBase": true
+    },
+    {
+      "path": "shaders/raytracing/include/rt_diagnostics.glsl",
+      "sameBlobAsBase": true
+    },
+    {
+      "path": "shaders/raytracing/include/rt_dielectric_common.glsl",
+      "sameBlobAsBase": true
+    },
+    {
+      "path": "shaders/raytracing/include/rt_dielectric_spawn.glsl",
+      "sameBlobAsBase": true
+    },
+    {
+      "path": "shaders/raytracing/include/rt_dielectric_transport.glsl",
+      "sameBlobAsBase": true
+    },
+    {
+      "path": "shaders/raytracing/include/rt_fire.glsl",
+      "sameBlobAsBase": true
+    },
+    {
+      "path": "shaders/raytracing/include/rt_frame.glsl",
+      "sameBlobAsBase": true
+    },
+    {
+      "path": "shaders/raytracing/include/rt_hit_decode.glsl",
+      "sameBlobAsBase": true
+    },
+    {
+      "path": "shaders/raytracing/include/rt_indoor_dust.glsl",
+      "sameBlobAsBase": true
+    },
+    {
+      "path": "shaders/raytracing/include/rt_lighting.glsl",
+      "sameBlobAsBase": true
+    },
+    {
+      "path": "shaders/raytracing/include/rt_scene_abi.generated.glsl",
+      "sameBlobAsBase": true
+    },
+    {
+      "path": "shaders/raytracing/include/rt_scene_abi.glsl",
+      "sameBlobAsBase": true
+    },
+    {
+      "path": "shaders/raytracing/include/rt_variant_config.glsl",
+      "sameBlobAsBase": true
+    },
+    {
+      "path": "shaders/raytracing/minimal.comp",
+      "sameBlobAsBase": true
+    },
+    {
+      "path": "shaders/raytracing/minimal.rchit",
+      "sameBlobAsBase": true
+    },
+    {
+      "path": "shaders/raytracing/minimal.rgen",
+      "sameBlobAsBase": true
+    },
+    {
+      "path": "shaders/raytracing/minimal.rmiss",
+      "sameBlobAsBase": true
+    },
+    {
+      "path": "src/vulkan/raytracing/RtSceneAbi.def",
+      "sameBlobAsBase": true
+    }
+  ],
+  "untrackedCandidatesNotStaged": true,
+  "existingBlend1Sha256": "0dae1e8fb803336cef2d045f48c5f4c9195a6463f45161cb0b6c7434350769fb",
+  "expectedBlend1Sha256": "0dae1e8fb803336cef2d045f48c5f4c9195a6463f45161cb0b6c7434350769fb",
+  "historicalBackupOriginalRecoveryVerified": false
+}

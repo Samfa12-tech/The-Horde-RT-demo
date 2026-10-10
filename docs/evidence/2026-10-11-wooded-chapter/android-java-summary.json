@@ -1,0 +1,18 @@
+{
+  "suites": 42,
+  "tests": 280,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "chapterTests": [
+    {
+      "name": "com.samfa12.hordelanternrt.ChapterSubtitlePolicyTest",
+      "tests": "5",
+      "skipped": "0",
+      "failures": "0",
+      "errors": "0",
+      "timestamp": "2026-10-10T15:01:08",
+      "time": "0.017"
+    }
+  ]
+}
