@@ -1,0 +1,512 @@
+[
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-abi-witness-debug-build.log",
+    "sanitizedSha256": "99e578675ac127c4749329258ff4ab8a4cc3d818f32a23c89d236fdf80260f58",
+    "bytes": 193,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-abi-witness-debug-test.log",
+    "sanitizedSha256": "0ac9595089499088d76890aefbe6164183d7691f4d695d65e945d8ed1be5ad18",
+    "bytes": 249,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-android-corrected.log",
+    "sanitizedSha256": "931d886ea521220d6ed3c8caa82613609ca423b38d96e5cd8f87036100646294",
+    "bytes": 7083,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-android-debug-arm64-package-corrected.log",
+    "sanitizedSha256": "2c66e103d1dd4e4ca1fa2fff3c3543db3ceccfbfeee98d0f69ebe63a2542832a",
+    "bytes": 3446,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/final-validation/logs/tomb-polish-android-debug-arm64-package-final.log",
+    "sanitizedSha256": "2c66e103d1dd4e4ca1fa2fff3c3543db3ceccfbfeee98d0f69ebe63a2542832a",
+    "bytes": 3446,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-android-debug-arm64-package.log",
+    "sanitizedSha256": "e80e9f345e61c12558b965b1de1246655f8c1b6b215b7438d3d9b450a2da6197",
+    "bytes": 264,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/final-validation/logs/tomb-polish-android-debug-asset-package-final.log",
+    "sanitizedSha256": "6567fb23239b71777fe6b7debfbcb0077ab0df3cc5761c33ebfe80a827e8dcf0",
+    "bytes": 183,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-android-debug-asset-package.log",
+    "sanitizedSha256": "6567fb23239b71777fe6b7debfbcb0077ab0df3cc5761c33ebfe80a827e8dcf0",
+    "bytes": 183,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-android-final.log",
+    "sanitizedSha256": "a2fb24b4de68d6bbc3f0a1c88dee7e809bb081ed6343585ed51f6a0fcf111ec9",
+    "bytes": 7559,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/final-validation/logs/tomb-polish-android-metadata-correction.log",
+    "sanitizedSha256": "7ca347aa485fce58caa27faae85a1fddb42d697cdde049343c4f3335c2ce0243",
+    "bytes": 13096,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/final-validation/logs/tomb-polish-android-release-arm64-package-final.log",
+    "sanitizedSha256": "dcaa46e87db8ff517c3a8fb3d08567d4fda8435bfa4c0cfacb4c97c143b85451",
+    "bytes": 3445,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-android-release-arm64-package.log",
+    "sanitizedSha256": "dcaa46e87db8ff517c3a8fb3d08567d4fda8435bfa4c0cfacb4c97c143b85451",
+    "bytes": 3445,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/final-validation/logs/tomb-polish-android-release-asset-package-final.log",
+    "sanitizedSha256": "6567fb23239b71777fe6b7debfbcb0077ab0df3cc5761c33ebfe80a827e8dcf0",
+    "bytes": 183,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-android-release-asset-package.log",
+    "sanitizedSha256": "6567fb23239b71777fe6b7debfbcb0077ab0df3cc5761c33ebfe80a827e8dcf0",
+    "bytes": 183,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-asset-policy-corrected.log",
+    "sanitizedSha256": "038a8255221841b5cb786224578564634d626927d843a938294c834f8d63ec61",
+    "bytes": 523,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-asset-policy-final-a.log",
+    "sanitizedSha256": "3e0ed9870a9d873c19772d5645636f419c97b462464751f09854676754f83f2f",
+    "bytes": 281,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-asset-policy.log",
+    "sanitizedSha256": "22ca25581363b7d05551f53a1b3be0fa942c7507567f1db6ad69471c7cae03e8",
+    "bytes": 447,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-character-witness-debug-build.log",
+    "sanitizedSha256": "7482421dcf6fd8c529f2ee9de3db018cd333b497f3b851c8962ba96cfaf1c8a8",
+    "bytes": 580,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-character-witness-debug-build2.log",
+    "sanitizedSha256": "7482421dcf6fd8c529f2ee9de3db018cd333b497f3b851c8962ba96cfaf1c8a8",
+    "bytes": 580,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-character-witness-debug-test.log",
+    "sanitizedSha256": "02ddfa52e61d4fe7ad9c17e13948722fe4af04a83ddca2548fccb582ace134b2",
+    "bytes": 520,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-character-witness-debug-test2.log",
+    "sanitizedSha256": "08089088261a9589957f618fc23e28b96ee8ecb3bd367f6fd439c6b78778359e",
+    "bytes": 269,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-compatibility-generation.log",
+    "sanitizedSha256": "a983df94664e9dca1d631fc6e293271c7b39b38e7a2d7da78363d3c6b7c76f3a",
+    "bytes": 1162,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-configure-b.log",
+    "sanitizedSha256": "6231d4024cc18093061dc254f741403dd6d3ea46a83704f4200a2aea9bdd3128",
+    "bytes": 606,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-configure-coherent.log",
+    "sanitizedSha256": "ba376491f27b12b21c86a63b2e52136628b26f37a84d2b10b4753a1feba348a6",
+    "bytes": 606,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-configure-red-corrected.log",
+    "sanitizedSha256": "e42d97d8f0276669ab382783b35ae8631a431dba1137431914230432528f9e0d",
+    "bytes": 606,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-cpu-intake-debug-build.log",
+    "sanitizedSha256": "24bd7aadd8dc65eb35ae11e6222fffaab394eae08aa5ec22dd6ae5078ad28d7c",
+    "bytes": 591,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-cpu-intake-debug-test.log",
+    "sanitizedSha256": "98982535a6d373939eba78fd26a46cb8a1f433a426cb46fa8dd7be01d379ae20",
+    "bytes": 1961,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-cpu-intake-release-build.log",
+    "sanitizedSha256": "f156b3146f892badce4110f14dac2fefc2d108248e74a427804917f3bd05e74f",
+    "bytes": 607,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-cpu-intake-release-test.log",
+    "sanitizedSha256": "af85bed8901a857739d01fbf2545da72884689ea907b5e638a1929a15f6787ce",
+    "bytes": 1973,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-debug-affected-regressions.log",
+    "sanitizedSha256": "3624c5479b7639eb0326d72b506534a6418b786629daa491788740aa912ce127",
+    "bytes": 7305,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-debug-build-a.log",
+    "sanitizedSha256": "bd56ff3118d7b63d68ff08563b966ff58dd02f3508015782db763409c294289e",
+    "bytes": 20464,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-debug-build-coherent.log",
+    "sanitizedSha256": "3bfa273ed3e64dd3fd6b04d291af3e2e99b15941e7337e30e98af1d0d2589e2c",
+    "bytes": 142,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-debug-build-corrected-target.log",
+    "sanitizedSha256": "047f2745c9d148033e39d9198c5e11a43fe10e1d131c80f001ed73e7d21f65ff",
+    "bytes": 5598,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-debug-build-final.log",
+    "sanitizedSha256": "ff4ff65d7900fc634c3ca742c3e8298dff2b60877b2e6bd6405d1bfec0dd95f8",
+    "bytes": 31472,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-dressing-module-recess-adjusted.log",
+    "sanitizedSha256": "6e7e2a90b981c21f74e4d4c3f9ff9725f93137a03ab6d28c8e19520ddf5dd20e",
+    "bytes": 1328,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-dressing-module.log",
+    "sanitizedSha256": "c74476aaa16bb2e13358257330cfdd6ce242c2d1756d51cea7e6688d3ac9f766",
+    "bytes": 1330,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-final-torch-debug.log",
+    "sanitizedSha256": "3b6b03fd86cb6d0072624265a4f8cc66ad44fa712074bdc15c8882f42deb1069",
+    "bytes": 277,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-focused-green-tests.log",
+    "sanitizedSha256": "764915c973db79ccfcd38536b89ada6ec199a1f115798bdcb6f4ef0f45dcca69",
+    "bytes": 555,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-focused-green.log",
+    "sanitizedSha256": "df864b2c3978b31e7d52a7d5338db85829d23494cc8788cf44ed66231443166c",
+    "bytes": 1391,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-integrated-tests.log",
+    "sanitizedSha256": "993973f5902dfc3151cd81e18f9c3dc86c85a2bd0169440d17f26d9a0fcd0f01",
+    "bytes": 1218,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-integration-build.log",
+    "sanitizedSha256": "c7ce9bacdb28248c6a49770640e937f08a35fa0cd35f9bef0af4b82e8c95c74f",
+    "bytes": 2145,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-integration-tests.log",
+    "sanitizedSha256": "7b0badd98a148c30a1bc67a42e9fe5dcfc74d68e21e2509a6c487e8fce271491",
+    "bytes": 668,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-legacy-compatibility-generation.log",
+    "sanitizedSha256": "321f201fb045645521f56960823553c90d2fe3d4558ec1f132e89ca42809915e",
+    "bytes": 588,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-one-unit-negative-corrected.log",
+    "sanitizedSha256": "fcc2bb0aa824fe408db9d1396343ada8d9db955d70b8e4abc4443dc5117820cf",
+    "bytes": 1650,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-one-unit-negative.log",
+    "sanitizedSha256": "35d3d37b993c16b3b88d33b24bf2fa297a32401a78a67d6136736ae25f9019f2",
+    "bytes": 227,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/final-validation/logs/tomb-polish-other-abi-identities-final.log",
+    "sanitizedSha256": "690c29ce1a2fb7b08bfc2ea30bcb5f04c28d02601b1784800ffca28efbf9e002",
+    "bytes": 217,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-other-abi-identities.log",
+    "sanitizedSha256": "690c29ce1a2fb7b08bfc2ea30bcb5f04c28d02601b1784800ffca28efbf9e002",
+    "bytes": 217,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-other-abi-inspections.log",
+    "sanitizedSha256": "6d245f4ae609dff6861f3920cc6a73082ecf83d70a90a63c5b01295fad01685b",
+    "bytes": 236,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-pipeline-adapter.log",
+    "sanitizedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-preflight-correction-debug-build.log",
+    "sanitizedSha256": "b41c8f835a0ce5df246da1f3bf444745732eed6d6a68f1bde70ed3e92c45171b",
+    "bytes": 2232,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-preflight-correction-debug-tests.log",
+    "sanitizedSha256": "539b7ea2ca870e1615146cdd29692eb2816a882c7b1fe8bfedc0f820ec4d2997",
+    "bytes": 697,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-query-generation-corrected.log",
+    "sanitizedSha256": "713c3a93c6e18c7d191851c1f86dd7d4871aa3a5a80cd1b3538add89cafdbbe9",
+    "bytes": 1875,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-query-generation.log",
+    "sanitizedSha256": "76c7ee82a4c7ba75a68709e3acd9d601b82525f0415e8c66b0ca728191558082",
+    "bytes": 305,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-release-affected-tests.log",
+    "sanitizedSha256": "03e0b3d52ea4765b69c6479a990c3550e7fa0a927370462f23ddf5f9f606670c",
+    "bytes": 3311,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-release-build.log",
+    "sanitizedSha256": "64e74a2acaa1ea167c7e354bb924b47cd642bb5674f6838e76c3a16001eee279",
+    "bytes": 34228,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-release-configure.log",
+    "sanitizedSha256": "4f0e332b0725c42102e057e4670268a1fd53585e2367ce74bf4d5c8424d69ab1",
+    "bytes": 608,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-release-corrected-build.log",
+    "sanitizedSha256": "03c05a8c65259755315136169c4271d80645a9724a525c79c5d5c9f08f03e6fb",
+    "bytes": 18685,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-resource-diagnostic-build.log",
+    "sanitizedSha256": "24bd7aadd8dc65eb35ae11e6222fffaab394eae08aa5ec22dd6ae5078ad28d7c",
+    "bytes": 591,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-resource-diagnostic-run.log",
+    "sanitizedSha256": "62605f3411c738bd8d036bdffefd03984f910ffc2028d28630182a250a0309d0",
+    "bytes": 896,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-resource-diagnostic2-build.log",
+    "sanitizedSha256": "24bd7aadd8dc65eb35ae11e6222fffaab394eae08aa5ec22dd6ae5078ad28d7c",
+    "bytes": 591,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-resource-diagnostic2-run.log",
+    "sanitizedSha256": "5dd2639d623bd4b2781d1753e59c9b3e0cbdbdfc09191511a66ebbd8c0f7e6b8",
+    "bytes": 1062,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-resource-diagnostic3-build.log",
+    "sanitizedSha256": "24bd7aadd8dc65eb35ae11e6222fffaab394eae08aa5ec22dd6ae5078ad28d7c",
+    "bytes": 591,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-resource-diagnostic3-run.log",
+    "sanitizedSha256": "75586e55f938a18bbbf2a6053154b693d27544f7476025fffa41c2209c34a434",
+    "bytes": 1062,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/final-validation/logs/tomb-polish-selected-roster-debug-build.log",
+    "sanitizedSha256": "7f9bd1bd7dd7fcf31c4911107427c6edb3635a89875ce1797444c413b74164aa",
+    "bytes": 214,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/final-validation/logs/tomb-polish-selected-roster-debug-test.log",
+    "sanitizedSha256": "182874c72d185a71a2be630139dcf59041f20eb49cfb457e9b3b223174ac5a69",
+    "bytes": 259,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/final-validation/logs/tomb-polish-selected-roster-release-build.log",
+    "sanitizedSha256": "62be37b495136874dca1a9a51b3356e18d22a7c723bc140ca8fd34caa8ac302f",
+    "bytes": 218,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/final-validation/logs/tomb-polish-selected-roster-release-test.log",
+    "sanitizedSha256": "a4dd29a16c970a7c976fa34b00c9aec61fee6d97538ce155738a67d6b5c783a5",
+    "bytes": 261,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-shader-freeze.log",
+    "sanitizedSha256": "61972026f42eca4c5e32a0f9a88b42a983cf1b1da082c5ae94ee46be1596d0bb",
+    "bytes": 1632,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-shader-policy-tests.log",
+    "sanitizedSha256": "79187b0e06b038b6ccfbcf36f07e78cf6c7c7ece705c2e63efc330cb4079dc20",
+    "bytes": 1084,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/final-validation/logs/tomb-polish-showcase-witness-corrected.log",
+    "sanitizedSha256": "11ab4fb12aa1614fcbe62d9e4b10ac828cd574149ab55882a1f0dc9830871403",
+    "bytes": 170,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-slowdown-rebuild.log",
+    "sanitizedSha256": "91beb3f2f50104cd4d9a536e76a48b0b9afec8e4586ce078b32f24f71a814122",
+    "bytes": 1107,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-source-checkpoint-debug-build.log",
+    "sanitizedSha256": "774173b32fe86a06d55b61989030a02dd9021c8a28b1b76612bff1bde5e6350a",
+    "bytes": 619,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-source-checkpoint-debug-configure.log",
+    "sanitizedSha256": "4c445b953de1cac9451e7b1100313714125c1660754647bf052ac2016536884b",
+    "bytes": 606,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-source-checkpoint-release-build.log",
+    "sanitizedSha256": "653d7fe648852123533b82b94afdd4103e13ab73965067268eb8b37a48aca327",
+    "bytes": 639,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-source-checkpoint-release-configure.log",
+    "sanitizedSha256": "f45584ad1fbc893f78ab03dbd81bc2ac405934e3cb94f9013bfdedea36d87e24",
+    "bytes": 608,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-t02-recovery.log",
+    "sanitizedSha256": "260e1884f1e38b49849ec5f38464769e51315f3ff74a1ece388c73b04532d7e8",
+    "bytes": 61,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-t03-recovery.log",
+    "sanitizedSha256": "b04dc0e4b059236b65b22078b26b8aef59c35292f3afdb1f0a753b92b0be1360",
+    "bytes": 61,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-water-build-green.log",
+    "sanitizedSha256": "db3613b4e666716ce969e7badd3d55376b5387cc4b4f800eb711ce1cca0ec5a0",
+    "bytes": 3409,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-water-build-red-unsandboxed.log",
+    "sanitizedSha256": "8560f3e6d9737cf5384950820c7308d521bb7e7ea2a963c1243f82c7cc05b4aa",
+    "bytes": 520,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-water-build-red.log",
+    "sanitizedSha256": "807e65597d8f2fd98a35836b8e6e2e613a873c44e044af3ad0942f6c34035162",
+    "bytes": 57,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-water-integration-tests.log",
+    "sanitizedSha256": "178b5521e30c4b4025c1fff147c044bb55ad6fd6defb2dbf402e5ff091e27a0d",
+    "bytes": 596,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-water-integration.log",
+    "sanitizedSha256": "27d323e4470c1d389dad3b3cf9a7e061f8d9b17a4202b922793a799c9e79bebf",
+    "bytes": 1346,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-water-red.log",
+    "sanitizedSha256": "8c2d85506fa3edb94347b336555b59297ebf3e57aba85aeebc40a3e6cc43850f",
+    "bytes": 599,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-windows-debug-containment.log",
+    "sanitizedSha256": "1bac3f7e372a88e4c65607f9c28c52a9182e0dbc0facf356b070cb53f6a1d74b",
+    "bytes": 1566,
+    "rawRetainedLocally": true
+  },
+  {
+    "path": "docs/evidence/2026-10-10-tomb-polish/logs/tomb-polish-windows-release-containment.log",
+    "sanitizedSha256": "c68a1b0ef74e2fc95da4d28ca502ea0f18c328078f901a8783edf9717bd72fb0",
+    "bytes": 1561,
+    "rawRetainedLocally": true
+  }
+]

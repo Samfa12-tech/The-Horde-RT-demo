@@ -1,0 +1,42 @@
+[
+  {
+    "path": "models/world/runtime/tomb-dressing-v01/tomb-niche-rect/asset.manifest.json",
+    "oldBytes": 753,
+    "newBytes": 721,
+    "oldSha256": "90045051c989fef04d09623067596733316b5ca0bf60ff2bf0a3794ee0f70aae",
+    "newSha256": "cad866e741683d054a944afe7bb082e8b435cad6d0e27c85252ee8e1ee082abc",
+    "change": "CRLF to LF only; no JSON value or mesh change"
+  },
+  {
+    "path": "models/world/runtime/tomb-dressing-v01/tomb-niche-rect/candidate-receipt.json",
+    "oldBytes": 975,
+    "newBytes": 940,
+    "oldSha256": "7b34d1f7a53c20a800d2fdf53b7d828a6c42489f89e0eb28e02e162cbdaa800f",
+    "newSha256": "025ab5c64df9878d2d54bafcb1ade958aea77db429647987ce0883ce58839659",
+    "change": "CRLF to LF only; no JSON value or mesh change"
+  },
+  {
+    "path": "models/world/runtime/tomb-dressing-v01/tomb-niche-arched/asset.manifest.json",
+    "oldBytes": 755,
+    "newBytes": 723,
+    "oldSha256": "7e4a86f6c6c4a8a8ca185e1e295decf71c42a73000ce1d1e682119c8376d4822",
+    "newSha256": "3f67e0906b49664cb17de8657c4be71a87b3bbd806358ac615df956e88e63c04",
+    "change": "CRLF to LF only; no JSON value or mesh change"
+  },
+  {
+    "path": "models/world/runtime/tomb-dressing-v01/tomb-niche-arched/candidate-receipt.json",
+    "oldBytes": 978,
+    "newBytes": 943,
+    "oldSha256": "1a9a8932fab31704bfa88ca88f455a0037fe84bb3b78af3d1ea5eb58bc2ea48e",
+    "newSha256": "32785f6edd88f07a0e1adcab35aa23fa8f2ba75f7b708b5348949980e068c4d5",
+    "change": "CRLF to LF only; no JSON value or mesh change"
+  },
+  {
+    "path": "models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/derivation-receipt.json",
+    "oldBytes": 5230,
+    "newBytes": 5134,
+    "oldSha256": "35751b1d052f6867815e0493ab2570965298a435a63343ad2b5567c2c4f77da0",
+    "newSha256": "6c138994f57a3b3e10bf3113d591d6a47f47493b63618acc20932e9d79ee2f2f",
+    "change": "CRLF to LF only; no JSON value or mesh change"
+  }
+]

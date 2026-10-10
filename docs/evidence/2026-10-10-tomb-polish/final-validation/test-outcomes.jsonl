@@ -1,0 +1,5 @@
+{"log": "tomb-polish-ci-contract-corrections-debug.log", "test": "horde_rt_static_gltf_asset_tests", "outcome": "Passed", "seconds": 0.37, "sourceTree": "Implementation tree represented by e2503ba54fca46f21d3c9baf03368cb0bdbe5e00"}
+{"log": "tomb-polish-ci-contract-corrections-debug.log", "test": "horde_rt_horde_162_asset_policy_tests", "outcome": "Passed", "seconds": 81.35, "sourceTree": "Implementation tree represented by e2503ba54fca46f21d3c9baf03368cb0bdbe5e00"}
+{"log": "tomb-polish-ci-contract-corrections-debug.log", "test": "horde_rt_android_showcase_witness_policy_tests", "outcome": "Passed", "seconds": 1.04, "sourceTree": "Implementation tree represented by e2503ba54fca46f21d3c9baf03368cb0bdbe5e00"}
+{"log": "tomb-polish-selected-roster-debug-test.log", "test": "horde_rt_static_gltf_asset_tests", "outcome": "Passed", "seconds": 3.54, "sourceTree": "Implementation tree represented by e2503ba54fca46f21d3c9baf03368cb0bdbe5e00"}
+{"log": "tomb-polish-selected-roster-release-test.log", "test": "horde_rt_static_gltf_asset_tests", "outcome": "Passed", "seconds": 1.26, "sourceTree": "Implementation tree represented by e2503ba54fca46f21d3c9baf03368cb0bdbe5e00"}

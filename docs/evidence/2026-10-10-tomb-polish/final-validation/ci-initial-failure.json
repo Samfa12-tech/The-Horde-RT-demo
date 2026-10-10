@@ -1,0 +1,12 @@
+{
+  "run": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/38041246849",
+  "head": "bbadc2168805e0348bb04c0cf8738882e57e046e",
+  "outcome": "1/6 PASS, 5/6 FAILED",
+  "causes": [
+    "Static GLB test erroneously required four unselected local replacement experiments absent from the public checkpoint. Selected niche checks and recovered T02/T03 import checks are retained.",
+    "Exact derived JSON pins used CRLF working-tree bytes while committed files use LF. Writers now explicitly emit LF; five measured pins were refreshed with no JSON value/GLB/master change.",
+    "Android showcase witness expected old TLAS count26. Corrected to27, with water-contact slot26 / metadata24 and all invalid-count negative fixtures retained."
+  ],
+  "correctionSourceCommit": "e2503ba54fca46f21d3c9baf03368cb0bdbe5e00",
+  "localValidation": "Static GLB Debug/Release pass; three Debug contract gates 3/3 pass82.78s; Android four-ABI Debug/unsigned Release/lint/Java pass53s; both final APK asset/ARM64 shader inspections pass."
+}

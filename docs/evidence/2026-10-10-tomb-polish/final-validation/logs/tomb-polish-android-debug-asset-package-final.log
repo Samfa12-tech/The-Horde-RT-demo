@@ -1,0 +1,2 @@
+PASS: Android 1.6.2 runtime audio/environment/world package roster and exact bytes.
+This is asset admission only; signing, device, visual and changed-audio acceptance are separate.

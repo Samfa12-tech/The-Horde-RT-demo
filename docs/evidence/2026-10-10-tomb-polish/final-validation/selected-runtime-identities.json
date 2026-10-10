@@ -1,0 +1,92 @@
+[
+  {
+    "path": "assets/models/world/runtime/prepared-funerary-v01/t02-native-import-candidates/derivation-receipt.json",
+    "sha256": "390b57a453a0cb883bdd01938b0edb0dcae35e117a74eb324e4387b64022d1b8",
+    "bytes": 3465
+  },
+  {
+    "path": "assets/models/world/runtime/prepared-funerary-v01/t02-native-import-candidates/femur/tomb-femur-lod0.runtime.glb",
+    "sha256": "bdf24bb2b71290b3acf843ea48c2eb280e7d75300463ae0096e0da4796c4c608",
+    "bytes": 10580
+  },
+  {
+    "path": "assets/models/world/runtime/prepared-funerary-v01/t02-native-import-candidates/humerus/tomb-humerus-lod0.runtime.glb",
+    "sha256": "f39dc48c4b0faf1668e748f8927f219dbd3e4d1c90e6e90c71ec9f8a97c192af",
+    "bytes": 8564
+  },
+  {
+    "path": "assets/models/world/runtime/prepared-funerary-v01/t02-native-import-candidates/skull-jaw/tomb-skull-jaw-lod0.runtime.glb",
+    "sha256": "07d00188f183de5fd1ea1d24051e7e3c993953f02aaf85fcc9349d4b38105c4f",
+    "bytes": 127212
+  },
+  {
+    "path": "assets/models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/derivation-receipt.json",
+    "sha256": "6c138994f57a3b3e10bf3113d591d6a47f47493b63618acc20932e9d79ee2f2f",
+    "bytes": 5134
+  },
+  {
+    "path": "assets/models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_candle_stub_1.glb",
+    "sha256": "5e454e5aa302e3d081c9857e00a9c8d005c5454a5a7e04d6f212fdbf56c20823",
+    "bytes": 34992
+  },
+  {
+    "path": "assets/models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_candle_stub_2.glb",
+    "sha256": "01d24d1c097267b87bafe4a7545d0cdde50292f2fe7af12a70022c590a82d125",
+    "bytes": 38456
+  },
+  {
+    "path": "assets/models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_candle_stub_3.glb",
+    "sha256": "1a7967a9ae3a82a1e470067b9a344804aa5f40b36b7ba13b401538c6b8fa30a3",
+    "bytes": 30440
+  },
+  {
+    "path": "assets/models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_displaced_lid.glb",
+    "sha256": "e93203b35e8e1979ba16a67f31044076b20127fa8bfbc60b96512d2a5e777962",
+    "bytes": 67240
+  },
+  {
+    "path": "assets/models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_offering_bowl.glb",
+    "sha256": "6e193a9b36656bffa8c972dab0958884208c0a4f38b72333a4677ad2ceab302b",
+    "bytes": 45880
+  },
+  {
+    "path": "assets/models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_urn_broken_base.glb",
+    "sha256": "c0ed7c0261a125385f821109927567c4fc8f1ff0799d0c3c479d4149e09ad594",
+    "bytes": 87384
+  },
+  {
+    "path": "assets/models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_urn_rim_shard.glb",
+    "sha256": "63a76503741ae51f9230e7b23201037bb1e4402d348bbd27323000a82605f1ad",
+    "bytes": 56588
+  },
+  {
+    "path": "assets/models/world/runtime/tomb-dressing-v01/tomb-niche-rect/asset.manifest.json",
+    "sha256": "cad866e741683d054a944afe7bb082e8b435cad6d0e27c85252ee8e1ee082abc",
+    "bytes": 721
+  },
+  {
+    "path": "assets/models/world/runtime/tomb-dressing-v01/tomb-niche-rect/candidate-receipt.json",
+    "sha256": "025ab5c64df9878d2d54bafcb1ade958aea77db429647987ce0883ce58839659",
+    "bytes": 940
+  },
+  {
+    "path": "assets/models/world/runtime/tomb-dressing-v01/tomb-niche-rect/tomb-niche-rect-lod0.runtime.glb",
+    "sha256": "aa4b6cb8b072448534c4555a941851946bd6e9295af56b4b3ad035dd714e3ad9",
+    "bytes": 86016
+  },
+  {
+    "path": "assets/models/world/runtime/tomb-dressing-v01/tomb-niche-arched/asset.manifest.json",
+    "sha256": "3f67e0906b49664cb17de8657c4be71a87b3bbd806358ac615df956e88e63c04",
+    "bytes": 723
+  },
+  {
+    "path": "assets/models/world/runtime/tomb-dressing-v01/tomb-niche-arched/candidate-receipt.json",
+    "sha256": "32785f6edd88f07a0e1adcab35aa23fa8f2ba75f7b708b5348949980e068c4d5",
+    "bytes": 943
+  },
+  {
+    "path": "assets/models/world/runtime/tomb-dressing-v01/tomb-niche-arched/tomb-niche-arched-lod0.runtime.glb",
+    "sha256": "18810291df9ee3a630ca69dd813a29362b707f664982557e7dd7d37b8c8b5794",
+    "bytes": 99316
+  }
+]
