@@ -705,7 +705,8 @@ int main()
 
     GameSimulationConfig listenerConfig;
     listenerConfig.movementSpeedMetresPerSecond = 30.0f;
-    GameSimulation movingListeners(listenerConfig);
+    auto movingListenersStorage = std::make_unique<GameSimulation>(listenerConfig);
+    GameSimulation& movingListeners = *movingListenersStorage;
     InputSnapshot movingListenerInput;
     movingListenerInput.moveForward = 1.0f;
     movingListenerInput.yawRadians = 0.15f;
@@ -743,7 +744,8 @@ int main()
           movingFootstepsCaptureCurrentListener && atLeastOneListenerDiffersFromFrameEnd,
           "events from several fixed ticks in one moving frame must retain each contact's listener state");
 
-    GameSimulation attacks;
+    auto attacksStorage = std::make_unique<GameSimulation>();
+    GameSimulation& attacks = *attacksStorage;
     InputSnapshot attackInput;
     attackInput.damageEnabled = false;
     attackInput.commands.attack = 1u;
@@ -801,7 +803,8 @@ int main()
           }),
           "an out-of-range player swing must not falsely claim a skeleton target");
 
-    GameSimulation chainedAttack;
+    auto chainedAttackStorage = std::make_unique<GameSimulation>();
+    GameSimulation& chainedAttack = *chainedAttackStorage;
     InputSnapshot chainedInput;
     chainedInput.hasAuthoritativePlayerPose = true;
     chainedInput.authoritativePlayerX = 0.0f;
@@ -836,7 +839,8 @@ int main()
           chainedAttack.Snapshot().openingEncounterComplete,
           "downward then upward cut must consume two edges and publish one identified swing/hit per cut");
 
-    GameSimulation ownerTimedChainedAttack;
+    auto ownerTimedChainedAttackStorage = std::make_unique<GameSimulation>();
+    GameSimulation& ownerTimedChainedAttack = *ownerTimedChainedAttackStorage;
     InputSnapshot ownerTimedChainedInput;
     ownerTimedChainedInput.damageEnabled = false;
     ownerTimedChainedInput.commands.attack = 1u;
@@ -856,7 +860,8 @@ int main()
           CountEvents(ownerTimedChainedAttack.Events(), GameplayEventType::PlayerSwing) == 2u,
           "a natural 400 ms second press after the downstroke lands must produce the upward slice");
 
-    GameSimulation coalescedAttack;
+    auto coalescedAttackStorage = std::make_unique<GameSimulation>();
+    GameSimulation& coalescedAttack = *coalescedAttackStorage;
     InputSnapshot coalescedInput;
     coalescedInput.hasAuthoritativePlayerPose = true;
     coalescedInput.authoritativePlayerX = 0.0f;
@@ -872,7 +877,8 @@ int main()
           CountEvents(coalescedAttack.Events(), GameplayEventType::EnemyHit) == 2u,
           "a coalesced 0-to-2 publication must preserve both downward and upward edges");
 
-    GameSimulation pausedChain;
+    auto pausedChainStorage = std::make_unique<GameSimulation>();
+    GameSimulation& pausedChain = *pausedChainStorage;
     InputSnapshot pausedChainInput;
     pausedChainInput.damageEnabled = false;
     pausedChainInput.commands.attack = 1u;
@@ -892,7 +898,8 @@ int main()
 
     const auto deliverChainedAttack = [](const int renderRate)
     {
-        GameSimulation delivered;
+        auto deliveredStorage = std::make_unique<GameSimulation>();
+        GameSimulation& delivered = *deliveredStorage;
         InputSnapshot input;
         input.hasAuthoritativePlayerPose = true;
         input.authoritativePlayerX = 0.0f;
@@ -925,7 +932,8 @@ int main()
           chainedAt60[3] == 2u && chainedAt60[4] == 2u,
           "30/60/120 render delivery must preserve the same owner-timed 400 ms two-cut commands, hits, and final phase");
 
-    GameSimulation skeletonPair;
+    auto skeletonPairStorage = std::make_unique<GameSimulation>();
+    GameSimulation& skeletonPair = *skeletonPairStorage;
     InputSnapshot pairInput;
     pairInput.hasAuthoritativePlayerPose = true;
     pairInput.authoritativePlayerX = 0.0f;
@@ -1038,7 +1046,8 @@ int main()
     check(pairSwingCount == 2u && pairSwingsAreTargetless,
           "swing-intent events must stay targetless until an actual entity-aware hit resolves");
 
-    GameSimulation parrySimulation;
+    auto parrySimulationStorage = std::make_unique<GameSimulation>();
+    GameSimulation& parrySimulation = *parrySimulationStorage;
     InputSnapshot parryInput;
     parryInput.hasAuthoritativePlayerPose = true;
     parryInput.authoritativePlayerX = -0.75f;
@@ -1087,7 +1096,8 @@ int main()
           parrySimulation.Snapshot().playerAnimation.reaction == CombatReaction::Parried,
           "the next-tick riposte must start immediately while independent parry presentation remains visible");
 
-    GameSimulation catchUpParry;
+    auto catchUpParryStorage = std::make_unique<GameSimulation>();
+    GameSimulation& catchUpParry = *catchUpParryStorage;
     InputSnapshot catchUpParryInput = parryInput;
     catchUpParryInput.commands = {};
     bool catchUpParryIssued = false;
@@ -1130,7 +1140,8 @@ int main()
     bool parryPresentationCadenceStable = true;
     for (const double frameRate : frameRates)
     {
-        GameSimulation cadenceParry;
+        auto cadenceParryStorage = std::make_unique<GameSimulation>();
+        GameSimulation& cadenceParry = *cadenceParryStorage;
         InputSnapshot cadenceInput = parryInput;
         cadenceInput.commands = {};
         bool commandPublished = false;
@@ -1175,7 +1186,8 @@ int main()
           catchUpParry.Snapshot().combatPresentation.parrySuccessRemainingSeconds > 0.0f,
           "a 100 ms frame contribution must age parry presentation once rather than once per catch-up tick");
 
-    GameSimulation overCapParry;
+    auto overCapParryStorage = std::make_unique<GameSimulation>();
+    GameSimulation& overCapParry = *overCapParryStorage;
     InputSnapshot overCapParryInput = parryInput;
     overCapParryInput.commands = {};
     bool overCapParryIssued = false;
@@ -1240,7 +1252,8 @@ int main()
           NearlyEqual(skeletonPair.Snapshot().skeletonEnemies[1].x, 0.75f),
           "encounter retry must restore both skeletons at their authored spawns");
 
-    GameSimulation damageEvents;
+    auto damageEventsStorage = std::make_unique<GameSimulation>();
+    GameSimulation& damageEvents = *damageEventsStorage;
     InputSnapshot damageInput;
     damageInput.hasAuthoritativePlayerPose = true;
     damageInput.authoritativePlayerX = 0.0f;
@@ -1271,7 +1284,8 @@ int main()
 
     // Reproduce Restart Route's actual ordering: the UI publishes reset and
     // immediately resumes before the owner gets to consume the mailbox.
-    GameSimulation deadBeforeMenu = damageEvents;
+    auto deadBeforeMenuStorage = std::make_unique<GameSimulation>(damageEvents);
+    GameSimulation& deadBeforeMenu = *deadBeforeMenuStorage;
     for (int frame = 0; frame < 60; ++frame)
         deadBeforeMenu.StepFixed(damageInput);
     check(deadBeforeMenu.Snapshot().playerVitals.phase == PlayerLifePhase::Dead &&
@@ -1291,7 +1305,8 @@ int main()
     menuResume.paused = false;
     menuMailbox.Publish(menuResume);
     const auto coalescedMenu = menuMailbox.ConsumeLatest();
-    GameSimulation menuRestart = deadBeforeMenu;
+    auto menuRestartStorage = std::make_unique<GameSimulation>(deadBeforeMenu);
+    GameSimulation& menuRestart = *menuRestartStorage;
     menuRestart.SynchronizePausedInput(coalescedMenu.snapshot, coalescedMenu.publicationSequence,
         PausedInputPolicy::PreserveWorldCommands);
     menuRestart.SynchronizePausedInput(coalescedMenu.snapshot, coalescedMenu.publicationSequence,
@@ -1313,7 +1328,8 @@ int main()
           menuRestart.Snapshot().tickIndex == restarted.tickIndex && menuRestart.Events().Empty(),
           "the same resumed publication cannot apply a reset twice or advance paused gameplay time");
 
-    GameSimulation menuRetry = deadBeforeMenu;
+    auto menuRetryStorage = std::make_unique<GameSimulation>(deadBeforeMenu);
+    GameSimulation& menuRetry = *menuRetryStorage;
     InputSnapshot retryMenu = menuWorldInput;
     retryMenu.commands.routeReset = 0u;
     retryMenu.commands.retry = 1u;
@@ -1330,7 +1346,8 @@ int main()
           menuRetry.Snapshot().playerVitals.vitality == 3 && menuRetry.Events().Empty(),
           "repeated menu synchronization never duplicates retry or enables paused damage");
 
-    GameSimulation stopOverridesMenu = deadBeforeMenu;
+    auto stopOverridesMenuStorage = std::make_unique<GameSimulation>(deadBeforeMenu);
+    GameSimulation& stopOverridesMenu = *stopOverridesMenuStorage;
     stopOverridesMenu.SynchronizePausedInput(menuWorldInput, 401u, PausedInputPolicy::PreserveWorldCommands);
     stopOverridesMenu.SynchronizePausedInput(menuWorldInput, 402u); // New actual stop: default discards all.
     stopOverridesMenu.AdvanceFrame(menuResume, 0.0, 403u);
@@ -1339,7 +1356,8 @@ int main()
           stopOverridesMenu.Snapshot().retryGeneration == 0u && stopOverridesMenu.Events().Empty(),
           "a newer genuine lifecycle stop discards an earlier menu reset without reviving the player");
 
-    GameSimulation menuAfterStop = deadBeforeMenu;
+    auto menuAfterStopStorage = std::make_unique<GameSimulation>(deadBeforeMenu);
+    GameSimulation& menuAfterStop = *menuAfterStopStorage;
     menuAfterStop.SynchronizePausedInput(menuWorldInput, 501u); // Retained lifecycle discard floor.
     InputSnapshot newerMenuReset = menuWorldInput;
     newerMenuReset.commands.routeReset = 2u;
@@ -1350,7 +1368,8 @@ int main()
           menuAfterStop.Snapshot().lastConsumedRouteResetSequence == 2u && menuAfterStop.Events().Empty(),
           "a deliberate newer menu reset survives after older stopped edges were discarded");
 
-    GameSimulation menuTwoWorldCommands = deadBeforeMenu;
+    auto menuTwoWorldCommandsStorage = std::make_unique<GameSimulation>(deadBeforeMenu);
+    GameSimulation& menuTwoWorldCommands = *menuTwoWorldCommandsStorage;
     InputSnapshot bothWorld = menuWorldInput;
     bothWorld.commands.retry = 1u;
     menuTwoWorldCommands.SynchronizePausedInput(bothWorld, 601u, PausedInputPolicy::PreserveWorldCommands);
@@ -1366,7 +1385,8 @@ int main()
           menuTwoWorldCommands.Snapshot().retryGeneration == 1u && menuTwoWorldCommands.Events().Empty(),
           "another menu barrier preserves already-ingested retry until it is applied exactly once");
 
-    GameSimulation skeletonFeedback;
+    auto skeletonFeedbackStorage = std::make_unique<GameSimulation>();
+    GameSimulation& skeletonFeedback = *skeletonFeedbackStorage;
     InputSnapshot skeletonFeedbackInput;
     skeletonFeedbackInput.damageEnabled = false;
     bool sawEnemyFootstep = false;
@@ -1402,7 +1422,8 @@ int main()
     check(sawEnemyFootstep && sawEnemyAttackStarted && skeletonFeedbackIdentityValid,
           "walking and attacking skeletons must emit ordered entity-aware footstep and attack events");
 
-    GameSimulation lichFeedback;
+    auto lichFeedbackStorage = std::make_unique<GameSimulation>();
+    GameSimulation& lichFeedback = *lichFeedbackStorage;
     check(lichFeedback.ApplyShowcaseCheckpoint(9),
           "mirror checkpoint import must initialise lich feedback coverage");
     InputSnapshot lichFeedbackInput;
@@ -1440,7 +1461,8 @@ int main()
           lichFeedbackIdentityValid,
           "the lich must emit an ordered entity-aware charge then impact sequence");
 
-    GameSimulation lichDefeatFeedback;
+    auto lichDefeatFeedbackStorage = std::make_unique<GameSimulation>();
+    GameSimulation& lichDefeatFeedback = *lichDefeatFeedbackStorage;
     check(lichDefeatFeedback.ApplyShowcaseCheckpoint(10),
           "lich checkpoint import must initialise defeat-event coverage");
     InputSnapshot lichDefeatInput;
@@ -1547,7 +1569,8 @@ int main()
           chestUnlockedSequence > lichDefeatedSequence,
           "three accepted hits must emit one lich defeat followed exactly two fixed seconds later by one chest unlock");
 
-    GameSimulation retry;
+    auto retryStorage = std::make_unique<GameSimulation>();
+    GameSimulation& retry = *retryStorage;
     check(retry.ApplyShowcaseCheckpoint(9), "legacy combat fixture imports its exact authored state");
     InputSnapshot finaleInput;
     finaleInput.hasAuthoritativePlayerPose = true;
@@ -1616,7 +1639,8 @@ int main()
           NearlyEqual(retry.Snapshot().playerPitchRadians, 0.0f),
           "a paused route reset must restore the live opening pose with zero pitch once");
 
-    GameSimulation deadRejectsParry;
+    auto deadRejectsParryStorage = std::make_unique<GameSimulation>();
+    GameSimulation& deadRejectsParry = *deadRejectsParryStorage;
     InputSnapshot lethalInput;
     lethalInput.hasAuthoritativePlayerPose = true;
     lethalInput.authoritativePlayerX = -0.75f;
@@ -1632,7 +1656,8 @@ int main()
           deadRejectsParry.Snapshot().playerCombat.action == PlayerCombatAction::Idle,
           "death-state parry input must be consumed without starting or buffering an action");
 
-    GameSimulation pausedRejectsParry;
+    auto pausedRejectsParryStorage = std::make_unique<GameSimulation>();
+    GameSimulation& pausedRejectsParry = *pausedRejectsParryStorage;
     InputSnapshot pausedParryInput;
     pausedParryInput.paused = true;
     pausedParryInput.commands.parry = 1u;
@@ -1643,7 +1668,8 @@ int main()
           pausedRejectsParry.Snapshot().playerCombat.action == PlayerCombatAction::Idle,
           "paused parry input must be consumed without starting after resume");
 
-    GameSimulation directionalDodge;
+    auto directionalDodgeStorage = std::make_unique<GameSimulation>();
+    GameSimulation& directionalDodge = *directionalDodgeStorage;
     InputSnapshot dodgeInput;
     dodgeInput.damageEnabled = false;
     dodgeInput.moveForward = 1.0f;
@@ -1780,9 +1806,11 @@ int main()
           std::abs(neutralDodge->Snapshot().playerZ - kPlayerSpawn.z) < 0.04f,
           "neutral-stick dodge must fall back to current facing");
 
-    GameSimulation collisionDodge(GameSimulationConfig{.playerStartX = 1.65f,
-                                                        .playerStartZ = 1.85f,
-                                                        .playerStartYawRadians = 0.0f});
+    auto collisionDodgeStorage = std::make_unique<GameSimulation>(GameSimulationConfig{
+        .playerStartX = 1.65f,
+        .playerStartZ = 1.85f,
+        .playerStartYawRadians = 0.0f});
+    GameSimulation& collisionDodge = *collisionDodgeStorage;
     InputSnapshot collisionDodgeInput;
     collisionDodgeInput.damageEnabled = false;
     collisionDodgeInput.moveStrafe = 1.0f;
@@ -1797,7 +1825,8 @@ int main()
           collisionDodge.Snapshot().playerX < 1.85f,
           "dodge displacement must remain inside the shared corridor collision route");
 
-    GameSimulation pausedRejectsDodge;
+    auto pausedRejectsDodgeStorage = std::make_unique<GameSimulation>();
+    GameSimulation& pausedRejectsDodge = *pausedRejectsDodgeStorage;
     InputSnapshot pausedDodgeInput;
     pausedDodgeInput.paused = true;
     pausedDodgeInput.commands.dodge = 1u;
@@ -1810,7 +1839,8 @@ int main()
           NearlyEqual(pausedRejectsDodge.Snapshot().playerZ, kPlayerSpawn.z),
           "paused dodge input must be consumed without buffering movement after resume");
 
-    GameSimulation torchDrenchFeedback;
+    auto torchDrenchFeedbackStorage = std::make_unique<GameSimulation>();
+    GameSimulation& torchDrenchFeedback = *torchDrenchFeedbackStorage;
     InputSnapshot drenchedTorchInput;
     drenchedTorchInput.hasAuthoritativePlayerPose = true;
     drenchedTorchInput.authoritativePlayerX = -2.10f;
@@ -1851,7 +1881,8 @@ int main()
                       GameplayEventType::TorchExtinguished) == 0u,
           "pause/resume must not replay the already-consumed extinguish cue");
 
-    GameSimulation resetParity;
+    auto resetParityStorage = std::make_unique<GameSimulation>();
+    GameSimulation& resetParity = *resetParityStorage;
     check(resetParity.ApplyShowcaseCheckpoint(0) &&
           NearlyEqual(resetParity.Snapshot().playerPitchRadians, -0.05f) &&
           resetParity.Snapshot().skeletonEnemyCount == 1u &&
@@ -1866,7 +1897,8 @@ int main()
     bool historicalCheckpointsRemainSingle = true;
     for (std::int32_t checkpointId = 0; checkpointId < 12; ++checkpointId)
     {
-        GameSimulation historicalCapture;
+        auto historicalCaptureStorage = std::make_unique<GameSimulation>();
+        GameSimulation& historicalCapture = *historicalCaptureStorage;
         historicalCheckpointsRemainSingle = historicalCheckpointsRemainSingle &&
             historicalCapture.ApplyShowcaseCheckpoint(checkpointId) &&
             historicalCapture.Snapshot().skeletonEnemyCount == 1u &&
@@ -1876,7 +1908,8 @@ int main()
     }
     check(historicalCheckpointsRemainSingle,
           "all twelve historical authored checkpoints must retain the original one-skeleton capture state");
-    GameSimulation twoEnemyCapture;
+    auto twoEnemyCaptureStorage = std::make_unique<GameSimulation>();
+    GameSimulation& twoEnemyCapture = *twoEnemyCaptureStorage;
     check(twoEnemyCapture.ApplyShowcaseCheckpoint(12) &&
           twoEnemyCapture.Snapshot().activeEnemyKind == EnemyKind::Skeleton &&
           twoEnemyCapture.Snapshot().skeletonEnemyCount == 2u &&
@@ -2212,7 +2245,8 @@ int main()
           !IsWaterfallSkeletonPositionWalkable(-2.40f, -15.20f),
           "zigzag, retreat and re-entry preserve both reachable skeletons behind the wetline and block nav through the room boundary");
 
-    GameSimulation mirrorCapture;
+    auto mirrorCaptureStorage = std::make_unique<GameSimulation>();
+    GameSimulation& mirrorCapture = *mirrorCaptureStorage;
     check(mirrorCapture.ApplyShowcaseCheckpoint(9),
           "mirror checkpoint import must succeed");
     const float mirrorFacing = std::atan2(mirrorCapture.Snapshot().playerX - mirrorCapture.Snapshot().lich.x,
@@ -2223,7 +2257,8 @@ int main()
           mirrorCapture.Events().Empty(),
           "mirror import must finalize zero-delta lich facing without a tick or event");
 
-    GameSimulation finaleRoofCapture;
+    auto finaleRoofCaptureStorage = std::make_unique<GameSimulation>();
+    GameSimulation& finaleRoofCapture = *finaleRoofCaptureStorage;
     check(finaleRoofCapture.ApplyShowcaseCheckpoint(11) &&
           finaleRoofCapture.Snapshot().lich.phase == LichPhase::Dead &&
           finaleRoofCapture.Snapshot().lich.deathAnimationComplete &&
@@ -2232,12 +2267,17 @@ int main()
           finaleRoofCapture.Events().Empty(),
           "finale-roof zero-delta finalization must preserve the authored dead/open-roof state without a tick or event");
 
-    GameSimulation legacyMount;
+    auto legacyMountStorage = std::make_unique<GameSimulation>();
+    GameSimulation& legacyMount = *legacyMountStorage;
+    auto defaultMountStorage = std::make_unique<GameSimulation>(GameSimulationConfig{});
+    GameSimulation& defaultMount = *defaultMountStorage;
     GameSimulationConfig anatomicalMountConfig{};
     anatomicalMountConfig.playerMountProfile = items::PlayerMountProfile::AnatomicalBody;
     anatomicalMountConfig.swordStartsStowed = true;
-    GameSimulation anatomicalMount(anatomicalMountConfig);
-    GameSimulation productionMount(ProductionGameSimulationConfig());
+    auto anatomicalMountStorage = std::make_unique<GameSimulation>(anatomicalMountConfig);
+    GameSimulation& anatomicalMount = *anatomicalMountStorage;
+    auto productionMountStorage = std::make_unique<GameSimulation>(ProductionGameSimulationConfig());
+    GameSimulation& productionMount = *productionMountStorage;
     check(productionMount.Snapshot().playerMountProfile == items::PlayerMountProfile::AnatomicalBody &&
           productionMount.Snapshot().heldItemKinematics.leftHandLocal ==
               anatomicalMount.Snapshot().heldItemKinematics.leftHandLocal &&
@@ -2246,7 +2286,7 @@ int main()
           "production application configuration must preserve the exact accepted anatomical targets");
     check(legacyMount.Snapshot().playerMountProfile == items::PlayerMountProfile::LegacyViewRelative &&
           NearlyEqual(legacyMount.Snapshot().heldItemKinematics.heldPropDepth,
-                      GameSimulation(GameSimulationConfig{}).Snapshot().heldItemKinematics.heldPropDepth),
+                      defaultMount.Snapshot().heldItemKinematics.heldPropDepth),
           "default game simulation retains the legacy view-relative mount profile and target");
     {
         // The entry ceiling now requires additional Rag clearance. Compare
@@ -2351,7 +2391,8 @@ int main()
         GameSimulationConfig boundedLookConfig;
         boundedLookConfig.playerMountProfile = profile;
         boundedLookConfig.playerStartPitchRadians = -4.0f;
-        GameSimulation boundedLook(boundedLookConfig);
+        auto boundedLookStorage = std::make_unique<GameSimulation>(boundedLookConfig);
+        GameSimulation& boundedLook = *boundedLookStorage;
         check(NearlyEqual(boundedLook.Snapshot().playerPitchRadians, -0.32f),
               "both player mounts use the established gameplay look limit at construction");
         InputSnapshot extremeLook;
@@ -2380,7 +2421,8 @@ int main()
     check(anatomicalMount.Snapshot().playerMountProfile == items::PlayerMountProfile::AnatomicalBody,
           "reward checkpoint import preserves the configured player mount profile");
 
-    GameSimulation pausedRetry;
+    auto pausedRetryStorage = std::make_unique<GameSimulation>();
+    GameSimulation& pausedRetry = *pausedRetryStorage;
     InputSnapshot pausedFinale = finaleInput;
     pausedFinale.commands = {};
     pausedRetry.AdvanceFrame(pausedFinale, 1.0 / 60.0);
@@ -2405,7 +2447,8 @@ int main()
                             "glass-tinted-transport", "glass-millimetre-closed",
                             "glass-edge-fresnel"})
     {
-        GameSimulation glassCheckpoint(ProductionGameSimulationConfig());
+        auto glassCheckpointStorage = std::make_unique<GameSimulation>(ProductionGameSimulationConfig());
+        GameSimulation& glassCheckpoint = *glassCheckpointStorage;
         const auto* checkpoint = FindDevelopmentCheckpoint(name);
         check(checkpoint != nullptr &&
               StageDevelopmentCheckpointSimulation(glassCheckpoint, *checkpoint) &&
