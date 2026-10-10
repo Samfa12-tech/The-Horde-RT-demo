@@ -1,0 +1,80 @@
+UpdateCTestConfiguration  from :<repo>/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/build/presets/windows-x64-release/DartConfiguration.tcl
+Parse Config file:<repo>/build/presets/windows-x64-release/DartConfiguration.tcl
+Test project <repo>/build/presets/windows-x64-release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 156
+    Start 156: horde_rt_rescue_rig_attachment_tests
+
+156: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_rescue_rig_attachment_tests.exe"
+156: Working Directory: <repo>/build/presets/windows-x64-release
+156: Test timeout computed to be: 180
+156: FAIL: restored ordinary rig: Skinned player palm Grip socket exceeded the 15 mm grip tolerance: left=0.000000 right=2.268513 leftTarget=0.448847,1.551437,0.216984 leftSocket=0.448847,1.551437,0.216984 leftHandTarget=0.482522,1.542939,0.157907 leftHandSocket=0.482522,1.542939,0.157907 rightHandTarget=-0.186930,-1.648711,-0.060098 rightHandSocket=-0.173769,0.619733,-0.072072.
+156: FAIL: first restored supported pose must satisfy actual palm socket tolerance
+156: FAIL: restored ordinary rig: Skinned player palm Grip socket exceeded the 15 mm grip tolerance: left=0.000000 right=2.180628 leftTarget=0.448630,1.459081,0.142704 leftSocket=0.448630,1.459081,0.142704 leftHandTarget=0.482305,1.480129,0.086853 leftHandSocket=0.482305,1.480129,0.086853 rightHandTarget=-0.186930,-1.556676,-0.235616 rightHandSocket=-0.173911,0.620889,-0.120823.
+156: FAIL: first restored supported pose must satisfy actual palm socket tolerance
+156: FAIL: restored ordinary rig: Skinned player palm Grip socket exceeded the 15 mm grip tolerance: left=0.000000 right=2.253346 leftTarget=0.448428,1.510725,0.193299 leftSocket=0.448428,1.510725,0.193299 leftHandTarget=0.482103,1.514064,0.133707 leftHandSocket=0.482103,1.514064,0.133707 rightHandTarget=-0.186930,-1.633214,-0.124549 rightHandSocket=-0.173793,0.619823,-0.089577.
+156: FAIL: first restored supported pose must satisfy actual palm socket tolerance
+156: FAIL: restored ordinary rig: Skinned player palm Grip socket exceeded the 15 mm grip tolerance: left=0.000000 right=2.277970 leftTarget=0.448242,1.568761,0.223849 leftSocket=0.448243,1.568760,0.223849 leftHandTarget=0.481918,1.555732,0.165603 leftHandSocket=0.481918,1.555732,0.165603 rightHandTarget=-0.186930,-1.657967,-0.037529 rightHandSocket=-0.173754,0.619787,-0.065996.
+156: FAIL: first restored supported pose must satisfy actual palm socket tolerance
+156: FAIL: restored ordinary rig: Skinned player palm Grip socket exceeded the 15 mm grip tolerance: left=0.000000 right=2.180630 leftTarget=0.448076,1.459346,0.142802 leftSocket=0.448076,1.459346,0.142802 leftHandTarget=0.481751,1.480394,0.086951 leftHandSocket=0.481751,1.480394,0.086951 rightHandTarget=-0.186930,-1.556676,-0.235664 rightHandSocket=-0.173911,0.620890,-0.120836.
+156: FAIL: first restored supported pose must satisfy actual palm socket tolerance
+156: FAIL: restored ordinary rig: Skinned player palm Grip socket exceeded the 15 mm grip tolerance: left=0.000000 right=2.253346 leftTarget=0.447930,1.510979,0.193311 leftSocket=0.447930,1.510979,0.193311 leftHandTarget=0.481605,1.514318,0.133720 leftHandSocket=0.481605,1.514318,0.133720 rightHandTarget=-0.186930,-1.633213,-0.124578 rightHandSocket=-0.173793,0.619823,-0.089585.
+156: FAIL: first restored supported pose must satisfy actual palm socket tolerance
+156: FAIL: restored ordinary rig: Skinned player palm Grip socket exceeded the 15 mm grip tolerance: left=0.000000 right=2.277969 leftTarget=0.447806,1.568978,0.223799 leftSocket=0.447806,1.568978,0.223799 leftHandTarget=0.481481,1.555950,0.165553 leftHandSocket=0.481481,1.555950,0.165553 rightHandTarget=-0.186930,-1.657967,-0.037541 rightHandSocket=-0.173754,0.619787,-0.065999.
+156: FAIL: first restored supported pose must satisfy actual palm socket tolerance
+156: FAIL: restored ordinary rig: Skinned player palm Grip socket exceeded the 15 mm grip tolerance: left=0.000000 right=2.180632 leftTarget=0.447705,1.459524,0.142868 leftSocket=0.447705,1.459524,0.142867 leftHandTarget=0.481380,1.480572,0.087017 leftHandSocket=0.481380,1.480572,0.087017 rightHandTarget=-0.186930,-1.556676,-0.235695 rightHandSocket=-0.173911,0.620890,-0.120845.
+156: FAIL: first restored supported pose must satisfy actual palm socket tolerance
+156: FAIL: restored ordinary rig: Skinned player palm Grip socket exceeded the 15 mm grip tolerance: left=0.000000 right=2.253346 leftTarget=0.447629,1.511132,0.193319 leftSocket=0.447629,1.511132,0.193319 leftHandTarget=0.481304,1.514472,0.133727 leftHandSocket=0.481304,1.514472,0.133727 rightHandTarget=-0.186930,-1.633213,-0.124595 rightHandSocket=-0.173793,0.619823,-0.089590.
+156: FAIL: first restored supported pose must satisfy actual palm socket tolerance
+156: FAIL: restored ordinary rig: Skinned player palm Grip socket exceeded the 15 mm grip tolerance: left=0.000000 right=2.277969 leftTarget=0.447578,1.569091,0.223773 leftSocket=0.447578,1.569091,0.223773 leftHandTarget=0.481253,1.556063,0.165527 leftHandSocket=0.481253,1.556063,0.165527 rightHandTarget=-0.186930,-1.657967,-0.037547 rightHandSocket=-0.173754,0.619787,-0.066001.
+156: FAIL: first restored supported pose must satisfy actual palm socket tolerance
+156: FAIL: restored ordinary rig: Skinned player palm Grip socket exceeded the 15 mm grip tolerance: left=0.000000 right=2.180632 leftTarget=0.447553,1.459597,0.142895 leftSocket=0.447553,1.459597,0.142894 leftHandTarget=0.481228,1.480644,0.087044 leftHandSocket=0.481228,1.480644,0.087044 rightHandTarget=-0.186930,-1.556676,-0.235710 rightHandSocket=-0.173911,0.620890,-0.120849.
+156: FAIL: first restored supported pose must satisfy actual palm socket tolerance
+156: FAIL: restored ordinary rig: Skinned player palm Grip socket exceeded the 15 mm grip tolerance: left=0.000000 right=2.253347 leftTarget=0.447554,1.511170,0.193321 leftSocket=0.447554,1.511170,0.193321 leftHandTarget=0.481229,1.514510,0.133729 leftHandSocket=0.481229,1.514510,0.133729 rightHandTarget=-0.186930,-1.633214,-0.124601 rightHandSocket=-0.173793,0.619823,-0.089591.
+156: FAIL: first restored supported pose must satisfy actual palm socket tolerance
+156: FAIL: restored ordinary rig: Skinned player palm Grip socket exceeded the 15 mm grip tolerance: left=0.000000 right=2.277969 leftTarget=0.447581,1.569089,0.223774 leftSocket=0.447581,1.569089,0.223774 leftHandTarget=0.481256,1.556061,0.165528 leftHandSocket=0.481256,1.556061,0.165528 rightHandTarget=-0.186930,-1.657967,-0.037548 rightHandSocket=-0.173754,0.619787,-0.066001.
+156: FAIL: first restored supported pose must satisfy actual palm socket tolerance
+156: Rescue rig attachment cases=16455 failures=13 sampled_poses=955 max_left_reach=0.612579@phase=6 max_right_reach=0.619561@phase=6
+1/1 Test #156: horde_rt_rescue_rig_attachment_tests ...***Failed    2.84 sec
+FAIL: restored ordinary rig: Skinned player palm Grip socket exceeded the 15 mm grip tolerance: left=0.000000 right=2.268513 leftTarget=0.448847,1.551437,0.216984 leftSocket=0.448847,1.551437,0.216984 leftHandTarget=0.482522,1.542939,0.157907 leftHandSocket=0.482522,1.542939,0.157907 rightHandTarget=-0.186930,-1.648711,-0.060098 rightHandSocket=-0.173769,0.619733,-0.072072.
+FAIL: first restored supported pose must satisfy actual palm socket tolerance
+FAIL: restored ordinary rig: Skinned player palm Grip socket exceeded the 15 mm grip tolerance: left=0.000000 right=2.180628 leftTarget=0.448630,1.459081,0.142704 leftSocket=0.448630,1.459081,0.142704 leftHandTarget=0.482305,1.480129,0.086853 leftHandSocket=0.482305,1.480129,0.086853 rightHandTarget=-0.186930,-1.556676,-0.235616 rightHandSocket=-0.173911,0.620889,-0.120823.
+FAIL: first restored supported pose must satisfy actual palm socket tolerance
+FAIL: restored ordinary rig: Skinned player palm Grip socket exceeded the 15 mm grip tolerance: left=0.000000 right=2.253346 leftTarget=0.448428,1.510725,0.193299 leftSocket=0.448428,1.510725,0.193299 leftHandTarget=0.482103,1.514064,0.133707 leftHandSocket=0.482103,1.514064,0.133707 rightHandTarget=-0.186930,-1.633214,-0.124549 rightHandSocket=-0.173793,0.619823,-0.089577.
+FAIL: first restored supported pose must satisfy actual palm socket tolerance
+FAIL: restored ordinary rig: Skinned player palm Grip socket exceeded the 15 mm grip tolerance: left=0.000000 right=2.277970 leftTarget=0.448242,1.568761,0.223849 leftSocket=0.448243,1.568760,0.223849 leftHandTarget=0.481918,1.555732,0.165603 leftHandSocket=0.481918,1.555732,0.165603 rightHandTarget=-0.186930,-1.657967,-0.037529 rightHandSocket=-0.173754,0.619787,-0.065996.
+FAIL: first restored supported pose must satisfy actual palm socket tolerance
+FAIL: restored ordinary rig: Skinned player palm Grip socket exceeded the 15 mm grip tolerance: left=0.000000 right=2.180630 leftTarget=0.448076,1.459346,0.142802 leftSocket=0.448076,1.459346,0.142802 leftHandTarget=0.481751,1.480394,0.086951 leftHandSocket=0.481751,1.480394,0.086951 rightHandTarget=-0.186930,-1.556676,-0.235664 rightHandSocket=-0.173911,0.620890,-0.120836.
+FAIL: first restored supported pose must satisfy actual palm socket tolerance
+FAIL: restored ordinary rig: Skinned player palm Grip socket exceeded the 15 mm grip tolerance: left=0.000000 right=2.253346 leftTarget=0.447930,1.510979,0.193311 leftSocket=0.447930,1.510979,0.193311 leftHandTarget=0.481605,1.514318,0.133720 leftHandSocket=0.481605,1.514318,0.133720 rightHandTarget=-0.186930,-1.633213,-0.124578 rightHandSocket=-0.173793,0.619823,-0.089585.
+FAIL: first restored supported pose must satisfy actual palm socket tolerance
+FAIL: restored ordinary rig: Skinned player palm Grip socket exceeded the 15 mm grip tolerance: left=0.000000 right=2.277969 leftTarget=0.447806,1.568978,0.223799 leftSocket=0.447806,1.568978,0.223799 leftHandTarget=0.481481,1.555950,0.165553 leftHandSocket=0.481481,1.555950,0.165553 rightHandTarget=-0.186930,-1.657967,-0.037541 rightHandSocket=-0.173754,0.619787,-0.065999.
+FAIL: first restored supported pose must satisfy actual palm socket tolerance
+FAIL: restored ordinary rig: Skinned player palm Grip socket exceeded the 15 mm grip tolerance: left=0.000000 right=2.180632 leftTarget=0.447705,1.459524,0.142868 leftSocket=0.447705,1.459524,0.142867 leftHandTarget=0.481380,1.480572,0.087017 leftHandSocket=0.481380,1.480572,0.087017 rightHandTarget=-0.186930,-1.556676,-0.235695 rightHandSocket=-0.173911,0.620890,-0.120845.
+FAIL: first restored supported pose must satisfy actual palm socket tolerance
+FAIL: restored ordinary rig: Skinned player palm Grip socket exceeded the 15 mm grip tolerance: left=0.000000 right=2.253346 leftTarget=0.447629,1.511132,0.193319 leftSocket=0.447629,1.511132,0.193319 leftHandTarget=0.481304,1.514472,0.133727 leftHandSocket=0.481304,1.514472,0.133727 rightHandTarget=-0.186930,-1.633213,-0.124595 rightHandSocket=-0.173793,0.619823,-0.089590.
+FAIL: first restored supported pose must satisfy actual palm socket tolerance
+FAIL: restored ordinary rig: Skinned player palm Grip socket exceeded the 15 mm grip tolerance: left=0.000000 right=2.277969 leftTarget=0.447578,1.569091,0.223773 leftSocket=0.447578,1.569091,0.223773 leftHandTarget=0.481253,1.556063,0.165527 leftHandSocket=0.481253,1.556063,0.165527 rightHandTarget=-0.186930,-1.657967,-0.037547 rightHandSocket=-0.173754,0.619787,-0.066001.
+FAIL: first restored supported pose must satisfy actual palm socket tolerance
+FAIL: restored ordinary rig: Skinned player palm Grip socket exceeded the 15 mm grip tolerance: left=0.000000 right=2.180632 leftTarget=0.447553,1.459597,0.142895 leftSocket=0.447553,1.459597,0.142894 leftHandTarget=0.481228,1.480644,0.087044 leftHandSocket=0.481228,1.480644,0.087044 rightHandTarget=-0.186930,-1.556676,-0.235710 rightHandSocket=-0.173911,0.620890,-0.120849.
+FAIL: first restored supported pose must satisfy actual palm socket tolerance
+FAIL: restored ordinary rig: Skinned player palm Grip socket exceeded the 15 mm grip tolerance: left=0.000000 right=2.253347 leftTarget=0.447554,1.511170,0.193321 leftSocket=0.447554,1.511170,0.193321 leftHandTarget=0.481229,1.514510,0.133729 leftHandSocket=0.481229,1.514510,0.133729 rightHandTarget=-0.186930,-1.633214,-0.124601 rightHandSocket=-0.173793,0.619823,-0.089591.
+FAIL: first restored supported pose must satisfy actual palm socket tolerance
+FAIL: restored ordinary rig: Skinned player palm Grip socket exceeded the 15 mm grip tolerance: left=0.000000 right=2.277969 leftTarget=0.447581,1.569089,0.223774 leftSocket=0.447581,1.569089,0.223774 leftHandTarget=0.481256,1.556061,0.165528 leftHandSocket=0.481256,1.556061,0.165528 rightHandTarget=-0.186930,-1.657967,-0.037548 rightHandSocket=-0.173754,0.619787,-0.066001.
+FAIL: first restored supported pose must satisfy actual palm socket tolerance
+Rescue rig attachment cases=16455 failures=13 sampled_poses=955 max_left_reach=0.612579@phase=6 max_right_reach=0.619561@phase=6
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   2.86 sec
+
+The following tests FAILED:
+	156 - horde_rt_rescue_rig_attachment_tests (Failed)
+Errors while running CTest

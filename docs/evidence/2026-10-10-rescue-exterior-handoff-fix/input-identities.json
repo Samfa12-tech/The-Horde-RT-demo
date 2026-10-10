@@ -1,0 +1,42 @@
+{
+  "assets/models/player/runtime/gothic-traveller-lod0.runtime.glb": {
+    "bytes": 2568508,
+    "sha256": "46a88dac9dd569117be5a17a35540fecf3e0e6026d3ad404dd5fdbc85a9ad54f",
+    "lfs_pointer": false
+  },
+  "assets/models/props/runtime/reward-lantern-body/reward-lantern-body-lod0.runtime.glb": {
+    "bytes": 658308,
+    "sha256": "34a2522f2027d3fb04b77480cc929d36c5a19c6e0f33bf3fa0f0ae0959c99ec4",
+    "lfs_pointer": false
+  },
+  "assets/models/props/runtime/reward-lantern-ring/reward-lantern-ring-lod0.runtime.glb": {
+    "bytes": 76716,
+    "sha256": "75bf4f0d7c64c67848f08f1b2fb5b802527160c79def7f71ca964bdcf72799f5",
+    "lfs_pointer": false
+  },
+  "assets/models/weapons/runtime/gothic-arming-sword-rh-lod0.glb": {
+    "bytes": 621220,
+    "sha256": "477ff6c53c4b407bc16e9e84d16aaf47dc72131b812debf2b92d0ab2fcfab5c1",
+    "lfs_pointer": false
+  },
+  "assets/models/weapons/runtime/gothic-arming-sword-rh-lod0.runtime.glb": {
+    "bytes": 621220,
+    "sha256": "477ff6c53c4b407bc16e9e84d16aaf47dc72131b812debf2b92d0ab2fcfab5c1",
+    "lfs_pointer": false
+  },
+  "assets/models/player/viewmodel/runtime/gothic-traveller-viewmodel.runtime.glb": {
+    "bytes": 1228828,
+    "sha256": "eaa0db3abb8ff2dae616247054c190031a08c542dd95396cc6dc1e18a7462488",
+    "lfs_pointer": false
+  },
+  "assets/models/props/runtime/player-rag-torch/rag-torch-player-lod0.runtime.glb": {
+    "bytes": 267672,
+    "sha256": "476cb05a8f11f1af917a0cfa29610cc03f23522478a366f6cf2cf49b906db74d",
+    "lfs_pointer": false
+  },
+  "assets/models/world/runtime/collapsed-entry/collapsed-entry-lod0.runtime.glb": {
+    "bytes": 652980,
+    "sha256": "c67471b522c92f354d9a5880dea6e48b4f22b5095207841c35c95b5cfc75c4d4",
+    "lfs_pointer": false
+  }
+}

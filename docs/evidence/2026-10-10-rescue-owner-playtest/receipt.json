@@ -8,16 +8,19 @@
     "platform": "Windows Debug",
     "file": "HordeLanternRT.exe",
     "sha256": "79e1e8634717bb563928611553019506288a78ce0df2cd1032d7a164e45a6a75",
-    "arguments": ["--development-rescue-journey"]
+    "arguments": [
+      "--development-rescue-journey"
+    ]
   },
   "owner_observations": {
     "rope_deployment_appearance": "Positive: came down and looked like a rope; overall excellent.",
     "player_rope_contact": "Positive: responded to player bump.",
     "climbing": "Animation OK; hand movement a little too fast; climb speed good.",
     "controller_l3": "Confirmed toggle sprint.",
-    "failure": "Owner reports the game crashed when climbing up. Exact phase, visible error and exit mechanism remain unresolved.",
-    "graphics_menu": "NOT RUN",
-    "rope_shadow_in_mist": "NOT RUN"
+    "failure": "Owner reports the renderer-stopped dialog appears when getting off the rope, already outside. The initial launch lacked stderr/exit capture; subsequent unchanged-candidate retry reproduced a restored right palm socket error.",
+    "launch_setup_feedback": "Owner reports Keeper did not activate while the torch remained held, requiring a return to the waterfall. Source confirms reveal requires the completed torch-failure sequence; the next focused retry uses the existing Keeper-practice start without changing that production gate.",
+    "graphics_menu": "Initially NOT RUN; later owner reports graphics caption fit is good, but controller selection order/direction is annoying.",
+    "rope_shadow_in_mist": "Initially NOT RUN; later owner did not notice an error during this run. This is a scoped owner observation, not full backend/effect acceptance."
   },
   "technical_evidence": {
     "backend": "RayTracingPipeline",
@@ -28,7 +31,7 @@
     "last_saved_completed_frame": 1919,
     "last_saved_completed_tick": 4732,
     "scope": "Successful presentation before the reported failure; does not establish completed ascent or exterior acceptance.",
-    "process_after_owner_report": "Not running at inspection.",
+    "process_after_owner_report": "The earlier sandboxed process query was not authoritative. Later unrestricted host inventory during retry launch found only the new retry process; the previous process was absent then.",
     "exit_status": null,
     "stderr": "Not retained by the launch command.",
     "windows_crash_events": "No matching Horde Application Error/Windows Error Reporting event found in the inspected preceding two-hour interval; this does not prove a normal exit.",
@@ -39,10 +42,32 @@
       "vulkan_capability_report.txt": "a8ca36fc509c4798398352675981779e08d3e94aff106ae3a08127ae40baa01b",
       "windows_audio.log": "cc6f0062c0a02cd76683cdbdc9d5ef5015dd9b44718a062adbb97cd94f89e18e",
       "windows_showcase_timing.csv": "610dcacc3a44602c2128adab90ea11730786482c20db7c9d99078d1e1a6cffb2"
+    },
+    "unchanged_candidate_retry": {
+      "started_utc": "2026-10-10T03:54:05.031378+00:00",
+      "exe_sha256": "79e1e8634717bb563928611553019506288a78ce0df2cd1032d7a164e45a6a75",
+      "arguments": [
+        "--development-rescue-journey",
+        "--development-keeper-practice"
+      ],
+      "setup_difference": "Existing Keeper-practice start avoids the waterfall torch sequence; unchanged executable.",
+      "exit_code": 1,
+      "finished_utc": "2026-10-10T04:06:27.319442+00:00",
+      "file_sha256": {
+        "stderr.private.log": "e1c4077a7d99f4eca3f18a77f39c5d56780c33cfb633c9c45fd7588c8bba5c42",
+        "stdout.private.log": "38989ccdebcd72b1235cd4b981e8535923668a05499d99e0878e0538f7a73812",
+        "vulkan_capability_report.json": "ba4e6423be3264f326ab7b26fa3baec84ac6df1e63fc2d7549be4fb8b0cd5da7",
+        "vulkan_capability_report.txt": "679afcabcf7115d8dc7528cb01758b0bc0aedf6a4ee479e7e50c5114432dcf59",
+        "windows_audio.log": "486ef0fed3a39ab08be76ea02d855c4b40247f1a371d92023584c5a3166b517a",
+        "windows_showcase_timing.csv": "9d9857a6ea1180f4472761951df06470737030bca2d89459bffcc8721c91b548"
+      },
+      "source_candidate": "53347791b0bd1331219651b01ea3012bafcab26d",
+      "evidence": "Unchanged candidate owner-operated retry. Raw logs retained privately, hashes published; no personal paths or audio contents exported.",
+      "frame_record_error": "Failed to record RT frame: Skinned player palm Grip socket exceeded the 15 mm grip tolerance: left=0.000000 right=2.245027 leftTarget=0.487099,1.452404,0.139100 leftSocket=0.487099,1.452404,0.139100 leftHandTarget=0.520774,1.459876,0.079885 leftHandSocket=0.520774,1.459876,0.079885 rightHandTarget=-0.225294,-1.622911,-0.184604 rightHandSocket=-0.184267,0.620364,-0.105988."
     }
   },
   "disposition": {
-    "ascent_completion": "FAIL: owner-reported crash; cause unresolved",
+    "ascent_completion": "FAIL: owner-reported exterior release stop; unchanged-candidate retry identifies actual rig rejection. New source repair still requires physical replay.",
     "repeat_traversal": "NOT RUN",
     "windows_pipeline": "Partial successful presentation and owner observations only; full route acceptance blocked",
     "windows_query": "NOT RUN",
@@ -50,7 +75,9 @@
     "lifecycle": "Not accepted by this run",
     "owner_audio_haptic": "PENDING",
     "hand_cadence": "Tuning feedback retained; no change made",
-    "next_diagnostic": "Clarify exact failure point and visible error. If another owner-authorized launch is needed, retain stdout/stderr and process exit status on the unchanged candidate before considering a repair.",
-    "implementation_changes": false
+    "next_diagnostic": "Completed owner-authorized retry; exit 1 after renderer error dialog, right palm socket miss 2.245027 m versus 15 mm. Actual-rig host regression reproduces 13 exterior failures before the narrow roof/support correction.",
+    "implementation_changes": false,
+    "correction_source_candidate": "d40d75b349c146d9096a768b393705ccc2f9f0fc",
+    "new_candidate_physical_acceptance": "PENDING; this old-candidate owner evidence does not transfer."
   }
 }
