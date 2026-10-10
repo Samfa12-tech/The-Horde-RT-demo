@@ -1,0 +1,4519 @@
+{
+  "backtraceGraph" :
+  {
+    "commands" :
+    [
+      "add_test",
+      "horde_rt_add_pipeline_variant_fixture"
+    ],
+    "files" :
+    [
+      "<repo>/CMakeLists.txt",
+      "<repo>/third_party/pocket-audio-core/native/CMakeLists.txt"
+    ],
+    "nodes" :
+    [
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 42,
+        "parent" : 0
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 46,
+        "parent" : 2
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 49,
+        "parent" : 4
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 53,
+        "parent" : 6
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 57,
+        "parent" : 8
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 61,
+        "parent" : 10
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 65,
+        "parent" : 12
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 69,
+        "parent" : 14
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 73,
+        "parent" : 16
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 77,
+        "parent" : 18
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 82,
+        "parent" : 20
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 82,
+        "parent" : 22
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 91,
+        "parent" : 24
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 95,
+        "parent" : 26
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 99,
+        "parent" : 28
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 103,
+        "parent" : 30
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 108,
+        "parent" : 32
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 113,
+        "parent" : 34
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 117,
+        "parent" : 36
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 122,
+        "parent" : 38
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 125,
+        "parent" : 40
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 128,
+        "parent" : 42
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 131,
+        "parent" : 44
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 180,
+        "parent" : 46
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 184,
+        "parent" : 48
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 188,
+        "parent" : 50
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 192,
+        "parent" : 52
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 204,
+        "parent" : 54
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 208,
+        "parent" : 56
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 235,
+        "parent" : 58
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 239,
+        "parent" : 60
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 245,
+        "parent" : 62
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 247,
+        "parent" : 64
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 354,
+        "parent" : 66
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 357,
+        "parent" : 68
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 366,
+        "parent" : 70
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 377,
+        "parent" : 72
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 382,
+        "parent" : 74
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 387,
+        "parent" : 76
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 390,
+        "parent" : 78
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 393,
+        "parent" : 80
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 394,
+        "parent" : 82
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 399,
+        "parent" : 84
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 402,
+        "parent" : 86
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 408,
+        "parent" : 88
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 413,
+        "parent" : 90
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 416,
+        "parent" : 92
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 419,
+        "parent" : 94
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 424,
+        "parent" : 96
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 429,
+        "parent" : 98
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 442,
+        "parent" : 100
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 450,
+        "parent" : 102
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 457,
+        "parent" : 104
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 467,
+        "parent" : 106
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 475,
+        "parent" : 108
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 484,
+        "parent" : 110
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 494,
+        "parent" : 112
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 505,
+        "parent" : 114
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 1,
+        "file" : 0,
+        "line" : 574,
+        "parent" : 116
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 521,
+        "parent" : 117
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 1,
+        "file" : 0,
+        "line" : 574,
+        "parent" : 119
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 522,
+        "parent" : 120
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 1,
+        "file" : 0,
+        "line" : 578,
+        "parent" : 122
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 521,
+        "parent" : 123
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 1,
+        "file" : 0,
+        "line" : 578,
+        "parent" : 125
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 522,
+        "parent" : 126
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 1,
+        "file" : 0,
+        "line" : 582,
+        "parent" : 128
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 521,
+        "parent" : 129
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 1,
+        "file" : 0,
+        "line" : 582,
+        "parent" : 131
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 522,
+        "parent" : 132
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 1,
+        "file" : 0,
+        "line" : 586,
+        "parent" : 134
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 521,
+        "parent" : 135
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 1,
+        "file" : 0,
+        "line" : 586,
+        "parent" : 137
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 522,
+        "parent" : 138
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 596,
+        "parent" : 140
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 604,
+        "parent" : 142
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 611,
+        "parent" : 144
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 617,
+        "parent" : 146
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 627,
+        "parent" : 148
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 639,
+        "parent" : 150
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 647,
+        "parent" : 152
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 669,
+        "parent" : 154
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 670,
+        "parent" : 156
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 672,
+        "parent" : 158
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 692,
+        "parent" : 160
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 700,
+        "parent" : 162
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 704,
+        "parent" : 164
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 712,
+        "parent" : 166
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 731,
+        "parent" : 168
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 750,
+        "parent" : 170
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 761,
+        "parent" : 172
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 766,
+        "parent" : 174
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 769,
+        "parent" : 176
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 772,
+        "parent" : 178
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 775,
+        "parent" : 180
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 778,
+        "parent" : 182
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 784,
+        "parent" : 184
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 788,
+        "parent" : 186
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 792,
+        "parent" : 188
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 795,
+        "parent" : 190
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 798,
+        "parent" : 192
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 804,
+        "parent" : 194
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 811,
+        "parent" : 196
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 814,
+        "parent" : 198
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 817,
+        "parent" : 200
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 820,
+        "parent" : 202
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 823,
+        "parent" : 204
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 830,
+        "parent" : 206
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 833,
+        "parent" : 208
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 837,
+        "parent" : 210
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 869,
+        "parent" : 212
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 874,
+        "parent" : 214
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 879,
+        "parent" : 216
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 884,
+        "parent" : 218
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 885,
+        "parent" : 220
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 891,
+        "parent" : 222
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 895,
+        "parent" : 224
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 899,
+        "parent" : 226
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 906,
+        "parent" : 228
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 913,
+        "parent" : 230
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 919,
+        "parent" : 232
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 923,
+        "parent" : 234
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 927,
+        "parent" : 236
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 932,
+        "parent" : 238
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 942,
+        "parent" : 240
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 951,
+        "parent" : 242
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 962,
+        "parent" : 244
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 973,
+        "parent" : 246
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 989,
+        "parent" : 248
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1009,
+        "parent" : 250
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1012,
+        "parent" : 252
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1015,
+        "parent" : 254
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1018,
+        "parent" : 256
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1022,
+        "parent" : 258
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1030,
+        "parent" : 260
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1035,
+        "parent" : 262
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1039,
+        "parent" : 264
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1044,
+        "parent" : 266
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1050,
+        "parent" : 268
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1054,
+        "parent" : 270
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1058,
+        "parent" : 272
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1063,
+        "parent" : 274
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1089,
+        "parent" : 276
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1099,
+        "parent" : 278
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1114,
+        "parent" : 280
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1123,
+        "parent" : 282
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1136,
+        "parent" : 284
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1146,
+        "parent" : 286
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1159,
+        "parent" : 288
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1167,
+        "parent" : 290
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1178,
+        "parent" : 292
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1192,
+        "parent" : 294
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1199,
+        "parent" : 296
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1208,
+        "parent" : 298
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1228,
+        "parent" : 300
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1233,
+        "parent" : 302
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1236,
+        "parent" : 304
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1240,
+        "parent" : 306
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1248,
+        "parent" : 308
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1256,
+        "parent" : 310
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1270,
+        "parent" : 312
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1275,
+        "parent" : 314
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1280,
+        "parent" : 316
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1293,
+        "parent" : 318
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1299,
+        "parent" : 320
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1305,
+        "parent" : 322
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1311,
+        "parent" : 324
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1312,
+        "parent" : 326
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1313,
+        "parent" : 328
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1321,
+        "parent" : 330
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 1322,
+        "parent" : 332
+      },
+      {
+        "file" : 1
+      },
+      {
+        "command" : 0,
+        "file" : 1,
+        "line" : 35,
+        "parent" : 334
+      }
+    ]
+  },
+  "kind" : "ctestInfo",
+  "tests" :
+  [
+    {
+      "backtrace" : 1,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_menu_ambience_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_menu_ambience_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 3,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_indoor_dust_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_indoor_dust_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 5,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_retirement_owner_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_retirement_owner_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 7,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_graphics_settings_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_graphics_settings_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 9,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_entry_menu_handoff_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_entry_menu_handoff_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 11,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_foreground_pause_render_cadence_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_foreground_pause_render_cadence_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 13,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_surface_presentation_policy_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_surface_presentation_policy_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 15,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_presentation_transform_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_presentation_transform_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 17,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_compiled_pipeline_cache_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_compiled_pipeline_cache_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 19,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_pipeline_cache_seed_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_pipeline_cache_seed_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 21,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_graphics_scale_min33_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_graphics_scale_min33_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 23,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_graphics_scale_legacy50_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_graphics_scale_legacy50_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 25,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_graphics_preview_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_graphics_preview_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 27,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_graphics_preview_performance_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_graphics_preview_performance_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 29,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_texture_layer_subset_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_texture_layer_subset_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 31,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_shaft_dressing_geometry_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_shaft_dressing_geometry_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 33,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_graphics_windows_persistence_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_graphics_windows_persistence_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 35,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_device_address_layout_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_device_address_layout_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 37,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_player_primitive_contract_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_player_primitive_contract_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 39,
+      "command" :
+      [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/ThirdPartyNoticeAdmissionTests.ps1"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_third_party_notice_admission_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 41,
+      "command" :
+      [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/RaygenArtifactOwnershipTests.ps1"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_raygen_artifact_ownership_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 43,
+      "command" :
+      [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/PlayerManifestAgreementTests.ps1"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_player_manifest_agreement_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 45,
+      "command" :
+      [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/PlayerPackageInventoryTests.ps1"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_player_package_inventory_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 47,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_combat_foundation_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_combat_foundation_tests",
+      "properties" :
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 30.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 49,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_held_item_transition_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_held_item_transition_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 51,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_combat_timing_trace_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_combat_timing_trace_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 53,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_input_presentation_trace_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_input_presentation_trace_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 55,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_held_item_clearance_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_held_item_clearance_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 57,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_ambience_pcm_loop_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_ambience_pcm_loop_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>"
+        }
+      ]
+    },
+    {
+      "backtrace" : 59,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_present_completion_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_present_completion_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 61,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_present_timing_evidence_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_present_timing_evidence_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 63,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_entry_menu_scene_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_entry_menu_scene_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 65,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_graphics_preview_frame_adapter_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_graphics_preview_frame_adapter_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 67,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_benchmark_summary_report_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_benchmark_summary_report_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 69,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_staged_primary_contract_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_staged_primary_contract_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 71,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_lantern_benchmark_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_lantern_benchmark_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 73,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_benchmark_evidence_report_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_benchmark_evidence_report_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 75,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_windows_benchmark_launch_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_windows_benchmark_launch_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 77,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_windows_output_resize_launch_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_windows_output_resize_launch_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 79,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_windows_motion_evidence_launch_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_windows_motion_evidence_launch_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 81,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_windows_combat_practice_launch_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_windows_combat_practice_launch_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 83,
+      "command" :
+      [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/WindowsCombatTeachingPresentationTests.ps1"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_windows_combat_teaching_presentation_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 85,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_android_motion_evidence_policy_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_android_motion_evidence_policy_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 87,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_android_debug_request_admission_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_android_debug_request_admission_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 89,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_motion_evidence_scenario_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_motion_evidence_scenario_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 91,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_world_route_foundation_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_world_route_foundation_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 93,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_vertical_support_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_vertical_support_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 95,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_held_item_vertical_support_rig_tests.exe",
+        "<repo>"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_held_item_vertical_support_rig_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 97,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_player_directional_rig_tests.exe",
+        "<repo>"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_player_directional_rig_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 99,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_final_held_torch_clearance_tests.exe",
+        "<repo>"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_final_held_torch_clearance_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 101,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_benchmark_evidence_run_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_benchmark_evidence_run_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 103,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_evidence_publication_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_evidence_publication_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 105,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_ray_tracing_requirements_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_ray_tracing_requirements_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 107,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_performance_evidence_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_performance_evidence_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 109,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_scene_record_observation_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_scene_record_observation_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 111,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_pipeline_variants_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_pipeline_variants_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 113,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_pipeline_variant_provider_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_pipeline_variant_provider_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 115,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_pipeline_bundle_contracts_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_pipeline_bundle_contracts_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 118,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_provider_shipping_mobile_fixture.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_provider_shipping_mobile_fixture",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 121,
+      "command" :
+      [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/RtPipelineVariantFixtureEvidence.ps1",
+        "-Fixture",
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_provider_shipping_mobile_fixture.exe",
+        "-ProviderObject",
+        "<repo>/build/presets/windows-x64-debug/horde_rtpv_0_0_obj.dir/Debug/RtPipelineVariantProvider.obj",
+        "-OpaqueSha256",
+        "0c5dfc70cde011e47325c38bc818722d000dd22d4134d0dc3a419d9792cb3711",
+        "-GenericSha256",
+        "2e60e707f21089375ef457159eda188d75450989f6a9d7feb4c58cc84b140745",
+        "-RequiredKey",
+        "shipping_mobile_opaque_fast"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_provider_shipping_mobile_fixture_evidence",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 124,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_provider_shipping_high_fixture.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_provider_shipping_high_fixture",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 127,
+      "command" :
+      [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/RtPipelineVariantFixtureEvidence.ps1",
+        "-Fixture",
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_provider_shipping_high_fixture.exe",
+        "-ProviderObject",
+        "<repo>/build/presets/windows-x64-debug/horde_rtpv_0_1_obj.dir/Debug/RtPipelineVariantProvider.obj",
+        "-OpaqueSha256",
+        "28217780606cfc2456209b776f7faee7363c33ed96940fd53ef75a332c150f4f",
+        "-GenericSha256",
+        "265d7982700835fe1837f05ec27c6fbf19c0f8a8b7eb33890cee752c9c381250",
+        "-RequiredKey",
+        "shipping_high_opaque_fast"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_provider_shipping_high_fixture_evidence",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 130,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_provider_diagnostic_mobile_fixture.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_provider_diagnostic_mobile_fixture",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 133,
+      "command" :
+      [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/RtPipelineVariantFixtureEvidence.ps1",
+        "-Fixture",
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_provider_diagnostic_mobile_fixture.exe",
+        "-ProviderObject",
+        "<repo>/build/presets/windows-x64-debug/horde_rtpv_1_0_obj.dir/Debug/RtPipelineVariantProvider.obj",
+        "-OpaqueSha256",
+        "9b71b88c3d6f97d055b9f3fadfc54205c68767fc1dd4a86b9dc03b9496b26224",
+        "-GenericSha256",
+        "d105e2ce407a90405f2ff1bcdd55fbeb76fc88e863ebf7aa925823dacd295e44",
+        "-RequiredKey",
+        "diagnostic_mobile_opaque_fast"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_provider_diagnostic_mobile_fixture_evidence",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 136,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_provider_diagnostic_high_fixture.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_provider_diagnostic_high_fixture",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 139,
+      "command" :
+      [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/RtPipelineVariantFixtureEvidence.ps1",
+        "-Fixture",
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_provider_diagnostic_high_fixture.exe",
+        "-ProviderObject",
+        "<repo>/build/presets/windows-x64-debug/horde_rtpv_1_1_obj.dir/Debug/RtPipelineVariantProvider.obj",
+        "-OpaqueSha256",
+        "a38a62242bbcbddad7f6dbb94c397791944a0cdad788bda8c717e1d46d338b09",
+        "-GenericSha256",
+        "9937fc79adcc50c017c1d15fc84c24b088b5628f2b58472ae4e6086829a56414",
+        "-RequiredKey",
+        "diagnostic_high_opaque_fast"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_provider_diagnostic_high_fixture_evidence",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 141,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_github_release_updater_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_github_release_updater_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 143,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_version_contract_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_version_contract_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 145,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_version_contract_incremental_configure_tests.exe",
+        "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_version_contract_incremental_configure_tests",
+      "properties" :
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 120.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 147,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_dielectric_math_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_dielectric_math_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 149,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_skinned_node_pose_batch_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_skinned_node_pose_batch_tests",
+      "properties" :
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 30.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 151,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_player_animation_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_player_animation_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 153,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_fire_emitter_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_fire_emitter_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 155,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_held_item_socket_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_held_item_socket_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 157,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_held_item_socket_tests.exe",
+        "--skeleton-render-pose-contracts"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_skeleton_render_pose_contracts",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 159,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_held_item_socket_tests.exe",
+        "--combat-sword-authority-agreement"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_combat_sword_authority_agreement",
+      "properties" :
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 30.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 161,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_development_static_asset_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_development_static_asset_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 163,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_scene_abi_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_scene_abi_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 165,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_tomb_wall_recess_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_tomb_wall_recess_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 167,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_tomb_dressing_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_tomb_dressing_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 169,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_static_gltf_asset_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_static_gltf_asset_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 171,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_production_prop_asset_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_production_prop_asset_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 173,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_static_collapse_asset_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_static_collapse_asset_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 175,
+      "command" :
+      [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/RtSceneAbiGeneratorTests.ps1"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_scene_abi_generator_tests",
+      "properties" :
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 120.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 177,
+      "command" :
+      [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/RaygenCompilerStrategyTests.ps1"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_raygen_compiler_strategy_tests",
+      "properties" :
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 600.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 179,
+      "command" :
+      [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/RaygenVariantManifestTests.ps1"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_raygen_variant_manifest_tests",
+      "properties" :
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 600.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 181,
+      "command" :
+      [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/RaygenVariantArtifactTests.ps1"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_raygen_variant_artifact_tests",
+      "properties" :
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 1200.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 183,
+      "command" :
+      [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/ValidateRayQueryComputeShader.ps1"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_rayquery_compute_shader_tests",
+      "properties" :
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 180.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 185,
+      "command" :
+      [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/RtPipelinePolicyFenceTests.ps1",
+        "-CmakeExecutable",
+        "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_pipeline_policy_fence_tests",
+      "properties" :
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 300.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 187,
+      "command" :
+      [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/BenchmarkScalePolicyTests.ps1",
+        "-CmakeExecutable",
+        "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_benchmark_scale_policy_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 189,
+      "command" :
+      [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/WindowsGlassGraphicsContracts.ps1"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_windows_glass_graphics_contract_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 191,
+      "command" :
+      [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/WindowsBenchmarkSummaryReviewContracts.ps1"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_windows_benchmark_summary_review_contract_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 193,
+      "command" :
+      [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/RtPipelinePolicyExecutionTests.ps1",
+        "-CmakeExecutable",
+        "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe",
+        "-GradleExecutable",
+        "<repo>/android/gradlew.bat"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_pipeline_policy_execution_tests",
+      "properties" :
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 300.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 195,
+      "command" :
+      [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tools/tests/Test-AndroidStagedPrimaryAdmission.ps1"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_android_staged_admission_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 197,
+      "command" :
+      [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/StaticTextureArrayToolTests.ps1"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_static_texture_array_tool_tests",
+      "properties" :
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 120.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 199,
+      "command" :
+      [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/StaticAssetPreparationPolicyTests.ps1",
+        "-Mode",
+        "LodBudget"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_static_preparation_lod_policy_tests",
+      "properties" :
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 120.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 201,
+      "command" :
+      [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/StaticAssetPreparationPolicyTests.ps1",
+        "-Mode",
+        "UnsafeSkip"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_static_preparation_skip_policy_tests",
+      "properties" :
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 120.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 203,
+      "command" :
+      [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/StaticAssetPreparationPolicyTests.ps1",
+        "-Mode",
+        "CollidingLod"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_static_preparation_colliding_lod_policy_tests",
+      "properties" :
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 120.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 205,
+      "command" :
+      [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/DielectricTopologyToolTests.ps1"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_dielectric_topology_tool_tests",
+      "properties" :
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 120.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 207,
+      "command" :
+      [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/VersionContractPowerShellTests.ps1"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_version_contract_powershell_tests",
+      "properties" :
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 120.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 209,
+      "command" :
+      [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/GitHubReleasePreflightTests.ps1"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_github_release_preflight_tests",
+      "properties" :
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 120.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 211,
+      "command" :
+      [
+        "C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/VersionContractPowerShellTests.ps1"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_version_contract_windows_powershell_tests",
+      "properties" :
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 120.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 213,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_simulation_timing_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_simulation_timing_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 215,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_simulation_gameplay_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_simulation_gameplay_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 217,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_water_contact_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_water_contact_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 219,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_waterfall_production_route_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_waterfall_production_route_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 221,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_waterfall_production_route_tests.exe",
+        "--legacy-contact-policy"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_waterfall_legacy_route_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 223,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_music_director_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_music_director_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 225,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_sfx_volume_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_sfx_volume_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 227,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_windows_music_focus_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_windows_music_focus_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>"
+        }
+      ]
+    },
+    {
+      "backtrace" : 229,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_music_pcm_stream_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_music_pcm_stream_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 231,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_music_pcm_wave_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_music_pcm_wave_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 233,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_music_pcm_asset_bank_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_music_pcm_asset_bank_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 235,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_music_playback_session_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_music_playback_session_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 237,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_surface_session_mailbox_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_surface_session_mailbox_tests",
+      "properties" :
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 20.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 239,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_playtest_report_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_playtest_report_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 241,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_playtest_submission_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_playtest_submission_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 243,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_windows_playtest_screenshot_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_windows_playtest_screenshot_tests",
+      "properties" :
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 30.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 245,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_windows_playtest_submission_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_windows_playtest_submission_tests",
+      "properties" :
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 60.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 247,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_windows_playtest_verification_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_windows_playtest_verification_tests",
+      "properties" :
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 30.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 249,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_windows_remote_playtest_report_ui_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_windows_remote_playtest_report_ui_tests",
+      "properties" :
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 45.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 251,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_windows_playtest_report_ui_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_windows_playtest_report_ui_tests",
+      "properties" :
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 30.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 253,
+      "command" :
+      [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/MusicAssetAdmissionTests.ps1"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_music_asset_admission_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 255,
+      "command" :
+      [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/Horde162AssetPolicyTests.ps1"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_horde_162_asset_policy_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 257,
+      "command" :
+      [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/AndroidShowcaseWitnessPolicyTests.ps1"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_android_showcase_witness_policy_tests",
+      "properties" :
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 30.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 259,
+      "command" :
+      [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/PocketAudioCorePinTests.ps1",
+        "-CmakeExecutable",
+        "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_pocket_audio_core_pin_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 261,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_lantern_reward_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_lantern_reward_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 263,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_lantern_pendulum_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_lantern_pendulum_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 265,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_input_mailbox_stress.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_input_mailbox_stress",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 267,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_desktop_controller_input_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_desktop_controller_input_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>"
+        }
+      ]
+    },
+    {
+      "backtrace" : 269,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_gpu_timestamp_math_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_gpu_timestamp_math_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 271,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_combat_smoke.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_combat_smoke",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 273,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_showcase_route_smoke.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_showcase_route_smoke",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 275,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_showcase_gameplay_smoke.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_showcase_gameplay_smoke",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 277,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_spatial_audio_smoke.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_spatial_audio_smoke",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>"
+        }
+      ]
+    },
+    {
+      "backtrace" : 279,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_staged_primary_timing_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_staged_primary_timing_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 281,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_staged_primary_resource_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_staged_primary_resource_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 283,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_gpu_frame_timer_collection_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_gpu_frame_timer_collection_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 285,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_frame_evidence_coordinator_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_frame_evidence_coordinator_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 287,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_gpu_resources_observation_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_gpu_resources_observation_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 289,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_pipeline_bundle_lifetime_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_pipeline_bundle_lifetime_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 291,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_scene_initialise_preflight_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_scene_initialise_preflight_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 293,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_scene_resource_inventory_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_scene_resource_inventory_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 295,
+      "command" :
+      [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tools/InspectRtPipelineBundleContainment.ps1",
+        "-TargetPath",
+        "<repo>/build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+        "-TargetPlatform",
+        "Windows",
+        "-Instrumentation",
+        "Diagnostic",
+        "-Quality",
+        "High"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_final_windows_bundle_containment",
+      "properties" :
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 300.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 297,
+      "command" :
+      [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/RtPipelineBundleContainmentTests.ps1",
+        "-Scanner",
+        "<repo>/tools/InspectRtPipelineBundleContainment.ps1",
+        "-TargetPath",
+        "<repo>/build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+        "-TargetPlatform",
+        "Windows",
+        "-Instrumentation",
+        "Diagnostic",
+        "-Quality",
+        "High",
+        "-PowerShellExecutable",
+        "C:/Program Files/PowerShell/7/pwsh.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_final_windows_bundle_containment_controls",
+      "properties" :
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 300.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 299,
+      "command" :
+      [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/RtPipelineBundleContainmentRegistrationTests.ps1",
+        "-CmakeExecutable",
+        "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe",
+        "-ConfiguredCtestFile",
+        "<repo>/build/presets/windows-x64-debug/CTestTestfile.cmake",
+        "-Configuration",
+        "Debug",
+        "-Instrumentation",
+        "Diagnostic",
+        "-Quality",
+        "High",
+        "-Generator",
+        "Visual Studio 17 2022",
+        "-GeneratorPlatform",
+        "x64"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_final_windows_bundle_containment_registration",
+      "properties" :
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 300.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 301,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_skinned_arm_reference_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_skinned_arm_reference_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 303,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_skinned_character_smoke.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_skinned_character_smoke",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>"
+        }
+      ]
+    },
+    {
+      "backtrace" : 305,
+      "command" :
+      [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/PlayerSkinnedSemanticFixtures.ps1",
+        "-TestExecutable",
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_skinned_character_smoke.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_player_skinned_semantic_fixtures",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 307,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_skinned_character_smoke.exe",
+        "--validate-viewmodel-admission",
+        "<repo>/assets/models/player/viewmodel/runtime/gothic-traveller-viewmodel.runtime.glb",
+        "<repo>/assets/models/player/viewmodel/runtime/asset.manifest.json",
+        "<repo>/assets/models/player/runtime/gothic-traveller-lod0.runtime.glb"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_player_viewmodel_admission",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>"
+        }
+      ]
+    },
+    {
+      "backtrace" : 309,
+      "command" :
+      [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/PlayerViewmodelPoseFixtures.ps1",
+        "-TestExecutable",
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_skinned_character_smoke.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_player_viewmodel_pose_fixtures",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 311,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_character_render_slot_smoke.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_character_render_slot_smoke",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>"
+        }
+      ]
+    },
+    {
+      "backtrace" : 313,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_developer_overlay_smoke.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_developer_overlay_smoke",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 315,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_showcase_benchmark_smoke.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_showcase_benchmark_smoke",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 317,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_driver_capability_report_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_driver_capability_report_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 319,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_rescue_traversal_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_rescue_traversal_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 321,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_rescue_blockout_import_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_rescue_blockout_import_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 323,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_rescue_journey_integration_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_rescue_journey_integration_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 325,
+      "command" :
+      [
+        "<user>/AppData/Local/Programs/Python/Python312/python.exe",
+        "<repo>/tests/RescueBlockoutSourceAdmissionTests.py"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_rescue_source_admission_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 327,
+      "command" :
+      [
+        "<user>/AppData/Local/Programs/Python/Python312/python.exe",
+        "<repo>/tests/test_water_contact_audio.py"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_water_contact_audio_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 329,
+      "command" :
+      [
+        "<user>/AppData/Local/Programs/Python/Python312/python.exe",
+        "<repo>/tests/test_keeper_death_audio.py"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_keeper_death_audio_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 331,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_rescue_rig_attachment_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_rescue_rig_attachment_tests",
+      "properties" :
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 180.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 333,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_rescue_rig_attachment_tests.exe",
+        "--adversarial-regression"
+      ],
+      "config" : "Debug",
+      "name" : "horde_rt_rescue_adversarial_regression_tests",
+      "properties" :
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 180.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace" : 335,
+      "command" :
+      [
+        "<repo>/build/presets/windows-x64-debug/pocket-audio-core-native/Debug/pocket_audio_native_pcm_tests.exe"
+      ],
+      "config" : "Debug",
+      "name" : "pocket_audio_native_pcm_tests",
+      "properties" :
+      [
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "<repo>/build/presets/windows-x64-debug/pocket-audio-core-native"
+        }
+      ]
+    }
+  ],
+  "version" :
+  {
+    "major" : 1,
+    "minor" : 0
+  }
+}

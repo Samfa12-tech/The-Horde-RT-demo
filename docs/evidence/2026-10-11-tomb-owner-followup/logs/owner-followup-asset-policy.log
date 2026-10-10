@@ -1,0 +1,27 @@
+UpdateCTestConfiguration  from :<repo>/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Parse Config file:<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Test project <repo>/build/presets/windows-x64-debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 124
+    Start 124: horde_rt_horde_162_asset_policy_tests
+
+124: Test command: "C:\Program Files\PowerShell\7\pwsh.exe" "-NoProfile" "-File" "<repo>/tests/Horde162AssetPolicyTests.ps1"
+124: Working Directory: <repo>/build/presets/windows-x64-debug
+124: Test timeout computed to be: 1500
+124: Held-item/player runtime package entries and exact Meshy CC BY 4.0 attribution passed.
+124: Held-item/player runtime package entries and exact Meshy CC BY 4.0 attribution passed.
+124: PASS: 148 1.6.2 admission/staging/archive cases; no build, release packaging, signing or device action.
+1/1 Test #124: horde_rt_horde_162_asset_policy_tests ...   Passed   77.41 sec
+
+The following tests passed:
+	horde_rt_horde_162_asset_policy_tests
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =  77.43 sec

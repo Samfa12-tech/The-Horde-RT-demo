@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "sourceCommit": "4459d64897d080eec72c956abbe85407fa912c89",
+  "previousCheckpoint": "b36b244c3b2c535e0bded3da29e1901f03994e7b",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "pr": 27,
+  "sourceAndEvidenceCommitsSeparated": true,
+  "buildSourceNote": "Built before source commit; intended source/asset content equals the source-identities ledger. No runtime source changes after build.",
+  "scopedCorrectionHostPackageReady": true,
+  "wholeTombComplete": false,
+  "deviceVerified": false,
+  "physicalChecks": "not run for this candidate; no launches/install/input",
+  "audioHapticManualRevalidationRequiredForThisDiff": false,
+  "reason": "Only niche geometry/placement, Windows prompt drawing and regression coverage changed. Event/audio/haptic inputs and timing unchanged. Prior owner feedback remains scoped to its exact candidate.",
+  "gates": {
+    "nativeDebug": {
+      "passed": 14,
+      "failed": 0,
+      "ctestSeconds": 44.0
+    },
+    "nativeRelease": {
+      "passed": 14,
+      "failed": 0,
+      "ctestSeconds": 9.86
+    },
+    "windowsBuilds": [
+      "Debug PASS",
+      "Release PASS"
+    ],
+    "android": "Debug/unsigned Release all four ABIs; lintDebug/lintRelease/testDebugUnitTest PASS offline; sandbox cache failure retained",
+    "freshness": "Pipeline fresh eight-key CheckCatalog PASS; QueryCompute eight-key Check PASS; Pipeline generated adapter Check PASS. No generated artifacts changed.",
+    "assetPolicy": "PASS including existing closed-roster/negative checks",
+    "package": "Windows Diagnostic/High and Shipping/High containment PASS; Android ARM64 package helper PASS for both builds; other three ABIs stripped/APK byte identities only; niche and death audio payloads match source",
+    "originalTorch": "Unchanged test, cases and 180-second policy. Prior source 7bedc4b test PASS 173.92 seconds (6.08 seconds margin), coverage 3287/1812/3178/57970. Not rerun: this change does not modify held-rig/clearance consumers or fixture inputs. This is historical, not a fresh result."
+  },
+  "archRegression": {
+    "cause": "left-half voussoir front winding reversed by author script",
+    "baselineReproduction": "native importer detected opposed shading/geometric normals before correction; source branch matches owner black arch wedges",
+    "correctedNativeFrontTriangles": 14,
+    "backFacing": 0,
+    "opposedNormals": 0,
+    "minimumNormalDot": 1.0,
+    "realRtVisualAcceptance": "pending"
+  },
+  "health": "Production config development launch, paused publication, one-second idle and route-reset fixture publish 3/3. Live two-heart report unresolved; no health defaults changed.",
+  "pending": [
+    "Owner visual check of centred niche items and corrected arch",
+    "Same-view backward doorway RT capture; winding/normal source inspection did not reproduce a defect",
+    "Waterfall lighting change attribution",
+    "Owner decision on renderer third slot for both waterfall skeletons plus Keeper; no capacity change applied",
+    "Android/Query/lifecycle physical evidence and prior open admission gates"
+  ],
+  "ownerObservations": {
+    "candidateSource": "7bedc4b99558a15fcb7aa3055d877c91a0f4d001",
+    "windowsDebugExeSha256": "3190c97732d5f134f734e162a8a151fdc1f23492407b15c6858464ce914892fa",
+    "backend": "RayTracingPipeline",
+    "class": "owner report with screenshots; no transfer to corrected candidate",
+    "positive": [
+      "small backed niches",
+      "Keeper wind-up and slowdown",
+      "death sound",
+      "mist absent after death"
+    ],
+    "limitations": [
+      "pre-death mist not confirmed",
+      "arch/doorway patches",
+      "two-heart observation",
+      "waterfall lighting and skeleton disappearance"
+    ]
+  },
+  "mistIntervalCorrection": "deferred; no prototype adopted",
+  "backupPreserved": {
+    "path": "assets/models/world/source/tomb-dressing-v01/tomb-dressing-v01.blend1",
+    "sha256": "0dae1e8fb803336cef2d045f48c5f4c9195a6463f45161cb0b6c7434350769fb",
+    "excludedFromCommit": true,
+    "earlierOriginalBytes": "unknown; prior disclosure unchanged"
+  },
+  "unrelatedUntracked": "preexisting alternative funerary/bone directories, source candidates, preview and backup preserved/excluded",
+  "protectedUnchanged": [
+    "shaders",
+    "src/vulkan",
+    "tools/raygen-variant-budgets.json",
+    "tools/raygen-variants.json",
+    "tests/FinalHeldTorchClearanceTests.cpp"
+  ],
+  "runs": "runs.jsonl",
+  "artifacts": "package-identities-owner-followup.json",
+  "identities": "source-identities.json",
+  "ci": "verified externally against final pushed evidence SHA; no recursive self hash"
+}

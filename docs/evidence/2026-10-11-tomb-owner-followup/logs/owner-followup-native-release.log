@@ -1,0 +1,178 @@
+UpdateCTestConfiguration  from :<repo>/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/build/presets/windows-x64-release/DartConfiguration.tcl
+Parse Config file:<repo>/build/presets/windows-x64-release/DartConfiguration.tcl
+Test project <repo>/build/presets/windows-x64-release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 4
+      Start   4: horde_rt_graphics_settings_tests
+
+4: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_graphics_settings_tests.exe"
+4: Working Directory: <repo>/build/presets/windows-x64-release
+4: Test timeout computed to be: 1500
+ 1/14 Test   #4: horde_rt_graphics_settings_tests ......................   Passed    1.93 sec
+test 27
+      Start  27: horde_rt_input_presentation_trace_tests
+
+27: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_input_presentation_trace_tests.exe"
+27: Working Directory: <repo>/build/presets/windows-x64-release
+27: Test timeout computed to be: 1500
+ 2/14 Test  #27: horde_rt_input_presentation_trace_tests ...............   Passed    0.03 sec
+test 33
+      Start  33: horde_rt_graphics_preview_frame_adapter_tests
+
+33: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_graphics_preview_frame_adapter_tests.exe"
+33: Working Directory: <repo>/build/presets/windows-x64-release
+33: Test timeout computed to be: 1500
+ 3/14 Test  #33: horde_rt_graphics_preview_frame_adapter_tests .........   Passed    0.95 sec
+test 41
+      Start  41: horde_rt_windows_combat_practice_launch_tests
+
+41: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_windows_combat_practice_launch_tests.exe"
+41: Working Directory: <repo>/build/presets/windows-x64-release
+41: Test timeout computed to be: 1500
+ 4/14 Test  #41: horde_rt_windows_combat_practice_launch_tests .........   Passed    0.02 sec
+test 42
+      Start  42: horde_rt_windows_combat_teaching_presentation_tests
+
+42: Test command: "C:\Program Files\PowerShell\7\pwsh.exe" "-NoProfile" "-File" "<repo>/tests/WindowsCombatTeachingPresentationTests.ps1"
+42: Working Directory: <repo>/build/presets/windows-x64-release
+42: Test timeout computed to be: 1500
+42: Windows combat lesson presentation contract passed.
+ 5/14 Test  #42: horde_rt_windows_combat_teaching_presentation_tests ...   Passed    0.34 sec
+test 73
+      Start  73: horde_rt_fire_emitter_tests
+
+73: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_fire_emitter_tests.exe"
+73: Working Directory: <repo>/build/presets/windows-x64-release
+73: Test timeout computed to be: 1500
+73: Fire emitter deterministic state, motion, selection, and budget contracts passed
+ 6/14 Test  #73: horde_rt_fire_emitter_tests ...........................   Passed    1.21 sec
+test 79
+      Start  79: horde_rt_tomb_wall_recess_tests
+
+79: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_tomb_wall_recess_tests.exe"
+79: Working Directory: <repo>/build/presets/windows-x64-release
+79: Test timeout computed to be: 1500
+ 7/14 Test  #79: horde_rt_tomb_wall_recess_tests .......................   Passed    0.02 sec
+test 80
+      Start  80: horde_rt_tomb_dressing_tests
+
+80: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_tomb_dressing_tests.exe"
+80: Working Directory: <repo>/build/presets/windows-x64-release
+80: Test timeout computed to be: 1500
+80: Imported arch front faces: triangles=14 back-facing=0 opposed-normal=0 minimum-normal-dot=1
+80: Refined niche ray 0 back-surface t=0.15666
+80: Refined niche ray 1 back-surface t=0.15666
+80: Refined niche ray 2 back-surface t=0.17666
+80: Dressing metrics: vertices=19024 indices=53040 triangles=17680 primitives=4 materials=3 instances=16 bounds=[-36.9193,-0.95,-18.3137]..[6.31018,1.21901,2.16]
+80: Placement 0 rect niche bounds=[-2.16018,-0.54,-1.0478]..[-1.8,0.285,-0.3522]
+80: Placement 1 arched niche bounds=[-2.16018,-0.55,-2.9572]..[-1.8,0.35,-2.2428]
+80: Placement 2 rect niche bounds=[5.95,-0.5,-12.729]..[6.31018,0.275,-12.071]
+80: Placement 3 T03 candle 1 bounds=[-2.0967,-0.394336,-0.7342]..[-2.02921,-0.331127,-0.666956]
+80: Placement 4 T02 skull/jaw bounds=[-1.99798,-0.391094,-2.65305]..[-1.85595,-0.241166,-2.54695]
+80: Placement 5 T02 femur bounds=[-2.14459,-0.391094,-2.80403]..[-2.07041,-0.314966,-2.47]
+80: Placement 6 T02 humerus bounds=[-2.12354,-0.391094,-2.47539]..[-2.09146,-0.33627,-2.25]
+80: Placement 7 T03 candle 2 bounds=[6.13178,-0.363164,-12.5088]..[6.18822,-0.259739,-12.4526]
+80: Placement 8 T03 candle 3 bounds=[6.1602,-0.363164,-12.3606]..[6.2398,-0.328768,-12.2814]
+80: Placement 9 T03 displaced lid bounds=[-1.53,-0.58,0.22]..[-0.745,-0.395,2.16]
+80: Placement 10 T03 offering bowl bounds=[-31.1321,-0.95,-18.1875]..[-30.6613,-0.832,-17.7159]
+80: Placement 11 T03 broken urn bounds=[-36.6406,-0.95,-18.1438]..[-36.2592,-0.596276,-17.7638]
+80: Placement 12 T03 urn rim shard bounds=[-36.9193,-0.949589,-18.3137]..[-36.6129,-0.748349,-17.9784]
+80: Placement 13 T03 candle 2 bounds=[-0.21156,1.14,-6.32699]..[-0.16844,1.21901,-6.28409]
+80: Placement 14 T03 offering bowl bounds=[-0.0546447,1.14,-6.37625]..[0.086609,1.1754,-6.23477]
+80: Placement 15 T03 candle 3 bounds=[0.174594,1.14,-6.33601]..[0.235406,1.16627,-6.27551]
+80: Prepared tomb dressing import and merge checks passed.
+ 8/14 Test  #80: horde_rt_tomb_dressing_tests ..........................   Passed    1.06 sec
+test 81
+      Start  81: horde_rt_static_gltf_asset_tests
+
+81: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_static_gltf_asset_tests.exe"
+81: Working Directory: <repo>/build/presets/windows-x64-release
+81: Test timeout computed to be: 1500
+81: Static GLB temporary root=horde-rt-static-gltf-tests-release-pid-15244
+81: Static GLB asset contract passed
+ 9/14 Test  #81: horde_rt_static_gltf_asset_tests ......................   Passed    0.13 sec
+test 103
+      Start 103: horde_rt_simulation_timing_tests
+
+103: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_simulation_timing_tests.exe"
+103: Working Directory: <repo>/build/presets/windows-x64-release
+103: Test timeout computed to be: 1500
+103: Shared simulation cadence, hitch, diagonal, pause, and overrun tests passed.
+10/14 Test #103: horde_rt_simulation_timing_tests ......................   Passed    0.03 sec
+test 104
+      Start 104: horde_rt_simulation_gameplay_tests
+
+104: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_simulation_gameplay_tests.exe"
+104: Working Directory: <repo>/build/presets/windows-x64-release
+104: Test timeout computed to be: 1500
+104: lich/chest delayed finale events hits/defeat/unlock=3/1/1 phase=1 pending=0 time=0 sequence=8/9
+104: open shaft actual X/Z=-5.5/-14.5 mount torch lowering/left Y legacy=0/-0.41 anatomical=0/-0.31
+104: Shared simulation command, event, seam-persistence, and retry tests passed.
+11/14 Test #104: horde_rt_simulation_gameplay_tests ....................   Passed    0.11 sec
+test 130
+      Start 130: horde_rt_desktop_controller_input_tests
+
+130: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_desktop_controller_input_tests.exe"
+130: Working Directory: <repo>
+130: Test timeout computed to be: 1500
+130: Desktop controller input tests passed
+12/14 Test #130: horde_rt_desktop_controller_input_tests ...............   Passed    0.03 sec
+test 158
+      Start 158: horde_rt_rescue_journey_integration_tests
+
+158: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_rescue_journey_integration_tests.exe"
+158: Working Directory: <repo>/build/presets/windows-x64-release
+158: Test timeout computed to be: 1500
+158: claim-site position=-34,-17.55 prompt=0 phase=4
+158: cycle=0 ascent-end phase=4 root=-33.7,2.05,-12.8
+158: upper lantern hand depth=0.69 localY=0.0506989
+158: unready-edge start=39.9707,-0.0043903 end=39.9707,-0.0043903 blocked=1
+158: cycle=1 ascent-end phase=4 root=-33.7,2.05,-12.8
+158: upper lantern hand depth=0.69 localY=0.0502189
+158: Combined CPU preparation resident_ns=48800 staged_ns=46400 resident_retained_bytes=49056 staged_retained_bytes=49056 resident_peak_capacity_bytes=71808 staged_peak_capacity_bytes=71808 gpu_residency_comparison=NOT_MEASURED
+158: Rescue journey integration cases=19451 failures=0 retained_triangles=1022
+13/14 Test #158: horde_rt_rescue_journey_integration_tests .............   Passed    1.26 sec
+test 163
+      Start 163: horde_rt_rescue_adversarial_regression_tests
+
+163: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_rescue_rig_attachment_tests.exe" "--adversarial-regression"
+163: Working Directory: <repo>/build/presets/windows-x64-release
+163: Test timeout computed to be: 180
+163: finding1 before=0,-0.95,0.900001 after=0,-0.95,0.900001 generation=2->3
+163: finding2 offset=-1.1 walk minZ=-13.3383 support=2.05 copingPenetration=0
+163: finding2 offset=-1.1 dodge minZ=-13.325 support=2.05 copingPenetration=0
+163: finding2 offset=0 walk minZ=-13.3383 support=2.05 copingPenetration=0
+163: finding2 offset=0 dodge minZ=-13.325 support=2.05 copingPenetration=0
+163: finding2 offset=1.1 walk minZ=-13.3383 support=2.05 copingPenetration=0
+163: finding2 offset=1.1 dodge minZ=-13.325 support=2.05 copingPenetration=0
+163: finding6 approachX=-34.4378 maximumLoadedOffset=0.142849 rigPoses=496 rigRejections=0
+163: finding6 approachX=-32.9622 maximumLoadedOffset=0.138577 rigPoses=496 rigRejections=0
+163: finding7 subTickHipBodyError=0 ticks=0
+163: Adversarial rescue cases=17409 failures=0
+14/14 Test #163: horde_rt_rescue_adversarial_regression_tests ..........   Passed    2.70 sec
+
+The following tests passed:
+	horde_rt_graphics_settings_tests
+	horde_rt_input_presentation_trace_tests
+	horde_rt_graphics_preview_frame_adapter_tests
+	horde_rt_windows_combat_practice_launch_tests
+	horde_rt_windows_combat_teaching_presentation_tests
+	horde_rt_fire_emitter_tests
+	horde_rt_tomb_wall_recess_tests
+	horde_rt_tomb_dressing_tests
+	horde_rt_static_gltf_asset_tests
+	horde_rt_simulation_timing_tests
+	horde_rt_simulation_gameplay_tests
+	horde_rt_desktop_controller_input_tests
+	horde_rt_rescue_journey_integration_tests
+	horde_rt_rescue_adversarial_regression_tests
+
+100% tests passed, 0 tests failed out of 14
+
+Total Test time (real) =   9.86 sec
