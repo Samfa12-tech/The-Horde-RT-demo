@@ -40,51 +40,77 @@ public final class CombatTeachingPreferencesTest {
         assertFalse(values.slowdown);
     }
 
-    @Test public void promptsUseShapeAndMotionCuesWithBoundedProgressAndSafeControls() {
+    @Test public void promptsUseShortShapeAndMotionCuesWithTouchAndControllerControls() {
         long parryNow = 2L | (2L << 3) | (1L << 10) | (0xffL << 16) | (0xffL << 40);
         String prompt = CombatTeachingPreferences.prompt(parryNow);
-        assertTrue(prompt.contains("PRESS PARRY"));
-        assertTrue(prompt.contains("raise guard before the strike"));
-        assertTrue(prompt.contains("######"));
-        assertTrue(prompt.contains("Move/look live"));
-        assertTrue(prompt.contains("Retry safe"));
+        assertTrue(prompt.contains("PARRY NOW"));
+        assertTrue(prompt.contains("raise your guard"));
+        assertTrue(prompt.contains("[Parry]"));
+        assertTrue(prompt.contains("[Dodge]"));
+        assertFalse(prompt.contains("COMBAT TEACHING"));
+        assertFalse(prompt.contains("######"));
+        assertFalse(prompt.contains("Retry safe"));
         long parryActive = 2L | (8L << 3) | (1L << 10) | (0xffL << 40);
         prompt = CombatTeachingPreferences.prompt(parryActive);
-        assertTrue(prompt.contains("● PARRY WINDOW ACTIVE"));
-        assertTrue(prompt.contains("face the incoming blade"));
-        assertFalse(prompt.contains("PRESS PARRY"));
+        assertTrue(prompt.contains("● Guard up"));
+        assertTrue(prompt.contains("face the blade"));
+        assertFalse(prompt.contains("PARRY NOW"));
 
         long dodgeNow = 1L | (5L << 3) | (1L << 10) | (1L << 14) | (0xffL << 16) | (0xffL << 40);
         prompt = CombatTeachingPreferences.prompt(dodgeNow);
         assertTrue(prompt.contains("← DODGE NOW →"));
-        assertTrue(prompt.contains("TIME EASED"));
-        assertTrue(prompt.contains("######"));
+        assertFalse(prompt.contains("TIME EASED"));
+        assertFalse(prompt.contains("######"));
 
         long keeperWindup = 1L | (4L << 3) | (1L << 10) | (0xffL << 40);
         prompt = CombatTeachingPreferences.prompt(keeperWindup);
-        assertTrue(prompt.contains("KEEPER CHARGING"));
-        assertTrue(prompt.contains("staff glow build"));
+        assertTrue(prompt.contains("The Keeper gathers lightning"));
+        assertTrue(prompt.contains("watch the staff"));
         assertFalse(prompt.contains("draw back"));
     }
 
-    @Test public void nativeNormalizedProgressBytesMapAcrossTheSixMarkBar() {
+    @Test public void shortPromptsWrapWithoutLosingGlyphsAtLargeFontScale() {
+        android.text.TextPaint paint = new android.text.TextPaint();
+        paint.setTextSize(28f); // 14sp at an explicit 2x host font scale.
+        for (int width : new int[]{240, 480}) for (boolean controller : new boolean[]{false, true}) {
+            for (int cue : new int[]{1,2,4,5,8}) {
+                String text=CombatTeachingPreferences.prompt((cue<<3)|(1L<<10)|(0xffL<<40),controller);
+                android.text.StaticLayout layout=android.text.StaticLayout.Builder.obtain(text,0,text.length(),paint,width)
+                    .setAlignment(android.text.Layout.Alignment.ALIGN_CENTER).setIncludePad(true).build();
+                assertEquals(text.length(),layout.getLineEnd(layout.getLineCount()-1));
+                for(int line=0;line<layout.getLineCount();++line)
+                    assertTrue("glyph line fits finite portrait/landscape host width",layout.getLineWidth(line)<=width+1);
+            }
+        }
+    }
+
+    @Test public void activeControllerGlyphsReplaceTouchActions() {
+        long state = (5L << 3) | (1L << 10) | (0xffL << 40);
+        String controller = CombatTeachingPreferences.prompt(state, true);
+        assertTrue(controller.contains("[LT]") && controller.contains("[B] + stick"));
+        assertFalse(controller.contains("[Parry]"));
+        assertFalse(CombatTeachingPreferences.prompt(state, false).contains("[LT]"));
+    }
+
+    @Test public void nativeDiagnosticProgressDoesNotLeakIntoTheGameplayPrompt() {
         int[] nativeBytes = {0, 64, 128, 191, 255};
         String[] expectedBars = {"[------]", "[##----]", "[###---]", "[####--]", "[######]"};
         for (int i = 0; i < nativeBytes.length; ++i) {
             long packed = 1L | (4L << 3) | (1L << 10) |
                     ((long) nativeBytes[i] << 16) | (0xffL << 40);
-            assertTrue("native normalized byte " + nativeBytes[i],
-                    CombatTeachingPreferences.prompt(packed).contains(expectedBars[i]));
+            String prompt = CombatTeachingPreferences.prompt(packed);
+            assertTrue("native normalized byte " + nativeBytes[i], !prompt.contains(expectedBars[i]));
+            assertTrue(prompt.contains("[Parry]") && prompt.contains("[Dodge]"));
         }
     }
 
-    @Test public void timelyRefreshIsLimitedToVisibleKeeperChargeAndRecoveryCues() {
-        for (int cue : new int[]{4, 5, 6}) {
+    @Test public void timelyRefreshIncludesShortParryAndDodgeActionWindows() {
+        for (int cue : new int[]{1, 2, 3, 4, 5, 6, 8}) {
             long active = (cue << 3) | (1L << 10) | (0xffL << 40);
             assertTrue(CombatTeachingPreferences.needsTimelyRefresh(active));
         }
         assertFalse(CombatTeachingPreferences.needsTimelyRefresh(
-                (2L << 3) | (1L << 10) | (0xffL << 40)));
+                (7L << 3) | (1L << 10) | (0xffL << 40)));
         assertFalse(CombatTeachingPreferences.needsTimelyRefresh(
                 (5L << 3) | (0xffL << 40)));
         assertFalse(CombatTeachingPreferences.needsTimelyRefresh(

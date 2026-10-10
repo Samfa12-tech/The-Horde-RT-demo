@@ -1,3 +1,4 @@
+#include "scene/TombDressingContact.h"
 #include "gameplay/simulation/GameSimulation.h"
 
 #include <algorithm>
@@ -532,6 +533,10 @@ void GameSimulation::ResolveMovementCollision(float previousX, float previousZ)
     if (!config_.developmentWorldRoute)
     {
         ResolveCorridorPlayerCollision(previousX,previousZ,playerX_,playerZ_);
+        if (config_.developmentRescueJourney &&
+            !horde::scene::TombDressingMovementClear(previousX, previousZ, playerX_, playerZ_)) {
+            playerX_ = previousX; playerZ_ = previousZ;
+        }
         return;
     }
     auto projection=ProjectWorldRoute(playerX_,playerZ_);
@@ -1884,13 +1889,23 @@ void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSecon
     runActive_ = runRequested && travelled > 0.00001f && dodgeRemainingSeconds_ <= 0.0f;
     const float blend = std::clamp(deltaSeconds * 8.0f, 0.0f, 1.0f);
     walkVisualAmount_ += (movementIntent - walkVisualAmount_) * blend;
-    if (playerFootsteps_.Update(travelled, movementIntent > 0.02f))
+    const bool footstep = playerFootsteps_.Update(travelled, movementIntent > 0.02f);
+    const auto wetContact = CurrentCombatRules() ? waterContact_.Step(deltaSeconds,
+        playerX_,playerSupport_.worldY,playerZ_,playerSupport_.grounded,footstep,
+        deltaSeconds>0 ? travelled/deltaSeconds : 0,lastInput_.waterfallWidthScale)
+        : horde::gameplay::effects::WaterContactResult{};
+    if(wetContact.streamEntry && config_.combatFoundation1_7 && !legacyCombatCheckpoint_)
+        Emit(GameplayEventType::WaterfallContact,EntityId::Player,EntityId::Invalid,
+             playerX_,playerZ_,.35f,0,playerSupport_.worldY+.85f);
+    if (footstep)
     {
-        Emit(GameplayEventType::PlayerFootstep,
+        Emit(wetContact.wetStep && config_.combatFoundation1_7 && !legacyCombatCheckpoint_
+                 ? GameplayEventType::PlayerWetFootstep : GameplayEventType::PlayerFootstep,
              EntityId::Player,
              EntityId::Invalid,
              playerX_,
-             playerZ_);
+             playerZ_,wetContact.wetStep ? wetContact.intensity : 1.f,0,
+             wetContact.wetStep ? playerSupport_.worldY : 0.f);
     }
 }
 
@@ -1901,8 +1916,10 @@ bool GameSimulation::CurrentCombatRules() const
 
 void GameSimulation::CancelCombatTransients()
 {
+    waterContact_.Reset();
     dodgeProtectionAccepted_ = false;
     keeperRepelRemainingSeconds_ = 0.0f;
+    gameplayTimeScale_ = 1.0f;
     combatTeaching_.CancelTransient();
     currentCutCommandSequence_ = currentCutConsumedTick_ = 0;
     queuedUpCutCommandSequence_ = queuedUpCutConsumedTick_ = 0;
@@ -2421,7 +2438,8 @@ std::uint64_t GameSimulation::Emit(GameplayEventType type,
                                    float x,
                                    float z,
                                    float intensity,
-                                   std::int32_t payload)
+                                   std::int32_t payload,
+                                   float worldY)
 {
     GameplayEvent event;
     event.tickIndex = tickIndex_;
@@ -2430,6 +2448,7 @@ std::uint64_t GameSimulation::Emit(GameplayEventType type,
     event.target = target;
     event.worldX = x;
     event.worldZ = z;
+    event.worldY = worldY;
     event.listenerY = PlayerEyeWorldY(playerSupport_.worldY);
     event.listenerX = playerX_;
     event.listenerZ = playerZ_;
@@ -2551,6 +2570,7 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.lanternPendulum = lanternPendulum_.Snapshot();
     snapshot_.rewardLanternWorldFromHinge = RescueLanternHinge();
     snapshot_.torchFailure = torchFailureSnapshot_;
+    snapshot_.waterContact = waterContact_.Snapshot();
     snapshot_.heldItems = heldItems_;
     snapshot_.automaticSwordDrawBlocksDefense = SwordDrawBlocksDefense();
     snapshot_.heldItemKinematics = heldItemFixedStepState_.kinematics;

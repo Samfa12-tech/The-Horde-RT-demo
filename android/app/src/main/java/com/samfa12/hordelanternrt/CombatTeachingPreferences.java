@@ -31,7 +31,9 @@ final class CombatTeachingPreferences {
         catch (ClassCastException invalid) { return fallback; }
     }
 
-    static String prompt(long state) {
+    static String prompt(long state) { return prompt(state, false); }
+
+    static String prompt(long state, boolean controller) {
         final boolean enabled = (state & (1L << 10)) != 0;
         final int opacity = (int) ((state >>> 40) & 0xffL);
         if (!enabled || opacity == 0) return "";
@@ -40,23 +42,17 @@ final class CombatTeachingPreferences {
         final int source = (int) ((state >>> 7) & 0x7L);
         final boolean parryLearned = (state & (1L << 11)) != 0;
         final boolean dodgeLearned = (state & (1L << 12)) != 0;
-        final boolean slowed = (state & (1L << 14)) != 0;
-        final int progress = (int) ((state >>> 16) & 0xffL);
         final String lesson = cueText(cue, stage, source, parryLearned, dodgeLearned);
         if (lesson.isEmpty()) return "";
-        final int marks = (progress * 6 + 127) / 255;
-        final StringBuilder bar = new StringBuilder(6);
-        for (int i = 0; i < 6; ++i) bar.append(i < marks ? '#' : '-');
-        return "COMBAT TEACHING  [" + bar + "]\n" + lesson +
-                (slowed ? "  ·  TIME EASED" : "") +
-                "\nParry: tap / LT  ·  Dodge: tap / B  ·  Move/look live · Retry safe";
+        return lesson + (controller ? "\n[LT] Parry  ·  [B] + stick: Dodge"
+                : "\n[Parry] Guard  ·  [Dodge] + move: Evade");
     }
 
     static boolean needsTimelyRefresh(long state) {
         final boolean enabled = (state & (1L << 10)) != 0;
         final int opacity = (int) ((state >>> 40) & 0xffL);
         final int cue = (int) ((state >>> 3) & 0xfL);
-        return enabled && opacity > 0 && cue >= 4 && cue <= 6;
+        return enabled && opacity > 0 && ((cue >= 1 && cue <= 6) || cue == 8);
     }
 
     static float alpha(int opacity, boolean reducedMotion) {
@@ -74,20 +70,20 @@ final class CombatTeachingPreferences {
     }
 
     private static String cueText(int cue, int stage, int source, boolean parryLearned, boolean dodgeLearned) {
-        final String skeleton = source == 4 ? "SKELETON B" : "SKELETON A";
+        // Source identity stays in diagnostics; the lesson names the visible action.
         switch (cue) {
-            case 1: return "○ " + skeleton + " WIND-UP — watch its raised blade";
-            case 2: return "○ PRESS PARRY — raise guard before the strike";
-            case 8: return "● PARRY WINDOW ACTIVE — face the incoming blade";
-            case 3: return "↩ RESET — watch the next strike";
-            case 4: return "○ KEEPER CHARGING — watch the staff glow build";
-            case 5: return "← DODGE NOW → — move sideways";
-            case 6: return "↩ RECOVER — face the Keeper again";
-            case 7: return "● PARRY LANDED — the attacker is staggered";
+            case 1: return "○ Watch the raised blade";
+            case 2: return "○ PARRY NOW — raise your guard";
+            case 8: return "● Guard up — face the blade";
+            case 3: return "↩ Ready for the next strike";
+            case 4: return "○ The Keeper gathers lightning — watch the staff";
+            case 5: return "← DODGE NOW → — step sideways";
+            case 6: return "↩ Close in before the next charge";
+            case 7: return "● Well parried — strike back";
             default:
                 if (stage == 2 || stage == 3) return "";
-                if (parryLearned && !dodgeLearned) return "○ NEXT: DODGE THE KEEPER'S CHARGE";
-                return "○ WATCH THE ATTACKER — parry the blade, dodge the charge";
+                if (parryLearned && !dodgeLearned) return "○ Dodge the Keeper's lightning";
+                return "○ Watch the attacker";
         }
     }
 

@@ -187,11 +187,15 @@ void TestEquipmentEventAdmission()
     // These are observer-only fixtures, not manufactured gameplay evidence.
     static_assert(static_cast<unsigned>(GameplayEventType::ParryPrepareCue) == 24u);
     static_assert(static_cast<unsigned>(GameplayEventType::LichDischargeWarning) == 25u);
+    static_assert(static_cast<unsigned>(GameplayEventType::PlayerWetFootstep) == 26u);
+    static_assert(static_cast<unsigned>(GameplayEventType::WaterfallContact) == 27u);
     for (const auto type : {GameplayEventType::PlayerSwordDrawStarted,
                             GameplayEventType::PlayerSwordAttachmentChanged,
                             GameplayEventType::SkeletonEncounterWarning,
                             GameplayEventType::ParryPrepareCue,
                             GameplayEventType::LichDischargeWarning,
+                            GameplayEventType::PlayerWetFootstep,
+                            GameplayEventType::WaterfallContact,
                             static_cast<GameplayEventType>(kGameplayEventTypeCount),
                             static_cast<GameplayEventType>(255u)})
     {

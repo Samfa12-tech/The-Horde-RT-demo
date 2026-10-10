@@ -3,19 +3,26 @@
 #include "vulkan/raytracing/RtSceneRecordObservation.h"
 #include "vulkan/raytracing/RtExecutionPolicy.h"
 #include "vulkan/raytracing/TlasInstanceRefresh.h"
+#include "vulkan/raytracing/WaterContactRenderGeometry.h"
 #include "vulkan/raytracing/RtDescriptorSetLayoutBindings.h"
 #include "gameplay/effects/KeeperTorchLighting.h"
 
+#ifdef _MSC_VER
+#include <crtdbg.h>
+#endif
 #include <algorithm>
 #include <array>
 #include <cctype>
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
+#include <cmath>
 #include <cstring>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <iterator>
+#include <limits>
 #include <string>
 #include <string_view>
 #include <type_traits>
@@ -105,6 +112,171 @@ bool CheckTlasInstanceRefresh()
     ok &= Require(RequiresTlasInstanceRebuild(built, next), "instance-flag change must rebuild");
     ok &= Require(RequiresTlasInstanceRebuild(built, std::span(next).first(20u)),
                   "instance-count change must rebuild");
+    return ok;
+}
+
+bool CheckBoundedWaterDropletGeometry()
+{
+    using namespace horde::vulkan::raytracing;
+    using horde::gameplay::effects::WaterContactSnapshot;
+    bool ok = true;
+    const auto asset = MakeWaterDropletStaticAsset();
+    ok &= Require(asset.vertices.size() == kWaterDropletVertexCount &&
+                      asset.indices.size() == kWaterDropletIndexCount &&
+                      asset.primitives.size() == 1u &&
+                      asset.primitives[0].indexCount == kWaterDropletIndexCount,
+                  "water droplets must retain one dedicated fixed 24-octahedron topology");
+    bool initialSlotsDegenerate = true;
+    for (std::size_t slot = 0u; slot < horde::gameplay::effects::kWaterDropletCapacity; ++slot)
+    {
+        const auto& first = asset.vertices[slot * kWaterDropletVerticesPerSlot].position;
+        for (std::size_t vertex = 1u; vertex < kWaterDropletVerticesPerSlot; ++vertex)
+        {
+            const auto& position = asset.vertices[slot * kWaterDropletVerticesPerSlot + vertex].position;
+            initialSlotsDegenerate = initialSlotsDegenerate &&
+                position[0] == first[0] && position[1] == first[1] && position[2] == first[2];
+        }
+    }
+    ok &= Require(initialSlotsDegenerate,
+                  "inactive droplet slots must begin as finite degenerate geometry, not overlapping dielectric shells");
+    ok &= Require(asset.materials.size() == 1u &&
+                      asset.materials[0].ior == 1.333f &&
+                      asset.materials[0].baseColorTexture == -1 &&
+                      asset.materials[0].normalTexture == -1 &&
+                      asset.materials[0].ormTexture == -1 &&
+                      asset.materials[0].emissiveTexture == -1 &&
+                      asset.materials[0].transmissionFactor == 0.88f &&
+                      (asset.materials[0].flags &
+                       static_cast<std::uint32_t>(RtMaterialFlag::Transmission)) != 0u &&
+                      (asset.materials[0].flags &
+                       static_cast<std::uint32_t>(RtMaterialFlag::ThinWall)) != 0u,
+                  "droplets must use texture-free thin water through existing generic dielectric transport");
+    WaterContactSnapshot snapshot{};
+    snapshot.droplets[0].active = true;
+    snapshot.droplets[0].position = {{2.0f, 3.0f, 4.0f}};
+    snapshot.droplets[0].age = 0.0f;
+    snapshot.droplets[0].lifetime = 1.0f;
+    snapshot.droplets[1].active = true;
+    snapshot.droplets[1].position = {{-1.0f, 0.5f, 8.0f}};
+    snapshot.droplets[1].age = 0.5f;
+    snapshot.droplets[1].lifetime = 1.0f;
+    std::array<horde::scene::assets::StaticRtVertex, kWaterDropletVertexCount> frameVertices{};
+    ok &= Require(UpdateWaterDropletVertices(snapshot, frameVertices),
+                  "finite authoritative contact positions must produce finite refit vertices");
+    for (std::size_t slot = 2u; slot < horde::gameplay::effects::kWaterDropletCapacity; ++slot)
+    {
+        const auto& first = frameVertices[slot * kWaterDropletVerticesPerSlot].position;
+        bool sameFrameSample = true;
+        for (std::size_t vertex = 1u; vertex < kWaterDropletVerticesPerSlot; ++vertex)
+        {
+            const auto& position = frameVertices[slot * kWaterDropletVerticesPerSlot + vertex].position;
+            sameFrameSample = sameFrameSample && position[0] == first[0] &&
+                position[1] == first[1] && position[2] == first[2];
+        }
+        bool zeroAreaFaces = true;
+        const auto begin = slot * kWaterDropletIndicesPerSlot;
+        const auto end = begin + kWaterDropletIndicesPerSlot;
+        for (std::size_t index = begin; index < end; index += 3u)
+        {
+            const auto& a = frameVertices[asset.indices[index]].position;
+            const auto& b = frameVertices[asset.indices[index + 1u]].position;
+            const auto& c = frameVertices[asset.indices[index + 2u]].position;
+            const float abx = b[0] - a[0], aby = b[1] - a[1], abz = b[2] - a[2];
+            const float acx = c[0] - a[0], acy = c[1] - a[1], acz = c[2] - a[2];
+            const float nx = aby * acz - abz * acy;
+            const float ny = abz * acx - abx * acz;
+            const float nz = abx * acy - aby * acx;
+            zeroAreaFaces = zeroAreaFaces && nx == 0.0f && ny == 0.0f && nz == 0.0f;
+        }
+        ok &= Require(sameFrameSample && zeroAreaFaces,
+                      "inactive triangles must have zero area at the actual finite refit sample");
+    }
+    ok &= Require(std::abs(frameVertices[0].position[0] - 2.0f) < 1.0e-6f &&
+                      std::abs(frameVertices[0].position[1] -
+                               (3.0f + kWaterDropletMaxRadiusMetres)) < 1.0e-6f &&
+                      std::abs(frameVertices[kWaterDropletVerticesPerSlot].position[1] -
+                               (0.5f + (kWaterDropletMinRadiusMetres +
+                                       kWaterDropletMaxRadiusMetres) * 0.5f)) < 1.0e-6f,
+                  "life-scaled droplets must move only within the declared radius bounds");
+    for (const auto& vertex : frameVertices)
+        ok &= Require(std::isfinite(vertex.position[0]) && std::isfinite(vertex.position[1]) &&
+                          std::isfinite(vertex.position[2]),
+                      "all fixed refit vertices must remain finite, including inactive slots");
+    std::array<horde::scene::assets::StaticRtVertex, kWaterDropletVertexCount> hiddenVertices{};
+    ok &= Require(UpdateWaterDropletVertices(snapshot, hiddenVertices, false) &&
+                      hiddenVertices[0].position[0] > 9999.0f &&
+                      hiddenVertices[0].position[1] > 9999.0f,
+                  "disabled water quality must refit droplet geometry outside the playable scene");
+    for (std::size_t slot = 0u; slot < horde::gameplay::effects::kWaterDropletCapacity; ++slot)
+    {
+        const auto& first = hiddenVertices[slot * kWaterDropletVerticesPerSlot].position;
+        for (std::size_t vertex = 1u; vertex < kWaterDropletVerticesPerSlot; ++vertex)
+        {
+            const auto& position = hiddenVertices[slot * kWaterDropletVerticesPerSlot + vertex].position;
+            ok &= Require(position[0] == first[0] && position[1] == first[1] &&
+                              position[2] == first[2],
+                          "quality-hidden droplets must use degenerate, finite off-scene geometry");
+        }
+    }
+    snapshot.ripples[0] = {{{-2.0f, -0.925f, -15.0f}}, 0.6f, 0.45f, true};
+    snapshot.ripples[1] = {{{-3.0f, -0.925f, -15.3f}}, 0.2f, 0.75f, true};
+    const auto gpuRipple = MakeWaterContactRippleGpu(snapshot);
+    ok &= Require(gpuRipple.value[0] == -3.0f && gpuRipple.value[1] == -15.3f &&
+                      gpuRipple.value[2] == 0.2f && gpuRipple.value[3] == 0.75f,
+                  "GPU contact normal must select only the newest valid active ripple");
+    snapshot.ripples[1].active = false;
+    const auto olderGpuRipple = MakeWaterContactRippleGpu(snapshot);
+    ok &= Require(olderGpuRipple.value[0] == -2.0f && olderGpuRipple.value[2] == 0.6f &&
+                      olderGpuRipple.value[3] == 0.45f,
+                  "GPU contact normal must fall back to the remaining active ripple");
+    snapshot.ripples[0].active = false;
+    const auto noGpuRipple = MakeWaterContactRippleGpu(snapshot);
+    ok &= Require(noGpuRipple.value == std::array<float, 4u>{},
+                  "GPU contact ripple buffer must be zeroed when no contact is active");
+    snapshot.ripples[0].active = true;
+    snapshot.ripples[0].age = kWaterRippleLifetimeSeconds - 0.001f;
+    snapshot.ripples[0].strength = 0.45f;
+    const auto finalLiveGpuRipple = MakeWaterContactRippleGpu(snapshot);
+    ok &= Require(finalLiveGpuRipple.value[2] == kWaterRippleLifetimeSeconds - 0.001f &&
+                      finalLiveGpuRipple.value[3] == 0.45f,
+                  "GPU contact ripple remains available immediately before the simulation lifetime boundary");
+    snapshot.ripples[0].age = kWaterRippleLifetimeSeconds;
+    const auto expiredGpuRipple = MakeWaterContactRippleGpu(snapshot);
+    ok &= Require(expiredGpuRipple.value == std::array<float, 4u>{},
+                  "GPU contact ripple must be zero at the simulation's 0.90-second expiry boundary");
+    auto malformed = snapshot;
+    malformed.droplets[0].position[0] = std::numeric_limits<float>::quiet_NaN();
+    ok &= Require(!UpdateWaterDropletVertices(malformed, frameVertices),
+                  "active nonfinite water input must be rejected before upload or AS refit");
+    malformed = snapshot;
+    malformed.droplets[0].position[0] = kWaterDropletWorldLimitMetres + 1.0f;
+    ok &= Require(!UpdateWaterDropletVertices(malformed, frameVertices),
+                  "active water geometry must reject world coordinates beyond its bounded upload domain");
+    for (std::size_t slot = 0u; slot < 2u; ++slot)
+    {
+        const auto& centre = snapshot.droplets[slot].position;
+        const auto firstIndex = slot * kWaterDropletIndicesPerSlot;
+        const auto lastIndex = firstIndex + kWaterDropletIndicesPerSlot;
+        for (std::size_t index = firstIndex; index < lastIndex; index += 3u)
+        {
+            const auto& worldA = frameVertices[asset.indices[index]].position;
+            const auto& worldB = frameVertices[asset.indices[index + 1u]].position;
+            const auto& worldC = frameVertices[asset.indices[index + 2u]].position;
+            const float a[3]{worldA[0] - centre[0], worldA[1] - centre[1], worldA[2] - centre[2]};
+            const float b[3]{worldB[0] - centre[0], worldB[1] - centre[1], worldB[2] - centre[2]};
+            const float c[3]{worldC[0] - centre[0], worldC[1] - centre[1], worldC[2] - centre[2]};
+            const float ab[3]{b[0] - a[0], b[1] - a[1], b[2] - a[2]};
+            const float ac[3]{c[0] - a[0], c[1] - a[1], c[2] - a[2]};
+            const float nx = ab[1] * ac[2] - ab[2] * ac[1];
+            const float ny = ab[2] * ac[0] - ab[0] * ac[2];
+            const float nz = ab[0] * ac[1] - ab[1] * ac[0];
+            const float cx = (a[0] + b[0] + c[0]) / 3.0f;
+            const float cy = (a[1] + b[1] + c[1]) / 3.0f;
+            const float cz = (a[2] + b[2] + c[2]) / 3.0f;
+            ok &= Require(nx * cx + ny * cy + nz * cz > 0.0f,
+                          "each active octahedron triangle must face outward for stable dielectric entry/exit");
+        }
+    }
     return ok;
 }
 
@@ -437,6 +609,7 @@ struct PresentableTinyRtSceneObservationTestAccess
         for (RtGpuBuffer* buffer : std::array{
                  &scene.vertexBuffer_, &scene.indexBuffer_, &scene.transformBuffer_,
                  &scene.instanceBuffer_, &scene.heldLightBuffer_, &scene.fireEmitterBuffer_, &scene.qualityControlsBuffer_,
+                 &scene.waterContactRippleBuffer_,
                  &scene.worldSurfaceBuffer_, &scene.staticVertexBuffer_,
                  &scene.worldPlayerVertexBuffer_, &scene.viewmodelVertexBuffer_,
                  &scene.staticIndexBuffer_, &scene.staticGeometryTransformBuffer_,
@@ -453,12 +626,16 @@ struct PresentableTinyRtSceneObservationTestAccess
                  &scene.gothicChestLidBlas_, &scene.rewardLanternRingBlas_,
                  &scene.rewardLanternBodyBlas_, &scene.dielectricFixtureBlas_,
                  &scene.playerBodyBlas_, &scene.playerLimbBlas_,
-                 &scene.skinnedPlayerBlas_, &scene.viewmodelBlas_, &scene.collapseBlas_})
+                 &scene.skinnedPlayerBlas_, &scene.viewmodelBlas_, &scene.collapseBlas_,
+                 &scene.waterDropletBlas_})
         {
             populateBlas(*accelerationStructure);
         }
         populateBuffer(scene.skinnedPlayerBlasUpdateScratch_);
         populateBuffer(scene.viewmodelBlasUpdateScratch_);
+        populateBuffer(scene.waterDropletBlasUpdateScratch_);
+        scene.waterDropletAsset_ = MakeWaterDropletStaticAsset();
+        scene.waterDropletGeometryVisible_ = true;
         scene.ready_ = true;
         scene.uploadedQualityControls_ = {{2u, 4u, 2u, 0u}};
         scene.uploadedFireQuality_ = FireEmitterQuality::Low;
@@ -514,6 +691,62 @@ struct PresentableTinyRtSceneObservationTestAccess
     static void RemoveDiagnosticBuffer(PresentableTinyRtScene& scene)
     {
         scene.pipelineBundle_.diagnosticBuffer = {};
+    }
+
+    static bool CheckIntegratedTombIntake()
+    {
+        PresentableTinyRtScene baseline;
+        PresentableTinyRtScene tomb;
+        tomb.developmentRescueJourney_ = true;
+        const auto root = (std::filesystem::path(HORDE_RT_SOURCE_DIR) / "assets").string();
+        std::string diagnostic;
+        const auto start = std::chrono::steady_clock::now();
+        const bool baselineLoaded = baseline.LoadStaticHeldItemAssets("", root, diagnostic);
+        const auto middle = std::chrono::steady_clock::now();
+        const bool tombLoaded = baselineLoaded && tomb.LoadStaticHeldItemAssets("", root, diagnostic);
+        const auto end = std::chrono::steady_clock::now();
+        if (!baselineLoaded || !tombLoaded)
+        { std::cerr << "Integrated tomb intake: " << diagnostic << '\n'; return false; }
+        const auto oldIndices = baseline.collapseStaticAsset_.indices.size();
+        bool ok = tomb.collapseStaticAsset_.indices.size() == oldIndices + 46140u &&
+                  tomb.staticMeshSlot_.PrimitiveMetadata().size() <= 32u &&
+                  tomb.staticMeshSlot_.Materials().size() <= 32u;
+        std::cout << "Integrated native tomb static roster: "
+                  << tomb.staticMeshSlot_.PrimitiveMetadata().size() << " primitives, "
+                  << tomb.staticMeshSlot_.Materials().size() << " materials\n";
+        std::cout << "Matched CPU intake only (baseline first; cache/order bias possible): "
+                  << std::chrono::duration<double, std::milli>(middle-start).count()
+                  << " / " << std::chrono::duration<double, std::milli>(end-middle).count()
+                  << " ms; additional static vertices/indices bytes: "
+                  << tomb.staticMeshSlot_.Measurements().vertexBytes - baseline.staticMeshSlot_.Measurements().vertexBytes
+                  << " / " << tomb.staticMeshSlot_.Measurements().indexBytes - baseline.staticMeshSlot_.Measurements().indexBytes
+                  << "; no GPU allocation, AS build or presentation measurement\n";
+        return ok;
+    }
+
+    static bool CheckWaterDropletOwnerLifetime()
+    {
+        PresentableTinyRtScene source;
+        std::cerr << "Water lifetime: populate\n";
+        Populate(source);
+        const bool sourceOwns = source.waterDropletBlas_.handle != VK_NULL_HANDLE &&
+            source.waterDropletBlasUpdateScratch_.buffer != VK_NULL_HANDLE &&
+            source.waterDropletAsset_.vertices.size() == kWaterDropletVertexCount;
+        std::cerr << "Water lifetime: move\n";
+        PresentableTinyRtScene destination(std::move(source));
+        const bool transferred = destination.waterDropletBlas_.handle != VK_NULL_HANDLE &&
+            destination.waterDropletBlasUpdateScratch_.buffer != VK_NULL_HANDLE &&
+            destination.waterDropletAsset_.vertices.size() == kWaterDropletVertexCount &&
+            source.waterDropletBlas_.handle == VK_NULL_HANDLE &&
+            source.waterDropletBlasUpdateScratch_.buffer == VK_NULL_HANDLE &&
+            source.waterDropletAsset_.vertices.empty();
+        std::cerr << "Water lifetime: destroy\n";
+        destination.Destroy();
+        return sourceOwns && transferred &&
+            destination.waterDropletBlas_.handle == VK_NULL_HANDLE &&
+            destination.waterDropletBlasUpdateScratch_.buffer == VK_NULL_HANDLE &&
+            destination.waterDropletAsset_.vertices.empty() &&
+            !destination.waterDropletGeometryVisible_;
     }
 
 #ifndef NDEBUG
@@ -1017,11 +1250,17 @@ int main()
 {
     using namespace horde::vulkan::raytracing;
 
+#ifdef _MSC_VER
+    _CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_FILE);
+    _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);
+#endif
+    std::cerr << "Resource integration: existing readback/mist/torch contracts\n";
     bool ok = PresentableTinyRtSceneObservationTestAccess::CheckPersistentReadback();
     ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckMistControlsAndLifetime(),
                   "mist control must preserve default-On/shadow policy and distinguish requested from owned uploaded state");
     ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckKeeperTorchBodyAliases(),
                   "two physical world torch slots must share dark body geometry and valid static metadata aliases");
+    std::cerr << "Resource integration: descriptor contracts\n";
     for (const auto instrumentation : {RtInstrumentation::Diagnostic, RtInstrumentation::Shipping})
     {
         const auto contract = TryMakeRtDescriptorIoContract(instrumentation);
@@ -1031,13 +1270,13 @@ int main()
             const auto policy = TryMakeRtExecutionPolicy(backend);
             const auto layout = TryMakeRtDescriptorSetLayoutBindings(*contract,
                 policy->pushConstantStages, policy->shaderStage);
-            const auto count = instrumentation == RtInstrumentation::Diagnostic ? 27u : 26u;
+            const auto count = instrumentation == RtInstrumentation::Diagnostic ? 28u : 27u;
             ok &= Require(layout && layout->count == count,
                           "both real backend layouts must fit the full Diagnostic/Shipping rosters");
             if (!layout) continue;
-            ok &= Require(layout->values[count - 1u].binding == 26u &&
+            ok &= Require(layout->values[count - 1u].binding == kRtBindingWaterContactRipple &&
                           layout->values[count - 1u].descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-                          "the final quality-control descriptor must survive layout construction");
+                          "the final owned water-ripple descriptor must survive layout construction");
             for (std::uint32_t i = 0u; i < count; ++i)
                 ok &= Require(layout->values[i].binding == contract->bindings[i].binding &&
                               layout->values[i].descriptorCount == 1u &&
@@ -1053,8 +1292,18 @@ int main()
         ok &= Require(!TryMakeRtDescriptorSetLayoutBindings(malformed, VK_SHADER_STAGE_COMPUTE_BIT, VK_SHADER_STAGE_COMPUTE_BIT),
                       "unknown resource kind must not silently become a storage descriptor");
     }
+    std::cerr << "Resource integration: TLAS and water geometry\n";
     ok &= CheckTlasInstanceRefresh();
+    ok &= CheckBoundedWaterDropletGeometry();
+    std::cerr << "Resource integration: actual tomb intake\n";
+    ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckIntegratedTombIntake(),
+                  "actual combined native tomb asset intake retains the frozen primitive/material capacities");
+    std::cerr << "Resource integration: water owner lifetime\n";
+    ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckWaterDropletOwnerLifetime(),
+                  "water droplet CPU/GPU owner must transfer and clear through scene move/destroy");
+    std::cerr << "Resource integration: resize contracts\n";
     ok &= PresentableTinyRtSceneOutputResizeTestAccess::RunTests();
+    std::cerr << "Resource integration: command/resource observations\n";
     const auto pipelinePolicy = TryMakeRtExecutionPolicy(
         horde::vulkan::RtExecutionBackend::RayTracingPipeline);
     const auto computePolicy = TryMakeRtExecutionPolicy(
@@ -1143,6 +1392,7 @@ int main()
                       horde::telemetry::RtFixedTextView(
                           rejectedIdentity.bundleKey).empty(),
                   "identity construction must reject rather than truncate an oversized key");
+    std::cerr << "Resource integration: command execution fixtures\n";
     const auto executeFixedCommands = [](
         RtSceneRecordObservation& observation,
         RtCommandExecutionLog& execution,
@@ -1273,6 +1523,7 @@ int main()
                           std::string::npos,
                   "dynamic recording must not read the prior Diagnostic submission");
 
+    std::cerr << "Resource integration: not-ready rejection\n";
     PresentableTinyRtScene notReadyScene;
     PresentableTinyRtSceneObservationTestAccess::MarkTlasDefinitions(notReadyScene);
     PresentableTinyRtSceneObservationTestAccess::MarkPendingTlasDefinitions(notReadyScene);
@@ -1298,6 +1549,7 @@ int main()
     ok &= Require(notReadyStages.Abort(),
                   "not-ready record observation attempt did not abort");
 
+    std::cerr << "Resource integration: preview inventory\n";
     PresentableTinyRtScene previewInventoryScene;
     ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckGlassVisibility(previewInventoryScene, true),
                   "Glass On must preserve fixture, mixed lantern body and procedural arm ray admission");
@@ -1338,7 +1590,7 @@ int main()
 #ifndef NDEBUG
     const auto originalHandles = scene.CaptureResourceHandles();
     ok &= Require(originalHandles.ready &&
-                      originalHandles.bottomLevelAccelerationStructures.size() == 20u &&
+                      originalHandles.bottomLevelAccelerationStructures.size() == 21u &&
                       originalHandles.topLevelAccelerationStructures.size() == 1u &&
                       originalHandles.pipelines.size() == 2u &&
                       originalHandles.shaderBindingTableBuffers.size() == 2u &&
@@ -1361,26 +1613,26 @@ int main()
                       scene.PrimaryRewardBodyPixelCount() == 41u,
                   "legacy getters must project one explicitly published completed record");
     const auto diagnostic = scene.ResourceInventory();
-    ok &= Require(diagnostic.bufferCount == 49u &&
-                      diagnostic.memoryAllocationCount == 59u &&
-                      diagnostic.bottomLevelAccelerationStructureCount == 20u &&
-                      scene.BlasCount() == 20u &&
+    ok &= Require(diagnostic.bufferCount == 52u &&
+                      diagnostic.memoryAllocationCount == 62u &&
+                      diagnostic.bottomLevelAccelerationStructureCount == 21u &&
+                      scene.BlasCount() == 21u &&
                       diagnostic.topLevelAccelerationStructureCount == 1u &&
-                      diagnostic.tlasInstanceCount == 26u &&
+                      diagnostic.tlasInstanceCount == 27u &&
                       diagnostic.pipelineCount == 2u &&
                       diagnostic.shaderBindingTableCount == 2u &&
                       diagnostic.descriptorSetCount == 1u,
                   "live inventory must include direct, character, image, and both SBT owners");
-    ok &= Require(diagnostic.hostVisibleBytes == 3264u &&
-                      diagnostic.deviceLocalBytes == 4416u,
+    ok &= Require(diagnostic.hostVisibleBytes == 3456u &&
+                      diagnostic.deviceLocalBytes == 4608u,
                   "host-visible and device-local bytes must use inclusive allocation classes");
 
     PresentableTinyRtSceneObservationTestAccess::RemoveDiagnosticBuffer(scene);
     const auto shipping = scene.ResourceInventory();
-    ok &= Require(shipping.bufferCount == 48u &&
-                      shipping.memoryAllocationCount == 58u &&
-                      shipping.hostVisibleBytes == 3200u &&
-                      shipping.deviceLocalBytes == 4352u,
+    ok &= Require(shipping.bufferCount == 51u &&
+                      shipping.memoryAllocationCount == 61u &&
+                      shipping.hostVisibleBytes == 3392u &&
+                      shipping.deviceLocalBytes == 4544u,
                   "inventory must count only a genuinely live Diagnostic buffer");
 
     PresentableTinyRtSceneObservationTestAccess::MarkTlasDefinitions(scene);
@@ -1413,6 +1665,7 @@ int main()
     moved.NotifyFrameSubmitted();
     ok &= Require(PresentableTinyRtSceneObservationTestAccess::HasTlasDefinitions(moved, 99u),
                   "submission notification with no pending BUILD must be idempotent");
+    std::cerr << "Resource integration: populated inventory\n";
     PresentableTinyRtScene emptyScene;
     PresentableTinyRtSceneObservationTestAccess::MarkTlasDefinitions(emptyScene);
     PresentableTinyRtSceneObservationTestAccess::MarkPendingTlasDefinitions(emptyScene);
@@ -1435,7 +1688,7 @@ int main()
                       moved.QualityControls().controls == std::array<std::uint32_t, 4u>{{2u, 4u, 2u, 0u}} &&
                       moved.UploadedFireQuality() == horde::vulkan::raytracing::FireEmitterQuality::Low,
                   "actual uploaded policy must transfer to exactly one owner with its buffer");
-    ok &= Require(scene.BlasCount() == 0u && moved.BlasCount() == 20u &&
+    ok &= Require(scene.BlasCount() == 0u && moved.BlasCount() == 21u &&
                       movedFrom.bufferCount == 0u &&
                       movedFrom.memoryAllocationCount == 0u &&
                       movedFrom.hostVisibleBytes == 0u &&

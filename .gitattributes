@@ -14,6 +14,9 @@ docs/evidence/2026-10-02-backend-pixel-witness/**/*.log whitespace=-trailing-spa
 *.ktx2 filter=lfs diff=lfs merge=lfs -text
 *.rgba filter=lfs diff=lfs merge=lfs -text
 *.mp4 filter=lfs diff=lfs merge=lfs -text
+assets/audio/pixabay/water_*step*.wav filter=lfs diff=lfs merge=lfs -text
+assets/audio/pixabay/water_stream_contact*.wav filter=lfs diff=lfs merge=lfs -text
+assets/audio/pixabay/water-contact.manifest.json text eol=lf
 
 # Public package policy pins the player Rag manifest's exact LF bytes.
 assets/models/props/runtime/player-rag-torch/asset.manifest.json text eol=lf
@@ -264,3 +267,12 @@ docs/evidence/2026-10-08-menu-ambience/*.json text eol=lf
 # Byte-stable scoped grate evidence.
 docs/evidence/2026-10-08-grate-floor/*.json text eol=lf
 docs/evidence/2026-10-08-grate-floor/*.png -text
+
+assets/models/world/runtime/prepared-funerary-v01/**/*.glb filter=lfs diff=lfs merge=lfs -text
+assets/models/world/runtime/tomb-dressing-v01/tomb-niche-*/**/*.glb filter=lfs diff=lfs merge=lfs -text
+assets/source/beyond_the_tomb/** -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+assets/source/beyond_the_tomb/**/*.blend filter=lfs diff=lfs merge=lfs -text
+assets/source/beyond_the_tomb/**/*.glb filter=lfs diff=lfs merge=lfs -text
+assets/source/beyond_the_tomb/**/*.png filter=lfs diff=lfs merge=lfs -text
+assets/models/world/runtime/prepared-funerary-v01/**/*.json text eol=lf
+assets/models/world/runtime/tomb-dressing-v01/tomb-niche-*/**/*.json text eol=lf

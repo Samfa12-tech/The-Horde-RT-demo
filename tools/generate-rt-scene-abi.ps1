@@ -152,6 +152,7 @@ inline constexpr std::uint32_t kRtBindingWorldPlayerVertices = $($b.worldPlayerV
 inline constexpr std::uint32_t kRtBindingViewmodelVertices = $($b.viewmodelVertices)u;
 inline constexpr std::uint32_t kRtBindingEnvironmentTexture = $($b.environmentTexture)u;
 inline constexpr std::uint32_t kRtBindingQualityControls = $($b.qualityControls)u;
+inline constexpr std::uint32_t kRtBindingWaterContactRipple = $($b.waterContactRipple)u;
 
 enum class RtGeometryRole : std::uint32_t
 {
@@ -279,6 +280,10 @@ layout(std430, set = 0, binding = $($b.qualityControls)) readonly buffer RtQuali
     RtDustMoteGpu dustMotes[$($c.dustMotes)];
     uvec4 dustTiles[$($c.dustTiles)];
 } rtQualityControls;
+layout(std430, set = 0, binding = $($b.waterContactRipple)) readonly buffer RtWaterContactRippleBuffer
+{
+    vec4 value;
+} rtWaterContactRipple;
 #if !defined(HORDE_RT_VARIANT_INSTRUMENTATION) || HORDE_RT_VARIANT_INSTRUMENTATION == 1
 layout(std430, set = 0, binding = $($b.dielectricDiagnostics)) restrict buffer RtDielectricDiagnosticsBuffer
 {

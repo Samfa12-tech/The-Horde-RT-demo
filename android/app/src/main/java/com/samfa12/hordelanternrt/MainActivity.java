@@ -205,6 +205,8 @@ public class MainActivity extends Activity {
     private static final int PLATFORM_EVENT_SKELETON_ENCOUNTER_WARNING = 23;
     private static final int PLATFORM_EVENT_PARRY_PREPARE_CUE = 24;
     private static final int PLATFORM_EVENT_LICH_DISCHARGE_WARNING = 25;
+    private static final int PLATFORM_EVENT_PLAYER_WET_FOOTSTEP = 26;
+    private static final int PLATFORM_EVENT_WATERFALL_CONTACT = 27;
     private static final int EQUIPMENT_AUDIO_SWORD_DRAW = 1;
     private static final int EQUIPMENT_AUDIO_SWORD_SHEATH = 2;
     private static final int ENTITY_LICH = 3;
@@ -659,6 +661,26 @@ public class MainActivity extends Activity {
                     stageAsset("models/world/runtime/collapsed-entry/collapsed-entry-lod0.runtime.glb",
                     "models/world/runtime/collapsed-entry/collapsed-entry-lod0.runtime.glb");
             if (!collapseStaged) throw new IllegalStateException("Required collapsed-entry runtime assets could not be staged.");
+            final boolean tombDressingStaged =
+                    stageAsset("models/world/runtime/tomb-dressing-v01/tomb-niche-rect/asset.manifest.json", "models/world/runtime/tomb-dressing-v01/tomb-niche-rect/asset.manifest.json") &&
+                    stageAsset("models/world/runtime/tomb-dressing-v01/tomb-niche-rect/candidate-receipt.json", "models/world/runtime/tomb-dressing-v01/tomb-niche-rect/candidate-receipt.json") &&
+                    stageAsset("models/world/runtime/tomb-dressing-v01/tomb-niche-rect/tomb-niche-rect-lod0.runtime.glb", "models/world/runtime/tomb-dressing-v01/tomb-niche-rect/tomb-niche-rect-lod0.runtime.glb") &&
+                    stageAsset("models/world/runtime/tomb-dressing-v01/tomb-niche-arched/asset.manifest.json", "models/world/runtime/tomb-dressing-v01/tomb-niche-arched/asset.manifest.json") &&
+                    stageAsset("models/world/runtime/tomb-dressing-v01/tomb-niche-arched/candidate-receipt.json", "models/world/runtime/tomb-dressing-v01/tomb-niche-arched/candidate-receipt.json") &&
+                    stageAsset("models/world/runtime/tomb-dressing-v01/tomb-niche-arched/tomb-niche-arched-lod0.runtime.glb", "models/world/runtime/tomb-dressing-v01/tomb-niche-arched/tomb-niche-arched-lod0.runtime.glb") &&
+                    stageAsset("models/world/runtime/prepared-funerary-v01/t02-native-import-candidates/femur/tomb-femur-lod0.runtime.glb", "models/world/runtime/prepared-funerary-v01/t02-native-import-candidates/femur/tomb-femur-lod0.runtime.glb") &&
+                    stageAsset("models/world/runtime/prepared-funerary-v01/t02-native-import-candidates/humerus/tomb-humerus-lod0.runtime.glb", "models/world/runtime/prepared-funerary-v01/t02-native-import-candidates/humerus/tomb-humerus-lod0.runtime.glb") &&
+                    stageAsset("models/world/runtime/prepared-funerary-v01/t02-native-import-candidates/skull-jaw/tomb-skull-jaw-lod0.runtime.glb", "models/world/runtime/prepared-funerary-v01/t02-native-import-candidates/skull-jaw/tomb-skull-jaw-lod0.runtime.glb") &&
+                    stageAsset("models/world/runtime/prepared-funerary-v01/t02-native-import-candidates/derivation-receipt.json", "models/world/runtime/prepared-funerary-v01/t02-native-import-candidates/derivation-receipt.json") &&
+                    stageAsset("models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_candle_stub_1.glb", "models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_candle_stub_1.glb") &&
+                    stageAsset("models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_candle_stub_2.glb", "models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_candle_stub_2.glb") &&
+                    stageAsset("models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_candle_stub_3.glb", "models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_candle_stub_3.glb") &&
+                    stageAsset("models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_displaced_lid.glb", "models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_displaced_lid.glb") &&
+                    stageAsset("models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_offering_bowl.glb", "models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_offering_bowl.glb") &&
+                    stageAsset("models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_urn_broken_base.glb", "models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_urn_broken_base.glb") &&
+                    stageAsset("models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_urn_rim_shard.glb", "models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_urn_rim_shard.glb") &&
+                    stageAsset("models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/derivation-receipt.json", "models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/derivation-receipt.json");
+            if (!tombDressingStaged) throw new IllegalStateException("Required tomb dressing runtime assets could not be staged.");
             if (BuildConfig.VIEWMODEL_CANDIDATE && !stageAsset(
                     "models/player/viewmodel/runtime/candidate-receipt.json",
                     "models/player/viewmodel/runtime/candidate-receipt.json")) {
@@ -2506,7 +2528,7 @@ public class MainActivity extends Activity {
     private boolean updateCombatTeachingPrompt(int surfaceState) {
         if (combatTeachingPrompt == null) return false;
         final long packed = ProbeBridge.getCombatTeachingState();
-        final String text = CombatTeachingPreferences.prompt(packed);
+        final String text = CombatTeachingPreferences.prompt(packed, controllerMode);
         final boolean allowed = resumed && surfaceStarted && surfaceState == 1 &&
                 preferences.getBoolean("show_hud", true) &&
                 !menuVisible && !diagnosticsVisible && !graphicsVisible && !rtLabVisible &&
@@ -4817,6 +4839,15 @@ public class MainActivity extends Activity {
                     final int equipmentAudioCue = (int) ((metadata >>> 24) & 0xffL);
                     final long eventSequence = (metadata >>> 32) & 0xffffffffL;
                     switch (eventType) {
+                        case PLATFORM_EVENT_PLAYER_WET_FOOTSTEP:
+                            playSpatialSound((playerStepVariant++ & 1) == 0 ?
+                                    "water_wet_step_1" : "water_wet_step_2", 0.45f,
+                                    stereoGains, verticalMetadata);
+                            break;
+                        case PLATFORM_EVENT_WATERFALL_CONTACT:
+                            playSpatialSound("water_stream_contact", 0.45f,
+                                    stereoGains, verticalMetadata);
+                            break;
                         case PLATFORM_EVENT_PLAYER_FOOTSTEP:
                             playSpatialSound((playerStepVariant++ & 1) == 0 ?
                                     "player_step_1" : "player_step_2", 0.45f,
@@ -5423,6 +5454,9 @@ public class MainActivity extends Activity {
         loadSound("enemy_fall", "audio/filmcow/enemy_fall.wav");
         loadSound("player_step_1", "audio/filmcow/player_step_1.wav");
         loadSound("player_step_2", "audio/filmcow/player_step_2.wav");
+        loadSound("water_wet_step_1", "audio/pixabay/water_wet_step_1_core.wav");
+        loadSound("water_wet_step_2", "audio/pixabay/water_wet_step_2_core.wav");
+        loadSound("water_stream_contact", "audio/pixabay/water_stream_contact_core.wav");
         loadSound("skeleton_step_1", "audio/filmcow/skeleton_step_1.wav");
         loadSound("skeleton_step_2", "audio/filmcow/skeleton_step_2.wav");
         loadSound("skeleton_attack", "audio/filmcow/skeleton_attack.wav");

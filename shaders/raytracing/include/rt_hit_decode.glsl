@@ -79,26 +79,6 @@ vec3 waterSurfaceNormal(vec3 p, vec3 geometricNormal)
 {
     vec3 n = waterBaseNormal(p, geometricNormal);
     bool runoff = abs(n.y) > 0.65;
-    bool catchment = runoff && p.x > -2.88;
-    if (catchment)
-    {
-        // The roof stream transfers momentum into concentric capillary waves in
-        // the real catchment geometry. These normals drive the same bounded RT
-        // reflection/refraction paths; no screen-space ring is composited later.
-        vec2 impactOffset = p.xz - vec2(-2.32, -15.26);
-        float impactDistance = length(impactOffset);
-        vec2 radial = impactOffset / max(impactDistance, 0.001);
-        float angularWarp = sin(atan(impactOffset.y, impactOffset.x) * 3.0
-                              + controls.time * 0.37) * 0.28;
-        float ripple = sin(impactDistance * 31.0 - controls.time * 6.2
-                           + angularWarp);
-        float rippleEnvelope = 1.0 - smoothstep(0.07, 0.72, impactDistance);
-        vec3 radialDirection = vec3(radial.x, 0.0, radial.y);
-        return normalize(n + radialDirection * ripple * rippleEnvelope * 0.020
-                           + vec3(0.006 * sin(p.z * 23.0 - controls.time * 3.7),
-                                  0.0,
-                                  0.004 * sin(p.x * 29.0 + controls.time * 4.1)));
-    }
     vec3 flow = runoff ? vec3(-1.0, 0.0, 0.0) : vec3(0.0, -1.0, 0.0);
     vec3 across = normalize(cross(flow, n));
     float alongPosition = dot(p, flow);
@@ -108,8 +88,25 @@ vec3 waterSurfaceNormal(vec3 p, vec3 geometricNormal)
     float slopeB = sin(alongPosition * 7.1 - controls.time * 6.8
                      + acrossPosition * 2.9);
     float amplitude = runoff ? 0.008 : 0.018;
-    return normalize(n + flow * slopeA * amplitude
-                       + across * slopeB * amplitude * 0.65);
+    vec3 perturbed = n + flow * slopeA * amplitude
+                       + across * slopeB * amplitude * 0.65;
+    // Water material hits on the horizontal catchment and runoff share this
+    // bounded normal-only contact wave. The underlying admitted surfaces keep
+    // their positions and remain the membership test; no displaced sheet or
+    // coordinate-only overlay is introduced.
+    vec2 offset = p.xz - rtWaterContactRipple.value.xy;
+    float distanceToImpact = length(offset);
+    float age = max(rtWaterContactRipple.value.z, 0.0);
+    float envelope = clamp(rtWaterContactRipple.value.w, 0.0, 1.0)
+                   * (runoff ? 1.0 : 0.0)
+                   * step(0.0005, distanceToImpact)
+                   * (1.0 - smoothstep(0.62, 1.0, distanceToImpact))
+                   * (1.0 - smoothstep(0.35, 0.90, age));
+    float radialSlope = cos(distanceToImpact * 39.0 - age * 7.5)
+                      * envelope * 0.022;
+    perturbed += vec3(offset.x, 0.0, offset.y)
+               * (radialSlope / max(distanceToImpact, 0.0005));
+    return normalize(perturbed);
 }
 
 bool waterStreamExit(vec3 entryPoint, vec3 insideDirection,

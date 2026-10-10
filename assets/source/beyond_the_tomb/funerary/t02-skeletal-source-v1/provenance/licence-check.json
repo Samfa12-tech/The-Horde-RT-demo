@@ -1,0 +1,30 @@
+{
+  "checked_date_utc": "2026-10-06",
+  "creator_listing": {
+    "url": "https://blendswap.com/blend/1609",
+    "title": "Simple Rigged Skeleton",
+    "creator_account": "feelgoodcomics",
+    "licence_field": "CC0",
+    "status": "Read through web tool on checked date"
+  },
+  "distributor": {
+    "url": "https://opengameart.org/content/skeleton-with-rig",
+    "title": "Skeleton with rig",
+    "creator": "Gord Goodwin",
+    "uploader": "Anonymous",
+    "licence_field": "CC0",
+    "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "snapshot": "opengameart-source-page.html",
+    "source_download": "https://opengameart.org/sites/default/files/fgc_skeleton.blend"
+  },
+  "creator_blog": {
+    "url": "https://gord-goodwin.blogspot.com/2010/03/manny-mannequin.html",
+    "status": "Linked by distributor; inaccessible to web reader in this task; not relied upon as current licence evidence"
+  },
+  "source_sha256": "0ba13c9f0c2af50aafb317f450a92083f7d08ece67c3ecc9a2c64eac13257926",
+  "source_bytes": 1748720,
+  "external_source_geometry": "CC0-1.0",
+  "new_material_scripts_arrangements": "Project-authored in this task; kept distinct from source CC0 geometry; no relicensing claim for user's additions",
+  "paid_provider_calls": 0,
+  "spend": 0
+}

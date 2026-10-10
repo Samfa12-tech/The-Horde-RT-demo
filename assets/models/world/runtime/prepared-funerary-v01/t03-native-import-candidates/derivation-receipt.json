@@ -1,0 +1,96 @@
+{
+  "status": "runtime candidate; not admitted",
+  "sourcePackage": "assets/source/beyond_the_tomb/funerary/t03-v01",
+  "sourceManifestSha256": "5f16c2dead279914176322b62fb8d3a39bb62427106464b87f7a720aa676b1e6",
+  "sourceReadmeSha256": "c56711ca0fdb71f247b5643492ccdb4620a7b0da8afc69f4ef9678efafd54fdf",
+  "sourceChecksumListSha256": "26177b187de24568f3b3127d1b1165dd12e7fb6b7abf28f08274a28ae90ce580",
+  "sourceAuthority": "Recovered Horde-owned A17/T03 source package; per-asset GLB hashes match its asset-manifest.json and SHA256SUMS.",
+  "rights": "Original Blender-authored project geometry and PBR parameters; the source README states no third-party model/texture bytes or external stock-asset license. No external acquisition or generation was performed for this runtime copy.",
+  "recipe": "Byte-exact file copy from each manifest-selected source GLB into the runtime candidate directory; no geometry, indices, materials, UVs, or textures changed.",
+  "assets": [
+    {
+      "id": "t03_displaced_lid",
+      "source": "assets/source/beyond_the_tomb/funerary/t03-v01/models/t03_displaced_lid.glb",
+      "sourceBytes": 67240,
+      "sourceSha256": "e93203b35e8e1979ba16a67f31044076b20127fa8bfbc60b96512d2a5e777962",
+      "runtime": "assets/models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_displaced_lid.glb",
+      "runtimeBytes": 67240,
+      "runtimeSha256": "e93203b35e8e1979ba16a67f31044076b20127fa8bfbc60b96512d2a5e777962",
+      "triangles": 496,
+      "geometryChanged": false,
+      "materialsOrUvsChanged": false
+    },
+    {
+      "id": "t03_offering_bowl",
+      "source": "assets/source/beyond_the_tomb/funerary/t03-v01/models/t03_offering_bowl.glb",
+      "sourceBytes": 45880,
+      "sourceSha256": "6e193a9b36656bffa8c972dab0958884208c0a4f38b72333a4677ad2ceab302b",
+      "runtime": "assets/models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_offering_bowl.glb",
+      "runtimeBytes": 45880,
+      "runtimeSha256": "6e193a9b36656bffa8c972dab0958884208c0a4f38b72333a4677ad2ceab302b",
+      "triangles": 960,
+      "geometryChanged": false,
+      "materialsOrUvsChanged": false
+    },
+    {
+      "id": "t03_urn_broken_base",
+      "source": "assets/source/beyond_the_tomb/funerary/t03-v01/models/t03_urn_broken_base.glb",
+      "sourceBytes": 87384,
+      "sourceSha256": "c0ed7c0261a125385f821109927567c4fc8f1ff0799d0c3c479d4149e09ad594",
+      "runtime": "assets/models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_urn_broken_base.glb",
+      "runtimeBytes": 87384,
+      "runtimeSha256": "c0ed7c0261a125385f821109927567c4fc8f1ff0799d0c3c479d4149e09ad594",
+      "triangles": 1212,
+      "geometryChanged": false,
+      "materialsOrUvsChanged": false
+    },
+    {
+      "id": "t03_urn_rim_shard",
+      "source": "assets/source/beyond_the_tomb/funerary/t03-v01/models/t03_urn_rim_shard.glb",
+      "sourceBytes": 56588,
+      "sourceSha256": "63a76503741ae51f9230e7b23201037bb1e4402d348bbd27323000a82605f1ad",
+      "runtime": "assets/models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_urn_rim_shard.glb",
+      "runtimeBytes": 56588,
+      "runtimeSha256": "63a76503741ae51f9230e7b23201037bb1e4402d348bbd27323000a82605f1ad",
+      "triangles": 800,
+      "geometryChanged": false,
+      "materialsOrUvsChanged": false
+    },
+    {
+      "id": "t03_candle_stub_1",
+      "source": "assets/source/beyond_the_tomb/funerary/t03-v01/models/t03_candle_stub_1.glb",
+      "sourceBytes": 34992,
+      "sourceSha256": "5e454e5aa302e3d081c9857e00a9c8d005c5454a5a7e04d6f212fdbf56c20823",
+      "runtime": "assets/models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_candle_stub_1.glb",
+      "runtimeBytes": 34992,
+      "runtimeSha256": "5e454e5aa302e3d081c9857e00a9c8d005c5454a5a7e04d6f212fdbf56c20823",
+      "triangles": 664,
+      "geometryChanged": false,
+      "materialsOrUvsChanged": false
+    },
+    {
+      "id": "t03_candle_stub_2",
+      "source": "assets/source/beyond_the_tomb/funerary/t03-v01/models/t03_candle_stub_2.glb",
+      "sourceBytes": 38456,
+      "sourceSha256": "01d24d1c097267b87bafe4a7545d0cdde50292f2fe7af12a70022c590a82d125",
+      "runtime": "assets/models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_candle_stub_2.glb",
+      "runtimeBytes": 38456,
+      "runtimeSha256": "01d24d1c097267b87bafe4a7545d0cdde50292f2fe7af12a70022c590a82d125",
+      "triangles": 664,
+      "geometryChanged": false,
+      "materialsOrUvsChanged": false
+    },
+    {
+      "id": "t03_candle_stub_3",
+      "source": "assets/source/beyond_the_tomb/funerary/t03-v01/models/t03_candle_stub_3.glb",
+      "sourceBytes": 30440,
+      "sourceSha256": "1a7967a9ae3a82a1e470067b9a344804aa5f40b36b7ba13b401538c6b8fa30a3",
+      "runtime": "assets/models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_candle_stub_3.glb",
+      "runtimeBytes": 30440,
+      "runtimeSha256": "1a7967a9ae3a82a1e470067b9a344804aa5f40b36b7ba13b401538c6b8fa30a3",
+      "triangles": 664,
+      "geometryChanged": false,
+      "materialsOrUvsChanged": false
+    }
+  ]
+}

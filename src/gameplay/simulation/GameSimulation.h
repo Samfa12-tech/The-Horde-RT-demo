@@ -7,6 +7,7 @@
 #include "gameplay/SpatialAudio.h"
 #include "gameplay/SwordCombat.h"
 #include "gameplay/effects/FireEmitterState.h"
+#include "gameplay/effects/WaterContact.h"
 #include "gameplay/animation/PlayerAnimationState.h"
 #include "gameplay/items/HeldItemState.h"
 #include "gameplay/items/HeldItemKinematics.h"
@@ -199,7 +200,8 @@ private:
                        float x,
                        float z,
                        float intensity = 1.0f,
-                       std::int32_t payload = 0);
+                         std::int32_t payload = 0,
+                         float worldY = 0.0f);
     void RefreshSnapshot(const InputSnapshot& input);
 
     GameSimulationConfig config_{};
@@ -244,6 +246,7 @@ private:
     horde::gameplay::interactions::LanternPendulum lanternPendulum_{};
     PlayerVitals playerVitals_{};
     TravelFootstepCadence playerFootsteps_{};
+    horde::gameplay::effects::WaterContact waterContact_{};
     std::array<PlayerFootstepCadence, kSkeletonEnemyCapacity> enemyFootsteps_{};
     std::array<double, kSkeletonEnemyCapacity> skeletonIncidentalIdleSeconds_{};
     std::array<double, kSkeletonEnemyCapacity> skeletonIncidentalNextSeconds_{{12.0, 18.0}};

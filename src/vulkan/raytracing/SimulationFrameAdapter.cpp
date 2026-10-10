@@ -143,6 +143,7 @@ RtSceneFrameInputs BuildRtSceneFrameInputs(
     }
     frame.lich = simulation.lich;
     frame.zone = simulation.zone;
+    frame.waterContact = simulation.waterContact;
     frame.fireEmitters = simulation.fireEmitters;
     frame.fireEmitterCount = simulation.fireEmitterCount;
     // A live rescue opening is authoritative collision/progression state.

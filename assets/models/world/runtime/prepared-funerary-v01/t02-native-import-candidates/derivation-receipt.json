@@ -1,0 +1,105 @@
+{
+  "status": "candidate-only; not admitted",
+  "reason": "Horde static GLB loader requires TEXCOORD_0 on texture-free primitives",
+  "geometryChanged": false,
+  "texturesAdded": false,
+  "sourceRoot": "assets/source/beyond_the_tomb/funerary/t02-skeletal-source-v1",
+  "assets": [
+    {
+      "asset": "skull-jaw",
+      "source": "meshes/skull_jaw.glb",
+      "sourceBytes": 104032,
+      "sourceSha256": "35b2643b2154afd5d0593e9048b0ec43cb5db09cdc3f4e5ca8b46dc0c3ff9aa3",
+      "runtime": "skull-jaw/tomb-skull-jaw-lod0.runtime.glb",
+      "runtimeBytes": 127212,
+      "runtimeSha256": "07d00188f183de5fd1ea1d24051e7e3c993953f02aaf85fcc9349d4b38105c4f",
+      "triangles": 5564,
+      "boundsGlbMeters": {
+        "min": [
+          -0.073674761,
+          0.0,
+          -0.097893074
+        ],
+        "max": [
+          0.073674768,
+          0.20823279,
+          0.099375159
+        ],
+        "dimensions": [
+          0.147349529,
+          0.20823279,
+          0.197268233
+        ],
+        "basis": "glTF +Y up, +Z forward; metres per T02 source package"
+      },
+      "geometrySignaturePreserved": true,
+      "primitiveCount": 1,
+      "uvVertexCount": 2875,
+      "derivation": "append deterministic dominant-axis planar TEXCOORD_0 from source positions; preserve source geometry, indices, normals, materials and scene nodes"
+    },
+    {
+      "asset": "femur",
+      "source": "meshes/femur.glb",
+      "sourceBytes": 8804,
+      "sourceSha256": "b00f2492791a3d2b6936d76fe689acea7a1d6c5820c40408fe4a76d71d827c6c",
+      "runtime": "femur/tomb-femur-lod0.runtime.glb",
+      "runtimeBytes": 10580,
+      "runtimeSha256": "bdf24bb2b71290b3acf843ea48c2eb280e7d75300463ae0096e0da4796c4c608",
+      "triangles": 396,
+      "boundsGlbMeters": {
+        "min": [
+          -0.052866623,
+          0.0,
+          -0.051509216
+        ],
+        "max": [
+          0.052866623,
+          0.463929415,
+          0.051509216
+        ],
+        "dimensions": [
+          0.105733246,
+          0.463929415,
+          0.103018433
+        ],
+        "basis": "glTF +Y up, +Z forward; metres per T02 source package"
+      },
+      "geometrySignaturePreserved": true,
+      "primitiveCount": 1,
+      "uvVertexCount": 200,
+      "derivation": "append deterministic dominant-axis planar TEXCOORD_0 from source positions; preserve source geometry, indices, normals, materials and scene nodes"
+    },
+    {
+      "asset": "humerus",
+      "source": "meshes/humerus.glb",
+      "sourceBytes": 7156,
+      "sourceSha256": "3608f324e9f70ff73dba0fc9bc1a350a486c220a333114b43bfdde64369e4a99",
+      "runtime": "humerus/tomb-humerus-lod0.runtime.glb",
+      "runtimeBytes": 8564,
+      "runtimeSha256": "f39dc48c4b0faf1668e748f8927f219dbd3e4d1c90e6e90c71ec9f8a97c192af",
+      "triangles": 304,
+      "boundsGlbMeters": {
+        "min": [
+          -0.038072579,
+          0.0,
+          -0.022279091
+        ],
+        "max": [
+          0.038072579,
+          0.313043267,
+          0.022279091
+        ],
+        "dimensions": [
+          0.076145157,
+          0.313043267,
+          0.044558182
+        ],
+        "basis": "glTF +Y up, +Z forward; metres per T02 source package"
+      },
+      "geometrySignaturePreserved": true,
+      "primitiveCount": 1,
+      "uvVertexCount": 154,
+      "derivation": "append deterministic dominant-axis planar TEXCOORD_0 from source positions; preserve source geometry, indices, normals, materials and scene nodes"
+    }
+  ]
+}

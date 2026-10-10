@@ -30,42 +30,34 @@ inline unsigned char CombatTeachingPromptFadeAlpha(
 }
 
 inline std::string CombatTeachingPromptText(
-    const gameplay::simulation::CombatTeachingSnapshot& teaching)
+    const gameplay::simulation::CombatTeachingSnapshot& teaching, const bool controller = false)
 {
     using gameplay::simulation::CombatTeachingCue;
     using gameplay::simulation::TutorialStage;
     if (!teaching.enabled || !std::isfinite(teaching.promptOpacity) || teaching.promptOpacity <= 0.0f)
         return {};
-    const char* lesson = "O WATCH THE ATTACKER - read the motion";
+    const char* lesson = "O Watch the attacker";
     switch (teaching.cue)
     {
     case CombatTeachingCue::ParryWindup:
-        lesson = teaching.source == gameplay::simulation::EntityId::SkeletonB
-            ? "O SKELETON B WIND-UP - watch its raised blade"
-            : "O SKELETON A WIND-UP - watch its raised blade";
+        lesson = "O Watch the raised blade";
         break;
-    case CombatTeachingCue::ParryNow: lesson = "o PRESS PARRY - raise guard before the strike"; break;
-    case CombatTeachingCue::ParryActive: lesson = "(*) PARRY WINDOW ACTIVE - face the incoming blade"; break;
-    case CombatTeachingCue::ParryRecovery: lesson = "-> RESET - ready for the next strike"; break;
-    case CombatTeachingCue::DodgeWindup: lesson = "O KEEPER CHARGING - watch the staff glow build"; break;
-    case CombatTeachingCue::DodgeNow: lesson = "<-- DODGE NOW --> - move sideways"; break;
-    case CombatTeachingCue::Recovery: lesson = "-> RECOVER - face the Keeper again"; break;
-    case CombatTeachingCue::Learned: lesson = "(*) PARRY LANDED - the attacker is staggered"; break;
+    case CombatTeachingCue::ParryNow: lesson = "o PARRY NOW - raise your guard"; break;
+    case CombatTeachingCue::ParryActive: lesson = "(*) Guard up - face the blade"; break;
+    case CombatTeachingCue::ParryRecovery: lesson = "-> Ready for the next strike"; break;
+    case CombatTeachingCue::DodgeWindup: lesson = "O The Keeper gathers lightning - watch the staff"; break;
+    case CombatTeachingCue::DodgeNow: lesson = "<-- DODGE NOW --> - step sideways"; break;
+    case CombatTeachingCue::Recovery: lesson = "-> Close in before the next charge"; break;
+    case CombatTeachingCue::Learned: lesson = "(*) Well parried - strike back"; break;
     case CombatTeachingCue::None:
         if (teaching.stage == TutorialStage::Complete || teaching.stage == TutorialStage::Skipped)
             return {};
-        if (teaching.parryLearned) lesson = "O NEXT: DODGE THE KEEPER'S CHARGE";
+        if (teaching.parryLearned) lesson = "O Dodge the Keeper's lightning";
         break;
     }
-    const float progress = std::isfinite(teaching.cueProgress)
-        ? std::clamp(teaching.cueProgress, 0.0f, 1.0f) : 0.0f;
-    const int filled = std::clamp(static_cast<int>(std::lround(progress * 6.0f)), 0, 6);
-    std::string bar;
-    bar.reserve(6u);
-    for (int index = 0; index < 6; ++index) bar.push_back(index < filled ? '#' : '-');
-    std::string text = "COMBAT LESSON [" + bar + "]\r\n" + lesson;
-    if (teaching.slowdownActive) text += "  |  TIME EASED";
-    text += "\r\nPARRY: Q  |  DODGE: SPACE + A/D  |  MOVE/LOOK LIVE  |  RETRY SAFE";
+    std::string text = lesson;
+    text += controller ? "\r\n[LT] Parry  |  [B] + left stick: Dodge"
+                       : "\r\n[Q] Parry  |  [Space] + A/D: Dodge";
     return text;
 }
 } // namespace horde::platform::windows

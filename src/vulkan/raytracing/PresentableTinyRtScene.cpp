@@ -1,3 +1,5 @@
+#include "scene/TombDressing.h"
+#include "scene/TombWallRecess.h"
 #include "vulkan/raytracing/RescuePlayerRig.h"
 #include "scene/RescueJourneyGeometry.h"
 #include "scene/ShowcaseIndoorDust.h"
@@ -22,6 +24,7 @@
 #include "scene/ShaftDressingGeometry.h"
 #include "vulkan/raytracing/RtLanternGeometryProfile.h"
 #include "vulkan/raytracing/TlasInstanceRefresh.h"
+#include "vulkan/raytracing/WaterContactRenderGeometry.h"
 
 #include <algorithm>
 #include <array>
@@ -514,6 +517,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     heldLightBuffer_ = std::exchange(other.heldLightBuffer_, Buffer{});
     fireEmitterBuffer_ = std::exchange(other.fireEmitterBuffer_, Buffer{});
     qualityControlsBuffer_ = std::exchange(other.qualityControlsBuffer_, {});
+    waterContactRippleBuffer_ = std::exchange(other.waterContactRippleBuffer_, {});
     uploadedQualityControls_ = std::exchange(other.uploadedQualityControls_, {});
     uploadedFireQuality_ = std::exchange(other.uploadedFireQuality_, FireEmitterQuality::Mobile);
     uploadedFireEmitters_ = std::exchange(other.uploadedFireEmitters_, FireEmitterUpload{});
@@ -551,6 +555,8 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     skinnedPlayerBlas_ = std::exchange(other.skinnedPlayerBlas_, AccelerationStructure{});
     viewmodelBlas_ = std::exchange(other.viewmodelBlas_, AccelerationStructure{});
     collapseBlas_ = std::exchange(other.collapseBlas_, AccelerationStructure{});
+    waterDropletBlas_ = std::exchange(other.waterDropletBlas_, AccelerationStructure{});
+    waterDropletBlasUpdateScratch_ = std::exchange(other.waterDropletBlasUpdateScratch_, Buffer{});
     viewmodelBlasUpdateScratch_ = std::exchange(other.viewmodelBlasUpdateScratch_, Buffer{});
     skinnedPlayerBlasUpdateScratch_ =
         std::exchange(other.skinnedPlayerBlasUpdateScratch_, Buffer{});
@@ -572,6 +578,8 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     rewardLanternBodyAsset_ = std::move(other.rewardLanternBodyAsset_);
     productionDielectricFixtureAsset_ =
         std::move(other.productionDielectricFixtureAsset_);
+    waterDropletAsset_ = std::move(other.waterDropletAsset_);
+    waterDropletGeometryVisible_ = std::exchange(other.waterDropletGeometryVisible_, false);
     skinnedPlayerUpload_ = std::move(other.skinnedPlayerUpload_);
     viewmodelAsset_ = std::move(other.viewmodelAsset_);
     viewmodelSkin_ = std::move(other.viewmodelSkin_);
@@ -1072,6 +1080,10 @@ void PresentableTinyRtScene::Destroy()
         pipelineBundle_.Reset();
         compiledPipelineCache_ = nullptr;
         worldTorchBodyBlas_ = {};
+        waterDropletBlas_ = {};
+        waterDropletBlasUpdateScratch_ = {};
+        waterDropletAsset_ = {};
+        waterDropletGeometryVisible_ = false;
         pipelineEvidenceIdentity_ = {};
         pipelineEvidenceIdentityValid_ = false;
         framePipelineEvidence_ = {};
@@ -1088,6 +1100,7 @@ void PresentableTinyRtScene::Destroy()
     DestroyAccelerationStructure(tlas_);
     DestroyBuffer(tlasUpdateScratch_);
     DestroyBuffer(rescueWorldUpdateScratch_);
+    DestroyBuffer(waterDropletBlasUpdateScratch_);
     rescueWorldVertices_.clear();
     rescueWorldSurfaceCodes_.clear();
     characterSlot_.DestroyGpuResources(gpuResources_);
@@ -1095,6 +1108,7 @@ void PresentableTinyRtScene::Destroy()
     DestroyBuffer(viewmodelBlasUpdateScratch_);
     DestroyAccelerationStructure(viewmodelBlas_);
     DestroyAccelerationStructure(collapseBlas_);
+    DestroyAccelerationStructure(waterDropletBlas_);
     DestroyAccelerationStructure(skinnedPlayerBlas_);
     DestroyAccelerationStructure(playerLimbBlas_);
     DestroyAccelerationStructure(playerBodyBlas_);
@@ -1122,6 +1136,7 @@ void PresentableTinyRtScene::Destroy()
     DestroyBuffer(heldLightBuffer_);
     DestroyBuffer(fireEmitterBuffer_);
     DestroyBuffer(qualityControlsBuffer_);
+    DestroyBuffer(waterContactRippleBuffer_);
     DestroyBuffer(instanceBuffer_);
     DestroyBuffer(transformBuffer_);
     DestroyBuffer(indexBuffer_);
@@ -1159,6 +1174,8 @@ void PresentableTinyRtScene::Destroy()
     rewardLanternRingAsset_ = {};
     rewardLanternBodyAsset_ = {};
     productionDielectricFixtureAsset_ = {};
+    waterDropletAsset_ = {};
+    waterDropletGeometryVisible_ = false;
     playerRenderSlot_ = {};
     skinnedPlayerUpload_.clear();
     viewmodelAsset_ = {};
@@ -1273,7 +1290,8 @@ PresentableTinyRtScene::CaptureResourceHandles() const
              &playerSwordScabbardBlas_,
              &gothicChestBaseBlas_, &gothicChestLidBlas_, &rewardLanternRingBlas_,
              &rewardLanternBodyBlas_, &dielectricFixtureBlas_, &playerBodyBlas_,
-             &playerLimbBlas_, &skinnedPlayerBlas_, &viewmodelBlas_, &collapseBlas_})
+             &playerLimbBlas_, &skinnedPlayerBlas_, &viewmodelBlas_, &collapseBlas_,
+             &waterDropletBlas_})
         append(result.bottomLevelAccelerationStructures, blas->handle);
     for (std::size_t bucket = 0u;
          bucket < CharacterRenderSlot::kMaximumSkeletonPoseBuckets; ++bucket)
@@ -1307,11 +1325,13 @@ horde::telemetry::RtResourceInventory PresentableTinyRtScene::ResourceInventory(
     horde::telemetry::RtResourceInventory inventory{};
     for (const Buffer* buffer : std::array{
              &vertexBuffer_, &indexBuffer_, &transformBuffer_, &instanceBuffer_,
-             &heldLightBuffer_, &fireEmitterBuffer_, &qualityControlsBuffer_, &worldSurfaceBuffer_,
+             &heldLightBuffer_, &fireEmitterBuffer_, &qualityControlsBuffer_, &waterContactRippleBuffer_, &worldSurfaceBuffer_,
              &staticVertexBuffer_, &worldPlayerVertexBuffer_, &viewmodelVertexBuffer_,
              &staticIndexBuffer_, &staticGeometryTransformBuffer_,
              &instanceMetadataBuffer_, &primitiveMetadataBuffer_, &materialMetadataBuffer_,
-             &skinnedPlayerBlasUpdateScratch_, &viewmodelBlasUpdateScratch_, &rescueWorldUpdateScratch_, &tlas_.backing, &tlasUpdateScratch_})
+             &skinnedPlayerBlasUpdateScratch_, &viewmodelBlasUpdateScratch_,
+             &rescueWorldUpdateScratch_, &waterDropletBlasUpdateScratch_,
+             &tlas_.backing, &tlasUpdateScratch_})
     {
         AccumulateRtGpuBuffer(inventory, *buffer);
     }
@@ -1327,7 +1347,8 @@ horde::telemetry::RtResourceInventory PresentableTinyRtScene::ResourceInventory(
              &playerSwordScabbardBlas_,
              &gothicChestBaseBlas_, &gothicChestLidBlas_, &rewardLanternRingBlas_,
              &rewardLanternBodyBlas_, &dielectricFixtureBlas_, &playerBodyBlas_,
-             &playerLimbBlas_, &skinnedPlayerBlas_, &viewmodelBlas_, &collapseBlas_})
+             &playerLimbBlas_, &skinnedPlayerBlas_, &viewmodelBlas_, &collapseBlas_,
+             &waterDropletBlas_})
     {
         accumulateBlas(*blas);
     }
@@ -2403,11 +2424,19 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
             collapseDirectory / "collapsed-entry-lod0.runtime.glb",
             collapseManifest, collapseStaticAsset_, diagnostic))
         return false;
+    if (sceneProfile_ == RtSceneProfile::Showcase && developmentRescueJourney_)
+    {
+        horde::scene::TombDressingBuildReport dressing;
+        if (!horde::scene::AppendPreparedTombDressing(root, collapseStaticAsset_, dressing, diagnostic))
+            return false;
+    }
     // The selected immutable quality bundle owns the geometry profile too.
     // Mobile panes are absent from the BLAS, not hidden/skipped in a shader.
     if (!SelectLanternGeometryForQuality(
             rewardLanternBodyAsset_, pipelineBundle_.Request().quality, diagnostic, glassEnabled_))
         return false;
+    if (sceneProfile_ == RtSceneProfile::Showcase)
+        waterDropletAsset_ = MakeWaterDropletStaticAsset();
     staticTextureDirectory_ = (root / "textures/props/runtime").string();
     const auto viewmodelDirectory = root / "models/player/viewmodel/runtime";
     const auto viewmodelPath = viewmodelDirectory / "gothic-traveller-viewmodel.runtime.glb";
@@ -2458,6 +2487,11 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
     registrations.push_back({kPlayerSwordScabbardMetadataIndex, 0x53434142u,
         static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u,
         &playerSwordScabbardAsset_});
+    if (sceneProfile_ == RtSceneProfile::Showcase)
+        registrations.push_back({kWaterDropletMetadataIndex, 0x57415452u,
+            static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr) |
+                static_cast<std::uint32_t>(RtInstanceFlag::Transmissive), 0u,
+            &waterDropletAsset_});
     if (!staticMeshSlot_.Initialize(registrations, diagnostic)) return false;
     const RtInstanceMetadata playerMetadata = staticMeshSlot_.InstanceMetadata()[kPlayerWorldBodyInstanceIndex];
     if (playerMetadata.primitiveCount == 0u ||
@@ -2944,6 +2978,7 @@ bool PresentableTinyRtScene::BuildPreviewAccelerationStructures(std::string& dia
     const auto initialQuality = *ResolveRtQualityControls(std::nullopt, RtWorkloadPreset::Authored,
         pipelineBundle_.Request().quality == DielectricQuality::High);
     const QualityDustUpload initialDustQuality{initialQuality,{}};
+    const WaterContactRippleGpu initialWaterContactRipple{};
     if (!upload(vertices.data(), vertices.size() * sizeof(Vertex), geometryUsage, true, "preview world vertices", vertexBuffer_) ||
         !upload(indices.data(), indices.size() * sizeof(std::uint32_t), geometryUsage, true, "preview world indices", indexBuffer_) ||
         !upload(surfaceCodes.data(), surfaceCodes.size() * sizeof(std::uint32_t), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, false,
@@ -2951,7 +2986,9 @@ bool PresentableTinyRtScene::BuildPreviewAccelerationStructures(std::string& dia
         !upload(&light, sizeof(light), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, false, "preview light", heldLightBuffer_, true) ||
         !upload(fire.data(), sizeof(fire), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, false, "preview fire", fireEmitterBuffer_, true) ||
         !upload(&initialDustQuality, sizeof(initialDustQuality), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, false,
-                "preview quality controls", qualityControlsBuffer_, true)) return false;
+                "preview quality controls", qualityControlsBuffer_, true) ||
+        !upload(&initialWaterContactRipple, sizeof(initialWaterContactRipple), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, false,
+                "preview water contact ripple", waterContactRippleBuffer_, true)) return false;
     VkAccelerationStructureGeometryKHR world{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR};
     world.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR; world.flags = VK_GEOMETRY_OPAQUE_BIT_KHR;
     auto& triangles = world.geometry.triangles;
@@ -3284,7 +3321,19 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     const auto& roofSeam = horde::scene::kShowcaseCollapseRoofSeam;
     addWorldBox(roofSeam.footprint[1][0], roofSeam.bottomY, roofSeam.footprint[1][1],
                 roofSeam.footprint[3][0], roofSeam.topY, roofSeam.footprint[3][1], SurfaceMossyStone);
-    addWorldQuad({{-1.85f, kRouteFloorWorldY, 3.4f}}, {{-1.85f, kRouteFloorWorldY, -6.4f}}, {{-1.85f, 1.35f, -6.4f}}, {{-1.85f, 1.35f, 3.4f}}, SurfaceMossyStone, SurfaceRight);
+    const auto addRecessedWallX = [&](float x, float logicalX, float minZ, float maxZ,
+        float bottom, float top, SurfaceMaterial material, SurfaceNormal normal) {
+        for (const auto& panel : horde::scene::TombWallPanels(logicalX, minZ, maxZ,
+                bottom, top, developmentRescueJourney_)) {
+            if (normal == SurfaceRight)
+                addWorldQuad({{x, panel.minimumY, panel.maximumZ}}, {{x, panel.minimumY, panel.minimumZ}},
+                    {{x, panel.maximumY, panel.minimumZ}}, {{x, panel.maximumY, panel.maximumZ}}, material, normal);
+            else
+                addWorldQuad({{x, panel.minimumY, panel.minimumZ}}, {{x, panel.minimumY, panel.maximumZ}},
+                    {{x, panel.maximumY, panel.maximumZ}}, {{x, panel.maximumY, panel.minimumZ}}, material, normal);
+        }
+    };
+    addRecessedWallX(-1.85f, -1.85f, -6.4f, 3.4f, kRouteFloorWorldY, 1.35f, SurfaceMossyStone, SurfaceRight);
     addWorldQuad({{1.85f, kRouteFloorWorldY, -6.4f}}, {{1.85f, kRouteFloorWorldY, 3.4f}}, {{1.85f, 1.35f, 3.4f}}, {{1.85f, 1.35f, -6.4f}}, SurfaceMossyStone, SurfaceLeft);
     // The required immutable collapsed-entry asset physically seals this end.
     // Keep the gameplay/collision threshold at 3.4 m while revealing its recess.
@@ -3302,11 +3351,6 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     addWorldBox(-1.20f, kRouteFloorWorldY, -3.55f, -0.78f, 0.95f, -3.25f, SurfaceMossyStone);
     addWorldBox(0.78f, kRouteFloorWorldY, -3.55f, 1.20f, 0.95f, -3.25f, SurfaceMossyStone);
     addOverheadBox(0u);
-    addWorldQuad({{-1.86f, -0.28f, 1.12f}}, {{-1.86f, 0.46f, 1.12f}}, {{-1.86f, 0.46f, 0.62f}}, {{-1.86f, -0.28f, 0.62f}}, SurfaceFlame, SurfaceRight);
-    addWorldQuad({{1.86f, -0.35f, -1.98f}}, {{1.86f, -0.35f, -1.48f}}, {{1.86f, 0.38f, -1.48f}}, {{1.86f, 0.38f, -1.98f}}, SurfaceFlame, SurfaceLeft);
-    addWorldQuad({{-1.84f, -0.32f, -0.82f}}, {{-1.84f, 0.24f, -0.62f}}, {{-1.84f, 0.42f, -1.12f}}, {{-1.84f, -0.12f, -1.34f}}, SurfaceMirror, SurfaceRight);
-    addWorldQuad({{1.84f, -0.44f, 0.24f}}, {{1.84f, -0.02f, 0.5f}}, {{1.84f, 0.28f, 0.1f}}, {{1.84f, -0.18f, -0.2f}}, SurfaceMirror, SurfaceLeft);
-    addWorldQuad({{-0.52f, -0.94f, -0.86f}}, {{0.34f, -0.94f, -0.64f}}, {{0.64f, -0.94f, -1.18f}}, {{-0.38f, -0.94f, -1.42f}}, SurfaceAgedMetal, SurfaceUp);
     // Close the former irregular entry breach with the same opaque roof and
     // shared clearance data. The independent waterfall/finale openings remain.
     addCeilingPatch(1u);
@@ -3314,6 +3358,13 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     addCeilingPatch(3u);
     addCeilingPatch(4u);
     addCeilingPatch(22u);
+    if (!developmentRescueJourney_)
+    {
+    addWorldQuad({{-1.86f, -0.28f, 1.12f}}, {{-1.86f, 0.46f, 1.12f}}, {{-1.86f, 0.46f, 0.62f}}, {{-1.86f, -0.28f, 0.62f}}, SurfaceFlame, SurfaceRight);
+    addWorldQuad({{1.86f, -0.35f, -1.98f}}, {{1.86f, -0.35f, -1.48f}}, {{1.86f, 0.38f, -1.48f}}, {{1.86f, 0.38f, -1.98f}}, SurfaceFlame, SurfaceLeft);
+    addWorldQuad({{-1.84f, -0.32f, -0.82f}}, {{-1.84f, 0.24f, -0.62f}}, {{-1.84f, 0.42f, -1.12f}}, {{-1.84f, -0.12f, -1.34f}}, SurfaceMirror, SurfaceRight);
+    addWorldQuad({{1.84f, -0.44f, 0.24f}}, {{1.84f, -0.02f, 0.5f}}, {{1.84f, 0.28f, 0.1f}}, {{1.84f, -0.18f, -0.2f}}, SurfaceMirror, SurfaceLeft);
+    addWorldQuad({{-0.52f, -0.94f, -0.86f}}, {{0.34f, -0.94f, -0.64f}}, {{0.64f, -0.94f, -1.18f}}, {{-0.38f, -0.94f, -1.42f}}, SurfaceAgedMetal, SurfaceUp);
     for (std::uint32_t i = 0u; i < 8u; ++i)
     {
         const float x = -1.05f + static_cast<float>(i % 4u) * 0.7f + (i >= 4u ? 0.18f : 0.0f);
@@ -3322,8 +3373,9 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         addWorldQuad({{x - 0.18f, kRouteFloorWorldY, z}}, {{x + 0.18f, kRouteFloorWorldY, z}}, {{x + 0.14f, kRouteFloorWorldY + h, z}}, {{x - 0.14f, kRouteFloorWorldY + h, z}}, SurfaceDarkFigure, SurfaceForward);
     }
 
-    // A shallow gallery table runs along the left wall, leaving the central
-    // lane open. Five canted swatches reuse the existing ASTC material layers.
+    // The development tomb reuses the stone table as a burial bier with a
+    // recovered funerary lid. Legacy material swatches remain diagnostic fixtures.
+    }
     constexpr float galleryMinX = -1.55f;
     constexpr float galleryMaxX = -0.72f;
     constexpr float galleryMinY = kRouteFloorWorldY;
@@ -3336,6 +3388,8 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     addWorldQuad({{galleryMaxX, galleryMinY, galleryMinZ}}, {{galleryMaxX, galleryMaxY, galleryMinZ}}, {{galleryMaxX, galleryMaxY, galleryMaxZ}}, {{galleryMaxX, galleryMinY, galleryMaxZ}}, SurfaceDryStone, SurfaceRight);
     addWorldQuad({{galleryMinX, galleryMaxY, galleryMinZ}}, {{galleryMinX, galleryMaxY, galleryMaxZ}}, {{galleryMaxX, galleryMaxY, galleryMaxZ}}, {{galleryMaxX, galleryMaxY, galleryMinZ}}, SurfaceDryStone, SurfaceUp);
     addWorldQuad({{galleryMinX, galleryMinY, galleryMaxZ}}, {{galleryMinX, galleryMinY, galleryMinZ}}, {{galleryMaxX, galleryMinY, galleryMinZ}}, {{galleryMaxX, galleryMinY, galleryMaxZ}}, SurfaceDryStone, SurfaceDown);
+    if (!developmentRescueJourney_)
+    {
     const std::array<SurfaceMaterial, 5u> galleryMaterials{{SurfaceDryStone, SurfaceWetCobble, SurfaceMossyStone, SurfaceDampGround, SurfaceAgedMetal}};
     for (std::size_t i = 0u; i < galleryMaterials.size(); ++i)
     {
@@ -3343,11 +3397,13 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         addWorldQuad({{-0.80f, -0.54f, z + 0.16f}}, {{-0.80f, -0.54f, z - 0.16f}}, {{-1.22f, -0.08f, z - 0.16f}}, {{-1.22f, -0.08f, z + 0.16f}}, galleryMaterials[i], SurfaceGalleryCant);
     }
 
+    }
+
     // A thin hidden shell behind the zero-thickness room planes catches rays
     // that start near a join and skip the adjoining face because of ray tMin.
     // It leaves the room-two roof breach unobstructed. Appending it here
     // preserves every existing material index.
-    addWorldQuad({{-1.92f, -1.02f, 3.4f}}, {{-1.92f, -1.02f, -6.47f}}, {{-1.92f, 1.42f, -6.47f}}, {{-1.92f, 1.42f, 3.4f}}, SurfaceHiddenShell, SurfaceRight);
+    addRecessedWallX(-1.92f, -1.85f, -6.47f, 3.4f, -1.02f, 1.42f, SurfaceHiddenShell, SurfaceRight);
     addWorldQuad({{1.92f, -1.02f, -6.47f}}, {{1.92f, -1.02f, 3.4f}}, {{1.92f, 1.42f, 3.4f}}, {{1.92f, 1.42f, -6.47f}}, SurfaceHiddenShell, SurfaceLeft);
     addWorldQuad({{-1.92f, -1.02f, 3.4f}}, {{1.92f, -1.02f, 3.4f}}, {{1.92f, -1.02f, -6.47f}}, {{-1.92f, -1.02f, -6.47f}}, SurfaceHiddenShell, SurfaceUp);
     addWorldQuad({{-1.92f, -1.02f, -6.47f}}, {{-0.90f, -1.02f, -6.47f}}, {{-0.90f, 1.42f, -6.47f}}, {{-1.92f, 1.42f, -6.47f}}, SurfaceHiddenShell, SurfaceForward);
@@ -3436,7 +3492,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     addRouteWallZ(-11.2f, 0.0f, 3.60f, SurfaceForward);
     addRouteWallZ(-10.0f, 4.80f, 6.0f, SurfaceBack);
     addRouteWallX(3.60f, -14.0f, -11.2f, SurfaceRight);
-    addRouteWallX(6.0f, -15.2f, -10.0f, SurfaceLeft);
+    addRecessedWallX(6.0f, 6.0f, -15.2f, -10.0f, kRouteFloorWorldY, routeCeiling, SurfaceMossyStone, SurfaceLeft);
     addRouteWallZ(-15.2f, 4.80f, 6.0f, SurfaceForward);
     addRouteWallZ(-14.0f, -2.50f, 3.60f, SurfaceBack);
     addRouteWallX(4.80f, -16.4f, -15.2f, SurfaceLeft);
@@ -3957,6 +4013,8 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
                       uploadMemory, false, fireEmitterBuffer_, diagnostic) ||
         !CreateBuffer(sizeof(QualityDustUpload), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
                       uploadMemory, false, qualityControlsBuffer_, diagnostic) ||
+        !CreateBuffer(sizeof(WaterContactRippleGpu), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                      uploadMemory, false, waterContactRippleBuffer_, diagnostic) ||
         !CreateBuffer(worldSurfaceBufferSize, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
                       uploadMemory, false, worldSurfaceBuffer_, diagnostic, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT))
     {
@@ -3966,11 +4024,13 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     const auto initialQuality = *ResolveRtQualityControls(std::nullopt, RtWorkloadPreset::Authored,
         pipelineBundle_.Request().quality == DielectricQuality::High);
     const QualityDustUpload initialDustQuality{initialQuality,{}};
+    const WaterContactRippleGpu initialWaterContactRipple{};
     const RtHeldLightGpu initialHeldLight{};
     const std::array<RtFireEmitterGpu, kRtFireEmitterCapacity> initialFireEmitters{};
     if (!gpuResources_.MapBufferForHostWrites(heldLightBuffer_, diagnostic) ||
         !gpuResources_.MapBufferForHostWrites(fireEmitterBuffer_, diagnostic) ||
         !gpuResources_.MapBufferForHostWrites(qualityControlsBuffer_, diagnostic) ||
+        !gpuResources_.MapBufferForHostWrites(waterContactRippleBuffer_, diagnostic) ||
         !WriteBuffer(vertexBuffer_, vertices.data(), vertexBufferSize, "world vertex", diagnostic) ||
         !WriteBuffer(indexBuffer_, indices.data(), indexBufferSize, "world index", diagnostic) ||
         !WriteBuffer(transformBuffer_, &transform, sizeof(transform), "world transform", diagnostic) ||
@@ -3980,6 +4040,8 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
                      "fire emitters", diagnostic) ||
         !WriteBuffer(qualityControlsBuffer_, &initialDustQuality, sizeof(initialDustQuality),
                      "quality controls", diagnostic) ||
+        !WriteBuffer(waterContactRippleBuffer_, &initialWaterContactRipple,
+                     sizeof(initialWaterContactRipple), "water contact ripple", diagnostic) ||
         !WriteBuffer(worldSurfaceBuffer_, worldSurfaceCodes.data(), worldSurfaceBufferSize,
                      "world surface metadata", diagnostic))
     {
@@ -4236,7 +4298,8 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         const std::uint32_t instanceCustomIndex,
         const char* label,
         AccelerationStructure& accelerationStructure,
-        const bool productionProp = false) {
+        const bool productionProp = false,
+        Buffer* retainedUpdateScratch = nullptr) {
         std::vector<VkAccelerationStructureGeometryKHR> geometries;
         std::vector<VkAccelerationStructureBuildRangeInfoKHR> ranges;
         std::vector<std::uint32_t> primitiveCounts;
@@ -4246,7 +4309,9 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         VkAccelerationStructureBuildGeometryInfoKHR buildInfo{
             VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR};
         buildInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
-        buildInfo.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR;
+        buildInfo.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR |
+            (retainedUpdateScratch != nullptr
+                ? VK_BUILD_ACCELERATION_STRUCTURE_ALLOW_UPDATE_BIT_KHR : 0u);
         buildInfo.geometryCount = static_cast<std::uint32_t>(geometries.size());
         buildInfo.pGeometries = geometries.data();
         VkAccelerationStructureBuildSizesInfoKHR sizes{
@@ -4270,8 +4335,13 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
             diagnostic = std::string("Failed to create ") + label + " BLAS.";
             return false;
         }
-        Buffer scratch;
-        if (!CreateScratchBuffer(sizes.buildScratchSize, scratch, diagnostic))
+        Buffer temporaryScratch;
+        Buffer& scratch = retainedUpdateScratch != nullptr
+            ? *retainedUpdateScratch : temporaryScratch;
+        const VkDeviceSize scratchSize = retainedUpdateScratch != nullptr
+            ? std::max(sizes.buildScratchSize, sizes.updateScratchSize)
+            : sizes.buildScratchSize;
+        if (!CreateScratchBuffer(scratchSize, scratch, diagnostic))
             return false;
         buildInfo.dstAccelerationStructure = accelerationStructure.handle;
         buildInfo.scratchData.deviceAddress = scratch.AlignedAddress();
@@ -4282,10 +4352,10 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         const auto buildStart = std::chrono::steady_clock::now();
         if (!RunOneTimeCommands(buildBlas, &buildData, diagnostic))
         {
-            DestroyBuffer(scratch);
+            if (retainedUpdateScratch == nullptr) DestroyBuffer(scratch);
             return false;
         }
-        DestroyBuffer(scratch);
+        if (retainedUpdateScratch == nullptr) DestroyBuffer(scratch);
         VkAccelerationStructureDeviceAddressInfoKHR addressInfo{
             VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR};
         addressInfo.accelerationStructure = accelerationStructure.handle;
@@ -4489,7 +4559,11 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
             kCollapseInstanceIndex, "production collapsed entry", collapseBlas_, true) ||
         !buildRegisteredStaticBlas(
             kPlayerSwordScabbardMetadataIndex, "player sword scabbard",
-            playerSwordScabbardBlas_, true))
+            playerSwordScabbardBlas_, true) ||
+        (sceneProfile_ == RtSceneProfile::Showcase &&
+         !buildRegisteredStaticBlas(
+             kWaterDropletMetadataIndex, "runtime water contact droplets",
+             waterDropletBlas_, false, &waterDropletBlasUpdateScratch_)))
         return false;
 
     VkAccelerationStructureBuildRangeInfoKHR playerBodyRange{};
@@ -4923,6 +4997,14 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     instances[kPlayerSwordScabbardInstanceIndex].mask = 0u;
     instances[kPlayerSwordScabbardInstanceIndex].accelerationStructureReference =
         playerSwordScabbardBlas_.address;
+    if (sceneProfile_ == RtSceneProfile::Showcase)
+    {
+        instances[kWaterDropletInstanceIndex] = instances[0];
+        instances[kWaterDropletInstanceIndex].instanceCustomIndex = kWaterDropletMetadataIndex;
+        instances[kWaterDropletInstanceIndex].mask = 0x01u;
+        instances[kWaterDropletInstanceIndex].accelerationStructureReference =
+            waterDropletBlas_.address;
+    }
     ApplyKeeperTorchBodyInstances(instances);
     ApplyGlassFixtureVisibility(instances);
     if (!CreateBuffer(sizeof(instances), VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, uploadMemory, true, instanceBuffer_, diagnostic))
@@ -5376,6 +5458,8 @@ bool PresentableTinyRtScene::WriteBundleDescriptors(RtPipelineBundle& bundle,
         fireEmitterBuffer_.buffer, 0u, fireEmitterBuffer_.size};
     const VkDescriptorBufferInfo qualityControlsInfo{
         qualityControlsBuffer_.buffer, 0u, qualityControlsBuffer_.size};
+    const VkDescriptorBufferInfo waterContactRippleInfo{
+        waterContactRippleBuffer_.buffer, 0u, waterContactRippleBuffer_.size};
     std::optional<VkDescriptorBufferInfo> dielectricDiagnosticsInfo;
     if (bundle.DescriptorIo().diagnosticIo.descriptorInfo)
         dielectricDiagnosticsInfo.emplace(VkDescriptorBufferInfo{
@@ -5449,6 +5533,7 @@ bool PresentableTinyRtScene::WriteBundleDescriptors(RtPipelineBundle& bundle,
         bufferWrite(kRtBindingHeldLight, &heldLightInfo),
         bufferWrite(kRtBindingFireEmitters, &fireEmitterInfo),
         bufferWrite(kRtBindingQualityControls, &qualityControlsInfo),
+        bufferWrite(kRtBindingWaterContactRipple, &waterContactRippleInfo),
         bufferWrite(kRtBindingWorldPlayerVertices, &worldVertexInfo),
         bufferWrite(kRtBindingViewmodelVertices, &viewVertexInfo),
         sampledWrite(kRtBindingEnvironmentTexture, &environmentInfo)};
@@ -5867,7 +5952,10 @@ bool PresentableTinyRtScene::UpdatePreviewInstances(VkCommandBuffer commandBuffe
     case WaterQuality::High: framePipelineEvidence_.waterQuality = horde::telemetry::RtWaterQuality::High; break;
     default: framePipelineEvidenceValid_ = false; break;
     }
+    const auto contactRipple = MakeWaterContactRippleGpu(frame.waterContact);
     if (!WriteDustQuality(*quality, frame, diagnostic, observation) ||
+        !WriteBuffer(waterContactRippleBuffer_, &contactRipple, sizeof(contactRipple),
+                     "preview water contact ripple", diagnostic, observation) ||
         !WriteBuffer(heldLightBuffer_, &light, sizeof(light), "preview light", diagnostic, observation) ||
         !WriteBuffer(fireEmitterBuffer_, fire.emitters.data(), sizeof(fire.emitters), "preview fire", diagnostic, observation) ||
         !WriteBuffer(instanceBuffer_, instances.data(), tlasInstanceCount_ * sizeof(instances[0]), "preview instances", diagnostic, observation) ||
@@ -5992,6 +6080,10 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     uploadedFireEmittersValid_ = false;
     if (sceneProfile_ != RtSceneProfile::Showcase)
         return UpdatePreviewInstances(commandBuffer, frame, diagnostic, observation);
+    const bool waterDropletsVisible = genericStaticAssetEnabled_ &&
+        frame.waterQuality != WaterQuality::Off &&
+        std::any_of(frame.waterContact.droplets.begin(), frame.waterContact.droplets.end(),
+                    [](const auto& droplet) { return droplet.active; });
 #ifndef NDEBUG
     // Captures after this call are valid only if this frame finishes preparing
     // and recording the current skinned world-body instance successfully.
@@ -6043,6 +6135,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     const auto& lichGpu = characterSlot_.LichGpu();
     if (instanceBuffer_.memory == VK_NULL_HANDLE || heldLightBuffer_.memory == VK_NULL_HANDLE ||
         fireEmitterBuffer_.memory == VK_NULL_HANDLE || qualityControlsBuffer_.memory == VK_NULL_HANDLE ||
+        waterContactRippleBuffer_.memory == VK_NULL_HANDLE ||
         (pipelineBundle_.DescriptorIo().diagnosticIo.allocateBuffer &&
          pipelineBundle_.diagnosticBuffer.memory == VK_NULL_HANDLE) ||
         skeletonGpu.vertices.memory == VK_NULL_HANDLE ||
@@ -6747,6 +6840,12 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     instances[kCollapseInstanceIndex].instanceCustomIndex = kCollapseInstanceIndex;
     instances[kCollapseInstanceIndex].mask = 0x01u;
     instances[kCollapseInstanceIndex].accelerationStructureReference = collapseBlas_.address;
+    instances[kWaterDropletInstanceIndex] = instances[0];
+    instances[kWaterDropletInstanceIndex].instanceCustomIndex = kWaterDropletMetadataIndex;
+    // Keep the fixed TLAS definition stable. Empty slots are refit to the
+    // reserved far-away staging point and cannot force an every-contact TLAS BUILD.
+    instances[kWaterDropletInstanceIndex].mask = 0x01u;
+    instances[kWaterDropletInstanceIndex].accelerationStructureReference = waterDropletBlas_.address;
     ApplyKeeperTorchBodyInstances(instances);
     for (std::size_t instance = 0u; instance < instances.size(); ++instance)
         lastInstanceMasks_[instance] = instances[instance].mask;
@@ -6860,6 +6959,10 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         pipelineBundle_.DiagnosticAvailability() == RtDiagnosticAvailability::Available;
     const RtDielectricDiagnostics clearedDielectricDiagnostics{};
     auto frameInstanceMetadata = staticMeshSlot_.InstanceMetadata();
+    frameInstanceMetadata[kWaterDropletMetadataIndex].flags =
+        static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr) |
+        (waterDropletsVisible
+            ? static_cast<std::uint32_t>(RtInstanceFlag::Transmissive) : 0u);
     if (effectivePlayerRenderRoute == PlayerRenderRoute::ModelledViewmodel &&
         playerBodyRemainderAvailable_)
         frameInstanceMetadata[kPlayerWorldBodyInstanceIndex].flags |=
@@ -6932,7 +7035,10 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         break;
     }
     ApplyGlassFixtureVisibility(instances);
+    const auto contactRipple = MakeWaterContactRippleGpu(frame.waterContact);
     if (!WriteDustQuality(*quality, frame, diagnostic, observation) ||
+        !WriteBuffer(waterContactRippleBuffer_, &contactRipple, sizeof(contactRipple),
+                     "water contact ripple", diagnostic, observation) ||
         !WriteBuffer(heldLightBuffer_, &heldLightGpu, sizeof(heldLightGpu),
                      "held light", diagnostic, observation) ||
         !WriteBuffer(fireEmitterBuffer_, fireEmitterUpload.emitters.data(),
@@ -6994,6 +7100,38 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         if(!WriteBuffer(worldSurfaceBuffer_,rescueWorldSurfaceCodes_.data(),worldSurfaceBuffer_.size,
             "rescue rope surface update",diagnostic,observation)) return false;
     }
+    const bool updateWaterDropletBlas = genericStaticAssetEnabled_ &&
+        sceneProfile_ == RtSceneProfile::Showcase &&
+        (waterDropletsVisible || waterDropletGeometryVisible_);
+    if (updateWaterDropletBlas)
+    {
+        const RtInstanceMetadata metadata =
+            staticMeshSlot_.InstanceMetadata()[kWaterDropletMetadataIndex];
+        if (metadata.primitiveCount != 1u || metadata.primitiveBase >=
+                staticMeshSlot_.PrimitiveMetadata().size())
+        {
+            diagnostic = "Water contact BLAS lost its dedicated one-primitive metadata owner.";
+            return false;
+        }
+        const auto& primitive = staticMeshSlot_.PrimitiveMetadata()[metadata.primitiveBase];
+        const auto& vertexCounts = staticMeshSlot_.PrimitiveVertexCounts();
+        std::array<horde::scene::assets::StaticRtVertex, kWaterDropletVertexCount> vertices{};
+        if (metadata.primitiveBase >= vertexCounts.size() ||
+            vertexCounts[metadata.primitiveBase] != kWaterDropletVertexCount ||
+            primitive.indexCount != kWaterDropletIndexCount ||
+            !UpdateWaterDropletVertices(frame.waterContact, vertices, waterDropletsVisible))
+        {
+            diagnostic = "Water contact snapshot or fixed droplet topology is invalid.";
+            return false;
+        }
+        const VkDeviceSize vertexOffset = static_cast<VkDeviceSize>(primitive.vertexOffset) *
+            sizeof(horde::scene::assets::StaticRtVertex);
+        if (!gpuResources_.WriteBufferRange(
+                staticVertexBuffer_, vertexOffset, vertices.data(), sizeof(vertices),
+                "fixed-topology water contact vertices", diagnostic, observation))
+            return false;
+        waterDropletGeometryVisible_ = waterDropletsVisible;
+    }
     VkMemoryBarrier hostWriteBarrier{VK_STRUCTURE_TYPE_MEMORY_BARRIER};
     hostWriteBarrier.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT;
     hostWriteBarrier.dstAccessMask = VK_ACCESS_ACCELERATION_STRUCTURE_READ_BIT_KHR |
@@ -7015,9 +7153,9 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                                  nullptr);
         });
 
-    const std::array<bool, 6u> requestedBlasWork{{
+    const std::array<bool, 7u> requestedBlasWork{{
         updateRescueWorldBlas, updateSkinnedPlayer, updateSkeletonPose0,
-        updateSkeletonPose1, updateLich, updateViewmodel}};
+        updateSkeletonPose1, updateLich, updateViewmodel, updateWaterDropletBlas}};
     const std::uint64_t blasWorkInvocationCount = static_cast<std::uint64_t>(
         std::count(requestedBlasWork.begin(), requestedBlasWork.end(), true));
     RtSceneStageScope blasRefitScope(
@@ -7172,9 +7310,55 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         vkCmdBuildAccelerationStructuresKHR_(commandBuffer,1,&info,ranges);
     };
 
+    const auto recordWaterDropletBlas = [&]() noexcept
+    {
+        const RtInstanceMetadata metadata =
+            staticMeshSlot_.InstanceMetadata()[kWaterDropletMetadataIndex];
+        const auto& primitive = staticMeshSlot_.PrimitiveMetadata()[metadata.primitiveBase];
+        const auto& vertexCounts = staticMeshSlot_.PrimitiveVertexCounts();
+        const std::uint32_t geometryIndex = metadata.primitiveBase;
+        VkAccelerationStructureGeometryKHR geometry{
+            VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR};
+        geometry.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
+        geometry.flags = VK_GEOMETRY_NO_DUPLICATE_ANY_HIT_INVOCATION_BIT_KHR;
+        geometry.geometry.triangles.sType =
+            VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR;
+        geometry.geometry.triangles.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;
+        geometry.geometry.triangles.vertexData.deviceAddress =
+            staticVertexBuffer_.address +
+            static_cast<VkDeviceSize>(primitive.vertexOffset) *
+                sizeof(horde::scene::assets::StaticRtVertex);
+        geometry.geometry.triangles.vertexStride =
+            sizeof(horde::scene::assets::StaticRtVertex);
+        geometry.geometry.triangles.maxVertex = vertexCounts[geometryIndex] - 1u;
+        geometry.geometry.triangles.indexType = VK_INDEX_TYPE_UINT32;
+        geometry.geometry.triangles.indexData.deviceAddress =
+            staticIndexBuffer_.address +
+            static_cast<VkDeviceSize>(primitive.indexOffset) * sizeof(std::uint32_t);
+        geometry.geometry.triangles.transformData.deviceAddress =
+            staticGeometryTransformBuffer_.address +
+            static_cast<VkDeviceSize>(geometryIndex) * sizeof(VkTransformMatrixKHR);
+        VkAccelerationStructureBuildGeometryInfoKHR update{
+            VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR};
+        update.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
+        update.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR |
+            VK_BUILD_ACCELERATION_STRUCTURE_ALLOW_UPDATE_BIT_KHR;
+        update.mode = VK_BUILD_ACCELERATION_STRUCTURE_MODE_UPDATE_KHR;
+        update.srcAccelerationStructure = waterDropletBlas_.handle;
+        update.dstAccelerationStructure = waterDropletBlas_.handle;
+        update.geometryCount = 1u;
+        update.pGeometries = &geometry;
+        update.scratchData.deviceAddress = waterDropletBlasUpdateScratch_.AlignedAddress();
+        VkAccelerationStructureBuildRangeInfoKHR range{};
+        range.primitiveCount = primitive.indexCount / 3u;
+        const VkAccelerationStructureBuildRangeInfoKHR* ranges[] = {&range};
+        vkCmdBuildAccelerationStructuresKHR_(commandBuffer, 1u, &update, ranges);
+    };
+
     const DynamicBlasToTlasDependency blasToTlasDependency =
         BuildDynamicBlasToTlasDependency({
-            requestedBlasWork[0] || requestedBlasWork[1] || requestedBlasWork[5],
+            requestedBlasWork[0] || requestedBlasWork[1] || requestedBlasWork[5] ||
+                requestedBlasWork[6],
             requestedBlasWork[2], requestedBlasWork[3], requestedBlasWork[4]});
     const auto recordBlasToTlasBarrier = [&]() noexcept
     {
@@ -7203,6 +7387,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             case 3u: recordSkeletonBlas(1u); break;
             case 4u: recordLichBlas(); break;
             case 5u: recordPlayerBlas(kPlayerViewmodelInstanceIndex, viewmodelBlas_, viewmodelBlasUpdateScratch_); break;
+            case 6u: recordWaterDropletBlas(); break;
             default: break;
             }
         },

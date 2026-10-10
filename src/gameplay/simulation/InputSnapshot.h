@@ -65,6 +65,8 @@ struct InputSnapshot
     float yawRadians = 0.0f;
     float pitchRadians = 0.0f;
     float torchLightStrength = 1.8f;
+    // Same clamped width used by the renderer-owned RT Lab stream transform.
+    float waterfallWidthScale = 1.0f;
     float authoritativePlayerX = 0.0f;
     float authoritativePlayerZ = 0.0f;
     bool paused = false;

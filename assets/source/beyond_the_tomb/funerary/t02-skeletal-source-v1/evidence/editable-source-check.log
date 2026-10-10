@@ -1,0 +1,76 @@
+{
+  "source_sha256": "0ba13c9f0c2af50aafb317f450a92083f7d08ece67c3ecc9a2c64eac13257926",
+  "derived_blend_armatures": 0,
+  "derived_blend_actions": 0,
+  "derived_blend_materials": 1,
+  "external_images": 0,
+  "arrangements": [
+    {
+      "collection": "04_ARRANGEMENT_A_EXAMPLE",
+      "instances": 3,
+      "linked_to_master": [
+        "Example_A_1_skull_jaw",
+        "Example_A_2_femur",
+        "Example_A_3_humerus"
+      ],
+      "floor_minima_m": {
+        "Example_A_1_skull_jaw": 0.0,
+        "Example_A_2_femur": 2.3283064365386963e-10,
+        "Example_A_3_humerus": -1.3387762010097504e-09
+      },
+      "triangle_intersections": [
+        {
+          "a": "Example_A_1_skull_jaw",
+          "b": "Example_A_2_femur",
+          "overlap_pairs": 0
+        },
+        {
+          "a": "Example_A_1_skull_jaw",
+          "b": "Example_A_3_humerus",
+          "overlap_pairs": 0
+        },
+        {
+          "a": "Example_A_2_femur",
+          "b": "Example_A_3_humerus",
+          "overlap_pairs": 0
+        }
+      ]
+    },
+    {
+      "collection": "05_ARRANGEMENT_B_EXAMPLE",
+      "instances": 3,
+      "linked_to_master": [
+        "Example_B_1_skull_jaw",
+        "Example_B_2_humerus",
+        "Example_B_3_femur"
+      ],
+      "floor_minima_m": {
+        "Example_B_1_skull_jaw": 0.0,
+        "Example_B_2_humerus": 2.2495338924954922e-10,
+        "Example_B_3_femur": 2.3283064365386963e-10
+      },
+      "triangle_intersections": [
+        {
+          "a": "Example_B_1_skull_jaw",
+          "b": "Example_B_2_humerus",
+          "overlap_pairs": 0
+        },
+        {
+          "a": "Example_B_1_skull_jaw",
+          "b": "Example_B_3_femur",
+          "overlap_pairs": 0
+        },
+        {
+          "a": "Example_B_2_humerus",
+          "b": "Example_B_3_femur",
+          "overlap_pairs": 0
+        }
+      ]
+    }
+  ],
+  "checks": "PASS: exact original checksum, static derived file, shared editable mesh data, floor support and no inter-object triangle intersections"
+}
+Blender 4.3.2
+Read blend: "/source-workspace/horde-skeletal-source-kit-v1/source/horde_skeletal_source_kit.blend"
+
+Blender quit

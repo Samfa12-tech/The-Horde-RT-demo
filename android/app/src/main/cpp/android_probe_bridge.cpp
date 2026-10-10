@@ -3787,6 +3787,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
     const auto recordStart = std::chrono::steady_clock::now();
     if (useRtFrame)
     {
+        const horde::vulkan::raytracing::RtSceneTuning rtLabTuning = gRtLabState.Snapshot();
         if (context.sceneProfile == horde::vulkan::raytracing::RtSceneProfile::Showcase)
         {
             if (gInAppBenchmarkRequested.exchange(false, std::memory_order_acq_rel))
@@ -3923,6 +3924,9 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
             const std::uint64_t inputOwnerSteadyNs =
                 horde::vulkan::raytracing::ReadRtSceneSteadyClock(nullptr);
             horde::gameplay::simulation::InputSnapshot simulationInput = publishedInput.snapshot;
+            // One owner-thread tuning publication drives contact and the actual
+            // stream transform in this frame. JNI still only publishes controls.
+            simulationInput.waterfallWidthScale = rtLabTuning.waterfallWidthScale;
             gGameSimulation.SetPresentationAspect(
                 horde::graphics::RtViewAspectFromImageExtent(
                     context.swapchainExtent.width, context.swapchainExtent.height,
@@ -4214,7 +4218,6 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                     benchmarkActive}),
                 std::memory_order_release);
         }
-        const horde::vulkan::raytracing::RtSceneTuning rtLabTuning = gRtLabState.Snapshot();
         horde::vulkan::raytracing::PublishDevelopmentWorldReadiness(gGameSimulation,context.rtScene);
         horde::vulkan::raytracing::RtSceneFrameInputs frameInputs;
         if (context.sceneProfile == horde::vulkan::raytracing::RtSceneProfile::GraphicsPreview)

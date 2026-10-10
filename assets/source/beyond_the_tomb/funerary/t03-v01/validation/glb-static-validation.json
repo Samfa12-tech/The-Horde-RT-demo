@@ -1,0 +1,172 @@
+[
+  {
+    "file": "models/t03_candle_stub_1.glb",
+    "triangles": 664,
+    "bytes": 34992,
+    "sha256": "5e454e5aa302e3d081c9857e00a9c8d005c5454a5a7e04d6f212fdbf56c20823",
+    "primitive_checks": [
+      {
+        "vertices": 537,
+        "triangles": 636,
+        "has_uv_normals_tangents": true
+      },
+      {
+        "vertices": 48,
+        "triangles": 28,
+        "has_uv_normals_tangents": true
+      }
+    ],
+    "valid_glb_2": true,
+    "external_dependencies": false,
+    "finite_attributes": true,
+    "normals_tangents_normalized_orthogonal": true,
+    "opaque_nonemissive": true,
+    "authoring_envelope_max_triangles": 1500,
+    "native_runtime_tested": false
+  },
+  {
+    "file": "models/t03_candle_stub_2.glb",
+    "triangles": 664,
+    "bytes": 38456,
+    "sha256": "01d24d1c097267b87bafe4a7545d0cdde50292f2fe7af12a70022c590a82d125",
+    "primitive_checks": [
+      {
+        "vertices": 609,
+        "triangles": 636,
+        "has_uv_normals_tangents": true
+      },
+      {
+        "vertices": 48,
+        "triangles": 28,
+        "has_uv_normals_tangents": true
+      }
+    ],
+    "valid_glb_2": true,
+    "external_dependencies": false,
+    "finite_attributes": true,
+    "normals_tangents_normalized_orthogonal": true,
+    "opaque_nonemissive": true,
+    "authoring_envelope_max_triangles": 1500,
+    "native_runtime_tested": false
+  },
+  {
+    "file": "models/t03_candle_stub_3.glb",
+    "triangles": 664,
+    "bytes": 30440,
+    "sha256": "1a7967a9ae3a82a1e470067b9a344804aa5f40b36b7ba13b401538c6b8fa30a3",
+    "primitive_checks": [
+      {
+        "vertices": 442,
+        "triangles": 636,
+        "has_uv_normals_tangents": true
+      },
+      {
+        "vertices": 48,
+        "triangles": 28,
+        "has_uv_normals_tangents": true
+      }
+    ],
+    "valid_glb_2": true,
+    "external_dependencies": false,
+    "finite_attributes": true,
+    "normals_tangents_normalized_orthogonal": true,
+    "opaque_nonemissive": true,
+    "authoring_envelope_max_triangles": 1500,
+    "native_runtime_tested": false
+  },
+  {
+    "file": "models/t03_displaced_lid.glb",
+    "triangles": 496,
+    "bytes": 67240,
+    "sha256": "e93203b35e8e1979ba16a67f31044076b20127fa8bfbc60b96512d2a5e777962",
+    "primitive_checks": [
+      {
+        "vertices": 838,
+        "triangles": 316,
+        "has_uv_normals_tangents": true
+      },
+      {
+        "vertices": 444,
+        "triangles": 180,
+        "has_uv_normals_tangents": true
+      }
+    ],
+    "valid_glb_2": true,
+    "external_dependencies": false,
+    "finite_attributes": true,
+    "normals_tangents_normalized_orthogonal": true,
+    "opaque_nonemissive": true,
+    "authoring_envelope_max_triangles": 1500,
+    "native_runtime_tested": false
+  },
+  {
+    "file": "models/t03_offering_bowl.glb",
+    "triangles": 960,
+    "bytes": 45880,
+    "sha256": "6e193a9b36656bffa8c972dab0958884208c0a4f38b72333a4677ad2ceab302b",
+    "primitive_checks": [
+      {
+        "vertices": 803,
+        "triangles": 960,
+        "has_uv_normals_tangents": true
+      }
+    ],
+    "valid_glb_2": true,
+    "external_dependencies": false,
+    "finite_attributes": true,
+    "normals_tangents_normalized_orthogonal": true,
+    "opaque_nonemissive": true,
+    "authoring_envelope_max_triangles": 1500,
+    "native_runtime_tested": false
+  },
+  {
+    "file": "models/t03_urn_broken_base.glb",
+    "triangles": 1212,
+    "bytes": 87384,
+    "sha256": "c0ed7c0261a125385f821109927567c4fc8f1ff0799d0c3c479d4149e09ad594",
+    "primitive_checks": [
+      {
+        "vertices": 926,
+        "triangles": 983,
+        "has_uv_normals_tangents": true
+      },
+      {
+        "vertices": 687,
+        "triangles": 229,
+        "has_uv_normals_tangents": true
+      }
+    ],
+    "valid_glb_2": true,
+    "external_dependencies": false,
+    "finite_attributes": true,
+    "normals_tangents_normalized_orthogonal": true,
+    "opaque_nonemissive": true,
+    "authoring_envelope_max_triangles": 1500,
+    "native_runtime_tested": false
+  },
+  {
+    "file": "models/t03_urn_rim_shard.glb",
+    "triangles": 800,
+    "bytes": 56588,
+    "sha256": "63a76503741ae51f9230e7b23201037bb1e4402d348bbd27323000a82605f1ad",
+    "primitive_checks": [
+      {
+        "vertices": 781,
+        "triangles": 696,
+        "has_uv_normals_tangents": true
+      },
+      {
+        "vertices": 242,
+        "triangles": 104,
+        "has_uv_normals_tangents": true
+      }
+    ],
+    "valid_glb_2": true,
+    "external_dependencies": false,
+    "finite_attributes": true,
+    "normals_tangents_normalized_orthogonal": true,
+    "opaque_nonemissive": true,
+    "authoring_envelope_max_triangles": 1500,
+    "native_runtime_tested": false
+  }
+]

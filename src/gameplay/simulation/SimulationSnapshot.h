@@ -1,4 +1,5 @@
 #pragma once
+#include "gameplay/effects/WaterContact.h"
 #include "gameplay/simulation/DevelopmentSupportFixture.h"
 #include "gameplay/simulation/DevelopmentWorldRoute.h"
 #include "gameplay/traversal/DevelopmentRescueJourney.h"
@@ -133,6 +134,7 @@ struct SimulationSnapshot
     horde::gameplay::items::HeldItemTransform rewardLanternWorldFromHinge{};
 
     TorchFailureSnapshot torchFailure{};
+    horde::gameplay::effects::WaterContactSnapshot waterContact{};
     horde::gameplay::items::HeldItemStates heldItems =
         horde::gameplay::items::MakeDefaultHeldItemStates();
     horde::gameplay::items::HeldItemKinematicsState heldItemKinematics{};

@@ -506,6 +506,7 @@ struct VulkanSurfaceContext
     float controllerStrafe = 0.0f;
     float controllerLookHorizontal = 0.0f;
     float controllerLookVertical = 0.0f;
+    bool teachingControllerGlyphs = false;
     WORD previousControllerButtons = 0u;
     WORD previousXInputUiButtons = 0u;
     horde::platform::windows::ControllerFocusLatch controllerFocusLatch;
@@ -1772,6 +1773,16 @@ void DrainGameplayEvents(VulkanSurfaceContext& context)
     {
         switch (event.type)
         {
+        case GameplayEventType::PlayerWetFootstep:
+            PlayPositionalSoundEffect(context,
+                (context.playerFootstepVariant++ & 1) == 0
+                    ? "water_wet_step_1.wav" : "water_wet_step_2.wav",
+                event.intensity * 0.45f, event, "pixabay");
+            break;
+        case GameplayEventType::WaterfallContact:
+            PlayPositionalSoundEffect(context, "water_stream_contact.wav",
+                event.intensity * 0.45f, event, "pixabay");
+            break;
         case GameplayEventType::PlayerFootstep:
         {
             const char* clip = (context.playerFootstepVariant++ & 1) == 0
@@ -2331,7 +2342,7 @@ void RefreshCombatTeachingPrompt(VulkanSurfaceContext& context)
     HWND prompt = GetDlgItem(context.windowHandle, kCombatTeachingPromptId);
     if (!prompt) return;
     const auto& teaching = context.simulation.Snapshot().combatTeaching;
-    const std::string text = horde::platform::windows::CombatTeachingPromptText(teaching);
+    const std::string text = horde::platform::windows::CombatTeachingPromptText(teaching, context.teachingControllerGlyphs);
     const bool eligible = context.controlsEnabled && !MeasurementPausedByUi(context) &&
         !context.benchmarkReportVisible && !context.benchmark.IsRunning() &&
         !context.deathOverlayVisible && !context.endingOverlayVisible && !context.rtLabVisible;
@@ -4138,6 +4149,10 @@ void PollDesktopController(VulkanSurfaceContext& context)
         const horde::platform::windows::ControllerActionEdges edges =
             horde::platform::windows::MapLegacyControllerEdges(
                 legacy.dwButtons, context.previousLegacyControllerButtons, identity);
+        if (legacy.dwButtons != context.previousLegacyControllerButtons ||
+            std::abs(context.controllerForward) > 0.0f || std::abs(context.controllerStrafe) > 0.0f ||
+            std::abs(context.controllerLookHorizontal) > 0.0f || std::abs(context.controllerLookVertical) > 0.0f)
+            context.teachingControllerGlyphs = true;
         if (!context.simulationPaused)
         {
             if (horde::platform::windows::LegacyRunTogglePressed(
@@ -4212,6 +4227,10 @@ void PollDesktopController(VulkanSurfaceContext& context)
             state.Gamepad.bLeftTrigger,
             state.Gamepad.bRightTrigger,
             context.controllerTriggerLatch);
+    if (pressed != 0u || triggerEdges.attackPressed || triggerEdges.parryPressed ||
+        std::abs(context.controllerForward) > 0.0f || std::abs(context.controllerStrafe) > 0.0f ||
+        std::abs(context.controllerLookHorizontal) > 0.0f || std::abs(context.controllerLookVertical) > 0.0f)
+        context.teachingControllerGlyphs = true;
     if (!context.simulationPaused)
     {
         if (triggerEdges.attackPressed) PublishDesktopCombatEdge(context, horde::gameplay::simulation::CombatInputEdgeKind::Attack);
@@ -4296,6 +4315,8 @@ void UpdateDesktopSceneControls(
     input.commands.tutorialSkip = context.combatTeachingSkipSequence;
     input.commands.tutorialReplay = context.combatTeachingReplaySequence;
     input.runHeld = context.runHeld || context.controllerRunHeld;
+    input.waterfallWidthScale = horde::vulkan::raytracing::ClampRtSceneTuning(
+        context.rtSceneTuning).waterfallWidthScale;
     input.hasAuthoritativePlayerPose = false;
     input.moveForward = (context.forwardHeld ? 1.0f : 0.0f) -
                         (context.backwardHeld ? 1.0f : 0.0f) + context.controllerForward;
@@ -9223,6 +9244,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
     case WM_SYSKEYDOWN:
         if (sceneContext && sceneContext->controlsEnabled)
         {
+            sceneContext->teachingControllerGlyphs = false;
             if (sceneContext->simulationPaused && wParam == VK_TAB && (lParam & (1ll << 30)) == 0)
             {
                 NavigateControllerMenu(*sceneContext,
@@ -9487,6 +9509,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         }
         break;
     case WM_LBUTTONDOWN:
+        if (sceneContext) sceneContext->teachingControllerGlyphs = false;
         if (sceneContext)
         {
             using horde::platform::windows::DesktopClickAction;
@@ -9559,6 +9582,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 static_cast<LONG>(static_cast<short>(HIWORD(lParam)))};
             const LONG deltaX = currentMousePosition.x - sceneContext->lastMousePosition.x;
             const LONG deltaY = currentMousePosition.y - sceneContext->lastMousePosition.y;
+            if (deltaX != 0 || deltaY != 0) sceneContext->teachingControllerGlyphs = false;
             sceneContext->lastMousePosition = currentMousePosition;
             sceneContext->cameraYaw += static_cast<float>(deltaX) * 0.0036f * sceneContext->mouseSensitivity;
             sceneContext->cameraPitch = std::clamp(sceneContext->cameraPitch - static_cast<float>(deltaY) * 0.0028f * sceneContext->mouseSensitivity, -0.32f, 0.28f);

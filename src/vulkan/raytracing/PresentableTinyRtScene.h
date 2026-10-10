@@ -129,6 +129,10 @@ struct RtSceneFrameInputs
     horde::gameplay::EnemyRosterSnapshot roster{};
     horde::gameplay::LichSnapshot lich{};
     horde::gameplay::ShowcaseZone zone = horde::gameplay::ShowcaseZone::Opening;
+    // Authoritative fixed-step water contact state is passed through unchanged
+    // so the renderer can consume bounded droplets/ripples without sampling
+    // or advancing gameplay state of its own.
+    horde::gameplay::effects::WaterContactSnapshot waterContact{};
     std::array<horde::gameplay::effects::FireEmitterState,
                horde::gameplay::effects::kFireEmitterCapacity> fireEmitters{};
     std::size_t fireEmitterCount = 0u;
@@ -200,11 +204,13 @@ public:
     };
 
     // Maximum including the optional development viewmodel. Live reports count owners.
-    static constexpr std::uint32_t kBlasCount = 20u;
+    static constexpr std::uint32_t kBlasCount = 21u;
     static constexpr std::uint32_t kCollapseInstanceIndex = 21u;
     static constexpr std::uint32_t kPlayerTorchInstanceIndex = 22u;
     static constexpr std::uint32_t kPlayerSwordScabbardMetadataIndex = 23u;
     static constexpr std::uint32_t kPlayerSwordScabbardInstanceIndex = 25u;
+    static constexpr std::uint32_t kWaterDropletMetadataIndex = 24u;
+    static constexpr std::uint32_t kWaterDropletInstanceIndex = 26u;
     static constexpr std::uint32_t kTlasCount = 1u;
     static constexpr std::uint32_t kTlasInstanceCount = kRtTlasInstanceCapacity;
     // Keep the two existing Keeper body instances at their original TLAS slots.
@@ -214,7 +220,8 @@ public:
     static_assert(kKeeperTorchFirstTlasInstance + kKeeperTorchInstanceCount ==
                   kPlayerSwordScabbardInstanceIndex);
     static_assert(kPlayerSwordScabbardMetadataIndex < kRtInstanceMetadataCapacity);
-    static_assert(kTlasInstanceCount == kPlayerSwordScabbardInstanceIndex + 1u);
+    static_assert(kWaterDropletMetadataIndex < kRtInstanceMetadataCapacity);
+    static_assert(kTlasInstanceCount == kWaterDropletInstanceIndex + 1u);
 
     PresentableTinyRtScene() = default;
     ~PresentableTinyRtScene();
@@ -849,6 +856,7 @@ private:
     Buffer heldLightBuffer_;
     Buffer fireEmitterBuffer_;
     Buffer qualityControlsBuffer_;
+    Buffer waterContactRippleBuffer_;
     RtQualityControlsGpu uploadedQualityControls_{};
     FireEmitterQuality uploadedFireQuality_ = FireEmitterQuality::Mobile;
     FireEmitterUpload uploadedFireEmitters_{};
@@ -876,6 +884,8 @@ private:
     AccelerationStructure rewardLanternBodyBlas_;
     AccelerationStructure dielectricFixtureBlas_;
     AccelerationStructure collapseBlas_;
+    AccelerationStructure waterDropletBlas_;
+    Buffer waterDropletBlasUpdateScratch_;
     AccelerationStructure playerBodyBlas_;
     AccelerationStructure playerLimbBlas_;
     AccelerationStructure skinnedPlayerBlas_;
@@ -935,6 +945,8 @@ private:
     horde::scene::assets::StaticMeshAsset rewardLanternRingAsset_;
     horde::scene::assets::StaticMeshAsset rewardLanternBodyAsset_;
     horde::scene::assets::StaticMeshAsset productionDielectricFixtureAsset_;
+    horde::scene::assets::StaticMeshAsset waterDropletAsset_;
+    bool waterDropletGeometryVisible_ = false;
     std::vector<horde::scene::assets::StaticRtVertex> skinnedPlayerUpload_;
     std::uint32_t playerStaticVertexBase_ = 0u;
     std::uint32_t dielectricFixtureMaterialIndex_ = 0u;

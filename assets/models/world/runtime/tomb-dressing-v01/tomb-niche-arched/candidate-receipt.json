@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "asset": "tomb-niche-arched",
+  "stage": "authored candidate; runtime admission pending",
+  "role": "A voussoir-framed arched burial alcove with deep side returns and a stone shelf.",
+  "sourceBlend": "../../../source/tomb-dressing-v01/tomb-dressing-v01.blend",
+  "sourceBlendSha256": "42b7f7ea7a1f2b863b0c236fd1d04509a2f0fc7b59607bcf3ca767c9871596ba",
+  "authoringScriptSha256": "cf473cc1397ee6b8f4dcd4fb69ab33947a73e6fad7ed195e4546595957ebb9d5",
+  "triangleCount": 1280,
+  "vertexCount": 672,
+  "materials": [
+    "MedievalWall02"
+  ],
+  "boundsBlenderXyzMetres": {
+    "min": [
+      -0.64,
+      -0.2475,
+      0.0
+    ],
+    "max": [
+      0.64,
+      0.27,
+      1.6
+    ],
+    "size": [
+      1.28,
+      0.5175,
+      1.6
+    ]
+  },
+  "runtimeGlbSha256": "18810291df9ee3a630ca69dd813a29362b707f664982557e7dd7d37b8c8b5794",
+  "runtimeGlbBytes": 99316,
+  "textureCount": 0,
+  "texturesOrExternalDependencies": false
+}

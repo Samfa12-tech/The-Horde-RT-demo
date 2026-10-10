@@ -1,9 +1,9 @@
 {
   "schema": 1,
   "capacities": {
-    "instanceMetadata": 24,
-    "tlasInstances": 26,
-    "staticAssets": 12,
+    "instanceMetadata": 25,
+    "tlasInstances": 27,
+    "staticAssets": 13,
     "primitives": 32,
     "materials": 32,
     "textureLayers": 16,
@@ -29,7 +29,8 @@
     "worldPlayerVertices": 23,
     "viewmodelVertices": 24,
     "environmentTexture": 25,
-    "qualityControls": 26
+    "qualityControls": 26,
+    "waterContactRipple": 27
   },
   "geometryRoles": { "static": 0, "playerWorldBody": 1, "playerViewmodel": 2 },
   "playerInstances": { "worldBody": 4, "viewmodel": 20, "viewmodelPrimaryMask": 64, "bodyRemainderPrimaryMask": 128 },

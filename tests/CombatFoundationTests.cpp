@@ -58,17 +58,34 @@ void TeachingContract() {
     combat.combatants[0].actionTime=.90f;
     teaching.Update(true,true,false,combat,keeper,EnemyKind::Skeleton);
     Check(teaching.Snapshot().cue==CombatTeachingCue::ParryNow&&
-          Near(teaching.Snapshot().simulationTimeScale,.45f),"optional slowdown is narrowly tied to an unlearned window");
+          Near(teaching.Snapshot().simulationTimeScale,.25f),"optional quarter-speed ease is narrowly tied to an unlearned parry prompt");
+    teaching.Update(true,true,true,combat,keeper,EnemyKind::Skeleton);
+    Check(!teaching.Snapshot().safePractice&&!teaching.Snapshot().slowdownActive&&
+          Near(teaching.Snapshot().simulationTimeScale,1.0f)&&teaching.Snapshot().promptOpacity==0.0f,
+          "suspension such as player death cancels practice, prompt and eased time immediately");
+    combat.player.action=PlayerCombatAction::ParryActive;
+    teaching.Update(true,true,false,combat,keeper,EnemyKind::Skeleton);
+    Check(teaching.Snapshot().cue==CombatTeachingCue::ParryActive&&
+          !teaching.Snapshot().slowdownActive&&Near(teaching.Snapshot().simulationTimeScale,1.0f),
+          "slowdown expires as the real parry window opens");
+    combat.player.action=PlayerCombatAction::Idle;
     teaching.ParrySucceeded(); teaching.Update(true,true,false,combat,keeper,EnemyKind::Skeleton);
-    Check(!teaching.Snapshot().slowdownActive&&teaching.Snapshot().promptOpacity==0,
+    Check(!teaching.Snapshot().slowdownActive&&teaching.Snapshot().promptOpacity==0&&
+          Near(teaching.Snapshot().simulationTimeScale,1.0f),
           "understood parry stops teaching prompts and dilation");
     keeper.phase=LichPhase::Charging; keeper.phaseTime=1.10f;
     teaching.Update(true,true,false,combat,keeper,EnemyKind::Lich);
-    Check(teaching.Snapshot().cue==CombatTeachingCue::DodgeNow&&teaching.Snapshot().safePractice,
-          "Keeper teaches a distinct short dodge interval without progression");
+    Check(teaching.Snapshot().cue==CombatTeachingCue::DodgeNow&&teaching.Snapshot().safePractice&&
+          Near(teaching.Snapshot().simulationTimeScale,.25f),
+          "Keeper teaches the actual short dodge interval at optional quarter speed");
     teaching.DodgeSucceeded(); teaching.Update(true,true,false,combat,keeper,EnemyKind::Lich);
     Check(teaching.Snapshot().stage==TutorialStage::Complete&&!teaching.Snapshot().safePractice&&
-          teaching.Snapshot().promptOpacity==0,"completed lesson cannot keep immunity or permanent prompts");
+          teaching.Snapshot().promptOpacity==0&&Near(teaching.Snapshot().simulationTimeScale,1.0f),
+          "completed lesson cannot keep immunity, prompts or eased time");
+    teaching.Update(false,true,false,combat,keeper,EnemyKind::Lich);
+    Check(!teaching.Snapshot().enabled&&!teaching.Snapshot().slowdownActive&&
+          Near(teaching.Snapshot().simulationTimeScale,1.0f),
+          "disabling teaching restores ordinary gameplay speed");
     teaching.Reset(true); teaching.Skip(); teaching.Update(true,true,false,combat,keeper,EnemyKind::Lich);
     Check(!teaching.Snapshot().safePractice&&!teaching.Snapshot().slowdownActive,"skip restores ordinary gameplay clocks/damage");
     GameSimulation sim(Rules()); InputSnapshot input; sim.BeginCombatPractice(EnemyKind::Lich);
@@ -95,13 +112,45 @@ void KeeperContract() {
           keeper.Snapshot().phase==LichPhase::Repelling&&!keeper.Snapshot().damagePulse,
           "first accepted hit starts knockback-only repel");
     Check(!keeper.TryAcceptPlayerHit(target.x,target.z),"existing two-second accepted-hit lockout remains exact");
-    int warning=0,pulses=0; bool warningBefore=false;
-    for(int i=0;i<130;++i) {
+    int warning=0,pulses=0,warningTick=-1,pulseTick=-1; bool warningBefore=false;
+    float warningLight=0.0f,warningTilt=0.0f;
+    for(int i=0;i<130 && pulses==0;++i) {
         keeper.Update(1.0f/60,target.x+4,target.z,true,true);
-        if(keeper.Snapshot().dischargeWarningPulse) { ++warning; warningBefore=pulses==0; }
-        if(keeper.Snapshot().damagePulse) ++pulses;
+        if(keeper.Snapshot().dischargeWarningPulse) {
+            ++warning; warningTick=i; warningBefore=pulses==0;
+            warningLight=keeper.Snapshot().staffLightStrength;
+            warningTilt=keeper.Snapshot().presentationTiltRadians;
+        }
+        if(keeper.Snapshot().damagePulse) { ++pulses; pulseTick=i; }
     }
-    Check(warning==1&&pulses==1&&warningBefore,"early cast gets one distinct warning before discharge");
+    Check(warning==1&&pulses==1&&warningBefore&&pulseTick-warningTick==18,
+          "one damage pulse follows the one warning by the authored 300ms lead");
+    Check(warningLight>1.9f&&warningLight<=LichEncounter::kStaffLightPeak&&warningTilt<-.07f,
+          "charge warning uses a bounded late staff-glow surge and visible anticipatory pose");
+    Check(keeper.Snapshot().phase==LichPhase::Recovering&&
+          Near(keeper.Snapshot().phaseTime,0.0f)&&
+          Near(keeper.Snapshot().staffLightStrength,LichEncounter::kStaffLightPeak),
+          "single charge-boundary damage pulse begins a separate visible discharge burst");
+    for(int i=0;i<3;++i) keeper.Update(0.05f,target.x+4,target.z,true,true);
+    keeper.Update(0.029f,target.x+4,target.z,true,true);
+    Check(keeper.Snapshot().phase==LichPhase::Recovering&&
+          keeper.Snapshot().phaseTime<LichEncounter::kDischargeVisibleBurstDuration&&
+          keeper.Snapshot().staffLightStrength>0.0f,
+          "visible staff discharge remains active just before its 180ms endpoint");
+    keeper.Update(0.002f,target.x+4,target.z,true,true);
+    Check(keeper.Snapshot().phase==LichPhase::Recovering&&
+          keeper.Snapshot().staffLightStrength<=0.001f&&
+          keeper.Snapshot().phaseTime<LichEncounter::kRecoveryDuration&&
+          LichEncounter::kRecoveryDuration==1.80f,
+          "staff discharge glow ends while the independent 1.8s recovery continues");
+    int recoveryDamagePulses=0,recoveryWarnings=0;
+    for(int i=0;i<7;++i) {
+        keeper.Update(0.05f,target.x+4,target.z,true,true);
+        recoveryDamagePulses+=keeper.Snapshot().damagePulse?1:0;
+        recoveryWarnings+=keeper.Snapshot().dischargeWarningPulse?1:0;
+    }
+    Check(recoveryDamagePulses==0&&recoveryWarnings==0,
+          "the one charge-boundary damage pulse and warning do not replay during recovery");
     target=keeper.Snapshot(); Check(keeper.TryAcceptPlayerHit(target.x,target.z)&&keeper.Snapshot().health==1,
           "second accepted hit preserves three-hit defeat");
     for(int i=0;i<121;++i) keeper.Update(1.0f/60,target.x+4,target.z,true,true);
@@ -244,23 +293,56 @@ void CoherentSlowdown() {
         sim.StepFixed(input); sim.ClearEvents();
     }
     Check(ticks<600,"real opening attack enters optional teaching slowdown");
+    if(sim.Snapshot().combatTeaching.cue==CombatTeachingCue::ParryNow)
+        sim.StepFixed(input);
+    Check(Near(sim.Snapshot().gameplayTimeScale,.25f),
+          "focus cancellation fixture first reaches live optional slowdown");
+    sim.SynchronizePausedInput(input,2,PausedInputPolicy::DiscardAllCommands);
+    Check(Near(sim.Snapshot().gameplayTimeScale,1.0f)&&
+          Near(sim.Snapshot().combatTeaching.simulationTimeScale,1.0f)&&
+          !sim.Snapshot().combatTeaching.slowdownActive,
+          "focus synchronization immediately clears both cached and teaching slowdown");
+    // Use the same live encounter-distance setup as the slowdown probe above;
+    // the default spawn has no enemy in range to teach a defensive window.
+    GameSimulation retryProbe(config); InputSnapshot retryInput;
+    retryInput.tutorialSlowdownEnabled=true;
+    int retryTicks=0;
+    while(retryTicks++<600&&retryProbe.Snapshot().combatTeaching.cue!=CombatTeachingCue::ParryNow)
+        retryProbe.StepFixed(retryInput);
+    // Cue state is derived from the last completed combat snapshot; the next
+    // fixed step is where that newly published cue owns the gameplay delta.
+    if(retryProbe.Snapshot().combatTeaching.cue==CombatTeachingCue::ParryNow)
+        retryProbe.StepFixed(retryInput);
+    Check(retryTicks<600&&Near(retryProbe.Snapshot().gameplayTimeScale,.25f),
+          "retry boundary fixture reaches the real optional slowdown");
+    retryProbe.RetryEncounter();
+    Check(Near(retryProbe.Snapshot().gameplayTimeScale,1.0f)&&
+          !retryProbe.Snapshot().combatTeaching.slowdownActive,
+          "retry reconstruction immediately restores normal gameplay speed");
+    sim.StepFixed(input); sim.ClearEvents();
     const auto before=sim.Snapshot();
     input.commands.attack=1; input.commands.parry=1; input.commands.dodge=1;
     input.moveStrafe=1;
     sim.StepFixed(input);
     const auto after=sim.Snapshot();
-    Check(after.tickIndex==before.tickIndex+1 && Near(after.gameplayTimeScale,.45f),
+    Check(after.tickIndex==before.tickIndex+1 && Near(after.gameplayTimeScale,.25f),
           "input owner still consumes one real fixed tick while gameplay time is eased");
-    Check(Near(after.walkTime-before.walkTime,.45f/60) && Near(after.dodgeElapsedSeconds,.45f/60),
+    Check(Near(after.walkTime-before.walkTime,.25f/60) && Near(after.dodgeElapsedSeconds,.25f/60),
           "movement and dodge protection use the same scaled gameplay delta");
     Check(after.playerCombat.action==PlayerCombatAction::SwingWindup &&
-          Near(after.playerCombat.actionTime,.45f/60) && after.lastConsumedAttackSequence==1 &&
+          Near(after.playerCombat.actionTime,.25f/60) && after.lastConsumedAttackSequence==1 &&
           after.lastConsumedParrySequence==1 && after.lastConsumedDodgeSequence==1,
           "attack wins simultaneous parry; all input edges remain responsive during slowdown");
     const auto attacker=before.swordCombat.attackerIndex;
     Check(attacker>=0 && Near(after.swordCombat.combatants[attacker].actionTime-
-          before.swordCombat.combatants[attacker].actionTime,.45f/60),
+          before.swordCombat.combatants[attacker].actionTime,.25f/60),
           "enemy contact clock cannot run ahead of the slowed player pose and defense");
+    input.paused=true;
+    sim.AdvanceFrame(input,.25);
+    Check(sim.Snapshot().gameplayTimeScale==1.0f&&
+          !sim.Snapshot().combatTeaching.slowdownActive,
+          "pause immediately restores normal gameplay speed");
+    input.paused=false;
     input.commands.tutorialSkip=1;
     sim.StepFixed(input);
     Check(sim.Snapshot().combatTeaching.stage==TutorialStage::Skipped &&
@@ -268,6 +350,9 @@ void CoherentSlowdown() {
     const auto skipped=sim.Snapshot(); sim.StepFixed(input);
     Check(Near(sim.Snapshot().walkTime-skipped.walkTime,1.0f/60) &&
           sim.Snapshot().gameplayTimeScale==1,"ordinary clock resumes without double stepping");
+    sim.ResetRoute();
+    Check(sim.Snapshot().gameplayTimeScale==1.0f&&!sim.Snapshot().combatTeaching.slowdownActive,
+          "route reconstruction cannot retain a teaching time scale");
     input.paused=true; const auto pauseTick=sim.Snapshot().tickIndex;
     sim.AdvanceFrame(input,.25);
     Check(sim.Snapshot().tickIndex==pauseTick&&!sim.Snapshot().dodgeInvulnerable&&

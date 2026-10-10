@@ -153,6 +153,7 @@ add_library(horde_gameplay_simulation STATIC
     src/reporting/PlaytestSubmission.cpp
     src/reporting/BenchmarkSummarySubmission.cpp
     src/gameplay/simulation/GameSimulation.cpp
+    src/gameplay/effects/WaterContact.cpp
     src/gameplay/simulation/GameSimulationRescue.cpp
     src/gameplay/traversal/RescueTraversal.cpp
     src/gameplay/animation/PlayerAnimationState.cpp
@@ -695,6 +696,18 @@ if(BUILD_TESTING)
     )
     add_test(NAME horde_rt_scene_abi_tests COMMAND horde_rt_scene_abi_tests)
 
+    add_executable(horde_rt_tomb_wall_recess_tests tests/TombWallRecessTests.cpp)
+    target_include_directories(horde_rt_tomb_wall_recess_tests PRIVATE src)
+    add_test(NAME horde_rt_tomb_wall_recess_tests COMMAND horde_rt_tomb_wall_recess_tests)
+
+    add_executable(horde_rt_tomb_dressing_tests tests/TombDressingTests.cpp
+        src/scene/TombDressing.cpp src/scene/assets/AssetManifest.cpp
+        src/scene/assets/AssetValidation.cpp src/scene/assets/GltfDocument.cpp
+        src/scene/assets/StaticMeshAsset.cpp src/vulkan/raytracing/RtStaticMeshSlot.cpp)
+    target_include_directories(horde_rt_tomb_dressing_tests PRIVATE src third_party)
+    target_compile_definitions(horde_rt_tomb_dressing_tests PRIVATE HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
+    add_test(NAME horde_rt_tomb_dressing_tests COMMAND horde_rt_tomb_dressing_tests)
+
     add_executable(horde_rt_static_gltf_asset_tests tests/StaticGltfAssetTests.cpp)
     target_include_directories(horde_rt_static_gltf_asset_tests PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
@@ -710,6 +723,7 @@ if(BUILD_TESTING)
     target_compile_definitions(horde_rt_static_gltf_asset_tests PRIVATE
         HORDE_RT_STATIC_GLTF_FIXTURE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/static-gltf"
         HORDE_RT_DIELECTRIC_FIXTURE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets/models/props/runtime/dielectric-fixture"
+        HORDE_RT_TOMB_DRESSING_ROOT="${CMAKE_CURRENT_SOURCE_DIR}/assets/models/world/runtime/tomb-dressing-v01"
     )
     add_test(NAME horde_rt_static_gltf_asset_tests COMMAND horde_rt_static_gltf_asset_tests)
 
@@ -855,6 +869,11 @@ if(BUILD_TESTING)
     target_include_directories(horde_rt_simulation_gameplay_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     target_link_libraries(horde_rt_simulation_gameplay_tests PRIVATE horde_gameplay_simulation)
     add_test(NAME horde_rt_simulation_gameplay_tests COMMAND horde_rt_simulation_gameplay_tests)
+
+    add_executable(horde_rt_water_contact_tests tests/WaterContactTests.cpp)
+    target_include_directories(horde_rt_water_contact_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_link_libraries(horde_rt_water_contact_tests PRIVATE horde_gameplay_simulation)
+    add_test(NAME horde_rt_water_contact_tests COMMAND horde_rt_water_contact_tests)
 
     add_executable(horde_rt_waterfall_production_route_tests tests/WaterfallProductionRouteTests.cpp)
     target_include_directories(horde_rt_waterfall_production_route_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)

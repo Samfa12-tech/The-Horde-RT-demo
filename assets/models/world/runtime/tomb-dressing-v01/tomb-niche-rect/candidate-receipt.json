@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "asset": "tomb-niche-rect",
+  "stage": "authored candidate; runtime admission pending",
+  "role": "A rect-headed recessed burial alcove with stone returns and load-bearing shelf.",
+  "sourceBlend": "../../../source/tomb-dressing-v01/tomb-dressing-v01.blend",
+  "sourceBlendSha256": "42b7f7ea7a1f2b863b0c236fd1d04509a2f0fc7b59607bcf3ca767c9871596ba",
+  "authoringScriptSha256": "cf473cc1397ee6b8f4dcd4fb69ab33947a73e6fad7ed195e4546595957ebb9d5",
+  "triangleCount": 1188,
+  "vertexCount": 616,
+  "materials": [
+    "MedievalWall02"
+  ],
+  "boundsBlenderXyzMetres": {
+    "min": [
+      -0.64,
+      -0.2475,
+      0.0
+    ],
+    "max": [
+      0.64,
+      0.27,
+      1.6
+    ],
+    "size": [
+      1.28,
+      0.5175,
+      1.6
+    ]
+  },
+  "runtimeGlbSha256": "aa4b6cb8b072448534c4555a941851946bd6e9295af56b4b3ad035dd714e3ad9",
+  "runtimeGlbBytes": 86016,
+  "textureCount": 0,
+  "texturesOrExternalDependencies": false
+}

@@ -2197,6 +2197,141 @@ void TestExactDielectricWeldCellDomain()
     }
 }
 
+void TestTombDressingCandidates()
+{
+    using namespace horde::scene::assets;
+    struct Candidate { const char* id; std::size_t triangles; std::size_t primitives; const char* material; };
+    constexpr Candidate candidates[] = {
+        {"tomb-niche-rect", 1188u, 10u, "MedievalWall02"},
+        {"tomb-niche-arched", 1280u, 16u, "MedievalWall02"},
+        {"tomb-skull", 5240u, 20u, "TombBone"},
+        {"tomb-bone-femur", 1328u, 3u, "TombBone"},
+        {"tomb-bone-rib-bundle", 1272u, 6u, "TombBone"},
+        {"funerary-group", 8348u, 30u, "TombBone"},
+    };
+    for (const Candidate& candidate : candidates)
+    {
+        const auto directory = std::filesystem::path(HORDE_RT_TOMB_DRESSING_ROOT) / candidate.id;
+        AssetManifest manifest;
+        StaticMeshAsset asset;
+        std::string diagnostic;
+        const bool manifestLoaded = AssetManifest::Load(
+            directory / "asset.manifest.json", manifest, diagnostic);
+        Check(manifestLoaded, std::string(candidate.id) + " candidate manifest loads: " + diagnostic);
+        if (!manifestLoaded) continue;
+        const bool loaded = StaticMeshAsset::Load(
+            directory / (std::string(candidate.id) + "-lod0.runtime.glb"),
+            manifest, asset, diagnostic);
+        Check(loaded, std::string(candidate.id) + " imports through the production static GLB loader: " + diagnostic);
+        if (!loaded) continue;
+        Check(asset.indices.size() == candidate.triangles * 3u,
+              std::string(candidate.id) + " imported triangle count matches its author receipt");
+        Check(asset.primitives.size() >= candidate.primitives,
+              std::string(candidate.id) + " retains separate authored geometry primitives");
+        Check(std::any_of(asset.materials.begin(), asset.materials.end(), [&](const StaticMaterial& material) {
+                  return material.name == candidate.material;
+              }), std::string(candidate.id) + " retains its intended ordinary static PBR material family");
+        Check(asset.materials.size() == (std::string_view(candidate.id) == "funerary-group" ? 3u : 1u),
+              std::string(candidate.id) + " retains only its declared PBR material families");
+        Check(std::all_of(asset.materials.begin(), asset.materials.end(), [](const StaticMaterial& material) {
+                  return material.baseColorTexture < 0 && material.normalTexture < 0 &&
+                         material.ormTexture < 0 && material.emissiveTexture < 0 &&
+                         material.metallicFactor == 0.0f && material.transmissionFactor == 0.0f &&
+                         material.emissiveFactor == std::array<float, 3u>{};
+              }), std::string(candidate.id) + " is texture-free, opaque, nonmetal and nonemissive");
+        Check(std::all_of(asset.vertices.begin(), asset.vertices.end(), [](const StaticRtVertex& vertex) {
+                  return std::isfinite(vertex.position[0]) && std::isfinite(vertex.position[1]) &&
+                         std::isfinite(vertex.position[2]);
+              }), std::string(candidate.id) + " imported vertices are finite");
+        if (std::string_view(candidate.id).starts_with("tomb-niche-"))
+            Check(asset.primitives.size() >= 10u && asset.indices.size() > 1000u,
+                  std::string(candidate.id) + " contains deep modular wall geometry instead of a dark quad");
+    }
+}
+
+void TestPreparedFunerarySourceAssets(const std::filesystem::path& temporaryRoot)
+{
+    using namespace horde::scene::assets;
+    const std::filesystem::path repositoryRoot =
+        kFixtureRoot.parent_path().parent_path().parent_path();
+    const std::filesystem::path sourceRoot = repositoryRoot / "assets/source/beyond_the_tomb/funerary";
+    const std::filesystem::path t02Root = sourceRoot / "t02-skeletal-source-v1";
+    const std::filesystem::path t03Root = sourceRoot / "t03-v01";
+    const std::filesystem::path runtimeRoot = repositoryRoot /
+        "assets/models/world/runtime/prepared-funerary-v01/t02-native-import-candidates";
+    const auto manifestPath = temporaryRoot / "prepared-funerary-import-probe.manifest.json";
+    WriteText(manifestPath,
+        R"({
+            "schema": 1,
+            "asset": "prepared-funerary-import-probe",
+            "metresPerUnit": 1.0,
+            "coordinateSystem": { "up": "+Y", "forward": "+Z" },
+            "budgets": {
+                "maxVertices": 1000000,
+                "maxIndices": 3000000,
+                "maxPrimitives": 128,
+                "maxMaterials": 32,
+                "maxTextureLayersPerKind": 16
+            },
+            "lods": [{ "name": "lod0", "maxTriangles": 100000 }],
+            "requiredSockets": [],
+            "runtimeTextureProfile": {
+                "android": "astc", "windows": "rgba8", "mipmapped": true
+            },
+            "materialOverrides": []
+        })");
+    AssetManifest manifest;
+    std::string diagnostic;
+    const bool manifestLoaded = AssetManifest::Load(manifestPath, manifest, diagnostic);
+    Check(manifestLoaded, "prepared-source native-import probe manifest loads: " + diagnostic);
+    if (!manifestLoaded) return;
+
+    struct Candidate
+    {
+        const char* label;
+        std::filesystem::path path;
+        std::size_t triangles;
+        bool expectNativeImport;
+    };
+    const Candidate candidates[] = {
+        {"T02 skull/jaw source", t02Root / "meshes/skull_jaw.glb", 5564u, false},
+        {"T02 femur source", t02Root / "meshes/femur.glb", 396u, false},
+        {"T02 humerus source", t02Root / "meshes/humerus.glb", 304u, false},
+        {"T02 skull/jaw UV candidate", runtimeRoot / "skull-jaw/tomb-skull-jaw-lod0.runtime.glb", 5564u, true},
+        {"T02 femur UV candidate", runtimeRoot / "femur/tomb-femur-lod0.runtime.glb", 396u, true},
+        {"T02 humerus UV candidate", runtimeRoot / "humerus/tomb-humerus-lod0.runtime.glb", 304u, true},
+        {"T03 displaced lid", t03Root / "models/t03_displaced_lid.glb", 496u, true},
+        {"T03 offering bowl", t03Root / "models/t03_offering_bowl.glb", 960u, true},
+        {"T03 broken urn base", t03Root / "models/t03_urn_broken_base.glb", 1212u, true},
+        {"T03 urn rim shard", t03Root / "models/t03_urn_rim_shard.glb", 800u, true},
+        {"T03 candle stub 1", t03Root / "models/t03_candle_stub_1.glb", 664u, true},
+        {"T03 candle stub 2", t03Root / "models/t03_candle_stub_2.glb", 664u, true},
+        {"T03 candle stub 3", t03Root / "models/t03_candle_stub_3.glb", 664u, true},
+    };
+    for (const Candidate& candidate : candidates)
+    {
+        StaticMeshAsset asset;
+        diagnostic.clear();
+        const bool loaded = StaticMeshAsset::Load(candidate.path, manifest, asset, diagnostic);
+        if (!candidate.expectNativeImport)
+        {
+            Check(!loaded && diagnostic.find("missing TEXCOORD_0") != std::string::npos,
+                  std::string(candidate.label) + " confirms the texture-free source UV import gap: " + diagnostic);
+            continue;
+        }
+        Check(loaded, std::string(candidate.label) + " imports through the production static GLB loader: " + diagnostic);
+        if (!loaded) continue;
+        Check(asset.indices.size() == candidate.triangles * 3u,
+              std::string(candidate.label) + " native triangle count matches its prepared package evidence");
+        Check(!asset.vertices.empty() && !asset.primitives.empty() && !asset.materials.empty(),
+              std::string(candidate.label) + " imports geometry, primitives, and material slots");
+        Check(std::all_of(asset.vertices.begin(), asset.vertices.end(), [](const StaticRtVertex& vertex) {
+                  return std::isfinite(vertex.position[0]) && std::isfinite(vertex.position[1]) &&
+                         std::isfinite(vertex.position[2]);
+              }), std::string(candidate.label) + " imports finite vertex positions");
+    }
+}
+
 } // namespace
 
 int main(int argc, char** argv)
@@ -2247,6 +2382,8 @@ int main(int argc, char** argv)
     TestProductionDielectricFixture();
     TestLanternGeometryQualityProfile();
     TestRuntimeOfflineDielectricComponentParity();
+    TestTombDressingCandidates();
+    TestPreparedFunerarySourceAssets(temporaryRoot);
 
     horde::scene::assets::AssetManifest manifest;
     std::string diagnostic;

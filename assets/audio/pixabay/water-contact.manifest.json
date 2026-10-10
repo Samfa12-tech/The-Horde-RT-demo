@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "source": "assets/audio/pixabay/waterfall_loop.wav",
+  "sourceSha256": "de7711f0e6ef9cf0bdd3d04ba7a1b713ce09ef18169bd994182b09ab2017ee62",
+  "sampleRate": 48000,
+  "bitsPerSample": 16,
+  "cues": [
+    {
+      "path": "assets/audio/pixabay/water_wet_step_1.wav",
+      "platform": "Windows",
+      "channels": 1,
+      "sourceStartSeconds": 6.25,
+      "durationSeconds": 0.22,
+      "processingGain": 0.65,
+      "frames": 10560,
+      "bytes": 21164,
+      "sha256": "663ebe1e5fb38945e0e0e25037efe95d86964c03a4d6d1c642464593ec2d3263"
+    },
+    {
+      "path": "assets/audio/pixabay/water_wet_step_1_core.wav",
+      "platform": "Android",
+      "channels": 2,
+      "sourceStartSeconds": 6.25,
+      "durationSeconds": 0.22,
+      "processingGain": 0.65,
+      "frames": 10560,
+      "bytes": 42284,
+      "sha256": "bae5e1c700b7b3fc841662ca92869d6b074680fe513a8d04a4ef46e2deb7a944"
+    },
+    {
+      "path": "assets/audio/pixabay/water_wet_step_2.wav",
+      "platform": "Windows",
+      "channels": 1,
+      "sourceStartSeconds": 8.75,
+      "durationSeconds": 0.24,
+      "processingGain": 0.65,
+      "frames": 11520,
+      "bytes": 23084,
+      "sha256": "cd62db9512d7ff60ad9f0160c1eb3d98d6cf82130a30da6971bc0d053fe358b2"
+    },
+    {
+      "path": "assets/audio/pixabay/water_wet_step_2_core.wav",
+      "platform": "Android",
+      "channels": 2,
+      "sourceStartSeconds": 8.75,
+      "durationSeconds": 0.24,
+      "processingGain": 0.65,
+      "frames": 11520,
+      "bytes": 46124,
+      "sha256": "785201e135581c30cb243b77428bd32d07b113e2d1f3416eab8d85018ee89159"
+    },
+    {
+      "path": "assets/audio/pixabay/water_stream_contact.wav",
+      "platform": "Windows",
+      "channels": 1,
+      "sourceStartSeconds": 13.65,
+      "durationSeconds": 0.35,
+      "processingGain": 0.7,
+      "frames": 16800,
+      "bytes": 33644,
+      "sha256": "2cee1adcb1c944d19af0d2a5c8b81999908f6482bf2fcdd486d0457627ed8cfa"
+    },
+    {
+      "path": "assets/audio/pixabay/water_stream_contact_core.wav",
+      "platform": "Android",
+      "channels": 2,
+      "sourceStartSeconds": 13.65,
+      "durationSeconds": 0.35,
+      "processingGain": 0.7,
+      "frames": 16800,
+      "bytes": 67244,
+      "sha256": "2e242637d10db7b978efaa755eee93d037477985e2106ce462063e7af18c3461"
+    }
+  ],
+  "processing": "Fixed source cuts; 10ms fade-in/30ms fade-out, gain reduction, dual-mono. No normalisation.",
+  "license": "Existing DRAGON-STUDIO/Pixabay adaptation licence; retain ASSET_LICENSES.md. Not MIT.",
+  "ownerListeningApproval": false
+}

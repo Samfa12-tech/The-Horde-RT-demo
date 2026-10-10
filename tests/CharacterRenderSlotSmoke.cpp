@@ -232,17 +232,19 @@ int main()
                       !ShouldPersistRtLabUnlock({true, false, false, false, true}),
                   "Android RT Lab unlock was not restricted to genuine live finale completion");
 
-    ok &= Require(PresentableTinyRtScene::kBlasCount == 20u &&
-                      PresentableTinyRtScene::kTlasInstanceCount == 26u &&
-                      kRtInstanceMetadataCapacity == 24u &&
-                      kRtStaticAssetCapacity == 12u &&
+    ok &= Require(PresentableTinyRtScene::kBlasCount == 21u &&
+                      PresentableTinyRtScene::kTlasInstanceCount == 27u &&
+                      kRtInstanceMetadataCapacity == 25u &&
+                      kRtStaticAssetCapacity == 13u &&
                       PresentableTinyRtScene::kKeeperTorchFirstTlasInstance == 23u &&
                       PresentableTinyRtScene::kKeeperTorchInstanceCount == 2u &&
                       PresentableTinyRtScene::kCollapseInstanceIndex == 21u &&
                       PresentableTinyRtScene::kPlayerTorchInstanceIndex == 22u &&
                       PresentableTinyRtScene::kPlayerSwordScabbardMetadataIndex == 23u &&
-                      PresentableTinyRtScene::kPlayerSwordScabbardInstanceIndex == 25u,
-                  "new scabbard metadata23/TLAS25 and static asset12 fit fixed capacities while preserving viewmodel20/collapse21/player torch22 and Keeper TLAS aliases23/24");
+                      PresentableTinyRtScene::kPlayerSwordScabbardInstanceIndex == 25u &&
+                      PresentableTinyRtScene::kWaterDropletMetadataIndex == 24u &&
+                      PresentableTinyRtScene::kWaterDropletInstanceIndex == 26u,
+                  "water metadata24/TLAS26 and asset13 preserve scabbard23/TLAS25, viewmodel20/collapse21/player torch22 and Keeper TLAS aliases23/24");
     const DynamicBlasToTlasDependency noDynamicBlasDependency =
         BuildDynamicBlasToTlasDependency({});
     const DynamicBlasToTlasDependency playerOnlyDependency =
@@ -384,7 +386,20 @@ int main()
         interactions::ChestRewardPhase::LanternClaimed;
     simulationSnapshot.lanternPendulum.forwardAngleRadians = 0.37f;
     simulationSnapshot.rewardLanternWorldFromHinge[12] = -12.5f;
+    simulationSnapshot.waterContact.stepCount = 19u;
+    simulationSnapshot.waterContact.droplets[3].active = true;
+    simulationSnapshot.waterContact.droplets[3].position = {-2.1f, 0.4f, -15.0f};
+    simulationSnapshot.waterContact.ripples[1].active = true;
+    simulationSnapshot.waterContact.ripples[1].strength = 0.72f;
     const RtSceneFrameInputs adaptedFrame = BuildRtSceneFrameInputs(simulationSnapshot, 0.75f);
+    ok &= Require(adaptedFrame.waterContact.stepCount == simulationSnapshot.waterContact.stepCount &&
+                  adaptedFrame.waterContact.droplets[3].active &&
+                  adaptedFrame.waterContact.droplets[3].position[0] == -2.1f &&
+                  adaptedFrame.waterContact.droplets[3].position[1] == 0.4f &&
+                  adaptedFrame.waterContact.droplets[3].position[2] == -15.0f &&
+                  adaptedFrame.waterContact.ripples[1].active &&
+                  adaptedFrame.waterContact.ripples[1].strength == 0.72f,
+                  "frame adapter preserves authoritative water contact snapshot");
     ok &= Require(adaptedFrame.playerAnimation == simulationSnapshot.playerAnimation,
                   "simulation adapter must copy authoritative player animation without platform logic");
     ok &= Require(adaptedFrame.interaction == simulationSnapshot.interaction &&
@@ -807,6 +822,13 @@ int main()
                       sceneSource.find("runoffDrainLipX = -5.30f") != std::string::npos &&
                       sceneSource.find("-5.16f, -1.035f") == std::string::npos,
                       "floor water must use a rounded catchment and remain visible through the drain lip");
+        ok &= Require(raygenSource.find("rtWaterContactRipple.value") != std::string::npos &&
+                      raygenSource.find("bool runoff = abs(n.y) > 0.65;") != std::string::npos &&
+                      raygenSource.find("(runoff ? 1.0 : 0.0)") != std::string::npos &&
+                      raygenSource.find("angularWarp") == std::string::npos &&
+                      sceneSource.find("kRtBindingWaterContactRipple") != std::string::npos &&
+                      sceneSource.find("MakeWaterContactRippleGpu(frame.waterContact)") != std::string::npos,
+                      "one bounded contact ripple must drive only horizontal water hit normals through the owned binding27 buffer");
         ok &= Require(raygenSource.find("const int kMaterialWater = 10;") != std::string::npos &&
                       raygenSource.find("bool isThinWater") != std::string::npos &&
                       raygenSource.find("material == kMaterialClearGlass") != std::string::npos &&

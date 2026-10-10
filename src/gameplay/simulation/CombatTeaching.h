@@ -123,10 +123,9 @@ public:
         // contact, defense and pose use the SAME scaled step delta. No shader or
         // animation-only dilation and no timestamp remapping are introduced.
         snapshot_.slowdownActive = practicing && optionalSlowdown &&
-            (((snapshot_.cue == CombatTeachingCue::ParryNow ||
-               snapshot_.cue == CombatTeachingCue::ParryActive) && !snapshot_.parryLearned) ||
+            ((snapshot_.cue == CombatTeachingCue::ParryNow && !snapshot_.parryLearned) ||
              (snapshot_.cue == CombatTeachingCue::DodgeNow && !snapshot_.dodgeLearned));
-        if (snapshot_.slowdownActive) snapshot_.simulationTimeScale = 0.45f;
+        if (snapshot_.slowdownActive) snapshot_.simulationTimeScale = 0.25f;
         const bool relevantUnlearnedCue =
             (selectedEnemy == EnemyKind::Skeleton && !snapshot_.parryLearned) ||
             (selectedEnemy == EnemyKind::Lich && !snapshot_.dodgeLearned);

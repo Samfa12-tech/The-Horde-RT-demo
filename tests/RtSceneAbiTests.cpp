@@ -210,12 +210,12 @@ void TestGeneratedConstants()
           "topology-certified closed volume is an append-only material ABI flag");
     Check(static_cast<std::uint32_t>(RtMaterialFlag::CertifiedRectangularVolume) == 4096u,
           "rectangular geometry certification has a distinct append-only material flag");
-    Check(kRtInstanceMetadataCapacity == 24u, "instance metadata preserves viewmodel20/collapse21/player torch22 and appends player scabbard23");
-    Check(kRtTlasInstanceCapacity == 26u,
-          "player scabbard adds a metadata-backed owner while the two permanent Keeper torches retain physical indices23/24");
+    Check(kRtInstanceMetadataCapacity == 25u, "instance metadata preserves prior owners and appends water contact24");
+    Check(kRtTlasInstanceCapacity == 27u,
+          "water contact adds physical owner26 while the two permanent Keeper torches retain physical indices23/24");
     Check(kRtActiveFireEmitterCapacity == 4u && kRtFireEmitterCapacity == 4u && sizeof(RtFireEmitterGpu) == 160u,
           "all four important lights are active within the unchanged 640-byte fire storage buffer");
-    Check(kRtStaticAssetCapacity == 12u, "static asset capacity admits the original player sword scabbard without replacing old assets");
+    Check(kRtStaticAssetCapacity == 13u, "static asset capacity admits the original player sword scabbard and dedicated water droplet owner without replacing old assets");
     Check(kRtPrimitiveMetadataCapacity == 32u, "primitive capacity is 32");
     Check(kRtMaterialCapacity == 32u, "material capacity is 32");
     Check(kRtTextureLayerCapacity == 16u, "each PBR texture category has 16 layers");
@@ -226,8 +226,9 @@ void TestGeneratedConstants()
               kRtBindingEmissiveTextures == 19u && kRtBindingHeldLight == 20u &&
               kRtBindingFireEmitters == 21u && kRtBindingDielectricDiagnostics == 22u &&
               kRtBindingWorldPlayerVertices == 23u && kRtBindingViewmodelVertices == 24u &&
-              kRtBindingEnvironmentTexture == 25u && kRtBindingQualityControls == 26u,
-          "descriptor bindings preserve player streams23/24 and append environment25 and quality26");
+              kRtBindingEnvironmentTexture == 25u && kRtBindingQualityControls == 26u &&
+              kRtBindingWaterContactRipple == 27u,
+          "descriptor bindings preserve player streams23/24 and append environment25, quality26 and water ripple27");
     Check(static_cast<std::uint32_t>(RtGeometryRole::Static) == 0u &&
               static_cast<std::uint32_t>(RtGeometryRole::PlayerWorldBody) == 1u &&
               static_cast<std::uint32_t>(RtGeometryRole::PlayerViewmodel) == 2u &&
@@ -308,7 +309,7 @@ void TestGenericRegistrationAndMeasurements()
     Check(slot.Measurements().vertexBytes == 6u * 64u &&
               slot.Measurements().indexBytes == 6u * 4u &&
               slot.Measurements().materialBytes == 2u * 128u &&
-               slot.Measurements().instanceMetadataBytes == 24u * 32u &&
+               slot.Measurements().instanceMetadataBytes == 25u * 32u &&
               slot.Measurements().primitiveMetadataBytes == 2u * 16u &&
               slot.Measurements().descriptorCount == 9u,
           "resource measurements use literal ABI sizes and descriptor count");

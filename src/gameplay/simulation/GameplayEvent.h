@@ -51,10 +51,12 @@ enum class GameplayEventType : std::uint8_t
     SkeletonEncounterWarning,
     ParryPrepareCue,
     LichDischargeWarning,
+    PlayerWetFootstep,
+    WaterfallContact,
 };
 
 inline constexpr std::size_t kGameplayEventTypeCount =
-    static_cast<std::size_t>(GameplayEventType::LichDischargeWarning) + 1u;
+    static_cast<std::size_t>(GameplayEventType::WaterfallContact) + 1u;
 
 struct GameplayEvent
 {

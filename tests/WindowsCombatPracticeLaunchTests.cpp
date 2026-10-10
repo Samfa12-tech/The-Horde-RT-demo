@@ -52,28 +52,36 @@ int main()
     teaching.cue = CombatTeachingCue::ParryWindup;
     teaching.cueProgress = 0.5f;
     const auto windup = CombatTeachingPromptText(teaching);
-    check(windup.find("O SKELETON A WIND-UP") != std::string::npos &&
-              windup.find("###---") != std::string::npos,
-          "wind-up uses hollow shape and bounded progress");
+    check(windup.find("O Watch the raised blade") != std::string::npos &&
+              windup.find("COMBAT LESSON") == std::string::npos &&
+              windup.find("###") == std::string::npos &&
+              windup.find("[Q]") != std::string::npos &&
+              windup.find("[Space] + A/D") != std::string::npos,
+          "short in-world wind-up prompt shows current keyboard/controller bindings without diagnostic chrome");
     teaching.cue = CombatTeachingCue::ParryNow;
     const auto press = CombatTeachingPromptText(teaching);
-    check(press.find("o PRESS PARRY") != std::string::npos &&
-              press.find("raise guard before the strike") != std::string::npos &&
-              press.find("O SKELETON A WIND-UP") == std::string::npos,
+    check(press.find("o PARRY NOW") != std::string::npos &&
+              press.find("raise your guard") != std::string::npos &&
+              press.find("O Watch the raised blade") == std::string::npos,
           "anticipatory press and live blade-window prompts stay distinct");
     teaching.cue = CombatTeachingCue::ParryActive;
     const auto active = CombatTeachingPromptText(teaching);
-    check(active.find("(*) PARRY WINDOW ACTIVE") != std::string::npos &&
-              active.find("face the incoming blade") != std::string::npos &&
-              active.find("PRESS PARRY") == std::string::npos,
+    check(active.find("(*) Guard up") != std::string::npos &&
+              active.find("face the blade") != std::string::npos &&
+              active.find("PARRY NOW") == std::string::npos,
           "filled shape is reserved for the live blade window");
     teaching.cue = CombatTeachingCue::DodgeNow;
     teaching.cueProgress = 4.0f;
     const auto dodge = CombatTeachingPromptText(teaching);
     check(dodge.find("<-- DODGE NOW -->") != std::string::npos &&
-              dodge.find("######") != std::string::npos && dodge.find("MOVE/LOOK LIVE") != std::string::npos &&
-              dodge.find("DODGE: SPACE + A/D") != std::string::npos,
-          "dodge uses directional motion cue and bounded full progress");
+              dodge.find("######") == std::string::npos &&
+              dodge.find("[Space] + A/D: Dodge") != std::string::npos,
+          "dodge uses a short directional cue and current keyboard/controller bindings");
+    const auto controllerDodge = CombatTeachingPromptText(teaching, true);
+    check(controllerDodge.find("[B] + left stick") != std::string::npos &&
+          controllerDodge.find("[LT]") != std::string::npos &&
+          controllerDodge.find("[Space]") == std::string::npos && dodge.find("[LT]") == std::string::npos,
+          "active input glyphs select controller or keyboard without changing gameplay");
     teaching.promptOpacity = 0.0f;
     check(CombatTeachingPromptText(teaching).empty(), "zero-opacity cue hides the banner");
     check(CombatTeachingPromptAlpha(0.5f, false) == 128u &&

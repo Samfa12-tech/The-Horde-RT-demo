@@ -624,6 +624,7 @@ public:
         {
         case LichPhase::Repelling:
             snapshot_.staffLightStrength = kStaffLightStart;
+            snapshot_.presentationTiltRadians = 0.0f;
             if (snapshot_.phaseTime + 0.00001f >= kRepelDuration)
             {
                 snapshot_.phase = LichPhase::Charging;
@@ -633,6 +634,7 @@ public:
             break;
         case LichPhase::MaintainingRange:
             snapshot_.staffLightStrength = 0.0f;
+            snapshot_.presentationTiltRadians = 0.0f;
             if (snapshot_.phaseTime >= kMinimumRepositionDuration &&
                 distance >= kPreferredMinRange && distance <= kPreferredMaxRange)
             {
@@ -645,9 +647,13 @@ public:
         case LichPhase::Charging:
         {
             const float charge = std::clamp(snapshot_.phaseTime / kChargeDuration, 0.0f, 1.0f);
+            const bool modernReadableCast = readableCombat_ && !legacyCapture_;
+            const float anticipation = modernReadableCast ? SmoothStep(charge) : charge;
             snapshot_.staffLightStrength = kStaffLightStart +
-                                           (kStaffLightPeak - kStaffLightStart) * charge;
-            if (readableCombat_ && !legacyCapture_ && !dischargeWarningEmitted_ &&
+                                           (kStaffLightPeak - kStaffLightStart) * anticipation;
+            snapshot_.presentationTiltRadians = modernReadableCast
+                ? -kChargeAnticipationTiltRadians * anticipation : 0.0f;
+            if (modernReadableCast && !dischargeWarningEmitted_ &&
                 snapshot_.phaseTime + 0.00001f >= kChargeDuration - kDischargeWarningLead)
             {
                 snapshot_.dischargeWarningPulse = true;
@@ -663,15 +669,24 @@ public:
             break;
         }
         case LichPhase::Recovering:
-            snapshot_.staffLightStrength = kStaffLightPeak *
-                (1.0f - std::clamp(snapshot_.phaseTime / kRecoveryDuration, 0.0f, 1.0f));
+        {
+            const bool modernReadableCast = readableCombat_ && !legacyCapture_;
+            const float visibleDuration = modernReadableCast
+                ? kDischargeVisibleBurstDuration : kRecoveryDuration;
+            const float visibleStrength = 1.0f -
+                std::clamp(snapshot_.phaseTime / visibleDuration, 0.0f, 1.0f);
+            snapshot_.staffLightStrength = kStaffLightPeak * visibleStrength;
+            snapshot_.presentationTiltRadians = modernReadableCast
+                ? -kChargeAnticipationTiltRadians * visibleStrength : 0.0f;
             if (snapshot_.phaseTime + 0.00001f >= kRecoveryDuration)
             {
                 snapshot_.phase = LichPhase::MaintainingRange;
                 snapshot_.phaseTime = 0.0f;
                 snapshot_.staffLightStrength = 0.0f;
+                snapshot_.presentationTiltRadians = 0.0f;
             }
             break;
+        }
         default:
             break;
         }
@@ -764,6 +779,8 @@ public:
     static constexpr float kRepelDuration = 0.30f;
     static constexpr float kRepelDistance = 1.00f;
     static constexpr float kDischargeWarningLead = 0.30f;
+    static constexpr float kDischargeVisibleBurstDuration = 0.18f;
+    static constexpr float kChargeAnticipationTiltRadians = 0.10f;
     static constexpr float kRecoveryDuration = 1.80f;
     static constexpr float kDeathAnimationDuration = 2.967f;
     static constexpr float kFinaleSkylightOpenDuration =
