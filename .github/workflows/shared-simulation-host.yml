@@ -1,6 +1,7 @@
 name: Shared simulation host tests
 
 on:
+  workflow_dispatch:
   pull_request:
   push:
     branches:

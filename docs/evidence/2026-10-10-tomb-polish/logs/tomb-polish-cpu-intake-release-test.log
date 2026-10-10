@@ -1,0 +1,40 @@
+UpdateCTestConfiguration  from :<repo>/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/build/presets/windows-x64-release/DartConfiguration.tcl
+Parse Config file:<repo>/build/presets/windows-x64-release/DartConfiguration.tcl
+Test project <repo>/build/presets/windows-x64-release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 142
+    Start 142: horde_rt_scene_resource_inventory_tests
+
+142: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_scene_resource_inventory_tests.exe"
+142: Working Directory: <repo>/build/presets/windows-x64-release
+142: Test timeout computed to be: 1500
+142: Resource integration: existing readback/mist/torch contracts
+142: Resource integration: descriptor contracts
+142: Resource integration: TLAS and water geometry
+142: Resource integration: actual tomb intake
+142: Integrated native tomb static roster: 28 primitives, 26 materials
+142: Matched CPU intake only (baseline first; cache/order bias possible): 60.9138 / 63.1998 ms; additional static vertices/indices bytes: 1091200 / 184560; no GPU allocation, AS build or presentation measurement
+142: Resource integration: water owner lifetime
+142: Water lifetime: populate
+142: Water lifetime: move
+142: Water lifetime: destroy
+142: Resource integration: resize contracts
+142: Resource integration: command/resource observations
+142: Resource integration: command execution fixtures
+142: Resource integration: not-ready rejection
+142: Resource integration: preview inventory
+142: Resource integration: populated inventory
+1/1 Test #142: horde_rt_scene_resource_inventory_tests ...   Passed    2.45 sec
+
+The following tests passed:
+	horde_rt_scene_resource_inventory_tests
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   2.47 sec

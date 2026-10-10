@@ -1,0 +1,107 @@
+Test project <repo>/build/presets/windows-x64-debug
+      Start   6: horde_rt_foreground_pause_render_cadence_tests
+ 1/45 Test   #6: horde_rt_foreground_pause_render_cadence_tests ...   Passed    0.03 sec
+      Start  19: horde_rt_player_primitive_contract_tests
+ 2/45 Test  #19: horde_rt_player_primitive_contract_tests .........   Passed    1.73 sec
+      Start  25: horde_rt_held_item_transition_tests
+ 3/45 Test  #25: horde_rt_held_item_transition_tests ..............   Passed    1.77 sec
+      Start  26: horde_rt_combat_timing_trace_tests
+ 4/45 Test  #26: horde_rt_combat_timing_trace_tests ...............   Passed    4.60 sec
+      Start  27: horde_rt_input_presentation_trace_tests
+ 5/45 Test  #27: horde_rt_input_presentation_trace_tests ..........   Passed    5.17 sec
+      Start  28: horde_rt_held_item_clearance_tests
+ 6/45 Test  #28: horde_rt_held_item_clearance_tests ...............   Passed    5.90 sec
+      Start  32: horde_rt_entry_menu_scene_tests
+ 7/45 Test  #32: horde_rt_entry_menu_scene_tests ..................   Passed    3.27 sec
+      Start  33: horde_rt_graphics_preview_frame_adapter_tests
+ 8/45 Test  #33: horde_rt_graphics_preview_frame_adapter_tests ....   Passed    2.08 sec
+      Start  39: horde_rt_windows_output_resize_launch_tests
+ 9/45 Test  #39: horde_rt_windows_output_resize_launch_tests ......   Passed    1.71 sec
+      Start  44: horde_rt_motion_evidence_scenario_tests
+10/45 Test  #44: horde_rt_motion_evidence_scenario_tests ..........   Passed    8.73 sec
+      Start  45: horde_rt_world_route_foundation_tests
+11/45 Test  #45: horde_rt_world_route_foundation_tests ............   Passed    7.16 sec
+      Start  46: horde_rt_vertical_support_tests
+12/45 Test  #46: horde_rt_vertical_support_tests ..................   Passed    7.78 sec
+      Start  47: horde_rt_held_item_vertical_support_rig_tests
+13/45 Test  #47: horde_rt_held_item_vertical_support_rig_tests ....   Passed    2.53 sec
+      Start  48: horde_rt_player_directional_rig_tests
+14/45 Test  #48: horde_rt_player_directional_rig_tests ............   Passed    4.34 sec
+      Start  55: horde_rt_pipeline_variants_tests
+15/45 Test  #55: horde_rt_pipeline_variants_tests .................   Passed    1.51 sec
+      Start  56: horde_rt_pipeline_variant_provider_tests
+16/45 Test  #56: horde_rt_pipeline_variant_provider_tests .........   Passed    1.88 sec
+      Start  57: horde_rt_pipeline_bundle_contracts_tests
+17/45 Test  #57: horde_rt_pipeline_bundle_contracts_tests .........   Passed    3.25 sec
+      Start  70: horde_rt_skinned_node_pose_batch_tests
+18/45 Test  #70: horde_rt_skinned_node_pose_batch_tests ...........   Passed    2.15 sec
+      Start  71: horde_rt_player_animation_tests
+19/45 Test  #71: horde_rt_player_animation_tests ..................   Passed    4.86 sec
+      Start  73: horde_rt_held_item_socket_tests
+20/45 Test  #73: horde_rt_held_item_socket_tests ..................   Passed   29.39 sec
+      Start  75: horde_rt_combat_sword_authority_agreement
+21/45 Test  #75: horde_rt_combat_sword_authority_agreement ........   Passed    0.81 sec
+      Start  77: horde_rt_scene_abi_tests
+22/45 Test  #77: horde_rt_scene_abi_tests .........................***Failed    2.66 sec
+FAIL: instance metadata preserves viewmodel20/collapse21/player torch22 and appends player scabbard23
+FAIL: player scabbard adds a metadata-backed owner while the two permanent Keeper torches retain physical indices23/24
+FAIL: resource measurements use literal ABI sizes and descriptor count
+3 RT scene ABI assertion(s) failed
+
+      Start  81: horde_rt_production_prop_asset_tests
+23/45 Test  #81: horde_rt_production_prop_asset_tests .............   Passed    4.94 sec
+      Start  82: horde_rt_static_collapse_asset_tests
+24/45 Test  #82: horde_rt_static_collapse_asset_tests .............   Passed    3.68 sec
+      Start 102: horde_rt_simulation_timing_tests
+25/45 Test #102: horde_rt_simulation_timing_tests .................   Passed    6.18 sec
+      Start 103: horde_rt_simulation_gameplay_tests
+26/45 Test #103: horde_rt_simulation_gameplay_tests ...............   Passed    7.42 sec
+      Start 105: horde_rt_waterfall_production_route_tests
+27/45 Test #105: horde_rt_waterfall_production_route_tests ........   Passed    5.82 sec
+      Start 106: horde_rt_waterfall_legacy_route_tests
+28/45 Test #106: horde_rt_waterfall_legacy_route_tests ............   Passed    1.09 sec
+      Start 114: horde_rt_surface_session_mailbox_tests
+29/45 Test #114: horde_rt_surface_session_mailbox_tests ...........   Passed    2.51 sec
+      Start 126: horde_rt_lantern_reward_tests
+30/45 Test #126: horde_rt_lantern_reward_tests ....................   Passed    5.25 sec
+      Start 127: horde_rt_lantern_pendulum_tests
+31/45 Test #127: horde_rt_lantern_pendulum_tests ..................   Passed    2.45 sec
+      Start 128: horde_rt_input_mailbox_stress
+32/45 Test #128: horde_rt_input_mailbox_stress ....................   Passed    3.49 sec
+      Start 129: horde_rt_desktop_controller_input_tests
+33/45 Test #129: horde_rt_desktop_controller_input_tests ..........   Passed    1.50 sec
+      Start 131: horde_rt_combat_smoke
+34/45 Test #131: horde_rt_combat_smoke ............................   Passed    2.97 sec
+      Start 132: horde_rt_showcase_route_smoke
+35/45 Test #132: horde_rt_showcase_route_smoke ....................   Passed    1.49 sec
+      Start 133: horde_rt_showcase_gameplay_smoke
+36/45 Test #133: horde_rt_showcase_gameplay_smoke .................   Passed    2.71 sec
+      Start 134: horde_rt_spatial_audio_smoke
+37/45 Test #134: horde_rt_spatial_audio_smoke .....................   Passed    1.67 sec
+      Start 140: horde_rt_pipeline_bundle_lifetime_tests
+38/45 Test #140: horde_rt_pipeline_bundle_lifetime_tests ..........   Passed    2.51 sec
+      Start 141: horde_rt_scene_initialise_preflight_tests
+39/45 Test #141: horde_rt_scene_initialise_preflight_tests ........   Passed    0.27 sec
+      Start 151: horde_rt_character_render_slot_smoke
+40/45 Test #151: horde_rt_character_render_slot_smoke .............***Failed    5.32 sec
+FAIL: new scabbard metadata23/TLAS25 and static asset12 fit fixed capacities while preserving viewmodel20/collapse21/player torch22 and Keeper TLAS aliases23/24
+
+      Start 155: horde_rt_rescue_traversal_tests
+41/45 Test #155: horde_rt_rescue_traversal_tests ..................   Passed    3.29 sec
+      Start 156: horde_rt_rescue_blockout_import_tests
+42/45 Test #156: horde_rt_rescue_blockout_import_tests ............   Passed    2.47 sec
+      Start 157: horde_rt_rescue_journey_integration_tests
+43/45 Test #157: horde_rt_rescue_journey_integration_tests ........   Passed    9.46 sec
+      Start 159: horde_rt_rescue_rig_attachment_tests
+44/45 Test #159: horde_rt_rescue_rig_attachment_tests .............   Passed   20.64 sec
+      Start 160: horde_rt_rescue_adversarial_regression_tests
+45/45 Test #160: horde_rt_rescue_adversarial_regression_tests .....   Passed   21.50 sec
+
+96% tests passed, 2 tests failed out of 45
+
+Total Test time (real) = 222.04 sec
+
+The following tests FAILED:
+	 77 - horde_rt_scene_abi_tests (Failed)
+	151 - horde_rt_character_render_slot_smoke (Failed)
+Errors while running CTest

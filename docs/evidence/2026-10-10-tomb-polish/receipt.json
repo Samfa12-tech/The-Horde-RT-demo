@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "sourceCommit": "e18f17b4bb5d07eb80611ec0f60ff0ce7787cbaa",
+  "startingCommit": "77016c64aae545e111137e3ddfcad06ea0b81437",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "pullRequest": 27,
+  "scope": "Development tomb dressing, stronger optional teaching, Keeper anticipation/short burst, wet-contact audio/ripples and bounded RT droplets",
+  "artifacts": [
+    {
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+      "sha256": "5c0dfbfa4a823431381e1b67aa9263ec3c04d40448f7bd2e92803f0aac83d947",
+      "bytes": 12047872
+    },
+    {
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+      "sha256": "fa3be3f8d2a3a52d3bb9b731784d1c8a162cbc08be7841e54709987469011c29",
+      "bytes": 4216832
+    },
+    {
+      "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "sha256": "69b6e35d845a689656db0c6dab1feb650f905f86dc9fd1c4ca96930afebc1d82",
+      "bytes": 133792913
+    },
+    {
+      "path": "android/app/build/outputs/apk/release/app-release-unsigned.apk",
+      "sha256": "3a6537c47acc01a361dfc07ddb3b2e3996e0144cafe6fac0ef8ee02110afe691",
+      "bytes": 122141776
+    }
+  ],
+  "host": "PASS available affected Windows Debug/Release and Android four-ABI Debug/unsigned Release/lint/Java lanes after recorded corrections",
+  "package": "PASS Windows selected policy bundles and Android ARM64 shader inspection; all ABI packaged identities matched",
+  "deviceVerified": false,
+  "ownerAudioHaptic": "PENDING",
+  "torch": {
+    "configuration": "Windows Debug",
+    "test": "horde_rt_final_held_torch_clearance_tests",
+    "seconds": 167.71,
+    "timeoutSeconds": 180,
+    "marginSeconds": 12.29,
+    "coverage": [
+      3287,
+      1812,
+      3178,
+      57970
+    ],
+    "testSourceUnchanged": true
+  },
+  "pending": [
+    "Owner complete tomb and rope playtest",
+    "Matched dressing/effects on/off GPU/resource/presentation measurements",
+    "Windows and Android actual backends/lifecycle/orientation/large-font appearance",
+    "Owner audio/haptic review",
+    "Non-ARM64 packaged shader inspection unsupported by current tool",
+    "Kit public distribution rights; no voice integration",
+    "Existing mist defect investigation; no correction claimed",
+    "WP3 representative outdoor budget admission"
+  ],
+  "preservation": "Other worktrees and unselected local experiments retained; no device launch/install, release, budget relaxation or master regeneration."
+}

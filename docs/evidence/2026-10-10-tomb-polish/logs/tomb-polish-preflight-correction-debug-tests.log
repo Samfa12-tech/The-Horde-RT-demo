@@ -1,0 +1,13 @@
+Test project <repo>/build/presets/windows-x64-debug
+    Start  57: horde_rt_pipeline_bundle_contracts_tests
+1/4 Test  #57: horde_rt_pipeline_bundle_contracts_tests ....   Passed    3.31 sec
+    Start 140: horde_rt_pipeline_bundle_lifetime_tests
+2/4 Test #140: horde_rt_pipeline_bundle_lifetime_tests .....   Passed    5.19 sec
+    Start 141: horde_rt_scene_initialise_preflight_tests
+3/4 Test #141: horde_rt_scene_initialise_preflight_tests ...   Passed    1.84 sec
+    Start 142: horde_rt_scene_resource_inventory_tests
+4/4 Test #142: horde_rt_scene_resource_inventory_tests .....   Passed    4.83 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Total Test time (real) =  15.19 sec

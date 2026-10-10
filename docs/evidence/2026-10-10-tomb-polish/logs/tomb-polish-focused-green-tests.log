@@ -1,0 +1,11 @@
+Test project <repo>/build/presets/windows-x64-debug
+    Start  24: horde_rt_combat_foundation_tests
+1/3 Test  #24: horde_rt_combat_foundation_tests ................   Passed    5.79 sec
+    Start  41: horde_rt_windows_combat_practice_launch_tests
+2/3 Test  #41: horde_rt_windows_combat_practice_launch_tests ...   Passed    1.67 sec
+    Start 102: horde_rt_water_contact_tests
+3/3 Test #102: horde_rt_water_contact_tests ....................   Passed    3.30 sec
+
+100% tests passed, 0 tests failed out of 3
+
+Total Test time (real) =  10.78 sec

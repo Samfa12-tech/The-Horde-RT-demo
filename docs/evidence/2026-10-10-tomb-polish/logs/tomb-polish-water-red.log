@@ -1,0 +1,18 @@
+Test project <repo>/build/presets/windows-x64-debug
+    Start 102: horde_rt_water_contact_tests
+1/1 Test #102: horde_rt_water_contact_tests .....***Failed    1.79 sec
+resolved wet step emits once
+stationary puddle emits no repeating steps
+actual stream entry emits burst
+stationary stream has bounded continuing spray
+repeated stream entry independent from one-shot torch
+36 water checks, 5 failures
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   1.80 sec
+
+The following tests FAILED:
+	102 - horde_rt_water_contact_tests (Failed)
+Errors while running CTest

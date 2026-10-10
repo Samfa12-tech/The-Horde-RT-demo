@@ -1,0 +1,7 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  horde_rt_probe_core.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_probe_core.lib
+  horde_windows_music.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_windows_music.lib
+  horde_rt_diagnostic_window.vcxproj -> <repo>\build\presets\windows-x64-release\Release\HordeLanternRT.exe

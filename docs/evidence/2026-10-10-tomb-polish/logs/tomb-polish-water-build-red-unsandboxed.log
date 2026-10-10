@@ -1,0 +1,8 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-debug\pocket-audio-core-native\Debug\pocket_audio_native_pcm.lib
+  WaterContact.cpp
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_gameplay_simulation.lib
+  Building Custom Rule <repo>/CMakeLists.txt
+  WaterContactTests.cpp
+  horde_rt_water_contact_tests.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_rt_water_contact_tests.exe

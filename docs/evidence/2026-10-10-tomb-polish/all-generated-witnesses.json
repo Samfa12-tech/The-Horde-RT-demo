@@ -1,0 +1,86 @@
+[
+  {
+    "path": "src/vulkan/raytracing/MinimalLegacyRayGenShader.inc",
+    "sha256": "35bbb6d0194ef9771fc7a528c871be5cd9350be4d47471bbff3e2c6cc32be6cd"
+  },
+  {
+    "path": "src/vulkan/raytracing/MinimalRayGenShader.inc",
+    "sha256": "a333a899c319ab090bb7747f54cdfcd8cba9eec0ef07cc1f8e931020df47200c"
+  },
+  {
+    "path": "src/vulkan/raytracing/RtPipelineVariantCatalog.generated.h",
+    "sha256": "effc06b4a1ec185a2a89f6baf2c9f05187447a784bd73e1c6f3d1b5e5c46fa95"
+  },
+  {
+    "path": "src/vulkan/raytracing/RtRayQueryVariantCatalog.generated.h",
+    "sha256": "e6640bc9ca5e630a2536a72f3746cf48a447f49397ec129527594c1bfb969883"
+  },
+  {
+    "path": "src/vulkan/raytracing/RtSceneAbi.generated.h",
+    "sha256": "d95c548af6fa590db715bebd51230b1064c2ce682607c44fadcfd87d5e34ab9b"
+  },
+  {
+    "path": "src/vulkan/raytracing/variants/diagnostic_high_generic_dielectric.inc",
+    "sha256": "c2b4b492cf40c0e764f7f85d695e0af8a21edea6506db87ed6db4eec40909fb3"
+  },
+  {
+    "path": "src/vulkan/raytracing/variants/diagnostic_high_opaque_fast.inc",
+    "sha256": "311b1d1a7121fc08c76fbe6b755bbb159363e9975b29d9ecb3c5f0b13b233d97"
+  },
+  {
+    "path": "src/vulkan/raytracing/variants/diagnostic_mobile_generic_dielectric.inc",
+    "sha256": "6c64bad0fef8701733c68365ae7939ca766e3e377a942f7970b592efa3690d53"
+  },
+  {
+    "path": "src/vulkan/raytracing/variants/diagnostic_mobile_opaque_fast.inc",
+    "sha256": "9098e39fb2f752f651b86c7071a96d112a088a38df799ab8289c0fdf1c5d6bab"
+  },
+  {
+    "path": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_high_generic_dielectric.inc",
+    "sha256": "86b733f07cbd7362ab1bd8bec02b45752b338380c4f0491414b04299d7a1b500"
+  },
+  {
+    "path": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_high_opaque_fast.inc",
+    "sha256": "77e4a0025d7797fbfc1faf2a9700b1678923a91aa7a08079996d5ecb35b6a5fe"
+  },
+  {
+    "path": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_mobile_generic_dielectric.inc",
+    "sha256": "c3d2745b253649c1e1787fb03aa327cc49ec5c386abad16879d97a795583c78d"
+  },
+  {
+    "path": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_mobile_opaque_fast.inc",
+    "sha256": "36fffb1ede63943b6c8e63b092ce302b48d0b0783a99e6bc38865b06e481c412"
+  },
+  {
+    "path": "src/vulkan/raytracing/variants/rayquery_compute_shipping_high_generic_dielectric.inc",
+    "sha256": "a1976a2244459c4c5ea4ce80c3ae18f76a12a6166248b6f3bc866ef2e575ff86"
+  },
+  {
+    "path": "src/vulkan/raytracing/variants/rayquery_compute_shipping_high_opaque_fast.inc",
+    "sha256": "9d5ff7609b01e8342eb2992040c95e451ac79b4f3351b901564f9f2f4d161283"
+  },
+  {
+    "path": "src/vulkan/raytracing/variants/rayquery_compute_shipping_mobile_generic_dielectric.inc",
+    "sha256": "e556c9433a3ebda38558efe80b042f79145a23479a06110c62044649cfd6bee4"
+  },
+  {
+    "path": "src/vulkan/raytracing/variants/rayquery_compute_shipping_mobile_opaque_fast.inc",
+    "sha256": "b4d7ee0207a20001d1162b66aebd6ddc02b4e666887a7a94776ceb8f82635ffc"
+  },
+  {
+    "path": "src/vulkan/raytracing/variants/shipping_high_generic_dielectric.inc",
+    "sha256": "bc8625ce24d04bbc31efc73f6fd862cd2b0b9e6f031483b22a4d9b96bc7e82fa"
+  },
+  {
+    "path": "src/vulkan/raytracing/variants/shipping_high_opaque_fast.inc",
+    "sha256": "4f657ddabe381041d9a23d2fd734a3bc6236f7623453ccbd8bcb1f66aaa3717a"
+  },
+  {
+    "path": "src/vulkan/raytracing/variants/shipping_mobile_generic_dielectric.inc",
+    "sha256": "ffdd2656476ec74dc7c168043eb0662497f9ec4ae1ca2231e60e86e886bb7438"
+  },
+  {
+    "path": "src/vulkan/raytracing/variants/shipping_mobile_opaque_fast.inc",
+    "sha256": "500de910f0e00b038507368b5212ff16a00204be6cf8c7acf4ed386c2e2868a6"
+  }
+]
