@@ -78,6 +78,29 @@ Their original failures remain recorded in the receipt and ignored local logs.
 The PR remains draft with base conflicts. This milestone does not merge main,
 rewrite history, change released 1.6.2 artifacts or relax shader budgets.
 
+### Exact-commit CI follow-up
+
+[Run 38094375607](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/38094375607)
+on `2dd45a50b16a0d5bc2746c31b39d4f52c28099dd` passed Android Debug,
+Vulkan host and selected sanitizers. GCC and Clang each passed 114/115 tests;
+MSVC passed 123/126. The retained failures exposed two integration mistakes:
+
+- The subtitle fixture configured the Windows manifest a second time, violating
+  the existing single-template version contract. It now shares the one generated
+  manifest with the game, including in non-Vulkan Windows test builds.
+- Windows auto-CRLF checkout changed hash-pinned forest package text and its
+  runtime manifest. Scoped attributes now preserve original source bytes and
+  canonical LF runtime JSON. No expected hashes or asset assertions changed.
+
+Local correction checks: unchanged version contract PASS (0.55 s), full asset
+policy PASS (126.65 s), native subtitle bitmap fixture PASS, forest source/texel
+checks PASS. A separate auto-CRLF index export verified exact hashes for all 27
+archived/runtime text payloads in that selection. The first export also included
+new derivative receipts with local CRLF, which are not original archive bytes;
+their explicit canonical-LF rule avoids changing the source package policy.
+Remote correction CI must be verified on the subsequent commit; these local
+results do not retroactively turn the failed run green.
+
 ## Next chapter work
 
 The new topo-derived Blender masters remain separate source candidates. Native

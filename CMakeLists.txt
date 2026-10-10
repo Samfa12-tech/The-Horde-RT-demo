@@ -289,13 +289,18 @@ if(WIN32)
     endif()
 endif()
 
-if(HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW AND WIN32)
+if(WIN32)
     set(HORDE_RT_WINDOWS_RESOURCE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/generated/windows")
     file(MAKE_DIRECTORY "${HORDE_RT_WINDOWS_RESOURCE_DIRECTORY}")
-    configure_file(src/platform/windows/HordeLanternRT.rc.in
-        "${HORDE_RT_WINDOWS_RESOURCE_DIRECTORY}/HordeLanternRT.rc" @ONLY)
+    # The game and native subtitle fixture share one versioned compatibility
+    # manifest. Portable Windows tests also need it without the Vulkan target.
     configure_file(src/platform/windows/HordeLanternRT.manifest.in
         "${HORDE_RT_WINDOWS_RESOURCE_DIRECTORY}/HordeLanternRT.manifest" @ONLY)
+endif()
+
+if(HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW AND WIN32)
+    configure_file(src/platform/windows/HordeLanternRT.rc.in
+        "${HORDE_RT_WINDOWS_RESOURCE_DIRECTORY}/HordeLanternRT.rc" @ONLY)
 
     add_executable(horde_rt_diagnostic_window WIN32
         src/platform/windows/DiagnosticWindowMain.cpp
@@ -924,10 +929,8 @@ if(BUILD_TESTING)
     if(WIN32)
         add_executable(horde_rt_windows_subtitle_bitmap_tests tests/WindowsSubtitleBitmapTests.cpp)
         target_include_directories(horde_rt_windows_subtitle_bitmap_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
-        configure_file(src/platform/windows/HordeLanternRT.manifest.in
-            "${CMAKE_CURRENT_BINARY_DIR}/SubtitleBitmapTests.manifest" @ONLY)
         target_sources(horde_rt_windows_subtitle_bitmap_tests PRIVATE
-            "${CMAKE_CURRENT_BINARY_DIR}/SubtitleBitmapTests.manifest")
+            "${HORDE_RT_WINDOWS_RESOURCE_DIRECTORY}/HordeLanternRT.manifest")
         add_test(NAME horde_rt_windows_subtitle_bitmap_tests COMMAND horde_rt_windows_subtitle_bitmap_tests)
     endif()
 
