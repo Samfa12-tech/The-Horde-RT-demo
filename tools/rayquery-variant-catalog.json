@@ -98,7 +98,7 @@
       },
       {
         "path": "shaders/raytracing/include/rt_atmosphere.glsl",
-        "sha256": "06ededde2bb77fb15aea75747212f8579ef9027b8aaa972bab28b8b0c4d96fe3"
+        "sha256": "48f47db9214ad8f085091793f3c4bc7259a2f7788775d6b199792439b6900edc"
       },
       {
         "path": "shaders/raytracing/include/rt_indoor_dust.glsl",
@@ -119,7 +119,7 @@
       "stage": "comp",
       "executionModel": "GLCompute",
       "artifactPath": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_high_generic_dielectric.inc",
-      "dependencySha256": "69d5841831be328468165fe4681bf4c9c33653dd09a2d327a4fc889c2ea5a50c",
+      "dependencySha256": "735026a5c7cc918ea5a07afaddb776137b430801bd6ed621a7cad886306538a9",
       "dependencies": [
         {
           "path": "shaders/raytracing/minimal.comp",
@@ -171,18 +171,18 @@
         },
         {
           "path": "shaders/raytracing/include/rt_atmosphere.glsl",
-          "sha256": "06ededde2bb77fb15aea75747212f8579ef9027b8aaa972bab28b8b0c4d96fe3"
+          "sha256": "48f47db9214ad8f085091793f3c4bc7259a2f7788775d6b199792439b6900edc"
         },
         {
           "path": "shaders/raytracing/include/rt_indoor_dust.glsl",
           "sha256": "89cdb898388dfeeff25227c4efde8f4ca9f2e851d4309d949bf3a767b55e3bf5"
         }
       ],
-      "includeSha256": "86b733f07cbd7362ab1bd8bec02b45752b338380c4f0491414b04299d7a1b500",
-      "spirvSha256": "2c405c8c02ff22e207f2dd80078ebe920dc1dfc04b54d72e7c164c2bc261ee49",
-      "bytes": 295788,
-      "words": 73947,
-      "instructions": 17637,
+      "includeSha256": "d77c61b8435f66e83e311079916f1e0f18f603a415e6c24d4318fcb20575bf69",
+      "spirvSha256": "dec03f19fefc361f67f7f0e242ff585f05e64f6ac3e4c88cb63061d43cf3f4c4",
+      "bytes": 295980,
+      "words": 73995,
+      "instructions": 17647,
       "branchOperations": 981,
       "loops": 21,
       "selectionMerges": 414,
@@ -239,7 +239,7 @@
       "stage": "comp",
       "executionModel": "GLCompute",
       "artifactPath": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_high_opaque_fast.inc",
-      "dependencySha256": "ad13c7530f88c81f5f9d740041682e67bbecd9ecbfabebc15f8b856effd8613a",
+      "dependencySha256": "e729c8bf9fee587c655848df0344ccc4e91991db6c3e391ba25028668cae13a2",
       "dependencies": [
         {
           "path": "shaders/raytracing/minimal.comp",
@@ -291,18 +291,18 @@
         },
         {
           "path": "shaders/raytracing/include/rt_atmosphere.glsl",
-          "sha256": "06ededde2bb77fb15aea75747212f8579ef9027b8aaa972bab28b8b0c4d96fe3"
+          "sha256": "48f47db9214ad8f085091793f3c4bc7259a2f7788775d6b199792439b6900edc"
         },
         {
           "path": "shaders/raytracing/include/rt_indoor_dust.glsl",
           "sha256": "89cdb898388dfeeff25227c4efde8f4ca9f2e851d4309d949bf3a767b55e3bf5"
         }
       ],
-      "includeSha256": "77e4a0025d7797fbfc1faf2a9700b1678923a91aa7a08079996d5ecb35b6a5fe",
-      "spirvSha256": "8d2cf318bee6e16bca5787c7404b6ac3e013ae6827106f3c4bfb949c6bcaef3e",
-      "bytes": 591800,
-      "words": 147950,
-      "instructions": 32793,
+      "includeSha256": "da92478dde32e1fff35123a4eb0fe60475825a2d5e68c8351a994ab20231d23f",
+      "spirvSha256": "093711e01b0edb08eb8312094653b6ae4499034b9c59722dd6db6b94a7768c8d",
+      "bytes": 592372,
+      "words": 148093,
+      "instructions": 32820,
       "branchOperations": 4538,
       "loops": 84,
       "selectionMerges": 1821,
@@ -356,7 +356,7 @@
       "stage": "comp",
       "executionModel": "GLCompute",
       "artifactPath": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_mobile_generic_dielectric.inc",
-      "dependencySha256": "a0aa00cd3830eb1eb5fb7b94752487235bc9d345d96844b5ee015202a50ce74d",
+      "dependencySha256": "901406be2bbc57ed33615ed06fe2be46fc3d378b5c2b579b68ed080aca12f0e4",
       "dependencies": [
         {
           "path": "shaders/raytracing/minimal.comp",
@@ -408,18 +408,18 @@
         },
         {
           "path": "shaders/raytracing/include/rt_atmosphere.glsl",
-          "sha256": "06ededde2bb77fb15aea75747212f8579ef9027b8aaa972bab28b8b0c4d96fe3"
+          "sha256": "48f47db9214ad8f085091793f3c4bc7259a2f7788775d6b199792439b6900edc"
         },
         {
           "path": "shaders/raytracing/include/rt_indoor_dust.glsl",
           "sha256": "89cdb898388dfeeff25227c4efde8f4ca9f2e851d4309d949bf3a767b55e3bf5"
         }
       ],
-      "includeSha256": "c3d2745b253649c1e1787fb03aa327cc49ec5c386abad16879d97a795583c78d",
-      "spirvSha256": "d0963fb6a08b96e81daa6ffd139e060a12c36efee449e40a6b5f8f62f148324d",
-      "bytes": 294288,
-      "words": 73572,
-      "instructions": 17541,
+      "includeSha256": "859af12b0b6a35b7c0d783bc88cd0ccfc3145fbd47c00797a8faf42674b03c06",
+      "spirvSha256": "b38489dbccc39bbe5eb3071c83ae0f7e22eedad52f99e4864009386d0502dc7c",
+      "bytes": 294480,
+      "words": 73620,
+      "instructions": 17551,
       "branchOperations": 972,
       "loops": 20,
       "selectionMerges": 412,
@@ -476,7 +476,7 @@
       "stage": "comp",
       "executionModel": "GLCompute",
       "artifactPath": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_mobile_opaque_fast.inc",
-      "dependencySha256": "ad256090a0adef8bc2196937b4f6249fc7e9be2bb1780854f0e421f252fce623",
+      "dependencySha256": "767713e6810c90bd9819a87f62f2e9e92c98c2cd9b106ed280371d4e0504d982",
       "dependencies": [
         {
           "path": "shaders/raytracing/minimal.comp",
@@ -528,18 +528,18 @@
         },
         {
           "path": "shaders/raytracing/include/rt_atmosphere.glsl",
-          "sha256": "06ededde2bb77fb15aea75747212f8579ef9027b8aaa972bab28b8b0c4d96fe3"
+          "sha256": "48f47db9214ad8f085091793f3c4bc7259a2f7788775d6b199792439b6900edc"
         },
         {
           "path": "shaders/raytracing/include/rt_indoor_dust.glsl",
           "sha256": "89cdb898388dfeeff25227c4efde8f4ca9f2e851d4309d949bf3a767b55e3bf5"
         }
       ],
-      "includeSha256": "36fffb1ede63943b6c8e63b092ce302b48d0b0783a99e6bc38865b06e481c412",
-      "spirvSha256": "54e0d2f6eeeeb9130a288daac635d87c43820b743507fbbc04e48f5845a70885",
-      "bytes": 588700,
-      "words": 147175,
-      "instructions": 32600,
+      "includeSha256": "1599c4f363f4fc96219735f31d695652332e42a54203a76eca9f83876fb11524",
+      "spirvSha256": "26827e4b5c68037d945ac05c749300e49d36652f55e0599c332fffd0f1b38a58",
+      "bytes": 589272,
+      "words": 147318,
+      "instructions": 32627,
       "branchOperations": 4502,
       "loops": 80,
       "selectionMerges": 1811,
@@ -593,7 +593,7 @@
       "stage": "comp",
       "executionModel": "GLCompute",
       "artifactPath": "src/vulkan/raytracing/variants/rayquery_compute_shipping_high_generic_dielectric.inc",
-      "dependencySha256": "4d8e2bbd02de135d1df8d504b77f1ebd977c7e6c4c7b6885ac7b39a3dfff75e9",
+      "dependencySha256": "2e156c954d7df80369125c15d49be398b514a61c6b902ca736b10e2ba4b0fd14",
       "dependencies": [
         {
           "path": "shaders/raytracing/minimal.comp",
@@ -645,18 +645,18 @@
         },
         {
           "path": "shaders/raytracing/include/rt_atmosphere.glsl",
-          "sha256": "06ededde2bb77fb15aea75747212f8579ef9027b8aaa972bab28b8b0c4d96fe3"
+          "sha256": "48f47db9214ad8f085091793f3c4bc7259a2f7788775d6b199792439b6900edc"
         },
         {
           "path": "shaders/raytracing/include/rt_indoor_dust.glsl",
           "sha256": "89cdb898388dfeeff25227c4efde8f4ca9f2e851d4309d949bf3a767b55e3bf5"
         }
       ],
-      "includeSha256": "a1976a2244459c4c5ea4ce80c3ae18f76a12a6166248b6f3bc866ef2e575ff86",
-      "spirvSha256": "37d6fae6a2ad7266ab9473a49d65e02844ad30e5795303e96d79c9aeec363c3c",
-      "bytes": 286960,
-      "words": 71740,
-      "instructions": 17213,
+      "includeSha256": "def4d5b0db99a2a18cf208fe6ac0d87b69cbbfa96f3b90b4b9c6451fc802af2e",
+      "spirvSha256": "0ff4029639bbc38e3a1a775f3a9f00ec7a422e4cc087608ffa284faf193902a7",
+      "bytes": 287152,
+      "words": 71788,
+      "instructions": 17223,
       "branchOperations": 934,
       "loops": 21,
       "selectionMerges": 386,
@@ -713,7 +713,7 @@
       "stage": "comp",
       "executionModel": "GLCompute",
       "artifactPath": "src/vulkan/raytracing/variants/rayquery_compute_shipping_high_opaque_fast.inc",
-      "dependencySha256": "5883c1b3c38995533d14522536562099d2dcb449602efbc5661cd654d2ba7f25",
+      "dependencySha256": "985680de7663a0e334b22d5f3d53b4c839105406858e681c29a5c8e420142849",
       "dependencies": [
         {
           "path": "shaders/raytracing/minimal.comp",
@@ -765,18 +765,18 @@
         },
         {
           "path": "shaders/raytracing/include/rt_atmosphere.glsl",
-          "sha256": "06ededde2bb77fb15aea75747212f8579ef9027b8aaa972bab28b8b0c4d96fe3"
+          "sha256": "48f47db9214ad8f085091793f3c4bc7259a2f7788775d6b199792439b6900edc"
         },
         {
           "path": "shaders/raytracing/include/rt_indoor_dust.glsl",
           "sha256": "89cdb898388dfeeff25227c4efde8f4ca9f2e851d4309d949bf3a767b55e3bf5"
         }
       ],
-      "includeSha256": "9d5ff7609b01e8342eb2992040c95e451ac79b4f3351b901564f9f2f4d161283",
-      "spirvSha256": "c79a0bed730727ada945979da7e1bee47ab592b9ced9f4283b81b6669c06bd3a",
-      "bytes": 587564,
-      "words": 146891,
-      "instructions": 32614,
+      "includeSha256": "f133eba6f271a82960137b0ec44915b0085aa52da6e689cc73866040ddf50736",
+      "spirvSha256": "44d81bcc71f4366236792d8b9af8aff8502bd28b128fd0c2572f12793ec697ac",
+      "bytes": 588136,
+      "words": 147034,
+      "instructions": 32641,
       "branchOperations": 4516,
       "loops": 84,
       "selectionMerges": 1812,
@@ -830,7 +830,7 @@
       "stage": "comp",
       "executionModel": "GLCompute",
       "artifactPath": "src/vulkan/raytracing/variants/rayquery_compute_shipping_mobile_generic_dielectric.inc",
-      "dependencySha256": "5841ec216ecdb06be0ce16d9e755eabe32836c4791caf5e45ad541f2d30d52b7",
+      "dependencySha256": "61c8f06d5d0def7b1224a965a4298ad0d6bc8a79f994e8a6afdfadc6ca3252f2",
       "dependencies": [
         {
           "path": "shaders/raytracing/minimal.comp",
@@ -882,18 +882,18 @@
         },
         {
           "path": "shaders/raytracing/include/rt_atmosphere.glsl",
-          "sha256": "06ededde2bb77fb15aea75747212f8579ef9027b8aaa972bab28b8b0c4d96fe3"
+          "sha256": "48f47db9214ad8f085091793f3c4bc7259a2f7788775d6b199792439b6900edc"
         },
         {
           "path": "shaders/raytracing/include/rt_indoor_dust.glsl",
           "sha256": "89cdb898388dfeeff25227c4efde8f4ca9f2e851d4309d949bf3a767b55e3bf5"
         }
       ],
-      "includeSha256": "e556c9433a3ebda38558efe80b042f79145a23479a06110c62044649cfd6bee4",
-      "spirvSha256": "609c24dc514b8185a3d2d71bbdef99d27e17d9323f7a827b377e9c9c8c9d1635",
-      "bytes": 285460,
-      "words": 71365,
-      "instructions": 17117,
+      "includeSha256": "6402bd72ca93b48e8cca03069fbc611379cbcd56382f6fe44aa0df0834c20d95",
+      "spirvSha256": "fa9ff2db02287987b077745d4e72268c689de82aff6930587f883faffbd818ad",
+      "bytes": 285652,
+      "words": 71413,
+      "instructions": 17127,
       "branchOperations": 925,
       "loops": 20,
       "selectionMerges": 384,
@@ -950,7 +950,7 @@
       "stage": "comp",
       "executionModel": "GLCompute",
       "artifactPath": "src/vulkan/raytracing/variants/rayquery_compute_shipping_mobile_opaque_fast.inc",
-      "dependencySha256": "36f4c23bcbd92be1e20ef3aab735d11c74d960e3a9ffde551a216e7150994054",
+      "dependencySha256": "ba19414e615fb8cb99a47cdc9e8f57bac99926bc38d9186515594590bcce3202",
       "dependencies": [
         {
           "path": "shaders/raytracing/minimal.comp",
@@ -1002,18 +1002,18 @@
         },
         {
           "path": "shaders/raytracing/include/rt_atmosphere.glsl",
-          "sha256": "06ededde2bb77fb15aea75747212f8579ef9027b8aaa972bab28b8b0c4d96fe3"
+          "sha256": "48f47db9214ad8f085091793f3c4bc7259a2f7788775d6b199792439b6900edc"
         },
         {
           "path": "shaders/raytracing/include/rt_indoor_dust.glsl",
           "sha256": "89cdb898388dfeeff25227c4efde8f4ca9f2e851d4309d949bf3a767b55e3bf5"
         }
       ],
-      "includeSha256": "b4d7ee0207a20001d1162b66aebd6ddc02b4e666887a7a94776ceb8f82635ffc",
-      "spirvSha256": "2bc7e361288cd14314afb81d340800feb8b3ca84e528bf9b7391dd21727837e4",
-      "bytes": 584464,
-      "words": 146116,
-      "instructions": 32421,
+      "includeSha256": "d8c0c8002219de08c3674c5f00feed4e6531115c47a6107a6c405b66bd587551",
+      "spirvSha256": "fb9036ce5b85682cb5727cf9c701e8a3e666cf87caeee6a1c81d22aea6f573ac",
+      "bytes": 585036,
+      "words": 146259,
+      "instructions": 32448,
       "branchOperations": 4480,
       "loops": 80,
       "selectionMerges": 1802,

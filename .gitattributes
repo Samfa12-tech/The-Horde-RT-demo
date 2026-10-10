@@ -19,6 +19,8 @@ docs/evidence/2026-10-02-backend-pixel-witness/**/*.log whitespace=-trailing-spa
 assets/audio/pixabay/water_*step*.wav filter=lfs diff=lfs merge=lfs -text
 assets/audio/pixabay/water_stream_contact*.wav filter=lfs diff=lfs merge=lfs -text
 assets/audio/pixabay/water-contact.manifest.json text eol=lf
+assets/audio/pixabay/keeper_death*.wav filter=lfs diff=lfs merge=lfs -text
+assets/audio/pixabay/keeper-death.manifest.json text eol=lf
 
 # Public package policy pins the player Rag manifest's exact LF bytes.
 assets/models/props/runtime/player-rag-torch/asset.manifest.json text eol=lf
@@ -279,3 +281,6 @@ assets/source/beyond_the_tomb/**/*.png filter=lfs diff=lfs merge=lfs -text
 assets/models/world/runtime/prepared-funerary-v01/**/*.json text eol=lf
 assets/models/world/runtime/tomb-dressing-v01/tomb-niche-*/**/*.json text eol=lf
 docs/evidence/2026-10-10-tomb-polish/** -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+
+# Preserve measured authoring recipe bytes across native checkouts.
+tools/author-tomb-dressing.py text eol=lf

@@ -528,6 +528,10 @@ struct LichSnapshot
     int health = 3;
     bool damagePulse = false;
     bool dischargeWarningPulse = false;
+    // Live readable cast presentation; deterministic legacy captures stay unchanged.
+    bool readableCastPresentation = false;
+    // Live encounter medium only; legacy capture imports retain their density.
+    float roomMistDensityScale = 1.0f;
     bool hitPulse = false;
     bool deathAnimationComplete = false;
     FinaleEndingPhase finaleEndingPhase = FinaleEndingPhase::Inactive;
@@ -544,6 +548,7 @@ public:
                                bool revealMayStart = true)
     {
         deltaSeconds = std::clamp(deltaSeconds, 0.0f, 0.05f);
+        snapshot_.readableCastPresentation = readableCombat_ && !legacyCapture_;
         snapshot_.damagePulse = false;
         snapshot_.dischargeWarningPulse = false;
         snapshot_.hitCooldownRemaining = std::max(0.0f, snapshot_.hitCooldownRemaining - deltaSeconds);
@@ -559,6 +564,11 @@ public:
         // authored Dead clip has reached its clamped final pose.
         if (snapshot_.phase == LichPhase::Dead)
         {
+            deathPresentationTime_ = std::min(kDeathAnimationDuration + kMistDeathDelay + kMistDeathFade,
+                                            deathPresentationTime_ + deltaSeconds);
+            if (readableCombat_ && !legacyCapture_)
+                snapshot_.roomMistDensityScale = 1.0f - SmoothStep(
+                    (deathPresentationTime_ - kDeathAnimationDuration - kMistDeathDelay) / kMistDeathFade);
             const float deathTimeRemaining = std::max(0.0f, kDeathAnimationDuration - snapshot_.phaseTime);
             const float deathDelta = std::min(deltaSeconds, deathTimeRemaining);
             snapshot_.phaseTime = std::min(kDeathAnimationDuration, snapshot_.phaseTime + deathDelta);
@@ -741,6 +751,7 @@ public:
         hitPulseTime_ = 0.0f;
         hitRecoilTime_ = 0.0f;
         combatTime_ = 0.0f;
+        deathPresentationTime_ = 0.0f;
         legacyCapture_ = false;
         dischargeWarningEmitted_ = false;
     }
@@ -783,6 +794,8 @@ public:
     static constexpr float kChargeAnticipationTiltRadians = 0.10f;
     static constexpr float kRecoveryDuration = 1.80f;
     static constexpr float kDeathAnimationDuration = 2.967f;
+    static constexpr float kMistDeathDelay = 1.0f;
+    static constexpr float kMistDeathFade = 1.0f;
     static constexpr float kFinaleSkylightOpenDuration =
         horde::gameplay::interactions::kFinaleSkylightOpenSeconds;
     static constexpr float kFinaleDawnRevealDuration =
@@ -865,6 +878,8 @@ private:
 
     void BeginDeath()
     {
+        deathPresentationTime_ = 0.0f;
+        snapshot_.roomMistDensityScale = 1.0f;
         deathStartY_ = snapshot_.y;
         snapshot_.phase = LichPhase::Dead;
         snapshot_.revealPhase = KeeperRevealPhase::Defeated;
@@ -951,6 +966,7 @@ private:
     float hitRecoilTime_ = 0.0f;
     float combatTime_ = 0.0f;
     float deathStartY_ = kBaseY;
+    float deathPresentationTime_ = 0.0f;
     bool legacyCapture_ = false;
 };
 

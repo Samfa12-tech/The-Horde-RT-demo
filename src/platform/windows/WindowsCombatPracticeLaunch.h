@@ -12,6 +12,7 @@ enum class WindowsCombatPractice : unsigned char { None, Parry, Keeper };
 struct WindowsCombatPracticeLaunch
 {
     WindowsCombatPractice practice = WindowsCombatPractice::None;
+    bool teachingSlowdown = false;
     std::string error;
 };
 
@@ -23,7 +24,12 @@ inline WindowsCombatPracticeLaunch ParseWindowsCombatPracticeLaunch(
     bool sawKeeper = false;
     for (const std::wstring_view argument : arguments)
     {
-        if (argument == L"--development-combat-practice")
+        if (argument == L"--development-teaching-slowdown")
+        {
+            if (result.teachingSlowdown) result.error = "--development-teaching-slowdown may only be specified once.";
+            result.teachingSlowdown = true;
+        }
+        else if (argument == L"--development-combat-practice")
         {
             if (sawParry) result.error = "--development-combat-practice may only be specified once.";
             sawParry = true;
@@ -35,7 +41,7 @@ inline WindowsCombatPracticeLaunch ParseWindowsCombatPracticeLaunch(
         }
     }
     if (!result.error.empty()) return result;
-    if (!sawParry && !sawKeeper) return result;
+    if (!sawParry && !sawKeeper && !result.teachingSlowdown) return result;
     if (!debugBuild)
     {
         result.error = "Development combat practice is Debug-only.";
@@ -64,7 +70,8 @@ inline WindowsCombatPracticeLaunch ParseWindowsCombatPracticeLaunch(
             }
         }
     }
-    result.practice = sawKeeper ? WindowsCombatPractice::Keeper : WindowsCombatPractice::Parry;
+    result.practice = sawKeeper ? WindowsCombatPractice::Keeper :
+        sawParry ? WindowsCombatPractice::Parry : WindowsCombatPractice::None;
     return result;
 }
 } // namespace horde::platform::windows

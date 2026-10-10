@@ -16,6 +16,15 @@ int main()
     {
         if (!value) { passed = false; std::cerr << message << '\n'; }
     };
+    const auto eased = ParseWindowsCombatPracticeLaunch({L"--development-rescue-journey", L"--development-teaching-slowdown"});
+    check(eased.error.empty() && eased.teachingSlowdown && eased.practice == WindowsCombatPractice::None,
+          "explicit eased journey keeps the ordinary route and opts into lesson slowdown");
+    check(!ParseWindowsCombatPracticeLaunch({L"--development-teaching-slowdown"}, false).error.empty(),
+          "eased teaching launch is Debug-only");
+    check(!ParseWindowsCombatPracticeLaunch({L"--development-teaching-slowdown", L"--capture-showcase"}).error.empty(),
+          "eased interactive teaching cannot contaminate a frozen capture");
+    check(!ParseWindowsCombatPracticeLaunch({L"--development-teaching-slowdown", L"--development-teaching-slowdown"}).error.empty(),
+          "duplicate teaching launch flags are rejected");
     const auto parry = ParseWindowsCombatPracticeLaunch({L"--development-combat-practice"});
     check(parry.error.empty() && parry.practice == WindowsCombatPractice::Parry,
           "parry practice launch is admitted in Debug");

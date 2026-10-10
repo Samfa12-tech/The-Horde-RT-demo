@@ -12,6 +12,7 @@ import hashlib
 import json
 import math
 import struct
+import sys
 from pathlib import Path
 
 import bpy
@@ -160,7 +161,7 @@ def arch_stone(name, theta0, theta1, inner, outer, zc, front_y, depth,
 
 
 def make_rect_niche(target, stone):
-    # Overall module: 1.28 W x .54 D x 1.60 H; real .30 m deep opening.
+    # Authored at 1.28 W x .54 D x 1.60 H, then resized to the fitted wall cut.
     bevelled_box("rect_rear_wall", (0, 0.21, 0.80), (1.28, 0.12, 1.60),
                  stone, target, 0.008)
     bevelled_box("rect_left_mass", (-0.49, -0.025, 0.80), (0.30, 0.39, 1.60),
@@ -369,10 +370,12 @@ def create_assets(stone, bone, wax):
     definitions = {}
     rect = collection("TombNiche_Rectangular_RealRecess")
     make_rect_niche(rect, stone)
+    resize_geometry(rect, (0.734375, 0.87, 0.78125))
     definitions["tomb-niche-rect"] = (rect, "A rect-headed recessed burial alcove with stone returns and load-bearing shelf.")
 
     arch = collection("TombNiche_Arched_RealRecess")
     make_arch_niche(arch, stone)
+    resize_geometry(arch, (0.734375, 0.87, 0.78125))
     definitions["tomb-niche-arched"] = (arch, "A voussoir-framed arched burial alcove with deep side returns and a stone shelf.")
 
     skull = collection("TombSkull_Original")
@@ -426,6 +429,20 @@ def create_assets(stone, bone, wax):
                  (0.92, 0.44, 0.05), stone, group, 0.012)
     definitions["funerary-group"] = (group, "Compact grouped funerary dressing: skull, femur, ribs, and one extinguished non-emissive candle on a low stone plinth.")
     return definitions
+
+
+def resize_geometry(group, scale):
+    # Bake the proportions into the reusable source mesh so the shelf, returns,
+    # lintel and closed rear wall retain one consistent fitted scale.
+    for obj in group.objects:
+        if obj.type != "MESH":
+            continue
+        for axis in range(3):
+            obj.location[axis] *= scale[axis]
+        for vertex in obj.data.vertices:
+            for axis in range(3):
+                vertex.co[axis] *= scale[axis]
+        obj.data.update()
 
 
 def deselect_all():
@@ -484,9 +501,13 @@ def canonicalize_glb(path):
                     for i in range(vertex_count)]
             ordered_keys = sorted(set(keys))
             key_to_index = {key: index for index, key in enumerate(ordered_keys)}
+            key_to_source_row = {key: index for index, key in enumerate(keys)}
             remap = [key_to_index[key] for key in keys]
             for _, accessor_index, view_index, rows in row_sets:
-                canonical_rows = [rows[key_to_index[key]] for key in ordered_keys]
+                # Remap each attribute by the source vertex that owns the full
+                # position/normal/UV key. key_to_index is the *new* vertex
+                # number and cannot be used as an index into this old row list.
+                canonical_rows = [rows[key_to_source_row[key]] for key in ordered_keys]
                 if view_index in rewritten_views:
                     raise RuntimeError(f"{path.name} shares a vertex bufferView unexpectedly")
                 rewritten_views[view_index] = b"".join(canonical_rows)
@@ -727,14 +748,21 @@ def main():
     wax = material(WAX, (0.57, 0.48, 0.31), 0.84)
     definitions = create_assets(stone, bone, wax)
     deselect_all()
+    # Blender rotates the saved source into .blend1 unless versioned backups are disabled.
+    # Preserve any existing recovery copy before this authorized source save.
+    bpy.context.preferences.filepaths.save_version = 0
     bpy.ops.wm.save_as_mainfile(filepath=str(BLEND_PATH))
     source_hash = hashlib.sha256(BLEND_PATH.read_bytes()).hexdigest()
     script_hash = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
-    write_manifests(definitions, source_hash, script_hash)
-    render_previews(definitions)
+    niches_only = "--niches-only" in sys.argv
+    selected = {key: value for key, value in definitions.items()
+                if not niches_only or key in {"tomb-niche-rect", "tomb-niche-arched"}}
+    write_manifests(selected, source_hash, script_hash)
+    if not niches_only:
+        render_previews(definitions)
     print("TOMB_DRESSING_SOURCE_SHA256=" + source_hash)
     print("TOMB_DRESSING_SCRIPT_SHA256=" + script_hash)
-    for asset_id, (group, _) in definitions.items():
+    for asset_id, (group, _) in selected.items():
         print("TOMB_DRESSING_ASSET=" + json.dumps({"asset": asset_id, **mesh_summary(group)}))
 
 

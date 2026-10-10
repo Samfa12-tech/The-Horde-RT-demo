@@ -708,7 +708,12 @@ struct PresentableTinyRtSceneObservationTestAccess
         if (!baselineLoaded || !tombLoaded)
         { std::cerr << "Integrated tomb intake: " << diagnostic << '\n'; return false; }
         const auto oldIndices = baseline.collapseStaticAsset_.indices.size();
-        bool ok = tomb.collapseStaticAsset_.indices.size() == oldIndices + 46140u &&
+        // Original selected dressing plus two T03 candle stubs (664 each),
+        // one offering bowl (960), and the closed 12-triangle lintel lip.
+        constexpr std::size_t addedIndices = 46140u + (2u*664u + 960u + 12u)*3u;
+        bool ok = tomb.collapseStaticAsset_.indices.size() == oldIndices + addedIndices &&
+                  tomb.staticMeshSlot_.PrimitiveMetadata().size() == 28u &&
+                  tomb.staticMeshSlot_.Materials().size() == 26u &&
                   tomb.staticMeshSlot_.PrimitiveMetadata().size() <= 32u &&
                   tomb.staticMeshSlot_.Materials().size() <= 32u;
         std::cout << "Integrated native tomb static roster: "

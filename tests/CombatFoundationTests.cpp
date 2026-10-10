@@ -1,3 +1,4 @@
+#include "gameplay/effects/KeeperCastPresentation.h"
 #include "gameplay/simulation/GameSimulation.h"
 #include "gameplay/ShowcaseCheckpoints.h"
 #include "gameplay/CorridorCollision.h"
@@ -59,6 +60,10 @@ void TeachingContract() {
     teaching.Update(true,true,false,combat,keeper,EnemyKind::Skeleton);
     Check(teaching.Snapshot().cue==CombatTeachingCue::ParryNow&&
           Near(teaching.Snapshot().simulationTimeScale,.25f),"optional quarter-speed ease is narrowly tied to an unlearned parry prompt");
+    teaching.Update(true,false,false,combat,keeper,EnemyKind::Skeleton);
+    Check(teaching.Snapshot().cue==CombatTeachingCue::ParryNow &&
+          !teaching.Snapshot().slowdownActive && Near(teaching.Snapshot().simulationTimeScale,1.0f),
+          "saved slowdown opt-out explains an unslowed live lesson without changing contact timing");
     teaching.Update(true,true,true,combat,keeper,EnemyKind::Skeleton);
     Check(!teaching.Snapshot().safePractice&&!teaching.Snapshot().slowdownActive&&
           Near(teaching.Snapshot().simulationTimeScale,1.0f)&&teaching.Snapshot().promptOpacity==0.0f,
@@ -116,6 +121,9 @@ void KeeperContract() {
     float warningLight=0.0f,warningTilt=0.0f;
     for(int i=0;i<130 && pulses==0;++i) {
         keeper.Update(1.0f/60,target.x+4,target.z,true,true);
+        if(keeper.Snapshot().phase==LichPhase::Charging || keeper.Snapshot().phase==LichPhase::Repelling)
+            Check(effects::KeeperShaderPresentationKind(true,keeper.Snapshot())==1.0f,
+                  "charge glow and warning never render premature lightning");
         if(keeper.Snapshot().dischargeWarningPulse) {
             ++warning; warningTick=i; warningBefore=pulses==0;
             warningLight=keeper.Snapshot().staffLightStrength;
@@ -127,6 +135,8 @@ void KeeperContract() {
           "one damage pulse follows the one warning by the authored 300ms lead");
     Check(warningLight>1.9f&&warningLight<=LichEncounter::kStaffLightPeak&&warningTilt<-.07f,
           "charge warning uses a bounded late staff-glow surge and visible anticipatory pose");
+    Check(effects::KeeperShaderPresentationKind(true,keeper.Snapshot())==2.0f,
+          "real discharge boundary enables rendered lightning on the damage tick");
     Check(keeper.Snapshot().phase==LichPhase::Recovering&&
           Near(keeper.Snapshot().phaseTime,0.0f)&&
           Near(keeper.Snapshot().staffLightStrength,LichEncounter::kStaffLightPeak),
@@ -143,6 +153,8 @@ void KeeperContract() {
           keeper.Snapshot().phaseTime<LichEncounter::kRecoveryDuration&&
           LichEncounter::kRecoveryDuration==1.80f,
           "staff discharge glow ends while the independent 1.8s recovery continues");
+    Check(effects::KeeperShaderPresentationKind(true,keeper.Snapshot())==1.0f,
+          "ended discharge cannot leave lightning enabled during recovery");
     int recoveryDamagePulses=0,recoveryWarnings=0;
     for(int i=0;i<7;++i) {
         keeper.Update(0.05f,target.x+4,target.z,true,true);
@@ -157,10 +169,43 @@ void KeeperContract() {
     target=keeper.Snapshot(); Check(keeper.TryAcceptPlayerHit(target.x,target.z)&&keeper.Snapshot().phase==LichPhase::Dead&&
           keeper.Snapshot().health==0&&!keeper.Snapshot().damagePulse&&!keeper.Snapshot().dischargeWarningPulse,
           "lethal third hit cancels pending repel, charge and warning");
+    Check(effects::KeeperShaderPresentationKind(false,keeper.Snapshot())==0.0f &&
+          effects::KeeperShaderPresentationKind(true,keeper.Snapshot())==1.0f,
+          "death cancels live discharge and skeleton selection cannot render it");
+    LichEncounter legacy; legacy.ImportCombatCheckpoint();
+    Check(effects::KeeperShaderPresentationKind(true,legacy.Snapshot())==2.0f,
+          "historical imported captures preserve their presentation discriminator");
     for(int i=0;i<180;++i) {
         keeper.Update(1.0f/60,target.x+4,target.z,true,true);
         Check(!keeper.Snapshot().damagePulse&&!keeper.Snapshot().dischargeWarningPulse,"dead Keeper never replays queued damage");
     }
+    Check(keeper.Snapshot().deathAnimationComplete && Near(keeper.Snapshot().roomMistDensityScale,1.0f),
+          "room mist remains full after the authored death animation, during the one-second hold");
+    for(int i=0;i<19;++i) keeper.Update(.05f,target.x+4,target.z,true,true);
+    Check(Near(keeper.Snapshot().roomMistDensityScale,1.0f),
+          "mist cannot fade before death clip plus the full one-second delay");
+    keeper.Update(.017f,target.x+4,target.z,true,true);
+    Check(Near(keeper.Snapshot().roomMistDensityScale,1.0f),"mist starts from unchanged density at its hold boundary");
+    for(int i=0;i<10;++i) keeper.Update(.05f,target.x+4,target.z,true,true);
+    const float heldDensity=keeper.Snapshot().roomMistDensityScale;
+    Check(std::abs(heldDensity-.5f)<.001f &&
+          std::abs(effects::KeeperShaderPresentationKind(true,keeper.Snapshot())-.875f)<.001f,
+          "half fade reaches half extinction and scattering through the actual render discriminator");
+    for(int i=0;i<20;++i) keeper.Update(0,target.x+4,target.z,true,true);
+    Check(keeper.Snapshot().roomMistDensityScale==heldDensity,
+          "zero simulation ticks cannot advance the post-death dissolve");
+    for(int i=0;i<11;++i) keeper.Update(.05f,target.x+4,target.z,true,true);
+    Check(keeper.Snapshot().roomMistDensityScale==0 &&
+          effects::KeeperShaderPresentationKind(true,keeper.Snapshot())==.75f &&
+          !keeper.Snapshot().damagePulse && !keeper.Snapshot().dischargeWarningPulse,
+          "complete dissolve preserves Keeper classification and never restores damage or electricity");
+    keeper.BeginRetryRecognition();
+    Check(keeper.Snapshot().roomMistDensityScale==1 && keeper.Snapshot().health==3,
+          "retry discards death-clock density and restores the living encounter");
+    keeper.ImportCombatCheckpoint();
+    Check(keeper.Snapshot().roomMistDensityScale==1 &&
+          effects::KeeperShaderPresentationKind(true,keeper.Snapshot())==2,
+          "legacy capture import restores its exact full-density presentation");
 }
 void ActualIncomingHits() {
     for(int ticksBefore:{1,2,5,9,10,12}) {
@@ -445,6 +490,16 @@ void IntegratedKeeperRepelAndReward() {
           "live three-hit defeat cancels future repel/discharge and preserves ordered reward admission");
     Check(!sim.Snapshot().lich.damagePulse && sim.Snapshot().torchFailure.phase==TorchFailurePhase::Settled,
           "dead Keeper never restores attack or the failed held torch");
+    Check(sim.Snapshot().lich.roomMistDensityScale==0,
+          "actual fixed-step defeat/reward continuation publishes completed room-mist dissolve");
+    const auto paused=sim.Snapshot();
+    input.paused=true;
+    sim.AdvanceFrame(input,10.0);
+    Check(sim.Snapshot().lich.roomMistDensityScale==paused.lich.roomMistDensityScale,
+          "paused publication cannot restart or advance death presentation");
+    sim.RetryEncounter();
+    Check(sim.Snapshot().lich.roomMistDensityScale==1 && sim.Snapshot().lich.health==3,
+          "integrated retry restores full mist with the living Keeper");
 }
 }
 void OutgoingTraceContract() {

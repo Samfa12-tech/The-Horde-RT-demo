@@ -358,6 +358,7 @@ int main()
             ReadTextFile(root / "src/platform/windows/DiagnosticWindow.cpp");
         const std::string androidSource = ReadTextFile(
             root / "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java");
+        const std::string androidBuildSource = ReadTextFile(root / "android/app/build.gradle");
         const std::string androidBridgeSource =
             ReadTextFile(root / "android/app/src/main/cpp/android_probe_bridge.cpp");
         const std::string ambienceWorker = ReadTextFile(
@@ -384,13 +385,24 @@ int main()
               "both native positional-audio consumers must pass source and event-time listener Y metadata");
         check(windowsSource.find("PlayAmbientSoundEffect(context, clip, horde::audio::kPlayerFootstepCueGain)") !=
                   std::string::npos &&
+              windowsSource.find("event.intensity * horde::audio::kWetFootstepCueGain") !=
+                  std::string::npos &&
+              windowsSource.find("water_wet_step_3.wav") != std::string::npos &&
+              windowsSource.find("water_wet_step_4.wav") != std::string::npos &&
               windowsSource.find("GetPrivateProfileIntA(\"audio\", \"sfxVolume\"") != std::string::npos &&
               windowsSource.find("WritePrivateProfileStringA(\"audio\", \"sfxVolume\"") != std::string::npos &&
               windowsSource.find("kSfxVolumeSliderId") != std::string::npos &&
               windowsSource.find("kSfxButtonId") == std::string::npos,
               "Windows must persist a separate SFX slider and quiet player footsteps without another primary toggle");
-        check(androidSource.find("\"player_step_1\" : \"player_step_2\", 0.45f,") !=
+        check(androidSource.find("\"player_step_1\" : \"player_step_2\", PLAYER_DRY_FOOTSTEP_GAIN,") !=
                   std::string::npos &&
+              androidSource.find("PLAYER_DRY_FOOTSTEP_GAIN = 0.29f") != std::string::npos &&
+              androidSource.find("PLAYER_WET_FOOTSTEP_GAIN = 1.0f") != std::string::npos &&
+              androidSource.find("wetFootstepSoundKey(playerStepVariant++)") != std::string::npos &&
+              androidSource.find("case 2: return \"water_wet_step_3\"") != std::string::npos &&
+              androidSource.find("default: return \"water_wet_step_4\"") != std::string::npos &&
+              androidBuildSource.find("include 'audio/pixabay/water_wet_step_3_core.wav'") != std::string::npos &&
+              androidBuildSource.find("include 'audio/pixabay/water_wet_step_4_core.wav'") != std::string::npos &&
               androidSource.find("stereoGains, verticalMetadata)") != std::string::npos &&
               androidSource.find("addSlider(panel, getString(R.string.sfx_volume)") != std::string::npos &&
               androidSource.find("preferences.edit().putInt(\"sfx_volume\", value).apply()") != std::string::npos,

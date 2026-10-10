@@ -3,10 +3,46 @@
 #include <iostream>
 #include <cmath>
 using namespace horde::gameplay::effects;
+// Independent ray/triangle intersection witness for visible water contact.
+// A downward ray chooses the nearest face, including the overlapping join.
+float DownwardMeshHit(float x,float z,const std::array<WaterTriangle,28>& surfaces) {
+    const auto subtract=[](WaterPoint a,WaterPoint b) {return WaterPoint{a[0]-b[0],a[1]-b[1],a[2]-b[2]};};
+    const auto cross=[](WaterPoint a,WaterPoint b) {return WaterPoint{a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]};};
+    const auto dot=[](WaterPoint a,WaterPoint b) {return a[0]*b[0]+a[1]*b[1]+a[2]*b[2];};
+    const WaterPoint origin{x,1,z}, direction{0,-1,0};
+    float nearest=std::numeric_limits<float>::infinity();
+    for(const auto& t:surfaces) {
+        const auto e1=subtract(t[1],t[0]),e2=subtract(t[2],t[0]);
+        const auto p=cross(direction,e2);const float determinant=dot(e1,p);
+        if(std::abs(determinant)<1e-8f) continue;
+        const float inverse=1/determinant;const auto offset=subtract(origin,t[0]);
+        const float u=dot(offset,p)*inverse;const auto q=cross(offset,e1);
+        const float v=dot(direction,q)*inverse,distance=dot(e2,q)*inverse;
+        if(u>=-1e-6f && v>=-1e-6f && u+v<=1.000001f && distance>=0)
+            nearest=std::min(nearest,distance);
+    }
+    return 1-nearest;
+}
 int main() {
     int failures=0,count=0;
     auto check=[&](bool c,const char* m) {++count;if(!c){++failures;std::cerr<<m<<'\n';}};
+    const auto surfaces=WaterSurfaceTriangles();
+    check(surfaces.size()==28,"rendered and contacted pool/runnel share the authored 28 triangles");
+    for(const auto& triangle:surfaces) {
+        const float x=(triangle[0][0]+triangle[1][0]+triangle[2][0])/3.f;
+        const float z=(triangle[0][2]+triangle[1][2]+triangle[2][2])/3.f;
+        float surfaceY=0;
+        check(WaterSurfaceAt(x,z,surfaceY)&&
+              std::abs(surfaceY-DownwardMeshHit(x,z,surfaces))<1e-5f,
+              "every rendered water triangle centroid contacts its nearest actual downward-ray surface");
+    }
     float y=0;check(WaterSurfaceAt(-2.32f,-15.26f,y)&&std::abs(y+.925f)<1e-6f,"real catchment membership");
+    const auto& join=surfaces[16];
+    const float joinX=(join[0][0]+join[1][0]+join[2][0])/3,
+                joinZ=(join[0][2]+join[1][2]+join[2][2])/3;
+    check(WaterSurfaceAt(joinX,joinZ,y) && y>-.925f &&
+          std::abs(y-DownwardMeshHit(joinX,joinZ,surfaces))<1e-6f,
+          "overlapping runoff selects the real higher face rather than the earlier catchment face");
     check(WaterSurfaceAt(-4.6f,-15.2f,y),"real narrow runnel membership");
     check(!WaterSurfaceAt(-4.6f,-14.95f,y),"damp dry stone excluded");
     check(!BodyTouchesWaterfall(-2.32f,-.95f,-14.7f,.25f),"narrow transformed stream rejects broad rectangle");

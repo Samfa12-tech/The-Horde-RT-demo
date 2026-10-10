@@ -95,6 +95,18 @@ int main() {
   std::cout<<"cycle="<<cycle<<" ascent-end phase="<<static_cast<int>(sim.Snapshot().rescue.phase)
            <<" root="<<sim.Snapshot().playerX<<","<<sim.Snapshot().playerSupportWorldY<<","<<sim.Snapshot().playerZ<<'\n';
   check(std::abs(sim.Snapshot().playerSupportWorldY-kUpperSupportWorldY)<.001f,"upper landing support incorrect");
+  // The upper apron/connector is real retained support, not the isolated WP2
+  // centreline. A free hand must return to its ordinary carry depth here.
+  input.moveForward=0;input.runHeld=false;input.yawRadians=2.250f;
+  sim.StepFixed(input);
+  const auto& upperCarry=sim.Snapshot();
+  std::cout<<"upper lantern hand depth="<<upperCarry.heldItemKinematics.leftHandLocal[2]
+           <<" localY="<<upperCarry.heldItemKinematics.leftHandLocal[1]<<'\n';
+  check(upperCarry.heldItemKinematics.leftHandLocal[2]>.45f,
+        "upper landing falsely retracts restored lantern against a missing route wall");
+  check(upperCarry.rewardLanternWorldFromHinge[13]>upperCarry.playerSupportWorldY+1.25f &&
+        upperCarry.interaction.heldLightKind==interactions::HeldLightKind::RewardLantern,
+        "upper safe landing must restore claimed lantern to physical free hand");
   const auto exteriorFrame=horde::vulkan::raytracing::BuildRtSceneFrameInputs(sim.Snapshot(),.92f,horde::vulkan::raytracing::WaterQuality::High);
   const auto plan=horde::vulkan::raytracing::EvaluateCharacterFramePlan(exteriorFrame.skeletonEnemies,
       exteriorFrame.skeletonEnemyCount,exteriorFrame.roster,exteriorFrame.lich,1,true);

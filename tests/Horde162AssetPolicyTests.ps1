@@ -223,7 +223,7 @@ try {
     $baseAndroid=@(Get-Horde162AssetSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Android'})
     Require ($baseWindows.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Windows'}).Count -eq 29 -and
              $baseAndroid.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Android'}).Count -eq 30) 'Historical 1.6.2 roster changed.'
-    Require ($windows.Count -eq 51 -and $android.Count -eq 52) 'Current closed roster requires exact contact cues and selected native tomb derivatives; no editable sources.'
+    Require ($windows.Count -eq 55 -and $android.Count -eq 56) 'Current closed roster requires four wet-step variants, Keeper death cue/manifest and selected native tomb derivatives; no editable sources.'
     Require ($windows -ccontains 'audio/pixabay/waterfall_loop.wav' -and $windows -cnotcontains 'audio/pixabay/waterfall_core_loop.wav') 'Windows must preserve accepted full waterfall only.'
     Require ($android -ccontains 'audio/pixabay/waterfall_core_loop.wav' -and $android -cnotcontains 'audio/pixabay/waterfall_loop.wav') 'Android must use admitted Core loop only.'
     ++$script:checks
@@ -270,6 +270,9 @@ try {
     Expect-Failure {Assert-Horde162Package $repo $archive Windows} 'closed runtime roster'
     foreach($case in @(
         @{Name='missing-cue';Platform='Windows';Omit='assets/audio/pixabay/keeper_i_sense_you.wav'},
+        @{Name='missing-death-cue';Platform='Windows';Omit='assets/audio/pixabay/keeper_death.wav'},
+        @{Name='missing-death-core';Platform='Android';Omit='assets/audio/pixabay/keeper_death_core.wav'},
+        @{Name='missing-death-manifest';Platform='Android';Omit='assets/audio/pixabay/keeper-death.manifest.json'},
         @{Name='missing-core-manifest';Platform='Android';Omit='assets/audio/pixabay/waterfall-core.manifest.json'},
         @{Name='missing-collapse-glb';Platform='Android';Omit='assets/models/world/runtime/collapsed-entry/collapsed-entry-lod0.runtime.glb'},
         @{Name='missing-collapse-manifest';Platform='Windows';Omit='assets/models/world/runtime/collapsed-entry/asset.manifest.json'},

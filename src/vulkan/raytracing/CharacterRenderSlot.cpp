@@ -47,6 +47,18 @@ std::array<float, 3u> TransformPoint(const VkTransformMatrixKHR& transform,
             transform.matrix[2][2] * point[2] + transform.matrix[2][3]}};
 }
 
+std::array<float, 4u> RotationAroundX(const float radians)
+{
+    const float halfAngle = radians * 0.5f;
+    return {{std::sin(halfAngle), 0.0f, 0.0f, std::cos(halfAngle)}};
+}
+
+float SmoothStep01(const float value)
+{
+    const float clamped = std::clamp(value, 0.0f, 1.0f);
+    return clamped * clamped * (3.0f - 2.0f * clamped);
+}
+
 } // namespace
 
 CharacterFramePlan EvaluateCharacterFramePlan(
@@ -64,6 +76,21 @@ CharacterFramePlan EvaluateCharacterFramePlan(
         ? horde::scene::SkinnedClip::Dead
         : horde::scene::SkinnedClip::Idle;
     plan.lichTime = lich.animationTime;
+    if (lich.readableCastPresentation && lich.phase == horde::gameplay::LichPhase::Charging)
+    {
+        const float chargeFraction = std::clamp(
+            lich.phaseTime / horde::gameplay::LichEncounter::kChargeDuration, 0.0f, 1.0f);
+        // Reach the held anticipation pose before discharge and keep it through
+        // the final fifth of the authoritative 1.20 second charge.
+        plan.lichStaffLiftRadians = 0.58f * SmoothStep01(chargeFraction / 0.80f);
+    }
+    else if (lich.readableCastPresentation && lich.phase == horde::gameplay::LichPhase::Recovering)
+    {
+        const float castFade = 1.0f - SmoothStep01(
+            lich.phaseTime / horde::gameplay::LichEncounter::kDischargeVisibleBurstDuration);
+        plan.lichStaffLiftRadians = 0.58f * castFade;
+        plan.lichStaffCastRadians = 0.46f * castFade;
+    }
     plan.lichTransform = LichInstanceTransform(lich);
     if (plan.selectedLich && !retainedWorkloadSkeleton)
     {
@@ -289,11 +316,32 @@ bool CharacterRenderSlot::PrepareFrame(
     if(framePlan.selectedLich)
     {
         const int clipIndex = static_cast<int>(framePlan.lichClip);
-        if (CharacterPoseNeedsRefresh(clipIndex, framePlan.lichTime, lastLichClip_, lastLichUpdateTime_))
+        const bool castPoseChanged =
+            std::abs(framePlan.lichStaffLiftRadians - lastLichStaffLiftRadians_) > 0.0001f ||
+            std::abs(framePlan.lichStaffCastRadians - lastLichStaffCastRadians_) > 0.0001f;
+        if (castPoseChanged || CharacterPoseNeedsRefresh(
+                clipIndex, framePlan.lichTime, lastLichClip_, lastLichUpdateTime_))
         {
             RtSceneStageScope skinScope(
                 observation, horde::telemetry::RtStage::CharacterSkin);
-            if (!lichModel_.SkinTextured(framePlan.lichClip, framePlan.lichTime, lichSkinnedVertices_, diagnostic))
+            bool skinned = false;
+            if (framePlan.lichStaffLiftRadians == 0.0f && framePlan.lichStaffCastRadians == 0.0f)
+            {
+                // Keep dormant, dead, and legacy capture skins byte-identical
+                // to the authored clip path.
+                skinned = lichModel_.SkinTextured(
+                    framePlan.lichClip, framePlan.lichTime, lichSkinnedVertices_, diagnostic);
+            }
+            else
+            {
+                const std::array<horde::scene::SkinnedNodeRotation, 2u> castPose{{
+                    {"LeftArm", RotationAroundX(-framePlan.lichStaffLiftRadians -
+                                                  framePlan.lichStaffCastRadians)},
+                    {"LeftForeArm", RotationAroundX(-0.72f * framePlan.lichStaffLiftRadians)}}};
+                skinned = lichModel_.SkinTextured(framePlan.lichClip, framePlan.lichTime,
+                                                  lichSkinnedVertices_, diagnostic, castPose);
+            }
+            if (!skinned)
             {
                 skinScope.Cancel();
                 return false;
@@ -308,6 +356,8 @@ bool CharacterRenderSlot::PrepareFrame(
             }
             lastLichUpdateTime_ = framePlan.lichTime;
             lastLichClip_ = clipIndex;
+            lastLichStaffLiftRadians_ = framePlan.lichStaffLiftRadians;
+            lastLichStaffCastRadians_ = framePlan.lichStaffCastRadians;
             pendingRefit_ = pendingRefit_ | CharacterBlasRefit::Lich;
         }
     }
@@ -397,6 +447,8 @@ void CharacterRenderSlot::DestroyGpuResources(const RtGpuResources& resources)
     lastSkeletonUpdateTimes_.fill(-1.0f);
     lastSkeletonClips_.fill(-1);
     lastLichUpdateTime_ = -1.0f;
+    lastLichStaffLiftRadians_ = -1.0f;
+    lastLichStaffCastRadians_ = -1.0f;
     lastLichClip_ = -1;
     pendingRefit_ = CharacterBlasRefit::None;
     skeletonPoseBucketCount_ = 0u;

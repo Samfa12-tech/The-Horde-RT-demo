@@ -30,7 +30,9 @@ int main()
                      std::abs(SfxVolumeLinearGain(70) - 0.7f) < 0.0001f &&
                      std::abs(SfxVolumeLinearGain(100) - 1.0f) < 0.0001f,
                      "mastering gain must follow the bounded percentage");
-    passed &= expect(std::abs(kPlayerFootstepCueGain - 0.45f) < 0.0001f,
-                     "player footsteps must retain their authored quieting gain");
+    passed &= expect(std::abs(kPlayerFootstepCueGain - 0.29f) < 0.0001f,
+                     "dry player footsteps must use the owner-requested reduced mix gain");
+    passed &= expect(std::abs(kWetFootstepCueGain - 1.0f) < 0.0001f,
+                     "wet event intensity must reach the wet cue without a second attenuation");
     return passed ? 0 : 1;
 }

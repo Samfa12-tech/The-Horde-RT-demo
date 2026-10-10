@@ -1,7 +1,28 @@
 {
-  "schema": 1,
-  "source": "assets/audio/pixabay/waterfall_loop.wav",
-  "sourceSha256": "de7711f0e6ef9cf0bdd3d04ba7a1b713ce09ef18169bd994182b09ab2017ee62",
+  "schema": 2,
+  "sources": [
+    {
+      "filename": "waterfall_loop.wav",
+      "sha256": "de7711f0e6ef9cf0bdd3d04ba7a1b713ce09ef18169bd994182b09ab2017ee62",
+      "title": "Water Dripping 364450",
+      "contributor": "DRAGON-STUDIO",
+      "url": "https://pixabay.com/sound-effects/nature-water-dripping-364450/",
+      "license": "Pixabay Content License"
+    },
+    {
+      "filename": "freesound_community-footsteps-water-01-73731.mp3",
+      "sha256": "70f548d544985d6fa7e14463684d3792c51d87da5a987b631d51f3e589f401a9",
+      "url": "https://pixabay.com/sound-effects/footsteps-water-01-73731/",
+      "title": "Footsteps Water 01",
+      "contributor": "aglinder (Freesound)",
+      "license": "Pixabay Content License",
+      "licenseTermsUrl": "https://pixabay.com/service/terms/",
+      "usageTerms": "Commercial and non-commercial use plus modification/adaptation are permitted; standalone distribution is prohibited; attribution is appreciated but not required.",
+      "originalSourceUrl": "https://freesound.org/people/aglinder/sounds/265582/",
+      "originalSourceLicense": "CC0 1.0 (as stated on the Freesound source page)",
+      "includedInRepository": false
+    }
+  ],
   "sampleRate": 48000,
   "bitsPerSample": 16,
   "cues": [
@@ -9,45 +30,209 @@
       "path": "assets/audio/pixabay/water_wet_step_1.wav",
       "platform": "Windows",
       "channels": 1,
-      "sourceStartSeconds": 6.25,
-      "durationSeconds": 0.22,
-      "processingGain": 0.65,
-      "frames": 10560,
-      "bytes": 21164,
-      "sha256": "663ebe1e5fb38945e0e0e25037efe95d86964c03a4d6d1c642464593ec2d3263"
+      "sourceStartSeconds": 32.0,
+      "durationSeconds": 0.38,
+      "processingGain": 0.61405287,
+      "preGainRms": 0.02956209,
+      "outputRms": 0.0181526,
+      "outputPeak": 0.3237915,
+      "frames": 18240,
+      "bytes": 36524,
+      "sha256": "e3b3855ef7a91b676bc5be94fb403cdb8edbd4a461a5bd56790175b0bd1917de",
+      "source": {
+        "filename": "freesound_community-footsteps-water-01-73731.mp3",
+        "sha256": "70f548d544985d6fa7e14463684d3792c51d87da5a987b631d51f3e589f401a9",
+        "url": "https://pixabay.com/sound-effects/footsteps-water-01-73731/",
+        "title": "Footsteps Water 01",
+        "contributor": "aglinder (Freesound)",
+        "license": "Pixabay Content License",
+        "licenseTermsUrl": "https://pixabay.com/service/terms/",
+        "usageTerms": "Commercial and non-commercial use plus modification/adaptation are permitted; standalone distribution is prohibited; attribution is appreciated but not required.",
+        "originalSourceUrl": "https://freesound.org/people/aglinder/sounds/265582/",
+        "originalSourceLicense": "CC0 1.0 (as stated on the Freesound source page)"
+      }
     },
     {
       "path": "assets/audio/pixabay/water_wet_step_1_core.wav",
       "platform": "Android",
       "channels": 2,
-      "sourceStartSeconds": 6.25,
-      "durationSeconds": 0.22,
-      "processingGain": 0.65,
-      "frames": 10560,
-      "bytes": 42284,
-      "sha256": "bae5e1c700b7b3fc841662ca92869d6b074680fe513a8d04a4ef46e2deb7a944"
+      "sourceStartSeconds": 32.0,
+      "durationSeconds": 0.38,
+      "processingGain": 0.61405287,
+      "preGainRms": 0.02956209,
+      "outputRms": 0.0181526,
+      "outputPeak": 0.3237915,
+      "frames": 18240,
+      "bytes": 73004,
+      "sha256": "b15bd6c9a7b84c08aedbcee87e53bcbc85a2740abd5180858391ed66283b8622",
+      "source": {
+        "filename": "freesound_community-footsteps-water-01-73731.mp3",
+        "sha256": "70f548d544985d6fa7e14463684d3792c51d87da5a987b631d51f3e589f401a9",
+        "url": "https://pixabay.com/sound-effects/footsteps-water-01-73731/",
+        "title": "Footsteps Water 01",
+        "contributor": "aglinder (Freesound)",
+        "license": "Pixabay Content License",
+        "licenseTermsUrl": "https://pixabay.com/service/terms/",
+        "usageTerms": "Commercial and non-commercial use plus modification/adaptation are permitted; standalone distribution is prohibited; attribution is appreciated but not required.",
+        "originalSourceUrl": "https://freesound.org/people/aglinder/sounds/265582/",
+        "originalSourceLicense": "CC0 1.0 (as stated on the Freesound source page)"
+      }
     },
     {
       "path": "assets/audio/pixabay/water_wet_step_2.wav",
       "platform": "Windows",
       "channels": 1,
-      "sourceStartSeconds": 8.75,
-      "durationSeconds": 0.24,
-      "processingGain": 0.65,
-      "frames": 11520,
-      "bytes": 23084,
-      "sha256": "cd62db9512d7ff60ad9f0160c1eb3d98d6cf82130a30da6971bc0d053fe358b2"
+      "sourceStartSeconds": 32.8,
+      "durationSeconds": 0.38,
+      "processingGain": 0.58355252,
+      "preGainRms": 0.0311072,
+      "outputRms": 0.01815271,
+      "outputPeak": 0.16213989,
+      "frames": 18240,
+      "bytes": 36524,
+      "sha256": "b8752ba0dc7b737d8148c1c5c56eac5e5ff52d49d57dc3cfb27239276f2a0fff",
+      "source": {
+        "filename": "freesound_community-footsteps-water-01-73731.mp3",
+        "sha256": "70f548d544985d6fa7e14463684d3792c51d87da5a987b631d51f3e589f401a9",
+        "url": "https://pixabay.com/sound-effects/footsteps-water-01-73731/",
+        "title": "Footsteps Water 01",
+        "contributor": "aglinder (Freesound)",
+        "license": "Pixabay Content License",
+        "licenseTermsUrl": "https://pixabay.com/service/terms/",
+        "usageTerms": "Commercial and non-commercial use plus modification/adaptation are permitted; standalone distribution is prohibited; attribution is appreciated but not required.",
+        "originalSourceUrl": "https://freesound.org/people/aglinder/sounds/265582/",
+        "originalSourceLicense": "CC0 1.0 (as stated on the Freesound source page)"
+      }
     },
     {
       "path": "assets/audio/pixabay/water_wet_step_2_core.wav",
       "platform": "Android",
       "channels": 2,
-      "sourceStartSeconds": 8.75,
-      "durationSeconds": 0.24,
-      "processingGain": 0.65,
-      "frames": 11520,
-      "bytes": 46124,
-      "sha256": "785201e135581c30cb243b77428bd32d07b113e2d1f3416eab8d85018ee89159"
+      "sourceStartSeconds": 32.8,
+      "durationSeconds": 0.38,
+      "processingGain": 0.58355252,
+      "preGainRms": 0.0311072,
+      "outputRms": 0.01815271,
+      "outputPeak": 0.16213989,
+      "frames": 18240,
+      "bytes": 73004,
+      "sha256": "40188320f8eea7d56c948301a969d4e31d8af4dea02a5f1d864eda2973f28224",
+      "source": {
+        "filename": "freesound_community-footsteps-water-01-73731.mp3",
+        "sha256": "70f548d544985d6fa7e14463684d3792c51d87da5a987b631d51f3e589f401a9",
+        "url": "https://pixabay.com/sound-effects/footsteps-water-01-73731/",
+        "title": "Footsteps Water 01",
+        "contributor": "aglinder (Freesound)",
+        "license": "Pixabay Content License",
+        "licenseTermsUrl": "https://pixabay.com/service/terms/",
+        "usageTerms": "Commercial and non-commercial use plus modification/adaptation are permitted; standalone distribution is prohibited; attribution is appreciated but not required.",
+        "originalSourceUrl": "https://freesound.org/people/aglinder/sounds/265582/",
+        "originalSourceLicense": "CC0 1.0 (as stated on the Freesound source page)"
+      }
+    },
+    {
+      "path": "assets/audio/pixabay/water_wet_step_3.wav",
+      "platform": "Windows",
+      "channels": 1,
+      "sourceStartSeconds": 33.9,
+      "durationSeconds": 0.38,
+      "processingGain": 0.6321446,
+      "preGainRms": 0.02871604,
+      "outputRms": 0.01815278,
+      "outputPeak": 0.32104492,
+      "frames": 18240,
+      "bytes": 36524,
+      "sha256": "4f5deb13d657dc77065b230dc2d6fac4b9e11f38c1aa1e0912875e969a12d599",
+      "source": {
+        "filename": "freesound_community-footsteps-water-01-73731.mp3",
+        "sha256": "70f548d544985d6fa7e14463684d3792c51d87da5a987b631d51f3e589f401a9",
+        "url": "https://pixabay.com/sound-effects/footsteps-water-01-73731/",
+        "title": "Footsteps Water 01",
+        "contributor": "aglinder (Freesound)",
+        "license": "Pixabay Content License",
+        "licenseTermsUrl": "https://pixabay.com/service/terms/",
+        "usageTerms": "Commercial and non-commercial use plus modification/adaptation are permitted; standalone distribution is prohibited; attribution is appreciated but not required.",
+        "originalSourceUrl": "https://freesound.org/people/aglinder/sounds/265582/",
+        "originalSourceLicense": "CC0 1.0 (as stated on the Freesound source page)"
+      }
+    },
+    {
+      "path": "assets/audio/pixabay/water_wet_step_3_core.wav",
+      "platform": "Android",
+      "channels": 2,
+      "sourceStartSeconds": 33.9,
+      "durationSeconds": 0.38,
+      "processingGain": 0.6321446,
+      "preGainRms": 0.02871604,
+      "outputRms": 0.01815278,
+      "outputPeak": 0.32104492,
+      "frames": 18240,
+      "bytes": 73004,
+      "sha256": "2926ac06b2a10cf388d29142ffd6d15f512d4809da0ad151de191df3040fdd30",
+      "source": {
+        "filename": "freesound_community-footsteps-water-01-73731.mp3",
+        "sha256": "70f548d544985d6fa7e14463684d3792c51d87da5a987b631d51f3e589f401a9",
+        "url": "https://pixabay.com/sound-effects/footsteps-water-01-73731/",
+        "title": "Footsteps Water 01",
+        "contributor": "aglinder (Freesound)",
+        "license": "Pixabay Content License",
+        "licenseTermsUrl": "https://pixabay.com/service/terms/",
+        "usageTerms": "Commercial and non-commercial use plus modification/adaptation are permitted; standalone distribution is prohibited; attribution is appreciated but not required.",
+        "originalSourceUrl": "https://freesound.org/people/aglinder/sounds/265582/",
+        "originalSourceLicense": "CC0 1.0 (as stated on the Freesound source page)"
+      }
+    },
+    {
+      "path": "assets/audio/pixabay/water_wet_step_4.wav",
+      "platform": "Windows",
+      "channels": 1,
+      "sourceStartSeconds": 34.85,
+      "durationSeconds": 0.38,
+      "processingGain": 0.80176932,
+      "preGainRms": 0.02264079,
+      "outputRms": 0.01815275,
+      "outputPeak": 0.42883301,
+      "frames": 18240,
+      "bytes": 36524,
+      "sha256": "26e33d3c7d8aca36216dfc45457c1f6ddad57dccc9ceb64d5343482536dd3a46",
+      "source": {
+        "filename": "freesound_community-footsteps-water-01-73731.mp3",
+        "sha256": "70f548d544985d6fa7e14463684d3792c51d87da5a987b631d51f3e589f401a9",
+        "url": "https://pixabay.com/sound-effects/footsteps-water-01-73731/",
+        "title": "Footsteps Water 01",
+        "contributor": "aglinder (Freesound)",
+        "license": "Pixabay Content License",
+        "licenseTermsUrl": "https://pixabay.com/service/terms/",
+        "usageTerms": "Commercial and non-commercial use plus modification/adaptation are permitted; standalone distribution is prohibited; attribution is appreciated but not required.",
+        "originalSourceUrl": "https://freesound.org/people/aglinder/sounds/265582/",
+        "originalSourceLicense": "CC0 1.0 (as stated on the Freesound source page)"
+      }
+    },
+    {
+      "path": "assets/audio/pixabay/water_wet_step_4_core.wav",
+      "platform": "Android",
+      "channels": 2,
+      "sourceStartSeconds": 34.85,
+      "durationSeconds": 0.38,
+      "processingGain": 0.80176932,
+      "preGainRms": 0.02264079,
+      "outputRms": 0.01815275,
+      "outputPeak": 0.42883301,
+      "frames": 18240,
+      "bytes": 73004,
+      "sha256": "1344c72ef5ffc3418aa49e8900b213e6a8140086456ca5cbaebef6d5034a06b1",
+      "source": {
+        "filename": "freesound_community-footsteps-water-01-73731.mp3",
+        "sha256": "70f548d544985d6fa7e14463684d3792c51d87da5a987b631d51f3e589f401a9",
+        "url": "https://pixabay.com/sound-effects/footsteps-water-01-73731/",
+        "title": "Footsteps Water 01",
+        "contributor": "aglinder (Freesound)",
+        "license": "Pixabay Content License",
+        "licenseTermsUrl": "https://pixabay.com/service/terms/",
+        "usageTerms": "Commercial and non-commercial use plus modification/adaptation are permitted; standalone distribution is prohibited; attribution is appreciated but not required.",
+        "originalSourceUrl": "https://freesound.org/people/aglinder/sounds/265582/",
+        "originalSourceLicense": "CC0 1.0 (as stated on the Freesound source page)"
+      }
     },
     {
       "path": "assets/audio/pixabay/water_stream_contact.wav",
@@ -56,9 +241,17 @@
       "sourceStartSeconds": 13.65,
       "durationSeconds": 0.35,
       "processingGain": 0.7,
+      "preGainRms": 0.01253261,
+      "outputRms": 0.01253261,
+      "outputPeak": 0.15740967,
       "frames": 16800,
       "bytes": 33644,
-      "sha256": "2cee1adcb1c944d19af0d2a5c8b81999908f6482bf2fcdd486d0457627ed8cfa"
+      "sha256": "2cee1adcb1c944d19af0d2a5c8b81999908f6482bf2fcdd486d0457627ed8cfa",
+      "source": {
+        "filename": "waterfall_loop.wav",
+        "sha256": "de7711f0e6ef9cf0bdd3d04ba7a1b713ce09ef18169bd994182b09ab2017ee62",
+        "license": "Existing DRAGON-STUDIO/Pixabay Content License"
+      }
     },
     {
       "path": "assets/audio/pixabay/water_stream_contact_core.wav",
@@ -67,12 +260,36 @@
       "sourceStartSeconds": 13.65,
       "durationSeconds": 0.35,
       "processingGain": 0.7,
+      "preGainRms": 0.01253261,
+      "outputRms": 0.01253261,
+      "outputPeak": 0.15740967,
       "frames": 16800,
       "bytes": 67244,
-      "sha256": "2e242637d10db7b978efaa755eee93d037477985e2106ce462063e7af18c3461"
+      "sha256": "2e242637d10db7b978efaa755eee93d037477985e2106ce462063e7af18c3461",
+      "source": {
+        "filename": "waterfall_loop.wav",
+        "sha256": "de7711f0e6ef9cf0bdd3d04ba7a1b713ce09ef18169bd994182b09ab2017ee62",
+        "license": "Existing DRAGON-STUDIO/Pixabay Content License"
+      }
     }
   ],
-  "processing": "Fixed source cuts; 10ms fade-in/30ms fade-out, gain reduction, dual-mono. No normalisation.",
-  "license": "Existing DRAGON-STUDIO/Pixabay adaptation licence; retain ASSET_LICENSES.md. Not MIT.",
+  "levelMatch": {
+    "dryReferencePaths": [
+      "assets/audio/filmcow/player_step_1.wav",
+      "assets/audio/filmcow/player_step_2.wav"
+    ],
+    "dryReferenceRms": [
+      0.0717734,
+      0.05967709
+    ],
+    "dryPlayerMixGain": 0.29,
+    "wetMeanEventIntensity": 0.525,
+    "targetWetToDryFinalRms": 0.5,
+    "targetWetCueRmsBeforeEventGain": 0.01815269,
+    "peakLimit": 0.45
+  },
+  "processing": "Wet variants: mono FFmpeg decode to 48 kHz PCM16; four fixed 0.38 s source cuts; 10 ms fade-in, 40 ms fade-out; measured RMS match to half the dry cue's final RMS at mean wet event intensity; peak ceiling 0.45; dual-mono Android copies. No limiter or clipping; owner MP3 remains outside repository. Stream cue retains the previous fixed waterfall-source cut and gain.",
+  "ffmpegVersion": "ffmpeg version 9.0-full_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers",
+  "license": "Pixabay Content License",
   "ownerListeningApproval": false
 }

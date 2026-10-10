@@ -66,6 +66,8 @@ struct HeldItemKinematicsInput
     float playerSupportWorldY = kRouteFloorWorldY;
     bool developmentWorldRoute = false;
     bool readableCombatPose = false;
+    // Explicit zone choice: the rescue apron/connector is not the isolated WP2 route.
+    bool rescueExterior = false;
 };
 
 struct HeldSwordPose
@@ -136,6 +138,8 @@ struct HeldItemFixedStepInput
     float playerSupportWorldY = kRouteFloorWorldY;
     bool developmentWorldRoute = false;
     bool readableCombatPose = false;
+    // Explicit zone choice: the rescue apron/connector is not the isolated WP2 route.
+    bool rescueExterior = false;
 };
 
 inline constexpr float kHeldItemSpreadStartAspect = 1.0f;
@@ -221,7 +225,9 @@ float ComputePlayerTorchOverheadLowering(
 float ComputeRewardLanternForwardClearance(float cameraX,
                                            float cameraZ,
                                            float forwardX,
-                                           float forwardZ, bool developmentWorldRoute = false);
+                                           float forwardZ, bool developmentWorldRoute = false,
+                                           bool rescueExterior = false,
+                                           float supportWorldY = kRouteFloorWorldY);
 
 HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput& input);
 

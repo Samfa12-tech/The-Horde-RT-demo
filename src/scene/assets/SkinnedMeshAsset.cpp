@@ -1379,7 +1379,10 @@ bool SkinnedMeshAsset::NodeTransform(const SkinnedClip clipId,
     output = transforms[0];
     return true;
 }
-bool SkinnedMeshAsset::Skin(SkinnedClip clipId, float timeSeconds, std::vector<SkinnedRtVertex>& output, std::string& diagnostic) const
+bool SkinnedMeshAsset::Skin(
+    SkinnedClip clipId, float timeSeconds, std::vector<SkinnedRtVertex>& output,
+    std::string& diagnostic,
+    const std::span<const SkinnedNodeRotation> additiveNodeRotations) const
 {
     if (!loaded_) { diagnostic = "Skeleton model was not loaded."; return false; }
     const std::size_t clipIndex = static_cast<std::size_t>(clipId);
@@ -1411,6 +1414,45 @@ bool SkinnedMeshAsset::Skin(SkinnedClip clipId, float timeSeconds, std::vector<S
             if (channel.path == Channel::Path::Translation) pose[channel.node].translation = value;
             else pose[channel.node].scale = value;
         }
+    }
+    for (std::size_t rotationIndex = 0u; rotationIndex < additiveNodeRotations.size(); ++rotationIndex)
+    {
+        const SkinnedNodeRotation& additive = additiveNodeRotations[rotationIndex];
+        const auto node = std::find_if(nodes_.begin(), nodes_.end(), [&additive](const Node& candidate) {
+            return candidate.name == additive.nodeName;
+        });
+        if (node == nodes_.end())
+        {
+            diagnostic = "Skinned asset is missing additive rotation node: " + std::string(additive.nodeName);
+            return false;
+        }
+        for (std::size_t previous = 0u; previous < rotationIndex; ++previous)
+        {
+            if (additiveNodeRotations[previous].nodeName == additive.nodeName)
+            {
+                diagnostic = "Skinned additive node rotations contain a duplicate node name.";
+                return false;
+            }
+        }
+        const auto& value = additive.rotation;
+        const float lengthSquared = value[0] * value[0] + value[1] * value[1] +
+            value[2] * value[2] + value[3] * value[3];
+        if (!std::isfinite(lengthSquared) || lengthSquared <= 1.0e-12f)
+        {
+            diagnostic = "Skinned additive node rotation is not a finite nonzero quaternion.";
+            return false;
+        }
+        if (value[0] == 0.0f && value[1] == 0.0f && value[2] == 0.0f && value[3] == 1.0f)
+        {
+            continue;
+        }
+        const Quat delta = Normalise({value[0], value[1], value[2], value[3]});
+        const Quat base = pose[static_cast<std::size_t>(node - nodes_.begin())].rotation;
+        pose[static_cast<std::size_t>(node - nodes_.begin())].rotation = Normalise({
+            base.w * delta.x + base.x * delta.w + base.y * delta.z - base.z * delta.y,
+            base.w * delta.y - base.x * delta.z + base.y * delta.w + base.z * delta.x,
+            base.w * delta.z + base.x * delta.y - base.y * delta.x + base.z * delta.w,
+            base.w * delta.w - base.x * delta.x - base.y * delta.y - base.z * delta.z});
     }
     std::vector<Matrix> globals(pose.size());
     std::vector<bool> computed(pose.size(), false);
@@ -1468,14 +1510,15 @@ bool SkinnedMeshAsset::Skin(SkinnedClip clipId, float timeSeconds, std::vector<S
 bool SkinnedMeshAsset::SkinTextured(SkinnedClip clipId,
                                       float timeSeconds,
                                       std::vector<TexturedSkinnedRtVertex>& output,
-                                      std::string& diagnostic) const
+                                      std::string& diagnostic,
+                                      const std::span<const SkinnedNodeRotation> additiveNodeRotations) const
 {
     if (!hasTexcoords_)
     {
         diagnostic = "Skinned model has no TEXCOORD_0 stream.";
         return false;
     }
-    if (!Skin(clipId, timeSeconds, texturedSkinScratch_, diagnostic)) return false;
+    if (!Skin(clipId, timeSeconds, texturedSkinScratch_, diagnostic, additiveNodeRotations)) return false;
     output.resize(texturedSkinScratch_.size());
     for (std::size_t outputIndex = 0u; outputIndex < output.size(); ++outputIndex)
     {

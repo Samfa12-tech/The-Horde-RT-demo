@@ -4,6 +4,7 @@
 #include <array>
 #include <algorithm>
 #include <cmath>
+#include <limits>
 
 namespace horde::gameplay::effects
 {
@@ -38,6 +39,8 @@ inline std::array<WaterTriangle,28> WaterSurfaceTriangles()
 inline bool WaterSurfaceAt(float x,float z,float& y)
 {
     if(!std::isfinite(x)||!std::isfinite(z)) return false;
+    bool found=false;
+    float highest=-std::numeric_limits<float>::infinity();
     for(const auto& t:WaterSurfaceTriangles()) {
         const float ax=t[0][0],az=t[0][2],bx=t[1][0],bz=t[1][2],cx=t[2][0],cz=t[2][2];
         const float d=(bz-cz)*(ax-cx)+(cx-bx)*(az-cz);
@@ -45,10 +48,14 @@ inline bool WaterSurfaceAt(float x,float z,float& y)
         const float u=((bz-cz)*(x-cx)+(cx-bx)*(z-cz))/d;
         const float v=((cz-az)*(x-cx)+(ax-cx)*(z-cz))/d;
         if(u>=-1e-6f && v>=-1e-6f && u+v<=1.000001f) {
-            y=u*t[0][1]+v*t[1][1]+(1-u-v)*t[2][1]; return true;
+            // Pool and runoff overlap at the join. Contact and ripples belong
+            // to the topmost real face, matching a downward ray from the feet.
+            highest=std::max(highest,u*t[0][1]+v*t[1][1]+(1-u-v)*t[2][1]);
+            found=true;
         }
     }
-    return false;
+    if(found) y=highest;
+    return found;
 }
 inline bool CircleTouchesEllipse(float x,float z,float rx,float rz,float radius)
 {

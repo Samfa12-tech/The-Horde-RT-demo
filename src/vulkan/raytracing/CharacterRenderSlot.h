@@ -51,6 +51,8 @@ struct CharacterFramePlan
     bool retainedWorkloadSkeleton = false;
     horde::scene::SkinnedClip lichClip = horde::scene::SkinnedClip::Idle;
     float lichTime = 0.0f;
+    float lichStaffLiftRadians = 0.0f;
+    float lichStaffCastRadians = 0.0f;
     VkTransformMatrixKHR lichTransform{};
     std::array<SkeletonRenderPlan, horde::gameplay::simulation::kSkeletonEnemyCapacity> skeletons{};
     std::size_t skeletonCount = 0u;
@@ -136,6 +138,8 @@ private:
     std::array<float, kMaximumSkeletonPoseBuckets> lastSkeletonUpdateTimes_{{-1.0f, -1.0f}};
     std::array<int, kMaximumSkeletonPoseBuckets> lastSkeletonClips_{{-1, -1}};
     float lastLichUpdateTime_ = -1.0f;
+    float lastLichStaffLiftRadians_ = -1.0f;
+    float lastLichStaffCastRadians_ = -1.0f;
     int lastLichClip_ = -1;
     CharacterBlasRefit pendingRefit_ = CharacterBlasRefit::None;
     std::size_t skeletonPoseBucketCount_ = 0u;

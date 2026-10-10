@@ -5,9 +5,11 @@
 #include "vulkan/raytracing/RtSceneTuning.h"
 #include "vulkan/raytracing/SimulationFrameAdapter.h"
 #include "platform/android/AndroidRtLabState.h"
+#include "KeeperLowerBodyWitnesses.h"
 
 #include <cmath>
 #include <atomic>
+#include <cstring>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -815,13 +817,15 @@ int main()
                       sceneSource.find("addWaterfallQuad") != std::string::npos &&
                       sceneSource.find("worldSurfaceCodes.size() != sceneIndexCount / 3u") != std::string::npos &&
                       sceneSource.find("waterStreams.size() == 3u") != std::string::npos &&
-                      sceneSource.find("falling water streams must retain real ten-centimetre air gaps") != std::string::npos,
+                      sceneSource.find("falling water streams must retain real ten-centimetre air gaps") != std::string::npos &&
+                      sceneSource.find("waterScale.crossLane") != std::string::npos &&
+                      hitDecodeSource.find("-15.26 + (-15.44 + 15.26) * widthScale") != std::string::npos &&
+                      hitDecodeSource.find("0.065 * widthScale") != std::string::npos,
                       "world water must use separated metadata-backed geometry and retain the triangle-code contract");
-        ok &= Require(sceneSource.find("roundedCatchmentRim") != std::string::npos &&
-                      sceneSource.find("addWorldTriangle(waterImpactCentre") != std::string::npos &&
-                      sceneSource.find("runoffDrainLipX = -5.30f") != std::string::npos &&
+        ok &= Require(sceneSource.find("WaterSurfaceTriangles()") != std::string::npos &&
+                      sceneSource.find("addWorldTriangle(Vertex{{triangle[0][0]") != std::string::npos &&
                       sceneSource.find("-5.16f, -1.035f") == std::string::npos,
-                      "floor water must use a rounded catchment and remain visible through the drain lip");
+                      "floor water rendering must use the same contact triangle source and preserve its drain separation");
         ok &= Require(raygenSource.find("rtWaterContactRipple.value") != std::string::npos &&
                       raygenSource.find("bool runoff = abs(n.y) > 0.65;") != std::string::npos &&
                       raygenSource.find("(runoff ? 1.0 : 0.0)") != std::string::npos &&
@@ -1772,6 +1776,199 @@ int main()
         spareCapacityRoster.renderedEnemyCount = 1u;
         spareCapacityRoster.selectedEnemy = EnemyKind::Skeleton;
         spareCapacityRoster.renderedEnemies[0] = EnemyKind::Skeleton;
+        EnemyRosterSnapshot keeperRoster;
+        keeperRoster.renderedEnemyCapacity = 1u;
+        keeperRoster.renderedEnemyCount = 1u;
+        keeperRoster.selectedEnemy = EnemyKind::Lich;
+        keeperRoster.renderedEnemies[0] = EnemyKind::Lich;
+        LichSnapshot castSnapshot;
+        castSnapshot.readableCastPresentation = true;
+        castSnapshot.phase = LichPhase::Charging;
+        castSnapshot.phaseTime = 0.0f;
+        const auto earlyCast = EvaluateCharacterFramePlan(
+            skeletons, 0u, keeperRoster, castSnapshot, slot.SkeletonDeadClipDuration());
+        castSnapshot.phaseTime = 0.96f;
+        const auto lateCast = EvaluateCharacterFramePlan(
+            skeletons, 0u, keeperRoster, castSnapshot, slot.SkeletonDeadClipDuration());
+        castSnapshot.phaseTime = 1.20f;
+        const auto chargeBoundary = EvaluateCharacterFramePlan(
+            skeletons, 0u, keeperRoster, castSnapshot, slot.SkeletonDeadClipDuration());
+        castSnapshot.phase = LichPhase::Recovering;
+        castSnapshot.phaseTime = 0.0f;
+        const auto recoveryBoundary = EvaluateCharacterFramePlan(
+            skeletons, 0u, keeperRoster, castSnapshot, slot.SkeletonDeadClipDuration());
+        castSnapshot.phaseTime = 0.18f;
+        const auto recoveryEnd = EvaluateCharacterFramePlan(
+            skeletons, 0u, keeperRoster, castSnapshot, slot.SkeletonDeadClipDuration());
+        ok &= Require(earlyCast.lichStaffLiftRadians < lateCast.lichStaffLiftRadians &&
+                      Near(lateCast.lichStaffLiftRadians, chargeBoundary.lichStaffLiftRadians) &&
+                      Near(chargeBoundary.lichStaffLiftRadians, recoveryBoundary.lichStaffLiftRadians) &&
+                      recoveryBoundary.lichStaffCastRadians > 0.0f &&
+                      Near(recoveryEnd.lichStaffLiftRadians, 0.0f) &&
+                      Near(recoveryEnd.lichStaffCastRadians, 0.0f),
+                      "readable keeper staff pose must lift into a held anticipation, continue across discharge, and blend out over the visible recovery burst");
+        castSnapshot.phase = LichPhase::Dormant;
+        const auto castReset = EvaluateCharacterFramePlan(
+            skeletons, 0u, keeperRoster, castSnapshot, slot.SkeletonDeadClipDuration());
+        castSnapshot.phase = LichPhase::Dead;
+        const auto castDeath = EvaluateCharacterFramePlan(
+            skeletons, 0u, keeperRoster, castSnapshot, slot.SkeletonDeadClipDuration());
+        castSnapshot.phase = LichPhase::Charging;
+        castSnapshot.readableCastPresentation = false;
+        const auto legacyCast = EvaluateCharacterFramePlan(
+            skeletons, 0u, keeperRoster, castSnapshot, slot.SkeletonDeadClipDuration());
+        ok &= Require(Near(castReset.lichStaffLiftRadians, 0.0f) &&
+                      Near(castDeath.lichStaffLiftRadians, 0.0f) &&
+                      Near(legacyCast.lichStaffLiftRadians, 0.0f) &&
+                      Near(legacyCast.lichStaffCastRadians, 0.0f),
+                      "reset, death, and legacy keeper captures must disable readable cast pose");
+
+        horde::scene::SkinnedMeshAsset castSkin;
+        const auto lichPath = (root / "assets/models/enemies/meshy/lich_placeholder_merged_animations_v01.glb").string();
+        ok &= Require(castSkin.LoadClips(lichPath, horde::scene::LichPlaceholderClipSet(), diagnostic),
+                      diagnostic.c_str());
+        std::vector<horde::scene::TexturedSkinnedRtVertex> neutralSkin, liftedSkin, forwardSkin;
+        const std::array<horde::scene::SkinnedNodeRotation, 2u> identityPose{{
+            {"LeftArm", {{0.0f, 0.0f, 0.0f, 1.0f}}},
+            {"LeftForeArm", {{0.0f, 0.0f, 0.0f, 1.0f}}}}};
+        const std::array<horde::scene::SkinnedNodeRotation, 2u> liftedPose{{
+            {"LeftArm", {{std::sin(-0.58f * 0.5f), 0.0f, 0.0f, std::cos(0.58f * 0.5f)}}},
+            {"LeftForeArm", {{std::sin(-0.72f * 0.58f * 0.5f), 0.0f, 0.0f,
+                               std::cos(0.72f * 0.58f * 0.5f)}}}}};
+        const std::array<horde::scene::SkinnedNodeRotation, 2u> forwardPose{{
+            {"LeftArm", {{std::sin((-0.58f - 0.46f) * 0.5f), 0.0f, 0.0f,
+                           std::cos((-0.58f - 0.46f) * 0.5f)}}},
+            {"LeftForeArm", {{std::sin(-0.72f * 0.58f * 0.5f), 0.0f, 0.0f,
+                               std::cos(0.72f * 0.58f * 0.5f)}}}}};
+        if (castSkin.IsLoaded())
+        {
+            ok &= Require(castSkin.SkinTextured(horde::scene::SkinnedClip::Idle, 0.0f,
+                                                neutralSkin, diagnostic), diagnostic.c_str());
+            ok &= Require(castSkin.SkinTextured(horde::scene::SkinnedClip::Idle, 0.0f,
+                                                liftedSkin, diagnostic, liftedPose), diagnostic.c_str());
+            ok &= Require(castSkin.SkinTextured(horde::scene::SkinnedClip::Idle, 0.0f,
+                                                forwardSkin, diagnostic, forwardPose), diagnostic.c_str());
+        }
+        std::vector<horde::scene::TexturedSkinnedRtVertex> identitySkin;
+        if (castSkin.IsLoaded())
+        {
+            ok &= Require(castSkin.SkinTextured(horde::scene::SkinnedClip::Idle, 0.0f,
+                                                identitySkin, diagnostic, identityPose), diagnostic.c_str());
+            ok &= Require(!neutralSkin.empty() && identitySkin.size() == neutralSkin.size() &&
+                          std::memcmp(identitySkin.data(), neutralSkin.data(),
+                              neutralSkin.size() * sizeof(horde::scene::TexturedSkinnedRtVertex)) == 0,
+                          "identity additive node rotations must preserve exact authored skin bytes");
+            std::array<horde::scene::SkinnedNodeRotation, 1u> missingPose{{
+                {"MissingCastNode", {{0.0f, 0.0f, 0.0f, 1.0f}}}}};
+            std::array<horde::scene::SkinnedNodeRotation, 2u> duplicatePose{{
+                {"LeftArm", {{0.0f, 0.0f, 0.0f, 1.0f}}},
+                {"LeftArm", {{0.0f, 0.0f, 0.0f, 1.0f}}}}};
+            std::array<horde::scene::SkinnedNodeRotation, 1u> invalidPose{{
+                {"LeftArm", {{0.0f, 0.0f, 0.0f, 0.0f}}}}};
+            ok &= Require(!castSkin.SkinTextured(horde::scene::SkinnedClip::Idle, 0.0f,
+                                                 identitySkin, diagnostic, missingPose) &&
+                          diagnostic.find("missing additive rotation node") != std::string::npos,
+                          "named additive rotations must reject a missing rig node");
+            ok &= Require(!castSkin.SkinTextured(horde::scene::SkinnedClip::Idle, 0.0f,
+                                                 identitySkin, diagnostic, duplicatePose) &&
+                          diagnostic.find("duplicate node name") != std::string::npos,
+                          "named additive rotations must reject duplicate rig nodes");
+            ok &= Require(!castSkin.SkinTextured(horde::scene::SkinnedClip::Idle, 0.0f,
+                                                 identitySkin, diagnostic, invalidPose) &&
+                          diagnostic.find("finite nonzero quaternion") != std::string::npos,
+                          "named additive rotations must reject invalid quaternions");
+        }
+        std::size_t stableLowerBodyWitnesses = 0u;
+        float liftedStaffDelta = 0.0f;
+        float forwardStaffDelta = 0.0f;
+        std::array<float, 3u> neutralStaffCentroid{};
+        std::array<float, 3u> liftedStaffCentroid{};
+        std::array<float, 3u> forwardStaffCentroid{};
+        bool finiteCastSkin = neutralSkin.size() == liftedSkin.size() &&
+            neutralSkin.size() == forwardSkin.size() && !neutralSkin.empty();
+        for (std::size_t index = 0u; index < neutralSkin.size() && index < liftedSkin.size() &&
+             index < forwardSkin.size(); ++index)
+        {
+            const auto finiteVertex = [](const horde::scene::TexturedSkinnedRtVertex& vertex) {
+                for (float value : vertex.position) if (!std::isfinite(value)) return false;
+                for (float value : vertex.normal) if (!std::isfinite(value)) return false;
+                return true;
+            };
+            finiteCastSkin &= finiteVertex(neutralSkin[index]) && finiteVertex(liftedSkin[index]) &&
+                finiteVertex(forwardSkin[index]);
+        }
+        for (const auto& witness : horde::tests::keeper_lower_body_witnesses::kWitnesses)
+        {
+            const std::size_t index = witness.outputIndex;
+            const bool inRange = index < neutralSkin.size() && index < liftedSkin.size() &&
+                index < forwardSkin.size();
+            if (!inRange)
+            {
+                std::cerr << "Keeper lower-body witness index out of range: " << witness.outputIndex << '\n';
+                continue;
+            }
+            bool pinned = true;
+            bool stationary = true;
+            for (std::size_t axis = 0u; axis < 3u; ++axis)
+            {
+                pinned &= Near(neutralSkin[index].position[axis], witness.neutralPosition[axis], 0.0002f);
+                stationary &= Near(liftedSkin[index].position[axis], neutralSkin[index].position[axis], 0.0001f) &&
+                    Near(forwardSkin[index].position[axis], neutralSkin[index].position[axis], 0.0001f);
+            }
+            if (pinned && stationary)
+            {
+                ++stableLowerBodyWitnesses;
+            }
+            else
+            {
+                std::cerr << "Keeper lower-body witness changed or missed neutral pin: output="
+                          << witness.outputIndex << " pin=" << pinned << " stationary=" << stationary << '\n';
+            }
+        }
+        for (const std::uint32_t vertexIndex : std::array<std::uint32_t, 40u>{{
+                 15436u,16369u,16370u,16373u,17107u,17124u,17125u,17339u,17685u,17686u,
+                 17687u,17988u,17989u,17990u,17994u,17995u,17996u,18822u,18823u,18826u,
+                 18829u,18835u,19152u,19153u,19154u,19174u,19792u,20010u,20011u,20012u,
+                 20385u,20387u,20388u,20389u,20390u,20625u,20845u,20846u,21255u,25309u}})
+        {
+            if (vertexIndex < neutralSkin.size() && vertexIndex < liftedSkin.size() &&
+                vertexIndex < forwardSkin.size())
+            {
+                for (std::size_t axis = 0u; axis < 3u; ++axis)
+                {
+                    neutralStaffCentroid[axis] += neutralSkin[vertexIndex].position[axis];
+                    liftedStaffCentroid[axis] += liftedSkin[vertexIndex].position[axis];
+                    forwardStaffCentroid[axis] += forwardSkin[vertexIndex].position[axis];
+                    liftedStaffDelta += std::abs(liftedSkin[vertexIndex].position[axis] -
+                                                 neutralSkin[vertexIndex].position[axis]);
+                    forwardStaffDelta += std::abs(forwardSkin[vertexIndex].position[axis] -
+                                                  neutralSkin[vertexIndex].position[axis]);
+                }
+            }
+        }
+        for (std::size_t axis = 0u; axis < 3u; ++axis)
+        {
+            neutralStaffCentroid[axis] /= 40.0f;
+            liftedStaffCentroid[axis] /= 40.0f;
+            forwardStaffCentroid[axis] /= 40.0f;
+        }
+        const auto& sampledStaff = slot.LichStaffLocalSample();
+        ok &= Require(Near(sampledStaff[0], neutralStaffCentroid[0]) &&
+                      Near(sampledStaff[1], neutralStaffCentroid[1]) &&
+                      Near(sampledStaff[2], neutralStaffCentroid[2]),
+                      "physical staff light sample must match the audited neutral staff mesh centroid");
+        std::cerr << "Keeper audited staff centroids: neutral=(" << neutralStaffCentroid[0] << ", "
+                  << neutralStaffCentroid[1] << ", " << neutralStaffCentroid[2] << ") lifted=("
+                  << liftedStaffCentroid[0] << ", " << liftedStaffCentroid[1] << ", "
+                  << liftedStaffCentroid[2] << ") forward=(" << forwardStaffCentroid[0] << ", "
+                  << forwardStaffCentroid[1] << ", " << forwardStaffCentroid[2] << ")\n";
+        ok &= Require(finiteCastSkin && stableLowerBodyWitnesses > 100u &&
+                      stableLowerBodyWitnesses == horde::tests::keeper_lower_body_witnesses::kWitnesses.size() &&
+                      liftedStaffDelta > 1.0f &&
+                      forwardStaffDelta > 1.0f &&
+                      liftedStaffCentroid[1] > neutralStaffCentroid[1] + 0.10f &&
+                      forwardStaffCentroid[2] > liftedStaffCentroid[2] + 0.04f,
+                      "actual keeper staff centroid must rise during lift and move along actor-forward +Z during cast; both skins must keep the lower body fixed with finite positions and normals");
         const float deadDuration = slot.SkeletonDeadClipDuration();
         ok &= Require(deadDuration > 0.0f, "skeleton Dead clip duration was not captured from the model");
         skeletons[0].animation = EnemyAnimation::Dead;

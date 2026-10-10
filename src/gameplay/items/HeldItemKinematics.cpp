@@ -3,6 +3,7 @@
 #include "gameplay/CorridorCollision.h"
 #include "scene/ShowcaseOverheadGeometry.h"
 #include "scene/DevelopmentWorldGeometry.h"
+#include "gameplay/traversal/DevelopmentRescueJourney.h"
 
 #include <algorithm>
 #include <cmath>
@@ -359,9 +360,15 @@ float ComputePlayerTorchOverheadLowering(
 float ComputeRewardLanternForwardClearance(const float cameraX,
                                            const float cameraZ,
                                            const float forwardX,
-                                           const float forwardZ, const bool developmentWorldRoute)
+                                           const float forwardZ, const bool developmentWorldRoute,
+                                           const bool rescueExterior, const float supportWorldY)
 {
-    const auto walkable=[&](float x,float z) { return developmentWorldRoute ?
+    const auto walkable=[&](float x,float z) {
+        if (rescueExterior)
+            return horde::gameplay::traversal::RescueExteriorSupport(x,z).grounded &&
+                horde::gameplay::traversal::RescueExteriorMovementClear(
+                    cameraX,cameraZ,x,z,supportWorldY,kPlayerCollisionRadius);
+        return developmentWorldRoute ?
         horde::gameplay::simulation::ProjectWorldRoute(x,z).distance <=
             horde::gameplay::simulation::kWorldRouteHalfWidth-horde::gameplay::kPlayerCollisionRadius : IsShowcaseHeldPropPositionWalkable(x,z); };
     if (!std::isfinite(cameraX) || !std::isfinite(cameraZ) ||
@@ -713,7 +720,8 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
     const float forwardX = std::sin(input.cameraYawRadians);
     const float forwardZ = -std::cos(input.cameraYawRadians);
     const float forwardClearance = ComputeRewardLanternForwardClearance(
-        input.cameraX, input.cameraZ, forwardX, forwardZ, input.developmentWorldRoute);
+        input.cameraX, input.cameraZ, forwardX, forwardZ, input.developmentWorldRoute,
+        input.rescueExterior, input.playerSupportWorldY);
     // All rigid hand props share the continuous collision clearance. The
     // legacy 7.5 cm sampled helper produced a visible one-tick sword/forearm
     // jump while approaching a wall and could feed a discontinuous pose into
@@ -1176,7 +1184,7 @@ bool ResolveHeldItemsFixedStep(HeldItemStates& items,
         input.playerMountProfile,
         input.playerPitchRadians,
         input.logicalViewAspect,
-        input.playerSupportWorldY,input.developmentWorldRoute,input.readableCombatPose});
+        input.playerSupportWorldY,input.developmentWorldRoute,input.readableCombatPose,input.rescueExterior});
     if (input.swordItemState != nullptr &&
         input.swordItemState->id == HeldItemId::Sword)
     {

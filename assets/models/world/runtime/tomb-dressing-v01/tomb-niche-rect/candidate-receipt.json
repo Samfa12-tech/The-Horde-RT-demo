@@ -4,8 +4,8 @@
   "stage": "authored candidate; runtime admission pending",
   "role": "A rect-headed recessed burial alcove with stone returns and load-bearing shelf.",
   "sourceBlend": "../../../source/tomb-dressing-v01/tomb-dressing-v01.blend",
-  "sourceBlendSha256": "42b7f7ea7a1f2b863b0c236fd1d04509a2f0fc7b59607bcf3ca767c9871596ba",
-  "authoringScriptSha256": "cf473cc1397ee6b8f4dcd4fb69ab33947a73e6fad7ed195e4546595957ebb9d5",
+  "sourceBlendSha256": "713a3cf2878157e5ea8be4d6b36b55fde12f04170113b94ae99e0f501c9c0683",
+  "authoringScriptSha256": "e8eb9b27432b62d2dd1cbd5eb6e8d90045b6ae74dc6641ac70fb5015ad55db9d",
   "triangleCount": 1188,
   "vertexCount": 616,
   "materials": [
@@ -13,23 +13,23 @@
   ],
   "boundsBlenderXyzMetres": {
     "min": [
-      -0.64,
-      -0.2475,
+      -0.47,
+      -0.215325,
       0.0
     ],
     "max": [
-      0.64,
-      0.27,
-      1.6
+      0.47,
+      0.2349,
+      1.25
     ],
     "size": [
-      1.28,
-      0.5175,
-      1.6
+      0.94,
+      0.450225,
+      1.25
     ]
   },
-  "runtimeGlbSha256": "aa4b6cb8b072448534c4555a941851946bd6e9295af56b4b3ad035dd714e3ad9",
-  "runtimeGlbBytes": 86016,
+  "runtimeGlbSha256": "1dc8453c5fb455f9fabcc1837e0c77bd54429e240029478511f00b775b757368",
+  "runtimeGlbBytes": 85684,
   "textureCount": 0,
   "texturesOrExternalDependencies": false
 }

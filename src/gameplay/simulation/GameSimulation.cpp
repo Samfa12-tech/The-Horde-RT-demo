@@ -1413,7 +1413,7 @@ void GameSimulation::ResolveHeldItems()
         config_.playerMountProfile,
         &heldItems_[1],
         presentationAspect_,
-        playerSupport_.worldY,config_.developmentWorldRoute || UsesRescueExterior()};
+        playerSupport_.worldY,config_.developmentWorldRoute, false, UsesRescueExterior()};
     // Simulation owns the transition/visual blend. Kinematics keeps a stable
     // hand-endpoint matrix for gameplay; PlayerRenderSlot composes its single
     // rendered matrix from that endpoint and the animated Hips mount.

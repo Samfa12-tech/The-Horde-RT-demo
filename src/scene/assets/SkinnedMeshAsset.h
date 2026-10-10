@@ -16,6 +16,14 @@ namespace assets { class StaticMeshAsset; }
 
 using SkinnedNodeTransform = std::array<float, 16u>;
 
+// Local-space additive rotation applied after the authored clip pose. Missing
+// entries leave a node untouched, so existing skins retain their exact pose.
+struct SkinnedNodeRotation
+{
+    std::string_view nodeName;
+    std::array<float, 4u> rotation{{0.0f, 0.0f, 0.0f, 1.0f}};
+};
+
 // std430-compatible layout for both the RT build input and the raygen SSBO.
 struct SkinnedRtVertex
 {
@@ -172,8 +180,12 @@ public:
                        std::string_view nodeName,
                        SkinnedNodeTransform& output,
                        std::string& diagnostic) const;
-    bool Skin(SkinnedClip clip, float timeSeconds, std::vector<SkinnedRtVertex>& output, std::string& diagnostic) const;
-    bool SkinTextured(SkinnedClip clip, float timeSeconds, std::vector<TexturedSkinnedRtVertex>& output, std::string& diagnostic) const;
+    bool Skin(SkinnedClip clip, float timeSeconds, std::vector<SkinnedRtVertex>& output,
+              std::string& diagnostic,
+              std::span<const SkinnedNodeRotation> additiveNodeRotations = {}) const;
+    bool SkinTextured(SkinnedClip clip, float timeSeconds,
+                      std::vector<TexturedSkinnedRtVertex>& output, std::string& diagnostic,
+                      std::span<const SkinnedNodeRotation> additiveNodeRotations = {}) const;
     bool SkinUniqueTextured(SkinnedClip clip,
                             float timeSeconds,
                             std::vector<TexturedSkinnedRtVertex>& output,

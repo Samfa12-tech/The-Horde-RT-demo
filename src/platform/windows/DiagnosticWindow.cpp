@@ -1774,11 +1774,15 @@ void DrainGameplayEvents(VulkanSurfaceContext& context)
         switch (event.type)
         {
         case GameplayEventType::PlayerWetFootstep:
-            PlayPositionalSoundEffect(context,
-                (context.playerFootstepVariant++ & 1) == 0
-                    ? "water_wet_step_1.wav" : "water_wet_step_2.wav",
-                event.intensity * 0.45f, event, "pixabay");
+        {
+            const unsigned variant = static_cast<unsigned>(context.playerFootstepVariant++) & 3u;
+            const char* clip = variant == 0u ? "water_wet_step_1.wav" :
+                               variant == 1u ? "water_wet_step_2.wav" :
+                               variant == 2u ? "water_wet_step_3.wav" : "water_wet_step_4.wav";
+            PlayPositionalSoundEffect(context, clip,
+                event.intensity * horde::audio::kWetFootstepCueGain, event, "pixabay");
             break;
+        }
         case GameplayEventType::WaterfallContact:
             PlayPositionalSoundEffect(context, "water_stream_contact.wav",
                 event.intensity * 0.45f, event, "pixabay");
@@ -1839,7 +1843,7 @@ void DrainGameplayEvents(VulkanSurfaceContext& context)
             PlayPositionalSoundEffect(context, "skeleton_attack.wav", 0.20f, event);
             break;
         case GameplayEventType::LichDefeated:
-            PlayPositionalSoundEffect(context, "lich_fall.wav", 0.36f, event);
+            PlayPositionalSoundEffect(context, "keeper_death.wav", 0.36f, event, "pixabay");
             break;
         case GameplayEventType::KeeperRevealStarted:
             PlayPositionalSoundEffect(context, "keeper_i_sense_you.wav", 0.36f, event, "pixabay");
@@ -7293,6 +7297,22 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         context.stagedWorldPreparation = proof != nullptr && proof->stagedWorldPreparation;
     }
     if (!graphicsPreviewCapture && !outputResizeValidation && !context.nativeMotionValidation) LoadSettings(context);
+#if defined(_DEBUG)
+    // Explicit owner-playtest setup; ordinary launches keep their saved choice.
+    if (GetCommandLineW() != nullptr) {
+        int teachingArgc = 0;
+        auto teachingArgv = CommandLineToArgvW(GetCommandLineW(), &teachingArgc);
+        if (teachingArgv) {
+            for (int i = 1; i < teachingArgc; ++i)
+                if (std::wstring_view(teachingArgv[i]) == L"--development-teaching-slowdown") {
+                    context.combatTeachingEnabled = true;
+                    context.combatTeachingSlowdown = true;
+                }
+            LocalFree(teachingArgv);
+        }
+    }
+#endif
+
     if (context.developmentCombatPractice)
         context.simulation.BeginCombatPractice(horde::gameplay::EnemyKind::Skeleton);
     else if (context.developmentKeeperPractice)

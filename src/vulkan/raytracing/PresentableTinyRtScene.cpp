@@ -1,3 +1,4 @@
+#include "gameplay/effects/KeeperCastPresentation.h"
 #include "scene/TombDressing.h"
 #include "scene/TombWallRecess.h"
 #include "vulkan/raytracing/RescuePlayerRig.h"
@@ -3589,55 +3590,15 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
             }
         }
     }
-    // A rounded, slightly irregular catchment sits over the wet cobbles. The
-    // sixteen-triangle fan keeps a natural curved silhouette without a texture,
-    // alpha card, collision change, or screen-space mask.
-    constexpr Vertex waterImpactCentre{{-2.32f, -0.925f, -15.26f}};
-    constexpr std::array<std::array<float, 2u>, 16u> roundedCatchmentRim{{
-        {{-2.32f, -14.72f}}, {{-2.13f, -14.77f}},
-        {{-1.96f, -14.90f}}, {{-1.85f, -15.06f}},
-        {{-1.82f, -15.26f}}, {{-1.86f, -15.47f}},
-        {{-1.98f, -15.65f}}, {{-2.15f, -15.76f}},
-        {{-2.35f, -15.80f}}, {{-2.55f, -15.75f}},
-        {{-2.73f, -15.61f}}, {{-2.83f, -15.42f}},
-        {{-2.86f, -15.21f}}, {{-2.79f, -14.99f}},
-        {{-2.65f, -14.83f}}, {{-2.48f, -14.74f}},
-    }};
-    for (std::size_t point = 0u; point < roundedCatchmentRim.size(); ++point)
+    // The authoritative contact triangles also feed the fixed RT mesh. This
+    // keeps wet-event membership on the exact surfaces the camera can see.
+    for (const auto& triangle : horde::gameplay::effects::WaterSurfaceTriangles())
     {
-        const std::size_t next = (point + 1u) % roundedCatchmentRim.size();
-        const Vertex rimA{{roundedCatchmentRim[point][0], -0.925f,
-                           roundedCatchmentRim[point][1]}};
-        const Vertex rimB{{roundedCatchmentRim[next][0], -0.925f,
-                           roundedCatchmentRim[next][1]}};
-        addWorldTriangle(waterImpactCentre, rimA, rimB, SurfaceWater, SurfaceUp);
+        addWorldTriangle(Vertex{{triangle[0][0], triangle[0][1], triangle[0][2]}},
+                         Vertex{{triangle[1][0], triangle[1][1], triangle[1][2]}},
+                         Vertex{{triangle[2][0], triangle[2][1], triangle[2][2]}},
+                         SurfaceWater, SurfaceUp);
     }
-
-    // The catchment spills into a shallow stone runnel that narrows toward a
-    // real recessed drain in the skylight chamber. These connected surfaces
-    // remain above the collision floor and therefore do not alter traversal.
-    addWorldQuad({{-2.48f, -0.924f, -14.96f}}, {{-2.48f, -0.924f, -15.54f}},
-                 {{-3.10f, -0.926f, -15.48f}}, {{-3.10f, -0.926f, -15.02f}},
-                 SurfaceWater, SurfaceUp);
-    addWorldQuad({{-3.10f, -0.926f, -15.02f}}, {{-3.10f, -0.926f, -15.48f}},
-                 {{-3.72f, -0.928f, -15.46f}}, {{-3.72f, -0.928f, -14.98f}},
-                 SurfaceWater, SurfaceUp);
-    addWorldQuad({{-3.72f, -0.928f, -14.98f}}, {{-3.72f, -0.928f, -15.46f}},
-                 {{-4.35f, -0.930f, -15.40f}}, {{-4.35f, -0.930f, -15.05f}},
-                 SurfaceWater, SurfaceUp);
-    addWorldQuad({{-4.35f, -0.930f, -15.05f}}, {{-4.35f, -0.930f, -15.40f}},
-                 {{-4.88f, -0.931f, -15.36f}}, {{-4.88f, -0.931f, -15.08f}},
-                 SurfaceWater, SurfaceUp);
-    constexpr float runoffDrainLipX = -5.30f;
-    addWorldQuad({{-4.88f, -0.931f, -15.08f}}, {{-4.88f, -0.931f, -15.36f}},
-                 {{runoffDrainLipX, -0.932f, -15.33f}},
-                 {{runoffDrainLipX, -0.932f, -15.11f}}, SurfaceWater, SurfaceUp);
-    // The final film folds below the grate instead of being buried beneath the
-    // cobbles before it arrives. Its upper edge overlaps the drain throat.
-    addWorldQuad({{runoffDrainLipX, -0.932f, -15.11f}},
-                 {{runoffDrainLipX, -0.932f, -15.33f}},
-                 {{-5.38f, -1.08f, -15.30f}}, {{-5.38f, -1.08f, -15.14f}},
-                 SurfaceWater, SurfaceUp);
 
     // Dark throat and metal crossbars make the sink legible through the clear
     // runoff while the final sloped water surface visibly disappears below
@@ -7597,7 +7558,8 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
         std::clamp(frame.outputExposure, sceneProfile_ == RtSceneProfile::EntryMenu ? 0.0f : 0.2f,
                    1.4f),
         std::clamp(frame.combat.damageFlash, 0.0f, 1.0f),
-        frame.roster.selectedEnemy == horde::gameplay::EnemyKind::Lich ? 1.0f : 0.0f,
+        horde::gameplay::effects::KeeperShaderPresentationKind(
+            frame.roster.selectedEnemy == horde::gameplay::EnemyKind::Lich, frame.lich),
         guidanceLightActive ? 0.0f : std::clamp(frame.lich.staffLightStrength, 0.0f, 2.2f),
         guidanceLightActive ? guidanceLight.position[0] : staffWorldPosition[0],
         guidanceLightActive ? guidanceLight.position[1] : staffWorldPosition[1],

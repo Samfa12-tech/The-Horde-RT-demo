@@ -76,34 +76,46 @@ struct Placement
     std::array<float, 3u> position;
     float yaw;
     float rollZ;
+    std::array<float, 3u> scale{{1.0f, 1.0f, 1.0f}};
 };
 
 // The side-wall niches face into the route and sit mostly behind its walk boundary,
-// presenting their real .29-.30 m deep returns with at most 5 cm of frame reveal.
-// Their lower bounds sit 0.30 m above the route floor. All loose pieces stay
+// presenting real .29-.30 m deep returns with at most 5 cm of frame reveal.
+// Their openings are 0.66-.71 m wide and 0.78-.90 m high. All loose pieces stay
 // at the room/passage edges; the centre walk lane, right-wall grate, portal,
 // guards, reward chest, and rescue-rope approaches remain clear.
-constexpr std::array<Placement, 13u> kPlacements{{
-    // Three self-contained recessed burial modules.
-    {AssetId::RectNiche, {-2.0475f, -0.65f, -0.70f}, kPi * 0.5f, 0.0f},
-    {AssetId::ArchedNiche, {-2.0475f, -0.65f, -2.60f}, kPi * 0.5f, 0.0f},
-    {AssetId::RectNiche, {6.1975f, -0.65f, -12.40f}, -kPi * 0.5f, 0.0f},
+constexpr std::array<Placement, 16u> kPlacements{{
+    // Compact sealed recesses use varied width/height while retaining a deep reveal.
+    {AssetId::RectNiche, {-1.97226f, -0.54f, -0.70f}, kPi * 0.5f, 0.0f, {{0.74f, 0.66f, 0.80f}}},
+    {AssetId::ArchedNiche, {-1.97226f, -0.55f, -2.60f}, kPi * 0.5f, 0.0f, {{0.76f, 0.72f, 0.80f}}},
+    {AssetId::RectNiche, {6.12226f, -0.50f, -12.40f}, -kPi * 0.5f, 0.0f, {{0.70f, 0.62f, 0.80f}}},
     // One cold stub on the first genuine niche shelf.
-    {AssetId::CandleOne, {-2.0625f, -0.3675f, -0.49f}, 0.0f, 0.0f},
+    {AssetId::CandleOne, {-2.0625f, kEntryRectNicheShelfTop, -0.55f}, 0.0f, 0.0f, {{0.72f, 0.72f, 0.72f}}},
     // Skull and two laid-out long-bone remains on the second shelf.
-    {AssetId::SkullJaw, {-1.9275f, -0.3675f, -2.58f}, kPi * 0.5f, 0.0f},
-    {AssetId::Femur, {-2.1075f, -0.314633f, -2.34f}, kPi * 0.5f, -kPi * 0.5f},
-    {AssetId::Humerus, {-2.1075f, -0.329427f, -2.02f}, kPi * 0.5f, -kPi * 0.5f},
+    {AssetId::SkullJaw, {-1.9275f, kEntryArchNicheShelfTop, -2.60f}, kPi * 0.5f, 0.0f, {{0.72f, 0.72f, 0.72f}}},
+    {AssetId::Femur, {-2.1075f, kEntryArchNicheShelfTop + 0.038064f, -2.47f}, kPi * 0.5f, -kPi * 0.5f, {{0.72f, 0.72f, 0.72f}}},
+    {AssetId::Humerus, {-2.1075f, kEntryArchNicheShelfTop + 0.027412f, -2.25f}, kPi * 0.5f, -kPi * 0.5f, {{0.72f, 0.72f, 0.72f}}},
     // Two extinguished stubs in the outer route east-wall recess at x=6.
-    {AssetId::CandleTwo, {6.1825f, -0.3675f, -12.60f}, 0.0f, 0.0f},
-    {AssetId::CandleThree, {6.1825f, -0.3675f, -12.15f}, 0.0f, 0.0f},
+    {AssetId::CandleTwo, {6.1825f, kOuterNicheShelfTop, -12.56f}, 0.0f, 0.0f, {{0.72f, 0.72f, 0.72f}}},
+    {AssetId::CandleThree, {6.1825f, kOuterNicheShelfTop, -12.24f}, 0.0f, 0.0f, {{0.72f, 0.72f, 0.72f}}},
     // The displaced lid rests entirely on the existing collidable stone bier.
     {AssetId::DisplacedLid, {-1.135f, -0.58f, 1.20f}, 0.0f, 0.0f},
     // Ceremonial offerings and fragments sit in Keeper's rear corner, away from routes.
     {AssetId::OfferingBowl, {-30.90f, kFloorY, -17.95f}, 0.0f, 0.0f},
     {AssetId::BrokenUrn, {-36.45f, kFloorY, -17.95f}, 0.15f, 0.0f},
     {AssetId::UrnShard, {-36.75f, kFloorY, -18.12f}, -0.45f, 0.0f},
+    // Small cold offerings rest on the authored masonry lip at the entry lintel.
+    {AssetId::CandleTwo, {-0.19f, 1.14f, -6.305f}, 0.0f, 0.0f, {{0.55f, 0.55f, 0.55f}}},
+    {AssetId::OfferingBowl, {0.015f, 1.14f, -6.305f}, 0.0f, 0.0f, {{0.30f, 0.30f, 0.30f}}},
+    {AssetId::CandleThree, {0.205f, 1.14f, -6.305f}, 0.0f, 0.0f, {{0.55f, 0.55f, 0.55f}}},
 }};
+
+constexpr float kEntryLintelShelfMinX = -0.34f;
+constexpr float kEntryLintelShelfMaxX = 0.34f;
+constexpr float kEntryLintelShelfBackZ = -6.40f;
+constexpr float kEntryLintelShelfFrontZ = -6.20f;
+constexpr float kEntryLintelShelfBaseY = 1.09f;
+constexpr float kEntryLintelShelfTopY = 1.14f;
 
 assets::AssetManifest MakeIntakeManifest(std::string_view name)
 {
@@ -140,6 +152,7 @@ std::array<float, 3u> TransformPoint(const assets::StaticRtVertex& vertex,
 {
     // StaticMeshAsset::Load has already baked the GLB node-world transform.
     std::array<float, 3u> point{{vertex.position[0], vertex.position[1], vertex.position[2]}};
+    for (std::size_t axis = 0u; axis < 3u; ++axis) point[axis] *= placement.scale[axis];
     point = RotateZ(point, placement.rollZ);
     point = RotateY(point, placement.yaw);
     for (std::size_t axis = 0u; axis < 3u; ++axis) point[axis] += placement.position[axis];
@@ -147,9 +160,12 @@ std::array<float, 3u> TransformPoint(const assets::StaticRtVertex& vertex,
 }
 
 std::array<float, 3u> TransformDirection(const std::array<float, 4u>& source,
-                                         const Placement& placement)
+                                         const Placement& placement,
+                                         bool normal)
 {
     std::array<float, 3u> direction{{source[0], source[1], source[2]}};
+    for (std::size_t axis = 0u; axis < 3u; ++axis)
+        direction[axis] *= normal ? 1.0f / placement.scale[axis] : placement.scale[axis];
     direction = RotateZ(direction, placement.rollZ);
     direction = RotateY(direction, placement.yaw);
     const float length = std::sqrt(direction[0] * direction[0] +
@@ -175,6 +191,76 @@ MaterialFamily ClassifyMaterial(AssetId asset, const assets::StaticMaterial& mat
     if (name == "Original_charred_wick") return MaterialFamily::CharredWick;
     diagnostic = "Tomb dressing candidate has an unclassified source material '" + material.name + "'.";
     return MaterialFamily::Count;
+}
+
+void AppendEntryLintelShelf(std::vector<assets::StaticRtVertex>& vertices,
+                            std::vector<std::uint32_t>& indices,
+                            TombDressingBuildReport& report)
+{
+    const std::array<std::array<std::array<float, 3u>, 4u>, 6u> faces{{
+        {{{{kEntryLintelShelfMinX, kEntryLintelShelfTopY, kEntryLintelShelfBackZ}},
+          {{kEntryLintelShelfMinX, kEntryLintelShelfTopY, kEntryLintelShelfFrontZ}},
+          {{kEntryLintelShelfMaxX, kEntryLintelShelfTopY, kEntryLintelShelfFrontZ}},
+          {{kEntryLintelShelfMaxX, kEntryLintelShelfTopY, kEntryLintelShelfBackZ}}}},
+        {{{{kEntryLintelShelfMinX, kEntryLintelShelfBaseY, kEntryLintelShelfBackZ}},
+          {{kEntryLintelShelfMaxX, kEntryLintelShelfBaseY, kEntryLintelShelfBackZ}},
+          {{kEntryLintelShelfMaxX, kEntryLintelShelfBaseY, kEntryLintelShelfFrontZ}},
+          {{kEntryLintelShelfMinX, kEntryLintelShelfBaseY, kEntryLintelShelfFrontZ}}}},
+        {{{{kEntryLintelShelfMinX, kEntryLintelShelfBaseY, kEntryLintelShelfFrontZ}},
+          {{kEntryLintelShelfMaxX, kEntryLintelShelfBaseY, kEntryLintelShelfFrontZ}},
+          {{kEntryLintelShelfMaxX, kEntryLintelShelfTopY, kEntryLintelShelfFrontZ}},
+          {{kEntryLintelShelfMinX, kEntryLintelShelfTopY, kEntryLintelShelfFrontZ}}}},
+        {{{{kEntryLintelShelfMaxX, kEntryLintelShelfBaseY, kEntryLintelShelfBackZ}},
+          {{kEntryLintelShelfMinX, kEntryLintelShelfBaseY, kEntryLintelShelfBackZ}},
+          {{kEntryLintelShelfMinX, kEntryLintelShelfTopY, kEntryLintelShelfBackZ}},
+          {{kEntryLintelShelfMaxX, kEntryLintelShelfTopY, kEntryLintelShelfBackZ}}}},
+        {{{{kEntryLintelShelfMinX, kEntryLintelShelfBaseY, kEntryLintelShelfBackZ}},
+          {{kEntryLintelShelfMinX, kEntryLintelShelfBaseY, kEntryLintelShelfFrontZ}},
+          {{kEntryLintelShelfMinX, kEntryLintelShelfTopY, kEntryLintelShelfFrontZ}},
+          {{kEntryLintelShelfMinX, kEntryLintelShelfTopY, kEntryLintelShelfBackZ}}}},
+        {{{{kEntryLintelShelfMaxX, kEntryLintelShelfBaseY, kEntryLintelShelfFrontZ}},
+          {{kEntryLintelShelfMaxX, kEntryLintelShelfBaseY, kEntryLintelShelfBackZ}},
+          {{kEntryLintelShelfMaxX, kEntryLintelShelfTopY, kEntryLintelShelfBackZ}},
+          {{kEntryLintelShelfMaxX, kEntryLintelShelfTopY, kEntryLintelShelfFrontZ}}}},
+    }};
+    const std::array<std::array<float, 3u>, 6u> normals{{
+        {{0.0f, 1.0f, 0.0f}}, {{0.0f, -1.0f, 0.0f}},
+        {{0.0f, 0.0f, 1.0f}}, {{0.0f, 0.0f, -1.0f}},
+        {{-1.0f, 0.0f, 0.0f}}, {{1.0f, 0.0f, 0.0f}},
+    }};
+    const std::array<std::array<float, 3u>, 6u> tangents{{
+        {{1.0f, 0.0f, 0.0f}}, {{1.0f, 0.0f, 0.0f}},
+        {{1.0f, 0.0f, 0.0f}}, {{1.0f, 0.0f, 0.0f}},
+        {{0.0f, 0.0f, 1.0f}}, {{0.0f, 0.0f, 1.0f}},
+    }};
+    constexpr std::array<std::array<float, 2u>, 4u> uvs{{
+        {{0.0f, 0.0f}}, {{0.0f, 1.0f}}, {{1.0f, 1.0f}}, {{1.0f, 0.0f}},
+    }};
+    const std::uint32_t firstVertex = static_cast<std::uint32_t>(vertices.size());
+    for (std::size_t face = 0u; face < faces.size(); ++face)
+    {
+        for (std::size_t corner = 0u; corner < faces[face].size(); ++corner)
+        {
+            assets::StaticRtVertex vertex{};
+            vertex.position = {{faces[face][corner][0], faces[face][corner][1],
+                                faces[face][corner][2], 1.0f}};
+            vertex.normal = {{normals[face][0], normals[face][1], normals[face][2], 0.0f}};
+            vertex.tangent = {{tangents[face][0], tangents[face][1], tangents[face][2], 1.0f}};
+            vertex.uv0 = {{uvs[corner][0], uvs[corner][1], 0.0f, 0.0f}};
+            vertices.push_back(vertex);
+            for (std::size_t axis = 0u; axis < 3u; ++axis)
+            {
+                report.entryLintelShelfBounds.minimum[axis] =
+                    std::min(report.entryLintelShelfBounds.minimum[axis], faces[face][corner][axis]);
+                report.entryLintelShelfBounds.maximum[axis] =
+                    std::max(report.entryLintelShelfBounds.maximum[axis], faces[face][corner][axis]);
+                report.addedBounds.minimum[axis] = std::min(report.addedBounds.minimum[axis], faces[face][corner][axis]);
+                report.addedBounds.maximum[axis] = std::max(report.addedBounds.maximum[axis], faces[face][corner][axis]);
+            }
+        }
+        const std::uint32_t base = firstVertex + static_cast<std::uint32_t>(face * 4u);
+        indices.insert(indices.end(), {base, base + 1u, base + 2u, base, base + 2u, base + 3u});
+    }
 }
 
 } // namespace
@@ -317,6 +403,8 @@ bool AppendPreparedTombDressing(const std::filesystem::path& assetRoot,
     TombDressingBuildReport candidateReport{};
     candidateReport.addedBounds.minimum.fill(std::numeric_limits<float>::max());
     candidateReport.addedBounds.maximum.fill(std::numeric_limits<float>::lowest());
+    candidateReport.entryLintelShelfBounds.minimum.fill(std::numeric_limits<float>::max());
+    candidateReport.entryLintelShelfBounds.maximum.fill(std::numeric_limits<float>::lowest());
     std::array<bool, static_cast<std::size_t>(AssetId::Count)> placed{};
 
     for (std::size_t placementIndex = 0u; placementIndex < kPlacements.size(); ++placementIndex)
@@ -358,8 +446,8 @@ bool AppendPreparedTombDressing(const std::filesystem::path& assetRoot,
             {
                 assets::StaticRtVertex vertex = source.vertices[vertexIndex];
                 const auto position = TransformPoint(vertex, placement);
-                const auto normal = TransformDirection(vertex.normal, placement);
-                const auto tangent = TransformDirection(vertex.tangent, placement);
+                const auto normal = TransformDirection(vertex.normal, placement, true);
+                const auto tangent = TransformDirection(vertex.tangent, placement, false);
                 for (std::size_t axis = 0u; axis < 3u; ++axis)
                 {
                     if (!std::isfinite(position[axis]) || !std::isfinite(normal[axis]) ||
@@ -399,6 +487,9 @@ bool AppendPreparedTombDressing(const std::filesystem::path& assetRoot,
         }
         ++candidateReport.placedInstances;
     }
+    AppendEntryLintelShelf(groupedVertices[static_cast<std::size_t>(MaterialFamily::Masonry)],
+                           groupedIndices[static_cast<std::size_t>(MaterialFamily::Masonry)],
+                           candidateReport);
     if (std::any_of(placed.begin(), placed.end(), [](bool value) { return !value; }))
     {
         diagnostic = "Tomb dressing bounded placement set is missing a selected source family.";

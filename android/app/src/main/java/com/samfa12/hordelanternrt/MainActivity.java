@@ -206,6 +206,8 @@ public class MainActivity extends Activity {
     private static final int PLATFORM_EVENT_PARRY_PREPARE_CUE = 24;
     private static final int PLATFORM_EVENT_LICH_DISCHARGE_WARNING = 25;
     private static final int PLATFORM_EVENT_PLAYER_WET_FOOTSTEP = 26;
+    private static final float PLAYER_DRY_FOOTSTEP_GAIN = 0.29f;
+    private static final float PLAYER_WET_FOOTSTEP_GAIN = 1.0f;
     private static final int PLATFORM_EVENT_WATERFALL_CONTACT = 27;
     private static final int EQUIPMENT_AUDIO_SWORD_DRAW = 1;
     private static final int EQUIPMENT_AUDIO_SWORD_SHEATH = 2;
@@ -4840,8 +4842,7 @@ public class MainActivity extends Activity {
                     final long eventSequence = (metadata >>> 32) & 0xffffffffL;
                     switch (eventType) {
                         case PLATFORM_EVENT_PLAYER_WET_FOOTSTEP:
-                            playSpatialSound((playerStepVariant++ & 1) == 0 ?
-                                    "water_wet_step_1" : "water_wet_step_2", 0.45f,
+                            playSpatialSound(wetFootstepSoundKey(playerStepVariant++), PLAYER_WET_FOOTSTEP_GAIN,
                                     stereoGains, verticalMetadata);
                             break;
                         case PLATFORM_EVENT_WATERFALL_CONTACT:
@@ -4850,7 +4851,7 @@ public class MainActivity extends Activity {
                             break;
                         case PLATFORM_EVENT_PLAYER_FOOTSTEP:
                             playSpatialSound((playerStepVariant++ & 1) == 0 ?
-                                    "player_step_1" : "player_step_2", 0.45f,
+                                    "player_step_1" : "player_step_2", PLAYER_DRY_FOOTSTEP_GAIN,
                                     stereoGains, verticalMetadata);
                             break;
                         case PLATFORM_EVENT_PLAYER_SWING:
@@ -4920,7 +4921,7 @@ public class MainActivity extends Activity {
                             playSpatialSound("lich_impact", 0.55f, stereoGains, verticalMetadata);
                             break;
                         case PLATFORM_EVENT_LICH_DEFEATED:
-                            playSpatialSound("lich_fall", 0.28f, stereoGains, verticalMetadata);
+                            playSpatialSound("keeper_death", 0.28f, stereoGains, verticalMetadata);
                             break;
                         case PLATFORM_EVENT_CHEST_UNLOCKED:
                             playSpatialSound("chest_unlock", 0.82f, stereoGains, verticalMetadata);
@@ -5456,13 +5457,15 @@ public class MainActivity extends Activity {
         loadSound("player_step_2", "audio/filmcow/player_step_2.wav");
         loadSound("water_wet_step_1", "audio/pixabay/water_wet_step_1_core.wav");
         loadSound("water_wet_step_2", "audio/pixabay/water_wet_step_2_core.wav");
+        loadSound("water_wet_step_3", "audio/pixabay/water_wet_step_3_core.wav");
+        loadSound("water_wet_step_4", "audio/pixabay/water_wet_step_4_core.wav");
         loadSound("water_stream_contact", "audio/pixabay/water_stream_contact_core.wav");
         loadSound("skeleton_step_1", "audio/filmcow/skeleton_step_1.wav");
         loadSound("skeleton_step_2", "audio/filmcow/skeleton_step_2.wav");
         loadSound("skeleton_attack", "audio/filmcow/skeleton_attack.wav");
         loadSound("lich_charge", "audio/filmcow/lich_charge.wav");
         loadSound("lich_impact", "audio/filmcow/lich_impact.wav");
-        loadSound("lich_fall", "audio/filmcow/lich_fall.wav");
+        loadSound("keeper_death", "audio/pixabay/keeper_death_core.wav");
         loadSound("lich_hurt", "audio/filmcow/lich_hurt.wav");
         loadSound("chest_unlock", "audio/pixabay/chest_unlock.wav");
         loadSound("chest_open", "audio/pixabay/chest_open.wav");
@@ -5595,6 +5598,15 @@ public class MainActivity extends Activity {
         final float left = clamp(Float.intBitsToFloat((int) packedStereoGains), 0.0f, 1.0f);
         final float right = clamp(Float.intBitsToFloat((int) (packedStereoGains >>> 32)), 0.0f, 1.0f);
         playSound(key, mixGain, left, right);
+    }
+
+    private static String wetFootstepSoundKey(final int variant) {
+        switch (variant & 3) {
+            case 0: return "water_wet_step_1";
+            case 1: return "water_wet_step_2";
+            case 2: return "water_wet_step_3";
+            default: return "water_wet_step_4";
+        }
     }
 
     private void playSpatialSound(final String key, final float mixGain,
