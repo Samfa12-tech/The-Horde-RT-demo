@@ -1,0 +1,22 @@
+Test project <repo>/build/presets/windows-x64-debug
+    Start 157: horde_rt_rescue_journey_integration_tests
+1/1 Test #157: horde_rt_rescue_journey_integration_tests ...***Failed    9.64 sec
+claim-site position=-34,-17.55 prompt=0 phase=4
+cycle=0 ascent-end phase=4 root=-33.7,2.05,-12.8
+upper lantern hand depth=0.2 localY=-0.129301
+upper landing falsely retracts restored lantern against a missing route wall
+unready-edge start=39.9707,-0.0043903 end=39.9707,-0.0043903 blocked=1
+cycle=1 ascent-end phase=4 root=-33.7,2.05,-12.8
+upper lantern hand depth=0.2 localY=-0.129781
+upper landing falsely retracts restored lantern against a missing route wall
+Combined CPU preparation resident_ns=178400 staged_ns=172800 resident_retained_bytes=49056 staged_retained_bytes=49056 resident_peak_capacity_bytes=71808 staged_peak_capacity_bytes=71808 gpu_residency_comparison=NOT_MEASURED
+Rescue journey integration cases=19447 failures=2 retained_triangles=1022
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   9.66 sec
+
+The following tests FAILED:
+	157 - horde_rt_rescue_journey_integration_tests (Failed)
+Errors while running CTest

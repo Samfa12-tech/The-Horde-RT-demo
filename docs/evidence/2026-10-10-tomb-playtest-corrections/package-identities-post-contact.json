@@ -1,0 +1,110 @@
+[
+  {
+    "path": "build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+    "sha256": "3190c97732d5f134f734e162a8a151fdc1f23492407b15c6858464ce914892fa",
+    "bytes": 12066304,
+    "instrumentation": "Diagnostic",
+    "quality": "High"
+  },
+  {
+    "path": "build\\presets\\windows-x64-release\\Release\\HordeLanternRT.exe",
+    "sha256": "5d51b557c25a9b2c8da3e55fb8954bbc6e457f3d830770af5171b5152aaf1c16",
+    "bytes": 4224000,
+    "instrumentation": "Shipping",
+    "quality": "High"
+  },
+  {
+    "apk": "android\\app\\build\\outputs\\apk\\debug\\app-debug.apk",
+    "entry": "lib/arm64-v8a/libhorde_rt_probe_android.so",
+    "sha256": "38ab52a4c23af11a821a324060e503ae4c33b6c771ad806e629733b198dfc391",
+    "bytes": 4710672,
+    "strippedMatch": true,
+    "shaderInspection": "passed ARM64 package helper",
+    "instrumentation": "Diagnostic",
+    "quality": "Mobile"
+  },
+  {
+    "apk": "android\\app\\build\\outputs\\apk\\debug\\app-debug.apk",
+    "entry": "lib/armeabi-v7a/libhorde_rt_probe_android.so",
+    "sha256": "7b95d5f487c51dfeebb0feb2b5978e82d4d81b13229ce52adc7d2bb6b306ce58",
+    "bytes": 4136696,
+    "strippedMatch": true,
+    "shaderInspection": "unavailable: existing scanner requires AArch64 ELF64; byte identity only",
+    "instrumentation": "Diagnostic",
+    "quality": "Mobile"
+  },
+  {
+    "apk": "android\\app\\build\\outputs\\apk\\debug\\app-debug.apk",
+    "entry": "lib/x86/libhorde_rt_probe_android.so",
+    "sha256": "262ec99a33e45947524157dab772b7f7cb8370051a0e2251bfa11ed01b24787e",
+    "bytes": 5146608,
+    "strippedMatch": true,
+    "shaderInspection": "unavailable: existing scanner requires AArch64 ELF64; byte identity only",
+    "instrumentation": "Diagnostic",
+    "quality": "Mobile"
+  },
+  {
+    "apk": "android\\app\\build\\outputs\\apk\\debug\\app-debug.apk",
+    "entry": "lib/x86_64/libhorde_rt_probe_android.so",
+    "sha256": "7797bb2e8a9b7da63b52f5b805932084673698266af3e345f4b82e9cd482d758",
+    "bytes": 4889056,
+    "strippedMatch": true,
+    "shaderInspection": "unavailable: existing scanner requires AArch64 ELF64; byte identity only",
+    "instrumentation": "Diagnostic",
+    "quality": "Mobile"
+  },
+  {
+    "path": "android\\app\\build\\outputs\\apk\\debug\\app-debug.apk",
+    "sha256": "314a877c1b85aec6bff773571e22bf884944a70e80e7a82807ee561a82c4638c",
+    "bytes": 138534878,
+    "inspection": "ARM64-only package helper; other three ABI byte identities only; no device execution",
+    "deathAudioMatches": true
+  },
+  {
+    "apk": "android\\app\\build\\outputs\\apk\\release\\app-release-unsigned.apk",
+    "entry": "lib/arm64-v8a/libhorde_rt_probe_android.so",
+    "sha256": "4f26304e3afc98270caa37765976c3aa4cff6804f91a41d532dcd02dac480496",
+    "bytes": 4516264,
+    "strippedMatch": true,
+    "shaderInspection": "passed ARM64 package helper",
+    "instrumentation": "Shipping",
+    "quality": "Mobile"
+  },
+  {
+    "apk": "android\\app\\build\\outputs\\apk\\release\\app-release-unsigned.apk",
+    "entry": "lib/armeabi-v7a/libhorde_rt_probe_android.so",
+    "sha256": "50972efb1379a0d6a52802f443efde650ff7b2794145c9890b5f63e64695ede5",
+    "bytes": 3978356,
+    "strippedMatch": true,
+    "shaderInspection": "unavailable: existing scanner requires AArch64 ELF64; byte identity only",
+    "instrumentation": "Shipping",
+    "quality": "Mobile"
+  },
+  {
+    "apk": "android\\app\\build\\outputs\\apk\\release\\app-release-unsigned.apk",
+    "entry": "lib/x86/libhorde_rt_probe_android.so",
+    "sha256": "324fef43e4fc36e0a7e89d75c3d2a947e220b585b951f93abc18c8b4308731c5",
+    "bytes": 4906588,
+    "strippedMatch": true,
+    "shaderInspection": "unavailable: existing scanner requires AArch64 ELF64; byte identity only",
+    "instrumentation": "Shipping",
+    "quality": "Mobile"
+  },
+  {
+    "apk": "android\\app\\build\\outputs\\apk\\release\\app-release-unsigned.apk",
+    "entry": "lib/x86_64/libhorde_rt_probe_android.so",
+    "sha256": "cd79539325240aee4b442e9d07c59bfbb3935d9e1079012df42188c8945ef7fc",
+    "bytes": 4684056,
+    "strippedMatch": true,
+    "shaderInspection": "unavailable: existing scanner requires AArch64 ELF64; byte identity only",
+    "instrumentation": "Shipping",
+    "quality": "Mobile"
+  },
+  {
+    "path": "android\\app\\build\\outputs\\apk\\release\\app-release-unsigned.apk",
+    "sha256": "467bb628bf0ce36f9d3431a38549e073013733e99975c189fd7165987ad4bc40",
+    "bytes": 122750125,
+    "inspection": "ARM64-only package helper; other three ABI byte identities only; no device execution",
+    "deathAudioMatches": true
+  }
+]

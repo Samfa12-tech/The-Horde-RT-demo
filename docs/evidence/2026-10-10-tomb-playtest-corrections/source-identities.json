@@ -1,0 +1,503 @@
+{
+  "sourceCommit": "7bedc4b99558a15fcb7aa3055d877c91a0f4d001",
+  "files": [
+    {
+      "path": ".gitattributes",
+      "workingBytes": 19928,
+      "sha256": "d34ed6932c319021eb52d61463a89dbb663fd4a1ae5a67b038cb0a209617c5d6",
+      "gitBlob": "4e7c80565a7045d22e326e078e2832bcd72c09a8"
+    },
+    {
+      "path": ".github/workflows/shared-simulation-host.yml",
+      "workingBytes": 24271,
+      "sha256": "86aba950e40168453033a8fbe466caca4be1d511198e072a8a8f0436e8c62107",
+      "gitBlob": "313380689ed95f0bbadebe240cbc2676e444e1d8"
+    },
+    {
+      "path": "ASSET_LICENSES.md",
+      "workingBytes": 45130,
+      "sha256": "9773a35ee9dd193c8d2736fc53033ee40fa1dda1ed298247029751a0c9027c4f",
+      "gitBlob": "9745dce6802610c9099a169a79740bc825278cf3"
+    },
+    {
+      "path": "CMakeLists.txt",
+      "workingBytes": 84180,
+      "sha256": "3dab64eb3000a506c1fb62bd332a7f82babedae94ddb8988ca36217e5fcffe4b",
+      "gitBlob": "b436b450181aeea3f2e289c7ee0668dc2d7aac2f"
+    },
+    {
+      "path": "android/app/build.gradle",
+      "workingBytes": 34613,
+      "sha256": "334e7f4fae38331564bacc377f8c42b10c2fffaabf8d88044e68ef4d8a506ea6",
+      "gitBlob": "5d52f7c366dd239a6c316a494c39f5215e3aec75"
+    },
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java",
+      "workingBytes": 373133,
+      "sha256": "4799bd837e9fea37a922b4ec7f3d6be66511255d2789254636c30165343c8c80",
+      "gitBlob": "0ffddae9f0e470decf5ab9d025e6054b37e5901a"
+    },
+    {
+      "path": "assets/audio/pixabay/water-contact.manifest.json",
+      "workingBytes": 13669,
+      "sha256": "a03036deff4aa1ea889c512b1ba34257b85c1ea3bbd695320dc52be70f22a6a2",
+      "gitBlob": "02af391302c06c7c38229bc71dd66c4ba95f9573"
+    },
+    {
+      "path": "assets/audio/pixabay/water_wet_step_1.wav",
+      "workingBytes": 36524,
+      "sha256": "e3b3855ef7a91b676bc5be94fb403cdb8edbd4a461a5bd56790175b0bd1917de",
+      "gitBlob": "11f18b3806eb1cb530212ca65c1ad560cdda6098"
+    },
+    {
+      "path": "assets/audio/pixabay/water_wet_step_1_core.wav",
+      "workingBytes": 73004,
+      "sha256": "b15bd6c9a7b84c08aedbcee87e53bcbc85a2740abd5180858391ed66283b8622",
+      "gitBlob": "3db6f8b74a2a59be907e64085e1171d93d6bbe4e"
+    },
+    {
+      "path": "assets/audio/pixabay/water_wet_step_2.wav",
+      "workingBytes": 36524,
+      "sha256": "b8752ba0dc7b737d8148c1c5c56eac5e5ff52d49d57dc3cfb27239276f2a0fff",
+      "gitBlob": "5ed219a48916a9f37b8bd50842e940e103f89c85"
+    },
+    {
+      "path": "assets/audio/pixabay/water_wet_step_2_core.wav",
+      "workingBytes": 73004,
+      "sha256": "40188320f8eea7d56c948301a969d4e31d8af4dea02a5f1d864eda2973f28224",
+      "gitBlob": "02821ae10d0cc6867debd08bc33ecd520ad306a0"
+    },
+    {
+      "path": "assets/models/world/runtime/tomb-dressing-v01/tomb-niche-arched/candidate-receipt.json",
+      "workingBytes": 951,
+      "sha256": "17a450b1aa46eedb2ea492787d302ab52a2ff323a4142a2255f0dd57d81f043f",
+      "gitBlob": "dfb20a6a360cc636d496ced6c26ccb08070234b8"
+    },
+    {
+      "path": "assets/models/world/runtime/tomb-dressing-v01/tomb-niche-arched/tomb-niche-arched-lod0.runtime.glb",
+      "workingBytes": 99036,
+      "sha256": "b2d619b13ad1da198bb6c46768882c5720cc931acf521c7569980155d2b6534d",
+      "gitBlob": "db6ebacacf4a44629b725fcf32a3c5ea1d2a1665"
+    },
+    {
+      "path": "assets/models/world/runtime/tomb-dressing-v01/tomb-niche-rect/candidate-receipt.json",
+      "workingBytes": 948,
+      "sha256": "59c4f6f51a51d81178714bd4a853abf1baf94bd2b34d4ccdac3d9867de6ab221",
+      "gitBlob": "02c28f8c7287162f90c4f639c1cf64c847ae923d"
+    },
+    {
+      "path": "assets/models/world/runtime/tomb-dressing-v01/tomb-niche-rect/tomb-niche-rect-lod0.runtime.glb",
+      "workingBytes": 85684,
+      "sha256": "1dc8453c5fb455f9fabcc1837e0c77bd54429e240029478511f00b775b757368",
+      "gitBlob": "1c23b3befebb61bb48ed09a0317a05b21feeb65d"
+    },
+    {
+      "path": "assets/models/world/source/tomb-dressing-v01/tomb-dressing-v01.blend",
+      "workingBytes": 259121,
+      "sha256": "713a3cf2878157e5ea8be4d6b36b55fde12f04170113b94ae99e0f501c9c0683",
+      "gitBlob": "db26e62c46ad15c1bd13446dae865d7dc8cc4aa1"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_atmosphere.glsl",
+      "workingBytes": 15548,
+      "sha256": "cc5fe1a124357663279bf000349277d5f82d1a29ebd8a3e1f9c8cc8113a7016a",
+      "gitBlob": "4b60c91ef4193086fba69a9dc59ca27ca4549a98"
+    },
+    {
+      "path": "src/audio/SfxVolume.h",
+      "workingBytes": 1029,
+      "sha256": "ac7971859265a175d88615f612c022dd39d418aa5e6b690ee6c5a569afb80efd",
+      "gitBlob": "78755501de06f32a80d857246a5bba6f4b2bab51"
+    },
+    {
+      "path": "src/gameplay/ShowcaseGameplay.h",
+      "workingBytes": 36961,
+      "sha256": "28f3e3048ad5bb47b22c7dd13f8a9f23a80f889eb20d225c55fbc97ddffac6e0",
+      "gitBlob": "84dd1eb469d6e1524fd23125aa6a4230843cd3c4"
+    },
+    {
+      "path": "src/gameplay/effects/WaterContactSurfaces.h",
+      "workingBytes": 4185,
+      "sha256": "f7fc11c760880b7cf611889a85bec2aee4c408904f53824a225699aa80b3613b",
+      "gitBlob": "1a53d1c42586f3aa60bf1c4984dc44ae29174a6e"
+    },
+    {
+      "path": "src/gameplay/items/HeldItemKinematics.cpp",
+      "workingBytes": 64343,
+      "sha256": "aee1496b8f031e853561ba7f5a93ccceabb7a5345bc61e80cbbffe8e4a06bd75",
+      "gitBlob": "97ce635269143d266350987b91aabb33d8dfd5a7"
+    },
+    {
+      "path": "src/gameplay/items/HeldItemKinematics.h",
+      "workingBytes": 11973,
+      "sha256": "5e93658ef18e7f9f45156b7c00dda65a2543992d311ba67faa9e320a998ec9de",
+      "gitBlob": "363b0ffab1dccd4e29d19b9bd63ff437885d7739"
+    },
+    {
+      "path": "src/gameplay/simulation/GameSimulation.cpp",
+      "workingBytes": 120722,
+      "sha256": "9f541d3f628da4cd15b3ae96bf309bb522a995cf8c700ad842c95c2ae2c40e85",
+      "gitBlob": "08728950599e6360227b1a7a1f3db429972b0463"
+    },
+    {
+      "path": "src/platform/windows/DiagnosticWindow.cpp",
+      "workingBytes": 515449,
+      "sha256": "de972053d319284a450857f5dfdec2fc405344da430744541801a794457e0e4d",
+      "gitBlob": "009a54e76f89aa8491d28d94fadd26dfb856b0f0"
+    },
+    {
+      "path": "src/platform/windows/WindowsCombatPracticeLaunch.h",
+      "workingBytes": 2912,
+      "sha256": "b957fe7d7af1ce87afce908f60649df3f9fcfa4c670d8bf58c6a236b6072da2a",
+      "gitBlob": "3905773b30473eae2324b324da0bec2c054280ef"
+    },
+    {
+      "path": "src/scene/TombDressing.cpp",
+      "workingBytes": 28787,
+      "sha256": "bb8f821fdee7971ea0bd8f9f224a4ca82106d9c6d56e5ef3b7bce830bc52eccd",
+      "gitBlob": "eab4a71975b52970b62ffebce0355a1ed4210daa"
+    },
+    {
+      "path": "src/scene/TombDressing.h",
+      "workingBytes": 2569,
+      "sha256": "ce1c1ff41b0260e2efab41fd19d6d360c2d92edac3932e4ec66f1c5d30d5ff6a",
+      "gitBlob": "b326f869e71c229357907a88da7da7ce4c32aeee"
+    },
+    {
+      "path": "src/scene/assets/SkinnedMeshAsset.cpp",
+      "workingBytes": 90830,
+      "sha256": "6f15e5efc046bb7c8d3350415dc6fb2c11ca1800a2ee19f21ddc93c4b43c9754",
+      "gitBlob": "996f5392554cfec31527f0b1b05608a60af7fe20"
+    },
+    {
+      "path": "src/scene/assets/SkinnedMeshAsset.h",
+      "workingBytes": 9394,
+      "sha256": "d367972e96fda9d171489b34d4fe7a599174dc2820045e8ff2d8b25dd1fb5945",
+      "gitBlob": "a94d4baab1cf5b0143299e5c3c7b5d89c5422a11"
+    },
+    {
+      "path": "src/vulkan/raytracing/CharacterRenderSlot.cpp",
+      "workingBytes": 20558,
+      "sha256": "e1a0d0063b85c09f2c8b842e3fea62fa6de1b8cf830432f875c7a9035de33cb2",
+      "gitBlob": "c81d1cf5faf87c49a20ad710f2845bc94e90d8a8"
+    },
+    {
+      "path": "src/vulkan/raytracing/CharacterRenderSlot.h",
+      "workingBytes": 6713,
+      "sha256": "0236315161a5d77f335c658277f17f531b3634ea6d83ff48dbbc639319d8ee96",
+      "gitBlob": "510102344d14412db1ea990b741f9376ec588baf"
+    },
+    {
+      "path": "src/vulkan/raytracing/MinimalLegacyRayGenShader.inc",
+      "workingBytes": 1984828,
+      "sha256": "46e6eb730050ab348d916b862ea4ad5e20d590bbaed431b060e7a51363a7730d",
+      "gitBlob": "cd0140fd501508881b40f4232dc6d023ef61370f"
+    },
+    {
+      "path": "src/vulkan/raytracing/MinimalRayGenShader.inc",
+      "workingBytes": 994628,
+      "sha256": "d95fec182426d4381046d5ad0ac6ac3e63a1fca7238d89582b279695849cd024",
+      "gitBlob": "437eaaf615e35410b72605909f6694de4fac0378"
+    },
+    {
+      "path": "src/vulkan/raytracing/PresentableTinyRtScene.cpp",
+      "workingBytes": 447498,
+      "sha256": "3fd4ad448ad1fd5d30ccb45dbae84327adad6887f8db1fa198e224f2904ab822",
+      "gitBlob": "6a7703d95e729bb66ef704116f27ec1e96a5156c"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtPipelineVariantCatalog.generated.h",
+      "workingBytes": 4575,
+      "sha256": "a61dfc7b840311a718fa54899ab6a1d3385fbac50f6233de92a8a1b3c841cd7c",
+      "gitBlob": "f360847077156e004ac0a75bec76c14415c83aab"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtRayQueryVariantCatalog.generated.h",
+      "workingBytes": 4820,
+      "sha256": "c66e7d3e40fe005291e763c4137c74e9493fd11cf2c6b071bad0e0385d832649",
+      "gitBlob": "c11043048283a0be4f3bbd9c6259d7d5b1e9bcaf"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/diagnostic_high_generic_dielectric.inc",
+      "workingBytes": 998250,
+      "sha256": "082e94b90e6cca3c2222e9e81a7291821b983891ac145e3eca0e5233e2f9213b",
+      "gitBlob": "a20b84a8032801f52cfafbf3daceaed5f9211cf2"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/diagnostic_high_opaque_fast.inc",
+      "workingBytes": 1995338,
+      "sha256": "682b4d7123de274d03056206084118b374cb622f6e86c6859d05df4eecf3d0b0",
+      "gitBlob": "76b303f6497e927826cbc812fc373a2dac0c4101"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/diagnostic_mobile_generic_dielectric.inc",
+      "workingBytes": 993189,
+      "sha256": "8f5f23c8c9406efbb9499d067b8dd6dbd825c489b1fe494498a171e97547558b",
+      "gitBlob": "28ba5f228b49d79f2d9faee1b9a038e543f52e68"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/diagnostic_mobile_opaque_fast.inc",
+      "workingBytes": 1984881,
+      "sha256": "c57c30d563c5497870cd2bcee8dc01b365eb101dba3ad4f1d4a0f590a4825e22",
+      "gitBlob": "eb384e520c564f4c708ddcad42c922d98da0305e"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_high_generic_dielectric.inc",
+      "workingBytes": 999125,
+      "sha256": "d77c61b8435f66e83e311079916f1e0f18f603a415e6c24d4318fcb20575bf69",
+      "gitBlob": "1a9f2db3305cca14f4e55de742b581a3bf8a3afe"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_high_opaque_fast.inc",
+      "workingBytes": 1999440,
+      "sha256": "da92478dde32e1fff35123a4eb0fe60475825a2d5e68c8351a994ab20231d23f",
+      "gitBlob": "f7cdd01be143bea9a5ffeba6265b3f02f72e2994"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_mobile_generic_dielectric.inc",
+      "workingBytes": 994064,
+      "sha256": "859af12b0b6a35b7c0d783bc88cd0ccfc3145fbd47c00797a8faf42674b03c06",
+      "gitBlob": "d35afccaf0e02fbc06744b3bc268538650cd170a"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_mobile_opaque_fast.inc",
+      "workingBytes": 1988979,
+      "sha256": "1599c4f363f4fc96219735f31d695652332e42a54203a76eca9f83876fb11524",
+      "gitBlob": "77f197664c7a255ded5385dd0e3ff0c028eb0c2c"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_shipping_high_generic_dielectric.inc",
+      "workingBytes": 969328,
+      "sha256": "def4d5b0db99a2a18cf208fe6ac0d87b69cbbfa96f3b90b4b9c6451fc802af2e",
+      "gitBlob": "5bdd5911d81bc2eb3c8ce9f5ee137c52ac34ccf2"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_shipping_high_opaque_fast.inc",
+      "workingBytes": 1985143,
+      "sha256": "f133eba6f271a82960137b0ec44915b0085aa52da6e689cc73866040ddf50736",
+      "gitBlob": "63d7f6cf433c317dfc3b573f8dcc1abf836d4249"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_shipping_mobile_generic_dielectric.inc",
+      "workingBytes": 964267,
+      "sha256": "6402bd72ca93b48e8cca03069fbc611379cbcd56382f6fe44aa0df0834c20d95",
+      "gitBlob": "7531daff3a6f16adee5a096438657f59f9d670ef"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_shipping_mobile_opaque_fast.inc",
+      "workingBytes": 1974682,
+      "sha256": "d8c0c8002219de08c3674c5f00feed4e6531115c47a6107a6c405b66bd587551",
+      "gitBlob": "8f5fc069b6239f892a4b48c4fd22be1c5f02af6b"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/shipping_high_generic_dielectric.inc",
+      "workingBytes": 968453,
+      "sha256": "99b6827ebd9f587e8f70e01c5c41c32ab7111f3a9310836148ce99fbae35ef7f",
+      "gitBlob": "5650dab2627dd48b5a01c023fb412606ab1ec0a9"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/shipping_high_opaque_fast.inc",
+      "workingBytes": 1981041,
+      "sha256": "64c185f7ef9f80ab20d183c0fe7d2cce9ccf9066c909023f0531750793fc85ce",
+      "gitBlob": "3d9851ae1c2327e235a4a0543f4a973947a6390c"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/shipping_mobile_generic_dielectric.inc",
+      "workingBytes": 963392,
+      "sha256": "af110cae1878354ab2840511c699b5cdcecec1ec3f97104bee688ceaa9ab5773",
+      "gitBlob": "1bfd27777befaacb5e7b21d86a9b569bd1107ea9"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/shipping_mobile_opaque_fast.inc",
+      "workingBytes": 1970580,
+      "sha256": "9683586ac1d53a4b576b15ec653c64b8343cd122f4d676525754110aaf753b9e",
+      "gitBlob": "f99e8b8b03f87e3832e508059ddfd180d75fb334"
+    },
+    {
+      "path": "tests/CharacterRenderSlotSmoke.cpp",
+      "workingBytes": 157665,
+      "sha256": "e7457530c6129e06846a14897e619a2d3daff2f24fe01056af9d72a273da0803",
+      "gitBlob": "20a6a88094a51943fa265c2e05a8a794b0e51d1d"
+    },
+    {
+      "path": "tests/CombatFoundationTests.cpp",
+      "workingBytes": 52829,
+      "sha256": "b84502607904d49030b036f1055e054390370e0764ebe06f98cd5342cf1f3717",
+      "gitBlob": "a9da83e877090d16dd2271f3c87d301e986c71f1"
+    },
+    {
+      "path": "tests/Horde162AssetPolicyTests.ps1",
+      "workingBytes": 37222,
+      "sha256": "4b6baddaaff9e35912dc64bf123eaa5c14b744475a48cf1323bbd9769d56bf58",
+      "gitBlob": "382ea713833f81d2fdc650b607a4d4d3aa5986da"
+    },
+    {
+      "path": "tests/RaygenVariantArtifactTests.ps1",
+      "workingBytes": 56887,
+      "sha256": "53dd927bdd7b1d46650bf689e2b94726bf2ac7079a1c0ccaaeea4435438a4164",
+      "gitBlob": "88dd766ec68977df5a047e2a7d18ab19c1261c5e"
+    },
+    {
+      "path": "tests/RaygenVariantManifestTests.ps1",
+      "workingBytes": 27176,
+      "sha256": "1ba7df8cad2906354a215826755fb583a9c93426e3c1aff42294f697d83309b4",
+      "gitBlob": "42ce686e0233f4793b268649acbe9274b6e6834b"
+    },
+    {
+      "path": "tests/RescueJourneyIntegrationTests.cpp",
+      "workingBytes": 16607,
+      "sha256": "00999ce9635496dcd7317388db3dbee1402e477fb1e000339e59a8e40226f38d",
+      "gitBlob": "201abce1788d9c4afad62f38420d3becae514594"
+    },
+    {
+      "path": "tests/RtSceneResourceInventoryTests.cpp",
+      "workingBytes": 105958,
+      "sha256": "dd560fadd277265b6486fa8eb415fe1e0c66bae092286e3f1e91607a8594a36a",
+      "gitBlob": "11c84bd3c45dc2f8b7b188ab130227efbcc45153"
+    },
+    {
+      "path": "tests/SfxVolumeTests.cpp",
+      "workingBytes": 1818,
+      "sha256": "f075e521d52af963ecf2a2c9d06821a3526277ac67307c79c6a3b4aabd84b775",
+      "gitBlob": "236541c3f4fd9934f0dfce0bbff657e416bb00fa"
+    },
+    {
+      "path": "tests/SpatialAudioSmoke.cpp",
+      "workingBytes": 37332,
+      "sha256": "473c0c8cbfdfc84c84287474e841a3816075150d7457b8c39ea48714847803f8",
+      "gitBlob": "6842f21dbe6b0b71859c563b6ee36ca14694548b"
+    },
+    {
+      "path": "tests/TombDressingTests.cpp",
+      "workingBytes": 24961,
+      "sha256": "9609b626380fb9c1366906bd2bd94894f26b641207f08d85a04ecef181254190",
+      "gitBlob": "c6c7616bcb6f05683787e7cc9b70e09f22db834e"
+    },
+    {
+      "path": "tests/TombWallRecessTests.cpp",
+      "workingBytes": 2799,
+      "sha256": "da33477e7fbf202734dae30a85c91c328da03ee55093bfc5b8ac633f9c31ee4d",
+      "gitBlob": "ddda3d7900cd1a6ef03a44b981177c74ea5a997b"
+    },
+    {
+      "path": "tests/WaterContactTests.cpp",
+      "workingBytes": 8615,
+      "sha256": "e44a05c6808c709499a5b1e2fe8a9c063046c329c5065b2c14bcd39d3d015465",
+      "gitBlob": "6623ede6fb5b3e0273c46944667dba36513dd0f0"
+    },
+    {
+      "path": "tests/WindowsCombatPracticeLaunchTests.cpp",
+      "workingBytes": 6848,
+      "sha256": "89547051c66f7461142eb41611904f7db237e9669ffee80a1a3d181d8ff59ed4",
+      "gitBlob": "c1f8f2f5d7748bd3a1e376172965171668f7d89f"
+    },
+    {
+      "path": "tools/author-tomb-dressing.py",
+      "workingBytes": 35760,
+      "sha256": "e8eb9b27432b62d2dd1cbd5eb6e8d90045b6ae74dc6641ac70fb5015ad55db9d",
+      "gitBlob": "bf4dcaf4f4bc84ea944a519db6dffdb9793c0033"
+    },
+    {
+      "path": "tools/horde-1.7-tomb-asset-policy.ps1",
+      "workingBytes": 7710,
+      "sha256": "0fc3f5512b6f395fd4209cbb8b52ee29c8b13f055b2a707ba802ec5867080906",
+      "gitBlob": "6f53ce0e446a18526ed24b9b37b5a5ef028149fa"
+    },
+    {
+      "path": "tools/package-alpha.ps1",
+      "workingBytes": 30730,
+      "sha256": "f05981a6912e8785df6edeca6949a45ce2f4b1c53b1c4b22221f78331e725dc7",
+      "gitBlob": "3f00d161d5f0c1486144e1e348f82c0abf63d07e"
+    },
+    {
+      "path": "tools/prepare-water-contact-audio.py",
+      "workingBytes": 9105,
+      "sha256": "7f0c3ad243dcce415d856ab4c01acd3b145ba7335fac5918fd07a98260a30e3a",
+      "gitBlob": "8d4ec069e898cfeb54df4abca0f4ea8363ebf8c6"
+    },
+    {
+      "path": "tools/raygen-variant-catalog.json",
+      "workingBytes": 35050,
+      "sha256": "41a77e6d416336d8edc066016ee9ff86a8ab6cc8767fa8aa987ab3ca6dd49cf3",
+      "gitBlob": "7631e8fc115bbc70bb7dc2777d3095d8e987746b"
+    },
+    {
+      "path": "tools/rayquery-variant-catalog.json",
+      "workingBytes": 39371,
+      "sha256": "f290c57e7b891251aa9b666c5066ca84a5ea81a201c9663d4a571203d783b138",
+      "gitBlob": "3643240fde730063ecc7debda0789894add2b160"
+    },
+    {
+      "path": "assets/audio/pixabay/keeper-death.manifest.json",
+      "workingBytes": 2415,
+      "sha256": "a5830abcb78eb6535c3a5784f4a88269271b6e57cc83c03917417a62497e1cad",
+      "gitBlob": "ab0f6cb28cb541e689815e2ec2c06e87dc85b012"
+    },
+    {
+      "path": "assets/audio/pixabay/keeper_death.wav",
+      "workingBytes": 195650,
+      "sha256": "500f76c3deb40c89c684562acedf6b7549b6b03e402cc51e09553281517d7020",
+      "gitBlob": "45d77885caf697f218bb4a3cf3ddc33ae769f89d"
+    },
+    {
+      "path": "assets/audio/pixabay/keeper_death_core.wav",
+      "workingBytes": 391256,
+      "sha256": "799cf5d2fdb3f69b3be82683d126fad3852c390bab726a7af9c2b8d02685594c",
+      "gitBlob": "4d442e05123af00bac5498af0c26ff7c1b0a7621"
+    },
+    {
+      "path": "assets/audio/pixabay/water_wet_step_3.wav",
+      "workingBytes": 36524,
+      "sha256": "4f5deb13d657dc77065b230dc2d6fac4b9e11f38c1aa1e0912875e969a12d599",
+      "gitBlob": "ede0d324d06c79402265968737bf78c34f05a1ed"
+    },
+    {
+      "path": "assets/audio/pixabay/water_wet_step_3_core.wav",
+      "workingBytes": 73004,
+      "sha256": "2926ac06b2a10cf388d29142ffd6d15f512d4809da0ad151de191df3040fdd30",
+      "gitBlob": "a08ce0ba159b43e637d68dacd2d75b4927503e91"
+    },
+    {
+      "path": "assets/audio/pixabay/water_wet_step_4.wav",
+      "workingBytes": 36524,
+      "sha256": "26e33d3c7d8aca36216dfc45457c1f6ddad57dccc9ceb64d5343482536dd3a46",
+      "gitBlob": "4f6fb5e77fe5e4b241134703fffdbb939bdf1f5c"
+    },
+    {
+      "path": "assets/audio/pixabay/water_wet_step_4_core.wav",
+      "workingBytes": 73004,
+      "sha256": "1344c72ef5ffc3418aa49e8900b213e6a8140086456ca5cbaebef6d5034a06b1",
+      "gitBlob": "7cd207b524f4d1b8c282f26198947e2a11f95ff3"
+    },
+    {
+      "path": "src/gameplay/effects/KeeperCastPresentation.h",
+      "workingBytes": 1079,
+      "sha256": "7fffeb5ffd12dd864f7fe052eefb3f83a9a3fb5b79fa818ee3a963c101ab378a",
+      "gitBlob": "009c484282aa7c92f144ff369ea3ed9b65120617"
+    },
+    {
+      "path": "tests/KeeperLowerBodyWitnesses.h",
+      "workingBytes": 6627,
+      "sha256": "923930b08bbe73d952bfb1193da78075c115a971b425115b39300f49d066fb72",
+      "gitBlob": "c0dbf96f06391876fd126108662c869ff3a1be85"
+    },
+    {
+      "path": "tests/test_keeper_death_audio.py",
+      "workingBytes": 5348,
+      "sha256": "ed0a2a34a4a794ca7c80fb6fce04f5261fcdce4583f6426229fba4655356c6e7",
+      "gitBlob": "ccec2a9d8635d57879d5bed8fec54ee1e11cb7dd"
+    },
+    {
+      "path": "tests/test_water_contact_audio.py",
+      "workingBytes": 3957,
+      "sha256": "91d0e74462ad81b753a17210b73b8d886a1c65773e34136e8bdb98ed018b629c",
+      "gitBlob": "dc3b9666abb0b7b8d35e7d467a3e30db9cad41dd"
+    },
+    {
+      "path": "tools/prepare-keeper-death-audio.py",
+      "workingBytes": 6135,
+      "sha256": "0037af604ed5d9c8d3ed69df3a2715ae03476c1b1bf98f4b0db3d39295739d5d",
+      "gitBlob": "426257729563caeab7d52e03fd03356073707f11"
+    }
+  ]
+}

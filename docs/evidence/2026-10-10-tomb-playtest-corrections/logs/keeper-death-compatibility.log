@@ -1,0 +1,10 @@
+<repo>\shaders\raytracing\minimal.rgen.resolved
+Generated <repo>\src\vulkan\raytracing\MinimalRayGenShader.inc
+Source dependency SHA-256: 5982aea5ca39ceebb8f3cba4d08b4cae1ac7961f14fa1d897a7dc0ccac2aae81; embedded include SHA-256 before generation: 0a1bb717124eeee0da4e8cc8d227c50d834aedc6b9999a938827e3300ba3732f
+SPIR-V bytes: 294676; words: 73669; instructions: 17559; branch operations: 971; loops: 20; selection merges: 411; SHA-256: 9b33976c7d6e8c09351571974ea114f4bfaa6cd81e8869c12e35a3916fc17c82
+Raygen optimizer shape: functions=83; calls=261; ray-query sites=2
+<repo>\shaders\raytracing\minimal.legacy.rgen.resolved
+Generated <repo>\src\vulkan\raytracing\MinimalLegacyRayGenShader.inc
+Source dependency SHA-256: c5e593c7e7be523b5a1add7e21a0f39cea263b8831e22278fae9921355709d08; embedded include SHA-256 before generation: 1234537c0bd2338c016627f61de2fc57e40c9b24c1eaed3e236b1c9213a4bc06
+SPIR-V bytes: 588068; words: 147017; instructions: 32549; branch operations: 4495; loops: 80; selection merges: 1808; SHA-256: 319a6d5956d5cbd49800d985f0677db61a9da3abd045b6c1558fce70e3cd862b
+Raygen optimizer shape: functions=1; calls=0; ray-query sites=27

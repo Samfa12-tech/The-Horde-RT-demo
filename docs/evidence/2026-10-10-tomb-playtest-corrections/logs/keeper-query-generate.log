@@ -1,0 +1,8 @@
+Exception: <repo>\tools\GenerateRayQueryComputeVariants.ps1:289
+Line |
+ 289 |          throw "Compute compilation failed for $($Variant.key) with ex …
+     |          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     | Compute compilation failed for rayquery_compute_diagnostic_high_generic_dielectric with exit code 1:
+     | C:/Users/<owner>\Documents\the Horde RT
+     | Demo\.worktrees\horde-1.7-wp2-vertical-proof\shaders\raytracing\minimal.comp ERROR: Failed to open file:
+     | C:/Users/<owner>\AppData\Local\Packages\sandbox.{d0f603ed-4efe-4b9a-8fa5-f2f3aa6cdb65}\AC\Temp\horde-rt-rayquery-compute-de02a92ebaa845ea8ce9215e48bc2514\run-838d06096e30437eb487eeedd5ec63d2\rayquery_compute_diagnostic_high_generic_dielectric\minimal.comp.raw.spv

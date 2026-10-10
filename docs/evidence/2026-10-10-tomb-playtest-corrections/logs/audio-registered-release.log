@@ -1,0 +1,42 @@
+UpdateCTestConfiguration  from :<repo>/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/build/presets/windows-x64-release/DartConfiguration.tcl
+Parse Config file:<repo>/build/presets/windows-x64-release/DartConfiguration.tcl
+Test project <repo>/build/presets/windows-x64-release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 159
+    Start 159: horde_rt_water_contact_audio_tests
+
+159: Test command: C:/Users/<owner>\AppData\Local\Programs\Python\Python312\python.exe "<repo>/tests/test_water_contact_audio.py"
+159: Working Directory: <repo>/build/presets/windows-x64-release
+159: Test timeout computed to be: 1500
+159: ....
+159: ----------------------------------------------------------------------
+159: Ran 4 tests in 0.021s
+159: 
+159: OK
+1/2 Test #159: horde_rt_water_contact_audio_tests ...   Passed    0.14 sec
+test 160
+    Start 160: horde_rt_keeper_death_audio_tests
+
+160: Test command: C:/Users/<owner>\AppData\Local\Programs\Python\Python312\python.exe "<repo>/tests/test_keeper_death_audio.py"
+160: Working Directory: <repo>/build/presets/windows-x64-release
+160: Test timeout computed to be: 1500
+160: .....
+160: ----------------------------------------------------------------------
+160: Ran 5 tests in 0.033s
+160: 
+160: OK
+2/2 Test #160: horde_rt_keeper_death_audio_tests ....   Passed    0.16 sec
+
+The following tests passed:
+	horde_rt_water_contact_audio_tests
+	horde_rt_keeper_death_audio_tests
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   0.31 sec

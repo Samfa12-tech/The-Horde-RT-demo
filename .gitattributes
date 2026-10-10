@@ -284,3 +284,6 @@ docs/evidence/2026-10-10-tomb-polish/** -text whitespace=-trailing-space,-blank-
 
 # Preserve measured authoring recipe bytes across native checkouts.
 tools/author-tomb-dressing.py text eol=lf
+
+# Public sanitized correction receipts remain byte-stable.
+docs/evidence/2026-10-10-tomb-playtest-corrections/** text eol=lf
