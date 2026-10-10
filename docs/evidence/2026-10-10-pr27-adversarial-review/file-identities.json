@@ -1,18 +1,18 @@
 [
   {
     "path": "android-all-abi-identities.json",
-    "bytes": 4658,
-    "sha256": "579ffa94878ae5877dd18a7a4cea8861be8d281f32f93087b8259bf9ceb3ceb9"
+    "bytes": 4523,
+    "sha256": "4eb71011866eeed4758051bae38858277520bd41e26e56a198d65ae3f6d72433"
   },
   {
     "path": "android-validation.md",
-    "bytes": 3712,
-    "sha256": "880a22027b3cc7f623444b597fe9af082f90cea3e4bf58f6d82a704fdec52286"
+    "bytes": 3687,
+    "sha256": "2cfd7effe61122ead57b788b80b56cc1630856add4423af8407ad241eae4a9e2"
   },
   {
     "path": "package-inspections.json",
-    "bytes": 15401,
-    "sha256": "68f2d1d0bcfe6891ae9537df1ef901faa8e281fb0c221b46aff40300c660f04e"
+    "bytes": 15001,
+    "sha256": "7a57d5b45a801740e98d87cc69666ea7d7a32e54f62efb0fcdfecc49ff283cfb"
   },
   {
     "path": "pre-fix-tracked-tests.patch",
@@ -21,8 +21,8 @@
   },
   {
     "path": "receipt.json",
-    "bytes": 14016,
-    "sha256": "1d9f9fe3a4fd6b3af3081c41a15a8e9965725666b7c6783da489df9a4397ea8d"
+    "bytes": 13734,
+    "sha256": "a0d5438ee6668abe17f1346583efeda1487260ba81dc23a84357cca6b18432ee"
   },
   {
     "path": "review-android-arm64-debug-package-01.log",
@@ -251,7 +251,7 @@
   },
   {
     "path": "runs.jsonl",
-    "bytes": 44979,
-    "sha256": "e9dd83d5df6f1748baebc16b12bbbf012fe45e2726deb60cf039ed617e316182"
+    "bytes": 44934,
+    "sha256": "5caedfc67852a01c0e3bbbde4d49128b78c32371597e6dcc7baa74bd08ae6e43"
   }
 ]
