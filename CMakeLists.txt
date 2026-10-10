@@ -1315,6 +1315,7 @@ if(BUILD_TESTING)
         add_test(NAME horde_rt_rescue_source_admission_tests COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/RescueBlockoutSourceAdmissionTests.py)
         add_test(NAME horde_rt_water_contact_audio_tests COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_water_contact_audio.py)
         add_test(NAME horde_rt_keeper_death_audio_tests COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_keeper_death_audio.py)
+        add_test(NAME horde_rt_kit_audio_tests COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_kit_audio.py)
     endif()
 endif()
 

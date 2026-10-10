@@ -1,3 +1,4 @@
+. (Join-Path $PSScriptRoot 'horde-1.7-kit-asset-policy.ps1')
 . (Join-Path $PSScriptRoot 'horde-1.7-tomb-asset-policy.ps1')
 
 # Runtime-only 1.6.2 audio/environment/world admission. This does not certify device,
@@ -103,11 +104,12 @@ function Assert-Horde162EnvironmentKtx {
 function Assert-Horde162Assets {
     param([Parameter(Mandatory=$true)][string]$RepositoryRoot)
     $assets=Join-Horde162Path $RepositoryRoot 'assets'
-    foreach ($spec in @(Get-Horde162AssetSpecification; Get-Horde17TombAssetSpecification)) {
+    foreach ($spec in @(Get-Horde162AssetSpecification; Get-Horde17TombAssetSpecification; Get-Horde17KitAssetSpecification)) {
         $path=Join-Horde162Path $assets $spec.Path
         if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "1.6.2 runtime asset missing: $($spec.Path)" }
         if ((Get-Item -LiteralPath $path).Length -ne $spec.Bytes -or (Get-Horde162Sha256 $path) -cne $spec.Sha256) { throw "1.6.2 runtime byte/hash mismatch: $($spec.Path)" }
         if ($spec.Kind -ceq 'Wave') { Assert-Horde162Wave $path $spec.Channels $spec.Frames }
+        elseif ($spec.Kind -ceq 'KitWave') { Assert-Horde17KitWave $path $spec.Frames }
         elseif ($spec.Kind -ceq 'Ktx') { Assert-Horde162EnvironmentKtx $path $spec.Format }
         elseif ($spec.Kind -ceq 'PropsKtx') {
             $bytes=[byte[]]::new(80); $stream=[IO.File]::OpenRead($path)
@@ -135,14 +137,14 @@ function Assert-Horde162Assets {
     $keeperPaths=@('keeper_i_sense_you.wav','keeper_come_closer.wav','skeleton_idle_rattle.wav','skeleton_falling_bones.wav')
     foreach ($name in $keeperPaths) {
         $entries=@($keeper.assets | Where-Object { $_.runtimePath -ceq $name })
-        $spec=@(@(Get-Horde162AssetSpecification; Get-Horde17TombAssetSpecification) | Where-Object { $_.Path -ceq "audio/pixabay/$name" })[0]
+        $spec=@(@(Get-Horde162AssetSpecification; Get-Horde17TombAssetSpecification; Get-Horde17KitAssetSpecification) | Where-Object { $_.Path -ceq "audio/pixabay/$name" })[0]
         if ($entries.Count -ne 1 -or $entries[0].sha256 -cne $spec.Sha256 -or $entries[0].bytes -ne $spec.Bytes -or
             $entries[0].sampleRate -ne 48000 -or $entries[0].channels -ne 1 -or $entries[0].bitsPerSample -ne 16 -or
             $entries[0].frames -ne $spec.Frames) { throw "1.6.2 keeper manifest runtime mismatch: $name" }
     }
     $core=Get-Content -LiteralPath (Join-Horde162Path $assets 'audio/pixabay/waterfall-core.manifest.json') -Raw | ConvertFrom-Json
-    $coreSpec=@(@(Get-Horde162AssetSpecification; Get-Horde17TombAssetSpecification) | Where-Object { $_.Path -ceq 'audio/pixabay/waterfall_core_loop.wav' })[0]
-    $fullSpec=@(@(Get-Horde162AssetSpecification; Get-Horde17TombAssetSpecification) | Where-Object { $_.Path -ceq 'audio/pixabay/waterfall_loop.wav' })[0]
+    $coreSpec=@(@(Get-Horde162AssetSpecification; Get-Horde17TombAssetSpecification; Get-Horde17KitAssetSpecification) | Where-Object { $_.Path -ceq 'audio/pixabay/waterfall_core_loop.wav' })[0]
+    $fullSpec=@(@(Get-Horde162AssetSpecification; Get-Horde17TombAssetSpecification; Get-Horde17KitAssetSpecification) | Where-Object { $_.Path -ceq 'audio/pixabay/waterfall_loop.wav' })[0]
     if ($core.schema -ne 1 -or $core.runtimePath -cne 'waterfall_core_loop.wav' -or $core.sha256 -cne $coreSpec.Sha256 -or
         $core.bytes -ne $coreSpec.Bytes -or $core.frames -ne $coreSpec.Frames -or $core.channels -ne 2 -or
         $core.sampleRate -ne 48000 -or $core.bitsPerSample -ne 16 -or $core.source -cne 'waterfall_loop.wav' -or
@@ -151,7 +153,7 @@ function Assert-Horde162Assets {
     if ($environment.schema -ne 1 -or $environment.rights -cne 'Project-owned generated asset.' -or @($environment.runtime).Count -ne 2) { throw '1.6.2 environment manifest admission mismatch.' }
     foreach ($platform in @('windows','android')) {
         $entry=@($environment.runtime | Where-Object { $_.platform -ceq $platform })
-        $spec=@(@(Get-Horde162AssetSpecification; Get-Horde17TombAssetSpecification) | Where-Object { $_.Path -ceq "textures/environment/runtime/night-storm.$platform.ktx2" })[0]
+        $spec=@(@(Get-Horde162AssetSpecification; Get-Horde17TombAssetSpecification; Get-Horde17KitAssetSpecification) | Where-Object { $_.Path -ceq "textures/environment/runtime/night-storm.$platform.ktx2" })[0]
         $format=if($platform -ceq 'windows'){'R8G8B8A8_SRGB'}else{'ASTC_6x6_SRGB_BLOCK'}
         if ($entry.Count -ne 1 -or $entry[0].path -cne "night-storm.$platform.ktx2" -or $entry[0].sha256 -cne $spec.Sha256 -or
             $entry[0].bytes -ne $spec.Bytes -or $entry[0].format -cne $format -or @($entry[0].dimensions).Count -ne 2 -or
@@ -163,14 +165,14 @@ function Assert-Horde162Assets {
 function Get-Horde162RuntimeFiles {
     param([Parameter(Mandatory=$true)][string]$RepositoryRoot, [Parameter(Mandatory=$true)][ValidateSet('Windows','Android')][string]$Platform)
     $null=Assert-Horde162Assets $RepositoryRoot
-    @(@(Get-Horde162AssetSpecification; Get-Horde17TombAssetSpecification) | Where-Object { $_.Platform -ceq 'Both' -or $_.Platform -ceq $Platform } | ForEach-Object Path)
+    @(@(Get-Horde162AssetSpecification; Get-Horde17TombAssetSpecification; Get-Horde17KitAssetSpecification) | Where-Object { $_.Platform -ceq 'Both' -or $_.Platform -ceq $Platform } | ForEach-Object Path)
     @(Get-Horde162ManifestSpecification | Where-Object { $_.Platform -ceq 'Both' -or $_.Platform -ceq $Platform } | ForEach-Object Path)
 }
 
 function Assert-Horde162StagedAssets {
     param([string]$RepositoryRoot, [string]$AssetRoot, [ValidateSet('Windows','Android')][string]$Platform)
     $expected=@(Get-Horde162RuntimeFiles $RepositoryRoot $Platform)
-    $observed=@(foreach($root in @('audio/menu','audio/filmcow/equipment','audio/pixabay','textures/environment','textures/props','models/world','models/props/runtime/player-rag-torch','models/props/runtime/player-sword-scabbard','models/props/source')) {
+    $observed=@(foreach($root in @('audio/menu','audio/filmcow/equipment','audio/pixabay','audio/kit','textures/environment','textures/props','models/world','models/props/runtime/player-rag-torch','models/props/runtime/player-sword-scabbard','models/props/source')) {
         $path=Join-Horde162Path $AssetRoot $root
         if (Test-Path -LiteralPath $path -PathType Container) {
             foreach($item in Get-ChildItem -LiteralPath $path -Recurse -Force) {
@@ -214,7 +216,7 @@ function Assert-Horde162Package {
             if ($entry.FullName.Contains('\') -or $entry.FullName.StartsWith('/', [StringComparison]::Ordinal) -or
                 $entry.FullName -match '(^|/)(\.|\.\.)(/|$)') { throw '1.6.2 package contains a noncanonical or traversing entry path.' }
         }
-        $entries=@($zip.Entries | Where-Object { $_.FullName -match '(?i)^assets/(audio/menu|audio/filmcow/equipment|audio/pixabay|textures/environment|textures/props|models/world|models/props/runtime/player-rag-torch|models/props/runtime/player-sword-scabbard|models/props/source)(/|$)' })
+        $entries=@($zip.Entries | Where-Object { $_.FullName -match '(?i)^assets/(audio/menu|audio/filmcow/equipment|audio/pixabay|audio/kit|textures/environment|textures/props|models/world|models/props/runtime/player-rag-torch|models/props/runtime/player-sword-scabbard|models/props/source)(/|$)' })
         # ZIP directory entries are metadata, distinguished by their trailing
         # slash, not by byte length (a zero-byte foreign file is still a file).
         foreach($entry in $entries) {

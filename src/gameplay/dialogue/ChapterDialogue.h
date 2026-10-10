@@ -14,25 +14,25 @@ enum class Line : std::uint32_t { None, KeeperSense, KeeperCloser, Grate, Rescue
     ReunionDepart, ForestNight, ForestWaystone, ForestClue, ForestWait, ForestVillage };
 struct LineSpec { Line id; const char* stableId; const char* speaker; const char* text;
     const char* audio; float duration; unsigned priority; };
-// Kit text/timing matches the thirteen owner-approved local cuts. Audio stays
-// absent until separate public-distribution rights and runtime admission pass.
+// Kit text/timing and PCM match the thirteen approved cuts. Public game/repository
+// distribution was explicitly confirmed by the owner on 11 October 2026.
 inline constexpr std::array<LineSpec,16> kLines{{
     {Line::None,"","","","",0,0},
     {Line::KeeperSense,"keeper.sense","Keeper","I sense you","assets/audio/pixabay/keeper_i_sense_you.wav",2.590000f,3},
     {Line::KeeperCloser,"keeper.closer","Keeper","Come closer","assets/audio/pixabay/keeper_come_closer.wav",2.868479f,3},
-    {Line::Grate,"prologue.kit_grate","Kit","Mate, are you ok? I heard the collapse! The treasure should be just ahead. Be careful!","",6.469042f,1},
-    {Line::RescueFound,"rescue.found","Kit","There you are. Still in one piece?","",2.430458f,2},
-    {Line::RescueRope,"rescue.rope","Kit","Stay clear. Rope coming down.","",2.622917f,2},
-    {Line::ReunionQuestion,"reunion.question","Kit","Steady. Catch your breath. Did you find it?","",3.107667f,1},
-    {Line::ReunionHint,"reunion.hint","Kit","Let me see. Raise it.","",2.139708f,1},
-    {Line::ReunionProof,"reunion.proof","Kit","Then we're not chasing a story anymore.","",2.601125f,1},
-    {Line::ReunionFirstPiece,"reunion.first_piece","Kit","A start, then. Let's see where it leads.","",3.333625f,1},
-    {Line::ReunionDepart,"reunion.depart","Kit","Come on. There's a fire and a dry seat waiting in the village.","",4.408417f,1},
-    {Line::ForestNight,"forest.night","Kit","I'd forgotten how big the sky was.","",2.436708f,1},
-    {Line::ForestWaystone,"forest.waystone","Kit","Hold it there. There are marks under the moss.","",2.978125f,1},
-    {Line::ForestClue,"forest.clue","Kit","A road to the treasury, perhaps. Someone in the village might read it.","",4.216542f,1},
-    {Line::ForestWait,"forest.wait","Kit","I'll wait here.","",1.589208f,1},
-    {Line::ForestVillage,"forest.village","Kit","There. Chimney smoke.","",2.173792f,1}
+    {Line::Grate,"prologue.kit_grate","Kit","Mate, are you ok? I heard the collapse! The treasure should be just ahead. Be careful!","assets/audio/kit/runtime/prologue.kit_grate.wav",6.469042f,1},
+    {Line::RescueFound,"rescue.found","Kit","There you are. Still in one piece?","assets/audio/kit/runtime/rescue.found.wav",2.430458f,2},
+    {Line::RescueRope,"rescue.rope","Kit","Stay clear. Rope coming down.","assets/audio/kit/runtime/rescue.rope.wav",2.622917f,2},
+    {Line::ReunionQuestion,"reunion.question","Kit","Steady. Catch your breath. Did you find it?","assets/audio/kit/runtime/reunion.question.wav",3.107667f,1},
+    {Line::ReunionHint,"reunion.hint","Kit","Let me see. Raise it.","assets/audio/kit/runtime/reunion.hint.wav",2.139708f,1},
+    {Line::ReunionProof,"reunion.proof","Kit","Then we're not chasing a story anymore.","assets/audio/kit/runtime/reunion.proof.wav",2.601125f,1},
+    {Line::ReunionFirstPiece,"reunion.first_piece","Kit","A start, then. Let's see where it leads.","assets/audio/kit/runtime/reunion.first_piece.wav",3.333625f,1},
+    {Line::ReunionDepart,"reunion.depart","Kit","Come on. There's a fire and a dry seat waiting in the village.","assets/audio/kit/runtime/reunion.depart.wav",4.408417f,1},
+    {Line::ForestNight,"forest.night","Kit","I'd forgotten how big the sky was.","assets/audio/kit/runtime/forest.night.wav",2.436708f,1},
+    {Line::ForestWaystone,"forest.waystone","Kit","Hold it there. There are marks under the moss.","assets/audio/kit/runtime/forest.waystone.wav",2.978125f,1},
+    {Line::ForestClue,"forest.clue","Kit","A road to the treasury, perhaps. Someone in the village might read it.","assets/audio/kit/runtime/forest.clue.wav",4.216542f,1},
+    {Line::ForestWait,"forest.wait","Kit","I'll wait here.","assets/audio/kit/runtime/forest.wait.wav",1.589208f,1},
+    {Line::ForestVillage,"forest.village","Kit","There. Chimney smoke.","assets/audio/kit/runtime/forest.village.wav",2.173792f,1}
 }};
 inline const LineSpec& Spec(Line line) { const auto n=static_cast<unsigned>(line);
     return kLines[n<kLines.size()?n:0]; }

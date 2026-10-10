@@ -32,3 +32,16 @@ The owner-requested Irhouen `Metal Creaks 189729` replaces the initial Hammy01
 chain. Its authored one-second event is cropped from 4.1–5.1 s and edge-faded;
 room bytes and the saved 7%/21% mix remain unchanged. Replacement listening
 is pending on its own exact build.
+
+## Kit chapter speech (1.7 development)
+
+`kit/runtime/` contains the thirteen approved English cuts with owner-confirmed
+public game/repository distribution rights. They preserve the approved mono
+PCM16 24 kHz samples and measured timing; source masters and private provider
+account records remain outside the repository. Public provenance names Mureka
+and pins the approved cut hashes. The closed manifest, reproducible
+read-only-source admission recipe and ASSET_LICENSES entry identify the exact
+cuts. Windows uses its generation-owned XAudio2 speech voice; Android reuses
+its finite SoundPool speech mapping. Both use persisted independent Voice gain
+and the shared subtitle/skip/fallback owner. `forest.wait` is admitted and mapped
+but remains catalog-only until a separate gameplay trigger is accepted.

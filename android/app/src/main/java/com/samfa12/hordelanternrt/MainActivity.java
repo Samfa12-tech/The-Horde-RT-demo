@@ -2789,14 +2789,12 @@ public class MainActivity extends Activity {
         if (generation != chapterVoiceGeneration) {
             stopChapterVoice();
             chapterVoicePaused = paused;
-            if (paused || soundPool == null) return;
-            final String key = line == 1 ? "keeper_i_sense_you" :
-                    (line == 2 ? "keeper_come_closer" : null);
-            if (key == null) {
-                chapterVoiceGeneration = generation;
-                return;
-            }
-            final Integer soundId = sounds.get(key);
+            // Paused lines remain eligible to start on resume. An unavailable or
+            // not-yet-loaded asset falls back for this generation without a late start.
+            if (paused) return;
+            chapterVoiceGeneration = generation;
+            if (soundPool == null) return;
+            final Integer soundId = ChapterVoiceAssets.soundIdForLine(line, sounds);
             if (soundId == null) return;
             synchronized (loadedSounds) { if (!loadedSounds.contains(soundId)) return; }
             final long gains = ProbeBridge.getChapterDialogueStereoGains(generation);
@@ -2805,7 +2803,6 @@ public class MainActivity extends Activity {
             final float right = clamp(Float.intBitsToFloat((int) (gains >>> 32)), 0.0f, 1.0f);
             chapterVoiceStream = soundPool.play(soundId, voiceGain * left, voiceGain * right,
                     2, 0, 1.0f);
-            chapterVoiceGeneration = generation;
             if (chapterVoiceStream == 0) Log.w(TAG, "Chapter voice playback could not start.");
             return;
         }
@@ -5924,6 +5921,9 @@ public class MainActivity extends Activity {
         loadSound("torch_extinguish", "audio/pixabay/torch_extinguish.wav");
         loadSound("keeper_i_sense_you", "audio/pixabay/keeper_i_sense_you.wav");
         loadSound("keeper_come_closer", "audio/pixabay/keeper_come_closer.wav");
+        for (ChapterVoiceAssets.Asset asset : ChapterVoiceAssets.all()) {
+            if (asset.line > 2) loadSound(asset.soundKey, asset.assetPath);
+        }
         loadSound("skeleton_idle_rattle", "audio/pixabay/skeleton_idle_rattle.wav");
         loadSound("skeleton_falling_bones", "audio/pixabay/skeleton_falling_bones.wav");
         loadSound("menu_room", "audio/menu/menu_room.wav");

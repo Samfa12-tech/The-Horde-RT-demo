@@ -260,3 +260,23 @@ remain unchanged.
 - **Keeper death scream**: the owner-supplied “Monster Demon Voice - Death / Defeat Scream” by PhatPhrogStudio, [Pixabay item 582531](https://pixabay.com/sound-effects/film-special-effects-monster-demon-voice-death-defeat-scream-582531/), published 17 August 2026, is used under the [Pixabay Content License terms](https://pixabay.com/service/terms/), checked 10 October 2026. Adapted commercial/non-commercial game use is permitted; standalone redistribution is prohibited. This audio is not MIT-licensed. The original MP3 remains outside the public repository. Only the game-integrated mono/dual-mono PCM derivatives and provenance/processing manifest are included. Full source/runtime hashes, endpoint fades and measured levels are in `assets/audio/pixabay/keeper-death.manifest.json`; `tools/prepare-keeper-death-audio.py` reproduces them from an independently supplied source. Voluntary credit: PhatPhrogStudio via Pixabay. Exact-candidate owner listening and Android device acceptance remain pending.
 
 The repository code licence does not override these individual asset terms. Native import and exact package hashes do not establish artistic, RT presentation or sustained-performance acceptance. Library locators identify the recovered prepared packages; they do not by themselves admit runtime use. The later-outdoor Meshy stump is excluded from this tomb slice. No private Briarhold assets or Kit recordings are transferred.
+
+### Approved Kit English runtime cuts (11 October 2026)
+
+The owner explicitly confirmed: **“I confirm public game/repository distribution
+rights”** for the thirteen previously approved Mureka Kit cuts. This supersedes
+the pending audio-rights disposition at chapter checkpoint `24eb2587`; it does
+not change the separate visual-actor or unrelated asset rights. The evidence
+class is owner-confirmed permission, not a newly obtained provider legal opinion.
+
+Only the thirteen clean game-integrated PCM cuts are admitted under
+`assets/audio/kit/runtime/`, with a closed source/runtime hash roster and measured
+clip duration in `asset.manifest.json`. `tools/prepare-kit-audio.py` verifies the
+private approved-cut package and copies byte-exact mono PCM16 24 kHz cuts without
+normalization, resampling or additional mask/grate treatment. The master audio,
+provider manifest/account details and prototype archives remain private and
+unchanged. Runtime redistribution is covered by the owner's confirmed grant;
+these audio files are not blanket MIT-licensed by the repository code licence.
+No new generation, acquisition or spending occurred. Exact-candidate positional
+listening, Voice/SFX balance and Android playback/lifecycle acceptance remain
+pending. The visible Kit model remains unadmitted.

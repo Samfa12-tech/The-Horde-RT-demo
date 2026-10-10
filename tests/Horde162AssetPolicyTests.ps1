@@ -223,7 +223,22 @@ try {
     $baseAndroid=@(Get-Horde162AssetSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Android'})
     Require ($baseWindows.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Windows'}).Count -eq 29 -and
              $baseAndroid.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Android'}).Count -eq 30) 'Historical 1.6.2 roster changed.'
-    Require ($windows.Count -eq 55 -and $android.Count -eq 56) 'Current closed roster requires four wet-step variants, Keeper death cue/manifest and selected native tomb derivatives; no editable sources.'
+    Require ($windows.Count -eq 69 -and $android.Count -eq 70) 'Current closed roster requires the previous tomb derivatives plus exactly thirteen Kit cuts and their manifest; no editable sources.'
+    Require (@(Get-Horde17KitAssetSpecification).Count -eq 14) 'Kit admission must retain its exact thirteen-cut/one-manifest roster.'
+    foreach ($kit in Get-Horde17KitAssetSpecification) {
+        Require ($windows -ccontains $kit.Path -and $android -ccontains $kit.Path) 'Both platforms must admit every approved Kit runtime entry.'
+        Require (@($packageStrings | Where-Object { $_ -ceq ('assets/'+$kit.Path) }).Count -eq 2) 'Both package inventories must explicitly require every Kit runtime entry.'
+    }
+    $kitSpec=@(Get-Horde17KitAssetSpecification | Where-Object {$_.Kind -ceq 'KitWave'})[0]
+    $kitWave=Join-Horde162Path $repo ('assets/'+$kitSpec.Path)
+    Assert-Horde17KitWave $kitWave $kitSpec.Frames
+    Expect-Failure {Assert-Horde17KitWave $kitWave 0} 'Kit WAV requires'
+    Expect-Failure {Assert-Horde17KitWave $kitWave 156001} 'Kit WAV requires'
+    $badKitWave=Join-Path $scratch 'kit-wrong-rate.wav'
+    $kitBytes=[IO.File]::ReadAllBytes($kitWave)
+    [BitConverter]::GetBytes([uint32]48000).CopyTo($kitBytes,24)
+    [IO.File]::WriteAllBytes($badKitWave,$kitBytes)
+    Expect-Failure {Assert-Horde17KitWave $badKitWave $kitSpec.Frames} 'Kit WAV requires'
     Require ($windows -ccontains 'audio/pixabay/waterfall_loop.wav' -and $windows -cnotcontains 'audio/pixabay/waterfall_core_loop.wav') 'Windows must preserve accepted full waterfall only.'
     Require ($android -ccontains 'audio/pixabay/waterfall_core_loop.wav' -and $android -cnotcontains 'audio/pixabay/waterfall_loop.wav') 'Android must use admitted Core loop only.'
     ++$script:checks
@@ -264,12 +279,16 @@ try {
     Expect-Failure {Assert-Horde162Package $repo $archive Windows} 'closed runtime roster'
     $archive=New-FixtureArchive 'nonempty-directory.zip' Windows -Extra 'assets/textures/environment/runtime/'
     Expect-Failure {Assert-Horde162Package $repo $archive Windows} 'malformed nonempty directory'
+    $kitArchive=New-FixtureArchive 'foreign-kit-master.zip' Windows -EmptyFile 'assets/audio/kit/master.wav'
+    Expect-Failure {Assert-Horde162Package $repo $kitArchive Windows} 'closed runtime roster'
     $archive=New-FixtureArchive 'zero-byte-foreign-file.zip' Windows -EmptyFile 'assets/audio/pixabay/foreign.wav'
     Expect-Failure {Assert-Horde162Package $repo $archive Windows} 'closed runtime roster'
     $archive=New-FixtureArchive 'foreign-empty-directory.zip' Windows -Directories @('assets/textures/environment/source/')
     Expect-Failure {Assert-Horde162Package $repo $archive Windows} 'closed runtime roster'
     foreach($case in @(
         @{Name='missing-cue';Platform='Windows';Omit='assets/audio/pixabay/keeper_i_sense_you.wav'},
+        @{Name='missing-kit-grate';Platform='Windows';Omit='assets/audio/kit/runtime/prologue.kit_grate.wav'},
+        @{Name='missing-kit-manifest';Platform='Android';Omit='assets/audio/kit/runtime/asset.manifest.json'},
         @{Name='missing-death-cue';Platform='Windows';Omit='assets/audio/pixabay/keeper_death.wav'},
         @{Name='missing-death-core';Platform='Android';Omit='assets/audio/pixabay/keeper_death_core.wav'},
         @{Name='missing-death-manifest';Platform='Android';Omit='assets/audio/pixabay/keeper-death.manifest.json'},
@@ -334,6 +353,7 @@ try {
         @{Name='corrupt-sword-draw';Platform='Windows';Path='assets/audio/filmcow/equipment/sword_draw.wav'},
         @{Name='corrupt-sword-sheath';Platform='Android';Path='assets/audio/filmcow/equipment/sword_sheath.wav'},
         @{Name='corrupt-equipment-manifest';Platform='Android';Path='assets/audio/filmcow/equipment/asset.manifest.json'},
+        @{Name='corrupt-kit-rope';Platform='Android';Path='assets/audio/kit/runtime/rescue.rope.wav'},
         @{Name='corrupt-scabbard-glb';Platform='Windows';Path='assets/models/props/runtime/player-sword-scabbard/player-sword-scabbard-lod0.runtime.glb'},
         @{Name='corrupt-scabbard-receipt';Platform='Android';Path='assets/models/props/runtime/player-sword-scabbard/processing-receipt.json'},
         @{Name='corrupt-scabbard-manifest';Platform='Android';Path='assets/models/props/runtime/player-sword-scabbard/asset.manifest.json'}
@@ -342,7 +362,7 @@ try {
         Expect-Failure {Assert-Horde162Package $repo $archive $case.Platform} 'byte/hash mismatch'
     }
     $fixtureRepo=Join-Path $scratch 'manifest-fixture'
-    foreach($relative in (@(Get-Horde162AssetSpecification | ForEach-Object Path)+@(Get-Horde162ManifestSpecification | ForEach-Object Path)+@(Get-Horde17TombAssetSpecification | ForEach-Object Path))) {
+    foreach($relative in (@(Get-Horde162AssetSpecification | ForEach-Object Path)+@(Get-Horde162ManifestSpecification | ForEach-Object Path)+@(Get-Horde17TombAssetSpecification | ForEach-Object Path)+@(Get-Horde17KitAssetSpecification | ForEach-Object Path))) {
         $source=Join-Horde162Path $repo "assets/$relative";$target=Join-Horde162Path $fixtureRepo "assets/$relative"
         $null=New-Item -ItemType Directory -Path (Split-Path -Parent $target) -Force
         Copy-Item -LiteralPath $source -Destination $target

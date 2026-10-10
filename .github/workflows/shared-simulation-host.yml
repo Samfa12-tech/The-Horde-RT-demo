@@ -44,7 +44,7 @@ jobs:
       - name: Fetch only Android runtime LFS payloads
         run: >-
           git -c lfs.fetchexclude= lfs fetch
-          --include="assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb,assets/models/enemies/meshy/lich_placeholder_merged_animations_v01.glb,assets/models/player/runtime/*.runtime.glb,assets/models/player/viewmodel/runtime/*.runtime.glb,assets/models/props/runtime/*.runtime.glb,assets/models/props/runtime/*/*.runtime.glb,assets/models/weapons/runtime/*.runtime.glb,assets/textures/polyhaven/mobile_1k/*-array-512-astc*.ktx2,assets/textures/meshy/lich_placeholder_v01/*-2048-astc6x6.ktx2,assets/textures/props/runtime/*.android.ktx2,assets/textures/props/runtime/*.windows.ktx2,assets/audio/music/what-the-dark-keeps/runtime/*.wav,assets/audio/pixabay/keeper_i_sense_you.wav,assets/audio/pixabay/keeper_come_closer.wav,assets/audio/pixabay/skeleton_idle_rattle.wav,assets/audio/pixabay/skeleton_falling_bones.wav,assets/audio/pixabay/waterfall_core_loop.wav,assets/textures/environment/runtime/night-storm.android.ktx2,assets/textures/environment/runtime/night-storm.windows.ktx2,assets/models/world/runtime/collapsed-entry/*.runtime.glb,assets/models/world/runtime/prepared-funerary-v01/**/*.glb,assets/models/world/runtime/tomb-dressing-v01/tomb-niche-*/*.glb,assets/source/beyond_the_tomb/funerary/t02-skeletal-source-v1/meshes/*.glb,assets/source/beyond_the_tomb/funerary/t03-v01/models/*.glb,assets/audio/pixabay/water_wet_step*.wav,assets/audio/pixabay/water_stream_contact*.wav,assets/audio/pixabay/keeper_death*.wav"
+          --include="assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb,assets/models/enemies/meshy/lich_placeholder_merged_animations_v01.glb,assets/models/player/runtime/*.runtime.glb,assets/models/player/viewmodel/runtime/*.runtime.glb,assets/models/props/runtime/*.runtime.glb,assets/models/props/runtime/*/*.runtime.glb,assets/models/weapons/runtime/*.runtime.glb,assets/textures/polyhaven/mobile_1k/*-array-512-astc*.ktx2,assets/textures/meshy/lich_placeholder_v01/*-2048-astc6x6.ktx2,assets/textures/props/runtime/*.android.ktx2,assets/textures/props/runtime/*.windows.ktx2,assets/audio/music/what-the-dark-keeps/runtime/*.wav,assets/audio/pixabay/keeper_i_sense_you.wav,assets/audio/pixabay/keeper_come_closer.wav,assets/audio/pixabay/skeleton_idle_rattle.wav,assets/audio/pixabay/skeleton_falling_bones.wav,assets/audio/pixabay/waterfall_core_loop.wav,assets/textures/environment/runtime/night-storm.android.ktx2,assets/textures/environment/runtime/night-storm.windows.ktx2,assets/models/world/runtime/collapsed-entry/*.runtime.glb,assets/models/world/runtime/prepared-funerary-v01/**/*.glb,assets/models/world/runtime/tomb-dressing-v01/tomb-niche-*/*.glb,assets/source/beyond_the_tomb/funerary/t02-skeletal-source-v1/meshes/*.glb,assets/source/beyond_the_tomb/funerary/t03-v01/models/*.glb,assets/audio/pixabay/water_wet_step*.wav,assets/audio/pixabay/water_stream_contact*.wav,assets/audio/pixabay/keeper_death*.wav,assets/audio/kit/runtime/*.wav"
           && git lfs checkout
           "assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb"
           "assets/models/enemies/meshy/lich_placeholder_merged_animations_v01.glb"
@@ -61,6 +61,7 @@ jobs:
           "assets/audio/pixabay/water_wet_step*.wav"
           "assets/audio/pixabay/water_stream_contact*.wav"
           "assets/audio/pixabay/keeper_death*.wav"
+          "assets/audio/kit/runtime/*.wav"
           "assets/textures/polyhaven/mobile_1k/*-array-512-astc*.ktx2"
           "assets/textures/meshy/lich_placeholder_v01/*-2048-astc6x6.ktx2"
           "assets/textures/props/runtime/*.android.ktx2"
@@ -169,7 +170,7 @@ jobs:
       - name: Fetch portable-test GLB and music PCM assets
         run: >-
           git -c lfs.fetchexclude= lfs fetch
-          --include="assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb,assets/models/player/runtime/*.glb,assets/models/player/viewmodel/runtime/*.glb,assets/models/props/runtime/*.glb,assets/models/props/runtime/*/*.glb,assets/models/weapons/runtime/*.glb,tests/fixtures/*/*.glb,assets/source/development-rescue/*.glb,assets/audio/music/what-the-dark-keeps/runtime/*.wav,assets/audio/pixabay/keeper_i_sense_you.wav,assets/audio/pixabay/keeper_come_closer.wav,assets/audio/pixabay/skeleton_idle_rattle.wav,assets/audio/pixabay/skeleton_falling_bones.wav,assets/audio/pixabay/waterfall_core_loop.wav,assets/textures/environment/runtime/night-storm.android.ktx2,assets/textures/environment/runtime/night-storm.windows.ktx2,assets/models/world/runtime/collapsed-entry/*.runtime.glb,assets/textures/props/runtime/*.android.ktx2,assets/textures/props/runtime/*.windows.ktx2,assets/models/world/runtime/prepared-funerary-v01/**/*.glb,assets/models/world/runtime/tomb-dressing-v01/tomb-niche-*/*.glb,assets/source/beyond_the_tomb/funerary/t02-skeletal-source-v1/meshes/*.glb,assets/source/beyond_the_tomb/funerary/t03-v01/models/*.glb,assets/audio/pixabay/water_wet_step*.wav,assets/audio/pixabay/water_stream_contact*.wav,assets/audio/pixabay/keeper_death*.wav"
+          --include="assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb,assets/models/player/runtime/*.glb,assets/models/player/viewmodel/runtime/*.glb,assets/models/props/runtime/*.glb,assets/models/props/runtime/*/*.glb,assets/models/weapons/runtime/*.glb,tests/fixtures/*/*.glb,assets/source/development-rescue/*.glb,assets/audio/music/what-the-dark-keeps/runtime/*.wav,assets/audio/pixabay/keeper_i_sense_you.wav,assets/audio/pixabay/keeper_come_closer.wav,assets/audio/pixabay/skeleton_idle_rattle.wav,assets/audio/pixabay/skeleton_falling_bones.wav,assets/audio/pixabay/waterfall_core_loop.wav,assets/textures/environment/runtime/night-storm.android.ktx2,assets/textures/environment/runtime/night-storm.windows.ktx2,assets/models/world/runtime/collapsed-entry/*.runtime.glb,assets/textures/props/runtime/*.android.ktx2,assets/textures/props/runtime/*.windows.ktx2,assets/models/world/runtime/prepared-funerary-v01/**/*.glb,assets/models/world/runtime/tomb-dressing-v01/tomb-niche-*/*.glb,assets/source/beyond_the_tomb/funerary/t02-skeletal-source-v1/meshes/*.glb,assets/source/beyond_the_tomb/funerary/t03-v01/models/*.glb,assets/audio/pixabay/water_wet_step*.wav,assets/audio/pixabay/water_stream_contact*.wav,assets/audio/pixabay/keeper_death*.wav,assets/audio/kit/runtime/*.wav"
           && git lfs checkout
           "assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb"
           "assets/models/player/runtime/*.glb"
@@ -185,6 +186,7 @@ jobs:
           "assets/audio/pixabay/water_wet_step*.wav"
           "assets/audio/pixabay/water_stream_contact*.wav"
           "assets/audio/pixabay/keeper_death*.wav"
+          "assets/audio/kit/runtime/*.wav"
           "assets/textures/props/runtime/*.android.ktx2"
           "assets/textures/props/runtime/*.windows.ktx2"
           "tests/fixtures/*/*.glb"
@@ -249,7 +251,7 @@ jobs:
       - name: Fetch only selected fixture and PCM payloads
         run: >-
           git -c lfs.fetchexclude= lfs fetch
-          --include="assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb,assets/models/player/runtime/*.glb,assets/models/player/viewmodel/runtime/*.glb,assets/models/props/runtime/*.glb,assets/models/props/runtime/*/*.glb,assets/models/weapons/runtime/*.glb,tests/fixtures/*/*.glb,assets/source/development-rescue/*.glb,assets/audio/music/what-the-dark-keeps/runtime/*.wav,assets/audio/pixabay/keeper_i_sense_you.wav,assets/audio/pixabay/keeper_come_closer.wav,assets/audio/pixabay/skeleton_idle_rattle.wav,assets/audio/pixabay/skeleton_falling_bones.wav,assets/audio/pixabay/waterfall_core_loop.wav,assets/textures/environment/runtime/night-storm.android.ktx2,assets/textures/environment/runtime/night-storm.windows.ktx2,assets/models/world/runtime/collapsed-entry/*.runtime.glb,assets/models/world/runtime/prepared-funerary-v01/**/*.glb,assets/models/world/runtime/tomb-dressing-v01/tomb-niche-*/*.glb,assets/source/beyond_the_tomb/funerary/t02-skeletal-source-v1/meshes/*.glb,assets/source/beyond_the_tomb/funerary/t03-v01/models/*.glb,assets/audio/pixabay/water_wet_step*.wav,assets/audio/pixabay/water_stream_contact*.wav,assets/audio/pixabay/keeper_death*.wav"
+          --include="assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb,assets/models/player/runtime/*.glb,assets/models/player/viewmodel/runtime/*.glb,assets/models/props/runtime/*.glb,assets/models/props/runtime/*/*.glb,assets/models/weapons/runtime/*.glb,tests/fixtures/*/*.glb,assets/source/development-rescue/*.glb,assets/audio/music/what-the-dark-keeps/runtime/*.wav,assets/audio/pixabay/keeper_i_sense_you.wav,assets/audio/pixabay/keeper_come_closer.wav,assets/audio/pixabay/skeleton_idle_rattle.wav,assets/audio/pixabay/skeleton_falling_bones.wav,assets/audio/pixabay/waterfall_core_loop.wav,assets/textures/environment/runtime/night-storm.android.ktx2,assets/textures/environment/runtime/night-storm.windows.ktx2,assets/models/world/runtime/collapsed-entry/*.runtime.glb,assets/models/world/runtime/prepared-funerary-v01/**/*.glb,assets/models/world/runtime/tomb-dressing-v01/tomb-niche-*/*.glb,assets/source/beyond_the_tomb/funerary/t02-skeletal-source-v1/meshes/*.glb,assets/source/beyond_the_tomb/funerary/t03-v01/models/*.glb,assets/audio/pixabay/water_wet_step*.wav,assets/audio/pixabay/water_stream_contact*.wav,assets/audio/pixabay/keeper_death*.wav,assets/audio/kit/runtime/*.wav"
           && git lfs checkout
           "assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb"
           "assets/models/player/runtime/*.glb"
@@ -265,6 +267,7 @@ jobs:
           "assets/audio/pixabay/water_wet_step*.wav"
           "assets/audio/pixabay/water_stream_contact*.wav"
           "assets/audio/pixabay/keeper_death*.wav"
+          "assets/audio/kit/runtime/*.wav"
           "tests/fixtures/*/*.glb"
           "assets/source/development-rescue/*.glb"
           "assets/audio/music/what-the-dark-keeps/runtime/*.wav"
@@ -298,7 +301,7 @@ jobs:
       - name: Fetch player smoke GLB and texture assets
         run: >-
           git -c lfs.fetchexclude= lfs fetch
-          --include="assets/models/enemies/meshy/*.glb,assets/models/player/runtime/*.glb,assets/models/player/viewmodel/runtime/*.glb,assets/models/props/runtime/*.glb,assets/models/props/runtime/*/*.glb,assets/models/weapons/runtime/*.glb,assets/textures/meshy/lich_placeholder_v01/*.ktx2,tests/fixtures/*/*.glb,assets/source/development-rescue/*.glb,assets/audio/pixabay/keeper_i_sense_you.wav,assets/audio/pixabay/keeper_come_closer.wav,assets/audio/pixabay/skeleton_idle_rattle.wav,assets/audio/pixabay/skeleton_falling_bones.wav,assets/audio/pixabay/waterfall_core_loop.wav,assets/textures/environment/runtime/night-storm.android.ktx2,assets/textures/environment/runtime/night-storm.windows.ktx2,assets/models/world/runtime/collapsed-entry/*.runtime.glb,assets/models/world/runtime/prepared-funerary-v01/**/*.glb,assets/models/world/runtime/tomb-dressing-v01/tomb-niche-*/*.glb,assets/source/beyond_the_tomb/funerary/t02-skeletal-source-v1/meshes/*.glb,assets/source/beyond_the_tomb/funerary/t03-v01/models/*.glb,assets/audio/pixabay/water_wet_step*.wav,assets/audio/pixabay/water_stream_contact*.wav,assets/audio/pixabay/keeper_death*.wav"
+          --include="assets/models/enemies/meshy/*.glb,assets/models/player/runtime/*.glb,assets/models/player/viewmodel/runtime/*.glb,assets/models/props/runtime/*.glb,assets/models/props/runtime/*/*.glb,assets/models/weapons/runtime/*.glb,assets/textures/meshy/lich_placeholder_v01/*.ktx2,tests/fixtures/*/*.glb,assets/source/development-rescue/*.glb,assets/audio/pixabay/keeper_i_sense_you.wav,assets/audio/pixabay/keeper_come_closer.wav,assets/audio/pixabay/skeleton_idle_rattle.wav,assets/audio/pixabay/skeleton_falling_bones.wav,assets/audio/pixabay/waterfall_core_loop.wav,assets/textures/environment/runtime/night-storm.android.ktx2,assets/textures/environment/runtime/night-storm.windows.ktx2,assets/models/world/runtime/collapsed-entry/*.runtime.glb,assets/models/world/runtime/prepared-funerary-v01/**/*.glb,assets/models/world/runtime/tomb-dressing-v01/tomb-niche-*/*.glb,assets/source/beyond_the_tomb/funerary/t02-skeletal-source-v1/meshes/*.glb,assets/source/beyond_the_tomb/funerary/t03-v01/models/*.glb,assets/audio/pixabay/water_wet_step*.wav,assets/audio/pixabay/water_stream_contact*.wav,assets/audio/pixabay/keeper_death*.wav,assets/audio/kit/runtime/*.wav"
           && git lfs checkout
           "assets/models/enemies/meshy/*.glb"
           "assets/models/player/runtime/*.glb"
@@ -314,6 +317,7 @@ jobs:
           "assets/audio/pixabay/water_wet_step*.wav"
           "assets/audio/pixabay/water_stream_contact*.wav"
           "assets/audio/pixabay/keeper_death*.wav"
+          "assets/audio/kit/runtime/*.wav"
           "assets/textures/meshy/lich_placeholder_v01/*.ktx2"
           "tests/fixtures/*/*.glb"
           "assets/source/development-rescue/*.glb"
