@@ -1,0 +1,3 @@
+# Preserve immutable historical bytes, including their original line endings.
+# Inherited PNG LFS ownership remains unchanged.
+* -text whitespace=cr-at-eol

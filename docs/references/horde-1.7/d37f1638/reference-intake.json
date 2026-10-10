@@ -1,0 +1,225 @@
+{
+  "schema": 1,
+  "planningCommit": "d37f16381311c6e620f0c4a9d01c1cce83260dc8",
+  "policy": "Immutable reference copy only; later owner decisions and current implementation are indexed separately. No historical branch merge.",
+  "files": [
+    {
+      "originalPath": "docs/superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md",
+      "gitBlob": "58a982a12c30654da1b517ce75f628875306d669",
+      "repositoryBlobSha256": "80bc87a322b094e882e9888bc629767ed6184def269038252e1f4b4202dd32c7",
+      "status": "actualBytes",
+      "bytes": 187575,
+      "sha256": "80bc87a322b094e882e9888bc629767ed6184def269038252e1f4b4202dd32c7",
+      "referencePath": "docs/references/horde-1.7/d37f1638/docs/superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md"
+    },
+    {
+      "originalPath": "docs/WORLD_LAYOUT.md",
+      "gitBlob": "972bf7155c3d7bf2330485861cfddbca973d302b",
+      "repositoryBlobSha256": "01f5abe513a752228e1678790777f049abfebc8167c3684f58399954b06bad14",
+      "status": "actualBytes",
+      "bytes": 16228,
+      "sha256": "01f5abe513a752228e1678790777f049abfebc8167c3684f58399954b06bad14",
+      "referencePath": "docs/references/horde-1.7/d37f1638/docs/WORLD_LAYOUT.md"
+    },
+    {
+      "originalPath": "docs/ASSET_PLAN_1_7.md",
+      "gitBlob": "0719d10ba41bbb91e67a78757f6011ad9aec0c28",
+      "repositoryBlobSha256": "ff60c445137befc2cae973ae438f41de8af5492cb8dcacdfcea9fc7b8dc26d82",
+      "status": "actualBytes",
+      "bytes": 40650,
+      "sha256": "ff60c445137befc2cae973ae438f41de8af5492cb8dcacdfcea9fc7b8dc26d82",
+      "referencePath": "docs/references/horde-1.7/d37f1638/docs/ASSET_PLAN_1_7.md"
+    },
+    {
+      "originalPath": "docs/design/reference-manifest.json",
+      "gitBlob": "b6346db3538f9b027236aa6bdf7d3e3cad0457f8",
+      "repositoryBlobSha256": "f5e2ca91ab55823f980ae2fbcf2f21e54039215c2af1733513ff097db7f2f778",
+      "status": "actualBytes",
+      "bytes": 11356,
+      "sha256": "f5e2ca91ab55823f980ae2fbcf2f21e54039215c2af1733513ff097db7f2f778",
+      "referencePath": "docs/references/horde-1.7/d37f1638/docs/design/reference-manifest.json"
+    },
+    {
+      "originalPath": "docs/design/world/connected/01-forest-track-1-7.pdf",
+      "gitBlob": "fd69dadeeaf05e1ba3f3e915283dd0991b812646",
+      "repositoryBlobSha256": "f5a3a758a070108d9b24136c1f9c8c129c85b3b83660bafb6fea7d979c9756dc",
+      "status": "actualBytes",
+      "bytes": 116754,
+      "sha256": "f5a3a758a070108d9b24136c1f9c8c129c85b3b83660bafb6fea7d979c9756dc",
+      "referencePath": "docs/references/horde-1.7/d37f1638/docs/design/world/connected/01-forest-track-1-7.pdf"
+    },
+    {
+      "originalPath": "docs/design/world/connected/01-forest-track-1-7.svg",
+      "gitBlob": "412da0b24ce6ed93455ddd74ac2bca20ffa2c1f6",
+      "repositoryBlobSha256": "317b282f62ec2cb02879717fcbd7452d3a48714703551deb604dbf3d740d57f9",
+      "status": "actualBytes",
+      "bytes": 310928,
+      "sha256": "317b282f62ec2cb02879717fcbd7452d3a48714703551deb604dbf3d740d57f9",
+      "referencePath": "docs/references/horde-1.7/d37f1638/docs/design/world/connected/01-forest-track-1-7.svg"
+    },
+    {
+      "originalPath": "docs/design/world/connected/01-forest-track-1-7.webp",
+      "gitBlob": "7d91427a600e4fef1ad15618d5d6dee0ce4f1f1d",
+      "repositoryBlobSha256": "7ece732e40f11f777408d410cce79618a31c28e6bbd7303de36d1622fe018395",
+      "status": "actualBytes",
+      "bytes": 292488,
+      "sha256": "7ece732e40f11f777408d410cce79618a31c28e6bbd7303de36d1622fe018395",
+      "referencePath": "docs/references/horde-1.7/d37f1638/docs/design/world/connected/01-forest-track-1-7.webp"
+    },
+    {
+      "originalPath": "docs/design/world/connected/02-bellwether-town-1-8.pdf",
+      "gitBlob": "35364ed60dc2919afc9aee0e82a3d96f8fb85c97",
+      "repositoryBlobSha256": "3cc75f450e2507980e864a3a03575f4f16a9bfba62f6337ea689fb6e8c1cd624",
+      "status": "actualBytes",
+      "bytes": 358566,
+      "sha256": "3cc75f450e2507980e864a3a03575f4f16a9bfba62f6337ea689fb6e8c1cd624",
+      "referencePath": "docs/references/horde-1.7/d37f1638/docs/design/world/connected/02-bellwether-town-1-8.pdf"
+    },
+    {
+      "originalPath": "docs/design/world/connected/02a-bellwether-terrain-1-8.svg",
+      "gitBlob": "7b3509c6009d10be64d1da06a22a2bd05298961e",
+      "repositoryBlobSha256": "d6fa87549c64050f89b70578da75896939798c622b9487877b0a9d2a8ba6a679",
+      "status": "actualBytes",
+      "bytes": 660337,
+      "sha256": "d6fa87549c64050f89b70578da75896939798c622b9487877b0a9d2a8ba6a679",
+      "referencePath": "docs/references/horde-1.7/d37f1638/docs/design/world/connected/02a-bellwether-terrain-1-8.svg"
+    },
+    {
+      "originalPath": "docs/design/world/connected/02a-bellwether-terrain-1-8.webp",
+      "gitBlob": "26e53772e80cda122eab51b7fed01764bad05c62",
+      "repositoryBlobSha256": "8c463d0d87a2b0fe5aa1f16f934671819ac7f8954d0dc65744d509fb146d3135",
+      "status": "actualBytes",
+      "bytes": 391324,
+      "sha256": "8c463d0d87a2b0fe5aa1f16f934671819ac7f8954d0dc65744d509fb146d3135",
+      "referencePath": "docs/references/horde-1.7/d37f1638/docs/design/world/connected/02a-bellwether-terrain-1-8.webp"
+    },
+    {
+      "originalPath": "docs/design/world/connected/02b-bellwether-use-1-8.svg",
+      "gitBlob": "30e2cdaf7982381a52992321c805d532561053f9",
+      "repositoryBlobSha256": "5efa79a18750c4a1beea6375d6e5edbab15c9a8b648647425f6f46ae71555977",
+      "status": "actualBytes",
+      "bytes": 198114,
+      "sha256": "5efa79a18750c4a1beea6375d6e5edbab15c9a8b648647425f6f46ae71555977",
+      "referencePath": "docs/references/horde-1.7/d37f1638/docs/design/world/connected/02b-bellwether-use-1-8.svg"
+    },
+    {
+      "originalPath": "docs/design/world/connected/02b-bellwether-use-1-8.webp",
+      "gitBlob": "27d19f20a8e2d07f350fc3f04f4760a9ba612873",
+      "repositoryBlobSha256": "d88f4c11b3e224cdb2e641afadb4524ff705eecf9dbaaa067bddb94206d18f49",
+      "status": "actualBytes",
+      "bytes": 184396,
+      "sha256": "d88f4c11b3e224cdb2e641afadb4524ff705eecf9dbaaa067bddb94206d18f49",
+      "referencePath": "docs/references/horde-1.7/d37f1638/docs/design/world/connected/02b-bellwether-use-1-8.webp"
+    },
+    {
+      "originalPath": "docs/design/world/connected/02c-bellwether-water-height-1-8.svg",
+      "gitBlob": "be897f4306ecc0e5ab45b47e41b165c3f5d451a4",
+      "repositoryBlobSha256": "d59f1256f8b206b32ef49990df2ae4dd50ca12bb0df72fc2f53886f1687b6265",
+      "status": "actualBytes",
+      "bytes": 35115,
+      "sha256": "d59f1256f8b206b32ef49990df2ae4dd50ca12bb0df72fc2f53886f1687b6265",
+      "referencePath": "docs/references/horde-1.7/d37f1638/docs/design/world/connected/02c-bellwether-water-height-1-8.svg"
+    },
+    {
+      "originalPath": "docs/design/world/connected/02c-bellwether-water-height-1-8.webp",
+      "gitBlob": "54fbd1c1580739ecf0bf16a8a1905a184ca1d8be",
+      "repositoryBlobSha256": "fc7dd7418969a9ea05963a9be54cfeabd5570713381962715fe120a7fafe9bce",
+      "status": "actualBytes",
+      "bytes": 114740,
+      "sha256": "fc7dd7418969a9ea05963a9be54cfeabd5570713381962715fe120a7fafe9bce",
+      "referencePath": "docs/references/horde-1.7/d37f1638/docs/design/world/connected/02c-bellwether-water-height-1-8.webp"
+    },
+    {
+      "originalPath": "docs/design/world/connected/README.md",
+      "gitBlob": "6de35c8c8d72adec2accc45f8d555a3383a17be4",
+      "repositoryBlobSha256": "236cb45d141755c0224c31381f45e69f9b68c3296e8956e20b2251720a6cfd8f",
+      "status": "actualBytes",
+      "bytes": 13269,
+      "sha256": "236cb45d141755c0224c31381f45e69f9b68c3296e8956e20b2251720a6cfd8f",
+      "referencePath": "docs/references/horde-1.7/d37f1638/docs/design/world/connected/README.md"
+    },
+    {
+      "originalPath": "docs/design/world/connected/build_maps.py",
+      "gitBlob": "1a4813f52833eeb723f9d128b3237b0c5262d273",
+      "repositoryBlobSha256": "7a394e88be7b2a45f52dab40affa5baae74daf4a94eaf01328d9eab0bce0ffe7",
+      "status": "actualBytes",
+      "bytes": 28448,
+      "sha256": "7a394e88be7b2a45f52dab40affa5baae74daf4a94eaf01328d9eab0bce0ffe7",
+      "referencePath": "docs/references/horde-1.7/d37f1638/docs/design/world/connected/build_maps.py"
+    },
+    {
+      "originalPath": "docs/design/world/connected/building-feature-register.csv",
+      "gitBlob": "2a4509ee96cb766d7688aa89894995591021e6ef",
+      "repositoryBlobSha256": "e0284fa28de3e1d8a4b2c3ba05ca795f0c445d90429ae215027508c4e5041719",
+      "status": "actualBytes",
+      "bytes": 585,
+      "sha256": "e0284fa28de3e1d8a4b2c3ba05ca795f0c445d90429ae215027508c4e5041719",
+      "referencePath": "docs/references/horde-1.7/d37f1638/docs/design/world/connected/building-feature-register.csv"
+    },
+    {
+      "originalPath": "docs/design/world/connected/shared-coordinate-layout.json",
+      "gitBlob": "4ce1a6852c1572659b3498b948e538587053d829",
+      "repositoryBlobSha256": "0a4da29bf8d988145c0f7b3f1c7afaf415a5da9b14c34bbd53bd1e00e3a86e59",
+      "status": "actualBytes",
+      "bytes": 8345,
+      "sha256": "0a4da29bf8d988145c0f7b3f1c7afaf415a5da9b14c34bbd53bd1e00e3a86e59",
+      "referencePath": "docs/references/horde-1.7/d37f1638/docs/design/world/connected/shared-coordinate-layout.json"
+    },
+    {
+      "originalPath": "docs/design/world/the-horde-world-layout.png",
+      "gitBlob": "41f09159ce63f06df33f5a29f946162445ac0684",
+      "repositoryBlobSha256": "22ee237b984d4817727e8a1771f2724cbb945affaf019ab56277fed1f781a6c9",
+      "lfsOid": "c1ffd94e17fc12793519b6cd03fdbb93f41dc461c201e0bbcbb858d93fcfd95f",
+      "lfsBytes": 3506134,
+      "status": "actualBytes",
+      "bytes": 3506134,
+      "sha256": "c1ffd94e17fc12793519b6cd03fdbb93f41dc461c201e0bbcbb858d93fcfd95f",
+      "referencePath": "docs/references/horde-1.7/d37f1638/docs/design/world/the-horde-world-layout.png"
+    },
+    {
+      "originalPath": "docs/design/ui/README.md",
+      "gitBlob": "ec730071d6dad4ce96052369d5ea609ce11f0713",
+      "repositoryBlobSha256": "b5ed83fc994f32196c3591f3c51f5e33d7c5aae3bb39bf9fcd963c2f89b95d1b",
+      "status": "actualBytes",
+      "bytes": 3748,
+      "sha256": "b5ed83fc994f32196c3591f3c51f5e33d7c5aae3bb39bf9fcd963c2f89b95d1b",
+      "referencePath": "docs/references/horde-1.7/d37f1638/docs/design/ui/README.md"
+    },
+    {
+      "originalPath": "docs/design/ui/horde-physical-lantern-menu-v1.webp",
+      "gitBlob": "03e26de6fcd747fb09ff465b14845a92d0181dbf",
+      "repositoryBlobSha256": "788127c84358f2368110c3b2ef2aaf74c4162071c14280ee191c56e1f03c1f34",
+      "status": "actualBytes",
+      "bytes": 421156,
+      "sha256": "788127c84358f2368110c3b2ef2aaf74c4162071c14280ee191c56e1f03c1f34",
+      "referencePath": "docs/references/horde-1.7/d37f1638/docs/design/ui/horde-physical-lantern-menu-v1.webp"
+    },
+    {
+      "originalPath": "docs/design/ui/horde-settings-graphics-physical-v1.webp",
+      "gitBlob": "50b282e347c02819d4083f83073ce72d1a9d149e",
+      "repositoryBlobSha256": "dd7151252f6e8f0d05a08f2b4c2bfdc66eed73df6863aca65441c601db846e94",
+      "status": "actualBytes",
+      "bytes": 578948,
+      "sha256": "dd7151252f6e8f0d05a08f2b4c2bfdc66eed73df6863aca65441c601db846e94",
+      "referencePath": "docs/references/horde-1.7/d37f1638/docs/design/ui/horde-settings-graphics-physical-v1.webp"
+    },
+    {
+      "originalPath": "docs/design/ui/horde-loading-orientation-concept-v1.webp",
+      "gitBlob": "6694dfb5ea8789d8667f5b59a0ebef25ab66c411",
+      "repositoryBlobSha256": "bd186119773beb1e0446f34568bf572b1fb3d0ceeedd4f183d74841fd467c22f",
+      "status": "actualBytes",
+      "bytes": 318230,
+      "sha256": "bd186119773beb1e0446f34568bf572b1fb3d0ceeedd4f183d74841fd467c22f",
+      "referencePath": "docs/references/horde-1.7/d37f1638/docs/design/ui/horde-loading-orientation-concept-v1.webp"
+    },
+    {
+      "originalPath": "docs/KIT_ANIMATION_PLAN_1_7.md",
+      "gitBlob": "9d906e83b005caab7ba80ebcbb7341c76a8bd2ea",
+      "repositoryBlobSha256": "fe2c6c0bd8b1f720091f35b55c87a68227b8843cf7dce6f3b33b6cd24fd19e4d",
+      "status": "actualBytes",
+      "bytes": 23956,
+      "sha256": "fe2c6c0bd8b1f720091f35b55c87a68227b8843cf7dce6f3b33b6cd24fd19e4d",
+      "referencePath": "docs/references/horde-1.7/d37f1638/docs/KIT_ANIMATION_PLAN_1_7.md"
+    }
+  ]
+}
