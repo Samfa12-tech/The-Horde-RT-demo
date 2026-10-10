@@ -1,0 +1,102 @@
+{
+  "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+  "baseline": {
+    "schema": 1,
+    "key": "diagnostic_high_generic_dielectric",
+    "instrumentation": "Diagnostic",
+    "quality": "High",
+    "material": "GenericDielectric",
+    "strategy": "GenericRetained",
+    "targetEnv": "vulkan1.2",
+    "manifestSha256": "c11665dc94c48dcb01ad2940d9884ece51eb9286a0c2fe5cae9d3812d794b62b",
+    "dependencySha256": "82372f03db772aee0601188ba05951cd59903587bbbfd087f56ffc57ac45506c",
+    "dependencies": [
+      {
+        "path": "shaders/raytracing/minimal.rgen",
+        "sha256": "033484e51931a6884517e003d8bf968f6d9e00438f5ba789cc58f3153a6740ca"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_frame.glsl",
+        "sha256": "dfb391706b461d2360d0a3937bc53cbdbcd66a62bebd57a4fc88ff516eecfaf6"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_scene_abi.glsl",
+        "sha256": "b67d926e227b18d51d29f3b25d8ed628b81748b8f925287495baa50acadf8b2a"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_scene_abi.generated.glsl",
+        "sha256": "7b217231aec55dd6725cc63939aaaff3793afb4d5beee37e98c0683dc9a2adb3"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_diagnostics.glsl",
+        "sha256": "17e28b3422c8218d7fa7c4183e1df9a6e07e45451ef5b86dbe0a7a16fc47df9f"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_lighting.glsl",
+        "sha256": "d89db03ec94142b32bbbcab8e3917ee2cb66ee64ca6b3dffe368918ed3e119f2"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_fire.glsl",
+        "sha256": "47228a17f5a450ca533b0cb100b887a1aaf182b9c49691213ab06e37606598ee"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_hit_decode.glsl",
+        "sha256": "92cb3812d5f9e2586687e602c307d5c9f6af4a0acdc2209240ab5635bac45585"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_dielectric_spawn.glsl",
+        "sha256": "ab76e15c20b7f5d3a390f56804db5f8afa0aa7c2709e5895c707c6ea220182c3"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_dielectric_common.glsl",
+        "sha256": "6c5ac0ebc893d74142d93b660c73730f278b0811ab25db284f93c82300500e77"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_dielectric_transport.glsl",
+        "sha256": "d58c7a6334f5b23be109863d213053a0cbf2dbcc7132077a248085f347f0e9c2"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_atmosphere.glsl",
+        "sha256": "06ededde2bb77fb15aea75747212f8579ef9027b8aaa972bab28b8b0c4d96fe3"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_indoor_dust.glsl",
+        "sha256": "89cdb898388dfeeff25227c4efde8f4ca9f2e851d4309d949bf3a767b55e3bf5"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_variant_config.glsl",
+        "sha256": "8d043fae9db9c3efb31071045bfc5b2922cc0ae929e748416e164988c01b4649"
+      }
+    ],
+    "compiledSpirvSha256": "9fed471359c5ae3970eeb7d698cf92a2289708fea263b2189783fa46eff752e1",
+    "bytes": 295540,
+    "words": 73885,
+    "instructions": 17621,
+    "branchOperations": 980,
+    "loops": 21,
+    "selectionMerges": 413,
+    "functions": 83,
+    "functionCalls": 264,
+    "rayQueryInitializations": 2,
+    "atomicInstructions": 41,
+    "hasDiagnosticsBinding": true,
+    "driverSafeFullyInlined": false,
+    "boundedGenericFunctionsRetained": true
+  },
+  "diagnostic_sources": {
+    "harness\\CMakeLists.txt": "dcb4bb3d874c8d752fb9af568454ac6209cc17474d36c38dd69a696ebc5db3e9",
+    "harness\\DiagnosticWindow.cpp": "a57625121326cfcfb0da6b1d6a36861deb0d8c8d30989e2a4103ca4187fcd540",
+    "harness\\ProbeConeInput.h": "439bbf3ebe63df156f6a5df9c66ed86095d9481b44576e0dc2daaa8bcdb3d50e",
+    "harness\\ProbeContracts.cpp": "36fd5adb4cc2cd7933dd4f6f3b70f05c0a6d3cc07e897d9906bf09c1054f33d3",
+    "harness\\ProbeScene.cpp": "da5c7bbfe91ad1a6f79705c78e98f679299f825c0ea657d0b44624415f03e303",
+    "harness\\Provider.cpp": "54f3063fd00ccfd380ef9a0649aec0b8f376de6df910bf1635aadf55bec3a0a5",
+    "harness\\gameplay\\DevelopmentCheckpoints.h": "62b1014a1c5126d960363ebef435279d762142c1a3c429e3d98226629d35f139",
+    "harness\\vulkan\\raytracing\\PresentableTinyRtScene.h": "18b5d61d2543ae06e9a49065238b995cd1d54f1d16dcd76e8b9482040ab48db0"
+  },
+  "native_libraries": {
+    "build\\presets\\windows-x64-debug\\Debug\\horde_rt_probe_core.lib": "6c9ef8278e89b6d54a68285daa4232a00357efb8fd725fc0b4bea63ca1a651e4",
+    "build\\presets\\windows-x64-debug\\Debug\\horde_windows_music.lib": "612c11a073d2dec66d7c15a19113abc8b346b794d19ed41c0e7e57f8e0454d1a",
+    "build\\presets\\windows-x64-debug\\Debug\\horde_gameplay_simulation.lib": "557a4f3f66a7669525c74169cbe955c5fb9c02884895db3b03a1557c08865000",
+    "build\\presets\\windows-x64-debug\\pocket-audio-core-native\\Debug\\pocket_audio_native_pcm.lib": "99ee4c19884e5c74a68ed59c92143f240bfde8babfb26301c61d3470739bc948"
+  }
+}

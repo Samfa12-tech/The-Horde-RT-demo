@@ -1,0 +1,36 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  1>Checking Build System
+  Building Custom Rule <repo>/reports/mist-interval-prototype/harness/CMakeLists.txt
+  DiagnosticWindow.cpp
+  Provider.cpp
+  DiagnosticWindowMain.cpp
+  WindowsGitHubReleaseUpdate.cpp
+  WindowsPlaytestReport.cpp
+  WindowsRemotePlaytestReport.cpp
+  WindowsPlaytestScreenshot.cpp
+  WindowsPlaytestSubmission.cpp
+  WindowsPlaytestVerification.cpp
+  DiagnosticOverlay.cpp
+  MotionEvidenceScenario.cpp
+  MotionEvidenceLedger.cpp
+  ProbeScene.cpp
+<repo>\reports\mist-interval-prototype\harness\ProbeScene.cpp(10,51): error C2039: 'GameSimulation': is not a member of 'horde::gameplay::simulation' [<repo>\reports\mist-interval-prototype\build\frozen_mist.vcxproj]
+      <repo>\src\gameplay\simulation\SimulationSnapshot.h(27,11):
+      see declaration of 'horde::gameplay::simulation'
+
+<repo>\reports\mist-interval-prototype\harness\ProbeScene.cpp(10,51): error C2065: 'GameSimulation': undeclared identifier [<repo>\reports\mist-interval-prototype\build\frozen_mist.vcxproj]
+<repo>\reports\mist-interval-prototype\harness\ProbeScene.cpp(10,66): error C2059: syntax error: ',' [<repo>\reports\mist-interval-prototype\build\frozen_mist.vcxproj]
+<repo>\reports\mist-interval-prototype\harness\ProbeScene.cpp(8126,34): error C2039: 'GameSimulation': is not a member of 'horde::gameplay::simulation' [<repo>\reports\mist-interval-prototype\build\frozen_mist.vcxproj]
+      <repo>\src\gameplay\simulation\SimulationSnapshot.h(27,11):
+      see declaration of 'horde::gameplay::simulation'
+
+<repo>\reports\mist-interval-prototype\harness\ProbeScene.cpp(8126,34): error C2065: 'GameSimulation': undeclared identifier [<repo>\reports\mist-interval-prototype\build\frozen_mist.vcxproj]
+<repo>\reports\mist-interval-prototype\harness\ProbeScene.cpp(8126,49): error C2146: syntax error: missing ';' before identifier 'simulation' [<repo>\reports\mist-interval-prototype\build\frozen_mist.vcxproj]
+<repo>\reports\mist-interval-prototype\harness\ProbeScene.cpp(8126,49): error C2065: 'simulation': undeclared identifier [<repo>\reports\mist-interval-prototype\build\frozen_mist.vcxproj]
+<repo>\reports\mist-interval-prototype\harness\ProbeScene.cpp(8128,40): error C2065: 'simulation': undeclared identifier [<repo>\reports\mist-interval-prototype\build\frozen_mist.vcxproj]
+<repo>\reports\mist-interval-prototype\harness\ProbeScene.cpp(8131,62): error C2065: 'simulation': undeclared identifier [<repo>\reports\mist-interval-prototype\build\frozen_mist.vcxproj]
+<repo>\reports\mist-interval-prototype\harness\ProbeScene.cpp(8131,16): error C2737: 'rope': const object must be initialized [<repo>\reports\mist-interval-prototype\build\frozen_mist.vcxproj]
+<repo>\reports\mist-interval-prototype\harness\ProbeScene.cpp(8132,8): error C3536: 'rope': cannot be used before it is initialized [<repo>\reports\mist-interval-prototype\build\frozen_mist.vcxproj]
+<repo>\reports\mist-interval-prototype\harness\ProbeScene.cpp(8135,53): error C2109: subscript requires array or pointer type [<repo>\reports\mist-interval-prototype\build\frozen_mist.vcxproj]
+  Generating Code...

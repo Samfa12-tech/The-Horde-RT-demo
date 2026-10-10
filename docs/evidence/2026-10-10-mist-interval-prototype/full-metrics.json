@@ -1,0 +1,356 @@
+[
+  {
+    "name": "diagnostic_high_generic_dielectric-interval",
+    "source_sha256": "4f91cf541d929d324cfeaf12eed0bc021bab23167e292e34b22a13f1da0b2903",
+    "spirv_sha256": "eb3db3611c9c9bb58d395ceec61420a5f034d950b4acac5627b4120f384eefb3",
+    "include_sha256": "61b4b45e9cc401541839cb24c5627966343b73421fc66793ee72003703b827ec",
+    "bytes": 305592,
+    "words": 76398,
+    "instructions": 18291,
+    "branchOperations": 1065,
+    "loops": 27,
+    "selectionMerges": 441,
+    "functions": 85,
+    "functionCalls": 267,
+    "rayQueryInitializations": 3,
+    "atomicInstructions": 41,
+    "key": "diagnostic_high_generic_dielectric",
+    "excess": {
+      "bytes": 9632,
+      "words": 2408,
+      "instructions": 642,
+      "branchOperations": 79,
+      "loops": 6,
+      "selectionMerges": 25,
+      "functions": 2,
+      "functionCalls": 3,
+      "rayQueryInitializations": 1
+    },
+    "measured_exact_contract": {
+      "instrumentation": "Diagnostic",
+      "quality": "High",
+      "material": "GenericDielectric",
+      "strategy": "GenericRetained",
+      "shippingAllowed": false,
+      "atomicInstructions": 41,
+      "hasDiagnosticsBinding": true,
+      "driverSafeFullyInlined": false,
+      "boundedGenericFunctionsRetained": true
+    },
+    "exact_violations": {},
+    "extra_diagnostic_bindings": [
+      28,
+      29
+    ]
+  },
+  {
+    "name": "diagnostic_high_opaque_fast-interval",
+    "source_sha256": "908270b0a2248c93eddc6cc8a98a782ba4eb347eb44ffb07205eb48a1013832a",
+    "spirv_sha256": "06693ecdba888aea688bea1c1f5e83442703b6e7c8968a8604e97bd2b9ae7ffe",
+    "include_sha256": "6aa01d41ffa0f09dcdd13e6ad4e04657b7582b66380fe6177a6eed4d2fc7bf74",
+    "bytes": 610812,
+    "words": 152703,
+    "instructions": 33955,
+    "branchOperations": 4779,
+    "loops": 105,
+    "selectionMerges": 1906,
+    "functions": 1,
+    "functionCalls": 0,
+    "rayQueryInitializations": 30,
+    "atomicInstructions": 5,
+    "key": "diagnostic_high_opaque_fast",
+    "excess": {
+      "bytes": 15292,
+      "words": 3823,
+      "instructions": 888,
+      "branchOperations": 164,
+      "loops": 21,
+      "selectionMerges": 46,
+      "rayQueryInitializations": 1
+    },
+    "measured_exact_contract": {
+      "instrumentation": "Diagnostic",
+      "quality": "High",
+      "material": "OpaqueFast",
+      "strategy": "LegacyInlined",
+      "shippingAllowed": false,
+      "atomicInstructions": 5,
+      "hasDiagnosticsBinding": true,
+      "driverSafeFullyInlined": false,
+      "boundedGenericFunctionsRetained": false
+    },
+    "exact_violations": {
+      "driverSafeFullyInlined": {
+        "expected": true,
+        "observed": false
+      }
+    },
+    "extra_diagnostic_bindings": [
+      28,
+      29
+    ]
+  },
+  {
+    "name": "diagnostic_mobile_generic_dielectric-interval",
+    "source_sha256": "7f8fec3500f16cafbc7bd811366b6db3795d2358fc32eb97062a9c11a66110ff",
+    "spirv_sha256": "9112444925d1247973859f87266cc58022010c776cf96908725a88a4ea92374e",
+    "include_sha256": "e617652323b0f6c78eb5c2da10f43f7b39318a342fac9cf8a92030ef9264ffaa",
+    "bytes": 304108,
+    "words": 76027,
+    "instructions": 18196,
+    "branchOperations": 1056,
+    "loops": 26,
+    "selectionMerges": 439,
+    "functions": 85,
+    "functionCalls": 264,
+    "rayQueryInitializations": 3,
+    "atomicInstructions": 41,
+    "key": "diagnostic_mobile_generic_dielectric",
+    "excess": {
+      "bytes": 9648,
+      "words": 2412,
+      "instructions": 643,
+      "branchOperations": 79,
+      "loops": 6,
+      "selectionMerges": 25,
+      "functions": 2,
+      "functionCalls": 3,
+      "rayQueryInitializations": 1
+    },
+    "measured_exact_contract": {
+      "instrumentation": "Diagnostic",
+      "quality": "Mobile",
+      "material": "GenericDielectric",
+      "strategy": "GenericRetained",
+      "shippingAllowed": false,
+      "atomicInstructions": 41,
+      "hasDiagnosticsBinding": true,
+      "driverSafeFullyInlined": false,
+      "boundedGenericFunctionsRetained": true
+    },
+    "exact_violations": {},
+    "extra_diagnostic_bindings": [
+      28,
+      29
+    ]
+  },
+  {
+    "name": "diagnostic_mobile_opaque_fast-interval",
+    "source_sha256": "bee35949dba05af5dde540abb88b9a95961cc530a23a5703769845fc10e3f46d",
+    "spirv_sha256": "f8b26031eca70fcfedd0ed9cacfbda65eb0a74397c99a4795eb0b5b37a4da9e0",
+    "include_sha256": "9b03f26039c02dbc1835165658f422b22009d7f13c0bf8627bd87bf1a786b50a",
+    "bytes": 607712,
+    "words": 151928,
+    "instructions": 33762,
+    "branchOperations": 4743,
+    "loops": 101,
+    "selectionMerges": 1896,
+    "functions": 1,
+    "functionCalls": 0,
+    "rayQueryInitializations": 28,
+    "atomicInstructions": 5,
+    "key": "diagnostic_mobile_opaque_fast",
+    "excess": {
+      "bytes": 15292,
+      "words": 3823,
+      "instructions": 888,
+      "branchOperations": 164,
+      "loops": 21,
+      "selectionMerges": 46,
+      "rayQueryInitializations": 1
+    },
+    "measured_exact_contract": {
+      "instrumentation": "Diagnostic",
+      "quality": "Mobile",
+      "material": "OpaqueFast",
+      "strategy": "LegacyInlined",
+      "shippingAllowed": false,
+      "atomicInstructions": 5,
+      "hasDiagnosticsBinding": true,
+      "driverSafeFullyInlined": true,
+      "boundedGenericFunctionsRetained": false
+    },
+    "exact_violations": {},
+    "extra_diagnostic_bindings": [
+      28,
+      29
+    ]
+  },
+  {
+    "name": "shipping_high_generic_dielectric-interval",
+    "source_sha256": "527d7630c47133f566b00b3237c216615b2779f51cf0c5aa1a60a04fed0d4a6e",
+    "spirv_sha256": "60eb579ffd3668c8388ca1d01a8021e121014c9ff166b3e0c92b682306ab8314",
+    "include_sha256": "043979c7cebfc6dd903c9fcd0bef7e217a88e85056258d85bf333416a8a75aec",
+    "bytes": 296764,
+    "words": 74191,
+    "instructions": 17867,
+    "branchOperations": 1018,
+    "loops": 27,
+    "selectionMerges": 413,
+    "functions": 85,
+    "functionCalls": 267,
+    "rayQueryInitializations": 3,
+    "atomicInstructions": 0,
+    "key": "shipping_high_generic_dielectric",
+    "excess": {
+      "bytes": 9632,
+      "words": 2408,
+      "instructions": 642,
+      "branchOperations": 79,
+      "loops": 6,
+      "selectionMerges": 25,
+      "functions": 2,
+      "functionCalls": 3,
+      "rayQueryInitializations": 1
+    },
+    "measured_exact_contract": {
+      "instrumentation": "Shipping",
+      "quality": "High",
+      "material": "GenericDielectric",
+      "strategy": "GenericRetained",
+      "shippingAllowed": true,
+      "atomicInstructions": 0,
+      "hasDiagnosticsBinding": false,
+      "driverSafeFullyInlined": false,
+      "boundedGenericFunctionsRetained": true
+    },
+    "exact_violations": {},
+    "extra_diagnostic_bindings": [
+      28,
+      29
+    ]
+  },
+  {
+    "name": "shipping_high_opaque_fast-interval",
+    "source_sha256": "c9d53c053225b1e8de93ad133fcf854ad49163b3b25f416ade067223c27269a4",
+    "spirv_sha256": "c2e5d094a7bbd246302b5053a3aaf31358f44114b11a2f1483574d3fbbd14d49",
+    "include_sha256": "298777c41e2ffa31fb03b59fc2e08d7ebe09f7720adc6bc25517253d38b014bb",
+    "bytes": 606576,
+    "words": 151644,
+    "instructions": 33776,
+    "branchOperations": 4757,
+    "loops": 105,
+    "selectionMerges": 1897,
+    "functions": 1,
+    "functionCalls": 0,
+    "rayQueryInitializations": 30,
+    "atomicInstructions": 0,
+    "key": "shipping_high_opaque_fast",
+    "excess": {
+      "bytes": 15292,
+      "words": 3823,
+      "instructions": 888,
+      "branchOperations": 164,
+      "loops": 21,
+      "selectionMerges": 46,
+      "rayQueryInitializations": 1
+    },
+    "measured_exact_contract": {
+      "instrumentation": "Shipping",
+      "quality": "High",
+      "material": "OpaqueFast",
+      "strategy": "LegacyInlined",
+      "shippingAllowed": true,
+      "atomicInstructions": 0,
+      "hasDiagnosticsBinding": false,
+      "driverSafeFullyInlined": false,
+      "boundedGenericFunctionsRetained": false
+    },
+    "exact_violations": {
+      "driverSafeFullyInlined": {
+        "expected": true,
+        "observed": false
+      }
+    },
+    "extra_diagnostic_bindings": [
+      28,
+      29
+    ]
+  },
+  {
+    "name": "shipping_mobile_generic_dielectric-interval",
+    "source_sha256": "4930d934d91f39fa03494c1e66c1d9287d0f0013f2c1092c6b46f4a9d00a57d3",
+    "spirv_sha256": "e2326c399cf83652062f55b88b6952f76fbe21ef9b2156673ca697741b9178d5",
+    "include_sha256": "bc35aae7ae9f34db8f2501232009f0ef98868c740554b24059609e426c00a543",
+    "bytes": 295280,
+    "words": 73820,
+    "instructions": 17772,
+    "branchOperations": 1009,
+    "loops": 26,
+    "selectionMerges": 411,
+    "functions": 85,
+    "functionCalls": 264,
+    "rayQueryInitializations": 3,
+    "atomicInstructions": 0,
+    "key": "shipping_mobile_generic_dielectric",
+    "excess": {
+      "bytes": 9648,
+      "words": 2412,
+      "instructions": 643,
+      "branchOperations": 79,
+      "loops": 6,
+      "selectionMerges": 25,
+      "functions": 2,
+      "functionCalls": 3,
+      "rayQueryInitializations": 1
+    },
+    "measured_exact_contract": {
+      "instrumentation": "Shipping",
+      "quality": "Mobile",
+      "material": "GenericDielectric",
+      "strategy": "GenericRetained",
+      "shippingAllowed": true,
+      "atomicInstructions": 0,
+      "hasDiagnosticsBinding": false,
+      "driverSafeFullyInlined": false,
+      "boundedGenericFunctionsRetained": true
+    },
+    "exact_violations": {},
+    "extra_diagnostic_bindings": [
+      28,
+      29
+    ]
+  },
+  {
+    "name": "shipping_mobile_opaque_fast-interval",
+    "source_sha256": "82a55cfaa3b74fe0ec06a517c4c417237696812a87d460eb9e17ade54b84968f",
+    "spirv_sha256": "c4220d21398a736c98fb34f7922cc0288daf38d463042f039160c7a1e5736e65",
+    "include_sha256": "923bd28bd8fd2856870f0491435a3ddefc9a4f33d5897b0df3f1b5ef48f513eb",
+    "bytes": 603476,
+    "words": 150869,
+    "instructions": 33583,
+    "branchOperations": 4721,
+    "loops": 101,
+    "selectionMerges": 1887,
+    "functions": 1,
+    "functionCalls": 0,
+    "rayQueryInitializations": 28,
+    "atomicInstructions": 0,
+    "key": "shipping_mobile_opaque_fast",
+    "excess": {
+      "bytes": 15292,
+      "words": 3823,
+      "instructions": 888,
+      "branchOperations": 164,
+      "loops": 21,
+      "selectionMerges": 46,
+      "rayQueryInitializations": 1
+    },
+    "measured_exact_contract": {
+      "instrumentation": "Shipping",
+      "quality": "Mobile",
+      "material": "OpaqueFast",
+      "strategy": "LegacyInlined",
+      "shippingAllowed": true,
+      "atomicInstructions": 0,
+      "hasDiagnosticsBinding": false,
+      "driverSafeFullyInlined": true,
+      "boundedGenericFunctionsRetained": false
+    },
+    "exact_violations": {},
+    "extra_diagnostic_bindings": [
+      28,
+      29
+    ]
+  }
+]

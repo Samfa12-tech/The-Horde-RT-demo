@@ -1,0 +1,263 @@
+{
+  "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+  "budgets": {
+    "schema": 1,
+    "status": "frozen",
+    "metrics": [
+      "bytes",
+      "words",
+      "instructions",
+      "branchOperations",
+      "loops",
+      "selectionMerges",
+      "functions",
+      "functionCalls",
+      "rayQueryInitializations",
+      "atomicInstructions"
+    ],
+    "budgets": [
+      {
+        "key": "diagnostic_high_generic_dielectric",
+        "max": {
+          "bytes": 295960,
+          "words": 73990,
+          "instructions": 17649,
+          "branchOperations": 986,
+          "loops": 21,
+          "selectionMerges": 416,
+          "functions": 83,
+          "functionCalls": 264,
+          "rayQueryInitializations": 2,
+          "atomicInstructions": 41
+        },
+        "exact": {
+          "instrumentation": "Diagnostic",
+          "quality": "High",
+          "material": "GenericDielectric",
+          "strategy": "GenericRetained",
+          "shippingAllowed": false,
+          "atomicInstructions": 41,
+          "hasDiagnosticsBinding": true,
+          "driverSafeFullyInlined": false,
+          "boundedGenericFunctionsRetained": true
+        }
+      },
+      {
+        "key": "diagnostic_high_opaque_fast",
+        "max": {
+          "bytes": 595520,
+          "words": 148880,
+          "instructions": 33067,
+          "branchOperations": 4615,
+          "loops": 84,
+          "selectionMerges": 1860,
+          "functions": 1,
+          "functionCalls": 0,
+          "rayQueryInitializations": 29,
+          "atomicInstructions": 5
+        },
+        "exact": {
+          "instrumentation": "Diagnostic",
+          "quality": "High",
+          "material": "OpaqueFast",
+          "strategy": "LegacyInlined",
+          "shippingAllowed": false,
+          "atomicInstructions": 5,
+          "hasDiagnosticsBinding": true,
+          "driverSafeFullyInlined": true,
+          "boundedGenericFunctionsRetained": false
+        }
+      },
+      {
+        "key": "diagnostic_mobile_generic_dielectric",
+        "max": {
+          "bytes": 294460,
+          "words": 73615,
+          "instructions": 17553,
+          "branchOperations": 977,
+          "loops": 20,
+          "selectionMerges": 414,
+          "functions": 83,
+          "functionCalls": 261,
+          "rayQueryInitializations": 2,
+          "atomicInstructions": 41
+        },
+        "exact": {
+          "instrumentation": "Diagnostic",
+          "quality": "Mobile",
+          "material": "GenericDielectric",
+          "strategy": "GenericRetained",
+          "shippingAllowed": false,
+          "atomicInstructions": 41,
+          "hasDiagnosticsBinding": true,
+          "driverSafeFullyInlined": false,
+          "boundedGenericFunctionsRetained": true
+        }
+      },
+      {
+        "key": "diagnostic_mobile_opaque_fast",
+        "max": {
+          "bytes": 592420,
+          "words": 148105,
+          "instructions": 32874,
+          "branchOperations": 4579,
+          "loops": 80,
+          "selectionMerges": 1850,
+          "functions": 1,
+          "functionCalls": 0,
+          "rayQueryInitializations": 27,
+          "atomicInstructions": 5
+        },
+        "exact": {
+          "instrumentation": "Diagnostic",
+          "quality": "Mobile",
+          "material": "OpaqueFast",
+          "strategy": "LegacyInlined",
+          "shippingAllowed": false,
+          "atomicInstructions": 5,
+          "hasDiagnosticsBinding": true,
+          "driverSafeFullyInlined": true,
+          "boundedGenericFunctionsRetained": false
+        }
+      },
+      {
+        "key": "shipping_high_generic_dielectric",
+        "max": {
+          "bytes": 287132,
+          "words": 71783,
+          "instructions": 17225,
+          "branchOperations": 939,
+          "loops": 21,
+          "selectionMerges": 388,
+          "functions": 83,
+          "functionCalls": 264,
+          "rayQueryInitializations": 2,
+          "atomicInstructions": 0
+        },
+        "exact": {
+          "instrumentation": "Shipping",
+          "quality": "High",
+          "material": "GenericDielectric",
+          "strategy": "GenericRetained",
+          "shippingAllowed": true,
+          "atomicInstructions": 0,
+          "hasDiagnosticsBinding": false,
+          "driverSafeFullyInlined": false,
+          "boundedGenericFunctionsRetained": true
+        }
+      },
+      {
+        "key": "shipping_high_opaque_fast",
+        "max": {
+          "bytes": 591284,
+          "words": 147821,
+          "instructions": 32888,
+          "branchOperations": 4593,
+          "loops": 84,
+          "selectionMerges": 1851,
+          "functions": 1,
+          "functionCalls": 0,
+          "rayQueryInitializations": 29,
+          "atomicInstructions": 0
+        },
+        "exact": {
+          "instrumentation": "Shipping",
+          "quality": "High",
+          "material": "OpaqueFast",
+          "strategy": "LegacyInlined",
+          "shippingAllowed": true,
+          "atomicInstructions": 0,
+          "hasDiagnosticsBinding": false,
+          "driverSafeFullyInlined": true,
+          "boundedGenericFunctionsRetained": false
+        }
+      },
+      {
+        "key": "shipping_mobile_generic_dielectric",
+        "max": {
+          "bytes": 285632,
+          "words": 71408,
+          "instructions": 17129,
+          "branchOperations": 930,
+          "loops": 20,
+          "selectionMerges": 386,
+          "functions": 83,
+          "functionCalls": 261,
+          "rayQueryInitializations": 2,
+          "atomicInstructions": 0
+        },
+        "exact": {
+          "instrumentation": "Shipping",
+          "quality": "Mobile",
+          "material": "GenericDielectric",
+          "strategy": "GenericRetained",
+          "shippingAllowed": true,
+          "atomicInstructions": 0,
+          "hasDiagnosticsBinding": false,
+          "driverSafeFullyInlined": false,
+          "boundedGenericFunctionsRetained": true
+        }
+      },
+      {
+        "key": "shipping_mobile_opaque_fast",
+        "max": {
+          "bytes": 588184,
+          "words": 147046,
+          "instructions": 32695,
+          "branchOperations": 4557,
+          "loops": 80,
+          "selectionMerges": 1841,
+          "functions": 1,
+          "functionCalls": 0,
+          "rayQueryInitializations": 27,
+          "atomicInstructions": 0
+        },
+        "exact": {
+          "instrumentation": "Shipping",
+          "quality": "Mobile",
+          "material": "OpaqueFast",
+          "strategy": "LegacyInlined",
+          "shippingAllowed": true,
+          "atomicInstructions": 0,
+          "hasDiagnosticsBinding": false,
+          "driverSafeFullyInlined": true,
+          "boundedGenericFunctionsRetained": false
+        }
+      }
+    ]
+  },
+  "toolchain": {
+    "glslangValidator": {
+      "version": "Glslang Version: 11:16.2.0 ESSL Version: OpenGL ES GLSL 3.20 glslang Khronos. 16.2.0 GLSL Version: 4.60 glslang Khronos. 16.2.0 SPIR-V Version 0x00010600, Revision 1 GLSL.std.450 Version 100, Revision 1 Khronos Tool ID 8 SPIR-V Generator Version 11 GL_KHR_vulkan_glsl version 100 ARB_GL_gl_spirv version 100",
+      "preprocessArguments": [
+        "-E",
+        "-S",
+        "rgen",
+        "<source>"
+      ]
+    },
+    "spirvOpt": {
+      "version": "SPIRV-Tools v2026.2 v2026.2.rc2-1-g2ec8457a"
+    },
+    "spirvVal": {
+      "version": "SPIRV-Tools v2026.2 v2026.2.rc2-1-g2ec8457a Targets: SPIR-V 1.0 SPIR-V 1.1 SPIR-V 1.2 SPIR-V 1.3 SPIR-V 1.4 SPIR-V 1.5 SPIR-V 1.6 SPIR-V 1.2 (under OpenCL 2.2 Full Profile semantics) SPIR-V 1.0 (under Vulkan 1.0 semantics) SPIR-V 1.3 (under Vulkan 1.1 semantics) SPIR-V 1.4 (under Vulkan 1.1 semantics) SPIR-V 1.5 (under Vulkan 1.2 semantics) SPIR-V 1.6 (under Vulkan 1.3 semantics) SPIR-V 1.6 (under Vulkan 1.4 semantics)"
+    },
+    "spirvDis": {
+      "version": "SPIRV-Tools v2026.2 v2026.2.rc2-1-g2ec8457a Target: SPIR-V 1.5"
+    }
+  },
+  "generator": {
+    "path": "tools/compile-raygen.ps1",
+    "interface": "freeze-v1",
+    "sha256": "2d919bdb6ad03ed4b67e7691ffb1547801268d09df0794c658ea2f59054debcf"
+  },
+  "hashes": {
+    "tools/raygen-variant-budgets.json": "56936479b2d202dbdb9393ba94b66a1b0bc12d490b700d8af4c63de3460e53bf",
+    "tools/raygen-variant-catalog.json": "03f75d2e907cb25a3acfc537e9976ceef44bf53f0b831959ea5f53207818b278",
+    "tools/raygen-variants.json": "d615c29c129cf8f3495ae8c1b9d46476979dbdf23003d690c6416f8eae45fca5",
+    "src/vulkan/raytracing/RtSceneAbi.def": "f692bab518fdfdd700361a087a60248318b7ac8d46c1cab7fc5a520d09f45894",
+    "shaders/raytracing/include/rt_atmosphere.glsl": "36ddb178dcfe0076715d810f77df932ea87bb7dce01e9bba6b3d4bc41475b9c7",
+    "src/vulkan/raytracing/PresentableTinyRtScene.cpp": "89b903a0f453106e343df2bee74d725640ddf98ed6da16eabb49723473b1cc18",
+    "src/platform/windows/DiagnosticWindow.cpp": "af26487ef36d6b8fa82efdd18e46b4bf41cfc3d8cb62b85e4aef0d6c72f2b8cf"
+  }
+}

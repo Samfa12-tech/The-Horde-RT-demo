@@ -1,0 +1,78 @@
+{
+  "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+  "cwd": "<existing Horde proof worktree>",
+  "python": "3.12.14",
+  "os": "10.0.26300.0",
+  "powershell": "7.6.6",
+  "attachment": {
+    "name": "Horde-rope-mist-investigation-77016c64.md",
+    "sha256": "1c7f5c607c963ea0d48eb39aa7563987698ac70a577169f2984a6fea5b585914"
+  },
+  "operations": [
+    {
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "tools/compile-raygen.ps1",
+        "-Matrix",
+        "-OutputDirectory",
+        "<repo>/reports/mist-interval-prototype/baseline-matrix"
+      ],
+      "exit_code": 0,
+      "outcome": "8 baseline SPIR-V hashes exactly matched catalogue"
+    },
+    {
+      "argv": [
+        "<python-with-NumPy>",
+        "docs/evidence/2026-10-10-mist-interval-prototype/reproduce/prepare.py"
+      ],
+      "exit_code": 0,
+      "outcome": "all8 corrected diagnostic modules compiled, optimized, validated and disassembled; not production admitted"
+    },
+    {
+      "argv": [
+        "<cmake-from-current-cache>",
+        "-S",
+        "<repo>/reports/mist-interval-prototype/harness",
+        "-B",
+        "<repo>/reports/mist-interval-prototype/build",
+        "-G",
+        "Visual Studio 17 2022",
+        "-A",
+        "x64"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.41,
+      "log": "logs/configure-8.log"
+    },
+    {
+      "argv": [
+        "<cmake-from-current-cache>",
+        "--build",
+        "<repo>/reports/mist-interval-prototype/build",
+        "--config",
+        "Debug",
+        "--target",
+        "frozen_mist",
+        "--parallel",
+        "2"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 10.238,
+      "log": "logs/build-8.log"
+    },
+    {
+      "argv": [
+        "<python-with-NumPy>",
+        "docs/evidence/2026-10-10-mist-interval-prototype/reproduce/verify.py"
+      ],
+      "exit_code": 0,
+      "outcome": "904 GPU interval comparisons;6 nonzero weighted witnesses; exact2 surface matches; negative overflow;5 analytic cases;101 moving-triangle subset poses;4 adjacent-view frozen pairs",
+      "log": "logs/verify-version2-views.log"
+    }
+  ],
+  "capture_commands": "Full actual argv/environment/exit/timing/module identity for every run in runs.json and selected captures/run.json",
+  "compile_commands": "Exact fixed glslang/spirv-opt/val/dis argv defined in reproduce/prepare.py; source/module hashes in full-metrics and shader-metrics; individual elapsed times were printed but not persisted as a machine ledger",
+  "publication": "evidence only; final commit SHA verified externally, never recursive in receipt"
+}

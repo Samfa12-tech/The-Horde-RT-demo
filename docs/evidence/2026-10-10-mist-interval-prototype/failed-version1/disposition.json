@@ -1,0 +1,8 @@
+{
+  "status": "FAILED weighted validation; not a correction",
+  "executable_sha256": "a6df0997824d46b193f79972ba1728f7acb000502228b35379e617a93ee9c5da",
+  "cause": "Cell-width insertion missed all three sampleCount branches; GPU weighted fraction0 where CPU expected0.0380447224",
+  "geometric_discovery_only": true,
+  "colour_strength_valid": false,
+  "original_files_retained_locally": true
+}

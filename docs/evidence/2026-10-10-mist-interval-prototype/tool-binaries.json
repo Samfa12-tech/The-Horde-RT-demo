@@ -1,0 +1,18 @@
+[
+  {
+    "tool": "glslangValidator.exe",
+    "sha256": "afd12a24c54137ab6169bc71458ecd58a1b1b2891345a7f2f5ec8e1f22e948d7"
+  },
+  {
+    "tool": "spirv-opt.exe",
+    "sha256": "ba03c9c7762a32155fd3800fef1a6cd8ca75b49e68f73e48bc96e1e911768f47"
+  },
+  {
+    "tool": "spirv-val.exe",
+    "sha256": "556f42595acb5c144f94eb6c15f8e5b75b412bac7b326f828725b3368767afa7"
+  },
+  {
+    "tool": "spirv-dis.exe",
+    "sha256": "1848582c22f378a22c330cd8e4d9c97aeca1bd79c2b15a3a5e2eeb89dfa93d64"
+  }
+]

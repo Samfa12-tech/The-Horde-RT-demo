@@ -1,4 +1,6 @@
 # Keep high-resolution source art out of normal Git history.
+# Immutable, unadmitted mist diagnostic captures and shader evidence.
+docs/evidence/2026-10-10-mist-interval-prototype/** -text whitespace=cr-at-eol
 tools/run-host-sanitizer-validation.sh text eol=lf
 # Inactive mist experiment: preserve the pinned original source/budget bytes.
 docs/experiments/1.6.2-mist/rt_atmosphere.candidate.glsl -text whitespace=cr-at-eol

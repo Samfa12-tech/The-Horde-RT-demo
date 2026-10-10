@@ -1,0 +1,4192 @@
+[
+  {
+    "name": "current-baseline",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\current-baseline",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": null,
+    "elapsed_seconds": 5.991405799999484,
+    "exit_code": 1,
+    "exe_sha256": "bab3d7b29e55688a51bc19109435e23567521fdfbdd15ec7a330939ca86d31e8",
+    "shader": {
+      "name": "baseline",
+      "source_sha256": "1fb374ba65273d6d4726386b7ce483cd7eb7eb2d25f629bd300dbb5ea3ce652f",
+      "spirv_sha256": "9fed471359c5ae3970eeb7d698cf92a2289708fea263b2189783fa46eff752e1",
+      "include_sha256": "4502ff1fd59ffdd177b2810201a4dfd118731a5f7a01499cadd7caec1401e7e1",
+      "bytes": 295540,
+      "words": 73885,
+      "instructions": 17621,
+      "branchOperations": 980,
+      "loops": 21,
+      "selectionMerges": 413,
+      "functions": 83,
+      "functionCalls": 264,
+      "rayQueryInitializations": 2,
+      "atomicInstructions": 41
+    },
+    "presentation": null,
+    "gpu": null,
+    "files": {
+      "capture.log": "9651edcfa0266a3f369d57e18632a7736b46e06f1c92b55da3b1cde93b0b7158"
+    },
+    "failure": null
+  },
+  {
+    "name": "current-baseline-2",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\current-baseline-2",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": null,
+    "elapsed_seconds": 5.253711700002896,
+    "exit_code": 1,
+    "exe_sha256": "b2ce47304b572487911756ec9ab891d7c2dc71a1373248b7c274cffad8c374c1",
+    "shader": {
+      "name": "baseline",
+      "source_sha256": "1fb374ba65273d6d4726386b7ce483cd7eb7eb2d25f629bd300dbb5ea3ce652f",
+      "spirv_sha256": "9fed471359c5ae3970eeb7d698cf92a2289708fea263b2189783fa46eff752e1",
+      "include_sha256": "4502ff1fd59ffdd177b2810201a4dfd118731a5f7a01499cadd7caec1401e7e1",
+      "bytes": 295540,
+      "words": 73885,
+      "instructions": 17621,
+      "branchOperations": 980,
+      "loops": 21,
+      "selectionMerges": 413,
+      "functions": 83,
+      "functionCalls": 264,
+      "rayQueryInitializations": 2,
+      "atomicInstructions": 41
+    },
+    "presentation": null,
+    "gpu": null,
+    "files": {
+      "capture.log": "2118721085307896c1dbe9432acc754e3f934049480e67d2f615c23a044bcbe2"
+    },
+    "failure": null
+  },
+  {
+    "name": "current-baseline-3",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\current-baseline-3",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": null,
+    "elapsed_seconds": 51.174395499998354,
+    "exit_code": 1,
+    "exe_sha256": "57f3102b6ecec066164aa678a4a6b0c79c2c146fd8cadd05ec8b2bd572782a7b",
+    "shader": {
+      "name": "baseline",
+      "source_sha256": "1fb374ba65273d6d4726386b7ce483cd7eb7eb2d25f629bd300dbb5ea3ce652f",
+      "spirv_sha256": "9fed471359c5ae3970eeb7d698cf92a2289708fea263b2189783fa46eff752e1",
+      "include_sha256": "4502ff1fd59ffdd177b2810201a4dfd118731a5f7a01499cadd7caec1401e7e1",
+      "bytes": 295540,
+      "words": 73885,
+      "instructions": 17621,
+      "branchOperations": 980,
+      "loops": 21,
+      "selectionMerges": 413,
+      "functions": 83,
+      "functionCalls": 264,
+      "rayQueryInitializations": 2,
+      "atomicInstructions": 41
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 4.036992,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "e5deba2a75a24f6c91d734c18869fb11c0a1b74f5facf55fe51aaed93e34d75e",
+      "capture-manifest.json": "06ee3be64bd93415c708fd31d50725f48ac11bb73e579632424ce6d2a318d92f",
+      "capture.log": "344f4029ecaf328b3fbe985e7edd917d14693d1e578ff64d478478cde932a116",
+      "completed-frame.json": "56fb520794f719b2f2bb472b83cb1524a73d95a55300fbf2185f1dc7cfd1c5d3",
+      "frozen-state.json": "b19c4e07b17725ae920907974310240ff130d5b8ddf25fd28a771a9067dcc7f7",
+      "native-resources.json": "5893051578d7ea943cd034159308008ac85e8cd70e2c7cf5fd796a8c5167fb6b"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50239/1030/23714 sword/torch=0/2588 wall-retraction=0 grip=0/0 authority=1.19209e-07/0 finalGrip=-34.5071,0.384931,-14.1008 body=-34.4664,0.333254,-14.1218."
+  },
+  {
+    "name": "current-baseline-4",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\current-baseline-4",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "1",
+      "HORDE_MIST_PROBE_SHADOW": "CURRENT"
+    },
+    "elapsed_seconds": 22.38788249999925,
+    "exit_code": 1,
+    "exe_sha256": "a6df0997824d46b193f79972ba1728f7acb000502228b35379e617a93ee9c5da",
+    "shader": {
+      "name": "baseline",
+      "source_sha256": "1fb374ba65273d6d4726386b7ce483cd7eb7eb2d25f629bd300dbb5ea3ce652f",
+      "spirv_sha256": "9fed471359c5ae3970eeb7d698cf92a2289708fea263b2189783fa46eff752e1",
+      "include_sha256": "4502ff1fd59ffdd177b2810201a4dfd118731a5f7a01499cadd7caec1401e7e1",
+      "bytes": 295540,
+      "words": 73885,
+      "instructions": 17621,
+      "branchOperations": 980,
+      "loops": 21,
+      "selectionMerges": 413,
+      "functions": 83,
+      "functionCalls": 264,
+      "rayQueryInitializations": 2,
+      "atomicInstructions": 41
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 5.952864,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "e5deba2a75a24f6c91d734c18869fb11c0a1b74f5facf55fe51aaed93e34d75e",
+      "capture-manifest.json": "18513aaf005d7d81919bdd6c8aeb7a2155646b3ec49b3a839b7e65bc71753cdd",
+      "capture.log": "d96efa3d76d620a54df3aebed3b6d0c8075be6a32116052567a3f54df93872e4",
+      "completed-frame.json": "9c23d3bb89467d917a2d1ace1015110f2a5fb6f5b93a2ccff7580035f8fff91f",
+      "frozen-state.json": "b19c4e07b17725ae920907974310240ff130d5b8ddf25fd28a771a9067dcc7f7",
+      "native-resources.json": "185a723ee8528744b3acb0fb79d301de7bedba6aa3cc6ee5967b5af65543a522"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50239/1030/23714 sword/torch=0/2588 wall-retraction=0 grip=0/0 authority=1.19209e-07/0 finalGrip=-34.5071,0.384931,-14.1008 body=-34.4664,0.333254,-14.1218."
+  },
+  {
+    "name": "current-baseline-5",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\current-baseline-5",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "1",
+      "HORDE_MIST_PROBE_SHADOW": "CURRENT"
+    },
+    "elapsed_seconds": 23.681687899996177,
+    "exit_code": 1,
+    "exe_sha256": "2277c6a32481e8503fa9b96dee69eccbda62b7f66c1f078389bbd0f1960041d0",
+    "shader": {
+      "name": "baseline",
+      "source_sha256": "1fb374ba65273d6d4726386b7ce483cd7eb7eb2d25f629bd300dbb5ea3ce652f",
+      "spirv_sha256": "9fed471359c5ae3970eeb7d698cf92a2289708fea263b2189783fa46eff752e1",
+      "include_sha256": "4502ff1fd59ffdd177b2810201a4dfd118731a5f7a01499cadd7caec1401e7e1",
+      "bytes": 295540,
+      "words": 73885,
+      "instructions": 17621,
+      "branchOperations": 980,
+      "loops": 21,
+      "selectionMerges": 413,
+      "functions": 83,
+      "functionCalls": 264,
+      "rayQueryInitializations": 2,
+      "atomicInstructions": 41
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 6.193056,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "e5deba2a75a24f6c91d734c18869fb11c0a1b74f5facf55fe51aaed93e34d75e",
+      "capture-manifest.json": "1470c0a5da777c89de13b14982c7f455372999af70d802d499fbe517eb1e188c",
+      "capture.log": "8335a27da3bfb0f7d70c2a016e8fff1f206020f79c511523ac2fe2305f383c07",
+      "completed-frame.json": "b673e4409d29133219365d3b2c7a0fd03d1926f11f16d26116893a9c1aadddfb",
+      "frozen-state.json": "b19c4e07b17725ae920907974310240ff130d5b8ddf25fd28a771a9067dcc7f7",
+      "native-resources.json": "9273a8bc7756b92d8acb9bb34d17b2adaf0df167445db7809e65bb017ff970e3"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50239/1030/23714 sword/torch=0/2588 wall-retraction=0 grip=0/0 authority=1.19209e-07/0 finalGrip=-34.5071,0.384931,-14.1008 body=-34.4664,0.333254,-14.1218."
+  },
+  {
+    "name": "current-baseline-surface",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\current-baseline-surface",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": null,
+    "elapsed_seconds": 22.2756781999924,
+    "exit_code": 1,
+    "exe_sha256": "57f3102b6ecec066164aa678a4a6b0c79c2c146fd8cadd05ec8b2bd572782a7b",
+    "shader": {
+      "name": "baseline-surface",
+      "source_sha256": "1ba38723a28d77b334842b0c1d884a80506b242afc10f32b4b40617522e8105a",
+      "spirv_sha256": "96e5f08d91453af0fe7c1679e7ba719046b9a4028ba5ac2611c24799459b96ef",
+      "include_sha256": "c5953fd0fdd3a8c352256ab543b2cf0a0308e243a8cbe35b91aff8b9927566d4",
+      "bytes": 238100,
+      "words": 59525,
+      "instructions": 14106,
+      "branchOperations": 861,
+      "loops": 17,
+      "selectionMerges": 360,
+      "functions": 62,
+      "functionCalls": 177,
+      "rayQueryInitializations": 2,
+      "atomicInstructions": 41
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 2.643712,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "dad2e23f057ab01766c28ee4f53fd55f6cf5c0b609d84cd35c00ec711792dd01",
+      "capture-manifest.json": "52931812edc27ebd5069f28cb07095c0be8fda398bba35c7acd2f68c486b9424",
+      "capture.log": "aa6375643892ddd3f99b429c0bd0952796d56b96b1817df87a0785220e83bb20",
+      "completed-frame.json": "9983b12cf934ec12a382a1172ea9da0132c0c514e3183181bf419b89212c506d",
+      "frozen-state.json": "b19c4e07b17725ae920907974310240ff130d5b8ddf25fd28a771a9067dcc7f7",
+      "native-resources.json": "2f82bb6a3fb3f5c3c78674c5c7a6f5d46a473124dd90d2c5bf84be844e0abac6"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50239/1030/23714 sword/torch=0/2588 wall-retraction=0 grip=0/0 authority=1.19209e-07/0 finalGrip=-34.5071,0.384931,-14.1008 body=-34.4664,0.333254,-14.1218."
+  },
+  {
+    "name": "current-baseline-surface-2",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\current-baseline-surface-2",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "3",
+      "HORDE_MIST_PROBE_SHADOW": "CURRENT"
+    },
+    "elapsed_seconds": 18.472407699999167,
+    "exit_code": 1,
+    "exe_sha256": "a6df0997824d46b193f79972ba1728f7acb000502228b35379e617a93ee9c5da",
+    "shader": {
+      "name": "baseline-surface",
+      "source_sha256": "1ba38723a28d77b334842b0c1d884a80506b242afc10f32b4b40617522e8105a",
+      "spirv_sha256": "96e5f08d91453af0fe7c1679e7ba719046b9a4028ba5ac2611c24799459b96ef",
+      "include_sha256": "c5953fd0fdd3a8c352256ab543b2cf0a0308e243a8cbe35b91aff8b9927566d4",
+      "bytes": 238100,
+      "words": 59525,
+      "instructions": 14106,
+      "branchOperations": 861,
+      "loops": 17,
+      "selectionMerges": 360,
+      "functions": 62,
+      "functionCalls": 177,
+      "rayQueryInitializations": 2,
+      "atomicInstructions": 41
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 5.3424,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "dad2e23f057ab01766c28ee4f53fd55f6cf5c0b609d84cd35c00ec711792dd01",
+      "capture-manifest.json": "0b3a68f678b4e9d41c744904ee3b7ae44c97af25acb38d346422382163c98654",
+      "capture.log": "f44bd0381caff4ffd9908c47d8db02c598d48c662c3d8031cb3e333f9396c720",
+      "completed-frame.json": "d739ef931f95988915c84308c2a3ae7f4ca8ffc4e64cda9a86be8ac262cce2d5",
+      "frozen-state.json": "b19c4e07b17725ae920907974310240ff130d5b8ddf25fd28a771a9067dcc7f7",
+      "native-resources.json": "cab9eecd9f9e3c4b5854c9af7a1d1d1ce57ceaadaf7454bc55506b84dd89b623"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50239/1030/23714 sword/torch=0/2588 wall-retraction=0 grip=0/0 authority=1.19209e-07/0 finalGrip=-34.5071,0.384931,-14.1008 body=-34.4664,0.333254,-14.1218."
+  },
+  {
+    "name": "current-baseline-surface-3",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\current-baseline-surface-3",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "3",
+      "HORDE_MIST_PROBE_SHADOW": "CURRENT"
+    },
+    "elapsed_seconds": 19.950313900000765,
+    "exit_code": 1,
+    "exe_sha256": "2277c6a32481e8503fa9b96dee69eccbda62b7f66c1f078389bbd0f1960041d0",
+    "shader": {
+      "name": "baseline-surface",
+      "source_sha256": "1ba38723a28d77b334842b0c1d884a80506b242afc10f32b4b40617522e8105a",
+      "spirv_sha256": "96e5f08d91453af0fe7c1679e7ba719046b9a4028ba5ac2611c24799459b96ef",
+      "include_sha256": "c5953fd0fdd3a8c352256ab543b2cf0a0308e243a8cbe35b91aff8b9927566d4",
+      "bytes": 238100,
+      "words": 59525,
+      "instructions": 14106,
+      "branchOperations": 861,
+      "loops": 17,
+      "selectionMerges": 360,
+      "functions": 62,
+      "functionCalls": 177,
+      "rayQueryInitializations": 2,
+      "atomicInstructions": 41
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 2.633152,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "dad2e23f057ab01766c28ee4f53fd55f6cf5c0b609d84cd35c00ec711792dd01",
+      "capture-manifest.json": "cf18187501d28a3baedb92e99b5fa92352005089dc289942dda2dd6e5c3b1a86",
+      "capture.log": "acc761a44c130ed8ccd722af70a75523e1e9df0c33c5ecf32859f991a7797229",
+      "completed-frame.json": "ea373ec67876d4989fd08a85f0ace2940b191f778ab13faee1a5bbb25f2fd1e6",
+      "frozen-state.json": "b19c4e07b17725ae920907974310240ff130d5b8ddf25fd28a771a9067dcc7f7",
+      "native-resources.json": "d76849c32ecce2c28ca2932c0edfe22cedfd29a6bf1051aeba55d82b3655db62"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50239/1030/23714 sword/torch=0/2588 wall-retraction=0 grip=0/0 authority=1.19209e-07/0 finalGrip=-34.5071,0.384931,-14.1008 body=-34.4664,0.333254,-14.1218."
+  },
+  {
+    "name": "current-baseline-yaw-0.025",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\current-baseline-yaw-0.025",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "1",
+      "HORDE_MIST_PROBE_SHADOW": "CURRENT",
+      "HORDE_MIST_VIEW_YAW": "-0.025"
+    },
+    "elapsed_seconds": 21.92930139999953,
+    "exit_code": 1,
+    "exe_sha256": "a6df0997824d46b193f79972ba1728f7acb000502228b35379e617a93ee9c5da",
+    "shader": {
+      "name": "baseline",
+      "source_sha256": "1fb374ba65273d6d4726386b7ce483cd7eb7eb2d25f629bd300dbb5ea3ce652f",
+      "spirv_sha256": "9fed471359c5ae3970eeb7d698cf92a2289708fea263b2189783fa46eff752e1",
+      "include_sha256": "4502ff1fd59ffdd177b2810201a4dfd118731a5f7a01499cadd7caec1401e7e1",
+      "bytes": 295540,
+      "words": 73885,
+      "instructions": 17621,
+      "branchOperations": 980,
+      "loops": 21,
+      "selectionMerges": 413,
+      "functions": 83,
+      "functionCalls": 264,
+      "rayQueryInitializations": 2,
+      "atomicInstructions": 41
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 6.564608,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "8039e7f9e8acf3e8012566a0c66d117681bb471196d982ab7283ffd56b9914db",
+      "capture-manifest.json": "98f270b341b2a118541915119917518ba23c71f67fd86a2426cc8cf50d194b66",
+      "capture.log": "e72fd326865f716ea9b1f84a8ba5f1d121fcd156979f7b51751367ee97948458",
+      "completed-frame.json": "c8102f979845ca9943de57956f986864c4f8a9837c3a109dd8fab74a9ea208ac",
+      "frozen-state.json": "54ac2f84ad2226b574906fc01e4acb8b61693776289877a07c800a969628fd33",
+      "native-resources.json": "a88a1cdf1ef599d6c2cf3c16dd7c866967bf04d5a4ccf26c92e59ab6819fab53"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50238/1030/23712 sword/torch=0/2491 wall-retraction=0 grip=0/0.000488281 authority=1.19209e-07/0 finalGrip=-34.5221,0.384931,-14.0979 body=-34.482,0.333254,-14.12."
+  },
+  {
+    "name": "current-baseline-yaw-0.025-2",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\current-baseline-yaw-0.025-2",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "1",
+      "HORDE_MIST_PROBE_SHADOW": "CURRENT",
+      "HORDE_MIST_VIEW_YAW": "-0.025"
+    },
+    "elapsed_seconds": 30.499904900003457,
+    "exit_code": 1,
+    "exe_sha256": "2277c6a32481e8503fa9b96dee69eccbda62b7f66c1f078389bbd0f1960041d0",
+    "shader": {
+      "name": "baseline",
+      "source_sha256": "1fb374ba65273d6d4726386b7ce483cd7eb7eb2d25f629bd300dbb5ea3ce652f",
+      "spirv_sha256": "9fed471359c5ae3970eeb7d698cf92a2289708fea263b2189783fa46eff752e1",
+      "include_sha256": "4502ff1fd59ffdd177b2810201a4dfd118731a5f7a01499cadd7caec1401e7e1",
+      "bytes": 295540,
+      "words": 73885,
+      "instructions": 17621,
+      "branchOperations": 980,
+      "loops": 21,
+      "selectionMerges": 413,
+      "functions": 83,
+      "functionCalls": 264,
+      "rayQueryInitializations": 2,
+      "atomicInstructions": 41
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 6.464064,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "8039e7f9e8acf3e8012566a0c66d117681bb471196d982ab7283ffd56b9914db",
+      "capture-manifest.json": "58dbbeb83a3c168aa0b030d57e768598f209c119bdbad38460f25ce9f4deee61",
+      "capture.log": "80225d4257e12c7577f6ac89b98f6646dbc4c7e40a8b632393ab7641e604cff5",
+      "completed-frame.json": "c7eb972176b7c1eb74919d1cb52024cdc4b77bf6a4c5a6df95216f2aebd8a298",
+      "frozen-state.json": "54ac2f84ad2226b574906fc01e4acb8b61693776289877a07c800a969628fd33",
+      "native-resources.json": "eb4c4233d45816b5b32d1aac11e60c0676470947224214484f0f18febae612c8"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50238/1030/23712 sword/torch=0/2491 wall-retraction=0 grip=0/0.000488281 authority=1.19209e-07/0 finalGrip=-34.5221,0.384931,-14.0979 body=-34.482,0.333254,-14.12."
+  },
+  {
+    "name": "current-baseline-yaw0.025",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\current-baseline-yaw0.025",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "1",
+      "HORDE_MIST_PROBE_SHADOW": "CURRENT",
+      "HORDE_MIST_VIEW_YAW": "0.025"
+    },
+    "elapsed_seconds": 3.712856099999044,
+    "exit_code": 1,
+    "exe_sha256": "a6df0997824d46b193f79972ba1728f7acb000502228b35379e617a93ee9c5da",
+    "shader": {
+      "name": "baseline",
+      "source_sha256": "1fb374ba65273d6d4726386b7ce483cd7eb7eb2d25f629bd300dbb5ea3ce652f",
+      "spirv_sha256": "9fed471359c5ae3970eeb7d698cf92a2289708fea263b2189783fa46eff752e1",
+      "include_sha256": "4502ff1fd59ffdd177b2810201a4dfd118731a5f7a01499cadd7caec1401e7e1",
+      "bytes": 295540,
+      "words": 73885,
+      "instructions": 17621,
+      "branchOperations": 980,
+      "loops": 21,
+      "selectionMerges": 413,
+      "functions": 83,
+      "functionCalls": 264,
+      "rayQueryInitializations": 2,
+      "atomicInstructions": 41
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 3.613888,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "028826386b15e0bd089fa56a6c49e6b5b045f5624a4560209b060961814d38c9",
+      "capture-manifest.json": "6bb76903ebbd625933e673cbb00db540f223e8912826bb1b3929d85f27a339b4",
+      "capture.log": "e5f9fc7f9a68e6f604a27d3af2de27a1c0e4112c1d75430a2cd135cc6f1bea61",
+      "completed-frame.json": "a5ec4c4914fd345b65ba97792532566860467a556519e5b6b531b4d626e6c2a9",
+      "frozen-state.json": "ab8fd94048dea8993951f563adc725d0031f1f8bc15aebc317e24118ba074a65",
+      "native-resources.json": "bd6a048cd89d1530afadd7a2e53b939463a773205690ed670860b5bf1eb9c9c1"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50240/1030/23713 sword/torch=0/2690 wall-retraction=0 grip=0/0 authority=0/0 finalGrip=-34.4921,0.384931,-14.1033 body=-34.4509,0.333255,-14.1233."
+  },
+  {
+    "name": "current-baseline-yaw0.025-2",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\current-baseline-yaw0.025-2",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "1",
+      "HORDE_MIST_PROBE_SHADOW": "CURRENT",
+      "HORDE_MIST_VIEW_YAW": "0.025"
+    },
+    "elapsed_seconds": 3.88095359998988,
+    "exit_code": 1,
+    "exe_sha256": "2277c6a32481e8503fa9b96dee69eccbda62b7f66c1f078389bbd0f1960041d0",
+    "shader": {
+      "name": "baseline",
+      "source_sha256": "1fb374ba65273d6d4726386b7ce483cd7eb7eb2d25f629bd300dbb5ea3ce652f",
+      "spirv_sha256": "9fed471359c5ae3970eeb7d698cf92a2289708fea263b2189783fa46eff752e1",
+      "include_sha256": "4502ff1fd59ffdd177b2810201a4dfd118731a5f7a01499cadd7caec1401e7e1",
+      "bytes": 295540,
+      "words": 73885,
+      "instructions": 17621,
+      "branchOperations": 980,
+      "loops": 21,
+      "selectionMerges": 413,
+      "functions": 83,
+      "functionCalls": 264,
+      "rayQueryInitializations": 2,
+      "atomicInstructions": 41
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 4.286208,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "028826386b15e0bd089fa56a6c49e6b5b045f5624a4560209b060961814d38c9",
+      "capture-manifest.json": "6a444912f9260d822210031566791b4a5e7bb3c192af646ed29c1f8ee06a6747",
+      "capture.log": "c1073d1b65c69b045b35fd4c53805bd4cda6d35b4909ddd6de146edaeb5cc6f2",
+      "completed-frame.json": "ebe7e0261de0362f699eb92216bee9e0b4c281a8a13cc78f7263715eaacad52f",
+      "frozen-state.json": "ab8fd94048dea8993951f563adc725d0031f1f8bc15aebc317e24118ba074a65",
+      "native-resources.json": "80482a6e10a59df684d85096e5b1b4eb7fac20a98a966080cde34511c7534d25"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50240/1030/23713 sword/torch=0/2690 wall-retraction=0 grip=0/0 authority=0/0 finalGrip=-34.4921,0.384931,-14.1033 body=-34.4509,0.333255,-14.1233."
+  },
+  {
+    "name": "current-depth",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\current-depth",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": null,
+    "elapsed_seconds": 13.886348600004567,
+    "exit_code": 1,
+    "exe_sha256": "57f3102b6ecec066164aa678a4a6b0c79c2c146fd8cadd05ec8b2bd572782a7b",
+    "shader": {
+      "name": "depth",
+      "source_sha256": "8a4df539f6ef6314e195b484978342e82e61930d08c9b1b27a77c06f9b558397",
+      "spirv_sha256": "06b14261b8b5457e5c246db656dc0fbd2aae5971d6753e25e9b0e56968e434f6",
+      "include_sha256": "7d2f08fa6c92873d61f442a7d25f1ef59c92c14777bec08a95533e1cf1010bf0",
+      "bytes": 238236,
+      "words": 59559,
+      "instructions": 14114,
+      "branchOperations": 861,
+      "loops": 17,
+      "selectionMerges": 360,
+      "functions": 62,
+      "functionCalls": 177,
+      "rayQueryInitializations": 2,
+      "atomicInstructions": 41
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 2.443104,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "a2ca1422aede8c8984d7dba1628e2a6851ac3260eaa60601509772ed1839d710",
+      "capture-manifest.json": "45e5d9e11f962a9ae68c77634ee80160e5db16cd4df688f3e16aa889c7f5aecb",
+      "capture.log": "df83af8441a1eb7e29e67e8f40ef7abb899acd35c27cd5821851b2c8daa7fe60",
+      "completed-frame.json": "f78da03149e0a1c810e6a3e9716e295311c3e74805699056fd51ec659bbdb923",
+      "frozen-state.json": "b19c4e07b17725ae920907974310240ff130d5b8ddf25fd28a771a9067dcc7f7",
+      "native-resources.json": "a2769df1d5157475c82179aa65e05697f7fec650c039d5b9b2370b154742e7e6"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50239/1030/23714 sword/torch=0/2588 wall-retraction=0 grip=0/0 authority=1.19209e-07/0 finalGrip=-34.5071,0.384931,-14.1008 body=-34.4664,0.333254,-14.1218."
+  },
+  {
+    "name": "current-depth-2",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\current-depth-2",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "4",
+      "HORDE_MIST_PROBE_SHADOW": "CURRENT"
+    },
+    "elapsed_seconds": 12.855335599990212,
+    "exit_code": 1,
+    "exe_sha256": "a6df0997824d46b193f79972ba1728f7acb000502228b35379e617a93ee9c5da",
+    "shader": {
+      "name": "depth",
+      "source_sha256": "8a4df539f6ef6314e195b484978342e82e61930d08c9b1b27a77c06f9b558397",
+      "spirv_sha256": "06b14261b8b5457e5c246db656dc0fbd2aae5971d6753e25e9b0e56968e434f6",
+      "include_sha256": "7d2f08fa6c92873d61f442a7d25f1ef59c92c14777bec08a95533e1cf1010bf0",
+      "bytes": 238236,
+      "words": 59559,
+      "instructions": 14114,
+      "branchOperations": 861,
+      "loops": 17,
+      "selectionMerges": 360,
+      "functions": 62,
+      "functionCalls": 177,
+      "rayQueryInitializations": 2,
+      "atomicInstructions": 41
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 3.633152,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "a2ca1422aede8c8984d7dba1628e2a6851ac3260eaa60601509772ed1839d710",
+      "capture-manifest.json": "5bf19f99cd43b9104bf4b45d16e310eb8ca7b1f564485af1aacba84289ca5155",
+      "capture.log": "3614c1cb33d3fd4a0360140c37545fc379c577afca10d9c5baef270476778978",
+      "completed-frame.json": "8682acec934930a14e3e29b9fab5ec74420e2a6dda0b92224862d3632805cae0",
+      "frozen-state.json": "b19c4e07b17725ae920907974310240ff130d5b8ddf25fd28a771a9067dcc7f7",
+      "native-resources.json": "0c0a2930755ba3ae0b6ba78c399082829a37cb7c3fc294312094a2bc8b2fa120"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50239/1030/23714 sword/torch=0/2588 wall-retraction=0 grip=0/0 authority=1.19209e-07/0 finalGrip=-34.5071,0.384931,-14.1008 body=-34.4664,0.333254,-14.1218."
+  },
+  {
+    "name": "current-depth-3",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\current-depth-3",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "4",
+      "HORDE_MIST_PROBE_SHADOW": "CURRENT"
+    },
+    "elapsed_seconds": 12.443039499994484,
+    "exit_code": 1,
+    "exe_sha256": "2277c6a32481e8503fa9b96dee69eccbda62b7f66c1f078389bbd0f1960041d0",
+    "shader": {
+      "name": "depth",
+      "source_sha256": "8a4df539f6ef6314e195b484978342e82e61930d08c9b1b27a77c06f9b558397",
+      "spirv_sha256": "06b14261b8b5457e5c246db656dc0fbd2aae5971d6753e25e9b0e56968e434f6",
+      "include_sha256": "7d2f08fa6c92873d61f442a7d25f1ef59c92c14777bec08a95533e1cf1010bf0",
+      "bytes": 238236,
+      "words": 59559,
+      "instructions": 14114,
+      "branchOperations": 861,
+      "loops": 17,
+      "selectionMerges": 360,
+      "functions": 62,
+      "functionCalls": 177,
+      "rayQueryInitializations": 2,
+      "atomicInstructions": 41
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 3.04128,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "a2ca1422aede8c8984d7dba1628e2a6851ac3260eaa60601509772ed1839d710",
+      "capture-manifest.json": "d5fc13f2193e844f58c2949613d3464883501b61c216939c64cf1d036cbf0e8d",
+      "capture.log": "9d994af06e0767b9d6b656239b51013c7ed91ef423cf7116c1abc82965cafc88",
+      "completed-frame.json": "24085663669f63d0629739024fa394e34c1355260ca506ce39cf1f8a39766fe5",
+      "frozen-state.json": "b19c4e07b17725ae920907974310240ff130d5b8ddf25fd28a771a9067dcc7f7",
+      "native-resources.json": "038169e47eda27f1e73c13ae2052ad3c0db3765b6c63bf12348ec20be79bb1f0"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50239/1030/23714 sword/torch=0/2588 wall-retraction=0 grip=0/0 authority=1.19209e-07/0 finalGrip=-34.5071,0.384931,-14.1008 body=-34.4664,0.333254,-14.1218."
+  },
+  {
+    "name": "current-diagnostic_high_generic_dielectric-interval",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\current-diagnostic_high_generic_dielectric-interval",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": null,
+    "elapsed_seconds": 0.8445257999992464,
+    "exit_code": 1,
+    "exe_sha256": "57f3102b6ecec066164aa678a4a6b0c79c2c146fd8cadd05ec8b2bd572782a7b",
+    "shader": {
+      "name": "diagnostic_high_generic_dielectric-interval",
+      "source_sha256": "1672eeda099147af77c30d6ebd910be539d59c74ebff39d80a54a56d3df73fd6",
+      "spirv_sha256": "3908291bb0e2b096544fecf19186a5636c9b9788d22b032260dedf24a394765a",
+      "include_sha256": "eea737b72d9a01ae7309efceba0348c9e26442194f1b5845b92c0d050e758c78",
+      "bytes": 303924,
+      "words": 75981,
+      "instructions": 18170,
+      "branchOperations": 1043,
+      "loops": 27,
+      "selectionMerges": 428,
+      "functions": 85,
+      "functionCalls": 267,
+      "rayQueryInitializations": 3,
+      "atomicInstructions": 41,
+      "key": "diagnostic_high_generic_dielectric",
+      "excess": {
+        "bytes": 7964,
+        "words": 1991,
+        "instructions": 521,
+        "branchOperations": 57,
+        "loops": 6,
+        "selectionMerges": 12,
+        "functions": 2,
+        "functionCalls": 3,
+        "rayQueryInitializations": 1
+      }
+    },
+    "presentation": null,
+    "gpu": null,
+    "files": {
+      "capture.log": "46c91e5031a19bb43f0223e7b97c2665145784f06ce5131077e80221767c117a",
+      "native-resources.json": "5893051578d7ea943cd034159308008ac85e8cd70e2c7cf5fd796a8c5167fb6b"
+    },
+    "failure": null
+  },
+  {
+    "name": "current-diagnostic_high_generic_dielectric-interval-2",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\current-diagnostic_high_generic_dielectric-interval-2",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": null,
+    "elapsed_seconds": 34.64002550000441,
+    "exit_code": 1,
+    "exe_sha256": "33446a5690ab3e993438b0bdcca944638a467e55f1e1d47e7ca88264952a721d",
+    "shader": {
+      "name": "diagnostic_high_generic_dielectric-interval",
+      "source_sha256": "1672eeda099147af77c30d6ebd910be539d59c74ebff39d80a54a56d3df73fd6",
+      "spirv_sha256": "3908291bb0e2b096544fecf19186a5636c9b9788d22b032260dedf24a394765a",
+      "include_sha256": "eea737b72d9a01ae7309efceba0348c9e26442194f1b5845b92c0d050e758c78",
+      "bytes": 303924,
+      "words": 75981,
+      "instructions": 18170,
+      "branchOperations": 1043,
+      "loops": 27,
+      "selectionMerges": 428,
+      "functions": 85,
+      "functionCalls": 267,
+      "rayQueryInitializations": 3,
+      "atomicInstructions": 41,
+      "key": "diagnostic_high_generic_dielectric",
+      "excess": {
+        "bytes": 7964,
+        "words": 1991,
+        "instructions": 521,
+        "branchOperations": 57,
+        "loops": 6,
+        "selectionMerges": 12,
+        "functions": 2,
+        "functionCalls": 3,
+        "rayQueryInitializations": 1
+      }
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 8.017376,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "b7bbe8dc7f5edcd6434a6ba74431a27939e67de36066f86a29922dbc9e08237b",
+      "capture-manifest.json": "d6d9b5c92ccc6f2e1e8b4ad6a4c694ee182dcd734a4dc2708820ef43c7830823",
+      "capture.log": "da37ee5b4dee08c3d75c151915b5c24f010170cc634942f004b57a4ea7991c10",
+      "completed-frame.json": "3278f4c555df5885b0eef27e065962e5892fba187f0a130c71dc469919d9952e",
+      "frozen-state.json": "b19c4e07b17725ae920907974310240ff130d5b8ddf25fd28a771a9067dcc7f7",
+      "native-resources.json": "3b2c11df9b4ef30b44e54531a46ea9a5fac10f66419db8dbd8d958cb36a1b10b"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50239/1030/23714 sword/torch=0/2588 wall-retraction=0 grip=0/0 authority=1.19209e-07/0 finalGrip=-34.5071,0.384931,-14.1008 body=-34.4664,0.333254,-14.1218."
+  },
+  {
+    "name": "current-diagnostic_high_generic_dielectric-interval-3",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\current-diagnostic_high_generic_dielectric-interval-3",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "0",
+      "HORDE_MIST_PROBE_SHADOW": "CURRENT"
+    },
+    "elapsed_seconds": 35.73080130000017,
+    "exit_code": 1,
+    "exe_sha256": "a6df0997824d46b193f79972ba1728f7acb000502228b35379e617a93ee9c5da",
+    "shader": {
+      "name": "diagnostic_high_generic_dielectric-interval",
+      "source_sha256": "1672eeda099147af77c30d6ebd910be539d59c74ebff39d80a54a56d3df73fd6",
+      "spirv_sha256": "3908291bb0e2b096544fecf19186a5636c9b9788d22b032260dedf24a394765a",
+      "include_sha256": "eea737b72d9a01ae7309efceba0348c9e26442194f1b5845b92c0d050e758c78",
+      "bytes": 303924,
+      "words": 75981,
+      "instructions": 18170,
+      "branchOperations": 1043,
+      "loops": 27,
+      "selectionMerges": 428,
+      "functions": 85,
+      "functionCalls": 267,
+      "rayQueryInitializations": 3,
+      "atomicInstructions": 41,
+      "key": "diagnostic_high_generic_dielectric",
+      "excess": {
+        "bytes": 7964,
+        "words": 1991,
+        "instructions": 521,
+        "branchOperations": 57,
+        "loops": 6,
+        "selectionMerges": 12,
+        "functions": 2,
+        "functionCalls": 3,
+        "rayQueryInitializations": 1
+      }
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 7.633344,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "b7bbe8dc7f5edcd6434a6ba74431a27939e67de36066f86a29922dbc9e08237b",
+      "capture-manifest.json": "93cff90842480616b8cc40e64d789f8cc20cca1b0c6d26bf315298567d72217b",
+      "capture.log": "0ddb603da6a44b8a7378eac0a17d2b29a1f6f23c38e7db224eae5448db6bdcf3",
+      "completed-frame.json": "f658d98f103c3fe49ebdbbe4a4a50ea487fffdcf720d5c693938cd2001102a72",
+      "frozen-state.json": "b19c4e07b17725ae920907974310240ff130d5b8ddf25fd28a771a9067dcc7f7",
+      "native-resources.json": "b21e80240bab02373b35a88fe809cf7fcbd24b3f00dff77a1461a8c0cd1db173"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50239/1030/23714 sword/torch=0/2588 wall-retraction=0 grip=0/0 authority=1.19209e-07/0 finalGrip=-34.5071,0.384931,-14.1008 body=-34.4664,0.333254,-14.1218."
+  },
+  {
+    "name": "current-diagnostic_high_generic_dielectric-interval-4",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\current-diagnostic_high_generic_dielectric-interval-4",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "0",
+      "HORDE_MIST_PROBE_SHADOW": "CURRENT"
+    },
+    "elapsed_seconds": 34.72213080000074,
+    "exit_code": 1,
+    "exe_sha256": "2277c6a32481e8503fa9b96dee69eccbda62b7f66c1f078389bbd0f1960041d0",
+    "shader": {
+      "name": "diagnostic_high_generic_dielectric-interval",
+      "source_sha256": "4f91cf541d929d324cfeaf12eed0bc021bab23167e292e34b22a13f1da0b2903",
+      "spirv_sha256": "eb3db3611c9c9bb58d395ceec61420a5f034d950b4acac5627b4120f384eefb3",
+      "include_sha256": "61b4b45e9cc401541839cb24c5627966343b73421fc66793ee72003703b827ec",
+      "bytes": 305592,
+      "words": 76398,
+      "instructions": 18291,
+      "branchOperations": 1065,
+      "loops": 27,
+      "selectionMerges": 441,
+      "functions": 85,
+      "functionCalls": 267,
+      "rayQueryInitializations": 3,
+      "atomicInstructions": 41,
+      "key": "diagnostic_high_generic_dielectric",
+      "excess": {
+        "bytes": 9632,
+        "words": 2408,
+        "instructions": 642,
+        "branchOperations": 79,
+        "loops": 6,
+        "selectionMerges": 25,
+        "functions": 2,
+        "functionCalls": 3,
+        "rayQueryInitializations": 1
+      }
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 7.789472,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "38a3d129e6da2e4f24c88a67086e1bea4bf421179bad4d47675fca6314776134",
+      "capture-manifest.json": "5577388b028309a5985134f998c0431bac84e0c8fa600038db07e38599b4537e",
+      "capture.log": "ffd2daad521298cd909dbded5d2d9fe38c71c1f2a0453ca224306c13d3ab3915",
+      "completed-frame.json": "32c04dec4121e298710253e9db31493996ff300b1b395b9bbc23f374f5b56c99",
+      "frozen-state.json": "b19c4e07b17725ae920907974310240ff130d5b8ddf25fd28a771a9067dcc7f7",
+      "native-resources.json": "6e66801d8e5cab69b30d0b436bba831710076b1a78c54bf94577364f6719f808"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50239/1030/23714 sword/torch=0/2588 wall-retraction=0 grip=0/0 authority=1.19209e-07/0 finalGrip=-34.5071,0.384931,-14.1008 body=-34.4664,0.333254,-14.1218."
+  },
+  {
+    "name": "current-diagnostic_high_generic_dielectric-interval-yaw-0.025",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\current-diagnostic_high_generic_dielectric-interval-yaw-0.025",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "0",
+      "HORDE_MIST_PROBE_SHADOW": "CURRENT",
+      "HORDE_MIST_VIEW_YAW": "-0.025"
+    },
+    "elapsed_seconds": 30.355807800006005,
+    "exit_code": 1,
+    "exe_sha256": "a6df0997824d46b193f79972ba1728f7acb000502228b35379e617a93ee9c5da",
+    "shader": {
+      "name": "diagnostic_high_generic_dielectric-interval",
+      "source_sha256": "1672eeda099147af77c30d6ebd910be539d59c74ebff39d80a54a56d3df73fd6",
+      "spirv_sha256": "3908291bb0e2b096544fecf19186a5636c9b9788d22b032260dedf24a394765a",
+      "include_sha256": "eea737b72d9a01ae7309efceba0348c9e26442194f1b5845b92c0d050e758c78",
+      "bytes": 303924,
+      "words": 75981,
+      "instructions": 18170,
+      "branchOperations": 1043,
+      "loops": 27,
+      "selectionMerges": 428,
+      "functions": 85,
+      "functionCalls": 267,
+      "rayQueryInitializations": 3,
+      "atomicInstructions": 41,
+      "key": "diagnostic_high_generic_dielectric",
+      "excess": {
+        "bytes": 7964,
+        "words": 1991,
+        "instructions": 521,
+        "branchOperations": 57,
+        "loops": 6,
+        "selectionMerges": 12,
+        "functions": 2,
+        "functionCalls": 3,
+        "rayQueryInitializations": 1
+      }
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 8.187744,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "fbbfa0918429bd447c879b20a1797506d2f354a322a74ac3b336b9c89b10d92b",
+      "capture-manifest.json": "360681030979a531201581801f23d1425ca7d4198f6f7155f6bd72d581489d08",
+      "capture.log": "f67d7250092321849dca4377848722984f8e5d206339ec6ec90f22c1c106070a",
+      "completed-frame.json": "85019f04b6c17e472ad0292d04e8b8bfc094a9aff07e5281debfc529c3770447",
+      "frozen-state.json": "54ac2f84ad2226b574906fc01e4acb8b61693776289877a07c800a969628fd33",
+      "native-resources.json": "7290cc4df551fdc795159ca2362de8b80cc85c5ef644943c2c92058783234d95"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50238/1030/23712 sword/torch=0/2491 wall-retraction=0 grip=0/0.000488281 authority=1.19209e-07/0 finalGrip=-34.5221,0.384931,-14.0979 body=-34.482,0.333254,-14.12."
+  },
+  {
+    "name": "current-diagnostic_high_generic_dielectric-interval-yaw-0.025-2",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\current-diagnostic_high_generic_dielectric-interval-yaw-0.025-2",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "0",
+      "HORDE_MIST_PROBE_SHADOW": "CURRENT",
+      "HORDE_MIST_VIEW_YAW": "-0.025"
+    },
+    "elapsed_seconds": 23.921838100010063,
+    "exit_code": 1,
+    "exe_sha256": "2277c6a32481e8503fa9b96dee69eccbda62b7f66c1f078389bbd0f1960041d0",
+    "shader": {
+      "name": "diagnostic_high_generic_dielectric-interval",
+      "source_sha256": "4f91cf541d929d324cfeaf12eed0bc021bab23167e292e34b22a13f1da0b2903",
+      "spirv_sha256": "eb3db3611c9c9bb58d395ceec61420a5f034d950b4acac5627b4120f384eefb3",
+      "include_sha256": "61b4b45e9cc401541839cb24c5627966343b73421fc66793ee72003703b827ec",
+      "bytes": 305592,
+      "words": 76398,
+      "instructions": 18291,
+      "branchOperations": 1065,
+      "loops": 27,
+      "selectionMerges": 441,
+      "functions": 85,
+      "functionCalls": 267,
+      "rayQueryInitializations": 3,
+      "atomicInstructions": 41,
+      "key": "diagnostic_high_generic_dielectric",
+      "excess": {
+        "bytes": 9632,
+        "words": 2408,
+        "instructions": 642,
+        "branchOperations": 79,
+        "loops": 6,
+        "selectionMerges": 25,
+        "functions": 2,
+        "functionCalls": 3,
+        "rayQueryInitializations": 1
+      }
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 4.757408,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "3016e0878b8c517dd7c4aeec2889b2743ded1646097ada827649b56fa088e648",
+      "capture-manifest.json": "89ccacae1a0930c02c96c54cb0496c5260db8c18353adc73dcf00a64febc4e0f",
+      "capture.log": "875582dbeecc88a5e673906c54d11ceadfdaf0faffe9c34ce3df5033f924ef6e",
+      "completed-frame.json": "32547b29b41e1df5b50960b940ef08285da1304ab5857847c50891e5c0fcf1ab",
+      "frozen-state.json": "54ac2f84ad2226b574906fc01e4acb8b61693776289877a07c800a969628fd33",
+      "native-resources.json": "94dfec6d382636584a8d03d5008f67c3fb7ef1fe954667bafe7fe161e6f1c4ea"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50238/1030/23712 sword/torch=0/2491 wall-retraction=0 grip=0/0.000488281 authority=1.19209e-07/0 finalGrip=-34.5221,0.384931,-14.0979 body=-34.482,0.333254,-14.12."
+  },
+  {
+    "name": "current-diagnostic_high_generic_dielectric-interval-yaw0.025",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\current-diagnostic_high_generic_dielectric-interval-yaw0.025",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "0",
+      "HORDE_MIST_PROBE_SHADOW": "CURRENT",
+      "HORDE_MIST_VIEW_YAW": "0.025"
+    },
+    "elapsed_seconds": 3.8660657000000356,
+    "exit_code": 1,
+    "exe_sha256": "a6df0997824d46b193f79972ba1728f7acb000502228b35379e617a93ee9c5da",
+    "shader": {
+      "name": "diagnostic_high_generic_dielectric-interval",
+      "source_sha256": "1672eeda099147af77c30d6ebd910be539d59c74ebff39d80a54a56d3df73fd6",
+      "spirv_sha256": "3908291bb0e2b096544fecf19186a5636c9b9788d22b032260dedf24a394765a",
+      "include_sha256": "eea737b72d9a01ae7309efceba0348c9e26442194f1b5845b92c0d050e758c78",
+      "bytes": 303924,
+      "words": 75981,
+      "instructions": 18170,
+      "branchOperations": 1043,
+      "loops": 27,
+      "selectionMerges": 428,
+      "functions": 85,
+      "functionCalls": 267,
+      "rayQueryInitializations": 3,
+      "atomicInstructions": 41,
+      "key": "diagnostic_high_generic_dielectric",
+      "excess": {
+        "bytes": 7964,
+        "words": 1991,
+        "instructions": 521,
+        "branchOperations": 57,
+        "loops": 6,
+        "selectionMerges": 12,
+        "functions": 2,
+        "functionCalls": 3,
+        "rayQueryInitializations": 1
+      }
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 4.95408,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "e07b6ae039083b473d9a10b9c220815ba9f1498d01ad3c526c109937ef8ebd11",
+      "capture-manifest.json": "4dc09523d6cd3578950ac7cb55684b6f3a58d35d158a1f4292880f3741f89e4c",
+      "capture.log": "90ba9b3ac02ad5c35e316e3f7790841e37da0daab8eda11a1aa5439faad25819",
+      "completed-frame.json": "e2048c47e74bbd3708b2bfaed6080a3c320b11e15e1d973ee64ac207d6e470ef",
+      "frozen-state.json": "ab8fd94048dea8993951f563adc725d0031f1f8bc15aebc317e24118ba074a65",
+      "native-resources.json": "06d947920e6a9cd6c59a97289752e7a9c7e0612d020e149d93b94827cac27cfa"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50240/1030/23713 sword/torch=0/2690 wall-retraction=0 grip=0/0 authority=0/0 finalGrip=-34.4921,0.384931,-14.1033 body=-34.4509,0.333255,-14.1233."
+  },
+  {
+    "name": "current-diagnostic_high_generic_dielectric-interval-yaw0.025-2",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\current-diagnostic_high_generic_dielectric-interval-yaw0.025-2",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "0",
+      "HORDE_MIST_PROBE_SHADOW": "CURRENT",
+      "HORDE_MIST_VIEW_YAW": "0.025"
+    },
+    "elapsed_seconds": 3.8703928999893833,
+    "exit_code": 1,
+    "exe_sha256": "2277c6a32481e8503fa9b96dee69eccbda62b7f66c1f078389bbd0f1960041d0",
+    "shader": {
+      "name": "diagnostic_high_generic_dielectric-interval",
+      "source_sha256": "4f91cf541d929d324cfeaf12eed0bc021bab23167e292e34b22a13f1da0b2903",
+      "spirv_sha256": "eb3db3611c9c9bb58d395ceec61420a5f034d950b4acac5627b4120f384eefb3",
+      "include_sha256": "61b4b45e9cc401541839cb24c5627966343b73421fc66793ee72003703b827ec",
+      "bytes": 305592,
+      "words": 76398,
+      "instructions": 18291,
+      "branchOperations": 1065,
+      "loops": 27,
+      "selectionMerges": 441,
+      "functions": 85,
+      "functionCalls": 267,
+      "rayQueryInitializations": 3,
+      "atomicInstructions": 41,
+      "key": "diagnostic_high_generic_dielectric",
+      "excess": {
+        "bytes": 9632,
+        "words": 2408,
+        "instructions": 642,
+        "branchOperations": 79,
+        "loops": 6,
+        "selectionMerges": 25,
+        "functions": 2,
+        "functionCalls": 3,
+        "rayQueryInitializations": 1
+      }
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 5.602272,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "5a1590d14122e873eb980a2506b91275a5dafed565badd7d61467006069641fe",
+      "capture-manifest.json": "56593c8e78ad48a28bba082a56945998a7d1d3cad7f44ce1cb9c0d55cd1f0446",
+      "capture.log": "191f11d99f324954af0eb5abc1211b7c171fffaa825c00f27fb0a55b2f83d0cd",
+      "completed-frame.json": "8772dba3f2b3f3e33cee6277de39e63215564da5a8ac0655285f78ecbe8ac904",
+      "frozen-state.json": "ab8fd94048dea8993951f563adc725d0031f1f8bc15aebc317e24118ba074a65",
+      "native-resources.json": "462242cda9d35c0bbb3aeb554f3bde6b3e45696f02597668f7ff805921f6cdff"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50240/1030/23713 sword/torch=0/2690 wall-retraction=0 grip=0/0 authority=0/0 finalGrip=-34.4921,0.384931,-14.1033 body=-34.4509,0.333255,-14.1233."
+  },
+  {
+    "name": "current-interval-coverage",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\current-interval-coverage",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": null,
+    "elapsed_seconds": 0.806325099998503,
+    "exit_code": 1,
+    "exe_sha256": "57f3102b6ecec066164aa678a4a6b0c79c2c146fd8cadd05ec8b2bd572782a7b",
+    "shader": {
+      "name": "interval-coverage",
+      "source_sha256": "0c116f784a57df3cd0f1ea7dd0cbaa1986a627c926115bbd6c74746768d3c094",
+      "spirv_sha256": "4762f6740e7cab7725b02636dac36656f645398c066e43078c22f102ed465c01",
+      "include_sha256": "63b59de81508772e41e4831cce9ed1982e385b136ab151c4e05eb9c4461bfead",
+      "bytes": 304812,
+      "words": 76203,
+      "instructions": 18227,
+      "branchOperations": 1048,
+      "loops": 28,
+      "selectionMerges": 428,
+      "functions": 85,
+      "functionCalls": 267,
+      "rayQueryInitializations": 3,
+      "atomicInstructions": 41
+    },
+    "presentation": null,
+    "gpu": null,
+    "files": {
+      "capture.log": "46c91e5031a19bb43f0223e7b97c2665145784f06ce5131077e80221767c117a",
+      "native-resources.json": "a2769df1d5157475c82179aa65e05697f7fec650c039d5b9b2370b154742e7e6"
+    },
+    "failure": null
+  },
+  {
+    "name": "current-interval-coverage-2",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\current-interval-coverage-2",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": null,
+    "elapsed_seconds": 17.48490869998932,
+    "exit_code": 1,
+    "exe_sha256": "33446a5690ab3e993438b0bdcca944638a467e55f1e1d47e7ca88264952a721d",
+    "shader": {
+      "name": "interval-coverage",
+      "source_sha256": "0c116f784a57df3cd0f1ea7dd0cbaa1986a627c926115bbd6c74746768d3c094",
+      "spirv_sha256": "4762f6740e7cab7725b02636dac36656f645398c066e43078c22f102ed465c01",
+      "include_sha256": "63b59de81508772e41e4831cce9ed1982e385b136ab151c4e05eb9c4461bfead",
+      "bytes": 304812,
+      "words": 76203,
+      "instructions": 18227,
+      "branchOperations": 1048,
+      "loops": 28,
+      "selectionMerges": 428,
+      "functions": 85,
+      "functionCalls": 267,
+      "rayQueryInitializations": 3,
+      "atomicInstructions": 41
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 4.944896,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "eb654b7b80def732e9dbcac062c66a1584c745433cfc6faabcdebb3e32b321c9",
+      "capture-manifest.json": "6d7fa43badd03672a72c4b4c7dfa037d0feb2990220550c4622a63c92afbe42d",
+      "capture.log": "7df4a7e7567434724c2a1a9f429d94db0c293f20e46d611d7fc0a58fb2d49e39",
+      "completed-frame.json": "d6aebf169558d5222a004efcaa95d94aad7a988e32342a64cc84e17f91c069e2",
+      "frozen-state.json": "b19c4e07b17725ae920907974310240ff130d5b8ddf25fd28a771a9067dcc7f7",
+      "native-resources.json": "8e313928e1c57e58732ba2f8a2cbbc0d3644e89eda370d1553b0efa4c90819a4"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50239/1030/23714 sword/torch=0/2588 wall-retraction=0 grip=0/0 authority=1.19209e-07/0 finalGrip=-34.5071,0.384931,-14.1008 body=-34.4664,0.333254,-14.1218."
+  },
+  {
+    "name": "current-interval-coverage-3",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\current-interval-coverage-3",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "5",
+      "HORDE_MIST_PROBE_SHADOW": "CURRENT"
+    },
+    "elapsed_seconds": 15.931304500001715,
+    "exit_code": 1,
+    "exe_sha256": "a6df0997824d46b193f79972ba1728f7acb000502228b35379e617a93ee9c5da",
+    "shader": {
+      "name": "interval-coverage",
+      "source_sha256": "0c116f784a57df3cd0f1ea7dd0cbaa1986a627c926115bbd6c74746768d3c094",
+      "spirv_sha256": "4762f6740e7cab7725b02636dac36656f645398c066e43078c22f102ed465c01",
+      "include_sha256": "63b59de81508772e41e4831cce9ed1982e385b136ab151c4e05eb9c4461bfead",
+      "bytes": 304812,
+      "words": 76203,
+      "instructions": 18227,
+      "branchOperations": 1048,
+      "loops": 28,
+      "selectionMerges": 428,
+      "functions": 85,
+      "functionCalls": 267,
+      "rayQueryInitializations": 3,
+      "atomicInstructions": 41
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 3.498048,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "eb654b7b80def732e9dbcac062c66a1584c745433cfc6faabcdebb3e32b321c9",
+      "capture-manifest.json": "2e9f769efeed9417358569723627eda4b214e8b0c4947b57df57e26a135bfcd8",
+      "capture.log": "be346e32b0f8a5d628cdeb6276d00a22c379cefce1e8ccf49e27510b407697ae",
+      "completed-frame.json": "20cb942ec255bd2f74e6d6b0a230480ae0b3ba7ffeefa2e8ebb51fa93b3d2033",
+      "frozen-state.json": "b19c4e07b17725ae920907974310240ff130d5b8ddf25fd28a771a9067dcc7f7",
+      "native-resources.json": "29b6a6e03a3aa8bc13b255afd85a39d3b5e46b5429fbd51fcdd37c1a42b2659f"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50239/1030/23714 sword/torch=0/2588 wall-retraction=0 grip=0/0 authority=1.19209e-07/0 finalGrip=-34.5071,0.384931,-14.1008 body=-34.4664,0.333254,-14.1218."
+  },
+  {
+    "name": "current-interval-coverage-4",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\current-interval-coverage-4",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "5",
+      "HORDE_MIST_PROBE_SHADOW": "CURRENT"
+    },
+    "elapsed_seconds": 18.436786600010237,
+    "exit_code": 1,
+    "exe_sha256": "2277c6a32481e8503fa9b96dee69eccbda62b7f66c1f078389bbd0f1960041d0",
+    "shader": {
+      "name": "interval-coverage",
+      "source_sha256": "154f56154a769f90d4d8c331e988ff2fc38f4845bf227884967fc7bec2c276c5",
+      "spirv_sha256": "286388ca2873b14f32703b876d05afc675ef1a4d7504136dc5daff4af896fde2",
+      "include_sha256": "99c3d1616d17dfe00f5f056b1ff5dafaa1d6669e2a50821f718da69fb7b6af61",
+      "bytes": 306480,
+      "words": 76620,
+      "instructions": 18348,
+      "branchOperations": 1070,
+      "loops": 28,
+      "selectionMerges": 441,
+      "functions": 85,
+      "functionCalls": 267,
+      "rayQueryInitializations": 3,
+      "atomicInstructions": 41
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 4.845568,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "eb654b7b80def732e9dbcac062c66a1584c745433cfc6faabcdebb3e32b321c9",
+      "capture-manifest.json": "1bd4c22e4eb03cf0a5dc9b274da9d715831bd78591747daae1de12dd7290d9b6",
+      "capture.log": "c275bd18974840a67e3fa86219d467b6ae4e3a487e7f247de22a9c3a222c5fd3",
+      "completed-frame.json": "b7a729005ef7d911c666511f0285ad3723b86c8575cc37c7bc51f8ded6f950ef",
+      "frozen-state.json": "b19c4e07b17725ae920907974310240ff130d5b8ddf25fd28a771a9067dcc7f7",
+      "native-resources.json": "6d1aaf2ea8a77d687b07acd62fd1fb9ff9ba9ecedd419d9978e5ff0befbe78db"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50239/1030/23714 sword/torch=0/2588 wall-retraction=0 grip=0/0 authority=1.19209e-07/0 finalGrip=-34.5071,0.384931,-14.1008 body=-34.4664,0.333254,-14.1218."
+  },
+  {
+    "name": "current-interval-surface",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\current-interval-surface",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": null,
+    "elapsed_seconds": 40.23847979999846,
+    "exit_code": 1,
+    "exe_sha256": "57f3102b6ecec066164aa678a4a6b0c79c2c146fd8cadd05ec8b2bd572782a7b",
+    "shader": {
+      "name": "interval-surface",
+      "source_sha256": "f53b73721e19bd88ba83d1004af2971a3774eee78ba13cc52e9bc8ff84fe0b6f",
+      "spirv_sha256": "fe32e68a44981532b723d9c29d1a9c251afe34755a450817f451efee4b1a6528",
+      "include_sha256": "47256be25ba3a7a627d4983fa40cdee81bb912395ce119ee63aff12c4c6fc31a",
+      "bytes": 238796,
+      "words": 59699,
+      "instructions": 14150,
+      "branchOperations": 866,
+      "loops": 17,
+      "selectionMerges": 362,
+      "functions": 62,
+      "functionCalls": 177,
+      "rayQueryInitializations": 2,
+      "atomicInstructions": 41
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 5.38944,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "dad2e23f057ab01766c28ee4f53fd55f6cf5c0b609d84cd35c00ec711792dd01",
+      "capture-manifest.json": "651a59ffc2445608d5c0bfe0c514b0175066366b3591eec928490881f0764e6b",
+      "capture.log": "2660f9258bed322164feaa7bcad7b1f40acdcfd45ba34d5b41e750cbdc84c4d7",
+      "completed-frame.json": "f5deaa4f6a22a856b3ef9cc6edc62f6d128338f718ce4c60779b4346f2b787ce",
+      "frozen-state.json": "b19c4e07b17725ae920907974310240ff130d5b8ddf25fd28a771a9067dcc7f7",
+      "native-resources.json": "dc8b5aae7f38ba2e621e071a0ecd2d4a8c046489e391cf0ae1d489722fedac5c"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50239/1030/23714 sword/torch=0/2588 wall-retraction=0 grip=0/0 authority=1.19209e-07/0 finalGrip=-34.5071,0.384931,-14.1008 body=-34.4664,0.333254,-14.1218."
+  },
+  {
+    "name": "current-interval-surface-2",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\current-interval-surface-2",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "2",
+      "HORDE_MIST_PROBE_SHADOW": "CURRENT"
+    },
+    "elapsed_seconds": 19.722126699998626,
+    "exit_code": 1,
+    "exe_sha256": "a6df0997824d46b193f79972ba1728f7acb000502228b35379e617a93ee9c5da",
+    "shader": {
+      "name": "interval-surface",
+      "source_sha256": "f53b73721e19bd88ba83d1004af2971a3774eee78ba13cc52e9bc8ff84fe0b6f",
+      "spirv_sha256": "fe32e68a44981532b723d9c29d1a9c251afe34755a450817f451efee4b1a6528",
+      "include_sha256": "47256be25ba3a7a627d4983fa40cdee81bb912395ce119ee63aff12c4c6fc31a",
+      "bytes": 238796,
+      "words": 59699,
+      "instructions": 14150,
+      "branchOperations": 866,
+      "loops": 17,
+      "selectionMerges": 362,
+      "functions": 62,
+      "functionCalls": 177,
+      "rayQueryInitializations": 2,
+      "atomicInstructions": 41
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 2.635168,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "dad2e23f057ab01766c28ee4f53fd55f6cf5c0b609d84cd35c00ec711792dd01",
+      "capture-manifest.json": "9f3a8e7931578ec727d786fc158d34c96714f20c618d6f3a2a69e8120955880d",
+      "capture.log": "9459b3e1070c4399c3fccd83efa875525538e24a2a6da7444bc5d7c3b17f3d57",
+      "completed-frame.json": "e0aceb03951c8b68d742766ae31992e73fcca6b214e11920259b7944aea354d6",
+      "frozen-state.json": "b19c4e07b17725ae920907974310240ff130d5b8ddf25fd28a771a9067dcc7f7",
+      "native-resources.json": "93d90d7577c1e9c74fdbe0e0b3bfec97a62377e89a4e2b3f7b8976dcb7edc57c"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50239/1030/23714 sword/torch=0/2588 wall-retraction=0 grip=0/0 authority=1.19209e-07/0 finalGrip=-34.5071,0.384931,-14.1008 body=-34.4664,0.333254,-14.1218."
+  },
+  {
+    "name": "current-interval-surface-3",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\current-interval-surface-3",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "2",
+      "HORDE_MIST_PROBE_SHADOW": "CURRENT"
+    },
+    "elapsed_seconds": 25.19980129999749,
+    "exit_code": 1,
+    "exe_sha256": "2277c6a32481e8503fa9b96dee69eccbda62b7f66c1f078389bbd0f1960041d0",
+    "shader": {
+      "name": "interval-surface",
+      "source_sha256": "b343e5191e7dc4fb7986d001b17dde09d962fc6db831258641984a6fa9d8300e",
+      "spirv_sha256": "fe32e68a44981532b723d9c29d1a9c251afe34755a450817f451efee4b1a6528",
+      "include_sha256": "47256be25ba3a7a627d4983fa40cdee81bb912395ce119ee63aff12c4c6fc31a",
+      "bytes": 238796,
+      "words": 59699,
+      "instructions": 14150,
+      "branchOperations": 866,
+      "loops": 17,
+      "selectionMerges": 362,
+      "functions": 62,
+      "functionCalls": 177,
+      "rayQueryInitializations": 2,
+      "atomicInstructions": 41
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 5.54208,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "dad2e23f057ab01766c28ee4f53fd55f6cf5c0b609d84cd35c00ec711792dd01",
+      "capture-manifest.json": "920156b3c1186f42b7c7f0ff454813abfda45001d1083dfaeaf5bb28b7aa7ff1",
+      "capture.log": "d291eff01d241fd54873f8dd3ff9f02474b01f2965e79eab18aac43912c685ed",
+      "completed-frame.json": "028962dc19316ce8149a1e7ca5eb8d8a64905009919d5adb7e3ac90bc8cc0edf",
+      "frozen-state.json": "b19c4e07b17725ae920907974310240ff130d5b8ddf25fd28a771a9067dcc7f7",
+      "native-resources.json": "4dff1deea56b9db5731d42b3f769032dda7d781a344ba094d4a8292eaa376c96"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50239/1030/23714 sword/torch=0/2588 wall-retraction=0 grip=0/0 authority=1.19209e-07/0 finalGrip=-34.5071,0.384931,-14.1008 body=-34.4664,0.333254,-14.1218."
+  },
+  {
+    "name": "current-overflow-negative",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\current-overflow-negative",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "7",
+      "HORDE_MIST_PROBE_SHADOW": "CURRENT"
+    },
+    "elapsed_seconds": 20.620836999994935,
+    "exit_code": 1,
+    "exe_sha256": "a6df0997824d46b193f79972ba1728f7acb000502228b35379e617a93ee9c5da",
+    "shader": {
+      "name": "overflow-negative",
+      "source_sha256": "e2d900bc6fc42b568eea30fa8ca59611bec0a06804ecf5a55bfc44881791681e",
+      "spirv_sha256": "a075709ffecbeb3eed59e98d6ef6649cf77a4be66b5d402f0fbeca9929679176",
+      "include_sha256": "61c10d75ff103621f403eea018fcba96d1f4991d989e65734daa3526051abec6",
+      "bytes": 304796,
+      "words": 76199,
+      "instructions": 18226,
+      "branchOperations": 1048,
+      "loops": 28,
+      "selectionMerges": 428,
+      "functions": 85,
+      "functionCalls": 267,
+      "rayQueryInitializations": 3,
+      "atomicInstructions": 41
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 2.954752,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "ffb55b7519f9df7aeb056c7e2c9b0350ad7b1fde9b3efbd64302d1e2f4c59d29",
+      "capture-manifest.json": "85232c9fd09c3c592b8517820fb00a25c720ede3f7907b7e72a2ea9ec6cc60a1",
+      "capture.log": "03176cfe32c3719cf47a7f3cd8d3874db2d5b86adf06d3f8c7b947b780e5c805",
+      "completed-frame.json": "1467481f763cefb6b0028ff4cde104ba101d553e98e2f220808d24bd9c8b335f",
+      "frozen-state.json": "b19c4e07b17725ae920907974310240ff130d5b8ddf25fd28a771a9067dcc7f7",
+      "native-resources.json": "1639c9443675b0e8dfa79a0c5654dfbd635ea90b1c6e92a9eb6b13ff3f50dbfd"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50239/1030/23714 sword/torch=0/2588 wall-retraction=0 grip=0/0 authority=1.19209e-07/0 finalGrip=-34.5071,0.384931,-14.1008 body=-34.4664,0.333254,-14.1218."
+  },
+  {
+    "name": "current-overflow-negative-2",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\current-overflow-negative-2",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "7",
+      "HORDE_MIST_PROBE_SHADOW": "CURRENT"
+    },
+    "elapsed_seconds": 17.458345699997153,
+    "exit_code": 1,
+    "exe_sha256": "2277c6a32481e8503fa9b96dee69eccbda62b7f66c1f078389bbd0f1960041d0",
+    "shader": {
+      "name": "overflow-negative",
+      "source_sha256": "9d94a5aaeae552fb7e856e1fd4e7378d4dedb8dd21271aa332d512e7fd4c60c7",
+      "spirv_sha256": "39b59ced1868c2efe6bd6c46391d3c798e03fad2eaf7d4aa08fb4b8a8aa874c6",
+      "include_sha256": "dd1f355ec80f4a8dafe515760b0659cb71c85ffda23ca5c1deab0213bbb8f14d",
+      "bytes": 306464,
+      "words": 76616,
+      "instructions": 18347,
+      "branchOperations": 1070,
+      "loops": 28,
+      "selectionMerges": 441,
+      "functions": 85,
+      "functionCalls": 267,
+      "rayQueryInitializations": 3,
+      "atomicInstructions": 41
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 4.175552,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "ffb55b7519f9df7aeb056c7e2c9b0350ad7b1fde9b3efbd64302d1e2f4c59d29",
+      "capture-manifest.json": "c6ff0b00cbc15561b5686e9b824270f911a26c39828264e9979100033e9a6367",
+      "capture.log": "a1681405660a37aa6f865821f78e0cb5eab3483c1bb0d167e675e068d1b556b4",
+      "completed-frame.json": "b4477bb526a85d6ac1dcc41a1ac9c3536ae50b14031c50748c44c5e0668deaae",
+      "frozen-state.json": "b19c4e07b17725ae920907974310240ff130d5b8ddf25fd28a771a9067dcc7f7",
+      "native-resources.json": "f0873474322e270ff56f85b83e6930513a5853ff1bc3b2681cddd494136afac7"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50239/1030/23714 sword/torch=0/2588 wall-retraction=0 grip=0/0 authority=1.19209e-07/0 finalGrip=-34.5071,0.384931,-14.1008 body=-34.4664,0.333254,-14.1218."
+  },
+  {
+    "name": "current-weighted-coverage",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\current-weighted-coverage",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "6",
+      "HORDE_MIST_PROBE_SHADOW": "CURRENT"
+    },
+    "elapsed_seconds": 19.16722079999454,
+    "exit_code": 1,
+    "exe_sha256": "a6df0997824d46b193f79972ba1728f7acb000502228b35379e617a93ee9c5da",
+    "shader": {
+      "name": "weighted-coverage",
+      "source_sha256": "7432ce6dac3116447bbc27897e452a46f61e3aeffee34ab5be0a2da2a0d65bc2",
+      "spirv_sha256": "1e0fa20e874b3c7524f1b5d0fc79b2bf24c4539e60c40e9aaecf271c723cdf9b",
+      "include_sha256": "b45ca7a896099b3f535580fe8d953f17f3d5c90142a161e9c21b30e54dedc146",
+      "bytes": 304940,
+      "words": 76235,
+      "instructions": 18231,
+      "branchOperations": 1046,
+      "loops": 27,
+      "selectionMerges": 429,
+      "functions": 85,
+      "functionCalls": 267,
+      "rayQueryInitializations": 3,
+      "atomicInstructions": 41
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 4.59136,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "9fa73864b45d8c4a0d42493dcdcdc617343d0aad492a1c6d7dd2ee2fa6b9c2f1",
+      "capture-manifest.json": "18c295f6553730097977f499b73673672cf93f01acd28fcf29b40899af5e8b8f",
+      "capture.log": "61a4d4ab5d7c18336c7fe4c107c15df8ad5cc5f9f12caf4af490692d863c3b66",
+      "completed-frame.json": "9a6ae621020ee1b2cfe5148b3480cf61762f0800a0d2ca77489ea2107eecc00d",
+      "frozen-state.json": "b19c4e07b17725ae920907974310240ff130d5b8ddf25fd28a771a9067dcc7f7",
+      "native-resources.json": "25207694bf3e94e6506332c2d2ee9cd833e9475de4930675bd0750f24921b34b"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50239/1030/23714 sword/torch=0/2588 wall-retraction=0 grip=0/0 authority=1.19209e-07/0 finalGrip=-34.5071,0.384931,-14.1008 body=-34.4664,0.333254,-14.1218."
+  },
+  {
+    "name": "current-weighted-coverage-2",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\current-weighted-coverage-2",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "6",
+      "HORDE_MIST_PROBE_SHADOW": "CURRENT"
+    },
+    "elapsed_seconds": 16.584268799997517,
+    "exit_code": 1,
+    "exe_sha256": "2277c6a32481e8503fa9b96dee69eccbda62b7f66c1f078389bbd0f1960041d0",
+    "shader": {
+      "name": "weighted-coverage",
+      "source_sha256": "03c8b289e8ade4e9abbf19d433036e8b5d3d79a200dfcc4022549426dc73cd2a",
+      "spirv_sha256": "22c85d9ada40ae70fed1313e2c9c16933357f68a694b76d8ec1e3575a57a023d",
+      "include_sha256": "517fcde5070976f092050cbab1dac7bc93bc59ad63b6a4d2685f82ecf09a96e3",
+      "bytes": 306608,
+      "words": 76652,
+      "instructions": 18352,
+      "branchOperations": 1068,
+      "loops": 27,
+      "selectionMerges": 442,
+      "functions": 85,
+      "functionCalls": 267,
+      "rayQueryInitializations": 3,
+      "atomicInstructions": 41
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 3.557152,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "91a4c444bb889a67c7392153feb4d26d08953f724b4953f7b929af01eafdc422",
+      "capture-manifest.json": "18111deedb54f0b4df2c10a851b34292d1ed2fc92114a716e4b5231945c465e8",
+      "capture.log": "c33410fe70531b35d4b98f5206648e649c911c51afd892db778401f7009af6c1",
+      "completed-frame.json": "c3e8e8b54d2b7b1f55d583ba044df8f89f197305496b8ee1452fca892668a746",
+      "frozen-state.json": "b19c4e07b17725ae920907974310240ff130d5b8ddf25fd28a771a9067dcc7f7",
+      "native-resources.json": "0bc9e197e258fa9f9e3eb91eeaff26517b8cf0139788f780a251acbae905b794"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50239/1030/23714 sword/torch=0/2588 wall-retraction=0 grip=0/0 authority=1.19209e-07/0 finalGrip=-34.5071,0.384931,-14.1008 body=-34.4664,0.333254,-14.1218."
+  },
+  {
+    "name": "higher-baseline",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\higher-baseline",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": null,
+    "elapsed_seconds": 24.679554499991355,
+    "exit_code": 1,
+    "exe_sha256": "57f3102b6ecec066164aa678a4a6b0c79c2c146fd8cadd05ec8b2bd572782a7b",
+    "shader": {
+      "name": "baseline",
+      "source_sha256": "1fb374ba65273d6d4726386b7ce483cd7eb7eb2d25f629bd300dbb5ea3ce652f",
+      "spirv_sha256": "9fed471359c5ae3970eeb7d698cf92a2289708fea263b2189783fa46eff752e1",
+      "include_sha256": "4502ff1fd59ffdd177b2810201a4dfd118731a5f7a01499cadd7caec1401e7e1",
+      "bytes": 295540,
+      "words": 73885,
+      "instructions": 17621,
+      "branchOperations": 980,
+      "loops": 21,
+      "selectionMerges": 413,
+      "functions": 83,
+      "functionCalls": 264,
+      "rayQueryInitializations": 2,
+      "atomicInstructions": 41
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 5.331776,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "c70488450bd19cc6aede129ca8f763d17653cdba3314e4cc5f861b4162a7afc3",
+      "capture-manifest.json": "3ad15dde64d363f79da13ac0e1cef225fae4b7a1e17ba06e760f139c19c74bb2",
+      "capture.log": "bb61a6d3891df374486479a247cc843c93e46fd7eb9eef164e9bbd3b0d1c3c2e",
+      "completed-frame.json": "8aa55d1e2447e89e437fafbd622efe2c91601bbadce065efe4ada6a0295aab23",
+      "frozen-state.json": "b19c4e07b17725ae920907974310240ff130d5b8ddf25fd28a771a9067dcc7f7",
+      "native-resources.json": "34cbaabf96e94edf685d05cb507bba3bcfa51eaeb3d018d921b3c641d1fb306e"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50239/1030/23714 sword/torch=0/2588 wall-retraction=0 grip=0/0 authority=1.19209e-07/0 finalGrip=-34.5071,0.384931,-14.1008 body=-34.4664,0.333254,-14.1218."
+  },
+  {
+    "name": "higher-baseline-2",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\higher-baseline-2",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "1",
+      "HORDE_MIST_PROBE_SHADOW": "HIGHER"
+    },
+    "elapsed_seconds": 3.6708622999867657,
+    "exit_code": 1,
+    "exe_sha256": "a6df0997824d46b193f79972ba1728f7acb000502228b35379e617a93ee9c5da",
+    "shader": {
+      "name": "baseline",
+      "source_sha256": "1fb374ba65273d6d4726386b7ce483cd7eb7eb2d25f629bd300dbb5ea3ce652f",
+      "spirv_sha256": "9fed471359c5ae3970eeb7d698cf92a2289708fea263b2189783fa46eff752e1",
+      "include_sha256": "4502ff1fd59ffdd177b2810201a4dfd118731a5f7a01499cadd7caec1401e7e1",
+      "bytes": 295540,
+      "words": 73885,
+      "instructions": 17621,
+      "branchOperations": 980,
+      "loops": 21,
+      "selectionMerges": 413,
+      "functions": 83,
+      "functionCalls": 264,
+      "rayQueryInitializations": 2,
+      "atomicInstructions": 41
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 4.733856,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "c70488450bd19cc6aede129ca8f763d17653cdba3314e4cc5f861b4162a7afc3",
+      "capture-manifest.json": "3d7f6bda028b752bc39246eef4ae2fb0e753fe7c3365b527a53e198f2a44c80c",
+      "capture.log": "197430f3265b175ffc34f01476cafb6055cac6547b491e25841bb15330d4a0ce",
+      "completed-frame.json": "21c7f525b2a57663cd7b5ee33bb2dafd59f80bde2d262bec7bd56a8f64c9875b",
+      "frozen-state.json": "b19c4e07b17725ae920907974310240ff130d5b8ddf25fd28a771a9067dcc7f7",
+      "native-resources.json": "fd518f206c07aee4c0a62d82cd34fc1e176b6395786bb500d8679ff9395bb4ed"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50239/1030/23714 sword/torch=0/2588 wall-retraction=0 grip=0/0 authority=1.19209e-07/0 finalGrip=-34.5071,0.384931,-14.1008 body=-34.4664,0.333254,-14.1218."
+  },
+  {
+    "name": "higher-baseline-3",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\higher-baseline-3",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "1",
+      "HORDE_MIST_PROBE_SHADOW": "HIGHER"
+    },
+    "elapsed_seconds": 4.034620799997356,
+    "exit_code": 1,
+    "exe_sha256": "2277c6a32481e8503fa9b96dee69eccbda62b7f66c1f078389bbd0f1960041d0",
+    "shader": {
+      "name": "baseline",
+      "source_sha256": "1fb374ba65273d6d4726386b7ce483cd7eb7eb2d25f629bd300dbb5ea3ce652f",
+      "spirv_sha256": "9fed471359c5ae3970eeb7d698cf92a2289708fea263b2189783fa46eff752e1",
+      "include_sha256": "4502ff1fd59ffdd177b2810201a4dfd118731a5f7a01499cadd7caec1401e7e1",
+      "bytes": 295540,
+      "words": 73885,
+      "instructions": 17621,
+      "branchOperations": 980,
+      "loops": 21,
+      "selectionMerges": 413,
+      "functions": 83,
+      "functionCalls": 264,
+      "rayQueryInitializations": 2,
+      "atomicInstructions": 41
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 4.719488,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "c70488450bd19cc6aede129ca8f763d17653cdba3314e4cc5f861b4162a7afc3",
+      "capture-manifest.json": "8db5d1ee48d92f9cd8add2343ac3d9a1657dccb0b2fcb2b2ae84d194823e387a",
+      "capture.log": "eac968a25ce85ba32604b72e61f4e47834095e8480e3b661c9f6512b42f3d59d",
+      "completed-frame.json": "d175dc75db02644fb55bf0373858eda03a0bd5fc0fa434c1c3a2c9f42c0f4a57",
+      "frozen-state.json": "b19c4e07b17725ae920907974310240ff130d5b8ddf25fd28a771a9067dcc7f7",
+      "native-resources.json": "b7208ce200780c8be31db786eb586cb1669c05fcfceaf4022638f85aca5513fa"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50239/1030/23714 sword/torch=0/2588 wall-retraction=0 grip=0/0 authority=1.19209e-07/0 finalGrip=-34.5071,0.384931,-14.1008 body=-34.4664,0.333254,-14.1218."
+  },
+  {
+    "name": "higher-baseline-surface",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\higher-baseline-surface",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": null,
+    "elapsed_seconds": 3.7180766000092262,
+    "exit_code": 1,
+    "exe_sha256": "57f3102b6ecec066164aa678a4a6b0c79c2c146fd8cadd05ec8b2bd572782a7b",
+    "shader": {
+      "name": "baseline-surface",
+      "source_sha256": "1ba38723a28d77b334842b0c1d884a80506b242afc10f32b4b40617522e8105a",
+      "spirv_sha256": "96e5f08d91453af0fe7c1679e7ba719046b9a4028ba5ac2611c24799459b96ef",
+      "include_sha256": "c5953fd0fdd3a8c352256ab543b2cf0a0308e243a8cbe35b91aff8b9927566d4",
+      "bytes": 238100,
+      "words": 59525,
+      "instructions": 14106,
+      "branchOperations": 861,
+      "loops": 17,
+      "selectionMerges": 360,
+      "functions": 62,
+      "functionCalls": 177,
+      "rayQueryInitializations": 2,
+      "atomicInstructions": 41
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 4.523744,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "696fc98c70ced8173523f571091fc0dedb49028b6b48d54d3f0e3f96bd805333",
+      "capture-manifest.json": "7119feda5b1205c96edb2572d213ebf55b9584cdb6dad2b07395e6095dcf043f",
+      "capture.log": "72cb61b632eb7f1a61138cd19e83968401223a8cbb13686d7088b7cad879a054",
+      "completed-frame.json": "55f1f9cc7bd705f2da35180f054a653bdcc0341e139cd7260c1332050289fd1a",
+      "frozen-state.json": "b19c4e07b17725ae920907974310240ff130d5b8ddf25fd28a771a9067dcc7f7",
+      "native-resources.json": "b266350ce22cbe7fe97614679923020f302a47c26c2b6cccfbfb654c13f139cd"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50239/1030/23714 sword/torch=0/2588 wall-retraction=0 grip=0/0 authority=1.19209e-07/0 finalGrip=-34.5071,0.384931,-14.1008 body=-34.4664,0.333254,-14.1218."
+  },
+  {
+    "name": "higher-baseline-surface-2",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\higher-baseline-surface-2",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "3",
+      "HORDE_MIST_PROBE_SHADOW": "HIGHER"
+    },
+    "elapsed_seconds": 3.5101405999885174,
+    "exit_code": 1,
+    "exe_sha256": "a6df0997824d46b193f79972ba1728f7acb000502228b35379e617a93ee9c5da",
+    "shader": {
+      "name": "baseline-surface",
+      "source_sha256": "1ba38723a28d77b334842b0c1d884a80506b242afc10f32b4b40617522e8105a",
+      "spirv_sha256": "96e5f08d91453af0fe7c1679e7ba719046b9a4028ba5ac2611c24799459b96ef",
+      "include_sha256": "c5953fd0fdd3a8c352256ab543b2cf0a0308e243a8cbe35b91aff8b9927566d4",
+      "bytes": 238100,
+      "words": 59525,
+      "instructions": 14106,
+      "branchOperations": 861,
+      "loops": 17,
+      "selectionMerges": 360,
+      "functions": 62,
+      "functionCalls": 177,
+      "rayQueryInitializations": 2,
+      "atomicInstructions": 41
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 3.948768,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "696fc98c70ced8173523f571091fc0dedb49028b6b48d54d3f0e3f96bd805333",
+      "capture-manifest.json": "d506f401ec0b2064922fe1d755717a369c093636d10fcab448c10b37b2259320",
+      "capture.log": "10d9826a458aa40e4d17c983497eaecd0dd3eb1dadca7ab01a77d562f40da835",
+      "completed-frame.json": "4f46953193cc9261d93b98385d7dea967878f0c5b29d00b1f63a9f5d8dc7ca56",
+      "frozen-state.json": "b19c4e07b17725ae920907974310240ff130d5b8ddf25fd28a771a9067dcc7f7",
+      "native-resources.json": "71822e491fdfa2d17f7fad91caf04334b63d8a005bf451a5902fc6ac4a1f21e9"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50239/1030/23714 sword/torch=0/2588 wall-retraction=0 grip=0/0 authority=1.19209e-07/0 finalGrip=-34.5071,0.384931,-14.1008 body=-34.4664,0.333254,-14.1218."
+  },
+  {
+    "name": "higher-baseline-surface-3",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\higher-baseline-surface-3",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "3",
+      "HORDE_MIST_PROBE_SHADOW": "HIGHER"
+    },
+    "elapsed_seconds": 3.6140661999961594,
+    "exit_code": 1,
+    "exe_sha256": "2277c6a32481e8503fa9b96dee69eccbda62b7f66c1f078389bbd0f1960041d0",
+    "shader": {
+      "name": "baseline-surface",
+      "source_sha256": "1ba38723a28d77b334842b0c1d884a80506b242afc10f32b4b40617522e8105a",
+      "spirv_sha256": "96e5f08d91453af0fe7c1679e7ba719046b9a4028ba5ac2611c24799459b96ef",
+      "include_sha256": "c5953fd0fdd3a8c352256ab543b2cf0a0308e243a8cbe35b91aff8b9927566d4",
+      "bytes": 238100,
+      "words": 59525,
+      "instructions": 14106,
+      "branchOperations": 861,
+      "loops": 17,
+      "selectionMerges": 360,
+      "functions": 62,
+      "functionCalls": 177,
+      "rayQueryInitializations": 2,
+      "atomicInstructions": 41
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 4.53776,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "696fc98c70ced8173523f571091fc0dedb49028b6b48d54d3f0e3f96bd805333",
+      "capture-manifest.json": "ee213b9e381fe93b2afc39cb97769b091be7f9e9ecb9e2d78a36dfb25880dcb1",
+      "capture.log": "459e7ccc5d21bf2dba78da1cfa171df7f91aef8164125c74742ecaaae14b0f33",
+      "completed-frame.json": "376bc7d4b2d18cbeb0810454717b8b43c12d97dcb184c5380eacb4fb507a1018",
+      "frozen-state.json": "b19c4e07b17725ae920907974310240ff130d5b8ddf25fd28a771a9067dcc7f7",
+      "native-resources.json": "3882472e6ba5df1122426049320a68747f53de513ce351efc5136468933c1428"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50239/1030/23714 sword/torch=0/2588 wall-retraction=0 grip=0/0 authority=1.19209e-07/0 finalGrip=-34.5071,0.384931,-14.1008 body=-34.4664,0.333254,-14.1218."
+  },
+  {
+    "name": "higher-baseline-yaw-0.025",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\higher-baseline-yaw-0.025",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "1",
+      "HORDE_MIST_PROBE_SHADOW": "HIGHER",
+      "HORDE_MIST_VIEW_YAW": "-0.025"
+    },
+    "elapsed_seconds": 3.74651540000923,
+    "exit_code": 1,
+    "exe_sha256": "a6df0997824d46b193f79972ba1728f7acb000502228b35379e617a93ee9c5da",
+    "shader": {
+      "name": "baseline",
+      "source_sha256": "1fb374ba65273d6d4726386b7ce483cd7eb7eb2d25f629bd300dbb5ea3ce652f",
+      "spirv_sha256": "9fed471359c5ae3970eeb7d698cf92a2289708fea263b2189783fa46eff752e1",
+      "include_sha256": "4502ff1fd59ffdd177b2810201a4dfd118731a5f7a01499cadd7caec1401e7e1",
+      "bytes": 295540,
+      "words": 73885,
+      "instructions": 17621,
+      "branchOperations": 980,
+      "loops": 21,
+      "selectionMerges": 413,
+      "functions": 83,
+      "functionCalls": 264,
+      "rayQueryInitializations": 2,
+      "atomicInstructions": 41
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 4.767072,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "59264a981fc6d4db318112834327b4d46f1cc19d097f4b1dc1fec37259ab5de4",
+      "capture-manifest.json": "d4600b543ebb2c7ef4193979f7eb1cb2e8eac1844dd76cb5cc979015e6e47a02",
+      "capture.log": "dc1df75a2ff94ef2dcc0deaa16b387671f1cdc801126a138faf583b303bfe422",
+      "completed-frame.json": "fdfb0d7548899ab7fc5d6c291aaf0c5cde7aef769710439c766b66bc76f4b9de",
+      "frozen-state.json": "54ac2f84ad2226b574906fc01e4acb8b61693776289877a07c800a969628fd33",
+      "native-resources.json": "81dea155a6d6d050f9a980933afd7719d2d172f41d616fe53475e9decbe622c4"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50238/1030/23712 sword/torch=0/2491 wall-retraction=0 grip=0/0.000488281 authority=1.19209e-07/0 finalGrip=-34.5221,0.384931,-14.0979 body=-34.482,0.333254,-14.12."
+  },
+  {
+    "name": "higher-baseline-yaw-0.025-2",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\higher-baseline-yaw-0.025-2",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "1",
+      "HORDE_MIST_PROBE_SHADOW": "HIGHER",
+      "HORDE_MIST_VIEW_YAW": "-0.025"
+    },
+    "elapsed_seconds": 3.9733441999997012,
+    "exit_code": 1,
+    "exe_sha256": "2277c6a32481e8503fa9b96dee69eccbda62b7f66c1f078389bbd0f1960041d0",
+    "shader": {
+      "name": "baseline",
+      "source_sha256": "1fb374ba65273d6d4726386b7ce483cd7eb7eb2d25f629bd300dbb5ea3ce652f",
+      "spirv_sha256": "9fed471359c5ae3970eeb7d698cf92a2289708fea263b2189783fa46eff752e1",
+      "include_sha256": "4502ff1fd59ffdd177b2810201a4dfd118731a5f7a01499cadd7caec1401e7e1",
+      "bytes": 295540,
+      "words": 73885,
+      "instructions": 17621,
+      "branchOperations": 980,
+      "loops": 21,
+      "selectionMerges": 413,
+      "functions": 83,
+      "functionCalls": 264,
+      "rayQueryInitializations": 2,
+      "atomicInstructions": 41
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 5.636064,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "59264a981fc6d4db318112834327b4d46f1cc19d097f4b1dc1fec37259ab5de4",
+      "capture-manifest.json": "5a0cc98796596dfbedd94651d74f32f47bb8c05f7d2139ba4c3e78a53273e2e6",
+      "capture.log": "21965ebba22d2912c2631756a899951e6ed6b15631ec66922d1f42c6b13b021b",
+      "completed-frame.json": "7c0045658036082812ba6f0b7d9ed3e27886843c0f03983c3d41f5a6ea14ef16",
+      "frozen-state.json": "54ac2f84ad2226b574906fc01e4acb8b61693776289877a07c800a969628fd33",
+      "native-resources.json": "d26b6266248595692df50351af6e48f49622dfd4cdcf9495c9a3d709e6cf2312"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50238/1030/23712 sword/torch=0/2491 wall-retraction=0 grip=0/0.000488281 authority=1.19209e-07/0 finalGrip=-34.5221,0.384931,-14.0979 body=-34.482,0.333254,-14.12."
+  },
+  {
+    "name": "higher-baseline-yaw0.025",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\higher-baseline-yaw0.025",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "1",
+      "HORDE_MIST_PROBE_SHADOW": "HIGHER",
+      "HORDE_MIST_VIEW_YAW": "0.025"
+    },
+    "elapsed_seconds": 3.853563500000746,
+    "exit_code": 1,
+    "exe_sha256": "a6df0997824d46b193f79972ba1728f7acb000502228b35379e617a93ee9c5da",
+    "shader": {
+      "name": "baseline",
+      "source_sha256": "1fb374ba65273d6d4726386b7ce483cd7eb7eb2d25f629bd300dbb5ea3ce652f",
+      "spirv_sha256": "9fed471359c5ae3970eeb7d698cf92a2289708fea263b2189783fa46eff752e1",
+      "include_sha256": "4502ff1fd59ffdd177b2810201a4dfd118731a5f7a01499cadd7caec1401e7e1",
+      "bytes": 295540,
+      "words": 73885,
+      "instructions": 17621,
+      "branchOperations": 980,
+      "loops": 21,
+      "selectionMerges": 413,
+      "functions": 83,
+      "functionCalls": 264,
+      "rayQueryInitializations": 2,
+      "atomicInstructions": 41
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 4.733568,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "5ff3ef69125f3f5e572a33f7b8eaa58accfe674f0bb6964913e20f6e5173d8c8",
+      "capture-manifest.json": "c4942bdb8e256e774b40d8849504a961a054d1404be9e6a47f837bb32fafc5bf",
+      "capture.log": "6eaef91f38ba0adc2a66d3e96271be254a1f813d3ab57d525cf269d09f314581",
+      "completed-frame.json": "4d9e899deb37bd0a8d2ea27cadc48909ed818c361d2bf0b331d894579f2b323a",
+      "frozen-state.json": "ab8fd94048dea8993951f563adc725d0031f1f8bc15aebc317e24118ba074a65",
+      "native-resources.json": "f0aaa84e2311e2884f008ddfb0b34fbeed43305369830d3c4436464d3078175d"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50240/1030/23713 sword/torch=0/2690 wall-retraction=0 grip=0/0 authority=0/0 finalGrip=-34.4921,0.384931,-14.1033 body=-34.4509,0.333255,-14.1233."
+  },
+  {
+    "name": "higher-baseline-yaw0.025-2",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\higher-baseline-yaw0.025-2",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "1",
+      "HORDE_MIST_PROBE_SHADOW": "HIGHER",
+      "HORDE_MIST_VIEW_YAW": "0.025"
+    },
+    "elapsed_seconds": 3.8416926999925636,
+    "exit_code": 1,
+    "exe_sha256": "2277c6a32481e8503fa9b96dee69eccbda62b7f66c1f078389bbd0f1960041d0",
+    "shader": {
+      "name": "baseline",
+      "source_sha256": "1fb374ba65273d6d4726386b7ce483cd7eb7eb2d25f629bd300dbb5ea3ce652f",
+      "spirv_sha256": "9fed471359c5ae3970eeb7d698cf92a2289708fea263b2189783fa46eff752e1",
+      "include_sha256": "4502ff1fd59ffdd177b2810201a4dfd118731a5f7a01499cadd7caec1401e7e1",
+      "bytes": 295540,
+      "words": 73885,
+      "instructions": 17621,
+      "branchOperations": 980,
+      "loops": 21,
+      "selectionMerges": 413,
+      "functions": 83,
+      "functionCalls": 264,
+      "rayQueryInitializations": 2,
+      "atomicInstructions": 41
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 5.326432,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "5ff3ef69125f3f5e572a33f7b8eaa58accfe674f0bb6964913e20f6e5173d8c8",
+      "capture-manifest.json": "8441065d6e204f8565f0285fefacf80af153e162a259917a3d45a593bd295f39",
+      "capture.log": "45a338cc77c12c72e3b0f3d7db3ee2a56b453569d9334773bed38d4d4ff1baf6",
+      "completed-frame.json": "bc4930eb2cd949e250a561ade6af26571a891533b4c5e8e5300f98a5b050c4bc",
+      "frozen-state.json": "ab8fd94048dea8993951f563adc725d0031f1f8bc15aebc317e24118ba074a65",
+      "native-resources.json": "4452064795c381fe17790d0ba0c7ea012ddfc929656f471a2e622717939106bb"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50240/1030/23713 sword/torch=0/2690 wall-retraction=0 grip=0/0 authority=0/0 finalGrip=-34.4921,0.384931,-14.1033 body=-34.4509,0.333255,-14.1233."
+  },
+  {
+    "name": "higher-depth",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\higher-depth",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": null,
+    "elapsed_seconds": 3.963992099990719,
+    "exit_code": 1,
+    "exe_sha256": "57f3102b6ecec066164aa678a4a6b0c79c2c146fd8cadd05ec8b2bd572782a7b",
+    "shader": {
+      "name": "depth",
+      "source_sha256": "8a4df539f6ef6314e195b484978342e82e61930d08c9b1b27a77c06f9b558397",
+      "spirv_sha256": "06b14261b8b5457e5c246db656dc0fbd2aae5971d6753e25e9b0e56968e434f6",
+      "include_sha256": "7d2f08fa6c92873d61f442a7d25f1ef59c92c14777bec08a95533e1cf1010bf0",
+      "bytes": 238236,
+      "words": 59559,
+      "instructions": 14114,
+      "branchOperations": 861,
+      "loops": 17,
+      "selectionMerges": 360,
+      "functions": 62,
+      "functionCalls": 177,
+      "rayQueryInitializations": 2,
+      "atomicInstructions": 41
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 3.663808,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "a2ca1422aede8c8984d7dba1628e2a6851ac3260eaa60601509772ed1839d710",
+      "capture-manifest.json": "f29dad4c7bfd82c483e9ebd4ed712dfde3e7ae99d54822f03034fc3c7a01cd00",
+      "capture.log": "172ff7e3d127c433cabd6124e614ae4584fe1869c7d8f64276ae6593f78549b4",
+      "completed-frame.json": "a2fa1d70f505d00fb94a2ba3424728920645fcfcd7e018860805ed0fe070068c",
+      "frozen-state.json": "b19c4e07b17725ae920907974310240ff130d5b8ddf25fd28a771a9067dcc7f7",
+      "native-resources.json": "cac1123d680e4f961efdca64e27f77c039e5e765013ba03b53f4b3e2439bff27"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50239/1030/23714 sword/torch=0/2588 wall-retraction=0 grip=0/0 authority=1.19209e-07/0 finalGrip=-34.5071,0.384931,-14.1008 body=-34.4664,0.333254,-14.1218."
+  },
+  {
+    "name": "higher-depth-2",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\higher-depth-2",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "4",
+      "HORDE_MIST_PROBE_SHADOW": "HIGHER"
+    },
+    "elapsed_seconds": 3.4230468000023393,
+    "exit_code": 1,
+    "exe_sha256": "a6df0997824d46b193f79972ba1728f7acb000502228b35379e617a93ee9c5da",
+    "shader": {
+      "name": "depth",
+      "source_sha256": "8a4df539f6ef6314e195b484978342e82e61930d08c9b1b27a77c06f9b558397",
+      "spirv_sha256": "06b14261b8b5457e5c246db656dc0fbd2aae5971d6753e25e9b0e56968e434f6",
+      "include_sha256": "7d2f08fa6c92873d61f442a7d25f1ef59c92c14777bec08a95533e1cf1010bf0",
+      "bytes": 238236,
+      "words": 59559,
+      "instructions": 14114,
+      "branchOperations": 861,
+      "loops": 17,
+      "selectionMerges": 360,
+      "functions": 62,
+      "functionCalls": 177,
+      "rayQueryInitializations": 2,
+      "atomicInstructions": 41
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 3.706752,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "a2ca1422aede8c8984d7dba1628e2a6851ac3260eaa60601509772ed1839d710",
+      "capture-manifest.json": "b2e9597b401da1772ffdf1dd57ec423a8a91be6b26ab7a27cc198975e5f29c38",
+      "capture.log": "2249e8e1f33621e6eda1dd82a21077d5c533f013a66b2cd7220101864fc2db63",
+      "completed-frame.json": "0da2605c78f01194273256edd1bf8e650972ed0648005c4fe45b5ed265823fa2",
+      "frozen-state.json": "b19c4e07b17725ae920907974310240ff130d5b8ddf25fd28a771a9067dcc7f7",
+      "native-resources.json": "3f94522f8bd907fc1a9deeb306328db247088c18cec125f723ab4e5f7a6fe3cb"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50239/1030/23714 sword/torch=0/2588 wall-retraction=0 grip=0/0 authority=1.19209e-07/0 finalGrip=-34.5071,0.384931,-14.1008 body=-34.4664,0.333254,-14.1218."
+  },
+  {
+    "name": "higher-depth-3",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\higher-depth-3",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "4",
+      "HORDE_MIST_PROBE_SHADOW": "HIGHER"
+    },
+    "elapsed_seconds": 3.5650312999932794,
+    "exit_code": 1,
+    "exe_sha256": "2277c6a32481e8503fa9b96dee69eccbda62b7f66c1f078389bbd0f1960041d0",
+    "shader": {
+      "name": "depth",
+      "source_sha256": "8a4df539f6ef6314e195b484978342e82e61930d08c9b1b27a77c06f9b558397",
+      "spirv_sha256": "06b14261b8b5457e5c246db656dc0fbd2aae5971d6753e25e9b0e56968e434f6",
+      "include_sha256": "7d2f08fa6c92873d61f442a7d25f1ef59c92c14777bec08a95533e1cf1010bf0",
+      "bytes": 238236,
+      "words": 59559,
+      "instructions": 14114,
+      "branchOperations": 861,
+      "loops": 17,
+      "selectionMerges": 360,
+      "functions": 62,
+      "functionCalls": 177,
+      "rayQueryInitializations": 2,
+      "atomicInstructions": 41
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 3.475296,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "a2ca1422aede8c8984d7dba1628e2a6851ac3260eaa60601509772ed1839d710",
+      "capture-manifest.json": "66aa3f81d8ac45457af77081a6cd46b751e25d31b1987da93cd9a48518a00004",
+      "capture.log": "597397e23d9ef8bdf3c49ab7df2ca27bbd0dd90df4096254575f8319c3d575b6",
+      "completed-frame.json": "5dfe0eb5e35f5afa48680dec120eed1094d49e71ac86b1a1ca3df34035e88d02",
+      "frozen-state.json": "b19c4e07b17725ae920907974310240ff130d5b8ddf25fd28a771a9067dcc7f7",
+      "native-resources.json": "ae24a836fee69225d1f3a2eef4f5e6d452529cb93f8f9a17ac54bc4787a77c70"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50239/1030/23714 sword/torch=0/2588 wall-retraction=0 grip=0/0 authority=1.19209e-07/0 finalGrip=-34.5071,0.384931,-14.1008 body=-34.4664,0.333254,-14.1218."
+  },
+  {
+    "name": "higher-diagnostic_high_generic_dielectric-interval",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\higher-diagnostic_high_generic_dielectric-interval",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": null,
+    "elapsed_seconds": 0.7657596000062767,
+    "exit_code": 1,
+    "exe_sha256": "57f3102b6ecec066164aa678a4a6b0c79c2c146fd8cadd05ec8b2bd572782a7b",
+    "shader": {
+      "name": "diagnostic_high_generic_dielectric-interval",
+      "source_sha256": "1672eeda099147af77c30d6ebd910be539d59c74ebff39d80a54a56d3df73fd6",
+      "spirv_sha256": "3908291bb0e2b096544fecf19186a5636c9b9788d22b032260dedf24a394765a",
+      "include_sha256": "eea737b72d9a01ae7309efceba0348c9e26442194f1b5845b92c0d050e758c78",
+      "bytes": 303924,
+      "words": 75981,
+      "instructions": 18170,
+      "branchOperations": 1043,
+      "loops": 27,
+      "selectionMerges": 428,
+      "functions": 85,
+      "functionCalls": 267,
+      "rayQueryInitializations": 3,
+      "atomicInstructions": 41,
+      "key": "diagnostic_high_generic_dielectric",
+      "excess": {
+        "bytes": 7964,
+        "words": 1991,
+        "instructions": 521,
+        "branchOperations": 57,
+        "loops": 6,
+        "selectionMerges": 12,
+        "functions": 2,
+        "functionCalls": 3,
+        "rayQueryInitializations": 1
+      }
+    },
+    "presentation": null,
+    "gpu": null,
+    "files": {
+      "capture.log": "46c91e5031a19bb43f0223e7b97c2665145784f06ce5131077e80221767c117a",
+      "native-resources.json": "a2769df1d5157475c82179aa65e05697f7fec650c039d5b9b2370b154742e7e6"
+    },
+    "failure": null
+  },
+  {
+    "name": "higher-diagnostic_high_generic_dielectric-interval-2",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\higher-diagnostic_high_generic_dielectric-interval-2",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": null,
+    "elapsed_seconds": 4.8269773999927565,
+    "exit_code": 1,
+    "exe_sha256": "33446a5690ab3e993438b0bdcca944638a467e55f1e1d47e7ca88264952a721d",
+    "shader": {
+      "name": "diagnostic_high_generic_dielectric-interval",
+      "source_sha256": "1672eeda099147af77c30d6ebd910be539d59c74ebff39d80a54a56d3df73fd6",
+      "spirv_sha256": "3908291bb0e2b096544fecf19186a5636c9b9788d22b032260dedf24a394765a",
+      "include_sha256": "eea737b72d9a01ae7309efceba0348c9e26442194f1b5845b92c0d050e758c78",
+      "bytes": 303924,
+      "words": 75981,
+      "instructions": 18170,
+      "branchOperations": 1043,
+      "loops": 27,
+      "selectionMerges": 428,
+      "functions": 85,
+      "functionCalls": 267,
+      "rayQueryInitializations": 3,
+      "atomicInstructions": 41,
+      "key": "diagnostic_high_generic_dielectric",
+      "excess": {
+        "bytes": 7964,
+        "words": 1991,
+        "instructions": 521,
+        "branchOperations": 57,
+        "loops": 6,
+        "selectionMerges": 12,
+        "functions": 2,
+        "functionCalls": 3,
+        "rayQueryInitializations": 1
+      }
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 5.807136,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "917357a470f57263b0a2e705dbdf283710e7f84dba11a65a6df8690b5bf8e78a",
+      "capture-manifest.json": "f5dde7aed09dc9372bb072e5afcc905639894ab3221f4ec6616c33e338f2ca24",
+      "capture.log": "d4db52c4f5c1351f194735d5a718f8b83f27153a4f9813916b9047736521d3c4",
+      "completed-frame.json": "03ec5a614d3c42f9e4cd3095fe82b7d7e51ff590493b0fe23783f6a7567fe492",
+      "frozen-state.json": "b19c4e07b17725ae920907974310240ff130d5b8ddf25fd28a771a9067dcc7f7",
+      "native-resources.json": "fc71d9216aba92598d51b155d7cf8188652f8b6e9f5efc06022e3cf05b1dc511"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50239/1030/23714 sword/torch=0/2588 wall-retraction=0 grip=0/0 authority=1.19209e-07/0 finalGrip=-34.5071,0.384931,-14.1008 body=-34.4664,0.333254,-14.1218."
+  },
+  {
+    "name": "higher-diagnostic_high_generic_dielectric-interval-3",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\higher-diagnostic_high_generic_dielectric-interval-3",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "0",
+      "HORDE_MIST_PROBE_SHADOW": "HIGHER"
+    },
+    "elapsed_seconds": 3.7532961999968393,
+    "exit_code": 1,
+    "exe_sha256": "a6df0997824d46b193f79972ba1728f7acb000502228b35379e617a93ee9c5da",
+    "shader": {
+      "name": "diagnostic_high_generic_dielectric-interval",
+      "source_sha256": "1672eeda099147af77c30d6ebd910be539d59c74ebff39d80a54a56d3df73fd6",
+      "spirv_sha256": "3908291bb0e2b096544fecf19186a5636c9b9788d22b032260dedf24a394765a",
+      "include_sha256": "eea737b72d9a01ae7309efceba0348c9e26442194f1b5845b92c0d050e758c78",
+      "bytes": 303924,
+      "words": 75981,
+      "instructions": 18170,
+      "branchOperations": 1043,
+      "loops": 27,
+      "selectionMerges": 428,
+      "functions": 85,
+      "functionCalls": 267,
+      "rayQueryInitializations": 3,
+      "atomicInstructions": 41,
+      "key": "diagnostic_high_generic_dielectric",
+      "excess": {
+        "bytes": 7964,
+        "words": 1991,
+        "instructions": 521,
+        "branchOperations": 57,
+        "loops": 6,
+        "selectionMerges": 12,
+        "functions": 2,
+        "functionCalls": 3,
+        "rayQueryInitializations": 1
+      }
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 5.800736,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "917357a470f57263b0a2e705dbdf283710e7f84dba11a65a6df8690b5bf8e78a",
+      "capture-manifest.json": "52fd5cbe8bf904c60c76453ecad6c113d2aa48e4138c62ebe84ebcef32ae7fc3",
+      "capture.log": "35379297dd1d6315b4c37076ffb3a73a36141799fe55ca39324c7bdfea06afea",
+      "completed-frame.json": "d6b42f6ff41d69b000e3157b22cc672ea6007af7fe567ac5f6a5d084c44e0061",
+      "frozen-state.json": "b19c4e07b17725ae920907974310240ff130d5b8ddf25fd28a771a9067dcc7f7",
+      "native-resources.json": "bff9220eb4e3397b60bda4a9d779c78606d79ec946413f7edb6a4fa0cda6a86d"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50239/1030/23714 sword/torch=0/2588 wall-retraction=0 grip=0/0 authority=1.19209e-07/0 finalGrip=-34.5071,0.384931,-14.1008 body=-34.4664,0.333254,-14.1218."
+  },
+  {
+    "name": "higher-diagnostic_high_generic_dielectric-interval-4",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\higher-diagnostic_high_generic_dielectric-interval-4",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "0",
+      "HORDE_MIST_PROBE_SHADOW": "HIGHER"
+    },
+    "elapsed_seconds": 3.967612399996142,
+    "exit_code": 1,
+    "exe_sha256": "2277c6a32481e8503fa9b96dee69eccbda62b7f66c1f078389bbd0f1960041d0",
+    "shader": {
+      "name": "diagnostic_high_generic_dielectric-interval",
+      "source_sha256": "4f91cf541d929d324cfeaf12eed0bc021bab23167e292e34b22a13f1da0b2903",
+      "spirv_sha256": "eb3db3611c9c9bb58d395ceec61420a5f034d950b4acac5627b4120f384eefb3",
+      "include_sha256": "61b4b45e9cc401541839cb24c5627966343b73421fc66793ee72003703b827ec",
+      "bytes": 305592,
+      "words": 76398,
+      "instructions": 18291,
+      "branchOperations": 1065,
+      "loops": 27,
+      "selectionMerges": 441,
+      "functions": 85,
+      "functionCalls": 267,
+      "rayQueryInitializations": 3,
+      "atomicInstructions": 41,
+      "key": "diagnostic_high_generic_dielectric",
+      "excess": {
+        "bytes": 9632,
+        "words": 2408,
+        "instructions": 642,
+        "branchOperations": 79,
+        "loops": 6,
+        "selectionMerges": 25,
+        "functions": 2,
+        "functionCalls": 3,
+        "rayQueryInitializations": 1
+      }
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 5.822784,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "52881e841c0f630963528fca661d6df34850bc442abf6addefacbdf8b1c8de44",
+      "capture-manifest.json": "c62cfa2e7a37bdf559057229b69a5ec4baea6a6309a6af67133455b28e1297f3",
+      "capture.log": "ff606621ec6fe7f88a2a26d464956caacf753fb4fed9d62d4d98db5ef6f7d3f7",
+      "completed-frame.json": "52879c02a6ecaaef4df787c451b6382f61342eb48746119ac010fb741e155e5f",
+      "frozen-state.json": "b19c4e07b17725ae920907974310240ff130d5b8ddf25fd28a771a9067dcc7f7",
+      "native-resources.json": "dc5413de880078509cf5bfbfaf207f67f54f9a6b62b7cd03f0494b8d7661185c"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50239/1030/23714 sword/torch=0/2588 wall-retraction=0 grip=0/0 authority=1.19209e-07/0 finalGrip=-34.5071,0.384931,-14.1008 body=-34.4664,0.333254,-14.1218."
+  },
+  {
+    "name": "higher-diagnostic_high_generic_dielectric-interval-yaw-0.025",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\higher-diagnostic_high_generic_dielectric-interval-yaw-0.025",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "0",
+      "HORDE_MIST_PROBE_SHADOW": "HIGHER",
+      "HORDE_MIST_VIEW_YAW": "-0.025"
+    },
+    "elapsed_seconds": 3.852425500008394,
+    "exit_code": 1,
+    "exe_sha256": "a6df0997824d46b193f79972ba1728f7acb000502228b35379e617a93ee9c5da",
+    "shader": {
+      "name": "diagnostic_high_generic_dielectric-interval",
+      "source_sha256": "1672eeda099147af77c30d6ebd910be539d59c74ebff39d80a54a56d3df73fd6",
+      "spirv_sha256": "3908291bb0e2b096544fecf19186a5636c9b9788d22b032260dedf24a394765a",
+      "include_sha256": "eea737b72d9a01ae7309efceba0348c9e26442194f1b5845b92c0d050e758c78",
+      "bytes": 303924,
+      "words": 75981,
+      "instructions": 18170,
+      "branchOperations": 1043,
+      "loops": 27,
+      "selectionMerges": 428,
+      "functions": 85,
+      "functionCalls": 267,
+      "rayQueryInitializations": 3,
+      "atomicInstructions": 41,
+      "key": "diagnostic_high_generic_dielectric",
+      "excess": {
+        "bytes": 7964,
+        "words": 1991,
+        "instructions": 521,
+        "branchOperations": 57,
+        "loops": 6,
+        "selectionMerges": 12,
+        "functions": 2,
+        "functionCalls": 3,
+        "rayQueryInitializations": 1
+      }
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 5.83872,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "1c95423c97e55f17f07c34dcea11e22300a0a17ba1434fe2d23f2e1af281e677",
+      "capture-manifest.json": "f3603a189b8cf11ef16035e54f1264a251597d7d317f2e69df793be7cae78b83",
+      "capture.log": "8b10357a42212c36ea2525bba52713bac85db127c690ab02f3eb369e90a71ee2",
+      "completed-frame.json": "68a3f63429e2ee9fdea112a2030760d4027c55c710be8958daa14a9df4744845",
+      "frozen-state.json": "54ac2f84ad2226b574906fc01e4acb8b61693776289877a07c800a969628fd33",
+      "native-resources.json": "c54f49739da96d170d1987be162c7f6497d58dc56a8d22ee64811e9063b3807d"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50238/1030/23712 sword/torch=0/2491 wall-retraction=0 grip=0/0.000488281 authority=1.19209e-07/0 finalGrip=-34.5221,0.384931,-14.0979 body=-34.482,0.333254,-14.12."
+  },
+  {
+    "name": "higher-diagnostic_high_generic_dielectric-interval-yaw-0.025-2",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\higher-diagnostic_high_generic_dielectric-interval-yaw-0.025-2",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "0",
+      "HORDE_MIST_PROBE_SHADOW": "HIGHER",
+      "HORDE_MIST_VIEW_YAW": "-0.025"
+    },
+    "elapsed_seconds": 3.8898626000009244,
+    "exit_code": 1,
+    "exe_sha256": "2277c6a32481e8503fa9b96dee69eccbda62b7f66c1f078389bbd0f1960041d0",
+    "shader": {
+      "name": "diagnostic_high_generic_dielectric-interval",
+      "source_sha256": "4f91cf541d929d324cfeaf12eed0bc021bab23167e292e34b22a13f1da0b2903",
+      "spirv_sha256": "eb3db3611c9c9bb58d395ceec61420a5f034d950b4acac5627b4120f384eefb3",
+      "include_sha256": "61b4b45e9cc401541839cb24c5627966343b73421fc66793ee72003703b827ec",
+      "bytes": 305592,
+      "words": 76398,
+      "instructions": 18291,
+      "branchOperations": 1065,
+      "loops": 27,
+      "selectionMerges": 441,
+      "functions": 85,
+      "functionCalls": 267,
+      "rayQueryInitializations": 3,
+      "atomicInstructions": 41,
+      "key": "diagnostic_high_generic_dielectric",
+      "excess": {
+        "bytes": 9632,
+        "words": 2408,
+        "instructions": 642,
+        "branchOperations": 79,
+        "loops": 6,
+        "selectionMerges": 25,
+        "functions": 2,
+        "functionCalls": 3,
+        "rayQueryInitializations": 1
+      }
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 6.471072,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "a25b27728e80b90c52fd87fe1c556403c954a4c94804c54bb3a8ae820b68f783",
+      "capture-manifest.json": "e45fa961199f6c77a730ca84b8dafedd17c5f62487f7c8545f69d3f10448a2e2",
+      "capture.log": "3d8f91266b916b3d740945985e1827f07e91fc0d12de158060f2c2d7dba2754c",
+      "completed-frame.json": "5338339556c5a7c92c301edfed26cdfaf7908853fc958b978e734c17316512d6",
+      "frozen-state.json": "54ac2f84ad2226b574906fc01e4acb8b61693776289877a07c800a969628fd33",
+      "native-resources.json": "4673edf08f61e6b3e20bf6aa433cf68825070ca91611e4bb5fd445d094569a4d"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50238/1030/23712 sword/torch=0/2491 wall-retraction=0 grip=0/0.000488281 authority=1.19209e-07/0 finalGrip=-34.5221,0.384931,-14.0979 body=-34.482,0.333254,-14.12."
+  },
+  {
+    "name": "higher-diagnostic_high_generic_dielectric-interval-yaw0.025",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\higher-diagnostic_high_generic_dielectric-interval-yaw0.025",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "0",
+      "HORDE_MIST_PROBE_SHADOW": "HIGHER",
+      "HORDE_MIST_VIEW_YAW": "0.025"
+    },
+    "elapsed_seconds": 3.7120856000110507,
+    "exit_code": 1,
+    "exe_sha256": "a6df0997824d46b193f79972ba1728f7acb000502228b35379e617a93ee9c5da",
+    "shader": {
+      "name": "diagnostic_high_generic_dielectric-interval",
+      "source_sha256": "1672eeda099147af77c30d6ebd910be539d59c74ebff39d80a54a56d3df73fd6",
+      "spirv_sha256": "3908291bb0e2b096544fecf19186a5636c9b9788d22b032260dedf24a394765a",
+      "include_sha256": "eea737b72d9a01ae7309efceba0348c9e26442194f1b5845b92c0d050e758c78",
+      "bytes": 303924,
+      "words": 75981,
+      "instructions": 18170,
+      "branchOperations": 1043,
+      "loops": 27,
+      "selectionMerges": 428,
+      "functions": 85,
+      "functionCalls": 267,
+      "rayQueryInitializations": 3,
+      "atomicInstructions": 41,
+      "key": "diagnostic_high_generic_dielectric",
+      "excess": {
+        "bytes": 7964,
+        "words": 1991,
+        "instructions": 521,
+        "branchOperations": 57,
+        "loops": 6,
+        "selectionMerges": 12,
+        "functions": 2,
+        "functionCalls": 3,
+        "rayQueryInitializations": 1
+      }
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 6.450112,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "3165d776b17f760abab33bd44fa0e9c47d3315de41ad8d4e49af500003cfc2f8",
+      "capture-manifest.json": "3fdaebe0292c155840ec293bcd3d4deeb1f38843fe566a9f3127a187d7bf5138",
+      "capture.log": "1e6f9a72c23eaba2559c6435407a26b83c4d0fbb7d90deb9ee54b031ab367574",
+      "completed-frame.json": "0bd3b451e2114ad4f7ce097b972f17465149e707f67531e3ea47b9c86a1018f9",
+      "frozen-state.json": "ab8fd94048dea8993951f563adc725d0031f1f8bc15aebc317e24118ba074a65",
+      "native-resources.json": "5569edb701ed1267d784de8b2bce87dc5c0843c3b10947c0f18208db095a3beb"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50240/1030/23713 sword/torch=0/2690 wall-retraction=0 grip=0/0 authority=0/0 finalGrip=-34.4921,0.384931,-14.1033 body=-34.4509,0.333255,-14.1233."
+  },
+  {
+    "name": "higher-diagnostic_high_generic_dielectric-interval-yaw0.025-2",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\higher-diagnostic_high_generic_dielectric-interval-yaw0.025-2",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "0",
+      "HORDE_MIST_PROBE_SHADOW": "HIGHER",
+      "HORDE_MIST_VIEW_YAW": "0.025"
+    },
+    "elapsed_seconds": 3.9368333000020357,
+    "exit_code": 1,
+    "exe_sha256": "2277c6a32481e8503fa9b96dee69eccbda62b7f66c1f078389bbd0f1960041d0",
+    "shader": {
+      "name": "diagnostic_high_generic_dielectric-interval",
+      "source_sha256": "4f91cf541d929d324cfeaf12eed0bc021bab23167e292e34b22a13f1da0b2903",
+      "spirv_sha256": "eb3db3611c9c9bb58d395ceec61420a5f034d950b4acac5627b4120f384eefb3",
+      "include_sha256": "61b4b45e9cc401541839cb24c5627966343b73421fc66793ee72003703b827ec",
+      "bytes": 305592,
+      "words": 76398,
+      "instructions": 18291,
+      "branchOperations": 1065,
+      "loops": 27,
+      "selectionMerges": 441,
+      "functions": 85,
+      "functionCalls": 267,
+      "rayQueryInitializations": 3,
+      "atomicInstructions": 41,
+      "key": "diagnostic_high_generic_dielectric",
+      "excess": {
+        "bytes": 9632,
+        "words": 2408,
+        "instructions": 642,
+        "branchOperations": 79,
+        "loops": 6,
+        "selectionMerges": 25,
+        "functions": 2,
+        "functionCalls": 3,
+        "rayQueryInitializations": 1
+      }
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 5.814432,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "d05ad0ac4fca877cdb691a13c2e5a6d6d26397670d9c43a6a3106c87647358d4",
+      "capture-manifest.json": "8d3b95a95afbf16e2f68ce4fa6bf8c871f2bf79d7e9e2c73a68da862f99a26d7",
+      "capture.log": "a0f2881d0462ab20efca04bcf59f5ef76757490af76530a91c48c7871df79725",
+      "completed-frame.json": "8cac138490649b15be7653ae58195e6b51b7052866226a0a966da2b542cd5842",
+      "frozen-state.json": "ab8fd94048dea8993951f563adc725d0031f1f8bc15aebc317e24118ba074a65",
+      "native-resources.json": "696439c496b3a70ed6f00d28ce72d2aac8f9ad815734489555fa7bbe3e67109d"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50240/1030/23713 sword/torch=0/2690 wall-retraction=0 grip=0/0 authority=0/0 finalGrip=-34.4921,0.384931,-14.1033 body=-34.4509,0.333255,-14.1233."
+  },
+  {
+    "name": "higher-interval-coverage",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\higher-interval-coverage",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": null,
+    "elapsed_seconds": 0.8198946999909822,
+    "exit_code": 1,
+    "exe_sha256": "57f3102b6ecec066164aa678a4a6b0c79c2c146fd8cadd05ec8b2bd572782a7b",
+    "shader": {
+      "name": "interval-coverage",
+      "source_sha256": "0c116f784a57df3cd0f1ea7dd0cbaa1986a627c926115bbd6c74746768d3c094",
+      "spirv_sha256": "4762f6740e7cab7725b02636dac36656f645398c066e43078c22f102ed465c01",
+      "include_sha256": "63b59de81508772e41e4831cce9ed1982e385b136ab151c4e05eb9c4461bfead",
+      "bytes": 304812,
+      "words": 76203,
+      "instructions": 18227,
+      "branchOperations": 1048,
+      "loops": 28,
+      "selectionMerges": 428,
+      "functions": 85,
+      "functionCalls": 267,
+      "rayQueryInitializations": 3,
+      "atomicInstructions": 41
+    },
+    "presentation": null,
+    "gpu": null,
+    "files": {
+      "capture.log": "46c91e5031a19bb43f0223e7b97c2665145784f06ce5131077e80221767c117a",
+      "native-resources.json": "cac1123d680e4f961efdca64e27f77c039e5e765013ba03b53f4b3e2439bff27"
+    },
+    "failure": null
+  },
+  {
+    "name": "higher-interval-coverage-2",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\higher-interval-coverage-2",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": null,
+    "elapsed_seconds": 3.9234817000105977,
+    "exit_code": 1,
+    "exe_sha256": "33446a5690ab3e993438b0bdcca944638a467e55f1e1d47e7ca88264952a721d",
+    "shader": {
+      "name": "interval-coverage",
+      "source_sha256": "0c116f784a57df3cd0f1ea7dd0cbaa1986a627c926115bbd6c74746768d3c094",
+      "spirv_sha256": "4762f6740e7cab7725b02636dac36656f645398c066e43078c22f102ed465c01",
+      "include_sha256": "63b59de81508772e41e4831cce9ed1982e385b136ab151c4e05eb9c4461bfead",
+      "bytes": 304812,
+      "words": 76203,
+      "instructions": 18227,
+      "branchOperations": 1048,
+      "loops": 28,
+      "selectionMerges": 428,
+      "functions": 85,
+      "functionCalls": 267,
+      "rayQueryInitializations": 3,
+      "atomicInstructions": 41
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 4.982368,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "a8ae9c83bb9a6fabfdf0c72832920c9754bf58af524edee9d8ae2cd020d88e9f",
+      "capture-manifest.json": "dd70523c0ce8f37c1a9825832e9cc2930b7fdbf2f1c9437d6ae11cf7305a229a",
+      "capture.log": "6248becacae08d5aa290ab6d9eea9adcfd2174ee003a22a8309b130e63f8d751",
+      "completed-frame.json": "66023dc414008ae4cf8a695053be3b130834c8068ea5f47296d1430f558bfa97",
+      "frozen-state.json": "b19c4e07b17725ae920907974310240ff130d5b8ddf25fd28a771a9067dcc7f7",
+      "native-resources.json": "e38c63af975c84dc153e5cf85db526de2db45d5c42683552f8b8d05b9c8cd0da"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50239/1030/23714 sword/torch=0/2588 wall-retraction=0 grip=0/0 authority=1.19209e-07/0 finalGrip=-34.5071,0.384931,-14.1008 body=-34.4664,0.333254,-14.1218."
+  },
+  {
+    "name": "higher-interval-coverage-3",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\higher-interval-coverage-3",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "5",
+      "HORDE_MIST_PROBE_SHADOW": "HIGHER"
+    },
+    "elapsed_seconds": 3.720486300007906,
+    "exit_code": 1,
+    "exe_sha256": "a6df0997824d46b193f79972ba1728f7acb000502228b35379e617a93ee9c5da",
+    "shader": {
+      "name": "interval-coverage",
+      "source_sha256": "0c116f784a57df3cd0f1ea7dd0cbaa1986a627c926115bbd6c74746768d3c094",
+      "spirv_sha256": "4762f6740e7cab7725b02636dac36656f645398c066e43078c22f102ed465c01",
+      "include_sha256": "63b59de81508772e41e4831cce9ed1982e385b136ab151c4e05eb9c4461bfead",
+      "bytes": 304812,
+      "words": 76203,
+      "instructions": 18227,
+      "branchOperations": 1048,
+      "loops": 28,
+      "selectionMerges": 428,
+      "functions": 85,
+      "functionCalls": 267,
+      "rayQueryInitializations": 3,
+      "atomicInstructions": 41
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 4.989504,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "a8ae9c83bb9a6fabfdf0c72832920c9754bf58af524edee9d8ae2cd020d88e9f",
+      "capture-manifest.json": "3ef463502c58738ad63b9f375a107f8185b0c016f2a7b1a7797c1213a39b0377",
+      "capture.log": "e9d612b4596e9445136d76e22abdc854fb31fe984448300c8628a9e3fcf3d696",
+      "completed-frame.json": "a5dfb489014bd1ce723cfc4054198e5a03a76997ff0171260cab59c4f05ce20a",
+      "frozen-state.json": "b19c4e07b17725ae920907974310240ff130d5b8ddf25fd28a771a9067dcc7f7",
+      "native-resources.json": "30e5b86d60abe8480bf277bdd188eb48985ca85fc8471adeccbb9908311f0c40"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50239/1030/23714 sword/torch=0/2588 wall-retraction=0 grip=0/0 authority=1.19209e-07/0 finalGrip=-34.5071,0.384931,-14.1008 body=-34.4664,0.333254,-14.1218."
+  },
+  {
+    "name": "higher-interval-coverage-4",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\higher-interval-coverage-4",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "5",
+      "HORDE_MIST_PROBE_SHADOW": "HIGHER"
+    },
+    "elapsed_seconds": 3.795670899999095,
+    "exit_code": 1,
+    "exe_sha256": "2277c6a32481e8503fa9b96dee69eccbda62b7f66c1f078389bbd0f1960041d0",
+    "shader": {
+      "name": "interval-coverage",
+      "source_sha256": "154f56154a769f90d4d8c331e988ff2fc38f4845bf227884967fc7bec2c276c5",
+      "spirv_sha256": "286388ca2873b14f32703b876d05afc675ef1a4d7504136dc5daff4af896fde2",
+      "include_sha256": "99c3d1616d17dfe00f5f056b1ff5dafaa1d6669e2a50821f718da69fb7b6af61",
+      "bytes": 306480,
+      "words": 76620,
+      "instructions": 18348,
+      "branchOperations": 1070,
+      "loops": 28,
+      "selectionMerges": 441,
+      "functions": 85,
+      "functionCalls": 267,
+      "rayQueryInitializations": 3,
+      "atomicInstructions": 41
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 4.999328,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "a8ae9c83bb9a6fabfdf0c72832920c9754bf58af524edee9d8ae2cd020d88e9f",
+      "capture-manifest.json": "ff337a108a5ca94717ca8a50f80f5e26df9a415ac5216e8aacda0623b59967ec",
+      "capture.log": "82c6628bf83c187ab686e621672a11b0b0f7cd7302f20aefc15c72dec94a44e0",
+      "completed-frame.json": "7796649f910ebd1ff7c22ab45a084fd9f2acb31d3f6809a8e0be3dfe0fed48d2",
+      "frozen-state.json": "b19c4e07b17725ae920907974310240ff130d5b8ddf25fd28a771a9067dcc7f7",
+      "native-resources.json": "945ce3f279136365305e1b4207eaa15d2969d8cc7bdf189aaeb88988dd0f351f"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50239/1030/23714 sword/torch=0/2588 wall-retraction=0 grip=0/0 authority=1.19209e-07/0 finalGrip=-34.5071,0.384931,-14.1008 body=-34.4664,0.333254,-14.1218."
+  },
+  {
+    "name": "higher-interval-surface",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\higher-interval-surface",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": null,
+    "elapsed_seconds": 3.783618100002059,
+    "exit_code": 1,
+    "exe_sha256": "57f3102b6ecec066164aa678a4a6b0c79c2c146fd8cadd05ec8b2bd572782a7b",
+    "shader": {
+      "name": "interval-surface",
+      "source_sha256": "f53b73721e19bd88ba83d1004af2971a3774eee78ba13cc52e9bc8ff84fe0b6f",
+      "spirv_sha256": "fe32e68a44981532b723d9c29d1a9c251afe34755a450817f451efee4b1a6528",
+      "include_sha256": "47256be25ba3a7a627d4983fa40cdee81bb912395ce119ee63aff12c4c6fc31a",
+      "bytes": 238796,
+      "words": 59699,
+      "instructions": 14150,
+      "branchOperations": 866,
+      "loops": 17,
+      "selectionMerges": 362,
+      "functions": 62,
+      "functionCalls": 177,
+      "rayQueryInitializations": 2,
+      "atomicInstructions": 41
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 4.527552,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "696fc98c70ced8173523f571091fc0dedb49028b6b48d54d3f0e3f96bd805333",
+      "capture-manifest.json": "6a36a688ec0681ca2ff4ac3ddf902835a759534242e50dda87eb0cca94b25cc4",
+      "capture.log": "503a4884269ea5c84aec145275b3bdf1909b6b30f608cfa512521bd1e61c649b",
+      "completed-frame.json": "ab492701e2bc6046cde23236a2abecbf3ac506c4e6fcb1a9eca04dfef4d7037a",
+      "frozen-state.json": "b19c4e07b17725ae920907974310240ff130d5b8ddf25fd28a771a9067dcc7f7",
+      "native-resources.json": "92ecd0b4a9b8d9b32b4663206b3732c8e917d960617efdd20ec382d4f0301303"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50239/1030/23714 sword/torch=0/2588 wall-retraction=0 grip=0/0 authority=1.19209e-07/0 finalGrip=-34.5071,0.384931,-14.1008 body=-34.4664,0.333254,-14.1218."
+  },
+  {
+    "name": "higher-interval-surface-2",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\higher-interval-surface-2",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "2",
+      "HORDE_MIST_PROBE_SHADOW": "HIGHER"
+    },
+    "elapsed_seconds": 3.4807529999961844,
+    "exit_code": 1,
+    "exe_sha256": "a6df0997824d46b193f79972ba1728f7acb000502228b35379e617a93ee9c5da",
+    "shader": {
+      "name": "interval-surface",
+      "source_sha256": "f53b73721e19bd88ba83d1004af2971a3774eee78ba13cc52e9bc8ff84fe0b6f",
+      "spirv_sha256": "fe32e68a44981532b723d9c29d1a9c251afe34755a450817f451efee4b1a6528",
+      "include_sha256": "47256be25ba3a7a627d4983fa40cdee81bb912395ce119ee63aff12c4c6fc31a",
+      "bytes": 238796,
+      "words": 59699,
+      "instructions": 14150,
+      "branchOperations": 866,
+      "loops": 17,
+      "selectionMerges": 362,
+      "functions": 62,
+      "functionCalls": 177,
+      "rayQueryInitializations": 2,
+      "atomicInstructions": 41
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 4.551296,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "696fc98c70ced8173523f571091fc0dedb49028b6b48d54d3f0e3f96bd805333",
+      "capture-manifest.json": "a41161569c2ae59adff865dc0da5a2af00a8406cbfd1784e4dc1b4f12be04dd9",
+      "capture.log": "ae5f1976fff3ccc264791a6af34313d3a8ffe96dc7fd6386e6b36347dbb0816c",
+      "completed-frame.json": "a648e904654a6d65ecb8ac77d04a9301e46e6eae22c9191e81558a1ef67202eb",
+      "frozen-state.json": "b19c4e07b17725ae920907974310240ff130d5b8ddf25fd28a771a9067dcc7f7",
+      "native-resources.json": "d190e6c70b12c77ca9e2d62082cdfc72c082ea903046839eb9752a400777b0bf"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50239/1030/23714 sword/torch=0/2588 wall-retraction=0 grip=0/0 authority=1.19209e-07/0 finalGrip=-34.5071,0.384931,-14.1008 body=-34.4664,0.333254,-14.1218."
+  },
+  {
+    "name": "higher-interval-surface-3",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\higher-interval-surface-3",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "2",
+      "HORDE_MIST_PROBE_SHADOW": "HIGHER"
+    },
+    "elapsed_seconds": 3.6549956999951974,
+    "exit_code": 1,
+    "exe_sha256": "2277c6a32481e8503fa9b96dee69eccbda62b7f66c1f078389bbd0f1960041d0",
+    "shader": {
+      "name": "interval-surface",
+      "source_sha256": "b343e5191e7dc4fb7986d001b17dde09d962fc6db831258641984a6fa9d8300e",
+      "spirv_sha256": "fe32e68a44981532b723d9c29d1a9c251afe34755a450817f451efee4b1a6528",
+      "include_sha256": "47256be25ba3a7a627d4983fa40cdee81bb912395ce119ee63aff12c4c6fc31a",
+      "bytes": 238796,
+      "words": 59699,
+      "instructions": 14150,
+      "branchOperations": 866,
+      "loops": 17,
+      "selectionMerges": 362,
+      "functions": 62,
+      "functionCalls": 177,
+      "rayQueryInitializations": 2,
+      "atomicInstructions": 41
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 3.95376,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "696fc98c70ced8173523f571091fc0dedb49028b6b48d54d3f0e3f96bd805333",
+      "capture-manifest.json": "347ec143bf4c57d9081537be6c73b3c583a2b8ff9de71a9a24a1dbd67295add3",
+      "capture.log": "6d4e0e07a2dad6151b666bd6dacc6543ee9e8cec491e7dbcff4022eac56eb5c9",
+      "completed-frame.json": "351ff775427961e26d9fdc510254e5ce2bd5f0118d1ba1e42827c806c4f06503",
+      "frozen-state.json": "b19c4e07b17725ae920907974310240ff130d5b8ddf25fd28a771a9067dcc7f7",
+      "native-resources.json": "c35b9913c17fde26d432c645fc3cbde07634720ed70b106ee769f150f79d475c"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50239/1030/23714 sword/torch=0/2588 wall-retraction=0 grip=0/0 authority=1.19209e-07/0 finalGrip=-34.5071,0.384931,-14.1008 body=-34.4664,0.333254,-14.1218."
+  },
+  {
+    "name": "higher-overflow-negative",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\higher-overflow-negative",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "7",
+      "HORDE_MIST_PROBE_SHADOW": "HIGHER"
+    },
+    "elapsed_seconds": 3.7287489000009373,
+    "exit_code": 1,
+    "exe_sha256": "a6df0997824d46b193f79972ba1728f7acb000502228b35379e617a93ee9c5da",
+    "shader": {
+      "name": "overflow-negative",
+      "source_sha256": "e2d900bc6fc42b568eea30fa8ca59611bec0a06804ecf5a55bfc44881791681e",
+      "spirv_sha256": "a075709ffecbeb3eed59e98d6ef6649cf77a4be66b5d402f0fbeca9929679176",
+      "include_sha256": "61c10d75ff103621f403eea018fcba96d1f4991d989e65734daa3526051abec6",
+      "bytes": 304796,
+      "words": 76199,
+      "instructions": 18226,
+      "branchOperations": 1048,
+      "loops": 28,
+      "selectionMerges": 428,
+      "functions": 85,
+      "functionCalls": 267,
+      "rayQueryInitializations": 3,
+      "atomicInstructions": 41
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 4.105728,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "ffb55b7519f9df7aeb056c7e2c9b0350ad7b1fde9b3efbd64302d1e2f4c59d29",
+      "capture-manifest.json": "67e841f6ef2ddfbb0a78473b1e75c9f5f68601955a1b776327027940f56b1c8a",
+      "capture.log": "6be6a0de40e3113ef6e7ae0b1c7e82304e42a46af3d334d8c8fc7f3343b04507",
+      "completed-frame.json": "1f1b90b86a4b5bf972ed502a18b036b7826e01390c0d642a3471cc1786c54573",
+      "frozen-state.json": "b19c4e07b17725ae920907974310240ff130d5b8ddf25fd28a771a9067dcc7f7",
+      "native-resources.json": "ebb7e23b4688817af791fab2649e01693c2c91f84191266b8e5e9187432a6f3d"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50239/1030/23714 sword/torch=0/2588 wall-retraction=0 grip=0/0 authority=1.19209e-07/0 finalGrip=-34.5071,0.384931,-14.1008 body=-34.4664,0.333254,-14.1218."
+  },
+  {
+    "name": "higher-overflow-negative-2",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\higher-overflow-negative-2",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "7",
+      "HORDE_MIST_PROBE_SHADOW": "HIGHER"
+    },
+    "elapsed_seconds": 3.8195476999972016,
+    "exit_code": 1,
+    "exe_sha256": "2277c6a32481e8503fa9b96dee69eccbda62b7f66c1f078389bbd0f1960041d0",
+    "shader": {
+      "name": "overflow-negative",
+      "source_sha256": "9d94a5aaeae552fb7e856e1fd4e7378d4dedb8dd21271aa332d512e7fd4c60c7",
+      "spirv_sha256": "39b59ced1868c2efe6bd6c46391d3c798e03fad2eaf7d4aa08fb4b8a8aa874c6",
+      "include_sha256": "dd1f355ec80f4a8dafe515760b0659cb71c85ffda23ca5c1deab0213bbb8f14d",
+      "bytes": 306464,
+      "words": 76616,
+      "instructions": 18347,
+      "branchOperations": 1070,
+      "loops": 28,
+      "selectionMerges": 441,
+      "functions": 85,
+      "functionCalls": 267,
+      "rayQueryInitializations": 3,
+      "atomicInstructions": 41
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 3.94992,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "ffb55b7519f9df7aeb056c7e2c9b0350ad7b1fde9b3efbd64302d1e2f4c59d29",
+      "capture-manifest.json": "6b87a52015880589a214f725120aa1fb067735404f8e62983c123b3a7f39c95d",
+      "capture.log": "e5943afc1afe4f61644f13a671d1cebc0e693122ffb1c34b251e2f04c707f05e",
+      "completed-frame.json": "8f682b31c7324b858348bad6e15386a074a62fca92a614f4ad7cd0f1d57b48bc",
+      "frozen-state.json": "b19c4e07b17725ae920907974310240ff130d5b8ddf25fd28a771a9067dcc7f7",
+      "native-resources.json": "ba219f7f14ce40c6e91250d0390b781f1a2c6802db35c098835ea36c30d4611a"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50239/1030/23714 sword/torch=0/2588 wall-retraction=0 grip=0/0 authority=1.19209e-07/0 finalGrip=-34.5071,0.384931,-14.1008 body=-34.4664,0.333254,-14.1218."
+  },
+  {
+    "name": "higher-weighted-coverage",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\higher-weighted-coverage",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "6",
+      "HORDE_MIST_PROBE_SHADOW": "HIGHER"
+    },
+    "elapsed_seconds": 3.6760390999988886,
+    "exit_code": 1,
+    "exe_sha256": "a6df0997824d46b193f79972ba1728f7acb000502228b35379e617a93ee9c5da",
+    "shader": {
+      "name": "weighted-coverage",
+      "source_sha256": "7432ce6dac3116447bbc27897e452a46f61e3aeffee34ab5be0a2da2a0d65bc2",
+      "spirv_sha256": "1e0fa20e874b3c7524f1b5d0fc79b2bf24c4539e60c40e9aaecf271c723cdf9b",
+      "include_sha256": "b45ca7a896099b3f535580fe8d953f17f3d5c90142a161e9c21b30e54dedc146",
+      "bytes": 304940,
+      "words": 76235,
+      "instructions": 18231,
+      "branchOperations": 1046,
+      "loops": 27,
+      "selectionMerges": 429,
+      "functions": 85,
+      "functionCalls": 267,
+      "rayQueryInitializations": 3,
+      "atomicInstructions": 41
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 5.0424,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "9fa73864b45d8c4a0d42493dcdcdc617343d0aad492a1c6d7dd2ee2fa6b9c2f1",
+      "capture-manifest.json": "44743a12b2b3c324b1262f9f5ca66298175b8af49385d9067b9cee414312ea0e",
+      "capture.log": "b678bfd9e13088b7bc2f221ea08eb85710750d8e20182e429fa3d1d3c543350c",
+      "completed-frame.json": "e547482ca9224ab2e1edd1cb70d6e5cfef4ff31af725f9830726198e76f68ac7",
+      "frozen-state.json": "b19c4e07b17725ae920907974310240ff130d5b8ddf25fd28a771a9067dcc7f7",
+      "native-resources.json": "695c83532670f1e5293587d16802091faf7ab0fc980060dc892f8f23e792788f"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50239/1030/23714 sword/torch=0/2588 wall-retraction=0 grip=0/0 authority=1.19209e-07/0 finalGrip=-34.5071,0.384931,-14.1008 body=-34.4664,0.333254,-14.1218."
+  },
+  {
+    "name": "higher-weighted-coverage-2",
+    "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\mist-interval-prototype\\captures\\higher-weighted-coverage-2",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "environment": {
+      "HORDE_MIST_PROBE_MODE": "6",
+      "HORDE_MIST_PROBE_SHADOW": "HIGHER"
+    },
+    "elapsed_seconds": 3.8251244999992196,
+    "exit_code": 1,
+    "exe_sha256": "2277c6a32481e8503fa9b96dee69eccbda62b7f66c1f078389bbd0f1960041d0",
+    "shader": {
+      "name": "weighted-coverage",
+      "source_sha256": "03c8b289e8ade4e9abbf19d433036e8b5d3d79a200dfcc4022549426dc73cd2a",
+      "spirv_sha256": "22c85d9ada40ae70fed1313e2c9c16933357f68a694b76d8ec1e3575a57a023d",
+      "include_sha256": "517fcde5070976f092050cbab1dac7bc93bc59ad63b6a4d2685f82ecf09a96e3",
+      "bytes": 306608,
+      "words": 76652,
+      "instructions": 18352,
+      "branchOperations": 1068,
+      "loops": 27,
+      "selectionMerges": 442,
+      "functions": 85,
+      "functionCalls": 267,
+      "rayQueryInitializations": 3,
+      "atomicInstructions": 41
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 5.045888,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "files": {
+      "192-rescue-journey-start.png": "8e6439829bc70a25eeee4caa03273e0fd68801f9d83d1733db1754be02c2aa15",
+      "capture-manifest.json": "00309b2bc381f1b389e64ad90eb0156fe60167eb4c9b2909cf4d5f1feb1e74a8",
+      "capture.log": "58515fa4a93de129cffbfb603b091c4b6ae945c737e7107d0f2a47da8ab66fcf",
+      "completed-frame.json": "a427194c5267634b495e9866564619cfd27ab4a9d5bdd9509cd870987339dd94",
+      "frozen-state.json": "b19c4e07b17725ae920907974310240ff130d5b8ddf25fd28a771a9067dcc7f7",
+      "native-resources.json": "a473a21a61f91f12b6a2ad725bb83ffbef4e078f187f78ba6589ff18209a92a2"
+    },
+    "failure": "Showcase capture failed: Checkpoint 'rescue-journey-start' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=50239/1030/23714 sword/torch=0/2588 wall-retraction=0 grip=0/0 authority=1.19209e-07/0 finalGrip=-34.5071,0.384931,-14.1008 body=-34.4664,0.333254,-14.1218."
+  }
+]
