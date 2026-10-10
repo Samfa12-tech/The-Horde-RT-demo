@@ -291,9 +291,10 @@ int main()
           kRescueBlockoutBoxes[10u].minimum[0] < kRescueBlockoutBoxes[9u].maximum[0] &&
           Near(kRescueBlockoutBoxes[10u].minimum[1], 3.62f) &&
           Near(kRescueBlockoutBoxes[10u].maximum[1], 3.78f) &&
-          Near(anchor.x, -33.7f) && Near(anchor.y, 3.8f) && Near(anchor.z, -15.5f) &&
+          Near(anchor.x, -33.7f) && Near(anchor.y, 3.678f) && Near(anchor.z, -15.5f) &&
           anchor.x >= cantilever.minimum[0] && anchor.x <= cantilever.maximum[0] &&
-          anchor.y > cantilever.minimum[1] && anchor.y < cantilever.maximum[1] &&
+          Near(cantilever.minimum[1] - anchor.y, .042f) &&
+          anchor.y + .035f < cantilever.minimum[1] &&
           anchor.z >= cantilever.minimum[2] && anchor.z <= cantilever.maximum[2] &&
           Near(cantilever.minimum[1], 3.72f) && Near(cantilever.maximum[1], 3.96f) &&
           Near(cantilever.minimum[2], -16.72f) && Near(cantilever.maximum[2], -15.40f) &&

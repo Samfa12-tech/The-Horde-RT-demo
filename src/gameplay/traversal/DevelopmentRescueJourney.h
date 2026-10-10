@@ -60,7 +60,8 @@ inline simulation::PlayerSupportResolution RescueExteriorSupport(float x,float z
 }
 inline bool AtRopeEndpoint(float x,float z,bool exterior) {
     const auto p=exterior?kExteriorLanding:kLowerLanding;
-    return std::isfinite(x)&&std::isfinite(z)&&std::hypot(x-p.x,z-p.z)<=.10f;
+    return std::isfinite(x)&&std::isfinite(z)&&
+        std::hypot(x-p.x,z-p.z)<=kRescueApproachRadius;
 }
 inline bool ValidRescueCapsulePath(const RescueTraversalSnapshot& s) {
     const auto p=s.playerPosition;
@@ -71,6 +72,32 @@ inline bool ValidRescueCapsulePath(const RescueTraversalSnapshot& s) {
     // 3D physics or sword occlusion claim follows from this route validator.
     if(p.z>=-13.76f-.20f && p.z<=-13.58f+.20f && p.y<2.23f+.04f) return false;
     return p.y>=kLowerSupportWorldY-.001f && p.y<=2.28f+.001f;
+}
+inline bool CanApproachRopeEndpoint(Vec3 start,float supportWorldY,bool exterior) {
+    const Vec3 endpoint=exterior?kExteriorLanding:kLowerLanding;
+    const float expectedSupport=exterior?kUpperSupportWorldY:kLowerSupportWorldY;
+    if(!std::isfinite(start.x)||!std::isfinite(start.y)||!std::isfinite(start.z)||
+       !std::isfinite(supportWorldY)||std::abs(supportWorldY-expectedSupport)>.10f||
+       std::hypot(start.x-endpoint.x,start.z-endpoint.z)>kRescueApproachRadius)
+        return false;
+    // Validate the complete swept capsule centre line, including the current
+    // pose, against the shaft/coping envelope and retained upper support mesh.
+    // In particular, a nominally nearby player at y=2.05 cannot walk through
+    // the front coping just because the endpoint itself is safe.
+    constexpr int samples=24;
+    for(int i=0;i<=samples;++i) {
+        const float t=static_cast<float>(i)/samples;
+        RescueTraversalSnapshot pose;
+        pose.playerPosition={start.x+(endpoint.x-start.x)*t,expectedSupport,
+                             start.z+(endpoint.z-start.z)*t};
+        pose.supportWorldY=expectedSupport;
+        if(!ValidRescueCapsulePath(pose)) return false;
+        if(exterior) {
+            const auto retained=RescueExteriorSupport(pose.playerPosition.x,pose.playerPosition.z);
+            if(!retained.grounded||std::abs(retained.worldY-expectedSupport)>.10f) return false;
+        }
+    }
+    return true;
 }
 enum class RescuePrompt : unsigned { None, Climb, Descend, Preparing, Traversing };
 } // namespace horde::gameplay::traversal

@@ -2246,8 +2246,8 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
         using horde::gameplay::traversal::RescuePrompt;
         switch (snapshot.rescuePrompt)
         {
-        case RescuePrompt::Climb: text = "RESCUE ROPE | LEFT-CLICK TO CLIMB"; break;
-        case RescuePrompt::Descend: text = "RESCUE ROPE | LEFT-CLICK TO DESCEND"; break;
+        case RescuePrompt::Climb: text = "RESCUE ROPE | LEFT-CLICK / A TO CLIMB"; break;
+        case RescuePrompt::Descend: text = "RESCUE ROPE | LEFT-CLICK / A TO DESCEND"; break;
         case RescuePrompt::Preparing: text = "RESCUE ROUTE PREPARING..."; break;
         case RescuePrompt::Traversing: text = "TRAVERSING RESCUE ROPE..."; break;
         default: break;
@@ -4045,7 +4045,12 @@ void PollDesktopController(VulkanSurfaceContext& context)
             context.legacyRightStickAxes =
                 horde::platform::windows::SelectLegacyRightStickAxes(axisSample, identity);
             context.previousControllerButtons = 0u;
-            context.previousLegacyControllerButtons = 0u;
+            // Acquiring a device is a baseline sample, not a fresh button
+            // press. A stick held during connection must not toggle running.
+            if (context.legacyJoystickId != joystick)
+                context.previousLegacyControllerButtons = legacy.dwButtons;
+            else
+                context.previousLegacyControllerButtons = 0u;
             context.previousLegacyUiButtons = legacy.dwButtons;
             context.previousLegacyPov = legacy.dwPOV;
             context.controllerTriggerLatch = {};
@@ -4070,6 +4075,10 @@ void PollDesktopController(VulkanSurfaceContext& context)
                 legacy.dwButtons, context.previousLegacyControllerButtons, identity);
         if (!context.simulationPaused)
         {
+            if (horde::platform::windows::LegacyRunTogglePressed(
+                    legacy.dwButtons, context.previousLegacyControllerButtons, identity) &&
+                context.runToggleSequence != UINT64_MAX)
+                ++context.runToggleSequence;
             if (edges.attackPressed) PublishDesktopCombatEdge(context, horde::gameplay::simulation::CombatInputEdgeKind::Attack);
             if (edges.parryPressed) PublishDesktopCombatEdge(context, horde::gameplay::simulation::CombatInputEdgeKind::Parry);
             if (edges.dodgePressed) PublishDesktopCombatEdge(context, horde::gameplay::simulation::CombatInputEdgeKind::Dodge);
@@ -4091,10 +4100,12 @@ void PollDesktopController(VulkanSurfaceContext& context)
     context.controllerRunHeld = rightShoulderHeld && !context.controllerRunBlockedUntilRelease;
     if (context.xInputUserIndex != xinputUser)
     {
-        context.previousControllerButtons = 0u;
+        context.previousControllerButtons = state.Gamepad.wButtons;
         context.previousXInputUiButtons = state.Gamepad.wButtons;
         context.previousLegacyControllerButtons = 0u;
-        context.controllerTriggerLatch = {};
+        horde::platform::windows::SeedXInputTriggerLatch(
+            state.Gamepad.bLeftTrigger, state.Gamepad.bRightTrigger,
+            context.controllerTriggerLatch);
     }
     context.xInputUserIndex = xinputUser;
     context.legacyJoystickId.reset();
@@ -4116,6 +4127,11 @@ void PollDesktopController(VulkanSurfaceContext& context)
         context.controllerFocusLatch.CompleteReseed();
         return;
     }
+    if (!context.simulationPaused &&
+        horde::platform::windows::XInputRunTogglePressed(
+            state.Gamepad.wButtons, context.previousControllerButtons) &&
+        context.runToggleSequence != UINT64_MAX)
+        ++context.runToggleSequence;
     const auto axis = [](SHORT value, SHORT deadzone)
     {
         const float magnitude = static_cast<float>(value) / 32767.0f;
@@ -7763,6 +7779,83 @@ int ScaleForDpi(HWND window, const int logicalPixels)
     return MulDiv(logicalPixels, static_cast<int>(dpi == 0u ? kDefaultDpi : dpi), static_cast<int>(kDefaultDpi));
 }
 
+bool IsGraphicsMenuButton(const int controlId)
+{
+    switch (controlId)
+    {
+    case kGraphicsPresetButtonId:
+    case kGraphicsFireButtonId:
+    case kGraphicsShadowButtonId:
+    case kGraphicsGlassButtonId:
+    case kGraphicsMistButtonId:
+    case kGraphicsDustButtonId:
+    case kGraphicsApplyButtonId:
+    case kGraphicsConfirmButtonId:
+    case kGraphicsRevertButtonId:
+    case kGraphicsResetButtonId:
+    case kGraphicsPreviewPauseId:
+    case kGraphicsPreviewCameraId:
+    case kGraphicsPreviewMotionId:
+    case kGraphicsPreviewResetId:
+    case kWaterQualityButtonId:
+    case kSettingsBackButtonId:
+        return true;
+    default:
+        return false;
+    }
+}
+
+HFONT CreateGraphicsButtonFitFont(HWND window, HDC dc, HFONT currentFont,
+                                  const char* text, const int availableWidth)
+{
+    if (currentFont == nullptr || text == nullptr || text[0] == '\0' || availableWidth <= 0)
+        return nullptr;
+
+    SIZE measured{};
+    const int textLength = lstrlenA(text);
+    if (textLength <= 0 || !GetTextExtentPoint32A(dc, text, textLength, &measured) ||
+        measured.cx <= availableWidth)
+        return nullptr;
+
+    LOGFONTA fontDescription{};
+    if (GetObjectA(currentFont, sizeof(fontDescription), &fontDescription) !=
+        static_cast<int>(sizeof(fontDescription)))
+        return nullptr;
+
+    const int originalHeight = std::max(1,
+        static_cast<int>(std::abs(fontDescription.lfHeight)));
+    const int minimumHeight = std::max(1, ScaleForDpi(window, 9));
+    int candidateHeight = std::max(minimumHeight,
+        MulDiv(originalHeight, availableWidth, std::max(1, measured.cx)));
+    while (candidateHeight >= minimumHeight)
+    {
+        LOGFONTA fittedDescription = fontDescription;
+        fittedDescription.lfHeight = fontDescription.lfHeight < 0
+            ? -candidateHeight : candidateHeight;
+        HFONT fittedFont = CreateFontIndirectA(&fittedDescription);
+        if (fittedFont == nullptr)
+            return nullptr;
+
+        const HGDIOBJ previousFont = SelectObject(dc, fittedFont);
+        if (previousFont == nullptr || previousFont == HGDI_ERROR)
+        {
+            DeleteObject(fittedFont);
+            return nullptr;
+        }
+        SIZE fittedExtent{};
+        const bool measuredFit = GetTextExtentPoint32A(
+            dc, text, textLength, &fittedExtent) && fittedExtent.cx <= availableWidth;
+        SelectObject(dc, previousFont);
+        if (measuredFit)
+            return fittedFont;
+        DeleteObject(fittedFont);
+        if (candidateHeight == minimumHeight)
+            break;
+        --candidateHeight;
+    }
+    return nullptr;
+}
+
 void ReplaceFontProperty(HWND window, const char* propertyName, HFONT font)
 {
     if (HFONT oldFont = reinterpret_cast<HFONT>(GetPropA(window, propertyName)))
@@ -8187,17 +8280,22 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
         const int graphicsX = inset;
         const int compactHeight = ScaleForDpi(window, 36);
         const int infoHeight = ScaleForDpi(window, 148);
-        y = std::max(ScaleForDpi(window, 12), (height - ScaleForDpi(window, 470)) / 2);
+        // The preset receives a full row so its full caption remains readable
+        // even when the graphics panel is at its 420-DIP minimum width.
+        y = std::max(ScaleForDpi(window, 12), (height - ScaleForDpi(window, 506)) / 2);
         MoveWindow(GetDlgItem(window, kSettingsTitleId), graphicsX, y, graphicsWidth, titleHeight, TRUE);
         y += titleHeight + gap;
         MoveWindow(GetDlgItem(window, kGraphicsInfoId), graphicsX, y, graphicsWidth, infoHeight, TRUE);
         y += infoHeight + gap;
-        const int glassWidth = ScaleForDpi(window, 88);
-        const int dustWidth = ScaleForDpi(window, 112);
-        MoveWindow(GetDlgItem(window, kGraphicsPresetButtonId), graphicsX, y, graphicsWidth - glassWidth * 2 - dustWidth - gap * 3, compactHeight, TRUE);
-        MoveWindow(GetDlgItem(window, kGraphicsGlassButtonId), graphicsX + graphicsWidth - glassWidth * 2 - dustWidth - gap * 2, y, glassWidth, compactHeight, TRUE);
-        MoveWindow(GetDlgItem(window, kGraphicsMistButtonId), graphicsX + graphicsWidth - glassWidth - dustWidth - gap, y, glassWidth, compactHeight, TRUE);
-        MoveWindow(GetDlgItem(window, kGraphicsDustButtonId), graphicsX + graphicsWidth - dustWidth, y, dustWidth, compactHeight, TRUE);
+        MoveWindow(GetDlgItem(window, kGraphicsPresetButtonId), graphicsX, y, graphicsWidth, compactHeight, TRUE);
+        y += compactHeight + gap;
+        const int glassWidth = ScaleForDpi(window, 104);
+        const int dustWidth = ScaleForDpi(window, 144);
+        const int toggleRowWidth = glassWidth * 2 + dustWidth + gap * 2;
+        const int toggleX = graphicsX + graphicsWidth - toggleRowWidth;
+        MoveWindow(GetDlgItem(window, kGraphicsGlassButtonId), toggleX, y, glassWidth, compactHeight, TRUE);
+        MoveWindow(GetDlgItem(window, kGraphicsMistButtonId), toggleX + glassWidth + gap, y, glassWidth, compactHeight, TRUE);
+        MoveWindow(GetDlgItem(window, kGraphicsDustButtonId), toggleX + (glassWidth + gap) * 2, y, dustWidth, compactHeight, TRUE);
         y += compactHeight + gap;
         MoveWindow(GetDlgItem(window, kRenderScaleLabelId), graphicsX, y, graphicsWidth, labelHeight, TRUE);
         y += labelHeight;
@@ -8220,11 +8318,11 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
         MoveWindow(GetDlgItem(window, kGraphicsPreviewTelemetryId), previewX, ScaleForDpi(window, 66), previewWidth, ScaleForDpi(window, 120), TRUE);
         MoveWindow(GetDlgItem(window, kGraphicsPreviewGraphId), previewX, ScaleForDpi(window, 192), previewWidth, ScaleForDpi(window, 76), TRUE);
         const int previewHalf = (previewWidth - gap) / 2;
-        const int bottom = height - inset - compactHeight * 2 - gap;
+        const int bottom = height - inset - compactHeight * 3 - gap * 2;
         MoveWindow(GetDlgItem(window, kGraphicsPreviewPauseId), previewX, bottom, previewHalf, compactHeight, TRUE);
         MoveWindow(GetDlgItem(window, kGraphicsPreviewCameraId), previewX + previewHalf + gap, bottom, previewHalf, compactHeight, TRUE);
-        MoveWindow(GetDlgItem(window, kGraphicsPreviewMotionId), previewX, bottom + compactHeight + gap, previewHalf, compactHeight, TRUE);
-        MoveWindow(GetDlgItem(window, kGraphicsPreviewResetId), previewX + previewHalf + gap, bottom + compactHeight + gap, previewHalf, compactHeight, TRUE);
+        MoveWindow(GetDlgItem(window, kGraphicsPreviewMotionId), previewX, bottom + compactHeight + gap, previewWidth, compactHeight, TRUE);
+        MoveWindow(GetDlgItem(window, kGraphicsPreviewResetId), previewX, bottom + (compactHeight + gap) * 2, previewWidth, compactHeight, TRUE);
     }
 
     if (layoutContext != nullptr && layoutContext->rtLabVisible)
@@ -8326,7 +8424,7 @@ void ShowControlsHelp(HWND window)
                 "Q  Parry skeleton strike\n"
                 "Space + movement direction  Dodge (neutral: forward)\n"
                 "E  Raise / lower claimed lantern    Right mouse  Reserved\n"
-                "Controller left stick  Move and strafe\n"
+                "Controller left stick  Move and strafe; click L3 to toggle run\n"
                 "Controller right stick  Camera look\n"
                 "RT  Attack    LT  Parry    B / Circle  Dodge\n"
                 "A  Interact    Y  Raise / lower claimed lantern\n"
@@ -9535,8 +9633,10 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         if (item && item->CtlType == ODT_BUTTON)
         {
             const bool highContrast = NativeUiUsesHighContrast();
-            const HGDIOBJ previousFont = SelectObject(item->hDC,
-                reinterpret_cast<HGDIOBJ>(SendMessageA(item->hwndItem, WM_GETFONT, 0, 0)));
+            const HFONT controlFont = reinterpret_cast<HFONT>(
+                SendMessageA(item->hwndItem, WM_GETFONT, 0, 0));
+            const HGDIOBJ previousFont = controlFont != nullptr
+                ? SelectObject(item->hDC, controlFont) : nullptr;
             const bool disabled = (item->itemState & ODS_DISABLED) != 0u;
             const bool pressed = (item->itemState & ODS_SELECTED) != 0u;
             const bool focused = (item->itemState & ODS_FOCUS) != 0u;
@@ -9587,7 +9687,9 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                     }
             }
             RECT label = item->rcItem;
-            InflateRect(&label, -ScaleForDpi(hWnd, 6), -ScaleForDpi(hWnd, 3));
+            const bool graphicsMenuButton = IsGraphicsMenuButton(static_cast<int>(item->CtlID));
+            const int horizontalLabelInset = ScaleForDpi(hWnd, graphicsMenuButton ? 15 : 6);
+            InflateRect(&label, -horizontalLabelInset, -ScaleForDpi(hWnd, 3));
             if (pressed) OffsetRect(&label, 1, 1);
             SetTextColor(item->hDC, highContrast ?
                 GetSysColor(disabled ? COLOR_GRAYTEXT : (pressed ? COLOR_HIGHLIGHTTEXT : COLOR_BTNTEXT)) :
@@ -9595,7 +9697,18 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
             SetBkMode(item->hDC, TRANSPARENT);
             char text[192]{};
             GetWindowTextA(item->hwndItem, text, static_cast<int>(sizeof(text)));
+            HFONT fittedFont = graphicsMenuButton
+                ? CreateGraphicsButtonFitFont(hWnd, item->hDC, controlFont, text,
+                                              label.right - label.left)
+                : nullptr;
+            if (fittedFont != nullptr)
+                SelectObject(item->hDC, fittedFont);
             DrawTextA(item->hDC, text, -1, &label, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+            if (fittedFont != nullptr)
+            {
+                if (controlFont != nullptr) SelectObject(item->hDC, controlFont);
+                DeleteObject(fittedFont);
+            }
             if (focused && (item->itemState & ODS_NOFOCUSRECT) == 0u)
             {
                 RECT focus = item->rcItem;

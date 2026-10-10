@@ -294,9 +294,13 @@ bool ResolveRigAndAttachments(const SimulationSnapshot& source,
                   "active rope hand target must clear the solid cantilever beam by 40 mm");
         }
     }
-    Check(std::hypot(frame.rescue.ropeNodes[0].x - root[0],
-                     frame.rescue.ropeNodes[0].z - root[2]) >= 0.28f,
+    const float anchorRootDistance = std::hypot(frame.rescue.ropeNodes[0].x - root[0],
+                                                 frame.rescue.ropeNodes[0].z - root[2]);
+    Check(anchorRootDistance >= 0.28f,
           "the cantilever anchor and rope must clear the admitted body radius and margin");
+    if (frame.rescue.ropeHandsActive)
+        Check(root[2] >= frame.rescue.ropeNodes[0].z + 0.30f - 0.001f,
+              "the loaded player root must remain in front of the authored rope support plane");
 
     bool poseUpdated = false;
     if (!slot.PreparePose(ropePose, tick,
@@ -433,6 +437,12 @@ int main()
     const auto torchWorldFromItemAtStart = simulation.Snapshot().heldItems[0].worldFromItem;
     Check(simulation.Snapshot().heldItems[0].detached,
           "rescue setup must keep the extinguished torch out of hand ownership");
+    InputSnapshot deploymentInput;
+    deploymentInput.damageEnabled = false;
+    for (int tick = 0; tick < 420 && !simulation.Snapshot().rescue.ropeReady; ++tick)
+        simulation.StepFixed(deploymentInput);
+    Check(simulation.Snapshot().rescue.ropeReady,
+          "rig traversal test must wait for the physically deployed rope");
     InputSnapshot input;
     input.damageEnabled = false;
     input.commands.interact = 1u;

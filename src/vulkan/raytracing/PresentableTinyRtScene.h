@@ -891,6 +891,7 @@ private:
     bool developmentRescueJourney_ = false;
     Buffer rescueWorldUpdateScratch_;
     std::vector<std::array<float,3>> rescueWorldVertices_;
+    std::vector<std::uint32_t> rescueWorldSurfaceCodes_;
     std::size_t rescueRopeVertexOffset_ = 0;
     std::uint32_t rescueWorldPrimitiveCount_ = 0;
     std::uint32_t rescueWorldMaxVertex_ = 0;

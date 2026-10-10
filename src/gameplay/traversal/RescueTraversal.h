@@ -19,13 +19,15 @@ inline constexpr float kCopingTopWorldY = 2.23f;
 inline constexpr float kCopingClearanceSupportWorldY = 2.28f;
 inline constexpr float kCopingZMin = -13.76f;
 inline constexpr float kCopingZMax = -13.58f;
-// The anchor sits inside x[-34.9,-32.5], z[-16.6,-13.8]; the exterior
+// The rope attachment is on the cantilever's clear underside at y=3.678 m:
+// 42 mm below its 3.72 m lower face, preserving the admitted hand clearance.
+// Its x/z remain inside x[-34.9,-32.5], z[-16.6,-13.8]; the exterior
 // landing is one metre beyond the aperture. The approach rises to 2.28 over
 // the 2.23 coping, then settles at 2.05 on the exterior support.
 // Keep the fixed upper anchor 0.3 m in front of the rope-facing body's safe
 // endpoint, so its loaded span and anchor fitting do not run through the
 // player's torso. The lower contact endpoint remains at z=-15.2.
-inline constexpr Vec3 kAnchor{-33.7f, 3.8f, -15.5f};
+inline constexpr Vec3 kAnchor{-33.7f, 3.678f, -15.5f};
 inline constexpr Vec3 kLowerLanding{-33.7f, kLowerSupportWorldY, -15.2f};
 inline constexpr Vec3 kRimLanding{-33.7f, kUpperSupportWorldY, -15.2f};
 inline constexpr Vec3 kExteriorLanding{-33.7f, kUpperSupportWorldY, -12.8f};
@@ -38,16 +40,24 @@ inline constexpr std::size_t kRopeNodeCount = 12;
 inline constexpr float kRopeLength = 4.8f;
 inline constexpr float kRopeSegmentRestLength = kRopeLength / (kRopeNodeCount - 1);
 inline constexpr float kMaximumRopeTension = 400.0f;
+inline constexpr float kRescueApproachRadius = 0.75f;
+inline constexpr float kRescueMaximumApproachStep = 0.025f;
+
+enum class RopeDeploymentPhase : std::uint8_t {
+    Stowed, WaitingForOpening, WaitingToThrow, WarningBeforeThrow, Unfurling, Settling, Ready
+};
 
 enum class Phase : std::uint8_t {
-    LowerSafe,
-    AwaitingAscentReadiness,
-    Ascent,
-    PullUp,
-    UpperSafe,
-    AwaitingDescentReadiness,
-    Descent,
-    Landing,
+    LowerSafe = 0,
+    AwaitingAscentReadiness = 1,
+    Ascent = 2,
+    PullUp = 3,
+    UpperSafe = 4,
+    AwaitingDescentReadiness = 5,
+    Descent = 6,
+    Landing = 7,
+    ApproachAscent = 8,
+    ApproachDescent = 9,
 };
 
 enum class PromptReason : std::uint8_t {
@@ -64,6 +74,7 @@ struct Input {
     float contactPlaneWorldY{-100.0f};
     bool paused{};
     bool contactBlocked{};
+    bool openingReady{true};
 };
 
 struct RescueTraversalSnapshot {
@@ -79,10 +90,16 @@ struct RescueTraversalSnapshot {
     float ropeTension{};
     std::uint32_t claimCount{};
     std::uint32_t deploymentCount{};
+    RopeDeploymentPhase deploymentPhase{RopeDeploymentPhase::Stowed};
+    float deploymentSeconds{};
+    float deploymentWaitSecondsRemaining{};
+    float deploymentSwing{};
     bool equipmentStowed{};
     bool ropeHandsActive{};
     bool lanternClaimed{};
     bool ropeDeployed{};
+    bool ropeReady{};
+    bool ropeBumpedPlayer{};
     bool exteriorSide{};
     bool firstAscentCompleted{};
     bool sawAscent{};
@@ -119,6 +136,7 @@ public:
     const RescueTraversalSnapshot& Snapshot() const { return snapshot_; }
     bool IsActive() const;
     bool CanInteract() const;
+    bool CanInteractAt(Vec3 playerPosition, float supportWorldY) const;
 
 private:
     enum class PullUpStage : std::uint8_t { RegripLeft, RegripRight, Handoff, Lift, Cross, Settle };
@@ -126,12 +144,17 @@ private:
 
     void BeginRequest(bool ascent);
     void AbortRequest();
+    void AbortApproach();
     void RollbackToSafeEndpoint(bool upper);
     void ResolveRope(float contactPlaneWorldY);
     void PublishHands();
     void RefreshPrompt();
     void AdvanceMotion();
     void AdvanceAlternatingGrip(bool towardAnchor);
+    void AdvanceDeployment(const Input& input);
+    void BeginRopeThrow();
+    void UpdateDeploymentReadiness(float contactPlaneWorldY);
+    void ResolveSafePlayerContact();
 
     RescueTraversalSnapshot snapshot_{};
     std::array<Vec3, kRopeNodeCount> previousRopeNodes_{};
@@ -140,10 +163,14 @@ private:
     PullUpStage pullUpStage_{PullUpStage::Lift};
     DescentStage descentStage_{DescentStage::Lift};
     std::uint16_t motorTicks_{};
+    std::uint16_t deploymentSettleTicks_{};
     std::uint16_t gripAdvanceIntervalTicks_{};
     float gripAdvanceStartIndex_{};
     float gripAdvanceTargetIndex_{};
+    float deploymentDelaySeconds_{};
+    float deploymentPaidOutLength_{};
     bool nextGripIsLeft_{true};
+    bool pullUpAlignmentActive_{};
     bool readinessReceived_{};
     bool readinessReady_{};
     bool promptBlocked_{};

@@ -9,6 +9,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <memory>
 #include <sstream>
 #include <string>
 #include <string_view>
@@ -330,6 +331,33 @@ int main()
     Require(pitchedView.pitchRadians <= 0.28f && pitchedView.pitchRadians > 0.27f,
             "right-stick pitch must advance and retain the authored clamp");
 
+    // Owner's read-only paused L3 capture: button 14, mask 0x2000.
+    Require(horde::platform::windows::LegacyRunTogglePressed(0x2000u, 0u, capturedBackbone) &&
+            !horde::platform::windows::LegacyRunTogglePressed(0x2000u, 0x2000u, capturedBackbone) &&
+            !horde::platform::windows::LegacyRunTogglePressed(0u, 0x2000u, capturedBackbone) &&
+            !horde::platform::windows::LegacyRunTogglePressed(0x0800u, 0u, capturedBackbone) &&
+            !horde::platform::windows::LegacyRunTogglePressed(0x2000u, 0u, LegacyControllerIdentity{}),
+            "captured L3 toggles once; hold/release/menu/unknown layouts cannot toggle run");
+    Require(horde::platform::windows::XInputRunTogglePressed(0x0040u, 0u) &&
+            !horde::platform::windows::XInputRunTogglePressed(0x0040u, 0x0040u) &&
+            !horde::platform::windows::XInputRunTogglePressed(0x0080u, 0u),
+            "XInput L3 uses a single edge and never maps right-stick click to run");
+    const std::string windowsSource = ReadWindowsSource();
+    const auto legacyAcquisition = windowsSource.find("if (context.legacyJoystickId != joystick ||");
+    const auto legacyAcquisitionEnd = windowsSource.find("context.legacyJoystickId = joystick;", legacyAcquisition);
+    const auto xinputAcquisition = windowsSource.find("if (context.xInputUserIndex != xinputUser)");
+    const auto xinputAcquisitionEnd = windowsSource.find("context.xInputUserIndex = xinputUser;", xinputAcquisition);
+    Require(legacyAcquisition != std::string::npos && legacyAcquisitionEnd != std::string::npos &&
+            xinputAcquisition != std::string::npos && xinputAcquisitionEnd != std::string::npos,
+            "both actual native device-acquisition paths must remain inspectable");
+    Require(windowsSource.substr(legacyAcquisition, legacyAcquisitionEnd - legacyAcquisition).find(
+                "context.previousLegacyControllerButtons = legacy.dwButtons;") != std::string::npos &&
+            windowsSource.substr(xinputAcquisition, xinputAcquisitionEnd - xinputAcquisition).find(
+                "context.previousControllerButtons = state.Gamepad.wButtons;") != std::string::npos &&
+            windowsSource.substr(xinputAcquisition, xinputAcquisitionEnd - xinputAcquisition).find(
+                "SeedXInputTriggerLatch(") != std::string::npos,
+            "native acquisition must seed held buttons/triggers before mapping gameplay edges");
+
     // Exact Backbone menu topology: D-pad is a WinMM POV hat and the standard
     // A/B/Menu fields occupy buttons 1/2/12. All are edge-triggered.
     const auto dpadDown = MapLegacyControllerMenuEdges(
@@ -376,7 +404,6 @@ int main()
                 0x0800u, 0x0800u, 65535u, 65535u, capturedBackbone).Any(),
             "held menu/start must not rapidly pause and resume");
 
-    const std::string windowsSource = ReadWindowsSource();
     Require(windowsSource.find("ControllerFocusOutlineSubclass") != std::string::npos &&
             windowsSource.find("SetWindowSubclass") != std::string::npos &&
             windowsSource.find("WM_SETFOCUS") != std::string::npos &&
@@ -538,6 +565,30 @@ int main()
     const ControllerActionEdges leftTrigger = UpdateXInputTriggerEdges(255u, 0u, triggerLatch);
     Require(!leftTrigger.attackPressed && leftTrigger.parryPressed,
             "XInput LT threshold crossing must parry once");
+
+    // Deliver the measured physical L3 edge through the shared fixed-step
+    // command path, including held/reseed and lifecycle intent cancellation.
+    auto runSimulation=std::make_unique<horde::gameplay::simulation::GameSimulation>();
+    horde::gameplay::simulation::InputSnapshot runInput;
+    runInput.damageEnabled=false;runInput.moveForward=1;
+    std::uint32_t previousL3=0;
+    for(int tick=0;tick<12;++tick) {
+        if(horde::platform::windows::LegacyRunTogglePressed(0x2000u,previousL3,capturedBackbone))
+            ++runInput.commands.runToggle;
+        previousL3=0x2000u;runSimulation->StepFixed(runInput);
+    }
+    Require(runInput.commands.runToggle==1 && runSimulation->Snapshot().runToggleActive &&
+            runSimulation->Snapshot().runActive,"L3 held over twelve ticks creates one running intent");
+    runInput.paused=true;runSimulation->StepFixed(runInput);
+    Require(!runSimulation->Snapshot().runToggleActive&&!runSimulation->Snapshot().runActive,
+            "pause cancels controller run and keeps gameplay frozen");
+    runInput.paused=false;runSimulation->StepFixed(runInput);
+    Require(!runSimulation->Snapshot().runToggleActive,
+            "same held/reseed L3 counter cannot restore running after pause");
+    runInput.commands.runToggle=2;runSimulation->StepFixed(runInput);
+    Require(runSimulation->Snapshot().runToggleActive,"a fresh deliberate L3 edge can run again");
+    ++runInput.commands.clearRunIntent;runSimulation->StepFixed(runInput);
+    Require(!runSimulation->Snapshot().runToggleActive,"focus/traversal intent cancellation consumes the existing run toggle");
 
     std::cout << "Desktop controller input tests passed\n";
     return EXIT_SUCCESS;

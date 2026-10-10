@@ -42,7 +42,7 @@ void GameSimulation::StepRescueJourney(bool paused) {
     const bool wasActive=rescueTraversal_.IsActive();
     if(!paused) rescueOpeningSeconds_=std::min(1.0f,rescueOpeningSeconds_+1.0f/60.0f);
     rescueTraversal_.Step({{playerX_,playerSupport_.worldY,playerZ_},playerSupport_.worldY,
-        kLowerSupportWorldY,paused,false});
+        kLowerSupportWorldY,paused,false,rescueOpeningSeconds_>=1.0f});
     if(!paused && chestRewardSequence_.Snapshot().phase==interactions::ChestRewardPhase::LanternClaimed) {
         // Revalidate and consume the one contextual intent before movement and
         // combat, so simultaneous edges cannot act before traversal ownership.
@@ -76,10 +76,13 @@ void GameSimulation::StepRescueJourney(bool paused) {
 }
 bool GameSimulation::TryRescueInteraction() {
     const auto& s=rescueTraversal_.Snapshot();
+    const Vec3 player{playerX_,playerSupport_.worldY,playerZ_};
     if(rescueTraversal_.IsActive() || !AtRopeEndpoint(playerX_,playerZ_,s.exteriorSide) ||
-       rescueOpeningSeconds_<1 || !rescueTraversal_.CanInteract()) return false;
+       !CanApproachRopeEndpoint(player,playerSupport_.worldY,s.exteriorSide) ||
+       rescueOpeningSeconds_<1 || !rescueTraversal_.CanInteractAt(player,playerSupport_.worldY)) return false;
     const auto zone=s.exteriorSide?WorldZoneId::Dungeon:WorldZoneId::TombExterior;
     const bool ready=worldRoute_.readiness[static_cast<std::size_t>(zone)]==ZoneReadiness::Ready;
+    if(!ready) return false;
     if(!rescueTraversal_.Request()) return false;
     const auto generation=rescueTraversal_.Snapshot().generation;
     rescueTraversal_.PublishReadiness(generation,ready);
@@ -144,9 +147,13 @@ void GameSimulation::PublishRescueSnapshot() {
         snapshot_.rescuePrompt=RescuePrompt::Traversing;
         snapshot_.playerAnimation.swordHandGripBlend=0;
         snapshot_.playerAnimation.swordStowBlend=1;
-    } else if(snapshot_.rescue.deploymentCount && AtRopeEndpoint(playerX_,playerZ_,snapshot_.rescue.exteriorSide)) {
+    } else if(snapshot_.rescue.deploymentCount && AtRopeEndpoint(playerX_,playerZ_,snapshot_.rescue.exteriorSide) &&
+              CanApproachRopeEndpoint({playerX_,playerSupport_.worldY,playerZ_},playerSupport_.worldY,
+                                      snapshot_.rescue.exteriorSide)) {
         const auto zone=snapshot_.rescue.exteriorSide?WorldZoneId::Dungeon:WorldZoneId::TombExterior;
-        snapshot_.rescuePrompt=rescueOpeningSeconds_>=1 && worldRoute_.readiness[static_cast<std::size_t>(zone)]==ZoneReadiness::Ready
+        snapshot_.rescuePrompt=rescueOpeningSeconds_>=1 &&
+            rescueTraversal_.CanInteractAt({playerX_,playerSupport_.worldY,playerZ_},playerSupport_.worldY) &&
+            worldRoute_.readiness[static_cast<std::size_t>(zone)]==ZoneReadiness::Ready
             ?(snapshot_.rescue.exteriorSide?RescuePrompt::Descend:RescuePrompt::Climb):RescuePrompt::Preparing;
     }
 }

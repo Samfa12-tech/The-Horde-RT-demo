@@ -723,6 +723,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     developmentRescueJourney_=std::exchange(other.developmentRescueJourney_,false);
     rescueWorldUpdateScratch_=std::exchange(other.rescueWorldUpdateScratch_,Buffer{});
     rescueWorldVertices_=std::move(other.rescueWorldVertices_);
+    rescueWorldSurfaceCodes_=std::move(other.rescueWorldSurfaceCodes_);
     rescueRopeVertexOffset_=std::exchange(other.rescueRopeVertexOffset_,0);
     rescueWorldPrimitiveCount_=std::exchange(other.rescueWorldPrimitiveCount_,0);
     rescueWorldMaxVertex_=std::exchange(other.rescueWorldMaxVertex_,0);
@@ -1042,7 +1043,8 @@ horde::gameplay::simulation::ZoneReadiness PresentableTinyRtScene::WorldZoneRead
         indexBuffer_.memory==VK_NULL_HANDLE || blas_.handle==VK_NULL_HANDLE || tlas_.handle==VK_NULL_HANDLE)
         return ZoneReadiness::Preparing;
     if(developmentRescueJourney_ && (rescueWorldUpdateScratch_.buffer==VK_NULL_HANDLE ||
-        rescueWorldVertices_.empty() || rescueWorldPrimitiveCount_==0)) return ZoneReadiness::Preparing;
+        rescueWorldVertices_.empty() || rescueWorldPrimitiveCount_==0 ||
+        rescueWorldSurfaceCodes_.size()!=rescueWorldPrimitiveCount_)) return ZoneReadiness::Preparing;
     return ZoneReadiness::Ready;
 }
 void PresentableTinyRtScene::Destroy()
@@ -1087,6 +1089,7 @@ void PresentableTinyRtScene::Destroy()
     DestroyBuffer(tlasUpdateScratch_);
     DestroyBuffer(rescueWorldUpdateScratch_);
     rescueWorldVertices_.clear();
+    rescueWorldSurfaceCodes_.clear();
     characterSlot_.DestroyGpuResources(gpuResources_);
     DestroyBuffer(skinnedPlayerBlasUpdateScratch_);
     DestroyBuffer(viewmodelBlasUpdateScratch_);
@@ -3761,8 +3764,10 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
             auto p=rope[i],q=rope[i+1],r=rope[i+2];
             // Undeployed full topology remains below the closed lower floor.
             p[1]-=8;q[1]-=8;r[1]-=8;
-            addWorldTriangle(Vertex{{p[0],p[1],p[2]}},Vertex{{q[0],q[1],q[2]}},Vertex{{r[0],r[1],r[2]}},SurfaceDryStone,SurfaceForward);
+            addWorldTriangle(Vertex{{p[0],p[1],p[2]}},Vertex{{q[0],q[1],q[2]}},Vertex{{r[0],r[1],r[2]}},SurfaceDryStone,
+                static_cast<SurfaceNormal>(horde::scene::RescueRopeTriangleNormalCode(p,q,r)));
         }
+        rescueWorldSurfaceCodes_=worldSurfaceCodes;
         rescueWorldVertices_.clear();
         for(const auto& vertex:vertices) rescueWorldVertices_.push_back({vertex.position[0],vertex.position[1],vertex.position[2]});
     }
@@ -6975,6 +6980,19 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         }
         if(!WriteBuffer(vertexBuffer_,rescueWorldVertices_.data(),rescueWorldVertices_.size()*sizeof(rescueWorldVertices_[0]),
             "rescue world vertex update",diagnostic,observation)) return false;
+        if(rescueWorldSurfaceCodes_.size()!=rescueWorldPrimitiveCount_ ||
+           rescueWorldSurfaceCodes_.size()*sizeof(rescueWorldSurfaceCodes_[0])!=worldSurfaceBuffer_.size ||
+           rope.size()/3>rescueWorldPrimitiveCount_) {
+            diagnostic="Rescue rope surface metadata no longer matches admitted primitives.";return false;
+        }
+        const auto first=rescueWorldPrimitiveCount_-rope.size()/3;
+        for(std::size_t i=0;i<rope.size();i+=3)
+            rescueWorldSurfaceCodes_[first+i/3]=(rescueWorldSurfaceCodes_[first+i/3]&~0xff00u) |
+                (horde::scene::RescueRopeTriangleNormalCode(rope[i],rope[i+1],rope[i+2])<<8u);
+        // Positions and their matching facet metadata share the existing host
+        // write barrier/fence before BLAS update, TLAS build and ray traversal.
+        if(!WriteBuffer(worldSurfaceBuffer_,rescueWorldSurfaceCodes_.data(),worldSurfaceBuffer_.size,
+            "rescue rope surface update",diagnostic,observation)) return false;
     }
     VkMemoryBarrier hostWriteBarrier{VK_STRUCTURE_TYPE_MEMORY_BARRIER};
     hostWriteBarrier.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT;

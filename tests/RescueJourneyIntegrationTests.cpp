@@ -42,10 +42,21 @@ int main() {
  std::cout<<"claim-site position="<<claimSim.Snapshot().playerX<<","<<claimSim.Snapshot().playerZ
           <<" prompt="<<static_cast<int>(claimSim.Snapshot().chestPrompt)<<" phase="<<static_cast<int>(claimSim.Snapshot().chestReward.phase)<<'\n';
  check(claimSim.Snapshot().chestReward.phase==interactions::ChestRewardPhase::LanternClaimed &&
-       claimSim.Snapshot().rescue.claimCount==1 && claimSim.Snapshot().rescue.deploymentCount==1,
-       "actual lantern interaction did not deploy exactly one owned rope");
+       claimSim.Snapshot().rescue.claimCount==1 && claimSim.Snapshot().rescue.deploymentCount==1 &&
+       claimSim.Snapshot().rescue.deploymentPhase==RopeDeploymentPhase::WaitingForOpening &&
+       !claimSim.Snapshot().rescue.ropeDeployed,
+       "actual lantern interaction did not begin one opening-gated owned rope deployment");
  ++claimInput.commands.interact;claimSim.StepFixed(claimInput);
  check(claimSim.Snapshot().rescue.deploymentCount==1,"repeated claim intent deployed twice");
+ bool sawThrowWarning=false;
+ for(int tick=0;tick<420&&!sim.Snapshot().rescue.ropeReady;++tick) {
+  sim.StepFixed(input);
+   if(sim.Snapshot().rescue.deploymentPhase==RopeDeploymentPhase::WarningBeforeThrow)
+    sawThrowWarning=true;
+ }
+ check(sawThrowWarning,"imported claim skipped the distinct pre-throw warning interval");
+ check(sim.Snapshot().rescue.ropeReady && sim.Snapshot().rescue.deploymentPhase==RopeDeploymentPhase::Ready,
+       "imported owned rope never completed its opening-gated physical deployment");
  input.commands.interact=1;sim.StepFixed(input);
  check(!sim.Snapshot().rescue.equipmentStowed && sim.Snapshot().playerSupportWorldY==kLowerSupportWorldY,"unready destination committed");
  horde::vulkan::raytracing::PresentableTinyRtScene notReady;
@@ -145,12 +156,16 @@ int main() {
  sim.InvalidateWorldZoneReadiness();
  check(!sim.Snapshot().rescue.exteriorSide && sim.Snapshot().playerSupportWorldY==kLowerSupportWorldY,"interrupted ascent did not return lower");
  check(!sim.PublishWorldZoneReadiness(old,ZoneReadiness::Ready),"late reconstruction callback admitted");
- sim.RetryEncounter();check(sim.Snapshot().rescue.claimCount==1,"logical retry lost ownership");
+ const auto paidRopeBeforeRetry=sim.Snapshot().rescue.ropeNodes;
+ sim.RetryEncounter();check(sim.Snapshot().rescue.claimCount==1 && sim.Snapshot().rescue.ropeReady &&
+       sim.Snapshot().rescue.ropeNodes==paidRopeBeforeRetry,
+       "logical retry lost or replayed the already paid-out rope deployment");
  sim.ResetRoute();check(!sim.Snapshot().rescue.ropeDeployed && sim.Snapshot().rescue.claimCount==0,"new route kept stale deployment");
  auto resident=horde::scene::PrepareDevelopmentWorldGeometry(false),staged=horde::scene::PrepareDevelopmentWorldGeometry(true);
  horde::scene::AppendRescueJourneyGeometry(resident);horde::scene::AppendRescueJourneyGeometry(staged);
  check(resident.valid&&staged.valid&&resident.triangles.size()==staged.triangles.size(),"combined geometry failed admission");
- check(resident.triangles.size()==934+horde::scene::kOutdoorEffectMarkerTriangleCount,
+ check(resident.triangles.size()==934+horde::scene::kOutdoorEffectMarkerTriangleCount+
+       horde::scene::kRescueAnchorCollarTriangleCount,
        "region markers were not included as separately counted original geometry");
  for(const auto& marker:horde::scene::kOutdoorEffectRegionMarkers)
   check(!marker.effectImplemented && std::string_view(marker.label).find("NOT IMPLEMENTED")!=std::string_view::npos,

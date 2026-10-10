@@ -1,5 +1,7 @@
 #include "gameplay/traversal/RescueTraversal.h"
+#include "gameplay/traversal/DevelopmentRescueJourney.h"
 #include "scene/RescueBlockoutGeometry.h"
+#include "scene/RescueJourneyGeometry.h"
 
 #include <algorithm>
 #include <cmath>
@@ -30,6 +32,50 @@ int main()
                 "rope hand target intersected the solid cantilever beam");
         }
     };
+    const auto checkRopeClearBlockout = [&](const RescueTraversalSnapshot& snapshot) {
+        for(std::size_t nodeIndex=1;nodeIndex<kRopeNodeCount;++nodeIndex) {
+            const auto& node=snapshot.ropeNodes[nodeIndex];
+            for(const auto& box:horde::scene::kRescueBlockoutBoxes) {
+                const bool overlaps=node.x>=box.minimum[0]-0.034f&&node.x<=box.maximum[0]+0.034f&&
+                    node.y>=box.minimum[1]-0.034f&&node.y<=box.maximum[1]+0.034f&&
+                    node.z>=box.minimum[2]-0.034f&&node.z<=box.maximum[2]+0.034f;
+                check(!overlaps,"rope particle crossed solid shaft/coping/cantilever blockout");
+            }
+        }
+    };
+    const auto checkRopeClearPlayer = [&](const RescueTraversalSnapshot& snapshot) {
+        constexpr float capsuleBottom = 0.10f;
+        constexpr float capsuleTop = 1.68f;
+        constexpr float combinedRadius = 0.22f + 0.035f;
+        for (std::size_t nodeIndex = 1u; nodeIndex < kRopeNodeCount; ++nodeIndex) {
+            const auto& node = snapshot.ropeNodes[nodeIndex];
+            if (node.y < snapshot.supportWorldY + capsuleBottom ||
+                node.y > snapshot.supportWorldY + capsuleTop) continue;
+            const float radial = std::hypot(node.x - snapshot.playerPosition.x,
+                                            node.z - snapshot.playerPosition.z);
+            check(radial >= combinedRadius - 0.001f,
+                "loaded rope particle crossed the player capsule contact boundary");
+        }
+    };
+    const auto ropeRenderGeometryValid = [&](const RescueTraversalSnapshot& snapshot) {
+        using namespace horde::scene;
+        constexpr std::array<RescueRopePoint,6> cardinal{{
+            {0,1,0},{0,-1,0},{1,0,0},{-1,0,0},{0,0,1},{0,0,-1}}};
+        const auto vertices=RescueRopeTriangleVertices(snapshot);
+        if(vertices.size()!=528u) return false;
+        for(std::size_t i=0;i<vertices.size();i+=3) {
+            const auto normal=RopeCross(RopeSubtract(vertices[i+1],vertices[i]),
+                                        RopeSubtract(vertices[i+2],vertices[i]));
+            const float area=std::sqrt(RopeDot(normal,normal));
+            const auto code=RescueRopeTriangleNormalCode(vertices[i],vertices[i+1],vertices[i+2]);
+            if(!std::isfinite(area)||area<=1.0e-7f||code>=cardinal.size()||
+               RopeDot(normal,cardinal[code])<area*.57f) return false;
+            for(std::size_t vertex=i;vertex<i+3;++vertex)
+                for(const float component:vertices[vertex])
+                    if(!std::isfinite(component)) return false;
+        }
+        return true;
+    };
 
     RescueTraversal traversal;
     auto state = traversal.Snapshot();
@@ -41,14 +87,233 @@ int main()
         traversal.DeployOwned() && !traversal.DeployOwned(),
         "lantern claim and owned rope deployment must each happen exactly once");
     state = traversal.Snapshot();
-    check(state.lanternClaimed && state.ropeDeployed && state.claimCount == 1 && state.deploymentCount == 1 &&
-        traversal.CanInteract(), "claim did not deploy the anchored rope before interaction");
-    check(near(kAnchor.x, -33.7f) && near(kAnchor.y, 3.8f) && near(kAnchor.z, -15.5f),
-        "rope anchor must match the elevated cantilever and remain clear of the safe player torso");
+    check(state.lanternClaimed && !state.ropeDeployed && !state.ropeReady && state.claimCount == 1 &&
+        state.deploymentCount == 1 && state.deploymentPhase==RopeDeploymentPhase::WaitingForOpening &&
+        !traversal.CanInteract(), "claim did not begin the gated rope deployment before interaction");
+    const auto& cantilever = horde::scene::kRescueBlockoutBoxes[11];
+    check(near(kAnchor.x, -33.7f) && near(kAnchor.y, 3.678f) && near(kAnchor.z, -15.5f) &&
+          kAnchor.y + 0.035f + 0.002f <= cantilever.minimum[1] + 0.0001f,
+        "rope anchor must attach at the cantilever underside with rope-radius clearance");
     check(near(kUpperSupportWorldY, 2.05f) && near(kLowerSupportWorldY, -0.95f),
         "safe support heights changed");
     check(near(kExteriorLanding.z, -12.8f), "exterior landing must clear the rim");
+    check(CanApproachRopeEndpoint({kLowerLanding.x+0.30f,kLowerSupportWorldY,kLowerLanding.z+0.20f},
+                                  kLowerSupportWorldY,false),
+        "safe support-aligned lower approach was rejected");
+    check(!CanApproachRopeEndpoint({kLowerLanding.x,kLowerSupportWorldY+.25f,kLowerLanding.z},
+                                   kLowerSupportWorldY+.25f,false),
+        "lower approach accepted an unsupported height");
+    check(!CanApproachRopeEndpoint({kExteriorLanding.x, kUpperSupportWorldY, -13.55f},
+                                   kUpperSupportWorldY,true),
+        "upper approach offered a prompt through the front coping");
+    check(CanApproachRopeEndpoint({kExteriorLanding.x,kUpperSupportWorldY,-12.90f},
+                                  kUpperSupportWorldY,true),
+        "safe upper landing approach was rejected");
     check(state.bodyYawRadians == 0.0f, "rope climb body orientation must not depend on camera yaw");
+
+    RescueTraversal pendingWarning;
+    pendingWarning.NotifyLanternClaimed();
+    pendingWarning.DeployOwned();
+    Input pendingInput;
+    pendingInput.playerPosition=kLowerLanding;
+    pendingInput.supportWorldY=kLowerSupportWorldY;
+    pendingInput.contactPlaneWorldY=kLowerSupportWorldY;
+    for(int tick=0;tick<60+39;++tick) check(pendingWarning.Step(pendingInput),
+        "pending warning setup fixed tick rejected");
+    const auto warningGeneration=pendingWarning.Snapshot().generation;
+    const auto warningRemaining=pendingWarning.Snapshot().deploymentWaitSecondsRemaining;
+    check(pendingWarning.Snapshot().deploymentPhase==RopeDeploymentPhase::WarningBeforeThrow,
+        "pending deployment did not reach its warning phase for reconstruction coverage");
+    pendingWarning.RecoverForReconstruction();
+    check(pendingWarning.Snapshot().generation>warningGeneration &&
+          pendingWarning.Snapshot().deploymentPhase==RopeDeploymentPhase::WarningBeforeThrow &&
+          pendingWarning.Snapshot().deploymentWaitSecondsRemaining==warningRemaining &&
+          !pendingWarning.Snapshot().ropeDeployed,
+        "reconstruction replayed or discarded a pending warning instead of invalidating stale state");
+    pendingWarning.Reset(kLowerLanding,kLowerSupportWorldY);
+    check(pendingWarning.Snapshot().deploymentPhase==RopeDeploymentPhase::Stowed &&
+          pendingWarning.Snapshot().deploymentCount==0 && !pendingWarning.Snapshot().ropeDeployed,
+        "full reset failed to cancel an in-progress deployment warning");
+
+    Input deploymentInput;
+    deploymentInput.playerPosition=kLowerLanding;
+    deploymentInput.supportWorldY=kLowerSupportWorldY;
+    deploymentInput.contactPlaneWorldY=kLowerSupportWorldY;
+    deploymentInput.openingReady=false;
+    for(int tick=0;tick<90;++tick) check(traversal.Step(deploymentInput),"waiting deployment tick rejected");
+    check(!traversal.Snapshot().ropeDeployed && !traversal.Snapshot().ropeReady,
+        "rope appeared before the roof opening completed");
+    const auto deploymentBeforePause=traversal.Snapshot();
+    deploymentInput.paused=true;
+    deploymentInput.openingReady=true;
+    check(traversal.Step(deploymentInput) &&
+          traversal.Snapshot().deploymentPhase==deploymentBeforePause.deploymentPhase &&
+          traversal.Snapshot().deploymentSeconds==deploymentBeforePause.deploymentSeconds &&
+          traversal.Snapshot().ropeNodes==deploymentBeforePause.ropeNodes,
+        "pause advanced the pending deployment or moved hidden rope particles");
+    deploymentInput.paused=false;
+    deploymentInput.openingReady=true;
+    check(traversal.Step(deploymentInput),"opening-ready deployment tick rejected");
+    check(traversal.Snapshot().deploymentPhase==RopeDeploymentPhase::WaitingToThrow &&
+          !traversal.Snapshot().ropeDeployed &&
+          near(traversal.Snapshot().deploymentWaitSecondsRemaining,.65f,.002f),
+        "deployment did not wait until the opening finished before its post-opening pause");
+    const float waitBeforeTick=traversal.Snapshot().deploymentWaitSecondsRemaining;
+    deploymentInput.paused=true;
+    check(traversal.Step(deploymentInput) &&
+          traversal.Snapshot().deploymentWaitSecondsRemaining==waitBeforeTick &&
+          traversal.Snapshot().deploymentPhase==RopeDeploymentPhase::WaitingToThrow,
+        "pause advanced the post-opening pause countdown");
+    deploymentInput.paused=false;
+    check(traversal.Step(deploymentInput) &&
+          traversal.Snapshot().deploymentWaitSecondsRemaining<waitBeforeTick,
+        "post-opening pause countdown did not decrease at a fixed step");
+    for(int tick=0;tick<80&&traversal.Snapshot().deploymentPhase==RopeDeploymentPhase::WaitingToThrow;++tick)
+        check(traversal.Step(deploymentInput),"post-opening pause tick rejected");
+    check(traversal.Snapshot().deploymentPhase==RopeDeploymentPhase::WarningBeforeThrow &&
+          !traversal.Snapshot().ropeDeployed &&
+          near(traversal.Snapshot().deploymentWaitSecondsRemaining,2.0f,.002f),
+        "reserved pre-throw interval did not precede the physical throw");
+    const float warningBeforePause=traversal.Snapshot().deploymentWaitSecondsRemaining;
+    deploymentInput.paused=true;
+    check(traversal.Step(deploymentInput) &&
+          traversal.Snapshot().deploymentPhase==RopeDeploymentPhase::WarningBeforeThrow &&
+          traversal.Snapshot().deploymentWaitSecondsRemaining==warningBeforePause &&
+          !traversal.Snapshot().ropeDeployed,
+        "pause advanced the reserved pre-throw interval or released the rope");
+    deploymentInput.paused=false;
+    check(traversal.Step(deploymentInput) &&
+          traversal.Snapshot().deploymentWaitSecondsRemaining<warningBeforePause,
+        "reserved pre-throw countdown did not expose its fixed-step progress");
+    for(int tick=0;tick<130&&!traversal.Snapshot().ropeDeployed;++tick)
+        check(traversal.Step(deploymentInput),"reserved pre-throw interval tick rejected");
+    const auto thrownPose=traversal.Snapshot();
+    check(thrownPose.ropeDeployed && !thrownPose.ropeReady &&
+          thrownPose.deploymentPhase==RopeDeploymentPhase::Unfurling,
+        "rope did not enter a visible, non-interactable physical unfurl phase");
+    check(ropeRenderGeometryValid(thrownPose),
+        "actual compact-coil rope frame produced invalid fixed-topology render triangles");
+    const auto throwNodes=thrownPose.ropeNodes;
+    bool unfurlRenderFramesValid=true;
+    for(int tick=0;tick<12;++tick) {
+        check(traversal.Step(deploymentInput),"rope unfurl tick rejected");
+        unfurlRenderFramesValid=unfurlRenderFramesValid&&ropeRenderGeometryValid(traversal.Snapshot());
+    }
+    check(unfurlRenderFramesValid,"actual early-unfurl rope frame produced invalid render geometry");
+    checkRopeClearBlockout(traversal.Snapshot());
+    bool nodeMotion=false;
+    for(std::size_t i=1;i<kRopeNodeCount;++i)
+        nodeMotion=nodeMotion||std::hypot(traversal.Snapshot().ropeNodes[i].x-throwNodes[i].x,
+            traversal.Snapshot().ropeNodes[i].y-throwNodes[i].y,
+            traversal.Snapshot().ropeNodes[i].z-throwNodes[i].z)>.03f;
+    check(nodeMotion && traversal.Snapshot().deploymentSwing>.07f,
+        "thrown rope had no solved particle payout or swing");
+    bool settlingRenderFramesValid=true;
+    for(int tick=0;tick<360&&!traversal.Snapshot().ropeReady;++tick) {
+        check(traversal.Step(deploymentInput),"rope settling tick rejected");
+        settlingRenderFramesValid=settlingRenderFramesValid&&ropeRenderGeometryValid(traversal.Snapshot());
+    }
+    check(settlingRenderFramesValid,"actual paid-out rope trajectory produced invalid render geometry");
+    check(traversal.Snapshot().ropeReady &&
+          traversal.Snapshot().deploymentPhase==RopeDeploymentPhase::Ready,
+        "rope became interaction-ready before it physically paid out and settled on the lower support");
+    float settledLength=0.0f;
+    for(std::size_t i=0;i+1<kRopeNodeCount;++i)
+        settledLength+=std::hypot(traversal.Snapshot().ropeNodes[i+1].x-traversal.Snapshot().ropeNodes[i].x,
+                                  traversal.Snapshot().ropeNodes[i+1].y-traversal.Snapshot().ropeNodes[i].y,
+                                  traversal.Snapshot().ropeNodes[i+1].z-traversal.Snapshot().ropeNodes[i].z);
+    check(settledLength>=kRopeLength*.94f &&
+          traversal.Snapshot().ropeNodes.back().y<=kLowerSupportWorldY+.20f,
+        "ready rope was not physically paid out to lower support");
+    Input bumpInput=deploymentInput;
+    std::size_t bumpNodeIndex=1u;
+    float bumpHeightError=std::numeric_limits<float>::infinity();
+    for(std::size_t i=1;i<kRopeNodeCount;++i) {
+        const auto& node=traversal.Snapshot().ropeNodes[i];
+        const float targetHeight=kLowerSupportWorldY+0.45f;
+        if(node.y<kLowerSupportWorldY+0.10f||node.y>kLowerSupportWorldY+1.68f) continue;
+        const float error=std::abs(node.y-targetHeight);
+        if(error<bumpHeightError) {bumpHeightError=error;bumpNodeIndex=i;}
+    }
+    const auto& bumpNode=traversal.Snapshot().ropeNodes[bumpNodeIndex];
+    bumpInput.playerPosition={bumpNode.x,kLowerSupportWorldY,bumpNode.z};
+    const auto ropeBeforeBump=traversal.Snapshot().ropeNodes;
+    check(traversal.Step(bumpInput) && traversal.Snapshot().ropeBumpedPlayer,
+        "safe player capsule did not register contact with the deployed rope");
+    bool ropeRespondedToBump=false;
+    for(std::size_t i=1;i<kRopeNodeCount;++i)
+        ropeRespondedToBump=ropeRespondedToBump||
+            std::hypot(traversal.Snapshot().ropeNodes[i].x-ropeBeforeBump[i].x,
+                       traversal.Snapshot().ropeNodes[i].z-ropeBeforeBump[i].z)>.01f;
+    check(ropeRespondedToBump,"player contact did not push the solved rope particles");
+    check(traversal.Step(deploymentInput),"restoring lower safe pose after rope bump failed");
+
+    const auto finishDeployment=[&](RescueTraversal& instance) {
+        Input deploy;deploy.playerPosition=kLowerLanding;deploy.supportWorldY=kLowerSupportWorldY;
+        deploy.contactPlaneWorldY=kLowerSupportWorldY;deploy.openingReady=true;
+        for(int tick=0;tick<360&&!instance.Snapshot().ropeReady;++tick) instance.Step(deploy);
+        return instance.Snapshot().ropeReady;
+    };
+
+    // A contextual interaction can be reached from a real, support-aligned
+    // approach position. It must start a bounded motor instead of snapping to
+    // the endpoint, while wrong-height and outside-radius poses remain gated.
+    RescueTraversal offsetTraversal;
+    check(offsetTraversal.NotifyLanternClaimed() && offsetTraversal.DeployOwned(),
+        "offset approach fixture did not acquire its one owned rope");
+    check(finishDeployment(offsetTraversal),"offset approach fixture rope never became ready");
+    Input approachInput;
+    approachInput.playerPosition = {kLowerLanding.x + 0.30f, kLowerSupportWorldY,
+                                    kLowerLanding.z + 0.20f};
+    approachInput.supportWorldY = kLowerSupportWorldY;
+    approachInput.contactPlaneWorldY = kLowerSupportWorldY;
+    check(offsetTraversal.Step(approachInput), "valid offset approach input rejected");
+    check(offsetTraversal.CanInteract(),
+        "support-aligned player within the bounded approach radius did not get an actionable climb prompt");
+    const auto approachStart = approachInput.playerPosition;
+    check(offsetTraversal.Request(), "valid offset climb interaction was not consumed");
+    const auto offsetGeneration = offsetTraversal.Snapshot().generation;
+    check(offsetTraversal.PublishReadiness(offsetGeneration, true) &&
+          offsetTraversal.TryBegin(offsetGeneration, true, true),
+        "ready offset climb did not commit its bounded approach");
+    float maximumApproachStep = 0.0f;
+    auto priorApproachPosition = offsetTraversal.Snapshot().playerPosition;
+    for (int tick = 0; tick < 180 && offsetTraversal.Snapshot().phase != Phase::Ascent; ++tick) {
+        check(offsetTraversal.Step(approachInput), "approach motor tick rejected");
+        const auto& approached = offsetTraversal.Snapshot();
+        const float dx = approached.playerPosition.x - priorApproachPosition.x;
+        const float dy = approached.playerPosition.y - priorApproachPosition.y;
+        const float dz = approached.playerPosition.z - priorApproachPosition.z;
+        maximumApproachStep = std::max(maximumApproachStep, std::sqrt(dx*dx+dy*dy+dz*dz));
+        check(!approached.ropeHandsActive || approached.phase == Phase::Ascent,
+            "rope hands attached before the bounded endpoint approach completed");
+        priorApproachPosition = approached.playerPosition;
+    }
+    check(offsetTraversal.Snapshot().phase == Phase::Ascent,
+        "offset approach did not reach the authored lower endpoint");
+    check(std::sqrt(std::pow(offsetTraversal.Snapshot().playerPosition.x-approachStart.x,2.0f) +
+                    std::pow(offsetTraversal.Snapshot().playerPosition.z-approachStart.z,2.0f)) > 0.30f,
+        "offset approach committed by teleporting the player to the rope");
+    check(maximumApproachStep <= 0.0251f,
+        "offset approach exceeded the per-tick root motion bound");
+
+    RescueTraversal invalidApproachTraversal;
+    check(invalidApproachTraversal.NotifyLanternClaimed() && invalidApproachTraversal.DeployOwned(),
+        "invalid approach fixture did not acquire its one owned rope");
+    check(finishDeployment(invalidApproachTraversal),"invalid approach fixture rope never became ready");
+    Input invalidApproach;
+    invalidApproach.playerPosition = {kLowerLanding.x + 0.20f, kLowerSupportWorldY + 0.25f,
+                                     kLowerLanding.z};
+    invalidApproach.supportWorldY = kLowerSupportWorldY + 0.25f;
+    invalidApproach.contactPlaneWorldY = kLowerSupportWorldY;
+    check(invalidApproachTraversal.Step(invalidApproach) && !invalidApproachTraversal.CanInteract() &&
+          !invalidApproachTraversal.Request(),
+        "wrong-height player received a climb prompt or started traversal");
+    invalidApproach.playerPosition = {kLowerLanding.x + 0.76f, kLowerSupportWorldY, kLowerLanding.z};
+    invalidApproach.supportWorldY = kLowerSupportWorldY;
+    check(invalidApproachTraversal.Step(invalidApproach) && !invalidApproachTraversal.CanInteract() &&
+          !invalidApproachTraversal.Request(),
+        "player outside the bounded approach radius received a climb prompt or started traversal");
 
     Input input;
     input.playerPosition = kLowerLanding;
@@ -63,8 +328,8 @@ int main()
         return traversal.Step(input);
     };
 
-    input.playerPosition.x += 0.5f;
-    check(traversal.Step(input) && !traversal.CanInteract(), "approach tolerance allowed a distant player to attach by teleport");
+    input.playerPosition.x += 0.80f;
+    check(traversal.Step(input) && !traversal.CanInteract(), "approach radius allowed a distant player to attach by teleport");
     input.playerPosition = kLowerLanding;
     input.supportWorldY = kLowerSupportWorldY;
     check(traversal.Step(input) && traversal.CanInteract(), "valid lower approach did not restore interaction eligibility");
@@ -107,12 +372,12 @@ int main()
     float maximumPullUpHandStepDistance = 0.0f;
     float pullUpStartLeftIndex = -1.0f;
     float pullUpStartRightIndex = -1.0f;
-    std::array<float, 2u> maximumPullUpHandStepIndices{};
-    float maximumPullUpHandStepZ = 0.0f;
     bool pullupCrossedCoping = false;
-    float initialGripMidpointY = 0.0f;
-    for (const auto& hand : traversal.Snapshot().grippingHandTargets)
-        initialGripMidpointY += hand.y * 0.5f;
+    Vec3 initialGripMidpoint{};
+    initialGripMidpoint = {
+        (traversal.Snapshot().grippingHandTargets[0].x + traversal.Snapshot().grippingHandTargets[1].x) * 0.5f,
+        (traversal.Snapshot().grippingHandTargets[0].y + traversal.Snapshot().grippingHandTargets[1].y) * 0.5f,
+        (traversal.Snapshot().grippingHandTargets[0].z + traversal.Snapshot().grippingHandTargets[1].z) * 0.5f};
     auto previousGrip = traversal.Snapshot().grippingRopeNodeIndices;
     auto previousHands = traversal.Snapshot().grippingHandTargets;
     auto previousPlayer = traversal.Snapshot().playerPosition;
@@ -121,6 +386,8 @@ int main()
         check(step(), "valid ascent tick rejected");
         state = traversal.Snapshot();
         checkHandsClearAnchorBeam(state);
+        checkRopeClearBlockout(state);
+        if (state.ropeHandsActive) checkRopeClearPlayer(state);
         check(state.ropeHandsActive || state.phase != Phase::PullUp ||
                   (state.playerPosition.z >= kApronHandoff.z - 0.001f &&
                    state.supportWorldY >= kUpperSupportWorldY - 0.001f),
@@ -143,8 +410,10 @@ int main()
                 const float hx = current.x - previous.x;
                 const float hy = current.y - previous.y;
                 const float hz = current.z - previous.z;
-                maximumAscentHandStepDistance = std::max(maximumAscentHandStepDistance,
-                    std::sqrt(hx * hx + hy * hy + hz * hz));
+                const float handStep = std::sqrt(hx * hx + hy * hy + hz * hz);
+                if (handStep > maximumAscentHandStepDistance) {
+                    maximumAscentHandStepDistance = handStep;
+                }
             }
         }
         if (phaseBeforeStep == Phase::PullUp || state.phase == Phase::PullUp)
@@ -157,8 +426,12 @@ int main()
                 pullUpStartRightIndex = state.grippingRopeNodeIndices[1];
                 check(std::isfinite(pullUpStartLeftIndex) &&
                       std::isfinite(pullUpStartRightIndex) &&
-                      pullUpStartLeftIndex < pullUpStartRightIndex,
-                      "pull-up must preserve the actual ordered ascent grip pair");
+                      near(pullUpStartLeftIndex, 0.5f, 0.001f) &&
+                      near(pullUpStartRightIndex, 1.0f, 0.001f) &&
+                      pullUpStartLeftIndex < pullUpStartRightIndex &&
+                      state.ropeHandsActive &&
+                      state.supportWorldY < kUpperSupportWorldY - 0.05f,
+                      "loaded pull-up must start from the final clear, reachable rope grips before the rim");
             }
             if (state.ropeHandsActive)
             {
@@ -173,8 +446,6 @@ int main()
                     if (handStep > maximumPullUpHandStepDistance)
                     {
                         maximumPullUpHandStepDistance = handStep;
-                        maximumPullUpHandStepIndices = state.grippingRopeNodeIndices;
-                        maximumPullUpHandStepZ = state.playerPosition.z;
                     }
                 }
             }
@@ -201,6 +472,14 @@ int main()
         check(state.supportWorldY >= kLowerSupportWorldY - 0.001f &&
             state.supportWorldY <= kCopingClearanceSupportWorldY + 0.001f,
             "ascent escaped bounded vertical supports");
+        const float anchorClearance = std::hypot(state.playerPosition.x - kAnchor.x,
+                                                 state.playerPosition.z - kAnchor.z);
+        check(anchorClearance >= 0.28f,
+            "loaded traversal root entered the cantilever anchor body-clearance radius");
+        if (state.ropeHandsActive) {
+            check(state.playerPosition.z >= kAnchor.z + 0.30f - 0.001f,
+                "loaded traversal root crossed behind the authored rope-front support plane");
+        }
         if (state.playerPosition.z >= kCopingZMin && state.playerPosition.z <= kCopingZMax) {
             pullupCrossedCoping = true;
             check(state.supportWorldY >= kCopingClearanceSupportWorldY - 0.001f,
@@ -241,16 +520,12 @@ int main()
             const Vec3 midpoint{(state.grippingHandTargets[0].x + state.grippingHandTargets[1].x) * 0.5f,
                 (state.grippingHandTargets[0].y + state.grippingHandTargets[1].y) * 0.5f,
                 (state.grippingHandTargets[0].z + state.grippingHandTargets[1].z) * 0.5f};
-            check(near(state.supportWorldY, kLowerSupportWorldY + midpoint.y - initialGripMidpointY, 0.04f),
+            const float expectedSupport = kLowerSupportWorldY + midpoint.y - initialGripMidpoint.y;
+            check(near(state.supportWorldY, expectedSupport, 0.04f),
                 "player root detached from solved rope grip segment");
         }
     }
     state = traversal.Snapshot();
-    std::cerr << "PullUp diagnostic start_indices=" << pullUpStartLeftIndex << ','
-              << pullUpStartRightIndex << " max_hand_step=" << maximumPullUpHandStepDistance
-              << " at_indices=" << maximumPullUpHandStepIndices[0] << ','
-              << maximumPullUpHandStepIndices[1] << " z=" << maximumPullUpHandStepZ
-              << std::endl;
     check(state.phase == Phase::UpperSafe && near(state.supportWorldY, kUpperSupportWorldY) &&
         near(state.playerPosition.z, kExteriorLanding.z),
         "ascent and pull-up did not reach exterior landing");
@@ -392,11 +667,14 @@ int main()
 
     // Reconstruction must invalidate callbacks while retaining ownership; full reset clears it.
     const auto oldGeneration = state.generation;
+    const auto paidOutNodes=traversal.Snapshot().ropeNodes;
     traversal.RecoverForReconstruction();
     state = traversal.Snapshot();
     check(state.generation > oldGeneration && state.claimCount == 1 && state.deploymentCount == 1 &&
-        state.lanternClaimed && state.ropeDeployed && state.firstAscentCompleted,
-        "reconstruction recovery lost ownership or completed ascent");
+        state.lanternClaimed && state.ropeDeployed && state.ropeReady &&
+        state.deploymentPhase==RopeDeploymentPhase::Ready && state.ropeNodes==paidOutNodes &&
+        state.firstAscentCompleted,
+        "reconstruction recovery redeployed or lost the already paid-out rope/ownership");
     check(!traversal.PublishReadiness(oldGeneration, true), "pre-reconstruction readiness callback accepted");
 
     // A blocked ascent returns to the lower safe point; a blocked descent returns to exterior upper support.
@@ -444,7 +722,9 @@ int main()
     traversal.Reset(kLowerLanding, kLowerSupportWorldY);
     state = traversal.Snapshot();
     check(state.generation > generationBeforeReset && state.claimCount == 0 && state.deploymentCount == 0 &&
-        !state.firstAscentCompleted && !state.ropeDeployed && !traversal.PublishReadiness(generationBeforeReset, true),
+        !state.firstAscentCompleted && !state.ropeDeployed && !state.ropeReady &&
+        state.deploymentPhase==RopeDeploymentPhase::Stowed &&
+        !traversal.PublishReadiness(generationBeforeReset, true),
         "full reset did not clear ownership and reject stale callbacks");
     std::cout << "Rescue traversal cases=" << cases << " failures=" << failures
               << " max_root_step=" << maximumLoadedAscentStepDistance

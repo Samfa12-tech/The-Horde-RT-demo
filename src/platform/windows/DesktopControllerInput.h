@@ -248,6 +248,19 @@ inline LegacyRightStickAxes SelectLegacyRightStickAxes(
     return SelectLegacyRightStickAxes(sample, identity.productName);
 }
 
+// Windows run toggle uses the same simulation intent as keyboard/mobile run.
+// Exact Backbone L3 was observed read-only during the paused owner playtest.
+inline bool LegacyRunTogglePressed(std::uint32_t current, std::uint32_t previous,
+                                   const LegacyControllerIdentity& identity)
+{
+    return IsCapturedBackboneOne(identity) && ((current & ~previous) & 0x2000u) != 0u;
+}
+inline bool XInputRunTogglePressed(std::uint16_t current, std::uint16_t previous)
+{
+    // XINPUT_GAMEPAD_LEFT_THUMB; preserve this SDK-independent host helper.
+    return ((current & ~previous) & 0x0040u) != 0u;
+}
+
 inline ControllerActionEdges MapLegacyControllerEdges(
     const std::uint32_t currentButtons,
     const std::uint32_t previousButtons,
