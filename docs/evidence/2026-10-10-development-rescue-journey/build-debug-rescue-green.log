@@ -1,0 +1,58 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  1>Checking Build System
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-debug\pocket-audio-core-native\Debug\pocket_audio_native_pcm.lib
+  Building Custom Rule <repo>/CMakeLists.txt
+  MusicDirector.cpp
+  MusicPcmAssetBank.cpp
+  MusicPcmStream.cpp
+  MusicPlaybackSession.cpp
+  GameSimulation.cpp
+  GameSimulationRescue.cpp
+  RescueTraversal.cpp
+  Generating Code...
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_gameplay_simulation.lib
+  Building Custom Rule <repo>/CMakeLists.txt
+  Building Custom Rule <repo>/CMakeLists.txt
+  WindowsMusicPlayback.cpp
+  CharacterRenderSlot.cpp
+  PresentableTinyRtScene.cpp
+  horde_windows_music.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_windows_music.lib
+  SimulationFrameAdapter.cpp
+  Generating Code...
+  horde_rt_probe_core.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_rt_probe_core.lib
+  Building Custom Rule <repo>/CMakeLists.txt
+  MotionEvidenceScenario.cpp
+  DiagnosticWindow.cpp
+  MotionEvidenceLedger.cpp
+  Generating Code...
+  LINK : <repo>\build\presets\windows-x64-debug\Debug\HordeLanternRT.exe not found or not built by the last incremental link; performing full link
+  horde_rt_diagnostic_window.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\HordeLanternRT.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-debug\pocket-audio-core-native\Debug\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_gameplay_simulation.lib
+  Building Custom Rule <repo>/CMakeLists.txt
+  RescueTraversalTests.cpp
+  horde_rt_rescue_traversal_tests.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_rt_rescue_traversal_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  Building Custom Rule <repo>/CMakeLists.txt
+  RescueBlockoutImportTests.cpp
+  horde_rt_rescue_blockout_import_tests.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_rt_rescue_blockout_import_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-debug\pocket-audio-core-native\Debug\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_gameplay_simulation.lib
+  horde_rt_probe_core.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_rt_probe_core.lib
+  Building Custom Rule <repo>/CMakeLists.txt
+  RescueJourneyIntegrationTests.cpp
+  horde_rt_rescue_journey_integration_tests.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_rt_rescue_journey_integration_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-debug\pocket-audio-core-native\Debug\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_gameplay_simulation.lib
+  horde_rt_probe_core.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_rt_probe_core.lib
+  Building Custom Rule <repo>/CMakeLists.txt
+  RescueRigAttachmentTests.cpp
+<repo>\tests\RescueRigAttachmentTests.cpp(3,10): error C1083: Cannot open include file: 'gameplay/interactions/LanternPendulum.h': No such file or directory [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_rig_attachment_tests.vcxproj]

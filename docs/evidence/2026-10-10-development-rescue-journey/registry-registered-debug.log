@@ -1,0 +1,25 @@
+UpdateCTestConfiguration  from :<repo>/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Parse Config file:<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Test project <repo>/build/presets/windows-x64-debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 76
+    Start 76: horde_rt_development_static_asset_tests
+
+76: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_development_static_asset_tests.exe"
+76: Working Directory: <repo>/build/presets/windows-x64-debug
+76: Test timeout computed to be: 1500
+76: Development static asset policy passed
+1/1 Test #76: horde_rt_development_static_asset_tests ...   Passed    0.04 sec
+
+The following tests passed:
+	horde_rt_development_static_asset_tests
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.05 sec

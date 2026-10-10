@@ -1,0 +1,34 @@
+UpdateCTestConfiguration  from :<repo>/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Parse Config file:<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Test project <repo>/build/presets/windows-x64-debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 152
+    Start 152: horde_rt_rescue_traversal_tests
+
+152: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_rescue_traversal_tests.exe"
+152: Working Directory: <repo>/build/presets/windows-x64-debug
+152: Test timeout computed to be: 1500
+152: ascent must reach its final solved grip pair before pull-up regrip
+152: PullUp diagnostic start_indices=1,2.00114 max_hand_step=0.0591378 at_indices=0.4,1.24259 z=-15.2
+152: upper regrip and supported handoff must remain continuous for root and actual rope targets
+152: Rescue traversal cases=23259 failures=2 max_root_step=0.0245255 max_landing_root_step=0.0243783
+1/1 Test #152: horde_rt_rescue_traversal_tests ...***Failed    3.44 sec
+ascent must reach its final solved grip pair before pull-up regrip
+PullUp diagnostic start_indices=1,2.00114 max_hand_step=0.0591378 at_indices=0.4,1.24259 z=-15.2
+upper regrip and supported handoff must remain continuous for root and actual rope targets
+Rescue traversal cases=23259 failures=2 max_root_step=0.0245255 max_landing_root_step=0.0243783
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   3.45 sec
+
+The following tests FAILED:
+	152 - horde_rt_rescue_traversal_tests (Failed)
+Errors while running CTest
