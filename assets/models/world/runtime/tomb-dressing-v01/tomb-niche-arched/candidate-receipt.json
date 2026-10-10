@@ -4,8 +4,8 @@
   "stage": "authored candidate; runtime admission pending",
   "role": "A voussoir-framed arched burial alcove with deep side returns and a stone shelf.",
   "sourceBlend": "../../../source/tomb-dressing-v01/tomb-dressing-v01.blend",
-  "sourceBlendSha256": "713a3cf2878157e5ea8be4d6b36b55fde12f04170113b94ae99e0f501c9c0683",
-  "authoringScriptSha256": "e8eb9b27432b62d2dd1cbd5eb6e8d90045b6ae74dc6641ac70fb5015ad55db9d",
+  "sourceBlendSha256": "ad16ff3716ed92ff6c666944526bf3cc7679a4df79cd3020d5eaa91e2f54adbc",
+  "authoringScriptSha256": "cefe0332ad590307456c092d0b8972b1b023e421f91d744c3369c8366da409f9",
   "triangleCount": 1280,
   "vertexCount": 672,
   "materials": [
@@ -28,8 +28,8 @@
       1.25
     ]
   },
-  "runtimeGlbSha256": "b2d619b13ad1da198bb6c46768882c5720cc931acf521c7569980155d2b6534d",
-  "runtimeGlbBytes": 99036,
+  "runtimeGlbSha256": "fe78a2108e94814967f49387c3285476776ce7a6a04f82a610d2dbf5e0f20934",
+  "runtimeGlbBytes": 99856,
   "textureCount": 0,
   "texturesOrExternalDependencies": false
 }

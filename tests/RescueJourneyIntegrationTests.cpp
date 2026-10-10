@@ -11,6 +11,23 @@ int main() {
  int cases=0,failures=0;
  auto check=[&](bool b,const char* m){++cases;if(!b){++failures;std::cerr<<m<<'\n';}};
  InputSnapshot input;input.damageEnabled=false;
+ // The real development launch does not seed missing health, even while paused
+ // or after a new-game reset. HUD rendering must consume this published tuple.
+ GameSimulation launch(ProductionGameSimulationConfig());
+ launch.SetDevelopmentRescueJourney(true);
+ InputSnapshot launchInput;launchInput.tutorialEnabled=true;launchInput.tutorialSlowdownEnabled=true;
+ check(launch.Snapshot().playerVitals.vitality==3 && launch.Snapshot().playerVitals.maxVitality==3,
+       "development journey launch did not start with three hearts");
+ launchInput.paused=true;launch.AdvanceFrame(launchInput,.25,1);
+ check(launch.Snapshot().playerVitals.vitality==3 && launch.Snapshot().playerVitals.maxVitality==3,
+       "paused initial publication lost a heart");
+ launchInput.paused=false;
+ for(int frame=0;frame<60;++frame)launch.AdvanceFrame(launchInput,1.0/60.0,frame+2);
+ check(launch.Snapshot().playerVitals.vitality==3,"idle opening route damaged the player");
+ launchInput.commands.routeReset=1;launch.StepFixed(launchInput);
+ check(launch.Snapshot().playerVitals.vitality==3 && launch.Snapshot().playerVitals.maxVitality==3,
+       "development journey reset did not restore three hearts");
+
  GameSimulation baseline,disabled;
  disabled.SetDevelopmentRescueJourney(false);
  for(int i=0;i<60;++i) {baseline.StepFixed(input);disabled.StepFixed(input);}

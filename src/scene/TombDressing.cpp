@@ -90,14 +90,14 @@ constexpr std::array<Placement, 16u> kPlacements{{
     {AssetId::ArchedNiche, {-1.97226f, -0.55f, -2.60f}, kPi * 0.5f, 0.0f, {{0.76f, 0.72f, 0.80f}}},
     {AssetId::RectNiche, {6.12226f, -0.50f, -12.40f}, -kPi * 0.5f, 0.0f, {{0.70f, 0.62f, 0.80f}}},
     // One cold stub on the first genuine niche shelf.
-    {AssetId::CandleOne, {-2.0625f, kEntryRectNicheShelfTop, -0.55f}, 0.0f, 0.0f, {{0.72f, 0.72f, 0.72f}}},
+    {AssetId::CandleOne, {-2.0625f, kEntryRectNicheShelfTop, -0.70f}, 0.0f, 0.0f, {{0.72f, 0.72f, 0.72f}}},
     // Skull and two laid-out long-bone remains on the second shelf.
     {AssetId::SkullJaw, {-1.9275f, kEntryArchNicheShelfTop, -2.60f}, kPi * 0.5f, 0.0f, {{0.72f, 0.72f, 0.72f}}},
     {AssetId::Femur, {-2.1075f, kEntryArchNicheShelfTop + 0.038064f, -2.47f}, kPi * 0.5f, -kPi * 0.5f, {{0.72f, 0.72f, 0.72f}}},
     {AssetId::Humerus, {-2.1075f, kEntryArchNicheShelfTop + 0.027412f, -2.25f}, kPi * 0.5f, -kPi * 0.5f, {{0.72f, 0.72f, 0.72f}}},
     // Two extinguished stubs in the outer route east-wall recess at x=6.
-    {AssetId::CandleTwo, {6.1825f, kOuterNicheShelfTop, -12.56f}, 0.0f, 0.0f, {{0.72f, 0.72f, 0.72f}}},
-    {AssetId::CandleThree, {6.1825f, kOuterNicheShelfTop, -12.24f}, 0.0f, 0.0f, {{0.72f, 0.72f, 0.72f}}},
+    {AssetId::CandleTwo, {6.16f, kOuterNicheShelfTop, -12.48f}, 0.0f, 0.0f, {{0.72f, 0.72f, 0.72f}}},
+    {AssetId::CandleThree, {6.20f, kOuterNicheShelfTop, -12.32f}, 0.0f, 0.0f, {{0.72f, 0.72f, 0.72f}}},
     // The displaced lid rests entirely on the existing collidable stone bier.
     {AssetId::DisplacedLid, {-1.135f, -0.58f, 1.20f}, 0.0f, 0.0f},
     // Ceremonial offerings and fragments sit in Keeper's rear corner, away from routes.

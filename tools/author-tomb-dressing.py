@@ -144,9 +144,9 @@ def arch_stone(name, theta0, theta1, inner, outer, zc, front_y, depth,
               (outer * math.cos(theta0), zc + outer * math.sin(theta0)),
               (outer * math.cos(theta1), zc + outer * math.sin(theta1)),
               (inner * math.cos(theta1), zc + inner * math.sin(theta1))]
-    # Preserve front-face winding across the left half of the arch.
-    if (theta0 + theta1) / 2 > math.pi / 2:
-        points.reverse()
+    # Radial-then-increasing-angle order gives the same outward front normal
+    # across the complete arch. Reversing the left half made those voussoirs
+    # face away from the room and rendered them as black wedges in RT lighting.
     vertices = [(x, y, z) for y in (front_y, front_y + depth)
                 for x, z in points]
     faces = [(0, 1, 2, 3), (7, 6, 5, 4), (0, 4, 5, 1),

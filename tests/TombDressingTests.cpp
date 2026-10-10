@@ -156,6 +156,98 @@ void TestRayHelperFixture()
     Check(Near(hit, 0.1f, 0.001f), "CPU triangle-ray helper hits a synthetic wall face");
 }
 
+void TestImportedNicheFaceNormals(const std::filesystem::path& assetRoot)
+{
+    using namespace horde::scene::assets;
+    const auto directory = assetRoot / "models/world/runtime/tomb-dressing-v01/tomb-niche-arched";
+    AssetManifest manifest;
+    StaticMeshAsset imported;
+    std::string diagnostic;
+    Check(AssetManifest::Load(directory / "asset.manifest.json", manifest, diagnostic),
+          "arched niche manifest loads for native winding inspection");
+    Check(StaticMeshAsset::Load(directory / "tomb-niche-arched-lod0.runtime.glb", manifest,
+                                imported, diagnostic),
+          "arched niche GLB imports through the production native static-mesh loader");
+    if (imported.vertices.empty()) return;
+
+    std::size_t visibleArchTriangles = 0u;
+    std::size_t opposedNormals = 0u;
+    std::size_t backFacingArchTriangles = 0u;
+    float minimumAgreement = 1.0f;
+    const auto normalize = [](std::array<float, 3u>& value) {
+        const float length = std::sqrt(value[0] * value[0] + value[1] * value[1] + value[2] * value[2]);
+        if (!std::isfinite(length) || length <= 1.0e-8f) return false;
+        for (float& component : value) component /= length;
+        return true;
+    };
+    for (const auto& primitive : imported.primitives)
+    {
+        if (primitive.materialIndex >= imported.materials.size() ||
+            imported.materials[primitive.materialIndex].name != "MedievalWall02" ||
+            primitive.nodeTransformIndex >= imported.nodeTransforms.size() ||
+            imported.nodeTransforms[primitive.nodeTransformIndex].name.find("arch_voussoir_") != 0u) continue;
+        float maxZ = std::numeric_limits<float>::lowest();
+        std::size_t vertexEnd = imported.vertices.size();
+        for (const auto& next : imported.primitives)
+            if (next.vertexOffset > primitive.vertexOffset)
+                vertexEnd = std::min(vertexEnd, static_cast<std::size_t>(next.vertexOffset));
+        for (std::size_t v = primitive.vertexOffset; v < vertexEnd; ++v)
+        {
+            const auto& point = imported.vertices[v].position;
+            maxZ = std::max(maxZ, point[2]);
+        }
+        for (std::size_t index = primitive.indexOffset;
+             index + 2u < primitive.indexOffset + primitive.indexCount; index += 3u)
+        {
+            const auto& a = imported.vertices[primitive.vertexOffset + imported.indices[index]];
+            const auto& b = imported.vertices[primitive.vertexOffset + imported.indices[index + 1u]];
+            const auto& c = imported.vertices[primitive.vertexOffset + imported.indices[index + 2u]];
+            const float centerX = (a.position[0] + b.position[0] + c.position[0]) / 3.0f;
+            // Test the actual front plane of each imported voussoir. A
+            // geometric-normal filter would hide precisely the reversed faces
+            // this regression guards against.
+            if (std::abs(centerX) > 0.49f ||
+                std::abs(a.position[2] - maxZ) > 1.0e-4f ||
+                std::abs(b.position[2] - maxZ) > 1.0e-4f ||
+                std::abs(c.position[2] - maxZ) > 1.0e-4f) continue;
+            std::array<float, 3u> edge1{{b.position[0] - a.position[0],
+                                         b.position[1] - a.position[1],
+                                         b.position[2] - a.position[2]}};
+            std::array<float, 3u> edge2{{c.position[0] - a.position[0],
+                                         c.position[1] - a.position[1],
+                                         c.position[2] - a.position[2]}};
+            auto geometricNormal = std::array<float, 3u>{{
+                edge1[1] * edge2[2] - edge1[2] * edge2[1],
+                edge1[2] * edge2[0] - edge1[0] * edge2[2],
+                edge1[0] * edge2[1] - edge1[1] * edge2[0]}};
+            auto shadingNormal = std::array<float, 3u>{{
+                a.normal[0] + b.normal[0] + c.normal[0],
+                a.normal[1] + b.normal[1] + c.normal[1],
+                a.normal[2] + b.normal[2] + c.normal[2]}};
+            if (!normalize(geometricNormal) || !normalize(shadingNormal)) continue;
+            if (std::abs(geometricNormal[2]) < 0.90f) continue;
+            const float agreement = geometricNormal[0] * shadingNormal[0] +
+                                    geometricNormal[1] * shadingNormal[1] +
+                                    geometricNormal[2] * shadingNormal[2];
+            ++visibleArchTriangles;
+            minimumAgreement = std::min(minimumAgreement, agreement);
+            if (geometricNormal[2] < 0.90f) ++backFacingArchTriangles;
+            if (agreement <= 0.0f) ++opposedNormals;
+        }
+    }
+    Check(visibleArchTriangles >= 14u,
+          "native-imported arched niche exposes a useful set of room-facing voussoir triangles");
+    Check(backFacingArchTriangles == 0u && opposedNormals == 0u,
+          "imported room-facing arch faces point into the room and agree with their shading normals");
+    std::cout << "Imported arch front faces: triangles=" << visibleArchTriangles
+              << " back-facing=" << backFacingArchTriangles << " opposed-normal=" << opposedNormals
+              << " minimum-normal-dot=" << minimumAgreement << '\n';
+    if (opposedNormals != 0u)
+        std::cout << "Arched niche normal diagnostics: frontTriangles=" << visibleArchTriangles
+                  << " backFacing=" << backFacingArchTriangles << " opposed=" << opposedNormals
+                  << " minimumDot=" << minimumAgreement << '\n';
+}
+
 void TestOriginalNicheBaseline(const std::filesystem::path& assetRoot,
                                const std::filesystem::path& baselineRoot)
 {
@@ -350,6 +442,22 @@ void TestPreparedDressingAppend(const std::filesystem::path& assetRoot)
     for (std::size_t i = 0u; i < shelfTops.size(); ++i)
         Check(Near(firstReport.placementBounds[i + 3u].worldBounds.minimum[1], shelfTops[i]),
               "skull, bones and cold candles rest on their varied real niche shelves");
+    const auto& firstRectOffering = firstReport.placementBounds[3u].worldBounds;
+    Check(Near((firstRectOffering.minimum[2] + firstRectOffering.maximum[2]) * 0.5f,
+               (kTombDressingNicheOpenings[0].minimumZ +
+                kTombDressingNicheOpenings[0].maximumZ) * 0.5f, 0.01f),
+          "the first rectangular niche candle is centered on the real shelf");
+    const auto& outerCandleA = firstReport.placementBounds[7u].worldBounds;
+    const auto& outerCandleB = firstReport.placementBounds[8u].worldBounds;
+    Check(outerCandleA.maximum[2] < outerCandleB.minimum[2] &&
+              outerCandleB.minimum[2] - outerCandleA.maximum[2] < 0.11f &&
+              Near((std::min(outerCandleA.minimum[2], outerCandleB.minimum[2]) +
+                    std::max(outerCandleA.maximum[2], outerCandleB.maximum[2])) * 0.5f,
+                   (kTombDressingNicheOpenings[2].minimumZ +
+                    kTombDressingNicheOpenings[2].maximumZ) * 0.5f, 0.01f) &&
+              Near(outerCandleA.minimum[1], kOuterNicheShelfTop) &&
+              Near(outerCandleB.minimum[1], kOuterNicheShelfTop),
+          "outer rectangular niche candles form a close, centered cluster grounded on its shelf");
     const auto& lid = firstReport.placementBounds[9u].worldBounds;
     Check(lid.minimum[0] >= -1.55f && lid.maximum[0] <= -0.72f &&
               lid.minimum[2] >= 0.05f && lid.maximum[2] <= 2.35f &&
@@ -425,6 +533,7 @@ int main()
     const auto assetRoot = assetRootOverride != nullptr
         ? std::filesystem::path(assetRootOverride)
         : std::filesystem::path(HORDE_RT_SOURCE_DIR) / "assets";
+    TestImportedNicheFaceNormals(assetRoot);
     TestPreparedDressingAppend(assetRoot);
     if (const char* baseline = std::getenv("HORDE_RT_NICHE_BASELINE_DIR"); baseline != nullptr)
         TestOriginalNicheBaseline(assetRoot, baseline);

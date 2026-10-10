@@ -391,6 +391,9 @@ if(BUILD_TESTING)
     add_executable(horde_rt_windows_combat_practice_launch_tests tests/WindowsCombatPracticeLaunchTests.cpp)
     target_include_directories(horde_rt_windows_combat_practice_launch_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     add_test(NAME horde_rt_windows_combat_practice_launch_tests COMMAND horde_rt_windows_combat_practice_launch_tests)
+    add_test(NAME horde_rt_windows_combat_teaching_presentation_tests
+        COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
+            ${CMAKE_CURRENT_SOURCE_DIR}/tests/WindowsCombatTeachingPresentationTests.ps1)
     add_executable(horde_rt_android_motion_evidence_policy_tests tests/AndroidMotionEvidencePolicyTests.cpp)
     target_include_directories(horde_rt_android_motion_evidence_policy_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     add_test(NAME horde_rt_android_motion_evidence_policy_tests COMMAND horde_rt_android_motion_evidence_policy_tests)

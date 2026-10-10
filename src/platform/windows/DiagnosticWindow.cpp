@@ -245,6 +245,7 @@ constexpr UINT kDefaultDpi = 96u;
 constexpr char kUiFontProperty[] = "HordeLanternRtUiFont";
 constexpr char kEntryTitleFontProperty[] = "HordeLanternRtEntryTitleFont";
 constexpr char kEntryPlaqueFontProperty[] = "HordeLanternRtEntryPlaqueFont";
+constexpr char kCombatTeachingPromptFontProperty[] = "HordeLanternRtCombatTeachingPromptFont";
 constexpr char kGraphicsInfoFontProperty[] = "HordeLanternRtGraphicsInfoFont";
 constexpr char kMonoFontProperty[] = "HordeLanternRtMonoFont";
 constexpr char kDeveloperFontProperty[] = "HordeLanternRtDeveloperFont";
@@ -8018,6 +8019,17 @@ void ApplyDpiScaledFonts(HWND window)
         uiFont = static_cast<HFONT>(GetStockObject(DEFAULT_GUI_FONT));
     }
 
+    HFONT teachingPromptFont = CreateFontA(
+        ScaleForDpi(window, 19), 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE,
+        ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY,
+        DEFAULT_PITCH | FF_ROMAN, "Georgia");
+    if (teachingPromptFont)
+    {
+        if (HWND prompt = GetDlgItem(window, kCombatTeachingPromptId))
+            SendMessageA(prompt, WM_SETFONT, reinterpret_cast<WPARAM>(teachingPromptFont), TRUE);
+        ReplaceFontProperty(window, kCombatTeachingPromptFontProperty, teachingPromptFont);
+    }
+
     if (HWND edit = GetDlgItem(window, kEditControlId))
     {
         SendMessageA(edit, WM_SETFONT, reinterpret_cast<WPARAM>(monoFont), TRUE);
@@ -8172,6 +8184,7 @@ void ReleaseDpiScaledFonts(HWND window)
 {
     for (const char* propertyName : {kUiFontProperty, kMonoFontProperty, kDeveloperFontProperty,
                                    kGraphicsInfoFontProperty, kEntryTitleFontProperty,
+                                   kCombatTeachingPromptFontProperty,
                                    kEntryPlaqueFontProperty})
     {
         if (HFONT font = reinterpret_cast<HFONT>(RemovePropA(window, propertyName)))
@@ -9693,6 +9706,45 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
     case WM_DRAWITEM:
     {
         const auto* item = reinterpret_cast<const DRAWITEMSTRUCT*>(lParam);
+        if (item && item->CtlID == kCombatTeachingPromptId)
+        {
+            const bool highContrast = NativeUiUsesHighContrast();
+            const COLORREF text = highContrast ? GetSysColor(COLOR_WINDOWTEXT) : RGB(242, 233, 216);
+            static HBRUSH slatePanel = CreateSolidBrush(RGB(24, 25, 27));
+            static HBRUSH brassFrame = CreateSolidBrush(RGB(157, 124, 72));
+            static HBRUSH ironInset = CreateSolidBrush(RGB(77, 68, 53));
+            HBRUSH panel = highContrast ? GetSysColorBrush(COLOR_WINDOW) : slatePanel;
+            HBRUSH frame = highContrast ? GetSysColorBrush(COLOR_WINDOWTEXT) : brassFrame;
+            HBRUSH innerFrame = highContrast ? GetSysColorBrush(COLOR_WINDOWTEXT) : ironInset;
+            FillRect(item->hDC, &item->rcItem, panel);
+            FrameRect(item->hDC, &item->rcItem, frame);
+            RECT inner = item->rcItem;
+            InflateRect(&inner, -ScaleForDpi(hWnd, 4), -ScaleForDpi(hWnd, 4));
+            FrameRect(item->hDC, &inner, innerFrame);
+            RECT rule = inner;
+            rule.left += ScaleForDpi(hWnd, 12);
+            rule.right -= ScaleForDpi(hWnd, 12);
+            rule.top += ScaleForDpi(hWnd, 3);
+            rule.bottom = rule.top + ScaleForDpi(hWnd, 1);
+            FillRect(item->hDC, &rule, frame);
+            rule.top = inner.bottom - ScaleForDpi(hWnd, 4);
+            rule.bottom = rule.top + ScaleForDpi(hWnd, 1);
+            FillRect(item->hDC, &rule, frame);
+
+            const HFONT font = reinterpret_cast<HFONT>(
+                SendMessageA(item->hwndItem, WM_GETFONT, 0, 0));
+            const HGDIOBJ previousFont = font ? SelectObject(item->hDC, font) : nullptr;
+            SetTextColor(item->hDC, text);
+            SetBkMode(item->hDC, TRANSPARENT);
+            RECT label = item->rcItem;
+            InflateRect(&label, -ScaleForDpi(hWnd, 18), -ScaleForDpi(hWnd, 9));
+            char caption[256]{};
+            GetWindowTextA(item->hwndItem, caption, static_cast<int>(sizeof(caption)));
+            DrawTextA(item->hDC, caption, -1, &label,
+                      DT_CENTER | DT_VCENTER | DT_WORDBREAK | DT_NOPREFIX);
+            if (previousFont && previousFont != HGDI_ERROR) SelectObject(item->hDC, previousFont);
+            return TRUE;
+        }
         if (item && item->CtlID == kEntryLoadingIndicatorId)
         {
             // A small native loading indicator, with an accessible STATIC label.
@@ -10155,7 +10207,7 @@ int CreateAndShowWindow(const std::string& diagnosticText,
 
     createStatic(kHudControlId, kHudStartingText, SS_LEFT | SS_CENTERIMAGE | SS_NOTIFY);
     createStatic(kVitalityHudControlId, "Vitality 3 of 3", SS_OWNERDRAW);
-    if (HWND prompt = createStatic(kCombatTeachingPromptId, "", SS_CENTER | SS_NOPREFIX))
+    if (HWND prompt = createStatic(kCombatTeachingPromptId, "", SS_OWNERDRAW))
     {
         SetWindowLongPtrA(prompt, GWL_EXSTYLE,
             GetWindowLongPtrA(prompt, GWL_EXSTYLE) | WS_EX_LAYERED);
