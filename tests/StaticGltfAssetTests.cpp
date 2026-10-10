@@ -2204,11 +2204,10 @@ void TestTombDressingCandidates()
     constexpr Candidate candidates[] = {
         {"tomb-niche-rect", 1188u, 10u, "MedievalWall02"},
         {"tomb-niche-arched", 1280u, 16u, "MedievalWall02"},
-        {"tomb-skull", 5240u, 20u, "TombBone"},
-        {"tomb-bone-femur", 1328u, 3u, "TombBone"},
-        {"tomb-bone-rib-bundle", 1272u, 6u, "TombBone"},
-        {"funerary-group", 8348u, 30u, "TombBone"},
     };
+    // Only the original niche family is selected from this directory. Bones and
+    // funerary props use the recovered T02/T03 roster tested below. Unselected
+    // local replacement experiments must never become required test inputs.
     for (const Candidate& candidate : candidates)
     {
         const auto directory = std::filesystem::path(HORDE_RT_TOMB_DRESSING_ROOT) / candidate.id;
@@ -2231,7 +2230,7 @@ void TestTombDressingCandidates()
         Check(std::any_of(asset.materials.begin(), asset.materials.end(), [&](const StaticMaterial& material) {
                   return material.name == candidate.material;
               }), std::string(candidate.id) + " retains its intended ordinary static PBR material family");
-        Check(asset.materials.size() == (std::string_view(candidate.id) == "funerary-group" ? 3u : 1u),
+        Check(asset.materials.size() == 1u,
               std::string(candidate.id) + " retains only its declared PBR material families");
         Check(std::all_of(asset.materials.begin(), asset.materials.end(), [](const StaticMaterial& material) {
                   return material.baseColorTexture < 0 && material.normalTexture < 0 &&

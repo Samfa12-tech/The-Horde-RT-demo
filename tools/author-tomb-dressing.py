@@ -610,7 +610,7 @@ def write_manifests(definitions, source_hash, script_hash):
             "materialOverrides": [], "distribution": "candidate",
             "licenceStatus": "Original project-authored Blender geometry and PBR parameters; no third-party model, texture, font, or provider bytes."
         }
-        (directory / "asset.manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+        (directory / "asset.manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8", newline="\n")
         receipt = {
             "schema": 1, "asset": asset_id, "stage": "authored candidate; runtime admission pending",
             "role": role, "sourceBlend": "../../../source/tomb-dressing-v01/tomb-dressing-v01.blend",
@@ -621,7 +621,7 @@ def write_manifests(definitions, source_hash, script_hash):
             "runtimeGlbBytes": glb.stat().st_size, "textureCount": 0,
             "texturesOrExternalDependencies": False
         }
-        (directory / "candidate-receipt.json").write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
+        (directory / "candidate-receipt.json").write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8", newline="\n")
 
 
 def render_previews(definitions):

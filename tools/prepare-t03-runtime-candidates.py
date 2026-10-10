@@ -81,7 +81,7 @@ def main() -> None:
         "assets": recovered,
     }
     output = RUNTIME_ROOT / "derivation-receipt.json"
-    output.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
+    output.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8", newline="\n")
     print(f"Prepared {len(recovered)} byte-exact T03 runtime candidates.")
     for item in recovered:
         print(f"{item['id']}: {item['runtimeBytes']} bytes, {item['triangles']} triangles, sha256={item['runtimeSha256']}")

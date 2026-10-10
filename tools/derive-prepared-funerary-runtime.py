@@ -260,7 +260,7 @@ def derive(source_root: Path, output_root: Path) -> dict:
         "assets": records,
     }
     (output_root / "derivation-receipt.json").write_text(
-        json.dumps(receipt, indent=2) + "\n", encoding="utf-8"
+        json.dumps(receipt, indent=2) + "\n", encoding="utf-8", newline="\n"
     )
     (output_root / "README.md").write_text(
         "# Prepared T02 native-import candidates\n\n"
