@@ -1,4 +1,8 @@
 #include "gameplay/effects/KeeperCastPresentation.h"
+#include "scene/EntryPortalCapGeometry.h"
+#include "scene/ForestDressing.h"
+#include "scene/assets/StaticPrimitiveGrouping.h"
+#include "vulkan/raytracing/RtWorldMaterialPalette.h"
 #include "scene/TombDressing.h"
 #include "scene/TombWallRecess.h"
 #include "vulkan/raytracing/RescuePlayerRig.h"
@@ -2430,6 +2434,14 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
         horde::scene::TombDressingBuildReport dressing;
         if (!horde::scene::AppendPreparedTombDressing(root, collapseStaticAsset_, dressing, diagnostic))
             return false;
+        horde::scene::ForestDressingBuildReport forest;
+        if (!horde::scene::AppendPreparedForestDressing(root, collapseStaticAsset_, forest, diagnostic))
+            return false;
+        // The collapse's final masonry range and the first dressing range use
+        // the same material. Keep every triangle while sharing one metadata row;
+        // High's physical lantern panes must fit alongside this resident scene.
+        if (!horde::scene::assets::CoalesceAdjacentWorldBakedPrimitives(collapseStaticAsset_, diagnostic))
+            return false;
     }
     // The selected immutable quality bundle owns the geometry profile too.
     // Mobile panes are absent from the BLAS, not hidden/skipped in a shader.
@@ -2682,7 +2694,8 @@ bool PresentableTinyRtScene::CreateStaticMeshResources(std::string& diagnostic)
     const auto& instances = staticMeshSlot_.InstanceMetadata();
     const auto& primitives = staticMeshSlot_.PrimitiveMetadata();
     sceneMaterials_ = staticMeshSlot_.Materials();
-    const std::uint32_t worldMaterialCount = sceneProfile_ == RtSceneProfile::Showcase ? 6u : 5u;
+    const auto worldPalette=MakeRtWorldMaterialPalette(sceneProfile_ == RtSceneProfile::Showcase);
+    const std::uint32_t worldMaterialCount = worldPalette.count;
     if (sceneMaterials_.size() > kRtMaterialCapacity - worldMaterialCount)
     {
         diagnostic = "Imported and authored world materials exceed the fixed RT material capacity.";
@@ -2692,17 +2705,7 @@ bool PresentableTinyRtScene::CreateStaticMeshResources(std::string& diagnostic)
     worldMaterialBase_ = static_cast<std::uint32_t>(sceneMaterials_.size());
     for (std::uint32_t material = 0u; material < worldMaterialCount; ++material)
     {
-        RtMaterialGpu authored{};
-        authored.baseColorFactor = {{1.0f, 1.0f, 1.0f, 1.0f}};
-        authored.normalScaleUvScaleBlend = {{1.0f, 0.42f, 0.42f, 0.34f}};
-        if (material == 5u)
-        {
-            // Opaque leaf silhouettes reuse the moss layer and generic world
-            // albedo modulation. They do not add a material type/shader branch.
-            authored.baseColorFactor = {{0.24f, 0.52f, 0.19f, 1.0f}};
-            authored.normalScaleUvScaleBlend[0] = 0.0f;
-        }
-        sceneMaterials_.push_back(authored);
+        sceneMaterials_.push_back(worldPalette.records[material]);
     }
     const auto& materials = sceneMaterials_;
     const auto& vertices = staticMeshSlot_.Vertices();
@@ -2932,7 +2935,7 @@ bool PresentableTinyRtScene::BuildPreviewAccelerationStructures(std::string& dia
     };
     const auto worldQuad = [this, &quad, &surfaceCodes](const horde::graphics::PreviewQuad& plane) {
         quad(plane.vertices);
-        const auto authored = plane.material < 5u ? worldMaterialBase_ + plane.material + 1u : 0u;
+        const auto authored = AuthoredWorldMaterialIndexPlusOne(worldMaterialBase_,plane.material);
         const auto code = plane.SurfaceCode() | (authored << 16u);
         surfaceCodes.insert(surfaceCodes.end(), {code, code});
     };
@@ -3193,7 +3196,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     const auto surfaceCode = [this](SurfaceMaterial material, SurfaceNormal normal, std::uint32_t authoredIndexPlusOne = 0u) {
         const auto materialId = static_cast<std::uint32_t>(material);
         const auto authoredRecord = authoredIndexPlusOne != 0u ? authoredIndexPlusOne
-            : (materialId < 5u ? worldMaterialBase_ + materialId + 1u : 0u);
+            : AuthoredWorldMaterialIndexPlusOne(worldMaterialBase_,materialId);
         return materialId | (static_cast<std::uint32_t>(normal) << 8u) |
             (authoredRecord << 16u);
     };
@@ -3342,12 +3345,16 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     // extended showcase route. The matching hidden shell is split below too.
     addWorldQuad({{-1.85f, kRouteFloorWorldY, -6.4f}}, {{-0.90f, kRouteFloorWorldY, -6.4f}}, {{-0.90f, 1.35f, -6.4f}}, {{-1.85f, 1.35f, -6.4f}}, SurfaceMossyStone, SurfaceForward);
     addWorldQuad({{0.90f, kRouteFloorWorldY, -6.4f}}, {{1.85f, kRouteFloorWorldY, -6.4f}}, {{1.85f, 1.35f, -6.4f}}, {{0.90f, 1.35f, -6.4f}}, SurfaceMossyStone, SurfaceForward);
-    const auto& exitCap = horde::scene::kShowcaseLowOverheadVolumes[1];
-    const float exitCapMinX = exitCap.footprint[1][0], exitCapMaxX = exitCap.footprint[2][0];
-    const float exitCapFrontZ = exitCap.footprint[0][1], exitCapBackZ = exitCap.footprint[1][1];
-    addWorldQuad({{exitCapMinX, exitCap.bottomY, exitCapFrontZ}}, {{exitCapMaxX, exitCap.bottomY, exitCapFrontZ}},
-                 {{exitCapMaxX, horde::scene::kShowcaseRouteCeilingWorldY, exitCapFrontZ}},
-                 {{exitCapMinX, horde::scene::kShowcaseRouteCeilingWorldY, exitCapFrontZ}}, SurfaceMossyStone, SurfaceForward);
+    for (const auto& face : horde::scene::EntryPortalCapFaces())
+    {
+        const auto vertex = [](const auto& point) {
+            return Vertex{{point[0], point[1], point[2]}};
+        };
+        addWorldQuad(vertex(face.vertices[0]), vertex(face.vertices[1]),
+                     vertex(face.vertices[2]), vertex(face.vertices[3]),
+                     static_cast<SurfaceMaterial>(face.materialCode),
+                     static_cast<SurfaceNormal>(face.normalCode));
+    }
     // Give the room-two portal real RT depth instead of three paper-thin cards.
     addWorldBox(-1.20f, kRouteFloorWorldY, -3.55f, -0.78f, 0.95f, -3.25f, SurfaceMossyStone);
     addWorldBox(0.78f, kRouteFloorWorldY, -3.55f, 1.20f, 0.95f, -3.25f, SurfaceMossyStone);
@@ -3409,10 +3416,6 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     addWorldQuad({{-1.92f, -1.02f, 3.4f}}, {{1.92f, -1.02f, 3.4f}}, {{1.92f, -1.02f, -6.47f}}, {{-1.92f, -1.02f, -6.47f}}, SurfaceHiddenShell, SurfaceUp);
     addWorldQuad({{-1.92f, -1.02f, -6.47f}}, {{-0.90f, -1.02f, -6.47f}}, {{-0.90f, 1.42f, -6.47f}}, {{-1.92f, 1.42f, -6.47f}}, SurfaceHiddenShell, SurfaceForward);
     addWorldQuad({{0.90f, -1.02f, -6.47f}}, {{1.92f, -1.02f, -6.47f}}, {{1.92f, 1.42f, -6.47f}}, {{0.90f, 1.42f, -6.47f}}, SurfaceHiddenShell, SurfaceForward);
-    addWorldQuad({{exitCapMinX, exitCap.bottomY, exitCapBackZ}}, {{exitCapMaxX, exitCap.bottomY, exitCapBackZ}},
-                 {{exitCapMaxX, exitCap.topY, exitCapBackZ}}, {{exitCapMinX, exitCap.topY, exitCapBackZ}},
-                 SurfaceHiddenShell, SurfaceForward);
-
     // Slice A extends the room with static, geometry-only RT proof spaces. It
     // deliberately adds no new flame, glass or mirror surface: the brackets
     // are unlit, the transmission frame is empty and the final mirror frame
@@ -3512,7 +3515,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     // Physical restrained growth hangs from the deep masonry shaft rim.
     // Closed stems and thick leaf silhouettes share normal/material metadata
     // and all ordinary RT occlusion/reflection paths; no alpha card or light.
-    const auto leafMaterialIndexPlusOne = worldMaterialBase_ + 6u;
+    const auto leafMaterialIndexPlusOne = worldMaterialBase_ + 2u;
     for (const auto& sprig : horde::scene::kWaterShaftSprigs)
     {
         const auto dressing = horde::scene::MakeHangingSprig(sprig.attachment, sprig.length, sprig.phase);
@@ -4968,6 +4971,10 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     }
     ApplyKeeperTorchBodyInstances(instances);
     ApplyGlassFixtureVisibility(instances);
+    // Seed the same dormant third-lane owner used by dynamic frames. A zero
+    // reference is an inactive instance, but would force a needless definition
+    // change before the first live snapshot even while the Keeper stays hidden.
+    instances[kKeeperInstanceIndex] = characterSlot_.BuildActiveInstances()[2];
     if (!CreateBuffer(sizeof(instances), VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, uploadMemory, true, instanceBuffer_, diagnostic))
     {
         return false;
@@ -6464,7 +6471,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                                      lich,
                                      gpuResources_,
                                      diagnostic,
-                                     observation,frame.retainedWorkloadSkeleton))
+                                     observation))
     {
         return false;
     }
@@ -6528,6 +6535,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         heldTransformToInstanceTransform(worldFromBodyStow);
     const auto characterInstances = characterSlot_.BuildActiveInstances();
     instances[CharacterRenderSlot::kTlasInstanceIndex] = characterInstances[0];
+    instances[kKeeperInstanceIndex] = characterInstances[2];
     instances[3] = instances[1];
     instances[3].instanceCustomIndex = 3u;
     instances[3].mask = productionVisibility.swordMask;

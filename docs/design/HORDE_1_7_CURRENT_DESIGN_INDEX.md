@@ -55,13 +55,16 @@ Do not run the archived map generator in place: it writes beside its source.
 | Tutorial/normal subtitle plaque | Owner requests compact edge text, no default large backing, no flicker. Android Auto: bottom for keyboard/mouse/controller, top for touch; touch landscape bottom only when controls genuinely leave space. Explicit Top/Bottom and per-line stability remain. |
 | Mist interval investigation | Deferred by owner. Preserve correct floor shadows and production rendering. Post-Keeper mist clearing is an art mitigation, not a repaired volumetric shadow. Outdoor M/F markers are not effects or cost evidence. |
 | Conservative sword contact proxy | Remains inactive. Forgiving unobstructed contact is provisional; authored masonry correctness protection remains. Arbitrary 3D shaft occlusion and final contact calibration are not proven. |
-| Terrain authored by this executor | Eric's separate Blender terrain task has not started. Prepare precise integration requirements and continue independent repairs; do not duplicate terrain authoring or replace the missing handoff with more placeholders. |
+| Waiting for Eric's terrain package | Superseded on 11 October: that task never started and no package is forthcoming. This job owns versioned Blender terrain authoring from the supplied topo and runtime integration, with one implementation writer. Preserve existing masters and use the measured interfaces below. |
 
-Current work remains scene integrity, subtitle corrections, recovery/admission of
-the supplied original forest assets and preparation for the connected terrain.
+Current authorized work is the complete tomb-to-woodland chapter: scene integrity,
+subtitles, topo-authored continuous terrain, admitted woodland dressing, visible
+Kit, and actual two-way GPU preparation/retirement at the rope gate.
 The full master is the design target, not automatic permission for every later
 work package. No new acquisition/generation, release, merge, budget increase,
 device installation or campaign-save implementation follows from this index.
+
+Current repair milestone: [11 October scene repair evidence](../evidence/2026-10-11-scene-repair-milestone/README.md). It records the tested three-character/18-layer repair batch, dialogue path and HUD corrections, inspected frozen Windows backends, and the unfinished terrain/Kit/streaming gates. This supersedes the table below only where its dated evidence explicitly says so.
 
 ## Reconciled implementation and remaining work
 
@@ -116,7 +119,7 @@ length is 76.264196 m and maximum straight grade 7.269005%; these do not certify
 smoothed terrain/collision. The 0.5 m grid is not final collision or permission
 to move the accepted tomb. See the [measured integration handoff](../superpowers/plans/2026-10-11-topo-terrain-integration-handoff.md)
 for F01–F04 transforms, shaft/apron keepouts, all nine occupied tomb volumes,
-support/eye conventions and export/material/resource requirements for Eric.
+support/eye conventions and export/material/resource requirements for this job.
 
 ## Actual asset disposition before substitutions
 
@@ -136,7 +139,7 @@ No replacement master was generated during this reconciliation.
 | Meshy stump | All 18 manifest payloads match, plus unlisted README | Native import passed. Owner now confirms this exact stump was created on the paid plan and may be publicly reused; the rights blocker is resolved. Scene/material/placement/cost admission remains pending; retain origin/repair metadata and record paid-plan creator ownership. |
 | Exact Kit Warden | 7,034,964 bytes, SHA-256 `47e249840ed9dd438da386137257050a5bd463e7fe54bf94873e1fd21715835e`; owner confirmed public Horde rights | Native 24-joint model, seven clips/35 sampled skinned poses passed; idle height 1.8 m. Source candidate only; no visible Kit or automatic additional capacity claimed. |
 | Approved Kit cuts | All 13 actual runtime WAVs match exact policy hashes; mono PCM16 24 kHz; owner distribution confirmation recorded | Speech integrated at `59eb44c6`. Canonical English IDs/text/state/schema remain authority, not older prose. Fresh listening/mix/device review remains pending. |
-| Eric terrain | Planning topo/grid/map bytes present | No authored production terrain package delivered. Do not substitute another primitive strip or wait indefinitely before independent repairs. |
+| Chapter terrain | Planning topo/grid/map bytes present | This job now authors a new versioned Blender master and native derivative. No external delivery is pending. Production terrain/support and inspected RT acceptance remain unfinished. |
 
 The [Meshy terms §3.2](https://www.meshy.ai/terms-of-use) and [official commercial-use guidance](https://help.meshy.ai/en/articles/9992001-can-i-use-meshy-assets-commercially-license-copyright-explained) were checked on 11 October 2026. The [pinned stump provenance](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/e6cf2e97e5577aa051c5a18014477598762d7b75/assets/source/beyond_the_tomb/forest_dressing/stump-v01/RIGHTS.md) records original text-only generation with no third-party model/image. Its historical account-verification gap is closed by the owner's paid-plan confirmation; it is not a current blocker.
 
@@ -158,7 +161,7 @@ changes or to Android/Query/lifecycle tests automatically.
 Before a new playtest checkpoint: finish affected native/package checks for the
 working repairs; render matched portal/tunnel/Keeper/landing views through actual
 RT; verify subtitle line stability and three-character retention; then integrate
-only the reviewed terrain handoff. Preserve all failed evidence, shader ceilings,
+terrain against the reviewed topo and measured interfaces. Preserve all failed evidence, shader ceilings,
 quality and the original torch sweep/180-second policy. No placeholder or source
 hash can count as art, sustained performance or physical presentation acceptance.
 

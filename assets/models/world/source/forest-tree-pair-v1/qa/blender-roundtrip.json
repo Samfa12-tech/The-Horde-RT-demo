@@ -1,0 +1,124 @@
+[
+  {
+    "asset": "horde-upright-alder-v1",
+    "source_topology": [
+      {
+        "name": "Alder | closed moss tendrils",
+        "boundary_edges": 0,
+        "nonmanifold_edges": 0,
+        "signed_volume_m3": 0.00218853849951091
+      },
+      {
+        "name": "Alder | closed trunk roots branches",
+        "boundary_edges": 0,
+        "nonmanifold_edges": 0,
+        "signed_volume_m3": 1.2321571655555168
+      },
+      {
+        "name": "Alder | individually closed opaque leaves",
+        "boundary_edges": 0,
+        "nonmanifold_edges": 0,
+        "signed_volume_m3": 0.05830345339962956
+      }
+    ],
+    "runtime_reimport_topology": [
+      {
+        "name": "Alder | closed trunk roots branches",
+        "boundary_edges_after_seam_weld": 0,
+        "nonmanifold_edges_after_seam_weld": 0,
+        "signed_volume_m3": 1.233491501941088
+      },
+      {
+        "name": "Alder | individually closed opaque leaves",
+        "boundary_edges_after_seam_weld": 0,
+        "nonmanifold_edges_after_seam_weld": 0,
+        "signed_volume_m3": 0.05830345339962956
+      },
+      {
+        "name": "Alder | closed moss tendrils",
+        "boundary_edges_after_seam_weld": 0,
+        "nonmanifold_edges_after_seam_weld": 0,
+        "signed_volume_m3": 0.00216428456789735
+      }
+    ],
+    "runtime_triangles": 7832,
+    "runtime_bounds_blender_world_xyz": {
+      "min": [
+        -1.6904454231262207,
+        -1.7183218002319336,
+        -0.007092012092471123
+      ],
+      "max": [
+        1.6727383136749268,
+        1.3647300004959106,
+        8.474547386169434
+      ]
+    },
+    "blender_roundtrip_import_pass": true,
+    "source_closed_volume_meshes_pass": true,
+    "runtime_closed_volume_after_uv_seam_weld_pass": true,
+    "runtime_render": "previews/horde-upright-alder-v1-runtime-reimport.png",
+    "engine_gpu_import": "not performed"
+  },
+  {
+    "asset": "horde-irregular-pine-v1",
+    "source_topology": [
+      {
+        "name": "Pine | closed moss tendrils",
+        "boundary_edges": 0,
+        "nonmanifold_edges": 0,
+        "signed_volume_m3": 0.0015287961159193024
+      },
+      {
+        "name": "Pine | closed needle-spray volumes",
+        "boundary_edges": 0,
+        "nonmanifold_edges": 0,
+        "signed_volume_m3": 0.08003657430983092
+      },
+      {
+        "name": "Pine | closed trunk roots branches",
+        "boundary_edges": 0,
+        "nonmanifold_edges": 0,
+        "signed_volume_m3": 1.075394882083995
+      }
+    ],
+    "runtime_reimport_topology": [
+      {
+        "name": "Pine | closed trunk roots branches",
+        "boundary_edges_after_seam_weld": 0,
+        "nonmanifold_edges_after_seam_weld": 0,
+        "signed_volume_m3": 1.0752069275768075
+      },
+      {
+        "name": "Pine | closed needle-spray volumes",
+        "boundary_edges_after_seam_weld": 0,
+        "nonmanifold_edges_after_seam_weld": 0,
+        "signed_volume_m3": 0.08003657430983092
+      },
+      {
+        "name": "Pine | closed moss tendrils",
+        "boundary_edges_after_seam_weld": 0,
+        "nonmanifold_edges_after_seam_weld": 0,
+        "signed_volume_m3": 0.0014943610887369898
+      }
+    ],
+    "runtime_triangles": 7984,
+    "runtime_bounds_blender_world_xyz": {
+      "min": [
+        -1.8599222898483276,
+        -1.5585356950759888,
+        -0.00683143176138401
+      ],
+      "max": [
+        1.8909538984298706,
+        1.8350584506988525,
+        8.686391830444336
+      ]
+    },
+    "blender_roundtrip_import_pass": true,
+    "source_closed_volume_meshes_pass": true,
+    "runtime_closed_volume_after_uv_seam_weld_pass": true,
+    "runtime_render": "previews/horde-irregular-pine-v1-runtime-reimport.png",
+    "engine_gpu_import": "not performed"
+  }
+]

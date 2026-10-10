@@ -3,6 +3,7 @@ Set-StrictMode -Version Latest
 $repo=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 . (Join-Path $repo 'tools/horde-1.6.2-asset-policy.ps1')
 Add-Type -AssemblyName System.IO.Compression.FileSystem
+Add-Type -AssemblyName System.IO.Compression
 $temp=[IO.Path]::GetFullPath([IO.Path]::GetTempPath())
 $scratch=Join-Path $temp ('Horde162AssetPolicy-'+[Guid]::NewGuid().ToString('N'))
 $null=New-Item -ItemType Directory -Path $scratch
@@ -10,8 +11,10 @@ $script:checks=0
 function Require([bool]$Value,[string]$Message) { if(-not $Value){throw $Message} }
 function Assert-CollapseGradleInventory([string]$Text) {
     $names=@([regex]::Matches($Text, "(?m)^\s*include '([^']+)'\s*$") | ForEach-Object { $_.Groups[1].Value } | Where-Object { $_ -like 'models/world/*' })
-    $expected=@('models/world/runtime/collapsed-entry/asset.manifest.json','models/world/runtime/collapsed-entry/collapsed-entry-lod0.runtime.glb') + @(Get-Horde17TombAssetSpecification | Where-Object {$_.Path -like 'models/world/*'} | ForEach-Object Path)
-    Require ([string]::Join("`n",[string[]]@($names | Sort-Object -CaseSensitive)) -ceq [string]::Join("`n",[string[]]@($expected | Sort-Object -CaseSensitive))) 'Gradle world assets must be the exact two-file runtime roster.'
+    $expected=@('models/world/runtime/collapsed-entry/asset.manifest.json','models/world/runtime/collapsed-entry/collapsed-entry-lod0.runtime.glb',
+        'models/world/runtime/forest-tree-pair-v1/asset.manifest.json','models/world/runtime/forest-tree-pair-v1/runtime-roster.json',
+        'models/world/runtime/forest-tree-pair-v1/horde-irregular-pine-v1-lod1.glb','models/world/runtime/forest-tree-pair-v1/horde-upright-alder-v1-lod1.glb') + @(Get-Horde17TombAssetSpecification | Where-Object {$_.Path -like 'models/world/*'} | ForEach-Object Path)
+    Require ([string]::Join("`n",[string[]]@($names | Sort-Object -CaseSensitive)) -ceq [string]::Join("`n",[string[]]@($expected | Sort-Object -CaseSensitive))) 'Gradle world assets must match the exact collapse, forest and tomb runtime rosters.'
 }
 function Assert-PropsGradleInventory([string]$Text) {
     $names=@([regex]::Matches($Text, "(?m)^\s*include '([^']+)'\s*$") | ForEach-Object { $_.Groups[1].Value } | Where-Object { $_ -like 'textures/props/*' })
@@ -63,6 +66,12 @@ function Assert-CollapsePackageInventory([string]$Text) {
     $strings=@($ast.FindAll({param($node) $node -is [Management.Automation.Language.StringConstantExpressionAst]},$true) | ForEach-Object Value)
     foreach ($name in @('assets/models/world/runtime/collapsed-entry/asset.manifest.json','assets/models/world/runtime/collapsed-entry/collapsed-entry-lod0.runtime.glb')) {
         Require (@($strings | Where-Object { $_ -ceq $name }).Count -eq 2) 'Package inventory must require the collapse pair in both platform archives.'
+    }
+    foreach ($name in @('assets/models/world/runtime/forest-tree-pair-v1/asset.manifest.json',
+                       'assets/models/world/runtime/forest-tree-pair-v1/runtime-roster.json',
+                       'assets/models/world/runtime/forest-tree-pair-v1/horde-irregular-pine-v1-lod1.glb',
+                       'assets/models/world/runtime/forest-tree-pair-v1/horde-upright-alder-v1-lod1.glb')) {
+        Require (@($strings | Where-Object { $_ -ceq $name }).Count -eq 2) 'Package inventory must require the exact forest tree-pair roster in both platform archives.'
     }
     $commands=@($ast.FindAll({param($node) $node -is [Management.Automation.Language.CommandAst]},$true) | ForEach-Object { $_.GetCommandName() })
     Require ($commands -contains 'Copy-Horde162RuntimeAssets' -and @($commands | Where-Object { $_ -ceq 'Assert-Horde162Package' }).Count -ge 2) 'Package inventory must use closed staging and admission.'
@@ -151,8 +160,9 @@ function New-HeldFixtureArchive([string]$Name,[string[]]$Omit=@(), [string]$Dupl
 try {
     $gradle=Get-Content (Join-Path $repo 'android/app/build.gradle') -Raw
     Assert-CollapseGradleInventory $gradle; ++$script:checks
-    Expect-Failure {Assert-CollapseGradleInventory ($gradle.Replace("        include 'models/world/runtime/collapsed-entry/asset.manifest.json'",''))} 'exact two-file runtime roster'
-    Expect-Failure {Assert-CollapseGradleInventory ($gradle+"`ninclude 'models/world/source/*.blend'`n")} 'exact two-file runtime roster'
+    Expect-Failure {Assert-CollapseGradleInventory ($gradle.Replace("        include 'models/world/runtime/collapsed-entry/asset.manifest.json'",''))} 'exact collapse, forest and tomb runtime rosters'
+    Expect-Failure {Assert-CollapseGradleInventory ($gradle.Replace("        include 'models/world/runtime/forest-tree-pair-v1/runtime-roster.json'",''))} 'exact collapse, forest and tomb runtime rosters'
+    Expect-Failure {Assert-CollapseGradleInventory ($gradle+"`ninclude 'models/world/source/*.blend'`n")} 'exact collapse, forest and tomb runtime rosters'
     Assert-PropsGradleInventory $gradle; ++$script:checks
     Expect-Failure {Assert-PropsGradleInventory ($gradle.Replace('textures/props/runtime/base-color.android.ktx2','textures/props/runtime/*.android.ktx2'))} 'exact five-file Android runtime roster'
     Expect-Failure {Assert-PropsGradleInventory ($gradle+"`ninclude 'textures/props/runtime/base-color.windows.ktx2'`n")} 'exact five-file Android runtime roster'
@@ -221,9 +231,9 @@ try {
     $windows=@(Get-Horde162RuntimeFiles $repo Windows);$android=@(Get-Horde162RuntimeFiles $repo Android)
     $baseWindows=@(Get-Horde162AssetSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Windows'})
     $baseAndroid=@(Get-Horde162AssetSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Android'})
-    Require ($baseWindows.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Windows'}).Count -eq 29 -and
-             $baseAndroid.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Android'}).Count -eq 30) 'Historical 1.6.2 roster changed.'
-    Require ($windows.Count -eq 69 -and $android.Count -eq 70) 'Current closed roster requires the previous tomb derivatives plus exactly thirteen Kit cuts and their manifest; no editable sources.'
+    Require ($baseWindows.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Windows'}).Count -eq 33 -and
+             $baseAndroid.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Android'}).Count -eq 34) 'Current shared asset roster includes the four admitted forest entries.'
+    Require ($windows.Count -eq 73 -and $android.Count -eq 74) 'Current closed roster includes exact tomb, tree-pair and Kit runtime assets; no editable sources.'
     Require (@(Get-Horde17KitAssetSpecification).Count -eq 14) 'Kit admission must retain its exact thirteen-cut/one-manifest roster.'
     foreach ($kit in Get-Horde17KitAssetSpecification) {
         Require ($windows -ccontains $kit.Path -and $android -ccontains $kit.Path) 'Both platforms must admit every approved Kit runtime entry.'

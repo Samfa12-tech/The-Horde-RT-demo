@@ -7,6 +7,18 @@ using namespace horde::gameplay;
 using namespace horde::gameplay::dialogue;
 void Check(bool value,const char* msg) { if(!value) {std::cerr<<msg<<'\n';std::exit(1);} }
 int main() {
+    const std::filesystem::path assetRoot = std::filesystem::path(HORDE_RT_SOURCE_DIR) / "assets";
+    for (const auto& spec : kLines) {
+        if (spec.id == Line::None) continue;
+        const auto path = horde::platform::windows::WindowsDialogueAudioPath(assetRoot, spec.audio);
+        Check(!path.empty() && std::filesystem::is_regular_file(path),
+            "every Kit and Keeper voice resolves to actual bytes from the Windows assets root");
+        Check(path.lexically_relative(assetRoot).generic_string().starts_with("audio/"),
+            "dialogue root is joined once rather than duplicating assets/assets");
+    }
+    Check(horde::platform::windows::WindowsDialogueAudioPath(assetRoot,"assets/../private.wav").empty() &&
+          horde::platform::windows::WindowsDialogueAudioPath(assetRoot,"C:/private.wav").empty(),
+          "invalid catalogue paths cannot escape the supplied asset root");
     Director d;Context c;c.player={2.6f,-.95f,-8.6f};c.listener={2.6f,.7f,-8.6f};
     d.Step(.016f,c);Check(d.State().line==Line::Grate,"eligible passing approach triggers without looking");
     auto old=d.State();c.player.x=50;d.Step(.016f,c);
@@ -82,6 +94,15 @@ int main() {
     using namespace horde::platform::windows;
     Check(WindowsSfxSourceGain(.5f,0)==0&&WindowsDialogueSourceGain(70)>.69f,"SFX mute leaves voice independent");
     Check(WindowsDialogueSourceGain(0)==0&&WindowsSfxSourceGain(.5f,70)>0,"voice mute leaves effects independent");
+    Check(WindowsSubtitleCaption("Keeper","Come closer")=="Keeper: Come closer",
+        "normal subtitle contains only speaker and spoken words, no modal/footer paragraphs");
+    request={};request.lines=1;request.bottomReserved=WindowsSubtitleBottomReserved(false,100);request.margin=12;
+    layout=LayoutSubtitle(request);
+    Check(layout.fits&&layout.y>request.height*4/5&&layout.height<request.height/8,
+        "desktop single-line subtitle stays low and leaves combat view clear");
+    request.bottomReserved=WindowsSubtitleBottomReserved(true,100);
+    layout=LayoutSubtitle(request);Check(layout.y+layout.height<request.height-94,
+        "context prompt remains clear above its actual bottom band");
     SubtitlePlacementLatch latch;request={};request.position=SubtitlePosition::Auto;
     Check(ResolveWindowsSubtitleLayout(request,3,latch,SubtitlePosition::Auto).region==SubtitlePosition::Bottom,"Windows Auto bottom");
     request.touch=true;Check(ResolveWindowsSubtitleLayout(request,3,latch,SubtitlePosition::Auto).region==SubtitlePosition::Bottom,"incidental input does not move active line");

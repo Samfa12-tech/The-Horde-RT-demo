@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "asset": "forest-tree-pair-v1-lod1",
+  "metresPerUnit": 1.0,
+  "coordinateSystem": { "up": "+Y", "forward": "+Z" },
+  "budgets": {
+    "maxVertices": 5632,
+    "maxIndices": 15306,
+    "maxPrimitives": 3,
+    "maxMaterials": 3,
+    "maxTextureLayersPerKind": 3
+  },
+  "lods": [
+    { "name": "pine-v1-lod1", "maxTriangles": 5000 },
+    { "name": "alder-v1-lod1", "maxTriangles": 5102 }
+  ],
+  "requiredSockets": [],
+  "runtimeTextureProfile": {
+    "android": "astc",
+    "windows": "rgba8",
+    "mipmapped": true,
+    "resolution": 1024
+  },
+  "materialOverrides": [],
+  "distribution": "runtime",
+  "licenceStatus": "Owner-authored tree-pair originals, owner-approved for integration/public PR; package assigns no blanket open-source license. Source masters and package rights notice are preserved at assets/models/world/source/forest-tree-pair-v1; see ASSET_LICENSES.md."
+}

@@ -47,6 +47,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.view.Window;
 import android.view.WindowInsets;
 import android.view.WindowManager;
@@ -103,10 +104,13 @@ public class MainActivity extends Activity {
     private static final String PREF_CHAPTER_SUBTITLES = "chapter_subtitles_enabled";
     private static final String PREF_CHAPTER_SUBTITLE_SIZE = "chapter_subtitle_size_percent";
     private static final String PREF_CHAPTER_SUBTITLE_POSITION = "chapter_subtitle_position";
+    private static final String PREF_CHAPTER_SUBTITLE_BACKING = "chapter_subtitle_backing";
     private static final String PREF_CHAPTER_VOICE_VOLUME = "chapter_voice_volume";
     static final int SUBTITLE_POSITION_AUTO = 0;
     static final int SUBTITLE_POSITION_TOP = 1;
     static final int SUBTITLE_POSITION_BOTTOM = 2;
+    static final int SUBTITLE_INPUT_TOUCH = 0;
+    static final int SUBTITLE_INPUT_KEYBOARD_MOUSE_CONTROLLER = 1;
     static final String PREF_RENDER_SCALE = "render_scale";
     static final int DEFAULT_ANDROID_RT_RENDER_SCALE_PERCENT = 75;
     private static final String PREF_RT_LAB_UNLOCKED = "rt_lab_unlocked";
@@ -271,7 +275,8 @@ public class MainActivity extends Activity {
     private Button chapterDialogueSkipButton;
     private long chapterSubtitleGeneration = Long.MIN_VALUE;
     private long chapterDialogueSkipPendingGeneration = Long.MIN_VALUE;
-    private int chapterAutoPosition = -1;
+    private final ChapterSubtitlePlacement chapterSubtitlePlacement = new ChapterSubtitlePlacement();
+    private int latestSubtitleInputMode = SUBTITLE_INPUT_TOUCH;
     private long chapterVoiceGeneration = Long.MIN_VALUE;
     private int chapterVoiceStream;
     private boolean chapterVoicePaused;
@@ -689,6 +694,12 @@ public class MainActivity extends Activity {
                     stageAsset("models/world/runtime/collapsed-entry/collapsed-entry-lod0.runtime.glb",
                     "models/world/runtime/collapsed-entry/collapsed-entry-lod0.runtime.glb");
             if (!collapseStaged) throw new IllegalStateException("Required collapsed-entry runtime assets could not be staged.");
+            final boolean forestTreesStaged =
+                    stageAsset("models/world/runtime/forest-tree-pair-v1/asset.manifest.json", "models/world/runtime/forest-tree-pair-v1/asset.manifest.json") &&
+                    stageAsset("models/world/runtime/forest-tree-pair-v1/runtime-roster.json", "models/world/runtime/forest-tree-pair-v1/runtime-roster.json") &&
+                    stageAsset("models/world/runtime/forest-tree-pair-v1/horde-irregular-pine-v1-lod1.glb", "models/world/runtime/forest-tree-pair-v1/horde-irregular-pine-v1-lod1.glb") &&
+                    stageAsset("models/world/runtime/forest-tree-pair-v1/horde-upright-alder-v1-lod1.glb", "models/world/runtime/forest-tree-pair-v1/horde-upright-alder-v1-lod1.glb");
+            if (!forestTreesStaged) throw new IllegalStateException("Required forest tree-pair runtime assets could not be staged.");
             final boolean tombDressingStaged =
                     stageAsset("models/world/runtime/tomb-dressing-v01/tomb-niche-rect/asset.manifest.json", "models/world/runtime/tomb-dressing-v01/tomb-niche-rect/asset.manifest.json") &&
                     stageAsset("models/world/runtime/tomb-dressing-v01/tomb-niche-rect/candidate-receipt.json", "models/world/runtime/tomb-dressing-v01/tomb-niche-rect/candidate-receipt.json") &&
@@ -2629,14 +2640,10 @@ public class MainActivity extends Activity {
         if (appRoot == null) return;
         chapterSubtitlePanel = new LinearLayout(this);
         chapterSubtitlePanel.setOrientation(LinearLayout.VERTICAL);
-        chapterSubtitlePanel.setPadding(dp(16), dp(12), dp(16), dp(8));
+        chapterSubtitlePanel.setPadding(0, dp(2), 0, dp(2));
         chapterSubtitlePanel.setClickable(false);
         chapterSubtitlePanel.setFocusable(false);
-        final GradientDrawable background = new GradientDrawable();
-        background.setColor(0xEE151719);
-        background.setCornerRadius(dp(4));
-        background.setStroke(dp(1), HordeUiTokens.BRASS);
-        chapterSubtitlePanel.setBackground(background);
+        chapterSubtitlePanel.setBackground(null);
 
         chapterSubtitleScroll = new ScrollView(this);
         chapterSubtitleScroll.setFillViewport(true);
@@ -2644,9 +2651,10 @@ public class MainActivity extends Activity {
         chapterSubtitleScroll.setOverScrollMode(View.OVER_SCROLL_IF_CONTENT_SCROLLS);
         chapterSubtitleText = new TextView(this);
         chapterSubtitleText.setTextColor(0xFFF2E9D8);
-        chapterSubtitleText.setTypeface(Typeface.SERIF);
+        chapterSubtitleText.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
         chapterSubtitleText.setGravity(Gravity.CENTER);
         chapterSubtitleText.setIncludeFontPadding(true);
+        chapterSubtitleText.setShadowLayer(dp(2), 0, dp(1), 0xE6000000);
         chapterSubtitleText.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_YES);
         chapterSubtitleText.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
         chapterSubtitleScroll.addView(chapterSubtitleText, new ScrollView.LayoutParams(
@@ -2685,15 +2693,98 @@ public class MainActivity extends Activity {
         chapterSubtitlePanel.setVisibility(View.GONE);
         appRoot.addView(chapterSubtitlePanel, new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        applyChapterSubtitleBacking();
     }
 
-    static int resolveChapterSubtitlePosition(int preferred, int topRoom, int bottomRoom,
-            int requiredHeight) {
+    private void applyChapterSubtitleBacking() {
+        if (chapterSubtitlePanel == null) return;
+        if (preferences != null && preferences.getBoolean(PREF_CHAPTER_SUBTITLE_BACKING, false)) {
+            final GradientDrawable backing = new GradientDrawable();
+            backing.setColor(0xC9000000);
+            backing.setCornerRadius(dp(3));
+            chapterSubtitlePanel.setBackground(backing);
+            chapterSubtitlePanel.setPadding(dp(8), dp(4), dp(8), dp(4));
+        } else {
+            chapterSubtitlePanel.setBackground(null);
+            applyChapterSubtitleBasePadding();
+        }
+        reflowChapterDialoguePlacement();
+    }
+
+    static int resolveChapterSubtitlePosition(int preferred, int inputMode, boolean landscape,
+            int topRoom, int bottomRoom, int requiredHeight) {
         if (preferred == SUBTITLE_POSITION_TOP || preferred == SUBTITLE_POSITION_BOTTOM)
             return preferred;
-        if (topRoom >= requiredHeight) return SUBTITLE_POSITION_TOP;
-        if (bottomRoom >= requiredHeight) return SUBTITLE_POSITION_BOTTOM;
-        return SUBTITLE_POSITION_TOP;
+        final boolean topFits = topRoom >= requiredHeight;
+        final boolean bottomFits = bottomRoom >= requiredHeight;
+        if (inputMode == SUBTITLE_INPUT_TOUCH) {
+            // Touch keeps the upper view clear in portrait. In landscape the lower
+            // region is allowed only when its measured safe area fits the whole panel.
+            if (landscape && bottomFits) return SUBTITLE_POSITION_BOTTOM;
+            if (topFits) return SUBTITLE_POSITION_TOP;
+            return bottomFits ? SUBTITLE_POSITION_BOTTOM : SUBTITLE_POSITION_TOP;
+        }
+        // Keyboard, mouse, and actual controller input default below the scene;
+        // use the upper region only when the measured lower region cannot fit.
+        if (bottomFits) return SUBTITLE_POSITION_BOTTOM;
+        if (topFits) return SUBTITLE_POSITION_TOP;
+        return SUBTITLE_POSITION_BOTTOM;
+    }
+
+    static final class ChapterSubtitlePlacement {
+        private long generation = Long.MIN_VALUE;
+        private int inputMode = SUBTITLE_INPUT_TOUCH;
+        private int position = -1;
+        private int landscape = -1;
+
+        void beginLine(long nextGeneration, int nextInputMode) {
+            if (generation == nextGeneration) return;
+            generation = nextGeneration;
+            inputMode = nextInputMode;
+            position = -1;
+            landscape = -1;
+        }
+
+        int positionFor(int preferred, boolean isLandscape, int topRoom, int bottomRoom,
+                int requiredHeight) {
+            if (preferred == SUBTITLE_POSITION_TOP || preferred == SUBTITLE_POSITION_BOTTOM)
+                return preferred;
+            final int orientation = isLandscape ? 1 : 0;
+            final int currentRoom = position == SUBTITLE_POSITION_TOP ? topRoom : bottomRoom;
+            final int alternateRoom = position == SUBTITLE_POSITION_TOP ? bottomRoom : topRoom;
+            if (position < 0 || landscape != orientation ||
+                    (currentRoom < requiredHeight && alternateRoom >= requiredHeight)) {
+                position = resolveChapterSubtitlePosition(SUBTITLE_POSITION_AUTO, inputMode,
+                        isLandscape, topRoom, bottomRoom, requiredHeight);
+                landscape = orientation;
+            }
+            return position;
+        }
+
+        void resetPosition() { position = -1; landscape = -1; }
+
+        int inputModeForCurrentLine() { return inputMode; }
+        long generation() { return generation; }
+    }
+
+    private static boolean isMouseSubtitleInput(MotionEvent event) {
+        if (event == null || !event.isFromSource(InputDevice.SOURCE_MOUSE)) return false;
+        final int action = event.getActionMasked();
+        return action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_MOVE ||
+                action == MotionEvent.ACTION_HOVER_MOVE || action == MotionEvent.ACTION_SCROLL ||
+                action == MotionEvent.ACTION_BUTTON_PRESS;
+    }
+
+    private static boolean isTouchSubtitleInput(MotionEvent event) {
+        if (event == null || event.getActionMasked() != MotionEvent.ACTION_DOWN) return false;
+        if (event.isFromSource(InputDevice.SOURCE_TOUCHSCREEN)) return true;
+        for (int i = 0; i < event.getPointerCount(); i++)
+            if (event.getToolType(i) == MotionEvent.TOOL_TYPE_FINGER) return true;
+        return false;
+    }
+
+    private void observeSubtitleInputMode(int inputMode) {
+        latestSubtitleInputMode = inputMode;
     }
 
     static int clampChapterSubtitleSize(int percent) {
@@ -2734,7 +2825,6 @@ public class MainActivity extends Activity {
         if (confirm == null || confirm.length != 5 || state[1] != confirm[1] ||
                 (state[0] > 0 && (text == null || text.isEmpty()))) {
             // The render owner published between JNI reads. Wait one poll for a coherent pair.
-            chapterSubtitlePanel.setVisibility(View.GONE);
             pauseChapterVoice(true);
             return;
         }
@@ -2743,12 +2833,12 @@ public class MainActivity extends Activity {
             chapterSubtitlePanel.setVisibility(View.GONE);
             chapterSubtitleGeneration = Long.MIN_VALUE;
             chapterDialogueSkipPendingGeneration = Long.MIN_VALUE;
-            chapterAutoPosition = -1;
+            chapterSubtitlePlacement.beginLine(Long.MIN_VALUE, latestSubtitleInputMode);
             stopChapterVoice();
             chapterSubtitleText.setText("");
             chapterSubtitleScroll.scrollTo(0, 0);
             chapterSubtitleOverflow.setText("Subtitle exceeds the selected safe area; scroll to read the full line.");
-            chapterSubtitlePanel.setPadding(dp(16), dp(12), dp(16), dp(8));
+            applyChapterSubtitleBasePadding();
             chapterSubtitleScroll.setVisibility(View.VISIBLE);
             chapterSubtitleOverflow.setVisibility(View.GONE);
             chapterDialogueSkipButton.setVisibility(View.VISIBLE);
@@ -2770,7 +2860,7 @@ public class MainActivity extends Activity {
         chapterDialogueSkipButton.setVisibility(View.VISIBLE);
         if (chapterSubtitleGeneration != generation) {
             chapterSubtitleGeneration = generation;
-            chapterAutoPosition = -1;
+            chapterSubtitlePlacement.beginLine(generation, latestSubtitleInputMode);
             chapterSubtitleOverflowReported = false;
             chapterSubtitleText.setText(text);
             chapterSubtitleText.setContentDescription(text.replace('\n', ' '));
@@ -2866,7 +2956,7 @@ public class MainActivity extends Activity {
                 bottomEnd = Math.min(bottomEnd, rect.top - dp(8));
         }
         final int panelWidth = Math.max(dp(80), width - side * 2);
-        chapterSubtitlePanel.setPadding(dp(16), dp(12), dp(16), dp(8));
+        applyChapterSubtitleBasePadding();
         chapterSubtitleScroll.setVisibility(View.VISIBLE);
         chapterDialogueSkipButton.setVisibility(View.VISIBLE);
         chapterSubtitleOverflow.setVisibility(View.GONE);
@@ -2886,12 +2976,8 @@ public class MainActivity extends Activity {
         final int preferred = Math.max(SUBTITLE_POSITION_AUTO, Math.min(SUBTITLE_POSITION_BOTTOM,
                 preferences.getInt(PREF_CHAPTER_SUBTITLE_POSITION, SUBTITLE_POSITION_AUTO)));
         int selected;
-        if (preferred == SUBTITLE_POSITION_AUTO) {
-            if (chapterAutoPosition < 0)
-                chapterAutoPosition = resolveChapterSubtitlePosition(preferred, topRoom, bottomRoom,
-                        requiredHeight);
-            selected = chapterAutoPosition;
-        } else selected = resolveChapterSubtitlePosition(preferred, topRoom, bottomRoom, requiredHeight);
+        selected = chapterSubtitlePlacement.positionFor(preferred, width > height,
+                topRoom, bottomRoom, requiredHeight);
         final boolean overflow = selected == SUBTITLE_POSITION_TOP ? requiredHeight > topRoom :
                 requiredHeight > bottomRoom;
         final int selectedRoom = selected == SUBTITLE_POSITION_TOP ? topRoom : bottomRoom;
@@ -2948,7 +3034,7 @@ public class MainActivity extends Activity {
                 chapterSubtitleOverflowReported = true;
             }
         } else {
-            chapterSubtitlePanel.setPadding(dp(16), dp(12), dp(16), dp(8));
+            applyChapterSubtitleBasePadding();
             chapterSubtitleScroll.setVisibility(View.VISIBLE);
             chapterSubtitleOverflow.setText("Subtitle exceeds this safe area; scroll to read the full line.");
             chapterSubtitleOverflow.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
@@ -2985,13 +3071,35 @@ public class MainActivity extends Activity {
         }
     }
 
+    private void applyChapterSubtitleBasePadding() {
+        final boolean backing = preferences != null &&
+                preferences.getBoolean(PREF_CHAPTER_SUBTITLE_BACKING, false);
+        final int horizontal = backing ? dp(8) : 0;
+        final int vertical = backing ? dp(4) : dp(2);
+        chapterSubtitlePanel.setPadding(horizontal, vertical, horizontal, vertical);
+    }
+
     private Rect visibleRectInRoot(View view) {
-        if (view == null || view.getVisibility() != View.VISIBLE || !view.isShown()) return null;
+        if (view == null || view.getVisibility() != View.VISIBLE) return null;
+        ViewParent ancestor = view.getParent();
+        while (ancestor instanceof View) {
+            if (((View) ancestor).getVisibility() != View.VISIBLE) return null;
+            ancestor = ancestor.getParent();
+        }
         final Rect rect = new Rect();
-        if (!view.getGlobalVisibleRect(rect)) return null;
-        final int[] rootLocation = new int[2];
-        appRoot.getLocationOnScreen(rootLocation);
-        rect.offset(-rootLocation[0], -rootLocation[1]);
+        if (view.getGlobalVisibleRect(rect)) {
+            final int[] rootLocation = new int[2];
+            appRoot.getLocationOnScreen(rootLocation);
+            rect.offset(-rootLocation[0], -rootLocation[1]);
+        } else {
+            // Pre-draw/layout and Robolectric may not have a window coordinate map yet.
+            // The descendants are still measured in appRoot coordinates and can safely
+            // constrain the panel before the first frame is attached.
+            rect.set(0, 0, view.getWidth(), view.getHeight());
+            try { appRoot.offsetDescendantRectToMyCoords(view, rect); }
+            catch (IllegalArgumentException notADescendant) { return null; }
+            if (!rect.intersect(0, 0, appRoot.getWidth(), appRoot.getHeight())) return null;
+        }
         return rect;
     }
 
@@ -3041,7 +3149,7 @@ public class MainActivity extends Activity {
 
         addSlider(panel, getString(R.string.sfx_volume), preferences.getInt("sfx_volume", 70), 0, 100,
                 value -> preferences.edit().putInt("sfx_volume", value).apply());
-        addSlider(panel, "Chapter voice", preferences.getInt(PREF_CHAPTER_VOICE_VOLUME, 70), 0, 100,
+        addSlider(panel, getString(R.string.dialogue_volume), preferences.getInt(PREF_CHAPTER_VOICE_VOLUME, 70), 0, 100,
                 value -> preferences.edit().putInt(PREF_CHAPTER_VOICE_VOLUME, value).apply());
         addBody(panel, "Chapter subtitles");
         final CheckBox subtitlesEnabled = new CheckBox(this);
@@ -3054,6 +3162,19 @@ public class MainActivity extends Activity {
         subtitlesEnabled.setOnCheckedChangeListener((buttonView, checked) ->
                 preferences.edit().putBoolean(PREF_CHAPTER_SUBTITLES, checked).apply());
         panel.addView(subtitlesEnabled, matchWrap());
+        final CheckBox subtitleBacking = new CheckBox(this);
+        subtitleBacking.setText("Add contrast backing behind subtitles");
+        subtitleBacking.setContentDescription("Add a subtle background behind subtitles for extra contrast");
+        subtitleBacking.setTextColor(0xFFFFE5BA);
+        subtitleBacking.setButtonTintList(HordeUiTokens.label(HordeUiTokens.BRASS));
+        subtitleBacking.setTextSize(16);
+        subtitleBacking.setChecked(preferences.getBoolean(PREF_CHAPTER_SUBTITLE_BACKING, false));
+        subtitleBacking.setMinHeight(dp(48));
+        subtitleBacking.setOnCheckedChangeListener((buttonView, checked) -> {
+            preferences.edit().putBoolean(PREF_CHAPTER_SUBTITLE_BACKING, checked).apply();
+            applyChapterSubtitleBacking();
+        });
+        panel.addView(subtitleBacking, matchWrap());
         addSlider(panel, "Subtitle size", clampChapterSubtitleSize(
                         preferences.getInt(PREF_CHAPTER_SUBTITLE_SIZE, 100)), 80, 160,
                 value -> {
@@ -3082,7 +3203,7 @@ public class MainActivity extends Activity {
             @Override public void onItemSelected(android.widget.AdapterView<?> parent, View view,
                     int position, long id) {
                 preferences.edit().putInt(PREF_CHAPTER_SUBTITLE_POSITION, position).apply();
-                chapterAutoPosition = -1;
+                chapterSubtitlePlacement.resetPosition();
                 reflowChapterDialoguePlacement();
             }
             @Override public void onNothingSelected(android.widget.AdapterView<?> parent) { }
@@ -6343,7 +6464,12 @@ public class MainActivity extends Activity {
     }
 
     @Override public boolean dispatchKeyEvent(KeyEvent event) {
-        if (!AndroidControllerInput.isControllerKey(event)) return super.dispatchKeyEvent(event);
+        if (!AndroidControllerInput.isControllerKey(event)) {
+            if (event != null && event.getAction() == KeyEvent.ACTION_DOWN &&
+                    event.getRepeatCount() == 0 && event.isFromSource(InputDevice.SOURCE_KEYBOARD))
+                observeSubtitleInputMode(SUBTITLE_INPUT_KEYBOARD_MOUSE_CONTROLLER);
+            return super.dispatchKeyEvent(event);
+        }
         AndroidControllerInput.Result result=controllerInput.key(event,SystemClock.uptimeMillis());
         if (!result.handled) return super.dispatchKeyEvent(event);
         if (resumed && controllerHasFocusedWindow()) {
@@ -6355,6 +6481,8 @@ public class MainActivity extends Activity {
     }
 
     @Override public boolean dispatchGenericMotionEvent(MotionEvent event) {
+        if (isMouseSubtitleInput(event))
+            observeSubtitleInputMode(SUBTITLE_INPUT_KEYBOARD_MOUSE_CONTROLLER);
         if (!AndroidControllerInput.isControllerMotion(event)) return super.dispatchGenericMotionEvent(event);
         AndroidControllerInput.Result result=controllerInput.motion(event,SystemClock.uptimeMillis());
         if (!result.handled) return super.dispatchGenericMotionEvent(event);
@@ -6367,6 +6495,9 @@ public class MainActivity extends Activity {
     }
 
     @Override public boolean dispatchTouchEvent(MotionEvent event) {
+        if (isMouseSubtitleInput(event))
+            observeSubtitleInputMode(SUBTITLE_INPUT_KEYBOARD_MOUSE_CONTROLLER);
+        else if (isTouchSubtitleInput(event)) observeSubtitleInputMode(SUBTITLE_INPUT_TOUCH);
         if (event.getActionMasked()==MotionEvent.ACTION_DOWN && controllerMode) {
             // Restore hit targets BEFORE this intentional first fallback down is dispatched.
             suspendControllerInput(true);
@@ -6474,6 +6605,8 @@ public class MainActivity extends Activity {
             controllerMode=true;
             refreshControllerHud();
         }
+        if (result.meaningful)
+            observeSubtitleInputMode(SUBTITLE_INPUT_KEYBOARD_MOUSE_CONTROLLER);
         if(!controllerMode)return;
         View ui=controllerUiRoot();
         if(ui!=null) {

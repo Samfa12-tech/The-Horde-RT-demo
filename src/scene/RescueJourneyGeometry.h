@@ -22,7 +22,7 @@ inline constexpr std::size_t kRescueAnchorCollarTriangleCount=12;
 inline void AppendRescueJourneyGeometry(DevelopmentWorldGeometry& out) {
     const auto preparationBegin=std::chrono::steady_clock::now();
     const auto previousBytes=out.triangles.capacity()*sizeof(DevelopmentWorldTriangle);
-    out.triangles.reserve(out.triangles.size()+kRescueBlockoutBoxes.size()*12+12+420+kOutdoorEffectMarkerTriangleCount+kRescueAnchorCollarTriangleCount);
+    out.triangles.reserve(out.triangles.size()+kRescueBlockoutBoxes.size()*12+12+kOutdoorEffectMarkerTriangleCount+kRescueAnchorCollarTriangleCount);
     out.peakPreparationCpuBytes=std::max(out.peakPreparationCpuBytes,
         previousBytes+out.triangles.capacity()*sizeof(DevelopmentWorldTriangle));
     using P=std::array<float,3>; using namespace horde::gameplay::simulation;
@@ -42,22 +42,8 @@ inline void AppendRescueJourneyGeometry(DevelopmentWorldGeometry& out) {
     for(const auto& b:kRescueBlockoutBoxes) box(b);
     box(kRescueBlockoutLanding);
     box(kRescueAnchorCollar);
-    // Original faceted silhouettes at three distances. These are a measurement
-    // workload, not admitted final forest art or a capacity certification.
-    for(unsigned band=0;band<3;++band) for(unsigned i=0;i<5;++i) {
-        const auto& trunk=WorldRouteSilhouetteTrunks()[band*5+i];
-        const float x=(trunk.minimum[0]+trunk.maximum[0])*.5f,z=(trunk.minimum[2]+trunk.maximum[2])*.5f;
-        const float floor=trunk.minimum[1]+.12f;
-        box({trunk.minimum,trunk.maximum,0});
-        const float radius=1.2f+band*.2f;
-        for(unsigned ring=0;ring<2;++ring) for(unsigned side=0;side<8;++side) {
-            const float a=side*.7853981634f,b=(side+1)*.7853981634f;
-            const P v{x+radius*std::cos(a),floor+2.3f+ring,z+radius*std::sin(a)};
-            const P w{x+radius*std::cos(b),floor+2.3f+ring,z+radius*std::sin(b)};
-            const P top{x,floor+4.6f+ring,z};
-            out.triangles.push_back({{v,w,top},2,side%2?2u:4u,band==0?WorldZoneId::ForestApproach:WorldZoneId::Lookout});
-        }
-    }
+    // The admitted pine/alder geometry is appended to the existing static
+    // asset owner. Do not retain invisible placeholder trunk/crown geometry.
     // Readable original M and F silhouettes beside (not on) the support route.
     for(std::size_t i=0;i<kOutdoorEffectRegionMarkers.size();++i) {
         const auto p=kOutdoorEffectRegionMarkers[i].centre;const float x=p[0],y=p[1],z=p[2];

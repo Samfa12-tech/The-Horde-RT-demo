@@ -1,8 +1,11 @@
 #include "gameplay/simulation/GameSimulation.h"
 #include "gameplay/traversal/DevelopmentRescueJourney.h"
 #include "scene/DevelopmentWorldGeometry.h"
+#include "scene/RescueJourneyGeometry.h"
+#include "scene/OccupiedTombVolume.h"
 #include "vulkan/raytracing/DevelopmentWorldSceneAdapter.h"
 #include <algorithm>
+#include <array>
 #include <chrono>
 #include <iostream>
 #include <limits>
@@ -44,6 +47,113 @@ int main()
             ((tri[0][1]==-5.0f&&tri[1][1]==-5.0f)||(tri[1][1]==-5.0f&&tri[2][1]==-5.0f));
     });
     check(hasSolidBank,"terrain perimeter has no solid cut-bank geometry");
+
+    // The rescue version must start its rendered/support terrain at F01. Segment
+    // 1 is only the short pre-landing approach, and the Keeper chamber occupies
+    // the exact same world coordinates below it. Inspect triangles emitted by
+    // the real geometry factory, not a route proxy or source-text pattern.
+    const auto rescueTerrain=horde::scene::PrepareDevelopmentWorldGeometry(false,true);
+    // Exact polygon clipping covers all nine occupied rooms/passages, including
+    // the reported blue/green gallery. Keep this separate from render masks.
+    for(std::size_t room=0;room<horde::gameplay::kShowcaseWalkableRects.size();++room) {
+        std::size_t hits=0;
+        for(std::size_t i=0;i<rescueTerrain.triangles.size();++i)
+            if(horde::scene::ExteriorTriangleEntersOccupiedTomb(rescueTerrain.triangles[i].points,
+                horde::gameplay::kShowcaseWalkableRects[room])) {
+                ++hits;std::cerr<<"occupied room="<<room<<" terrain triangle="<<i<<'\n';
+            }
+        check(hits==0,"actual exterior triangles cross an occupied tomb room or passage");
+    }
+    const auto gallery=horde::gameplay::kShowcaseWalkableRects[6];
+    check(horde::scene::ExteriorTriangleEntersOccupiedTomb(
+        {{{-40.f,0.f,-15.2f},{10.f,0.f,-15.2f},{10.f,.1f,-15.1f}}},gallery),
+        "thin crossing triangle with all vertices outside evades exclusion");
+    check(!horde::scene::ExteriorTriangleEntersOccupiedTomb(
+        {{{-28.f,2.05f,-16.f},{-20.f,2.05f,-16.f},{-20.f,2.05f,-14.f}}},gallery),
+        "valid terrain above the roof is rejected");
+    const auto sameTriangle=[](const auto& a,const auto& b){return a==b;};
+    std::size_t preLandingTriangles=0;
+    for(const auto& source:WorldRouteSurfaceTriangles()) if(source.segment==1)
+        for(const auto& triangle:rescueTerrain.triangles)
+            if(triangle.owner==WorldZoneId::TombExterior && sameTriangle(triangle.points,source.points))
+                ++preLandingTriangles;
+    for(const auto& source:WorldRouteTerrainShellTriangles()) if(source.segment==1)
+        for(const auto& triangle:rescueTerrain.triangles)
+            if(triangle.owner==WorldZoneId::TombExterior && sameTriangle(triangle.points,source.points))
+                ++preLandingTriangles;
+    check(preLandingTriangles==0,
+          "rescue render mesh retains nonplayable segment 1 across the Keeper roof");
+
+    // Check the actual retained rescue geometry against the authored Keeper
+    // interior volume. Sampling each generated triangle catches vertical bank
+    // faces and the former six lane-diagonal curtains, not just support height.
+    constexpr float keeperMinX=-36.90f,keeperMaxX=-30.50f;
+    constexpr float keeperMinZ=-18.40f,keeperMaxZ=-12.00f;
+    constexpr float keeperFloor=-.95f,keeperRoof=1.35f;
+    std::size_t interiorIntrudingTriangles=0;
+    std::array<std::size_t,kWorldRoutePoints.size()> intrusionsBySegment{};
+    std::size_t unclassifiedIntrusions=0;
+    for(const auto& triangle:rescueTerrain.triangles) {
+        bool intrudes=false;
+        constexpr int subdivisions=16;
+        for(int i=0;i<=subdivisions&&!intrudes;++i) for(int j=0;j<=subdivisions-i&&!intrudes;++j) {
+            const float u=static_cast<float>(i)/subdivisions,v=static_cast<float>(j)/subdivisions,w=1-u-v;
+            const float x=w*triangle.points[0][0]+u*triangle.points[1][0]+v*triangle.points[2][0];
+            const float y=w*triangle.points[0][1]+u*triangle.points[1][1]+v*triangle.points[2][1];
+            const float z=w*triangle.points[0][2]+u*triangle.points[1][2]+v*triangle.points[2][2];
+            intrudes=x>keeperMinX&&x<keeperMaxX&&z>keeperMinZ&&z<keeperMaxZ&&
+                     y>keeperFloor&&y<keeperRoof;
+        }
+        interiorIntrudingTriangles+=intrudes?1u:0u;
+        if(intrudes) {
+            bool classified=false;
+            for(const auto& source:WorldRouteSurfaceTriangles()) if(source.points==triangle.points) {
+                ++intrusionsBySegment[source.segment];classified=true;break;
+            }
+            if(!classified) for(const auto& source:WorldRouteTerrainShellTriangles()) if(source.points==triangle.points) {
+                ++intrusionsBySegment[source.segment];classified=true;break;
+            }
+            if(!classified) ++unclassifiedIntrusions;
+        }
+    }
+    if(interiorIntrudingTriangles) {
+        std::cerr<<"Keeper-interior terrain triangle hits="<<interiorIntrudingTriangles<<" by route segment=";
+        for(std::size_t i=0;i<intrusionsBySegment.size();++i)
+            if(intrusionsBySegment[i]) std::cerr<<i<<':'<<intrusionsBySegment[i]<<' ';
+        std::cerr<<"other="<<unclassifiedIntrusions<<'\n';
+    }
+    check(interiorIntrudingTriangles==0,
+          "generated rescue terrain banks or curtains intersect the Keeper interior volume");
+
+    // Removing the pre-landing segment from rendering must leave the real F01
+    // apron and every playable connector point supported by uploaded top faces.
+    auto rescueWithApron=rescueTerrain;
+    horde::scene::AppendRescueJourneyGeometry(rescueWithApron);
+    const auto hasRenderedSupport=[&](float x,float z,float expectedY) {
+        bool found=false;
+        for(const auto& triangle:rescueWithApron.triangles) {
+            if(triangle.normal!=0u) continue;
+            const auto& a=triangle.points[0];const auto& b=triangle.points[1];const auto& c=triangle.points[2];
+            const float d=(b[2]-c[2])*(a[0]-c[0])+(c[0]-b[0])*(a[2]-c[2]);
+            if(std::abs(d)<1e-7f) continue;
+            const float u=((b[2]-c[2])*(x-c[0])+(c[0]-b[0])*(z-c[2]))/d;
+            const float v=((c[2]-a[2])*(x-c[0])+(a[0]-c[0])*(z-c[2]))/d;
+            if(u>=-.00001f&&v>=-.00001f&&u+v<=1.00001f)
+                found |= near(u*a[1]+v*b[1]+(1-u-v)*c[1],expectedY);
+        }
+        return found;
+    };
+    for(std::size_t leg=0;leg+1<horde::gameplay::traversal::kRescueConnector.size();++leg) {
+        const auto a=horde::gameplay::traversal::kRescueConnector[leg];
+        const auto b=horde::gameplay::traversal::kRescueConnector[leg+1];
+        for(int i=0;i<=20;++i) {
+            const float t=static_cast<float>(i)/20.0f;
+            const float x=a.x+(b.x-a.x)*t,z=a.z+(b.z-a.z)*t;
+            const auto support=horde::gameplay::traversal::RescueExteriorSupport(x,z);
+            check(support.grounded&&hasRenderedSupport(x,z,support.worldY),
+                  "rescue apron/connector support does not match an emitted top triangle");
+        }
+    }
     for(std::size_t i=0;i<resident.triangles.size();++i)
         check(resident.triangles[i].points==staged.triangles[i].points && resident.triangles[i].owner==staged.triangles[i].owner,"staged preparation drops or alters retained contributors");
     check(staged.peakPreparationCpuBytes>=resident.retainedCpuBytes,"staged overlap omitted");

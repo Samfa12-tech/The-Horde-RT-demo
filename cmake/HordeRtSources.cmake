@@ -32,6 +32,7 @@ set(HORDE_RT_CORE_RELATIVE_SOURCES
     gameplay/items/HeldLightState.cpp
     gameplay/items/HeldItemKinematics.cpp
     gameplay/ShowcaseBenchmark.cpp
+    scene/ForestDressing.cpp
     scene/TombDressing.cpp
     scene/assets/AssetManifest.cpp
     scene/assets/AssetValidation.cpp

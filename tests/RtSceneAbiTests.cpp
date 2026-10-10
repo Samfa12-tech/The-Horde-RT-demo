@@ -210,15 +210,16 @@ void TestGeneratedConstants()
           "topology-certified closed volume is an append-only material ABI flag");
     Check(static_cast<std::uint32_t>(RtMaterialFlag::CertifiedRectangularVolume) == 4096u,
           "rectangular geometry certification has a distinct append-only material flag");
-    Check(kRtInstanceMetadataCapacity == 25u, "instance metadata preserves prior owners and appends water contact24");
-    Check(kRtTlasInstanceCapacity == 27u,
-          "water contact adds physical owner26 while the two permanent Keeper torches retain physical indices23/24");
+    Check(kRtInstanceMetadataCapacity == 26u,
+          "instance metadata appends the dedicated Keeper identity25 after existing water contact24");
+    Check(kRtTlasInstanceCapacity == 28u,
+          "Keeper character owner27 appends after water contact26 while preserving Keeper torches23/24");
     Check(kRtActiveFireEmitterCapacity == 4u && kRtFireEmitterCapacity == 4u && sizeof(RtFireEmitterGpu) == 160u,
           "all four important lights are active within the unchanged 640-byte fire storage buffer");
     Check(kRtStaticAssetCapacity == 13u, "static asset capacity admits the original player sword scabbard and dedicated water droplet owner without replacing old assets");
     Check(kRtPrimitiveMetadataCapacity == 32u, "primitive capacity is 32");
     Check(kRtMaterialCapacity == 32u, "material capacity is 32");
-    Check(kRtTextureLayerCapacity == 16u, "each PBR texture category has 16 layers");
+    Check(kRtTextureLayerCapacity == 18u, "each PBR texture category has 18 layers");
     Check(kRtBindingInstanceMetadata == 11u && kRtBindingPrimitiveMetadata == 12u &&
               kRtBindingMaterials == 13u && kRtBindingStaticVertices == 14u &&
               kRtBindingStaticIndices == 15u && kRtBindingBaseColorTextures == 16u &&
@@ -309,7 +310,7 @@ void TestGenericRegistrationAndMeasurements()
     Check(slot.Measurements().vertexBytes == 6u * 64u &&
               slot.Measurements().indexBytes == 6u * 4u &&
               slot.Measurements().materialBytes == 2u * 128u &&
-               slot.Measurements().instanceMetadataBytes == 25u * 32u &&
+               slot.Measurements().instanceMetadataBytes == 26u * 32u &&
               slot.Measurements().primitiveMetadataBytes == 2u * 16u &&
               slot.Measurements().descriptorCount == 9u,
           "resource measurements use literal ABI sizes and descriptor count");
@@ -339,13 +340,52 @@ void TestExplicitTextureGroups()
               diagnostic == "RtStaticMeshSlot texture group has conflicting texture presence.",
           "grouped materials cannot silently disagree on texture presence");
     asset.materials[2].normalTexture = 6;
-    auto preceding = MakeAsset(1u, 15u);
+    auto preceding = MakeAsset(1u, 17u);
     for (std::size_t i = 0; i < preceding.materials.size(); ++i)
         preceding.materials[i].baseColorTexture = static_cast<std::int32_t>(i);
     const std::array<StaticRtAssetRegistration, 2> registrations{{{1u, 2u, 1u, 0u, &preceding}, request}};
     Check(!slot.Initialize(registrations, diagnostic) &&
-              diagnostic == "RtStaticMeshSlot capacity overflow: baseColor texture layers exceed 16.",
+              diagnostic == "RtStaticMeshSlot capacity overflow: baseColor texture layers exceed 18.",
           "canonical groups still enforce bounded texture capacity");
+}
+
+void TestDeferredTextureGroups()
+{
+    using namespace horde::vulkan::raytracing;
+    auto combined=MakeAsset(6u,6u);
+    for(std::size_t i=0;i<2;++i) combined.materials[i].baseColorTexture=static_cast<std::int32_t>(i);
+    for(std::size_t i=2;i<6;++i) {
+        auto& material=combined.materials[i];
+        material.baseColorTexture=static_cast<std::int32_t>(i);
+        material.textureGroup=static_cast<std::int32_t>(i-2);
+        material.deferTextureAllocation=true;
+    }
+    auto later=MakeAsset(1u,12u);
+    for(std::size_t i=0;i<12;++i) later.materials[i].baseColorTexture=static_cast<std::int32_t>(i);
+    const std::array<StaticRtAssetRegistration,2> registrations{{
+        {1u,1u,1u,0u,&combined},{3u,2u,1u,0u,&later}}};
+    RtStaticMeshSlot slot;std::string diagnostic;
+    Check(slot.Initialize(registrations,diagnostic),"deferred groups fit exactly at the18-layer boundary");
+    bool legacy=true,newGroups=true;
+    if(slot.Materials().size()==18) {
+        for(std::size_t i=0;i<2;++i) legacy&=slot.Materials()[i].textureLayers[0]==i;
+        for(std::size_t i=0;i<12;++i) legacy&=slot.Materials()[6+i].textureLayers[0]==i+2;
+        for(std::size_t i=0;i<4;++i) newGroups&=slot.Materials()[2+i].textureLayers[0]==14+i;
+    } else legacy=newGroups=false;
+    Check(legacy&&newGroups&&slot.TextureArrayCounts().baseColor==18,
+          "sharing geometry owner preserves all14 legacy layers and routes tail families14..17");
+    Check(slot.PrimitiveMetadata().size()==7&&slot.PrimitiveMetadata()[6].materialIndex==6,
+          "deferred textures do not reorder primitive/material geometry");
+    later.materials.push_back(later.materials.back());
+    later.materials.back().baseColorTexture=12;
+    Check(!slot.Initialize(registrations,diagnostic)&&diagnostic=="RtStaticMeshSlot deferred texture layers exceed capacity.",
+          "one extra actual layer rejects deferred admission");
+    later.materials.pop_back();
+    combined.materials[2].textureGroup=-1;
+    Check(!slot.Initialize(registrations,diagnostic),"ungrouped deferred material is rejected");
+    combined.materials[2].textureGroup=0;
+    combined.materials[3].textureGroup=0;combined.materials[3].deferTextureAllocation=false;
+    Check(!slot.Initialize(registrations,diagnostic),"conflicting deferred/ordinary group policy is rejected");
 }
 
 void TestNamedCapacityFailures()
@@ -390,12 +430,12 @@ void TestNamedCapacityFailures()
               diagnostic == "RtStaticMeshSlot capacity overflow: materials exceed 32.",
           "material overflow fails initialization by name");
 
-    auto textureOverflow = MakeAsset(1u, 17u);
+    auto textureOverflow = MakeAsset(1u, 19u);
     for (std::size_t materialIndex = 0u; materialIndex < textureOverflow.materials.size(); ++materialIndex)
         textureOverflow.materials[materialIndex].baseColorTexture = static_cast<std::int32_t>(materialIndex);
     StaticRtAssetRegistration textureRequest{3u, 1u, 1u, 0u, &textureOverflow};
     Check(!slot.Initialize(std::span<const StaticRtAssetRegistration>(&textureRequest, 1u), diagnostic) &&
-              diagnostic == "RtStaticMeshSlot capacity overflow: baseColor texture layers exceed 16.",
+              diagnostic == "RtStaticMeshSlot capacity overflow: baseColor texture layers exceed 18.",
           "metadata cannot assign a texture layer outside the fixed Vulkan array");
 }
 
@@ -424,19 +464,19 @@ void TestTextureArrayCapacities()
 {
     using namespace horde::vulkan::raytracing;
     std::string diagnostic;
-    Check(RtTextureArrays::Validate({16u, 16u, 16u, 16u}, diagnostic),
-          "all four arrays accept the exact 16-layer boundary");
-    Check(!RtTextureArrays::Validate({17u, 1u, 1u, 1u}, diagnostic) &&
-              diagnostic == "RtTextureArrays capacity overflow: baseColor layers exceed 16.",
+    Check(RtTextureArrays::Validate({18u, 18u, 18u, 18u}, diagnostic),
+          "all four arrays accept the exact 18-layer boundary");
+    Check(!RtTextureArrays::Validate({19u, 1u, 1u, 1u}, diagnostic) &&
+              diagnostic == "RtTextureArrays capacity overflow: baseColor layers exceed 18.",
           "base colour overflow is named");
-    Check(!RtTextureArrays::Validate({1u, 17u, 1u, 1u}, diagnostic) &&
-              diagnostic == "RtTextureArrays capacity overflow: normal layers exceed 16.",
+    Check(!RtTextureArrays::Validate({1u, 19u, 1u, 1u}, diagnostic) &&
+              diagnostic == "RtTextureArrays capacity overflow: normal layers exceed 18.",
           "normal overflow is named");
-    Check(!RtTextureArrays::Validate({1u, 1u, 17u, 1u}, diagnostic) &&
-              diagnostic == "RtTextureArrays capacity overflow: ORM layers exceed 16.",
+    Check(!RtTextureArrays::Validate({1u, 1u, 19u, 1u}, diagnostic) &&
+              diagnostic == "RtTextureArrays capacity overflow: ORM layers exceed 18.",
           "ORM overflow is named");
-    Check(!RtTextureArrays::Validate({1u, 1u, 1u, 17u}, diagnostic) &&
-              diagnostic == "RtTextureArrays capacity overflow: emissive layers exceed 16.",
+    Check(!RtTextureArrays::Validate({1u, 1u, 1u, 19u}, diagnostic) &&
+              diagnostic == "RtTextureArrays capacity overflow: emissive layers exceed 18.",
           "emissive overflow is named");
 }
 
@@ -620,6 +660,7 @@ int main()
     TestGeneratedConstants();
     TestGenericRegistrationAndMeasurements();
     TestExplicitTextureGroups();
+    TestDeferredTextureGroups();
     TestNamedCapacityFailures();
     TestMaterialAuthoringValidation();
     TestTextureArrayCapacities();

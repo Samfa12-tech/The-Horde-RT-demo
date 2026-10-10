@@ -6,6 +6,8 @@
 #include "vulkan/raytracing/WaterContactRenderGeometry.h"
 #include "vulkan/raytracing/RtDescriptorSetLayoutBindings.h"
 #include "gameplay/effects/KeeperTorchLighting.h"
+#include "scene/assets/StaticPrimitiveGrouping.h"
+#include "vulkan/raytracing/RtWorldMaterialPalette.h"
 
 #ifdef _MSC_VER
 #include <crtdbg.h>
@@ -338,6 +340,115 @@ namespace horde::vulkan::raytracing
 
 struct PresentableTinyRtSceneObservationTestAccess
 {
+    static bool CheckStaticGroupingSemantics()
+    {
+        using horde::scene::assets::StaticMeshAsset;
+        using horde::scene::assets::CoalesceAdjacentWorldBakedPrimitives;
+        StaticMeshAsset source;
+        source.vertices.resize(9u);
+        for(std::size_t i=0;i<source.vertices.size();++i) {
+            source.vertices[i].position={{static_cast<float>(i),0.f,1.f,1.f}};
+            source.vertices[i].normal={{0.f,1.f,0.f,0.f}};
+            source.vertices[i].uv0={{static_cast<float>(i)/9.f,0.f,0.f,0.f}};
+        }
+        source.indices={0,1,2,0,1,2,0,1,2};
+        source.materials.resize(2);
+        source.nodeTransforms.resize(1);
+        source.primitives={{0,0,3,0,0},{3,3,3,0,0},{6,6,3,1,0}};
+        auto tuples=[](const StaticMeshAsset& asset) {
+            std::vector<std::array<std::uint32_t,4>> result;
+            for(const auto& p:asset.primitives) for(std::size_t n=0;n<p.indexCount;n+=3)
+                result.push_back({{p.vertexOffset+asset.indices[p.indexOffset+n],
+                    p.vertexOffset+asset.indices[p.indexOffset+n+1],
+                    p.vertexOffset+asset.indices[p.indexOffset+n+2],p.materialIndex}});
+            return result;
+        };
+        const auto before=tuples(source);
+        const auto oldVertices=source.vertices;
+        auto grouped=source;
+        std::string diagnostic;
+        bool ok=CoalesceAdjacentWorldBakedPrimitives(grouped,diagnostic) &&
+            grouped.primitives.size()==2 && tuples(grouped)==before &&
+            grouped.vertices.size()==oldVertices.size() &&
+            std::memcmp(grouped.vertices.data(),oldVertices.data(),oldVertices.size()*sizeof(oldVertices[0]))==0;
+        ok &= CoalesceAdjacentWorldBakedPrimitives(grouped,diagnostic) &&
+            grouped.primitives.size()==2 && tuples(grouped)==before;
+        auto invalid=source;invalid.indices[3]=99u;
+        const auto invalidIndices=invalid.indices;
+        ok &= !CoalesceAdjacentWorldBakedPrimitives(invalid,diagnostic) &&
+            invalid.indices==invalidIndices && invalid.primitives.size()==source.primitives.size();
+        return ok;
+    }
+
+    static bool CheckWorldMaterialPaletteSemantics()
+    {
+        const auto shared=MakeRtWorldMaterialPalette(true);
+        const auto preview=MakeRtWorldMaterialPalette(false);
+        bool ok=shared.count==2u && preview.count==1u;
+        for(std::uint32_t surface=0u;surface<6u;++surface) {
+            RtMaterialGpu legacy{};
+            legacy.baseColorFactor={{1.f,1.f,1.f,1.f}};
+            legacy.normalScaleUvScaleBlend={{1.f,.42f,.42f,.34f}};
+            if(surface==5u) {legacy.baseColorFactor={{.24f,.52f,.19f,1.f}};
+                            legacy.normalScaleUvScaleBlend[0]=0.f;}
+            const auto& selected=shared.records[surface==5u?1u:0u];
+            ok &= std::memcmp(&legacy,&selected,sizeof(legacy))==0;
+            for(std::uint32_t normal=0u;normal<6u;++normal) {
+                const auto oldCode=surface|(normal<<8u)|((26u+surface+1u)<<16u);
+                const auto nextCode=surface|(normal<<8u)|
+                    ((surface==5u?32u:AuthoredWorldMaterialIndexPlusOne(30u,surface))<<16u);
+                ok &= (oldCode&0xffffu)==(nextCode&0xffffu);
+            }
+        }
+        ok &= AuthoredWorldMaterialIndexPlusOne(30u,5u)==0u &&
+              AuthoredWorldMaterialIndexPlusOne(30u,99u)==0u;
+        return ok;
+    }
+
+    static bool CheckDevelopmentStaticAdmission()
+    {
+        bool all=true;
+        for(const bool compiledHigh:{false,true}) {
+        PresentableTinyRtScene scene;
+        scene.sceneProfile_=RtSceneProfile::Showcase;
+        scene.SetDevelopmentRescueJourney(true);
+        std::string diagnostic;
+        if(compiledHigh) {
+            RtPipelineBundlePreflight preflight;
+            RtPipelineBundleDestroyApi destroy;
+            destroy.gpuResources=&scene.gpuResources_;
+            destroy.destroyBuffer=[](void*,RtGpuResources*,RtGpuBuffer&,RtPipelineOwnedBuffer) noexcept {};
+            destroy.destroyPipeline=[](void*,VkPipeline&,RtMaterialStrategy) noexcept {};
+            destroy.destroyPipelineLayout=[](void*,VkPipelineLayout&) noexcept {};
+            destroy.destroyDescriptorPool=[](void*,VkDescriptorPool&) noexcept {};
+            destroy.destroyDescriptorSetLayout=[](void*,VkDescriptorSetLayout&) noexcept {};
+            if(!ResolveCompiledRtPipelineBundlePreflight(preflight,diagnostic) ||
+                !scene.pipelineBundle_.AdoptPreflight(std::move(preflight),destroy,diagnostic)) return false;
+        }
+        const auto root=(std::filesystem::path(HORDE_RT_SOURCE_DIR)/"assets").string();
+        if(!scene.LoadStaticHeldItemAssets("",root,diagnostic)) {
+            std::cerr<<"Real development static admission: "<<diagnostic<<'\n';
+            return false;
+        }
+        const auto counts=scene.staticMeshSlot_.TextureArrayCounts();
+        const std::array<std::uint32_t,4> layers{{counts.baseColor,counts.normal,counts.orm,counts.emissive}};
+        // No admitted static material references an emissive image. The
+        // packaged emissive array separately retains its one fallback layer.
+        bool ok=layers==std::array<std::uint32_t,4>{{18,15,15,0}};
+        const auto& materials=scene.staticMeshSlot_.Materials();
+        const auto& primitives=scene.staticMeshSlot_.PrimitiveMetadata();
+        std::cout<<"Actual development static admission materials="<<materials.size()
+            <<" primitives="<<primitives.size()<<" layers="<<layers[0]<<","<<layers[1]
+            <<","<<layers[2]<<","<<layers[3]<<'\n';
+        ok &= materials.size()<=kRtMaterialCapacity && primitives.size()<=kRtPrimitiveMetadataCapacity;
+        ok &= materials.size()+MakeRtWorldMaterialPalette(true).count<=kRtMaterialCapacity;
+        ok &= materials.size()==30u && primitives.size()==
+            (scene.pipelineBundle_.Request().quality==DielectricQuality::High?32u:31u);
+        all &= ok;
+        }
+        return all;
+    }
+
     static bool CheckMistControlsAndLifetime()
     {
         bool ok = true;
@@ -709,11 +820,12 @@ struct PresentableTinyRtSceneObservationTestAccess
         { std::cerr << "Integrated tomb intake: " << diagnostic << '\n'; return false; }
         const auto oldIndices = baseline.collapseStaticAsset_.indices.size();
         // Original selected dressing plus two T03 candle stubs (664 each),
-        // one offering bowl (960), and the closed 12-triangle lintel lip.
-        constexpr std::size_t addedIndices = 46140u + (2u*664u + 960u + 12u)*3u;
+        // one offering bowl (960), the closed 12-triangle lintel lip, and
+        // ten original pine/alder instances grouped into four primitives.
+        constexpr std::size_t addedIndices = 46140u + (2u*664u + 960u + 12u + 50510u)*3u;
         bool ok = tomb.collapseStaticAsset_.indices.size() == oldIndices + addedIndices &&
-                  tomb.staticMeshSlot_.PrimitiveMetadata().size() == 28u &&
-                  tomb.staticMeshSlot_.Materials().size() == 26u &&
+                  tomb.staticMeshSlot_.PrimitiveMetadata().size() == 31u &&
+                  tomb.staticMeshSlot_.Materials().size() == 30u &&
                   tomb.staticMeshSlot_.PrimitiveMetadata().size() <= 32u &&
                   tomb.staticMeshSlot_.Materials().size() <= 32u;
         std::cout << "Integrated native tomb static roster: "
@@ -1261,6 +1373,12 @@ int main()
 #endif
     std::cerr << "Resource integration: existing readback/mist/torch contracts\n";
     bool ok = PresentableTinyRtSceneObservationTestAccess::CheckPersistentReadback();
+    ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckStaticGroupingSemantics(),
+                  "adjacent static grouping must preserve every triangle/material/vertex and reject malformed input atomically");
+    ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckWorldMaterialPaletteSemantics(),
+                  "shared authored palette must retain byte-identical material values and every surface/normal classification");
+    ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckDevelopmentStaticAdmission(),
+                  "real dressed tomb/forest production registration exceeds its unchanged resource contracts");
     ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckMistControlsAndLifetime(),
                   "mist control must preserve default-On/shadow policy and distinguish requested from owned uploaded state");
     ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckKeeperTorchBodyAliases(),
@@ -1623,7 +1741,7 @@ int main()
                       diagnostic.bottomLevelAccelerationStructureCount == 21u &&
                       scene.BlasCount() == 21u &&
                       diagnostic.topLevelAccelerationStructureCount == 1u &&
-                      diagnostic.tlasInstanceCount == 27u &&
+                      diagnostic.tlasInstanceCount == 28u &&
                       diagnostic.pipelineCount == 2u &&
                       diagnostic.shaderBindingTableCount == 2u &&
                       diagnostic.descriptorSetCount == 1u,

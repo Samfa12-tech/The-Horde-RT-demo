@@ -32,14 +32,16 @@ int main() {
  disabled.SetDevelopmentRescueJourney(false);
  for(int i=0;i<60;++i) {baseline.StepFixed(input);disabled.StepFixed(input);}
  check(baseline.Snapshot().playerX==disabled.Snapshot().playerX && baseline.Snapshot().playerSupportWorldY==disabled.Snapshot().playerSupportWorldY,"default production support changed");
- GameSimulationConfig config;config.playerStartX=kLowerLanding.x;config.playerStartZ=kLowerLanding.z;
- config.playerMountProfile=items::PlayerMountProfile::AnatomicalBody;
+ GameSimulationConfig config=ProductionGameSimulationConfig();
+ config.playerStartX=kLowerLanding.x;config.playerStartZ=kLowerLanding.z;
  GameSimulation sim(config);sim.SetDevelopmentRescueJourney(true);
  check(!sim.Snapshot().rescue.ropeDeployed && sim.Snapshot().rescuePrompt==RescuePrompt::None,"reward bypass before ownership");
  interactions::ChestRewardSnapshot chest;chest.phase=interactions::ChestRewardPhase::LanternClaimed;chest.lidOpenProgress=1;
  interactions::InteractionState interaction;interactions::ResetInteractionState(interaction,interactions::HeldLightKind::RewardLantern);
  interactions::FinaleSequenceSnapshot finale;finale.lichDefeated=true;
  check(sim.ApplyShowcaseCheckpoint(11),"actual Keeper-victory checkpoint unavailable");
+ check(sim.Snapshot().skeletonEnemyCount==2,
+       "production Keeper-victory checkpoint did not retain both waterfall guards");
  sim.ImportRewardCheckpoint(chest,interaction,finale);
  check(sim.Snapshot().rescue.claimCount==1 && sim.Snapshot().rescue.deploymentCount==1,"claimed import did not seed one owned deployment");
  horde::vulkan::raytracing::RtSceneTuning overrides;overrides.finaleRoofOpenOverride=0;overrides.finaleDawnRevealOverride=1;
@@ -126,9 +128,14 @@ int main() {
         "upper safe landing must restore claimed lantern to physical free hand");
   const auto exteriorFrame=horde::vulkan::raytracing::BuildRtSceneFrameInputs(sim.Snapshot(),.92f,horde::vulkan::raytracing::WaterQuality::High);
   const auto plan=horde::vulkan::raytracing::EvaluateCharacterFramePlan(exteriorFrame.skeletonEnemies,
-      exteriorFrame.skeletonEnemyCount,exteriorFrame.roster,exteriorFrame.lich,1,true);
-  check(plan.selectedLich && plan.skeletonCount==1 && plan.skeletons[0].poseBucket==1,
-      "combined workload discarded the off-camera Keeper or selected the wrong skeleton buffer");
+      exteriorFrame.skeletonEnemyCount,exteriorFrame.roster,exteriorFrame.lich,1);
+  check(plan.lichVisible && plan.skeletonCount==2 &&
+        exteriorFrame.skeletonEnemyCount==sim.Snapshot().skeletonEnemyCount,
+      "exterior handoff discards the off-camera Keeper or either authoritative waterfall guard");
+  for(std::size_t enemy=0;enemy<2;++enemy)
+      check(exteriorFrame.skeletonEnemies[enemy].x==sim.Snapshot().skeletonEnemies[enemy].x &&
+            exteriorFrame.skeletonEnemies[enemy].z==sim.Snapshot().skeletonEnemies[enemy].z,
+            "exterior presentation substitutes a synthetic actor for a waterfall guard");
   input.moveForward=0;input.runHeld=false;
   const auto paused=sim.Snapshot();input.paused=true;sim.StepFixed(input);
   check(sim.Snapshot().playerX==paused.playerX && sim.Snapshot().playerSupportWorldY==paused.playerSupportWorldY,"pause moved safe side");input.paused=false;
@@ -203,9 +210,16 @@ int main() {
  horde::scene::AppendRescueJourneyGeometry(resident);horde::scene::AppendRescueJourneyGeometry(staged);
  check(resident.valid&&staged.valid&&resident.triangles.size()==staged.triangles.size(),"combined geometry failed admission");
  check(resident.triangles.size()==horde::scene::PrepareDevelopmentWorldGeometry(false,true).triangles.size()+
-       (horde::scene::kRescueBlockoutBoxes.size()+2)*12+420+
+       (horde::scene::kRescueBlockoutBoxes.size()+2)*12+
        horde::scene::kOutdoorEffectMarkerTriangleCount,
-       "combined real scene is missing counted rim, anchor, tree or placeholder contributors");
+       "combined real scene is missing counted rim, anchor or labelled experiment contributors");
+ const auto preLanding=horde::gameplay::traversal::RescueExteriorSupport(
+     kWorldRoutePoints[1].x-1.6f,(kWorldRoutePoints[1].z+kWorldRoutePoints[2].z)*.5f);
+ check(!preLanding.grounded,
+       "nonplayable roof-overlapping segment 1 retained rescue support outside the F01 apron");
+ const auto apron=horde::gameplay::traversal::RescueExteriorSupport(kExteriorLanding.x,kExteriorLanding.z);
+ check(apron.grounded&&std::abs(apron.worldY-kUpperSupportWorldY)<.0001f,
+       "rescue landing apron lost its authored safe support");
  check(!RescueExteriorSupport(-33.7f,-15.2f).grounded,
        "wooded terrain incorrectly closes the actual rope shaft aperture");
  for(const auto& triangle:resident.triangles) {
@@ -230,7 +244,38 @@ int main() {
   const float t=i/600.0f;
   for(std::size_t s=0;s+1<kRescueConnector.size();++s) {
    const auto a=kRescueConnector[s],b=kRescueConnector[s+1];
-   check(RescueExteriorSupport(a.x+(b.x-a.x)*t,a.z+(b.z-a.z)*t).grounded,"connector support gap");
+   const float x=a.x+(b.x-a.x)*t,z=a.z+(b.z-a.z)*t;
+   const auto support=RescueExteriorSupport(x,z);
+   check(support.grounded,"connector support gap");
+   bool renderedTop=false;
+   for(const auto& triangle:resident.triangles) {
+    if(triangle.normal!=0u)continue;
+    const auto p=triangle.points[0],q=triangle.points[1],r=triangle.points[2];
+    const float den=(q[2]-r[2])*(p[0]-r[0])+(r[0]-q[0])*(p[2]-r[2]);
+    if(std::abs(den)<1e-6f)continue;
+    const float u=((q[2]-r[2])*(x-r[0])+(r[0]-q[0])*(z-r[2]))/den;
+    const float v=((r[2]-p[2])*(x-r[0])+(p[0]-r[0])*(z-r[2]))/den;
+    if(u>=-.00001f&&v>=-.00001f&&u+v<=1.00001f) {
+     const float y=u*p[1]+v*q[1]+(1-u-v)*r[1];
+     renderedTop|=std::abs(y-support.worldY)<.0001f;
+    }
+   }
+   check(renderedTop,"connector/apron support has no matching emitted top triangle");
+  }
+ }
+ {
+  const auto a=kWorldRoutePoints[2],b=kWorldRoutePoints[3];
+  const float dx=b.x-a.x,dz=b.z-a.z,length=std::hypot(dx,dz);
+  const float cx=a.x+.65f*dx,cz=a.z+.65f*dz,nx=-dz/length,nz=dx/length;
+  for(float side:{-1.0f,1.0f}) {
+   const float insideX=cx+side*nx*11.0f,insideZ=cz+side*nz*11.0f;
+   const auto inside=RescueExteriorSupport(insideX,insideZ);
+   check(inside.grounded,"wide rescue approach bank lost actual rendered support");
+   const float outsideX=cx+side*nx*13.0f,outsideZ=cz+side*nz*13.0f;
+   check(!RescueExteriorSupport(outsideX,outsideZ).grounded,
+         "rescue support extended beyond the actual exterior terrain edge");
+   check(!WorldRouteTerrainMovementClear(cx,cz,outsideX,outsideZ,inside.worldY,.35f),
+         "rescue capsule sweep crossed the actual exterior terrain edge");
   }
  }
  std::cout<<"Combined CPU preparation resident_ns="<<resident.preparationCpuNanoseconds

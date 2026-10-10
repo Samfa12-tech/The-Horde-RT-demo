@@ -5,8 +5,11 @@ the scene, subtitle, three-character and tree integration changes described
 below are still uncommitted and awaiting their final affected build/package and
 physical checks. This documentation checkpoint does not admit that candidate.
 
-Preparation for Eric's separate Blender terrain package; no replacement terrain
-authoring or planning-grid runtime import was performed here. The existing
+**Ownership update, 11 October:** the owner assigns Blender terrain authoring and
+runtime integration to this job. Eric's separate task never started and no
+package is forthcoming. The measurements below remain the integration contract;
+the external dependency is removed. At this measurement checkpoint no terrain
+authoring or planning-grid runtime import was performed. The existing
 exterior remains a development blockout and does not satisfy final woodland art
 or terrain-envelope acceptance. This record supplements the scene/subtitle
 repairs on PR27 rather than starting another implementation branch.
@@ -113,9 +116,8 @@ character slot, its geometry/texture handoff and safe resource lifetime; it must
 not assume the need for a larger character or atlas capacity. No private project archive
 or unrelated source is transferred.
 
-Terrain authoring has not started according to the owner. Independent repairs
-and this handoff proceed now; runtime terrain integration waits for an actual
-reviewed package. Required subsequent evidence: native import negatives,
+This job will produce the versioned editable master and runtime derivative;
+integration no longer waits for an external package. Required subsequent evidence: native import negatives,
 surface/support correspondence, matched real RT views on both backends, full
 rope/route/backtrack sweep, actual resource/timing measurements, and Android
 touch/visual/lifecycle checks. CPU geometry counts and Blender views cannot

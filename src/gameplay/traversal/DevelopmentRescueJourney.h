@@ -2,6 +2,7 @@
 #include "gameplay/simulation/DevelopmentWorldRoute.h"
 #include "gameplay/traversal/RescueTraversal.h"
 #include "scene/RescueBlockoutGeometry.h"
+#include "scene/OccupiedTombVolume.h"
 #include <array>
 #include <algorithm>
 #include <cmath>
@@ -24,8 +25,22 @@ inline simulation::PlayerSupportResolution RescueExteriorSupport(float x,float z
     using namespace simulation;
     if(OnRescueLanding(x,z)) return {kUpperSupportWorldY,static_cast<PlayerSupportId>(130),true};
     const auto p=ProjectWorldRoute(x,z);
-    if(!p.valid||p.segment<1) return {kRouteFloorWorldY,PlayerSupportId::RouteFloor,false};
-    return ResolveWorldRouteSupport(x,z);
+    // The rescue route begins at F01 (point 2). Segment 1 is the short
+    // pre-landing approach over the Keeper roof and is intentionally absent
+    // from the rescue RT terrain. Keep support eligibility aligned with the
+    // emitted connector; the apron above owns the safe landing itself.
+    if(!p.valid||p.segment<2) return {kRouteFloorWorldY,PlayerSupportId::RouteFloor,false};
+    auto support=ResolveWorldRouteSupport(x,z);
+    if(support.grounded) for(const auto& room:horde::gameplay::kShowcaseWalkableRects) {
+        if(horde::gameplay::Contains(room,x,z)&&support.worldY>kRouteFloorWorldY&&
+           support.worldY<horde::scene::kShowcaseRouteCeilingWorldY) {
+            float roof=0;
+            if(!horde::scene::RetainedTombRoofAt(x,z,roof))
+                return {kRouteFloorWorldY,PlayerSupportId::RouteFloor,false};
+            support.worldY=roof;break;
+        }
+    }
+    return support;
 }
 inline bool RescueExteriorMovementClear(float fromX,float fromZ,float toX,float toZ,
                                         float supportY,float radius) {

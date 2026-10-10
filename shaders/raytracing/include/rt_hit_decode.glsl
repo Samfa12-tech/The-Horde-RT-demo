@@ -1,5 +1,7 @@
 #include "rt_dielectric_spawn.glsl"
 
+const int kKeeperInstanceMetadataIndex = 25;
+
 vec3 normalForSurfaceCode(uint code)
 {
     uint normalCode = (code >> 8u) & 0xffu;
@@ -250,7 +252,7 @@ void materialForPrimitive(int primitive,
         return;
     }
 
-    if (instance == 2 || instance == 18)
+    if (instance == 2 || instance == 18 || instance == kKeeperInstanceMetadataIndex)
     {
         normal = vec3(0.0, 1.0, 0.0);
         geometricNormal = normal;
@@ -258,7 +260,7 @@ void materialForPrimitive(int primitive,
         // floor/hash lookup changed colour in hard 10 cm cells and looked like
         // checkerboard lighting across the animated mesh.
         float age = 0.5 + 0.5 * sin(p.y * 3.1 + p.x * 1.7 + p.z * 2.3);
-        bool lichInstance = instance == 2 && controls.enemyKind > 0.5;
+        bool lichInstance = instance == kKeeperInstanceMetadataIndex;
         base = lichInstance ? vec3(0.16, 0.13, 0.19)
                             : mix(vec3(0.34, 0.29, 0.21), vec3(0.48, 0.42, 0.30), age * 0.42);
         metallic = lichInstance ? 0.08 : 0.04;
@@ -626,12 +628,12 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
                                  h.normal, h.geometricNormal, h.base, h.metallic,
                                  h.reflectivity, h.occlusion, h.emissive);
         }
-        if (h.instance == 2 || h.instance == 18)
+        if (h.instance == 2 || h.instance == 18 || h.instance == kKeeperInstanceMetadataIndex)
         {
             const int firstVertex = h.primitive * 3;
             const vec2 bary = rayQueryGetIntersectionBarycentricsEXT(query, true);
             const float w0 = 1.0 - bary.x - bary.y;
-            bool lichInstance = h.instance == 2 && controls.enemyKind > 0.5;
+            bool lichInstance = h.instance == kKeeperInstanceMetadataIndex;
             bool secondSkeletonPose = h.instance == 18;
             vec3 localNormal = lichInstance
                 ? normalize(lich.vertices[firstVertex].normal.xyz * w0

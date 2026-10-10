@@ -192,6 +192,11 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
     };
     std::unordered_map<const horde::scene::assets::StaticMeshAsset*, AssetRoute> routes;
     std::array<std::uint32_t, 4u> nextTextureLayers{};
+    struct DeferredGroup {
+        std::array<bool,4u> present{};
+        std::vector<std::size_t> materialIndices;
+    };
+    std::map<std::pair<std::size_t,std::int32_t>,DeferredGroup> deferredGroups;
     for (std::size_t assetIndex = 0u; assetIndex < uniqueAssets.size(); ++assetIndex)
     {
         const auto& asset = *uniqueAssets[assetIndex];
@@ -245,12 +250,23 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
         }
         else
         {
+            std::map<std::int32_t,bool> groupDeferred;
             // Explicit asset-local groups are allocated canonically before the
             // ordinary per-texture routes. Visibility-only material duplication
             // cannot exchange body/gauntlet atlas layers by changing material order.
             for (const auto& material : asset.materials)
             {
+                if(material.deferTextureAllocation && material.textureGroup<0) {
+                    diagnostic="RtStaticMeshSlot deferred texture material requires an explicit group.";
+                    return false;
+                }
                 if (material.textureGroup < 0) continue;
+                const auto [policy,policyInserted]=groupDeferred.try_emplace(
+                    material.textureGroup,material.deferTextureAllocation);
+                if(!policyInserted && policy->second!=material.deferTextureAllocation) {
+                    diagnostic="RtStaticMeshSlot texture group has conflicting allocation policy.";
+                    return false;
+                }
                 const std::array<bool, 4u> present{{material.baseColorTexture >= 0,
                     material.normalTexture >= 0, material.ormTexture >= 0, material.emissiveTexture >= 0}};
                 const auto [entry, inserted] = groupPresence.try_emplace(material.textureGroup, present);
@@ -264,13 +280,17 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
             for (const auto& [group, present] : groupPresence)
             {
                 auto& layers = groupLayers[group];
+                if(groupDeferred.at(group)) {
+                    deferredGroups[{assetIndex,group}].present=present;
+                    continue;
+                }
                 for (std::size_t category = 0; category < layers.size(); ++category)
                 {
                     if (!present[category]) continue;
                     if (nextTextureLayers[category] >= kRtTextureLayerCapacity)
                     {
                         diagnostic = std::string("RtStaticMeshSlot capacity overflow: ") +
-                            categoryNames[category] + " texture layers exceed 16.";
+                            categoryNames[category] + " texture layers exceed 18.";
                         return false;
                     }
                     layers[category] = nextTextureLayers[category]++;
@@ -294,7 +314,7 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
                 if (nextTextureLayers[category] >= kRtTextureLayerCapacity)
                 {
                     diagnostic = std::string("RtStaticMeshSlot capacity overflow: ") +
-                                 categoryName + " texture layers exceed 16.";
+                                 categoryName + " texture layers exceed 18.";
                     return false;
                 }
                 ++nextTextureLayers[category];
@@ -307,6 +327,12 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
             std::array<std::uint32_t, 4u> layers{};
             if (textureSource != nullptr)
             {
+                const auto provider=std::find(uniqueAssets.begin(),uniqueAssets.end(),textureSource);
+                if(sourceMaterial.deferTextureAllocation ||
+                    deferredGroups.contains({static_cast<std::size_t>(provider-uniqueAssets.begin()),sourceMaterial.textureGroup})) {
+                    diagnostic="RtStaticMeshSlot deferred texture groups cannot be aliased.";
+                    return false;
+                }
                 const std::array<bool, 4u> present{{sourceMaterial.baseColorTexture >= 0,
                     sourceMaterial.normalTexture >= 0, sourceMaterial.ormTexture >= 0,
                     sourceMaterial.emissiveTexture >= 0}};
@@ -356,6 +382,8 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
                 diagnostic = "RtStaticMeshSlot material normal/texture scale is outside the finite authoring contract.";
                 return false;
             }
+            if(sourceMaterial.deferTextureAllocation)
+                deferredGroups.at({assetIndex,sourceMaterial.textureGroup}).materialIndices.push_back(materials_.size());
             materials_.push_back(ConvertMaterial(sourceMaterial, layers));
         }
         for (std::size_t primitiveIndex = 0u;
@@ -396,6 +424,20 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
             geometryRole, static_cast<std::uint32_t>(assetIndex), primitiveBase,
             static_cast<std::uint32_t>(asset.primitives.size()),
             std::move(groupPresence), std::move(groupLayers)});
+    }
+
+    // Canonical asset/group order, after every unchanged ordinary route. Only
+    // CPU allocation is deferred; material/primitive/vertex ordering is retained.
+    for(const auto& [key,group]:deferredGroups) {
+        std::array<std::uint32_t,4u> layers{};
+        for(std::size_t category=0;category<4;++category) if(group.present[category]) {
+            if(nextTextureLayers[category]>=kRtTextureLayerCapacity) {
+                diagnostic="RtStaticMeshSlot deferred texture layers exceed capacity.";
+                return false;
+            }
+            layers[category]=nextTextureLayers[category]++;
+        }
+        for(const auto index:group.materialIndices) materials_[index].textureLayers=layers;
     }
 
     for (const StaticRtAssetRegistration& registration : registrations)

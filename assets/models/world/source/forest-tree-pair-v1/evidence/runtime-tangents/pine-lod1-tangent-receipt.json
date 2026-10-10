@@ -1,0 +1,21 @@
+{
+  "status": "pass",
+  "input": "assets/models/world/source/forest-tree-pair-v1/runtime/horde-irregular-pine-v1-lod1.glb",
+  "output": "assets/models/world/runtime/forest-tree-pair-v1/horde-irregular-pine-v1-lod1.glb",
+  "inputSha256": "77c793480abff4ed7515b224a1b4fc55ac840f27d0b1ef9a17dd1ca58ee1ee2c",
+  "outputSha256": "db2d45547ad2f629c48ab8c994db845eb5d097a7db5bed6192b837e29f7a1b3f",
+  "outputBytes": 1402952,
+  "geometryUnchanged": true,
+  "geometryComparison": "positions/winding/UV0 exact at 1e-6; normal direction dot >= 0.99999",
+  "maximumNormalComponentDelta": 0.0006050000000000083,
+  "minimumNormalDirectionDot": 0.999999813024996,
+  "embeddedImagePixelsUnchanged": true,
+  "tangentLoopCountsByMappedMaterial": {
+    "Original charcoal-gray ridged bark": 5748
+  },
+  "materialTriangles": {
+    "Original charcoal-gray ridged bark": 1916,
+    "Original opaque pine needle sprays": 2928,
+    "Original opaque hanging woodland moss": 156
+  }
+}

@@ -69,6 +69,10 @@ struct StaticMaterial
     // Optional asset-local texture group. Groups allocate in ascending ID order,
     // independent of GLB material order; -1 retains generic texture-index routing.
     std::int32_t textureGroup = -1;
+    // CPU-only, explicitly prepared atlas families allocate after the ordinary
+    // routes. This keeps legacy layers stable when geometry shares an owner.
+    // Requires an explicit asset-local group; never changes the GPU record ABI.
+    bool deferTextureAllocation = false;
     std::uint32_t flags = 0u;
 };
 

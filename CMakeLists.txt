@@ -178,7 +178,13 @@ target_link_libraries(horde_gameplay_simulation PUBLIC pocket_audio_native_pcm)
 if(BUILD_TESTING)
     add_executable(horde_rt_chapter_dialogue_tests tests/ChapterDialogueTests.cpp)
     target_link_libraries(horde_rt_chapter_dialogue_tests PRIVATE horde_gameplay_simulation)
+    target_compile_definitions(horde_rt_chapter_dialogue_tests PRIVATE HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
     add_test(NAME horde_rt_chapter_dialogue_tests COMMAND horde_rt_chapter_dialogue_tests)
+    add_executable(horde_rt_windows_vitality_layout_tests tests/WindowsVitalityHudLayoutTests.cpp)
+    target_include_directories(horde_rt_windows_vitality_layout_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_compile_features(horde_rt_windows_vitality_layout_tests PRIVATE cxx_std_20)
+    add_test(NAME horde_rt_windows_vitality_layout_tests COMMAND horde_rt_windows_vitality_layout_tests)
+    set_tests_properties(horde_rt_windows_vitality_layout_tests PROPERTIES TIMEOUT 10)
     add_executable(horde_rt_combat_foundation_tests tests/CombatFoundationTests.cpp)
     target_link_libraries(horde_rt_combat_foundation_tests PRIVATE horde_gameplay_simulation)
     add_test(NAME horde_rt_combat_foundation_tests COMMAND horde_rt_combat_foundation_tests)
@@ -715,6 +721,20 @@ if(BUILD_TESTING)
     target_compile_definitions(horde_rt_tomb_dressing_tests PRIVATE HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
     add_test(NAME horde_rt_tomb_dressing_tests COMMAND horde_rt_tomb_dressing_tests)
 
+    add_executable(horde_rt_forest_dressing_tests
+        tests/ForestDressingTests.cpp src/scene/ForestDressing.cpp src/scene/TombDressing.cpp
+        src/scene/assets/AssetManifest.cpp src/scene/assets/AssetValidation.cpp
+        src/scene/assets/GltfDocument.cpp src/scene/assets/StaticMeshAsset.cpp
+        src/vulkan/raytracing/RtStaticMeshSlot.cpp)
+    target_include_directories(horde_rt_forest_dressing_tests PRIVATE src third_party)
+    target_compile_definitions(horde_rt_forest_dressing_tests PRIVATE HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
+    add_test(NAME horde_rt_forest_dressing_tests COMMAND horde_rt_forest_dressing_tests)
+    find_package(Python3 COMPONENTS Interpreter REQUIRED)
+    add_test(NAME horde_rt_forest_runtime_roster_tests COMMAND ${Python3_EXECUTABLE}
+        ${CMAKE_CURRENT_SOURCE_DIR}/tests/ForestRuntimeRosterTests.py)
+    add_test(NAME horde_rt_forest_texture_source_tests COMMAND ${Python3_EXECUTABLE}
+        ${CMAKE_CURRENT_SOURCE_DIR}/tests/ForestTextureSourceTests.py)
+
     add_executable(horde_rt_static_gltf_asset_tests tests/StaticGltfAssetTests.cpp)
     target_include_directories(horde_rt_static_gltf_asset_tests PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
@@ -893,6 +913,23 @@ if(BUILD_TESTING)
     target_include_directories(horde_rt_music_director_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     target_link_libraries(horde_rt_music_director_tests PRIVATE horde_gameplay_simulation)
     add_test(NAME horde_rt_music_director_tests COMMAND horde_rt_music_director_tests)
+
+    add_executable(horde_rt_entry_portal_cap_geometry_tests tests/EntryPortalCapGeometryTests.cpp)
+    target_include_directories(horde_rt_entry_portal_cap_geometry_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    add_test(NAME horde_rt_entry_portal_cap_geometry_tests COMMAND horde_rt_entry_portal_cap_geometry_tests)
+    add_executable(horde_rt_tomb_terrain_exclusion_tests tests/TombTerrainExclusionTests.cpp)
+    target_include_directories(horde_rt_tomb_terrain_exclusion_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    add_test(NAME horde_rt_tomb_terrain_exclusion_tests COMMAND horde_rt_tomb_terrain_exclusion_tests)
+
+    if(WIN32)
+        add_executable(horde_rt_windows_subtitle_bitmap_tests tests/WindowsSubtitleBitmapTests.cpp)
+        target_include_directories(horde_rt_windows_subtitle_bitmap_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+        configure_file(src/platform/windows/HordeLanternRT.manifest.in
+            "${CMAKE_CURRENT_BINARY_DIR}/SubtitleBitmapTests.manifest" @ONLY)
+        target_sources(horde_rt_windows_subtitle_bitmap_tests PRIVATE
+            "${CMAKE_CURRENT_BINARY_DIR}/SubtitleBitmapTests.manifest")
+        add_test(NAME horde_rt_windows_subtitle_bitmap_tests COMMAND horde_rt_windows_subtitle_bitmap_tests)
+    endif()
 
     add_executable(horde_rt_sfx_volume_tests tests/SfxVolumeTests.cpp)
     target_include_directories(horde_rt_sfx_volume_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
@@ -1307,6 +1344,11 @@ if(BUILD_TESTING AND TARGET horde_rt_probe_core)
     add_executable(horde_rt_rescue_journey_integration_tests tests/RescueJourneyIntegrationTests.cpp)
     target_link_libraries(horde_rt_rescue_journey_integration_tests PRIVATE horde_rt_probe_core)
     add_test(NAME horde_rt_rescue_journey_integration_tests COMMAND horde_rt_rescue_journey_integration_tests)
+    add_executable(horde_rt_kit_source_intake_tests tests/KitSourceIntakeTests.cpp)
+    target_link_libraries(horde_rt_kit_source_intake_tests PRIVATE horde_rt_probe_core)
+    target_compile_definitions(horde_rt_kit_source_intake_tests PRIVATE
+        HORDE_KIT_SOURCE_CANDIDATE="${CMAKE_CURRENT_SOURCE_DIR}/assets/models/characters/source/kit-warden-v1/briarhold-warden-1k.glb")
+    add_test(NAME horde_rt_kit_source_intake_tests COMMAND horde_rt_kit_source_intake_tests)
 endif()
 
 if(BUILD_TESTING)

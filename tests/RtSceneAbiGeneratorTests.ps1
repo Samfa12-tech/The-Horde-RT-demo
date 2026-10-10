@@ -47,14 +47,16 @@ try {
 
     $definition = Get-Content -LiteralPath (Join-Path $repoRoot "src\vulkan\raytracing\RtSceneAbi.def") -Raw | ConvertFrom-Json
     $capacityCpu = Get-Content -LiteralPath $portableCpuPath -Raw
-    if ($definition.capacities.instanceMetadata -ne 25 -or $definition.capacities.tlasInstances -ne 27 -or
-        $definition.capacities.staticAssets -ne 13 -or
-        $capacityCpu -notmatch 'kRtTlasInstanceCapacity = 27u;' -or
-        $capacityCpu -notmatch 'kRtInstanceMetadataCapacity = 25u;' -or
+    if ($definition.capacities.instanceMetadata -ne 26 -or $definition.capacities.tlasInstances -ne 28 -or
+        $definition.capacities.staticAssets -ne 13 -or $definition.capacities.textureLayers -ne 18 -or
+        $capacityCpu -notmatch 'kRtTlasInstanceCapacity = 28u;' -or
+        $capacityCpu -notmatch 'kRtInstanceMetadataCapacity = 26u;' -or
         $capacityCpu -notmatch 'kRtStaticAssetCapacity = 13u;' -or
+        $capacityCpu -notmatch 'kRtTextureLayerCapacity = 18u;' -or
         $capacityCpu -notmatch 'kRtActiveFireEmitterCapacity = 4u;' -or
-        $capacityCpu -notmatch 'kRtFireEmitterCapacity = 4u;') {
-        throw 'Generated owners must admit 27 TLAS instances, 25 metadata records, 13 static assets, and four fire storage records.'
+        $capacityCpu -notmatch 'kRtFireEmitterCapacity = 4u;' -or
+        $generatedGlsl -notmatch 'const uint kRtTextureLayerCapacity = 18u;') {
+        throw 'Generated owners must admit 28 TLAS instances, 26 metadata records, 13 static assets, 18 texture layers, and four fire storage records.'
     }
     foreach ($case in @(
         @{ name = 'tlasInstances'; value = 21 },

@@ -1,6 +1,7 @@
 #pragma once
 #include "gameplay/simulation/DevelopmentWorldRoute.h"
 #include "scene/ShowcaseOverheadGeometry.h"
+#include "scene/OccupiedTombVolume.h"
 #include <chrono>
 #include <vector>
 
@@ -70,11 +71,11 @@ inline DevelopmentWorldGeometry PrepareDevelopmentWorldGeometry(bool staged,bool
         const auto stageBegin=std::chrono::steady_clock::now();
         const auto owner=static_cast<WorldZoneId>(zone);
         VisitWorldRouteSurfaceTriangles([&](const auto& points,std::size_t segment) {
-            if(ZoneForRouteSegment(segment)==owner && (!rescueJourney||segment>=1))
+            if(ZoneForRouteSegment(segment)==owner && (!rescueJourney||segment!=1))
                 out.triangles.push_back({points,zone==1?1u:3u,0u,owner});
         });
         VisitWorldRouteTerrainShellTriangles([&](const auto& points,std::size_t segment,std::uint32_t normal) {
-            if(ZoneForRouteSegment(segment)==owner && (!rescueJourney||segment>=1))
+            if(ZoneForRouteSegment(segment)==owner && (!rescueJourney||segment!=1))
                 out.triangles.push_back({points,zone==1?1u:3u,normal,owner});
         });
         if (zone==1 && !rescueJourney)
@@ -88,18 +89,11 @@ inline DevelopmentWorldGeometry PrepareDevelopmentWorldGeometry(bool staged,bool
             box({41.2f+kWorldPlanTranslateX,-.95f,-8+kWorldPlanTranslateZ},
                 {41.55f+kWorldPlanTranslateX,1.22f,-5+kWorldPlanTranslateZ},2,owner);
         }
-        else if (zone!=1)
+        else if (zone!=1 && !rescueJourney)
         {
             for(const auto& obstacle:WorldRouteBlockoutBoxes())
                 if(ZoneForRouteSegment(obstacle.segment)==owner)
                     box(obstacle.minimum,obstacle.maximum,obstacle.material,owner);
-        }
-        if(zone==1 && rescueJourney) {
-            const auto& top=WorldRouteSurfaceTriangles();
-            for(std::size_t lane=0;lane<6;++lane) {
-                const auto a=top[(6+lane)*2].points[0],b=top[(6+lane)*2+1].points[2];
-                quad(a,b,{b[0],-5,b[2]},{a[0],-5,a[2]},1u,5u,owner);
-            }
         }
         if(zone==3)
         {
@@ -124,6 +118,18 @@ inline DevelopmentWorldGeometry PrepareDevelopmentWorldGeometry(bool staged,bool
             out.peakPreparationCpuBytes=std::max(out.peakPreparationCpuBytes,
                 out.triangles.capacity()*sizeof(DevelopmentWorldTriangle)+batch.capacity()*sizeof(DevelopmentWorldTriangle));
         }
+    }
+    if(rescueJourney) {
+        std::vector<DevelopmentWorldTriangle> repaired;
+        for(const auto& triangle:out.triangles) {
+            std::vector<std::array<TerrainPoint,3>> fragments;
+            if(!ExteriorTriangleOutsideTomb(triangle.points,fragments)) return out;
+            for(const auto& fragment:fragments)
+                repaired.push_back({fragment,triangle.material,triangle.normal,triangle.owner});
+        }
+        out.peakPreparationCpuBytes=std::max(out.peakPreparationCpuBytes,
+            (out.triangles.capacity()+repaired.capacity())*sizeof(DevelopmentWorldTriangle));
+        out.triangles=std::move(repaired);
     }
     out.valid=ValidateDevelopmentWorldGeometry(out);
     out.retainedCpuBytes=out.triangles.capacity()*sizeof(DevelopmentWorldTriangle);

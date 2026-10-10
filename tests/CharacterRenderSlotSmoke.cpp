@@ -4,6 +4,7 @@
 #include "vulkan/raytracing/RtSceneRecordObservation.h"
 #include "vulkan/raytracing/RtSceneTuning.h"
 #include "vulkan/raytracing/SimulationFrameAdapter.h"
+#include "vulkan/raytracing/TlasInstanceRefresh.h"
 #include "platform/android/AndroidRtLabState.h"
 #include "KeeperLowerBodyWitnesses.h"
 
@@ -235,18 +236,22 @@ int main()
                   "Android RT Lab unlock was not restricted to genuine live finale completion");
 
     ok &= Require(PresentableTinyRtScene::kBlasCount == 21u &&
-                      PresentableTinyRtScene::kTlasInstanceCount == 27u &&
-                      kRtInstanceMetadataCapacity == 25u &&
+                      PresentableTinyRtScene::kTlasInstanceCount == 28u &&
+                      kRtInstanceMetadataCapacity == 26u &&
                       kRtStaticAssetCapacity == 13u &&
                       PresentableTinyRtScene::kKeeperTorchFirstTlasInstance == 23u &&
                       PresentableTinyRtScene::kKeeperTorchInstanceCount == 2u &&
                       PresentableTinyRtScene::kCollapseInstanceIndex == 21u &&
                       PresentableTinyRtScene::kPlayerTorchInstanceIndex == 22u &&
+                      kPlayerWorldBodyInstanceIndex == 4u &&
+                      kPlayerViewmodelInstanceIndex == 20u &&
                       PresentableTinyRtScene::kPlayerSwordScabbardMetadataIndex == 23u &&
                       PresentableTinyRtScene::kPlayerSwordScabbardInstanceIndex == 25u &&
                       PresentableTinyRtScene::kWaterDropletMetadataIndex == 24u &&
-                      PresentableTinyRtScene::kWaterDropletInstanceIndex == 26u,
-                  "water metadata24/TLAS26 and asset13 preserve scabbard23/TLAS25, viewmodel20/collapse21/player torch22 and Keeper TLAS aliases23/24");
+                      PresentableTinyRtScene::kWaterDropletInstanceIndex == 26u &&
+                      PresentableTinyRtScene::kKeeperMetadataIndex == 25u &&
+                      PresentableTinyRtScene::kKeeperInstanceIndex == 27u,
+                  "Keeper metadata25/TLAS27 appends after the existing waterfall skeleton, torches, scabbard, viewmodel, and water owners");
     const DynamicBlasToTlasDependency noDynamicBlasDependency =
         BuildDynamicBlasToTlasDependency({});
     const DynamicBlasToTlasDependency playerOnlyDependency =
@@ -394,6 +399,19 @@ int main()
     simulationSnapshot.waterContact.ripples[1].active = true;
     simulationSnapshot.waterContact.ripples[1].strength = 0.72f;
     const RtSceneFrameInputs adaptedFrame = BuildRtSceneFrameInputs(simulationSnapshot, 0.75f);
+    auto rescueExteriorSnapshot = simulationSnapshot;
+    rescueExteriorSnapshot.developmentRescueJourney = true;
+    rescueExteriorSnapshot.rescue.exteriorSide = true;
+    rescueExteriorSnapshot.enemyRoster.selectedEnemy = EnemyKind::Skeleton;
+    const RtSceneFrameInputs rescueExteriorFrame =
+        BuildRtSceneFrameInputs(rescueExteriorSnapshot, 0.75f);
+    ok &= Require(rescueExteriorFrame.skeletonEnemyCount == 2u &&
+                  rescueExteriorFrame.skeletonEnemies[0].id == rescueExteriorSnapshot.skeletonEnemies[0].id &&
+                  rescueExteriorFrame.skeletonEnemies[0].x == rescueExteriorSnapshot.skeletonEnemies[0].x &&
+                  rescueExteriorFrame.skeletonEnemies[1].id == rescueExteriorSnapshot.skeletonEnemies[1].id &&
+                  rescueExteriorFrame.skeletonEnemies[1].x == rescueExteriorSnapshot.skeletonEnemies[1].x &&
+                  rescueExteriorFrame.roster.selectedEnemy == EnemyKind::Lich,
+                  "rescue exterior Keeper selection replaced or dropped the original waterfall skeleton snapshots");
     ok &= Require(adaptedFrame.waterContact.stepCount == simulationSnapshot.waterContact.stepCount &&
                   adaptedFrame.waterContact.droplets[3].active &&
                   adaptedFrame.waterContact.droplets[3].position[0] == -2.1f &&
@@ -545,7 +563,7 @@ int main()
     lich.hitRecoil = 0.0f;
     lich.animationTime = 3.25f;
     const CharacterFramePlan lichPlan = EvaluateCharacterFramePlan(skeletons, 0u, roster, lich, 2.967f);
-    ok &= Require(lichPlan.selectedLich && lichPlan.lichClip == horde::scene::SkinnedClip::Idle,
+    ok &= Require(lichPlan.lichVisible && lichPlan.lichClip == horde::scene::SkinnedClip::Idle,
                   "living lich selection or clip changed");
     ok &= Require(Near(lichPlan.lichTime, 3.25f), "lich animation time changed");
     ok &= Require(Near(lichPlan.lichTransform.matrix[0][3], -32.2f) &&
@@ -555,6 +573,26 @@ int main()
     lich.phase = LichPhase::Dead;
     ok &= Require(EvaluateCharacterFramePlan(skeletons, 0u, roster, lich, 2.967f).lichClip == horde::scene::SkinnedClip::Dead,
                   "lich death clip mapping changed");
+
+    auto keeperSnapshots = skeletons;
+    keeperSnapshots[0].dead = true;
+    keeperSnapshots[0].animation = EnemyAnimation::Dead;
+    keeperSnapshots[1].action = EnemyCombatAction::AttackWindup;
+    const CharacterFramePlan concurrentPlan = EvaluateCharacterFramePlan(
+        keeperSnapshots, keeperSnapshots.size(), roster, lich, 2.967f);
+    ok &= Require(concurrentPlan.lichVisible && concurrentPlan.skeletonCount == 2u &&
+                  concurrentPlan.skeletonPoseBucketCount == 2u,
+                  "Keeper selection dropped one or both retained skeleton snapshots");
+    ok &= Require(concurrentPlan.skeletons[0].clip == horde::scene::SkeletonClip::Dead &&
+                  concurrentPlan.skeletons[1].clip != horde::scene::SkeletonClip::Dead,
+                  "Keeper overlap did not preserve the waterfall corpse pose independently from the surviving skeleton");
+    EnemyRosterSnapshot backtrackRoster = roster;
+    backtrackRoster.selectedEnemy = EnemyKind::Skeleton;
+    const CharacterFramePlan backtrackPlan = EvaluateCharacterFramePlan(
+        keeperSnapshots, keeperSnapshots.size(), backtrackRoster, lich, 2.967f);
+    ok &= Require(backtrackPlan.lichVisible && backtrackPlan.skeletonCount == 2u &&
+                  backtrackPlan.lichClip == horde::scene::SkinnedClip::Dead,
+                  "backtracking to the waterfall hid the Keeper corpse or either skeleton snapshot");
 
     constexpr float interval = 1.0f / 30.0f;
     ok &= Require(CharacterPoseNeedsRefresh(1, 1.0f, -1, -1.0f), "first pose must refresh");
@@ -583,6 +621,21 @@ int main()
         slot.SkeletonGpu(0u).accelerationStructure.address = 101u;
         slot.SkeletonGpu(1u).accelerationStructure.address = 202u;
         slot.LichGpu().accelerationStructure.address = 303u;
+        const auto initialKeeper = slot.BuildActiveInstances()[2];
+        ok &= Require(initialKeeper.instanceCustomIndex == 25u && initialKeeper.mask == 0u &&
+                      initialKeeper.accelerationStructureReference == 303u &&
+                      HasInvertibleLinearTransform(initialKeeper.transform),
+                      "initial dormant Keeper owner requires its real BLAS and an invertible transform");
+        CharacterRenderSlot dormantSlot;
+        dormantSlot.LichGpu().accelerationStructure.address = 303u;
+        EnemyRosterSnapshot dormantRoster;
+        dormantRoster.selectedEnemy = EnemyKind::Skeleton;
+        LichSnapshot dormantLich;
+        ok &= Require(dormantSlot.CacheFramePlan({}, 0u, dormantRoster, dormantLich, diagnostic), diagnostic.c_str());
+        const auto nextDormantKeeper = dormantSlot.BuildActiveInstances()[2];
+        ok &= Require(!RequiresTlasInstanceRebuild(
+            std::span(&initialKeeper, 1u), std::span(&nextDormantKeeper, 1u)),
+            "first dormant snapshot must not invent a third-lane definition change");
         EnemyRosterSnapshot skeletonRoster = roster;
         skeletonRoster.selectedEnemy = EnemyKind::Skeleton;
         skeletons[1] = skeletons[0];
@@ -604,15 +657,29 @@ int main()
                       splitInstances[1].accelerationStructureReference == 202u,
                       "divergent second skeleton did not select pose one BLAS and shader route");
         invalidRoster.selectedEnemy = EnemyKind::Lich;
-        ok &= Require(slot.CacheFramePlan(skeletons, 0u, invalidRoster, lich, diagnostic), diagnostic.c_str());
+        ok &= Require(slot.CacheFramePlan(skeletons, skeletons.size(), invalidRoster, lich, diagnostic), diagnostic.c_str());
         const auto lichInstances = slot.BuildActiveInstances();
-        ok &= Require(lichInstances[0].accelerationStructureReference == 303u &&
-                      lichInstances[0].mask == 0x01u && lichInstances[1].mask == 0u,
-                      "singular lich route populated the second character slot");
-        ok &= Require(HasInvertibleLinearTransform(lichInstances[0].transform) &&
-                      HasInvertibleLinearTransform(lichInstances[1].transform),
-                      "singular lich route emitted a non-invertible masked TLAS transform");
+        ok &= Require(lichInstances[0].accelerationStructureReference == 101u &&
+                      lichInstances[1].accelerationStructureReference == 202u &&
+                      lichInstances[2].accelerationStructureReference == 303u &&
+                      lichInstances[0].mask == 0x01u && lichInstances[1].mask == 0x01u &&
+                      lichInstances[2].mask == 0x01u &&
+                      lichInstances[0].instanceCustomIndex == CharacterRenderSlot::kTlasInstanceIndex &&
+                      lichInstances[1].instanceCustomIndex == CharacterRenderSlot::kSecondSkeletonTlasInstanceIndex &&
+                      lichInstances[2].instanceCustomIndex == 25u,
+                      "Keeper selection did not preserve both skeleton BLAS owners and route the Keeper through dedicated identity25");
+        ok &= Require(Near(lichInstances[0].transform.matrix[0][3], skeletons[0].x) &&
+                      Near(lichInstances[1].transform.matrix[0][3], skeletons[1].x) &&
+                      Near(lichInstances[2].transform.matrix[0][3], lich.x),
+                      "concurrent character TLAS transforms did not follow each independent snapshot");
         skeletonRoster.selectedEnemy = EnemyKind::Skeleton;
+        ok &= Require(slot.CacheFramePlan(skeletons, skeletons.size(), skeletonRoster, lich, diagnostic), diagnostic.c_str());
+        const auto backtrackInstances = slot.BuildActiveInstances();
+        ok &= Require(backtrackInstances[0].mask == 0x01u && backtrackInstances[1].mask == 0x01u &&
+                      backtrackInstances[2].mask == 0x01u &&
+                      backtrackInstances[2].instanceCustomIndex == CharacterRenderSlot::kKeeperMetadataIndex,
+                      "backtracking to Skeleton selection dropped the active Keeper corpse TLAS owner");
+        lich.phase = LichPhase::Dormant;
         ok &= Require(slot.CacheFramePlan(skeletons, 1u, skeletonRoster, lich, diagnostic), diagnostic.c_str());
         const auto oneSkeletonInstances = slot.BuildActiveInstances();
         ok &= Require(oneSkeletonInstances[1].mask == 0u &&
@@ -623,8 +690,10 @@ int main()
         ok &= Require(noSkeletonInstances[0].mask == 0u && noSkeletonInstances[1].mask == 0u &&
                       noSkeletonInstances[0].instanceCustomIndex == 2u &&
                       noSkeletonInstances[1].instanceCustomIndex == 18u &&
+                      noSkeletonInstances[2].mask == 0u && noSkeletonInstances[2].instanceCustomIndex == 25u &&
                       HasInvertibleLinearTransform(noSkeletonInstances[0].transform) &&
-                      HasInvertibleLinearTransform(noSkeletonInstances[1].transform),
+                      HasInvertibleLinearTransform(noSkeletonInstances[1].transform) &&
+                      HasInvertibleLinearTransform(noSkeletonInstances[2].transform),
                       "empty skeleton route did not preserve masked TLAS transforms and custom indices");
     }
 
@@ -704,6 +773,15 @@ int main()
                       hitDecodeSource.find("precise vec3 surfacePosition = objectToWorld * localPosition +") != std::string::npos &&
                       hitDecodeSource.find("h.position = surfacePosition;") != std::string::npos,
                       "transmitting triangle hits must reconstruct the geometric surface point before spawning dielectric rays");
+        ok &= Require(hitDecodeSource.find("const int kKeeperInstanceMetadataIndex = 25;") != std::string::npos &&
+                      hitDecodeSource.find("instance == 2 || instance == 18 || instance == kKeeperInstanceMetadataIndex") != std::string::npos &&
+                      hitDecodeSource.find("h.instance == 2 || h.instance == 18 || h.instance == kKeeperInstanceMetadataIndex") != std::string::npos &&
+                      hitDecodeSource.find("instance == 2 && controls.enemyKind > 0.5") == std::string::npos,
+                      "shared pipeline/query hit decode must keep the Keeper identity distinct from both skeleton pose routes");
+        ok &= Require(sceneSource.find("instances[CharacterRenderSlot::kTlasInstanceIndex] = characterInstances[0];") != std::string::npos &&
+                      sceneSource.find("instances[CharacterRenderSlot::kSecondSkeletonTlasInstanceIndex] = characterInstances[1];") != std::string::npos &&
+                      sceneSource.find("instances[kKeeperInstanceIndex] = characterInstances[2];") != std::string::npos,
+                      "the fixed RT scene must retain both skeleton owners and append the dedicated Keeper TLAS owner");
         const std::size_t shadowStart = lightingSource.find("vec3 boundedShadowTransmittanceMask(");
         const std::size_t shadowEnd = lightingSource.find("float visibilityMask(", shadowStart);
         const std::string selectedShadow = shadowStart != std::string::npos &&
@@ -2053,15 +2131,21 @@ int main()
                       !previewSlot.SkeletonVertices(0u).empty() &&
                       previewSlot.SkeletonVertices(1u).empty() && previewSlot.LichVertices().empty(),
                       "skeleton-only preview must omit lich and second-pose CPU geometry");
-        ok &= Require(!previewSlot.CacheFramePlan(skeletons, 2u, spareCapacityRoster, lich, diagnostic),
+        LichSnapshot previewLich{};
+        previewLich.phase = LichPhase::Dormant;
+        ok &= Require(!previewSlot.CacheFramePlan(skeletons, 2u, spareCapacityRoster, previewLich, diagnostic),
                       "skeleton-only preview cannot admit the full two-enemy game workload");
-        ok &= Require(previewSlot.CacheFramePlan(skeletons, 1u, spareCapacityRoster, lich, diagnostic) &&
+        ok &= Require(previewSlot.CacheFramePlan(skeletons, 1u, spareCapacityRoster, previewLich, diagnostic) &&
                       previewSlot.SkeletonPoseBucketCount() == 1u,
                       "skeleton-only preview retains one actual authored skeleton pose");
         auto forbiddenLich = spareCapacityRoster;
         forbiddenLich.selectedEnemy = EnemyKind::Lich;
-        ok &= Require(!previewSlot.CacheFramePlan(skeletons, 1u, forbiddenLich, lich, diagnostic),
+        ok &= Require(!previewSlot.CacheFramePlan(skeletons, 1u, forbiddenLich, previewLich, diagnostic),
                       "skeleton-only preview cannot select unadmitted lich resources");
+        LichSnapshot unadmittedKeeper = previewLich;
+        unadmittedKeeper.phase = LichPhase::Dead;
+        ok &= Require(!previewSlot.CacheFramePlan(skeletons, 1u, spareCapacityRoster, unadmittedKeeper, diagnostic),
+                      "skeleton-only preview cannot admit a non-dormant Keeper corpse without Keeper resources");
     }
 
     return ok ? 0 : 1;

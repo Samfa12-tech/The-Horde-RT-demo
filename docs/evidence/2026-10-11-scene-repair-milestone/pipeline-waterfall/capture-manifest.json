@@ -1,0 +1,529 @@
+{
+  "schemaVersion": 1,
+  "complete": true,
+  "source": "rt-storage-image",
+  "sceneOnly": true,
+  "overlaysIncluded": false,
+  "settlingFrames": 12,
+  "fixedAnimationTimeSeconds": 0.0,
+  "buildId": "1.6.2",
+  "playerMountProfile": "AnatomicalBody",
+  "executionBackend": "RayTracingPipeline",
+  "selectedRtPipelineBundle": {
+    "opaqueFast": {
+      "key": "diagnostic_high_opaque_fast",
+      "sha256": "5b8eb292cfa45524bb521abad3f7b9153ae93913375d975bcc3ba48b2d09ebf0"
+    },
+    "genericDielectric": {
+      "key": "diagnostic_high_generic_dielectric",
+      "sha256": "919710743ed0a5957501c2040823650657c77df620445b7c83085cfef72daf1f"
+    }
+  },
+  "presentation": {
+    "renderScale": 1.0,
+    "dispatchWidth": 960,
+    "dispatchHeight": 540,
+    "swapchainWidth": 960,
+    "swapchainHeight": 540,
+    "swapchainFormat": 44
+  },
+  "timing": {
+    "sampleCount": 12,
+    "overallMedianMs": 6.0935,
+    "overallMeanMs": 76.528517,
+    "gpuRtCommandBuffer": {
+      "valid": true,
+      "latestMs": 1.45616,
+      "averageMs": 1.790896,
+      "sampleCount": 12,
+      "timestampValidBits": 64,
+      "timestampPeriodNanoseconds": 1.0
+    }
+  },
+  "staticRtAsset": {
+    "enabled": true,
+    "vertexBytes": 11746048,
+    "indexBytes": 1816692,
+    "materialBytes": 3840,
+    "instanceMetadataBytes": 832,
+    "primitiveMetadataBytes": 512,
+    "textureBytes": 274027796,
+    "descriptorCount": 9,
+    "blasBytes": 1060096,
+    "blasBuildMilliseconds": 1.1384,
+    "swordBlasBytes": 717696,
+    "swordBlasBuildMilliseconds": 0.5808,
+    "torchBlasBytes": 342400,
+    "torchBlasBuildMilliseconds": 0.5576,
+    "productionPropBlasBytes": 5409536,
+    "productionPropBlasBuildMilliseconds": 9.5315
+  },
+  "dielectricDiagnostics": {
+    "availability": "Available",
+    "available": true,
+    "transportOverflowCount": 0,
+    "shadowOverflowCount": 0,
+    "secondaryDielectricRejectCount": 0,
+    "unclosedVolumeCount": 0,
+    "primaryUnclosedVolumeCount": 0,
+    "shadowUnclosedVolumeCount": 0,
+    "productionPaneStackFailureCount": 0,
+    "productionPaneSecondaryOriginCount": 0,
+    "productionPaneSecondaryTerminalCount": 0,
+    "productionPaneSecondarySameMediumCount": 0,
+    "productionPaneSecondaryDifferentMediumCount": 0
+  },
+  "dielectricReasonDiagnostics": {
+    "availability": "Available",
+    "available": true,
+    "secondaryNearSelfHitCount": 0,
+    "primaryOpenMissCount": 0,
+    "primaryOpenOpaqueCount": 0,
+    "primaryMismatchedExitCount": 0,
+    "primaryInterfaceBudgetCount": 0,
+    "primaryVolumeBudgetCount": 0,
+    "shadowOpenMissCount": 0,
+    "shadowMismatchedExitCount": 0,
+    "primaryTirCount": 0,
+    "primaryInterfaceBudgetOpenVolumeCount": 0,
+    "primaryInterfaceBudgetClosedVolumeCount": 0,
+    "shadowMismatchEmptyCount": 0,
+    "shadowImplicitOriginExitCount": 0,
+    "secondaryDielectricTerminalCount": 0,
+    "primaryTirTerminationCount": 0,
+    "shadowFiniteEndpointVolumeCount": 0,
+    "primaryOpenOpaqueSameInstanceDifferentMaterialCount": 0,
+    "primaryOpenOpaqueAfterTirCount": 0,
+    "primaryOpenOpaqueTerminalInstanceMask": 0,
+    "primaryOpenOpaqueVolumeInstanceMask": 0,
+    "primaryOpenOpaqueTerminalMaterialMask": 0,
+    "primaryClosedVolumeAbsorptionCount": 0,
+    "primaryCertifiedClosedVolumeRecoveryCount": 0,
+    "shadowCertifiedClosedVolumeRecoveryCount": 0,
+    "certifiedClosedVolumeRecoveryReasonMask": 0,
+    "primaryTorchPixelCount": 0,
+    "primarySwordPixelCount": 0,
+    "primaryPlayerPixelCount": 4637,
+    "primaryRewardRingPixelCount": 0,
+    "primaryRewardBodyPixelCount": 0
+  },
+  "error": null,
+  "captures": [
+    {
+      "id": 154,
+      "checkpoint": "waterfall-guards-walk-early",
+      "preset": "fresh",
+      "zone": "shadow-corridor",
+      "camera": {
+        "x": -3.45,
+        "z": -15.2,
+        "yaw": -1.570796,
+        "pitch": -0.06
+      },
+      "requestedCamera": {
+        "x": -3.45,
+        "z": -15.2,
+        "yaw": -1.570796,
+        "pitch": -0.06
+      },
+      "state": {
+        "torchFailurePhase": "held",
+        "selectedEnemy": "skeleton",
+        "lichPhase": "dormant",
+        "finaleSkylightOpenProgress": 0.0
+      },
+      "width": 960,
+      "height": 540,
+      "honestlyPresentedRtFrame": true,
+      "completedFrame": {
+        "schema": 1,
+        "identity": {
+          "sceneEpoch": 2,
+          "measurementGeneration": 1,
+          "recordAttemptSerial": 12,
+          "recordSerial": 12,
+          "submissionSerial": 12,
+          "completionSerial": 12,
+          "simulationTick": 7,
+          "frameSlot": 0
+        },
+        "pipeline": {
+          "executionBackend": "RayTracingPipeline",
+          "instrumentation": "diagnostic",
+          "dielectricQuality": "high",
+          "bundleKey": "diagnostic_high_pair",
+          "opaqueFast": {
+            "key": "diagnostic_high_opaque_fast",
+            "sha256": "5b8eb292cfa45524bb521abad3f7b9153ae93913375d975bcc3ba48b2d09ebf0"
+          },
+          "genericDielectric": {
+            "key": "diagnostic_high_generic_dielectric",
+            "sha256": "919710743ed0a5957501c2040823650657c77df620445b7c83085cfef72daf1f"
+          },
+          "activeStrategy": "opaque-fast",
+          "activeKey": "diagnostic_high_opaque_fast",
+          "activeSha256": "5b8eb292cfa45524bb521abad3f7b9153ae93913375d975bcc3ba48b2d09ebf0",
+          "waterQuality": "high"
+        },
+        "dispatch": {
+          "sceneReady": true,
+          "rtDispatchRecorded": true,
+          "swapchainCopyRecorded": true
+        },
+        "shadowQuality": {
+          "mode": "higher",
+          "localPrimarySamples": 4,
+          "skyPrimarySamples": 2,
+          "reserved": 0
+        },
+        "fireQuality": {
+          "quality": "High",
+          "volumeSteps": 10,
+          "reflectionSamples": 2,
+          "reflectedVolumeSteps": 8
+        },
+        "actualUploadedDustQuality": 2,
+        "actualUploadedMistEnabled": true,
+        "fireLighting": {
+          "count": 1,
+          "emitters": [
+            {
+              "stableId": 1,
+              "positionStrength": [
+                -4.07867384,
+                0.865155876,
+                -14.9951286,
+                1.5727787
+              ],
+              "colourIntensity": [
+                1,
+                0.454960018,
+                0.0977689177,
+                1.5727787
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        "resources": {
+          "bufferCount": 53,
+          "memoryAllocationCount": 64,
+          "bottomLevelAccelerationStructureCount": 21,
+          "topLevelAccelerationStructureCount": 1,
+          "tlasInstanceCount": 28,
+          "pipelineCount": 2,
+          "shaderBindingTableCount": 2,
+          "descriptorSetCount": 1,
+          "hostVisibleBytes": 16848288,
+          "deviceLocalBytes": 350313072
+        },
+        "player": {
+          "skinCadenceHz": 60,
+          "skinUpdateCount": 1,
+          "maximumSocketErrorMicrometres": 0,
+          "primaryPixelCountAvailable": true,
+          "primaryPixelCount": 4637,
+          "primaryVisible": true
+        },
+        "dielectric": {
+          "status": "valid",
+          "available": true,
+          "compiled": true,
+          "completedSubmissionSerial": 12,
+          "readCount": 12,
+          "resetCount": 12,
+          "counters": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            4637,
+            0,
+            0
+          ],
+          "detail": "Diagnostic counters were collected after the owning fence."
+        },
+        "gpu": {
+          "status": "valid",
+          "available": true,
+          "completedSubmissionSerial": 12,
+          "wholeRtGpuMs": 1.45616,
+          "timestampValidBits": 64,
+          "timestampPeriodPicoseconds": 1000,
+          "sampleCount": 12,
+          "unavailableResultCount": 0,
+          "errorCount": 0,
+          "detail": "GPU RT command-buffer timing is available."
+        },
+        "stages": {
+          "status": "valid",
+          "simulationStepCpuMs": 0.0,
+          "skinCpuMs": 0.0,
+          "playerSkinCpuMs": 0.0,
+          "characterSkinCpuMs": 0.0,
+          "dynamicUploadCpuMs": 0.0143,
+          "blasRefitRecordCpuMs": 0.0332,
+          "tlasUpdateRecordCpuMs": 0.0071,
+          "traceCopyRecordCpuMs": 0.029,
+          "frameFenceWaitCpuMs": 0.0041,
+          "imageAcquireCpuMs": 0.0047,
+          "queueSubmitCpuMs": 0.0409,
+          "presentCallCpuMs": 4.2998,
+          "wholeFrameCycleCpuMs": 6.0121,
+          "workInvocationCounts": [
+            0,
+            0,
+            0,
+            0,
+            9,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "byteCounts": [
+            0,
+            0,
+            0,
+            0,
+            93528,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "operationCounts": [
+            0,
+            0,
+            0,
+            0,
+            9,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1
+          ]
+        },
+        "presentation": {
+          "outcome": "presented",
+          "presented": true,
+          "lastSuccessfulPresentSubmissionSerial": 12,
+          "finalIdleCompletion": true
+        },
+        "cpuBenchmarkEligible": true,
+        "benchmarkEligible": true
+      },
+      "indoorDust": {
+        "requestedQuality": 2,
+        "actualUploadedQuality": 2,
+        "cpuWork": {
+          "admittedZones": 0,
+          "generatedMotes": 0,
+          "projectedMotes": 0,
+          "tileReferences": 0,
+          "overflowReferences": 0
+        }
+      },
+      "visibility": {
+        "playerPrimaryVisible": true,
+        "primaryArmsMayBeOutsideFrame": false,
+        "primaryArmsCeilingRetracted": false,
+        "verticalProofPoseWitness": {
+          "supportWorldY": -0.95,
+          "heightDelta": 0.0,
+          "supportId": 1,
+          "heldLightKind": 1,
+          "swordStowBlend": 1.0,
+          "swordHandGripBlend": 0.5,
+          "torchOverheadLoweringMetres": 0.0,
+          "torchOverheadRetractionMetres": 0.0
+        },
+        "playerWorldBodyInstanceFlags": 9,
+        "instanceMasks": [
+          1,
+          2,
+          1,
+          2,
+          144,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          32,
+          1,
+          1,
+          64,
+          1,
+          0,
+          1,
+          1,
+          54,
+          1,
+          0
+        ],
+        "diagnostics": {
+          "availability": "Available",
+          "available": true
+        },
+        "primaryPixels": {
+          "torch": 0,
+          "sword": 0,
+          "player": 4637,
+          "rewardRing": 0,
+          "rewardBody": 0
+        },
+        "rewardGrip": {
+          "positionErrorMetres": 0.0,
+          "orientationErrorRadians": 0.0,
+          "authorityPositionErrorMetres": 0.0,
+          "authorityOrientationErrorRadians": 0.0,
+          "finalGripPosition": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "ringGripPosition": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "bodyPosition": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "timing": {
+        "sampleCount": 12,
+        "medianMs": 6.0935,
+        "meanMs": 76.528517
+      },
+      "outputRedBlueSwapAppliedAndNormalised": true,
+      "pixelFormat": "RGBA8",
+      "file": "154-waterfall-guards-walk-early.png",
+      "viewmodelGeometry": {
+        "available": true,
+        "space": "model",
+        "source": "cpu-upload",
+        "file": "154-waterfall-guards-walk-early.obj",
+        "sha256": "96a883963813f943c48e0a4e4ae6b312b9dce39b0464e99efead416be77ee52a",
+        "finiteVerticesValidated": false,
+        "finiteVertexCount": 0,
+        "faceCount": 0
+      },
+      "playerWorldBodyGeometry": {
+        "available": true,
+        "space": "model",
+        "source": "cpu-upload",
+        "file": "154-waterfall-guards-walk-early.player-world-body.obj",
+        "sha256": "1cb7635b8616223e6379aac3bae20d69373d7d1e0948566f07651e6b515aedb2",
+        "finiteVerticesValidated": false,
+        "finiteVertexCount": 0,
+        "faceCount": 0
+      },
+      "pngSha256": "08fc1a6db8f8cd104989a33bd1e326cd908264b2082c7a9afbb0c3ecda94f06c",
+      "publicImageSha256": "08fc1a6db8f8cd104989a33bd1e326cd908264b2082c7a9afbb0c3ecda94f06c"
+    }
+  ],
+  "deviceClass": "Windows RTX laptop",
+  "candidateExeSha256": "8504463dfa3ee14c1856c407ded7237eb8fd3c05131ef488029f1a87c8d28aeb"
+}

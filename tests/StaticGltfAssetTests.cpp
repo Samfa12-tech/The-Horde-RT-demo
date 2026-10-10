@@ -2270,7 +2270,7 @@ void TestPreparedFunerarySourceAssets(const std::filesystem::path& temporaryRoot
                 "maxIndices": 3000000,
                 "maxPrimitives": 128,
                 "maxMaterials": 32,
-                "maxTextureLayersPerKind": 16
+                "maxTextureLayersPerKind": 18
             },
             "lods": [{ "name": "lod0", "maxTriangles": 100000 }],
             "requiredSockets": [],
@@ -2336,6 +2336,29 @@ void TestPreparedFunerarySourceAssets(const std::filesystem::path& temporaryRoot
 int main(int argc, char** argv)
 {
     executablePath = std::filesystem::absolute(argv[0]);
+    // Read-only source-candidate intake uses the same native importer as the
+    // normal fixture suite. A successful import is not runtime admission.
+    if (argc == 4 && std::string_view(argv[1]) == "--inspect-candidate")
+    {
+        horde::scene::assets::AssetManifest manifest;
+        horde::scene::assets::StaticMeshAsset asset;
+        std::string diagnostic;
+        if (!horde::scene::assets::AssetManifest::Load(argv[3], manifest, diagnostic) ||
+            !horde::scene::assets::StaticMeshAsset::Load(argv[2], manifest, asset, diagnostic))
+        {
+            std::cerr << "Native candidate rejected: " << diagnostic << '\n';
+            return 1;
+        }
+        std::cout << "Native candidate=" << std::filesystem::path(argv[2]).filename().string()
+                  << " vertices=" << asset.vertices.size() << " triangles=" << asset.indices.size()/3
+                  << " primitives=" << asset.primitives.size() << " materials=" << asset.materials.size()
+                  << " bounds=";
+        for(float coordinate:asset.bounds.minimum) std::cout << coordinate << ',';
+        std::cout << " to ";
+        for(float coordinate:asset.bounds.maximum) std::cout << coordinate << ',';
+        std::cout << '\n';
+        return 0;
+    }
 #if defined(_WIN32)
     const char* cyclicEnvironment = std::getenv("HORDE_TEST_CYCLIC_PATH");
     const char* manifestEnvironment = std::getenv("HORDE_TEST_CYCLIC_MANIFEST");

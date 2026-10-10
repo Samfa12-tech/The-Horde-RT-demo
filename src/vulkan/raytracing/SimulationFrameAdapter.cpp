@@ -130,16 +130,12 @@ RtSceneFrameInputs BuildRtSceneFrameInputs(
     frame.lanternPendulum = simulation.lanternPendulum;
     frame.rewardLanternWorldFromHinge = simulation.rewardLanternWorldFromHinge;
     frame.roster = simulation.enemyRoster;
-    if(simulation.developmentRescueJourney && simulation.rescue.exteriorSide) {
-        // Render-only admitted skeleton workload; no AI, enemy registration,
-        // attack target or Kit identity. Existing two waterfall guards persist.
-        frame.retainedWorkloadSkeleton=true;
-        frame.roster.selectedEnemy=horde::gameplay::EnemyKind::Lich;
-        frame.skeletonEnemyCount=1;
-        auto& actor=frame.skeletonEnemies[0];actor={};
-        actor.x=47;actor.z=7;actor.worldY=1.45f;
-        actor.animation=horde::gameplay::EnemyAnimation::Walking;
-        actor.animationTime=simulation.walkTime;
+    if (simulation.developmentRescueJourney && simulation.rescue.exteriorSide)
+    {
+        // Keep both authoritative waterfall skeleton snapshots in the RT
+        // frame while selecting the Keeper for the exterior encounter view.
+        // The retired synthetic actor replaced SkeletonA and dropped SkeletonB.
+        frame.roster.selectedEnemy = horde::gameplay::EnemyKind::Lich;
     }
     frame.lich = simulation.lich;
     frame.zone = simulation.zone;

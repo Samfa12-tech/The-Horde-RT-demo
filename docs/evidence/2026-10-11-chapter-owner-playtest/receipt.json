@@ -1,0 +1,12 @@
+{
+  "evidenceClass": "owner report and supplied screenshots",
+  "sourceBase": "e8ba0586a6495fd9d0ba0c9a69a532a0cf9d6052",
+  "workingChanges": true,
+  "windowsDebugExeSha256": "3c74ed267030fb2d131a0834d07288f2c918eccd64c9cbd02a3e574a40af17ef",
+  "launch": ["--development-rescue-journey", "--development-teaching-slowdown"],
+  "backend": "RayTracingPipeline",
+  "ownerPositive": ["Compact subtitles", "Niches", "Entry threshold underside", "Skeletons remain when entering coloured tunnel", "Exterior geometry no longer intrudes into tomb", "Keeper death rattle"],
+  "ownerOpen": ["Skeletons appear in A pose instead of idle", "Black outline remains behind threshold", "Waterfall lighting changes at coloured tunnel boundary; owner thinks tunnel-side lighting is more correct", "No voiceover heard; Keeper spoken dialogue also absent", "Dead Keeper model remains on floor", "Masonry box crowns coexist with real trees", "Two hearts still shown"],
+  "technicalBoundary": "Owner observations do not establish causes, whole-chapter acceptance, Android acceptance or QueryCompute parity. No raw desktop screenshots or private logs are published.",
+  "gameClosedByOwner": true
+}

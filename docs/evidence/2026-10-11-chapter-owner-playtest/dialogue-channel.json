@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "change": "Dialogue / Speech volume label and independent channel verification",
+  "sourceBase": "e8ba0586a6495fd9d0ba0c9a69a532a0cf9d6052",
+  "workingTree": "Uncommitted chapter candidate; includes other in-progress repairs",
+  "windowsDebugExeSha256": "7f3fdbcb61bf03944318a8a9c97eb1f8f3ff6fbc2dbe43062838cb46e4531f94",
+  "windowsSettingsPath": "Settings > Audio / Subtitles > Dialogue / Speech",
+  "androidSettingsPath": "Settings > Audio > Dialogue / Speech",
+  "defaultPercent": 70,
+  "rangePercent": [
+    0,
+    100
+  ],
+  "savedPreferenceKeys": [
+    "Windows audio.voiceVolume",
+    "Android chapter_voice_volume"
+  ],
+  "routing": "Dialogue source gain is independent of SFX and music; active speech updates without restart",
+  "checks": {
+    "windowsDebugBuild": "PASS",
+    "nativeChapterDialogue": "PASS (1/1)",
+    "androidChapterVoiceAssets": "PASS (2/2)",
+    "androidSubtitlePolicy": "PASS (6/6)",
+    "androidLintDebug": "PASS"
+  },
+  "ownerListening": "PENDING",
+  "devicePlayback": "NOT RUN",
+  "launched": false
+}

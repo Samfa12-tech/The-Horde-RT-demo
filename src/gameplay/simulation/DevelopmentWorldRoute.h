@@ -1,4 +1,5 @@
 #pragma once
+#include "gameplay/simulation/ForestTreePlacementContract.h"
 #include "gameplay/simulation/DevelopmentSupportFixture.h"
 #include <algorithm>
 #include <array>
@@ -232,26 +233,16 @@ inline PlayerSupportResolution ResolveWorldRouteSupport(float x, float z)
     return {highest+(step?.12f:0.0f),step?PlayerSupportId::WorldRouteStep:static_cast<PlayerSupportId>(100+segment),
         true,kWorldZones[static_cast<std::size_t>(ZoneForRouteSegment(segment))].surface};
 }
-// Original low-cost wooded silhouettes used by the combined workload. The
-// opaque trunk AABBs are grounded on the same terrain and own their collision.
-inline const auto& WorldRouteSilhouetteTrunks() {
+// Native-imported tree bark uses the same measured placement contract as the
+// retained static geometry. Foliage remains a ray contributor, not an obstacle.
+inline const auto& WorldRouteForestTrunks() {
     static const auto boxes=[] {
-        std::array<WorldRouteBlockoutBox,15> out{};
-        for(unsigned band=0;band<3;++band) for(unsigned i=0;i<5;++i) {
-            float x=44+band*16.0f+(i%2?-6.0f:6.0f)+kWorldPlanTranslateX;
-            float z=7+band*12.0f+i*2.5f+kWorldPlanTranslateZ;
-            // Retain wooded banks without blocking the authored approach.
-            const auto route=ProjectWorldRoute(x,z);
-            if(route.distance<3.0f) {
-                const auto a=kWorldRoutePoints[route.segment],b=kWorldRoutePoints[route.segment+1];
-                const float length=std::hypot(b.x-a.x,b.z-a.z);
-                const float side=(x-route.x)*(-(b.z-a.z))+(z-route.z)*(b.x-a.x)<0?-1.0f:1.0f;
-                x=route.x-side*(b.z-a.z)/length*4.5f;
-                z=route.z+side*(b.x-a.x)/length*4.5f;
-            }
-            const auto ground=ResolveWorldRouteSupport(x,z);
-            const float y=ground.grounded?ground.worldY:kWorldRoutePoints[band+3].y;
-            out[band*5+i]={{{x-.16f,y-.12f,z-.16f}},{{x+.16f,y+4,z+.16f}},0u,band==0?2u:5u};
+        std::array<WorldRouteBlockoutBox,kForestTreePlacementContract.size()> out{};
+        for(std::size_t i=0;i<out.size();++i) {
+            const auto& tree=kForestTreePlacementContract[i];
+            const auto support=ResolveWorldRouteSupport(tree.x,tree.z);
+            out[i]={{{tree.trunkMinX,support.worldY,tree.trunkMinZ}},
+                    {{tree.trunkMaxX,support.worldY+2.0f,tree.trunkMaxZ}},0u,2u};
         }
         return out;
     }(); return boxes;
@@ -286,8 +277,7 @@ inline bool WorldRouteTerrainMovementClear(float fromX,float fromZ,float toX,flo
     }
     return true;
 }
-// Collision uses the exact retained opaque tree-trunk AABBs. Their material-
-// 2 crown boxes begin above the player capsule and remain visual contributors.
+// Collision uses the measured imported bark AABBs; foliage remains visual.
 inline bool WorldRouteBlockoutMovementClear(float fromX,float fromZ,float toX,float toZ,
                                             float supportY,float radius,bool combined=false)
 {
@@ -311,7 +301,9 @@ inline bool WorldRouteBlockoutMovementClear(float fromX,float fromZ,float toX,fl
            axis(fromZ,toZ,box.minimum[2]-radius,box.maximum[2]+radius)) return false;
     }
     return true; };
-    return blocks(WorldRouteBlockoutBoxes())&&(!combined||blocks(WorldRouteSilhouetteTrunks()));
+    // The chapter replaces the original demonstration boxes with imported
+    // trees. Keep collision on the same roster as the selected rendered scene.
+    return combined ? blocks(WorldRouteForestTrunks()) : blocks(WorldRouteBlockoutBoxes());
 }
 struct WorldRouteState
 {

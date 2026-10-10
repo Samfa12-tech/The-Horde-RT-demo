@@ -1,0 +1,76 @@
+[
+  {
+    "asset": "horde-upright-alder-v1",
+    "centerlines_and_leaf_placements_identical": true,
+    "tube_count": 80,
+    "leaf_count": 330,
+    "wood_branch_attachment_starts_checked": 73,
+    "wood_attachment_clearance_conservative_worst_m": -0.0018085253786858395,
+    "detached_wood_starts": [],
+    "silhouette_views": [
+      {
+        "view": "front",
+        "full_silhouette_iou": 0.9318170701883101,
+        "crown_silhouette_iou": 0.9283782846841849,
+        "lod_to_full_coverage_ratio": 0.963412209186717,
+        "mask_resolution": [
+          512,
+          600
+        ]
+      },
+      {
+        "view": "back",
+        "full_silhouette_iou": 0.9371738060068932,
+        "crown_silhouette_iou": 0.9285563454635039,
+        "lod_to_full_coverage_ratio": 0.9653329337129727,
+        "mask_resolution": [
+          512,
+          600
+        ]
+      }
+    ],
+    "acceptance_thresholds": {
+      "full_silhouette_iou": 0.85,
+      "crown_silhouette_iou": 0.8
+    },
+    "pass": true,
+    "notes": "Alpha masks compare actual exported geometry at identical front/back cameras. Tube centerlines, radii and leaf poses are unchanged. Surface side/perimeter counts differ."
+  },
+  {
+    "asset": "horde-irregular-pine-v1",
+    "centerlines_and_leaf_placements_identical": true,
+    "tube_count": 65,
+    "leaf_count": 366,
+    "wood_branch_attachment_starts_checked": 58,
+    "wood_attachment_clearance_conservative_worst_m": -0.004546416488086887,
+    "detached_wood_starts": [],
+    "silhouette_views": [
+      {
+        "view": "front",
+        "full_silhouette_iou": 0.9321022008601062,
+        "crown_silhouette_iou": 0.9296605293440736,
+        "lod_to_full_coverage_ratio": 0.9594643132023193,
+        "mask_resolution": [
+          512,
+          600
+        ]
+      },
+      {
+        "view": "back",
+        "full_silhouette_iou": 0.9361012956419317,
+        "crown_silhouette_iou": 0.9305247084952804,
+        "lod_to_full_coverage_ratio": 0.9633703279749166,
+        "mask_resolution": [
+          512,
+          600
+        ]
+      }
+    ],
+    "acceptance_thresholds": {
+      "full_silhouette_iou": 0.85,
+      "crown_silhouette_iou": 0.8
+    },
+    "pass": true,
+    "notes": "Alpha masks compare actual exported geometry at identical front/back cameras. Tube centerlines, radii and leaf poses are unchanged. Surface side/perimeter counts differ."
+  }
+]

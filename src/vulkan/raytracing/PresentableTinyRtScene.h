@@ -87,7 +87,6 @@ PlayerWeaponRenderPose EvaluatePlayerWeaponRenderPose(
 struct RtSceneFrameInputs
 {
     bool developmentRescueJourney = false;
-    bool retainedWorkloadSkeleton = false;
     horde::gameplay::traversal::RescueTraversalSnapshot rescue{};
     float playerSupportWorldY = horde::gameplay::kRouteFloorWorldY;
     std::uint64_t tickIndex = 0u;
@@ -211,6 +210,8 @@ public:
     static constexpr std::uint32_t kPlayerSwordScabbardInstanceIndex = 25u;
     static constexpr std::uint32_t kWaterDropletMetadataIndex = 24u;
     static constexpr std::uint32_t kWaterDropletInstanceIndex = 26u;
+    static constexpr std::uint32_t kKeeperMetadataIndex = CharacterRenderSlot::kKeeperMetadataIndex;
+    static constexpr std::uint32_t kKeeperInstanceIndex = CharacterRenderSlot::kKeeperTlasInstanceIndex;
     static constexpr std::uint32_t kTlasCount = 1u;
     static constexpr std::uint32_t kTlasInstanceCount = kRtTlasInstanceCapacity;
     // Keep the two existing Keeper body instances at their original TLAS slots.
@@ -221,7 +222,8 @@ public:
                   kPlayerSwordScabbardInstanceIndex);
     static_assert(kPlayerSwordScabbardMetadataIndex < kRtInstanceMetadataCapacity);
     static_assert(kWaterDropletMetadataIndex < kRtInstanceMetadataCapacity);
-    static_assert(kTlasInstanceCount == kWaterDropletInstanceIndex + 1u);
+    static_assert(kKeeperMetadataIndex < kRtInstanceMetadataCapacity);
+    static_assert(kTlasInstanceCount == kKeeperInstanceIndex + 1u);
 
     PresentableTinyRtScene() = default;
     ~PresentableTinyRtScene();

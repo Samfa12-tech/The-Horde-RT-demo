@@ -1,0 +1,242 @@
+[
+  {
+    "path": "README.txt",
+    "bytes": 4798,
+    "sha256": "17dfaab3456f3ef4778243b04a71735cdba554b4fad888431ab0e82907088430"
+  },
+  {
+    "path": "previews/horde-tree-pair-runtime-comparison.png",
+    "bytes": 2540249,
+    "sha256": "ccd0d6bd56b0912d4985240750f187d34431045d00ef042d5662a2046114040d"
+  },
+  {
+    "path": "qa/QA-SUMMARY.json",
+    "bytes": 10062,
+    "sha256": "fc36262fd5744af59ebed46ae910f6ee48229bdcf999f53bb700de1fc2b647a7"
+  },
+  {
+    "path": "qa/blender-roundtrip-lod1.json",
+    "bytes": 3737,
+    "sha256": "a34753a63d3bdc75d8f9e1ca6602449c08656bfe3a27cd2beb3ed2522a658727"
+  },
+  {
+    "path": "qa/blender-roundtrip.json",
+    "bytes": 3711,
+    "sha256": "026ebea7bbcce6d71d30a10485d0e68ddee69502c4390da10c1d22ab001c71d6"
+  },
+  {
+    "path": "qa/deterministic-rebuild.json",
+    "bytes": 2684,
+    "sha256": "98d3e6073d0eb7d76ca6503034f58cda1ed4a6550e67e96fee08f822ff9710bd"
+  },
+  {
+    "path": "qa/horde-irregular-pine-v1-back-silhouette.png",
+    "bytes": 177128,
+    "sha256": "12371700f5f719305dd3f1f1ef06fa7ada2dad24941900af7c560ea213172e20"
+  },
+  {
+    "path": "qa/horde-irregular-pine-v1-centerlines.json",
+    "bytes": 179381,
+    "sha256": "f18a52c778aa752fc32bc369cb78847b77aa5cbb7c75ec600f457986564ad6a0"
+  },
+  {
+    "path": "qa/horde-irregular-pine-v1-front-silhouette.png",
+    "bytes": 175512,
+    "sha256": "5081c56bfacfe5400d4bcda83d166f3f67387c5ff5e9054faadf9726740fdba7"
+  },
+  {
+    "path": "qa/horde-irregular-pine-v1-lod1-back-silhouette.png",
+    "bytes": 177379,
+    "sha256": "a1557e793c61ccb22c93361932e3804c27edf1719d08e289487589ed82f00459"
+  },
+  {
+    "path": "qa/horde-irregular-pine-v1-lod1-centerlines.json",
+    "bytes": 179381,
+    "sha256": "f18a52c778aa752fc32bc369cb78847b77aa5cbb7c75ec600f457986564ad6a0"
+  },
+  {
+    "path": "qa/horde-irregular-pine-v1-lod1-front-silhouette.png",
+    "bytes": 175780,
+    "sha256": "127a8aa2403ac719d6be49240af321266c294094c6d146471aa97299ebb17a2e"
+  },
+  {
+    "path": "qa/horde-irregular-pine-v1-lod1-stats.json",
+    "bytes": 1137,
+    "sha256": "d1796f261fec98882b8f6c3488c7ba75fd8cf23f2527a25dcf41828df20428c4"
+  },
+  {
+    "path": "qa/horde-irregular-pine-v1-stats.json",
+    "bytes": 1130,
+    "sha256": "98d988ab6cbfa41179b8b68324bb286673cf15dc1f6e7426a6f18d9dda491e0a"
+  },
+  {
+    "path": "qa/horde-upright-alder-v1-back-silhouette.png",
+    "bytes": 175731,
+    "sha256": "14c14a51891f25650223d914f8b709c239bcef2ec450ed0bb05a948d050e025a"
+  },
+  {
+    "path": "qa/horde-upright-alder-v1-centerlines.json",
+    "bytes": 185671,
+    "sha256": "02d6c82dd13e34f120a760a8070be03e649aeb327496351e76bfe522e7ea4de3"
+  },
+  {
+    "path": "qa/horde-upright-alder-v1-front-silhouette.png",
+    "bytes": 174762,
+    "sha256": "1ba1fd5f2c2217a6c211ac1e0182e1badd7753bf752a28e36cb0ea4afac90c80"
+  },
+  {
+    "path": "qa/horde-upright-alder-v1-lod1-back-silhouette.png",
+    "bytes": 176052,
+    "sha256": "92f9d2368353a3f13f9e1b879b915a4dbb2a6062d277814dc2d23c4a4521c28c"
+  },
+  {
+    "path": "qa/horde-upright-alder-v1-lod1-centerlines.json",
+    "bytes": 185671,
+    "sha256": "02d6c82dd13e34f120a760a8070be03e649aeb327496351e76bfe522e7ea4de3"
+  },
+  {
+    "path": "qa/horde-upright-alder-v1-lod1-front-silhouette.png",
+    "bytes": 175263,
+    "sha256": "0b738553d648cd90ed0f9056a0c9e40736f0c1341106bc84c0ba0aaf394c527d"
+  },
+  {
+    "path": "qa/horde-upright-alder-v1-lod1-stats.json",
+    "bytes": 1143,
+    "sha256": "b3cb18ea9b646f3ba4551a76b39ccd5eb75a335277db532c6d0fb6d25e2e50c9"
+  },
+  {
+    "path": "qa/horde-upright-alder-v1-stats.json",
+    "bytes": 1140,
+    "sha256": "fdd785dcda5e9d5083026b456f0712e76d8181297c29f139ca515c3dc66a7de9"
+  },
+  {
+    "path": "qa/lod-comparison.json",
+    "bytes": 2381,
+    "sha256": "abea26e20e48a1b86e6a318cc71116f3371ec74066fe7d7c235ba8397d657120"
+  },
+  {
+    "path": "qa/mesh-summary-lod1.json",
+    "bytes": 2518,
+    "sha256": "3ebd6473281c78b2054238e4ab64bdde63c441a9709776698f0980596004a529"
+  },
+  {
+    "path": "qa/mesh-summary.json",
+    "bytes": 2508,
+    "sha256": "8eb9e69abd29c02b1490df24e9664dbc596f343da81e668a275d10dbd57eade7"
+  },
+  {
+    "path": "qa/runtime-byte-inspection.json",
+    "bytes": 13466,
+    "sha256": "fe6b99e93e3a5afc51d52a882df13e7da7883b72d2cb9dafa70e997836869031"
+  },
+  {
+    "path": "qa/visual-review.json",
+    "bytes": 1843,
+    "sha256": "fb7c12250b7c412abb4ba20fca63088482f872323d959312740fac3571dc2def"
+  },
+  {
+    "path": "runtime/horde-irregular-pine-v1-lod1.glb",
+    "bytes": 1266620,
+    "sha256": "77c793480abff4ed7515b224a1b4fc55ac840f27d0b1ef9a17dd1ca58ee1ee2c"
+  },
+  {
+    "path": "runtime/horde-irregular-pine-v1.glb",
+    "bytes": 1341552,
+    "sha256": "c9e595041da122b7731157189219f81ad83fb09560c9c544775e1e4cb216bb84"
+  },
+  {
+    "path": "runtime/horde-upright-alder-v1-lod1.glb",
+    "bytes": 1304432,
+    "sha256": "38333b05a996d46942fb9fddb022e128a0591c372582b520f4d051a308e9282d"
+  },
+  {
+    "path": "runtime/horde-upright-alder-v1.glb",
+    "bytes": 1373076,
+    "sha256": "d2e373b23baded5574fc91172f764207a42a10b6388d9fe27bd18d400067cdee"
+  },
+  {
+    "path": "source/build_horde_trees.py",
+    "bytes": 21527,
+    "sha256": "f2642f6ad5ca89efef100423ef09688a2ca06400ad9326444d330408b8c61ec0"
+  },
+  {
+    "path": "source/check_lod_metrics.py",
+    "bytes": 2756,
+    "sha256": "9fba87751ecfb85c24c452c7c785a3610e6f70aefa071741469e44ec2936f349"
+  },
+  {
+    "path": "source/horde-irregular-pine-v1-lod1.blend",
+    "bytes": 2172604,
+    "sha256": "348aa97d396404d40bba8b510e9b5afc412439312a1dc018efd26a85c9ccb399"
+  },
+  {
+    "path": "source/horde-irregular-pine-v1.blend",
+    "bytes": 2350888,
+    "sha256": "53f3cf7d71b5f55598da62477a3a9e765e4c219566705035146962e5d4ae91f0"
+  },
+  {
+    "path": "source/horde-upright-alder-v1-lod1.blend",
+    "bytes": 2144356,
+    "sha256": "3ca9b7847a90436c759cdec0acb87d91f3b2a1ae9f18cdc3f5bcb5c57bc3b2bc"
+  },
+  {
+    "path": "source/horde-upright-alder-v1.blend",
+    "bytes": 2306936,
+    "sha256": "ae91e9b3b59307483ab5a258302e2095fe6e8068f795b489eb68bc90af3e80dd"
+  },
+  {
+    "path": "source/inspect_runtime.py",
+    "bytes": 3549,
+    "sha256": "de5ae099c8fa9b3f1693b52746054928116d02d35077fb592f0b232f0b26182b"
+  },
+  {
+    "path": "source/package_candidates.py",
+    "bytes": 4646,
+    "sha256": "02b14d814f5cd9ad5688fe5c868b003e780e3bfe9a42061657d0a97c9ebbc44e"
+  },
+  {
+    "path": "source/render_pair.py",
+    "bytes": 1134,
+    "sha256": "470558cb18e029d884ec7007823e2d5054fab00f9f0a6c38912766abdfafe64c"
+  },
+  {
+    "path": "source/validate_lod_silhouettes.py",
+    "bytes": 1700,
+    "sha256": "3c301cfcdcd434a288c5df6d7e90bbc7161f531bed19f706108d373e11236c1a"
+  },
+  {
+    "path": "source/verify_blender_roundtrip.py",
+    "bytes": 3239,
+    "sha256": "a373c81268888db28c2548a58df6012b4142740fae3f2eedc4865257668e0b9d"
+  },
+  {
+    "path": "textures/horde-alder-original-basecolor-512.png",
+    "bytes": 102219,
+    "sha256": "ee50e858d39fa43418ae8b243f2336d4f353408753fa736460c0fe8f16125d44"
+  },
+  {
+    "path": "textures/horde-bark-original-basecolor-512.png",
+    "bytes": 242353,
+    "sha256": "c9cc184f0edb207c5081b78a70e7564e221dcd2c5d40f2c74449d065eeb7d27b"
+  },
+  {
+    "path": "textures/horde-bark-original-normal-512.png",
+    "bytes": 529212,
+    "sha256": "73785defa7ea75739f403bc0b1e0710d7dca0435fed542cecd8efc9496b98e06"
+  },
+  {
+    "path": "textures/horde-bark-original-roughness-512.png",
+    "bytes": 145997,
+    "sha256": "03e409b0fc569647c0f4ac18154ee506cce4328433ab8096c97a53ea02105e76"
+  },
+  {
+    "path": "textures/horde-moss-original-basecolor-512.png",
+    "bytes": 112637,
+    "sha256": "e9140e672e54a4b073351b4f17b76f15238ff8cc70e8c16158a54e0ddc092822"
+  },
+  {
+    "path": "textures/horde-pine-original-basecolor-512.png",
+    "bytes": 70601,
+    "sha256": "6fdeb17cd4ff08e25396926b42827dcd9ab88945d03a604da0a74d762ecd28b7"
+  }
+]

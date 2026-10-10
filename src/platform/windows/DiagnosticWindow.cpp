@@ -80,6 +80,7 @@
 #include "gameplay/SpatialAudio.h"
 #include "gameplay/dialogue/ChapterDialogue.h"
 #include "gameplay/dialogue/SubtitleLayout.h"
+#include "platform/windows/WindowsSubtitleBitmap.h"
 #include "gameplay/SwordCombat.h"
 #include "gameplay/simulation/GameSimulation.h"
 #include "platform/windows/DesktopControllerInput.h"
@@ -99,6 +100,7 @@
 #include "platform/windows/WindowsInteractionPrompt.h"
 #include "platform/windows/WindowsGameplayInput.h"
 #include "platform/windows/WindowsChapterDialogue.h"
+#include "platform/windows/WindowsVitalityHudLayout.h"
 #include "platform/windows/WindowsGitHubReleaseUpdate.h"
 #include "platform/windows/WindowsRtLabState.h"
 #include "vulkan/GpuFrameTimer.h"
@@ -510,6 +512,8 @@ struct VulkanSurfaceContext
     horde::gameplay::dialogue::Line presentedDialogueLine = horde::gameplay::dialogue::Line::None;
     std::uint64_t presentedDialogueGeneration = 0u;
     horde::platform::windows::SubtitlePlacementLatch subtitlePlacementLatch{};
+    horde::platform::windows::SubtitlePaintKey subtitlePaintKey{};
+    bool subtitleBitmapCurrent = false;
     std::uint32_t playingDialogueLine = 0u;
     std::uint64_t playingDialogueGeneration = 0u;
     std::uint64_t lastChapterPresentationAckTick = 0u;
@@ -1223,6 +1227,7 @@ bool PlayXAudioFile(const std::filesystem::path& path,
                     int sfxVolumePercent);
 void SetControlVisible(HWND window, int id, bool visible);
 bool MeasurementPausedByUi(const VulkanSurfaceContext& context);
+bool NativeUiUsesHighContrast();
 void ReplaceFontProperty(HWND window, const char* propertyName, HFONT font);
 
 void PlaySoundEffect(const VulkanSurfaceContext& context, const char* filename)
@@ -1748,7 +1753,8 @@ void UpdateChapterDialogueAudio(VulkanSurfaceContext& context)
     context.playingDialogueGeneration = 0u;
     const auto& spec = horde::gameplay::dialogue::Spec(line);
     if (spec.audio == nullptr || spec.audio[0] == '\0') return;
-    const std::filesystem::path path = ResolveAssetRoot() / spec.audio;
+    const auto path = horde::platform::windows::WindowsDialogueAudioPath(
+        ResolveAssetRoot(), spec.audio);
     if (!std::filesystem::exists(path))
     {
         LogWindowsAudio("chapter line audio unavailable; subtitle remains active: " + path.string());
@@ -1795,7 +1801,7 @@ void RefreshChapterSubtitle(VulkanSurfaceContext& context)
     if (fontPixels != context.appliedSubtitleFontPixels)
     {
         HFONT font = CreateFontA(-fontPixels, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
-            ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY,
+            ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, ANTIALIASED_QUALITY,
             DEFAULT_PITCH | FF_ROMAN, "Georgia");
         if (font)
         {
@@ -1804,12 +1810,11 @@ void RefreshChapterSubtitle(VulkanSurfaceContext& context)
             context.appliedSubtitleFontPixels = fontPixels;
         }
     }
-    std::string text = std::string(spec.speaker) + "\r\n" + spec.text +
-        "\r\n\r\n[TAB / X: SKIP]";
+    std::string text = horde::platform::windows::WindowsSubtitleCaption(spec.speaker, spec.text);
     const int subtitleWidth = std::max(0, std::min(900,
         width - 2 * ScaleForDpi(context.windowHandle, 24)));
     HDC measureDc = GetDC(context.windowHandle);
-    RECT measured{0, 0, subtitleWidth, 0};
+    RECT measured{0, 0, std::max(0, subtitleWidth - 24), 0};
     const HFONT measureFont = reinterpret_cast<HFONT>(SendMessageA(subtitle, WM_GETFONT, 0, 0));
     const HGDIOBJ oldMeasureFont = measureDc && measureFont ? SelectObject(measureDc, measureFont) : nullptr;
     if (measureDc) DrawTextA(measureDc, text.c_str(), -1, &measured,
@@ -1820,11 +1825,13 @@ void RefreshChapterSubtitle(VulkanSurfaceContext& context)
     const int measuredLineHeight = std::max(1, fontPixels + ScaleForDpi(context.windowHandle, 6));
     const int wrappedLines = std::max(1, static_cast<int>((measured.bottom + measuredLineHeight - 1) / measuredLineHeight));
     const int topReserved = ScaleForDpi(context.windowHandle, 164);
-    const int bottomReserved = ScaleForDpi(context.windowHandle, 128);
+    const HWND interaction = GetDlgItem(context.windowHandle, kChestPromptControlId);
+    const int bottomReserved = ScaleForDpi(context.windowHandle,
+        interaction && IsWindowVisible(interaction) ? 100 : 20);
     horde::gameplay::dialogue::SubtitleRequest request;
     request.width = width;
     request.height = height;
-    request.margin = ScaleForDpi(context.windowHandle, 24);
+    request.margin = ScaleForDpi(context.windowHandle, 12);
     request.topReserved = topReserved;
     request.bottomReserved = bottomReserved;
     request.fontPixels = fontPixels;
@@ -1871,20 +1878,17 @@ void RefreshChapterSubtitle(VulkanSurfaceContext& context)
         request, dialogue.generation, context.subtitlePlacementLatch, context.subtitlePosition);
     if (!layout.fits)
     {
-        text = "SUBTITLE TOO LARGE - ENLARGE WINDOW OR LOWER TEXT SIZE";
-        request.lines = 2;
-        request.fontPixels = std::min(fontPixels, ScaleForDpi(context.windowHandle, 16));
-        if (request.fontPixels != context.appliedSubtitleFontPixels)
-        {
-            if (HFONT font = CreateFontA(-request.fontPixels, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
-                    ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY,
-                    DEFAULT_PITCH | FF_ROMAN, "Georgia"))
-            {
-                SendMessageA(subtitle, WM_SETFONT, reinterpret_cast<WPARAM>(font), TRUE);
-                ReplaceFontProperty(context.windowHandle, kSubtitleFontProperty, font);
-                context.appliedSubtitleFontPixels = request.fontPixels;
-            }
-        }
+        // Keep the requested accessible size; report insufficient room rather
+        // than swapping large/small fonts on each publication.
+        text = "Enlarge window for subtitles";
+        HDC dc = GetDC(context.windowHandle);
+        RECT bounds{0, 0, std::max(0, subtitleWidth - 24), 0};
+        const HFONT font = reinterpret_cast<HFONT>(SendMessageA(subtitle, WM_GETFONT, 0, 0));
+        const HGDIOBJ old = dc && font ? SelectObject(dc, font) : nullptr;
+        if (dc) DrawTextA(dc, text.c_str(), -1, &bounds, DT_CALCRECT | DT_WORDBREAK | DT_NOPREFIX);
+        if (dc && old && old != HGDI_ERROR) SelectObject(dc, old);
+        if (dc) ReleaseDC(context.windowHandle, dc);
+        request.lines = std::max(1, static_cast<int>((bounds.bottom + measuredLineHeight - 1) / measuredLineHeight));
         layout = horde::platform::windows::ResolveWindowsSubtitleLayout(
             request, dialogue.generation, context.subtitlePlacementLatch, context.subtitlePosition);
         if (!layout.fits)
@@ -1893,11 +1897,24 @@ void RefreshChapterSubtitle(VulkanSurfaceContext& context)
             return;
         }
     }
-    SetWindowTextA(subtitle, text.c_str());
-    MoveWindow(subtitle, layout.x, layout.y, layout.width, layout.height, TRUE);
-    SetControlVisible(context.windowHandle, kChapterSubtitleId, true);
-    SetWindowPos(subtitle, HWND_TOP, 0, 0, 0, 0,
-        SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+    const horde::platform::windows::SubtitlePaintKey paint{
+        text, layout.width, layout.height, context.appliedSubtitleFontPixels, NativeUiUsesHighContrast()};
+    RECT previous{};
+    GetWindowRect(subtitle, &previous);
+    MapWindowPoints(HWND_DESKTOP, context.windowHandle, reinterpret_cast<POINT*>(&previous), 2);
+    if (previous.left != layout.x || previous.top != layout.y ||
+        previous.right - previous.left != layout.width || previous.bottom - previous.top != layout.height)
+        SetWindowPos(subtitle, HWND_TOP, layout.x, layout.y, layout.width, layout.height, SWP_NOACTIVATE);
+    // Do not erase/repaint identical labels at render cadence: that flickers over
+    // Vulkan's independently presented scene. The native alpha sprite owns paint.
+    if (!context.subtitleBitmapCurrent || !(paint == context.subtitlePaintKey))
+    {
+        if (text != context.subtitlePaintKey.text) SetWindowTextA(subtitle, text.c_str());
+        const HFONT font = reinterpret_cast<HFONT>(SendMessageA(subtitle, WM_GETFONT, 0, 0));
+        context.subtitleBitmapCurrent = horde::platform::windows::PresentSubtitleBitmap(subtitle, paint, font);
+        if (context.subtitleBitmapCurrent) context.subtitlePaintKey = paint;
+    }
+    SetControlVisible(context.windowHandle, kChapterSubtitleId, context.subtitleBitmapCurrent);
 }
 
 void UpdateWaterfallAmbience(const VulkanSurfaceContext& context)
@@ -2282,7 +2299,7 @@ void UpdateSettingsLabels(VulkanSurfaceContext& context)
         SendMessageA(slider, TBM_SETPOS, TRUE, static_cast<LPARAM>(context.musicVolumePercent));
     }
     if (HWND label = GetDlgItem(context.windowHandle, kVoiceVolumeLabelId))
-        SetWindowTextA(label, ("VOICE VOLUME: " + std::to_string(context.voiceVolumePercent) + "%").c_str());
+        SetWindowTextA(label, ("DIALOGUE / SPEECH: " + std::to_string(context.voiceVolumePercent) + "%").c_str());
     if (HWND slider = GetDlgItem(context.windowHandle, kVoiceVolumeSliderId))
         SendMessageA(slider, TBM_SETPOS, TRUE, context.voiceVolumePercent);
     if (HWND button = GetDlgItem(context.windowHandle, kSubtitlesButtonId))
@@ -2481,15 +2498,11 @@ void LayoutVitalityHud(HWND window, int clientWidth, int maximum)
 {
     if (HWND hud = GetDlgItem(window, kVitalityHudControlId))
     {
-        const int size = ScaleForDpi(window, 18), gap = ScaleForDpi(window, 4);
-        const int count = std::max(0, maximum);
-        const int available = std::max(size, clientWidth - ScaleForDpi(window, 40));
-        const int columns = std::max(1, std::min(count, (available + gap) / (size + gap)));
-        const int rows = count == 0 ? 1 : (count - 1) / columns + 1;
-        const int heartHeight = ScaleForDpi(window, 22), verticalInset = ScaleForDpi(window, 4);
+        const UINT dpi = GetDpiForWindow(window);
+        const auto layout = horde::platform::windows::LayoutWindowsVitalityHud(
+            clientWidth, maximum, static_cast<int>(dpi ? dpi : kDefaultDpi));
         MoveWindow(hud, ScaleForDpi(window, 14), ScaleForDpi(window, 52),
-                   columns * (size + gap) - gap + ScaleForDpi(window, 12),
-                   rows * (heartHeight + gap) - gap + 2 * verticalInset, TRUE);
+                   layout.width, layout.height, TRUE);
     }
 }
 
@@ -8364,7 +8377,7 @@ void ApplyDpiScaledFonts(HWND window)
     }
 #endif
 
-    const auto *fontContext = reinterpret_cast<const VulkanSurfaceContext *>(
+    auto *fontContext = reinterpret_cast<VulkanSurfaceContext *>(
         GetWindowLongPtrA(window, GWLP_USERDATA));
     const bool entryStyle = fontContext != nullptr && fontContext->entryMenuVisible;
     HFONT uiFont = CreateFontA(
@@ -8388,12 +8401,17 @@ void ApplyDpiScaledFonts(HWND window)
     }
     HFONT subtitleFont = CreateFontA(-ScaleForDpi(window, 22), 0, 0, 0, FW_NORMAL,
         FALSE, FALSE, FALSE, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
-        CLEARTYPE_QUALITY, DEFAULT_PITCH | FF_ROMAN, "Georgia");
+        ANTIALIASED_QUALITY, DEFAULT_PITCH | FF_ROMAN, "Georgia");
     if (subtitleFont)
     {
         if (HWND subtitle = GetDlgItem(window, kChapterSubtitleId))
             SendMessageA(subtitle, WM_SETFONT, reinterpret_cast<WPARAM>(subtitleFont), TRUE);
         ReplaceFontProperty(window, kSubtitleFontProperty, subtitleFont);
+        if (fontContext)
+        {
+            fontContext->appliedSubtitleFontPixels = 0;
+            fontContext->subtitleBitmapCurrent = false;
+        }
     }
 
     if (HWND edit = GetDlgItem(window, kEditControlId))
@@ -10165,24 +10183,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         const auto* item = reinterpret_cast<const DRAWITEMSTRUCT*>(lParam);
         if (item && item->CtlID == kChapterSubtitleId)
         {
-            const bool highContrast = NativeUiUsesHighContrast();
-            static HBRUSH darkCreamPlaque = CreateSolidBrush(RGB(24, 22, 18));
-            static HBRUSH brassBorder = CreateSolidBrush(RGB(157, 124, 72));
-            FillRect(item->hDC, &item->rcItem,
-                highContrast ? GetSysColorBrush(COLOR_WINDOW) : darkCreamPlaque);
-            FrameRect(item->hDC, &item->rcItem,
-                highContrast ? GetSysColorBrush(COLOR_WINDOWTEXT) : brassBorder);
-            RECT textRect = item->rcItem;
-            InflateRect(&textRect, -ScaleForDpi(hWnd, 14), -ScaleForDpi(hWnd, 9));
-            const HFONT font = reinterpret_cast<HFONT>(SendMessageA(item->hwndItem, WM_GETFONT, 0, 0));
-            const HGDIOBJ previousFont = font ? SelectObject(item->hDC, font) : nullptr;
-            SetTextColor(item->hDC, highContrast ? GetSysColor(COLOR_WINDOWTEXT) : RGB(248, 236, 207));
-            SetBkMode(item->hDC, TRANSPARENT);
-            char text[768]{};
-            GetWindowTextA(item->hwndItem, text, static_cast<int>(sizeof(text)));
-            DrawTextA(item->hDC, text, -1, &textRect,
-                DT_CENTER | DT_VCENTER | DT_WORDBREAK | DT_NOPREFIX);
-            if (previousFont && previousFont != HGDI_ERROR) SelectObject(item->hDC, previousFont);
+            // Per-pixel layered child is updated only on actual label/layout changes.
             return TRUE;
         }
         if (item && item->CtlID == kCombatTeachingPromptId)
@@ -10271,8 +10272,8 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 {12,21},{9,18},{2,12},{2,7},{2,1},{9,0},{12,5},
                 {15,0},{22,1},{22,7},{22,12},{15,18},{12,21}}};
             const int gap = ScaleForDpi(hWnd, 4);
-            const int columns = std::max<int>(1, (item->rcItem.right - item->rcItem.left - 2 * inset + gap) /
-                                             (heartWidth + gap));
+            const int columns = horde::platform::windows::VitalityHudColumns(
+                item->rcItem.right - item->rcItem.left, heartWidth, gap, inset);
             for (int index = 0; index < std::max(0, vitals.maxVitality); ++index)
             {
                 const int x = item->rcItem.left + inset + (index % columns) * (heartWidth + gap);
@@ -10420,13 +10421,6 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         }
         COLORREF textColor = RGB(242, 233, 216);
         const int controlId = GetDlgCtrlID(reinterpret_cast<HWND>(lParam));
-        if (controlId == kChapterSubtitleId)
-        {
-            SetTextColor(dc, RGB(248, 236, 207));
-            SetBkColor(dc, RGB(24, 22, 18));
-            static HBRUSH subtitlePlaque = CreateSolidBrush(RGB(24, 22, 18));
-            return reinterpret_cast<LRESULT>(subtitlePlaque);
-        }
         if (controlId == kGraphicsInfoId || controlId == kGraphicsPreviewTelemetryId)
         {
             SetTextColor(dc, RGB(242, 233, 216));
@@ -10784,7 +10778,7 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     SendMessageA(musicVolumeSlider, TBM_SETTICFREQ, 10, 0);
     SendMessageA(musicVolumeSlider, TBM_SETPOS, TRUE, 70);
     createButton(kSettingsMoreId, "AUDIO & SUBTITLES...");
-    createStatic(kVoiceVolumeLabelId, "VOICE VOLUME: 70%", SS_CENTER | SS_CENTERIMAGE);
+    createStatic(kVoiceVolumeLabelId, "DIALOGUE / SPEECH: 70%", SS_CENTER | SS_CENTERIMAGE);
     HWND voiceVolumeSlider = CreateWindowExA(0, TRACKBAR_CLASSA, "",
         WS_CHILD | WS_VISIBLE | WS_TABSTOP | TBS_AUTOTICKS, 0, 0, 100, 38, hWnd,
         reinterpret_cast<HMENU>(static_cast<INT_PTR>(kVoiceVolumeSliderId)), instance, nullptr);
@@ -10802,7 +10796,9 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     SendMessageA(subtitleSizeSlider, TBM_SETTICFREQ, 10, 0);
     SendMessageA(subtitleSizeSlider, TBM_SETPOS, TRUE, 100);
     createButton(kSubtitlePositionButtonId, "SUBTITLE POSITION: AUTO");
-    createStatic(kChapterSubtitleId, "", SS_OWNERDRAW | SS_NOTIFY);
+    if (HWND subtitle = createStatic(kChapterSubtitleId, "", SS_OWNERDRAW | SS_NOTIFY))
+        SetWindowLongPtrA(subtitle, GWL_EXSTYLE,
+            GetWindowLongPtrA(subtitle, GWL_EXSTYLE) | WS_EX_LAYERED);
     SetControlVisible(hWnd, kChapterSubtitleId, false);
     createButton(kFullscreenButtonId, "DISPLAY: WINDOWED");
     createButton(kSettingsBackButtonId, "BACK");

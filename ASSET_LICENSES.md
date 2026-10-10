@@ -239,15 +239,32 @@ not evidence that the former MediaPlayer issue was reproduced or diagnosed.
 
 `DevelopmentWorldRoute.h`, `DevelopmentWorldGeometry.h` and `RescueJourneyGeometry.h`
 retain the editable original terrain, closed banks and opaque tree silhouette
-recipes. The native world upload consumes those recipes directly. They add no
-third-party model, texture or audio bytes and reuse the existing admitted material
-bindings. They are a development blockout, not final forest art. The selected
-prepared tree payloads remain unavailable in this local checkout; no replacement
-masters were generated or downloaded. Kit's thirteen owner-approved local WAV
-cuts were inventoried but remain outside the public repository and runtime
-packages pending verified distribution rights. Performance approval does not
-grant those rights. Existing asset licences and public-redistribution questions
-remain unchanged.
+recipes. The native world upload consumes those recipes directly. The owner-supplied
+original pine/alder pair below provides the bounded LOD1 forest dressing; the former
+silhouette recipe remains a separate diagnostic geometry path. Kit's thirteen
+exact approved WAV cuts were subsequently admitted after the owner confirmed
+public repository and game-package distribution rights; see the dedicated Kit
+audio entry below. This does not change the asset-specific licence notices or
+establish physical playback/performance acceptance.
+
+- **Original irregular pine and upright alder tree pair v1**: owner-authored editable
+  Blender sources, original 512px PBR maps, LOD0/LOD1 GLB exports, source receipts,
+  and LOD1 runtime GLBs. Supplied in `Horde-1.7-tree-pair-compact-editable.zip`; the
+  exact package SHA-256 and preserved closed source roster are in
+  `assets/models/world/source/forest-tree-pair-v1/`. The owner confirms these assets
+  are approved for game integration and public PR. The package assigns no blanket
+  public/open-source license; this entry claims no MIT, CC0, Meshy, or other
+  third-party rights. The runtime admits only `horde-irregular-pine-v1-lod1.glb`
+  (5,000 triangles) and `horde-upright-alder-v1-lod1.glb` (5,102 triangles), at
+  authored scale 1.0. Exact bytes, hashes, bounds and source links are in
+  `assets/models/world/runtime/forest-tree-pair-v1/runtime-roster.json`. Original
+  bark normal/roughness and foliage/base maps remain 512px; production array inputs
+  use exact nearest-neighbour 2x texel replication, with bark roughness packed as
+  ORM G, and original source PNGs remain unchanged. Four base-colour families append
+  at layers 14–17; mapped bark alone appends normal/ORM layer 14. The 18/15/15
+  layer-count manifest and full-mip Windows RGBA8/Android ASTC outputs record exact
+  hashes. Source masters and rights notices stay preserved; the repository license
+  does not assign a license to these assets.
 
 
 ### 1.7 development tomb native candidates (2026-10-10)
@@ -280,3 +297,16 @@ these audio files are not blanket MIT-licensed by the repository code licence.
 No new generation, acquisition or spending occurred. Exact-candidate positional
 listening, Voice/SFX balance and Android playback/lifecycle acceptance remain
 pending. The visible Kit model remains unadmitted.
+
+
+### Kit visual source intake (11 October 2026)
+
+The owner expressly confirmed that public Horde repository and game-package
+redistribution of the exact Meshy Warden model is covered. The copied source
+`assets/models/characters/source/kit-warden-v1/briarhold-warden-1k.glb` has SHA-256
+`47e249840ed9dd438da386137257050a5bd463e7fe54bf94873e1fd21715835e`.
+This records the owner's entitlement confirmation, not an independent account
+inspection or an MIT/CC0 claim. Credit: Warden/Kit source created with Meshy;
+source supplied by Samfa12. The original private-project file is unchanged.
+Native clip/skin intake is separate from runtime admission: no visible Kit,
+Kit renderer/resource handoff is shipped by this intake. The intended non-overlapping Keeper/Kit lifecycle may reuse the dedicated character slot; that is a subsequent admission task.

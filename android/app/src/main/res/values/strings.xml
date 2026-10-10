@@ -20,6 +20,7 @@
     <string name="restart_route">RESTART ROUTE</string>
     <string name="controls">CONTROLS</string>
     <string name="settings">SETTINGS</string>
+    <string name="dialogue_volume">Dialogue / Speech</string>
     <string name="technical_info">RT DIAGNOSTICS</string>
     <string name="run_benchmark">RUN BENCHMARK</string>
     <string name="more_by_samfa12">MORE BY SAMFA12</string>

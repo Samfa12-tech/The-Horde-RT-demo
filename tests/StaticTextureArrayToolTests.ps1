@@ -32,7 +32,19 @@ try {
         $bytes[$descriptorOffset + 13] -ne 1 -or $bytes[$descriptorOffset + 14] -ne 2) {
         throw "Expected full mip chain and assigned BT709/sRGB metadata for mixed-metadata input PNGs."
     }
-    Write-Output "Static texture array tool contract passed: two real layers, full mips and mixed-input BT709 assignment"
+    $sourceImage = Join-Path $repoRoot "assets\textures\props\source\static-array-1k\sword-base-color.png"
+    $oneOverCapacity = @($sourceImage) * 19
+    try {
+        & (Join-Path $repoRoot "tools\compile-static-texture-array.ps1") `
+            -InputPaths $oneOverCapacity `
+            -OutputPath (Join-Path $temporaryRoot "nineteen-layer-overflow.ktx2") `
+            -Format R8G8B8A8_SRGB -Transfer srgb -Width 512 -Height 512
+        throw "Expected the 19-layer input to exceed the approved 18-layer capacity."
+    }
+    catch {
+        if ($_.Exception.Message -notmatch "cannot exceed the approved 18-layer capacity") { throw }
+    }
+    Write-Output "Static texture array tool contract passed: two real layers, full mips, mixed metadata, and 19-layer overflow rejection"
 }
 finally {
     if (Test-Path -LiteralPath $temporaryRoot) {

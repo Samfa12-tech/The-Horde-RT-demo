@@ -47,13 +47,15 @@ struct SkeletonRenderPlan
 
 struct CharacterFramePlan
 {
-    bool selectedLich = false;
-    bool retainedWorkloadSkeleton = false;
+    bool lichVisible = false;
     horde::scene::SkinnedClip lichClip = horde::scene::SkinnedClip::Idle;
     float lichTime = 0.0f;
     float lichStaffLiftRadians = 0.0f;
     float lichStaffCastRadians = 0.0f;
-    VkTransformMatrixKHR lichTransform{};
+    VkTransformMatrixKHR lichTransform{{
+        1.0f, 0.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f}};
     std::array<SkeletonRenderPlan, horde::gameplay::simulation::kSkeletonEnemyCapacity> skeletons{};
     std::size_t skeletonCount = 0u;
     std::size_t skeletonPoseBucketCount = 0u;
@@ -72,7 +74,7 @@ CharacterFramePlan EvaluateCharacterFramePlan(
     std::size_t skeletonCount,
     const horde::gameplay::EnemyRosterSnapshot& roster,
     const horde::gameplay::LichSnapshot& lich,
-    float skeletonDeadClipDuration, bool retainedWorkloadSkeleton = false);
+    float skeletonDeadClipDuration);
 
 class CharacterRenderSlot
 {
@@ -80,6 +82,9 @@ public:
     static constexpr std::uint32_t kTlasInstanceIndex = 2u;
     static constexpr std::uint32_t kSecondSkeletonTlasInstanceIndex = 18u;
     static constexpr std::uint32_t kMaximumActiveSkeletons = 2u;
+    static constexpr std::uint32_t kKeeperMetadataIndex = 25u;
+    static constexpr std::uint32_t kKeeperTlasInstanceIndex = 27u;
+    static constexpr std::uint32_t kMaximumCharacterInstances = 3u;
     static constexpr std::uint32_t kMaximumSkeletonPoseBuckets = 2u;
 
     bool LoadAssets(const std::string& skeletonAssetPath,
@@ -92,7 +97,7 @@ public:
                         std::size_t skeletonCount,
                         const horde::gameplay::EnemyRosterSnapshot& roster,
                         const horde::gameplay::LichSnapshot& lich,
-                        std::string& diagnostic, bool retainedWorkloadSkeleton = false);
+                        std::string& diagnostic);
     bool PrepareFrame(const std::array<horde::gameplay::simulation::SkeletonEnemySnapshot,
                                        horde::gameplay::simulation::kSkeletonEnemyCapacity>& skeletons,
                       std::size_t skeletonCount,
@@ -100,9 +105,9 @@ public:
                       const horde::gameplay::LichSnapshot& lich,
                       const RtGpuResources& resources,
                       std::string& diagnostic,
-                      RtSceneRecordObservation* observation = nullptr, bool retainedWorkloadSkeleton = false);
+                      RtSceneRecordObservation* observation = nullptr);
 
-    std::array<VkAccelerationStructureInstanceKHR, kMaximumActiveSkeletons> BuildActiveInstances() const;
+    std::array<VkAccelerationStructureInstanceKHR, kMaximumCharacterInstances> BuildActiveInstances() const;
     std::array<float, 3u> LichStaffWorldPosition(const horde::gameplay::LichSnapshot& lich) const;
 
     CharacterBlasRefit PendingRefit() const { return pendingRefit_; }
