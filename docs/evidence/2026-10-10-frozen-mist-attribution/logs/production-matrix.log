@@ -1,0 +1,16 @@
+<repo>\reports\frozen-mist\matrix-baseline\diagnostic_high_generic_dielectric\minimal.rgen.resolved
+Raygen variant diagnostic_high_generic_dielectric: 295960 bytes; functions=83; calls=264; ray-query sites=2; dependency SHA-256=48417a6160c6b049f93f9a69f4630ec04790d22c6ad472a9ad77823a684272b8
+<repo>\reports\frozen-mist\matrix-baseline\diagnostic_high_opaque_fast\minimal.rgen.resolved
+Raygen variant diagnostic_high_opaque_fast: 595520 bytes; functions=1; calls=0; ray-query sites=29; dependency SHA-256=f48687e370d8f4c34b0cbcfd0ff0fdc7484d9a3c605e3bce7ea4d6f43e04258e
+<repo>\reports\frozen-mist\matrix-baseline\diagnostic_mobile_generic_dielectric\minimal.rgen.resolved
+Raygen variant diagnostic_mobile_generic_dielectric: 294460 bytes; functions=83; calls=261; ray-query sites=2; dependency SHA-256=d9eddf452a49888ecb3e6b4f72c89d737b6a61691b0e151f0320b18b5407c390
+<repo>\reports\frozen-mist\matrix-baseline\diagnostic_mobile_opaque_fast\minimal.rgen.resolved
+Raygen variant diagnostic_mobile_opaque_fast: 592420 bytes; functions=1; calls=0; ray-query sites=27; dependency SHA-256=e8f9143905742dceda9feda2493161e69d56d4a3ecf30ed4296f9b16fef0f9ca
+<repo>\reports\frozen-mist\matrix-baseline\shipping_high_generic_dielectric\minimal.rgen.resolved
+Raygen variant shipping_high_generic_dielectric: 287132 bytes; functions=83; calls=264; ray-query sites=2; dependency SHA-256=8c608eaf2e12a13ff100ed2d0acd82eb201afea395a651f3c2c1e876678cf6a0
+<repo>\reports\frozen-mist\matrix-baseline\shipping_high_opaque_fast\minimal.rgen.resolved
+Raygen variant shipping_high_opaque_fast: 591284 bytes; functions=1; calls=0; ray-query sites=29; dependency SHA-256=12168a8c2897ccc8795a53a2ca848a8ea7ebd4169695846e2700b56908baade6
+<repo>\reports\frozen-mist\matrix-baseline\shipping_mobile_generic_dielectric\minimal.rgen.resolved
+Raygen variant shipping_mobile_generic_dielectric: 285632 bytes; functions=83; calls=261; ray-query sites=2; dependency SHA-256=f95f347812f32154079cb48b1a412a9c346df59c26d02d8ffaaeda5f6222db4f
+<repo>\reports\frozen-mist\matrix-baseline\shipping_mobile_opaque_fast\minimal.rgen.resolved
+Raygen variant shipping_mobile_opaque_fast: 588184 bytes; functions=1; calls=0; ray-query sites=27; dependency SHA-256=9f47b79fc53f8ccec50d32857d96cd2b663dee14332619322b4bfebd14f1eb30

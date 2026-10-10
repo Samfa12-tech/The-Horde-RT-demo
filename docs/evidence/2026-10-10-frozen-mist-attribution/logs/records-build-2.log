@@ -1,0 +1,8 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  1>Checking Build System
+  Building Custom Rule <repo>/reports/frozen-mist/records/harness/CMakeLists.txt
+  DiagnosticWindow.cpp
+  Provider.cpp
+  Generating Code...
+  frozen_mist.vcxproj -> <repo>\reports\frozen-mist\records\build\Debug\frozen_mist.exe
