@@ -195,5 +195,6 @@
       "sha256": "9d73a74d151ad55afd5aeea1349b055eecec0e12d55a41356a1f98fc41e9b4ae",
       "bytes": 122820177
     }
-  ]
+  ],
+  "publicLogIdentityPolicy": "sanitizedSha256 hashes committed canonical Git bytes (LF where attributes normalize); sanitizedWorkingTreeSha256 separately hashes the local sanitized copy. Raw private bytes remain local and retain rawSha256. Every log has an immutable earlier evidence URL and exact Git blob identity; no recursive self commit."
 }
