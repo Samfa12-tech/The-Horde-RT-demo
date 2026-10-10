@@ -1,0 +1,30 @@
+UpdateCTestConfiguration  from :<repo>/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/build/presets/windows-x64-release/DartConfiguration.tcl
+Parse Config file:<repo>/build/presets/windows-x64-release/DartConfiguration.tcl
+Test project <repo>/build/presets/windows-x64-release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 49
+    Start 49: horde_rt_final_held_torch_clearance_tests
+
+49: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_final_held_torch_clearance_tests.exe" "<repo>"
+49: Working Directory: <repo>/build/presets/windows-x64-release
+49: Test timeout computed to be: 180
+49: worst-bend targetGripY=0.330294 finalGripY=0.330294 flameY=0.892789 lightY=0.870196 finalMainEnvelopeHeadroom=0.0494097 root=4.2,-0.949749,-10
+49: clearance viewport aspect=1
+49: imported structural underside triangles=118 planeSamples=3178 diskSamples=57970
+49: new roof final rig cases=1812 actualViewmodelVerticesPerPose=15855 skinnedRoofCases=1812 worstHeadroom=0.0323757 worstPoseXZ=-0.58,-4.3 yaw/pitch=1.5708,0 walk=10.07 action=8 target/finalGripY=0.348713,0.348714
+49: limiting worldPoint=-0.0634497,1.31762,-4.33031 roofY=1.35 sharedY=1.35
+49: actual final rig cases=3287 worstHeadroom=0.0323757 maxGripError=0.0118211 failures=0
+1/1 Test #49: horde_rt_final_held_torch_clearance_tests ...   Passed   14.72 sec
+
+The following tests passed:
+	horde_rt_final_held_torch_clearance_tests
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =  14.74 sec
