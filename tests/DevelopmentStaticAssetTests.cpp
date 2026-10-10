@@ -66,8 +66,8 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 72u,
-          "development registry retains prior views plus bounded water-lighting and world-route views");
+    Check(kDevelopmentCheckpoints.size() == 73u,
+          "development registry retains prior views plus bounded water-lighting, world-route and rescue views");
     Check(FindDevelopmentCheckpoint(164) == nullptr,
           "development lookup preserves the unassigned gap before later bounded additions");
     const auto* worldRoute = FindDevelopmentCheckpoint("world-route");
@@ -84,8 +84,20 @@ int main()
               FindShowcaseCheckpoint("world-route") == nullptr &&
               FindShowcaseCheckpoint("world-route-staged") == nullptr,
           "the appended world-route views remain bounded debug-only entries with stable name and ID lookup");
-    Check(FindDevelopmentCheckpoint(192) == nullptr,
-          "development lookup still rejects IDs beyond the appended route views");
+    const auto* rescueJourney = FindDevelopmentCheckpoint("rescue-journey-start");
+    Check(rescueJourney != nullptr && rescueJourney->id == 192 &&
+              FindDevelopmentCheckpoint(192) == rescueJourney &&
+              rescueJourney->baseShowcaseCheckpointId == 0 &&
+              rescueJourney->cameraX == 0.0f && rescueJourney->cameraZ == 1.85f &&
+              rescueJourney->yaw == 3.14159265359f && rescueJourney->pitch == -0.05f &&
+              !rescueJourney->developmentWorldRoute && !rescueJourney->stagedWorldPreparation &&
+              !rescueJourney->developmentSupportFixture &&
+              FindShowcaseCheckpoint(192) == nullptr &&
+              FindShowcaseCheckpoint("rescue-journey-start") == nullptr,
+          "rescue entry retains the ordinary lower start and is absent from release checkpoints");
+    Check(FindDevelopmentCheckpoint(193) == nullptr &&
+              FindDevelopmentCheckpoint("rescue-journey-unknown") == nullptr,
+          "development lookup still rejects IDs and names beyond the appended rescue entry");
     const auto* torchParry = FindDevelopmentCheckpoint("player-torch-parry-clearance");
     simulation::GameSimulation stagedTorchParry;
     DevelopmentCheckpointStageEvidence torchParryEvidence{};
