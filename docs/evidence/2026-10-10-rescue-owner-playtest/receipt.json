@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "date": "2026-10-10",
+  "timezone": "Australia/Sydney",
+  "source_candidate": "53347791b0bd1331219651b01ea3012bafcab26d",
+  "launch_checkpoint": "17603dedfef2e905179a113ffbb860d234e03adb",
+  "artifact": {
+    "platform": "Windows Debug",
+    "file": "HordeLanternRT.exe",
+    "sha256": "79e1e8634717bb563928611553019506288a78ce0df2cd1032d7a164e45a6a75",
+    "arguments": ["--development-rescue-journey"]
+  },
+  "owner_observations": {
+    "rope_deployment_appearance": "Positive: came down and looked like a rope; overall excellent.",
+    "player_rope_contact": "Positive: responded to player bump.",
+    "climbing": "Animation OK; hand movement a little too fast; climb speed good.",
+    "controller_l3": "Confirmed toggle sprint.",
+    "failure": "Owner reports the game crashed when climbing up. Exact phase, visible error and exit mechanism remain unresolved.",
+    "graphics_menu": "NOT RUN",
+    "rope_shadow_in_mist": "NOT RUN"
+  },
+  "technical_evidence": {
+    "backend": "RayTracingPipeline",
+    "profile": "Diagnostic/High",
+    "gpu_class": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "driver": "NVIDIA 610.47",
+    "last_saved_report_presented": true,
+    "last_saved_completed_frame": 1919,
+    "last_saved_completed_tick": 4732,
+    "scope": "Successful presentation before the reported failure; does not establish completed ascent or exterior acceptance.",
+    "process_after_owner_report": "Not running at inspection.",
+    "exit_status": null,
+    "stderr": "Not retained by the launch command.",
+    "windows_crash_events": "No matching Horde Application Error/Windows Error Reporting event found in the inspected preceding two-hour interval; this does not prove a normal exit.",
+    "crash_dump": "No matching dump located in the existing per-user CrashDumps directory.",
+    "raw_reports": "Preserved locally under ignored reports; private paths and raw audio logs excluded from public evidence.",
+    "raw_report_sha256": {
+      "vulkan_capability_report.json": "c57e7cb29195f7b47ee6f41be04f2c563a9312b62fd076bb696151348149e98f",
+      "vulkan_capability_report.txt": "a8ca36fc509c4798398352675981779e08d3e94aff106ae3a08127ae40baa01b",
+      "windows_audio.log": "cc6f0062c0a02cd76683cdbdc9d5ef5015dd9b44718a062adbb97cd94f89e18e",
+      "windows_showcase_timing.csv": "610dcacc3a44602c2128adab90ea11730786482c20db7c9d99078d1e1a6cffb2"
+    }
+  },
+  "disposition": {
+    "ascent_completion": "FAIL: owner-reported crash; cause unresolved",
+    "repeat_traversal": "NOT RUN",
+    "windows_pipeline": "Partial successful presentation and owner observations only; full route acceptance blocked",
+    "windows_query": "NOT RUN",
+    "android": "NOT RUN",
+    "lifecycle": "Not accepted by this run",
+    "owner_audio_haptic": "PENDING",
+    "hand_cadence": "Tuning feedback retained; no change made",
+    "next_diagnostic": "Clarify exact failure point and visible error. If another owner-authorized launch is needed, retain stdout/stderr and process exit status on the unchanged candidate before considering a repair.",
+    "implementation_changes": false
+  }
+}
