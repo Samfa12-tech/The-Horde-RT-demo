@@ -11,7 +11,7 @@ from pathlib import Path
 import struct
 
 ROOT = Path(__file__).resolve().parents[1]
-PLAN = ROOT / 'assets/models/world/source/forest-tree-pair-v1/woodland-placements-v3.json'
+PLAN = ROOT / 'assets/models/world/source/forest-placement-v1/woodland-placements-v3.json'
 HEADER = ROOT / 'src/gameplay/simulation/ForestTreePlacementContract.h'
 
 

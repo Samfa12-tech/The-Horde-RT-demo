@@ -4,6 +4,23 @@ Development checkpoint following `d24a9971016050964a7a9a1f2cf1ac383b411324`.
 The complete chapter is **unfinished**. This closes reproduced placement and
 held-item defects; it does not admit the sparse tree pair as the final forest.
 
+## CI source-roster correction
+
+Checkpoint `f451cc461be3c8ae82d443cc811f6258e1526557`, run `38127303244`,
+passed Vulkan-host, sanitizer and Android jobs. GCC/Clang/MSVC each failed only
+the unchanged forest texture source-roster assertion: my two scene-placement
+JSON derivatives had been placed inside the immutable 48-file source package.
+The Windows Unicode report UI test still passed (0.73 s); this is a separate
+asset-source boundary regression. The same assertion failed locally before repair.
+
+The correction moves those two JSON files byte-for-byte to the adjacent
+`assets/models/world/source/forest-placement-v1/` directory and updates their
+two consumers. No source roster, assertion, deadline, runtime geometry or shader
+is changed. All three source/placement/root freshness CTests pass in 10.32 s.
+The historical `identities.json` retains the paths at the captured checkpoint;
+its placement hashes still match the moved files. Executable/APK and inspected
+capture identities below are unchanged. Exact successor CI is tracked on PR27.
+
 ## Reproduction and correction
 
 The owner's floating-root report reproduced on actual native imported geometry:

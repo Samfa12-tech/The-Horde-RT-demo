@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SPEC = importlib.util.spec_from_file_location('forest_contract', Path(__file__).with_name('build-forest-placement-contract.py'))
 CONTRACT = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(CONTRACT)
-SOURCE = ROOT / 'assets/models/world/source/forest-tree-pair-v1/woodland-placements-v2.json'
+SOURCE = ROOT / 'assets/models/world/source/forest-placement-v1/woodland-placements-v2.json'
 OUTPUT = SOURCE.with_name('woodland-placements-v3.json')
 TERRAIN = ROOT / 'assets/models/world/runtime/chapter-terrain-v1/chapter-terrain-lod0.runtime.glb'
 ROUTE = [(-33.7,-12.8),(-28.7,-5.8),(-15.7,.2),(-17.7,15.2),(-3.7,20.2),(13.3,36.2)]
