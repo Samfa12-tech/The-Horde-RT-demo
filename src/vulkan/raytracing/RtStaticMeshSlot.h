@@ -54,6 +54,14 @@ public:
     bool Initialize(std::span<const StaticRtAssetRegistration> registrations,
                     std::string& diagnostic);
 
+    // Opt-in candidate packing for zone resource replacement. Packs only the
+    // union of registered immutable primitive ranges, once per source asset.
+    // Material/texture identities and dynamic geometry stay unchanged. This is
+    // CPU preparation, not GPU residency or a streaming completion signal.
+    // Failure leaves the previously admitted slot intact.
+    bool InitializeSelectedGeometry(std::span<const StaticRtAssetRegistration> registrations,
+                                    std::string& diagnostic);
+
     // CPU admission only, before GPU upload. Caller explicitly warrants these
     // rows are immutable; mutable fixture materials must never be nominated.
     // Requires exact converted GPU records, and atomically remaps every primitive.

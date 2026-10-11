@@ -419,6 +419,70 @@ void TestNativeChapterPrimitiveOwnership()
     }
     Check(visited == owner.primitives.size(),
           "native ownership ranges cover all chapter primitives exactly once");
+    const auto verifySelection = [&](std::span<const StaticRtAssetRegistration> selectedRanges,
+                                     const char* label) {
+        RtStaticMeshSlot candidate;
+        const bool ready = candidate.InitializeSelectedGeometry(selectedRanges, diagnostic);
+        Check(ready, std::string(label) + " selected native geometry initializes: " + diagnostic);
+        if (!ready) return;
+        std::uint64_t expectedVertices = 0, expectedIndices = 0;
+        std::uint32_t expectedPrimitives = 0;
+        for (const auto& range : selectedRanges) {
+            const auto& metadata = candidate.InstanceMetadata()[range.instanceCustomIndex];
+            Check(metadata.primitiveCount == range.primitiveCount &&
+                  metadata.stableObjectId == range.stableObjectId && metadata.flags == range.flags,
+                  "selected native owner retains its logical identity and full geometry count");
+            for (std::uint32_t local = 0; local < range.primitiveCount; ++local) {
+                const auto sourceIndex = range.primitiveOffset + local;
+                const auto& source = owner.primitives[sourceIndex];
+                const auto& packed = candidate.PrimitiveMetadata()[metadata.primitiveBase + local];
+                const std::size_t sourceEnd = sourceIndex + 1 < owner.primitives.size()
+                    ? owner.primitives[sourceIndex + 1].vertexOffset : owner.vertices.size();
+                const auto count = sourceEnd - source.vertexOffset;
+                const bool inBounds = packed.vertexOffset <= candidate.Vertices().size() &&
+                    count <= candidate.Vertices().size() - packed.vertexOffset &&
+                    packed.indexOffset <= candidate.Indices().size() &&
+                    source.indexCount <= candidate.Indices().size() - packed.indexOffset;
+                Check(inBounds, "selected native hit decode stays inside its packed upload payload");
+                if (!inBounds) continue;
+                Check(packed.indexCount == source.indexCount &&
+                      packed.materialIndex == source.materialIndex &&
+                      candidate.PrimitiveVertexCounts()[metadata.primitiveBase + local] == count &&
+                      std::memcmp(candidate.Vertices().data() + packed.vertexOffset,
+                          owner.vertices.data() + source.vertexOffset, count * sizeof(StaticRtVertex)) == 0 &&
+                      std::equal(owner.indices.begin() + source.indexOffset,
+                          owner.indices.begin() + source.indexOffset + source.indexCount,
+                          candidate.Indices().begin() + packed.indexOffset),
+                      "every retained native triangle/normal/tangent/UV/local index/material is exact");
+                expectedVertices += count; expectedIndices += source.indexCount; ++expectedPrimitives;
+            }
+        }
+        Check(candidate.Vertices().size() == expectedVertices &&
+              candidate.Indices().size() == expectedIndices &&
+              candidate.PrimitiveMetadata().size() == expectedPrimitives &&
+              candidate.Measurements().vertexBytes == expectedVertices * sizeof(StaticRtVertex) &&
+              candidate.Measurements().indexBytes == expectedIndices * sizeof(std::uint32_t) &&
+              candidate.Measurements().vertexBytes < complete.Measurements().vertexBytes &&
+              candidate.Measurements().indexBytes < complete.Measurements().indexBytes,
+              "absent native zone geometry costs no candidate vertex/index bytes or hidden padding");
+        Check(candidate.Materials().size() == complete.Materials().size() &&
+              std::memcmp(candidate.Materials().data(), complete.Materials().data(),
+                  complete.Measurements().materialBytes) == 0 &&
+              candidate.TextureArrayCounts().baseColor == complete.TextureArrayCounts().baseColor &&
+              candidate.TextureArrayCounts().normal == complete.TextureArrayCounts().normal &&
+              candidate.TextureArrayCounts().orm == complete.TextureArrayCounts().orm,
+              "native candidate keeps shared texture layers/material identities unchanged");
+        std::cout << "Native selected geometry " << label << ": primitives=" << expectedPrimitives
+                  << " vertexBytes=" << candidate.Measurements().vertexBytes
+                  << " indexBytes=" << candidate.Measurements().indexBytes
+                  << " removedVertexBytes=" << complete.Measurements().vertexBytes - candidate.Measurements().vertexBytes
+                  << " removedIndexBytes=" << complete.Measurements().indexBytes - candidate.Measurements().indexBytes
+                  << "; CPU preparation only; common masonry still includes tomb surfaces\n";
+    };
+    const std::array tombRanges{ranges[0], ranges[1]};
+    const std::array forestRanges{ranges[0], ranges[2]};
+    verifySelection(tombRanges, "common+tomb");
+    verifySelection(forestRanges, "common+forest");
     std::cout << "Native chapter ownership: common 2 (includes mixed tomb masonry), tomb 3, forest 6; "
               << "primitiveRows=" << visited << " vertexBytes=" << complete.Measurements().vertexBytes
               << " indexBytes=" << complete.Measurements().indexBytes << "; CPU admission only\n";

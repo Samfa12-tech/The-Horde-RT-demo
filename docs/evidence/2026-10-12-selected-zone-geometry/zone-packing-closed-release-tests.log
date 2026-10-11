@@ -1,0 +1,23 @@
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+    Start  16: horde_rt_texture_layer_subset_tests
+1/9 Test  #16: horde_rt_texture_layer_subset_tests ..................   Passed    0.02 sec
+    Start  17: horde_rt_chapter_texture_append_payload_tests
+2/9 Test  #17: horde_rt_chapter_texture_append_payload_tests ........   Passed    1.77 sec
+    Start  82: horde_rt_scene_abi_tests
+3/9 Test  #82: horde_rt_scene_abi_tests .............................   Passed    1.40 sec
+    Start  85: horde_rt_forest_dressing_tests
+4/9 Test  #85: horde_rt_forest_dressing_tests .......................   Passed    2.00 sec
+    Start  90: horde_rt_static_gltf_asset_tests
+5/9 Test  #90: horde_rt_static_gltf_asset_tests .....................   Passed    1.71 sec
+    Start  91: horde_rt_static_gltf_intake_missing_argument_tests
+6/9 Test  #91: horde_rt_static_gltf_intake_missing_argument_tests ...   Passed    0.02 sec
+    Start  92: horde_rt_static_gltf_intake_unknown_argument_tests
+7/9 Test  #92: horde_rt_static_gltf_intake_unknown_argument_tests ...   Passed    0.01 sec
+    Start  94: horde_rt_static_collapse_asset_tests
+8/9 Test  #94: horde_rt_static_collapse_asset_tests .................   Passed    1.53 sec
+    Start 179: horde_rt_chapter_texture_alias_payload_tests
+9/9 Test #179: horde_rt_chapter_texture_alias_payload_tests .........   Passed    0.32 sec
+
+100% tests passed, 0 tests failed out of 9
+
+Total Test time (real) =   8.82 sec

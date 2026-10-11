@@ -1,0 +1,162 @@
+Start testing: Oct 12 05:41 AUS Eastern Summer Time
+----------------------------------------------------------
+16/182 Testing: horde_rt_texture_layer_subset_tests
+16/182 Test: horde_rt_texture_layer_subset_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/Debug/horde_rt_texture_layer_subset_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+"horde_rt_texture_layer_subset_tests" start time: Oct 12 05:41 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_texture_layer_subset_tests" end time: Oct 12 05:41 AUS Eastern Summer Time
+"horde_rt_texture_layer_subset_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+17/182 Testing: horde_rt_chapter_texture_append_payload_tests
+17/182 Test: horde_rt_chapter_texture_append_payload_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/Debug/horde_rt_texture_layer_subset_tests.exe" "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/assets/textures/props/runtime" "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/assets/textures/props/source/chapter-terrain-maps-r03" "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/assets/textures/characters/runtime/kit-warden-v1"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+"horde_rt_chapter_texture_append_payload_tests" start time: Oct 12 05:41 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+base-color.windows.ktx2: 18 layers, 11 mips, 100663272 upload bytes
+normal.windows.ktx2: 15 layers, 11 mips, 83886060 upload bytes
+orm.windows.ktx2: 15 layers, 11 mips, 83886060 upload bytes
+base-color.android.ktx2: 18 layers, 11 mips, 11273184 upload bytes
+normal.android.ktx2: 15 layers, 11 mips, 20971920 upload bytes
+orm.android.ktx2: 15 layers, 11 mips, 9394320 upload bytes
+<end of output>
+Test time =  24.46 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_chapter_texture_append_payload_tests" end time: Oct 12 05:41 AUS Eastern Summer Time
+"horde_rt_chapter_texture_append_payload_tests" time elapsed: 00:00:24
+----------------------------------------------------------
+
+82/182 Testing: horde_rt_scene_abi_tests
+82/182 Test: horde_rt_scene_abi_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/Debug/horde_rt_scene_abi_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+"horde_rt_scene_abi_tests" start time: Oct 12 05:41 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+RT scene ABI contract passed
+<end of output>
+Test time =   2.67 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_scene_abi_tests" end time: Oct 12 05:41 AUS Eastern Summer Time
+"horde_rt_scene_abi_tests" time elapsed: 00:00:02
+----------------------------------------------------------
+
+85/182 Testing: horde_rt_forest_dressing_tests
+85/182 Test: horde_rt_forest_dressing_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/Debug/horde_rt_forest_dressing_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+"horde_rt_forest_dressing_tests" start time: Oct 12 05:41 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Native root footprint samples=4992 exposed=0 maximum_gap_m=-0.0199988
+Native selected geometry common+tomb: primitives=5 vertexBytes=2119872 indexBytes=319080 removedVertexBytes=24132864 removedIndexBytes=4287768; CPU preparation only; common masonry still includes tomb surfaces
+Native selected geometry common+forest: primitives=8 vertexBytes=25590336 indexBytes=4444656 removedVertexBytes=662400 removedIndexBytes=162192; CPU preparation only; common masonry still includes tomb surfaces
+Native chapter ownership: common 2 (includes mixed tomb masonry), tomb 3, forest 6; primitiveRows=11 vertexBytes=26252736 indexBytes=4606848; CPU admission only
+Native forest tree-pair import, grounding, grouping, and clean-failure checks passed.
+<end of output>
+Test time =  10.28 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_forest_dressing_tests" end time: Oct 12 05:41 AUS Eastern Summer Time
+"horde_rt_forest_dressing_tests" time elapsed: 00:00:10
+----------------------------------------------------------
+
+90/182 Testing: horde_rt_static_gltf_asset_tests
+90/182 Test: horde_rt_static_gltf_asset_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/Debug/horde_rt_static_gltf_asset_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+"horde_rt_static_gltf_asset_tests" start time: Oct 12 05:41 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Static GLB temporary root=horde-rt-static-gltf-tests-debug-pid-60868
+Static GLB asset contract passed
+<end of output>
+Test time =   4.37 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_static_gltf_asset_tests" end time: Oct 12 05:41 AUS Eastern Summer Time
+"horde_rt_static_gltf_asset_tests" time elapsed: 00:00:04
+----------------------------------------------------------
+
+91/182 Testing: horde_rt_static_gltf_intake_missing_argument_tests
+91/182 Test: horde_rt_static_gltf_intake_missing_argument_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/Debug/horde_rt_static_gltf_asset_tests.exe" "--inspect-candidate" "missing.glb"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+"horde_rt_static_gltf_intake_missing_argument_tests" start time: Oct 12 05:41 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Expected no arguments, or --inspect-candidate <glb> <manifest>, or --inspect-terrain-support <glb> <manifest> <stations>, or --probe-cyclic <glb> <manifest>.
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_static_gltf_intake_missing_argument_tests" end time: Oct 12 05:41 AUS Eastern Summer Time
+"horde_rt_static_gltf_intake_missing_argument_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+92/182 Testing: horde_rt_static_gltf_intake_unknown_argument_tests
+92/182 Test: horde_rt_static_gltf_intake_unknown_argument_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/Debug/horde_rt_static_gltf_asset_tests.exe" "--unknown-intake"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+"horde_rt_static_gltf_intake_unknown_argument_tests" start time: Oct 12 05:41 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Expected no arguments, or --inspect-candidate <glb> <manifest>, or --inspect-terrain-support <glb> <manifest> <stations>, or --probe-cyclic <glb> <manifest>.
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_static_gltf_intake_unknown_argument_tests" end time: Oct 12 05:41 AUS Eastern Summer Time
+"horde_rt_static_gltf_intake_unknown_argument_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+94/182 Testing: horde_rt_static_collapse_asset_tests
+94/182 Test: horde_rt_static_collapse_asset_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/Debug/horde_rt_static_collapse_asset_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+"horde_rt_static_collapse_asset_tests" start time: Oct 12 05:41 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Collapse static admission: triangles=8422 vertices=12467 registry materials=21 primitives=23
+<end of output>
+Test time =   4.89 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_static_collapse_asset_tests" end time: Oct 12 05:41 AUS Eastern Summer Time
+"horde_rt_static_collapse_asset_tests" time elapsed: 00:00:04
+----------------------------------------------------------
+
+179/182 Testing: horde_rt_chapter_texture_alias_payload_tests
+179/182 Test: horde_rt_chapter_texture_alias_payload_tests
+Command: "C:/Users/sam_s/AppData/Local/Programs/Python/Python312/python.exe" "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/tests/test_chapter_texture_aliases.py"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+"horde_rt_chapter_texture_alias_payload_tests" start time: Oct 12 05:41 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+..
+----------------------------------------------------------------------
+Ran 2 tests in 0.192s
+
+OK
+windows: exact encoded PBR mip bytes 268435392 -> 218103756; saved 50331636; all material samples preserved
+android: exact encoded PBR mip bytes 41639424 -> 33687312; saved 7952112; all material samples preserved
+<end of output>
+Test time =   0.32 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_chapter_texture_alias_payload_tests" end time: Oct 12 05:41 AUS Eastern Summer Time
+"horde_rt_chapter_texture_alias_payload_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 12 05:41 AUS Eastern Summer Time

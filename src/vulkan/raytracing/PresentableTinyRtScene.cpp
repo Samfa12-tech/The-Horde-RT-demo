@@ -2619,7 +2619,12 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
             static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u, &chapterActor_.Asset()});
         chapterActorReady_ = true;
     }
-    if (!staticMeshSlot_.Initialize(registrations, diagnostic)) return false;
+    // The chapter uses failure-atomic candidate preparation. Its current full
+    // registrations retain every source primitive; residency changes require a
+    // separately completed GPU arena/descriptor/AS transaction, not this call.
+    if (!(developmentRescueJourney_
+            ? staticMeshSlot_.InitializeSelectedGeometry(registrations, diagnostic)
+            : staticMeshSlot_.Initialize(registrations, diagnostic))) return false;
     if (developmentRescueJourney_)
     {
         // Only these immutable opaque chest families opt in. The separately

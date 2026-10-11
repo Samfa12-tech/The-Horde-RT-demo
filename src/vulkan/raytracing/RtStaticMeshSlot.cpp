@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstring>
+#include <iterator>
 #include <limits>
 #include <map>
 #include <unordered_map>
@@ -47,6 +48,117 @@ RtMaterialGpu ConvertMaterial(const horde::scene::assets::StaticMaterial& source
 }
 
 } // namespace
+
+bool RtStaticMeshSlot::InitializeSelectedGeometry(
+    std::span<const StaticRtAssetRegistration> registrations, std::string& diagnostic)
+{
+    using Asset = horde::scene::assets::StaticMeshAsset;
+    struct Selection {
+        const Asset* source = nullptr;
+        Asset payload;
+        std::vector<bool> retained;
+        std::vector<std::uint32_t> remap;
+        bool complete = false;
+    };
+    std::vector<Selection> selections;
+    selections.reserve(kRtStaticAssetCapacity);
+    const auto find = [&](const Asset* asset) {
+        return std::find_if(selections.begin(), selections.end(),
+            [asset](const Selection& item) { return item.source == asset; });
+    };
+    const auto reject = [&](const char* reason) {
+        diagnostic = std::string("RtStaticMeshSlot selected geometry: ") + reason;
+        return false;
+    };
+    if (registrations.empty()) return reject("candidate has no registrations.");
+    for (const auto& registration : registrations) {
+        if (!registration.asset) return reject("registration has no asset.");
+        const auto& asset = *registration.asset;
+        if (asset.vertices.size() > UINT32_MAX || asset.indices.size() > UINT32_MAX ||
+            asset.primitives.empty() || asset.primitives.size() > UINT32_MAX)
+            return reject("empty primitives or geometry exceeds addressable offsets.");
+        auto selection = find(&asset);
+        if (selection == selections.end()) {
+            if (selections.size() == kRtStaticAssetCapacity)
+                return reject("source assets exceed the unchanged capacity.");
+            selections.push_back({&asset, {}, std::vector<bool>(asset.primitives.size()), {}});
+            selection = std::prev(selections.end());
+        }
+        const bool ranged = registration.primitiveOffset != 0 || registration.primitiveCount != 0;
+        if (ranged && (registration.geometryRole != RtGeometryRole::Static ||
+            !(registration.flags & static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr))))
+            return reject("primitive ranges require immutable StaticPbr geometry.");
+        const std::size_t start = ranged ? registration.primitiveOffset : 0;
+        const std::size_t count = ranged ? registration.primitiveCount : asset.primitives.size();
+        if (!count || start >= asset.primitives.size() || count > asset.primitives.size() - start)
+            return reject("primitive range is empty or outside its source.");
+        std::fill(selection->retained.begin() + start, selection->retained.begin() + start + count, true);
+    }
+    // Source-local ordering is deterministic even when owner registrations are
+    // reordered or overlap. Retain whole indexed vertex spans; no decimation,
+    // altered attributes, index widening, or shader/material changes occur.
+    for (auto& selection : selections) {
+        const auto& source = *selection.source;
+        selection.remap.assign(source.primitives.size(), UINT32_MAX);
+        selection.complete = std::all_of(selection.retained.begin(), selection.retained.end(),
+            [](bool retained) { return retained; });
+        if (!selection.complete) {
+            // Do not duplicate the retired zone's geometry in a temporary CPU
+            // asset just to clear it again. Shared source metadata stays exact.
+            selection.payload.materials = source.materials;
+            selection.payload.nodeTransforms = source.nodeTransforms;
+            selection.payload.sockets = source.sockets;
+            selection.payload.bounds = source.bounds;
+        }
+        for (std::size_t i = 0; i < source.primitives.size(); ++i) {
+            if (!selection.retained[i]) continue;
+            const auto& primitive = source.primitives[i];
+            const std::size_t end = i + 1 < source.primitives.size()
+                ? source.primitives[i + 1].vertexOffset : source.vertices.size();
+            if (primitive.vertexOffset >= source.vertices.size() || end > source.vertices.size() ||
+                end <= primitive.vertexOffset || (i > 0 &&
+                    primitive.vertexOffset <= source.primitives[i - 1].vertexOffset))
+                return reject("primitive has an invalid source-local vertex span.");
+            if (!primitive.indexCount || primitive.indexCount % 3 != 0 ||
+                primitive.indexOffset > source.indices.size() ||
+                primitive.indexCount > source.indices.size() - primitive.indexOffset)
+                return reject("primitive has an invalid triangle index range.");
+            if (primitive.materialIndex >= source.materials.size() ||
+                primitive.nodeTransformIndex >= source.nodeTransforms.size())
+                return reject("primitive references an absent material or node transform.");
+            const auto indexBegin = source.indices.begin() + primitive.indexOffset;
+            const auto indexEnd = indexBegin + primitive.indexCount;
+            if (std::any_of(indexBegin, indexEnd, [&](std::uint32_t index) {
+                return index >= end - primitive.vertexOffset;
+            })) return reject("triangle index leaves its source-local vertex span.");
+            if (selection.complete) { selection.remap[i] = static_cast<std::uint32_t>(i); continue; }
+            auto compacted = primitive;
+            compacted.vertexOffset = static_cast<std::uint32_t>(selection.payload.vertices.size());
+            compacted.indexOffset = static_cast<std::uint32_t>(selection.payload.indices.size());
+            selection.remap[i] = static_cast<std::uint32_t>(selection.payload.primitives.size());
+            selection.payload.vertices.insert(selection.payload.vertices.end(),
+                source.vertices.begin() + primitive.vertexOffset, source.vertices.begin() + end);
+            selection.payload.indices.insert(selection.payload.indices.end(), indexBegin, indexEnd);
+            selection.payload.primitives.push_back(compacted);
+        }
+    }
+    std::vector<StaticRtAssetRegistration> packed(registrations.begin(), registrations.end());
+    for (auto& registration : packed) {
+        const auto selection = find(registration.asset);
+        const auto oldOffset = registration.primitiveOffset;
+        registration.asset = selection->complete ? selection->source : &selection->payload;
+        registration.primitiveOffset = selection->remap[oldOffset];
+        if (registration.textureSource) {
+            const auto provider = find(registration.textureSource);
+            if (provider == selections.end()) return reject("texture provider is not registered.");
+            registration.textureSource = provider->complete ? provider->source : &provider->payload;
+        }
+    }
+    RtStaticMeshSlot candidate;
+    if (!candidate.Initialize(packed, diagnostic)) return false;
+    *this = std::move(candidate);
+    return true;
+}
 
 bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> registrations,
                                   std::string& diagnostic)

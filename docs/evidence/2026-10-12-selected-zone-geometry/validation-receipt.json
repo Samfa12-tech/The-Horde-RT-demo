@@ -1,0 +1,146 @@
+{
+  "sourceParent": "3c15c53410b80ac6b09c743312aed24cbb2da129",
+  "sourceState": "final implementation bytes built before this coherent commit",
+  "sources": [
+    {
+      "path": "src/vulkan/raytracing/PresentableTinyRtScene.cpp",
+      "bytes": 463808,
+      "sha256": "b2729ea8537ed6de5afa74dd86156ee6d73aadf9263ee199015fa59e495866f5"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtStaticMeshSlot.cpp",
+      "bytes": 33763,
+      "sha256": "67b33aacf4605f926c163b6ada9a7d9749e36e72e119efb72741b90a7559e41c"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtStaticMeshSlot.h",
+      "bytes": 4847,
+      "sha256": "f0e1b21047b8403310447c9e6f0b4644cea30521fe800510cb363d5ecaa1bb97"
+    },
+    {
+      "path": "tests/StaticGltfAssetTests.cpp",
+      "bytes": 166537,
+      "sha256": "3a3620147b4d95e624e83957998b9f6435b889419f1c0688049186c7ac422994"
+    },
+    {
+      "path": "tests/ForestDressingTests.cpp",
+      "bytes": 30371,
+      "sha256": "06cb8b2dd8f4cb1add3aa7d33903a78696bc8ad0630b7a14f06c2a8e1cfe5ed0"
+    },
+    {
+      "path": ".github/workflows/shared-simulation-host.yml",
+      "bytes": 31456,
+      "sha256": "132357435ed4a24cb477207fba033104c53870896ccb7e4ebd56dd3177490b50"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+      "bytes": 12596736,
+      "sha256": "a5a9a18267a79c3be24971e594e7cd0929ad63d0fe977236ec0664df144d8f41"
+    },
+    {
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+      "bytes": 4380160,
+      "sha256": "cf2d598f97ddd357a07971153b6651b5b8a7e379a1b740475c30fac91d785966"
+    },
+    {
+      "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "bytes": 172769371,
+      "sha256": "46c97b9207b51864935d33ce234be62975e1e746c8ce0a7f7cdc1113cad48ff3"
+    }
+  ],
+  "frozenBudgets": {
+    "path": "tools/raygen-variant-budgets.json",
+    "bytes": 6425,
+    "sha256": "56936479b2d202dbdb9393ba94b66a1b0bc12d490b700d8af4c63de3460e53bf"
+  },
+  "preservedBackup": {
+    "path": "assets/models/world/source/tomb-dressing-v01/tomb-dressing-v01.blend1",
+    "bytes": 259583,
+    "sha256": "0dae1e8fb803336cef2d045f48c5f4c9195a6463f45161cb0b6c7434350769fb"
+  },
+  "limitations": [
+    "No GPU zone retirement",
+    "Shared texture/material residency unchanged",
+    "Common masonry contains tomb geometry",
+    "Android Java tests reused UP-TO-DATE",
+    "No installation or physical acceptance",
+    "Frozen frames are not sustained performance"
+  ],
+  "localTests": {
+    "initialBehavioralFailures": 14,
+    "closedPackages": "pass",
+    "debugPassed": 9,
+    "androidLint": "pass",
+    "releasePassed": 9,
+    "androidJava": "UP-TO-DATE",
+    "androidABIs": 4
+  },
+  "logs": [
+    {
+      "path": "docs/evidence/2026-10-12-selected-zone-geometry/zone-packing-red-build.log",
+      "bytes": 336,
+      "sha256": "afd45d527fd2e3570067319ff93b47a6154452a5faa42f09265d3d5421dbe807"
+    },
+    {
+      "path": "docs/evidence/2026-10-12-selected-zone-geometry/zone-packing-red-test.log",
+      "bytes": 1675,
+      "sha256": "26f353b9bbfe8bfe255e926361b92c99c6a01d44d08f048560956f66e10fea38"
+    },
+    {
+      "path": "docs/evidence/2026-10-12-selected-zone-geometry/zone-packing-closed-debug-build.log",
+      "bytes": 2205,
+      "sha256": "c038148d966f6b465379cc82c58066e8ae189df1dfe8b2fa31da821458893340"
+    },
+    {
+      "path": "docs/evidence/2026-10-12-selected-zone-geometry/zone-packing-closed-debug-tests.log",
+      "bytes": 1541,
+      "sha256": "7d3b80dd33140302eb745e5fee421dcd3e9a54d3ac8ed69be52eb3f544331c33"
+    },
+    {
+      "path": "docs/evidence/2026-10-12-selected-zone-geometry/zone-packing-closed-release-build.log",
+      "bytes": 2241,
+      "sha256": "e1fb20c05eec0cf220b6850e92c90e958cd19879ace84b4fca645e891c9ec5db"
+    },
+    {
+      "path": "docs/evidence/2026-10-12-selected-zone-geometry/zone-packing-closed-release-tests.log",
+      "bytes": 1543,
+      "sha256": "957c2a916285467d230e597f13ae63034b2c8fac4669f4662ef6c7f8e65d4277"
+    },
+    {
+      "path": "docs/evidence/2026-10-12-selected-zone-geometry/zone-packing-android-build-tests.log",
+      "bytes": 528,
+      "sha256": "db4e0beac976aff59d9548642f38dfebf3209065c796f10ffd5bc2a362bd1df7"
+    },
+    {
+      "path": "docs/evidence/2026-10-12-selected-zone-geometry/zone-packing-closed-android-build-tests.log",
+      "bytes": 3219,
+      "sha256": "09e5b1ac980496f29e6b60f8f613060fad8262b1aa7011e14aa8932052975d6f"
+    },
+    {
+      "path": "docs/evidence/2026-10-12-selected-zone-geometry/zone-packing-closed-android-package.log",
+      "bytes": 183,
+      "sha256": "6567fb23239b71777fe6b7debfbcb0077ab0df3cc5761c33ebfe80a827e8dcf0"
+    },
+    {
+      "path": "docs/evidence/2026-10-12-selected-zone-geometry/zone-packing-closed-held-package.log",
+      "bytes": 88,
+      "sha256": "e2cfb119097e04a192d24db6918144619af82ad8a5561156d4dec735e0b91fd4"
+    }
+  ],
+  "parentCI": {
+    "jobsPassed": 6,
+    "run": 38162791741,
+    "unicodeUiSeconds": 0.44,
+    "head": "3c15c53410b80ac6b09c743312aed24cbb2da129",
+    "requiredTraversalTestsExecuted": 7
+  },
+  "currentCommitCI": "Verify after normal push",
+  "capturedFrames": [
+    "pullup-pipeline",
+    "pullup-query",
+    "bend-pipeline",
+    "bend-query"
+  ]
+}

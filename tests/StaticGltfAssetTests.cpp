@@ -1199,6 +1199,131 @@ void TestStaticPrimitiveRangeOwnership()
           "subranges retain earlier-provider texture aliases and distinct consumer material factors");
 }
 
+void TestSelectedGeometryPacking()
+{
+    using namespace horde::vulkan::raytracing;
+    using horde::scene::assets::StaticMeshAsset;
+    StaticMeshAsset source;
+    source.nodeTransforms.resize(1);
+    source.materials.resize(3);
+    source.vertices.resize(12);
+    for (std::size_t i = 0; i < source.vertices.size(); ++i)
+        source.vertices[i].position[0] = static_cast<float>(i);
+    source.indices = {0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 2, 3};
+    source.primitives = {{0, 0, 3, 0, 0}, {3, 3, 3, 1, 0}, {6, 6, 6, 2, 0}};
+    for (std::size_t i = 0; i < source.materials.size(); ++i) {
+        source.materials[i].name = "retained-family-" + std::to_string(i);
+        source.materials[i].textureGroup = static_cast<std::int32_t>(i);
+        source.materials[i].baseColorTexture = static_cast<std::int32_t>(i);
+    }
+    const auto preserved = source;
+    const auto pbr = static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr);
+    std::array<StaticRtAssetRegistration, 2> owners{{
+        {14, 100, pbr, 0, &source, nullptr, RtGeometryRole::Static, 0, 1},
+        {16, 102, pbr, 0, &source, nullptr, RtGeometryRole::Static, 2, 1}}};
+    RtStaticMeshSlot selected;
+    std::string diagnostic;
+    const bool packed = selected.InitializeSelectedGeometry(owners, diagnostic);
+    Check(packed, std::string("selected zone geometry admits: ") + diagnostic);
+    if (!packed) return;
+    Check(selected.Vertices().size() == 9 && selected.Indices().size() == 9 &&
+          selected.PrimitiveMetadata().size() == 2 &&
+          selected.Measurements().vertexBytes == 9 * sizeof(StaticRtVertex) &&
+          selected.Measurements().indexBytes == 9 * sizeof(std::uint32_t),
+          "retired primitive contributes no candidate geometry bytes or primitive rows");
+    Check(selected.InstanceMetadata()[14].primitiveBase == 0 &&
+          selected.InstanceMetadata()[16].primitiveBase == 1 &&
+          selected.InstanceMetadata()[14].primitiveCount == 1 &&
+          selected.InstanceMetadata()[16].primitiveCount == 1,
+          "source ranges remap to their exact compacted owners");
+    if (selected.Vertices().size() == 9 && selected.PrimitiveMetadata().size() == 2) {
+        Check(selected.Vertices()[3].position[0] == 6 &&
+              selected.PrimitiveMetadata()[1].vertexOffset == 3 &&
+              selected.PrimitiveMetadata()[1].indexOffset == 3 &&
+              selected.PrimitiveVertexCounts()[1] == 6 &&
+              selected.Indices() == std::vector<std::uint32_t>({0,1,2,0,1,2,0,2,3}),
+              "compaction retains local indices and the complete referenced vertex spans");
+    }
+    const auto equalBytes = [](const auto& a, const auto& b) {
+        return a.size() == b.size() && (a.empty() ||
+            std::memcmp(a.data(), b.data(), a.size() * sizeof(a[0])) == 0);
+    };
+    Check(equalBytes(source.vertices, preserved.vertices) && source.indices == preserved.indices &&
+          equalBytes(source.primitives, preserved.primitives),
+          "zone packing never mutates the archived/native source geometry");
+    RtStaticMeshSlot legacy;
+    Check(legacy.Initialize(owners, diagnostic) && legacy.Vertices().size() == 12 &&
+          legacy.PrimitiveMetadata().size() == 3 &&
+          equalBytes(legacy.Materials(), selected.Materials()) &&
+          legacy.TextureArrayCounts().baseColor == selected.TextureArrayCounts().baseColor,
+          "legacy range packing and shared material/texture identity are unchanged");
+    const auto before = selected;
+    std::reverse(owners.begin(), owners.end());
+    Check(selected.InitializeSelectedGeometry(owners, diagnostic) &&
+          equalBytes(before.Vertices(), selected.Vertices()) &&
+          equalBytes(before.InstanceMetadata(), selected.InstanceMetadata()),
+          "registration order does not reorder a source's retained geometry");
+    auto overlap = owners;
+    overlap[0].primitiveOffset = 0;
+    Check(selected.InitializeSelectedGeometry(overlap, diagnostic) &&
+          selected.Vertices().size() == 3 && selected.Indices().size() == 3 &&
+          selected.PrimitiveMetadata().size() == 1 &&
+          selected.InstanceMetadata()[14].primitiveBase == selected.InstanceMetadata()[16].primitiveBase,
+          "overlapping instances own one retained primitive payload");
+    const StaticRtAssetRegistration complete{21, 200, pbr, 0, &source};
+    RtStaticMeshSlot completeLegacy;
+    Check(completeLegacy.Initialize(std::array{complete}, diagnostic) &&
+          selected.InitializeSelectedGeometry(std::array{complete}, diagnostic) &&
+          equalBytes(completeLegacy.Vertices(), selected.Vertices()) &&
+          equalBytes(completeLegacy.PrimitiveMetadata(), selected.PrimitiveMetadata()) &&
+          equalBytes(completeLegacy.InstanceMetadata(), selected.InstanceMetadata()) &&
+          completeLegacy.Indices() == selected.Indices(),
+          "full selection remains byte-identical to complete asset packing");
+    const auto admitted = selected;
+    const auto reject = [&](const auto& invalid) {
+        Check(!selected.InitializeSelectedGeometry(invalid, diagnostic) &&
+              !diagnostic.empty() && equalBytes(admitted.Vertices(), selected.Vertices()) &&
+              equalBytes(admitted.InstanceMetadata(), selected.InstanceMetadata()) &&
+              equalBytes(admitted.PrimitiveMetadata(), selected.PrimitiveMetadata()) &&
+              admitted.PrimitiveVertexCounts() == selected.PrimitiveVertexCounts() &&
+              admitted.GeometryTransforms() == selected.GeometryTransforms() &&
+              equalBytes(admitted.Materials(), selected.Materials()) &&
+              admitted.TextureArrayCounts().baseColor == selected.TextureArrayCounts().baseColor &&
+              admitted.TextureArrayCounts().normal == selected.TextureArrayCounts().normal &&
+              admitted.TextureArrayCounts().orm == selected.TextureArrayCounts().orm &&
+              admitted.TextureArrayCounts().emissive == selected.TextureArrayCounts().emissive &&
+              admitted.Indices() == selected.Indices(),
+              "failed candidate leaves every previously admitted route and payload intact");
+    };
+    reject(std::span<const StaticRtAssetRegistration>{});
+    auto bad = owners;
+    bad[0].primitiveCount = std::numeric_limits<std::uint32_t>::max(); reject(bad);
+    bad = owners; bad[0].geometryRole = RtGeometryRole::PlayerViewmodel; reject(bad);
+    bad = owners; bad[0].instanceCustomIndex = bad[1].instanceCustomIndex; reject(bad);
+    bad = owners; bad[0].asset = nullptr; reject(bad);
+    auto invalidSource = source;
+    bad = owners; for (auto& owner : bad) owner.asset = &invalidSource;
+    invalidSource.primitives[2].indexOffset = std::numeric_limits<std::uint32_t>::max(); reject(bad);
+    invalidSource = source; invalidSource.primitives[2].indexCount = 5; reject(bad);
+    invalidSource = source; invalidSource.indices[6] = 6; reject(bad);
+    invalidSource = source; invalidSource.primitives[2].vertexOffset = 2; reject(bad);
+    invalidSource = source; invalidSource.primitives[2].materialIndex = 3; reject(bad);
+    invalidSource = source; invalidSource.primitives[2].nodeTransformIndex = 1; reject(bad);
+
+    auto consumer = source;
+    for (auto& material : consumer.materials) material.baseColorFactor[0] = .5f;
+    const std::array<StaticRtAssetRegistration, 3> aliased{{
+        {21, 200, pbr, 0, &source, nullptr, RtGeometryRole::Static, 0, 1},
+        {14, 100, pbr, 0, &consumer, &source, RtGeometryRole::Static, 2, 1},
+        {16, 102, pbr, 0, &consumer, &source, RtGeometryRole::Static, 2, 1}}};
+    Check(selected.InitializeSelectedGeometry(aliased, diagnostic) &&
+          selected.Vertices().size() == 9 && selected.PrimitiveMetadata().size() == 2 &&
+          selected.TextureArrayCounts().baseColor == 3 &&
+          selected.Materials()[5].textureLayers == selected.Materials()[2].textureLayers &&
+          selected.Materials()[5].baseColorFactor != selected.Materials()[2].baseColorFactor,
+          "selected providers retain alias families without duplicate consumer geometry/textures");
+}
+
 void TestGeometryRolePartitioning()
 {
     using horde::scene::assets::StaticMaterial;
@@ -2710,6 +2835,7 @@ int main(int argc, char** argv)
     TestPlayerSemanticManifestAndGeometry(temporaryRoot);
     TestSharedTextureSourceRouting();
     TestStaticPrimitiveRangeOwnership();
+    TestSelectedGeometryPacking();
     TestGeometryRolePartitioning();
     TestProductionDielectricFixture();
     TestLanternGeometryQualityProfile();

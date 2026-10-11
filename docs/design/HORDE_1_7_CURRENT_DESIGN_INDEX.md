@@ -397,3 +397,21 @@ measurements are required. The final source/Android build is not a new device
 install. Phone Current/Higher and saved Lower migration, touch/lifecycle and
 owner audio/haptic/traversal acceptance remain pending. Frozen shader limits,
 three actor slots and the 18-layer ceiling remain unchanged.
+
+### Selected zone geometry candidate packing (12 October)
+
+The [selected geometry proof](../evidence/2026-10-12-selected-zone-geometry/README.md)
+adds failure-atomic packing of immutable source primitive unions. Actual native
+common+tomb/common+forest candidates omit absent vertex/index payloads and retain
+every selected triangle attribute, material and texture identity. The chapter's
+current complete admission uses this route without changing resident content.
+Malformed/overflowing/empty candidates preserve the admitted state. Both
+hardware RT backends have matched pull-up and forest-bend regression captures.
+
+This is CPU candidate preparation, not GPU streaming. The coalesced common
+masonry still contains tomb surfaces and the full scene's primitive table is
+saturated at 32. Genuine candidate arena/BLAS/TLAS commit, completed-work
+retirement, procedural-world ownership and measured allocation overlap remain
+required. No shader budget, 18-layer/three-actor limit or original torch deadline
+changed. The native forest candidate test is added to Vulkan-host CI; exact
+pushed-commit results remain distinct from local and parent-checkpoint evidence.

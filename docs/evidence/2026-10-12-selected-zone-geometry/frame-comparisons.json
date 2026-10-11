@@ -1,0 +1,38 @@
+[
+  {
+    "comparison": "pullup-pipeline-parent-to-final",
+    "left": "docs\\evidence\\2026-10-12-ground-stake-traversal\\pullup-pipeline-corrected.png",
+    "right": "docs\\evidence\\2026-10-12-selected-zone-geometry\\pullup-pipeline.png",
+    "width": 960,
+    "height": 540,
+    "changedPixels": 0,
+    "maxAbsoluteChannelDifference": 0
+  },
+  {
+    "comparison": "pullup-query-parent-to-final",
+    "left": "docs\\evidence\\2026-10-12-ground-stake-traversal\\pullup-query-corrected.png",
+    "right": "docs\\evidence\\2026-10-12-selected-zone-geometry\\pullup-query.png",
+    "width": 960,
+    "height": 540,
+    "changedPixels": 0,
+    "maxAbsoluteChannelDifference": 0
+  },
+  {
+    "comparison": "pullup-backend-comparison",
+    "left": "docs\\evidence\\2026-10-12-selected-zone-geometry\\pullup-pipeline.png",
+    "right": "docs\\evidence\\2026-10-12-selected-zone-geometry\\pullup-query.png",
+    "width": 960,
+    "height": 540,
+    "changedPixels": 2560,
+    "maxAbsoluteChannelDifference": 60
+  },
+  {
+    "comparison": "bend-backend-comparison",
+    "left": "docs\\evidence\\2026-10-12-selected-zone-geometry\\bend-pipeline.png",
+    "right": "docs\\evidence\\2026-10-12-selected-zone-geometry\\bend-query.png",
+    "width": 960,
+    "height": 540,
+    "changedPixels": 3468,
+    "maxAbsoluteChannelDifference": 46
+  }
+]
