@@ -8,6 +8,8 @@ This is a navigation and coverage record for [ROADMAP.md](ROADMAP.md), not a sec
 
 Repository Markdown/manifest paths were inventoried across all three trees, then planning links followed through the source, map, dialogue and evidence indexes. Root AGENTS.md was inspected; no tracked `.agents/skills` or nested AGENTS.md appears in these trees. Referenced binaries were not imported or treated as newly inspected art. Nothing from an implementation or whole planning branch is merged here.
 
+Map navigation: the [linked world-map atlas](design/world/atlas/README.md) adds numbered local-sheet views, projected interior extents, return links and an offline HTML viewer. Its [coordinate evidence](design/world/atlas/coordinate-evidence.json) records the separately inspected map images/vector sources and exact registration within the preserved draft; it changes no gameplay scope or runtime acceptance.
+
 ## Published updates and historical plans
 
 | Home | Detailed sources and coverage |

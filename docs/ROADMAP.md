@@ -8,6 +8,8 @@ Record each new owner scope decision here, under its update or **version unassig
 
 Use the [source inventory and reconciliation](ROADMAP_SOURCES.md) to find full plans, maps, dialogue, assets, animation, music and dated evidence. Later explicit owner decisions supersede conflicting historical wording; a newer implementation report only proves the candidate and checks it names. [AGENTS.md](../AGENTS.md), [PROJECT_DECISIONS.md](../PROJECT_DECISIONS.md), the [engine contracts](AGENT_ENGINE_CONTRACTS.md) and [validation guide](AGENT_VALIDATION.md) retain engineering authority. The [Phase Plan](PHASE_PLAN.md) retains history.
 
+The [linked world-map atlas](design/world/atlas/README.md) locates the preserved local sheets within the regional topography. It adds navigation only; metric blockout and unresolved tomb/treasury alignment retain their existing proposal limits.
+
 | Status | Meaning |
 |---|---|
 | Published / release receipt | Released package and exact evidence, including limitations. |
