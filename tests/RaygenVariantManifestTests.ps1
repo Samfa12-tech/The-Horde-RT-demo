@@ -168,9 +168,9 @@ try {
     $legacyIncludePath = Join-Path $repoRoot 'src\vulkan\raytracing\MinimalLegacyRayGenShader.inc'
     $genericHashBefore = Get-RawFileHash $genericIncludePath
     $legacyHashBefore = Get-RawFileHash $legacyIncludePath
-    # These compatibility artifacts include the approved dedicated third-character route and 18-layer ABI; matrix compilation must not mutate them.
-    Assert-True ((Get-CanonicalShaderTextHash $genericIncludePath) -eq '3a8a45b02affcd96f98ba9899e2d75160b7a9bff0de8470ceec3956ea552b997') 'Generic include hash changed before matrix compilation.'
-    Assert-True ((Get-CanonicalShaderTextHash $legacyIncludePath) -eq 'e4a450ca21c5339c70b142f53f0706927f148fe151999623e6c22eca2bf2ee0b') 'Legacy include hash changed before matrix compilation.'
+    # These compatibility artifacts include the approved dedicated third-character route, 18-layer ABI and removal of the retired Lower shadow branch; matrix compilation must not mutate them.
+    Assert-True ((Get-CanonicalShaderTextHash $genericIncludePath) -eq '34ccbe266f4c92145f07182469c35f53c34f1969b8dfb912ec0e9178975b953c') 'Generic include hash changed before matrix compilation.'
+    Assert-True ((Get-CanonicalShaderTextHash $legacyIncludePath) -eq '2e22998480e8b7a09f196aa60f7046dd549a26a69970bedc4193539d1ed49981') 'Legacy include hash changed before matrix compilation.'
 
     $matrixOutputRoot = Join-Path $temporaryRoot 'matrix'
     $matrixCompilerOutput = @(& $compiler -Matrix -OutputDirectory $matrixOutputRoot)

@@ -503,7 +503,6 @@ struct PresentableTinyRtSceneObservationTestAccess
     {
         bool ok = true;
         for (const auto shadow : {std::optional<horde::graphics::ShadowQuality>{},
-                                  std::optional{horde::graphics::ShadowQuality::Lower},
                                   std::optional{horde::graphics::ShadowQuality::Current},
                                   std::optional{horde::graphics::ShadowQuality::Higher}})
         for (const auto workload : {RtWorkloadPreset::Lean, RtWorkloadPreset::Authored, RtWorkloadPreset::Max})

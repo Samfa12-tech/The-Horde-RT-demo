@@ -256,6 +256,35 @@ void TestGlassMigrationAndTransactions()
 }
 void TestIndependentShadowAndLowFire()
 {
+    const auto retiredLower = static_cast<ShadowQuality>(0u);
+    auto retired = GraphicsSettings{63, WaterQuality::Off, FireDetail::Low, 42,
+        false, retiredLower, false, DustQuality::Standard};
+    Check(!ValidGraphicsSettings(retired), "retired Lower is not an active graphics choice");
+    Check(NextShadowQuality(ShadowQuality::Current) == ShadowQuality::Higher &&
+        NextShadowQuality(ShadowQuality::Higher) == ShadowQuality::Current &&
+        NextShadowQuality(retiredLower) == ShadowQuality::Current,
+        "Windows shadow cycling reaches exactly Current and Higher and recovers a stale draft");
+    Check(!horde::vulkan::raytracing::ResolveRtQualityControls(retiredLower,
+        horde::vulkan::raytracing::RtWorkloadPreset::Authored, true),
+        "retired Lower cannot reach the GPU quality upload");
+    for (const auto platform : {GraphicsPlatform::Android, GraphicsPlatform::Windows})
+    {
+        Check(ReducedEffectsGraphicsSettings(platform).shadowQuality == ShadowQuality::Current,
+            "Reduced Effects cannot reactivate retired Lower shadows");
+        GraphicsEditSession session(PlatformDefaultGraphicsSettings(platform));
+        Check(!session.Stage(retired), "live editing rejects the retired choice");
+        for (const auto schema : {3u, 4u, 5u})
+        {
+            auto expected = retired;
+            expected.shadowQuality = ShadowQuality::Current;
+            if (schema < 4u) expected.mistEnabled = true;
+            if (schema < 5u) expected.dustQuality = DustQuality::Off;
+            const auto migrated = RecoverGraphicsSettings({schema, retired, retired}, platform);
+            Check(migrated.startup == expected && migrated.retainedRequested == expected &&
+                !HasGraphicsReason(migrated.reasons, GraphicsReason::InvalidStoredSettings),
+                "saved and interrupted Lower migrate only shadows and existing schema fields");
+        }
+    }
     for (const auto oldSchema : {1u, 2u})
     {
         auto old = BaselineGraphicsSettings(GraphicsPlatform::Android);
@@ -288,7 +317,7 @@ void TestIndependentShadowAndLowFire()
     using namespace horde::vulkan::raytracing;
     for (const bool high : {false, true})
         for (const auto workload : {RtWorkloadPreset::Lean, RtWorkloadPreset::Authored, RtWorkloadPreset::Max})
-            for (const auto mode : {ShadowQuality::Lower, ShadowQuality::Current, ShadowQuality::Higher})
+            for (const auto mode : {ShadowQuality::Current, ShadowQuality::Higher})
             {
                 const auto policy = ResolveRtQualityControls(mode, workload, high);
                 Check(policy && policy->controls[0] == static_cast<std::uint32_t>(mode) &&
@@ -351,7 +380,7 @@ void TestPlatformDefaultsAndMist()
     }
     using namespace horde::vulkan::raytracing;
     for (const bool high : {false, true})
-        for (const auto shadow : {ShadowQuality::Lower, ShadowQuality::Current, ShadowQuality::Higher})
+        for (const auto shadow : {ShadowQuality::Current, ShadowQuality::Higher})
             for (const auto workload : {RtWorkloadPreset::Lean, RtWorkloadPreset::Authored, RtWorkloadPreset::Max})
             {
                 const auto on = ResolveRtQualityControls(shadow, workload, high);

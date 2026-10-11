@@ -1014,8 +1014,8 @@ int main()
                       lightingSource.find("return clamp(int(rtQualityControls.value.controls.y), 1, 4);") != std::string::npos &&
                       lightingSource.find("return clamp(int(rtQualityControls.value.controls.y), 1, 2);") != std::string::npos &&
                       lightingSource.find("return clamp(int(rtQualityControls.value.controls.z), 1, 2);") != std::string::npos &&
-                      lightingSource.find("if (rtQualityControls.value.controls.x == 0u) return vec3(0.0);") != std::string::npos,
-                      "independent shadow controls must retain bounded real RGB visibility, normalized weights, hard Lower and one-ray secondary receivers");
+                      lightingSource.find("rtQualityControls.value.controls.x == 0u") == std::string::npos,
+                      "independent shadow controls must retain bounded real RGB visibility, normalized weights, no retired Lower branch and one-ray secondary receivers");
         ok &= Require(raygenSource.find("waterSheetCoverage") == std::string::npos &&
                       raygenSource.find("bool waterStreamExit") != std::string::npos &&
                       raygenSource.find("controls.waterQuality < 0.5") != std::string::npos &&

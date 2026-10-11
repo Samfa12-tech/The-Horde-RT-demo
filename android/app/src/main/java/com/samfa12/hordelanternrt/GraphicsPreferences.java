@@ -11,7 +11,10 @@ final class GraphicsPreferences {
     static final String PENDING_GLASS = "graphics_pending_glass";
     static final String SHADOW = "graphics_shadow_quality";
     static final String PENDING_SHADOW = "graphics_pending_shadow";
-    static final int SHADOW_LOWER = 0, SHADOW_CURRENT = 1, SHADOW_HIGHER = 2;
+    // Value 0 was the removed, broken Lower setting. It is translated while
+    // reading old records and is never a valid live choice.
+    private static final int LEGACY_SHADOW_LOWER = 0;
+    static final int SHADOW_CURRENT = 1, SHADOW_HIGHER = 2;
     static final int FIRE_MOBILE = 0, FIRE_HIGH = 1, FIRE_LOW = 2;
     static final int SCHEMA = 5;
     static final String MIST = "graphics_mist_enabled";
@@ -46,7 +49,7 @@ final class GraphicsPreferences {
         boolean valid() { return valid(MIN_RENDER_SCALE_PERCENT); }
         boolean valid(int minimum) { return validScale(scale, minimum) && water >= 0 && water <= 2 &&
                 fire >= FIRE_MOBILE && fire <= FIRE_LOW && cap >= 15 && cap <= 60 &&
-                shadow >= SHADOW_LOWER && shadow <= SHADOW_HIGHER && dust >= 0 && dust <= 2; }
+                shadow >= SHADOW_CURRENT && shadow <= SHADOW_HIGHER && dust >= 0 && dust <= 2; }
         boolean same(Values other) { return other != null && scale == other.scale && water == other.water &&
                 fire == other.fire && cap == other.cap && glassEnabled == other.glassEnabled &&
                 shadow == other.shadow && mistEnabled == other.mistEnabled && dust == other.dust; }
@@ -92,10 +95,10 @@ final class GraphicsPreferences {
         catch (ClassCastException invalid) { return baseline(); }
         final int dust = schema < 5 ? 0 : integer(prefs, DUST, -1);
         final int water = integer(prefs, "water_quality", 1);
+        final int shadow = schema < 3 ? SHADOW_CURRENT : readShadow(prefs, SHADOW, SHADOW_CURRENT);
         final Values values = new Values(integer(prefs, "render_scale", 75), water,
                 integer(prefs, FIRE, water == 2 ? 1 : 0), integer(prefs, CAP, 30), glass,
-                schema < 3 ? SHADOW_CURRENT : integer(prefs, SHADOW,
-                        prefs.contains(SHADOW) ? -1 : SHADOW_CURRENT), mist, dust);
+                shadow, mist, dust);
         return values.valid(minimum) && (schema >= 3 || values.fire <= FIRE_HIGH) ? values : baseline();
     }
     static boolean markPending(SharedPreferences prefs, Values candidate) {
@@ -138,10 +141,10 @@ final class GraphicsPreferences {
         try { mist = pendingSchema < 4 || prefs.getBoolean(PENDING_MIST, true); }
         catch (ClassCastException invalid) { return baseline(); }
         final int dust = pendingSchema < 5 ? 0 : integer(prefs, PENDING_DUST, -1);
+        final int shadow = pendingSchema < 3 ? SHADOW_CURRENT : readShadow(prefs, PENDING_SHADOW, SHADOW_CURRENT);
         final Values values = new Values(integer(prefs, "graphics_pending_scale", 75), integer(prefs, "graphics_pending_water", 1),
                 integer(prefs, "graphics_pending_fire", 0), integer(prefs, "graphics_pending_cap", 30), glass,
-                pendingSchema < 3 ? SHADOW_CURRENT : integer(prefs, PENDING_SHADOW,
-                        prefs.contains(PENDING_SHADOW) ? -1 : SHADOW_CURRENT), mist, dust);
+                shadow, mist, dust);
         // Retain explicit experimental intent even when recovering in a constrained50
         // build. It never becomes effective without owner recovery.
         return values.valid(33) && (pendingSchema >= 3 || values.fire <= FIRE_HIGH) ? values : baseline();
@@ -155,8 +158,8 @@ final class GraphicsPreferences {
                 snapshot[26] >= 0 && snapshot[26] <= 2 && snapshot[27] >= 0 && snapshot[27] <= 2 &&
                 snapshot[5] >= FIRE_MOBILE && snapshot[5] <= FIRE_LOW &&
                 snapshot[17] >= FIRE_MOBILE && snapshot[17] <= FIRE_LOW &&
-                snapshot[22] >= SHADOW_LOWER && snapshot[22] <= SHADOW_HIGHER &&
-                snapshot[23] >= SHADOW_LOWER && snapshot[23] <= SHADOW_HIGHER;
+                snapshot[22] >= SHADOW_CURRENT && snapshot[22] <= SHADOW_HIGHER &&
+                snapshot[23] >= SHADOW_CURRENT && snapshot[23] <= SHADOW_HIGHER;
     }
     static boolean matchesEffective(long[] snapshot, Values values) {
         return values != null && snapshot != null && snapshot.length == 28 &&
@@ -169,6 +172,10 @@ final class GraphicsPreferences {
                 snapshot[21] == (values.glassEnabled ? 1 : 0) && values.scale == snapshot[15] &&
                 values.water == snapshot[16] && values.fire == snapshot[17] && values.cap == snapshot[18] &&
                 values.shadow == snapshot[23] && snapshot[25] == (values.mistEnabled ? 1 : 0) && values.dust == snapshot[27];
+    }
+    private static int readShadow(SharedPreferences prefs, String key, int fallback) {
+        final int stored = integer(prefs, key, prefs.contains(key) ? -1 : fallback);
+        return stored == LEGACY_SHADOW_LOWER ? SHADOW_CURRENT : stored;
     }
     private GraphicsPreferences() {}
 }

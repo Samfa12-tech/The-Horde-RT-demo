@@ -16,7 +16,7 @@ int main()
     };
     GraphicsPersistenceRecord record;
     record.confirmed = BaselineGraphicsSettings(GraphicsPlatform::Windows);
-    record.pending = GraphicsSettings{63, WaterQuality::Off, FireDetail::Low, 30, false, ShadowQuality::Lower, false, DustQuality::Standard};
+    record.pending = GraphicsSettings{63, WaterQuality::Off, FireDetail::Low, 30, false, ShadowQuality::Current, false, DustQuality::Standard};
     check(horde::platform::windows::SaveGraphicsPersistenceRecord(path, record), "pending tuple saved atomically");
     const auto read = [&filename](const char* section, const char* key) {
         return GetPrivateProfileIntA(section, key, -1, filename.c_str());
@@ -24,7 +24,7 @@ int main()
     check(read("graphics", "pending") == 1 && read("graphics", "pendingScale") == 63 &&
           read("graphics", "confirmedScale") == 100 && read("graphics", "pendingGlass") == 0 &&
           read("graphics", "confirmedGlass") == 1 && read("graphics", "schema") == 5 &&
-          read("graphics", "pendingFire") == 2 && read("graphics", "pendingShadow") == 0 &&
+          read("graphics", "pendingFire") == 2 && read("graphics", "pendingShadow") == 1 &&
           read("graphics", "confirmedShadow") == 1 && read("graphics", "confirmedMist") == 1 && read("graphics", "pendingMist") == 0 &&
           read("graphics", "confirmedDust") == 0 && read("graphics", "pendingDust") == 2,
           "interrupted settings candidate retains complete last-confirmed tuple and Standard dust intent");
@@ -36,7 +36,7 @@ int main()
         const auto recovery = RecoverGraphicsSettings(*loadedPending, GraphicsPlatform::Windows);
         check(recovery.startup == record.confirmed && recovery.retainedRequested == record.pending &&
             HasGraphicsReason(recovery.reasons, GraphicsReason::InterruptedApply),
-            "interrupted Low/Lower loads confirmed baseline while retaining unconfirmed intent");
+            "interrupted Low/Current loads confirmed baseline while retaining unconfirmed intent");
     }
     check(read("audio", "volume") == 43 && read("controls", "sensitivity") == 135,
           "graphics transaction preserves unrelated INI sections");
@@ -44,7 +44,7 @@ int main()
     check(horde::platform::windows::SaveGraphicsPersistenceRecord(path, record), "confirmation tuple saved atomically");
     check(read("graphics", "pending") == 0 && read("graphics", "confirmedScale") == 63 &&
           read("graphics", "confirmedWater") == 0 && read("graphics", "confirmedFire") == 2 &&
-          read("graphics", "confirmedGlass") == 0 && read("graphics", "confirmedShadow") == 0 && read("graphics", "confirmedMist") == 0 &&
+          read("graphics", "confirmedGlass") == 0 && read("graphics", "confirmedShadow") == 1 && read("graphics", "confirmedMist") == 0 &&
           read("graphics", "confirmedDust") == 2,
           "confirmation clears marker and publishes complete requested tuple");
     check(!horde::platform::windows::SaveGraphicsPersistenceRecord(directory / "missing" / "settings.ini", record),
@@ -62,15 +62,15 @@ int main()
               "failed atomic publication is explicit");
         CloseHandle(locked);
         check(read("graphics", "confirmedScale") == 63 && read("graphics", "confirmedGlass") == 0 &&
-              read("graphics", "confirmedFire") == 2 && read("graphics", "confirmedShadow") == 0 &&
+              read("graphics", "confirmedFire") == 2 && read("graphics", "confirmedShadow") == 1 &&
               read("audio", "volume") == 43,
               "failed publication preserves the entire prior record and unrelated preferences");
     }
-    record.confirmed = GraphicsSettings{63, WaterQuality::Off, FireDetail::Low, 30, false, ShadowQuality::Lower, false, DustQuality::Standard};
+    record.confirmed = GraphicsSettings{63, WaterQuality::Off, FireDetail::Low, 30, false, ShadowQuality::Current, false, DustQuality::Standard};
     auto invalid = record;
     invalid.confirmed.shadowQuality = static_cast<ShadowQuality>(3);
     check(!horde::platform::windows::SaveGraphicsPersistenceRecord(path, invalid) &&
-        read("graphics", "confirmedShadow") == 0,
+        read("graphics", "confirmedShadow") == 1,
         "unknown shadow cannot replace a usable seven-field record");
     const auto write = [&](const char* key, const char* value) {
         check(WritePrivateProfileStringA("graphics", key, value, filename.c_str()) != FALSE, "fixture INI key written");
@@ -81,6 +81,23 @@ int main()
         check(loaded.has_value(), "stored graphics schema is present");
         return loaded ? RecoverGraphicsSettings(*loaded, GraphicsPlatform::Windows) : GraphicsRecovery{};
     };
+    for (const char* schema : {"3", "4", "5"})
+    {
+        record.pending = record.confirmed;
+        check(horde::platform::windows::SaveGraphicsPersistenceRecord(path, record), "retired-tier migration fixture saved");
+        write("schema", schema); write("confirmedShadow", "0"); write("pendingShadow", "0");
+        auto expected = record.confirmed;
+        if (schema[0] < '4') expected.mistEnabled = true;
+        if (schema[0] < '5') expected.dustQuality = DustQuality::Off;
+        const auto recovered = recover();
+        check(recovered.startup == expected && recovered.retainedRequested == expected &&
+            !HasGraphicsReason(recovered.reasons, GraphicsReason::InvalidStoredSettings),
+            "legacy disk value zero migrates confirmed and pending shadows without dropping custom settings");
+        auto retired = record;
+        retired.confirmed.shadowQuality = static_cast<ShadowQuality>(0);
+        check(!horde::platform::windows::SaveGraphicsPersistenceRecord(path, retired),
+            "retired shadow value cannot be saved again through the current writer");
+    }
     // Keep the legacy Fire value valid in both tuples while exercising stale
     // confirmed and pending Dust keys under schemas that predate Dust.
     record.confirmed.fireDetail = FireDetail::High;
@@ -103,13 +120,13 @@ int main()
             "old schema cannot reinterpret previously unknown Fire2 as new Low");
     }
     record.pending.reset();
-    for (const auto quality : {ShadowQuality::Lower, ShadowQuality::Current, ShadowQuality::Higher})
+    for (const auto quality : {ShadowQuality::Current, ShadowQuality::Higher})
     {
         record.confirmed.shadowQuality = quality;
         check(horde::platform::windows::SaveGraphicsPersistenceRecord(path, record), "all new shadow selections save");
         const auto current = recover();
         check(current.startup == record.confirmed && current.reasons == GraphicsReason::None,
-            "schema4 Low retains all three exact shadow selections without remapping or unrelated changes");
+            "current schema retains both supported shadow selections without unrelated changes");
     }
     for (const char* schema : {"1", "2", "3"})
     {
@@ -161,7 +178,7 @@ int main()
     check(HasGraphicsReason(recover().reasons, GraphicsReason::InvalidStoredSettings),
         "boolean parser still requires exact0/1 rather than numeric coercion");
     record.pending = record.confirmed;
-    record.pending->shadowQuality = ShadowQuality::Lower;
+    record.pending->shadowQuality = ShadowQuality::Current;
     check(horde::platform::windows::SaveGraphicsPersistenceRecord(path, record), "pending negative source seeded");
     write("pendingDust", nullptr);
     check(HasGraphicsReason(recover().reasons, GraphicsReason::InvalidStoredSettings),

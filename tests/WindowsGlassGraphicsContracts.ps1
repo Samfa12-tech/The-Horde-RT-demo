@@ -78,7 +78,10 @@ Check ($persistence.Contains('write("confirmedShadow"') -and $persistence.Contai
     $resize.Contains('context.shadowQuality = context.graphicsBeforeApply.shadowQuality')) 'Complete shadow tuple is persisted, applied and restored after resize failure.'
 Check ($source.Contains('createButton(kGraphicsShadowButtonId, "SHADOW: CURRENT")') -and
     $source.Contains('MoveWindow(GetDlgItem(window, kGraphicsShadowButtonId)') -and
-    $source.Contains('draft.shadowQuality = static_cast<horde::graphics::ShadowQuality>')) 'Native shadow button has visible placement and edits only the draft.'
+    $source.Contains('draft.shadowQuality = horde::graphics::NextShadowQuality')) 'Native shadow button has visible placement and edits only the draft.'
+Check (-not $source.Contains('return "LOWER"') -and
+    -not $source.Contains('Shadows: Lower fixed') -and
+    $source.Contains('requestedDustQuality = savedGraphics.dustQuality')) 'Retired Lower is absent from the menu/help and no-preference captures start with the complete saved default tuple.'
 $render = Section $source 'bool RenderFrame(' 'void ApplyCaptureCheckpoint('
 Check ($render.Contains('ResolveFireEmitterQuality(ctx.fireDetail)') -and $render.Contains('frameInputs.shadowQuality = ctx.shadowQuality') -and
     -not $render.Contains('ctx.fireDetail == horde::graphics::FireDetail::High ?')) 'Showcase and Preview share exhaustive Low/Mobile/High mapping and independent shadow frame policy.'
@@ -366,7 +369,7 @@ Uploaded fire: High  |  shadows: Current  |  mist: On  |  indoor dust: Standard
 High optical build: physical panes retained; profile is fixed by this build.
 Water: Off omits water, Mobile refracts, High adds scene reflections.
 Fire: Low/Mobile/High use 2/4/10 steps; light strength unchanged.
-Shadows: Lower fixed centre1; Current area1; Higher area2/4. Cost unmeasured.
+Shadows: Current area1; Higher area2/4. Cost unmeasured.
 Indoor dust: Off/Low/Standard controls bounded visible motes; cost not yet measured.
 Apply needs an RT frame. Keep confirms within 15 foreground seconds.
 Requested scene could not load. Previous graphics and scene restored; saved settings and pending recovery remain unchanged.

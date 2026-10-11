@@ -3624,7 +3624,7 @@ public class MainActivity extends Activity {
         final TextView details = new TextView(this);
         details.setText("Resolution controls RT render scale. Water Off omits water appearance; Mobile uses reduced reflected detail; High adds a reflected scene query. " +
                 "Fire detail changes volume steps while preserving emitters, lights and gameplay. Menu / preview cap controls their frame cap. " +
-                "Glass enables only glass supported by this build; mobile lantern panes remain absent. Shadows select Lower, Current or Higher RT sampling. " +
+                "Glass enables only glass supported by this build; mobile lantern panes remain absent. Shadows select Current or Higher RT sampling. " +
                 "Mist toggles keeper-room ground mist; fire, smoke and electricity stay enabled. The compact authored preview has no ground mist.\n" +
                 "Indoor dust controls the bounded room effect; the preview reports uploaded quality even where no motes are visible.\n\n" +
                 "Changing a choice edits the draft. Use starts a temporary trial only after the RT request is accepted. Keep and save is enabled only after a matching RT frame is presented. " +

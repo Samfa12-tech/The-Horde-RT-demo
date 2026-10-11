@@ -964,14 +964,13 @@ bool highMaxAreaShadows()
 }
 int areaShadowSampleIndex()
 {
-    return rtQualityControls.value.controls.x == 0u || highMaxAreaShadows()
+    return highMaxAreaShadows()
         ? 0 : int((HORDE_RT_PIXEL_ID.x + HORDE_RT_PIXEL_ID.y) & 1u);
 }
 vec3 areaShadowOffset(int index)
 {
-    // Lower retains real occlusion but uses a hard centre sample. Current keeps
-    // the exact historical authored offsets and spatial alternation.
-    if (rtQualityControls.value.controls.x == 0u) return vec3(0.0);
+    // Current and Higher retain their authored offsets and spatial alternation.
+    // The retired centre-sample Lower path is deliberately absent.
     const vec3 offsets[4] = vec3[4](vec3(-0.075, 0.03, -0.045),
         vec3(0.070, 0.10, 0.060), vec3(-0.075, 0.10, 0.060),
         vec3(0.070, 0.03, -0.045));

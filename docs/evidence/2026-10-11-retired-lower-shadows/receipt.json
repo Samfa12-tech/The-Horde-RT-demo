@@ -1,0 +1,1007 @@
+{
+  "baseCommit": "e01f87a6c745c356b44be04e921a9b5b02433086",
+  "captures": [
+    {
+      "backend": "RayTracingPipeline",
+      "complete": true,
+      "captureCount": 17,
+      "executableSha256": "95d4d10864edd2f45496ed1be4842de7e66e4e8fa0f2f2a38c82775a90905b69",
+      "currentRestoredChangedChannels": 0,
+      "captures": [
+        {
+          "name": "shadows-current",
+          "file": "shadows-current.png",
+          "pngSha256": "23076f8c4c43ab0f929f6d85f482dac4b8f1e67dbafc0f5960bb5244d872e689",
+          "honestlyPresentedRtFrame": true,
+          "outputRedBlueSwapAppliedAndNormalised": true,
+          "previewTimeline": {
+            "epoch": 21,
+            "tick": 120,
+            "timeSeconds": 2.0,
+            "paused": true,
+            "motion": false
+          },
+          "camera": {
+            "x": -3.85,
+            "z": -13.3,
+            "yaw": 0.4,
+            "pitch": -0.22
+          },
+          "skeleton": {
+            "animation": "Idle",
+            "animationTime": 2.0
+          },
+          "firePhases": [
+            0.740001,
+            0.740001
+          ],
+          "graphics": {
+            "serial": 0,
+            "lifecycleGeneration": 1,
+            "requested": {
+              "renderScalePercent": 100,
+              "waterQuality": 2,
+              "fireDetail": 1,
+              "previewFrameCap": 30,
+              "glassEnabled": true,
+              "shadowQuality": 1,
+              "mistEnabled": true,
+              "dustQuality": 1
+            },
+            "effective": {
+              "renderScalePercent": 100,
+              "waterQuality": 2,
+              "fireDetail": 1,
+              "previewFrameCap": 30,
+              "glassEnabled": true,
+              "shadowQuality": 1,
+              "mistEnabled": true,
+              "dustQuality": 1
+            },
+            "compiledOpticalProfile": "High",
+            "internalWidth": 960,
+            "internalHeight": 540,
+            "outputWidth": 960,
+            "outputHeight": 540,
+            "executionBackend": "RayTracingPipeline",
+            "sceneProfile": "GraphicsPreview",
+            "rtPresented": true
+          },
+          "cpuDustWork": {
+            "admittedZones": 0,
+            "generatedMotes": 0,
+            "projectedMotes": 0,
+            "tileReferences": 0,
+            "overflowReferences": 0
+          },
+          "sceneGlassEnabled": true,
+          "instanceMasksByCustomIndex": [
+            1,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "customGlassIndex": 9,
+          "customGlassMask": 1,
+          "currentEvidence": {
+            "sceneEpoch": 6,
+            "measurementGeneration": 1,
+            "hasCompletedEvidence": true,
+            "currentCompletedPresent": true,
+            "actualUploadedDustQuality": 1,
+            "submissionSerial": 53,
+            "recordedPreviewTick": 120,
+            "completionSerial": 53
+          },
+          "resources": {
+            "buffers": 28,
+            "memoryAllocations": 37,
+            "blasCount": 7,
+            "tlasCount": 1,
+            "tlasInstanceCount": 7,
+            "pipelineCount": 2,
+            "sbtCount": 2,
+            "descriptorSetCount": 1,
+            "deviceLocalBytes": 77568336,
+            "hostVisibleBytes": 2308608
+          },
+          "timing": {
+            "successfulPresentCount": 12,
+            "renderCallMeanMs": 41.176375,
+            "renderCallMedianMs": 6.0075,
+            "readbackMs": 15.3434,
+            "currentCompletedGpuMs": 2.06496
+          }
+        },
+        {
+          "name": "shadows-higher",
+          "file": "shadows-higher.png",
+          "pngSha256": "80d44bbfd8e4ecd5c2aab8941b477e582569fc04a4965f0d2e1d93a140aee8a9",
+          "honestlyPresentedRtFrame": true,
+          "outputRedBlueSwapAppliedAndNormalised": true,
+          "previewTimeline": {
+            "epoch": 23,
+            "tick": 120,
+            "timeSeconds": 2.0,
+            "paused": true,
+            "motion": false
+          },
+          "camera": {
+            "x": -3.85,
+            "z": -13.3,
+            "yaw": 0.4,
+            "pitch": -0.22
+          },
+          "skeleton": {
+            "animation": "Idle",
+            "animationTime": 2.0
+          },
+          "firePhases": [
+            0.740001,
+            0.740001
+          ],
+          "graphics": {
+            "serial": 0,
+            "lifecycleGeneration": 1,
+            "requested": {
+              "renderScalePercent": 100,
+              "waterQuality": 2,
+              "fireDetail": 1,
+              "previewFrameCap": 30,
+              "glassEnabled": true,
+              "shadowQuality": 2,
+              "mistEnabled": true,
+              "dustQuality": 1
+            },
+            "effective": {
+              "renderScalePercent": 100,
+              "waterQuality": 2,
+              "fireDetail": 1,
+              "previewFrameCap": 30,
+              "glassEnabled": true,
+              "shadowQuality": 2,
+              "mistEnabled": true,
+              "dustQuality": 1
+            },
+            "compiledOpticalProfile": "High",
+            "internalWidth": 960,
+            "internalHeight": 540,
+            "outputWidth": 960,
+            "outputHeight": 540,
+            "executionBackend": "RayTracingPipeline",
+            "sceneProfile": "GraphicsPreview",
+            "rtPresented": true
+          },
+          "cpuDustWork": {
+            "admittedZones": 0,
+            "generatedMotes": 0,
+            "projectedMotes": 0,
+            "tileReferences": 0,
+            "overflowReferences": 0
+          },
+          "sceneGlassEnabled": true,
+          "instanceMasksByCustomIndex": [
+            1,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "customGlassIndex": 9,
+          "customGlassMask": 1,
+          "currentEvidence": {
+            "sceneEpoch": 6,
+            "measurementGeneration": 1,
+            "hasCompletedEvidence": true,
+            "currentCompletedPresent": true,
+            "actualUploadedDustQuality": 1,
+            "submissionSerial": 67,
+            "recordedPreviewTick": 120,
+            "completionSerial": 67
+          },
+          "resources": {
+            "buffers": 28,
+            "memoryAllocations": 37,
+            "blasCount": 7,
+            "tlasCount": 1,
+            "tlasInstanceCount": 7,
+            "pipelineCount": 2,
+            "sbtCount": 2,
+            "descriptorSetCount": 1,
+            "deviceLocalBytes": 77568336,
+            "hostVisibleBytes": 2308608
+          },
+          "timing": {
+            "successfulPresentCount": 12,
+            "renderCallMeanMs": 5.684217,
+            "renderCallMedianMs": 6.01235,
+            "readbackMs": 10.8111,
+            "currentCompletedGpuMs": 2.892448
+          }
+        },
+        {
+          "name": "shadows-restored-current",
+          "file": "shadows-restored-current.png",
+          "pngSha256": "23076f8c4c43ab0f929f6d85f482dac4b8f1e67dbafc0f5960bb5244d872e689",
+          "honestlyPresentedRtFrame": true,
+          "outputRedBlueSwapAppliedAndNormalised": true,
+          "previewTimeline": {
+            "epoch": 25,
+            "tick": 120,
+            "timeSeconds": 2.0,
+            "paused": true,
+            "motion": false
+          },
+          "camera": {
+            "x": -3.85,
+            "z": -13.3,
+            "yaw": 0.4,
+            "pitch": -0.22
+          },
+          "skeleton": {
+            "animation": "Idle",
+            "animationTime": 2.0
+          },
+          "firePhases": [
+            0.740001,
+            0.740001
+          ],
+          "graphics": {
+            "serial": 0,
+            "lifecycleGeneration": 1,
+            "requested": {
+              "renderScalePercent": 100,
+              "waterQuality": 2,
+              "fireDetail": 1,
+              "previewFrameCap": 30,
+              "glassEnabled": true,
+              "shadowQuality": 1,
+              "mistEnabled": true,
+              "dustQuality": 1
+            },
+            "effective": {
+              "renderScalePercent": 100,
+              "waterQuality": 2,
+              "fireDetail": 1,
+              "previewFrameCap": 30,
+              "glassEnabled": true,
+              "shadowQuality": 1,
+              "mistEnabled": true,
+              "dustQuality": 1
+            },
+            "compiledOpticalProfile": "High",
+            "internalWidth": 960,
+            "internalHeight": 540,
+            "outputWidth": 960,
+            "outputHeight": 540,
+            "executionBackend": "RayTracingPipeline",
+            "sceneProfile": "GraphicsPreview",
+            "rtPresented": true
+          },
+          "cpuDustWork": {
+            "admittedZones": 0,
+            "generatedMotes": 0,
+            "projectedMotes": 0,
+            "tileReferences": 0,
+            "overflowReferences": 0
+          },
+          "sceneGlassEnabled": true,
+          "instanceMasksByCustomIndex": [
+            1,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "customGlassIndex": 9,
+          "customGlassMask": 1,
+          "currentEvidence": {
+            "sceneEpoch": 6,
+            "measurementGeneration": 1,
+            "hasCompletedEvidence": true,
+            "currentCompletedPresent": true,
+            "actualUploadedDustQuality": 1,
+            "submissionSerial": 81,
+            "recordedPreviewTick": 120,
+            "completionSerial": 81
+          },
+          "resources": {
+            "buffers": 28,
+            "memoryAllocations": 37,
+            "blasCount": 7,
+            "tlasCount": 1,
+            "tlasInstanceCount": 7,
+            "pipelineCount": 2,
+            "sbtCount": 2,
+            "descriptorSetCount": 1,
+            "deviceLocalBytes": 77568336,
+            "hostVisibleBytes": 2308608
+          },
+          "timing": {
+            "successfulPresentCount": 12,
+            "renderCallMeanMs": 6.000708,
+            "renderCallMedianMs": 6.00815,
+            "readbackMs": 13.1283,
+            "currentCompletedGpuMs": 2.779552
+          }
+        }
+      ],
+      "catalog": {
+        "bundleIdentity": "opaqueFast:diagnostic_high_opaque_fast@37367f71263b8cf0268b2795d8bf20c616b12119ef2af9e057ac93986aef01a8|genericDielectric:diagnostic_high_generic_dielectric@e44d820c812a5c067e7d28a85a43e138559cb39807e3621fca58f37ac1446158",
+        "artifacts": [
+          {
+            "key": "diagnostic_high_opaque_fast",
+            "spirvSha256": "37367f71263b8cf0268b2795d8bf20c616b12119ef2af9e057ac93986aef01a8",
+            "includeSha256": "c445f19e4f57574ed760ee503ab38430cad4cd5e56969fdac2257c1eed29e131",
+            "artifactPath": "src/vulkan/raytracing/variants/diagnostic_high_opaque_fast.inc",
+            "wordCount": 146582,
+            "diagnosticsBinding": true
+          },
+          {
+            "key": "diagnostic_high_generic_dielectric",
+            "spirvSha256": "e44d820c812a5c067e7d28a85a43e138559cb39807e3621fca58f37ac1446158",
+            "includeSha256": "6890401720d9b90a0cbfae366bb7e5c55ff3375994f6af1907899eb073f7227d",
+            "artifactPath": "src/vulkan/raytracing/variants/diagnostic_high_generic_dielectric.inc",
+            "wordCount": 73848,
+            "diagnosticsBinding": true
+          }
+        ]
+      }
+    },
+    {
+      "backend": "RayQueryCompute",
+      "complete": true,
+      "captureCount": 17,
+      "executableSha256": "95d4d10864edd2f45496ed1be4842de7e66e4e8fa0f2f2a38c82775a90905b69",
+      "currentRestoredChangedChannels": 0,
+      "captures": [
+        {
+          "name": "shadows-current",
+          "file": "shadows-current.png",
+          "pngSha256": "cb62c9156e9d9ec362d2e74aff850a1b30cd44e1a16e28dcab6960e7303cdca0",
+          "honestlyPresentedRtFrame": true,
+          "outputRedBlueSwapAppliedAndNormalised": true,
+          "previewTimeline": {
+            "epoch": 21,
+            "tick": 120,
+            "timeSeconds": 2.0,
+            "paused": true,
+            "motion": false
+          },
+          "camera": {
+            "x": -3.85,
+            "z": -13.3,
+            "yaw": 0.4,
+            "pitch": -0.22
+          },
+          "skeleton": {
+            "animation": "Idle",
+            "animationTime": 2.0
+          },
+          "firePhases": [
+            0.740001,
+            0.740001
+          ],
+          "graphics": {
+            "serial": 0,
+            "lifecycleGeneration": 1,
+            "requested": {
+              "renderScalePercent": 100,
+              "waterQuality": 2,
+              "fireDetail": 1,
+              "previewFrameCap": 30,
+              "glassEnabled": true,
+              "shadowQuality": 1,
+              "mistEnabled": true,
+              "dustQuality": 1
+            },
+            "effective": {
+              "renderScalePercent": 100,
+              "waterQuality": 2,
+              "fireDetail": 1,
+              "previewFrameCap": 30,
+              "glassEnabled": true,
+              "shadowQuality": 1,
+              "mistEnabled": true,
+              "dustQuality": 1
+            },
+            "compiledOpticalProfile": "High",
+            "internalWidth": 960,
+            "internalHeight": 540,
+            "outputWidth": 960,
+            "outputHeight": 540,
+            "executionBackend": "RayQueryCompute",
+            "sceneProfile": "GraphicsPreview",
+            "rtPresented": true
+          },
+          "cpuDustWork": {
+            "admittedZones": 0,
+            "generatedMotes": 0,
+            "projectedMotes": 0,
+            "tileReferences": 0,
+            "overflowReferences": 0
+          },
+          "sceneGlassEnabled": true,
+          "instanceMasksByCustomIndex": [
+            1,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "customGlassIndex": 9,
+          "customGlassMask": 1,
+          "currentEvidence": {
+            "sceneEpoch": 6,
+            "measurementGeneration": 1,
+            "hasCompletedEvidence": true,
+            "currentCompletedPresent": true,
+            "actualUploadedDustQuality": 1,
+            "submissionSerial": 53,
+            "recordedPreviewTick": 120,
+            "completionSerial": 53
+          },
+          "resources": {
+            "buffers": 26,
+            "memoryAllocations": 35,
+            "blasCount": 7,
+            "tlasCount": 1,
+            "tlasInstanceCount": 7,
+            "pipelineCount": 2,
+            "sbtCount": 0,
+            "descriptorSetCount": 1,
+            "deviceLocalBytes": 77568336,
+            "hostVisibleBytes": 2308096
+          },
+          "timing": {
+            "successfulPresentCount": 12,
+            "renderCallMeanMs": 5.980283,
+            "renderCallMedianMs": 6.0161,
+            "readbackMs": 11.8558,
+            "currentCompletedGpuMs": 2.142752
+          }
+        },
+        {
+          "name": "shadows-higher",
+          "file": "shadows-higher.png",
+          "pngSha256": "233520b7d70515c84486dd0a44f4ceb5c5871a4306b6d593155738c089629313",
+          "honestlyPresentedRtFrame": true,
+          "outputRedBlueSwapAppliedAndNormalised": true,
+          "previewTimeline": {
+            "epoch": 23,
+            "tick": 120,
+            "timeSeconds": 2.0,
+            "paused": true,
+            "motion": false
+          },
+          "camera": {
+            "x": -3.85,
+            "z": -13.3,
+            "yaw": 0.4,
+            "pitch": -0.22
+          },
+          "skeleton": {
+            "animation": "Idle",
+            "animationTime": 2.0
+          },
+          "firePhases": [
+            0.740001,
+            0.740001
+          ],
+          "graphics": {
+            "serial": 0,
+            "lifecycleGeneration": 1,
+            "requested": {
+              "renderScalePercent": 100,
+              "waterQuality": 2,
+              "fireDetail": 1,
+              "previewFrameCap": 30,
+              "glassEnabled": true,
+              "shadowQuality": 2,
+              "mistEnabled": true,
+              "dustQuality": 1
+            },
+            "effective": {
+              "renderScalePercent": 100,
+              "waterQuality": 2,
+              "fireDetail": 1,
+              "previewFrameCap": 30,
+              "glassEnabled": true,
+              "shadowQuality": 2,
+              "mistEnabled": true,
+              "dustQuality": 1
+            },
+            "compiledOpticalProfile": "High",
+            "internalWidth": 960,
+            "internalHeight": 540,
+            "outputWidth": 960,
+            "outputHeight": 540,
+            "executionBackend": "RayQueryCompute",
+            "sceneProfile": "GraphicsPreview",
+            "rtPresented": true
+          },
+          "cpuDustWork": {
+            "admittedZones": 0,
+            "generatedMotes": 0,
+            "projectedMotes": 0,
+            "tileReferences": 0,
+            "overflowReferences": 0
+          },
+          "sceneGlassEnabled": true,
+          "instanceMasksByCustomIndex": [
+            1,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "customGlassIndex": 9,
+          "customGlassMask": 1,
+          "currentEvidence": {
+            "sceneEpoch": 6,
+            "measurementGeneration": 1,
+            "hasCompletedEvidence": true,
+            "currentCompletedPresent": true,
+            "actualUploadedDustQuality": 1,
+            "submissionSerial": 67,
+            "recordedPreviewTick": 120,
+            "completionSerial": 67
+          },
+          "resources": {
+            "buffers": 26,
+            "memoryAllocations": 35,
+            "blasCount": 7,
+            "tlasCount": 1,
+            "tlasInstanceCount": 7,
+            "pipelineCount": 2,
+            "sbtCount": 0,
+            "descriptorSetCount": 1,
+            "deviceLocalBytes": 77568336,
+            "hostVisibleBytes": 2308096
+          },
+          "timing": {
+            "successfulPresentCount": 12,
+            "renderCallMeanMs": 45.582992,
+            "renderCallMedianMs": 6.03185,
+            "readbackMs": 11.1095,
+            "currentCompletedGpuMs": 3.172256
+          }
+        },
+        {
+          "name": "shadows-restored-current",
+          "file": "shadows-restored-current.png",
+          "pngSha256": "cb62c9156e9d9ec362d2e74aff850a1b30cd44e1a16e28dcab6960e7303cdca0",
+          "honestlyPresentedRtFrame": true,
+          "outputRedBlueSwapAppliedAndNormalised": true,
+          "previewTimeline": {
+            "epoch": 25,
+            "tick": 120,
+            "timeSeconds": 2.0,
+            "paused": true,
+            "motion": false
+          },
+          "camera": {
+            "x": -3.85,
+            "z": -13.3,
+            "yaw": 0.4,
+            "pitch": -0.22
+          },
+          "skeleton": {
+            "animation": "Idle",
+            "animationTime": 2.0
+          },
+          "firePhases": [
+            0.740001,
+            0.740001
+          ],
+          "graphics": {
+            "serial": 0,
+            "lifecycleGeneration": 1,
+            "requested": {
+              "renderScalePercent": 100,
+              "waterQuality": 2,
+              "fireDetail": 1,
+              "previewFrameCap": 30,
+              "glassEnabled": true,
+              "shadowQuality": 1,
+              "mistEnabled": true,
+              "dustQuality": 1
+            },
+            "effective": {
+              "renderScalePercent": 100,
+              "waterQuality": 2,
+              "fireDetail": 1,
+              "previewFrameCap": 30,
+              "glassEnabled": true,
+              "shadowQuality": 1,
+              "mistEnabled": true,
+              "dustQuality": 1
+            },
+            "compiledOpticalProfile": "High",
+            "internalWidth": 960,
+            "internalHeight": 540,
+            "outputWidth": 960,
+            "outputHeight": 540,
+            "executionBackend": "RayQueryCompute",
+            "sceneProfile": "GraphicsPreview",
+            "rtPresented": true
+          },
+          "cpuDustWork": {
+            "admittedZones": 0,
+            "generatedMotes": 0,
+            "projectedMotes": 0,
+            "tileReferences": 0,
+            "overflowReferences": 0
+          },
+          "sceneGlassEnabled": true,
+          "instanceMasksByCustomIndex": [
+            1,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "customGlassIndex": 9,
+          "customGlassMask": 1,
+          "currentEvidence": {
+            "sceneEpoch": 6,
+            "measurementGeneration": 1,
+            "hasCompletedEvidence": true,
+            "currentCompletedPresent": true,
+            "actualUploadedDustQuality": 1,
+            "submissionSerial": 81,
+            "recordedPreviewTick": 120,
+            "completionSerial": 81
+          },
+          "resources": {
+            "buffers": 26,
+            "memoryAllocations": 35,
+            "blasCount": 7,
+            "tlasCount": 1,
+            "tlasInstanceCount": 7,
+            "pipelineCount": 2,
+            "sbtCount": 0,
+            "descriptorSetCount": 1,
+            "deviceLocalBytes": 77568336,
+            "hostVisibleBytes": 2308096
+          },
+          "timing": {
+            "successfulPresentCount": 12,
+            "renderCallMeanMs": 5.989258,
+            "renderCallMedianMs": 6.0164,
+            "readbackMs": 11.506,
+            "currentCompletedGpuMs": 2.330976
+          }
+        }
+      ],
+      "catalog": {
+        "bundleIdentity": "opaqueFast:rayquery_compute_diagnostic_high_opaque_fast@d9ea68faace998572bae50812a121d341626e4a2dabee23714bc43d233614c33|genericDielectric:rayquery_compute_diagnostic_high_generic_dielectric@0902ae131a90bc81f29ff504bf364fc5e457b01d4126e8ad601a2bfe6076e998",
+        "artifacts": [
+          {
+            "key": "rayquery_compute_diagnostic_high_opaque_fast",
+            "spirvSha256": "d9ea68faace998572bae50812a121d341626e4a2dabee23714bc43d233614c33",
+            "includeSha256": "42a466219faf59bac56dc0c0fe75f915917f3c1fca8d6047eddf12daa29c22e8",
+            "artifactPath": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_high_opaque_fast.inc",
+            "wordCount": 146883,
+            "diagnosticsBinding": true
+          },
+          {
+            "key": "rayquery_compute_diagnostic_high_generic_dielectric",
+            "spirvSha256": "0902ae131a90bc81f29ff504bf364fc5e457b01d4126e8ad601a2bfe6076e998",
+            "includeSha256": "cdf8743fb5669032e5e13a7fc4a33aa464f65a3b182727b4560d9982841b73cc",
+            "artifactPath": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_high_generic_dielectric.inc",
+            "wordCount": 73910,
+            "diagnosticsBinding": true
+          }
+        ]
+      }
+    }
+  ],
+  "shaderCost": [
+    {
+      "key": "diagnostic_high_generic_dielectric",
+      "before": {
+        "bytes": 295668,
+        "instructions": 17626,
+        "rayQueryInitializations": 2
+      },
+      "after": {
+        "bytes": 295392,
+        "instructions": 17608,
+        "rayQueryInitializations": 2
+      }
+    },
+    {
+      "key": "diagnostic_high_opaque_fast",
+      "before": {
+        "bytes": 590592,
+        "instructions": 32700,
+        "rayQueryInitializations": 29
+      },
+      "after": {
+        "bytes": 586328,
+        "instructions": 32390,
+        "rayQueryInitializations": 29
+      }
+    },
+    {
+      "key": "diagnostic_mobile_generic_dielectric",
+      "before": {
+        "bytes": 294168,
+        "instructions": 17530,
+        "rayQueryInitializations": 2
+      },
+      "after": {
+        "bytes": 293892,
+        "instructions": 17512,
+        "rayQueryInitializations": 2
+      }
+    },
+    {
+      "key": "diagnostic_mobile_opaque_fast",
+      "before": {
+        "bytes": 587492,
+        "instructions": 32507,
+        "rayQueryInitializations": 27
+      },
+      "after": {
+        "bytes": 583380,
+        "instructions": 32209,
+        "rayQueryInitializations": 27
+      }
+    },
+    {
+      "key": "shipping_high_generic_dielectric",
+      "before": {
+        "bytes": 286840,
+        "instructions": 17202,
+        "rayQueryInitializations": 2
+      },
+      "after": {
+        "bytes": 286564,
+        "instructions": 17184,
+        "rayQueryInitializations": 2
+      }
+    },
+    {
+      "key": "shipping_high_opaque_fast",
+      "before": {
+        "bytes": 586356,
+        "instructions": 32521,
+        "rayQueryInitializations": 29
+      },
+      "after": {
+        "bytes": 582092,
+        "instructions": 32211,
+        "rayQueryInitializations": 29
+      }
+    },
+    {
+      "key": "shipping_mobile_generic_dielectric",
+      "before": {
+        "bytes": 285340,
+        "instructions": 17106,
+        "rayQueryInitializations": 2
+      },
+      "after": {
+        "bytes": 285064,
+        "instructions": 17088,
+        "rayQueryInitializations": 2
+      }
+    },
+    {
+      "key": "shipping_mobile_opaque_fast",
+      "before": {
+        "bytes": 583256,
+        "instructions": 32328,
+        "rayQueryInitializations": 27
+      },
+      "after": {
+        "bytes": 579144,
+        "instructions": 32030,
+        "rayQueryInitializations": 27
+      }
+    }
+  ],
+  "shaderBudgetsSha256": "56936479b2d202dbdb9393ba94b66a1b0bc12d490b700d8af4c63de3460e53bf",
+  "artifacts": {
+    "windowsDebug": {
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+      "bytes": 12425216,
+      "sha256": "95d4d10864edd2f45496ed1be4842de7e66e4e8fa0f2f2a38c82775a90905b69"
+    },
+    "windowsRelease": {
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+      "bytes": 4325888,
+      "sha256": "6f1960f84931dd77362e55cbc1a8f9c14e9179f9adb5d42472550b41016bac11"
+    },
+    "androidDebug": {
+      "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "bytes": 167423978,
+      "sha256": "716cf41f85019db57f663c8d62ecb1ffeb44cf9daecac30901aff7d9eac742d4"
+    }
+  },
+  "androidJava": {
+    "tests": 284,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "validation": {
+    "debugCtests": {
+      "passed": 12,
+      "failed": 0,
+      "seconds": 29.75
+    },
+    "releaseCtests": {
+      "passed": 11,
+      "failed": 0,
+      "seconds": 15.68
+    },
+    "androidBuildLint": "PASS",
+    "androidInstalled": false,
+    "packageChecks": "held-item/world/strict-ASTC and closed exact roster PASS",
+    "physicalAndroid": "pending",
+    "performanceClaim": false,
+    "shaderCtests": "4/4 passed across corrected runs; artifact negatives 93.12s; unchanged deadlines"
+  },
+  "preservedFailures": [
+    "pre-change retirement regressions failed as expected",
+    "sandbox native INI replacement denied; same fixture passed unsandboxed",
+    "baseline e01f87a6 preview capture stopped before image readback on mismatched default dust intent; fixed initial requested dust to match saved defaults",
+    "first Android run failed stale negative fixture using unchanged shadow value; changed it to the other supported value, all tests rerun",
+    "exact compatibility/opaque shader pins changed deliberately; refreshed witnesses, fresh compilation and negative gates retained"
+  ],
+  "androidShaderContainment": {
+    "apkEntry": "lib/arm64-v8a/libhorde_rt_probe_android.so",
+    "instrumentation": "Diagnostic",
+    "quality": "Mobile",
+    "arm64Sha256": "4547cdfc65664a685cffccca5dc328e5cd0001987e916fb4945ccc8487c7b173",
+    "semanticKeys": [
+      "diagnostic_mobile_generic_dielectric",
+      "diagnostic_mobile_opaque_fast",
+      "rayquery_compute_diagnostic_mobile_generic_dielectric",
+      "rayquery_compute_diagnostic_mobile_opaque_fast"
+    ],
+    "packagedMatchesStripped": true
+  }
+}

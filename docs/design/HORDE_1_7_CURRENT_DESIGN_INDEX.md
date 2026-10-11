@@ -275,3 +275,9 @@ supersede r19 for the terrain asset, without transferring its physical acceptanc
 The macro river/lake beds are not finished water surfaces, and coarse surrounding
 land is not a finished forest or new playable region. Visible distant landmarks,
 dense colliding foliage, Kit and actual streaming remain active work.
+
+The owner now explicitly authorizes issue 23 within this branch: retire broken
+Lower shadows instead of repairing that tier. Current/Higher remain, with saved
+Lower values migrating to Current. [Removal, migration and RT evidence](../evidence/2026-10-11-retired-lower-shadows/README.md)
+record the bounded change; phone acceptance and sustained performance remain
+separate. No other issue or released 1.6.2 artifact is changed by that direction.

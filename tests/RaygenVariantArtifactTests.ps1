@@ -541,10 +541,10 @@ try {
     New-Item -ItemType Directory -Path $temporaryRoot | Out-Null
     $genericInclude = Join-Path $repoRoot 'src\vulkan\raytracing\MinimalRayGenShader.inc'
     $legacyInclude = Join-Path $repoRoot 'src\vulkan\raytracing\MinimalLegacyRayGenShader.inc'
-    # These compatibility artifacts include the approved dedicated third-character route and 18-layer ABI; fresh compilation still validates source identity.
-    Assert-True ((Get-CanonicalTextHash $genericInclude) -eq '3a8a45b02affcd96f98ba9899e2d75160b7a9bff0de8470ceec3956ea552b997') `
+    # These compatibility artifacts include the approved dedicated third-character route, 18-layer ABI and removal of the retired Lower shadow branch; fresh compilation still validates source identity.
+    Assert-True ((Get-CanonicalTextHash $genericInclude) -eq '34ccbe266f4c92145f07182469c35f53c34f1969b8dfb912ec0e9178975b953c') `
         'Compatibility generic include changed unexpectedly.'
-    Assert-True ((Get-CanonicalTextHash $legacyInclude) -eq 'e4a450ca21c5339c70b142f53f0706927f148fe151999623e6c22eca2bf2ee0b') `
+    Assert-True ((Get-CanonicalTextHash $legacyInclude) -eq '2e22998480e8b7a09f196aa60f7046dd549a26a69970bedc4193539d1ed49981') `
         'Compatibility legacy include changed unexpectedly.'
 
     $lfFixture = Join-Path $temporaryRoot 'canonical-lf-fixture.txt'
@@ -587,14 +587,14 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
     # no longer the admitted snapshot; keep exact mist/active-fire4, current ABI
     # and the reviewed shared presentation pre-rotation raw-word witnesses.
     $opaqueWordPins = @{
-        diagnostic_high_opaque_fast = '5b8eb292cfa45524bb521abad3f7b9153ae93913375d975bcc3ba48b2d09ebf0'
-        diagnostic_mobile_opaque_fast = '08a3f68e62d249bca1d0d9d1dafaa35e26becb13590746779b12d755681790a7'
-        shipping_high_opaque_fast = '4222d936cde42bc2fd1aaea15bb467d498f9eae8ee948f9f16acf6f7f7cd9a26'
-        shipping_mobile_opaque_fast = '5784fc3d3e3a79a81c4b4d9bf4f9bc398e22816179b37159e0667b03233e2e5e'
+        diagnostic_high_opaque_fast = '37367f71263b8cf0268b2795d8bf20c616b12119ef2af9e057ac93986aef01a8'
+        diagnostic_mobile_opaque_fast = '800c0043a3e01167841ad0dd06d8f08d6dd210edc3ae4bc4acd7dfb1298e3257'
+        shipping_high_opaque_fast = '41917008d534b32f48ff23946a9e2827ceebc23e3fcf2dcbc6281278018b52dc'
+        shipping_mobile_opaque_fast = '95262e6c06f2ad2c81717a2b189b4ca8f81c037a1054d4cd5e063bc82eb75fb4'
     }
     foreach ($row in @($catalog.variants | Where-Object { $_.material -eq 'OpaqueFast' })) {
         Assert-True ($row.spirvSha256 -ceq $opaqueWordPins[$row.key]) `
-            "Bounded indoor-dust OpaqueFast raw SPIR-V snapshot changed: $($row.key)"
+            "Current/Higher-only OpaqueFast raw SPIR-V snapshot changed: $($row.key)"
     }
     # Equal raw-word hashes are still a valid catalog shape when two explicit
     # variant keys/paths compile identically; freshness is checked separately.
@@ -774,13 +774,13 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
     & $compiler -Check -OutputDirectory $compatibilityGenericOutput
     if ($LASTEXITCODE -ne 0) { throw "Generic compatibility freshness failed with exit code $LASTEXITCODE." }
     Assert-True ((Get-RawFileHash (Join-Path $compatibilityGenericOutput 'minimal.rgen.spv')) -eq
-        '8640e07578479551e9601980b2b32c8f82ff70fea7c96e9743ef9ea46511995a') `
+        'c3690ac4866291e6948e8bf0cec99186d64cb00d4a1ca3283fba4aa5b13b73a3') `
         'Compatibility generic SPIR-V words changed.'
     $compatibilityLegacyOutput = Join-Path $temporaryRoot 'compatibility-legacy'
     & $compiler -Legacy -Check -OutputDirectory $compatibilityLegacyOutput
     if ($LASTEXITCODE -ne 0) { throw "Legacy compatibility freshness failed with exit code $LASTEXITCODE." }
     Assert-True ((Get-RawFileHash (Join-Path $compatibilityLegacyOutput 'minimal.legacy.rgen.spv')) -eq
-        'cfa7b3649f2bbd490531a916f0a51a4148a277f2e5ae01cb5942a1942280c5e4') `
+        '32f7aee7b6ae5b01999db3c6fb933d90d183b4fcfd39ee22662080795544f2f7') `
         'Compatibility legacy SPIR-V words changed.'
     Assert-True ((& git -C $repoRoot status --porcelain) -join "`n" -eq $worktreeStatusBefore) `
         'Temporary artifact compilation modified the worktree.'

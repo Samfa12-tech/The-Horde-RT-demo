@@ -111,8 +111,8 @@ int main()
           "frustum fixture rejects the actual former close pose that cropped the pool");
     const auto previewBefore = session.Snapshot();
     const auto selected = BuildGraphicsPreviewFrameInputs(session,1.0f,WaterQuality::Mobile,
-        FireEmitterQuality::Low,RtSceneTuning{},horde::graphics::ShadowQuality::Lower);
-    check(selected.fireDetail == FireEmitterQuality::Low && selected.shadowQuality == horde::graphics::ShadowQuality::Lower &&
+        FireEmitterQuality::Low,RtSceneTuning{},horde::graphics::ShadowQuality::Current);
+    check(selected.fireDetail == FireEmitterQuality::Low && selected.shadowQuality == horde::graphics::ShadowQuality::Current &&
           selected.tuning.workloadPreset == RtWorkloadPreset::Authored &&
           session.Snapshot().tick == previewBefore.tick && session.Snapshot().timeSeconds == previewBefore.timeSeconds,
           "preview independent policy adapter consumes immutable timeline without advancing gameplay");

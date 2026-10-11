@@ -72,7 +72,7 @@ final class GraphicsPreviewOptions {
             case RESOLUTION: presets = minimum == 33 ? new int[]{33,40,50,63,75,100} : new int[]{50,63,75,100}; break;
             case WATER: return new int[]{0,1,2};
             case FIRE: return new int[]{GraphicsPreferences.FIRE_LOW,GraphicsPreferences.FIRE_MOBILE,GraphicsPreferences.FIRE_HIGH};
-            case SHADOW: return new int[]{GraphicsPreferences.SHADOW_LOWER,GraphicsPreferences.SHADOW_CURRENT,GraphicsPreferences.SHADOW_HIGHER};
+            case SHADOW: return new int[]{GraphicsPreferences.SHADOW_CURRENT,GraphicsPreferences.SHADOW_HIGHER};
             case GLASS:
             case MIST: return new int[]{0,1};
             case DUST: return new int[]{0,1,2};
@@ -101,7 +101,6 @@ final class GraphicsPreviewOptions {
     }
     static String shadowLabel(int value) {
         switch (value) {
-            case GraphicsPreferences.SHADOW_LOWER: return "Lower";
             case GraphicsPreferences.SHADOW_CURRENT: return "Current";
             case GraphicsPreferences.SHADOW_HIGHER: return "Higher";
             default: throw new IllegalArgumentException("Unknown shadow quality");

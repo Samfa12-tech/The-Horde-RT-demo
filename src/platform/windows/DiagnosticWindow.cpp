@@ -460,7 +460,7 @@ struct VulkanSurfaceContext
     // Requested intent is distinct from the ready scene's applied geometry policy.
     bool requestedGlassEnabled = true;
     bool requestedMistEnabled = true;
-    horde::graphics::DustQuality requestedDustQuality = horde::graphics::DustQuality::Off;
+    horde::graphics::DustQuality requestedDustQuality = savedGraphics.dustQuality;
     bool glassGeometryDirty = false;
     std::uint64_t graphicsSerialFloor = 0u;
     ULONGLONG graphicsConfirmationTick = 0u;
@@ -2205,7 +2205,6 @@ const char* GraphicsShadowName(const horde::graphics::ShadowQuality quality)
 {
     switch (quality)
     {
-    case horde::graphics::ShadowQuality::Lower: return "LOWER";
     case horde::graphics::ShadowQuality::Current: return "CURRENT";
     case horde::graphics::ShadowQuality::Higher: return "HIGHER";
     }
@@ -2359,7 +2358,7 @@ void UpdateSettingsLabels(VulkanSurfaceContext& context)
                  "High optical build: physical panes retained; profile is fixed by this build.")
              << "\r\nWater: Off omits water, Mobile refracts, High adds scene reflections."
              << "\r\nFire: Low/Mobile/High use2/4/10 steps; light strength unchanged."
-             << "\r\nShadows: Lower fixed centre1; Current area1; Higher area2/4. Cost unmeasured."
+             << "\r\nShadows: Current area1; Higher area2/4. Cost unmeasured."
              << "\r\nIndoor dust: Off/Low/Standard controls bounded visible motes; cost not yet measured."
              << "\r\nApply needs an RT frame. Keep confirms within 15 foreground seconds."
              << "\r\n" << context.graphicsStatus;
@@ -9550,8 +9549,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 if (sceneContext->graphicsEdit)
                 {
                     auto draft = sceneContext->graphicsEdit->Draft();
-                    draft.shadowQuality = static_cast<horde::graphics::ShadowQuality>(
-                        (static_cast<unsigned>(draft.shadowQuality) + 1u) % 3u);
+                    draft.shadowQuality = horde::graphics::NextShadowQuality(draft.shadowQuality);
                     sceneContext->graphicsEdit->Stage(draft);
                     UpdateSettingsLabels(*sceneContext);
                 }
