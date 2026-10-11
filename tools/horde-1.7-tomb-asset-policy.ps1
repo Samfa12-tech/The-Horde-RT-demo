@@ -3,7 +3,7 @@
 function Get-Horde17TombAssetSpecification {
     @(
         [pscustomobject]@{ Path='models/world/runtime/chapter-terrain-v1/asset.manifest.json'; Bytes=639; Sha256='1ddbc7b615b9b03f99be98c181d88d456c256d6e9b672f937486388c3fba952b'; Platform='Both'; Kind='Json' },
-        [pscustomobject]@{ Path='models/world/runtime/chapter-terrain-v1/chapter-terrain-lod0.runtime.glb'; Bytes=18531656; Sha256='cb7f5e68809963e29b52a26d30d6ba3f36ce29c129e43e713fdcf3c6cebc15a9'; Platform='Both'; Kind='Glb' },
+        [pscustomobject]@{ Path='models/world/runtime/chapter-terrain-v1/chapter-terrain-lod0.runtime.glb'; Bytes=18328048; Sha256='fb21e177b8e67fb553d4853a778603a598908812fc1603ca8a16d94d152a4854'; Platform='Both'; Kind='Glb' },
         [pscustomobject]@{ Path='textures/props/runtime/chapter-terrain/base-color.windows.ktx2'; Bytes=11185312; Sha256='91fa9c1870722069ef930df44f88963f1d38ddefd8e689c26c9ca5ecbe8712b9'; Platform='Windows'; Kind='PropsKtx'; Format=43; Layers=2 },
         [pscustomobject]@{ Path='textures/props/runtime/chapter-terrain/normal.windows.ktx2'; Bytes=11185312; Sha256='2d138ef174528932dcd2c4326d5bfc85663c0fc453ebdccfcbcdec39768db963'; Platform='Windows'; Kind='PropsKtx'; Format=37; Layers=2 },
         [pscustomobject]@{ Path='textures/props/runtime/chapter-terrain/orm.windows.ktx2'; Bytes=11185312; Sha256='9f0a9b6ab1d61affa0459c58bc5000824caeff50f8e17c979109ad24a1d619c8'; Platform='Windows'; Kind='PropsKtx'; Format=37; Layers=2 },

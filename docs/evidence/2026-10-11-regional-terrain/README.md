@@ -79,6 +79,15 @@ lookout sightlines and final foliage/water/landmark visibility remain to inspect
   the candidate under the **unchanged previous manifest limits**.
 - Android Debug build, Java unit lane and lint pass (59 tasks, 1m17s); actual
   APK/world/strict-ASTC package checks pass. This APK has not been installed.
+- First pushed source `8b098d37` failed the closed asset-roster check in
+  [CI run 38115862648](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/38115862648):
+  the terrain GLB's exact-byte pin still named r19. Vulkan host and sanitizer
+  lanes passed; portable host and Android package lanes rejected the stale pin.
+  The same APK reproduced that failure locally. Updating only the terrain's
+  expected byte count and SHA-256 to the admitted r21 payload makes the APK
+  check pass, and the closed-roster negative CTest passes (1/1, 125.89 s).
+  Historical asset pins, capacity limits and rejection assertions are unchanged.
+  Failed logs remain preserved; the correction changes no executable/APK bytes.
 - West Pipeline capture reports production-prop BLAS 7,547,008 bytes, static
   vertex bytes 12,976,128 and index bytes 2,231,148. Twelve-frame average GPU
   command-buffer time is 4.526 ms; this is a short diagnostic sample, **not a
