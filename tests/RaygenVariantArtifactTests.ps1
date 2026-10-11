@@ -541,10 +541,11 @@ try {
     New-Item -ItemType Directory -Path $temporaryRoot | Out-Null
     $genericInclude = Join-Path $repoRoot 'src\vulkan\raytracing\MinimalRayGenShader.inc'
     $legacyInclude = Join-Path $repoRoot 'src\vulkan\raytracing\MinimalLegacyRayGenShader.inc'
-    # These compatibility artifacts include the approved dedicated third-character route, 18-layer ABI and removal of the retired Lower shadow branch; fresh compilation still validates source identity.
-    Assert-True ((Get-CanonicalTextHash $genericInclude) -eq '34ccbe266f4c92145f07182469c35f53c34f1969b8dfb912ec0e9178975b953c') `
+    # Include the indexed-PBR Kit guard admitted at 62a688ae; fresh compilation
+    # still validates source identity and the separately frozen budgets.
+    Assert-True ((Get-CanonicalTextHash $genericInclude) -eq 'e7d8f0ff9f1b7d79a3c7116b1d22c1a584e9186b6b70811bdb68891bd7210b43') `
         'Compatibility generic include changed unexpectedly.'
-    Assert-True ((Get-CanonicalTextHash $legacyInclude) -eq '2e22998480e8b7a09f196aa60f7046dd549a26a69970bedc4193539d1ed49981') `
+    Assert-True ((Get-CanonicalTextHash $legacyInclude) -eq '9d44b02a228ce6b808eb801a589fdd3c98e81b4b2fa989f9b4ee4cdd512cd92c') `
         'Compatibility legacy include changed unexpectedly.'
 
     $lfFixture = Join-Path $temporaryRoot 'canonical-lf-fixture.txt'
@@ -585,12 +586,12 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
     # 1.6.2 independent primary shadow quality specializes OpaqueFast lighting as
     # well as dielectric lighting. The former equal Mobile/High word pairs are
     # no longer the admitted snapshot; keep exact mist/active-fire4, current ABI
-    # and the reviewed shared presentation pre-rotation raw-word witnesses.
+    # and the reviewed shared presentation pre-rotation/indexed-PBR Kit witnesses.
     $opaqueWordPins = @{
-        diagnostic_high_opaque_fast = '37367f71263b8cf0268b2795d8bf20c616b12119ef2af9e057ac93986aef01a8'
-        diagnostic_mobile_opaque_fast = '800c0043a3e01167841ad0dd06d8f08d6dd210edc3ae4bc4acd7dfb1298e3257'
-        shipping_high_opaque_fast = '41917008d534b32f48ff23946a9e2827ceebc23e3fcf2dcbc6281278018b52dc'
-        shipping_mobile_opaque_fast = '95262e6c06f2ad2c81717a2b189b4ca8f81c037a1054d4cd5e063bc82eb75fb4'
+        diagnostic_high_opaque_fast = 'd56178b8af77f767db60233ad41788f838b11a81a36f77f8d924c8bd871ec352'
+        diagnostic_mobile_opaque_fast = 'c0fbc0b539b271399995dbf2bf6d18251a97813861ff9f289e5f97598f66b401'
+        shipping_high_opaque_fast = '792637089a1f7a5ebd7965b68a0d38377180af8a695f7063de82ac0959a4d9f5'
+        shipping_mobile_opaque_fast = '4c5e20822154cc8c3790016bfd26e3c8d4ae3e56e80ec53a94bfc4293e753cc7'
     }
     foreach ($row in @($catalog.variants | Where-Object { $_.material -eq 'OpaqueFast' })) {
         Assert-True ($row.spirvSha256 -ceq $opaqueWordPins[$row.key]) `
@@ -774,13 +775,13 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
     & $compiler -Check -OutputDirectory $compatibilityGenericOutput
     if ($LASTEXITCODE -ne 0) { throw "Generic compatibility freshness failed with exit code $LASTEXITCODE." }
     Assert-True ((Get-RawFileHash (Join-Path $compatibilityGenericOutput 'minimal.rgen.spv')) -eq
-        'c3690ac4866291e6948e8bf0cec99186d64cb00d4a1ca3283fba4aa5b13b73a3') `
+        '5fe611a99a062554bdd58062c3071e5d6fb2da4892eeef446581376365469c59') `
         'Compatibility generic SPIR-V words changed.'
     $compatibilityLegacyOutput = Join-Path $temporaryRoot 'compatibility-legacy'
     & $compiler -Legacy -Check -OutputDirectory $compatibilityLegacyOutput
     if ($LASTEXITCODE -ne 0) { throw "Legacy compatibility freshness failed with exit code $LASTEXITCODE." }
     Assert-True ((Get-RawFileHash (Join-Path $compatibilityLegacyOutput 'minimal.legacy.rgen.spv')) -eq
-        '32f7aee7b6ae5b01999db3c6fb933d90d183b4fcfd39ee22662080795544f2f7') `
+        '90a46eb26bcfa0e1b18676bba364e8a7ed41709792b8d61bd0e9f2d1bccf2739') `
         'Compatibility legacy SPIR-V words changed.'
     Assert-True ((& git -C $repoRoot status --porcelain) -join "`n" -eq $worktreeStatusBefore) `
         'Temporary artifact compilation modified the worktree.'

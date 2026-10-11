@@ -51,6 +51,41 @@ int main()
     const auto crack=Surface::Build(cracked,error);
     check(crack&&!crack->GroundSweep(-.3f,0,.3f,0,0,.24f),"thin unsupported crack was skipped by point sampling");
     check(crack&&!crack->GroundSweep(.3f,0,-.3f,0,0,.24f),"reverse sweep skipped thin crack");
+    check(crack&&crack->HorizontalVolumeClear(-.3f,0,.3f,0,.25f,2.3f,.24f),
+          "elevated volume falsely collides with empty space over a crack");
+    const std::array<Surface::Triangle,2> wall{{
+        {{P{0,0,-.3f},P{0,2,-.3f},P{0,2,.3f}},SupportSurface::Stone},
+        {{P{0,0,-.3f},P{0,2,.3f},P{0,0,.3f}},SupportSurface::Stone}}};
+    const auto solid=Surface::Build(wall,error);
+    check(solid&&!solid->HorizontalVolumeClear(-1,0,1,0,.25f,1.8f,.1f),
+          "elevated volume skipped a vertical wall with no support projection");
+    check(solid&&!solid->HorizontalVolumeClear(1,0,-1,0,.25f,1.8f,.1f),
+          "reverse elevated sweep skipped wall");
+    check(solid&&solid->HorizontalVolumeClear(-1,.6f,1,.6f,.25f,1.8f,.1f),
+          "clear side of wall was blocked");
+    check(solid&&!solid->HorizontalVolumeClear(-1,.39f,1,.39f,.25f,1.8f,.1f),
+          "radius contact at a wall edge was skipped");
+    check(solid&&solid->HorizontalVolumeClear(-1,0,1,0,2.1f,2.3f,.1f),
+          "volume above a short wall collided with its empty extension");
+    check(solid&&!solid->HorizontalVolumeClear(0,0,0,0,.25f,1.8f,.1f),
+          "stationary elevated volume overlapping a wall was accepted");
+    auto oblique=wall;
+    for(auto& t:oblique)for(auto& p:t.points) {const float x=p[0],z=p[2];
+        p[0]=.70710678f*(x+z);p[2]=.70710678f*(z-x);}
+    const auto diagonal=Surface::Build(oblique,error);
+    check(diagonal&&!diagonal->HorizontalVolumeClear(-1,0,1,0,.25f,1.8f,.03f),
+          "oblique thin wall was skipped");
+    auto ceiling=quad(-2,2,-2,2,1.5f,1.5f);
+    for(auto& t:ceiling)std::swap(t.points[1],t.points[2]);
+    const auto roof=Surface::Build(ceiling,error);
+    check(roof&&!roof->HorizontalVolumeClear(-.3f,0,.3f,0,.25f,1.8f,.1f)&&
+          roof->HorizontalVolumeClear(-.3f,0,.3f,0,.25f,1.4f,.1f),
+          "downward overhead face or height clipping was incorrect");
+    check(!solid->HorizontalVolumeClear(0,0,1,0,nan,2,.1f)&&
+          !solid->HorizontalVolumeClear(0,0,1,0,2,1,.1f)&&
+          !solid->HorizontalVolumeClear(0,0,1,0,0,2,0)&&
+          !solid->HorizontalVolumeClear(0,0,100,0,0,2,.1f),
+          "invalid or unbounded elevated sweep was accepted");
     auto sliver=std::vector<Surface::Triangle>();
     for(const auto extent:std::array<std::array<float,3>,3>{{{{-2,.053f,0}},{{.053f,.058f,.3f}},{{.058f,2,0}}}})
         for(const auto& t:quad(extent[0],extent[1],-2,2,extent[2],extent[2]))sliver.push_back(t);

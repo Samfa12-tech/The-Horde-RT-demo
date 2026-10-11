@@ -76,6 +76,19 @@ public:
            !std::isfinite(maximumY)||minimumY>maximumY) return result;
         QueryNode(0,x,z,minimumY,maximumY,result);return result;
     }
+    // Collision query for an elevated horizontal volume, independent of ground
+    // eligibility. Empty space over a hole is clear; upward/downward and steep
+    // imported faces within the height band are solids. This is a fixed-height
+    // swept cylinder, not a general rotating item or character physics solver.
+    bool HorizontalVolumeClear(float fromX,float fromZ,float toX,float toZ,
+                               float minimumY,float maximumY,float radius) const
+    {
+        for(float v:{fromX,fromZ,toX,toZ,minimumY,maximumY,radius})
+            if(!std::isfinite(v)||std::abs(v)>1000000.f)return false;
+        if(minimumY>maximumY||radius<=0||radius>2||
+           std::hypot(toX-fromX,toZ-fromZ)>16)return false;
+        return HorizontalVolumeNodeClear(0,fromX,fromZ,toX,toZ,minimumY,maximumY,radius);
+    }
     // Ground-footprint sweep only. Authored obstacle/body-clearance tests remain
     // separate; this cannot certify capsule clearance under branches or roofs.
     bool GroundSweep(float fromX,float fromZ,float toX,float toZ,float supportY,
@@ -123,6 +136,87 @@ private:
     std::vector<Point> normals_;
     std::vector<std::uint32_t> order_;
     std::vector<Node> nodes_;
+    using Polygon=std::array<Point,6>;
+    static std::size_t ClipHeight(const Polygon& input,std::size_t count,
+                                  float height,bool keepAbove,Polygon& output)
+    {
+        if(!count)return 0;
+        std::size_t out=0;
+        auto previous=input[count-1];
+        bool previousInside=keepAbove?previous[1]>=height:previous[1]<=height;
+        for(std::size_t i=0;i<count;++i) {
+            const auto current=input[i];
+            const bool inside=keepAbove?current[1]>=height:current[1]<=height;
+            if(inside!=previousInside) {
+                const double t=(double(height)-previous[1])/(double(current[1])-previous[1]);
+                output[out++]={float(previous[0]+t*(double(current[0])-previous[0])),height,
+                               float(previous[2]+t*(double(current[2])-previous[2]))};
+            }
+            if(inside)output[out++]=current;
+            previous=current;previousInside=inside;
+        }
+        return out;
+    }
+    static double Cross2(Point a,Point b,Point c)
+    {
+        return (double(b[0])-a[0])*(double(c[2])-a[2])-
+               (double(b[2])-a[2])*(double(c[0])-a[0]);
+    }
+    static double PointSegmentDistanceSquared(Point p,Point a,Point b)
+    {
+        const double dx=double(b[0])-a[0],dz=double(b[2])-a[2],length=dx*dx+dz*dz;
+        const double t=length>0?std::clamp(((double(p[0])-a[0])*dx+
+                            (double(p[2])-a[2])*dz)/length,0.0,1.0):0;
+        const double x=double(p[0])-a[0]-t*dx,z=double(p[2])-a[2]-t*dz;
+        return x*x+z*z;
+    }
+    static double SegmentDistanceSquared(Point a,Point b,Point c,Point d)
+    {
+        const double abC=Cross2(a,b,c),abD=Cross2(a,b,d),cdA=Cross2(c,d,a),cdB=Cross2(c,d,b);
+        const bool overlap=std::max(a[0],b[0])>=std::min(c[0],d[0])&&
+            std::max(c[0],d[0])>=std::min(a[0],b[0])&&
+            std::max(a[2],b[2])>=std::min(c[2],d[2])&&
+            std::max(c[2],d[2])>=std::min(a[2],b[2]);
+        if(overlap&&((abC<=0&&abD>=0)||(abC>=0&&abD<=0))&&
+           ((cdA<=0&&cdB>=0)||(cdA>=0&&cdB<=0)))return 0;
+        return std::min({PointSegmentDistanceSquared(a,c,d),PointSegmentDistanceSquared(b,c,d),
+                         PointSegmentDistanceSquared(c,a,b),PointSegmentDistanceSquared(d,a,b)});
+    }
+    static bool ProjectedPolygonContains(const Polygon& polygon,std::size_t count,Point p)
+    {
+        bool positive=false,negative=false;
+        double area=0;
+        for(std::size_t i=0;i<count;++i) {
+            const auto a=polygon[i],b=polygon[(i+1)%count];
+            const auto cross=Cross2(a,b,p);positive|=cross>0;negative|=cross<0;
+            area+=double(a[0])*b[2]-double(b[0])*a[2];
+        }
+        return std::abs(area)>1e-12&&!(positive&&negative);
+    }
+    bool HorizontalVolumeNodeClear(std::uint32_t index,float x,float z,float toX,float toZ,
+                                  float minY,float maxY,float radius) const
+    {
+        const auto& node=nodes_[index];
+        if(std::max(x,toX)+radius<node.minimum[0]||std::min(x,toX)-radius>node.maximum[0]||
+           std::max(z,toZ)+radius<node.minimum[2]||std::min(z,toZ)-radius>node.maximum[2]||
+           maxY<node.minimum[1]||minY>node.maximum[1])return true;
+        if(!node.count)return HorizontalVolumeNodeClear(node.left,x,z,toX,toZ,minY,maxY,radius)&&
+                               HorizontalVolumeNodeClear(node.right,x,z,toX,toZ,minY,maxY,radius);
+        const Point from{x,0,z},to{toX,0,toZ};
+        const double radiusSquared=double(radius)*radius;
+        for(auto i=node.begin;i<node.begin+node.count;++i) {
+            Polygon a{},b{};
+            const auto& triangle=triangles_[order_[i]];
+            std::copy(triangle.points.begin(),triangle.points.end(),a.begin());
+            const auto first=ClipHeight(a,3,minY,true,b);
+            const auto count=ClipHeight(b,first,maxY,false,a);
+            if(!count)continue;
+            if(ProjectedPolygonContains(a,count,from)||ProjectedPolygonContains(a,count,to))return false;
+            for(std::size_t edge=0;edge<count;++edge)
+                if(SegmentDistanceSquared(from,to,a[edge],a[(edge+1)%count])<=radiusSquared)return false;
+        }
+        return true;
+    }
     static std::size_t NodeCount(std::size_t triangles)
     {
         return triangles<=8?1:1+NodeCount(triangles/2)+NodeCount(triangles-triangles/2);

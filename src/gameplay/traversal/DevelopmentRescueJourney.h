@@ -42,18 +42,15 @@ inline simulation::PlayerSupportResolution RescueExteriorSupport(float x,float z
     }
     return support;
 }
-inline bool RescueExteriorMovementClear(float fromX,float fromZ,float toX,float toZ,
-                                        float supportY,float radius) {
+inline bool RescueExteriorVolumeClear(float fromX,float fromZ,float toX,float toZ,
+                                      float minimumY,float maximumY,float radius) {
     if(!std::isfinite(fromX)||!std::isfinite(fromZ)||!std::isfinite(toX)||
-       !std::isfinite(toZ)||!std::isfinite(supportY)||!std::isfinite(radius)||radius<=0)
+       !std::isfinite(toZ)||!std::isfinite(minimumY)||!std::isfinite(maximumY)||
+       minimumY>=maximumY||!std::isfinite(radius)||radius<=0)
         return false;
-    // Sweep the conservative horizontal capsule envelope through the actual
-    // retained blockout boxes. Geometry at/below the feet is support, and
-    // geometry above the baseline body height is not an obstacle. This does
-    // not add a general step/fall solver or apply to the traversal handoff.
+    // Conservative horizontal volume against the actual retained boxes.
     for(const auto& box:horde::scene::kRescueBlockoutBoxes) {
-        if(box.maximum[1]<=supportY+.001f ||
-           box.minimum[1]>=supportY+(kShowcaseEyeWorldY-kRouteFloorWorldY)) continue;
+        if(box.maximum[1]<=minimumY || box.minimum[1]>=maximumY) continue;
         float enter=0.0f,leave=1.0f;
         const auto axis=[&](float from,float to,float minimum,float maximum) {
             const float delta=to-from;
@@ -67,6 +64,11 @@ inline bool RescueExteriorMovementClear(float fromX,float fromZ,float toX,float 
            axis(fromZ,toZ,box.minimum[2]-radius,box.maximum[2]+radius)) return false;
     }
     return true;
+}
+inline bool RescueExteriorMovementClear(float fromX,float fromZ,float toX,float toZ,
+                                        float supportY,float radius) {
+    return RescueExteriorVolumeClear(fromX,fromZ,toX,toZ,supportY+.001f,
+        supportY+(kShowcaseEyeWorldY-kRouteFloorWorldY),radius);
 }
 inline bool AtRopeEndpoint(float x,float z,bool exterior) {
     const auto p=exterior?kExteriorLanding:kLowerLanding;

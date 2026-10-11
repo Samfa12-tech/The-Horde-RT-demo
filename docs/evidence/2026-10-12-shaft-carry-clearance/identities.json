@@ -1,0 +1,489 @@
+{
+  "schema": 1,
+  "date": "2026-10-12",
+  "sourceParent": "a5ac1299045adef5177b1983a677707789af2df8",
+  "sourceFiles": [
+    {
+      "path": "src/gameplay/items/HeldItemKinematics.cpp",
+      "sha256": "6ad2e6cb2fdd3a6dfdc22c00ff1e47d69495621b99f604caeb46e47b00abf789"
+    },
+    {
+      "path": "src/gameplay/simulation/TriangleSupportSurface.h",
+      "sha256": "093af20e590631267ec7e6439177559eff2ba710ba752890296fba2bde2ccc23"
+    },
+    {
+      "path": "src/gameplay/traversal/ChapterTerrainMovement.h",
+      "sha256": "e94e083cfa65a3acbe8beaf905e39f04571bd47e000cdf8dadc6abc476aa80f9"
+    },
+    {
+      "path": "src/gameplay/traversal/DevelopmentRescueJourney.h",
+      "sha256": "243de2a58c39525943fbc0fbd6befdd8719dd7171592bd295fa2de216db79cbb"
+    },
+    {
+      "path": "tests/RescueJourneyIntegrationTests.cpp",
+      "sha256": "f57ec5df24c0d1e1cc1358d8bb7c77533519af2be84ef1004df7e71cacbf4604"
+    },
+    {
+      "path": "tests/TriangleSupportSurfaceTests.cpp",
+      "sha256": "06d083aebc50f68280d76272e66e21de4ec86440d5cb93c37cb76bd5aebf3be8"
+    },
+    {
+      "path": "tests/RaygenVariantArtifactTests.ps1",
+      "sha256": "4cf1e9be25b7e12f9f02a9f4b9c269fda451f67cef4aa3272302a0b9127e76ad"
+    },
+    {
+      "path": "tests/RaygenVariantManifestTests.ps1",
+      "sha256": "e0a187a8713d628e1827eb1c3b32d1d58393acbdc5d20a2ca858b2b00c908d8a"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+      "bytes": 12506624,
+      "sha256": "a399cef103724efce8fcd615f218454427680d92e262ca6dd0e498bd677c546c"
+    },
+    {
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+      "bytes": 4358144,
+      "sha256": "cdb0d19bf4126e8af428d741004c86585a58b99e61a84159f99e76c105d874bc"
+    },
+    {
+      "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "bytes": 172739323,
+      "sha256": "0b438a8b06d2cc583a124363c15203bc08f6353106a81b1d3cc4f53e5a040f02"
+    }
+  ],
+  "budgetFiles": [
+    {
+      "path": "tools\\raygen-variant-budgets.json",
+      "sha256": "56936479b2d202dbdb9393ba94b66a1b0bc12d490b700d8af4c63de3460e53bf"
+    },
+    {
+      "path": "docs\\experiments\\1.6.2-mist\\raygen-variant-budgets.candidate.json",
+      "sha256": "0f130f8f1e50623772bf857561adafee23e730e2691c35e31cb6455df4b258ba"
+    },
+    {
+      "path": "docs\\ENGINEERING_1_6_2_SHADER_BUDGET_REVIEW.md",
+      "sha256": "a0d9b5b9252674d309fa838149d89e5552cec831843f193b9422017a89526ff4"
+    },
+    {
+      "path": "docs\\superpowers\\plans\\2026-10-09-horde-1.7-wp2-shader-budget-admission.md",
+      "sha256": "34c44bea276c26cf0385d13a8182594e75e474a3c79ccfc1549f0014c9fe8b9c"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-vertical-proof\\shader-budget-deltas.json",
+      "sha256": "681dfa8a747ad2dc34e0ab66f66792c0d84f391a45f68d008dff5a0f88df5830"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\android-debug-arm64-package.log",
+      "sha256": "13588792a49e99982d785879d7bf12278a438956cbb61c68e6aaec72273663a7"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\android-all-abi-check.log",
+      "sha256": "3ff843e095312835071e2670b4b7aac42b42d5d1e0f9719acaa7615749300932"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\android-all-abi-check-retry.log",
+      "sha256": "81fd6eb4e19ef95ef267a7425686dc9f38861a66e55bc7b8edd788f1d89d4f58"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\android-fresh-java-evidence.log",
+      "sha256": "ad9edba52ebc1d7220946180b1eeef7e6c0e6e62c5112a64d42d9dccde4fab53"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\android-fresh-java-evidence.json",
+      "sha256": "00b19f2f6e127150dabb9727954904c07eb931141e30690bc49c4f6373259efe"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\android-fresh-selected-java-tests.log",
+      "sha256": "e3e90689af6b2d1eb54d213324554c33f3e3e83aadd4ca1798a828721bcc297c"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\android-gradle-test-task-help.log",
+      "sha256": "ee826a60677ffe3a867cb38bbfd9162da78198116db8265f3e04789bb473c9ec"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\android-package-evidence.json",
+      "sha256": "a5a90377ba0b2c95cc1f9e58cd6585969aadb8f30855d6d4980adba45450cee4"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\android-gradle.log",
+      "sha256": "6b45d10ba1d3d76f36bba1954ffb7101a47567f4f511af4c7238f8742368ff7a"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\android-release-arm64-package.log",
+      "sha256": "1ff54cbb2b36c3e25238af8d71eb2f1639f7ebbb5a1ebe7159bd20746a3fc7ac"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\configure-debug.log",
+      "sha256": "7538c2b2084ebf2029bb36af72adf8538ac9e6ec4bc6d54c1875689e42327dbd"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\compatibility-opaque.log",
+      "sha256": "931baf5f8ae15cd3091c745448f384f55aab90759e4033368f8fc68d70276f2d"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\compatibility-opaque-corrected.log",
+      "sha256": "b72077e196de53c94315f881aefb92d55c1ffd0077d8a6aa8a9ab4eed2e66ec0"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\compatibility-generic.log",
+      "sha256": "931baf5f8ae15cd3091c745448f384f55aab90759e4033368f8fc68d70276f2d"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\compatibility-generic-corrected.log",
+      "sha256": "170eef05983cffcaa8632aa60366d3d584a2caa6bcd2cc43dd19356761980251"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\catalog-check-one-low-rollback.log",
+      "sha256": "f56d60ed790020430df73a3fe4608f57b1189fe0e93227847d26416be9c8b1f4"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\capture-windows-package-identities.log",
+      "sha256": "a2daf709785ecf64fb66012b86561ecd96eb4ad884284b3967df5f3052c7bdec"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\approved-budget-delta.json",
+      "sha256": "ca69c09ad7802023e2ce4d03771cbd322f1268d6f7b2e05174d519463ca1ca32"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\final-integrity.json",
+      "sha256": "2fdb89b38b9953bea53ed6684ee61e817f2b5ba7cb7360b22820bbbebea2ec35"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\derived-witness-deltas.json",
+      "sha256": "50cb6e511d680c9c5b3ebb7739840c252cfc1696fc809831ef331d984f167f71"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\custody-and-scope.json",
+      "sha256": "931b74307b41059b3d381bc61fc1db0f80f1171f88ee98bdf8700a13fc160ec2"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\configure-release.log",
+      "sha256": "2195c11cae8a8646015d47f3649f77fae1a211ac6fe41c8499b112bd6035617a"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\log-identities.json",
+      "sha256": "39730c2dff4bb03b5c120556ca9036405c9a5b1cef2265f103ab284e03a5e128"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\full-metrics-and-packages.json",
+      "sha256": "b83cb7efe1da27e740fda6e42f9078a300c97146fbad7e92f585d08d589c1423"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\native-debug-build.log",
+      "sha256": "d68b5caf4bbb14d50b48884bd5dfcf10184d951eff65573b8066e817d4c19648"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\native-debug-test.log",
+      "sha256": "d6930c42ef1ced40809a2bffe417584eefc0f8b6d4a5b847a253de2b03e53041"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\native-release-build.log",
+      "sha256": "28e0aa95ccb73e50a7803e735556e9d2994b66dc86c97cf6b38114dd2d896a1e"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\windows-release-package.log",
+      "sha256": "1de1f5517641b58812329f6268f87eaea27bbfe40ba010ec8740ac8f951e180a"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\windows-release-package-detail.log",
+      "sha256": "ecaabc855b3a47e6d24dd4b040c81c3e091ee5f9338cd546221d5a8e09f03dc4"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\windows-package-identities.json",
+      "sha256": "8e70fd8f67af72a05d523485db50c721c8c6e5ffaecd7113dfda031806df04c9"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\windows-debug-policy-package.log",
+      "sha256": "243897521ecae5d72a03cc97857c50f8bd30895060266a9f1db338251f6844b4"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\windows-debug-package-detail.log",
+      "sha256": "4cc5e0d2a00baf2b1da416d138e33e041d72dfd9f2875b7c5905c9b83c7696ae"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\verify-and-admit.log",
+      "sha256": "9f4690336dcefd9906c45b3441f36c0488b740b489bb63a585be3de742fe2b4c"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\torch-release-full.log",
+      "sha256": "6f5b560474b255ce05e8a14e4c7e320d1f0eac416055a77f6d08d2ab7d3357df"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\torch-fresh-results.json",
+      "sha256": "769b9b05ba20b659e09009b921f6ebc0aaf9f812639b66ec06a0ae437de3ad9a"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\torch-debug-full.log",
+      "sha256": "7daf1af645a23ea6d70f0122d1de7bc4e9b41e694657434c985eb0a9f2921416"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\source-to-package-provenance.json",
+      "sha256": "ecab70e5d84a784cbc0814c1ca0c9ebf2a7125d669bfe651c1f30a4a4eb10860"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\shader-contracts.log",
+      "sha256": "03bbbffb472e1f40b56c1f3ef142ccb27710c9980933c805ec4a5f92bf4058d5"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\selected-native-checks.json",
+      "sha256": "5d2a5a57afed78886b08a51d6a7a479624f74c67ad7011b893e07de94d991815"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\runs.jsonl",
+      "sha256": "af70a657111c259cb60823c90d44f2b9db0ec2dbb98aaa1f74114836c1c9a936"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\reproduce-matrix.log",
+      "sha256": "9f77db527069d3eb4cd67ce69bd357c5d6ced5d0de96a56684899918f514dfab"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\recorded-toolchain-verified.json",
+      "sha256": "cc31811227900bd2736850be3106965b8a8f44481280aa0fb2d0b3aea331e810"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\receipt.json",
+      "sha256": "cb752b05c863cfbba53fef016e8269d948f1d970d8f8dd91dec7ce540a02c0bb"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\rayquery-current-check.log",
+      "sha256": "e99dd0241ff280c0a52ed30a3fa79fa3651d357f253b56c31e2a002a96abfada"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\prepare-derived-gates.log",
+      "sha256": "211088c0a9bd2a87dfb1f1d5c3b6b657cf9d25f6eff43febc3ced90cf8672872"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\pipeline-freeze.log",
+      "sha256": "6e77261baae4020133fcb3d68a191088fcf23a210f6fe284b4f48003fb9ec40d"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\pipeline-adapter.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\pipeline-adapter-check.log",
+      "sha256": "359cc7dcf5d4ed04eb4981a4c93826f746f2e506f698e2e1e9c553b9973c4bf9"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\one-unit-low-fixtures.json",
+      "sha256": "811927427efd1965113ac8ebd05a8e207c24e2c47705e0214f130dd25a9a9e8e"
+    },
+    {
+      "path": "docs\\evidence\\2026-10-09-wp2-shader-budget-admission\\native-release-test.log",
+      "sha256": "d8bfc3b6daf18c61e2163a2fe242453e1c3b034cb9568810c81d989da8d7ffc9"
+    }
+  ],
+  "backupSha256": "0dae1e8fb803336cef2d045f48c5f4c9195a6463f45161cb0b6c7434350769fb",
+  "shaderFiles": [
+    {
+      "path": "docs/evidence/2026-10-01-opaque-secondary/modules/control/rayquery_compute_shipping_mobile_generic_dielectric-spirv-dis.log",
+      "sha256": "8c94d0f8f9f8a69931ebd2f395e73998caedccd26486b6b1ae94ce7aedf1d6e0"
+    },
+    {
+      "path": "docs/evidence/2026-10-01-opaque-secondary/modules/control/rayquery_compute_shipping_mobile_generic_dielectric-spirv-val.log",
+      "sha256": "c3440a00ac7b25601fd2c8677d31972485facb151718e3a717e357b8cea0b392"
+    },
+    {
+      "path": "docs/evidence/2026-10-01-opaque-secondary/modules/control/rayquery_compute_shipping_mobile_opaque_fast-spirv-dis.log",
+      "sha256": "ca1d03bcb38c277d97cf1326b2cffdaa62e8b29ef59e1c0440674fa413f36466"
+    },
+    {
+      "path": "docs/evidence/2026-10-01-opaque-secondary/modules/control/rayquery_compute_shipping_mobile_opaque_fast-spirv-val.log",
+      "sha256": "41fb7c4bedda1539b4687c73e84ec7e3ad921e7ef18c988806613db467b7080f"
+    },
+    {
+      "path": "docs/evidence/2026-10-01-opaque-secondary/modules/control/shipping_mobile_generic_dielectric-spirv-dis.log",
+      "sha256": "31b84e5d9996acbdd9a6d2866330b63b8edbe32015d29c830afdfe7d5692ccb9"
+    },
+    {
+      "path": "docs/evidence/2026-10-01-opaque-secondary/modules/control/shipping_mobile_generic_dielectric-spirv-val.log",
+      "sha256": "19686f5c2f39f788164a7dddacd947a7cd9b5f20ef2fd58b0e615a684ba1bbfa"
+    },
+    {
+      "path": "docs/evidence/2026-10-01-opaque-secondary/modules/control/shipping_mobile_opaque_fast-spirv-dis.log",
+      "sha256": "3f5e28cf621bbd29f733609120e8bb580696a6430a05e310bbdf90d1666de479"
+    },
+    {
+      "path": "docs/evidence/2026-10-01-opaque-secondary/modules/control/shipping_mobile_opaque_fast-spirv-val.log",
+      "sha256": "b781e60c90f6418a66f4160b6c24aba91e93a59be24e0994ba7dfd3e7f878a11"
+    },
+    {
+      "path": "docs/evidence/2026-10-01-opaque-secondary/modules/isolate/rayquery_compute_shipping_mobile_generic_dielectric-spirv-dis.log",
+      "sha256": "a36d2758d583ab1cef667bb3a425f9cc7fabac1c52033b98dece0af9a9380680"
+    },
+    {
+      "path": "docs/evidence/2026-10-01-opaque-secondary/modules/isolate/rayquery_compute_shipping_mobile_generic_dielectric-spirv-val.log",
+      "sha256": "29d894d50e3c509434648de8bf2b0dc7397b03b02664c65f25a91be371fa8ab3"
+    },
+    {
+      "path": "docs/evidence/2026-10-01-opaque-secondary/modules/isolate/rayquery_compute_shipping_mobile_opaque_fast-spirv-dis.log",
+      "sha256": "ab53a60ae8282e6a2cc1639920ae7212c8d01f8abcbb74e8fead9cca86a303d3"
+    },
+    {
+      "path": "docs/evidence/2026-10-01-opaque-secondary/modules/isolate/rayquery_compute_shipping_mobile_opaque_fast-spirv-val.log",
+      "sha256": "10fe46c19bdda39c73a10847455926cdfdb2d6a4c1f602e2bec0ca0e1dc4678e"
+    },
+    {
+      "path": "docs/evidence/2026-10-01-opaque-secondary/modules/isolate/shipping_mobile_generic_dielectric-spirv-dis.log",
+      "sha256": "1f383915a3b948762ea2ff08bb26b81ba560a913ecd78c641190c855c7fc6d84"
+    },
+    {
+      "path": "docs/evidence/2026-10-01-opaque-secondary/modules/isolate/shipping_mobile_generic_dielectric-spirv-val.log",
+      "sha256": "9c358ede84596098970a029434c4e8f530ef0e984e685bc6c67916d3f540c58f"
+    },
+    {
+      "path": "docs/evidence/2026-10-01-opaque-secondary/modules/isolate/shipping_mobile_opaque_fast-spirv-dis.log",
+      "sha256": "179b2705063dfcd15e88aa5ff7fa3bd76609ce239625ad37cb866e9038e1fdc7"
+    },
+    {
+      "path": "docs/evidence/2026-10-01-opaque-secondary/modules/isolate/shipping_mobile_opaque_fast-spirv-val.log",
+      "sha256": "3cd2de58cd10c2aa245c4b64c3e1f629b9094ebe1d6dfad3076bf720e8497a94"
+    },
+    {
+      "path": "docs/evidence/2026-10-01-primary-hit-reference/audit-primary-hit-packaged-20261001-retry2/control-rayquery_compute_shipping_mobile_generic_dielectric-spirv-dis.log",
+      "sha256": "8c94d0f8f9f8a69931ebd2f395e73998caedccd26486b6b1ae94ce7aedf1d6e0"
+    },
+    {
+      "path": "docs/evidence/2026-10-01-primary-hit-reference/audit-primary-hit-packaged-20261001-retry2/control-rayquery_compute_shipping_mobile_generic_dielectric-spirv-val.log",
+      "sha256": "c3440a00ac7b25601fd2c8677d31972485facb151718e3a717e357b8cea0b392"
+    },
+    {
+      "path": "docs/evidence/2026-10-01-primary-hit-reference/audit-primary-hit-packaged-20261001-retry2/control-rayquery_compute_shipping_mobile_opaque_fast-spirv-dis.log",
+      "sha256": "ca1d03bcb38c277d97cf1326b2cffdaa62e8b29ef59e1c0440674fa413f36466"
+    },
+    {
+      "path": "docs/evidence/2026-10-01-primary-hit-reference/audit-primary-hit-packaged-20261001-retry2/control-rayquery_compute_shipping_mobile_opaque_fast-spirv-val.log",
+      "sha256": "41fb7c4bedda1539b4687c73e84ec7e3ad921e7ef18c988806613db467b7080f"
+    },
+    {
+      "path": "docs/evidence/2026-10-01-primary-hit-reference/audit-primary-hit-packaged-20261001-retry2/control-shipping_mobile_generic_dielectric-spirv-dis.log",
+      "sha256": "31b84e5d9996acbdd9a6d2866330b63b8edbe32015d29c830afdfe7d5692ccb9"
+    },
+    {
+      "path": "docs/evidence/2026-10-01-primary-hit-reference/audit-primary-hit-packaged-20261001-retry2/control-shipping_mobile_generic_dielectric-spirv-val.log",
+      "sha256": "19686f5c2f39f788164a7dddacd947a7cd9b5f20ef2fd58b0e615a684ba1bbfa"
+    },
+    {
+      "path": "docs/evidence/2026-10-01-primary-hit-reference/audit-primary-hit-packaged-20261001-retry2/control-shipping_mobile_opaque_fast-spirv-dis.log",
+      "sha256": "3f5e28cf621bbd29f733609120e8bb580696a6430a05e310bbdf90d1666de479"
+    },
+    {
+      "path": "docs/evidence/2026-10-01-primary-hit-reference/audit-primary-hit-packaged-20261001-retry2/control-shipping_mobile_opaque_fast-spirv-val.log",
+      "sha256": "b781e60c90f6418a66f4160b6c24aba91e93a59be24e0994ba7dfd3e7f878a11"
+    },
+    {
+      "path": "docs/evidence/2026-10-01-primary-hit-reference/audit-primary-hit-packaged-20261001-retry2/reference-rayquery_compute_shipping_mobile_generic_dielectric-spirv-dis.log",
+      "sha256": "5bf5521452515b527d8430f65ca1bd6473b429e5d147b8a138044a00c4f32893"
+    },
+    {
+      "path": "docs/evidence/2026-10-01-primary-hit-reference/audit-primary-hit-packaged-20261001-retry2/reference-rayquery_compute_shipping_mobile_generic_dielectric-spirv-val.log",
+      "sha256": "0a4c87977d08e069afe3893d5f3afa387838d110e2e4c8f7f416f129795ccb88"
+    },
+    {
+      "path": "docs/evidence/2026-10-01-primary-hit-reference/audit-primary-hit-packaged-20261001-retry2/reference-rayquery_compute_shipping_mobile_opaque_fast-spirv-dis.log",
+      "sha256": "ce1bed0db090a61ebc5141db0b8f377f2f3e0569789c1d93c64b1bec71ce7490"
+    },
+    {
+      "path": "docs/evidence/2026-10-01-primary-hit-reference/audit-primary-hit-packaged-20261001-retry2/reference-rayquery_compute_shipping_mobile_opaque_fast-spirv-val.log",
+      "sha256": "e9ade15ee83e507d7bdb521738a7a9b75a009e98799394386fb3f8353ea82580"
+    },
+    {
+      "path": "docs/evidence/2026-10-01-primary-hit-reference/audit-primary-hit-packaged-20261001-retry2/reference-shipping_mobile_generic_dielectric-spirv-dis.log",
+      "sha256": "81f62e784dd6c64aad9463de9fdf8d885cc57ea0f3f3f7fbcf57e5c66999a152"
+    },
+    {
+      "path": "docs/evidence/2026-10-01-primary-hit-reference/audit-primary-hit-packaged-20261001-retry2/reference-shipping_mobile_generic_dielectric-spirv-val.log",
+      "sha256": "4a57a3bef0d9c742ac70f4c9db92ee8fc6ac0d4723e1a76bd3c788e7fbee1a8e"
+    },
+    {
+      "path": "docs/evidence/2026-10-01-primary-hit-reference/audit-primary-hit-packaged-20261001-retry2/reference-shipping_mobile_opaque_fast-spirv-dis.log",
+      "sha256": "a9ec5677c79c37dcadd15e91569bc21fbd0f57a81f58f708461b8c6c8aace7fb"
+    },
+    {
+      "path": "docs/evidence/2026-10-01-primary-hit-reference/audit-primary-hit-packaged-20261001-retry2/reference-shipping_mobile_opaque_fast-spirv-val.log",
+      "sha256": "a47b6c3129b256c75858d0ac7f6296f40a07e99f4fa23fd716b288e117b7a54b"
+    },
+    {
+      "path": "shaders/README.md",
+      "sha256": "9b68e260625a9cca7e6f20cf3b3eccad45589c48033ec8bf8dac1dfe2dc98efd"
+    },
+    {
+      "path": "shaders/raytracing/README.md",
+      "sha256": "edb0fbd2fae39809b6f4806d643d471a1fa243f393051bea59e2159447a4ac2c"
+    },
+    {
+      "path": "shaders/raytracing/experimental/staged_primary_record.glsl",
+      "sha256": "caa851350ec1f14845ea3c59e63aa6ac820685dc42ec720cd7695124edecf5bc"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_atmosphere.glsl",
+      "sha256": "cc5fe1a124357663279bf000349277d5f82d1a29ebd8a3e1f9c8cc8113a7016a"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_diagnostics.glsl",
+      "sha256": "50028bb601d18546110ea546de9c9dcee0cfad89a5520ef448756e43206f2bb4"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_dielectric_common.glsl",
+      "sha256": "54ea2f2b2d1c898fcd93fad561d5dcd53b4e942ba245a1639ad45abcedcf028e"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_dielectric_spawn.glsl",
+      "sha256": "652200988024f3bdb5f61284474f5d6b34d0777743d2989ce342203bc7fbe5c7"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_dielectric_transport.glsl",
+      "sha256": "10b109115a509ef2865e68b463f200f3df6c98d50f5834633435d0dfee7a17ae"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_fire.glsl",
+      "sha256": "74b5130bc37f2b601fca6181736bcb402a583e2a7c1fcf8a1be8b7c07c7cc57f"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_frame.glsl",
+      "sha256": "6541ff4011f3051ed89752c04de6beb2af90a002011b705f63c96fdf8ab835b2"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_hit_decode.glsl",
+      "sha256": "1138e46d1d79b38ed2098888f533c228cc3b8b30d21c506a467738cf12b23b1c"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_indoor_dust.glsl",
+      "sha256": "63f2bdd44c4500926d68b05c834f4916bbfe7f438d9f06c2ba537d39ddc7d865"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_lighting.glsl",
+      "sha256": "bf833307850b4681e67c2168318a564835a3e0667fb4f83af8f7275d01692df5"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_scene_abi.generated.glsl",
+      "sha256": "6d4cb15eacc3a2ed38b311e7138450d19b4314f9a1c7db9ff97ae9354baf661a"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_scene_abi.glsl",
+      "sha256": "467b95c024fcee6e0fb2224680f9555c944c705a6984b14afbd8f071e8ae4577"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_variant_config.glsl",
+      "sha256": "b75a99a9c7789d0dc89c180d0c5918077d64274d08ec86fb523ae092318c3f5c"
+    },
+    {
+      "path": "shaders/raytracing/minimal.comp",
+      "sha256": "e7f78df4a5233b0fa4488b80a6f130227a7ee92170f44e5ba75c16dd06a06594"
+    },
+    {
+      "path": "shaders/raytracing/minimal.rchit",
+      "sha256": "59a374fa105f231f9ade604212d731a475f07f22c723fff6b0e0089dd2cd2a37"
+    },
+    {
+      "path": "shaders/raytracing/minimal.rgen",
+      "sha256": "bdad62d56ed79e2c4beb9ff3830628ac6d3ad94f9ef8863911228ca059d74ced"
+    },
+    {
+      "path": "shaders/raytracing/minimal.rmiss",
+      "sha256": "7bcc1b7fbdcf1802ed80ec25ccae50f20e9e7239026d767c0e7ba5f110ada936"
+    }
+  ]
+}

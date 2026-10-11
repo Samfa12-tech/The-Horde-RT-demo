@@ -317,3 +317,34 @@ Lower shadows instead of repairing that tier. Current/Higher remain, with saved
 Lower values migrating to Current. [Removal, migration and RT evidence](../evidence/2026-10-11-retired-lower-shadows/README.md)
 record the bounded change; phone acceptance and sustained performance remain
 separate. No other issue or released 1.6.2 artifact is changed by that direction.
+
+### Current playable integration (12 October)
+
+Visible Kit is now admitted at `62a688ae` with the approved Warden's indexed PBR
+geometry, existing idle/walk clips and matching native terrain support. This
+supersedes the older source-only/missing-visible-Kit rows above. The existing third
+character BLAS is rebuilt when ownership changes from the fully dissolved Keeper
+to Kit, then refitted for poses; both waterfall lanes remain independent. No
+fourth instance or nineteenth texture layer. [Actual reunion/departure frames on
+both RT backends](../evidence/2026-10-11-kit-scene-admission/README.md) were inspected.
+Actor allocation reuse is not streaming: shared world/texture and Keeper source
+resources still remain resident, and true two-way zone lifetime work is required.
+
+The diagnostic settling fix at `a5ac1299` passed all six exact-commit CI jobs;
+north/down-shaft carry failures were preserved. The new [shaft-clearance correction
+and matched gallery](../evidence/2026-10-12-shaft-carry-clearance/README.md) separates
+elevated item collision from movement support. Both actual RT backends now retain
+the arms/lantern over the opening while real solids still retract them. It also
+reproduces and repairs stale exact-word shader test witnesses from Kit admission,
+without changing production shader code or frozen ceilings.
+
+The chapter remains incomplete. Next physical integration replaces the old
+overhead cantilever with the requested grounded stake and a rope contacting the
+rim. The lower hanging span, grounded anchor and separately reachable pull-up/
+descent grips must be solved together; simply lowering the old anchor would put
+upper grips outside the standing character's admitted reach. Preserve the accepted
+deployment timing, gravity/bump response, traversal speed, stowed equipment/light,
+safe-side recovery and reset/readiness generations. Graveyard/lid composition,
+GPU zone preparation/retirement, complete inspected traversal, sustained measurements
+and the current owner/phone acceptance gates remain required. Replacement tree
+generator/canopy work and mist issue28 stay deferred by the owner.

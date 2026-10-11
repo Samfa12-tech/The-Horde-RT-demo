@@ -1,0 +1,6 @@
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\reports\shaft-carry-compat-legacy\minimal.legacy.rgen.resolved
+Raygen check artifacts: C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\reports\shaft-carry-compat-legacy
+Source dependency SHA-256: 008fa7a337685c11b33cda18e61de8fc77fa0cff467049d049b3223e11d9d141; embedded include SHA-256: 9d44b02a228ce6b808eb801a589fdd3c98e81b4b2fa989f9b4ee4cdd512cd92c
+SPIR-V bytes: 583380; words: 145845; instructions: 32209; branch operations: 4397; loops: 80; selection merges: 1759; SHA-256: 90a46eb26bcfa0e1b18676bba364e8a7ed41709792b8d61bd0e9f2d1bccf2739
+Raygen optimizer shape: functions=1; calls=0; ray-query sites=27
+Embedded raygen SPIR-V words match the compiled shader.

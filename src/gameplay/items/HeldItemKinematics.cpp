@@ -372,8 +372,8 @@ float ComputeRewardLanternForwardClearance(const float cameraX,
 {
     const auto walkable=[&](float x,float z) {
         if (rescueExterior && chapterTerrain)
-            return traversal::ChapterExteriorSupport(chapterTerrain,x,z).grounded &&
-                traversal::ChapterExteriorMovementClear(*chapterTerrain,
+            return traversal::ChapterExteriorSupport(chapterTerrain,cameraX,cameraZ).grounded &&
+                traversal::ChapterExteriorCarryClear(*chapterTerrain,
                     cameraX,cameraZ,x,z,supportWorldY,kPlayerCollisionRadius);
         if (rescueExterior)
             return horde::gameplay::traversal::RescueExteriorSupport(x,z).grounded &&
@@ -393,8 +393,9 @@ float ComputeRewardLanternForwardClearance(const float cameraX,
     const float unitForwardZ = forwardZ / forwardLength;
     constexpr float kMaximumClearance = 2.70f;
     constexpr float kSearchStride = 0.025f;
-    // Authored terrain uses a continuous swept query (including holes and
-    // trunks), so an unobstructed full reach needs one sweep, not 108. The
+    // Authored terrain uses continuous elevated volume/solid queries, so an
+    // unobstructed full reach needs one sweep, not 108. Empty holes underneath
+    // the carried item are not walls. The
     // historical point predicate must retain its incremental search.
     if (rescueExterior && chapterTerrain && walkable(
             cameraX + unitForwardX*kMaximumClearance,

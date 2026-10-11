@@ -72,6 +72,16 @@ int main(int argc,char** argv) {
   }
   check(items::ComputeRewardLanternForwardClearance(-33.7f,-15.2f,0,1,false,true,
       kUpperSupportWorldY,terrain.get())==0.f,"held-item clearance accepted the open shaft");
+  const float shaftClearance=items::ComputeRewardLanternForwardClearance(kExteriorLanding.x,kExteriorLanding.z,
+      0,-1,false,true,kUpperSupportWorldY,terrain.get());
+  std::cout<<"shaft carry clearance="<<shaftClearance<<'\n';
+  // This axial view still meets the existing cantilever at 2.36m; empty
+  // space beside it must allow full reach, and the real solid must still stop it.
+  check(shaftClearance>2.30f && shaftClearance<2.40f,
+      "shaft carry must retain the actual cantilever obstruction");
+  check(items::ComputeRewardLanternForwardClearance(kExteriorLanding.x,kExteriorLanding.z,
+      -.35f,-.93675f,false,true,kUpperSupportWorldY,terrain.get())>2.69f,
+      "grounded landing carry treats the empty shaft as a full-height wall");
   // Macro terrain must be actual imported triangles in every direction, not
   // merely an enlarged support rectangle or the clamped local planning sheet.
   for(float radius:{25.f,75.f,250.f,750.f,2500.f,9000.f})for(int bearing=0;bearing<8;++bearing) {

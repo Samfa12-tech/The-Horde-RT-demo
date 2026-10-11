@@ -1,0 +1,38 @@
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+    Start 97: horde_rt_raygen_variant_manifest_tests
+1/3 Test #97: horde_rt_raygen_variant_manifest_tests ...***Failed    1.25 sec
+Exception: C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\tests\RaygenVariantManifestTests.ps1:25
+Line |
+  25 |      if (-not $Condition) { throw $Message }
+     |                             ~~~~~~~~~~~~~~
+     | Generic include hash changed before matrix compilation.
+
+    Start 98: horde_rt_raygen_variant_artifact_tests
+2/3 Test #98: horde_rt_raygen_variant_artifact_tests ...***Failed    1.22 sec
+Exception: C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\tests\RaygenVariantArtifactTests.ps1:28
+Line |
+  28 |      if (-not $Condition) { throw $Message }
+     |                             ~~~~~~~~~~~~~~
+     | Compatibility generic include changed unexpectedly.
+
+    Start 99: horde_rt_rayquery_compute_shader_tests
+3/3 Test #99: horde_rt_rayquery_compute_shader_tests ...***Failed    0.96 sec
+Exception: C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\tools\GenerateRayQueryComputeVariants.ps1:289
+Line |
+ 289 |          throw "Compute compilation failed for $($Variant.key) with ex …
+     |          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     | Compute compilation failed for rayquery_compute_diagnostic_high_generic_dielectric with exit code 1:
+     | C:\Users\sam_s\Documents\the Horde RT
+     | Demo\.worktrees\horde-1.7-wp2-vertical-proof\shaders\raytracing\minimal.comp ERROR: Failed to open file:
+     | C:\Users\sam_s\AppData\Local\Packages\sandbox.{13f345a9-09bf-415c-9267-117cdbb64736}\AC\Temp\horde-rt-rayquery-compute-check-4b23e890212848b5a2223fa623fe1ca9\run-a67fe484cb784eb7b93181321c6da7ed\rayquery_compute_diagnostic_high_generic_dielectric\minimal.comp.raw.spv
+
+
+0% tests passed, 3 tests failed out of 3
+
+Total Test time (real) =   3.46 sec
+
+The following tests FAILED:
+	 97 - horde_rt_raygen_variant_manifest_tests (Failed)
+	 98 - horde_rt_raygen_variant_artifact_tests (Failed)
+	 99 - horde_rt_rayquery_compute_shader_tests (Failed)
+Errors while running CTest

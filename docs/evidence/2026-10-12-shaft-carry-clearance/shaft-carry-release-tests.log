@@ -1,0 +1,27 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+    Start   1: horde_rt_triangle_support_surface_tests
+1/3 Test   #1: horde_rt_triangle_support_surface_tests .....   Passed    1.12 sec
+    Start 172: horde_rt_rescue_journey_integration_tests
+2/3 Test #172: horde_rt_rescue_journey_integration_tests ...   Passed    1.44 sec
+    Start 173: horde_rt_chapter_terrain_journey_tests
+3/3 Test #173: horde_rt_chapter_terrain_journey_tests ......***Failed    2.07 sec
+lookout held-item clearance=2.7
+grounded landing carry treats the empty shaft as a full-height wall
+claim-site position=-34,-17.55 prompt=0 phase=4
+cycle=0 ascent-end phase=4 root=-33.7,2.05,-12.8
+upper lantern hand depth=0.69 localY=0.0506989
+unready-edge start=-33.7,-12.8 end=-33.0742,-11.9239 blocked=1
+cycle=1 ascent-end phase=4 root=-33.7,2.05,-12.8
+upper lantern hand depth=0.69 localY=0.0510889
+Combined CPU preparation resident_ns=270400 staged_ns=164400 resident_retained_bytes=27072 staged_retained_bytes=27072 resident_peak_capacity_bytes=49824 staged_peak_capacity_bytes=49824 gpu_residency_comparison=NOT_MEASURED
+Rescue journey integration cases=15693 failures=1 retained_triangles=564
+
+
+67% tests passed, 1 tests failed out of 3
+
+Total Test time (real) =   4.66 sec
+
+The following tests FAILED:
+	173 - horde_rt_chapter_terrain_journey_tests (Failed)
+Errors while running CTest

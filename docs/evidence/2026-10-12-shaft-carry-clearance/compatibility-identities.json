@@ -1,0 +1,18 @@
+[
+  {
+    "path": "src/vulkan/raytracing/MinimalRayGenShader.inc",
+    "canonicalSha256": "e7d8f0ff9f1b7d79a3c7116b1d22c1a584e9186b6b70811bdb68891bd7210b43"
+  },
+  {
+    "path": "src/vulkan/raytracing/MinimalLegacyRayGenShader.inc",
+    "canonicalSha256": "9d44b02a228ce6b808eb801a589fdd3c98e81b4b2fa989f9b4ee4cdd512cd92c"
+  },
+  {
+    "path": "reports/shaft-carry-compat-generic/minimal.rgen.spv",
+    "sha256": "5fe611a99a062554bdd58062c3071e5d6fb2da4892eeef446581376365469c59"
+  },
+  {
+    "path": "reports/shaft-carry-compat-legacy/minimal.legacy.rgen.spv",
+    "sha256": "90a46eb26bcfa0e1b18676bba364e8a7ed41709792b8d61bd0e9f2d1bccf2739"
+  }
+]
