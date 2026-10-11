@@ -3366,7 +3366,10 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         };
         addWorldQuad(corner(0), corner(1), corner(2), corner(3), SurfaceDryStone, SurfaceDown);
     };
-    const auto addOverheadBox = [&addWorldBox](std::size_t index) {
+    const auto addOverheadBox = [this, &addWorldBox](std::size_t index) {
+        // Chapter replacements have true chamfer normals in the existing static
+        // masonry primitive. Never retain square faces over the cut corners.
+        if (developmentRescueJourney_) return;
         const auto& box = horde::scene::kShowcaseLowOverheadVolumes[index];
         addWorldBox(box.footprint[1][0], box.bottomY, box.footprint[1][1],
                     box.footprint[3][0], box.topY, box.footprint[3][1], SurfaceMossyStone);
@@ -3428,8 +3431,12 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     // Keep the gameplay/collision threshold at 3.4 m while revealing its recess.
     // The former sealed far wall is split around a 1.8 m doorway into the
     // extended showcase route. The matching hidden shell is split below too.
-    addWorldQuad({{-1.85f, kRouteFloorWorldY, -6.4f}}, {{-0.90f, kRouteFloorWorldY, -6.4f}}, {{-0.90f, 1.35f, -6.4f}}, {{-1.85f, 1.35f, -6.4f}}, SurfaceMossyStone, SurfaceForward);
-    addWorldQuad({{0.90f, kRouteFloorWorldY, -6.4f}}, {{1.85f, kRouteFloorWorldY, -6.4f}}, {{1.85f, 1.35f, -6.4f}}, {{0.90f, 1.35f, -6.4f}}, SurfaceMossyStone, SurfaceForward);
+    if (!developmentRescueJourney_)
+    {
+        addWorldQuad({{-1.85f, kRouteFloorWorldY, -6.4f}}, {{-0.90f, kRouteFloorWorldY, -6.4f}}, {{-0.90f, 1.35f, -6.4f}}, {{-1.85f, 1.35f, -6.4f}}, SurfaceMossyStone, SurfaceForward);
+        addWorldQuad({{0.90f, kRouteFloorWorldY, -6.4f}}, {{1.85f, kRouteFloorWorldY, -6.4f}}, {{1.85f, 1.35f, -6.4f}}, {{0.90f, 1.35f, -6.4f}}, SurfaceMossyStone, SurfaceForward);
+    }
+    if (!developmentRescueJourney_)
     for (const auto& face : horde::scene::EntryPortalCapFaces())
     {
         const auto vertex = [](const auto& point) {
@@ -3441,8 +3448,11 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
                      static_cast<SurfaceNormal>(face.normalCode));
     }
     // Give the room-two portal real RT depth instead of three paper-thin cards.
-    addWorldBox(-1.20f, kRouteFloorWorldY, -3.55f, -0.78f, 0.95f, -3.25f, SurfaceMossyStone);
-    addWorldBox(0.78f, kRouteFloorWorldY, -3.55f, 1.20f, 0.95f, -3.25f, SurfaceMossyStone);
+    if (!developmentRescueJourney_)
+    {
+        addWorldBox(-1.20f, kRouteFloorWorldY, -3.55f, -0.78f, 0.95f, -3.25f, SurfaceMossyStone);
+        addWorldBox(0.78f, kRouteFloorWorldY, -3.55f, 1.20f, 0.95f, -3.25f, SurfaceMossyStone);
+    }
     addOverheadBox(0u);
     // Close the former irregular entry breach with the same opaque roof and
     // shared clearance data. The independent waterfall/finale openings remain.
@@ -3499,8 +3509,11 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     addRecessedWallX(-1.92f, -1.85f, -6.47f, 3.4f, -1.02f, 1.42f, SurfaceHiddenShell, SurfaceRight);
     addWorldQuad({{1.92f, -1.02f, -6.47f}}, {{1.92f, -1.02f, 3.4f}}, {{1.92f, 1.42f, 3.4f}}, {{1.92f, 1.42f, -6.47f}}, SurfaceHiddenShell, SurfaceLeft);
     addWorldQuad({{-1.92f, -1.02f, 3.4f}}, {{1.92f, -1.02f, 3.4f}}, {{1.92f, -1.02f, -6.47f}}, {{-1.92f, -1.02f, -6.47f}}, SurfaceHiddenShell, SurfaceUp);
-    addWorldQuad({{-1.92f, -1.02f, -6.47f}}, {{-0.90f, -1.02f, -6.47f}}, {{-0.90f, 1.42f, -6.47f}}, {{-1.92f, 1.42f, -6.47f}}, SurfaceHiddenShell, SurfaceForward);
-    addWorldQuad({{0.90f, -1.02f, -6.47f}}, {{1.92f, -1.02f, -6.47f}}, {{1.92f, 1.42f, -6.47f}}, {{0.90f, 1.42f, -6.47f}}, SurfaceHiddenShell, SurfaceForward);
+    if (!developmentRescueJourney_)
+    {
+        addWorldQuad({{-1.92f, -1.02f, -6.47f}}, {{-0.90f, -1.02f, -6.47f}}, {{-0.90f, 1.42f, -6.47f}}, {{-1.92f, 1.42f, -6.47f}}, SurfaceHiddenShell, SurfaceForward);
+        addWorldQuad({{0.90f, -1.02f, -6.47f}}, {{1.92f, -1.02f, -6.47f}}, {{1.92f, 1.42f, -6.47f}}, {{0.90f, 1.42f, -6.47f}}, SurfaceHiddenShell, SurfaceForward);
+    }
     // Slice A extends the room with static, geometry-only RT proof spaces. It
     // deliberately adds no new flame, glass or mirror surface: the brackets
     // are unlit, the transmission frame is empty and the final mirror frame
@@ -3537,8 +3550,11 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
 
     // A shallow stone surround gives the new 1.8 m opening real RT depth. Its
     // clear width stays exactly x=-0.9..0.9 throughout the player's height.
-    addWorldBox(-1.08f, kRouteFloorWorldY, -6.52f, -0.90f, 0.82f, -6.28f, SurfaceMossyStone);
-    addWorldBox(0.90f, kRouteFloorWorldY, -6.52f, 1.08f, 0.82f, -6.28f, SurfaceMossyStone);
+    if (!developmentRescueJourney_)
+    {
+        addWorldBox(-1.08f, kRouteFloorWorldY, -6.52f, -0.90f, 0.82f, -6.28f, SurfaceMossyStone);
+        addWorldBox(0.90f, kRouteFloorWorldY, -6.52f, 1.08f, 0.82f, -6.28f, SurfaceMossyStone);
+    }
     addOverheadBox(2u);
     addOverheadBox(3u);
     addOverheadBox(4u);

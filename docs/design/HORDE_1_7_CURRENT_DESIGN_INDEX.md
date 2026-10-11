@@ -25,6 +25,14 @@ farther continuous ground without visible drop-offs, substantially denser trees
 with collision, less crowded touch controls and restrained bevels at visible
 tomb wall joins/door surrounds. Preserve the positively tested niches.
 
+The [stone-finish milestone](../evidence/2026-10-11-tomb-stone-bevels/README.md)
+adds 30 mm physical chamfers through existing static masonry, including closed
+entry-wall returns. The owner approved the bevel preview and final reverse view;
+that is screenshot feedback, not full-route/phone acceptance. Both reverse RT
+backend captures pass; front/corner frames retain strict arm-visibility failures.
+Do not attribute every historical dark edge to a defect: the owner observed that
+it can change with lighting. Preserve ordinary physical shadows.
+
 ## Authority and preserved sources
 
 The owner's current instructions and explicit later decisions govern execution.

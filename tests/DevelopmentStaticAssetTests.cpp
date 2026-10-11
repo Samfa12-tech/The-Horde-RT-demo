@@ -66,8 +66,8 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 78u,
-          "development registry retains prior views plus bounded water-lighting, world-route and rescue views");
+    Check(kDevelopmentCheckpoints.size() == 81u,
+          "development registry retains prior views plus three bounded stone-finish inspections");
     Check(FindDevelopmentCheckpoint(164) == nullptr,
           "development lookup preserves the unassigned gap before later bounded additions");
     const auto* worldRoute = FindDevelopmentCheckpoint("world-route");
@@ -95,9 +95,17 @@ int main()
               FindShowcaseCheckpoint(192) == nullptr &&
               FindShowcaseCheckpoint("rescue-journey-start") == nullptr,
           "rescue entry retains the ordinary lower start and is absent from release checkpoints");
-    Check(FindDevelopmentCheckpoint(198) == nullptr &&
+    for (const auto name : {"chapter-stone-portal-front", "chapter-stone-portal-rear", "chapter-stone-wall-corner"})
+    {
+        const auto* stone = FindDevelopmentCheckpoint(name);
+        Check(stone != nullptr && stone->id >= 198 && stone->id <= 200 &&
+              FindDevelopmentCheckpoint(stone->id) == stone && FindShowcaseCheckpoint(name) == nullptr &&
+              !stone->primaryArmsMayBeOutsideFrame,
+              "stone views are development-only and retain strict primary-arm visibility");
+    }
+    Check(FindDevelopmentCheckpoint(201) == nullptr &&
               FindDevelopmentCheckpoint("rescue-journey-unknown") == nullptr,
-          "development lookup still rejects IDs and names beyond the appended exterior inspections");
+          "development lookup rejects genuinely unknown IDs and names beyond the stone inspections");
     const auto* torchParry = FindDevelopmentCheckpoint("player-torch-parry-clearance");
     simulation::GameSimulation stagedTorchParry;
     DevelopmentCheckpointStageEvidence torchParryEvidence{};

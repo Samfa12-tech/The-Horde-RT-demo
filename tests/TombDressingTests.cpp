@@ -1,4 +1,5 @@
 #include "scene/TombDressing.h"
+#include "scene/TombStoneBevels.h"
 #include "scene/assets/AssetManifest.h"
 
 #include <algorithm>
@@ -10,6 +11,7 @@
 #include <filesystem>
 #include <iostream>
 #include <limits>
+#include <map>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -310,9 +312,11 @@ void TestPreparedDressingAppend(const std::filesystem::path& assetRoot)
     const std::size_t oldMaterials = first.materials.size();
     const std::size_t oldPrimitives = first.primitives.size();
     TombDressingBuildReport firstReport, secondReport;
-    Check(AppendPreparedTombDressing(assetRoot, first, firstReport, diagnostic),
+    // Preserve the original imported dressing fixture independently of the new
+    // architectural replacements; its low-prop/grounding checks remain strict.
+    Check(AppendPreparedTombDressing(assetRoot, first, firstReport, diagnostic, false),
           diagnostic.empty() ? "prepared source assets append through native static import" : diagnostic.c_str());
-    Check(AppendPreparedTombDressing(assetRoot, second, secondReport, diagnostic),
+    Check(AppendPreparedTombDressing(assetRoot, second, secondReport, diagnostic, false),
           diagnostic.empty() ? "second prepared source append succeeds" : diagnostic.c_str());
 
     Check(firstReport.addedTriangles == 17680u && firstReport.addedIndices == 17680u * 3u,
@@ -523,6 +527,71 @@ void TestPreparedDressingAppend(const std::filesystem::path& assetRoot)
           "the module refuses an accidental second append into the same static owner");
 }
 
+void TestStoneArchitecture(const std::filesystem::path& assetRoot)
+{
+    using namespace horde::scene;
+    assets::StaticMeshAsset asset; std::string diagnostic; TombDressingBuildReport report;
+    Check(LoadCollapsedOwner(assetRoot, asset, diagnostic), "load existing masonry owner for stone finish");
+    const auto firstPrimitive=asset.primitives.size();
+    const auto oldMaterialCount=asset.materials.size();
+    Check(AppendPreparedTombDressing(assetRoot,asset,report,diagnostic), diagnostic.c_str());
+    Check(report.bevelTriangles==656 && report.addedTriangles==17680+656,
+          "twelve bevelled solids and sixteen corner joins add exactly 656 triangles");
+    Check(asset.primitives.size()==firstPrimitive+4 && asset.materials.size()==oldMaterialCount+3,
+          "bevels share admitted masonry without another primitive/material/texture owner");
+    Check(Near(NearestMasonryHit(asset,{{-0.915f,0,-6}},{{0,0,-1}}, {},0,firstPrimitive,firstPrimitive+1),0.295f),
+          "entry jamb has a true cut 30 mm bevel");
+    Check(Near(NearestMasonryHit(asset,{{1.835f,0,-6}},{{0,0,-1}}, {},0,firstPrimitive,firstPrimitive+1),0.385f),
+          "meeting entry walls have a real diagonal stone corner");
+    Check(NearestMasonryHit(asset,{{0,0,-6}},{{0,0,-1}}, {},0,firstPrimitive,firstPrimitive+1)>2.0f,
+          "bevel architecture leaves the entrance walking lane open");
+    Check(Near(NearestMasonryHit(asset,{{1.14f,0,-7}},{{0,0,1}}, {},0,firstPrimitive,firstPrimitive+1),0.53f),
+          "backtracking sees a real closed return behind the former black paper-wall edge");
+
+    for(const auto& box:TombBevelBoxes())
+    {
+        std::vector<assets::StaticRtVertex> vertices; std::vector<std::uint32_t> indices;
+        AppendChamferedStoneBox(vertices,indices,box);
+        Check(indices.size()==132,"closed single-segment bevel box has 44 triangles");
+        // Face vertices are split for correct flat normals. Weld only in this
+        // topology check, to prove each geometric edge has two opposite uses.
+        using Key=std::array<long long,3>; using Edge=std::pair<Key,Key>;
+        std::map<Edge,std::pair<int,int>> edges;
+        const auto key=[](const auto& v) { return Key{std::llround(v.position[0]*100000),
+            std::llround(v.position[1]*100000),std::llround(v.position[2]*100000)}; };
+        for(std::size_t i=0;i<indices.size();i+=3)
+        {
+            const auto& a=vertices[indices[i]];const auto& b=vertices[indices[i+1]];const auto& c=vertices[indices[i+2]];
+            using namespace stone_bevel;
+            const Point pa{a.position[0],a.position[1],a.position[2]},pb{b.position[0],b.position[1],b.position[2]},pc{c.position[0],c.position[1],c.position[2]};
+            const auto face=Cross(Sub(pb,pa),Sub(pc,pa));
+            Check(Dot(face,face)>1e-10f && Dot(Unit(face),{a.normal[0],a.normal[1],a.normal[2]})>0.9999f,
+                  "every chamfer has nondegenerate winding and matching geometric/shading normals");
+            for(unsigned k=0;k<3;++k)
+            { auto from=key(vertices[indices[i+k]]),to=key(vertices[indices[i+(k+1)%3]]);const int direction=from<to?1:-1;
+              if(to<from)std::swap(from,to);auto& edge=edges[{from,to}];++edge.first;edge.second+=direction; }
+        }
+        for(const auto& entry:edges) Check(entry.second.first==2 && entry.second.second==0,
+            "stone bevel is watertight with no missing faces or reversed shared edges");
+        for(const auto& v:vertices)
+        {
+            Check(Finite(v),"bevel PBR vertex is finite");
+            for(unsigned axis=0;axis<3;++axis) Check(v.position[axis]>=box.minimum[axis]-0.00001f &&
+                v.position[axis]<=box.maximum[axis]+0.00001f,"cut bevel never reduces existing passage/capsule clearance");
+            Check(std::abs(v.normal[0]*v.tangent[0]+v.normal[1]*v.tangent[1]+v.normal[2]*v.tangent[2])<0.0001f,
+                "bevel normal-map tangent remains orthogonal");
+        }
+    }
+    std::vector<assets::StaticRtVertex> badVertices;std::vector<std::uint32_t> badIndices;
+    for(const float radius:{0.0f,-0.1f,2.0f,std::numeric_limits<float>::quiet_NaN()})
+    {
+        bool rejected=false;
+        try { AppendChamferedStoneBox(badVertices,badIndices,TombBevelBoxes()[0],radius); }
+        catch(const std::invalid_argument&) { rejected=true; }
+        Check(rejected && badVertices.empty() && badIndices.empty(),"invalid bevel radius rejects before any partial append");
+    }
+}
+
 } // namespace
 
 int main()
@@ -535,6 +604,7 @@ int main()
         : std::filesystem::path(HORDE_RT_SOURCE_DIR) / "assets";
     TestImportedNicheFaceNormals(assetRoot);
     TestPreparedDressingAppend(assetRoot);
+    TestStoneArchitecture(assetRoot);
     if (const char* baseline = std::getenv("HORDE_RT_NICHE_BASELINE_DIR"); baseline != nullptr)
         TestOriginalNicheBaseline(assetRoot, baseline);
     if (failures == 0)

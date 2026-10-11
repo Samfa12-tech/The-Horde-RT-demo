@@ -62,6 +62,7 @@ struct TombDressingBuildReport
     std::size_t addedPrimitives = 0u;
     std::size_t addedMaterials = 0u;
     std::size_t placedInstances = 0u;
+    std::size_t bevelTriangles = 0u;
     TombDressingBounds addedBounds{};
     std::array<TombDressingPlacementBounds, 16u> placementBounds{};
     TombDressingBounds entryLintelShelfBounds{};
@@ -70,9 +71,12 @@ struct TombDressingBuildReport
 // Loads selected, prepared T02/T03/niche GLBs through StaticMeshAsset::Load,
 // then bakes sparse scene transforms into the caller's already-owned static
 // asset. It adds no BLAS/asset owner and commits atomically on success.
+// The default includes the chapter's stone architecture. False is for the
+// original decoration-only import fixture and preserves its historical checks.
 bool AppendPreparedTombDressing(const std::filesystem::path& assetRoot,
                                 assets::StaticMeshAsset& existingOwner,
                                 TombDressingBuildReport& report,
-                                std::string& diagnostic);
+                                std::string& diagnostic,
+                                bool includeStoneArchitecture = true);
 
 } // namespace horde::scene

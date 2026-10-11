@@ -1,4 +1,5 @@
 #include "scene/TombDressing.h"
+#include "scene/TombStoneBevels.h"
 
 #include "scene/assets/AssetManifest.h"
 
@@ -268,7 +269,8 @@ void AppendEntryLintelShelf(std::vector<assets::StaticRtVertex>& vertices,
 bool AppendPreparedTombDressing(const std::filesystem::path& assetRoot,
                                 assets::StaticMeshAsset& existingOwner,
                                 TombDressingBuildReport& report,
-                                std::string& diagnostic)
+                                std::string& diagnostic,
+                                bool includeStoneArchitecture)
 {
     report = {};
     if (existingOwner.vertices.empty() || existingOwner.indices.empty() ||
@@ -490,6 +492,18 @@ bool AppendPreparedTombDressing(const std::filesystem::path& assetRoot,
     AppendEntryLintelShelf(groupedVertices[static_cast<std::size_t>(MaterialFamily::Masonry)],
                            groupedIndices[static_cast<std::size_t>(MaterialFamily::Masonry)],
                            candidateReport);
+    auto& masonryVertices = groupedVertices[static_cast<std::size_t>(MaterialFamily::Masonry)];
+    auto& masonryIndices = groupedIndices[static_cast<std::size_t>(MaterialFamily::Masonry)];
+    const auto bevelVertexStart = masonryVertices.size();
+    const auto bevelIndexStart = masonryIndices.size();
+    if (includeStoneArchitecture) AppendTombStoneBevels(masonryVertices, masonryIndices);
+    candidateReport.bevelTriangles = (masonryIndices.size() - bevelIndexStart) / 3u;
+    for (auto i = bevelVertexStart; i < masonryVertices.size(); ++i)
+        for (std::size_t axis = 0; axis < 3; ++axis)
+        {
+            candidateReport.addedBounds.minimum[axis] = std::min(candidateReport.addedBounds.minimum[axis], masonryVertices[i].position[axis]);
+            candidateReport.addedBounds.maximum[axis] = std::max(candidateReport.addedBounds.maximum[axis], masonryVertices[i].position[axis]);
+        }
     if (std::any_of(placed.begin(), placed.end(), [](bool value) { return !value; }))
     {
         diagnostic = "Tomb dressing bounded placement set is missing a selected source family.";

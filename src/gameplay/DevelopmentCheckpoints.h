@@ -62,7 +62,13 @@ struct DevelopmentCheckpoint
     bool stagesRescueExterior = false;
 };
 
-inline constexpr std::array<DevelopmentCheckpoint, 78u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 81u> kDevelopmentCheckpoints{{
+    {.id = 198, .name = "chapter-stone-portal-front", .baseShowcaseCheckpointId = 0,
+     .cameraX = 0.0f, .cameraZ = -5.1f, .yaw = 0, .pitch = -0.15f},
+    {.id = 199, .name = "chapter-stone-portal-rear", .baseShowcaseCheckpointId = 0,
+     .cameraX = 0.0f, .cameraZ = -7.8f, .yaw = 3.14159265359f, .pitch = -0.15f},
+    {.id = 200, .name = "chapter-stone-wall-corner", .baseShowcaseCheckpointId = 0,
+     .cameraX = 0.65f, .cameraZ = -5.1f, .yaw = 0.55f, .pitch = -0.15f},
     {.id = 190, .name = "world-route", .baseShowcaseCheckpointId = 0,
      .cameraX = -33.7f, .cameraZ = -20.8f, .yaw = 3.14159265359f, .pitch = -0.05f,
      .developmentWorldRoute = true},
