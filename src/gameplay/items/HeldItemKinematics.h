@@ -12,6 +12,8 @@
 #include <string>
 #include <string_view>
 
+namespace horde::gameplay::simulation { class TriangleSupportSurface; }
+
 namespace horde::gameplay::items
 {
 
@@ -68,6 +70,9 @@ struct HeldItemKinematicsInput
     bool readableCombatPose = false;
     // Explicit zone choice: the rescue apron/connector is not the isolated WP2 route.
     bool rescueExterior = false;
+    // Borrowed only during the synchronous fixed-step solve; never published
+    // in a snapshot. The simulation supplies its generation-validated owner.
+    const simulation::TriangleSupportSurface* chapterTerrain = nullptr;
 };
 
 struct HeldSwordPose
@@ -140,6 +145,9 @@ struct HeldItemFixedStepInput
     bool readableCombatPose = false;
     // Explicit zone choice: the rescue apron/connector is not the isolated WP2 route.
     bool rescueExterior = false;
+    // Borrowed only during the synchronous fixed-step solve; never published
+    // in a snapshot. The simulation supplies its generation-validated owner.
+    const simulation::TriangleSupportSurface* chapterTerrain = nullptr;
 };
 
 inline constexpr float kHeldItemSpreadStartAspect = 1.0f;
@@ -227,7 +235,8 @@ float ComputeRewardLanternForwardClearance(float cameraX,
                                            float forwardX,
                                            float forwardZ, bool developmentWorldRoute = false,
                                            bool rescueExterior = false,
-                                           float supportWorldY = kRouteFloorWorldY);
+                                           float supportWorldY = kRouteFloorWorldY,
+                                           const simulation::TriangleSupportSurface* chapterTerrain = nullptr);
 
 HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput& input);
 

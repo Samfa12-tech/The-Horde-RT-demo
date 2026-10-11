@@ -74,6 +74,29 @@ void IncludePoint(ForestDressingBounds& bounds, const std::array<float, 3u>& poi
     }
 }
 
+void IncludeTrunkTriangle(ForestDressingBounds& bounds,
+                          std::vector<std::array<float,3u>> polygon, float floor)
+{
+    // Clip actual bark surfaces to the collision slab. Merely dropping
+    // below-ground vertices misses edges that cross the terrain plane.
+    for (int plane=0;plane<2;++plane) {
+        const float height=floor+(plane==0 ? 0.f : kTrunkCollisionHeight);
+        std::vector<std::array<float,3u>> clipped;
+        for(std::size_t i=0;i<polygon.size();++i) {
+            const auto a=polygon[i],b=polygon[(i+1)%polygon.size()];
+            const bool inA=plane==0 ? a[1]>=height : a[1]<=height;
+            const bool inB=plane==0 ? b[1]>=height : b[1]<=height;
+            if(inA)clipped.push_back(a);
+            if(inA!=inB) {
+                const float t=(height-a[1])/(b[1]-a[1]);
+                clipped.push_back({a[0]+t*(b[0]-a[0]),height,a[2]+t*(b[2]-a[2])});
+            }
+        }
+        polygon=std::move(clipped);
+    }
+    for(const auto& point:polygon)IncludePoint(bounds,point);
+}
+
 assets::StaticMaterial MakeFamilyMaterial(const assets::StaticMaterial& source,
                                          MaterialFamily family)
 {
@@ -216,7 +239,36 @@ bool AppendPreparedForestDressing(const std::filesystem::path& assetRoot,
         const auto& source = sources[treeIndex];
         const AssetSpec& spec = kAssets[treeIndex];
         const float yaw = contract.yawRadians;
-        const float originY = support.worldY - source.bounds.minimum[1];
+        float originY = support.worldY - source.bounds.minimum[1] - contract.rootBurialMetres;
+        if (terrain) {
+            // Keep each tree upright and rigid. Embed the actual imported root
+            // tips in the terrain across their footprint, not only at the trunk
+            // centre. A bad steep placement must be reauthored, never sunk metres.
+            const float unburiedOriginY=support.worldY-source.bounds.minimum[1];
+            float fittedOriginY = unburiedOriginY;
+            std::size_t tipCount = 0u;
+            for (const auto& vertex : source.vertices) {
+                if (vertex.position[1] > source.bounds.minimum[1] + .02f) continue;
+                const auto tip = RotateY({{vertex.position[0],vertex.position[1],vertex.position[2]}},yaw);
+                const auto ground = terrain->Query(contract.x+tip[0],contract.z+tip[2]);
+                if (!ground.found) {
+                    diagnostic="Forest root footprint has missing terrain support.";
+                    return false;
+                }
+                fittedOriginY=std::min(fittedOriginY,ground.worldY-tip[1]-.02f);
+                ++tipCount;
+            }
+            if(tipCount<18u || unburiedOriginY-fittedOriginY>.65f ||
+               std::abs(fittedOriginY-originY)>.002f) {
+                diagnostic="Forest root footprint needs reauthoring at placement " +
+                    std::to_string(placementIndex) + "; required burial=" +
+                    std::to_string(unburiedOriginY-fittedOriginY) +
+                    " m (maximum 0.65 m; source collision receipt must match within 2mm).";
+                return false;
+            }
+            // Use the same measured transform as the shared collision bounds;
+            // native recomputation above rejects a stale placement receipt.
+        }
         ForestDressingPlacement& placement = candidate.placements[placementIndex];
         placement.asset = spec.name;
         placement.origin = {{contract.x, originY, contract.z}};
@@ -276,10 +328,6 @@ bool AppendPreparedForestDressing(const std::filesystem::path& assetRoot,
                     }
                     IncludePoint(placement.worldBounds, position);
                     IncludePoint(candidate.addedBounds, position);
-                    if (family == MaterialFamily::Bark &&
-                        source.vertices[vertexIndex].position[1] <=
-                            source.bounds.minimum[1] + kTrunkCollisionHeight)
-                        IncludePoint(placement.trunkBounds, position);
                     vertices.push_back(vertex);
                 }
                 for (std::size_t index = 0u; index < primitive.indexCount; ++index)
@@ -293,6 +341,16 @@ bool AppendPreparedForestDressing(const std::filesystem::path& assetRoot,
                     }
                     indices.push_back(static_cast<std::uint32_t>(vertexBase + sourceIndex));
                 }
+                if(family==MaterialFamily::Bark) {
+                    for(std::size_t i=indexBase;i<indices.size();i+=3) {
+                        std::vector<std::array<float,3u>> triangle;
+                        for(std::size_t corner=0;corner<3;++corner) {
+                            const auto& p=vertices[indices[i+corner]].position;
+                            triangle.push_back({p[0],p[1],p[2]});
+                        }
+                        IncludeTrunkTriangle(placement.trunkBounds,std::move(triangle),support.worldY);
+                    }
+                }
                 if (vertices.size() - vertexBase != vertexEnd - primitive.vertexOffset ||
                     indices.size() - indexBase != primitive.indexCount)
                 {
@@ -300,7 +358,7 @@ bool AppendPreparedForestDressing(const std::filesystem::path& assetRoot,
                     return false;
                 }
             }
-            if (std::abs(placement.worldBounds.minimum[1] - support.worldY) > 0.0001f)
+            if (std::abs(placement.worldBounds.minimum[1] + contract.rootBurialMetres - support.worldY) > 0.0001f)
             {
                 diagnostic = "Forest tree root does not meet the resolved route support height.";
                 return false;

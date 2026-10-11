@@ -24,6 +24,26 @@ int main(int argc,char** argv) {
  int cases=0,failures=0;
  auto check=[&](bool b,const char* m){++cases;if(!b){++failures;std::cerr<<m<<'\n';}};
  if(authored) {
+  // The lookout continues over native terrain beyond the old ribbon end cap.
+  // Looking toward Bellwether must not retract the hands against that absent wall.
+  const auto lookout=kWorldRoutePoints.back();
+  const auto ground=terrain->Query(lookout.x,lookout.z);
+  const float fx=std::sin(2.51f),fz=-std::cos(2.51f);
+  check(ground.found && ChapterExteriorMovementClear(*terrain,lookout.x,lookout.z,
+      lookout.x+fx*2.7f,lookout.z+fz*2.7f,ground.worldY,kPlayerCollisionRadius),
+      "lookout fixture must have a clear native ground path ahead");
+  const float clearance=items::ComputeRewardLanternForwardClearance(
+      lookout.x,lookout.z,fx,fz,false,true,ground.worldY,terrain.get());
+  std::cout<<"lookout held-item clearance="<<clearance<<'\n';
+  check(clearance>2.69f,"lookout hands retracted by obsolete ribbon support boundary");
+  // Continuous full-reach optimization must still reject actual solids/holes.
+  for(const auto& tree:kForestTreePlacementContract) {
+   const auto under=terrain->Query(tree.x,tree.z);
+   check(items::ComputeRewardLanternForwardClearance(tree.x,tree.z,1,0,false,true,
+       under.worldY,terrain.get())==0.f,"held-item clearance ignored a real native tree trunk");
+  }
+  check(items::ComputeRewardLanternForwardClearance(-33.7f,-15.2f,0,1,false,true,
+      kUpperSupportWorldY,terrain.get())==0.f,"held-item clearance accepted the open shaft");
   // Macro terrain must be actual imported triangles in every direction, not
   // merely an enlarged support rectangle or the clamped local planning sheet.
   for(float radius:{25.f,75.f,250.f,750.f,2500.f,9000.f})for(int bearing=0;bearing<8;++bearing) {

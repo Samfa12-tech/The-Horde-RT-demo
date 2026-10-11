@@ -3,7 +3,7 @@
 #include "gameplay/CorridorCollision.h"
 #include "scene/ShowcaseOverheadGeometry.h"
 #include "scene/DevelopmentWorldGeometry.h"
-#include "gameplay/traversal/DevelopmentRescueJourney.h"
+#include "gameplay/traversal/ChapterTerrainMovement.h"
 
 #include <algorithm>
 #include <cmath>
@@ -367,9 +367,14 @@ float ComputeRewardLanternForwardClearance(const float cameraX,
                                            const float cameraZ,
                                            const float forwardX,
                                            const float forwardZ, const bool developmentWorldRoute,
-                                           const bool rescueExterior, const float supportWorldY)
+                                           const bool rescueExterior, const float supportWorldY,
+                                           const simulation::TriangleSupportSurface* chapterTerrain)
 {
     const auto walkable=[&](float x,float z) {
+        if (rescueExterior && chapterTerrain)
+            return traversal::ChapterExteriorSupport(chapterTerrain,x,z).grounded &&
+                traversal::ChapterExteriorMovementClear(*chapterTerrain,
+                    cameraX,cameraZ,x,z,supportWorldY,kPlayerCollisionRadius);
         if (rescueExterior)
             return horde::gameplay::traversal::RescueExteriorSupport(x,z).grounded &&
                 horde::gameplay::traversal::RescueExteriorMovementClear(
@@ -388,6 +393,12 @@ float ComputeRewardLanternForwardClearance(const float cameraX,
     const float unitForwardZ = forwardZ / forwardLength;
     constexpr float kMaximumClearance = 2.70f;
     constexpr float kSearchStride = 0.025f;
+    // Authored terrain uses a continuous swept query (including holes and
+    // trunks), so an unobstructed full reach needs one sweep, not 108. The
+    // historical point predicate must retain its incremental search.
+    if (rescueExterior && chapterTerrain && walkable(
+            cameraX + unitForwardX*kMaximumClearance,
+            cameraZ + unitForwardZ*kMaximumClearance)) return kMaximumClearance;
     float lastWalkable = 0.0f;
     for (int step = 1; step <=
          static_cast<int>(kMaximumClearance / kSearchStride); ++step)
@@ -727,7 +738,7 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
     const float forwardZ = -std::cos(input.cameraYawRadians);
     const float forwardClearance = ComputeRewardLanternForwardClearance(
         input.cameraX, input.cameraZ, forwardX, forwardZ, input.developmentWorldRoute,
-        input.rescueExterior, input.playerSupportWorldY);
+        input.rescueExterior, input.playerSupportWorldY, input.chapterTerrain);
     // All rigid hand props share the continuous collision clearance. The
     // legacy 7.5 cm sampled helper produced a visible one-tick sword/forearm
     // jump while approaching a wall and could feed a discontinuous pose into
@@ -1192,7 +1203,7 @@ bool ResolveHeldItemsFixedStep(HeldItemStates& items,
         input.playerMountProfile,
         input.playerPitchRadians,
         input.logicalViewAspect,
-        input.playerSupportWorldY,input.developmentWorldRoute,input.readableCombatPose,input.rescueExterior});
+        input.playerSupportWorldY,input.developmentWorldRoute,input.readableCombatPose,input.rescueExterior,input.chapterTerrain});
     if (input.swordItemState != nullptr &&
         input.swordItemState->id == HeldItemId::Sword)
     {

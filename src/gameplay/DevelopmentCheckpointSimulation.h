@@ -125,9 +125,33 @@ inline bool StageDevelopmentCheckpointSimulation(
         if(!gameSimulation.Snapshot().rescue.equipmentStowed)return finalize(false);
         for(int tick=0;tick<1200&&gameSimulation.Snapshot().rescue.equipmentStowed;++tick)advance();
         if(!gameSimulation.Snapshot().rescue.exteriorSide || gameSimulation.Snapshot().rescue.equipmentStowed)return finalize(false);
+        // Capture route stations through real fixed-step movement and native
+        // support/collision after ascent, never a teleport through blockers.
+        if(checkpoint.exteriorRouteStation >= simulation::kWorldRoutePoints.size())return finalize(false);
+        for(std::size_t station=3;station<=checkpoint.exteriorRouteStation;++station) {
+            const auto destination=simulation::kWorldRoutePoints[station];
+            bool reached=false;
+            for(int tick=0;tick<2600;++tick) {
+                const auto& state=gameSimulation.Snapshot();
+                const float dx=destination.x-state.playerX,dz=destination.z-state.playerZ;
+                const float distance=std::hypot(dx,dz);
+                if(distance<.008f) {reached=true;break;}
+                routeInput.yawRadians=std::atan2(dx,-dz);
+                routeInput.moveForward=std::min(1.0f,distance/.055f);
+                routeInput.runHeld=distance>.3f;
+                advance();
+            }
+            if(!reached)return finalize(false);
+        }
+        routeInput.moveForward=0;routeInput.runHeld=false;
         // The native replay really ascends before freezing. Never seed a
         // camera-only exterior or invent ready resources for a missing scene.
         routeInput.yawRadians=checkpoint.yaw;routeInput.pitchRadians=checkpoint.pitch;
+        // Route shots are taken after stopping and looking at the bend. Let
+        // the physical lantern and locomotion pose settle in simulation time;
+        // render-only settling frames cannot advance those owners.
+        if(checkpoint.exteriorRouteStation>2u)
+            for(int tick=0;tick<120;++tick)advance();
         stepFixed(routeInput,0,gameSimulation.Snapshot().inputPublicationSequence+1);
         return finalize(std::hypot(gameSimulation.Snapshot().playerX-checkpoint.cameraX,
             gameSimulation.Snapshot().playerZ-checkpoint.cameraZ)<.01f);

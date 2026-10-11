@@ -747,6 +747,10 @@ if(BUILD_TESTING)
         ${CMAKE_CURRENT_SOURCE_DIR}/tests/ForestRuntimeRosterTests.py)
     add_test(NAME horde_rt_forest_texture_source_tests COMMAND ${Python3_EXECUTABLE}
         ${CMAKE_CURRENT_SOURCE_DIR}/tests/ForestTextureSourceTests.py)
+    add_test(NAME horde_rt_forest_placement_source_tests COMMAND ${Python3_EXECUTABLE}
+        ${CMAKE_CURRENT_SOURCE_DIR}/tools/build-forest-placement-contract.py)
+    add_test(NAME horde_rt_forest_root_placement_tests COMMAND ${Python3_EXECUTABLE}
+        ${CMAKE_CURRENT_SOURCE_DIR}/tools/fit-forest-root-placements.py)
 
     add_executable(horde_rt_static_gltf_asset_tests tests/StaticGltfAssetTests.cpp)
     target_include_directories(horde_rt_static_gltf_asset_tests PRIVATE

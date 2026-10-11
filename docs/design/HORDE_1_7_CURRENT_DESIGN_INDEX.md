@@ -7,6 +7,15 @@ full design, not a replacement master or a claim that all of 1.7 is complete.
 The continuing development branch is `codex/horde-1.7-wp2-vertical-proof`,
 [draft PR27](https://github.com/Samfa12-tech/The-Horde-RT-demo/pull/27).
 
+Newest bounded corrections: [Windows Unicode report editing](../evidence/2026-10-11-windows-report-unicode/README.md)
+at `d24a9971` passes all six exact-commit CI jobs. The subsequent
+[woodland root grounding and native-terrain held-item clearance](../evidence/2026-10-11-woodland-grounding-clearance/README.md)
+records the owner-reproduced root gaps and false lookout wall retraction,
+native fixes, actual RT gallery and artifact identities. The 64-tree placement
+is an intermediate density/grounding checkpoint, not final forest-road canopy
+acceptance. Fuller trees, visible Kit, streaming and complete chapter inspection
+remain required; researching Easy Tree does not yet establish native admission.
+
 Latest implementation evidence (11 October): [authored live terrain and forest
 ground](../evidence/2026-10-11-chapter-live-terrain/README.md) at `278ea604`,
 followed by [ordinary-startup atlas correction and physical Android

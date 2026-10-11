@@ -60,9 +60,19 @@ struct DevelopmentCheckpoint
     bool developmentWorldRoute = false;
     bool stagedWorldPreparation = false;
     bool stagesRescueExterior = false;
+    std::size_t exteriorRouteStation = 2u;
 };
 
-inline constexpr std::array<DevelopmentCheckpoint, 81u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 84u> kDevelopmentCheckpoints{{
+    {.id = 201, .name = "chapter-forest-first-bend", .baseShowcaseCheckpointId = 11,
+     .cameraX = -15.7f, .cameraZ = .2f, .yaw = -3.009f, .pitch = -0.15f,
+     .stagesRescueExterior = true, .exteriorRouteStation = 4u},
+    {.id = 202, .name = "chapter-forest-second-bend", .baseShowcaseCheckpointId = 11,
+     .cameraX = -17.7f, .cameraZ = 15.2f, .yaw = 1.914f, .pitch = -0.15f,
+     .stagesRescueExterior = true, .exteriorRouteStation = 5u},
+    {.id = 203, .name = "chapter-forest-lookout", .baseShowcaseCheckpointId = 11,
+     .cameraX = 13.3f, .cameraZ = 36.2f, .yaw = 2.51f, .pitch = -0.15f,
+     .stagesRescueExterior = true, .exteriorRouteStation = 7u},
     {.id = 198, .name = "chapter-stone-portal-front", .baseShowcaseCheckpointId = 0,
      .cameraX = 0.0f, .cameraZ = -5.1f, .yaw = 0, .pitch = -0.15f},
     {.id = 199, .name = "chapter-stone-portal-rear", .baseShowcaseCheckpointId = 0,

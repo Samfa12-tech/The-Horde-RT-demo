@@ -1,6 +1,8 @@
 #include "gameplay/simulation/DevelopmentWorldRoute.h"
 #include "gameplay/simulation/ForestTreePlacementContract.h"
 #include "scene/ForestDressing.h"
+#include "scene/ChapterTerrainSurface.h"
+#include "gameplay/traversal/ChapterTerrainMovement.h"
 #include "scene/assets/AssetManifest.h"
 
 #include <algorithm>
@@ -65,6 +67,8 @@ bool OverlapXZ(const ForestDressingBounds& left, const ForestDressingBounds& rig
 
 void TestNativeTreePairAndAppend()
 {
+    Check(gameplay::simulation::kForestTreePlacementContract.size() >= 64u,
+          "chapter woodland requires an authored near/mid stand rather than ten isolated demonstration trees");
     std::string diagnostic;
     StaticMeshAsset owner = LoadCollapse(diagnostic);
     if (owner.vertices.empty()) return;
@@ -74,13 +78,19 @@ void TestNativeTreePairAndAppend()
     const auto oldPrimitives = owner.primitives.size();
 
     ForestDressingBuildReport report;
-    Check(AppendPreparedForestDressing(kRoot / "assets", owner, report, diagnostic),
-          diagnostic.empty() ? "prepared tree pair imports and appends to the existing static owner"
-                             : diagnostic.c_str());
-    Check(report.addedTriangles == 50510u && report.addedIndices == 50510u * 3u,
-          "ten authored-scale instances contribute five LOD1 pine and five LOD1 alder triangle costs");
-    Check(report.placedInstances == 10u && report.addedPrimitives == 4u && report.addedMaterials == 4u,
-          "ten tree placements share exactly four material-family groups on the existing owner");
+    const bool appended = AppendPreparedForestDressing(kRoot / "assets", owner, report, diagnostic);
+    Check(appended, diagnostic.empty() ? "prepared tree pair imports and appends to the existing static owner"
+                                      : diagnostic.c_str());
+    if (!appended) {
+        for (const auto& tree : gameplay::simulation::kForestTreePlacementContract)
+            if (!gameplay::simulation::ResolveWorldRouteSupport(tree.x,tree.z).grounded)
+                std::cerr << "Unbacked placement: " << tree.x << ", " << tree.z << '\n';
+        return;
+    }
+    Check(report.addedTriangles == 323264u && report.addedIndices == 323264u * 3u,
+          "64 authored-scale instances contribute 32 LOD1 pine and 32 LOD1 alder triangle costs");
+    Check(report.placedInstances == 64u && report.addedPrimitives == 4u && report.addedMaterials == 4u,
+          "64 tree placements share exactly four material-family groups on the existing owner");
     Check(owner.primitives.size() == oldPrimitives + 4u && owner.materials.size() == oldMaterials + 4u,
           "forest adds no asset owner and stays within four appended materials and primitives");
     Check(owner.primitives.size() <= 32u && owner.materials.size() <= 32u,
@@ -139,7 +149,7 @@ void TestNativeTreePairAndAppend()
                   std::string_view(placement.asset) == expectedSpecies &&
                   Near(placement.origin[0], contract.x) && Near(placement.origin[2], contract.z) &&
                   Near(placement.yawRadians, contract.yawRadians) &&
-                  Near(placement.worldBounds.minimum[1], support.worldY),
+                  Near(placement.worldBounds.minimum[1]+contract.rootBurialMetres, support.worldY),
               "rendered tree uses the shared authored species, position, yaw, and resolved ground support");
         const float height = placement.worldBounds.maximum[1] - placement.worldBounds.minimum[1];
         const float expectedHeight = std::string_view(placement.asset) == "pine" ? 8.690f : 8.478f;
@@ -154,8 +164,8 @@ void TestNativeTreePairAndAppend()
             Check(!OverlapXZ(placement.trunkBounds, report.placements[j].trunkBounds),
                   "measured bark/trunk AABBs remain separated between adjacent placements");
     }
-    Check(pineCount == 5u && alderCount == 5u,
-          "the ten-point placement set alternates the original pine and alder silhouettes evenly");
+    Check(pineCount == 32u && alderCount == 32u,
+          "the woodland balances the original pine and alder silhouettes");
     const auto& collisionTrunks = gameplay::simulation::WorldRouteForestTrunks();
     Check(collisionTrunks.size() == gameplay::simulation::kForestTreePlacementContract.size(),
           "simulation exposes one shared collision trunk for each rendered tree");
@@ -224,12 +234,127 @@ void TestCleanFailures()
           "four-group admission fails before geometry mutation when the shared 32-material cap would overflow");
 }
 
+void TestUnsafeRootFootprintsFailAtomically()
+{
+    using Surface=gameplay::simulation::TriangleSupportSurface;
+    std::string diagnostic;
+    const auto& first=gameplay::simulation::kForestTreePlacementContract.front();
+    for(bool missing:{false,true}) {
+        const float radius=missing ? .01f : 100.f;
+        const float slope=missing ? 0.f : 2.f;
+        const float x=first.x,z=first.z;
+        const Surface::Point a{x-radius,-slope*radius,z-radius};
+        const Surface::Point b{x-radius,-slope*radius,z+radius};
+        const Surface::Point c{x+radius,slope*radius,z-radius};
+        const Surface::Point d{x+radius,slope*radius,z+radius};
+        const std::array<Surface::Triangle,2> triangles{{{{a,b,c}},{{c,b,d}}}};
+        const auto terrain=Surface::Build(triangles,diagnostic);
+        Check(terrain!=nullptr,"root negative fixture has valid native support triangles");
+        if(!terrain)continue;
+        auto owner=LoadCollapse(diagnostic);
+        const auto oldVertices=owner.vertices;
+        const auto oldIndices=owner.indices;
+        ForestDressingBuildReport report;
+        Check(!AppendPreparedForestDressing(kRoot/"assets",owner,report,diagnostic,terrain.get()),
+            "missing footprint or excessive burial must reject the placement");
+        Check(diagnostic.find(missing ? "missing terrain support" : "needs reauthoring")!=std::string::npos,
+            "root failure must identify the actual support/admission problem");
+        Check(owner.vertices.size()==oldVertices.size() && owner.indices==oldIndices &&
+              std::memcmp(owner.vertices.data(),oldVertices.data(),oldVertices.size()*sizeof(oldVertices[0]))==0,
+              "failed root fitting must preserve the original static owner byte-for-byte");
+    }
+}
+
+void TestNativeTerrainAndTrailClearance()
+{
+    std::string diagnostic;
+    AssetManifest manifest;
+    StaticMeshAsset mesh;
+    const auto directory = kRoot / "assets/models/world/runtime/chapter-terrain-v1";
+    if (!AssetManifest::Load(directory / "asset.manifest.json", manifest, diagnostic) ||
+        !StaticMeshAsset::Load(directory / "chapter-terrain-lod0.runtime.glb", manifest, mesh, diagnostic))
+    {
+        Check(false, diagnostic);
+        return;
+    }
+    const auto surface = PrepareChapterTerrainSurface(mesh, diagnostic);
+    Check(surface != nullptr, "native woodland terrain imports for actual grounding");
+    if (!surface) return;
+    auto owner = LoadCollapse(diagnostic);
+    ForestDressingBuildReport report;
+    const bool appended = AppendPreparedForestDressing(kRoot / "assets", owner, report, diagnostic, surface.get());
+    Check(appended, diagnostic.empty() ? "woodland appends on actual terrain" : diagnostic);
+    if (!appended) return;
+    std::array<StaticMeshAsset,2> rootSources;
+    for (std::size_t i=0;i<rootSources.size();++i) {
+        const auto sourceDirectory=kRoot/"assets/models/world/runtime/forest-tree-pair-v1";
+        const auto name=i==0 ? "horde-irregular-pine-v1-lod1.glb" : "horde-upright-alder-v1-lod1.glb";
+        Check(AssetManifest::Load(sourceDirectory/"asset.manifest.json",manifest,diagnostic) &&
+            StaticMeshAsset::Load(sourceDirectory/name,manifest,rootSources[i],diagnostic),
+            "actual native tree source required for footprint regression");
+    }
+    float worstRootGap=-1000.f;
+    std::size_t exposedRoots=0,rootSamples=0;
+    for (const auto& placement : report.placements)
+    {
+        const auto& source=rootSources[std::string_view(placement.asset)=="pine" ? 0 : 1];
+        const float c=std::cos(placement.yawRadians),sine=std::sin(placement.yawRadians);
+        for (const auto& vertex:source.vertices) {
+            const auto& p=vertex.position;
+            if(p[1]>source.bounds.minimum[1]+.02f)continue;
+            const float x=placement.origin[0]+c*p[0]+sine*p[2];
+            const float z=placement.origin[2]-sine*p[0]+c*p[2];
+            const auto under=surface->Query(x,z);
+            Check(under.found,"root tip must have real terrain underneath");
+            if(!under.found)continue;
+            const float gap=placement.origin[1]+p[1]-under.worldY;
+            worstRootGap=std::max(worstRootGap,gap);++rootSamples;
+            if(gap>-.019f)++exposedRoots;
+        }
+        const auto ground = surface->Query(placement.origin[0], placement.origin[2]);
+        Check(ground.found && placement.worldBounds.minimum[1]<=ground.worldY &&
+                  ground.worldY-placement.worldBounds.minimum[1]<=.6501f,
+              "root burial is bounded against actual native terrain, never the old ribbon");
+        Check(!gameplay::traversal::ChapterExteriorMovementClear(*surface,
+                  placement.origin[0], placement.origin[2], placement.origin[0], placement.origin[2],
+                  ground.worldY, .24f), "native chapter collision rejects entering a rendered trunk");
+    }
+    std::cout<<"Native root footprint samples="<<rootSamples<<" exposed="<<exposedRoots
+             <<" maximum_gap_m="<<worstRootGap<<'\n';
+    Check(rootSamples>=64u*18u && exposedRoots==0,
+          "all imported root-tip base vertices must embed at least 2cm into the exact terrain");
+    // Sweep the full 2.4 m authored clear trail, including player radius, against
+    // measured bark boxes. Side foliage can overhang; solids cannot narrow it.
+    const auto& route = gameplay::simulation::kWorldRoutePoints;
+    for (std::size_t segment = 2; segment + 1 < route.size(); ++segment)
+    {
+        const auto a = route[segment], b = route[segment + 1];
+        for (const auto& tree : gameplay::simulation::kForestTreePlacementContract)
+        {
+            float enter = 0, leave = 1;
+            const auto axis = [&](float start, float end, float low, float high) {
+                const float delta = end - start;
+                if (std::abs(delta) < 1e-7f) return start >= low && start <= high;
+                float t0 = (low - start) / delta, t1 = (high - start) / delta;
+                if (t0 > t1) std::swap(t0, t1);
+                enter = std::max(enter, t0); leave = std::min(leave, t1);
+                return enter <= leave;
+            };
+            Check(!(axis(a.x,b.x,tree.trunkMinX-1.44f,tree.trunkMaxX+1.44f) &&
+                    axis(a.z,b.z,tree.trunkMinZ-1.44f,tree.trunkMaxZ+1.44f)),
+                  "new woodland must preserve the 2.4 m trail plus capsule clearance");
+        }
+    }
+}
+
 } // namespace
 
 int main()
 {
     TestNativeTreePairAndAppend();
     TestCleanFailures();
+    TestNativeTerrainAndTrailClearance();
+    TestUnsafeRootFootprintsFailAtomically();
     if (failures == 0)
     {
         std::cout << "Native forest tree-pair import, grounding, grouping, and clean-failure checks passed.\n";

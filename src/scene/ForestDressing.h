@@ -2,6 +2,7 @@
 
 #include "scene/assets/StaticMeshAsset.h"
 #include "gameplay/simulation/TriangleSupportSurface.h"
+#include "gameplay/simulation/ForestTreePlacementContract.h"
 
 #include <array>
 #include <cstddef>
@@ -36,10 +37,10 @@ struct ForestDressingBuildReport
     std::size_t addedMaterials = 0u;
     std::size_t placedInstances = 0u;
     ForestDressingBounds addedBounds{};
-    std::array<ForestDressingPlacement, 10u> placements{};
+    std::array<ForestDressingPlacement, gameplay::simulation::kForestTreePlacementContract.size()> placements{};
 };
 
-// Imports the admitted LOD1 pine and alder, bakes ten grounded world
+// Imports the admitted LOD1 pine and alder, bakes the authored grounded world
 // placements into the existing static owner, and groups them into four
 // shared PBR material families. The source models add no new asset/BLAS owner.
 bool AppendPreparedForestDressing(const std::filesystem::path& assetRoot,

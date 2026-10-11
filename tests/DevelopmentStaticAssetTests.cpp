@@ -66,8 +66,8 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 81u,
-          "development registry retains prior views plus three bounded stone-finish inspections");
+    Check(kDevelopmentCheckpoints.size() == 84u,
+          "development registry retains prior views plus three bounded woodland route inspections");
     Check(FindDevelopmentCheckpoint(164) == nullptr,
           "development lookup preserves the unassigned gap before later bounded additions");
     const auto* worldRoute = FindDevelopmentCheckpoint("world-route");
@@ -103,9 +103,19 @@ int main()
               !stone->primaryArmsMayBeOutsideFrame,
               "stone views are development-only and retain strict primary-arm visibility");
     }
-    Check(FindDevelopmentCheckpoint(201) == nullptr &&
+    for (const auto name : {"chapter-forest-first-bend", "chapter-forest-second-bend", "chapter-forest-lookout"})
+    {
+        const auto* forest = FindDevelopmentCheckpoint(name);
+        Check(forest != nullptr && forest->id >= 201 && forest->id <= 203 &&
+              FindDevelopmentCheckpoint(forest->id) == forest && FindShowcaseCheckpoint(name) == nullptr &&
+              forest->stagesRescueExterior && forest->exteriorRouteStation >= 4u &&
+              forest->exteriorRouteStation < simulation::kWorldRoutePoints.size() &&
+              !forest->primaryArmsMayBeOutsideFrame,
+              "woodland views require real rescue/native-route staging and retain strict equipment visibility");
+    }
+    Check(FindDevelopmentCheckpoint(204) == nullptr &&
               FindDevelopmentCheckpoint("rescue-journey-unknown") == nullptr,
-          "development lookup rejects genuinely unknown IDs and names beyond the stone inspections");
+          "development lookup rejects genuinely unknown IDs and names beyond the woodland inspections");
     const auto* torchParry = FindDevelopmentCheckpoint("player-torch-parry-clearance");
     simulation::GameSimulation stagedTorchParry;
     DevelopmentCheckpointStageEvidence torchParryEvidence{};
