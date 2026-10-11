@@ -1,10 +1,12 @@
 #include "platform/windows/WindowsPlaytestReport.h"
 
 #include <atomic>
+#include <array>
 #include <algorithm>
 #include <cstring>
 #include <chrono>
 #include <iostream>
+#include <mutex>
 #include <string>
 #include <thread>
 #include <vector>
@@ -22,6 +24,9 @@ std::atomic<ULONGLONG> noteEditStarted{0};
 std::atomic<bool> noteEditExecuting{false};
 std::atomic<ULONGLONG> noteEditElapsed{0};
 bool exerciseTimeoutDiagnostic = false;
+struct NoteTrace { const char* phase; bool returned; ULONGLONG elapsed; };
+std::array<NoteTrace, 8> noteTraces{};
+std::size_t noteTraceCount = 0;
 
 LRESULT CALLBACK TraceNoteEntry(int code, WPARAM value, LPARAM argument)
 {
@@ -68,6 +73,8 @@ BOOL CALLBACK ReadCapturedStack(HANDLE process, DWORD64 address, PVOID output, D
 }
 void TraceOwnerStack(DWORD thread)
 {
+    static std::mutex captureMutex;
+    const std::lock_guard<std::mutex> captureLock(captureMutex);
     HANDLE owner = OpenThread(THREAD_SUSPEND_RESUME | THREAD_GET_CONTEXT | THREAD_QUERY_INFORMATION, FALSE, thread);
     if (!owner) return;
     CONTEXT context{}; context.ContextFlags = CONTEXT_FULL;
@@ -220,10 +227,8 @@ LRESULT Send(HWND window, const UINT message, const WPARAM value = 0, const LPAR
         TraceOwnerWait(ownerThread);
         passed.store(false);
     }
-    if (message == WM_SETTEXT && GetDlgCtrlID(window) == 106)
-        std::cerr << "note EDIT trace; phase=" << currentPhase.load()
-                  << " returned=" << !noteEditExecuting.load()
-                  << " elapsedMs=" << noteEditElapsed.load() << '\n';
+    if (message == WM_SETTEXT && GetDlgCtrlID(window) == 106 && noteTraceCount < noteTraces.size())
+        noteTraces[noteTraceCount++] = {currentPhase.load(), !noteEditExecuting.load(), noteEditElapsed.load()};
     return static_cast<LRESULT>(result);
 }
 
@@ -260,6 +265,20 @@ int main(int argc, char** argv)
     const HHOOK entryTrace = SetWindowsHookExW(WH_CALLWNDPROC, TraceNoteEntry, nullptr, thread);
     const HHOOK returnTrace = SetWindowsHookExW(WH_CALLWNDPROCRET, TraceNoteReturn, nullptr, thread);
     Check(entryTrace != nullptr && returnTrace != nullptr, "note UI timing trace hooks unavailable");
+    std::atomic<bool> stopObserver{false};
+    std::thread slowEditObserver([thread, &stopObserver] {
+        // A cold Unicode edit can be slow without reaching the unchanged 2 s
+        // deadline. Sample that real path once; no delay or font warm-up is
+        // inserted into the UI owner or its action sequence.
+        while (!stopObserver.load()) {
+            if (noteEditExecuting.load() && GetTickCount64() - noteEditStarted.load() >= 100 &&
+                std::strcmp(currentPhase.load(), "note-only approved Unicode note edit") == 0) {
+                TraceOwnerStack(thread);
+                return;
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        }
+    });
     std::thread actions([thread] {
         SetPhase("note-only default and private-content checks");
         const HWND form = WaitForForm(thread);
@@ -321,6 +340,13 @@ int main(int argc, char** argv)
     });
     horde::platform::windows::ShowWindowsPlaytestReport(owner, context, FakeDestination);
     contextActions.join();
+    stopObserver.store(true);
+    slowEditObserver.join();
+    // Flush after both action threads have joined, not between input operations:
+    // console IO must not space out the messages and hide an initialization race.
+    for (std::size_t i = 0; i < noteTraceCount; ++i)
+        std::cerr << "note EDIT trace; phase=" << noteTraces[i].phase
+                  << " returned=" << noteTraces[i].returned << " elapsedMs=" << noteTraces[i].elapsed << '\n';
     Check(approved.size() == 1 && approved[0].find("\"rtPresented\":false") != std::string::npos &&
         approved[0].find("\"context\"") != std::string::npos,
         "explicit allowlist context or honest false presentation state missing");
