@@ -977,6 +977,78 @@ void TestSharedTextureSourceRouting()
     auto ungroupedTextured = makeAsset({makeMaterial("UngroupedTextured", -1, 601)});
     expectFailure({worldRegistration, {1u, 2u, 0u, 0u, &ungroupedTextured, &world}},
                   "explicit texture group", "textured ungrouped alias is rejected");
+    // Explicit immutable material sharing is independent of texture-only aliasing.
+    // Geometry remains separate, and every primitive retains the same GPU record.
+    auto duplicate = world;
+    duplicate.vertices[0].position[0] = 9.0f;
+    auto trailing = makeAsset({makeMaterial("Trailing", -1, 0, {{false,false,false,false}})});
+    const auto materialRegistrations = [&]() {
+        return std::array<StaticRtAssetRegistration, 3>{{worldRegistration,
+            {1u, 2u, 0u, 0u, &duplicate, &world}, {2u, 3u, 0u, 0u, &trailing}}};
+    };
+    RtStaticMeshSlot immutable;
+    Check(immutable.Initialize(materialRegistrations(), diagnostic), "immutable fixture initializes");
+    const auto beforeMaterials = immutable.Materials();
+    const auto beforePrimitives = immutable.PrimitiveMetadata();
+    const auto beforeVertices = immutable.Vertices();
+    const auto beforeIndices = immutable.Indices();
+    const auto beforeInstances = immutable.InstanceMetadata();
+    using horde::vulkan::raytracing::RtImmutableMaterialAlias;
+    using horde::vulkan::raytracing::RtMaterialGpu;
+    const std::array<RtImmutableMaterialAlias,2> exactAliases{{{2u,0u},{3u,1u}}};
+    Check(immutable.ShareImmutableMaterialRows(exactAliases, diagnostic), "exact converted material rows may share");
+    Check(immutable.Materials().size() == 3u && immutable.Measurements().materialBytes == 3u*sizeof(RtMaterialGpu) &&
+          immutable.Indices() == beforeIndices &&
+          std::memcmp(immutable.Vertices().data(), beforeVertices.data(), beforeVertices.size()*sizeof(beforeVertices[0])) == 0 &&
+          std::memcmp(immutable.InstanceMetadata().data(), beforeInstances.data(), sizeof(beforeInstances)) == 0,
+          "immutable sharing saves only material rows; geometry and instance ownership stay identical");
+    for (std::size_t i=0; i<beforePrimitives.size(); ++i)
+    {
+        const auto& old = beforePrimitives[i]; const auto& now = immutable.PrimitiveMetadata()[i];
+        Check(old.vertexOffset == now.vertexOffset && old.indexOffset == now.indexOffset && old.indexCount == now.indexCount &&
+              std::memcmp(&beforeMaterials[old.materialIndex], &immutable.Materials()[now.materialIndex], sizeof(RtMaterialGpu)) == 0,
+              "every primitive including later materials preserves its exact converted GPU record");
+    }
+    const auto rejectAliases = [&](std::vector<RtImmutableMaterialAlias> aliases) {
+        RtStaticMeshSlot rejected;
+        Check(rejected.Initialize(materialRegistrations(), diagnostic), "negative immutable fixture initializes");
+        const auto materials = rejected.Materials(); const auto primitives = rejected.PrimitiveMetadata();
+        Check(!rejected.ShareImmutableMaterialRows(aliases, diagnostic) &&
+              rejected.Materials().size() == materials.size() &&
+              std::memcmp(rejected.Materials().data(), materials.data(), materials.size()*sizeof(materials[0])) == 0 &&
+              std::memcmp(rejected.PrimitiveMetadata().data(), primitives.data(), primitives.size()*sizeof(primitives[0])) == 0,
+              "invalid immutable aliases reject before any row or primitive changes");
+    };
+    rejectAliases({{2u,0u},{2u,0u}}); // duplicate consumer
+    rejectAliases({{0u,0u}}); rejectAliases({{2u,4u}}); rejectAliases({{99u,0u}});
+    rejectAliases({{2u,1u}}); // different exact factors and texture group
+    // Same converted bytes can still form a forbidden ownership chain.
+    auto thirdCopy = world;
+    RtStaticMeshSlot chain;
+    Check(chain.Initialize(std::array<StaticRtAssetRegistration,3>{{worldRegistration,
+        {1u,2u,0u,0u,&duplicate,&world},{2u,3u,0u,0u,&thirdCopy,&world}}},diagnostic), "chain fixture initializes");
+    Check(!chain.ShareImmutableMaterialRows(std::array<RtImmutableMaterialAlias,2>{{{4u,2u},{2u,0u}}},diagnostic),
+          "material alias chains reject regardless of request order");
+    // Include loader-derived optical fields and flags, not just base colour.
+    for (unsigned field=0; field<10; ++field)
+    {
+        duplicate = world;
+        auto& m=duplicate.materials[0];
+        switch(field) {
+        case 0: m.baseColorFactor[0]+=.01f;break;
+        case 1: m.emissiveStrength+=.01f;break;
+        case 2: m.roughnessFactor+=.01f;break;
+        case 3: m.ior+=.01f;break;
+        case 4: m.attenuationColor[2]+=.01f;break;
+        case 5: m.normalScale+=.01f;break;
+        case 6: m.textureScale[1]+=.01f;break;
+        case 7: m.numericalSpawnMinimumWidth=.01f;break;
+        case 8: m.numericalSpawnGeometryError=.01f;break;
+        case 9: m.flags ^= 0x80000000u;break;
+        }
+        rejectAliases({{2u,0u}});
+    }
+
 }
 
 void TestGeometryRolePartitioning()

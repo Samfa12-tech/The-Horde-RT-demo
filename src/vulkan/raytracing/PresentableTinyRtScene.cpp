@@ -2524,6 +2524,32 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
                 static_cast<std::uint32_t>(RtInstanceFlag::Transmissive), 0u,
             &waterDropletAsset_});
     if (!staticMeshSlot_.Initialize(registrations, diagnostic)) return false;
+    if (developmentRescueJourney_)
+    {
+        // Only these immutable opaque chest families opt in. The separately
+        // mutable dielectric fixture keeps its own row, as do all other assets.
+        std::array<RtImmutableMaterialAlias, 2> aliases{};
+        const auto materialRow = [&](const auto& asset, std::uint32_t instance,
+                                     const char* name, std::uint32_t& row) {
+            const auto& metadata = staticMeshSlot_.InstanceMetadata()[instance];
+            for (std::size_t i = 0; i < asset.primitives.size(); ++i)
+                if (asset.materials[asset.primitives[i].materialIndex].name == name)
+                {
+                    row = staticMeshSlot_.PrimitiveMetadata()[metadata.primitiveBase + i].materialIndex;
+                    return true;
+                }
+            return false;
+        };
+        constexpr std::array<const char*, 2> families{{"ChestWood", "BlackIron"}};
+        for (std::size_t i = 0; i < families.size(); ++i)
+            if (!materialRow(gothicChestBaseAsset_, 5u, families[i], aliases[i].provider) ||
+                !materialRow(gothicChestLidAsset_, 6u, families[i], aliases[i].consumer))
+            {
+                diagnostic = "Chapter immutable chest material roster changed.";
+                return false;
+            }
+        if (!staticMeshSlot_.ShareImmutableMaterialRows(aliases, diagnostic)) return false;
+    }
     const RtInstanceMetadata playerMetadata = staticMeshSlot_.InstanceMetadata()[kPlayerWorldBodyInstanceIndex];
     if (playerMetadata.primitiveCount == 0u ||
         playerMetadata.primitiveCount != productionPlayerAsset_.primitives.size() ||

@@ -27,6 +27,12 @@ struct StaticRtAssetRegistration
     RtGeometryRole geometryRole = RtGeometryRole::Static;
 };
 
+struct RtImmutableMaterialAlias
+{
+    std::uint32_t consumer = 0u;
+    std::uint32_t provider = 0u;
+};
+
 struct RtStaticMeshMeasurements
 {
     std::uint64_t vertexBytes = 0u;
@@ -42,6 +48,12 @@ class RtStaticMeshSlot
 public:
     bool Initialize(std::span<const StaticRtAssetRegistration> registrations,
                     std::string& diagnostic);
+
+    // CPU admission only, before GPU upload. Caller explicitly warrants these
+    // rows are immutable; mutable fixture materials must never be nominated.
+    // Requires exact converted GPU records, and atomically remaps every primitive.
+    bool ShareImmutableMaterialRows(std::span<const RtImmutableMaterialAlias> aliases,
+                                    std::string& diagnostic);
 
     const std::array<RtInstanceMetadata, kRtInstanceMetadataCapacity>& InstanceMetadata() const
     {

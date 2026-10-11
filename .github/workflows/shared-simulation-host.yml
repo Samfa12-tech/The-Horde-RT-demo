@@ -8,6 +8,7 @@ on:
       - main
       - codex/horde-1.6.1-engineering-pass
       - codex/horde-1.6.2-engine-readiness
+      - codex/horde-1.7-wp2-vertical-proof
 
 permissions:
   contents: read

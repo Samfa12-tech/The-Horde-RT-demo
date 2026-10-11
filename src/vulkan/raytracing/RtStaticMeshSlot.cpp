@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstring>
 #include <limits>
 #include <map>
 #include <unordered_map>
@@ -460,6 +461,60 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
     measurements_.instanceMetadataBytes = instanceMetadata_.size() * sizeof(RtInstanceMetadata);
     measurements_.primitiveMetadataBytes = primitiveMetadata_.size() * sizeof(RtPrimitiveMetadata);
     measurements_.descriptorCount = 9u;
+    diagnostic.clear();
+    return true;
+}
+
+bool RtStaticMeshSlot::ShareImmutableMaterialRows(
+    std::span<const RtImmutableMaterialAlias> aliases, std::string& diagnostic)
+{
+    std::array<std::uint32_t, kRtMaterialCapacity> provider{};
+    std::array<bool, kRtMaterialCapacity> removed{};
+    for (std::uint32_t i = 0; i < provider.size(); ++i) provider[i] = i;
+    for (const auto alias : aliases)
+    {
+        if (alias.consumer >= materials_.size() || alias.provider >= alias.consumer ||
+            removed[alias.consumer])
+        {
+            diagnostic = "Immutable material aliases require unique consumers and earlier valid providers.";
+            return false;
+        }
+        if (std::memcmp(&materials_[alias.consumer], &materials_[alias.provider],
+                        sizeof(RtMaterialGpu)) != 0)
+        {
+            diagnostic = "Immutable material aliases must match every converted GPU field and texture route.";
+            return false;
+        }
+        removed[alias.consumer] = true;
+        provider[alias.consumer] = alias.provider;
+    }
+    for (const auto alias : aliases)
+        if (removed[alias.provider])
+        {
+            diagnostic = "Immutable material alias chains are not permitted.";
+            return false;
+        }
+    for (const auto& primitive : primitiveMetadata_)
+        if (primitive.materialIndex >= materials_.size())
+        {
+            diagnostic = "Immutable material alias has an invalid primitive owner.";
+            return false;
+        }
+    // All possible rejection precedes publication. Vertex/index/transform,
+    // instance identities and texture ownership remain entirely unchanged.
+    std::array<std::uint32_t, kRtMaterialCapacity> remap{};
+    std::vector<RtMaterialGpu> retained;
+    retained.reserve(materials_.size() - aliases.size());
+    for (std::uint32_t i = 0; i < materials_.size(); ++i)
+        if (!removed[i])
+        {
+            remap[i] = static_cast<std::uint32_t>(retained.size());
+            retained.push_back(materials_[i]);
+        }
+    for (auto& primitive : primitiveMetadata_)
+        primitive.materialIndex = remap[provider[primitive.materialIndex]];
+    materials_ = std::move(retained);
+    measurements_.materialBytes = materials_.size() * sizeof(RtMaterialGpu);
     diagnostic.clear();
     return true;
 }

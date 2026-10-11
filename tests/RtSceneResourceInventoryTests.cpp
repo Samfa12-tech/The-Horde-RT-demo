@@ -442,8 +442,20 @@ struct PresentableTinyRtSceneObservationTestAccess
             <<","<<layers[2]<<","<<layers[3]<<'\n';
         ok &= materials.size()<=kRtMaterialCapacity && primitives.size()<=kRtPrimitiveMetadataCapacity;
         ok &= materials.size()+MakeRtWorldMaterialPalette(true).count<=kRtMaterialCapacity;
-        ok &= materials.size()==30u && primitives.size()==
+        ok &= materials.size()==28u && primitives.size()==
             (scene.pipelineBundle_.Request().quality==DielectricQuality::High?30u:29u);
+        const auto& instances=scene.staticMeshSlot_.InstanceMetadata();
+        for(const char* family:{"ChestWood","BlackIron"}) {
+            const auto row=[&](const auto& asset,std::uint32_t owner) {
+                for(std::size_t i=0;i<asset.primitives.size();++i)
+                    if(asset.materials[asset.primitives[i].materialIndex].name==family)
+                        return primitives[instances[owner].primitiveBase+i].materialIndex;
+                return kRtMaterialCapacity;
+            };
+            const auto base=row(scene.gothicChestBaseAsset_,5u);
+            const auto lid=row(scene.gothicChestLidAsset_,6u);
+            ok &= base<materials.size() && base==lid && base!=scene.dielectricFixtureMaterialIndex_;
+        }
         // These are separately owned rigid props. Grouping their baked node
         // geometry must preserve every vertex/triangle and every grip/latch
         // socket; source files and the articulated lantern-body owner stay intact.
@@ -868,7 +880,7 @@ struct PresentableTinyRtSceneObservationTestAccess
                   std::abs(chapterEntryTop - 6.0f) < 0.001f &&
                   tomb.collapseStaticAsset_.indices.size() == chapterEntryIndices + addedIndices &&
                   tomb.staticMeshSlot_.PrimitiveMetadata().size() == 29u &&
-                  tomb.staticMeshSlot_.Materials().size() == 30u &&
+                  tomb.staticMeshSlot_.Materials().size() == 28u &&
                   tomb.staticMeshSlot_.PrimitiveMetadata().size() <= 32u &&
                   tomb.staticMeshSlot_.Materials().size() <= 32u;
         std::cout << "Integrated native tomb static roster: "
