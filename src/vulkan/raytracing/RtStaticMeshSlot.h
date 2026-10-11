@@ -30,6 +30,12 @@ struct StaticRtAssetRegistration
     // owns the asset once; a range does not duplicate geometry or textures.
     std::uint32_t primitiveOffset = 0u;
     std::uint32_t primitiveCount = 0u;
+    // Candidate preparation may select disconnected source-local families for
+    // ONE BLAS owner without consuming another instance/asset/primitive row.
+    // Borrowed only during InitializeSelectedGeometry; strictly increasing,
+    // mutually exclusive with the contiguous range, immutable StaticPbr only.
+    // The legacy packer rejects this rather than silently ignoring selection.
+    std::span<const std::uint32_t> primitiveSelection{};
 };
 
 struct RtImmutableMaterialAlias

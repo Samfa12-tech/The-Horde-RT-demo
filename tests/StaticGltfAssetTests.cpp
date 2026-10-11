@@ -1295,6 +1295,50 @@ void TestSelectedGeometryPacking()
               admitted.Indices() == selected.Indices(),
               "failed candidate leaves every previously admitted route and payload intact");
     };
+    const std::array<std::uint32_t,2> disconnected{{0,2}};
+    auto oneOwner = complete;
+    oneOwner.primitiveSelection = disconnected;
+    Check(selected.InitializeSelectedGeometry(std::array{oneOwner}, diagnostic) &&
+          selected.InstanceMetadata()[21].primitiveCount == 2 &&
+          selected.InstanceMetadata()[21].primitiveBase == 0 &&
+          selected.PrimitiveMetadata().size() == 2 && selected.Vertices().size() == 9 &&
+          selected.Indices() == std::vector<std::uint32_t>({0,1,2,0,1,2,0,2,3}) &&
+          equalBytes(admitted.Materials(), selected.Materials()),
+          "one owner selects disconnected source families with exact decode and shared material identity");
+    // Put the admitted baseline back before each failure-atomic assertion.
+    Check(selected.InitializeSelectedGeometry(std::array{complete}, diagnostic),
+          "complete owner remains reconstructible after disconnected selection");
+    RtStaticMeshSlot legacySelection = admitted;
+    Check(!legacySelection.Initialize(std::array{oneOwner}, diagnostic) &&
+          !diagnostic.empty() && equalBytes(admitted.Vertices(), legacySelection.Vertices()) &&
+          equalBytes(admitted.PrimitiveMetadata(), legacySelection.PrimitiveMetadata()),
+          "legacy packing rejects explicit selection without clobbering admitted data");
+    const auto rejectList = [&](std::span<const std::uint32_t> list) {
+        auto invalid = oneOwner; invalid.primitiveSelection = list;
+        reject(std::array{invalid});
+    };
+    const std::array<std::uint32_t,2> duplicateList{{0,0}}, reversedList{{2,0}},
+        outsideList{{0,3}}, overflowList{{0,UINT32_MAX}};
+    rejectList(duplicateList); rejectList(reversedList); rejectList(outsideList); rejectList(overflowList);
+    auto invalidSelection = oneOwner;
+    invalidSelection.primitiveCount = 1; reject(std::array{invalidSelection});
+    invalidSelection = oneOwner; invalidSelection.primitiveOffset = 1; reject(std::array{invalidSelection});
+    invalidSelection = oneOwner; invalidSelection.geometryRole = RtGeometryRole::PlayerWorldBody;
+    reject(std::array{invalidSelection});
+    invalidSelection = oneOwner; invalidSelection.flags = 0; reject(std::array{invalidSelection});
+    const std::array<std::uint32_t,1> middle{{1}};
+    auto interleavingOwner = complete;
+    interleavingOwner.instanceCustomIndex = 14; interleavingOwner.primitiveSelection = middle;
+    reject(std::array{oneOwner, interleavingOwner});
+    auto overlappingOwner = oneOwner;
+    overlappingOwner.instanceCustomIndex = 14;
+    Check(selected.InitializeSelectedGeometry(std::array{oneOwner,overlappingOwner}, diagnostic) &&
+          selected.PrimitiveMetadata().size() == 2 && selected.Vertices().size() == 9 &&
+          selected.InstanceMetadata()[21].primitiveBase == selected.InstanceMetadata()[14].primitiveBase &&
+          selected.InstanceMetadata()[21].primitiveCount == 2,
+          "two identical disconnected owners share one exact packed payload");
+    Check(selected.InitializeSelectedGeometry(std::array{complete}, diagnostic),
+          "baseline restored after overlapping selection");
     reject(std::span<const StaticRtAssetRegistration>{});
     auto bad = owners;
     bad[0].primitiveCount = std::numeric_limits<std::uint32_t>::max(); reject(bad);

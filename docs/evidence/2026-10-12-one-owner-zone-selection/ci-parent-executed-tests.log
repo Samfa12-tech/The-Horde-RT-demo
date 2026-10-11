@@ -1,0 +1,9 @@
+player-vulkan-host	Run focused player, semantic and output-ownership fixtures	2026-10-11T20:04:42.5165101Z  9/39 Test  #49: horde_rt_world_route_foundation_tests ................   Passed    0.13 sec
+player-vulkan-host	Run focused player, semantic and output-ownership fixtures	2026-10-11T20:04:42.5198160Z 10/39 Test  #50: horde_rt_vertical_support_tests ......................   Passed    0.00 sec
+player-vulkan-host	Run focused player, semantic and output-ownership fixtures	2026-10-11T20:04:42.5789034Z 11/39 Test  #51: horde_rt_held_item_vertical_support_rig_tests ........   Passed    0.06 sec
+player-vulkan-host	Run focused player, semantic and output-ownership fixtures	2026-10-11T20:04:43.1189356Z 12/39 Test  #52: horde_rt_player_directional_rig_tests ................   Passed    0.50 sec
+player-vulkan-host	Run focused player, semantic and output-ownership fixtures	2026-10-11T20:05:13.5829176Z 34/39 Test #144: horde_rt_rescue_journey_integration_tests ............   Passed    0.24 sec
+player-vulkan-host	Run focused player, semantic and output-ownership fixtures	2026-10-11T20:05:20.3014775Z 38/39 Test #152: horde_rt_rescue_rig_attachment_tests .................   Passed    3.73 sec
+player-vulkan-host	Run focused player, semantic and output-ownership fixtures	2026-10-11T20:05:24.0597705Z 39/39 Test #153: horde_rt_rescue_adversarial_regression_tests .........   Passed    3.76 sec
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T20:11:05.8465645Z 111/132 Test #111: horde_rt_windows_playtest_report_ui_tests ..................   Passed    0.63 sec
+Shared simulation host (MSVC)	Retain native report edit timing trace	2026-10-11T20:14:25.5333434Z note EDIT trace; phase=note-only approved Unicode note edit returned=1 elapsedMs=328

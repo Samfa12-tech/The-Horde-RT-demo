@@ -1,0 +1,12 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  RtStaticMeshSlot.cpp
+  ForestDressingTests.cpp
+  Generating Code...
+  horde_rt_forest_dressing_tests.vcxproj -> C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-release\Release\horde_rt_forest_dressing_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  RtStaticMeshSlot.cpp
+  StaticGltfAssetTests.cpp
+  Generating Code...
+  horde_rt_static_gltf_asset_tests.vcxproj -> C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-release\Release\horde_rt_static_gltf_asset_tests.exe

@@ -348,3 +348,4 @@ docs/evidence/2026-10-12-gpu-buffer-preparation/** -text whitespace=cr-at-eol
 docs/evidence/2026-10-12-gpu-buffer-preparation/gpu-buffer-batch-shader-catalog-missing-paths.log whitespace=-blank-at-eof,cr-at-eol
 docs/evidence/2026-10-12-report-ui-font-policy/logs/** -text whitespace=cr-at-eol
 docs/evidence/2026-10-12-report-ui-font-policy/logs/ci-37310bd5-msvc-failure.log whitespace=-trailing-space,cr-at-eol
+docs/evidence/2026-10-12-one-owner-zone-selection/** -text whitespace=cr-at-eol

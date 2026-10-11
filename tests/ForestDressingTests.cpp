@@ -429,11 +429,14 @@ void TestNativeChapterPrimitiveOwnership()
         std::uint32_t expectedPrimitives = 0;
         for (const auto& range : selectedRanges) {
             const auto& metadata = candidate.InstanceMetadata()[range.instanceCustomIndex];
-            Check(metadata.primitiveCount == range.primitiveCount &&
+            const auto selectedCount = range.primitiveSelection.empty()
+                ? range.primitiveCount : range.primitiveSelection.size();
+            Check(metadata.primitiveCount == selectedCount &&
                   metadata.stableObjectId == range.stableObjectId && metadata.flags == range.flags,
                   "selected native owner retains its logical identity and full geometry count");
-            for (std::uint32_t local = 0; local < range.primitiveCount; ++local) {
-                const auto sourceIndex = range.primitiveOffset + local;
+            for (std::uint32_t local = 0; local < selectedCount; ++local) {
+                const auto sourceIndex = range.primitiveSelection.empty()
+                    ? range.primitiveOffset + local : range.primitiveSelection[local];
                 const auto& source = owner.primitives[sourceIndex];
                 const auto& packed = candidate.PrimitiveMetadata()[metadata.primitiveBase + local];
                 const std::size_t sourceEnd = sourceIndex + 1 < owner.primitives.size()
@@ -447,6 +450,8 @@ void TestNativeChapterPrimitiveOwnership()
                 if (!inBounds) continue;
                 Check(packed.indexCount == source.indexCount &&
                       packed.materialIndex == source.materialIndex &&
+                      candidate.GeometryTransforms()[metadata.primitiveBase + local] ==
+                          complete.GeometryTransforms()[sourceIndex] &&
                       candidate.PrimitiveVertexCounts()[metadata.primitiveBase + local] == count &&
                       std::memcmp(candidate.Vertices().data() + packed.vertexOffset,
                           owner.vertices.data() + source.vertexOffset, count * sizeof(StaticRtVertex)) == 0 &&
@@ -483,6 +488,16 @@ void TestNativeChapterPrimitiveOwnership()
     const std::array forestRanges{ranges[0], ranges[2]};
     verifySelection(tombRanges, "common+tomb");
     verifySelection(forestRanges, "common+forest");
+    // Production has no spare primitive or instance row. Disconnected source
+    // families must therefore pack into the existing collapse owner, preserving
+    // the same BLAS-local decode rather than inventing extra world instances.
+    const std::array<std::uint32_t,8> forestFamilies{{0,1,5,6,7,8,9,10}};
+    auto forestOwner = StaticRtAssetRegistration{21,100,pbr,0,&owner};
+    forestOwner.primitiveSelection = forestFamilies;
+    verifySelection(std::array{forestOwner}, "one-owner common+forest");
+    auto tombOwner = StaticRtAssetRegistration{21,100,pbr,0,&owner};
+    tombOwner.primitiveCount = 5;
+    verifySelection(std::array{tombOwner}, "one-owner common+tomb");
     std::cout << "Native chapter ownership: common 2 (includes mixed tomb masonry), tomb 3, forest 6; "
               << "primitiveRows=" << visited << " vertexBytes=" << complete.Measurements().vertexBytes
               << " indexBytes=" << complete.Measurements().indexBytes << "; CPU admission only\n";

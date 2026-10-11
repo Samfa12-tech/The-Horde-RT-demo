@@ -443,3 +443,19 @@ preserve the two-second message deadline, complete report assertions and all
 chapter work. Debug/Release focused checks pass locally; fresh exact-commit CI
 must establish the candidate's cold-host result. The trace identifies a GDI font
 measurement path, not a proved deadlock or a guaranteed performance cure.
+
+All six CI jobs subsequently passed on `6b0e02d3`; MSVC executed 132/132 tests,
+with the formerly failing Unicode edit completing in 328 ms under the unchanged
+two-second deadline. Retain `37310bd5` as failed evidence. This is one verified
+cold-host candidate run, not a guarantee against every Windows font-service stall.
+
+### Disconnected native families under one owner (12 October)
+
+The [one-owner selection milestone](../evidence/2026-10-12-one-owner-zone-selection/README.md)
+packs common+forest families without allocating additional owner or primitive
+rows. Invalid or interleaved lists preserve the admitted state. Actual native
+geometry/transform/material bytes remain exact; normal Pipeline/Query forest-bend
+captures remain pixel-identical. This is an opt-in CPU candidate capability,
+not completed GPU streaming. Actual resource preparation, cutover, retirement,
+reverse traversal and measured overlap remain required alongside the remaining
+chapter presentation and physical acceptance gates.

@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "implementationBase": "6b0e02d3b31bf042818eb91468ff78b0ccb4a25b",
+  "sourceFiles": [
+    {
+      "sha256": "d2e17f2027e73ba2e6663051ef3726a847d2148341856e3ab3abf7e7e7daae1b",
+      "path": "src/vulkan/raytracing/RtStaticMeshSlot.h"
+    },
+    {
+      "sha256": "c12e1bf2eec4888fc5a2a878b98d7b09208fa0a50e53454dacfcd2f37f7e64be",
+      "path": "src/vulkan/raytracing/RtStaticMeshSlot.cpp"
+    },
+    {
+      "sha256": "ba7b30f29ff4141cb84adb5bfd13da4f99b181d93648e32d64f162c7f3c5c6a0",
+      "path": "tests/StaticGltfAssetTests.cpp"
+    },
+    {
+      "sha256": "33c6bda4610ed8584613f072d3708743b22ba798247917b895f9850b9ef97a7e",
+      "path": "tests/ForestDressingTests.cpp"
+    }
+  ],
+  "artifacts": [
+    {
+      "sha256": "3c09667abe3f2a1aeddeb14fc7cea34c9961a4c9a08120a4b5fe727f9ce106b5",
+      "bytes": 12604416,
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe"
+    },
+    {
+      "sha256": "eaccbabc47b79f89d452352e97ba6797b5ef522c68e8e91f3a9f3cfa9fe13974",
+      "bytes": 4384256,
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe"
+    }
+  ],
+  "budgets": {
+    "unchanged": true,
+    "sha256": "56936479b2d202dbdb9393ba94b66a1b0bc12d490b700d8af4c63de3460e53bf",
+    "path": "tools/raygen-variant-budgets.json"
+  },
+  "checks": {
+    "interactiveGameLaunch": false,
+    "androidLocalRebuild": "not run for this selection; current-source CI required",
+    "Release": {
+      "passed": 2,
+      "selected": 2,
+      "seconds": 3.2
+    },
+    "phoneInstall": false,
+    "zeroChangedPixelComparisons": 2,
+    "actualNativeCaptures": 2,
+    "gpuStreamingImplemented": false,
+    "beforeImplementationFailures": 12,
+    "Debug": {
+      "passed": 2,
+      "selected": 2,
+      "seconds": 12.56
+    }
+  },
+  "parentCi": {
+    "jobs": 6,
+    "head": "6b0e02d3b31bf042818eb91468ff78b0ccb4a25b",
+    "run": 38170448572,
+    "passed": 6,
+    "unicodeEditMilliseconds": 328
+  },
+  "protectedBackup": {
+    "unchanged": true,
+    "sha256": "0dae1e8fb803336cef2d045f48c5f4c9195a6463f45161cb0b6c7434350769fb",
+    "path": "assets/models/world/source/tomb-dressing-v01/tomb-dressing-v01.blend1",
+    "historicalOriginalRecoveryClaimed": false
+  }
+}

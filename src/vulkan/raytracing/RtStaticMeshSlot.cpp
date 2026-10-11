@@ -85,9 +85,24 @@ bool RtStaticMeshSlot::InitializeSelectedGeometry(
             selection = std::prev(selections.end());
         }
         const bool ranged = registration.primitiveOffset != 0 || registration.primitiveCount != 0;
-        if (ranged && (registration.geometryRole != RtGeometryRole::Static ||
+        const bool listed = !registration.primitiveSelection.empty();
+        if (listed && ranged) return reject("explicit selection conflicts with a primitive range.");
+        if ((ranged || listed) && (registration.geometryRole != RtGeometryRole::Static ||
             !(registration.flags & static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr))))
-            return reject("primitive ranges require immutable StaticPbr geometry.");
+            return reject("primitive selections require immutable StaticPbr geometry.");
+        if (listed) {
+            if (registration.primitiveSelection.size() > asset.primitives.size())
+                return reject("explicit selection exceeds its source primitive count.");
+            std::uint32_t previous = 0;
+            bool first = true;
+            for (const auto index : registration.primitiveSelection) {
+                if (index >= asset.primitives.size() || (!first && index <= previous))
+                    return reject("explicit selection must be strictly increasing and inside its source.");
+                selection->retained[index] = true;
+                first = false; previous = index;
+            }
+            continue;
+        }
         const std::size_t start = ranged ? registration.primitiveOffset : 0;
         const std::size_t count = ranged ? registration.primitiveCount : asset.primitives.size();
         if (!count || start >= asset.primitives.size() || count > asset.primitives.size() - start)
@@ -145,7 +160,19 @@ bool RtStaticMeshSlot::InitializeSelectedGeometry(
     std::vector<StaticRtAssetRegistration> packed(registrations.begin(), registrations.end());
     for (auto& registration : packed) {
         const auto selection = find(registration.asset);
-        const auto oldOffset = registration.primitiveOffset;
+        const bool listed = !registration.primitiveSelection.empty();
+        const auto oldOffset = listed ? registration.primitiveSelection.front() : registration.primitiveOffset;
+        if (listed) {
+            // The existing hit ABI needs one contiguous packed span per owner.
+            // Source indices may have holes, but another owner's interleaved
+            // selection must never silently put unrelated geometry in this BLAS.
+            for (std::size_t i = 0; i < registration.primitiveSelection.size(); ++i)
+                if (selection->remap[registration.primitiveSelection[i]] !=
+                    selection->remap[oldOffset] + i)
+                    return reject("overlapping selections leave an owner noncontiguous in the packed hit ABI.");
+            registration.primitiveCount = static_cast<std::uint32_t>(registration.primitiveSelection.size());
+            registration.primitiveSelection = {};
+        }
         registration.asset = selection->complete ? selection->source : &selection->payload;
         registration.primitiveOffset = selection->remap[oldOffset];
         if (registration.textureSource) {
@@ -163,6 +190,12 @@ bool RtStaticMeshSlot::InitializeSelectedGeometry(
 bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> registrations,
                                   std::string& diagnostic)
 {
+    if (std::any_of(registrations.begin(), registrations.end(), [](const auto& registration) {
+        return !registration.primitiveSelection.empty();
+    })) {
+        diagnostic = "RtStaticMeshSlot explicit primitive selection requires selected-geometry preparation.";
+        return false;
+    }
     instanceMetadata_ = {};
     primitiveMetadata_.clear();
     primitiveVertexCounts_.clear();
