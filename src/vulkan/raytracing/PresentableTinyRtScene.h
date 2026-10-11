@@ -33,6 +33,7 @@
 #include "vulkan/raytracing/RtSceneTuning.h"
 #include "vulkan/raytracing/RtSceneProfile.h"
 #include "vulkan/raytracing/RtStaticMeshSlot.h"
+#include "vulkan/raytracing/RtTextureLayerSubset.h"
 #ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
 #include "vulkan/raytracing/experimental/StagedPrimaryPass.h"
 #endif
@@ -735,7 +736,8 @@ private:
                        TextureArray& texture,
                        std::string& diagnostic,
                        std::span<const std::uint32_t> sourceLayers = {},
-                       VkImageViewType viewType = VK_IMAGE_VIEW_TYPE_2D_ARRAY);
+                       VkImageViewType viewType = VK_IMAGE_VIEW_TYPE_2D_ARRAY,
+                       std::span<const RtTextureLayerAlias> sourceAliases = {});
     bool SupportsTextureArrayFormat(VkFormat format) const;
     bool CreateMaterialTextures(const std::string& directory, std::string& diagnostic);
     bool CreateEnvironmentTexture(const std::string& productionRoot, std::string& diagnostic);

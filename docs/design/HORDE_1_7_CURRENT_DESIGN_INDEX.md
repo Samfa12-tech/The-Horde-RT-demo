@@ -56,10 +56,26 @@ Do not run the archived map generator in place: it writes beside its source.
 | Mist interval investigation | Deferred by owner. Preserve correct floor shadows and production rendering. Post-Keeper mist clearing is an art mitigation, not a repaired volumetric shadow. Outdoor M/F markers are not effects or cost evidence. |
 | Conservative sword contact proxy | Remains inactive. Forgiving unobstructed contact is provisional; authored masonry correctness protection remains. Arbitrary 3D shaft occlusion and final contact calibration are not proven. |
 | Waiting for Eric's terrain package | Superseded on 11 October: that task never started and no package is forthcoming. This job owns versioned Blender terrain authoring from the supplied topo and runtime integration, with one implementation writer. Preserve existing masters and use the measured interfaces below. |
+| Tall exterior mound enclosing the original entry | The owner confirms the rising stair into darkness is intentional and must remain readable from the tomb start. The sealed collapsed entrance must be dressed coherently above ground. A shorter hidden upper flight or greater tomb depth is authorized if necessary; neither is implemented by the current terrain source candidates. Do not flatten away the opening's visual purpose. |
+| Rescue opening as a generic shaft with an overhead frame | The exit is a graveyard burial shaft and the sliding slab is its lid. Kit attaches the rope to a grounded stake or nearby tree, not an overhead apparatus. Replace the frame through a physically consistent anchor/rim-contact/pull-up change, preserving deployment, grip clearance, safe landing and both traversal directions. |
+| Night panorama alone establishes moonlight | The owner requires a visible moon that is the directional light source, with matching real RT shadow direction. Include this in the current chapter, with the same moon direction for the sky disc, surface illumination and visibility queries. Visibility and lighting must agree at the graveyard, clearing, bends and lookout; a painted disc or successful presentation counter alone is not acceptance. |
 
 Current authorized work is the complete tomb-to-woodland chapter: scene integrity,
 subtitles, topo-authored continuous terrain, admitted woodland dressing, visible
 Kit, and actual two-way GPU preparation/retirement at the rope gate.
+Moon integration inspection at `3c682619c107464bb1a27b9d781b2850d68e33b2`
+found that `skyColor` and ordinary `activeSkyLight` already share
+`kMoonDirection`, but ordinary sky visibility is capped at 18 metres and the
+legacy finale aperture overrides that direction within the rescue chamber's
+XZ bounds. Reconcile those policies with same-night exterior traversal without
+changing legacy diagnostic behavior or relaxing shader limits. Keep distant
+occluder relevance separate from camera visibility and zone residency.
+The chapter capture gate must show the visible moon together with ground
+shadows from known upright geometry, rope/characters and trees, plus movement,
+off-camera occluders and shaft/roof blocking at CURRENT and HIGHER settings.
+Verify both hardware RT backends and retain Android acceptance as pending until
+actually tested. These are explicit remaining requirements, not completed
+outdoor lighting or performance evidence.
 The full master is the design target, not automatic permission for every later
 work package. No new acquisition/generation, release, merge, budget increase,
 device installation or campaign-save implementation follows from this index.
@@ -168,3 +184,7 @@ hash can count as art, sustained performance or physical presentation acceptance
 This reconciliation changes documentation/reference custody only. Audio/haptic
 manual revalidation required: **NO for this diff**; the wider changed speech,
 combat/water mix and next gameplay candidate retain their pending owner gates.
+
+### Exact-byte texture reuse milestone (11 October)
+
+The chapter now reuses three byte-identical chest/lantern texture families, reducing base/normal/ORM uploads from 18/15/15 to 15/12/12 while preserving the 18-layer ceiling. Every encoded mip is validated at runtime. Matched Windows Pipeline and QueryCompute chest/glass captures have zero changed pixels and about 48 MiB less device-local allocation. [Evidence and limits](../evidence/2026-10-11-chapter-texture-reuse/README.md). Terrain/Kit admission, true zone retirement and the complete chapter remain unfinished. This creates capacity; it does not establish streaming or phone acceptance.

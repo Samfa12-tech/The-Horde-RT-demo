@@ -17,6 +17,7 @@
 #include "vulkan/raytracing/RtDescriptorSetLayoutBindings.h"
 #include "vulkan/raytracing/RtDeviceAddressLayout.h"
 #include "vulkan/raytracing/RtTextureLayerSubset.h"
+#include "vulkan/raytracing/RtChapterTextureLayout.h"
 
 #include "gameplay/items/HeldItemKinematics.h"
 #include "gameplay/items/HeldLightState.h"
@@ -1931,8 +1932,14 @@ bool PresentableTinyRtScene::CreateTexture(const std::string& path,
                                            TextureArray& texture,
                                            std::string& diagnostic,
                                            const std::span<const std::uint32_t> sourceLayers,
-                                           const VkImageViewType viewType)
+                                           const VkImageViewType viewType,
+                                           const std::span<const RtTextureLayerAlias> sourceAliases)
 {
+    if (!sourceAliases.empty() && sourceLayers.empty())
+    {
+        diagnostic = "Texture aliases require an explicit selected layer layout.";
+        return false;
+    }
     if ((viewType != VK_IMAGE_VIEW_TYPE_2D_ARRAY && viewType != VK_IMAGE_VIEW_TYPE_2D) ||
         (viewType == VK_IMAGE_VIEW_TYPE_2D && layers != 1u))
     {
@@ -2028,9 +2035,9 @@ bool PresentableTinyRtScene::CreateTexture(const std::string& path,
                 if (!AppendRtTextureLayerSubset(
                         std::span<const std::uint8_t>(fileBytes).subspan(
                             static_cast<std::size_t>(levelOffset), static_cast<std::size_t>(levelLength)),
-                        sourceLayerCount, mipLayerBytes, sourceLayers, pixels))
+                        sourceLayerCount, mipLayerBytes, sourceLayers, pixels, sourceAliases))
                 {
-                    diagnostic = "PBR KTX2 selected layers exceed the validated source mip range: " + path;
+                    diagnostic = "PBR KTX2 selected layers or exact encoded-mip aliases failed validation: " + path;
                     return false;
                 }
             }
@@ -2431,6 +2438,8 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
         return false;
     if (sceneProfile_ == RtSceneProfile::Showcase && developmentRescueJourney_)
     {
+        if (!ConfigureChapterTextureAliases(gothicChestBaseAsset_, gothicChestLidAsset_,
+                rewardLanternRingAsset_, rewardLanternBodyAsset_, diagnostic)) return false;
         horde::scene::TombDressingBuildReport dressing;
         if (!horde::scene::AppendPreparedTombDressing(root, collapseStaticAsset_, dressing, diagnostic))
             return false;
@@ -2477,13 +2486,13 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
         {5u, 0x43484241u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),
          0u, &gothicChestBaseAsset_},
         {6u, 0x43484c44u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),
-         0u, &gothicChestLidAsset_},
+         0u, &gothicChestLidAsset_, developmentRescueJourney_ ? &gothicChestBaseAsset_ : nullptr},
         {7u, 0x4c4e5247u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),
          0u, &rewardLanternRingAsset_},
         {8u, 0x4c4e4244u,
          static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr) |
              static_cast<std::uint32_t>(RtInstanceFlag::Transmissive),
-         0u, &rewardLanternBodyAsset_},
+         0u, &rewardLanternBodyAsset_, developmentRescueJourney_ ? &rewardLanternRingAsset_ : nullptr},
     };
     if (viewmodelAvailable_)
         registrations.push_back({kPlayerViewmodelInstanceIndex, 0x56494557u,
@@ -2778,6 +2787,19 @@ bool PresentableTinyRtScene::CreateStaticMeshResources(std::string& diagnostic)
         diagnostic = "Preview prop texture groups no longer match the admitted canonical layer selection.";
         return false;
     }
+    const bool chapterLayout=sceneProfile_==RtSceneProfile::Showcase && developmentRescueJourney_;
+    if (chapterLayout && (textureCounts.baseColor!=kChapterBaseColorSourceLayers.size() ||
+        textureCounts.normal!=kChapterNormalOrmSourceLayers.size() ||
+        textureCounts.orm!=kChapterNormalOrmSourceLayers.size())) {
+        diagnostic="Chapter material routes disagree with the exact-byte atlas subset.";
+        return false;
+    }
+    const std::span<const std::uint32_t> baseLayers=chapterLayout
+        ? std::span<const std::uint32_t>{kChapterBaseColorSourceLayers} : sourceLayers;
+    const std::span<const std::uint32_t> normalOrmLayers=chapterLayout
+        ? std::span<const std::uint32_t>{kChapterNormalOrmSourceLayers} : sourceLayers;
+    const std::span<const RtTextureLayerAlias> aliases=chapterLayout
+        ? std::span<const RtTextureLayerAlias>{kChapterTextureAliases} : std::span<const RtTextureLayerAlias>{};
     const std::array<std::uint32_t, 4u> actualTextureLayers{{
         std::max(textureCounts.baseColor, 1u),
         std::max(textureCounts.normal, 1u),
@@ -2806,21 +2828,21 @@ bool PresentableTinyRtScene::CreateStaticMeshResources(std::string& diagnostic)
         return false;
     }
     if (!CreateTexture(path("base-color.android.ktx2"), VK_FORMAT_ASTC_6x6_SRGB_BLOCK,
-                       textureDimension, textureDimension, actualTextureLayers[0], staticBaseColor_, diagnostic, sourceLayers) ||
+                       textureDimension, textureDimension, actualTextureLayers[0], staticBaseColor_, diagnostic, baseLayers, VK_IMAGE_VIEW_TYPE_2D_ARRAY, aliases) ||
         !CreateTexture(path("normal.android.ktx2"), VK_FORMAT_ASTC_4x4_UNORM_BLOCK,
-                       textureDimension, textureDimension, actualTextureLayers[1], staticNormal_, diagnostic, sourceLayers) ||
+                       textureDimension, textureDimension, actualTextureLayers[1], staticNormal_, diagnostic, normalOrmLayers, VK_IMAGE_VIEW_TYPE_2D_ARRAY, aliases) ||
         !CreateTexture(path("orm.android.ktx2"), VK_FORMAT_ASTC_6x6_UNORM_BLOCK,
-                       textureDimension, textureDimension, actualTextureLayers[2], staticOrm_, diagnostic, sourceLayers) ||
+                       textureDimension, textureDimension, actualTextureLayers[2], staticOrm_, diagnostic, normalOrmLayers, VK_IMAGE_VIEW_TYPE_2D_ARRAY, aliases) ||
         !CreateTexture(path("emissive.android.ktx2"), VK_FORMAT_ASTC_6x6_SRGB_BLOCK,
                        textureDimension, textureDimension, actualTextureLayers[3], staticEmissive_, diagnostic))
         return false;
 #else
     if (!CreateTexture(path("base-color.windows.ktx2"), VK_FORMAT_R8G8B8A8_SRGB,
-                       textureDimension, textureDimension, actualTextureLayers[0], staticBaseColor_, diagnostic, sourceLayers) ||
+                       textureDimension, textureDimension, actualTextureLayers[0], staticBaseColor_, diagnostic, baseLayers, VK_IMAGE_VIEW_TYPE_2D_ARRAY, aliases) ||
         !CreateTexture(path("normal.windows.ktx2"), VK_FORMAT_R8G8B8A8_UNORM,
-                       textureDimension, textureDimension, actualTextureLayers[1], staticNormal_, diagnostic, sourceLayers) ||
+                       textureDimension, textureDimension, actualTextureLayers[1], staticNormal_, diagnostic, normalOrmLayers, VK_IMAGE_VIEW_TYPE_2D_ARRAY, aliases) ||
         !CreateTexture(path("orm.windows.ktx2"), VK_FORMAT_R8G8B8A8_UNORM,
-                       textureDimension, textureDimension, actualTextureLayers[2], staticOrm_, diagnostic, sourceLayers) ||
+                       textureDimension, textureDimension, actualTextureLayers[2], staticOrm_, diagnostic, normalOrmLayers, VK_IMAGE_VIEW_TYPE_2D_ARRAY, aliases) ||
         !CreateTexture(path("emissive.windows.ktx2"), VK_FORMAT_R8G8B8A8_SRGB,
                        textureDimension, textureDimension, actualTextureLayers[3], staticEmissive_, diagnostic))
     {

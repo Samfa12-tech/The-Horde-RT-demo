@@ -434,7 +434,7 @@ struct PresentableTinyRtSceneObservationTestAccess
         const std::array<std::uint32_t,4> layers{{counts.baseColor,counts.normal,counts.orm,counts.emissive}};
         // No admitted static material references an emissive image. The
         // packaged emissive array separately retains its one fallback layer.
-        bool ok=layers==std::array<std::uint32_t,4>{{18,15,15,0}};
+        bool ok=layers==std::array<std::uint32_t,4>{{15,12,12,0}};
         const auto& materials=scene.staticMeshSlot_.Materials();
         const auto& primitives=scene.staticMeshSlot_.PrimitiveMetadata();
         std::cout<<"Actual development static admission materials="<<materials.size()
