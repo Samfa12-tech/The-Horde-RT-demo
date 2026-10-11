@@ -1063,7 +1063,7 @@ if(BUILD_TESTING)
             tests/WindowsPlaytestReportUiTests.cpp
             src/platform/windows/WindowsPlaytestReport.cpp)
         target_include_directories(horde_rt_windows_playtest_report_ui_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
-        target_link_libraries(horde_rt_windows_playtest_report_ui_tests PRIVATE horde_gameplay_simulation comdlg32 bcrypt)
+        target_link_libraries(horde_rt_windows_playtest_report_ui_tests PRIVATE horde_gameplay_simulation comdlg32 bcrypt dbghelp)
         add_test(NAME horde_rt_windows_playtest_report_ui_tests COMMAND horde_rt_windows_playtest_report_ui_tests)
         set_tests_properties(horde_rt_windows_playtest_report_ui_tests PROPERTIES TIMEOUT 30)
     endif()
