@@ -8,6 +8,13 @@ using namespace horde::gameplay::traversal;
 bool GameSimulation::UsesRescueExterior() const {
     return config_.developmentRescueJourney && rescueTraversal_.Snapshot().exteriorSide;
 }
+void GameSimulation::StartLiveDevelopmentRescueJourney(bool authoredTerrain) {
+    SetDevelopmentRescueJourney(true,authoredTerrain);
+    // ResetRoute clears historical capture policy, dialogue consumption and
+    // transient teaching/input state. A frozen checkpoint import must not do
+    // this implicitly: its accepted timing/visual evidence stays unchanged.
+    ResetRoute();
+}
 void GameSimulation::SetDevelopmentRescueJourney(bool enabled, bool authoredTerrain) {
     RestoreRescueEquipment();
     config_.developmentRescueJourney=enabled;

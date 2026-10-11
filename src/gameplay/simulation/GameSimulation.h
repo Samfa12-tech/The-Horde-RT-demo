@@ -113,6 +113,8 @@ public:
     void SetDevelopmentSupportFixture(bool enabled, std::uint64_t generation);
     void SetDevelopmentWorldRoute(bool enabled, bool stagedPreparation = false);
     void SetDevelopmentRescueJourney(bool enabled, bool authoredTerrain = false);
+    // Live play is deliberately distinct from historical frozen checkpoint imports.
+    void StartLiveDevelopmentRescueJourney(bool authoredTerrain = false);
     bool PublishChapterTerrain(WorldZoneToken token, std::shared_ptr<const TriangleSupportSurface> terrain);
     bool PublishWorldZoneReadiness(WorldZoneToken token, ZoneReadiness readiness);
     void InvalidateWorldZoneReadiness();

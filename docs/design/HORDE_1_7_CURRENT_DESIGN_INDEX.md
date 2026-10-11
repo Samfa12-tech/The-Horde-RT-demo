@@ -17,6 +17,14 @@ verified CC0 Forest Ground 01 now replaces masonry on the terrain banks.
 The complete chapter, visible Kit, graveyard/stake, actual GPU zone retirement,
 moon alignment and full route/owner/device acceptance remain unfinished.
 
+The subsequent [Android owner chapter playtest](../evidence/2026-10-11-android-chapter-playtest/README.md)
+is failed/incomplete chapter acceptance despite successful startup. It identifies
+and corrects live-versus-frozen gameplay policy and legacy ending publication;
+corrected phone validation remains pending. Latest owner direction also requires
+farther continuous ground without visible drop-offs, substantially denser trees
+with collision, less crowded touch controls and restrained bevels at visible
+tomb wall joins/door surrounds. Preserve the positively tested niches.
+
 ## Authority and preserved sources
 
 The owner's current instructions and explicit later decisions govern execution.

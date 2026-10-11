@@ -168,6 +168,13 @@ struct SimulationSnapshot
         horde::gameplay::items::PlayerMountProfile::LegacyViewRelative;
     // True only during the automatic pre-encounter draw's temporary defense lockout.
     bool automaticSwordDrawBlocksDefense = false;
+
+    horde::gameplay::interactions::FinaleEndingPhase EndingPhaseForUi() const
+    {
+        return developmentRescueJourney
+            ? horde::gameplay::interactions::FinaleEndingPhase::Inactive
+            : finale.endingPhase;
+    }
 };
 
 } // namespace horde::gameplay::simulation

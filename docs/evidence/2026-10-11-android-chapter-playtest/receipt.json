@@ -1,0 +1,34 @@
+{
+  "testedSource": "2d72d978e181e11e2f9b547259c6eb0f756ec1a8",
+  "testedApkSha256": "eb50a06a1bfab9612f2a40fe87390c7e36567388cf540d16338417ad6944ba0e",
+  "phoneModel": "Samsung SM-S948B",
+  "backend": "RayTracingPipeline",
+  "profile": "Diagnostic/Mobile",
+  "savedScale": 0.5,
+  "ownerManualOnly": true,
+  "chapterAcceptance": "FAIL / incomplete",
+  "appClosedAsAuthorized": true,
+  "candidateSourceParent": "2d72d978e181e11e2f9b547259c6eb0f756ec1a8",
+  "candidateSourceFiles": {
+    "android/app/src/main/cpp/android_probe_bridge.cpp": "f7dc5ea116b5ad03bb64ab3ce04587a6386f620502d478353175e208afcd8ed0",
+    "src/gameplay/simulation/GameSimulation.h": "ad2b8426ff6f05d05b467e30dc1722000a217739988c59fb8804ea1d5cf2b711",
+    "src/gameplay/simulation/GameSimulationRescue.cpp": "8a86d8f64b13bc56cd2c1b83acfbb01ef805fb90009104aeca29e3fc2e2aefbc",
+    "src/gameplay/simulation/SimulationSnapshot.h": "69cddf6b551427b7b456bd66e69dec37eb186a95a8544461d7db79c1cda66737",
+    "tests/RescueJourneyIntegrationTests.cpp": "1f8df409a5b3c7a0d56e7bc619475c6d0e7ed05da1470b3604408483688a9aec"
+  },
+  "candidateArtifacts": {
+    "windowsDebug": {
+      "sha256": "acfe51a0c9c5bc9b19416ffebbbd4b69ace51fb00648bee069ae1692ed042323",
+      "bytes": 12408320
+    },
+    "windowsRelease": {
+      "sha256": "56964b26bff14d87cb004c8211875f33108aca389f2eb456820aabd0cf0f1d7b",
+      "bytes": 4326912
+    },
+    "androidDebug": {
+      "sha256": "cc53485d6170dc97fe41c8641c142fc35f49cf0f0469325561bd3a83bc70c065",
+      "bytes": 172489464
+    }
+  },
+  "correctedCandidatePhoneStatus": "NOT RUN / not installed"
+}

@@ -27,7 +27,8 @@ int main(int argc,char** argv) {
  // The real development launch does not seed missing health, even while paused
  // or after a new-game reset. HUD rendering must consume this published tuple.
  GameSimulation launch(ProductionGameSimulationConfig());
- launch.SetDevelopmentRescueJourney(true);
+ check(launch.ApplyShowcaseCheckpoint(0),"legacy capture seed unavailable");
+ launch.StartLiveDevelopmentRescueJourney();
  InputSnapshot launchInput;launchInput.tutorialEnabled=true;launchInput.tutorialSlowdownEnabled=true;
  check(launch.Snapshot().playerVitals.vitality==3 && launch.Snapshot().playerVitals.maxVitality==3,
        "development journey launch did not start with three hearts");
@@ -37,6 +38,26 @@ int main(int argc,char** argv) {
  launchInput.paused=false;
  for(int frame=0;frame<60;++frame)launch.AdvanceFrame(launchInput,1.0/60.0,frame+2);
  check(launch.Snapshot().playerVitals.vitality==3,"idle opening route damaged the player");
+ check(launch.Snapshot().combatTeaching.enabled && launch.Snapshot().lich.readableCastPresentation,
+       "live chapter startup retained historical capture combat/teaching rules");
+ auto grateConfig=ProductionGameSimulationConfig();grateConfig.playerStartX=0.0f;grateConfig.playerStartZ=-8.6f;
+ GameSimulation grateLaunch(grateConfig);grateLaunch.StartLiveDevelopmentRescueJourney();
+ check(std::abs(grateLaunch.Snapshot().playerZ+8.6f)<.001f,"grate fixture is not on a valid player surface");
+ for(int frame=0;frame<30;++frame)grateLaunch.StepFixed(launchInput);
+ check(grateLaunch.Snapshot().chapterDialogue.line==horde::gameplay::dialogue::Line::Grate,
+       "live chapter startup suppressed the actual grate dialogue trigger");
+ GameSimulation frozen(ProductionGameSimulationConfig());
+ check(frozen.ApplyShowcaseCheckpoint(0),"frozen capture seed unavailable");
+ frozen.SetDevelopmentRescueJourney(true);
+ for(int frame=0;frame<30;++frame)frozen.StepFixed(launchInput);
+ check(!frozen.Snapshot().combatTeaching.enabled && !frozen.Snapshot().lich.readableCastPresentation,
+       "live launch correction changed historical frozen capture rules");
+ auto ending=launch.Snapshot();ending.finale.endingPhase=interactions::FinaleEndingPhase::Complete;
+ check(ending.EndingPhaseForUi()==interactions::FinaleEndingPhase::Inactive,
+       "chapter exposed the legacy Dawn Returns overlay");
+ ending.developmentRescueJourney=false;
+ check(ending.EndingPhaseForUi()==interactions::FinaleEndingPhase::Complete,
+       "ordinary demo lost its accepted ending overlay");
  launchInput.commands.routeReset=1;launch.StepFixed(launchInput);
  check(launch.Snapshot().playerVitals.vitality==3 && launch.Snapshot().playerVitals.maxVitality==3,
        "development journey reset did not restore three hearts");

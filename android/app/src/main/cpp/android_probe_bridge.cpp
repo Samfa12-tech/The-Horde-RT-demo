@@ -948,7 +948,7 @@ void PublishSimulationUiState()
     gPlayerLifePhase.store(static_cast<int>(vitals.phase), std::memory_order_release);
     gPlayerRetryCheckpoint.store(simulation.retryCheckpoint, std::memory_order_release);
     gFinaleEndingPhase.store(
-        static_cast<int>(simulation.finale.endingPhase),
+        static_cast<int>(simulation.EndingPhaseForUi()),
         std::memory_order_release);
     int contextualControls = 0;
     using horde::gameplay::interactions::ChestRewardPrompt;
@@ -1726,7 +1726,8 @@ bool ResolveDebugCheckpoint(const std::int32_t id, DebugCheckpointSelection& sel
 
 void ApplyDebugCheckpointSimulation(
     const DebugCheckpointSelection& selection,
-    horde::vulkan::raytracing::RtSceneRecordObservation* observation)
+    horde::vulkan::raytracing::RtSceneRecordObservation* observation,
+    bool liveJourney = false)
 {
     // Owning-thread, explicit full checkpoint import; not JNI or a fallback.
     const auto config = selection.playerRoute == kDefaultPlayerPresentationRoute
@@ -1770,12 +1771,16 @@ void ApplyDebugCheckpointSimulation(
         // This checkpoint is a journey-mode start, not a world-route debug
         // teleport. Preserve the normal dungeon start and let the journey
         // authority place the player at its lower safe landing.
-        const bool staged = rescueJourneyCheckpoint
-            ? gGameSimulation.ApplyShowcaseCheckpoint(selection.simulationCheckpointId)
-            : horde::gameplay::StageDevelopmentCheckpointSimulation(
+        bool staged = true;
+        if (rescueJourneyCheckpoint && liveJourney)
+            gGameSimulation.StartLiveDevelopmentRescueJourney(true);
+        else if (rescueJourneyCheckpoint)
+            staged = gGameSimulation.ApplyShowcaseCheckpoint(selection.simulationCheckpointId);
+        else
+            staged = horde::gameplay::StageDevelopmentCheckpointSimulation(
                 gGameSimulation, *selection.development, &evidence,
                 observation != nullptr ? &stepObservation : nullptr);
-        if (rescueJourneyCheckpoint)
+        if (rescueJourneyCheckpoint && !liveJourney)
             gGameSimulation.SetDevelopmentRescueJourney(true,true);
         if (selection.development->combatPose ==
             horde::gameplay::DevelopmentCombatPose::ParryActive)
@@ -2044,7 +2049,8 @@ void ApplyBenchmarkCheckpoint(
     horde::vulkan::raytracing::RtSceneRecordObservation* observation)
 {
     const auto& checkpoint = selection.checkpoint;
-    ApplyDebugCheckpointSimulation(selection, observation);
+    const bool liveJourney = selection.development != nullptr && selection.development->id == 192;
+    ApplyDebugCheckpointSimulation(selection, observation, liveJourney);
     context.developmentSupportFixture =
         gGameSimulation.Snapshot().developmentSupportFixture;
     context.developmentSupportFixtureOverride.reset();
@@ -2055,8 +2061,9 @@ void ApplyBenchmarkCheckpoint(
     {
         (void)context.rtFrameEvidence.ApplyEvent(
             horde::telemetry::RtLifecycleEvent::CheckpointChange);
-        (void)context.rtFrameEvidence.ApplyEvent(
-            horde::telemetry::RtLifecycleEvent::BenchmarkStart);
+        if (!liveJourney)
+            (void)context.rtFrameEvidence.ApplyEvent(
+                horde::telemetry::RtLifecycleEvent::BenchmarkStart);
     }
     gGameSimulation.ResetTiming();
     gGameSimulation.ClearEvents();
@@ -2080,7 +2087,16 @@ void ApplyBenchmarkCheckpoint(
     context.captureActive = false;
     gDebugCaptureActive.store(false, std::memory_order_release);
     context.capturePresentedFrames = 0u;
-    context.benchmarkSampling = true;
+    context.benchmarkSampling = !liveJourney;
+    if (liveJourney)
+    {
+        // This owner playtest route is not a benchmark: retain ordinary damage,
+        // teaching and dialogue timing from its first live fixed step.
+        __android_log_print(ANDROID_LOG_INFO, kTag,
+                            "HORDE_LIVE_CHAPTER checkpoint=%s capture=0 benchmark=0", checkpoint.name);
+        WriteShowcaseDebugState(context, "live-start");
+        return;
+    }
     ++context.benchmarkGeneration;
     ResetBenchmarkTiming(context);
     __android_log_print(ANDROID_LOG_INFO,
