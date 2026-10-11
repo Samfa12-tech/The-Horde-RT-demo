@@ -3,6 +3,7 @@
 #include "scene/assets/DielectricTopologyMath.h"
 #include "scene/assets/StaticMeshAsset.h"
 #include "scene/assets/PlayerPrimitiveContract.h"
+#include "scene/ChapterTerrainSurface.h"
 #include "vulkan/raytracing/RtLanternGeometryProfile.h"
 #include "vulkan/raytracing/RtStaticMeshSlot.h"
 #include "cgltf/cgltf.h"
@@ -10,6 +11,7 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <chrono>
 #include <cstdlib>
 #include <cstdint>
 #include <cstring>
@@ -2331,11 +2333,89 @@ void TestPreparedFunerarySourceAssets(const std::filesystem::path& temporaryRoot
     }
 }
 
+void TestChapterTerrainSupportIntake()
+{
+    using namespace horde::scene::assets;
+    StaticMeshAsset mesh;
+    mesh.materials.resize(2);
+    mesh.materials[0].name="ChapterTrailDampSand";
+    mesh.materials[1].name="ChapterBankStone";
+    mesh.vertices.resize(6);
+    const std::array<std::array<float,3>,6> points{{{{0,0,0}},{{0,0,1}},{{1,0,0}},
+                                                 {{1,0,0}},{{0,0,1}},{{1,0,1}}}};
+    for(std::size_t i=0;i<points.size();++i)for(std::size_t k=0;k<3;++k)mesh.vertices[i].position[k]=points[i][k];
+    mesh.indices={0,1,2,0,1,2};
+    mesh.primitives={{0,0,3,0,0},{3,3,3,1,0}};
+    std::string diagnostic;
+    const auto valid=horde::scene::PrepareChapterTerrainSurface(mesh,diagnostic);
+    Check(valid&&valid->TriangleCount()==2&&valid->Query(.1f,.1f).walkable&&
+          valid->Query(.9f,.9f).surface==horde::gameplay::simulation::SupportSurface::Stone,
+          "terrain intake preserves local indices and material surface classification");
+    auto invalid=mesh;invalid.indices[0]=3;
+    Check(!horde::scene::PrepareChapterTerrainSurface(invalid,diagnostic),"terrain index cannot borrow another primitive's vertices");
+    invalid=mesh;invalid.primitives[1].indexOffset=0;
+    Check(!horde::scene::PrepareChapterTerrainSurface(invalid,diagnostic),"terrain primitive cannot overlap index ownership");
+    invalid=mesh;invalid.materials[1].name="unadmitted";
+    Check(!horde::scene::PrepareChapterTerrainSurface(invalid,diagnostic),"unknown terrain material rejected");
+    invalid=mesh;invalid.primitives.pop_back();
+    Check(!horde::scene::PrepareChapterTerrainSurface(invalid,diagnostic),"unowned terrain indices rejected");
+}
+
+int InspectTerrainSupport(const char* glb,const char* manifestPath,const char* stationsPath)
+{
+    using namespace horde::scene::assets;
+    AssetManifest manifest;StaticMeshAsset asset;std::string diagnostic;
+    if(!AssetManifest::Load(manifestPath,manifest,diagnostic)||!StaticMeshAsset::Load(glb,manifest,asset,diagnostic)) {
+        std::cerr<<"Native terrain rejected: "<<diagnostic<<'\n';return 1;
+    }
+    const auto started=std::chrono::steady_clock::now();
+    const auto surface=horde::scene::PrepareChapterTerrainSurface(asset,diagnostic);
+    const auto prepared=std::chrono::steady_clock::now();
+    if(!surface){std::cerr<<diagnostic<<'\n';return 1;}
+    std::ifstream input(stationsPath);
+    std::vector<std::array<float,3>> stations;
+    std::string line;
+    while(std::getline(input,line)) {
+        std::istringstream row(line);std::array<float,3> p{};std::string extra;
+        if(!(row>>p[0]>>p[1]>>p[2])||(row>>extra)) {std::cerr<<"Invalid route station row\n";return 1;}
+        stations.push_back(p);
+    }
+    if(stations.size()<2||stations.size()>10000){std::cerr<<"Missing or unbounded route station fixture\n";return 1;}
+    std::uint64_t queries=0,triangleTests=0,sweeps=0;
+    for(std::size_t i=0;i<stations.size();++i) {
+        const auto p=stations[i];const auto centre=surface->Query(p[0],p[1]);
+        Check(centre.found&&centre.walkable&&std::abs(centre.worldY-p[2])<=.18f,"native terrain route disagrees with graded height");
+        triangleTests+=centre.testedTriangles;++queries;
+        for(int ring=0;ring<8;++ring) {
+            const float angle=float(ring)*.785398163397f;
+            const auto sample=surface->Query(p[0]+.24f*std::cos(angle),p[1]+.24f*std::sin(angle));
+            Check(sample.found&&sample.walkable,"native terrain footprint is unsupported or steep");
+            triangleTests+=sample.testedTriangles;++queries;
+        }
+        if(i) {
+            const auto previous=stations[i-1];const auto previousSample=surface->Query(previous[0],previous[1]);
+            Check(surface->GroundSweep(previous[0],previous[1],p[0],p[1],previousSample.worldY,.24f),
+                  "native terrain forward sweep failed");
+            Check(surface->GroundSweep(p[0],p[1],previous[0],previous[1],centre.worldY,.24f),
+                  "native terrain reverse sweep failed");
+            sweeps+=2;
+        }
+    }
+    const auto finished=std::chrono::steady_clock::now();
+    std::cout<<"Native terrain triangles="<<surface->TriangleCount()<<" retainedBytes="<<surface->RetainedBytes()
+             <<" preparationMs="<<std::chrono::duration<double,std::milli>(prepared-started).count()
+             <<" routeCheckMs="<<std::chrono::duration<double,std::milli>(finished-prepared).count()
+             <<" queries="<<queries<<" triangleTests="<<triangleTests<<" sweeps="<<sweeps<<" failures="<<failures<<'\n';
+    return failures?1:0;
+}
+
 } // namespace
 
 int main(int argc, char** argv)
 {
     executablePath = std::filesystem::absolute(argv[0]);
+    if(argc==5&&std::string_view(argv[1])=="--inspect-terrain-support")
+        return InspectTerrainSupport(argv[2],argv[3],argv[4]);
     // Read-only source-candidate intake uses the same native importer as the
     // normal fixture suite. A successful import is not runtime admission.
     if (argc == 4 && std::string_view(argv[1]) == "--inspect-candidate")
@@ -2386,6 +2466,15 @@ int main(int argc, char** argv)
         return !loaded && IsSafeCyclicRejectionDiagnostic(diagnostic) ? 0 : 2;
     }
 
+    // A malformed intake command must never silently run the ordinary suite
+    // and report success without inspecting the requested candidate.
+    if (argc != 1)
+    {
+        std::cerr << "Expected no arguments, or --inspect-candidate <glb> <manifest>, "
+                     "or --inspect-terrain-support <glb> <manifest> <stations>, "
+                     "or --probe-cyclic <glb> <manifest>.\n";
+        return 64;
+    }
     const ScopedStaticGltfTestDirectory scopedTemporaryRoot;
     Check(scopedTemporaryRoot.Ready(),
           "process/config-unique static GLB temporary directory is safely created");
@@ -2406,6 +2495,7 @@ int main(int argc, char** argv)
     TestRuntimeOfflineDielectricComponentParity();
     TestTombDressingCandidates();
     TestPreparedFunerarySourceAssets(temporaryRoot);
+    TestChapterTerrainSupportIntake();
 
     horde::scene::assets::AssetManifest manifest;
     std::string diagnostic;

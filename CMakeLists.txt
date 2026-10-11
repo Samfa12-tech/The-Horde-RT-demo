@@ -37,6 +37,9 @@ endif()
 include(cmake/HordeRtPocketAudioCore.cmake)
 horde_rt_add_pocket_audio_core("${CMAKE_CURRENT_SOURCE_DIR}" "${BUILD_TESTING}")
 if(BUILD_TESTING)
+    add_executable(horde_rt_triangle_support_surface_tests tests/TriangleSupportSurfaceTests.cpp)
+    target_include_directories(horde_rt_triangle_support_surface_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    add_test(NAME horde_rt_triangle_support_surface_tests COMMAND horde_rt_triangle_support_surface_tests)
     add_executable(horde_rt_menu_ambience_tests tests/MenuAmbienceTests.cpp)
     target_include_directories(horde_rt_menu_ambience_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     add_test(NAME horde_rt_menu_ambience_tests COMMAND horde_rt_menu_ambience_tests)
@@ -758,6 +761,12 @@ if(BUILD_TESTING)
         HORDE_RT_TOMB_DRESSING_ROOT="${CMAKE_CURRENT_SOURCE_DIR}/assets/models/world/runtime/tomb-dressing-v01"
     )
     add_test(NAME horde_rt_static_gltf_asset_tests COMMAND horde_rt_static_gltf_asset_tests)
+    add_test(NAME horde_rt_static_gltf_intake_missing_argument_tests
+        COMMAND horde_rt_static_gltf_asset_tests --inspect-candidate missing.glb)
+    add_test(NAME horde_rt_static_gltf_intake_unknown_argument_tests
+        COMMAND horde_rt_static_gltf_asset_tests --unknown-intake)
+    set_tests_properties(horde_rt_static_gltf_intake_missing_argument_tests
+        horde_rt_static_gltf_intake_unknown_argument_tests PROPERTIES WILL_FAIL TRUE)
 
     add_executable(horde_rt_production_prop_asset_tests tests/ProductionPropAssetTests.cpp)
     target_include_directories(horde_rt_production_prop_asset_tests PRIVATE
