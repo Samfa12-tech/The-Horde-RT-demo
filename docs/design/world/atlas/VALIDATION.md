@@ -33,4 +33,4 @@ Visual review corrected an overflowing forest title, leaders crossing original l
 
 GitHub Markdown has adjacent sheet links because SVG click-through may be stripped in previews. The [self-contained HTML](atlas.html) provides actual click-through and offline images after downloading/opening it in a browser. GitHub's HTML source page is not a running preview. Browser checks used localhost; no website was deployed and no actual Android device was tested.
 
-The documentation branch is local and unpushed. The parent can publish it through normal review to provide a GitHub link usable on Android. Existing main, PR27 development, planning branches and game assets remain untouched.
+At the preparation handoff, the documentation branch was local and unpushed. Subsequent publication and merge are tracked through the pull request history; these navigation checks do not certify runtime geography. PR27 development, planning branches, other working trees and game assets were untouched by this atlas work.
