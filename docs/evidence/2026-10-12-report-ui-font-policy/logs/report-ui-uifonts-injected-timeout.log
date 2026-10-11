@@ -1,0 +1,56 @@
+UI stack 0: ntdll!NtDelayExecution+0x14 address=0x7fff12bc1444
+UI stack 1: ntdll!NtDelayExecution+0x14 address=0x7fff12bc1444
+UI stack 2: ntdll!RtlDelayExecution+0x34 address=0x7fff12b33924
+UI stack 3: KERNELBASE!SleepEx+0x91 address=0x7fff1016bb01
+UI stack 4: horde_rt_windows_playtest_repor!_Thrd_sleep_for+0x12 address=0x7ff602b2b1f2
+UI stack 5: horde_rt_windows_playtest_repor!std::this_thread::sleep_until<std::chrono::steady_clock,std::chrono::duration<__int64,std::ratio<1,1000000000> > >+0xb4 address=0x7ff602a9da14
+UI stack 6: horde_rt_windows_playtest_repor!std::this_thread::sleep_for<__int64,std::ratio<1,1000> >+0x21 address=0x7ff602a9d941
+UI stack 7: horde_rt_windows_playtest_repor!`anonymous namespace'::TraceNoteEntry+0xcf address=0x7ff602a92a1f
+UI stack 8: USER32!PostMessageW+0x5bb address=0x7fff115b989b
+UI stack 9: USER32!User32InitializeImmEntryTable+0x1375 address=0x7fff115b8225
+UI stack 10: ntdll!KiUserCallbackDispatcher+0x24 address=0x7fff12bc4de4
+UI stack 11: win32u!NtUserGetMessage+0x14 address=0x7fff0fe61344
+UI stack 12: USER32!GetMessageW+0x22 address=0x7fff115c2812
+UI stack 13: horde_rt_windows_playtest_repor!horde::platform::windows::ShowWindowsPlaytestReport+0x3ef address=0x7ff602aaccff
+UI stack 14: horde_rt_windows_playtest_repor!main+0x2ce address=0x7ff602a9483e
+UI stack 15: horde_rt_windows_playtest_repor!invoke_main+0x39 address=0x7ff602b78b39
+UI stack 16: horde_rt_windows_playtest_repor!__scrt_common_main_seh+0x132 address=0x7ff602b78a22
+UI stack 17: horde_rt_windows_playtest_repor!__scrt_common_main+0xe address=0x7ff602b788de
+UI stack 18: horde_rt_windows_playtest_repor!mainCRTStartup+0xe address=0x7ff602b78bce
+UI stack 19: KERNEL32!BaseThreadInitThunk+0x17 address=0x7fff1141cd87
+UI stack 20: ntdll!RtlUserThreadStart+0x2c address=0x7fff12b0caec
+native control message timed out; phase=note-only approved Unicode note edit hwnd=0000000001810A98 controlId=106 message=0xc error=1460 senderThread=62004 ownerThread=50704 elapsedMs=2000 enabled=1 visible=1 guiInfoAvailable=1 guiInfoError=0 guiFlags=0x0 active=0000000000B60CB4 focus=0000000000EB05A2 capture=0000000000000000
+UI stack 0: ntdll!NtDelayExecution+0x14 address=0x7fff12bc1444
+UI stack 1: ntdll!NtDelayExecution+0x14 address=0x7fff12bc1444
+UI stack 2: ntdll!RtlDelayExecution+0x34 address=0x7fff12b33924
+UI stack 3: KERNELBASE!SleepEx+0x91 address=0x7fff1016bb01
+UI stack 4: horde_rt_windows_playtest_repor!_Thrd_sleep_for+0x12 address=0x7ff602b2b1f2
+UI stack 5: horde_rt_windows_playtest_repor!std::this_thread::sleep_until<std::chrono::steady_clock,std::chrono::duration<__int64,std::ratio<1,1000000000> > >+0xb4 address=0x7ff602a9da14
+UI stack 6: horde_rt_windows_playtest_repor!std::this_thread::sleep_for<__int64,std::ratio<1,1000> >+0x21 address=0x7ff602a9d941
+UI stack 7: horde_rt_windows_playtest_repor!`anonymous namespace'::TraceNoteEntry+0xcf address=0x7ff602a92a1f
+UI stack 8: USER32!PostMessageW+0x5bb address=0x7fff115b989b
+UI stack 9: USER32!User32InitializeImmEntryTable+0x1375 address=0x7fff115b8225
+UI stack 10: ntdll!KiUserCallbackDispatcher+0x24 address=0x7fff12bc4de4
+UI stack 11: win32u!NtUserGetMessage+0x14 address=0x7fff0fe61344
+UI stack 12: USER32!GetMessageW+0x22 address=0x7fff115c2812
+UI stack 13: horde_rt_windows_playtest_repor!horde::platform::windows::ShowWindowsPlaytestReport+0x3ef address=0x7ff602aaccff
+UI stack 14: horde_rt_windows_playtest_repor!main+0x2ce address=0x7ff602a9483e
+UI stack 15: horde_rt_windows_playtest_repor!invoke_main+0x39 address=0x7ff602b78b39
+UI stack 16: horde_rt_windows_playtest_repor!__scrt_common_main_seh+0x132 address=0x7ff602b78a22
+UI stack 17: horde_rt_windows_playtest_repor!__scrt_common_main+0xe address=0x7ff602b788de
+UI stack 18: horde_rt_windows_playtest_repor!mainCRTStartup+0xe address=0x7ff602b78bce
+UI stack 19: KERNEL32!BaseThreadInitThunk+0x17 address=0x7fff1141cd87
+UI stack 20: ntdll!RtlUserThreadStart+0x2c address=0x7fff12b0caec
+note EDIT executing=1
+UI wait-chain nodes=1 cycle=0
+  node=0 type=8 status=3
+approved note-only export did not reach injected destination once
+approved note did not freeze for retry
+explicit retry did not reach destination
+retry changed report ID or JSON bytes
+note EDIT trace; phase=note-only initial note edit returned=1 elapsedMs=0
+note EDIT trace; phase=note-only rejected-input note edit returned=1 elapsedMs=0
+note EDIT trace; phase=note-only oversized note edit returned=1 elapsedMs=0
+note EDIT trace; phase=note-only approved Unicode note edit returned=0 elapsedMs=0
+note EDIT trace; phase=note-only frozen retry edit returned=1 elapsedMs=0
+note EDIT trace; phase=explicit-context note edit returned=1 elapsedMs=0

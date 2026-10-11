@@ -355,15 +355,19 @@ bool CreateControls(HWND window, DialogState& state)
     SendMessageW(impacts, CB_SETCURSEL, static_cast<WPARAM>(-1), 0);
     SendMessageW(impacts, CB_SETMINVISIBLE, static_cast<WPARAM>(kImpacts.size()), 0);
     AddControl(window, L"STATIC", L"What happened? Add a short note", SS_LEFT, kNoteLabel);
-    // The legacy EDIT's synchronous GDI/Uniscribe shaping path stalls on the
-    // first mixed CJK/supplementary note on cold Windows hosts. Use the OS's
-    // Unicode editor in plain-text mode; keep formatting, objects and links off.
+    // Native accessible Unicode editing, with formatting, objects and links
+    // disabled. Font fallback remains enabled for all supported scripts.
     const HWND note = AddControl(window, MSFTEDIT_CLASS, L"",
         ES_LEFT | ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN | WS_VSCROLL | WS_TABSTOP,
         kNoteEdit, WS_EX_CLIENTEDGE);
     if (!note || SendMessageW(note, EM_SETTEXTMODE, TM_PLAINTEXT | TM_MULTICODEPAGE, 0) != 0)
         return false;
     SendMessageW(note, EM_AUTOURLDETECT, FALSE, 0);
+    // This is a user-interface field rather than a document editor. Preserve
+    // its IME/language policy, but use Windows' UI script-font associations
+    // instead of legacy document-font defaults during automatic font binding.
+    const LRESULT languageOptions = SendMessageW(note, EM_GETLANGOPTIONS, 0, 0);
+    SendMessageW(note, EM_SETLANGOPTIONS, 0, languageOptions | IMF_UIFONTS);
     AddControl(window, L"BUTTON", L"I consent to export this report as a local JSON file", BS_AUTOCHECKBOX | WS_TABSTOP,
                kConsent);
     AddControl(window, L"BUTTON", L"Include basic device and RT context (optional)", BS_AUTOCHECKBOX | WS_TABSTOP,

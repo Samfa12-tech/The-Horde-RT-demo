@@ -252,6 +252,8 @@ void Defaults(HWND form, const bool hasContext)
         "report note must use native Unicode plain-text mode, without rich formatting or objects");
     Check(Send(GetDlgItem(form, 106), EM_GETAUTOURLDETECT) == 0,
         "report note must not activate automatic links");
+    Check((Send(GetDlgItem(form, 106), EM_GETLANGOPTIONS) & IMF_UIFONTS) != 0,
+        "report note must bind script fallback to Windows user-interface fonts");
     Check(GetDlgItem(form, 102) != GetDlgItem(form, IDCANCEL), "category and Close IDs collide");
 }
 } // namespace

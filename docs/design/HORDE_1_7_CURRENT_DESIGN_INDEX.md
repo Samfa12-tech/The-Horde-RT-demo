@@ -433,3 +433,13 @@ cutover, dynamic geometry rebinding and reverse ownership remain required. The
 chapter is incomplete; graveyard/lid and remaining prepared dressing, the full
 gallery, sustained measurements and physical acceptance remain open. Shared
 textures, shader budgets, three actor slots and the 18-layer ceiling stay intact.
+
+### Windows report Unicode deadline recurrence (12 October)
+
+The GPU preparation checkpoint `37310bd5` passed five CI jobs but failed MSVC's
+native report UI test while inserting mixed Unicode. It is not an all-green
+checkpoint. The [font-policy repair candidate and retained failure](../evidence/2026-10-12-report-ui-font-policy/README.md)
+preserve the two-second message deadline, complete report assertions and all
+chapter work. Debug/Release focused checks pass locally; fresh exact-commit CI
+must establish the candidate's cold-host result. The trace identifies a GDI font
+measurement path, not a proved deadlock or a guaranteed performance cure.
