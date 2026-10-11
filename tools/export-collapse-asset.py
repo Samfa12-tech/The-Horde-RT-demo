@@ -18,24 +18,48 @@ import bpy
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--review-root", type=Path, required=True)
+parser.add_argument("--chapter-output", type=Path,
+                    help="Fresh chapter candidate directory; never writes legacy source/runtime paths")
 args = parser.parse_args(sys.argv[sys.argv.index("--") + 1:])
 review = args.review_root.resolve()
 repo = Path(__file__).resolve().parent.parent
-source_dir = repo / "assets/models/world/source/collapsed-entry"
-runtime_dir = repo / "assets/models/world/runtime/collapsed-entry"
 texture_dir = repo / "assets/textures/props/source/collapsed-entry"
-source_dir.mkdir(parents=True, exist_ok=True)
-runtime_dir.mkdir(parents=True, exist_ok=True)
-approval = json.loads((repo / "docs/design/1.6.2-collapse/milestone-reviews.json").read_text(encoding="utf-8-sig"))
-if approval["form"]["status"] != "approved":
-    raise RuntimeError("Explicit owner Form approval is required")
 blend = review / "final.blend"
-approved_blend_sha = "f03e8a175b20c60f444a133831586a533d7c1de2a73ceda916af6e521ecd547a"
-approved_sheet_sha = "0fa7fca2b8e403b8c8f33b9adc70381a751e8e2c9e397e3dd1efe06547807486"
-if hashlib.sha256(blend.read_bytes()).hexdigest() != approved_blend_sha:
-    raise RuntimeError("Editable source differs from the exact Form-approved source")
-if hashlib.sha256((review / "final-form-contact-sheet.png").read_bytes()).hexdigest() != approved_sheet_sha:
-    raise RuntimeError("Form-approved review receipt differs")
+chapter = args.chapter_output is not None
+if chapter:
+    source_dir = args.chapter_output.resolve()
+    if source_dir.exists() or not source_dir.is_relative_to(repo / "assets/models/world/source"):
+        raise RuntimeError("Chapter export requires a fresh repository world-source directory")
+    audit = json.loads((review / "audit.json").read_text())
+    if not audit.get("upperReturn") or audit.get("stairCount") != 18:
+        raise RuntimeError("Chapter export requires the audited eighteen-riser return")
+    expected_views = {"production", "neutral", "contact", "support", "opening-left", "opening-right",
+                      "wide-left", "wide-right", "ceiling", "ceiling-left", "ceiling-right",
+                      "stairs-oblique", "near-cap-upward"}
+    checks = audit["physicalEnclosureFrustumChecks"]
+    if (len(checks) != len(expected_views) or {c["view"] for c in checks} != expected_views or
+        any(c["sampleGrid"] != [128,72] or c["rearwardRays"] <= 0 or
+            c["worldBoundaryMisses"] or c["visibleRemoteSealSamples"] for c in checks)):
+        raise RuntimeError("Chapter enclosure checks failed")
+    approved_blend_sha = hashlib.sha256(blend.read_bytes()).hexdigest()
+    if audit.get("blendSha256") != approved_blend_sha:
+        raise RuntimeError("Chapter audit does not bind this exact editable master")
+    approved_sheet_sha = None
+    runtime_dir = source_dir / "runtime-candidate"
+else:
+    source_dir = repo / "assets/models/world/source/collapsed-entry"
+    runtime_dir = repo / "assets/models/world/runtime/collapsed-entry"
+    approval = json.loads((repo / "docs/design/1.6.2-collapse/milestone-reviews.json").read_text(encoding="utf-8-sig"))
+    if approval["form"]["status"] != "approved":
+        raise RuntimeError("Explicit owner Form approval is required")
+    approved_blend_sha = "f03e8a175b20c60f444a133831586a533d7c1de2a73ceda916af6e521ecd547a"
+    approved_sheet_sha = "0fa7fca2b8e403b8c8f33b9adc70381a751e8e2c9e397e3dd1efe06547807486"
+    if hashlib.sha256(blend.read_bytes()).hexdigest() != approved_blend_sha:
+        raise RuntimeError("Editable source differs from the exact Form-approved source")
+    if hashlib.sha256((review / "final-form-contact-sheet.png").read_bytes()).hexdigest() != approved_sheet_sha:
+        raise RuntimeError("Form-approved review receipt differs")
+source_dir.mkdir(parents=True, exist_ok=not chapter)
+runtime_dir.mkdir(parents=True, exist_ok=not chapter)
 inputs = json.loads((texture_dir / "input-receipt.json").read_text())
 for item in inputs["maps"]:
     for path, expected in ((texture_dir / item["file"], item["sha256"]),
@@ -46,10 +70,12 @@ for item in inputs["maps"]:
 bpy.ops.wm.open_mainfile(filepath=str(blend))
 excluded = {"Continuous solid floor", "Existing chamber left", "Existing chamber right", "Existing chamber roof"}
 meshes = [o for o in bpy.context.scene.objects if o.type == "MESH"]
-if len(meshes) != 67 or not excluded.issubset({o.name for o in meshes}):
+if (not chapter and len(meshes) != 67) or not excluded.issubset({o.name for o in meshes}):
     raise RuntimeError("Reviewed mesh roster differs")
 core = [o for o in meshes if o.name not in excluded]
-if sum(len(p.vertices)-2 for o in core for p in o.data.polygons) != 8422:
+expected_triangles = (sum(g["triangles"] for g in audit["geometry"] if g["name"] not in excluded)
+                      if chapter else 8422)
+if sum(len(p.vertices)-2 for o in core for p in o.data.polygons) != expected_triangles:
     raise RuntimeError("Reviewed core triangle count differs")
 
 # New portable export graph describes the same maps, with explicit nonmetallic
@@ -116,8 +142,8 @@ for o in core:
 bpy.context.view_layer.objects.active = core[0]
 bpy.ops.object.join()
 joined = bpy.context.object
-joined.name = "CollapsedEntryWorld"
-joined.data.name = "Approved collapsed entry - metre world geometry"
+joined.name = "ChapterEntryReturn" if chapter else "CollapsedEntryWorld"
+joined.data.name = "Chapter return candidate - metre world geometry" if chapter else "Approved collapsed entry - metre world geometry"
 material_indices = [0 if joined.data.materials[p.material_index].name == "Boulder01Rock" else 1 for p in joined.data.polygons]
 joined.data.materials.clear()
 for material in materials:
@@ -261,11 +287,11 @@ runtime_path = runtime_dir / "collapsed-entry-lod0.runtime.glb"
 write_glb(runtime_path,runtime_document,runtime_binary)
 triangles = sum(runtime_document["accessors"][p["indices"]]["count"]//3 for p in primitives)
 vertices = sum(runtime_document["accessors"][p["attributes"]["POSITION"]]["count"] for p in primitives)
-if triangles != 8422 or vertices > 25266:
+if triangles != expected_triangles or triangles >= 10000 or vertices > 25266:
     raise RuntimeError("Actual exported geometry exceeds reviewed budget")
-report = {"schema":"horde.collapse-export.v1","form":"owner-approved-revision2","runtimeAcceptance":"pending",
+report = {"schema":"horde.collapse-export.v1","form":"chapter-candidate-not-owner-accepted" if chapter else "owner-approved-revision2","runtimeAcceptance":"pending",
           "approvedBlendSha256":approved_blend_sha,"approvedContactSheetSha256":approved_sheet_sha,
-          "excludedContextMeshes":sorted(excluded),"coreSourceMeshes":63,"triangles":triangles,"vertices":vertices,
+          "excludedContextMeshes":sorted(excluded),"coreSourceMeshes":len(core),"triangles":triangles,"vertices":vertices,
           "indices":triangles*3,"primitives":2,"materials":["Boulder01Rock","MedievalWall02"],
           "worldTransform":"baked, identity node/TLAS placement; glTF metre+Yup maps to Horde",
           "lightingBaked":False,"exportedCamerasOrLights":False,"runtimeEmbeddedImageDimensions":[4,4],
@@ -279,3 +305,8 @@ report = {"schema":"horde.collapse-export.v1","form":"owner-approved-revision2",
                             "Native RT owner visual/resource/performance/device acceptance"]}
 (source_dir / "export-receipt.json").write_text(json.dumps(report,indent=2)+"\n")
 print(json.dumps(report))
+
+if chapter:
+    import shutil
+    shutil.copyfile(blend, source_dir / "chapter-entry-return.blend")
+    shutil.copyfile(review / "audit.json", source_dir / "authoring-audit.json")

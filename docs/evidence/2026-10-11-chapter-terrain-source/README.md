@@ -1,0 +1,9 @@
+# Lower entry and topo source checkpoint
+
+**SOURCE inspection, not in-game RT acceptance.** [Rounded mound](mound-section.png) and [route overhead](near-overhead.png) were opened and inspected using Blender Workbench. The shown r16 geometry, materials and route stations are identical to the final preserved r18 candidate; only source identity/audit packaging changed. There are no shipped lights or baked lighting in these previews.
+
+The enclosed entry return passes thirteen unchanged frustum checks, retains the first twelve risers, and reduces the original 12.24 m envelope to 6.00 m. Native intake: 8,254 triangles, 12,131 vertices, two materials, unchanged original admission ceilings. Source/export hashes and provenance are in [the entry candidate](../../../assets/models/world/source/chapter-entry-return-r03/README.md). Exact-master hash mismatch and duplicate/missing frustum-view audits were both rejected before output creation. Earlier straight 18/24-riser failures remain retained locally.
+
+[Terrain r18](../../../assets/models/world/source/chapter-terrain-r18/README.md) is 39,618 native triangles/two materials. Exported support matches geometry exactly; 2,781 route queries and 616 bidirectional sweeps pass. Exact triangle clipping retains all nine occupied tomb volumes; 263 roof/terrain intersections provide at least 0.3938 m cover. It retains land around/behind the rope and all three distinct apertures. These are native-source and CPU-support results, not capsule/headroom, GPU residency, performance, gameplay or owner acceptance.
+
+The live runtime remains unchanged by this source checkpoint. Next: matching renderer/support admission, dressed route, true two-way resource ownership and Kit, followed by inspected RT views and physical checks. Original masters/backups, earlier candidates, failed export logs and release assets remain preserved. No capacity, shader budget, quality or timeout changed.

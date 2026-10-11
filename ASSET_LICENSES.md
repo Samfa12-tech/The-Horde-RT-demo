@@ -310,3 +310,7 @@ inspection or an MIT/CC0 claim. Credit: Warden/Kit source created with Meshy;
 source supplied by Samfa12. The original private-project file is unchanged.
 Native clip/skin intake is separate from runtime admission: no visible Kit,
 Kit renderer/resource handoff is shipped by this intake. The intended non-overlapping Keeper/Kit lifecycle may reuse the dedicated character slot; that is a subsequent admission task.
+
+### Chapter terrain and shortened entry source candidates (11 October 2026)
+
+`assets/models/world/source/chapter-entry-return-r03/` preserves original Horde architectural authoring derived from the accepted collapse, reusing the existing Poly Haven Boulder01 rock and Boulder01/MedievalWall02 CC0 maps. `assets/models/world/source/chapter-terrain-r18/` is original Horde Blender authoring from the owner-supplied r2 heightfield, with admitted Poly Haven damp_sand/mossy_stone_wall CC0 materials. Individual texture/source hashes and derivation recipes remain with each candidate. The recovered original planning NPZ is under `assets/source/beyond_the_tomb/terrain/topo-r2/`. These sources and candidate GLBs are outside runtime package paths; native import and source validation do not grant final runtime/visual/performance acceptance. No blanket third-party licence change or new generation occurred.

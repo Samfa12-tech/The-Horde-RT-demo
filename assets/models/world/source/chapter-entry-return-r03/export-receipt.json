@@ -1,0 +1,65 @@
+{
+  "schema": "horde.collapse-export.v1",
+  "form": "chapter-candidate-not-owner-accepted",
+  "runtimeAcceptance": "pending",
+  "approvedBlendSha256": "cba42d8a06c3d09c35c18dc1586d2bd4c09d440ab9e68575a34cc1f0a78a6f19",
+  "approvedContactSheetSha256": null,
+  "excludedContextMeshes": [
+    "Continuous solid floor",
+    "Existing chamber left",
+    "Existing chamber right",
+    "Existing chamber roof"
+  ],
+  "coreSourceMeshes": 49,
+  "triangles": 8254,
+  "vertices": 12131,
+  "indices": 24762,
+  "primitives": 2,
+  "materials": [
+    "Boulder01Rock",
+    "MedievalWall02"
+  ],
+  "worldTransform": "baked, identity node/TLAS placement; glTF metre+Yup maps to Horde",
+  "lightingBaked": false,
+  "exportedCamerasOrLights": false,
+  "runtimeEmbeddedImageDimensions": [
+    4,
+    4
+  ],
+  "source": {
+    "path": "assets/models/world/source/chapter-entry-return-r03/collapsed-entry-lod0.glb",
+    "bytes": 6174940,
+    "sha256": "f886a68e24278f6d1f18bdfea2d8939073ce0bb2c0ea9cd8e8f31949a2846b5e"
+  },
+  "runtime": {
+    "path": "assets/models/world/source/chapter-entry-return-r03/runtime-candidate/collapsed-entry-lod0.runtime.glb",
+    "bytes": 635844,
+    "sha256": "29cd8b3ad46cd0b115c2bef8264be3b404281ac048c2cfb495c18324a5189c69"
+  },
+  "textureInputReceipt": "assets/textures/props/source/collapsed-entry/input-receipt.json",
+  "authoredTangentCorrections": [
+    {
+      "primitive": 0,
+      "vertex": 3270,
+      "reason": "singular Mikk UV derivative",
+      "normal": [
+        -0.08890379220247269,
+        -0.9954425096511841,
+        -0.03450147062540054
+      ],
+      "authoredUnitTangent": [
+        0.9960354894898029,
+        -0.08895675172132154,
+        0.0,
+        -1.0
+      ],
+      "positionsAndUvsUnchanged": true
+    }
+  ],
+  "acceptanceGaps": [
+    "Khronos validation",
+    "Real StaticMeshAsset loader validation",
+    "Atlas/native integration",
+    "Native RT owner visual/resource/performance/device acceptance"
+  ]
+}

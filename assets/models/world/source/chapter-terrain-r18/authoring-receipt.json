@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "author": "Original Horde authoring from owner-supplied r2 topo",
+  "entryAuditSha256": "c0cae7d7cda070669241093105178638ef2e9d84fefc1fc18cec24057252e618",
+  "sourceNpzSha256": "251126186fa4923f9902524ec4ac2cc76d0f7a1c82cb1feac9901cc7832bb0ba",
+  "recipeSha256": "9c5cebd5110ae11c64f91cf0a22ea095b4b5b411f32d5aa8ffa2e31507b5b36a",
+  "blender": "5.2.0 LTS",
+  "vertices": 20151,
+  "triangles": 39618,
+  "materials": 2,
+  "uvRepeatsPerMetre": 0.42,
+  "textures": [
+    {
+      "path": "assets/textures/polyhaven/mobile_1k/damp_sand/diff.jpg",
+      "sha256": "3b26e6033205d4c774bb8c48bda8081b5a369e01ac701a0dcaa7ddc1f484f1de"
+    },
+    {
+      "path": "assets/textures/polyhaven/mobile_1k/damp_sand/normal.jpg",
+      "sha256": "1bda846d2361eeba2938700e68771711a29880299da61733bd2bcdd7af83c1f4"
+    },
+    {
+      "path": "assets/textures/polyhaven/mobile_1k/damp_sand/arm.jpg",
+      "sha256": "a54ba44a05381a87b4506c6e75d92e096b11cb45c5d7d052957b1d36eee4aef9"
+    },
+    {
+      "path": "assets/textures/polyhaven/mobile_1k/mossy_stone_wall/diff.jpg",
+      "sha256": "7240e55cfc662ea403600fc7d5143f72983fbe8098d55fc6ccae75d21421dce4"
+    },
+    {
+      "path": "assets/textures/polyhaven/mobile_1k/mossy_stone_wall/normal.jpg",
+      "sha256": "e159e429269bc933743ee47051b4081261e6131e994242bf26e05ab0a0df4542"
+    },
+    {
+      "path": "assets/textures/polyhaven/mobile_1k/mossy_stone_wall/arm.jpg",
+      "sha256": "c76fd89a80b95a1daa63af4b467a97117322207a04f7d59b86a5db160bbe8001"
+    }
+  ],
+  "boundsEngine": [
+    [
+      -65.0,
+      -38.0,
+      -110.0
+    ],
+    [
+      237.0,
+      33.696258544921875,
+      381.0
+    ]
+  ],
+  "gridSpacing": "1m near; 2/4m mid; 8m far; exact shaft/skylight interfaces",
+  "adjustments": [
+    "Five-tap separable planning-height smoothing",
+    "2.4m graded trail; 6.4m/7m pockets",
+    "Clue trail cut into exterior mound shoulder; occupied roofs and rising stairs retained",
+    "Banks and retained tomb roof/collapse mound clearance",
+    "Exact 2.05m apron and three separate open shafts"
+  ],
+  "files": [
+    {
+      "path": "asset.manifest.json",
+      "bytes": 680,
+      "sha256": "7d87da814c78874fb1dfc277f26a8ab1a614bd65e6e71c668be1ed921fc01d1f"
+    },
+    {
+      "path": "chapter-terrain-r18.blend",
+      "bytes": 6762515,
+      "sha256": "7265bb28837aa3f5fb493952516c4565827eefefff037a3cbb09441610d4361c"
+    },
+    {
+      "path": "chapter-terrain-r18.glb",
+      "bytes": 7406620,
+      "sha256": "ec310d24af87d7360bf5e77c26a57427ee5b1be633e2a3b686faae6038e5da13"
+    },
+    {
+      "path": "surface.json",
+      "bytes": 2491143,
+      "sha256": "68e6d8ef9a18509783e2953f37b63d1c11907cf0e1c1806a49df1d32dd3a1b7e"
+    }
+  ],
+  "status": "Authored source candidate; NOT runtime admission or visual acceptance"
+}

@@ -1,0 +1,1 @@
+Native candidate=collapsed-entry-lod0.runtime.glb vertices=12131 triangles=8254 primitives=2 materials=2 bounds=-2,-1.1,2.92, to 7.38,6,11.99,

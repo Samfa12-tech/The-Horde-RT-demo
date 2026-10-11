@@ -23,10 +23,21 @@ parser.add_argument("--approved", type=Path, required=True)
 parser.add_argument("--output", type=Path, required=True)
 parser.add_argument("--views", default="all", help="Comma-separated view names or all/none")
 parser.add_argument("--revision", type=int, choices=(1, 2), default=1)
+parser.add_argument("--stair-count", type=int, default=None,
+                    help="Optional 1.7 derivative, 18..44 risers; original revision-two default stays 44")
+parser.add_argument("--upper-return", action="store_true",
+                    help="Chapter-only 18-riser enclosed upper stair return; fresh output required")
 args = parser.parse_args(sys.argv[sys.argv.index("--") + 1:])
 args.source = args.source.resolve()
 args.approved = args.approved.resolve()
 args.output = args.output.resolve()
+if args.upper_return and (args.revision != 2 or args.stair_count != 18):
+    raise RuntimeError("Upper return requires a fresh revision-two 18-riser derivative")
+if args.stair_count is not None:
+    if args.revision != 2 or not 18 <= args.stair_count <= 44:
+        raise RuntimeError("A shortened derivative requires revision two and 18..44 risers")
+    if args.output.exists():
+        raise RuntimeError("A shortened derivative must use a fresh output directory")
 if args.revision == 2 and args.output.name == "final":
     raise RuntimeError("The rejected revision-one package must remain untouched")
 args.output.mkdir(parents=True, exist_ok=True)
@@ -41,6 +52,7 @@ for item in receipt:
         raise RuntimeError("Preserved source receipt mismatch: " + item["path"])
 
 bpy.ops.wm.read_factory_settings(use_empty=True)
+bpy.context.preferences.filepaths.save_version = 0
 scene = bpy.context.scene
 scene.render.engine = "CYCLES"
 scene.cycles.device = "CPU"
@@ -190,7 +202,7 @@ bpy.ops.object.modifier_apply(modifier=boolean.name)
 bpy.data.objects.remove(cutter, do_unlink=True)
 roof_meshes = []
 roof_supports = []
-stair_count = 5 if args.revision == 1 else 44
+stair_count = 5 if args.revision == 1 else (args.stair_count or 44)
 stair_width = .96 if args.revision == 1 else 3.7
 stair_end = 4.78 + stair_count*.28
 seal_z = 6.35 if args.revision == 1 else stair_end + .20
@@ -229,6 +241,56 @@ if args.revision == 1:
     box("Recess right wall",(1.4,-1.10,3.66),(1.55,2.35,6.4))
     roof = box("Sealed recess roof",(-1.55,2.20,3.55),(1.55,2.35,6.52))
     roof_meshes.append(roof)
+elif args.upper_return:
+    # A real full-width landing, six eastward steps, and south-facing return.
+    # The terminal wall remains explicitly identifiable by the same strict ray
+    # audit. No blocker is renamed and no inspection ray is excluded.
+    landing_z = 4.78 + 12*.28  # 8.14
+    landing_far = landing_z + 3.7
+    landing_y = tread_height(11)  # 2.71
+    upper_x = 1.85 + 6*.28
+    upper_far_x = upper_x + 3.7
+    upper_y = tread_height(17)  # 4.15
+    for name,xmin,xmax in (("left",-2,-1.85),("right",1.85,2)):
+        wedge("Closed cave-in side envelope "+name,xmin,xmax,2.92,3.68,1.35,1.35,1.80,1.98)
+        wedge("Rising full-width stairwell "+name,xmin,xmax,3.66,4.78,-1.1,-1.1,1.8,1.95)
+        wedge("Upper stairwell "+name,xmin,xmax,4.78,landing_z,-1.1,-1.1,1.95,landing_y+1.85)
+    roof_meshes.append(wedge("Rising enclosure over collapse",-2,2,2.92,4.78,1.60,1.80,1.78,1.98))
+    roof_meshes.append(wedge("Ascending roof beyond visible flight",-2,2,4.78,landing_z,
+                             1.80,landing_y+1.65,1.98,landing_y+1.85))
+    box("Upper turn landing",(-2,-1.1,landing_z),(2,landing_y,landing_far),wall_material)
+    box("Upper turn west wall",(-2,-1.1,landing_z),(-1.85,landing_y+1.85,landing_far+.15))
+    box("Upper turn north wall",(-2,-1.1,landing_far),(2,landing_y+1.85,landing_far+.15))
+    roof_meshes.append(box("Upper turn landing roof",(-2,landing_y+1.65,landing_z),
+                           (1.85,landing_y+1.85,landing_far+.15)))
+    # Build the transverse roof/walls in the same metre-scaled frame, rotating
+    # X/-Z/Y Blender coordinates so local +Z points east (+X in the engine).
+    def east_wedge(name, across_min, across_max, along0, along1, b0,b1,t0,t1):
+        obj=wedge(name,across_min,across_max,along0,along1,b0,b1,t0,t1)
+        for vertex in obj.data.vertices:
+            x,y,z=vertex.co
+            vertex.co=(-y, -(landing_far-x), z)
+        # Rotation preserves winding; normals are recalculated by mesh update.
+        obj.data.update()
+        return obj
+    for i in range(6):
+        box("Stair upper east tread %d" % (i+13),
+            (1.85+i*.28,-1.1,landing_z),
+            (1.85+(i+1)*.28,tread_height(i+12),landing_far),wall_material,"stair")
+    east_wedge("Upper east front wall",3.7,3.85,1.85,upper_x,-1.1,-1.1,
+               landing_y+1.85,upper_y+1.85)
+    east_wedge("Upper east rear wall",-.15,0,1.85,upper_x,-1.1,-1.1,
+               landing_y+1.85,upper_y+1.85)
+    roof_meshes.append(east_wedge("Upper east ascending roof",-.15,3.85,1.85,upper_x,
+                                 landing_y+1.65,upper_y+1.65,landing_y+1.85,upper_y+1.85))
+    box("Return landing",(upper_x,-1.1,landing_z-1.2),(upper_far_x,upper_y,landing_far),wall_material)
+    box("Return east wall",(upper_far_x,-1.1,landing_z-1.35),(upper_far_x+.15,upper_y+1.85,landing_far+.15))
+    box("Return north wall",(upper_x,-1.1,landing_far),(upper_far_x+.15,upper_y+1.85,landing_far+.15))
+    box("Return west reveal",(upper_x-.15,-1.1,landing_z-1.35),(upper_x,upper_y+1.85,landing_z))
+    roof_meshes.append(box("Return enclosure roof",(upper_x,upper_y+1.65,landing_z-1.35),
+                           (upper_far_x+.15,upper_y+1.85,landing_far+.15)))
+    box("Remote physical seal - visibility forbidden",(upper_x,-1.1,landing_z-1.35),
+        (upper_far_x,upper_y+1.85,landing_z-1.2))
 else:
     # Owner steering replaces the old narrow five-tread dead end. Forty-four
     # risers continue upward at full chamber width. The distant physical
@@ -250,7 +312,7 @@ box("Existing chamber left",(-2.0,-1.10,-6.4),(-1.85,1.50,3.66))
 box("Existing chamber right",(1.85,-1.10,-6.4),(2.0,1.50,3.66))
 chamber_roof = box("Existing chamber roof",(-2,1.35,-6.4),(2,1.50,3.66 if args.revision == 1 else 2.94))
 roof_meshes.append(chamber_roof)
-for i in range(stair_count):
+for i in range(12 if args.upper_return else stair_count):
     z = 4.78 + i*.28
     # The lower flight is buried by the settled collapse. Its exposed five-tread
     # remnant climbs above the low upper cavities rather than disappearing behind
@@ -657,6 +719,9 @@ if sum(item["visibleRiserSamples"]>0 for item in stair_visibility)<3:
 for image in bpy.data.images:
     if image.source == "FILE" and image.users:
         image.pack()
+        image.filepath = "//textures/" + Path(image.filepath).name
+        for packed in image.packed_files:
+            packed.filepath = image.filepath
 bpy.ops.outliner.orphans_purge(do_local_ids=True,do_linked_ids=False,do_recursive=True)
 images = [{"name":image.name,"dimensions":list(image.size),"packed":bool(image.packed_file)}
           for image in bpy.data.images if image.users and image.source == "FILE"]
@@ -678,16 +743,19 @@ report = {
     "cpuRenderer":{"engine":"Cycles","device":"CPU","threads":2,"samples":20},
     "productionCameraHorde":{"position":list(views["production"][0]),"target":list(views["production"][1]),
                              "verticalFovDegrees":60,"viewport":[960,540]},
-    "sealedBackingFrontZ":seal_z,"unchangedCollisionCapZ":3.4,"stairDepthRange":[4.78,stair_end],
-    "stairWidthMeters":stair_width,"stairCount":stair_count,"lowerRiseRunMeters":[.21,.28],
+    "sealedBackingFrontZ":landing_z-1.35 if args.upper_return else seal_z,
+    "sealedTerminalBounds":next(bounds(o) for o in meshes if o.name.startswith("Remote physical seal")) if args.revision==2 else None,
+    "unchangedCollisionCapZ":3.4,"stairDepthRange":[4.78,landing_far if args.upper_return else stair_end],
+    "upperReturn":args.upper_return,"stairWidthMeters":stair_width,"stairCount":stair_count,"lowerRiseRunMeters":[.21,.28],
     "upperRiseRunMeters":[.24,.28] if args.revision == 2 else [.21,.28],
     "ownerSteeringOverridesOldRecess":args.revision == 2,
     "renderedViews":rendered,"cutawayDisclosure":"overhead-cutaway hides roof meshes for inspection only",
     "provenance":{"asset":"Boulder 01","license":"CC0 1.0","receipt":"../download-receipt.json",
                   "licenseSnapshot":"../polyhaven-license.html","verifiedSourceFiles":receipt},
-    "acceptanceGaps":["Owner Form approval","No runtime GLB export before Form approval",
+    "acceptanceGaps":["Owner Form approval","Chapter derivative owner/native acceptance pending" if args.upper_return else "No runtime GLB export before Form approval",
                       "Native RT visual/asset-resource validation","Owner/device acceptance"]}
-(args.output/"audit.json").write_text(json.dumps(report,indent=2))
 bpy.ops.wm.save_as_mainfile(filepath=str(args.output/"final.blend"))
+report["blendSha256"] = hashlib.sha256((args.output/"final.blend").read_bytes()).hexdigest()
+(args.output/"audit.json").write_text(json.dumps(report,indent=2))
 print(json.dumps({"finalBlend":str(args.output/"final.blend"),"totalTriangles":total,
                   "rocks":[{"name":o.name,"triangles":tris(o)} for o in rocks],"views":rendered}))
