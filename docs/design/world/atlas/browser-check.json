@@ -1,0 +1,20 @@
+{
+  "review_date": "2026-10-11",
+  "browser": "Isolated headless Chrome via Playwright CLI",
+  "desktop_viewport": [1180, 1450],
+  "embedded_images": 10,
+  "all_images_loaded": true,
+  "desktop_locator_width": 120,
+  "nav_links_clicked": ["01-forest", "02-bellwether", "03-abbey", "04-foundry", "05-court", "06-approaches", "07-transitions", "08-progression"],
+  "overview_links_clicked": ["01-forest", "02-bellwether", "03-abbey", "04-foundry", "05-court", "06-approaches", "06-approaches", "06-approaches", "07-transitions", "08-progression"],
+  "corresponding_return_links_passed": true,
+  "offline_navigation_passed": true,
+  "phone_viewport": [390, 844],
+  "phone_document_width": 390,
+  "phone_map_zoom": {"map_width": 1120, "scroll_window_width": 364},
+  "phone_sheet_zoom": {"image_width": 1600, "scroll_window_width": 364},
+  "phone_locator_width": 85,
+  "page_script_errors": [],
+  "actual_android_device_tested": false,
+  "site_deployed": false
+}

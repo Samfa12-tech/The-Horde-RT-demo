@@ -1,0 +1,480 @@
+{
+  "source_commit": "d37f16381311c6e620f0c4a9d01c1cce83260dc8",
+  "base_main_commit": "8e1a41ee4d04b3c45e63c872e3ef216b0d5e2b0d",
+  "status": "Navigation derivative; all metric geography draft, no runtime acceptance",
+  "axes": {
+    "x": "east metres",
+    "y": "north metres",
+    "z": "up metres above proposed lake datum"
+  },
+  "origin": "Bellwether well, X=0 Y=0 Z=20",
+  "regional_window_xy": [
+    -150,
+    410,
+    -510,
+    440
+  ],
+  "regional_contour_interval_m": 5,
+  "original_svg_plot_box": [
+    231.247326,
+    578.551074,
+    143.0856,
+    732.2616
+  ],
+  "original_svg_units_per_m": 0.6201852642857143,
+  "retained_baseline_equal": true,
+  "room_translations_xy": {
+    "DA": [
+      30,
+      -284
+    ],
+    "AF": [
+      230,
+      -40
+    ],
+    "GC": [
+      306,
+      308
+    ]
+  },
+  "room_rotation_degrees": 0,
+  "room_plate_world_bounds": {
+    "DA": [
+      -29.0,
+      76.0,
+      -382.0,
+      -275.0
+    ],
+    "AF": [
+      192.0,
+      277.0,
+      -71.0,
+      53.0
+    ],
+    "GC": [
+      263.0,
+      372.0,
+      296.0,
+      413.0
+    ]
+  },
+  "local_sheets": [
+    {
+      "id": "01-forest",
+      "number": "01",
+      "name": "Forest / rescue rim to lookout",
+      "color": "#315b39",
+      "files": [
+        "connected/01-forest-track-1-7"
+      ],
+      "bounds": [
+        -126,
+        -47,
+        79,
+        153
+      ],
+      "note": "Surface plan; exact shared XY registration within the proposed blockout. View X −126…−47, Y 79…153 m; north up; 2 m contours; 20 m scale bar. F01 rescue rim (−112,139,33.6), F04 lookout (−65,90,30.4). This does not align the tomb interior.",
+      "short": [
+        "Forest / rescue rim",
+        "Reunion → fixed lookout",
+        "79 × 74 m view · north up"
+      ],
+      "point": [
+        -126,
+        139
+      ],
+      "label": [
+        12,
+        405,
+        190
+      ]
+    },
+    {
+      "id": "02-bellwether",
+      "number": "02",
+      "name": "Bellwether / terrain, use, river and mill",
+      "color": "#805716",
+      "files": [
+        "connected/02a-bellwether-terrain-1-8",
+        "connected/02b-bellwether-use-1-8",
+        "connected/02c-bellwether-water-height-1-8"
+      ],
+      "bounds": [
+        -85,
+        92,
+        -78,
+        116
+      ],
+      "note": "Terrain and use sheets share X −85…92, Y −78…116 m; north up; terrain contours 2 m; 40 m scale bars. The river/mill sheet is a set of profiles and an unfolded diagram, not a third plan footprint. The true mill section on the use sheet is at world Y=13 m, X=25…90 m. Well (0,0,20); mill floor Z16; lake datum Z0. Optional mill bridge is separate from the Foundry crossing.",
+      "short": [
+        "Bellwether · 3 sheets",
+        "Terrain + use share this view",
+        "Profiles link to river / mill"
+      ],
+      "point": [
+        -85,
+        0
+      ],
+      "label": [
+        12,
+        650,
+        190
+      ]
+    },
+    {
+      "id": "03-abbey",
+      "number": "03",
+      "name": "Drowned Abbey / floorplan and section",
+      "color": "#285c75",
+      "files": [
+        "dungeons/03-drowned-abbey-floorplan"
+      ],
+      "bounds": [
+        -29.0,
+        76.0,
+        -382.0,
+        -275.0
+      ],
+      "note": "Projected room-plate bounds X −29…76, Y −382…−275 m (105 × 107 m), not surface terrain. Local (x,y) → world (x+30,y−284), no rotation; north up; 20 m scale bar. Local plan view X −67…56, Y −110…20 m. DA01/A3 origin (30,−284), dry floor Z+2; dry galleries Z−4; hall Z+6. The unfolded section is not a plan-distance axis. Alignment is exact in the draft source, unaccepted in runtime.",
+      "short": [
+        "Drowned Abbey",
+        "Projected interior · 105 × 107 m",
+        "World = local + (30, −284)"
+      ],
+      "point": [
+        76,
+        -382
+      ],
+      "label": [
+        792,
+        875,
+        312
+      ]
+    },
+    {
+      "id": "04-foundry",
+      "number": "04",
+      "name": "Ashen Foundry / floorplan and section",
+      "color": "#934821",
+      "files": [
+        "dungeons/04-ashen-foundry-floorplan"
+      ],
+      "bounds": [
+        192.0,
+        277.0,
+        -71.0,
+        53.0
+      ],
+      "note": "Projected room-plate bounds X 192…277, Y −71…53 m (85 × 124 m), not a surface terrain sheet. Local (x,y) → world (x+230,y−40), no rotation; north up; 20 m scale bar. Local plan view X −47…56, Y −38…105 m. AF01/F0 origin (230,−40), intake/mint floor Z30; galleries Z34. The section is unfolded. Alignment is exact in the draft source, unaccepted in runtime.",
+      "short": [
+        "Ashen Foundry",
+        "Projected interior · 85 × 124 m",
+        "World = local + (230, −40)"
+      ],
+      "point": [
+        277,
+        53
+      ],
+      "label": [
+        792,
+        535,
+        312
+      ]
+    },
+    {
+      "id": "05-court",
+      "number": "05",
+      "name": "Glass Court / floorplan and section",
+      "color": "#675478",
+      "files": [
+        "dungeons/05-glass-court-floorplan"
+      ],
+      "bounds": [
+        263.0,
+        372.0,
+        296.0,
+        413.0
+      ],
+      "note": "Projected room-plate bounds X 263…372, Y 296…413 m (109 × 117 m), not surface terrain. Local (x,y) → world (x+306,y+308), no rotation; north up; 20 m scale bar. Local plan view X −49…75, Y −24…113 m. GC01 origin (306,308), floors Z80/84/88. GC10 is a threshold proposal; it does not locate or size the treasury/finale. Alignment is exact in the draft source, unaccepted in runtime.",
+      "short": [
+        "Glass Court",
+        "Projected interior · 109 × 117 m",
+        "World = local + (306, 308)"
+      ],
+      "point": [
+        372,
+        413
+      ],
+      "label": [
+        792,
+        163,
+        312
+      ]
+    },
+    {
+      "id": "06-approaches",
+      "number": "06",
+      "name": "Approaches / three plan insets and profiles",
+      "color": "#344b43",
+      "files": [
+        "dungeons/02-approach-plans-and-sections"
+      ],
+      "bounds": null,
+      "note": "6A Abbey: world X −70…115, Y −305…−70 m, 40 m scale bar. 6B gorge/Foundry: X 30…245, Y −125…15 m, 50 m scale bar. 6C ridge/Court: X 110…330, Y −85…330 m, 50 m scale bar. All three plan insets are north up and share regional world XY; their page scales differ. The lower panels are route-distance/Z profiles, not extra map extents. The Abbey inlet/crossing extends from A1 (0,−265) through refuge A2 (16,−275) to A3 (30,−284).",
+      "short": []
+    },
+    {
+      "id": "07-transitions",
+      "number": "07",
+      "name": "Crossings / complications and transitions",
+      "color": "#344b43",
+      "files": [
+        "dungeons/06-complications-and-transitions"
+      ],
+      "bounds": null,
+      "note": "An Abbey crossing distance/Z profile plus text keyed to A1–A3, X0/X1/X2–F0, and G0–GC01. No independent north, plan scale or footprint. Use sheet 06 to place these references; the profile uses metric distance along the authored crossing centreline.",
+      "short": []
+    },
+    {
+      "id": "08-progression",
+      "number": "08",
+      "name": "Dungeon theme, item and boss progression",
+      "color": "#344b43",
+      "files": [
+        "dungeons/07-theme-item-boss-progression"
+      ],
+      "bounds": null,
+      "note": "A room-ID progression diagram for the same three floorplans (03–05). No north, terrain scale or new geographic footprint. Abbey and Foundry remain peer branches; Court follows both seals. This atlas adds navigation only.",
+      "short": []
+    }
+  ],
+  "approach_inset_windows": [
+    {
+      "key": "6A",
+      "name": "Abbey descent",
+      "bounds": [
+        -70,
+        115,
+        -305,
+        -70
+      ],
+      "point": [
+        -2.0,
+        -190.0
+      ],
+      "label": [
+        792,
+        756,
+        312
+      ],
+      "color": "#285c75"
+    },
+    {
+      "key": "6B",
+      "name": "Foundry gorge",
+      "bounds": [
+        30,
+        245,
+        -125,
+        15
+      ],
+      "point": [
+        89.0,
+        -94.0
+      ],
+      "label": [
+        792,
+        656,
+        312
+      ],
+      "color": "#934821"
+    },
+    {
+      "key": "6C",
+      "name": "Court ridge",
+      "bounds": [
+        110,
+        330,
+        -85,
+        330
+      ],
+      "point": [
+        257,
+        258
+      ],
+      "label": [
+        792,
+        354,
+        312
+      ],
+      "color": "#675478"
+    }
+  ],
+  "unresolved": [
+    "No tomb-interior to rescue-rim transform",
+    "No precise treasury/finale floorplan or extent"
+  ],
+  "retained_axes_xml_sha256": "b9d1a4daef5216ab9a2dfa264b636cd1f2084705ef38a036ef2789b8bdf31c10",
+  "sources": {
+    "connected/shared-coordinate-layout.json": {
+      "sha256": "0a4da29bf8d988145c0f7b3f1c7afaf415a5da9b14c34bbd53bd1e00e3a86e59",
+      "bytes": 8345,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/design/world/connected/shared-coordinate-layout.json"
+    },
+    "connected/build_maps.py": {
+      "sha256": "7a394e88be7b2a45f52dab40affa5baae74daf4a94eaf01328d9eab0bce0ffe7",
+      "bytes": 28448,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/design/world/connected/build_maps.py"
+    },
+    "connected/building-feature-register.csv": {
+      "sha256": "e0284fa28de3e1d8a4b2c3ba05ca795f0c445d90429ae215027508c4e5041719",
+      "bytes": 585,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/design/world/connected/building-feature-register.csv"
+    },
+    "connected/README.md": {
+      "sha256": "236cb45d141755c0224c31381f45e69f9b68c3296e8956e20b2251720a6cfd8f",
+      "bytes": 13269,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/design/world/connected/README.md"
+    },
+    "dungeons/01-connected-region.svg": {
+      "sha256": "580dc5c4982d55df607d7b9f84c26637ec244d8d0312c26c3aba4781fb458aad",
+      "bytes": 621164,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/design/world/dungeons/01-connected-region.svg"
+    },
+    "dungeons/01-connected-region.webp": {
+      "sha256": "798bf267332aa14795666e5eea308c7bf475c0ad4d4cd03f3833cbad13ab14db",
+      "bytes": 363694,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/design/world/dungeons/01-connected-region.webp"
+    },
+    "dungeons/build_atlas.py": {
+      "sha256": "1ac9a8e9bfa0530004341e7c5db59808a1f5b7f36154d7fd4203a722dee1b273",
+      "bytes": 44786,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/design/world/dungeons/build_atlas.py"
+    },
+    "dungeons/dungeon-layout.json": {
+      "sha256": "cd1471f84c398d151702eb387378883bb3a297454c87bbcdac92b2652a38062c",
+      "bytes": 40259,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/design/world/dungeons/dungeon-layout.json"
+    },
+    "dungeons/baseline/shared-coordinate-layout.json": {
+      "sha256": "0a4da29bf8d988145c0f7b3f1c7afaf415a5da9b14c34bbd53bd1e00e3a86e59",
+      "bytes": 8345,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/design/world/dungeons/baseline/shared-coordinate-layout.json"
+    },
+    "dungeons/README.md": {
+      "sha256": "bcde26f2c87f1828a29493b5e3d6d342fd41a0962870beb50e0c65798a8cdb37",
+      "bytes": 5895,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/design/world/dungeons/README.md"
+    },
+    "dungeons/room-register.csv": {
+      "sha256": "3f97ba3bd490dc36474f6bcaa2fca20462cdef62a74937b503c027241b4ab39e",
+      "bytes": 4881,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/design/world/dungeons/room-register.csv"
+    },
+    "dungeons/route-register.csv": {
+      "sha256": "d2de6ffacf6892e7358d758def6126be87125b510af93c824e3f999868d0edca",
+      "bytes": 1232,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/design/world/dungeons/route-register.csv"
+    },
+    "connected/01-forest-track-1-7.webp": {
+      "sha256": "7ece732e40f11f777408d410cce79618a31c28e6bbd7303de36d1622fe018395",
+      "bytes": 292488,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/design/world/connected/01-forest-track-1-7.webp"
+    },
+    "connected/01-forest-track-1-7.svg": {
+      "sha256": "317b282f62ec2cb02879717fcbd7452d3a48714703551deb604dbf3d740d57f9",
+      "bytes": 310928,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/design/world/connected/01-forest-track-1-7.svg"
+    },
+    "connected/02a-bellwether-terrain-1-8.webp": {
+      "sha256": "8c463d0d87a2b0fe5aa1f16f934671819ac7f8954d0dc65744d509fb146d3135",
+      "bytes": 391324,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/design/world/connected/02a-bellwether-terrain-1-8.webp"
+    },
+    "connected/02a-bellwether-terrain-1-8.svg": {
+      "sha256": "d6fa87549c64050f89b70578da75896939798c622b9487877b0a9d2a8ba6a679",
+      "bytes": 660337,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/design/world/connected/02a-bellwether-terrain-1-8.svg"
+    },
+    "connected/02b-bellwether-use-1-8.webp": {
+      "sha256": "d88f4c11b3e224cdb2e641afadb4524ff705eecf9dbaaa067bddb94206d18f49",
+      "bytes": 184396,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/design/world/connected/02b-bellwether-use-1-8.webp"
+    },
+    "connected/02b-bellwether-use-1-8.svg": {
+      "sha256": "5efa79a18750c4a1beea6375d6e5edbab15c9a8b648647425f6f46ae71555977",
+      "bytes": 198114,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/design/world/connected/02b-bellwether-use-1-8.svg"
+    },
+    "connected/02c-bellwether-water-height-1-8.webp": {
+      "sha256": "fc7dd7418969a9ea05963a9be54cfeabd5570713381962715fe120a7fafe9bce",
+      "bytes": 114740,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/design/world/connected/02c-bellwether-water-height-1-8.webp"
+    },
+    "connected/02c-bellwether-water-height-1-8.svg": {
+      "sha256": "d59f1256f8b206b32ef49990df2ae4dd50ca12bb0df72fc2f53886f1687b6265",
+      "bytes": 35115,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/design/world/connected/02c-bellwether-water-height-1-8.svg"
+    },
+    "dungeons/03-drowned-abbey-floorplan.webp": {
+      "sha256": "8e23e188542adbc9fd8f31fa5778a2386cefe70529d4143eac9b1dcff0407d39",
+      "bytes": 120812,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/design/world/dungeons/03-drowned-abbey-floorplan.webp"
+    },
+    "dungeons/03-drowned-abbey-floorplan.svg": {
+      "sha256": "a2d3491cad1a920bff5eb6ee955116571c219e640def55ec55e656c5a8add9bb",
+      "bytes": 64891,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/design/world/dungeons/03-drowned-abbey-floorplan.svg"
+    },
+    "dungeons/04-ashen-foundry-floorplan.webp": {
+      "sha256": "4db1ca43b7b82180f9eac984f4596e9585453c1a316ac198ed501cbaf8b12f60",
+      "bytes": 107248,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/design/world/dungeons/04-ashen-foundry-floorplan.webp"
+    },
+    "dungeons/04-ashen-foundry-floorplan.svg": {
+      "sha256": "f4f249e44f8d250bb4f4a0fb2584f9059e420c715df27aadedac7560efc1ac06",
+      "bytes": 59558,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/design/world/dungeons/04-ashen-foundry-floorplan.svg"
+    },
+    "dungeons/05-glass-court-floorplan.webp": {
+      "sha256": "501a866f3a9006e5d356e30c11bc78637329d1022410b843777132985562849e",
+      "bytes": 111430,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/design/world/dungeons/05-glass-court-floorplan.webp"
+    },
+    "dungeons/05-glass-court-floorplan.svg": {
+      "sha256": "21b838c2efca0bd7dbbe4a43dc1a54f48477848e456adf5464e6e24a620264a6",
+      "bytes": 58626,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/design/world/dungeons/05-glass-court-floorplan.svg"
+    },
+    "dungeons/02-approach-plans-and-sections.webp": {
+      "sha256": "e0edbfc8d717ce85861ba9c830b66f84cae280c3a8a49233e0d37537448b688c",
+      "bytes": 338108,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/design/world/dungeons/02-approach-plans-and-sections.webp"
+    },
+    "dungeons/02-approach-plans-and-sections.svg": {
+      "sha256": "58641c931c532284b866f1173530372d4af538d22b6baaa5d6beda09494e3c42",
+      "bytes": 1005389,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/design/world/dungeons/02-approach-plans-and-sections.svg"
+    },
+    "dungeons/06-complications-and-transitions.webp": {
+      "sha256": "d1501e65252dfa5a6d06d87184e02c06d16c72dbc2af930f36cb8949a7036837",
+      "bytes": 125298,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/design/world/dungeons/06-complications-and-transitions.webp"
+    },
+    "dungeons/06-complications-and-transitions.svg": {
+      "sha256": "a50f85fe36bec57735d3692ee31cf2ef5d66c5fc805e40484d89bc1372313c95",
+      "bytes": 30045,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/design/world/dungeons/06-complications-and-transitions.svg"
+    },
+    "dungeons/07-theme-item-boss-progression.webp": {
+      "sha256": "8c710ae332ee6e1f818a094a77399f2d2909b76b428bc4fcb63dbcf4b554038c",
+      "bytes": 113110,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/design/world/dungeons/07-theme-item-boss-progression.webp"
+    },
+    "dungeons/07-theme-item-boss-progression.svg": {
+      "sha256": "50abe6f39421f98f4e8052167796b9091a5ec8212c9151028bdf1f53de7fea9a",
+      "bytes": 29934,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/design/world/dungeons/07-theme-item-boss-progression.svg"
+    }
+  }
+}
