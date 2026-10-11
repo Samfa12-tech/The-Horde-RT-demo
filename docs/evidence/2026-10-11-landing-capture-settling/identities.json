@@ -1,0 +1,9 @@
+{
+  "baseCommit": "397ace03c3a5937c2169662fe6a2a47a33566291",
+  "changedSource": "src/gameplay/DevelopmentCheckpointSimulation.h",
+  "sourceSha256": "82bcbb7b39dbe4ea62c3d737bddfe009923b66d8d3f5624d3944af9f7188f369",
+  "debugExeSha256": "50ef40e7fb242fc32686e207af9e2c80942b67ad985e3f71cae6468dbb2a22b4",
+  "releaseExeSha256": "574939725774659f884588dc1640c1042f0b60bf9005a0b01c7c9fdf5eea76ec",
+  "shaderBudgetsSha256": "56936479b2d202dbdb9393ba94b66a1b0bc12d490b700d8af4c63de3460e53bf",
+  "note": "Diagnostic staging only; prior Kit APK unchanged. Four landing directions captured; two passed and two still failed."
+}

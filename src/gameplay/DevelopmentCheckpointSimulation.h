@@ -157,8 +157,7 @@ inline bool StageDevelopmentCheckpointSimulation(
         // Route shots are taken after stopping and looking at the bend. Let
         // the physical lantern and locomotion pose settle in simulation time;
         // render-only settling frames cannot advance those owners.
-        if(checkpoint.exteriorRouteStation>2u)
-            for(int tick=0;tick<120;++tick)advance();
+        for(int tick=0;tick<120;++tick)advance();
         if(checkpoint.raisesLanternForCompanion) {
             routeInput.commands.toggleHeldLightPose=gameSimulation.Snapshot().lastConsumedToggleHeldLightPoseSequence+1;
             for(int tick=0;tick<100;++tick) {

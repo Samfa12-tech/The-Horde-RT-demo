@@ -35,6 +35,12 @@ unchanged limits. Native terrain, pause/zero-delta pose and exact package checks
 pass. This supersedes preparation-only wording for visible Kit, but **does not
 establish GPU streaming, sustained/phone cost or complete chapter acceptance**.
 
+The subsequent [landing capture settling investigation](../evidence/2026-10-11-landing-capture-settling/README.md)
+fixes the frozen east/south lantern orientation by advancing ordinary fixed-step
+settling before capture. North/down-shaft primary-arm checks still fail and are
+preserved as failures. The inspected landing also retains the overhead anchor;
+the required grounded stake/graveyard and complete route acceptance remain open.
+
 
 Latest implementation evidence (11 October): [authored live terrain and forest
 ground](../evidence/2026-10-11-chapter-live-terrain/README.md) at `278ea604`,
