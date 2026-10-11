@@ -77,6 +77,29 @@ struct PresentableTinyRtScenePreflightTestAccess {
     {
         scene.pipelineBundle_.Reset();
     }
+
+    static bool AdmitChapter(PresentableTinyRtScene& scene, std::string& diagnostic)
+    {
+        scene.developmentRescueJourney_ = true;
+        if (!scene.LoadStaticHeldItemAssets({}, std::string(HORDE_RT_SOURCE_DIR) + "/assets", diagnostic))
+            return false;
+        const auto& slot = scene.staticMeshSlot_;
+        const auto counts = slot.TextureArrayCounts();
+        std::size_t emissiveOwners = 0;
+        for (const auto& material : slot.Materials())
+            emissiveOwners += (material.materialFlags[0] & static_cast<std::uint32_t>(RtMaterialFlag::EmissiveTexture)) != 0;
+        // Real native imports must fit before any Vulkan device is needed.
+        // Kit replaces only the separate laboratory test-box registration.
+        if (!scene.chapterActorReady_ || slot.InstanceMetadata()[9].primitiveCount != 0 ||
+            slot.InstanceMetadata()[25].primitiveCount != 1 ||
+            slot.PrimitiveMetadata().size() > kRtPrimitiveMetadataCapacity ||
+            counts.baseColor != 18 || counts.normal != 15 || counts.orm != 15 ||
+            counts.emissive != 1 || emissiveOwners != 1) {
+            diagnostic = "Chapter's real native asset/material roster exceeded or misrouted the bounded admission.";
+            return false;
+        }
+        return true;
+    }
 };
 
 } // namespace horde::vulkan::raytracing
@@ -156,6 +179,8 @@ int main()
                       observedScene.SelectedDielectricQualityName() == expectedQuality &&
                       observationLedger.pipelineCacheDuringOwnership == suppliedPipelineCache,
                   "scene quality and borrowed cache observations must reach the ownership seam");
+    ok &= Require(PresentableTinyRtScenePreflightTestAccess::AdmitChapter(observedScene, observationDiagnostic),
+                  observationDiagnostic);
     PresentableTinyRtScenePreflightTestAccess::ResetSelectedBundle(observedScene);
     ok &= Require(observedScene.SelectedDielectricQualityName().empty(),
                   "reset scene bundle must report no dielectric quality");

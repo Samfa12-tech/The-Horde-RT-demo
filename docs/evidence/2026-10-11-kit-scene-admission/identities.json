@@ -1,0 +1,275 @@
+{
+  "sourceBase": "2c23ae49f2bb9e7ba3a1a6ac2479e56fea587c9e",
+  "captures": [
+    {
+      "name": "reunion-pipeline",
+      "pngSha256": "fdaebcdc6f57d08d6ae8a78b7c79f42d4ec5107d5c153a1c69563fdde6a15df8",
+      "backend": "RayTracingPipeline",
+      "gpuTiming": {
+        "valid": true,
+        "latestMs": 2.704288,
+        "averageMs": 9.552163,
+        "sampleCount": 12,
+        "timestampValidBits": 64,
+        "timestampPeriodNanoseconds": 1.0
+      },
+      "companion": {
+        "grounded": true,
+        "walking": false,
+        "position": [
+          -27.699997,
+          1.394641,
+          -5.8
+        ],
+        "yaw": -1.567554,
+        "animationSeconds": 6.566698,
+        "generation": 1,
+        "keeperDissolve": 1.0
+      }
+    },
+    {
+      "name": "reunion-query",
+      "pngSha256": "a3d5e2e4ab784c4b57996641789ca2f5db9f3feda513cfc344f6f182c1956d70",
+      "backend": "RayQueryCompute",
+      "gpuTiming": {
+        "valid": true,
+        "latestMs": 8.79472,
+        "averageMs": 10.212712,
+        "sampleCount": 12,
+        "timestampValidBits": 64,
+        "timestampPeriodNanoseconds": 1.0
+      },
+      "companion": {
+        "grounded": true,
+        "walking": false,
+        "position": [
+          -27.699997,
+          1.394641,
+          -5.8
+        ],
+        "yaw": -1.567554,
+        "animationSeconds": 6.566698,
+        "generation": 1,
+        "keeperDissolve": 1.0
+      }
+    },
+    {
+      "name": "departure-pipeline",
+      "pngSha256": "675517f85406ea6c612d9e7ce7ce2820cb8e68aca623e5e85b4013b667938392",
+      "backend": "RayTracingPipeline",
+      "gpuTiming": {
+        "valid": true,
+        "latestMs": 8.995072,
+        "averageMs": 11.119363,
+        "sampleCount": 12,
+        "timestampValidBits": 64,
+        "timestampPeriodNanoseconds": 1.0
+      },
+      "companion": {
+        "grounded": true,
+        "walking": true,
+        "position": [
+          -26.038427,
+          1.279145,
+          -5.03312
+        ],
+        "yaw": -4.007552,
+        "animationSeconds": 1.0,
+        "generation": 1,
+        "keeperDissolve": 1.0
+      }
+    },
+    {
+      "name": "departure-query",
+      "pngSha256": "55361b62dbcd8a4bc59c9f8338ea0987293d7d9241255200b71de81917e56f7a",
+      "backend": "RayQueryCompute",
+      "gpuTiming": {
+        "valid": true,
+        "latestMs": 8.755744,
+        "averageMs": 9.941766,
+        "sampleCount": 12,
+        "timestampValidBits": 64,
+        "timestampPeriodNanoseconds": 1.0
+      },
+      "companion": {
+        "grounded": true,
+        "walking": true,
+        "position": [
+          -26.038427,
+          1.279145,
+          -5.03312
+        ],
+        "yaw": -4.007552,
+        "animationSeconds": 1.0,
+        "generation": 1,
+        "keeperDissolve": 1.0
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+      "bytes": 12492800,
+      "sha256": "db47150b8c14f498fda5b82977babe71e36eee90747da00f230a52e9bbff4b1c"
+    },
+    {
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+      "bytes": 4350464,
+      "sha256": "6f175aa0bcab2b46a96dc771b6f12856b2a4415033374ba39dbbc1f5b662d1cf"
+    },
+    {
+      "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "bytes": 172734651,
+      "sha256": "29de9f8cb9bd1b1766b6d0825d64a1445f9c33ea658e7d591e608db438581aeb"
+    },
+    {
+      "path": "assets/models/characters/runtime/kit-warden-v1/kit-warden-lod0.runtime.glb",
+      "bytes": 2151672,
+      "sha256": "1ba628235814b5912ae1439b180347dd8e1cce85b0f4d1fae5bbacb41e7d3713"
+    },
+    {
+      "path": "assets/models/world/source/tomb-dressing-v01/tomb-dressing-v01.blend1",
+      "bytes": 259583,
+      "sha256": "0dae1e8fb803336cef2d045f48c5f4c9195a6463f45161cb0b6c7434350769fb"
+    },
+    {
+      "path": "tools/raygen-variant-budgets.json",
+      "bytes": 6425,
+      "sha256": "56936479b2d202dbdb9393ba94b66a1b0bc12d490b700d8af4c63de3460e53bf"
+    }
+  ],
+  "sourceInputs": [
+    {
+      "path": "CMakeLists.txt",
+      "sha256": "a43f6d02865b03de5e1f77e0daff34f1a8c727398905877536c19ce96780b6f3"
+    },
+    {
+      "path": "android/app/build.gradle",
+      "sha256": "0880045868d36659e8f9baf9ad7d29547b0d5b943cfa5974f7ecce7b894b603b"
+    },
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java",
+      "sha256": "bbbd05c938bde39df7f55676e7be784132a5677c2766e4c561f16199325264d2"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_hit_decode.glsl",
+      "sha256": "1138e46d1d79b38ed2098888f533c228cc3b8b30d21c506a467738cf12b23b1c"
+    },
+    {
+      "path": "src/gameplay/DevelopmentCheckpointSimulation.h",
+      "sha256": "18bb2ac4a38a3deaf3d4b2a52ac7540f8a08ea487e4019c34907435d18ae6cf4"
+    },
+    {
+      "path": "src/gameplay/DevelopmentCheckpoints.h",
+      "sha256": "ae317b34fe6b68a10b7b653d0e59c36e5b089a523d74341416394a8a0b8f9dc6"
+    },
+    {
+      "path": "src/gameplay/dialogue/CompanionRouteFixture.h",
+      "sha256": "a6f55a89dc56f71682da40926f1972d076ad6af0867dd09d286805f3cd1ef1d2"
+    },
+    {
+      "path": "src/gameplay/simulation/GameSimulationDialogue.cpp",
+      "sha256": "c2922dab69bedf7428fee36a666866a55eb86b5234f8bb7e3b96d3052254be82"
+    },
+    {
+      "path": "src/platform/windows/DiagnosticWindow.cpp",
+      "sha256": "eb82b394a85a0409238364119ae57107ff21801d8c72aaf7ecf1c16903438ba9"
+    },
+    {
+      "path": "src/vulkan/raytracing/MinimalLegacyRayGenShader.inc",
+      "sha256": "9d44b02a228ce6b808eb801a589fdd3c98e81b4b2fa989f9b4ee4cdd512cd92c"
+    },
+    {
+      "path": "src/vulkan/raytracing/MinimalRayGenShader.inc",
+      "sha256": "e7d8f0ff9f1b7d79a3c7116b1d22c1a584e9186b6b70811bdb68891bd7210b43"
+    },
+    {
+      "path": "src/vulkan/raytracing/PresentableTinyRtScene.cpp",
+      "sha256": "e548eb57133e7d39dcf7b858db2d9bc8496e1c553dacc2ead494ad7d4ea38048"
+    },
+    {
+      "path": "src/vulkan/raytracing/PresentableTinyRtScene.h",
+      "sha256": "59c0087be8a8bb7d39f77b8aec010210ad40bc8fb861583b9957c92c33dc18c9"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtPipelineVariantCatalog.generated.h",
+      "sha256": "4db7ae9b1e8543df3216f63af3098be8ddc683411eff1189e9e35d97c1ed119c"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtRayQueryVariantCatalog.generated.h",
+      "sha256": "f5e55e2368cd395de4eff2252a1041535097e9e51bc69e0bdbc8b5ace1ce1b1a"
+    },
+    {
+      "path": "src/vulkan/raytracing/SimulationFrameAdapter.cpp",
+      "sha256": "9b183229389b7b7cc59541e486e99f81861c5612329b35dab1b08262d2dc4017"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/diagnostic_high_generic_dielectric.inc",
+      "sha256": "29f04a0849b28236de78c9ef49e2c290b0a0dcb8e40cea94867584aac889679c"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/diagnostic_high_opaque_fast.inc",
+      "sha256": "d050a4b1472df860987996d4d87e6e517634b234c04e9bf03bc48f83edae76a6"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/diagnostic_mobile_generic_dielectric.inc",
+      "sha256": "d9c22d71f8dd737ac75476ad748408afd2046e4e527344a6a12c69d471866f1b"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/diagnostic_mobile_opaque_fast.inc",
+      "sha256": "795cafc38578b35276ff8f81ee06708288e383078d25ef6feabe5d20cc7d1bf1"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_high_generic_dielectric.inc",
+      "sha256": "126f7f04697c472444bd470ba7fc0f3ded2721e93e8dc9bed77389e5fba6a932"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_high_opaque_fast.inc",
+      "sha256": "13906188bce8a7aea8dbcda3192a81914961a629f2d82c22f36ed1f0f58d51d4"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_mobile_generic_dielectric.inc",
+      "sha256": "97088a0d3667b25880ff4ef446da7c8e1527e9152ccaee814e7e1153b07d768c"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_mobile_opaque_fast.inc",
+      "sha256": "0587d28731f9bb7e280e911b949571a31aedb79b841626bc2d107cfebeb69961"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_shipping_high_generic_dielectric.inc",
+      "sha256": "a6184ec65cdc053378c56a97214e8ea0112508dddd4ed299f168541f2a40e120"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_shipping_high_opaque_fast.inc",
+      "sha256": "5b846b4ad5147aa355312994dd65c8eb34c8e12ca03106e8e7faeaec2a5247a1"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_shipping_mobile_generic_dielectric.inc",
+      "sha256": "7e9a0cbee089d543c99a0fea5315d9f1583562089a5f4773659bfa312a531cd8"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_shipping_mobile_opaque_fast.inc",
+      "sha256": "4804d1555771eded669251c8de0247be075e1e3cdff7ebdeba8faa9356967aee"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/shipping_high_generic_dielectric.inc",
+      "sha256": "705c2bd9f82131a053feb9aa754cc831a4b4308875763845b4ced7f8b4038b61"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/shipping_high_opaque_fast.inc",
+      "sha256": "1fede5ee95a23eb9fb50555b2fe8040c203b490a1be36b0af8f1e79246d49834"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/shipping_mobile_generic_dielectric.inc",
+      "sha256": "f98e2ea08a68ab5ab684d62f07f29335405fcf1cd11a1a499ee5d5c4f2c70db6"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/shipping_mobile_opaque_fast.inc",
+      "sha256": "d9c9d77ff598581c3e3be6d7aa6f386041316a199f40237d5f3bcec539784992"
+    },
+    {
+      "path": "src/scene/assets/SkinnedPbrActor.h",
+      "sha256": "a731c91bc1dcaeb2306d8ea44d66922f297dca8f2f4eac115ba13669143cda6d"
+    }
+  ]
+}

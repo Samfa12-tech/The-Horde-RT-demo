@@ -572,6 +572,14 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     tlas_ = std::exchange(other.tlas_, AccelerationStructure{});
     tlasUpdateScratch_ = std::exchange(other.tlasUpdateScratch_, Buffer{});
     characterSlot_ = std::move(other.characterSlot_);
+    chapterActor_ = std::move(other.chapterActor_);
+    chapterActorReady_ = std::exchange(other.chapterActorReady_, false);
+    thirdActorIsCompanion_ = std::exchange(other.thirdActorIsCompanion_, false);
+    thirdActorNeedsBuild_ = std::exchange(other.thirdActorNeedsBuild_, false);
+    chapterActorNeedsRefit_ = std::exchange(other.chapterActorNeedsRefit_, false);
+    chapterActorPoseGeneration_ = std::exchange(other.chapterActorPoseGeneration_, UINT64_MAX);
+    chapterActorPoseSeconds_ = std::exchange(other.chapterActorPoseSeconds_, -1.0f);
+    chapterActorWalking_ = std::exchange(other.chapterActorWalking_, false);
     other.characterSlot_ = {};
     playerRenderSlot_ = std::move(other.playerRenderSlot_);
     other.playerRenderSlot_ = {};
@@ -1115,6 +1123,11 @@ void PresentableTinyRtScene::Destroy()
     rescueWorldVertices_.clear();
     rescueWorldSurfaceCodes_.clear();
     characterSlot_.DestroyGpuResources(gpuResources_);
+    chapterActor_ = {};
+    chapterActorReady_ = thirdActorIsCompanion_ = thirdActorNeedsBuild_ = chapterActorNeedsRefit_ = false;
+    chapterActorPoseGeneration_ = UINT64_MAX;
+    chapterActorPoseSeconds_ = -1.0f;
+    chapterActorWalking_ = false;
     DestroyBuffer(skinnedPlayerBlasUpdateScratch_);
     DestroyBuffer(viewmodelBlasUpdateScratch_);
     DestroyAccelerationStructure(viewmodelBlas_);
@@ -1940,7 +1953,7 @@ bool PresentableTinyRtScene::CreateTexture(const std::string& path,
                                            const std::span<const std::uint32_t> sourceLayers,
                                            const VkImageViewType viewType,
                                            const std::span<const RtTextureLayerAlias> sourceAliases,
-                                           const std::string& appendedArrayPath)
+                                           std::span<const std::string> appendedArrayPaths)
 {
     if (!sourceAliases.empty() && sourceLayers.empty())
     {
@@ -1976,32 +1989,34 @@ bool PresentableTinyRtScene::CreateTexture(const std::string& path,
         diagnostic = "Failed to read PBR texture array: " + path;
         return false;
     }
-    std::vector<std::uint8_t> appendedBytes;
-    RtKtxArrayAppendView appended;
-    if (!appendedArrayPath.empty())
+    if (appendedArrayPaths.size() > kRtTextureLayerCapacity) {
+        diagnostic = "Too many appended PBR arrays."; return false;
+    }
+    std::vector<std::vector<std::uint8_t>> appendedBytes(appendedArrayPaths.size());
+    std::vector<RtKtxArrayAppendView> appended(appendedArrayPaths.size());
+    std::uint32_t appendedLayerCount = 0;
+    for (std::size_t i = 0; i < appendedArrayPaths.size(); ++i)
     {
-        if (!ktx2 || sourceLayers.empty())
-        {
-            diagnostic = "Appended PBR arrays require an explicit KTX layer selection.";
-            return false;
+        if (!ktx2 || sourceLayers.empty()) {
+            diagnostic = "Appended PBR arrays require an explicit KTX layer selection."; return false;
         }
+        const auto& appendedArrayPath = appendedArrayPaths[i];
         std::ifstream extra(appendedArrayPath, std::ios::binary | std::ios::ate);
-        if (!extra || extra.tellg() <= 0)
-        {
-            diagnostic = "Appended PBR texture array is missing or empty: " + appendedArrayPath;
-            return false;
+        if (!extra || extra.tellg() < 80) {
+            diagnostic = "Appended PBR texture array is missing or truncated: " + appendedArrayPath; return false;
         }
-        appendedBytes.resize(static_cast<std::size_t>(extra.tellg()));
-        extra.seekg(0, std::ios::beg);
-        if (!extra.read(reinterpret_cast<char*>(appendedBytes.data()),
-                        static_cast<std::streamsize>(appendedBytes.size())))
-        {
-            diagnostic = "Failed to read appended PBR texture array: " + appendedArrayPath;
-            return false;
+        auto& bytes = appendedBytes[i];
+        bytes.resize(static_cast<std::size_t>(extra.tellg())); extra.seekg(0, std::ios::beg);
+        if (!extra.read(reinterpret_cast<char*>(bytes.data()), static_cast<std::streamsize>(bytes.size()))) {
+            diagnostic = "Failed to read appended PBR texture array: " + appendedArrayPath; return false;
         }
-        if (!PrepareRtKtxArrayAppend(fileBytes, appendedBytes, static_cast<std::uint32_t>(format),
-                width, height, static_cast<std::uint32_t>(sourceLayers.size()), layers, appended, diagnostic))
-            return false;
+        std::uint32_t count = 0; std::memcpy(&count, bytes.data() + 32, sizeof(count));
+        if (!count || count > kRtTextureLayerCapacity ||
+            sourceLayers.size() + appendedLayerCount + count > layers ||
+            !PrepareRtKtxArrayAppend(fileBytes, bytes, static_cast<std::uint32_t>(format),
+                width, height, static_cast<std::uint32_t>(sourceLayers.size()),
+                static_cast<std::uint32_t>(sourceLayers.size()) + count, appended[i], diagnostic)) return false;
+        appendedLayerCount += count;
     }
     struct MipPayload
     {
@@ -2034,7 +2049,7 @@ bool PresentableTinyRtScene::CreateTexture(const std::string& path,
                                  std::equal(identifier.begin(), identifier.end(), fileBytes.begin()) &&
                                  read32(12u) == static_cast<std::uint32_t>(format) && read32(16u) == 1u &&
                                  read32(20u) == width && read32(24u) == height && read32(28u) == 0u &&
-                                 (subset ? sourceLayers.size() + appended.layers == layers && sourceLayerCount <= kRtTextureLayerCapacity
+                                 (subset ? sourceLayers.size() + appendedLayerCount == layers && sourceLayerCount <= kRtTextureLayerCapacity
                                          : read32(32u) == layers || (layers == 1u && read32(32u) == 0u)) &&
                                  read32(36u) == 1u &&
                                  read32(44u) == 0u;
@@ -2080,8 +2095,8 @@ bool PresentableTinyRtScene::CreateTexture(const std::string& path,
                           fileBytes.begin() + static_cast<std::ptrdiff_t>(levelOffset + levelLength));
             // Assemble each complete GPU mip once. The existing array bytes
             // are neither re-encoded nor duplicated in the packaged addition.
-            if (appended.layers)
-                pixels.insert(pixels.end(), appended.mips[level].begin(), appended.mips[level].end());
+            for (const auto& addition : appended)
+                pixels.insert(pixels.end(), addition.mips[level].begin(), addition.mips[level].end());
             mipPayloads.push_back({destinationOffset, mipLayerBytes, mipWidth, mipHeight});
         }
     }
@@ -2198,6 +2213,25 @@ bool PresentableTinyRtScene::CreateTexture(const std::string& path,
     }
     texture.mipLevels = mipLevels;
     return true;
+}
+
+VkAccelerationStructureGeometryKHR PresentableTinyRtScene::ChapterActorGeometry() const
+{
+    const auto& metadata = staticMeshSlot_.InstanceMetadata()[CharacterRenderSlot::kKeeperMetadataIndex];
+    const auto& primitive = staticMeshSlot_.PrimitiveMetadata()[metadata.primitiveBase];
+    VkAccelerationStructureGeometryKHR geometry{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR};
+    geometry.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
+    geometry.flags = VK_GEOMETRY_OPAQUE_BIT_KHR;
+    auto& triangle = geometry.geometry.triangles;
+    triangle.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR;
+    triangle.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;
+    triangle.vertexData.deviceAddress = staticVertexBuffer_.address +
+        VkDeviceSize(primitive.vertexOffset) * sizeof(horde::scene::assets::StaticRtVertex);
+    triangle.vertexStride = sizeof(horde::scene::assets::StaticRtVertex);
+    triangle.maxVertex = staticMeshSlot_.PrimitiveVertexCounts()[metadata.primitiveBase] - 1u;
+    triangle.indexType = VK_INDEX_TYPE_UINT32;
+    triangle.indexData.deviceAddress = staticIndexBuffer_.address + VkDeviceSize(primitive.indexOffset) * sizeof(std::uint32_t);
+    return geometry;
 }
 
 bool PresentableTinyRtScene::SupportsTextureArrayFormat(VkFormat format) const
@@ -2563,6 +2597,28 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
             static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr) |
                 static_cast<std::uint32_t>(RtInstanceFlag::Transmissive), 0u,
             &waterDropletAsset_});
+    if (sceneProfile_ == RtSceneProfile::Showcase && developmentRescueJourney_) {
+        // The freestanding RT Lab glass test box is not chapter geometry.
+        // Its separate preview/nonchapter scenes retain the fixture. Reuse
+        // that unused registration/primitive capacity, preserving all actual
+        // chapter surfaces (including the lantern's physical glass).
+        std::erase_if(registrations, [](const auto& row) { return row.instanceCustomIndex == 9u; });
+        horde::scene::SkinnedClipSet clips{};
+        clips.clips[0] = {"Warden|idle", true, true};
+        clips.clips[1] = {"Warden|walk", true, true};
+        clips.clips[2] = {"", false, false}; clips.clips[3] = {"", false, false};
+        if (!chapterActor_.Load(root / "models/characters/runtime/kit-warden-v1",
+                "kit-warden-lod0.runtime.glb", clips, diagnostic)) return false;
+        if (chapterActor_.Asset().primitives.size() != 1) {
+            diagnostic = "The bounded chapter actor requires one indexed primitive."; return false;
+        }
+        for (auto& material : chapterActor_.Asset().materials) {
+            material.textureGroup = 0; material.deferTextureAllocation = true;
+        }
+        registrations.push_back({CharacterRenderSlot::kKeeperMetadataIndex, 0x4b495431u,
+            static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u, &chapterActor_.Asset()});
+        chapterActorReady_ = true;
+    }
     if (!staticMeshSlot_.Initialize(registrations, diagnostic)) return false;
     if (developmentRescueJourney_)
     {
@@ -2607,6 +2663,7 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
             return (productionPlayerAsset_.materials[primitive.materialIndex].flags &
                 static_cast<std::uint32_t>(RtMaterialFlag::BodyRemainderPrimaryVisible)) != 0u;
         });
+    if (!chapterActorReady_) {
     const RtInstanceMetadata dielectricMetadata =
         staticMeshSlot_.InstanceMetadata()[9u];
     if (dielectricMetadata.primitiveCount != 1u ||
@@ -2617,6 +2674,7 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
     }
     dielectricFixtureMaterialIndex_ = staticMeshSlot_.PrimitiveMetadata()[
         dielectricMetadata.primitiveBase].materialIndex;
+    }
     if (!playerRenderSlot_.ValidateStaticVertexLayout(productionPlayerAsset_, diagnostic)) return false;
     return true;
 }
@@ -2851,7 +2909,7 @@ bool PresentableTinyRtScene::CreateStaticMeshResources(std::string& diagnostic)
     const auto baseLayers = selection.baseColor;
     const auto normalOrmLayers = selection.normalOrm;
     const auto aliases = selection.aliases;
-    const std::size_t extraLayers = chapterLayout ? 2u : 0u;
+    const std::size_t extraLayers = chapterLayout ? (chapterActorReady_ ? 3u : 2u) : 0u;
     if (!baseLayers.empty() &&
         (textureCounts.baseColor != baseLayers.size() + extraLayers ||
          textureCounts.normal != normalOrmLayers.size() + extraLayers ||
@@ -2874,8 +2932,16 @@ bool PresentableTinyRtScene::CreateStaticMeshResources(std::string& diagnostic)
     const auto path = [&assetDirectory](const char* name) {
         return (assetDirectory / name).string();
     };
-    const auto addition = [&assetDirectory,chapterLayout](const char* name) {
-        return chapterLayout ? (assetDirectory / "chapter-terrain" / name).string() : std::string{};
+    const auto kitTextureDirectory = assetDirectory.parent_path().parent_path() /
+        "characters/runtime/kit-warden-v1";
+    const auto addition = [&assetDirectory,&kitTextureDirectory,chapterLayout,this](const char* name) {
+        std::vector<std::string> paths;
+        if (chapterLayout) paths.push_back((assetDirectory / "chapter-terrain" / name).string());
+        if (chapterActorReady_) paths.push_back((kitTextureDirectory / name).string());
+        return paths;
+    };
+    const auto emissionPath = [&](const char* name) {
+        return chapterActorReady_ ? (kitTextureDirectory / name).string() : path(name);
     };
 #if defined(__ANDROID__)
     if (!productionHeldItemAssetsEnabled_)
@@ -2896,7 +2962,7 @@ bool PresentableTinyRtScene::CreateStaticMeshResources(std::string& diagnostic)
                        textureDimension, textureDimension, actualTextureLayers[1], staticNormal_, diagnostic, normalOrmLayers, VK_IMAGE_VIEW_TYPE_2D_ARRAY, aliases, addition("normal.android.ktx2")) ||
         !CreateTexture(path("orm.android.ktx2"), VK_FORMAT_ASTC_6x6_UNORM_BLOCK,
                        textureDimension, textureDimension, actualTextureLayers[2], staticOrm_, diagnostic, normalOrmLayers, VK_IMAGE_VIEW_TYPE_2D_ARRAY, aliases, addition("orm.android.ktx2")) ||
-        !CreateTexture(path("emissive.android.ktx2"), VK_FORMAT_ASTC_6x6_SRGB_BLOCK,
+        !CreateTexture(emissionPath("emissive.android.ktx2"), VK_FORMAT_ASTC_6x6_SRGB_BLOCK,
                        textureDimension, textureDimension, actualTextureLayers[3], staticEmissive_, diagnostic))
         return false;
 #else
@@ -2906,7 +2972,7 @@ bool PresentableTinyRtScene::CreateStaticMeshResources(std::string& diagnostic)
                        textureDimension, textureDimension, actualTextureLayers[1], staticNormal_, diagnostic, normalOrmLayers, VK_IMAGE_VIEW_TYPE_2D_ARRAY, aliases, addition("normal.windows.ktx2")) ||
         !CreateTexture(path("orm.windows.ktx2"), VK_FORMAT_R8G8B8A8_UNORM,
                        textureDimension, textureDimension, actualTextureLayers[2], staticOrm_, diagnostic, normalOrmLayers, VK_IMAGE_VIEW_TYPE_2D_ARRAY, aliases, addition("orm.windows.ktx2")) ||
-        !CreateTexture(path("emissive.windows.ktx2"), VK_FORMAT_R8G8B8A8_SRGB,
+        !CreateTexture(emissionPath("emissive.windows.ktx2"), VK_FORMAT_R8G8B8A8_SRGB,
                        textureDimension, textureDimension, actualTextureLayers[3], staticEmissive_, diagnostic))
     {
         return false;
@@ -4618,8 +4684,8 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
             7u, "production reward lantern ring", rewardLanternRingBlas_, true) ||
         !buildRegisteredStaticBlas(
             8u, "production reward lantern body", rewardLanternBodyBlas_, true) ||
-        !buildRegisteredStaticBlas(
-            9u, "generic dielectric fixture", dielectricFixtureBlas_) ||
+        (!chapterActorReady_ && !buildRegisteredStaticBlas(
+            9u, "generic dielectric fixture", dielectricFixtureBlas_)) ||
         !buildRegisteredStaticBlas(
             kCollapseInstanceIndex, "production collapsed entry", collapseBlas_, true) ||
         !buildRegisteredStaticBlas(
@@ -4933,6 +4999,18 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     VkAccelerationStructureBuildSizesInfoKHR lichSizes{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR};
     vkGetAccelerationStructureBuildSizesKHR_(device_, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR,
                                              &lichBuildInfo, &lichPrimitiveCount, &lichSizes);
+    // One third-lane AS allocation can be rebuilt for either compatible owner.
+    // Size for both layouts up front; UPDATE is only used within an owner.
+    if (chapterActorReady_) {
+        auto geometry = ChapterActorGeometry();
+        auto build = lichBuildInfo; build.pGeometries = &geometry;
+        const std::uint32_t count = static_cast<std::uint32_t>(chapterActor_.Asset().indices.size() / 3u);
+        VkAccelerationStructureBuildSizesInfoKHR sizes{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR};
+        vkGetAccelerationStructureBuildSizesKHR_(device_, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &build, &count, &sizes);
+        lichSizes.accelerationStructureSize = std::max(lichSizes.accelerationStructureSize, sizes.accelerationStructureSize);
+        lichSizes.buildScratchSize = std::max(lichSizes.buildScratchSize, sizes.buildScratchSize);
+        lichSizes.updateScratchSize = std::max(lichSizes.updateScratchSize, sizes.updateScratchSize);
+    }
     if (!CreateBuffer(lichSizes.accelerationStructureSize,
                       VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR,
                       VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
@@ -5018,7 +5096,8 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     instances[5] = instances[0];
     instances[5].instanceCustomIndex = 9u;
     instances[5].mask = 0u;
-    instances[5].accelerationStructureReference = dielectricFixtureBlas_.address;
+    instances[5].accelerationStructureReference = chapterActorReady_
+        ? gothicChestBaseBlas_.address : dielectricFixtureBlas_.address;
     instances[5].transform = {{
         0.20f, 0.0f, 0.0f, -9.10f,
         0.0f, 1.25f, 0.0f, -0.325f,
@@ -6162,6 +6241,10 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     const bool glassFixtureVisible =
         glassEnabled_ && clampedTuning.glassFixtureVisible &&
         !clampedTuning.productionRewardPropsVisible;
+    if (chapterActorReady_ && glassFixtureVisible) {
+        diagnostic = "The freestanding glass fixture belongs to the separate RT Lab preview, not the chapter scene.";
+        return false;
+    }
     const bool productionInspection = clampedTuning.productionRewardPropsVisible &&
         frame.chestReward.phase ==
             horde::gameplay::interactions::ChestRewardPhase::Locked;
@@ -6219,7 +6302,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         gothicChestLidBlas_.handle == VK_NULL_HANDLE ||
         rewardLanternRingBlas_.handle == VK_NULL_HANDLE ||
         rewardLanternBodyBlas_.handle == VK_NULL_HANDLE ||
-        dielectricFixtureBlas_.handle == VK_NULL_HANDLE ||
+        (!chapterActorReady_ && dielectricFixtureBlas_.handle == VK_NULL_HANDLE) ||
         collapseBlas_.handle == VK_NULL_HANDLE ||
         playerBodyBlas_.handle == VK_NULL_HANDLE || playerLimbBlas_.handle == VK_NULL_HANDLE ||
         skinnedPlayerBlas_.handle == VK_NULL_HANDLE ||
@@ -6566,6 +6649,33 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         hasFinalSkinnedLeftGrip = true;
     }
 
+    const bool wantCompanion = chapterActorReady_ && frame.developmentRescueJourney &&
+        lich.phase == horde::gameplay::LichPhase::Dead && lich.deathAnimationComplete &&
+        lich.deathDissolveProgress >= 1.0f && frame.chapterCompanion.grounded;
+    if (wantCompanion != thirdActorIsCompanion_) {
+        thirdActorIsCompanion_ = wantCompanion;
+        thirdActorNeedsBuild_ = true;
+        chapterActorPoseGeneration_ = UINT64_MAX;
+        chapterActorPoseSeconds_ = -1.0f;
+    }
+    if (thirdActorIsCompanion_ && (chapterActorPoseGeneration_ != frame.chapterCompanion.generation ||
+        chapterActorPoseSeconds_ != frame.chapterCompanion.animationSeconds ||
+        chapterActorWalking_ != frame.chapterCompanion.walking)) {
+        const auto clip = frame.chapterCompanion.walking ? horde::scene::SkinnedClip::Walking : horde::scene::SkinnedClip::Idle;
+        const float duration = chapterActor_.Duration(clip);
+        const float time = std::fmod(frame.chapterCompanion.animationSeconds, duration);
+        if (!chapterActor_.Pose(clip, time, diagnostic)) return false;
+        const auto& metadata = staticMeshSlot_.InstanceMetadata()[CharacterRenderSlot::kKeeperMetadataIndex];
+        const auto& primitive = staticMeshSlot_.PrimitiveMetadata()[metadata.primitiveBase];
+        const auto& vertices = chapterActor_.Asset().vertices;
+        if (!gpuResources_.WriteBufferRange(staticVertexBuffer_,
+                VkDeviceSize(primitive.vertexOffset) * sizeof(vertices.front()), vertices.data(),
+                vertices.size() * sizeof(vertices.front()), "chapter actor pose", diagnostic, observation)) return false;
+        chapterActorPoseGeneration_ = frame.chapterCompanion.generation;
+        chapterActorPoseSeconds_ = frame.chapterCompanion.animationSeconds;
+        chapterActorWalking_ = frame.chapterCompanion.walking;
+        chapterActorNeedsRefit_ = true;
+    }
     if (!characterSlot_.PrepareFrame(frame.skeletonEnemies,
                                      frame.skeletonEnemyCount,
                                      roster,
@@ -6581,7 +6691,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         HasCharacterBlasRefit(pendingCharacterRefit, CharacterBlasRefit::SkeletonPose0);
     const bool updateSkeletonPose1 =
         HasCharacterBlasRefit(pendingCharacterRefit, CharacterBlasRefit::SkeletonPose1);
-    const bool updateLich = HasCharacterBlasRefit(pendingCharacterRefit, CharacterBlasRefit::Lich);
+    const bool updateLich = HasCharacterBlasRefit(pendingCharacterRefit, CharacterBlasRefit::Lich) ||
+        thirdActorNeedsBuild_ || chapterActorNeedsRefit_;
     const auto& lichVertexBuffer_ = lichGpu.vertices;
     const auto& lichBlas_ = lichGpu.accelerationStructure;
     const auto& lichBlasUpdateScratch_ = lichGpu.updateScratch;
@@ -6637,6 +6748,14 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     const auto characterInstances = characterSlot_.BuildActiveInstances();
     instances[CharacterRenderSlot::kTlasInstanceIndex] = characterInstances[0];
     instances[kKeeperInstanceIndex] = characterInstances[2];
+    if (thirdActorIsCompanion_) {
+        auto& actor = instances[kKeeperInstanceIndex];
+        const auto& pose = frame.chapterCompanion;
+        const float yaw = pose.yaw + 3.14159265359f;
+        const float c = std::cos(yaw), q = std::sin(yaw);
+        actor.transform = {{c,0,q,pose.x, 0,1,0,pose.y, -q,0,c,pose.z}};
+        actor.mask = 0x01u;
+    }
     instances[3] = instances[1];
     instances[3].instanceCustomIndex = 3u;
     instances[3].mask = productionVisibility.swordMask;
@@ -7029,6 +7148,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         pipelineBundle_.DiagnosticAvailability() == RtDiagnosticAvailability::Available;
     const RtDielectricDiagnostics clearedDielectricDiagnostics{};
     auto frameInstanceMetadata = staticMeshSlot_.InstanceMetadata();
+    if (!thirdActorIsCompanion_)
+        frameInstanceMetadata[CharacterRenderSlot::kKeeperMetadataIndex] = {};
     frameInstanceMetadata[kWaterDropletMetadataIndex].flags =
         static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr) |
         (waterDropletsVisible
@@ -7063,6 +7184,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     }
     lastPlayerWorldBodyInstanceFlags_ = frameInstanceMetadata[kPlayerWorldBodyInstanceIndex].flags;
     auto frameMaterials = sceneMaterials_;
+    if (!chapterActorReady_) {
     if (dielectricFixtureMaterialIndex_ >= frameMaterials.size())
     {
         diagnostic = "Runtime dielectric fixture material metadata is unavailable.";
@@ -7079,6 +7201,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     fixtureMaterial.attenuationColor[0] = clampedTuning.glassAttenuationColor[0];
     fixtureMaterial.attenuationColor[1] = clampedTuning.glassAttenuationColor[1];
     fixtureMaterial.attenuationColor[2] = clampedTuning.glassAttenuationColor[2];
+    }
     genericTransmissionActive_ = HasActiveGenericTransmission(frameInstanceMetadata,
         staticMeshSlot_.PrimitiveMetadata(), frameMaterials);
     framePipelineEvidence_ = pipelineEvidenceIdentity_;
@@ -7335,17 +7458,18 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         lichGeometry.geometry.triangles.vertexStride = sizeof(horde::scene::TexturedSkinnedRtVertex);
         lichGeometry.geometry.triangles.maxVertex = static_cast<std::uint32_t>(lichSkinnedVertices_.size() - 1u);
         lichGeometry.geometry.triangles.indexType = VK_INDEX_TYPE_NONE_KHR;
+        if (thirdActorIsCompanion_) lichGeometry = ChapterActorGeometry();
         VkAccelerationStructureBuildGeometryInfoKHR lichUpdateInfo{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR};
         lichUpdateInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
         lichUpdateInfo.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR | VK_BUILD_ACCELERATION_STRUCTURE_ALLOW_UPDATE_BIT_KHR;
-        lichUpdateInfo.mode = VK_BUILD_ACCELERATION_STRUCTURE_MODE_UPDATE_KHR;
-        lichUpdateInfo.srcAccelerationStructure = lichBlas_.handle;
+        lichUpdateInfo.mode = thirdActorNeedsBuild_ ? VK_BUILD_ACCELERATION_STRUCTURE_MODE_BUILD_KHR : VK_BUILD_ACCELERATION_STRUCTURE_MODE_UPDATE_KHR;
+        lichUpdateInfo.srcAccelerationStructure = thirdActorNeedsBuild_ ? VK_NULL_HANDLE : lichBlas_.handle;
         lichUpdateInfo.dstAccelerationStructure = lichBlas_.handle;
         lichUpdateInfo.geometryCount = 1u;
         lichUpdateInfo.pGeometries = &lichGeometry;
         lichUpdateInfo.scratchData.deviceAddress = lichBlasUpdateScratch_.AlignedAddress();
         VkAccelerationStructureBuildRangeInfoKHR lichRange{};
-        lichRange.primitiveCount = static_cast<std::uint32_t>(lichSkinnedVertices_.size() / 3u);
+        lichRange.primitiveCount = static_cast<std::uint32_t>(thirdActorIsCompanion_ ? chapterActor_.Asset().indices.size() / 3u : lichSkinnedVertices_.size() / 3u);
         const VkAccelerationStructureBuildRangeInfoKHR* lichRanges[] = {&lichRange};
         vkCmdBuildAccelerationStructuresKHR_(commandBuffer, 1u, &lichUpdateInfo, lichRanges);
     };
@@ -7565,6 +7689,7 @@ bool PresentableTinyRtScene::WriteDustQuality(const RtQualityControlsGpu& qualit
 void PresentableTinyRtScene::NotifyFrameSubmitted() noexcept
 {
     characterSlot_.NotifyFrameSubmitted();
+    thirdActorNeedsBuild_ = chapterActorNeedsRefit_ = false;
     if (!tlasPendingDefinitionsValid_) return;
     tlasBuiltInstances_ = tlasPendingInstances_;
     tlasInstanceDefinitionsValid_ = true;

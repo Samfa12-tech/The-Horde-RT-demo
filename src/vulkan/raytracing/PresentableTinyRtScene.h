@@ -25,6 +25,7 @@
 #include "gameplay/interactions/InteractionState.h"
 #include "gameplay/items/LanternPendulum.h"
 #include "vulkan/raytracing/CharacterRenderSlot.h"
+#include "scene/assets/SkinnedPbrActor.h"
 #include "vulkan/raytracing/FireEmitterBuffer.h"
 #include "vulkan/raytracing/HeldItemBlasMeasurements.h"
 #include "vulkan/raytracing/PlayerRenderSlot.h"
@@ -90,6 +91,7 @@ struct RtSceneFrameInputs
 {
     bool developmentRescueJourney = false;
     horde::gameplay::traversal::RescueTraversalSnapshot rescue{};
+    horde::gameplay::dialogue::CompanionSnapshot chapterCompanion{};
     float playerSupportWorldY = horde::gameplay::kRouteFloorWorldY;
     std::uint64_t tickIndex = 0u;
     float cameraYaw = 0.0f;
@@ -740,7 +742,8 @@ private:
                        std::span<const std::uint32_t> sourceLayers = {},
                        VkImageViewType viewType = VK_IMAGE_VIEW_TYPE_2D_ARRAY,
                        std::span<const RtTextureLayerAlias> sourceAliases = {},
-                       const std::string& appendedArrayPath = {});
+                       std::span<const std::string> appendedArrayPaths = {});
+    VkAccelerationStructureGeometryKHR ChapterActorGeometry() const;
     bool SupportsTextureArrayFormat(VkFormat format) const;
     bool CreateMaterialTextures(const std::string& directory, std::string& diagnostic);
     bool CreateEnvironmentTexture(const std::string& productionRoot, std::string& diagnostic);
@@ -928,6 +931,14 @@ private:
     std::array<horde::gameplay::effects::FireEmitterFixedStepInput, 2u> previewFireInputs_{};
     VkDeviceSize scratchAddressAlignment_ = 0u;
     CharacterRenderSlot characterSlot_;
+    horde::scene::assets::SkinnedPbrActor chapterActor_;
+    bool chapterActorReady_ = false;
+    bool thirdActorIsCompanion_ = false;
+    bool thirdActorNeedsBuild_ = false;
+    bool chapterActorNeedsRefit_ = false;
+    std::uint64_t chapterActorPoseGeneration_ = UINT64_MAX;
+    float chapterActorPoseSeconds_ = -1.0f;
+    bool chapterActorWalking_ = false;
     PlayerRenderSlot playerRenderSlot_;
     horde::scene::assets::StaticMeshAsset developmentStaticAsset_;
     horde::scene::assets::StaticMeshAsset collapseStaticAsset_;

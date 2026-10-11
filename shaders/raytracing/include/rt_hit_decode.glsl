@@ -627,7 +627,6 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
             materialForPrimitive(h.primitive, h.instance, h.position, h.material,
                                  h.normal, h.geometricNormal, h.base, h.metallic,
                                  h.reflectivity, h.occlusion, h.emissive);
-        }
         if (h.instance == 2 || h.instance == 18 || h.instance == kKeeperInstanceMetadataIndex)
         {
             const int firstVertex = h.primitive * 3;
@@ -679,6 +678,7 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
                                         : albedo * 0.72;
                 h.emissive = glowMask * (3.8 + controls.staffLightStrength * 2.3);
             }
+        }
         }
     }
     return h;

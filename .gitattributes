@@ -333,3 +333,6 @@ docs/evidence/2026-10-11-kit-pbr-preparation/*.log whitespace=-trailing-space,-b
 tools/prepare-kit-runtime.py text eol=lf
 tools/build-kit-textures.ps1 text eol=lf
 tests/fixtures/skinned-pbr/generate.py text eol=lf
+
+# Preserve exact native Kit scene capture and validation receipts.
+docs/evidence/2026-10-11-kit-scene-admission/** -text whitespace=cr-at-eol

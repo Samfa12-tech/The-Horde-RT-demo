@@ -1,0 +1,22 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+    Start  16: horde_rt_texture_layer_subset_tests
+1/8 Test  #16: horde_rt_texture_layer_subset_tests .............   Passed    1.13 sec
+    Start  17: horde_rt_chapter_texture_append_payload_tests
+2/8 Test  #17: horde_rt_chapter_texture_append_payload_tests ...   Passed    1.93 sec
+    Start  26: horde_rt_chapter_dialogue_tests
+3/8 Test  #26: horde_rt_chapter_dialogue_tests .................   Passed    1.20 sec
+    Start 156: horde_rt_scene_initialise_preflight_tests
+4/8 Test #156: horde_rt_scene_initialise_preflight_tests .......   Passed    1.26 sec
+    Start 162: horde_rt_skinned_character_smoke
+5/8 Test #162: horde_rt_skinned_character_smoke ................   Passed    5.31 sec
+    Start 172: horde_rt_rescue_journey_integration_tests
+6/8 Test #172: horde_rt_rescue_journey_integration_tests .......   Passed    1.78 sec
+    Start 173: horde_rt_chapter_terrain_journey_tests
+7/8 Test #173: horde_rt_chapter_terrain_journey_tests ..........   Passed    1.73 sec
+    Start 174: horde_rt_kit_source_intake_tests
+8/8 Test #174: horde_rt_kit_source_intake_tests ................   Passed    2.13 sec
+
+100% tests passed, 0 tests failed out of 8
+
+Total Test time (real) =  16.51 sec

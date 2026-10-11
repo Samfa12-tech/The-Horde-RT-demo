@@ -1,5 +1,6 @@
 #include "scene/assets/SkinnedMeshAsset.h"
 #include "scene/assets/StaticMeshAsset.h"
+#include "scene/assets/SkinnedPbrActor.h"
 #include <algorithm>
 #include <array>
 #include <cmath>
@@ -50,6 +51,29 @@ int main() {
         std::cerr<<"Native Kit PBR admission failed: "<<admission<<'\n';return 1;
     }
     const auto& material=staticAsset.materials[0];
+    assets::SkinnedPbrActor actor;
+    SkinnedClipSet actorClips{};
+    actorClips.clips[0]={"Warden|idle",true,true};
+    actorClips.clips[1]={"Warden|walk",true,true};
+    for(std::size_t i=2;i<actorClips.clips.size();++i) actorClips.clips[i]={"",false,false};
+    if(!actor.Load(runtimeDirectory,"kit-warden-lod0.runtime.glb",actorClips,admission)) {
+        std::cerr<<"Scene actor import failed: "<<admission<<'\n';return 1;
+    }
+    for(const auto clip:{SkinnedClip::Idle,SkinnedClip::Walking}) {
+        for(float fraction:{0.f,.25f,.5f,.75f}) {
+            if(!actor.Pose(clip,fraction*actor.Duration(clip),admission)) return 1;
+            const auto& pose=actor.Asset();
+            if(std::abs(pose.bounds.minimum[1])>1e-5f ||
+               pose.bounds.maximum[1]<1.4f || pose.bounds.maximum[1]>2.3f ||
+               pose.indices!=staticAsset.indices) {
+                std::cerr<<"Actor must retain indexed topology and human-scale ground contact\n";return 1;
+            }
+            for(const auto& node:pose.nodeTransforms)
+                if(node.world!=std::array<float,16>{1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1}) return 1;
+            for(std::size_t i=0;i<pose.vertices.size();++i)
+                if(pose.vertices[i].uv0!=staticAsset.vertices[i].uv0) return 1;
+        }
+    }
     if(material.baseColorTexture<0||material.normalTexture<0||material.ormTexture<0||
        material.emissiveTexture<0||std::abs(material.normalScale-.7f)>1e-5f||
        std::abs(material.emissiveFactor[0]-.55f)>1e-5f) {

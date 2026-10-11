@@ -100,6 +100,7 @@ RtSceneFrameInputs BuildRtSceneFrameInputs(
     frame.tickIndex = simulation.tickIndex;
     frame.developmentRescueJourney = simulation.developmentRescueJourney;
     frame.rescue = simulation.rescue;
+    frame.chapterCompanion = simulation.chapterCompanion;
     frame.cameraYaw = simulation.playerYawRadians;
     frame.cameraPitch = simulation.playerPitchRadians;
     frame.torchLightStrength = simulation.torchLightStrength * simulation.torchFailure.flameStrength;

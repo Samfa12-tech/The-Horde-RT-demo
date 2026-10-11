@@ -55,8 +55,10 @@ function Assert-EquipmentAndroidStaging([string]$Gradle, [string]$Activity) {
                        $_ -like 'models/props/runtime/player-sword-scabbard/*' -or
                        $_ -like 'models/world/runtime/chapter-entry-return-v1/*' -or
                        $_ -like 'models/world/runtime/chapter-terrain-v1/*' -or
-                       $_ -like 'textures/props/runtime/chapter-terrain/*.android.ktx2' })
-    Require ($required.Count -eq 12) 'Android equipment, entry and terrain staging require the closed twelve-file package roster.'
+                       $_ -like 'textures/props/runtime/chapter-terrain/*.android.ktx2' -or
+                       $_ -like 'models/characters/runtime/kit-warden-v1/*' -or
+                       $_ -like 'textures/characters/runtime/kit-warden-v1/*.android.ktx2' })
+    Require ($required.Count -eq 18) 'Android equipment, entry and terrain staging require the closed eighteen-file package roster.'
     $startup=[regex]::Match($Activity, '(?s)private void collectInitialDiagnostics\(\)\s*\{(.*?)final boolean written = ProbeBridge[.]writeReports\(filesRoot\);')
     Require $startup.Success 'Android equipment staging must precede native report-root publication.'
     $staged=@([regex]::Matches($startup.Groups[1].Value,
@@ -255,7 +257,7 @@ try {
     $baseAndroid=@(Get-Horde162AssetSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Android'})
     Require ($baseWindows.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Windows'}).Count -eq 33 -and
              $baseAndroid.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Android'}).Count -eq 34) 'Current shared asset roster includes the four admitted forest entries.'
-    Require ($windows.Count -eq 80 -and $android.Count -eq 81) 'Current closed roster includes exact tomb, terrain, tree-pair and Kit runtime assets; no editable sources.'
+    Require ($windows.Count -eq 86 -and $android.Count -eq 87) 'Current closed roster includes exact tomb, terrain, tree-pair and Kit runtime assets; no editable sources.'
     Require (@(Get-Horde17KitAssetSpecification).Count -eq 14) 'Kit admission must retain its exact thirteen-cut/one-manifest roster.'
     foreach ($kit in Get-Horde17KitAssetSpecification) {
         Require ($windows -ccontains $kit.Path -and $android -ccontains $kit.Path) 'Both platforms must admit every approved Kit runtime entry.'
@@ -320,6 +322,10 @@ try {
     foreach($case in @(
         @{Name='missing-cue';Platform='Windows';Omit='assets/audio/pixabay/keeper_i_sense_you.wav'},
         @{Name='missing-kit-grate';Platform='Windows';Omit='assets/audio/kit/runtime/prologue.kit_grate.wav'},
+        @{Name='missing-kit-model';Platform='Windows';Omit='assets/models/characters/runtime/kit-warden-v1/kit-warden-lod0.runtime.glb'},
+        @{Name='missing-kit-normal';Platform='Android';Omit='assets/textures/characters/runtime/kit-warden-v1/normal.android.ktx2'},
+        @{Name='kit-private-source';Platform='Windows';Extra='assets/models/characters/source/private.blend'},
+        @{Name='kit-private-texture';Platform='Android';Extra='assets/textures/characters/source/master.png'},
         @{Name='missing-kit-manifest';Platform='Android';Omit='assets/audio/kit/runtime/asset.manifest.json'},
         @{Name='missing-death-cue';Platform='Windows';Omit='assets/audio/pixabay/keeper_death.wav'},
         @{Name='missing-death-core';Platform='Android';Omit='assets/audio/pixabay/keeper_death_core.wav'},
@@ -386,6 +392,8 @@ try {
         @{Name='corrupt-sword-sheath';Platform='Android';Path='assets/audio/filmcow/equipment/sword_sheath.wav'},
         @{Name='corrupt-equipment-manifest';Platform='Android';Path='assets/audio/filmcow/equipment/asset.manifest.json'},
         @{Name='corrupt-kit-rope';Platform='Android';Path='assets/audio/kit/runtime/rescue.rope.wav'},
+        @{Name='corrupt-kit-visual';Platform='Android';Path='assets/models/characters/runtime/kit-warden-v1/kit-warden-lod0.runtime.glb'},
+        @{Name='corrupt-kit-map';Platform='Windows';Path='assets/textures/characters/runtime/kit-warden-v1/base-color.windows.ktx2'},
         @{Name='corrupt-scabbard-glb';Platform='Windows';Path='assets/models/props/runtime/player-sword-scabbard/player-sword-scabbard-lod0.runtime.glb'},
         @{Name='corrupt-scabbard-receipt';Platform='Android';Path='assets/models/props/runtime/player-sword-scabbard/processing-receipt.json'},
         @{Name='corrupt-scabbard-manifest';Platform='Android';Path='assets/models/props/runtime/player-sword-scabbard/asset.manifest.json'}
@@ -394,7 +402,7 @@ try {
         Expect-Failure {Assert-Horde162Package $repo $archive $case.Platform} 'byte/hash mismatch'
     }
     $fixtureRepo=Join-Path $scratch 'manifest-fixture'
-    foreach($relative in (@(Get-Horde162AssetSpecification | ForEach-Object Path)+@(Get-Horde162ManifestSpecification | ForEach-Object Path)+@(Get-Horde17TombAssetSpecification | ForEach-Object Path)+@(Get-Horde17KitAssetSpecification | ForEach-Object Path))) {
+    foreach($relative in (@(Get-Horde162AssetSpecification | ForEach-Object Path)+@(Get-Horde162ManifestSpecification | ForEach-Object Path)+@(Get-Horde17TombAssetSpecification | ForEach-Object Path)+@(Get-Horde17KitAssetSpecification | ForEach-Object Path)+@(Get-Horde17KitVisualAssetSpecification | ForEach-Object Path))) {
         $source=Join-Horde162Path $repo "assets/$relative";$target=Join-Horde162Path $fixtureRepo "assets/$relative"
         $null=New-Item -ItemType Directory -Path (Split-Path -Parent $target) -Force
         Copy-Item -LiteralPath $source -Destination $target

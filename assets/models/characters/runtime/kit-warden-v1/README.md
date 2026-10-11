@@ -30,10 +30,14 @@ Native static import, original/runtime indexed skin correspondence, all seven
 clips at five phases, PBR tangent frames and original expanded-index mapping
 are tested by `horde_rt_kit_source_intake_tests`. Khronos validation reports
 zero errors and one inherited `NODE_SKINNED_MESH_NON_ROOT` warning. Native
-source/runtime poses match; live RT placement still needs inspection.
+source/runtime poses match. Chapter reunion/departure frames now exercise actual RT placement.
 
-This is a prepared candidate, not scene admission. It is not copied into game
-packages yet. Texture upload, dedicated third-slot lifetime ownership, actual
-Kit rendering, zone retirement and Windows/Android visual/performance checks
-remain integration gates. The frozen 18-layer/three-character ceilings and
-production shaders are unchanged.
+The development chapter now packages this derivative and the exact maps in
+`assets/textures/characters/runtime/kit-warden-v1`. Its indexed pose uses the
+existing third-character BLAS allocation after Keeper retirement; the two
+waterfall actors retain their lanes. The separate RT Lab test box remains in
+preview/nonchapter scenes and consumes no chapter registration. Limits remain
+13 asset registrations, 32 primitives, 18 texture layers and three actors.
+See `docs/evidence/2026-10-11-kit-scene-admission/README.md` for the inspected
+frames and validation. GPU zone retirement, sustained cost and physical Android
+acceptance remain open; this is not a streaming or completed-chapter claim.

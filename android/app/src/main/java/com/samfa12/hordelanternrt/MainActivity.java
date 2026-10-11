@@ -705,7 +705,13 @@ public class MainActivity extends Activity {
                     stageAsset("models/world/runtime/chapter-terrain-v1/chapter-terrain-lod0.runtime.glb", "models/world/runtime/chapter-terrain-v1/chapter-terrain-lod0.runtime.glb") &&
                     stageAsset("textures/props/runtime/chapter-terrain/base-color.android.ktx2", "textures/props/runtime/chapter-terrain/base-color.android.ktx2") &&
                     stageAsset("textures/props/runtime/chapter-terrain/normal.android.ktx2", "textures/props/runtime/chapter-terrain/normal.android.ktx2") &&
-                    stageAsset("textures/props/runtime/chapter-terrain/orm.android.ktx2", "textures/props/runtime/chapter-terrain/orm.android.ktx2");
+                    stageAsset("textures/props/runtime/chapter-terrain/orm.android.ktx2", "textures/props/runtime/chapter-terrain/orm.android.ktx2") &&
+                    stageAsset("models/characters/runtime/kit-warden-v1/asset.manifest.json", "models/characters/runtime/kit-warden-v1/asset.manifest.json") &&
+                    stageAsset("models/characters/runtime/kit-warden-v1/kit-warden-lod0.runtime.glb", "models/characters/runtime/kit-warden-v1/kit-warden-lod0.runtime.glb") &&
+                    stageAsset("textures/characters/runtime/kit-warden-v1/base-color.android.ktx2", "textures/characters/runtime/kit-warden-v1/base-color.android.ktx2") &&
+                    stageAsset("textures/characters/runtime/kit-warden-v1/normal.android.ktx2", "textures/characters/runtime/kit-warden-v1/normal.android.ktx2") &&
+                    stageAsset("textures/characters/runtime/kit-warden-v1/orm.android.ktx2", "textures/characters/runtime/kit-warden-v1/orm.android.ktx2") &&
+                    stageAsset("textures/characters/runtime/kit-warden-v1/emissive.android.ktx2", "textures/characters/runtime/kit-warden-v1/emissive.android.ktx2");
             if (!chapterTerrainStaged) throw new IllegalStateException("Required authored terrain assets could not be staged.");
             final boolean forestTreesStaged =
                     stageAsset("models/world/runtime/forest-tree-pair-v1/asset.manifest.json", "models/world/runtime/forest-tree-pair-v1/asset.manifest.json") &&

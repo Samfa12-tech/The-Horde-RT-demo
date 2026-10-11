@@ -326,6 +326,8 @@ struct ShowcaseCaptureRecord
     bool primaryArmsMayBeOutsideFrame = false;
     bool primaryArmsCeilingRetracted = false;
     float playerSupportWorldY = 0.0f;
+    horde::gameplay::dialogue::CompanionSnapshot chapterCompanion{};
+    float keeperDissolve = 0.0f;
     float playerHeightDelta = 0.0f;
     std::uint8_t playerSupportId = 0u;
     std::uint8_t heldLightKind = 0u;
@@ -6777,6 +6779,11 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
                  << capture.torchOverheadLoweringMetres
                  << ", \"torchOverheadRetractionMetres\": "
                  << capture.torchOverheadRetractionMetres << "}"
+                 << ", \"chapterCompanion\": {\"grounded\": " << (capture.chapterCompanion.grounded ? "true" : "false")
+                 << ", \"walking\": " << (capture.chapterCompanion.walking ? "true" : "false")
+                 << ", \"position\": [" << capture.chapterCompanion.x << ", " << capture.chapterCompanion.y << ", " << capture.chapterCompanion.z << "]"
+                 << ", \"yaw\": " << capture.chapterCompanion.yaw << ", \"animationSeconds\": " << capture.chapterCompanion.animationSeconds
+                 << ", \"generation\": " << capture.chapterCompanion.generation << ", \"keeperDissolve\": " << capture.keeperDissolve << "}"
                  << ", \"playerWorldBodyInstanceFlags\": " << capture.playerWorldBodyInstanceFlags
                  << ", \"instanceMasks\": [";
         for (std::size_t mask = 0u; mask < capture.instanceMasks.size(); ++mask)
@@ -7043,6 +7050,8 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         record.torchOverheadLoweringMetres = simulation.heldItemKinematics.torchOverheadLowering;
         record.torchOverheadRetractionMetres = simulation.heldItemKinematics.torchOverheadRetraction;
         record.playerSupportWorldY = simulation.playerSupportWorldY;
+        record.chapterCompanion = simulation.chapterCompanion;
+        record.keeperDissolve = simulation.lich.deathDissolveProgress;
         record.playerHeightDelta = simulation.playerHeightDelta;
         record.playerSupportId = static_cast<std::uint8_t>(simulation.playerSupportId);
         record.heldLightKind = static_cast<std::uint8_t>(simulation.interaction.heldLightKind);

@@ -35,7 +35,9 @@ void GameSimulation::UpdateChapterDialogue(const InputSnapshot& input,float seco
     }
     chapterDialogue_.Step(seconds,c);
     chapterCompanion_.Step(seconds,playerX_,playerZ_,c.exterior,
-        chapterDialogue_.State().proofAccepted,c.paused);
+        chapterDialogue_.State().proofAccepted,c.paused,
+        chapterTerrainGeneration_==worldRoute_.generation?chapterTerrain_.get():nullptr,
+        config_.authoredChapterTerrain);
 }
 bool GameSimulation::AcknowledgeChapterPresentation(std::uint64_t tick,std::uint64_t generation) {
     if(tick!=snapshot_.tickIndex||generation!=chapterDialogue_.State().generation||

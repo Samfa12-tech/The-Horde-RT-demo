@@ -130,8 +130,8 @@ int main(int argc,char** argv)
     rejectAppend(std::vector<std::uint8_t>(79));
     auto overlap=extraKtx;const std::uint64_t overlapping=208;std::memcpy(overlap.data()+104,&overlapping,8);rejectAppend(std::move(overlap));
     check(!PrepareRtKtxArrayAppend(baseKtx,extraKtx,37,2,2,18,17,appendView,diagnostic),"addition cannot underflow final layer count");
-    if(argc!=1 && argc!=3) {std::cerr<<"Expected optional base-array and append-array directories.\n";return 2;}
-    if(argc==3) {
+    if(argc!=1 && argc!=3 && argc!=4) {std::cerr<<"Expected base, terrain and optional actor array directories.\n";return 2;}
+    if(argc>=3) {
         const auto read=[](const std::filesystem::path& path) {
             std::ifstream file(path,std::ios::binary);
             return std::vector<std::uint8_t>(std::istreambuf_iterator<char>(file),{});
@@ -149,6 +149,12 @@ int main(int argc,char** argv)
                 static_cast<std::uint32_t>(chosen.size()),static_cast<std::uint32_t>(chosen.size()+2),view,diagnostic);
             check(valid,"actual Windows/ASTC array append admission");
             if(!valid){std::cerr<<name<<": "<<diagnostic<<'\n';continue;}
+            const auto actor=argc==4?read(std::filesystem::path(argv[3])/name):std::vector<std::uint8_t>{};
+            RtKtxArrayAppendView actorView;
+            if(argc==4 && !PrepareRtKtxArrayAppend(original,actor,format,1024,1024,
+                static_cast<std::uint32_t>(chosen.size()+2),static_cast<std::uint32_t>(chosen.size()+3),actorView,diagnostic)) {
+                check(false,"actual actor maps fit after the terrain and preserve native format");continue;
+            }
             std::size_t total=0;
             for(std::size_t mip=0;mip<view.mipLevels;++mip) {
                 std::uint64_t offset,length;std::uint32_t layers;
@@ -173,9 +179,16 @@ int main(int argc,char** argv)
                 const auto kept=upload;
                 upload.insert(upload.end(),view.mips[mip].begin(),view.mips[mip].end());
                 check(std::equal(kept.begin(),kept.end(),upload.begin()),"appended terrain cannot alter preceding encoded mips");
+                if(argc==4) {
+                    const auto terrainUpload=upload;
+                    upload.insert(upload.end(),actorView.mips[mip].begin(),actorView.mips[mip].end());
+                    check(std::equal(terrainUpload.begin(),terrainUpload.end(),upload.begin()) &&
+                          upload.size()==(length/layers)*(chosen.size()+3),
+                          "actor append preserves every existing encoded mip and has exactly one extra layer");
+                }
                 total+=upload.size();
             }
-            std::cout<<name<<": "<<chosen.size()+2<<" layers, "<<view.mipLevels<<" mips, "<<total<<" upload bytes\n";
+            std::cout<<name<<": "<<chosen.size()+(argc==4?3:2)<<" layers, "<<view.mipLevels<<" mips, "<<total<<" upload bytes\n";
         }
     }
     return passed ? 0 : 1;

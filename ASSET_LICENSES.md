@@ -334,5 +334,6 @@ buffer views are byte-preserved; routing thumbnails replace embedded image
 payloads, and the reproducible map extraction/compilation keeps the source
 masters untouched. Credit: Warden/Kit source created with Meshy; runtime
 processing by Samfa12/Codex. The same asset-specific Meshy entitlement applies,
-not a blanket MIT/CC0 licence. This native-tested candidate is not yet copied
-into game packages or admitted as a visible actor; see its README and receipt.
+not a blanket MIT/CC0 licence. The development chapter packages the runtime
+derivative and exact native maps under `assets/textures/characters/runtime/kit-warden-v1/`.
+Editable masters remain separate; see the runtime README and processing receipt.

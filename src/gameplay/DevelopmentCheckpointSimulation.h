@@ -109,6 +109,13 @@ inline bool StageDevelopmentCheckpointSimulation(
     };
 
     if(checkpoint.stagesRescueExterior) {
+        // Explicit companion evidence first executes the accepted-hit/death
+        // seed, then the same rope/native-grounding path as ordinary captures.
+        // Historical route captures retain their existing imported state.
+        if(checkpoint.keeperDeathFixedTicks != 0u) {
+            const auto* death=FindDevelopmentCheckpoint("chapter-keeper-death-retired");
+            if(!death || !StageDevelopmentCheckpointSimulation(gameSimulation,*death)) return finalize(false);
+        }
         using namespace interactions;
         ChestRewardSnapshot chest;chest.phase=ChestRewardPhase::LanternClaimed;chest.lidOpenProgress=1;
         InteractionState interaction;ResetInteractionState(interaction,HeldLightKind::RewardLantern);
@@ -152,6 +159,17 @@ inline bool StageDevelopmentCheckpointSimulation(
         // render-only settling frames cannot advance those owners.
         if(checkpoint.exteriorRouteStation>2u)
             for(int tick=0;tick<120;++tick)advance();
+        if(checkpoint.raisesLanternForCompanion) {
+            routeInput.commands.toggleHeldLightPose=gameSimulation.Snapshot().lastConsumedToggleHeldLightPoseSequence+1;
+            for(int tick=0;tick<100;++tick) {
+                advance();
+                const auto& state=gameSimulation.Snapshot();
+                // Diagnostic acknowledgement of the exact current raised pose;
+                // this is not evidence of an owner completing the reunion.
+                gameSimulation.AcknowledgeChapterPresentation(state.tickIndex,state.chapterDialogue.generation);
+            }
+            if(!gameSimulation.Snapshot().chapterDialogue.proofAccepted) return finalize(false);
+        }
         stepFixed(routeInput,0,gameSimulation.Snapshot().inputPublicationSequence+1);
         return finalize(std::hypot(gameSimulation.Snapshot().playerX-checkpoint.cameraX,
             gameSimulation.Snapshot().playerZ-checkpoint.cameraZ)<.01f);

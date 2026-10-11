@@ -66,8 +66,8 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 87u,
-          "development registry retains prior views plus three bounded Keeper death inspections");
+    Check(kDevelopmentCheckpoints.size() == 89u,
+          "development registry retains prior views plus two bounded Kit inspections");
     Check(FindDevelopmentCheckpoint(164) == nullptr,
           "development lookup preserves the unassigned gap before later bounded additions");
     const auto* worldRoute = FindDevelopmentCheckpoint("world-route");
@@ -133,7 +133,13 @@ int main()
         if (death && death->id == 206) Check(keeper.deathDissolveProgress == 1.0f, "last capture retires corpse");
         previousDissolve = keeper.deathDissolveProgress;
     }
-    Check(FindDevelopmentCheckpoint(207) == nullptr &&
+    for(const auto name:{"chapter-kit-reunion","chapter-kit-departure"}) {
+        const auto* kit=FindDevelopmentCheckpoint(name);
+        Check(kit && kit->stagesRescueExterior && kit->keeperDeathFixedTicks==240u &&
+              FindShowcaseCheckpoint(name)==nullptr && !kit->primaryArmsMayBeOutsideFrame,
+              "Kit captures require the actual retired-Keeper/native-ascent path and remain development-only");
+    }
+    Check(FindDevelopmentCheckpoint(209) == nullptr &&
               FindDevelopmentCheckpoint("rescue-journey-unknown") == nullptr,
           "development lookup rejects genuinely unknown IDs and names beyond the woodland inspections");
     const auto* torchParry = FindDevelopmentCheckpoint("player-torch-parry-clearance");

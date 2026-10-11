@@ -103,7 +103,8 @@ if(BUILD_TESTING)
     if(HORDE_RT_BUILD_VULKAN_TARGETS)
         add_test(NAME horde_rt_chapter_texture_append_payload_tests COMMAND horde_rt_texture_layer_subset_tests
             ${CMAKE_CURRENT_SOURCE_DIR}/assets/textures/props/runtime
-            ${CMAKE_CURRENT_SOURCE_DIR}/assets/textures/props/source/chapter-terrain-maps-r03)
+            ${CMAKE_CURRENT_SOURCE_DIR}/assets/textures/props/source/chapter-terrain-maps-r03
+            ${CMAKE_CURRENT_SOURCE_DIR}/assets/textures/characters/runtime/kit-warden-v1)
     endif()
 
     add_executable(horde_rt_shaft_dressing_geometry_tests tests/ShaftDressingGeometryTests.cpp)
@@ -1226,6 +1227,8 @@ if(BUILD_TESTING)
             ${CMAKE_CURRENT_SOURCE_DIR}/src)
         target_link_libraries(horde_rt_scene_initialise_preflight_tests PRIVATE
             horde_rt_probe_core)
+        target_compile_definitions(horde_rt_scene_initialise_preflight_tests PRIVATE
+            HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
         add_test(NAME horde_rt_scene_initialise_preflight_tests
             COMMAND horde_rt_scene_initialise_preflight_tests)
 

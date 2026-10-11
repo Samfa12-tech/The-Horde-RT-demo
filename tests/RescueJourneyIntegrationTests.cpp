@@ -1,4 +1,5 @@
 #include "gameplay/simulation/GameSimulation.h"
+#include "gameplay/DevelopmentCheckpointSimulation.h"
 #include "scene/RescueJourneyGeometry.h"
 #include "scene/ChapterTerrainSurface.h"
 #include "scene/assets/AssetManifest.h"
@@ -24,6 +25,33 @@ int main(int argc,char** argv) {
  int cases=0,failures=0;
  auto check=[&](bool b,const char* m){++cases;if(!b){++failures;std::cerr<<m<<'\n';}};
  if(authored) {
+  auto captureConfig=ProductionGameSimulationConfig();
+  captureConfig.developmentRescueJourney=true;
+  captureConfig.authoredChapterTerrain=true;
+  GameSimulation capture(captureConfig);
+  for(std::size_t zone=1;zone<kWorldZones.size();++zone)
+   check(capture.PublishChapterTerrain({capture.Snapshot().worldRoute.generation,static_cast<WorldZoneId>(zone)},terrain),
+         "Kit capture terrain preparation failed");
+  const auto* reunion=FindDevelopmentCheckpoint("chapter-kit-reunion");
+  check(reunion && StageDevelopmentCheckpointSimulation(capture,*reunion),"Kit capture native ascent failed");
+  const auto& state=capture.Snapshot();
+  check(state.chapterCompanion.grounded && !state.chapterCompanion.walking &&
+        state.lich.deathDissolveProgress==1 && state.rescue.exteriorSide && !state.rescue.equipmentStowed,
+        "Kit reunion requires retired Keeper, grounded companion and completed physical ascent");
+  check(state.interaction.heldLightPose==interactions::HeldLightPose::Low,
+        "First reunion capture must preserve fresh player-controlled lantern raise");
+  horde::gameplay::dialogue::CompanionRouteFixture companion;
+  for(int tick=0;tick<6000&&companion.State().wait!=horde::gameplay::dialogue::CompanionWait::Lookout;++tick) {
+   const auto before=companion.State();
+   companion.Step(1.f/60.f,before.x,before.z,true,true,false,terrain.get(),true);
+   if(companion.State().wait==horde::gameplay::dialogue::CompanionWait::Obstacle) {
+    std::cerr<<"native companion blocked at "<<before.x<<","<<before.y<<","<<before.z
+             <<" waypoint="<<before.waypoint<<'\n';break;
+   }
+  }
+  check(companion.State().wait==horde::gameplay::dialogue::CompanionWait::Lookout,
+        "native companion could not follow the complete authored route to lookout");
+  check(companion.State().grounded,"native companion lost support at lookout");
   // The lookout continues over native terrain beyond the old ribbon end cap.
   // Looking toward Bellwether must not retract the hands against that absent wall.
   const auto lookout=kWorldRoutePoints.back();

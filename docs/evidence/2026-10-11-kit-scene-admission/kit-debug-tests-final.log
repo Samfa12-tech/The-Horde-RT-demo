@@ -1,0 +1,32 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+    Start  16: horde_rt_texture_layer_subset_tests
+1/9 Test  #16: horde_rt_texture_layer_subset_tests .............   Passed    2.14 sec
+    Start  17: horde_rt_chapter_texture_append_payload_tests
+2/9 Test  #17: horde_rt_chapter_texture_append_payload_tests ...   Passed   31.24 sec
+    Start  26: horde_rt_chapter_dialogue_tests
+3/9 Test  #26: horde_rt_chapter_dialogue_tests .................   Passed    0.03 sec
+    Start  81: horde_rt_development_static_asset_tests
+4/9 Test  #81: horde_rt_development_static_asset_tests .........***Failed    4.29 sec
+FAIL: development registry retains prior views plus three bounded Keeper death inspections
+FAIL: development lookup rejects genuinely unknown IDs and names beyond the woodland inspections
+2 development static asset assertion(s) failed
+
+    Start 156: horde_rt_scene_initialise_preflight_tests
+5/9 Test #156: horde_rt_scene_initialise_preflight_tests .......   Passed    6.05 sec
+    Start 162: horde_rt_skinned_character_smoke
+6/9 Test #162: horde_rt_skinned_character_smoke ................   Passed   54.45 sec
+    Start 172: horde_rt_rescue_journey_integration_tests
+7/9 Test #172: horde_rt_rescue_journey_integration_tests .......   Passed    8.79 sec
+    Start 173: horde_rt_chapter_terrain_journey_tests
+8/9 Test #173: horde_rt_chapter_terrain_journey_tests ..........   Passed   19.87 sec
+    Start 174: horde_rt_kit_source_intake_tests
+9/9 Test #174: horde_rt_kit_source_intake_tests ................   Passed    5.37 sec
+
+89% tests passed, 1 tests failed out of 9
+
+Total Test time (real) = 132.26 sec
+
+The following tests FAILED:
+	 81 - horde_rt_development_static_asset_tests (Failed)
+Errors while running CTest

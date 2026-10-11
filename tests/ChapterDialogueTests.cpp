@@ -111,6 +111,34 @@ int main() {
     request.position=SubtitlePosition::Bottom;
     Check(ResolveWindowsSubtitleLayout(request,4,latch,SubtitlePosition::Bottom).region==SubtitlePosition::Bottom,"new line preserves explicit bottom");
     Check(WindowsDialogueSourceGain(500)==1&&WindowsDialogueSourceGain(-5)==0&&WindowsSfxSourceGain(-1,80)==0,"volume clamps");
+    // A high flat native surface deliberately disagrees with the old ribbon.
+    using Terrain=simulation::TriangleSupportSurface;
+    const std::array<Terrain::Triangle,2> land{{
+        {{{{-1000,7,-1000},{-1000,7,1000},{1000,7,1000}}}},
+        {{{{-1000,7,-1000},{1000,7,1000},{1000,7,-1000}}}}
+    }};
+    std::string terrainError;auto terrain=Terrain::Build(land,terrainError);
+    Check(bool(terrain),"companion native test surface imports");
+    CompanionRouteFixture nativeCompanion;auto nativeBefore=nativeCompanion.State();
+    nativeCompanion.Step(.05f,nativeBefore.x,nativeBefore.z,true,false,false,terrain.get(),true);
+    Check(std::abs(nativeCompanion.State().y-7.f)<.001f&&!nativeCompanion.State().walking,
+        "companion must stand on actual native ground while waiting for lantern proof");
+    nativeCompanion.Step(.05f,nativeBefore.x,nativeBefore.z,true,true,false,terrain.get(),true);
+    Check(nativeCompanion.State().walking&&std::abs(nativeCompanion.State().y-7.f)<.001f,
+        "companion movement must follow native ground, not ribbon elevation");
+    nativeBefore=nativeCompanion.State();
+    nativeCompanion.Step(0,nativeBefore.x,nativeBefore.z,true,true,false,terrain.get(),true);
+    Check(nativeCompanion.State().walking && nativeCompanion.State().animationSeconds==nativeBefore.animationSeconds,
+        "zero-delta snapshot finalization must preserve the walking clip and pose clock");
+    nativeCompanion.Step(.05f,nativeBefore.x,nativeBefore.z,true,true,false,nullptr,true);
+    Check(!nativeCompanion.State().walking&&nativeCompanion.State().x==nativeBefore.x&&nativeCompanion.State().y==nativeBefore.y,
+        "missing or stale native support must stop companion without fallback or teleport");
+    nativeCompanion.Step(.05f,nativeBefore.x,nativeBefore.z,true,true,true,terrain.get(),true);
+    Check(nativeCompanion.State().x==nativeBefore.x,"native companion pause preserves position");
+    nativeCompanion.Reset();
+    Check(nativeCompanion.State().generation>nativeBefore.generation&&!nativeCompanion.State().walking,
+        "companion reset invalidates prior route generation");
+
     CompanionRouteFixture companion;auto before=companion.State();
     companion.Step(.05f,before.x,before.z,true,false,false);
     Check(!companion.State().walking&&companion.State().wait==CompanionWait::Reunion,"companion cannot depart before fresh proof");
@@ -120,7 +148,18 @@ int main() {
     Check(companion.State().x==before.x&&companion.State().wait==CompanionWait::PlayerLagging,"lagging player holds companion without teleport");
     companion.Step(.05f,before.x,before.z,false,true,false);
     Check(companion.State().x==before.x&&companion.State().wait==CompanionWait::PlayerInTomb,"returning to tomb holds companion");
-    companion.Step(.05f,before.x,before.z,true,true,true);Check(companion.State().x==before.x,"pause freezes companion");
+    before=companion.State();
+    companion.Step(.05f,before.x,before.z,true,true,true);
+    Check(companion.State().x==before.x && companion.State().yaw==before.yaw &&
+          companion.State().animationSeconds==before.animationSeconds && companion.State().walking==before.walking,
+          "pause freezes companion placement, pose clock and clip");
+    CompanionRouteFixture turning;
+    const auto startTurn=turning.State();
+    turning.Step(.05f,startTurn.x-1,startTurn.z,true,true,false);
+    Check(std::abs(turning.State().yaw-startTurn.yaw)<=.12001f,"walking turn is bounded per simulation step");
+    turning.Step(.05f,startTurn.x-1,startTurn.z,true,false,false);
+    for(int tick=0;tick<40;++tick)turning.Step(.05f,turning.State().x-1,turning.State().z,true,false,false);
+    Check(std::abs(turning.State().yaw+1.57079632679f)<.001f,"waiting companion turns to face the player");
 
     // Outdoor subtitle fixtures use the same translated landmarks as terrain.
     const auto f02=simulation::kWorldRoutePoints[3];

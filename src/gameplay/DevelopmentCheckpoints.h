@@ -63,9 +63,17 @@ struct DevelopmentCheckpoint
     std::size_t exteriorRouteStation = 2u;
     // Chapter-only diagnostic seed: accepted lethal hit, then real fixed ticks.
     std::uint32_t keeperDeathFixedTicks = 0u;
+    bool raisesLanternForCompanion = false;
 };
 
-inline constexpr std::array<DevelopmentCheckpoint, 87u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 89u> kDevelopmentCheckpoints{{
+    {.id = 208, .name = "chapter-kit-departure", .baseShowcaseCheckpointId = 11,
+     .cameraX = -28.7f, .cameraZ = -5.8f, .yaw = 1.57079632679f, .pitch = -0.10f,
+     .stagesRescueExterior = true, .exteriorRouteStation = 3u, .keeperDeathFixedTicks = 240u,
+     .raisesLanternForCompanion = true},
+    {.id = 207, .name = "chapter-kit-reunion", .baseShowcaseCheckpointId = 11,
+     .cameraX = -28.7f, .cameraZ = -5.8f, .yaw = 1.57079632679f, .pitch = -0.10f,
+     .stagesRescueExterior = true, .exteriorRouteStation = 3u, .keeperDeathFixedTicks = 240u},
     {.id = 204, .name = "chapter-keeper-death-held", .baseShowcaseCheckpointId = 10,
      .cameraX = -31.9f, .cameraZ = -15.2f, .yaw = -1.57079632679f, .pitch = -0.35f,
      .keeperDeathFixedTicks = 193u},

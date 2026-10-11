@@ -1,0 +1,7 @@
+Preserved first actual Windows RT startup failure, 11 October 2026:
+RtStaticMeshSlot capacity overflow: static assets exceed 13.
+The CPU shader/preflight-only test passed but did not load all native assets.
+Correction: exclude the freestanding, invisible laboratory glass test box only
+from the chapter registration; keep the separate RT Lab and nonchapter fixtures.
+Add real chapter native-import capacity/emission assertions to the preflight test.
+No capacity, shader budget, lantern-glass quality or chapter surface was removed.

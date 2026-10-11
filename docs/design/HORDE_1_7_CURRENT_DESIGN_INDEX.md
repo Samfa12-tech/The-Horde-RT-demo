@@ -27,6 +27,15 @@ now preserves the supplied model in a native-tested runtime derivative and adds
 indexed animated tangent frames. It remains outside game packages pending the
 third-slot/material/resource handoff; visible Kit and streaming are still open.
 
+The subsequent [Kit scene admission](../evidence/2026-10-11-kit-scene-admission/README.md)
+now packages the native derivative/maps and shows grounded idle/walk Kit in actual
+matched Pipeline/QueryCompute frames after Keeper retirement. It reuses the third
+BLAS allocation and the chapter's unused laboratory-fixture registration under
+unchanged limits. Native terrain, pause/zero-delta pose and exact package checks
+pass. This supersedes preparation-only wording for visible Kit, but **does not
+establish GPU streaming, sustained/phone cost or complete chapter acceptance**.
+
+
 Latest implementation evidence (11 October): [authored live terrain and forest
 ground](../evidence/2026-10-11-chapter-live-terrain/README.md) at `278ea604`,
 followed by [ordinary-startup atlas correction and physical Android
