@@ -1370,7 +1370,9 @@ if(BUILD_TESTING AND TARGET horde_rt_probe_core)
     add_executable(horde_rt_kit_source_intake_tests tests/KitSourceIntakeTests.cpp)
     target_link_libraries(horde_rt_kit_source_intake_tests PRIVATE horde_rt_probe_core)
     target_compile_definitions(horde_rt_kit_source_intake_tests PRIVATE
-        HORDE_KIT_SOURCE_CANDIDATE="${CMAKE_CURRENT_SOURCE_DIR}/assets/models/characters/source/kit-warden-v1/briarhold-warden-1k.glb")
+        HORDE_KIT_SOURCE_CANDIDATE="${CMAKE_CURRENT_SOURCE_DIR}/assets/models/characters/source/kit-warden-v1/briarhold-warden-1k.glb"
+        HORDE_KIT_RUNTIME_DIRECTORY="${CMAKE_CURRENT_SOURCE_DIR}/assets/models/characters/runtime/kit-warden-v1"
+        HORDE_SKINNED_PBR_FIXTURE="${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/skinned-pbr/tangent-frames.glb")
     add_test(NAME horde_rt_kit_source_intake_tests COMMAND horde_rt_kit_source_intake_tests)
 endif()
 

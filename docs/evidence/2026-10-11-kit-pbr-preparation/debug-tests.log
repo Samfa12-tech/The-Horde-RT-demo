@@ -1,0 +1,20 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+    Start  75: horde_rt_skinned_node_pose_batch_tests
+1/7 Test  #75: horde_rt_skinned_node_pose_batch_tests .........   Passed    2.69 sec
+    Start  76: horde_rt_player_animation_tests
+2/7 Test  #76: horde_rt_player_animation_tests ................   Passed    5.36 sec
+    Start 162: horde_rt_skinned_character_smoke
+3/7 Test #162: horde_rt_skinned_character_smoke ...............   Passed   43.89 sec
+    Start 166: horde_rt_character_render_slot_smoke
+4/7 Test #166: horde_rt_character_render_slot_smoke ...........   Passed    5.62 sec
+    Start 174: horde_rt_kit_source_intake_tests
+5/7 Test #174: horde_rt_kit_source_intake_tests ...............   Passed    7.69 sec
+    Start 180: horde_rt_rescue_rig_attachment_tests
+6/7 Test #180: horde_rt_rescue_rig_attachment_tests ...........   Passed   21.92 sec
+    Start 181: horde_rt_rescue_adversarial_regression_tests
+7/7 Test #181: horde_rt_rescue_adversarial_regression_tests ...   Passed   22.23 sec
+
+100% tests passed, 0 tests failed out of 7
+
+Total Test time (real) = 109.41 sec

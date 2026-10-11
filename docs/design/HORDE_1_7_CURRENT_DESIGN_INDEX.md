@@ -22,6 +22,11 @@ The next bounded milestone adds [chapter Keeper retirement and submission-safe
 refits](../evidence/2026-10-11-keeper-retirement/README.md), with inspected matched
 Pipeline/QueryCompute frames. It does not yet admit Kit or claim GPU streaming.
 
+[Kit native PBR preparation](../evidence/2026-10-11-kit-pbr-preparation/README.md)
+now preserves the supplied model in a native-tested runtime derivative and adds
+indexed animated tangent frames. It remains outside game packages pending the
+third-slot/material/resource handoff; visible Kit and streaming are still open.
+
 Latest implementation evidence (11 October): [authored live terrain and forest
 ground](../evidence/2026-10-11-chapter-live-terrain/README.md) at `278ea604`,
 followed by [ordinary-startup atlas correction and physical Android

@@ -1384,6 +1384,18 @@ bool SkinnedMeshAsset::Skin(
     std::string& diagnostic,
     const std::span<const SkinnedNodeRotation> additiveNodeRotations) const
 {
+    if (!SkinUniqueGeometry(clipId, timeSeconds, diagnostic, additiveNodeRotations)) return false;
+    output.resize(expandedIndices_.size());
+    for (std::size_t index = 0u; index < expandedIndices_.size(); ++index)
+        output[index] = skinnedUniqueVertices_[expandedIndices_[index]];
+    return true;
+}
+
+bool SkinnedMeshAsset::SkinUniqueGeometry(
+    SkinnedClip clipId, float timeSeconds, std::string& diagnostic,
+    const std::span<const SkinnedNodeRotation> additiveNodeRotations,
+    std::vector<SkinnedPbrTangent>* outputTangents) const
+{
     if (!loaded_) { diagnostic = "Skeleton model was not loaded."; return false; }
     const std::size_t clipIndex = static_cast<std::size_t>(clipId);
     if (clipIndex >= clips_.size()) { diagnostic = "Skeleton combat clip index is invalid."; return false; }
@@ -1471,15 +1483,19 @@ bool SkinnedMeshAsset::Skin(
         std::memcpy(inverse.m.data(), inverseBindMatrices_.data() + i * 16u, sizeof(float) * 16u);
         skinMatrices[i] = Multiply(resolveGlobal(resolveGlobal, joints_[i]), inverse);
     }
-    // Skin each source vertex once. The RT BLAS remains deliberately non-indexed,
-    // but transforming the 9,854 unique vertices is much cheaper than repeating
-    // the same four-weight work for all 28,206 expanded triangle vertices.
+    // Skin each source vertex once. Legacy non-indexed consumers expand this
+    // result afterwards; indexed PBR consumers retain the unique stream.
     skinnedUniqueVertices_.resize(vertices_.size());
+    if (outputTangents) outputTangents->resize(vertices_.size());
     for (std::size_t sourceIndex = 0u; sourceIndex < vertices_.size(); ++sourceIndex)
     {
         const SourceVertex& source = vertices_[sourceIndex];
         Vec3 position{};
         Vec3 normal{};
+        Vec3 tangent{};
+        Vec3 bitangent{};
+        const Vec3 sourceBitangent = outputTangents
+            ? Scale(Cross(source.normal, source.tangent), source.tangentSign) : Vec3{};
         for (std::size_t influence = 0u; influence < 4u; ++influence)
         {
             const float weight = source.weights[influence];
@@ -1495,13 +1511,39 @@ bool SkinnedMeshAsset::Skin(
             }
             position.x += transformedPosition.x * weight; position.y += transformedPosition.y * weight; position.z += transformedPosition.z * weight;
             normal.x += transformedNormal.x * weight; normal.y += transformedNormal.y * weight; normal.z += transformedNormal.z * weight;
+            if (outputTangents)
+            {
+                tangent = Add(tangent, Scale(TransformVector(skinMatrices[joint], source.tangent), weight));
+                bitangent = Add(bitangent, Scale(TransformVector(skinMatrices[joint], sourceBitangent), weight));
+            }
         }
         normal = Normalise(normal);
         skinnedUniqueVertices_[sourceIndex] = {{position.x, position.y, position.z, 1.0f}, {normal.x, normal.y, normal.z, 0.0f}};
+        if (outputTangents)
+        {
+            tangent = Subtract(tangent, Scale(normal, Dot(normal, tangent)));
+            if (Length(tangent) <= 0.00001f)
+                tangent = Cross(std::abs(normal.y) < 0.9f ? Vec3{0.0f, 1.0f, 0.0f}
+                                                         : Vec3{1.0f, 0.0f, 0.0f}, normal);
+            tangent = Normalise(tangent);
+            for (const float value : {position.x, position.y, position.z,
+                                      normal.x, normal.y, normal.z,
+                                      tangent.x, tangent.y, tangent.z,
+                                      bitangent.x, bitangent.y, bitangent.z})
+                if (!std::isfinite(value))
+                {
+                    diagnostic = "PBR clip skinning produced a non-finite vertex frame.";
+                    return false;
+                }
+            // A reflected joint palette reverses the frame even though the
+            // authored tangent sign is unchanged. Recover handedness from the
+            // deformed bitangent instead of assuming orientation preservation.
+            const float orientation = Dot(Cross(normal, tangent), bitangent);
+            const float sign = std::abs(orientation) <= 0.00000001f
+                ? source.tangentSign : (orientation < 0.0f ? -1.0f : 1.0f);
+            (*outputTangents)[sourceIndex] = {{tangent.x, tangent.y, tangent.z, sign}};
+        }
     }
-    output.resize(expandedIndices_.size());
-    for (std::size_t outputIndex = 0u; outputIndex < expandedIndices_.size(); ++outputIndex)
-        output[outputIndex] = skinnedUniqueVertices_[expandedIndices_[outputIndex]];
 
     diagnostic.clear();
     return true;
@@ -1546,7 +1588,14 @@ bool SkinnedMeshAsset::SkinUniqueTextured(const SkinnedClip clipId,
         diagnostic = "Skinned model has no TEXCOORD_0 stream.";
         return false;
     }
-    if (!Skin(clipId, timeSeconds, texturedSkinScratch_, diagnostic)) return false;
+    if (!SkinUniqueGeometry(clipId, timeSeconds, diagnostic, {})) return false;
+    CopyUniqueTextured(output);
+    diagnostic.clear();
+    return true;
+}
+
+void SkinnedMeshAsset::CopyUniqueTextured(std::vector<TexturedSkinnedRtVertex>& output) const
+{
     output.resize(skinnedUniqueVertices_.size());
     for (std::size_t sourceIndex = 0u; sourceIndex < output.size(); ++sourceIndex)
     {
@@ -1561,7 +1610,25 @@ bool SkinnedMeshAsset::SkinUniqueTextured(const SkinnedClip clipId,
         destination.texcoord[2] = 0.0f;
         destination.texcoord[3] = 0.0f;
     }
-    diagnostic.clear();
+}
+
+bool SkinnedMeshAsset::SkinUniquePbr(SkinnedClip clip, float time,
+    std::vector<TexturedSkinnedRtVertex>& output,
+    std::vector<SkinnedPbrTangent>& tangents, std::string& diagnostic) const
+{
+    output.clear();
+    tangents.clear();
+    if (!hasTexcoords_ || !hasTangents_ || !std::isfinite(time))
+    {
+        diagnostic = "PBR clip skinning requires UVs, tangents and finite time.";
+        return false;
+    }
+    if (!SkinUniqueGeometry(clip, time, diagnostic, {}, &tangents))
+    {
+        tangents.clear();
+        return false;
+    }
+    CopyUniqueTextured(output);
     return true;
 }
 

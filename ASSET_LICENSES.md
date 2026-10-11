@@ -325,3 +325,14 @@ Forest Ground 01 by Rob Tuytel, [Poly Haven original](https://polyhaven.com/a/fo
 `chapter-terrain-r19` replaces the unsuitable broad mossy-masonry bank material with this forest-ground family at the published 2 m texture width. Existing damp sand remains on the trail. `tools/build-chapter-terrain-textures.ps1` records the two-layer runtime derivation in `assets/textures/props/source/chapter-terrain-maps-r03/receipt.json`: Windows 1K RGBA8 and Android strict ASTC6x6 base/ORM, ASTC4x4 normal, eleven mips. The original prop arrays are not re-encoded. Previous terrain and texture candidates remain preserved. Runtime distribution includes only the two-layer platform arrays and admitted GLB/manifest, not editable sources.
 
 `chapter-terrain-r21` extends the original Horde landform using the owner-designated connected-region atlas and local topo at planning commit `d37f16381311c6e620f0c4a9d01c1cce83260dc8`. Its source receipt identifies both authoring scripts and the exact recovered layout/grid. The regional mesh reuses the same admitted damp-sand and Forest Ground 01 material images and platform arrays unchanged; no additional texture, external model or licence is introduced. The editable master stays outside runtime packages. Beyond the reviewed macro rectangle, coarse surrounding relief is labelled provisional continuation, not additional approved map content.
+
+### Kit preserved runtime derivative (11 October 2026)
+
+`assets/models/characters/runtime/kit-warden-v1/` is a prepared derivative of the
+exact Kit source covered by the owner confirmation above. All non-image GLB
+buffer views are byte-preserved; routing thumbnails replace embedded image
+payloads, and the reproducible map extraction/compilation keeps the source
+masters untouched. Credit: Warden/Kit source created with Meshy; runtime
+processing by Samfa12/Codex. The same asset-specific Meshy entitlement applies,
+not a blanket MIT/CC0 licence. This native-tested candidate is not yet copied
+into game packages or admitted as a visible actor; see its README and receipt.

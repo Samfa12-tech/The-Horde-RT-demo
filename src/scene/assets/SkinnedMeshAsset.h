@@ -47,7 +47,7 @@ static_assert(offsetof(TexturedSkinnedRtVertex, normal) == 16u);
 static_assert(offsetof(TexturedSkinnedRtVertex, texcoord) == 32u);
 
 // Kept separate from TexturedSkinnedRtVertex so the established mobile lich
-// SSBO/BLAS stride remains 48 bytes. The static-PBR player path consumes this
+// SSBO/BLAS stride remains 48 bytes. Indexed PBR skinning consumes this
 // alongside its unique skinned vertices and writes it into StaticRtVertex.
 struct SkinnedPbrTangent
 {
@@ -190,6 +190,11 @@ public:
                             float timeSeconds,
                             std::vector<TexturedSkinnedRtVertex>& output,
                             std::string& diagnostic) const;
+    // Plain clip skinning for indexed PBR actors, without player rig/IK rules.
+    bool SkinUniquePbr(SkinnedClip clip, float timeSeconds,
+                       std::vector<TexturedSkinnedRtVertex>& output,
+                       std::vector<SkinnedPbrTangent>& outputTangents,
+                       std::string& diagnostic) const;
     bool SkinPlayerUniqueTextured(SkinnedClip clip,
                                   float timeSeconds,
                                   const SkinnedArmIkTarget& leftArm,
@@ -210,6 +215,11 @@ public:
                                       std::string& diagnostic) const;
 
 private:
+    bool SkinUniqueGeometry(SkinnedClip clip, float timeSeconds,
+                            std::string& diagnostic,
+                            std::span<const SkinnedNodeRotation> additiveNodeRotations,
+                            std::vector<SkinnedPbrTangent>* outputTangents = nullptr) const;
+    void CopyUniqueTextured(std::vector<TexturedSkinnedRtVertex>& output) const;
     struct SourceVertex;
     struct Node;
     struct Channel;
