@@ -125,13 +125,49 @@ inline bool StageDevelopmentCheckpointSimulation(
             if(!gameSimulation.PublishChapterTerrain({gameSimulation.worldRoute_.generation,
                 static_cast<simulation::WorldZoneId>(i)},chapterTerrain))return finalize(false);
         simulation::InputSnapshot routeInput;routeInput.damageEnabled=false;routeInput.tutorialEnabled=false;
+        routeInput.yawRadians=checkpoint.yaw;routeInput.pitchRadians=checkpoint.pitch;
         const auto advance=[&](){stepFixed(routeInput,1.0f/60.0f,gameSimulation.Snapshot().inputPublicationSequence+1);};
         for(int tick=0;tick<420&&!gameSimulation.Snapshot().rescue.ropeReady;++tick)advance();
         if(!gameSimulation.Snapshot().rescue.ropeReady)return finalize(false);
         routeInput.commands.interact=gameSimulation.Snapshot().lastConsumedInteractSequence+1;advance();
         if(!gameSimulation.Snapshot().rescue.equipmentStowed)return finalize(false);
+        const auto freezeTraversal=[&]() {
+            stepFixed(routeInput,0,gameSimulation.Snapshot().inputPublicationSequence+1);
+            return finalize(gameSimulation.Snapshot().rescue.equipmentStowed);
+        };
+        if(checkpoint.rescueTraversalCapture==1u || checkpoint.rescueTraversalCapture==2u) {
+            for(int tick=0;tick<1200 && gameSimulation.Snapshot().rescue.equipmentStowed;++tick) {
+                const auto& s=gameSimulation.Snapshot().rescue;
+                const bool match=checkpoint.rescueTraversalCapture==1u
+                    ?s.phase==traversal::Phase::Ascent&&s.supportWorldY>.25f
+                    :s.phase==traversal::Phase::PullUp&&s.plantedPelvisDropMetres>.35f&&s.ropeHandsActive;
+                if(match)return freezeTraversal();
+                advance();
+            }
+            return finalize(false);
+        }
         for(int tick=0;tick<1200&&gameSimulation.Snapshot().rescue.equipmentStowed;++tick)advance();
         if(!gameSimulation.Snapshot().rescue.exteriorSide || gameSimulation.Snapshot().rescue.equipmentStowed)return finalize(false);
+        if(checkpoint.rescueTraversalCapture==3u || checkpoint.rescueTraversalCapture==4u) {
+            routeInput.commands.interact=gameSimulation.Snapshot().lastConsumedInteractSequence+1;advance();
+            if(!gameSimulation.Snapshot().rescue.equipmentStowed)return finalize(false);
+            for(int tick=0;tick<1200 && gameSimulation.Snapshot().rescue.equipmentStowed;++tick) {
+                const auto& s=gameSimulation.Snapshot().rescue;
+                if(checkpoint.rescueTraversalCapture==3u && s.phase==traversal::Phase::Descent&&s.ropeHandsActive)
+                    return freezeTraversal();
+                advance();
+            }
+            if(checkpoint.rescueTraversalCapture==3u || gameSimulation.Snapshot().rescue.exteriorSide)
+                return finalize(false);
+            routeInput.commands.interact=gameSimulation.Snapshot().lastConsumedInteractSequence+1;advance();
+            for(int tick=0;tick<1200 && gameSimulation.Snapshot().rescue.equipmentStowed;++tick) {
+                const auto& s=gameSimulation.Snapshot().rescue;
+                if(s.phase==traversal::Phase::Ascent&&s.supportWorldY>.25f)return freezeTraversal();
+                advance();
+            }
+            return finalize(false);
+        }
+        if(checkpoint.rescueTraversalCapture!=0u)return finalize(false);
         // Capture route stations through real fixed-step movement and native
         // support/collision after ascent, never a teleport through blockers.
         if(checkpoint.exteriorRouteStation >= simulation::kWorldRoutePoints.size())return finalize(false);

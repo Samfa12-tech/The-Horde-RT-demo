@@ -121,14 +121,18 @@ void GameSimulation::RestoreRescueEquipment() {
 items::HeldItemTransform GameSimulation::RescueLanternHinge() const {
     if(!config_.developmentRescueJourney || !rescueTraversal_.Snapshot().equipmentStowed)
         return heldItemFixedStepState_.worldFromLeftHand;
-    // Original development carry attachment on the anatomical left hip. No
-    // camera-follow offset: body heading is fixed to the rope, eye/look is free.
+    // Original high rear carry attachment on the anatomical left side. It is
+    // body-owned, never camera-owned; the extra height keeps the actual hanging
+    // lantern envelope above a grounded folded pose's feet and the apron.
     auto m=items::IdentityHeldItemTransform();
     const float yaw=rescueTraversal_.Snapshot().bodyYawRadians,c=std::cos(yaw),s=std::sin(yaw);
     m[0]=c;m[2]=-s;m[8]=s;m[10]=c;
     // Rearward hip mount clears the solid apron while the rope still supports
     // the body below its top; the real ring/body GLB bounds validate this offset.
-    m[12]=playerX_-.32f*c-.35f*s;m[13]=playerSupport_.worldY+.82f;m[14]=playerZ_+.32f*s-.35f*c;
+    const auto offset=RescueTorsoOffset(rescueTraversal_.Snapshot());
+    m[12]=playerX_-.32f*c-.35f*s+offset.x;
+    m[13]=playerSupport_.worldY+1.45f+offset.y;
+    m[14]=playerZ_-.32f*s+.35f*c+offset.z;
     return m;
 }
 void GameSimulation::ApplyRescuePresentation() {
@@ -150,6 +154,8 @@ void GameSimulation::ApplyRescuePresentation() {
 void GameSimulation::PublishRescueSnapshot() {
     snapshot_.developmentRescueJourney=config_.developmentRescueJourney;
     snapshot_.rescue=rescueTraversal_.Snapshot();snapshot_.rescuePrompt=RescuePrompt::None;
+    snapshot_.playerAnimation.plantedPelvisDropMetres=snapshot_.rescue.equipmentStowed
+        ?snapshot_.rescue.plantedPelvisDropMetres:0.0f;
     if(!config_.developmentRescueJourney) return;
     snapshot_.playerSupportGeneration=worldRoute_.generation;
     // Night and route continuation are a mode boundary, not changes to frozen

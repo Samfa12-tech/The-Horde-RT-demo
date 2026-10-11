@@ -13,10 +13,10 @@ struct RescueBlockoutBox
 {
     std::array<float, 3u> minimum;
     std::array<float, 3u> maximum;
-    unsigned materialCode; // Existing world SurfaceDryStone=0, SurfaceMossyStone=2.
+    unsigned materialCode; // Existing DryStone=0, MossyStone=2, AgedMetal=4.
 };
 
-inline constexpr std::array<RescueBlockoutBox, 12u> kRescueBlockoutBoxes{{
+inline constexpr std::array<RescueBlockoutBox, 9u> kRescueBlockoutBoxes{{
     // Shaft returns rise from the lower roof at y=1.30 to the safe rim at 2.05.
     {{{-35.05f, 1.30f, -16.75f}}, {{-34.88f, 2.05f, -13.65f}}, 2u},
     {{{-32.52f, 1.30f, -16.75f}}, {{-32.35f, 2.05f, -13.65f}}, 2u},
@@ -27,12 +27,9 @@ inline constexpr std::array<RescueBlockoutBox, 12u> kRescueBlockoutBoxes{{
     {{{-35.12f, 2.05f, -13.76f}}, {{-32.28f, 2.23f, -13.58f}}, 0u},
     {{{-35.12f, 2.05f, -16.64f}}, {{-34.94f, 2.23f, -13.76f}}, 0u},
     {{{-32.46f, 2.05f, -16.64f}}, {{-32.28f, 2.23f, -13.76f}}, 0u},
-    // Original rear-post frame anchors to the coping behind the rope line.
-    {{{-34.45f, 2.23f, -16.78f}}, {{-34.27f, 3.72f, -16.66f}}, 0u},
-    {{{-33.13f, 2.23f, -16.78f}}, {{-32.95f, 3.72f, -16.66f}}, 0u},
-    {{{-34.36f, 3.62f, -16.78f}}, {{-33.04f, 3.78f, -16.66f}}, 0u},
-    // The raised cantilever clears the body capsule and contains the anchor at z=-15.5.
-    {{{-33.82f, 3.72f, -16.72f}}, {{-33.58f, 3.96f, -15.40f}}, 0u},
+    // Original short iron stake, buried 0.30 m in the landing. SurfaceAgedMetal
+    // reuses the admitted world family. No overhead rescue apparatus remains.
+    {{{-33.47f, 1.75f, -14.86f}}, {{-33.33f, 2.73f, -14.72f}}, 4u},
 }};
 
 // The solid lid spans the shaft opening at the rim height; the landing joins

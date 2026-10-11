@@ -181,7 +181,8 @@ void CheckRecipeEquivalence(const horde::scene::assets::StaticMeshAsset& asset)
         }
         const auto& material = asset.materials[primitive.materialIndex];
         const unsigned materialCode = material.name.starts_with("MossyStone") ? 2u :
-                                      material.name.starts_with("DryStone") ? 0u : 99u;
+                                      material.name.starts_with("DryStone") ? 0u :
+                                      material.name.starts_with("AgedMetal") ? 4u : 99u;
         Check(materialCode != 99u, "native material name maps to a recorded world material code");
         if (materialCode == 99u) continue;
 
@@ -267,38 +268,28 @@ int main()
     using namespace horde::scene;
     using namespace horde::scene::assets;
     const std::filesystem::path sourceRoot{HORDE_RT_SOURCE_DIR};
-    const auto assetRoot = sourceRoot / "assets/source/development-rescue";
+    const auto assetRoot = sourceRoot / "assets/source/development-rescue-ground-stake-v1";
     const auto roundtrip = assetRoot / "rescue-shaft-roundtrip.glb";
     AssetManifest manifest;
     std::string diagnostic;
     Check(AssetManifest::Load(assetRoot / "asset.manifest.json", manifest, diagnostic),
           std::string("source manifest loads through the native manifest reader: ") + diagnostic);
     const auto& anchor = horde::gameplay::traversal::kAnchor;
-    const auto& cantilever = kRescueBlockoutBoxes[11u];
-    Check(kRescueBlockoutBoxes.size() == 12u &&
+    const auto& stake = kRescueBlockoutBoxes[8u];
+    Check(kRescueBlockoutBoxes.size() == 9u &&
           std::all_of(kRescueBlockoutBoxes.begin(), kRescueBlockoutBoxes.begin() + 4,
               [](const RescueBlockoutBox& box) {
                   return box.minimum[1] == 1.30f && box.maximum[1] == 2.05f &&
                          box.materialCode == 2u;
               }) &&
-          kRescueBlockoutBoxes[8u].minimum[1] == 2.23f &&
-          kRescueBlockoutBoxes[8u].maximum[1] == 3.72f &&
-          kRescueBlockoutBoxes[8u].minimum[2] >= -16.82f &&
-          kRescueBlockoutBoxes[8u].maximum[2] <= -16.64f &&
-          kRescueBlockoutBoxes[9u].minimum[1] == 2.23f &&
-          kRescueBlockoutBoxes[9u].maximum[1] == 3.72f &&
-          kRescueBlockoutBoxes[10u].maximum[0] > kRescueBlockoutBoxes[8u].minimum[0] &&
-          kRescueBlockoutBoxes[10u].minimum[0] < kRescueBlockoutBoxes[9u].maximum[0] &&
-          Near(kRescueBlockoutBoxes[10u].minimum[1], 3.62f) &&
-          Near(kRescueBlockoutBoxes[10u].maximum[1], 3.78f) &&
-          Near(anchor.x, -33.7f) && Near(anchor.y, 3.678f) && Near(anchor.z, -15.5f) &&
-          anchor.x >= cantilever.minimum[0] && anchor.x <= cantilever.maximum[0] &&
-          Near(cantilever.minimum[1] - anchor.y, .042f) &&
-          anchor.y + .035f < cantilever.minimum[1] &&
-          anchor.z >= cantilever.minimum[2] && anchor.z <= cantilever.maximum[2] &&
-          Near(cantilever.minimum[1], 3.72f) && Near(cantilever.maximum[1], 3.96f) &&
-          Near(cantilever.minimum[2], -16.72f) && Near(cantilever.maximum[2], -15.40f) &&
-          cantilever.maximum[2] <= -15.4f &&
+          Near(stake.minimum[1],1.75f) && Near(stake.maximum[1],2.73f) &&
+          stake.materialCode==4u && stake.minimum[1]<kRescueBlockoutLanding.maximum[1] &&
+          RescueLandingContains(stake.minimum[0],stake.minimum[2]) &&
+          RescueLandingContains(stake.maximum[0],stake.maximum[2]) &&
+          Near(anchor.x,-33.4f) && Near(anchor.y,2.65f) && Near(anchor.z,-14.979f) &&
+          anchor.x>=stake.minimum[0] && anchor.x<=stake.maximum[0] &&
+          anchor.y>=stake.minimum[1] && anchor.y<=stake.maximum[1] &&
+          anchor.z+.04f<stake.minimum[2] &&
           kRescueBlockoutLid.minimum[1] == 2.05f &&
           kRescueBlockoutLid.maximum[1] == 2.19f &&
           kRescueBlockoutLanding.minimum[1] == 1.92f &&
@@ -307,36 +298,38 @@ int main()
           Near(kRescueBlockoutLandingCollision.minZ, -14.95f) &&
           RescueLandingContains(-33.7f, -14.94f) &&
           !RescueLandingContains(-33.7f, -15.0f),
-          "shared recipe preserves the open climb column, then supports the raised coping-anchored handoff");
+          "shared recipe preserves the shaft, lid and apron with a buried short stake and open overhead clearance");
 
     StaticMeshAsset imported;
     const bool loaded = Load(roundtrip, manifest, &imported, diagnostic);
     Check(loaded, std::string("Blender reimported GLB loads through native cgltf importer: ") + diagnostic);
     if (loaded)
     {
-        Check(imported.primitives.size() == 2u && imported.materials.size() == 2u,
-              "roundtrip retains the two existing opaque material-code groups");
-        Check(imported.vertices.size() == 336u && imported.indices.size() == 504u,
+        Check(imported.primitives.size() == 3u && imported.materials.size() == 3u,
+              "roundtrip retains the three existing opaque material-code groups");
+        Check(imported.vertices.size() == 264u && imported.indices.size() == 396u,
               "roundtrip retains bounded cube-face geometry and real indices");
         CheckRecipeEquivalence(imported);
         bool hasDryStone = false;
         bool hasMossyStone = false;
+        bool hasAgedMetal = false;
         for (const auto& material : imported.materials)
         {
             hasDryStone = hasDryStone || material.name.starts_with("DryStone");
             hasMossyStone = hasMossyStone || material.name.starts_with("MossyStone");
+            hasAgedMetal = hasAgedMetal || material.name.starts_with("AgedMetal");
             Check(material.baseColorTexture < 0 && material.normalTexture < 0 &&
                   material.ormTexture < 0 && material.emissiveTexture < 0,
                   "existing material codes do not add or reference texture layers");
             Check((material.flags & 2u) == 0u,
                   "roundtrip material remains opaque under the existing static importer policy");
         }
-        Check(hasDryStone && hasMossyStone,
-              "GLB retains names for the two existing world material codes");
+        Check(hasDryStone && hasMossyStone && hasAgedMetal,
+              "GLB retains names for the three existing world material codes");
         Check(Near(imported.bounds.minimum[0], -35.12f) &&
               Near(imported.bounds.maximum[0], -32.28f) &&
               Near(imported.bounds.minimum[1], 1.30f) &&
-              Near(imported.bounds.maximum[1], 3.96f) &&
+              Near(imported.bounds.maximum[1], 2.73f) &&
               Near(imported.bounds.minimum[2], -16.82f) &&
               Near(imported.bounds.maximum[2], -11.92f),
               "native transformed bounds remain in the authored +Y world coordinate system");

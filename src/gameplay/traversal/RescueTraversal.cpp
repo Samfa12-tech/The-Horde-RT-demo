@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cmath>
 #include <limits>
+#include <utility>
 
 namespace horde::gameplay::traversal {
 namespace {
@@ -35,7 +36,9 @@ constexpr float kRopePayoutSpeed = 6.0f;
 constexpr std::uint16_t kRopeSettlingTicks = 12u;
 constexpr float kSafePlayerRadius = 0.22f;
 constexpr float kRopeCollisionRadius = 0.035f;
-constexpr float kWorldContactSkin = 0.002f;
+// 35 mm rendered rope plus a 7 mm contact skin also clears a 40 mm gripping
+// hand envelope. The former 2 mm skin let valid rope contacts clip that hand.
+constexpr float kWorldContactSkin = 0.007f;
 
 bool Finite(Vec3 v)
 {
@@ -76,11 +79,11 @@ Vec3 MoveTowardSupportFirst(Vec3 from, Vec3 to, float maxDistance)
 
 Vec3 ClampRootToRopeFront(Vec3 target)
 {
-    // The anchor and the hanging line are authored 0.30 m behind the player
-    // route. Keep the body center in that forward half-space during rope load;
-    // this leaves grip-derived X/Y untouched and gives every bounded root
-    // segment a direct, non-crossing clearance from the cantilever.
-    target.z = std::max(target.z, kAnchor.z + kAnchorBodyStandOffMetres);
+    // The lower loaded column stays in the open shaft. The stake is to its
+    // side, so an anchor-relative Z half-space would incorrectly stop ascent.
+    // The separately supported upper handoff is not routed through this clamp.
+    target.z = std::min(target.z, kLowerLanding.z);
+    target.x = std::min(target.x, kAnchor.x - kAnchorBodyStandOffMetres);
     return target;
 }
 
@@ -105,7 +108,7 @@ Vec3 Sample(const std::array<Vec3, kRopeNodeCount>& nodes, float index)
 }
 
 std::array<float,2> SelectLowerGripPair(const std::array<Vec3,kRopeNodeCount>& nodes,
-                                         const float supportWorldY)
+                                         const float supportWorldY, const float yaw)
 {
     // The thrown line settles against real shaft contacts and is not a straight
     // nominal-length ladder. Select two solved points the imported shoulders
@@ -114,12 +117,13 @@ std::array<float,2> SelectLowerGripPair(const std::array<Vec3,kRopeNodeCount>& n
     constexpr float minimumVerticalSeparation=0.10f;
     constexpr float minimumHandSeparation=0.08f;
     constexpr float minimumIndexGap=0.75f;
-    constexpr float shoulderHeight=1.38f;
+    constexpr float shoulderHeight=1.41f;
     constexpr float shoulderHalfWidth=0.19f;
-    const Vec3 leftShoulder{kLowerLanding.x-shoulderHalfWidth,
-                            supportWorldY+shoulderHeight,kLowerLanding.z};
-    const Vec3 rightShoulder{kLowerLanding.x+shoulderHalfWidth,
-                             supportWorldY+shoulderHeight,kLowerLanding.z};
+    const float c=std::cos(yaw),s=std::sin(yaw);
+    const Vec3 leftShoulder{kLowerLanding.x-shoulderHalfWidth*c,
+                            supportWorldY+shoulderHeight,kLowerLanding.z-shoulderHalfWidth*s};
+    const Vec3 rightShoulder{kLowerLanding.x+shoulderHalfWidth*c,
+                             supportWorldY+shoulderHeight,kLowerLanding.z+shoulderHalfWidth*s};
     std::array<float,2> best{{8.0f,9.0f}};
     float bestScore=std::numeric_limits<float>::infinity();
     for(float left=1.0f;left<=9.75f;left+=step) {
@@ -142,17 +146,27 @@ std::array<float,2> SelectLowerGripPair(const std::array<Vec3,kRopeNodeCount>& n
     return best;
 }
 
-void ResolveRopeBlockoutContact(Vec3& node)
+void ResolveRopeBlockoutContact(Vec3& node,const float radius,const bool roundedGrip=false)
 {
-    for(const auto& box:horde::scene::kRescueBlockoutBoxes) {
-        const float minX=box.minimum[0]-kRopeCollisionRadius;
-        const float minY=box.minimum[1]-kRopeCollisionRadius;
-        const float minZ=box.minimum[2]-kRopeCollisionRadius;
-        const float maxX=box.maximum[0]+kRopeCollisionRadius;
-        const float maxY=box.maximum[1]+kRopeCollisionRadius;
-        const float maxZ=box.maximum[2]+kRopeCollisionRadius;
+    const auto resolve = [&](const horde::scene::RescueBlockoutBox& box) {
+        const Vec3 closest{Clamp(node.x,box.minimum[0],box.maximum[0]),
+                           Clamp(node.y,box.minimum[1],box.maximum[1]),
+                           Clamp(node.z,box.minimum[2],box.maximum[2])};
+        const Vec3 separation=Sub(node,closest);
+        const float distance=Length(separation);
+        if(roundedGrip&&distance>1.0e-6f) {
+            if(distance<radius+kWorldContactSkin)
+                node=Add(closest,Mul(separation,(radius+kWorldContactSkin)/distance));
+            return;
+        }
+        const float minX=box.minimum[0]-radius;
+        const float minY=box.minimum[1]-radius;
+        const float minZ=box.minimum[2]-radius;
+        const float maxX=box.maximum[0]+radius;
+        const float maxY=box.maximum[1]+radius;
+        const float maxZ=box.maximum[2]+radius;
         if(node.x<minX||node.x>maxX||node.y<minY||node.y>maxY||node.z<minZ||node.z>maxZ)
-            continue;
+            return;
         const std::array<float,6> exits{{node.x-minX,maxX-node.x,node.y-minY,maxY-node.y,
                                          node.z-minZ,maxZ-node.z}};
         const auto face=static_cast<std::size_t>(std::min_element(exits.begin(),exits.end())-exits.begin());
@@ -164,7 +178,10 @@ void ResolveRopeBlockoutContact(Vec3& node)
         case 4: node.z=minZ-kWorldContactSkin; break;
         default: node.z=maxZ+kWorldContactSkin; break;
         }
-    }
+    };
+    for(const auto& box:horde::scene::kRescueBlockoutBoxes) resolve(box);
+    // The actual apron is a contact surface, including its vertical edge.
+    resolve(horde::scene::kRescueBlockoutLanding);
 }
 
 std::uint16_t SmoothRegripDurationTicks(float indexDistance)
@@ -316,12 +333,12 @@ void RescueTraversal::BeginRopeThrow()
         const float t=static_cast<float>(i)/static_cast<float>(kRopeNodeCount-1);
         const float angle=t*6.0f*3.14159265358979323846f;
         const Vec3 p=Add(kAnchor,{0.055f*std::cos(angle),-0.018f*static_cast<float>(i),
-                                  0.055f*std::sin(angle)});
+                                  -0.10f+0.055f*std::sin(angle)});
         snapshot_.ropeNodes[i]=p;
         // Most launch energy points down the shaft; a small lateral component
         // gives the cord a visible real swing without throwing reachable grips
         // outside the imported forearm envelope at the lower endpoint.
-        const Vec3 velocity{0.08f*std::sin(angle),-5.6f*t,0.12f*std::cos(angle)};
+        const Vec3 velocity{0.08f*std::sin(angle),-5.6f*t,-0.40f*t+0.12f*std::cos(angle)};
         previousRopeNodes_[i]=Sub(p,Mul(velocity,kFixedDelta));
     }
     snapshot_.ropeNodes[0]=kAnchor;
@@ -352,23 +369,32 @@ void RescueTraversal::ResolveSafePlayerContact()
     // from an idle approach into a loaded grip. Dropping this projection as
     // soon as the player grabs the line lets particles previously pushed off
     // the capsule spring back through the body and creates a rope/root snap.
-    if((!Safe(snapshot_.phase)&&!snapshot_.ropeHandsActive)||!snapshot_.ropeDeployed) return;
+    if((!Safe(snapshot_.phase)&&!snapshot_.ropeHandsActive&&!snapshot_.equipmentStowed)||!snapshot_.ropeDeployed) return;
     constexpr float capsuleBottom=0.10f;
-    constexpr float capsuleTop=1.68f;
+    const float capsuleTop=1.68f-snapshot_.plantedPelvisDropMetres;
     const float combined=kSafePlayerRadius+kRopeCollisionRadius;
     for(std::size_t i=1;i<kRopeNodeCount;++i) {
         Vec3& node=snapshot_.ropeNodes[i];
-        if(node.y<snapshot_.supportWorldY+capsuleBottom||node.y>snapshot_.supportWorldY+capsuleTop) continue;
-        const float dx=node.x-snapshot_.playerPosition.x,dz=node.z-snapshot_.playerPosition.z;
-        const float radial=std::hypot(dx,dz);
+        const float centreY=Clamp(node.y,snapshot_.supportWorldY+capsuleBottom+kSafePlayerRadius,
+            snapshot_.supportWorldY+capsuleTop-kSafePlayerRadius);
+        const float backset=0.25f*snapshot_.plantedPelvisDropMetres;
+        const float dx=node.x-(snapshot_.playerPosition.x-backset*std::sin(snapshot_.bodyYawRadians));
+        const float dy=node.y-centreY;
+        const float dz=node.z-(snapshot_.playerPosition.z+backset*std::cos(snapshot_.bodyYawRadians));
+        // A capsule has rounded ends. The old flat cylinder admitted a node
+        // above its top, then projected it a full radius when the stance grew
+        // by a few millimetres, snapping a loaded hand through the air.
+        const float radial=std::sqrt(dx*dx+dy*dy+dz*dz);
         if(radial>=combined) continue;
         const float nx=radial>1.0e-5f?dx/radial:0.0f;
+        const float ny=radial>1.0e-5f?dy/radial:0.0f;
         const float nz=radial>1.0e-5f?dz/radial:1.0f;
-        const Vec3 correction{nx*(combined-radial),0.0f,nz*(combined-radial)};
+        const Vec3 correction{nx*(combined-radial),ny*(combined-radial),nz*(combined-radial)};
         Vec3 velocity = Sub(node, previousRopeNodes_[i]);
-        const float inwardVelocity = velocity.x * nx + velocity.z * nz;
+        const float inwardVelocity = velocity.x * nx + velocity.y*ny + velocity.z * nz;
         if (inwardVelocity < 0.0f) {
             velocity.x -= nx * inwardVelocity;
+            velocity.y -= ny * inwardVelocity;
             velocity.z -= nz * inwardVelocity;
         }
         node=Add(node,correction);
@@ -389,7 +415,7 @@ void RescueTraversal::BeginRequest(bool ascent)
     snapshot_.equipmentStowed = true;
     snapshot_.ropeHandsActive = false;
     snapshot_.ropeTension = 0.0f;
-    if(!ascent) snapshot_.grippingRopeNodeIndices={0.75f,1.0f};
+    if(!ascent) snapshot_.grippingRopeNodeIndices={kPullUpLeftGripNodeIndex,kPullUpRightGripNodeIndex};
     readinessReceived_ = false;
     readinessReady_ = false;
     motorTicks_ = 0;
@@ -405,7 +431,7 @@ bool RescueTraversal::Request()
     if (snapshot_.phase == Phase::LowerSafe) {
         gripReferencePlayerPosition_ = snapshot_.playerPosition;
         snapshot_.grippingRopeNodeIndices=SelectLowerGripPair(snapshot_.ropeNodes,
-                                                               snapshot_.supportWorldY);
+                                                               snapshot_.supportWorldY,snapshot_.bodyYawRadians);
         PublishHands();
         // Each route cycle rebases on the selected currently solved grips, so
         // settled sag from the previous climb cannot introduce a root jump.
@@ -437,10 +463,14 @@ bool RescueTraversal::TryBegin(std::uint64_t generation, bool claimOwned, bool r
     const Vec3 endpoint=ascent?kLowerLanding:kExteriorLanding;
     const float endpointDistance=std::hypot(snapshot_.playerPosition.x-endpoint.x,
                                             snapshot_.playerPosition.z-endpoint.z);
+    const float targetYaw=std::atan2(kAnchor.x-endpoint.x,-(kAnchor.z-endpoint.z));
     const bool needsApproach=endpointDistance>0.001f ||
-        std::abs(snapshot_.supportWorldY-(ascent?kLowerSupportWorldY:kUpperSupportWorldY))>0.001f;
+        std::abs(snapshot_.supportWorldY-(ascent?kLowerSupportWorldY:kUpperSupportWorldY))>0.001f ||
+        (ascent && std::abs(std::remainder(targetYaw-snapshot_.bodyYawRadians,6.28318530718f))>.041f);
     snapshot_.phase = needsApproach ? (ascent?Phase::ApproachAscent:Phase::ApproachDescent)
                                     : (ascent ? Phase::Ascent : Phase::Descent);
+    approachSafePosition_=snapshot_.playerPosition;
+    approachSafeSupportWorldY_=snapshot_.supportWorldY;
     pullUpStage_ = PullUpStage::Handoff;
     descentStage_ = DescentStage::Lift;
     snapshot_.equipmentStowed = true;
@@ -478,6 +508,8 @@ void RescueTraversal::Reset(Vec3 safePosition, float safeSupportWorldY)
     snapshot_.supportWorldY = upper ? kUpperSupportWorldY : kLowerSupportWorldY;
     snapshot_.bodyYawRadians = 0.0f;
     gripReferencePlayerPosition_ = kLowerLanding;
+    approachSafePosition_=snapshot_.playerPosition;
+    approachSafeSupportWorldY_=snapshot_.supportWorldY;
     snapshot_.exteriorSide = upper;
     snapshot_.equipmentStowed = false;
     for (std::size_t i = 0; i < kRopeNodeCount; ++i) {
@@ -537,6 +569,7 @@ void RescueTraversal::RecoverForReconstruction()
     deploymentPaidOutLength_=paidOutLength;
     deploymentSettleTicks_=settleTicks;
     snapshot_.firstAscentCompleted = firstAscent;
+    PublishHands();
     snapshot_.promptReason = PromptReason::Blocked;
     promptBlocked_ = true;
 }
@@ -553,6 +586,7 @@ void RescueTraversal::RollbackToSafeEndpoint(bool upper)
     snapshot_.grippingRopeNodeIndices = upper ? std::array<float, 2>{0.75f, 1.0f}
                                                 : std::array<float, 2>{8.0f, 9.0f};
     readinessReceived_ = readinessReady_ = false;
+    snapshot_.plantedPelvisDropMetres=0.0f;
     promptBlocked_ = false;
     PublishHands();
     RefreshPrompt();
@@ -563,9 +597,14 @@ void RescueTraversal::AbortApproach()
     const bool upper=snapshot_.phase==Phase::ApproachDescent;
     snapshot_.phase=upper?Phase::UpperSafe:Phase::LowerSafe;
     snapshot_.exteriorSide=upper;
+    // Retain the actual collision-validated request side, rather than marking
+    // a partially approached pose safe after a new blocking contact.
+    snapshot_.playerPosition=approachSafePosition_;
+    snapshot_.supportWorldY=approachSafeSupportWorldY_;
     snapshot_.equipmentStowed=false;
     snapshot_.ropeHandsActive=false;
     snapshot_.ropeTension=0.0f;
+    snapshot_.plantedPelvisDropMetres=0.0f;
     readinessReceived_=readinessReady_=false;
     promptBlocked_=true;
     RefreshPrompt();
@@ -579,6 +618,12 @@ void RescueTraversal::PublishHands()
 
 void RescueTraversal::AdvanceAlternatingGrip(const bool towardAnchor)
 {
+    // Let the loaded body settle on its solved target before another downwards
+    // hand advance. A contact-induced root lag must not drag the hands beyond
+    // the unchanged anatomical envelope while the body catches up.
+    if (!towardAnchor && std::min(snapshot_.grippingHandTargets[0].y,
+                                  snapshot_.grippingHandTargets[1].y) < snapshot_.supportWorldY+0.30f)
+        return;
     const std::size_t hand = nextGripIsLeft_ ? 0u : 1u;
     float& index = snapshot_.grippingRopeNodeIndices[hand];
     if (motorTicks_ == 0u)
@@ -631,6 +676,15 @@ void RescueTraversal::AdvanceMotion()
            std::abs(snapshot_.supportWorldY-support)<=0.001f) {
             snapshot_.playerPosition=target;
             snapshot_.supportWorldY=support;
+            // Keep the boots grounded and hands free until the bounded body
+            // turn faces the stake. Camera input remains independent. Scoring
+            // a grip before this turn retained an off-centre approach pose and
+            // could pull the right hand beyond its native reach during ascent.
+            const float targetYaw=std::atan2(kAnchor.x-target.x,-(kAnchor.z-target.z));
+            if(ascent && std::abs(std::remainder(targetYaw-snapshot_.bodyYawRadians,
+                6.28318530718f))>.041f)return;
+            if(ascent) snapshot_.grippingRopeNodeIndices=SelectLowerGripPair(
+                snapshot_.ropeNodes,snapshot_.supportWorldY,snapshot_.bodyYawRadians);
             snapshot_.phase=ascent?Phase::Ascent:Phase::Descent;
             snapshot_.ropeHandsActive=ascent;
             if(ascent) {
@@ -740,11 +794,24 @@ void RescueTraversal::AdvanceMotion()
             if (snapshot_.supportWorldY <= kUpperSupportWorldY + 1.0e-5f) {
                 snapshot_.supportWorldY = kUpperSupportWorldY;
                 snapshot_.playerPosition = kApronHandoff;
-                snapshot_.ropeHandsActive = true;
-                descentStage_ = DescentStage::Rope;
+                descentStage_ = DescentStage::Crouch;
+                motorTicks_ = 0u;
+            }
+        } else if (descentStage_ == DescentStage::Crouch) {
+            const float desired=Clamp(snapshot_.supportWorldY+1.45f-
+                std::min(snapshot_.grippingHandTargets[0].y,snapshot_.grippingHandTargets[1].y)-0.40f,0.0f,0.72f);
+            if(snapshot_.plantedPelvisDropMetres>=desired-0.01f) {
+                snapshot_.ropeHandsActive=true;
+                descentStage_=DescentStage::Back;
+            }
+        } else if (descentStage_ == DescentStage::Back) {
+            snapshot_.playerPosition=MoveToward(snapshot_.playerPosition,kRimLanding,
+                kDescentSpeed*kFixedDelta);
+            if(snapshot_.playerPosition==kRimLanding) {
+                descentStage_=DescentStage::Rope;
                 gripReferencePlayerPosition_ = snapshot_.playerPosition;
-                gripReferenceWorld_ = Mul(Add(Sample(snapshot_.ropeNodes, 0.75f),
-                                              Sample(snapshot_.ropeNodes, 1.0f)), 0.5f);
+                gripReferenceWorld_ = Mul(Add(Sample(snapshot_.ropeNodes, kPullUpLeftGripNodeIndex),
+                                              Sample(snapshot_.ropeNodes, kPullUpRightGripNodeIndex)), 0.5f);
                 motorTicks_ = 0u;
             }
         }
@@ -753,7 +820,7 @@ void RescueTraversal::AdvanceMotion()
         return;
     }
     if (snapshot_.phase == Phase::Landing) {
-        AdvanceAlternatingGrip(false);
+        if(snapshot_.ropeHandsActive)AdvanceAlternatingGrip(false);
     }
 }
 
@@ -769,6 +836,9 @@ void RescueTraversal::ResolveRope(float contactPlaneWorldY)
         const bool loaded = snapshot_.ropeHandsActive && snapshot_.equipmentStowed &&
             (std::abs(static_cast<float>(i) - left) < 1.0f ||
              std::abs(static_cast<float>(i) - right) < 1.0f);
+        // Gripping hands damp the loaded line; the free tail and ordinary
+        // player bumps keep their existing Verlet response.
+        if(loaded)velocity=Mul(velocity,0.80f);
         const float gravity = kRopeGravity - (loaded ? kPlayerLoadAcceleration : 0.0f);
         snapshot_.ropeNodes[i] = Add(p, Add(velocity, {0.0f, gravity * kFixedDelta * kFixedDelta, 0.0f}));
         snapshot_.ropeNodes[i].y = std::max(snapshot_.ropeNodes[i].y, contactPlaneWorldY + kContactSkin);
@@ -788,7 +858,10 @@ void RescueTraversal::ResolveRope(float contactPlaneWorldY)
                 : kRopeSegmentRestLength;
             const float extension = length - constraintLength;
             maximumPreSolveStretch = std::max(maximumPreSolveStretch, extension);
-            if (extension > 0.0f) {
+            // A paid-out rope preserves material length in slack as well as
+            // tension. Otherwise the lower anchor collapses its loose tail
+            // and can never satisfy the existing readiness length check.
+            if (extension > 0.0f || snapshot_.deploymentPhase != RopeDeploymentPhase::Unfurling) {
                 const Vec3 correction = Mul(delta, extension / length);
                 if (i == 0) b = Sub(b, correction);
                 else {
@@ -799,7 +872,42 @@ void RescueTraversal::ResolveRope(float contactPlaneWorldY)
             if (i > 0) a.y = std::max(a.y, contactPlaneWorldY + kContactSkin);
             b.y = std::max(b.y, contactPlaneWorldY + kContactSkin);
         }
-        for(std::size_t i=1;i<kRopeNodeCount;++i) ResolveRopeBlockoutContact(snapshot_.ropeNodes[i]);
+        for(std::size_t i=1;i<kRopeNodeCount;++i) {
+            ResolveRopeBlockoutContact(snapshot_.ropeNodes[i],kRopeCollisionRadius);
+        }
+        if(snapshot_.ropeHandsActive) {
+            // Node contact alone cannot protect a hand sampled between nodes
+            // on opposite sides of an edge. Project the actual interpolated
+            // grip sphere and distribute that constraint to its two particles.
+            // The anchor stays fixed; this also covers fractional upper grips.
+            const float direction=snapshot_.phase==Phase::Descent||snapshot_.phase==Phase::Landing?1.0f:-1.0f;
+            const std::array<float,4> gripContacts{{left,right,
+                Clamp(left+direction*kAscentGripStep,.20f,10.0f),
+                Clamp(right+direction*kAscentGripStep,.45f,10.0f)}};
+            // Clear the next half-node travel before a moving hand reaches an
+            // edge, so a thin slab cannot trigger a one-tick contact snap.
+            for(const float index:gripContacts) {
+                const auto lower=static_cast<std::size_t>(index);
+                const auto upper=std::min(lower+1,kRopeNodeCount-1);
+                const float t=index-static_cast<float>(lower);
+                const float a=lower==0?0.0f:1.0f-t;
+                const float b=upper==lower?0.0f:t;
+                const float weight=a*a+b*b;
+                if(weight<1.0e-6f)continue;
+                const Vec3 before=Sample(snapshot_.ropeNodes,index);
+                Vec3 after=before;
+                constexpr float gripRadius=0.060f;
+                ResolveRopeBlockoutContact(after,gripRadius,true);
+                const Vec3 correction=Sub(after,before);
+                for(const auto [node,w]:std::array<std::pair<std::size_t,float>,2>{{
+                        {lower,a},{upper,b}}}) {
+                    const Vec3 move=Mul(correction,w/weight);
+                    snapshot_.ropeNodes[node]=Add(snapshot_.ropeNodes[node],move);
+                    // A contact correction is not a new Verlet impulse.
+                    previousRopeNodes_[node]=Add(previousRopeNodes_[node],move);
+                }
+            }
+        }
         ResolveSafePlayerContact();
     }
     snapshot_.ropeNodes[0] = kAnchor;
@@ -861,17 +969,21 @@ void RescueTraversal::ResolveRope(float contactPlaneWorldY)
     } else if (snapshot_.phase == Phase::PullUp ||
                (snapshot_.phase == Phase::Descent && descentStage_ != DescentStage::Rope)) {
         snapshot_.playerPosition.y = snapshot_.supportWorldY;
+    } else if(snapshot_.phase==Phase::Landing&&!snapshot_.ropeHandsActive) {
+        snapshot_.playerPosition=kLowerLanding;
+        snapshot_.supportWorldY=kLowerSupportWorldY;
     } else if ((snapshot_.phase == Phase::Descent && descentStage_ == DescentStage::Rope) ||
                snapshot_.phase == Phase::Landing) {
         const float targetSupport = Clamp(kUpperSupportWorldY + gripMidpoint.y - gripReferenceWorld_.y,
             kLowerSupportWorldY, kUpperSupportWorldY);
         const float descentProgress = Clamp((kUpperSupportWorldY - targetSupport) /
             (kUpperSupportWorldY - kLowerSupportWorldY), 0.0f, 1.0f);
-        const Vec3 targetRoot = ClampRootToRopeFront({
+        Vec3 targetRoot = {
             gripReferencePlayerPosition_.x + gripMidpoint.x - gripReferenceWorld_.x,
             targetSupport,
             gripReferencePlayerPosition_.z + gripMidpoint.z - gripReferenceWorld_.z +
-                (kLowerLanding.z - kApronHandoff.z) * descentProgress});
+                (kLowerLanding.z - kRimLanding.z) * descentProgress};
+        targetRoot.x=std::min(targetRoot.x,kAnchor.x-kAnchorBodyStandOffMetres);
         const Vec3 currentRoot{snapshot_.playerPosition.x, snapshot_.supportWorldY,
                                snapshot_.playerPosition.z};
         const Vec3 resolvedRoot = MoveTowardSupportFirst(currentRoot, targetRoot,
@@ -889,13 +1001,39 @@ void RescueTraversal::ResolveRope(float contactPlaneWorldY)
             snapshot_.supportWorldY <= kLowerSupportWorldY + 0.005f) {
             snapshot_.supportWorldY = kLowerSupportWorldY;
             snapshot_.playerPosition = kLowerLanding;
-            snapshot_.phase = Phase::LowerSafe;
-            snapshot_.exteriorSide = false;
-            snapshot_.equipmentStowed = false;
             snapshot_.ropeHandsActive = false;
         }
         ResolveSafePlayerContact();
         PublishHands();
+    }
+}
+
+void RescueTraversal::UpdateBodyPresentation()
+{
+    if (!snapshot_.equipmentStowed) {
+        snapshot_.plantedPelvisDropMetres = 0.0f;
+        return;
+    }
+    const float dx = kAnchor.x - snapshot_.playerPosition.x;
+    const float dz = kAnchor.z - snapshot_.playerPosition.z;
+    constexpr float pi = 3.14159265358979323846f;
+    const float targetYaw = std::atan2(dx, -dz);
+    const float delta = std::remainder(targetYaw - snapshot_.bodyYawRadians, 2.0f*pi);
+    snapshot_.bodyYawRadians += Clamp(delta, -0.04f, 0.04f);
+    const float lowGripY = std::min(snapshot_.grippingHandTargets[0].y,
+                                    snapshot_.grippingHandTargets[1].y);
+    const bool preparingGrip=snapshot_.phase==Phase::Descent&&descentStage_==DescentStage::Crouch;
+    const float targetDrop = (snapshot_.ropeHandsActive||preparingGrip)
+        ? Clamp(snapshot_.supportWorldY + 1.45f - lowGripY - 0.40f, 0.0f, 0.72f)
+        : 0.0f;
+    snapshot_.plantedPelvisDropMetres += Clamp(
+        targetDrop-snapshot_.plantedPelvisDropMetres,-0.015f,0.015f);
+    if(snapshot_.phase==Phase::Landing&&!snapshot_.ropeHandsActive&&
+       snapshot_.plantedPelvisDropMetres<=0.001f) {
+        snapshot_.plantedPelvisDropMetres=0.0f;
+        snapshot_.phase=Phase::LowerSafe;
+        snapshot_.exteriorSide=false;
+        snapshot_.equipmentStowed=false;
     }
 }
 
@@ -932,6 +1070,11 @@ bool RescueTraversal::Step(const Input& input)
     if (Moving(snapshot_.phase)) AdvanceMotion();
     PublishHands();
     ResolveRope(input.contactPlaneWorldY);
+    UpdateBodyPresentation();
+    // Publish one coherent final manifold after the bounded stance/yaw change;
+    // consumers must not receive rope contact against last tick's torso.
+    ResolveSafePlayerContact();
+    PublishHands();
     UpdateDeploymentReadiness(input.contactPlaneWorldY);
     RefreshPrompt();
     return true;

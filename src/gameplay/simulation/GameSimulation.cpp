@@ -2518,9 +2518,10 @@ std::uint64_t GameSimulation::Emit(GameplayEventType type,
     event.worldX = x;
     event.worldZ = z;
     event.worldY = worldY;
-    event.listenerY = PlayerEyeWorldY(playerSupport_.worldY);
-    event.listenerX = playerX_;
-    event.listenerZ = playerZ_;
+    const auto rescueTorsoOffset=traversal::RescueTorsoOffset(rescueTraversal_.Snapshot());
+    event.listenerY = PlayerEyeWorldY(playerSupport_.worldY)+rescueTorsoOffset.y;
+    event.listenerX = playerX_+rescueTorsoOffset.x;
+    event.listenerZ = playerZ_+rescueTorsoOffset.z;
     event.listenerYawRadians = playerYawRadians_;
     event.intensity = intensity;
     event.payload = payload;

@@ -233,6 +233,15 @@ not evidence that the former MediaPlayer issue was reproduced or diagnosed.
 
 ### Original development rescue blockout (1.7 journey)
 
+The later `assets/source/development-rescue-ground-stake-v1/` is a separate
+original Blender master/GLB round-trip. It replaces the development overhead
+frame with a short buried iron stake and retains the accepted shaft, lid,
+coping and apron interfaces. The stake reuses existing Poly Haven CC0
+Rusty Metal 04 (world layer 4); exact source-map hashes are in its source
+manifest. The original rescue master and backups remain preserved. Neither
+editable source directory belongs in runtime packages. No new texture family,
+generation service or third-party geometry was acquired.
+
 `assets/source/development-rescue/` contains original shaft, coping, lid and landing geometry authored locally from `src/scene/RescueBlockoutGeometry.h` through installed Blender 5.2. No third-party geometry was acquired. Editable Blender and GLB roundtrip sources remain outside runtime packaging; the renderer consumes the verified shared geometry recipe. Existing Poly Haven CC0 DryStone (world layer 0) and MossyStone (layer 2) maps retain their original attribution and exact byte identities in the source manifest. Native import and source admission are engineering checks, not artistic/device acceptance or new redistribution rights. The temporary outdoor skeleton reuses the already-admitted runtime model and its existing licence entry; it is a render workload witness, not Kit or a new enemy roster entry. Outstanding Hotstrike/Meshy public redistribution questions remain unresolved.
 
 ### Original development wooded terrain recipe (11 October 2026)

@@ -6330,7 +6330,10 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         return Vec3{v[0] / length, v[1] / length, v[2] / length};
     };
     const Vec3 worldUp{0.0f, 1.0f, 0.0f};
-    const Vec3 eye{cameraX, horde::gameplay::simulation::PlayerEyeWorldY(frame.playerSupportWorldY), cameraZ};
+    const auto rescueTorsoOffset=horde::gameplay::traversal::RescueTorsoOffset(frame.rescue);
+    const Vec3 eye{cameraX+rescueTorsoOffset.x,
+        horde::gameplay::simulation::PlayerEyeWorldY(frame.playerSupportWorldY)+rescueTorsoOffset.y,
+        cameraZ+rescueTorsoOffset.z};
     const float bodyYaw=frame.developmentRescueJourney && frame.rescue.equipmentStowed
         ?frame.rescue.bodyYawRadians:cameraYaw;
     const Vec3 bodyForward{std::sin(bodyYaw), 0.0f, -std::cos(bodyYaw)};
@@ -6448,6 +6451,13 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             skinnedPlayerRootWorld = GroundPlayerRootOnRouteFloor(
                 animatedBodyOrigin, frame.playerSupportWorldY,
                 playerRenderSlot_.BootGroundingOffsetMetres(frame.playerAnimation));
+        }
+        if(frame.developmentRescueJourney && frame.rescue.equipmentStowed)
+        {
+            // The folded head/eye moves, but the planted boots keep the actual
+            // traversal root. Do not apply the torso setback to that root twice.
+            skinnedPlayerRootWorld={{cameraX,frame.playerSupportWorldY+
+                playerRenderSlot_.BootGroundingOffsetMetres(frame.playerAnimation),cameraZ}};
         }
         const auto worldPointToPlayer = [&subtract, &playerModelBasis,
                                          &skinnedPlayerRootWorld](
@@ -7085,7 +7095,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         renderedTorchLight.worldFromLight[12],
         renderedTorchLight.worldFromLight[13],
         renderedTorchLight.worldFromLight[14],
-        frame.heldLight.active ? frame.torchLightStrength : 0.0f}, frame.playerSupportWorldY);
+        frame.heldLight.active ? frame.torchLightStrength : 0.0f}, frame.playerSupportWorldY,rescueTorsoOffset.y);
     if (productionLanternVisible)
     {
         heldLightGpu.positionStrength = {{
@@ -7110,7 +7120,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             std::span<const horde::gameplay::effects::FireEmitterState>(
                 renderFireEmitters.data(),
                 std::min(frame.fireEmitterCount, renderFireEmitters.size())),
-            {{frame.cameraX, horde::gameplay::simulation::PlayerEyeWorldY(frame.playerSupportWorldY), frame.cameraZ},
+            {eye,
              frame.zone, 24.0f},
             fireTuning,
             fireQuality,
@@ -7663,8 +7673,9 @@ bool PresentableTinyRtScene::WriteDustQuality(const RtQualityControlsGpu& qualit
     QualityDustUpload upload{quality,{}};
     using namespace horde::scene::atmosphere;
     const float step=frame.walkTime*6.2f;
-    DustCamera camera{{frame.cameraX+std::sin(step*0.5f)*0.035f*frame.walkAmount,
-        horde::gameplay::simulation::PlayerEyeWorldY(frame.playerSupportWorldY)+std::abs(std::sin(step))*0.035f*frame.walkAmount,frame.cameraZ},
+    const auto offset=horde::gameplay::traversal::RescueTorsoOffset(frame.rescue);
+    DustCamera camera{{frame.cameraX+offset.x+std::sin(step*0.5f)*0.035f*frame.walkAmount,
+        horde::gameplay::simulation::PlayerEyeWorldY(frame.playerSupportWorldY)+offset.y+std::abs(std::sin(step))*0.035f*frame.walkAmount,frame.cameraZ+offset.z},
         frame.cameraYaw,frame.cameraPitch+std::sin(step)*0.012f*frame.walkAmount,
         float(dispatchExtent_.width)/float(std::max(dispatchExtent_.height,1u))};
     const auto rotation=static_cast<unsigned>(frame.presentationTransform)&3u;
@@ -7780,13 +7791,14 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
     const RtLightTuning& skylightTuning = tuning.lights[static_cast<std::size_t>(RtLightGroup::Skylight)];
     const RtLightTuning& passageTuning = tuning.lights[static_cast<std::size_t>(RtLightGroup::Passage)];
     const RtLightTuning& staffTuning = tuning.lights[static_cast<std::size_t>(RtLightGroup::Staff)];
+    const auto offset=horde::gameplay::traversal::RescueTorsoOffset(frame.rescue);
     const ScenePushConstants pushConstants{
         frame.cameraYaw,
         frame.cameraPitch,
         frame.torchLightStrength,
         frame.walkTime,
-        frame.cameraX,
-        frame.cameraZ,
+        frame.cameraX+offset.x,
+        frame.cameraZ+offset.z,
         frame.walkAmount,
         static_cast<float>(horde::graphics::EncodeRtPresentationOutputMode(
             frame.presentationTransform, presentationUsesBgra_ && !scaledPresentation)),

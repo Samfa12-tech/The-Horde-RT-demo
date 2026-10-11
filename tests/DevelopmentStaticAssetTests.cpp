@@ -5,6 +5,7 @@
 #include "vulkan/raytracing/DevelopmentStaticAssetPolicy.h"
 #include "platform/windows/WindowsCaptureContracts.h"
 
+#include <array>
 #include <cmath>
 #include <cstdint>
 #include <filesystem>
@@ -66,8 +67,21 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 89u,
-          "development registry retains prior views plus two bounded Kit inspections");
+    Check(kDevelopmentCheckpoints.size() == 93u,
+          "development registry retains prior views plus four fixed-step stake traversal inspections");
+    const std::array<const char*, 4u> stakeViews{{
+        "chapter-stake-ascent", "chapter-stake-pullup",
+        "chapter-stake-descent", "chapter-stake-repeat-ascent"}};
+    for (std::size_t i = 0u; i < stakeViews.size(); ++i)
+    {
+        const auto* stake = FindDevelopmentCheckpoint(stakeViews[i]);
+        Check(stake != nullptr && stake->id == 210 + static_cast<std::int32_t>(i) &&
+                  FindDevelopmentCheckpoint(stake->id) == stake &&
+                  stake->rescueTraversalCapture == i + 1u &&
+                  !stake->primaryArmsMayBeOutsideFrame &&
+                  FindShowcaseCheckpoint(stakeViews[i]) == nullptr,
+              "stake views have stable unique IDs, real traversal staging and strict primary-arm visibility");
+    }
     Check(FindDevelopmentCheckpoint(164) == nullptr,
           "development lookup preserves the unassigned gap before later bounded additions");
     const auto* worldRoute = FindDevelopmentCheckpoint("world-route");

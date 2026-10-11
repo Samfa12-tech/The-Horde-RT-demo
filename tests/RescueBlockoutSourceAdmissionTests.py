@@ -19,9 +19,9 @@ def main() -> int:
     spec.loader.exec_module(tool)
 
     materials = tool.validate_material_sources(repo)
-    require([(item["name"], item["surfaceCode"], item["worldTextureLayer"])
-             for item in materials] == [("DryStone", 0, 0), ("MossyStone", 2, 2)],
-            "admission binds the existing dry/mossy world material codes and layers")
+    require(sorted((item["name"], item["surfaceCode"], item["worldTextureLayer"])
+             for item in materials) == [("AgedMetal", 4, 4), ("DryStone", 0, 0), ("MossyStone", 2, 2)],
+            "admission binds the existing dry/mossy stone and original stake's aged-metal codes and layers")
 
     root = repo / f".tmp-rescue-source-admission-{time.time_ns()}"
     root.mkdir()

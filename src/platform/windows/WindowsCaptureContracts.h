@@ -128,9 +128,65 @@ struct ClaimedRewardCapturePixelPolicy
     bool permitsCompleteWallRetraction = false;
 };
 
-constexpr ClaimedRewardCapturePixelPolicy ClaimedRewardCapturePolicy(
-    const std::string_view checkpointName, const bool swordFullyStowed = false)
+inline bool HasRescueBodyStowCaptureWitness(
+    const horde::gameplay::simulation::SimulationSnapshot& snapshot) noexcept
 {
+    using namespace horde::gameplay;
+    const auto& rope = snapshot.rescue;
+    const bool loadedPhase = rope.phase == traversal::Phase::Ascent ||
+        rope.phase == traversal::Phase::PullUp || rope.phase == traversal::Phase::Descent ||
+        rope.phase == traversal::Phase::Landing;
+    if (!snapshot.developmentRescueJourney || !loadedPhase ||
+        !rope.equipmentStowed || !rope.ropeHandsActive || !rope.lanternClaimed ||
+        !rope.ropeDeployed || !rope.ropeReady || rope.generation == 0u ||
+        rope.claimCount != 1u || rope.deploymentCount != 1u ||
+        snapshot.chestReward.phase != interactions::ChestRewardPhase::LanternClaimed ||
+        snapshot.interaction.heldLightKind != interactions::HeldLightKind::RewardLantern ||
+        !IsCaptureSwordFullyStowed(snapshot.heldItems[1]) ||
+        snapshot.heldItems[0].parentMode == items::HeldItemParentMode::HandSocket ||
+        !snapshot.lanternPendulum.initialized ||
+        !std::isfinite(rope.plantedPelvisDropMetres) || rope.plantedPelvisDropMetres < 0.0f ||
+        rope.plantedPelvisDropMetres > 0.72f ||
+        snapshot.playerAnimation.plantedPelvisDropMetres != rope.plantedPelvisDropMetres)
+        return false;
+    const auto close = [](float a, float b) {
+        return std::isfinite(a) && std::isfinite(b) && std::abs(a-b) <= 0.001f;
+    };
+    if (!close(snapshot.playerX,rope.playerPosition.x) ||
+        !close(snapshot.playerZ,rope.playerPosition.z) ||
+        !close(snapshot.playerSupportWorldY,rope.supportWorldY)) return false;
+    for (const auto p : rope.ropeNodes)
+        if (!std::isfinite(p.x) || !std::isfinite(p.y) || !std::isfinite(p.z)) return false;
+    for (const auto& transform : {snapshot.rewardLanternWorldFromHinge,
+                                  snapshot.lanternPendulum.worldFromBody})
+        for (const auto component : transform) if (!std::isfinite(component)) return false;
+    for (std::size_t hand=0; hand<2u; ++hand) {
+        const float node = rope.grippingRopeNodeIndices[hand];
+        if (!std::isfinite(node) || node < 0.0f || node >= traversal::kRopeNodeCount-1u)
+            return false;
+        const auto index = static_cast<std::size_t>(node);
+        const auto a=rope.ropeNodes[index], b=rope.ropeNodes[index+1u];
+        const float t=node-static_cast<float>(index);
+        const auto target=rope.grippingHandTargets[hand];
+        if (!close(target.x,a.x+(b.x-a.x)*t) || !close(target.y,a.y+(b.y-a.y)*t) ||
+            !close(target.z,a.z+(b.z-a.z)*t)) return false;
+    }
+    return true;
+}
+
+constexpr ClaimedRewardCapturePixelPolicy ClaimedRewardCapturePolicy(
+    const std::string_view checkpointName, const bool swordFullyStowed = false,
+    const horde::gameplay::simulation::SimulationSnapshot* simulation = nullptr)
+{
+    if (simulation != nullptr && HasRescueBodyStowCaptureWitness(*simulation))
+    {
+        // Both real hands grip the line. The independent rear-mounted lantern
+        // must retain its instance masks and authoritative attachment, but need
+        // not be in the primary camera. Player-arm visibility is still required.
+        return {.requirePlayerPixels=true, .requireRewardRingPixels=false,
+                .requireRewardBodyPixels=false, .requireSwordPixels=false,
+                .permitsCompleteWallRetraction=false};
+    }
     if (checkpointName == "finale-roof")
     {
         // The authored finale now occurs after the route-local reward claim.

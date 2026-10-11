@@ -22,14 +22,25 @@ int main()
         return std::abs(a - b) <= epsilon;
     };
     const auto checkHandsClearAnchorBeam = [&](const RescueTraversalSnapshot& snapshot) {
-        const auto& beam = horde::scene::kRescueBlockoutBoxes[11];
+        const auto& beam = horde::scene::kRescueBlockoutBoxes[8];
         for (const auto& hand : snapshot.grippingHandTargets) {
             const bool insideFootprint = hand.x >= beam.minimum[0] - 0.04f &&
                 hand.x <= beam.maximum[0] + 0.04f && hand.z >= beam.minimum[2] - 0.04f &&
                 hand.z <= beam.maximum[2] + 0.04f;
             check(!insideFootprint || hand.y + 0.04f <= beam.minimum[1] ||
                 hand.y - 0.04f >= beam.maximum[1],
-                "rope hand target intersected the solid cantilever beam");
+                "rope hand target intersected the solid grounded stake");
+            if(snapshot.ropeHandsActive) {
+                const auto sphereClear=[&](const horde::scene::RescueBlockoutBox& box) {
+                    const float dx=hand.x-std::clamp(hand.x,box.minimum[0],box.maximum[0]);
+                    const float dy=hand.y-std::clamp(hand.y,box.minimum[1],box.maximum[1]);
+                    const float dz=hand.z-std::clamp(hand.z,box.minimum[2],box.maximum[2]);
+                    check(std::sqrt(dx*dx+dy*dy+dz*dz)>=.066f,
+                          "final published interpolated grip sphere crossed a stake/shaft/apron solid");
+                };
+                for(const auto& box:horde::scene::kRescueBlockoutBoxes)sphereClear(box);
+                sphereClear(horde::scene::kRescueBlockoutLanding);
+            }
         }
     };
     const auto checkRopeClearBlockout = [&](const RescueTraversalSnapshot& snapshot) {
@@ -45,14 +56,17 @@ int main()
     };
     const auto checkRopeClearPlayer = [&](const RescueTraversalSnapshot& snapshot) {
         constexpr float capsuleBottom = 0.10f;
-        constexpr float capsuleTop = 1.68f;
+        const float capsuleTop = 1.68f-snapshot.plantedPelvisDropMetres;
         constexpr float combinedRadius = 0.22f + 0.035f;
         for (std::size_t nodeIndex = 1u; nodeIndex < kRopeNodeCount; ++nodeIndex) {
             const auto& node = snapshot.ropeNodes[nodeIndex];
-            if (node.y < snapshot.supportWorldY + capsuleBottom ||
-                node.y > snapshot.supportWorldY + capsuleTop) continue;
-            const float radial = std::hypot(node.x - snapshot.playerPosition.x,
-                                            node.z - snapshot.playerPosition.z);
+            const float y=std::clamp(node.y,snapshot.supportWorldY+capsuleBottom+.22f,
+                snapshot.supportWorldY+capsuleTop-.22f);
+            const auto torso=RescueTorsoOffset(snapshot);
+            const float dx=node.x-snapshot.playerPosition.x-torso.x;
+            const float dy=node.y-y;
+            const float dz=node.z-snapshot.playerPosition.z-torso.z;
+            const float radial = std::sqrt(dx*dx+dy*dy+dz*dz);
             check(radial >= combinedRadius - 0.001f,
                 "loaded rope particle crossed the player capsule contact boundary");
         }
@@ -78,6 +92,11 @@ int main()
     };
 
     RescueTraversal traversal;
+    check(kAnchor.y >= kUpperSupportWorldY + 0.45f && kAnchor.y <= kUpperSupportWorldY + 0.70f &&
+          horde::scene::RescueLandingContains(kAnchor.x, horde::scene::kRescueBlockoutBoxes[8].minimum[2]) &&
+          kAnchor.z<horde::scene::kRescueBlockoutLanding.minimum[2] &&
+          kAnchor.z>horde::scene::kRescueBlockoutLanding.minimum[2]-.20f,
+          "rescue rope must tie to a short grounded stake on the actual apron, not an overhead frame");
     auto state = traversal.Snapshot();
     check(state.phase == Phase::LowerSafe && near(state.supportWorldY, kLowerSupportWorldY) &&
         !traversal.CanInteract(), "unclaimed route must start safely with interaction gated");
@@ -90,10 +109,11 @@ int main()
     check(state.lanternClaimed && !state.ropeDeployed && !state.ropeReady && state.claimCount == 1 &&
         state.deploymentCount == 1 && state.deploymentPhase==RopeDeploymentPhase::WaitingForOpening &&
         !traversal.CanInteract(), "claim did not begin the gated rope deployment before interaction");
-    const auto& cantilever = horde::scene::kRescueBlockoutBoxes[11];
-    check(near(kAnchor.x, -33.7f) && near(kAnchor.y, 3.678f) && near(kAnchor.z, -15.5f) &&
-          kAnchor.y + 0.035f + 0.002f <= cantilever.minimum[1] + 0.0001f,
-        "rope anchor must attach at the cantilever underside with rope-radius clearance");
+    const auto& stake = horde::scene::kRescueBlockoutBoxes[8];
+    check(near(kAnchor.x, -33.4f) && near(kAnchor.y, 2.65f) && near(kAnchor.z, -14.979f) &&
+          stake.minimum[1] < kUpperSupportWorldY && stake.maximum[1] > kAnchor.y &&
+          kAnchor.z + 0.035f <= stake.minimum[2],
+        "rope anchor must tie to the buried stake with rope-radius clearance");
     check(near(kUpperSupportWorldY, 2.05f) && near(kLowerSupportWorldY, -0.95f),
         "safe support heights changed");
     check(near(kExteriorLanding.z, -12.8f), "exterior landing must clear the rim");
@@ -361,8 +381,9 @@ int main()
     const auto readyGeneration = traversal.Snapshot().generation;
     check(traversal.PublishReadiness(readyGeneration, true) &&
         traversal.TryBegin(readyGeneration, true, true), "ready claimed ascent failed to commit");
-    check(traversal.Snapshot().phase == Phase::Ascent && traversal.Snapshot().deploymentCount == 1,
-        "ascent did not commit after one owned rope deployment");
+    check(traversal.Snapshot().phase == Phase::ApproachAscent &&
+        !traversal.Snapshot().ropeHandsActive && traversal.Snapshot().deploymentCount == 1,
+        "owned ascent must ground and orient the body before loading the first grip");
     bool sawLeftMove = false, sawRightMove = false;
     float maximumTension = 0.0f;
     float maximumStepDistance = 0.0f;
@@ -373,6 +394,7 @@ int main()
     float pullUpStartLeftIndex = -1.0f;
     float pullUpStartRightIndex = -1.0f;
     bool pullupCrossedCoping = false;
+    bool checkedPlantedPauseRecovery = false;
     Vec3 initialGripMidpoint{};
     initialGripMidpoint = {
         (traversal.Snapshot().grippingHandTargets[0].x + traversal.Snapshot().grippingHandTargets[1].x) * 0.5f,
@@ -385,6 +407,35 @@ int main()
         const auto phaseBeforeStep = traversal.Snapshot().phase;
         check(step(), "valid ascent tick rejected");
         state = traversal.Snapshot();
+        if(phaseBeforeStep==Phase::ApproachAscent && state.phase==Phase::Ascent) {
+            initialGripMidpoint = {
+                (state.grippingHandTargets[0].x+state.grippingHandTargets[1].x)*.5f,
+                (state.grippingHandTargets[0].y+state.grippingHandTargets[1].y)*.5f,
+                (state.grippingHandTargets[0].z+state.grippingHandTargets[1].z)*.5f};
+            previousHands=state.grippingHandTargets;
+            const float targetYaw=std::atan2(kAnchor.x-kLowerLanding.x,-(kAnchor.z-kLowerLanding.z));
+            check(std::abs(std::remainder(state.bodyYawRadians-targetYaw,6.28318530718f))<=.041f,
+                  "first loaded grip must use the admitted stake-facing body orientation");
+        }
+        check(std::isfinite(state.plantedPelvisDropMetres) && state.plantedPelvisDropMetres>=0.0f &&
+            state.plantedPelvisDropMetres<=0.72f,"traversal planted stance escaped its finite native range");
+        if(!checkedPlantedPauseRecovery && state.phase==Phase::PullUp && state.plantedPelvisDropMetres>.20f) {
+            auto pausedInput=input;pausedInput.paused=true;
+            check(traversal.Step(pausedInput) && traversal.Snapshot().ropeNodes==state.ropeNodes &&
+                traversal.Snapshot().grippingHandTargets==state.grippingHandTargets &&
+                traversal.Snapshot().playerPosition==state.playerPosition &&
+                traversal.Snapshot().bodyYawRadians==state.bodyYawRadians &&
+                traversal.Snapshot().plantedPelvisDropMetres==state.plantedPelvisDropMetres,
+                "pause advanced the loaded planted stance, grips or physical rope");
+            auto recovered=traversal;recovered.RecoverForReconstruction();
+            const auto& safe=recovered.Snapshot();
+            check(safe.phase==Phase::LowerSafe && safe.playerPosition==kLowerLanding &&
+                safe.plantedPelvisDropMetres==0 && RescueTorsoOffset(safe)==Vec3{} &&
+                !safe.equipmentStowed && !safe.ropeHandsActive && safe.lanternClaimed &&
+                safe.claimCount==1 && safe.deploymentCount==1 && safe.generation>state.generation,
+                "interrupted planted pull-up must restore the lower safe body/equipment without losing victory");
+            checkedPlantedPauseRecovery=true;
+        }
         checkHandsClearAnchorBeam(state);
         checkRopeClearBlockout(state);
         if (state.ropeHandsActive) checkRopeClearPlayer(state);
@@ -413,6 +464,10 @@ int main()
                 const float handStep = std::sqrt(hx * hx + hy * hy + hz * hz);
                 if (handStep > maximumAscentHandStepDistance) {
                     maximumAscentHandStepDistance = handStep;
+                    if(handStep>0.05f)std::cerr<<"grip_step="<<handStep<<" phase="<<static_cast<unsigned>(state.phase)
+                        <<" index="<<state.grippingRopeNodeIndices[hand]<<" support="<<state.supportWorldY
+                        <<" before="<<previous.x<<","<<previous.y<<","<<previous.z
+                        <<" after="<<current.x<<","<<current.y<<","<<current.z<<'\n';
                 }
             }
         }
@@ -477,8 +532,8 @@ int main()
         check(anchorClearance >= 0.28f,
             "loaded traversal root entered the cantilever anchor body-clearance radius");
         if (state.ropeHandsActive) {
-            check(state.playerPosition.z >= kAnchor.z + 0.30f - 0.001f,
-                "loaded traversal root crossed behind the authored rope-front support plane");
+            check(state.playerPosition.x <= kAnchor.x - 0.30f + 0.001f,
+                "loaded traversal root crossed the side stake body-clearance plane");
         }
         if (state.playerPosition.z >= kCopingZMin && state.playerPosition.z <= kCopingZMax) {
             pullupCrossedCoping = true;
@@ -544,6 +599,8 @@ int main()
     check(!state.equipmentStowed && traversal.CanInteract(), "upper landing not interactable or equipment still stowed");
     checkHandsClearAnchorBeam(state);
     check(!state.ropeHandsActive, "upper safe landing must release both rope hands");
+    check(checkedPlantedPauseRecovery && state.plantedPelvisDropMetres==0 && RescueTorsoOffset(state)==Vec3{},
+        "completed pull-up must leave no traversal torso displacement active");
 
     check(traversal.Request(), "upper safe endpoint did not accept descent interaction");
     const auto descentGeneration = traversal.Snapshot().generation;
@@ -676,6 +733,15 @@ int main()
         state.firstAscentCompleted,
         "reconstruction recovery redeployed or lost the already paid-out rope/ownership");
     check(!traversal.PublishReadiness(oldGeneration, true), "pre-reconstruction readiness callback accepted");
+    for(std::size_t hand=0;hand<2u;++hand) {
+        const float index=state.grippingRopeNodeIndices[hand];
+        const auto a=static_cast<std::size_t>(index),b=std::min(a+1u,kRopeNodeCount-1u);
+        const float t=index-static_cast<float>(a);
+        check(near(state.grippingHandTargets[hand].x,state.ropeNodes[a].x+(state.ropeNodes[b].x-state.ropeNodes[a].x)*t,.0001f) &&
+              near(state.grippingHandTargets[hand].y,state.ropeNodes[a].y+(state.ropeNodes[b].y-state.ropeNodes[a].y)*t,.0001f) &&
+              near(state.grippingHandTargets[hand].z,state.ropeNodes[a].z+(state.ropeNodes[b].z-state.ropeNodes[a].z)*t,.0001f),
+              "reconstruction must immediately republish grips against the preserved rope nodes");
+    }
 
     // A blocked ascent returns to the lower safe point; a blocked descent returns to exterior upper support.
     check(traversal.Request(), "recovered lower state was not interactable");
@@ -713,6 +779,37 @@ int main()
         traversal.Snapshot().supportWorldY == beforePause.supportWorldY,
         "pause advanced traversal");
     input.paused = false;
+    for(const bool upper:{false,true}) {
+        auto blocked=traversal;
+        if(!upper) {
+            // Preserve the paid-out rope while choosing the other known safe
+            // side through the same recovery authority, without redeployment.
+            check(blocked.Request(),"blocked-approach lower fixture could not request descent");
+            const auto g=blocked.Snapshot().generation;
+            blocked.PublishReadiness(g,true);blocked.TryBegin(g,true,true);
+            auto descent=input;descent.contactBlocked=false;
+            for(int tick=0;tick<700 && blocked.Snapshot().phase!=Phase::LowerSafe;++tick)
+                blocked.Step(descent);
+        }
+        auto approach=input;approach.contactBlocked=false;
+        const auto endpoint=upper?kExteriorLanding:kLowerLanding;
+        approach.playerPosition={endpoint.x-.35f,endpoint.y,endpoint.z};
+        approach.supportWorldY=endpoint.y;
+        blocked.Step(approach);
+        const auto safe=blocked.Snapshot().playerPosition;
+        check(blocked.Request(),"offset blocked-approach request was not eligible");
+        const auto g=blocked.Snapshot().generation;
+        blocked.PublishReadiness(g,true);blocked.TryBegin(g,true,true);
+        blocked.Step(approach);
+        check(blocked.Snapshot().phase==(upper?Phase::ApproachDescent:Phase::ApproachAscent),
+              "offset fixture must still be approaching before its collision abort");
+        approach.contactBlocked=true;blocked.Step(approach);
+        check(blocked.Snapshot().playerPosition==safe && !blocked.Snapshot().equipmentStowed &&
+              blocked.Snapshot().supportWorldY==endpoint.y && !blocked.Snapshot().ropeHandsActive &&
+              blocked.Snapshot().phase==(upper?Phase::UpperSafe:Phase::LowerSafe),
+              "blocked approach must restore its actual grounded request pose and equipment");
+        check(!blocked.PublishReadiness(g,true),"blocked approach retained a stale readiness generation");
+    }
     input.playerPosition.x = std::numeric_limits<float>::quiet_NaN();
     check(!traversal.Step(input), "nonfinite player input accepted");
     check(traversal.Snapshot().playerPosition.x == beforePause.playerPosition.x,

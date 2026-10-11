@@ -1832,9 +1832,9 @@ bool SkinnedMeshAsset::EvaluatePlayerPose(
                 return false;
             }
             const Vec3 direction = Normalise(request);
-            // The imported player is +Z forward. A small outward preference
-            // leaves the knees separated while both feet keep their clip pose.
-            const Vec3 pole{side == 0u ? 0.2f : -0.2f, 0.0f, 1.0f};
+            // The imported player is +Z forward. A supported squat opens the
+            // knees outward while both feet retain their exact clip pose.
+            const Vec3 pole{side == 0u ? 1.0f : -1.0f, 0.0f, 1.0f};
             Vec3 projectedPole = Subtract(pole, Scale(direction, Dot(pole, direction)));
             if (Length(projectedPole) < 0.0001f)
             {

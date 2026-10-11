@@ -64,9 +64,24 @@ struct DevelopmentCheckpoint
     // Chapter-only diagnostic seed: accepted lethal hit, then real fixed ticks.
     std::uint32_t keeperDeathFixedTicks = 0u;
     bool raisesLanternForCompanion = false;
+    // Real fixed-step traversal capture: 1 ascent, 2 folded pull-up,
+    // 3 return grip/backoff, 4 second ascent. No authored root teleport.
+    std::uint8_t rescueTraversalCapture = 0u;
 };
 
-inline constexpr std::array<DevelopmentCheckpoint, 89u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 93u> kDevelopmentCheckpoints{{
+    {.id=210,.name="chapter-stake-ascent",.baseShowcaseCheckpointId=11,
+     .cameraX=-33.7f,.cameraZ=-15.2f,.yaw=2.35619449f,.pitch=-.32f,
+     .stagesRescueExterior=true,.rescueTraversalCapture=1u},
+    {.id=211,.name="chapter-stake-pullup",.baseShowcaseCheckpointId=11,
+     .cameraX=-33.7f,.cameraZ=-15.2f,.yaw=2.35619449f,.pitch=-.32f,
+     .stagesRescueExterior=true,.rescueTraversalCapture=2u},
+    {.id=212,.name="chapter-stake-descent",.baseShowcaseCheckpointId=11,
+     .cameraX=-33.7f,.cameraZ=-14.6f,.yaw=1.57079632679f,.pitch=-.32f,
+     .stagesRescueExterior=true,.rescueTraversalCapture=3u},
+    {.id=213,.name="chapter-stake-repeat-ascent",.baseShowcaseCheckpointId=11,
+     .cameraX=-33.7f,.cameraZ=-15.2f,.yaw=2.35619449f,.pitch=-.32f,
+     .stagesRescueExterior=true,.rescueTraversalCapture=4u},
     {.id = 208, .name = "chapter-kit-departure", .baseShowcaseCheckpointId = 11,
      .cameraX = -28.7f, .cameraZ = -5.8f, .yaw = 1.57079632679f, .pitch = -0.10f,
      .stagesRescueExterior = true, .exteriorRouteStation = 3u, .keeperDeathFixedTicks = 240u,

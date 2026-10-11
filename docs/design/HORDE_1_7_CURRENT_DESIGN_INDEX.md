@@ -377,3 +377,23 @@ Ordinary gameplay still uses zero, and inspected Pipeline/Query normal frames ar
 pixel-identical. This is numerical capability evidence, not an integrated or
 visually accepted rope pose. Anchor/rim physics, snapshot/camera/collision and
 solved-hips equipment/light integration remain required before enabling it.
+
+### Grounded stake traversal integrated (12 October)
+
+The [grounded stake milestone](../evidence/2026-10-12-ground-stake-traversal/README.md)
+now supersedes the pending anchor/pose integration above. The overhead cantilever
+is replaced by a buried short iron stake with an attachment collar. The line
+contacts the real shaft/apron; bounded planted pull-up and separately authored
+descent retain actual grip targets, boots, body-mounted lantern/light and safe
+equipment restoration. Grounded approach finishes body alignment before load;
+failed approach and reconstruction preserve safe-side ownership and generations.
+Both RT backends have inspected actual frozen ascent/pull-up/descent/repeat frames.
+The hand views remain dark/tightly framed and owner visual/feel acceptance is open.
+
+This is not GPU streaming or chapter completion. Shared geometry/textures are
+still resident; true two-way zone resource lifetimes, graveyard composition,
+remaining prepared woodland dressing, complete chapter gallery and sustained
+measurements are required. The final source/Android build is not a new device
+install. Phone Current/Higher and saved Lower migration, touch/lifecycle and
+owner audio/haptic/traversal acceptance remain pending. Frozen shader limits,
+three actor slots and the 18-layer ceiling remain unchanged.

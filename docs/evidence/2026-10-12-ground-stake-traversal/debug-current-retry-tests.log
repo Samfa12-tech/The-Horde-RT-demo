@@ -1,0 +1,70 @@
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+      Start  19: horde_rt_graphics_windows_persistence_tests
+ 1/29 Test  #19: horde_rt_graphics_windows_persistence_tests ..............   Passed    0.17 sec
+      Start  50: horde_rt_world_route_foundation_tests
+ 2/29 Test  #50: horde_rt_world_route_foundation_tests ....................   Passed    6.07 sec
+      Start  51: horde_rt_vertical_support_tests
+ 3/29 Test  #51: horde_rt_vertical_support_tests ..........................   Passed    4.21 sec
+      Start  52: horde_rt_held_item_vertical_support_rig_tests
+ 4/29 Test  #52: horde_rt_held_item_vertical_support_rig_tests ............   Passed    1.97 sec
+      Start  53: horde_rt_player_directional_rig_tests
+ 5/29 Test  #53: horde_rt_player_directional_rig_tests ....................   Passed    5.14 sec
+      Start  59: horde_rt_scene_record_observation_tests
+ 6/29 Test  #59: horde_rt_scene_record_observation_tests ..................   Passed    1.57 sec
+      Start  73: horde_rt_version_contract_incremental_configure_tests
+ 7/29 Test  #73: horde_rt_version_contract_incremental_configure_tests ....   Passed   11.66 sec
+      Start  76: horde_rt_player_animation_tests
+ 8/29 Test  #76: horde_rt_player_animation_tests ..........................   Passed    2.89 sec
+      Start  81: horde_rt_development_static_asset_tests
+ 9/29 Test  #81: horde_rt_development_static_asset_tests ..................***Failed    4.18 sec
+FAIL: development registry retains prior views plus two bounded Kit inspections
+1 development static asset assertion(s) failed
+
+      Start  99: horde_rt_rayquery_compute_shader_tests
+10/29 Test  #99: horde_rt_rayquery_compute_shader_tests ...................   Passed   47.00 sec
+      Start 100: horde_rt_pipeline_policy_fence_tests
+11/29 Test #100: horde_rt_pipeline_policy_fence_tests .....................   Passed   56.25 sec
+      Start 104: horde_rt_pipeline_policy_execution_tests
+12/29 Test #104: horde_rt_pipeline_policy_execution_tests .................   Passed   71.26 sec
+      Start 107: horde_rt_static_preparation_lod_policy_tests
+13/29 Test #107: horde_rt_static_preparation_lod_policy_tests .............   Passed    5.34 sec
+      Start 109: horde_rt_static_preparation_colliding_lod_policy_tests
+14/29 Test #109: horde_rt_static_preparation_colliding_lod_policy_tests ...   Passed    8.27 sec
+      Start 110: horde_rt_dielectric_topology_tool_tests
+15/29 Test #110: horde_rt_dielectric_topology_tool_tests ..................   Passed    3.49 sec
+      Start 113: horde_rt_version_contract_windows_powershell_tests
+16/29 Test #113: horde_rt_version_contract_windows_powershell_tests .......   Passed    1.69 sec
+      Start 144: horde_rt_desktop_controller_input_tests
+17/29 Test #144: horde_rt_desktop_controller_input_tests ..................   Passed    2.12 sec
+      Start 161: horde_rt_skinned_arm_reference_tests
+18/29 Test #161: horde_rt_skinned_arm_reference_tests .....................   Passed    3.35 sec
+      Start 162: horde_rt_skinned_character_smoke
+19/29 Test #162: horde_rt_skinned_character_smoke .........................   Passed   42.27 sec
+      Start 165: horde_rt_player_viewmodel_pose_fixtures
+20/29 Test #165: horde_rt_player_viewmodel_pose_fixtures ..................   Passed    2.94 sec
+      Start 166: horde_rt_character_render_slot_smoke
+21/29 Test #166: horde_rt_character_render_slot_smoke .....................   Passed    5.44 sec
+      Start 170: horde_rt_rescue_traversal_tests
+22/29 Test #170: horde_rt_rescue_traversal_tests ..........................   Passed    7.77 sec
+      Start 171: horde_rt_rescue_blockout_import_tests
+23/29 Test #171: horde_rt_rescue_blockout_import_tests ....................   Passed    2.69 sec
+      Start 172: horde_rt_rescue_journey_integration_tests
+24/29 Test #172: horde_rt_rescue_journey_integration_tests ................   Passed   10.76 sec
+      Start 173: horde_rt_chapter_terrain_journey_tests
+25/29 Test #173: horde_rt_chapter_terrain_journey_tests ...................   Passed   27.46 sec
+      Start 175: horde_rt_rescue_source_admission_tests
+26/29 Test #175: horde_rt_rescue_source_admission_tests ...................   Passed    0.09 sec
+      Start 178: horde_rt_kit_audio_tests
+27/29 Test #178: horde_rt_kit_audio_tests .................................   Passed    0.12 sec
+      Start 180: horde_rt_rescue_rig_attachment_tests
+28/29 Test #180: horde_rt_rescue_rig_attachment_tests .....................   Passed   31.29 sec
+      Start 181: horde_rt_rescue_adversarial_regression_tests
+29/29 Test #181: horde_rt_rescue_adversarial_regression_tests .............   Passed   29.55 sec
+
+97% tests passed, 1 tests failed out of 29
+
+Total Test time (real) = 397.07 sec
+
+The following tests FAILED:
+	 81 - horde_rt_development_static_asset_tests (Failed)
+Errors while running CTest

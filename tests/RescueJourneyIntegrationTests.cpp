@@ -6,6 +6,7 @@
 #include "gameplay/traversal/ChapterTerrainMovement.h"
 #include "vulkan/raytracing/SimulationFrameAdapter.h"
 #include "vulkan/raytracing/DevelopmentWorldSceneAdapter.h"
+#include "platform/windows/WindowsCaptureContracts.h"
 #include <cmath>
 #include <iostream>
 using namespace horde::gameplay;
@@ -40,6 +41,54 @@ int main(int argc,char** argv) {
         "Kit reunion requires retired Keeper, grounded companion and completed physical ascent");
   check(state.interaction.heldLightPose==interactions::HeldLightPose::Low,
         "First reunion capture must preserve fresh player-controlled lantern raise");
+  for(const auto name:{"chapter-stake-ascent","chapter-stake-pullup","chapter-stake-descent","chapter-stake-repeat-ascent"}) {
+   GameSimulation motorCapture(captureConfig);
+   for(std::size_t zone=1;zone<kWorldZones.size();++zone)
+    check(motorCapture.PublishChapterTerrain({motorCapture.Snapshot().worldRoute.generation,
+          static_cast<WorldZoneId>(zone)},terrain),"stake capture requires actual native destination terrain readiness");
+   const auto* checkpoint=FindDevelopmentCheckpoint(name);
+   check(checkpoint && StageDevelopmentCheckpointSimulation(motorCapture,*checkpoint),
+         "ground stake inspection must stage the real repeatable fixed-step traversal");
+   const auto& s=motorCapture.Snapshot();
+   check(s.rescue.equipmentStowed && s.rescue.ropeHandsActive && s.rescue.claimCount==1 &&
+         s.rescue.deploymentCount==1 && s.chestReward.phase==interactions::ChestRewardPhase::LanternClaimed,
+         "frozen stake capture must own real grips and one reward/deployment");
+   check(s.playerAnimation.plantedPelvisDropMetres==s.rescue.plantedPelvisDropMetres,
+         "zero-delta capture lost the published traversal stance");
+   using namespace horde::platform::windows;
+   check(HasRescueBodyStowCaptureWitness(s),"actual loaded rope capture lacks authoritative body-stow witness");
+   const auto policy=ClaimedRewardCapturePolicy(name,IsCaptureSwordFullyStowed(s.heldItems[1]),&s);
+   check(policy.requirePlayerPixels && !policy.requireRewardBodyPixels &&
+         !policy.requireRewardRingPixels && !policy.requireSwordPixels &&
+         !policy.permitsCompleteWallRetraction,"loaded capture must preserve arm visibility without requiring rear lantern in primary view");
+   for(unsigned invalid=0;invalid<18u;++invalid) {
+    auto bad=s;
+    if(invalid==0)bad.rescue.ropeHandsActive=false;
+    if(invalid==1)bad.rescue.phase=Phase::UpperSafe;
+    if(invalid==2)bad.rescue.equipmentStowed=false;
+    if(invalid==3)bad.rescue.claimCount=2u;
+    if(invalid==4)bad.rescue.generation=0u;
+    if(invalid==5)bad.rescue.grippingHandTargets[0].x+=.01f;
+    if(invalid==6)bad.rescue.grippingRopeNodeIndices[1]=12.f;
+    if(invalid==7)bad.playerX+=.01f;
+    if(invalid==8)bad.lanternPendulum.initialized=false;
+    if(invalid==9)bad.heldItems[1].visualStowBlend=.9f;
+    if(invalid==10)bad.chestReward.phase=interactions::ChestRewardPhase::LanternAvailable;
+    if(invalid==11)bad.heldItems[0].parentMode=items::HeldItemParentMode::HandSocket;
+    if(invalid==12)bad.rescue.plantedPelvisDropMetres=std::numeric_limits<float>::quiet_NaN();
+    if(invalid==13)bad.rewardLanternWorldFromHinge[12]=std::numeric_limits<float>::infinity();
+    if(invalid==14)bad.rescue.ropeNodes[0].y=std::numeric_limits<float>::quiet_NaN();
+    if(invalid==15)bad.playerAnimation.plantedPelvisDropMetres+=.01f;
+    if(invalid==16)bad.developmentRescueJourney=false;
+    if(invalid==17)bad.interaction.heldLightKind=interactions::HeldLightKind::Torch;
+    check(!HasRescueBodyStowCaptureWitness(bad),"invalid stow/grip/ownership must not admit rear-lantern capture");
+    check(ClaimedRewardCapturePolicy(name,true,&bad).requireRewardBodyPixels,
+          "invalid loaded evidence must keep ordinary held-lantern visibility requirements");
+   }
+   if(checkpoint && checkpoint->rescueTraversalCapture==4u)
+    check(s.rescue.firstAscentCompleted && s.rescue.sawDescent && s.rescue.sawLanding,
+          "repeat-ascent inspection must execute the first round trip before freezing");
+  }
   horde::gameplay::dialogue::CompanionRouteFixture companion;
   for(int tick=0;tick<6000&&companion.State().wait!=horde::gameplay::dialogue::CompanionWait::Lookout;++tick) {
    const auto before=companion.State();
@@ -75,10 +124,10 @@ int main(int argc,char** argv) {
   const float shaftClearance=items::ComputeRewardLanternForwardClearance(kExteriorLanding.x,kExteriorLanding.z,
       0,-1,false,true,kUpperSupportWorldY,terrain.get());
   std::cout<<"shaft carry clearance="<<shaftClearance<<'\n';
-  // This axial view still meets the existing cantilever at 2.36m; empty
-  // space beside it must allow full reach, and the real solid must still stop it.
-  check(shaftClearance>2.30f && shaftClearance<2.40f,
-      "shaft carry must retain the actual cantilever obstruction");
+  // The short solid stake is now in this low carry sweep. Retraction is
+  // legitimate there; the adjacent diagonal ray remains fully clear below.
+  check(shaftClearance>1.67f && shaftClearance<1.69f,
+      "landing carry must stop at the actual stake footprint rather than an absent overhead frame");
   check(items::ComputeRewardLanternForwardClearance(kExteriorLanding.x,kExteriorLanding.z,
       -.35f,-.93675f,false,true,kUpperSupportWorldY,terrain.get())>2.69f,
       "grounded landing carry treats the empty shaft as a full-height wall");

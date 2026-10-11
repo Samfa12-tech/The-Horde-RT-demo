@@ -14,10 +14,10 @@ inline constexpr std::array<OutdoorEffectRegionMarker,2> kOutdoorEffectRegionMar
     {"M: OUTDOOR MIST NOT IMPLEMENTED",{61.0f+horde::gameplay::simulation::kWorldPlanTranslateX,.55f,13.0f+horde::gameplay::simulation::kWorldPlanTranslateZ},false},
     {"F: FIREFLIES NOT IMPLEMENTED",{59.0f+horde::gameplay::simulation::kWorldPlanTranslateX,-.55f,28.0f+horde::gameplay::simulation::kWorldPlanTranslateZ},false}}};
 inline constexpr std::size_t kOutdoorEffectMarkerTriangleCount=76;
-// Original blockout fitting joins the solver's clear underside attachment to
-// the retained cantilever. It is geometry, not a renderer-only rope anchor.
+// Original tie collar joins the solved root to the grounded iron stake.
+// Its underside stays above the native glove envelope at the upper grip.
 inline constexpr RescueBlockoutBox kRescueAnchorCollar{
-    {{-33.74f,3.67f,-15.54f}},{{-33.66f,3.73f,-15.46f}},0u};
+    {{-33.44f,2.64f,-15.019f}},{{-33.36f,2.69f,-14.75f}},4u};
 inline constexpr std::size_t kRescueAnchorCollarTriangleCount=12;
 inline void AppendRescueJourneyGeometry(DevelopmentWorldGeometry& out) {
     const auto preparationBegin=std::chrono::steady_clock::now();

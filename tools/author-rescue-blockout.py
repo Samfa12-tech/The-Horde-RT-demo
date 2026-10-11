@@ -24,8 +24,8 @@ def read_geometry(header: Path) -> tuple[list[dict], dict, dict]:
         minimum = [float(v.strip().removesuffix("f")) for v in match.group(1).split(",")]
         maximum = [float(v.strip().removesuffix("f")) for v in match.group(2).split(",")]
         blocks.append({"min": minimum, "max": maximum, "materialCode": int(match.group(3))})
-    if len(blocks) != 12:
-        raise ValueError(f"Expected 12 shared box records, parsed {len(blocks)} from {header}")
+    if len(blocks) != 9:
+        raise ValueError(f"Expected 9 grounded-stake box records, parsed {len(blocks)} from {header}")
 
     def named_box(name: str) -> dict:
         match = re.search(rf"kRescueBlockout{name}\s*\{{\s*\{{\{{([^}}]+)\}}\}},\s*\{{\{{([^}}]+)\}}\}},\s*(\d+)u?\s*\}}", text)
@@ -45,7 +45,7 @@ bpy.ops.object.delete(use_global=False)
 for material in list(bpy.data.materials):
     if material.users == 0: bpy.data.materials.remove(material)
 materials = []
-for name, code in (("DryStone", 0), ("MossyStone", 2)):
+for name, code in (("DryStone", 0), ("MossyStone", 2), ("AgedMetal", 4)):
     color = (1,1,1,1)
     mat = bpy.data.materials.new(name)
     mat.diffuse_color = color
@@ -56,7 +56,7 @@ for name, code in (("DryStone", 0), ("MossyStone", 2)):
         bsdf.inputs["Roughness"].default_value = 0.88
     mat["horde_existing_surface_material_code"] = code
     materials.append(mat)
-names = {0:"DryStone", 2:"MossyStone"}
+names = {0:"DryStone", 2:"MossyStone", 4:"AgedMetal"}
 objects = []
 def box(label, spec):
     lo, hi = spec["min"], spec["max"]
@@ -67,7 +67,7 @@ def box(label, spec):
     bpy.ops.mesh.primitive_cube_add(size=1, location=center)
     obj=bpy.context.object; obj.name=label
     obj.dimensions=dimensions; bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
-    code=spec["materialCode"]; obj.data.materials.append(materials[0 if code==0 else 1])
+    code=spec["materialCode"]; obj.data.materials.append(materials[{0:0,2:1,4:2}[code]])
     obj["horde_existing_surface_material_code"]=code
     uv=obj.data.uv_layers.new(name="UVMap")
     face_uv=((0,0),(1,0),(1,1),(0,1))
@@ -110,6 +110,11 @@ bpy.ops.export_scene.gltf(filepath=args["roundtrip"], export_format="GLB", use_s
 
 
 MATERIAL_SOURCE_SPECS = (
+    ("AgedMetal", 4, 4, "rusty_metal_04", {
+        "diff.jpg": "37c6757c5b6b2229f61423c7e5013f970e4dafb48070d35f53ed6d08958ed288",
+        "normal.jpg": "9c432bee334e65e73ff0b20676dd3f0efbed3f91d261a13dc03b9c8c1a4f4eec",
+        "arm.jpg": "b040e35ed5e885d04b465761782a5d0ebd241175f562821f8fba35a12dccb789",
+    }),
     ("DryStone", 0, 0, "medieval_wall_02", {
         "diff.jpg": "c3123e0512b784dbfbb000fbe2cd7b5779c4b577ea2f221db6d59f3dbff2fd10",
         "normal.jpg": "3da467a4b25408892beda4c5d931feaf0b75a5424376f09a33b6356022a63da9",
@@ -152,7 +157,9 @@ def main() -> int:
     parser.add_argument("--output", type=Path, default=None)
     args = parser.parse_args()
     repo = args.repo.resolve()
-    output = (args.output or repo / "assets/source/development-rescue").resolve()
+    output = (args.output or repo / "assets/source/development-rescue-ground-stake-v1").resolve()
+    if output.exists() and any(output.iterdir()):
+        raise FileExistsError(f"Refusing to replace an existing editable source or evidence: {output}")
     output.mkdir(parents=True, exist_ok=True)
     if not args.blender.is_file():
         raise FileNotFoundError(f"Blender executable not found: {args.blender}")
@@ -191,7 +198,7 @@ def main() -> int:
         "metresPerUnit": 1.0,
         "coordinateSystem": {"up": "+Y", "forward": "+Z"},
         "budgets": {"maxVertices": 400, "maxIndices": 600, "maxPrimitives": 4,
-                    "maxMaterials": 2, "maxTextureLayersPerKind": 2},
+                    "maxMaterials": 3, "maxTextureLayersPerKind": 3},
         "lods": [{"name": "lod0", "maxTriangles": 200}],
         "requiredSockets": [],
         "runtimeTextureProfile": {"android": "astc", "windows": "rgba8", "mipmapped": True},
@@ -212,7 +219,7 @@ def main() -> int:
         "coordinateSystem": {"up": "+Y", "forward": "+Z"},
         "geometryHeader": str(header.relative_to(repo)).replace("\\", "/"),
         "geometryRecipe": {
-            "identity": "horde.scene.RescueBlockoutGeometry.v1",
+            "identity": "horde.scene.RescueBlockoutGeometry.grounded-stake.v2",
             "symbols": ["kRescueBlockoutBoxes", "kRescueBlockoutLid", "kRescueBlockoutLanding"],
             "sha256": hashlib.sha256(recipe_bytes).hexdigest()
         },
@@ -220,7 +227,7 @@ def main() -> int:
         "materialPaletteSource": {
             "identity": "horde.world.surface-material-codes.v1",
             "semanticReference": "src/vulkan/raytracing/PresentableTinyRtScene.cpp::enum SurfaceMaterial",
-            "surfaceCodes": {"SurfaceDryStone": 0, "SurfaceMossyStone": 2}
+            "surfaceCodes": {"SurfaceDryStone": 0, "SurfaceMossyStone": 2, "SurfaceAgedMetal": 4}
         },
         "packagePolicy": "Development source only; no runtime package inventory references this directory.",
         "bounds": recipe_bounds,

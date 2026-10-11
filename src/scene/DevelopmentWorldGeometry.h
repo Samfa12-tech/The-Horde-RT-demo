@@ -34,7 +34,9 @@ inline bool ValidateDevelopmentWorldGeometry(const DevelopmentWorldGeometry& geo
     std::array<bool,kWorldZones.size()> owners{};
     for(const auto& triangle:geometry.triangles) {
         const auto owner=static_cast<std::size_t>(triangle.owner);
-        if(owner==0 || owner>=owners.size() || triangle.material>3 || triangle.normal>5) return false;
+        // Grounded rescue stake reuses already-admitted SurfaceAgedMetal=4.
+        // Higher codes (fire/figures/glass/water) are not opaque world dressing.
+        if(owner==0 || owner>=owners.size() || triangle.material>4 || triangle.normal>5) return false;
         owners[owner]=true;
         for(const auto& point:triangle.points) for(float component:point)
             if(!std::isfinite(component)) return false;

@@ -8,6 +8,7 @@
 #include "scene/assets/AssetManifest.h"
 #include "scene/assets/StaticMeshAsset.h"
 #include "scene/RescueBlockoutGeometry.h"
+#include "scene/RescueJourneyGeometry.h"
 #include "vulkan/raytracing/PlayerRenderSlot.h"
 #include "vulkan/raytracing/RescuePlayerRig.h"
 #include "vulkan/raytracing/SimulationFrameAdapter.h"
@@ -162,9 +163,10 @@ bool MakeRescueRigPose(const RtSceneFrameInputs& frame,
 
     // The rescue world-body renderer is rooted on the gameplay support plane;
     // camera eye height is the established support-relative 1.65 m.
-    const Vec3 eye{{frame.cameraX,
-                    PlayerEyeWorldY(frame.playerSupportWorldY),
-                    frame.cameraZ}};
+    const auto offset=RescueTorsoOffset(frame.rescue);
+    const Vec3 eye{{frame.cameraX+offset.x,
+                    PlayerEyeWorldY(frame.playerSupportWorldY)+offset.y,
+                    frame.cameraZ+offset.z}};
     rootWorld = {{frame.cameraX,
                   frame.playerSupportWorldY +
                       slot.BootGroundingOffsetMetres(frame.playerAnimation),
@@ -287,8 +289,18 @@ bool ResolveRigAndAttachments(const SimulationSnapshot& source,
     };
     if (!frame.rescue.ropeHandsActive)
     {
-        const Vec3 eyeWorld{{frame.cameraX, PlayerEyeWorldY(frame.playerSupportWorldY),
-                             frame.cameraZ}};
+        auto shiftedLine=frame;
+        for(auto& target:shiftedLine.rescue.grippingHandTargets) {
+            target.x+=.5f;target.y+=.4f;target.z-=.3f;
+        }
+        horde::gameplay::animation::PlayerAnimationSnapshot shiftedPose;
+        PlayerModelWorldBasis shiftedBasis;Vec3 shiftedRoot{};
+        Check(MakeRescueRigPose(shiftedLine,slot,shiftedPose,shiftedBasis,shiftedRoot,diagnostic) &&
+              shiftedPose.leftIk==ropePose.leftIk && shiftedPose.rightIk==ropePose.rightIk,
+              "hands-free support arms must be independent of the nearby rope grip coordinates");
+        const auto offset=RescueTorsoOffset(frame.rescue);
+        const Vec3 eyeWorld{{frame.cameraX+offset.x, PlayerEyeWorldY(frame.playerSupportWorldY)+offset.y,
+                             frame.cameraZ+offset.z}};
         const std::array<float, 2u> sides{{-1.0f, 1.0f}};
         const std::array<const horde::gameplay::animation::PlayerArmIkTarget*, 2u> arms{{
             &ropePose.leftIk, &ropePose.rightIk}};
@@ -303,8 +315,6 @@ bool ResolveRigAndAttachments(const SimulationSnapshot& source,
             const float freeReach = Distance(shoulderWorld(arms[hand]->shoulder), actual);
             Check(Distance(actual, expected) <= 0.001f,
                   "hands-free apron transition must use the body-relative rescue carry pose");
-            Check(Distance(actual, targetWorld(hand)) > 0.10f,
-                  "hands-free support pose must not claim a solved rope grip");
             Check(freeReach <= kPlayerAnatomicalHandReachLimitMetres,
                   "hands-free support pose must remain within admitted anatomical reach");
         }
@@ -324,10 +334,15 @@ bool ResolveRigAndAttachments(const SimulationSnapshot& source,
             maximumRightReach = rightReach;
             maximumRightReachPhase = frame.rescue.phase;
         }
+        static unsigned reachDiagnostics=0u;
+        if((leftReach>kPlayerAnatomicalHandReachLimitMetres || rightReach>kPlayerAnatomicalHandReachLimitMetres) && reachDiagnostics++<4u)
+            std::cerr<<"reach phase="<<static_cast<unsigned>(frame.rescue.phase)<<" root="<<root[0]<<","<<root[1]<<","<<root[2]
+                     <<" yaw="<<frame.rescue.bodyYawRadians<<" grips="<<frame.rescue.grippingRopeNodeIndices[0]<<","<<frame.rescue.grippingRopeNodeIndices[1]
+                     <<" reaches="<<leftReach<<","<<rightReach<<'\n';
         Check(leftReach <= kPlayerAnatomicalHandReachLimitMetres &&
                   rightReach <= kPlayerAnatomicalHandReachLimitMetres,
               "both solved rope grips must remain within the admitted imported forearm reach");
-        const auto& anchorBeam = horde::scene::kRescueBlockoutBoxes[11];
+        const auto& anchorBeam = horde::scene::kRescueBlockoutBoxes[8];
         for (std::size_t hand = 0u; hand < frame.rescue.grippingHandTargets.size(); ++hand)
         {
             const Vec3 target = targetWorld(hand);
@@ -337,16 +352,27 @@ bool ResolveRigAndAttachments(const SimulationSnapshot& source,
                 target[2] <= anchorBeam.maximum[2] + 0.04f;
             Check(!insideBeamFootprint || target[1] + 0.04f <= anchorBeam.minimum[1] ||
                       target[1] - 0.04f >= anchorBeam.maximum[1],
-                  "active rope hand target must clear the solid cantilever beam by 40 mm");
+                  "active rope hand target must clear the solid stake by 40 mm");
         }
     }
     const float anchorRootDistance = std::hypot(frame.rescue.ropeNodes[0].x - root[0],
                                                  frame.rescue.ropeNodes[0].z - root[2]);
-    Check(anchorRootDistance >= 0.28f,
-          "the cantilever anchor and rope must clear the admitted body radius and margin");
+    const auto& stake=horde::scene::kRescueBlockoutBoxes[8];
+    const auto torso=horde::gameplay::traversal::RescueTorsoOffset(frame.rescue);
+    // A grounded lower-room approach is below the stake. A planar distance to
+    // its elevated tie is not a collision. Check the actual solid when their
+    // vertical extents overlap; every imported body vertex is also tested below.
+    if(root[1]+1.68f+torso.y>stake.minimum[1] && root[1]<stake.maximum[1]) {
+        const float x=root[0]+torso.x,z=root[2]+torso.z;
+        Check(std::hypot(x-std::clamp(x,stake.minimum[0],stake.maximum[0]),
+                         z-std::clamp(z,stake.minimum[2],stake.maximum[2]))>=.22f-.001f,
+              "actual grounded stake must clear the overlapping player capsule");
+    }
+    if(frame.rescue.ropeHandsActive)
+        Check(anchorRootDistance >= 0.28f,"loaded rope anchor retains body-radius stand-off");
     if (frame.rescue.ropeHandsActive)
-        Check(root[2] >= frame.rescue.ropeNodes[0].z + 0.30f - 0.001f,
-              "the loaded player root must remain in front of the authored rope support plane");
+        Check(root[0] <= frame.rescue.ropeNodes[0].x - 0.30f + 0.001f,
+              "the loaded player root must remain clear of the side stake support plane");
 
     bool poseUpdated = false;
     if (!slot.PreparePose(ropePose, tick,
@@ -361,6 +387,43 @@ bool ResolveRigAndAttachments(const SimulationSnapshot& source,
     Check(slot.LeftSocketErrorMetres() <= kPlayerGripSocketToleranceMetres &&
               slot.RightSocketErrorMetres() <= kPlayerGripSocketToleranceMetres,
           "actual imported left/right Grip sockets must meet the authored rope or hands-free targets");
+    bool meshClear=true;
+    bool releasedFeetSupported=true;
+    float minimumBodyY=std::numeric_limits<float>::infinity();
+    Vec3 firstPenetration{};
+    std::size_t firstVertex=0u,vertexIndex=0u;
+    for(const auto& vertex:slot.UniqueVertices())
+    {
+        const auto offset=PlayerModelVectorToWorld(basis,
+            {{vertex.position[0],vertex.position[1],vertex.position[2]}});
+        const Vec3 world{{root[0]+offset[0],root[1]+offset[1],root[2]+offset[2]}};
+        minimumBodyY=std::min(minimumBodyY,world[1]);
+        const auto penetrates=[&](const horde::scene::RescueBlockoutBox& box) {
+            return world[0]>box.minimum[0]+.001f && world[0]<box.maximum[0]-.001f &&
+                world[1]>box.minimum[1]+.001f && world[1]<box.maximum[1]-.001f &&
+                world[2]>box.minimum[2]+.001f && world[2]<box.maximum[2]-.001f;
+        };
+        bool clear=true;
+        for(const auto& box:horde::scene::kRescueBlockoutBoxes) clear=clear&&!penetrates(box);
+        clear=clear&&!penetrates(horde::scene::kRescueBlockoutLanding);
+        clear=clear&&!penetrates(horde::scene::kRescueAnchorCollar);
+        if(meshClear&&!clear){firstPenetration=world;firstVertex=vertexIndex;}
+        meshClear=meshClear&&clear;
+        if(!frame.rescue.ropeHandsActive && frame.rescue.phase==Phase::PullUp &&
+           world[1]<frame.playerSupportWorldY+.20f)
+            releasedFeetSupported=releasedFeetSupported&&horde::scene::RescueLandingContains(world[0],world[2]);
+        ++vertexIndex;
+    }
+    if(!meshClear)std::cerr<<"mesh_contact phase="<<static_cast<unsigned>(frame.rescue.phase)
+        <<" root="<<root[0]<<","<<root[1]<<","<<root[2]<<" yaw="<<frame.rescue.bodyYawRadians
+        <<" drop="<<frame.rescue.plantedPelvisDropMetres<<" vertexId="<<firstVertex<<" vertex="<<firstPenetration[0]<<","
+        <<firstPenetration[1]<<","<<firstPenetration[2]
+        <<" grips="<<frame.rescue.grippingHandTargets[0].x<<","<<frame.rescue.grippingHandTargets[0].y<<","<<frame.rescue.grippingHandTargets[0].z
+        <<" / "<<frame.rescue.grippingHandTargets[1].x<<","<<frame.rescue.grippingHandTargets[1].y<<","<<frame.rescue.grippingHandTargets[1].z<<'\n';
+    Check(meshClear,"actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids");
+    Check(releasedFeetSupported,"rope release requires the actual boot envelope on the apron, not only its root centre");
+    Check(minimumBodyY>=frame.playerSupportWorldY-.001f,
+        "planted rescue body/boots must stay above their authoritative support plane");
 
     const auto leftGrip = WorldGripFromSnapshot(frame.rescue, 0u);
     const auto rightGrip = WorldGripFromSnapshot(frame.rescue, 1u);
@@ -859,6 +922,12 @@ int main(int argc,char** argv)
         input.yawRadians += 0.45f;
         simulation.StepFixed(input);
     }
+    for(int tick=0;tick<80 && simulation.Snapshot().rescue.phase==Phase::ApproachAscent;++tick) {
+        Check(!simulation.Snapshot().rescue.ropeHandsActive,
+              "bounded body turn must keep both hands free on lower safe support");
+        sampleCurrent();
+        simulation.StepFixed(input);
+    }
     Check(simulation.Snapshot().rescue.phase == Phase::Ascent,
           "first rope sample must come from a loaded ascent snapshot");
     sampleCurrent();
@@ -934,8 +1003,7 @@ int main(int argc,char** argv)
     {
         simulation.StepFixed(input);
         ++descentCrossingTicks;
-        if (simulation.Snapshot().rescue.ropeHandsActive ||
-            simulation.Snapshot().rescue.phase == Phase::Descent)
+        if (simulation.Snapshot().rescue.equipmentStowed)
             sampleCurrent();
     }
     Check(simulation.Snapshot().heldItems[0].detached &&

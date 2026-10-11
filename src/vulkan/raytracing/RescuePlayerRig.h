@@ -27,6 +27,8 @@ inline bool ApplyRescueRopeRigTargets(
     if (!finite(rootWorld) || !finite(eyeWorld) ||
         !finite(modelBasis.modelXInWorld) || !finite(modelBasis.modelYInWorld) ||
         !finite(modelBasis.modelZInWorld) || !std::isfinite(rescue.bodyYawRadians) ||
+        !std::isfinite(rescue.plantedPelvisDropMetres) || rescue.plantedPelvisDropMetres<0.0f ||
+        rescue.plantedPelvisDropMetres>horde::scene::kMaximumPlayerPelvisDropMetres ||
         !std::isfinite(rescue.grippingHandTargets[0].x) ||
         !std::isfinite(rescue.grippingHandTargets[0].y) ||
         !std::isfinite(rescue.grippingHandTargets[0].z) ||
@@ -59,6 +61,7 @@ inline bool ApplyRescueRopeRigTargets(
     candidate.locomotionTime = 0.0f;
     candidate.swordStowBlend = 1.0f;
     candidate.swordHandGripBlend = 0.0f;
+    candidate.plantedPelvisDropMetres = rescue.plantedPelvisDropMetres;
     const std::array<float, 2u> sides{{-1.0f, 1.0f}};
     std::array<horde::gameplay::animation::PlayerArmIkTarget*, 2u> arms{{
         &candidate.leftIk, &candidate.rightIk}};
@@ -71,9 +74,9 @@ inline bool ApplyRescueRopeRigTargets(
             eyeWorld[2] + bodyRight[2] * sides[hand] * 0.19f}};
         arm.shoulder = worldPointToModel(shoulder);
         arm.pole = worldVectorToModel({{
-            bodyRight[0] * sides[hand] + bodyForward[0],
-            bodyRight[1] * sides[hand] + bodyForward[1],
-            bodyRight[2] * sides[hand] + bodyForward[2]}});
+            bodyRight[0] * sides[hand] - bodyForward[0],
+            bodyRight[1] * sides[hand] - bodyForward[1],
+            bodyRight[2] * sides[hand] - bodyForward[2]}});
         const std::array<float, 3u> handRight{{
             bodyRight[0] * sides[hand], 0.0f, bodyRight[2] * sides[hand]}};
         const std::array<float, 3u> handZ{{

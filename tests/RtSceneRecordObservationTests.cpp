@@ -259,8 +259,12 @@ int main()
     ok &= Require(anchor.x>=kRescueAnchorCollar.minimum[0] && anchor.x<=kRescueAnchorCollar.maximum[0] &&
                   anchor.y>=kRescueAnchorCollar.minimum[1] && anchor.y<=kRescueAnchorCollar.maximum[1] &&
                   anchor.z>=kRescueAnchorCollar.minimum[2] && anchor.z<=kRescueAnchorCollar.maximum[2] &&
-                  kRescueAnchorCollar.maximum[1]>=kRescueBlockoutBoxes[11].minimum[1],
-                  "actual clear solver anchor remains inside a retained fitting joined to the cantilever");
+                  kRescueAnchorCollar.minimum[0]>=kRescueBlockoutBoxes[8].minimum[0] &&
+                  kRescueAnchorCollar.maximum[0]<=kRescueBlockoutBoxes[8].maximum[0] &&
+                  kRescueAnchorCollar.minimum[1]>=kRescueBlockoutBoxes[8].minimum[1] &&
+                  kRescueAnchorCollar.maximum[1]<=kRescueBlockoutBoxes[8].maximum[1] &&
+                  kRescueAnchorCollar.maximum[2]>=kRescueBlockoutBoxes[8].minimum[2],
+                  "actual solver anchor remains inside a retained fitting joined to the grounded stake");
     horde::gameplay::traversal::RescueTraversalSnapshot rope{};
     constexpr std::array<RescueRopePoint,6> cardinal{{{0,1,0},{0,-1,0},{1,0,0},{-1,0,0},{0,0,1},{0,0,-1}}};
     for(unsigned shape=0;shape<3;++shape) {

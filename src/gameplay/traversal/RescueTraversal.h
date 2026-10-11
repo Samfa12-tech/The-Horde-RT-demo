@@ -3,6 +3,7 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <cmath>
 
 namespace horde::gameplay::traversal {
 
@@ -19,23 +20,17 @@ inline constexpr float kCopingTopWorldY = 2.23f;
 inline constexpr float kCopingClearanceSupportWorldY = 2.28f;
 inline constexpr float kCopingZMin = -13.76f;
 inline constexpr float kCopingZMax = -13.58f;
-// The rope attachment is on the cantilever's clear underside at y=3.678 m:
-// 42 mm below its 3.72 m lower face, preserving the admitted hand clearance.
-// Its x/z remain inside x[-34.9,-32.5], z[-16.6,-13.8]; the exterior
-// landing is one metre beyond the aperture. The approach rises to 2.28 over
-// the 2.23 coping, then settles at 2.05 on the exterior support.
-// Keep the fixed upper anchor 0.3 m in front of the rope-facing body's safe
-// endpoint, so its loaded span and anchor fitting do not run through the
-// player's torso. The lower contact endpoint remains at z=-15.2.
-inline constexpr Vec3 kAnchor{-33.7f, 3.678f, -15.5f};
+// Short stake seated in the actual apron. Its side offset leaves the loaded
+// body clear while the line drapes across the apron edge into the burial shaft.
+inline constexpr Vec3 kAnchor{-33.4f, 2.65f, -14.979f};
 inline constexpr Vec3 kLowerLanding{-33.7f, kLowerSupportWorldY, -15.2f};
-inline constexpr Vec3 kRimLanding{-33.7f, kUpperSupportWorldY, -15.2f};
+inline constexpr Vec3 kRimLanding{-33.7f, kUpperSupportWorldY, -15.30f};
 inline constexpr Vec3 kExteriorLanding{-33.7f, kUpperSupportWorldY, -12.8f};
 // The actual stone apron begins at z=-14.95. Keep the body column at -15.2
 // open until the ascent rope handoff reaches this first supported center.
-inline constexpr Vec3 kApronHandoff{-33.7f, kUpperSupportWorldY, -14.94f};
-inline constexpr float kPullUpLeftGripNodeIndex = 0.40f;
-inline constexpr float kPullUpRightGripNodeIndex = 0.70f;
+inline constexpr Vec3 kApronHandoff{-33.7f, kUpperSupportWorldY, -14.72f};
+inline constexpr float kPullUpLeftGripNodeIndex = 0.20f;
+inline constexpr float kPullUpRightGripNodeIndex = 0.45f;
 inline constexpr std::size_t kRopeNodeCount = 12;
 inline constexpr float kRopeLength = 4.8f;
 inline constexpr float kRopeSegmentRestLength = kRopeLength / (kRopeNodeCount - 1);
@@ -84,6 +79,7 @@ struct RescueTraversalSnapshot {
     Vec3 playerPosition{kLowerLanding};
     float supportWorldY{kLowerSupportWorldY};
     float bodyYawRadians{};
+    float plantedPelvisDropMetres{};
     std::array<Vec3, 2> grippingHandTargets{};
     std::array<float, 2> grippingRopeNodeIndices{8.0f, 9.0f};
     std::array<Vec3, kRopeNodeCount> ropeNodes{};
@@ -107,6 +103,16 @@ struct RescueTraversalSnapshot {
     bool sawDescent{};
     bool sawLanding{};
 };
+
+// Same physical torso displacement for the imported stance, view, listener,
+// explicit IK shoulders and independently carried lantern. Boots/support stay
+// rooted at playerPosition. Ordinary gameplay publishes zero.
+inline Vec3 RescueTorsoOffset(const RescueTraversalSnapshot& s)
+{
+    const float drop = s.equipmentStowed ? s.plantedPelvisDropMetres : 0.0f;
+    return {-0.25f*drop*std::sin(s.bodyYawRadians), -drop,
+             0.25f*drop*std::cos(s.bodyYawRadians)};
+}
 
 // Pure fixed-step gameplay state. The caller publishes this output through
 // the shared simulation snapshot; platform and renderer state remain external.
@@ -140,7 +146,7 @@ public:
 
 private:
     enum class PullUpStage : std::uint8_t { RegripLeft, RegripRight, Handoff, Lift, Cross, Settle };
-    enum class DescentStage : std::uint8_t { Lift, Cross, Settle, Rope };
+    enum class DescentStage : std::uint8_t { Lift, Cross, Settle, Crouch, Back, Rope };
 
     void BeginRequest(bool ascent);
     void AbortRequest();
@@ -155,11 +161,14 @@ private:
     void BeginRopeThrow();
     void UpdateDeploymentReadiness(float contactPlaneWorldY);
     void ResolveSafePlayerContact();
+    void UpdateBodyPresentation();
 
     RescueTraversalSnapshot snapshot_{};
     std::array<Vec3, kRopeNodeCount> previousRopeNodes_{};
     Vec3 gripReferenceWorld_{};
     Vec3 gripReferencePlayerPosition_{kLowerLanding};
+    Vec3 approachSafePosition_{kLowerLanding};
+    float approachSafeSupportWorldY_{kLowerSupportWorldY};
     PullUpStage pullUpStage_{PullUpStage::Lift};
     DescentStage descentStage_{DescentStage::Lift};
     std::uint16_t motorTicks_{};

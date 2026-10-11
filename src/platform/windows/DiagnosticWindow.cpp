@@ -326,6 +326,11 @@ struct ShowcaseCaptureRecord
     bool primaryArmsMayBeOutsideFrame = false;
     bool primaryArmsCeilingRetracted = false;
     float playerSupportWorldY = 0.0f;
+    horde::gameplay::traversal::RescueTraversalSnapshot rescue{};
+    bool rescueBodyStowWitness = false;
+    std::array<float,3u> renderedEyePosition{};
+    horde::gameplay::items::HeldItemTransform publishedLanternHinge{};
+    horde::gameplay::items::HeldItemTransform publishedLanternBody{};
     horde::gameplay::dialogue::CompanionSnapshot chapterCompanion{};
     float keeperDissolve = 0.0f;
     float playerHeightDelta = 0.0f;
@@ -6736,6 +6741,43 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
     {
         const ShowcaseCaptureRecord& capture = captures[index];
         const auto& checkpoint = *capture.checkpoint;
+        std::ostringstream traversalEvidence;
+        const auto& rescue=capture.rescue;
+        const auto vectorJson=[&](const horde::gameplay::traversal::Vec3& v) {
+            traversalEvidence << '[' << v.x << ',' << v.y << ',' << v.z << ']';
+        };
+        traversalEvidence << "{\"phase\":" << static_cast<unsigned>(rescue.phase)
+            << ",\"generation\":" << rescue.generation
+            << ",\"claimCount\":" << rescue.claimCount
+            << ",\"deploymentCount\":" << rescue.deploymentCount
+            << ",\"equipmentStowed\":" << (rescue.equipmentStowed?"true":"false")
+            << ",\"ropeHandsActive\":" << (rescue.ropeHandsActive?"true":"false")
+            << ",\"bodyStowWitness\":" << (capture.rescueBodyStowWitness?"true":"false")
+            << ",\"plantedPelvisDropMetres\":" << rescue.plantedPelvisDropMetres
+            << ",\"bodyYawRadians\":" << rescue.bodyYawRadians
+            << ",\"root\":";
+        vectorJson(rescue.playerPosition);
+        traversalEvidence << ",\"renderedEye\":[" << capture.renderedEyePosition[0] << ','
+            << capture.renderedEyePosition[1] << ',' << capture.renderedEyePosition[2]
+            << "],\"gripNodeIndices\":[" << rescue.grippingRopeNodeIndices[0] << ','
+            << rescue.grippingRopeNodeIndices[1] << "],\"gripTargets\":[";
+        vectorJson(rescue.grippingHandTargets[0]); traversalEvidence << ',';
+        vectorJson(rescue.grippingHandTargets[1]); traversalEvidence << "],\"ropeNodes\":[";
+        for(std::size_t i=0;i<rescue.ropeNodes.size();++i) {
+            if(i)traversalEvidence << ',';
+            vectorJson(rescue.ropeNodes[i]);
+        }
+        traversalEvidence << "],\"publishedLanternHinge\":[";
+        for(std::size_t i=0;i<capture.publishedLanternHinge.size();++i) {
+            if(i)traversalEvidence << ',';
+            traversalEvidence << capture.publishedLanternHinge[i];
+        }
+        traversalEvidence << "],\"publishedLanternBody\":[";
+        for(std::size_t i=0;i<capture.publishedLanternBody.size();++i) {
+            if(i)traversalEvidence << ',';
+            traversalEvidence << capture.publishedLanternBody[i];
+        }
+        traversalEvidence << "]}";
         manifest << "    {\n"
                  << "      \"id\": " << checkpoint.id << ",\n"
                  << "      \"checkpoint\": \"" << JsonEscape(checkpoint.name) << "\",\n"
@@ -6751,6 +6793,7 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
                  << "\", \"finaleSkylightOpenProgress\": " << capture.finaleSkylightOpenProgress << "},\n"
                  << "      \"width\": " << capture.width << ",\n"
                  << "      \"height\": " << capture.height << ",\n"
+                 << "      \"rescueTraversal\": " << traversalEvidence.str() << ",\n"
                   << "      \"honestlyPresentedRtFrame\": true,\n"
                   << "      \"completedFrame\": " << capture.completedFrameEvidenceJson << ",\n"
                   << "      \"indoorDust\": {\"requestedQuality\": "
@@ -7050,6 +7093,15 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         record.torchOverheadLoweringMetres = simulation.heldItemKinematics.torchOverheadLowering;
         record.torchOverheadRetractionMetres = simulation.heldItemKinematics.torchOverheadRetraction;
         record.playerSupportWorldY = simulation.playerSupportWorldY;
+        record.rescue = simulation.rescue;
+        record.rescueBodyStowWitness =
+            horde::platform::windows::HasRescueBodyStowCaptureWitness(simulation);
+        const auto torsoOffset = horde::gameplay::traversal::RescueTorsoOffset(simulation.rescue);
+        record.renderedEyePosition = {simulation.playerX+torsoOffset.x,
+            horde::gameplay::simulation::PlayerEyeWorldY(simulation.playerSupportWorldY)+torsoOffset.y,
+            simulation.playerZ+torsoOffset.z};
+        record.publishedLanternHinge = simulation.rewardLanternWorldFromHinge;
+        record.publishedLanternBody = simulation.lanternPendulum.worldFromBody;
         record.chapterCompanion = simulation.chapterCompanion;
         record.keeperDissolve = simulation.lich.deathDissolveProgress;
         record.playerHeightDelta = simulation.playerHeightDelta;
@@ -7098,7 +7150,7 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
                  horde::gameplay::DevelopmentRewardPose::None);
         const auto claimedRewardPixelPolicy =
             horde::platform::windows::ClaimedRewardCapturePolicy(checkpoint.name,
-                horde::platform::windows::IsCaptureSwordFullyStowed(simulation.heldItems[1]));
+                horde::platform::windows::IsCaptureSwordFullyStowed(simulation.heldItems[1]), &simulation);
         const bool diagnosticPixelCountersAvailable =
             context.rtScene.DiagnosticsAvailability() ==
             horde::vulkan::raytracing::RtDiagnosticAvailability::Available;
