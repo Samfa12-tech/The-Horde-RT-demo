@@ -16,6 +16,15 @@ repairs on PR27 rather than starting another implementation branch.
 
 ## Verified reference and correspondence
 
+**Macro coverage clarification:** the owner additionally requires the full
+[connected-region topo](../../references/horde-1.7/d37f1638/docs/design/world/dungeons/01-connected-region.webp)
+to govern surrounding land in every visible direction. Its generator covers
+East[-150,410], North[-510,440], beyond the local NPZ bounds below. The local
+trail detail must blend into that macro relief; visible distant river/landmark/
+foliage proxies remain nonplayable and use measured LOD. A wider ribbon or clamped
+local heightfield does not meet this requirement. The current design index and
+reference custody note record verified source bytes and remaining integration.
+
 The supplied revision-2 archive is 7,602,193 bytes, SHA-256
 `5b3d1eadb7606e0348f19c9959aa34f901b3c1986350d69f4ebc6a21bc7cba8b`.
 All fifteen entries in its FINAL-MANIFEST match their recorded bytes and hashes.
@@ -148,3 +157,19 @@ whole-world residency. Gate-controlled travel must overlap preparation, commit
 only collision/render-ready destinations, and then retire eligible old resources.
 This is an accepted design direction, not evidence of an implemented streaming
 system or permission to drop off-camera ray/light contributors indiscriminately.
+
+## Regional geometry implemented, chapter still open
+
+Following the owner's macro-map clarification, r21 replaces the runtime terrain
+with joined near/mid/far regional land while preserving the exact local route
+triangles and all tomb apertures. Original macro source and new Blender master
+are retained. Actual count falls from 39,618 to 34,050 triangles; previous runtime
+manifest, shader and texture ceilings are unchanged. The native export/support,
+regional coverage and affected platform checks pass; the inspected gallery and
+strict capture failures are in `docs/evidence/2026-10-11-regional-terrain/README.md`.
+
+Do not treat this as completed woodland, dynamic LOD or streaming. The river and
+lake basins now exist as landform; water surfaces and visible distant landmarks
+still need scoped integration. Dense colliding foliage, graveyard/stake, visible
+Kit, safe third-slot reuse and real GPU retirement remain required. Android
+installation/physical evidence for the new bytes remains pending authorization.

@@ -315,3 +315,14 @@ assets/models/world/runtime/chapter-terrain-v1/*.json text eol=lf
 
 assets/models/world/source/chapter-terrain-r19/*.blend filter=lfs diff=lfs merge=lfs -text
 assets/models/world/source/chapter-terrain-r19/*.json -text whitespace=cr-at-eol
+
+# Preserve pinned regional reference bytes and the new editable derivative.
+docs/references/horde-1.7/d37f1638/docs/design/world/dungeons/** -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+docs/references/horde-1.7/d37f1638/docs/design/world/dungeons/baseline/*.npz filter=lfs diff=lfs merge=lfs -text
+assets/models/world/source/chapter-terrain-r21/*.blend filter=lfs diff=lfs merge=lfs -text
+assets/models/world/source/chapter-terrain-r21/*.json -text whitespace=cr-at-eol
+assets/models/world/source/chapter-terrain-r21/authoring-recipe.executed.py -text whitespace=cr-at-eol
+tools/author-chapter-terrain.py text eol=lf
+tools/chapter_regional_terrain.py text eol=lf
+tools/test-chapter-regional-terrain.py text eol=lf
+tools/validate-chapter-terrain.py text eol=lf

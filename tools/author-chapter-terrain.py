@@ -14,6 +14,8 @@ import sys
 
 import bpy
 import numpy as np
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from chapter_regional_terrain import RegionalTerrain, ring_coordinates, stitch_sides
 
 
 def digest(path):
@@ -31,6 +33,7 @@ def main():
     parser.add_argument('--source-npz', type=Path, required=True)
     parser.add_argument('--output-directory', type=Path, required=True)
     parser.add_argument('--entry-audit', type=Path, help='Audited chapter upper-return geometry; legacy mound otherwise')
+    parser.add_argument('--regional-layout', type=Path, help='Pinned connected-region baseline layout; preserves local interfaces')
     args = parser.parse_args(sys.argv[sys.argv.index('--') + 1:])
     root = args.root.resolve()
     out = args.output_directory.resolve()
@@ -67,13 +70,45 @@ def main():
         np.arange(-30., 49., 1.), np.arange(49., 113., 4.), np.arange(113., 381., 8.),
         [-18.4, -16.82, -16.6, -16.1, -15.2, -14.95, -14.72, -13.8,
          -13.58, -12.8, -12., -11.92, 381.])), 5)))
+    regional = RegionalTerrain(data,args.regional_layout) if args.regional_layout else None
+    rings=[]
+    if regional:
+        # Keep every accepted near-route grid line, but do not extend narrow
+        # aperture stripes across a kilometre of distant scenery.
+        xs=[x for x in xs if -46<=x<=25];zs=[z for z in zs if -30<=z<=49]
+        for distance in range(16,657,16):
+            spacing=4 if distance<=48 else (8 if distance<=160 else 16)
+            rings.append(ring_coordinates((-46-distance,25+distance,-30-distance,49+distance),spacing))
+        for distance in (720,848,1104,1616,2640,4688,8784,12880):
+            rings.append(ring_coordinates((-46-distance,25+distance,-30-distance,49+distance),
+                                          max(32,distance/8)))
     xx, zz = np.meshgrid(xs, zs)
+    grid_shape=xx.shape;grid_count=xx.size
+    outer_points=[];ring_indices=[];outer_index={}
+    for ring in rings:
+        sides=[]
+        for side in ring:
+            indices=[]
+            for point in side:
+                key=tuple(round(float(v),5) for v in point)
+                if key not in outer_index:
+                    outer_index[key]=grid_count+len(outer_points);outer_points.append(key)
+                indices.append(outer_index[key])
+            sides.append(indices)
+        ring_indices.append(sides)
+    if regional:
+        xx=np.concatenate((xx.ravel(),np.array(outer_points)[:,0]))
+        zz=np.concatenate((zz.ravel(),np.array(outer_points)[:,1]))
     u = np.clip((xx - 78.3 - east[0]) / .5, 0, len(east) - 1.00001)
     v = np.clip((126.2 - zz - north[0]) / .5, 0, len(north) - 1.00001)
     ix, iz = u.astype(int), v.astype(int)
     a, b = u - ix, v - iz
     heights = ((1-b) * ((1-a)*filtered[iz, ix] + a*filtered[iz, ix+1]) +
                b * ((1-a)*filtered[iz+1, ix] + a*filtered[iz+1, ix+1])) - 31.55
+    if regional:
+        local_distance=np.maximum.reduce([-46-xx,xx-25,-30-zz,zz-49,np.zeros_like(xx)])
+        blend=smooth01(local_distance/48)
+        heights=heights*(1-blend)+(regional.sample(xx-78.3,126.2-zz)-31.55)*blend
     route = np.array([[-33.7, -12.8, 2.05], [-28.7, -5.8, 1.45],
         [-15.7, .2, .55], [-17.7, 15.2, -.55], [-3.7, 20.2, -.25], [13.3, 36.2, -1.15]])
     # Interpolate through the six approved landmarks, with bounded Hermite
@@ -181,6 +216,13 @@ def main():
     holes = [(-34.9,-32.5,-16.6,-13.8), (-6.7,-4.3,-16.6,-13.8),
              (-2.5,-1.58,-16.1,-14.72)]
     vertices = [(float(x), -float(z), float(y)) for x,z,y in zip(xx.flat,zz.flat,heights.flat)]
+    all_bounds=[[float(xx.min()),float(heights.min()),float(zz.min())],
+                [float(xx.max()),float(heights.max()),float(zz.max())]]
+    # Grid metadata describes the metre-scale chapter core. Outer stitched
+    # triangles have explicit vertices and a distinct cell tag in schema 2.
+    if regional:
+        heights=heights[:grid_count].reshape(grid_shape)
+        grade_distance=grade_distance[:grid_count].reshape(grid_shape)
     faces, materials, cells = [], [], []
     split_vertices = {}
     def crossing(a, da, b, db):
@@ -221,16 +263,20 @@ def main():
                     grade_distance[j+1,i+1]-1.2,grade_distance[j,i+1]-1.2]
             emit_surface((q,q+width,q+width+1),signed[:3],(i,j,0))
             emit_surface((q,q+width+1,q+1),(signed[0],signed[2],signed[3]),(i,j,1))
+    inner_sides=[list(range(width)),[j*width+width-1 for j in range(len(zs))],
+                 list(range((len(zs)-1)*width+width-1,(len(zs)-1)*width-1,-1)),
+                 [j*width for j in range(len(zs)-1,-1,-1)]]
+    for sides in ring_indices:
+        for tri in stitch_sides(inner_sides,sides,vertices):
+            faces.append(tri);materials.append(1);cells.append((-2,-2,-2))
+        inner_sides=sides
     surface_face_count = len(faces)
     # Close only the distant outer perimeter, never extrude every near cell
     # through the tomb. The underside is below all occupied tomb volumes.
     # Apertures still open into their existing authored shafts; no new cap is
     # placed across any skylight or rescue opening.
-    bottom_y = float(math.floor(float(heights.min())) - 5)
-    perimeter = list(range(width))
-    perimeter += [j*width+width-1 for j in range(1,len(zs))]
-    perimeter += list(range((len(zs)-1)*width+width-2,(len(zs)-1)*width-1,-1))
-    perimeter += [j*width for j in range(len(zs)-2,0,-1)]
+    bottom_y = float(math.floor(all_bounds[0][1]) - 5)
+    perimeter = [i for side in inner_sides for i in side[:-1]]
     bottom = []
     for index in perimeter:
         vx, vz, _ = vertices[index]
@@ -245,7 +291,8 @@ def main():
     # segmented wall edges; there is no open underside. Do not fan the fine
     # interface samples hundreds of metres across this plane: those needle
     # triangles produced zero MikkTSpace tangents in the retained r05/r06.
-    corners=[bottom[i] for i in (0,width-1,width+len(zs)-2,2*width+len(zs)-3)]
+    corner_offsets=np.cumsum([0]+[len(side)-1 for side in inner_sides[:-1]])
+    corners=[bottom[i] for i in corner_offsets]
     for triangle in ((corners[0],corners[1],corners[2]),
                      (corners[0],corners[2],corners[3])):
         faces.append(triangle);materials.append(1);cells.append((-1,-1,-1))
@@ -323,12 +370,15 @@ def main():
     bpy.ops.export_scene.gltf(filepath=str(out/(version+'.glb')), export_format='GLB',
         use_selection=True, export_tangents=True, export_animations=False,
         export_cameras=False, export_lights=False, export_extras=True)
-    surface = {'schema':1,'axis':'engine X/Y/Z metres','x':xs,'z':zs,
+    surface = {'schema':2 if regional else 1,'axis':'engine X/Y/Z metres','x':xs,'z':zs,
         'vertices':[(x,y,-z) for x,z,y in vertices],
         'heights':heights.tolist(),'holes':holes,'faces':faces,'cells':cells,'undersideY':bottom_y,
         'surfaceMaterials':materials,'walkable':walkable,'surfaceFaceCount':surface_face_count,
         'routeStations':stations.tolist(),'maxWalkableSlope':.65,
-        'entryEnvelopes':entry_envelopes,'sourceGlbSha256':digest(out/(version+'.glb'))}
+        'entryEnvelopes':entry_envelopes,'sourceGlbSha256':digest(out/(version+'.glb')),
+        'boundsEngine':[[all_bounds[0][0],bottom_y,all_bounds[0][2]],all_bounds[1]],
+        'regional':{'east':[-150,410],'north':[-510,440],'ringCount':len(rings),
+                    'layoutSha256':digest(args.regional_layout)} if regional else None}
     (out/'surface.json').write_text(json.dumps(surface,separators=(',',':'))+'\n')
     # Derive the candidate manifest from actual exporter output, not Blender's
     # pre-split vertex count. This is a new asset envelope, not a renderer cap.
@@ -349,9 +399,11 @@ def main():
         'sourceNpzSha256':expected,'recipeSha256':digest(Path(__file__)),
         'blender':bpy.app.version_string,'vertices':len(vertices),'triangles':len(faces),
         'materials':2,'uvRepeatsPerMetre':{'trail':.42,'forest':.5},'textures':source_textures,
-        'boundsEngine':[[float(xx.min()),bottom_y,float(zz.min())],
-                        [float(xx.max()),float(heights.max()),float(zz.max())]],
-        'gridSpacing':'1m near; 2/4m mid; 8m far; exact shaft/skylight interfaces',
+        'boundsEngine':surface['boundsEngine'],
+        'regional':surface['regional'],
+        'regionalRecipeSha256':digest(Path(__file__).with_name('chapter_regional_terrain.py')) if regional else None,
+        'gridSpacing':('1m near; stitched 4/8/16m regional rings; coarse surrounding envelope beyond 10km ray reach' if regional
+                       else '1m near; 2/4m mid; 8m far; exact shaft/skylight interfaces'),
         'adjustments':['Five-tap separable planning-height smoothing','2.4m graded trail; 6.4m/7m pockets',
           'Clue trail cut into exterior mound shoulder; occupied roofs and rising stairs retained',
           'Banks and retained tomb roof/collapse mound clearance','Exact 2.05m apron and three separate open shafts'],

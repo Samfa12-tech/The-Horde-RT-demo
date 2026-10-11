@@ -72,6 +72,11 @@ def validate(directory):
         return min(p,p[1:]+p[:1],p[2:]+p[:2])
     x,z,h=surface['x'],surface['z'],surface['heights']
     vertices=surface.get('vertices',[(px,h[j][i],pz) for j,pz in enumerate(z) for i,px in enumerate(x)])
+    bounds=surface.get('boundsEngine',[[x[0],surface.get('undersideY',-30),z[0]],
+                                      [x[-1],max(map(max,h)),z[-1]]])
+    for axis in range(3):
+        assert abs(min(v[axis] for v in vertices)-bounds[0][axis])<.001
+        assert abs(max(v[axis] for v in vertices)-bounds[1][axis])<.001
     expected=Counter(triangle([vertices[i] for i in f]) for f in surface['faces'])
     actual=Counter();max_uv_error=0.;min_normal_y=1.;triangles=0
     for node in data['nodes']:
@@ -100,8 +105,7 @@ def validate(directory):
                     # Non-support faces may only close the far outer shell.
                     assert all(abs(v[1]-surface.get('undersideY',-30))<.001 for v in pts) or any(
                         all(abs(v[axis]-bound)<.001 for v in pts)
-                        for axis,bounds in ((0,(x[0],x[-1])),(2,(z[0],z[-1])))
-                        for bound in bounds), 'Interior curtain or reversed support face'
+                        for axis in (0,2) for bound in (bounds[0][axis],bounds[1][axis])), 'Interior curtain or reversed support face'
                 actual[triangle(pts)]+=1;triangles+=1
     assert actual==expected, 'Exported positions/topology/winding differ from support data'
     if 'undersideY' in surface:
@@ -110,7 +114,7 @@ def validate(directory):
     assert len(surface['holes'])==3 and len(surface['cells'])==triangles
     for i,j,_ in surface['cells']:
         if i<0:
-            assert j==-1, 'Invalid shell cell'
+            assert (i,j) == (-1,-1) or (surface['schema']==2 and (i,j)==(-2,-2)), 'Invalid shell/regional cell'
             continue
         px,pz=(x[i]+x[i+1])*.5,(z[j]+z[j+1])*.5
         assert not any(a<px<b and c<pz<d for a,b,c,d in surface['holes']), 'Authored hole covered'
@@ -130,6 +134,47 @@ def validate(directory):
         return (bisect.bisect_right(x,px)-1,bisect.bisect_right(z,pz)-1) in cells
     for px,pz in [(-33.7,-20),(-38,-15.2),(-29,-15.2),(-33.7,-10),(-41,-21),(-27,-21)]:
         assert has_cell(px,pz), 'Missing surrounding ground'
+    regional_checks=0
+    if surface.get('regional'):
+        # Every regional seam must be shared by exactly two oppositely wound
+        # faces. Only the four outer sides and three intentional holes are open
+        # in the surface (the outer sides have separately checked shell faces).
+        edges=Counter();directions=Counter()
+        for face in surface['faces'][:surface['surfaceFaceCount']]:
+            for a,b in zip(face,face[1:]+face[:1]):
+                key=tuple(sorted((a,b)));edges[key]+=1;directions[key]+=1 if a<b else -1
+        for (a,b),count in edges.items():
+            assert count<=2, 'Overlapping regional terrain topology'
+            if count==2:
+                assert directions[(a,b)]==0, 'Regional seam winding differs'
+                continue
+            p,q=vertices[a],vertices[b]
+            outer=any(abs(p[axis]-edge)<.001 and abs(q[axis]-edge)<.001
+                      for axis in (0,2) for edge in (bounds[0][axis],bounds[1][axis]))
+            aperture=any((abs(p[0]-side)<.001 and abs(q[0]-side)<.001 and
+                          back-.001<=p[2]<=front+.001 and back-.001<=q[2]<=front+.001)
+                         or (abs(p[2]-end)<.001 and abs(q[2]-end)<.001 and
+                             lo-.001<=p[0]<=hi+.001 and lo-.001<=q[0]<=hi+.001)
+                         for lo,hi,back,front in surface['holes'] for side in (lo,hi) for end in (back,front))
+            assert outer or aperture, 'Crack between chapter and regional terrain'
+        # Actual triangles must cover all four macro corners, landmark regions,
+        # and each compass bearing from the landing, not only metadata bounds.
+        probes=[(e+78.3,126.2-n) for e,n in [(-150,-510),(-150,440),(410,-510),(410,440),
+                  (306,308),(230,-40),(50,-350),(70,110),(0,0)]]
+        for radius in (25,75,250,750,2500,9000):
+            probes.extend((-33.7+radius*math.cos(i*math.pi/4),-12.8+radius*math.sin(i*math.pi/4)) for i in range(8))
+        for px,pz in probes:
+            found=False
+            for face in surface['faces'][:surface['surfaceFaceCount']]:
+                a,b,c=(vertices[n] for n in face)
+                if not min(a[0],b[0],c[0])-.001<=px<=max(a[0],b[0],c[0])+.001 or not min(a[2],b[2],c[2])-.001<=pz<=max(a[2],b[2],c[2])+.001:continue
+                den=(b[2]-c[2])*(a[0]-c[0])+(c[0]-b[0])*(a[2]-c[2])
+                if abs(den)<1e-12:continue
+                u=((b[2]-c[2])*(px-c[0])+(c[0]-b[0])*(pz-c[2]))/den
+                v=((c[2]-a[2])*(px-c[0])+(a[0]-c[0])*(pz-c[2]))/den
+                if min(u,v,1-u-v)>=-1e-5:found=True;break
+            assert found, f'Missing actual regional terrain at {px},{pz}'
+            regional_checks+=1
     # Query the exported triangles, including split trail-material faces. A
     # centreline/pad receipt alone cannot prove that the capsule fits the path.
     import bisect
@@ -194,6 +239,7 @@ def validate(directory):
             'occupiedTombVolumesChecked':9,'thinDiagonalClippingNegativeCases':True,
             'entryRoofTriangleIntersections':entry_intersections,
             'minimumEntryRoofCoverMetres':minimum_entry_cover if entry_intersections else None,
+            'regionalTriangleCoverageProbes':regional_checks,
             'glbSha256':surface['sourceGlbSha256'],'visualAcceptance':False}
 
 

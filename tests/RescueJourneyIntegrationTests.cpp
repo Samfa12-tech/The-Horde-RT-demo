@@ -23,6 +23,22 @@ int main(int argc,char** argv) {
  }
  int cases=0,failures=0;
  auto check=[&](bool b,const char* m){++cases;if(!b){++failures;std::cerr<<m<<'\n';}};
+ if(authored) {
+  // Macro terrain must be actual imported triangles in every direction, not
+  // merely an enlarged support rectangle or the clamped local planning sheet.
+  for(float radius:{25.f,75.f,250.f,750.f,2500.f,9000.f})for(int bearing=0;bearing<8;++bearing) {
+   const float angle=bearing*.785398163397f;
+   check(terrain->Query(-33.7f+radius*std::cos(angle),-12.8f+radius*std::sin(angle)).found,
+         "regional terrain missing on a landing compass bearing");
+  }
+  for(const auto point:std::array<std::array<float,2>,4>{{{{-71.7f,-313.8f}},{{488.3f,-313.8f}},
+                                                                     {{-71.7f,636.2f}},{{488.3f,636.2f}}}})
+   check(terrain->Query(point[0],point[1]).found,"connected-region map corner has no native ground");
+  const auto lake=terrain->Query(128.3f,476.2f),ridge=terrain->Query(384.3f,-181.8f);
+  check(lake.found && lake.worldY < -34.f,"regional lake basin no longer lies below proposed water datum");
+  check(ridge.found && ridge.worldY > 40.f,"regional northeast ridge was flattened to the local sheet edge");
+  check(terrain->TriangleCount()<=39618u,"regional land exceeded the existing terrain derivative triangle envelope");
+ }
  InputSnapshot input;input.damageEnabled=false;
  // The real development launch does not seed missing health, even while paused
  // or after a new-game reset. HUD rendering must consume this published tuple.

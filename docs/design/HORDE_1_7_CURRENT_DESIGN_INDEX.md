@@ -147,6 +147,29 @@ discarding corpse state or using camera visibility alone as residency policy.
 
 ## Map correspondence and terrain handoff
 
+**Later owner clarification (11 October):** the
+[macro regional topo](../references/horde-1.7/d37f1638/docs/design/world/dungeons/01-connected-region.webp)
+defines the whole surrounding terrain, together with the local forest topo.
+Standing anywhere on the forest path should reveal real terrain in every
+direction, including behind the rope; visible distant rivers, foliage and
+landmark shells belong to that geography. Use aggressively simplified distant
+geometry/LOD where measured, not exposed ribbon edges, a flat regional shortcut
+or a scenery wall. This is background continuity, not permission to make later
+dungeons or Bellwether playable in 1.7.
+
+The exact macro pixels were opened and inspected; the recovered WebP matches
+pinned Git blob `8766e992a601163dda5a9324ace8b91be509fadd`, SHA-256
+`798bf267332aa14795666e5eea308c7bf475c0ad4d4cd03f3833cbad13ab14db`.
+Its generator explicitly extends the baseline to East[-150,410], North[-510,440]
+metres, retaining Bellwether west of the river, the southern lake, eastern terrace
+and northeast ridge. This is larger than the currently used local NPZ. The
+recovered baseline NPZ is real data, SHA-256
+`251126186fa4923f9902524ec4ac2cc76d0f7a1c82cb1feac9901cc7832bb0ba`,
+matching the supplied revision-2 archive. See the
+[reference custody note](../references/horde-1.7/d37f1638/docs/design/world/dungeons/CURRENT-REFERENCE-NOTE.md).
+Regional terrain integration remains work to do; current r19 is not full macro
+coverage or all-direction visual acceptance.
+
 The supplied revision-2 bundle contains the actual planning heightfield omitted
 from the pinned repository. All 15 manifest entries passed byte/hash checks.
 Its forest and terrain PNG decoded pixels exactly match the pinned lossless
@@ -233,3 +256,22 @@ The current chapter now imports the r19 terrain into an existing static owner an
 The owner identified the broad stone-floor appearance. It was the wrong mossy-masonry bank material, not a desired outdoor design. The owner authorized suitable Poly Haven textures; verified CC0 Forest Ground 01 by Rob Tuytel now replaces that bank layer at its published 2 m scale. No extra texture layer or shader work: chapter totals are 17/14/14, within the existing 18 limit. Both Windows backend frames and the landing sweep were opened and inspected; strict arm failures are retained, not waived. [Current terrain evidence, exact identities and unfinished work](../evidence/2026-10-11-chapter-live-terrain/README.md).
 
 Woodland composition, visible Kit/third-slot resources, actual zone retirement, graveyard and stake anchor, moon/shadow alignment and complete physical acceptance are still missing. This remains one active chapter-integration goal, not a completed chapter or permission to advance scope.
+
+### Regional land and approved stone bevels (11 October, current)
+
+The owner accepted the restrained stone bevel preview and the corrected lit
+reverse portal screenshot at `0457cdbe`; all six exact-commit CI jobs passed
+[run 38113895752](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/38113895752).
+Legitimate view-dependent shadow remains intact; a dark edge alone is not proof
+of missing material. This is screenshot feedback, not a new phone acceptance.
+
+The owner explicitly designated the full connected-region topo as surrounding
+land authority. Recovered reference pixels/layout/generator bytes are preserved
+under the pinned reference tree. Runtime terrain r21 now combines that macro
+relief with the accepted local route, using 34,050 triangles under the unchanged
+39,618 envelope. All 15,472 near-core triangles and route/opening data are
+identical. [Current regional evidence and inspected gallery](../evidence/2026-10-11-regional-terrain/README.md)
+supersede r19 for the terrain asset, without transferring its physical acceptance.
+The macro river/lake beds are not finished water surfaces, and coarse surrounding
+land is not a finished forest or new playable region. Visible distant landmarks,
+dense colliding foliage, Kit and actual streaming remain active work.

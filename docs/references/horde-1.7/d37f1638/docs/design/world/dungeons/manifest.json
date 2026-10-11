@@ -1,0 +1,187 @@
+{
+  "revision": "R2",
+  "source_commit": "48fd8d6e0ee73c480502906104593c4e6d3b8aae",
+  "status": "Approved theme/item/boss-use concepts; metric blockout and detailed mechanics remain proposals. Static planning checks only.",
+  "files": [
+    {
+      "path": "01-connected-region.webp",
+      "source_filename": "01-connected-region.png",
+      "source_sha256": "2482f593a9ab219782600de2156b353ae1385b9fa2fbb4e75ce21bc03248ee9b",
+      "size_bytes": 363694,
+      "sha256": "798bf267332aa14795666e5eea308c7bf475c0ad4d4cd03f3833cbad13ab14db",
+      "encoding": "lossless WebP; decoded RGBA identical to source PNG"
+    },
+    {
+      "path": "01-connected-region.svg",
+      "source_filename": "01-connected-region.svg",
+      "source_sha256": "580dc5c4982d55df607d7b9f84c26637ec244d8d0312c26c3aba4781fb458aad",
+      "size_bytes": 621164,
+      "sha256": "580dc5c4982d55df607d7b9f84c26637ec244d8d0312c26c3aba4781fb458aad",
+      "encoding": "unchanged source bytes"
+    },
+    {
+      "path": "02-approach-plans-and-sections.webp",
+      "source_filename": "02-approach-plans-and-sections.png",
+      "source_sha256": "619a009324859d483c0979d219eb334e4d9d89c2413c5994b7540e2e7477ed77",
+      "size_bytes": 338108,
+      "sha256": "e0edbfc8d717ce85861ba9c830b66f84cae280c3a8a49233e0d37537448b688c",
+      "encoding": "lossless WebP; decoded RGBA identical to source PNG"
+    },
+    {
+      "path": "02-approach-plans-and-sections.svg",
+      "source_filename": "02-approach-plans-and-sections.svg",
+      "source_sha256": "58641c931c532284b866f1173530372d4af538d22b6baaa5d6beda09494e3c42",
+      "size_bytes": 1005389,
+      "sha256": "58641c931c532284b866f1173530372d4af538d22b6baaa5d6beda09494e3c42",
+      "encoding": "unchanged source bytes"
+    },
+    {
+      "path": "03-drowned-abbey-floorplan.webp",
+      "source_filename": "03-drowned-abbey-floorplan.png",
+      "source_sha256": "95fdb430b22316c8c9574956adb5699c7fcc105aed73163064f96925cd6ff414",
+      "size_bytes": 120812,
+      "sha256": "8e23e188542adbc9fd8f31fa5778a2386cefe70529d4143eac9b1dcff0407d39",
+      "encoding": "lossless WebP; decoded RGBA identical to source PNG"
+    },
+    {
+      "path": "03-drowned-abbey-floorplan.svg",
+      "source_filename": "03-drowned-abbey-floorplan.svg",
+      "source_sha256": "a2d3491cad1a920bff5eb6ee955116571c219e640def55ec55e656c5a8add9bb",
+      "size_bytes": 64891,
+      "sha256": "a2d3491cad1a920bff5eb6ee955116571c219e640def55ec55e656c5a8add9bb",
+      "encoding": "unchanged source bytes"
+    },
+    {
+      "path": "04-ashen-foundry-floorplan.webp",
+      "source_filename": "04-ashen-foundry-floorplan.png",
+      "source_sha256": "bb25ef845fd11b93fcead3a84f8e4183e3d591a18387d4ead8d594dd8ad952ef",
+      "size_bytes": 107248,
+      "sha256": "4db1ca43b7b82180f9eac984f4596e9585453c1a316ac198ed501cbaf8b12f60",
+      "encoding": "lossless WebP; decoded RGBA identical to source PNG"
+    },
+    {
+      "path": "04-ashen-foundry-floorplan.svg",
+      "source_filename": "04-ashen-foundry-floorplan.svg",
+      "source_sha256": "f4f249e44f8d250bb4f4a0fb2584f9059e420c715df27aadedac7560efc1ac06",
+      "size_bytes": 59558,
+      "sha256": "f4f249e44f8d250bb4f4a0fb2584f9059e420c715df27aadedac7560efc1ac06",
+      "encoding": "unchanged source bytes"
+    },
+    {
+      "path": "05-glass-court-floorplan.webp",
+      "source_filename": "05-glass-court-floorplan.png",
+      "source_sha256": "8a8879426dec504832d70ddc6363614e198fa977db7e1c6750b7bb8369a18301",
+      "size_bytes": 111430,
+      "sha256": "501a866f3a9006e5d356e30c11bc78637329d1022410b843777132985562849e",
+      "encoding": "lossless WebP; decoded RGBA identical to source PNG"
+    },
+    {
+      "path": "05-glass-court-floorplan.svg",
+      "source_filename": "05-glass-court-floorplan.svg",
+      "source_sha256": "21b838c2efca0bd7dbbe4a43dc1a54f48477848e456adf5464e6e24a620264a6",
+      "size_bytes": 58626,
+      "sha256": "21b838c2efca0bd7dbbe4a43dc1a54f48477848e456adf5464e6e24a620264a6",
+      "encoding": "unchanged source bytes"
+    },
+    {
+      "path": "06-complications-and-transitions.webp",
+      "source_filename": "06-complications-and-transitions.png",
+      "source_sha256": "a7fae15c28cf462d512d7e83acb1be951a1be69e6be64f647cdfb05de9e28995",
+      "size_bytes": 125298,
+      "sha256": "d1501e65252dfa5a6d06d87184e02c06d16c72dbc2af930f36cb8949a7036837",
+      "encoding": "lossless WebP; decoded RGBA identical to source PNG"
+    },
+    {
+      "path": "06-complications-and-transitions.svg",
+      "source_filename": "06-complications-and-transitions.svg",
+      "source_sha256": "a50f85fe36bec57735d3692ee31cf2ef5d66c5fc805e40484d89bc1372313c95",
+      "size_bytes": 30045,
+      "sha256": "a50f85fe36bec57735d3692ee31cf2ef5d66c5fc805e40484d89bc1372313c95",
+      "encoding": "unchanged source bytes"
+    },
+    {
+      "path": "07-theme-item-boss-progression.webp",
+      "source_filename": "07-theme-item-boss-progression.png",
+      "source_sha256": "edac7503d6bd889b213c2975042df799b94c27709053816cbe7113c45b6b5db8",
+      "size_bytes": 113110,
+      "sha256": "8c710ae332ee6e1f818a094a77399f2d2909b76b428bc4fcb63dbcf4b554038c",
+      "encoding": "lossless WebP; decoded RGBA identical to source PNG"
+    },
+    {
+      "path": "07-theme-item-boss-progression.svg",
+      "source_filename": "07-theme-item-boss-progression.svg",
+      "source_sha256": "50abe6f39421f98f4e8052167796b9091a5ec8212c9151028bdf1f53de7fea9a",
+      "size_bytes": 29934,
+      "sha256": "50abe6f39421f98f4e8052167796b9091a5ec8212c9151028bdf1f53de7fea9a",
+      "encoding": "unchanged source bytes"
+    },
+    {
+      "path": "baseline/proposed_terrain_heightfield.npz",
+      "source_filename": "baseline/proposed_terrain_heightfield.npz",
+      "source_sha256": "251126186fa4923f9902524ec4ac2cc76d0f7a1c82cb1feac9901cc7832bb0ba",
+      "size_bytes": 4354922,
+      "sha256": "251126186fa4923f9902524ec4ac2cc76d0f7a1c82cb1feac9901cc7832bb0ba",
+      "encoding": "unchanged source bytes"
+    },
+    {
+      "path": "baseline/shared-coordinate-layout.json",
+      "source_filename": "baseline/shared-coordinate-layout.json",
+      "source_sha256": "0a4da29bf8d988145c0f7b3f1c7afaf415a5da9b14c34bbd53bd1e00e3a86e59",
+      "size_bytes": 8345,
+      "sha256": "0a4da29bf8d988145c0f7b3f1c7afaf415a5da9b14c34bbd53bd1e00e3a86e59",
+      "encoding": "unchanged source bytes"
+    },
+    {
+      "path": "build_atlas.py",
+      "source_filename": "build_atlas.py",
+      "source_sha256": "1ac9a8e9bfa0530004341e7c5db59808a1f5b7f36154d7fd4203a722dee1b273",
+      "size_bytes": 44786,
+      "sha256": "1ac9a8e9bfa0530004341e7c5db59808a1f5b7f36154d7fd4203a722dee1b273",
+      "encoding": "unchanged source bytes"
+    },
+    {
+      "path": "dungeon-layout.json",
+      "source_filename": "dungeon-layout.json",
+      "source_sha256": "cd1471f84c398d151702eb387378883bb3a297454c87bbcdac92b2652a38062c",
+      "size_bytes": 40259,
+      "sha256": "cd1471f84c398d151702eb387378883bb3a297454c87bbcdac92b2652a38062c",
+      "encoding": "unchanged source bytes"
+    },
+    {
+      "path": "room-register.csv",
+      "source_filename": "room-register.csv",
+      "source_sha256": "3f97ba3bd490dc36474f6bcaa2fca20462cdef62a74937b503c027241b4ab39e",
+      "size_bytes": 4881,
+      "sha256": "3f97ba3bd490dc36474f6bcaa2fca20462cdef62a74937b503c027241b4ab39e",
+      "encoding": "unchanged source bytes"
+    },
+    {
+      "path": "route-register.csv",
+      "source_filename": "route-register.csv",
+      "source_sha256": "d2de6ffacf6892e7358d758def6126be87125b510af93c824e3f999868d0edca",
+      "size_bytes": 1232,
+      "sha256": "d2de6ffacf6892e7358d758def6126be87125b510af93c824e3f999868d0edca",
+      "encoding": "unchanged source bytes"
+    },
+    {
+      "path": "validation.json",
+      "source_filename": "validation.json",
+      "source_sha256": "ca1cf12063fe5d44f3aa49bb492ea15199dfeb29b799b648633bd127bb2b0b9d",
+      "size_bytes": 1092,
+      "sha256": "ca1cf12063fe5d44f3aa49bb492ea15199dfeb29b799b648633bd127bb2b0b9d",
+      "encoding": "unchanged source bytes"
+    },
+    {
+      "path": "asset-register.json",
+      "size_bytes": 86003,
+      "sha256": "8b759b9a4dbfcee5eab27e8c57c00ff30e1b09a73f466180c649bb5230fbe3e9",
+      "encoding": "unchanged frozen R2 production register bytes"
+    },
+    {
+      "path": "asset-register.csv",
+      "size_bytes": 30655,
+      "sha256": "e129442d2e447bca69935ad2713064c53113aa5b56fb8107575e84348806e4dc",
+      "encoding": "unchanged frozen R2 production register bytes"
+    }
+  ]
+}

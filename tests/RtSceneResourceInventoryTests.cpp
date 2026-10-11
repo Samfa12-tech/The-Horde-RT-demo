@@ -445,7 +445,7 @@ struct PresentableTinyRtSceneObservationTestAccess
         ok &= materials.size()+MakeRtWorldMaterialPalette(true).count<=kRtMaterialCapacity;
         ok &= materials.size()==30u && primitives.size()==
             (scene.pipelineBundle_.Request().quality==DielectricQuality::High?32u:31u);
-        ok &= scene.chapterTerrainSurface_ && scene.chapterTerrainSurface_->TriangleCount()==39618u;
+        ok &= scene.chapterTerrainSurface_ && scene.chapterTerrainSurface_->TriangleCount()==34050u;
         const auto& instances=scene.staticMeshSlot_.InstanceMetadata();
         for(const char* family:{"ChestWood","BlackIron"}) {
             const auto row=[&](const auto& asset,std::uint32_t owner) {
@@ -895,7 +895,7 @@ struct PresentableTinyRtSceneObservationTestAccess
         // one offering bowl (960), the closed 12-triangle lintel lip, and
         // ten original pine/alder instances grouped into four primitives, and
         // 656 stone-finish triangles sharing the admitted masonry primitive.
-        constexpr std::size_t addedIndices = 46140u + (2u*664u + 960u + 12u + 50510u + 39618u + 656u)*3u;
+        constexpr std::size_t addedIndices = 46140u + (2u*664u + 960u + 12u + 50510u + 34050u + 656u)*3u;
         bool ok = oldIndices == 8422u * 3u &&
                   baseline.collapseStaticAsset_.bounds.maximum[1] > 12.0f &&
                   std::abs(chapterEntryTop - 6.0f) < 0.001f &&
