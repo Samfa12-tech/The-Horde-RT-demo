@@ -7,6 +7,7 @@
 #include <array>
 #include <cstdint>
 #include <optional>
+#include <memory>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -267,6 +268,29 @@ public:
     const horde::scene::DevelopmentWorldGeometry& WorldRouteGeometry() const { return worldRouteGeometry_; }
     std::shared_ptr<const horde::gameplay::simulation::TriangleSupportSurface> ChapterTerrainSurface() const { return chapterTerrainSurface_; }
     bool IsReady() const { return ready_; }
+    // Offside GPU preparation only. The caller supplies a conservative retained
+    // world-family set; an empty set restores the complete admitted geometry.
+    // Shared textures, materials, player buffers and unchanged BLAS stay owned.
+    std::uint64_t StaticGeometryGeneration() const noexcept { return staticGeometryGeneration_; }
+    bool PrepareStaticGeometryReplacement(std::uint64_t expectedGeneration,
+        std::span<const std::uint32_t> retainedWorldFamilies, std::string& diagnostic);
+    // Proof must complete GPU/evidence work and reset ALL recorded frame command
+    // buffers. Failed proof retains both owners; no descriptors are published.
+    bool CommitStaticGeometryReplacement(std::uint64_t expectedGeneration,
+        bool (*retireReferences)(void*, std::string&), void* user, std::string& diagnostic);
+    bool StaticGeometryCompletionUnproved() const noexcept { return staticGeometryCompletionUnproved_; }
+    struct StaticGeometryReplacementMeasurements {
+        double prepareMilliseconds = 0.0;
+        double cutoverMilliseconds = 0.0;
+        std::uint64_t oldOwnerAllocationBytes = 0;
+        std::uint64_t candidateOwnerAllocationBytes = 0;
+        std::uint64_t overlapOwnerAllocationBytes = 0;
+        std::uint32_t oldPrimitiveCount = 0;
+        std::uint32_t newPrimitiveCount = 0;
+    };
+    const StaticGeometryReplacementMeasurements& StaticGeometryReplacementEvidence() const noexcept {
+        return staticGeometryReplacementMeasurements_;
+    }
     // CPU-side timings for the most recent Initialise attempt. Failed attempts
     // retain partial measurements across cleanup until the next attempt begins.
     const InitialisationMeasurements& InitialiseMeasurements() const noexcept
@@ -629,9 +653,35 @@ private:
     friend struct PresentableTinyRtScenePreflightTestAccess;
     friend struct PresentableTinyRtSceneObservationTestAccess;
     friend struct PresentableTinyRtSceneOutputResizeTestAccess;
+    friend struct PresentableTinyRtSceneStaticCutoverTestAccess;
 
     using Buffer = RtGpuBuffer;
     using AccelerationStructure = RtAccelerationStructure;
+
+    struct PreparedStaticGeometry {
+        std::uint64_t sourceGeneration = 0;
+        bool ready = false;
+        RtStaticMeshSlot slot;
+        Buffer vertices, indices, transforms, instances, primitives, tlasInstances;
+        AccelerationStructure collapse, tlas;
+        Buffer collapseScratch, tlasScratch;
+        std::array<VkAccelerationStructureInstanceKHR, kTlasInstanceCount> definitions{};
+    };
+    struct StaticCutoverApi {
+        void* user = nullptr;
+        bool (*retireReferences)(void*, std::string&) = nullptr;
+        bool (*publishDescriptors)(void*, PresentableTinyRtScene&, std::string&) = nullptr;
+        void (*destroyRetired)(void*, PresentableTinyRtScene&, PreparedStaticGeometry&) noexcept = nullptr;
+    };
+    bool CommitStaticGeometryWithApi(std::uint64_t expectedGeneration,
+        const StaticCutoverApi& api, std::string& diagnostic);
+    bool PackLoadedStaticAssets(RtStaticMeshSlot& out,
+        std::span<const std::uint32_t> retainedWorldFamilies, std::string& diagnostic);
+    void DestroyPreparedStaticGeometry(PreparedStaticGeometry& owner) noexcept;
+    std::unique_ptr<PreparedStaticGeometry> preparedStaticGeometry_;
+    std::uint64_t staticGeometryGeneration_ = 1;
+    bool staticGeometryCompletionUnproved_ = false;
+    StaticGeometryReplacementMeasurements staticGeometryReplacementMeasurements_{};
 
     struct OutputImageResources
     {
@@ -761,7 +811,7 @@ private:
         std::span<const VkAccelerationStructureBuildRangeInfoKHR> ranges,
         VkAccelerationStructureTypeKHR type, VkBuildAccelerationStructureFlagsKHR flags,
         AccelerationStructure& out, Buffer* retainedScratch,
-        std::string& diagnostic);
+        std::string& diagnostic, bool* completionUnproved = nullptr);
     bool UpdatePreviewInstances(VkCommandBuffer commandBuffer,
                                 const RtSceneFrameInputs& frame,
                                 std::string& diagnostic,
@@ -813,7 +863,7 @@ private:
                                 RtSceneRecordObservation* observation = nullptr);
     void ApplyKeeperTorchBodyInstances(
         std::array<VkAccelerationStructureInstanceKHR, kTlasInstanceCount>& instances) const;
-    bool RunOneTimeCommands(void (*record)(VkCommandBuffer, void*), void* userData, std::string& diagnostic) const;
+    bool RunOneTimeCommands(void (*record)(VkCommandBuffer, void*), void* userData, std::string& diagnostic, bool* completionUnproved = nullptr) const;
     void DestroyBuffer(Buffer& buffer) const;
     void DestroyAccelerationStructure(AccelerationStructure& accelerationStructure);
     void DestroyTextureArray(TextureArray& texture);

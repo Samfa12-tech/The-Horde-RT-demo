@@ -1,0 +1,74 @@
+[
+  {
+    "capture": "bend-pipeline-final",
+    "phase": "01-selected",
+    "changedPixels": 0,
+    "maximumChannelDelta": 0
+  },
+  {
+    "capture": "bend-pipeline-final",
+    "phase": "02-restored",
+    "changedPixels": 0,
+    "maximumChannelDelta": 0
+  },
+  {
+    "capture": "bend-query-final",
+    "phase": "01-selected",
+    "changedPixels": 0,
+    "maximumChannelDelta": 0
+  },
+  {
+    "capture": "bend-query-final",
+    "phase": "02-restored",
+    "changedPixels": 0,
+    "maximumChannelDelta": 0
+  },
+  {
+    "capture": "kit-pipeline-final",
+    "phase": "01-selected",
+    "changedPixels": 0,
+    "maximumChannelDelta": 0
+  },
+  {
+    "capture": "kit-pipeline-final",
+    "phase": "02-restored",
+    "changedPixels": 0,
+    "maximumChannelDelta": 0
+  },
+  {
+    "capture": "kit-query-final",
+    "phase": "01-selected",
+    "changedPixels": 0,
+    "maximumChannelDelta": 0
+  },
+  {
+    "capture": "kit-query-final",
+    "phase": "02-restored",
+    "changedPixels": 0,
+    "maximumChannelDelta": 0
+  },
+  {
+    "capture": "portal-pipeline-final",
+    "phase": "01-selected",
+    "changedPixels": 0,
+    "maximumChannelDelta": 0
+  },
+  {
+    "capture": "portal-pipeline-final",
+    "phase": "02-restored",
+    "changedPixels": 0,
+    "maximumChannelDelta": 0
+  },
+  {
+    "capture": "stake-pipeline-final",
+    "phase": "01-selected",
+    "changedPixels": 0,
+    "maximumChannelDelta": 0
+  },
+  {
+    "capture": "stake-pipeline-final",
+    "phase": "02-restored",
+    "changedPixels": 0,
+    "maximumChannelDelta": 0
+  }
+]

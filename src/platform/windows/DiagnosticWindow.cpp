@@ -281,6 +281,7 @@ struct CaptureLaunchOptions
     bool requireRayQueryCompute = false;
     bool portrait = false;
     bool anatomicalPlayerMount = false;
+    bool validateStaticZoneCutover = false;
     std::filesystem::path outputDirectory;
     std::string developmentCheckpoint;
     std::string error;
@@ -739,6 +740,15 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
 #endif
             continue;
         }
+        if (argument == L"--validate-static-zone-cutover")
+        {
+#if defined(_DEBUG)
+            options.validateStaticZoneCutover = true;
+#else
+            options.error = "--validate-static-zone-cutover is Debug-only.";
+#endif
+            continue;
+        }
         if (argument == L"--anatomical-player-mount")
         {
 #if defined(_DEBUG)
@@ -805,6 +815,9 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
     if (options.error.empty() && !options.developmentCheckpoint.empty() &&
         horde::gameplay::FindDevelopmentCheckpoint(options.developmentCheckpoint) == nullptr)
         options.error = "Unknown development checkpoint: " + options.developmentCheckpoint;
+    if (options.error.empty() && options.validateStaticZoneCutover &&
+        (!options.requested || options.developmentCheckpoint.empty()))
+        options.error = "--validate-static-zone-cutover requires one frozen development capture.";
     LocalFree(arguments);
     return options;
 }
@@ -6896,6 +6909,96 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
     return WriteReportFile(outputDirectory / "capture-manifest.json", manifest.str());
 }
 
+#if defined(_DEBUG)
+bool RunStaticGeometryCutoverCapture(VulkanSurfaceContext& context,
+    const std::filesystem::path& directory, const VkClearColorValue& clear, std::string& error)
+{
+    using Scene = horde::vulkan::raytracing::PresentableTinyRtScene;
+    const auto readback = [&](const char* filename) {
+        const VkResult idle = vkDeviceWaitIdle(context.device);
+        if (!CompleteRtEvidenceAfterDeviceIdle(context, idle)) { error="Cutover capture completion failed."; return false; }
+        Scene::StorageImageCapture image;
+        return context.rtScene.CaptureStorageImage(image,error) && WriteRgbaPng(directory/filename,image,error);
+    };
+    if (!readback("cutover-00-before.png")) return false;
+    std::ostringstream receipt;
+    receipt << "{\"schema\":1,\"scope\":\"diagnostic GPU owner replacement; shared textures/materials/unchanged BLAS retained\",\"backend\":"
+            << static_cast<int>(context.rtScene.ExecutionBackend()) << ",\"hops\":[";
+    // This is a feasibility capture, not ordinary-play eviction eligibility.
+    // Inside views replace the full owner twice; forest views omit only the
+    // three tomb ornament families, retaining all masonry/terrain/forest.
+    constexpr std::array<std::uint32_t,8> forest{{0,1,5,6,7,8,9,10}};
+    const bool exterior = context.developmentCheckpoint.find("forest") != std::string::npos;
+    for (unsigned hop=0;hop<2;++hop) {
+        const auto generation=context.rtScene.StaticGeometryGeneration();
+        const auto before=context.rtScene.ResourceInventory();
+        const std::array<std::uint32_t,1> invalid{{UINT32_MAX}};
+        if (context.rtScene.PrepareStaticGeometryReplacement(generation,invalid,error) ||
+            context.rtScene.StaticGeometryGeneration()!=generation ||
+            context.rtScene.ResourceInventory().deviceLocalBytes != before.deviceLocalBytes) {
+            error="Invalid family preparation changed the admitted GPU owner."; return false;
+        }
+        const std::span<const std::uint32_t> retained = exterior && hop==0
+            ? std::span<const std::uint32_t>(forest) : std::span<const std::uint32_t>{};
+        if (!context.rtScene.PrepareStaticGeometryReplacement(generation,retained,error)) return false;
+        const auto overlap=context.rtScene.ResourceInventory();
+        const auto reject = [](void*,std::string& diagnostic) { diagnostic="Injected failed retirement proof"; return false; };
+        // A failed completion proof keeps the candidate available for a safe
+        // retry; a stale generation must not even invoke the platform proof.
+        if (context.rtScene.CommitStaticGeometryReplacement(generation,reject,nullptr,error) ||
+            context.rtScene.CommitStaticGeometryReplacement(generation+1,reject,nullptr,error) ||
+            context.rtScene.StaticGeometryGeneration()!=generation) {
+            error="Failed/stale cutover did not preserve the active owner."; return false;
+        }
+        const auto retire = [](void* user,std::string& diagnostic) {
+            auto& ctx=*static_cast<VulkanSurfaceContext*>(user);
+            if (!ConsumePendingImageAcquire(ctx)) { diagnostic="Pending acquire could not be consumed."; return false; }
+            const VkResult idle=vkDeviceWaitIdle(ctx.device);
+            if (!CompleteRtEvidenceAfterDeviceIdle(ctx,idle)) { diagnostic="GPU/evidence completion unproved."; return false; }
+            for (const auto command : ctx.commandBuffers)
+                if (vkResetCommandBuffer(command,0u)!=VK_SUCCESS) { diagnostic="Recorded frame references could not be reset."; return false; }
+            ctx.gpuFrameTimer.ResetAfterDeviceIdle();
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+            ctx.stagedPassTimer.ResetAfterDeviceIdle();
+#endif
+            ctx.gpuFrameTimingTotalMs=0; ctx.gpuFrameTimingSampleCount=0;
+            RefreshGpuTimingTelemetry(ctx);
+            ctx.benchmarkEvidence.Cancel();
+            return !ctx.rtFrameEvidenceInitialised || ctx.rtFrameEvidence.Recreate(
+                horde::telemetry::RtResourceResetReason::DiagnosticResourceReplacement,
+                CurrentInitialGpuEvidenceStatus(ctx));
+        };
+        if (!context.rtScene.CommitStaticGeometryReplacement(generation,retire,&context,error)) return false;
+        const auto& m=context.rtScene.StaticGeometryReplacementEvidence();
+        const auto after=context.rtScene.ResourceInventory();
+        receipt << (hop?",":"") << "{\"sourceGeneration\":" << generation
+            << ",\"admittedGeneration\":" << context.rtScene.StaticGeometryGeneration()
+            << ",\"selection\":\"" << ((exterior && hop==0)?"common-and-forest":"complete")
+            << "\",\"prepareMilliseconds\":" << m.prepareMilliseconds << ",\"cutoverMilliseconds\":" << m.cutoverMilliseconds
+            << ",\"oldOwnerAllocationBytes\":" << m.oldOwnerAllocationBytes
+            << ",\"candidateOwnerAllocationBytes\":" << m.candidateOwnerAllocationBytes
+            << ",\"overlapOwnerAllocationBytes\":" << m.overlapOwnerAllocationBytes
+            << ",\"oldPrimitiveCount\":" << m.oldPrimitiveCount << ",\"newPrimitiveCount\":" << m.newPrimitiveCount
+            << ",\"sceneDeviceLocalOverlap\":" << overlap.deviceLocalBytes
+            << ",\"sceneHostVisibleOverlap\":" << overlap.hostVisibleBytes
+            << ",\"topLevelOwnersBefore\":" << before.topLevelAccelerationStructureCount
+            << ",\"topLevelOwnersOverlap\":" << overlap.topLevelAccelerationStructureCount
+            << ",\"topLevelOwnersAfter\":" << after.topLevelAccelerationStructureCount
+            << ",\"sceneDeviceLocalBefore\":" << before.deviceLocalBytes << ",\"sceneDeviceLocalAfter\":" << after.deviceLocalBytes
+            << ",\"sceneHostVisibleBefore\":" << before.hostVisibleBytes << ",\"sceneHostVisibleAfter\":" << after.hostVisibleBytes << "}";
+        for (int frame=0;frame<kCaptureSettlingFrames;++frame) {
+            bool presented=false;
+            if (!RenderFrame(context,clear,presented) || !presented) {
+                error="Replacement owner did not produce a real RT-presented frame: "+context.lastRtFrameError; return false;
+            }
+        }
+        if (!readback(hop?"cutover-02-restored.png":"cutover-01-selected.png")) return false;
+    }
+    receipt << "]}\n";
+    return WriteReportFile(directory/"static-zone-cutover.json",receipt.str());
+}
+#endif
+
 int RunShowcaseCapture(VulkanSurfaceContext& context,
                        horde::vulkan::DeviceCapabilities& capabilities,
                        const std::filesystem::path& outputDirectory)
@@ -7022,6 +7125,13 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
             capabilities.rtScene.executionBackend = context.rtScene.ExecutionBackend();
         }
 
+#if defined(_DEBUG)
+        if (ParseCaptureLaunchOptions().validateStaticZoneCutover) {
+            std::string cutoverError;
+            if (!RunStaticGeometryCutoverCapture(context,outputDirectory,clearColor,cutoverError))
+                return fail("Static GPU owner cutover: "+cutoverError);
+        }
+#endif
         // Complete the actual last presented submission before reading its
         // image. Capture evidence must not borrow an earlier checkpoint's fire
         // upload or manufacture completion from the current CPU simulation.

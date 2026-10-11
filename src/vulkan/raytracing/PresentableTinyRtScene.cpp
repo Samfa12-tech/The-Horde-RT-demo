@@ -483,6 +483,10 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
 
     Destroy();
 
+    preparedStaticGeometry_ = std::move(other.preparedStaticGeometry_);
+    staticGeometryGeneration_ = std::exchange(other.staticGeometryGeneration_, 1u);
+    staticGeometryCompletionUnproved_ = std::exchange(other.staticGeometryCompletionUnproved_, false);
+    staticGeometryReplacementMeasurements_ = std::exchange(other.staticGeometryReplacementMeasurements_, {});
     physicalDevice_ = std::exchange(other.physicalDevice_, nullptr);
     instance_ = std::exchange(other.instance_, nullptr);
     device_ = std::exchange(other.device_, nullptr);
@@ -1075,6 +1079,12 @@ horde::gameplay::simulation::ZoneReadiness PresentableTinyRtScene::WorldZoneRead
 }
 void PresentableTinyRtScene::Destroy()
 {
+    if (preparedStaticGeometry_ && device_ != VK_NULL_HANDLE)
+        DestroyPreparedStaticGeometry(*preparedStaticGeometry_);
+    preparedStaticGeometry_.reset();
+    staticGeometryGeneration_ = 1u;
+    staticGeometryCompletionUnproved_ = false;
+    staticGeometryReplacementMeasurements_ = {};
     worldRouteGeometry_ = {}; // Release CPU batches with the renderer-owned scene.
     chapterTerrainSurface_.reset();
     pipelineCache_ = VK_NULL_HANDLE; // Borrowed device cache remains owned by the platform context.
@@ -1382,6 +1392,16 @@ horde::telemetry::RtResourceInventory PresentableTinyRtScene::ResourceInventory(
         AccumulateRtResourceCount(inventory.topLevelAccelerationStructureCount);
         inventory.tlasInstanceCount = tlasInstanceCount_;
     }
+    if (preparedStaticGeometry_) {
+        const auto& candidate = *preparedStaticGeometry_;
+        for (const Buffer* buffer : {&candidate.vertices, &candidate.indices, &candidate.transforms,
+             &candidate.instances, &candidate.primitives, &candidate.tlasInstances,
+             &candidate.collapseScratch, &candidate.tlasScratch, &candidate.tlas.backing})
+            AccumulateRtGpuBuffer(inventory, *buffer);
+        accumulateBlas(candidate.collapse);
+        if (candidate.tlas.handle != VK_NULL_HANDLE)
+            AccumulateRtResourceCount(inventory.topLevelAccelerationStructureCount);
+    }
     characterSlot_.AccumulateResourceInventory(inventory);
     pipelineBundle_.AccumulateResourceInventory(inventory);
 #ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
@@ -1628,8 +1648,9 @@ VkDeviceAddress PresentableTinyRtScene::BufferAddress(VkBuffer buffer) const
     return gpuResources_.BufferAddress(buffer);
 }
 
-bool PresentableTinyRtScene::RunOneTimeCommands(void (*record)(VkCommandBuffer, void*), void* userData, std::string& diagnostic) const
+bool PresentableTinyRtScene::RunOneTimeCommands(void (*record)(VkCommandBuffer, void*), void* userData, std::string& diagnostic, bool* completionUnproved) const
 {
+    if (completionUnproved) *completionUnproved = false;
     VkCommandBufferAllocateInfo allocateInfo{
         VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
         nullptr,
@@ -1675,6 +1696,14 @@ bool PresentableTinyRtScene::RunOneTimeCommands(void (*record)(VkCommandBuffer, 
     if (result == VK_SUCCESS)
     {
         result = vkQueueWaitIdle(queue_);
+        if (result != VK_SUCCESS)
+        {
+            // Submission succeeded; completion did not. The command pool and
+            // referenced resources remain owned until platform retirement proof.
+            if (completionUnproved) *completionUnproved = true;
+            diagnostic = "One-time RT submission has unproved GPU completion.";
+            return false;
+        }
     }
 
     vkFreeCommandBuffers(device_, commandPool_, 1u, &commandBuffer);
@@ -2555,54 +2584,7 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
             !viewmodelSkin_.LoadClips(viewmodelPath.string(), horde::scene::PlayerLocomotionClipSet(), diagnostic) ||
             !viewmodelSkin_.ValidateStaticVertexLayout(viewmodelAsset_, diagnostic)) return false;
     }
-    std::vector<StaticRtAssetRegistration> registrations{
-        {3u, 0x53574f52u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),
-         0u, &developmentStaticAsset_},
-        {1u, 0x544f5243u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),
-         1u, &productionTorchAsset_},
-        {kPlayerWorldBodyInstanceIndex, 0x504c4159u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),
-         0u, &productionPlayerAsset_, nullptr, RtGeometryRole::PlayerWorldBody},
-        {9u, 0x474c4153u,
-         static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr) |
-             static_cast<std::uint32_t>(RtInstanceFlag::Transmissive),
-         0u, &productionDielectricFixtureAsset_},
-        {5u, 0x43484241u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),
-         0u, &gothicChestBaseAsset_},
-        {6u, 0x43484c44u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),
-         0u, &gothicChestLidAsset_, developmentRescueJourney_ ? &gothicChestBaseAsset_ : nullptr},
-        {7u, 0x4c4e5247u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),
-         0u, &rewardLanternRingAsset_},
-        {8u, 0x4c4e4244u,
-         static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr) |
-             static_cast<std::uint32_t>(RtInstanceFlag::Transmissive),
-         0u, &rewardLanternBodyAsset_, developmentRescueJourney_ ? &rewardLanternRingAsset_ : nullptr},
-    };
-    if (viewmodelAvailable_)
-        registrations.push_back({kPlayerViewmodelInstanceIndex, 0x56494557u,
-            static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u,
-            &viewmodelAsset_, &productionPlayerAsset_, RtGeometryRole::PlayerViewmodel});
-    registrations.push_back({kCollapseInstanceIndex, 0x434f4c4cu,
-        static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u,
-        &collapseStaticAsset_});
-    // Player Rag torch gets its own metadata/material route. The original
-    // production torch remains layer1 for permanent Keeper/world instances.
-    registrations.push_back({kPlayerTorchInstanceIndex, 0x544f5243u,
-        static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u,
-        &playerTorchAsset_});
-    registrations.push_back({kPlayerSwordScabbardMetadataIndex, 0x53434142u,
-        static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u,
-        &playerSwordScabbardAsset_});
-    if (sceneProfile_ == RtSceneProfile::Showcase)
-        registrations.push_back({kWaterDropletMetadataIndex, 0x57415452u,
-            static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr) |
-                static_cast<std::uint32_t>(RtInstanceFlag::Transmissive), 0u,
-            &waterDropletAsset_});
     if (sceneProfile_ == RtSceneProfile::Showcase && developmentRescueJourney_) {
-        // The freestanding RT Lab glass test box is not chapter geometry.
-        // Its separate preview/nonchapter scenes retain the fixture. Reuse
-        // that unused registration/primitive capacity, preserving all actual
-        // chapter surfaces (including the lantern's physical glass).
-        std::erase_if(registrations, [](const auto& row) { return row.instanceCustomIndex == 9u; });
         horde::scene::SkinnedClipSet clips{};
         clips.clips[0] = {"Warden|idle", true, true};
         clips.clips[1] = {"Warden|walk", true, true};
@@ -2615,42 +2597,9 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
         for (auto& material : chapterActor_.Asset().materials) {
             material.textureGroup = 0; material.deferTextureAllocation = true;
         }
-        registrations.push_back({CharacterRenderSlot::kKeeperMetadataIndex, 0x4b495431u,
-            static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u, &chapterActor_.Asset()});
         chapterActorReady_ = true;
     }
-    // The chapter uses failure-atomic candidate preparation. Its current full
-    // registrations retain every source primitive; residency changes require a
-    // separately completed GPU arena/descriptor/AS transaction, not this call.
-    if (!(developmentRescueJourney_
-            ? staticMeshSlot_.InitializeSelectedGeometry(registrations, diagnostic)
-            : staticMeshSlot_.Initialize(registrations, diagnostic))) return false;
-    if (developmentRescueJourney_)
-    {
-        // Only these immutable opaque chest families opt in. The separately
-        // mutable dielectric fixture keeps its own row, as do all other assets.
-        std::array<RtImmutableMaterialAlias, 2> aliases{};
-        const auto materialRow = [&](const auto& asset, std::uint32_t instance,
-                                     const char* name, std::uint32_t& row) {
-            const auto& metadata = staticMeshSlot_.InstanceMetadata()[instance];
-            for (std::size_t i = 0; i < asset.primitives.size(); ++i)
-                if (asset.materials[asset.primitives[i].materialIndex].name == name)
-                {
-                    row = staticMeshSlot_.PrimitiveMetadata()[metadata.primitiveBase + i].materialIndex;
-                    return true;
-                }
-            return false;
-        };
-        constexpr std::array<const char*, 2> families{{"ChestWood", "BlackIron"}};
-        for (std::size_t i = 0; i < families.size(); ++i)
-            if (!materialRow(gothicChestBaseAsset_, 5u, families[i], aliases[i].provider) ||
-                !materialRow(gothicChestLidAsset_, 6u, families[i], aliases[i].consumer))
-            {
-                diagnostic = "Chapter immutable chest material roster changed.";
-                return false;
-            }
-        if (!staticMeshSlot_.ShareImmutableMaterialRows(aliases, diagnostic)) return false;
-    }
+    if (!PackLoadedStaticAssets(staticMeshSlot_, {}, diagnostic)) return false;
     const RtInstanceMetadata playerMetadata = staticMeshSlot_.InstanceMetadata()[kPlayerWorldBodyInstanceIndex];
     if (playerMetadata.primitiveCount == 0u ||
         playerMetadata.primitiveCount != productionPlayerAsset_.primitives.size() ||
@@ -3020,7 +2969,7 @@ bool PresentableTinyRtScene::BuildProfileAccelerationStructure(
     const std::span<const VkAccelerationStructureGeometryKHR> geometries,
     const std::span<const VkAccelerationStructureBuildRangeInfoKHR> ranges,
     const VkAccelerationStructureTypeKHR type, const VkBuildAccelerationStructureFlagsKHR flags,
-    AccelerationStructure& out, Buffer* retainedScratch, std::string& diagnostic)
+    AccelerationStructure& out, Buffer* retainedScratch, std::string& diagnostic, bool* completionUnproved)
 {
     if (geometries.empty() || geometries.size() != ranges.size() || geometries.size() > UINT32_MAX)
     {
@@ -3077,8 +3026,8 @@ bool PresentableTinyRtScene::BuildProfileAccelerationStructure(
                              VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR |
                                  data.scene->executionPolicy_.shaderPipelineStage,
                              0u, 1u, &barrier, 0u, nullptr, 0u, nullptr);
-    }, &data, diagnostic);
-    if (retainedScratch == nullptr) DestroyBuffer(temporaryScratch);
+    }, &data, diagnostic, completionUnproved);
+    if (retainedScratch == nullptr && !(completionUnproved && *completionUnproved)) DestroyBuffer(temporaryScratch);
     if (!built) return false;
     VkAccelerationStructureDeviceAddressInfoKHR addressInfo{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR};
     addressInfo.accelerationStructure = out.handle;

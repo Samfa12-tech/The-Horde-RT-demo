@@ -1241,6 +1241,11 @@ if(BUILD_TESTING)
         add_test(NAME horde_rt_scene_initialise_preflight_tests
             COMMAND horde_rt_scene_initialise_preflight_tests)
 
+        add_executable(horde_rt_static_geometry_cutover_tests tests/StaticGeometryCutoverTests.cpp)
+        target_link_libraries(horde_rt_static_geometry_cutover_tests PRIVATE horde_rt_probe_core)
+        add_test(NAME horde_rt_static_geometry_cutover_tests COMMAND horde_rt_static_geometry_cutover_tests)
+        set_tests_properties(horde_rt_static_geometry_cutover_tests PROPERTIES TIMEOUT 10)
+
         add_executable(horde_rt_scene_resource_inventory_tests
             tests/RtSceneResourceInventoryTests.cpp)
         target_include_directories(horde_rt_scene_resource_inventory_tests PRIVATE

@@ -8,16 +8,13 @@ full design, not a replacement master or a claim that all of 1.7 is complete.
 The continuing development branch is `codex/horde-1.7-wp2-vertical-proof`,
 [draft PR27](https://github.com/Samfa12-tech/The-Horde-RT-demo/pull/27).
 
-Current rig integration: the native planted-leg proof at `91a68a58` passed all
-six exact-commit CI jobs, including the seven requested traversal CTests and
-the Windows Unicode report UI test. The [renderer/mount continuation](../evidence/2026-10-12-planted-renderer-mounts/README.md)
-connects the optional stationary stance to the production player palette and
-coherent pre/post-solve Hips attachments. Ordinary animation still publishes
-zero; this does not enable a new rope route or certify a folded live pose.
-The remaining anchor change must replace the old body half-space clamp, add
-actual apron-edge rope contact and manage the longer loose tail; moving the
-anchor alone would stall traversal. Graveyard/stake, real GPU zone retirement,
-full inspected route and final owner/phone acceptance remain required.
+Current rig integration: the [grounded stake traversal milestone](../evidence/2026-10-12-ground-stake-traversal/README.md)
+supersedes the earlier pending anchor/pose work. The overhead apparatus is gone;
+the planted pull-up, apron contact and separately authored descent are integrated
+and inspected on both RT backends. The dark/tight hand views still need owner
+acceptance. Graveyard/lid composition, ordinary GPU zone lifetimes, remaining
+prepared dressing, full chapter gallery and sustained/phone acceptance remain
+required. Older staged proofs below retain their historical scope.
 
 The [static primitive ownership continuation](../evidence/2026-10-12-static-primitive-owners/README.md)
 adds validated packed-asset subranges, avoiding extra static-asset or primitive
@@ -459,3 +456,28 @@ captures remain pixel-identical. This is an opt-in CPU candidate capability,
 not completed GPU streaming. Actual resource preparation, cutover, retirement,
 reverse traversal and measured overlap remain required alongside the remaining
 chapter presentation and physical acceptance gates.
+
+### Actual GPU owner cutover diagnostic (12 October)
+
+The [native GPU handoff milestone](../evidence/2026-10-12-static-gpu-owner-cutover/README.md)
+prepares actual buffers/collapse BLAS/TLAS offside, checks resource generations,
+completes GPU/evidence work and drops every recorded reference before descriptor
+publication and old-owner retirement. Failures preserve both owners; descriptor
+preparation rejection rolls back. Kit and droplets reupload/refit in the new
+arena. Both RT backends preserve frozen forest/Kit output, with Pipeline portal
+and pull-up regressions too: twelve comparisons have zero changed pixels.
+
+This exceeds the earlier CPU-only preparation proof but **does not activate
+ordinary zone eviction**. Only the three tomb ornament families are omitted in
+the forest diagnostic; common tomb masonry and all shared textures remain
+resident. Actual savings are 1.587 MiB, while synchronous preparation costs
+approximately 57–110 ms in Debug. Incremental preparation, conservative region/
+secondary-ray retention, owned zone-readiness generations and normal two-way
+cutover are still required. Do not label this completed seamless streaming.
+
+Parent `8e37190f` passed all six jobs (MSVC132/132, Unicode281 ms; Vulkan39/39
+including each of the seven traversal CTests). Its one-owner disconnected-family
+packing is now exercised by the GPU diagnostic. New focused Debug/Release9/9,
+Android four-ABI/package and fresh eight-variant checks passed; exact pushed CI
+remains tied to the new SHA/run. Phone CURRENT/HIGHER and saved LOWER migration,
+owner listening/haptics and full chapter acceptance remain pending.
