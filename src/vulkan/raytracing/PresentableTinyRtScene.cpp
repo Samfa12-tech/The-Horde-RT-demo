@@ -2358,7 +2358,10 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
         root / "models/props/runtime/reward-lantern-ring";
     const auto lanternBodyDirectory =
         root / "models/props/runtime/reward-lantern-body";
-    const auto collapseDirectory = root / "models/world/runtime/collapsed-entry";
+    // Separate development derivative: the original accepted tomb stays immutable.
+    const auto collapseDirectory = root / (sceneProfile_ == RtSceneProfile::Showcase &&
+        developmentRescueJourney_ ? "models/world/runtime/chapter-entry-return-v1" :
+                                   "models/world/runtime/collapsed-entry");
     horde::scene::assets::AssetManifest swordManifest;
     horde::scene::assets::AssetManifest torchManifest;
     horde::scene::assets::AssetManifest playerTorchManifest;

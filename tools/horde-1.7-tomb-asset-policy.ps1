@@ -2,6 +2,8 @@
 # This admits file identities, not owner listening or physical-device acceptance.
 function Get-Horde17TombAssetSpecification {
     @(
+        [pscustomobject]@{ Path='models/world/runtime/chapter-entry-return-v1/asset.manifest.json'; Bytes=718; Sha256='d2693be6a2c743af08006e89b9848b235c16c20df9f1d7a5da214499e02a1468'; Platform='Both'; Kind='Json' },
+        [pscustomobject]@{ Path='models/world/runtime/chapter-entry-return-v1/collapsed-entry-lod0.runtime.glb'; Bytes=635844; Sha256='29cd8b3ad46cd0b115c2bef8264be3b404281ac048c2cfb495c18324a5189c69'; Platform='Both'; Kind='Glb' },
         [pscustomobject]@{ Path='audio/pixabay/keeper_death.wav'; Bytes=195650; Sha256='500f76c3deb40c89c684562acedf6b7549b6b03e402cc51e09553281517d7020'; Platform='Windows'; Kind='Wave'; Channels=1; Frames=97803 },
         [pscustomobject]@{ Path='audio/pixabay/keeper_death_core.wav'; Bytes=391256; Sha256='799cf5d2fdb3f69b3be82683d126fad3852c390bab726a7af9c2b8d02685594c'; Platform='Android'; Kind='Wave'; Channels=2; Frames=97803 },
         [pscustomobject]@{ Path='audio/pixabay/keeper-death.manifest.json'; Bytes=2415; Sha256='a5830abcb78eb6535c3a5784f4a88269271b6e57cc83c03917417a62497e1cad'; Platform='Both'; Kind='Json' },

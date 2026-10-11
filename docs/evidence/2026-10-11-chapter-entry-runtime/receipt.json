@@ -1,0 +1,183 @@
+{
+  "sourceParent": "6914568735e10d9f788013144aef75cbe09618d5",
+  "beforeExecutableSha256": "f205a81fcf3045202f3c13c206ab6b9e50b89977e8425e2728d946fb2e4d9b96",
+  "identities": {
+    "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe": {
+      "bytes": 12274688,
+      "sha256": "ba114adf0b8d686e0aca0f6c39106a6c50da23220639b72373feed3f90d22076"
+    },
+    "build/presets/windows-x64-release/Release/HordeLanternRT.exe": {
+      "bytes": 4284416,
+      "sha256": "1e4f4123bd1ba852e94c9d210413095c9f343d7bb459ee5a4a7c9598a4ea61c3"
+    },
+    "android/app/build/outputs/apk/debug/app-debug.apk": {
+      "bytes": 149528333,
+      "sha256": "e7039091dc4316a32b1aee5fa8ee253bc9781899290098a62fd4a9bd4624bb88"
+    },
+    "assets/models/world/runtime/chapter-entry-return-v1/asset.manifest.json": {
+      "bytes": 718,
+      "sha256": "d2693be6a2c743af08006e89b9848b235c16c20df9f1d7a5da214499e02a1468"
+    },
+    "assets/models/world/runtime/chapter-entry-return-v1/collapsed-entry-lod0.runtime.glb": {
+      "bytes": 635844,
+      "sha256": "29cd8b3ad46cd0b115c2bef8264be3b404281ac048c2cfb495c18324a5189c69"
+    }
+  },
+  "checkpoint": {
+    "id": 192,
+    "name": "rescue-journey-start",
+    "x": 0,
+    "z": 1.85,
+    "eyeY": 0.7,
+    "yaw": 3.14159265359,
+    "pitch": -0.05,
+    "simulationSeconds": 0
+  },
+  "captures": [
+    {
+      "label": "before-pipeline",
+      "sha256": "443e65aa32176518e94e18fa24d53b4cc246c56248041fc4c8aa2fb4b6f525d9",
+      "backend": "RayTracingPipeline",
+      "shaders": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "5b8eb292cfa45524bb521abad3f7b9153ae93913375d975bcc3ba48b2d09ebf0"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "919710743ed0a5957501c2040823650657c77df620445b7c83085cfef72daf1f"
+        }
+      },
+      "presentation": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "staticRtAsset": {
+        "enabled": true,
+        "vertexBytes": 11746048,
+        "indexBytes": 1816692,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 832,
+        "primitiveMetadataBytes": 480,
+        "textureBytes": 223696160,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.4001,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 0.6862,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.7139,
+        "productionPropBlasBytes": 5409536,
+        "productionPropBlasBuildMilliseconds": 7.6417
+      },
+      "complete": false,
+      "error": "Dedicated viewmodel capture lacks modelled primary arms or contains legacy/full-body primary ownership: dedicated=1, visible=1, armPixels=0."
+    },
+    {
+      "label": "after-pipeline",
+      "sha256": "fc05a54144d013cea6959106d6b5ba416b3e0e0f85f8c401abea31119951c25f",
+      "backend": "RayTracingPipeline",
+      "shaders": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "5b8eb292cfa45524bb521abad3f7b9153ae93913375d975bcc3ba48b2d09ebf0"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "919710743ed0a5957501c2040823650657c77df620445b7c83085cfef72daf1f"
+        }
+      },
+      "presentation": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "staticRtAsset": {
+        "enabled": true,
+        "vertexBytes": 11724544,
+        "indexBytes": 1814676,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 832,
+        "primitiveMetadataBytes": 480,
+        "textureBytes": 223696160,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.434,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 0.6301,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.8039,
+        "productionPropBlasBytes": 5401984,
+        "productionPropBlasBuildMilliseconds": 6.5236
+      },
+      "complete": false,
+      "error": "Dedicated viewmodel capture lacks modelled primary arms or contains legacy/full-body primary ownership: dedicated=1, visible=1, armPixels=0."
+    },
+    {
+      "label": "after-query",
+      "sha256": "86a2f5388b30f2ad5e18431872a169ef8fc7162bcf1b4b258847b825094e9cab",
+      "backend": "RayQueryCompute",
+      "shaders": {
+        "opaqueFast": {
+          "key": "rayquery_compute_diagnostic_high_opaque_fast",
+          "sha256": "57b7a23d6eaed1885001e488654815cbbc1c1e25cec29db16c77b698aac92f13"
+        },
+        "genericDielectric": {
+          "key": "rayquery_compute_diagnostic_high_generic_dielectric",
+          "sha256": "c329f47673a9ed4bb3287c59c52a6db4d7a29dc39814b78beb78b969d2f527ec"
+        }
+      },
+      "presentation": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "staticRtAsset": {
+        "enabled": true,
+        "vertexBytes": 11724544,
+        "indexBytes": 1814676,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 832,
+        "primitiveMetadataBytes": 480,
+        "textureBytes": 223696160,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.2873,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 0.6623,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.625,
+        "productionPropBlasBytes": 5401984,
+        "productionPropBlasBuildMilliseconds": 7.1017
+      },
+      "complete": false,
+      "error": "Dedicated viewmodel capture lacks modelled primary arms or contains legacy/full-body primary ownership: dedicated=1, visible=1, armPixels=0."
+    }
+  ],
+  "comparisons": [
+    {
+      "a": "before-pipeline",
+      "b": "after-pipeline",
+      "changedPixels": 6152,
+      "maxChannelDifference": 15,
+      "pixelsAboveTwo": 3867
+    },
+    {
+      "a": "after-pipeline",
+      "b": "after-query",
+      "changedPixels": 274,
+      "maxChannelDifference": 1,
+      "pixelsAboveTwo": 0
+    }
+  ]
+}

@@ -123,6 +123,29 @@ int main()
         for (int y=0; y<=7; ++y)
             sealed &= RayOccluded(collapse, {0,0.70f,1.85f}, {x*0.10f,y*0.05f,1.0f});
     Check(sealed, "real collapse/stair enclosure physically stops rearward opening rays without flat cap or inspection floor");
+    // A lower, closed upper return for the development chapter; it must not
+    // replace or relax any of the accepted legacy checks above.
+    const auto chapter = Load("models/world/runtime/chapter-entry-return-v1", "collapsed-entry-lod0.runtime.glb");
+    Check(chapter.indices.size() == 8254u * 3u && chapter.vertices.size() == 12131u &&
+          chapter.primitives.size() == 2u && chapter.materials.size() == 2u,
+          "chapter native derivative retains its measured two-family geometry");
+    if (failures) return 1;
+    Check(std::abs(chapter.bounds.maximum[1] - 6.0f) < 0.001f &&
+          chapter.bounds.maximum[0] > 7.3f && chapter.bounds.maximum[2] < 12.0f &&
+          std::abs(chapter.bounds.minimum[0] - collapse.bounds.minimum[0]) < 1e-6f &&
+          std::abs(chapter.bounds.minimum[1] - collapse.bounds.minimum[1]) < 1e-6f &&
+          std::abs(chapter.bounds.minimum[2] - collapse.bounds.minimum[2]) < 1e-6f,
+          "lower chapter enclosure turns east without moving lower rubble or spawn bounds");
+    bool chapterSealed = true;
+    for (int x = -6; x <= 6; ++x)
+        for (int y = 0; y <= 7; ++y)
+            chapterSealed &= RayOccluded(chapter, {0,0.70f,1.85f}, {x*0.10f,y*0.05f,1.0f});
+    Check(chapterSealed, "actual exported chapter triangles enclose the same rearward opening rays");
+    for (unsigned i = 0; i < 2; ++i)
+        Check(chapter.materials[i].name == collapse.materials[i].name &&
+              chapter.materials[i].normalScale == collapse.materials[i].normalScale &&
+              chapter.materials[i].emissiveFactor == Vec3{} && chapter.materials[i].transmissionFactor == 0,
+              "chapter preserves ordinary admitted masonry/rock shading");
     registrations.push_back({21,0x434f4c4cu,static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),0,&collapse});
     AssetManifest ragManifest;
     StaticMeshAsset ragTorch;

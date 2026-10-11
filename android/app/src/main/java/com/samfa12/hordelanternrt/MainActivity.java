@@ -694,6 +694,12 @@ public class MainActivity extends Activity {
                     stageAsset("models/world/runtime/collapsed-entry/collapsed-entry-lod0.runtime.glb",
                     "models/world/runtime/collapsed-entry/collapsed-entry-lod0.runtime.glb");
             if (!collapseStaged) throw new IllegalStateException("Required collapsed-entry runtime assets could not be staged.");
+            final boolean chapterEntryStaged =
+                    stageAsset("models/world/runtime/chapter-entry-return-v1/asset.manifest.json",
+                            "models/world/runtime/chapter-entry-return-v1/asset.manifest.json") &&
+                    stageAsset("models/world/runtime/chapter-entry-return-v1/collapsed-entry-lod0.runtime.glb",
+                            "models/world/runtime/chapter-entry-return-v1/collapsed-entry-lod0.runtime.glb");
+            if (!chapterEntryStaged) throw new IllegalStateException("Required chapter-entry runtime assets could not be staged.");
             final boolean forestTreesStaged =
                     stageAsset("models/world/runtime/forest-tree-pair-v1/asset.manifest.json", "models/world/runtime/forest-tree-pair-v1/asset.manifest.json") &&
                     stageAsset("models/world/runtime/forest-tree-pair-v1/runtime-roster.json", "models/world/runtime/forest-tree-pair-v1/runtime-roster.json") &&

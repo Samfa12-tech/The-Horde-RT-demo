@@ -49,8 +49,9 @@ function Assert-EquipmentAndroidStaging([string]$Gradle, [string]$Activity) {
     $required=@([regex]::Matches($Gradle, "(?m)^\s*include '([^']+)'\s*$") |
         ForEach-Object { $_.Groups[1].Value } |
         Where-Object { $_ -like 'models/props/runtime/player-rag-torch/*' -or
-                       $_ -like 'models/props/runtime/player-sword-scabbard/*' })
-    Require ($required.Count -eq 5) 'Android equipment staging requires the closed five-file package roster.'
+                       $_ -like 'models/props/runtime/player-sword-scabbard/*' -or
+                       $_ -like 'models/world/runtime/chapter-entry-return-v1/*' })
+    Require ($required.Count -eq 7) 'Android equipment and chapter-entry staging require the closed seven-file package roster.'
     $startup=[regex]::Match($Activity, '(?s)private void collectInitialDiagnostics\(\)\s*\{(.*?)final boolean written = ProbeBridge[.]writeReports\(filesRoot\);')
     Require $startup.Success 'Android equipment staging must precede native report-root publication.'
     $staged=@([regex]::Matches($startup.Groups[1].Value,
@@ -184,10 +185,12 @@ try {
                        'models/props/runtime/player-rag-torch/rag-torch-player-lod0.runtime.glb',
                        'models/props/runtime/player-sword-scabbard/asset.manifest.json',
                        'models/props/runtime/player-sword-scabbard/player-sword-scabbard-lod0.runtime.glb',
-                       'models/props/runtime/player-sword-scabbard/processing-receipt.json')) {
-        $call='stageAsset("'+$path+'", "'+$path+'")'
-        Expect-Failure {Assert-EquipmentAndroidStaging $gradle ($activity.Replace($call,'true'))} 'exact native path'
-        Expect-Failure {Assert-EquipmentAndroidStaging $gradle ($activity.Replace($call,'stageAsset("'+$path+'", "wrong-native-path")'))} 'exact native path'
+                       'models/props/runtime/player-sword-scabbard/processing-receipt.json',
+                       'models/world/runtime/chapter-entry-return-v1/asset.manifest.json',
+                       'models/world/runtime/chapter-entry-return-v1/collapsed-entry-lod0.runtime.glb')) {
+        $call='stageAsset\("'+[regex]::Escape($path)+'",\s*"'+[regex]::Escape($path)+'"\)'
+        Expect-Failure {Assert-EquipmentAndroidStaging $gradle ([regex]::Replace($activity,$call,'true'))} 'exact native path'
+        Expect-Failure {Assert-EquipmentAndroidStaging $gradle ([regex]::Replace($activity,$call,'stageAsset("'+$path+'", "wrong-native-path")'))} 'exact native path'
     }
     foreach ($scriptPath in @('tools/package-alpha.ps1','tools/run-foundation-validation.ps1')) {
         $text=Get-Content (Join-Path $repo $scriptPath) -Raw
@@ -228,12 +231,21 @@ try {
         $heldArchive=New-HeldFixtureArchive ('held-corrupt-'+$name+'.zip') -Corrupt $path
         Expect-Failure {& $heldContract -AndroidApkPath $heldArchive -RequireHorde162World} 'byte/hash mismatch'
     }
+    foreach ($name in @('asset.manifest.json','collapsed-entry-lod0.runtime.glb')) {
+        $path="assets/models/world/runtime/chapter-entry-return-v1/$name"
+        $heldArchive=New-HeldFixtureArchive ('chapter-missing-'+$name+'.zip') -Omit $path
+        Expect-Failure {& $heldContract -AndroidApkPath $heldArchive} 'missing exact entry'
+        $heldArchive=New-HeldFixtureArchive ('chapter-duplicate-'+$name+'.zip') -Duplicate $path
+        Expect-Failure {& $heldContract -AndroidApkPath $heldArchive} 'exactly one'
+        $heldArchive=New-HeldFixtureArchive ('chapter-corrupt-'+$name+'.zip') -Corrupt $path
+        Expect-Failure {& $heldContract -AndroidApkPath $heldArchive} 'byte/hash mismatch'
+    }
     $windows=@(Get-Horde162RuntimeFiles $repo Windows);$android=@(Get-Horde162RuntimeFiles $repo Android)
     $baseWindows=@(Get-Horde162AssetSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Windows'})
     $baseAndroid=@(Get-Horde162AssetSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Android'})
     Require ($baseWindows.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Windows'}).Count -eq 33 -and
              $baseAndroid.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Android'}).Count -eq 34) 'Current shared asset roster includes the four admitted forest entries.'
-    Require ($windows.Count -eq 73 -and $android.Count -eq 74) 'Current closed roster includes exact tomb, tree-pair and Kit runtime assets; no editable sources.'
+    Require ($windows.Count -eq 75 -and $android.Count -eq 76) 'Current closed roster includes exact tomb, tree-pair and Kit runtime assets; no editable sources.'
     Require (@(Get-Horde17KitAssetSpecification).Count -eq 14) 'Kit admission must retain its exact thirteen-cut/one-manifest roster.'
     foreach ($kit in Get-Horde17KitAssetSpecification) {
         Require ($windows -ccontains $kit.Path -and $android -ccontains $kit.Path) 'Both platforms must admit every approved Kit runtime entry.'

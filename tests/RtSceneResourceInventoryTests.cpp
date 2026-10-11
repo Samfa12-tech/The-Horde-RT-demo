@@ -847,11 +847,26 @@ struct PresentableTinyRtSceneObservationTestAccess
         if (!baselineLoaded || !tombLoaded)
         { std::cerr << "Integrated tomb intake: " << diagnostic << '\n'; return false; }
         const auto oldIndices = baseline.collapseStaticAsset_.indices.size();
+        // The chapter selects its separately admitted lower, enclosed return.
+        // Dressing is appended after it; the legacy scene retains the tall source.
+        constexpr std::size_t chapterEntryIndices = 8254u * 3u;
+        float chapterEntryTop = -100.0f;
+        for (std::size_t i = 0; i < 2u && i < tomb.collapseStaticAsset_.primitives.size(); ++i)
+        {
+            const auto& primitive = tomb.collapseStaticAsset_.primitives[i];
+            for (std::uint32_t j = 0; j < primitive.indexCount; ++j)
+                chapterEntryTop = std::max(chapterEntryTop,
+                    tomb.collapseStaticAsset_.vertices.at(primitive.vertexOffset +
+                        tomb.collapseStaticAsset_.indices.at(primitive.indexOffset + j)).position[1]);
+        }
         // Original selected dressing plus two T03 candle stubs (664 each),
         // one offering bowl (960), the closed 12-triangle lintel lip, and
         // ten original pine/alder instances grouped into four primitives.
         constexpr std::size_t addedIndices = 46140u + (2u*664u + 960u + 12u + 50510u)*3u;
-        bool ok = tomb.collapseStaticAsset_.indices.size() == oldIndices + addedIndices &&
+        bool ok = oldIndices == 8422u * 3u &&
+                  baseline.collapseStaticAsset_.bounds.maximum[1] > 12.0f &&
+                  std::abs(chapterEntryTop - 6.0f) < 0.001f &&
+                  tomb.collapseStaticAsset_.indices.size() == chapterEntryIndices + addedIndices &&
                   tomb.staticMeshSlot_.PrimitiveMetadata().size() == 29u &&
                   tomb.staticMeshSlot_.Materials().size() == 30u &&
                   tomb.staticMeshSlot_.PrimitiveMetadata().size() <= 32u &&

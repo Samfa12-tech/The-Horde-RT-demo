@@ -48,6 +48,8 @@ function Test-HeldItemPackage {
     try {
         $entries = @($archive.Entries | ForEach-Object { $_.FullName.Replace('\', '/') })
         $requiredEntries = @(
+            "$AssetPrefix/models/world/runtime/chapter-entry-return-v1/asset.manifest.json",
+            "$AssetPrefix/models/world/runtime/chapter-entry-return-v1/collapsed-entry-lod0.runtime.glb",
             "$AssetPrefix/models/weapons/runtime/asset.manifest.json",
             "$AssetPrefix/models/weapons/runtime/gothic-arming-sword-rh-lod0.runtime.glb",
             "$AssetPrefix/models/props/runtime/asset.manifest.json",
@@ -89,6 +91,18 @@ function Test-HeldItemPackage {
                 finally { $stream.Dispose(); $sha.Dispose() }
                 if ($actual -cne (Get-FileHash -LiteralPath $source -Algorithm SHA256).Hash) { throw "Collapsed-entry package byte/hash mismatch: $name" }
             }
+        }
+        # Current packages also carry the independent development entry. Require
+        # exact source bytes, while retaining the immutable 1.6.2 check above.
+        foreach ($relative in @('asset.manifest.json', 'collapsed-entry-lod0.runtime.glb')) {
+            $name = "$AssetPrefix/models/world/runtime/chapter-entry-return-v1/$relative"
+            $matches = @($archive.Entries | Where-Object { $_.FullName -ceq $name })
+            if ($matches.Count -ne 1) { throw "Chapter entry package must contain exactly one '$name'." }
+            $source = Join-Path (Split-Path -Parent $PSScriptRoot) "assets/models/world/runtime/chapter-entry-return-v1/$relative"
+            $sha = [Security.Cryptography.SHA256]::Create(); $stream = $matches[0].Open()
+            try { $actual = [BitConverter]::ToString($sha.ComputeHash($stream)).Replace('-', '') }
+            finally { $stream.Dispose(); $sha.Dispose() }
+            if ($actual -cne (Get-FileHash -LiteralPath $source -Algorithm SHA256).Hash) { throw "Chapter entry package byte/hash mismatch: $name" }
         }
         # A ZIP entry alone is not an admitted runtime asset. Fresh isolated
         # checkouts can package Git LFS pointer text and still build successfully.
