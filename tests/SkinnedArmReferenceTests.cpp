@@ -529,6 +529,11 @@ bool CheckPose(horde::scene::SkinnedMeshAsset& asset,
         if (!Require(asset.SkinPlayerPoseUniqueTextured(pose, posed, tangents,
                                                         diagnostic),
                      diagnostic)) return false;
+        SkinnedPlayerPose unsupportedStance;
+        if (!Require(!asset.EvaluatePlayerPose(SkinnedClip::Idle, 0.0f, left, right,
+                                               unsupportedStance, diagnostic, 0.36f) &&
+                     !unsupportedStance.IsValid() && diagnostic.find("stance requires") != std::string::npos,
+                     "an arm-only fixture must reject a planted stance without leg chains")) return false;
 
         const Vec3 expectedElbow{{arm.shoulder[0] - arm.side * adjacent,
                                   arm.shoulder[1] - bendHeight,

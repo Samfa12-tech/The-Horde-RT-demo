@@ -1658,7 +1658,8 @@ bool SkinnedMeshAsset::SkinPlayerUniqueTextured(
 bool SkinnedMeshAsset::EvaluatePlayerPose(
     const SkinnedClip clipId, const float timeSeconds,
     const SkinnedArmIkTarget& leftArm, const SkinnedArmIkTarget& rightArm,
-    SkinnedPlayerPose& outputPose, std::string& diagnostic) const
+    SkinnedPlayerPose& outputPose, std::string& diagnostic,
+    const float plantedPelvisDropMetres) const
 {
     if (!outputPose.data_) outputPose.data_ = std::make_unique<SkinnedPlayerPoseData>();
     auto& solved = *outputPose.data_;
@@ -1674,6 +1675,17 @@ bool SkinnedMeshAsset::EvaluatePlayerPose(
     if (!std::isfinite(timeSeconds))
     {
         diagnostic = "Player pose time is not finite.";
+        return false;
+    }
+    if (!std::isfinite(plantedPelvisDropMetres) || plantedPelvisDropMetres < 0.0f ||
+        plantedPelvisDropMetres > kMaximumPlayerPelvisDropMetres)
+    {
+        diagnostic = "Player planted pelvis drop is outside the finite admitted range.";
+        return false;
+    }
+    if (plantedPelvisDropMetres > 0.0f && clipId != SkinnedClip::Idle)
+    {
+        diagnostic = "Planted player stance requires the stationary Idle clip.";
         return false;
     }
     const auto finiteArm = [](const SkinnedArmIkTarget& arm) {
@@ -1763,7 +1775,6 @@ bool SkinnedMeshAsset::EvaluatePlayerPose(
                                      : static_cast<std::size_t>(found - nodes_.begin());
     };
     const std::size_t hipsNode = findNode("Hips");
-    if (hipsNode < globals.size()) sockets.hips = globals[hipsNode].m;
     const auto isDescendant = [&pose](std::size_t node, const std::size_t ancestor) {
         while (node < pose.size())
         {
@@ -1774,6 +1785,85 @@ bool SkinnedMeshAsset::EvaluatePlayerPose(
         }
         return false;
     };
+    if (plantedPelvisDropMetres > 0.0f)
+    {
+        const std::array<std::array<std::size_t, 3u>, 2u> legs{{
+            {{findNode("LeftUpLeg"), findNode("LeftLeg"), findNode("LeftFoot")}},
+            {{findNode("RightUpLeg"), findNode("RightLeg"), findNode("RightFoot")}}}};
+        if (hipsNode >= globals.size())
+        {
+            diagnostic = "Planted player stance requires the Hips root.";
+            return false;
+        }
+        for (const auto& leg : legs)
+            if (leg[0] >= globals.size() || leg[1] >= globals.size() || leg[2] >= globals.size() ||
+                !isDescendant(leg[0], hipsNode) || !isDescendant(leg[1], leg[0]) ||
+                !isDescendant(leg[2], leg[1]))
+            {
+                diagnostic = "Planted player stance requires both hierarchical thigh/shin/foot chains.";
+                return false;
+            }
+        // Translate the whole pelvis/torso, then articulate each leg back to
+        // its original ankle. Foot descendants retain the authored transforms
+        // exactly. No shoulder-only shift, bone stretch or boot translation.
+        const auto authoredGlobals = globals;
+        for (std::size_t node = 0u; node < globals.size(); ++node)
+            if (isDescendant(node, hipsNode))
+            {
+                globals[node].m[13] -= plantedPelvisDropMetres;
+                globals[node].m[14] -= plantedPelvisDropMetres * kPlayerPlantedPelvisSetbackPerDrop;
+            }
+        const auto position = [](const Matrix& m) { return Vec3{m.m[12], m.m[13], m.m[14]}; };
+        for (std::size_t side = 0u; side < legs.size(); ++side)
+        {
+            const auto& leg = legs[side];
+            const Vec3 hip = position(globals[leg[0]]);
+            const Vec3 originalKnee = position(globals[leg[1]]);
+            const Vec3 originalFoot = position(globals[leg[2]]);
+            const Vec3 plantedFoot = position(authoredGlobals[leg[2]]);
+            const float thigh = Length(Subtract(originalKnee, hip));
+            const float shin = Length(Subtract(originalFoot, originalKnee));
+            const Vec3 request = Subtract(plantedFoot, hip);
+            const float distance = Length(request);
+            if (thigh < 0.0001f || shin < 0.0001f || distance <= std::abs(thigh - shin) ||
+                distance >= thigh + shin)
+            {
+                diagnostic = "Planted player stance cannot reach an ankle without changing leg length.";
+                return false;
+            }
+            const Vec3 direction = Normalise(request);
+            // The imported player is +Z forward. A small outward preference
+            // leaves the knees separated while both feet keep their clip pose.
+            const Vec3 pole{side == 0u ? 0.2f : -0.2f, 0.0f, 1.0f};
+            Vec3 projectedPole = Subtract(pole, Scale(direction, Dot(pole, direction)));
+            if (Length(projectedPole) < 0.0001f)
+            {
+                const Vec3 fallback = std::abs(direction.y) < 0.9f
+                    ? Vec3{0.0f, 1.0f, 0.0f} : Vec3{1.0f, 0.0f, 0.0f};
+                projectedPole = Subtract(fallback, Scale(direction, Dot(fallback, direction)));
+            }
+            const Vec3 bend = Normalise(projectedPole);
+            const float adjacent = (thigh * thigh - shin * shin + distance * distance) /
+                (2.0f * distance);
+            const float height = std::sqrt(std::max(thigh * thigh - adjacent * adjacent, 0.0f));
+            const Vec3 knee = Add(hip, Add(Scale(direction, adjacent), Scale(bend, height)));
+            const Matrix upperDelta = RotationAroundPoint(
+                FromToRotation(Subtract(originalKnee, hip), Subtract(knee, hip)), hip);
+            const Matrix lowerDelta = Multiply(
+                LocalMatrix(Subtract(knee, originalKnee), {}, {1.0f, 1.0f, 1.0f}),
+                RotationAroundPoint(FromToRotation(Subtract(originalFoot, originalKnee),
+                                                   Subtract(plantedFoot, knee)), originalKnee));
+            for (std::size_t node = 0u; node < globals.size(); ++node)
+            {
+                if (isDescendant(node, leg[2])) globals[node] = authoredGlobals[node];
+                else if (isDescendant(node, leg[1])) globals[node] = Multiply(lowerDelta, globals[node]);
+                else if (isDescendant(node, leg[0])) globals[node] = Multiply(upperDelta, globals[node]);
+            }
+            for (std::size_t joint = 0u; joint < leg.size(); ++joint)
+                (side == 0u ? sockets.leftLeg : sockets.rightLeg)[joint] = globals[leg[joint]].m;
+        }
+    }
+    if (hipsNode < globals.size()) sockets.hips = globals[hipsNode].m;
     const auto solveArm = [&globals, &findNode, &isDescendant, this, &diagnostic](
         const char* upperName,
         const char* lowerName,

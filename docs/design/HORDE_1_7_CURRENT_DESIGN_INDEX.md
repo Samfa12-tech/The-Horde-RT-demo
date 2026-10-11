@@ -348,3 +348,13 @@ safe-side recovery and reset/readiness generations. Graveyard/lid composition,
 GPU zone preparation/retirement, complete inspected traversal, sustained measurements
 and the current owner/phone acceptance gates remain required. Replacement tree
 generator/canopy work and mist issue28 stay deferred by the owner.
+
+The [stationary planted pull-up pose proof](../evidence/2026-10-12-planted-pullup-pose/README.md)
+adds an inactive native constraint for the grounded-anchor handoff. It lowers and
+sets back the actual torso, articulates the imported legs without stretching,
+retains exact ankle transforms and reaches low hand targets. Failed vertical-only
+and walking-pose experiments are retained; positive use is explicitly Idle only.
+Ordinary gameplay still uses zero, and inspected Pipeline/Query normal frames are
+pixel-identical. This is numerical capability evidence, not an integrated or
+visually accepted rope pose. Anchor/rim physics, snapshot/camera/collision and
+solved-hips equipment/light integration remain required before enabling it.

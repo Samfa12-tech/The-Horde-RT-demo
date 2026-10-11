@@ -106,7 +106,16 @@ struct SkinnedPlayerSockets
     SkinnedNodeTransform rightHand{};
     SkinnedNodeTransform leftGrip{};
     SkinnedNodeTransform rightGrip{};
+    // Hip joint, knee and ankle in the same immutable solved palette.
+    // Empty when the planted stance is not requested (the legacy fast path).
+    std::array<SkinnedNodeTransform, 3u> leftLeg{};
+    std::array<SkinnedNodeTransform, 3u> rightLeg{};
 };
+
+inline constexpr float kMaximumPlayerPelvisDropMetres = 0.72f;
+// Reversible native pose recipe: move the pelvis back as the knees fold.
+// In the imported +Z-forward frame, the deepest admitted pose sets back 18 cm.
+inline constexpr float kPlayerPlantedPelvisSetbackPerDrop = 0.25f;
 
 struct SkinnedPlayerPoseData;
 struct SkinnedPlayerRigLayout;
@@ -203,10 +212,15 @@ public:
                                   std::vector<SkinnedPbrTangent>& outputTangents,
                                   SkinnedPlayerSockets& sockets,
                                   std::string& diagnostic) const;
+    // Positive drop is stationary Idle only: it lowers/sets back the torso and
+    // folds both legs without changing lengths or authored ankle transforms.
+    // [0, 0.72] metres; zero keeps the old palette for every supported clip.
+    // This is a pose constraint, not a movement/collision or foot support query.
     bool EvaluatePlayerPose(SkinnedClip clip, float timeSeconds,
                             const SkinnedArmIkTarget& leftArm,
                             const SkinnedArmIkTarget& rightArm,
-                            SkinnedPlayerPose& pose, std::string& diagnostic) const;
+                            SkinnedPlayerPose& pose, std::string& diagnostic,
+                            float plantedPelvisDropMetres = 0.0f) const;
     // Requires exact ordered joint names and inverse-bind agreement. A successful
     // binding is cached by immutable rig identity, never by raw asset addresses.
     bool SkinPlayerPoseUniqueTextured(const SkinnedPlayerPose& pose,

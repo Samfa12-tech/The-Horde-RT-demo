@@ -1428,7 +1428,128 @@ int main(int argc, char** argv)
                              !movedPose.IsValid(), "non-finite IK input must be rejected")) return 1;
             }
         }
-        std::cout << "Viewmodel addressing, shared pose/vertex/tangent/grip agreement and invalid-pose rejection passed\n";
+        // A grounded anchor needs a real folded-leg stance at the rim. Prove
+        // the imported whole-body palette, not just relocated arm shoulders.
+        const auto jointDistance = [](const SkinnedNodeTransform& a,
+                                      const SkinnedNodeTransform& b) {
+            return std::hypot(std::hypot(a[12] - b[12], a[13] - b[13]), a[14] - b[14]);
+        };
+        constexpr std::array<std::string_view, 7u> stanceNodes{{"Hips", "LeftUpLeg", "LeftLeg",
+            "LeftFoot", "RightUpLeg", "RightLeg", "RightFoot"}};
+        std::size_t stanceSamples = 0u;
+        for (const auto clip : {SkinnedClip::Idle, SkinnedClip::Walking})
+        for (const float phase : {0.0f, 0.25f, 0.75f})
+        {
+            const float time = phase * world.ClipDuration(clip);
+            std::array<SkinnedNodeTransform, stanceNodes.size()> authored{};
+            if (!world.NodeTransforms(clip, time, stanceNodes, authored, diagnostic)) return 1;
+            if (clip == SkinnedClip::Idle && phase == 0.0f)
+                for (std::size_t joint = 0u; joint < stanceNodes.size(); ++joint)
+                    std::cout << "authored " << stanceNodes[joint] << '=' << authored[joint][12] << ','
+                              << authored[joint][13] << ',' << authored[joint][14] << '\n';
+            SkinnedArmIkTarget left{}, right{};
+            left.poseWeight = right.poseWeight = 0.0f;
+            SkinnedPlayerPose basePose;
+            std::vector<TexturedSkinnedRtVertex> baseVertices;
+            std::vector<SkinnedPbrTangent> baseTangents;
+            if (!world.EvaluatePlayerPose(clip, time, left, right, basePose, diagnostic) ||
+                !world.SkinPlayerPoseUniqueTextured(basePose, baseVertices, baseTangents, diagnostic)) return 1;
+            for (const float drop : {0.0f, 0.18f, 0.36f, 0.54f, kMaximumPlayerPelvisDropMetres})
+            {
+                SkinnedPlayerPose stancePose, independentPose;
+                if (clip != SkinnedClip::Idle && drop > 0.0f)
+                {
+                    if (!Require(world.EvaluatePlayerPose(SkinnedClip::Idle, 0.0f, left, right, stancePose, diagnostic, 0.36f) &&
+                                 viewmodel.EvaluatePlayerPose(SkinnedClip::Idle, 0.0f, left, right, independentPose, diagnostic, 0.36f) &&
+                                 !world.EvaluatePlayerPose(clip, time, left, right, stancePose, diagnostic, drop) &&
+                                 !stancePose.IsValid() && diagnostic.find("stationary Idle") != std::string::npos &&
+                                 !viewmodel.EvaluatePlayerPose(clip, time, left, right, independentPose, diagnostic, drop) &&
+                                 !independentPose.IsValid(),
+                                 "moving clips must explicitly reject the stationary planted stance")) return 1;
+                    continue;
+                }
+                std::vector<TexturedSkinnedRtVertex> bodyVertices, sharedVertices, independentVertices;
+                std::vector<SkinnedPbrTangent> bodyTangents, sharedTangents, independentTangents;
+                if (!world.EvaluatePlayerPose(clip, time, left, right, stancePose, diagnostic, drop) ||
+                    !viewmodel.EvaluatePlayerPose(clip, time, left, right, independentPose, diagnostic, drop) ||
+                    !world.SkinPlayerPoseUniqueTextured(stancePose, bodyVertices, bodyTangents, diagnostic) ||
+                    !viewmodel.SkinPlayerPoseUniqueTextured(stancePose, sharedVertices, sharedTangents, diagnostic) ||
+                    !viewmodel.SkinPlayerPoseUniqueTextured(independentPose, independentVertices, independentTangents, diagnostic))
+                {
+                    std::cerr << "FAIL: planted stance: " << diagnostic << '\n';
+                    return 1;
+                }
+                const auto& sockets = stancePose.Sockets();
+                const float supportPlane = std::min_element(baseVertices.begin(), baseVertices.end(),
+                    [](const auto& a, const auto& b) { return a.position[1] < b.position[1]; })->position[1];
+                if (!Require(std::abs(sockets.hips[13] - (authored[0][13] - drop)) < 0.0001f &&
+                             sockets.hips[12] == authored[0][12] &&
+                             std::abs(sockets.hips[14] - (authored[0][14] - drop * kPlayerPlantedPelvisSetbackPerDrop)) < 0.0001f,
+                             "planted stance must lower and set back the real Hips attachment by the admitted recipe")) return 1;
+                for (std::size_t leg = 0u; drop > 0.0f && leg < 2u; ++leg)
+                {
+                    const auto& solvedLeg = leg ? sockets.rightLeg : sockets.leftLeg;
+                    const std::size_t start = leg ? 4u : 1u;
+                    if (!Require(solvedLeg[2] == authored[start + 2u],
+                                 "folded stance must preserve exact ankle position, orientation and scale")) return 1;
+                    if (!Require(solvedLeg[1][13] >= supportPlane + 0.05f,
+                                 "folded stance must keep each knee above the actual standing mesh support plane")) return 1;
+                    for (std::size_t bone = 0u; bone < 2u; ++bone)
+                        if (!Require(std::abs(jointDistance(solvedLeg[bone], solvedLeg[bone + 1u]) -
+                                             jointDistance(authored[start + bone], authored[start + bone + 1u])) < 0.0001f,
+                                     "folded thigh and shin must retain imported lengths without stretch")) return 1;
+                }
+                if (drop == 0.0f && !Require(sockets.leftLeg == decltype(sockets.leftLeg){} &&
+                    sockets.rightLeg == decltype(sockets.rightLeg){},
+                    "zero stance must use the legacy fast path without solving or querying leg chains")) return 1;
+                if (!Require(FiniteTexturedVertices(bodyVertices) && FiniteTexturedVertices(sharedVertices) &&
+                             bodyVertices.size() == baseVertices.size() && sharedVertices.size() == independentVertices.size() &&
+                             sharedTangents.size() == independentTangents.size() &&
+                             std::memcmp(sharedVertices.data(), independentVertices.data(), sharedVertices.size() * sizeof(TexturedSkinnedRtVertex)) == 0 &&
+                             std::memcmp(sharedTangents.data(), independentTangents.data(), sharedTangents.size() * sizeof(SkinnedPbrTangent)) == 0,
+                             "folded stance must drive finite body and byte-identical shared viewmodel geometry")) return 1;
+                if (drop == 0.0f && !Require(bodyVertices.size() == baseVertices.size() &&
+                    std::memcmp(bodyVertices.data(), baseVertices.data(), bodyVertices.size() * sizeof(TexturedSkinnedRtVertex)) == 0 &&
+                    std::memcmp(bodyTangents.data(), baseTangents.data(), bodyTangents.size() * sizeof(SkinnedPbrTangent)) == 0,
+                    "zero stance must retain byte-identical normal-play skinning")) return 1;
+                if (drop > 0.0f && clip == SkinnedClip::Idle && phase == 0.0f)
+                    std::cout << "stance drop=" << drop << " hips=" << sockets.hips[13]
+                              << " left_knee=" << sockets.leftLeg[1][12] << ',' << sockets.leftLeg[1][13] << ',' << sockets.leftLeg[1][14]
+                              << " right_knee=" << sockets.rightLeg[1][12] << ',' << sockets.rightLeg[1][13] << ',' << sockets.rightLeg[1][14] << '\n';
+                ++stanceSamples;
+            }
+            // Actual low-rim hand targets must still be reached by the arm
+            // solve after the torso moved, with the same planted leg palette.
+            if (clip == SkinnedClip::Idle)
+            {
+                left.poseWeight = right.poseWeight = 1.0f;
+                left.target = {{0.08f, 0.15f, 0.30f}};
+                right.target = {{-0.08f, 0.15f, 0.30f}};
+                left.pole = {{1.0f, 0.0f, 1.0f}};
+                right.pole = {{-1.0f, 0.0f, 1.0f}};
+                SkinnedPlayerPose lowGripPose;
+                if (!world.EvaluatePlayerPose(clip, time, left, right, lowGripPose, diagnostic,
+                                              kMaximumPlayerPelvisDropMetres)) return 1;
+                const auto& lowSockets = lowGripPose.Sockets();
+                for (std::size_t hand = 0u; hand < 2u; ++hand)
+                {
+                    const auto& actual = hand ? lowSockets.rightHand : lowSockets.leftHand;
+                    const auto& target = hand ? right.target : left.target;
+                    if (!Require(std::hypot(std::hypot(actual[12] - target[0], actual[13] - target[1]), actual[14] - target[2]) < 0.0001f,
+                                 "both real arm chains must reach the low-rim targets after the torso folds")) return 1;
+                }
+                if (!Require(lowSockets.leftLeg[2] == authored[3] && lowSockets.rightLeg[2] == authored[6],
+                             "reaching both low grips must retain the planted ankles")) return 1;
+            }
+            SkinnedPlayerPose rejected;
+            for (const float invalid : {-0.01f, kMaximumPlayerPelvisDropMetres + 0.01f,
+                                       std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::infinity()})
+                if (!Require(world.EvaluatePlayerPose(clip, time, left, right, rejected, diagnostic) &&
+                             !world.EvaluatePlayerPose(clip, time, left, right, rejected, diagnostic, invalid) && !rejected.IsValid(),
+                             "invalid stance must reject and invalidate the previous solved palette")) return 1;
+        }
+        std::cout << "Viewmodel addressing, shared pose/vertex/tangent/grip agreement and invalid-pose rejection passed; planted_stance_samples="
+                  << stanceSamples << '\n';
         return 0;
     }
     if (argc == 4 && std::string(argv[1]) == "--validate-player-admission")
