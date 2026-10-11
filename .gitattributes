@@ -330,3 +330,6 @@ tools/validate-chapter-terrain.py text eol=lf
 assets/models/characters/runtime/kit-warden-v1/*.json text eol=lf
 docs/evidence/2026-10-11-kit-pbr-preparation/** text eol=lf
 docs/evidence/2026-10-11-kit-pbr-preparation/*.log whitespace=-trailing-space,-blank-at-eof
+tools/prepare-kit-runtime.py text eol=lf
+tools/build-kit-textures.ps1 text eol=lf
+tests/fixtures/skinned-pbr/generate.py text eol=lf
