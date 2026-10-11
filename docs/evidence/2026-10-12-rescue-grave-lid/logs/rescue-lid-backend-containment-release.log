@@ -1,0 +1,30 @@
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+    Start  54: horde_rt_final_held_torch_clearance_tests
+1/6 Test  #54: horde_rt_final_held_torch_clearance_tests ................   Passed   17.75 sec
+    Start  82: horde_rt_scene_abi_tests
+2/6 Test  #82: horde_rt_scene_abi_tests .................................   Passed    0.04 sec
+    Start 101: horde_rt_rayquery_compute_shader_tests
+3/6 Test #101: horde_rt_rayquery_compute_shader_tests ...................***Failed    1.03 sec
+Exception: C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\tools\GenerateRayQueryComputeVariants.ps1:289
+Line |
+ 289 |          throw "Compute compilation failed for $($Variant.key) with ex …
+     |          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     | Compute compilation failed for rayquery_compute_diagnostic_high_generic_dielectric with exit code 1:
+     | C:\Users\sam_s\Documents\the Horde RT
+     | Demo\.worktrees\horde-1.7-wp2-vertical-proof\shaders\raytracing\minimal.comp ERROR: Failed to open file:
+     | C:\Users\sam_s\AppData\Local\Packages\sandbox.{ccb89665-246b-415a-9768-befea1bde84b}\AC\Temp\horde-rt-rayquery-compute-check-1c7dc4eba1c44cefbe8880cb19397d38\run-514a39ec88144eb6a3b773fa7320fea1\rayquery_compute_diagnostic_high_generic_dielectric\minimal.comp.raw.spv
+
+    Start 162: horde_rt_final_windows_bundle_containment
+4/6 Test #162: horde_rt_final_windows_bundle_containment ................   Passed   11.46 sec
+    Start 163: horde_rt_final_windows_bundle_containment_controls
+5/6 Test #163: horde_rt_final_windows_bundle_containment_controls .......   Passed  120.34 sec
+    Start 164: horde_rt_final_windows_bundle_containment_registration
+6/6 Test #164: horde_rt_final_windows_bundle_containment_registration ...   Passed   86.00 sec
+
+83% tests passed, 1 tests failed out of 6
+
+Total Test time (real) = 236.65 sec
+
+The following tests FAILED:
+	101 - horde_rt_rayquery_compute_shader_tests (Failed)
+Errors while running CTest

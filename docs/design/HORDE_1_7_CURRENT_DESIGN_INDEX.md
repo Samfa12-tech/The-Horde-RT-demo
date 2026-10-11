@@ -15,7 +15,9 @@ and inspected on both RT backends. The dark/tight hand views still need owner
 acceptance. The [rescue graveyard milestone](../evidence/2026-10-12-rescue-graveyard/README.md)
 adds grounded markers and verified T03 covers/cold offerings with matching
 immutable contact and unchanged material/texture/primitive ceilings.
-Rescue-lid finish, ordinary GPU zone lifetimes, remaining
+The [rescue grave-lid finish](../evidence/2026-10-12-rescue-grave-lid/README.md)
+adds bounded original relief and shared stone shading, with native round-trip,
+both-backend captures and replacement/restore verification. Ordinary GPU zone lifetimes, remaining
 prepared dressing, full chapter gallery and sustained/phone acceptance remain
 required. Older staged proofs below retain their historical scope.
 
@@ -492,3 +494,21 @@ The [current graveyard evidence](../evidence/2026-10-12-rescue-graveyard/README.
 Tomb ornament families now also own exterior offerings. The GPU diagnostic retains the complete owner until spatial retention is proved; the earlier 1.587MiB ornament-only saving is historical, not current eviction eligibility. Normal two-way resource preparation/readiness remains unfinished. The rescue lid, remaining prepared dressing, distant shell and physical acceptance still prevent chapter completion.
 
 All six jobs passed on parent `fbe33b9f40c9d844702c805b48ffb420533b2a25` in [run38176375984](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/38176375984), including Vulkan40/40 and all seven requested traversal executions. Fresh source/CI identities belong to the next pushed milestone; do not infer them from the parent result.
+
+### Graveyard package fixture and lid continuation (12 October)
+
+All six jobs passed on `ee808c02136d62c7d6657f1153e48e68629d9d04` in
+[run38182008135](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/38182008135).
+MSVC executed 133/133 (Unicode edit 312 ms), GCC/Clang 122/122 and Vulkan41/41,
+including all seven requested traversal CTests. The preceding graveyard push
+failed the exact package-count fixture in all three compiler lanes: the admitted
+four marker payloads required 90/91 entries. The correction pins those exact
+paths and preserves negative package coverage; failed-run evidence remains.
+
+The next [lid milestone](../evidence/2026-10-12-rescue-grave-lid/README.md) preserves
+the accepted seal/slide/rope contracts while adding original stone relief.
+Debug/Release focused and backend tests, four-ABI Android/lint/Java/package and
+all sixteen fresh shader artifacts are checked locally, with retained sandbox
+and readiness failures. Exact CI belongs to its new pushed SHA. Ordinary
+incremental zone streaming and the remaining chapter presentation/physical
+gates remain open; the full-owner diagnostic does not establish eviction.

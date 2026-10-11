@@ -1,4 +1,5 @@
 #include "scene/RescueBlockoutGeometry.h"
+#include "scene/RescueLidFinish.h"
 #include "scene/assets/AssetManifest.h"
 #include "scene/assets/StaticMeshAsset.h"
 #include "gameplay/traversal/RescueTraversal.h"
@@ -169,9 +170,8 @@ bool TriangleMatchesBoxFace(const std::array<QuantizedPoint, 3u>& triangle,
     return ab0 * ac1 - ab1 * ac0 != 0;
 }
 
-void CheckRecipeEquivalence(const horde::scene::assets::StaticMeshAsset& asset)
+void CheckRecipeEquivalence(const horde::scene::assets::StaticMeshAsset& asset, const std::vector<RescueBlockoutBox>& boxes=AllRecipeBoxes())
 {
-    const auto boxes = AllRecipeBoxes();
     for (const auto& primitive : asset.primitives)
     {
         if (primitive.materialIndex >= asset.materials.size())
@@ -337,6 +337,24 @@ int main()
               kRescueBlockoutLandingCollision.topY == 2.05f &&
               !RescueLandingContains(-33.7f, -11.7f),
               "shared landing collision contains the existing upper landing and excludes the edge");
+    }
+
+    const auto lidSource=sourceRoot / "assets/source/development-rescue-lid-finish-v1";
+    AssetManifest lidManifest; StaticMeshAsset finishedLid;
+    Check(AssetManifest::Load(lidSource / "asset.manifest.json",lidManifest,diagnostic) &&
+        Load(lidSource / "rescue-lid-finish-roundtrip.glb",lidManifest,&finishedLid,diagnostic),
+        std::string("original finished lid passes the Blender/native round trip: ")+diagnostic);
+    Check(finishedLid.primitives.size()==6 && finishedLid.indices.size()==216 &&
+        finishedLid.materials.size()==1,"finished lid adds only 72 opaque triangles, one existing stone family");
+    const auto pieces=RescueLidFinishBoxes();
+    if(finishedLid.primitives.size()==pieces.size())for(std::size_t i=0;i<pieces.size();++i) {
+        StaticMeshAsset part=finishedLid; auto primitive=finishedLid.primitives[i];
+        const auto end=i+1<pieces.size()?finishedLid.primitives[i+1].vertexOffset:finishedLid.vertices.size();
+        part.vertices.assign(finishedLid.vertices.begin()+primitive.vertexOffset,finishedLid.vertices.begin()+end);
+        part.indices.assign(finishedLid.indices.begin()+primitive.indexOffset,
+            finishedLid.indices.begin()+primitive.indexOffset+primitive.indexCount);
+        primitive.vertexOffset=0;primitive.indexOffset=0;part.primitives={primitive};
+        CheckRecipeEquivalence(part,{pieces[i]});
     }
 
     const auto unique = std::chrono::steady_clock::now().time_since_epoch().count();

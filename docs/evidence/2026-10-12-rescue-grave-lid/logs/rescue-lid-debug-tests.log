@@ -1,0 +1,29 @@
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+      Start  84: horde_rt_tomb_dressing_tests
+ 1/12 Test  #84: horde_rt_tomb_dressing_tests ...................   Passed    0.42 sec
+      Start  85: horde_rt_world_surface_range_tests
+ 2/12 Test  #85: horde_rt_world_surface_range_tests .............   Passed    0.02 sec
+      Start  86: horde_rt_graveyard_dressing_tests
+ 3/12 Test  #86: horde_rt_graveyard_dressing_tests ..............   Passed    1.64 sec
+      Start  87: horde_rt_forest_dressing_tests
+ 4/12 Test  #87: horde_rt_forest_dressing_tests .................   Passed    6.39 sec
+      Start 159: horde_rt_scene_initialise_preflight_tests
+ 5/12 Test #159: horde_rt_scene_initialise_preflight_tests ......   Passed    3.41 sec
+      Start 160: horde_rt_static_geometry_cutover_tests
+ 6/12 Test #160: horde_rt_static_geometry_cutover_tests .........   Passed    3.57 sec
+      Start 161: horde_rt_scene_resource_inventory_tests
+ 7/12 Test #161: horde_rt_scene_resource_inventory_tests ........   Passed   18.48 sec
+      Start 175: horde_rt_rescue_blockout_import_tests
+ 8/12 Test #175: horde_rt_rescue_blockout_import_tests ..........   Passed    2.59 sec
+      Start 176: horde_rt_rescue_journey_integration_tests
+ 9/12 Test #176: horde_rt_rescue_journey_integration_tests ......   Passed   10.25 sec
+      Start 177: horde_rt_chapter_terrain_journey_tests
+10/12 Test #177: horde_rt_chapter_terrain_journey_tests .........   Passed   27.42 sec
+      Start 184: horde_rt_rescue_rig_attachment_tests
+11/12 Test #184: horde_rt_rescue_rig_attachment_tests ...........   Passed   31.42 sec
+      Start 185: horde_rt_rescue_adversarial_regression_tests
+12/12 Test #185: horde_rt_rescue_adversarial_regression_tests ...   Passed   29.33 sec
+
+100% tests passed, 0 tests failed out of 12
+
+Total Test time (real) = 134.97 sec

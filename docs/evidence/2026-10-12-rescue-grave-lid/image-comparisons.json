@@ -1,0 +1,62 @@
+[
+  {
+    "label": "portal preservation",
+    "changedPixels": 73,
+    "maxChannelDelta": 1,
+    "meanChannelDelta": 4.8225308641975306e-05,
+    "images": [
+      "docs/evidence/2026-10-12-rescue-graveyard/portal-pipeline/199-chapter-stone-portal-rear.png",
+      "reports/rescue-lid-accepted-portal-pipeline/199-chapter-stone-portal-rear.png"
+    ]
+  },
+  {
+    "label": "pipeline commit",
+    "changedPixels": 0,
+    "maxChannelDelta": 0,
+    "meanChannelDelta": 0.0,
+    "images": [
+      "reports/rescue-lid-fresh-west-cutover-pipeline/cutover-00-before.png",
+      "reports/rescue-lid-fresh-west-cutover-pipeline/cutover-01-selected.png"
+    ]
+  },
+  {
+    "label": "pipeline restore",
+    "changedPixels": 0,
+    "maxChannelDelta": 0,
+    "meanChannelDelta": 0.0,
+    "images": [
+      "reports/rescue-lid-fresh-west-cutover-pipeline/cutover-00-before.png",
+      "reports/rescue-lid-fresh-west-cutover-pipeline/cutover-02-restored.png"
+    ]
+  },
+  {
+    "label": "query commit",
+    "changedPixels": 0,
+    "maxChannelDelta": 0,
+    "meanChannelDelta": 0.0,
+    "images": [
+      "reports/rescue-lid-fresh-west-cutover-query/cutover-00-before.png",
+      "reports/rescue-lid-fresh-west-cutover-query/cutover-01-selected.png"
+    ]
+  },
+  {
+    "label": "query restore",
+    "changedPixels": 0,
+    "maxChannelDelta": 0,
+    "meanChannelDelta": 0.0,
+    "images": [
+      "reports/rescue-lid-fresh-west-cutover-query/cutover-00-before.png",
+      "reports/rescue-lid-fresh-west-cutover-query/cutover-02-restored.png"
+    ]
+  },
+  {
+    "label": "backend comparison",
+    "changedPixels": 3197,
+    "maxChannelDelta": 33,
+    "meanChannelDelta": 0.003229809670781893,
+    "images": [
+      "reports/rescue-lid-fresh-west-cutover-pipeline/cutover-00-before.png",
+      "reports/rescue-lid-fresh-west-cutover-query/cutover-00-before.png"
+    ]
+  }
+]

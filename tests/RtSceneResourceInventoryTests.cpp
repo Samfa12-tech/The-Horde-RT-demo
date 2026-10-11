@@ -341,6 +341,36 @@ namespace horde::vulkan::raytracing
 
 struct PresentableTinyRtSceneObservationTestAccess
 {
+    static bool CheckProceduralSurfaceReadiness()
+    {
+        using namespace horde::gameplay::simulation;
+        PresentableTinyRtScene scene;
+        scene.ready_=true;scene.developmentWorldRoute_=true;scene.developmentRescueJourney_=true;
+        scene.worldRouteGeometry_.valid=true;
+        scene.vertexBuffer_.memory=FakeHandle<VkDeviceMemory>(101);
+        scene.indexBuffer_.memory=FakeHandle<VkDeviceMemory>(102);
+        scene.blas_.handle=FakeHandle<VkAccelerationStructureKHR>(103);
+        scene.tlas_.handle=FakeHandle<VkAccelerationStructureKHR>(104);
+        scene.rescueWorldUpdateScratch_.buffer=FakeHandle<VkBuffer>(105);
+        scene.rescueWorldVertices_.resize(3);
+        scene.rescueWorldPrimitiveCount_=100;
+        scene.finaleRoofSurfaceBase_=100;scene.finaleRoofSurfaceCount_=72;
+        scene.rescueWorldSurfaceCodes_.resize(172);
+        const TriangleSupportSurface::Triangle triangle{{{{0,0,0},{0,0,1},{1,0,0}}},SupportSurface::Stone};
+        std::string diagnostic;
+        scene.chapterTerrainSurface_=TriangleSupportSurface::Build(std::span(&triangle,1),diagnostic);
+        const WorldZoneToken token{1,WorldZoneId::TombExterior};
+        bool ok=scene.WorldZoneReadiness(token)==ZoneReadiness::Ready;
+        scene.rescueWorldSurfaceCodes_.pop_back();
+        ok &= scene.WorldZoneReadiness(token)==ZoneReadiness::Preparing;
+        scene.rescueWorldSurfaceCodes_.push_back(0);
+        ++scene.finaleRoofSurfaceBase_;
+        ok &= scene.WorldZoneReadiness(token)==ZoneReadiness::Preparing;
+        --scene.finaleRoofSurfaceBase_;scene.finaleRoofSurfaceCount_=0;
+        ok &= scene.WorldZoneReadiness(token)==ZoneReadiness::Preparing;
+        return ok; // Synthetic handles have no device and cannot destroy Vulkan resources.
+    }
+
     static bool CheckStaticGroupingSemantics()
     {
         using horde::scene::assets::StaticMeshAsset;
@@ -1460,6 +1490,8 @@ int main()
 #endif
     std::cerr << "Resource integration: existing readback/mist/torch contracts\n";
     bool ok = PresentableTinyRtSceneObservationTestAccess::CheckPersistentReadback();
+    ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckProceduralSurfaceReadiness(),
+                  "chapter readiness must admit the complete world/lid code buffer and reject missing/misaligned ranges");
     ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckStaticGroupingSemantics(),
                   "adjacent static grouping must preserve every triangle/material/vertex and reject malformed input atomically");
     ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckWorldMaterialPaletteSemantics(),

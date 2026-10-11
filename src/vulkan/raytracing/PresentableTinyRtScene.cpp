@@ -2,6 +2,8 @@
 #include "scene/EntryPortalCapGeometry.h"
 #include "scene/ForestDressing.h"
 #include "scene/GraveyardDressing.h"
+#include "scene/RescueLidFinish.h"
+#include "vulkan/raytracing/RtWorldSurfaceRange.h"
 #include "scene/assets/StaticPrimitiveGrouping.h"
 #include "vulkan/raytracing/RtWorldMaterialPalette.h"
 #include "scene/TombDressing.h"
@@ -757,6 +759,8 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     rescueRopeVertexOffset_=std::exchange(other.rescueRopeVertexOffset_,0);
     rescueWorldPrimitiveCount_=std::exchange(other.rescueWorldPrimitiveCount_,0);
     rescueWorldMaxVertex_=std::exchange(other.rescueWorldMaxVertex_,0);
+    finaleRoofSurfaceBase_=std::exchange(other.finaleRoofSurfaceBase_,0);
+    finaleRoofSurfaceCount_=std::exchange(other.finaleRoofSurfaceCount_,0);
     stagedWorldPreparation_=std::exchange(other.stagedWorldPreparation_,false);
     worldRouteGeometry_=std::move(other.worldRouteGeometry_);
     chapterTerrainSurface_=std::move(other.chapterTerrainSurface_);
@@ -1075,7 +1079,9 @@ horde::gameplay::simulation::ZoneReadiness PresentableTinyRtScene::WorldZoneRead
         return ZoneReadiness::Preparing;
     if(developmentRescueJourney_ && (!chapterTerrainSurface_ || rescueWorldUpdateScratch_.buffer==VK_NULL_HANDLE ||
         rescueWorldVertices_.empty() || rescueWorldPrimitiveCount_==0 ||
-        rescueWorldSurfaceCodes_.size()!=rescueWorldPrimitiveCount_)) return ZoneReadiness::Preparing;
+        finaleRoofSurfaceBase_!=rescueWorldPrimitiveCount_ || !finaleRoofSurfaceCount_ ||
+        rescueWorldSurfaceCodes_.size()!=static_cast<std::size_t>(rescueWorldPrimitiveCount_)+finaleRoofSurfaceCount_))
+        return ZoneReadiness::Preparing;
     return ZoneReadiness::Ready;
 }
 void PresentableTinyRtScene::Destroy()
@@ -1133,6 +1139,7 @@ void PresentableTinyRtScene::Destroy()
     DestroyBuffer(waterDropletBlasUpdateScratch_);
     rescueWorldVertices_.clear();
     rescueWorldSurfaceCodes_.clear();
+    finaleRoofSurfaceBase_=0; finaleRoofSurfaceCount_=0;
     characterSlot_.DestroyGpuResources(gpuResources_);
     chapterActor_ = {};
     chapterActorReady_ = thirdActorIsCompanion_ = thirdActorNeedsBuild_ = chapterActorNeedsRefit_ = false;
@@ -3928,7 +3935,6 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
             addWorldTriangle(Vertex{{p[0],p[1],p[2]}},Vertex{{q[0],q[1],q[2]}},Vertex{{r[0],r[1],r[2]}},SurfaceDryStone,
                 static_cast<SurfaceNormal>(horde::scene::RescueRopeTriangleNormalCode(p,q,r)));
         }
-        rescueWorldSurfaceCodes_=worldSurfaceCodes;
         rescueWorldVertices_.clear();
         for(const auto& vertex:vertices) rescueWorldVertices_.push_back({vertex.position[0],vertex.position[1],vertex.position[2]});
     }
@@ -3949,10 +3955,19 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     // Closed-position sliding roof slab. Its TLAS transform moves west after
     // the lich's death animation, physically exposing the sky to primary and
     // visibility rays rather than fading a ceiling texture away.
-    if(developmentRescueJourney_) {
-        const auto& lid=horde::scene::kRescueBlockoutLid;
+    finaleRoofSurfaceBase_=static_cast<std::uint32_t>(worldSurfaceCodes.size());
+    const auto addStoneLidBox=[&](const horde::scene::RescueBlockoutBox& lid) {
         addBox(lid.minimum[0],lid.minimum[1],lid.minimum[2],lid.maximum[0],lid.maximum[1],lid.maximum[2]);
-    } else addBox(-34.90f, 1.30f, -16.60f, -32.50f, 1.42f, -13.80f);
+        // addBox's closed face order: -Z,+Z,-X,+X,+Y,-Y. The code buffer is
+        // independent of vertex/index offsets and BLAS-local primitive IDs.
+        for(auto normal:{SurfaceBack,SurfaceForward,SurfaceLeft,SurfaceRight,SurfaceUp,SurfaceDown})
+            worldSurfaceCodes.insert(worldSurfaceCodes.end(),2,surfaceCode(SurfaceDryStone,normal));
+    };
+    if(developmentRescueJourney_) {
+        for(const auto& piece:horde::scene::RescueLidFinishBoxes())addStoneLidBox(piece);
+    } else addStoneLidBox({{{-34.90f,1.30f,-16.60f}},{{-32.50f,1.42f,-13.80f}},0u});
+    finaleRoofSurfaceCount_=static_cast<std::uint32_t>(worldSurfaceCodes.size())-finaleRoofSurfaceBase_;
+    if(developmentRescueJourney_)rescueWorldSurfaceCodes_=worldSurfaceCodes;
     const std::uint32_t finaleRoofIndexCount = static_cast<std::uint32_t>(indices.size());
 
     // The production torch body comes through the generic static GLB/PBR slot.
@@ -7132,6 +7147,9 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         pipelineBundle_.DiagnosticAvailability() == RtDiagnosticAvailability::Available;
     const RtDielectricDiagnostics clearedDielectricDiagnostics{};
     auto frameInstanceMetadata = staticMeshSlot_.InstanceMetadata();
+    if(sceneProfile_==RtSceneProfile::Showcase &&
+       !SetWorldSurfaceRange(frameInstanceMetadata[17],finaleRoofSurfaceBase_,finaleRoofSurfaceCount_,
+            worldSurfaceBuffer_.size/sizeof(std::uint32_t),diagnostic)) return false;
     if (!thirdActorIsCompanion_)
         frameInstanceMetadata[CharacterRenderSlot::kKeeperMetadataIndex] = {};
     frameInstanceMetadata[kWaterDropletMetadataIndex].flags =
@@ -7263,7 +7281,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         }
         if(!WriteBuffer(vertexBuffer_,rescueWorldVertices_.data(),rescueWorldVertices_.size()*sizeof(rescueWorldVertices_[0]),
             "rescue world vertex update",diagnostic,observation)) return false;
-        if(rescueWorldSurfaceCodes_.size()!=rescueWorldPrimitiveCount_ ||
+        if(rescueWorldSurfaceCodes_.size()!=rescueWorldPrimitiveCount_+finaleRoofSurfaceCount_ ||
            rescueWorldSurfaceCodes_.size()*sizeof(rescueWorldSurfaceCodes_[0])!=worldSurfaceBuffer_.size ||
            rope.size()/3>rescueWorldPrimitiveCount_) {
             diagnostic="Rescue rope surface metadata no longer matches admitted primitives.";return false;

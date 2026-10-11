@@ -1,0 +1,24 @@
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\tools\author-rescue-lid-finish.py:23: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  stone.use_nodes = True
+00:02.156  image.write      | ERROR OpenImageIO write failed: Could not open file "C:\Users\sam_s\.thumbnails\large\blender_36428_ba271181e9cfc502594081155c399cf2.png.png"
+Info: Saved as "rescue-lid-finish.blend"
+INFO Draco is available, use library at C:\Program Files\Blender Foundation\Blender 5.2\5.2\scripts\addons_core\io_scene_gltf2\bf_intern_draco_bridge.dll
+INFO MeshOptimizer is available, use library at C:\Program Files\Blender Foundation\Blender 5.2\5.2\scripts\addons_core\io_scene_gltf2\bf_intern_meshopt_bridge.dll
+09:52:39 | INFO: Starting glTF 2.0 export
+09:52:39 | INFO: Extracting primitive: Cube
+09:52:39 | INFO: Primitives created: 1
+09:52:39 | INFO: Extracting primitive: Cube.001
+09:52:39 | INFO: Primitives created: 1
+09:52:39 | INFO: Extracting primitive: Cube.002
+09:52:39 | INFO: Primitives created: 1
+09:52:39 | INFO: Extracting primitive: Cube.003
+09:52:39 | INFO: Primitives created: 1
+09:52:39 | INFO: Extracting primitive: Cube.004
+09:52:39 | INFO: Primitives created: 1
+09:52:39 | INFO: Extracting primitive: Cube.005
+09:52:39 | INFO: Primitives created: 1
+09:52:39 | INFO: Finished glTF 2.0 export in 0.07535123825073242 s
+
+Blender 5.2.0 LTS (hash fbe6228777e7 built 2026-07-14 01:35:40)
+
+Blender quit

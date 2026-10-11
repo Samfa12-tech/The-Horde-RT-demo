@@ -236,22 +236,6 @@ void materialForPrimitive(int primitive,
         return;
     }
 
-    if (instance == 17)
-    {
-        int face = (primitive % 12) / 2;
-        normal = face == 0 ? vec3(0.0, 0.0, -1.0) :
-                 (face == 1 ? vec3(0.0, 0.0, 1.0) :
-                 (face == 2 ? vec3(-1.0, 0.0, 0.0) :
-                 (face == 3 ? vec3(1.0, 0.0, 0.0) :
-                 (face == 4 ? vec3(0.0, 1.0, 0.0) : vec3(0.0, -1.0, 0.0)))));
-        geometricNormal = normal;
-        base = vec3(0.115, 0.105, 0.092);
-        metallic = 0.0;
-        reflectivity = 0.06;
-        emissive = 0.0;
-        return;
-    }
-
     if (instance == 2 || instance == 18 || instance == kKeeperInstanceMetadataIndex)
     {
         normal = vec3(0.0, 1.0, 0.0);
@@ -269,7 +253,9 @@ void materialForPrimitive(int primitive,
         return;
     }
 
-    uint code = worldSurfaces.codes[primitive];
+    // Non-StaticPbr owners share the procedural surface-code transport. Their
+    // BLAS-local primitive ID is relative to this instance's explicit range.
+    uint code = worldSurfaces.codes[uint(primitive) + rtInstances.values[instance].primitiveBase];
     uint normalCode = (code >> 8u) & 0xffu;
     material = int(code & 0xffu);
     normal = normalForSurfaceCode(code);
@@ -624,7 +610,14 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
         }
         else
         {
-            materialForPrimitive(h.primitive, h.instance, h.position, h.material,
+            // Explicit procedural owners project in their BLAS coordinates,
+            // so rigid movement carries the texture with the geometry. Ordinary
+            // world/water/player proofs keep their accepted world projection.
+            vec3 materialPosition = h.position;
+            if (rtInstances.values[h.instance].reserved1 != 0u)
+                materialPosition = rayQueryGetIntersectionObjectRayOriginEXT(query, true)
+                    + rayQueryGetIntersectionObjectRayDirectionEXT(query, true) * h.t;
+            materialForPrimitive(h.primitive, h.instance, materialPosition, h.material,
                                  h.normal, h.geometricNormal, h.base, h.metallic,
                                  h.reflectivity, h.occlusion, h.emissive);
         if (h.instance == 2 || h.instance == 18 || h.instance == kKeeperInstanceMetadataIndex)

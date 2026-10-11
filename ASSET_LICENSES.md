@@ -350,3 +350,13 @@ Editable masters remain separate; see the runtime README and processing receipt.
 ### Original Horde grave markers (1.7 development)
 
 `assets/models/world/source/grave-markers-r03` contains a new original Blender master and derivation hashes for two plain closed stone markers, authored with `tools/author-grave-markers.py`. Runtime GLBs in `assets/models/world/runtime/grave-markers-r03` contain no third-party asset or embedded texture. Rendering reuses the admitted CC0 MedievalWall02 family; its separate licence remains unchanged. The graveyard also reuses existing T03 covers, bowls, urn and cold candle source/runtime identities and original provenance. Editable sources and failed r01 intake evidence remain outside packages; no flames, lights, loot or new texture layers are admitted.
+
+### Original rescue grave-lid relief (12 October 2026)
+
+`assets/source/development-rescue-lid-finish-v1` preserves the original editable
+Blender master and native GLB round trip of `src/scene/RescueLidFinish.h`, authored
+with `tools/author-rescue-lid-finish.py`. No external input or provider output is
+included. Runtime consumes the same closed stone recipe through the shared
+world-surface material transport, without packaging the editable source/GLB or
+adding a texture, material row or light. Existing stone texture notices remain
+separate; this original geometry does not change their licensing.

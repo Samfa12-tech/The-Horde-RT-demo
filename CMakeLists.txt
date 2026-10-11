@@ -735,6 +735,10 @@ if(BUILD_TESTING)
     target_compile_definitions(horde_rt_tomb_dressing_tests PRIVATE HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
     add_test(NAME horde_rt_tomb_dressing_tests COMMAND horde_rt_tomb_dressing_tests)
 
+    add_executable(horde_rt_world_surface_range_tests tests/WorldSurfaceRangeTests.cpp)
+    target_include_directories(horde_rt_world_surface_range_tests PRIVATE src)
+    add_test(NAME horde_rt_world_surface_range_tests COMMAND horde_rt_world_surface_range_tests)
+
     add_executable(horde_rt_graveyard_dressing_tests tests/GraveyardDressingTests.cpp
         src/scene/GraveyardDressing.cpp src/scene/TombDressing.cpp
         src/scene/assets/AssetManifest.cpp src/scene/assets/AssetValidation.cpp

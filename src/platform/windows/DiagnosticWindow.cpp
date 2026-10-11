@@ -7074,8 +7074,17 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
                 !horde::gameplay::StageDevelopmentCheckpointSimulation(
                     context.simulation, *development))
             {
-                return fail(std::string("Development checkpoint '") + checkpoint.name +
-                            "' could not stage its authoritative combat pose.");
+                const auto& state=context.simulation.Snapshot();
+                std::ostringstream trace;
+                trace << "Development checkpoint '" << checkpoint.name
+                    << "' could not stage its authoritative combat pose; player=("
+                    << state.playerX << ',' << state.playerZ << "), rescuePhase="
+                    << static_cast<unsigned>(state.rescue.phase) << ", stowed="
+                    << state.rescue.equipmentStowed << ", ropeReady=" << state.rescue.ropeReady
+                    << ", exterior=" << state.rescue.exteriorSide << ", worldGeneration="
+                    << state.worldRoute.generation << ", terrain=" << bool(context.rtScene.ChapterTerrainSurface());
+                for(const auto ready:state.worldRoute.readiness)trace << ',' << static_cast<unsigned>(ready);
+                return fail(trace.str());
             }
             context.simulation.ResetTiming();
             context.simulation.ClearEvents();

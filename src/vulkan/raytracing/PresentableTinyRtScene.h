@@ -965,6 +965,7 @@ private:
     std::size_t rescueRopeVertexOffset_ = 0;
     std::uint32_t rescueWorldPrimitiveCount_ = 0;
     std::uint32_t rescueWorldMaxVertex_ = 0;
+    std::uint32_t finaleRoofSurfaceBase_ = 0, finaleRoofSurfaceCount_ = 0;
     horde::scene::DevelopmentWorldGeometry worldRouteGeometry_{};
     std::shared_ptr<const horde::gameplay::simulation::TriangleSupportSurface> chapterTerrainSurface_;
     RtSceneProfile sceneProfile_ = RtSceneProfile::Showcase;
