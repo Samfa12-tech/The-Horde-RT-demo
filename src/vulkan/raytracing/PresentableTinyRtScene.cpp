@@ -1,6 +1,7 @@
 #include "gameplay/effects/KeeperCastPresentation.h"
 #include "scene/EntryPortalCapGeometry.h"
 #include "scene/ForestDressing.h"
+#include "scene/GraveyardDressing.h"
 #include "scene/assets/StaticPrimitiveGrouping.h"
 #include "vulkan/raytracing/RtWorldMaterialPalette.h"
 #include "scene/TombDressing.h"
@@ -2549,6 +2550,9 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
             return false;
         if (!horde::scene::AppendChapterTerrain(root, collapseStaticAsset_, chapterTerrainSurface_, diagnostic))
             return false;
+        horde::scene::GraveyardDressingReport graveyard;
+        if (!horde::scene::AppendPreparedGraveyard(root, collapseStaticAsset_, chapterTerrainSurface_, graveyard, diagnostic))
+            return false;
         horde::scene::ForestDressingBuildReport forest;
         if (!horde::scene::AppendPreparedForestDressing(root, collapseStaticAsset_, forest, diagnostic, chapterTerrainSurface_.get()))
             return false;
@@ -2559,7 +2563,7 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
         // owners. Native import already baked their node transforms, while
         // grip/hinge/latch sockets remain separate records. Their adjacent
         // identical-material ranges need no additional geometry metadata.
-        if (!horde::scene::assets::CoalesceAdjacentWorldBakedPrimitives(collapseStaticAsset_, diagnostic) ||
+        if (!horde::scene::assets::ConsolidateWorldBakedMaterialFamilies(collapseStaticAsset_, diagnostic) ||
             !horde::scene::assets::CoalesceAdjacentWorldBakedPrimitives(gothicChestBaseAsset_, diagnostic) ||
             !horde::scene::assets::CoalesceAdjacentWorldBakedPrimitives(rewardLanternRingAsset_, diagnostic))
             return false;

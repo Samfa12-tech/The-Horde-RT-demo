@@ -6925,10 +6925,9 @@ bool RunStaticGeometryCutoverCapture(VulkanSurfaceContext& context,
     receipt << "{\"schema\":1,\"scope\":\"diagnostic GPU owner replacement; shared textures/materials/unchanged BLAS retained\",\"backend\":"
             << static_cast<int>(context.rtScene.ExecutionBackend()) << ",\"hops\":[";
     // This is a feasibility capture, not ordinary-play eviction eligibility.
-    // Inside views replace the full owner twice; forest views omit only the
-    // three tomb ornament families, retaining all masonry/terrain/forest.
-    constexpr std::array<std::uint32_t,8> forest{{0,1,5,6,7,8,9,10}};
-    const bool exterior = context.developmentCheckpoint.find("forest") != std::string::npos;
+    // Burial ornaments now share these material families across both zones.
+    // Retain the full owner until spatial contributor eligibility is proved;
+    // omitting an entire ornament family would also discard exterior pieces.
     for (unsigned hop=0;hop<2;++hop) {
         const auto generation=context.rtScene.StaticGeometryGeneration();
         const auto before=context.rtScene.ResourceInventory();
@@ -6938,8 +6937,7 @@ bool RunStaticGeometryCutoverCapture(VulkanSurfaceContext& context,
             context.rtScene.ResourceInventory().deviceLocalBytes != before.deviceLocalBytes) {
             error="Invalid family preparation changed the admitted GPU owner."; return false;
         }
-        const std::span<const std::uint32_t> retained = exterior && hop==0
-            ? std::span<const std::uint32_t>(forest) : std::span<const std::uint32_t>{};
+        const std::span<const std::uint32_t> retained{};
         if (!context.rtScene.PrepareStaticGeometryReplacement(generation,retained,error)) return false;
         const auto overlap=context.rtScene.ResourceInventory();
         const auto reject = [](void*,std::string& diagnostic) { diagnostic="Injected failed retirement proof"; return false; };
@@ -6973,7 +6971,7 @@ bool RunStaticGeometryCutoverCapture(VulkanSurfaceContext& context,
         const auto after=context.rtScene.ResourceInventory();
         receipt << (hop?",":"") << "{\"sourceGeneration\":" << generation
             << ",\"admittedGeneration\":" << context.rtScene.StaticGeometryGeneration()
-            << ",\"selection\":\"" << ((exterior && hop==0)?"common-and-forest":"complete")
+            << ",\"selection\":\"complete-with-graveyard"
             << "\",\"prepareMilliseconds\":" << m.prepareMilliseconds << ",\"cutoverMilliseconds\":" << m.cutoverMilliseconds
             << ",\"oldOwnerAllocationBytes\":" << m.oldOwnerAllocationBytes
             << ",\"candidateOwnerAllocationBytes\":" << m.candidateOwnerAllocationBytes

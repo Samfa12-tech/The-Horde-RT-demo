@@ -57,6 +57,16 @@ int main()
         {{P{0,0,-.3f},P{0,2,-.3f},P{0,2,.3f}},SupportSurface::Stone},
         {{P{0,0,-.3f},P{0,2,.3f},P{0,0,.3f}},SupportSurface::Stone}}};
     const auto solid=Surface::Build(wall,error);
+    const auto combined=Surface::WithNonWalkableGeometry(*terrain,wall,error);
+    check(combined && combined->TriangleCount()==terrain->TriangleCount() &&
+          combined->NonWalkableTriangleCount()==2 && combined->Query(0,0).worldY==sample.worldY,
+          "attaching actual nonwalkable geometry changed the admitted ground surface");
+    check(combined && !combined->NonWalkableVolumeClear(-1,0,1,0,.25f,1.8f,.1f) &&
+          combined->NonWalkableVolumeClear(-1,.6f,1,.6f,.25f,1.8f,.1f),
+          "immutable nonwalkable geometry must block a thin crossing and allow its clear side");
+    check(combined && !Surface::WithNonWalkableGeometry(*combined,wall,error),"duplicate contact owner admitted");
+    check(!Surface::WithNonWalkableGeometry(*terrain,{},error),"empty contact owner admitted");
+    check(!Surface::WithNonWalkableGeometry(*terrain,tooMany,error),"combined contact capacity overflow admitted");
     check(solid&&!solid->HorizontalVolumeClear(-1,0,1,0,.25f,1.8f,.1f),
           "elevated volume skipped a vertical wall with no support projection");
     check(solid&&!solid->HorizontalVolumeClear(1,0,-1,0,.25f,1.8f,.1f),

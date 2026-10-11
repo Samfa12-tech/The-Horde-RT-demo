@@ -1,0 +1,2 @@
+HORDE_PIPELINE_CACHE_CREATE attempted=1 result=0 available=1
+Failed to initialise presentable RT scene: Asset manifest is missing required schema-1 fields.

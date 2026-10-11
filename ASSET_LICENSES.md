@@ -346,3 +346,7 @@ processing by Samfa12/Codex. The same asset-specific Meshy entitlement applies,
 not a blanket MIT/CC0 licence. The development chapter packages the runtime
 derivative and exact native maps under `assets/textures/characters/runtime/kit-warden-v1/`.
 Editable masters remain separate; see the runtime README and processing receipt.
+
+### Original Horde grave markers (1.7 development)
+
+`assets/models/world/source/grave-markers-r03` contains a new original Blender master and derivation hashes for two plain closed stone markers, authored with `tools/author-grave-markers.py`. Runtime GLBs in `assets/models/world/runtime/grave-markers-r03` contain no third-party asset or embedded texture. Rendering reuses the admitted CC0 MedievalWall02 family; its separate licence remains unchanged. The graveyard also reuses existing T03 covers, bowls, urn and cold candle source/runtime identities and original provenance. Editable sources and failed r01 intake evidence remain outside packages; no flames, lights, loot or new texture layers are admitted.

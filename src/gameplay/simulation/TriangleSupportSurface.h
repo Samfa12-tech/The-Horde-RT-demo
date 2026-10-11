@@ -76,6 +76,23 @@ public:
            !std::isfinite(maximumY)||minimumY>maximumY) return result;
         QueryNode(0,x,z,minimumY,maximumY,result);return result;
     }
+    // Nonwalkable props share immutable publication/lifetime with this ground,
+    // while their top faces never become support samples or tree root heights.
+    static std::shared_ptr<const TriangleSupportSurface> WithNonWalkableGeometry(
+        const TriangleSupportSurface& ground, std::span<const Triangle> input, std::string& diagnostic)
+    {
+        if(ground.nonWalkable_ || input.size()>kMaximumTriangles-ground.TriangleCount()) {
+            diagnostic="Nonwalkable geometry was already attached or exceeds bounded intake.";return {};
+        }
+        auto contact=Build(input,diagnostic);
+        if(!contact)return {};
+        auto result=std::shared_ptr<TriangleSupportSurface>(new TriangleSupportSurface(ground));
+        result->nonWalkable_=std::move(contact);diagnostic.clear();return result;
+    }
+    bool NonWalkableVolumeClear(float x0,float z0,float x1,float z1,float y0,float y1,float radius) const {
+        return !nonWalkable_ || nonWalkable_->HorizontalVolumeClear(x0,z0,x1,z1,y0,y1,radius);
+    }
+    std::size_t NonWalkableTriangleCount() const {return nonWalkable_?nonWalkable_->TriangleCount():0;}
     // Collision query for an elevated horizontal volume, independent of ground
     // eligibility. Empty space over a hole is clear; upward/downward and steep
     // imported faces within the height band are solids. This is a fixed-height
@@ -125,7 +142,7 @@ public:
     }
     std::size_t TriangleCount() const { return triangles_.size(); }
     std::size_t RetainedBytes() const {
-        return triangles_.capacity()*sizeof(Triangle)+normals_.capacity()*sizeof(Point)+
+        return (nonWalkable_?nonWalkable_->RetainedBytes():0)+triangles_.capacity()*sizeof(Triangle)+normals_.capacity()*sizeof(Point)+
                order_.capacity()*sizeof(std::uint32_t)+nodes_.capacity()*sizeof(Node);
     }
 private:
@@ -133,6 +150,7 @@ private:
     using Intervals=std::array<Interval,kMaximumSweepIntervals>;
     struct Node { Point minimum{},maximum{};std::uint32_t begin=0,count=0,left=0,right=0; };
     std::vector<Triangle> triangles_;
+    std::shared_ptr<const TriangleSupportSurface> nonWalkable_;
     std::vector<Point> normals_;
     std::vector<std::uint32_t> order_;
     std::vector<Node> nodes_;

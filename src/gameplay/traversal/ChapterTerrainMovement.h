@@ -18,6 +18,7 @@ inline bool ChapterExteriorObstacleClear(const simulation::TriangleSupportSurfac
     float fromX,float fromZ,float toX,float toZ,float minimumY,float maximumY,float radius)
 {
     if(!RescueExteriorVolumeClear(fromX,fromZ,toX,toZ,minimumY,maximumY,radius))return false;
+    if(!terrain.NonWalkableVolumeClear(fromX,fromZ,toX,toZ,minimumY,maximumY,radius))return false;
     // Trunk horizontal bounds remain the measured admitted bark bounds. The
     // vertical origin follows the very same terrain sample used for rendering.
     for(const auto& tree:simulation::kForestTreePlacementContract) {

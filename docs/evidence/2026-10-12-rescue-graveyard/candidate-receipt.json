@@ -1,0 +1,737 @@
+{
+  "sourceParent": "fbe33b9f40c9d844702c805b48ffb420533b2a25",
+  "worktree": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "builds": {
+    "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe": {
+      "bytes": 12710912,
+      "sha256": "0502fd6e63a6a16bcdab71f0a4f7b9e43e320de04715fae83ce0b6bdcf3ee641"
+    },
+    "build/presets/windows-x64-release/Release/HordeLanternRT.exe": {
+      "bytes": 4404224,
+      "sha256": "112c9f470ef8ee260bad833139974c4601383c05ba53f3888e12f24ef6045642"
+    },
+    "android/app/build/outputs/apk/debug/app-debug.apk": {
+      "bytes": 172809259,
+      "sha256": "1d3602ebf7b0dc8d8277ed2de48196251386ff4474b5f42b740ec252e4794795"
+    }
+  },
+  "views": [
+    {
+      "label": "west-pipeline",
+      "checkpoint": "chapter-landing-west",
+      "camera": {
+        "x": -33.700001,
+        "z": -12.8,
+        "yaw": -1.570796,
+        "pitch": -0.15
+      },
+      "backend": "RayTracingPipeline",
+      "shaderKeys": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "d56178b8af77f767db60233ad41788f838b11a81a36f77f8d924c8bd871ec352"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "315ae69ae2548be21d7240f904b61cc1d1c1d492fefb835796cdffc309a664c7"
+        }
+      },
+      "resources": {
+        "bufferCount": 52,
+        "memoryAllocationCount": 63,
+        "bottomLevelAccelerationStructureCount": 20,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 2,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 43924176,
+        "deviceLocalBytes": 397805344
+      },
+      "gpu": {
+        "valid": true,
+        "latestMs": 5.946784,
+        "averageMs": 8.741526,
+        "sampleCount": 12,
+        "timestampValidBits": 64,
+        "timestampPeriodNanoseconds": 1.0
+      },
+      "shadowQuality": {
+        "mode": "higher",
+        "localPrimarySamples": 4,
+        "skyPrimarySamples": 2,
+        "reserved": 0
+      },
+      "cpu": {
+        "status": "valid",
+        "simulationStepCpuMs": 0.0,
+        "skinCpuMs": 0.0,
+        "playerSkinCpuMs": 0.0,
+        "characterSkinCpuMs": 0.0,
+        "dynamicUploadCpuMs": 0.0724,
+        "blasRefitRecordCpuMs": 0.0333,
+        "tlasUpdateRecordCpuMs": 0.0086,
+        "traceCopyRecordCpuMs": 0.0291,
+        "frameFenceWaitCpuMs": 10.6906,
+        "imageAcquireCpuMs": 0.0073,
+        "queueSubmitCpuMs": 0.1472,
+        "presentCallCpuMs": 0.1471,
+        "wholeFrameCycleCpuMs": 12.5885,
+        "workInvocationCounts": [
+          0,
+          0,
+          0,
+          0,
+          9,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "byteCounts": [
+          0,
+          0,
+          0,
+          0,
+          77680,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "operationCounts": [
+          0,
+          0,
+          0,
+          0,
+          9,
+          0,
+          0,
+          0,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "png": "196-chapter-landing-west.png",
+      "sha256": "c8edb1e918e24fb7a50708311325d18c2a97e9d6e783e768cb6941d8021e69be"
+    },
+    {
+      "label": "south-pipeline",
+      "checkpoint": "chapter-landing-south",
+      "camera": {
+        "x": -33.700001,
+        "z": -12.8,
+        "yaw": 3.141593,
+        "pitch": -0.15
+      },
+      "backend": "RayTracingPipeline",
+      "shaderKeys": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "d56178b8af77f767db60233ad41788f838b11a81a36f77f8d924c8bd871ec352"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "315ae69ae2548be21d7240f904b61cc1d1c1d492fefb835796cdffc309a664c7"
+        }
+      },
+      "resources": {
+        "bufferCount": 52,
+        "memoryAllocationCount": 63,
+        "bottomLevelAccelerationStructureCount": 20,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 2,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 43924176,
+        "deviceLocalBytes": 397805344
+      },
+      "gpu": {
+        "valid": true,
+        "latestMs": 2.49664,
+        "averageMs": 10.949432,
+        "sampleCount": 12,
+        "timestampValidBits": 64,
+        "timestampPeriodNanoseconds": 1.0
+      },
+      "shadowQuality": {
+        "mode": "higher",
+        "localPrimarySamples": 4,
+        "skyPrimarySamples": 2,
+        "reserved": 0
+      },
+      "cpu": {
+        "status": "valid",
+        "simulationStepCpuMs": 0.0,
+        "skinCpuMs": 0.0,
+        "playerSkinCpuMs": 0.0,
+        "characterSkinCpuMs": 0.0,
+        "dynamicUploadCpuMs": 0.0107,
+        "blasRefitRecordCpuMs": 0.031,
+        "tlasUpdateRecordCpuMs": 0.0076,
+        "traceCopyRecordCpuMs": 0.0302,
+        "frameFenceWaitCpuMs": 6.2141,
+        "imageAcquireCpuMs": 0.0068,
+        "queueSubmitCpuMs": 0.0729,
+        "presentCallCpuMs": 0.0959,
+        "wholeFrameCycleCpuMs": 7.9013,
+        "workInvocationCounts": [
+          0,
+          0,
+          0,
+          0,
+          9,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "byteCounts": [
+          0,
+          0,
+          0,
+          0,
+          77680,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "operationCounts": [
+          0,
+          0,
+          0,
+          0,
+          9,
+          0,
+          0,
+          0,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "png": "195-chapter-landing-south.png",
+      "sha256": "266da9c2342dda3afd3d592f6792fbd36d4c415009b240f1fa93020aba8b52c3"
+    },
+    {
+      "label": "west-query",
+      "checkpoint": "chapter-landing-west",
+      "camera": {
+        "x": -33.700001,
+        "z": -12.8,
+        "yaw": -1.570796,
+        "pitch": -0.15
+      },
+      "backend": "RayQueryCompute",
+      "shaderKeys": {
+        "opaqueFast": {
+          "key": "rayquery_compute_diagnostic_high_opaque_fast",
+          "sha256": "f21469a4c5fd339c54fc74085e562795d90a2fd0db296d8602e53f9a0834a2f7"
+        },
+        "genericDielectric": {
+          "key": "rayquery_compute_diagnostic_high_generic_dielectric",
+          "sha256": "07dcc0f4a69942755c1c9750afc9a3b0395ae81cb4c462b9b640e72c5b9cecdc"
+        }
+      },
+      "resources": {
+        "bufferCount": 50,
+        "memoryAllocationCount": 61,
+        "bottomLevelAccelerationStructureCount": 20,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 0,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 43923664,
+        "deviceLocalBytes": 397805344
+      },
+      "gpu": {
+        "valid": true,
+        "latestMs": 5.753056,
+        "averageMs": 10.552958,
+        "sampleCount": 12,
+        "timestampValidBits": 64,
+        "timestampPeriodNanoseconds": 1.0
+      },
+      "shadowQuality": {
+        "mode": "higher",
+        "localPrimarySamples": 4,
+        "skyPrimarySamples": 2,
+        "reserved": 0
+      },
+      "cpu": {
+        "status": "valid",
+        "simulationStepCpuMs": 0.0,
+        "skinCpuMs": 0.0,
+        "playerSkinCpuMs": 0.0,
+        "characterSkinCpuMs": 0.0,
+        "dynamicUploadCpuMs": 0.078,
+        "blasRefitRecordCpuMs": 0.0318,
+        "tlasUpdateRecordCpuMs": 0.017,
+        "traceCopyRecordCpuMs": 0.0255,
+        "frameFenceWaitCpuMs": 7.0078,
+        "imageAcquireCpuMs": 0.0088,
+        "queueSubmitCpuMs": 0.057,
+        "presentCallCpuMs": 0.1154,
+        "wholeFrameCycleCpuMs": 9.0252,
+        "workInvocationCounts": [
+          0,
+          0,
+          0,
+          0,
+          9,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "byteCounts": [
+          0,
+          0,
+          0,
+          0,
+          77680,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "operationCounts": [
+          0,
+          0,
+          0,
+          0,
+          9,
+          0,
+          0,
+          0,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "png": "196-chapter-landing-west.png",
+      "sha256": "6f9083bfe275b3a58e40bd0185a5004d91bbab3d843548cb5302d44385659925"
+    },
+    {
+      "label": "portal-pipeline",
+      "checkpoint": "chapter-stone-portal-rear",
+      "camera": {
+        "x": 0.0,
+        "z": -7.8,
+        "yaw": 3.141593,
+        "pitch": -0.15
+      },
+      "backend": "RayTracingPipeline",
+      "shaderKeys": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "d56178b8af77f767db60233ad41788f838b11a81a36f77f8d924c8bd871ec352"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "315ae69ae2548be21d7240f904b61cc1d1c1d492fefb835796cdffc309a664c7"
+        }
+      },
+      "resources": {
+        "bufferCount": 52,
+        "memoryAllocationCount": 63,
+        "bottomLevelAccelerationStructureCount": 20,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 2,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 43924176,
+        "deviceLocalBytes": 397805344
+      },
+      "gpu": {
+        "valid": true,
+        "latestMs": 3.475936,
+        "averageMs": 5.123981,
+        "sampleCount": 12,
+        "timestampValidBits": 64,
+        "timestampPeriodNanoseconds": 1.0
+      },
+      "shadowQuality": {
+        "mode": "higher",
+        "localPrimarySamples": 4,
+        "skyPrimarySamples": 2,
+        "reserved": 0
+      },
+      "cpu": {
+        "status": "valid",
+        "simulationStepCpuMs": 0.0,
+        "skinCpuMs": 0.0,
+        "playerSkinCpuMs": 0.0,
+        "characterSkinCpuMs": 0.0,
+        "dynamicUploadCpuMs": 0.0752,
+        "blasRefitRecordCpuMs": 0.0283,
+        "tlasUpdateRecordCpuMs": 0.0076,
+        "traceCopyRecordCpuMs": 0.0277,
+        "frameFenceWaitCpuMs": 4.7004,
+        "imageAcquireCpuMs": 0.0055,
+        "queueSubmitCpuMs": 0.1066,
+        "presentCallCpuMs": 0.1129,
+        "wholeFrameCycleCpuMs": 6.6596,
+        "workInvocationCounts": [
+          0,
+          0,
+          0,
+          0,
+          9,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "byteCounts": [
+          0,
+          0,
+          0,
+          0,
+          77680,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "operationCounts": [
+          0,
+          0,
+          0,
+          0,
+          9,
+          0,
+          0,
+          0,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "png": "199-chapter-stone-portal-rear.png",
+      "sha256": "2126883c09ea49114364fbafdad7dfb1faec38b18afa68c8a4422233c72e089f"
+    },
+    {
+      "label": "repeat-pipeline",
+      "checkpoint": "chapter-stake-repeat-ascent",
+      "camera": {
+        "x": -33.701553,
+        "z": -15.230299,
+        "yaw": 2.356194,
+        "pitch": -0.32
+      },
+      "backend": "RayTracingPipeline",
+      "shaderKeys": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "d56178b8af77f767db60233ad41788f838b11a81a36f77f8d924c8bd871ec352"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "315ae69ae2548be21d7240f904b61cc1d1c1d492fefb835796cdffc309a664c7"
+        }
+      },
+      "resources": {
+        "bufferCount": 52,
+        "memoryAllocationCount": 63,
+        "bottomLevelAccelerationStructureCount": 20,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 2,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 43924176,
+        "deviceLocalBytes": 397805344
+      },
+      "gpu": {
+        "valid": true,
+        "latestMs": 3.879168,
+        "averageMs": 6.312168,
+        "sampleCount": 12,
+        "timestampValidBits": 64,
+        "timestampPeriodNanoseconds": 1.0
+      },
+      "shadowQuality": {
+        "mode": "higher",
+        "localPrimarySamples": 4,
+        "skyPrimarySamples": 2,
+        "reserved": 0
+      },
+      "cpu": {
+        "status": "valid",
+        "simulationStepCpuMs": 0.0,
+        "skinCpuMs": 0.0,
+        "playerSkinCpuMs": 0.0,
+        "characterSkinCpuMs": 0.0,
+        "dynamicUploadCpuMs": 0.078,
+        "blasRefitRecordCpuMs": 0.0321,
+        "tlasUpdateRecordCpuMs": 0.0075,
+        "traceCopyRecordCpuMs": 0.032,
+        "frameFenceWaitCpuMs": 4.1149,
+        "imageAcquireCpuMs": 0.0069,
+        "queueSubmitCpuMs": 0.058,
+        "presentCallCpuMs": 0.1251,
+        "wholeFrameCycleCpuMs": 6.6326,
+        "workInvocationCounts": [
+          0,
+          0,
+          0,
+          0,
+          9,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "byteCounts": [
+          0,
+          0,
+          0,
+          0,
+          77680,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "operationCounts": [
+          0,
+          0,
+          0,
+          0,
+          9,
+          0,
+          0,
+          0,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "png": "213-chapter-stake-repeat-ascent.png",
+      "sha256": "651aad4b103cee0139c0bf09b7aaa734b06dc521a6ed7c27bb35d06dcd49320c"
+    },
+    {
+      "label": "cutover-pipeline",
+      "checkpoint": "chapter-landing-west",
+      "camera": {
+        "x": -33.700001,
+        "z": -12.8,
+        "yaw": -1.570796,
+        "pitch": -0.15
+      },
+      "backend": "RayTracingPipeline",
+      "shaderKeys": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "d56178b8af77f767db60233ad41788f838b11a81a36f77f8d924c8bd871ec352"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "315ae69ae2548be21d7240f904b61cc1d1c1d492fefb835796cdffc309a664c7"
+        }
+      },
+      "resources": {
+        "bufferCount": 52,
+        "memoryAllocationCount": 63,
+        "bottomLevelAccelerationStructureCount": 20,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 2,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 43924176,
+        "deviceLocalBytes": 397805344
+      },
+      "gpu": {
+        "valid": true,
+        "latestMs": 3.647008,
+        "averageMs": 3.647013,
+        "sampleCount": 12,
+        "timestampValidBits": 64,
+        "timestampPeriodNanoseconds": 1.0
+      },
+      "shadowQuality": {
+        "mode": "higher",
+        "localPrimarySamples": 4,
+        "skyPrimarySamples": 2,
+        "reserved": 0
+      },
+      "cpu": {
+        "status": "valid",
+        "simulationStepCpuMs": 0.0,
+        "skinCpuMs": 0.0,
+        "playerSkinCpuMs": 0.0,
+        "characterSkinCpuMs": 0.0,
+        "dynamicUploadCpuMs": 0.0346,
+        "blasRefitRecordCpuMs": 0.0262,
+        "tlasUpdateRecordCpuMs": 0.0078,
+        "traceCopyRecordCpuMs": 0.0258,
+        "frameFenceWaitCpuMs": 0.0039,
+        "imageAcquireCpuMs": 0.0045,
+        "queueSubmitCpuMs": 0.0433,
+        "presentCallCpuMs": 4.5417,
+        "wholeFrameCycleCpuMs": 6.0516,
+        "workInvocationCounts": [
+          0,
+          0,
+          0,
+          0,
+          9,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "byteCounts": [
+          0,
+          0,
+          0,
+          0,
+          77680,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "operationCounts": [
+          0,
+          0,
+          0,
+          0,
+          9,
+          0,
+          0,
+          0,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "png": "196-chapter-landing-west.png",
+      "sha256": "c8edb1e918e24fb7a50708311325d18c2a97e9d6e783e768cb6941d8021e69be"
+    }
+  ],
+  "comparisons": {
+    "portal": {
+      "changedPixels": 0,
+      "maxChannelDifference": 0,
+      "meanChannelDifference": 0.0
+    },
+    "west-backends": {
+      "changedPixels": 3202,
+      "maxChannelDifference": 33,
+      "meanChannelDifference": 0.0032259516460905347
+    },
+    "cutover": {
+      "changedPixels": 0,
+      "maxChannelDifference": 0,
+      "meanChannelDifference": 0.0
+    },
+    "restore": {
+      "changedPixels": 0,
+      "maxChannelDifference": 0,
+      "meanChannelDifference": 0.0
+    }
+  },
+  "allocationDelta": {
+    "deviceLocalBytes": 1114112,
+    "hostVisibleBytes": 731648
+  },
+  "existingGlassCounter": "West shadowUnclosedVolumeCount/productionPaneStackFailureCount=1 in both parent and candidate; not newly introduced. Primary and transport overflows=0.",
+  "sourceAssets": {
+    "schema": 1,
+    "authoring": "Original Horde Blender geometry; no third-party input",
+    "sourceBlendSha256": "49a7f0bfee81a8d7d977151fecf420d7b251d5f85ff9b23b4dc0f5e5e9617198",
+    "scriptSha256": "01cbc3855afbe5900b94d8eb1feea6f6d1d07d7803d771b924b2550fb82df6b9",
+    "blenderVersion": "5.2.0 LTS",
+    "units": "metres",
+    "nativeAxes": "+Y up / +Z forward",
+    "uvScale": "2m per repeat; production reuses admitted MedievalWall02",
+    "texturesAdded": 0,
+    "assets": [
+      {
+        "name": "grave-marker-round",
+        "file": "grave-marker-round.runtime.glb",
+        "triangles": 292,
+        "sha256": "2eec59d80f737a90c2e5f22cec020e2fc227ebf7ac40118e136ef7b8ac656ba1",
+        "bytes": 38056
+      },
+      {
+        "name": "grave-marker-damaged",
+        "file": "grave-marker-damaged.runtime.glb",
+        "triangles": 272,
+        "sha256": "b937d5165187b22728901e63b37f72ffc872af9bf521de08cd7edb67f67d3e92",
+        "bytes": 41172
+      }
+    ]
+  },
+  "shaderBudgetSha256": "56936479b2d202dbdb9393ba94b66a1b0bc12d490b700d8af4c63de3460e53bf",
+  "protectedBackupSha256": "0dae1e8fb803336cef2d045f48c5f4c9195a6463f45161cb0b6c7434350769fb"
+}

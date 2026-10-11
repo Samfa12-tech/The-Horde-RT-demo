@@ -12,7 +12,10 @@ Current rig integration: the [grounded stake traversal milestone](../evidence/20
 supersedes the earlier pending anchor/pose work. The overhead apparatus is gone;
 the planted pull-up, apron contact and separately authored descent are integrated
 and inspected on both RT backends. The dark/tight hand views still need owner
-acceptance. Graveyard/lid composition, ordinary GPU zone lifetimes, remaining
+acceptance. The [rescue graveyard milestone](../evidence/2026-10-12-rescue-graveyard/README.md)
+adds grounded markers and verified T03 covers/cold offerings with matching
+immutable contact and unchanged material/texture/primitive ceilings.
+Rescue-lid finish, ordinary GPU zone lifetimes, remaining
 prepared dressing, full chapter gallery and sustained/phone acceptance remain
 required. Older staged proofs below retain their historical scope.
 
@@ -481,3 +484,11 @@ packing is now exercised by the GPU diagnostic. New focused Debug/Release9/9,
 Android four-ABI/package and fresh eight-variant checks passed; exact pushed CI
 remains tied to the new SHA/run. Phone CURRENT/HIGHER and saved LOWER migration,
 owner listening/haptics and full chapter acceptance remain pending.
+
+### Rescue graveyard and material reuse (12 October)
+
+The [current graveyard evidence](../evidence/2026-10-12-rescue-graveyard/README.md) records twelve grounded pieces, matching nonwalkable triangles and unchanged eleven world families/18 texture layers. Reverse portal and full-owner replacement/restoration are pixel-identical; opened Pipeline/QueryCompute graveyard views are recorded with actual cost and limits. Debug/Release11/11, four-ABI Android/build/lint/package and eight fresh frozen variants pass locally. Source masters/backups and failed evidence remain preserved.
+
+Tomb ornament families now also own exterior offerings. The GPU diagnostic retains the complete owner until spatial retention is proved; the earlier 1.587MiB ornament-only saving is historical, not current eviction eligibility. Normal two-way resource preparation/readiness remains unfinished. The rescue lid, remaining prepared dressing, distant shell and physical acceptance still prevent chapter completion.
+
+All six jobs passed on parent `fbe33b9f40c9d844702c805b48ffb420533b2a25` in [run38176375984](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/38176375984), including Vulkan40/40 and all seven requested traversal executions. Fresh source/CI identities belong to the next pushed milestone; do not infer them from the parent result.

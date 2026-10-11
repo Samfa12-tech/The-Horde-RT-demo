@@ -1,6 +1,7 @@
 #include "gameplay/simulation/DevelopmentWorldRoute.h"
 #include "gameplay/simulation/ForestTreePlacementContract.h"
 #include "scene/ForestDressing.h"
+#include "scene/GraveyardDressing.h"
 #include "scene/ChapterTerrainSurface.h"
 #include "scene/ChapterTerrainAdmission.h"
 #include "scene/TombDressing.h"
@@ -364,11 +365,13 @@ void TestNativeChapterPrimitiveOwnership()
     if (!imported) return;
     TombDressingBuildReport tomb;
     ForestDressingBuildReport forest;
+    GraveyardDressingReport graveyard;
     std::shared_ptr<const gameplay::simulation::TriangleSupportSurface> terrain;
     const bool prepared = AppendPreparedTombDressing(kRoot / "assets", owner, tomb, diagnostic) &&
         AppendChapterTerrain(kRoot / "assets", owner, terrain, diagnostic) &&
+        AppendPreparedGraveyard(kRoot / "assets", owner, terrain, graveyard, diagnostic) &&
         AppendPreparedForestDressing(kRoot / "assets", owner, forest, diagnostic, terrain.get()) &&
-        CoalesceAdjacentWorldBakedPrimitives(owner, diagnostic);
+        ConsolidateWorldBakedMaterialFamilies(owner, diagnostic);
     Check(prepared, diagnostic.empty() ? "real tomb/terrain/forest preparation succeeds" : diagnostic);
     if (!prepared) return;
     constexpr std::array<std::string_view,11> families{{

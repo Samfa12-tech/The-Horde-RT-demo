@@ -2,6 +2,10 @@
 # This admits file identities, not owner listening or physical-device acceptance.
 function Get-Horde17TombAssetSpecification {
     @(
+        [pscustomobject]@{ Path='models/world/runtime/grave-markers-r03/grave-marker-damaged.manifest.json'; Bytes=682; Sha256='dc94eccfbc493be1ffd17df81cb98159f8eaa92c0ba7da84b9234ce3ac0a165c'; Platform='Both'; Kind='Json' },
+        [pscustomobject]@{ Path='models/world/runtime/grave-markers-r03/grave-marker-damaged.runtime.glb'; Bytes=41172; Sha256='b937d5165187b22728901e63b37f72ffc872af9bf521de08cd7edb67f67d3e92'; Platform='Both'; Kind='Glb' },
+        [pscustomobject]@{ Path='models/world/runtime/grave-markers-r03/grave-marker-round.manifest.json'; Bytes=680; Sha256='e1781f6e973ee61dd00eaf61b3da02653b6280c1ca6c7d276d6feed28407e191'; Platform='Both'; Kind='Json' },
+        [pscustomobject]@{ Path='models/world/runtime/grave-markers-r03/grave-marker-round.runtime.glb'; Bytes=38056; Sha256='2eec59d80f737a90c2e5f22cec020e2fc227ebf7ac40118e136ef7b8ac656ba1'; Platform='Both'; Kind='Glb' },
         [pscustomobject]@{ Path='models/world/runtime/chapter-terrain-v1/asset.manifest.json'; Bytes=639; Sha256='1ddbc7b615b9b03f99be98c181d88d456c256d6e9b672f937486388c3fba952b'; Platform='Both'; Kind='Json' },
         [pscustomobject]@{ Path='models/world/runtime/chapter-terrain-v1/chapter-terrain-lod0.runtime.glb'; Bytes=18328048; Sha256='fb21e177b8e67fb553d4853a778603a598908812fc1603ca8a16d94d152a4854'; Platform='Both'; Kind='Glb' },
         [pscustomobject]@{ Path='textures/props/runtime/chapter-terrain/base-color.windows.ktx2'; Bytes=11185312; Sha256='91fa9c1870722069ef930df44f88963f1d38ddefd8e689c26c9ca5ecbe8712b9'; Platform='Windows'; Kind='PropsKtx'; Format=43; Layers=2 },

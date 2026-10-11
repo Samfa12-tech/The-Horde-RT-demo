@@ -904,7 +904,9 @@ struct PresentableTinyRtSceneObservationTestAccess
         // one offering bowl (960), the closed 12-triangle lintel lip, and
         // 64 original pine/alder instances grouped into four primitives, and
         // 656 stone-finish triangles sharing the admitted masonry primitive.
-        constexpr std::size_t addedIndices = 46140u + (2u*664u + 960u + 12u + 323264u + 34050u + 656u)*3u;
+        // Six markers, two scaled T03 covers and four cold offerings add exactly
+        // 6,184 native triangles; shared material-family consolidation adds no rows.
+        constexpr std::size_t addedIndices = 46140u + (2u*664u + 960u + 12u + 323264u + 34050u + 656u + 6184u)*3u;
         bool ok = oldIndices == 8422u * 3u &&
                   baseline.collapseStaticAsset_.bounds.maximum[1] > 12.0f &&
                   std::abs(chapterEntryTop - 6.0f) < 0.001f &&
