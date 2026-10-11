@@ -1,0 +1,16 @@
+Static GLB temporary root=horde-rt-static-gltf-tests-release-pid-59292
+FAIL: zone metadata addresses exactly its indexed PBR primitive range
+FAIL: zone metadata addresses exactly its indexed PBR primitive range
+FAIL: range owner retains local hit indices, material and vertex span
+FAIL: zone metadata addresses exactly its indexed PBR primitive range
+FAIL: range owner retains local hit indices, material and vertex span
+FAIL: overlapping immutable range instances share storage without rewriting another owner
+FAIL: invalid/empty/overflow or animated primitive range is rejected before packing
+FAIL: invalid/empty/overflow or animated primitive range is rejected before packing
+FAIL: invalid/empty/overflow or animated primitive range is rejected before packing
+FAIL: invalid/empty/overflow or animated primitive range is rejected before packing
+FAIL: invalid/empty/overflow or animated primitive range is rejected before packing
+FAIL: invalid/empty/overflow or animated primitive range is rejected before packing
+FAIL: invalid/empty/overflow or animated primitive range is rejected before packing
+FAIL: invalid/empty/overflow or animated primitive range is rejected before packing
+14 static glTF asset assertion(s) failed

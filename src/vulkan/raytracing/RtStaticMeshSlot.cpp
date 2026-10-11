@@ -95,6 +95,27 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
             diagnostic = "RtStaticMeshSlot registration has no static asset.";
             return false;
         }
+        const bool hasPrimitiveRange = registration.primitiveOffset != 0u ||
+                                       registration.primitiveCount != 0u;
+        if (hasPrimitiveRange)
+        {
+            if (registration.geometryRole != RtGeometryRole::Static ||
+                (registration.flags & static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr)) == 0u)
+            {
+                diagnostic = "RtStaticMeshSlot primitive range requires immutable StaticPbr geometry.";
+                return false;
+            }
+            const auto available = registration.asset->primitives.size();
+            // Subtract only after checking the start. Do not let a wrapped
+            // offset+count turn an invalid registration into a valid owner.
+            if (registration.primitiveCount == 0u ||
+                registration.primitiveOffset >= available ||
+                registration.primitiveCount > available - registration.primitiveOffset)
+            {
+                diagnostic = "RtStaticMeshSlot primitive range is empty or outside its asset.";
+                return false;
+            }
+        }
         switch (registration.geometryRole)
         {
         case RtGeometryRole::Static:
@@ -445,7 +466,8 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
     {
         const AssetRoute route = routes.at(registration.asset);
         instanceMetadata_[registration.instanceCustomIndex] = {
-            route.primitiveBase, route.primitiveCount,
+            route.primitiveBase + registration.primitiveOffset,
+            registration.primitiveCount == 0u ? route.primitiveCount : registration.primitiveCount,
             registration.stableObjectId, registration.flags,
             registration.emitterIndex, route.assetIndex,
             static_cast<std::uint32_t>(route.geometryRole), 0u};

@@ -25,6 +25,11 @@ struct StaticRtAssetRegistration
     // material factors remain asset-local.
     const horde::scene::assets::StaticMeshAsset* textureSource = nullptr;
     RtGeometryRole geometryRole = RtGeometryRole::Static;
+    // Optional asset-local primitive subrange for independent immutable BLAS
+    // owners. Zero/zero preserves the complete asset route. Packing still
+    // owns the asset once; a range does not duplicate geometry or textures.
+    std::uint32_t primitiveOffset = 0u;
+    std::uint32_t primitiveCount = 0u;
 };
 
 struct RtImmutableMaterialAlias

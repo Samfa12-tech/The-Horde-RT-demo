@@ -1051,6 +1051,154 @@ void TestSharedTextureSourceRouting()
 
 }
 
+void TestStaticPrimitiveRangeOwnership()
+{
+    using namespace horde::vulkan::raytracing;
+    using horde::scene::assets::StaticMeshAsset;
+    StaticMeshAsset asset;
+    asset.nodeTransforms.resize(1);
+    asset.materials.resize(3);
+    asset.vertices.resize(12);
+    asset.indices = {0,1,2, 0,1,2, 0,1,2, 0,2,3};
+    asset.primitives = {{0,0,3,0,0}, {3,3,3,1,0}, {6,6,6,2,0}};
+    for (std::size_t i = 0; i < asset.materials.size(); ++i) {
+        asset.materials[i].name = "owner-" + std::to_string(i);
+        asset.materials[i].baseColorTexture = static_cast<std::int32_t>(i);
+        asset.materials[i].baseColorFactor[0] = 0.25f * static_cast<float>(i + 1);
+    }
+    const auto pbr = static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr);
+    StaticRtAssetRegistration complete{21, 0x434f4c4c, pbr, 0, &asset};
+    std::string diagnostic;
+    RtStaticMeshSlot baseline;
+    const bool baselineReady = baseline.Initialize(std::array{complete}, diagnostic);
+    Check(baselineReady,
+          "complete primitive ownership baseline initializes");
+    if (!baselineReady) return;
+    std::array<StaticRtAssetRegistration,3> owners{{
+        {14, 0x434f4d4d, pbr, 0, &asset, nullptr, RtGeometryRole::Static, 0, 1},
+        {15, 0x544f4d42, pbr, 0, &asset, nullptr, RtGeometryRole::Static, 1, 1},
+        {16, 0x464f5253, pbr, 0, &asset, nullptr, RtGeometryRole::Static, 2, 1}}};
+    RtStaticMeshSlot partitioned;
+    const bool partitionReady = partitioned.Initialize(owners, diagnostic);
+    Check(partitionReady,
+          std::string("three independent primitive owners initialize: ") + diagnostic);
+    if (!partitionReady) return;
+    for (std::size_t i = 0; i < owners.size(); ++i) {
+        const auto& row = partitioned.InstanceMetadata()[owners[i].instanceCustomIndex];
+        Check(row.primitiveBase == i && row.primitiveCount == 1 &&
+              row.stableObjectId == owners[i].stableObjectId && row.assetIndex == 0 &&
+              row.flags == pbr && row.geometryRole == static_cast<std::uint32_t>(RtGeometryRole::Static),
+              "zone metadata addresses exactly its indexed PBR primitive range");
+        const auto& primitive = partitioned.PrimitiveMetadata()[row.primitiveBase];
+        Check(primitive.indexOffset == asset.primitives[i].indexOffset &&
+              primitive.indexCount == asset.primitives[i].indexCount &&
+              primitive.materialIndex == i &&
+              partitioned.PrimitiveVertexCounts()[row.primitiveBase] == (i == 2 ? 6 : 3),
+              "range owner retains local hit indices, material and vertex span");
+    }
+    const auto equalBytes = [](const auto& a, const auto& b) {
+        return a.size() == b.size() &&
+            (a.empty() || std::memcmp(a.data(), b.data(), a.size() * sizeof(a[0])) == 0);
+    };
+    Check(equalBytes(baseline.Vertices(), partitioned.Vertices()) &&
+          baseline.Indices() == partitioned.Indices() &&
+          equalBytes(baseline.Materials(), partitioned.Materials()) &&
+          equalBytes(baseline.PrimitiveMetadata(), partitioned.PrimitiveMetadata()) &&
+          baseline.GeometryTransforms() == partitioned.GeometryTransforms() &&
+          baseline.Measurements().vertexBytes == partitioned.Measurements().vertexBytes &&
+          baseline.Measurements().indexBytes == partitioned.Measurements().indexBytes &&
+          baseline.Measurements().descriptorCount == partitioned.Measurements().descriptorCount &&
+          partitioned.TextureArrayCounts().baseColor == 3,
+          "primitive ownership shares byte-identical packed geometry/materials and texture allocation");
+    std::reverse(owners.begin(), owners.end());
+    RtStaticMeshSlot reordered;
+    Check(reordered.Initialize(owners, diagnostic) &&
+          equalBytes(reordered.InstanceMetadata(), partitioned.InstanceMetadata()) &&
+          equalBytes(reordered.PrimitiveMetadata(), partitioned.PrimitiveMetadata()),
+          "reordered range registrations preserve exact instance and primitive metadata");
+    // Intentional repeated geometry remains legal (e.g. multiple instances).
+    auto repeated = owners;
+    repeated[0].primitiveOffset = 1;
+    Check(reordered.Initialize(repeated, diagnostic) &&
+          reordered.InstanceMetadata()[16].primitiveBase == 1 &&
+          reordered.InstanceMetadata()[15].primitiveBase == 1,
+          "overlapping immutable range instances share storage without rewriting another owner");
+    const auto reject = [&](std::uint32_t offset, std::uint32_t count,
+                            RtGeometryRole role, std::uint32_t flags) {
+        auto invalid = complete;
+        invalid.primitiveOffset = offset; invalid.primitiveCount = count;
+        invalid.geometryRole = role; invalid.flags = flags;
+        RtStaticMeshSlot rejected;
+        Check(!rejected.Initialize(std::array{invalid}, diagnostic) &&
+              diagnostic.find("primitive range") != std::string::npos,
+              "invalid/empty/overflow or animated primitive range is rejected before packing");
+    };
+    reject(1, 0, RtGeometryRole::Static, pbr);
+    reject(3, 1, RtGeometryRole::Static, pbr);
+    reject(2, 2, RtGeometryRole::Static, pbr);
+    reject(1, std::numeric_limits<std::uint32_t>::max(), RtGeometryRole::Static, pbr);
+    reject(std::numeric_limits<std::uint32_t>::max(), 1, RtGeometryRole::Static, pbr);
+    reject(0, 1, RtGeometryRole::PlayerWorldBody, pbr);
+    reject(0, 1, RtGeometryRole::PlayerViewmodel, pbr);
+    reject(0, 1, RtGeometryRole::Static, 0);
+    auto explicitComplete = complete;
+    explicitComplete.primitiveCount = 3;
+    Check(reordered.Initialize(std::array{explicitComplete}, diagnostic) &&
+          equalBytes(baseline.InstanceMetadata(), reordered.InstanceMetadata()),
+          "explicit complete static range matches the legacy zero/zero route exactly");
+
+    std::vector<StaticMeshAsset> fullAssets(kRtStaticAssetCapacity, asset);
+    std::vector<StaticRtAssetRegistration> fullOwners;
+    // One three-primitive owner plus twelve one-primitive owners: 15 rows,
+    // exactly 13 unique assets. Three extra instance ranges must cost neither
+    // a fourteenth asset nor duplicated metadata/geometry/material storage.
+    for (std::uint32_t i = 0; i < kRtStaticAssetCapacity; ++i) {
+        auto& next = fullAssets[i];
+        next.materials[0].baseColorTexture = -1;
+        next.materials[1].baseColorTexture = -1;
+        next.materials[2].baseColorTexture = -1;
+        if (i != 0) {
+            next.primitives.resize(1); next.materials.resize(1);
+            next.vertices.resize(3); next.indices.resize(3);
+        }
+        fullOwners.push_back({i, i + 100, pbr, 0, &next});
+    }
+    RtStaticMeshSlot fullBaseline;
+    Check(fullBaseline.Initialize(fullOwners, diagnostic),
+          "unchanged full static-asset ceiling initializes for ownership proof");
+    for (std::uint32_t i = 0; i < 3; ++i)
+        fullOwners.push_back({14+i, 200+i, pbr, 0, &fullAssets[0], nullptr,
+                             RtGeometryRole::Static, i, 1});
+    RtStaticMeshSlot fullPartition;
+    Check(fullPartition.Initialize(fullOwners, diagnostic) &&
+          equalBytes(fullBaseline.Vertices(), fullPartition.Vertices()) &&
+          fullBaseline.Indices() == fullPartition.Indices() &&
+          equalBytes(fullBaseline.Materials(), fullPartition.Materials()) &&
+          equalBytes(fullBaseline.PrimitiveMetadata(), fullPartition.PrimitiveMetadata()),
+          "three range aliases fit the saturated thirteen-asset ceiling without extra packed rows/bytes");
+
+    auto provider = asset;
+    auto consumer = asset;
+    for (std::size_t i = 0; i < 3; ++i) {
+        provider.materials[i].textureGroup = static_cast<std::int32_t>(i);
+        consumer.materials[i].textureGroup = static_cast<std::int32_t>(i);
+        consumer.materials[i].baseColorTexture = static_cast<std::int32_t>(100 + i);
+        consumer.materials[i].baseColorFactor[0] *= 0.5f;
+    }
+    std::array<StaticRtAssetRegistration,3> textureOwners{{
+        {21, 100, pbr, 0, &provider},
+        {14, 200, pbr, 0, &consumer, &provider, RtGeometryRole::Static, 0, 1},
+        {15, 201, pbr, 0, &consumer, &provider, RtGeometryRole::Static, 1, 2}}};
+    Check(reordered.Initialize(textureOwners, diagnostic) &&
+          reordered.InstanceMetadata()[14].primitiveBase == 3 &&
+          reordered.InstanceMetadata()[15].primitiveBase == 4 &&
+          reordered.InstanceMetadata()[15].primitiveCount == 2 &&
+          reordered.TextureArrayCounts().baseColor == 3 &&
+          reordered.Materials()[4].textureLayers == reordered.Materials()[1].textureLayers &&
+          reordered.Materials()[4].baseColorFactor != reordered.Materials()[1].baseColorFactor,
+          "subranges retain earlier-provider texture aliases and distinct consumer material factors");
+}
+
 void TestGeometryRolePartitioning()
 {
     using horde::scene::assets::StaticMaterial;
@@ -2561,6 +2709,7 @@ int main(int argc, char** argv)
     TestExactDielectricWeldCellDomain();
     TestPlayerSemanticManifestAndGeometry(temporaryRoot);
     TestSharedTextureSourceRouting();
+    TestStaticPrimitiveRangeOwnership();
     TestGeometryRolePartitioning();
     TestProductionDielectricFixture();
     TestLanternGeometryQualityProfile();

@@ -1,0 +1,44 @@
+{
+  "sourceParent": "a0e0cc7e5df1e170dfdc175c3a7a5bb6bea53e35",
+  "deviceInstalled": false,
+  "closedPackageCheck": "pass",
+  "runtimeZoneSubrangesEnabled": false,
+  "files": {
+    "src/vulkan/raytracing/RtStaticMeshSlot.h": {
+      "bytes": 4311,
+      "sha256": "a02a44c8cb8f7f79fd41b456fddb1086502e57aa57fe6d28d3e38a41caf3ff8d"
+    },
+    "src/vulkan/raytracing/RtStaticMeshSlot.cpp": {
+      "bytes": 26811,
+      "sha256": "12c33f95f7d57c3b4a03a04089d04363fad355d74e145252cd2fecfb04fab3f5"
+    },
+    "tests/StaticGltfAssetTests.cpp": {
+      "bytes": 158328,
+      "sha256": "c5ed09dff17093a2cd256fea5627055f36d8bde978b45ec9525a5fee72263854"
+    },
+    "tests/ForestDressingTests.cpp": {
+      "bytes": 25330,
+      "sha256": "e7b13969a93fa110152f0895354c2bcf20152143878ce978e35200dfdb7820cf"
+    },
+    "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe": {
+      "bytes": 12521984,
+      "sha256": "96f3d0f15ae8e65c1bd46cd5dd56d5c201ec40de52f99f862fdec362a8cba13e"
+    },
+    "build/presets/windows-x64-release/Release/HordeLanternRT.exe": {
+      "bytes": 4364800,
+      "sha256": "96c41cc1ece3011143e84b65c8bf6fa09b71cc320fa7df4e404c8d812c15bcc2"
+    },
+    "android/app/build/outputs/apk/debug/app-debug.apk": {
+      "bytes": 172745371,
+      "sha256": "482f7dd0ef60592bfada1d2a5710246074973aad5b2b48a6aee25776e70fe0db"
+    },
+    "tools/raygen-variant-budgets.json": {
+      "bytes": 6425,
+      "sha256": "56936479b2d202dbdb9393ba94b66a1b0bc12d490b700d8af4c63de3460e53bf"
+    },
+    "assets/models/world/source/tomb-dressing-v01/tomb-dressing-v01.blend1": {
+      "bytes": 259583,
+      "sha256": "0dae1e8fb803336cef2d045f48c5f4c9195a6463f45161cb0b6c7434350769fb"
+    }
+  }
+}

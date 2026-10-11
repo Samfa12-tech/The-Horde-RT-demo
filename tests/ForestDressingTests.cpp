@@ -2,6 +2,10 @@
 #include "gameplay/simulation/ForestTreePlacementContract.h"
 #include "scene/ForestDressing.h"
 #include "scene/ChapterTerrainSurface.h"
+#include "scene/ChapterTerrainAdmission.h"
+#include "scene/TombDressing.h"
+#include "scene/assets/StaticPrimitiveGrouping.h"
+#include "vulkan/raytracing/RtStaticMeshSlot.h"
 #include "gameplay/traversal/ChapterTerrainMovement.h"
 #include "scene/assets/AssetManifest.h"
 
@@ -347,6 +351,79 @@ void TestNativeTerrainAndTrailClearance()
     }
 }
 
+void TestNativeChapterPrimitiveOwnership()
+{
+    using namespace horde::vulkan::raytracing;
+    std::string diagnostic;
+    AssetManifest manifest;
+    StaticMeshAsset owner;
+    const auto directory = kRoot / "assets/models/world/runtime/chapter-entry-return-v1";
+    const bool imported = AssetManifest::Load(directory / "asset.manifest.json", manifest, diagnostic) &&
+        StaticMeshAsset::Load(directory / "collapsed-entry-lod0.runtime.glb", manifest, owner, diagnostic);
+    Check(imported, "current chapter entry imports for real primitive ownership proof");
+    if (!imported) return;
+    TombDressingBuildReport tomb;
+    ForestDressingBuildReport forest;
+    std::shared_ptr<const gameplay::simulation::TriangleSupportSurface> terrain;
+    const bool prepared = AppendPreparedTombDressing(kRoot / "assets", owner, tomb, diagnostic) &&
+        AppendChapterTerrain(kRoot / "assets", owner, terrain, diagnostic) &&
+        AppendPreparedForestDressing(kRoot / "assets", owner, forest, diagnostic, terrain.get()) &&
+        CoalesceAdjacentWorldBakedPrimitives(owner, diagnostic);
+    Check(prepared, diagnostic.empty() ? "real tomb/terrain/forest preparation succeeds" : diagnostic);
+    if (!prepared) return;
+    constexpr std::array<std::string_view,11> families{{
+        "Boulder01Rock", "MedievalWall02", "TombBoneWax", "TombEarthenware", "TombCharredWick",
+        "ChapterTrailDampSand", "ChapterForestGround", "ForestBark", "ForestPine", "ForestMoss", "ForestAlder"}};
+    Check(owner.primitives.size() == families.size(),
+          "current coalesced chapter retains eleven existing primitive rows");
+    if (owner.primitives.size() != families.size()) return;
+    for (std::size_t i = 0; i < families.size(); ++i)
+        Check(owner.materials.at(owner.primitives[i].materialIndex).name == families[i],
+              "actual material families identify preserved shared, tomb and forest boundaries");
+    const auto pbr = static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr);
+    RtStaticMeshSlot complete, partitioned;
+    const bool completeReady = complete.Initialize(
+        std::array{StaticRtAssetRegistration{21,100,pbr,0,&owner}}, diagnostic);
+    Check(completeReady,
+          "real combined chapter static route initializes");
+    if (!completeReady) return;
+    const std::array<StaticRtAssetRegistration,3> ranges{{
+        {14,101,pbr,0,&owner,nullptr,RtGeometryRole::Static,0,2},
+        {15,102,pbr,0,&owner,nullptr,RtGeometryRole::Static,2,3},
+        {16,103,pbr,0,&owner,nullptr,RtGeometryRole::Static,5,6}}};
+    const bool partitionReady = partitioned.Initialize(ranges, diagnostic);
+    Check(partitionReady,
+          "three actual chapter ranges share one packed native asset");
+    if (!partitionReady) return;
+    Check(complete.Indices() == partitioned.Indices() &&
+          complete.Vertices().size() == partitioned.Vertices().size() &&
+          std::memcmp(complete.Vertices().data(), partitioned.Vertices().data(),
+                      complete.Measurements().vertexBytes) == 0 &&
+          complete.Measurements().primitiveMetadataBytes == partitioned.Measurements().primitiveMetadataBytes &&
+          complete.Measurements().materialBytes == partitioned.Measurements().materialBytes &&
+          complete.TextureArrayCounts().baseColor == partitioned.TextureArrayCounts().baseColor,
+          "native owner partition preserves every triangle, vertex byte, material row and atlas allocation");
+    std::uint32_t visited = 0;
+    for (const auto& range : ranges) {
+        const auto& row = partitioned.InstanceMetadata()[range.instanceCustomIndex];
+        Check(row.primitiveBase == range.primitiveOffset && row.primitiveCount == range.primitiveCount,
+              "actual BLAS-local geometry indices resolve to the intended packed chapter range");
+        for (std::uint32_t local = 0; local < row.primitiveCount; ++local) {
+            const auto& metadata = partitioned.PrimitiveMetadata()[row.primitiveBase + local];
+            const auto& source = owner.primitives[range.primitiveOffset + local];
+            Check(metadata.vertexOffset == source.vertexOffset && metadata.indexOffset == source.indexOffset &&
+                  metadata.indexCount == source.indexCount && metadata.materialIndex == source.materialIndex,
+                  "native per-owner hit decode keeps source positions/indices and exact material identity");
+            ++visited;
+        }
+    }
+    Check(visited == owner.primitives.size(),
+          "native ownership ranges cover all chapter primitives exactly once");
+    std::cout << "Native chapter ownership: common 2 (includes mixed tomb masonry), tomb 3, forest 6; "
+              << "primitiveRows=" << visited << " vertexBytes=" << complete.Measurements().vertexBytes
+              << " indexBytes=" << complete.Measurements().indexBytes << "; CPU admission only\n";
+}
+
 } // namespace
 
 int main()
@@ -355,6 +432,7 @@ int main()
     TestCleanFailures();
     TestNativeTerrainAndTrailClearance();
     TestUnsafeRootFootprintsFailAtomically();
+    TestNativeChapterPrimitiveOwnership();
     if (failures == 0)
     {
         std::cout << "Native forest tree-pair import, grounding, grouping, and clean-failure checks passed.\n";

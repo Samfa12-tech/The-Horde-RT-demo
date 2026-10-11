@@ -1,0 +1,24 @@
+{
+  "pipeline": {
+    "changedPixels": 0,
+    "size": [
+      960,
+      540
+    ],
+    "resourceInventoryUnchanged": true,
+    "shaderBundleUnchanged": true,
+    "staticPackingBytesUnchanged": true,
+    "sustainedPerformance": false
+  },
+  "query": {
+    "changedPixels": 0,
+    "size": [
+      960,
+      540
+    ],
+    "resourceInventoryUnchanged": true,
+    "shaderBundleUnchanged": true,
+    "staticPackingBytesUnchanged": true,
+    "sustainedPerformance": false
+  }
+}

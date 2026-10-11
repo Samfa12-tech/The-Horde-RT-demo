@@ -19,6 +19,13 @@ actual apron-edge rope contact and manage the longer loose tail; moving the
 anchor alone would stall traversal. Graveyard/stake, real GPU zone retirement,
 full inspected route and final owner/phone acceptance remain required.
 
+The [static primitive ownership continuation](../evidence/2026-10-12-static-primitive-owners/README.md)
+adds validated packed-asset subranges, avoiding extra static-asset or primitive
+rows for future zone owners. Native chapter tests preserve all geometry/material
+bytes. Production still uses the combined BLAS and resident buffers; this is
+not streaming. The mixed collapse/tomb masonry row must remain retained, and
+actual GPU allocation/fence handoffs are still required under unchanged limits.
+
 Newest bounded corrections: [Windows Unicode report editing](../evidence/2026-10-11-windows-report-unicode/README.md)
 at `d24a9971` passes all six exact-commit CI jobs. The subsequent
 [woodland root grounding and native-terrain held-item clearance](../evidence/2026-10-11-woodland-grounding-clearance/README.md)
