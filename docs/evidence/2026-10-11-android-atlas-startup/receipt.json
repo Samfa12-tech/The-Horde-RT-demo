@@ -1,0 +1,464 @@
+{
+  "sourceParent": "c6e2076c074b3fb9590c8a048cc4d6154b600587",
+  "sourceFiles": {
+    "src/vulkan/raytracing/RtStaticTextureSelection.h": "c90088074e8146d074c52e5be1c3f7847f00bff0597965363c4d3f6d86c5e0dd",
+    "src/vulkan/raytracing/PresentableTinyRtScene.cpp": "3b8d154178f890f2abe6cae50d43f57da72217da9babe7d917dd7eb87ea9372e",
+    "tests/RtTextureLayerSubsetTests.cpp": "52ea36728173dd0a68bbaa9f9e0106b5d2602cc7766914f6ef914d0b080bfc7a",
+    "tests/RtSceneResourceInventoryTests.cpp": "49e427ef19ea0445068ff1eb6fecf59a39379c41ea0e2447cbc384241ccd042c"
+  },
+  "artifacts": {
+    "windowsDebug": {
+      "sha256": "5fb3a3239ee0f5ccfbcfafaa41a0bf8134e8285fc74f324d20c5ee4ac4bcf088",
+      "bytes": 12407808
+    },
+    "windowsRelease": {
+      "sha256": "12f0231ab00f07785ad7a8b834b38d3766c5627764d2cb76d5be0910e57a4811",
+      "bytes": 4326912
+    },
+    "androidDebug": {
+      "sha256": "eb50a06a1bfab9612f2a40fe87390c7e36567388cf540d16338417ad6944ba0e",
+      "bytes": 172489016
+    }
+  },
+  "windowsCaptures": {
+    "pipeline": {
+      "complete": true,
+      "source": "rt-storage-image",
+      "sceneOnly": true,
+      "settlingFrames": 12,
+      "fixedAnimationTimeSeconds": 0.0,
+      "executionBackend": "RayTracingPipeline",
+      "selectedRtPipelineBundle": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "5b8eb292cfa45524bb521abad3f7b9153ae93913375d975bcc3ba48b2d09ebf0"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "919710743ed0a5957501c2040823650657c77df620445b7c83085cfef72daf1f"
+        }
+      },
+      "presentation": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "timing": {
+        "sampleCount": 12,
+        "overallMedianMs": 6.07695,
+        "overallMeanMs": 57.695375,
+        "gpuRtCommandBuffer": {
+          "valid": true,
+          "latestMs": 1.248704,
+          "averageMs": 1.452336,
+          "sampleCount": 12,
+          "timestampValidBits": 64,
+          "timestampPeriodNanoseconds": 1.0
+        }
+      }
+    },
+    "query": {
+      "complete": true,
+      "source": "rt-storage-image",
+      "sceneOnly": true,
+      "settlingFrames": 12,
+      "fixedAnimationTimeSeconds": 0.0,
+      "executionBackend": "RayQueryCompute",
+      "selectedRtPipelineBundle": {
+        "opaqueFast": {
+          "key": "rayquery_compute_diagnostic_high_opaque_fast",
+          "sha256": "57b7a23d6eaed1885001e488654815cbbc1c1e25cec29db16c77b698aac92f13"
+        },
+        "genericDielectric": {
+          "key": "rayquery_compute_diagnostic_high_generic_dielectric",
+          "sha256": "c329f47673a9ed4bb3287c59c52a6db4d7a29dc39814b78beb78b969d2f527ec"
+        }
+      },
+      "presentation": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "timing": {
+        "sampleCount": 12,
+        "overallMedianMs": 6.07245,
+        "overallMeanMs": 34.486267,
+        "gpuRtCommandBuffer": {
+          "valid": true,
+          "latestMs": 1.262528,
+          "averageMs": 1.482619,
+          "sampleCount": 12,
+          "timestampValidBits": 64,
+          "timestampPeriodNanoseconds": 1.0
+        }
+      }
+    }
+  },
+  "phoneFailure": {
+    "model": "Samsung SM-S948B",
+    "apkSha256": "bce773bbe29bc94f4d47f6ca73504830c58993337495cbf6ffc702c2650f516e",
+    "backend": "RayTracingPipeline",
+    "checkpoint": "rescue-journey-start",
+    "captureIntent": false,
+    "presented": false,
+    "failureStage": "static-meshes",
+    "error": "PBR KTX2 array has an unsupported header, format, or payload size",
+    "installedTextureMatchesApk": true,
+    "baseTextureSha256": "5e21700c1f781c913e5dcf0ca05ff79e01db57eac39514ef3ed19a2b961eeb44",
+    "baseTextureLayers": 18,
+    "legacyNativeLayers": [
+      14,
+      14,
+      14
+    ],
+    "foregroundBeforeScreenshotVerified": true
+  },
+  "correctedPhoneStatus": "PASS bounded Pipeline startup and RT presentation; traversal, Query, lifecycle and owner acceptance pending",
+  "javaTests": {
+    "tests": 283,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "correctedPhone": {
+    "checkpoint": "rescue-journey-start",
+    "player": {
+      "x": 0.0,
+      "z": 1.85,
+      "yaw": 3.1416,
+      "pitch": -0.05,
+      "vitality": 3,
+      "maxVitality": 3,
+      "lifePhase": "alive",
+      "damageEnabled": false
+    },
+    "renderScale": 0.5,
+    "outputExposure": 0.92,
+    "waterQuality": 1,
+    "internalExtent": {
+      "width": 720,
+      "height": 1490
+    },
+    "presented": true,
+    "executionBackend": "RayTracingPipeline",
+    "selectedRtPipelineBundle": {
+      "opaqueFast": {
+        "key": "diagnostic_mobile_opaque_fast",
+        "sha256": "08a3f68e62d249bca1d0d9d1dafaa35e26becb13590746779b12d755681790a7"
+      },
+      "genericDielectric": {
+        "key": "diagnostic_mobile_generic_dielectric",
+        "sha256": "0c3d7a98b2e8268f534cfe9ac8cc7301caa8d472f7ed9873bb122a27700875e2"
+      }
+    },
+    "swapchainExtent": {
+      "width": 1440,
+      "height": 2980
+    },
+    "playerRenderRoute": "modelled-viewmodel",
+    "dedicatedPlayerPrimaryOwnership": true,
+    "rtFrameEvidence": {
+      "version": 1,
+      "observerAvailable": true,
+      "sceneEpoch": 3,
+      "measurementGeneration": 5,
+      "running": true,
+      "paused": false,
+      "presented": true,
+      "diagnosticStatus": "valid",
+      "gpuStatus": "valid",
+      "completedFrameStatus": "available",
+      "completedFrameReason": null,
+      "completedFrame": {
+        "schema": 1,
+        "identity": {
+          "sceneEpoch": 3,
+          "measurementGeneration": 5,
+          "recordAttemptSerial": 480,
+          "recordSerial": 480,
+          "submissionSerial": 480,
+          "completionSerial": 480,
+          "simulationTick": 0,
+          "frameSlot": 0
+        },
+        "pipeline": {
+          "executionBackend": "RayTracingPipeline",
+          "instrumentation": "diagnostic",
+          "dielectricQuality": "mobile",
+          "bundleKey": "diagnostic_mobile_pair",
+          "opaqueFast": {
+            "key": "diagnostic_mobile_opaque_fast",
+            "sha256": "08a3f68e62d249bca1d0d9d1dafaa35e26becb13590746779b12d755681790a7"
+          },
+          "genericDielectric": {
+            "key": "diagnostic_mobile_generic_dielectric",
+            "sha256": "0c3d7a98b2e8268f534cfe9ac8cc7301caa8d472f7ed9873bb122a27700875e2"
+          },
+          "activeStrategy": "opaque-fast",
+          "activeKey": "diagnostic_mobile_opaque_fast",
+          "activeSha256": "08a3f68e62d249bca1d0d9d1dafaa35e26becb13590746779b12d755681790a7",
+          "waterQuality": "mobile"
+        },
+        "dispatch": {
+          "sceneReady": true,
+          "rtDispatchRecorded": true,
+          "swapchainCopyRecorded": true
+        },
+        "shadowQuality": {
+          "mode": "current",
+          "localPrimarySamples": 1,
+          "skyPrimarySamples": 1,
+          "reserved": 0
+        },
+        "fireQuality": {
+          "quality": "Mobile",
+          "volumeSteps": 4,
+          "reflectionSamples": 1,
+          "reflectedVolumeSteps": 4
+        },
+        "actualUploadedDustQuality": 1,
+        "actualUploadedMistEnabled": true,
+        "fireLighting": {
+          "count": 1,
+          "emitters": [
+            {
+              "stableId": 1,
+              "positionStrength": [
+                0.150804073,
+                0.88448751,
+                2.30693388,
+                1.58399999
+              ],
+              "colourIntensity": [
+                1,
+                0.454959989,
+                0.0977689251,
+                1.58399999
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        "resources": {
+          "bufferCount": 53,
+          "memoryAllocationCount": 64,
+          "bottomLevelAccelerationStructureCount": 21,
+          "topLevelAccelerationStructureCount": 1,
+          "tlasInstanceCount": 28,
+          "pipelineCount": 2,
+          "shaderBindingTableCount": 2,
+          "descriptorSetCount": 1,
+          "hostVisibleBytes": 18637824,
+          "deviceLocalBytes": 104042880
+        },
+        "player": {
+          "skinCadenceHz": 60,
+          "skinUpdateCount": 2,
+          "maximumSocketErrorMicrometres": 10,
+          "primaryPixelCountAvailable": true,
+          "primaryPixelCount": 1909,
+          "primaryVisible": true
+        },
+        "dielectric": {
+          "status": "valid",
+          "available": true,
+          "compiled": true,
+          "completedSubmissionSerial": 480,
+          "readCount": 479,
+          "resetCount": 479,
+          "counters": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1909,
+            0,
+            0
+          ],
+          "detail": "Diagnostic counters were collected after the owning fence."
+        },
+        "gpu": {
+          "status": "valid",
+          "available": true,
+          "completedSubmissionSerial": 480,
+          "wholeRtGpuMs": 47.110884,
+          "timestampValidBits": 48,
+          "timestampPeriodPicoseconds": 52083,
+          "sampleCount": 480,
+          "unavailableResultCount": 0,
+          "errorCount": 0,
+          "detail": "GPU RT command-buffer timing is available."
+        },
+        "stages": {
+          "status": "valid",
+          "simulationStepCpuMs": 0.009323,
+          "skinCpuMs": 0.0,
+          "playerSkinCpuMs": 0.0,
+          "characterSkinCpuMs": 0.0,
+          "dynamicUploadCpuMs": 0.009947,
+          "blasRefitRecordCpuMs": 0.018959,
+          "tlasUpdateRecordCpuMs": 0.008958,
+          "traceCopyRecordCpuMs": 0.21625,
+          "frameFenceWaitCpuMs": 48.174375,
+          "imageAcquireCpuMs": 0.048177,
+          "queueSubmitCpuMs": 0.256667,
+          "presentCallCpuMs": 0.422812,
+          "wholeFrameCycleCpuMs": 49.645052,
+          "workInvocationCounts": [
+            1,
+            0,
+            0,
+            0,
+            9,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "byteCounts": [
+            0,
+            0,
+            0,
+            0,
+            82648,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "operationCounts": [
+            0,
+            0,
+            0,
+            0,
+            9,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1
+          ]
+        },
+        "presentation": {
+          "outcome": "presented",
+          "presented": true,
+          "lastSuccessfulPresentSubmissionSerial": 480,
+          "finalIdleCompletion": false
+        },
+        "cpuBenchmarkEligible": true,
+        "benchmarkEligible": true
+      }
+    },
+    "gpuRtTiming": {
+      "status": "GPU RT command-buffer timing is available.",
+      "supported": true,
+      "valid": true,
+      "latestMs": 47.171093,
+      "averageMs": 48.585598,
+      "timestampPeriodNanoseconds": 52.0833,
+      "timestampValidBits": 48,
+      "sampleCount": 1109,
+      "unavailableCount": 0,
+      "errorCount": 0
+    },
+    "foregroundVerifiedBeforeCapture": true,
+    "automatedInputSent": false,
+    "ownerObservation": "Game visible",
+    "savedScalePreserved": true
+  }
+}

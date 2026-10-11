@@ -2790,3 +2790,23 @@ static capture fails its arm-pixel gate twice and is stopped for review. Owner
 absence is not acceptance; manual and lifecycle gates need his return. Full
 DEVICE-VERIFIED remains NO. No other device or sustained-performance claim.
 [Continuation report and exact evidence](superpowers/plans/2026-10-09-horde-1.7-wp2-acceptance-continuation.md).
+
+
+### 11 October chapter terrain — ordinary-startup regression and repair
+
+Authorized Samsung SM-S948B / Android 16 / Adreno 840. Owner-approved Debug APK
+`bce773bbe29bc94f4d47f6ca73504830c58993337495cbf6ffc702c2650f516e`
+failed before RT presentation: ordinary atlas ownership did not select its
+legacy rows from the enlarged packaged atlas. Installed/staged bytes matched.
+The separately approved corrected APK
+`eb50a06a1bfab9612f2a40fe87390c7e36567388cf540d16338417ad6944ba0e`
+installed without data clearing, signature changes or release-app modification.
+
+Evidence class: bounded exact-candidate physical Pipeline Diagnostic/Mobile
+startup/presentation plus an inspected foreground game screenshot. Owner reports
+"Game visible". Actual saved render scale 50%, 720x1490 into 1440x2980; settings
+were not lowered for this test. Native ordinary startup and chapter rebuild both
+succeeded, followed by genuine RT presentation. Fresh checkpoint shows 3/3 hearts.
+No automated input. This does not establish QueryCompute, complete chapter
+traversal, sustained performance, lifecycle or audio/haptic acceptance.
+[Failure, correction, hashes and evidence](evidence/2026-10-11-android-atlas-startup/README.md).

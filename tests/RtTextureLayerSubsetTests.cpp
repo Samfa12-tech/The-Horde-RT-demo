@@ -1,6 +1,7 @@
 #include "vulkan/raytracing/RtTextureLayerSubset.h"
 #include "vulkan/raytracing/RtChapterTextureLayout.h"
 #include "vulkan/raytracing/RtKtxArrayAppend.h"
+#include "vulkan/raytracing/RtStaticTextureSelection.h"
 
 #include <array>
 #include <iostream>
@@ -16,6 +17,24 @@ int main(int argc,char** argv)
     const auto check = [&passed](bool condition, const char* label) {
         if (!condition) { std::cerr << label << "\n"; passed = false; }
     };
+    using namespace horde::vulkan::raytracing;
+    const auto legacy = SelectRtStaticTextureLayers(RtSceneProfile::Showcase,true,false);
+    check(legacy.baseColor.size()==14 && legacy.normalOrm.size()==14 && !legacy.appendTerrain &&
+          legacy.aliases.empty(), "ordinary production startup must select its legacy atlas rows");
+    for(std::size_t i=0;i<legacy.baseColor.size();++i)
+        check(legacy.baseColor[i]==i,"legacy base layer indices remain unchanged");
+    for(std::size_t i=0;i<legacy.normalOrm.size();++i)
+        check(legacy.normalOrm[i]==i,"legacy normal/ORM indices remain unchanged");
+    for(auto profile:{RtSceneProfile::EntryMenu,RtSceneProfile::GraphicsPreview}) {
+        const auto selected=SelectRtStaticTextureLayers(profile,true,true);
+        check(selected.baseColor.size()==(profile==RtSceneProfile::EntryMenu?2u:3u) &&
+              !selected.appendTerrain && selected.aliases.empty(), "menus retain narrow atlas admission");
+    }
+    check(SelectRtStaticTextureLayers(RtSceneProfile::Showcase,false,false).baseColor.empty(),
+          "synthetic development assets keep their own exact array layout");
+    const auto chapter=SelectRtStaticTextureLayers(RtSceneProfile::Showcase,true,true);
+    check(chapter.baseColor.size()==15 && chapter.normalOrm.size()==12 && chapter.appendTerrain &&
+          chapter.aliases.size()==3,"chapter keeps deduplicated layers and terrain addition");
     const std::array<std::uint8_t, 12> source{10,11,12,13,20,21,22,23,30,31,32,33};
     const std::array<std::uint32_t, 3> reorder{2,0,2};
     std::vector<std::uint8_t> destination{99};
@@ -135,6 +154,18 @@ int main(int argc,char** argv)
                 std::uint64_t offset,length;std::uint32_t layers;
                 std::memcpy(&offset,original.data()+80+24*mip,8);std::memcpy(&length,original.data()+88+24*mip,8);
                 std::memcpy(&layers,original.data()+32,4);
+                // The ordinary startup scene precedes Android checkpoint
+                // dispatch. Its upload must preserve every legacy encoded
+                // texel/mip while excluding the appended forest families.
+                const auto legacyChosen=color?legacy.baseColor:legacy.normalOrm;
+                std::vector<std::uint8_t> legacyUpload;
+                const auto originalMip=std::span<const std::uint8_t>(original).subspan(
+                    static_cast<std::size_t>(offset),static_cast<std::size_t>(length));
+                check(AppendRtTextureLayerSubset(originalMip,layers,length/layers,legacyChosen,legacyUpload),
+                      "actual ordinary startup selects bounded Windows/ASTC layers");
+                check(legacyUpload.size()==length/layers*legacyChosen.size() &&
+                      std::equal(legacyUpload.begin(),legacyUpload.end(),originalMip.begin()),
+                      "ordinary startup preserves byte-identical legacy mip prefix");
                 std::vector<std::uint8_t> upload;
                 check(AppendRtTextureLayerSubset(std::span<const std::uint8_t>(original).subspan(
                     static_cast<std::size_t>(offset),static_cast<std::size_t>(length)),layers,length/layers,chosen,upload,

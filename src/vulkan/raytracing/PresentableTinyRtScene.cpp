@@ -20,6 +20,7 @@
 #include "vulkan/raytracing/RtKtxArrayAppend.h"
 #include "scene/ChapterTerrainAdmission.h"
 #include "vulkan/raytracing/RtChapterTextureLayout.h"
+#include "vulkan/raytracing/RtStaticTextureSelection.h"
 
 #include "gameplay/items/HeldItemKinematics.h"
 #include "gameplay/items/HeldLightState.h"
@@ -2844,36 +2845,21 @@ bool PresentableTinyRtScene::CreateStaticMeshResources(std::string& diagnostic)
 
     if (!genericStaticAssetEnabled_) return true;
     const RtTextureArrayCounts textureCounts = staticMeshSlot_.TextureArrayCounts();
-    // Canonical packaged atlas order is recorded in textures/props/runtime/
-    // asset.manifest.json. Narrow admission preserves torch/ring/body order.
-    constexpr std::array<std::uint32_t, 3u> previewTextureLayers{{1u, 8u, 9u}};
-    constexpr std::array<std::uint32_t, 2u> entryTextureLayers{{8u, 9u}};
-    const std::span<const std::uint32_t> sourceLayers =
-        sceneProfile_ == RtSceneProfile::GraphicsPreview
-            ? std::span<const std::uint32_t>(previewTextureLayers)
-        : sceneProfile_ == RtSceneProfile::EntryMenu
-            ? std::span<const std::uint32_t>(entryTextureLayers)
-            : std::span<const std::uint32_t>{};
-    if (!sourceLayers.empty() &&
-        (textureCounts.baseColor != sourceLayers.size() ||
-         textureCounts.normal != sourceLayers.size() || textureCounts.orm != sourceLayers.size()))
+    const auto selection = SelectRtStaticTextureLayers(
+        sceneProfile_, productionHeldItemAssetsEnabled_, developmentRescueJourney_);
+    const bool chapterLayout = selection.appendTerrain;
+    const auto baseLayers = selection.baseColor;
+    const auto normalOrmLayers = selection.normalOrm;
+    const auto aliases = selection.aliases;
+    const std::size_t extraLayers = chapterLayout ? 2u : 0u;
+    if (!baseLayers.empty() &&
+        (textureCounts.baseColor != baseLayers.size() + extraLayers ||
+         textureCounts.normal != normalOrmLayers.size() + extraLayers ||
+         textureCounts.orm != normalOrmLayers.size() + extraLayers))
     {
-        diagnostic = "Preview prop texture groups no longer match the admitted canonical layer selection.";
+        diagnostic = "Static material routes disagree with the exact-byte atlas selection.";
         return false;
     }
-    const bool chapterLayout=sceneProfile_==RtSceneProfile::Showcase && developmentRescueJourney_;
-    if (chapterLayout && (textureCounts.baseColor!=kChapterBaseColorSourceLayers.size()+2 ||
-        textureCounts.normal!=kChapterNormalOrmSourceLayers.size()+2 ||
-        textureCounts.orm!=kChapterNormalOrmSourceLayers.size()+2)) {
-        diagnostic="Chapter material routes disagree with the exact-byte atlas subset.";
-        return false;
-    }
-    const std::span<const std::uint32_t> baseLayers=chapterLayout
-        ? std::span<const std::uint32_t>{kChapterBaseColorSourceLayers} : sourceLayers;
-    const std::span<const std::uint32_t> normalOrmLayers=chapterLayout
-        ? std::span<const std::uint32_t>{kChapterNormalOrmSourceLayers} : sourceLayers;
-    const std::span<const RtTextureLayerAlias> aliases=chapterLayout
-        ? std::span<const RtTextureLayerAlias>{kChapterTextureAliases} : std::span<const RtTextureLayerAlias>{};
     const std::array<std::uint32_t, 4u> actualTextureLayers{{
         std::max(textureCounts.baseColor, 1u),
         std::max(textureCounts.normal, 1u),

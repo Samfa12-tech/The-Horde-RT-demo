@@ -7,6 +7,16 @@ full design, not a replacement master or a claim that all of 1.7 is complete.
 The continuing development branch is `codex/horde-1.7-wp2-vertical-proof`,
 [draft PR27](https://github.com/Samfa12-tech/The-Horde-RT-demo/pull/27).
 
+Latest implementation evidence (11 October): [authored live terrain and forest
+ground](../evidence/2026-10-11-chapter-live-terrain/README.md) at `278ea604`,
+followed by [ordinary-startup atlas correction and physical Android
+presentation](../evidence/2026-10-11-android-atlas-startup/README.md).
+These dated receipts supersede earlier uncommitted/pending wording only for
+their tested changes. The owner authorized Poly Haven texture acquisition;
+verified CC0 Forest Ground 01 now replaces masonry on the terrain banks.
+The complete chapter, visible Kit, graveyard/stake, actual GPU zone retirement,
+moon alignment and full route/owner/device acceptance remain unfinished.
+
 ## Authority and preserved sources
 
 The owner's current instructions and explicit later decisions govern execution.

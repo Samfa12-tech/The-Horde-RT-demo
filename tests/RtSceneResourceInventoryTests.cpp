@@ -8,6 +8,7 @@
 #include "gameplay/effects/KeeperTorchLighting.h"
 #include "scene/assets/StaticPrimitiveGrouping.h"
 #include "vulkan/raytracing/RtWorldMaterialPalette.h"
+#include "vulkan/raytracing/RtStaticTextureSelection.h"
 
 #ifdef _MSC_VER
 #include <crtdbg.h>
@@ -867,6 +868,16 @@ struct PresentableTinyRtSceneObservationTestAccess
         const auto end = std::chrono::steady_clock::now();
         if (!baselineLoaded || !tombLoaded)
         { std::cerr << "Integrated tomb intake: " << diagnostic << '\n'; return false; }
+        const auto baselineCounts=baseline.staticMeshSlot_.TextureArrayCounts();
+        const auto baselineSelection=SelectRtStaticTextureLayers(RtSceneProfile::Showcase,true,false);
+        if (baselineCounts.baseColor!=baselineSelection.baseColor.size() ||
+            baselineCounts.normal!=baselineSelection.normalOrm.size() ||
+            baselineCounts.orm!=baselineSelection.normalOrm.size())
+        {
+            std::cerr<<"Ordinary live-scene atlas selection disagrees with native material ownership: "
+                     <<baselineCounts.baseColor<<","<<baselineCounts.normal<<","<<baselineCounts.orm<<'\n';
+            return false;
+        }
         const auto oldIndices = baseline.collapseStaticAsset_.indices.size();
         // The chapter selects its separately admitted lower, enclosed return.
         // Dressing is appended after it; the legacy scene retains the tall source.
