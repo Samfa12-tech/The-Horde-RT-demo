@@ -44,9 +44,11 @@ Device compatibility is tracked in [`docs/ANDROID_RT_DEVICE_COMPATIBILITY_RECORD
 
 ## Roadmap and future chapters
 
-The [Campaign and Engine Roadmap](docs/ROADMAP.md) records the forward direction: [1.7.0 — Beyond the Tomb](docs/superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md), then [1.8.0 — Village Hub](docs/superpowers/plans/2026-09-11-village-hub-1.8.0.md), followed by three themed dungeons with enemies, puzzles, bosses and Horde/key/map-related pieces. Dungeon-specific items and ray-traced light as gameplay are central design considerations; exact themes, lore and later versions remain open.
+The [shared roadmap](docs/ROADMAP.md) is Sam, Eric and Codex's source of truth for each update's approved scope, status, boundaries and acceptance. Its [source inventory](docs/ROADMAP_SOURCES.md) links the detailed campaign, dungeon, map, dialogue, UI, asset/animation and evidence records.
 
-These are plans, not shipped features. Use the released 1.6.2 baseline for future work, and make, test and accept1.7 before finalising or implementing the provisional village hub. The [Phase Plan](docs/PHASE_PLAN.md) retains the historical implementation sequence.
+1.6.2 is published. 1.7's tomb-to-woodland chapter is in progress in draft PR27; 1.8 centres on Bellwether, NPCs and bounded light RPG systems after accepted 1.7. The later Abbey/Foundry/Court delivery labels are provisional; Abbey and Foundry remain playable in either order. Unassigned directions and proposals stay in the roadmap until scoped to an update.
+
+Record new scope decisions in the roadmap and link their detailed plans; preserve dated receipts as evidence of their own candidates. The [Phase Plan](docs/PHASE_PLAN.md) retains historical implementation order.
 
 ## RT or nothing
 

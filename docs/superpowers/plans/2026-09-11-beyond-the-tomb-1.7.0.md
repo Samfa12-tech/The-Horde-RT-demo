@@ -1,5 +1,7 @@
 # Beyond the Tomb — 1.7.0 Scoped Update and Implementation Plan
 
+> **Current scope navigation, 11 October 2026:** [The shared roadmap](../../ROADMAP.md#17---beyond-the-tomb) and its [full-master/current-PR27 source index](../../ROADMAP_SOURCES.md#17-plans-production-and-pr27-evidence) govern later chapter decisions and implementation status. This abbreviated historical plan does not replace the fuller pinned master or establish acceptance of ongoing PR27 work.
+
 > **For agentic workers:** Use `superpowers:subagent-driven-development` or `superpowers:executing-plans` when available. Execute one reviewed work package at a time. This is the complete master handoff, not permission to build every subsystem concurrently.
 
 **Owner:** Sam Small / Samfa12  
