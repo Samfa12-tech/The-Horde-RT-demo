@@ -415,3 +415,21 @@ retirement, procedural-world ownership and measured allocation overlap remain
 required. No shader budget, 18-layer/three-actor limit or original torch deadline
 changed. The native forest candidate test is added to Vulkan-host CI; exact
 pushed-commit results remain distinct from local and parent-checkpoint evidence.
+
+### Isolated GPU buffer preparation (12 October)
+
+The [GPU preparation milestone](../evidence/2026-10-12-gpu-buffer-preparation/README.md)
+now isolates complete geometry/metadata upload batches before handle adoption.
+Every allocation/bind/map/address failure cleans up the candidate and preserves
+the admitted destination. Ordinary chapter/compact-preview initialization uses
+this seam; exact resource counts and all 38 matched native RT image comparisons
+are unchanged. Debug/Release resource and containment tests, all Android Debug
+ABIs/lint/package checks, and fresh eight-variant shader checks passed locally.
+The new lifecycle fixture is selected explicitly in Vulkan-host CI.
+
+This still does not load or retire zones. Candidate BLAS/TLAS, generation and
+completed-work checks, invalidation of old recorded command buffers, descriptor
+cutover, dynamic geometry rebinding and reverse ownership remain required. The
+chapter is incomplete; graveyard/lid and remaining prepared dressing, the full
+gallery, sustained measurements and physical acceptance remain open. Shared
+textures, shader budgets, three actor slots and the 18-layer ceiling stay intact.

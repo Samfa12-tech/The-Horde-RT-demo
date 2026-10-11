@@ -2,10 +2,81 @@
 #include "vulkan/raytracing/RtDeviceAddressLayout.h"
 #include "vulkan/raytracing/RtSceneRecordObservation.h"
 
+#include <array>
 #include <cstring>
+#include <utility>
 
 namespace horde::vulkan::raytracing
 {
+
+bool RtGpuResources::PrepareBufferUploads(
+    const std::span<const RtGpuBufferUpload> uploads, const std::span<RtGpuBuffer> destination,
+    std::string& diagnostic) const
+{
+    if (device_ == VK_NULL_HANDLE || physicalDevice_ == VK_NULL_HANDLE ||
+        uploads.empty() || uploads.size() > kBufferUploadBatchCapacity ||
+        uploads.size() != destination.size())
+    {
+        diagnostic = "Invalid Vulkan context or bounded GPU upload batch.";
+        return false;
+    }
+    // Validate the entire destination and payload before any Vulkan call. An
+    // admitted buffer (including stray allocation facts) is never overwritten.
+    for (std::size_t i = 0u; i < uploads.size(); ++i)
+    {
+        const auto& upload = uploads[i];
+        const auto& buffer = destination[i];
+        if (upload.data == nullptr || upload.size == 0u ||
+            upload.size > std::numeric_limits<std::size_t>::max() ||
+            upload.usage == 0u || upload.label == nullptr || upload.label[0] == '\0' ||
+            !buffer.Empty())
+        {
+            diagnostic = "GPU upload batch needs valid payloads and empty candidate destinations.";
+            return false;
+        }
+    }
+
+    std::array<RtGpuBuffer, kBufferUploadBatchCapacity> candidate{};
+    const auto rollback = [this, &candidate, &uploads]() {
+        for (std::size_t i = 0u; i < uploads.size(); ++i) DestroyBuffer(candidate[i]);
+    };
+    constexpr VkMemoryPropertyFlags uploadMemory =
+        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+    for (std::size_t i = 0u; i < uploads.size(); ++i)
+    {
+        const auto& upload = uploads[i];
+        auto& buffer = candidate[i];
+        if (!CreateBuffer(upload.size, upload.usage, uploadMemory, upload.deviceAddress,
+                          buffer, diagnostic, upload.preferredMemoryFlags))
+        {
+            rollback();
+            return false;
+        }
+        if (upload.deviceAddress && buffer.address == 0u)
+        {
+            diagnostic = std::string("Zero device address for ") + upload.label + ".";
+            rollback();
+            return false;
+        }
+        // One map/copy per row. Keep mappings only for the dynamic resources;
+        // the same cleanup path owns success-null-map and ordinary failures.
+        if (!MapBufferForHostWrites(buffer, diagnostic) ||
+            !WriteBuffer(buffer, upload.data, upload.size, upload.label, diagnostic))
+        {
+            rollback();
+            return false;
+        }
+        if (!upload.retainMapping)
+        {
+            vkUnmapMemory(device_, buffer.memory);
+            buffer.mappedWriteData = nullptr;
+        }
+    }
+    for (std::size_t i = 0u; i < uploads.size(); ++i)
+        destination[i] = std::exchange(candidate[i], RtGpuBuffer{});
+    diagnostic.clear();
+    return true;
+}
 
 void RtGpuResources::Bind(const VkPhysicalDevice physicalDevice,
                           const VkDevice device,

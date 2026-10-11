@@ -2836,75 +2836,91 @@ bool PresentableTinyRtScene::ConfigureEntryMenu(horde::graphics::EntryMenuSessio
 
 bool PresentableTinyRtScene::CreateStaticMeshResources(std::string& diagnostic)
 {
-    const VkMemoryPropertyFlags uploadMemory =
-        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
     const auto& instances = staticMeshSlot_.InstanceMetadata();
     const auto& primitives = staticMeshSlot_.PrimitiveMetadata();
-    sceneMaterials_ = staticMeshSlot_.Materials();
+    auto candidateMaterials = staticMeshSlot_.Materials();
     const auto worldPalette=MakeRtWorldMaterialPalette(sceneProfile_ == RtSceneProfile::Showcase);
     const std::uint32_t worldMaterialCount = worldPalette.count;
-    if (sceneMaterials_.size() > kRtMaterialCapacity - worldMaterialCount)
+    if (candidateMaterials.size() > kRtMaterialCapacity - worldMaterialCount)
     {
         diagnostic = "Imported and authored world materials exceed the fixed RT material capacity.";
         return false;
     }
 
-    worldMaterialBase_ = static_cast<std::uint32_t>(sceneMaterials_.size());
+    const auto candidateWorldMaterialBase = static_cast<std::uint32_t>(candidateMaterials.size());
     for (std::uint32_t material = 0u; material < worldMaterialCount; ++material)
     {
-        sceneMaterials_.push_back(worldPalette.records[material]);
+        candidateMaterials.push_back(worldPalette.records[material]);
     }
-    const auto& materials = sceneMaterials_;
+    const auto& materials = candidateMaterials;
     const auto& vertices = staticMeshSlot_.Vertices();
     const auto& worldVertices = staticMeshSlot_.Vertices(RtGeometryRole::PlayerWorldBody);
     const auto& viewVertices = staticMeshSlot_.Vertices(RtGeometryRole::PlayerViewmodel);
     const horde::scene::assets::StaticRtVertex unusedViewVertex{};
     const auto& indices = staticMeshSlot_.Indices();
     const auto& geometryTransforms = staticMeshSlot_.GeometryTransforms();
-    const auto createAndWrite = [this, uploadMemory, &diagnostic](
+    std::array<RtGpuBufferUpload, RtGpuResources::kBufferUploadBatchCapacity> uploads{};
+    std::array<Buffer, RtGpuResources::kBufferUploadBatchCapacity> candidate{};
+    std::array<Buffer*, RtGpuResources::kBufferUploadBatchCapacity> destinations{};
+    std::array<std::array<std::uint8_t, 16u>, RtGpuResources::kBufferUploadBatchCapacity> padding{};
+    std::size_t uploadCount = 0u;
+    const auto enqueue = [&uploads, &destinations, &padding, &uploadCount](
         const void* data,
         VkDeviceSize size,
         VkBufferUsageFlags usage,
         bool address,
         const char* label,
         Buffer& buffer, const bool dynamic = false) {
-        const std::array<std::uint8_t, 16u> zeros{};
-        const VkDeviceSize actualSize = std::max<VkDeviceSize>(size, zeros.size());
-        if (!CreateBuffer(actualSize, usage, uploadMemory, address, buffer, diagnostic,
-                          dynamic ? 0u : VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT)) return false;
-        if (dynamic && !gpuResources_.MapBufferForHostWrites(buffer, diagnostic)) return false;
-        return WriteBuffer(buffer, size == 0u ? zeros.data() : data, actualSize, label, diagnostic);
+        const VkDeviceSize actualSize = std::max<VkDeviceSize>(size, padding[0].size());
+        if (size < padding[0].size())
+        {
+            if (size != 0u) std::memcpy(padding[uploadCount].data(), data, static_cast<std::size_t>(size));
+            data = padding[uploadCount].data();
+        }
+        uploads[uploadCount] = {data, actualSize, usage, address, dynamic, label,
+                               dynamic ? 0u : VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT};
+        destinations[uploadCount++] = &buffer;
     };
 
     const VkBufferUsageFlags storage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
     const VkBufferUsageFlags geometry = storage |
         VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR;
-    if (!createAndWrite(instances.data(), sizeof(instances), storage, false, "RT instance metadata",
-                        instanceMetadataBuffer_, true) ||
-        !createAndWrite(primitives.data(), primitives.size() * sizeof(RtPrimitiveMetadata), storage,
-                        false, "RT primitive metadata", primitiveMetadataBuffer_) ||
-        !createAndWrite(materials.data(), materials.size() * sizeof(RtMaterialGpu), storage, false,
-                        "RT material metadata", materialMetadataBuffer_, true) ||
-        !createAndWrite(vertices.data(),
-                        vertices.size() * sizeof(horde::scene::assets::StaticRtVertex), geometry,
-                        true, "static RT vertices", staticVertexBuffer_) ||
-        (sceneProfile_ == RtSceneProfile::Showcase &&
-         !createAndWrite(worldVertices.data(), worldVertices.size() * sizeof(worldVertices.front()),
-                         geometry, true, "world player RT vertices", worldPlayerVertexBuffer_,
-                         true)) ||
-        (sceneProfile_ == RtSceneProfile::Showcase &&
-         !createAndWrite(viewVertices.empty() ? &unusedViewVertex : viewVertices.data(),
-                         std::max<std::size_t>(viewVertices.size(), 1u) * sizeof(unusedViewVertex),
-                         geometry, true, "viewmodel RT vertices", viewmodelVertexBuffer_, true)) ||
-        !createAndWrite(indices.data(), indices.size() * sizeof(std::uint32_t), geometry, true,
-                        "static RT indices", staticIndexBuffer_) ||
-        !createAndWrite(geometryTransforms.data(),
-                        geometryTransforms.size() * sizeof(geometryTransforms.front()),
-                        VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, true,
-                        "static RT geometry transforms", staticGeometryTransformBuffer_))
+    enqueue(instances.data(), sizeof(instances), storage, false, "RT instance metadata",
+            instanceMetadataBuffer_, true);
+    enqueue(primitives.data(), primitives.size() * sizeof(RtPrimitiveMetadata), storage, false,
+            "RT primitive metadata", primitiveMetadataBuffer_);
+    enqueue(materials.data(), materials.size() * sizeof(RtMaterialGpu), storage, false,
+            "RT material metadata", materialMetadataBuffer_, true);
+    enqueue(vertices.data(), vertices.size() * sizeof(horde::scene::assets::StaticRtVertex),
+            geometry, true, "static RT vertices", staticVertexBuffer_);
+    if (sceneProfile_ == RtSceneProfile::Showcase)
+    {
+        enqueue(worldVertices.data(), worldVertices.size() * sizeof(worldVertices.front()),
+                geometry, true, "world player RT vertices", worldPlayerVertexBuffer_, true);
+        enqueue(viewVertices.empty() ? &unusedViewVertex : viewVertices.data(),
+                std::max<std::size_t>(viewVertices.size(), 1u) * sizeof(unusedViewVertex),
+                geometry, true, "viewmodel RT vertices", viewmodelVertexBuffer_, true);
+    }
+    enqueue(indices.data(), indices.size() * sizeof(std::uint32_t), geometry, true,
+            "static RT indices", staticIndexBuffer_);
+    enqueue(geometryTransforms.data(), geometryTransforms.size() * sizeof(geometryTransforms.front()),
+            VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, true,
+            "static RT geometry transforms", staticGeometryTransformBuffer_);
+    for (std::size_t i = 0u; i < uploadCount; ++i)
+        if (!destinations[i]->Empty())
+        {
+            diagnostic = "Static mesh preparation cannot overwrite admitted GPU resources.";
+            return false;
+        }
+    if (!gpuResources_.PrepareBufferUploads(std::span(uploads).first(uploadCount),
+                                            std::span(candidate).first(uploadCount), diagnostic))
     {
         return false;
     }
+    for (std::size_t i = 0u; i < uploadCount; ++i)
+        *destinations[i] = std::exchange(candidate[i], Buffer{});
+    sceneMaterials_ = std::move(candidateMaterials);
+    worldMaterialBase_ = candidateWorldMaterialBase;
 
     if (!genericStaticAssetEnabled_) return true;
     const RtTextureArrayCounts textureCounts = staticMeshSlot_.TextureArrayCounts();

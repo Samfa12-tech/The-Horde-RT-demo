@@ -4,6 +4,7 @@
 
 #include <cstdint>
 #include <limits>
+#include <span>
 #include <string>
 
 #include <vulkan/vulkan.h>
@@ -30,6 +31,12 @@ struct RtGpuBuffer
     {
         return address + deviceAddressOffset;
     }
+    [[nodiscard]] bool Empty() const noexcept
+    {
+        return buffer == VK_NULL_HANDLE && memory == VK_NULL_HANDLE && address == 0u &&
+            size == 0u && allocationSize == 0u && memoryPropertyFlags == 0u &&
+            mappedWriteData == nullptr && deviceAddressOffset == 0u;
+    }
 };
 
 struct RtAccelerationStructure
@@ -37,6 +44,17 @@ struct RtAccelerationStructure
     RtGpuBuffer backing;
     VkAccelerationStructureKHR handle = VK_NULL_HANDLE;
     VkDeviceAddress address = 0;
+};
+
+struct RtGpuBufferUpload
+{
+    const void* data = nullptr;
+    VkDeviceSize size = 0u;
+    VkBufferUsageFlags usage = 0u;
+    bool deviceAddress = false;
+    bool retainMapping = false;
+    const char* label = nullptr;
+    VkMemoryPropertyFlags preferredMemoryFlags = 0u;
 };
 
 struct RtUpdatableTriangleBlas
@@ -106,6 +124,15 @@ inline void AccumulateRtGpuBuffer(
 class RtGpuResources
 {
 public:
+    // Preparation only: no descriptors, AS, queue work or live resource are
+    // changed. Callers own fence/generation validation and adoption/retirement.
+    // Eight covers the scene's six static and two dynamic geometry/metadata
+    // uploads; it does not change any renderer or shader capacity.
+    static constexpr std::size_t kBufferUploadBatchCapacity = 8u;
+    bool PrepareBufferUploads(std::span<const RtGpuBufferUpload> uploads,
+                              std::span<RtGpuBuffer> destination,
+                              std::string& diagnostic) const;
+
     void Bind(VkPhysicalDevice physicalDevice,
               VkDevice device,
               PFN_vkDestroyAccelerationStructureKHR destroyAccelerationStructure,

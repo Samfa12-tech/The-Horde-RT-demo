@@ -344,3 +344,5 @@ assets/source/development-rescue-ground-stake-v1/*.blend filter=lfs diff=lfs mer
 assets/source/development-rescue-ground-stake-v1/*.json -text whitespace=cr-at-eol
 docs/evidence/2026-10-12-ground-stake-traversal/** -text whitespace=cr-at-eol
 docs/evidence/2026-10-12-selected-zone-geometry/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-12-gpu-buffer-preparation/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-12-gpu-buffer-preparation/gpu-buffer-batch-shader-catalog-missing-paths.log whitespace=-blank-at-eof,cr-at-eol

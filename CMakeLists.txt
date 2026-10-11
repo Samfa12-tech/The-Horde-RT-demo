@@ -1209,6 +1209,15 @@ if(BUILD_TESTING)
         add_test(NAME horde_rt_gpu_resources_observation_tests
             COMMAND horde_rt_gpu_resources_observation_tests)
 
+        add_executable(horde_rt_gpu_buffer_batch_tests
+            tests/RtGpuBufferBatchTests.cpp
+            src/telemetry/RtPerformanceEvidence.cpp
+            src/vulkan/raytracing/RtGpuResources.cpp)
+        target_include_directories(horde_rt_gpu_buffer_batch_tests PRIVATE
+            ${CMAKE_CURRENT_SOURCE_DIR}/src ${Vulkan_INCLUDE_DIRS})
+        add_test(NAME horde_rt_gpu_buffer_batch_tests
+            COMMAND horde_rt_gpu_buffer_batch_tests)
+
         add_executable(horde_rt_pipeline_bundle_lifetime_tests
             tests/RtPipelineBundleLifetimeTests.cpp
             src/vulkan/raytracing/RtPipelineBundle.cpp
