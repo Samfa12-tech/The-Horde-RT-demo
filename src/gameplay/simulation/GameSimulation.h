@@ -144,6 +144,16 @@ private:
     bool BeginMotionEvidenceEquipmentSeed();
     void EndMotionEvidenceEquipmentSeed();
 
+    // Only the friend development staging helper may retain an authored pose.
+    // Public reconstruction always returns to the valid recovery side.
+    enum class RewardCheckpointPlacement { SafeRecovery, AuthoredCapture };
+    void ImportRewardCheckpointState(
+        const horde::gameplay::interactions::ChestRewardSnapshot& chestReward,
+        const horde::gameplay::interactions::InteractionState& interaction,
+        const horde::gameplay::interactions::FinaleSequenceSnapshot& finale,
+        const horde::gameplay::interactions::LanternPendulumSnapshot* pendulum,
+        RewardCheckpointPlacement placement);
+
     void StepFixedTick(const InputSnapshot& input, float fixedDeltaSeconds,
                        std::uint64_t inputPublicationSequence,
                        bool activateTimestampedEdges = true);

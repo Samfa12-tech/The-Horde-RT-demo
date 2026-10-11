@@ -700,6 +700,39 @@ int main()
               QueryShowcaseZone(chestHeldHigh->cameraX, chestHeldHigh->cameraZ) ==
                   ShowcaseZone::Finale,
           "post-claim chest checkpoint freezes the exact finale-room carry pose above the low chest footprint");
+    // A real chapter capture must retain the authored pose through BOTH reward
+    // imports, including the hand target used to construct the frozen pendulum.
+    for (const auto* capture : {heldHigh, heldLow, glassTransmission, motionExtreme,
+                                chestHeldHigh, wallHigh, wallLow, lookUp})
+    {
+        simulation::GameSimulationConfig chapterConfig;
+        chapterConfig.developmentRescueJourney = true;
+        simulation::GameSimulation chapterCapture(chapterConfig);
+        simulation::GameSimulation legacyCapture;
+        Check(capture != nullptr && StageDevelopmentCheckpointSimulation(chapterCapture, *capture) &&
+              StageDevelopmentCheckpointSimulation(legacyCapture, *capture),
+              "reward capture stages with rescue enabled");
+        if (capture == nullptr) continue;
+        const auto chapter = chapterCapture.Snapshot();
+        const auto legacy = legacyCapture.Snapshot();
+        Check(chapter.playerX == capture->cameraX && chapter.playerZ == capture->cameraZ &&
+              chapter.playerYawRadians == capture->yaw && chapter.playerPitchRadians == capture->pitch &&
+              chapter.playerSupportWorldY == legacy.playerSupportWorldY,
+              "rescue reward capture preserves authored camera and support");
+        Check(chapter.rewardLanternWorldFromHinge == legacy.rewardLanternWorldFromHinge &&
+              chapter.lanternPendulum.worldFromBody == legacy.lanternPendulum.worldFromBody &&
+              chapter.lanternPendulum.previousPivotPosition == legacy.lanternPendulum.previousPivotPosition &&
+              chapter.lanternPendulum.previousPivotVelocity == legacy.lanternPendulum.previousPivotVelocity,
+              "rescue capture freezes pendulum at the authored hand rather than the recovery landing");
+        Check(chapterCapture.Events().Empty() && chapter.tickIndex == legacy.tickIndex,
+              "capture placement introduces no extra fixed step or feedback");
+        // Ordinary reconstruction must still use the safe lower landing.
+        chapterCapture.ImportRewardCheckpoint(chapter.chestReward, chapter.interaction, chapter.finale);
+        Check(chapterCapture.Snapshot().playerX == traversal::kLowerLanding.x &&
+              chapterCapture.Snapshot().playerZ == traversal::kLowerLanding.z &&
+              chapterCapture.Snapshot().playerSupportWorldY == kRouteFloorWorldY,
+              "public reward import retains lower-side rescue recovery");
+    }
     horde::gameplay::simulation::GameSimulation stagedWallHigh;
     horde::gameplay::simulation::GameSimulation stagedWallLow;
     horde::gameplay::simulation::GameSimulation stagedLookUp;

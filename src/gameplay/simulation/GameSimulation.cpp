@@ -729,6 +729,20 @@ void GameSimulation::ImportRewardCheckpoint(
     const horde::gameplay::interactions::FinaleSequenceSnapshot& finale,
     const horde::gameplay::interactions::LanternPendulumSnapshot* pendulum)
 {
+    ImportRewardCheckpointState(chestReward, interaction, finale, pendulum,
+                                RewardCheckpointPlacement::SafeRecovery);
+}
+
+void GameSimulation::ImportRewardCheckpointState(
+    const horde::gameplay::interactions::ChestRewardSnapshot& chestReward,
+    const horde::gameplay::interactions::InteractionState& interaction,
+    const horde::gameplay::interactions::FinaleSequenceSnapshot& finale,
+    const horde::gameplay::interactions::LanternPendulumSnapshot* pendulum,
+    RewardCheckpointPlacement placement)
+{
+    const bool authoredCapture = placement == RewardCheckpointPlacement::AuthoredCapture;
+    const float authoredX = playerX_, authoredZ = playerZ_;
+    const auto authoredSupport = playerSupport_;
     events_.Clear();
     chapterDialogue_.Reset(true);chapterVisibleRaise_=0;
     combatPresentation_.Reset();
@@ -756,11 +770,19 @@ void GameSimulation::ImportRewardCheckpoint(
     finaleCompletionEmitted_ =
         finaleSequence_.Snapshot().endingPhase ==
         horde::gameplay::interactions::FinaleEndingPhase::Complete;
+    if (authoredCapture)
+    {
+        // Restore before resolving either the hand or the imported pendulum.
+        // Restoring only the camera afterwards leaves equipment at a stale hinge.
+        playerX_ = authoredX;
+        playerZ_ = authoredZ;
+        playerSupport_ = authoredSupport;
+    }
     ResolveHeldItems();
     lanternPendulum_.Reset(
         heldItemFixedStepState_.worldFromLeftHand,
         heldItemFixedStepState_.kinematics.rewardLanternPresentationYawRadians);
-    if (pendulum != nullptr && !wasRaised)
+    if (pendulum != nullptr && (authoredCapture || !wasRaised))
     {
         lanternPendulum_.Import(*pendulum);
         lanternPendulumResetPending_ = false;

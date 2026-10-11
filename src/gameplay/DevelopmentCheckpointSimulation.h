@@ -125,7 +125,8 @@ inline bool StageDevelopmentCheckpointSimulation(
         finale.phase = FinaleSequencePhase::LichFalling;
         finale.endingPhase = FinaleEndingPhase::LichFalling;
         finale.lichDefeated = true;
-        gameSimulation.ImportRewardCheckpoint(chest, interaction, finale);
+        gameSimulation.ImportRewardCheckpointState(chest, interaction, finale, nullptr,
+            simulation::GameSimulation::RewardCheckpointPlacement::AuthoredCapture);
     }
     if (checkpoint.rewardPose != DevelopmentRewardPose::None)
     {
@@ -148,7 +149,8 @@ inline bool StageDevelopmentCheckpointSimulation(
         // Resolve the exact high/low shared hand target before authoring the
         // frozen body state beneath it. The final import then preserves those
         // finite angles/velocities without advancing a simulation tick.
-        gameSimulation.ImportRewardCheckpoint(chest, interaction, finale);
+        gameSimulation.ImportRewardCheckpointState(chest, interaction, finale, nullptr,
+            simulation::GameSimulation::RewardCheckpointPlacement::AuthoredCapture);
         LanternPendulumSnapshot pendulum;
         const auto& hinge = gameSimulation.Snapshot().rewardLanternWorldFromHinge;
         pendulum.initialized = true;
@@ -166,7 +168,8 @@ inline bool StageDevelopmentCheckpointSimulation(
             pendulum.torsionAngleRadians,
             gameSimulation.Snapshot().heldItemKinematics.
                 rewardLanternPresentationYawRadians);
-        gameSimulation.ImportRewardCheckpoint(chest, interaction, finale, &pendulum);
+        gameSimulation.ImportRewardCheckpointState(chest, interaction, finale, &pendulum,
+            simulation::GameSimulation::RewardCheckpointPlacement::AuthoredCapture);
     }
     constexpr float fixedDelta =
         static_cast<float>(simulation::FixedStepRunner::kFixedDeltaSeconds);
