@@ -257,7 +257,17 @@ try {
     $baseAndroid=@(Get-Horde162AssetSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Android'})
     Require ($baseWindows.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Windows'}).Count -eq 33 -and
              $baseAndroid.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Android'}).Count -eq 34) 'Current shared asset roster includes the four admitted forest entries.'
-    Require ($windows.Count -eq 86 -and $android.Count -eq 87) 'Current closed roster includes exact tomb, terrain, tree-pair and Kit runtime assets; no editable sources.'
+    Require ($windows.Count -eq 90 -and $android.Count -eq 91) 'Current closed roster includes exact tomb, terrain, tree-pair, Kit and four grave-marker runtime assets; no editable sources.'
+    $graveMarkers=@('models/world/runtime/grave-markers-r03/grave-marker-round.manifest.json',
+        'models/world/runtime/grave-markers-r03/grave-marker-round.runtime.glb',
+        'models/world/runtime/grave-markers-r03/grave-marker-damaged.manifest.json',
+        'models/world/runtime/grave-markers-r03/grave-marker-damaged.runtime.glb')
+    Require (@($windows | Where-Object {$_ -like 'models/world/runtime/grave-markers-*/*'}).Count -eq 4 -and
+             @($android | Where-Object {$_ -like 'models/world/runtime/grave-markers-*/*'}).Count -eq 4) 'Both platforms admit only the four final grave-marker files.'
+    foreach($marker in $graveMarkers) {
+        Require (@($windows | Where-Object {$_ -ceq $marker}).Count -eq 1 -and
+                 @($android | Where-Object {$_ -ceq $marker}).Count -eq 1) 'Each exact grave-marker path must be admitted once on both platforms.'
+    }
     Require (@(Get-Horde17KitAssetSpecification).Count -eq 14) 'Kit admission must retain its exact thirteen-cut/one-manifest roster.'
     foreach ($kit in Get-Horde17KitAssetSpecification) {
         Require ($windows -ccontains $kit.Path -and $android -ccontains $kit.Path) 'Both platforms must admit every approved Kit runtime entry.'

@@ -96,6 +96,17 @@ remain required; earlier ornament-only savings retain their historical scope.
   new native fixture in Vulkan-host beside all seven required traversal CTests.
   Exact pushed-commit results must be linked to this milestone's SHA.
 
+The first exact-commit run at `e075dc2026a1dc6e8b6e229f203d013187b2db32`
+([38181114675](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/38181114675))
+failed the closed-roster assertion in MSVC/GCC/Clang: that fixture still expected
+86/87 files before the four marker files were admitted. Vulkan, Android and
+selected sanitizers passed. The correction retains exact count assertions at
+90/91, explicitly requires each of the four final marker paths once on both
+platforms, and retains all missing/corrupt/duplicate/source-exclusion checks.
+The complete local package fixture passes in 147.59 seconds; this adds evidence
+that was missing from the initial focused suite. Fresh exact-commit CI remains
+required for the correction. No deadline or assertion was removed.
+
 Normal streaming, rescue-lid finish, further prepared dressing, distant-town
 refinement, complete route/gallery and sustained owner/device acceptance remain
 open. The two-heart and waterfall-light observations remain separate checks.
