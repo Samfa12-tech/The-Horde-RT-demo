@@ -68,6 +68,9 @@ struct PlayerAnimationSnapshot
     float lanternPoseBlend = 0.0f;
     float swordStowBlend = 0.0f;
     float swordHandGripBlend = 1.0f;
+    // Stationary traversal may publish the bounded native planted-leg pose.
+    // Ordinary animation keeps this zero; it is not a crouch movement control.
+    float plantedPelvisDropMetres = 0.0f;
     PlayerArmIkTarget leftIk{};
     PlayerArmIkTarget rightIk{};
     PlayerVisibilityFlags visibility{};

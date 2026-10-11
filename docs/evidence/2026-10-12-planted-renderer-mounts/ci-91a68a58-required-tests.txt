@@ -1,0 +1,11 @@
+player-vulkan-host	Run focused player, semantic and output-ownership fixtures	2026-10-11T14:21:45.7199795Z  9/37 Test  #49: horde_rt_world_route_foundation_tests ................   Passed    0.13 sec
+player-vulkan-host	Run focused player, semantic and output-ownership fixtures	2026-10-11T14:21:45.7236584Z 10/37 Test  #50: horde_rt_vertical_support_tests ......................   Passed    0.00 sec
+player-vulkan-host	Run focused player, semantic and output-ownership fixtures	2026-10-11T14:21:45.7815288Z 11/37 Test  #51: horde_rt_held_item_vertical_support_rig_tests ........   Passed    0.06 sec
+player-vulkan-host	Run focused player, semantic and output-ownership fixtures	2026-10-11T14:21:46.2676098Z 12/37 Test  #52: horde_rt_player_directional_rig_tests ................   Passed    0.49 sec
+player-vulkan-host	Run focused player, semantic and output-ownership fixtures	2026-10-11T14:22:14.9844263Z 29/37 Test #135: horde_rt_player_viewmodel_admission ..................   Passed    0.16 sec
+player-vulkan-host	Run focused player, semantic and output-ownership fixtures	2026-10-11T14:22:16.9398387Z 32/37 Test #143: horde_rt_rescue_journey_integration_tests ............   Passed    0.23 sec
+player-vulkan-host	Run focused player, semantic and output-ownership fixtures	2026-10-11T14:22:22.1726702Z 36/37 Test #151: horde_rt_rescue_rig_attachment_tests .................   Passed    2.47 sec
+player-vulkan-host	Run focused player, semantic and output-ownership fixtures	2026-10-11T14:22:24.8161420Z 37/37 Test #152: horde_rt_rescue_adversarial_regression_tests .........   Passed    2.64 sec
+player-vulkan-host	Run focused player, semantic and output-ownership fixtures	2026-10-11T14:22:24.8166942Z 100% tests passed, 0 tests failed out of 37
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T14:28:27.3299767Z 111/132 Test #111: horde_rt_windows_playtest_report_ui_tests ..................   Passed    2.50 sec
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T14:31:34.2186561Z 100% tests passed out of 132

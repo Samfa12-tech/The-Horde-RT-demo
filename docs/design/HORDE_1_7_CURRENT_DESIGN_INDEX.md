@@ -1,11 +1,23 @@
 # Horde 1.7 current design index
 
-Reconciled 11 October 2026 against implementation checkpoint
-`59eb44c692783e71362aa7dd068ba462703bcdc5`, the current uncommitted scene/subtitle/tree
-repairs, and the owner's later decisions. This index is the entry point to the
+Reconciled through 12 October 2026 against the chapter implementation and the
+owner's later decisions. The dated receipts below retain their historical
+scope; their preparation-only statements do not supersede later admission.
+This index is the entry point to the
 full design, not a replacement master or a claim that all of 1.7 is complete.
 The continuing development branch is `codex/horde-1.7-wp2-vertical-proof`,
 [draft PR27](https://github.com/Samfa12-tech/The-Horde-RT-demo/pull/27).
+
+Current rig integration: the native planted-leg proof at `91a68a58` passed all
+six exact-commit CI jobs, including the seven requested traversal CTests and
+the Windows Unicode report UI test. The [renderer/mount continuation](../evidence/2026-10-12-planted-renderer-mounts/README.md)
+connects the optional stationary stance to the production player palette and
+coherent pre/post-solve Hips attachments. Ordinary animation still publishes
+zero; this does not enable a new rope route or certify a folded live pose.
+The remaining anchor change must replace the old body half-space clamp, add
+actual apron-edge rope contact and manage the longer loose tail; moving the
+anchor alone would stall traversal. Graveyard/stake, real GPU zone retirement,
+full inspected route and final owner/phone acceptance remain required.
 
 Newest bounded corrections: [Windows Unicode report editing](../evidence/2026-10-11-windows-report-unicode/README.md)
 at `d24a9971` passes all six exact-commit CI jobs. The subsequent

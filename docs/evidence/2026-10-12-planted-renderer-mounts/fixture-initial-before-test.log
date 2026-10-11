@@ -1,0 +1,8 @@
+FAIL: production equipment composition must accept the planted Hips and actual grips
+FAIL: stowed sword must follow the solved planted hip instead of the old standing clip
+FAIL: renderer must consume the native planted legs rather than lowering only equipment
+FAIL: actual planted ankles must remain above the grounded model origin
+FAIL: production equipment composition must accept the planted Hips and actual grips
+FAIL: stowed sword must follow the solved planted hip instead of the old standing clip
+FAIL: planted renderer pose: Skinned player palm Grip socket exceeded the 15 mm grip tolerance: left=0.043968 right=0.007983 leftTarget=-0.160000,0.740000,0.260000 leftSocket=-0.142643,0.775430,0.240591 leftHandTarget=-0.193675,0.740359,0.319684 leftHandSocket=-0.176319,0.775789,0.300275 rightHandTarget=0.106155,0.740002,0.278289 rightHandSocket=0.103571,0.746780,0.274956.
+FAIL: renderer must reach both actual low targets with the planted palette

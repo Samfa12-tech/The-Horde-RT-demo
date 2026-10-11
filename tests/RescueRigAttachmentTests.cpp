@@ -635,6 +635,134 @@ int RunAdversarialRescueCases(PlayerRenderSlot& playerSlot,
     return failures?1:0;
 }
 
+void CheckPlantedRendererMounts(PlayerRenderSlot& slot)
+{
+    using horde::scene::kMaximumPlayerPelvisDropMetres;
+    std::string diagnostic;
+    const std::uint64_t tick = 12000u;
+    for (const float yaw : {0.0f, 1.57079632679f, 3.14159265359f})
+    for (const float drop : {0.0f, 0.18f, 0.36f, 0.54f, kMaximumPlayerPelvisDropMetres})
+    {
+        horde::gameplay::animation::PlayerAnimationSnapshot pose;
+        pose.plantedPelvisDropMetres = drop;
+        pose.swordStowBlend = 1.0f;
+        pose.swordHandGripBlend = 0.0f;
+        for (std::size_t hand = 0u; hand < 2u; ++hand)
+        {
+            auto& arm = hand ? pose.rightIk : pose.leftIk;
+            // Imported +X is anatomical Left; the world basis maps it to
+            // gameplay left. Preserve that identity for both low grips.
+            const float side = hand ? -1.0f : 1.0f;
+            arm.target = {{side * 0.16f, 1.10f - drop, 0.35f - drop * 0.25f}};
+            arm.pole = {{side, 0.0f, 1.0f}};
+            arm.gripX = {{1.0f, 0.0f, 0.0f}};
+            arm.gripY = {{0.0f, 1.0f, 0.0f}};
+            arm.gripZ = {{0.0f, 0.0f, 1.0f}};
+        }
+        const Vec3 forward{{std::sin(yaw), 0.0f, -std::cos(yaw)}};
+        const Vec3 right{{std::cos(yaw), 0.0f, std::sin(yaw)}};
+        const auto basis = BuildPlayerModelWorldBasis(right, forward);
+        const Vec3 root{{-33.7f, kUpperSupportWorldY + slot.BootGroundingOffsetMetres(pose), -14.94f}};
+        auto beforeSolve = IdentityHeldItemTransform();
+        if (!slot.AnimatedHipsWorldTransform(pose, basis, root, beforeSolve, diagnostic))
+        {
+            std::cerr << "FAIL: planted mount preparation: " << diagnostic << '\n';
+            Check(false, "planted mount preparation must accept the admitted stationary pose");
+            return;
+        }
+        bool updated = false;
+        // Reuse the same tick: every stance change still needs a real new pose.
+        if (!slot.PreparePose(pose, tick, PlayerCpuSkinCadence::Hz30, updated, diagnostic))
+        {
+            std::cerr << "FAIL: planted renderer pose: " << diagnostic << '\n';
+            Check(false, "renderer must reach both actual low targets with the planted palette");
+            return;
+        }
+        Check(updated, "same-tick stance changes must invalidate skin cadence reuse");
+        const auto& sockets = slot.BoneSockets();
+        const auto hipsLocal = Vec3{{sockets.hips[12], sockets.hips[13], sockets.hips[14]}};
+        const auto hipsOffset = PlayerModelVectorToWorld(basis, hipsLocal);
+        const Vec3 expected{{root[0] + hipsOffset[0], root[1] + hipsOffset[1], root[2] + hipsOffset[2]}};
+        const Vec3 actual{{beforeSolve[12], beforeSolve[13], beforeSolve[14]}};
+        Check(Distance(actual, expected) <= 0.0001f,
+              "pre-solve equipment Hips mount must agree with the actual solved palette in every body heading");
+        Check(slot.LeftSocketErrorMetres() <= kPlayerGripSocketToleranceMetres &&
+              slot.RightSocketErrorMetres() <= kPlayerGripSocketToleranceMetres,
+              "planted renderer must preserve the actual imported 15 mm grip admission");
+        const float minimumVertexY = std::min_element(slot.UniqueVertices().begin(), slot.UniqueVertices().end(),
+            [](const auto& a, const auto& b) { return a.position[1] < b.position[1]; })->position[1];
+        Check(root[1] + minimumVertexY >= kUpperSupportWorldY - 0.001f,
+              "actual skinned planted mesh must not sink through its grounded support plane");
+        if (drop > 0.0f)
+        {
+            Check(sockets.leftLeg[2] != horde::scene::SkinnedNodeTransform{} &&
+                  sockets.rightLeg[2] != horde::scene::SkinnedNodeTransform{},
+                  "renderer must consume the native planted legs rather than lowering only equipment");
+            const float footY = std::min(sockets.leftLeg[2][13], sockets.rightLeg[2][13]);
+            Check(footY > 0.10f, "actual planted ankles must remain above the grounded model origin");
+        }
+        auto afterSolve = IdentityHeldItemTransform();
+        Check(slot.AnimatedHipsWorldTransform(pose, basis, root, afterSolve, diagnostic) &&
+              beforeSolve == afterSolve,
+              "pre/post-solve mounts must be byte-identical without a second pose evaluation");
+        // The ordinary stowed sword consumes this very mount.
+        auto items = MakeDefaultHeldItemStates();
+        items[0].detached = true;
+        items[0].parentMode = HeldItemParentMode::WorldObject;
+        items[0].transition.active = false;
+        items[1].parentMode = HeldItemParentMode::BodyStow;
+        items[1].visualStowBlend = 1.0f;
+        items[1].visualGripBlend = 0.0f;
+        items[1].transition.active = false;
+        HeldItemStates rendered{};
+        const auto gripWorld = [&](const horde::scene::SkinnedNodeTransform& grip) {
+            const auto axis = [&](std::size_t column) {
+                auto result = PlayerModelVectorToWorld(basis, {{grip[column], grip[column+1u], grip[column+2u]}});
+                const float length = std::hypot(std::hypot(result[0], result[1]), result[2]);
+                for (float& component : result) component /= length;
+                return result;
+            };
+            const auto p = PlayerModelVectorToWorld(basis, {{grip[12], grip[13], grip[14]}});
+            return WorldFromAxes(axis(0u), axis(4u), axis(8u),
+                {{root[0]+p[0], root[1]+p[1], root[2]+p[2]}});
+        };
+        const auto expectedSword = MultiplyHeldItemTransforms(beforeSolve, SwordBodyStowFromHips());
+        const bool equipmentReady = slot.ResolveHeldItemVisuals(items, gripWorld(sockets.leftGrip), gripWorld(sockets.rightGrip),
+                  expectedSword, rendered, diagnostic);
+        if (!equipmentReady) std::cerr << "FAIL: planted equipment: " << diagnostic << '\n';
+        Check(equipmentReady,
+              "production equipment composition must accept the planted Hips and actual grips");
+        const auto swordAgreement = MeasureTransformAgreement(expectedSword, rendered[1].worldFromItem);
+        Check(swordAgreement.positionErrorMetres <= 0.0001f &&
+              swordAgreement.orientationErrorRadians <= kPlayerGripOrientationToleranceRadians,
+              "stowed sword must follow the solved planted hip instead of the old standing clip");
+    }
+    horde::gameplay::animation::PlayerAnimationSnapshot invalid;
+    invalid.plantedPelvisDropMetres = std::numeric_limits<float>::quiet_NaN();
+    bool updated = true;
+    Check(!slot.PreparePose(invalid, tick, PlayerCpuSkinCadence::Hz30, updated, diagnostic) &&
+          !updated && !slot.SolvedPose().IsValid(),
+          "invalid stance must reject before cadence reuse and invalidate its old solved palette");
+    invalid.plantedPelvisDropMetres = 0.36f;
+    invalid.locomotionClip = horde::gameplay::animation::PlayerLocomotionClip::Walk;
+    auto unchanged = IdentityHeldItemTransform();
+    const auto oldOutput = unchanged;
+    const auto basis = BuildPlayerModelWorldBasis({{1,0,0}}, {{0,0,-1}});
+    Check(!slot.AnimatedHipsWorldTransform(invalid, basis, {{0,0,0}}, unchanged, diagnostic) &&
+          unchanged == oldOutput, "moving planted mount must reject without publishing a replacement transform");
+    horde::gameplay::animation::PlayerAnimationState ordinary;
+    invalid.locomotionClip = horde::gameplay::animation::PlayerLocomotionClip::Idle;
+    ordinary.Import(invalid);
+    ordinary.StepFixed({}, 1.0f / 60.0f);
+    Check(ordinary.Snapshot().plantedPelvisDropMetres == 0.0f,
+          "ordinary animation reconstruction must not keep a traversal-owned stance");
+    ordinary.Import(invalid);
+    ordinary.Reset();
+    Check(ordinary.Snapshot().plantedPelvisDropMetres == 0.0f,
+          "ordinary animation reset must discard the traversal-owned stance");
+    std::cout << "planted_renderer_mount_samples=15; stationary mounts, shared legs and cadence rejection checked\n";
+}
+
 } // namespace
 
 int main(int argc,char** argv)
@@ -666,6 +794,10 @@ int main(int argc,char** argv)
 
     if(argc==2 && std::string_view(argv[1])=="--adversarial-regression")
         return RunAdversarialRescueCases(playerSlot,rewardRing,rewardBody);
+
+    CheckPlantedRendererMounts(playerSlot);
+    if (argc == 2 && std::string_view(argv[1]) == "--planted-mount-regression")
+        return failures ? 1 : 0;
 
     GameSimulationConfig config;
     config.playerStartX = kLowerLanding.x;

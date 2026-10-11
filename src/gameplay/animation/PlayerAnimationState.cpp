@@ -101,6 +101,7 @@ void PlayerAnimationState::StepFixed(const PlayerAnimationInput& input,
         snapshot_.locomotionBlend, locomotionTarget, fixedDeltaSeconds * 8.0f);
     snapshot_.locomotionClip = MapPlayerLocomotionClip(snapshot_.locomotionBlend);
     snapshot_.locomotionTime = std::max(0.0f, FiniteOr(input.walkTime, 0.0f));
+    snapshot_.plantedPelvisDropMetres = 0.0f;
     snapshot_.combatLayer = EvaluatePlayerCombatLayer(input.playerCombat);
     snapshot_.reaction = input.playerCombat.reaction;
     snapshot_.reactionTime = std::max(0.0f, FiniteOr(input.playerCombat.reactionTime, 0.0f));

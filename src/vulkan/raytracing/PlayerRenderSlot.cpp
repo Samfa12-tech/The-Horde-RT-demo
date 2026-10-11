@@ -11,6 +11,41 @@
 namespace horde::vulkan::raytracing
 {
 
+namespace
+{
+bool ValidatePlantedStance(
+    const horde::gameplay::animation::PlayerAnimationSnapshot& animation,
+    std::string& diagnostic)
+{
+    const float drop = animation.plantedPelvisDropMetres;
+    if (!std::isfinite(drop) || drop < 0.0f ||
+        drop > horde::scene::kMaximumPlayerPelvisDropMetres)
+    {
+        diagnostic = "Player planted pelvis drop is outside the finite admitted range.";
+        return false;
+    }
+    if (drop > 0.0f && animation.locomotionClip !=
+            horde::gameplay::animation::PlayerLocomotionClip::Idle)
+    {
+        diagnostic = "Planted player stance requires the stationary Idle clip.";
+        return false;
+    }
+    return true;
+}
+
+// This is the same translation applied to the native Hips subtree. Use it
+// before the arm solve as well as afterwards; no second skin or pose palette
+// is needed to obtain a coherent mount while composing the arm targets.
+void ApplyPlantedTorsoTranslation(
+    std::array<float, 3u>& position,
+    const horde::gameplay::animation::PlayerAnimationSnapshot& animation)
+{
+    position[1] -= animation.plantedPelvisDropMetres;
+    position[2] -= animation.plantedPelvisDropMetres *
+                   horde::scene::kPlayerPlantedPelvisSetbackPerDrop;
+}
+} // namespace
+
 bool HasDedicatedPlayerPrimaryOwnership(
     const std::array<std::uint8_t, kRtTlasInstanceCapacity>& masks,
     std::uint32_t worldBodyInstanceFlags)
@@ -738,6 +773,16 @@ bool PlayerRenderSlot::PreparePose(
         diagnostic = "Skinned player render slot has no loaded asset.";
         return false;
     }
+    // Validate before cadence reuse: an invalid request cannot return a stale
+    // valid palette at the same tick or within the 30 Hz interval.
+    if (!ValidatePlantedStance(animation, diagnostic))
+    {
+        solvedPose_ = {};
+        sockets_ = {};
+        hasLastPreparedAnimation_ = false;
+        lastSkinnedTick_ = std::numeric_limits<std::uint64_t>::max();
+        return false;
+    }
     const bool importedPoseAtSameTick = hasLastPreparedAnimation_ &&
         tickIndex == lastSkinnedTick_ && animation != lastPreparedAnimation_;
     if (!PlayerPoseNeedsRefresh(tickIndex, lastSkinnedTick_, cadence) &&
@@ -808,7 +853,8 @@ bool PlayerRenderSlot::PreparePose(
     }
     RtSceneStageScope skinScope(observation, horde::telemetry::RtStage::PlayerSkin);
     if (!asset_.EvaluatePlayerPose(
-            clip, animation.locomotionTime, left, right, solvedPose_, diagnostic) ||
+            clip, animation.locomotionTime, left, right, solvedPose_, diagnostic,
+            animation.plantedPelvisDropMetres) ||
         !asset_.SkinPlayerPoseUniqueTextured(
             solvedPose_, uniqueVertices_, uniqueTangents_, diagnostic))
     {
@@ -869,6 +915,7 @@ bool PlayerRenderSlot::ShoulderCenter(
     std::array<float, 3u>& center,
     std::string& diagnostic) const
 {
+    if (!ValidatePlantedStance(animation, diagnostic)) return false;
     const horde::scene::SkinnedClip clip =
         animation.locomotionClip == horde::gameplay::animation::PlayerLocomotionClip::Walk
         ? horde::scene::SkinnedClip::Walking
@@ -883,6 +930,7 @@ bool PlayerRenderSlot::ShoulderCenter(
     center = {{(left[12] + right[12]) * 0.5f,
                (left[13] + right[13]) * 0.5f,
                (left[14] + right[14]) * 0.5f}};
+    ApplyPlantedTorsoTranslation(center, animation);
     diagnostic.clear();
     return true;
 }
@@ -899,6 +947,7 @@ bool PlayerRenderSlot::AnimatedHipsWorldTransform(
         diagnostic = "Player Hips mount requires the loaded runtime rig.";
         return false;
     }
+    if (!ValidatePlantedStance(animation, diagnostic)) return false;
     const auto clip = animation.locomotionClip ==
             horde::gameplay::animation::PlayerLocomotionClip::Walk
         ? horde::scene::SkinnedClip::Walking : horde::scene::SkinnedClip::Idle;
@@ -906,6 +955,8 @@ bool PlayerRenderSlot::AnimatedHipsWorldTransform(
     if (!asset_.NodeTransform(clip, animation.locomotionTime, "Hips", hips,
                               diagnostic))
         return false;
+    std::array<float, 3u> hipsPosition{{hips[12], hips[13], hips[14]}};
+    ApplyPlantedTorsoTranslation(hipsPosition, animation);
     const auto axisToWorld = [&basis](const std::array<float, 3u>& axis) {
         return Normalise(PlayerModelVectorToWorld(basis, axis));
     };
@@ -920,7 +971,7 @@ bool PlayerRenderSlot::AnimatedHipsWorldTransform(
         z = Scale(z, -1.0f);
     }
     const Vec3 offset = PlayerModelVectorToWorld(
-        basis, {{hips[12], hips[13], hips[14]}});
+        basis, hipsPosition);
     const Vec3 position = Add(rootWorld, offset);
     worldFromHips = TransformFromAxes(x, y, z, position);
     if (!horde::gameplay::items::ValidateHeldItemSocketTransform(
