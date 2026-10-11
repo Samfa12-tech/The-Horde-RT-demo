@@ -27,7 +27,7 @@ The lead agent, including Astra, may implement, inspect, test and fix safe local
 | Choosing checks, compiling shaders, device evidence or performance claims | [Validation guide](docs/AGENT_VALIDATION.md) - select the applicable section, not every gate |
 | Importing or shipping an asset | `docs/ASSET_PIPELINE.md` and `ASSET_LICENSES.md`; keep source/runtime separation and commercial-safe provenance |
 | Release work | [README](README.md) package summary, `tools/release-version-policy.ps1`, and [owner-only signing safeguards](docs/OWNER_RELEASE_SAFETY_CHECKLIST.md) |
-| Requested campaign/roadmap work | [Phase plan](docs/PHASE_PLAN.md) and the relevant accepted plan; a future version label is not a release instruction |
+| Requested campaign/roadmap work | [Shared roadmap](docs/ROADMAP.md) for update scope/status and [source inventory](docs/ROADMAP_SOURCES.md) for detailed plans; record new scope decisions in the roadmap, keep [Phase Plan](docs/PHASE_PLAN.md) as history, and never treat a future version label as a release instruction |
 
 ## Skills and delegation
 

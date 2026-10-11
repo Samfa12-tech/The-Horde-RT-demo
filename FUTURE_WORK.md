@@ -1,5 +1,7 @@
 # Horde Lantern RT - Current and Future Work
 
+> **Scope navigation:** [The shared roadmap](docs/ROADMAP.md) owns update assignments and new scope decisions. This file retains dated technical detail and deferrals; link those records from the roadmap rather than maintaining a competing scope list.
+
 Current status, 2026-10-09: 1.6.2/code10 is published on itch and as a [non-draft GitHub prerelease](https://github.com/Samfa12-tech/The-Horde-RT-demo/releases/tag/v1.6.2), and the runtime is normally merged to main. [Signed validation and canonical GitHub plan](docs/SHOWCASE_ALPHA_1_6_2_RELEASE_VALIDATION_2026-10-09.md), [publication receipt](docs/evidence/2026-10-09-release-publication/README.md) and [GitHub closeout](docs/evidence/2026-10-09-github-release/README.md) identify the current release. The full graphics menu and accepted tomb polish are shipped within the recorded limits. Fresh/reset mobile defaults stay 50%, Dust Low; 33%/40% are experimental. Forgiving combat, walking-arm wiggle, shafts, seamless music handover and long sustained phone testing remain deferred. Issue #19 is owner-closed as completed; no independent reproduction is claimed here. Future 1.7 work has separate scope and authority.
 
 Historical status, 2026-10-03: 1.6.1 was published and normally merged to main. The
