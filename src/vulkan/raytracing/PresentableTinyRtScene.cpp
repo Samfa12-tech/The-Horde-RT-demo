@@ -2449,7 +2449,13 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
         // The collapse's final masonry range and the first dressing range use
         // the same material. Keep every triangle while sharing one metadata row;
         // High's physical lantern panes must fit alongside this resident scene.
-        if (!horde::scene::assets::CoalesceAdjacentWorldBakedPrimitives(collapseStaticAsset_, diagnostic))
+        // Ring/hinge and chest iron/latch are rigid within their respective
+        // owners. Native import already baked their node transforms, while
+        // grip/hinge/latch sockets remain separate records. Their adjacent
+        // identical-material ranges need no additional geometry metadata.
+        if (!horde::scene::assets::CoalesceAdjacentWorldBakedPrimitives(collapseStaticAsset_, diagnostic) ||
+            !horde::scene::assets::CoalesceAdjacentWorldBakedPrimitives(gothicChestBaseAsset_, diagnostic) ||
+            !horde::scene::assets::CoalesceAdjacentWorldBakedPrimitives(rewardLanternRingAsset_, diagnostic))
             return false;
     }
     // The selected immutable quality bundle owns the geometry profile too.

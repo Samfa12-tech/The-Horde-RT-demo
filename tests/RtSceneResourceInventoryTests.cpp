@@ -443,7 +443,35 @@ struct PresentableTinyRtSceneObservationTestAccess
         ok &= materials.size()<=kRtMaterialCapacity && primitives.size()<=kRtPrimitiveMetadataCapacity;
         ok &= materials.size()+MakeRtWorldMaterialPalette(true).count<=kRtMaterialCapacity;
         ok &= materials.size()==30u && primitives.size()==
-            (scene.pipelineBundle_.Request().quality==DielectricQuality::High?32u:31u);
+            (scene.pipelineBundle_.Request().quality==DielectricQuality::High?30u:29u);
+        // These are separately owned rigid props. Grouping their baked node
+        // geometry must preserve every vertex/triangle and every grip/latch
+        // socket; source files and the articulated lantern-body owner stay intact.
+        for(const auto& candidate:std::array<std::pair<const char*,const horde::scene::assets::StaticMeshAsset*>,2>{{
+                {"gothic-chest-base",&scene.gothicChestBaseAsset_},
+                {"reward-lantern-ring",&scene.rewardLanternRingAsset_}}}) {
+            using namespace horde::scene::assets;
+            const auto directory=std::filesystem::path(root)/"models/props/runtime"/candidate.first;
+            AssetManifest manifest;StaticMeshAsset original;
+            if(!AssetManifest::Load(directory/"asset.manifest.json",manifest,diagnostic)||
+               !StaticMeshAsset::Load(directory/(std::string(candidate.first)+"-lod0.runtime.glb"),manifest,original,diagnostic)) return false;
+            const auto& grouped=*candidate.second;
+            const auto tuples=[](const StaticMeshAsset& asset) {
+                std::vector<std::array<std::uint32_t,4>> result;
+                for(const auto& p:asset.primitives)for(std::size_t n=0;n<p.indexCount;n+=3)
+                    result.push_back({p.vertexOffset+asset.indices[p.indexOffset+n],
+                        p.vertexOffset+asset.indices[p.indexOffset+n+1],
+                        p.vertexOffset+asset.indices[p.indexOffset+n+2],p.materialIndex});
+                return result;
+            };
+            ok &= original.primitives.size()==grouped.primitives.size()+1 && tuples(original)==tuples(grouped) &&
+                  original.vertices.size()==grouped.vertices.size() && original.sockets.size()==grouped.sockets.size();
+            if(original.vertices.size()==grouped.vertices.size())
+                ok &= std::memcmp(original.vertices.data(),grouped.vertices.data(),original.vertices.size()*sizeof(StaticRtVertex))==0;
+            for(std::size_t i=0;i<original.sockets.size()&&i<grouped.sockets.size();++i)
+                ok &= original.sockets[i].name==grouped.sockets[i].name&&original.sockets[i].world==grouped.sockets[i].world&&
+                      original.sockets[i].nodeTransformIndex==grouped.sockets[i].nodeTransformIndex;
+        }
         all &= ok;
         }
         return all;
@@ -824,7 +852,7 @@ struct PresentableTinyRtSceneObservationTestAccess
         // ten original pine/alder instances grouped into four primitives.
         constexpr std::size_t addedIndices = 46140u + (2u*664u + 960u + 12u + 50510u)*3u;
         bool ok = tomb.collapseStaticAsset_.indices.size() == oldIndices + addedIndices &&
-                  tomb.staticMeshSlot_.PrimitiveMetadata().size() == 31u &&
+                  tomb.staticMeshSlot_.PrimitiveMetadata().size() == 29u &&
                   tomb.staticMeshSlot_.Materials().size() == 30u &&
                   tomb.staticMeshSlot_.PrimitiveMetadata().size() <= 32u &&
                   tomb.staticMeshSlot_.Materials().size() <= 32u;
