@@ -237,6 +237,18 @@ jobs:
           ctest --test-dir build/host-ci --build-config Release
           --output-on-failure --no-tests=error ${{ matrix.ctest_filter_args }}
 
+      - name: Retain native report edit timing trace
+        if: always() && runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $path = 'build/host-ci/Testing/Temporary/LastTest.log'
+          if (Test-Path -LiteralPath $path) {
+            $text = [IO.File]::ReadAllText((Resolve-Path -LiteralPath $path))
+            $record = [regex]::Match($text, '(?ms)^\d+/\d+ Testing: horde_rt_windows_playtest_report_ui_tests\r?\n.*?(?=^\d+/\d+ Testing:|\z)')
+            if ($record.Success) { Write-Output $record.Value }
+            else { Write-Output 'Native report UI fixture did not execute in this job.' }
+          }
+
       - name: Check offline gauntlet chirality and UV winding
         run: python -m unittest discover -s tests -p test_player_gauntlet_geometry.py -v
 

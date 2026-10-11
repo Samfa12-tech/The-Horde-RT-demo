@@ -1,12 +1,15 @@
 #include "platform/windows/WindowsPlaytestReport.h"
 
 #include <atomic>
+#include <algorithm>
+#include <cstring>
 #include <chrono>
 #include <iostream>
 #include <string>
 #include <thread>
 #include <vector>
 #include <wct.h>
+#include <dbghelp.h>
 
 namespace
 {
@@ -17,6 +20,8 @@ std::vector<std::string> approved;
 bool acceptExport = false; // Accessed only by the UI owner thread.
 std::atomic<ULONGLONG> noteEditStarted{0};
 std::atomic<bool> noteEditExecuting{false};
+std::atomic<ULONGLONG> noteEditElapsed{0};
+bool exerciseTimeoutDiagnostic = false;
 
 LRESULT CALLBACK TraceNoteEntry(int code, WPARAM value, LPARAM argument)
 {
@@ -24,8 +29,11 @@ LRESULT CALLBACK TraceNoteEntry(int code, WPARAM value, LPARAM argument)
         const auto& message = *reinterpret_cast<CWPSTRUCT*>(argument);
         if (message.message == WM_SETTEXT && GetDlgCtrlID(message.hwnd) == 106) {
             noteEditStarted.store(GetTickCount64());
+            noteEditElapsed.store(0);
             noteEditExecuting.store(true);
-            std::cerr << "note EDIT enter; phase=" << currentPhase.load() << '\n';
+            if (exerciseTimeoutDiagnostic &&
+                std::strcmp(currentPhase.load(), "note-only approved Unicode note edit") == 0)
+                std::this_thread::sleep_for(std::chrono::milliseconds(2200));
         }
     }
     return CallNextHookEx(nullptr, code, value, argument);
@@ -38,11 +46,76 @@ LRESULT CALLBACK TraceNoteReturn(int code, WPARAM value, LPARAM argument)
         if (message.message == WM_SETTEXT && GetDlgCtrlID(message.hwnd) == 106) {
             const auto elapsed = GetTickCount64() - noteEditStarted.load();
             noteEditExecuting.store(false);
-            std::cerr << "note EDIT returned; elapsedMs=" << elapsed << '\n';
+            noteEditElapsed.store(elapsed);
         }
     }
     return CallNextHookEx(nullptr, code, value, argument);
 }
+
+#if defined(_M_X64)
+std::vector<unsigned char> ownerStack;
+DWORD64 ownerStackBase = 0;
+BOOL CALLBACK ReadCapturedStack(HANDLE process, DWORD64 address, PVOID output, DWORD bytes, LPDWORD read)
+{
+    if (address >= ownerStackBase && address - ownerStackBase <= ownerStack.size() &&
+        bytes <= ownerStack.size() - static_cast<std::size_t>(address - ownerStackBase)) {
+        std::memcpy(output, ownerStack.data() + (address - ownerStackBase), bytes);
+        *read = bytes; return TRUE;
+    }
+    SIZE_T count = 0;
+    const BOOL result = ReadProcessMemory(process, reinterpret_cast<void*>(address), output, bytes, &count);
+    *read = static_cast<DWORD>(count); return result;
+}
+void TraceOwnerStack(DWORD thread)
+{
+    HANDLE owner = OpenThread(THREAD_SUSPEND_RESUME | THREAD_GET_CONTEXT | THREAD_QUERY_INFORMATION, FALSE, thread);
+    if (!owner) return;
+    CONTEXT context{}; context.ContextFlags = CONTEXT_FULL;
+    bool captured = false;
+    // Snapshot only the synthetic fixture's UI stack. Resume before symbol
+    // lookup/output so a loader or stream lock can never deadlock its owner.
+    ownerStack.resize(64u * 1024u);
+    if (SuspendThread(owner) != DWORD(-1)) {
+        if (GetThreadContext(owner, &context)) {
+            MEMORY_BASIC_INFORMATION region{};
+            if (VirtualQuery(reinterpret_cast<void*>(context.Rsp), &region, sizeof(region))) {
+                const auto end = reinterpret_cast<ULONG_PTR>(region.BaseAddress) + region.RegionSize;
+                const auto size = std::min<std::size_t>(ownerStack.size(), end - context.Rsp);
+                SIZE_T read = 0;
+                captured = ReadProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(context.Rsp),
+                                              ownerStack.data(), size, &read) != FALSE;
+                ownerStack.resize(read); ownerStackBase = context.Rsp;
+            }
+        }
+        ResumeThread(owner);
+    }
+    SymSetOptions(SYMOPT_DEFERRED_LOADS | SYMOPT_UNDNAME | SYMOPT_FAIL_CRITICAL_ERRORS | SYMOPT_NO_PROMPTS);
+    if (captured && SymInitialize(GetCurrentProcess(), "", TRUE)) {
+        STACKFRAME64 frame{};
+        frame.AddrPC = {context.Rip, 0, AddrModeFlat};
+        frame.AddrStack = {context.Rsp, 0, AddrModeFlat};
+        frame.AddrFrame = {context.Rbp, 0, AddrModeFlat};
+        for (int depth = 0; depth < 24; ++depth) {
+            alignas(SYMBOL_INFO) unsigned char storage[sizeof(SYMBOL_INFO) + MAX_SYM_NAME]{};
+            auto* symbol = reinterpret_cast<SYMBOL_INFO*>(storage);
+            symbol->SizeOfStruct = sizeof(SYMBOL_INFO); symbol->MaxNameLen = MAX_SYM_NAME;
+            DWORD64 displacement = 0;
+            const bool named = SymFromAddr(GetCurrentProcess(), frame.AddrPC.Offset, &displacement, symbol) != FALSE;
+            IMAGEHLP_MODULE64 module{}; module.SizeOfStruct = sizeof(module);
+            const bool hasModule = SymGetModuleInfo64(GetCurrentProcess(), frame.AddrPC.Offset, &module) != FALSE;
+            std::cerr << "UI stack " << depth << ": " << (hasModule ? module.ModuleName : "unknown-module")
+                      << '!' << (named ? symbol->Name : "unresolved") << "+0x" << std::hex << displacement
+                      << " address=0x" << frame.AddrPC.Offset << std::dec << '\n';
+            if (!StackWalk64(IMAGE_FILE_MACHINE_AMD64, GetCurrentProcess(), owner, &frame, &context,
+                             ReadCapturedStack, SymFunctionTableAccess64, SymGetModuleBase64, nullptr)) break;
+        }
+        SymCleanup(GetCurrentProcess());
+    }
+    CloseHandle(owner); ownerStack.clear();
+}
+#else
+void TraceOwnerStack(DWORD) {}
+#endif
 
 void TraceOwnerWait(DWORD thread)
 {
@@ -143,9 +216,14 @@ LRESULT Send(HWND window, const UINT message, const WPARAM value = 0, const LPAR
                       << " capture=" << info.hwndCapture;
         }
         std::cerr << '\n';
+        TraceOwnerStack(ownerThread);
         TraceOwnerWait(ownerThread);
         passed.store(false);
     }
+    if (message == WM_SETTEXT && GetDlgCtrlID(window) == 106)
+        std::cerr << "note EDIT trace; phase=" << currentPhase.load()
+                  << " returned=" << !noteEditExecuting.load()
+                  << " elapsedMs=" << noteEditElapsed.load() << '\n';
     return static_cast<LRESULT>(result);
 }
 
@@ -168,8 +246,12 @@ void Defaults(HWND form, const bool hasContext)
 }
 } // namespace
 
-int main()
+int main(int argc, char** argv)
 {
+    if (argc > 1) {
+        if (argc != 2 || std::strcmp(argv[1], "--exercise-timeout-diagnostic") != 0) return 2;
+        exerciseTimeoutDiagnostic = true; // Explicit failing diagnostic, never enabled by normal CTest.
+    }
     SetProcessDPIAware();
     const HWND owner = CreateWindowExW(0, L"STATIC", L"Horde report UI test owner", WS_OVERLAPPEDWINDOW,
         0, 0, 800, 800, nullptr, nullptr, GetModuleHandleW(nullptr), nullptr);
