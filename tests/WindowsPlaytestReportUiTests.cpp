@@ -12,6 +12,7 @@
 #include <vector>
 #include <wct.h>
 #include <dbghelp.h>
+#include <richedit.h>
 
 namespace
 {
@@ -247,6 +248,10 @@ void Defaults(HWND form, const bool hasContext)
     Check(Send(GetDlgItem(form, 108), BM_GETCHECK) == BST_UNCHECKED, "context consent default is not off");
     Check(IsWindowEnabled(GetDlgItem(form, 108)) == (hasContext ? TRUE : FALSE),
         "unavailable context opt-in must be disabled, never guessed");
+    Check((Send(GetDlgItem(form, 106), EM_GETTEXTMODE) & TM_PLAINTEXT) != 0,
+        "report note must use native Unicode plain-text mode, without rich formatting or objects");
+    Check(Send(GetDlgItem(form, 106), EM_GETAUTOURLDETECT) == 0,
+        "report note must not activate automatic links");
     Check(GetDlgItem(form, 102) != GetDlgItem(form, IDCANCEL), "category and Close IDs collide");
 }
 } // namespace
@@ -295,6 +300,10 @@ int main(int argc, char** argv)
         SetNote(form, L"test@example.invalid", "note-only rejected-input note edit");
         ClickExport(form);
         Check(exports.load() == 0, "private-content rejection reached destination");
+        const std::wstring oversized(4097, L'x');
+        SetNote(form, oversized.c_str(), "note-only oversized note edit");
+        ClickExport(form);
+        Check(exports.load() == 0, "oversized native note reached destination");
         SetNote(form, L"Walk.\r\nThen parry. \u9f8d \U0001f525", "note-only approved Unicode note edit");
         SetPhase("note-only approved export and retry");
         ClickExport(form);
