@@ -25,12 +25,12 @@ PrepareChapterTerrainSurface(const assets::StaticMeshAsset& asset,std::string& d
             diagnostic="Chapter terrain primitive ranges or material identity are invalid.";return {};
         }
         const auto& name=asset.materials[primitive.materialIndex].name;
-        if(name!="ChapterTrailDampSand" && name!="ChapterBankStone") {
+        if(name!="ChapterTrailDampSand" && name!="ChapterBankStone" && name!="ChapterForestGround") {
             diagnostic="Chapter terrain has an unadmitted support material.";return {};
         }
         for(std::size_t i=0;i<primitive.indexCount;i+=3) {
             Surface::Triangle triangle;
-            triangle.surface=name=="ChapterTrailDampSand" ? gameplay::simulation::SupportSurface::Earth :
+            triangle.surface=name!="ChapterBankStone" ? gameplay::simulation::SupportSurface::Earth :
                                                           gameplay::simulation::SupportSurface::Stone;
             for(std::size_t k=0;k<3;++k) {
                 const auto local=asset.indices[primitive.indexOffset+i+k];

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "scene/assets/StaticMeshAsset.h"
+#include "gameplay/simulation/TriangleSupportSurface.h"
 
 #include <array>
 #include <cstddef>
@@ -44,6 +45,7 @@ struct ForestDressingBuildReport
 bool AppendPreparedForestDressing(const std::filesystem::path& assetRoot,
                                  assets::StaticMeshAsset& existingOwner,
                                  ForestDressingBuildReport& report,
-                                 std::string& diagnostic);
+                                 std::string& diagnostic,
+                                 const gameplay::simulation::TriangleSupportSurface* terrain = nullptr);
 
 } // namespace horde::scene

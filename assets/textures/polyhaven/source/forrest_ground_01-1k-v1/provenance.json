@@ -1,0 +1,33 @@
+{
+  "author": "Rob Tuytel",
+  "asset": "forrest_ground_01",
+  "retrieved": "2026-10-11",
+  "source": "https://polyhaven.com/a/forrest_ground_01",
+  "physicalWidthMetres": 2,
+  "licence": "CC0-1.0",
+  "licenceUrl": "https://polyhaven.com/license",
+  "files": [
+    {
+      "bytes": 6603753,
+      "providerMd5": "8b85fb10bc45ac4969262edb5965133f",
+      "path": "diff.png",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/1k/forrest_ground_01/forrest_ground_01_diff_1k.png",
+      "sha256": "c4bae8c86c8f9f50f2cd0fa627b097e089de3427f071e3446e69bf8e39132896"
+    },
+    {
+      "bytes": 6787606,
+      "providerMd5": "68875a9e81c29ba8f70e5dccdd66c476",
+      "path": "normal.png",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/1k/forrest_ground_01/forrest_ground_01_nor_gl_1k.png",
+      "sha256": "879a84565d016743583421a644bae72df26f4031ea8852fc6d6275feb967353e"
+    },
+    {
+      "bytes": 4650954,
+      "providerMd5": "e6d08b420397de4144e872a10317c997",
+      "path": "arm.png",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/1k/forrest_ground_01/forrest_ground_01_arm_1k.png",
+      "sha256": "f4a137f68021a6e84495ea990323bdc471d4e34dad3f393bdf608a211aebe772"
+    }
+  ],
+  "schema": 1
+}

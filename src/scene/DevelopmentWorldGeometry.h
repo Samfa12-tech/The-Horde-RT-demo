@@ -25,6 +25,7 @@ struct DevelopmentWorldGeometry
     std::uint64_t preparationCpuNanoseconds = 0;
     std::size_t retainedCpuBytes = 0, peakPreparationCpuBytes = 0;
     bool valid = false;
+    bool authoredTerrain = false; // Ground is in the separately validated static owner.
 };
 inline bool ValidateDevelopmentWorldGeometry(const DevelopmentWorldGeometry& geometry)
 {
@@ -43,16 +44,17 @@ inline bool ValidateDevelopmentWorldGeometry(const DevelopmentWorldGeometry& geo
         const float x=uy*vz-uz*vy,y=uz*vx-ux*vz,z=ux*vy-uy*vx;
         if(x*x+y*y+z*z<1e-10f) return false;
     }
-    return owners[1] && owners[2] && owners[3];
+    return owners[3] && (geometry.authoredTerrain || (owners[1] && owners[2]));
 }
 // Same triangles consumed by the real world BLAS and the native contract tests.
 // Staged CPU batches retain their off-camera contributors until final admission;
 // no frustum-based residency or simulated GPU cost is introduced here.
-inline DevelopmentWorldGeometry PrepareDevelopmentWorldGeometry(bool staged,bool rescueJourney=false)
+inline DevelopmentWorldGeometry PrepareDevelopmentWorldGeometry(bool staged,bool rescueJourney=false,bool authoredTerrain=false)
 {
     using namespace horde::gameplay::simulation;
     using Point = std::array<float,3>;
     DevelopmentWorldGeometry out;
+    out.authoredTerrain=authoredTerrain&&rescueJourney;
     const auto begin=std::chrono::steady_clock::now();
     auto quad=[&](Point a,Point b,Point c,Point d,std::uint32_t material,std::uint32_t normal,WorldZoneId owner) {
         out.triangles.push_back({{a,b,c},material,normal,owner});
@@ -70,6 +72,7 @@ inline DevelopmentWorldGeometry PrepareDevelopmentWorldGeometry(bool staged,bool
     {
         const auto stageBegin=std::chrono::steady_clock::now();
         const auto owner=static_cast<WorldZoneId>(zone);
+        if(!out.authoredTerrain) {
         VisitWorldRouteSurfaceTriangles([&](const auto& points,std::size_t segment) {
             if(ZoneForRouteSegment(segment)==owner && (!rescueJourney||segment!=1))
                 out.triangles.push_back({points,zone==1?1u:3u,0u,owner});
@@ -78,6 +81,7 @@ inline DevelopmentWorldGeometry PrepareDevelopmentWorldGeometry(bool staged,bool
             if(ZoneForRouteSegment(segment)==owner && (!rescueJourney||segment!=1))
                 out.triangles.push_back({points,zone==1?1u:3u,normal,owner});
         });
+        }
         if (zone==1 && !rescueJourney)
         {
             box({39.35f+kWorldPlanTranslateX,horde::gameplay::kRouteFloorWorldY,-7+kWorldPlanTranslateZ},

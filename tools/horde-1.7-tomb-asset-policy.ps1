@@ -2,6 +2,14 @@
 # This admits file identities, not owner listening or physical-device acceptance.
 function Get-Horde17TombAssetSpecification {
     @(
+        [pscustomobject]@{ Path='models/world/runtime/chapter-terrain-v1/asset.manifest.json'; Bytes=639; Sha256='1ddbc7b615b9b03f99be98c181d88d456c256d6e9b672f937486388c3fba952b'; Platform='Both'; Kind='Json' },
+        [pscustomobject]@{ Path='models/world/runtime/chapter-terrain-v1/chapter-terrain-lod0.runtime.glb'; Bytes=18531656; Sha256='cb7f5e68809963e29b52a26d30d6ba3f36ce29c129e43e713fdcf3c6cebc15a9'; Platform='Both'; Kind='Glb' },
+        [pscustomobject]@{ Path='textures/props/runtime/chapter-terrain/base-color.windows.ktx2'; Bytes=11185312; Sha256='91fa9c1870722069ef930df44f88963f1d38ddefd8e689c26c9ca5ecbe8712b9'; Platform='Windows'; Kind='PropsKtx'; Format=43; Layers=2 },
+        [pscustomobject]@{ Path='textures/props/runtime/chapter-terrain/normal.windows.ktx2'; Bytes=11185312; Sha256='2d138ef174528932dcd2c4326d5bfc85663c0fc453ebdccfcbcdec39768db963'; Platform='Windows'; Kind='PropsKtx'; Format=37; Layers=2 },
+        [pscustomobject]@{ Path='textures/props/runtime/chapter-terrain/orm.windows.ktx2'; Bytes=11185312; Sha256='9f0a9b6ab1d61affa0459c58bc5000824caeff50f8e17c979109ad24a1d619c8'; Platform='Windows'; Kind='PropsKtx'; Format=37; Layers=2 },
+        [pscustomobject]@{ Path='textures/props/runtime/chapter-terrain/base-color.android.ktx2'; Bytes=1253040; Sha256='114afde2675443ff09806692e8e42f95b7caec0518b6c5a2f85a7917a8667395'; Platform='Android'; Kind='PropsKtx'; Format=166; Layers=2 },
+        [pscustomobject]@{ Path='textures/props/runtime/chapter-terrain/normal.android.ktx2'; Bytes=2796720; Sha256='1da244cbd8006b9bd07573435ae0a050a497033a2784f636a9bad5996dc80c78'; Platform='Android'; Kind='PropsKtx'; Format=157; Layers=2 },
+        [pscustomobject]@{ Path='textures/props/runtime/chapter-terrain/orm.android.ktx2'; Bytes=1253040; Sha256='7f0ca5ad53159ee1ebb31c46a47384511757605375766b4a7d48ea8e61e2f845'; Platform='Android'; Kind='PropsKtx'; Format=165; Layers=2 },
         [pscustomobject]@{ Path='models/world/runtime/chapter-entry-return-v1/asset.manifest.json'; Bytes=718; Sha256='d2693be6a2c743af08006e89b9848b235c16c20df9f1d7a5da214499e02a1468'; Platform='Both'; Kind='Json' },
         [pscustomobject]@{ Path='models/world/runtime/chapter-entry-return-v1/collapsed-entry-lod0.runtime.glb'; Bytes=635844; Sha256='29cd8b3ad46cd0b115c2bef8264be3b404281ac048c2cfb495c18324a5189c69'; Platform='Both'; Kind='Glb' },
         [pscustomobject]@{ Path='audio/pixabay/keeper_death.wav'; Bytes=195650; Sha256='500f76c3deb40c89c684562acedf6b7549b6b03e402cc51e09553281517d7020'; Platform='Windows'; Kind='Wave'; Channels=1; Frames=97803 },

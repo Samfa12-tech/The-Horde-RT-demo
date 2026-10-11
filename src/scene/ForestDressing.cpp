@@ -96,7 +96,8 @@ assets::StaticMaterial MakeFamilyMaterial(const assets::StaticMaterial& source,
 bool AppendPreparedForestDressing(const std::filesystem::path& assetRoot,
                                   assets::StaticMeshAsset& existingOwner,
                                   ForestDressingBuildReport& report,
-                                  std::string& diagnostic)
+                                  std::string& diagnostic,
+                                  const gameplay::simulation::TriangleSupportSurface* terrain)
 {
     report = {};
     if (existingOwner.vertices.empty() || existingOwner.indices.empty() ||
@@ -199,7 +200,11 @@ bool AppendPreparedForestDressing(const std::filesystem::path& assetRoot,
          ++placementIndex)
     {
         const auto& contract = gameplay::simulation::kForestTreePlacementContract[placementIndex];
-        const auto support = gameplay::simulation::ResolveWorldRouteSupport(contract.x, contract.z);
+        auto support = gameplay::simulation::ResolveWorldRouteSupport(contract.x, contract.z);
+        if(terrain) {
+            const auto ground=terrain->Query(contract.x,contract.z);
+            support.worldY=ground.worldY;support.grounded=ground.found;
+        }
         if (!support.grounded || !std::isfinite(support.worldY))
         {
             diagnostic = "Forest tree placement has no measured native route support surface.";

@@ -8,9 +8,10 @@ using namespace horde::gameplay::traversal;
 bool GameSimulation::UsesRescueExterior() const {
     return config_.developmentRescueJourney && rescueTraversal_.Snapshot().exteriorSide;
 }
-void GameSimulation::SetDevelopmentRescueJourney(bool enabled) {
+void GameSimulation::SetDevelopmentRescueJourney(bool enabled, bool authoredTerrain) {
     RestoreRescueEquipment();
     config_.developmentRescueJourney=enabled;
+    config_.authoredChapterTerrain=enabled&&authoredTerrain;chapterTerrain_.reset();
     rescueTraversal_.Reset(); rescueOpeningSeconds_=0;worldRoute_.Invalidate();
     worldRoute_.current=WorldZoneId::Dungeon;
     if(enabled) {
@@ -26,6 +27,7 @@ void GameSimulation::SetDevelopmentRescueJourney(bool enabled) {
     ResolvePlayerAnimation(0);ResolveFireEmitters(0);RefreshSnapshot(lastInput_);
 }
 void GameSimulation::RecoverRescueJourney() {
+    chapterTerrain_.reset();
     // Only traversal owns a rollback destination. Ordinary play (including
     // pre-claim play) retains the simulation's current support and zone.
     const bool traversalOwned=rescueTraversal_.IsActive();

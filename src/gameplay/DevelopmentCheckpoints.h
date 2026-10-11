@@ -59,9 +59,10 @@ struct DevelopmentCheckpoint
     bool developmentSupportFixture = false;
     bool developmentWorldRoute = false;
     bool stagedWorldPreparation = false;
+    bool stagesRescueExterior = false;
 };
 
-inline constexpr std::array<DevelopmentCheckpoint, 73u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 78u> kDevelopmentCheckpoints{{
     {.id = 190, .name = "world-route", .baseShowcaseCheckpointId = 0,
      .cameraX = -33.7f, .cameraZ = -20.8f, .yaw = 3.14159265359f, .pitch = -0.05f,
      .developmentWorldRoute = true},
@@ -70,6 +71,16 @@ inline constexpr std::array<DevelopmentCheckpoint, 73u> kDevelopmentCheckpoints{
      .developmentWorldRoute = true, .stagedWorldPreparation = true},
     {.id = 192, .name = "rescue-journey-start", .baseShowcaseCheckpointId = 0,
      .cameraX = 0.0f, .cameraZ = 1.85f, .yaw = 3.14159265359f, .pitch = -0.05f},
+    {.id = 193, .name = "chapter-landing-north", .baseShowcaseCheckpointId = 11,
+     .cameraX = -33.7f, .cameraZ = -12.8f, .yaw = 0, .pitch = -0.15f, .stagesRescueExterior = true},
+    {.id = 194, .name = "chapter-landing-east", .baseShowcaseCheckpointId = 11,
+     .cameraX = -33.7f, .cameraZ = -12.8f, .yaw = 1.57079632679f, .pitch = -0.15f, .stagesRescueExterior = true},
+    {.id = 195, .name = "chapter-landing-south", .baseShowcaseCheckpointId = 11,
+     .cameraX = -33.7f, .cameraZ = -12.8f, .yaw = 3.14159265359f, .pitch = -0.15f, .stagesRescueExterior = true},
+    {.id = 196, .name = "chapter-landing-west", .baseShowcaseCheckpointId = 11,
+     .cameraX = -33.7f, .cameraZ = -12.8f, .yaw = -1.57079632679f, .pitch = -0.15f, .stagesRescueExterior = true},
+    {.id = 197, .name = "chapter-landing-shaft", .baseShowcaseCheckpointId = 11,
+     .cameraX = -33.7f, .cameraZ = -12.8f, .yaw = 0, .pitch = -0.65f, .stagesRescueExterior = true},
     {.id = 170, .name = "vertical-proof-ground", .baseShowcaseCheckpointId = 0,
      .cameraX = 0.0f, .cameraZ = 1.85f, .yaw = 0.0f, .pitch = -0.05f,
      .developmentSupportFixture = true},

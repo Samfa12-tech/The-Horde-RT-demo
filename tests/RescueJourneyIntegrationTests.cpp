@@ -1,5 +1,8 @@
 #include "gameplay/simulation/GameSimulation.h"
 #include "scene/RescueJourneyGeometry.h"
+#include "scene/ChapterTerrainSurface.h"
+#include "scene/assets/AssetManifest.h"
+#include "gameplay/traversal/ChapterTerrainMovement.h"
 #include "vulkan/raytracing/SimulationFrameAdapter.h"
 #include "vulkan/raytracing/DevelopmentWorldSceneAdapter.h"
 #include <cmath>
@@ -7,7 +10,17 @@
 using namespace horde::gameplay;
 using namespace horde::gameplay::simulation;
 using namespace horde::gameplay::traversal;
-int main() {
+int main(int argc,char** argv) {
+ const bool authored=argc==2 && std::string_view(argv[1])=="--authored-terrain";
+ if(argc!=1&&!authored)return 2;
+ std::shared_ptr<const TriangleSupportSurface> terrain;
+ if(authored) {
+  const auto directory=std::filesystem::path(HORDE_RT_SOURCE_DIR)/"assets/models/world/runtime/chapter-terrain-v1";
+  horde::scene::assets::AssetManifest manifest;horde::scene::assets::StaticMeshAsset mesh;std::string error;
+  if(!horde::scene::assets::AssetManifest::Load(directory/"asset.manifest.json",manifest,error)||
+     !horde::scene::assets::StaticMeshAsset::Load(directory/"chapter-terrain-lod0.runtime.glb",manifest,mesh,error)||
+     !(terrain=horde::scene::PrepareChapterTerrainSurface(mesh,error))) {std::cerr<<error<<'\n';return 1;}
+ }
  int cases=0,failures=0;
  auto check=[&](bool b,const char* m){++cases;if(!b){++failures;std::cerr<<m<<'\n';}};
  InputSnapshot input;input.damageEnabled=false;
@@ -34,7 +47,8 @@ int main() {
  check(baseline.Snapshot().playerX==disabled.Snapshot().playerX && baseline.Snapshot().playerSupportWorldY==disabled.Snapshot().playerSupportWorldY,"default production support changed");
  GameSimulationConfig config=ProductionGameSimulationConfig();
  config.playerStartX=kLowerLanding.x;config.playerStartZ=kLowerLanding.z;
- GameSimulation sim(config);sim.SetDevelopmentRescueJourney(true);
+ GameSimulation sim(config);sim.SetDevelopmentRescueJourney(true,authored);
+ const auto publish=[&](WorldZoneToken token) {return authored?sim.PublishChapterTerrain(token,terrain):sim.PublishWorldZoneReadiness(token,ZoneReadiness::Ready);};
  check(!sim.Snapshot().rescue.ropeDeployed && sim.Snapshot().rescuePrompt==RescuePrompt::None,"reward bypass before ownership");
  interactions::ChestRewardSnapshot chest;chest.phase=interactions::ChestRewardPhase::LanternClaimed;chest.lidOpenProgress=1;
  interactions::InteractionState interaction;interactions::ResetInteractionState(interaction,interactions::HeldLightKind::RewardLantern);
@@ -82,7 +96,8 @@ int main() {
  horde::vulkan::raytracing::PublishDevelopmentWorldReadiness(sim,notReady);
  check(sim.Snapshot().worldRoute.readiness[1]!=ZoneReadiness::Ready,"unbuilt renderer falsely admitted destination");
  const auto token=WorldZoneToken{sim.Snapshot().worldRoute.generation,WorldZoneId::TombExterior};
- check(sim.PublishWorldZoneReadiness(token,ZoneReadiness::Ready),"current readiness could not be admitted");
+ if(authored)check(!sim.PublishWorldZoneReadiness(token,ZoneReadiness::Ready),"readiness admitted without authored support");
+ check(publish(token),"current readiness could not be admitted");
  for(int cycle=0;cycle<2;++cycle) {
   ++input.commands.interact;++input.commands.attack;sim.StepFixed(input);
   check(sim.Snapshot().rescue.equipmentStowed,"ascent failed to commit from lower endpoint");
@@ -145,7 +160,8 @@ int main() {
      const auto before=sim.Snapshot();const float dx=destination.x-before.playerX,dz=destination.z-before.playerZ;
      const float distance=std::hypot(dx,dz);if(distance<.03f) return true;
      input.yawRadians=std::atan2(dx,-dz);input.moveForward=std::min(1.0f,distance/.055f);input.moveStrafe=0;input.runHeld=distance>.3f;
-     sim.StepFixed(input);const auto after=sim.Snapshot();const auto support=RescueExteriorSupport(after.playerX,after.playerZ);
+     sim.StepFixed(input);const auto after=sim.Snapshot();const auto support=authored?
+        ChapterExteriorSupport(terrain.get(),after.playerX,after.playerZ):RescueExteriorSupport(after.playerX,after.playerZ);
      check(support.grounded && std::abs(support.worldY-after.playerSupportWorldY)<.0001f,"walking support differs from actual retained triangles");
      check(std::abs(after.playerSupportWorldY-before.playerSupportWorldY)<=kWorldRouteMaximumStep+.0001f,"connector walk accepted an unbounded step");
     }
@@ -168,7 +184,7 @@ int main() {
          OnRescueLanding(sim.Snapshot().playerX,sim.Snapshot().playerZ),
        "unprepared forest crossing escaped its last safe side");
    for(auto zone:{WorldZoneId::ForestApproach,WorldZoneId::Lookout})
-    check(sim.PublishWorldZoneReadiness({sim.Snapshot().worldRoute.generation,zone},ZoneReadiness::Ready),"current forest host token rejected");
+    check(publish({sim.Snapshot().worldRoute.generation,zone}),"current forest host token rejected");
    // These positive CPU tokens are harness inputs. Real renderer admission is
    // separately guarded above and cannot be inferred from this host traversal.
    for(std::size_t i=1;i<kRescueConnector.size();++i) check(walkTo(kRescueConnector[i]),"actual simulation rescue-to-clue trail walk failed");
@@ -187,8 +203,8 @@ int main() {
    sim.InvalidateWorldZoneReadiness();
    check(sim.Snapshot().rescue.exteriorSide && !sim.Snapshot().rescue.equipmentStowed && sim.Snapshot().playerSupportWorldY==kUpperSupportWorldY,
        "interrupted descent did not restore exterior/equipment ownership");
-   check(!sim.PublishWorldZoneReadiness(stale,ZoneReadiness::Ready),"stale descent reconstruction callback accepted");
-   sim.PublishWorldZoneReadiness({sim.Snapshot().worldRoute.generation,WorldZoneId::TombExterior},ZoneReadiness::Ready);
+   check(!publish(stale),"stale descent reconstruction callback accepted");
+   check(publish({sim.Snapshot().worldRoute.generation,WorldZoneId::TombExterior}),"fresh terrain publication rejected after reconstruction");
    ++input.commands.interact;sim.StepFixed(input);
    check(sim.Snapshot().rescue.equipmentStowed,"fresh descent edge failed after reconstruction");
   }
@@ -200,12 +216,19 @@ int main() {
  const auto old=WorldZoneToken{sim.Snapshot().worldRoute.generation,WorldZoneId::TombExterior};
  sim.InvalidateWorldZoneReadiness();
  check(!sim.Snapshot().rescue.exteriorSide && sim.Snapshot().playerSupportWorldY==kLowerSupportWorldY,"interrupted ascent did not return lower");
- check(!sim.PublishWorldZoneReadiness(old,ZoneReadiness::Ready),"late reconstruction callback admitted");
+ check(!publish(old),"late reconstruction callback admitted");
  const auto paidRopeBeforeRetry=sim.Snapshot().rescue.ropeNodes;
  sim.RetryEncounter();check(sim.Snapshot().rescue.claimCount==1 && sim.Snapshot().rescue.ropeReady &&
        sim.Snapshot().rescue.ropeNodes==paidRopeBeforeRetry,
        "logical retry lost or replayed the already paid-out rope deployment");
  sim.ResetRoute();check(!sim.Snapshot().rescue.ropeDeployed && sim.Snapshot().rescue.claimCount==0,"new route kept stale deployment");
+ if(authored) {
+  const WorldZoneToken failed{sim.Snapshot().worldRoute.generation,WorldZoneId::TombExterior};
+  check(!sim.PublishChapterTerrain(failed,{}),"empty terrain published");
+  check(sim.PublishWorldZoneReadiness(failed,ZoneReadiness::Failed),"failed generation not recorded");
+  check(!publish(failed),"late terrain resurrected failed preparation");
+  check(!publish(old),"reset accepted old terrain callback");
+ }
  auto resident=horde::scene::PrepareDevelopmentWorldGeometry(false,true),staged=horde::scene::PrepareDevelopmentWorldGeometry(true,true);
  horde::scene::AppendRescueJourneyGeometry(resident);horde::scene::AppendRescueJourneyGeometry(staged);
  check(resident.valid&&staged.valid&&resident.triangles.size()==staged.triangles.size(),"combined geometry failed admission");

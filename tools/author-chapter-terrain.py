@@ -272,24 +272,26 @@ def main():
     for poly in mesh.polygons:
         poly.use_smooth = poly.index < surface_face_count
         poly.material_index = materials[poly.index]
+        repeats = .5 if poly.material_index == 1 else .42
         for loop in poly.loop_indices:
             vtx = mesh.vertices[mesh.loops[loop].vertex_index].co
             # Boundary walls use a vertical projection, avoiding collapsed UVs
-            # and invalid tangents. Surface UV scale stays exactly unchanged.
+            # and invalid tangents. Forest source spans 2 metres; trail retains its existing scale.
             if poly.index >= surface_face_count and abs(poly.normal.z)<.5:
                 horizontal=vtx.x if abs(poly.normal.y)>.5 else -vtx.y
-                uv.data[loop].uv=(horizontal*.42,vtx.z*.42)
+                uv.data[loop].uv=(horizontal*repeats,vtx.z*repeats)
             else:
-                uv.data[loop].uv = (vtx.x*.42, -vtx.y*.42)
+                uv.data[loop].uv = (vtx.x*repeats, -vtx.y*repeats)
     source_textures = []
-    for name, family in [('ChapterTrailDampSand','damp_sand'), ('ChapterBankStone','mossy_stone_wall')]:
+    for name, family in [('ChapterTrailDampSand','damp_sand'), ('ChapterForestGround','forrest_ground_01')]:
         mat = bpy.data.materials.new(name)
         mat.use_nodes = True
         mat.diffuse_color = (.22,.20,.15,1)
         bsdf = mat.node_tree.nodes.get('Principled BSDF')
         bsdf.inputs['Metallic'].default_value = 0
         for filename, color, socket in [('diff.jpg','sRGB','Base Color'),('normal.jpg','Non-Color','Normal'),('arm.jpg','Non-Color','Roughness')]:
-            path = root/'assets/textures/polyhaven/mobile_1k'/family/filename
+            path = (root/'assets/textures/polyhaven/source/forrest_ground_01-1k-v1'/filename.replace('.jpg','.png')
+                    if family == 'forrest_ground_01' else root/'assets/textures/polyhaven/mobile_1k'/family/filename)
             if not path.is_file(): raise RuntimeError('Missing admitted material '+str(path))
             image = bpy.data.images.load(str(path), check_existing=True)
             image.colorspace_settings.name = color
@@ -346,7 +348,7 @@ def main():
         'entryAuditSha256':digest(args.entry_audit) if args.entry_audit else None,
         'sourceNpzSha256':expected,'recipeSha256':digest(Path(__file__)),
         'blender':bpy.app.version_string,'vertices':len(vertices),'triangles':len(faces),
-        'materials':2,'uvRepeatsPerMetre':.42,'textures':source_textures,
+        'materials':2,'uvRepeatsPerMetre':{'trail':.42,'forest':.5},'textures':source_textures,
         'boundsEngine':[[float(xx.min()),bottom_y,float(zz.min())],
                         [float(xx.max()),float(heights.max()),float(zz.max())]],
         'gridSpacing':'1m near; 2/4m mid; 8m far; exact shaft/skylight interfaces',

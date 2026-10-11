@@ -198,3 +198,12 @@ The diagnostic staging helper now preserves authored reward-camera/support and l
 The chapter now has a native-imported [shortened enclosed stair-return source](../../assets/models/world/source/chapter-entry-return-r03/README.md) and [rounded topo terrain r18](../../assets/models/world/source/chapter-terrain-r18/README.md). All thirteen original enclosure views pass; the entry envelope falls from 12.24 to 6.00 m, and terrain/support correspondence plus nine-room exclusion passes. These are preserved editable source candidates, not yet live terrain or RT visual acceptance. Runtime admission, full support/collision integration, Kit and actual zone retirement remain active work.
 
 The shortened enclosed entry is now selected only by the development rescue chapter and packaged/staged on both platforms. [Native runtime evidence](../evidence/2026-10-11-chapter-entry-runtime/README.md) includes matched inspected Pipeline/Query frames and the separately retained arm-capture failure. The legacy entry stays unchanged. Terrain/support publication, woodland completion, Kit and real zone lifetimes remain incomplete.
+
+
+### Live terrain and corrected forest ground (11 October)
+
+The current chapter now imports the r19 terrain into an existing static owner and publishes its matching native triangle support only after renderer readiness for the current generation. Rebuilds invalidate readiness; late callbacks and terrain moves/destruction are covered. The old ribbon is omitted only in this authored chapter path. This supersedes earlier source-only/live-support-pending notes above; full-body/headroom and true GPU streaming remain open.
+
+The owner identified the broad stone-floor appearance. It was the wrong mossy-masonry bank material, not a desired outdoor design. The owner authorized suitable Poly Haven textures; verified CC0 Forest Ground 01 by Rob Tuytel now replaces that bank layer at its published 2 m scale. No extra texture layer or shader work: chapter totals are 17/14/14, within the existing 18 limit. Both Windows backend frames and the landing sweep were opened and inspected; strict arm failures are retained, not waived. [Current terrain evidence, exact identities and unfinished work](../evidence/2026-10-11-chapter-live-terrain/README.md).
+
+Woodland composition, visible Kit/third-slot resources, actual zone retirement, graveyard and stake anchor, moon/shadow alignment and complete physical acceptance are still missing. This remains one active chapter-integration goal, not a completed chapter or permission to advance scope.

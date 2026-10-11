@@ -38,6 +38,9 @@ inline bool StageDevelopmentCheckpointSimulation(
     DevelopmentCheckpointStageEvidence* evidence = nullptr,
     const DevelopmentCheckpointStepFixedObservation* stepObservation = nullptr)
 {
+    const auto chapterTerrain=gameSimulation.chapterTerrain_;
+    if(checkpoint.stagesRescueExterior && (!gameSimulation.config_.authoredChapterTerrain ||
+       !chapterTerrain || gameSimulation.chapterTerrainGeneration_!=gameSimulation.worldRoute_.generation))return false;
     if (checkpoint.stagesWaterfallGuards &&
         (checkpoint.waterfallGuardFixedTicks > 30u ||
          checkpoint.combatPose != DevelopmentCombatPose::Rest ||
@@ -104,6 +107,31 @@ inline bool StageDevelopmentCheckpointSimulation(
         gameSimulation.ClearEvents();
         return staged;
     };
+
+    if(checkpoint.stagesRescueExterior) {
+        using namespace interactions;
+        ChestRewardSnapshot chest;chest.phase=ChestRewardPhase::LanternClaimed;chest.lidOpenProgress=1;
+        InteractionState interaction;ResetInteractionState(interaction,HeldLightKind::RewardLantern);
+        FinaleSequenceSnapshot finale;finale.lichDefeated=true;
+        gameSimulation.ImportRewardCheckpoint(chest,interaction,finale);
+        for(std::size_t i=1;i<simulation::kWorldZones.size();++i)
+            if(!gameSimulation.PublishChapterTerrain({gameSimulation.worldRoute_.generation,
+                static_cast<simulation::WorldZoneId>(i)},chapterTerrain))return finalize(false);
+        simulation::InputSnapshot routeInput;routeInput.damageEnabled=false;routeInput.tutorialEnabled=false;
+        const auto advance=[&](){stepFixed(routeInput,1.0f/60.0f,gameSimulation.Snapshot().inputPublicationSequence+1);};
+        for(int tick=0;tick<420&&!gameSimulation.Snapshot().rescue.ropeReady;++tick)advance();
+        if(!gameSimulation.Snapshot().rescue.ropeReady)return finalize(false);
+        routeInput.commands.interact=gameSimulation.Snapshot().lastConsumedInteractSequence+1;advance();
+        if(!gameSimulation.Snapshot().rescue.equipmentStowed)return finalize(false);
+        for(int tick=0;tick<1200&&gameSimulation.Snapshot().rescue.equipmentStowed;++tick)advance();
+        if(!gameSimulation.Snapshot().rescue.exteriorSide || gameSimulation.Snapshot().rescue.equipmentStowed)return finalize(false);
+        // The native replay really ascends before freezing. Never seed a
+        // camera-only exterior or invent ready resources for a missing scene.
+        routeInput.yawRadians=checkpoint.yaw;routeInput.pitchRadians=checkpoint.pitch;
+        stepFixed(routeInput,0,gameSimulation.Snapshot().inputPublicationSequence+1);
+        return finalize(std::hypot(gameSimulation.Snapshot().playerX-checkpoint.cameraX,
+            gameSimulation.Snapshot().playerZ-checkpoint.cameraZ)<.01f);
+    }
 
     simulation::InputSnapshot input;
     input.damageEnabled = false;

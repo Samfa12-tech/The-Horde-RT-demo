@@ -1,5 +1,6 @@
 #include "scene/TombDressingContact.h"
 #include "gameplay/simulation/GameSimulation.h"
+#include "gameplay/traversal/ChapterTerrainMovement.h"
 
 #include <algorithm>
 #include <cmath>
@@ -506,6 +507,11 @@ void GameSimulation::ResolvePlayerSupport()
 {
     if (config_.developmentRescueJourney && rescueTraversal_.IsActive()) return;
     if (UsesRescueExterior()) {
+        if(config_.authoredChapterTerrain) {
+            if(chapterTerrain_ && chapterTerrainGeneration_==worldRoute_.generation)
+                playerSupport_=horde::gameplay::traversal::ChapterExteriorSupport(chapterTerrain_.get(),playerX_,playerZ_);
+            return; // retain the last safe support while reconstruction is pending
+        }
         playerSupport_ = horde::gameplay::traversal::RescueExteriorSupport(playerX_,playerZ_); return;
     }
     if (config_.developmentWorldRoute)
@@ -524,16 +530,21 @@ void GameSimulation::ResolvePlayerSupport()
 void GameSimulation::ResolveMovementCollision(float previousX, float previousZ)
 {
     if (UsesRescueExterior()) {
-        const auto support=horde::gameplay::traversal::RescueExteriorSupport(playerX_,playerZ_);
+        const auto support=config_.authoredChapterTerrain?
+            horde::gameplay::traversal::ChapterExteriorSupport(chapterTerrain_.get(),playerX_,playerZ_):
+            horde::gameplay::traversal::RescueExteriorSupport(playerX_,playerZ_);
         const auto p=ProjectWorldRoute(playerX_,playerZ_);
         const auto zone=support.id==static_cast<PlayerSupportId>(130)?WorldZoneId::TombExterior:
             (p.valid&&p.distance<=kWorldRouteHalfWidth?ZoneForRouteSegment(p.segment):WorldZoneId::TombExterior);
         const bool ready=worldRoute_.readiness[static_cast<std::size_t>(zone)]==ZoneReadiness::Ready;
-        const bool clear=horde::gameplay::traversal::RescueExteriorMovementClear(
+        const bool clear=config_.authoredChapterTerrain ?
+            (chapterTerrain_ && chapterTerrainGeneration_==worldRoute_.generation && horde::gameplay::traversal::ChapterExteriorMovementClear(
+                *chapterTerrain_,previousX,previousZ,playerX_,playerZ_,playerSupport_.worldY,kPlayerCollisionRadius)) :
+            (horde::gameplay::traversal::RescueExteriorMovementClear(
             previousX,previousZ,playerX_,playerZ_,playerSupport_.worldY,kPlayerCollisionRadius) &&
             WorldRouteBlockoutMovementClear(previousX,previousZ,playerX_,playerZ_,playerSupport_.worldY,kPlayerCollisionRadius,true) &&
             (support.id==static_cast<PlayerSupportId>(130) ||
-             WorldRouteTerrainMovementClear(previousX,previousZ,playerX_,playerZ_,playerSupport_.worldY,kPlayerCollisionRadius));
+             WorldRouteTerrainMovementClear(previousX,previousZ,playerX_,playerZ_,playerSupport_.worldY,kPlayerCollisionRadius)));
         if(!support.grounded||!ready||!clear||std::abs(support.worldY-playerSupport_.worldY)>kWorldRouteMaximumStep) {
             playerX_=previousX;playerZ_=previousZ;worldRoute_.blocked=true;++worldRoute_.rollbackCount;
         } else {
@@ -582,8 +593,20 @@ void GameSimulation::SetDevelopmentWorldRoute(bool enabled, bool stagedPreparati
 }
 bool GameSimulation::PublishWorldZoneReadiness(WorldZoneToken token, ZoneReadiness readiness)
 {
+    if(config_.authoredChapterTerrain && token.zone!=WorldZoneId::Dungeon && readiness==ZoneReadiness::Ready &&
+       (!chapterTerrain_ || chapterTerrainGeneration_!=worldRoute_.generation)) return false;
     if((!config_.developmentWorldRoute && !config_.developmentRescueJourney) || !worldRoute_.Publish(token,readiness)) return false;
     RefreshSnapshot(lastInput_); return true;
+}
+bool GameSimulation::PublishChapterTerrain(WorldZoneToken token, std::shared_ptr<const TriangleSupportSurface> terrain)
+{
+    if(!config_.developmentRescueJourney || !config_.authoredChapterTerrain || !terrain ||
+       !terrain->TriangleCount() || token.zone==WorldZoneId::Dungeon ||
+       (chapterTerrain_ && chapterTerrainGeneration_==worldRoute_.generation && chapterTerrain_!=terrain) ||
+       !worldRoute_.Publish(token,ZoneReadiness::Ready)) return false;
+    chapterTerrain_=std::move(terrain);
+    chapterTerrainGeneration_=token.generation;
+    RefreshSnapshot(lastInput_);return true;
 }
 void GameSimulation::InvalidateWorldZoneReadiness()
 {
@@ -610,6 +633,7 @@ void GameSimulation::SetDevelopmentSupportFixture(bool enabled, std::uint64_t ge
 
 void GameSimulation::ResetRoute()
 {
+    chapterTerrain_.reset();
     chapterDialogue_.Reset();chapterCompanion_.Reset();chapterFirstExterior_=false;chapterVisibleRaise_=0;
     if(config_.developmentRescueJourney) { rescueSavedSwordValid_=false;rescueTraversal_.Reset();rescueOpeningSeconds_=0;worldRoute_.Invalidate(); }
     legacyCombatCheckpoint_ = false;

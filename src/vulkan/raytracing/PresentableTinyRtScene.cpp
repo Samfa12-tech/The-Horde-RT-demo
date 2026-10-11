@@ -17,6 +17,8 @@
 #include "vulkan/raytracing/RtDescriptorSetLayoutBindings.h"
 #include "vulkan/raytracing/RtDeviceAddressLayout.h"
 #include "vulkan/raytracing/RtTextureLayerSubset.h"
+#include "vulkan/raytracing/RtKtxArrayAppend.h"
+#include "scene/ChapterTerrainAdmission.h"
 #include "vulkan/raytracing/RtChapterTextureLayout.h"
 
 #include "gameplay/items/HeldItemKinematics.h"
@@ -743,6 +745,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     rescueWorldMaxVertex_=std::exchange(other.rescueWorldMaxVertex_,0);
     stagedWorldPreparation_=std::exchange(other.stagedWorldPreparation_,false);
     worldRouteGeometry_=std::move(other.worldRouteGeometry_);
+    chapterTerrainSurface_=std::move(other.chapterTerrainSurface_);
     sceneProfile_ = std::exchange(other.sceneProfile_, RtSceneProfile::Showcase);
     glassEnabled_ = std::exchange(other.glassEnabled_, true);
     mistEnabled_ = std::exchange(other.mistEnabled_, true);
@@ -1056,7 +1059,7 @@ horde::gameplay::simulation::ZoneReadiness PresentableTinyRtScene::WorldZoneRead
     if(!ready_ || !worldRouteGeometry_.valid || vertexBuffer_.memory==VK_NULL_HANDLE ||
         indexBuffer_.memory==VK_NULL_HANDLE || blas_.handle==VK_NULL_HANDLE || tlas_.handle==VK_NULL_HANDLE)
         return ZoneReadiness::Preparing;
-    if(developmentRescueJourney_ && (rescueWorldUpdateScratch_.buffer==VK_NULL_HANDLE ||
+    if(developmentRescueJourney_ && (!chapterTerrainSurface_ || rescueWorldUpdateScratch_.buffer==VK_NULL_HANDLE ||
         rescueWorldVertices_.empty() || rescueWorldPrimitiveCount_==0 ||
         rescueWorldSurfaceCodes_.size()!=rescueWorldPrimitiveCount_)) return ZoneReadiness::Preparing;
     return ZoneReadiness::Ready;
@@ -1064,6 +1067,7 @@ horde::gameplay::simulation::ZoneReadiness PresentableTinyRtScene::WorldZoneRead
 void PresentableTinyRtScene::Destroy()
 {
     worldRouteGeometry_ = {}; // Release CPU batches with the renderer-owned scene.
+    chapterTerrainSurface_.reset();
     pipelineCache_ = VK_NULL_HANDLE; // Borrowed device cache remains owned by the platform context.
     uploadedQualityControls_ = {};
     uploadedFireQuality_ = FireEmitterQuality::Mobile;
@@ -1171,6 +1175,7 @@ void PresentableTinyRtScene::Destroy()
     materialEncoding_.clear();
     developmentStaticAsset_ = {};
     collapseStaticAsset_ = {};
+    chapterTerrainSurface_.reset();
     productionTorchAsset_ = {};
     playerTorchAsset_ = {};
     playerSwordScabbardAsset_ = {};
@@ -1933,7 +1938,8 @@ bool PresentableTinyRtScene::CreateTexture(const std::string& path,
                                            std::string& diagnostic,
                                            const std::span<const std::uint32_t> sourceLayers,
                                            const VkImageViewType viewType,
-                                           const std::span<const RtTextureLayerAlias> sourceAliases)
+                                           const std::span<const RtTextureLayerAlias> sourceAliases,
+                                           const std::string& appendedArrayPath)
 {
     if (!sourceAliases.empty() && sourceLayers.empty())
     {
@@ -1969,6 +1975,33 @@ bool PresentableTinyRtScene::CreateTexture(const std::string& path,
         diagnostic = "Failed to read PBR texture array: " + path;
         return false;
     }
+    std::vector<std::uint8_t> appendedBytes;
+    RtKtxArrayAppendView appended;
+    if (!appendedArrayPath.empty())
+    {
+        if (!ktx2 || sourceLayers.empty())
+        {
+            diagnostic = "Appended PBR arrays require an explicit KTX layer selection.";
+            return false;
+        }
+        std::ifstream extra(appendedArrayPath, std::ios::binary | std::ios::ate);
+        if (!extra || extra.tellg() <= 0)
+        {
+            diagnostic = "Appended PBR texture array is missing or empty: " + appendedArrayPath;
+            return false;
+        }
+        appendedBytes.resize(static_cast<std::size_t>(extra.tellg()));
+        extra.seekg(0, std::ios::beg);
+        if (!extra.read(reinterpret_cast<char*>(appendedBytes.data()),
+                        static_cast<std::streamsize>(appendedBytes.size())))
+        {
+            diagnostic = "Failed to read appended PBR texture array: " + appendedArrayPath;
+            return false;
+        }
+        if (!PrepareRtKtxArrayAppend(fileBytes, appendedBytes, static_cast<std::uint32_t>(format),
+                width, height, static_cast<std::uint32_t>(sourceLayers.size()), layers, appended, diagnostic))
+            return false;
+    }
     struct MipPayload
     {
         VkDeviceSize bufferOffset = 0u;
@@ -2000,7 +2033,7 @@ bool PresentableTinyRtScene::CreateTexture(const std::string& path,
                                  std::equal(identifier.begin(), identifier.end(), fileBytes.begin()) &&
                                  read32(12u) == static_cast<std::uint32_t>(format) && read32(16u) == 1u &&
                                  read32(20u) == width && read32(24u) == height && read32(28u) == 0u &&
-                                 (subset ? sourceLayers.size() == layers && sourceLayerCount <= kRtTextureLayerCapacity
+                                 (subset ? sourceLayers.size() + appended.layers == layers && sourceLayerCount <= kRtTextureLayerCapacity
                                          : read32(32u) == layers || (layers == 1u && read32(32u) == 0u)) &&
                                  read32(36u) == 1u &&
                                  read32(44u) == 0u;
@@ -2044,6 +2077,10 @@ bool PresentableTinyRtScene::CreateTexture(const std::string& path,
             else pixels.insert(pixels.end(),
                           fileBytes.begin() + static_cast<std::ptrdiff_t>(levelOffset),
                           fileBytes.begin() + static_cast<std::ptrdiff_t>(levelOffset + levelLength));
+            // Assemble each complete GPU mip once. The existing array bytes
+            // are neither re-encoded nor duplicated in the packaged addition.
+            if (appended.layers)
+                pixels.insert(pixels.end(), appended.mips[level].begin(), appended.mips[level].end());
             mipPayloads.push_back({destinationOffset, mipLayerBytes, mipWidth, mipHeight});
         }
     }
@@ -2446,8 +2483,10 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
         horde::scene::TombDressingBuildReport dressing;
         if (!horde::scene::AppendPreparedTombDressing(root, collapseStaticAsset_, dressing, diagnostic))
             return false;
+        if (!horde::scene::AppendChapterTerrain(root, collapseStaticAsset_, chapterTerrainSurface_, diagnostic))
+            return false;
         horde::scene::ForestDressingBuildReport forest;
-        if (!horde::scene::AppendPreparedForestDressing(root, collapseStaticAsset_, forest, diagnostic))
+        if (!horde::scene::AppendPreparedForestDressing(root, collapseStaticAsset_, forest, diagnostic, chapterTerrainSurface_.get()))
             return false;
         // The collapse's final masonry range and the first dressing range use
         // the same material. Keep every triangle while sharing one metadata row;
@@ -2823,9 +2862,9 @@ bool PresentableTinyRtScene::CreateStaticMeshResources(std::string& diagnostic)
         return false;
     }
     const bool chapterLayout=sceneProfile_==RtSceneProfile::Showcase && developmentRescueJourney_;
-    if (chapterLayout && (textureCounts.baseColor!=kChapterBaseColorSourceLayers.size() ||
-        textureCounts.normal!=kChapterNormalOrmSourceLayers.size() ||
-        textureCounts.orm!=kChapterNormalOrmSourceLayers.size())) {
+    if (chapterLayout && (textureCounts.baseColor!=kChapterBaseColorSourceLayers.size()+2 ||
+        textureCounts.normal!=kChapterNormalOrmSourceLayers.size()+2 ||
+        textureCounts.orm!=kChapterNormalOrmSourceLayers.size()+2)) {
         diagnostic="Chapter material routes disagree with the exact-byte atlas subset.";
         return false;
     }
@@ -2849,6 +2888,9 @@ bool PresentableTinyRtScene::CreateStaticMeshResources(std::string& diagnostic)
     const auto path = [&assetDirectory](const char* name) {
         return (assetDirectory / name).string();
     };
+    const auto addition = [&assetDirectory,chapterLayout](const char* name) {
+        return chapterLayout ? (assetDirectory / "chapter-terrain" / name).string() : std::string{};
+    };
 #if defined(__ANDROID__)
     if (!productionHeldItemAssetsEnabled_)
     {
@@ -2863,21 +2905,21 @@ bool PresentableTinyRtScene::CreateStaticMeshResources(std::string& diagnostic)
         return false;
     }
     if (!CreateTexture(path("base-color.android.ktx2"), VK_FORMAT_ASTC_6x6_SRGB_BLOCK,
-                       textureDimension, textureDimension, actualTextureLayers[0], staticBaseColor_, diagnostic, baseLayers, VK_IMAGE_VIEW_TYPE_2D_ARRAY, aliases) ||
+                       textureDimension, textureDimension, actualTextureLayers[0], staticBaseColor_, diagnostic, baseLayers, VK_IMAGE_VIEW_TYPE_2D_ARRAY, aliases, addition("base-color.android.ktx2")) ||
         !CreateTexture(path("normal.android.ktx2"), VK_FORMAT_ASTC_4x4_UNORM_BLOCK,
-                       textureDimension, textureDimension, actualTextureLayers[1], staticNormal_, diagnostic, normalOrmLayers, VK_IMAGE_VIEW_TYPE_2D_ARRAY, aliases) ||
+                       textureDimension, textureDimension, actualTextureLayers[1], staticNormal_, diagnostic, normalOrmLayers, VK_IMAGE_VIEW_TYPE_2D_ARRAY, aliases, addition("normal.android.ktx2")) ||
         !CreateTexture(path("orm.android.ktx2"), VK_FORMAT_ASTC_6x6_UNORM_BLOCK,
-                       textureDimension, textureDimension, actualTextureLayers[2], staticOrm_, diagnostic, normalOrmLayers, VK_IMAGE_VIEW_TYPE_2D_ARRAY, aliases) ||
+                       textureDimension, textureDimension, actualTextureLayers[2], staticOrm_, diagnostic, normalOrmLayers, VK_IMAGE_VIEW_TYPE_2D_ARRAY, aliases, addition("orm.android.ktx2")) ||
         !CreateTexture(path("emissive.android.ktx2"), VK_FORMAT_ASTC_6x6_SRGB_BLOCK,
                        textureDimension, textureDimension, actualTextureLayers[3], staticEmissive_, diagnostic))
         return false;
 #else
     if (!CreateTexture(path("base-color.windows.ktx2"), VK_FORMAT_R8G8B8A8_SRGB,
-                       textureDimension, textureDimension, actualTextureLayers[0], staticBaseColor_, diagnostic, baseLayers, VK_IMAGE_VIEW_TYPE_2D_ARRAY, aliases) ||
+                       textureDimension, textureDimension, actualTextureLayers[0], staticBaseColor_, diagnostic, baseLayers, VK_IMAGE_VIEW_TYPE_2D_ARRAY, aliases, addition("base-color.windows.ktx2")) ||
         !CreateTexture(path("normal.windows.ktx2"), VK_FORMAT_R8G8B8A8_UNORM,
-                       textureDimension, textureDimension, actualTextureLayers[1], staticNormal_, diagnostic, normalOrmLayers, VK_IMAGE_VIEW_TYPE_2D_ARRAY, aliases) ||
+                       textureDimension, textureDimension, actualTextureLayers[1], staticNormal_, diagnostic, normalOrmLayers, VK_IMAGE_VIEW_TYPE_2D_ARRAY, aliases, addition("normal.windows.ktx2")) ||
         !CreateTexture(path("orm.windows.ktx2"), VK_FORMAT_R8G8B8A8_UNORM,
-                       textureDimension, textureDimension, actualTextureLayers[2], staticOrm_, diagnostic, normalOrmLayers, VK_IMAGE_VIEW_TYPE_2D_ARRAY, aliases) ||
+                       textureDimension, textureDimension, actualTextureLayers[2], staticOrm_, diagnostic, normalOrmLayers, VK_IMAGE_VIEW_TYPE_2D_ARRAY, aliases, addition("orm.windows.ktx2")) ||
         !CreateTexture(path("emissive.windows.ktx2"), VK_FORMAT_R8G8B8A8_SRGB,
                        textureDimension, textureDimension, actualTextureLayers[3], staticEmissive_, diagnostic))
     {
@@ -3364,7 +3406,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     }
     if(developmentWorldRoute_)
     {
-        worldRouteGeometry_=horde::scene::PrepareDevelopmentWorldGeometry(stagedWorldPreparation_,developmentRescueJourney_);
+        worldRouteGeometry_=horde::scene::PrepareDevelopmentWorldGeometry(stagedWorldPreparation_,developmentRescueJourney_,chapterTerrainSurface_!=nullptr);
         if(developmentRescueJourney_) horde::scene::AppendRescueJourneyGeometry(worldRouteGeometry_);
         if(!worldRouteGeometry_.valid) { diagnostic="Development world route preparation failed finite geometry admission."; return false; }
         for(const auto& triangle:worldRouteGeometry_.triangles)

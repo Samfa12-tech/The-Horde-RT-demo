@@ -100,6 +100,11 @@ if(BUILD_TESTING)
     add_executable(horde_rt_texture_layer_subset_tests tests/RtTextureLayerSubsetTests.cpp)
     target_include_directories(horde_rt_texture_layer_subset_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     add_test(NAME horde_rt_texture_layer_subset_tests COMMAND horde_rt_texture_layer_subset_tests)
+    if(HORDE_RT_BUILD_VULKAN_TARGETS)
+        add_test(NAME horde_rt_chapter_texture_append_payload_tests COMMAND horde_rt_texture_layer_subset_tests
+            ${CMAKE_CURRENT_SOURCE_DIR}/assets/textures/props/runtime
+            ${CMAKE_CURRENT_SOURCE_DIR}/assets/textures/props/source/chapter-terrain-maps-r03)
+    endif()
 
     add_executable(horde_rt_shaft_dressing_geometry_tests tests/ShaftDressingGeometryTests.cpp)
     target_include_directories(horde_rt_shaft_dressing_geometry_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
@@ -1355,7 +1360,9 @@ endif()
 if(BUILD_TESTING AND TARGET horde_rt_probe_core)
     add_executable(horde_rt_rescue_journey_integration_tests tests/RescueJourneyIntegrationTests.cpp)
     target_link_libraries(horde_rt_rescue_journey_integration_tests PRIVATE horde_rt_probe_core)
+    target_compile_definitions(horde_rt_rescue_journey_integration_tests PRIVATE HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
     add_test(NAME horde_rt_rescue_journey_integration_tests COMMAND horde_rt_rescue_journey_integration_tests)
+    add_test(NAME horde_rt_chapter_terrain_journey_tests COMMAND horde_rt_rescue_journey_integration_tests --authored-terrain)
     add_executable(horde_rt_kit_source_intake_tests tests/KitSourceIntakeTests.cpp)
     target_link_libraries(horde_rt_kit_source_intake_tests PRIVATE horde_rt_probe_core)
     target_compile_definitions(horde_rt_kit_source_intake_tests PRIVATE

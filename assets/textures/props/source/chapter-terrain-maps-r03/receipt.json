@@ -1,0 +1,92 @@
+{
+  "schema": 1,
+  "asset": "chapter-terrain-two-layer-addition",
+  "distribution": "source-candidate",
+  "resolution": 1024,
+  "mipLevels": 11,
+  "layers": 2,
+  "layerOrder": [
+    "damp_sand",
+    "forrest_ground_01"
+  ],
+  "primaries": "bt709",
+  "sourceNotice": "Poly Haven CC0 damp_sand and forrest_ground_01; original sources retained",
+  "recipe": "tools/build-chapter-terrain-textures.ps1",
+  "sources": [
+    {
+      "bytes": 900798,
+      "path": "assets/textures/polyhaven/mobile_1k/damp_sand/diff.jpg",
+      "sha256": "3b26e6033205d4c774bb8c48bda8081b5a369e01ac701a0dcaa7ddc1f484f1de"
+    },
+    {
+      "bytes": 1223062,
+      "path": "assets/textures/polyhaven/mobile_1k/damp_sand/normal.jpg",
+      "sha256": "1bda846d2361eeba2938700e68771711a29880299da61733bd2bcdd7af83c1f4"
+    },
+    {
+      "bytes": 657410,
+      "path": "assets/textures/polyhaven/mobile_1k/damp_sand/arm.jpg",
+      "sha256": "a54ba44a05381a87b4506c6e75d92e096b11cb45c5d7d052957b1d36eee4aef9"
+    },
+    {
+      "bytes": 6603753,
+      "path": "assets/textures/polyhaven/source/forrest_ground_01-1k-v1/diff.png",
+      "sha256": "c4bae8c86c8f9f50f2cd0fa627b097e089de3427f071e3446e69bf8e39132896"
+    },
+    {
+      "bytes": 6787606,
+      "path": "assets/textures/polyhaven/source/forrest_ground_01-1k-v1/normal.png",
+      "sha256": "879a84565d016743583421a644bae72df26f4031ea8852fc6d6275feb967353e"
+    },
+    {
+      "bytes": 4650954,
+      "path": "assets/textures/polyhaven/source/forrest_ground_01-1k-v1/arm.png",
+      "sha256": "f4a137f68021a6e84495ea990323bdc471d4e34dad3f393bdf608a211aebe772"
+    }
+  ],
+  "products": [
+    {
+      "bytes": 11185312,
+      "sha256": "91fa9c1870722069ef930df44f88963f1d38ddefd8e689c26c9ca5ecbe8712b9",
+      "format": "R8G8B8A8_SRGB",
+      "file": "base-color.windows.ktx2",
+      "transfer": "srgb"
+    },
+    {
+      "bytes": 1253040,
+      "sha256": "114afde2675443ff09806692e8e42f95b7caec0518b6c5a2f85a7917a8667395",
+      "format": "ASTC_6x6_SRGB_BLOCK",
+      "file": "base-color.android.ktx2",
+      "transfer": "srgb"
+    },
+    {
+      "bytes": 11185312,
+      "sha256": "2d138ef174528932dcd2c4326d5bfc85663c0fc453ebdccfcbcdec39768db963",
+      "format": "R8G8B8A8_UNORM",
+      "file": "normal.windows.ktx2",
+      "transfer": "linear"
+    },
+    {
+      "bytes": 2796720,
+      "sha256": "1da244cbd8006b9bd07573435ae0a050a497033a2784f636a9bad5996dc80c78",
+      "format": "ASTC_4x4_UNORM_BLOCK",
+      "file": "normal.android.ktx2",
+      "transfer": "linear"
+    },
+    {
+      "bytes": 11185312,
+      "sha256": "9f0a9b6ab1d61affa0459c58bc5000824caeff50f8e17c979109ad24a1d619c8",
+      "format": "R8G8B8A8_UNORM",
+      "file": "orm.windows.ktx2",
+      "transfer": "linear"
+    },
+    {
+      "bytes": 1253040,
+      "sha256": "7f0ca5ad53159ee1ebb31c46a47384511757605375766b4a7d48ea8e61e2f845",
+      "format": "ASTC_6x6_UNORM_BLOCK",
+      "file": "orm.android.ktx2",
+      "transfer": "linear"
+    }
+  ],
+  "scope": "Exact two-layer addition; no existing prop array is re-encoded. Native admission is separate from physical device acceptance."
+}

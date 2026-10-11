@@ -434,7 +434,7 @@ struct PresentableTinyRtSceneObservationTestAccess
         const std::array<std::uint32_t,4> layers{{counts.baseColor,counts.normal,counts.orm,counts.emissive}};
         // No admitted static material references an emissive image. The
         // packaged emissive array separately retains its one fallback layer.
-        bool ok=layers==std::array<std::uint32_t,4>{{15,12,12,0}};
+        bool ok=layers==std::array<std::uint32_t,4>{{17,14,14,0}};
         const auto& materials=scene.staticMeshSlot_.Materials();
         const auto& primitives=scene.staticMeshSlot_.PrimitiveMetadata();
         std::cout<<"Actual development static admission materials="<<materials.size()
@@ -442,8 +442,9 @@ struct PresentableTinyRtSceneObservationTestAccess
             <<","<<layers[2]<<","<<layers[3]<<'\n';
         ok &= materials.size()<=kRtMaterialCapacity && primitives.size()<=kRtPrimitiveMetadataCapacity;
         ok &= materials.size()+MakeRtWorldMaterialPalette(true).count<=kRtMaterialCapacity;
-        ok &= materials.size()==28u && primitives.size()==
-            (scene.pipelineBundle_.Request().quality==DielectricQuality::High?30u:29u);
+        ok &= materials.size()==30u && primitives.size()==
+            (scene.pipelineBundle_.Request().quality==DielectricQuality::High?32u:31u);
+        ok &= scene.chapterTerrainSurface_ && scene.chapterTerrainSurface_->TriangleCount()==39618u;
         const auto& instances=scene.staticMeshSlot_.InstanceMetadata();
         for(const char* family:{"ChestWood","BlackIron"}) {
             const auto row=[&](const auto& asset,std::uint32_t owner) {
@@ -484,6 +485,14 @@ struct PresentableTinyRtSceneObservationTestAccess
                 ok &= original.sockets[i].name==grouped.sockets[i].name&&original.sockets[i].world==grouped.sockets[i].world&&
                       original.sockets[i].nodeTransformIndex==grouped.sockets[i].nodeTransformIndex;
         }
+        const auto terrain = scene.ChapterTerrainSurface();
+        PresentableTinyRtScene moved(std::move(scene));
+        ok &= moved.ChapterTerrainSurface()==terrain && !scene.ChapterTerrainSurface();
+        PresentableTinyRtScene assigned;
+        assigned=std::move(moved);
+        ok &= assigned.ChapterTerrainSurface()==terrain && !moved.ChapterTerrainSurface();
+        assigned.Destroy();
+        ok &= !assigned.ChapterTerrainSurface();
         all &= ok;
         }
         return all;
@@ -874,13 +883,13 @@ struct PresentableTinyRtSceneObservationTestAccess
         // Original selected dressing plus two T03 candle stubs (664 each),
         // one offering bowl (960), the closed 12-triangle lintel lip, and
         // ten original pine/alder instances grouped into four primitives.
-        constexpr std::size_t addedIndices = 46140u + (2u*664u + 960u + 12u + 50510u)*3u;
+        constexpr std::size_t addedIndices = 46140u + (2u*664u + 960u + 12u + 50510u + 39618u)*3u;
         bool ok = oldIndices == 8422u * 3u &&
                   baseline.collapseStaticAsset_.bounds.maximum[1] > 12.0f &&
                   std::abs(chapterEntryTop - 6.0f) < 0.001f &&
                   tomb.collapseStaticAsset_.indices.size() == chapterEntryIndices + addedIndices &&
-                  tomb.staticMeshSlot_.PrimitiveMetadata().size() == 29u &&
-                  tomb.staticMeshSlot_.Materials().size() == 28u &&
+                  tomb.staticMeshSlot_.PrimitiveMetadata().size() == 31u &&
+                  tomb.staticMeshSlot_.Materials().size() == 30u &&
                   tomb.staticMeshSlot_.PrimitiveMetadata().size() <= 32u &&
                   tomb.staticMeshSlot_.Materials().size() <= 32u;
         std::cout << "Integrated native tomb static roster: "

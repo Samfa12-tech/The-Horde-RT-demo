@@ -1,6 +1,7 @@
 #pragma once
 #include "scene/atmosphere/IndoorDust.h"
 #include "scene/DevelopmentWorldGeometry.h"
+#include "gameplay/simulation/TriangleSupportSurface.h"
 #include "gameplay/traversal/RescueTraversal.h"
 
 #include <array>
@@ -262,6 +263,7 @@ public:
     void SetDevelopmentWorldRoute(bool enabled, bool staged = false) { developmentWorldRoute_=enabled; stagedWorldPreparation_=staged; }
     horde::gameplay::simulation::ZoneReadiness WorldZoneReadiness(horde::gameplay::simulation::WorldZoneToken token) const;
     const horde::scene::DevelopmentWorldGeometry& WorldRouteGeometry() const { return worldRouteGeometry_; }
+    std::shared_ptr<const horde::gameplay::simulation::TriangleSupportSurface> ChapterTerrainSurface() const { return chapterTerrainSurface_; }
     bool IsReady() const { return ready_; }
     // CPU-side timings for the most recent Initialise attempt. Failed attempts
     // retain partial measurements across cleanup until the next attempt begins.
@@ -737,7 +739,8 @@ private:
                        std::string& diagnostic,
                        std::span<const std::uint32_t> sourceLayers = {},
                        VkImageViewType viewType = VK_IMAGE_VIEW_TYPE_2D_ARRAY,
-                       std::span<const RtTextureLayerAlias> sourceAliases = {});
+                       std::span<const RtTextureLayerAlias> sourceAliases = {},
+                       const std::string& appendedArrayPath = {});
     bool SupportsTextureArrayFormat(VkFormat format) const;
     bool CreateMaterialTextures(const std::string& directory, std::string& diagnostic);
     bool CreateEnvironmentTexture(const std::string& productionRoot, std::string& diagnostic);
@@ -910,6 +913,7 @@ private:
     std::uint32_t rescueWorldPrimitiveCount_ = 0;
     std::uint32_t rescueWorldMaxVertex_ = 0;
     horde::scene::DevelopmentWorldGeometry worldRouteGeometry_{};
+    std::shared_ptr<const horde::gameplay::simulation::TriangleSupportSurface> chapterTerrainSurface_;
     RtSceneProfile sceneProfile_ = RtSceneProfile::Showcase;
     bool glassEnabled_ = true;
     bool mistEnabled_ = true;

@@ -18,7 +18,11 @@ inline void PublishDevelopmentWorldReadiness(
         const WorldZoneToken token{snapshot.worldRoute.generation,static_cast<WorldZoneId>(i)};
         simulation.PublishWorldZoneReadiness(token,ZoneReadiness::Preparing);
         const auto actual=scene.WorldZoneReadiness(token);
-        if(actual==ZoneReadiness::Ready) simulation.PublishWorldZoneReadiness(token,actual);
+        if(actual==ZoneReadiness::Ready) {
+            if(snapshot.developmentRescueJourney && scene.ChapterTerrainSurface())
+                simulation.PublishChapterTerrain(token,scene.ChapterTerrainSurface());
+            else simulation.PublishWorldZoneReadiness(token,actual);
+        }
     }
 }
 } // namespace horde::vulkan::raytracing

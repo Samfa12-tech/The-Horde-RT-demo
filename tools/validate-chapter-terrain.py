@@ -79,6 +79,7 @@ def validate(directory):
         assert not any(k in node for k in ('matrix','translation','rotation','scale')), 'Unexpected unbaked export transform'
         for prim in data['meshes'][node['mesh']]['primitives']:
             attr=prim['attributes'];p=accessor(attr['POSITION']);n=accessor(attr['NORMAL'])
+            repeats=.5 if data['materials'][prim['material']]['name']=='ChapterForestGround' else .42
             uv=accessor(attr['TEXCOORD_0']);t=accessor(attr['TANGENT']);indices=[v[0] for v in accessor(prim['indices'])]
             assert len(p)==len(n)==len(uv)==len(t)
             assert len(indices)%3==0 and max(indices)<len(p)
@@ -89,7 +90,7 @@ def validate(directory):
                 assert abs(sum(a*b for a,b in zip(normal,tangent)))<.0002
                 # Blender exports glTF V with its conventional flip.
                 if normal[1]>.001:
-                    max_uv_error=max(max_uv_error,abs(tex[0]-pos[0]*.42),abs(tex[1]-(1-pos[2]*.42)))
+                    max_uv_error=max(max_uv_error,abs(tex[0]-pos[0]*repeats),abs(tex[1]-(1-pos[2]*repeats)))
                 min_normal_y=min(min_normal_y,normal[1])
             for start in range(0,len(indices),3):
                 pts=[p[i] for i in indices[start:start+3]]
@@ -105,7 +106,7 @@ def validate(directory):
     assert actual==expected, 'Exported positions/topology/winding differ from support data'
     if 'undersideY' in surface:
         assert surface['undersideY'] < min(min(row) for row in h)-4., 'Underside crosses the low terrain'
-    assert max_uv_error<.00003, 'UV0 no longer has .42 repeats/metre'
+    assert max_uv_error<.00003, 'UV0 differs from the declared trail/forest real-world scale'
     assert len(surface['holes'])==3 and len(surface['cells'])==triangles
     for i,j,_ in surface['cells']:
         if i<0:

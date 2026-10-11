@@ -66,7 +66,7 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 73u,
+    Check(kDevelopmentCheckpoints.size() == 78u,
           "development registry retains prior views plus bounded water-lighting, world-route and rescue views");
     Check(FindDevelopmentCheckpoint(164) == nullptr,
           "development lookup preserves the unassigned gap before later bounded additions");
@@ -95,9 +95,9 @@ int main()
               FindShowcaseCheckpoint(192) == nullptr &&
               FindShowcaseCheckpoint("rescue-journey-start") == nullptr,
           "rescue entry retains the ordinary lower start and is absent from release checkpoints");
-    Check(FindDevelopmentCheckpoint(193) == nullptr &&
+    Check(FindDevelopmentCheckpoint(198) == nullptr &&
               FindDevelopmentCheckpoint("rescue-journey-unknown") == nullptr,
-          "development lookup still rejects IDs and names beyond the appended rescue entry");
+          "development lookup still rejects IDs and names beyond the appended exterior inspections");
     const auto* torchParry = FindDevelopmentCheckpoint("player-torch-parry-clearance");
     simulation::GameSimulation stagedTorchParry;
     DevelopmentCheckpointStageEvidence torchParryEvidence{};

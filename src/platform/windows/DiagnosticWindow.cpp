@@ -5665,6 +5665,7 @@ bool DestroyRenderContext(VulkanSurfaceContext& ctx)
         (void)ctx.rtFrameEvidence.Destroy();
         ctx.rtFrameEvidenceInitialised = false;
     }
+    ctx.simulation.InvalidateWorldZoneReadiness();
     ctx.rtScene.Destroy();
     if (ctx.pipelineCache != VK_NULL_HANDLE)
     {
@@ -5772,6 +5773,7 @@ bool ApplyPendingSceneReplacement(VulkanSurfaceContext& context,
     };
     context.benchmarkEvidence.Cancel();
     if (!retireSceneReferences()) return false;
+    context.simulation.InvalidateWorldZoneReadiness();
     context.rtScene.Destroy(); // Exactly one scene; shared simulation remains paused and CPU-owned.
     if (!InitialiseRtSceneForSwapchain(context, false))
     {
@@ -5779,6 +5781,7 @@ bool ApplyPendingSceneReplacement(VulkanSurfaceContext& context,
         // Partial initialisation may have submitted work. A fresh proof is required
         // before its cleanup and before recreating the prior complete configuration.
         if (!retireSceneReferences()) return false;
+        context.simulation.InvalidateWorldZoneReadiness();
         context.rtScene.Destroy();
         context.sceneProfile = previousProfile;
         context.executionBackend = previousBackend;
@@ -6914,6 +6917,7 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         const horde::gameplay::ShowcaseCheckpoint& checkpoint = *checkpointPointer;
         if (checkpoint.id >= 100)
         {
+            horde::vulkan::raytracing::PublishDevelopmentWorldReadiness(context.simulation,context.rtScene);
             const auto* development =
                 horde::gameplay::FindDevelopmentCheckpoint(context.developmentCheckpoint);
             if (development == nullptr ||
@@ -7640,7 +7644,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
                                  horde::gameplay::simulation::ProductionGameSimulationConfig());
     if (context.developmentRescueJourney)
     {
-        context.simulation.SetDevelopmentRescueJourney(true);
+        context.simulation.SetDevelopmentRescueJourney(true,true);
         context.developmentWorldRoute = true; // Scene route only; simulation route owns no teleport.
     }
     if (context.developmentVerticalProof)

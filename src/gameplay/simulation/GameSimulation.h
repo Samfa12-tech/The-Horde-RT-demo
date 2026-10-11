@@ -23,6 +23,7 @@
 #include "gameplay/simulation/SimulationSnapshot.h"
 #include "gameplay/simulation/DevelopmentSupportFixture.h"
 #include "gameplay/simulation/DevelopmentWorldRoute.h"
+#include "gameplay/simulation/TriangleSupportSurface.h"
 #include "gameplay/traversal/DevelopmentRescueJourney.h"
 
 namespace horde::gameplay::validation
@@ -60,6 +61,7 @@ struct GameSimulationConfig
     bool developmentSupportFixture = false;
     bool developmentWorldRoute = false;
     bool developmentRescueJourney = false;
+    bool authoredChapterTerrain = false; // Live applications; historical route fixtures stay explicit.
     // Current development gameplay; legacy constructor/capture fixtures retain
     // their authored rules unless the live application profile selects this.
     bool combatFoundation1_7 = false;
@@ -110,7 +112,8 @@ public:
     // Owner-thread development control; invalidates previous support immediately.
     void SetDevelopmentSupportFixture(bool enabled, std::uint64_t generation);
     void SetDevelopmentWorldRoute(bool enabled, bool stagedPreparation = false);
-    void SetDevelopmentRescueJourney(bool enabled);
+    void SetDevelopmentRescueJourney(bool enabled, bool authoredTerrain = false);
+    bool PublishChapterTerrain(WorldZoneToken token, std::shared_ptr<const TriangleSupportSurface> terrain);
     bool PublishWorldZoneReadiness(WorldZoneToken token, ZoneReadiness readiness);
     void InvalidateWorldZoneReadiness();
     void ResetRoute();
@@ -284,6 +287,8 @@ private:
 
     PlayerSupportResolution playerSupport_{};
     WorldRouteState worldRoute_{};
+    std::shared_ptr<const TriangleSupportSurface> chapterTerrain_;
+    std::uint64_t chapterTerrainGeneration_=0;
     horde::gameplay::traversal::RescueTraversal rescueTraversal_{};
     float rescueOpeningSeconds_ = 0.0f;
     bool rescueMovementSuppressedThisTick_ = false;

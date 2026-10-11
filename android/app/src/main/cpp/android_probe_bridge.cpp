@@ -1776,7 +1776,7 @@ void ApplyDebugCheckpointSimulation(
                 gGameSimulation, *selection.development, &evidence,
                 observation != nullptr ? &stepObservation : nullptr);
         if (rescueJourneyCheckpoint)
-            gGameSimulation.SetDevelopmentRescueJourney(true);
+            gGameSimulation.SetDevelopmentRescueJourney(true,true);
         if (selection.development->combatPose ==
             horde::gameplay::DevelopmentCombatPose::ParryActive)
         {
@@ -3341,6 +3341,7 @@ bool RebuildDevelopmentSupportFixtureOnOwner(
         context.rtFrameEvidenceInitialised = false;
     }
 
+    gGameSimulation.InvalidateWorldZoneReadiness();
     context.rtScene.Destroy();
     context.developmentSupportFixtureOverride = requestedFixture;
     context.developmentWorldRouteOverride=requestedWorld;
@@ -3355,6 +3356,7 @@ bool RebuildDevelopmentSupportFixtureOnOwner(
         if (rebuildIdleResult == VK_SUCCESS && rebuildEvidenceCompleted &&
             vkResetCommandPool(context.device, context.commandPool, 0) == VK_SUCCESS)
         {
+            gGameSimulation.InvalidateWorldZoneReadiness();
             context.rtScene.Destroy();
         }
         context.entryHandoff.FailLoad();
@@ -3559,6 +3561,7 @@ bool DestroySwapchainContext(SwapchainContext& context)
     }
     CancelActiveInAppBenchmark(context);
     DestroyRtEvidenceOnOwnerThread(context);
+    gGameSimulation.InvalidateWorldZoneReadiness();
     context.rtScene.Destroy();
     if (context.compiledPipelineCache != nullptr)
     {
@@ -4767,6 +4770,7 @@ GlassGeometryApplyResult ApplyGlassGeometryOnOwner(
     // One scene, same backend/provider/compiled optics. The fifth setting owns
     // actual admitted geometry; a combined scale uses this one new extent.
     const auto destroyStart = GraphicsSteadyNs();
+    gGameSimulation.InvalidateWorldZoneReadiness();
     context.rtScene.Destroy();
     context.graphicsLatency.destroyMilliseconds += GraphicsElapsedMs(destroyStart, GraphicsSteadyNs());
     context.graphicsSettings = requested;
@@ -4781,6 +4785,7 @@ GlassGeometryApplyResult ApplyGlassGeometryOnOwner(
         // their real retirement too; never destroy/fallback after failed idle.
         if (!drainAndReset()) return GlassGeometryApplyResult::Fatal;
         const auto rollbackDestroyStart = GraphicsSteadyNs();
+        gGameSimulation.InvalidateWorldZoneReadiness();
         context.rtScene.Destroy();
         context.graphicsLatency.destroyMilliseconds += GraphicsElapsedMs(rollbackDestroyStart, GraphicsSteadyNs());
         context.graphicsSettings = previous;
@@ -4839,6 +4844,7 @@ bool ApplySceneProfileOnOwner(SwapchainContext& context, const PreviewControls c
         (void)context.rtFrameEvidence.Destroy();
         context.rtFrameEvidenceInitialised = false;
     }
+    gGameSimulation.InvalidateWorldZoneReadiness();
     context.rtScene.Destroy(); // One active GPU scene; no simulation/reset constructor.
     context.sceneProfile = desired;
     if (!InitialiseRtSceneForSwapchain(context))
@@ -4849,6 +4855,7 @@ bool ApplySceneProfileOnOwner(SwapchainContext& context, const PreviewControls c
         if (!CompleteRtEvidenceAfterDeviceIdle(context, rollbackIdle) ||
             vkResetCommandPool(context.device, context.commandPool, 0) != VK_SUCCESS)
             return false;
+        gGameSimulation.InvalidateWorldZoneReadiness();
         context.rtScene.Destroy();
         context.sceneProfile = previous;
         if (!InitialiseRtSceneForSwapchain(context)) return false;

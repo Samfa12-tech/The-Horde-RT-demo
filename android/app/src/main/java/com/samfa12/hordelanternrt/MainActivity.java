@@ -700,6 +700,13 @@ public class MainActivity extends Activity {
                     stageAsset("models/world/runtime/chapter-entry-return-v1/collapsed-entry-lod0.runtime.glb",
                             "models/world/runtime/chapter-entry-return-v1/collapsed-entry-lod0.runtime.glb");
             if (!chapterEntryStaged) throw new IllegalStateException("Required chapter-entry runtime assets could not be staged.");
+            final boolean chapterTerrainStaged =
+                    stageAsset("models/world/runtime/chapter-terrain-v1/asset.manifest.json", "models/world/runtime/chapter-terrain-v1/asset.manifest.json") &&
+                    stageAsset("models/world/runtime/chapter-terrain-v1/chapter-terrain-lod0.runtime.glb", "models/world/runtime/chapter-terrain-v1/chapter-terrain-lod0.runtime.glb") &&
+                    stageAsset("textures/props/runtime/chapter-terrain/base-color.android.ktx2", "textures/props/runtime/chapter-terrain/base-color.android.ktx2") &&
+                    stageAsset("textures/props/runtime/chapter-terrain/normal.android.ktx2", "textures/props/runtime/chapter-terrain/normal.android.ktx2") &&
+                    stageAsset("textures/props/runtime/chapter-terrain/orm.android.ktx2", "textures/props/runtime/chapter-terrain/orm.android.ktx2");
+            if (!chapterTerrainStaged) throw new IllegalStateException("Required authored terrain assets could not be staged.");
             final boolean forestTreesStaged =
                     stageAsset("models/world/runtime/forest-tree-pair-v1/asset.manifest.json", "models/world/runtime/forest-tree-pair-v1/asset.manifest.json") &&
                     stageAsset("models/world/runtime/forest-tree-pair-v1/runtime-roster.json", "models/world/runtime/forest-tree-pair-v1/runtime-roster.json") &&
