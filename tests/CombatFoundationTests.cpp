@@ -175,6 +175,34 @@ void KeeperContract() {
     LichEncounter legacy; legacy.ImportCombatCheckpoint();
     Check(effects::KeeperShaderPresentationKind(true,legacy.Snapshot())==2.0f,
           "historical imported captures preserve their presentation discriminator");
+    {
+        LichEncounter chapter = keeper;
+        chapter.SetChapterDeathPresentation(true);
+        for (int tick = 0; tick < 193; ++tick)
+            chapter.Update(1.0f/60, target.x+4, target.z, true, true);
+        Check(chapter.Snapshot().deathAnimationComplete && chapter.Snapshot().deathDissolveProgress==0,
+              "chapter corpse retains the complete death clip and short settled hold");
+        for (int tick = 0; tick < 23; ++tick)
+            chapter.Update(1.0f/60, target.x+4, target.z, true, true);
+        const float dissolve = chapter.Snapshot().deathDissolveProgress;
+        Check(dissolve>0 && dissolve<1,
+              "chapter corpse has a bounded visible dissolve before actor-slot retirement");
+        for (int tick = 0; tick < 20; ++tick)
+            chapter.Update(0, target.x+4, target.z, true, true);
+        Check(chapter.Snapshot().deathDissolveProgress==dissolve,
+              "paused presentation cannot advance corpse retirement");
+        for (int tick = 0; tick < 120; ++tick)
+            chapter.Update(1.0f/60, target.x+4, target.z, true, true);
+        Check(chapter.Snapshot().deathDissolveProgress==1 && chapter.Snapshot().health==0 &&
+              !chapter.Snapshot().damagePulse && !chapter.Snapshot().dischargeWarningPulse,
+              "chapter retirement completes without changing defeat or rearming damage");
+        chapter.BeginRetryRecognition();
+        Check(chapter.Snapshot().deathDissolveProgress==0 && chapter.Snapshot().health==3,
+              "retry reconstructs a visible living Keeper");
+        chapter.ImportCombatCheckpoint();
+        Check(chapter.Snapshot().deathDissolveProgress==0,
+              "legacy import clears chapter-only dissolve state");
+    }
     for(int i=0;i<180;++i) {
         keeper.Update(1.0f/60,target.x+4,target.z,true,true);
         Check(!keeper.Snapshot().damagePulse&&!keeper.Snapshot().dischargeWarningPulse,"dead Keeper never replays queued damage");

@@ -13,8 +13,14 @@ at `d24a9971` passes all six exact-commit CI jobs. The subsequent
 records the owner-reproduced root gaps and false lookout wall retraction,
 native fixes, actual RT gallery and artifact identities. The 64-tree placement
 is an intermediate density/grounding checkpoint, not final forest-road canopy
-acceptance. Fuller trees, visible Kit, streaming and complete chapter inspection
-remain required; researching Easy Tree does not yet establish native admission.
+acceptance. The owner subsequently deferred tree-generator/replacement-canopy
+work until after this goal. Keep the grounded supplied trees for this chapter;
+the private Easy Tree trial is not admitted. Visible Kit, streaming and complete
+chapter inspection remain required.
+
+The next bounded milestone adds [chapter Keeper retirement and submission-safe
+refits](../evidence/2026-10-11-keeper-retirement/README.md), with inspected matched
+Pipeline/QueryCompute frames. It does not yet admit Kit or claim GPU streaming.
 
 Latest implementation evidence (11 October): [authored live terrain and forest
 ground](../evidence/2026-10-11-chapter-live-terrain/README.md) at `278ea604`,

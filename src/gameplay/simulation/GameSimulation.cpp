@@ -84,6 +84,7 @@ GameSimulation::GameSimulation(GameSimulationConfig config)
     }
     combatTeaching_.Reset(config_.combatFoundation1_7);
     lichEncounter_.SetReadableCombat(CurrentCombatRules());
+    lichEncounter_.SetChapterDeathPresentation(config_.developmentRescueJourney && CurrentCombatRules());
     enemyDirector_.Reset();
     activeEnemyKind_ = enemyDirector_.Snapshot().selectedEnemy;
     if (config_.waterfallSkeletonEncounter)
@@ -1346,6 +1347,7 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
     activeEnemyKind_ = enemyDirector_.Snapshot().selectedEnemy;
     lichEncounter_ = state.lichEncounter;
     lichEncounter_.SetReadableCombat(CurrentCombatRules());
+    lichEncounter_.SetChapterDeathPresentation(config_.developmentRescueJourney && CurrentCombatRules());
     if (isRetry && !config_.developmentWorldRoute && checkpoint->preset == ShowcaseCheckpointPreset::LichActive)
     {
         playerX_ = kKeeperRetryPosition.x;

@@ -167,6 +167,37 @@ inline bool StageDevelopmentCheckpointSimulation(
     input.torchLightStrength = 1.8f;
     stepFixed(input, 0.0f,
               gameSimulation.Snapshot().inputPublicationSequence + 1u);
+    if (checkpoint.keeperDeathFixedTicks != 0u)
+    {
+        if (!gameSimulation.config_.developmentRescueJourney ||
+            checkpoint.keeperDeathFixedTicks > 360u) return finalize(false);
+        // Explicit diagnostic setup, not evidence of a player-completed fight.
+        // Preserve legacy checkpoint imports. This separate seed uses live
+        // recognition, accepted-hit lockout and the actual death clock.
+        gameSimulation.legacyCombatCheckpoint_ = false;
+        auto& keeper = gameSimulation.lichEncounter_;
+        keeper.SetReadableCombat(true);
+        keeper.SetChapterDeathPresentation(true);
+        keeper.BeginRetryRecognition();
+        constexpr float tickSeconds = 1.0f / 60.0f;
+        for (int tick = 0; tick < 180 && !keeper.Snapshot().revealComplete; ++tick)
+            keeper.Update(tickSeconds, checkpoint.cameraX, checkpoint.cameraZ, false, true);
+        keeper.Update(tickSeconds, checkpoint.cameraX, checkpoint.cameraZ, false, true);
+        for (int hit = 0; hit < 3; ++hit)
+        {
+            if (!keeper.TryAcceptPlayerHit(keeper.Snapshot().x, keeper.Snapshot().z))
+                return finalize(false);
+            if (hit < 2)
+                for (int tick = 0; tick < 120; ++tick)
+                    keeper.Update(tickSeconds, checkpoint.cameraX, checkpoint.cameraZ, false, true);
+        }
+        if (gameSimulation.finaleSequence_.NotifyLichDefeated())
+            gameSimulation.chestRewardSequence_.BeginUnlockCountdown();
+        input.tutorialEnabled = false;
+        for (std::uint32_t tick = 0; tick < checkpoint.keeperDeathFixedTicks; ++tick)
+            stepFixed(input, tickSeconds, gameSimulation.Snapshot().inputPublicationSequence + 1u);
+        return finalize(gameSimulation.Snapshot().lich.phase == LichPhase::Dead);
+    }
     if (checkpoint.stagesUnlockedChest)
     {
         using namespace horde::gameplay::interactions;

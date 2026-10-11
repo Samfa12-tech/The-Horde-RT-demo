@@ -52,6 +52,7 @@ struct CharacterFramePlan
     float lichTime = 0.0f;
     float lichStaffLiftRadians = 0.0f;
     float lichStaffCastRadians = 0.0f;
+    float lichDissolveProgress = 0.0f;
     VkTransformMatrixKHR lichTransform{{
         1.0f, 0.0f, 0.0f, 0.0f,
         0.0f, 1.0f, 0.0f, 0.0f,
@@ -111,6 +112,8 @@ public:
     std::array<float, 3u> LichStaffWorldPosition(const horde::gameplay::LichSnapshot& lich) const;
 
     CharacterBlasRefit PendingRefit() const { return pendingRefit_; }
+    // Called only after the owning frame was successfully submitted.
+    void NotifyFrameSubmitted() noexcept { pendingRefit_ = CharacterBlasRefit::None; }
 
     RtUpdatableTriangleBlas& SkeletonGpu(std::size_t bucket = 0u) { return skeletonGpus_.at(bucket); }
     const RtUpdatableTriangleBlas& SkeletonGpu(std::size_t bucket = 0u) const { return skeletonGpus_.at(bucket); }
@@ -145,6 +148,7 @@ private:
     float lastLichUpdateTime_ = -1.0f;
     float lastLichStaffLiftRadians_ = -1.0f;
     float lastLichStaffCastRadians_ = -1.0f;
+    float lastLichDissolveProgress_ = -1.0f;
     int lastLichClip_ = -1;
     CharacterBlasRefit pendingRefit_ = CharacterBlasRefit::None;
     std::size_t skeletonPoseBucketCount_ = 0u;

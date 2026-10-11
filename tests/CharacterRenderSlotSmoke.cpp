@@ -7,6 +7,7 @@
 #include "vulkan/raytracing/TlasInstanceRefresh.h"
 #include "platform/android/AndroidRtLabState.h"
 #include "KeeperLowerBodyWitnesses.h"
+#include "scene/TriangleDissolve.h"
 
 #include <cmath>
 #include <atomic>
@@ -593,6 +594,66 @@ int main()
     ok &= Require(backtrackPlan.lichVisible && backtrackPlan.skeletonCount == 2u &&
                   backtrackPlan.lichClip == horde::scene::SkinnedClip::Dead,
                   "backtracking to the waterfall hid the Keeper corpse or either skeleton snapshot");
+    {
+        auto chapterKeeper = lich;
+        chapterKeeper.deathAnimationComplete = true;
+        chapterKeeper.deathDissolveProgress = .5f;
+        const auto dissolving = EvaluateCharacterFramePlan(
+            keeperSnapshots, keeperSnapshots.size(), backtrackRoster, chapterKeeper, 2.967f);
+        ok &= Require(dissolving.lichVisible && dissolving.lichDissolveProgress == .5f &&
+                      dissolving.skeletonCount == 2u,
+                      "chapter dissolve must retain the full independent skeleton roster");
+        chapterKeeper.deathDissolveProgress = 1.0f;
+        const auto retired = EvaluateCharacterFramePlan(
+            keeperSnapshots, keeperSnapshots.size(), roster, chapterKeeper, 2.967f);
+        ok &= Require(!retired.lichVisible && retired.skeletonCount == 2u &&
+                      retired.skeletons[0].clip == horde::scene::SkeletonClip::Dead,
+                      "completed chapter death cannot be resurrected by Keeper roster selection");
+        chapterKeeper.deathAnimationComplete = false;
+        ok &= Require(EvaluateCharacterFramePlan(keeperSnapshots, keeperSnapshots.size(), roster,
+                      chapterKeeper, 2.967f).lichVisible,
+                      "retirement cannot skip the authoritative death animation");
+
+        std::array<horde::scene::TexturedSkinnedRtVertex, 6> original{};
+        for (std::size_t i=0; i<original.size(); ++i) {
+            original[i].position[0] = static_cast<float>(i%3);
+            original[i].position[1] = i%3 == 1u ? 2.0f : 0.0f;
+            original[i].position[2] = static_cast<float>(i/3);
+            original[i].normal[2] = 1.0f; original[i].texcoord[0] = static_cast<float>(i);
+        }
+        auto zero = original;
+        ok &= Require(horde::scene::ApplyTriangleDissolve(std::span(zero), 0.0f) &&
+                      std::memcmp(zero.data(), original.data(), sizeof(original)) == 0,
+                      "zero dissolve must preserve exact legacy skinned bytes");
+        auto invalid = original;
+        ok &= Require(!horde::scene::ApplyTriangleDissolve(std::span(invalid).first(5), .5f) &&
+                      std::memcmp(invalid.data(), original.data(), sizeof(original)) == 0 &&
+                      !horde::scene::ApplyTriangleDissolve(std::span(invalid), NAN),
+                      "invalid dissolve input must be rejected before modifying geometry");
+        float previousExtent = 100.0f;
+        for (int step=0; step<=24; ++step) {
+            auto sample = original;
+            auto repeat = original;
+            const float progress = static_cast<float>(step)/24.0f;
+            ok &= Require(horde::scene::ApplyTriangleDissolve(std::span(sample), progress) &&
+                          horde::scene::ApplyTriangleDissolve(std::span(repeat), progress) &&
+                          std::memcmp(sample.data(), repeat.data(), sizeof(sample)) == 0,
+                          "bounded dissolve must be deterministic without a render-time clock");
+            float extent = 0.0f;
+            for (std::size_t i=0; i<sample.size(); ++i) {
+                extent += std::abs(sample[i].position[0]-1.0f);
+                ok &= Require(sample[i].position[0]>=0 && sample[i].position[0]<=2 &&
+                              sample[i].position[1]>=0 && sample[i].position[1]<=2 &&
+                              sample[i].position[2]==original[i].position[2] &&
+                              std::memcmp(sample[i].normal,original[i].normal,sizeof(sample[i].normal))==0 &&
+                              std::memcmp(sample[i].texcoord,original[i].texcoord,sizeof(sample[i].texcoord))==0,
+                              "dissolve must remain inside source triangles without changing normals/UVs");
+            }
+            ok &= Require(extent<=previousExtent,"dissolve cannot re-expand or resurrect geometry");
+            previousExtent=extent;
+        }
+        ok &= Require(previousExtent==0,"completed triangles collapse to their own centres");
+    }
 
     constexpr float interval = 1.0f / 30.0f;
     ok &= Require(CharacterPoseNeedsRefresh(1, 1.0f, -1, -1.0f), "first pose must refresh");
@@ -1849,6 +1910,34 @@ int main()
                           diagnostic),
                       diagnostic.c_str());
         ok &= Require(slot.PrepareInitialGeometry(diagnostic), diagnostic.c_str());
+        {
+            // Real native skinning/host upload with CPU-backed coherent memory;
+            // no Vulkan submission is claimed by this failed-record regression.
+            std::vector<std::byte> memory(slot.LichVertices().size()*sizeof(horde::scene::TexturedSkinnedRtVertex));
+            auto& buffer=slot.LichGpu().vertices;
+            buffer.memory=(VkDeviceMemory)1;
+            buffer.size=memory.size();buffer.mappedWriteData=memory.data();
+            RtGpuResources resources;
+            LichSnapshot dying;
+            dying.phase=LichPhase::Dead;dying.deathAnimationComplete=true;
+            dying.animationTime=LichEncounter::kDeathAnimationDuration;dying.deathDissolveProgress=.5f;
+            EnemyRosterSnapshot keeperRoster;keeperRoster.selectedEnemy=EnemyKind::Lich;
+            ok &= Require(slot.PrepareFrame(skeletons,0u,keeperRoster,dying,resources,diagnostic) &&
+                          HasCharacterBlasRefit(slot.PendingRefit(),CharacterBlasRefit::Lich),
+                          "dissolved native vertices require a matching BLAS refit");
+            const auto written=memory;
+            ok &= Require(slot.PrepareFrame(skeletons,0u,keeperRoster,dying,resources,diagnostic) &&
+                          memory==written && HasCharacterBlasRefit(slot.PendingRefit(),CharacterBlasRefit::Lich),
+                          "abandoned recording must retry an unchanged uploaded pose's refit");
+            slot.NotifyFrameSubmitted();
+            ok &= Require(slot.PendingRefit()==CharacterBlasRefit::None &&
+                          slot.PrepareFrame(skeletons,0u,keeperRoster,dying,resources,diagnostic) &&
+                          slot.PendingRefit()==CharacterBlasRefit::None,
+                          "submitted frozen pose must not redundantly refit");
+            buffer={};
+            // Restore this fixture's neutral CPU pose for the later staff tests.
+            ok &= Require(slot.PrepareInitialGeometry(diagnostic),diagnostic.c_str());
+        }
         EnemyRosterSnapshot spareCapacityRoster;
         spareCapacityRoster.renderedEnemyCapacity = 8u;
         spareCapacityRoster.renderedEnemyCount = 1u;

@@ -1,6 +1,7 @@
 #include "vulkan/raytracing/CharacterRenderSlot.h"
 #include "vulkan/raytracing/RtSceneRecordObservation.h"
 #include "scene/SkeletonRenderPose.h"
+#include "scene/TriangleDissolve.h"
 
 #include <algorithm>
 #include <cmath>
@@ -72,6 +73,13 @@ CharacterFramePlan EvaluateCharacterFramePlan(
     CharacterFramePlan plan;
     plan.lichVisible = roster.selectedEnemy == horde::gameplay::EnemyKind::Lich ||
         lich.phase != horde::gameplay::LichPhase::Dormant;
+    if (lich.phase == horde::gameplay::LichPhase::Dead && lich.deathAnimationComplete &&
+        std::isfinite(lich.deathDissolveProgress)) {
+        // At most 24 additional skinned/refitted poses over the short dissolve.
+        // No extra geometry, shader variant, material or light is introduced.
+        plan.lichDissolveProgress = std::floor(std::clamp(lich.deathDissolveProgress, 0.0f, 1.0f)*24.0f)/24.0f;
+        if (lich.deathDissolveProgress >= 1.0f) plan.lichVisible = false;
+    }
     plan.lichClip = lich.phase == horde::gameplay::LichPhase::Dead
         ? horde::scene::SkinnedClip::Dead
         : horde::scene::SkinnedClip::Idle;
@@ -247,7 +255,8 @@ bool CharacterRenderSlot::PrepareFrame(
     std::string& diagnostic,
     RtSceneRecordObservation* observation)
 {
-    pendingRefit_ = CharacterBlasRefit::None;
+    // Host writes survive an abandoned recording or failed queue submission.
+    // Keep their refits pending until the submission owner acknowledges them.
     if (!CacheFramePlan(skeletons, skeletonCount, roster, lich, diagnostic))
     {
         return false;
@@ -308,7 +317,7 @@ bool CharacterRenderSlot::PrepareFrame(
         const bool castPoseChanged =
             std::abs(framePlan.lichStaffLiftRadians - lastLichStaffLiftRadians_) > 0.0001f ||
             std::abs(framePlan.lichStaffCastRadians - lastLichStaffCastRadians_) > 0.0001f;
-        if (castPoseChanged || CharacterPoseNeedsRefresh(
+        if (castPoseChanged || framePlan.lichDissolveProgress != lastLichDissolveProgress_ || CharacterPoseNeedsRefresh(
                 clipIndex, framePlan.lichTime, lastLichClip_, lastLichUpdateTime_))
         {
             RtSceneStageScope skinScope(
@@ -335,6 +344,12 @@ bool CharacterRenderSlot::PrepareFrame(
                 skinScope.Cancel();
                 return false;
             }
+            if (!horde::scene::ApplyTriangleDissolve(
+                    std::span(lichSkinnedVertices_), framePlan.lichDissolveProgress)) {
+                diagnostic = "Textured character dissolve requires finite progress and a triangle stream.";
+                skinScope.Cancel();
+                return false;
+            }
             skinScope.Complete(1u);
             const VkDeviceSize byteSize = sizeof(horde::scene::TexturedSkinnedRtVertex) * lichSkinnedVertices_.size();
             if (!resources.WriteBuffer(lichGpu_.vertices, lichSkinnedVertices_.data(), byteSize,
@@ -347,6 +362,7 @@ bool CharacterRenderSlot::PrepareFrame(
             lastLichClip_ = clipIndex;
             lastLichStaffLiftRadians_ = framePlan.lichStaffLiftRadians;
             lastLichStaffCastRadians_ = framePlan.lichStaffCastRadians;
+            lastLichDissolveProgress_ = framePlan.lichDissolveProgress;
             pendingRefit_ = pendingRefit_ | CharacterBlasRefit::Lich;
         }
     }
@@ -433,6 +449,7 @@ void CharacterRenderSlot::DestroyGpuResources(const RtGpuResources& resources)
     lastLichUpdateTime_ = -1.0f;
     lastLichStaffLiftRadians_ = -1.0f;
     lastLichStaffCastRadians_ = -1.0f;
+    lastLichDissolveProgress_ = -1.0f;
     lastLichClip_ = -1;
     pendingRefit_ = CharacterBlasRefit::None;
     skeletonPoseBucketCount_ = 0u;

@@ -66,8 +66,8 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 84u,
-          "development registry retains prior views plus three bounded woodland route inspections");
+    Check(kDevelopmentCheckpoints.size() == 87u,
+          "development registry retains prior views plus three bounded Keeper death inspections");
     Check(FindDevelopmentCheckpoint(164) == nullptr,
           "development lookup preserves the unassigned gap before later bounded additions");
     const auto* worldRoute = FindDevelopmentCheckpoint("world-route");
@@ -113,7 +113,27 @@ int main()
               !forest->primaryArmsMayBeOutsideFrame,
               "woodland views require real rescue/native-route staging and retain strict equipment visibility");
     }
-    Check(FindDevelopmentCheckpoint(204) == nullptr &&
+    float previousDissolve = -1.0f;
+    for (const auto name : {"chapter-keeper-death-held", "chapter-keeper-death-dissolve", "chapter-keeper-death-retired"})
+    {
+        const auto* death = FindDevelopmentCheckpoint(name);
+        auto config = simulation::ProductionGameSimulationConfig();
+        config.developmentRescueJourney = true;
+        simulation::GameSimulation staged(config);
+        Check(death && StageDevelopmentCheckpointSimulation(staged, *death),
+              "chapter death capture stages an accepted lethal hit and fixed-step presentation");
+        const auto& keeper = staged.Snapshot().lich;
+        Check(keeper.phase == LichPhase::Dead && keeper.deathAnimationComplete &&
+                  keeper.deathDissolveProgress > previousDissolve && !keeper.damagePulse,
+              "matched death stages preserve completed animation and progress without damage");
+        Check(staged.Snapshot().finale.lichDefeated &&
+                  staged.Snapshot().chestReward.phase == interactions::ChestRewardPhase::ClosedUnlocked,
+              "death seed preserves the actual defeat and chest-unlock owners for scene lighting");
+        if (death && death->id == 204) Check(keeper.deathDissolveProgress == 0.0f, "held corpse precedes dissolve");
+        if (death && death->id == 206) Check(keeper.deathDissolveProgress == 1.0f, "last capture retires corpse");
+        previousDissolve = keeper.deathDissolveProgress;
+    }
+    Check(FindDevelopmentCheckpoint(207) == nullptr &&
               FindDevelopmentCheckpoint("rescue-journey-unknown") == nullptr,
           "development lookup rejects genuinely unknown IDs and names beyond the woodland inspections");
     const auto* torchParry = FindDevelopmentCheckpoint("player-torch-parry-clearance");

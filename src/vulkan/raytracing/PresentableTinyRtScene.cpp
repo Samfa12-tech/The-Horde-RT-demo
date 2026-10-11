@@ -7564,6 +7564,7 @@ bool PresentableTinyRtScene::WriteDustQuality(const RtQualityControlsGpu& qualit
 
 void PresentableTinyRtScene::NotifyFrameSubmitted() noexcept
 {
+    characterSlot_.NotifyFrameSubmitted();
     if (!tlasPendingDefinitionsValid_) return;
     tlasBuiltInstances_ = tlasPendingInstances_;
     tlasInstanceDefinitionsValid_ = true;

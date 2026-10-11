@@ -61,9 +61,20 @@ struct DevelopmentCheckpoint
     bool stagedWorldPreparation = false;
     bool stagesRescueExterior = false;
     std::size_t exteriorRouteStation = 2u;
+    // Chapter-only diagnostic seed: accepted lethal hit, then real fixed ticks.
+    std::uint32_t keeperDeathFixedTicks = 0u;
 };
 
-inline constexpr std::array<DevelopmentCheckpoint, 84u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 87u> kDevelopmentCheckpoints{{
+    {.id = 204, .name = "chapter-keeper-death-held", .baseShowcaseCheckpointId = 10,
+     .cameraX = -31.9f, .cameraZ = -15.2f, .yaw = -1.57079632679f, .pitch = -0.35f,
+     .keeperDeathFixedTicks = 193u},
+    {.id = 205, .name = "chapter-keeper-death-dissolve", .baseShowcaseCheckpointId = 10,
+     .cameraX = -31.9f, .cameraZ = -15.2f, .yaw = -1.57079632679f, .pitch = -0.35f,
+     .keeperDeathFixedTicks = 216u},
+    {.id = 206, .name = "chapter-keeper-death-retired", .baseShowcaseCheckpointId = 10,
+     .cameraX = -31.9f, .cameraZ = -15.2f, .yaw = -1.57079632679f, .pitch = -0.35f,
+     .keeperDeathFixedTicks = 240u},
     {.id = 201, .name = "chapter-forest-first-bend", .baseShowcaseCheckpointId = 11,
      .cameraX = -15.7f, .cameraZ = .2f, .yaw = -3.009f, .pitch = -0.15f,
      .stagesRescueExterior = true, .exteriorRouteStation = 4u},

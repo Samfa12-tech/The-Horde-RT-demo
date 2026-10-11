@@ -534,6 +534,8 @@ struct LichSnapshot
     float roomMistDensityScale = 1.0f;
     bool hitPulse = false;
     bool deathAnimationComplete = false;
+    // Chapter-only presentation lifetime. Gameplay death/rewards are separate.
+    float deathDissolveProgress = 0.0f;
     FinaleEndingPhase finaleEndingPhase = FinaleEndingPhase::Inactive;
 };
 
@@ -541,6 +543,7 @@ class LichEncounter
 {
 public:
     void SetReadableCombat(bool enabled) { readableCombat_ = enabled; }
+    void SetChapterDeathPresentation(bool enabled) { chapterDeathPresentation_ = enabled; }
     LichEncounter() { Reset(); }
 
     const LichSnapshot& Update(float deltaSeconds, float playerX, float playerZ,
@@ -566,6 +569,10 @@ public:
         {
             deathPresentationTime_ = std::min(kDeathAnimationDuration + kMistDeathDelay + kMistDeathFade,
                                             deathPresentationTime_ + deltaSeconds);
+            snapshot_.deathDissolveProgress = chapterDeathPresentation_ && !legacyCapture_
+                ? std::clamp((deathPresentationTime_ - kDeathAnimationDuration - kDeathDissolveHold) /
+                                 kDeathDissolveDuration, 0.0f, 1.0f)
+                : 0.0f;
             if (readableCombat_ && !legacyCapture_)
                 snapshot_.roomMistDensityScale = 1.0f - SmoothStep(
                     (deathPresentationTime_ - kDeathAnimationDuration - kMistDeathDelay) / kMistDeathFade);
@@ -794,6 +801,8 @@ public:
     static constexpr float kChargeAnticipationTiltRadians = 0.10f;
     static constexpr float kRecoveryDuration = 1.80f;
     static constexpr float kDeathAnimationDuration = 2.967f;
+    static constexpr float kDeathDissolveHold = 0.25f;
+    static constexpr float kDeathDissolveDuration = 0.75f;
     static constexpr float kMistDeathDelay = 1.0f;
     static constexpr float kMistDeathFade = 1.0f;
     static constexpr float kFinaleSkylightOpenDuration =
@@ -968,6 +977,7 @@ private:
     float deathStartY_ = kBaseY;
     float deathPresentationTime_ = 0.0f;
     bool legacyCapture_ = false;
+    bool chapterDeathPresentation_ = false;
 };
 
 } // namespace horde::gameplay
