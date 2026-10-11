@@ -89,8 +89,21 @@ Android Debug APK: `29de9f8cb9bd1b1766b6d0825d64a1445f9c33ea658e7d591e608db43858
 - Existing untracked `.blend1` remains SHA-256
   `0dae1e8fb803336cef2d045f48c5f4c9195a6463f45161cb0b6c7434350769fb`.
 
-Exact-commit CI will be recorded after the normal push. PR27 remains draft with
-base conflicts; no merge/rebase, release, signing or device install.
+CI on `62a688ae` reproduced an outdated exact texture-inventory expectation in
+`horde_rt_scene_resource_inventory_tests`: it still expected 17/14/14/0 despite
+the admitted Kit family producing 18/15/15/1. The [failed Vulkan job](kit-62a688-vulkan-ci-failed.log)
+is preserved. A freshly rebuilt Windows Release executable reproduced it
+([local failure](kit-resource-inventory-rebuilt-before.log)); an earlier stale
+Debug executable passing was not evidence for current source.
+
+The corrected test retains every capacity/material/primitive assertion and adds
+exact checks that the chapter omits only laboratory row 9, Kit owns row 25, and
+Kit alone owns the mapped emissive image. Rebuilt Debug and Release preflight/
+inventory tests pass 2/2 ([Debug](kit-resource-inventory-debug-after.log),
+[Release](kit-resource-inventory-release-after.log)). No production change or
+deadline increase follows from this correction. Exact final CI is recorded in
+the PR after push. PR27 remains draft with base conflicts; no merge/rebase,
+release, signing or device install.
 
 ## Still required
 

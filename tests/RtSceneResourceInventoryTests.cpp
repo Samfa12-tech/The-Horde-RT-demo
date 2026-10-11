@@ -433,9 +433,9 @@ struct PresentableTinyRtSceneObservationTestAccess
         }
         const auto counts=scene.staticMeshSlot_.TextureArrayCounts();
         const std::array<std::uint32_t,4> layers{{counts.baseColor,counts.normal,counts.orm,counts.emissive}};
-        // No admitted static material references an emissive image. The
-        // packaged emissive array separately retains its one fallback layer.
-        bool ok=layers==std::array<std::uint32_t,4>{{17,14,14,0}};
+        // The admitted Kit maps append one family after the terrain maps;
+        // Kit is the sole mapped emissive owner, replacing the unused fallback.
+        bool ok=layers==std::array<std::uint32_t,4>{{18,15,15,1}};
         const auto& materials=scene.staticMeshSlot_.Materials();
         const auto& primitives=scene.staticMeshSlot_.PrimitiveMetadata();
         std::cout<<"Actual development static admission materials="<<materials.size()
@@ -447,6 +447,16 @@ struct PresentableTinyRtSceneObservationTestAccess
             (scene.pipelineBundle_.Request().quality==DielectricQuality::High?32u:31u);
         ok &= scene.chapterTerrainSurface_ && scene.chapterTerrainSurface_->TriangleCount()==34050u;
         const auto& instances=scene.staticMeshSlot_.InstanceMetadata();
+        ok &= instances[9u].primitiveCount==0u && instances[25u].primitiveCount==1u;
+        const auto kitMaterial=primitives[instances[25u].primitiveBase].materialIndex;
+        std::size_t emissiveOwners=0u;
+        for(std::size_t i=0;i<materials.size();++i) {
+            if((materials[i].materialFlags[0] &
+                static_cast<std::uint32_t>(RtMaterialFlag::EmissiveTexture))==0u) continue;
+            ++emissiveOwners;
+            ok &= i==kitMaterial;
+        }
+        ok &= emissiveOwners==1u;
         for(const char* family:{"ChestWood","BlackIron"}) {
             const auto row=[&](const auto& asset,std::uint32_t owner) {
                 for(std::size_t i=0;i<asset.primitives.size();++i)

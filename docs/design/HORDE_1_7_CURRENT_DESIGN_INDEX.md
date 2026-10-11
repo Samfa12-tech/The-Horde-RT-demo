@@ -15,8 +15,8 @@ native fixes, actual RT gallery and artifact identities. The 64-tree placement
 is an intermediate density/grounding checkpoint, not final forest-road canopy
 acceptance. The owner subsequently deferred tree-generator/replacement-canopy
 work until after this goal. Keep the grounded supplied trees for this chapter;
-the private Easy Tree trial is not admitted. Visible Kit, streaming and complete
-chapter inspection remain required.
+the private Easy Tree trial is not admitted. Kit's latest visible admission is
+recorded below; streaming and complete chapter inspection remain required.
 
 The next bounded milestone adds [chapter Keeper retirement and submission-safe
 refits](../evidence/2026-10-11-keeper-retirement/README.md), with inspected matched
@@ -43,8 +43,9 @@ presentation](../evidence/2026-10-11-android-atlas-startup/README.md).
 These dated receipts supersede earlier uncommitted/pending wording only for
 their tested changes. The owner authorized Poly Haven texture acquisition;
 verified CC0 Forest Ground 01 now replaces masonry on the terrain banks.
-The complete chapter, visible Kit, graveyard/stake, actual GPU zone retirement,
-moon alignment and full route/owner/device acceptance remain unfinished.
+The complete chapter, graveyard/stake, actual GPU zone retirement and full
+route/owner/device acceptance remain unfinished. Later Kit and moon evidence
+below supersedes their earlier absence in this terrain milestone.
 
 The subsequent [Android owner chapter playtest](../evidence/2026-10-11-android-chapter-playtest/README.md)
 is failed/incomplete chapter acceptance despite successful startup. It identifies

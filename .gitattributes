@@ -336,3 +336,4 @@ tests/fixtures/skinned-pbr/generate.py text eol=lf
 
 # Preserve exact native Kit scene capture and validation receipts.
 docs/evidence/2026-10-11-kit-scene-admission/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-11-kit-scene-admission/kit-62a688-vulkan-ci-failed.log whitespace=-trailing-space,-blank-at-eof,cr-at-eol
