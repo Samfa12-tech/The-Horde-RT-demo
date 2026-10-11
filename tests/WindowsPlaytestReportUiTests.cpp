@@ -6,6 +6,7 @@
 #include <string>
 #include <thread>
 #include <vector>
+#include <wct.h>
 
 namespace
 {
@@ -14,6 +15,52 @@ std::atomic<int> exports{0};
 std::atomic<const char*> currentPhase{"startup"};
 std::vector<std::string> approved;
 bool acceptExport = false; // Accessed only by the UI owner thread.
+std::atomic<ULONGLONG> noteEditStarted{0};
+std::atomic<bool> noteEditExecuting{false};
+
+LRESULT CALLBACK TraceNoteEntry(int code, WPARAM value, LPARAM argument)
+{
+    if (code >= 0) {
+        const auto& message = *reinterpret_cast<CWPSTRUCT*>(argument);
+        if (message.message == WM_SETTEXT && GetDlgCtrlID(message.hwnd) == 106) {
+            noteEditStarted.store(GetTickCount64());
+            noteEditExecuting.store(true);
+            std::cerr << "note EDIT enter; phase=" << currentPhase.load() << '\n';
+        }
+    }
+    return CallNextHookEx(nullptr, code, value, argument);
+}
+
+LRESULT CALLBACK TraceNoteReturn(int code, WPARAM value, LPARAM argument)
+{
+    if (code >= 0) {
+        const auto& message = *reinterpret_cast<CWPRETSTRUCT*>(argument);
+        if (message.message == WM_SETTEXT && GetDlgCtrlID(message.hwnd) == 106) {
+            const auto elapsed = GetTickCount64() - noteEditStarted.load();
+            noteEditExecuting.store(false);
+            std::cerr << "note EDIT returned; elapsedMs=" << elapsed << '\n';
+        }
+    }
+    return CallNextHookEx(nullptr, code, value, argument);
+}
+
+void TraceOwnerWait(DWORD thread)
+{
+    std::cerr << "note EDIT executing=" << noteEditExecuting.load() << '\n';
+    const HWCT session = OpenThreadWaitChainSession(0, nullptr);
+    if (!session) { std::cerr << "wait-chain session error=" << GetLastError() << '\n'; return; }
+    WAITCHAIN_NODE_INFO nodes[WCT_MAX_NODE_COUNT]{};
+    DWORD count = WCT_MAX_NODE_COUNT;
+    BOOL cycle = FALSE;
+    if (GetThreadWaitChain(session, 0, WCTP_GETINFO_ALL_FLAGS, thread, &count, nodes, &cycle)) {
+        std::cerr << "UI wait-chain nodes=" << count << " cycle=" << cycle << '\n';
+        for (DWORD i = 0; i < count; ++i)
+            std::cerr << "  node=" << i << " type=" << nodes[i].ObjectType
+                      << " status=" << nodes[i].ObjectStatus << '\n';
+    } else std::cerr << "wait-chain query error=" << GetLastError() << '\n';
+    // Deliberately omit object names, note text and private process metadata.
+    CloseThreadWaitChainSession(session);
+}
 
 void SetPhase(const char* phase) { currentPhase.store(phase); }
 
@@ -96,6 +143,7 @@ LRESULT Send(HWND window, const UINT message, const WPARAM value = 0, const LPAR
                       << " capture=" << info.hwndCapture;
         }
         std::cerr << '\n';
+        TraceOwnerWait(ownerThread);
         passed.store(false);
     }
     return static_cast<LRESULT>(result);
@@ -127,6 +175,9 @@ int main()
         0, 0, 800, 800, nullptr, nullptr, GetModuleHandleW(nullptr), nullptr);
     if (!owner) return 1;
     const DWORD thread = GetCurrentThreadId();
+    const HHOOK entryTrace = SetWindowsHookExW(WH_CALLWNDPROC, TraceNoteEntry, nullptr, thread);
+    const HHOOK returnTrace = SetWindowsHookExW(WH_CALLWNDPROCRET, TraceNoteReturn, nullptr, thread);
+    Check(entryTrace != nullptr && returnTrace != nullptr, "note UI timing trace hooks unavailable");
     std::thread actions([thread] {
         SetPhase("note-only default and private-content checks");
         const HWND form = WaitForForm(thread);
@@ -192,5 +243,7 @@ int main()
         approved[0].find("\"context\"") != std::string::npos,
         "explicit allowlist context or honest false presentation state missing");
     DestroyWindow(owner);
+    if (entryTrace) UnhookWindowsHookEx(entryTrace);
+    if (returnTrace) UnhookWindowsHookEx(returnTrace);
     return passed.load() ? 0 : 1;
 }
