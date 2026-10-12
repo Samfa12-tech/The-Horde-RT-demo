@@ -260,7 +260,15 @@ int main()
         PostMessageW(note, WM_KEYDOWN, VK_TAB, 0);
         const bool reachedConsent = WaitFor([&] {
             GUITHREADINFO gui{}; gui.cbSize = sizeof(gui);
-            return GetGUIThreadInfo(thread, &gui) != FALSE && gui.hwndFocus == consentControl;
+            // Focus becomes observable before the UI thread finishes scrolling
+            // (and the focus subclass may post that scroll). Observe the whole
+            // completed interaction within the existing deadline, rather than
+            // racing GetWindowRect against SetFocus on the other thread.
+            RECT controlRect{}, bodyRect{};
+            return GetGUIThreadInfo(thread, &gui) != FALSE && gui.hwndFocus == consentControl &&
+                viewport && GetWindowRect(consentControl, &controlRect) &&
+                GetWindowRect(viewport, &bodyRect) && controlRect.top >= bodyRect.top &&
+                controlRect.bottom <= bodyRect.bottom;
         });
         Check(reachedConsent, "nested keyboard tab navigation reaches remote consent");
         GetWindowRect(consentControl, &consent);
