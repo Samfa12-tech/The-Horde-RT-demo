@@ -6,6 +6,7 @@
 
 #include <array>
 #include <cstdint>
+#include <memory>
 #include <span>
 #include <string>
 #include <vector>
@@ -104,8 +105,11 @@ public:
     }
     const RtTextureArrayCounts& TextureArrayCounts() const { return textureArrayCounts_; }
     const RtStaticMeshMeasurements& Measurements() const { return measurements_; }
+    std::uint64_t PayloadBytes() const noexcept;
 
 private:
+    friend class RtStaticMeshCopy;
+    bool admitted_ = false;
     std::array<RtInstanceMetadata, kRtInstanceMetadataCapacity> instanceMetadata_{};
     std::vector<RtPrimitiveMetadata> primitiveMetadata_;
     std::vector<std::uint32_t> primitiveVertexCounts_;
@@ -117,6 +121,29 @@ private:
     std::vector<std::array<float, 12u>> geometryTransforms_;
     RtTextureArrayCounts textureArrayCounts_{};
     RtStaticMeshMeasurements measurements_{};
+};
+
+// Copies an already admitted immutable source across application turns. This
+// pins CPU source data only; no Vulkan work or zone-readiness claim occurs.
+// Caller must own an immutable source: no mutable aliases may write to it
+// throughout the copy. A const shared pointer alone does not enforce this.
+// Each turn copies at most maxBytes of vector payload, in complete records.
+// Reserve/allocator latency is measured separately from the byte guarantee.
+class RtStaticMeshCopy
+{
+public:
+    bool Begin(std::shared_ptr<const RtStaticMeshSlot> source, std::string& diagnostic);
+    bool Advance(std::size_t maxBytes, std::string& diagnostic);
+    bool Ready() const noexcept { return output_ && row_ == 8u; }
+    std::unique_ptr<RtStaticMeshSlot> Take() noexcept;
+    void Cancel() noexcept;
+    std::size_t LastCopiedBytes() const noexcept { return lastBytes_; }
+    std::uint64_t CopiedBytes() const noexcept { return copiedBytes_; }
+private:
+    std::shared_ptr<const RtStaticMeshSlot> source_;
+    std::unique_ptr<RtStaticMeshSlot> output_;
+    std::size_t row_ = 0u, offset_ = 0u, lastBytes_ = 0u;
+    std::uint64_t copiedBytes_ = 0u;
 };
 
 } // namespace horde::vulkan::raytracing

@@ -102,6 +102,7 @@ template<class T> bool SameBytes(const std::vector<T>& a, const std::vector<T>& 
 
 void PresentableTinyRtScene::DestroyPreparedStaticGeometry(PreparedStaticGeometry& owner) noexcept
 {
+    owner.copy.reset();
     owner.uploads.reset();
     DestroyAccelerationStructure(owner.tlas);
     DestroyAccelerationStructure(owner.collapse);
@@ -151,8 +152,27 @@ bool PresentableTinyRtScene::BeginStaticGeometryReplacement(
     auto candidate = std::make_unique<PreparedStaticGeometry>();
     candidate->prepareStart = start;
     candidate->sourceGeneration = expectedGeneration;
+    staticGeometryReplacementMeasurements_ = {};
+    if (retainedWorldFamilies.empty() && fullStaticGeometrySource_) {
+        candidate->copy = std::make_unique<RtStaticMeshCopy>();
+        if (!candidate->copy->Begin(fullStaticGeometrySource_, diagnostic)) return false;
+        candidate->phase = PreparedStaticGeometry::Phase::Copy;
+        preparedStaticGeometry_ = std::move(candidate);
+        diagnostic.clear(); return true;
+    }
     if (!PackLoadedStaticAssets(candidate->slot, retainedWorldFamilies, diagnostic)) return false;
-    const auto& packed = candidate->slot;
+    if (!BeginPreparedStaticUploads(*candidate, diagnostic)) return false;
+    staticGeometryReplacementMeasurements_ = {};
+    staticGeometryReplacementMeasurements_.packMilliseconds =
+        std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-start).count();
+    preparedStaticGeometry_ = std::move(candidate);
+    diagnostic.clear(); return true;
+}
+
+bool PresentableTinyRtScene::BeginPreparedStaticUploads(
+    PreparedStaticGeometry& candidate, std::string& diagnostic)
+{
+    const auto& packed = candidate.slot;
     // Every material/texture identity stays shared, including rows unused by a
     // selected zone. There is no hidden texture expansion or layer relocation.
     const auto& oldCounts = staticMeshSlot_.TextureArrayCounts();
@@ -192,7 +212,7 @@ bool PresentableTinyRtScene::BeginStaticGeometryReplacement(
             }
         }
     }
-    candidate->definitions = tlasBuiltInstances_;
+    candidate.definitions = tlasBuiltInstances_;
     std::array<RtGpuBufferUpload, 6> uploads{};
     const VkBufferUsageFlags storage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
     const VkBufferUsageFlags geometry = storage | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR;
@@ -202,15 +222,12 @@ bool PresentableTinyRtScene::BeginStaticGeometryReplacement(
         {packed.GeometryTransforms().data(), packed.GeometryTransforms().size()*sizeof(packed.GeometryTransforms().front()), VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, true, false, "candidate static transforms", VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT},
         {packed.InstanceMetadata().data(), sizeof(packed.InstanceMetadata()), storage, false, true, "candidate instance metadata", 0},
         {packed.PrimitiveMetadata().data(), packed.PrimitiveMetadata().size()*sizeof(RtPrimitiveMetadata), storage, false, false, "candidate primitive metadata", VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT},
-        {candidate->definitions.data(), sizeof(candidate->definitions), VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, true, true, "candidate TLAS instances", 0}
+        {candidate.definitions.data(), sizeof(candidate.definitions), VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, true, true, "candidate TLAS instances", 0}
     }};
-    candidate->uploads = std::make_unique<RtGpuBufferPreparation>(gpuResources_);
-    if (!candidate->uploads->Begin(uploads, diagnostic)) return false;
-    staticGeometryReplacementMeasurements_ = {};
-    staticGeometryReplacementMeasurements_.packMilliseconds =
-        std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-start).count();
-    preparedStaticGeometry_ = std::move(candidate);
-    diagnostic.clear(); return true;
+    candidate.uploads = std::make_unique<RtGpuBufferPreparation>(gpuResources_);
+    if (!candidate.uploads->Begin(uploads, diagnostic)) return false;
+    candidate.phase = PreparedStaticGeometry::Phase::Upload;
+    return true;
 }
 
 bool PresentableTinyRtScene::AdvanceStaticGeometryReplacement(
@@ -242,6 +259,21 @@ bool PresentableTinyRtScene::AdvanceStaticGeometryReplacement(
         }
         return false;
     };
+    if (candidate->phase == PreparedStaticGeometry::Phase::Copy) {
+        if (!candidate->copy->Advance(static_cast<std::size_t>(std::min<VkDeviceSize>(
+                maxCopyBytes, std::numeric_limits<std::size_t>::max())), diagnostic)) return failBuild();
+        ++evidence.cpuCopyAdvanceCount;
+        evidence.copiedCpuPayloadBytes += candidate->copy->LastCopiedBytes();
+        if (candidate->copy->Ready()) {
+            auto copied = candidate->copy->Take();
+            candidate->slot = std::move(*copied);
+            candidate->copy.reset();
+            if (!BeginPreparedStaticUploads(*candidate, diagnostic)) return failBuild();
+        }
+        evidence.packMilliseconds += std::chrono::duration<double,std::milli>(
+            std::chrono::steady_clock::now()-start).count();
+        return completedStep();
+    }
     if (candidate->phase == PreparedStaticGeometry::Phase::Upload) {
         if (!candidate->uploads->Advance(maxCopyBytes, diagnostic)) return failBuild();
         ++evidence.uploadAdvanceCount;

@@ -6938,14 +6938,29 @@ bool RunStaticGeometryCutoverCapture(VulkanSurfaceContext& context,
             error="Invalid family preparation changed the admitted GPU owner."; return false;
         }
         const std::span<const std::uint32_t> retained{};
-        // Prove cancellation after actual allocation/copy without touching the
-        // admitted scene. Then spread the same owner upload across RT frames.
+        // Prove both CPU-source and actual GPU allocation cancellation before
+        // spreading reconstruction/upload across RT frames.
         if (!context.rtScene.BeginStaticGeometryReplacement(generation,retained,error) ||
             !context.rtScene.AdvanceStaticGeometryReplacement(generation,64u*1024u,error) ||
             !context.rtScene.CancelStaticGeometryReplacement(error) ||
             context.rtScene.ResourceInventory().deviceLocalBytes != before.deviceLocalBytes ||
             context.rtScene.ResourceInventory().hostVisibleBytes != before.hostVisibleBytes) {
             error="Cancelled real candidate did not preserve the admitted allocations."; return false;
+        }
+        if (!context.rtScene.BeginStaticGeometryReplacement(generation,retained,error)) return false;
+        unsigned cancelledPreparationFrames=0;
+        while (context.rtScene.StaticGeometryReplacementEvidence().uploadedBytes==0u) {
+            if (++cancelledPreparationFrames>1024u ||
+                !context.rtScene.AdvanceStaticGeometryReplacement(generation,256u*1024u,error)) return false;
+            bool presented=false;
+            if (!RenderFrame(context,clear,presented) || !presented) {
+                error="Admitted owner failed during cancellation proof: "+context.lastRtFrameError; return false;
+            }
+        }
+        if (!context.rtScene.CancelStaticGeometryReplacement(error) ||
+            context.rtScene.ResourceInventory().deviceLocalBytes != before.deviceLocalBytes ||
+            context.rtScene.ResourceInventory().hostVisibleBytes != before.hostVisibleBytes) {
+            error="Cancelled GPU upload did not preserve admitted allocations."; return false;
         }
         if (!context.rtScene.BeginStaticGeometryReplacement(generation,retained,error)) return false;
         unsigned preparationFrames=0;
@@ -6998,6 +7013,9 @@ bool RunStaticGeometryCutoverCapture(VulkanSurfaceContext& context,
             << ",\"maximumAdvanceMilliseconds\":" << m.maximumAdvanceMilliseconds
             << ",\"uploadAdvanceCount\":" << m.uploadAdvanceCount
             << ",\"uploadedBytes\":" << m.uploadedBytes
+            << ",\"cpuCopyAdvanceCount\":" << m.cpuCopyAdvanceCount
+            << ",\"copiedCpuPayloadBytes\":" << m.copiedCpuPayloadBytes
+            << ",\"cachedCpuSourcePayloadBytes\":" << context.rtScene.CachedStaticGeometryPayloadBytes()
             << ",\"preparationFrames\":" << preparationFrames
             << ",\"oldOwnerAllocationBytes\":" << m.oldOwnerAllocationBytes
             << ",\"candidateOwnerAllocationBytes\":" << m.candidateOwnerAllocationBytes

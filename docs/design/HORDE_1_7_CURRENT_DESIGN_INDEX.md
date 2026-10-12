@@ -527,6 +527,15 @@ All six jobs passed on parent `fbe33b9f40c9d844702c805b48ffb420533b2a25` in [run
 
 ### Incremental candidate uploads (12 October)
 
+The follow-on [bounded CPU reconstruction evidence](../evidence/2026-10-12-bounded-cpu-reconstruction/README.md)
+removes the full-source pack from a single render turn, with exact byte parity,
+copy/admission/cleanup regressions and both backend captures. It adds44.9MB of
+CPU source payload; normal-play GPU savings remain zero. AS stages and cutover
+still synchronously complete. Parent `b3e3a4ef` has five passing CI jobs and a
+cancelled MSVC lane (remote viewport assertion and asset-policy runtime); this
+is an open CI regression, not a six-job pass. New Debug/Release4/4 and Android
+build/lint/package checks pass locally. The APK remains intermediate.
+
 The [bounded native upload evidence](../evidence/2026-10-12-incremental-gpu-upload/README.md)
 preserves the completed graveyard/lid, prepared ferns/rocks and Bellwether shell.
 Candidate uploads now advance across RT frames, with partial allocations counted,

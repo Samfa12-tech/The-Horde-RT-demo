@@ -7,6 +7,7 @@
 #include <limits>
 #include <map>
 #include <unordered_map>
+#include <type_traits>
 #include <utility>
 
 namespace horde::vulkan::raytracing
@@ -48,6 +49,76 @@ RtMaterialGpu ConvertMaterial(const horde::scene::assets::StaticMaterial& source
 }
 
 } // namespace
+
+std::uint64_t RtStaticMeshSlot::PayloadBytes() const noexcept
+{
+    return vertices_.size()*sizeof(vertices_.front()) + worldBodyVertices_.size()*sizeof(worldBodyVertices_.front()) +
+        viewmodelVertices_.size()*sizeof(viewmodelVertices_.front()) + indices_.size()*sizeof(indices_.front()) +
+        materials_.size()*sizeof(materials_.front()) + primitiveMetadata_.size()*sizeof(primitiveMetadata_.front()) +
+        primitiveVertexCounts_.size()*sizeof(primitiveVertexCounts_.front()) +
+        geometryTransforms_.size()*sizeof(geometryTransforms_.front()) + sizeof(instanceMetadata_) +
+        sizeof(textureArrayCounts_) + sizeof(measurements_);
+}
+bool RtStaticMeshCopy::Begin(std::shared_ptr<const RtStaticMeshSlot> source, std::string& diagnostic)
+{
+    if(output_ || !source || !source->admitted_ || source->PrimitiveMetadata().empty() || source->Materials().empty() ||
+        source->Indices().empty()) {
+        diagnostic="Immutable copy needs an admitted source and no existing candidate."; return false;
+    }
+    try {
+        auto output=std::make_unique<RtStaticMeshSlot>();
+        output->instanceMetadata_=source->instanceMetadata_;
+        output->textureArrayCounts_=source->textureArrayCounts_;
+        output->measurements_=source->measurements_;
+        Cancel(); source_=std::move(source); output_=std::move(output);
+    } catch(const std::exception&) {
+        diagnostic="Failed to allocate an immutable CPU copy owner."; return false;
+    }
+    diagnostic.clear(); return true;
+}
+bool RtStaticMeshCopy::Advance(const std::size_t maxBytes, std::string& diagnostic)
+{
+    lastBytes_=0u;
+    if(!output_ || Ready() || maxBytes==0u) {
+        diagnostic="Immutable copy advance needs an active owner and positive byte budget."; return false;
+    }
+    const auto copy=[&](const auto& from,auto& to) {
+        using T=typename std::remove_cvref_t<decltype(from)>::value_type;
+        static_assert(std::is_trivially_copyable_v<T>);
+        if(!from.empty() && maxBytes<sizeof(T)) {
+            diagnostic="Immutable copy budget cannot hold one complete record."; return false;
+        }
+        if(offset_==0u) to.reserve(from.size());
+        const auto count=std::min(maxBytes/sizeof(T),from.size()-offset_);
+        to.insert(to.end(),from.begin()+offset_,from.begin()+offset_+count);
+        offset_+=count; lastBytes_=count*sizeof(T); copiedBytes_+=lastBytes_;
+        if(offset_==from.size()) { ++row_;offset_=0u; }
+        diagnostic.clear(); return true;
+    };
+    try {
+        switch(row_) {
+        case 0: return copy(source_->vertices_,output_->vertices_);
+        case 1: return copy(source_->worldBodyVertices_,output_->worldBodyVertices_);
+        case 2: return copy(source_->viewmodelVertices_,output_->viewmodelVertices_);
+        case 3: return copy(source_->indices_,output_->indices_);
+        case 4: return copy(source_->materials_,output_->materials_);
+        case 5: return copy(source_->primitiveMetadata_,output_->primitiveMetadata_);
+        case 6: return copy(source_->primitiveVertexCounts_,output_->primitiveVertexCounts_);
+        case 7: return copy(source_->geometryTransforms_,output_->geometryTransforms_);
+        default: diagnostic="Invalid immutable copy cursor."; return false;
+        }
+    } catch(const std::exception&) {
+        Cancel(); diagnostic="Immutable CPU candidate allocation/copy failed."; return false;
+    }
+}
+std::unique_ptr<RtStaticMeshSlot> RtStaticMeshCopy::Take() noexcept
+{
+    if(!Ready()) return {};
+    output_->admitted_=true;
+    source_.reset(); row_=offset_=lastBytes_=0u; return std::move(output_);
+}
+void RtStaticMeshCopy::Cancel() noexcept
+{ output_.reset(); source_.reset(); row_=offset_=lastBytes_=0u; copiedBytes_=0u; }
 
 bool RtStaticMeshSlot::InitializeSelectedGeometry(
     std::span<const StaticRtAssetRegistration> registrations, std::string& diagnostic)
@@ -196,6 +267,7 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
         diagnostic = "RtStaticMeshSlot explicit primitive selection requires selected-geometry preparation.";
         return false;
     }
+    admitted_ = false;
     instanceMetadata_ = {};
     primitiveMetadata_.clear();
     primitiveVertexCounts_.clear();
@@ -628,6 +700,7 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
     measurements_.instanceMetadataBytes = instanceMetadata_.size() * sizeof(RtInstanceMetadata);
     measurements_.primitiveMetadataBytes = primitiveMetadata_.size() * sizeof(RtPrimitiveMetadata);
     measurements_.descriptorCount = 9u;
+    admitted_ = true;
     diagnostic.clear();
     return true;
 }

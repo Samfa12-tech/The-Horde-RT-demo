@@ -490,6 +490,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     Destroy();
 
     preparedStaticGeometry_ = std::move(other.preparedStaticGeometry_);
+    fullStaticGeometrySource_ = std::move(other.fullStaticGeometrySource_);
     staticGeometryGeneration_ = std::exchange(other.staticGeometryGeneration_, 1u);
     staticGeometryCompletionUnproved_ = std::exchange(other.staticGeometryCompletionUnproved_, false);
     staticGeometryReplacementMeasurements_ = std::exchange(other.staticGeometryReplacementMeasurements_, {});
@@ -1092,6 +1093,7 @@ void PresentableTinyRtScene::Destroy()
     if (preparedStaticGeometry_ && device_ != VK_NULL_HANDLE)
         DestroyPreparedStaticGeometry(*preparedStaticGeometry_);
     preparedStaticGeometry_.reset();
+    fullStaticGeometrySource_.reset();
     staticGeometryGeneration_ = 1u;
     staticGeometryCompletionUnproved_ = false;
     staticGeometryReplacementMeasurements_ = {};
@@ -2622,6 +2624,11 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
         chapterActorReady_ = true;
     }
     if (!PackLoadedStaticAssets(staticMeshSlot_, {}, diagnostic)) return false;
+    // Pin the validated full CPU source once during heavy startup. Candidate
+    // reconstruction can then copy in bounded turns without rescanning meshes
+    // on the normal application thread. This adds CPU payload, not GPU rows.
+    if (developmentRescueJourney_)
+        fullStaticGeometrySource_ = std::make_shared<const RtStaticMeshSlot>(staticMeshSlot_);
     const RtInstanceMetadata playerMetadata = staticMeshSlot_.InstanceMetadata()[kPlayerWorldBodyInstanceIndex];
     if (playerMetadata.primitiveCount == 0u ||
         playerMetadata.primitiveCount != productionPlayerAsset_.primitives.size() ||

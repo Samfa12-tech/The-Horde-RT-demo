@@ -1051,6 +1051,64 @@ void TestSharedTextureSourceRouting()
 
 }
 
+void TestBoundedImmutableMeshCopy()
+{
+    using namespace horde::vulkan::raytracing;
+    horde::scene::assets::StaticMeshAsset world;
+    world.nodeTransforms.resize(1); world.materials.resize(1); world.vertices.resize(129);
+    world.indices={0,1,2}; world.primitives={{0,0,3,0,0}};
+    for(std::size_t i=0;i<world.vertices.size();++i) world.vertices[i].position[0]=static_cast<float>(i);
+    auto body=world, view=world;
+    const auto pbr=static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr);
+    auto source=std::make_shared<RtStaticMeshSlot>(); std::string error;
+    const std::array registrations{
+        StaticRtAssetRegistration{21,100,pbr,0,&world},
+        StaticRtAssetRegistration{22,101,pbr,0,&body,nullptr,RtGeometryRole::PlayerWorldBody},
+        StaticRtAssetRegistration{20,102,pbr,0,&view,nullptr,RtGeometryRole::PlayerViewmodel}};
+    Check(source->Initialize(registrations,error),"immutable copy source includes all geometry roles");
+    RtStaticMeshCopy copy;
+    Check(!copy.Begin({},error) && !copy.Begin(std::make_shared<RtStaticMeshSlot>(),error),
+        "null or unadmitted copy source rejects");
+    auto malformed=world;
+    malformed.primitives={{0,0,3,0,0},{3,0,3,99,0}};
+    auto failed=std::make_shared<RtStaticMeshSlot>();
+    Check(!failed->Initialize(std::array{StaticRtAssetRegistration{21,100,pbr,0,&malformed}},error) &&
+        !failed->PrimitiveMetadata().empty(),"late admission failure exercises a partially populated slot");
+    Check(!copy.Begin(failed,error),"failed admission cannot become a ready immutable copy");
+    copy.Cancel();
+    Check(copy.Begin(source,error) && !copy.Take(),"source pins without exposing a partial slot");
+    if(!copy.Ready() && copy.Advance(512u,error)) {
+        Check(copy.LastCopiedBytes()<=512u && !copy.Begin(source,error) && !copy.Advance(0u,error),
+            "copy is byte bounded and rejects replacement/zero budget");
+        unsigned turns=1;
+        while(!copy.Ready() && turns++<200u) Check(copy.Advance(512u,error) && copy.LastCopiedBytes()<=512u,
+            "every immutable copy turn respects its payload budget");
+        auto result=copy.Take();
+        const auto same=[](const auto& a,const auto& b) {
+            return a.size()==b.size() && (a.empty() || std::memcmp(a.data(),b.data(),a.size()*sizeof(a.front()))==0);
+        };
+        Check(result && same(source->InstanceMetadata(),result->InstanceMetadata()) &&
+            same(source->PrimitiveMetadata(),result->PrimitiveMetadata()) &&
+            same(source->GeometryTransforms(),result->GeometryTransforms()) &&
+            same(source->Indices(),result->Indices()) && same(source->Materials(),result->Materials()) &&
+            same(source->PrimitiveVertexCounts(),result->PrimitiveVertexCounts()) &&
+            same(source->Vertices(),result->Vertices()) &&
+            same(source->Vertices(RtGeometryRole::PlayerWorldBody),result->Vertices(RtGeometryRole::PlayerWorldBody)) &&
+            same(source->Vertices(RtGeometryRole::PlayerViewmodel),result->Vertices(RtGeometryRole::PlayerViewmodel)) &&
+            source->PayloadBytes()==result->PayloadBytes(),"completed copy preserves every admitted byte and role");
+        Check(!copy.Take(),"completed immutable owner transfers once");
+        for(unsigned cancelTurn=0;cancelTurn<turns;++cancelTurn) {
+            Check(copy.Begin(source,error),"cancel/retry begins on preserved source");
+            for(unsigned t=0;t<cancelTurn;++t) Check(copy.Advance(512u,error),"cancel boundary advances");
+            copy.Cancel(); copy.Cancel(); Check(!copy.Take(),"cancellation never exposes partial geometry");
+        }
+        std::weak_ptr<const RtStaticMeshSlot> weak=source;
+        Check(copy.Begin(source,error),"lifetime pin begins"); source.reset();
+        Check(!weak.expired(),"source survives external owner release"); copy.Cancel();
+        Check(weak.expired(),"cancellation releases only its source lease");
+    } else Check(false,"bounded source copy must advance");
+}
+
 void TestStaticPrimitiveRangeOwnership()
 {
     using namespace horde::vulkan::raytracing;
@@ -2880,6 +2938,7 @@ int main(int argc, char** argv)
     TestSharedTextureSourceRouting();
     TestStaticPrimitiveRangeOwnership();
     TestSelectedGeometryPacking();
+    TestBoundedImmutableMeshCopy();
     TestGeometryRolePartitioning();
     TestProductionDielectricFixture();
     TestLanternGeometryQualityProfile();

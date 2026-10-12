@@ -527,13 +527,41 @@ struct PresentableTinyRtSceneObservationTestAccess
                       original.sockets[i].nodeTransformIndex==grouped.sockets[i].nodeTransformIndex;
         }
         const auto terrain = scene.ChapterTerrainSurface();
+        const auto sourceBytes=scene.CachedStaticGeometryPayloadBytes();
+        ok &= Require(sourceBytes>0u && sourceBytes==scene.staticMeshSlot_.PayloadBytes(), "pinned source payload matches admitted chapter");
+        RtStaticMeshCopy cpu;
+        ok &= Require(cpu.Begin(scene.fullStaticGeometrySource_,diagnostic), "native pinned source begins copy");
+        unsigned copyTurns=0;
+        while(!cpu.Ready() && copyTurns++<1024u) {
+            if(!cpu.Advance(256u*1024u,diagnostic)) { ok=false;break; }
+            ok &= cpu.LastCopiedBytes()<=256u*1024u;
+        }
+        auto copied=cpu.Take();
+        const auto same=[](const auto& a,const auto& b) {
+            return a.size()==b.size() && (a.empty() || std::memcmp(a.data(),b.data(),a.size()*sizeof(a.front()))==0);
+        };
+        ok &= Require(copied && copied->PayloadBytes()==sourceBytes &&
+            same(copied->Vertices(),scene.staticMeshSlot_.Vertices()) &&
+            same(copied->Vertices(RtGeometryRole::PlayerWorldBody),scene.staticMeshSlot_.Vertices(RtGeometryRole::PlayerWorldBody)) &&
+            same(copied->Vertices(RtGeometryRole::PlayerViewmodel),scene.staticMeshSlot_.Vertices(RtGeometryRole::PlayerViewmodel)) &&
+            same(copied->Indices(),scene.staticMeshSlot_.Indices()) &&
+            same(copied->Materials(),scene.staticMeshSlot_.Materials()) &&
+            same(copied->PrimitiveMetadata(),primitives) &&
+            same(copied->PrimitiveVertexCounts(),scene.staticMeshSlot_.PrimitiveVertexCounts()) &&
+            same(copied->GeometryTransforms(),scene.staticMeshSlot_.GeometryTransforms()) &&
+            same(copied->InstanceMetadata(),instances), "native bounded copy preserves every role and metadata byte");
+        std::weak_ptr<const RtStaticMeshSlot> sourceLease=scene.fullStaticGeometrySource_;
+        ok &= Require(cpu.Begin(scene.fullStaticGeometrySource_,diagnostic) && cpu.Advance(256u,diagnostic), "native lifetime copy begins");
         PresentableTinyRtScene moved(std::move(scene));
-        ok &= moved.ChapterTerrainSurface()==terrain && !scene.ChapterTerrainSurface();
+        ok &= Require(moved.ChapterTerrainSurface()==terrain && !scene.ChapterTerrainSurface() &&
+            moved.CachedStaticGeometryPayloadBytes()==sourceBytes && scene.CachedStaticGeometryPayloadBytes()==0u, "move transfers pinned source");
         PresentableTinyRtScene assigned;
         assigned=std::move(moved);
-        ok &= assigned.ChapterTerrainSurface()==terrain && !moved.ChapterTerrainSurface();
+        ok &= Require(assigned.ChapterTerrainSurface()==terrain && !moved.ChapterTerrainSurface() &&
+            assigned.CachedStaticGeometryPayloadBytes()==sourceBytes && moved.CachedStaticGeometryPayloadBytes()==0u, "assignment transfers pinned source");
         assigned.Destroy();
-        ok &= !assigned.ChapterTerrainSurface();
+        ok &= Require(!assigned.ChapterTerrainSurface() && assigned.CachedStaticGeometryPayloadBytes()==0u && !sourceLease.expired(), "destroy retains exactly the copy source lease");
+        cpu.Cancel(); ok &= Require(sourceLease.expired(), "cancel releases final source lease");
         all &= ok;
         }
         return all;
