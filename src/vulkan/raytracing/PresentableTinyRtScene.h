@@ -646,6 +646,23 @@ public:
 #endif
                             );
 
+    // A completed offside owner can be adopted while poses keep moving only
+    // through this combined path. Proof must retire previous submitted work and
+    // reset prior frame references before this command's first scene record,
+    // while preserving the supplied command's already-begun recording state.
+    // Failure after publication retains both owners for platform teardown.
+    bool RecordTraceAndCopyWithStaticReplacement(std::uint64_t expectedGeneration,
+                            bool (*retireReferences)(void*, std::string&), void* user,
+                            VkCommandBuffer commandBuffer, VkImage swapchainImage,
+                            VkImageLayout& swapchainImageLayout, VkExtent2D swapchainExtent,
+                            const RtSceneFrameInputs& frame, std::string& diagnostic,
+                            RtSceneRecordObservation* observation = nullptr
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+                            , experimental::StagedPrimaryTiming* stagedTiming = nullptr,
+                            std::uint32_t timingFrameSlot = 0u
+#endif
+                            );
+
     // Owning render thread, only after successful submission of the recorded RT
     // command buffer. One frame in flight: pending TLAS definitions never become
     // the UPDATE baseline merely because a BUILD was recorded.
@@ -702,6 +719,10 @@ private:
         bool (*retireReferences)(void*, std::string&) = nullptr;
         bool (*publishDescriptors)(void*, PresentableTinyRtScene&, std::string&) = nullptr;
         void (*destroyRetired)(void*, PresentableTinyRtScene&, PreparedStaticGeometry&) noexcept = nullptr;
+        // Optional mandatory first-frame recorder. Only this path admits a
+        // completed candidate with an older submitted pose: the real dynamic
+        // upload/TLAS record must precede its trace and old-owner retirement.
+        bool (*recordCurrentFrame)(void*, PresentableTinyRtScene&, std::string&) = nullptr;
     };
     bool CommitStaticGeometryWithApi(std::uint64_t expectedGeneration,
         const StaticCutoverApi& api, std::string& diagnostic);

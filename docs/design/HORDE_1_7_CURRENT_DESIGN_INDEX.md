@@ -1,5 +1,12 @@
 # Horde 1.7 current design index
 
+The [moving-frame static handoff and Android chapter capture admission](../evidence/2026-10-12-moving-frame-static-handoff/README.md)
+now proves current-pose adoption and safe old-owner retirement in actual
+Pipeline/QueryCompute diagnostic frames. Android resolves the full chapter
+checkpoint roster, with native camera-parity regression coverage. The new APK
+is prepared, not installed while the owner has the phone. Ordinary-play zone
+eviction and full journey acceptance remain open; residency savings stay zero.
+
 The [Android world-startup repair](../evidence/2026-10-12-android-world-startup/README.md)
 closes the packaged-versus-staged dependency gap for all eighteen new graveyard/
 woodland payloads. The current phone renders a clean, three-heart start; its

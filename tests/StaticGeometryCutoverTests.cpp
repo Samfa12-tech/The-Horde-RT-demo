@@ -22,7 +22,9 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
     }
     struct Proof {
         Scene* scene=nullptr; bool succeed=true, stale=false, descriptorFailure=false, descriptorThrow=false, poseChange=false;
-        unsigned proof=0, publish=0, retire=0;
+        unsigned proof=0, publish=0, retire=0, record=0;
+        bool recordFailure=false, recordThrow=false, omitDefinitions=false, wrongWorld=false, resetDuringRecord=false;
+        bool recordingCorrect=false;
         bool publicationCorrect=false, retirementCorrect=false;
     };
     static void Seed(Scene& s, int& oldMap, int& newMap) {
@@ -80,8 +82,64 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
     static bool Check(bool condition,const char* message) {
         if(!condition) std::cerr<<"FAIL: "<<message<<'\n'; return condition;
     }
+    static Scene::StaticCutoverApi FrameApi(Proof& p) {
+        auto api=Api(p);
+        api.recordCurrentFrame=[](void* u,Scene& s,std::string& error) {
+            auto& p=*static_cast<Proof*>(u);++p.record;
+            p.recordingCorrect=p.proof==1 && p.publish==1 && p.retire==0 &&
+                s.staticGeometryGeneration_==41 && s.staticVertexBuffer_.buffer==Handle<VkBuffer>(101) &&
+                s.chapterActorNeedsRefit_ && s.tlasBuiltInstances_[Scene::kCollapseInstanceIndex].accelerationStructureReference==107*4096;
+            if(p.recordThrow)throw std::runtime_error("Injected current-frame record exception");
+            if(p.recordFailure){error="Injected current-frame record failure";return false;}
+            auto current=s.tlasBuiltInstances_;
+            current[20].transform.matrix[0][3]=9.f;
+            current[21].transform.matrix[1][3]=8.f;
+            current[2].transform.matrix[2][3]=7.f;
+            current[2].mask=0x01;
+            if(p.wrongWorld)current[Scene::kCollapseInstanceIndex].accelerationStructureReference=7*4096;
+            if(!p.omitDefinitions)s.StageTlasSubmissionDefinitions(current);
+            if(p.resetDuringRecord)++s.staticGeometryGeneration_;
+            return true;
+        };
+        return api;
+    }
     static int Run() {
         int failures=0,oldMap=3,newMap=4; std::string error;
+        {
+            Scene s;Seed(s,oldMap,newMap);Proof p{&s};auto api=FrameApi(p);
+            s.tlasBuiltInstances_[0].transform.matrix[0][3]=4.f;
+            s.tlasBuiltInstances_[2].mask=0;
+            failures+=!Check(s.CommitStaticGeometryWithApi(41,api,error) && p.recordingCorrect &&
+                p.record==1 && p.retire==1 && s.tlasPendingDefinitionsValid_ &&
+                s.staticGeometryGeneration_==42,
+                "moving candidate publishes only with a fresh current-frame record before retirement");
+            failures+=!Check(s.tlasBuiltInstances_[20].transform.matrix[0][3]!=9.f,
+                "recording remains distinct from successful graphics submission");
+            s.NotifyFrameSubmitted();
+            failures+=!Check(s.tlasBuiltInstances_[20].transform.matrix[0][3]==9.f &&
+                s.tlasBuiltInstances_[21].transform.matrix[1][3]==8.f &&
+                s.tlasBuiltInstances_[2].transform.matrix[2][3]==7.f && s.tlasBuiltInstances_[2].mask==0x01 &&
+                !s.tlasPendingDefinitionsValid_,
+                "first successful frame preserves latest player, held and actor poses and masks");
+        }
+        for(unsigned edge=0;edge<5;++edge){
+            Scene s;Seed(s,oldMap,newMap);Proof p{&s};auto api=FrameApi(p);
+            p.recordFailure=edge==0;p.recordThrow=edge==1;p.omitDefinitions=edge==2;
+            p.wrongWorld=edge==3;p.resetDuringRecord=edge==4;
+            failures+=!Check(!s.CommitStaticGeometryWithApi(41,api,error) && p.record==1 && p.retire==0 &&
+                !s.ready_ && s.staticGeometryCompletionUnproved_ && s.preparedStaticGeometry_ &&
+                s.staticVertexBuffer_.buffer==Handle<VkBuffer>(101) &&
+                s.preparedStaticGeometry_->vertices.buffer==Handle<VkBuffer>(1),
+                "failed/invalid fresh recording retains both referenced owners and stops publication readiness");
+            failures+=!Check(!s.CancelStaticGeometryReplacement(error),
+                "failed fresh recording cannot destroy resources before recorded-work retirement proof");
+        }
+        {
+            Scene s;Seed(s,oldMap,newMap);Proof p{&s};auto api=FrameApi(p);p.descriptorFailure=true;
+            failures+=!Check(!s.CommitStaticGeometryWithApi(41,api,error) && p.record==0 && p.retire==0 &&
+                s.staticVertexBuffer_.buffer==Handle<VkBuffer>(1) && s.preparedStaticGeometry_ && s.ready_,
+                "descriptor rejection rolls back before any first-frame command references the candidate");
+        }
         {
             Scene s; Seed(s,oldMap,newMap); Proof p{&s}; auto api=Api(p);
             failures+=!Check(s.CommitStaticGeometryWithApi(41,api,error),"valid current transaction commits");

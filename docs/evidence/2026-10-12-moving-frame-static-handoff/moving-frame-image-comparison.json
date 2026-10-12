@@ -1,0 +1,34 @@
+{
+  "pipeline": {
+    "cutover-01-selected.png": {
+      "changedPixels": 0,
+      "extent": [
+        960,
+        540
+      ]
+    },
+    "cutover-02-restored.png": {
+      "changedPixels": 0,
+      "extent": [
+        960,
+        540
+      ]
+    }
+  },
+  "query": {
+    "cutover-01-selected.png": {
+      "changedPixels": 0,
+      "extent": [
+        960,
+        540
+      ]
+    },
+    "cutover-02-restored.png": {
+      "changedPixels": 0,
+      "extent": [
+        960,
+        540
+      ]
+    }
+  }
+}

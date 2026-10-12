@@ -1,0 +1,9 @@
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+    Start 165: horde_rt_static_geometry_cutover_tests
+1/2 Test #165: horde_rt_static_geometry_cutover_tests ....   Passed    3.39 sec
+    Start 166: horde_rt_scene_resource_inventory_tests
+2/2 Test #166: horde_rt_scene_resource_inventory_tests ...   Passed   22.22 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =  25.64 sec

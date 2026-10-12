@@ -2810,3 +2810,26 @@ succeeded, followed by genuine RT presentation. Fresh checkpoint shows 3/3 heart
 No automated input. This does not establish QueryCompute, complete chapter
 traversal, sustained performance, lifecycle or audio/haptic acceptance.
 [Failure, correction, hashes and evidence](evidence/2026-10-11-android-atlas-startup/README.md).
+
+
+### 12 October chapter dependency staging — bounded physical clean start
+
+Owner-authorized Samsung SM-S948B / Adreno840 / API1.4.295, raw driver2150932499.
+Exact separate Debug APK `af533134b224344041c4991f7f50fffbd5d4019ce05c7b735f9bc81a2761eb84`
+(183,030,634 bytes) repairs the packaged-versus-filesystem-staged dependency gap.
+This intermediate APK contains the recorded uncommitted staging/owner-API source;
+it is not claimed to be a pristine later commit. Existing development signer,
+versionCode10, app data and release app are preserved.
+
+Evidence class: native Pipeline Diagnostic/Mobile startup, real GPU timestamp
+samples and an opened foreground screenshot. Clean start shows three hearts
+before movement/damage. At unchanged100%/1440x2980, 29 valid bounded GPU samples
+average486.995ms (latest487.176ms): very poor performance, not sustained acceptance.
+The initial `live-start` JSON predates presentation and is not presentation proof.
+The attempted chapter shadow capture did not select the requested checkpoint;
+Java lacked the new names. It is retained as failure, not blamed on GPU cost.
+Original Debug preferences were restored and the game stopped. The owner then
+took the phone; Current/Higher, Lower→Current migration, Query, complete route,
+life-cycle, sustained timing and listening/haptic acceptance remain pending.
+[Exact startup evidence](evidence/2026-10-12-android-world-startup/README.md) and
+[chapter capture correction/new uninstalled APK](evidence/2026-10-12-moving-frame-static-handoff/README.md).

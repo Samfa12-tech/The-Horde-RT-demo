@@ -451,6 +451,11 @@ bool PresentableTinyRtScene::CommitStaticGeometryWithApi(const std::uint64_t exp
             preparedStaticGeometry_->sourceGeneration == expectedGeneration &&
             tlasInstanceDefinitionsValid_ && !tlasPendingDefinitionsValid_;
         if (!owned) return false;
+        // A moving first frame cannot use a preparation-time pose as its
+        // displayed TLAS. The separate recorder path must stage that frame's
+        // complete dynamic definitions before tracing or retiring old owners.
+        // Snapshot-only cutovers retain their exact submitted-pose guard.
+        if (api.recordCurrentFrame) return true;
         auto latest = tlasBuiltInstances_;
         latest[kCollapseInstanceIndex].accelerationStructureReference = preparedStaticGeometry_->collapse.address;
         return std::memcmp(latest.data(), preparedStaticGeometry_->definitions.data(), sizeof(latest)) == 0;
@@ -495,6 +500,25 @@ bool PresentableTinyRtScene::CommitStaticGeometryWithApi(const std::uint64_t exp
     chapterActorPoseGeneration_ = UINT64_MAX; chapterActorPoseSeconds_ = -1.0f;
     chapterActorNeedsRefit_ = thirdActorIsCompanion_;
     waterDropletGeometryVisible_ = true; // Forces one write/refit, also for a now-empty pool.
+    if (api.recordCurrentFrame) {
+        bool recorded = false;
+        try { recorded = api.recordCurrentFrame(api.user, *this, diagnostic); }
+        catch (...) { diagnostic = "Static geometry first-frame recording threw."; }
+        const bool currentWorld = tlasPendingDefinitionsValid_ &&
+            tlasPendingInstances_[kCollapseInstanceIndex].accelerationStructureReference == collapseBlas_.address;
+        if (!recorded || !currentWorld || staticGeometryGeneration_ != expectedGeneration) {
+            // Commands may already reference the new resources. Do not roll
+            // descriptors back underneath that recording or free either owner.
+            // The platform must retire/reset recorded work before teardown.
+            if (diagnostic.empty()) diagnostic = "Static geometry first frame lacks current recorded-world definitions.";
+            ready_ = false;
+            staticGeometryCompletionUnproved_ = true;
+            tlasPendingDefinitionsValid_ = false;
+            retired->ready = false;
+            preparedStaticGeometry_ = std::move(retired);
+            return false;
+        }
+    }
     ++staticGeometryGeneration_;
     api.destroyRetired(api.user, *this, *retired);
     staticGeometryReplacementMeasurements_.cutoverMilliseconds =
@@ -513,6 +537,63 @@ bool PresentableTinyRtScene::CommitStaticGeometryReplacement(const std::uint64_t
             scene.DestroyPreparedStaticGeometry(retired);
         }};
     return CommitStaticGeometryWithApi(expectedGeneration, api, diagnostic);
+}
+
+bool PresentableTinyRtScene::RecordTraceAndCopyWithStaticReplacement(
+    const std::uint64_t expectedGeneration,
+    bool (*retireReferences)(void*, std::string&), void* user,
+    VkCommandBuffer commandBuffer, VkImage swapchainImage,
+    VkImageLayout& swapchainImageLayout, VkExtent2D swapchainExtent,
+    const RtSceneFrameInputs& frame, std::string& diagnostic,
+    RtSceneRecordObservation* observation
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+    , experimental::StagedPrimaryTiming* stagedTiming, std::uint32_t timingFrameSlot
+#endif
+    )
+{
+    if (!retireReferences || commandBuffer == VK_NULL_HANDLE || swapchainImage == VK_NULL_HANDLE ||
+        swapchainExtent.width == 0 || swapchainExtent.height == 0) {
+        diagnostic = "Static replacement requires an actual first-frame command, output and retirement proof.";
+        return false;
+    }
+    struct FirstFrame {
+        bool (*proof)(void*, std::string&);
+        void* user;
+        VkCommandBuffer command;
+        VkImage image;
+        VkImageLayout* layout;
+        VkExtent2D extent;
+        const RtSceneFrameInputs* frame;
+        RtSceneRecordObservation* observation;
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+        experimental::StagedPrimaryTiming* stagedTiming;
+        std::uint32_t timingFrameSlot;
+#endif
+    } first{retireReferences,user,commandBuffer,swapchainImage,&swapchainImageLayout,
+        swapchainExtent,&frame,observation
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+        ,stagedTiming,timingFrameSlot
+#endif
+    };
+    const StaticCutoverApi api{&first,
+        [](void* u,std::string& error) {
+            const auto& f=*static_cast<FirstFrame*>(u);return f.proof(f.user,error);
+        },
+        [](void*,PresentableTinyRtScene& scene,std::string& error) {
+            return scene.WriteBundleDescriptors(scene.pipelineBundle_,error);
+        },
+        [](void*,PresentableTinyRtScene& scene,PreparedStaticGeometry& retired) noexcept {
+            scene.DestroyPreparedStaticGeometry(retired);
+        },
+        [](void* u,PresentableTinyRtScene& scene,std::string& error) {
+            const auto& f=*static_cast<FirstFrame*>(u);
+            return scene.RecordTraceAndCopy(f.command,f.image,*f.layout,f.extent,*f.frame,error,f.observation
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+                ,f.stagedTiming,f.timingFrameSlot
+#endif
+            );
+        }};
+    return CommitStaticGeometryWithApi(expectedGeneration,api,diagnostic);
 }
 
 } // namespace horde::vulkan::raytracing

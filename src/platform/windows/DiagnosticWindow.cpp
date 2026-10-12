@@ -445,6 +445,9 @@ struct VulkanSurfaceContext
     bool outputResizeValidation = false;
     bool nativeMotionValidation = false;
 #if defined(_DEBUG)
+    bool staticReplacementFrameRequested = false;
+    std::uint64_t staticReplacementExpectedGeneration = 0u;
+    std::uint64_t staticReplacementProofGeneration = 0u;
     horde::gameplay::validation::MotionEvidenceScenario motionScenario;
     horde::gameplay::validation::MotionScenario motionRequestedScenario{};
     horde::vulkan::raytracing::RtWorkloadPreset motionRequestedRtPreset =
@@ -6030,6 +6033,35 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         return false;
     }
 
+#if defined(_DEBUG)
+    if (ctx.staticReplacementFrameRequested)
+    {
+        // Drain/reset all prior references BEFORE beginning this frame, its
+        // evidence token or command buffer. The recorder callback only verifies
+        // this owner-thread proof; it must not reset an already-begun command.
+        const auto generation = ctx.rtScene.StaticGeometryGeneration();
+        if (generation != ctx.staticReplacementExpectedGeneration ||
+            !ctx.rtScene.StaticGeometryReplacementReady() || !ConsumePendingImageAcquire(ctx))
+        { ctx.lastRtFrameError="Moving-frame static replacement is stale or incomplete."; return false; }
+        const VkResult idle=vkDeviceWaitIdle(ctx.device);
+        if (!CompleteRtEvidenceAfterDeviceIdle(ctx,idle))
+        { ctx.lastRtFrameError="Moving-frame prior GPU completion is unproved."; return false; }
+        for (const auto command : ctx.commandBuffers)
+            if (vkResetCommandBuffer(command,0u)!=VK_SUCCESS)
+            { ctx.lastRtFrameError="Moving-frame prior command references could not be reset."; return false; }
+        ctx.gpuFrameTimer.ResetAfterDeviceIdle();
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+        ctx.stagedPassTimer.ResetAfterDeviceIdle();
+#endif
+        ctx.gpuFrameTimingTotalMs=0;ctx.gpuFrameTimingSampleCount=0;
+        RefreshGpuTimingTelemetry(ctx);ctx.benchmarkEvidence.Cancel();
+        if (ctx.rtFrameEvidenceInitialised && !ctx.rtFrameEvidence.Recreate(
+                horde::telemetry::RtResourceResetReason::DiagnosticResourceReplacement,
+                CurrentInitialGpuEvidenceStatus(ctx)))
+        { ctx.lastRtFrameError="Moving-frame evidence retirement failed."; return false; }
+        ctx.staticReplacementProofGeneration=generation;
+    }
+#endif
     const bool useRtFrame = ctx.useRtPath && ctx.rtScene.IsReady();
     if (useRtFrame && ctx.rtScene.Profile() ==
             horde::vulkan::raytracing::RtSceneProfile::Showcase)
@@ -6257,7 +6289,34 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         }
         gpuTimingRecording = evidenceFrame && ctx.gpuFrameTimer.RecordBegin(
             ctx.commandBuffers[imageIndex], ctx.currentFrame);
-        if (!ctx.rtScene.RecordTraceAndCopy(ctx.commandBuffers[imageIndex],
+#if defined(_DEBUG)
+        const bool recorded = ctx.staticReplacementFrameRequested
+            ? ctx.rtScene.RecordTraceAndCopyWithStaticReplacement(
+                ctx.staticReplacementExpectedGeneration,
+                [](void* user,std::string& error) {
+                    const auto& owner=*static_cast<VulkanSurfaceContext*>(user);
+                    if (!owner.staticReplacementFrameRequested ||
+                        owner.staticReplacementProofGeneration!=owner.rtScene.StaticGeometryGeneration())
+                    { error="Moving-frame retirement proof became stale before record.";return false; }
+                    return true;
+                }, &ctx, ctx.commandBuffers[imageIndex],ctx.swapchainImages[imageIndex],
+                ctx.swapchainImageLayouts[imageIndex],ctx.swapchainExtent,frameInputs,diagnostic,
+                evidenceFrame ? &observation : nullptr
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+                , gpuTimingRecording ? &ctx.stagedPassTimer : nullptr,ctx.currentFrame
+#endif
+              )
+            : ctx.rtScene.RecordTraceAndCopy(ctx.commandBuffers[imageIndex],ctx.swapchainImages[imageIndex],
+                ctx.swapchainImageLayouts[imageIndex],ctx.swapchainExtent,frameInputs,diagnostic,
+                evidenceFrame ? &observation : nullptr
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+                , gpuTimingRecording ? &ctx.stagedPassTimer : nullptr,ctx.currentFrame
+#endif
+              );
+        if (recorded && ctx.staticReplacementFrameRequested)
+        { ctx.staticReplacementFrameRequested=false;ctx.staticReplacementProofGeneration=0; }
+#else
+        const bool recorded = ctx.rtScene.RecordTraceAndCopy(ctx.commandBuffers[imageIndex],
                                             ctx.swapchainImages[imageIndex],
                                             ctx.swapchainImageLayouts[imageIndex],
                                             ctx.swapchainExtent,
@@ -6267,7 +6326,9 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
 #if HORDE_RT_STAGED_PRIMARY_TIMING
                                            , gpuTimingRecording ? &ctx.stagedPassTimer : nullptr, ctx.currentFrame
 #endif
-                                           ))
+                                           );
+#endif
+        if (!recorded)
         {
             if (evidenceFrame)
             {
@@ -7000,29 +7061,29 @@ bool RunStaticGeometryCutoverCapture(VulkanSurfaceContext& context,
             context.rtScene.StaticGeometryGeneration()!=generation) {
             error="Failed/stale cutover did not preserve the active owner."; return false;
         }
-        const auto retire = [](void* user,std::string& diagnostic) {
-            auto& ctx=*static_cast<VulkanSurfaceContext*>(user);
-            if (!ConsumePendingImageAcquire(ctx)) { diagnostic="Pending acquire could not be consumed."; return false; }
-            const VkResult idle=vkDeviceWaitIdle(ctx.device);
-            if (!CompleteRtEvidenceAfterDeviceIdle(ctx,idle)) { diagnostic="GPU/evidence completion unproved."; return false; }
-            for (const auto command : ctx.commandBuffers)
-                if (vkResetCommandBuffer(command,0u)!=VK_SUCCESS) { diagnostic="Recorded frame references could not be reset."; return false; }
-            ctx.gpuFrameTimer.ResetAfterDeviceIdle();
-#if HORDE_RT_STAGED_PRIMARY_TIMING
-            ctx.stagedPassTimer.ResetAfterDeviceIdle();
-#endif
-            ctx.gpuFrameTimingTotalMs=0; ctx.gpuFrameTimingSampleCount=0;
-            RefreshGpuTimingTelemetry(ctx);
-            ctx.benchmarkEvidence.Cancel();
-            return !ctx.rtFrameEvidenceInitialised || ctx.rtFrameEvidence.Recreate(
-                horde::telemetry::RtResourceResetReason::DiagnosticResourceReplacement,
-                CurrentInitialGpuEvidenceStatus(ctx));
-        };
-        if (!context.rtScene.CommitStaticGeometryReplacement(generation,retire,&context,error)) return false;
+        // An exact zero-delta authority publication changes the camera/held
+        // transforms after preparation. The candidate must rebuild THIS frame's
+        // dynamic TLAS before trace, while retiring the previous static owner.
+        const auto original=context.simulation.Snapshot();
+        horde::gameplay::simulation::InputSnapshot pose;
+        pose.damageEnabled=false;pose.tutorialEnabled=false;
+        pose.hasAuthoritativePlayerPose=true;
+        pose.authoritativePlayerX=original.playerX;pose.authoritativePlayerZ=original.playerZ;
+        pose.yawRadians=original.playerYawRadians+.025f;pose.pitchRadians=original.playerPitchRadians;
+        context.simulation.StepFixed(pose,0,original.inputPublicationSequence+1);
+        context.staticReplacementExpectedGeneration=generation;
+        context.staticReplacementFrameRequested=true;
+        bool presented=false;
+        if (!RenderFrame(context,clear,presented) || !presented ||
+            context.rtScene.StaticGeometryGeneration()!=generation+1 || context.staticReplacementFrameRequested)
+        { error="Moving-frame static owner adoption did not produce a submitted RT frame: "+context.lastRtFrameError;return false; }
+        pose.yawRadians=original.playerYawRadians;
+        context.simulation.StepFixed(pose,0,context.simulation.Snapshot().inputPublicationSequence+1);
         const auto& m=context.rtScene.StaticGeometryReplacementEvidence();
         const auto after=context.rtScene.ResourceInventory();
         receipt << (hop?",":"") << "{\"sourceGeneration\":" << generation
             << ",\"admittedGeneration\":" << context.rtScene.StaticGeometryGeneration()
+            << ",\"movingFirstFrame\":true,\"poseYawDeltaRadians\":0.025"
             << ",\"selection\":\"complete-with-graveyard"
             << "\",\"prepareMilliseconds\":" << m.prepareMilliseconds << ",\"cutoverMilliseconds\":" << m.cutoverMilliseconds
             << ",\"packMilliseconds\":" << m.packMilliseconds
