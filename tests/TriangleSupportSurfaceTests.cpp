@@ -67,6 +67,17 @@ int main()
     check(combined && !Surface::WithNonWalkableGeometry(*combined,wall,error),"duplicate contact owner admitted");
     check(!Surface::WithNonWalkableGeometry(*terrain,{},error),"empty contact owner admitted");
     check(!Surface::WithNonWalkableGeometry(*terrain,tooMany,error),"combined contact capacity overflow admitted");
+    auto anotherWall=wall;
+    for(auto& t:anotherWall)for(auto& p:t.points)p[0]+=2;
+    const auto extended=Surface::WithAdditionalNonWalkableGeometry(*combined,anotherWall,error);
+    check(extended && extended->NonWalkableTriangleCount()==4 && combined->NonWalkableTriangleCount()==2 &&
+        !extended->NonWalkableVolumeClear(-1,0,1,0,.25f,1.8f,.1f) &&
+        !extended->NonWalkableVolumeClear(1,0,3,0,.25f,1.8f,.1f),"additional props replaced old contact or mutated the old owner");
+    check(!Surface::WithAdditionalNonWalkableGeometry(*combined,{},error) &&
+        !Surface::WithAdditionalNonWalkableGeometry(*combined,tooMany,error),"empty or overflowing prop extension admitted");
+    auto brokenWall=anotherWall;brokenWall[0].points[0][0]=std::numeric_limits<float>::quiet_NaN();
+    check(!Surface::WithAdditionalNonWalkableGeometry(*combined,brokenWall,error) && combined->NonWalkableTriangleCount()==2,
+        "malformed extension altered the accepted contact owner");
     check(solid&&!solid->HorizontalVolumeClear(-1,0,1,0,.25f,1.8f,.1f),
           "elevated volume skipped a vertical wall with no support projection");
     check(solid&&!solid->HorizontalVolumeClear(1,0,-1,0,.25f,1.8f,.1f),

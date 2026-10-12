@@ -34,6 +34,7 @@ set(HORDE_RT_CORE_RELATIVE_SOURCES
     gameplay/ShowcaseBenchmark.cpp
     scene/ForestDressing.cpp
     scene/ForestUnderstory.cpp
+    scene/ForestRockDressing.cpp
     scene/BellwetherShell.cpp
     scene/GraveyardDressing.cpp
     scene/TombDressing.cpp

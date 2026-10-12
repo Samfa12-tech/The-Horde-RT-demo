@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "source": "preserved original forest-understory-v1/original-package",
+  "runtime": [
+    {
+      "path": "models/world/runtime/forest-rocks-v1/asset.manifest.json",
+      "bytes": 854,
+      "sha256": "252add83e55b0e2e0e38c4d395e5422b77047fcc456e0bade1ac6dec33d2a072"
+    },
+    {
+      "path": "models/world/runtime/forest-rocks-v1/horde-rock-low_boulder.glb",
+      "bytes": 704076,
+      "sha256": "1bdc6f650410a1f352ad8a314fa0f0b1a978ab226720c97a3e6dde6fd94df262"
+    },
+    {
+      "path": "models/world/runtime/forest-rocks-v1/horde-rock-split_shelf.glb",
+      "bytes": 763376,
+      "sha256": "00cc649340942f503cb83a3f5f91c5c5d9509bffe0851f972a4fd2c6625b3aa5"
+    },
+    {
+      "path": "models/world/runtime/forest-rocks-v1/horde-rock-upright_crag.glb",
+      "bytes": 703880,
+      "sha256": "2e3e0ca2a3d25c91d12dfa46c3ba6fb639dbda54af2a551c0a46c79b9c186d4a"
+    }
+  ],
+  "geometry": "original triangles, winding, normals and UV0 preserved; separately verified tangent derivatives",
+  "material": "runtime shares the existing admitted Poly Haven Boulder01Rock maps; original slate maps/master remain preserved",
+  "collision": "same world-baked native triangles extend immutable nonwalkable contact, never ground support",
+  "tuning": "12 uneven bank placements; slope-aligned bottom-perimeter survey with 30mm burial; no new texture/material/AS owner"
+}

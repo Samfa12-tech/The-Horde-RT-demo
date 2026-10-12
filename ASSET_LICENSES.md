@@ -1,5 +1,19 @@
 # Asset Licenses
 
+## Prepared original woodland rocks (1.7 development)
+
+The low boulder, upright crag and split shelf are the three original Horde
+masters in the supplied forest-dressing package. Their editable scene, maps,
+authoring scripts, original-authorship notice and all 59 hash-verified payloads
+remain in `assets/models/world/source/forest-understory-v1/original-package/`.
+Separate `forest-rocks-v1` runtime derivatives add authored tangents, preserving
+source triangles, UVs, normals and embedded image pixels. The runtime placements
+reuse the admitted Poly Haven Boulder01Rock PBR family; that CC0 attribution
+remains below. The original slate maps are preserved in source, rather than
+overwritten or represented as the reused material. Native render and collision
+consume the same world-baked triangles. No new model generation, lights,
+transparency, material rows or texture layers are introduced.
+
 ## Original Bellwether distant shell (Horde1.7 development chapter)
 
 `assets/models/world/runtime/bellwether-shell-v2/` contains original closed Horde

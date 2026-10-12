@@ -943,7 +943,7 @@ struct PresentableTinyRtSceneObservationTestAccess
         // 6,184 native triangles; shared material-family consolidation adds no rows.
         // The original open/small fern pair contributes 18 terrain placements:
         // nine of each, 9*1200 + 9*768 = 17,712 exact native triangles.
-        constexpr std::size_t addedIndices = 46140u + (2u*664u + 960u + 12u + 323264u + 34050u + 656u + 6184u + 17712u + 342u)*3u;
+        constexpr std::size_t addedIndices = 46140u + (2u*664u + 960u + 12u + 323264u + 34050u + 656u + 6184u + 17712u + 342u + 6168u)*3u;
         bool ok = oldIndices == 8422u * 3u &&
                   baseline.collapseStaticAsset_.bounds.maximum[1] > 12.0f &&
                   std::abs(chapterEntryTop - 6.0f) < 0.001f &&

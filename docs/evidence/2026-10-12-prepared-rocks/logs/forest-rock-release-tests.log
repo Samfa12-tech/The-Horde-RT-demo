@@ -1,0 +1,13 @@
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+    Start   1: horde_rt_triangle_support_surface_tests
+1/4 Test   #1: horde_rt_triangle_support_surface_tests ...   Passed    0.78 sec
+    Start  88: horde_rt_forest_rock_dressing_tests
+2/4 Test  #88: horde_rt_forest_rock_dressing_tests .......   Passed    0.89 sec
+    Start  90: horde_rt_forest_dressing_tests
+3/4 Test  #90: horde_rt_forest_dressing_tests ............   Passed    1.45 sec
+    Start 164: horde_rt_scene_resource_inventory_tests
+4/4 Test #164: horde_rt_scene_resource_inventory_tests ...   Passed    2.74 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Total Test time (real) =   5.89 sec

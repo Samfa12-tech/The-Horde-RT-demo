@@ -1,5 +1,16 @@
 # Horde 1.7 current design index
 
+The prepared rock milestone adds twelve original, tangent-verified low boulder,
+crag and split-shelf placements to native terrain banks. Render and immutable
+nonwalkable contact consume the same triangles, retaining graveyard contact and
+ground support. [Exact evidence and actual RT gallery](../evidence/2026-10-12-prepared-rocks/README.md).
+The native chapter uses all18 texture layers and all32 High primitive rows;
+rocks reuse Boulder01Rock rather than expand either. The original log/root
+cut-end family needs deliberate reuse or zone ownership before admission.
+Normal-play residency saving remains zero. Full two-way loading/retirement,
+remaining props, sustained/full-route inspection and the final phone candidate
+are still active work. Easy Tree/canopy replacement remains owner-deferred.
+
 Reconciled through 12 October 2026 against the chapter implementation and the
 owner's later decisions. The dated receipts below retain their historical
 scope; their preparation-only statements do not supersede later admission.

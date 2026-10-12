@@ -2,6 +2,7 @@
 #include "gameplay/simulation/ForestTreePlacementContract.h"
 #include "scene/ForestDressing.h"
 #include "scene/ForestUnderstory.h"
+#include "scene/ForestRockDressing.h"
 #include "scene/BellwetherShell.h"
 #include "scene/GraveyardDressing.h"
 #include "scene/ChapterTerrainSurface.h"
@@ -376,6 +377,7 @@ void TestNativeChapterPrimitiveOwnership()
         AppendBellwetherShell(kRoot / "assets", owner, diagnostic) &&
         AppendPreparedForestDressing(kRoot / "assets", owner, forest, diagnostic, terrain.get()) &&
         AppendPreparedForestUnderstory(kRoot / "assets", owner, *terrain, understory, diagnostic) &&
+        [&]{ForestRockReport rocks;return AppendPreparedForestRocks(kRoot / "assets",owner,terrain,rocks,diagnostic);}() &&
         ConsolidateWorldBakedMaterialFamilies(owner, diagnostic);
     Check(prepared, diagnostic.empty() ? "real tomb/terrain/forest preparation succeeds" : diagnostic);
     if (!prepared) return;

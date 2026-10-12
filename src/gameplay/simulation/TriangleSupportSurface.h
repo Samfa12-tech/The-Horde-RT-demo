@@ -92,6 +92,25 @@ public:
     bool NonWalkableVolumeClear(float x0,float z0,float x1,float z1,float y0,float y1,float radius) const {
         return !nonWalkable_ || nonWalkable_->HorizontalVolumeClear(x0,z0,x1,z1,y0,y1,radius);
     }
+    // Append real imported prop triangles without replacing earlier contact or
+    // promoting their tops to ground. Both generations stay immutable.
+    static std::shared_ptr<const TriangleSupportSurface> WithAdditionalNonWalkableGeometry(
+        const TriangleSupportSurface& ground, std::span<const Triangle> input, std::string& diagnostic)
+    {
+        const auto oldCount=ground.NonWalkableTriangleCount();
+        if(input.empty() || oldCount>kMaximumTriangles-ground.TriangleCount() ||
+           input.size()>kMaximumTriangles-ground.TriangleCount()-oldCount) {
+            diagnostic="Additional nonwalkable geometry is empty or exceeds bounded intake.";return {};
+        }
+        std::vector<Triangle> combined;
+        combined.reserve(oldCount+input.size());
+        if(ground.nonWalkable_)combined=ground.nonWalkable_->triangles_;
+        combined.insert(combined.end(),input.begin(),input.end());
+        auto contact=Build(combined,diagnostic);
+        if(!contact)return {};
+        auto result=std::shared_ptr<TriangleSupportSurface>(new TriangleSupportSurface(ground));
+        result->nonWalkable_=std::move(contact);diagnostic.clear();return result;
+    }
     std::size_t NonWalkableTriangleCount() const {return nonWalkable_?nonWalkable_->TriangleCount():0;}
     // Collision query for an elevated horizontal volume, independent of ground
     // eligibility. Empty space over a hole is clear; upward/downward and steep
