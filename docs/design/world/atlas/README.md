@@ -33,6 +33,12 @@ All plans use **X east, Y north, Z up, metres**; north is up. Regional origin is
 
 The [shared roadmap](../../../ROADMAP.md) and [source inventory](../../../ROADMAP_SOURCES.md) retain scope/status authority. Active PR27 world development, source geometry and game assets are untouched.
 
+## Current world-authoring decisions
+
+Sam's [12 October continuity, hydrology and Bellwether decisions](../../../superpowers/plans/2026-10-12-horde-world-continuity-and-bellwether.md) require the complete mapped low-detail world in 1.7 with accurately registered major locations, objects and landmarks, including the unobstructed forge. The whole coarse topology remains available above ground as local detail changes. Playable scope still ends at the lookout. These requirements supersede older shell-only scope; this atlas's metric proposals, missing tomb survey and unplaced treasury/finale remain authoring/registration tasks. Existing footprints do not establish roof/rotation fidelity.
+
+Read-only PR27 `d130386a`, 12 October: regional river/lake beds exist, but outdoor water surfaces are outstanding. The linked plan records their 1.7 integration task separately from tomb water, plus stable Bellwether near/mid/far buildings and safe detail/NPC preparation and retirement. No coordinates, source drawings or runtime geometry are changed by this documentation update.
+
 ## Source custody and rebuild
 
 The source is pinned to planning commit `d37f16381311c6e620f0c4a9d01c1cce83260dc8`, retained on `docs/horde-1.6.2-roadmap`. The overview copies the original regional SVG's map subtree and definitions, adds extents/leaders outside critical routes and changes only its display transform. It never invokes the archived generators or overwrites the originals. Source hashes, exact windows and transforms are in [coordinate evidence](coordinate-evidence.json).

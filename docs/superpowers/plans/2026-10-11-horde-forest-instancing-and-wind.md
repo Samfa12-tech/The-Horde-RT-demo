@@ -16,6 +16,8 @@ The direction and authoring-tool choice are owner-approved; the remaining implem
 
 Do the one-tree asset proof alongside cheap geography/hero-view proof, then the representative grove through WP3. Earn bulk placement/final art in WP8 only after outdoor gates 1–5 and explicit production budgets. If a stage fails, improve the bounded engine path or bring a specific experience compromise to Sam before expanding. The likely 1.7 target may move with evidence and chapter sequencing.
 
+**12 October integration:** the [current world/streaming/Bellwether decisions](2026-10-12-horde-world-continuity-and-bellwether.md) now require the complete mapped low-detail world for 1.7. Apply the existing tree proofs with that coarse terrain, registered landmarks and regional-water workload retained, rather than treating the distant village shell as the whole far-world requirement. Terrain/architecture are preferred dependable detail-transition occluders; trees may be porous and need view/wind proof. Easy Tree remains selected, likely 1.7 subject to proof/sequencing; PR27's currently deferred canopy implementation slice does not cancel this ambition.
+
 ## Historical starting point, to re-audit before implementation
 
 The supplied read-only review of [PR27 at d24a9971](https://github.com/Samfa12-tech/The-Horde-RT-demo/commit/d24a9971016050964a7a9a1f2cf1ac383b411324) found ten world-baked trees, approximately 50,510 triangles, an opaque-only static import path, and shared asset foundations without a scalable forest lifecycle or deformation path. This is a dated snapshot, not a permanent limit, current capacity certificate or benchmark. Re-inspect the accepted implementation when this work starts; later chapter changes can supersede it.

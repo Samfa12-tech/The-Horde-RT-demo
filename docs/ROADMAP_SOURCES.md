@@ -1,6 +1,6 @@
 # Roadmap source inventory and reconciliation
 
-This is a navigation and coverage record for [ROADMAP.md](ROADMAP.md), not a second scope document. Reviewed 11 October 2026 against:
+This is a navigation and coverage record for [ROADMAP.md](ROADMAP.md), not a second scope document. Historical reconciliation reviewed 11 October 2026; current owner decisions added 12 October against main `fd1a41e80eef6f6b9e346427cd333de8baf7a14e` and read-only PR27 `d130386a19df914532f7a9f442de2103d454f9b7`. The original reviewed snapshots remain:
 
 - Main `0ebd608b619217696e6b00fbab263905b0684387`: published baseline, receipts, older campaign/milestone plans and technical backlog.
 - Preserved planning `d37f16381311c6e620f0c4a9d01c1cce83260dc8`: full roadmap/master, campaign, future dungeons, maps, English authoring archive, UI, asset/animation and source-review records.
@@ -25,6 +25,7 @@ Map navigation: the [linked world-map atlas](design/world/atlas/README.md) adds 
 
 | Source | What it owns / status |
 |---|---|
+| [Current world, hydrology and continuity decisions](superpowers/plans/2026-10-12-horde-world-continuity-and-bellwether.md) | Sam's 12 October 1.7 shipping requirement: complete mapped low-detail terrain and accurate major locations/objects/landmarks, persistent coarse topology and unobstructed forge visibility. Records authoring/registration gaps, outdoor river/lake water still absent at read-only d130386a, safe local-detail transitions and exact combined-platform gates. Supersedes the preserved masters' narrow village-shell-only scope without adding playable future regions. |
 | [Tree authoring, instancing and wind proposal](superpowers/plans/2026-10-11-horde-forest-instancing-and-wind.md) | Sam's 11 October owner-approved varied/thick/living-canopy direction and selected Easy Tree authoring system, likely 1.7 subject to proof/sequencing. Tooling/native support around its output, supported export fidelity, master/placement/3D LOD/collision/wind contracts, shared BLAS/deformation choices and one-tree → dense-grove → hundreds proof. Implementation, format compatibility and exact-target performance remain unaccepted; inherits the master's outdoor gates. |
 | [Full master](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md) | Chapter experience, WP0-WP10, movement/combat, physical rope/equipment, Kit, atmosphere, UI/pause, save/recovery and six outdoor gates. Historical task/model wrappers do not override current owner instructions. |
 | [Current design index](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/c7c0d24cfcc7aeb1dc033563ca29a6d0f6f189d4/docs/design/HORDE_1_7_CURRENT_DESIGN_INDEX.md) | Current/later decisions, implementation gaps, protected limits, source rights/intake, terrain handoff and pending acceptance. Read the later scene/CI receipts for batches the index still labels uncommitted. |
@@ -80,6 +81,7 @@ All entries below are pinned to the reviewed PR27 snapshot. They preserve propos
 
 | Source | What it owns / status |
 |---|---|
+| [Current Bellwether and NPC-capacity decisions](superpowers/plans/2026-10-12-horde-world-continuity-and-bellwether.md#bellwether-one-positioned-building-through-near-mid-and-far-detail) | Sam's 12 October stable building/transform/footprint/roof/door contracts through near/mid/far detail; unwalled occlusion/preload/reversal/GPU-lifetime rules; reusable three-character proof before expansion. Cast envelopes and specialised guard/Keeper/Kit lanes do not prove simultaneous general-pool capacity. Dated ABI inventory is not hardware or phone capacity. |
 | [Full 1.8 plan](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/superpowers/plans/2026-09-11-village-hub-1.8.0.md) | Useful hub, selected services/progression, cast/interior envelopes, arrival-to-tavern stress slice and acceptance after 1.7. |
 | [Full campaign canon](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/CAMPAIGN_DESIGN.md) | Identity, geography/names, story/reveal, silent player, Kit arc, mixable improvements, access, item/boss relationships and single hopeful ending. Supersedes abbreviated main's remaining candidate/undecided language. |
 | [Historical whole-campaign dialogue bank](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/CAMPAIGN_DIALOGUE_BANK.md) | Scene/voice drafts, access/service exchanges, either-order returns and fair-clue ledger. Older Kit escort/treasury-presence wording is superseded. |
@@ -102,6 +104,9 @@ All entries below are pinned to the reviewed PR27 snapshot. They preserve propos
 
 | Older source / wording | Governing disposition |
 |---|---|
+| Historical 1.7 master/WORLD_LAYOUT/connected maps: bounded trail + village shell; new stream/lake excluded; wider landmark visibility still reviewable | Sam's 12 October explicit shipping requirement now includes the complete mapped low-detail world and accurate major locations/objects/landmarks, including regional water integration and unobstructed forge visibility. Playable future regions/detailed dungeons remain later; metric registration and actual sightlines still need proof. See the current decision record. |
+| Earlier recommendation to increase NPC lanes from four-to-seven total cast | Sam's 12 October clarification: NPCs can load/unload during walking; prove reusable three-character capacity first with persistent state and preloading, street/doorway and human/animal overlap. Expand only from scene evidence and an owner decision. Three enemies is a current encounter target, not an immutable technical ceiling. |
+| Easy Tree/canopy slice currently deferred in PR27 | Preserve 11 October selected authoring direction and likely 1.7 proof-gated ambition separately from the deferred implementation slice; no cancellation is inferred. |
 | Planning/PR27 roadmap: 1.6.2 planned; stops at WP0 | Main's published 1.6.2 receipts and PR27's current index/implementation receipts supersede the dated status. No implementation import into main occurs here. |
 | Main: Bellwether/name/mythology/tool candidates; blanket shops/economy exclusion | Full planning canon, approved item/boss update and full 1.8 plan, reinforced by Sam's 11 October hub/NPC/light RPG instruction. Specific systems/counts/scripts remain bounded or unresolved. |
 | Main: later chapters have no numbers; planning: 1.9/1.10/1.11 | Preserve proposed delivery labels explicitly; no release promise or required Abbey-first play order. |
