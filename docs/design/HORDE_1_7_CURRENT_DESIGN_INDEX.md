@@ -1,5 +1,14 @@
 # Horde 1.7 current design index
 
+The [prepared deadwood milestone](../evidence/2026-10-12-prepared-deadwood/README.md)
+now admits the recovered log/root/stump/snag derivatives with actual terrain
+contact, shared bark material and unchanged ceilings. The exact `2d6748e3`
+CI run exposed a missing runtime LFS hydration glob; its correction preserves
+all native import, hash and package checks. Normal-play GPU residency savings
+remain **zero**. Full two-way GPU readiness/retirement, complete inspected route,
+controlled sustained measurements and the final phone candidate remain required.
+Easy Tree/canopy work and mist28 remain deferred.
+
 The prepared rock milestone adds twelve original, tangent-verified low boulder,
 crag and split-shelf placements to native terrain banks. Render and immutable
 nonwalkable contact consume the same triangles, retaining graveyard contact and

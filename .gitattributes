@@ -1,5 +1,7 @@
 # Keep high-resolution source art out of normal Git history.
 assets/models/world/source/forest-deadwood-v1/** -text whitespace=cr-at-eol
+# Immutable upstream notice retains its original trailing/EOF whitespace.
+assets/models/world/source/forest-deadwood-v1/original-snag/source/QUATERNIUS_LICENSE.txt whitespace=-trailing-space,-blank-at-eof,cr-at-eol
 assets/models/world/source/forest-deadwood-v1/**/*.blend filter=lfs diff=lfs merge=lfs -text
 assets/models/world/runtime/forest-deadwood-v1/*.json text eol=lf
 docs/evidence/2026-10-12-prepared-deadwood/** -text whitespace=cr-at-eol
