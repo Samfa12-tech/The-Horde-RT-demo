@@ -1,0 +1,1322 @@
+{
+  "sourceParent": "326d3915d670584a7e27a91a23e6a56b081402a3",
+  "parentCiRun": 38188260338,
+  "parentCi": {
+    "conclusion": "success",
+    "headSha": "326d3915d670584a7e27a91a23e6a56b081402a3",
+    "jobs": [
+      {
+        "completedAt": "2026-10-12T00:36:01Z",
+        "conclusion": "success",
+        "databaseId": 114615218051,
+        "name": "Android Debug build, playback/report contracts and lint",
+        "startedAt": "2026-10-12T00:30:29Z",
+        "status": "completed",
+        "steps": [
+          {
+            "completedAt": "2026-10-12T00:30:31Z",
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "startedAt": "2026-10-12T00:30:30Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:30:37Z",
+            "conclusion": "success",
+            "name": "Check out source",
+            "number": 2,
+            "startedAt": "2026-10-12T00:30:31Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:30:45Z",
+            "conclusion": "success",
+            "name": "Set up the Android Gradle JDK",
+            "number": 3,
+            "startedAt": "2026-10-12T00:30:37Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:31:09Z",
+            "conclusion": "success",
+            "name": "Install the repository-pinned Android SDK tools",
+            "number": 4,
+            "startedAt": "2026-10-12T00:30:45Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:31:20Z",
+            "conclusion": "success",
+            "name": "Fetch only Android runtime LFS payloads",
+            "number": 5,
+            "startedAt": "2026-10-12T00:31:09Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:35:56Z",
+            "conclusion": "success",
+            "name": "Build all Debug ABIs, run Java contracts and lint",
+            "number": 6,
+            "startedAt": "2026-10-12T00:31:20Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:35:59Z",
+            "conclusion": "success",
+            "name": "Check actual Java results and runtime APK payload",
+            "number": 7,
+            "startedAt": "2026-10-12T00:35:56Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:35:59Z",
+            "conclusion": "success",
+            "name": "Post Set up the Android Gradle JDK",
+            "number": 13,
+            "startedAt": "2026-10-12T00:35:59Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:35:59Z",
+            "conclusion": "success",
+            "name": "Post Check out source",
+            "number": 14,
+            "startedAt": "2026-10-12T00:35:59Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:35:59Z",
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 15,
+            "startedAt": "2026-10-12T00:35:59Z",
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/38188260338/job/114615218051"
+      },
+      {
+        "completedAt": "2026-10-12T00:37:55Z",
+        "conclusion": "success",
+        "databaseId": 114615218171,
+        "name": "Shared simulation host (GCC)",
+        "startedAt": "2026-10-12T00:30:29Z",
+        "status": "completed",
+        "steps": [
+          {
+            "completedAt": "2026-10-12T00:30:31Z",
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "startedAt": "2026-10-12T00:30:30Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:30:37Z",
+            "conclusion": "success",
+            "name": "Check out source",
+            "number": 2,
+            "startedAt": "2026-10-12T00:30:31Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:30:56Z",
+            "conclusion": "success",
+            "name": "Fetch portable-test GLB and music PCM assets",
+            "number": 3,
+            "startedAt": "2026-10-12T00:30:37Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:30:56Z",
+            "conclusion": "skipped",
+            "name": "Restore pinned Windows report-verification SDK",
+            "number": 4,
+            "startedAt": "2026-10-12T00:30:56Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:31:02Z",
+            "conclusion": "success",
+            "name": "Configure non-hardware host tests",
+            "number": 5,
+            "startedAt": "2026-10-12T00:30:56Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:34:07Z",
+            "conclusion": "success",
+            "name": "Build shared gameplay tests",
+            "number": 6,
+            "startedAt": "2026-10-12T00:31:02Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:37:49Z",
+            "conclusion": "success",
+            "name": "Run shared gameplay tests",
+            "number": 7,
+            "startedAt": "2026-10-12T00:34:07Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:37:49Z",
+            "conclusion": "skipped",
+            "name": "Retain native report edit timing trace",
+            "number": 8,
+            "startedAt": "2026-10-12T00:37:49Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:37:50Z",
+            "conclusion": "success",
+            "name": "Check offline gauntlet chirality and UV winding",
+            "number": 9,
+            "startedAt": "2026-10-12T00:37:49Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:37:50Z",
+            "conclusion": "success",
+            "name": "Check exact player cloth seam weight transfers",
+            "number": 10,
+            "startedAt": "2026-10-12T00:37:50Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:37:50Z",
+            "conclusion": "success",
+            "name": "Check upper torso partition preserves the head mask",
+            "number": 11,
+            "startedAt": "2026-10-12T00:37:50Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:37:50Z",
+            "conclusion": "success",
+            "name": "Check bounded segmented cloth seam plans",
+            "number": 12,
+            "startedAt": "2026-10-12T00:37:50Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:37:50Z",
+            "conclusion": "success",
+            "name": "Check Gradle APK artifact resolution",
+            "number": 13,
+            "startedAt": "2026-10-12T00:37:50Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:37:51Z",
+            "conclusion": "success",
+            "name": "Check Android combat capture expectations",
+            "number": 14,
+            "startedAt": "2026-10-12T00:37:50Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:37:51Z",
+            "conclusion": "success",
+            "name": "Post Check out source",
+            "number": 28,
+            "startedAt": "2026-10-12T00:37:51Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:37:51Z",
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 29,
+            "startedAt": "2026-10-12T00:37:51Z",
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/38188260338/job/114615218171"
+      },
+      {
+        "completedAt": "2026-10-12T00:35:03Z",
+        "conclusion": "success",
+        "databaseId": 114615218193,
+        "name": "player-vulkan-host",
+        "startedAt": "2026-10-12T00:30:29Z",
+        "status": "completed",
+        "steps": [
+          {
+            "completedAt": "2026-10-12T00:30:31Z",
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "startedAt": "2026-10-12T00:30:30Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:30:36Z",
+            "conclusion": "success",
+            "name": "Check out source",
+            "number": 2,
+            "startedAt": "2026-10-12T00:30:31Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:30:46Z",
+            "conclusion": "success",
+            "name": "Install Vulkan host development package",
+            "number": 3,
+            "startedAt": "2026-10-12T00:30:36Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:31:03Z",
+            "conclusion": "success",
+            "name": "Fetch player smoke GLB and texture assets",
+            "number": 4,
+            "startedAt": "2026-10-12T00:30:46Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:31:12Z",
+            "conclusion": "success",
+            "name": "Configure Vulkan CPU-host player and resource lane",
+            "number": 5,
+            "startedAt": "2026-10-12T00:31:03Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:34:15Z",
+            "conclusion": "success",
+            "name": "Build focused player and resource Vulkan-host targets",
+            "number": 6,
+            "startedAt": "2026-10-12T00:31:12Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:34:59Z",
+            "conclusion": "success",
+            "name": "Run focused player, semantic and output-ownership fixtures",
+            "number": 7,
+            "startedAt": "2026-10-12T00:34:15Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:34:59Z",
+            "conclusion": "success",
+            "name": "Check strict Android image-presentation analysis",
+            "number": 8,
+            "startedAt": "2026-10-12T00:34:59Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:34:59Z",
+            "conclusion": "success",
+            "name": "Check current-HAL thermal evidence admission",
+            "number": 9,
+            "startedAt": "2026-10-12T00:34:59Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:34:59Z",
+            "conclusion": "success",
+            "name": "Check strict Android motion-presentation join",
+            "number": 10,
+            "startedAt": "2026-10-12T00:34:59Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:35:00Z",
+            "conclusion": "success",
+            "name": "Post Check out source",
+            "number": 20,
+            "startedAt": "2026-10-12T00:34:59Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:35:00Z",
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 21,
+            "startedAt": "2026-10-12T00:35:00Z",
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/38188260338/job/114615218193"
+      },
+      {
+        "completedAt": "2026-10-12T00:36:18Z",
+        "conclusion": "success",
+        "databaseId": 114615218200,
+        "name": "Shared simulation host (Clang)",
+        "startedAt": "2026-10-12T00:30:29Z",
+        "status": "completed",
+        "steps": [
+          {
+            "completedAt": "2026-10-12T00:30:30Z",
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "startedAt": "2026-10-12T00:30:29Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:30:35Z",
+            "conclusion": "success",
+            "name": "Check out source",
+            "number": 2,
+            "startedAt": "2026-10-12T00:30:30Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:30:46Z",
+            "conclusion": "success",
+            "name": "Fetch portable-test GLB and music PCM assets",
+            "number": 3,
+            "startedAt": "2026-10-12T00:30:35Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:30:46Z",
+            "conclusion": "skipped",
+            "name": "Restore pinned Windows report-verification SDK",
+            "number": 4,
+            "startedAt": "2026-10-12T00:30:46Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:30:52Z",
+            "conclusion": "success",
+            "name": "Configure non-hardware host tests",
+            "number": 5,
+            "startedAt": "2026-10-12T00:30:46Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:32:47Z",
+            "conclusion": "success",
+            "name": "Build shared gameplay tests",
+            "number": 6,
+            "startedAt": "2026-10-12T00:30:52Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:36:15Z",
+            "conclusion": "success",
+            "name": "Run shared gameplay tests",
+            "number": 7,
+            "startedAt": "2026-10-12T00:32:47Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:36:15Z",
+            "conclusion": "skipped",
+            "name": "Retain native report edit timing trace",
+            "number": 8,
+            "startedAt": "2026-10-12T00:36:15Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:36:15Z",
+            "conclusion": "success",
+            "name": "Check offline gauntlet chirality and UV winding",
+            "number": 9,
+            "startedAt": "2026-10-12T00:36:15Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:36:15Z",
+            "conclusion": "success",
+            "name": "Check exact player cloth seam weight transfers",
+            "number": 10,
+            "startedAt": "2026-10-12T00:36:15Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:36:15Z",
+            "conclusion": "success",
+            "name": "Check upper torso partition preserves the head mask",
+            "number": 11,
+            "startedAt": "2026-10-12T00:36:15Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:36:15Z",
+            "conclusion": "success",
+            "name": "Check bounded segmented cloth seam plans",
+            "number": 12,
+            "startedAt": "2026-10-12T00:36:15Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:36:15Z",
+            "conclusion": "success",
+            "name": "Check Gradle APK artifact resolution",
+            "number": 13,
+            "startedAt": "2026-10-12T00:36:15Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:36:16Z",
+            "conclusion": "success",
+            "name": "Check Android combat capture expectations",
+            "number": 14,
+            "startedAt": "2026-10-12T00:36:15Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:36:16Z",
+            "conclusion": "success",
+            "name": "Post Check out source",
+            "number": 28,
+            "startedAt": "2026-10-12T00:36:16Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:36:16Z",
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 29,
+            "startedAt": "2026-10-12T00:36:16Z",
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/38188260338/job/114615218200"
+      },
+      {
+        "completedAt": "2026-10-12T00:32:39Z",
+        "conclusion": "success",
+        "databaseId": 114615218242,
+        "name": "Selected host contracts (Clang ASan/UBSan)",
+        "startedAt": "2026-10-12T00:30:29Z",
+        "status": "completed",
+        "steps": [
+          {
+            "completedAt": "2026-10-12T00:30:30Z",
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "startedAt": "2026-10-12T00:30:30Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:30:35Z",
+            "conclusion": "success",
+            "name": "Check out source",
+            "number": 2,
+            "startedAt": "2026-10-12T00:30:30Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:30:38Z",
+            "conclusion": "success",
+            "name": "Fetch only selected fixture and PCM payloads",
+            "number": 3,
+            "startedAt": "2026-10-12T00:30:35Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:32:38Z",
+            "conclusion": "success",
+            "name": "Build and run the finite sanitizer roster",
+            "number": 4,
+            "startedAt": "2026-10-12T00:30:38Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:32:38Z",
+            "conclusion": "success",
+            "name": "Post Check out source",
+            "number": 8,
+            "startedAt": "2026-10-12T00:32:38Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:32:38Z",
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 9,
+            "startedAt": "2026-10-12T00:32:38Z",
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/38188260338/job/114615218242"
+      },
+      {
+        "completedAt": "2026-10-12T00:39:23Z",
+        "conclusion": "success",
+        "databaseId": 114615218270,
+        "name": "Shared simulation host (MSVC)",
+        "startedAt": "2026-10-12T00:30:29Z",
+        "status": "completed",
+        "steps": [
+          {
+            "completedAt": "2026-10-12T00:30:30Z",
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "startedAt": "2026-10-12T00:30:30Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:30:40Z",
+            "conclusion": "success",
+            "name": "Check out source",
+            "number": 2,
+            "startedAt": "2026-10-12T00:30:30Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:30:54Z",
+            "conclusion": "success",
+            "name": "Fetch portable-test GLB and music PCM assets",
+            "number": 3,
+            "startedAt": "2026-10-12T00:30:40Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:30:55Z",
+            "conclusion": "success",
+            "name": "Restore pinned Windows report-verification SDK",
+            "number": 4,
+            "startedAt": "2026-10-12T00:30:54Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:31:13Z",
+            "conclusion": "success",
+            "name": "Configure non-hardware host tests",
+            "number": 5,
+            "startedAt": "2026-10-12T00:30:55Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:34:52Z",
+            "conclusion": "success",
+            "name": "Build shared gameplay tests",
+            "number": 6,
+            "startedAt": "2026-10-12T00:31:13Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:39:08Z",
+            "conclusion": "success",
+            "name": "Run shared gameplay tests",
+            "number": 7,
+            "startedAt": "2026-10-12T00:34:52Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:39:10Z",
+            "conclusion": "success",
+            "name": "Retain native report edit timing trace",
+            "number": 8,
+            "startedAt": "2026-10-12T00:39:08Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:39:18Z",
+            "conclusion": "success",
+            "name": "Check offline gauntlet chirality and UV winding",
+            "number": 9,
+            "startedAt": "2026-10-12T00:39:10Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:39:18Z",
+            "conclusion": "success",
+            "name": "Check exact player cloth seam weight transfers",
+            "number": 10,
+            "startedAt": "2026-10-12T00:39:18Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:39:18Z",
+            "conclusion": "success",
+            "name": "Check upper torso partition preserves the head mask",
+            "number": 11,
+            "startedAt": "2026-10-12T00:39:18Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:39:19Z",
+            "conclusion": "success",
+            "name": "Check bounded segmented cloth seam plans",
+            "number": 12,
+            "startedAt": "2026-10-12T00:39:18Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:39:19Z",
+            "conclusion": "success",
+            "name": "Check Gradle APK artifact resolution",
+            "number": 13,
+            "startedAt": "2026-10-12T00:39:19Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:39:20Z",
+            "conclusion": "success",
+            "name": "Check Android combat capture expectations",
+            "number": 14,
+            "startedAt": "2026-10-12T00:39:19Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:39:22Z",
+            "conclusion": "success",
+            "name": "Post Check out source",
+            "number": 28,
+            "startedAt": "2026-10-12T00:39:20Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-12T00:39:22Z",
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 29,
+            "startedAt": "2026-10-12T00:39:22Z",
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/38188260338/job/114615218270"
+      }
+    ],
+    "status": "completed"
+  },
+  "requestedTraversalExecutions": {
+    "world_route_foundation": 1,
+    "vertical_support": 1,
+    "held_item_vertical_support_rig": 1,
+    "player_directional_rig": 1,
+    "rescue_journey_integration": 1,
+    "rescue_rig_attachment": 1,
+    "rescue_adversarial_regression": 1
+  },
+  "builds": {
+    "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe": {
+      "bytes": 12756992,
+      "sha256": "ead9a038ae37d5edaa8b8034882dcc8188e4385801d29b06854452551d1eaf57"
+    },
+    "build/presets/windows-x64-release/Release/HordeLanternRT.exe": {
+      "bytes": 4412416,
+      "sha256": "cc8a8d4d71d8dc8296a7602f489f234b32d6835154799aee2e6fde892704419a"
+    },
+    "android/app/build/outputs/apk/debug/app-debug.apk": {
+      "bytes": 172822004,
+      "sha256": "acfe31726418fc6bcf772e426a0508462f41dde77e493391e765730021491b8a"
+    }
+  },
+  "frames": {
+    "before": {
+      "backend": "RayTracingPipeline",
+      "camera": {
+        "x": 13.304916,
+        "z": 36.204624,
+        "yaw": 2.51,
+        "pitch": -0.15
+      },
+      "shaders": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "b4cad65003368cce20cc95b2415e8b57a43561a44ba4d761753f9a3418eb6296"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "28e42e4c9683c403c0958735998d7ef44c7587640e676930121d3eac394f45a6"
+        }
+      },
+      "timing": {
+        "sampleCount": 12,
+        "overallMedianMs": 8.21705,
+        "overallMeanMs": 60.353433,
+        "gpuRtCommandBuffer": {
+          "valid": true,
+          "latestMs": 1.996224,
+          "averageMs": 6.099995,
+          "sampleCount": 12,
+          "timestampValidBits": 64,
+          "timestampPeriodNanoseconds": 1.0
+        }
+      },
+      "assets": {
+        "enabled": true,
+        "vertexBytes": 37532928,
+        "indexBytes": 6102420,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 832,
+        "primitiveMetadataBytes": 512,
+        "textureBytes": 274027796,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.3861,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 0.7011,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.685,
+        "productionPropBlasBytes": 25892096,
+        "productionPropBlasBuildMilliseconds": 21.2491
+      },
+      "rescue": {
+        "phase": 4,
+        "generation": 4,
+        "claimCount": 1,
+        "deploymentCount": 1,
+        "equipmentStowed": false,
+        "ropeHandsActive": false,
+        "bodyStowWitness": false,
+        "plantedPelvisDropMetres": 0,
+        "bodyYawRadians": 0.136817,
+        "root": [
+          13.3049,
+          -1.14039,
+          36.2046
+        ],
+        "renderedEye": [
+          13.3049,
+          0.50961,
+          36.2046
+        ],
+        "gripNodeIndices": [
+          0.2,
+          0.45
+        ],
+        "gripTargets": [
+          [
+            -33.4,
+            2.5625,
+            -14.979
+          ],
+          [
+            -33.4,
+            2.45312,
+            -14.979
+          ]
+        ],
+        "ropeNodes": [
+          [
+            -33.4,
+            2.65,
+            -14.979
+          ],
+          [
+            -33.4,
+            2.21248,
+            -14.9791
+          ],
+          [
+            -33.4002,
+            1.77505,
+            -14.9791
+          ],
+          [
+            -33.4007,
+            1.33775,
+            -14.9793
+          ],
+          [
+            -33.4013,
+            0.900611,
+            -14.9794
+          ],
+          [
+            -33.4021,
+            0.46365,
+            -14.9796
+          ],
+          [
+            -33.403,
+            0.0268816,
+            -14.9799
+          ],
+          [
+            -33.4047,
+            -0.409683,
+            -14.9803
+          ],
+          [
+            -33.4078,
+            -0.846039,
+            -14.9813
+          ],
+          [
+            -33.7392,
+            -0.92496,
+            -15.254
+          ],
+          [
+            -33.3142,
+            -0.925,
+            -15.3526
+          ],
+          [
+            -32.9062,
+            -0.925,
+            -15.1976
+          ]
+        ],
+        "publishedLanternHinge": [
+          -0.807088,
+          0,
+          0.590431,
+          0,
+          0.115793,
+          0.980581,
+          0.158283,
+          0,
+          -0.578965,
+          0.196116,
+          -0.791415,
+          0,
+          13.8281,
+          0.434063,
+          36.6118,
+          1
+        ],
+        "publishedLanternBody": [
+          -0.806382,
+          0.00325877,
+          0.591386,
+          0,
+          0.10502,
+          0.984881,
+          0.137772,
+          0,
+          -0.581996,
+          0.173204,
+          -0.794532,
+          0,
+          13.8167,
+          0.424257,
+          36.6809,
+          1
+        ]
+      }
+    },
+    "pipeline": {
+      "backend": "RayTracingPipeline",
+      "camera": {
+        "x": 13.304916,
+        "z": 36.204624,
+        "yaw": 2.51,
+        "pitch": -0.15
+      },
+      "shaders": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "b4cad65003368cce20cc95b2415e8b57a43561a44ba4d761753f9a3418eb6296"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "28e42e4c9683c403c0958735998d7ef44c7587640e676930121d3eac394f45a6"
+        }
+      },
+      "timing": {
+        "sampleCount": 12,
+        "overallMedianMs": 8.9297,
+        "overallMeanMs": 62.801858,
+        "gpuRtCommandBuffer": {
+          "valid": true,
+          "latestMs": 5.212512,
+          "averageMs": 8.151299,
+          "sampleCount": 12,
+          "timestampValidBits": 64,
+          "timestampPeriodNanoseconds": 1.0
+        }
+      },
+      "assets": {
+        "enabled": true,
+        "vertexBytes": 37578112,
+        "indexBytes": 6106524,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 832,
+        "primitiveMetadataBytes": 512,
+        "textureBytes": 274027796,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.3004,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 0.5729,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.7275,
+        "productionPropBlasBytes": 25912704,
+        "productionPropBlasBuildMilliseconds": 12.0815
+      },
+      "rescue": {
+        "phase": 4,
+        "generation": 4,
+        "claimCount": 1,
+        "deploymentCount": 1,
+        "equipmentStowed": false,
+        "ropeHandsActive": false,
+        "bodyStowWitness": false,
+        "plantedPelvisDropMetres": 0,
+        "bodyYawRadians": 0.136817,
+        "root": [
+          13.3049,
+          -1.14039,
+          36.2046
+        ],
+        "renderedEye": [
+          13.3049,
+          0.50961,
+          36.2046
+        ],
+        "gripNodeIndices": [
+          0.2,
+          0.45
+        ],
+        "gripTargets": [
+          [
+            -33.4,
+            2.5625,
+            -14.979
+          ],
+          [
+            -33.4,
+            2.45312,
+            -14.979
+          ]
+        ],
+        "ropeNodes": [
+          [
+            -33.4,
+            2.65,
+            -14.979
+          ],
+          [
+            -33.4,
+            2.21248,
+            -14.9791
+          ],
+          [
+            -33.4002,
+            1.77505,
+            -14.9791
+          ],
+          [
+            -33.4007,
+            1.33775,
+            -14.9793
+          ],
+          [
+            -33.4013,
+            0.900611,
+            -14.9794
+          ],
+          [
+            -33.4021,
+            0.46365,
+            -14.9796
+          ],
+          [
+            -33.403,
+            0.0268816,
+            -14.9799
+          ],
+          [
+            -33.4047,
+            -0.409683,
+            -14.9803
+          ],
+          [
+            -33.4078,
+            -0.846039,
+            -14.9813
+          ],
+          [
+            -33.7392,
+            -0.92496,
+            -15.254
+          ],
+          [
+            -33.3142,
+            -0.925,
+            -15.3526
+          ],
+          [
+            -32.9062,
+            -0.925,
+            -15.1976
+          ]
+        ],
+        "publishedLanternHinge": [
+          -0.807088,
+          0,
+          0.590431,
+          0,
+          0.115793,
+          0.980581,
+          0.158283,
+          0,
+          -0.578965,
+          0.196116,
+          -0.791415,
+          0,
+          13.8281,
+          0.434063,
+          36.6118,
+          1
+        ],
+        "publishedLanternBody": [
+          -0.806382,
+          0.00325877,
+          0.591386,
+          0,
+          0.10502,
+          0.984881,
+          0.137772,
+          0,
+          -0.581996,
+          0.173204,
+          -0.794532,
+          0,
+          13.8167,
+          0.424257,
+          36.6809,
+          1
+        ]
+      }
+    },
+    "query": {
+      "backend": "RayQueryCompute",
+      "camera": {
+        "x": 13.304916,
+        "z": 36.204624,
+        "yaw": 2.51,
+        "pitch": -0.15
+      },
+      "shaders": {
+        "opaqueFast": {
+          "key": "rayquery_compute_diagnostic_high_opaque_fast",
+          "sha256": "82f1aa6d54c5cae3d29c646996163a3480b547e9ef3903abf3cc7b01be1ae668"
+        },
+        "genericDielectric": {
+          "key": "rayquery_compute_diagnostic_high_generic_dielectric",
+          "sha256": "63d3bbb9f67940f42559f09383aacd511c3ca5b0b91dc812ecddcfc7d1468e67"
+        }
+      },
+      "timing": {
+        "sampleCount": 12,
+        "overallMedianMs": 8.45085,
+        "overallMeanMs": 60.14585,
+        "gpuRtCommandBuffer": {
+          "valid": true,
+          "latestMs": 3.114144,
+          "averageMs": 3.147656,
+          "sampleCount": 12,
+          "timestampValidBits": 64,
+          "timestampPeriodNanoseconds": 1.0
+        }
+      },
+      "assets": {
+        "enabled": true,
+        "vertexBytes": 37578112,
+        "indexBytes": 6106524,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 832,
+        "primitiveMetadataBytes": 512,
+        "textureBytes": 274027796,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.2822,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 0.6241,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.6581,
+        "productionPropBlasBytes": 25912704,
+        "productionPropBlasBuildMilliseconds": 9.4194
+      },
+      "rescue": {
+        "phase": 4,
+        "generation": 4,
+        "claimCount": 1,
+        "deploymentCount": 1,
+        "equipmentStowed": false,
+        "ropeHandsActive": false,
+        "bodyStowWitness": false,
+        "plantedPelvisDropMetres": 0,
+        "bodyYawRadians": 0.136817,
+        "root": [
+          13.3049,
+          -1.14039,
+          36.2046
+        ],
+        "renderedEye": [
+          13.3049,
+          0.50961,
+          36.2046
+        ],
+        "gripNodeIndices": [
+          0.2,
+          0.45
+        ],
+        "gripTargets": [
+          [
+            -33.4,
+            2.5625,
+            -14.979
+          ],
+          [
+            -33.4,
+            2.45312,
+            -14.979
+          ]
+        ],
+        "ropeNodes": [
+          [
+            -33.4,
+            2.65,
+            -14.979
+          ],
+          [
+            -33.4,
+            2.21248,
+            -14.9791
+          ],
+          [
+            -33.4002,
+            1.77505,
+            -14.9791
+          ],
+          [
+            -33.4007,
+            1.33775,
+            -14.9793
+          ],
+          [
+            -33.4013,
+            0.900611,
+            -14.9794
+          ],
+          [
+            -33.4021,
+            0.46365,
+            -14.9796
+          ],
+          [
+            -33.403,
+            0.0268816,
+            -14.9799
+          ],
+          [
+            -33.4047,
+            -0.409683,
+            -14.9803
+          ],
+          [
+            -33.4078,
+            -0.846039,
+            -14.9813
+          ],
+          [
+            -33.7392,
+            -0.92496,
+            -15.254
+          ],
+          [
+            -33.3142,
+            -0.925,
+            -15.3526
+          ],
+          [
+            -32.9062,
+            -0.925,
+            -15.1976
+          ]
+        ],
+        "publishedLanternHinge": [
+          -0.807088,
+          0,
+          0.590431,
+          0,
+          0.115793,
+          0.980581,
+          0.158283,
+          0,
+          -0.578965,
+          0.196116,
+          -0.791415,
+          0,
+          13.8281,
+          0.434063,
+          36.6118,
+          1
+        ],
+        "publishedLanternBody": [
+          -0.806382,
+          0.00325877,
+          0.591386,
+          0,
+          0.10502,
+          0.984881,
+          0.137772,
+          0,
+          -0.581996,
+          0.173204,
+          -0.794532,
+          0,
+          13.8167,
+          0.424257,
+          36.6809,
+          1
+        ]
+      }
+    }
+  },
+  "pixelComparisons": {
+    "backend": {
+      "changedPixels": 5124,
+      "maximumChannelDifference": 11,
+      "meanChannelDifference": 0.0039441872427983535
+    },
+    "replace": {
+      "changedPixels": 0,
+      "maximumChannelDifference": 0,
+      "meanChannelDifference": 0.0
+    },
+    "restore": {
+      "changedPixels": 0,
+      "maximumChannelDifference": 0,
+      "meanChannelDifference": 0.0
+    }
+  },
+  "currentResidencySavingBytes": 0,
+  "protectedBackup": {
+    "bytes": 259583,
+    "sha256": "0dae1e8fb803336cef2d045f48c5f4c9195a6463f45161cb0b6c7434350769fb"
+  },
+  "nativeRuntime": {
+    "asset.manifest.json": {
+      "bytes": 867,
+      "sha256": "ce693e14e702edadd9de7cfaa1b5213b275b59d93e0f59f95bf50b0f54e3ea31"
+    },
+    "bellwether-shell-v2.glb": {
+      "bytes": 38252,
+      "sha256": "8c6637cdc7ac7d7fee9aa48abf7f4eb63bd9cb46009fb55366812177d900001d"
+    }
+  },
+  "sourceFiles": {
+    "authoring-receipt.json": {
+      "bytes": 6177,
+      "sha256": "29b28ad491fd198c58aecd562d058ed1e3a5264fcab0ab4c97de732c3ee89ad1"
+    },
+    "authoring-recipe.executed.py": {
+      "bytes": 7011,
+      "sha256": "cff086115401e018f5ce44194b8102a048419c7e34a68a0c042611bb42b0494f"
+    },
+    "bellwether-shell-v2.blend": {
+      "bytes": 18222488,
+      "sha256": "a0bf16ab37d07cba325b746bd87ff42ef1618a762b212e6f408b693f650cca27"
+    },
+    "README.md": {
+      "bytes": 2156,
+      "sha256": "7ebd1e587205632b12dabe25154e162da7367bef4c1eeca7a545a5c0cd23ead0"
+    }
+  },
+  "limits": {
+    "actorSlots": 3,
+    "textureLayers": 18,
+    "shaderArtifacts": "unchanged"
+  },
+  "acceptance": "opened finite desktop frames; sustained/full route/phone pending",
+  "canonicalManifest": "LF bytes pinned before staging; final Android APK reassembled and exact package checked. Physical GLB and opened frames unchanged."
+}

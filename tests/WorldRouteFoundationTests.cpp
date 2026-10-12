@@ -18,6 +18,14 @@ int main()
     const auto near=[](float a,float b){return std::abs(a-b)<.0001f;};
     const auto resident=horde::scene::PrepareDevelopmentWorldGeometry(false);
     const auto staged=horde::scene::PrepareDevelopmentWorldGeometry(true);
+    auto nativeOwners=horde::scene::PrepareDevelopmentWorldGeometry(false,true,true,true);
+    check(nativeOwners.valid && nativeOwners.triangles.empty() && nativeOwners.authoredTownShell,
+        "admitted native terrain/town must omit the old procedural ground and four boxes");
+    horde::scene::AppendRescueJourneyGeometry(nativeOwners);
+    check(nativeOwners.valid && !nativeOwners.triangles.empty() &&
+        std::none_of(nativeOwners.triangles.begin(),nativeOwners.triangles.end(),[](const auto& t){
+            return t.owner==WorldZoneId::Lookout;}),
+        "native town ownership must retain physical rescue geometry without duplicate distant boxes");
     check(resident.valid && staged.valid && resident.triangles.size()==staged.triangles.size(),"real mesh preparation failed");
     const auto rescue= horde::gameplay::traversal::kExteriorLanding;
     check(std::hypot(kWorldRoutePoints[2].x-rescue.x,kWorldRoutePoints[2].z-rescue.z)<.01f &&

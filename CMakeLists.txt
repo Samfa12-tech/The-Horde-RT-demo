@@ -755,8 +755,16 @@ if(BUILD_TESTING)
     target_compile_definitions(horde_rt_forest_understory_tests PRIVATE HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
     add_test(NAME horde_rt_forest_understory_tests COMMAND horde_rt_forest_understory_tests)
 
+    add_executable(horde_rt_bellwether_shell_tests tests/BellwetherShellTests.cpp
+        src/scene/BellwetherShell.cpp src/scene/assets/AssetManifest.cpp
+        src/scene/assets/AssetValidation.cpp src/scene/assets/StaticMeshAsset.cpp
+        src/scene/assets/GltfDocument.cpp)
+    target_include_directories(horde_rt_bellwether_shell_tests PRIVATE src third_party)
+    target_compile_definitions(horde_rt_bellwether_shell_tests PRIVATE HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
+    add_test(NAME horde_rt_bellwether_shell_tests COMMAND horde_rt_bellwether_shell_tests)
+
     add_executable(horde_rt_forest_dressing_tests
-        tests/ForestDressingTests.cpp src/scene/ForestDressing.cpp src/scene/ForestUnderstory.cpp src/scene/TombDressing.cpp src/scene/GraveyardDressing.cpp
+        tests/ForestDressingTests.cpp src/scene/ForestDressing.cpp src/scene/ForestUnderstory.cpp src/scene/BellwetherShell.cpp src/scene/TombDressing.cpp src/scene/GraveyardDressing.cpp
         src/scene/assets/AssetManifest.cpp src/scene/assets/AssetValidation.cpp
         src/scene/assets/GltfDocument.cpp src/scene/assets/StaticMeshAsset.cpp
         src/vulkan/raytracing/RtStaticMeshSlot.cpp)

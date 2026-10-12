@@ -32,6 +32,14 @@ Easy Tree/replacement canopy remains at its deferred roadmap stage. Complete
 two-way inspection, sustained measurements and a current phone-test candidate
 remain required; physical acceptance is pending owner availability.
 
+The [distant-town milestone](../evidence/2026-10-12-bellwether-shell/README.md) replaces the four procedural proof boxes with
+nine original closed native masses from the reviewed footprints. Foundations
+use the actual exported terrain; shared stone/clay rows and pitched roof normals
+preserve the ceilings. It adds no village gameplay or lights. Actual matched
+lookout frames and source/build evidence accompany that milestone. Ordinary
+two-way GPU loading/retirement and sustained/full-route acceptance remain open;
+current residency saving is still zero.
+
 The [static primitive ownership continuation](../evidence/2026-10-12-static-primitive-owners/README.md)
 adds validated packed-asset subranges, avoiding extra static-asset or primitive
 rows for future zone owners. Native chapter tests preserve all geometry/material

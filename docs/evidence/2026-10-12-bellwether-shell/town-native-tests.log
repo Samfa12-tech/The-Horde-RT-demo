@@ -1,0 +1,7 @@
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+    Start 88: horde_rt_bellwether_shell_tests
+1/1 Test #88: horde_rt_bellwether_shell_tests ...   Passed    2.19 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   2.21 sec

@@ -2,6 +2,7 @@
 #include "gameplay/simulation/ForestTreePlacementContract.h"
 #include "scene/ForestDressing.h"
 #include "scene/ForestUnderstory.h"
+#include "scene/BellwetherShell.h"
 #include "scene/GraveyardDressing.h"
 #include "scene/ChapterTerrainSurface.h"
 #include "scene/ChapterTerrainAdmission.h"
@@ -372,6 +373,7 @@ void TestNativeChapterPrimitiveOwnership()
     const bool prepared = AppendPreparedTombDressing(kRoot / "assets", owner, tomb, diagnostic) &&
         AppendChapterTerrain(kRoot / "assets", owner, terrain, diagnostic) &&
         AppendPreparedGraveyard(kRoot / "assets", owner, terrain, graveyard, diagnostic) &&
+        AppendBellwetherShell(kRoot / "assets", owner, diagnostic) &&
         AppendPreparedForestDressing(kRoot / "assets", owner, forest, diagnostic, terrain.get()) &&
         AppendPreparedForestUnderstory(kRoot / "assets", owner, *terrain, understory, diagnostic) &&
         ConsolidateWorldBakedMaterialFamilies(owner, diagnostic);

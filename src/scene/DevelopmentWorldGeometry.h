@@ -26,11 +26,12 @@ struct DevelopmentWorldGeometry
     std::size_t retainedCpuBytes = 0, peakPreparationCpuBytes = 0;
     bool valid = false;
     bool authoredTerrain = false; // Ground is in the separately validated static owner.
+    bool authoredTownShell = false; // Closed town is in that same admitted native owner.
 };
 inline bool ValidateDevelopmentWorldGeometry(const DevelopmentWorldGeometry& geometry)
 {
     using namespace horde::gameplay::simulation;
-    if(geometry.triangles.empty()) return false;
+    if(geometry.triangles.empty()) return geometry.authoredTerrain && geometry.authoredTownShell;
     std::array<bool,kWorldZones.size()> owners{};
     for(const auto& triangle:geometry.triangles) {
         const auto owner=static_cast<std::size_t>(triangle.owner);
@@ -46,17 +47,20 @@ inline bool ValidateDevelopmentWorldGeometry(const DevelopmentWorldGeometry& geo
         const float x=uy*vz-uz*vy,y=uz*vx-ux*vz,z=ux*vy-uy*vx;
         if(x*x+y*y+z*z<1e-10f) return false;
     }
-    return owners[3] && (geometry.authoredTerrain || (owners[1] && owners[2]));
+    return (geometry.authoredTerrain && geometry.authoredTownShell) ||
+        (owners[3] && (geometry.authoredTerrain || (owners[1] && owners[2])));
 }
 // Same triangles consumed by the real world BLAS and the native contract tests.
 // Staged CPU batches retain their off-camera contributors until final admission;
 // no frustum-based residency or simulated GPU cost is introduced here.
-inline DevelopmentWorldGeometry PrepareDevelopmentWorldGeometry(bool staged,bool rescueJourney=false,bool authoredTerrain=false)
+inline DevelopmentWorldGeometry PrepareDevelopmentWorldGeometry(bool staged,bool rescueJourney=false,bool authoredTerrain=false,
+    bool authoredTownShell=false)
 {
     using namespace horde::gameplay::simulation;
     using Point = std::array<float,3>;
     DevelopmentWorldGeometry out;
     out.authoredTerrain=authoredTerrain&&rescueJourney;
+    out.authoredTownShell=authoredTownShell&&out.authoredTerrain;
     const auto begin=std::chrono::steady_clock::now();
     auto quad=[&](Point a,Point b,Point c,Point d,std::uint32_t material,std::uint32_t normal,WorldZoneId owner) {
         out.triangles.push_back({{a,b,c},material,normal,owner});
@@ -101,7 +105,7 @@ inline DevelopmentWorldGeometry PrepareDevelopmentWorldGeometry(bool staged,bool
                 if(ZoneForRouteSegment(obstacle.segment)==owner)
                     box(obstacle.minimum,obstacle.maximum,obstacle.material,owner);
         }
-        if(zone==3)
+        if(zone==3 && !out.authoredTownShell)
         {
             // Bellwether B01..B04 receive the same documented XY translation
             // as F01..F04. They remain closed, real geometry with no support.

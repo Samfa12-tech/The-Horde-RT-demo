@@ -13,6 +13,8 @@ function Assert-CollapseGradleInventory([string]$Text) {
     $names=@([regex]::Matches($Text, "(?m)^\s*include '([^']+)'\s*$") | ForEach-Object { $_.Groups[1].Value } | Where-Object { $_ -like 'models/world/*' })
     $expected=@('models/world/runtime/collapsed-entry/asset.manifest.json','models/world/runtime/collapsed-entry/collapsed-entry-lod0.runtime.glb',
         'models/world/runtime/forest-tree-pair-v1/asset.manifest.json','models/world/runtime/forest-tree-pair-v1/runtime-roster.json',
+        'models/world/runtime/bellwether-shell-v2/asset.manifest.json',
+        'models/world/runtime/bellwether-shell-v2/bellwether-shell-v2.glb',
         'models/world/runtime/forest-understory-v1/asset.manifest.json',
         'models/world/runtime/forest-understory-v1/horde-fern-open-clump.glb',
         'models/world/runtime/forest-understory-v1/horde-fern-small-clump.glb',
@@ -258,9 +260,17 @@ try {
     $windows=@(Get-Horde162RuntimeFiles $repo Windows);$android=@(Get-Horde162RuntimeFiles $repo Android)
     $baseWindows=@(Get-Horde162AssetSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Windows'})
     $baseAndroid=@(Get-Horde162AssetSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Android'})
-    Require ($baseWindows.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Windows'}).Count -eq 36 -and
-             $baseAndroid.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Android'}).Count -eq 37) 'Current shared asset roster includes four tree-pair and three understory entries.'
-    Require ($windows.Count -eq 93 -and $android.Count -eq 94) 'Current closed roster includes exact tomb, terrain, tree-pair, Kit, four grave-marker and three understory runtime assets; no editable sources.'
+    Require ($baseWindows.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Windows'}).Count -eq 38 -and
+             $baseAndroid.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Android'}).Count -eq 39) 'Current shared asset roster includes four tree-pair, three understory and two closed town entries.'
+    Require ($windows.Count -eq 95 -and $android.Count -eq 96) 'Current closed roster includes exact tomb, terrain, tree-pair, Kit, grave-marker, understory and town runtime assets; no editable sources.'
+    $townFiles=@('models/world/runtime/bellwether-shell-v2/asset.manifest.json',
+        'models/world/runtime/bellwether-shell-v2/bellwether-shell-v2.glb')
+    Require (@($windows | Where-Object {$_ -like 'models/world/runtime/bellwether-shell-*/*'}).Count -eq 2 -and
+             @($android | Where-Object {$_ -like 'models/world/runtime/bellwether-shell-*/*'}).Count -eq 2) 'Both platforms admit only the two final closed town payloads.'
+    foreach($town in $townFiles) {
+        Require (@($windows | Where-Object {$_ -ceq $town}).Count -eq 1 -and
+                 @($android | Where-Object {$_ -ceq $town}).Count -eq 1) 'Each exact town payload is admitted once on both platforms.'
+    }
     $understory=@('models/world/runtime/forest-understory-v1/asset.manifest.json',
         'models/world/runtime/forest-understory-v1/horde-fern-open-clump.glb',
         'models/world/runtime/forest-understory-v1/horde-fern-small-clump.glb')

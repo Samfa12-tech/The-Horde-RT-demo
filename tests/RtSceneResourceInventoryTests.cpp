@@ -926,9 +926,14 @@ struct PresentableTinyRtSceneObservationTestAccess
         {
             const auto& primitive = tomb.collapseStaticAsset_.primitives[i];
             for (std::uint32_t j = 0; j < primitive.indexCount; ++j)
-                chapterEntryTop = std::max(chapterEntryTop,
-                    tomb.collapseStaticAsset_.vertices.at(primitive.vertexOffset +
-                        tomb.collapseStaticAsset_.indices.at(primitive.indexOffset + j)).position[1]);
+            {
+                const auto& p=tomb.collapseStaticAsset_.vertices.at(primitive.vertexOffset +
+                    tomb.collapseStaticAsset_.indices.at(primitive.indexOffset+j)).position;
+                // The distant town now shares the masonry family. Measure the
+                // unchanged entry envelope, rather than a material's global height.
+                if(p[0]>=-2.1f && p[0]<=7.5f && p[2]>=2.9f && p[2]<=12.1f)
+                    chapterEntryTop=std::max(chapterEntryTop,p[1]);
+            }
         }
         // Original selected dressing plus two T03 candle stubs (664 each),
         // one offering bowl (960), the closed 12-triangle lintel lip, and
@@ -938,7 +943,7 @@ struct PresentableTinyRtSceneObservationTestAccess
         // 6,184 native triangles; shared material-family consolidation adds no rows.
         // The original open/small fern pair contributes 18 terrain placements:
         // nine of each, 9*1200 + 9*768 = 17,712 exact native triangles.
-        constexpr std::size_t addedIndices = 46140u + (2u*664u + 960u + 12u + 323264u + 34050u + 656u + 6184u + 17712u)*3u;
+        constexpr std::size_t addedIndices = 46140u + (2u*664u + 960u + 12u + 323264u + 34050u + 656u + 6184u + 17712u + 342u)*3u;
         bool ok = oldIndices == 8422u * 3u &&
                   baseline.collapseStaticAsset_.bounds.maximum[1] > 12.0f &&
                   std::abs(chapterEntryTop - 6.0f) < 0.001f &&

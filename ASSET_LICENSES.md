@@ -1,5 +1,18 @@
 # Asset Licenses
 
+## Original Bellwether distant shell (Horde1.7 development chapter)
+
+`assets/models/world/runtime/bellwether-shell-v2/` contains original closed Horde
+geometry authored with Blender5.2 from the reviewed connected-map footprints.
+The editable master, exact map/terrain/export hashes and reversible foundation
+adjustments are in `assets/models/world/source/bellwether-shell-v2/`.
+The owner-authorised public chapter task covers these original authored masses;
+no third-party model, new generation, light or texture is included in the GLB.
+Runtime reuses the existing MedievalWall02 and TombEarthenware material/texture
+owners. Their individual provenance below remains unchanged. The preserved v1
+source iteration is rejected and absent from runtime packages. This asset notice
+does not apply the code licence to third-party texture/audio/model sources.
+
 ## Generic closed dielectric fixture
 
 - `assets/models/props/runtime/dielectric-fixture/closed-glass-lod0.runtime.glb`

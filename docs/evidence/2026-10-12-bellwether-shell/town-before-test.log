@@ -1,0 +1,14 @@
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+    Start 88: horde_rt_bellwether_shell_tests
+1/1 Test #88: horde_rt_bellwether_shell_tests ...***Failed    2.57 sec
+FAIL: real exported closed distant town must enter the native world owner
+Bellwether native placement/material/rollback failed.
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   2.59 sec
+
+The following tests FAILED:
+	 88 - horde_rt_bellwether_shell_tests (Failed)
+Errors while running CTest

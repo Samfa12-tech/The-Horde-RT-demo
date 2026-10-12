@@ -2,6 +2,7 @@
 #include "scene/EntryPortalCapGeometry.h"
 #include "scene/ForestDressing.h"
 #include "scene/ForestUnderstory.h"
+#include "scene/BellwetherShell.h"
 #include "scene/GraveyardDressing.h"
 #include "scene/RescueLidFinish.h"
 #include "vulkan/raytracing/RtWorldSurfaceRange.h"
@@ -2561,6 +2562,7 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
         horde::scene::GraveyardDressingReport graveyard;
         if (!horde::scene::AppendPreparedGraveyard(root, collapseStaticAsset_, chapterTerrainSurface_, graveyard, diagnostic))
             return false;
+        if (!horde::scene::AppendBellwetherShell(root, collapseStaticAsset_, diagnostic)) return false;
         horde::scene::ForestDressingBuildReport forest;
         if (!horde::scene::AppendPreparedForestDressing(root, collapseStaticAsset_, forest, diagnostic, chapterTerrainSurface_.get()))
             return false;
@@ -3446,7 +3448,8 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     }
     if(developmentWorldRoute_)
     {
-        worldRouteGeometry_=horde::scene::PrepareDevelopmentWorldGeometry(stagedWorldPreparation_,developmentRescueJourney_,chapterTerrainSurface_!=nullptr);
+        worldRouteGeometry_=horde::scene::PrepareDevelopmentWorldGeometry(stagedWorldPreparation_,developmentRescueJourney_,
+            chapterTerrainSurface_!=nullptr,developmentRescueJourney_ && chapterTerrainSurface_!=nullptr);
         if(developmentRescueJourney_) horde::scene::AppendRescueJourneyGeometry(worldRouteGeometry_);
         if(!worldRouteGeometry_.valid) { diagnostic="Development world route preparation failed finite geometry admission."; return false; }
         for(const auto& triangle:worldRouteGeometry_.triangles)
