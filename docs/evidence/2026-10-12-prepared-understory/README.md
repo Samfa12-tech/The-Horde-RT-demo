@@ -77,6 +77,16 @@ retirement remain active chapter work, and shared textures remain resident.
 Fresh pushed-commit CI is reported on PR27 after it runs. Parent `6e41b014`
 passed all six jobs in run38184368569, including all seven traversal CTests once.
 
+The first fern push `18c90ffa` failed Vulkan43's integrated-scene fixture:
+its exact triangle total omitted the new17,712 fern triangles. Primitive31 and
+material30 limits remained correct. A fresh local resource-test rebuild
+reproduced the failure; the earlier local executable had not incorporated the
+renderer addition, so its passing result was insufficient. The fixture now
+includes precisely nine1,200-triangle and nine768-triangle sources, retaining
+all original exact-count/capacity assertions. The fresh Debug test passes in
+19.29s. The failed CI and before/after local logs remain beside this report.
+Fresh six-job CI belongs to the corrective pushed commit.
+
 Next chapter work is the remaining prepared dressing, coherent distant town,
 normal two-way GPU loading/retirement and complete route/sustained inspection.
 One exact phone-test candidate follows that work; phone shadow migration,

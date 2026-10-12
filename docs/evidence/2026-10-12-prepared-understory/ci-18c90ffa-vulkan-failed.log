@@ -1,0 +1,649 @@
+﻿2026-10-12T00:15:59.5860145Z Current runner version: '2.337.0'
+2026-10-12T00:15:59.5876732Z ##[group]Runner Image Provisioner
+2026-10-12T00:15:59.5877611Z Hosted Compute Agent
+2026-10-12T00:15:59.5877992Z Version: 20261002.596
+2026-10-12T00:15:59.5878429Z Commit: c3d12f3313a95f25162a1503be624f3b0617f8c0
+2026-10-12T00:15:59.5878864Z Build Date: 2026-10-02T22:28:27Z
+2026-10-12T00:15:59.5879293Z Worker ID: {6c51247f-a1b4-4b58-a088-98eefbdb6583}
+2026-10-12T00:15:59.5879730Z Region: centralus
+2026-10-12T00:15:59.5880129Z Cloud: Azure
+2026-10-12T00:15:59.5880709Z ##[endgroup]
+2026-10-12T00:15:59.5881573Z ##[group]Operating System
+2026-10-12T00:15:59.5881968Z Ubuntu
+2026-10-12T00:15:59.5882297Z 24.04.5
+2026-10-12T00:15:59.5882637Z LTS
+2026-10-12T00:15:59.5882992Z ##[endgroup]
+2026-10-12T00:15:59.5883320Z ##[group]Runner Image
+2026-10-12T00:15:59.5883671Z Image: ubuntu-24.04
+2026-10-12T00:15:59.5884056Z Version: 20261004.327.1
+2026-10-12T00:15:59.5884824Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261004.327/images/ubuntu/Ubuntu2404-Readme.md
+2026-10-12T00:15:59.5885767Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261004.327
+2026-10-12T00:15:59.5886333Z ##[endgroup]
+2026-10-12T00:15:59.5887254Z ##[group]GITHUB_TOKEN Permissions
+2026-10-12T00:15:59.5888633Z Contents: read
+2026-10-12T00:15:59.5889045Z Metadata: read
+2026-10-12T00:15:59.5889384Z ##[endgroup]
+2026-10-12T00:15:59.5890779Z Secret source: Actions
+2026-10-12T00:15:59.5891391Z Cache mode: write
+2026-10-12T00:15:59.5891951Z Prepare workflow directory
+2026-10-12T00:15:59.6238080Z Prepare all required actions
+2026-10-12T00:15:59.6270030Z Getting action download info
+2026-10-12T00:15:59.8564627Z Download action repository 'actions/checkout@v6' (SHA:d23441a48e516b6c34aea4fa41551a30e30af803)
+2026-10-12T00:16:00.1381461Z Complete job name: player-vulkan-host
+2026-10-12T00:16:00.2358354Z ##[group]Run actions/checkout@v6
+2026-10-12T00:16:00.2358767Z with:
+2026-10-12T00:16:00.2359028Z   repository: Samfa12-tech/The-Horde-RT-demo
+2026-10-12T00:16:00.2361075Z   token: ***
+2026-10-12T00:16:00.2361315Z   ssh-strict: true
+2026-10-12T00:16:00.2361557Z   ssh-user: git
+2026-10-12T00:16:00.2361806Z   persist-credentials: true
+2026-10-12T00:16:00.2362073Z   clean: true
+2026-10-12T00:16:00.2362322Z   sparse-checkout-cone-mode: true
+2026-10-12T00:16:00.2362608Z   fetch-depth: 1
+2026-10-12T00:16:00.2362847Z   fetch-tags: false
+2026-10-12T00:16:00.2363093Z   show-progress: true
+2026-10-12T00:16:00.2363341Z   lfs: false
+2026-10-12T00:16:00.2363569Z   submodules: false
+2026-10-12T00:16:00.2363815Z   set-safe-directory: true
+2026-10-12T00:16:00.2364093Z   allow-unsafe-pr-checkout: false
+2026-10-12T00:16:00.2364519Z ##[endgroup]
+2026-10-12T00:16:00.3003978Z Syncing repository: Samfa12-tech/The-Horde-RT-demo
+2026-10-12T00:16:00.3005448Z ##[group]Getting Git version info
+2026-10-12T00:16:00.3006191Z Working directory is '/home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo'
+2026-10-12T00:16:00.3007453Z [command]/usr/bin/git version
+2026-10-12T00:16:00.3071272Z git version 2.55.0
+2026-10-12T00:16:00.3086387Z ##[endgroup]
+2026-10-12T00:16:00.3096440Z Temporarily overriding HOME='/home/runner/work/_temp/2582ccca-3908-4467-874b-77a1a0e35ee7' before making global git config changes
+2026-10-12T00:16:00.3097843Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-12T00:16:00.3099973Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo
+2026-10-12T00:16:00.3451229Z Deleting the contents of '/home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo'
+2026-10-12T00:16:00.3454605Z ##[group]Determining repository object format
+2026-10-12T00:16:00.3456573Z ##[endgroup]
+2026-10-12T00:16:00.3457363Z ##[group]Initializing the repository
+2026-10-12T00:16:00.3461038Z [command]/usr/bin/git init /home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo
+2026-10-12T00:16:00.3624021Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-12T00:16:00.3625272Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-12T00:16:00.3626072Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-12T00:16:00.3626698Z hint: call:
+2026-10-12T00:16:00.3627186Z hint:
+2026-10-12T00:16:00.3627629Z hint: 	git config --global init.defaultBranch <name>
+2026-10-12T00:16:00.3628124Z hint:
+2026-10-12T00:16:00.3628579Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-12T00:16:00.3629271Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-12T00:16:00.3629686Z hint:
+2026-10-12T00:16:00.3629925Z hint: 	git branch -m <name>
+2026-10-12T00:16:00.3630183Z hint:
+2026-10-12T00:16:00.3630526Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-12T00:16:00.3631442Z Initialized empty Git repository in /home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo/.git/
+2026-10-12T00:16:00.3634516Z [command]/usr/bin/git remote add origin https://github.com/Samfa12-tech/The-Horde-RT-demo
+2026-10-12T00:16:00.3710616Z ##[endgroup]
+2026-10-12T00:16:00.3711047Z ##[group]Disabling automatic garbage collection
+2026-10-12T00:16:00.3713863Z [command]/usr/bin/git config --local gc.auto 0
+2026-10-12T00:16:00.3904692Z ##[endgroup]
+2026-10-12T00:16:00.3905100Z ##[group]Setting up auth
+2026-10-12T00:16:00.3905656Z Removing SSH command configuration
+2026-10-12T00:16:00.3910178Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-12T00:16:00.3939512Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-12T00:16:00.4434710Z Removing HTTP extra header
+2026-10-12T00:16:00.4438911Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-12T00:16:00.4470707Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-12T00:16:00.4649218Z Removing includeIf entries pointing to credentials config files
+2026-10-12T00:16:00.4654363Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-12T00:16:00.4681336Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-12T00:16:00.4856013Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-eab63ba8-69f5-43cb-bd88-b4f5cc3161b4.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-12T00:16:00.5306806Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo/.git.path /home/runner/work/_temp/git-credentials-eab63ba8-69f5-43cb-bd88-b4f5cc3161b4.config
+2026-10-12T00:16:00.5920149Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-eab63ba8-69f5-43cb-bd88-b4f5cc3161b4.config
+2026-10-12T00:16:00.7135499Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-eab63ba8-69f5-43cb-bd88-b4f5cc3161b4.config
+2026-10-12T00:16:00.7453617Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-eab63ba8-69f5-43cb-bd88-b4f5cc3161b4.config
+2026-10-12T00:16:00.7558423Z ##[endgroup]
+2026-10-12T00:16:00.7558845Z ##[group]Fetching the repository
+2026-10-12T00:16:00.7567846Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +18c90ffa0f80c00c4747eed7d56e6ff9daf70914:refs/remotes/origin/codex/horde-1.7-wp2-vertical-proof
+2026-10-12T00:16:03.7368775Z From https://github.com/Samfa12-tech/The-Horde-RT-demo
+2026-10-12T00:16:03.7370092Z  * [new ref]         18c90ffa0f80c00c4747eed7d56e6ff9daf70914 -> origin/codex/horde-1.7-wp2-vertical-proof
+2026-10-12T00:16:03.7377932Z [command]/usr/bin/git branch --list --remote origin/codex/horde-1.7-wp2-vertical-proof
+2026-10-12T00:16:03.7401363Z   origin/codex/horde-1.7-wp2-vertical-proof
+2026-10-12T00:16:03.7409333Z [command]/usr/bin/git rev-parse refs/remotes/origin/codex/horde-1.7-wp2-vertical-proof
+2026-10-12T00:16:03.7430742Z 18c90ffa0f80c00c4747eed7d56e6ff9daf70914
+2026-10-12T00:16:03.7444439Z ##[endgroup]
+2026-10-12T00:16:03.7445129Z ##[group]Determining the checkout info
+2026-10-12T00:16:03.7445878Z ##[endgroup]
+2026-10-12T00:16:03.7446331Z [command]/usr/bin/git sparse-checkout disable
+2026-10-12T00:16:03.7512478Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-12T00:16:03.7540229Z ##[group]Checking out the ref
+2026-10-12T00:16:03.7543593Z [command]/usr/bin/git checkout --progress --force -B codex/horde-1.7-wp2-vertical-proof refs/remotes/origin/codex/horde-1.7-wp2-vertical-proof
+2026-10-12T00:16:04.6602119Z Switched to a new branch 'codex/horde-1.7-wp2-vertical-proof'
+2026-10-12T00:16:04.6603472Z branch 'codex/horde-1.7-wp2-vertical-proof' set up to track 'origin/codex/horde-1.7-wp2-vertical-proof'.
+2026-10-12T00:16:04.7134061Z ##[endgroup]
+2026-10-12T00:16:04.7172276Z [command]/usr/bin/git log -1 --format=%H
+2026-10-12T00:16:04.7194527Z 18c90ffa0f80c00c4747eed7d56e6ff9daf70914
+2026-10-12T00:16:04.7374939Z ##[group]Run apt_options=(-o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 -o Acquire::Retries=2)
+2026-10-12T00:16:04.7375966Z [36;1mapt_options=(-o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 -o Acquire::Retries=2)[0m
+2026-10-12T00:16:04.7376815Z [36;1msudo apt-get "${apt_options[@]}" --error-on=any update[0m
+2026-10-12T00:16:04.7377818Z [36;1msudo apt-get "${apt_options[@]}" install --yes libvulkan-dev[0m
+2026-10-12T00:16:04.7708059Z shell: /usr/bin/bash -e {0}
+2026-10-12T00:16:04.7708674Z ##[endgroup]
+2026-10-12T00:16:04.8412216Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+2026-10-12T00:16:04.8838472Z Get:6 https://packages.microsoft.com/ubuntu/24.04/prod noble InRelease [3600 B]
+2026-10-12T00:16:04.8909726Z Hit:2 http://azure.archive.ubuntu.com/ubuntu noble InRelease
+2026-10-12T00:16:04.8950131Z Get:3 http://azure.archive.ubuntu.com/ubuntu noble-updates InRelease [126 kB]
+2026-10-12T00:16:04.8966320Z Get:4 http://azure.archive.ubuntu.com/ubuntu noble-backports InRelease [126 kB]
+2026-10-12T00:16:04.8988298Z Get:5 http://azure.archive.ubuntu.com/ubuntu noble-security InRelease [126 kB]
+2026-10-12T00:16:04.9369367Z Get:7 https://packages.microsoft.com/ubuntu/24.04/prod noble/main amd64 Packages [548 kB]
+2026-10-12T00:16:04.9543273Z Get:8 https://packages.microsoft.com/ubuntu/24.04/prod noble/main arm64 Packages [492 kB]
+2026-10-12T00:16:04.9668572Z Get:9 https://packages.microsoft.com/ubuntu/24.04/prod noble/main all Packages [640 B]
+2026-10-12T00:16:04.9703961Z Get:10 https://packages.microsoft.com/ubuntu/24.04/prod noble/main armhf Packages [12.3 kB]
+2026-10-12T00:16:05.0103114Z Get:11 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 Packages [1375 kB]
+2026-10-12T00:16:05.0179726Z Get:12 http://azure.archive.ubuntu.com/ubuntu noble-updates/main Translation-en [306 kB]
+2026-10-12T00:16:05.0198236Z Get:13 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 Packages [1702 kB]
+2026-10-12T00:16:05.0257420Z Get:14 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe Translation-en [342 kB]
+2026-10-12T00:16:05.0274892Z Get:15 http://azure.archive.ubuntu.com/ubuntu noble-updates/restricted amd64 Packages [1761 kB]
+2026-10-12T00:16:05.0339860Z Get:16 http://azure.archive.ubuntu.com/ubuntu noble-updates/restricted Translation-en [401 kB]
+2026-10-12T00:16:05.0361078Z Get:17 http://azure.archive.ubuntu.com/ubuntu noble-updates/multiverse amd64 Packages [55.0 kB]
+2026-10-12T00:16:05.0366023Z Get:18 http://azure.archive.ubuntu.com/ubuntu noble-updates/multiverse Translation-en [14.3 kB]
+2026-10-12T00:16:05.0871969Z Get:19 http://azure.archive.ubuntu.com/ubuntu noble-security/main amd64 Packages [1121 kB]
+2026-10-12T00:16:05.0915374Z Get:20 http://azure.archive.ubuntu.com/ubuntu noble-security/main Translation-en [228 kB]
+2026-10-12T00:16:05.1353836Z Get:21 http://azure.archive.ubuntu.com/ubuntu noble-security/universe amd64 Packages [1220 kB]
+2026-10-12T00:16:05.1396126Z Get:22 http://azure.archive.ubuntu.com/ubuntu noble-security/universe Translation-en [245 kB]
+2026-10-12T00:16:05.1408300Z Get:23 http://azure.archive.ubuntu.com/ubuntu noble-security/restricted amd64 Packages [1669 kB]
+2026-10-12T00:16:05.1461196Z Get:24 http://azure.archive.ubuntu.com/ubuntu noble-security/restricted Translation-en [383 kB]
+2026-10-12T00:16:05.1479652Z Get:25 http://azure.archive.ubuntu.com/ubuntu noble-security/multiverse amd64 Packages [49.8 kB]
+2026-10-12T00:16:05.1487542Z Get:26 http://azure.archive.ubuntu.com/ubuntu noble-security/multiverse Translation-en [12.4 kB]
+2026-10-12T00:16:10.3108555Z Fetched 12.3 MB in 1s (12.7 MB/s)
+2026-10-12T00:16:10.8793754Z Reading package lists...
+2026-10-12T00:16:10.9042380Z Reading package lists...
+2026-10-12T00:16:11.0632223Z Building dependency tree...
+2026-10-12T00:16:11.0637343Z Reading state information...
+2026-10-12T00:16:11.1900810Z The following NEW packages will be installed:
+2026-10-12T00:16:11.1901460Z   libvulkan-dev
+2026-10-12T00:16:11.2033544Z 0 upgraded, 1 newly installed, 0 to remove and 23 not upgraded.
+2026-10-12T00:16:11.2034014Z Need to get 1239 kB of archives.
+2026-10-12T00:16:11.2034321Z After this operation, 26.5 MB of additional disk space will be used.
+2026-10-12T00:16:11.2034697Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+2026-10-12T00:16:11.2646692Z Get:2 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 libvulkan-dev amd64 1.3.275.0-1build1 [1239 kB]
+2026-10-12T00:16:11.4532428Z Fetched 1239 kB in 0s (16.6 MB/s)
+2026-10-12T00:16:11.4780201Z Selecting previously unselected package libvulkan-dev:amd64.
+2026-10-12T00:16:11.5005330Z (Reading database ... 
+2026-10-12T00:16:11.5005952Z (Reading database ... 5%
+2026-10-12T00:16:11.5006441Z (Reading database ... 10%
+2026-10-12T00:16:11.5007090Z (Reading database ... 15%
+2026-10-12T00:16:11.5007278Z (Reading database ... 20%
+2026-10-12T00:16:11.5007465Z (Reading database ... 25%
+2026-10-12T00:16:11.5007675Z (Reading database ... 30%
+2026-10-12T00:16:11.5007885Z (Reading database ... 35%
+2026-10-12T00:16:11.5008103Z (Reading database ... 40%
+2026-10-12T00:16:11.5008298Z (Reading database ... 45%
+2026-10-12T00:16:11.5008481Z (Reading database ... 50%
+2026-10-12T00:16:11.5054932Z (Reading database ... 55%
+2026-10-12T00:16:11.6083573Z (Reading database ... 60%
+2026-10-12T00:16:11.7670626Z (Reading database ... 65%
+2026-10-12T00:16:11.9598532Z (Reading database ... 70%
+2026-10-12T00:16:12.1075664Z (Reading database ... 75%
+2026-10-12T00:16:12.2264430Z (Reading database ... 80%
+2026-10-12T00:16:12.3593337Z (Reading database ... 85%
+2026-10-12T00:16:12.5014068Z (Reading database ... 90%
+2026-10-12T00:16:12.6282223Z (Reading database ... 95%
+2026-10-12T00:16:12.6282535Z (Reading database ... 100%
+2026-10-12T00:16:12.6282833Z (Reading database ... 203191 files and directories currently installed.)
+2026-10-12T00:16:12.6319778Z Preparing to unpack .../libvulkan-dev_1.3.275.0-1build1_amd64.deb ...
+2026-10-12T00:16:12.7285626Z Unpacking libvulkan-dev:amd64 (1.3.275.0-1build1) ...
+2026-10-12T00:16:13.5181079Z Setting up libvulkan-dev:amd64 (1.3.275.0-1build1) ...
+2026-10-12T00:16:14.2090382Z 
+2026-10-12T00:16:15.0864845Z Running kernel seems to be up-to-date.
+2026-10-12T00:16:15.0865042Z 
+2026-10-12T00:16:15.0865102Z No services need to be restarted.
+2026-10-12T00:16:15.0865204Z 
+2026-10-12T00:16:15.0865262Z No containers need to be restarted.
+2026-10-12T00:16:15.0865368Z 
+2026-10-12T00:16:15.0865438Z No user sessions are running outdated binaries.
+2026-10-12T00:16:15.0865556Z 
+2026-10-12T00:16:15.0865665Z No VM guests are running outdated hypervisor (qemu) binaries on this host.
+2026-10-12T00:16:15.1027652Z ##[group]Run git -c lfs.fetchexclude= lfs fetch --include="assets/models/enemies/meshy/*.glb,assets/models/player/runtime/*.glb,assets/models/player/viewmodel/runtime/*.glb,assets/models/props/runtime/*.glb,assets/models/props/runtime/*/*.glb,assets/models/weapons/runtime/*.glb,assets/textures/props/runtime/*.android.ktx2,assets/textures/props/runtime/*.windows.ktx2,assets/textures/props/source/chapter-terrain-maps-r03/*.ktx2,assets/textures/meshy/lich_placeholder_v01/*.ktx2,tests/fixtures/*/*.glb,assets/source/development-rescue*/*.glb,assets/audio/pixabay/keeper_i_sense_you.wav,assets/audio/pixabay/keeper_come_closer.wav,assets/audio/pixabay/skeleton_idle_rattle.wav,assets/audio/pixabay/skeleton_falling_bones.wav,assets/audio/pixabay/waterfall_core_loop.wav,assets/textures/environment/runtime/night-storm.android.ktx2,assets/textures/environment/runtime/night-storm.windows.ktx2,assets/models/world/runtime/collapsed-entry/*.runtime.glb,assets/models/world/runtime/chapter-entry-return-v1/*.runtime.glb,assets/models/world/runtime/chapter-terrain-v1/*.runtime.glb,assets/models/world/runtime/grave-markers-r03/*.glb,assets/textures/props/runtime/chapter-terrain/*.ktx2,assets/models/world/runtime/forest-tree-pair-v1/*.glb,assets/models/world/runtime/forest-understory-v1/*.glb,assets/models/world/source/forest-tree-pair-v1/**,assets/textures/props/source/forest-tree-pair-v1/**,assets/models/characters/source/kit-warden-v1/*.glb,assets/models/characters/runtime/kit-warden-v1/*.glb,assets/textures/characters/runtime/kit-warden-v1/*.ktx2,assets/models/world/runtime/prepared-funerary-v01/**/*.glb,assets/models/world/runtime/tomb-dressing-v01/tomb-niche-*/*.glb,assets/source/beyond_the_tomb/funerary/t02-skeletal-source-v1/meshes/*.glb,assets/source/beyond_the_tomb/funerary/t03-v01/models/*.glb,assets/audio/pixabay/water_wet_step*.wav,assets/audio/pixabay/water_stream_contact*.wav,assets/audio/pixabay/keeper_death*.wav,assets/audio/kit/runtime/*.wav" && git lfs checkout "assets/models/enemies/meshy/*.glb" "assets/models/player/runtime/*.glb" "assets/models/player/viewmodel/runtime/*.glb" "assets/models/props/runtime/*.glb" "assets/models/props/runtime/*/*.glb" "assets/models/weapons/runtime/*.glb" "assets/models/world/runtime/collapsed-entry/*.runtime.glb" "assets/models/world/runtime/chapter-entry-return-v1/*.runtime.glb" "assets/models/world/runtime/chapter-terrain-v1/*.runtime.glb" "assets/models/world/runtime/grave-markers-r03/*.glb" "assets/textures/props/source/chapter-terrain-maps-r03/*.ktx2" "assets/textures/props/runtime/chapter-terrain/*.ktx2" "assets/models/world/runtime/forest-tree-pair-v1/*.glb" "assets/models/world/runtime/forest-understory-v1/*.glb" "assets/models/world/source/forest-tree-pair-v1/**" "assets/textures/props/source/forest-tree-pair-v1/**" "assets/models/characters/source/kit-warden-v1/*.glb" "assets/models/characters/runtime/kit-warden-v1/*.glb" "assets/textures/characters/runtime/kit-warden-v1/*.ktx2" "assets/models/world/runtime/prepared-funerary-v01/**/*.glb" "assets/models/world/runtime/tomb-dressing-v01/tomb-niche-*/*.glb" "assets/source/beyond_the_tomb/funerary/t02-skeletal-source-v1/meshes/*.glb" "assets/source/beyond_the_tomb/funerary/t03-v01/models/*.glb" "assets/audio/pixabay/water_wet_step*.wav" "assets/audio/pixabay/water_stream_contact*.wav" "assets/audio/pixabay/keeper_death*.wav" "assets/audio/kit/runtime/*.wav" "assets/textures/props/runtime/*.android.ktx2" "assets/textures/props/runtime/*.windows.ktx2" "assets/textures/meshy/lich_placeholder_v01/*.ktx2" "tests/fixtures/*/*.glb" "assets/source/development-rescue*/*.glb" "assets/audio/pixabay/keeper_i_sense_you.wav" "assets/audio/pixabay/keeper_come_closer.wav" "assets/audio/pixabay/skeleton_idle_rattle.wav" "assets/audio/pixabay/skeleton_falling_bones.wav" "assets/audio/pixabay/waterfall_core_loop.wav" "assets/textures/environment/runtime/night-storm.android.ktx2" "assets/textures/environment/runtime/night-storm.windows.ktx2"
+2026-10-12T00:16:15.1042011Z [36;1mgit -c lfs.fetchexclude= lfs fetch --include="assets/models/enemies/meshy/*.glb,assets/models/player/runtime/*.glb,assets/models/player/viewmodel/runtime/*.glb,assets/models/props/runtime/*.glb,assets/models/props/runtime/*/*.glb,assets/models/weapons/runtime/*.glb,assets/textures/props/runtime/*.android.ktx2,assets/textures/props/runtime/*.windows.ktx2,assets/textures/props/source/chapter-terrain-maps-r03/*.ktx2,assets/textures/meshy/lich_placeholder_v01/*.ktx2,tests/fixtures/*/*.glb,assets/source/development-rescue*/*.glb,assets/audio/pixabay/keeper_i_sense_you.wav,assets/audio/pixabay/keeper_come_closer.wav,assets/audio/pixabay/skeleton_idle_rattle.wav,assets/audio/pixabay/skeleton_falling_bones.wav,assets/audio/pixabay/waterfall_core_loop.wav,assets/textures/environment/runtime/night-storm.android.ktx2,assets/textures/environment/runtime/night-storm.windows.ktx2,assets/models/world/runtime/collapsed-entry/*.runtime.glb,assets/models/world/runtime/chapter-entry-return-v1/*.runtime.glb,assets/models/world/runtime/chapter-terrain-v1/*.runtime.glb,assets/models/world/runtime/grave-markers-r03/*.glb,assets/textures/props/runtime/chapter-terrain/*.ktx2,assets/models/world/runtime/forest-tree-pair-v1/*.glb,assets/models/world/runtime/forest-understory-v1/*.glb,assets/models/world/source/forest-tree-pair-v1/**,assets/textures/props/source/forest-tree-pair-v1/**,assets/models/characters/source/kit-warden-v1/*.glb,assets/models/characters/runtime/kit-warden-v1/*.glb,assets/textures/characters/runtime/kit-warden-v1/*.ktx2,assets/models/world/runtime/prepared-funerary-v01/**/*.glb,assets/models/world/runtime/tomb-dressing-v01/tomb-niche-*/*.glb,assets/source/beyond_the_tomb/funerary/t02-skeletal-source-v1/meshes/*.glb,assets/source/beyond_the_tomb/funerary/t03-v01/models/*.glb,assets/audio/pixabay/water_wet_step*.wav,assets/audio/pixabay/water_stream_contact*.wav,assets/audio/pixabay/keeper_death*.wav,assets/audio/kit/runtime/*.wav" && git lfs checkout "assets/models/enemies/meshy/*.glb" "assets/models/player/runtime/*.glb" "assets/models/player/viewmodel/runtime/*.glb" "assets/models/props/runtime/*.glb" "assets/models/props/runtime/*/*.glb" "assets/models/weapons/runtime/*.glb" "assets/models/world/runtime/collapsed-entry/*.runtime.glb" "assets/models/world/runtime/chapter-entry-return-v1/*.runtime.glb" "assets/models/world/runtime/chapter-terrain-v1/*.runtime.glb" "assets/models/world/runtime/grave-markers-r03/*.glb" "assets/textures/props/source/chapter-terrain-maps-r03/*.ktx2" "assets/textures/props/runtime/chapter-terrain/*.ktx2" "assets/models/world/runtime/forest-tree-pair-v1/*.glb" "assets/models/world/runtime/forest-understory-v1/*.glb" "assets/models/world/source/forest-tree-pair-v1/**" "assets/textures/props/source/forest-tree-pair-v1/**" "assets/models/characters/source/kit-warden-v1/*.glb" "assets/models/characters/runtime/kit-warden-v1/*.glb" "assets/textures/characters/runtime/kit-warden-v1/*.ktx2" "assets/models/world/runtime/prepared-funerary-v01/**/*.glb" "assets/models/world/runtime/tomb-dressing-v01/tomb-niche-*/*.glb" "assets/source/beyond_the_tomb/funerary/t02-skeletal-source-v1/meshes/*.glb" "assets/source/beyond_the_tomb/funerary/t03-v01/models/*.glb" "assets/audio/pixabay/water_wet_step*.wav" "assets/audio/pixabay/water_stream_contact*.wav" "assets/audio/pixabay/keeper_death*.wav" "assets/audio/kit/runtime/*.wav" "assets/textures/props/runtime/*.android.ktx2" "assets/textures/props/runtime/*.windows.ktx2" "assets/textures/meshy/lich_placeholder_v01/*.ktx2" "tests/fixtures/*/*.glb" "assets/source/development-rescue*/*.glb" "assets/audio/pixabay/keeper_i_sense_you.wav" "assets/audio/pixabay/keeper_come_closer.wav" "assets/audio/pixabay/skeleton_idle_rattle.wav" "assets/audio/pixabay/skeleton_falling_bones.wav" "assets/audio/pixabay/waterfall_core_loop.wav" "assets/textures/environment/runtime/night-storm.android.ktx2" "assets/textures/environment/runtime/night-storm.windows.ktx2"[0m
+2026-10-12T00:16:15.1106171Z shell: /usr/bin/bash -e {0}
+2026-10-12T00:16:15.1106318Z ##[endgroup]
+2026-10-12T00:16:15.1452286Z Fetching reference refs/heads/codex/horde-1.7-wp2-vertical-proof
+2026-10-12T00:16:21.2776297Z Checking out LFS objects: 100% (183/183), 563 MB | 0 B/s, done.
+2026-10-12T00:16:22.6406586Z ##[group]Run cmake -S . -B build/player-vulkan-host -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DHORDE_RT_BUILD_VULKAN_TARGETS=ON -DHORDE_RT_BUILD_CAPABILITY_PROBE_EXECUTABLE=OFF -DHORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW=OFF -DHORDE_RT_INSTRUMENTATION_OVERRIDE=Shipping -DHORDE_RT_DIELECTRIC_QUALITY_OVERRIDE=Mobile
+2026-10-12T00:16:22.6408446Z [36;1mcmake -S . -B build/player-vulkan-host -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DHORDE_RT_BUILD_VULKAN_TARGETS=ON -DHORDE_RT_BUILD_CAPABILITY_PROBE_EXECUTABLE=OFF -DHORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW=OFF -DHORDE_RT_INSTRUMENTATION_OVERRIDE=Shipping -DHORDE_RT_DIELECTRIC_QUALITY_OVERRIDE=Mobile[0m
+2026-10-12T00:16:22.6462650Z shell: /usr/bin/bash -e {0}
+2026-10-12T00:16:22.6462799Z ##[endgroup]
+2026-10-12T00:16:23.1333706Z -- The CXX compiler identification is GNU 13.3.0
+2026-10-12T00:16:23.1460511Z -- Detecting CXX compiler ABI info
+2026-10-12T00:16:23.2826793Z -- Detecting CXX compiler ABI info - done
+2026-10-12T00:16:23.2940730Z -- Check for working CXX compiler: /usr/bin/c++ - skipped
+2026-10-12T00:16:23.2944891Z -- Detecting CXX compile features
+2026-10-12T00:16:23.2951464Z -- Detecting CXX compile features - done
+2026-10-12T00:16:25.5689881Z Generated RT catalog adapter is current.
+2026-10-12T00:16:25.6586595Z -- Strict non-contracted asset-transform arithmetic enabled for GltfDocument.cpp and StaticMeshAsset.cpp: -fno-fast-math;-ffp-contract=off
+2026-10-12T00:16:25.7082011Z -- Found Vulkan: /usr/lib/x86_64-linux-gnu/libvulkan.so (found version "1.3.275")  missing components: glslc glslangValidator
+2026-10-12T00:16:25.7083163Z -- Vulkan SDK found: 1.3.275
+2026-10-12T00:16:25.7119612Z -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+2026-10-12T00:16:25.7882609Z -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+2026-10-12T00:16:25.7889751Z -- Found Threads: TRUE
+2026-10-12T00:16:25.9337841Z -- Found Python3: /usr/bin/python3.12 (found version "3.12.3") found components: Interpreter
+2026-10-12T00:16:26.5942574Z -- Legacy torch-failure identifiers were rejected by the configured GNU compiler.
+2026-10-12T00:16:26.5953754Z -- Horde Lantern RT: Vulkan capability probe and Windows diagnostic targets are available; Android builds from android/.
+2026-10-12T00:16:26.6795825Z -- Configuring done (3.9s)
+2026-10-12T00:16:26.8553309Z -- Generating done (0.2s)
+2026-10-12T00:16:26.8556145Z -- Build files have been written to: /home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo/build/player-vulkan-host
+2026-10-12T00:16:26.8677437Z ##[group]Run cmake --build build/player-vulkan-host --config Release --parallel 2 --target horde_rt_player_primitive_contract_tests horde_rt_player_animation_tests horde_rt_final_held_torch_clearance_tests horde_rt_windows_output_resize_launch_tests horde_rt_held_item_socket_tests horde_rt_scene_abi_tests horde_rt_static_gltf_asset_tests horde_rt_static_collapse_asset_tests horde_rt_forest_dressing_tests horde_rt_forest_understory_tests horde_rt_graveyard_dressing_tests horde_rt_world_surface_range_tests horde_rt_kit_source_intake_tests horde_rt_skinned_character_smoke horde_rt_skinned_arm_reference_tests horde_rt_scene_initialise_preflight_tests horde_rt_texture_layer_subset_tests horde_rt_scene_resource_inventory_tests horde_rt_static_geometry_cutover_tests horde_rt_gpu_resources_observation_tests horde_rt_gpu_buffer_batch_tests horde_rt_staged_primary_resource_tests horde_rt_staged_primary_timing_tests horde_rt_driver_capability_report_tests horde_rt_present_completion_tests horde_rt_present_timing_evidence_tests horde_rt_world_route_foundation_tests horde_rt_vertical_support_tests horde_rt_triangle_support_surface_tests horde_rt_held_item_vertical_support_rig_tests horde_rt_player_directional_rig_tests horde_rt_rescue_journey_integration_tests horde_rt_rescue_rig_attachment_tests
+2026-10-12T00:16:26.8683007Z [36;1mcmake --build build/player-vulkan-host --config Release --parallel 2 --target horde_rt_player_primitive_contract_tests horde_rt_player_animation_tests horde_rt_final_held_torch_clearance_tests horde_rt_windows_output_resize_launch_tests horde_rt_held_item_socket_tests horde_rt_scene_abi_tests horde_rt_static_gltf_asset_tests horde_rt_static_collapse_asset_tests horde_rt_forest_dressing_tests horde_rt_forest_understory_tests horde_rt_graveyard_dressing_tests horde_rt_world_surface_range_tests horde_rt_kit_source_intake_tests horde_rt_skinned_character_smoke horde_rt_skinned_arm_reference_tests horde_rt_scene_initialise_preflight_tests horde_rt_texture_layer_subset_tests horde_rt_scene_resource_inventory_tests horde_rt_static_geometry_cutover_tests horde_rt_gpu_resources_observation_tests horde_rt_gpu_buffer_batch_tests horde_rt_staged_primary_resource_tests horde_rt_staged_primary_timing_tests horde_rt_driver_capability_report_tests horde_rt_present_completion_tests horde_rt_present_timing_evidence_tests horde_rt_world_route_foundation_tests horde_rt_vertical_support_tests horde_rt_triangle_support_surface_tests horde_rt_held_item_vertical_support_rig_tests horde_rt_player_directional_rig_tests horde_rt_rescue_journey_integration_tests horde_rt_rescue_rig_attachment_tests[0m
+2026-10-12T00:16:26.8738792Z shell: /usr/bin/bash -e {0}
+2026-10-12T00:16:26.8738947Z ##[endgroup]
+2026-10-12T00:16:26.9087990Z [100%] Building CXX object CMakeFiles/horde_rt_player_primitive_contract_tests.dir/tests/PlayerPrimitiveContractTests.cpp.o
+2026-10-12T00:16:27.6405828Z [100%] Linking CXX executable horde_rt_player_primitive_contract_tests
+2026-10-12T00:16:27.6746502Z [100%] Built target horde_rt_player_primitive_contract_tests
+2026-10-12T00:16:27.6937603Z [ 14%] Building CXX object pocket-audio-core-native/CMakeFiles/pocket_audio_native_pcm.dir/src/PcmLoopStream.cpp.o
+2026-10-12T00:16:27.6939007Z [ 14%] Building CXX object pocket-audio-core-native/CMakeFiles/pocket_audio_native_pcm.dir/src/PcmWave.cpp.o
+2026-10-12T00:16:27.9169609Z [ 14%] Linking CXX static library libpocket_audio_native_pcm.a
+2026-10-12T00:16:28.7297278Z [ 14%] Built target pocket_audio_native_pcm
+2026-10-12T00:16:28.7368661Z [ 14%] Building CXX object CMakeFiles/horde_gameplay_simulation.dir/src/audio/AmbiencePcmLoop.cpp.o
+2026-10-12T00:16:28.7369340Z [ 14%] Building CXX object CMakeFiles/horde_gameplay_simulation.dir/src/audio/MusicDirector.cpp.o
+2026-10-12T00:16:29.1463292Z [ 14%] Building CXX object CMakeFiles/horde_gameplay_simulation.dir/src/audio/MusicPcmStream.cpp.o
+2026-10-12T00:16:29.4487471Z [ 14%] Building CXX object CMakeFiles/horde_gameplay_simulation.dir/src/audio/MusicPcmWave.cpp.o
+2026-10-12T00:16:29.6168817Z [ 28%] Building CXX object CMakeFiles/horde_gameplay_simulation.dir/src/audio/MusicPcmAssetBank.cpp.o
+2026-10-12T00:16:29.8589353Z [ 28%] Building CXX object CMakeFiles/horde_gameplay_simulation.dir/src/audio/MusicPlaybackSession.cpp.o
+2026-10-12T00:16:30.2969713Z [ 28%] Building CXX object CMakeFiles/horde_gameplay_simulation.dir/src/reporting/PlaytestReport.cpp.o
+2026-10-12T00:16:30.6367724Z [ 28%] Building CXX object CMakeFiles/horde_gameplay_simulation.dir/src/reporting/PlaytestSubmission.cpp.o
+2026-10-12T00:16:31.1485152Z [ 28%] Building CXX object CMakeFiles/horde_gameplay_simulation.dir/src/reporting/BenchmarkSummarySubmission.cpp.o
+2026-10-12T00:16:31.2593867Z [ 42%] Building CXX object CMakeFiles/horde_gameplay_simulation.dir/src/gameplay/simulation/GameSimulation.cpp.o
+2026-10-12T00:16:31.5719477Z [ 42%] Building CXX object CMakeFiles/horde_gameplay_simulation.dir/src/gameplay/effects/WaterContact.cpp.o
+2026-10-12T00:16:31.8584986Z [ 42%] Building CXX object CMakeFiles/horde_gameplay_simulation.dir/src/gameplay/simulation/GameSimulationRescue.cpp.o
+2026-10-12T00:16:32.5642530Z [ 42%] Building CXX object CMakeFiles/horde_gameplay_simulation.dir/src/gameplay/simulation/GameSimulationDialogue.cpp.o
+2026-10-12T00:16:33.7972350Z [ 57%] Building CXX object CMakeFiles/horde_gameplay_simulation.dir/src/gameplay/traversal/RescueTraversal.cpp.o
+2026-10-12T00:16:34.2564254Z [ 57%] Building CXX object CMakeFiles/horde_gameplay_simulation.dir/src/gameplay/animation/PlayerAnimationState.cpp.o
+2026-10-12T00:16:34.2586027Z [ 57%] Building CXX object CMakeFiles/horde_gameplay_simulation.dir/src/gameplay/animation/PlayerIkTargets.cpp.o
+2026-10-12T00:16:34.4110520Z [ 57%] Building CXX object CMakeFiles/horde_gameplay_simulation.dir/src/gameplay/effects/FireEmitterState.cpp.o
+2026-10-12T00:16:34.5870563Z [ 57%] Building CXX object CMakeFiles/horde_gameplay_simulation.dir/src/gameplay/interactions/InteractionState.cpp.o
+2026-10-12T00:16:34.7187462Z [ 71%] Building CXX object CMakeFiles/horde_gameplay_simulation.dir/src/gameplay/interactions/ChestRewardSequence.cpp.o
+2026-10-12T00:16:34.7241079Z [ 71%] Building CXX object CMakeFiles/horde_gameplay_simulation.dir/src/gameplay/interactions/FinaleSequence.cpp.o
+2026-10-12T00:16:34.8543622Z [ 71%] Building CXX object CMakeFiles/horde_gameplay_simulation.dir/src/gameplay/items/LanternPendulum.cpp.o
+2026-10-12T00:16:34.8544299Z [ 71%] Building CXX object CMakeFiles/horde_gameplay_simulation.dir/src/gameplay/items/HeldItemState.cpp.o
+2026-10-12T00:16:35.0553173Z [ 71%] Building CXX object CMakeFiles/horde_gameplay_simulation.dir/src/gameplay/items/HeldItemKinematics.cpp.o
+2026-10-12T00:16:35.0728087Z [ 85%] Building CXX object CMakeFiles/horde_gameplay_simulation.dir/src/gameplay/items/HeldLightState.cpp.o
+2026-10-12T00:16:36.6172968Z [ 85%] Linking CXX static library libhorde_gameplay_simulation.a
+2026-10-12T00:16:36.7016367Z [ 85%] Built target horde_gameplay_simulation
+2026-10-12T00:16:36.7074588Z [ 85%] Building CXX object CMakeFiles/horde_rt_player_animation_tests.dir/tests/PlayerAnimationTests.cpp.o
+2026-10-12T00:16:36.7075396Z [ 85%] Building CXX object CMakeFiles/horde_rt_player_animation_tests.dir/src/telemetry/RtPerformanceEvidence.cpp.o
+2026-10-12T00:16:37.6382868Z [100%] Building CXX object CMakeFiles/horde_rt_player_animation_tests.dir/src/scene/assets/SkinnedMeshAsset.cpp.o
+2026-10-12T00:16:37.9047560Z [100%] Building CXX object CMakeFiles/horde_rt_player_animation_tests.dir/src/vulkan/raytracing/PlayerRenderSlot.cpp.o
+2026-10-12T00:16:39.9632784Z [100%] Linking CXX executable horde_rt_player_animation_tests
+2026-10-12T00:16:40.0144107Z [100%] Built target horde_rt_player_animation_tests
+2026-10-12T00:16:40.0371546Z [  6%] Built target pocket_audio_native_pcm
+2026-10-12T00:16:40.0600580Z [ 40%] Built target horde_gameplay_simulation
+2026-10-12T00:16:40.0664625Z [ 40%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/telemetry/RtPerformanceEvidence.cpp.o
+2026-10-12T00:16:40.0666603Z [ 40%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/telemetry/RtEvidencePublication.cpp.o
+2026-10-12T00:16:40.3951790Z [ 40%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/telemetry/RtBenchmarkEvidenceRun.cpp.o
+2026-10-12T00:16:40.8188185Z [ 46%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/telemetry/RtBenchmarkEvidenceReport.cpp.o
+2026-10-12T00:16:40.9519239Z [ 46%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/telemetry/BenchmarkSummary.cpp.o
+2026-10-12T00:16:41.4300041Z [ 46%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/reporting/BenchmarkSummaryReport.cpp.o
+2026-10-12T00:16:41.5132981Z [ 46%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/reporting/BenchmarkSummarySubmission.cpp.o
+2026-10-12T00:16:41.9070730Z [ 46%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/gameplay/effects/WaterContact.cpp.o
+2026-10-12T00:16:41.9349305Z [ 53%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/gameplay/ShowcaseBenchmark.cpp.o
+2026-10-12T00:16:42.1773896Z [ 53%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/scene/ForestDressing.cpp.o
+2026-10-12T00:16:42.8833119Z [ 53%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/scene/ForestUnderstory.cpp.o
+2026-10-12T00:16:43.3937382Z [ 53%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/scene/GraveyardDressing.cpp.o
+2026-10-12T00:16:43.8155286Z [ 60%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/scene/TombDressing.cpp.o
+2026-10-12T00:16:44.7585723Z [ 60%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/scene/assets/AssetManifest.cpp.o
+2026-10-12T00:16:44.9647207Z [ 60%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/scene/assets/AssetValidation.cpp.o
+2026-10-12T00:16:45.2828483Z [ 60%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/scene/assets/GltfDocument.cpp.o
+2026-10-12T00:16:46.3425589Z [ 60%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/scene/assets/StaticMeshAsset.cpp.o
+2026-10-12T00:16:46.8943042Z [ 66%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/update/GitHubReleaseUpdater.cpp.o
+2026-10-12T00:16:48.0073524Z [ 66%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/vulkan/DeviceCapabilities.cpp.o
+2026-10-12T00:16:48.2297444Z [ 66%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/vulkan/RtCapabilityReport.cpp.o
+2026-10-12T00:16:48.7707328Z [ 66%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/vulkan/GpuFrameTimer.cpp.o
+2026-10-12T00:16:48.9226485Z [ 66%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/vulkan/VulkanContext.cpp.o
+2026-10-12T00:16:49.2934778Z [ 73%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/vulkan/raytracing/RayTracingRequirements.cpp.o
+2026-10-12T00:16:49.4416370Z [ 73%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/vulkan/raytracing/RtGpuResources.cpp.o
+2026-10-12T00:16:50.1533762Z [ 73%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/vulkan/raytracing/HeldItemRenderSlot.cpp.o
+2026-10-12T00:16:50.1988029Z [ 73%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/vulkan/raytracing/FireEmitterBuffer.cpp.o
+2026-10-12T00:16:50.2045899Z [ 80%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/vulkan/raytracing/RtStaticMeshSlot.cpp.o
+2026-10-12T00:16:50.8830008Z [ 80%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/vulkan/raytracing/RtTextureArrays.cpp.o
+2026-10-12T00:16:51.0350307Z [ 80%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/vulkan/raytracing/CharacterRenderSlot.cpp.o
+2026-10-12T00:16:52.1360586Z [ 80%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/vulkan/raytracing/PlayerRenderSlot.cpp.o
+2026-10-12T00:16:52.2657494Z [ 80%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/vulkan/raytracing/RtPipelineVariants.cpp.o
+2026-10-12T00:16:52.5908543Z [ 86%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/vulkan/raytracing/RtPipelineVariantProvider.cpp.o
+2026-10-12T00:16:53.1490810Z [ 86%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/vulkan/raytracing/RtPipelineBundleContracts.cpp.o
+2026-10-12T00:16:53.4487642Z [ 86%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/vulkan/raytracing/RtPipelineBundle.cpp.o
+2026-10-12T00:16:53.7060555Z [ 86%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/vulkan/raytracing/RtFrameEvidenceCoordinator.cpp.o
+2026-10-12T00:16:53.9302456Z [ 93%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/vulkan/raytracing/PresentableTinyRtScene.cpp.o
+2026-10-12T00:16:54.4434358Z [ 93%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/vulkan/raytracing/PresentableTinyRtSceneStaticGeometry.cpp.o
+2026-10-12T00:16:55.8901445Z [ 93%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/vulkan/raytracing/SimulationFrameAdapter.cpp.o
+2026-10-12T00:16:56.9634950Z [ 93%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/scene/assets/SkinnedMeshAsset.cpp.o
+2026-10-12T00:17:02.7037514Z [ 93%] Linking CXX static library libhorde_rt_probe_core.a
+2026-10-12T00:17:02.8004582Z [ 93%] Built target horde_rt_probe_core
+2026-10-12T00:17:02.8059405Z [ 93%] Building CXX object CMakeFiles/horde_rt_final_held_torch_clearance_tests.dir/tests/FinalHeldTorchClearanceTests.cpp.o
+2026-10-12T00:17:04.2806004Z [100%] Linking CXX executable horde_rt_final_held_torch_clearance_tests
+2026-10-12T00:17:04.3258610Z [100%] Built target horde_rt_final_held_torch_clearance_tests
+2026-10-12T00:17:04.3456105Z Building CXX object CMakeFiles/horde_rt_windows_output_resize_launch_tests.dir/tests/WindowsOutputResizeLaunchTests.cpp.o
+2026-10-12T00:17:04.8329384Z Linking CXX executable horde_rt_windows_output_resize_launch_tests
+2026-10-12T00:17:04.8694283Z Built target horde_rt_windows_output_resize_launch_tests
+2026-10-12T00:17:04.8888117Z [ 11%] Built target pocket_audio_native_pcm
+2026-10-12T00:17:04.9010646Z [ 66%] Built target horde_gameplay_simulation
+2026-10-12T00:17:04.9066049Z [ 66%] Building CXX object CMakeFiles/horde_rt_held_item_socket_tests.dir/tests/HeldItemSocketTests.cpp.o
+2026-10-12T00:17:04.9068347Z [ 77%] Building CXX object CMakeFiles/horde_rt_held_item_socket_tests.dir/src/scene/assets/AssetManifest.cpp.o
+2026-10-12T00:17:06.5668142Z [ 77%] Building CXX object CMakeFiles/horde_rt_held_item_socket_tests.dir/src/scene/assets/AssetValidation.cpp.o
+2026-10-12T00:17:06.8854301Z [ 77%] Building CXX object CMakeFiles/horde_rt_held_item_socket_tests.dir/src/scene/assets/GltfDocument.cpp.o
+2026-10-12T00:17:08.5500245Z [ 77%] Building CXX object CMakeFiles/horde_rt_held_item_socket_tests.dir/src/scene/assets/StaticMeshAsset.cpp.o
+2026-10-12T00:17:10.4615985Z [ 77%] Building CXX object CMakeFiles/horde_rt_held_item_socket_tests.dir/src/scene/assets/SkinnedMeshAsset.cpp.o
+2026-10-12T00:17:11.0388450Z [ 88%] Building CXX object CMakeFiles/horde_rt_held_item_socket_tests.dir/src/telemetry/RtPerformanceEvidence.cpp.o
+2026-10-12T00:17:11.9139955Z [ 88%] Building CXX object CMakeFiles/horde_rt_held_item_socket_tests.dir/src/vulkan/raytracing/HeldItemRenderSlot.cpp.o
+2026-10-12T00:17:11.9606407Z [ 88%] Building CXX object CMakeFiles/horde_rt_held_item_socket_tests.dir/src/vulkan/raytracing/PlayerRenderSlot.cpp.o
+2026-10-12T00:17:12.7918877Z [ 88%] Building CXX object CMakeFiles/horde_rt_held_item_socket_tests.dir/src/vulkan/raytracing/RtStaticMeshSlot.cpp.o
+2026-10-12T00:17:14.7109140Z [100%] Linking CXX executable horde_rt_held_item_socket_tests
+2026-10-12T00:17:14.7578936Z [100%] Built target horde_rt_held_item_socket_tests
+2026-10-12T00:17:14.7786206Z [  0%] Building CXX object CMakeFiles/horde_rt_scene_abi_tests.dir/tests/RtSceneAbiTests.cpp.o
+2026-10-12T00:17:14.7787287Z [  0%] Building CXX object CMakeFiles/horde_rt_scene_abi_tests.dir/src/vulkan/raytracing/RtStaticMeshSlot.cpp.o
+2026-10-12T00:17:16.1311891Z [  0%] Building CXX object CMakeFiles/horde_rt_scene_abi_tests.dir/src/vulkan/raytracing/RtTextureArrays.cpp.o
+2026-10-12T00:17:16.7154717Z [100%] Linking CXX executable horde_rt_scene_abi_tests
+2026-10-12T00:17:16.7530420Z [100%] Built target horde_rt_scene_abi_tests
+2026-10-12T00:17:16.7719902Z [  0%] Building CXX object CMakeFiles/horde_rt_static_gltf_asset_tests.dir/tests/StaticGltfAssetTests.cpp.o
+2026-10-12T00:17:16.7720643Z [  0%] Building CXX object CMakeFiles/horde_rt_static_gltf_asset_tests.dir/src/scene/assets/AssetManifest.cpp.o
+2026-10-12T00:17:18.4062756Z [  0%] Building CXX object CMakeFiles/horde_rt_static_gltf_asset_tests.dir/src/scene/assets/AssetValidation.cpp.o
+2026-10-12T00:17:18.7367203Z [100%] Building CXX object CMakeFiles/horde_rt_static_gltf_asset_tests.dir/src/scene/assets/GltfDocument.cpp.o
+2026-10-12T00:17:20.4254726Z [100%] Building CXX object CMakeFiles/horde_rt_static_gltf_asset_tests.dir/src/scene/assets/StaticMeshAsset.cpp.o
+2026-10-12T00:17:22.2291819Z [100%] Building CXX object CMakeFiles/horde_rt_static_gltf_asset_tests.dir/src/vulkan/raytracing/RtStaticMeshSlot.cpp.o
+2026-10-12T00:17:24.1557665Z [100%] Linking CXX executable horde_rt_static_gltf_asset_tests
+2026-10-12T00:17:24.1984307Z [100%] Built target horde_rt_static_gltf_asset_tests
+2026-10-12T00:17:24.2168637Z [  0%] Building CXX object CMakeFiles/horde_rt_static_collapse_asset_tests.dir/tests/StaticCollapseAssetTests.cpp.o
+2026-10-12T00:17:24.2169541Z [  0%] Building CXX object CMakeFiles/horde_rt_static_collapse_asset_tests.dir/src/scene/assets/AssetManifest.cpp.o
+2026-10-12T00:17:25.0211973Z [  0%] Building CXX object CMakeFiles/horde_rt_static_collapse_asset_tests.dir/src/scene/assets/AssetValidation.cpp.o
+2026-10-12T00:17:25.3351087Z [100%] Building CXX object CMakeFiles/horde_rt_static_collapse_asset_tests.dir/src/scene/assets/GltfDocument.cpp.o
+2026-10-12T00:17:25.8528884Z [100%] Building CXX object CMakeFiles/horde_rt_static_collapse_asset_tests.dir/src/scene/assets/StaticMeshAsset.cpp.o
+2026-10-12T00:17:26.9736466Z [100%] Building CXX object CMakeFiles/horde_rt_static_collapse_asset_tests.dir/src/vulkan/raytracing/RtStaticMeshSlot.cpp.o
+2026-10-12T00:17:28.9587157Z [100%] Linking CXX executable horde_rt_static_collapse_asset_tests
+2026-10-12T00:17:28.9979476Z [100%] Built target horde_rt_static_collapse_asset_tests
+2026-10-12T00:17:29.0160308Z [  0%] Building CXX object CMakeFiles/horde_rt_forest_dressing_tests.dir/tests/ForestDressingTests.cpp.o
+2026-10-12T00:17:29.0160984Z [  0%] Building CXX object CMakeFiles/horde_rt_forest_dressing_tests.dir/src/scene/ForestDressing.cpp.o
+2026-10-12T00:17:30.2639826Z [  0%] Building CXX object CMakeFiles/horde_rt_forest_dressing_tests.dir/src/scene/ForestUnderstory.cpp.o
+2026-10-12T00:17:31.0896803Z [ 50%] Building CXX object CMakeFiles/horde_rt_forest_dressing_tests.dir/src/scene/TombDressing.cpp.o
+2026-10-12T00:17:31.2424321Z [ 50%] Building CXX object CMakeFiles/horde_rt_forest_dressing_tests.dir/src/scene/GraveyardDressing.cpp.o
+2026-10-12T00:17:32.2457900Z [ 50%] Building CXX object CMakeFiles/horde_rt_forest_dressing_tests.dir/src/scene/assets/AssetManifest.cpp.o
+2026-10-12T00:17:32.6349725Z [ 50%] Building CXX object CMakeFiles/horde_rt_forest_dressing_tests.dir/src/scene/assets/AssetValidation.cpp.o
+2026-10-12T00:17:32.9572853Z [ 50%] Building CXX object CMakeFiles/horde_rt_forest_dressing_tests.dir/src/scene/assets/GltfDocument.cpp.o
+2026-10-12T00:17:33.9044117Z [100%] Building CXX object CMakeFiles/horde_rt_forest_dressing_tests.dir/src/scene/assets/StaticMeshAsset.cpp.o
+2026-10-12T00:17:34.6043525Z [100%] Building CXX object CMakeFiles/horde_rt_forest_dressing_tests.dir/src/vulkan/raytracing/RtStaticMeshSlot.cpp.o
+2026-10-12T00:17:36.5566427Z [100%] Linking CXX executable horde_rt_forest_dressing_tests
+2026-10-12T00:17:36.5985526Z [100%] Built target horde_rt_forest_dressing_tests
+2026-10-12T00:17:36.6173194Z [  0%] Building CXX object CMakeFiles/horde_rt_forest_understory_tests.dir/tests/ForestUnderstoryTests.cpp.o
+2026-10-12T00:17:36.6174641Z [ 50%] Building CXX object CMakeFiles/horde_rt_forest_understory_tests.dir/src/scene/ForestUnderstory.cpp.o
+2026-10-12T00:17:37.5550158Z [ 50%] Building CXX object CMakeFiles/horde_rt_forest_understory_tests.dir/src/scene/assets/AssetManifest.cpp.o
+2026-10-12T00:17:37.7127525Z [ 50%] Building CXX object CMakeFiles/horde_rt_forest_understory_tests.dir/src/scene/assets/AssetValidation.cpp.o
+2026-10-12T00:17:38.0233120Z [ 50%] Building CXX object CMakeFiles/horde_rt_forest_understory_tests.dir/src/scene/assets/GltfDocument.cpp.o
+2026-10-12T00:17:39.1368457Z [ 50%] Building CXX object CMakeFiles/horde_rt_forest_understory_tests.dir/src/scene/assets/StaticMeshAsset.cpp.o
+2026-10-12T00:17:41.4723614Z [100%] Linking CXX executable horde_rt_forest_understory_tests
+2026-10-12T00:17:41.5130361Z [100%] Built target horde_rt_forest_understory_tests
+2026-10-12T00:17:41.5323070Z [  0%] Building CXX object CMakeFiles/horde_rt_graveyard_dressing_tests.dir/tests/GraveyardDressingTests.cpp.o
+2026-10-12T00:17:41.5324117Z [ 50%] Building CXX object CMakeFiles/horde_rt_graveyard_dressing_tests.dir/src/scene/GraveyardDressing.cpp.o
+2026-10-12T00:17:42.9343696Z [ 50%] Building CXX object CMakeFiles/horde_rt_graveyard_dressing_tests.dir/src/scene/TombDressing.cpp.o
+2026-10-12T00:17:43.3886370Z [ 50%] Building CXX object CMakeFiles/horde_rt_graveyard_dressing_tests.dir/src/scene/assets/AssetManifest.cpp.o
+2026-10-12T00:17:44.1230278Z [ 50%] Building CXX object CMakeFiles/horde_rt_graveyard_dressing_tests.dir/src/scene/assets/AssetValidation.cpp.o
+2026-10-12T00:17:44.4431204Z [ 50%] Building CXX object CMakeFiles/horde_rt_graveyard_dressing_tests.dir/src/scene/assets/GltfDocument.cpp.o
+2026-10-12T00:17:45.0340519Z [100%] Building CXX object CMakeFiles/horde_rt_graveyard_dressing_tests.dir/src/scene/assets/StaticMeshAsset.cpp.o
+2026-10-12T00:17:47.5007583Z [100%] Linking CXX executable horde_rt_graveyard_dressing_tests
+2026-10-12T00:17:47.5409297Z [100%] Built target horde_rt_graveyard_dressing_tests
+2026-10-12T00:17:47.5596784Z [  0%] Building CXX object CMakeFiles/horde_rt_world_surface_range_tests.dir/tests/WorldSurfaceRangeTests.cpp.o
+2026-10-12T00:17:47.8328089Z [100%] Linking CXX executable horde_rt_world_surface_range_tests
+2026-10-12T00:17:47.8704034Z [100%] Built target horde_rt_world_surface_range_tests
+2026-10-12T00:17:47.8902577Z [  7%] Built target pocket_audio_native_pcm
+2026-10-12T00:17:47.9029063Z [ 42%] Built target horde_gameplay_simulation
+2026-10-12T00:17:47.9448737Z [100%] Built target horde_rt_probe_core
+2026-10-12T00:17:47.9502653Z [100%] Building CXX object CMakeFiles/horde_rt_kit_source_intake_tests.dir/tests/KitSourceIntakeTests.cpp.o
+2026-10-12T00:17:48.7369589Z [100%] Linking CXX executable horde_rt_kit_source_intake_tests
+2026-10-12T00:17:48.7790585Z [100%] Built target horde_rt_kit_source_intake_tests
+2026-10-12T00:17:48.7989086Z [  7%] Built target pocket_audio_native_pcm
+2026-10-12T00:17:48.8113767Z [ 42%] Built target horde_gameplay_simulation
+2026-10-12T00:17:48.8280390Z [100%] Built target horde_rt_probe_core
+2026-10-12T00:17:48.8334033Z [100%] Building CXX object CMakeFiles/horde_rt_skinned_character_smoke.dir/tests/SkinnedCharacterModelSmoke.cpp.o
+2026-10-12T00:17:52.8359142Z [100%] Linking CXX executable horde_rt_skinned_character_smoke
+2026-10-12T00:17:52.8863279Z [100%] Built target horde_rt_skinned_character_smoke
+2026-10-12T00:17:52.9066306Z [  6%] Built target pocket_audio_native_pcm
+2026-10-12T00:17:52.9192179Z [ 40%] Built target horde_gameplay_simulation
+2026-10-12T00:17:52.9362868Z [ 93%] Built target horde_rt_probe_core
+2026-10-12T00:17:52.9418200Z [ 93%] Building CXX object CMakeFiles/horde_rt_skinned_arm_reference_tests.dir/tests/SkinnedArmReferenceTests.cpp.o
+2026-10-12T00:17:54.3121837Z [100%] Linking CXX executable horde_rt_skinned_arm_reference_tests
+2026-10-12T00:17:54.3542678Z [100%] Built target horde_rt_skinned_arm_reference_tests
+2026-10-12T00:17:54.3743473Z [  7%] Built target pocket_audio_native_pcm
+2026-10-12T00:17:54.3869944Z [ 42%] Built target horde_gameplay_simulation
+2026-10-12T00:17:54.4040344Z [100%] Built target horde_rt_probe_core
+2026-10-12T00:17:54.4095049Z [100%] Building CXX object CMakeFiles/horde_rt_scene_initialise_preflight_tests.dir/tests/RtSceneInitialisePreflightTests.cpp.o
+2026-10-12T00:17:55.8373326Z [100%] Linking CXX executable horde_rt_scene_initialise_preflight_tests
+2026-10-12T00:17:55.8952766Z [100%] Built target horde_rt_scene_initialise_preflight_tests
+2026-10-12T00:17:55.9142210Z Building CXX object CMakeFiles/horde_rt_texture_layer_subset_tests.dir/tests/RtTextureLayerSubsetTests.cpp.o
+2026-10-12T00:17:57.1220246Z Linking CXX executable horde_rt_texture_layer_subset_tests
+2026-10-12T00:17:57.1591716Z Built target horde_rt_texture_layer_subset_tests
+2026-10-12T00:17:57.1787597Z [  7%] Built target pocket_audio_native_pcm
+2026-10-12T00:17:57.1910379Z [ 42%] Built target horde_gameplay_simulation
+2026-10-12T00:17:57.2076241Z [100%] Built target horde_rt_probe_core
+2026-10-12T00:17:57.2129182Z [100%] Building CXX object CMakeFiles/horde_rt_scene_resource_inventory_tests.dir/tests/RtSceneResourceInventoryTests.cpp.o
+2026-10-12T00:18:00.5141745Z [100%] Linking CXX executable horde_rt_scene_resource_inventory_tests
+2026-10-12T00:18:00.5649944Z [100%] Built target horde_rt_scene_resource_inventory_tests
+2026-10-12T00:18:00.5849301Z [  6%] Built target pocket_audio_native_pcm
+2026-10-12T00:18:00.5970950Z [ 40%] Built target horde_gameplay_simulation
+2026-10-12T00:18:00.6140624Z [ 93%] Built target horde_rt_probe_core
+2026-10-12T00:18:00.6194529Z [100%] Building CXX object CMakeFiles/horde_rt_static_geometry_cutover_tests.dir/tests/StaticGeometryCutoverTests.cpp.o
+2026-10-12T00:18:02.0976817Z [100%] Linking CXX executable horde_rt_static_geometry_cutover_tests
+2026-10-12T00:18:02.1497938Z [100%] Built target horde_rt_static_geometry_cutover_tests
+2026-10-12T00:18:02.1685879Z [  0%] Building CXX object CMakeFiles/horde_rt_gpu_resources_observation_tests.dir/tests/RtGpuResourcesObservationTests.cpp.o
+2026-10-12T00:18:02.1687101Z [  0%] Building CXX object CMakeFiles/horde_rt_gpu_resources_observation_tests.dir/src/telemetry/RtPerformanceEvidence.cpp.o
+2026-10-12T00:18:02.7898723Z [100%] Building CXX object CMakeFiles/horde_rt_gpu_resources_observation_tests.dir/src/vulkan/raytracing/RtGpuResources.cpp.o
+2026-10-12T00:18:03.4716321Z [100%] Linking CXX executable horde_rt_gpu_resources_observation_tests
+2026-10-12T00:18:03.5095254Z [100%] Built target horde_rt_gpu_resources_observation_tests
+2026-10-12T00:18:03.5281334Z [100%] Building CXX object CMakeFiles/horde_rt_gpu_buffer_batch_tests.dir/tests/RtGpuBufferBatchTests.cpp.o
+2026-10-12T00:18:03.5282153Z [100%] Building CXX object CMakeFiles/horde_rt_gpu_buffer_batch_tests.dir/src/telemetry/RtPerformanceEvidence.cpp.o
+2026-10-12T00:18:03.9375229Z [100%] Building CXX object CMakeFiles/horde_rt_gpu_buffer_batch_tests.dir/src/vulkan/raytracing/RtGpuResources.cpp.o
+2026-10-12T00:18:04.6198511Z [100%] Linking CXX executable horde_rt_gpu_buffer_batch_tests
+2026-10-12T00:18:04.6608878Z [100%] Built target horde_rt_gpu_buffer_batch_tests
+2026-10-12T00:18:04.6794170Z Building CXX object CMakeFiles/horde_rt_staged_primary_resource_tests.dir/tests/StagedPrimaryResourceTests.cpp.o
+2026-10-12T00:18:04.6795004Z Building CXX object CMakeFiles/horde_rt_staged_primary_resource_tests.dir/src/vulkan/raytracing/experimental/StagedPrimaryPass.cpp.o
+2026-10-12T00:18:05.1846771Z Linking CXX executable horde_rt_staged_primary_resource_tests
+2026-10-12T00:18:05.2191544Z Built target horde_rt_staged_primary_resource_tests
+2026-10-12T00:18:05.2374458Z [  0%] Building CXX object CMakeFiles/horde_rt_staged_primary_timing_tests.dir/tests/StagedPrimaryTimingTests.cpp.o
+2026-10-12T00:18:05.2375683Z [100%] Building CXX object CMakeFiles/horde_rt_staged_primary_timing_tests.dir/src/vulkan/raytracing/experimental/StagedPrimaryTiming.cpp.o
+2026-10-12T00:18:05.8452290Z [100%] Linking CXX executable horde_rt_staged_primary_timing_tests
+2026-10-12T00:18:05.8804399Z [100%] Built target horde_rt_staged_primary_timing_tests
+2026-10-12T00:18:05.9005836Z [  7%] Built target pocket_audio_native_pcm
+2026-10-12T00:18:05.9129361Z [ 42%] Built target horde_gameplay_simulation
+2026-10-12T00:18:05.9298077Z [100%] Built target horde_rt_probe_core
+2026-10-12T00:18:05.9352335Z [100%] Building CXX object CMakeFiles/horde_rt_driver_capability_report_tests.dir/tests/DriverCapabilityReportTests.cpp.o
+2026-10-12T00:18:06.2623890Z [100%] Linking CXX executable horde_rt_driver_capability_report_tests
+2026-10-12T00:18:06.3024910Z [100%] Built target horde_rt_driver_capability_report_tests
+2026-10-12T00:18:06.3212505Z [100%] Building CXX object CMakeFiles/horde_rt_present_completion_tests.dir/tests/PresentCompletionTests.cpp.o
+2026-10-12T00:18:06.7668831Z [100%] Linking CXX executable horde_rt_present_completion_tests
+2026-10-12T00:18:06.8014186Z [100%] Built target horde_rt_present_completion_tests
+2026-10-12T00:18:06.8198801Z Building CXX object CMakeFiles/horde_rt_present_timing_evidence_tests.dir/tests/PresentTimingEvidenceTests.cpp.o
+2026-10-12T00:18:07.2752539Z Linking CXX executable horde_rt_present_timing_evidence_tests
+2026-10-12T00:18:07.3097623Z Built target horde_rt_present_timing_evidence_tests
+2026-10-12T00:18:07.3293173Z [  7%] Built target pocket_audio_native_pcm
+2026-10-12T00:18:07.3415306Z [ 42%] Built target horde_gameplay_simulation
+2026-10-12T00:18:07.3581097Z [100%] Built target horde_rt_probe_core
+2026-10-12T00:18:07.3633446Z [100%] Building CXX object CMakeFiles/horde_rt_world_route_foundation_tests.dir/tests/WorldRouteFoundationTests.cpp.o
+2026-10-12T00:18:09.9414574Z [100%] Linking CXX executable horde_rt_world_route_foundation_tests
+2026-10-12T00:18:09.9967279Z [100%] Built target horde_rt_world_route_foundation_tests
+2026-10-12T00:18:10.0166678Z [  7%] Built target pocket_audio_native_pcm
+2026-10-12T00:18:10.0290761Z [ 42%] Built target horde_gameplay_simulation
+2026-10-12T00:18:10.0459410Z [100%] Built target horde_rt_probe_core
+2026-10-12T00:18:10.0512626Z [100%] Building CXX object CMakeFiles/horde_rt_vertical_support_tests.dir/tests/VerticalSupportTests.cpp.o
+2026-10-12T00:18:11.4649453Z [100%] Linking CXX executable horde_rt_vertical_support_tests
+2026-10-12T00:18:11.5103719Z [100%] Built target horde_rt_vertical_support_tests
+2026-10-12T00:18:11.5290244Z Building CXX object CMakeFiles/horde_rt_triangle_support_surface_tests.dir/tests/TriangleSupportSurfaceTests.cpp.o
+2026-10-12T00:18:12.6750761Z Linking CXX executable horde_rt_triangle_support_surface_tests
+2026-10-12T00:18:12.7134227Z Built target horde_rt_triangle_support_surface_tests
+2026-10-12T00:18:12.7327711Z [  7%] Built target pocket_audio_native_pcm
+2026-10-12T00:18:12.7448496Z [ 42%] Built target horde_gameplay_simulation
+2026-10-12T00:18:12.7612156Z [100%] Built target horde_rt_probe_core
+2026-10-12T00:18:12.7664495Z [100%] Building CXX object CMakeFiles/horde_rt_held_item_vertical_support_rig_tests.dir/tests/HeldItemVerticalSupportRigTests.cpp.o
+2026-10-12T00:18:14.2374878Z [100%] Linking CXX executable horde_rt_held_item_vertical_support_rig_tests
+2026-10-12T00:18:14.2853996Z [100%] Built target horde_rt_held_item_vertical_support_rig_tests
+2026-10-12T00:18:14.3052086Z [  7%] Built target pocket_audio_native_pcm
+2026-10-12T00:18:14.3174951Z [ 42%] Built target horde_gameplay_simulation
+2026-10-12T00:18:14.3341295Z [100%] Built target horde_rt_probe_core
+2026-10-12T00:18:14.3394421Z [100%] Building CXX object CMakeFiles/horde_rt_player_directional_rig_tests.dir/tests/PlayerDirectionalRigTests.cpp.o
+2026-10-12T00:18:15.7753861Z [100%] Linking CXX executable horde_rt_player_directional_rig_tests
+2026-10-12T00:18:15.8205874Z [100%] Built target horde_rt_player_directional_rig_tests
+2026-10-12T00:18:15.8408177Z [  7%] Built target pocket_audio_native_pcm
+2026-10-12T00:18:15.8534408Z [ 42%] Built target horde_gameplay_simulation
+2026-10-12T00:18:15.8704521Z [100%] Built target horde_rt_probe_core
+2026-10-12T00:18:15.8759621Z [100%] Building CXX object CMakeFiles/horde_rt_rescue_journey_integration_tests.dir/tests/RescueJourneyIntegrationTests.cpp.o
+2026-10-12T00:18:19.4206172Z [100%] Linking CXX executable horde_rt_rescue_journey_integration_tests
+2026-10-12T00:18:19.4748336Z [100%] Built target horde_rt_rescue_journey_integration_tests
+2026-10-12T00:18:19.4946609Z [  6%] Built target pocket_audio_native_pcm
+2026-10-12T00:18:19.5068625Z [ 40%] Built target horde_gameplay_simulation
+2026-10-12T00:18:19.5235715Z [ 93%] Built target horde_rt_probe_core
+2026-10-12T00:18:19.5290849Z [100%] Building CXX object CMakeFiles/horde_rt_rescue_rig_attachment_tests.dir/tests/RescueRigAttachmentTests.cpp.o
+2026-10-12T00:18:21.4735699Z [100%] Linking CXX executable horde_rt_rescue_rig_attachment_tests
+2026-10-12T00:18:21.5194777Z [100%] Built target horde_rt_rescue_rig_attachment_tests
+2026-10-12T00:18:21.5271092Z ##[group]Run ctest --test-dir build/player-vulkan-host --build-config Release --output-on-failure --no-tests=error -R "^(horde_rt_present_completion_tests|horde_rt_present_timing_evidence_tests|horde_rt_player_primitive_contract_tests|horde_rt_player_manifest_agreement_tests|horde_rt_player_animation_tests|horde_rt_final_held_torch_clearance_tests|horde_rt_windows_output_resize_launch_tests|horde_rt_held_item_socket_tests|horde_rt_scene_abi_tests|horde_rt_static_gltf_asset_tests|horde_rt_static_gltf_intake_missing_argument_tests|horde_rt_static_gltf_intake_unknown_argument_tests|horde_rt_static_collapse_asset_tests|horde_rt_forest_dressing_tests|horde_rt_forest_understory_tests|horde_rt_graveyard_dressing_tests|horde_rt_world_surface_range_tests|horde_rt_kit_source_intake_tests|horde_rt_skinned_character_smoke|horde_rt_skinned_arm_reference_tests|horde_rt_player_skinned_semantic_fixtures|horde_rt_player_viewmodel_admission|horde_rt_player_viewmodel_pose_fixtures|horde_rt_scene_initialise_preflight_tests|horde_rt_texture_layer_subset_tests|horde_rt_chapter_texture_alias_payload_tests|horde_rt_chapter_texture_append_payload_tests|horde_rt_scene_resource_inventory_tests|horde_rt_static_geometry_cutover_tests|horde_rt_gpu_resources_observation_tests|horde_rt_gpu_buffer_batch_tests|horde_rt_staged_primary_resource_tests|horde_rt_staged_primary_timing_tests|horde_rt_driver_capability_report_tests|horde_rt_world_route_foundation_tests|horde_rt_vertical_support_tests|horde_rt_triangle_support_surface_tests|horde_rt_held_item_vertical_support_rig_tests|horde_rt_player_directional_rig_tests|horde_rt_rescue_journey_integration_tests|horde_rt_chapter_terrain_journey_tests|horde_rt_rescue_rig_attachment_tests|horde_rt_rescue_adversarial_regression_tests)$"
+2026-10-12T00:18:21.5277471Z [36;1mctest --test-dir build/player-vulkan-host --build-config Release --output-on-failure --no-tests=error -R "^(horde_rt_present_completion_tests|horde_rt_present_timing_evidence_tests|horde_rt_player_primitive_contract_tests|horde_rt_player_manifest_agreement_tests|horde_rt_player_animation_tests|horde_rt_final_held_torch_clearance_tests|horde_rt_windows_output_resize_launch_tests|horde_rt_held_item_socket_tests|horde_rt_scene_abi_tests|horde_rt_static_gltf_asset_tests|horde_rt_static_gltf_intake_missing_argument_tests|horde_rt_static_gltf_intake_unknown_argument_tests|horde_rt_static_collapse_asset_tests|horde_rt_forest_dressing_tests|horde_rt_forest_understory_tests|horde_rt_graveyard_dressing_tests|horde_rt_world_surface_range_tests|horde_rt_kit_source_intake_tests|horde_rt_skinned_character_smoke|horde_rt_skinned_arm_reference_tests|horde_rt_player_skinned_semantic_fixtures|horde_rt_player_viewmodel_admission|horde_rt_player_viewmodel_pose_fixtures|horde_rt_scene_initialise_preflight_tests|horde_rt_texture_layer_subset_tests|horde_rt_chapter_texture_alias_payload_tests|horde_rt_chapter_texture_append_payload_tests|horde_rt_scene_resource_inventory_tests|horde_rt_static_geometry_cutover_tests|horde_rt_gpu_resources_observation_tests|horde_rt_gpu_buffer_batch_tests|horde_rt_staged_primary_resource_tests|horde_rt_staged_primary_timing_tests|horde_rt_driver_capability_report_tests|horde_rt_world_route_foundation_tests|horde_rt_vertical_support_tests|horde_rt_triangle_support_surface_tests|horde_rt_held_item_vertical_support_rig_tests|horde_rt_player_directional_rig_tests|horde_rt_rescue_journey_integration_tests|horde_rt_chapter_terrain_journey_tests|horde_rt_rescue_rig_attachment_tests|horde_rt_rescue_adversarial_regression_tests)$"[0m
+2026-10-12T00:18:21.5332614Z shell: /usr/bin/bash -e {0}
+2026-10-12T00:18:21.5332755Z ##[endgroup]
+2026-10-12T00:18:21.8378699Z Internal ctest changing into directory: /home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo/build/player-vulkan-host
+2026-10-12T00:18:21.8942125Z Test project /home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo/build/player-vulkan-host
+2026-10-12T00:18:21.9373205Z       Start   1: horde_rt_triangle_support_surface_tests
+2026-10-12T00:18:21.9440939Z  1/43 Test   #1: horde_rt_triangle_support_surface_tests ..............   Passed    0.00 sec
+2026-10-12T00:18:21.9495029Z       Start  16: horde_rt_texture_layer_subset_tests
+2026-10-12T00:18:21.9511331Z  2/43 Test  #16: horde_rt_texture_layer_subset_tests ..................   Passed    0.00 sec
+2026-10-12T00:18:21.9512248Z       Start  17: horde_rt_chapter_texture_append_payload_tests
+2026-10-12T00:18:22.4914482Z  3/43 Test  #17: horde_rt_chapter_texture_append_payload_tests ........   Passed    0.54 sec
+2026-10-12T00:18:22.4918144Z       Start  20: horde_rt_player_primitive_contract_tests
+2026-10-12T00:18:22.4935182Z  4/43 Test  #20: horde_rt_player_primitive_contract_tests .............   Passed    0.00 sec
+2026-10-12T00:18:22.4936082Z       Start  23: horde_rt_player_manifest_agreement_tests
+2026-10-12T00:18:23.1236243Z  5/43 Test  #23: horde_rt_player_manifest_agreement_tests .............   Passed    0.63 sec
+2026-10-12T00:18:23.1236982Z       Start  33: horde_rt_present_completion_tests
+2026-10-12T00:18:23.1261891Z  6/43 Test  #33: horde_rt_present_completion_tests ....................   Passed    0.00 sec
+2026-10-12T00:18:23.1262830Z       Start  34: horde_rt_present_timing_evidence_tests
+2026-10-12T00:18:23.1299998Z  7/43 Test  #34: horde_rt_present_timing_evidence_tests ...............   Passed    0.00 sec
+2026-10-12T00:18:23.1301004Z       Start  42: horde_rt_windows_output_resize_launch_tests
+2026-10-12T00:18:23.1313051Z  8/43 Test  #42: horde_rt_windows_output_resize_launch_tests ..........   Passed    0.00 sec
+2026-10-12T00:18:23.1313996Z       Start  49: horde_rt_world_route_foundation_tests
+2026-10-12T00:18:23.2051185Z  9/43 Test  #49: horde_rt_world_route_foundation_tests ................   Passed    0.07 sec
+2026-10-12T00:18:23.2052514Z       Start  50: horde_rt_vertical_support_tests
+2026-10-12T00:18:23.2074563Z 10/43 Test  #50: horde_rt_vertical_support_tests ......................   Passed    0.00 sec
+2026-10-12T00:18:23.2075484Z       Start  51: horde_rt_held_item_vertical_support_rig_tests
+2026-10-12T00:18:23.2413479Z 11/43 Test  #51: horde_rt_held_item_vertical_support_rig_tests ........   Passed    0.03 sec
+2026-10-12T00:18:23.2453691Z       Start  52: horde_rt_player_directional_rig_tests
+2026-10-12T00:18:23.5236355Z 12/43 Test  #52: horde_rt_player_directional_rig_tests ................   Passed    0.28 sec
+2026-10-12T00:18:23.5237486Z       Start  53: horde_rt_final_held_torch_clearance_tests
+2026-10-12T00:18:33.0865932Z 13/43 Test  #53: horde_rt_final_held_torch_clearance_tests ............   Passed    9.56 sec
+2026-10-12T00:18:33.0867487Z       Start  75: horde_rt_player_animation_tests
+2026-10-12T00:18:33.0922008Z 14/43 Test  #75: horde_rt_player_animation_tests ......................   Passed    0.01 sec
+2026-10-12T00:18:33.0922755Z       Start  77: horde_rt_held_item_socket_tests
+2026-10-12T00:18:34.0811257Z 15/43 Test  #77: horde_rt_held_item_socket_tests ......................   Passed    0.99 sec
+2026-10-12T00:18:34.0812551Z       Start  81: horde_rt_scene_abi_tests
+2026-10-12T00:18:34.0830535Z 16/43 Test  #81: horde_rt_scene_abi_tests .............................   Passed    0.00 sec
+2026-10-12T00:18:34.0831291Z       Start  84: horde_rt_world_surface_range_tests
+2026-10-12T00:18:34.0842976Z 17/43 Test  #84: horde_rt_world_surface_range_tests ...................   Passed    0.00 sec
+2026-10-12T00:18:34.0843710Z       Start  85: horde_rt_graveyard_dressing_tests
+2026-10-12T00:18:34.1377921Z 18/43 Test  #85: horde_rt_graveyard_dressing_tests ....................   Passed    0.05 sec
+2026-10-12T00:18:34.1378686Z       Start  86: horde_rt_forest_understory_tests
+2026-10-12T00:18:34.1495289Z 19/43 Test  #86: horde_rt_forest_understory_tests .....................   Passed    0.01 sec
+2026-10-12T00:18:34.1495739Z       Start  87: horde_rt_forest_dressing_tests
+2026-10-12T00:18:34.3761008Z 20/43 Test  #87: horde_rt_forest_dressing_tests .......................   Passed    0.23 sec
+2026-10-12T00:18:34.3761969Z       Start  92: horde_rt_static_gltf_asset_tests
+2026-10-12T00:18:34.4232704Z 21/43 Test  #92: horde_rt_static_gltf_asset_tests .....................   Passed    0.05 sec
+2026-10-12T00:18:34.4233190Z       Start  93: horde_rt_static_gltf_intake_missing_argument_tests
+2026-10-12T00:18:34.4248774Z 22/43 Test  #93: horde_rt_static_gltf_intake_missing_argument_tests ...   Passed    0.00 sec
+2026-10-12T00:18:34.4249777Z       Start  94: horde_rt_static_gltf_intake_unknown_argument_tests
+2026-10-12T00:18:34.4262149Z 23/43 Test  #94: horde_rt_static_gltf_intake_unknown_argument_tests ...   Passed    0.00 sec
+2026-10-12T00:18:34.4262849Z       Start  96: horde_rt_static_collapse_asset_tests
+2026-10-12T00:18:34.4671395Z 24/43 Test  #96: horde_rt_static_collapse_asset_tests .................   Passed    0.04 sec
+2026-10-12T00:18:34.4672204Z       Start 127: horde_rt_staged_primary_timing_tests
+2026-10-12T00:18:34.4689490Z 25/43 Test #127: horde_rt_staged_primary_timing_tests .................   Passed    0.00 sec
+2026-10-12T00:18:34.4690017Z       Start 128: horde_rt_staged_primary_resource_tests
+2026-10-12T00:18:34.4704916Z 26/43 Test #128: horde_rt_staged_primary_resource_tests ...............   Passed    0.00 sec
+2026-10-12T00:18:34.4705905Z       Start 131: horde_rt_gpu_resources_observation_tests
+2026-10-12T00:18:34.4718849Z 27/43 Test #131: horde_rt_gpu_resources_observation_tests .............   Passed    0.00 sec
+2026-10-12T00:18:34.4719746Z       Start 132: horde_rt_gpu_buffer_batch_tests
+2026-10-12T00:18:34.4732395Z 28/43 Test #132: horde_rt_gpu_buffer_batch_tests ......................   Passed    0.00 sec
+2026-10-12T00:18:34.4733434Z       Start 134: horde_rt_scene_initialise_preflight_tests
+2026-10-12T00:18:34.6132386Z 29/43 Test #134: horde_rt_scene_initialise_preflight_tests ............   Passed    0.14 sec
+2026-10-12T00:18:34.6132990Z       Start 135: horde_rt_static_geometry_cutover_tests
+2026-10-12T00:18:34.6152960Z 30/43 Test #135: horde_rt_static_geometry_cutover_tests ...............   Passed    0.00 sec
+2026-10-12T00:18:34.6153875Z       Start 136: horde_rt_scene_resource_inventory_tests
+2026-10-12T00:18:34.9826370Z 31/43 Test #136: horde_rt_scene_resource_inventory_tests ..............***Failed    0.37 sec
+2026-10-12T00:18:34.9827028Z Resource integration: existing readback/mist/torch contracts
+2026-10-12T00:18:34.9827446Z Actual development static admission materials=30 primitives=31 layers=18,15,15,1
+2026-10-12T00:18:34.9827892Z Actual development static admission materials=30 primitives=31 layers=18,15,15,1
+2026-10-12T00:18:34.9828251Z Resource integration: descriptor contracts
+2026-10-12T00:18:34.9828514Z Resource integration: TLAS and water geometry
+2026-10-12T00:18:34.9828771Z Resource integration: actual tomb intake
+2026-10-12T00:18:34.9829071Z Integrated native tomb static roster: 31 primitives, 30 materials
+2026-10-12T00:18:34.9829877Z Matched CPU intake only (baseline first; cache/order bias possible): 13.0771 / 108.199 ms; additional static vertices/indices bytes: 30599296 / 5104008; no GPU allocation, AS build or presentation measurement
+2026-10-12T00:18:34.9830550Z FAIL: actual combined native tomb asset intake retains the frozen primitive/material capacities
+2026-10-12T00:18:34.9830805Z Resource integration: water owner lifetime
+2026-10-12T00:18:34.9830961Z Water lifetime: populate
+2026-10-12T00:18:34.9831096Z Water lifetime: move
+2026-10-12T00:18:34.9831217Z Water lifetime: destroy
+2026-10-12T00:18:34.9831350Z Resource integration: resize contracts
+2026-10-12T00:18:34.9831519Z Resource integration: command/resource observations
+2026-10-12T00:18:34.9831706Z Resource integration: command execution fixtures
+2026-10-12T00:18:34.9831878Z Resource integration: not-ready rejection
+2026-10-12T00:18:34.9832040Z Resource integration: preview inventory
+2026-10-12T00:18:34.9832200Z Resource integration: populated inventory
+2026-10-12T00:18:34.9832304Z 
+2026-10-12T00:18:34.9832384Z       Start 137: horde_rt_skinned_arm_reference_tests
+2026-10-12T00:18:34.9848590Z 32/43 Test #137: horde_rt_skinned_arm_reference_tests .................   Passed    0.00 sec
+2026-10-12T00:18:34.9849935Z       Start 138: horde_rt_skinned_character_smoke
+2026-10-12T00:18:37.4165909Z 33/43 Test #138: horde_rt_skinned_character_smoke .....................   Passed    2.43 sec
+2026-10-12T00:18:37.4166782Z       Start 139: horde_rt_player_skinned_semantic_fixtures
+2026-10-12T00:18:39.9853217Z 34/43 Test #139: horde_rt_player_skinned_semantic_fixtures ............   Passed    2.57 sec
+2026-10-12T00:18:39.9854032Z       Start 140: horde_rt_player_viewmodel_admission
+2026-10-12T00:18:40.0778535Z 35/43 Test #140: horde_rt_player_viewmodel_admission ..................   Passed    0.09 sec
+2026-10-12T00:18:40.0779891Z       Start 141: horde_rt_player_viewmodel_pose_fixtures
+2026-10-12T00:18:41.1023902Z 36/43 Test #141: horde_rt_player_viewmodel_pose_fixtures ..............   Passed    1.02 sec
+2026-10-12T00:18:41.1024847Z       Start 145: horde_rt_driver_capability_report_tests
+2026-10-12T00:18:41.1043016Z 37/43 Test #145: horde_rt_driver_capability_report_tests ..............   Passed    0.00 sec
+2026-10-12T00:18:41.1043515Z       Start 148: horde_rt_rescue_journey_integration_tests
+2026-10-12T00:18:41.2394857Z 38/43 Test #148: horde_rt_rescue_journey_integration_tests ............   Passed    0.13 sec
+2026-10-12T00:18:41.2395743Z       Start 149: horde_rt_chapter_terrain_journey_tests
+2026-10-12T00:18:42.5242636Z 39/43 Test #149: horde_rt_chapter_terrain_journey_tests ...............   Passed    1.28 sec
+2026-10-12T00:18:42.5243555Z       Start 150: horde_rt_kit_source_intake_tests
+2026-10-12T00:18:42.8516075Z 40/43 Test #150: horde_rt_kit_source_intake_tests .....................   Passed    0.33 sec
+2026-10-12T00:18:42.8516770Z       Start 155: horde_rt_chapter_texture_alias_payload_tests
+2026-10-12T00:18:43.0059351Z 41/43 Test #155: horde_rt_chapter_texture_alias_payload_tests .........   Passed    0.15 sec
+2026-10-12T00:18:43.0060479Z       Start 156: horde_rt_rescue_rig_attachment_tests
+2026-10-12T00:18:45.1356703Z 42/43 Test #156: horde_rt_rescue_rig_attachment_tests .................   Passed    2.13 sec
+2026-10-12T00:18:45.1357676Z       Start 157: horde_rt_rescue_adversarial_regression_tests
+2026-10-12T00:18:47.2518807Z 43/43 Test #157: horde_rt_rescue_adversarial_regression_tests .........   Passed    2.12 sec
+2026-10-12T00:18:47.2521790Z 
+2026-10-12T00:18:47.2521894Z 98% tests passed, 1 tests failed out of 43
+2026-10-12T00:18:47.2522065Z 
+2026-10-12T00:18:47.2522211Z Total Test time (real) =  25.36 sec
+2026-10-12T00:18:47.2522353Z 
+2026-10-12T00:18:47.2522441Z The following tests FAILED:
+2026-10-12T00:18:47.2525489Z 	136 - horde_rt_scene_resource_inventory_tests (Failed)
+2026-10-12T00:18:47.2525792Z Errors while running CTest
+2026-10-12T00:18:47.2837928Z ##[error]Process completed with exit code 8.
+2026-10-12T00:18:47.2927342Z Post job cleanup.
+2026-10-12T00:18:47.3525679Z [command]/usr/bin/git version
+2026-10-12T00:18:47.3560822Z git version 2.55.0
+2026-10-12T00:18:47.3590547Z Temporarily overriding HOME='/home/runner/work/_temp/a07ef4b0-7682-4fc2-b02b-e5d0b8ef5e22' before making global git config changes
+2026-10-12T00:18:47.3591056Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-12T00:18:47.3594257Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo
+2026-10-12T00:18:47.3623569Z Removing SSH command configuration
+2026-10-12T00:18:47.3628767Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-12T00:18:47.3660557Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-12T00:18:47.3886689Z Removing HTTP extra header
+2026-10-12T00:18:47.3893221Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-12T00:18:47.3942797Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-12T00:18:47.4161427Z Removing includeIf entries pointing to credentials config files
+2026-10-12T00:18:47.4167556Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-12T00:18:47.4195845Z includeif.gitdir:/home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo/.git.path
+2026-10-12T00:18:47.4196406Z includeif.gitdir:/home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo/.git/worktrees/*.path
+2026-10-12T00:18:47.4196827Z includeif.gitdir:/github/workspace/.git.path
+2026-10-12T00:18:47.4197270Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-10-12T00:18:47.4203939Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo/.git.path
+2026-10-12T00:18:47.4227431Z /home/runner/work/_temp/git-credentials-eab63ba8-69f5-43cb-bd88-b4f5cc3161b4.config
+2026-10-12T00:18:47.4236117Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo/.git.path /home/runner/work/_temp/git-credentials-eab63ba8-69f5-43cb-bd88-b4f5cc3161b4.config
+2026-10-12T00:18:47.4270654Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo/.git/worktrees/*.path
+2026-10-12T00:18:47.4293298Z /home/runner/work/_temp/git-credentials-eab63ba8-69f5-43cb-bd88-b4f5cc3161b4.config
+2026-10-12T00:18:47.4300757Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-eab63ba8-69f5-43cb-bd88-b4f5cc3161b4.config
+2026-10-12T00:18:47.4333482Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path
+2026-10-12T00:18:47.4355615Z /github/runner_temp/git-credentials-eab63ba8-69f5-43cb-bd88-b4f5cc3161b4.config
+2026-10-12T00:18:47.4362433Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-eab63ba8-69f5-43cb-bd88-b4f5cc3161b4.config
+2026-10-12T00:18:47.4394265Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-10-12T00:18:47.4415561Z /github/runner_temp/git-credentials-eab63ba8-69f5-43cb-bd88-b4f5cc3161b4.config
+2026-10-12T00:18:47.4422888Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-eab63ba8-69f5-43cb-bd88-b4f5cc3161b4.config
+2026-10-12T00:18:47.4455601Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-12T00:18:47.4650166Z Removing credentials config '/home/runner/work/_temp/git-credentials-eab63ba8-69f5-43cb-bd88-b4f5cc3161b4.config'
+2026-10-12T00:18:47.4790877Z Cleaning up orphan processes
