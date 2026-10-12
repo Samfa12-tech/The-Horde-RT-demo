@@ -1,0 +1,19 @@
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+    Start  87: horde_rt_forest_understory_tests
+1/7 Test  #87: horde_rt_forest_understory_tests ...............   Passed    0.73 sec
+    Start  88: horde_rt_forest_dressing_tests
+2/7 Test  #88: horde_rt_forest_dressing_tests .................   Passed    1.62 sec
+    Start 161: horde_rt_static_geometry_cutover_tests
+3/7 Test #161: horde_rt_static_geometry_cutover_tests .........   Passed    0.02 sec
+    Start 162: horde_rt_scene_resource_inventory_tests
+4/7 Test #162: horde_rt_scene_resource_inventory_tests ........   Passed    1.29 sec
+    Start 178: horde_rt_chapter_terrain_journey_tests
+5/7 Test #178: horde_rt_chapter_terrain_journey_tests .........   Passed    2.77 sec
+    Start 185: horde_rt_rescue_rig_attachment_tests
+6/7 Test #185: horde_rt_rescue_rig_attachment_tests ...........   Passed    3.04 sec
+    Start 186: horde_rt_rescue_adversarial_regression_tests
+7/7 Test #186: horde_rt_rescue_adversarial_regression_tests ...   Passed    2.95 sec
+
+100% tests passed, 0 tests failed out of 7
+
+Total Test time (real) =  12.45 sec

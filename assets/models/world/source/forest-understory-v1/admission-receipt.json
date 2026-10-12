@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "originalPayloadsVerified": 59,
+  "runtime": [
+    {
+      "path": "models/world/runtime/forest-understory-v1/horde-fern-open-clump.glb",
+      "bytes": 206396,
+      "sha256": "0c86c7f7d1072ca18bda70080de645d5975bb9bb1634d2a74bd63943543e652b",
+      "derivation": "byte-identical original"
+    },
+    {
+      "path": "models/world/runtime/forest-understory-v1/horde-fern-small-clump.glb",
+      "bytes": 166268,
+      "sha256": "9e170ceae6443c3a68b3a7a300ca76343e422e1ee304a8f58452da046fe588f9",
+      "derivation": "byte-identical original"
+    },
+    {
+      "path": "models/world/runtime/forest-understory-v1/asset.manifest.json",
+      "bytes": 860,
+      "sha256": "cbc759a594b2e80092aa0c3daf87c52fd9c9ac77b08120e1fa908359d67241ee",
+      "derivation": "bounded native intake manifest"
+    }
+  ],
+  "albedoSha256": "ee50e858d39fa43418ae8b243f2336d4f353408753fa736460c0fe8f16125d44",
+  "exactTreeMapMatches": [
+    "textures/horde-alder-original-basecolor-512.png"
+  ],
+  "features": "closed opaque foliage; no normals/alpha/transparency/light or new texture family",
+  "material": "existing ForestAlder with exact shared source albedo",
+  "sourceOnly": "All seven original masters, maps, scripts and provenance preserved; only two ferns admitted next."
+}

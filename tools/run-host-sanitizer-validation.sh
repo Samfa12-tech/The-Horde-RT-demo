@@ -22,6 +22,7 @@ hordeTargets=(
   horde_rt_input_mailbox_stress
   horde_rt_playtest_report_tests
   horde_rt_playtest_submission_tests
+  horde_rt_forest_understory_tests
 )
 
 cmake -S . -B "$hordeBuild" \

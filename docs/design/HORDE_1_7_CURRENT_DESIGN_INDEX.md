@@ -21,6 +21,17 @@ both-backend captures and replacement/restore verification. Ordinary GPU zone li
 prepared dressing, full chapter gallery and sustained/phone acceptance remain
 required. Older staged proofs below retain their historical scope.
 
+The [prepared understory milestone](../evidence/2026-10-12-prepared-understory/README.md)
+recovers all 59 original forest-kit payloads and admits the two byte-identical
+ferns on exported terrain, using the existing alder material/texture family.
+Opened Pipeline/QueryCompute frames and native slope/rollback/package checks
+record its bounded cost. Remaining rocks/log/root/snags/stump and distant-town
+presentation continue within this chapter. Current ordinary-play residency
+saving is **zero**; the full-owner diagnostic is not normal-play streaming.
+Easy Tree/replacement canopy remains at its deferred roadmap stage. Complete
+two-way inspection, sustained measurements and a current phone-test candidate
+remain required; physical acceptance is pending owner availability.
+
 The [static primitive ownership continuation](../evidence/2026-10-12-static-primitive-owners/README.md)
 adds validated packed-asset subranges, avoiding extra static-asset or primitive
 rows for future zone owners. Native chapter tests preserve all geometry/material

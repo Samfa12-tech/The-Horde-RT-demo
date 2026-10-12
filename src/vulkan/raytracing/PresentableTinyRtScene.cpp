@@ -1,6 +1,7 @@
 #include "gameplay/effects/KeeperCastPresentation.h"
 #include "scene/EntryPortalCapGeometry.h"
 #include "scene/ForestDressing.h"
+#include "scene/ForestUnderstory.h"
 #include "scene/GraveyardDressing.h"
 #include "scene/RescueLidFinish.h"
 #include "vulkan/raytracing/RtWorldSurfaceRange.h"
@@ -2562,6 +2563,9 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
             return false;
         horde::scene::ForestDressingBuildReport forest;
         if (!horde::scene::AppendPreparedForestDressing(root, collapseStaticAsset_, forest, diagnostic, chapterTerrainSurface_.get()))
+            return false;
+        horde::scene::ForestUnderstoryReport understory;
+        if (!horde::scene::AppendPreparedForestUnderstory(root, collapseStaticAsset_, *chapterTerrainSurface_, understory, diagnostic))
             return false;
         // The collapse's final masonry range and the first dressing range use
         // the same material. Keep every triangle while sharing one metadata row;

@@ -67,8 +67,11 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 93u,
-          "development registry retains prior views plus four fixed-step stake traversal inspections");
+    Check(kDevelopmentCheckpoints.size() == 94u,
+          "development registry retains prior views, stake traversal and bounded understory inspection");
+    Check(FindDevelopmentCheckpoint("chapter-understory-close") != nullptr &&
+          FindShowcaseCheckpoint("chapter-understory-close") == nullptr,
+          "understory camera is development-only and cannot alter release checkpoint lookup");
     const std::array<const char*, 4u> stakeViews{{
         "chapter-stake-ascent", "chapter-stake-pullup",
         "chapter-stake-descent", "chapter-stake-repeat-ascent"}};

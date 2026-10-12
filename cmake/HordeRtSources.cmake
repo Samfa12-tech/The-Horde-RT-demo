@@ -33,6 +33,7 @@ set(HORDE_RT_CORE_RELATIVE_SOURCES
     gameplay/items/HeldItemKinematics.cpp
     gameplay/ShowcaseBenchmark.cpp
     scene/ForestDressing.cpp
+    scene/ForestUnderstory.cpp
     scene/GraveyardDressing.cpp
     scene/TombDressing.cpp
     scene/assets/AssetManifest.cpp

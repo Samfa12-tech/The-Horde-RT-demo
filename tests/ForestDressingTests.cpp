@@ -1,6 +1,7 @@
 #include "gameplay/simulation/DevelopmentWorldRoute.h"
 #include "gameplay/simulation/ForestTreePlacementContract.h"
 #include "scene/ForestDressing.h"
+#include "scene/ForestUnderstory.h"
 #include "scene/GraveyardDressing.h"
 #include "scene/ChapterTerrainSurface.h"
 #include "scene/ChapterTerrainAdmission.h"
@@ -366,14 +367,18 @@ void TestNativeChapterPrimitiveOwnership()
     TombDressingBuildReport tomb;
     ForestDressingBuildReport forest;
     GraveyardDressingReport graveyard;
+    ForestUnderstoryReport understory;
     std::shared_ptr<const gameplay::simulation::TriangleSupportSurface> terrain;
     const bool prepared = AppendPreparedTombDressing(kRoot / "assets", owner, tomb, diagnostic) &&
         AppendChapterTerrain(kRoot / "assets", owner, terrain, diagnostic) &&
         AppendPreparedGraveyard(kRoot / "assets", owner, terrain, graveyard, diagnostic) &&
         AppendPreparedForestDressing(kRoot / "assets", owner, forest, diagnostic, terrain.get()) &&
+        AppendPreparedForestUnderstory(kRoot / "assets", owner, *terrain, understory, diagnostic) &&
         ConsolidateWorldBakedMaterialFamilies(owner, diagnostic);
     Check(prepared, diagnostic.empty() ? "real tomb/terrain/forest preparation succeeds" : diagnostic);
     if (!prepared) return;
+    Check(understory.placements.size()==18 && understory.triangles==17712,
+          "real exported terrain supports all bounded understory clumps before native owner packing");
     constexpr std::array<std::string_view,11> families{{
         "Boulder01Rock", "MedievalWall02", "TombBoneWax", "TombEarthenware", "TombCharredWick",
         "ChapterTrailDampSand", "ChapterForestGround", "ForestBark", "ForestPine", "ForestMoss", "ForestAlder"}};

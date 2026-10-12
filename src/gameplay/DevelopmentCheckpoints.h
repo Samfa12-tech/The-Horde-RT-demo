@@ -69,7 +69,10 @@ struct DevelopmentCheckpoint
     std::uint8_t rescueTraversalCapture = 0u;
 };
 
-inline constexpr std::array<DevelopmentCheckpoint, 93u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 94u> kDevelopmentCheckpoints{{
+    {.id=214,.name="chapter-understory-close",.baseShowcaseCheckpointId=11,
+     .cameraX=-17.7f,.cameraZ=15.2f,.yaw=1.15f,.pitch=.10f,
+     .stagesRescueExterior=true,.exteriorRouteStation=5u},
     {.id=210,.name="chapter-stake-ascent",.baseShowcaseCheckpointId=11,
      .cameraX=-33.7f,.cameraZ=-15.2f,.yaw=2.35619449f,.pitch=-.32f,
      .stagesRescueExterior=true,.rescueTraversalCapture=1u},

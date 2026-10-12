@@ -13,6 +13,9 @@ function Assert-CollapseGradleInventory([string]$Text) {
     $names=@([regex]::Matches($Text, "(?m)^\s*include '([^']+)'\s*$") | ForEach-Object { $_.Groups[1].Value } | Where-Object { $_ -like 'models/world/*' })
     $expected=@('models/world/runtime/collapsed-entry/asset.manifest.json','models/world/runtime/collapsed-entry/collapsed-entry-lod0.runtime.glb',
         'models/world/runtime/forest-tree-pair-v1/asset.manifest.json','models/world/runtime/forest-tree-pair-v1/runtime-roster.json',
+        'models/world/runtime/forest-understory-v1/asset.manifest.json',
+        'models/world/runtime/forest-understory-v1/horde-fern-open-clump.glb',
+        'models/world/runtime/forest-understory-v1/horde-fern-small-clump.glb',
         'models/world/runtime/forest-tree-pair-v1/horde-irregular-pine-v1-lod1.glb','models/world/runtime/forest-tree-pair-v1/horde-upright-alder-v1-lod1.glb') + @(Get-Horde17TombAssetSpecification | Where-Object {$_.Path -like 'models/world/*'} | ForEach-Object Path)
     Require ([string]::Join("`n",[string[]]@($names | Sort-Object -CaseSensitive)) -ceq [string]::Join("`n",[string[]]@($expected | Sort-Object -CaseSensitive))) 'Gradle world assets must match the exact collapse, forest and tomb runtime rosters.'
 }
@@ -255,9 +258,18 @@ try {
     $windows=@(Get-Horde162RuntimeFiles $repo Windows);$android=@(Get-Horde162RuntimeFiles $repo Android)
     $baseWindows=@(Get-Horde162AssetSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Windows'})
     $baseAndroid=@(Get-Horde162AssetSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Android'})
-    Require ($baseWindows.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Windows'}).Count -eq 33 -and
-             $baseAndroid.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Android'}).Count -eq 34) 'Current shared asset roster includes the four admitted forest entries.'
-    Require ($windows.Count -eq 90 -and $android.Count -eq 91) 'Current closed roster includes exact tomb, terrain, tree-pair, Kit and four grave-marker runtime assets; no editable sources.'
+    Require ($baseWindows.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Windows'}).Count -eq 36 -and
+             $baseAndroid.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Android'}).Count -eq 37) 'Current shared asset roster includes four tree-pair and three understory entries.'
+    Require ($windows.Count -eq 93 -and $android.Count -eq 94) 'Current closed roster includes exact tomb, terrain, tree-pair, Kit, four grave-marker and three understory runtime assets; no editable sources.'
+    $understory=@('models/world/runtime/forest-understory-v1/asset.manifest.json',
+        'models/world/runtime/forest-understory-v1/horde-fern-open-clump.glb',
+        'models/world/runtime/forest-understory-v1/horde-fern-small-clump.glb')
+    Require (@($windows | Where-Object {$_ -like 'models/world/runtime/forest-understory-v1/*'}).Count -eq 3 -and
+             @($android | Where-Object {$_ -like 'models/world/runtime/forest-understory-v1/*'}).Count -eq 3) 'Both platforms admit only the three final understory files.'
+    foreach($clump in $understory) {
+        Require (@($windows | Where-Object {$_ -ceq $clump}).Count -eq 1 -and
+                 @($android | Where-Object {$_ -ceq $clump}).Count -eq 1) 'Each exact understory payload is admitted once on both platforms.'
+    }
     $graveMarkers=@('models/world/runtime/grave-markers-r03/grave-marker-round.manifest.json',
         'models/world/runtime/grave-markers-r03/grave-marker-round.runtime.glb',
         'models/world/runtime/grave-markers-r03/grave-marker-damaged.manifest.json',

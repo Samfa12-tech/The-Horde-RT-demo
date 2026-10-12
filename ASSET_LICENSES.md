@@ -360,3 +360,16 @@ included. Runtime consumes the same closed stone recipe through the shared
 world-surface material transport, without packaging the editable source/GLB or
 adding a texture, material row or light. Existing stone texture notices remain
 separate; this original geometry does not change their licensing.
+
+### Original supplied forest understory (1.7 development)
+
+`assets/models/world/source/forest-understory-v1/original-package` preserves all
+59 manifest payloads of the supplied original Horde forest-dressing kit,
+including its seven masters, editable Blender scene, maps, scripts and
+`ORIGINAL-AUTHORSHIP.txt`. The two runtime fern GLBs are byte-identical originals
+with Horde runtime filenames. Geometry and foliage are project-owned original
+work; no third-party model/map is included and no new CC0/MIT declaration is
+made. The current owner task authorizes public Horde reuse. Fern albedo matches
+the supplied tree-pair map exactly and reuses the admitted ForestAlder family.
+Rocks/log/root candidates remain source-only pending separate native derivative,
+material, collision and cost checks. No new texture or transparency is admitted.
