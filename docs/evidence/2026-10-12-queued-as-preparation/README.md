@@ -57,6 +57,13 @@ Phone CURRENT/HIGHER and saved LOWER migration, final chapter audio/haptics and
 physical acceptance remain pending. Shader budgets, quality,18 layers and three
 actor slots remain unchanged. Easy Tree/canopy and mist28 stay deferred.
 
+`e0881ae2` failed its Vulkan host compilation: the new lease fixture used
+`std::uintptr_t`/`std::uint32_t` without its own `<cstdint>` include. MSVC's
+transitive headers hid this omission. The retained exact compiler log identifies
+the cause; the follow-up adds the required include without changing assertions
+or runtime code. Local focused lease coverage passes; fresh exact CI remains
+required for the correction.
+
 Final identities/measurements are in `final/candidate-receipt.json`; the earlier
 receipt/captures remain historical evidence before the device-loss fix. Gallery:
 [Pipeline](final/pipeline/cutover-01-selected.png),

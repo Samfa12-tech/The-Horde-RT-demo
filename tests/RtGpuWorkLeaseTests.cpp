@@ -1,6 +1,7 @@
 #include "vulkan/raytracing/RtGpuWorkLease.h"
 #include <iostream>
 #include <type_traits>
+#include <cstdint>
 using namespace horde::vulkan::raytracing;
 template<class T> T Handle(unsigned id) {
     if constexpr(std::is_pointer_v<T>) return reinterpret_cast<T>(static_cast<std::uintptr_t>(id));
