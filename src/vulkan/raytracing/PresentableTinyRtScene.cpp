@@ -3,6 +3,7 @@
 #include "scene/ForestDressing.h"
 #include "scene/ForestUnderstory.h"
 #include "scene/ForestRockDressing.h"
+#include "scene/ForestDeadwood.h"
 #include "scene/BellwetherShell.h"
 #include "scene/GraveyardDressing.h"
 #include "scene/RescueLidFinish.h"
@@ -2576,6 +2577,9 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
         horde::scene::ForestRockReport rocks;
         if (!horde::scene::AppendPreparedForestRocks(root, collapseStaticAsset_, chapterTerrainSurface_, rocks, diagnostic))
             return false;
+        horde::scene::ForestDeadwoodReport deadwood;
+        if (!horde::scene::AppendPreparedForestDeadwood(root, collapseStaticAsset_, chapterTerrainSurface_, deadwood, diagnostic))
+            return false;
         // The collapse's final masonry range and the first dressing range use
         // the same material. Keep every triangle while sharing one metadata row;
         // High's physical lantern panes must fit alongside this resident scene.
@@ -3471,7 +3475,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     {
         worldRouteGeometry_=horde::scene::PrepareDevelopmentWorldGeometry(stagedWorldPreparation_,developmentRescueJourney_,
             chapterTerrainSurface_!=nullptr,developmentRescueJourney_ && chapterTerrainSurface_!=nullptr);
-        if(developmentRescueJourney_) horde::scene::AppendRescueJourneyGeometry(worldRouteGeometry_);
+        if(developmentRescueJourney_) horde::scene::AppendRescueJourneyGeometry(worldRouteGeometry_,chapterTerrainSurface_==nullptr);
         if(!worldRouteGeometry_.valid) { diagnostic="Development world route preparation failed finite geometry admission."; return false; }
         for(const auto& triangle:worldRouteGeometry_.triangles)
         {

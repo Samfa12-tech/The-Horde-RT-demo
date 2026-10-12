@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "asset": "prepared-deadwood-native-source-candidates",
+  "metresPerUnit": 1.0,
+  "coordinateSystem": {
+    "up": "+Y",
+    "forward": "+Z"
+  },
+  "budgets": {
+    "maxVertices": 12000,
+    "maxIndices": 12000,
+    "maxMaterials": 2,
+    "maxPrimitives": 2,
+    "maxTextureLayersPerKind": 2
+  },
+  "lods": [
+    {
+      "name": "lod0",
+      "maxTriangles": 3106
+    }
+  ],
+  "requiredSockets": [],
+  "runtimeTextureProfile": {
+    "android": "astc",
+    "windows": "rgba8",
+    "mipmapped": true,
+    "resolution": 1024
+  },
+  "materialOverrides": [],
+  "distribution": "source-candidate",
+  "licenceStatus": "Original owner supplied log/root; paid-plan Meshy creator stump with settled owner Horde permission; Quaternius CC0 snag geometry with original Horde bark. See ../RIGHTS.md; no blanket licence."
+}

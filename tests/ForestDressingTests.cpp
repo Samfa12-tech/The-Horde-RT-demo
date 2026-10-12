@@ -3,6 +3,7 @@
 #include "scene/ForestDressing.h"
 #include "scene/ForestUnderstory.h"
 #include "scene/ForestRockDressing.h"
+#include "scene/ForestDeadwood.h"
 #include "scene/BellwetherShell.h"
 #include "scene/GraveyardDressing.h"
 #include "scene/ChapterTerrainSurface.h"
@@ -370,6 +371,7 @@ void TestNativeChapterPrimitiveOwnership()
     ForestDressingBuildReport forest;
     GraveyardDressingReport graveyard;
     ForestUnderstoryReport understory;
+    ForestDeadwoodReport deadwood;
     std::shared_ptr<const gameplay::simulation::TriangleSupportSurface> terrain;
     const bool prepared = AppendPreparedTombDressing(kRoot / "assets", owner, tomb, diagnostic) &&
         AppendChapterTerrain(kRoot / "assets", owner, terrain, diagnostic) &&
@@ -378,11 +380,14 @@ void TestNativeChapterPrimitiveOwnership()
         AppendPreparedForestDressing(kRoot / "assets", owner, forest, diagnostic, terrain.get()) &&
         AppendPreparedForestUnderstory(kRoot / "assets", owner, *terrain, understory, diagnostic) &&
         [&]{ForestRockReport rocks;return AppendPreparedForestRocks(kRoot / "assets",owner,terrain,rocks,diagnostic);}() &&
+        AppendPreparedForestDeadwood(kRoot / "assets",owner,terrain,deadwood,diagnostic) &&
         ConsolidateWorldBakedMaterialFamilies(owner, diagnostic);
     Check(prepared, diagnostic.empty() ? "real tomb/terrain/forest preparation succeeds" : diagnostic);
     if (!prepared) return;
     Check(understory.placements.size()==18 && understory.triangles==17712,
           "real exported terrain supports all bounded understory clumps before native owner packing");
+    Check(deadwood.placements.size()==10 && deadwood.triangles==11884,
+          "real exported terrain supports all four prepared deadwood assets with exact contact");
     constexpr std::array<std::string_view,11> families{{
         "Boulder01Rock", "MedievalWall02", "TombBoneWax", "TombEarthenware", "TombCharredWick",
         "ChapterTrailDampSand", "ChapterForestGround", "ForestBark", "ForestPine", "ForestMoss", "ForestAlder"}};

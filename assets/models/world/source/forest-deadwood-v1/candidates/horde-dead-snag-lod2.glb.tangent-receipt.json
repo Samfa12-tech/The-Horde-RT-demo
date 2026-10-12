@@ -1,0 +1,19 @@
+{
+  "status": "pass",
+  "input": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\assets\\models\\world\\source\\forest-deadwood-v1\\original-snag\\models\\Horde_Dead_Snag_01_LOD2.glb",
+  "output": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\assets\\models\\world\\source\\forest-deadwood-v1\\candidates\\horde-dead-snag-lod2.glb",
+  "inputSha256": "f4245c9ee077411fcd77b6c611038ae4d958c80f76b26dde6af691092c285b63",
+  "outputSha256": "71905eaa0bf27baa40ccecd4d4a1d8722d43c9954dff94e3ccc242d639d410dd",
+  "outputBytes": 3730464,
+  "geometryUnchanged": true,
+  "geometryComparison": "positions/winding/UV0 exact at 1e-6; normal direction dot >= 0.99999",
+  "maximumNormalComponentDelta": 0.0005350000000000077,
+  "minimumNormalDirectionDot": 0.9999998227750486,
+  "embeddedImagePixelsUnchanged": true,
+  "tangentLoopCountsByMappedMaterial": {
+    "Original_Weathered_Bark": 3594
+  },
+  "materialTriangles": {
+    "Original_Weathered_Bark": 1198
+  }
+}

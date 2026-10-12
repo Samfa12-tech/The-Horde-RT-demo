@@ -1,0 +1,47 @@
+{
+  "runtime_reimport_passed": true,
+  "blender_version": "4.3.2",
+  "welded_vertices": 1555,
+  "faces": 3106,
+  "boundary_edges": 0,
+  "nonmanifold_edges": 0,
+  "nonmanifold_vertices": 0,
+  "inconsistent_winding_edges": 0,
+  "signed_volume_m3": 0.7219781263833792,
+  "dimensions_m_blender_xyz": [
+    1.753143548965454,
+    1.7999999523162842,
+    0.8765774369239807
+  ],
+  "mesh_objects": 1,
+  "material_count": 1,
+  "single_sided": true,
+  "editable_blend_reopened": true,
+  "editable_packed_images": [
+    {
+      "name": "stump_basecolor_512",
+      "packed": true,
+      "size": [
+        512,
+        512
+      ]
+    },
+    {
+      "name": "stump_metallic-roughness_512",
+      "packed": true,
+      "size": [
+        512,
+        512
+      ]
+    },
+    {
+      "name": "stump_normal_512",
+      "packed": true,
+      "size": [
+        512,
+        512
+      ]
+    }
+  ],
+  "editable_stump_exists": true
+}

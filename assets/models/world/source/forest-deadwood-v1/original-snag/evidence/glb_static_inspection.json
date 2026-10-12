@@ -1,0 +1,194 @@
+[
+  {
+    "file": "Horde_Dead_Snag_01_LOD0.glb",
+    "bytes": 3801032,
+    "sha256": "f65183bd67a330c0afd0413e3f686f81c6286939f005b22d6e3540c82b0319de",
+    "magic_valid": true,
+    "version": 2,
+    "length_valid": true,
+    "triangles": 4792,
+    "vertices": 2905,
+    "finite_positions_normals_uv": true,
+    "indices_valid": true,
+    "degenerate_triangles_area_lt_1e_12": 0,
+    "bounds_min": [
+      -1.6520121097564697,
+      0.0,
+      -0.676365852355957
+    ],
+    "bounds_max": [
+      1.4404239654541016,
+      6.195629596710205,
+      0.6190109848976135
+    ],
+    "welded_boundary_edges": 280,
+    "welded_nonmanifold_edges": 0,
+    "materials": [
+      {
+        "doubleSided": true,
+        "name": "Original_Weathered_Bark",
+        "normalTexture": {
+          "index": 0,
+          "scale": 0.6000000238418579
+        },
+        "pbrMetallicRoughness": {
+          "baseColorTexture": {
+            "index": 1
+          },
+          "metallicFactor": 0,
+          "metallicRoughnessTexture": {
+            "index": 2
+          }
+        }
+      }
+    ],
+    "images": [
+      {
+        "bufferView": 4,
+        "mimeType": "image/png",
+        "name": "snag_bark_normal"
+      },
+      {
+        "bufferView": 5,
+        "mimeType": "image/png",
+        "name": "snag_bark_basecolor"
+      },
+      {
+        "bufferView": 6,
+        "mimeType": "image/png",
+        "name": "snag_bark_roughness"
+      }
+    ],
+    "external_dependencies": [],
+    "extensionsRequired": [],
+    "meshes": 1
+  },
+  {
+    "file": "Horde_Dead_Snag_01_LOD1.glb",
+    "bytes": 3743832,
+    "sha256": "e7bd3645388036a5689974c917a45779437707a404ae9083aacc4d4c746da099",
+    "magic_valid": true,
+    "version": 2,
+    "length_valid": true,
+    "triangles": 2395,
+    "vertices": 1567,
+    "finite_positions_normals_uv": true,
+    "indices_valid": true,
+    "degenerate_triangles_area_lt_1e_12": 0,
+    "bounds_min": [
+      -1.6520121097564697,
+      0.0,
+      -0.676365852355957
+    ],
+    "bounds_max": [
+      1.4404239654541016,
+      6.195629596710205,
+      0.6190109848976135
+    ],
+    "welded_boundary_edges": 273,
+    "welded_nonmanifold_edges": 0,
+    "materials": [
+      {
+        "doubleSided": true,
+        "name": "Original_Weathered_Bark",
+        "normalTexture": {
+          "index": 0,
+          "scale": 0.6000000238418579
+        },
+        "pbrMetallicRoughness": {
+          "baseColorTexture": {
+            "index": 1
+          },
+          "metallicFactor": 0,
+          "metallicRoughnessTexture": {
+            "index": 2
+          }
+        }
+      }
+    ],
+    "images": [
+      {
+        "bufferView": 4,
+        "mimeType": "image/png",
+        "name": "snag_bark_normal"
+      },
+      {
+        "bufferView": 5,
+        "mimeType": "image/png",
+        "name": "snag_bark_basecolor"
+      },
+      {
+        "bufferView": 6,
+        "mimeType": "image/png",
+        "name": "snag_bark_roughness"
+      }
+    ],
+    "external_dependencies": [],
+    "extensionsRequired": [],
+    "meshes": 1
+  },
+  {
+    "file": "Horde_Dead_Snag_01_LOD2.glb",
+    "bytes": 3713924,
+    "sha256": "f4245c9ee077411fcd77b6c611038ae4d958c80f76b26dde6af691092c285b63",
+    "magic_valid": true,
+    "version": 2,
+    "length_valid": true,
+    "triangles": 1198,
+    "vertices": 857,
+    "finite_positions_normals_uv": true,
+    "indices_valid": true,
+    "degenerate_triangles_area_lt_1e_12": 0,
+    "bounds_min": [
+      -1.6442404985427856,
+      0.0,
+      -0.6677151322364807
+    ],
+    "bounds_max": [
+      1.43192458152771,
+      6.195629596710205,
+      0.617686927318573
+    ],
+    "welded_boundary_edges": 156,
+    "welded_nonmanifold_edges": 0,
+    "materials": [
+      {
+        "doubleSided": true,
+        "name": "Original_Weathered_Bark",
+        "normalTexture": {
+          "index": 0,
+          "scale": 0.6000000238418579
+        },
+        "pbrMetallicRoughness": {
+          "baseColorTexture": {
+            "index": 1
+          },
+          "metallicFactor": 0,
+          "metallicRoughnessTexture": {
+            "index": 2
+          }
+        }
+      }
+    ],
+    "images": [
+      {
+        "bufferView": 4,
+        "mimeType": "image/png",
+        "name": "snag_bark_normal"
+      },
+      {
+        "bufferView": 5,
+        "mimeType": "image/png",
+        "name": "snag_bark_basecolor"
+      },
+      {
+        "bufferView": 6,
+        "mimeType": "image/png",
+        "name": "snag_bark_roughness"
+      }
+    ],
+    "external_dependencies": [],
+    "extensionsRequired": [],
+    "meshes": 1
+  }
+]

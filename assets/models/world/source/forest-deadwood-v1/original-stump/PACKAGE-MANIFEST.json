@@ -1,0 +1,92 @@
+[
+  {
+    "path": "runtime-candidate/horde-1.7-gnarled-stump-3k-512.glb",
+    "bytes": 1425904,
+    "sha256": "c15516edb1ad34535becf9d51bd2333d73a6dc69bbded421de34df715f84a5d9"
+  },
+  {
+    "path": "runtime-candidate/horde-1.7-gnarled-stump-editable.blend",
+    "bytes": 2368797,
+    "sha256": "c138b5822dcebc4c6513f0a91dfb69bad2d8d690a930d9fc37cecfa552eadb07"
+  },
+  {
+    "path": "runtime-candidate/QA-REPORT.txt",
+    "bytes": 4180,
+    "sha256": "f664b451868ffc2ca954302a594c3c0d5c596bb6fe113741a7b292893af9906f"
+  },
+  {
+    "path": "runtime-candidate/repair-receipt.json",
+    "bytes": 602,
+    "sha256": "007bc65a86a8be2bfb063b28147c9d7b3219c516c0e33a8050ae770aba6cdffe"
+  },
+  {
+    "path": "runtime-candidate/evidence/back.png",
+    "bytes": 1225613,
+    "sha256": "e5228904e217132b787612f451e40bacaffc4ba83de6e97dd1fd426f90ab6d95"
+  },
+  {
+    "path": "runtime-candidate/evidence/blender-normalization.json",
+    "bytes": 1094,
+    "sha256": "e98f2cfd860e5cd52ee49624545805204b24ec5060a4860c884a8e79e839b652"
+  },
+  {
+    "path": "runtime-candidate/evidence/closeup.png",
+    "bytes": 1238397,
+    "sha256": "70dd7365974cc92f090f921fc66c4433a094cf8851a598167b3094b11ac03005"
+  },
+  {
+    "path": "runtime-candidate/evidence/fresh-import-validation.json",
+    "bytes": 912,
+    "sha256": "9417bb2d20173049aeb74085f17ea136bd5d67ae1b44167a98fa6b7280277e20"
+  },
+  {
+    "path": "runtime-candidate/evidence/front.png",
+    "bytes": 1249120,
+    "sha256": "5c510168e5a8374277060e4c6e2355537e4d3efd82b91f65dd7b4a46dae2e05b"
+  },
+  {
+    "path": "runtime-candidate/evidence/runtime-512-audit.json",
+    "bytes": 3233,
+    "sha256": "5157667e53473c56437ba06f2d09959a6128e6ad384e31cf1f0f4e09ead43036"
+  },
+  {
+    "path": "runtime-candidate/evidence/stump-contact-sheet.png",
+    "bytes": 1475974,
+    "sha256": "213b73d217ace648bab20ea7e25c926ab4dccde4219537fe8734bdce13b0afac"
+  },
+  {
+    "path": "runtime-candidate/evidence/top.png",
+    "bytes": 1308457,
+    "sha256": "2a0882ee583107ebf74f65b6fcbfe297ee429e814e87fe4503ac99869283abe4"
+  },
+  {
+    "path": "runtime-candidate/evidence/wireframe.png",
+    "bytes": 1318924,
+    "sha256": "90c7b652a30c9f54fb882c74159cd7f44d901a969d1bc5b5df82bf5f2ce779f4"
+  },
+  {
+    "path": "runtime-candidate/textures/basecolor-512.png",
+    "bytes": 399956,
+    "sha256": "3de77a2f75a2833ee5f6151034d1ecc75ce406f7e9343c21f9bcc0518c656f6b"
+  },
+  {
+    "path": "runtime-candidate/textures/metallic-roughness-512.png",
+    "bytes": 269824,
+    "sha256": "f27e3cc2aff0672fb676085519df135477de7e18dea13c443a32aebb40d18deb"
+  },
+  {
+    "path": "runtime-candidate/textures/normal-512.png",
+    "bytes": 481691,
+    "sha256": "5e0cbcdbfc4aa143aad5b1749c5b2a08a689b9002526f52b18b789af9495c599"
+  },
+  {
+    "path": "NEXT_ASSETS.md",
+    "bytes": 2485,
+    "sha256": "8bd536f6bdd95403bbced6ef7baf37d615d9d968f7c0a6d7582980c186a3cd17"
+  },
+  {
+    "path": "mesh-provenance-and-costs.json",
+    "bytes": 2059,
+    "sha256": "e6d1b8d88dd10ec189dc8260e79b7248e75968885778cf17a6da567ac7a4e729"
+  }
+]

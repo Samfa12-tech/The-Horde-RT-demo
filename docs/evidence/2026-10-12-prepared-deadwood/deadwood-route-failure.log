@@ -1,0 +1,16 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+    Start 91: horde_rt_forest_dressing_tests
+1/1 Test #91: horde_rt_forest_dressing_tests ...***Failed   11.21 sec
+Native root footprint samples=4992 exposed=0 maximum_gap_m=-0.0199988
+FAIL: Deadwood geometry intrudes on the clear trail: source 3, segment 3, point -17.246616,5.193920,5.467114
+1 forest dressing check(s) failed.
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =  11.23 sec
+
+The following tests FAILED:
+	 91 - horde_rt_forest_dressing_tests (Failed)
+Errors while running CTest

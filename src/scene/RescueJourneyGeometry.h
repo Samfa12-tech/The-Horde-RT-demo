@@ -19,7 +19,7 @@ inline constexpr std::size_t kOutdoorEffectMarkerTriangleCount=76;
 inline constexpr RescueBlockoutBox kRescueAnchorCollar{
     {{-33.44f,2.64f,-15.019f}},{{-33.36f,2.69f,-14.75f}},4u};
 inline constexpr std::size_t kRescueAnchorCollarTriangleCount=12;
-inline void AppendRescueJourneyGeometry(DevelopmentWorldGeometry& out) {
+inline void AppendRescueJourneyGeometry(DevelopmentWorldGeometry& out,bool includeEffectRegionMarkers=true) {
     const auto preparationBegin=std::chrono::steady_clock::now();
     const auto previousBytes=out.triangles.capacity()*sizeof(DevelopmentWorldTriangle);
     out.triangles.reserve(out.triangles.size()+kRescueBlockoutBoxes.size()*12+12+kOutdoorEffectMarkerTriangleCount+kRescueAnchorCollarTriangleCount);
@@ -45,7 +45,7 @@ inline void AppendRescueJourneyGeometry(DevelopmentWorldGeometry& out) {
     // The admitted pine/alder geometry is appended to the existing static
     // asset owner. Do not retain invisible placeholder trunk/crown geometry.
     // Readable original M and F silhouettes beside (not on) the support route.
-    for(std::size_t i=0;i<kOutdoorEffectRegionMarkers.size();++i) {
+    for(std::size_t i=0;i<(includeEffectRegionMarkers?kOutdoorEffectRegionMarkers.size():0u);++i) {
         const auto p=kOutdoorEffectRegionMarkers[i].centre;const float x=p[0],y=p[1],z=p[2];
         box({{{x-.50f,y,z-.06f}},{{x-.38f,y+1.2f,z+.06f}},2});
         if(i==0) {

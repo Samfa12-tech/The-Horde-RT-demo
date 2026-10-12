@@ -762,6 +762,13 @@ if(BUILD_TESTING)
     target_compile_definitions(horde_rt_forest_rock_dressing_tests PRIVATE HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
     add_test(NAME horde_rt_forest_rock_dressing_tests COMMAND horde_rt_forest_rock_dressing_tests)
 
+    add_executable(horde_rt_forest_deadwood_tests tests/ForestDeadwoodTests.cpp src/scene/ForestDeadwood.cpp
+        src/scene/assets/AssetManifest.cpp src/scene/assets/AssetValidation.cpp
+        src/scene/assets/GltfDocument.cpp src/scene/assets/StaticMeshAsset.cpp)
+    target_include_directories(horde_rt_forest_deadwood_tests PRIVATE src third_party)
+    target_compile_definitions(horde_rt_forest_deadwood_tests PRIVATE HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
+    add_test(NAME horde_rt_forest_deadwood_tests COMMAND horde_rt_forest_deadwood_tests)
+
     add_executable(horde_rt_bellwether_shell_tests tests/BellwetherShellTests.cpp
         src/scene/BellwetherShell.cpp src/scene/assets/AssetManifest.cpp
         src/scene/assets/AssetValidation.cpp src/scene/assets/StaticMeshAsset.cpp
@@ -771,7 +778,7 @@ if(BUILD_TESTING)
     add_test(NAME horde_rt_bellwether_shell_tests COMMAND horde_rt_bellwether_shell_tests)
 
     add_executable(horde_rt_forest_dressing_tests
-        tests/ForestDressingTests.cpp src/scene/ForestDressing.cpp src/scene/ForestUnderstory.cpp src/scene/ForestRockDressing.cpp src/scene/BellwetherShell.cpp src/scene/TombDressing.cpp src/scene/GraveyardDressing.cpp
+        tests/ForestDressingTests.cpp src/scene/ForestDressing.cpp src/scene/ForestUnderstory.cpp src/scene/ForestRockDressing.cpp src/scene/ForestDeadwood.cpp src/scene/BellwetherShell.cpp src/scene/TombDressing.cpp src/scene/GraveyardDressing.cpp
         src/scene/assets/AssetManifest.cpp src/scene/assets/AssetValidation.cpp
         src/scene/assets/GltfDocument.cpp src/scene/assets/StaticMeshAsset.cpp
         src/vulkan/raytracing/RtStaticMeshSlot.cpp)

@@ -400,3 +400,23 @@ made. The current owner task authorizes public Horde reuse. Fern albedo matches
 the supplied tree-pair map exactly and reuses the admitted ForestAlder family.
 Rocks/log/root candidates remain source-only pending separate native derivative,
 material, collision and cost checks. No new texture or transparency is admitted.
+
+### Prepared woodland deadwood (12 October2026)
+
+Four separately hashed native tangent derivatives are admitted under
+`assets/models/world/runtime/forest-deadwood-v1`: original supplied fallen log
+and roots, the owner-created paid-plan Meshy stump (public Horde redistribution
+confirmed), and Quaternius CC0 DeadTree_1's prepared coarse LOD2 snag. Original
+stump/snag archives, notices, maps and editable sources are byte-preserved at
+`assets/models/world/source/forest-deadwood-v1`; log/root masters remain in the
+original forest-dressing package. Its rights/custody/derivative receipts identify
+each source separately; no blanket MIT/CC0 claim applies to the Meshy stump or
+original Horde assets. The compact stump is a repaired low-poly editable source,
+not the separately archived high-poly Meshy master.
+
+The reversible runtime material default shares the existing opaque dielectric
+ForestBark family, including cut wood, without allocating another texture layer.
+Original painted bark/end-grain/stump maps remain preserved. No new generation,
+decimation, transparency, light or shader feature is added. Exact world triangles
+supply nonwalkable contact; the open snag is not claimed as a closed volume.
+Phone performance and final owner art acceptance remain separate gates.

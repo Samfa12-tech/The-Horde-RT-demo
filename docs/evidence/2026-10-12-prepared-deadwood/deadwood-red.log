@@ -1,0 +1,15 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+    Start 89: horde_rt_forest_deadwood_tests
+1/1 Test #89: horde_rt_forest_deadwood_tests ...***Failed    2.88 sec
+prepared log/root/stump/snag and collision must be admitted together
+Prepared deadwood/contact fail
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   2.90 sec
+
+The following tests FAILED:
+	 89 - horde_rt_forest_deadwood_tests (Failed)
+Errors while running CTest

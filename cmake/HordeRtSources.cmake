@@ -35,6 +35,7 @@ set(HORDE_RT_CORE_RELATIVE_SOURCES
     scene/ForestDressing.cpp
     scene/ForestUnderstory.cpp
     scene/ForestRockDressing.cpp
+    scene/ForestDeadwood.cpp
     scene/BellwetherShell.cpp
     scene/GraveyardDressing.cpp
     scene/TombDressing.cpp

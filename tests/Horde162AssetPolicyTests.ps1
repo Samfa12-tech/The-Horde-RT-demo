@@ -14,6 +14,11 @@ function Assert-CollapseGradleInventory([string]$Text) {
     $expected=@('models/world/runtime/collapsed-entry/asset.manifest.json','models/world/runtime/collapsed-entry/collapsed-entry-lod0.runtime.glb',
         'models/world/runtime/forest-tree-pair-v1/asset.manifest.json','models/world/runtime/forest-tree-pair-v1/runtime-roster.json',
         'models/world/runtime/forest-rocks-v1/asset.manifest.json',
+        'models/world/runtime/forest-deadwood-v1/asset.manifest.json',
+        'models/world/runtime/forest-deadwood-v1/horde-fallen-log.glb',
+        'models/world/runtime/forest-deadwood-v1/horde-root-tangle.glb',
+        'models/world/runtime/forest-deadwood-v1/horde-gnarled-stump.glb',
+        'models/world/runtime/forest-deadwood-v1/horde-dead-snag-lod2.glb',
         'models/world/runtime/forest-rocks-v1/horde-rock-low_boulder.glb',
         'models/world/runtime/forest-rocks-v1/horde-rock-split_shelf.glb',
         'models/world/runtime/forest-rocks-v1/horde-rock-upright_crag.glb',
@@ -264,9 +269,20 @@ try {
     $windows=@(Get-Horde162RuntimeFiles $repo Windows);$android=@(Get-Horde162RuntimeFiles $repo Android)
     $baseWindows=@(Get-Horde162AssetSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Windows'})
     $baseAndroid=@(Get-Horde162AssetSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Android'})
-    Require ($baseWindows.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Windows'}).Count -eq 42 -and
-             $baseAndroid.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Android'}).Count -eq 43) 'Current shared asset roster includes four tree-pair, three understory and two closed town entries.'
-    Require ($windows.Count -eq 99 -and $android.Count -eq 100) 'Current closed roster includes exact tomb, terrain, tree-pair, Kit, grave-marker, understory and town runtime assets; no editable sources.'
+    Require ($baseWindows.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Windows'}).Count -eq 47 -and
+             $baseAndroid.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Android'}).Count -eq 48) 'Current shared asset roster includes five exact prepared deadwood payloads.'
+    Require ($windows.Count -eq 104 -and $android.Count -eq 105) 'Current closed roster includes exact tomb, terrain, tree-pair, Kit, grave-marker, understory, town and deadwood runtime assets; no editable sources.'
+    $deadwoodFiles=@('models/world/runtime/forest-deadwood-v1/asset.manifest.json',
+        'models/world/runtime/forest-deadwood-v1/horde-fallen-log.glb',
+        'models/world/runtime/forest-deadwood-v1/horde-root-tangle.glb',
+        'models/world/runtime/forest-deadwood-v1/horde-gnarled-stump.glb',
+        'models/world/runtime/forest-deadwood-v1/horde-dead-snag-lod2.glb')
+    Require (@($windows | Where-Object {$_ -like 'models/world/runtime/forest-deadwood-*/*'}).Count -eq 5 -and
+             @($android | Where-Object {$_ -like 'models/world/runtime/forest-deadwood-*/*'}).Count -eq 5) 'Both platforms admit only five exact deadwood payloads.'
+    foreach($piece in $deadwoodFiles) {
+        Require (@($windows | Where-Object {$_ -ceq $piece}).Count -eq 1 -and
+                 @($android | Where-Object {$_ -ceq $piece}).Count -eq 1) 'Each exact deadwood payload is admitted once on both platforms.'
+    }
     $rockFiles=@('models/world/runtime/forest-rocks-v1/asset.manifest.json',
         'models/world/runtime/forest-rocks-v1/horde-rock-low_boulder.glb',
         'models/world/runtime/forest-rocks-v1/horde-rock-split_shelf.glb',

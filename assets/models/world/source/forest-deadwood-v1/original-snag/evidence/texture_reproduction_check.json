@@ -1,0 +1,26 @@
+[
+  {
+    "file": "snag_bark_basecolor.png",
+    "sha256": "ebe55bfdddf0853f90f51e9da16b45a10fa5bdd9df84e315754334d847bada76",
+    "regenerated_sha256": "ebe55bfdddf0853f90f51e9da16b45a10fa5bdd9df84e315754334d847bada76",
+    "byte_identical": true
+  },
+  {
+    "file": "snag_bark_normal.png",
+    "sha256": "ebcf60fe242171e0fec17f4f7b6beb9d6d6e5ded7ed877a10406cdafb0d6e680",
+    "regenerated_sha256": "ebcf60fe242171e0fec17f4f7b6beb9d6d6e5ded7ed877a10406cdafb0d6e680",
+    "byte_identical": true
+  },
+  {
+    "file": "snag_bark_orm.png",
+    "sha256": "f8fc127c1e618c05d5301cdde26643a3bcfef058d5cc542789570c5a76581ffa",
+    "regenerated_sha256": "f8fc127c1e618c05d5301cdde26643a3bcfef058d5cc542789570c5a76581ffa",
+    "byte_identical": true
+  },
+  {
+    "file": "snag_bark_roughness.png",
+    "sha256": "7a722db939667e5150f2e7bd4436664b249a9e2d93d6c78244ef3040b9892b2a",
+    "regenerated_sha256": "7a722db939667e5150f2e7bd4436664b249a9e2d93d6c78244ef3040b9892b2a",
+    "byte_identical": true
+  }
+]

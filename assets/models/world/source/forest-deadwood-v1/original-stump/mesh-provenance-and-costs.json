@@ -1,0 +1,41 @@
+{
+  "asset": "Horde1.7 A08 gnarled stump/root pilot",
+  "generated_utc_date": "2026-10-06",
+  "provider": "Meshy",
+  "cli_version": "0.4.0",
+  "account_opening_balance": 1145,
+  "account_closing_balance": 1110,
+  "total_authorized_ceiling_credits": 1000,
+  "actual_charges_credits": 35,
+  "authorized_budget_remaining_credits": 965,
+  "tasks": [
+    {
+      "resource": "text-to-3d",
+      "stage": "preview",
+      "task_id": "01a10fd1-f93b-77df-8378-74e5754caad5",
+      "actual_credits": 20,
+      "status": "SUCCEEDED"
+    },
+    {
+      "resource": "text-to-3d",
+      "stage": "refine",
+      "task_id": "01a10fd6-ab6c-740f-88c5-b3edb51a99a1",
+      "actual_credits": 10,
+      "status": "SUCCEEDED"
+    },
+    {
+      "resource": "remesh",
+      "stage": "remesh-3k",
+      "task_id": "01a10fdb-9e92-727a-9f3e-123e503bad01",
+      "actual_credits": 5,
+      "status": "SUCCEEDED"
+    }
+  ],
+  "pricing_reference": "https://docs.meshy.ai/en/api/pricing",
+  "original_prompt": "One low-poly grounded gnarled woodland stump with five thick exposed tapering roots, broken trunk top, weathered bark, restrained moss, dark natural gothic woodland realism. Broad compact silhouette, physically plausible PBR materials, opaque surfaces. Isolated single reusable static game prop. No leaves, no soil base, no floating pieces, no props, no characters, no text, no lights.",
+  "texture_prompt": "Weathered woodland stump, rough dark gray-brown bark, subtle pale exposed wood on top, restrained deep green moss in lower creases, physically based dielectric wood, matte, no painted shadows, no metallic highlights, no emission.",
+  "refine_texture_setting": "2k, PBR enabled, remove-lighting true",
+  "remesh_setting": "triangle topology, target-polycount3000",
+  "scope": "Original source and locally validated candidate assets only; no game integration, Git publication or public deployment.",
+  "rights_note": "Generated in the user-connected Meshy account. Public redistribution/plan entitlement not independently audited; no public asset release performed."
+}

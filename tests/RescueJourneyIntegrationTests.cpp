@@ -375,6 +375,13 @@ int main(int argc,char** argv) {
  }
  auto resident=horde::scene::PrepareDevelopmentWorldGeometry(false,true),staged=horde::scene::PrepareDevelopmentWorldGeometry(true,true);
  horde::scene::AppendRescueJourneyGeometry(resident);horde::scene::AppendRescueJourneyGeometry(staged);
+ auto chapter=horde::scene::PrepareDevelopmentWorldGeometry(false,true);
+ horde::scene::AppendRescueJourneyGeometry(chapter,false);
+ check(chapter.valid && chapter.triangles.size()+horde::scene::kOutdoorEffectMarkerTriangleCount==resident.triangles.size(),
+       "authored chapter omits only optional experiment letters, retaining rim/anchor geometry");
+ for(std::size_t i=0;i<chapter.triangles.size();++i)check(chapter.triangles[i].points==resident.triangles[i].points &&
+     chapter.triangles[i].material==resident.triangles[i].material && chapter.triangles[i].normal==resident.triangles[i].normal,
+     "omitting experiment markers changed real rescue geometry");
  check(resident.valid&&staged.valid&&resident.triangles.size()==staged.triangles.size(),"combined geometry failed admission");
  check(resident.triangles.size()==horde::scene::PrepareDevelopmentWorldGeometry(false,true).triangles.size()+
        (horde::scene::kRescueBlockoutBoxes.size()+2)*12+

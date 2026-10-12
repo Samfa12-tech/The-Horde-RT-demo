@@ -1,0 +1,21 @@
+{
+  "status": "pass",
+  "input": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\assets\\models\\world\\source\\forest-understory-v1\\original-package\\assets\\bh_root_branch_tangle.glb",
+  "output": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\assets\\models\\world\\source\\forest-deadwood-v1\\candidates\\horde-root-tangle.glb",
+  "inputSha256": "bc6d4e6428c4ec3fa904262f2eadacf8e786d620a26853d32b39030240252d86",
+  "outputSha256": "a964f9af66778ddeda2dc3e03d9984fc66f7a36c0a20bf18f8b9b67cc12db5b6",
+  "outputBytes": 1876496,
+  "geometryUnchanged": true,
+  "geometryComparison": "positions/winding/UV0 exact at 1e-6; normal direction dot >= 0.99999",
+  "maximumNormalComponentDelta": 0.00010699999999999946,
+  "minimumNormalDirectionDot": 0.9999999942385286,
+  "embeddedImagePixelsUnchanged": true,
+  "tangentLoopCountsByMappedMaterial": {
+    "BH_Shared_Original_Bark": 1272,
+    "BH_Original_Weathered_Endgrain": 372
+  },
+  "materialTriangles": {
+    "BH_Shared_Original_Bark": 424,
+    "BH_Original_Weathered_Endgrain": 124
+  }
+}

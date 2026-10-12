@@ -527,6 +527,20 @@ All six jobs passed on parent `fbe33b9f40c9d844702c805b48ffb420533b2a25` in [run
 
 ### Incremental candidate uploads (12 October)
 
+The [prepared deadwood milestone](../evidence/2026-10-12-prepared-deadwood/README.md)
+adds the recovered log/roots/stump/coarse snag to real terrain with exact contact,
+source custody and reused bark. Ten placements add11884 triangles without new
+layers, actor slots or world families. Native Pipeline/Query close views, bend
+views and the final lookout are inspected; handoff/restoration is pixel-identical.
+The authored chapter omits the old M/F letters while preserving their diagnostic
+fixture and honest deferred-effects status. Current per-owner allocation is
+69,234,240 bytes and normal savings remain zero. Required normal two-way GPU
+scheduling/retention, full final route/gallery, controlled sustained evidence and
+one final phone candidate remain open. Intermediate capture hitches are reported,
+not accepted as sustained performance. Parent `95c85cbb` passed all six jobs,
+fixing `e0881ae2`'s new fixture include omission; the earlier viewport CI gap was
+closed on `8c7f84ca`. Exact new milestone CI is separate.
+
 The [queued AS successor](../evidence/2026-10-12-queued-as-preparation/README.md)
 removes queue-idle waits from candidate AS preparation, retains pending owners,
 and fixes the reproduced transform-only submitted-pose cache. A final candidate
