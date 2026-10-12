@@ -1,0 +1,17 @@
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+    Start 175: horde_rt_character_render_slot_smoke
+1/1 Test #175: horde_rt_character_render_slot_smoke ...***Failed    3.24 sec
+FAIL: woodland retains distant surface detail without changing the tomb distance-fog default
+FAIL: woodland environment preserves the explicit RT Lab density multiplier
+FAIL: both rope directions blend atmosphere from the same physical eye position
+FAIL: upper rope handoff has reached the woodland atmosphere before release
+Keeper audited staff centroids: neutral=(0.972983, 0.800802, 0.605775) lifted=(0.466067, 1.09768, 1.11467) forward=(0.0265056, 1.30031, 1.17645)
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   3.26 sec
+
+The following tests FAILED:
+	175 - horde_rt_character_render_slot_smoke (Failed)
+Errors while running CTest

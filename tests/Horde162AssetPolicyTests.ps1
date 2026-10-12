@@ -22,8 +22,8 @@ function Assert-CollapseGradleInventory([string]$Text) {
         'models/world/runtime/forest-rocks-v1/horde-rock-low_boulder.glb',
         'models/world/runtime/forest-rocks-v1/horde-rock-split_shelf.glb',
         'models/world/runtime/forest-rocks-v1/horde-rock-upright_crag.glb',
-        'models/world/runtime/bellwether-shell-v2/asset.manifest.json',
-        'models/world/runtime/bellwether-shell-v2/bellwether-shell-v2.glb',
+        'models/world/runtime/bellwether-shell-v4/asset.manifest.json',
+        'models/world/runtime/bellwether-shell-v4/bellwether-shell-v4.glb',
         'models/world/runtime/forest-understory-v1/asset.manifest.json',
         'models/world/runtime/forest-understory-v1/horde-fern-open-clump.glb',
         'models/world/runtime/forest-understory-v1/horde-fern-small-clump.glb',
@@ -293,8 +293,8 @@ try {
         Require (@($windows | Where-Object {$_ -ceq $rock}).Count -eq 1 -and
                  @($android | Where-Object {$_ -ceq $rock}).Count -eq 1) 'Each exact rock payload is admitted once.'
     }
-    $townFiles=@('models/world/runtime/bellwether-shell-v2/asset.manifest.json',
-        'models/world/runtime/bellwether-shell-v2/bellwether-shell-v2.glb')
+    $townFiles=@('models/world/runtime/bellwether-shell-v4/asset.manifest.json',
+        'models/world/runtime/bellwether-shell-v4/bellwether-shell-v4.glb')
     Require (@($windows | Where-Object {$_ -like 'models/world/runtime/bellwether-shell-*/*'}).Count -eq 2 -and
              @($android | Where-Object {$_ -like 'models/world/runtime/bellwether-shell-*/*'}).Count -eq 2) 'Both platforms admit only the two final closed town payloads.'
     foreach($town in $townFiles) {

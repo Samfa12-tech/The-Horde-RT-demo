@@ -413,6 +413,37 @@ int main()
                   rescueExteriorFrame.skeletonEnemies[1].x == rescueExteriorSnapshot.skeletonEnemies[1].x &&
                   rescueExteriorFrame.roster.selectedEnemy == EnemyKind::Lich,
                   "rescue exterior Keeper selection replaced or dropped the original waterfall skeleton snapshots");
+    ok &= Require(Near(adaptedFrame.tuning.fogDensityScale, 1.f) &&
+                  Near(rescueExteriorFrame.tuning.fogDensityScale, .004f),
+                  "chapter woodland retains distant detail while historical non-chapter tuning remains unchanged");
+    auto chapterInterior = rescueExteriorSnapshot;
+    chapterInterior.rescue.exteriorSide = false;
+    const auto chapterInteriorFrame = BuildRtSceneFrameInputs(chapterInterior, .75f);
+    ok &= Require(Near(chapterInteriorFrame.tuning.fogDensityScale, 0.f) &&
+                  chapterInteriorFrame.lich.roomMistDensityScale == chapterInterior.lich.roomMistDensityScale,
+                  "chapter tomb removes global distance fog without changing authoritative Keeper mist clearing");
+    RtSceneTuning fogOverride;fogOverride.fogDensityScale=2.f;
+    ok &= Require(Near(BuildRtSceneFrameInputs(rescueExteriorSnapshot,.75f,fogOverride).tuning.fogDensityScale,.008f),
+                  "woodland environment preserves the explicit RT Lab density multiplier");
+    auto ropeFog=simulationSnapshot;ropeFog.developmentRescueJourney=true;
+    ropeFog.rescue.phase=traversal::Phase::Ascent;
+    ropeFog.playerSupportWorldY=-.95f;
+    ok &= Require(Near(BuildRtSceneFrameInputs(ropeFog,.75f).tuning.fogDensityScale,0.f),
+                  "lower rope approach remains at the indoor atmosphere");
+    ropeFog.playerSupportWorldY=.70f;
+    const float ascendingFog=BuildRtSceneFrameInputs(ropeFog,.75f).tuning.fogDensityScale;
+    ropeFog.rescue.phase=traversal::Phase::Descent;ropeFog.rescue.exteriorSide=true;
+    const float descendingFog=BuildRtSceneFrameInputs(ropeFog,.75f).tuning.fogDensityScale;
+    ok &= Require(ascendingFog>0.f && ascendingFog<.004f && Near(ascendingFog,descendingFog),
+                  "both rope directions blend atmosphere from the same physical eye position");
+    ropeFog.playerSupportWorldY=2.05f;
+    ok &= Require(Near(BuildRtSceneFrameInputs(ropeFog,.75f).tuning.fogDensityScale,.004f),
+                  "upper rope handoff has reached the woodland atmosphere before release");
+    ropeFog.playerSupportWorldY=-.95f;ropeFog.rescue.phase=traversal::Phase::LowerSafe;
+    ropeFog.rescue.exteriorSide=false;
+    ok &= Require(Near(BuildRtSceneFrameInputs(ropeFog,.75f).tuning.fogDensityScale,0.f) &&
+                  ropeFog.tickIndex==simulationSnapshot.tickIndex,
+                  "return/reconstruction restore indoor atmosphere without renderer state or simulation mutation");
     ok &= Require(adaptedFrame.waterContact.stepCount == simulationSnapshot.waterContact.stepCount &&
                   adaptedFrame.waterContact.droplets[3].active &&
                   adaptedFrame.waterContact.droplets[3].position[0] == -2.1f &&

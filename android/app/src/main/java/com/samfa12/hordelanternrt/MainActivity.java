@@ -753,8 +753,8 @@ public class MainActivity extends Activity {
                     stageAsset("models/world/runtime/forest-rocks-v1/horde-rock-low_boulder.glb", "models/world/runtime/forest-rocks-v1/horde-rock-low_boulder.glb") &&
                     stageAsset("models/world/runtime/forest-rocks-v1/horde-rock-split_shelf.glb", "models/world/runtime/forest-rocks-v1/horde-rock-split_shelf.glb") &&
                     stageAsset("models/world/runtime/forest-rocks-v1/horde-rock-upright_crag.glb", "models/world/runtime/forest-rocks-v1/horde-rock-upright_crag.glb") &&
-                    stageAsset("models/world/runtime/bellwether-shell-v2/asset.manifest.json", "models/world/runtime/bellwether-shell-v2/asset.manifest.json") &&
-                    stageAsset("models/world/runtime/bellwether-shell-v2/bellwether-shell-v2.glb", "models/world/runtime/bellwether-shell-v2/bellwether-shell-v2.glb") &&
+                    stageAsset("models/world/runtime/bellwether-shell-v4/asset.manifest.json", "models/world/runtime/bellwether-shell-v4/asset.manifest.json") &&
+                    stageAsset("models/world/runtime/bellwether-shell-v4/bellwether-shell-v4.glb", "models/world/runtime/bellwether-shell-v4/bellwether-shell-v4.glb") &&
                     stageAsset("models/world/runtime/forest-understory-v1/asset.manifest.json", "models/world/runtime/forest-understory-v1/asset.manifest.json") &&
                     stageAsset("models/world/runtime/forest-understory-v1/horde-fern-open-clump.glb", "models/world/runtime/forest-understory-v1/horde-fern-open-clump.glb") &&
                     stageAsset("models/world/runtime/forest-understory-v1/horde-fern-small-clump.glb", "models/world/runtime/forest-understory-v1/horde-fern-small-clump.glb");

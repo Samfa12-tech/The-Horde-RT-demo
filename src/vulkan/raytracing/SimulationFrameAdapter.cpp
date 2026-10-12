@@ -1,6 +1,7 @@
 #include "vulkan/raytracing/SimulationFrameAdapter.h"
 
 #include <algorithm>
+#include <cmath>
 
 namespace horde::vulkan::raytracing
 {
@@ -114,6 +115,32 @@ RtSceneFrameInputs BuildRtSceneFrameInputs(
     frame.fireDetail = fireDetail;
     frame.shadowQuality = shadowQuality;
     frame.tuning = ClampRtSceneTuning(tuning);
+    if (simulation.developmentRescueJourney)
+    {
+        // Owner direction: clear tomb air, subtle woodland distance haze.
+        // The legacy multiplier saturates by20m and erases distant detail.
+        // Real Keeper mist and all lighting/transport work remain unchanged;
+        // this existing surface-fog multiplier is a reversible environment default.
+        constexpr float woodlandDistanceFog = .004f;
+        float exteriorBlend = simulation.rescue.exteriorSide ? 1.f : 0.f;
+        using horde::gameplay::traversal::Phase;
+        const auto phase = simulation.rescue.phase;
+        if (phase == Phase::Ascent || phase == Phase::PullUp ||
+            phase == Phase::Descent || phase == Phase::Landing)
+        {
+            // Both directions use the same physical camera height through
+            // the aperture. There is no timer, cached state or side-flag pop.
+            const float eyeY = horde::gameplay::simulation::PlayerEyeWorldY(
+                simulation.playerSupportWorldY) +
+                horde::gameplay::traversal::RescueTorsoOffset(simulation.rescue).y;
+            if (std::isfinite(eyeY))
+            {
+                const float t = std::clamp((eyeY - 1.70f) / .90f, 0.f, 1.f);
+                exteriorBlend = t*t*(3.f-2.f*t);
+            }
+        }
+        frame.tuning.fogDensityScale *= woodlandDistanceFog*exteriorBlend;
+    }
     frame.combat = simulation.swordCombat;
     frame.playerCombat = simulation.playerCombat;
     frame.combat.damageFlash = simulation.playerVitals.damageFlash;

@@ -973,7 +973,7 @@ struct PresentableTinyRtSceneObservationTestAccess
         // nine of each, 9*1200 + 9*768 = 17,712 exact native triangles.
         // Ten prepared log/root/stump/snag placements add 11,884 triangles
         // in the existing bark primitive, without expanding either row capacity.
-        constexpr std::size_t addedIndices = 46140u + (2u*664u + 960u + 12u + 323264u + 34050u + 656u + 6184u + 17712u + 342u + 6168u + 11884u)*3u;
+        constexpr std::size_t addedIndices = 46140u + (2u*664u + 960u + 12u + 323264u + 34050u + 656u + 6184u + 17712u + 966u + 6168u + 11884u)*3u;
         bool ok = oldIndices == 8422u * 3u &&
                   baseline.collapseStaticAsset_.bounds.maximum[1] > 12.0f &&
                   std::abs(chapterEntryTop - 6.0f) < 0.001f &&

@@ -1,0 +1,2 @@
+HORDE_PIPELINE_CACHE_CREATE attempted=1 result=0 available=1
+Showcase capture failed: Dedicated viewmodel capture lacks modelled primary arms or contains legacy/full-body primary ownership: dedicated=1, visible=1, armPixels=0.

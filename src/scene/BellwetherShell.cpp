@@ -17,11 +17,11 @@ bool AppendBellwetherShell(const std::filesystem::path& root, assets::StaticMesh
         if(found==world.materials.end()) {diagnostic="Distant town requires the existing admitted stone/clay rows.";return false;}
         rows[i]=static_cast<std::uint32_t>(found-world.materials.begin());
     }
-    const auto dir=root/"models/world/runtime/bellwether-shell-v2";
+    const auto dir=root/"models/world/runtime/bellwether-shell-v4";
     assets::AssetManifest manifest;assets::StaticMeshAsset source;
     if(!assets::AssetManifest::Load(dir/"asset.manifest.json",manifest,diagnostic) ||
-       !assets::StaticMeshAsset::Load(dir/"bellwether-shell-v2.glb",manifest,source,diagnostic))return false;
-    if(source.primitives.size()!=2 || source.materials.size()!=2 || source.indices.size()!=342*3 ||
+       !assets::StaticMeshAsset::Load(dir/"bellwether-shell-v4.glb",manifest,source,diagnostic))return false;
+    if(source.primitives.size()!=2 || source.materials.size()!=2 || source.indices.size()!=966*3 ||
        world.primitives.empty() || world.nodeTransforms.empty() || world.primitives.size()+2>32 || world.vertices.size()>UINT32_MAX-source.vertices.size() ||
        world.indices.size()>UINT32_MAX-source.indices.size()) {
         diagnostic="Distant town lost its exact bounded native geometry.";return false;

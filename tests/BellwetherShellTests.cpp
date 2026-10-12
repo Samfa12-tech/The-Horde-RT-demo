@@ -20,7 +20,7 @@ int main() {
     const auto result=AppendBellwetherShell(root,world,error);
     check(result,"real exported closed distant town must enter the native world owner");
     if(result) {
-        check(world.indices.size()==before.indices.size()+342*3,"all 342 source triangles are preserved");
+        check(world.indices.size()==before.indices.size()+966*3,"all 966 bounded silhouette/facade triangles are preserved");
         check(world.materials.size()==2,"no texture layer or material row expansion");
         check(std::memcmp(world.vertices.data(),before.vertices.data(),before.vertices.size()*sizeof(v))==0,
             "accepted geometry prefix remains byte-identical");
@@ -32,6 +32,28 @@ int main() {
             slopingNormal|=std::abs(n[1])>.1f && std::abs(n[1])<.99f;
         }
         check(slopingNormal,"real pitched roof normals survive native import");
+        // Cast through a closed B01 portal post at its actual planned facade.
+        // v2 hits the flat wall at Z103.2; v3 must hit 240mm of solid relief
+        // sooner. A label, UV, dark card or aggregate count cannot satisfy it.
+        float closestZ=104.2f;
+        for(std::size_t j=1;j<world.primitives.size();++j) {
+            const auto& p=world.primitives[j];
+            for(std::size_t k=0;k<p.indexCount;k+=3) {
+                const auto& a=world.vertices[p.vertexOffset+world.indices[p.indexOffset+k]].position;
+                const auto& b=world.vertices[p.vertexOffset+world.indices[p.indexOffset+k+1]].position;
+                const auto& c=world.vertices[p.vertexOffset+world.indices[p.indexOffset+k+2]].position;
+                const float determinant=(b[0]-a[0])*(c[1]-a[1])-(c[0]-a[0])*(b[1]-a[1]);
+                if(std::abs(determinant)<1e-6f)continue;
+                const float x=89.26f-a[0],y=-7.4845508f-a[1];
+                const float u=(x*(c[1]-a[1])-(c[0]-a[0])*y)/determinant;
+                const float v=((b[0]-a[0])*y-x*(b[1]-a[1]))/determinant;
+                if(u<0 || v<0 || u+v>1)continue;
+                const float z=a[2]+u*(b[2]-a[2])+v*(c[2]-a[2]);
+                if(z>=102.f)closestZ=std::min(closestZ,z);
+            }
+        }
+        check(std::abs(closestZ-102.96f)<.001f,
+            "actual closed stone facade relief survives native import at metre scale");
         const auto admittedIndices=world.indices;
         check(!AppendBellwetherShell(root,world,error) && world.indices==admittedIndices,
             "repeated admission cannot duplicate the distant town or partially mutate its owner");

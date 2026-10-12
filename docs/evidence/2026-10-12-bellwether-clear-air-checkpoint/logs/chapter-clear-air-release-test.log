@@ -1,0 +1,21 @@
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+    Start  37: horde_rt_graphics_preview_frame_adapter_tests
+1/8 Test  #37: horde_rt_graphics_preview_frame_adapter_tests ...   Passed    0.97 sec
+    Start  90: horde_rt_bellwether_shell_tests
+2/8 Test  #90: horde_rt_bellwether_shell_tests .................   Passed    0.02 sec
+    Start 166: horde_rt_scene_resource_inventory_tests
+3/8 Test #166: horde_rt_scene_resource_inventory_tests .........   Passed    3.42 sec
+    Start 175: horde_rt_character_render_slot_smoke
+4/8 Test #175: horde_rt_character_render_slot_smoke ............   Passed    2.75 sec
+    Start 181: horde_rt_rescue_journey_integration_tests
+5/8 Test #181: horde_rt_rescue_journey_integration_tests .......   Passed    1.34 sec
+    Start 182: horde_rt_chapter_terrain_journey_tests
+6/8 Test #182: horde_rt_chapter_terrain_journey_tests ..........   Passed    2.29 sec
+    Start 189: horde_rt_rescue_rig_attachment_tests
+7/8 Test #189: horde_rt_rescue_rig_attachment_tests ............   Passed    3.69 sec
+    Start 190: horde_rt_rescue_adversarial_regression_tests
+8/8 Test #190: horde_rt_rescue_adversarial_regression_tests ....   Passed    2.59 sec
+
+100% tests passed, 0 tests failed out of 8
+
+Total Test time (real) =  17.10 sec

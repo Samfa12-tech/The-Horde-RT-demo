@@ -1,5 +1,14 @@
 # Horde 1.7 current design index
 
+**Paused at the owner's request to conserve usage credits.** The current
+[town/clear-air checkpoint](../evidence/2026-10-12-bellwether-clear-air-checkpoint/README.md)
+preserves v4 native town detail and removes legacy global distance fog inside
+the chapter tomb, with subtle exterior haze. Keeper mist stays unchanged.
+Debug/Release, Android, package/asset and shader checks pass; the fresh portal
+gallery failed its primary-arm visibility guard and remains an explicit resume
+item. Full visual/phone acceptance and normal-play two-way GPU lifetimes remain
+open. Residency savings are still zero; the chapter is incomplete.
+
 The [moving-frame static handoff and Android chapter capture admission](../evidence/2026-10-12-moving-frame-static-handoff/README.md)
 now proves current-pose adoption and safe old-owner retirement in actual
 Pipeline/QueryCompute diagnostic frames. Android resolves the full chapter
