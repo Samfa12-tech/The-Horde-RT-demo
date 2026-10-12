@@ -1,5 +1,14 @@
 # Horde 1.7 current design index
 
+The [Android world-startup repair](../evidence/2026-10-12-android-world-startup/README.md)
+closes the packaged-versus-staged dependency gap for all eighteen new graveyard/
+woodland payloads. The current phone renders a clean, three-heart start; its
+bounded 100% scale GPU samples are slow and do not establish sustained acceptance.
+The exact integrated geometry count now includes the prepared deadwood, without
+changing any capacity. Windows retains its full test selection and fifteen-minute
+deadline, with only the isolated asset-policy fixture overlapping other tests.
+Normal-play residency saving remains zero; the full chapter remains incomplete.
+
 The [prepared deadwood milestone](../evidence/2026-10-12-prepared-deadwood/README.md)
 now admits the recovered log/root/stump/snag derivatives with actual terrain
 contact, shared bark material and unchanged ceilings. The exact `2d6748e3`

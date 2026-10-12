@@ -739,6 +739,26 @@ public class MainActivity extends Activity {
                     stageAsset("models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_urn_rim_shard.glb", "models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_urn_rim_shard.glb") &&
                     stageAsset("models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/derivation-receipt.json", "models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/derivation-receipt.json");
             if (!tombDressingStaged) throw new IllegalStateException("Required tomb dressing runtime assets could not be staged.");
+            final boolean chapterDressingStaged =
+                    stageAsset("models/world/runtime/grave-markers-r03/grave-marker-damaged.manifest.json", "models/world/runtime/grave-markers-r03/grave-marker-damaged.manifest.json") &&
+                    stageAsset("models/world/runtime/grave-markers-r03/grave-marker-damaged.runtime.glb", "models/world/runtime/grave-markers-r03/grave-marker-damaged.runtime.glb") &&
+                    stageAsset("models/world/runtime/grave-markers-r03/grave-marker-round.manifest.json", "models/world/runtime/grave-markers-r03/grave-marker-round.manifest.json") &&
+                    stageAsset("models/world/runtime/grave-markers-r03/grave-marker-round.runtime.glb", "models/world/runtime/grave-markers-r03/grave-marker-round.runtime.glb") &&
+                    stageAsset("models/world/runtime/forest-rocks-v1/asset.manifest.json", "models/world/runtime/forest-rocks-v1/asset.manifest.json") &&
+                    stageAsset("models/world/runtime/forest-deadwood-v1/asset.manifest.json", "models/world/runtime/forest-deadwood-v1/asset.manifest.json") &&
+                    stageAsset("models/world/runtime/forest-deadwood-v1/horde-fallen-log.glb", "models/world/runtime/forest-deadwood-v1/horde-fallen-log.glb") &&
+                    stageAsset("models/world/runtime/forest-deadwood-v1/horde-root-tangle.glb", "models/world/runtime/forest-deadwood-v1/horde-root-tangle.glb") &&
+                    stageAsset("models/world/runtime/forest-deadwood-v1/horde-gnarled-stump.glb", "models/world/runtime/forest-deadwood-v1/horde-gnarled-stump.glb") &&
+                    stageAsset("models/world/runtime/forest-deadwood-v1/horde-dead-snag-lod2.glb", "models/world/runtime/forest-deadwood-v1/horde-dead-snag-lod2.glb") &&
+                    stageAsset("models/world/runtime/forest-rocks-v1/horde-rock-low_boulder.glb", "models/world/runtime/forest-rocks-v1/horde-rock-low_boulder.glb") &&
+                    stageAsset("models/world/runtime/forest-rocks-v1/horde-rock-split_shelf.glb", "models/world/runtime/forest-rocks-v1/horde-rock-split_shelf.glb") &&
+                    stageAsset("models/world/runtime/forest-rocks-v1/horde-rock-upright_crag.glb", "models/world/runtime/forest-rocks-v1/horde-rock-upright_crag.glb") &&
+                    stageAsset("models/world/runtime/bellwether-shell-v2/asset.manifest.json", "models/world/runtime/bellwether-shell-v2/asset.manifest.json") &&
+                    stageAsset("models/world/runtime/bellwether-shell-v2/bellwether-shell-v2.glb", "models/world/runtime/bellwether-shell-v2/bellwether-shell-v2.glb") &&
+                    stageAsset("models/world/runtime/forest-understory-v1/asset.manifest.json", "models/world/runtime/forest-understory-v1/asset.manifest.json") &&
+                    stageAsset("models/world/runtime/forest-understory-v1/horde-fern-open-clump.glb", "models/world/runtime/forest-understory-v1/horde-fern-open-clump.glb") &&
+                    stageAsset("models/world/runtime/forest-understory-v1/horde-fern-small-clump.glb", "models/world/runtime/forest-understory-v1/horde-fern-small-clump.glb");
+            if (!chapterDressingStaged) throw new IllegalStateException("Required graveyard and woodland runtime assets could not be staged.");
             if (BuildConfig.VIEWMODEL_CANDIDATE && !stageAsset(
                     "models/player/viewmodel/runtime/candidate-receipt.json",
                     "models/player/viewmodel/runtime/candidate-receipt.json")) {

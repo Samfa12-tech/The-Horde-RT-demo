@@ -1,0 +1,20 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+    Start 1: horde_rt_static_geometry_cutover_tests
+1/2 Test #1: horde_rt_static_geometry_cutover_tests ....   Passed    0.03 sec
+    Start 2: horde_rt_scene_resource_inventory_tests
+2/2 Test #2: horde_rt_scene_resource_inventory_tests ...   Passed    1.97 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   2.02 sec
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+    Start 144: horde_rt_horde_162_asset_policy_tests
+1/1 Test #144: horde_rt_horde_162_asset_policy_tests ...   Passed  151.85 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) = 151.87 sec
+
+Windows selection: 3 tests; asset-policy once plus 2 sequential tests.

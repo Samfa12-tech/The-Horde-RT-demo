@@ -247,9 +247,20 @@ jobs:
         run: cmake --build build/host-ci --config Release --parallel 2
 
       - name: Run shared gameplay tests
+        if: runner.os != 'Windows'
         run: >-
           ctest --test-dir build/host-ci --build-config Release
           --output-on-failure --no-tests=error ${{ matrix.ctest_filter_args }}
+
+      - name: Run complete Windows selection with isolated asset-policy overlap
+        if: runner.os == 'Windows'
+        shell: pwsh
+        env:
+          HORDE_HOST_CTEST_FILTER: ${{ matrix.ctest_filter_args }}
+        run: |
+          $match = [regex]::Match($env:HORDE_HOST_CTEST_FILTER, "^-E '([^']+)'$")
+          if (-not $match.Success) { throw 'Unexpected Windows CTest filter format.' }
+          ./tools/run-windows-host-ci-tests.ps1 -BuildDirectory build/host-ci -Configuration Release -ExcludePattern $match.Groups[1].Value
 
       - name: Retain native report edit timing trace
         if: always() && runner.os == 'Windows'
