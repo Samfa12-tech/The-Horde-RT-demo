@@ -1,4 +1,5 @@
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
+#include "vulkan/raytracing/TlasInstanceRefresh.h"
 #include <iostream>
 #include <type_traits>
 #include <stdexcept>
@@ -91,7 +92,7 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
             failures+=!Check(!s.preparedStaticGeometry_ && !s.CommitStaticGeometryWithApi(41,api,error) && p.retire==1,
                 "consumed/stale candidate cannot republish or retire twice");
         }
-        for(unsigned edge=0;edge<15;++edge) {
+        for(unsigned edge=0;edge<16;++edge) {
             Scene s; Seed(s,oldMap,newMap); Proof p{&s}; auto api=Api(p); std::uint64_t token=41;
             switch(edge) {
                 case 0: token=0; break; case 1: token=40; break;
@@ -106,6 +107,7 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
                 case 12: s.tlasBuiltInstances_[0].accelerationStructureReference=999u; break;
                 case 13: p.poseChange=true; break;
                 case 14: s.tlasInstanceDefinitionsValid_=false; break;
+                case 15: s.preparedStaticGeometry_->buildWork.submitted=true; break;
             }
             failures+=!Check(!s.CommitStaticGeometryWithApi(token,api,error),"invalid/unproved cutover fails closed");
             failures+=!Check(s.staticVertexBuffer_.buffer==Handle<VkBuffer>(1) && s.tlas_.handle==Handle<VkAccelerationStructureKHR>(8) &&
@@ -166,6 +168,36 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
             s.staticGeometryCompletionUnproved_=false;
             failures+=!Check(s.CancelStaticGeometryReplacement(error) && !s.preparedStaticGeometry_,
                 "completed work permits explicit cancellation without retiring admitted resources");
+        }
+        {
+            Scene s; Seed(s,oldMap,newMap);
+            auto latest=s.tlasBuiltInstances_;
+            latest[20].transform.matrix[0][3]=3.f;
+            latest[21].transform.matrix[1][3]=4.f;
+            latest[2].transform.matrix[2][3]=5.f;
+            failures+=!Check(!RequiresTlasInstanceRebuild(s.tlasBuiltInstances_,latest),
+                "transform-only player/equipment/actor motion remains UPDATE, not BUILD");
+            s.StageTlasSubmissionDefinitions(latest);
+            failures+=!Check(s.tlasBuiltInstances_[20].transform.matrix[0][3]!=3.f,
+                "unsubmitted recording cannot advance admitted pose definitions");
+            s.NotifyFrameSubmitted();
+            failures+=!Check(s.tlasBuiltInstances_[20].transform.matrix[0][3]==3.f &&
+                s.tlasBuiltInstances_[21].transform.matrix[1][3]==4.f &&
+                s.tlasBuiltInstances_[2].transform.matrix[2][3]==5.f,
+                "every submitted UPDATE supplies exact latest pose to zone preparation");
+            Proof p{&s};auto api=Api(p);
+            failures+=!Check(!s.CommitStaticGeometryWithApi(41,api,error)&&p.proof==0,
+                "transform-only submitted motion rejects stale candidate before publication");
+            const auto vertices=s.preparedStaticGeometry_->vertices.buffer;
+            const auto collapse=s.preparedStaticGeometry_->collapse.handle;
+            failures+=!Check(!s.RefreshStaticGeometryReplacement(40,error)&&s.preparedStaticGeometry_->ready,
+                "stale source generation cannot schedule candidate refresh");
+            failures+=!Check(s.RefreshStaticGeometryReplacement(41,error)&&!s.preparedStaticGeometry_->ready&&
+                s.preparedStaticGeometry_->phase==Scene::PreparedStaticGeometry::Phase::Tlas&&
+                s.preparedStaticGeometry_->vertices.buffer==vertices&&s.preparedStaticGeometry_->collapse.handle==collapse,
+                "fresh pose refresh reuses completed geometry without restarting CPU/upload/BLAS owners");
+            failures+=!Check(!s.RefreshStaticGeometryReplacement(41,error),
+                "incomplete refresh cannot overwrite its TLAS input/scratch lifetime");
         }
         return failures?1:0;
     }

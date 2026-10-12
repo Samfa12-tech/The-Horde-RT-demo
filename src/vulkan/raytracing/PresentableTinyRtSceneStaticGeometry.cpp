@@ -1,4 +1,5 @@
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
+#include "vulkan/raytracing/TlasInstanceRefresh.h"
 #include <algorithm>
 #include <chrono>
 #include <cstring>
@@ -102,6 +103,9 @@ template<class T> bool SameBytes(const std::vector<T>& a, const std::vector<T>& 
 
 void PresentableTinyRtScene::DestroyPreparedStaticGeometry(PreparedStaticGeometry& owner) noexcept
 {
+    // Caller has proved completed work (cancel/advance) or platform device idle
+    // (scene destruction). Never call this while an ordinary build is pending.
+    RetireRtGpuWorkAfterIdle({device_,queue_,commandPool_},owner.buildWork);
     owner.copy.reset();
     owner.uploads.reset();
     DestroyAccelerationStructure(owner.tlas);
@@ -127,11 +131,41 @@ bool PresentableTinyRtScene::StaticGeometryReplacementReady() const noexcept
 {
     return preparedStaticGeometry_ && preparedStaticGeometry_->ready;
 }
+bool PresentableTinyRtScene::StaticGeometryReplacementHasGpuWork() const noexcept
+{
+    return preparedStaticGeometry_ && preparedStaticGeometry_->buildWork.submitted;
+}
+bool PresentableTinyRtScene::RefreshStaticGeometryReplacement(std::uint64_t expectedGeneration,
+    std::string& diagnostic)
+{
+    if(!ready_ || staticGeometryCompletionUnproved_ || !preparedStaticGeometry_ ||
+       !preparedStaticGeometry_->ready || preparedStaticGeometry_->buildWork.submitted ||
+       !tlasInstanceDefinitionsValid_ || tlasPendingDefinitionsValid_ || expectedGeneration==0 ||
+       expectedGeneration!=staticGeometryGeneration_ ||
+       preparedStaticGeometry_->sourceGeneration!=expectedGeneration) {
+        diagnostic="Candidate pose refresh requires completed current owners and no submitted candidate work.";
+        return false;
+    }
+    // Explicit final-boundary refresh: preserve CPU/uploads/BLAS and queue a
+    // single TLAS refit (or BUILD on discrete changes) from the latest submit.
+    preparedStaticGeometry_->ready=false;
+    preparedStaticGeometry_->phase=PreparedStaticGeometry::Phase::Tlas;
+    diagnostic.clear();return true;
+}
 
 bool PresentableTinyRtScene::CancelStaticGeometryReplacement(std::string& diagnostic)
 {
     if (staticGeometryCompletionUnproved_) {
         diagnostic = "Cannot cancel resources with unproved submitted GPU work."; return false;
+    }
+    if (preparedStaticGeometry_ && preparedStaticGeometry_->buildWork.submitted) {
+        const auto status=PollRtGpuWork({device_,queue_,commandPool_},preparedStaticGeometry_->buildWork,diagnostic);
+        if(status==RtGpuWorkStatus::Pending) {
+            diagnostic="Cannot cancel a candidate while its AS build is in flight.";return false;
+        }
+        if(status==RtGpuWorkStatus::Unproved) {
+            staticGeometryCompletionUnproved_=true;ready_=false;return false;
+        }
     }
     if (preparedStaticGeometry_) DestroyPreparedStaticGeometry(*preparedStaticGeometry_);
     preparedStaticGeometry_.reset(); diagnostic.clear(); return true;
@@ -250,6 +284,7 @@ bool PresentableTinyRtScene::AdvanceStaticGeometryReplacement(
         diagnostic.clear(); return true;
     };
     const auto failBuild = [&]() {
+        if(candidate->buildWork.completionUnproved) staticGeometryCompletionUnproved_=true;
         if (staticGeometryCompletionUnproved_) {
             // Retain every owner referenced by unproved submitted GPU work.
             ready_ = false;
@@ -316,18 +351,37 @@ bool PresentableTinyRtScene::AdvanceStaticGeometryReplacement(
         }
         if (!BuildProfileAccelerationStructure(geometries, ranges, VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR,
             VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR, candidate->collapse,
-            &candidate->collapseScratch, diagnostic, &staticGeometryCompletionUnproved_)) return failBuild();
+            &candidate->collapseScratch, diagnostic, &staticGeometryCompletionUnproved_, &candidate->buildWork)) return failBuild();
+        ++evidence.asSubmissionCount;
         candidate->collapseBuildOwnerBytes = candidate->vertices.allocationSize + candidate->indices.allocationSize +
             candidate->transforms.allocationSize + candidate->instances.allocationSize + candidate->primitives.allocationSize +
             candidate->tlasInstances.allocationSize + candidate->collapse.backing.allocationSize + candidate->collapseScratch.allocationSize;
-        DestroyBuffer(candidate->collapseScratch); // Built and completed; not a retained UPDATE owner.
-        candidate->phase = PreparedStaticGeometry::Phase::Tlas;
+        candidate->phase = PreparedStaticGeometry::Phase::CollapseWait;
         return completedStep();
     }
+    if (candidate->phase == PreparedStaticGeometry::Phase::CollapseWait ||
+        candidate->phase == PreparedStaticGeometry::Phase::TlasWait) {
+        const auto status=PollRtGpuWork({device_,queue_,commandPool_},candidate->buildWork,diagnostic);
+        ++evidence.asPollCount;
+        if(status==RtGpuWorkStatus::Pending) {++evidence.asPendingPollCount;return completedStep();}
+        if(status!=RtGpuWorkStatus::Complete) {
+            staticGeometryCompletionUnproved_=true;return failBuild();
+        }
+        if(candidate->phase==PreparedStaticGeometry::Phase::TlasWait) {
+            candidate->phase=PreparedStaticGeometry::Phase::Ready;
+        }else {
+            DestroyBuffer(candidate->collapseScratch); // Fence-proved completed build; not an UPDATE owner.
+            candidate->phase = PreparedStaticGeometry::Phase::Tlas;
+            return completedStep();
+        }
+    }
+    if(candidate->phase==PreparedStaticGeometry::Phase::Tlas) {
     // Gameplay may have advanced during uploads. Build against the latest
     // submitted definitions; never restore preparation-time actor/held poses.
-    candidate->definitions = tlasBuiltInstances_;
-    candidate->definitions[kCollapseInstanceIndex].accelerationStructureReference = candidate->collapse.address;
+    auto latest = tlasBuiltInstances_;
+    latest[kCollapseInstanceIndex].accelerationStructureReference = candidate->collapse.address;
+    const bool rebuild=!candidate->tlas.handle || RequiresTlasInstanceRebuild(candidate->definitions,latest);
+    candidate->definitions = latest;
     if (!WriteBuffer(candidate->tlasInstances, candidate->definitions.data(), sizeof(candidate->definitions),
         "prepared TLAS instances", diagnostic)) return failBuild();
     VkAccelerationStructureGeometryKHR tlasGeometry{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR};
@@ -335,10 +389,40 @@ bool PresentableTinyRtScene::AdvanceStaticGeometryReplacement(
     tlasGeometry.geometry.instances.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_INSTANCES_DATA_KHR;
     tlasGeometry.geometry.instances.data.deviceAddress = candidate->tlasInstances.address;
     const VkAccelerationStructureBuildRangeInfoKHR tlasRange{tlasInstanceCount_, 0u, 0u, 0u};
+    if (!candidate->tlas.handle) {
     if (!BuildProfileAccelerationStructure(std::span(&tlasGeometry, 1), std::span(&tlasRange, 1),
         VK_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL_KHR,
         VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR | VK_BUILD_ACCELERATION_STRUCTURE_ALLOW_UPDATE_BIT_KHR,
-        candidate->tlas, &candidate->tlasScratch, diagnostic, &staticGeometryCompletionUnproved_)) return failBuild();
+        candidate->tlas, &candidate->tlasScratch, diagnostic, &staticGeometryCompletionUnproved_, &candidate->buildWork)) return failBuild();
+    }else {
+        // A completed candidate may refresh only its TLAS, behind its own
+        // fence; do not reallocate its AS, restart uploads or retire geometry.
+        VkAccelerationStructureBuildGeometryInfoKHR update{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR};
+        update.type=VK_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL_KHR;
+        update.flags=VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR|VK_BUILD_ACCELERATION_STRUCTURE_ALLOW_UPDATE_BIT_KHR;
+        update.mode=rebuild?VK_BUILD_ACCELERATION_STRUCTURE_MODE_BUILD_KHR:VK_BUILD_ACCELERATION_STRUCTURE_MODE_UPDATE_KHR;
+        update.srcAccelerationStructure=rebuild?VK_NULL_HANDLE:candidate->tlas.handle;
+        update.dstAccelerationStructure=candidate->tlas.handle;
+        update.geometryCount=1;update.pGeometries=&tlasGeometry;
+        update.scratchData.deviceAddress=candidate->tlasScratch.AlignedAddress();
+        const VkAccelerationStructureBuildRangeInfoKHR* range=&tlasRange;
+        struct Refresh {PresentableTinyRtScene* scene;VkAccelerationStructureBuildGeometryInfoKHR* update;
+            const VkAccelerationStructureBuildRangeInfoKHR** range;} data{this,&update,&range};
+        if(!SubmitRtGpuWork({device_,queue_,commandPool_},candidate->buildWork,
+            [](VkCommandBuffer command,void* user){
+                const auto& data=*static_cast<Refresh*>(user);
+                data.scene->vkCmdBuildAccelerationStructuresKHR_(command,1,data.update,data.range);
+                VkMemoryBarrier barrier{VK_STRUCTURE_TYPE_MEMORY_BARRIER};
+                barrier.srcAccessMask=VK_ACCESS_ACCELERATION_STRUCTURE_WRITE_BIT_KHR;
+                barrier.dstAccessMask=VK_ACCESS_ACCELERATION_STRUCTURE_READ_BIT_KHR;
+                vkCmdPipelineBarrier(command,VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR,
+                    data.scene->executionPolicy_.shaderPipelineStage,0,1,&barrier,0,nullptr,0,nullptr);
+            },&data,diagnostic))return failBuild();
+    }
+    ++evidence.asSubmissionCount;
+    candidate->phase=PreparedStaticGeometry::Phase::TlasWait;
+    return completedStep();
+    }
     const auto bytes = [](std::initializer_list<const Buffer*> list) {
         std::uint64_t sum=0; for (const auto* buffer : list) sum += buffer->allocationSize; return sum;
     };
@@ -363,6 +447,7 @@ bool PresentableTinyRtScene::CommitStaticGeometryWithApi(const std::uint64_t exp
         const bool owned = ready_ && !staticGeometryCompletionUnproved_ && expectedGeneration != 0 &&
             expectedGeneration != UINT64_MAX && expectedGeneration == staticGeometryGeneration_ &&
             preparedStaticGeometry_ && preparedStaticGeometry_->ready &&
+            !preparedStaticGeometry_->buildWork.submitted &&
             preparedStaticGeometry_->sourceGeneration == expectedGeneration &&
             tlasInstanceDefinitionsValid_ && !tlasPendingDefinitionsValid_;
         if (!owned) return false;

@@ -6967,13 +6967,29 @@ bool RunStaticGeometryCutoverCapture(VulkanSurfaceContext& context,
         while (!context.rtScene.StaticGeometryReplacementReady()) {
             if (++preparationFrames>1024u ||
                 !context.rtScene.AdvanceStaticGeometryReplacement(generation,256u*1024u,error)) return false;
-            // Final TLAS build and publication share the same submitted pose.
+            // The frozen diagnostic remains renderable during AS fence polls.
             if (!context.rtScene.StaticGeometryReplacementReady()) {
                 bool presented=false;
                 if (!RenderFrame(context,clear,presented) || !presented) {
                     error="Admitted owner failed while candidate uploaded: "+context.lastRtFrameError; return false;
                 }
             }
+        }
+        // Exercise the final TLAS-only refresh on both hardware backends;
+        // immutable reconstruction, uploaded bytes and collapse ownership stay
+        // unchanged. Moving ordinary-play scheduling is a separate gate.
+        const auto uploaded=context.rtScene.StaticGeometryReplacementEvidence().uploadedBytes;
+        if(!context.rtScene.RefreshStaticGeometryReplacement(generation,error))return false;
+        while(!context.rtScene.StaticGeometryReplacementReady()) {
+            if(++preparationFrames>1024u ||
+               !context.rtScene.AdvanceStaticGeometryReplacement(generation,256u*1024u,error))return false;
+            if(!context.rtScene.StaticGeometryReplacementReady()) {
+                bool presented=false;
+                if(!RenderFrame(context,clear,presented)||!presented)return false;
+            }
+        }
+        if(context.rtScene.StaticGeometryReplacementEvidence().uploadedBytes!=uploaded) {
+            error="TLAS refresh restarted immutable reconstruction/upload.";return false;
         }
         const auto overlap=context.rtScene.ResourceInventory();
         const auto reject = [](void*,std::string& diagnostic) { diagnostic="Injected failed retirement proof"; return false; };
@@ -7014,6 +7030,9 @@ bool RunStaticGeometryCutoverCapture(VulkanSurfaceContext& context,
             << ",\"uploadAdvanceCount\":" << m.uploadAdvanceCount
             << ",\"uploadedBytes\":" << m.uploadedBytes
             << ",\"cpuCopyAdvanceCount\":" << m.cpuCopyAdvanceCount
+            << ",\"asSubmissionCount\":" << m.asSubmissionCount
+            << ",\"asPollCount\":" << m.asPollCount
+            << ",\"asPendingPollCount\":" << m.asPendingPollCount
             << ",\"copiedCpuPayloadBytes\":" << m.copiedCpuPayloadBytes
             << ",\"cachedCpuSourcePayloadBytes\":" << context.rtScene.CachedStaticGeometryPayloadBytes()
             << ",\"preparationFrames\":" << preparationFrames

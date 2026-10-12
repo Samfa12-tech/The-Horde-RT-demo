@@ -1,4 +1,5 @@
 #pragma once
+#include "vulkan/raytracing/RtGpuWorkLease.h"
 #include "scene/atmosphere/IndoorDust.h"
 #include "scene/DevelopmentWorldGeometry.h"
 #include "gameplay/simulation/TriangleSupportSurface.h"
@@ -277,11 +278,14 @@ public:
         std::span<const std::uint32_t> retainedWorldFamilies, std::string& diagnostic);
     bool BeginStaticGeometryReplacement(std::uint64_t expectedGeneration,
         std::span<const std::uint32_t> retainedWorldFamilies, std::string& diagnostic);
-    // One bounded upload step or one completed AS build. Packing and Vulkan
-    // driver/build latency remain measured work, not a frame-time guarantee.
+    // One bounded CPU/upload step or one owned AS submit/nonblocking fence
+    // poll. Allocation and command-record latency are not time guarantees.
     bool AdvanceStaticGeometryReplacement(std::uint64_t expectedGeneration,
         VkDeviceSize maxCopyBytes, std::string& diagnostic);
     bool StaticGeometryReplacementReady() const noexcept;
+    bool StaticGeometryReplacementHasGpuWork() const noexcept;
+    bool RefreshStaticGeometryReplacement(std::uint64_t expectedGeneration,
+        std::string& diagnostic);
     bool CancelStaticGeometryReplacement(std::string& diagnostic);
     std::uint64_t CachedStaticGeometryPayloadBytes() const noexcept {
         return fullStaticGeometrySource_ ? fullStaticGeometrySource_->PayloadBytes() : 0u;
@@ -297,6 +301,7 @@ public:
         double packMilliseconds = 0.0;
         double maximumAdvanceMilliseconds = 0.0;
         std::uint32_t uploadAdvanceCount = 0;
+        std::uint32_t asSubmissionCount = 0, asPollCount = 0, asPendingPollCount = 0;
         std::uint64_t uploadedBytes = 0;
         std::uint32_t cpuCopyAdvanceCount = 0;
         std::uint64_t copiedCpuPayloadBytes = 0;
@@ -677,7 +682,7 @@ private:
     using AccelerationStructure = RtAccelerationStructure;
 
     struct PreparedStaticGeometry {
-        enum class Phase { Copy, Upload, Collapse, Tlas, Ready };
+        enum class Phase { Copy, Upload, Collapse, CollapseWait, Tlas, TlasWait, Ready };
         std::uint64_t sourceGeneration = 0;
         bool ready = false;
         Phase phase = Phase::Upload;
@@ -689,6 +694,7 @@ private:
         Buffer vertices, indices, transforms, instances, primitives, tlasInstances;
         AccelerationStructure collapse, tlas;
         Buffer collapseScratch, tlasScratch;
+        RtGpuWorkLease buildWork;
         std::array<VkAccelerationStructureInstanceKHR, kTlasInstanceCount> definitions{};
     };
     struct StaticCutoverApi {
@@ -702,6 +708,8 @@ private:
     bool PackLoadedStaticAssets(RtStaticMeshSlot& out,
         std::span<const std::uint32_t> retainedWorldFamilies, std::string& diagnostic);
     void DestroyPreparedStaticGeometry(PreparedStaticGeometry& owner) noexcept;
+    void StageTlasSubmissionDefinitions(
+        const std::array<VkAccelerationStructureInstanceKHR,kTlasInstanceCount>& definitions) noexcept;
     bool BeginPreparedStaticUploads(PreparedStaticGeometry& owner, std::string& diagnostic);
     std::shared_ptr<const RtStaticMeshSlot> fullStaticGeometrySource_;
     std::unique_ptr<PreparedStaticGeometry> preparedStaticGeometry_;
@@ -837,7 +845,8 @@ private:
         std::span<const VkAccelerationStructureBuildRangeInfoKHR> ranges,
         VkAccelerationStructureTypeKHR type, VkBuildAccelerationStructureFlagsKHR flags,
         AccelerationStructure& out, Buffer* retainedScratch,
-        std::string& diagnostic, bool* completionUnproved = nullptr);
+        std::string& diagnostic, bool* completionUnproved = nullptr,
+        RtGpuWorkLease* queuedWork = nullptr);
     bool UpdatePreviewInstances(VkCommandBuffer commandBuffer,
                                 const RtSceneFrameInputs& frame,
                                 std::string& diagnostic,
@@ -935,6 +944,8 @@ private:
     Buffer indexBuffer_;
     Buffer transformBuffer_;
     Buffer instanceBuffer_;
+    // Exact last successful submission, including transform-only UPDATEs;
+    // also supplies the discrete BUILD-vs-UPDATE comparison baseline.
     std::array<VkAccelerationStructureInstanceKHR, kTlasInstanceCount> tlasBuiltInstances_{};
     bool tlasInstanceDefinitionsValid_ = false;
     std::array<VkAccelerationStructureInstanceKHR, kTlasInstanceCount> tlasPendingInstances_{};

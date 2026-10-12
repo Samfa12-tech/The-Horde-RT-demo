@@ -1253,6 +1253,12 @@ if(BUILD_TESTING)
         add_test(NAME horde_rt_gpu_buffer_batch_tests
             COMMAND horde_rt_gpu_buffer_batch_tests)
 
+        add_executable(horde_rt_gpu_work_lease_tests tests/RtGpuWorkLeaseTests.cpp)
+        target_include_directories(horde_rt_gpu_work_lease_tests PRIVATE
+            ${CMAKE_CURRENT_SOURCE_DIR}/src ${Vulkan_INCLUDE_DIRS})
+        target_link_libraries(horde_rt_gpu_work_lease_tests PRIVATE Vulkan::Vulkan)
+        add_test(NAME horde_rt_gpu_work_lease_tests COMMAND horde_rt_gpu_work_lease_tests)
+
         add_executable(horde_rt_pipeline_bundle_lifetime_tests
             tests/RtPipelineBundleLifetimeTests.cpp
             src/vulkan/raytracing/RtPipelineBundle.cpp

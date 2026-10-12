@@ -527,6 +527,16 @@ All six jobs passed on parent `fbe33b9f40c9d844702c805b48ffb420533b2a25` in [run
 
 ### Incremental candidate uploads (12 October)
 
+The [queued AS successor](../evidence/2026-10-12-queued-as-preparation/README.md)
+removes queue-idle waits from candidate AS preparation, retains pending owners,
+and fixes the reproduced transform-only submitted-pose cache. A final candidate
+TLAS refresh preserves its completed geometry. Both opened backend views and
+four zero-pixel handoff comparisons pass, alongside focused Debug/Release and
+Android/package checks. Normal scheduling/retention remains unfinished, with
+**zero normal-play residency saving**. Frozen captures do not certify moving
+cutover or sustained performance. Parent `8c7f84ca` passed all six CI jobs,
+closing the earlier `b3e3a4ef` viewport failure; exact successor CI is separate.
+
 The follow-on [bounded CPU reconstruction evidence](../evidence/2026-10-12-bounded-cpu-reconstruction/README.md)
 removes the full-source pack from a single render turn, with exact byte parity,
 copy/admission/cleanup regressions and both backend captures. It adds44.9MB of

@@ -2998,7 +2998,8 @@ bool PresentableTinyRtScene::BuildProfileAccelerationStructure(
     const std::span<const VkAccelerationStructureGeometryKHR> geometries,
     const std::span<const VkAccelerationStructureBuildRangeInfoKHR> ranges,
     const VkAccelerationStructureTypeKHR type, const VkBuildAccelerationStructureFlagsKHR flags,
-    AccelerationStructure& out, Buffer* retainedScratch, std::string& diagnostic, bool* completionUnproved)
+    AccelerationStructure& out, Buffer* retainedScratch, std::string& diagnostic, bool* completionUnproved,
+    RtGpuWorkLease* queuedWork)
 {
     if (geometries.empty() || geometries.size() != ranges.size() || geometries.size() > UINT32_MAX)
     {
@@ -3045,7 +3046,15 @@ bool PresentableTinyRtScene::BuildProfileAccelerationStructure(
         const VkAccelerationStructureBuildGeometryInfoKHR* build;
         const VkAccelerationStructureBuildRangeInfoKHR* const* ranges;
     } data{this, &build, pointers.data()};
-    const bool built = RunOneTimeCommands([](VkCommandBuffer commandBuffer, void* user) {
+    VkAccelerationStructureDeviceAddressInfoKHR addressInfo{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR};
+    addressInfo.accelerationStructure = out.handle;
+    out.address = vkGetAccelerationStructureDeviceAddressKHR_(device_, &addressInfo);
+    if (out.address == 0u) {
+        if (retainedScratch == nullptr) DestroyBuffer(temporaryScratch);
+        diagnostic = "RT content profile acceleration structure returned a zero device address.";
+        return false;
+    }
+    const auto record = [](VkCommandBuffer commandBuffer, void* user) {
         const auto& data = *static_cast<BuildData*>(user);
         data.scene->vkCmdBuildAccelerationStructuresKHR_(commandBuffer, 1u, data.build, data.ranges);
         VkMemoryBarrier barrier{VK_STRUCTURE_TYPE_MEMORY_BARRIER};
@@ -3055,17 +3064,17 @@ bool PresentableTinyRtScene::BuildProfileAccelerationStructure(
                              VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR |
                                  data.scene->executionPolicy_.shaderPipelineStage,
                              0u, 1u, &barrier, 0u, nullptr, 0u, nullptr);
-    }, &data, diagnostic, completionUnproved);
-    if (retainedScratch == nullptr && !(completionUnproved && *completionUnproved)) DestroyBuffer(temporaryScratch);
-    if (!built) return false;
-    VkAccelerationStructureDeviceAddressInfoKHR addressInfo{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR};
-    addressInfo.accelerationStructure = out.handle;
-    out.address = vkGetAccelerationStructureDeviceAddressKHR_(device_, &addressInfo);
-    if (out.address == 0u)
-    {
-        diagnostic = "RT content profile acceleration structure returned a zero device address.";
+    };
+    if (queuedWork != nullptr && retainedScratch == nullptr) {
+        DestroyBuffer(temporaryScratch);
+        diagnostic = "Queued AS construction requires an owned retained scratch lifetime.";
         return false;
     }
+    const bool built = queuedWork != nullptr
+        ? SubmitRtGpuWork({device_,queue_,commandPool_}, *queuedWork,record,&data,diagnostic)
+        : RunOneTimeCommands(record, &data, diagnostic, completionUnproved);
+    if (retainedScratch == nullptr && !(completionUnproved && *completionUnproved)) DestroyBuffer(temporaryScratch);
+    if (!built) return false;
     return true;
 }
 
@@ -6192,7 +6201,7 @@ bool PresentableTinyRtScene::UpdatePreviewInstances(VkCommandBuffer commandBuffe
                              executionPolicy_.shaderPipelineStage, 0u, 1u, &blasBarrier, 0u, nullptr, 0u, nullptr);
     });
     tlasScope.Complete(1u);
-    if (rebuild) { tlasPendingInstances_ = instances; tlasPendingDefinitionsValid_ = true; }
+    StageTlasSubmissionDefinitions(instances);
     lastInstanceMasks_ = {};
     for (std::size_t index = 0u; index < tlasInstanceCount_; ++index)
         lastInstanceMasks_[instances[index].instanceCustomIndex] = instances[index].mask;
@@ -7655,11 +7664,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                                  nullptr);
         });
     tlasUpdateScope.Complete(1u);
-    if (rebuildTlas)
-    {
-        tlasPendingInstances_ = instances;
-        tlasPendingDefinitionsValid_ = true;
-    }
+    StageTlasSubmissionDefinitions(instances);
 
 #ifndef NDEBUG
     playerWorldBodyPoseCurrent_ = usesSkinnedPlayer &&
@@ -7706,6 +7711,15 @@ bool PresentableTinyRtScene::WriteDustQuality(const RtQualityControlsGpu& qualit
     }
     dustCache_.Commit(zones,dustQuality_,camera,seconds);
     return true;
+}
+
+void PresentableTinyRtScene::StageTlasSubmissionDefinitions(
+    const std::array<VkAccelerationStructureInstanceKHR,kTlasInstanceCount>& definitions) noexcept
+{
+    // Record every BUILD or UPDATE, but publish only after successful submit.
+    // RequiresTlasInstanceRebuild still ignores transform-only movement.
+    tlasPendingInstances_=definitions;
+    tlasPendingDefinitionsValid_=true;
 }
 
 void PresentableTinyRtScene::NotifyFrameSubmitted() noexcept
