@@ -1405,6 +1405,7 @@ horde::telemetry::RtResourceInventory PresentableTinyRtScene::ResourceInventory(
     }
     if (preparedStaticGeometry_) {
         const auto& candidate = *preparedStaticGeometry_;
+        if (candidate.uploads) candidate.uploads->AccumulateResourceInventory(inventory);
         for (const Buffer* buffer : {&candidate.vertices, &candidate.indices, &candidate.transforms,
              &candidate.instances, &candidate.primitives, &candidate.tlasInstances,
              &candidate.collapseScratch, &candidate.tlasScratch, &candidate.tlas.backing})

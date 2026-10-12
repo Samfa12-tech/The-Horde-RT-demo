@@ -1,0 +1,670 @@
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+    Start 160: horde_rt_gpu_buffer_batch_tests
+1/1 Test #160: horde_rt_gpu_buffer_batch_tests ...***Failed    3.99 sec
+FAIL: begin borrows a validated batch without Vulkan allocation
+FAIL: cancellable begin
+FAIL: cancellable begin
+FAIL: cancellable bounded copy
+FAIL: cancellable begin
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable begin
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable begin
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable begin
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable begin
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable begin
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable begin
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable begin
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable begin
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable begin
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable begin
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable begin
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable begin
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable begin
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable begin
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable begin
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable begin
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable begin
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable begin
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable begin
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable begin
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable begin
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable begin
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable begin
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable begin
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable begin
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable begin
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable begin
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable begin
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable begin
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable begin
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: cancellable bounded copy
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+FAIL: failure injection begins
+FAIL: incremental driver failure cleans only candidate and preserves admitted owner
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   4.01 sec
+
+The following tests FAILED:
+	160 - horde_rt_gpu_buffer_batch_tests (Failed)
+Errors while running CTest

@@ -102,6 +102,7 @@ template<class T> bool SameBytes(const std::vector<T>& a, const std::vector<T>& 
 
 void PresentableTinyRtScene::DestroyPreparedStaticGeometry(PreparedStaticGeometry& owner) noexcept
 {
+    owner.uploads.reset();
     DestroyAccelerationStructure(owner.tlas);
     DestroyAccelerationStructure(owner.collapse);
     for (Buffer* buffer : {&owner.vertices, &owner.indices, &owner.transforms,
@@ -114,6 +115,31 @@ bool PresentableTinyRtScene::PrepareStaticGeometryReplacement(
     const std::uint64_t expectedGeneration, std::span<const std::uint32_t> retainedWorldFamilies,
     std::string& diagnostic)
 {
+    if (!BeginStaticGeometryReplacement(expectedGeneration, retainedWorldFamilies, diagnostic)) return false;
+    while (!StaticGeometryReplacementReady())
+        if (!AdvanceStaticGeometryReplacement(expectedGeneration,
+                std::numeric_limits<VkDeviceSize>::max(), diagnostic)) return false;
+    return true;
+}
+
+bool PresentableTinyRtScene::StaticGeometryReplacementReady() const noexcept
+{
+    return preparedStaticGeometry_ && preparedStaticGeometry_->ready;
+}
+
+bool PresentableTinyRtScene::CancelStaticGeometryReplacement(std::string& diagnostic)
+{
+    if (staticGeometryCompletionUnproved_) {
+        diagnostic = "Cannot cancel resources with unproved submitted GPU work."; return false;
+    }
+    if (preparedStaticGeometry_) DestroyPreparedStaticGeometry(*preparedStaticGeometry_);
+    preparedStaticGeometry_.reset(); diagnostic.clear(); return true;
+}
+
+bool PresentableTinyRtScene::BeginStaticGeometryReplacement(
+    const std::uint64_t expectedGeneration, std::span<const std::uint32_t> retainedWorldFamilies,
+    std::string& diagnostic)
+{
     if (!ready_ || !developmentRescueJourney_ || sceneProfile_ != RtSceneProfile::Showcase ||
         preparedStaticGeometry_ || staticGeometryCompletionUnproved_ || expectedGeneration == 0 ||
         expectedGeneration != staticGeometryGeneration_ || expectedGeneration == UINT64_MAX ||
@@ -123,6 +149,7 @@ bool PresentableTinyRtScene::PrepareStaticGeometryReplacement(
     }
     const auto start = std::chrono::steady_clock::now();
     auto candidate = std::make_unique<PreparedStaticGeometry>();
+    candidate->prepareStart = start;
     candidate->sourceGeneration = expectedGeneration;
     if (!PackLoadedStaticAssets(candidate->slot, retainedWorldFamilies, diagnostic)) return false;
     const auto& packed = candidate->slot;
@@ -167,7 +194,6 @@ bool PresentableTinyRtScene::PrepareStaticGeometryReplacement(
     }
     candidate->definitions = tlasBuiltInstances_;
     std::array<RtGpuBufferUpload, 6> uploads{};
-    std::array<Buffer, 6> buffers{};
     const VkBufferUsageFlags storage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
     const VkBufferUsageFlags geometry = storage | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR;
     uploads = {{
@@ -178,51 +204,97 @@ bool PresentableTinyRtScene::PrepareStaticGeometryReplacement(
         {packed.PrimitiveMetadata().data(), packed.PrimitiveMetadata().size()*sizeof(RtPrimitiveMetadata), storage, false, false, "candidate primitive metadata", VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT},
         {candidate->definitions.data(), sizeof(candidate->definitions), VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, true, true, "candidate TLAS instances", 0}
     }};
-    if (!gpuResources_.PrepareBufferUploads(uploads, buffers, diagnostic)) return false;
-    candidate->vertices = std::exchange(buffers[0], {});
-    candidate->indices = std::exchange(buffers[1], {});
-    candidate->transforms = std::exchange(buffers[2], {});
-    candidate->instances = std::exchange(buffers[3], {});
-    candidate->primitives = std::exchange(buffers[4], {});
-    candidate->tlasInstances = std::exchange(buffers[5], {});
+    candidate->uploads = std::make_unique<RtGpuBufferPreparation>(gpuResources_);
+    if (!candidate->uploads->Begin(uploads, diagnostic)) return false;
+    staticGeometryReplacementMeasurements_ = {};
+    staticGeometryReplacementMeasurements_.packMilliseconds =
+        std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-start).count();
+    preparedStaticGeometry_ = std::move(candidate);
+    diagnostic.clear(); return true;
+}
+
+bool PresentableTinyRtScene::AdvanceStaticGeometryReplacement(
+    const std::uint64_t expectedGeneration, const VkDeviceSize maxCopyBytes, std::string& diagnostic)
+{
+    if (!ready_ || staticGeometryCompletionUnproved_ || !preparedStaticGeometry_ ||
+        expectedGeneration == 0u || expectedGeneration != staticGeometryGeneration_ ||
+        preparedStaticGeometry_->sourceGeneration != expectedGeneration ||
+        preparedStaticGeometry_->ready || !tlasInstanceDefinitionsValid_ ||
+        tlasPendingDefinitionsValid_ || maxCopyBytes == 0u) {
+        diagnostic = "Static geometry advance rejected stale, pending or invalid preparation."; return false;
+    }
+    auto* candidate = preparedStaticGeometry_.get();
+    const auto& packed = candidate->slot;
+    const auto start = std::chrono::steady_clock::now();
+    auto& evidence = staticGeometryReplacementMeasurements_;
+    const auto completedStep = [&] {
+        evidence.maximumAdvanceMilliseconds = std::max(evidence.maximumAdvanceMilliseconds,
+            std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-start).count());
+        diagnostic.clear(); return true;
+    };
     const auto failBuild = [&]() {
         if (staticGeometryCompletionUnproved_) {
-            // Do not clean resources referenced by a successfully submitted but
-            // unproved command. Platform fatal retirement retains the whole owner.
-            preparedStaticGeometry_ = std::move(candidate);
+            // Retain every owner referenced by unproved submitted GPU work.
             ready_ = false;
-        } else DestroyPreparedStaticGeometry(*candidate);
+        } else {
+            DestroyPreparedStaticGeometry(*candidate);
+            preparedStaticGeometry_.reset();
+        }
         return false;
     };
-    const auto world = packed.InstanceMetadata()[kCollapseInstanceIndex];
-    std::vector<VkAccelerationStructureGeometryKHR> geometries;
-    std::vector<VkAccelerationStructureBuildRangeInfoKHR> ranges;
-    for (std::uint32_t local = 0; local < world.primitiveCount; ++local) {
-        const auto index = world.primitiveBase + local;
-        const auto& primitive = packed.PrimitiveMetadata()[index];
-        VkAccelerationStructureGeometryKHR g{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR};
-        g.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
-        g.flags = (packed.Materials()[primitive.materialIndex].materialFlags[0] & static_cast<std::uint32_t>(RtMaterialFlag::Transmission))
-            ? VK_GEOMETRY_NO_DUPLICATE_ANY_HIT_INVOCATION_BIT_KHR : VK_GEOMETRY_OPAQUE_BIT_KHR;
-        auto& t = g.geometry.triangles;
-        t.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR;
-        t.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;
-        t.vertexData.deviceAddress = candidate->vertices.address + VkDeviceSize(primitive.vertexOffset)*sizeof(horde::scene::assets::StaticRtVertex);
-        t.vertexStride = sizeof(horde::scene::assets::StaticRtVertex);
-        t.maxVertex = packed.PrimitiveVertexCounts()[index]-1;
-        t.indexType = VK_INDEX_TYPE_UINT32;
-        t.indexData.deviceAddress = candidate->indices.address + VkDeviceSize(primitive.indexOffset)*sizeof(std::uint32_t);
-        t.transformData.deviceAddress = candidate->transforms.address + VkDeviceSize(index)*sizeof(VkTransformMatrixKHR);
-        geometries.push_back(g);
-        ranges.push_back({primitive.indexCount/3u, 0u, 0u, 0u});
+    if (candidate->phase == PreparedStaticGeometry::Phase::Upload) {
+        if (!candidate->uploads->Advance(maxCopyBytes, diagnostic)) return failBuild();
+        ++evidence.uploadAdvanceCount;
+        evidence.uploadedBytes += candidate->uploads->LastAdvanceCopiedBytes();
+        if (candidate->uploads->Status() != RtGpuBufferPreparation::State::Ready) return completedStep();
+        std::array<Buffer, 6> buffers{};
+        if (!candidate->uploads->Take(buffers, diagnostic)) return failBuild();
+        candidate->vertices = std::exchange(buffers[0], {});
+        candidate->indices = std::exchange(buffers[1], {});
+        candidate->transforms = std::exchange(buffers[2], {});
+        candidate->instances = std::exchange(buffers[3], {});
+        candidate->primitives = std::exchange(buffers[4], {});
+        candidate->tlasInstances = std::exchange(buffers[5], {});
+        candidate->uploads.reset();
+        candidate->phase = PreparedStaticGeometry::Phase::Collapse;
+        return completedStep();
     }
-    if (!BuildProfileAccelerationStructure(geometries, ranges, VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR,
-        VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR, candidate->collapse,
-        &candidate->collapseScratch, diagnostic, &staticGeometryCompletionUnproved_)) return failBuild();
-    const std::uint64_t collapseBuildOwnerBytes = candidate->vertices.allocationSize + candidate->indices.allocationSize +
-        candidate->transforms.allocationSize + candidate->instances.allocationSize + candidate->primitives.allocationSize +
-        candidate->tlasInstances.allocationSize + candidate->collapse.backing.allocationSize + candidate->collapseScratch.allocationSize;
-    DestroyBuffer(candidate->collapseScratch); // Built and completed; not a retained UPDATE owner.
+    if (candidate->phase == PreparedStaticGeometry::Phase::Collapse) {
+        const auto world = packed.InstanceMetadata()[kCollapseInstanceIndex];
+        std::vector<VkAccelerationStructureGeometryKHR> geometries;
+        std::vector<VkAccelerationStructureBuildRangeInfoKHR> ranges;
+        for (std::uint32_t local = 0; local < world.primitiveCount; ++local) {
+            const auto index = world.primitiveBase + local;
+            const auto& primitive = packed.PrimitiveMetadata()[index];
+            VkAccelerationStructureGeometryKHR g{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR};
+            g.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
+            g.flags = (packed.Materials()[primitive.materialIndex].materialFlags[0] & static_cast<std::uint32_t>(RtMaterialFlag::Transmission))
+                ? VK_GEOMETRY_NO_DUPLICATE_ANY_HIT_INVOCATION_BIT_KHR : VK_GEOMETRY_OPAQUE_BIT_KHR;
+            auto& t = g.geometry.triangles;
+            t.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR;
+            t.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;
+            t.vertexData.deviceAddress = candidate->vertices.address + VkDeviceSize(primitive.vertexOffset)*sizeof(horde::scene::assets::StaticRtVertex);
+            t.vertexStride = sizeof(horde::scene::assets::StaticRtVertex);
+            t.maxVertex = packed.PrimitiveVertexCounts()[index]-1;
+            t.indexType = VK_INDEX_TYPE_UINT32;
+            t.indexData.deviceAddress = candidate->indices.address + VkDeviceSize(primitive.indexOffset)*sizeof(std::uint32_t);
+            t.transformData.deviceAddress = candidate->transforms.address + VkDeviceSize(index)*sizeof(VkTransformMatrixKHR);
+            geometries.push_back(g);
+            ranges.push_back({primitive.indexCount/3u, 0u, 0u, 0u});
+        }
+        if (!BuildProfileAccelerationStructure(geometries, ranges, VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR,
+            VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR, candidate->collapse,
+            &candidate->collapseScratch, diagnostic, &staticGeometryCompletionUnproved_)) return failBuild();
+        candidate->collapseBuildOwnerBytes = candidate->vertices.allocationSize + candidate->indices.allocationSize +
+            candidate->transforms.allocationSize + candidate->instances.allocationSize + candidate->primitives.allocationSize +
+            candidate->tlasInstances.allocationSize + candidate->collapse.backing.allocationSize + candidate->collapseScratch.allocationSize;
+        DestroyBuffer(candidate->collapseScratch); // Built and completed; not a retained UPDATE owner.
+        candidate->phase = PreparedStaticGeometry::Phase::Tlas;
+        return completedStep();
+    }
+    // Gameplay may have advanced during uploads. Build against the latest
+    // submitted definitions; never restore preparation-time actor/held poses.
+    candidate->definitions = tlasBuiltInstances_;
     candidate->definitions[kCollapseInstanceIndex].accelerationStructureReference = candidate->collapse.address;
     if (!WriteBuffer(candidate->tlasInstances, candidate->definitions.data(), sizeof(candidate->definitions),
         "prepared TLAS instances", diagnostic)) return failBuild();
@@ -238,30 +310,33 @@ bool PresentableTinyRtScene::PrepareStaticGeometryReplacement(
     const auto bytes = [](std::initializer_list<const Buffer*> list) {
         std::uint64_t sum=0; for (const auto* buffer : list) sum += buffer->allocationSize; return sum;
     };
-    auto& evidence = staticGeometryReplacementMeasurements_;
-    evidence = {};
     evidence.oldOwnerAllocationBytes = bytes({&staticVertexBuffer_, &staticIndexBuffer_, &staticGeometryTransformBuffer_,
         &instanceMetadataBuffer_, &primitiveMetadataBuffer_, &instanceBuffer_, &collapseBlas_.backing, &tlas_.backing, &tlasUpdateScratch_});
     evidence.candidateOwnerAllocationBytes = bytes({&candidate->vertices, &candidate->indices, &candidate->transforms,
         &candidate->instances, &candidate->primitives, &candidate->tlasInstances, &candidate->collapse.backing,
         &candidate->tlas.backing, &candidate->tlasScratch});
-    evidence.overlapOwnerAllocationBytes = evidence.oldOwnerAllocationBytes + std::max(evidence.candidateOwnerAllocationBytes, collapseBuildOwnerBytes);
+    evidence.overlapOwnerAllocationBytes = evidence.oldOwnerAllocationBytes + std::max(evidence.candidateOwnerAllocationBytes, candidate->collapseBuildOwnerBytes);
     evidence.oldPrimitiveCount = static_cast<std::uint32_t>(staticMeshSlot_.PrimitiveMetadata().size());
     evidence.newPrimitiveCount = static_cast<std::uint32_t>(packed.PrimitiveMetadata().size());
-    evidence.prepareMilliseconds = std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-start).count();
+    evidence.prepareMilliseconds = std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-candidate->prepareStart).count();
     candidate->ready = true;
-    preparedStaticGeometry_ = std::move(candidate);
-    diagnostic.clear(); return true;
+    candidate->phase = PreparedStaticGeometry::Phase::Ready;
+    return completedStep();
 }
 
 bool PresentableTinyRtScene::CommitStaticGeometryWithApi(const std::uint64_t expectedGeneration,
     const StaticCutoverApi& api, std::string& diagnostic)
 {
     const auto eligible = [&] {
-        return ready_ && !staticGeometryCompletionUnproved_ && expectedGeneration != 0 &&
+        const bool owned = ready_ && !staticGeometryCompletionUnproved_ && expectedGeneration != 0 &&
             expectedGeneration != UINT64_MAX && expectedGeneration == staticGeometryGeneration_ &&
             preparedStaticGeometry_ && preparedStaticGeometry_->ready &&
-            preparedStaticGeometry_->sourceGeneration == expectedGeneration && !tlasPendingDefinitionsValid_;
+            preparedStaticGeometry_->sourceGeneration == expectedGeneration &&
+            tlasInstanceDefinitionsValid_ && !tlasPendingDefinitionsValid_;
+        if (!owned) return false;
+        auto latest = tlasBuiltInstances_;
+        latest[kCollapseInstanceIndex].accelerationStructureReference = preparedStaticGeometry_->collapse.address;
+        return std::memcmp(latest.data(), preparedStaticGeometry_->definitions.data(), sizeof(latest)) == 0;
     };
     if (!eligible() || !api.retireReferences || !api.publishDescriptors || !api.destroyRetired) {
         diagnostic = "Static geometry cutover rejected an incomplete or stale candidate/proof."; return false;

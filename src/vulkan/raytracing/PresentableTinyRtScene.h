@@ -5,6 +5,7 @@
 #include "gameplay/traversal/RescueTraversal.h"
 
 #include <array>
+#include <chrono>
 #include <cstdint>
 #include <optional>
 #include <memory>
@@ -274,6 +275,14 @@ public:
     std::uint64_t StaticGeometryGeneration() const noexcept { return staticGeometryGeneration_; }
     bool PrepareStaticGeometryReplacement(std::uint64_t expectedGeneration,
         std::span<const std::uint32_t> retainedWorldFamilies, std::string& diagnostic);
+    bool BeginStaticGeometryReplacement(std::uint64_t expectedGeneration,
+        std::span<const std::uint32_t> retainedWorldFamilies, std::string& diagnostic);
+    // One bounded upload step or one completed AS build. Packing and Vulkan
+    // driver/build latency remain measured work, not a frame-time guarantee.
+    bool AdvanceStaticGeometryReplacement(std::uint64_t expectedGeneration,
+        VkDeviceSize maxCopyBytes, std::string& diagnostic);
+    bool StaticGeometryReplacementReady() const noexcept;
+    bool CancelStaticGeometryReplacement(std::string& diagnostic);
     // Proof must complete GPU/evidence work and reset ALL recorded frame command
     // buffers. Failed proof retains both owners; no descriptors are published.
     bool CommitStaticGeometryReplacement(std::uint64_t expectedGeneration,
@@ -282,6 +291,10 @@ public:
     struct StaticGeometryReplacementMeasurements {
         double prepareMilliseconds = 0.0;
         double cutoverMilliseconds = 0.0;
+        double packMilliseconds = 0.0;
+        double maximumAdvanceMilliseconds = 0.0;
+        std::uint32_t uploadAdvanceCount = 0;
+        std::uint64_t uploadedBytes = 0;
         std::uint64_t oldOwnerAllocationBytes = 0;
         std::uint64_t candidateOwnerAllocationBytes = 0;
         std::uint64_t overlapOwnerAllocationBytes = 0;
@@ -659,8 +672,13 @@ private:
     using AccelerationStructure = RtAccelerationStructure;
 
     struct PreparedStaticGeometry {
+        enum class Phase { Upload, Collapse, Tlas, Ready };
         std::uint64_t sourceGeneration = 0;
         bool ready = false;
+        Phase phase = Phase::Upload;
+        std::chrono::steady_clock::time_point prepareStart;
+        std::unique_ptr<RtGpuBufferPreparation> uploads;
+        std::uint64_t collapseBuildOwnerBytes = 0;
         RtStaticMeshSlot slot;
         Buffer vertices, indices, transforms, instances, primitives, tlasInstances;
         AccelerationStructure collapse, tlas;

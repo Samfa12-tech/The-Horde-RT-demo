@@ -6938,7 +6938,28 @@ bool RunStaticGeometryCutoverCapture(VulkanSurfaceContext& context,
             error="Invalid family preparation changed the admitted GPU owner."; return false;
         }
         const std::span<const std::uint32_t> retained{};
-        if (!context.rtScene.PrepareStaticGeometryReplacement(generation,retained,error)) return false;
+        // Prove cancellation after actual allocation/copy without touching the
+        // admitted scene. Then spread the same owner upload across RT frames.
+        if (!context.rtScene.BeginStaticGeometryReplacement(generation,retained,error) ||
+            !context.rtScene.AdvanceStaticGeometryReplacement(generation,64u*1024u,error) ||
+            !context.rtScene.CancelStaticGeometryReplacement(error) ||
+            context.rtScene.ResourceInventory().deviceLocalBytes != before.deviceLocalBytes ||
+            context.rtScene.ResourceInventory().hostVisibleBytes != before.hostVisibleBytes) {
+            error="Cancelled real candidate did not preserve the admitted allocations."; return false;
+        }
+        if (!context.rtScene.BeginStaticGeometryReplacement(generation,retained,error)) return false;
+        unsigned preparationFrames=0;
+        while (!context.rtScene.StaticGeometryReplacementReady()) {
+            if (++preparationFrames>1024u ||
+                !context.rtScene.AdvanceStaticGeometryReplacement(generation,256u*1024u,error)) return false;
+            // Final TLAS build and publication share the same submitted pose.
+            if (!context.rtScene.StaticGeometryReplacementReady()) {
+                bool presented=false;
+                if (!RenderFrame(context,clear,presented) || !presented) {
+                    error="Admitted owner failed while candidate uploaded: "+context.lastRtFrameError; return false;
+                }
+            }
+        }
         const auto overlap=context.rtScene.ResourceInventory();
         const auto reject = [](void*,std::string& diagnostic) { diagnostic="Injected failed retirement proof"; return false; };
         // A failed completion proof keeps the candidate available for a safe
@@ -6973,6 +6994,11 @@ bool RunStaticGeometryCutoverCapture(VulkanSurfaceContext& context,
             << ",\"admittedGeneration\":" << context.rtScene.StaticGeometryGeneration()
             << ",\"selection\":\"complete-with-graveyard"
             << "\",\"prepareMilliseconds\":" << m.prepareMilliseconds << ",\"cutoverMilliseconds\":" << m.cutoverMilliseconds
+            << ",\"packMilliseconds\":" << m.packMilliseconds
+            << ",\"maximumAdvanceMilliseconds\":" << m.maximumAdvanceMilliseconds
+            << ",\"uploadAdvanceCount\":" << m.uploadAdvanceCount
+            << ",\"uploadedBytes\":" << m.uploadedBytes
+            << ",\"preparationFrames\":" << preparationFrames
             << ",\"oldOwnerAllocationBytes\":" << m.oldOwnerAllocationBytes
             << ",\"candidateOwnerAllocationBytes\":" << m.candidateOwnerAllocationBytes
             << ",\"overlapOwnerAllocationBytes\":" << m.overlapOwnerAllocationBytes

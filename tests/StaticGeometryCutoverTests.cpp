@@ -20,7 +20,7 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
         a.address=id*4096; a.backing=Buffer(id); return a;
     }
     struct Proof {
-        Scene* scene=nullptr; bool succeed=true, stale=false, descriptorFailure=false, descriptorThrow=false;
+        Scene* scene=nullptr; bool succeed=true, stale=false, descriptorFailure=false, descriptorThrow=false, poseChange=false;
         unsigned proof=0, publish=0, retire=0;
         bool publicationCorrect=false, retirementCorrect=false;
     };
@@ -40,12 +40,16 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
         c.collapse=As(107); c.tlas=As(108); c.tlasScratch=Buffer(109);
         c.definitions[Scene::kCollapseInstanceIndex].accelerationStructureReference=c.collapse.address;
         c.definitions[0].mask=0x41; c.definitions[0].instanceCustomIndex=21;
+        s.tlasBuiltInstances_ = c.definitions;
+        s.tlasBuiltInstances_[Scene::kCollapseInstanceIndex].accelerationStructureReference=s.collapseBlas_.address;
+        s.tlasInstanceDefinitionsValid_=true;
     }
     static Scene::StaticCutoverApi Api(Proof& p) {
         return {&p,
             [](void* u,std::string& error) {
                 auto& p=*static_cast<Proof*>(u); ++p.proof;
                 if(p.stale) ++p.scene->staticGeometryGeneration_;
+                if(p.poseChange) p.scene->tlasBuiltInstances_[0].transform.matrix[0][3]+=1.0f;
                 if(!p.succeed) error="Injected incomplete retirement proof";
                 return p.succeed;
             },
@@ -87,7 +91,7 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
             failures+=!Check(!s.preparedStaticGeometry_ && !s.CommitStaticGeometryWithApi(41,api,error) && p.retire==1,
                 "consumed/stale candidate cannot republish or retire twice");
         }
-        for(unsigned edge=0;edge<10;++edge) {
+        for(unsigned edge=0;edge<15;++edge) {
             Scene s; Seed(s,oldMap,newMap); Proof p{&s}; auto api=Api(p); std::uint64_t token=41;
             switch(edge) {
                 case 0: token=0; break; case 1: token=40; break;
@@ -97,13 +101,18 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
                 case 6: s.staticGeometryCompletionUnproved_=true; break;
                 case 7: s.tlasPendingDefinitionsValid_=true; break;
                 case 8: api.publishDescriptors=nullptr; break; case 9: s.ready_=false; break;
+                case 10: s.tlasBuiltInstances_[0].transform.matrix[0][3]+=1.0f; break;
+                case 11: s.tlasBuiltInstances_[0].mask=0u; break;
+                case 12: s.tlasBuiltInstances_[0].accelerationStructureReference=999u; break;
+                case 13: p.poseChange=true; break;
+                case 14: s.tlasInstanceDefinitionsValid_=false; break;
             }
             failures+=!Check(!s.CommitStaticGeometryWithApi(token,api,error),"invalid/unproved cutover fails closed");
             failures+=!Check(s.staticVertexBuffer_.buffer==Handle<VkBuffer>(1) && s.tlas_.handle==Handle<VkAccelerationStructureKHR>(8) &&
                 s.instanceMetadataBuffer_.mappedWriteData==&oldMap && s.preparedStaticGeometry_ &&
                 s.preparedStaticGeometry_->vertices.buffer==Handle<VkBuffer>(101) && p.publish==0 && p.retire==0,
                 "failed or stale proof preserves both owners, descriptors and mappings");
-            failures+=!Check(p.proof == ((edge==4 || edge==5)?1u:0u),"ineligible candidate never invokes external retirement proof");
+            failures+=!Check(p.proof == ((edge==4 || edge==5 || edge==13)?1u:0u),"ineligible candidate never invokes external retirement proof");
         }
         {
             Scene s; Seed(s,oldMap,newMap); Proof p{&s}; auto api=Api(p); p.succeed=false;
@@ -136,6 +145,27 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
                 moved.staticGeometryGeneration_==41 && moved.instanceBuffer_.mappedWriteData==&oldMap &&
                 moved.CommitStaticGeometryWithApi(41,api,error) && p.retire==1,
                 "scene move transfers the single candidate, generation and mapped owner before cutover");
+        }
+        {
+            Scene s; Seed(s,oldMap,newMap);
+            s.preparedStaticGeometry_->ready=false;
+            s.preparedStaticGeometry_->sourceGeneration=40;
+            failures+=!Check(!s.AdvanceStaticGeometryReplacement(41,256u,error) &&
+                s.preparedStaticGeometry_ && s.staticGeometryGeneration_==41,
+                "stale preparation cannot advance or publish; cancellation remains explicit");
+            failures+=!Check(s.CancelStaticGeometryReplacement(error) && !s.preparedStaticGeometry_ &&
+                s.CancelStaticGeometryReplacement(error) && s.staticGeometryGeneration_==41 &&
+                s.staticVertexBuffer_.buffer==Handle<VkBuffer>(1) && s.tlas_.handle==Handle<VkAccelerationStructureKHR>(8),
+                "stale cancellation is idempotent and preserves admitted owner for preparation retry");
+        }
+        {
+            Scene s; Seed(s,oldMap,newMap); s.staticGeometryCompletionUnproved_=true;
+            failures+=!Check(!s.CancelStaticGeometryReplacement(error) && s.preparedStaticGeometry_ &&
+                s.preparedStaticGeometry_->vertices.buffer==Handle<VkBuffer>(101),
+                "cancellation cannot free resources referenced by unproved GPU work");
+            s.staticGeometryCompletionUnproved_=false;
+            failures+=!Check(s.CancelStaticGeometryReplacement(error) && !s.preparedStaticGeometry_,
+                "completed work permits explicit cancellation without retiring admitted resources");
         }
         return failures?1:0;
     }

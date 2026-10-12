@@ -176,6 +176,120 @@ int main()
     std::string diagnostic;
     bool ok = true;
 
+    // The chapter can upload across render turns without publishing partial
+    // buffers. A byte budget bounds copies; one turn never allocates two rows.
+    state = {};
+    {
+        RtGpuBufferPreparation preparation(resources);
+        ok &= Require(preparation.Begin(uploads, diagnostic) && state.calls == 0u,
+            "begin borrows a validated batch without Vulkan allocation");
+        if (preparation.Status() == RtGpuBufferPreparation::State::Preparing)
+        {
+            const auto calls = state.calls;
+            ok &= Require(!preparation.Begin(uploads, diagnostic) && state.calls == calls &&
+                preparation.Status() == RtGpuBufferPreparation::State::Preparing,
+                "second begin cannot replace an owned preparation");
+            ok &= Require(!preparation.Advance(0u, diagnostic) && state.calls == calls,
+                "zero copy budget preserves preparation without Vulkan calls");
+            unsigned turns = 0u;
+            while (preparation.Status() == RtGpuBufferPreparation::State::Preparing && turns++ < 100u)
+            {
+                const auto rows = state.row;
+                const auto bytes = preparation.UploadedBytes();
+                ok &= Require(preparation.Advance(3u, diagnostic) && state.row <= rows + 1u &&
+                    preparation.LastAdvanceCopiedBytes() <= 3u &&
+                    preparation.UploadedBytes() == bytes + preparation.LastAdvanceCopiedBytes(),
+                    "one allocation and at most three exact copied bytes per turn");
+                horde::telemetry::RtResourceInventory inventory;
+                preparation.AccumulateResourceInventory(inventory);
+                ok &= Require(inventory.bufferCount == state.row &&
+                    inventory.memoryAllocationCount == state.row &&
+                    inventory.deviceLocalBytes == state.row * (payload.size() + 64u) &&
+                    inventory.hostVisibleBytes == inventory.deviceLocalBytes,
+                    "partial upload allocations remain visible in actual resource inventory");
+                for (const auto& buffer : output) ok &= Require(Empty(buffer), "no partial publication");
+            }
+            ok &= Require(turns == 32u && preparation.CompletedRows() == uploads.size() &&
+                preparation.Status() == RtGpuBufferPreparation::State::Ready &&
+                preparation.UploadedBytes() == uploads.size() * payload.size(),
+                "all eight rows complete over exactly thirty-two turns");
+            ok &= Require(!preparation.Take(std::span(output).first(7u), diagnostic),
+                "wrong destination length retains the complete candidate");
+            output[7].size = 1u;
+            ok &= Require(!preparation.Take(output, diagnostic) && output[7].size == 1u,
+                "admitted destination rejects atomic take");
+            output = {};
+            RtGpuBufferPreparation moved(std::move(preparation));
+            preparation.Cancel();
+            ok &= Require(moved.Take(output, diagnostic) &&
+                moved.Status() == RtGpuBufferPreparation::State::Idle,
+                "moved preparation transfers completed ownership exactly once");
+            for (std::size_t i = 0u; i < output.size(); ++i)
+            {
+                ok &= Require(std::memcmp(state.memory[Id(output[i].memory)].bytes.data(),
+                    payload.data(), payload.size()) == 0 &&
+                    (output[i].mappedWriteData != nullptr) == uploads[i].retainMapping,
+                    "incremental payload and final mapping exactly match synchronous route");
+                resources.DestroyBuffer(output[i]);
+            }
+        }
+    }
+    ok &= Require(NoLiveResources(), "incremental success has no lost allocations");
+
+    state = {};
+    {
+        RtGpuBufferPreparation first(resources), second(resources);
+        ok &= Require(first.Begin(uploads, diagnostic) && first.Advance(3u, diagnostic) &&
+            second.Begin(uploads, diagnostic) && second.Advance(3u, diagnostic), "two isolated partial owners");
+        second = std::move(first);
+        second = std::move(second);
+        first.Cancel();
+        ok &= Require(state.frees == 1u && second.UploadedBytes() == 3u &&
+            second.Advance(3u, diagnostic) && second.UploadedBytes() == 6u,
+            "move assignment releases destination, preserves source cursor and tolerates self move");
+    }
+    ok &= Require(NoLiveResources() && state.maps == state.unmaps && state.allocations == state.frees,
+        "partial move and destruction release each allocation once");
+
+    // Cancellation at every copy boundary and every Vulkan failure retains the
+    // separately admitted sentinel, including success-null-map cleanup.
+    for (unsigned cancelTurn = 0u; cancelTurn <= 32u; ++cancelTurn)
+    {
+        state = {};
+        {
+            RtGpuBufferPreparation preparation(resources);
+            ok &= Require(preparation.Begin(uploads, diagnostic), "cancellable begin");
+            for (unsigned turn = 0u; turn < cancelTurn; ++turn)
+                ok &= Require(preparation.Advance(3u, diagnostic), "cancellable bounded copy");
+            preparation.Cancel(); preparation.Cancel();
+        }
+        ok &= Require(NoLiveResources() && state.maps == state.unmaps && state.allocations == state.frees,
+            "cancel/destruction at every boundary releases exactly its candidate");
+    }
+    for (auto failure : {Failure::Create, Failure::Allocate, Failure::Bind,
+                         Failure::Map, Failure::NullMap, Failure::Address})
+        for (std::size_t row = 1u; row <= uploads.size(); ++row)
+        {
+            state = {}; state.failure = failure; state.failureRow = row;
+            state.memory[31].alive = true; state.buffers[31] = true;
+            state.memory[31].bytes.fill(std::byte{0x5a});
+            const auto sentinel = state.memory[31].bytes;
+            {
+                RtGpuBufferPreparation preparation(resources);
+                ok &= Require(preparation.Begin(uploads, diagnostic), "failure injection begins");
+                while (preparation.Status() == RtGpuBufferPreparation::State::Preparing)
+                    if (!preparation.Advance(3u, diagnostic)) break;
+                ok &= Require(preparation.Status() == RtGpuBufferPreparation::State::Failed &&
+                    !preparation.Take(output, diagnostic) && !diagnostic.empty() &&
+                    state.row == row && state.memory[31].alive && state.buffers[31] &&
+                    state.memory[31].bytes == sentinel,
+                    "incremental driver failure cleans only candidate and preserves admitted owner");
+            }
+            state.memory[31].alive = false; state.buffers[31] = false;
+            ok &= Require(NoLiveResources() && state.maps == state.unmaps && state.allocations == state.frees,
+                "incremental Vulkan failure has no mapped or leaked resources");
+        }
+
     // The entire candidate is isolated until every row has allocated/uploaded.
     state = {};
     ok &= Require(resources.PrepareBufferUploads(uploads, output, diagnostic), "complete batch admission");
@@ -278,6 +392,11 @@ int main()
             if (defect == 3) bad[row].usage = 0u;
             if (defect == 4) bad[row].label = "";
             ok &= Reject(bad, output);
+            RtGpuBufferPreparation preparation(resources);
+            state = {};
+            ok &= Require(!preparation.Begin(bad, diagnostic) && !diagnostic.empty() && state.calls == 0u &&
+                preparation.Status() == RtGpuBufferPreparation::State::Idle,
+                "invalid incremental payload rejects before any allocation or cursor mutation");
         }
     for (int field = 0; field < 8; ++field)
     {
@@ -296,6 +415,8 @@ int main()
     output = {};
     resources.Reset();
     ok &= Reject(uploads, output);
-    if (ok) std::cout << "GPU buffer batch: exact uploads, 48 Vulkan failures, preflight, move and cleanup passed.\n";
+    RtGpuBufferPreparation unbound(resources);
+    ok &= Require(!unbound.Begin(uploads, diagnostic) && state.calls == 0u, "unbound incremental context rejects");
+    if (ok) std::cout << "GPU buffer batch: exact synchronous/incremental uploads, 96 Vulkan failures, bounded copies, preflight, cancellation, move and cleanup passed.\n";
     return ok ? 0 : 1;
 }

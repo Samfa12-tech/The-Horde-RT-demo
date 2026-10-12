@@ -525,6 +525,24 @@ Tomb ornament families now also own exterior offerings. The GPU diagnostic retai
 
 All six jobs passed on parent `fbe33b9f40c9d844702c805b48ffb420533b2a25` in [run38176375984](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/38176375984), including Vulkan40/40 and all seven requested traversal executions. Fresh source/CI identities belong to the next pushed milestone; do not infer them from the parent result.
 
+### Incremental candidate uploads (12 October)
+
+The [bounded native upload evidence](../evidence/2026-10-12-incremental-gpu-upload/README.md)
+preserves the completed graveyard/lid, prepared ferns/rocks and Bellwether shell.
+Candidate uploads now advance across RT frames, with partial allocations counted,
+atomic adoption, cancellation and stale-pose rejection. Both backends preserve
+replacement/restoration output byte-for-byte. The measured37.9–43.3ms CPU pack
+and synchronous AS stages still need work before normal seamless preparation.
+This remains diagnostic ownership, with **zero normal-play residency saving**.
+
+`d130386a` passed all six CI jobs (MSVC137, GCC/Clang126 each, Vulkan45), including
+each requested traversal CTest and the rock fixture once. New focused Debug/
+Release and four-ABI Android/package checks pass locally; exact CI remains tied
+to the new pushed commit. Normal bidirectional zone lifetimes, remaining wood/
+stump/snag, full-route inspection, sustained measurements and one final phone
+candidate remain required. Keep18 layers, three actor slots, quality and frozen
+shaders. Easy Tree/canopy and mist28 remain deferred.
+
 ### Graveyard package fixture and lid continuation (12 October)
 
 All six jobs passed on `ee808c02136d62c7d6657f1153e48e68629d9d04` in

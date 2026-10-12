@@ -3,6 +3,7 @@
 #include "telemetry/RtPerformanceEvidence.h"
 
 #include <cstdint>
+#include <array>
 #include <limits>
 #include <span>
 #include <string>
@@ -176,10 +177,45 @@ public:
         VkMemoryPropertyFlags* selectedFlags = nullptr) const;
 
 private:
+    friend class RtGpuBufferPreparation;
     VkPhysicalDevice physicalDevice_ = VK_NULL_HANDLE;
     VkDevice device_ = VK_NULL_HANDLE;
     PFN_vkDestroyAccelerationStructureKHR destroyAccelerationStructure_ = nullptr;
     PFN_vkGetBufferDeviceAddressKHR getBufferDeviceAddress_ = nullptr;
+};
+
+// Offside upload owner for scene preparation across render turns. Payloads and
+// labels remain borrowed until Ready or Cancel; the platform must destroy this
+// owner before its VkDevice. Each Advance allocates at most one row and copies
+// at most maxCopyBytes. Driver allocation/map latency is not time-bounded.
+class RtGpuBufferPreparation
+{
+public:
+    enum class State { Idle, Preparing, Ready, Failed };
+    explicit RtGpuBufferPreparation(const RtGpuResources& resources) : resources_(resources) {}
+    ~RtGpuBufferPreparation();
+    RtGpuBufferPreparation(const RtGpuBufferPreparation&) = delete;
+    RtGpuBufferPreparation& operator=(const RtGpuBufferPreparation&) = delete;
+    RtGpuBufferPreparation(RtGpuBufferPreparation&& other) noexcept;
+    RtGpuBufferPreparation& operator=(RtGpuBufferPreparation&& other) noexcept;
+
+    bool Begin(std::span<const RtGpuBufferUpload> uploads, std::string& diagnostic);
+    bool Advance(VkDeviceSize maxCopyBytes, std::string& diagnostic);
+    bool Take(std::span<RtGpuBuffer> destination, std::string& diagnostic);
+    void Cancel() noexcept;
+    void AccumulateResourceInventory(horde::telemetry::RtResourceInventory& inventory) const noexcept;
+    [[nodiscard]] State Status() const noexcept { return state_; }
+    [[nodiscard]] VkDeviceSize LastAdvanceCopiedBytes() const noexcept { return lastCopyBytes_; }
+    [[nodiscard]] VkDeviceSize UploadedBytes() const noexcept { return uploadedBytes_; }
+    [[nodiscard]] std::size_t CompletedRows() const noexcept { return row_; }
+
+private:
+    RtGpuResources resources_;
+    std::array<RtGpuBufferUpload, RtGpuResources::kBufferUploadBatchCapacity> uploads_{};
+    std::array<RtGpuBuffer, RtGpuResources::kBufferUploadBatchCapacity> buffers_{};
+    State state_ = State::Idle;
+    std::size_t count_ = 0u, row_ = 0u;
+    VkDeviceSize offset_ = 0u, uploadedBytes_ = 0u, lastCopyBytes_ = 0u;
 };
 
 } // namespace horde::vulkan::raytracing

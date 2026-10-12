@@ -1,0 +1,657 @@
+{
+  "parent": "d130386a19df914532f7a9f442de2103d454f9b7",
+  "parentCiRun": 38191982003,
+  "parentJobs": [
+    {
+      "name": "Android Debug build, playback/report contracts and lint",
+      "conclusion": "success"
+    },
+    {
+      "name": "Shared simulation host (MSVC)",
+      "conclusion": "success"
+    },
+    {
+      "name": "Selected host contracts (Clang ASan/UBSan)",
+      "conclusion": "success"
+    },
+    {
+      "name": "player-vulkan-host",
+      "conclusion": "success"
+    },
+    {
+      "name": "Shared simulation host (GCC)",
+      "conclusion": "success"
+    },
+    {
+      "name": "Shared simulation host (Clang)",
+      "conclusion": "success"
+    }
+  ],
+  "parentVulkanExecutions": {
+    "world_route_foundation": 1,
+    "vertical_support": 1,
+    "held_item_vertical_support_rig": 1,
+    "player_directional_rig": 1,
+    "rescue_journey_integration": 1,
+    "rescue_rig_attachment": 1,
+    "rescue_adversarial_regression": 1,
+    "forest_rock_dressing": 1
+  },
+  "sources": {
+    "src/platform/windows/DiagnosticWindow.cpp": {
+      "bytes": 560970,
+      "sha256": "4c01c5de9e735974c95a47717129fa16269e3030ef2d1c7836563395e671b23c"
+    },
+    "src/vulkan/raytracing/PresentableTinyRtScene.cpp": {
+      "bytes": 455379,
+      "sha256": "dabf02e62c968f6fbb4f23d6b369fac1f99b4f7dc7780d19b05bf8a872b18523"
+    },
+    "src/vulkan/raytracing/PresentableTinyRtScene.h": {
+      "bytes": 56234,
+      "sha256": "0f4d86a4409ca03108bd2604709bf3117acff209dca0690c05cb424b45e5b375"
+    },
+    "src/vulkan/raytracing/PresentableTinyRtSceneStaticGeometry.cpp": {
+      "bytes": 25345,
+      "sha256": "077a4b0eba0353dd82d42b2055f2b61a30749d1c79c5821a3b1020b4b3e75727"
+    },
+    "src/vulkan/raytracing/RtGpuResources.cpp": {
+      "bytes": 18584,
+      "sha256": "9e887deacad0913cc9241e2bad8309f5bc97e0bc0d75d60a572e6369ba5bd1be"
+    },
+    "src/vulkan/raytracing/RtGpuResources.h": {
+      "bytes": 8798,
+      "sha256": "8eadef03e3ce773f26fc6200a65bd5bddd354b6fd1c5e9e8dc2aea72eab9c1da"
+    },
+    "tests/RtGpuBufferBatchTests.cpp": {
+      "bytes": 20355,
+      "sha256": "c7068b885a1f6f5caee683f6b462e281c4091348e41285b7d53bf964e8e891d2"
+    },
+    "tests/StaticGeometryCutoverTests.cpp": {
+      "bytes": 12314,
+      "sha256": "5a3d34e2d2751e4255a82746626b294fabd7bd0ae9cb83fff35796bd54a22daf"
+    }
+  },
+  "frames": {
+    "pipeline": {
+      "buildId": "1.6.2",
+      "executionBackend": "RayTracingPipeline",
+      "selectedRtPipelineBundle": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "b4cad65003368cce20cc95b2415e8b57a43561a44ba4d761753f9a3418eb6296"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "28e42e4c9683c403c0958735998d7ef44c7587640e676930121d3eac394f45a6"
+        }
+      },
+      "device": {
+        "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "vendorId": 4318,
+        "deviceId": 11672
+      },
+      "presentation": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "timing": {
+        "sampleCount": 12,
+        "overallMedianMs": 11.5743,
+        "overallMeanMs": 64.8596,
+        "gpuRtCommandBuffer": {
+          "valid": true,
+          "latestMs": 2.561184,
+          "averageMs": 2.598413,
+          "sampleCount": 12,
+          "timestampValidBits": 64,
+          "timestampPeriodNanoseconds": 1.0
+        }
+      },
+      "staticRtAsset": {
+        "enabled": true,
+        "vertexBytes": 38717312,
+        "indexBytes": 6180540,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 832,
+        "primitiveMetadataBytes": 512,
+        "textureBytes": 274027796,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.588,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 0.8188,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.7692,
+        "productionPropBlasBytes": 26294912,
+        "productionPropBlasBuildMilliseconds": 19.9774
+      },
+      "camera": {
+        "x": -17.700905,
+        "z": 15.206802,
+        "yaw": 1.15,
+        "pitch": 0.1
+      },
+      "preset": "finale-roof-open",
+      "rescueTraversal": {
+        "phase": 4,
+        "generation": 4,
+        "claimCount": 1,
+        "deploymentCount": 1,
+        "equipmentStowed": false,
+        "ropeHandsActive": false,
+        "bodyStowWitness": false,
+        "plantedPelvisDropMetres": 0,
+        "bodyYawRadians": 0.136817,
+        "root": [
+          -17.7009,
+          -0.548164,
+          15.2068
+        ],
+        "renderedEye": [
+          -17.7009,
+          1.10184,
+          15.2068
+        ],
+        "gripNodeIndices": [
+          0.2,
+          0.45
+        ],
+        "gripTargets": [
+          [
+            -33.4,
+            2.5625,
+            -14.979
+          ],
+          [
+            -33.3999,
+            2.45312,
+            -14.979
+          ]
+        ],
+        "ropeNodes": [
+          [
+            -33.4,
+            2.65,
+            -14.979
+          ],
+          [
+            -33.3999,
+            2.21248,
+            -14.9789
+          ],
+          [
+            -33.4002,
+            1.77505,
+            -14.9789
+          ],
+          [
+            -33.4007,
+            1.33775,
+            -14.9788
+          ],
+          [
+            -33.4011,
+            0.900611,
+            -14.9789
+          ],
+          [
+            -33.4005,
+            0.463649,
+            -14.9791
+          ],
+          [
+            -33.4007,
+            0.0268801,
+            -14.9794
+          ],
+          [
+            -33.4015,
+            -0.409687,
+            -14.9799
+          ],
+          [
+            -33.404,
+            -0.846047,
+            -14.9808
+          ],
+          [
+            -33.7309,
+            -0.924961,
+            -15.2589
+          ],
+          [
+            -33.3104,
+            -0.925,
+            -15.3755
+          ],
+          [
+            -32.9119,
+            -0.925,
+            -15.1978
+          ]
+        ],
+        "publishedLanternHinge": [
+          0.408487,
+          0,
+          0.912764,
+          0,
+          -0.0455813,
+          0.998752,
+          0.0203989,
+          0,
+          -0.911625,
+          -0.0499376,
+          0.407978,
+          0,
+          -17.1943,
+          1.18494,
+          14.7803,
+          1
+        ],
+        "publishedLanternBody": [
+          0.408134,
+          0.00748893,
+          0.912891,
+          0,
+          -0.0486444,
+          0.998724,
+          0.0135548,
+          0,
+          -0.911625,
+          -0.0499393,
+          0.407978,
+          0,
+          -17.1283,
+          1.18744,
+          14.8055,
+          1
+        ]
+      },
+      "width": 960,
+      "height": 540,
+      "pngSha256": "fa39c461408b674857a6cefca3d77f91facdc37ebdac41285ad2cde26d0ffd98"
+    },
+    "query": {
+      "buildId": "1.6.2",
+      "executionBackend": "RayQueryCompute",
+      "selectedRtPipelineBundle": {
+        "opaqueFast": {
+          "key": "rayquery_compute_diagnostic_high_opaque_fast",
+          "sha256": "82f1aa6d54c5cae3d29c646996163a3480b547e9ef3903abf3cc7b01be1ae668"
+        },
+        "genericDielectric": {
+          "key": "rayquery_compute_diagnostic_high_generic_dielectric",
+          "sha256": "63d3bbb9f67940f42559f09383aacd511c3ca5b0b91dc812ecddcfc7d1468e67"
+        }
+      },
+      "device": {
+        "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "vendorId": 4318,
+        "deviceId": 11672
+      },
+      "presentation": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "timing": {
+        "sampleCount": 12,
+        "overallMedianMs": 11.65065,
+        "overallMeanMs": 65.757092,
+        "gpuRtCommandBuffer": {
+          "valid": true,
+          "latestMs": 2.8232,
+          "averageMs": 2.825451,
+          "sampleCount": 12,
+          "timestampValidBits": 64,
+          "timestampPeriodNanoseconds": 1.0
+        }
+      },
+      "staticRtAsset": {
+        "enabled": true,
+        "vertexBytes": 38717312,
+        "indexBytes": 6180540,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 832,
+        "primitiveMetadataBytes": 512,
+        "textureBytes": 274027796,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.574,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 0.7187,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.8553,
+        "productionPropBlasBytes": 26294912,
+        "productionPropBlasBuildMilliseconds": 8.2433
+      },
+      "camera": {
+        "x": -17.700905,
+        "z": 15.206802,
+        "yaw": 1.15,
+        "pitch": 0.1
+      },
+      "preset": "finale-roof-open",
+      "rescueTraversal": {
+        "phase": 4,
+        "generation": 4,
+        "claimCount": 1,
+        "deploymentCount": 1,
+        "equipmentStowed": false,
+        "ropeHandsActive": false,
+        "bodyStowWitness": false,
+        "plantedPelvisDropMetres": 0,
+        "bodyYawRadians": 0.136817,
+        "root": [
+          -17.7009,
+          -0.548164,
+          15.2068
+        ],
+        "renderedEye": [
+          -17.7009,
+          1.10184,
+          15.2068
+        ],
+        "gripNodeIndices": [
+          0.2,
+          0.45
+        ],
+        "gripTargets": [
+          [
+            -33.4,
+            2.5625,
+            -14.979
+          ],
+          [
+            -33.3999,
+            2.45312,
+            -14.979
+          ]
+        ],
+        "ropeNodes": [
+          [
+            -33.4,
+            2.65,
+            -14.979
+          ],
+          [
+            -33.3999,
+            2.21248,
+            -14.9789
+          ],
+          [
+            -33.4002,
+            1.77505,
+            -14.9789
+          ],
+          [
+            -33.4007,
+            1.33775,
+            -14.9788
+          ],
+          [
+            -33.4011,
+            0.900611,
+            -14.9789
+          ],
+          [
+            -33.4005,
+            0.463649,
+            -14.9791
+          ],
+          [
+            -33.4007,
+            0.0268801,
+            -14.9794
+          ],
+          [
+            -33.4015,
+            -0.409687,
+            -14.9799
+          ],
+          [
+            -33.404,
+            -0.846047,
+            -14.9808
+          ],
+          [
+            -33.7309,
+            -0.924961,
+            -15.2589
+          ],
+          [
+            -33.3104,
+            -0.925,
+            -15.3755
+          ],
+          [
+            -32.9119,
+            -0.925,
+            -15.1978
+          ]
+        ],
+        "publishedLanternHinge": [
+          0.408487,
+          0,
+          0.912764,
+          0,
+          -0.0455813,
+          0.998752,
+          0.0203989,
+          0,
+          -0.911625,
+          -0.0499376,
+          0.407978,
+          0,
+          -17.1943,
+          1.18494,
+          14.7803,
+          1
+        ],
+        "publishedLanternBody": [
+          0.408134,
+          0.00748893,
+          0.912891,
+          0,
+          -0.0486444,
+          0.998724,
+          0.0135548,
+          0,
+          -0.911625,
+          -0.0499393,
+          0.407978,
+          0,
+          -17.1283,
+          1.18744,
+          14.8055,
+          1
+        ]
+      },
+      "width": 960,
+      "height": 540,
+      "pngSha256": "06a0046012abf49befbe8253f8d4685659b905bb078d32ea541875af36b59e44"
+    }
+  },
+  "preparationMeasurements": {
+    "pipeline": {
+      "schema": 1,
+      "scope": "diagnostic GPU owner replacement; shared textures/materials/unchanged BLAS retained",
+      "backend": 1,
+      "hops": [
+        {
+          "sourceGeneration": 1,
+          "admittedGeneration": 2,
+          "selection": "complete-with-graveyard",
+          "prepareMilliseconds": 1571.93,
+          "cutoverMilliseconds": 8.6033,
+          "packMilliseconds": 39.9265,
+          "maximumAdvanceMilliseconds": 4.7253,
+          "uploadAdvanceCount": 164,
+          "uploadedBytes": 41692348,
+          "preparationFrames": 166,
+          "oldOwnerAllocationBytes": 67334720,
+          "candidateOwnerAllocationBytes": 67334720,
+          "overlapOwnerAllocationBytes": 155579904,
+          "oldPrimitiveCount": 32,
+          "newPrimitiveCount": 32,
+          "sceneDeviceLocalOverlap": 470872704,
+          "sceneHostVisibleOverlap": 89854832,
+          "topLevelOwnersBefore": 1,
+          "topLevelOwnersOverlap": 2,
+          "topLevelOwnersAfter": 1,
+          "sceneDeviceLocalBefore": 403540608,
+          "sceneDeviceLocalAfter": 403540608,
+          "sceneHostVisibleBefore": 48162352,
+          "sceneHostVisibleAfter": 48162352
+        },
+        {
+          "sourceGeneration": 2,
+          "admittedGeneration": 3,
+          "selection": "complete-with-graveyard",
+          "prepareMilliseconds": 1062.67,
+          "cutoverMilliseconds": 3.1873,
+          "packMilliseconds": 43.2668,
+          "maximumAdvanceMilliseconds": 6.0184,
+          "uploadAdvanceCount": 164,
+          "uploadedBytes": 41692348,
+          "preparationFrames": 166,
+          "oldOwnerAllocationBytes": 67334720,
+          "candidateOwnerAllocationBytes": 67334720,
+          "overlapOwnerAllocationBytes": 155579904,
+          "oldPrimitiveCount": 32,
+          "newPrimitiveCount": 32,
+          "sceneDeviceLocalOverlap": 470872704,
+          "sceneHostVisibleOverlap": 89854832,
+          "topLevelOwnersBefore": 1,
+          "topLevelOwnersOverlap": 2,
+          "topLevelOwnersAfter": 1,
+          "sceneDeviceLocalBefore": 403540608,
+          "sceneDeviceLocalAfter": 403540608,
+          "sceneHostVisibleBefore": 48162352,
+          "sceneHostVisibleAfter": 48162352
+        }
+      ]
+    },
+    "query": {
+      "schema": 1,
+      "scope": "diagnostic GPU owner replacement; shared textures/materials/unchanged BLAS retained",
+      "backend": 2,
+      "hops": [
+        {
+          "sourceGeneration": 1,
+          "admittedGeneration": 2,
+          "selection": "complete-with-graveyard",
+          "prepareMilliseconds": 1546.43,
+          "cutoverMilliseconds": 9.0115,
+          "packMilliseconds": 39.3931,
+          "maximumAdvanceMilliseconds": 5.3638,
+          "uploadAdvanceCount": 164,
+          "uploadedBytes": 41692348,
+          "preparationFrames": 166,
+          "oldOwnerAllocationBytes": 67334720,
+          "candidateOwnerAllocationBytes": 67334720,
+          "overlapOwnerAllocationBytes": 155579904,
+          "oldPrimitiveCount": 32,
+          "newPrimitiveCount": 32,
+          "sceneDeviceLocalOverlap": 470872704,
+          "sceneHostVisibleOverlap": 89854320,
+          "topLevelOwnersBefore": 1,
+          "topLevelOwnersOverlap": 2,
+          "topLevelOwnersAfter": 1,
+          "sceneDeviceLocalBefore": 403540608,
+          "sceneDeviceLocalAfter": 403540608,
+          "sceneHostVisibleBefore": 48161840,
+          "sceneHostVisibleAfter": 48161840
+        },
+        {
+          "sourceGeneration": 2,
+          "admittedGeneration": 3,
+          "selection": "complete-with-graveyard",
+          "prepareMilliseconds": 1056.03,
+          "cutoverMilliseconds": 3.6934,
+          "packMilliseconds": 37.8515,
+          "maximumAdvanceMilliseconds": 5.3887,
+          "uploadAdvanceCount": 164,
+          "uploadedBytes": 41692348,
+          "preparationFrames": 166,
+          "oldOwnerAllocationBytes": 67334720,
+          "candidateOwnerAllocationBytes": 67334720,
+          "overlapOwnerAllocationBytes": 155579904,
+          "oldPrimitiveCount": 32,
+          "newPrimitiveCount": 32,
+          "sceneDeviceLocalOverlap": 470872704,
+          "sceneHostVisibleOverlap": 89854320,
+          "topLevelOwnersBefore": 1,
+          "topLevelOwnersOverlap": 2,
+          "topLevelOwnersAfter": 1,
+          "sceneDeviceLocalBefore": 403540608,
+          "sceneDeviceLocalAfter": 403540608,
+          "sceneHostVisibleBefore": 48161840,
+          "sceneHostVisibleAfter": 48161840
+        }
+      ]
+    }
+  },
+  "comparisons": {
+    "pipeline-01-selected": {
+      "changedPixels": 0
+    },
+    "pipeline-02-restored": {
+      "changedPixels": 0
+    },
+    "query-01-selected": {
+      "changedPixels": 0
+    },
+    "query-02-restored": {
+      "changedPixels": 0
+    }
+  },
+  "normalPlayResidencySavingBytes": 0,
+  "limitations": [
+    "Diagnostic incremental preparation; normal zone activation/eviction still unfinished",
+    "CPU packing synchronous, AS builds synchronous per stage",
+    "Finite captures alongside builds are not sustained performance",
+    "Phone and owner feel/audio/haptic acceptance pending"
+  ],
+  "limits": {
+    "textureLayers": 18,
+    "highPrimitiveRows": 32,
+    "actorSlots": 3
+  },
+  "capturedBuilds": {
+    "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe": {
+      "bytes": 12823552,
+      "sha256": "bf1d1527c022fc9c45128d2ab99b3bfea0d88058f7761d35cb5fc26a32a8dd04"
+    },
+    "build/presets/windows-x64-release/Release/HordeLanternRT.exe": {
+      "bytes": 4426240,
+      "sha256": "d2fe27675f532afc5d72cc92125420a7649e64f7aa3d8e797ae245b61c481397"
+    },
+    "android/app/build/outputs/apk/debug/app-debug.apk": {
+      "bytes": 172849374,
+      "sha256": "cfccf057ef5f4bd9df8c345c40489a0a73f4a7be756ace711d033baeb48fe757"
+    }
+  },
+  "finalBuilds": {
+    "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe": {
+      "bytes": 12823552,
+      "sha256": "f113ab563652ed95673dd06645c141418cb68f32ed5e9e42aa3845d058fcff61"
+    },
+    "build/presets/windows-x64-release/Release/HordeLanternRT.exe": {
+      "bytes": 4426240,
+      "sha256": "8cef6e19ff3e85af115dc8144ae2316a65400d784457a942b4127f4b78d77544"
+    },
+    "android/app/build/outputs/apk/debug/app-debug.apk": {
+      "bytes": 172849374,
+      "sha256": "ce52cc4e8fcb79e9d4a69af7f3dadc0822ecfa65dfff3e2b76391a2f8044670d"
+    }
+  },
+  "captureToFinalChanges": "Whitespace-only scene cleanup and additional host-only negative tests. No rendering semantics or shader changes."
+}
