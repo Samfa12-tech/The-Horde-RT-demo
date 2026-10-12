@@ -1,5 +1,6 @@
 #include "gameplay/items/HeldItemKinematics.h"
 #include "gameplay/animation/PlayerAnimationState.h"
+#include "gameplay/DevelopmentCheckpointSimulation.h"
 #include "scene/ShowcaseOverheadGeometry.h"
 #include "scene/assets/AssetManifest.h"
 #include "vulkan/raytracing/PlayerRenderSlot.h"
@@ -10,6 +11,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <limits>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -104,7 +106,9 @@ struct Solved { HeldItemFixedStepState target; HeldItemStates rendered; HeldLigh
 // CPU reconstruction of the production scene's view->grounded rig conversion,
 // followed by actual imported-rig solve and production item/socket composition.
 bool Solve(PlayerRenderSlot& rig,const HeldItemFixedStepInput& input,std::uint64_t tick,Solved& out,std::string& diagnostic,
-          float candidateRetraction=-1.0f) {
+          float candidateRetraction=-1.0f,
+          float candidatePoleY=std::numeric_limits<float>::quiet_NaN(),
+          float candidateBendDegrees=std::numeric_limits<float>::quiet_NaN()) {
     auto items=MakeDefaultHeldItemStates();
     if(!ResolveHeldItemsFixedStep(items,input,tick,out.target,diagnostic)) return false;
     const V eye{{input.playerX,kShowcaseEyeWorldY,input.playerZ}},up{{0,1,0}};
@@ -161,6 +165,12 @@ bool Solve(PlayerRenderSlot& rig,const HeldItemFixedStepInput& input,std::uint64
     auto animation=state.Snapshot();
     // Supply the same settled locomotion blend as a sustained walking snapshot.
     if(input.walkAmount>0) { for(int i=0;i<8;++i) state.StepFixed(animationInput,1.0f/60); animation=state.Snapshot(); }
+    if(std::isfinite(candidatePoleY)) {
+        animation.leftIk.pole[1]=candidatePoleY;
+        animation.rightIk.pole[1]=candidatePoleY;
+    }
+    if(std::isfinite(candidateBendDegrees))
+        animation.leftIk.preferredElbowFlexionRadians=candidateBendDegrees*.01745329252f;
     const auto gait=EvaluateLowerBodyPose(input.walkTime,input.walkAmount);
     const V bodyForward{{std::sin(input.playerYawRadians),0,-std::cos(input.playerYawRadians)}},bodyRight{{std::cos(input.playerYawRadians),0,std::sin(input.playerYawRadians)}};
     const float c=std::cos(gait.torsoTwistRadians),s=std::sin(gait.torsoTwistRadians);
@@ -188,10 +198,50 @@ bool Solve(PlayerRenderSlot& rig,const HeldItemFixedStepInput& input,std::uint64
     return rig.ResolveHeldItemVisuals(items,out.grip,worldSocket(sockets.rightGrip),out.rendered,diagnostic) &&
         ComposeHeldLightState(out.rendered[0].worldFromItem,PlayerRagTorchFlameSocketTransform(),PlayerRagTorchLightSocketTransform(),1,out.light,diagnostic);
 }
+
+// Exact shader camera/frustum clipping of the same imported/skinned triangles.
+// This proves an arm can enter primary rays; actual scene occlusion remains a
+// separate RT gate. It does not move the camera, wrist or held item.
+std::size_t VisibleArmTriangles(const horde::scene::assets::StaticMeshAsset& layout,
+    const std::vector<horde::scene::TexturedSkinnedRtVertex>& posed,
+    const Solved& solved,const HeldItemFixedStepInput& input) {
+    const V eye{{input.playerX,kShowcaseEyeWorldY,input.playerZ}};
+    const V forward=Unit({{std::sin(input.playerYawRadians),-.05f+input.playerPitchRadians,-std::cos(input.playerYawRadians)}});
+    const V right=Unit(Cross(forward,{{0,1,0}})),up=Unit(Cross(right,forward));
+    const float aspect=input.logicalViewAspect;
+    const std::array<V,5> planes{{{{0,0,1}},{{1.22f,0,aspect}},{{-1.22f,0,aspect}},{{0,1.22f,.74f}},{{0,-1.22f,.74f}}}};
+    std::size_t visible=0;
+    for(const auto& primitive:layout.primitives) for(std::uint32_t i=0;i<primitive.indexCount;i+=3) {
+        std::vector<V> polygon;
+        bool left=false;
+        for(unsigned corner=0;corner<3;++corner) {
+            const auto index=primitive.vertexOffset+layout.indices[primitive.indexOffset+i+corner];
+            const auto& point=posed.at(index).position;
+            const auto world=Add(solved.root,PlayerModelVectorToWorld(solved.basis,{{point[0],point[1],point[2]}}));
+            const auto relative=Add(world,Scale(eye,-1));
+            const V camera{{Dot(relative,right),Dot(relative,up),Dot(relative,forward)}};
+            left|=camera[0]<0;polygon.push_back(camera);
+        }
+        if(!left)continue;
+        for(std::size_t plane=0;plane<planes.size()&&!polygon.empty();++plane) {
+            std::vector<V> clipped;
+            const auto distance=[&](V p){return Dot(planes[plane],p)-(plane==0?.002f:0.f);};
+            for(std::size_t edge=0;edge<polygon.size();++edge) {
+                const auto a=polygon[edge],b=polygon[(edge+1)%polygon.size()];
+                const float da=distance(a),db=distance(b);
+                if(da>=0)clipped.push_back(a);
+                if((da>=0)!=(db>=0))clipped.push_back(Add(a,Scale(Add(b,Scale(a,-1)),da/(da-db))));
+            }
+            polygon=std::move(clipped);
+        }
+        visible+=polygon.size()>=3;
+    }
+    return visible;
+}
 }
 int main(int argc,char** argv) {
-    if(argc<2) { std::cerr<<"Pass repository root [--original-sweep | --roof-witness | --reach-witness | --reach-candidates] [--wide-view] [--capture-obj path]\n";return 2; }
-    bool originalSweep=false,roofWitness=false,reachWitness=false,reachCandidates=false,wideView=false;
+    if(argc<2) { std::cerr<<"Pass repository root [--original-sweep | --roof-witness | --reach-witness | --reach-candidates | --primary-pole-candidates] [--wide-view] [--capture-obj path]\n";return 2; }
+    bool originalSweep=false,roofWitness=false,reachWitness=false,reachCandidates=false,wideView=false,primaryPoleCandidates=false;
     std::filesystem::path captureObj;
     for(int argument=2;argument<argc;++argument) {
         const std::string flag=argv[argument];
@@ -200,11 +250,12 @@ int main(int argc,char** argv) {
         else if(flag=="--reach-witness" && !reachWitness) reachWitness=true;
         else if(flag=="--reach-candidates" && !reachCandidates) reachCandidates=true;
         else if(flag=="--wide-view" && !wideView) wideView=true;
+        else if(flag=="--primary-pole-candidates" && !primaryPoleCandidates) primaryPoleCandidates=true;
         else if(flag=="--capture-obj" && captureObj.empty() && argument+1<argc) captureObj=argv[++argument];
         else { std::cerr<<"Invalid diagnostic argument: "<<flag<<'\n';return 2; }
     }
     const unsigned focusedModeCount=static_cast<unsigned>(roofWitness)+
-        static_cast<unsigned>(reachWitness)+static_cast<unsigned>(reachCandidates);
+        static_cast<unsigned>(reachWitness)+static_cast<unsigned>(reachCandidates)+static_cast<unsigned>(primaryPoleCandidates);
     if(focusedModeCount>1u ||
        (focusedModeCount>0u && (originalSweep || !captureObj.empty()))) {
         std::cerr<<"Roof and reach diagnostics are separate CPU modes\n";return 2;
@@ -248,6 +299,71 @@ int main(int argc,char** argv) {
             }
     }
     unsigned cases=0,failures=0,roofCases=0,skinnedRoofCases=0,planeSamples=0,diskSamples=0;
+    if(primaryPoleCandidates || (!originalSweep && focusedModeCount==0)) {
+        horde::scene::assets::StaticMeshAsset layout;
+        horde::scene::assets::AssetManifest viewManifest;
+        if(!horde::scene::assets::AssetManifest::Load(root/"assets/models/player/viewmodel/runtime/asset.manifest.json",viewManifest,diagnostic) ||
+           !horde::scene::assets::StaticMeshAsset::Load(root/"assets/models/player/viewmodel/runtime/gothic-traveller-viewmodel.runtime.glb",viewManifest,layout,diagnostic) ||
+           !viewmodel.ValidateStaticVertexLayout(layout,diagnostic)) {std::cerr<<diagnostic<<'\n';return 2;}
+        horde::gameplay::simulation::GameSimulation portalSimulation(
+            horde::gameplay::simulation::ProductionGameSimulationConfig());
+        portalSimulation.SetDevelopmentRescueJourney(true,true);
+        if(!StageDevelopmentCheckpointSimulation(portalSimulation,*FindDevelopmentCheckpoint("chapter-stone-portal-front")))return 2;
+        const auto portalSnapshot=portalSimulation.Snapshot();
+        HeldItemFixedStepInput portal;portal.playerMountProfile=portalSnapshot.playerMountProfile;
+        portal.playerX=portalSnapshot.playerX;portal.playerZ=portalSnapshot.playerZ;
+        portal.playerYawRadians=portalSnapshot.playerYawRadians;portal.playerPitchRadians=portalSnapshot.playerPitchRadians;
+        portal.playerSupportWorldY=portalSnapshot.playerSupportWorldY;
+        portal.interaction=portalSnapshot.interaction;portal.torchFailure=portalSnapshot.torchFailure;
+        portal.playerCombat=portalSnapshot.playerCombat;portal.swordItemState=&portalSnapshot.heldItems[1];
+        portal.logicalViewAspect=16.f/9.f;
+        Solved baseline;
+        std::vector<horde::scene::TexturedSkinnedRtVertex> baselineVertices;
+        const auto inspectPrimary=[&](float pole,std::uint64_t tick,float bend=std::numeric_limits<float>::quiet_NaN(),float retreat=-1.f) {
+            Solved solved;
+            std::vector<horde::scene::TexturedSkinnedRtVertex> vertices;
+            std::vector<horde::scene::SkinnedPbrTangent> tangents;
+            if(!Solve(rig,portal,tick,solved,diagnostic,retreat,pole,bend) ||
+               !viewmodel.SkinPlayerPoseUniqueTextured(rig.SolvedPose(),vertices,tangents,diagnostic)) {++failures;std::cerr<<diagnostic<<'\n';return std::size_t{0};}
+            const auto count=VisibleArmTriangles(layout,vertices,solved,portal);
+            float itemDelta=0,vertexDelta=0;
+            if(tick==1){baseline=solved;baselineVertices=vertices;}
+            else for(std::size_t component=0;component<16;++component)
+                itemDelta=std::max({itemDelta,std::abs(solved.rendered[0].worldFromItem[component]-baseline.rendered[0].worldFromItem[component]),
+                    std::abs(solved.light.worldFromLight[component]-baseline.light.worldFromLight[component])});
+            for(std::size_t vertex=0;vertex<vertices.size();++vertex)for(unsigned axis=0;axis<3;++axis)
+                vertexDelta=std::max(vertexDelta,std::abs(vertices[vertex].position[axis]-baselineVertices[vertex].position[axis]));
+            std::cout<<"primary-arm portal poleY="<<pole<<" bendDegrees="<<bend<<" clippedLeftTriangles="<<count<<" itemLightDelta="<<itemDelta<<" vertexDelta="<<vertexDelta
+                     <<" target="<<solved.target.kinematics.leftHandLocal[0]<<','<<solved.target.kinematics.leftHandLocal[1]<<','<<solved.target.kinematics.leftHandLocal[2]<<'\n';
+            if(retreat<0 && portal.playerZ==portalSnapshot.playerZ && itemDelta>1e-5f)++failures;
+            return count;
+        };
+        const auto baselineCount=inspectPrimary(std::numeric_limits<float>::quiet_NaN(),1);
+        if(primaryPoleCandidates) {
+            std::uint64_t candidateTick=2;
+            for(const float pole:{-1.f,-.5f,0.f,.5f,1.f})inspectPrimary(pole,candidateTick++);
+            for(const float bend:{22.f,30.f,40.f})for(const float pole:{-1.f,1.f})inspectPrimary(pole,candidateTick++,bend);
+            for(const float retreat:{0.f,.02f,.05f,.10f})inspectPrimary(std::numeric_limits<float>::quiet_NaN(),candidateTick++,std::numeric_limits<float>::quiet_NaN(),retreat);
+            for(const float retreat:{-1.f,0.f,.05f})inspectPrimary(1.f,candidateTick++,45.f,retreat);
+            // Diagnose scene-inspection framing without altering production IK.
+            for(const float z:{-4.9f,-4.6f,-4.3f,-4.f}) {
+                portal.playerZ=z;
+                std::cout<<"inspection-camera-z="<<z<<'\n';
+                inspectPrimary(std::numeric_limits<float>::quiet_NaN(),candidateTick++);
+            }
+            return failures?1:0;
+        }
+        // Keep the original close position as a negative geometric witness:
+        // correct low-ceiling clearance can put the complete arm below view.
+        // The scene-inspection camera must pass the ordinary positive gate.
+        const float inspectionZ=portal.playerZ;
+        portal.playerZ=-5.1f;
+        const auto closeCount=inspectPrimary(std::numeric_limits<float>::quiet_NaN(),2);
+        portal.playerZ=inspectionZ;
+        if(closeCount) {++failures;std::cerr<<"Rejected close portal pose unexpectedly entered the unchanged frustum\n";}
+        if(!baselineCount) {++failures;std::cerr<<"Normal low-ceiling carry must retain actual modelled left arm in the unchanged primary frustum\n";}
+        std::cout<<"primary-frustum witnesses=2; original sweep pose count remains separate\n";
+    }
     float worstHeadroom=100,maxGripError=0,worstRoofHeadroom=100;
     HeldItemFixedStepInput worstRoofInput{};
     V worstRoofPoint{};

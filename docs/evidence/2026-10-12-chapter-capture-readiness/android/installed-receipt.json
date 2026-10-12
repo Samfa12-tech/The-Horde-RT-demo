@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "device": "SM-S948B",
+  "serial": "R5GL219SZGK",
+  "package": "com.samfa12.hordelanternrt.debug",
+  "sha256": "af533134b224344041c4991f7f50fffbd5d4019ce05c7b735f9bc81a2761eb84",
+  "bytes": 183030634,
+  "readOnlyIdentification": true,
+  "identifiedOnceOnResume": true,
+  "overwritePerformed": false
+}

@@ -377,4 +377,41 @@ inline bool StageDevelopmentCheckpointSimulation(
     return finalize(false);
 }
 
+// Platform owner-thread boundary. A publisher consumes actual scene readiness;
+// the returned result must gate capture/benchmark admission, not just its label.
+template<class PublishReadyWorld>
+[[nodiscard]] inline bool StageDevelopmentCheckpointForScene(
+    simulation::GameSimulation& gameSimulation,
+    const DevelopmentCheckpoint& checkpoint,
+    PublishReadyWorld&& publishReadyWorld,
+    bool liveJourney = false,
+    DevelopmentCheckpointStageEvidence* evidence = nullptr,
+    const DevelopmentCheckpointStepFixedObservation* stepObservation = nullptr)
+{
+    const bool chapter = DevelopmentCheckpointRequiresAuthoredChapter(checkpoint);
+    if (checkpoint.id == 192)
+    {
+        if (liveJourney)
+            gameSimulation.StartLiveDevelopmentRescueJourney(true);
+        else
+        {
+            if (!gameSimulation.ApplyShowcaseCheckpoint(checkpoint.baseShowcaseCheckpointId))
+                return false;
+            gameSimulation.SetDevelopmentRescueJourney(true, true);
+        }
+        publishReadyWorld();
+        return true; // The live lower safe start does not require exterior readiness yet.
+    }
+    if (chapter)
+    {
+        // Explicit checkpoint import changes the generation. Publish actual
+        // renderer readiness only afterwards; old callbacks cannot populate it.
+        gameSimulation.SetDevelopmentRescueJourney(true, true);
+        publishReadyWorld();
+    }
+    else if (gameSimulation.Snapshot().developmentRescueJourney)
+        gameSimulation.SetDevelopmentRescueJourney(false);
+    return StageDevelopmentCheckpointSimulation(gameSimulation, checkpoint, evidence, stepObservation);
+}
+
 } // namespace horde::gameplay

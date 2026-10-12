@@ -2833,3 +2833,27 @@ took the phone; Current/Higher, Lower→Current migration, Query, complete route
 life-cycle, sustained timing and listening/haptic acceptance remain pending.
 [Exact startup evidence](evidence/2026-10-12-android-world-startup/README.md) and
 [chapter capture correction/new uninstalled APK](evidence/2026-10-12-moving-frame-static-handoff/README.md).
+
+### 12 October — physical chapter capture readiness and shadow tiers
+
+Owner-authorized SM-S948B, same development signer/versionCode10 and separate
+Debug app, release untouched. Original installed bytes were identified once.
+An initial b9d466317151 prototype falsely named a start frame `capture-ready`;
+actual camera/progression admission now rejects that failure. APK
+`0374dd8d4c367ff21bf586a6424e9c2f9733b6a3abecbccff9de2f43c0005a0c`
+then rendered the actual frozen landing at X-33.7/Z-12.8/tick922/3 hearts.
+
+Evidence class: four opened frozen screenshots plus12 stable presented frames
+per case, Current/Higher on both Pipeline and QueryCompute, at original saved40%
+scale/576x1192 into1440x3120. Legacy saved Lower(0) actually rendered Current(1);
+confirmation and saved-value normalization remain physically untested. Last GPU
+samples range54.64–67.91ms, not sustained acceptance. Primary arm counters are0
+in this portrait Low pose, so no held-arm/equipment visual acceptance is claimed.
+Original preferences were restored exactly and Debug stopped after each case.
+The owner has paused the goal and removed the phone; no further action is due.
+
+Final prepared APK `24aaf0b5894e57a38804f39875c06fbf34b801dfd0c83997b76c8aea8fa9233e`
+includes subsequent legacy-exit and inspection-camera corrections and is NOT
+installed/device accepted. Full route, lifecycle, listening/haptics, sustained
+performance and owner acceptance remain open. No other device is certified.
+[Exact artifacts, failed evidence and matched results](evidence/2026-10-12-chapter-capture-readiness/README.md).

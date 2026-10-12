@@ -1,6 +1,18 @@
 # Horde 1.7 current design index
 
-**Paused at the owner's request to conserve usage credits.** The current
+**Paused again at the owner's request; the phone is removed.** The newest
+[capture-readiness checkpoint](../evidence/2026-10-12-chapter-capture-readiness/README.md)
+fixes Android's false chapter-ready label with actual scene/generation admission.
+Matched physical Current/Higher frames and legacy Lower rendering as Current
+are saved for both RT backends at the original40% scale. These are bounded samples,
+not full route/performance acceptance; persisted setting confirmation remains open.
+The portal inspection camera is20cm farther back; both native RT frames now pass
+the unchanged primary-arm guard. Production IK and shaders stay unchanged.
+Debug/Release affected tests, Android and package checks pass. The final APK is
+prepared but uninstalled. Normal-play GPU lifetime work remains required,
+residency savings remain zero, and the chapter is incomplete.
+
+The preceding
 [town/clear-air checkpoint](../evidence/2026-10-12-bellwether-clear-air-checkpoint/README.md)
 preserves v4 native town detail and removes legacy global distance fog inside
 the chapter tomb, with subtle exterior haze. Keeper mist stays unchanged.

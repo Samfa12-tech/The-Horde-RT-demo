@@ -26,6 +26,39 @@ int main(int argc,char** argv) {
  int cases=0,failures=0;
  auto check=[&](bool b,const char* m){++cases;if(!b){++failures;std::cerr<<m<<'\n';}};
  if(authored) {
+  unsigned chapterSelections=0;
+  for(const auto& checkpoint:kDevelopmentCheckpoints) {
+   const bool expected=checkpoint.id==192 || checkpoint.name.starts_with("chapter-");
+   check(DevelopmentCheckpointRequiresAuthoredChapter(checkpoint)==expected,
+         "canonical chapter selections must request their actual authored GPU scene");
+   chapterSelections+=expected;
+  }
+  check(chapterSelections==23,"live journey and all22 chapter views retain authored-scene admission");
+  const auto* landing=FindDevelopmentCheckpoint("chapter-landing-north");
+  GameSimulation fresh(ProductionGameSimulationConfig());
+  check(!StageDevelopmentCheckpointForScene(fresh,*landing,[]{}),
+        "missing renderer readiness must reject the landing capture instead of naming a start frame ready");
+  const auto staleGeneration=fresh.Snapshot().worldRoute.generation;
+  check(!StageDevelopmentCheckpointForScene(fresh,*landing,[&]{
+    fresh.PublishChapterTerrain({staleGeneration,WorldZoneId::TombExterior},terrain);
+   }),"stale scene generation must not admit a frozen landing");
+  unsigned publications=0;
+  const bool staged=StageDevelopmentCheckpointForScene(fresh,*landing,[&]{
+   ++publications;
+   for(std::size_t zone=1;zone<kWorldZones.size();++zone)
+    check(fresh.PublishChapterTerrain({fresh.Snapshot().worldRoute.generation,
+     static_cast<WorldZoneId>(zone)},terrain),"ready exported terrain must publish against the current selected scene");
+  });
+  check(staged && publications==1,"fresh production profile must stage the real landing only after current readiness");
+  if(staged) {
+   const auto& snapshot=fresh.Snapshot();
+   check(snapshot.developmentRescueJourney && snapshot.rescue.exteriorSide && snapshot.tickIndex>400 &&
+         snapshot.interaction.heldLightKind==interactions::HeldLightKind::RewardLantern &&
+         std::hypot(snapshot.playerX-landing->cameraX,snapshot.playerZ-landing->cameraZ)<.02f,
+         "admitted landing must prove actual journey, camera, progression and equipment rather than a checkpoint label");
+  }
+ }
+ if(authored) {
   auto captureConfig=ProductionGameSimulationConfig();
   captureConfig.developmentRescueJourney=true;
   captureConfig.authoredChapterTerrain=true;

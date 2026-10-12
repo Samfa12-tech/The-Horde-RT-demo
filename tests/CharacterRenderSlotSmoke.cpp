@@ -1560,7 +1560,7 @@ int main()
                     androidPauseSyncEnd - androidPauseSyncBegin)
                 : std::string{};
         const std::size_t androidCaptureBegin =
-            androidBridgeSource.find("void ApplyCaptureCheckpoint(");
+            androidBridgeSource.find("bool ApplyCaptureCheckpoint(");
         const std::size_t androidCaptureEnd =
             androidBridgeSource.find("void ApplyRouteReplay(", androidCaptureBegin);
         const std::string androidCapture =

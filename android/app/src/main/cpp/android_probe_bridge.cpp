@@ -1724,7 +1724,8 @@ bool ResolveDebugCheckpoint(const std::int32_t id, DebugCheckpointSelection& sel
     return true;
 }
 
-void ApplyDebugCheckpointSimulation(
+bool ApplyDebugCheckpointSimulation(
+    SwapchainContext& context,
     const DebugCheckpointSelection& selection,
     horde::vulkan::raytracing::RtSceneRecordObservation* observation,
     bool liveJourney = false)
@@ -1736,10 +1737,6 @@ void ApplyDebugCheckpointSimulation(
     const bool replacedQueue = gGameSimulation.Snapshot().playerMountProfile != config.playerMountProfile;
     if (replacedQueue)
         gGameSimulation = horde::gameplay::simulation::GameSimulation(config);
-    const bool rescueJourneyCheckpoint = selection.development != nullptr &&
-        selection.development->id == 192;
-    if (gGameSimulation.Snapshot().developmentRescueJourney && !rescueJourneyCheckpoint)
-        gGameSimulation.SetDevelopmentRescueJourney(false);
     horde::platform::android::ResetMusicSession(replacedQueue);
     if (selection.development != nullptr)
     {
@@ -1771,17 +1768,20 @@ void ApplyDebugCheckpointSimulation(
         // This checkpoint is a journey-mode start, not a world-route debug
         // teleport. Preserve the normal dungeon start and let the journey
         // authority place the player at its lower safe landing.
-        bool staged = true;
-        if (rescueJourneyCheckpoint && liveJourney)
-            gGameSimulation.StartLiveDevelopmentRescueJourney(true);
-        else if (rescueJourneyCheckpoint)
-            staged = gGameSimulation.ApplyShowcaseCheckpoint(selection.simulationCheckpointId);
-        else
-            staged = horde::gameplay::StageDevelopmentCheckpointSimulation(
-                gGameSimulation, *selection.development, &evidence,
-                observation != nullptr ? &stepObservation : nullptr);
-        if (rescueJourneyCheckpoint && !liveJourney)
-            gGameSimulation.SetDevelopmentRescueJourney(true,true);
+        const bool staged = horde::gameplay::StageDevelopmentCheckpointForScene(
+            gGameSimulation, *selection.development, [&] {
+                horde::vulkan::raytracing::PublishDevelopmentWorldReadiness(gGameSimulation, context.rtScene);
+            }, liveJourney, &evidence, observation != nullptr ? &stepObservation : nullptr);
+        if (!staged)
+        {
+            gDebugCheckpointInProgress.store(false, std::memory_order_release);
+            __android_log_print(ANDROID_LOG_ERROR, kTag,
+                "HORDE_CHECKPOINT_STAGE_FAILED id=%d requested=%s tick=%llu chapter=%d",
+                selection.checkpoint.id, selection.checkpoint.name,
+                static_cast<unsigned long long>(gGameSimulation.Snapshot().tickIndex),
+                gGameSimulation.Snapshot().developmentRescueJourney ? 1 : 0);
+            return false;
+        }
         if (selection.development->combatPose ==
             horde::gameplay::DevelopmentCombatPose::ParryActive)
         {
@@ -1808,17 +1808,23 @@ void ApplyDebugCheckpointSimulation(
                 evidence.enemyHitEvents, DebugPlayerCombatActionName(evidence.action),
                 evidence.actionTime);
         }
-        return;
+        return true;
     }
+    if (gGameSimulation.Snapshot().developmentRescueJourney)
+        gGameSimulation.SetDevelopmentRescueJourney(false);
     const auto& currentSimulation = gGameSimulation.Snapshot();
     if (currentSimulation.developmentSupportFixture)
     {
         gGameSimulation.SetDevelopmentSupportFixture(
             false, currentSimulation.playerSupportGeneration + 1u);
     }
-    gGameSimulation.ApplyShowcaseCheckpoint(selection.simulationCheckpointId);
+    if (!gGameSimulation.ApplyShowcaseCheckpoint(selection.simulationCheckpointId))
+    {
+        gDebugCheckpointInProgress.store(false, std::memory_order_release);
+        return false;
+    }
     if (selection.checkpoint.id == selection.simulationCheckpointId)
-        return;
+        return true;
     horde::gameplay::simulation::InputSnapshot input;
     input.paused = false;
     input.damageEnabled = false;
@@ -1833,6 +1839,7 @@ void ApplyDebugCheckpointSimulation(
     gGameSimulation.StepFixed(input, 0.0f,
                               gGameSimulation.Snapshot().inputPublicationSequence + 1u);
     simulationScope.Complete(1u);
+    return true;
 }
 
 void WriteShowcaseDebugState(const SwapchainContext& context, const char* status)
@@ -2043,14 +2050,18 @@ void WriteShowcaseDebugState(const SwapchainContext& context, const char* status
     WriteTextFile(context.reportDirectory + '/' + kShowcaseDebugStateFilename, json.str());
 }
 
-void ApplyBenchmarkCheckpoint(
+bool ApplyBenchmarkCheckpoint(
     SwapchainContext& context,
     const DebugCheckpointSelection& selection,
     horde::vulkan::raytracing::RtSceneRecordObservation* observation)
 {
     const auto& checkpoint = selection.checkpoint;
     const bool liveJourney = selection.development != nullptr && selection.development->id == 192;
-    ApplyDebugCheckpointSimulation(selection, observation, liveJourney);
+    if (!ApplyDebugCheckpointSimulation(context, selection, observation, liveJourney))
+    {
+        WriteShowcaseDebugState(context, "checkpoint-failed");
+        return false;
+    }
     context.developmentSupportFixture =
         gGameSimulation.Snapshot().developmentSupportFixture;
     context.developmentSupportFixtureOverride.reset();
@@ -2095,7 +2106,7 @@ void ApplyBenchmarkCheckpoint(
         __android_log_print(ANDROID_LOG_INFO, kTag,
                             "HORDE_LIVE_CHAPTER checkpoint=%s capture=0 benchmark=0", checkpoint.name);
         WriteShowcaseDebugState(context, "live-start");
-        return;
+        return true;
     }
     ++context.benchmarkGeneration;
     ResetBenchmarkTiming(context);
@@ -2107,15 +2118,20 @@ void ApplyBenchmarkCheckpoint(
                         context.renderScale * 100.0f,
                         horde::gameplay::ShowcaseZoneName(checkpoint.expectedZone));
     WriteShowcaseDebugState(context, "warming");
+    return true;
 }
 
-void ApplyCaptureCheckpoint(
+bool ApplyCaptureCheckpoint(
     SwapchainContext& context,
     const DebugCheckpointSelection& selection,
     horde::vulkan::raytracing::RtSceneRecordObservation* observation)
 {
     const auto& checkpoint = selection.checkpoint;
-    ApplyDebugCheckpointSimulation(selection, observation);
+    if (!ApplyDebugCheckpointSimulation(context, selection, observation))
+    {
+        WriteShowcaseDebugState(context, "capture-failed");
+        return false;
+    }
     context.developmentSupportFixture =
         gGameSimulation.Snapshot().developmentSupportFixture;
     context.developmentSupportFixtureOverride.reset();
@@ -2160,6 +2176,7 @@ void ApplyCaptureCheckpoint(
                         context.renderScale * 100.0f,
                         horde::gameplay::ShowcaseZoneName(checkpoint.expectedZone));
     WriteShowcaseDebugState(context, "capture-warming");
+    return true;
 }
 
 void ApplyRouteReplay(SwapchainContext& context)
@@ -3422,9 +3439,10 @@ bool PrepareFixtureChangingCheckpointOnOwner(
         selection.development->developmentSupportFixture;
     // Ordinary selections and transitions between checkpoints using the same
     // fixture retain their established RenderFrame staging/observation path.
+    const bool requestedRescueJourney=selection.development &&
+        horde::gameplay::DevelopmentCheckpointRequiresAuthoredChapter(*selection.development);
     const bool requestedWorld=selection.development &&
-        (selection.development->developmentWorldRoute || selection.development->id == 192);
-    const bool requestedRescueJourney=selection.development && selection.development->id == 192;
+        (selection.development->developmentWorldRoute || requestedRescueJourney);
     const bool stagedWorld=selection.development && selection.development->stagedWorldPreparation;
     if (context.developmentSupportFixture == requestedFixture && context.developmentWorldRoute == requestedWorld &&
         context.stagedWorldPreparation == stagedWorld && context.developmentRescueJourney == requestedRescueJourney)
@@ -3878,12 +3896,16 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                     if (ResolveDebugCheckpoint(
                             *context.preparedFixtureCheckpointId, selection))
                     {
-                        if (context.preparedFixtureCheckpointIsCapture)
-                            ApplyCaptureCheckpoint(
-                                context, selection, evidenceFrame ? &observation : nullptr);
-                        else
-                            ApplyBenchmarkCheckpoint(
-                                context, selection, evidenceFrame ? &observation : nullptr);
+                        const bool staged = context.preparedFixtureCheckpointIsCapture
+                            ? ApplyCaptureCheckpoint(context, selection, evidenceFrame ? &observation : nullptr)
+                            : ApplyBenchmarkCheckpoint(context, selection, evidenceFrame ? &observation : nullptr);
+                        if (!staged)
+                        {
+                            context.preparedFixtureCheckpointId.reset();
+                            context.preparedFixtureCheckpointIsCapture = false;
+                            gDebugCheckpointInProgress.store(false, std::memory_order_release);
+                            return false;
+                        }
                     }
                     context.preparedFixtureCheckpointId.reset();
                     context.preparedFixtureCheckpointIsCapture = false;
@@ -3891,13 +3913,13 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                 }
                 else if (ResolveDebugCheckpoint(requestedCaptureCheckpoint, selection))
                 {
-                    ApplyCaptureCheckpoint(
-                        context, selection, evidenceFrame ? &observation : nullptr);
+                    if (!ApplyCaptureCheckpoint(context, selection, evidenceFrame ? &observation : nullptr))
+                        return false;
                 }
                 else if (ResolveDebugCheckpoint(requestedCheckpoint, selection))
                 {
-                    ApplyBenchmarkCheckpoint(
-                        context, selection, evidenceFrame ? &observation : nullptr);
+                    if (!ApplyBenchmarkCheckpoint(context, selection, evidenceFrame ? &observation : nullptr))
+                        return false;
                 }
                 if (requestedCheckpoint >= 0 || requestedCaptureCheckpoint >= 0)
                     gDebugCheckpointInProgress.store(false, std::memory_order_release);

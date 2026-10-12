@@ -1,0 +1,7 @@
+{
+  "admitted": false,
+  "reason": "Label capture-ready was wrong: snapshot remained start X0 Z1.85 tick0, not authored landing",
+  "supersededBy": "actual-landing-lower-migration-current-pipeline",
+  "artifact": "b9d466317151",
+  "assertionAdded": "actual camera and progression tick are now required"
+}

@@ -7471,6 +7471,22 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
                 record.primaryArmsMayBeOutsideFrame,
                 &ceilingRetractionEvidence))
         {
+            // Preserve the actual uploaded meshes before rejecting the frame.
+            // Eligibility is not a primary-hit witness; these diagnostics help
+            // distinguish a solved pose outside the frustum from occlusion.
+            if (!record.viewmodelGeometryEvidence.currentUploadCaptured && !capturePlayerGeometry()) return false;
+            const auto& k = simulation.heldItemKinematics;
+            std::ostringstream pose;
+            pose << "{\"checkpoint\":\"" << checkpoint.name << "\",\"camera\":["
+                 << simulation.playerX << ',' << simulation.playerSupportWorldY << ','
+                 << simulation.playerZ << ',' << simulation.playerYawRadians << ','
+                 << simulation.playerPitchRadians << "],\"torchLowering\":"
+                 << k.torchOverheadLowering << ",\"torchRetraction\":" << k.torchOverheadRetraction
+                 << ",\"leftHandLocal\":[" << k.leftHandLocal[0] << ',' << k.leftHandLocal[1] << ','
+                 << k.leftHandLocal[2] << "],\"rightHandLocal\":[" << k.rightHandLocal[0] << ','
+                 << k.rightHandLocal[1] << ',' << k.rightHandLocal[2] << "]}\n";
+            if (!WriteReportFile(outputDirectory / "failed-primary-pose.json", pose.str()))
+                return fail("Failed to retain rejected primary-pose evidence.");
             return fail("Dedicated viewmodel capture lacks modelled primary arms or contains legacy/full-body primary ownership: dedicated=" +
                         std::to_string(dedicatedPlayerOwnership) + ", visible=" +
                         std::to_string(record.playerPrimaryVisible) + ", armPixels=" +

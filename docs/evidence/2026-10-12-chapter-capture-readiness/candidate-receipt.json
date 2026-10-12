@@ -1,0 +1,55 @@
+{
+  "sourceParent": "dc0d17296b6649b6a4b67c7541a9e71306c42001",
+  "scope": "Checkpoint readiness, failure propagation and diagnostic portal framing; source-file hashes identify the uncommitted build",
+  "sourceFiles": [
+    {
+      "sha256": "0ee8eb95d2d767ff8fadd062816efd0b83e8af81b663b1d8c5c3a965940a4139",
+      "path": "android/app/src/main/cpp/android_probe_bridge.cpp"
+    },
+    {
+      "sha256": "adf048c36cd914b60c5034631469f5a7f7135a9592b8811ca3b5a52bb2b4c95a",
+      "path": "src/gameplay/DevelopmentCheckpointSimulation.h"
+    },
+    {
+      "sha256": "02266b921b1ce042ad17fd4b95a0fa61308ac692687a14cc315b4432e0ad9f1b",
+      "path": "src/gameplay/DevelopmentCheckpoints.h"
+    },
+    {
+      "sha256": "091ad0ff60571f64f3574e6ec3559ebc7bc76d095b8dc5d40b8504f0917cc720",
+      "path": "src/platform/windows/DiagnosticWindow.cpp"
+    },
+    {
+      "sha256": "94397154973c6ac86b515bc3fa8725179c6407db33f05ca26691cc2190a33df7",
+      "path": "tests/FinalHeldTorchClearanceTests.cpp"
+    },
+    {
+      "sha256": "971cf98b9c9a5b7cb2f15a59660544a1142279b845a8c1a6498bf32f50207ff1",
+      "path": "tests/RescueJourneyIntegrationTests.cpp"
+    },
+    {
+      "sha256": "0b82fac7b9aa88557c0bf23b877e071708006589f4b5b43d8b02ef4c6bca48e9",
+      "path": "tests/CharacterRenderSlotSmoke.cpp"
+    }
+  ],
+  "artifacts": [
+    {
+      "sha256": "395312f3c673bfe67ac683537fa7d0e8830cb6bc0ff9528b80faa55b607440e1",
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+      "bytes": 12942848
+    },
+    {
+      "sha256": "54ab35c71c34b2c8d81d8aec05b99f5b07777f099a8385dbc4443d1e2dda3c09",
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+      "bytes": 4440576
+    },
+    {
+      "sha256": "24aaf0b5894e57a38804f39875c06fbf34b801dfd0c83997b76c8aea8fa9233e",
+      "path": "reports/phone-candidate-24aaf0b5894e/horde-debug.apk",
+      "bytes": 183031354
+    }
+  ],
+  "javaTests": 286,
+  "javaFailures": 0,
+  "javaErrors": 0,
+  "javaSkipped": 0
+}

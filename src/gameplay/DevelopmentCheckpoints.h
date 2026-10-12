@@ -69,6 +69,14 @@ struct DevelopmentCheckpoint
     std::uint8_t rescueTraversalCapture = 0u;
 };
 
+// Canonical chapter captures require the same authored scene as the live
+// rescue journey. Names are resolved against this closed registry first.
+inline constexpr bool DevelopmentCheckpointRequiresAuthoredChapter(
+    const DevelopmentCheckpoint& checkpoint) noexcept
+{
+    return checkpoint.id == 192 || checkpoint.name.starts_with("chapter-");
+}
+
 inline constexpr std::array<DevelopmentCheckpoint, 95u> kDevelopmentCheckpoints{{
     {.id=215,.name="chapter-deadwood-bank",.baseShowcaseCheckpointId=11,
      .cameraX=-28.7f,.cameraZ=-5.8f,.yaw=.55f,.pitch=.18f,
@@ -114,11 +122,11 @@ inline constexpr std::array<DevelopmentCheckpoint, 95u> kDevelopmentCheckpoints{
      .cameraX = 13.3f, .cameraZ = 36.2f, .yaw = 2.51f, .pitch = -0.15f,
      .stagesRescueExterior = true, .exteriorRouteStation = 7u},
     {.id = 198, .name = "chapter-stone-portal-front", .baseShowcaseCheckpointId = 0,
-     .cameraX = 0.0f, .cameraZ = -5.1f, .yaw = 0, .pitch = -0.15f},
+     .cameraX = 0.0f, .cameraZ = -4.9f, .yaw = 0, .pitch = -0.15f},
     {.id = 199, .name = "chapter-stone-portal-rear", .baseShowcaseCheckpointId = 0,
      .cameraX = 0.0f, .cameraZ = -7.8f, .yaw = 3.14159265359f, .pitch = -0.15f},
     {.id = 200, .name = "chapter-stone-wall-corner", .baseShowcaseCheckpointId = 0,
-     .cameraX = 0.65f, .cameraZ = -5.1f, .yaw = 0.55f, .pitch = -0.15f},
+     .cameraX = 0.65f, .cameraZ = -4.9f, .yaw = 0.55f, .pitch = -0.15f},
     {.id = 190, .name = "world-route", .baseShowcaseCheckpointId = 0,
      .cameraX = -33.7f, .cameraZ = -20.8f, .yaw = 3.14159265359f, .pitch = -0.05f,
      .developmentWorldRoute = true},
