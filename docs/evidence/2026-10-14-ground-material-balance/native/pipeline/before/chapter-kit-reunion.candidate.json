@@ -1,0 +1,15 @@
+{
+  "executableSha256": "b87f140344fd964d90190b72f8982b6b568e4075850191c8d6b08b9f1a510584",
+  "deadlineSeconds": 180,
+  "mode": "Production",
+  "scope": "Frozen Debug light attribution; no geometry, material, quality or settings mutation",
+  "sources": {
+    "shaders/raytracing/include/rt_lighting.glsl": "bf833307850b4681e67c2168318a564835a3e0667fb4f83af8f7275d01692df5",
+    "src/vulkan/raytracing/PresentableTinyRtScene.h": "ff79768a43c16129cb3fb6a039d5acff017981baf9835ffd224e646b74b5dc2d",
+    "src/vulkan/raytracing/PresentableTinyRtScene.cpp": "eb9f3a81a42338adf08f04b33ebc492d8ce1d9110bbbceb379db37e023aa1f69",
+    "src/platform/windows/WindowsSkyAttributionLaunch.h": "f64b1f239908e97cfa235c6b5e5d24acf82a16e5cf193b078e934366839a25a8",
+    "src/platform/windows/DiagnosticWindow.cpp": "29444ae0927bf5c28a3c8d7560868993359c8637b341ffdaab7800193de04e6e"
+  },
+  "checkpoint": "chapter-kit-reunion",
+  "backend": "RayTracingPipeline"
+}

@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <chrono>
 #include <cstdint>
 #include <filesystem>
 #include <fstream>
@@ -101,6 +102,52 @@ float Headroom(V point,const std::vector<OverheadTriangle>& triangles) {
     float roof=SharedRoofY(point);
     for(const auto& triangle:triangles) { float y=0;if(TriangleY(triangle,point,y)) roof=std::min(roof,y); }
     return roof-point[1];
+}
+// Conservative per-pose broad phase for the independent oracle. Use the exact
+// TriangleY AABB guards: a triangle outside the complete sample cloud cannot
+// accept any of its points. Keep original triangle order and every sample.
+std::vector<const OverheadTriangle*> SelectUndersides(
+    const std::vector<OverheadTriangle>& triangles,const std::vector<V>& points) {
+    V minimum{{INFINITY,INFINITY,INFINITY}},maximum{{-INFINITY,-INFINITY,-INFINITY}};
+    bool bounded=!points.empty();
+    for(const V& point:points) for(unsigned axis=0;axis<3;++axis) {
+        bounded&=std::isfinite(point[axis]);
+        minimum[axis]=std::min(minimum[axis],point[axis]);
+        maximum[axis]=std::max(maximum[axis],point[axis]);
+    }
+    std::vector<const OverheadTriangle*> selected;
+    for(const auto& triangle:triangles) {
+        if(bounded && (maximum[0]<triangle.minX-1e-6f || minimum[0]>triangle.maxX+1e-6f ||
+                       maximum[2]<triangle.minZ-1e-6f || minimum[2]>triangle.maxZ+1e-6f)) continue;
+        selected.push_back(&triangle);
+    }
+    return selected;
+}
+float Headroom(V point,const std::vector<const OverheadTriangle*>& triangles) {
+    float roof=SharedRoofY(point);
+    for(const auto* triangle:triangles) { float y=0;if(TriangleY(*triangle,point,y)) roof=std::min(roof,y); }
+    return roof-point[1];
+}
+unsigned CheckUndersideSelection(const std::vector<OverheadTriangle>& triangles) {
+    unsigned failures=0,checks=0;
+    for(const auto& triangle:triangles) {
+        const std::vector<V> cloud{{{triangle.minX,0,triangle.minZ}},{{triangle.maxX,0,triangle.maxZ}},
+            {{triangle.minX-1e-6f,0,triangle.maxZ+1e-6f}},{{triangle.minX-2e-6f,0,triangle.maxZ+2e-6f}}};
+        // Singleton, disconnected and seam-spanning domains; compare the exact
+        // old full scan, not another bounds implementation or a loose epsilon.
+        for(const auto& points:{cloud,std::vector<V>{cloud[2]},std::vector<V>{cloud[3]},
+                                std::vector<V>{{{-100,0,-100}},{{100,0,100}}}}) {
+            const auto selected=SelectUndersides(triangles,points);
+            for(const V& point:points) {
+                ++checks;
+                if(Headroom(point,triangles)!=Headroom(point,selected)) ++failures;
+            }
+        }
+    }
+    for(const auto& unbounded:{std::vector<V>{},std::vector<V>{{{NAN,0,0}}}})
+        if(SelectUndersides(triangles,unbounded).size()!=triangles.size()) ++failures;
+    std::cout<<"underside selection exact full-scan comparisons="<<checks<<" failures="<<failures<<'\n';
+    return failures;
 }
 struct Solved { HeldItemFixedStepState target; HeldItemStates rendered; HeldLightState light; HeldItemTransform grip; V root; PlayerModelWorldBasis basis; };
 // CPU reconstruction of the production scene's view->grounded rig conversion,
@@ -240,6 +287,8 @@ std::size_t VisibleArmTriangles(const horde::scene::assets::StaticMeshAsset& lay
 }
 }
 int main(int argc,char** argv) {
+    std::cout<<std::unitbuf;
+    const auto gateStart=std::chrono::steady_clock::now();
     if(argc<2) { std::cerr<<"Pass repository root [--original-sweep | --roof-witness | --reach-witness | --reach-candidates | --primary-pole-candidates] [--wide-view] [--capture-obj path]\n";return 2; }
     bool originalSweep=false,roofWitness=false,reachWitness=false,reachCandidates=false,wideView=false,primaryPoleCandidates=false;
     std::filesystem::path captureObj;
@@ -299,6 +348,11 @@ int main(int argc,char** argv) {
             }
     }
     unsigned cases=0,failures=0,roofCases=0,skinnedRoofCases=0,planeSamples=0,diskSamples=0;
+    failures+=CheckUndersideSelection(structuralUndersides);
+    std::vector<V> clearancePoints;
+    clearancePoints.reserve(torch.vertices.size()+9u);
+    std::uint64_t fullTriangleVisits=0,selectedTriangleVisits=0;
+    double poseWallMs=0,oracleWallMs=0,viewmodelWallMs=0;
     if(primaryPoleCandidates || (!originalSweep && focusedModeCount==0)) {
         horde::scene::assets::StaticMeshAsset layout;
         horde::scene::assets::AssetManifest viewManifest;
@@ -429,6 +483,7 @@ int main(int argc,char** argv) {
                            float candidateRetraction,bool candidateDiagnostic) {
         if(wideView) input.logicalViewAspect=kHeldItemSpreadMaximumAspect;
         Solved solved;
+        const auto poseStart=std::chrono::steady_clock::now();
         if(!Solve(rig,input,++cases,solved,diagnostic,candidateRetraction)) {
             if(!candidateDiagnostic) ++failures;
             std::cerr<<"pose case="<<cases<<" xz="<<input.playerX<<','<<input.playerZ
@@ -449,14 +504,21 @@ int main(int argc,char** argv) {
             }
             return;
         }
+        const auto oracleStart=std::chrono::steady_clock::now();
+        poseWallMs+=std::chrono::duration<double,std::milli>(oracleStart-poseStart).count();
         float room=100;
         V limitingPoint{};
-        const auto measure=[&](V point) { const float candidate=Headroom(point,structuralUndersides);if(candidate<room) {room=candidate;limitingPoint=point;} };
-        for(const auto& vertex:torch.vertices) measure(Point(solved.rendered[0].worldFromItem,{{vertex.position[0],vertex.position[1],vertex.position[2]}}));
+        clearancePoints.clear();
+        for(const auto& vertex:torch.vertices) clearancePoints.push_back(Point(solved.rendered[0].worldFromItem,{{vertex.position[0],vertex.position[1],vertex.position[2]}}));
         // Main visible flame plus admitted .06m tip margin and lateral domain.
         for(float x:{-.105f,.105f}) for(float z:{-.105f,.105f}) for(float y:{0.0f,.4f})
-            measure(Point(solved.light.worldFromFlame,{{x,y,z}}));
-        measure(Point(solved.light.worldFromLight,{}));
+            clearancePoints.push_back(Point(solved.light.worldFromFlame,{{x,y,z}}));
+        clearancePoints.push_back(Point(solved.light.worldFromLight,{}));
+        const auto selected=SelectUndersides(structuralUndersides,clearancePoints);
+        fullTriangleVisits+=structuralUndersides.size()*clearancePoints.size();
+        selectedTriangleVisits+=selected.size()*clearancePoints.size();
+        for(const V& point:clearancePoints) { const float candidate=Headroom(point,selected);if(candidate<room) {room=candidate;limitingPoint=point;} }
+        oracleWallMs+=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-oracleStart).count();
         worstHeadroom=std::min(worstHeadroom,room);maxGripError=std::max(maxGripError,rig.LeftGripAgreement().positionErrorMetres);
         if(candidateDiagnostic) {
             std::cout<<"candidate ";
@@ -468,6 +530,7 @@ int main(int argc,char** argv) {
         if(nearRoof) {
             ++roofCases;
             if(room<worstRoofHeadroom) { worstRoofHeadroom=room;worstRoofInput=input;worstRoofPoint=limitingPoint;worstTargetGripY=solved.target.worldFromLeftHand[13];worstFinalGripY=solved.grip[13]; }
+            const auto viewmodelStart=std::chrono::steady_clock::now();
             if(!viewmodel.SkinPlayerPoseUniqueTextured(rig.SolvedPose(),roofVertices,roofTangents,diagnostic) ||
                roofVertices.size()!=15855 || roofTangents.size()!=roofVertices.size()) { ++failures;std::cerr<<"Actual final viewmodel skin: "<<diagnostic<<'\n';return; }
             ++skinnedRoofCases;
@@ -477,6 +540,7 @@ int main(int argc,char** argv) {
                 const V world=Add(solved.root,PlayerModelVectorToWorld(solved.basis,{{vertex.position[0],vertex.position[1],vertex.position[2]}}));
                 if(!std::all_of(world.begin(),world.end(),[](float value){return std::isfinite(value);})) { ++failures;break; }
             }
+            viewmodelWallMs+=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-viewmodelStart).count();
             if(rig.UniqueVertices().empty() || rig.LeftGripAgreement().positionErrorMetres>kPlayerGripSocketToleranceMetres) ++failures;
             if(roofWitness) {
                 std::cout<<"roof witness playerXZ="<<input.playerX<<','<<input.playerZ<<" yaw/pitch="<<input.playerYawRadians<<','<<input.playerPitchRadians
@@ -485,6 +549,9 @@ int main(int argc,char** argv) {
                     <<" limitingPoint="<<limitingPoint[0]<<','<<limitingPoint[1]<<','<<limitingPoint[2]<<" headroom="<<room<<'\n';
             }
         }
+        if(cases%256u==0u) std::cout<<"torch gate progress cases="<<cases
+            <<" elapsedMs="<<std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-gateStart).count()
+            <<" poseWallMs="<<poseWallMs<<" oracleWallMs="<<oracleWallMs<<" viewmodelWallMs="<<viewmodelWallMs<<'\n';
         if(capture) {
             std::cout<<"worst-bend targetGripY="<<solved.target.worldFromLeftHand[13]<<" finalGripY="<<solved.grip[13]<<" flameY="<<solved.light.worldFromFlame[13]<<" lightY="<<solved.light.worldFromLight[13]<<" finalMainEnvelopeHeadroom="<<room<<" root="<<solved.root[0]<<','<<solved.root[1]<<','<<solved.root[2]<<'\n';
             // Local RT captures are diagnostic evidence, never a CI dependency.
@@ -734,5 +801,7 @@ int main(int argc,char** argv) {
         <<" walk="<<worstRoofInput.walkTime<<" action="<<static_cast<int>(worstRoofInput.playerCombat.action)<<" target/finalGripY="<<worstTargetGripY<<','<<worstFinalGripY<<'\n';
     if(roofCases) printLimitingTriangle(worstRoofPoint);
     std::cout<<"actual final rig cases="<<cases<<" worstHeadroom="<<worstHeadroom<<" maxGripError="<<maxGripError<<" failures="<<failures<<'\n';
+    std::cout<<"underside broad-phase visits="<<selectedTriangleVisits<<" original full-scan visits="<<fullTriangleVisits<<'\n';
+    std::cout<<"torch gate stages poseWallMs="<<poseWallMs<<" oracleWallMs="<<oracleWallMs<<" viewmodelWallMs="<<viewmodelWallMs<<'\n';
     return failures ? 1 : 0;
 }

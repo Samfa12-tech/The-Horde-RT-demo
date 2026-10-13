@@ -36,6 +36,7 @@ struct RuntimeTextureProfile
 struct MaterialOverride
 {
     std::string material;
+    std::array<float, 4u> baseColorFactor{{1.0f, 1.0f, 1.0f, 1.0f}};
     float emissiveStrength = 1.0f;
     float transmissionFactor = 0.0f;
     float ior = 1.5f;
@@ -46,6 +47,7 @@ struct MaterialOverride
     float normalScale = 1.0f;
     std::array<float, 2u> textureScale{{1.0f, 1.0f}};
     bool thinWall = false;
+    bool hasBaseColorFactor = false;
     bool hasEmissiveStrength = false;
     bool hasTransmissionFactor = false;
     bool hasIor = false;

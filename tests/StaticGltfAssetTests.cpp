@@ -1745,6 +1745,68 @@ void TestAcceptedStaticGlbContract(const horde::scene::assets::AssetManifest& ma
     }
 }
 
+void TestMaterialBaseColorAuthoring(const std::filesystem::path& temporaryRoot,
+                                   const horde::scene::assets::AssetManifest& manifest)
+{
+    using namespace horde::scene::assets;
+    StaticMeshAsset baseline, authored;
+    std::string diagnostic;
+    Check(StaticMeshAsset::Load(kFixtureRoot / "valid-multi.glb", manifest, baseline, diagnostic),
+          "base-colour authoring has an admitted control asset");
+    const auto path = RewriteManifest(temporaryRoot, "base-colour.manifest.json",
+        "\"roughnessFactor\": 0.18", "\"roughnessFactor\": 0.18, \"baseColorFactor\": [0.5,0.5,0.5,1]");
+    AssetManifest candidate;
+    const bool parsed = AssetManifest::Load(path, candidate, diagnostic);
+    Check(parsed, std::string("linear base-colour sidecar is admitted: ") + diagnostic);
+    const bool loaded = parsed && StaticMeshAsset::Load(kFixtureRoot / "valid-multi.glb", candidate, authored, diagnostic);
+    Check(loaded && authored.materials[0].baseColorFactor == std::array<float,4>{{.5f,.5f,.5f,1.f}},
+          "named base-colour authoring reaches the native PBR factor without changing encoded texels");
+    if (loaded) {
+        Check(authored.indices == baseline.indices && authored.vertices.size() == baseline.vertices.size() &&
+              std::memcmp(authored.vertices.data(), baseline.vertices.data(), baseline.vertices.size()*sizeof(StaticRtVertex)) == 0 &&
+              authored.bounds.minimum == baseline.bounds.minimum && authored.bounds.maximum == baseline.bounds.maximum,
+              "base-colour authoring preserves exact geometry, UVs, tangents and support bounds");
+        Check(authored.materials[0].baseColorTexture == baseline.materials[0].baseColorTexture &&
+              authored.materials[0].roughnessFactor == baseline.materials[0].roughnessFactor &&
+              authored.materials[0].flags == baseline.materials[0].flags,
+              "base-colour authoring preserves texture routing, roughness and optical flags");
+        candidate = manifest;
+        MaterialOverride unrelated;
+        unrelated.material = "UnrelatedMaterial";
+        unrelated.hasBaseColorFactor = true;
+        unrelated.baseColorFactor = {{.5f,.5f,.5f,1.f}};
+        candidate.materialOverrides.push_back(unrelated);
+        Check(StaticMeshAsset::Load(kFixtureRoot / "valid-multi.glb", candidate, authored, diagnostic) &&
+              authored.materials[0].baseColorFactor == std::array<float,4>{{.2f,.3f,.4f,.8f}},
+              "a named colour override does not alter an unrelated material");
+    }
+    std::string colourOnly = ReadText(kFixtureRoot / "valid.manifest.json");
+    const auto overridesBegin = colourOnly.find("\"materialOverrides\"");
+    const auto overridesEnd = colourOnly.rfind(']');
+    Check(overridesBegin != std::string::npos && overridesEnd != std::string::npos,
+          "colour-only test preserves the complete manifest outside its named overrides");
+    if (overridesBegin != std::string::npos && overridesEnd != std::string::npos) {
+        colourOnly.replace(overridesBegin, overridesEnd-overridesBegin+1u,
+            "\"materialOverrides\": [{\"material\":\"FixtureMaterial\",\"baseColorFactor\":[0.5,0.5,0.5,1]}]");
+        const auto onlyPath = temporaryRoot / "colour-only.manifest.json";
+        WriteText(onlyPath, colourOnly);
+        Check(AssetManifest::Load(onlyPath, candidate, diagnostic) &&
+              candidate.materialOverrides.size() == 1u && candidate.materialOverrides[0].hasBaseColorFactor,
+              "base-colour-only authoring is a complete optional override");
+    }
+    for (const std::string_view value : {"[0,0,0,1]", "[1,1,1,1]"}) {
+        const auto edge = RewriteManifest(temporaryRoot, "base-colour-edge.manifest.json",
+            "\"roughnessFactor\": 0.18", "\"roughnessFactor\": 0.18, \"baseColorFactor\": " + std::string(value));
+        Check(AssetManifest::Load(edge, candidate, diagnostic), "finite base-colour boundary factors are admitted");
+    }
+    for (const std::string_view value : {"[]", "[1,1,1]", "[1,1,1,1,1]", "[-0.1,1,1,1]",
+            "[1,1.01,1,1]", "[1,1,1,2]", "[1e40,1,1,1]", "[1,null,1,1]", "[1,\"1\",1,1]"}) {
+        const auto invalid = RewriteManifest(temporaryRoot, "base-colour-invalid.manifest.json",
+            "\"roughnessFactor\": 0.18", "\"roughnessFactor\": 0.18, \"baseColorFactor\": " + std::string(value));
+        Check(!AssetManifest::Load(invalid, candidate, diagnostic), "invalid colour array lengths/types/ranges reject admission");
+    }
+}
+
 void TestMaterialNormalAndTextureAuthoring(const std::filesystem::path& temporaryRoot,
                                           const horde::scene::assets::AssetManifest& manifest)
 {
@@ -3048,6 +3110,7 @@ int main(int argc, char** argv)
     else
     {
         TestAcceptedStaticGlbContract(manifest);
+        TestMaterialBaseColorAuthoring(temporaryRoot, manifest);
         TestMaterialNormalAndTextureAuthoring(temporaryRoot, manifest);
         TestUnsupportedAlphaMaterialIsRejected(temporaryRoot, manifest);
         TestTransmissionDefaultThinWallSemantics(temporaryRoot, manifest);

@@ -1,5 +1,25 @@
 # Horde 1.7 current design index
 
+**Current ground-material checkpoint; chapter incomplete.** The
+[matched material evidence](../evidence/2026-10-14-ground-material-balance/README.md)
+sets Forest Ground's linear factor to0.5 through the generic native PBR sidecar.
+Trail, geometry/support, maps, lighting/shadows, quality and limits stay unchanged.
+Both real RT backends complete the out-and-back/repeat/reset route; the full
+Debug/Release torch gate retains all coverage and its180-second limit. The
+prepared uninstalled phone candidate is APK1a00b34d61ce. Owner/phone appearance
+remains pending; this is reversible tuning, not final physical calibration.
+
+The owner's14 October priority is **ordinary two-way detailed static-region GPU
+loading, safe publication, completed-work retirement and return reload**. Keep
+the coarse world and required distant landmarks/contributors visible. Measure
+memory overlap and sustained frame/transition timings on a representative
+optimized Release route at unchanged quality. Static-region residency saving
+remains ZERO; Keeper-only savings, Debug CPU and GPU-only timings do not close
+this milestone. Defer unrelated polish/optimization unless it directly unblocks
+streaming. Easy Tree/canopy and mist28 stay deferred; physical acceptance is open.
+
+The preceding checkpoint:
+
 **Chapter integration remains active and incomplete.** The current
 [Keeper texture lifetime checkpoint](../evidence/2026-10-14-keeper-texture-lifetime/README.md)
 retires the private texture pair after completed Kit adoption and restores the

@@ -1,0 +1,87 @@
+{
+  "scope": "Pre-commit builds: base commit plus actual build-input bytes; not a post-commit rebuild",
+  "baseCommit": "735f28452c67babb6a8c13194a91e30255bc2108",
+  "sources": {
+    "src/scene/assets/AssetManifest.h": "4f14cecee034f39c35b9e6167ee7c2106a5e0c25c695d05f61f816719bad276c",
+    "src/scene/assets/AssetManifest.cpp": "9347f7c9a0a0009a465ad8e9251876177adaab4b1e6079ed042562251d83f8ee",
+    "src/scene/assets/StaticMeshAsset.cpp": "0f2427e6f96d8df11c87a9bb89a1e2bf217766836fe7cc7320fb1d146a733589",
+    "tests/StaticGltfAssetTests.cpp": "c8ba2c2180429759bc9dfcb5e5dea096ce62f0e49f121f2fd7d72988619ad23f",
+    "tests/FinalHeldTorchClearanceTests.cpp": "d2929550530a0c08553fc5fe9d0e2ab1c26759d30e1fc8544fa9053db986aa9b",
+    "tools/author-terrain-material-balance.py": "a305f117f9233bc5acae6c789efa6186a06133a749a59f15ae55a08120803628",
+    "tools/horde-1.7-tomb-asset-policy.ps1": "ba216afeb2cda0ab2218293c7bb9cc70f7a41bf49faeab1a4c2f33d94c6bc2eb",
+    "assets/models/world/runtime/chapter-terrain-v1/asset.manifest.json": "da0762e1250e9586022c25e1d1600c5e246ca542524cde137185f98f1fe0de13",
+    "src/vulkan/raytracing/PresentableTinyRtScene.cpp": "eb9f3a81a42338adf08f04b33ebc492d8ce1d9110bbbceb379db37e023aa1f69",
+    "src/platform/windows/DiagnosticWindow.cpp": "29444ae0927bf5c28a3c8d7560868993359c8637b341ffdaab7800193de04e6e",
+    "android/app/src/main/cpp/android_probe_bridge.cpp": "b689bb390aacfef7e307c8c38a85e02cba8e2e35d44322ed95e1190442a6e578",
+    "tools/raygen-variant-catalog.json": "e3b43b8f8ab01279f2d1c09cb9d4290b6e7a431b2e4101bdeccfc76b890fcb25",
+    "tools/raygen-variant-budgets.json": "56936479b2d202dbdb9393ba94b66a1b0bc12d490b700d8af4c63de3460e53bf"
+  },
+  "canonicalGitInputBlobs": {
+    "src/scene/assets/AssetManifest.h": "850a54244a446154a84b79ad0db20456be5005bc",
+    "src/scene/assets/AssetManifest.cpp": "fe233c605d9dd4174bf81797e5fbc0e05f7e862a",
+    "src/scene/assets/StaticMeshAsset.cpp": "5662e9ac12a3b3b934bd3c2785b5e35f1e7c0f13",
+    "tests/StaticGltfAssetTests.cpp": "ce5615ffc2daf9192ce5fc13432be4c9fd26bb09",
+    "tests/FinalHeldTorchClearanceTests.cpp": "b748f90036b6d6ec60d164cea8b30fd111007488",
+    "tools/author-terrain-material-balance.py": "8ee96750bd5d29c9f87a210d2b0ebd442e6f5e38",
+    "tools/horde-1.7-tomb-asset-policy.ps1": "9c799b6acc465cd74d69c57b1264ab58403ef2de",
+    "assets/models/world/runtime/chapter-terrain-v1/asset.manifest.json": "b2efd70866ee7f97c2174c3a26e05ae338fef516",
+    "src/vulkan/raytracing/PresentableTinyRtScene.cpp": "2176c5f7e559e1968dc5e33480a9ba795e30be1e",
+    "src/platform/windows/DiagnosticWindow.cpp": "b6628e586f696573a366135124a847ca967080ef",
+    "android/app/src/main/cpp/android_probe_bridge.cpp": "b7802557fec8d7f8752a7199e44de6f88906aed5",
+    "tools/raygen-variant-catalog.json": "47183605c440bf43a51c9af3191b35f680150120",
+    "tools/raygen-variant-budgets.json": "90d40a313084dca95055ed2ea32a231da9d0b9bb"
+  },
+  "artifacts": [
+    {
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+      "sha256": "b87f140344fd964d90190b72f8982b6b568e4075850191c8d6b08b9f1a510584",
+      "bytes": 13137408
+    },
+    {
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+      "sha256": "f2c7e5782d06fc0eb368cddd3b5499d45cca0f449ef4fa01e6663c5094a918a1",
+      "bytes": 4468736
+    },
+    {
+      "path": "reports/phone-candidate-1a00b34d61ce/horde-debug.apk",
+      "sha256": "1a00b34d61ce63423748c5b05434ae1a7744cbb55d196c6be5fa40e82089be6b",
+      "bytes": 183170474
+    }
+  ],
+  "apkChangedEntriesVs525e73bbd3c3": {
+    "lib/arm64-v8a/libhorde_rt_probe_android.so": "cfc8e052b2513640bc3c46ede7a6f917e4ced5eceeca15ba97a254a1b3733636",
+    "lib/armeabi-v7a/libhorde_rt_probe_android.so": "e04d4f98fdb6349c9b33ac636293945b3b07cf18c3164b73b1cb7c461a62f3c9",
+    "lib/x86/libhorde_rt_probe_android.so": "3a019a3d7bf79d73ca0197f73d7b9669d4b3016a9305463d299d34e0ff1abc63",
+    "lib/x86_64/libhorde_rt_probe_android.so": "cb5e7a2db90f42ff8a3ebf71b6cc931cb3ce84b9489e7d3ea29a69c6d84573ed",
+    "assets/ASSET_LICENSES.md": "4c05ac4a98b39d381e7bb9a6dd23ae75124a80a1a9a4b91686b160573c1020b9",
+    "assets/models/world/runtime/chapter-terrain-v1/asset.manifest.json": "da0762e1250e9586022c25e1d1600c5e246ca542524cde137185f98f1fe0de13"
+  },
+  "versionCode": 10,
+  "phoneInstalled": false,
+  "developmentCertificateSha256": "2bc406088b23ac80f2a00a40e2d5d8daa012844dc62f31ad6145d129f5566736",
+  "java": {
+    "suites": 45,
+    "tests": 286,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "materialFactor": [
+    0.5,
+    0.5,
+    0.5,
+    1
+  ],
+  "terrainGlbSha256": "fb21e177b8e67fb553d4853a778603a598908812fc1603ca8a16d94d152a4854",
+  "unchangedTextureArrays": {
+    "assets/textures/props/runtime/chapter-terrain/base-color.android.ktx2": "114afde2675443ff09806692e8e42f95b7caec0518b6c5a2f85a7917a8667395",
+    "assets/textures/props/runtime/chapter-terrain/base-color.windows.ktx2": "91fa9c1870722069ef930df44f88963f1d38ddefd8e689c26c9ca5ecbe8712b9",
+    "assets/textures/props/runtime/chapter-terrain/normal.android.ktx2": "1da244cbd8006b9bd07573435ae0a050a497033a2784f636a9bad5996dc80c78",
+    "assets/textures/props/runtime/chapter-terrain/normal.windows.ktx2": "2d138ef174528932dcd2c4326d5bfc85663c0fc453ebdccfcbcdec39768db963",
+    "assets/textures/props/runtime/chapter-terrain/orm.android.ktx2": "7f0ca5ad53159ee1ebb31c46a47384511757605375766b4a7d48ea8e61e2f845",
+    "assets/textures/props/runtime/chapter-terrain/orm.windows.ktx2": "9f0a9b6ab1d61affa0459c58bc5000824caeff50f8e17c979109ad24a1d619c8"
+  },
+  "staticRegionResidencySavingBytes": 0,
+  "normalTwoWayStaticStreamingComplete": false,
+  "releaseSustainedPlayableFpsAcceptance": false
+}

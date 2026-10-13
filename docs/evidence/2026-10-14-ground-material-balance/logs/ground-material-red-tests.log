@@ -1,0 +1,18 @@
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+    Start 98: horde_rt_static_gltf_asset_tests
+1/1 Test #98: horde_rt_static_gltf_asset_tests ...***Failed    3.61 sec
+Static GLB temporary root=horde-rt-static-gltf-tests-debug-pid-49272
+FAIL: linear base-colour sidecar is admitted: Asset manifest contains unsupported materialOverride field 'baseColorFactor'.
+FAIL: named base-colour authoring reaches the native PBR factor without changing encoded texels
+FAIL: finite base-colour boundary factors are admitted
+FAIL: finite base-colour boundary factors are admitted
+4 static glTF asset assertion(s) failed
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   3.63 sec
+
+The following tests FAILED:
+	 98 - horde_rt_static_gltf_asset_tests (Failed)
+Errors while running CTest

@@ -114,6 +114,13 @@ record; stretching object geometry does not establish believable texture scale.
 For example, a four-metre surface with UV span 1 and two repeats/metre needs an
 authored UV span 8 or an explicit multiplier 8. Confirm size under moving light.
 
+Named entries may also author `baseColorFactor: [r, g, b, a]`, four finite
+components within [0, 1]. This replaces the imported linear glTF factor; it
+multiplies the sRGB-decoded texture in the existing PBR path without re-encoding
+texels, adding samples or changing alpha-mode admission. Missing factors retain
+the imported value. Record reversible material tuning with the source recipe,
+and inspect matched RT views rather than compensating with global light strength.
+
 Dungeon world-projected materials retain 0.42 repeats/metre and a separate 0.34
 normal blend by default. That blend is not equivalent to glTF XY scale 0.34; the
 shared ABI records signed normal strength, two UV multipliers and blend separately.

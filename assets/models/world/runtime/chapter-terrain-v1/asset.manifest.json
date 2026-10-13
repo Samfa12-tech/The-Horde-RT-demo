@@ -25,7 +25,17 @@
     "windows": "rgba8",
     "mipmapped": true
   },
-  "materialOverrides": [],
+  "materialOverrides": [
+    {
+      "material": "ChapterForestGround",
+      "baseColorFactor": [
+        0.5,
+        0.5,
+        0.5,
+        1.0
+      ]
+    }
+  ],
   "distribution": "runtime",
   "licenceStatus": "Original Horde terrain; admitted Poly Haven CC0 materials"
 }

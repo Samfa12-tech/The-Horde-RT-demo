@@ -364,6 +364,12 @@ Forest Ground 01 by Rob Tuytel, [Poly Haven original](https://polyhaven.com/a/fo
 
 `chapter-terrain-r21` extends the original Horde landform using the owner-designated connected-region atlas and local topo at planning commit `d37f16381311c6e620f0c4a9d01c1cce83260dc8`. Its source receipt identifies both authoring scripts and the exact recovered layout/grid. The regional mesh reuses the same admitted damp-sand and Forest Ground 01 material images and platform arrays unchanged; no additional texture, external model or licence is introduced. The editable master stays outside runtime packages. Beyond the reviewed macro rectangle, coarse surrounding relief is labelled provisional continuation, not additional approved map content.
 
+`chapter-terrain-material-r01` records a named linear base-colour-factor
+adjustment for Forest Ground only. Its receipt preserves the exact r21 model
+and original six texture-array hashes; no new provider content or licence is
+introduced. The original manifest and reproduction recipe stay in source, and
+only the admitted material sidecar accompanies runtime assets.
+
 ### Kit preserved runtime derivative (11 October 2026)
 
 `assets/models/characters/runtime/kit-warden-v1/` is a prepared derivative of the

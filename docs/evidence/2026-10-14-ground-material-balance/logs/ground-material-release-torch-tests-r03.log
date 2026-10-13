@@ -1,0 +1,48 @@
+UpdateCTestConfiguration  from :C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/DartConfiguration.tcl
+UpdateCTestConfiguration  from :C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/DartConfiguration.tcl
+Parse Config file:C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/DartConfiguration.tcl
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 55
+    Start 55: horde_rt_final_held_torch_clearance_tests
+
+55: Test command: "C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-release\Release\horde_rt_final_held_torch_clearance_tests.exe" "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof"
+55: Working Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+55: Test timeout computed to be: 180
+55: underside selection exact full-scan comparisons=944 failures=0
+55: primary-arm portal poleY=nan bendDegrees=nan clippedLeftTriangles=2310 itemLightDelta=0 vertexDelta=0 target=-0.185,-0.350948,0.606509
+55: primary-arm portal poleY=nan bendDegrees=nan clippedLeftTriangles=0 itemLightDelta=0.109506 vertexDelta=0.105004 target=-0.185,-0.433164,0.530666
+55: primary-frustum witnesses=2; original sweep pose count remains separate
+55: worst-bend targetGripY=0.330294 finalGripY=0.330294 flameY=0.892789 lightY=0.870196 finalMainEnvelopeHeadroom=0.0494097 root=4.2,-0.949749,-10
+55: torch gate progress cases=256 elapsedMs=931.244 poseWallMs=429.943 oracleWallMs=448.499 viewmodelWallMs=0
+55: torch gate progress cases=512 elapsedMs=1864.62 poseWallMs=884.152 oracleWallMs=926.901 viewmodelWallMs=0
+55: torch gate progress cases=768 elapsedMs=2895.43 poseWallMs=1395.96 oracleWallMs=1445.31 viewmodelWallMs=0
+55: torch gate progress cases=1024 elapsedMs=3947.98 poseWallMs=1947.96 oracleWallMs=1945.01 viewmodelWallMs=0
+55: torch gate progress cases=1280 elapsedMs=5202.82 poseWallMs=2642.51 oracleWallMs=2504.59 viewmodelWallMs=0
+55: clearance viewport aspect=1
+55: torch gate progress cases=1536 elapsedMs=6077.42 poseWallMs=3046.96 oracleWallMs=2933.13 viewmodelWallMs=41.1342
+55: torch gate progress cases=1792 elapsedMs=7058.11 poseWallMs=3426.89 oracleWallMs=3341.23 viewmodelWallMs=233.352
+55: torch gate progress cases=2048 elapsedMs=8097.84 poseWallMs=3831.66 oracleWallMs=3771.01 viewmodelWallMs=437.852
+55: torch gate progress cases=2304 elapsedMs=9085.55 poseWallMs=4213.91 oracleWallMs=4189.78 viewmodelWallMs=624.009
+55: torch gate progress cases=2560 elapsedMs=10054.3 poseWallMs=4582.29 oracleWallMs=4605.19 viewmodelWallMs=808.415
+55: torch gate progress cases=2816 elapsedMs=11018.4 poseWallMs=4943.74 oracleWallMs=5025.19 viewmodelWallMs=990.389
+55: torch gate progress cases=3072 elapsedMs=12044.3 poseWallMs=5339.35 oracleWallMs=5461.61 viewmodelWallMs=1183.43
+55: imported structural underside triangles=118 planeSamples=3178 diskSamples=57970
+55: new roof final rig cases=1812 actualViewmodelVerticesPerPose=15855 skinnedRoofCases=1812 worstHeadroom=0.0323757 worstPoseXZ=-0.58,-4.3 yaw/pitch=1.5708,0 walk=10.07 action=8 target/finalGripY=0.348713,0.348714
+55: limiting worldPoint=-0.0634497,1.31762,-4.33031 roofY=1.35 sharedY=1.35
+55: actual final rig cases=3287 worstHeadroom=0.0323757 maxGripError=0.0118211 failures=0
+55: underside broad-phase visits=15135254 original full-scan visits=1874944244
+55: torch gate stages poseWallMs=5623.26 oracleWallMs=5786.41 viewmodelWallMs=1327.3
+1/1 Test #55: horde_rt_final_held_torch_clearance_tests ...   Passed   13.74 sec
+
+The following tests passed:
+	horde_rt_final_held_torch_clearance_tests
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =  13.76 sec

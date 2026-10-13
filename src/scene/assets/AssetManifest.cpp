@@ -473,7 +473,8 @@ bool ParseTextureProfile(JsonReader& reader, AssetManifest& manifest)
     return parsed && hasAndroid && hasWindows && hasMipmapped;
 }
 
-bool ParseFloat3(JsonReader& reader, std::array<float, 3u>& values)
+template<std::size_t N>
+bool ParseUnitFloatArray(JsonReader& reader, std::array<float, N>& values)
 {
     std::size_t count = 0u;
     const bool parsed = reader.Array([&](std::size_t) {
@@ -513,6 +514,12 @@ bool ParseMaterialOverrides(JsonReader& reader, AssetManifest& manifest)
                 return ParseOptionalFloat(reader, overrideValue.emissiveStrength,
                     overrideValue.hasEmissiveStrength, 0.0,
                     std::numeric_limits<double>::max());
+            if (key == "baseColorFactor")
+            {
+                overrideValue.hasBaseColorFactor = ParseUnitFloatArray(
+                    reader, overrideValue.baseColorFactor);
+                return overrideValue.hasBaseColorFactor;
+            }
             if (key == "transmissionFactor")
                 return ParseOptionalFloat(reader, overrideValue.transmissionFactor,
                     overrideValue.hasTransmissionFactor, 0.0, 1.0);
@@ -549,7 +556,7 @@ bool ParseMaterialOverrides(JsonReader& reader, AssetManifest& manifest)
             }
             if (key == "attenuationColor")
             {
-                overrideValue.hasAttenuationColor = ParseFloat3(
+                overrideValue.hasAttenuationColor = ParseUnitFloatArray(
                     reader, overrideValue.attenuationColor);
                 return overrideValue.hasAttenuationColor;
             }
@@ -560,7 +567,7 @@ bool ParseMaterialOverrides(JsonReader& reader, AssetManifest& manifest)
             }
             return reader.RejectField("materialOverride", key);
         });
-        const bool hasOverride = overrideValue.hasEmissiveStrength ||
+        const bool hasOverride = overrideValue.hasBaseColorFactor || overrideValue.hasEmissiveStrength ||
             overrideValue.hasTransmissionFactor || overrideValue.hasIor ||
             overrideValue.hasThicknessFactor || overrideValue.hasAttenuationDistance ||
             overrideValue.hasAttenuationColor || overrideValue.hasRoughnessFactor ||

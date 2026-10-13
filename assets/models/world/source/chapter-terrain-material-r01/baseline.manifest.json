@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "asset": "chapter-terrain-v1",
+  "metresPerUnit": 1.0,
+  "coordinateSystem": {
+    "up": "+Y",
+    "forward": "+Z"
+  },
+  "budgets": {
+    "maxVertices": 21134,
+    "maxIndices": 118854,
+    "maxPrimitives": 2,
+    "maxMaterials": 2,
+    "maxTextureLayersPerKind": 2
+  },
+  "lods": [
+    {
+      "name": "authored",
+      "maxTriangles": 39618
+    }
+  ],
+  "requiredSockets": [],
+  "runtimeTextureProfile": {
+    "android": "astc",
+    "windows": "rgba8",
+    "mipmapped": true
+  },
+  "materialOverrides": [],
+  "distribution": "runtime",
+  "licenceStatus": "Original Horde terrain; admitted Poly Haven CC0 materials"
+}
