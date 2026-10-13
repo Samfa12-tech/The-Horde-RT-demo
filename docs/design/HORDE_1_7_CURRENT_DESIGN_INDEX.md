@@ -1,6 +1,22 @@
 # Horde 1.7 current design index
 
 **Goal resumed13 October; phone temporarily disconnected after bounded testing.**
+The [cached-region preparation milestone](../evidence/2026-10-13-cached-region-preparation/README.md)
+removes the roughly half-second synchronous packing step by using the immutable
+admitted cache. Actual Pipeline/QueryCompute begin times are0.09–0.17ms, with
+copy/scan work spread over212 turns and a996,096-byte experimental device-local
+saving. Both matched before/selected/restored galleries are pixel-identical;
+default complete rendering also remains identical. All vertex bytes remain
+retained, a documented reversible choice. Cutovers still cost about39ms, and
+conservative contributor eligibility is still required. **Ordinary-play residency
+saving remains ZERO; no automatic subset/eviction is enabled.** Debug/Release
+affected tests and the full1,475 legacy+1,812 roof-case torch gate pass under the
+unchanged180-second policy. Four-ABI Android/lint/Java and package checks pass;
+the next phone candidate is prepared but uninstalled. Full moving two-way
+integration, sustained Shipping performance and final owner/phone acceptance
+remain open. The chapter is incomplete; integration continues.
+
+The preceding
 The [triangle-provenance checkpoint](../evidence/2026-10-13-triangle-region-candidates/README.md)
 preserves exterior grave offerings when preparing diagnostic GPU subsets and
 fails normal traversal readiness closed for any uncertified partial owner.

@@ -1060,7 +1060,97 @@ void TestBoundedImmutableMeshCopy()
     for(std::size_t i=0;i<world.vertices.size();++i) world.vertices[i].position[0]=static_cast<float>(i);
     auto body=world, view=world;
     const auto pbr=static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr);
-    auto source=std::make_shared<RtStaticMeshSlot>(); std::string error;
+    std::string error;
+    {
+        using Region=horde::scene::assets::StaticTriangleRegion;
+        auto tagged=world;
+        tagged.indices={0,1,2,3,4,5,6,7,8};tagged.primitives[0].indexCount=9;
+        tagged.triangleRegions={Region::Shared,Region::TombDressing,Region::ExteriorDressing};
+        auto packed=std::make_shared<RtStaticMeshSlot>();
+        const std::array rows{
+            StaticRtAssetRegistration{21,100,pbr,0,&tagged},
+            StaticRtAssetRegistration{22,101,pbr,0,&body,nullptr,RtGeometryRole::PlayerWorldBody},
+            StaticRtAssetRegistration{20,102,pbr,0,&view,nullptr,RtGeometryRole::PlayerViewmodel}};
+        Check(packed->Initialize(rows,error) && packed->TriangleRegions().size()==5 &&
+            packed->TriangleRegions()[1]==Region::TombDressing && packed->TriangleRegions().back()==Region::Shared,
+            "packed provenance follows the actual global triangle index order and defaults untagged roles to Shared");
+        RtStaticMeshCopy selected;
+        Check(!selected.Begin(packed,error,21,4u) && !selected.Begin(packed,error,UINT32_MAX,2u),
+            "invalid region/instance cannot begin a cached selection");
+        Check(selected.Begin(packed,error,21,2u),"cached selection pins admitted source without asset repacking");
+        unsigned turns=0;
+        while(!selected.Ready() && turns++<300u)
+            Check(selected.Advance(128u,error) && selected.LastCopiedBytes()<=128u &&
+                selected.LastScannedBytes()<=128u,"copy and selection scan remain individually bounded");
+        auto result=selected.Take();
+        const auto same=[](const auto& a,const auto& b){return a.size()==b.size() &&
+            (a.empty() || std::memcmp(a.data(),b.data(),a.size()*sizeof(a.front()))==0);};
+        Check(result && result->Indices()==std::vector<std::uint32_t>({0,1,2,6,7,8,0,1,2,0,1,2}) &&
+            result->PrimitiveMetadata()[0].indexCount==6 && result->PrimitiveMetadata()[1].indexOffset==6 &&
+            result->TriangleRegions()==std::vector<Region>({Region::Shared,Region::ExteriorDressing,Region::Shared,Region::Shared}),
+            "cached selection removes only tagged owner triangles and remaps all later index offsets");
+        Check(result && same(result->Vertices(),packed->Vertices()) &&
+            same(result->Materials(),packed->Materials()) && same(result->InstanceMetadata(),packed->InstanceMetadata()) &&
+            same(result->GeometryTransforms(),packed->GeometryTransforms()) &&
+            same(result->PrimitiveVertexCounts(),packed->PrimitiveVertexCounts()) &&
+            same(result->Vertices(RtGeometryRole::PlayerWorldBody),packed->Vertices(RtGeometryRole::PlayerWorldBody)) &&
+            same(result->Vertices(RtGeometryRole::PlayerViewmodel),packed->Vertices(RtGeometryRole::PlayerViewmodel)),
+            "index-only selection preserves all vertices, player roles, materials and row identities exactly");
+        for(unsigned turn=0;turn<turns;++turn){
+            Check(selected.Begin(packed,error,21,2u),"cached selection cancellation begins");
+            for(unsigned i=0;i<turn;++i)Check(selected.Advance(128u,error),"each selected cancellation boundary advances");
+            selected.Cancel();Check(!selected.Take() && packed->Indices().size()==15,
+                "cancellation cannot expose partial output or change source payload");
+        }
+        for(unsigned bad=0;bad<3u;++bad) {
+            auto malformed=tagged;
+            if(bad==0u)malformed.triangleRegions.push_back(Region::Shared);
+            if(bad==1u)malformed.triangleRegions[1]=static_cast<Region>(3u);
+            if(bad==2u)malformed.indices[3]=UINT32_MAX;
+            RtStaticMeshSlot rejected;
+            Check(!rejected.Initialize(std::array{StaticRtAssetRegistration{21,100,pbr,0,&malformed}},error),
+                "cached-source admission rejects excess/invalid labels and bad indices even on omitted triangles");
+        }
+        auto empty=world;empty.triangleRegions={Region::TombDressing};
+        auto emptySource=std::make_shared<RtStaticMeshSlot>();
+        Check(emptySource->Initialize(std::array{StaticRtAssetRegistration{21,100,pbr,0,&empty}},error) &&
+            selected.Begin(emptySource,error,21,2u),"empty-row negative owns a valid source");
+        bool success=true;unsigned turn=0;
+        while(!selected.Ready() && success && turn++<300u)success=selected.Advance(128u,error);
+        Check(!success && !selected.Take() && emptySource->Indices().size()==3,
+            "selection cannot delete a fixed primitive row or alter its source");
+        auto shared=std::make_shared<RtStaticMeshSlot>();
+        Check(shared->Initialize(std::array{StaticRtAssetRegistration{21,100,pbr,0,&tagged},
+            StaticRtAssetRegistration{19,101,pbr,0,&tagged}},error) && !selected.Begin(shared,error,21,2u),
+            "one selected instance cannot drop geometry still owned by another instance");
+        auto prefix=world,suffix=world;
+        prefix.indices={2,1,0};prefix.triangleRegions={Region::TombDressing};
+        suffix.triangleRegions={Region::TombDressing};
+        auto middle=std::make_shared<RtStaticMeshSlot>();
+        Check(middle->Initialize(std::array{StaticRtAssetRegistration{1,11,pbr,0,&prefix},
+            StaticRtAssetRegistration{21,100,pbr,0,&tagged},
+            StaticRtAssetRegistration{22,12,pbr,0,&suffix,nullptr,RtGeometryRole::PlayerWorldBody}},error),
+            "middle-owner fixture admits prefix, selected owner and role-separated suffix");
+        for(unsigned retry=0;retry<2u;++retry) {
+            Check(selected.Begin(middle,error,21,2u),"middle-owner selection starts or retries");
+            Check(selected.Advance(512u,error) && !selected.Take(),"middle-owner partial output stays private");
+            if(retry==0u){selected.Cancel();continue;}
+            unsigned turns=0;
+            while(!selected.Ready() && turns++<300u)Check(selected.Advance(512u,error),"middle-owner selection advances");
+            auto result=selected.Take();
+            Check(result && result->Indices()==std::vector<std::uint32_t>({2,1,0,0,1,2,6,7,8,0,1,2}) &&
+                result->TriangleRegions()==std::vector<Region>({Region::TombDressing,Region::Shared,
+                    Region::ExteriorDressing,Region::TombDressing}) &&
+                std::memcmp(&result->PrimitiveMetadata()[0],&middle->PrimitiveMetadata()[0],sizeof(RtPrimitiveMetadata))==0 &&
+                result->PrimitiveMetadata()[1].indexOffset==3 && result->PrimitiveMetadata()[1].indexCount==6 &&
+                result->PrimitiveMetadata()[2].indexOffset==9 && result->PrimitiveMetadata()[2].indexCount==3 &&
+                same(result->Vertices(),middle->Vertices()) && same(result->GeometryTransforms(),middle->GeometryTransforms()) &&
+                same(result->Materials(),middle->Materials()) && same(result->InstanceMetadata(),middle->InstanceMetadata()) &&
+                same(result->Vertices(RtGeometryRole::PlayerWorldBody),middle->Vertices(RtGeometryRole::PlayerWorldBody)),
+                "middle selection preserves foreign-tagged prefix/suffix and all identities, rebasing only affected indices after retry");
+        }
+    }
+    auto source=std::make_shared<RtStaticMeshSlot>();
     const std::array registrations{
         StaticRtAssetRegistration{21,100,pbr,0,&world},
         StaticRtAssetRegistration{22,101,pbr,0,&body,nullptr,RtGeometryRole::PlayerWorldBody},

@@ -7102,10 +7102,14 @@ bool RunStaticGeometryCutoverCapture(VulkanSurfaceContext& context,
             << ",\"selection\":\"" << (regions==2u ? "shared+graveyard-triangles" : "complete-with-graveyard")
             << "\",\"prepareMilliseconds\":" << m.prepareMilliseconds << ",\"cutoverMilliseconds\":" << m.cutoverMilliseconds
             << ",\"packMilliseconds\":" << m.packMilliseconds
+            << ",\"beginMilliseconds\":" << m.beginMilliseconds
+            << ",\"maximumCpuCopyAdvanceMilliseconds\":" << m.maximumCpuCopyAdvanceMilliseconds
             << ",\"maximumAdvanceMilliseconds\":" << m.maximumAdvanceMilliseconds
             << ",\"uploadAdvanceCount\":" << m.uploadAdvanceCount
             << ",\"uploadedBytes\":" << m.uploadedBytes
             << ",\"cpuCopyAdvanceCount\":" << m.cpuCopyAdvanceCount
+            << ",\"cpuRegionScanAdvanceCount\":" << m.cpuRegionScanAdvanceCount
+            << ",\"scannedCpuPayloadBytes\":" << m.scannedCpuPayloadBytes
             << ",\"asSubmissionCount\":" << m.asSubmissionCount
             << ",\"asPollCount\":" << m.asPollCount
             << ",\"asPendingPollCount\":" << m.asPendingPollCount

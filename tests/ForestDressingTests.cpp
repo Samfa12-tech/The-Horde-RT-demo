@@ -19,6 +19,7 @@
 #include <array>
 #include <cmath>
 #include <cstring>
+#include <chrono>
 #include <filesystem>
 #include <iostream>
 #include <string>
@@ -479,6 +480,41 @@ void TestNativeChapterPrimitiveOwnership()
     Check(completeReady,
           "real combined chapter static route initializes");
     if (!completeReady) return;
+    {
+        auto immutable=std::make_shared<const RtStaticMeshSlot>(complete);
+        RtStaticMeshCopy copy;
+        Check(copy.Begin(immutable,diagnostic,21u,2u),"actual chapter subset begins from the admitted immutable packed owner");
+        unsigned turns=0;double maximumMs=0.;
+        while(!copy.Ready() && turns++<1024u) {
+            const auto start=std::chrono::steady_clock::now();
+            if(!copy.Advance(256u*1024u,diagnostic)){Check(false,"actual chapter cached selection advances");break;}
+            maximumMs=std::max(maximumMs,std::chrono::duration<double,std::milli>(
+                std::chrono::steady_clock::now()-start).count());
+            Check(copy.LastCopiedBytes()<=256u*1024u && copy.LastScannedBytes()<=256u*1024u,
+                "real chapter copying and selection scans stay within each unchanged byte allowance");
+        }
+        auto candidate=copy.Take();
+        Check(candidate && candidate->Indices().size()+3u*taggedTomb==complete.Indices().size() &&
+            candidate->Vertices().size()==complete.Vertices().size() &&
+            std::memcmp(candidate->Vertices().data(),complete.Vertices().data(),complete.Measurements().vertexBytes)==0 &&
+            candidate->PrimitiveMetadata().size()==complete.PrimitiveMetadata().size() &&
+            std::count(candidate->TriangleRegions().begin(),candidate->TriangleRegions().end(),
+                StaticTriangleRegion::ExteriorDressing)==taggedExterior,
+            "bounded native candidate preserves all vertex bytes, eleven rows and every graveyard triangle");
+        if(candidate)for(std::size_t p=0;p<complete.PrimitiveMetadata().size();++p) {
+            const auto& a=complete.PrimitiveMetadata()[p];const auto& b=candidate->PrimitiveMetadata()[p];
+            std::size_t target=b.indexOffset;
+            for(std::size_t n=a.indexOffset;n<a.indexOffset+a.indexCount;n+=3u) {
+                if(complete.TriangleRegions()[n/3u]==StaticTriangleRegion::TombDressing)continue;
+                for(unsigned i=0;i<3u;++i)Check(complete.Indices()[n+i]==candidate->Indices()[target++],
+                    "actual retained local indices and triangle order remain byte-exact");
+            }
+            Check(target==b.indexOffset+b.indexCount && a.vertexOffset==b.vertexOffset && a.materialIndex==b.materialIndex,
+                "native cached selection only changes selected index spans, never material or vertex identity");
+        }
+        std::cout<<"Cached native selection: turns="<<turns<<" maximumCpuAdvanceMs="<<maximumMs
+                 <<" scannedBytes="<<copy.ScannedBytes()<<"; CPU candidate only, normal eviction remains prohibited\n";
+    }
     const std::array<StaticRtAssetRegistration,3> ranges{{
         {14,101,pbr,0,&owner,nullptr,RtGeometryRole::Static,0,2},
         {15,102,pbr,0,&owner,nullptr,RtGeometryRole::Static,2,3},

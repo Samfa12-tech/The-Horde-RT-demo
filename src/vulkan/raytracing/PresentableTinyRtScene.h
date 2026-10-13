@@ -304,11 +304,15 @@ public:
         double prepareMilliseconds = 0.0;
         double cutoverMilliseconds = 0.0;
         double packMilliseconds = 0.0;
+        double beginMilliseconds = 0.0;
+        double maximumCpuCopyAdvanceMilliseconds = 0.0;
         double maximumAdvanceMilliseconds = 0.0;
         std::uint32_t uploadAdvanceCount = 0;
         std::uint32_t asSubmissionCount = 0, asPollCount = 0, asPendingPollCount = 0;
         std::uint64_t uploadedBytes = 0;
         std::uint32_t cpuCopyAdvanceCount = 0;
+        std::uint32_t cpuRegionScanAdvanceCount = 0;
+        std::uint64_t scannedCpuPayloadBytes = 0;
         std::uint64_t copiedCpuPayloadBytes = 0;
         std::uint64_t oldOwnerAllocationBytes = 0;
         std::uint64_t candidateOwnerAllocationBytes = 0;

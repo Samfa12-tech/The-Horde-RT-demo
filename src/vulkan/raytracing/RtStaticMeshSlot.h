@@ -99,6 +99,7 @@ public:
         return empty;
     }
     const std::vector<std::uint32_t>& Indices() const { return indices_; }
+    const std::vector<horde::scene::assets::StaticTriangleRegion>& TriangleRegions() const { return triangleRegions_; }
     const std::vector<std::array<float, 12u>>& GeometryTransforms() const
     {
         return geometryTransforms_;
@@ -118,6 +119,7 @@ private:
     std::vector<horde::scene::assets::StaticRtVertex> worldBodyVertices_;
     std::vector<horde::scene::assets::StaticRtVertex> viewmodelVertices_;
     std::vector<std::uint32_t> indices_;
+    std::vector<horde::scene::assets::StaticTriangleRegion> triangleRegions_; // CPU only.
     std::vector<std::array<float, 12u>> geometryTransforms_;
     RtTextureArrayCounts textureArrayCounts_{};
     RtStaticMeshMeasurements measurements_{};
@@ -129,21 +131,38 @@ private:
 // throughout the copy. A const shared pointer alone does not enforce this.
 // Each turn copies at most maxBytes of vector payload, in complete records.
 // Reserve/allocator latency is measured separately from the byte guarantee.
+// Optional owner selection then scans at most maxBytes per turn and compacts
+// indices only. Vertex bytes stay exact, including now-unreferenced vertices;
+// this trades some residency saving for bounded CPU work and stable BLAS-local
+// geometry. Labels never certify an omitted triangle's ray/light irrelevance.
 class RtStaticMeshCopy
 {
 public:
-    bool Begin(std::shared_ptr<const RtStaticMeshSlot> source, std::string& diagnostic);
+    bool Begin(std::shared_ptr<const RtStaticMeshSlot> source, std::string& diagnostic,
+        std::uint32_t selectedInstance = UINT32_MAX,
+        std::uint8_t retainedRegions = horde::scene::assets::kAllStaticTriangleRegions);
     bool Advance(std::size_t maxBytes, std::string& diagnostic);
-    bool Ready() const noexcept { return output_ && row_ == 8u; }
+    bool Ready() const noexcept { return output_ && row_ == 9u &&
+        (retainedRegions_ == horde::scene::assets::kAllStaticTriangleRegions || filtered_); }
     std::unique_ptr<RtStaticMeshSlot> Take() noexcept;
     void Cancel() noexcept;
     std::size_t LastCopiedBytes() const noexcept { return lastBytes_; }
     std::uint64_t CopiedBytes() const noexcept { return copiedBytes_; }
+    std::size_t LastScannedBytes() const noexcept { return lastScannedBytes_; }
+    std::uint64_t ScannedBytes() const noexcept { return scannedBytes_; }
 private:
+    bool FilterIndices(std::size_t maxBytes, std::string& diagnostic);
+    struct Boundary { std::uint32_t index, primitive; bool end; };
     std::shared_ptr<const RtStaticMeshSlot> source_;
     std::unique_ptr<RtStaticMeshSlot> output_;
     std::size_t row_ = 0u, offset_ = 0u, lastBytes_ = 0u;
     std::uint64_t copiedBytes_ = 0u;
+    std::vector<Boundary> boundaries_;
+    std::size_t boundary_ = 0u, readIndex_ = 0u, writeIndex_ = 0u, lastScannedBytes_ = 0u;
+    std::uint64_t scannedBytes_ = 0u;
+    std::uint32_t selectedBegin_ = 0u, selectedEnd_ = 0u;
+    std::uint8_t retainedRegions_ = horde::scene::assets::kAllStaticTriangleRegions;
+    bool filtered_ = false;
 };
 
 } // namespace horde::vulkan::raytracing

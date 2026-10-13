@@ -200,12 +200,15 @@ bool PresentableTinyRtScene::BeginStaticGeometryReplacement(
     candidate->retainedTriangleRegions = retainedTriangleRegions;
     candidate->retainedAllFamilies = retainedWorldFamilies.empty();
     staticGeometryReplacementMeasurements_ = {};
-    if (retainedWorldFamilies.empty() && fullStaticGeometrySource_ &&
-        retainedTriangleRegions==horde::scene::assets::kAllStaticTriangleRegions) {
+    if (retainedWorldFamilies.empty() && fullStaticGeometrySource_) {
         candidate->copy = std::make_unique<RtStaticMeshCopy>();
-        if (!candidate->copy->Begin(fullStaticGeometrySource_, diagnostic)) return false;
+        if (!candidate->copy->Begin(fullStaticGeometrySource_, diagnostic,
+                kCollapseInstanceIndex,retainedTriangleRegions)) return false;
         candidate->phase = PreparedStaticGeometry::Phase::Copy;
         preparedStaticGeometry_ = std::move(candidate);
+        staticGeometryReplacementMeasurements_.beginMilliseconds =
+            std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-start).count();
+        staticGeometryReplacementMeasurements_.packMilliseconds = staticGeometryReplacementMeasurements_.beginMilliseconds;
         diagnostic.clear(); return true;
     }
     if (!PackLoadedStaticAssets(candidate->slot, retainedWorldFamilies, diagnostic,retainedTriangleRegions)) return false;
@@ -213,6 +216,7 @@ bool PresentableTinyRtScene::BeginStaticGeometryReplacement(
     staticGeometryReplacementMeasurements_ = {};
     staticGeometryReplacementMeasurements_.packMilliseconds =
         std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-start).count();
+    staticGeometryReplacementMeasurements_.beginMilliseconds = staticGeometryReplacementMeasurements_.packMilliseconds;
     preparedStaticGeometry_ = std::move(candidate);
     diagnostic.clear(); return true;
 }
@@ -313,14 +317,17 @@ bool PresentableTinyRtScene::AdvanceStaticGeometryReplacement(
                 maxCopyBytes, std::numeric_limits<std::size_t>::max())), diagnostic)) return failBuild();
         ++evidence.cpuCopyAdvanceCount;
         evidence.copiedCpuPayloadBytes += candidate->copy->LastCopiedBytes();
+        if(candidate->copy->LastScannedBytes())++evidence.cpuRegionScanAdvanceCount;
+        evidence.scannedCpuPayloadBytes+=candidate->copy->LastScannedBytes();
         if (candidate->copy->Ready()) {
             auto copied = candidate->copy->Take();
             candidate->slot = std::move(*copied);
             candidate->copy.reset();
             if (!BeginPreparedStaticUploads(*candidate, diagnostic)) return failBuild();
         }
-        evidence.packMilliseconds += std::chrono::duration<double,std::milli>(
-            std::chrono::steady_clock::now()-start).count();
+        const auto elapsed=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-start).count();
+        evidence.packMilliseconds += elapsed;
+        evidence.maximumCpuCopyAdvanceMilliseconds=std::max(evidence.maximumCpuCopyAdvanceMilliseconds,elapsed);
         return completedStep();
     }
     if (candidate->phase == PreparedStaticGeometry::Phase::Upload) {

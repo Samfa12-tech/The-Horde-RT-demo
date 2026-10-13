@@ -56,21 +56,72 @@ std::uint64_t RtStaticMeshSlot::PayloadBytes() const noexcept
         viewmodelVertices_.size()*sizeof(viewmodelVertices_.front()) + indices_.size()*sizeof(indices_.front()) +
         materials_.size()*sizeof(materials_.front()) + primitiveMetadata_.size()*sizeof(primitiveMetadata_.front()) +
         primitiveVertexCounts_.size()*sizeof(primitiveVertexCounts_.front()) +
-        geometryTransforms_.size()*sizeof(geometryTransforms_.front()) + sizeof(instanceMetadata_) +
+        geometryTransforms_.size()*sizeof(geometryTransforms_.front()) + triangleRegions_.size() + sizeof(instanceMetadata_) +
         sizeof(textureArrayCounts_) + sizeof(measurements_);
 }
-bool RtStaticMeshCopy::Begin(std::shared_ptr<const RtStaticMeshSlot> source, std::string& diagnostic)
+bool RtStaticMeshCopy::Begin(std::shared_ptr<const RtStaticMeshSlot> source, std::string& diagnostic,
+    std::uint32_t selectedInstance, std::uint8_t retainedRegions)
 {
     if(output_ || !source || !source->admitted_ || source->PrimitiveMetadata().empty() || source->Materials().empty() ||
-        source->Indices().empty()) {
+        source->Indices().empty() || retainedRegions>horde::scene::assets::kAllStaticTriangleRegions ||
+        source->triangleRegions_.size()!=source->indices_.size()/3u) {
         diagnostic="Immutable copy needs an admitted source and no existing candidate."; return false;
     }
     try {
+        std::vector<Boundary> boundaries;
+        std::uint32_t selectedBegin=0u,selectedEnd=0u;
+        if(retainedRegions!=horde::scene::assets::kAllStaticTriangleRegions) {
+            if(selectedInstance>=source->instanceMetadata_.size()) {
+                diagnostic="Cached selection needs an existing immutable instance.";return false;
+            }
+            const auto& owner=source->instanceMetadata_[selectedInstance];
+            if(!owner.primitiveCount || owner.geometryRole!=static_cast<std::uint32_t>(RtGeometryRole::Static) ||
+               (owner.flags&static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr))==0u ||
+               owner.primitiveBase>=source->primitiveMetadata_.size() ||
+               owner.primitiveCount>source->primitiveMetadata_.size()-owner.primitiveBase) {
+                diagnostic="Cached selection requires a complete static primitive owner.";return false;
+            }
+            selectedBegin=source->primitiveMetadata_[owner.primitiveBase].indexOffset;
+            selectedEnd=selectedBegin;
+            for(std::size_t i=owner.primitiveBase;i<owner.primitiveBase+owner.primitiveCount;++i) {
+                const auto& p=source->primitiveMetadata_[i];
+                if(p.indexOffset!=selectedEnd || !p.indexCount || p.indexCount%3u || p.indexOffset%3u ||
+                   p.indexOffset>source->indices_.size() || p.indexCount>source->indices_.size()-p.indexOffset) {
+                    diagnostic="Cached selection needs contiguous owned triangle spans.";return false;
+                }
+                selectedEnd+=p.indexCount;
+            }
+            // Geometry shared by another instance must remain intact. Region
+            // selection is not authority to alter another owner's local BLAS.
+            for(std::size_t i=0;i<source->instanceMetadata_.size();++i) if(i!=selectedInstance) {
+                const auto& other=source->instanceMetadata_[i];
+                if(other.primitiveCount && other.primitiveBase<owner.primitiveBase+owner.primitiveCount &&
+                   owner.primitiveBase<other.primitiveBase+other.primitiveCount) {
+                    diagnostic="Cached selection cannot omit another instance's shared geometry.";return false;
+                }
+            }
+            for(std::size_t i=0;i<source->primitiveMetadata_.size();++i) {
+                const auto& p=source->primitiveMetadata_[i];
+                if(p.indexOffset%3u || p.indexCount%3u || !p.indexCount ||
+                   p.indexOffset>source->indices_.size() || p.indexCount>source->indices_.size()-p.indexOffset) {
+                    diagnostic="Cached selection rejected an invalid admitted index boundary.";return false;
+                }
+                if((i<owner.primitiveBase || i>=owner.primitiveBase+owner.primitiveCount) &&
+                   p.indexOffset<selectedEnd && selectedBegin<p.indexOffset+p.indexCount) {
+                    diagnostic="Cached selection cannot omit another primitive's overlapping indices.";return false;
+                }
+                boundaries.push_back({p.indexOffset,static_cast<std::uint32_t>(i),false});
+                boundaries.push_back({p.indexOffset+p.indexCount,static_cast<std::uint32_t>(i),true});
+            }
+            std::sort(boundaries.begin(),boundaries.end(),[](const auto& a,const auto& b){return a.index<b.index;});
+        }
         auto output=std::make_unique<RtStaticMeshSlot>();
         output->instanceMetadata_=source->instanceMetadata_;
         output->textureArrayCounts_=source->textureArrayCounts_;
         output->measurements_=source->measurements_;
         Cancel(); source_=std::move(source); output_=std::move(output);
+        boundaries_=std::move(boundaries);selectedBegin_=selectedBegin;selectedEnd_=selectedEnd;
+        retainedRegions_=retainedRegions;
     } catch(const std::exception&) {
         diagnostic="Failed to allocate an immutable CPU copy owner."; return false;
     }
@@ -78,7 +129,7 @@ bool RtStaticMeshCopy::Begin(std::shared_ptr<const RtStaticMeshSlot> source, std
 }
 bool RtStaticMeshCopy::Advance(const std::size_t maxBytes, std::string& diagnostic)
 {
-    lastBytes_=0u;
+    lastBytes_=lastScannedBytes_=0u;
     if(!output_ || Ready() || maxBytes==0u) {
         diagnostic="Immutable copy advance needs an active owner and positive byte budget."; return false;
     }
@@ -105,20 +156,65 @@ bool RtStaticMeshCopy::Advance(const std::size_t maxBytes, std::string& diagnost
         case 5: return copy(source_->primitiveMetadata_,output_->primitiveMetadata_);
         case 6: return copy(source_->primitiveVertexCounts_,output_->primitiveVertexCounts_);
         case 7: return copy(source_->geometryTransforms_,output_->geometryTransforms_);
+        case 8: return copy(source_->triangleRegions_,output_->triangleRegions_);
+        case 9: return FilterIndices(maxBytes,diagnostic);
         default: diagnostic="Invalid immutable copy cursor."; return false;
         }
     } catch(const std::exception&) {
         Cancel(); diagnostic="Immutable CPU candidate allocation/copy failed."; return false;
     }
 }
+bool RtStaticMeshCopy::FilterIndices(std::size_t maxBytes,std::string& diagnostic)
+{
+    constexpr auto triangleBytes=3u*sizeof(std::uint32_t)+sizeof(horde::scene::assets::StaticTriangleRegion);
+    if(maxBytes<triangleBytes) {diagnostic="Cached selection budget cannot scan one triangle.";return false;}
+    const auto boundaries=[&] {
+        while(boundary_<boundaries_.size() && boundaries_[boundary_].index==readIndex_) {
+            const auto event=boundaries_[boundary_++];auto& p=output_->primitiveMetadata_[event.primitive];
+            if(event.end)p.indexCount=static_cast<std::uint32_t>(writeIndex_)-p.indexOffset;
+            else p.indexOffset=static_cast<std::uint32_t>(writeIndex_);
+        }
+    };
+    const auto count=std::min(maxBytes/triangleBytes,(source_->indices_.size()-readIndex_)/3u);
+    const auto finish=readIndex_+count*3u;
+    while(readIndex_<finish) {
+        boundaries();
+        const auto region=source_->triangleRegions_[readIndex_/3u];
+        const auto flag=static_cast<std::uint8_t>(region);
+        if(flag>2u) {Cancel();diagnostic="Cached selection rejected corrupt triangle provenance.";return false;}
+        const bool targeted=readIndex_>=selectedBegin_ && readIndex_<selectedEnd_;
+        if(!targeted || flag==0u || (retainedRegions_&flag)!=0u) {
+            for(unsigned i=0;i<3u;++i)output_->indices_[writeIndex_+i]=source_->indices_[readIndex_+i];
+            output_->triangleRegions_[writeIndex_/3u]=region;
+            writeIndex_+=3u;lastBytes_+=triangleBytes;copiedBytes_+=triangleBytes;
+        }
+        readIndex_+=3u;lastScannedBytes_+=triangleBytes;scannedBytes_+=triangleBytes;
+    }
+    boundaries();
+    if(readIndex_==source_->indices_.size()) {
+        if(boundary_!=boundaries_.size() || std::any_of(output_->primitiveMetadata_.begin(),
+            output_->primitiveMetadata_.end(),[](const auto& p){return !p.indexCount;})) {
+            Cancel();diagnostic="Cached selection would empty a required primitive row.";return false;
+        }
+        output_->indices_.resize(writeIndex_);output_->triangleRegions_.resize(writeIndex_/3u);
+        output_->measurements_.indexBytes=writeIndex_*sizeof(std::uint32_t);
+        filtered_=true;
+    }
+    diagnostic.clear();return true;
+}
 std::unique_ptr<RtStaticMeshSlot> RtStaticMeshCopy::Take() noexcept
 {
     if(!Ready()) return {};
     output_->admitted_=true;
-    source_.reset(); row_=offset_=lastBytes_=0u; return std::move(output_);
+    source_.reset(); row_=offset_=lastBytes_=lastScannedBytes_=0u;
+    boundaries_.clear();boundary_=readIndex_=writeIndex_=0u;filtered_=false;
+    retainedRegions_=horde::scene::assets::kAllStaticTriangleRegions;
+    return std::move(output_);
 }
 void RtStaticMeshCopy::Cancel() noexcept
-{ output_.reset(); source_.reset(); row_=offset_=lastBytes_=0u; copiedBytes_=0u; }
+{ output_.reset(); source_.reset(); row_=offset_=lastBytes_=lastScannedBytes_=0u; copiedBytes_=scannedBytes_=0u;
+  boundaries_.clear();boundary_=readIndex_=writeIndex_=0u;selectedBegin_=selectedEnd_=0u;filtered_=false;
+  retainedRegions_=horde::scene::assets::kAllStaticTriangleRegions; }
 
 bool RtStaticMeshSlot::InitializeSelectedGeometry(
     std::span<const StaticRtAssetRegistration> registrations, std::string& diagnostic)
@@ -185,6 +281,7 @@ bool RtStaticMeshSlot::InitializeSelectedGeometry(
     // altered attributes, index widening, or shader/material changes occur.
     for (auto& selection : selections) {
         const auto& source = *selection.source;
+        if(!source.HasValidTriangleProvenance())return reject("invalid source triangle provenance.");
         selection.remap.assign(source.primitives.size(), UINT32_MAX);
         selection.complete = std::all_of(selection.retained.begin(), selection.retained.end(),
             [](bool retained) { return retained; });
@@ -205,7 +302,7 @@ bool RtStaticMeshSlot::InitializeSelectedGeometry(
                 end <= primitive.vertexOffset || (i > 0 &&
                     primitive.vertexOffset <= source.primitives[i - 1].vertexOffset))
                 return reject("primitive has an invalid source-local vertex span.");
-            if (!primitive.indexCount || primitive.indexCount % 3 != 0 ||
+            if (!primitive.indexCount || primitive.indexCount % 3 != 0 || primitive.indexOffset%3u ||
                 primitive.indexOffset > source.indices.size() ||
                 primitive.indexCount > source.indices.size() - primitive.indexOffset)
                 return reject("primitive has an invalid triangle index range.");
@@ -225,6 +322,9 @@ bool RtStaticMeshSlot::InitializeSelectedGeometry(
             selection.payload.vertices.insert(selection.payload.vertices.end(),
                 source.vertices.begin() + primitive.vertexOffset, source.vertices.begin() + end);
             selection.payload.indices.insert(selection.payload.indices.end(), indexBegin, indexEnd);
+            for(std::size_t t=primitive.indexOffset/3u;t<(primitive.indexOffset+primitive.indexCount)/3u;++t)
+                selection.payload.triangleRegions.push_back(t<source.triangleRegions.size()?source.triangleRegions[t]:
+                    horde::scene::assets::StaticTriangleRegion::Shared);
             selection.payload.primitives.push_back(compacted);
         }
     }
@@ -276,6 +376,7 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
     worldBodyVertices_.clear();
     viewmodelVertices_.clear();
     indices_.clear();
+    triangleRegions_.clear();
     geometryTransforms_.clear();
     textureArrayCounts_ = {};
     measurements_ = {};
@@ -439,6 +540,9 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
     for (std::size_t assetIndex = 0u; assetIndex < uniqueAssets.size(); ++assetIndex)
     {
         const auto& asset = *uniqueAssets[assetIndex];
+        if(!asset.HasValidTriangleProvenance()) {
+            diagnostic="RtStaticMeshSlot rejected invalid triangle provenance.";return false;
+        }
         const RtGeometryRole geometryRole = geometryRoles.at(uniqueAssets[assetIndex]);
         std::vector<horde::scene::assets::StaticRtVertex>* roleVertices = &vertices_;
         switch (geometryRole)
@@ -472,6 +576,8 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
         const std::uint32_t primitiveBase = static_cast<std::uint32_t>(primitiveMetadata_.size());
         roleVertices->insert(roleVertices->end(), asset.vertices.begin(), asset.vertices.end());
         indices_.insert(indices_.end(), asset.indices.begin(), asset.indices.end());
+        triangleRegions_.insert(triangleRegions_.end(),asset.triangleRegions.begin(),asset.triangleRegions.end());
+        triangleRegions_.resize(indices_.size()/3u,horde::scene::assets::StaticTriangleRegion::Shared);
         std::array<std::unordered_map<std::int32_t, std::uint32_t>, 4u> textureRoutes;
         std::map<std::int32_t, std::array<bool, 4u>> groupPresence;
         std::map<std::int32_t, std::array<std::uint32_t, 4u>> groupLayers;
@@ -647,6 +753,14 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
             {
                 diagnostic = "RtStaticMeshSlot primitive references an out-of-range node transform.";
                 return false;
+            }
+            if(!primitive.indexCount || primitive.indexCount%3u || primitive.indexOffset%3u ||
+               primitive.indexOffset>asset.indices.size() ||
+               primitive.indexCount>asset.indices.size()-primitive.indexOffset ||
+               std::any_of(asset.indices.begin()+primitive.indexOffset,
+                   asset.indices.begin()+primitive.indexOffset+primitive.indexCount,
+                   [&](auto index){return index>=vertexEnd-primitive.vertexOffset;})) {
+                diagnostic="RtStaticMeshSlot primitive has invalid local triangle indices.";return false;
             }
             primitiveMetadata_.push_back({
                 vertexBase + primitive.vertexOffset,
