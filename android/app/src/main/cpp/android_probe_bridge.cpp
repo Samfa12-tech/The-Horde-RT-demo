@@ -4355,7 +4355,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
         // scene descriptors yet; discard other completed recorded references.
         struct ActorRetirementOwner { SwapchainContext* context; std::uint32_t image; };
         ActorRetirementOwner actorOwner{&context, imageIndex};
-        if (!context.rtScene.PrepareThirdActorVertexLifetime(frameInputs,
+        if (!context.rtScene.PrepareThirdActorResourceLifetime(frameInputs,
                 [](void* user, std::string& error) {
                     auto& owner = *static_cast<ActorRetirementOwner*>(user);
                     auto& ctx = *owner.context;

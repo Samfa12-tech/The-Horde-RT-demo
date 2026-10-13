@@ -1,6 +1,27 @@
 # Horde 1.7 current design index
 
 **Chapter integration remains active and incomplete.** The current
+[Keeper texture lifetime checkpoint](../evidence/2026-10-14-keeper-texture-lifetime/README.md)
+retires the private texture pair after completed Kit adoption and restores the
+exact pair before any Keeper return. Both Windows RT backends measure32 MiB of
+device-local saving, in addition to the existing host-visible vertex saving.
+Static tomb/forest regions and the shared18-layer atlas remain resident;
+**static-region residency saving remains ZERO**. Normal contributor-aware zone
+loading/retirement and optimized sustained throughput remain required.
+
+Both actual Diagnostic round-trip/reset runs pass, and all27 PNGs per backend
+are byte-identical to the preceding candidate. The full galleries were opened.
+Debug/Release affected tests, Android four-ABI/lint/286 fresh Java/package and
+fresh unchanged shader-budget checks pass. APK525e73bbd3c3 is the current
+prepared, uninstalled candidate. Fresh phone allocation/route and owner acceptance
+remain pending. Single Debug texture restoration cycles take113–120ms; these do
+not certify seamless or sustained performance. Ground material balance stays
+open without changing production lighting. Easy Tree/canopy and mist issue28
+remain deferred.
+
+The preceding checkpoint:
+
+**Chapter integration remains active and incomplete.** The current
 [sustained Shipping-shader route evidence](../evidence/2026-10-14-shipping-route-measurement/README.md)
 adds a bounded wall-clock Windows input/measurement route and verified completed
 records on both real RT backends. Both traverse for over106seconds at960x540,

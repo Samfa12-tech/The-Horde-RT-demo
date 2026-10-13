@@ -6355,7 +6355,7 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         // before a binding change can invalidate its references.
         struct ActorRetirementOwner { VulkanSurfaceContext* context; std::uint32_t image; };
         ActorRetirementOwner actorOwner{&ctx, imageIndex};
-        if (!ctx.rtScene.PrepareThirdActorVertexLifetime(frameInputs,
+        if (!ctx.rtScene.PrepareThirdActorResourceLifetime(frameInputs,
                 [](void* user, std::string& error) {
                     auto& owner = *static_cast<ActorRetirementOwner*>(user);
                     auto& context = *owner.context;

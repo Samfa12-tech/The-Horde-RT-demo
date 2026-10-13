@@ -1,0 +1,42 @@
+[
+  {
+    "path": "assets/textures/meshy/lich_placeholder_v01/base-color-2048-rgba8.ktx2",
+    "sha256": "eb1eed6d5990c47fb98c7489a5ba7b5b47b8bbbd41afd73a42457a668b82b168",
+    "bytes": 16777484,
+    "vkFormat": 43,
+    "width": 2048,
+    "height": 2048,
+    "layers": 1,
+    "mipLevels": 1
+  },
+  {
+    "path": "assets/textures/meshy/lich_placeholder_v01/emissive-2048-rgba8.ktx2",
+    "sha256": "aa22c00f6e89d74d93b689e8b3c5e50101031d0595b04451a3ebcf15d559da98",
+    "bytes": 16777484,
+    "vkFormat": 43,
+    "width": 2048,
+    "height": 2048,
+    "layers": 1,
+    "mipLevels": 1
+  },
+  {
+    "path": "assets/textures/meshy/lich_placeholder_v01/base-color-2048-astc6x6.ktx2",
+    "sha256": "dc2cfb44f7929c4d85f3a85b3785296da9db607f04b727d64eafc85b47283e46",
+    "bytes": 1871648,
+    "vkFormat": 166,
+    "width": 2048,
+    "height": 2048,
+    "layers": 1,
+    "mipLevels": 1
+  },
+  {
+    "path": "assets/textures/meshy/lich_placeholder_v01/emissive-2048-astc6x6.ktx2",
+    "sha256": "679e84d1b7797414aeaafe3268ebac756f734e3546e399b94ec5bec69d354f13",
+    "bytes": 1871648,
+    "vkFormat": 166,
+    "width": 2048,
+    "height": 2048,
+    "layers": 1,
+    "mipLevels": 1
+  }
+]

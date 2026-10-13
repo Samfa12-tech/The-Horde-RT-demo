@@ -250,9 +250,144 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
         std::cout << "Keeper vertex lifetime checks: " << (failures?"FAIL":"PASS") << '\n';
         return failures;
     }
+    static int KeeperTextureLifetimeChecks() {
+        int failures=0;std::string error;
+        const auto texture=[](unsigned id) {
+            Scene::TextureArray t{};t.image=Handle<VkImage>(id);t.memory=Handle<VkDeviceMemory>(id);
+            t.view=Handle<VkImageView>(id);t.allocationSize=256;t.mipLevels=1;
+            t.memoryPropertyFlags=VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;return t;
+        };
+        RtSceneFrameInputs frame{};frame.developmentRescueJourney=true;
+        frame.lich.phase=horde::gameplay::LichPhase::Dead;frame.lich.deathAnimationComplete=true;
+        frame.lich.deathDissolveProgress=1;frame.chapterCompanion.grounded=true;frame.chapterCompanion.generation=17;
+        const auto seed=[&](Scene& s) {
+            s.ready_=s.chapterActorReady_=s.genericStaticAssetEnabled_=true;
+            s.thirdActorIsCompanion_=s.thirdActorSubmittedCompanion_=true;s.chapterActorPoseGeneration_=17;
+            s.staticGeometryGeneration_=41;s.pipelineBundle_.descriptorSet=Handle<VkDescriptorSet>(19);
+            s.materialSampler_=Handle<VkSampler>(1);s.staticBaseColor_=texture(10);s.staticEmissive_=texture(11);
+            s.lichBaseColor_=texture(20);s.lichEmissive_=texture(21);
+        };
+        struct Calls {
+            Scene* scene;unsigned proof=0,prepare=0,bind=0,destroy=0;
+            bool proofOk=true,prepareOk=true,partial=false,stale=false,throws=false,unproved=false,pendingThrow=false;
+            std::array<VkImageView,2> bound{};bool ordered=true;
+        };
+        const auto api=[&](Calls& c) {
+            Scene::ThirdActorTextureLifetimeApi a{};a.user=&c;
+            a.retireReferences=[](void* u,std::string&) {
+                auto& c=*static_cast<Calls*>(u);++c.proof;
+                if(c.stale)++c.scene->staticGeometryGeneration_;
+                return c.proofOk;
+            };
+            a.prepareKeeper=+[](void* u,Scene::TextureArray& base,Scene::TextureArray& emission,std::string&) {
+                auto& c=*static_cast<Calls*>(u);++c.prepare;
+                base.image=Handle<VkImage>(30);base.memory=Handle<VkDeviceMemory>(30);base.view=Handle<VkImageView>(30);
+                base.allocationSize=256;base.mipLevels=1;base.memoryPropertyFlags=VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
+                if(!c.partial) {emission=base;emission.image=Handle<VkImage>(31);emission.memory=Handle<VkDeviceMemory>(31);emission.view=Handle<VkImageView>(31);}
+                if(c.unproved || c.pendingThrow) {
+                    c.scene->staticGeometryCompletionUnproved_=c.unproved;
+                    c.scene->keeperTextureUploadRecovery_.staging=Buffer(32);
+                    c.scene->keeperTextureUploadRecovery_.staging.memoryPropertyFlags=VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT;
+                    c.scene->keeperTextureUploadRecovery_.work.command=Handle<VkCommandBuffer>(33);
+                    c.scene->keeperTextureUploadRecovery_.work.fence=Handle<VkFence>(34);
+                    c.scene->keeperTextureUploadRecovery_.work.submitted=true;
+                    c.scene->keeperTextureUploadRecovery_.work.completionUnproved=true;
+                    if(c.pendingThrow)throw std::runtime_error("Exception after submitted texture upload");
+                    return false;
+                }
+                if(c.throws)throw std::runtime_error("Injected texture preparation exception");
+                return c.prepareOk;
+            };
+            a.bindImages=[](void* u,const std::array<VkDescriptorImageInfo,2>& images) noexcept {
+                auto& c=*static_cast<Calls*>(u);++c.bind;
+                c.bound={images[0].imageView,images[1].imageView};
+                c.ordered &= c.proof>0 && images[0].sampler && images[1].sampler &&
+                    images[0].imageLayout==VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL &&
+                    images[1].imageLayout==VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+            };
+            a.destroyImage=[](void* u,Scene::TextureArray& t) noexcept {
+                auto& c=*static_cast<Calls*>(u);++c.destroy;
+                if(t.view==Handle<VkImageView>(20)||t.view==Handle<VkImageView>(21))
+                    c.ordered &= c.bind==1 && c.bound[0]==Handle<VkImageView>(10) && c.bound[1]==Handle<VkImageView>(11);
+                t={};
+            };return a;
+        };
+        {
+            Scene s;seed(s);Calls c{&s};auto a=api(c);const auto before=s.ResourceInventory();
+            failures+=!Check(s.PrepareThirdActorTextureLifetimeWithApi(frame,a,error) && c.ordered &&
+                c.proof==1 && c.prepare==0 && c.bind==1 && c.destroy==2 && s.KeeperTextureLifetime().retired &&
+                !s.lichBaseColor_.image && !s.lichEmissive_.image && s.KeeperTextureLifetime().retiredDeviceLocalBytes==512 &&
+                s.KeeperTextureDescriptors()[0].imageView==Handle<VkImageView>(10) &&
+                s.KeeperTextureDescriptors()[1].imageView==Handle<VkImageView>(11) &&
+                s.ResourceInventory().deviceLocalBytes+512==before.deviceLocalBytes,
+                "completed Kit adoption aliases both descriptors before retiring both exact GPU texture owners");
+            failures+=!Check(s.PrepareThirdActorTextureLifetimeWithApi(frame,a,error) && c.bind==1 && c.destroy==2,
+                "repeat exterior traversal must not retire Keeper textures twice");
+            auto reset=frame;reset.lich.phase=horde::gameplay::LichPhase::Dormant;reset.chapterCompanion.grounded=false;
+            failures+=!Check(s.PrepareThirdActorTextureLifetimeWithApi(reset,a,error) && c.prepare==1 && c.bind==2 &&
+                s.lichBaseColor_.view==Handle<VkImageView>(30) && s.lichEmissive_.view==Handle<VkImageView>(31) &&
+                !s.KeeperTextureLifetime().retired && s.KeeperTextureLifetime().restorationCount==1 &&
+                s.KeeperTextureDescriptors()[0].imageView==Handle<VkImageView>(30) &&
+                s.KeeperTextureDescriptors()[1].imageView==Handle<VkImageView>(31) &&
+                s.ResourceInventory().deviceLocalBytes==before.deviceLocalBytes,
+                "reset restores the complete exact pair before either Keeper texture can be sampled");
+            s.Destroy();
+        }
+        for(unsigned fault=0;fault<9;++fault) {
+            Scene s;seed(s);Calls c{&s};auto a=api(c);
+            if(fault==0)c.proofOk=false;if(fault==1)c.stale=true;
+            if(fault==2)s.thirdActorSubmittedCompanion_=false;
+            if(fault==3)s.thirdActorNeedsBuild_=true;
+            if(fault==4)s.staticEmissive_.view=VK_NULL_HANDLE;
+            if(fault==5)a.retireReferences=nullptr;
+            if(fault==6)a.bindImages=nullptr;
+            if(fault==7)a.destroyImage=nullptr;
+            if(fault==8)s.materialSampler_=VK_NULL_HANDLE;
+            const bool noTransition=fault==2||fault==3;
+            failures+=!Check(s.PrepareThirdActorTextureLifetimeWithApi(frame,a,error)==noTransition &&
+                s.lichBaseColor_.image==Handle<VkImage>(20) && s.lichEmissive_.image==Handle<VkImage>(21) &&
+                c.bind==0 && c.destroy==0,"failed proof, stale generation, unsubmitted BUILD or missing alias cannot retire textures");
+            s.Destroy();
+        }
+        for(unsigned fault=0;fault<3;++fault) {
+            Scene s;seed(s);s.lichBaseColor_={};s.lichEmissive_={};s.keeperTextureLifetime_.retired=true;
+            Calls c{&s};auto a=api(c);c.prepareOk=fault!=0;c.partial=fault==1;c.throws=fault==2;
+            auto reset=frame;reset.chapterCompanion.grounded=false;
+            failures+=!Check(!s.PrepareThirdActorTextureLifetimeWithApi(reset,a,error) && c.bind==0 &&
+                s.KeeperTextureLifetime().retired && !s.lichBaseColor_.image && !s.lichEmissive_.image &&
+                c.destroy==(fault==1?1u:2u),"partial, failed or throwing texture restore keeps both live aliases and cleans only temporary owners");
+            s.Destroy();
+        }
+        for(unsigned fault=0;fault<2;++fault) {
+            Scene s;seed(s);s.lichBaseColor_={};s.lichEmissive_={};s.keeperTextureLifetime_.retired=true;
+            s.keeperTextureDirectory_="exact/keeper/source";Calls c{&s};auto a=api(c);
+            c.unproved=fault==0;c.pendingThrow=fault==1;
+            auto reset=frame;reset.chapterCompanion.grounded=false;
+            failures+=!Check(!s.PrepareThirdActorTextureLifetimeWithApi(reset,a,error) && !s.ready_ &&
+                c.bind==0 && c.destroy==0 && s.keeperTextureRestoreQuarantine_[0].image==Handle<VkImage>(30) &&
+                s.keeperTextureRestoreQuarantine_[1].image==Handle<VkImage>(31) &&
+                s.ResourceInventory().deviceLocalBytes==1024 && s.ResourceInventory().hostVisibleBytes==256,
+                "unproved texture upload retains and counts both images, staging and the owning command/fence");
+            Scene moved(std::move(s));
+            failures+=!Check(moved.keeperTextureRestoreQuarantine_[0].image==Handle<VkImage>(30) &&
+                moved.keeperTextureUploadRecovery_.work.command==Handle<VkCommandBuffer>(33) &&
+                moved.keeperTextureUploadRecovery_.staging.buffer==Handle<VkBuffer>(32) &&
+                moved.KeeperTextureLifetime().retired && moved.keeperTextureDirectory_=="exact/keeper/source" &&
+                !s.keeperTextureRestoreQuarantine_[0].image && !s.keeperTextureUploadRecovery_.work.command &&
+                !s.keeperTextureUploadRecovery_.staging.buffer && !s.KeeperTextureLifetime().retired,
+                "move transfers the quarantine and exact-source identity without duplicating GPU owners");
+            moved.Destroy();
+            failures+=!Check(!moved.keeperTextureRestoreQuarantine_[0].image &&
+                !moved.keeperTextureUploadRecovery_.work.command && !moved.keeperTextureUploadRecovery_.staging.buffer &&
+                !moved.KeeperTextureLifetime().retired && moved.keeperTextureDirectory_.empty(),
+                "idle teardown clears pending texture ownership and retirement evidence");
+        }
+        return failures;
+    }
     static int Run() {
         int failures=0,oldMap=3,newMap=4; std::string error;
         failures+=KeeperVertexLifetimeChecks();
+        failures+=KeeperTextureLifetimeChecks();
         {
             Scene s;Seed(s,oldMap,newMap);Proof p{&s};auto api=Api(p);
             s.developmentWorldRoute_=true;s.worldRouteGeometry_.valid=true;

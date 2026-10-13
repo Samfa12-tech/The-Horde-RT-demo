@@ -524,6 +524,10 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     environmentSampler_ = std::exchange(other.environmentSampler_, VK_NULL_HANDLE);
     lichBaseColor_ = std::exchange(other.lichBaseColor_, TextureArray{});
     lichEmissive_ = std::exchange(other.lichEmissive_, TextureArray{});
+    keeperTextureLifetime_ = std::exchange(other.keeperTextureLifetime_, {});
+    keeperTextureRestoreQuarantine_ = std::exchange(other.keeperTextureRestoreQuarantine_, {});
+    keeperTextureUploadRecovery_ = std::exchange(other.keeperTextureUploadRecovery_, {});
+    keeperTextureDirectory_ = std::exchange(other.keeperTextureDirectory_, {});
     staticBaseColor_ = std::exchange(other.staticBaseColor_, TextureArray{});
     staticNormal_ = std::exchange(other.staticNormal_, TextureArray{});
     staticOrm_ = std::exchange(other.staticOrm_, TextureArray{});
@@ -1098,6 +1102,15 @@ horde::gameplay::simulation::ZoneReadiness PresentableTinyRtScene::WorldZoneRead
 }
 void PresentableTinyRtScene::Destroy()
 {
+    // The platform proves device idle before destroying a scene. Pending upload
+    // commands and staging must outlive every image referenced by that work.
+    if (device_ != VK_NULL_HANDLE)
+        RetireRtGpuWorkAfterIdle({device_, queue_, commandPool_}, keeperTextureUploadRecovery_.work);
+    else keeperTextureUploadRecovery_.work = {};
+    DestroyBuffer(keeperTextureUploadRecovery_.staging);
+    for (auto& texture : keeperTextureRestoreQuarantine_) DestroyTextureArray(texture);
+    keeperTextureLifetime_ = {};
+    keeperTextureDirectory_.clear();
     if (preparedStaticGeometry_ && device_ != VK_NULL_HANDLE)
         DestroyPreparedStaticGeometry(*preparedStaticGeometry_);
     preparedStaticGeometry_.reset();
@@ -1369,10 +1382,10 @@ PresentableTinyRtScene::CaptureResourceHandles() const
         append(result.shaderBindingTableBuffers, resources.shaderBindingTable.buffer);
     }
     append(result.descriptorSets, pipelineBundle_.descriptorSet);
-    for (const TextureArray* texture : std::array<const TextureArray*, 10u>{
+    for (const TextureArray* texture : std::array<const TextureArray*, 12u>{
              &environmentTexture_, &materialDiffuse_, &materialNormal_, &materialArm_,
              &lichBaseColor_, &lichEmissive_, &staticBaseColor_, &staticNormal_,
-             &staticOrm_, &staticEmissive_})
+             &staticOrm_, &staticEmissive_, &keeperTextureRestoreQuarantine_[0], &keeperTextureRestoreQuarantine_[1]})
         append(result.textureImages, texture->image);
     result.outputImage = bits(storageImage_);
     result.outputMemory = bits(storageImageMemory_);
@@ -1392,7 +1405,7 @@ horde::telemetry::RtResourceInventory PresentableTinyRtScene::ResourceInventory(
              &instanceMetadataBuffer_, &primitiveMetadataBuffer_, &materialMetadataBuffer_,
              &skinnedPlayerBlasUpdateScratch_, &viewmodelBlasUpdateScratch_,
              &rescueWorldUpdateScratch_, &waterDropletBlasUpdateScratch_,
-             &tlas_.backing, &tlasUpdateScratch_})
+             &tlas_.backing, &tlasUpdateScratch_, &keeperTextureUploadRecovery_.staging})
     {
         AccumulateRtGpuBuffer(inventory, *buffer);
     }
@@ -1438,10 +1451,10 @@ horde::telemetry::RtResourceInventory PresentableTinyRtScene::ResourceInventory(
     AccumulateRtMemoryAllocation(
         inventory, storageImageMemory_, storageImageAllocationSize_,
         storageImageMemoryPropertyFlags_);
-    for (const TextureArray* texture : std::array<const TextureArray*, 10u>{
+    for (const TextureArray* texture : std::array<const TextureArray*, 12u>{
              &environmentTexture_, &materialDiffuse_, &materialNormal_, &materialArm_, &lichBaseColor_,
              &lichEmissive_, &staticBaseColor_, &staticNormal_, &staticOrm_,
-             &staticEmissive_})
+             &staticEmissive_, &keeperTextureRestoreQuarantine_[0], &keeperTextureRestoreQuarantine_[1]})
     {
         AccumulateRtMemoryAllocation(
             inventory, texture->memory, texture->allocationSize,
@@ -2009,8 +2022,15 @@ bool PresentableTinyRtScene::CreateTexture(const std::string& path,
                                            const std::span<const std::uint32_t> sourceLayers,
                                            const VkImageViewType viewType,
                                            const std::span<const RtTextureLayerAlias> sourceAliases,
-                                           std::span<const std::string> appendedArrayPaths)
+                                           std::span<const std::string> appendedArrayPaths,
+                                           TextureUploadRecovery* recovery,
+                                           RtSceneRecordObservation* observation)
 {
+    if (recovery && (recovery->staging.buffer || recovery->work.command || recovery->work.fence))
+    {
+        diagnostic = "Texture upload recovery still owns unretired GPU work.";
+        return false;
+    }
     if (!sourceAliases.empty() && sourceLayers.empty())
     {
         diagnostic = "Texture aliases require an explicit selected layer layout.";
@@ -2170,7 +2190,7 @@ bool PresentableTinyRtScene::CreateTexture(const std::string& path,
     Buffer staging;
     const VkDeviceSize uploadByteSize = pixels.size();
     if (!CreateBuffer(uploadByteSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, false, staging, diagnostic)) return false;
-    if (!WriteBuffer(staging, pixels.data(), uploadByteSize, "PBR texture staging", diagnostic))
+    if (!WriteBuffer(staging, pixels.data(), uploadByteSize, "PBR texture staging", diagnostic, observation))
     {
         DestroyBuffer(staging);
         return false;
@@ -2252,7 +2272,31 @@ bool PresentableTinyRtScene::CreateTexture(const std::string& path,
         toShader.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
         vkCmdPipelineBarrier(commandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, data->scene->executionPolicy_.shaderPipelineStage, 0u, 0u, nullptr, 0u, nullptr, 1u, &toShader);
     };
-    const bool uploaded = RunOneTimeCommands(recordUpload, &upload, diagnostic);
+    bool uploaded = false;
+    if (recovery)
+    {
+        const RtGpuWorkApi api{device_, queue_, commandPool_};
+        uploaded = SubmitRtGpuWork(api, recovery->work, recordUpload, &upload, diagnostic);
+        if (uploaded)
+        {
+            const VkResult waited = vkWaitForFences(device_, 1u, &recovery->work.fence, VK_TRUE, 2'000'000'000ull);
+            uploaded = waited == VK_SUCCESS &&
+                PollRtGpuWork(api, recovery->work, diagnostic) == RtGpuWorkStatus::Complete;
+            if (!uploaded)
+            {
+                recovery->work.completionUnproved = true;
+                diagnostic = "Keeper texture upload completion is unproved; retaining GPU owners until device idle.";
+            }
+        }
+        if (!uploaded && recovery->work.submitted)
+        {
+            recovery->staging = std::exchange(staging, {});
+            staticGeometryCompletionUnproved_ = true;
+            ready_ = false;
+            return false; // image and staging remain scene-owned, never freed here
+        }
+    }
+    else uploaded = RunOneTimeCommands(recordUpload, &upload, diagnostic);
     DestroyBuffer(staging);
     if (!uploaded) { DestroyTextureArray(texture); return false; }
 
@@ -2411,6 +2455,25 @@ bool PresentableTinyRtScene::CreateEnvironmentTexture(const std::string& product
 
 bool PresentableTinyRtScene::CreateLichTextures(const std::string& directory, std::string& diagnostic)
 {
+    if (!CreateKeeperTexturePair(directory, lichBaseColor_, lichEmissive_, diagnostic)) return false;
+    keeperTextureDirectory_ = directory;
+#if defined(__ANDROID__)
+    materialEncoding_ += " + strict ASTC 6x6 lich";
+#else
+    materialEncoding_ += " + raw RGBA8 KTX2 lich";
+#endif
+    return true;
+}
+
+bool PresentableTinyRtScene::CreateKeeperTexturePair(const std::string& directory,
+    TextureArray& base, TextureArray& emissive, std::string& diagnostic,
+    TextureUploadRecovery* recovery, RtSceneRecordObservation* observation)
+{
+    if (directory.empty() || base.image || base.memory || base.view || emissive.image || emissive.memory || emissive.view)
+    {
+        diagnostic = "Keeper texture preparation requires its exact source directory and empty owners.";
+        return false;
+    }
     const auto path = [&directory](const char* name) { return directory + "/" + name; };
 #if defined(__ANDROID__)
     if (!SupportsTextureArrayFormat(VK_FORMAT_ASTC_6x6_SRGB_BLOCK))
@@ -2420,21 +2483,23 @@ bool PresentableTinyRtScene::CreateLichTextures(const std::string& directory, st
     }
     const std::string basePath = path("base-color-2048-astc6x6.ktx2");
     const std::string emissivePath = path("emissive-2048-astc6x6.ktx2");
-    if (!CreateTexture(basePath, VK_FORMAT_ASTC_6x6_SRGB_BLOCK, 2048u, 2048u, 1u, lichBaseColor_, diagnostic) ||
-        !CreateTexture(emissivePath, VK_FORMAT_ASTC_6x6_SRGB_BLOCK, 2048u, 2048u, 1u, lichEmissive_, diagnostic))
+    if (!CreateTexture(basePath, VK_FORMAT_ASTC_6x6_SRGB_BLOCK, 2048u, 2048u, 1u, base, diagnostic,
+            {}, VK_IMAGE_VIEW_TYPE_2D_ARRAY, {}, {}, recovery, observation) ||
+        !CreateTexture(emissivePath, VK_FORMAT_ASTC_6x6_SRGB_BLOCK, 2048u, 2048u, 1u, emissive, diagnostic,
+            {}, VK_IMAGE_VIEW_TYPE_2D_ARRAY, {}, {}, recovery, observation))
     {
         return false;
     }
-    materialEncoding_ += " + strict ASTC 6x6 lich";
 #else
     const std::string basePath = path("base-color-2048-rgba8.ktx2");
     const std::string emissivePath = path("emissive-2048-rgba8.ktx2");
-    if (!CreateTexture(basePath, VK_FORMAT_R8G8B8A8_SRGB, 2048u, 2048u, 1u, lichBaseColor_, diagnostic) ||
-        !CreateTexture(emissivePath, VK_FORMAT_R8G8B8A8_SRGB, 2048u, 2048u, 1u, lichEmissive_, diagnostic))
+    if (!CreateTexture(basePath, VK_FORMAT_R8G8B8A8_SRGB, 2048u, 2048u, 1u, base, diagnostic,
+            {}, VK_IMAGE_VIEW_TYPE_2D_ARRAY, {}, {}, recovery, observation) ||
+        !CreateTexture(emissivePath, VK_FORMAT_R8G8B8A8_SRGB, 2048u, 2048u, 1u, emissive, diagnostic,
+            {}, VK_IMAGE_VIEW_TYPE_2D_ARRAY, {}, {}, recovery, observation))
     {
         return false;
     }
-    materialEncoding_ += " + raw RGBA8 KTX2 lich";
 #endif
     return true;
 }
@@ -5671,8 +5736,9 @@ bool PresentableTinyRtScene::WriteBundleDescriptors(RtPipelineBundle& bundle,
     const VkDescriptorImageInfo diffuseInfo{materialSampler_, materialDiffuse_.view, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL};
     const VkDescriptorImageInfo normalInfo{materialSampler_, materialNormal_.view, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL};
     const VkDescriptorImageInfo armInfo{materialSampler_, materialArm_.view, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL};
-    const VkDescriptorImageInfo lichBaseInfo{materialSampler_, preview ? staticBaseColor_.view : lichBaseColor_.view, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL};
-    const VkDescriptorImageInfo lichEmissiveInfo{materialSampler_, preview ? staticEmissive_.view : lichEmissive_.view, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL};
+    const auto keeperImages = KeeperTextureDescriptors(preview);
+    const auto& lichBaseInfo = keeperImages[0];
+    const auto& lichEmissiveInfo = keeperImages[1];
     const VkDescriptorImageInfo staticBaseInfo{
         materialSampler_, genericStaticAssetEnabled_ ? staticBaseColor_.view : materialDiffuse_.view,
         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL};
@@ -7747,6 +7813,100 @@ bool PresentableTinyRtScene::WantsChapterCompanion(const RtSceneFrameInputs& fra
         frame.lich.deathDissolveProgress >= 1.0f && frame.chapterCompanion.grounded;
 }
 
+std::array<VkDescriptorImageInfo, 2> PresentableTinyRtScene::KeeperTextureDescriptors(bool preview) const noexcept
+{
+    const bool alias = preview || keeperTextureLifetime_.retired;
+    return {{{materialSampler_, alias ? staticBaseColor_.view : lichBaseColor_.view, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL},
+             {materialSampler_, alias ? staticEmissive_.view : lichEmissive_.view, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL}}};
+}
+
+bool PresentableTinyRtScene::PrepareThirdActorTextureLifetimeWithApi(
+    const RtSceneFrameInputs& frame,const ThirdActorTextureLifetimeApi& api,std::string& diagnostic)
+{
+    if(sceneProfile_!=RtSceneProfile::Showcase || !chapterActorReady_)return true;
+    const bool wantsKit=WantsChapterCompanion(frame);
+    const bool restore=keeperTextureLifetime_.retired && !wantsKit;
+    const bool retire=!keeperTextureLifetime_.retired && wantsKit && thirdActorIsCompanion_ &&
+        thirdActorSubmittedCompanion_ && !thirdActorNeedsBuild_ &&
+        chapterActorPoseGeneration_==frame.chapterCompanion.generation;
+    if(!restore && !retire)return true;
+    const auto valid=[](const TextureArray& t) {
+        return t.image && t.memory && t.view && t.allocationSize && t.mipLevels;
+    };
+    if(!ready_ || staticGeometryCompletionUnproved_ || !api.retireReferences || !api.bindImages ||
+       !api.destroyImage || (restore && !api.prepareKeeper) || !genericStaticAssetEnabled_ ||
+       !pipelineBundle_.descriptorSet || !materialSampler_ || !valid(staticBaseColor_) ||
+       !valid(staticEmissive_) || (retire && (!valid(lichBaseColor_) || !valid(lichEmissive_))) ||
+       (restore && (lichBaseColor_.image || lichBaseColor_.memory || lichBaseColor_.view ||
+                    lichEmissive_.image || lichEmissive_.memory || lichEmissive_.view)) ||
+       keeperTextureRestoreQuarantine_[0].image || keeperTextureRestoreQuarantine_[1].image ||
+       keeperTextureUploadRecovery_.work.command || keeperTextureUploadRecovery_.staging.buffer) {
+        diagnostic="Third actor texture lifetime prerequisites are incomplete.";return false;
+    }
+    const auto generation=staticGeometryGeneration_,actorGeneration=chapterActorPoseGeneration_;
+    const auto descriptor=pipelineBundle_.descriptorSet;
+    const auto sampler=materialSampler_;
+    const auto baseAlias=staticBaseColor_.view,emissiveAlias=staticEmissive_.view;
+    const auto oldBase=lichBaseColor_.image,oldEmission=lichEmissive_.image;
+    const auto unchanged=[&] {
+        return ready_ && !staticGeometryCompletionUnproved_ && chapterActorReady_ &&
+            staticGeometryGeneration_==generation && chapterActorPoseGeneration_==actorGeneration &&
+            pipelineBundle_.descriptorSet==descriptor && materialSampler_==sampler &&
+            staticBaseColor_.view==baseAlias && staticEmissive_.view==emissiveAlias &&
+            lichBaseColor_.image==oldBase && lichEmissive_.image==oldEmission &&
+            WantsChapterCompanion(frame)==wantsKit;
+    };
+    std::array<TextureArray,2> candidate{};
+    const auto reject=[&] {
+        if(staticGeometryCompletionUnproved_ || keeperTextureUploadRecovery_.work.submitted) {
+            // Submitted texture upload references may still be live. The owned
+            // command/fence/staging and both images stay until platform idle.
+            keeperTextureRestoreQuarantine_=std::exchange(candidate,{});
+            staticGeometryCompletionUnproved_=true;
+            ready_=false;
+        } else for(auto& t:candidate)if(t.image || t.memory || t.view)api.destroyImage(api.user,t);
+        return false;
+    };
+    try {
+        if(restore) {
+            if(!api.prepareKeeper(api.user,candidate[0],candidate[1],diagnostic))return reject();
+            if(!valid(candidate[0]) || !valid(candidate[1]) || !unchanged()) {
+                diagnostic="Prepared Keeper texture pair is incomplete or stale.";return reject();
+            }
+        }
+        if(!api.retireReferences(api.user,diagnostic))return reject();
+        if(!unchanged() || (retire && (!thirdActorIsCompanion_ || !thirdActorSubmittedCompanion_ || thirdActorNeedsBuild_))) {
+            diagnostic="Third actor textures became stale during completed-work proof.";return reject();
+        }
+    } catch(...) {
+        diagnostic="Third actor texture preparation or retirement proof threw.";return reject();
+    }
+    const std::array<VkDescriptorImageInfo,2> images{{
+        {sampler,restore?candidate[0].view:baseAlias,VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL},
+        {sampler,restore?candidate[1].view:emissiveAlias,VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL}}};
+    api.bindImages(api.user,images); // all fallible operations precede publication
+    if(restore) {
+        lichBaseColor_=std::exchange(candidate[0],{});lichEmissive_=std::exchange(candidate[1],{});
+        AccumulateRtResourceCount(keeperTextureLifetime_.restorationCount);
+        keeperTextureLifetime_.retired=false;
+        keeperTextureLifetime_.retiredDeviceLocalBytes=keeperTextureLifetime_.retiredHostVisibleBytes=0;
+        keeperTextureLifetime_.baseMemoryFlags=keeperTextureLifetime_.emissiveMemoryFlags=0;
+    } else {
+        AccumulateRtResourceCount(keeperTextureLifetime_.retirementCount);keeperTextureLifetime_.retired=true;
+        keeperTextureLifetime_.baseMemoryFlags=lichBaseColor_.memoryPropertyFlags;
+        keeperTextureLifetime_.emissiveMemoryFlags=lichEmissive_.memoryPropertyFlags;
+        for(auto* t:{&lichBaseColor_,&lichEmissive_}) {
+            if(t->memoryPropertyFlags&VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT)
+                keeperTextureLifetime_.retiredDeviceLocalBytes+=t->allocationSize;
+            if(t->memoryPropertyFlags&VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT)
+                keeperTextureLifetime_.retiredHostVisibleBytes+=t->allocationSize;
+            api.destroyImage(api.user,*t);
+        }
+    }
+    diagnostic.clear();
+    return true;
+}
+
 bool PresentableTinyRtScene::PrepareThirdActorVertexLifetimeWithApi(
     const RtSceneFrameInputs& frame, const ThirdActorVertexLifetimeApi& api, std::string& diagnostic)
 {
@@ -7868,6 +8028,47 @@ bool PresentableTinyRtScene::PrepareThirdActorVertexLifetime(
             static_cast<Owner*>(opaque)->scene->DestroyBuffer(buffer);
         }};
     return PrepareThirdActorVertexLifetimeWithApi(frame, api, diagnostic);
+}
+
+bool PresentableTinyRtScene::PrepareThirdActorResourceLifetime(
+    const RtSceneFrameInputs& frame, bool (*retireReferences)(void*, std::string&),
+    void* user, std::string& diagnostic, RtSceneRecordObservation* observation)
+{
+    if (!PrepareThirdActorVertexLifetime(frame, retireReferences, user, diagnostic, observation)) return false;
+    struct Owner {
+        PresentableTinyRtScene* scene;
+        bool (*proof)(void*, std::string&);
+        void* proofUser;
+        RtSceneRecordObservation* observation;
+    } owner{this, retireReferences, user, observation};
+    const ThirdActorTextureLifetimeApi api{&owner,
+        [](void* opaque, std::string& error) {
+            auto& o = *static_cast<Owner*>(opaque);
+            if (!o.proof) { error = "No completed graphics-work proof supplied."; return false; }
+            return o.proof(o.proofUser, error);
+        },
+        [](void* opaque, TextureArray& base, TextureArray& emission, std::string& error) {
+            auto& o = *static_cast<Owner*>(opaque);
+            return o.scene->CreateKeeperTexturePair(o.scene->keeperTextureDirectory_, base, emission,
+                error, &o.scene->keeperTextureUploadRecovery_, o.observation);
+        },
+        [](void* opaque, const std::array<VkDescriptorImageInfo, 2>& images) noexcept {
+            auto& scene = *static_cast<Owner*>(opaque)->scene;
+            std::array<VkWriteDescriptorSet, 2> writes{};
+            for (std::uint32_t i = 0u; i < writes.size(); ++i) {
+                writes[i].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+                writes[i].dstSet = scene.pipelineBundle_.descriptorSet;
+                writes[i].dstBinding = 8u + i;
+                writes[i].descriptorCount = 1u;
+                writes[i].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+                writes[i].pImageInfo = &images[i];
+            }
+            vkUpdateDescriptorSets(scene.device_, static_cast<std::uint32_t>(writes.size()), writes.data(), 0u, nullptr);
+        },
+        [](void* opaque, TextureArray& texture) noexcept {
+            static_cast<Owner*>(opaque)->scene->DestroyTextureArray(texture);
+        }};
+    return PrepareThirdActorTextureLifetimeWithApi(frame, api, diagnostic);
 }
 
 void PresentableTinyRtScene::NotifyFrameSubmitted() noexcept

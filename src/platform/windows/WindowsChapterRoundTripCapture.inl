@@ -14,8 +14,8 @@ bool RunChapterRoundTripCapture(VulkanSurfaceContext& context,const std::filesys
     }
     std::ofstream rows(directory/"frames.csv"),manifest(directory/"gallery.json");
     if(!rows||!manifest) {error="Two-way evidence files could not open.";return false;}
-    rows<<"frame,phase,station,submitted_tick,simulation_ms,render_cycle_ms,completed_tick,completed_serial,gpu_status,gpu_ns,device_local_bytes,host_visible_bytes,keeper_retired_bytes,keeper_retired_memory_flags\n";
-    manifest<<"{\"schema\":1,\"scope\":\"moving fixed-step validation after staged Keeper death and first ascent; Diagnostic, static scene resident, normal Keeper vertex lifetime active; not owner or Shipping performance acceptance\",\"maximumSimulationTicksPerRender\":4,\"simulationHz\":60,\"captures\":[\n";
+    rows<<"frame,phase,station,submitted_tick,simulation_ms,render_cycle_ms,completed_tick,completed_serial,gpu_status,gpu_ns,device_local_bytes,host_visible_bytes,keeper_retired_bytes,keeper_retired_memory_flags,keeper_texture_retired_device_local_bytes,keeper_texture_retired_host_visible_bytes\n";
+    manifest<<"{\"schema\":1,\"scope\":\"moving fixed-step validation after staged Keeper death and first ascent; Diagnostic, static scene resident, normal Keeper vertex and texture lifetimes active; not owner or Shipping performance acceptance\",\"maximumSimulationTicksPerRender\":4,\"simulationHz\":60,\"captures\":[\n";
     struct Restore {
         VulkanSurfaceContext& ctx;bool paused,active;int sfx,voice,music;
         ~Restore() {ctx.simulationPaused=paused;ctx.sfxVolumePercent=sfx;ctx.voiceVolumePercent=voice;ctx.musicVolumePercent=music;
@@ -102,6 +102,7 @@ bool RunChapterRoundTripCapture(VulkanSurfaceContext& context,const std::filesys
         const auto completed=context.rtFrameEvidence.PublishedStateByValue();
         const auto inventory=context.rtScene.ResourceInventory();
         const auto keeper=context.rtScene.KeeperVertexLifetime();
+        const auto keeperTextures=context.rtScene.KeeperTextureLifetime();
         rows<<frames<<','<<ChapterProbePhaseName(phase)<<','<<station<<','<<context.simulation.Snapshot().tickIndex<<','
             <<std::chrono::duration<double,std::milli>(simulated-before).count()<<','
             <<std::chrono::duration<double,std::milli>(rendered-simulated).count()<<','
@@ -110,7 +111,8 @@ bool RunChapterRoundTripCapture(VulkanSurfaceContext& context,const std::filesys
             <<static_cast<unsigned>(completed.completedEvidence.gpu.status)<<','
             <<(completed.hasCompletedEvidence&&completed.completedEvidence.gpu.hasDuration?completed.completedEvidence.gpu.durationNanoseconds:0)<<','
             <<inventory.deviceLocalBytes<<','<<inventory.hostVisibleBytes<<','
-            <<keeper.retiredAllocationBytes<<','<<keeper.retiredMemoryFlags<<'\n';
+            <<keeper.retiredAllocationBytes<<','<<keeper.retiredMemoryFlags<<','
+            <<keeperTextures.retiredDeviceLocalBytes<<','<<keeperTextures.retiredHostVisibleBytes<<'\n';
         if(frames%120==0)rows.flush();
         const bool transition=phase!=probe.Phase() || station!=probe.Station();
         const bool quadrant=(phase==ChapterProbePhase::Landing || phase==ChapterProbePhase::Lookout ||
@@ -129,8 +131,11 @@ bool RunChapterRoundTripCapture(VulkanSurfaceContext& context,const std::filesys
         error="Two-way capture lacks final progression/equipment witnesses.";return false;
     }
     const auto retired=context.rtScene.KeeperVertexLifetime();
-    if(!retired.retired || retired.retirementCount!=1 || retired.restorationCount!=0) {
-        error="Two-way traversal lacks exactly one completed Keeper vertex retirement.";return false;
+    const auto texturesRetired=context.rtScene.KeeperTextureLifetime();
+    if(!retired.retired || retired.retirementCount!=1 || retired.restorationCount!=0 ||
+       !texturesRetired.retired || texturesRetired.retirementCount!=1 || texturesRetired.restorationCount!=0 ||
+       texturesRetired.retiredDeviceLocalBytes==0) {
+        error="Two-way traversal lacks exactly one completed Keeper vertex/texture retirement.";return false;
     }
     // Exercise ordinary route-reset input after the repeated ascent. The same
     // device/AS/descriptor owners must safely restore Keeper storage.
@@ -144,8 +149,10 @@ bool RunChapterRoundTripCapture(VulkanSurfaceContext& context,const std::filesys
         error="Chapter reset failed current-pose RT restoration: "+context.lastRtFrameError;return false;
     }
     const auto restored=context.rtScene.KeeperVertexLifetime();
+    const auto texturesRestored=context.rtScene.KeeperTextureLifetime();
     const auto& resetState=context.simulation.Snapshot();
     if(restored.retired || restored.retirementCount!=1 || restored.restorationCount!=1 ||
+       texturesRestored.retired || texturesRestored.retirementCount!=1 || texturesRestored.restorationCount!=1 ||
        resetState.lich.phase==horde::gameplay::LichPhase::Dead ||
        resetState.chapterCompanion.grounded || resetState.rescue.claimCount!=0) {
         error="Ordinary reset left stale companion or retired Keeper storage.";return false;
@@ -154,6 +161,10 @@ bool RunChapterRoundTripCapture(VulkanSurfaceContext& context,const std::filesys
         <<"\"keeperVertexLifetime\":{\"retiredAllocationBytes\":"<<retired.retiredAllocationBytes
         <<",\"retiredMemoryFlags\":"<<retired.retiredMemoryFlags
         <<",\"retirements\":"<<restored.retirementCount<<",\"restorations\":"<<restored.restorationCount
+        <<",\"resetRestored\":true},\"keeperTextureLifetime\":{\"retiredDeviceLocalBytes\":"
+        <<texturesRetired.retiredDeviceLocalBytes<<",\"retiredHostVisibleBytes\":"<<texturesRetired.retiredHostVisibleBytes
+        <<",\"baseMemoryFlags\":"<<texturesRetired.baseMemoryFlags<<",\"emissiveMemoryFlags\":"<<texturesRetired.emissiveMemoryFlags
+        <<",\"retirements\":"<<texturesRestored.retirementCount<<",\"restorations\":"<<texturesRestored.restorationCount
         <<",\"resetRestored\":true},\"complete\":true}\n";
     rows.flush();manifest.flush();
     if(!rows||!manifest) {error="Two-way evidence write failed.";return false;}

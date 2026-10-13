@@ -689,6 +689,11 @@ public:
     bool PrepareThirdActorVertexLifetime(const RtSceneFrameInputs& frame,
         bool (*retireReferences)(void*, std::string&), void* user,
         std::string& diagnostic, RtSceneRecordObservation* observation = nullptr);
+    // Includes the private Keeper texture pair. Shared AS and static texture
+    // families remain owned; texture aliases are valid while Kit owns the slot.
+    bool PrepareThirdActorResourceLifetime(const RtSceneFrameInputs& frame,
+        bool (*retireReferences)(void*, std::string&), void* user,
+        std::string& diagnostic, RtSceneRecordObservation* observation = nullptr);
     struct KeeperVertexLifetimeEvidence {
         std::uint32_t retirementCount = 0u, restorationCount = 0u;
         std::uint64_t retiredAllocationBytes = 0u;
@@ -698,6 +703,13 @@ public:
     KeeperVertexLifetimeEvidence KeeperVertexLifetime() const noexcept {
         return keeperVertexLifetime_;
     }
+    struct KeeperTextureLifetimeEvidence {
+        std::uint32_t retirementCount=0,restorationCount=0;
+        std::uint64_t retiredDeviceLocalBytes=0,retiredHostVisibleBytes=0;
+        VkMemoryPropertyFlags baseMemoryFlags=0,emissiveMemoryFlags=0;
+        bool retired=false;
+    };
+    KeeperTextureLifetimeEvidence KeeperTextureLifetime() const noexcept { return keeperTextureLifetime_; }
 
     // Owning render thread only, after successful device-idle/evidence completion.
     // Replaces only the extent-dependent output image; caller must reset and
@@ -728,6 +740,17 @@ private:
 
     using Buffer = RtGpuBuffer;
     using AccelerationStructure = RtAccelerationStructure;
+    struct TextureArray;
+    struct ThirdActorTextureLifetimeApi {
+        void* user=nullptr;
+        bool (*retireReferences)(void*,std::string&)=nullptr;
+        bool (*prepareKeeper)(void*,TextureArray&,TextureArray&,std::string&)=nullptr;
+        void (*bindImages)(void*,const std::array<VkDescriptorImageInfo,2>&) noexcept=nullptr;
+        void (*destroyImage)(void*,TextureArray&) noexcept=nullptr;
+    };
+    bool PrepareThirdActorTextureLifetimeWithApi(const RtSceneFrameInputs&,
+        const ThirdActorTextureLifetimeApi&,std::string&);
+    std::array<VkDescriptorImageInfo, 2> KeeperTextureDescriptors(bool preview = false) const noexcept;
     struct ThirdActorVertexLifetimeApi {
         void* user = nullptr;
         bool (*retireReferences)(void*, std::string&) = nullptr;
@@ -829,6 +852,10 @@ private:
         VkMemoryPropertyFlags memoryPropertyFlags = 0u;
         std::uint32_t mipLevels = 0u;
     };
+    struct TextureUploadRecovery {
+        Buffer staging;
+        RtGpuWorkLease work;
+    };
 
     bool InitialiseWithOrchestration(
         VkInstance instance,
@@ -893,12 +920,17 @@ private:
                        std::span<const std::uint32_t> sourceLayers = {},
                        VkImageViewType viewType = VK_IMAGE_VIEW_TYPE_2D_ARRAY,
                        std::span<const RtTextureLayerAlias> sourceAliases = {},
-                       std::span<const std::string> appendedArrayPaths = {});
+                       std::span<const std::string> appendedArrayPaths = {},
+                       TextureUploadRecovery* recovery = nullptr,
+                       RtSceneRecordObservation* observation = nullptr);
     VkAccelerationStructureGeometryKHR ChapterActorGeometry() const;
     bool SupportsTextureArrayFormat(VkFormat format) const;
     bool CreateMaterialTextures(const std::string& directory, std::string& diagnostic);
     bool CreateEnvironmentTexture(const std::string& productionRoot, std::string& diagnostic);
     bool CreateLichTextures(const std::string& directory, std::string& diagnostic);
+    bool CreateKeeperTexturePair(const std::string& directory, TextureArray& base,
+        TextureArray& emissive, std::string& diagnostic,
+        TextureUploadRecovery* recovery = nullptr, RtSceneRecordObservation* observation = nullptr);
     bool LoadStaticHeldItemAssets(const std::string& developmentDirectory,
                                   const std::string& productionAssetRoot,
                                   std::string& diagnostic);
@@ -1000,6 +1032,10 @@ private:
     VkSampler environmentSampler_ = VK_NULL_HANDLE;
     TextureArray lichBaseColor_;
     TextureArray lichEmissive_;
+    KeeperTextureLifetimeEvidence keeperTextureLifetime_{};
+    std::array<TextureArray,2> keeperTextureRestoreQuarantine_{};
+    TextureUploadRecovery keeperTextureUploadRecovery_{};
+    std::string keeperTextureDirectory_;
     TextureArray staticBaseColor_;
     TextureArray staticNormal_;
     TextureArray staticOrm_;

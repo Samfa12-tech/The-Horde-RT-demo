@@ -1,0 +1,8 @@
+HORDE_PIPELINE_CACHE_CREATE attempted=1 result=0 available=1
+HORDE_CHAPTER_INITIALISE begin checkpoint=chapter-kit-reunion
+HORDE_CHAPTER_INITIALISE scene-ready checkpoint=chapter-kit-reunion
+HORDE_CAPTURE_HOST scene-admitted
+HORDE_CAPTURE_HOST callbacks-attached
+HORDE_SHOWCASE_CAPTURE enter checkpoint=chapter-kit-reunion
+HORDE_SHOWCASE_CAPTURE options-ready
+HORDE_SHOWCASE_CAPTURE directory-result=0

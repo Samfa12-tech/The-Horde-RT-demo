@@ -1,0 +1,5 @@
+Available build presets:
+
+  "windows-x64-debug"   - Build Windows x64 Debug
+  "windows-x64-release" - Build Windows x64 Release
+CMake Error: No such build preset in C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof: "windows-debug"
