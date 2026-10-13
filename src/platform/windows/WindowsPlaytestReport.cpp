@@ -366,8 +366,12 @@ bool CreateControls(HWND window, DialogState& state)
     // This is a user-interface field rather than a document editor. Preserve
     // its IME/language policy, but use Windows' UI script-font associations
     // instead of legacy document-font defaults during automatic font binding.
+    // Keep the selected UI size when binding another script font. RichEdit's
+    // document-oriented Asian/Western size adjustment is unnecessary here;
+    // automatic font fallback and the existing IME policy remain enabled.
     const LRESULT languageOptions = SendMessageW(note, EM_GETLANGOPTIONS, 0, 0);
-    SendMessageW(note, EM_SETLANGOPTIONS, 0, languageOptions | IMF_UIFONTS);
+    SendMessageW(note, EM_SETLANGOPTIONS, 0,
+        (languageOptions | IMF_UIFONTS) & ~IMF_AUTOFONTSIZEADJUST);
     AddControl(window, L"BUTTON", L"I consent to export this report as a local JSON file", BS_AUTOCHECKBOX | WS_TABSTOP,
                kConsent);
     AddControl(window, L"BUTTON", L"Include basic device and RT context (optional)", BS_AUTOCHECKBOX | WS_TABSTOP,

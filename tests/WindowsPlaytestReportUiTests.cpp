@@ -254,6 +254,8 @@ void Defaults(HWND form, const bool hasContext)
         "report note must not activate automatic links");
     Check((Send(GetDlgItem(form, 106), EM_GETLANGOPTIONS) & IMF_UIFONTS) != 0,
         "report note must bind script fallback to Windows user-interface fonts");
+    Check((Send(GetDlgItem(form, 106), EM_GETLANGOPTIONS) & IMF_AUTOFONTSIZEADJUST) == 0,
+        "plain report note must retain its chosen UI size across script-font binding");
     Check(GetDlgItem(form, 102) != GetDlgItem(form, IDCANCEL), "category and Close IDs collide");
 }
 } // namespace
@@ -342,6 +344,10 @@ int main(int argc, char** argv)
         Send(GetDlgItem(form, 102), CB_SETCURSEL, 1);
         Send(GetDlgItem(form, 104), CB_SETCURSEL, 2);
         SetNote(form, L"Explicit context test", "explicit-context note edit");
+        const HWND note = GetDlgItem(form, 106);
+        Send(note, EM_SETSEL, static_cast<WPARAM>(-1), static_cast<LPARAM>(-1));
+        SetPhase("explicit-context native Unicode insertion");
+        Send(note, EM_REPLACESEL, FALSE, reinterpret_cast<LPARAM>(L" \u0915 \u03a9"));
         Send(GetDlgItem(form, 107), BM_SETCHECK, BST_CHECKED);
         Send(GetDlgItem(form, 108), BM_SETCHECK, BST_CHECKED);
         ClickExport(form);
@@ -361,6 +367,9 @@ int main(int argc, char** argv)
     Check(approved.size() == 1 && approved[0].find("\"rtPresented\":false") != std::string::npos &&
         approved[0].find("\"context\"") != std::string::npos,
         "explicit allowlist context or honest false presentation state missing");
+    Check(approved.size() == 1 &&
+        approved[0].find("Explicit context test \xe0\xa4\x95 \xce\xa9") != std::string::npos,
+        "native insertion changed the Unicode report note");
     DestroyWindow(owner);
     if (entryTrace) UnhookWindowsHookEx(entryTrace);
     if (returnTrace) UnhookWindowsHookEx(returnTrace);

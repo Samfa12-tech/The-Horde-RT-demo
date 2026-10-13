@@ -1,0 +1,1230 @@
+Shared simulation host (MSVC)	UNKNOWN STEP	﻿2026-10-13T21:09:29.4446305Z Current runner version: '2.337.0'
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:29.4468505Z ##[group]Runner Image Provisioner
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:29.4469282Z Hosted Compute Agent
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:29.4469774Z Version: 20260901.588
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:29.4470287Z Commit: f88ec8081b781fac6c440065ac7ff9e710ce3d0b
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:29.4470915Z Build Date: 2026-09-01T19:56:44Z
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:29.4471506Z Worker ID: {91b2795f-24d1-4579-8f15-28735d3b44f5}
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:29.4472109Z Azure Region: westus3
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:29.4472581Z ##[endgroup]
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:29.4473642Z ##[group]Operating System
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:29.4474206Z Microsoft Windows Server 2025
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:29.4474712Z 10.0.26100
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:29.4475151Z Datacenter
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:29.4475554Z ##[endgroup]
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:29.4475941Z ##[group]Runner Image
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:29.4476424Z Image: windows-2025-vs2026
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:29.4476890Z Version: 20260925.250.1
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:29.4478111Z Included Software: https://github.com/actions/runner-images/blob/win25-vs2026/20260925.250/images/windows/Windows2025-VS2026-Readme.md
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:29.4479335Z Image Release: https://github.com/actions/runner-images/releases/tag/win25-vs2026%2F20260925.250
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:29.4480099Z ##[endgroup]
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:29.4480930Z ##[group]GITHUB_TOKEN Permissions
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:29.4482657Z Contents: read
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:29.4483109Z Metadata: read
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:29.4483540Z ##[endgroup]
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:29.4485676Z Secret source: Actions
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:29.4486503Z Cache mode: write
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:29.4487131Z Prepare workflow directory
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:29.4808391Z Prepare all required actions
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:29.4848883Z Getting action download info
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:29.7830045Z Download action repository 'actions/checkout@v6' (SHA:d23441a48e516b6c34aea4fa41551a30e30af803)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:30.2888105Z Complete job name: Shared simulation host (MSVC)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:30.4694350Z ##[group]Run actions/checkout@v6
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:30.4695236Z with:
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:30.4695611Z   repository: Samfa12-tech/The-Horde-RT-demo
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:30.4699001Z   token: ***
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:30.4699317Z   ssh-strict: true
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:30.4699629Z   ssh-user: git
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:30.4699941Z   persist-credentials: true
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:30.4700288Z   clean: true
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:30.4700599Z   sparse-checkout-cone-mode: true
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:30.4700970Z   fetch-depth: 1
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:30.4701273Z   fetch-tags: false
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:30.4701583Z   show-progress: true
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:30.4701896Z   lfs: false
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:30.4702174Z   submodules: false
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:30.4702484Z   set-safe-directory: true
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:30.4702838Z   allow-unsafe-pr-checkout: false
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:30.4703363Z ##[endgroup]
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:30.5871912Z Syncing repository: Samfa12-tech/The-Horde-RT-demo
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:30.5873346Z ##[group]Getting Git version info
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:30.5873880Z Working directory is 'D:\a\The-Horde-RT-demo\The-Horde-RT-demo'
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:30.6627048Z [command]"C:\Program Files\Git\bin\git.exe" version
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:31.1678949Z git version 2.55.0.windows.5
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:31.1736577Z ##[endgroup]
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:31.1754827Z Temporarily overriding HOME='D:\a\_temp\1e0b9b20-48ef-4806-ad2b-5e7d7f984d65' before making global git config changes
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:31.1756253Z Adding repository directory to the temporary git global config as a safe directory
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:31.1763472Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\The-Horde-RT-demo\The-Horde-RT-demo
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:31.2476418Z Deleting the contents of 'D:\a\The-Horde-RT-demo\The-Horde-RT-demo'
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:31.2481243Z ##[group]Determining repository object format
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:31.2483405Z ##[endgroup]
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:31.2484546Z ##[group]Initializing the repository
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:31.2490839Z [command]"C:\Program Files\Git\bin\git.exe" init D:\a\The-Horde-RT-demo\The-Horde-RT-demo
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:31.3263704Z Initialized empty Git repository in D:/a/The-Horde-RT-demo/The-Horde-RT-demo/.git/
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:31.3304926Z [command]"C:\Program Files\Git\bin\git.exe" remote add origin https://github.com/Samfa12-tech/The-Horde-RT-demo
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:31.4071791Z ##[endgroup]
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:31.4073246Z ##[group]Disabling automatic garbage collection
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:31.4078624Z [command]"C:\Program Files\Git\bin\git.exe" config --local gc.auto 0
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:31.4304836Z ##[endgroup]
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:31.4306409Z ##[group]Setting up auth
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:31.4307512Z Removing SSH command configuration
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:31.4314714Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:31.4547982Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:33.4420335Z Removing HTTP extra header
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:33.4428762Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:33.4660886Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:33.8851939Z Removing includeIf entries pointing to credentials config files
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:33.8861908Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:33.9097777Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:34.3452209Z [command]"C:\Program Files\Git\bin\git.exe" config --file D:\a\_temp\git-credentials-257d1bec-b6b2-40d2-bf64-4f657286be53.config http.https://github.com/.extraheader "AUTHORIZATION: basic ***"
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:34.3685241Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:D:/a/The-Horde-RT-demo/The-Horde-RT-demo/.git.path D:\a\_temp\git-credentials-257d1bec-b6b2-40d2-bf64-4f657286be53.config
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:34.3931054Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:D:/a/The-Horde-RT-demo/The-Horde-RT-demo/.git/worktrees/*.path D:\a\_temp\git-credentials-257d1bec-b6b2-40d2-bf64-4f657286be53.config
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:34.5823167Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-257d1bec-b6b2-40d2-bf64-4f657286be53.config
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:34.6073732Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-257d1bec-b6b2-40d2-bf64-4f657286be53.config
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:34.6323141Z ##[endgroup]
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:34.6323781Z ##[group]Fetching the repository
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:34.6334991Z [command]"C:\Program Files\Git\bin\git.exe" -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +f005a4ecd4f3c45ed91d2ab908372b9c48e191cd:refs/remotes/origin/codex/horde-1.7-wp2-vertical-proof
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:38.3508628Z From https://github.com/Samfa12-tech/The-Horde-RT-demo
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:38.3510292Z  * [new ref]         f005a4ecd4f3c45ed91d2ab908372b9c48e191cd -> origin/codex/horde-1.7-wp2-vertical-proof
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:38.3561120Z [command]"C:\Program Files\Git\bin\git.exe" branch --list --remote origin/codex/horde-1.7-wp2-vertical-proof
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:38.5642275Z   origin/codex/horde-1.7-wp2-vertical-proof
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:38.5686775Z [command]"C:\Program Files\Git\bin\git.exe" rev-parse refs/remotes/origin/codex/horde-1.7-wp2-vertical-proof
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:38.6536261Z f005a4ecd4f3c45ed91d2ab908372b9c48e191cd
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:38.6563760Z ##[endgroup]
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:38.6564133Z ##[group]Determining the checkout info
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:38.6565774Z ##[endgroup]
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:38.6573345Z [command]"C:\Program Files\Git\bin\git.exe" sparse-checkout disable
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:38.7713875Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset-all extensions.worktreeConfig
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:38.7958347Z ##[group]Checking out the ref
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:38.7967634Z [command]"C:\Program Files\Git\bin\git.exe" checkout --progress --force -B codex/horde-1.7-wp2-vertical-proof refs/remotes/origin/codex/horde-1.7-wp2-vertical-proof
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:41.7684703Z Updating files:   0% (63/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:41.8184370Z Updating files:   1% (102/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:41.8738977Z Updating files:   2% (204/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:41.9138498Z Updating files:   3% (305/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:41.9201162Z Updating files:   3% (389/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:41.9942507Z Updating files:   4% (407/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:42.0399743Z Updating files:   5% (508/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:42.0798817Z Updating files:   6% (610/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:42.1136912Z Updating files:   7% (711/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:42.2123120Z Updating files:   8% (813/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:42.4243443Z Updating files:   9% (914/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:42.4470150Z Updating files:  10% (1016/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:42.4921719Z Updating files:  11% (1117/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:42.5223066Z Updating files:  12% (1219/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:42.5510866Z Updating files:  13% (1320/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:42.5759098Z Updating files:  14% (1422/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:42.6047978Z Updating files:  15% (1523/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:42.6304231Z Updating files:  16% (1625/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:42.6545939Z Updating files:  17% (1726/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:42.6797008Z Updating files:  18% (1828/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:42.7222268Z Updating files:  19% (1929/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:42.7569967Z Updating files:  20% (2031/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:42.7838440Z Updating files:  21% (2132/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:42.8173505Z Updating files:  22% (2234/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:42.8450093Z Updating files:  23% (2335/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:42.8729729Z Updating files:  24% (2437/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:42.9012557Z Updating files:  25% (2538/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:42.9255406Z Updating files:  26% (2640/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:42.9300901Z Updating files:  26% (2723/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:42.9554176Z Updating files:  27% (2741/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:42.9827413Z Updating files:  28% (2843/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:43.0073548Z Updating files:  29% (2944/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:43.0333143Z Updating files:  30% (3046/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:43.0623527Z Updating files:  31% (3147/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:43.0851549Z Updating files:  32% (3249/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:43.1035447Z Updating files:  33% (3350/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:43.1216522Z Updating files:  34% (3452/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:43.1507209Z Updating files:  35% (3553/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:43.1775284Z Updating files:  36% (3655/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:43.2057911Z Updating files:  37% (3756/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:43.2294842Z Updating files:  38% (3858/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:43.2555395Z Updating files:  39% (3959/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:43.2835696Z Updating files:  40% (4061/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:43.3097460Z Updating files:  41% (4162/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:43.3331047Z Updating files:  42% (4264/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:43.3597962Z Updating files:  43% (4365/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:43.3899719Z Updating files:  44% (4467/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:43.4223973Z Updating files:  45% (4568/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:43.4511642Z Updating files:  46% (4670/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:43.4787942Z Updating files:  47% (4771/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:43.5039399Z Updating files:  48% (4873/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:43.5277747Z Updating files:  49% (4974/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:43.5591006Z Updating files:  50% (5076/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:43.5912811Z Updating files:  51% (5178/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:43.6167972Z Updating files:  52% (5279/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:43.6410290Z Updating files:  53% (5381/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:44.0371205Z Updating files:  54% (5482/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:44.1661813Z Updating files:  54% (5513/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:44.1880595Z Updating files:  55% (5584/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:44.2138692Z Updating files:  56% (5685/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:44.2976364Z Updating files:  57% (5787/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:44.3193851Z Updating files:  58% (5888/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:44.3404008Z Updating files:  59% (5990/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:44.3681974Z Updating files:  60% (6091/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:44.3913260Z Updating files:  61% (6193/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:44.4117500Z Updating files:  62% (6294/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:44.4412642Z Updating files:  63% (6396/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:44.5144832Z Updating files:  64% (6497/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:44.5980905Z Updating files:  65% (6599/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:44.6157063Z Updating files:  66% (6700/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:44.6327571Z Updating files:  67% (6802/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:44.6536182Z Updating files:  68% (6903/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:44.6771795Z Updating files:  69% (7005/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:44.6983085Z Updating files:  70% (7106/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:44.7173944Z Updating files:  71% (7208/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:44.7361701Z Updating files:  72% (7309/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:44.7605332Z Updating files:  73% (7411/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:44.7889088Z Updating files:  74% (7512/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:44.8172303Z Updating files:  75% (7614/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:44.8458892Z Updating files:  76% (7715/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:44.8848550Z Updating files:  77% (7817/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:44.9109217Z Updating files:  78% (7918/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:44.9299736Z Updating files:  79% (8020/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:44.9354915Z Updating files:  79% (8098/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:44.9600338Z Updating files:  80% (8121/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:44.9849241Z Updating files:  81% (8223/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:45.2653341Z Updating files:  82% (8324/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:45.2942258Z Updating files:  83% (8426/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:45.3221026Z Updating files:  84% (8527/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:45.4340744Z Updating files:  85% (8629/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:45.4741645Z Updating files:  86% (8730/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:45.4998226Z Updating files:  87% (8832/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:45.5345215Z Updating files:  88% (8933/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:45.5788765Z Updating files:  89% (9035/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:45.6569766Z Updating files:  90% (9136/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:45.7019593Z Updating files:  91% (9238/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:45.7306715Z Updating files:  92% (9339/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:45.7584357Z Updating files:  93% (9441/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:45.7861145Z Updating files:  94% (9542/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:45.8497173Z Updating files:  95% (9644/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:45.9244135Z Updating files:  96% (9745/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:45.9316234Z Updating files:  97% (9847/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:45.9525169Z Updating files:  97% (9873/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:45.9796555Z Updating files:  98% (9948/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:46.0017571Z Updating files:  99% (10050/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:46.0017911Z Updating files: 100% (10151/10151)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:46.0018220Z Updating files: 100% (10151/10151), done.
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:46.0243480Z Switched to a new branch 'codex/horde-1.7-wp2-vertical-proof'
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:46.0309593Z branch 'codex/horde-1.7-wp2-vertical-proof' set up to track 'origin/codex/horde-1.7-wp2-vertical-proof'.
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:46.7509684Z ##[endgroup]
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:46.7940715Z [command]"C:\Program Files\Git\bin\git.exe" log -1 --format=%H
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:46.8610611Z f005a4ecd4f3c45ed91d2ab908372b9c48e191cd
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:46.8966440Z ##[group]Run git -c lfs.fetchexclude= lfs fetch --include="assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb,assets/models/player/runtime/*.glb,assets/models/player/viewmodel/runtime/*.glb,assets/models/props/runtime/*.glb,assets/models/props/runtime/*/*.glb,assets/models/weapons/runtime/*.glb,tests/fixtures/*/*.glb,assets/source/development-rescue*/*.glb,assets/audio/music/what-the-dark-keeps/runtime/*.wav,assets/audio/pixabay/keeper_i_sense_you.wav,assets/audio/pixabay/keeper_come_closer.wav,assets/audio/pixabay/skeleton_idle_rattle.wav,assets/audio/pixabay/skeleton_falling_bones.wav,assets/audio/pixabay/waterfall_core_loop.wav,assets/textures/environment/runtime/night-storm.android.ktx2,assets/textures/environment/runtime/night-storm.windows.ktx2,assets/models/world/runtime/collapsed-entry/*.runtime.glb,assets/models/world/runtime/chapter-entry-return-v1/*.runtime.glb,assets/models/world/runtime/chapter-terrain-v1/*.runtime.glb,assets/models/world/runtime/grave-markers-r03/*.glb,assets/textures/props/runtime/chapter-terrain/*.ktx2,assets/models/world/runtime/forest-tree-pair-v1/*.glb,assets/models/world/runtime/forest-understory-v1/*.glb,assets/models/world/runtime/forest-rocks-v1/*.glb,assets/models/world/runtime/forest-deadwood-v1/*.glb,assets/models/world/runtime/bellwether-shell-v4/*.glb,assets/models/world/source/forest-tree-pair-v1/**,assets/textures/props/source/forest-tree-pair-v1/**,assets/models/characters/source/kit-warden-v1/*.glb,assets/models/characters/runtime/kit-warden-v1/*.glb,assets/textures/characters/runtime/kit-warden-v1/*.ktx2,assets/textures/props/runtime/*.android.ktx2,assets/textures/props/runtime/*.windows.ktx2,assets/textures/props/source/chapter-terrain-maps-r03/*.ktx2,assets/models/world/runtime/prepared-funerary-v01/**/*.glb,assets/models/world/runtime/tomb-dressing-v01/tomb-niche-*/*.glb,assets/source/beyond_the_tomb/funerary/t02-skeletal-source-v1/meshes/*.glb,assets/source/beyond_the_tomb/funerary/t03-v01/models/*.glb,assets/audio/pixabay/water_wet_step*.wav,assets/audio/pixabay/water_stream_contact*.wav,assets/audio/pixabay/keeper_death*.wav,assets/audio/kit/runtime/*.wav" && git lfs checkout "assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb" "assets/models/player/runtime/*.glb" "assets/models/player/viewmodel/runtime/*.glb" "assets/models/props/runtime/*.glb" "assets/models/props/runtime/*/*.glb" "assets/models/weapons/runtime/*.glb" "assets/models/world/runtime/collapsed-entry/*.runtime.glb" "assets/models/world/runtime/chapter-entry-return-v1/*.runtime.glb" "assets/models/world/runtime/chapter-terrain-v1/*.runtime.glb" "assets/models/world/runtime/grave-markers-r03/*.glb" "assets/textures/props/source/chapter-terrain-maps-r03/*.ktx2" "assets/textures/props/runtime/chapter-terrain/*.ktx2" "assets/models/world/runtime/forest-tree-pair-v1/*.glb" "assets/models/world/runtime/forest-understory-v1/*.glb" "assets/models/world/runtime/forest-rocks-v1/*.glb" "assets/models/world/runtime/forest-deadwood-v1/*.glb" "assets/models/world/runtime/bellwether-shell-v4/*.glb" "assets/models/world/source/forest-tree-pair-v1/**" "assets/textures/props/source/forest-tree-pair-v1/**" "assets/models/characters/source/kit-warden-v1/*.glb" "assets/models/characters/runtime/kit-warden-v1/*.glb" "assets/textures/characters/runtime/kit-warden-v1/*.ktx2" "assets/models/world/runtime/prepared-funerary-v01/**/*.glb" "assets/models/world/runtime/tomb-dressing-v01/tomb-niche-*/*.glb" "assets/source/beyond_the_tomb/funerary/t02-skeletal-source-v1/meshes/*.glb" "assets/source/beyond_the_tomb/funerary/t03-v01/models/*.glb" "assets/audio/pixabay/water_wet_step*.wav" "assets/audio/pixabay/water_stream_contact*.wav" "assets/audio/pixabay/keeper_death*.wav" "assets/audio/kit/runtime/*.wav" "assets/textures/props/runtime/*.android.ktx2" "assets/textures/props/runtime/*.windows.ktx2" "tests/fixtures/*/*.glb" "assets/source/development-rescue*/*.glb" "assets/audio/music/what-the-dark-keeps/runtime/*.wav" "assets/audio/pixabay/keeper_i_sense_you.wav" "assets/audio/pixabay/keeper_come_closer.wav" "assets/audio/pixabay/skeleton_idle_rattle.wav" "assets/audio/pixabay/skeleton_falling_bones.wav" "assets/audio/pixabay/waterfall_core_loop.wav" "assets/textures/environment/runtime/night-storm.android.ktx2" "assets/textures/environment/runtime/night-storm.windows.ktx2"
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:46.8990962Z ^[[36;1mgit -c lfs.fetchexclude= lfs fetch --include="assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb,assets/models/player/runtime/*.glb,assets/models/player/viewmodel/runtime/*.glb,assets/models/props/runtime/*.glb,assets/models/props/runtime/*/*.glb,assets/models/weapons/runtime/*.glb,tests/fixtures/*/*.glb,assets/source/development-rescue*/*.glb,assets/audio/music/what-the-dark-keeps/runtime/*.wav,assets/audio/pixabay/keeper_i_sense_you.wav,assets/audio/pixabay/keeper_come_closer.wav,assets/audio/pixabay/skeleton_idle_rattle.wav,assets/audio/pixabay/skeleton_falling_bones.wav,assets/audio/pixabay/waterfall_core_loop.wav,assets/textures/environment/runtime/night-storm.android.ktx2,assets/textures/environment/runtime/night-storm.windows.ktx2,assets/models/world/runtime/collapsed-entry/*.runtime.glb,assets/models/world/runtime/chapter-entry-return-v1/*.runtime.glb,assets/models/world/runtime/chapter-terrain-v1/*.runtime.glb,assets/models/world/runtime/grave-markers-r03/*.glb,assets/textures/props/runtime/chapter-terrain/*.ktx2,assets/models/world/runtime/forest-tree-pair-v1/*.glb,assets/models/world/runtime/forest-understory-v1/*.glb,assets/models/world/runtime/forest-rocks-v1/*.glb,assets/models/world/runtime/forest-deadwood-v1/*.glb,assets/models/world/runtime/bellwether-shell-v4/*.glb,assets/models/world/source/forest-tree-pair-v1/**,assets/textures/props/source/forest-tree-pair-v1/**,assets/models/characters/source/kit-warden-v1/*.glb,assets/models/characters/runtime/kit-warden-v1/*.glb,assets/textures/characters/runtime/kit-warden-v1/*.ktx2,assets/textures/props/runtime/*.android.ktx2,assets/textures/props/runtime/*.windows.ktx2,assets/textures/props/source/chapter-terrain-maps-r03/*.ktx2,assets/models/world/runtime/prepared-funerary-v01/**/*.glb,assets/models/world/runtime/tomb-dressing-v01/tomb-niche-*/*.glb,assets/source/beyond_the_tomb/funerary/t02-skeletal-source-v1/meshes/*.glb,assets/source/beyond_the_tomb/funerary/t03-v01/models/*.glb,assets/audio/pixabay/water_wet_step*.wav,assets/audio/pixabay/water_stream_contact*.wav,assets/audio/pixabay/keeper_death*.wav,assets/audio/kit/runtime/*.wav" && git lfs checkout "assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb" "assets/models/player/runtime/*.glb" "assets/models/player/viewmodel/runtime/*.glb" "assets/models/props/runtime/*.glb" "assets/models/props/runtime/*/*.glb" "assets/models/weapons/runtime/*.glb" "assets/models/world/runtime/collapsed-entry/*.runtime.glb" "assets/models/world/runtime/chapter-entry-return-v1/*.runtime.glb" "assets/models/world/runtime/chapter-terrain-v1/*.runtime.glb" "assets/models/world/runtime/grave-markers-r03/*.glb" "assets/textures/props/source/chapter-terrain-maps-r03/*.ktx2" "assets/textures/props/runtime/chapter-terrain/*.ktx2" "assets/models/world/runtime/forest-tree-pair-v1/*.glb" "assets/models/world/runtime/forest-understory-v1/*.glb" "assets/models/world/runtime/forest-rocks-v1/*.glb" "assets/models/world/runtime/forest-deadwood-v1/*.glb" "assets/models/world/runtime/bellwether-shell-v4/*.glb" "assets/models/world/source/forest-tree-pair-v1/**" "assets/textures/props/source/forest-tree-pair-v1/**" "assets/models/characters/source/kit-warden-v1/*.glb" "assets/models/characters/runtime/kit-warden-v1/*.glb" "assets/textures/characters/runtime/kit-warden-v1/*.ktx2" "assets/models/world/runtime/prepared-funerary-v01/**/*.glb" "assets/models/world/runtime/tomb-dressing-v01/tomb-niche-*/*.glb" "assets/source/beyond_the_tomb/funerary/t02-skeletal-source-v1/meshes/*.glb" "assets/source/beyond_the_tomb/funerary/t03-v01/models/*.glb" "assets/audio/pixabay/water_wet_step*.wav" "assets/audio/pixabay/water_stream_contact*.wav" "assets/audio/pixabay/keeper_death*.wav" "assets/audio/kit/runtime/*.wav" "assets/textures/props/runtime/*.android.ktx2" "assets/textures/props/runtime/*.windows.ktx2" "tests/fixtures/*/*.glb" "assets/source/development-rescue*/*.glb" "assets/audio/music/what-the-dark-keeps/runtime/*.wav" "assets/audio/pixabay/keeper_i_sense_you.wav" "assets/audio/pixabay/keeper_come_closer.wav" "assets/audio/pixabay/skeleton_idle_rattle.wav" "assets/audio/pixabay/skeleton_falling_bones.wav" "assets/audio/pixabay/waterfall_core_loop.wav" "assets/textures/environment/runtime/night-storm.android.ktx2" "assets/textures/environment/runtime/night-storm.windows.ktx2"^[[0m
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:47.0289891Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:47.0290191Z ##[endgroup]
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:09:47.5084964Z Fetching reference refs/heads/codex/horde-1.7-wp2-vertical-proof
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:03.1699333Z Checking out LFS objects: 100% (202/202), 542 MB | 0 B/s, done.
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:04.1474283Z ##[group]Run ./tools/restore-report-webview2.ps1
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:04.1474651Z ^[[36;1m./tools/restore-report-webview2.ps1^[[0m
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:04.1534623Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:04.1534906Z ##[endgroup]
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:04.8807376Z Verified WebView2 1.0.4258.31 SDK (six pinned entries): D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\dependencies\Microsoft.Web.WebView2\1.0.4258.31
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:04.9469046Z ##[group]Run cmake -S . -B build/host-ci  -DBUILD_TESTING=ON -DHORDE_RT_BUILD_VULKAN_TARGETS=OFF
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:04.9469655Z ^[[36;1mcmake -S . -B build/host-ci  -DBUILD_TESTING=ON -DHORDE_RT_BUILD_VULKAN_TARGETS=OFF^[[0m
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:04.9535157Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:04.9535602Z ##[endgroup]
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:33.1795881Z -- Building for: Visual Studio 18 2026
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:33.1796259Z -- The CXX compiler identification is MSVC 19.51.36260.0
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:33.5055904Z -- Detecting CXX compiler ABI info
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:36.1068689Z -- Detecting CXX compiler ABI info - done
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:36.1888643Z -- Check for working CXX compiler: C:/Program Files/Microsoft Visual Studio/18/Enterprise/VC/Tools/MSVC/14.51.36231/bin/Hostx64/x64/cl.exe - skipped
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:36.1899236Z -- Detecting CXX compile features
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:36.1912638Z -- Detecting CXX compile features - done
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:39.6647602Z Generated RT catalog adapter is current.
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:40.3333325Z -- Strict non-contracted asset-transform arithmetic enabled for GltfDocument.cpp and StaticMeshAsset.cpp: /fp:strict
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:40.4374647Z -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:43.6087112Z -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:43.6087603Z -- Looking for pthread_create in pthreads
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:44.3255927Z -- Looking for pthread_create in pthreads - not found
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:44.3256419Z -- Looking for pthread_create in pthread
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:44.8510634Z -- Looking for pthread_create in pthread - not found
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:44.9473828Z -- Found Threads: TRUE
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:48.3813538Z -- Found Python3: C:/hostedtoolcache/windows/Python/3.14.7/x64/python3.exe (found version "3.14.7") found components: Interpreter
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:53.2749703Z -- Legacy torch-failure identifiers were rejected by the configured MSVC compiler.
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:53.2751111Z -- Horde Lantern RT: configuring shared host gameplay tests without Vulkan targets.
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:53.4576069Z -- Configuring done (46.0s)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:54.1291797Z -- Generating done (0.7s)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:54.1299947Z -- Build files have been written to: D:/a/The-Horde-RT-demo/The-Horde-RT-demo/build/host-ci
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:54.2372951Z ##[group]Run cmake --build build/host-ci --config Release --parallel 2
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:54.2373408Z ^[[36;1mcmake --build build/host-ci --config Release --parallel 2^[[0m
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:54.2430157Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:54.2430438Z ##[endgroup]
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:54.5763988Z MSBuild version 18.10.1-1.26427.6+3cd27c13e for .NET Framework
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:54.6166358Z 
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:54.8710969Z   1>Checking Build System
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:55.1120192Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:55.2224711Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:55.2579801Z   RtPipelineVariantProvider.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:55.2976829Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:55.3852921Z   RtPipelineVariantProvider.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:55.4051865Z   RtPipelineVariantProvider.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:57.3996569Z   horde_rtpv_0_1_obj.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\horde_rtpv_0_1_obj.dir\Release\horde_rtpv_0_1_obj.lib
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:57.4011170Z   horde_rtpv_0_0_obj.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\horde_rtpv_0_0_obj.dir\Release\horde_rtpv_0_0_obj.lib
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:57.4980125Z   horde_rtpv_1_0_obj.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\horde_rtpv_1_0_obj.dir\Release\horde_rtpv_1_0_obj.lib
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:57.5558603Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:57.6231171Z   RtPipelineVariantProvider.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:58.9841424Z   horde_rtpv_1_1_obj.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\horde_rtpv_1_1_obj.dir\Release\horde_rtpv_1_1_obj.lib
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:59.0924216Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/third_party/pocket-audio-core/native/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:59.0981572Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:59.1618931Z   PcmLoopStream.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:59.1701919Z   AndroidDebugRequestAdmissionTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:59.1924985Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:59.5484214Z   PcmWave.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:10:59.5826516Z   AndroidMotionEvidencePolicyTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:00.0448933Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:00.7556427Z   pocket_audio_native_pcm.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:00.9693325Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:00.9849731Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:01.0591018Z   SwordCombatSmoke.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:01.0591742Z   BellwetherShellTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:02.9359406Z   BellwetherShell.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:04.4349297Z   AssetManifest.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:06.1064186Z   AssetValidation.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:06.5023450Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:06.6236363Z   horde_rt_android_debug_request_admission_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_android_debug_request_admission_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:06.6247427Z   horde_rt_android_motion_evidence_policy_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_android_motion_evidence_policy_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:06.6712719Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:07.0830696Z   horde_rt_combat_smoke.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_combat_smoke.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:07.3136431Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:07.4546274Z   RtCompiledPipelineCacheTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:07.6782970Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:07.8716667Z   RtDeviceAddressLayoutTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:09.5612327Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:09.8490235Z   horde_rt_device_address_layout_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_device_address_layout_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:09.9306508Z   DielectricMathTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:10.0875717Z   StaticMeshAsset.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:10.7887937Z   horde_rt_compiled_pipeline_cache_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_compiled_pipeline_cache_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:10.8552007Z   AmbiencePcmLoop.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:11.7712788Z   MusicDirector.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:12.7243957Z   horde_rt_dielectric_math_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_dielectric_math_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:12.8082590Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:12.8917044Z   EntryMenuHandoffTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:12.9815267Z   GltfDocument.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:14.2131014Z   MusicPcmStream.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:14.5465708Z   horde_rt_entry_menu_handoff_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_entry_menu_handoff_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:14.6279342Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:14.7122191Z   EntryPortalCapGeometryTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:14.8486118Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:17.1226628Z   horde_rt_entry_portal_cap_geometry_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_entry_portal_cap_geometry_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:18.1318564Z   MusicPcmWave.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:18.2136586Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:18.2634467Z   MusicPcmAssetBank.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:18.3027780Z   RtEvidencePublicationTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:19.2012041Z   RtEvidencePublication.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:19.8443485Z   horde_rt_bellwether_shell_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_bellwether_shell_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:19.9666713Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:20.0401418Z   ForegroundPauseRenderCadenceTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:20.0419083Z   RtPerformanceEvidence.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:20.5093302Z   MusicPlaybackSession.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:21.2088910Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:22.6402673Z   horde_rt_foreground_pause_render_cadence_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_foreground_pause_render_cadence_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:22.7708027Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:22.9766921Z   ForestDeadwoodTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:23.1846350Z   horde_rt_evidence_publication_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_evidence_publication_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:23.2781466Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:23.3710348Z   ForestDressingTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:23.6693054Z   PlaytestReport.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:24.6596894Z   PlaytestSubmission.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:25.1062650Z   ForestDeadwood.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:25.3226762Z   BenchmarkSummarySubmission.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:26.0153096Z   ForestDressing.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:26.2315872Z   GameSimulation.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:27.1717675Z   AssetManifest.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:28.2017928Z   ForestUnderstory.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:28.7454623Z   WaterContact.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:28.9836915Z   AssetValidation.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:29.2554311Z   GameSimulationRescue.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:29.4940572Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:30.9223098Z   ForestRockDressing.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:32.4670973Z   GameSimulationDialogue.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:33.4648495Z   GltfDocument.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:33.9527220Z   ForestDeadwood.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:35.1584133Z   RescueTraversal.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:35.3406039Z   StaticMeshAsset.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:35.7000626Z   PlayerAnimationState.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:36.1227016Z   BellwetherShell.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:37.6399462Z   PlayerIkTargets.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:37.6685697Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:38.3131384Z   TombDressing.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:38.4436889Z   FireEmitterState.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:39.3104355Z   InteractionState.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:40.0057752Z   ChestRewardSequence.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:40.4302115Z   FinaleSequence.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:40.8308350Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:41.2177557Z   GraveyardDressing.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:43.3445552Z   horde_rt_forest_deadwood_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_forest_deadwood_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:43.5395634Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:43.5926997Z   ForestRockDressingTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:44.5684506Z   AssetManifest.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:45.6745604Z   Compiling...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:45.6747690Z   LanternPendulum.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:46.1409638Z   ForestRockDressing.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:46.2117235Z   HeldItemState.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:46.6014264Z   HeldItemKinematics.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:46.8126030Z   AssetValidation.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:47.2756939Z   RtStaticMeshSlot.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:48.3748857Z   AssetManifest.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:48.9916129Z   HeldLightState.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:49.9401871Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:50.5733266Z   AssetValidation.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:51.5355548Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:51.7592212Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:53.3811841Z   horde_gameplay_simulation.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_gameplay_simulation.lib
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:54.5614447Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:55.4084878Z   ForestUnderstoryTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:56.7273659Z   GltfDocument.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:58.6581775Z   ForestUnderstory.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:11:59.1484830Z   StaticMeshAsset.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:01.8936805Z   AssetManifest.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:02.6225987Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:05.7038241Z   AssetValidation.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:06.6674687Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:09.3800449Z   GltfDocument.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:09.6886186Z   horde_rt_forest_rock_dressing_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_forest_rock_dressing_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:09.7422063Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:09.8656544Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:10.5464801Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:10.6467872Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:10.7149523Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:10.7855880Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:10.8570239Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:10.8813716Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:10.9526869Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:10.9604521Z   GltfDocument.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:11.0273403Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:11.1132497Z   CombatTimingTraceTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:11.6756164Z   StaticMeshAsset.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:12.9261193Z   StaticMeshAsset.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:14.3388701Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:14.8187808Z   horde_rt_combat_timing_trace_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_combat_timing_trace_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:15.0130719Z   CombatFoundationTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:16.6030980Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:20.4218678Z   ChapterDialogueTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:20.8667588Z   horde_rt_combat_foundation_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_combat_foundation_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:21.1211669Z   BenchmarkSummaryReportTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:22.4410730Z   BenchmarkSummary.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:22.9759707Z   horde_rt_forest_understory_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_forest_understory_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:23.0300215Z   RtBenchmarkEvidenceRunTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:23.3013022Z   BenchmarkSummaryReport.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:24.5292075Z   RtBenchmarkEvidenceRun.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:24.8367472Z   PlaytestReport.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:25.3324925Z   horde_rt_chapter_dialogue_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_chapter_dialogue_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:25.3482912Z   RtBenchmarkEvidenceReport.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:25.3735355Z   RtBenchmarkEvidenceReportTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:25.7648629Z   ShowcaseBenchmark.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:26.4205734Z   RtPerformanceEvidence.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:26.5344091Z   ShowcaseBenchmark.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:26.8333404Z   RtBenchmarkEvidenceRun.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:27.6231353Z   ShowcaseBenchmark.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:27.6244714Z   RtBenchmarkEvidenceReport.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:27.7259750Z   RtBenchmarkEvidenceReport.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:28.6917126Z   RtPerformanceEvidence.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:28.7658000Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:28.8680956Z   RtBenchmarkEvidenceRun.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:30.2875451Z   RtPerformanceEvidence.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:30.6125704Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:32.6468351Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:32.6608274Z   horde_rt_benchmark_evidence_run_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_benchmark_evidence_run_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:33.0795913Z   AmbiencePcmLoopTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:37.5297690Z   FireEmitterTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:37.6954042Z   DevelopmentStaticAssetTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:37.6955273Z   horde_rt_benchmark_summary_report_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_benchmark_summary_report_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:37.9704990Z   horde_rt_benchmark_evidence_report_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_benchmark_evidence_report_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:38.1649651Z   horde_rt_ambience_pcm_loop_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_ambience_pcm_loop_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:38.2141488Z   DesktopControllerInputTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:40.1055044Z   FireEmitterBuffer.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:41.3935763Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:42.4244650Z   horde_rt_fire_emitter_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_fire_emitter_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:42.8571434Z   horde_rt_forest_dressing_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_forest_dressing_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:42.9773488Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:44.0449512Z   GitHubReleaseUpdaterTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:44.9197168Z   GitHubReleaseUpdater.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:45.8842337Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:47.2296561Z   horde_rt_development_static_asset_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_development_static_asset_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:47.2616644Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:47.3434147Z   GpuTimestampMathTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:47.4461672Z   horde_rt_github_release_updater_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_github_release_updater_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:47.5375155Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:47.6182232Z   GraphicsPreviewPerformanceTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:48.2584907Z   horde_rt_graphics_preview_performance_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_graphics_preview_performance_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:48.3325958Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:48.4113901Z   GraphicsPreviewTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:48.9076893Z   horde_rt_gpu_timestamp_math_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_gpu_timestamp_math_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:48.9910175Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:49.0736496Z   BenchmarkScaleAdmissionTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:49.2960545Z   FireEmitterState.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:49.7841864Z   horde_rt_desktop_controller_input_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_desktop_controller_input_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:49.8114387Z   HeldItemState.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:49.8747872Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:49.9574341Z   BenchmarkScaleAdmissionTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:50.5965874Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:51.5409268Z   horde_rt_graphics_scale_legacy50_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_graphics_scale_legacy50_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:51.6348583Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:51.7061990Z   GraphicsSettingsTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:51.7387752Z   horde_rt_graphics_preview_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_graphics_preview_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:52.0400581Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:52.1168989Z   GraphicsWindowsPersistenceTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:52.5294033Z   horde_rt_graphics_scale_min33_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_graphics_scale_min33_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:52.6177631Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:52.7052697Z   GraveyardDressingTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:55.0528750Z   GraveyardDressing.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:55.1997099Z   horde_rt_graphics_settings_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_graphics_settings_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:55.2716191Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:55.3496714Z   HeldItemClearanceTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:56.9132019Z   TombDressing.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:57.0414997Z   AssetManifest.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:58.7378031Z   AssetManifest.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:58.8242565Z   AssetValidation.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:12:59.3085878Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:01.3468666Z   AssetValidation.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:01.4071952Z   GltfDocument.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:01.8263190Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:04.0675234Z   StaticMeshAsset.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:06.1519295Z   horde_rt_graphics_windows_persistence_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_graphics_windows_persistence_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:06.2359735Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:06.3316959Z   HeldItemSocketTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:08.1651453Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:09.1445154Z   GltfDocument.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:11.4888657Z   AssetManifest.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:11.8011532Z   StaticMeshAsset.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:13.8439092Z   horde_rt_held_item_clearance_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_held_item_clearance_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:13.9253129Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:14.0386289Z   HeldItemTransitionTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:14.4892220Z   AssetValidation.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:15.3093503Z   SkinnedMeshAsset.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:15.5994231Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:16.7688340Z   horde_rt_held_item_transition_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_held_item_transition_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:17.3213894Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:18.0485192Z   IndoorDustTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:19.0112249Z   RtPerformanceEvidence.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:20.7918049Z   horde_rt_indoor_dust_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_indoor_dust_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:20.9015369Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:20.9589525Z   HeldItemRenderSlot.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:21.2200455Z   PlayerRenderSlot.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:21.2246220Z   InputMailboxStress.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:21.5171753Z   horde_rt_graveyard_dressing_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_graveyard_dressing_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:21.6241611Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:21.7087604Z   InputPresentationTraceTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:23.7158782Z   RtStaticMeshSlot.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:23.9267730Z   horde_rt_input_mailbox_stress.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_input_mailbox_stress.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:24.0044571Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:24.0780355Z   LanternBenchmarkTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:25.6234034Z   horde_rt_input_presentation_trace_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_input_presentation_trace_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:25.7192748Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:25.8017290Z   LanternPendulumTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:26.6822434Z   ShowcaseBenchmark.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:26.6844049Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:28.5935493Z   RtBenchmarkEvidenceReport.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:29.8886864Z   RtBenchmarkEvidenceRun.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:30.0047451Z   horde_rt_lantern_pendulum_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_lantern_pendulum_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:30.0961084Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:30.1873538Z   LanternRewardTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:31.1017918Z   RtPerformanceEvidence.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:33.0586622Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:36.9709037Z   horde_rt_lantern_reward_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_lantern_reward_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:37.4017159Z   horde_rt_lantern_benchmark_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_lantern_benchmark_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:37.6208060Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:37.7833409Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:38.0180596Z   MotionEvidenceScenarioTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:39.5627318Z   MenuAmbienceTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:40.8683297Z   horde_rt_menu_ambience_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_menu_ambience_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:40.9515812Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:41.0392340Z   MusicDirectorTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:41.1628183Z   GltfDocument.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:41.3918608Z   MotionEvidenceScenario.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:42.8839034Z   StaticMeshAsset.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:43.9429628Z   MotionEvidenceLedger.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:46.0968118Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:46.1278524Z   horde_rt_music_director_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_music_director_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:47.6645993Z   RtPerformanceEvidence.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:47.9420716Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:48.0234787Z   MusicPcmAssetBankTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:48.8868458Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:51.6858878Z   horde_rt_held_item_socket_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_held_item_socket_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:52.7708000Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:52.8460595Z   MusicPcmStreamTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:53.1150981Z   horde_rt_music_pcm_asset_bank_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_music_pcm_asset_bank_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:53.1815875Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:53.2671074Z   MusicPcmWaveTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:53.7923803Z   horde_rt_motion_evidence_scenario_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_motion_evidence_scenario_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:53.8782284Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:53.9640046Z   MusicPlaybackSessionTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:55.7615313Z   horde_rt_music_pcm_stream_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_music_pcm_stream_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:55.8482367Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:55.9282243Z   OpaqueSegmentCoverageTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:57.4870778Z   horde_rt_music_pcm_wave_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_music_pcm_wave_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:57.5733427Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:57.7084592Z   RtPerformanceEvidenceTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:58.3649834Z   horde_rt_music_playback_session_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_music_playback_session_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:58.4490226Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:58.5250502Z   RtPipelineBundleContractsTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:59.6234003Z   RtPipelineBundleContracts.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:59.8013786Z   horde_rt_opaque_segment_coverage_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_opaque_segment_coverage_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:59.9022236Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:13:59.9860339Z   PipelineCacheSeedTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:00.2182234Z   RtPerformanceEvidence.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:00.6082625Z   RtPipelineVariants.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:01.2746995Z   RtPipelineVariantProvider.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:01.3510539Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:02.1277650Z   horde_rt_pipeline_cache_seed_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_pipeline_cache_seed_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:02.4066398Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:02.8189317Z   RtPipelineVariantProviderTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:03.6650122Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:04.2292327Z   RtPipelineVariants.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:04.8716308Z   RtPipelineVariantProvider.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:05.4839975Z   horde_rt_performance_evidence_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_performance_evidence_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:05.5657787Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:05.5952451Z   horde_rt_pipeline_bundle_contracts_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_pipeline_bundle_contracts_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:05.6491933Z   RtPipelineVariantsTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:05.6688927Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:05.7442017Z   PlayerAnimationTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:06.3423114Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:06.4656727Z   RtPipelineVariants.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:07.0207842Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:07.2342399Z   horde_rt_pipeline_variant_provider_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_pipeline_variant_provider_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:07.3268811Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:07.4142038Z   PlayerPrimitiveContractTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:07.5924299Z   horde_rt_pipeline_variants_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_pipeline_variants_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:07.6739132Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:07.7498565Z   PlaytestReportTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:08.4414180Z   RtPerformanceEvidence.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:09.4342656Z   horde_rt_playtest_report_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_playtest_report_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:09.5096770Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:09.5857045Z   PlaytestSubmissionTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:09.6708178Z   horde_rt_player_primitive_contract_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_player_primitive_contract_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:09.7633117Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:09.8252303Z   SkinnedMeshAsset.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:09.8545004Z   RtPresentationTransformTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:10.8962316Z   BenchmarkSummary.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:10.9943100Z   horde_rt_presentation_transform_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_presentation_transform_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:11.0881705Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:11.1695325Z   ProductionPropAssetTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:11.8876680Z   BenchmarkSummaryReport.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:12.1759455Z   PlayerRenderSlot.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:12.9013079Z   ShowcaseBenchmark.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:13.6295979Z   AssetManifest.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:14.1532337Z   RtBenchmarkEvidenceRun.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:14.3516175Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:15.2389521Z   RtBenchmarkEvidenceReport.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:16.5574036Z   AssetValidation.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:17.0672532Z   RtPerformanceEvidence.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:17.1537704Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:19.2740554Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:23.4675949Z   horde_rt_player_animation_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_player_animation_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:23.5585763Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:23.6070246Z   GltfDocument.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:23.6513032Z   RtPipelineVariantFixture.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:24.9268973Z   horde_rt_playtest_submission_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_playtest_submission_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:25.0267614Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:25.1233623Z   RtPipelineVariantFixture.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:25.4505618Z   RtPipelineBundleContracts.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:25.6155336Z   StaticMeshAsset.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:26.4739144Z   RtPipelineVariants.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:26.8796289Z   RtPipelineBundleContracts.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:27.0073237Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:28.2776497Z   RtPipelineVariants.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:28.5095361Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:28.7225998Z   horde_rt_provider_diagnostic_high_fixture.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_provider_diagnostic_high_fixture.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:28.9421389Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:30.7648838Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:30.8716123Z   RtPipelineVariantFixture.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:31.0304002Z   horde_rt_provider_diagnostic_mobile_fixture.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_provider_diagnostic_mobile_fixture.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:31.1108611Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:31.1909543Z   RayTracingRequirementsTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:31.9683348Z   RayTracingRequirements.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:32.8116456Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:33.3590274Z   RtPipelineBundleContracts.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:34.1465606Z   horde_rt_ray_tracing_requirements_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_ray_tracing_requirements_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:34.1486561Z   horde_rt_production_prop_asset_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_production_prop_asset_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:34.2076862Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:34.2281295Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:34.3024884Z   RtPipelineVariantFixture.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:34.3105814Z   RtPipelineVariants.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:34.3197075Z   RescueBlockoutImportTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:34.7729835Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:36.4714175Z   horde_rt_provider_shipping_high_fixture.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_provider_shipping_high_fixture.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:36.5550938Z   RtPipelineBundleContracts.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:36.5701907Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:36.6549133Z   RescueTraversalTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:36.9064268Z   AssetManifest.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:37.5011646Z   RtPipelineVariants.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:37.9780931Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:39.3811616Z   AssetValidation.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:39.7363890Z   horde_rt_provider_shipping_mobile_fixture.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_provider_shipping_mobile_fixture.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:39.8208507Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:39.9158462Z   RetirementOwnerTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:39.9821732Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:41.5994330Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:41.7777164Z   RtSceneAbiTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:42.4318674Z   horde_rt_rescue_traversal_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_rescue_traversal_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:43.0385147Z   horde_rt_retirement_owner_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_retirement_owner_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:43.1234199Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:43.2113993Z   RtSceneRecordObservationTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:43.6343956Z   StaticMeshAsset.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:44.4515091Z   RtStaticMeshSlot.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:45.0571787Z   RtPerformanceEvidence.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:46.0043029Z   GltfDocument.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:46.2377596Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:47.6390364Z   RtTextureArrays.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:48.0904422Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:48.1049907Z   horde_rt_scene_record_observation_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_scene_record_observation_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:48.1847644Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:48.4632775Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:48.8981001Z   SfxVolumeTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:53.7891904Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:53.8743677Z   ShaftDressingGeometryTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:53.8999939Z   horde_rt_sfx_volume_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_sfx_volume_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:53.9978772Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:54.0852517Z   ShowcaseGameplaySmoke.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:54.1392707Z   horde_rt_scene_abi_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_scene_abi_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:54.3784572Z   horde_rt_rescue_blockout_import_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_rescue_blockout_import_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:54.4541783Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:54.5268472Z   ShowcaseRouteSmoke.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:56.3310480Z   horde_rt_showcase_route_smoke.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_showcase_route_smoke.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:56.4124565Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:56.4926115Z   SimulationGameplayTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:56.6181031Z   horde_rt_shaft_dressing_geometry_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_shaft_dressing_geometry_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:56.7093544Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:56.7905431Z   SimulationTimingTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:57.1656601Z   horde_rt_showcase_gameplay_smoke.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_showcase_gameplay_smoke.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:57.2622105Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:57.3579593Z   SkinnedNodePoseBatchTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:14:59.1817100Z   SkinnedMeshAsset.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:00.6762759Z   horde_rt_simulation_timing_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_simulation_timing_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:00.7554357Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:00.8389431Z   WindowsSkyAttributionLaunchTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:02.1138625Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:02.7645848Z   horde_rt_sky_attribution_launch_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_sky_attribution_launch_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:03.6288517Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:03.7262441Z   SpatialAudioSmoke.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:05.7953989Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:05.8799212Z   StagedPrimaryContractTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:05.9456892Z   horde_rt_skinned_node_pose_batch_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_skinned_node_pose_batch_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:06.3739005Z   horde_rt_simulation_gameplay_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_simulation_gameplay_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:06.6754117Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:06.9123722Z   StaticCollapseAssetTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:08.0234864Z   horde_rt_staged_primary_contract_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_staged_primary_contract_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:08.1094693Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:08.2015668Z   StaticGltfAssetTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:08.8574013Z   AssetManifest.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:09.1682476Z   horde_rt_spatial_audio_smoke.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_spatial_audio_smoke.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:09.2479936Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:09.3254941Z   SurfacePresentationPolicyTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:10.4453774Z   horde_rt_surface_presentation_policy_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_surface_presentation_policy_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:10.5359417Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:10.6312223Z   SurfaceSessionMailboxTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:10.9161931Z   AssetValidation.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:11.3688103Z   AssetManifest.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:11.3708007Z   RtStaticMeshSlot.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:13.5264531Z   horde_rt_surface_session_mailbox_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_surface_session_mailbox_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:13.6011053Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:13.6570503Z   AssetValidation.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:13.6885359Z   RtTextureLayerSubsetTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:14.1821989Z   RtStaticMeshSlot.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:14.4561026Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:18.0887173Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:21.0707223Z   horde_rt_texture_layer_subset_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_texture_layer_subset_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:21.1529768Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:21.2411057Z   TombDressingTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:22.2431768Z   GltfDocument.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:24.2437076Z   TombDressing.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:25.5864693Z   StaticMeshAsset.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:28.0733651Z   AssetManifest.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:30.0702052Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:32.0718168Z   AssetValidation.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:32.9002072Z   RtStaticMeshSlot.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:33.1909155Z   GltfDocument.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:35.6439689Z   StaticMeshAsset.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:35.8308777Z   horde_rt_static_collapse_asset_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_static_collapse_asset_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:35.9045953Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:35.9891337Z   TombTerrainExclusionTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:36.2694902Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:39.2323153Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:40.3334446Z   horde_rt_tomb_terrain_exclusion_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_tomb_terrain_exclusion_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:41.7644522Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:41.8714317Z   TombWallRecessTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:45.2383369Z   GltfDocument.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:45.6025119Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:45.6885311Z   TriangleSupportSurfaceTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:45.7248349Z   horde_rt_static_gltf_asset_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_static_gltf_asset_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:45.9426019Z   horde_rt_tomb_wall_recess_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_tomb_wall_recess_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:46.0289992Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:46.1079295Z   VersionContractIncrementalConfigureTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:47.2729279Z   StaticMeshAsset.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:48.8569330Z   horde_rt_triangle_support_surface_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_triangle_support_surface_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:49.1065046Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:49.2047486Z   VersionContractTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:50.1236593Z   horde_rt_version_contract_incremental_configure_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_version_contract_incremental_configure_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:50.2168534Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:50.2475404Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:50.3182600Z   WaterContactTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:56.0208687Z   horde_rt_water_contact_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_water_contact_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:56.0990103Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:56.1819024Z   WaterfallProductionRouteTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:56.4970504Z   horde_rt_tomb_dressing_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_tomb_dressing_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:56.5782172Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:56.6558656Z   horde_rt_version_contract_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_version_contract_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:56.6609703Z   WindowsBenchmarkLaunchTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:56.7384697Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:56.8113780Z   WindowsCombatPracticeLaunchTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:59.2144787Z   horde_rt_windows_combat_practice_launch_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_windows_combat_practice_launch_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:59.4600443Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:59.5496384Z   WindowsMotionEvidenceLaunchTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:15:59.9479894Z   horde_rt_waterfall_production_route_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_waterfall_production_route_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:00.0221956Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:00.0993351Z   WindowsMusicFocusTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:02.0433730Z   horde_rt_windows_music_focus_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_windows_music_focus_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:02.1466541Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:02.2206632Z   WindowsMusicPlayback.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:02.9005777Z   horde_rt_windows_benchmark_launch_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_windows_benchmark_launch_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:02.9989069Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:03.0834787Z   WindowsOutputResizeLaunchTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:03.8005083Z   horde_rt_windows_motion_evidence_launch_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_windows_motion_evidence_launch_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:03.8885972Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:03.9669402Z   WindowsPlaytestReportUiTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:04.6143005Z   horde_rt_windows_output_resize_launch_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_windows_output_resize_launch_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:04.7058224Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:04.8046921Z   WindowsPlaytestScreenshotTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:06.4048822Z   WindowsPlaytestReport.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:06.7027348Z   horde_windows_music.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_windows_music.lib
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:06.7538787Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:06.8368752Z   WindowsMusicPlaybackSmoke.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:07.5418983Z   WindowsPlaytestScreenshot.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:08.7311630Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:09.0891323Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:11.1558877Z   horde_rt_windows_playtest_screenshot_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_windows_playtest_screenshot_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:11.2358288Z   horde_rt_windows_playtest_report_ui_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_windows_playtest_report_ui_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:11.2424207Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:11.3093428Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:11.3257943Z   WindowsPlaytestSubmissionTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:11.3905417Z   WindowsPlaytestVerificationTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:11.6850946Z   horde_rt_windows_music_playback_smoke.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_windows_music_playback_smoke.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:11.7794056Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:11.8636318Z   WindowsRemotePlaytestReportUiTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:12.3432382Z   WindowsPlaytestVerification.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:13.2417269Z   WindowsPlaytestSubmission.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:13.9053149Z   WindowsRemotePlaytestReport.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:13.9814118Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:15.8619594Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:16.3297983Z   horde_rt_windows_playtest_verification_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_windows_playtest_verification_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:16.7137777Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:16.8022606Z   WindowsSubtitleBitmapTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:16.8649289Z   WindowsPlaytestReport.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:17.8426763Z   horde_rt_windows_playtest_submission_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_windows_playtest_submission_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:17.9260214Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:18.0112147Z   WindowsVitalityHudLayoutTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:19.2155514Z   WindowsPlaytestScreenshot.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:19.5068417Z   horde_rt_windows_vitality_layout_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_windows_vitality_layout_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:19.5793310Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:19.6492952Z   WorldSurfaceRangeTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:20.1895960Z   horde_rt_windows_subtitle_bitmap_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_windows_subtitle_bitmap_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:20.2614126Z   WindowsPlaytestSubmission.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:20.7474540Z   horde_rt_world_surface_range_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_world_surface_range_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:20.7775536Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/third_party/pocket-audio-core/native/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:20.8536901Z   PcmNativeTests.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:22.1817668Z   WindowsPlaytestVerification.cpp
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:22.8559800Z   pocket_audio_native_pcm_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\pocket-audio-core-native\Release\pocket_audio_native_pcm_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:23.3931921Z   Generating Code...
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:26.6333542Z   horde_rt_windows_remote_playtest_report_ui_tests.vcxproj -> D:\a\The-Horde-RT-demo\The-Horde-RT-demo\build\host-ci\Release\horde_rt_windows_remote_playtest_report_ui_tests.exe
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:26.7757010Z   Building Custom Rule D:/a/The-Horde-RT-demo/The-Horde-RT-demo/CMakeLists.txt
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:27.0913657Z ##[group]Run $match = [regex]::Match($env:HORDE_HOST_CTEST_FILTER, "^-E '([^']+)'$")
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:27.0914388Z ^[[36;1m$match = [regex]::Match($env:HORDE_HOST_CTEST_FILTER, "^-E '([^']+)'$")^[[0m
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:27.0914789Z ^[[36;1mif (-not $match.Success) { throw 'Unexpected Windows CTest filter format.' }^[[0m
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:27.0915388Z ^[[36;1m./tools/run-windows-host-ci-tests.ps1 -BuildDirectory build/host-ci -Configuration Release -ExcludePattern $match.Groups[1].Value^[[0m
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:27.0976100Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:27.0976452Z env:
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:27.0978284Z   HORDE_HOST_CTEST_FILTER: -E '^(horde_rt_scene_abi_generator_tests|horde_rt_raygen_compiler_strategy_tests|horde_rt_raygen_variant_manifest_tests|horde_rt_raygen_variant_artifact_tests|horde_rt_rayquery_compute_shader_tests|horde_rt_pipeline_policy_fence_tests|horde_rt_pipeline_policy_execution_tests|horde_rt_static_texture_array_tool_tests|horde_rt_static_preparation_lod_policy_tests|horde_rt_static_preparation_skip_policy_tests|horde_rt_static_preparation_colliding_lod_policy_tests|horde_rt_dielectric_topology_tool_tests|horde_rt_version_contract_powershell_tests|horde_rt_github_release_preflight_tests|horde_rt_version_contract_windows_powershell_tests)$'
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:27.0980062Z ##[endgroup]
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:28.9803773Z Test project D:/a/The-Horde-RT-demo/The-Horde-RT-demo/build/host-ci
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:28.9981181Z         Start   1: horde_rt_sky_attribution_launch_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:29.0130594Z   1/139 Test   #1: horde_rt_sky_attribution_launch_tests ......................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:29.0667350Z         Start   2: horde_rt_triangle_support_surface_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:29.0804547Z   2/139 Test   #2: horde_rt_triangle_support_surface_tests ....................   Passed    0.02 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:29.0810440Z         Start   3: horde_rt_menu_ambience_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:29.0902042Z   3/139 Test   #3: horde_rt_menu_ambience_tests ...............................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:29.0906286Z         Start   4: horde_rt_indoor_dust_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:29.1002043Z   4/139 Test   #4: horde_rt_indoor_dust_tests .................................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:29.1006204Z         Start   5: horde_rt_retirement_owner_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:29.1101679Z   5/139 Test   #5: horde_rt_retirement_owner_tests ............................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:29.1105904Z         Start   6: horde_rt_graphics_settings_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:29.1204827Z   6/139 Test   #6: horde_rt_graphics_settings_tests ...........................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:29.1208648Z         Start   7: horde_rt_entry_menu_handoff_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:29.1315355Z   7/139 Test   #7: horde_rt_entry_menu_handoff_tests ..........................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:29.1319422Z         Start   8: horde_rt_foreground_pause_render_cadence_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:29.1459275Z   8/139 Test   #8: horde_rt_foreground_pause_render_cadence_tests .............   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:29.1460871Z         Start   9: horde_rt_surface_presentation_policy_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:29.1583127Z   9/139 Test   #9: horde_rt_surface_presentation_policy_tests .................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:29.1586408Z         Start  10: horde_rt_presentation_transform_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:29.1895164Z  10/139 Test  #10: horde_rt_presentation_transform_tests ......................   Passed    0.03 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:29.1933027Z         Start  11: horde_rt_compiled_pipeline_cache_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:29.2032757Z  11/139 Test  #11: horde_rt_compiled_pipeline_cache_tests .....................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:29.2034578Z         Start  12: horde_rt_pipeline_cache_seed_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:29.2662938Z  12/139 Test  #12: horde_rt_pipeline_cache_seed_tests .........................   Passed    0.06 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:29.2669997Z         Start  13: horde_rt_graphics_scale_min33_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:29.2792017Z  13/139 Test  #13: horde_rt_graphics_scale_min33_tests ........................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:29.2797305Z         Start  14: horde_rt_graphics_scale_legacy50_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:29.2928119Z  14/139 Test  #14: horde_rt_graphics_scale_legacy50_tests .....................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:29.2934261Z         Start  15: horde_rt_graphics_preview_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:29.3067411Z  15/139 Test  #15: horde_rt_graphics_preview_tests ............................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:29.3072649Z         Start  16: horde_rt_graphics_preview_performance_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:29.3198560Z  16/139 Test  #16: horde_rt_graphics_preview_performance_tests ................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:29.3202727Z         Start  17: horde_rt_texture_layer_subset_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:29.3295682Z  17/139 Test  #17: horde_rt_texture_layer_subset_tests ........................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:29.3299782Z         Start  18: horde_rt_shaft_dressing_geometry_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:29.3876457Z  18/139 Test  #18: horde_rt_shaft_dressing_geometry_tests .....................   Passed    0.06 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:29.3881908Z         Start  19: horde_rt_graphics_windows_persistence_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:30.7940046Z  19/139 Test  #19: horde_rt_graphics_windows_persistence_tests ................   Passed    1.41 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:30.7944613Z         Start  20: horde_rt_device_address_layout_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:30.8074210Z  20/139 Test  #20: horde_rt_device_address_layout_tests .......................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:30.8081358Z         Start  21: horde_rt_player_primitive_contract_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:30.8174220Z  21/139 Test  #21: horde_rt_player_primitive_contract_tests ...................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:30.8178157Z         Start  22: horde_rt_third_party_notice_admission_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:32.2528141Z  22/139 Test  #22: horde_rt_third_party_notice_admission_tests ................   Passed    1.43 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:32.2533704Z         Start  23: horde_rt_raygen_artifact_ownership_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:33.0648289Z  23/139 Test  #23: horde_rt_raygen_artifact_ownership_tests ...................   Passed    0.81 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:33.0652903Z         Start  24: horde_rt_player_manifest_agreement_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:33.5881898Z  24/139 Test  #24: horde_rt_player_manifest_agreement_tests ...................   Passed    0.52 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:33.5887857Z         Start  25: horde_rt_player_package_inventory_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:34.3022092Z  25/139 Test  #25: horde_rt_player_package_inventory_tests ....................   Passed    0.71 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:34.3027713Z         Start  26: horde_rt_chapter_dialogue_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:34.3126358Z  26/139 Test  #26: horde_rt_chapter_dialogue_tests ............................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:34.3130312Z         Start  27: horde_rt_windows_vitality_layout_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:34.3216736Z  27/139 Test  #27: horde_rt_windows_vitality_layout_tests .....................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:34.3219965Z         Start  28: horde_rt_combat_foundation_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:34.3962205Z  28/139 Test  #28: horde_rt_combat_foundation_tests ...........................   Passed    0.07 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:34.3967006Z         Start  29: horde_rt_held_item_transition_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:34.4060209Z  29/139 Test  #29: horde_rt_held_item_transition_tests ........................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:34.4063663Z         Start  30: horde_rt_combat_timing_trace_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:34.4167657Z  30/139 Test  #30: horde_rt_combat_timing_trace_tests .........................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:34.4170879Z         Start  31: horde_rt_input_presentation_trace_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:34.4276657Z  31/139 Test  #31: horde_rt_input_presentation_trace_tests ....................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:34.4279889Z         Start  32: horde_rt_held_item_clearance_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:34.8216203Z  32/139 Test  #32: horde_rt_held_item_clearance_tests .........................   Passed    0.39 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:34.8221753Z         Start  33: horde_rt_ambience_pcm_loop_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:34.8890753Z  33/139 Test  #33: horde_rt_ambience_pcm_loop_tests ...........................   Passed    0.07 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:34.8894910Z         Start  34: horde_rt_benchmark_summary_report_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:34.9194484Z  34/139 Test  #34: horde_rt_benchmark_summary_report_tests ....................   Passed    0.03 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:34.9198550Z         Start  35: horde_rt_staged_primary_contract_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:34.9297630Z  35/139 Test  #35: horde_rt_staged_primary_contract_tests .....................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:34.9301299Z         Start  36: horde_rt_lantern_benchmark_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:34.9698842Z  36/139 Test  #36: horde_rt_lantern_benchmark_tests ...........................   Passed    0.04 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:34.9702613Z         Start  37: horde_rt_benchmark_evidence_report_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:34.9818879Z  37/139 Test  #37: horde_rt_benchmark_evidence_report_tests ...................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:34.9822260Z         Start  38: horde_rt_windows_benchmark_launch_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:34.9914974Z  38/139 Test  #38: horde_rt_windows_benchmark_launch_tests ....................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:34.9919138Z         Start  39: horde_rt_windows_output_resize_launch_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:35.0025526Z  39/139 Test  #39: horde_rt_windows_output_resize_launch_tests ................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:35.0028748Z         Start  40: horde_rt_windows_motion_evidence_launch_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:35.0128651Z  40/139 Test  #40: horde_rt_windows_motion_evidence_launch_tests ..............   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:35.0133120Z         Start  41: horde_rt_windows_combat_practice_launch_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:35.0229244Z  41/139 Test  #41: horde_rt_windows_combat_practice_launch_tests ..............   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:35.0232963Z         Start  42: horde_rt_windows_combat_teaching_presentation_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:35.4435207Z  42/139 Test  #42: horde_rt_windows_combat_teaching_presentation_tests ........   Passed    0.42 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:35.4439463Z         Start  43: horde_rt_android_motion_evidence_policy_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:35.4536071Z  43/139 Test  #43: horde_rt_android_motion_evidence_policy_tests ..............   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:35.4539862Z         Start  44: horde_rt_android_debug_request_admission_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:35.4635363Z  44/139 Test  #44: horde_rt_android_debug_request_admission_tests .............   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:35.4638833Z         Start  45: horde_rt_motion_evidence_scenario_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:36.1778383Z  45/139 Test  #45: horde_rt_motion_evidence_scenario_tests ....................   Passed    0.71 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:36.1784238Z         Start  46: horde_rt_benchmark_evidence_run_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:36.1974058Z  46/139 Test  #46: horde_rt_benchmark_evidence_run_tests ......................   Passed    0.02 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:36.1978039Z         Start  47: horde_rt_evidence_publication_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:36.2081813Z  47/139 Test  #47: horde_rt_evidence_publication_tests ........................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:36.2087020Z         Start  48: horde_rt_ray_tracing_requirements_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:36.2190488Z  48/139 Test  #48: horde_rt_ray_tracing_requirements_tests ....................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:36.2194479Z         Start  49: horde_rt_performance_evidence_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:36.5517471Z  49/139 Test  #49: horde_rt_performance_evidence_tests ........................   Passed    0.33 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:36.5522355Z         Start  50: horde_rt_scene_record_observation_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:36.5613648Z  50/139 Test  #50: horde_rt_scene_record_observation_tests ....................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:36.5617710Z         Start  51: horde_rt_pipeline_variants_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:36.5704717Z  51/139 Test  #51: horde_rt_pipeline_variants_tests ...........................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:36.5708610Z         Start  52: horde_rt_pipeline_variant_provider_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:36.5827152Z  52/139 Test  #52: horde_rt_pipeline_variant_provider_tests ...................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:36.5831666Z         Start  53: horde_rt_pipeline_bundle_contracts_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:36.6141561Z  53/139 Test  #53: horde_rt_pipeline_bundle_contracts_tests ...................   Passed    0.03 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:36.6146895Z         Start  54: horde_rt_provider_shipping_mobile_fixture
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:36.6289334Z  54/139 Test  #54: horde_rt_provider_shipping_mobile_fixture ..................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:36.6293529Z         Start  55: horde_rt_provider_shipping_mobile_fixture_evidence
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:59.3929123Z  55/139 Test  #55: horde_rt_provider_shipping_mobile_fixture_evidence .........   Passed   22.76 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:59.3934605Z         Start  56: horde_rt_provider_shipping_high_fixture
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:59.4078874Z  56/139 Test  #56: horde_rt_provider_shipping_high_fixture ....................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:16:59.4082602Z         Start  57: horde_rt_provider_shipping_high_fixture_evidence
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:17:20.3684045Z  57/139 Test  #57: horde_rt_provider_shipping_high_fixture_evidence ...........   Passed   20.96 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:17:20.3688697Z         Start  58: horde_rt_provider_diagnostic_mobile_fixture
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:17:20.3826363Z  58/139 Test  #58: horde_rt_provider_diagnostic_mobile_fixture ................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:17:20.3829152Z         Start  59: horde_rt_provider_diagnostic_mobile_fixture_evidence
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:17:42.0222722Z  59/139 Test  #59: horde_rt_provider_diagnostic_mobile_fixture_evidence .......   Passed   21.64 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:17:42.0226954Z         Start  60: horde_rt_provider_diagnostic_high_fixture
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:17:42.0369875Z  60/139 Test  #60: horde_rt_provider_diagnostic_high_fixture ..................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:17:42.0373377Z         Start  61: horde_rt_provider_diagnostic_high_fixture_evidence
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:04.7028236Z  61/139 Test  #61: horde_rt_provider_diagnostic_high_fixture_evidence .........   Passed   22.66 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:04.7032870Z         Start  62: horde_rt_github_release_updater_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:04.7126846Z  62/139 Test  #62: horde_rt_github_release_updater_tests ......................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:04.7130381Z         Start  63: horde_rt_version_contract_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:04.7249326Z  63/139 Test  #63: horde_rt_version_contract_tests ............................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:04.7253018Z         Start  64: horde_rt_version_contract_incremental_configure_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:14.0217942Z  64/139 Test  #64: horde_rt_version_contract_incremental_configure_tests ......   Passed    9.30 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:14.0222377Z         Start  65: horde_rt_dielectric_math_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:14.0405979Z  65/139 Test  #65: horde_rt_dielectric_math_tests .............................   Passed    0.02 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:14.0409973Z         Start  66: horde_rt_opaque_segment_coverage_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:14.0501674Z  66/139 Test  #66: horde_rt_opaque_segment_coverage_tests .....................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:14.0505166Z         Start  67: horde_rt_skinned_node_pose_batch_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:14.1034689Z  67/139 Test  #67: horde_rt_skinned_node_pose_batch_tests .....................   Passed    0.05 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:14.1038306Z         Start  68: horde_rt_player_animation_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:14.1217958Z  68/139 Test  #68: horde_rt_player_animation_tests ............................   Passed    0.02 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:14.1221995Z         Start  69: horde_rt_fire_emitter_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:14.1342889Z  69/139 Test  #69: horde_rt_fire_emitter_tests ................................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:14.1346701Z         Start  70: horde_rt_held_item_socket_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:16.1475302Z  70/139 Test  #70: horde_rt_held_item_socket_tests ............................   Passed    2.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:16.1481009Z         Start  71: horde_rt_skeleton_render_pose_contracts
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:16.1542462Z  71/139 Test  #71: horde_rt_skeleton_render_pose_contracts ....................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:16.1546368Z         Start  72: horde_rt_combat_sword_authority_agreement
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:16.2663799Z  72/139 Test  #72: horde_rt_combat_sword_authority_agreement ..................   Passed    0.11 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:16.2669876Z         Start  73: horde_rt_development_static_asset_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:16.2905216Z  73/139 Test  #73: horde_rt_development_static_asset_tests ....................   Passed    0.02 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:16.2909083Z         Start  74: horde_rt_scene_abi_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:16.3009093Z  74/139 Test  #74: horde_rt_scene_abi_tests ...................................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:16.3012610Z         Start  75: horde_rt_tomb_wall_recess_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:16.3110457Z  75/139 Test  #75: horde_rt_tomb_wall_recess_tests ............................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:16.3113779Z         Start  76: horde_rt_tomb_dressing_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:16.3741526Z  76/139 Test  #76: horde_rt_tomb_dressing_tests ...............................   Passed    0.06 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:16.3746154Z         Start  77: horde_rt_world_surface_range_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:16.3833316Z  77/139 Test  #77: horde_rt_world_surface_range_tests .........................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:16.3836859Z         Start  78: horde_rt_graveyard_dressing_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:16.5633757Z  78/139 Test  #78: horde_rt_graveyard_dressing_tests ..........................   Passed    0.18 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:16.5638430Z         Start  79: horde_rt_forest_understory_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:16.5957979Z  79/139 Test  #79: horde_rt_forest_understory_tests ...........................   Passed    0.03 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:16.5962073Z         Start  80: horde_rt_forest_rock_dressing_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:16.6234415Z  80/139 Test  #80: horde_rt_forest_rock_dressing_tests ........................   Passed    0.03 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:16.6238480Z         Start  81: horde_rt_forest_deadwood_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:16.6894712Z  81/139 Test  #81: horde_rt_forest_deadwood_tests .............................   Passed    0.07 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:16.6898259Z         Start  82: horde_rt_bellwether_shell_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:16.7010032Z  82/139 Test  #82: horde_rt_bellwether_shell_tests ............................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:16.7013502Z         Start  83: horde_rt_forest_dressing_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:17.7913152Z  83/139 Test  #83: horde_rt_forest_dressing_tests .............................   Passed    1.09 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:17.7917352Z         Start  84: horde_rt_forest_runtime_roster_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:21.5667913Z  84/139 Test  #84: horde_rt_forest_runtime_roster_tests .......................   Passed    3.78 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:21.5672347Z         Start  85: horde_rt_forest_texture_source_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:35.8812346Z  85/139 Test  #85: horde_rt_forest_texture_source_tests .......................   Passed   14.31 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:35.8817655Z         Start  86: horde_rt_forest_placement_source_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:38.7451675Z  86/139 Test  #86: horde_rt_forest_placement_source_tests .....................   Passed    2.86 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:38.7455909Z         Start  87: horde_rt_forest_root_placement_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:39.2205551Z  87/139 Test  #87: horde_rt_forest_root_placement_tests .......................   Passed    0.47 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:39.2208693Z         Start  88: horde_rt_static_gltf_asset_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:39.3789841Z  88/139 Test  #88: horde_rt_static_gltf_asset_tests ...........................   Passed    0.16 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:39.3795046Z         Start  89: horde_rt_static_gltf_intake_missing_argument_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:39.3872186Z  89/139 Test  #89: horde_rt_static_gltf_intake_missing_argument_tests .........   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:39.3877578Z         Start  90: horde_rt_static_gltf_intake_unknown_argument_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:39.3955208Z  90/139 Test  #90: horde_rt_static_gltf_intake_unknown_argument_tests .........   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:39.3960691Z         Start  91: horde_rt_production_prop_asset_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:39.4368169Z  91/139 Test  #91: horde_rt_production_prop_asset_tests .......................   Passed    0.04 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:39.4372957Z         Start  92: horde_rt_static_collapse_asset_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:39.5306814Z  92/139 Test  #92: horde_rt_static_collapse_asset_tests .......................   Passed    0.09 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:39.5310610Z         Start  93: horde_rt_benchmark_scale_policy_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:40.9634576Z  93/139 Test  #93: horde_rt_benchmark_scale_policy_tests ......................   Passed    1.43 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:18:40.9640017Z         Start  94: horde_rt_windows_glass_graphics_contract_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:06.1814602Z  94/139 Test  #94: horde_rt_windows_glass_graphics_contract_tests .............   Passed   25.22 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:06.1819652Z         Start  95: horde_rt_windows_benchmark_summary_review_contract_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:06.6101601Z  95/139 Test  #95: horde_rt_windows_benchmark_summary_review_contract_tests ...   Passed    0.43 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:06.6106321Z         Start  96: horde_rt_android_staged_admission_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:07.2849687Z  96/139 Test  #96: horde_rt_android_staged_admission_tests ....................   Passed    0.67 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:07.2854145Z         Start  97: horde_rt_simulation_timing_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:07.3063337Z  97/139 Test  #97: horde_rt_simulation_timing_tests ...........................   Passed    0.02 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:07.3067804Z         Start  98: horde_rt_simulation_gameplay_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:07.4280186Z  98/139 Test  #98: horde_rt_simulation_gameplay_tests .........................   Passed    0.12 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:07.4283997Z         Start  99: horde_rt_water_contact_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:07.4495955Z  99/139 Test  #99: horde_rt_water_contact_tests ...............................   Passed    0.02 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:07.4499571Z         Start 100: horde_rt_waterfall_production_route_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:07.5651823Z 100/139 Test #100: horde_rt_waterfall_production_route_tests ..................   Passed    0.11 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:07.5655398Z         Start 101: horde_rt_waterfall_legacy_route_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:07.6701228Z 101/139 Test #101: horde_rt_waterfall_legacy_route_tests ......................   Passed    0.10 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:07.6705052Z         Start 102: horde_rt_music_director_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:07.6856362Z 102/139 Test #102: horde_rt_music_director_tests ..............................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:07.6859879Z         Start 103: horde_rt_entry_portal_cap_geometry_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:07.6943177Z 103/139 Test #103: horde_rt_entry_portal_cap_geometry_tests ...................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:07.6946466Z         Start 104: horde_rt_tomb_terrain_exclusion_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:07.7030317Z 104/139 Test #104: horde_rt_tomb_terrain_exclusion_tests ......................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:07.7033884Z         Start 105: horde_rt_windows_subtitle_bitmap_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:07.8043741Z 105/139 Test #105: horde_rt_windows_subtitle_bitmap_tests .....................   Passed    0.10 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:07.8048734Z         Start 106: horde_rt_sfx_volume_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:07.8146137Z 106/139 Test #106: horde_rt_sfx_volume_tests ..................................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:07.8149635Z         Start 107: horde_rt_windows_music_focus_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:07.8265290Z 107/139 Test #107: horde_rt_windows_music_focus_tests .........................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:07.8268793Z         Start 108: horde_rt_music_pcm_stream_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:07.9767862Z 108/139 Test #108: horde_rt_music_pcm_stream_tests ............................   Passed    0.15 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:07.9772247Z         Start 109: horde_rt_music_pcm_wave_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:08.0219752Z 109/139 Test #109: horde_rt_music_pcm_wave_tests ..............................   Passed    0.04 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:08.0223279Z         Start 110: horde_rt_music_pcm_asset_bank_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:08.2845117Z 110/139 Test #110: horde_rt_music_pcm_asset_bank_tests ........................   Passed    0.26 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:08.2848341Z         Start 111: horde_rt_music_playback_session_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:08.4735372Z 111/139 Test #111: horde_rt_music_playback_session_tests ......................   Passed    0.19 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:08.4739243Z         Start 112: horde_rt_surface_session_mailbox_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:08.7686903Z 112/139 Test #112: horde_rt_surface_session_mailbox_tests .....................   Passed    0.29 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:08.7690914Z         Start 113: horde_rt_playtest_report_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:08.7774504Z 113/139 Test #113: horde_rt_playtest_report_tests .............................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:08.7777718Z         Start 114: horde_rt_playtest_submission_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:08.8084762Z 114/139 Test #114: horde_rt_playtest_submission_tests .........................   Passed    0.03 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:08.8088208Z         Start 115: horde_rt_windows_playtest_screenshot_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:08.8487235Z 115/139 Test #115: horde_rt_windows_playtest_screenshot_tests .................   Passed    0.04 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:08.8490685Z         Start 116: horde_rt_windows_playtest_submission_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:11.0147527Z 116/139 Test #116: horde_rt_windows_playtest_submission_tests .................   Passed    2.17 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:11.0151565Z         Start 117: horde_rt_windows_playtest_verification_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:11.0308376Z 117/139 Test #117: horde_rt_windows_playtest_verification_tests ...............   Passed    0.02 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:11.0311776Z         Start 118: horde_rt_windows_remote_playtest_report_ui_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:11.7661798Z 118/139 Test #118: horde_rt_windows_remote_playtest_report_ui_tests ...........   Passed    0.73 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:11.7666208Z         Start 119: horde_rt_windows_playtest_report_ui_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:18.1694916Z 119/139 Test #119: horde_rt_windows_playtest_report_ui_tests ..................***Failed    6.40 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:18.1697051Z UI stack 0: win32u!NtGdiGetTextMetricsW+0x14 address=0x7ffd73c32064
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:18.1697899Z UI stack 1: win32u!NtGdiGetTextMetricsW+0x14 address=0x7ffd73c32064
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:18.1699219Z UI stack 2: gdi32full!GetTextMetricsW+0x231 address=0x7ffd73b19041
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:18.1700171Z UI stack 3: Msftedit!Ordinal15+0xff4ca address=0x7ffd4321f4ca
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:18.1701770Z UI stack 4: Msftedit!CreateTextServices+0xc5c8 address=0x7ffd4322c1a8
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:18.1715992Z UI stack 5: Msftedit!RichEditWndProc+0x16a64 address=0x7ffd4325b8e4
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:18.1717008Z UI stack 6: Msftedit!RichEditWndProc+0x156b5 address=0x7ffd4325a535
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:18.1717772Z UI stack 7: Msftedit!Ordinal15+0xef242 address=0x7ffd4320f242
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:18.1718449Z UI stack 8: Msftedit!Ordinal15+0xef161 address=0x7ffd4320f161
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:18.1719150Z UI stack 9: Msftedit!Ordinal15+0x402ca address=0x7ffd431602ca
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:18.1719815Z UI stack 10: Msftedit!Ordinal15+0x67909 address=0x7ffd43187909
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:18.1720474Z UI stack 11: Msftedit!Ordinal15+0x658b3 address=0x7ffd431858b3
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:18.1721445Z UI stack 12: Msftedit!CreateTextServices+0x227d3 address=0x7ffd432423b3
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:18.1722204Z UI stack 13: Msftedit!RichEditWndProc+0xb22 address=0x7ffd432459a2
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:18.1723170Z UI stack 14: USER32!CallWindowProcW+0x6a6 address=0x7ffd75067846
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:18.1724319Z UI stack 15: USER32!SendMessageW+0xacc address=0x7ffd750670cc
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:18.1725246Z UI stack 16: USER32!User32InitializeImmEntryTable+0x1375 address=0x7ffd75085ab5
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:18.1726109Z UI stack 17: ntdll!KiUserCallbackDispatcher+0x24 address=0x7ffd76b46814
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:18.1726868Z UI stack 18: win32u!NtUserGetMessage+0x14 address=0x7ffd73c31324
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:18.1728785Z native control message timed out; phase=note-only approved Unicode note edit hwnd=000000000005021A controlId=106 message=0xc error=1460 senderThread=3480 ownerThread=1532 elapsedMs=2000 enabled=1 visible=1 guiInfoAvailable=1 guiInfoError=0 guiFlags=0x0 active=000000000011008C focus=0000000000020222 capture=0000000000000000
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:18.1730716Z UI stack 19: USER32!GetMessageW+0x22 address=0x7ffd7508f402
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:18.1731508Z UI stack 20: horde_rt_windows_playtest_repor!unresolved+0x0 address=0x7ff75b86de43
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:18.1732365Z UI stack 21: horde_rt_windows_playtest_repor!unresolved+0x0 address=0x7ff75b8690dc
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:18.1733199Z UI stack 22: horde_rt_windows_playtest_repor!unresolved+0x0 address=0x7ff75b8766df
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:18.1733995Z UI stack 23: KERNEL32!BaseThreadInitThunk+0x17 address=0x7ffd7478e987
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:18.1735010Z UI stack 0: win32u!NtUserGetMessage+0x14 address=0x7ffd73c31324
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:18.1735698Z UI stack 1: win32u!NtUserGetMessage+0x14 address=0x7ffd73c31324
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:18.1736389Z UI stack 2: USER32!GetMessageW+0x22 address=0x7ffd7508f402
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:18.1737126Z UI stack 3: horde_rt_windows_playtest_repor!unresolved+0x0 address=0x7ff75b86de43
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:18.1737958Z UI stack 4: horde_rt_windows_playtest_repor!unresolved+0x0 address=0x7ff75b8690dc
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:18.1738807Z UI stack 5: horde_rt_windows_playtest_repor!unresolved+0x0 address=0x7ff75b8766df
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:18.1739664Z UI stack 6: KERNEL32!BaseThreadInitThunk+0x17 address=0x7ffd7478e987
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:18.1740413Z UI stack 7: ntdll!RtlUserThreadStart+0x2c address=0x7ffd76a6c53c
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:18.1741017Z note EDIT executing=1
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:18.1741507Z UI wait-chain nodes=1 cycle=0
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:18.1741997Z   node=0 type=8 status=3
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:18.1742679Z note EDIT trace; phase=note-only initial note edit returned=1 elapsedMs=0
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:18.1743520Z note EDIT trace; phase=note-only rejected-input note edit returned=1 elapsedMs=0
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:18.1744393Z note EDIT trace; phase=note-only oversized note edit returned=1 elapsedMs=0
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:18.1746047Z note EDIT trace; phase=note-only approved Unicode note edit returned=0 elapsedMs=0
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:18.1747029Z note EDIT trace; phase=note-only frozen retry edit returned=1 elapsedMs=0
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:18.1747877Z note EDIT trace; phase=explicit-context note edit returned=1 elapsedMs=0
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:18.1748442Z 
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:18.1748802Z         Start 120: horde_rt_music_asset_admission_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:28.1304468Z 120/139 Test #120: horde_rt_music_asset_admission_tests .......................   Passed    9.96 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:28.1308925Z         Start 121: horde_rt_android_showcase_witness_policy_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:29.5780956Z 121/139 Test #121: horde_rt_android_showcase_witness_policy_tests .............   Passed    1.45 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:29.5786209Z         Start 122: horde_rt_pocket_audio_core_pin_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:31.1528347Z 122/139 Test #122: horde_rt_pocket_audio_core_pin_tests .......................   Passed    1.57 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:31.1532070Z         Start 123: horde_rt_lantern_reward_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:31.1632529Z 123/139 Test #123: horde_rt_lantern_reward_tests ..............................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:31.1635947Z         Start 124: horde_rt_lantern_pendulum_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:31.1745021Z 124/139 Test #124: horde_rt_lantern_pendulum_tests ............................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:31.1748256Z         Start 125: horde_rt_input_mailbox_stress
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:31.3097832Z 125/139 Test #125: horde_rt_input_mailbox_stress ..............................   Passed    0.13 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:31.3102350Z         Start 126: horde_rt_desktop_controller_input_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:31.3233141Z 126/139 Test #126: horde_rt_desktop_controller_input_tests ....................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:31.3236426Z         Start 127: horde_rt_gpu_timestamp_math_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:31.3320752Z 127/139 Test #127: horde_rt_gpu_timestamp_math_tests ..........................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:31.3324086Z         Start 128: horde_rt_combat_smoke
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:31.3410284Z 128/139 Test #128: horde_rt_combat_smoke ......................................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:31.3413634Z         Start 129: horde_rt_showcase_route_smoke
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:31.3490537Z 129/139 Test #129: horde_rt_showcase_route_smoke ..............................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:31.3493703Z         Start 130: horde_rt_showcase_gameplay_smoke
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:31.3645625Z 130/139 Test #130: horde_rt_showcase_gameplay_smoke ...........................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:31.3649398Z         Start 131: horde_rt_spatial_audio_smoke
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:31.3898289Z 131/139 Test #131: horde_rt_spatial_audio_smoke ...............................   Passed    0.02 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:31.3902647Z         Start 132: horde_rt_rescue_traversal_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:31.4640749Z 132/139 Test #132: horde_rt_rescue_traversal_tests ............................   Passed    0.07 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:31.4644443Z         Start 133: horde_rt_rescue_blockout_import_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:31.4799631Z 133/139 Test #133: horde_rt_rescue_blockout_import_tests ......................   Passed    0.02 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:31.4802880Z         Start 134: horde_rt_rescue_source_admission_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:31.6834642Z 134/139 Test #134: horde_rt_rescue_source_admission_tests .....................   Passed    0.20 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:31.6838558Z         Start 135: horde_rt_water_contact_audio_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:32.5639872Z 135/139 Test #135: horde_rt_water_contact_audio_tests .........................   Passed    0.88 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:32.5643598Z         Start 136: horde_rt_keeper_death_audio_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:32.8301582Z 136/139 Test #136: horde_rt_keeper_death_audio_tests ..........................   Passed    0.27 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:32.8305701Z         Start 137: horde_rt_kit_audio_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:33.1148986Z 137/139 Test #137: horde_rt_kit_audio_tests ...................................   Passed    0.28 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:33.1154017Z         Start 138: horde_rt_chapter_texture_alias_payload_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:33.3725507Z 138/139 Test #138: horde_rt_chapter_texture_alias_payload_tests ...............   Passed    0.26 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:33.3730827Z         Start 139: pocket_audio_native_pcm_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:33.3822725Z 139/139 Test #139: pocket_audio_native_pcm_tests ..............................   Passed    0.01 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:33.3838930Z 
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:33.3839258Z 99% tests passed, 1 tests failed out of 139
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:33.3839589Z 
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:33.3839732Z Total Test time (real) = 184.40 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:33.3840005Z 
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:33.3840174Z The following tests FAILED:
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:33.3841682Z 	119 - horde_rt_windows_playtest_report_ui_tests (Failed)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:19:33.3847870Z Errors while running CTest
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:23.0703904Z Test project D:/a/The-Horde-RT-demo/The-Horde-RT-demo/build/host-ci
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:23.0704361Z     Start 136: horde_rt_horde_162_asset_policy_tests
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:23.0704941Z 1/1 Test #136: horde_rt_horde_162_asset_policy_tests ...   Passed  294.04 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:23.0706488Z 
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:23.0706749Z 100% tests passed out of 1
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:23.0706938Z 
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:23.0707297Z Total Test time (real) = 294.06 sec
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:23.0707476Z 
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:23.0737447Z Windows selection: 140 tests; asset-policy once plus 139 sequential tests.
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:23.2551137Z ^[[31;1mException: ^[[0mD:\a\The-Horde-RT-demo\The-Horde-RT-demo\tools\run-windows-host-ci-tests.ps1:33^[[0m
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:23.2552048Z ^[[31;1m^[[0m^[[36;1mLine |^[[0m
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:23.2552925Z ^[[31;1m^[[0m^[[36;1m^[[36;1m  33 | ^[[0m … Code -ne 0){^[[36;1mthrow "Windows CTest failure: remaining=$restExit; asset-^[[0m …^[[0m
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:23.2554001Z ^[[31;1m^[[0m^[[36;1m^[[36;1m^[[0m^[[36;1m^[[0m^[[36;1m     | ^[[31;1m               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^[[0m
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:23.2554995Z ^[[31;1m^[[0m^[[36;1m^[[36;1m^[[0m^[[36;1m^[[0m^[[36;1m^[[31;1m^[[31;1m^[[36;1m     | ^[[31;1mWindows CTest failure: remaining=8; asset-policy=0.^[[0m
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:23.3129791Z ##[error]Process completed with exit code 1.
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:23.5222076Z ##[group]Run $path = 'build/host-ci/Testing/Temporary/LastTest.log'
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:23.5222673Z ^[[36;1m$path = 'build/host-ci/Testing/Temporary/LastTest.log'^[[0m
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:23.5223176Z ^[[36;1mif (Test-Path -LiteralPath $path) {^[[0m
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:23.5223704Z ^[[36;1m  $text = [IO.File]::ReadAllText((Resolve-Path -LiteralPath $path))^[[0m
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:23.5224576Z ^[[36;1m  $record = [regex]::Match($text, '(?ms)^\d+/\d+ Testing: horde_rt_windows_playtest_report_ui_tests\r?\n.*?(?=^\d+/\d+ Testing:|\z)')^[[0m
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:23.5225415Z ^[[36;1m  if ($record.Success) { Write-Output $record.Value }^[[0m
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:23.5226064Z ^[[36;1m  else { Write-Output 'Native report UI fixture did not execute in this job.' }^[[0m
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:23.5243081Z ^[[36;1m}^[[0m
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:23.5322790Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:23.5323139Z ##[endgroup]
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:23.8919048Z Native report UI fixture did not execute in this job.
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:24.2813211Z Post job cleanup.
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:30.4598051Z [command]"C:\Program Files\Git\bin\git.exe" version
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:31.0967667Z git version 2.55.0.windows.5
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:31.1394749Z Temporarily overriding HOME='D:\a\_temp\11003442-1828-410b-bd0c-5bbfad0efc6e' before making global git config changes
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:31.1396041Z Adding repository directory to the temporary git global config as a safe directory
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:31.1443711Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\The-Horde-RT-demo\The-Horde-RT-demo
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:31.2112783Z Removing SSH command configuration
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:31.2122351Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:31.2454838Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:34.9646954Z Removing HTTP extra header
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:34.9656128Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:34.9910181Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:35.4467196Z Removing includeIf entries pointing to credentials config files
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:35.4493927Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:35.4772324Z includeif.gitdir:D:/a/The-Horde-RT-demo/The-Horde-RT-demo/.git.path
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:35.4773103Z includeif.gitdir:D:/a/The-Horde-RT-demo/The-Horde-RT-demo/.git/worktrees/*.path
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:35.4773759Z includeif.gitdir:/github/workspace/.git.path
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:35.4774315Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:35.4809014Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:D:/a/The-Horde-RT-demo/The-Horde-RT-demo/.git.path
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:35.5161996Z D:\a\_temp\git-credentials-257d1bec-b6b2-40d2-bf64-4f657286be53.config
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:35.5202634Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:D:/a/The-Horde-RT-demo/The-Horde-RT-demo/.git.path D:\a\_temp\git-credentials-257d1bec-b6b2-40d2-bf64-4f657286be53.config
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:35.5473691Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:D:/a/The-Horde-RT-demo/The-Horde-RT-demo/.git/worktrees/*.path
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:35.5706162Z D:\a\_temp\git-credentials-257d1bec-b6b2-40d2-bf64-4f657286be53.config
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:35.5747078Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:D:/a/The-Horde-RT-demo/The-Horde-RT-demo/.git/worktrees/*.path D:\a\_temp\git-credentials-257d1bec-b6b2-40d2-bf64-4f657286be53.config
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:35.6017610Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:/github/workspace/.git.path
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:35.6290593Z /github/runner_temp/git-credentials-257d1bec-b6b2-40d2-bf64-4f657286be53.config
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:35.6330891Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-257d1bec-b6b2-40d2-bf64-4f657286be53.config
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:35.6609960Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:35.6843078Z /github/runner_temp/git-credentials-257d1bec-b6b2-40d2-bf64-4f657286be53.config
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:35.6884476Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-257d1bec-b6b2-40d2-bf64-4f657286be53.config
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:35.7150362Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:36.1675139Z Removing credentials config 'D:\a\_temp\git-credentials-257d1bec-b6b2-40d2-bf64-4f657286be53.config'
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:36.4751373Z Cleaning up orphan processes
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:36.9186998Z Terminate orphan process: pid (5344) (vctip)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:36.9469462Z Terminate orphan process: pid (5312) (MSBuild)
+Shared simulation host (MSVC)	UNKNOWN STEP	2026-10-13T21:21:36.9512880Z Terminate orphan process: pid (8444) (conhost)

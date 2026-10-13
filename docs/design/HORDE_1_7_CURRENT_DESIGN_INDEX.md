@@ -1,5 +1,16 @@
 # Horde 1.7 current design index
 
+The [optimized Release route baseline](../evidence/2026-10-14-release-route-baseline/README.md)
+now records matched visible Pipeline/Query out-and-back runs, constant allocation
+and zero static-region saving. Its original timestamps are post-render observations;
+immediate-present timing validation remains pending. The scoped phone ground views
+were captured on both real backends; full physical acceptance remains open.
+Parent `f005a4ec` passes five CI jobs but repeats the MSVC Unicode-note timeout.
+The [fixed-size field candidate](../evidence/2026-10-14-report-ui-fixed-size/README.md)
+addresses the remaining script-size policy with unchanged deadlines and added
+native insertion coverage. Exact successor CI must pass before calling it verified.
+Normal two-way static-region loading/retirement remains the next chapter milestone.
+
 **Current ground-material checkpoint; chapter incomplete.** The
 [matched material evidence](../evidence/2026-10-14-ground-material-balance/README.md)
 sets Forest Ground's linear factor to0.5 through the generic native PBR sidecar.

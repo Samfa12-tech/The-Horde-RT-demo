@@ -1,0 +1,46 @@
+UI stack 0: ntdll!NtDelayExecution+0x14 address=0x7ff8985e1444
+UI stack 1: ntdll!NtDelayExecution+0x14 address=0x7ff8985e1444
+UI stack 2: ntdll!RtlDelayExecution+0x34 address=0x7ff898553924
+UI stack 3: KERNELBASE!SleepEx+0x91 address=0x7ff895a8bb01
+UI stack 4: horde_rt_windows_playtest_repor!unresolved+0x0 address=0x7ff607ac2c4e
+UI stack 5: horde_rt_windows_playtest_repor!unresolved+0x0 address=0x7ff607ac5be6
+UI stack 6: USER32!PostMessageW+0x5bb address=0x7ff89694989b
+UI stack 7: USER32!User32InitializeImmEntryTable+0x1375 address=0x7ff896948225
+UI stack 8: ntdll!KiUserCallbackDispatcher+0x24 address=0x7ff8985e4de4
+UI stack 9: win32u!NtUserGetMessage+0x14 address=0x7ff895e11344
+UI stack 10: USER32!GetMessageW+0x22 address=0x7ff896952812
+UI stack 11: horde_rt_windows_playtest_repor!unresolved+0x0 address=0x7ff607acdec3
+UI stack 12: horde_rt_windows_playtest_repor!unresolved+0x0 address=0x7ff607ac8ed8
+UI stack 13: horde_rt_windows_playtest_repor!unresolved+0x0 address=0x7ff607ad659c
+UI stack 14: KERNEL32!BaseThreadInitThunk+0x17 address=0x7ff89811cd87
+UI stack 15: ntdll!RtlUserThreadStart+0x2c address=0x7ff89852caec
+native control message timed out; phase=note-only approved Unicode note edit hwnd=0000000000910BB6 controlId=106 message=0xc error=1460 senderThread=41352 ownerThread=54480 elapsedMs=2003 enabled=1 visible=1 guiInfoAvailable=1 guiInfoError=0 guiFlags=0x0 active=0000000000880E20 focus=0000000000550872 capture=0000000000000000
+UI stack 0: ntdll!NtDelayExecution+0x14 address=0x7ff8985e1444
+UI stack 1: ntdll!NtDelayExecution+0x14 address=0x7ff8985e1444
+UI stack 2: ntdll!RtlDelayExecution+0x34 address=0x7ff898553924
+UI stack 3: KERNELBASE!SleepEx+0x91 address=0x7ff895a8bb01
+UI stack 4: horde_rt_windows_playtest_repor!unresolved+0x0 address=0x7ff607ac2c4e
+UI stack 5: horde_rt_windows_playtest_repor!unresolved+0x0 address=0x7ff607ac5be6
+UI stack 6: USER32!PostMessageW+0x5bb address=0x7ff89694989b
+UI stack 7: USER32!User32InitializeImmEntryTable+0x1375 address=0x7ff896948225
+UI stack 8: ntdll!KiUserCallbackDispatcher+0x24 address=0x7ff8985e4de4
+UI stack 9: win32u!NtUserGetMessage+0x14 address=0x7ff895e11344
+UI stack 10: USER32!GetMessageW+0x22 address=0x7ff896952812
+UI stack 11: horde_rt_windows_playtest_repor!unresolved+0x0 address=0x7ff607acdec3
+UI stack 12: horde_rt_windows_playtest_repor!unresolved+0x0 address=0x7ff607ac8ed8
+UI stack 13: horde_rt_windows_playtest_repor!unresolved+0x0 address=0x7ff607ad659c
+UI stack 14: KERNEL32!BaseThreadInitThunk+0x17 address=0x7ff89811cd87
+UI stack 15: ntdll!RtlUserThreadStart+0x2c address=0x7ff89852caec
+note EDIT executing=1
+UI wait-chain nodes=1 cycle=0
+  node=0 type=8 status=3
+approved note-only export did not reach injected destination once
+approved note did not freeze for retry
+explicit retry did not reach destination
+retry changed report ID or JSON bytes
+note EDIT trace; phase=note-only initial note edit returned=1 elapsedMs=0
+note EDIT trace; phase=note-only rejected-input note edit returned=1 elapsedMs=0
+note EDIT trace; phase=note-only oversized note edit returned=1 elapsedMs=0
+note EDIT trace; phase=note-only approved Unicode note edit returned=0 elapsedMs=0
+note EDIT trace; phase=note-only frozen retry edit returned=1 elapsedMs=0
+note EDIT trace; phase=explicit-context note edit returned=1 elapsedMs=0
