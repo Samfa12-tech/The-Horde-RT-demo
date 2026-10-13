@@ -8,8 +8,20 @@ were captured on both real backends; full physical acceptance remains open.
 Parent `f005a4ec` passes five CI jobs but repeats the MSVC Unicode-note timeout.
 The [fixed-size field candidate](../evidence/2026-10-14-report-ui-fixed-size/README.md)
 addresses the remaining script-size policy with unchanged deadlines and added
-native insertion coverage. Exact successor CI must pass before calling it verified.
+native insertion coverage. Successor `b9f2e942` passes all six exact-commit
+[CI jobs](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/38471870756),
+including the Windows Unicode note-edit test and all seven requested Vulkan-host
+traversal tests. The observed font-metrics stall is retained; its particular
+font-service cause is not proved by the successor pass.
 Normal two-way static-region loading/retirement remains the next chapter milestone.
+
+The [prepared forest provenance repair](../evidence/2026-10-14-forest-region-provenance/README.md)
+now keeps all 365,212 actual exterior-dressing triangles distinct from shared
+terrain and tomb detail through consolidation and bounded copying. Complete GPU
+payloads are byte-identical; corrupt labels reject atomically. Debug/Release
+affected tests, four-ABI Android build and exact package checks pass. This closes
+the missing ownership-label prerequisite, **not contributor admission or normal
+GPU retirement**. Static-region saving remains zero; the phone is unavailable.
 
 **Current ground-material checkpoint; chapter incomplete.** The
 [matched material evidence](../evidence/2026-10-14-ground-material-balance/README.md)

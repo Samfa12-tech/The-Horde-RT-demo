@@ -123,7 +123,7 @@ bool AppendPreparedForestDressing(const std::filesystem::path& assetRoot,
                                   const gameplay::simulation::TriangleSupportSurface* terrain)
 {
     report = {};
-    if (existingOwner.vertices.empty() || existingOwner.indices.empty() ||
+    if (!existingOwner.HasValidTriangleProvenance() || existingOwner.vertices.empty() || existingOwner.indices.empty() ||
         existingOwner.primitives.empty() || existingOwner.materials.empty() ||
         existingOwner.nodeTransforms.empty())
     {
@@ -391,6 +391,11 @@ bool AppendPreparedForestDressing(const std::filesystem::path& assetRoot,
         primitive.materialIndex = materialIndices[family];
         primitive.nodeTransformIndex = static_cast<std::uint32_t>(staged.nodeTransforms.size());
         staged.vertices.insert(staged.vertices.end(), groupedVertices[family].begin(), groupedVertices[family].end());
+        // CPU ownership is independent of shared materials; it does not certify
+        // that these trees are irrelevant to any current ray or light path.
+        staged.triangleRegions.resize(staged.indices.size()/3u, assets::StaticTriangleRegion::Shared);
+        staged.triangleRegions.insert(staged.triangleRegions.end(), primitive.indexCount/3u,
+            assets::StaticTriangleRegion::ExteriorDressing);
         staged.indices.insert(staged.indices.end(), groupedIndices[family].begin(), groupedIndices[family].end());
         staged.primitives.push_back(primitive);
         staged.nodeTransforms.push_back({"forest-dressing-world-baked", {{

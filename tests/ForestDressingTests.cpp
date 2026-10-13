@@ -109,6 +109,10 @@ void TestNativeTreePairAndAppend()
     Check(owner.vertices.size() == oldVertices.size() + report.addedVertices &&
               owner.indices.size() == oldIndices.size() + report.addedIndices,
           "append report accounts for each forest vertex and index");
+    Check(owner.triangleRegions.size() == owner.indices.size()/3u &&
+              std::count(owner.triangleRegions.begin(), owner.triangleRegions.end(),
+                  StaticTriangleRegion::ExteriorDressing) == static_cast<std::ptrdiff_t>(report.addedTriangles),
+          "every prepared tree triangle has exterior ownership while the existing prefix stays shared");
     Check(std::memcmp(owner.vertices.data(), oldVertices.data(), oldVertices.size() * sizeof(oldVertices[0])) == 0 &&
               std::equal(oldIndices.begin(), oldIndices.end(), owner.indices.begin()),
           "existing collapsed-owner geometry and index prefix remain byte-identical");
@@ -243,6 +247,25 @@ void TestCleanFailures()
               std::memcmp(crowded.vertices.data(), crowdedVertices.data(),
                           crowdedVertices.size() * sizeof(crowdedVertices[0])) == 0,
           "four-group admission fails before geometry mutation when the shared 32-material cap would overflow");
+}
+
+template<class Append>
+void CheckCorruptForestProvenance(const StaticMeshAsset& owner, Append append)
+{
+    for (bool excessive : {false, true}) {
+        auto invalid = owner;
+        if (excessive) invalid.triangleRegions.resize(owner.indices.size()/3u+1u, StaticTriangleRegion::Shared);
+        else invalid.triangleRegions.assign(1u, static_cast<StaticTriangleRegion>(9u));
+        const auto regions = invalid.triangleRegions;
+        Check(!append(invalid) && invalid.indices == owner.indices && invalid.triangleRegions == regions &&
+                  invalid.vertices.size() == owner.vertices.size() &&
+                  std::memcmp(invalid.vertices.data(), owner.vertices.data(),
+                      owner.vertices.size()*sizeof(owner.vertices.front())) == 0 &&
+                  invalid.primitives.size() == owner.primitives.size() &&
+                  invalid.materials.size() == owner.materials.size() &&
+                  invalid.nodeTransforms.size() == owner.nodeTransforms.size(),
+              "forest append rejects corrupt ownership before publishing geometry or labels");
+    }
 }
 
 void TestUnsafeRootFootprintsFailAtomically()
@@ -380,6 +403,7 @@ void TestNativeChapterPrimitiveOwnership()
     GraveyardDressingReport graveyard;
     ForestUnderstoryReport understory;
     ForestDeadwoodReport deadwood;
+    ForestRockReport rocks;
     std::shared_ptr<const gameplay::simulation::TriangleSupportSurface> terrain;
     const bool prepared = AppendPreparedTombDressing(kRoot / "assets", owner, tomb, diagnostic) &&
         AppendChapterTerrain(kRoot / "assets", owner, terrain, diagnostic) &&
@@ -390,10 +414,30 @@ void TestNativeChapterPrimitiveOwnership()
                   "graveyard append rejects excessive provenance and retains prior geometry/contact");
             return AppendPreparedGraveyard(kRoot/"assets",owner,terrain,graveyard,diagnostic);}() &&
         AppendBellwetherShell(kRoot / "assets", owner, diagnostic) &&
-        AppendPreparedForestDressing(kRoot / "assets", owner, forest, diagnostic, terrain.get()) &&
-        AppendPreparedForestUnderstory(kRoot / "assets", owner, *terrain, understory, diagnostic) &&
-        [&]{ForestRockReport rocks;return AppendPreparedForestRocks(kRoot / "assets",owner,terrain,rocks,diagnostic);}() &&
-        AppendPreparedForestDeadwood(kRoot / "assets",owner,terrain,deadwood,diagnostic) &&
+        [&]{CheckCorruptForestProvenance(owner,[&](auto& invalid) {
+                ForestDressingBuildReport rejected;
+                return AppendPreparedForestDressing(kRoot/"assets",invalid,rejected,diagnostic,terrain.get());
+            });
+            return AppendPreparedForestDressing(kRoot/"assets",owner,forest,diagnostic,terrain.get());}() &&
+        [&]{CheckCorruptForestProvenance(owner,[&](auto& invalid) {
+                ForestUnderstoryReport rejected;
+                return AppendPreparedForestUnderstory(kRoot/"assets",invalid,*terrain,rejected,diagnostic);
+            });
+            return AppendPreparedForestUnderstory(kRoot/"assets",owner,*terrain,understory,diagnostic);}() &&
+        [&]{CheckCorruptForestProvenance(owner,[&](auto& invalid) {
+                auto retained=terrain;ForestRockReport rejected;
+                const bool accepted=AppendPreparedForestRocks(kRoot/"assets",invalid,retained,rejected,diagnostic);
+                Check(retained==terrain,"rejected rock ownership must retain authoritative collision support");
+                return accepted;
+            });
+            return AppendPreparedForestRocks(kRoot/"assets",owner,terrain,rocks,diagnostic);}() &&
+        [&]{CheckCorruptForestProvenance(owner,[&](auto& invalid) {
+                auto retained=terrain;ForestDeadwoodReport rejected;
+                const bool accepted=AppendPreparedForestDeadwood(kRoot/"assets",invalid,retained,rejected,diagnostic);
+                Check(retained==terrain,"rejected deadwood ownership must retain authoritative collision support");
+                return accepted;
+            });
+            return AppendPreparedForestDeadwood(kRoot/"assets",owner,terrain,deadwood,diagnostic);}() &&
         ConsolidateWorldBakedMaterialFamilies(owner, diagnostic);
     Check(prepared, diagnostic.empty() ? "real tomb/terrain/forest preparation succeeds" : diagnostic);
     if (!prepared) return;
@@ -415,19 +459,30 @@ void TestNativeChapterPrimitiveOwnership()
         StaticTriangleRegion::ExteriorDressing);
     Check(taggedTomb>0 && taggedExterior>0,
           "mixed candle/urn material families must distinguish tomb and actual graveyard geometry");
-    Check(taggedExterior==static_cast<std::ptrdiff_t>(graveyard.triangles),
-          "all actual graveyard triangles retain exterior provenance across consolidation");
+    Check(taggedExterior==static_cast<std::ptrdiff_t>(graveyard.triangles + forest.addedTriangles +
+              understory.triangles + rocks.triangles + deadwood.triangles),
+          "all graveyard, tree, understory, rock and deadwood triangles retain exterior ownership");
     for(const auto& primitive:owner.primitives)for(std::size_t n=0;n<primitive.indexCount;n+=3u) {
         if(owner.triangleRegions[(primitive.indexOffset+n)/3u]!=StaticTriangleRegion::ExteriorDressing)continue;
-        const bool authored=std::any_of(graveyard.placements.begin(),graveyard.placements.end(),[&](const auto& placement) {
+        const auto inside=[&](const auto& minimum,const auto& maximum) {
             for(unsigned corner=0;corner<3;++corner) {
                 const auto& point=owner.vertices[primitive.vertexOffset+owner.indices[primitive.indexOffset+n+corner]].position;
                 for(unsigned axis=0;axis<3;++axis)
-                    if(point[axis]<placement.minimum[axis]-.0001f || point[axis]>placement.maximum[axis]+.0001f)return false;
+                    if(point[axis]<minimum[axis]-.0001f || point[axis]>maximum[axis]+.0001f)return false;
             }
             return true;
-        });
-        Check(authored,"exterior provenance must still identify genuine authored graveyard triangles after reordering");
+        };
+        const bool authored=std::any_of(graveyard.placements.begin(),graveyard.placements.end(),
+                [&](const auto& p){return inside(p.minimum,p.maximum);}) ||
+            std::any_of(forest.placements.begin(),forest.placements.end(),
+                [&](const auto& p){return inside(p.worldBounds.minimum,p.worldBounds.maximum);}) ||
+            std::any_of(understory.placements.begin(),understory.placements.end(),
+                [&](const auto& p){return inside(p.minimum,p.maximum);}) ||
+            std::any_of(rocks.placements.begin(),rocks.placements.end(),
+                [&](const auto& p){return inside(p.minimum,p.maximum);}) ||
+            std::any_of(deadwood.placements.begin(),deadwood.placements.end(),
+                [&](const auto& p){return inside(p.minimum,p.maximum);});
+        Check(authored,"exterior provenance must still identify actual authored placements after reordering");
     }
     StaticMeshAsset selected, restored;
     const bool selectionReady=SelectStaticTriangleRegions(owner,2u,selected,diagnostic);
@@ -480,6 +535,27 @@ void TestNativeChapterPrimitiveOwnership()
     Check(completeReady,
           "real combined chapter static route initializes");
     if (!completeReady) return;
+    {
+        auto unclassified = owner;
+        unclassified.triangleRegions.clear();
+        RtStaticMeshSlot baseline;
+        const bool ready = baseline.Initialize(
+            std::array{StaticRtAssetRegistration{21,100,pbr,0,&unclassified}}, diagnostic);
+        const auto sameBytes=[](const auto& a,const auto& b) {
+            return a.size()==b.size() && (a.empty() ||
+                std::memcmp(a.data(),b.data(),a.size()*sizeof(a.front()))==0);
+        };
+        Check(ready && sameBytes(complete.Vertices(),baseline.Vertices()) &&
+                  sameBytes(complete.Indices(),baseline.Indices()) &&
+                  sameBytes(complete.Materials(),baseline.Materials()) &&
+                  sameBytes(complete.PrimitiveMetadata(),baseline.PrimitiveMetadata()) &&
+                  sameBytes(complete.PrimitiveVertexCounts(),baseline.PrimitiveVertexCounts()) &&
+                  sameBytes(complete.GeometryTransforms(),baseline.GeometryTransforms()) &&
+                  sameBytes(complete.InstanceMetadata(),baseline.InstanceMetadata()) &&
+                  std::memcmp(&complete.TextureArrayCounts(),&baseline.TextureArrayCounts(),
+                      sizeof(complete.TextureArrayCounts()))==0,
+              "CPU region provenance must leave every native GPU payload and texture identity byte-identical");
+    }
     {
         auto immutable=std::make_shared<const RtStaticMeshSlot>(complete);
         RtStaticMeshCopy copy;

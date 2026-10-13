@@ -26,7 +26,7 @@ bool AppendPreparedForestDeadwood(const std::filesystem::path& root,assets::Stat
     ForestDeadwoodReport& report,std::string& diagnostic) {
     report={};constexpr const char* nodeName="prepared-deadwood-world-baked";
     const auto family=std::find_if(owner.materials.begin(),owner.materials.end(),[](const auto& m){return m.name=="ForestBark";});
-    if(!support || family==owner.materials.end() || family->metallicFactor!=0 || family->transmissionFactor!=0 ||
+    if(!owner.HasValidTriangleProvenance() || !support || family==owner.materials.end() || family->metallicFactor!=0 || family->transmissionFactor!=0 ||
        family->emissiveFactor!=Point{} || owner.nodeTransforms.empty() || owner.primitives.empty() ||
        owner.primitives.size()>=32 || std::any_of(owner.nodeTransforms.begin(),owner.nodeTransforms.end(),
             [&](const auto& n){return n.name==nodeName;})) {
@@ -112,7 +112,10 @@ bool AppendPreparedForestDeadwood(const std::filesystem::path& root,assets::Stat
     staged.primitives.push_back({static_cast<std::uint32_t>(staged.vertices.size()),static_cast<std::uint32_t>(staged.indices.size()),
         static_cast<std::uint32_t>(indices.size()),static_cast<std::uint32_t>(family-owner.materials.begin()),static_cast<std::uint32_t>(staged.nodeTransforms.size())});
     staged.nodeTransforms.push_back({nodeName,{{1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1}}});
-    staged.vertices.insert(staged.vertices.end(),vertices.begin(),vertices.end());staged.indices.insert(staged.indices.end(),indices.begin(),indices.end());
+    staged.vertices.insert(staged.vertices.end(),vertices.begin(),vertices.end());
+    staged.triangleRegions.resize(staged.indices.size()/3u,assets::StaticTriangleRegion::Shared);
+    staged.triangleRegions.insert(staged.triangleRegions.end(),indices.size()/3u,assets::StaticTriangleRegion::ExteriorDressing);
+    staged.indices.insert(staged.indices.end(),indices.begin(),indices.end());
     for(const auto& placed:candidate.placements)for(unsigned axis=0;axis<3;++axis) {
         staged.bounds.minimum[axis]=std::min(staged.bounds.minimum[axis],placed.minimum[axis]);staged.bounds.maximum[axis]=std::max(staged.bounds.maximum[axis],placed.maximum[axis]);
     }

@@ -37,7 +37,7 @@ bool AppendPreparedForestUnderstory(const std::filesystem::path& root, assets::S
     report={};
     const auto material=std::find_if(owner.materials.begin(),owner.materials.end(),
         [](const auto& m){return m.name=="ForestAlder";});
-    if(material==owner.materials.end() || owner.primitives.empty() || owner.primitives.size()>=32 ||
+    if(!owner.HasValidTriangleProvenance() || material==owner.materials.end() || owner.primitives.empty() || owner.primitives.size()>=32 ||
        owner.nodeTransforms.empty() || material->textureGroup!=3 || !material->deferTextureAllocation) {
         diagnostic="Understory requires the existing admitted alder family and bounded world owner.";return false;
     }
@@ -108,6 +108,8 @@ bool AppendPreparedForestUnderstory(const std::filesystem::path& root, assets::S
         materialIndex,static_cast<std::uint32_t>(staged.nodeTransforms.size())});
     staged.nodeTransforms.push_back({"original-understory-world-baked",{{1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1}}});
     staged.vertices.insert(staged.vertices.end(),vertices.begin(),vertices.end());
+    staged.triangleRegions.resize(staged.indices.size()/3u,assets::StaticTriangleRegion::Shared);
+    staged.triangleRegions.insert(staged.triangleRegions.end(),indices.size()/3u,assets::StaticTriangleRegion::ExteriorDressing);
     staged.indices.insert(staged.indices.end(),indices.begin(),indices.end());
     for(const auto& p:candidate.placements)for(unsigned axis=0;axis<3;++axis) {
         staged.bounds.minimum[axis]=std::min(staged.bounds.minimum[axis],p.minimum[axis]);
