@@ -1,4 +1,7 @@
 #pragma once
+#ifndef HORDE_RT_CHAPTER_MEASUREMENT
+#define HORDE_RT_CHAPTER_MEASUREMENT 0
+#endif
 #include "vulkan/raytracing/RtGpuWorkLease.h"
 #include "scene/atmosphere/IndoorDust.h"
 #include "scene/DevelopmentWorldGeometry.h"
@@ -723,11 +726,11 @@ public:
     // bytes are canonical RGBA even when the presentation push constant had
     // swapped red/blue for a raw copy to a BGRA swapchain.
     bool CaptureStorageImage(StorageImageCapture& capture, std::string& diagnostic);
-#ifndef NDEBUG
-    // Debug asset inspection only: model-space copy of the exact current upload.
+#if !defined(NDEBUG) || HORDE_RT_CHAPTER_MEASUREMENT
+    // Opt-in asset inspection: model-space copy of the exact current upload.
     // This is CPU geometry evidence, not a GPU readback or a second pose solve.
     bool CaptureViewmodelMesh(const std::string& path, std::string& diagnostic) const;
-    // Debug asset inspection only: model-space copy of the exact current world-body
+    // Opt-in asset inspection: model-space copy of the exact current world-body
     // upload and its actual TLAS transform. This is CPU geometry evidence, not readback.
     bool CapturePlayerWorldBodyMesh(const std::string& path, std::string& diagnostic) const;
 #endif
@@ -1147,7 +1150,7 @@ private:
     bool viewmodelAvailable_ = false;
     bool playerBodyRemainderAvailable_ = false;
     bool viewmodelPoseCurrent_ = false;
-#ifndef NDEBUG
+#if !defined(NDEBUG) || HORDE_RT_CHAPTER_MEASUREMENT
     VkTransformMatrixKHR viewmodelCaptureTransform_{};
     VkTransformMatrixKHR playerWorldBodyCaptureTransform_{};
     bool playerWorldBodyPoseCurrent_ = false;

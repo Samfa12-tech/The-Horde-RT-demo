@@ -1,4 +1,7 @@
 #include "platform/windows/DiagnosticWindow.h"
+#ifndef HORDE_RT_CHAPTER_MEASUREMENT
+#define HORDE_RT_CHAPTER_MEASUREMENT 0
+#endif
 #include "platform/windows/WindowsSkyAttributionLaunch.h"
 #include "platform/windows/WindowsMusicPlayback.h"
 #include "platform/windows/WindowsMusicFocus.h"
@@ -53,6 +56,7 @@
 #include <bcrypt.h>
 #include <commdlg.h>
 #include <commctrl.h>
+#include <dwmapi.h>
 #include <mmsystem.h>
 #include <shellapi.h>
 #include <wincodec.h>
@@ -92,14 +96,16 @@
 #include "platform/windows/WindowsMotionEvidenceCapture.h"
 #include "platform/windows/WindowsCombatPracticeLaunch.h"
 #include "platform/windows/WindowsCombatTeachingPrompt.h"
-#if defined(_DEBUG)
+#if defined(_DEBUG) || HORDE_RT_CHAPTER_MEASUREMENT
 #include "gameplay/validation/MotionEvidenceScenario.h"
 #include "gameplay/validation/ChapterRoundTripProbe.h"
 #include "gameplay/validation/ChapterRouteMeasurementClock.h"
+#include "platform/windows/WindowsPresentInterval.h"
 #include "telemetry/MotionEvidenceLedger.h"
 #endif
 #include "platform/windows/WindowsBenchmarkLaunch.h"
 #include "platform/windows/WindowsChapterShippingLaunch.h"
+#include "platform/windows/WindowsAssetRoot.h"
 #include "platform/windows/WindowsMistCaptureLaunch.h"
 #include "platform/windows/WindowsInteractionPrompt.h"
 #include "platform/windows/WindowsGameplayInput.h"
@@ -291,6 +297,7 @@ struct CaptureLaunchOptions
     bool validateStaticTriangleCutover = false;
     bool validateChapterRoundTrip = false;
     bool measureChapterShippingRoute = false;
+    bool measureChapterForeground = false;
     std::filesystem::path outputDirectory;
     std::string developmentCheckpoint;
     std::string error;
@@ -454,9 +461,12 @@ struct VulkanSurfaceContext
     bool outputResizeValidation = false;
     bool nativeMotionValidation = false;
     bool chapterRoundTripCaptureActive = false;
+#if defined(_DEBUG) || HORDE_RT_CHAPTER_MEASUREMENT
+    std::uint64_t lastSuccessfulPresentReturnSteadyNs = 0;
+#endif
     horde::platform::windows::SkyAttributionMode skyAttribution =
         horde::platform::windows::SkyAttributionMode::Production;
-#if defined(_DEBUG)
+#if defined(_DEBUG) || HORDE_RT_CHAPTER_MEASUREMENT
     bool staticReplacementFrameRequested = false;
     std::uint64_t staticReplacementExpectedGeneration = 0u;
     std::uint64_t staticReplacementProofGeneration = 0u;
@@ -756,11 +766,13 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
 #else
         false
 #endif
+        ,HORDE_RT_CHAPTER_MEASUREMENT != 0
     );
     if(!chapterShipping.error.empty()) {
         options.error=chapterShipping.error;LocalFree(arguments);return options;
     }
     options.measureChapterShippingRoute=chapterShipping.requested;
+    options.measureChapterForeground=chapterShipping.foregroundRequested;
     for (int index = 1; index < argumentCount; ++index)
     {
         const std::wstring_view argument(arguments[index]);
@@ -1090,17 +1102,20 @@ std::filesystem::path ExecutableDirectory()
 std::filesystem::path ResolveAssetRoot()
 {
     const std::filesystem::path packaged = ExecutableDirectory() / "assets";
-    if (std::filesystem::exists(packaged))
-    {
-        return packaged;
-    }
-#if defined(_DEBUG) && defined(HORDE_RT_SOURCE_DIR)
-    return std::filesystem::path(HORDE_RT_SOURCE_DIR) / "assets";
+#if defined(HORDE_RT_SOURCE_DIR)
+    const std::filesystem::path source=HORDE_RT_SOURCE_DIR;
 #else
-    // Release must prove that the executable-relative package is complete.
-    // Falling back into a developer checkout can otherwise hide a broken ZIP.
-    return packaged;
+    const std::filesystem::path source;
 #endif
+    // Only the separately compiled, exact development measurement may use the
+    // checkout in optimized builds. Ordinary Release still proves its package.
+    return horde::platform::windows::ResolveWindowsAssetRoot(packaged,std::filesystem::exists(packaged),source,
+#if defined(_DEBUG)
+        true,
+#else
+        false,
+#endif
+        HORDE_RT_CHAPTER_MEASUREMENT && ParseCaptureLaunchOptions().measureChapterShippingRoute);
 }
 
 std::filesystem::path SettingsPath()
@@ -6070,6 +6085,9 @@ bool ApplyPendingOutputResize(VulkanSurfaceContext& context,
 
 bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor, bool& rtFramePresented)
 {
+#if defined(_DEBUG) || HORDE_RT_CHAPTER_MEASUREMENT
+    ctx.lastSuccessfulPresentReturnSteadyNs = 0;
+#endif
     const std::uint64_t frameStartNanoseconds =
         horde::vulkan::raytracing::ReadRtSceneSteadyClock(nullptr);
     ctx.lastFramePresentation = horde::telemetry::RtPresentationOutcome::NotAttempted;
@@ -6583,6 +6601,10 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         evidenceFrame ? &observation : nullptr,
         horde::telemetry::RtStage::PresentCall);
     const VkResult presentResult = vkQueuePresentKHR(ctx.graphicsQueue, &presentInfo);
+#if defined(_DEBUG) || HORDE_RT_CHAPTER_MEASUREMENT
+    if (useRtFrame && presentResult == VK_SUCCESS && acquireResult == VK_SUCCESS)
+        ctx.lastSuccessfulPresentReturnSteadyNs = horde::vulkan::raytracing::ReadRtSceneSteadyClock(nullptr);
+#endif
     if (useRtFrame && presentResult == VK_SUCCESS && acquireResult == VK_SUCCESS &&
         ctx.rtScene.Profile() == horde::vulkan::raytracing::RtSceneProfile::Showcase)
     {
@@ -6656,7 +6678,7 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
     return true;
 }
 
-#if defined(_DEBUG)
+#if defined(_DEBUG) || HORDE_RT_CHAPTER_MEASUREMENT
 const char* CapturePresetName(const horde::gameplay::ShowcaseCheckpointPreset preset)
 {
     switch (preset)
@@ -7219,7 +7241,7 @@ bool RunStaticGeometryCutoverCapture(VulkanSurfaceContext& context,
 #endif
 
 #include "platform/windows/WindowsChapterRoundTripCapture.inl"
-#if defined(_DEBUG)
+#if defined(_DEBUG) || HORDE_RT_CHAPTER_MEASUREMENT
 #include "platform/windows/WindowsChapterShippingMeasurement.inl"
 #endif
 
@@ -7580,6 +7602,11 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
             // Preserve the actual uploaded meshes before rejecting the frame.
             // Eligibility is not a primary-hit witness; these diagnostics help
             // distinguish a solved pose outside the frustum from occlusion.
+            std::cerr<<"HORDE_CAPTURE_OWNERSHIP_FAILURE dedicated="<<dedicatedPlayerOwnership
+                <<" visible="<<record.playerPrimaryVisible<<" flags="<<record.playerWorldBodyInstanceFlags
+                <<" world_mask="<<static_cast<unsigned>(record.instanceMasks[horde::vulkan::raytracing::kPlayerWorldBodyInstanceIndex])
+                <<" viewmodel_mask="<<static_cast<unsigned>(record.instanceMasks[horde::vulkan::raytracing::kPlayerViewmodelInstanceIndex])
+                <<" diagnostic="<<diagnosticPixelCountersAvailable<<std::endl;
             if (!record.viewmodelGeometryEvidence.currentUploadCaptured && !capturePlayerGeometry()) return false;
             const auto& k = simulation.heldItemKinematics;
             std::ostringstream pose;
@@ -7984,8 +8011,10 @@ int RunEntryMenuCapture(VulkanSurfaceContext &context,
 }
 
 #include "platform/windows/WindowsGraphicsPreviewCapture.inl"
+#if defined(_DEBUG)
 #include "platform/windows/WindowsOutputResizeValidation.inl"
 #include "platform/windows/WindowsMotionEvidenceValidation.inl"
+#endif
 #endif
 
 int RunDiagnosticSwapchainWindow(HWND hWnd,
@@ -8020,7 +8049,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     {
         for (int argument = 1; argument < entryArgumentCount; ++argument)
         {
-#if defined(_DEBUG)
+#if defined(_DEBUG) || HORDE_RT_CHAPTER_MEASUREMENT
             if (std::wstring_view(entryArguments[argument]) == L"--development-rescue-journey")
             { context.developmentRescueJourney = true; context.entryMenuVisible = false; }
             if (std::wstring_view(entryArguments[argument]) == L"--development-rescue-journey-staged")
@@ -8086,7 +8115,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     (void)anatomicalPlayerMount;
     context.windowHandle = hWnd;
     context.capabilitySnapshot = &capabilities;
-    context.unattendedBenchmark = unattendedBenchmark;
+    context.unattendedBenchmark = unattendedBenchmark || ParseCaptureLaunchOptions().measureChapterShippingRoute;
     if (developmentCheckpoint != nullptr)
     {
         context.developmentCheckpoint = *developmentCheckpoint;
@@ -8287,10 +8316,11 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         }
     }
 
-#if defined(_DEBUG)
+#if defined(_DEBUG) || HORDE_RT_CHAPTER_MEASUREMENT
     if (captureDirectory != nullptr)
     {
         int captureResult =
+#if defined(_DEBUG)
             context.entryMenuVisible ? RunEntryMenuCapture(context, capabilities, *captureDirectory)
             : context.nativeMotionValidation
                 ? RunNativeMotionEvidence(context, capabilities, *captureDirectory)
@@ -8298,7 +8328,9 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
                 ? RunOutputResizeValidation(context, capabilities, *captureDirectory)
             : graphicsPreviewCapture
                 ? RunGraphicsPreviewCapture(context, capabilities, *captureDirectory)
-                : RunShowcaseCapture(context, capabilities, *captureDirectory);
+                :
+#endif
+                RunShowcaseCapture(context, capabilities, *captureDirectory);
         if(captureResult==0 && ParseCaptureLaunchOptions().validateChapterRoundTrip) {
             std::string journeyError;
             if(!RunChapterRoundTripCapture(context,*captureDirectory,journeyError)) {
@@ -11347,6 +11379,14 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     if (!nativeMotionScenario.empty()) showMode=SW_SHOWNORMAL;
 #endif
     ShowWindow(hWnd,showMode);
+    // Only the explicitly owner-authorized foreground comparison may raise the
+    // window. Background measurements fail closed if another app covers it.
+    if(ParseCaptureLaunchOptions().measureChapterForeground)
+        SetWindowPos(hWnd,HWND_TOPMOST,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE|SWP_NOACTIVATE);
+    if(ParseCaptureLaunchOptions().measureChapterForeground) {
+        SetForegroundWindow(hWnd);
+        SetFocus(hWnd);
+    }
     UpdateWindow(hWnd);
     if (captureDirectory != nullptr)
     {
@@ -11397,7 +11437,7 @@ int RunDiagnosticWindow(const int showCommand)
         return 2;
     }
 #if !defined(_DEBUG)
-    if (launchOptions.requested)
+    if (launchOptions.requested && !(HORDE_RT_CHAPTER_MEASUREMENT && launchOptions.measureChapterShippingRoute))
     {
         std::cerr << "Scene capture modes are Debug-only automation; Release builds reject them.\n";
         return 2;

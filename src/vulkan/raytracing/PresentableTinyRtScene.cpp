@@ -627,7 +627,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     viewmodelAvailable_ = std::exchange(other.viewmodelAvailable_, false);
     playerBodyRemainderAvailable_ = std::exchange(other.playerBodyRemainderAvailable_, false);
     viewmodelPoseCurrent_ = std::exchange(other.viewmodelPoseCurrent_, false);
-#ifndef NDEBUG
+#if !defined(NDEBUG) || HORDE_RT_CHAPTER_MEASUREMENT
     viewmodelCaptureTransform_ = std::exchange(other.viewmodelCaptureTransform_, {});
     playerWorldBodyCaptureTransform_ =
         std::exchange(other.playerWorldBodyCaptureTransform_, {});
@@ -1261,7 +1261,7 @@ void PresentableTinyRtScene::Destroy()
     playerBodyRemainderAvailable_ = false;
     lastPlayerWorldBodyInstanceFlags_ = 0u;
     viewmodelPoseCurrent_ = false;
-#ifndef NDEBUG
+#if !defined(NDEBUG) || HORDE_RT_CHAPTER_MEASUREMENT
     viewmodelCaptureTransform_ = {};
     playerWorldBodyCaptureTransform_ = {};
     playerWorldBodyPoseCurrent_ = false;
@@ -6331,7 +6331,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         frame.waterQuality != WaterQuality::Off &&
         std::any_of(frame.waterContact.droplets.begin(), frame.waterContact.droplets.end(),
                     [](const auto& droplet) { return droplet.active; });
-#ifndef NDEBUG
+#if !defined(NDEBUG) || HORDE_RT_CHAPTER_MEASUREMENT
     // Captures after this call are valid only if this frame finishes preparing
     // and recording the current skinned world-body instance successfully.
     playerWorldBodyPoseCurrent_ = false;
@@ -7149,7 +7149,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     ApplyKeeperTorchBodyInstances(instances);
     for (std::size_t instance = 0u; instance < instances.size(); ++instance)
         lastInstanceMasks_[instance] = instances[instance].mask;
-#ifndef NDEBUG
+#if !defined(NDEBUG) || HORDE_RT_CHAPTER_MEASUREMENT
     viewmodelCaptureTransform_ = instances[kPlayerViewmodelInstanceIndex].transform;
     playerWorldBodyCaptureTransform_ =
         instances[kPlayerWorldBodyInstanceIndex].transform;
@@ -7750,7 +7750,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     tlasUpdateScope.Complete(1u);
     StageTlasSubmissionDefinitions(instances);
 
-#ifndef NDEBUG
+#if !defined(NDEBUG) || HORDE_RT_CHAPTER_MEASUREMENT
     playerWorldBodyPoseCurrent_ = usesSkinnedPlayer &&
         !productionPlayerAsset_.vertices.empty() &&
         skinnedPlayerUpload_.size() == productionPlayerAsset_.vertices.size();
@@ -8098,7 +8098,7 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
     // A prior unsubmitted recording must not advance the GPU definition cache.
     tlasPendingDefinitionsValid_ = false;
     uploadedFireEmittersValid_ = false;
-#ifndef NDEBUG
+#if !defined(NDEBUG) || HORDE_RT_CHAPTER_MEASUREMENT
     // A rejected presentation attempt invalidates geometry evidence from the
     // prior recorded frame, including failures before dynamic scene updates.
     playerWorldBodyPoseCurrent_ = false;
@@ -8415,7 +8415,7 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
     return true;
 }
 
-#ifndef NDEBUG
+#if !defined(NDEBUG) || HORDE_RT_CHAPTER_MEASUREMENT
 bool PresentableTinyRtScene::CaptureViewmodelMesh(const std::string& path,
                                                  std::string& diagnostic) const
 {

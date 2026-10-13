@@ -6,6 +6,8 @@
 #include "platform/windows/WindowsBenchmarkLaunch.h"
 #include "platform/windows/WindowsMistCaptureLaunch.h"
 #include "platform/windows/WindowsChapterShippingLaunch.h"
+#include "platform/windows/WindowsAssetRoot.h"
+#include "platform/windows/WindowsPresentInterval.h"
 
 int main()
 {
@@ -19,6 +21,27 @@ int main()
         }
     };
     const std::array<std::wstring_view, 0> ordinary{};
+    horde::platform::windows::WindowsPresentIntervals intervals(100);
+    check(!intervals.Consume(0) && !intervals.Consume(99) && !intervals.Consume(100),
+        "missing and pre-route successful-present stamps fail before interval publication");
+    const auto first=intervals.Consume(120);
+    check(first && !first->available && first->nanoseconds==0,
+        "first successful present has no preceding interval and cannot become an FPS sample");
+    check(!intervals.Consume(120) && !intervals.Consume(110),
+        "duplicate and reversed successful-present stamps fail closed");
+    const auto next=intervals.Consume(150);
+    check(next && next->available && next->nanoseconds==30,
+        "invalid stamps preserve the previous owner; interval joins actual successive present returns");
+    using horde::platform::windows::ResolveWindowsAssetRoot;
+    const std::filesystem::path packaged="C:/build/Release/assets",source="C:/source";
+    check(ResolveWindowsAssetRoot(packaged,false,source,false,true)==source/"assets",
+        "opt-in optimized route resolves existing checkout assets before Vulkan startup");
+    check(ResolveWindowsAssetRoot(packaged,true,source,false,true)==packaged &&
+        ResolveWindowsAssetRoot(packaged,false,source,false,false)==packaged &&
+        ResolveWindowsAssetRoot(packaged,false,{},false,true)==packaged,
+        "packaged assets win and ordinary Release never masks a missing package");
+    check(ResolveWindowsAssetRoot(packaged,false,source,true,false)==source/"assets",
+        "Debug asset fallback remains unchanged");
     using horde::platform::windows::ParseWindowsChapterShippingLaunch;
     const std::array<std::wstring_view,5> shippingArgs{L"--measure-chapter-shipping-route",
         L"--capture-showcase",L"C:\\reports\\shipping-route",L"--development-checkpoint",L"chapter-kit-reunion"};
@@ -27,6 +50,25 @@ int main()
         "bounded Shipping route must select exactly the admitted Debug capture");
     check(!ParseWindowsChapterShippingLaunch(shippingArgs,false).error.empty(),
         "Shipping measurement controls cannot enter ordinary Release play");
+    check(ParseWindowsChapterShippingLaunch(shippingArgs,false,true).requested &&
+        ParseWindowsChapterShippingLaunch(shippingArgs,false,true).error.empty(),
+        "separately compiled optimized measurement build admits the exact route without Debug CPU policy");
+    check(!ParseWindowsChapterShippingLaunch(ordinary,false,true).requested &&
+        ParseWindowsChapterShippingLaunch(ordinary,false,true).error.empty(),
+        "optimized measurement support alone cannot acquire inputs or change ordinary launch");
+    auto foregroundArgs=std::vector<std::wstring_view>(shippingArgs.begin(),shippingArgs.end());
+    foregroundArgs.push_back(L"--measure-chapter-foreground");
+    check(ParseWindowsChapterShippingLaunch(foregroundArgs,false,true).foregroundRequested &&
+        ParseWindowsChapterShippingLaunch(foregroundArgs,false,true).error.empty(),
+        "foreground acquisition requires the explicit bounded measurement option");
+    check(!ParseWindowsChapterShippingLaunch(shippingArgs,false,true).foregroundRequested,
+        "ordinary measurement cannot acquire foreground implicitly");
+    const std::array<std::wstring_view,1> foregroundAlone{L"--measure-chapter-foreground"};
+    check(!ParseWindowsChapterShippingLaunch(foregroundAlone,false,true).error.empty(),
+        "foreground flag without the closed measurement fails before window creation");
+    foregroundArgs.push_back(L"--measure-chapter-foreground");
+    check(!ParseWindowsChapterShippingLaunch(foregroundArgs,false,true).error.empty(),
+        "duplicate foreground ownership fails closed");
     check(!ParseWindowsChapterShippingLaunch(ordinary,true).requested &&
         ParseWindowsChapterShippingLaunch(ordinary,true).error.empty(),
         "ordinary launches must not gain a measurement owner");
@@ -37,6 +79,8 @@ int main()
         auto args=std::vector<std::wstring_view>(shippingArgs.begin(),shippingArgs.end());args.push_back(conflict);
         check(!ParseWindowsChapterShippingLaunch(args,true).error.empty(),
             "route measurement rejects conflicting validation/tuning and duplicate flags");
+        check(!ParseWindowsChapterShippingLaunch(args,false,true).error.empty(),
+            "optimized measurement rejects the same conflicting tuning and validation");
     }
     for(const auto badArgs:{
         std::vector<std::wstring_view>{L"--measure-chapter-shipping-route"},

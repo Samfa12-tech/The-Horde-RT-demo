@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "baseCommit": "e38a08c5d1d9ff098273cfd621bbb9aa721d939d",
+  "scope": "pre-commit builds bound to actual input bytes; matched schema2 runs used their older recorded executable; schema3 physical pacing remains pending",
+  "sources": {
+    "CMakeLists.txt": "0e2bb340ba426d802dc7ea5e3339f25fe6cdd4f9a973082d8bf759302762f459",
+    "src/platform/windows/DiagnosticWindow.cpp": "751b5db28487992480697f7997e5ea3899a2d49eea6ddaa4b53ddfb928b76f3e",
+    "src/platform/windows/WindowsChapterShippingLaunch.h": "e7a1b24a3ba752963ebd29f41d0be35d89bdb02b6a2753931b94f3c607b73b7c",
+    "src/platform/windows/WindowsChapterShippingMeasurement.inl": "68682f21efc79186965dd87b52f977a6e07d6a8035d14809dc0ab779827bb774",
+    "src/platform/windows/WindowsAssetRoot.h": "dcf3171daee55dfcdbd96a31bd411a368e7ea4ac73b6c8d131ba31a612f98b39",
+    "src/platform/windows/WindowsPresentInterval.h": "4521dcfeca420704ea4e17a2171471465710ced7e00dcd5ca9c0c66ade09e39c",
+    "src/vulkan/raytracing/PresentableTinyRtScene.cpp": "4e31072a6f5dd57a793d610ef26579cc50281e92426308e4280fb21507d8c64a",
+    "src/vulkan/raytracing/PresentableTinyRtScene.h": "6d55a7b32081d889a970148314b8aba2361ebfbac683aa672012e9da6641aef9",
+    "tests/WindowsBenchmarkLaunchTests.cpp": "9d1635786b4dd17f2967f7cb94e6d4934350381fd3614b3bb466e28eb54b3730",
+    "tools/measure-chapter-shipping-route.ps1": "5d036c694d3804da2452cd57b328ad6fad51ebe28b09bc87a50bbd019e6f012e",
+    "tools/analyze-chapter-route-measurement.py": "d9ddb8c384692e4dc21ee689ab2d380d83df9f86da1e53e12c02ab7e2472bb63",
+    "tools/raygen-variant-catalog.json": "e3b43b8f8ab01279f2d1c09cb9d4290b6e7a431b2e4101bdeccfc76b890fcb25",
+    "tools/rayquery-variant-catalog.json": "ca4e47e19aecf81354b9047a36d04269eb03f81e1ef1894ab9aa0479b493bf22",
+    "tools/raygen-variant-budgets.json": "56936479b2d202dbdb9393ba94b66a1b0bc12d490b700d8af4c63de3460e53bf"
+  },
+  "canonicalGitInputBlobs": {
+    "CMakeLists.txt": "7ab75b9783274283b38980f84c2e581c959dec0e",
+    "src/platform/windows/DiagnosticWindow.cpp": "67f6fa2d1932b640985440b55e407fef8f0a5567",
+    "src/platform/windows/WindowsChapterShippingLaunch.h": "aca5f874a147542401eadcf85071813ed36ddb3f",
+    "src/platform/windows/WindowsChapterShippingMeasurement.inl": "3971be779a5ceb02114c8053abe3ab62325b815f",
+    "src/platform/windows/WindowsAssetRoot.h": "69f101c130e237d27160f5412d155e636db6714b",
+    "src/platform/windows/WindowsPresentInterval.h": "aca3c36fcf85aadaf363eb8ecf20a127285663b9",
+    "src/vulkan/raytracing/PresentableTinyRtScene.cpp": "adc755253ed17ff901afe6a68c73513b6dc00861",
+    "src/vulkan/raytracing/PresentableTinyRtScene.h": "97753f7f70c063a568b4cd39cf8868f6e487965d",
+    "tests/WindowsBenchmarkLaunchTests.cpp": "3538c548075042f788ceb162c45c754ce2e1b580",
+    "tools/measure-chapter-shipping-route.ps1": "be9646e2fd6affe2f778c2391eef993eb6e1a253",
+    "tools/analyze-chapter-route-measurement.py": "0dd531800b0cca8a58fd50be2688a5f6bd124837",
+    "tools/raygen-variant-catalog.json": "47183605c440bf43a51c9af3191b35f680150120",
+    "tools/rayquery-variant-catalog.json": "1ce2be31ff11cd40109786e583755fb10e2929a4",
+    "tools/raygen-variant-budgets.json": "90d40a313084dca95055ed2ea32a231da9d0b9bb"
+  },
+  "artifacts": {
+    "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe": {
+      "bytes": 13150720,
+      "sha256": "a046f63363dd2462489a73e34020f736a296998ef6f4da05c06bcc08e802b68f"
+    },
+    "build/presets/windows-x64-release/Release/HordeLanternRT.exe": {
+      "bytes": 4469248,
+      "sha256": "d87e6730eb53c32e13802863c74d00f6df37898d3f5491c4279f12cba81d6ca9"
+    },
+    "build/chapter-shipping-measurement/Release/HordeLanternRT.exe": {
+      "bytes": 4604928,
+      "sha256": "91dbac30a9afdf904e0064519d92124e27dc4152b80eedab86fe61595b25eb81"
+    },
+    "android/app/build/outputs/apk/debug/app-debug.apk": {
+      "bytes": 183170474,
+      "sha256": "b594343f605ec05d9e1989cd1e4d919e7258032bb86b9d5bc319245c1b54a593"
+    }
+  },
+  "audioHapticRevalidationRequired": false,
+  "normalStaticRegionResidencySavingBytes": 0
+}

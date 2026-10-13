@@ -1,0 +1,19 @@
+{
+  "sources": {
+    "src/platform/windows/WindowsChapterShippingMeasurement.inl": "0f02ad5795d88862cffc34c8879501bd99ae7195b9ae841df3411f1f351d6102",
+    "src/gameplay/validation/ChapterRoundTripProbe.h": "fb8368500a4d6712803e21c2cdbf36118599908bf747d424cdffe77e9f9282a0",
+    "src/platform/windows/WindowsChapterShippingLaunch.h": "e7a1b24a3ba752963ebd29f41d0be35d89bdb02b6a2753931b94f3c607b73b7c",
+    "src/platform/windows/DiagnosticWindow.cpp": "caa96890d13d82cd69cb36bf6cead7cc5cff0bd45ed3960b9a3ed012c551e53e",
+    "src/platform/windows/WindowsAssetRoot.h": "dcf3171daee55dfcdbd96a31bd411a368e7ea4ac73b6c8d131ba31a612f98b39",
+    "CMakeLists.txt": "0e2bb340ba426d802dc7ea5e3339f25fe6cdd4f9a973082d8bf759302762f459",
+    "src/gameplay/validation/ChapterRouteMeasurementClock.h": "7a7e05ed68d0c4f5935967eec393b246103056fdf3406d6e3671be225c431edc"
+  },
+  "backend": "RayQueryCompute",
+  "scope": "Release CPU with Shipping High shaders; uncovered visible wall-clock scripted round-trip after staged Keeper death; zero static-region residency saving; not owner/phone acceptance",
+  "configure": "cmake -S . -B build/chapter-shipping-measurement -G \"Visual Studio 17 2022\" -A x64 -DHORDE_RT_INSTRUMENTATION_OVERRIDE=Shipping -DHORDE_RT_DIELECTRIC_QUALITY_OVERRIDE=High -DHORDE_RT_CHAPTER_MEASUREMENT=ON",
+  "simulationHz": 60,
+  "maximumSimulationTicksPerRender": 4,
+  "executableSha256": "a6802fcecc1b6374e597458f240b9d96d2b52ac8a1b95e45b344be8044238328",
+  "foregroundRequested": false,
+  "deadlineSeconds": 180
+}

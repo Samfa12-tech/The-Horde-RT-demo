@@ -1,4 +1,4 @@
-// Development measurement only. Production timing, inputs and shaders are not
+// Opt-in development measurement only. Production timing, inputs and shaders are not
 // modified. Unlike the faster deterministic capture, the route follows elapsed
 // wall time, retaining complete60Hz ticks behind a four-tick catch-up bound.
 
@@ -24,9 +24,11 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
     if(!std::filesystem::create_directory(directory,pathError)||pathError) {
         error="Shipping route evidence directory must be new and writable.";return false;
     }
-    std::ofstream csv(directory/"completed-frames.csv"),snapshots(directory/"identities.jsonl");
-    if(!csv||!snapshots) {error="Shipping route evidence files could not open.";return false;}
-    csv<<"elapsed_s,phase,station,simulation_step_cpu_ns,scene_epoch,generation,submission_serial,tick,gpu_status,gpu_ns,cpu_eligible,"
+    std::ofstream csv(directory/"completed-frames.csv"),snapshots(directory/"identities.jsonl"),
+        systemLoad(directory/"system-load.csv");
+    if(!csv||!snapshots||!systemLoad) {error="Shipping route evidence files could not open.";return false;}
+    systemLoad<<"elapsed_s,available,total_cpu_busy_percent\n";
+    csv<<"elapsed_s,present_return_interval_ns,present_interval_available,unoccluded_client,foreground_client,phase,station,simulation_step_cpu_ns,scene_epoch,generation,submission_serial,tick,gpu_status,gpu_ns,cpu_eligible,"
         <<"device_local_bytes,host_visible_bytes,strategy,shader_sha256";
     for(std::size_t i=0;i<kRtStageCount;++i) {
         const auto name=RtStageMetricName(static_cast<RtStage>(i));
@@ -47,7 +49,8 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
     (void)context.rtFrameEvidence.SetPaused(false);
     struct Tag {
         ChapterProbePhase phase=ChapterProbePhase::Failed;unsigned station=0;
-        std::uint64_t serial=0,tick=0,simulationNanoseconds=0;double elapsedSeconds=0;
+        std::uint64_t serial=0,tick=0,simulationNanoseconds=0,presentIntervalNanoseconds=0;
+        double elapsedSeconds=0;bool intervalAvailable=false,unoccluded=false,foreground=false;
     };
     // The sole in-flight graphics owner completes before reusing its slot.
     // Tags join that committed identity, never just a repeated simulation tick.
@@ -55,7 +58,34 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
     std::array<Tag,16> tags{};
     const auto baseTick=context.simulation.Snapshot().tickIndex;
     const auto start=std::chrono::steady_clock::now();
+    const auto startNs=static_cast<std::uint64_t>(std::chrono::duration_cast<std::chrono::nanoseconds>(
+        start.time_since_epoch()).count());
+    horde::platform::windows::WindowsPresentIntervals presentIntervals(startNs);
     const auto elapsed=[&] {return std::chrono::duration<double>(std::chrono::steady_clock::now()-start).count();};
+    // Read aggregate machine CPU time once per second, without process names,
+    // desktop pixels or a second input owner. This describes contention context;
+    // it cannot attribute an individual acquire stall to another task.
+    std::array<std::uint64_t,3> previousSystemTimes{};
+    double lastSystemLoadSeconds=-1;
+    const auto sampleSystemLoad=[&] {
+        const double seconds=elapsed();
+        if(seconds-lastSystemLoadSeconds<1)return;
+        FILETIME idle{},kernel{},user{};
+        const auto integer=[](FILETIME f) {return (std::uint64_t(f.dwHighDateTime)<<32)|f.dwLowDateTime;};
+        bool available=false;double busy=0;
+        if(GetSystemTimes(&idle,&kernel,&user)) {
+            const std::array<std::uint64_t,3> current{integer(idle),integer(kernel),integer(user)};
+            if(previousSystemTimes[1] && current[0]>=previousSystemTimes[0] &&
+               current[1]>=previousSystemTimes[1] && current[2]>=previousSystemTimes[2]) {
+                const auto total=(current[1]-previousSystemTimes[1])+(current[2]-previousSystemTimes[2]);
+                const auto idleDelta=current[0]-previousSystemTimes[0];
+                if(total && idleDelta<=total) {available=true;busy=100.*double(total-idleDelta)/double(total);}
+            }
+            previousSystemTimes=current;
+        } else previousSystemTimes={};
+        systemLoad<<seconds<<','<<available<<','<<busy<<'\n';
+        lastSystemLoadSeconds=seconds;
+    };
     auto lastSerial=initial.completedEvidence.identity.submitted.submissionSerial;
     ChapterProbePhase lastPhase=ChapterProbePhase::Failed;
     unsigned frames=0,samples=0;std::uint64_t maximumDebt=0;
@@ -79,7 +109,8 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
         if(!ValidateRtPerformanceEvidence(sample,validation)) {
             error="Shipping route completed sample failed canonical validation.";return false;
         }
-        csv<<tag.elapsedSeconds<<','<<ChapterProbePhaseName(tag.phase)<<','<<tag.station<<','
+        csv<<tag.elapsedSeconds<<','<<tag.presentIntervalNanoseconds<<','<<tag.intervalAvailable<<','<<tag.unoccluded<<','<<tag.foreground<<','
+            <<ChapterProbePhaseName(tag.phase)<<','<<tag.station<<','
             <<tag.simulationNanoseconds<<','<<id.frame.sceneEpoch<<','
             <<id.frame.measurementGeneration<<','<<id.submissionSerial<<','<<id.frame.simulationTick<<','
             <<RtSampleStatusName(sample.gpu.status)<<','<<(sample.gpu.hasDuration?sample.gpu.durationNanoseconds:0)<<','
@@ -107,7 +138,45 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
         return true;
     };
     const VkClearColorValue clear{{0,0,0,1}};
+    // Conservative Z-order check of the actual client. Do not infer pacing from
+    // hidden/minimized/covered presentation. No window titles or desktop pixels
+    // are collected. Only an explicitly requested foreground comparison may
+    // activate or raise its window before the measurement starts.
+    const auto unoccludedClient=[&] {
+        const auto window=context.windowHandle;
+        if(!IsWindow(window)||!IsWindowVisible(window)||IsIconic(window)){error="client hidden, minimized or destroyed";return false;}
+        RECT client{};if(!GetClientRect(window,&client)||client.right<=0||client.bottom<=0){error="invalid client extent";return false;}
+        POINT origin{};if(!ClientToScreen(window,&origin)){error="client coordinate conversion failed";return false;}
+        OffsetRect(&client,origin.x,origin.y);
+        MONITORINFO monitor{sizeof(MONITORINFO)};
+        if(!GetMonitorInfoW(MonitorFromWindow(window,MONITOR_DEFAULTTONULL),&monitor) ||
+           client.left<monitor.rcMonitor.left||client.top<monitor.rcMonitor.top||
+           client.right>monitor.rcMonitor.right||client.bottom>monitor.rcMonitor.bottom){error="client outside monitor bounds";return false;}
+        for(auto above=GetWindow(window,GW_HWNDPREV);above;above=GetWindow(above,GW_HWNDPREV)) {
+            if(!IsWindowVisible(above)||IsIconic(above))continue;
+            DWORD cloaked=0;
+            const auto result=DwmGetWindowAttribute(above,DWMWA_CLOAKED,&cloaked,sizeof(cloaked));
+            if(FAILED(result)){error="DWM visibility unavailable";return false;}
+            if(cloaked)continue;
+            RECT bounds{},intersection{};
+            if(!GetWindowRect(above,&bounds)){error="Z-order rectangle unavailable";return false;}
+            if(IntersectRect(&intersection,&client,&bounds)){error="visible Z-order overlap";return false;}
+        }
+        return true;
+    };
     while(frames++<30000 && probe.Phase()!=ChapterProbePhase::Complete) {
+        sampleSystemLoad();
+        MSG message{};
+        while(PeekMessageW(&message,nullptr,0,0,PM_REMOVE)) {
+            if(message.message==WM_QUIT) {error="Route measurement closed by owner.";return false;}
+            TranslateMessage(&message);DispatchMessageW(&message);
+        }
+        const bool visible=unoccludedClient();
+        if(!visible) {error="Release route requires an uncovered visible client ("+error+"); no focus was acquired.";return false;}
+        const bool foreground=GetForegroundWindow()==context.windowHandle;
+        if(ParseCaptureLaunchOptions().measureChapterForeground && !foreground) {
+            error="Owner-authorized foreground measurement lost foreground; no background FPS claim is allowed.";return false;
+        }
         const auto ticks=clock.Consume(elapsed());
         if(!ticks) {error="Shipping route exceeded its bounded150-second clock.";return false;}
         maximumDebt=std::max(maximumDebt,clock.PendingTicks());
@@ -131,8 +200,17 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
         if(!context.rtFrameEvidence.TryGetCommittedIdentity(0,submitted) || submitted.frame.simulationTick!=tick) {
             error="Shipping route did not commit its current simulation identity.";return false;
         }
+        // Captured immediately after the successful vkQueuePresentKHR return,
+        // before RenderFrame bookkeeping or this evidence join. The first
+        // sample has no prior successful route present and is unavailable.
+        const auto presentReturnNs=context.lastSuccessfulPresentReturnSteadyNs;
+        const auto interval=presentIntervals.Consume(presentReturnNs);
+        if(!interval) {
+            error="Shipping route successful present-return clock unavailable or nonmonotonic.";return false;
+        }
         tags[submitted.submissionSerial%tags.size()]={probe.Phase(),static_cast<unsigned>(probe.Station()),
-            submitted.submissionSerial,tick,simulationNs,elapsed()};
+            submitted.submissionSerial,tick,simulationNs,interval->nanoseconds,
+            static_cast<double>(presentReturnNs-startNs)*1.e-9,interval->available,visible,foreground};
         if(!append())return false;
     }
     const auto finishSeconds=elapsed();
@@ -149,12 +227,19 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
     horde::vulkan::raytracing::PresentableTinyRtScene::StorageImageCapture image;
     if(!context.rtScene.CaptureStorageImage(image,error)||!WriteRgbaPng(directory/"final-repeat-ascent.png",image,error))return false;
     std::ostringstream summary;
-    summary<<"{\"schema\":1,\"scope\":\"Debug CPU with actual Shipping High shaders; wall-clock two-way route after staged Keeper death; no owner or phone acceptance\","
+#if defined(_DEBUG)
+    constexpr auto build="Debug CPU";
+#else
+    constexpr auto build="Optimized Release CPU";
+#endif
+    summary<<"{\"schema\":3,\"scope\":\""<<build<<" with actual Shipping High shaders; visible uncovered wall-clock two-way route after staged Keeper death; no owner or phone acceptance\","
         <<"\"durationSeconds\":"<<finishSeconds<<",\"renderedFrames\":"<<frames-1<<",\"completedSamples\":"<<samples
         <<",\"simulationTicks\":"<<state.tickIndex-baseTick<<",\"maximumPendingSimulationTicks\":"<<maximumDebt
         <<",\"simulationHz\":60,\"maximumTicksPerRender\":4,\"deadlineSeconds\":150,\"warmupSeconds\":5,"
+        <<"\"unoccludedClientChecks\":true,\"intervalMeaning\":\"wall time between successful present API returns, not GPU-only or exact display scanout timestamps\","
+        <<"\"foregroundRequested\":"<<(ParseCaptureLaunchOptions().measureChapterForeground?"true":"false")<<','
         <<"\"normalStaticRegionResidencySavingBytes\":0,\"complete\":true}\n";
-    csv.flush();snapshots.flush();
+    csv.flush();snapshots.flush();systemLoad.flush();
     if(!WriteReportFile(directory/"run.json",summary.str())) {error="Shipping route summary write failed.";return false;}
     error.clear();return true;
 }

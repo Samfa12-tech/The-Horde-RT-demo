@@ -2876,3 +2876,26 @@ includes subsequent legacy-exit and inspection-camera corrections and is NOT
 installed/device accepted. Full route, lifecycle, listening/haptics, sustained
 performance and owner acceptance remain open. No other device is certified.
 [Exact artifacts, failed evidence and matched results](evidence/2026-10-12-chapter-capture-readiness/README.md).
+
+### 14 October — physical ground-material candidate, both RT backends
+
+Owner-authorized Samsung **SM-S948B**. Separate Debug APK
+`1a00b34d61ce63423748c5b05434ae1a7744cbb55d196c6be5fa40e82089be6b`
+(183,170,474 bytes), ground checkpoint `e38a08c5d1d9ff098273cfd621bbb9aa721d939d`,
+installed and byte-verified once with the existing development signer/code10;
+app data preserved and release app untouched.
+
+Evidence class: four opened actual foreground screenshots and current stable
+completed/presented native RT identities, landing north/second bend × Pipeline/
+QueryCompute. Original saved40% scale/576x1192 into1440x2980, CURRENT shadows,
+Mobile optical/fire/water and Diagnostic instrumentation. Last owning GPU
+samples are55.919/54.698ms at landing and139.624/166.012ms at the bend
+(Pipeline/Query); these are frozen-view samples, **not sustained FPS or a
+performance acceptance pass**. Device-local live allocations166,076,608/
+166,076,096 bytes and host-visible49,407,552/49,407,040, respectively.
+
+Debug was stopped and original preferences byte-restored before the owner
+removed the phone. No more device work until it returns. Current/Higher and
+saved Lower normalization on this candidate, complete live chapter, lifecycle,
+sustained performance and owner audio/haptic/visual acceptance remain pending.
+[Exact receipt and separate Windows Release baseline](evidence/2026-10-14-release-route-baseline/README.md).

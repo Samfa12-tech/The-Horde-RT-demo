@@ -625,6 +625,32 @@ install. Phone Current/Higher and saved Lower migration, touch/lifecycle and
 owner audio/haptic/traversal acceptance remain pending. Frozen shader limits,
 three actor slots and the 18-layer ceiling remain unchanged.
 
+### Optimized Release baseline and physical ground check (14 October)
+
+The [Release baseline](../evidence/2026-10-14-release-route-baseline/README.md)
+closes the Debug-versus-Release measurement gap for the existing staged-death
+out-and-back route. Three completed same-executable Pipeline/QueryCompute runs
+retain exact identities and actual wall-clock/CPU/GPU/resource facts. Schema2
+post-frame observation intervals are explicitly corrected in the report; current
+schema3 source timestamps actual successful present returns and excludes the
+first unavailable interval. A covered-window attempt fails closed. Earlier
+500ms acquisition stalls remain unattributed; the owner reports possible earlier
+100% system CPU contention. Focus is not established as their cause.
+
+Four physical ground views on SM-S948B use the exact e38 candidate APK and
+original saved40% settings, on both RT backends. Screenshots were opened,
+preferences restored exactly and Debug stopped before the owner removed the
+phone. This is scoped material/presentation evidence, not sustained mobile or
+complete chapter acceptance. All six e38 CI jobs passed in run38453146945,
+including all seven requested traversal CTests; successor CI remains separate.
+
+**Normal static-region saving is still zero.** The next completion milestone is
+ordinary two-way detailed-resource loading/readiness/retirement/reload, retaining
+coarse world, landmarks and all legitimate shadow/secondary contributors.
+Current/Higher and saved Lower normalization on the current phone candidate,
+complete physical route/lifecycle and owner audio/haptic acceptance remain open.
+Easy Tree/canopy and mist28 stay deferred. No merge/release.
+
 ### Selected zone geometry candidate packing (12 October)
 
 The [selected geometry proof](../evidence/2026-10-12-selected-zone-geometry/README.md)

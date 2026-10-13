@@ -28,6 +28,7 @@ endif()
 option(HORDE_RT_BUILD_CAPABILITY_PROBE_EXECUTABLE "Build the standalone command line Vulkan capability probe" ON)
 option(HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW "Build the Win32 diagnostic shell" ON)
 option(HORDE_RT_BUILD_VULKAN_TARGETS "Build targets that require a Vulkan SDK" ON)
+option(HORDE_RT_CHAPTER_MEASUREMENT "Enable the bounded chapter Shipping route in an optimized Windows development build" OFF)
 
 include(CTest)
 if(WIN32 AND (BUILD_TESTING OR (HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW)))
@@ -339,6 +340,7 @@ if(HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW AN
         horde_rt_report_webview2
         comdlg32
         comctl32
+        dwmapi
         bcrypt
         ole32
         windowscodecs
@@ -353,10 +355,19 @@ if(HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW AN
         HORDE_RT_BUILD_ID="${HORDE_RT_BUILD_ID}"
         $<$<CONFIG:Debug>:HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}">
     )
+    if(HORDE_RT_CHAPTER_MEASUREMENT)
+        target_compile_definitions(horde_rt_probe_core PUBLIC HORDE_RT_CHAPTER_MEASUREMENT=1)
+        target_compile_definitions(horde_rt_diagnostic_window PRIVATE
+            HORDE_RT_CHAPTER_MEASUREMENT=1 HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
+        target_sources(horde_rt_diagnostic_window PRIVATE
+            src/gameplay/validation/MotionEvidenceScenario.cpp src/telemetry/MotionEvidenceLedger.cpp)
+    endif()
     horde_rt_attach_raygen_artifacts(horde_rt_diagnostic_window)
+    if(NOT HORDE_RT_CHAPTER_MEASUREMENT)
     target_sources(horde_rt_diagnostic_window PRIVATE
         "$<$<CONFIG:Debug>:${CMAKE_CURRENT_SOURCE_DIR}/src/gameplay/validation/MotionEvidenceScenario.cpp>"
         "$<$<CONFIG:Debug>:${CMAKE_CURRENT_SOURCE_DIR}/src/telemetry/MotionEvidenceLedger.cpp>")
+    endif()
 
     set_target_properties(horde_rt_diagnostic_window PROPERTIES
         OUTPUT_NAME "HordeLanternRT"
