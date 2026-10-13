@@ -1,6 +1,21 @@
 # Horde 1.7 current design index
 
-**Paused again at the owner's request; the phone is removed.** The newest
+**Goal resumed13 October; phone temporarily disconnected after bounded testing.**
+The [triangle-provenance checkpoint](../evidence/2026-10-13-triangle-region-candidates/README.md)
+preserves exterior grave offerings when preparing diagnostic GPU subsets and
+fails normal traversal readiness closed for any uncertified partial owner.
+Debug/Release affected tests, four-ABI Android/lint/Java and package checks pass.
+Inspected native transactions save1,658,368 device-local bytes only in the explicit
+diagnostic; ordinary-play residency saving remains ZERO. Synchronous partial CPU
+packing and conservative contributor eligibility still block normal-play adoption.
+The phone was updated to42d00817, with original settings restored after actual
+landing/Kit/lookout captures. Its two frozen Diagnostic lookout runs average
+about55ms at the owner's saved40% scale; these are not full-route/performance
+acceptance. The new common-code APK is prepared, not installed. Two native capture
+startup stalls remain retained failures. Chapter integration continues; the full
+chapter is incomplete. Easy Tree canopy and mist issue28 stay deferred.
+
+The preceding
 [capture-readiness checkpoint](../evidence/2026-10-12-chapter-capture-readiness/README.md)
 fixes Android's false chapter-ready label with actual scene/generation admission.
 Matched physical Current/Higher frames and legacy Lower rendering as Current
@@ -9,7 +24,7 @@ not full route/performance acceptance; persisted setting confirmation remains op
 The portal inspection camera is20cm farther back; both native RT frames now pass
 the unchanged primary-arm guard. Production IK and shaders stay unchanged.
 Debug/Release affected tests, Android and package checks pass. The final APK is
-prepared but uninstalled. Normal-play GPU lifetime work remains required,
+was prepared but uninstalled at that pause. Normal-play GPU lifetime work remains required,
 residency savings remain zero, and the chapter is incomplete.
 
 The preceding

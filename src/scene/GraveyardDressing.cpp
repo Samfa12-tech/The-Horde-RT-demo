@@ -47,7 +47,8 @@ void Normalize(Surface::Point& p) {
 bool AppendPreparedGraveyard(const std::filesystem::path& root, StaticMeshAsset& owner,
     std::shared_ptr<const Surface>& support, GraveyardDressingReport& report,std::string& diagnostic) {
     if(!support || support->NonWalkableTriangleCount() || owner.nodeTransforms.empty() ||
-        owner.primitives.empty() || owner.primitives.size()+4>32 || owner.materials.size()>32) {
+        owner.primitives.empty() || owner.primitives.size()+4>32 || owner.materials.size()>32 ||
+        !owner.HasValidTriangleProvenance()) {
         diagnostic="Graveyard requires an unmodified admitted terrain/static owner within existing capacity.";return false;
     }
     std::array<std::uint32_t,4> materials{};
@@ -152,6 +153,9 @@ bool AppendPreparedGraveyard(const std::filesystem::path& root, StaticMeshAsset&
         primitive.indexOffset=static_cast<std::uint32_t>(staged.indices.size());
         primitive.indexCount=static_cast<std::uint32_t>(indices[family].size());primitive.materialIndex=materials[family];
         primitive.nodeTransformIndex=static_cast<std::uint32_t>(staged.nodeTransforms.size());
+        staged.triangleRegions.resize(staged.indices.size()/3u,StaticTriangleRegion::Shared);
+        staged.triangleRegions.insert(staged.triangleRegions.end(),primitive.indexCount/3u,
+            StaticTriangleRegion::ExteriorDressing);
         staged.vertices.insert(staged.vertices.end(),vertices[family].begin(),vertices[family].end());
         staged.indices.insert(staged.indices.end(),indices[family].begin(),indices[family].end());
         staged.primitives.push_back(primitive);

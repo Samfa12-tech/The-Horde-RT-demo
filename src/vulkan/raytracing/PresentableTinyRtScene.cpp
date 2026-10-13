@@ -493,6 +493,9 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     preparedStaticGeometry_ = std::move(other.preparedStaticGeometry_);
     fullStaticGeometrySource_ = std::move(other.fullStaticGeometrySource_);
     staticGeometryGeneration_ = std::exchange(other.staticGeometryGeneration_, 1u);
+    staticGeometryRetainedTriangleRegions_ = std::exchange(other.staticGeometryRetainedTriangleRegions_,
+        horde::scene::assets::kAllStaticTriangleRegions);
+    staticGeometryRetainedAllFamilies_ = std::exchange(other.staticGeometryRetainedAllFamilies_, true);
     staticGeometryCompletionUnproved_ = std::exchange(other.staticGeometryCompletionUnproved_, false);
     staticGeometryReplacementMeasurements_ = std::exchange(other.staticGeometryReplacementMeasurements_, {});
     physicalDevice_ = std::exchange(other.physicalDevice_, nullptr);
@@ -1079,7 +1082,9 @@ horde::gameplay::simulation::ZoneReadiness PresentableTinyRtScene::WorldZoneRead
         return ZoneReadiness::Unprepared;
     // ready_ is set only after real uploads, completed one-time BLAS/TLAS builds
     // and the selected pipeline bundle succeed. No platform declares GPU readiness.
-    if(!ready_ || !worldRouteGeometry_.valid || vertexBuffer_.memory==VK_NULL_HANDLE ||
+    // A diagnostic subset has no all-ray/light contributor certificate. Its
+    // successful upload/presentation cannot authorize ordinary zone traversal.
+    if(!ready_ || !StaticGeometryHasCompleteContributors() || !worldRouteGeometry_.valid || vertexBuffer_.memory==VK_NULL_HANDLE ||
         indexBuffer_.memory==VK_NULL_HANDLE || blas_.handle==VK_NULL_HANDLE || tlas_.handle==VK_NULL_HANDLE)
         return ZoneReadiness::Preparing;
     if(developmentRescueJourney_ && (!chapterTerrainSurface_ || rescueWorldUpdateScratch_.buffer==VK_NULL_HANDLE ||
@@ -1096,6 +1101,8 @@ void PresentableTinyRtScene::Destroy()
     preparedStaticGeometry_.reset();
     fullStaticGeometrySource_.reset();
     staticGeometryGeneration_ = 1u;
+    staticGeometryRetainedTriangleRegions_ = horde::scene::assets::kAllStaticTriangleRegions;
+    staticGeometryRetainedAllFamilies_ = true;
     staticGeometryCompletionUnproved_ = false;
     staticGeometryReplacementMeasurements_ = {};
     worldRouteGeometry_ = {}; // Release CPU batches with the renderer-owned scene.

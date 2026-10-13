@@ -282,6 +282,7 @@ struct CaptureLaunchOptions
     bool portrait = false;
     bool anatomicalPlayerMount = false;
     bool validateStaticZoneCutover = false;
+    bool validateStaticTriangleCutover = false;
     std::filesystem::path outputDirectory;
     std::string developmentCheckpoint;
     std::string error;
@@ -743,10 +744,11 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
 #endif
             continue;
         }
-        if (argument == L"--validate-static-zone-cutover")
+        if (argument == L"--validate-static-zone-cutover" || argument == L"--validate-static-triangle-cutover")
         {
 #if defined(_DEBUG)
             options.validateStaticZoneCutover = true;
+            options.validateStaticTriangleCutover = argument == L"--validate-static-triangle-cutover";
 #else
             options.error = "--validate-static-zone-cutover is Debug-only.";
 #endif
@@ -5521,6 +5523,10 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx, const bool startup
     const VkExtent2D renderExtent = ScaledRenderExtent(ctx.swapchainExtent, ctx.renderScale);
     std::string diagnostic;
     const bool rescueJourney = ctx.simulation.Snapshot().developmentRescueJourney;
+#if defined(_DEBUG)
+    if(!ctx.developmentCheckpoint.empty())
+        std::cerr << "HORDE_CHAPTER_INITIALISE begin checkpoint=" << ctx.developmentCheckpoint << std::endl;
+#endif
     ctx.rtScene.SetDevelopmentWorldRoute(ctx.developmentWorldRoute || rescueJourney,ctx.stagedWorldPreparation);
     ctx.rtScene.SetDevelopmentRescueJourney(rescueJourney);
     ctx.rtScene.SetDevelopmentSupportFixture(ctx.developmentVerticalProof &&
@@ -5551,6 +5557,10 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx, const bool startup
                     MB_OK | MB_ICONERROR);
         return false;
     }
+#if defined(_DEBUG)
+    if(!ctx.developmentCheckpoint.empty())
+        std::cerr << "HORDE_CHAPTER_INITIALISE scene-ready checkpoint=" << ctx.developmentCheckpoint << std::endl;
+#endif
     if (ctx.sceneProfile == horde::vulkan::raytracing::RtSceneProfile::GraphicsPreview &&
         !ctx.rtScene.ConfigurePreviewFireSockets(ctx.graphicsPreview, diagnostic))
     {
@@ -6972,7 +6982,8 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
 
 #if defined(_DEBUG)
 bool RunStaticGeometryCutoverCapture(VulkanSurfaceContext& context,
-    const std::filesystem::path& directory, const VkClearColorValue& clear, std::string& error)
+    const std::filesystem::path& directory, const VkClearColorValue& clear, std::string& error,
+    bool triangleSubset = false)
 {
     using Scene = horde::vulkan::raytracing::PresentableTinyRtScene;
     const auto readback = [&](const char* filename) {
@@ -6990,6 +7001,10 @@ bool RunStaticGeometryCutoverCapture(VulkanSurfaceContext& context,
     // Retain the full owner until spatial contributor eligibility is proved;
     // omitting an entire ornament family would also discard exterior pieces.
     for (unsigned hop=0;hop<2;++hop) {
+        // Explicit diagnostic only. A matched view does not prove global ray
+        // irrelevance or authorize normal-play omission of indoor dressing.
+        const auto regions=static_cast<std::uint8_t>(triangleSubset && hop==0 ? 2u :
+            horde::scene::assets::kAllStaticTriangleRegions);
         const auto generation=context.rtScene.StaticGeometryGeneration();
         const auto before=context.rtScene.ResourceInventory();
         const std::array<std::uint32_t,1> invalid{{UINT32_MAX}};
@@ -7001,14 +7016,14 @@ bool RunStaticGeometryCutoverCapture(VulkanSurfaceContext& context,
         const std::span<const std::uint32_t> retained{};
         // Prove both CPU-source and actual GPU allocation cancellation before
         // spreading reconstruction/upload across RT frames.
-        if (!context.rtScene.BeginStaticGeometryReplacement(generation,retained,error) ||
+        if (!context.rtScene.BeginStaticGeometryReplacement(generation,retained,error,regions) ||
             !context.rtScene.AdvanceStaticGeometryReplacement(generation,64u*1024u,error) ||
             !context.rtScene.CancelStaticGeometryReplacement(error) ||
             context.rtScene.ResourceInventory().deviceLocalBytes != before.deviceLocalBytes ||
             context.rtScene.ResourceInventory().hostVisibleBytes != before.hostVisibleBytes) {
             error="Cancelled real candidate did not preserve the admitted allocations."; return false;
         }
-        if (!context.rtScene.BeginStaticGeometryReplacement(generation,retained,error)) return false;
+        if (!context.rtScene.BeginStaticGeometryReplacement(generation,retained,error,regions)) return false;
         unsigned cancelledPreparationFrames=0;
         while (context.rtScene.StaticGeometryReplacementEvidence().uploadedBytes==0u) {
             if (++cancelledPreparationFrames>1024u ||
@@ -7023,7 +7038,7 @@ bool RunStaticGeometryCutoverCapture(VulkanSurfaceContext& context,
             context.rtScene.ResourceInventory().hostVisibleBytes != before.hostVisibleBytes) {
             error="Cancelled GPU upload did not preserve admitted allocations."; return false;
         }
-        if (!context.rtScene.BeginStaticGeometryReplacement(generation,retained,error)) return false;
+        if (!context.rtScene.BeginStaticGeometryReplacement(generation,retained,error,regions)) return false;
         unsigned preparationFrames=0;
         while (!context.rtScene.StaticGeometryReplacementReady()) {
             if (++preparationFrames>1024u ||
@@ -7084,7 +7099,7 @@ bool RunStaticGeometryCutoverCapture(VulkanSurfaceContext& context,
         receipt << (hop?",":"") << "{\"sourceGeneration\":" << generation
             << ",\"admittedGeneration\":" << context.rtScene.StaticGeometryGeneration()
             << ",\"movingFirstFrame\":true,\"poseYawDeltaRadians\":0.025"
-            << ",\"selection\":\"complete-with-graveyard"
+            << ",\"selection\":\"" << (regions==2u ? "shared+graveyard-triangles" : "complete-with-graveyard")
             << "\",\"prepareMilliseconds\":" << m.prepareMilliseconds << ",\"cutoverMilliseconds\":" << m.cutoverMilliseconds
             << ",\"packMilliseconds\":" << m.packMilliseconds
             << ",\"maximumAdvanceMilliseconds\":" << m.maximumAdvanceMilliseconds
@@ -7125,11 +7140,14 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
                        horde::vulkan::DeviceCapabilities& capabilities,
                        const std::filesystem::path& outputDirectory)
 {
+    std::cerr << "HORDE_SHOWCASE_CAPTURE enter checkpoint=" << context.developmentCheckpoint << std::endl;
     // The finite validation flag overrides saved Mist only for this process.
     // Ordinary captures retain historical Mist On; each frame uploads the choice.
     context.requestedMistEnabled = !ParseCaptureLaunchOptions().mistOff;
+    std::cerr << "HORDE_SHOWCASE_CAPTURE options-ready" << std::endl;
     std::error_code directoryError;
     std::filesystem::create_directories(outputDirectory, directoryError);
+    std::cerr << "HORDE_SHOWCASE_CAPTURE directory-result=" << directoryError.value() << std::endl;
     if (directoryError)
     {
         std::cerr << "Failed to create showcase capture directory: " << directoryError.message() << '\n';
@@ -7259,7 +7277,8 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
 #if defined(_DEBUG)
         if (ParseCaptureLaunchOptions().validateStaticZoneCutover) {
             std::string cutoverError;
-            if (!RunStaticGeometryCutoverCapture(context,outputDirectory,clearColor,cutoverError))
+            if (!RunStaticGeometryCutoverCapture(context,outputDirectory,clearColor,cutoverError,
+                    ParseCaptureLaunchOptions().validateStaticTriangleCutover))
                 return fail("Static GPU owner cutover: "+cutoverError);
         }
 #endif
@@ -8137,9 +8156,17 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     }
 
     context.controlsEnabled = context.useRtPath && context.rtScene.IsReady();
+#if defined(_DEBUG)
+    if(captureDirectory != nullptr)
+        std::cerr << "HORDE_CAPTURE_HOST scene-admitted" << std::endl;
+#endif
     if (context.controlsEnabled)
     {
         SetWindowLongPtrA(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(&context));
+#if defined(_DEBUG)
+        if(captureDirectory != nullptr)
+            std::cerr << "HORDE_CAPTURE_HOST callbacks-attached" << std::endl;
+#endif
         if (context.entryMenuVisible)
             ApplyDpiScaledFonts(hWnd);
         if (captureDirectory == nullptr)

@@ -1,4 +1,6 @@
 # Keep high-resolution source art out of normal Git history.
+docs/evidence/2026-10-13-triangle-region-candidates/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-13-triangle-region-candidates/**/*.log whitespace=-trailing-space,-blank-at-eof,cr-at-eol
 assets/models/world/source/forest-deadwood-v1/** -text whitespace=cr-at-eol
 # Immutable upstream notice retains its original trailing/EOF whitespace.
 assets/models/world/source/forest-deadwood-v1/original-snag/source/QUATERNIUS_LICENSE.txt whitespace=-trailing-space,-blank-at-eof,cr-at-eol

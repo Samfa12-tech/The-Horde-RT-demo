@@ -10,6 +10,7 @@
 #include "scene/ChapterTerrainAdmission.h"
 #include "scene/TombDressing.h"
 #include "scene/assets/StaticPrimitiveGrouping.h"
+#include "scene/assets/StaticTriangleSelection.h"
 #include "vulkan/raytracing/RtStaticMeshSlot.h"
 #include "gameplay/traversal/ChapterTerrainMovement.h"
 #include "scene/assets/AssetManifest.h"
@@ -367,6 +368,12 @@ void TestNativeChapterPrimitiveOwnership()
         StaticMeshAsset::Load(directory / "collapsed-entry-lod0.runtime.glb", manifest, owner, diagnostic);
     Check(imported, "current chapter entry imports for real primitive ownership proof");
     if (!imported) return;
+    auto malformedOwner=owner;
+    malformedOwner.triangleRegions.resize(owner.indices.size()/3u+1u,StaticTriangleRegion::Shared);
+    TombDressingBuildReport malformedTomb;
+    Check(!AppendPreparedTombDressing(kRoot/"assets",malformedOwner,malformedTomb,diagnostic) &&
+          malformedOwner.triangleRegions.size()==owner.indices.size()/3u+1u,
+          "tomb append rejects excessive provenance without truncating existing source data");
     TombDressingBuildReport tomb;
     ForestDressingBuildReport forest;
     GraveyardDressingReport graveyard;
@@ -375,7 +382,12 @@ void TestNativeChapterPrimitiveOwnership()
     std::shared_ptr<const gameplay::simulation::TriangleSupportSurface> terrain;
     const bool prepared = AppendPreparedTombDressing(kRoot / "assets", owner, tomb, diagnostic) &&
         AppendChapterTerrain(kRoot / "assets", owner, terrain, diagnostic) &&
-        AppendPreparedGraveyard(kRoot / "assets", owner, terrain, graveyard, diagnostic) &&
+        [&]{auto malformed=owner;malformed.triangleRegions.resize(owner.indices.size()/3u+1u,StaticTriangleRegion::Shared);
+            auto retainedTerrain=terrain;GraveyardDressingReport rejected;
+            Check(!AppendPreparedGraveyard(kRoot/"assets",malformed,retainedTerrain,rejected,diagnostic) && retainedTerrain==terrain &&
+                  malformed.triangleRegions.size()==owner.indices.size()/3u+1u,
+                  "graveyard append rejects excessive provenance and retains prior geometry/contact");
+            return AppendPreparedGraveyard(kRoot/"assets",owner,terrain,graveyard,diagnostic);}() &&
         AppendBellwetherShell(kRoot / "assets", owner, diagnostic) &&
         AppendPreparedForestDressing(kRoot / "assets", owner, forest, diagnostic, terrain.get()) &&
         AppendPreparedForestUnderstory(kRoot / "assets", owner, *terrain, understory, diagnostic) &&
@@ -394,6 +406,69 @@ void TestNativeChapterPrimitiveOwnership()
     Check(owner.primitives.size() == families.size(),
           "current coalesced chapter retains eleven existing primitive rows");
     if (owner.primitives.size() != families.size()) return;
+    Check(owner.triangleRegions.size() == owner.indices.size()/3u,
+          "native material consolidation must retain explicit per-triangle region provenance");
+    const auto taggedTomb=std::count(owner.triangleRegions.begin(),owner.triangleRegions.end(),
+        StaticTriangleRegion::TombDressing);
+    const auto taggedExterior=std::count(owner.triangleRegions.begin(),owner.triangleRegions.end(),
+        StaticTriangleRegion::ExteriorDressing);
+    Check(taggedTomb>0 && taggedExterior>0,
+          "mixed candle/urn material families must distinguish tomb and actual graveyard geometry");
+    Check(taggedExterior==static_cast<std::ptrdiff_t>(graveyard.triangles),
+          "all actual graveyard triangles retain exterior provenance across consolidation");
+    for(const auto& primitive:owner.primitives)for(std::size_t n=0;n<primitive.indexCount;n+=3u) {
+        if(owner.triangleRegions[(primitive.indexOffset+n)/3u]!=StaticTriangleRegion::ExteriorDressing)continue;
+        const bool authored=std::any_of(graveyard.placements.begin(),graveyard.placements.end(),[&](const auto& placement) {
+            for(unsigned corner=0;corner<3;++corner) {
+                const auto& point=owner.vertices[primitive.vertexOffset+owner.indices[primitive.indexOffset+n+corner]].position;
+                for(unsigned axis=0;axis<3;++axis)
+                    if(point[axis]<placement.minimum[axis]-.0001f || point[axis]>placement.maximum[axis]+.0001f)return false;
+            }
+            return true;
+        });
+        Check(authored,"exterior provenance must still identify genuine authored graveyard triangles after reordering");
+    }
+    StaticMeshAsset selected, restored;
+    const bool selectionReady=SelectStaticTriangleRegions(owner,2u,selected,diagnostic);
+    Check(selectionReady,"triangle-region candidate must retain shared and exterior geometry");
+    if(selectionReady) {
+        Check(selected.indices.size()+3u*taggedTomb==owner.indices.size() &&
+              selected.vertices.size()<owner.vertices.size() && selected.primitives.size()==owner.primitives.size(),
+              "real tomb-only triangle omission shrinks buffers while keeping all eleven material families");
+        Check(std::count(selected.triangleRegions.begin(),selected.triangleRegions.end(),StaticTriangleRegion::ExteriorDressing)==taggedExterior,
+              "graveyard offering and candle triangles cannot disappear with indoor material peers");
+        std::size_t target=0;
+        for(std::size_t p=0;p<owner.primitives.size();++p) {
+            const auto& a=owner.primitives[p];const auto& b=selected.primitives[p];
+            Check(a.materialIndex==b.materialIndex,"retained material identity is exact");
+            for(std::size_t n=0;n<a.indexCount;n+=3u) {
+                const auto tri=(a.indexOffset+n)/3u;
+                if(owner.triangleRegions[tri]==StaticTriangleRegion::TombDressing)continue;
+                for(unsigned corner=0;corner<3;++corner) {
+                    const auto& original=owner.vertices[a.vertexOffset+owner.indices[a.indexOffset+n+corner]];
+                    const auto& kept=selected.vertices[b.vertexOffset+selected.indices[target++]];
+                    Check(std::memcmp(&original,&kept,sizeof(original))==0,"retained triangle position, normal, UV and tangent bytes are exact");
+                }
+            }
+        }
+        Check(target==selected.indices.size(),"every retained native triangle participates exactly once");
+        RtStaticMeshSlot selectedSlot;
+        Check(selectedSlot.Initialize(std::array{StaticRtAssetRegistration{21,100,
+            static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),0,&selected}},diagnostic),
+            "triangle-selected native candidate packs within the unchanged one-owner ABI");
+        std::cout<<"Triangle-region candidate: retainedExterior="<<taggedExterior<<" omittedTomb="<<taggedTomb
+                 <<" vertexBytes="<<selectedSlot.Measurements().vertexBytes<<" indexBytes="<<selectedSlot.Measurements().indexBytes
+                 <<"; CPU candidate only, spatial eviction permission not established\n";
+    }
+    Check(SelectStaticTriangleRegions(owner,kAllStaticTriangleRegions,restored,diagnostic) &&
+          restored.indices==owner.indices && restored.vertices.size()==owner.vertices.size() &&
+          std::memcmp(restored.vertices.data(),owner.vertices.data(),owner.vertices.size()*sizeof(StaticRtVertex))==0 &&
+          restored.primitives.size()==owner.primitives.size() &&
+          std::memcmp(restored.primitives.data(),owner.primitives.data(),owner.primitives.size()*sizeof(StaticPrimitiveRecord))==0 &&
+          restored.bounds.minimum==owner.bounds.minimum && restored.bounds.maximum==owner.bounds.maximum &&
+          restored.nodeTransforms.size()==owner.nodeTransforms.size() && restored.materials.size()==owner.materials.size() &&
+          restored.sockets.size()==owner.sockets.size(),
+          "complete reverse selection preserves full geometry byte-for-byte");
     for (std::size_t i = 0; i < families.size(); ++i)
         Check(owner.materials.at(owner.primitives[i].materialIndex).name == families[i],
               "actual material families identify preserved shared, tomb and forest boundaries");
@@ -520,6 +595,54 @@ void TestNativeChapterPrimitiveOwnership()
               << " indexBytes=" << complete.Measurements().indexBytes << "; CPU admission only\n";
 }
 
+void TestTriangleRegionFailures()
+{
+    StaticMeshAsset original;
+    original.vertices.resize(9);original.indices={0,1,2,0,1,2,0,1,2};
+    original.materials.resize(2);original.materials[0].name="shared-family";original.materials[1].name="indoor-family";
+    original.nodeTransforms.resize(1);
+    for(unsigned i=0;i<9;++i){original.vertices[i].position[0]=static_cast<float>(i);original.vertices[i].normal[1]=1;original.vertices[i].tangent[0]=1;}
+    original.primitives={{0,0,3,0,0},{3,3,3,1,0},{6,6,3,0,0}};
+    original.triangleRegions={StaticTriangleRegion::Shared,StaticTriangleRegion::TombDressing,StaticTriangleRegion::ExteriorDressing};
+    std::string diagnostic;
+    auto reordered=original;
+    auto adjacent=original;adjacent.primitives[1].materialIndex=0;
+    Check(CoalesceAdjacentWorldBakedPrimitives(adjacent,diagnostic) && adjacent.triangleRegions==original.triangleRegions,
+          "adjacent-row coalescing preserves triangle-order provenance");
+    Check(ConsolidateWorldBakedMaterialFamilies(reordered,diagnostic) &&
+          reordered.triangleRegions==std::vector{StaticTriangleRegion::Shared,StaticTriangleRegion::ExteriorDressing,StaticTriangleRegion::TombDressing},
+          "disconnected family consolidation reorders region provenance with its actual triangles");
+    StaticMeshAsset selected;
+    Check(SelectStaticTriangleRegions(reordered,2,selected,diagnostic) && selected.indices.size()==6 &&
+          selected.vertices[3].position[0]==6 && selected.materials.size()==2,
+          "disconnected exterior triangles survive exact rebasing beside shared geometry");
+    auto unclassified=original;unclassified.triangleRegions.clear();
+    Check(SelectStaticTriangleRegions(unclassified,0,selected,diagnostic) && selected.indices==original.indices,
+          "missing provenance conservatively retains all unclassified geometry");
+    const auto rejects=[&](StaticMeshAsset source,std::uint8_t mask,const char* label) {
+        StaticMeshAsset sentinel;sentinel.indices={17};sentinel.vertices.resize(1);sentinel.vertices[0].position[0]=123;
+        Check(!SelectStaticTriangleRegions(source,mask,sentinel,diagnostic) && sentinel.indices==std::vector<std::uint32_t>{17} &&
+              sentinel.vertices.size()==1 && sentinel.vertices[0].position[0]==123,label);
+    };
+    rejects(original,4,"unknown retained-region bit fails without overwriting the previous candidate");
+    auto allIndoor=original;allIndoor.triangleRegions.assign(3,StaticTriangleRegion::TombDressing);
+    rejects(allIndoor,2,"empty retained candidate fails without destroying prior output");
+    auto invalid=original;invalid.triangleRegions.push_back(StaticTriangleRegion::Shared);
+    rejects(invalid,2,"excess region entries fail atomically");
+    invalid=original;invalid.triangleRegions[1]=static_cast<StaticTriangleRegion>(5);
+    rejects(invalid,2,"unknown source region fails atomically");
+    invalid=original;invalid.indices[3]=UINT32_MAX;
+    rejects(invalid,2,"invalid index in even an omitted triangle fails atomically");
+    invalid=original;invalid.primitives[1].indexOffset=1;
+    rejects(invalid,2,"unaligned overlapping triangle spans fail atomically");
+    invalid=original;invalid.primitives[1].vertexOffset=UINT32_MAX;
+    rejects(invalid,2,"unaddressable vertex span fails atomically");
+    invalid=original;invalid.indices.push_back(0);
+    rejects(invalid,2,"unowned trailing index fails atomically");
+    Check(!SelectStaticTriangleRegions(original,2,original,diagnostic) && original.indices.size()==9,
+          "selection never overwrites its source master");
+}
+
 } // namespace
 
 int main()
@@ -529,6 +652,7 @@ int main()
     TestNativeTerrainAndTrailClearance();
     TestUnsafeRootFootprintsFailAtomically();
     TestNativeChapterPrimitiveOwnership();
+    TestTriangleRegionFailures();
     if (failures == 0)
     {
         std::cout << "Native forest tree-pair import, grounding, grouping, and clean-failure checks passed.\n";

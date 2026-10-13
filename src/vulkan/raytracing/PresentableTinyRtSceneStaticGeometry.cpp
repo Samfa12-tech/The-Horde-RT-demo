@@ -1,5 +1,6 @@
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
 #include "vulkan/raytracing/TlasInstanceRefresh.h"
+#include "scene/assets/StaticTriangleSelection.h"
 #include <algorithm>
 #include <chrono>
 #include <cstring>
@@ -9,8 +10,13 @@
 namespace horde::vulkan::raytracing {
 
 bool PresentableTinyRtScene::PackLoadedStaticAssets(RtStaticMeshSlot& out,
-    std::span<const std::uint32_t> retainedWorldFamilies, std::string& diagnostic)
+    std::span<const std::uint32_t> retainedWorldFamilies, std::string& diagnostic,
+    const std::uint8_t retainedTriangleRegions)
 {
+    horde::scene::assets::StaticMeshAsset regionSelectedWorld;
+    if(retainedTriangleRegions!=horde::scene::assets::kAllStaticTriangleRegions &&
+       !horde::scene::assets::SelectStaticTriangleRegions(collapseStaticAsset_,retainedTriangleRegions,
+            regionSelectedWorld,diagnostic))return false;
     std::vector<StaticRtAssetRegistration> registrations{
         {3u, 0x53574f52u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),
          0u, &developmentStaticAsset_},
@@ -60,7 +66,10 @@ bool PresentableTinyRtScene::PackLoadedStaticAssets(RtStaticMeshSlot& out,
             static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u, &chapterActor_.Asset()});
     }
     for (auto& row : registrations)
-        if (row.instanceCustomIndex == kCollapseInstanceIndex) row.primitiveSelection = retainedWorldFamilies;
+        if (row.instanceCustomIndex == kCollapseInstanceIndex) {
+            row.primitiveSelection = retainedWorldFamilies;
+            if(retainedTriangleRegions!=horde::scene::assets::kAllStaticTriangleRegions)row.asset=&regionSelectedWorld;
+        }
     // Packing consumes borrowed selections synchronously into owned vectors.
     if (!(developmentRescueJourney_
             ? out.InitializeSelectedGeometry(registrations, diagnostic)
@@ -173,12 +182,14 @@ bool PresentableTinyRtScene::CancelStaticGeometryReplacement(std::string& diagno
 
 bool PresentableTinyRtScene::BeginStaticGeometryReplacement(
     const std::uint64_t expectedGeneration, std::span<const std::uint32_t> retainedWorldFamilies,
-    std::string& diagnostic)
+    std::string& diagnostic, const std::uint8_t retainedTriangleRegions)
 {
     if (!ready_ || !developmentRescueJourney_ || sceneProfile_ != RtSceneProfile::Showcase ||
         preparedStaticGeometry_ || staticGeometryCompletionUnproved_ || expectedGeneration == 0 ||
         expectedGeneration != staticGeometryGeneration_ || expectedGeneration == UINT64_MAX ||
-        !tlasInstanceDefinitionsValid_ || tlasPendingDefinitionsValid_) {
+        !tlasInstanceDefinitionsValid_ || tlasPendingDefinitionsValid_ ||
+        retainedTriangleRegions>horde::scene::assets::kAllStaticTriangleRegions ||
+        (retainedTriangleRegions!=horde::scene::assets::kAllStaticTriangleRegions && !retainedWorldFamilies.empty())) {
         diagnostic = "Static geometry preparation requires the current completed chapter owner and no pending candidate.";
         return false;
     }
@@ -186,15 +197,18 @@ bool PresentableTinyRtScene::BeginStaticGeometryReplacement(
     auto candidate = std::make_unique<PreparedStaticGeometry>();
     candidate->prepareStart = start;
     candidate->sourceGeneration = expectedGeneration;
+    candidate->retainedTriangleRegions = retainedTriangleRegions;
+    candidate->retainedAllFamilies = retainedWorldFamilies.empty();
     staticGeometryReplacementMeasurements_ = {};
-    if (retainedWorldFamilies.empty() && fullStaticGeometrySource_) {
+    if (retainedWorldFamilies.empty() && fullStaticGeometrySource_ &&
+        retainedTriangleRegions==horde::scene::assets::kAllStaticTriangleRegions) {
         candidate->copy = std::make_unique<RtStaticMeshCopy>();
         if (!candidate->copy->Begin(fullStaticGeometrySource_, diagnostic)) return false;
         candidate->phase = PreparedStaticGeometry::Phase::Copy;
         preparedStaticGeometry_ = std::move(candidate);
         diagnostic.clear(); return true;
     }
-    if (!PackLoadedStaticAssets(candidate->slot, retainedWorldFamilies, diagnostic)) return false;
+    if (!PackLoadedStaticAssets(candidate->slot, retainedWorldFamilies, diagnostic,retainedTriangleRegions)) return false;
     if (!BeginPreparedStaticUploads(*candidate, diagnostic)) return false;
     staticGeometryReplacementMeasurements_ = {};
     staticGeometryReplacementMeasurements_.packMilliseconds =
@@ -480,6 +494,8 @@ bool PresentableTinyRtScene::CommitStaticGeometryWithApi(const std::uint64_t exp
         std::swap(collapseBlas_, retired->collapse);
         std::swap(tlas_, retired->tlas);
         std::swap(tlasUpdateScratch_, retired->tlasScratch);
+        std::swap(staticGeometryRetainedTriangleRegions_, retired->retainedTriangleRegions);
+        std::swap(staticGeometryRetainedAllFamilies_, retired->retainedAllFamilies);
     };
     exchangeOwners();
     // The writer rejects its contract BEFORE vkUpdateDescriptorSets. A false

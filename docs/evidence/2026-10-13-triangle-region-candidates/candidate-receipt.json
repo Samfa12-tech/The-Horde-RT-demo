@@ -1,0 +1,44 @@
+{
+  "implementationParent": "42d00817356b1bdd93b14a0684268152fb2d0795",
+  "sourceFiles": {
+    "src/platform/windows/DiagnosticWindow.cpp": "8405f5ce74170338ba20976b722b05c366348a6569166da45bdc8664ddf60b4d",
+    "src/scene/GraveyardDressing.cpp": "c01afc909e68678ecf2e7bd922494379dea41eff7853c75c8b8ff088ed5ff7a2",
+    "src/scene/TombDressing.cpp": "e89ab8922996a1a0d6e930a6c438223356cd9abad275e635f9e18d841076f854",
+    "src/scene/assets/StaticMeshAsset.h": "9b55dddf5ed5b7e8dac28d9c7d61c7af244821d17d54dc1f095f27cea5adf01a",
+    "src/scene/assets/StaticPrimitiveGrouping.h": "fb7840995edd76fdb823fed2ef445b8f51c072f5e2accdddf9f9030e620684ee",
+    "src/scene/assets/StaticTriangleSelection.h": "3b89d3a1b58254aa0f2cd28ad8079dbba741dd52f320b116f5cf73ed2ff7e139",
+    "src/vulkan/raytracing/PresentableTinyRtScene.h": "5ffceab3dacca7679ede4313662941bc45ade6412f5ada4d6287a0484de3726f",
+    "src/vulkan/raytracing/PresentableTinyRtScene.cpp": "46abfa2b6b0b5d14b252986f3bf265f160c753b837ed2e4d6a529c84e4edc96e",
+    "src/vulkan/raytracing/PresentableTinyRtSceneStaticGeometry.cpp": "1e45d95ff4e0672cfdcc7c80ab585758a580a74cabcb53b672f54165bfb6c3a0",
+    "tests/ForestDressingTests.cpp": "5227d4fd4ace0398f88f0eb22d25ea869d0acf0f4fd42a345ae618928a18b422",
+    "tests/StaticGeometryCutoverTests.cpp": "ec22306eb49cc49bce5de78715a5df7c6cf89c090e2d62cf6f7e90627c302647"
+  },
+  "artifacts": {
+    "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe": {
+      "sha256": "5fb69f5fedcc05c6e76e18963a43e869f08889c80e6aad6cbd8af0ea1f1f223f",
+      "bytes": 12978176
+    },
+    "build/presets/windows-x64-release/Release/HordeLanternRT.exe": {
+      "sha256": "4c24879670ee32fe4c4fa71f5f5acd868a1909b0e146c4a9e86ac4e212d88f0f",
+      "bytes": 4448768
+    },
+    "android/app/build/outputs/apk/debug/app-debug.apk": {
+      "sha256": "f0729a6f2fe78526e369aa03d4268c2a1e8487da655d2af46496ed387e53a976",
+      "bytes": 183076298
+    }
+  },
+  "javaTests": {
+    "tests": 286,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "normalPlayResidencySavingBytes": 0,
+  "diagnosticOnlyDeviceLocalSavingBytes": 1658368,
+  "shaderAbiSha256": "c24a593942badbbeb1a500a1f0ff58ccf79e488c6b10ac8b9369395d54fed3e8",
+  "windowsProofBuilds": {
+    "pipelineExeSha256": "d46b6e90aa7fe9711f42e682af02369e9d049665b2cbf0abd0b152f20cabe9aa",
+    "pipelineScope": "final common ownership code before diagnostic boundary logging",
+    "queryExeSha256": "5fb69f5fedcc05c6e76e18963a43e869f08889c80e6aad6cbd8af0ea1f1f223f"
+  }
+}

@@ -16,6 +16,9 @@ inline bool ConsolidateWorldBakedMaterialFamilies(StaticMeshAsset& asset,
         asset.indices.size()>std::numeric_limits<std::uint32_t>::max()) {
         diagnostic="Static material consolidation has empty/unaddressable geometry.";return false;
     }
+    if(!asset.HasValidTriangleProvenance()) {
+        diagnostic="Static material consolidation rejected invalid triangle provenance.";return false;
+    }
     std::vector<std::uint32_t> families;
     std::size_t consumed=0;
     for(std::size_t i=0;i<asset.primitives.size();++i) {
@@ -36,6 +39,7 @@ inline bool ConsolidateWorldBakedMaterialFamilies(StaticMeshAsset& asset,
     if(consumed!=asset.indices.size()) {diagnostic="Static material consolidation rejected unowned indices.";return false;}
     std::vector<StaticRtVertex> vertices;vertices.reserve(asset.vertices.size());
     std::vector<std::uint32_t> indices;indices.reserve(asset.indices.size());
+    std::vector<StaticTriangleRegion> regions;regions.reserve(asset.indices.size()/3u);
     std::vector<StaticPrimitiveRecord> primitives;
     for(const auto family:families) {
         StaticPrimitiveRecord combined;
@@ -48,11 +52,17 @@ inline bool ConsolidateWorldBakedMaterialFamilies(StaticMeshAsset& asset,
             const auto localBase=static_cast<std::uint32_t>(vertices.size())-combined.vertexOffset;
             vertices.insert(vertices.end(),asset.vertices.begin()+p.vertexOffset,asset.vertices.begin()+end);
             for(std::size_t j=0;j<p.indexCount;++j)indices.push_back(localBase+asset.indices[p.indexOffset+j]);
+            for(std::size_t j=0;j<p.indexCount/3u;++j) {
+                const auto triangle=p.indexOffset/3u+j;
+                regions.push_back(triangle<asset.triangleRegions.size()
+                    ?asset.triangleRegions[triangle]:StaticTriangleRegion::Shared);
+            }
         }
         combined.indexCount=static_cast<std::uint32_t>(indices.size())-combined.indexOffset;
         primitives.push_back(combined);
     }
     asset.vertices=std::move(vertices);asset.indices=std::move(indices);asset.primitives=std::move(primitives);
+    asset.triangleRegions=std::move(regions);
     diagnostic.clear();return true;
 }
 
@@ -64,7 +74,7 @@ inline bool CoalesceAdjacentWorldBakedPrimitives(StaticMeshAsset& asset,
                                                std::string& diagnostic) {
     auto indices = asset.indices;
     std::vector<StaticPrimitiveRecord> primitives;
-    if (asset.vertices.size() > std::numeric_limits<std::uint32_t>::max()) {
+    if (asset.vertices.size() > std::numeric_limits<std::uint32_t>::max() || !asset.HasValidTriangleProvenance()) {
         diagnostic = "Static primitive grouping rejected an unaddressable vertex array.";
         return false;
     }

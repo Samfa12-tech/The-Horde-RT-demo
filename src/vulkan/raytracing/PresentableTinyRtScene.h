@@ -274,10 +274,15 @@ public:
     // world-family set; an empty set restores the complete admitted geometry.
     // Shared textures, materials, player buffers and unchanged BLAS stay owned.
     std::uint64_t StaticGeometryGeneration() const noexcept { return staticGeometryGeneration_; }
+    bool StaticGeometryHasCompleteContributors() const noexcept {
+        return staticGeometryRetainedAllFamilies_ &&
+            staticGeometryRetainedTriangleRegions_ == horde::scene::assets::kAllStaticTriangleRegions;
+    }
     bool PrepareStaticGeometryReplacement(std::uint64_t expectedGeneration,
         std::span<const std::uint32_t> retainedWorldFamilies, std::string& diagnostic);
     bool BeginStaticGeometryReplacement(std::uint64_t expectedGeneration,
-        std::span<const std::uint32_t> retainedWorldFamilies, std::string& diagnostic);
+        std::span<const std::uint32_t> retainedWorldFamilies, std::string& diagnostic,
+        std::uint8_t retainedTriangleRegions = horde::scene::assets::kAllStaticTriangleRegions);
     // One bounded CPU/upload step or one owned AS submit/nonblocking fence
     // poll. Allocation and command-record latency are not time guarantees.
     bool AdvanceStaticGeometryReplacement(std::uint64_t expectedGeneration,
@@ -701,6 +706,8 @@ private:
     struct PreparedStaticGeometry {
         enum class Phase { Copy, Upload, Collapse, CollapseWait, Tlas, TlasWait, Ready };
         std::uint64_t sourceGeneration = 0;
+        std::uint8_t retainedTriangleRegions = horde::scene::assets::kAllStaticTriangleRegions;
+        bool retainedAllFamilies = true;
         bool ready = false;
         Phase phase = Phase::Upload;
         std::chrono::steady_clock::time_point prepareStart;
@@ -727,7 +734,8 @@ private:
     bool CommitStaticGeometryWithApi(std::uint64_t expectedGeneration,
         const StaticCutoverApi& api, std::string& diagnostic);
     bool PackLoadedStaticAssets(RtStaticMeshSlot& out,
-        std::span<const std::uint32_t> retainedWorldFamilies, std::string& diagnostic);
+        std::span<const std::uint32_t> retainedWorldFamilies, std::string& diagnostic,
+        std::uint8_t retainedTriangleRegions = horde::scene::assets::kAllStaticTriangleRegions);
     void DestroyPreparedStaticGeometry(PreparedStaticGeometry& owner) noexcept;
     void StageTlasSubmissionDefinitions(
         const std::array<VkAccelerationStructureInstanceKHR,kTlasInstanceCount>& definitions) noexcept;
@@ -735,6 +743,8 @@ private:
     std::shared_ptr<const RtStaticMeshSlot> fullStaticGeometrySource_;
     std::unique_ptr<PreparedStaticGeometry> preparedStaticGeometry_;
     std::uint64_t staticGeometryGeneration_ = 1;
+    std::uint8_t staticGeometryRetainedTriangleRegions_ = horde::scene::assets::kAllStaticTriangleRegions;
+    bool staticGeometryRetainedAllFamilies_ = true;
     bool staticGeometryCompletionUnproved_ = false;
     StaticGeometryReplacementMeasurements staticGeometryReplacementMeasurements_{};
 

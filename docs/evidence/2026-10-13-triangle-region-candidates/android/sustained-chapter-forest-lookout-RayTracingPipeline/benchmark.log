@@ -1,0 +1,5 @@
+10-13 16:39:28.077  9730 10105 I HordeRtProbeBridge: HORDE_BENCH begin generation=1 checkpoint=chapter-forest-lookout scale=40 warmup_frames=120 sample_frames=120 windows=3 zone=finale
+10-13 16:39:41.180  9730 10105 I HordeRtProbeBridge: HORDE_BENCH sample generation=1 checkpoint=chapter-forest-lookout scale=40 window=1 frames=120 total_ms=54.692 fence_ms=53.062 record_ms=0.758 present_ms=0.669 zone=outside presented=1
+10-13 16:39:47.753  9730 10105 I HordeRtProbeBridge: HORDE_BENCH sample generation=1 checkpoint=chapter-forest-lookout scale=40 window=2 frames=120 total_ms=54.716 fence_ms=53.132 record_ms=0.713 present_ms=0.682 zone=outside presented=1
+10-13 16:39:54.343  9730 10105 I HordeRtProbeBridge: HORDE_BENCH sample generation=1 checkpoint=chapter-forest-lookout scale=40 window=3 frames=120 total_ms=54.866 fence_ms=53.288 record_ms=0.698 present_ms=0.674 zone=outside presented=1
+10-13 16:39:54.343  9730 10105 I HordeRtProbeBridge: HORDE_BENCH complete generation=1 checkpoint=chapter-forest-lookout scale=40 windows=3

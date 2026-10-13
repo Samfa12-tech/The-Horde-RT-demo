@@ -1,0 +1,9 @@
+{
+  "device": "SM-S948B",
+  "source": "42d00817356b1bdd93b14a0684268152fb2d0795",
+  "sha256": "24aaf0b5894e57a38804f39875c06fbf34b801dfd0c83997b76c8aea8fa9233e",
+  "preservesData": true,
+  "identityScope": "One verification after authorized update; prior installed identity is retained, not repeated",
+  "priorKnown": "0374dd8d4c367ff21bf586a6424e9c2f9733b6a3abecbccff9de2f43c0005a0c",
+  "package": "com.samfa12.hordelanternrt.debug"
+}

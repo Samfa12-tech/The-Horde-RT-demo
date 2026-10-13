@@ -275,7 +275,7 @@ bool AppendPreparedTombDressing(const std::filesystem::path& assetRoot,
     report = {};
     if (existingOwner.vertices.empty() || existingOwner.indices.empty() ||
         existingOwner.primitives.empty() || existingOwner.materials.empty() ||
-        existingOwner.nodeTransforms.empty())
+        existingOwner.nodeTransforms.empty() || !existingOwner.HasValidTriangleProvenance())
     {
         diagnostic = "Tomb dressing requires the caller's already-loaded non-empty collapsed static owner.";
         return false;
@@ -529,6 +529,9 @@ bool AppendPreparedTombDressing(const std::filesystem::path& assetRoot,
         primitive.indexCount = static_cast<std::uint32_t>(groupedIndices[family].size());
         primitive.materialIndex = materialIndices[family];
         primitive.nodeTransformIndex = static_cast<std::uint32_t>(staged.nodeTransforms.size());
+        staged.triangleRegions.resize(staged.indices.size()/3u, assets::StaticTriangleRegion::Shared);
+        staged.triangleRegions.insert(staged.triangleRegions.end(), primitive.indexCount/3u,
+            family == 0u ? assets::StaticTriangleRegion::Shared : assets::StaticTriangleRegion::TombDressing);
         staged.vertices.insert(staged.vertices.end(), groupedVertices[family].begin(), groupedVertices[family].end());
         staged.indices.insert(staged.indices.end(), groupedIndices[family].begin(), groupedIndices[family].end());
         staged.primitives.push_back(primitive);

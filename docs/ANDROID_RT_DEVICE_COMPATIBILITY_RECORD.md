@@ -1,5 +1,24 @@
 # Android RT Device Compatibility Record
 
+## 13 October 1.7 chapter resume — 42d00817 / SM-S948B
+
+Evidence class: **authorized exact Debug update/pullback, four frozen chapter
+images and two bounded frozen GPU workloads**, not final chapter acceptance.
+APK `24aaf0b5894e57a38804f39875c06fbf34b801dfd0c83997b76c8aea8fa9233e`,
+source `42d00817356b1bdd93b14a0684268152fb2d0795`, unchanged development signer
+and versionCode10. Debug data is preserved; the release app is untouched. Actual
+Pipeline landing/lookout and QueryCompute visible-Kit/lookout images were opened.
+Both frozen lookout runs completed120 warmup+360 measured frames at the original
+40% scale, Mobile/Current: three CPU-window means54.692–54.960ms; final owning
+GPU samples52.763/52.951ms. Resources remain finite/stable, thermal status0.
+This is roughly18FPS for frozen Diagnostic rendering, not motion/route, Shipping
+or sustained mobile-budget acceptance. A prior progress label incorrectly called
+simulation live; saved tick2516/animation41.9162 and the native benchmark branch
+prove freezing. The correction and unchanged raw states are retained.
+Debug stopped and original preferences restored before the phone disconnected.
+The new triangle-ownership APK is prepared, uninstalled; normal-play residency
+saving stays zero. [Exact images, identities, timings and remaining gates](evidence/2026-10-13-triangle-region-candidates/README.md).
+
 **Verified publication — 9 October:** the goal is complete; PR18 merged to main at `a3f120cf`, and signed Android/Windows 1.6.2 is live on itch. Fresh downloads match the signed APK and all 96 Windows files. [Exact post-release receipt, package hashes and Release smokes](evidence/2026-10-09-release-publication/README.md) supersede earlier no-merge/no-release statements. Historical validation snapshots and failures remain unchanged. Mobile default 50%, experimental 33/40, Dust Low and owner-deferred limitations remain authoritative; no sustained30FPS or completed Eric audit claim.
 
 **Owner controller disposition — 9 October:** controller support is approved for 1.6.2. Recorded hands-on evidence is the owner-identified Backbone One PlayStation Edition USB-C BB-51 on SM-S948B / Android 16, including accepted directional menu navigation, landscape gameplay and seamless reconnect after `ac468f51`. Earlier unmeasured matrix cases remain evidence limits, not further owner-acceptance gates. Firmware/InputDevice descriptor and other controller models remain unverified. Dated checkpoint outcomes below retain their original scope; this disposition supersedes conflicting pending-controller statements. No new device test or release approval is implied. [Exact controller history](ENGINEERING_1_6_2_ANDROID_CONTROLLER_2026_10_08.md).

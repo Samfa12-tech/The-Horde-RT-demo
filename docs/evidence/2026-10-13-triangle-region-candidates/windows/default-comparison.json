@@ -1,0 +1,10 @@
+[
+  {
+    "backend": "Pipeline",
+    "pixelsChanged": 0
+  },
+  {
+    "backend": "QueryCompute",
+    "pixelsChanged": 0
+  }
+]

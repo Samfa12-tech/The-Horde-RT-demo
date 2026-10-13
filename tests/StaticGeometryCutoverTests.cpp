@@ -106,6 +106,39 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
     static int Run() {
         int failures=0,oldMap=3,newMap=4; std::string error;
         {
+            Scene s;Seed(s,oldMap,newMap);Proof p{&s};auto api=Api(p);
+            s.developmentWorldRoute_=true;s.worldRouteGeometry_.valid=true;
+            s.vertexBuffer_=Buffer(201);s.indexBuffer_=Buffer(202);s.blas_=As(203);
+            const horde::gameplay::simulation::WorldZoneToken token{
+                1,horde::gameplay::simulation::WorldZoneId::Lookout};
+            using horde::gameplay::simulation::ZoneReadiness;
+            failures+=!Check(s.WorldZoneReadiness(token)==ZoneReadiness::Ready,
+                "complete scene keeps its real zone readiness");
+            s.preparedStaticGeometry_->retainedTriangleRegions=2u;
+            p.descriptorFailure=true;
+            failures+=!Check(!s.CommitStaticGeometryWithApi(41,api,error) &&
+                s.StaticGeometryHasCompleteContributors() && s.WorldZoneReadiness(token)==ZoneReadiness::Ready,
+                "rejected partial candidate cannot change admitted contributor readiness");
+            p.descriptorFailure=false;p.proof=0;p.publish=0;
+            failures+=!Check(s.CommitStaticGeometryWithApi(41,api,error) &&
+                !s.StaticGeometryHasCompleteContributors() && s.WorldZoneReadiness(token)==ZoneReadiness::Preparing,
+                "partial diagnostic owner cannot authorize normal traversal without a contributor proof");
+            Scene moved(std::move(s));
+            failures+=!Check(!moved.StaticGeometryHasCompleteContributors() &&
+                moved.WorldZoneReadiness(token)==ZoneReadiness::Preparing && s.StaticGeometryHasCompleteContributors(),
+                "scene move carries partial contributor state and resets the moved-from owner");
+            moved.staticGeometryRetainedTriangleRegions_=horde::scene::assets::kAllStaticTriangleRegions;
+            moved.staticGeometryRetainedAllFamilies_=false;
+            failures+=!Check(moved.WorldZoneReadiness(token)==ZoneReadiness::Preparing,
+                "whole-family diagnostic omission also fails normal traversal readiness closed");
+            moved.staticGeometryRetainedAllFamilies_=true;
+            failures+=!Check(moved.WorldZoneReadiness(token)==ZoneReadiness::Ready,
+                "complete restoration admits zone readiness again");
+            moved.Destroy();
+            failures+=!Check(moved.StaticGeometryHasCompleteContributors(),
+                "teardown resets contributor state for reconstruction");
+        }
+        {
             Scene s;Seed(s,oldMap,newMap);Proof p{&s};auto api=FrameApi(p);
             s.tlasBuiltInstances_[0].transform.matrix[0][3]=4.f;
             s.tlasBuiltInstances_[2].mask=0;
