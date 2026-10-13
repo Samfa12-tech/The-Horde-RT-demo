@@ -1,0 +1,129 @@
+{
+  "scope": "Frozen actual RT display-RGB comparison; not linear radiance or performance",
+  "rois": {
+    "farGround": {
+      "box": [
+        32,
+        178,
+        225,
+        252
+      ],
+      "displayLuminance": {
+        "production": 37.4573,
+        "directional": 37.7782,
+        "skyOff": 1.1306
+      }
+    },
+    "middleGround": {
+      "box": [
+        360,
+        186,
+        524,
+        238
+      ],
+      "displayLuminance": {
+        "production": 48.3093,
+        "directional": 48.3093,
+        "skyOff": 1.677
+      }
+    },
+    "shaft": {
+      "box": [
+        398,
+        356,
+        610,
+        471
+      ],
+      "displayLuminance": {
+        "production": 11.2457,
+        "directional": 3.7797,
+        "skyOff": 2.5928
+      }
+    },
+    "trunk": {
+      "box": [
+        567,
+        166,
+        576,
+        251
+      ],
+      "displayLuminance": {
+        "production": 1.3709,
+        "directional": 1.3709,
+        "skyOff": 1.3262
+      }
+    }
+  },
+  "comparisons": {
+    "directional": {
+      "changedPixels": 146194,
+      "displayRgbMeanAbsoluteDifference": [
+        3.3667322530864197,
+        3.2985667438271604,
+        2.5467496141975308
+      ],
+      "bounds": [
+        0,
+        225,
+        960,
+        540
+      ],
+      "farGroundIdentical": false,
+      "middleGroundIdentical": true
+    },
+    "skyOff": {
+      "changedPixels": 413846,
+      "displayRgbMeanAbsoluteDifference": [
+        15.124693287037037,
+        16.36528549382716,
+        14.171311728395061
+      ],
+      "bounds": [
+        0,
+        0,
+        960,
+        540
+      ],
+      "farGroundIdentical": false,
+      "middleGroundIdentical": false
+    }
+  },
+  "preserved": {
+    "production": {
+      "camera": true,
+      "requestedCamera": true,
+      "state": true,
+      "rescueTraversal": true,
+      "width": true,
+      "height": true,
+      "viewmodelBytes": true,
+      "worldBodyBytes": true,
+      "instanceMasks": true,
+      "quality": true
+    },
+    "directional": {
+      "camera": true,
+      "requestedCamera": true,
+      "state": true,
+      "rescueTraversal": true,
+      "width": true,
+      "height": true,
+      "viewmodelBytes": true,
+      "worldBodyBytes": true,
+      "instanceMasks": true,
+      "quality": true
+    },
+    "skyOff": {
+      "camera": true,
+      "requestedCamera": true,
+      "state": true,
+      "rescueTraversal": true,
+      "width": true,
+      "height": true,
+      "viewmodelBytes": true,
+      "worldBodyBytes": true,
+      "instanceMasks": true,
+      "quality": true
+    }
+  }
+}

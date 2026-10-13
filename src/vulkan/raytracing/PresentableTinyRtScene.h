@@ -92,6 +92,11 @@ PlayerWeaponRenderPose EvaluatePlayerWeaponRenderPose(
 
 struct RtSceneFrameInputs
 {
+#if defined(_DEBUG)
+    // Frozen Windows light attribution only. Physical roof/lid state, ordinary
+    // gameplay and Shipping rendering continue to use the authoritative value.
+    bool diagnosticSuppressFinaleApertureLighting = false;
+#endif
     bool developmentRescueJourney = false;
     horde::gameplay::traversal::RescueTraversalSnapshot rescue{};
     horde::gameplay::dialogue::CompanionSnapshot chapterCompanion{};

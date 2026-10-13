@@ -1,0 +1,2 @@
+FAIL: actual immutable world-baked triangle/material/index records must admit a retained witness
+54 segment-coverage checks, 1 failures

@@ -1,5 +1,21 @@
 # Horde 1.7 current design index
 
+**Chapter integration remains active and incomplete.** The
+[terrain-light attribution checkpoint](../evidence/2026-10-13-terrain-light-attribution/README.md)
+inspects matched actual RT lighting modes: the bright second-bend ground is
+unchanged when only the legacy aperture contribution is suppressed, and becomes
+dark with sky lighting removed. Ground/tree albedo and normal response differ;
+no production lighting/material correction is adopted yet. The default reunion
+frame remains byte-identical to ec43baa2. Conservative retained-quad admission
+now has analytic coverage and real native masonry tests, but does not certify
+closed ray-origin domains or an unload. **Normal-play residency saving is ZERO.**
+Debug/Release affected tests, fresh eight-key shader budgets and Android four-ABI/
+lint/286 Java/package checks pass. APK1b508d6ae48d is the current prepared,
+uninstalled candidate. Normal two-way GPU lifetimes, sustained Shipping and fresh
+phone/owner acceptance remain open. Easy Tree/canopy and mist issue28 stay deferred.
+
+The preceding checkpoint:
+
 **Chapter integration continues; the chapter is incomplete.** The
 [player skinning checkpoint](../evidence/2026-10-13-skin-normal-cache/README.md)
 preserves exact posed mesh/image output while reducing measured Release player

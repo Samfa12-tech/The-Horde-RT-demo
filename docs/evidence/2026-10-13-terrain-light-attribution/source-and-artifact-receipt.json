@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "baseHead": "ec43baa2c03838a124ddc074ab9751505ed74629",
+  "scope": "local candidate built before checkpoint commit; exact source input hashes, not a post-commit rebuild claim",
+  "artifacts": [
+    {
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+      "sha256": "c36b43fe4b15b8be26e4a3afba1009020742620a71e4d8e0707c8e348381dd1b",
+      "bytes": 13072384
+    },
+    {
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+      "sha256": "4369152eb14fdf140d892776e6e29c1f8fbb4253612664a4a38d6ce032ef9879",
+      "bytes": 4454400
+    },
+    {
+      "path": "reports/phone-candidate-1b508d6ae48d/horde-debug.apk",
+      "sha256": "1b508d6ae48da7fedeac466c945fbd7d3ca076b12aeca8984ec30d7a32e35b72",
+      "bytes": 183124186
+    }
+  ],
+  "sourceSha256": {
+    "CMakeLists.txt": "b8f4a33363b03bf0421350f9756c02252e2240abc9bcc21c386b11d0630d399a",
+    ".github/workflows/shared-simulation-host.yml": "15b8db3a742219a3e330559fe5f33f20eb545bca4364ca0cb2038d646d149177",
+    "src/platform/windows/DiagnosticWindow.cpp": "e89a5a8b473d9f893ab6bc55f45a53e12f574a80d07f715d632386330855d764",
+    "src/platform/windows/WindowsSkyAttributionLaunch.h": "f64b1f239908e97cfa235c6b5e5d24acf82a16e5cf193b078e934366839a25a8",
+    "src/vulkan/raytracing/PresentableTinyRtScene.h": "3b976208f682a67ac9f556a100e72f035a2ce4c149d9eb6c0ef64ca48f9e7fe0",
+    "src/vulkan/raytracing/PresentableTinyRtScene.cpp": "c1b2d9e4d0f6f43cc9e5944225f31b54dab6443f4badffc28ae6350c9bf22c88",
+    "src/scene/visibility/OpaqueSegmentCoverage.h": "1c838ed13bf84c14f167a1bf4a5d11599e914e7aae4d8390f3ff17b46109564e",
+    "src/scene/visibility/OpaqueStaticQuadAdmission.h": "f07f26e0b2159b70b7497b1d98770105ebbf454d2fe53398c5c0f48802d69102",
+    "tests/OpaqueSegmentCoverageTests.cpp": "c10d5507f15342e262751a25541155d57425df2797408417657891141c010509",
+    "tests/TombDressingTests.cpp": "395e460831bda5286613a8fe11a79489c5b059aff765fb54831bcea935202f66",
+    "tests/WindowsSkyAttributionLaunchTests.cpp": "0232c36d32f6978f52094a84f074e050c44935a4bffc2903939b0d534e0c86fc",
+    "tools/capture-chapter-sky-attribution.ps1": "801f12608bf5e0b6bcdc3b0b57ade33a9a1ad54980c09083c83479eb0b814fc5",
+    "shaders/raytracing/include/rt_lighting.glsl": "bf833307850b4681e67c2168318a564835a3e0667fb4f83af8f7275d01692df5",
+    "tools/raygen-variant-budgets.json": "56936479b2d202dbdb9393ba94b66a1b0bc12d490b700d8af4c63de3460e53bf",
+    "tools/raygen-variant-catalog.json": "e3b43b8f8ab01279f2d1c09cb9d4290b6e7a431b2e4101bdeccfc76b890fcb25"
+  },
+  "productionShaderOrBudgetChanges": false,
+  "normalPlayGpuResidencySavingBytes": 0,
+  "phoneCandidateInstalled": false
+}

@@ -1,0 +1,3 @@
+Both canonical props profiles have bounded per-lane LFS fetch/checkout; missing/duplicate/sibling/unbounded guards passed.
+Viewmodel pair is staged and required in both platform package inventories.
+Actual APK viewmodel GLB/manifest bytes match the current source.

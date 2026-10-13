@@ -1,0 +1,29 @@
+{
+  "scope": "Frozen actual RT display-RGB comparison; not linear radiance or performance",
+  "comparisons": {
+    "directional": {
+      "changedPixels": 0,
+      "displayRgbMeanAbsoluteDifference": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "bounds": null
+    },
+    "skyOff": {
+      "changedPixels": 435146,
+      "displayRgbMeanAbsoluteDifference": [
+        18.294403935185183,
+        19.607492283950616,
+        13.562347608024691
+      ],
+      "bounds": [
+        0,
+        0,
+        960,
+        540
+      ]
+    }
+  },
+  "productionReunionIdenticalToEc43": true
+}

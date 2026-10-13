@@ -1,0 +1,15 @@
+{
+  "executableSha256": "c36b43fe4b15b8be26e4a3afba1009020742620a71e4d8e0707c8e348381dd1b",
+  "sources": {
+    "src/platform/windows/WindowsSkyAttributionLaunch.h": "f64b1f239908e97cfa235c6b5e5d24acf82a16e5cf193b078e934366839a25a8",
+    "src/vulkan/raytracing/PresentableTinyRtScene.h": "3b976208f682a67ac9f556a100e72f035a2ce4c149d9eb6c0ef64ca48f9e7fe0",
+    "src/vulkan/raytracing/PresentableTinyRtScene.cpp": "c1b2d9e4d0f6f43cc9e5944225f31b54dab6443f4badffc28ae6350c9bf22c88",
+    "src/platform/windows/DiagnosticWindow.cpp": "e89a5a8b473d9f893ab6bc55f45a53e12f574a80d07f715d632386330855d764",
+    "shaders/raytracing/include/rt_lighting.glsl": "bf833307850b4681e67c2168318a564835a3e0667fb4f83af8f7275d01692df5"
+  },
+  "backend": "RayTracingPipeline",
+  "deadlineSeconds": 180,
+  "scope": "Frozen Debug light attribution; no geometry, material, quality or settings mutation",
+  "checkpoint": "chapter-landing-north",
+  "mode": "Production"
+}

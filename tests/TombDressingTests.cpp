@@ -1,5 +1,6 @@
 #include "scene/TombDressing.h"
 #include "scene/TombStoneBevels.h"
+#include "scene/visibility/OpaqueStaticQuadAdmission.h"
 #include "scene/assets/AssetManifest.h"
 
 #include <algorithm>
@@ -318,6 +319,21 @@ void TestPreparedDressingAppend(const std::filesystem::path& assetRoot)
           diagnostic.empty() ? "prepared source assets append through native static import" : diagnostic.c_str());
     Check(AppendPreparedTombDressing(assetRoot, second, secondReport, diagnostic, false),
           diagnostic.empty() ? "second prepared source append succeeds" : diagnostic.c_str());
+
+    const std::array<float,12> identity{{1,0,0,0,0,1,0,0,0,0,1,0}};
+    std::size_t realQuads=0,boneWitnesses=0;
+    for(std::size_t p=oldPrimitives;p<first.primitives.size();++p) {
+        const auto& primitive=first.primitives[p];
+        for(std::size_t i=0;i+6<=primitive.indexCount;i+=6) {
+            const auto witness=horde::scene::visibility::AdmitRetainedStaticQuad(first,p,i,identity,0x01,1,1,true);
+            if(!witness) continue;
+            ++realQuads;
+            if(first.materials[primitive.materialIndex].name=="TombBoneWax") ++boneWitnesses;
+        }
+    }
+    Check(realQuads>0,"native imported and world-baked retained masonry must supply actual opaque quad witnesses");
+    Check(boneWitnesses==0,"candidate TombDressing triangles must never serve as their own retained witness");
+    std::cout<<"Native retained dressing quad witnesses: "<<realQuads<<"; BoneWax witnesses: "<<boneWitnesses<<'\n';
 
     Check(firstReport.addedTriangles == 17680u && firstReport.addedIndices == 17680u * 3u,
           "sparse niche, funerary, and lintel dressing triangle/index cost is bounded");

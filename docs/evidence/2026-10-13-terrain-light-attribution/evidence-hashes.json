@@ -1,0 +1,382 @@
+{
+  "schema": 1,
+  "excludes": "evidence-hashes.json itself",
+  "files": {
+    "checks/opaque-admission-green-test.log": {
+      "sha256": "311dbde058144c88667068a718af5a632ba39a59c96768d1b49effb972986555",
+      "bytes": 899
+    },
+    "checks/opaque-admission-red-test.log": {
+      "sha256": "f03604dac814094037c408be1e93795a16f5cdcb6e0255af9427bacbf5bc495d",
+      "bytes": 138
+    },
+    "checks/opaque-admission-sealed-debug-test.log": {
+      "sha256": "e4b8347d16fa7ba64be350c8656400e1b7482a7c6cfa59d99286f76f863aa7e4",
+      "bytes": 626
+    },
+    "checks/opaque-admission-sealed-release-test.log": {
+      "sha256": "161530a65678a8e2d392ada684e896478963e69325466074c74febf203bb85af",
+      "bytes": 630
+    },
+    "checks/opaque-coverage-red-test.log": {
+      "sha256": "1de2440b650a4af488273e51af0519a4229383b36530f83a6c31b7601fbdc317",
+      "bytes": 62
+    },
+    "checks/sky-attribution-android-build.log": {
+      "sha256": "821ff1e08227a03ae9be083c9c87e71acec4916851d6478612fa669b111a0202",
+      "bytes": 3210
+    },
+    "checks/sky-attribution-android-java-fresh.log": {
+      "sha256": "b15f5a6a3ae18a34f8909b178e6f94a4592bee3f5ec9e53be2c9a2538e9eb92c",
+      "bytes": 1702
+    },
+    "checks/sky-attribution-apk-inventory.log": {
+      "sha256": "0f1da4ed5526cc937a46822942cc6b001aeac845c14fa7169a5b3bbbd635dfa7",
+      "bytes": 268
+    },
+    "checks/sky-attribution-apk-payload-comparison.json": {
+      "sha256": "2a510518889dedff51cd45f99c58fc8728526d51683a8561bf0528a4cb34a16a",
+      "bytes": 1204
+    },
+    "checks/sky-attribution-apk-signature.log": {
+      "sha256": "ccabc0788f8c2f0fca0620b6e4b1533bf6da1ade565222ecc603dbe6e2ce546f",
+      "bytes": 311
+    },
+    "checks/sky-attribution-backend-comparison-r02.json": {
+      "sha256": "2f01bfd38b4279a58a65e103c8f9080269a38baf340063490ff01e87e4c618d6",
+      "bytes": 1164
+    },
+    "checks/sky-attribution-bend-comparison.json": {
+      "sha256": "615d09c945817fa4c6c07c44046f7dfe5ca412fbeacbc832147bde7afa84c140",
+      "bytes": 618
+    },
+    "checks/sky-attribution-debug-test.log": {
+      "sha256": "50ece4b2755c2322e275b3502a2720108c60bc33639bc213c05ba59b7230c9d0",
+      "bytes": 1191
+    },
+    "checks/sky-attribution-green-test.log": {
+      "sha256": "a3a74bed7c1f932249f77b8f6aa3b3ff04e29083b0eea4e94fe1f97421ca36b7",
+      "bytes": 635
+    },
+    "checks/sky-attribution-java-results.json": {
+      "sha256": "af15867196818b1e635bb356a14ca898082eaf1a4165631091ffdc2858d04f84",
+      "bytes": 90
+    },
+    "checks/sky-attribution-north-comparison.json": {
+      "sha256": "c81dfa2fe78cdeda8ff0ae5041993c6fa09362f4c323df52237929e9e2dcd9bd",
+      "bytes": 2704
+    },
+    "checks/sky-attribution-production-parity-r01.json": {
+      "sha256": "e50c60b37e61acd929c6cde735117b3adc2ecc83c519a469a5455d1834888f3a",
+      "bytes": 274
+    },
+    "checks/sky-attribution-red-test.log": {
+      "sha256": "9e614c03314c2cf913234b06cb0d72ce2624fee67ccfe4b4ad050e6597e745f1",
+      "bytes": 1512
+    },
+    "checks/sky-attribution-release-test.log": {
+      "sha256": "6a57f00069d49661d96a5185e59db0530d61ff6c75fcc701552df1205f1a998b",
+      "bytes": 1195
+    },
+    "checks/sky-attribution-shader-catalog.log": {
+      "sha256": "8799f4a0ef634891154c52bbd0c8b7b8241af23631270f011f08c1585839ebdb",
+      "bytes": 2718
+    },
+    "checks/terrain-tree-source-albedo-review.json": {
+      "sha256": "ac21deb2cabf5cb0118de134cdafbb64ff0087e11d44628f1960a80b79591820",
+      "bytes": 1561
+    },
+    "native/pipeline/bend-directional/202-chapter-forest-second-bend.obj": {
+      "sha256": "8c7ea7c1c89b5016b16ab18972490c96c7160be20888a884079f022fa5083765",
+      "bytes": 2370817
+    },
+    "native/pipeline/bend-directional/202-chapter-forest-second-bend.player-world-body.obj": {
+      "sha256": "796743c0a0b9425ec9931494a246423369c8bd91d25ff46c5768ce47185103f1",
+      "bytes": 5104432
+    },
+    "native/pipeline/bend-directional/202-chapter-forest-second-bend.png": {
+      "sha256": "3c800bc634c34e781b8c991ec0c5bb6ba3b57dac0a955e10be4160a6a3ded02c",
+      "bytes": 983851
+    },
+    "native/pipeline/bend-directional/capture-manifest.json": {
+      "sha256": "a93eaef9b934ca01a4371ebc46ad2c39d5a48a0b42d2d93a50da74d1cbd21485",
+      "bytes": 10682
+    },
+    "native/pipeline/bend-directional/process.candidate.json": {
+      "sha256": "f25ed13274faa849fbcb0c4d61bf475de8b2bb2c7746b76c78690d67858edb19",
+      "bytes": 965
+    },
+    "native/pipeline/bend-directional/process.stderr.log": {
+      "sha256": "c4d078c7013fa926aa48c8522eb355c1497f3d18da1f8de5ffd2927632b6acae",
+      "bytes": 431
+    },
+    "native/pipeline/bend-directional/process.stdout.log": {
+      "sha256": "58d3d1f47b10a5fe77268d31d7881ffffe5caffba3491009d3a6db57203e1069",
+      "bytes": 2847
+    },
+    "native/pipeline/bend-full/202-chapter-forest-second-bend.obj": {
+      "sha256": "8c7ea7c1c89b5016b16ab18972490c96c7160be20888a884079f022fa5083765",
+      "bytes": 2370817
+    },
+    "native/pipeline/bend-full/202-chapter-forest-second-bend.player-world-body.obj": {
+      "sha256": "796743c0a0b9425ec9931494a246423369c8bd91d25ff46c5768ce47185103f1",
+      "bytes": 5104432
+    },
+    "native/pipeline/bend-full/202-chapter-forest-second-bend.png": {
+      "sha256": "3c800bc634c34e781b8c991ec0c5bb6ba3b57dac0a955e10be4160a6a3ded02c",
+      "bytes": 983851
+    },
+    "native/pipeline/bend-full/capture-manifest.json": {
+      "sha256": "f72eb4fc3a88299253d63cf040ec45d193c196bc4a4ac4f84bed0966d09986d8",
+      "bytes": 10680
+    },
+    "native/pipeline/bend-full/process.candidate.json": {
+      "sha256": "b9880cb893ac715d08eba23fceebb603fbe4cb8ccdc4297e63cac772df2983df",
+      "bytes": 964
+    },
+    "native/pipeline/bend-full/process.stderr.log": {
+      "sha256": "c4d078c7013fa926aa48c8522eb355c1497f3d18da1f8de5ffd2927632b6acae",
+      "bytes": 431
+    },
+    "native/pipeline/bend-full/process.stdout.log": {
+      "sha256": "b720274af5b6b205779a06c75dc00ff417084300d3a2db2a3e1bd6b46e5541a4",
+      "bytes": 2832
+    },
+    "native/pipeline/bend-off/202-chapter-forest-second-bend.obj": {
+      "sha256": "8c7ea7c1c89b5016b16ab18972490c96c7160be20888a884079f022fa5083765",
+      "bytes": 2370817
+    },
+    "native/pipeline/bend-off/202-chapter-forest-second-bend.player-world-body.obj": {
+      "sha256": "796743c0a0b9425ec9931494a246423369c8bd91d25ff46c5768ce47185103f1",
+      "bytes": 5104432
+    },
+    "native/pipeline/bend-off/202-chapter-forest-second-bend.png": {
+      "sha256": "150b27bbaefc7e532d330e00870423562452c5b51b9335d1fa024323f1e590de",
+      "bytes": 528851
+    },
+    "native/pipeline/bend-off/capture-manifest.json": {
+      "sha256": "4e9b22d8763f85ae3595dd63a10dd7e892c49e6c691bac084dee9ca2dc9483c5",
+      "bytes": 10682
+    },
+    "native/pipeline/bend-off/process.candidate.json": {
+      "sha256": "65f15179093f31e6924a94ec71544dfeebba9041acc29a713177ac0ed16a6d7c",
+      "bytes": 957
+    },
+    "native/pipeline/bend-off/process.stderr.log": {
+      "sha256": "c4d078c7013fa926aa48c8522eb355c1497f3d18da1f8de5ffd2927632b6acae",
+      "bytes": 431
+    },
+    "native/pipeline/bend-off/process.stdout.log": {
+      "sha256": "283826501cb04d2ac9049edef60b6749e4bae592e9dc2451c1c8681501ffbe96",
+      "bytes": 2831
+    },
+    "native/pipeline/north-directional/193-chapter-landing-north.obj": {
+      "sha256": "41fcef0bd2d70ae279f2f47ae132792ae7f6d517dd1e2528b8fe7bb32510746e",
+      "bytes": 2372453
+    },
+    "native/pipeline/north-directional/193-chapter-landing-north.player-world-body.obj": {
+      "sha256": "7fdb99570a20c639a44af9d4235cbe01edfd0b50f4f635f7111afc4572a1a62a",
+      "bytes": 5105763
+    },
+    "native/pipeline/north-directional/193-chapter-landing-north.png": {
+      "sha256": "925a11191a44aa5828945140e6bf3b0bb86f3b46f94c53c9df2d7b1a75169714",
+      "bytes": 696637
+    },
+    "native/pipeline/north-directional/capture-manifest.json": {
+      "sha256": "e6bb0bf286f20f3fba28abe7464390e1239229dbe01dcdeb5621a50040f2d3c5",
+      "bytes": 10610
+    },
+    "native/pipeline/north-directional/process.candidate.json": {
+      "sha256": "840711bf053f7600bd83b0d92c7abad0f02b1123b97f00d094710a4849c99fb6",
+      "bytes": 960
+    },
+    "native/pipeline/north-directional/process.stderr.log": {
+      "sha256": "6a3c049d4d32661ed877e317c16844edbe48e281c0432ba3926717bb8924c910",
+      "bytes": 416
+    },
+    "native/pipeline/north-directional/process.stdout.log": {
+      "sha256": "84c77f8e160801eca6b15eb95b6f574fa72296f52785cfc6580abbbe8c3f136e",
+      "bytes": 2839
+    },
+    "native/pipeline/north-full/193-chapter-landing-north.obj": {
+      "sha256": "41fcef0bd2d70ae279f2f47ae132792ae7f6d517dd1e2528b8fe7bb32510746e",
+      "bytes": 2372453
+    },
+    "native/pipeline/north-full/193-chapter-landing-north.player-world-body.obj": {
+      "sha256": "7fdb99570a20c639a44af9d4235cbe01edfd0b50f4f635f7111afc4572a1a62a",
+      "bytes": 5105763
+    },
+    "native/pipeline/north-full/193-chapter-landing-north.png": {
+      "sha256": "2bdaea07acc37196699477e58ee2af7e87163ace8e372008b3fb31ddeef267c3",
+      "bytes": 712862
+    },
+    "native/pipeline/north-full/capture-manifest.json": {
+      "sha256": "8d553d065e0009fcac2e0c880e60682dea64170004cf385d901f09878efed6ea",
+      "bytes": 10605
+    },
+    "native/pipeline/north-full/process.candidate.json": {
+      "sha256": "55658e478359dc0ffd2e868b20089bf10f57c7503f4be0d8a29d4e8e2132a452",
+      "bytes": 959
+    },
+    "native/pipeline/north-full/process.stderr.log": {
+      "sha256": "6a3c049d4d32661ed877e317c16844edbe48e281c0432ba3926717bb8924c910",
+      "bytes": 416
+    },
+    "native/pipeline/north-full/process.stdout.log": {
+      "sha256": "21420fe6625dd8c28189672f3b963979b03be766b50b736394ed9e8c2911d43d",
+      "bytes": 2824
+    },
+    "native/pipeline/north-off/193-chapter-landing-north.obj": {
+      "sha256": "41fcef0bd2d70ae279f2f47ae132792ae7f6d517dd1e2528b8fe7bb32510746e",
+      "bytes": 2372453
+    },
+    "native/pipeline/north-off/193-chapter-landing-north.player-world-body.obj": {
+      "sha256": "7fdb99570a20c639a44af9d4235cbe01edfd0b50f4f635f7111afc4572a1a62a",
+      "bytes": 5105763
+    },
+    "native/pipeline/north-off/193-chapter-landing-north.png": {
+      "sha256": "93ef8480dfd2e975a9f3f5a6d4a8bbe5586fdc18d0d58683415ef2aac2d366b5",
+      "bytes": 328749
+    },
+    "native/pipeline/north-off/capture-manifest.json": {
+      "sha256": "f6c8c88233aa63711a1ba8aa04c1c2cfacf7da3217f881451519095d94e0f0ee",
+      "bytes": 10607
+    },
+    "native/pipeline/north-off/process.candidate.json": {
+      "sha256": "0df6a7acdf12744cacf05c6e694f9d432675a1f75b718a2b0fb4bf9cf9574831",
+      "bytes": 952
+    },
+    "native/pipeline/north-off/process.stderr.log": {
+      "sha256": "6a3c049d4d32661ed877e317c16844edbe48e281c0432ba3926717bb8924c910",
+      "bytes": 416
+    },
+    "native/pipeline/north-off/process.stdout.log": {
+      "sha256": "5d0a4459d4916468b1ed9516d354be734fe8cb968df2a61d9f34c06790ffc9bc",
+      "bytes": 2823
+    },
+    "native/pipeline/reunion-production/207-chapter-kit-reunion.obj": {
+      "sha256": "73ef432075cc506953e18e147f50c101046ea63fca24a1aae57ca31c957769f6",
+      "bytes": 2370922
+    },
+    "native/pipeline/reunion-production/207-chapter-kit-reunion.player-world-body.obj": {
+      "sha256": "c99e263b3034b7459704b86de24c57f26a7ed27a434c5dc6c80fd2499d097481",
+      "bytes": 5104513
+    },
+    "native/pipeline/reunion-production/207-chapter-kit-reunion.png": {
+      "sha256": "4c5a51853a8c7c856d57d562fcbde377a0c3a9b22fc2ab0267477ccb46fb99b0",
+      "bytes": 809231
+    },
+    "native/pipeline/reunion-production/capture-manifest.json": {
+      "sha256": "97a2b0ed857fd42c49be7f5519fe5f5ed704d6a801889be49fc6b0d0e668ebeb",
+      "bytes": 10651
+    },
+    "native/pipeline/reunion-production/process.candidate.json": {
+      "sha256": "cac769373f83e876e390912f8b7cb007f9881795cbe80270bf7916e170012958",
+      "bytes": 957
+    },
+    "native/pipeline/reunion-production/process.stderr.log": {
+      "sha256": "a60eb0b2dce2ce256cb57f52e6c2cc78fc8e09dabfe5c9cfbddbfb6765a48175",
+      "bytes": 410
+    },
+    "native/pipeline/reunion-production/process.stdout.log": {
+      "sha256": "833e485077c96667ec1d26772aa7d56445178cef217444703e4524c9a42012f9",
+      "bytes": 2836
+    },
+    "native/query/north-directional/193-chapter-landing-north.obj": {
+      "sha256": "41fcef0bd2d70ae279f2f47ae132792ae7f6d517dd1e2528b8fe7bb32510746e",
+      "bytes": 2372453
+    },
+    "native/query/north-directional/193-chapter-landing-north.player-world-body.obj": {
+      "sha256": "7fdb99570a20c639a44af9d4235cbe01edfd0b50f4f635f7111afc4572a1a62a",
+      "bytes": 5105763
+    },
+    "native/query/north-directional/193-chapter-landing-north.png": {
+      "sha256": "ed4063d0ac4014f6751fd72864a36906c9d478f709c77ad8955a97b0273771d6",
+      "bytes": 696599
+    },
+    "native/query/north-directional/capture-manifest.json": {
+      "sha256": "798721d0157ad5c4d52dbc5afe3e7c28b8ea6c886f558360ac64f265d51d4aef",
+      "bytes": 10704
+    },
+    "native/query/north-directional/process.candidate.json": {
+      "sha256": "c34863be9b44de33ebc4e25c050c6f588b7c4012e4d6f3c1dc97af0dd243dc50",
+      "bytes": 957
+    },
+    "native/query/north-directional/process.stderr.log": {
+      "sha256": "6a3c049d4d32661ed877e317c16844edbe48e281c0432ba3926717bb8924c910",
+      "bytes": 416
+    },
+    "native/query/north-directional/process.stdout.log": {
+      "sha256": "4aafd23205165a551028e3b9b989be3a381b4756d61a94d9503cc38298d738c3",
+      "bytes": 2850
+    },
+    "native/query/north-full/193-chapter-landing-north.obj": {
+      "sha256": "41fcef0bd2d70ae279f2f47ae132792ae7f6d517dd1e2528b8fe7bb32510746e",
+      "bytes": 2372453
+    },
+    "native/query/north-full/193-chapter-landing-north.player-world-body.obj": {
+      "sha256": "7fdb99570a20c639a44af9d4235cbe01edfd0b50f4f635f7111afc4572a1a62a",
+      "bytes": 5105763
+    },
+    "native/query/north-full/193-chapter-landing-north.png": {
+      "sha256": "a59c74f0b6ff053d6ecb9c6267b3a5cb2ba82d83120ab98534711a690da71164",
+      "bytes": 712851
+    },
+    "native/query/north-full/capture-manifest.json": {
+      "sha256": "24690b440f2a9680073deff8392ed8eda3a8bc02193bf00564b5381180bd4f5b",
+      "bytes": 10699
+    },
+    "native/query/north-full/process.candidate.json": {
+      "sha256": "ff2612a3c83cc2f234ed633c28a469da1bc9c63bb33a71b387e3bbbd0aa58fbc",
+      "bytes": 956
+    },
+    "native/query/north-full/process.stderr.log": {
+      "sha256": "6a3c049d4d32661ed877e317c16844edbe48e281c0432ba3926717bb8924c910",
+      "bytes": 416
+    },
+    "native/query/north-full/process.stdout.log": {
+      "sha256": "b2dcfc118382c0fb3a0424db4b2604b22ede6d898e7431a3220158040398c09b",
+      "bytes": 2836
+    },
+    "native/query/north-off/193-chapter-landing-north.obj": {
+      "sha256": "41fcef0bd2d70ae279f2f47ae132792ae7f6d517dd1e2528b8fe7bb32510746e",
+      "bytes": 2372453
+    },
+    "native/query/north-off/193-chapter-landing-north.player-world-body.obj": {
+      "sha256": "7fdb99570a20c639a44af9d4235cbe01edfd0b50f4f635f7111afc4572a1a62a",
+      "bytes": 5105763
+    },
+    "native/query/north-off/193-chapter-landing-north.png": {
+      "sha256": "26ab0560bfff311e433f41610f05b6685f9b3a689065d5b425d4bf9d62d79e12",
+      "bytes": 328681
+    },
+    "native/query/north-off/capture-manifest.json": {
+      "sha256": "851e0320139b81eb89929ed142a42287530529154ece5e83d4440cc66cf51bb9",
+      "bytes": 10703
+    },
+    "native/query/north-off/process.candidate.json": {
+      "sha256": "564bbf2432dc6b5a942b295d869b1a0e11348fbf2cc6d22a873285cc410d2f4d",
+      "bytes": 949
+    },
+    "native/query/north-off/process.stderr.log": {
+      "sha256": "6a3c049d4d32661ed877e317c16844edbe48e281c0432ba3926717bb8924c910",
+      "bytes": 416
+    },
+    "native/query/north-off/process.stdout.log": {
+      "sha256": "926e394bf8e433f3465167e44fc1519434d5f2b602cbc94d4701d271825fe7ef",
+      "bytes": 2834
+    },
+    "phone-candidate.json": {
+      "sha256": "2a8f0dbc11e981f4d30d177644fa766d6d3af1a25fc17c7a2ea31e9cf1f835da",
+      "bytes": 1065
+    },
+    "README.md": {
+      "sha256": "10f8bc763ba5e1930e82dd04294dde346f46b39e0217a61640906577b5c5452c",
+      "bytes": 7166
+    },
+    "source-and-artifact-receipt.json": {
+      "sha256": "b2e3f7e388604cdc7ccc8128b985cacc1444fc39461bf79a3d03938e96773798",
+      "bytes": 2721
+    }
+  }
+}

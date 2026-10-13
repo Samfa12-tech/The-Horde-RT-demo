@@ -1,0 +1,51 @@
+{
+  "scope": "same frozen view and lighting mode across two hardware RT backends; exact parity not claimed",
+  "modes": {
+    "full": {
+      "changedPixels": 4221,
+      "displayRgbMeanAbsoluteDifference": [
+        0.0031809413580246916,
+        0.003256172839506173,
+        0.002970679012345679
+      ],
+      "maximumChannelDifference": 33,
+      "bounds": [
+        0,
+        112,
+        960,
+        540
+      ]
+    },
+    "directional": {
+      "changedPixels": 4199,
+      "displayRgbMeanAbsoluteDifference": [
+        0.0030883487654320987,
+        0.0031134259259259257,
+        0.003069058641975309
+      ],
+      "maximumChannelDifference": 37,
+      "bounds": [
+        0,
+        112,
+        960,
+        540
+      ]
+    },
+    "off": {
+      "changedPixels": 456,
+      "displayRgbMeanAbsoluteDifference": [
+        0.0006018518518518519,
+        0.0003452932098765432,
+        0.00016589506172839507
+      ],
+      "maximumChannelDifference": 17,
+      "bounds": [
+        3,
+        159,
+        948,
+        540
+      ]
+    }
+  },
+  "queryMiddleGroundUnchangedByApertureSuppression": true
+}

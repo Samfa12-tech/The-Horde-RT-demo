@@ -7847,6 +7847,9 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
         guidanceLightActive ? guidanceLight.position[0] : staffWorldPosition[0],
         guidanceLightActive ? guidanceLight.position[1] : staffWorldPosition[1],
         guidanceLightActive ? guidanceLight.position[2] : staffWorldPosition[2],
+#if defined(_DEBUG)
+        frame.diagnosticSuppressFinaleApertureLighting ? 0.0f :
+#endif
         std::clamp(frame.lich.finaleSkylightOpenProgress, 0.0f, 1.0f),
         std::clamp(frame.lich.finaleDawnRevealProgress, 0.0f, 1.0f),
         heldPropDepth,

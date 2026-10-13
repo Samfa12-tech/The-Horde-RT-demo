@@ -1,4 +1,5 @@
 #include "platform/windows/DiagnosticWindow.h"
+#include "platform/windows/WindowsSkyAttributionLaunch.h"
 #include "platform/windows/WindowsMusicPlayback.h"
 #include "platform/windows/WindowsMusicFocus.h"
 #include "platform/windows/GraphicsMenuNavigation.h"
@@ -270,6 +271,8 @@ constexpr UINT kMaxFramesInFlight = 1u;
 
 struct CaptureLaunchOptions
 {
+    horde::platform::windows::SkyAttributionMode skyAttribution =
+        horde::platform::windows::SkyAttributionMode::Production;
     horde::platform::windows::WindowsBenchmarkLaunch benchmark;
     bool requested = false;
     bool graphicsPreview = false;
@@ -448,6 +451,8 @@ struct VulkanSurfaceContext
     bool outputResizeValidation = false;
     bool nativeMotionValidation = false;
     bool chapterRoundTripCaptureActive = false;
+    horde::platform::windows::SkyAttributionMode skyAttribution =
+        horde::platform::windows::SkyAttributionMode::Production;
 #if defined(_DEBUG)
     bool staticReplacementFrameRequested = false;
     std::uint64_t staticReplacementExpectedGeneration = 0u;
@@ -670,6 +675,15 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
     }
     std::vector<std::wstring_view> argumentViews;
     for (int index = 1; index < argumentCount; ++index) argumentViews.emplace_back(arguments[index]);
+    const auto skyLaunch=horde::platform::windows::ParseSkyAttributionLaunch(argumentViews,
+#if defined(_DEBUG)
+        true
+#else
+        false
+#endif
+    );
+    if(!skyLaunch.error.empty()) {options.error=skyLaunch.error;LocalFree(arguments);return options;}
+    options.skyAttribution=skyLaunch.mode;
     const auto combatPractice = horde::platform::windows::ParseWindowsCombatPracticeLaunch(argumentViews,
 #if defined(_DEBUG)
         true
@@ -6263,6 +6277,15 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         }
         UpdateMenuAmbience(ctx);
         frameInputs.shadowQuality = ctx.shadowQuality;
+#if defined(_DEBUG)
+        if(frozenDevelopmentCheckpoint && simulation.developmentRescueJourney) {
+            frameInputs.diagnosticSuppressFinaleApertureLighting = ctx.skyAttribution ==
+                horde::platform::windows::SkyAttributionMode::DirectionalOnly;
+            if(ctx.skyAttribution==horde::platform::windows::SkyAttributionMode::Disabled)
+                frameInputs.tuning.lights[static_cast<std::size_t>(
+                    horde::vulkan::raytracing::RtLightGroup::Skylight)].intensityScale=0.0f;
+        }
+#endif
         ctx.rtScene.SetMistEnabled(ctx.requestedMistEnabled);
         ctx.rtScene.SetDustQuality(ctx.requestedDustQuality);
 #if defined(_DEBUG)
@@ -6835,6 +6858,7 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
              << ", \"primaryRewardBodyPixelCount\": "
              << context.rtScene.PrimaryRewardBodyPixelCount()
              << "},\n"
+             << "  \"lightAttribution\": \"" << horde::platform::windows::SkyAttributionName(context.skyAttribution) << "\",\n"
              << "  \"error\": " << (error.empty() ? "null" : "\"" + JsonEscape(error) + "\"") << ",\n"
              << "  \"captures\": [\n";
     for (std::size_t index = 0; index < captures.size(); ++index)
@@ -7989,6 +8013,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     context.outputResizeValidation = outputResizeValidation;
     context.nativeMotionValidation = !nativeMotionScenario.empty();
 #if defined(_DEBUG)
+    if(captureDirectory != nullptr) context.skyAttribution=ParseCaptureLaunchOptions().skyAttribution;
     if (context.nativeMotionValidation) context.motionRequestedRtPreset = nativeMotionRtWorkloadPreset;
 #endif
     if (graphicsPreviewCapture)

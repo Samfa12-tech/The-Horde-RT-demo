@@ -37,6 +37,10 @@ endif()
 include(cmake/HordeRtPocketAudioCore.cmake)
 horde_rt_add_pocket_audio_core("${CMAKE_CURRENT_SOURCE_DIR}" "${BUILD_TESTING}")
 if(BUILD_TESTING)
+    add_executable(horde_rt_sky_attribution_launch_tests tests/WindowsSkyAttributionLaunchTests.cpp)
+    target_include_directories(horde_rt_sky_attribution_launch_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    add_test(NAME horde_rt_sky_attribution_launch_tests COMMAND horde_rt_sky_attribution_launch_tests)
+    set_tests_properties(horde_rt_sky_attribution_launch_tests PROPERTIES TIMEOUT 10)
     add_executable(horde_rt_triangle_support_surface_tests tests/TriangleSupportSurfaceTests.cpp)
     target_include_directories(horde_rt_triangle_support_surface_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     add_test(NAME horde_rt_triangle_support_surface_tests COMMAND horde_rt_triangle_support_surface_tests)
@@ -639,6 +643,12 @@ if(BUILD_TESTING)
     add_executable(horde_rt_dielectric_math_tests tests/DielectricMathTests.cpp)
     target_include_directories(horde_rt_dielectric_math_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     add_test(NAME horde_rt_dielectric_math_tests COMMAND horde_rt_dielectric_math_tests)
+
+    add_executable(horde_rt_opaque_segment_coverage_tests tests/OpaqueSegmentCoverageTests.cpp)
+    target_include_directories(horde_rt_opaque_segment_coverage_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_compile_features(horde_rt_opaque_segment_coverage_tests PRIVATE cxx_std_20)
+    add_test(NAME horde_rt_opaque_segment_coverage_tests COMMAND horde_rt_opaque_segment_coverage_tests)
+    set_tests_properties(horde_rt_opaque_segment_coverage_tests PROPERTIES TIMEOUT 10)
 
     add_executable(horde_rt_skinned_node_pose_batch_tests
         tests/SkinnedNodePoseBatchTests.cpp
