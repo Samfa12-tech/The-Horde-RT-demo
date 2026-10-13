@@ -1,6 +1,19 @@
 # Horde 1.7 current design index
 
-**Goal resumed13 October; phone temporarily disconnected after bounded testing.**
+**Goal resumed13 October; phone validation is deferred during a shared-device handoff.**
+The [moving chapter route checkpoint](../evidence/2026-10-13-moving-chapter-roundtrip/README.md)
+adds normal-input validation through native terrain, fresh Kit raise/walking,
+lookout, return, descent and second ascent. The final Pipeline completes4,961
+simulation ticks/1,241RTframes with26inspected captures. Final QueryCompute reaches
+the lower sweep but times out before repeat ascent; prior prototype success does
+not certify this executable. Debug/Release affected checks pass; Diagnostic costs
+and failed evidence are retained. Production rendering stays complete and
+**normal-play residency saving remains ZERO**. Conservative contributor eligibility,
+actual normal two-way GPU lifetimes, sustained Shipping performance and current
+owner/phone acceptance remain required. The existing1a6f553f9f57APK is unchanged
+and uninstalled. Chapter integration continues; the chapter is incomplete.
+
+The preceding
 The [cached-region preparation milestone](../evidence/2026-10-13-cached-region-preparation/README.md)
 removes the roughly half-second synchronous packing step by using the immutable
 admitted cache. Actual Pipeline/QueryCompute begin times are0.09–0.17ms, with

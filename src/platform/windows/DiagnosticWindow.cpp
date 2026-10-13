@@ -93,6 +93,7 @@
 #include "platform/windows/WindowsCombatTeachingPrompt.h"
 #if defined(_DEBUG)
 #include "gameplay/validation/MotionEvidenceScenario.h"
+#include "gameplay/validation/ChapterRoundTripProbe.h"
 #include "telemetry/MotionEvidenceLedger.h"
 #endif
 #include "platform/windows/WindowsBenchmarkLaunch.h"
@@ -283,6 +284,7 @@ struct CaptureLaunchOptions
     bool anatomicalPlayerMount = false;
     bool validateStaticZoneCutover = false;
     bool validateStaticTriangleCutover = false;
+    bool validateChapterRoundTrip = false;
     std::filesystem::path outputDirectory;
     std::string developmentCheckpoint;
     std::string error;
@@ -445,6 +447,7 @@ struct VulkanSurfaceContext
     bool graphicsPreviewCapture = false;
     bool outputResizeValidation = false;
     bool nativeMotionValidation = false;
+    bool chapterRoundTripCaptureActive = false;
 #if defined(_DEBUG)
     bool staticReplacementFrameRequested = false;
     std::uint64_t staticReplacementExpectedGeneration = 0u;
@@ -754,6 +757,14 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
 #endif
             continue;
         }
+        if(argument==L"--validate-chapter-roundtrip") {
+#if defined(_DEBUG)
+            options.validateChapterRoundTrip=true;
+#else
+            options.error="--validate-chapter-roundtrip is Debug-only.";
+#endif
+            continue;
+        }
         if (argument == L"--anatomical-player-mount")
         {
 #if defined(_DEBUG)
@@ -823,6 +834,11 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
     if (options.error.empty() && options.validateStaticZoneCutover &&
         (!options.requested || options.developmentCheckpoint.empty()))
         options.error = "--validate-static-zone-cutover requires one frozen development capture.";
+    if(options.error.empty() && options.validateChapterRoundTrip &&
+       (!options.requested || options.developmentCheckpoint!="chapter-kit-reunion" ||
+        options.validateStaticZoneCutover || options.graphicsPreview || options.outputResizeValidation ||
+        !options.nativeMotionScenario.empty()))
+        options.error="--validate-chapter-roundtrip requires only the admitted chapter-kit-reunion capture.";
     LocalFree(arguments);
     return options;
 }
@@ -6203,7 +6219,7 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
             ctx.rtScene.Profile() == horde::vulkan::raytracing::RtSceneProfile::EntryMenu;
         const bool previewFrame =
             ctx.rtScene.Profile() != horde::vulkan::raytracing::RtSceneProfile::Showcase;
-        if (!frozenDevelopmentCheckpoint && !previewFrame && !ctx.outputResizeValidation)
+        if (!frozenDevelopmentCheckpoint && !previewFrame && !ctx.outputResizeValidation && !ctx.chapterRoundTripCaptureActive)
         {
             UpdateDesktopSceneControls(ctx, evidenceFrame ? &observation : nullptr);
         }
@@ -7139,6 +7155,8 @@ bool RunStaticGeometryCutoverCapture(VulkanSurfaceContext& context,
     return WriteReportFile(directory/"static-zone-cutover.json",receipt.str());
 }
 #endif
+
+#include "platform/windows/WindowsChapterRoundTripCapture.inl"
 
 int RunShowcaseCapture(VulkanSurfaceContext& context,
                        horde::vulkan::DeviceCapabilities& capabilities,
@@ -8215,6 +8233,12 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
             : graphicsPreviewCapture
                 ? RunGraphicsPreviewCapture(context, capabilities, *captureDirectory)
                 : RunShowcaseCapture(context, capabilities, *captureDirectory);
+        if(captureResult==0 && ParseCaptureLaunchOptions().validateChapterRoundTrip) {
+            std::string journeyError;
+            if(!RunChapterRoundTripCapture(context,*captureDirectory,journeyError)) {
+                std::cerr<<"Chapter two-way capture failed: "<<journeyError<<'\n';captureResult=1;
+            }
+        }
         if (captureResult == 0 && capabilities.rtScene.presented)
         {
             capabilities.rtScene.executionBackend = context.rtScene.ExecutionBackend();

@@ -1,0 +1,10 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+    Start 181: horde_rt_rescue_journey_integration_tests
+1/2 Test #181: horde_rt_rescue_journey_integration_tests ...   Passed    1.71 sec
+    Start 182: horde_rt_chapter_terrain_journey_tests
+2/2 Test #182: horde_rt_chapter_terrain_journey_tests ......   Passed    9.77 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =  11.51 sec

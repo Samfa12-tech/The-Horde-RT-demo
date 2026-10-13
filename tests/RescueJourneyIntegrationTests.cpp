@@ -7,6 +7,7 @@
 #include "vulkan/raytracing/SimulationFrameAdapter.h"
 #include "vulkan/raytracing/DevelopmentWorldSceneAdapter.h"
 #include "platform/windows/WindowsCaptureContracts.h"
+#include "gameplay/validation/ChapterRoundTripProbe.h"
 #include <cmath>
 #include <iostream>
 using namespace horde::gameplay;
@@ -74,6 +75,63 @@ int main(int argc,char** argv) {
         "Kit reunion requires retired Keeper, grounded companion and completed physical ascent");
   check(state.interaction.heldLightPose==interactions::HeldLightPose::Low,
         "First reunion capture must preserve fresh player-controlled lantern raise");
+  {
+   using namespace horde::gameplay::validation;
+   GameSimulation moving(captureConfig);
+   for(std::size_t zone=1;zone<kWorldZones.size();++zone)
+    moving.PublishChapterTerrain({moving.Snapshot().worldRoute.generation,static_cast<WorldZoneId>(zone)},terrain);
+   check(StageDevelopmentCheckpointSimulation(moving,*reunion),"moving probe must start from an actual admitted ascent");
+   ChapterRoundTripProbe probe;
+   const bool started=probe.Start(moving.Snapshot());
+   check(started,"rendered two-way probe must accept the native grounded reunion");
+   if(started) {
+    const auto paused=moving.Snapshot();
+    for(unsigned i=0;i<12;++i) {
+     const auto command=probe.Next(moving.Snapshot(),true);
+     moving.AdvanceFrame(command,.25,moving.Snapshot().inputPublicationSequence+1);
+     check(command.paused && command.moveForward==0 && !command.runHeld &&
+       moving.Snapshot().playerX==paused.playerX && probe.Phase()==ChapterProbePhase::Landing,
+       "paused probe must retain its phase without advancing input or moving the player");
+    }
+    unsigned frames=0,raises=0;bool walkingReunion=false;std::uint64_t lastRaise=moving.Snapshot().lastConsumedToggleHeldLightPoseSequence;
+    std::array<bool,10> seen{};
+    while(frames++<10000 && probe.Phase()!=ChapterProbePhase::Complete && probe.Phase()!=ChapterProbePhase::Failed) {
+     seen[static_cast<unsigned>(probe.Phase())]=true;
+     walkingReunion|=probe.Phase()==ChapterProbePhase::Raise && moving.Snapshot().chapterCompanion.walking &&
+        moving.Snapshot().chapterCompanion.animationSeconds>=.3f;
+     const auto command=probe.Next(moving.Snapshot());
+     check(!command.hasAuthoritativePlayerPose && !command.commands.attack && !command.commands.parry &&
+       !command.commands.dodge,"two-way probe must use normal movement/context input without pose injection or combat edges");
+     if(moving.Snapshot().rescue.equipmentStowed)
+      check(command.moveForward==0 && !command.runHeld,"probe movement must not compete with the rope motor");
+     if(command.commands.toggleHeldLightPose>lastRaise) {++raises;lastRaise=command.commands.toggleHeldLightPose;}
+     moving.StepFixed(command,1.f/60.f,moving.Snapshot().inputPublicationSequence+1);
+     // Host-only acknowledgement; native probe must use its actual submitted present.
+     if(frames%4==0)moving.AcknowledgeChapterPresentation(moving.Snapshot().tickIndex,moving.Snapshot().chapterDialogue.generation);
+    }
+    check(probe.Phase()==ChapterProbePhase::Complete && frames<10000,"actual terrain two-way probe stalled or failed");
+    check(walkingReunion,"probe did not inspect the available walking clip after a real fresh raise");
+    const auto& s=moving.Snapshot();
+    check(raises==1 && s.chapterDialogue.proofAccepted && s.rescue.sawDescent && s.rescue.firstAscentCompleted &&
+      s.rescue.exteriorSide && !s.rescue.equipmentStowed && s.rescue.claimCount==1 && s.rescue.deploymentCount==1,
+      "probe must prove one fresh raise, lookout/return, real descent and repeat ascent without duplicate ownership");
+    for(unsigned phase=0;phase<8;++phase)check(seen[phase],"probe skipped a required moving journey phase");
+    std::cout<<"native-terrain moving probe frames="<<frames<<'\n';
+   }
+   ChapterRoundTripProbe invalid;
+   auto bad=state;bad.rescue.equipmentStowed=true;
+   check(!invalid.Start(bad),"probe cannot start from a traversing or unready side");
+   bad=state;bad.interaction.heldLightPose=interactions::HeldLightPose::High;
+   check(!invalid.Start(bad),"probe cannot count an already raised lantern as fresh input");
+   bad=state;bad.worldRoute.readiness[2]=ZoneReadiness::Failed;
+   check(!invalid.Start(bad),"failed destination cannot start the moving probe");
+   ChapterRoundTripProbe stale;
+   check(stale.Start(state),"valid stale-generation fixture failed to start");
+   bad=state;++bad.worldRoute.generation;
+   const auto rejected=stale.Next(bad);
+   check(stale.Phase()==ChapterProbePhase::Failed && rejected.paused && rejected.moveForward==0 &&
+     !rejected.commands.interact,"stale reconstruction must fail the probe before issuing movement or interaction");
+  }
   for(const auto name:{"chapter-stake-ascent","chapter-stake-pullup","chapter-stake-descent","chapter-stake-repeat-ascent"}) {
    GameSimulation motorCapture(captureConfig);
    for(std::size_t zone=1;zone<kWorldZones.size();++zone)

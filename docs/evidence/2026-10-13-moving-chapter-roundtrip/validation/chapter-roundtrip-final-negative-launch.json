@@ -1,0 +1,18 @@
+[
+  {
+    "configuration": "Debug",
+    "arguments": [
+      "--validate-chapter-roundtrip"
+    ],
+    "exit": 2,
+    "stderr": "--validate-chapter-roundtrip requires only the admitted chapter-kit-reunion capture.\r\n"
+  },
+  {
+    "configuration": "Release",
+    "arguments": [
+      "--validate-chapter-roundtrip"
+    ],
+    "exit": 2,
+    "stderr": "--validate-chapter-roundtrip is Debug-only.\r\n"
+  }
+]
