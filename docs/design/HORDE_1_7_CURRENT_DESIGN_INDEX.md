@@ -1,5 +1,21 @@
 # Horde 1.7 current design index
 
+**Chapter integration continues; the chapter is incomplete.** The
+[player skinning checkpoint](../evidence/2026-10-13-skin-normal-cache/README.md)
+preserves exact posed mesh/image output while reducing measured Release player
+skinning by 14–20% in an alternating CPU comparison. Both final RT backends now
+complete the moving return/descent/repeat-ascent route under the original bounds.
+Debug/Release affected checks, full torch gate, fresh shader identity/budgets and
+Android four-ABI/lint/286 Java/package checks pass. Proven stale grave-lid shader
+snapshot pins are repaired without changing production shaders or budgets.
+APK 8c9fb2b0fc2c is prepared and uninstalled. **Normal-play residency saving is
+ZERO**; conservative contributor eligibility, actual normal two-way GPU
+lifetimes, sustained Shipping and fresh phone/owner acceptance remain required.
+The owner's bright-ground observation is under bounded light/material review;
+the confirmed X/Z-only legacy aperture rule has not yet been visually attributed
+or changed. Easy Tree/canopy and mist issue28 remain deferred.
+
+The preceding checkpoint records its own incomplete Query run:
 **Goal resumed13 October; phone validation is deferred during a shared-device handoff.**
 The [moving chapter route checkpoint](../evidence/2026-10-13-moving-chapter-roundtrip/README.md)
 adds normal-input validation through native terrain, fresh Kit raise/walking,

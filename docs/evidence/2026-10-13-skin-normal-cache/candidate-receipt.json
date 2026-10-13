@@ -1,0 +1,34 @@
+{
+  "implementationParent": "970858bebd2907b2067b9ea11bd769172658d515",
+  "scope": "per-joint CPU normal factors; no production shader/asset/quality/ABI/capacity change",
+  "sourceHashes": {
+    "src/scene/assets/SkinnedMeshAsset.cpp": "e6d387afaadc5d59f1898f506ad40f544efb40a1ac89171f2adbdb5975336f5c",
+    "src/scene/assets/SkinNormalTransport.h": "b565c2afa9513cac6e9b61a225b506b861d8cc40561ae9f40f78e9e4bb8b55f9",
+    "tests/SkinnedNodePoseBatchTests.cpp": "f42303c8609318ba03138ad7aea107e468fc4c2f455224a0759983a6515ec4d2",
+    "tests/SkinnedArmReferenceTests.cpp": "95d21c1e338fa1d3073e1a03ccbc8c684ffd6ea9924c1dd1086328197bc60843",
+    "tests/RaygenVariantManifestTests.ps1": "a1b3b13ed239f348294d44339e37ae7de3582d75240b04522f2dd88743962844",
+    "tests/RaygenVariantArtifactTests.ps1": "82e22a6c408988f5cfc3484ce62669077bd48c62be5573ec11c9de6a7eff1767"
+  },
+  "artifacts": [
+    {
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+      "bytes": 13049344,
+      "sha256": "1cade3574e84cb166d5f90ef7fc2b554431665375bcc60bf1c0cade52b092075"
+    },
+    {
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+      "bytes": 4453376,
+      "sha256": "994f218aedaccfb1331f53b6869d677c71e5b545616ed35de4089bf42e692935"
+    },
+    {
+      "path": "reports/phone-candidate-8c9fb2b0fc2c/horde-debug.apk",
+      "bytes": 183124186,
+      "sha256": "8c9fb2b0fc2cadf1d9cd441ade88f63e4175b06e5a4e0163d55ae11e71a24e7e"
+    }
+  ],
+  "androidStatus": "prepared and uninstalled; no device actions",
+  "normalPlayResidencySavingBytes": 0,
+  "routeScope": "Debug Diagnostic High/Higher 960x540100%; ordinary input max4 60Hz ticks/render; not Shipping or owner acceptance",
+  "shaderBudgetSha256": "56936479b2d202dbdb9393ba94b66a1b0bc12d490b700d8af4c63de3460e53bf",
+  "shaderCatalogSha256": "e3b43b8f8ab01279f2d1c09cb9d4290b6e7a431b2e4101bdeccfc76b890fcb25"
+}

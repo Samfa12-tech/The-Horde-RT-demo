@@ -1,0 +1,6 @@
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\reports\skin-normal-compatibility-legacy\minimal.legacy.rgen.resolved
+Raygen check artifacts: C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\reports\skin-normal-compatibility-legacy
+Source dependency SHA-256: 2c729a2c889393bb559c528f593e0684c7bc7134ef6428cb710dbe43a8d0b7d8; embedded include SHA-256: 4e94536f79922a4e1cf5da96bf6bbdf937686fd82fd5bc550c9a0dcb8ae90412
+SPIR-V bytes: 581068; words: 145267; instructions: 32030; branch operations: 4325; loops: 80; selection merges: 1735; SHA-256: 0a38ad5f234bd102e6f49927673c7e203ab7d34799caa2e15cf5a45ce0d8f1e5
+Raygen optimizer shape: functions=1; calls=0; ray-query sites=27
+Embedded raygen SPIR-V words match the compiled shader.

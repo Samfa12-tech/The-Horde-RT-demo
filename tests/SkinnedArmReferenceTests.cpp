@@ -200,6 +200,7 @@ struct FixtureData
     std::vector<std::uint16_t> indices;
     std::array<TestArm, 2u> arms{};
     std::array<Vec3, 8u> jointTranslations{};
+    int singularBindJoint = -1;
 };
 
 FixtureData MakeFixtureData()
@@ -286,6 +287,8 @@ AccessorSet AddFixtureViews(const FixtureData& fixture, GlbBinary& binary)
     inverseBind.reserve(fixture.jointTranslations.size());
     for (const auto& translation : fixture.jointTranslations)
         inverseBind.push_back(InverseTranslation(translation));
+    if (fixture.singularBindJoint >= 0)
+        inverseBind.at(static_cast<std::size_t>(fixture.singularBindJoint))[0] = 0.0f;
 
     const std::vector<float> times{0.0f, 1.0f};
     const std::vector<float> noOpTranslations{0.0f, 0.0f, 0.0f,
@@ -662,6 +665,49 @@ bool CheckCarryAllowance(horde::scene::SkinnedMeshAsset& asset, const FixtureDat
     return true;
 }
 
+bool CheckSingularSharedPose()
+{
+    using namespace horde::scene;
+    SkinnedPlayerPose reusedPose;
+    for (const int joint : {3, 0, -1}) // unused Grip, used upper arm, restored
+    {
+        auto fixture = MakeFixtureData();
+        fixture.singularBindJoint = joint;
+        GlbBinary binary;
+        const auto accessors = AddFixtureViews(fixture, binary);
+        TemporaryGlb temporary;
+        if (!WriteGlb(temporary.Path(), MakeFixtureJson(fixture,binary,accessors),binary.Bytes())) return false;
+        SkinnedMeshAsset asset;
+        std::string diagnostic;
+        if (!asset.LoadClips(temporary.Path().string(),PlayerLocomotionClipSet(),diagnostic)) return false;
+        const SkinnedArmIkTarget left{{{.4f,.8f,.2f}},{{1,0,0}}};
+        const SkinnedArmIkTarget right{{{-.4f,.8f,.2f}},{{-1,0,0}}};
+        if (!Require(asset.EvaluatePlayerPose(SkinnedClip::Idle,0,left,right,reusedPose,diagnostic) &&
+                         reusedPose.IsValid(),
+                     "singular inverse bind must not fail pose evaluation before an influence consumes it")) return false;
+        std::vector<TexturedSkinnedRtVertex> vertices(1);
+        std::vector<SkinnedPbrTangent> tangents(1);
+        const bool skinned = asset.SkinPlayerPoseUniqueTextured(reusedPose,vertices,tangents,diagnostic);
+        if (joint == 0)
+        {
+            if (!Require(!skinned && vertices.empty() && tangents.empty() &&
+                             diagnostic == "Player IK produced a non-invertible normal transform.",
+                         "used singular joint must fail skinning and clear both output streams")) return false;
+        }
+        else if (!Require(skinned && vertices.size() == fixture.vertices.size() &&
+                              tangents.size() == vertices.size(),
+                          "unused singular joint and restored pose must skin successfully")) return false;
+        if (!Require(!asset.EvaluatePlayerPose(SkinnedClip::Idle,
+                            std::numeric_limits<float>::quiet_NaN(),left,right,reusedPose,diagnostic) &&
+                         !reusedPose.IsValid() &&
+                         !asset.SkinPlayerPoseUniqueTextured(reusedPose,vertices,tangents,diagnostic) &&
+                         vertices.empty() && tangents.empty(),
+                     "failed reevaluation must invalidate cached transforms and reject stale output")) return false;
+    }
+    std::cout << "PASS: unused/used singular joint, restored shared pose and failed reevaluation\n";
+    return true;
+}
+
 } // namespace
 
 int main(int argc, char** argv)
@@ -703,6 +749,7 @@ int main(int argc, char** argv)
         return 0;
     }
     if (argc != 1) return 2;
+    if (!CheckSingularSharedPose()) return 1;
     FixtureData fixture = MakeFixtureData();
     GlbBinary binary;
     const AccessorSet accessors = AddFixtureViews(fixture, binary);

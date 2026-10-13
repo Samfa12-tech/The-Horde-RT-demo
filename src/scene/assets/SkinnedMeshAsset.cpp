@@ -1,4 +1,5 @@
 #include "scene/assets/SkinnedMeshAsset.h"
+#include "scene/assets/SkinNormalTransport.h"
 #include "scene/assets/StaticMeshAsset.h"
 
 #include <algorithm>
@@ -426,6 +427,7 @@ struct SkinnedPlayerRigLayout
 struct SkinnedPlayerPoseData
 {
     std::vector<Matrix> skinMatrices;
+    std::vector<detail::SkinNormalTransport> normalTransports;
     std::shared_ptr<const SkinnedPlayerRigLayout> rig;
     SkinnedPlayerSockets sockets{};
 };
@@ -1665,6 +1667,7 @@ bool SkinnedMeshAsset::EvaluatePlayerPose(
     auto& solved = *outputPose.data_;
     solved.rig.reset();
     solved.skinMatrices.clear();
+    solved.normalTransports.clear();
     solved.sockets = {};
     auto& sockets = solved.sockets;
     if (!loaded_ || !hasTexcoords_ || !hasTangents_)
@@ -2061,6 +2064,7 @@ bool SkinnedMeshAsset::EvaluatePlayerPose(
 
     auto& skinMatrices = solved.skinMatrices;
     skinMatrices.resize(joints_.size());
+    solved.normalTransports.resize(joints_.size());
     for (std::size_t joint = 0u; joint < joints_.size(); ++joint)
     {
         if (joints_[joint] >= globals.size())
@@ -2080,6 +2084,9 @@ bool SkinnedMeshAsset::EvaluatePlayerPose(
                 return false;
             }
         }
+        // Singular unused joints remain legal; only an admitted, positive
+        // vertex influence consumes this transform and may reject it below.
+        solved.normalTransports[joint] = detail::MakeSkinNormalTransport(skinMatrices[joint].m);
     }
     solved.rig = playerRigLayout_;
     diagnostic.clear();
@@ -2091,7 +2098,8 @@ bool SkinnedMeshAsset::SkinPlayerPoseUniqueTextured(
     std::vector<SkinnedPbrTangent>& outputTangents, std::string& diagnostic) const
 {
     if (!loaded_ || !playerRigLayout_ || !hasTexcoords_ || !hasTangents_ || !pose.IsValid() ||
-        pose.data_->skinMatrices.size() != joints_.size())
+        pose.data_->skinMatrices.size() != joints_.size() ||
+        pose.data_->normalTransports.size() != joints_.size())
     {
         diagnostic = "Player mesh or shared pose is not ready for skinning.";
         output.clear();
@@ -2127,8 +2135,9 @@ bool SkinnedMeshAsset::SkinPlayerPoseUniqueTextured(
             if (weight <= 0.00001f || joint >= skinMatrices.size()) continue;
             position = Add(position, Scale(TransformPoint(skinMatrices[joint], source.position), weight));
             Vec3 transformedNormal{};
-            if (!TransformNormal(skinMatrices[joint], source.normal,
-                                 transformedNormal))
+            if (!detail::ApplySkinNormalTransport(pose.data_->normalTransports[joint],
+                    source.normal.x, source.normal.y, source.normal.z,
+                    transformedNormal.x, transformedNormal.y, transformedNormal.z))
             {
                 diagnostic = "Player IK produced a non-invertible normal transform.";
                 output.clear();

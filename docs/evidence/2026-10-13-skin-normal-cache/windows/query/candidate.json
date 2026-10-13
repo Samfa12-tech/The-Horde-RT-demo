@@ -1,0 +1,13 @@
+{
+  "backend": "RayQueryCompute",
+  "deadlineSeconds": 180,
+  "maximumSimulationTicksPerRender": 4,
+  "simulationHz": 60,
+  "scope": "Debug Diagnostic resident scripted route; not Shipping or owner acceptance",
+  "executableSha256": "1cade3574e84cb166d5f90ef7fc2b554431665375bcc60bf1c0cade52b092075",
+  "sources": {
+    "src/platform/windows/DiagnosticWindow.cpp": "936de0b18de124c17a92ff00edd7072d918300fc8ca55ac1ef33441350792829",
+    "src/gameplay/validation/ChapterRoundTripProbe.h": "fb8368500a4d6712803e21c2cdbf36118599908bf747d424cdffe77e9f9282a0",
+    "src/platform/windows/WindowsChapterRoundTripCapture.inl": "d8c2b1dfac79ee516306052d24e8cbddb6cf65c389b2ddeec4b55ac1fbb5359a"
+  }
+}
