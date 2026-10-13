@@ -394,3 +394,5 @@ docs/evidence/2026-10-12-prepared-understory/*.log -text whitespace=-trailing-sp
 docs/evidence/2026-10-12-chapter-capture-readiness/** -text whitespace=cr-at-eol
 docs/evidence/2026-10-12-chapter-capture-readiness/logs/** whitespace=-trailing-space,-blank-at-eof,cr-at-eol
 docs/evidence/2026-10-13-moving-chapter-roundtrip/** -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+# Sealed native diagnostic evidence keeps the exact captured/logged bytes.
+docs/evidence/2026-10-13-terrain-light-attribution/** -text
