@@ -95,9 +95,11 @@
 #if defined(_DEBUG)
 #include "gameplay/validation/MotionEvidenceScenario.h"
 #include "gameplay/validation/ChapterRoundTripProbe.h"
+#include "gameplay/validation/ChapterRouteMeasurementClock.h"
 #include "telemetry/MotionEvidenceLedger.h"
 #endif
 #include "platform/windows/WindowsBenchmarkLaunch.h"
+#include "platform/windows/WindowsChapterShippingLaunch.h"
 #include "platform/windows/WindowsMistCaptureLaunch.h"
 #include "platform/windows/WindowsInteractionPrompt.h"
 #include "platform/windows/WindowsGameplayInput.h"
@@ -288,6 +290,7 @@ struct CaptureLaunchOptions
     bool validateStaticZoneCutover = false;
     bool validateStaticTriangleCutover = false;
     bool validateChapterRoundTrip = false;
+    bool measureChapterShippingRoute = false;
     std::filesystem::path outputDirectory;
     std::string developmentCheckpoint;
     std::string error;
@@ -747,6 +750,17 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
         LocalFree(arguments);
         return options;
     }
+    const auto chapterShipping=horde::platform::windows::ParseWindowsChapterShippingLaunch(argumentViews,
+#if defined(_DEBUG)
+        true
+#else
+        false
+#endif
+    );
+    if(!chapterShipping.error.empty()) {
+        options.error=chapterShipping.error;LocalFree(arguments);return options;
+    }
+    options.measureChapterShippingRoute=chapterShipping.requested;
     for (int index = 1; index < argumentCount; ++index)
     {
         const std::wstring_view argument(arguments[index]);
@@ -7205,6 +7219,9 @@ bool RunStaticGeometryCutoverCapture(VulkanSurfaceContext& context,
 #endif
 
 #include "platform/windows/WindowsChapterRoundTripCapture.inl"
+#if defined(_DEBUG)
+#include "platform/windows/WindowsChapterShippingMeasurement.inl"
+#endif
 
 int RunShowcaseCapture(VulkanSurfaceContext& context,
                        horde::vulkan::DeviceCapabilities& capabilities,
@@ -8286,6 +8303,12 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
             std::string journeyError;
             if(!RunChapterRoundTripCapture(context,*captureDirectory,journeyError)) {
                 std::cerr<<"Chapter two-way capture failed: "<<journeyError<<'\n';captureResult=1;
+            }
+        }
+        if(captureResult==0 && ParseCaptureLaunchOptions().measureChapterShippingRoute) {
+            std::string measurementError;
+            if(!RunChapterShippingRouteMeasurement(context,*captureDirectory,measurementError)) {
+                std::cerr<<"Chapter Shipping measurement failed: "<<measurementError<<'\n';captureResult=1;
             }
         }
         if (captureResult == 0 && capabilities.rtScene.presented)

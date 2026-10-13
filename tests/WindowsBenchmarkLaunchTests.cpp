@@ -1,9 +1,11 @@
 #include <array>
 #include <iostream>
 #include <string_view>
+#include <vector>
 
 #include "platform/windows/WindowsBenchmarkLaunch.h"
 #include "platform/windows/WindowsMistCaptureLaunch.h"
+#include "platform/windows/WindowsChapterShippingLaunch.h"
 
 int main()
 {
@@ -17,6 +19,32 @@ int main()
         }
     };
     const std::array<std::wstring_view, 0> ordinary{};
+    using horde::platform::windows::ParseWindowsChapterShippingLaunch;
+    const std::array<std::wstring_view,5> shippingArgs{L"--measure-chapter-shipping-route",
+        L"--capture-showcase",L"C:\\reports\\shipping-route",L"--development-checkpoint",L"chapter-kit-reunion"};
+    check(ParseWindowsChapterShippingLaunch(shippingArgs,true).requested &&
+        ParseWindowsChapterShippingLaunch(shippingArgs,true).error.empty(),
+        "bounded Shipping route must select exactly the admitted Debug capture");
+    check(!ParseWindowsChapterShippingLaunch(shippingArgs,false).error.empty(),
+        "Shipping measurement controls cannot enter ordinary Release play");
+    check(!ParseWindowsChapterShippingLaunch(ordinary,true).requested &&
+        ParseWindowsChapterShippingLaunch(ordinary,true).error.empty(),
+        "ordinary launches must not gain a measurement owner");
+    for(const auto conflict:{L"--validate-chapter-roundtrip",L"--validate-static-zone-cutover",
+        L"--validate-static-triangle-cutover",L"--capture-graphics-preview",L"--benchmark-showcase",
+        L"--validate-output-resize",L"--validate-native-motion",L"--capture-sky-attribution",L"--mist-off",
+        L"--capture-dust",L"--measure-chapter-shipping-route"}) {
+        auto args=std::vector<std::wstring_view>(shippingArgs.begin(),shippingArgs.end());args.push_back(conflict);
+        check(!ParseWindowsChapterShippingLaunch(args,true).error.empty(),
+            "route measurement rejects conflicting validation/tuning and duplicate flags");
+    }
+    for(const auto badArgs:{
+        std::vector<std::wstring_view>{L"--measure-chapter-shipping-route"},
+        std::vector<std::wstring_view>{L"--measure-chapter-shipping-route",L"--capture-showcase",L"C:\\reports",L"--development-checkpoint",L"chapter-lookout"},
+        std::vector<std::wstring_view>{L"--measure-chapter-shipping-route",L"--capture-showcase",L"C:\\reports",L"--capture-showcase",L"C:\\again",L"--development-checkpoint",L"chapter-kit-reunion"},
+        std::vector<std::wstring_view>{L"--measure-chapter-shipping-route",L"--capture-showcase",L"C:\\reports",L"--development-checkpoint",L"chapter-kit-reunion",L"--development-checkpoint",L"chapter-kit-reunion"}})
+        check(!ParseWindowsChapterShippingLaunch(badArgs,true).error.empty(),
+            "missing, wrong or duplicate route sources fail closed");
     const auto absent = ParseWindowsBenchmarkLaunch(ordinary);
     check(!absent.requested && absent.error.empty(), "ordinary launch must remain interactive");
     using horde::vulkan::raytracing::RtWorkloadPreset;

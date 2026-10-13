@@ -8,6 +8,7 @@
 #include "vulkan/raytracing/DevelopmentWorldSceneAdapter.h"
 #include "platform/windows/WindowsCaptureContracts.h"
 #include "gameplay/validation/ChapterRoundTripProbe.h"
+#include "gameplay/validation/ChapterRouteMeasurementClock.h"
 #include <cmath>
 #include <iostream>
 using namespace horde::gameplay;
@@ -26,6 +27,28 @@ int main(int argc,char** argv) {
  }
  int cases=0,failures=0;
  auto check=[&](bool b,const char* m){++cases;if(!b){++failures;std::cerr<<m<<'\n';}};
+ {
+  using horde::gameplay::validation::ChapterRouteMeasurementClock;
+  ChapterRouteMeasurementClock clock;
+  check(clock.Consume(0)==0 && clock.Consume(.01)==0,
+        "fast render frames must not invent a60Hz simulation tick");
+  check(clock.Consume(.051)==3 && clock.ConsumedTicks()==3,
+        "wall-clock route must consume every complete authoritative tick");
+  check(clock.Consume(.051)==0,"same time must not repeat an input/step");
+  check(clock.Consume(.251)==4 && clock.PendingTicks()==8,
+        "slow frame must retain debt behind the four-tick per-render bound");
+  check(clock.Consume(.251)==4 && clock.Consume(.251)==4 && clock.ConsumedTicks()==15,
+        "bounded catch-up must neither skip nor duplicate route actions");
+  check(!clock.Consume(.2) && !clock.Consume(-1) &&
+        !clock.Consume(std::numeric_limits<double>::infinity()) &&
+        !clock.Consume(std::numeric_limits<double>::quiet_NaN()) && !clock.Consume(150.01),
+        "clock rewind, invalid time and the unchanged150-second boundary fail closed");
+  check(clock.Consume(.267)==1 && clock.ConsumedTicks()==16,
+        "rejected clock samples must leave the valid cadence intact");
+  ChapterRouteMeasurementClock reset;
+  check(reset.Consume(0)==0 && reset.ConsumedTicks()==0 && reset.PendingTicks()==0,
+        "new measurement must have no inherited time or input debt");
+ }
  if(authored) {
   unsigned chapterSelections=0;
   for(const auto& checkpoint:kDevelopmentCheckpoints) {

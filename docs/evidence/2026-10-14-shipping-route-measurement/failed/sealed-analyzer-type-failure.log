@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\docs\evidence\2026-10-14-shipping-route-measurement\analyze.py", line 76, in <module>
+    for name in sys.argv[1:]: analyze(name)
+                              ^^^^^^^^^^^^^
+  File "C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\docs\evidence\2026-10-14-shipping-route-measurement\analyze.py", line 68, in analyze
+    assert json.loads(target.read_text())==summary,'stored analysis differs from verified arithmetic'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: stored analysis differs from verified arithmetic

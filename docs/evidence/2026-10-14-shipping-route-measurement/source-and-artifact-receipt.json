@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "baseCommit": "861f83314ae920f354a2eee88bd9a6674c2a1a20",
+  "scope": "Windows measurement source plus unchanged Android engine; artifacts built before checkpoint commit",
+  "inputSha256": {
+    "src/platform/windows/DiagnosticWindow.cpp": "204f07976271ffdf2c20f4304304e6170882ade234c88f17988da76c95616591",
+    "src/platform/windows/WindowsChapterShippingMeasurement.inl": "7d7a4bfbbab187f265f11db8e7887e0545e4a958ff2e542b612a87b9cd20023e",
+    "src/platform/windows/WindowsChapterShippingLaunch.h": "72e0b2c1c1244d9afd782196d07133fa5818caf6304e27029f329854bb1c4b4b",
+    "src/gameplay/validation/ChapterRouteMeasurementClock.h": "7a7e05ed68d0c4f5935967eec393b246103056fdf3406d6e3671be225c431edc",
+    "src/gameplay/validation/ChapterRoundTripProbe.h": "fb8368500a4d6712803e21c2cdbf36118599908bf747d424cdffe77e9f9282a0",
+    "tools/measure-chapter-shipping-route.ps1": "14c6abe66243601643156e8fb66aad83e69ba91418f60e9a7417ae88cb7dd237",
+    "tests/RescueJourneyIntegrationTests.cpp": "755548bee4b9dc3ca7c594a8b6d828f968782cc09692ffc7ebc5d71227ad0ea6",
+    "tests/WindowsBenchmarkLaunchTests.cpp": "06cf5d4058b977ec9fb148e7530dbd62bc933b05457b3306dec8219c051f505f"
+  },
+  "artifacts": {
+    "build/chapter-shipping-measurement/Debug/HordeLanternRT.exe": {
+      "sha256": "213a49a4fbc2f524e9cb03aa465a4b4d87c798ca144d3c3dfe39104f7ab41a09",
+      "bytes": 13084672
+    },
+    "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe": {
+      "sha256": "99c7772804d90d23d0a5431603a1776284020e5fb1f338d317b30960023ef8f2",
+      "bytes": 13115904
+    },
+    "build/presets/windows-x64-release/Release/HordeLanternRT.exe": {
+      "sha256": "b1535ec3d9286bd5ed9422f80bff614d61abee91f7f4a027fc8b552952047d08",
+      "bytes": 4460032
+    },
+    "reports/phone-candidate-f9d01fc4f53c/horde-debug.apk": {
+      "sha256": "f9d01fc4f53ca75719fbfca9cc82d3afcfaee5e1a2992e9bd41b4c52671370a2",
+      "bytes": 183145434
+    }
+  },
+  "phoneDisposition": "Previously prepared APK retained byte-for-byte; no Android source change, rebuild, installation or device action in this slice",
+  "hardwareObservation": {
+    "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "driver": "610.47",
+    "memoryTotalMiB": 8151,
+    "powerAndThermalControlDuringRun": "not recorded",
+    "postRunOnlyPstate": "P4",
+    "postRunOnlyPowerWatts": 8.65
+  }
+}

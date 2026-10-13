@@ -1,0 +1,16 @@
+{
+  "scope": "Debug CPU with Shipping High shaders; sustained wall-clock scripted round-trip after staged Keeper death; zero static-region residency saving; not owner/phone acceptance",
+  "sources": {
+    "src/gameplay/validation/ChapterRoundTripProbe.h": "fb8368500a4d6712803e21c2cdbf36118599908bf747d424cdffe77e9f9282a0",
+    "src/platform/windows/WindowsChapterShippingMeasurement.inl": "7d7a4bfbbab187f265f11db8e7887e0545e4a958ff2e542b612a87b9cd20023e",
+    "src/platform/windows/WindowsChapterShippingLaunch.h": "72e0b2c1c1244d9afd782196d07133fa5818caf6304e27029f329854bb1c4b4b",
+    "src/platform/windows/DiagnosticWindow.cpp": "204f07976271ffdf2c20f4304304e6170882ade234c88f17988da76c95616591",
+    "src/gameplay/validation/ChapterRouteMeasurementClock.h": "7a7e05ed68d0c4f5935967eec393b246103056fdf3406d6e3671be225c431edc"
+  },
+  "backend": "RayTracingPipeline",
+  "maximumSimulationTicksPerRender": 4,
+  "simulationHz": 60,
+  "configure": "cmake -S . -B build/chapter-shipping-measurement -G \"Visual Studio 17 2022\" -A x64 -DHORDE_RT_INSTRUMENTATION_OVERRIDE=Shipping -DHORDE_RT_DIELECTRIC_QUALITY_OVERRIDE=High",
+  "deadlineSeconds": 180,
+  "executableSha256": "213a49a4fbc2f524e9cb03aa465a4b4d87c798ca144d3c3dfe39104f7ab41a09"
+}

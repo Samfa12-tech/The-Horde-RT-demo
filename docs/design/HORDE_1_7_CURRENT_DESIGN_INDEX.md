@@ -1,5 +1,22 @@
 # Horde 1.7 current design index
 
+**Chapter integration remains active and incomplete.** The current
+[sustained Shipping-shader route evidence](../evidence/2026-10-14-shipping-route-measurement/README.md)
+adds a bounded wall-clock Windows input/measurement route and verified completed
+records on both real RT backends. Both traverse for over106seconds at960x540,
+100% scale, Current shadows and High water/fire/optical quality. GPU medians are
+7.489/7.386ms;95th percentiles13.765/13.873ms. Debug CPU skinning, acquisition
+stalls and retained simulation debt prevent treating those GPU values as sustained
+Release FPS. Production shaders/materials/quality/limits are unchanged. Static
+device-local residency saving remains **ZERO**; normal contributor-aware two-way
+GPU loading/retirement and optimized throughput remain required. The existing
+APKf9d01fc4f53c stays byte-identical and uninstalled; fresh full phone/owner and
+Current/Higher/Lower-migration acceptance remain pending. The four new Shipping
+frames were opened; the preceding full Diagnostic route gallery remains valid.
+Ground material balance, Easy Tree/canopy and mist issue28 dispositions are unchanged.
+
+The preceding checkpoint:
+
 **Chapter integration remains active and incomplete.** The
 [Keeper vertex lifetime checkpoint](../evidence/2026-10-14-keeper-vertex-lifetime/README.md)
 retires a real1,323,264-byte host-visible allocation after completed Kit adoption,
