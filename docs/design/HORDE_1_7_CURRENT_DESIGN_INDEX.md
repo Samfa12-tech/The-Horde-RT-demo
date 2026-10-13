@@ -1,6 +1,21 @@
 # Horde 1.7 current design index
 
 **Chapter integration remains active and incomplete.** The
+[Keeper vertex lifetime checkpoint](../evidence/2026-10-14-keeper-vertex-lifetime/README.md)
+retires a real1,323,264-byte host-visible allocation after completed Kit adoption,
+and restores it safely on reset/grounded loss. Both final RT backends complete
+the moving round-trip and reset; all26 comparable images per backend preserve
+prior pixels. Windows device-local residency savings remain **ZERO**; static
+regions/textures/shared AS remain resident. Debug/Release affected checks,
+Android four-ABI/lint/286 fresh Java/package checks pass. APKf9d01fc4f53c is the
+current prepared, uninstalled candidate. Static contributor eligibility, normal
+two-way GPU loading/retirement, sustained Shipping and fresh phone/owner
+acceptance remain open. Terrain-light attribution is preserved without production
+material/light tuning. Easy Tree/canopy and mist issue28 remain deferred.
+
+The preceding checkpoint:
+
+**Chapter integration remains active and incomplete.** The
 [terrain-light attribution checkpoint](../evidence/2026-10-13-terrain-light-attribution/README.md)
 inspects matched actual RT lighting modes: the bright second-bend ground is
 unchanged when only the legacy aperture contribution is suppressed, and becomes

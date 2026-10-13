@@ -1965,6 +1965,11 @@ int main()
                           slot.PrepareFrame(skeletons,0u,keeperRoster,dying,resources,diagnostic) &&
                           slot.PendingRefit()==CharacterBlasRefit::None,
                           "submitted frozen pose must not redundantly refit");
+            std::fill(memory.begin(),memory.end(),std::byte{0x7f});
+            slot.InvalidateLichPose();
+            ok &= Require(slot.PrepareFrame(skeletons,0u,keeperRoster,dying,resources,diagnostic) &&
+                          memory==written && HasCharacterBlasRefit(slot.PendingRefit(),CharacterBlasRefit::Lich),
+                          "restored storage must receive the exact fresh skin even at unchanged clip/time");
             buffer={};
             // Restore this fixture's neutral CPU pose for the later staff tests.
             ok &= Require(slot.PrepareInitialGeometry(diagnostic),diagnostic.c_str());

@@ -14,8 +14,8 @@ bool RunChapterRoundTripCapture(VulkanSurfaceContext& context,const std::filesys
     }
     std::ofstream rows(directory/"frames.csv"),manifest(directory/"gallery.json");
     if(!rows||!manifest) {error="Two-way evidence files could not open.";return false;}
-    rows<<"frame,phase,station,submitted_tick,simulation_ms,render_cycle_ms,completed_tick,completed_serial,gpu_status,gpu_ns,device_local_bytes,host_visible_bytes\n";
-    manifest<<"{\"schema\":1,\"scope\":\"moving fixed-step validation after staged Keeper death and first ascent; Diagnostic, fully resident; not owner or Shipping performance acceptance\",\"maximumSimulationTicksPerRender\":4,\"simulationHz\":60,\"captures\":[\n";
+    rows<<"frame,phase,station,submitted_tick,simulation_ms,render_cycle_ms,completed_tick,completed_serial,gpu_status,gpu_ns,device_local_bytes,host_visible_bytes,keeper_retired_bytes,keeper_retired_memory_flags\n";
+    manifest<<"{\"schema\":1,\"scope\":\"moving fixed-step validation after staged Keeper death and first ascent; Diagnostic, static scene resident, normal Keeper vertex lifetime active; not owner or Shipping performance acceptance\",\"maximumSimulationTicksPerRender\":4,\"simulationHz\":60,\"captures\":[\n";
     struct Restore {
         VulkanSurfaceContext& ctx;bool paused,active;int sfx,voice,music;
         ~Restore() {ctx.simulationPaused=paused;ctx.sfxVolumePercent=sfx;ctx.voiceVolumePercent=voice;ctx.musicVolumePercent=music;
@@ -101,6 +101,7 @@ bool RunChapterRoundTripCapture(VulkanSurfaceContext& context,const std::filesys
         }
         const auto completed=context.rtFrameEvidence.PublishedStateByValue();
         const auto inventory=context.rtScene.ResourceInventory();
+        const auto keeper=context.rtScene.KeeperVertexLifetime();
         rows<<frames<<','<<ChapterProbePhaseName(phase)<<','<<station<<','<<context.simulation.Snapshot().tickIndex<<','
             <<std::chrono::duration<double,std::milli>(simulated-before).count()<<','
             <<std::chrono::duration<double,std::milli>(rendered-simulated).count()<<','
@@ -108,7 +109,8 @@ bool RunChapterRoundTripCapture(VulkanSurfaceContext& context,const std::filesys
             <<(completed.hasCompletedEvidence?completed.completedEvidence.identity.submitted.submissionSerial:0)<<','
             <<static_cast<unsigned>(completed.completedEvidence.gpu.status)<<','
             <<(completed.hasCompletedEvidence&&completed.completedEvidence.gpu.hasDuration?completed.completedEvidence.gpu.durationNanoseconds:0)<<','
-            <<inventory.deviceLocalBytes<<','<<inventory.hostVisibleBytes<<'\n';
+            <<inventory.deviceLocalBytes<<','<<inventory.hostVisibleBytes<<','
+            <<keeper.retiredAllocationBytes<<','<<keeper.retiredMemoryFlags<<'\n';
         if(frames%120==0)rows.flush();
         const bool transition=phase!=probe.Phase() || station!=probe.Station();
         const bool quadrant=(phase==ChapterProbePhase::Landing || phase==ChapterProbePhase::Lookout ||
@@ -126,7 +128,33 @@ bool RunChapterRoundTripCapture(VulkanSurfaceContext& context,const std::filesys
        last.rescue.claimCount!=1||last.rescue.deploymentCount!=1||!last.chapterDialogue.proofAccepted||!kitWalkCaptured) {
         error="Two-way capture lacks final progression/equipment witnesses.";return false;
     }
-    manifest<<"\n],\"frames\":"<<frames-1<<",\"normalPlayResidencySavingBytes\":0,\"complete\":true}\n";
+    const auto retired=context.rtScene.KeeperVertexLifetime();
+    if(!retired.retired || retired.retirementCount!=1 || retired.restorationCount!=0) {
+        error="Two-way traversal lacks exactly one completed Keeper vertex retirement.";return false;
+    }
+    // Exercise ordinary route-reset input after the repeated ascent. The same
+    // device/AS/descriptor owners must safely restore Keeper storage.
+    auto reset=context.simulationInput;reset.moveForward=reset.moveStrafe=0;
+    ++reset.commands.routeReset;reset.paused=false;
+    context.simulationInput=reset;
+    context.simulation.StepFixed(reset,1.f/60.f,context.simulation.Snapshot().inputPublicationSequence+1);
+    bool resetPresented=false;
+    if(!RenderFrame(context,clear,resetPresented)||!resetPresented||
+       !capture("reset-opening")) {
+        error="Chapter reset failed current-pose RT restoration: "+context.lastRtFrameError;return false;
+    }
+    const auto restored=context.rtScene.KeeperVertexLifetime();
+    const auto& resetState=context.simulation.Snapshot();
+    if(restored.retired || restored.retirementCount!=1 || restored.restorationCount!=1 ||
+       resetState.lich.phase==horde::gameplay::LichPhase::Dead ||
+       resetState.chapterCompanion.grounded || resetState.rescue.claimCount!=0) {
+        error="Ordinary reset left stale companion or retired Keeper storage.";return false;
+    }
+    manifest<<"\n],\"frames\":"<<frames-1<<",\"normalPlayStaticRegionResidencySavingBytes\":0,"
+        <<"\"keeperVertexLifetime\":{\"retiredAllocationBytes\":"<<retired.retiredAllocationBytes
+        <<",\"retiredMemoryFlags\":"<<retired.retiredMemoryFlags
+        <<",\"retirements\":"<<restored.retirementCount<<",\"restorations\":"<<restored.restorationCount
+        <<",\"resetRestored\":true},\"complete\":true}\n";
     rows.flush();manifest.flush();
     if(!rows||!manifest) {error="Two-way evidence write failed.";return false;}
     error.clear();return true;

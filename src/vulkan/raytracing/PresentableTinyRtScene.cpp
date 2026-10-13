@@ -590,6 +590,8 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     chapterActor_ = std::move(other.chapterActor_);
     chapterActorReady_ = std::exchange(other.chapterActorReady_, false);
     thirdActorIsCompanion_ = std::exchange(other.thirdActorIsCompanion_, false);
+    thirdActorSubmittedCompanion_ = std::exchange(other.thirdActorSubmittedCompanion_, false);
+    keeperVertexLifetime_ = std::exchange(other.keeperVertexLifetime_, KeeperVertexLifetimeEvidence{});
     thirdActorNeedsBuild_ = std::exchange(other.thirdActorNeedsBuild_, false);
     chapterActorNeedsRefit_ = std::exchange(other.chapterActorNeedsRefit_, false);
     chapterActorPoseGeneration_ = std::exchange(other.chapterActorPoseGeneration_, UINT64_MAX);
@@ -1122,6 +1124,8 @@ void PresentableTinyRtScene::Destroy()
     tlasInstanceDefinitionsValid_ = false;
     tlasPendingInstances_ = {};
     tlasPendingDefinitionsValid_ = false;
+    thirdActorSubmittedCompanion_ = false;
+    keeperVertexLifetime_ = {};
     executionPolicy_ = {};
     computeDispatchGroups_ = {};
     if (device_ == VK_NULL_HANDLE)
@@ -1155,7 +1159,8 @@ void PresentableTinyRtScene::Destroy()
     finaleRoofSurfaceBase_=0; finaleRoofSurfaceCount_=0;
     characterSlot_.DestroyGpuResources(gpuResources_);
     chapterActor_ = {};
-    chapterActorReady_ = thirdActorIsCompanion_ = thirdActorNeedsBuild_ = chapterActorNeedsRefit_ = false;
+    chapterActorReady_ = thirdActorIsCompanion_ = thirdActorSubmittedCompanion_ =
+        thirdActorNeedsBuild_ = chapterActorNeedsRefit_ = false;
     chapterActorPoseGeneration_ = UINT64_MAX;
     chapterActorPoseSeconds_ = -1.0f;
     chapterActorWalking_ = false;
@@ -5558,7 +5563,7 @@ bool PresentableTinyRtScene::WriteBundleDescriptors(RtPipelineBundle& bundle,
     const bool preview = sceneProfile_ != RtSceneProfile::Showcase;
     const auto& secondSkeletonVertexBuffer = preview
         ? skeletonVertexBuffer_ : characterSlot_.SkeletonGpu(1u).vertices;
-    const auto& lichVertexBuffer_ = preview
+    const auto& lichVertexBuffer_ = (preview || characterSlot_.LichGpu().vertices.Empty())
         ? staticVertexBuffer_ : characterSlot_.LichGpu().vertices;
     const VkDescriptorSet descriptorSet = bundle.descriptorSet;
 
@@ -6687,9 +6692,11 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         hasFinalSkinnedLeftGrip = true;
     }
 
-    const bool wantCompanion = chapterActorReady_ && frame.developmentRescueJourney &&
-        lich.phase == horde::gameplay::LichPhase::Dead && lich.deathAnimationComplete &&
-        lich.deathDissolveProgress >= 1.0f && frame.chapterCompanion.grounded;
+    const bool wantCompanion = WantsChapterCompanion(frame);
+    if (!wantCompanion && lichGpu.vertices.Empty()) {
+        diagnostic = "Keeper vertex storage must be restored before recording its character owner.";
+        return false;
+    }
     if (wantCompanion != thirdActorIsCompanion_) {
         thirdActorIsCompanion_ = wantCompanion;
         thirdActorNeedsBuild_ = true;
@@ -7733,11 +7740,142 @@ void PresentableTinyRtScene::StageTlasSubmissionDefinitions(
     tlasPendingDefinitionsValid_=true;
 }
 
+bool PresentableTinyRtScene::WantsChapterCompanion(const RtSceneFrameInputs& frame) const noexcept
+{
+    return chapterActorReady_ && frame.developmentRescueJourney &&
+        frame.lich.phase == horde::gameplay::LichPhase::Dead && frame.lich.deathAnimationComplete &&
+        frame.lich.deathDissolveProgress >= 1.0f && frame.chapterCompanion.grounded;
+}
+
+bool PresentableTinyRtScene::PrepareThirdActorVertexLifetimeWithApi(
+    const RtSceneFrameInputs& frame, const ThirdActorVertexLifetimeApi& api, std::string& diagnostic)
+{
+    if (sceneProfile_ != RtSceneProfile::Showcase || !chapterActorReady_) return true;
+    auto& keeper = characterSlot_.LichGpu().vertices;
+    const bool wantsKit = WantsChapterCompanion(frame);
+    const bool restore = keeper.Empty() && !wantsKit;
+    // Recording a BUILD is not completed adoption. The platform callback below
+    // additionally proves that the submitted Kit frame and all old uses ended.
+    const bool retire = !keeper.Empty() && wantsKit && thirdActorIsCompanion_ &&
+        thirdActorSubmittedCompanion_ && !thirdActorNeedsBuild_ &&
+        chapterActorPoseGeneration_ == frame.chapterCompanion.generation;
+    if (!restore && !retire) return true;
+    if (!ready_ || !api.retireReferences || !api.bindVertices || !api.destroyVertices ||
+        (restore && !api.prepareKeeper) || pipelineBundle_.descriptorSet == VK_NULL_HANDLE ||
+        staticVertexBuffer_.buffer == VK_NULL_HANDLE || staticVertexBuffer_.memory == VK_NULL_HANDLE ||
+        staticVertexBuffer_.size == 0u) {
+        diagnostic = "Third actor vertex lifetime prerequisites are incomplete.";
+        return false;
+    }
+    const auto generation = staticGeometryGeneration_;
+    const auto actorGeneration = chapterActorPoseGeneration_;
+    const auto descriptor = pipelineBundle_.descriptorSet;
+    const auto staticBuffer = staticVertexBuffer_.buffer;
+    const auto keeperBuffer = keeper.buffer;
+    const auto unchanged = [&] {
+        return ready_ && chapterActorReady_ && staticGeometryGeneration_ == generation &&
+            chapterActorPoseGeneration_ == actorGeneration &&
+            pipelineBundle_.descriptorSet == descriptor && staticVertexBuffer_.buffer == staticBuffer &&
+            keeper.buffer == keeperBuffer && WantsChapterCompanion(frame) == wantsKit;
+    };
+    Buffer candidate{};
+    const auto reject = [&] {
+        if (!candidate.Empty()) api.destroyVertices(api.user, candidate);
+        return false;
+    };
+    try {
+        if (restore) {
+            if (!api.prepareKeeper(api.user, candidate, diagnostic)) return reject();
+            if (candidate.buffer == VK_NULL_HANDLE || candidate.memory == VK_NULL_HANDLE ||
+                candidate.address == 0u || candidate.size == 0u ||
+                candidate.allocationSize < candidate.size || candidate.mappedWriteData == nullptr ||
+                !unchanged()) {
+                diagnostic = "Prepared Keeper vertex storage is incomplete or stale.";
+                return reject();
+            }
+        }
+        if (!api.retireReferences(api.user, diagnostic)) return reject();
+        if (!unchanged() || (retire && (!thirdActorIsCompanion_ ||
+                !thirdActorSubmittedCompanion_ || thirdActorNeedsBuild_))) {
+            diagnostic = "Third actor ownership changed during completed-work retirement.";
+            return reject();
+        }
+    } catch (...) {
+        diagnostic = "Third actor vertex preparation or retirement proof threw.";
+        return reject();
+    }
+    // vkUpdateDescriptorSets has no failure result. All fallible operations end
+    // before this publication; neither actor metadata nor AS identity changes.
+    const auto& target = restore ? candidate : staticVertexBuffer_;
+    api.bindVertices(api.user, {target.buffer, 0u, target.size});
+    if (restore) {
+        keeper = std::exchange(candidate, Buffer{});
+        characterSlot_.InvalidateLichPose();
+        AccumulateRtResourceCount(keeperVertexLifetime_.restorationCount);
+        keeperVertexLifetime_.retired = false;
+        keeperVertexLifetime_.retiredAllocationBytes = 0u;
+        keeperVertexLifetime_.retiredMemoryFlags = 0u;
+    } else {
+        AccumulateRtResourceCount(keeperVertexLifetime_.retirementCount);
+        keeperVertexLifetime_.retired = true;
+        keeperVertexLifetime_.retiredAllocationBytes = keeper.allocationSize;
+        keeperVertexLifetime_.retiredMemoryFlags = keeper.memoryPropertyFlags;
+        api.destroyVertices(api.user, keeper);
+    }
+    diagnostic.clear();
+    return true;
+}
+
+bool PresentableTinyRtScene::PrepareThirdActorVertexLifetime(
+    const RtSceneFrameInputs& frame, bool (*retireReferences)(void*, std::string&),
+    void* user, std::string& diagnostic, RtSceneRecordObservation* observation)
+{
+    struct Owner {
+        PresentableTinyRtScene* scene;
+        bool (*proof)(void*, std::string&);
+        void* proofUser;
+        RtSceneRecordObservation* observation;
+    } owner{this, retireReferences, user, observation};
+    const ThirdActorVertexLifetimeApi api{&owner,
+        [](void* opaque, std::string& error) {
+            auto& o = *static_cast<Owner*>(opaque);
+            if (!o.proof) { error = "No completed graphics-work proof supplied."; return false; }
+            return o.proof(o.proofUser, error);
+        },
+        [](void* opaque, Buffer& out, std::string& error) {
+            auto& o = *static_cast<Owner*>(opaque);
+            auto& scene = *o.scene;
+            const auto& vertices = scene.characterSlot_.LichVertices();
+            const auto size = VkDeviceSize(vertices.size()) * sizeof(horde::scene::TexturedSkinnedRtVertex);
+            if (!scene.CreateBuffer(size,
+                    VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR |
+                        VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                    VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                    true, out, error) ||
+                !scene.gpuResources_.MapBufferForHostWrites(out, error)) return false;
+            return scene.WriteBuffer(out, vertices.data(), size, "restored Keeper vertex", error, o.observation);
+        },
+        [](void* opaque, const VkDescriptorBufferInfo& info) noexcept {
+            auto& scene = *static_cast<Owner*>(opaque)->scene;
+            VkWriteDescriptorSet write{VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET};
+            write.dstSet = scene.pipelineBundle_.descriptorSet;
+            write.dstBinding = 7u; write.descriptorCount = 1u;
+            write.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+            write.pBufferInfo = &info;
+            vkUpdateDescriptorSets(scene.device_, 1u, &write, 0u, nullptr);
+        },
+        [](void* opaque, Buffer& buffer) noexcept {
+            static_cast<Owner*>(opaque)->scene->DestroyBuffer(buffer);
+        }};
+    return PrepareThirdActorVertexLifetimeWithApi(frame, api, diagnostic);
+}
+
 void PresentableTinyRtScene::NotifyFrameSubmitted() noexcept
 {
     characterSlot_.NotifyFrameSubmitted();
     thirdActorNeedsBuild_ = chapterActorNeedsRefit_ = false;
     if (!tlasPendingDefinitionsValid_) return;
+    thirdActorSubmittedCompanion_ = thirdActorIsCompanion_;
     tlasBuiltInstances_ = tlasPendingInstances_;
     tlasInstanceDefinitionsValid_ = true;
     tlasPendingDefinitionsValid_ = false;

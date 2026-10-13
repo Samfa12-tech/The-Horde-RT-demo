@@ -4351,6 +4351,30 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
         {
             (void)context.rtFrameEvidence.BeginRecord(frameInputs.tickIndex);
         }
+        // The sole graphics fence completed above. This command has not bound
+        // scene descriptors yet; discard other completed recorded references.
+        struct ActorRetirementOwner { SwapchainContext* context; std::uint32_t image; };
+        ActorRetirementOwner actorOwner{&context, imageIndex};
+        if (!context.rtScene.PrepareThirdActorVertexLifetime(frameInputs,
+                [](void* user, std::string& error) {
+                    auto& owner = *static_cast<ActorRetirementOwner*>(user);
+                    auto& ctx = *owner.context;
+                    if (kMaxFramesInFlight != 1u ||
+                        !gSurfaceSessions.IsCurrent(ctx.surfaceGeneration)) {
+                        error = "Character retirement requires the current completed graphics owner.";
+                        return false;
+                    }
+                    for (std::size_t i = 0; i < ctx.commandBuffers.size(); ++i)
+                        if (i != owner.image && vkResetCommandBuffer(ctx.commandBuffers[i], 0u) != VK_SUCCESS) {
+                            error = "Prior character command references could not be reset.";
+                            return false;
+                        }
+                    return true;
+                }, &actorOwner, diagnostic, evidenceFrame ? &observation : nullptr)) {
+            if (evidenceFrame) context.rtFrameEvidence.FailRecord(observation);
+            __android_log_print(ANDROID_LOG_ERROR, kTag, "%s", diagnostic.c_str());
+            return false;
+        }
         gpuTimingRecording = evidenceFrame && context.gpuFrameTimingEnabled &&
             context.gpuFrameTimer.RecordBegin(context.commandBuffers[imageIndex], context.currentFrame);
         context.rtScene.SetMistEnabled(context.graphicsSettings.mistEnabled);

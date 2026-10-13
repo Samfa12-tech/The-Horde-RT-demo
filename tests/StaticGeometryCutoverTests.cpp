@@ -103,8 +103,156 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
         };
         return api;
     }
+    static int KeeperVertexLifetimeChecks() {
+        int failures=0; std::string error;
+        struct Calls {
+            Scene* scene=nullptr;
+            unsigned proof=0, prepare=0, bind=0, destroy=0;
+            bool proofOk=true, prepareOk=true, stale=false, incomplete=false, proofThrows=false, prepareThrows=false;
+            VkBuffer bound=VK_NULL_HANDLE;
+            bool retirementOrdered=true;
+        };
+        const auto frame=[] {
+            RtSceneFrameInputs f{};
+            f.developmentRescueJourney=true;
+            f.lich.phase=horde::gameplay::LichPhase::Dead;
+            f.lich.deathAnimationComplete=true;f.lich.deathDissolveProgress=1.f;
+            f.chapterCompanion.grounded=true;f.chapterCompanion.generation=17;
+            return f;
+        }();
+        const auto seed=[](Scene& s) {
+            s.ready_=true;s.chapterActorReady_=true;s.staticGeometryGeneration_=41;
+            s.thirdActorIsCompanion_=s.thirdActorSubmittedCompanion_=true;
+            s.chapterActorPoseGeneration_=17;
+            s.staticVertexBuffer_=Buffer(1);
+            s.pipelineBundle_.descriptorSet=Handle<VkDescriptorSet>(19);
+            s.characterSlot_.LichGpu().vertices=Buffer(2);
+            s.characterSlot_.LichGpu().vertices.mappedWriteData=reinterpret_cast<void*>(1);
+            s.characterSlot_.LichGpu().vertices.memoryPropertyFlags=
+                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT|VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+            s.characterSlot_.LichGpu().accelerationStructure=As(3);
+            s.characterSlot_.LichGpu().updateScratch=Buffer(4);
+        };
+        const auto api=[](Calls& c) {
+            Scene::ThirdActorVertexLifetimeApi a{};a.user=&c;
+            a.retireReferences=[](void* u,std::string& error) {
+                auto& c=*static_cast<Calls*>(u);++c.proof;
+                if(c.proofThrows)throw std::runtime_error("Injected proof exception");
+                if(c.stale)++c.scene->staticGeometryGeneration_;
+                if(!c.proofOk)error="Injected unproved GPU completion";
+                return c.proofOk;
+            };
+            a.prepareKeeper=[](void* u,Scene::Buffer& b,std::string& error) {
+                auto& c=*static_cast<Calls*>(u);++c.prepare;
+                b=Buffer(7);b.mappedWriteData=reinterpret_cast<void*>(1);
+                if(c.prepareThrows)throw std::runtime_error("Injected prepare exception");
+                if(c.incomplete)b.address=0;
+                if(!c.prepareOk)error="Injected allocation/map/upload failure";
+                return c.prepareOk;
+            };
+            a.bindVertices=[](void* u,const VkDescriptorBufferInfo& info) noexcept {
+                auto& c=*static_cast<Calls*>(u);++c.bind;c.bound=info.buffer;
+                c.retirementOrdered &= c.proof==1 && info.offset==0 && info.range>0 && c.destroy==0;
+            };
+            a.destroyVertices=[](void* u,Scene::Buffer& b) noexcept {
+                auto& c=*static_cast<Calls*>(u);++c.destroy;
+                if(b.buffer==Handle<VkBuffer>(2))
+                    c.retirementOrdered &= c.bound==Handle<VkBuffer>(1) && c.proof==1;
+                b={};
+            };
+            return a;
+        };
+        {
+            Scene s;seed(s);Calls c{&s};auto a=api(c);
+            const auto before=s.ResourceInventory();
+            failures+=!Check(s.PrepareThirdActorVertexLifetimeWithApi(frame,a,error) &&
+                s.characterSlot_.LichGpu().vertices.Empty() && c.retirementOrdered &&
+                c.proof==1 && c.bind==1 && c.destroy==1 && c.prepare==0,
+                "completed Kit adoption rebinds retained storage before retiring exactly one Keeper buffer");
+            const auto after=s.ResourceInventory();
+            failures+=!Check(after.bufferCount+1==before.bufferCount &&
+                after.memoryAllocationCount+1==before.memoryAllocationCount &&
+                after.hostVisibleBytes+256==before.hostVisibleBytes &&
+                after.bottomLevelAccelerationStructureCount==before.bottomLevelAccelerationStructureCount &&
+                s.KeeperVertexLifetime().retiredAllocationBytes==256 &&
+                s.KeeperVertexLifetime().retirementCount==1 &&
+                s.characterSlot_.LichGpu().accelerationStructure.handle==Handle<VkAccelerationStructureKHR>(3) &&
+                s.characterSlot_.LichGpu().updateScratch.buffer==Handle<VkBuffer>(4),
+                "inventory saving is exact and shared third BLAS/scratch remain unchanged");
+            failures+=!Check(s.PrepareThirdActorVertexLifetimeWithApi(frame,a,error) &&
+                c.proof==1 && c.destroy==1,
+                "repeated Kit frames never retire twice");
+            auto back=frame;back.chapterCompanion.grounded=false;
+            c={&s};a=api(c);
+            failures+=!Check(s.PrepareThirdActorVertexLifetimeWithApi(back,a,error) &&
+                s.characterSlot_.LichGpu().vertices.buffer==Handle<VkBuffer>(7) &&
+                c.prepare==1 && c.proof==1 && c.bind==1 && c.destroy==0 &&
+                !s.KeeperVertexLifetime().retired && s.KeeperVertexLifetime().restorationCount==1 &&
+                s.thirdActorIsCompanion_,
+                "grounded loss prepares valid Keeper storage without publishing a partial actor switch");
+            s.thirdActorIsCompanion_=false;s.thirdActorSubmittedCompanion_=false;
+            c={&s};a=api(c);
+            failures+=!Check(s.PrepareThirdActorVertexLifetimeWithApi(back,a,error) &&
+                c.proof==0 && c.bind==0 && c.prepare==0,
+                "ordinary Keeper frames perform no allocation or retirement");
+        }
+        for(int edge=0;edge<7;++edge) {
+            Scene s;seed(s);Calls c{&s};auto a=api(c);
+            if(edge==0)c.proofOk=false;
+            if(edge==1)c.stale=true;
+            if(edge==2)s.thirdActorSubmittedCompanion_=false;
+            if(edge==3)s.thirdActorNeedsBuild_=true;
+            if(edge==4)s.chapterActorPoseGeneration_=18;
+            if(edge==5)a.retireReferences=nullptr;
+            if(edge==6)c.proofThrows=true;
+            const bool noTransition=edge>=2 && edge<=4;
+            failures+=!Check(s.PrepareThirdActorVertexLifetimeWithApi(frame,a,error)==noTransition &&
+                !s.characterSlot_.LichGpu().vertices.Empty() && c.bind==0 && c.destroy==0,
+                "unsubmitted, stale or unproved adoption retains the Keeper allocation");
+        }
+        for(int edge=0;edge<7;++edge) {
+            Scene s;seed(s);s.characterSlot_.LichGpu().vertices={};
+            auto back=frame;back.developmentRescueJourney=false;
+            Calls c{&s};auto a=api(c);
+            if(edge==0)c.prepareOk=false;
+            if(edge==1)c.incomplete=true;
+            if(edge==2)c.proofOk=false;
+            if(edge==3)c.stale=true;
+            if(edge==4)a.prepareKeeper=nullptr;
+            if(edge==5)c.prepareThrows=true;
+            if(edge==6)c.proofThrows=true;
+            failures+=!Check(!s.PrepareThirdActorVertexLifetimeWithApi(back,a,error) &&
+                s.characterSlot_.LichGpu().vertices.Empty() && s.thirdActorIsCompanion_ &&
+                c.bind==0 && c.destroy==(edge==4?0u:1u),
+                "failed/reset restore retains Kit owner and destroys only the unsubmitted candidate");
+            c={&s};a=api(c);
+            failures+=!Check(s.PrepareThirdActorVertexLifetimeWithApi(back,a,error) &&
+                s.characterSlot_.LichGpu().vertices.buffer==Handle<VkBuffer>(7) &&
+                c.bind==1 && c.destroy==0,
+                "failed Keeper storage preparation remains retryable");
+        }
+        {
+            Scene s;seed(s);Calls c{&s};auto a=api(c);
+            failures+=!Check(s.PrepareThirdActorVertexLifetimeWithApi(frame,a,error),
+                "retired actor owner may move only after completed-work retirement");
+            Scene moved(std::move(s));c={&moved};a=api(c);
+            auto back=frame;back.chapterCompanion.grounded=false;
+            failures+=!Check(moved.KeeperVertexLifetime().retired &&
+                !s.KeeperVertexLifetime().retired && s.KeeperVertexLifetime().retirementCount==0 &&
+                moved.PrepareThirdActorVertexLifetimeWithApi(back,a,error) &&
+                moved.KeeperVertexLifetime().restorationCount==1,
+                "move transfers retirement state and reset restores only the new owner");
+            moved.Destroy();
+            failures+=!Check(!moved.KeeperVertexLifetime().retired &&
+                moved.KeeperVertexLifetime().retirementCount==0,
+                "reconstruction resets actor lifetime evidence without stale ownership");
+        }
+        std::cout << "Keeper vertex lifetime checks: " << (failures?"FAIL":"PASS") << '\n';
+        return failures;
+    }
     static int Run() {
         int failures=0,oldMap=3,newMap=4; std::string error;
+        failures+=KeeperVertexLifetimeChecks();
         {
             Scene s;Seed(s,oldMap,newMap);Proof p{&s};auto api=Api(p);
             s.developmentWorldRoute_=true;s.worldRouteGeometry_.valid=true;

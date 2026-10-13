@@ -114,6 +114,13 @@ public:
     CharacterBlasRefit PendingRefit() const { return pendingRefit_; }
     // Called only after the owning frame was successfully submitted.
     void NotifyFrameSubmitted() noexcept { pendingRefit_ = CharacterBlasRefit::None; }
+    // A recreated upload owner must receive the requested skin even when its
+    // clip/time matches the cached CPU pose.
+    void InvalidateLichPose() noexcept {
+        lastLichUpdateTime_ = lastLichStaffLiftRadians_ = lastLichStaffCastRadians_ =
+            lastLichDissolveProgress_ = -1.0f;
+        lastLichClip_ = -1;
+    }
 
     RtUpdatableTriangleBlas& SkeletonGpu(std::size_t bucket = 0u) { return skeletonGpus_.at(bucket); }
     const RtUpdatableTriangleBlas& SkeletonGpu(std::size_t bucket = 0u) const { return skeletonGpus_.at(bucket); }

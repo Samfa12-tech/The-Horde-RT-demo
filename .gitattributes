@@ -397,3 +397,5 @@ docs/evidence/2026-10-13-moving-chapter-roundtrip/** -text whitespace=-trailing-
 # Sealed native diagnostic evidence keeps the exact captured/logged bytes.
 docs/evidence/2026-10-13-terrain-light-attribution/** -text whitespace=cr-at-eol
 docs/evidence/2026-10-13-terrain-light-attribution/**/*.log whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+docs/evidence/2026-10-14-keeper-vertex-lifetime/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-14-keeper-vertex-lifetime/**/*.log whitespace=-trailing-space,-blank-at-eof,cr-at-eol

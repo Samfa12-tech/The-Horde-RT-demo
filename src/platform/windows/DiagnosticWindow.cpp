@@ -6336,6 +6336,30 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         {
             (void)ctx.rtFrameEvidence.BeginRecord(frameInputs.tickIndex);
         }
+        // This owner waited its sole graphics fence above. No scene descriptor
+        // has been bound in the current recording; reset every older recording
+        // before a binding change can invalidate its references.
+        struct ActorRetirementOwner { VulkanSurfaceContext* context; std::uint32_t image; };
+        ActorRetirementOwner actorOwner{&ctx, imageIndex};
+        if (!ctx.rtScene.PrepareThirdActorVertexLifetime(frameInputs,
+                [](void* user, std::string& error) {
+                    auto& owner = *static_cast<ActorRetirementOwner*>(user);
+                    auto& context = *owner.context;
+                    if (context.inFlightFences.size() != 1u) {
+                        error = "Character retirement requires the single completed graphics owner.";
+                        return false;
+                    }
+                    for (std::size_t i = 0; i < context.commandBuffers.size(); ++i)
+                        if (i != owner.image && vkResetCommandBuffer(context.commandBuffers[i], 0u) != VK_SUCCESS) {
+                            error = "Prior character command references could not be reset.";
+                            return false;
+                        }
+                    return true;
+                }, &actorOwner, diagnostic, evidenceFrame ? &observation : nullptr)) {
+            ctx.lastRtFrameError = diagnostic;
+            if (evidenceFrame) ctx.rtFrameEvidence.FailRecord(observation);
+            return false;
+        }
         gpuTimingRecording = evidenceFrame && ctx.gpuFrameTimer.RecordBegin(
             ctx.commandBuffers[imageIndex], ctx.currentFrame);
 #if defined(_DEBUG)

@@ -1,0 +1,18 @@
+{
+  "pipeline": {
+    "resetUploadBytes": 5520112,
+    "previousUnaccountedResetUploadBytes": 4197040,
+    "addedRestoredUploadBytes": 1323072,
+    "resetWholeFrameCycleCpuMs": 32.7858,
+    "resetDynamicUploadCpuMs": 0.4451,
+    "performanceAcceptance": false
+  },
+  "query": {
+    "resetUploadBytes": 5520112,
+    "previousUnaccountedResetUploadBytes": 4197040,
+    "addedRestoredUploadBytes": 1323072,
+    "resetWholeFrameCycleCpuMs": 32.5873,
+    "resetDynamicUploadCpuMs": 0.4625,
+    "performanceAcceptance": false
+  }
+}

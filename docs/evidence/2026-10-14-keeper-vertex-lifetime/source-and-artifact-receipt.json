@@ -1,0 +1,44 @@
+{
+  "scope": "Pre-commit local builds: base commit plus exact changed-source bytes, not a post-commit rebuild",
+  "baseCommit": "8f048cf5899ff4cc585159e974ec0777e3948d10",
+  "sources": {
+    "src/vulkan/raytracing/PresentableTinyRtScene.h": "595cd8f2a79a046906058987971edd859b2d3dd251bf8771fa9b876e8175563e",
+    "src/vulkan/raytracing/PresentableTinyRtScene.cpp": "593157380f6019c0525f503cc3609356dfe548de7031783d060989f5ce8a52bc",
+    "src/vulkan/raytracing/CharacterRenderSlot.h": "40ce4cf719edf02241294c73aec6f9750c356ef5bc2016d33cbab1e719a538a9",
+    "src/platform/windows/DiagnosticWindow.cpp": "b71a5ca1f884771107e3b75f7d3466e061fd55f6e79e22af1609caf2f549f5c6",
+    "src/platform/windows/WindowsChapterRoundTripCapture.inl": "8e8ae0f6e2d03a39cec65cac9bfd7245f06457ac872e1e9af929f8321c0451a2",
+    "android/app/src/main/cpp/android_probe_bridge.cpp": "e56eebc2bcc77e576785d1a37f37c7a2c5ff2808b8f162f37cbf8d5adcef5dd0",
+    "tests/StaticGeometryCutoverTests.cpp": "2296868cf3728b6e25e927124b5c986a95de71b07d702009047dceff5f2955c4",
+    "tests/CharacterRenderSlotSmoke.cpp": "4a0dab61274f7b68779bb685efa7823d30b8003ff4c24ae3309049e487452815",
+    "tools/capture-chapter-roundtrip.ps1": "c149d2d41f4f05b55439c54b1e51f34076ea2cf0af1250d02f25332547b3d3c4"
+  },
+  "artifacts": [
+    {
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+      "sha256": "30af7fa4ec92e886d4f0d902d05200b441e30e391367023c0dbbc79e01e19544",
+      "bytes": 13084672
+    },
+    {
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+      "sha256": "c24b7ed3888ac4e9e5337e10034efb9c67274b68487870b18bae716ecddbb886",
+      "bytes": 4458496
+    },
+    {
+      "path": "reports/phone-candidate-f9d01fc4f53c/horde-debug.apk",
+      "sha256": "f9d01fc4f53ca75719fbfca9cc82d3afcfaee5e1a2992e9bd41b4c52671370a2",
+      "bytes": 183145434
+    }
+  ],
+  "phoneInstalled": false,
+  "versionCode": 10,
+  "developmentCertificateSha256": "2bc406088b23ac80f2a00a40e2d5d8daa012844dc62f31ad6145d129f5566736",
+  "apkChangedEntriesVs1b508d6ae48d": {
+    "lib/arm64-v8a/libhorde_rt_probe_android.so": "7851cd4b18e7f7bd98152d48e5d0ae02b9120baf8d75c9a391fe5c4c623c588b",
+    "lib/armeabi-v7a/libhorde_rt_probe_android.so": "95c5a00aa16ed70f8fde736266becb7be87734810a2f908f0ef7865352070e4e",
+    "lib/x86/libhorde_rt_probe_android.so": "ed8ba9bc597c7d06f27e1a3c9aa88f53f40506682955d27a5f86951fdc7bef41",
+    "lib/x86_64/libhorde_rt_probe_android.so": "44169cd80203f02af657f272cd2f2f2d79974915eb34945dda267cb9be7ef54c"
+  },
+  "normalPlayDeviceLocalResidencySavingBytes": 0,
+  "retiredKeeperHostVisibleBytes": 1323264,
+  "staticRegionStreamingComplete": false
+}

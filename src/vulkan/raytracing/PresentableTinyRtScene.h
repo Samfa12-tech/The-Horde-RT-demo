@@ -682,6 +682,23 @@ public:
     // the UPDATE baseline merely because a BUILD was recorded.
     void NotifyFrameSubmitted() noexcept;
 
+    // Before this frame binds any scene descriptor. The callback must prove
+    // the preceding graphics submission complete and reset all older recorded
+    // references; it must preserve this frame's unbound recording, if begun.
+    // Only the Keeper vertex allocation changes. Shared AS/textures stay owned.
+    bool PrepareThirdActorVertexLifetime(const RtSceneFrameInputs& frame,
+        bool (*retireReferences)(void*, std::string&), void* user,
+        std::string& diagnostic, RtSceneRecordObservation* observation = nullptr);
+    struct KeeperVertexLifetimeEvidence {
+        std::uint32_t retirementCount = 0u, restorationCount = 0u;
+        std::uint64_t retiredAllocationBytes = 0u;
+        VkMemoryPropertyFlags retiredMemoryFlags = 0u;
+        bool retired = false;
+    };
+    KeeperVertexLifetimeEvidence KeeperVertexLifetime() const noexcept {
+        return keeperVertexLifetime_;
+    }
+
     // Owning render thread only, after successful device-idle/evidence completion.
     // Replaces only the extent-dependent output image; caller must reset and
     // re-record command buffers invalidated by the descriptor update.
@@ -711,6 +728,16 @@ private:
 
     using Buffer = RtGpuBuffer;
     using AccelerationStructure = RtAccelerationStructure;
+    struct ThirdActorVertexLifetimeApi {
+        void* user = nullptr;
+        bool (*retireReferences)(void*, std::string&) = nullptr;
+        bool (*prepareKeeper)(void*, Buffer&, std::string&) = nullptr;
+        void (*bindVertices)(void*, const VkDescriptorBufferInfo&) noexcept = nullptr;
+        void (*destroyVertices)(void*, Buffer&) noexcept = nullptr;
+    };
+    bool WantsChapterCompanion(const RtSceneFrameInputs&) const noexcept;
+    bool PrepareThirdActorVertexLifetimeWithApi(const RtSceneFrameInputs&,
+        const ThirdActorVertexLifetimeApi&, std::string&);
 
     struct PreparedStaticGeometry {
         enum class Phase { Copy, Upload, Collapse, CollapseWait, Tlas, TlasWait, Ready };
@@ -1062,6 +1089,8 @@ private:
     horde::scene::assets::SkinnedPbrActor chapterActor_;
     bool chapterActorReady_ = false;
     bool thirdActorIsCompanion_ = false;
+    bool thirdActorSubmittedCompanion_ = false;
+    KeeperVertexLifetimeEvidence keeperVertexLifetime_{};
     bool thirdActorNeedsBuild_ = false;
     bool chapterActorNeedsRefit_ = false;
     std::uint64_t chapterActorPoseGeneration_ = UINT64_MAX;

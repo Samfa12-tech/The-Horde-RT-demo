@@ -1,0 +1,265 @@
+{
+  "scope": "Exact evidence bytes; excludes this hash receipt",
+  "files": [
+    {
+      "path": "checks/keeper-vertex-accounted-apk-inventory.log",
+      "sha256": "6567fb23239b71777fe6b7debfbcb0077ab0df3cc5761c33ebfe80a827e8dcf0",
+      "bytes": 183
+    },
+    {
+      "path": "checks/keeper-vertex-accounted-apk-signature.log",
+      "sha256": "ccabc0788f8c2f0fca0620b6e4b1533bf6da1ade565222ecc603dbe6e2ce546f",
+      "bytes": 311
+    },
+    {
+      "path": "checks/keeper-vertex-accounted-held-package.log",
+      "sha256": "e2cfb119097e04a192d24db6918144619af82ad8a5561156d4dec735e0b91fd4",
+      "bytes": 88
+    },
+    {
+      "path": "checks/keeper-vertex-android-accounted-build.log",
+      "sha256": "f4156b23fce19780b28a26e3cbe5a3ebac89f2911df97a8eb3e3b20594105e3b",
+      "bytes": 2856
+    },
+    {
+      "path": "checks/keeper-vertex-debug-accounted-build.log",
+      "sha256": "31d23f904bcf16494bb0e4b80dd2f4e99437c328161bd40793da13c177d0d3e6",
+      "bytes": 4719
+    },
+    {
+      "path": "checks/keeper-vertex-debug-accounted-ctest.log",
+      "sha256": "027182ff4b1ac1df9e52196f4caad7802d6e9344f3ab79637859a1b53c9bf8ac",
+      "bytes": 768
+    },
+    {
+      "path": "checks/keeper-vertex-debug-final-build.log",
+      "sha256": "daeaf6f67dc0fa0bfe84bba329e2bf87a0ca51262f2f5c5fc6afd77e79fb411f",
+      "bytes": 17630
+    },
+    {
+      "path": "checks/keeper-vertex-debug-final-ctest.log",
+      "sha256": "a36a361929b5db238f5c51a268ece6f153dea27949dc1a1158829887e676ef96",
+      "bytes": 1354
+    },
+    {
+      "path": "checks/keeper-vertex-debug-full-last-test.log",
+      "sha256": "363e23361af932188ba0db01cd24e2b1565185d29a02ce889e8254ae77fa8a79",
+      "bytes": 11339
+    },
+    {
+      "path": "checks/keeper-vertex-image-comparison-r02.json",
+      "sha256": "f517100d7d3eda254fff80275e12ee6995f3a0509794406ba3c4750a82ea756f",
+      "bytes": 16690
+    },
+    {
+      "path": "checks/keeper-vertex-java-fresh.log",
+      "sha256": "f6924daad645039aa15a16a4516b4a7419680c047d165e6c3c10d2505f64b88c",
+      "bytes": 1702
+    },
+    {
+      "path": "checks/keeper-vertex-java-summary.json",
+      "sha256": "eb28f3751471c366c4617e87a12a86d34637adc43d1bfbca0947cad20bafde20",
+      "bytes": 90
+    },
+    {
+      "path": "checks/keeper-vertex-red-build.log",
+      "sha256": "66f92ef83d8a1e3f75035fad0f606b45ea3afc963523f6b0b7e47f72c530cda8",
+      "bytes": 1016
+    },
+    {
+      "path": "checks/keeper-vertex-red-ctest.log",
+      "sha256": "66b5419e2f4e8efae39bd5c1009380764504784abe7f346135d67b2d7a1e0e16",
+      "bytes": 1769
+    },
+    {
+      "path": "checks/keeper-vertex-release-accounted-build.log",
+      "sha256": "5d41b43f8957ee8aa5a9ca91993922082fb44acf7eadee8b7ffe5530c47d20bd",
+      "bytes": 21655
+    },
+    {
+      "path": "checks/keeper-vertex-release-ctest.log",
+      "sha256": "a40b6604dfba3bd65712507cac7a87d6378228b31007182058f060af6901a885",
+      "bytes": 1356
+    },
+    {
+      "path": "checks/keeper-vertex-reset-stages.json",
+      "sha256": "bc916584984c8408d452893e38e842ef650d6a60215b7631e96c3f6e59e16a70",
+      "bytes": 857
+    },
+    {
+      "path": "native/pipeline/capture-manifest.json",
+      "sha256": "73bafd92aedd5e91780e7dee7f49767e9476c30e3e53aa262d9a1fd83c58283c",
+      "bytes": 10648
+    },
+    {
+      "path": "native/pipeline/contact-1.jpg",
+      "sha256": "2aea5a5cc0db63e56eaf50bcfeb1a46671abdfc2f6f4454596778a3cbd789a1f",
+      "bytes": 274143
+    },
+    {
+      "path": "native/pipeline/contact-2.jpg",
+      "sha256": "6dce622112e434cfa7ccfc94ced3100a07f076ae775e65bcd6f8de248efc5bf9",
+      "bytes": 291705
+    },
+    {
+      "path": "native/pipeline/contact-3.jpg",
+      "sha256": "c52f2e6aeb25026a620222df2fef8e73acea187206bc1955803ad54910a0cb7d",
+      "bytes": 217702
+    },
+    {
+      "path": "native/pipeline/contact-4.jpg",
+      "sha256": "deb54983520192d694b94bb0b8c73ed61cb10de45f540414b039cd7dad6512a6",
+      "bytes": 100888
+    },
+    {
+      "path": "native/pipeline/frames.csv",
+      "sha256": "972fe8d1deb558bdbe646b2ba01885ae5c81e453b9dde30e0c0f3074a07d4aff",
+      "bytes": 106078
+    },
+    {
+      "path": "native/pipeline/gallery.json",
+      "sha256": "ad7c4eb46a57b1202227f32107d29be2f14beb415360b5e0dffe78bc2d4425c3",
+      "bytes": 100363
+    },
+    {
+      "path": "native/pipeline/launch.candidate.json",
+      "sha256": "2e6725ee8f4c8d570362b0afaf80bae362850de5aae30631086239c39fec96d7",
+      "bytes": 766
+    },
+    {
+      "path": "native/pipeline/launch.stderr.log",
+      "sha256": "a60eb0b2dce2ce256cb57f52e6c2cc78fc8e09dabfe5c9cfbddbfb6765a48175",
+      "bytes": 410
+    },
+    {
+      "path": "native/pipeline/launch.stdout.log",
+      "sha256": "5ed174abe5f88a28096d4cf321b7188d7ab282163142f7a63b0cb48ed0b3d93e",
+      "bytes": 2833
+    },
+    {
+      "path": "native/pipeline/selected/1-initial-reunion.png",
+      "sha256": "4c5a51853a8c7c856d57d562fcbde377a0c3a9b22fc2ab0267477ccb46fb99b0",
+      "bytes": 809231
+    },
+    {
+      "path": "native/pipeline/selected/11-outbound-7.png",
+      "sha256": "6770e50330530e72a0f4f637d23b52bcf596cfe0f4c7d5f280f678df43403f3f",
+      "bytes": 852673
+    },
+    {
+      "path": "native/pipeline/selected/21-descent-2.png",
+      "sha256": "07e15aecdd907e88afa4ca8eac4ef914f3b2cf0ca820dce7915dd79f2c7018af",
+      "bytes": 463966
+    },
+    {
+      "path": "native/pipeline/selected/26-repeat-ascent-2.png",
+      "sha256": "d785a7ef6d01dadce5a3b18708c63bdda2f9fb638349104d352fc49a0f35cc33",
+      "bytes": 789340
+    },
+    {
+      "path": "native/pipeline/selected/27-reset-opening.png",
+      "sha256": "edd44d398fd2e2d2c9dded3e5d30a5817591072f71bc6285b0c78d6605e40388",
+      "bytes": 765169
+    },
+    {
+      "path": "native/pipeline/selected/6-kit-walking.png",
+      "sha256": "0ac8e01d9ba683adc095694d70c3dd29bda456eff23ce9afcec6e5353a49018b",
+      "bytes": 794788
+    },
+    {
+      "path": "native/query/capture-manifest.json",
+      "sha256": "12703e1432b7be2f4caa04a3cab6ea877ece67187173aed5c05f9d2d00b41d2a",
+      "bytes": 10744
+    },
+    {
+      "path": "native/query/contact-1.jpg",
+      "sha256": "5f9455cccdbdbe1bd4ca9dad1ffb935bf58629d80946b2d5aa4cb5fe3710431b",
+      "bytes": 272874
+    },
+    {
+      "path": "native/query/contact-2.jpg",
+      "sha256": "5405965a6ccecf4ac9ee70c44dd8131e81bf52633837cce3cccbd5af212ffcc9",
+      "bytes": 290635
+    },
+    {
+      "path": "native/query/contact-3.jpg",
+      "sha256": "47ce01df5da65cefd4c1d19eeb7e7bc364801de2efcedbb4c3e385515c56a1dd",
+      "bytes": 216815
+    },
+    {
+      "path": "native/query/contact-4.jpg",
+      "sha256": "e8b5dfa2144704fb01008400f23fde787a0004950e25039e01d0eb739079176e",
+      "bytes": 100467
+    },
+    {
+      "path": "native/query/frames.csv",
+      "sha256": "c6ae0846c0640c1927e58db894430a88b2f28561815652b1facb346e5b7f4170",
+      "bytes": 106000
+    },
+    {
+      "path": "native/query/gallery.json",
+      "sha256": "2fa92fecf50a4ee0b6cec490054638479f7e5b875d9e090117d32493cc0b0370",
+      "bytes": 102111
+    },
+    {
+      "path": "native/query/launch.candidate.json",
+      "sha256": "7c804c02a4e3b000ab3a696d643bee5596693fbc4080b3e06eb4e02a3f81d5d9",
+      "bytes": 763
+    },
+    {
+      "path": "native/query/launch.stderr.log",
+      "sha256": "a60eb0b2dce2ce256cb57f52e6c2cc78fc8e09dabfe5c9cfbddbfb6765a48175",
+      "bytes": 410
+    },
+    {
+      "path": "native/query/launch.stdout.log",
+      "sha256": "c6b6e56365fd7c11b90fde03651f9ad78cce73c2a02c0187137f6fa7c41cc43f",
+      "bytes": 2827
+    },
+    {
+      "path": "native/query/selected/1-initial-reunion.png",
+      "sha256": "3da46201d23910cd6d3d86df5e99436fc509e2ceae54a305c4c6bc63ec644590",
+      "bytes": 809230
+    },
+    {
+      "path": "native/query/selected/11-outbound-7.png",
+      "sha256": "8f1d3f59393932d684ca42aa24b789288e1c4f2070c4a031e9176cd3415efa60",
+      "bytes": 852691
+    },
+    {
+      "path": "native/query/selected/21-descent-2.png",
+      "sha256": "eb72607dbd41f20329679f55ac457454f5947cbef451e238fa04a5765edbb18e",
+      "bytes": 463927
+    },
+    {
+      "path": "native/query/selected/26-repeat-ascent-2.png",
+      "sha256": "4ea153b9de64c98ad528839c82298ac730a377cf6f576995c3a1390e19220780",
+      "bytes": 789308
+    },
+    {
+      "path": "native/query/selected/27-reset-opening.png",
+      "sha256": "1979083693c54e240b2dd14e83263ba7f4ef46df46b8c66ec14e4df0c9b0c880",
+      "bytes": 765153
+    },
+    {
+      "path": "native/query/selected/6-kit-walking.png",
+      "sha256": "1e53c767fe0ddeb7fc33681db0ff4f6fab06d7854c5b211917c0c266a0fe3cbf",
+      "bytes": 794736
+    },
+    {
+      "path": "README.md",
+      "sha256": "3bb93b7e30da5f83b894d901404e16f9c91a905ba08f41c9352b2cbd58e025ec",
+      "bytes": 5972
+    },
+    {
+      "path": "restored-upload-accounting.json",
+      "sha256": "8e8006a347b529464332cc6454ec57a215a8330deb71eedc3d9ebc38131e2534",
+      "bytes": 544
+    },
+    {
+      "path": "source-and-artifact-receipt.json",
+      "sha256": "722682ffae4a8111e2740947ce3b1311166636380bdaddb74a2ca049f4e0ff58",
+      "bytes": 2707
+    }
+  ]
+}

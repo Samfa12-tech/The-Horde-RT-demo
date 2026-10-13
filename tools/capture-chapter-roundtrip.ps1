@@ -18,7 +18,7 @@ foreach($source in @('src/platform/windows/DiagnosticWindow.cpp','src/platform/w
  'src/gameplay/validation/ChapterRoundTripProbe.h')){
  $sourceHashes[$source]=(Get-FileHash -LiteralPath (Join-Path $root $source) -Algorithm SHA256).Hash.ToLowerInvariant()
 }
-@{scope='Debug Diagnostic resident scripted route; not Shipping or owner acceptance';
+@{scope='Debug Diagnostic static-resident scripted route with normal Keeper vertex retirement/reset restore; not Shipping or owner acceptance';
  executableSha256=(Get-FileHash -LiteralPath $start.FileName -Algorithm SHA256).Hash.ToLowerInvariant();
  sources=$sourceHashes;backend=if($Query){'RayQueryCompute'}else{'RayTracingPipeline'};
  maximumSimulationTicksPerRender=4;simulationHz=60;deadlineSeconds=180
