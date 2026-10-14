@@ -7520,6 +7520,12 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         const auto claimedRewardPixelPolicy =
             horde::platform::windows::ClaimedRewardCapturePolicy(checkpoint.name,
                 horde::platform::windows::IsCaptureSwordFullyStowed(simulation.heldItems[1]), &simulation);
+        const bool claimedTorchOwnershipValid =
+            horde::platform::windows::ClaimedTorchPrimaryOwnershipValid(
+                record.primaryTorchPixels, record.instanceMasks[1],
+                record.instanceMasks[horde::vulkan::raytracing::PresentableTinyRtScene::kPlayerTorchInstanceIndex],
+                record.instanceMasks[horde::vulkan::raytracing::PresentableTinyRtScene::kKeeperTorchFirstTlasInstance],
+                record.instanceMasks[horde::vulkan::raytracing::PresentableTinyRtScene::kKeeperTorchFirstTlasInstance+1u]);
         const bool diagnosticPixelCountersAvailable =
             context.rtScene.DiagnosticsAvailability() ==
             horde::vulkan::raytracing::RtDiagnosticAvailability::Available;
@@ -7651,11 +7657,11 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
              record.instanceMasks[12] != 0x04u ||
              record.instanceMasks[13] != 0x04u)) ||
              !record.playerPrimaryVisible ||
+             !claimedTorchOwnershipValid ||
              record.instanceMasks[7] != 0x01u ||
              record.instanceMasks[8] != 0x01u ||
              (diagnosticPixelCountersAvailable &&
-              (record.primaryTorchPixels != 0u ||
-               (claimedRewardPixelPolicy.requirePlayerPixels &&
+              ((claimedRewardPixelPolicy.requirePlayerPixels &&
                 record.primaryPlayerPixels == 0u) ||
                (claimedRewardPixelPolicy.requireRewardRingPixels &&
                 record.primaryRewardRingPixels == 0u) ||

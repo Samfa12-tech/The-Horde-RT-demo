@@ -1,4 +1,5 @@
 #include "gameplay/items/HeldItemKinematics.h"
+#include "gameplay/HorizontalEnvelope.h"
 #include "scene/ShowcaseOverheadGeometry.h"
 #include "scene/assets/StaticMeshAsset.h"
 
@@ -6,6 +7,7 @@
 #include <cmath>
 #include <filesystem>
 #include <iostream>
+#include <limits>
 #include <string>
 
 namespace
@@ -260,6 +262,55 @@ void TestSwordBreathingAndCombatBoundaries()
     Check(Distance(EvaluateHeldSwordPose(combat, 0.0f, 0.65f, false, 1.0f).rightHandLocal,
                    idle.rightHandLocal) < 0.00001f, "recovery must return continuously to breathing rest");
 }
+void TestHorizontalEnvelopeUnion()
+{
+    const std::array rooms{RouteRect{-4,0,-2,2},RouteRect{0,4,-1,1}};
+    const auto joined=RectangularUnionCover(rooms);
+    const auto portal=ClosestHorizontalEnvelopeCentre(joined,{0,0},.4f);
+    Check(portal && portal->x==0 && portal->z==0,
+          "a full item envelope crosses a genuine shared-edge portal without a false inset gap");
+    const std::array separated{RouteRect{-4,-2,-2,2},RouteRect{2,4,-2,2}};
+    const auto split=RectangularUnionCover(separated);
+    const auto gap=ClosestHorizontalEnvelopeCentre(split,{0,0},.4f);
+    Check(gap && std::abs(gap->x)>=2.4f,
+          "rectangular cover cannot bridge the empty space between disconnected rooms");
+    const std::array concave{RouteRect{-3,0,-2,2},RouteRect{-1,3,-2,0}};
+    const auto elbow=ClosestHorizontalEnvelopeCentre(RectangularUnionCover(concave),{1,1},.4f);
+    Check(elbow && (elbow->x<=-.4f || elbow->z<=-.4f),
+          "concave room unions retain their real outside corner");
+    const std::array narrow{RouteRect{0,.7f,0,2}};
+    Check(!ClosestHorizontalEnvelopeCentre(RectangularUnionCover(narrow),{.35f,1},.4f),
+          "a room narrower than the whole envelope cannot admit it");
+    const float invalid=std::numeric_limits<float>::quiet_NaN();
+    Check(!ClosestHorizontalEnvelopeCentre(joined,{invalid,0},.4f) &&
+          !ClosestHorizontalEnvelopeCentre(joined,{0,0},invalid) &&
+          !ClosestHorizontalEnvelopeCentre(joined,{0,0},0) &&
+          RectangularUnionCover(std::array{RouteRect{0,invalid,0,1}}).empty(),
+          "nonfinite and zero-sized envelope inputs fail closed");
+
+    const auto actual=RectangularUnionCover(kShowcaseWalkableRects);
+    for (float x : {-28.7f,-28.5f,-28.3f,-30.7f,-30.5f,-30.3f})
+    {
+        const auto p=ClosestHorizontalEnvelopeCentre(actual,{x,-15.2f},kRewardLanternHorizontalOriginEnvelope);
+        Check(p && p->x==x && p->z==-15.2f,
+              "actual passage/chamber joins retain continuous carried-item space");
+    }
+    HeldItemKinematicsInput input;
+    input.cameraX=-34; input.cameraZ=-15.2f;
+    input.cameraYawRadians=-1.57079632679f;
+    input.cameraPitchRadians=-.05f;
+    input.playerMountProfile=PlayerMountProfile::AnatomicalBody;
+    input.interaction.heldLightKind=interactions::HeldLightKind::RewardLantern;
+    auto previous=EvaluateHeldItemKinematics(input).leftHandLocal;
+    for (unsigned n=1;n<=520;++n)
+    {
+        input.cameraX=-34+.05f*static_cast<float>(n);
+        const auto current=EvaluateHeldItemKinematics(input).leftHandLocal;
+        Check(Distance(previous,current)<.051f,
+              "continuous passage traversal must not jump the hand at artificial room boundaries");
+        previous=current;
+    }
+}
 } // namespace
 
 int main()
@@ -289,5 +340,6 @@ int main()
     TestContinuousWalkAndLookResponse();
     TestOwnershipAndLoweredPoses();
     TestSwordBreathingAndCombatBoundaries();
+    TestHorizontalEnvelopeUnion();
     return failures == 0 ? 0 : 1;
 }

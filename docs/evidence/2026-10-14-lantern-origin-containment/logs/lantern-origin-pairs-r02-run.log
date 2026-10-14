@@ -1,0 +1,11 @@
+Pipeline before chapter-lantern-side-wall-high exit 1
+Pipeline after chapter-lantern-side-wall-high exit 1
+Pipeline before chapter-lantern-side-wall-low exit 1
+Pipeline after chapter-lantern-side-wall-low exit 1
+Query before chapter-lantern-side-wall-high exit 1
+Query after chapter-lantern-side-wall-high exit 1
+Query before chapter-lantern-side-wall-low exit 1
+Query after chapter-lantern-side-wall-low exit 1
+Pipeline after lantern-wall-high exit 1
+Query after lantern-wall-low exit 1
+Failed cases: 10

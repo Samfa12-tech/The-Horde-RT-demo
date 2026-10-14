@@ -1,0 +1,23 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+    Start 53: horde_rt_held_item_vertical_support_rig_tests
+1/1 Test #53: horde_rt_held_item_vertical_support_rig_tests ...***Failed    1.46 sec
+Exact-pose rejected missing geometry: missing skinned geometry
+Exact-pose rejected omitted support: body mesh or eye applied support incorrectly
+Exact-pose rejected doubled support: body mesh or eye applied support incorrectly
+Exact-pose rejected unreachable wrist: actual wrist is outside anatomical reach
+Exact-pose rejected broken torch Grip: torch no longer attaches to the solved rig Grip
+Exact-pose rejected broken sword Hips attachment: production stowed sword no longer attaches to animated Hips
+Exact-pose rejected independent flame offset: flame or physical light left its authored item socket
+Exact-pose rejected independent physical-light offset: flame or physical light left its authored item socket
+Exact checkpoint171 production rig yaw0 pitch-0.05 aspect16:9 passed; mesh points=34304 lowering/retraction/headroom=0.333987/0.200392/0.0347347 returned lowering=0 same-validator negatives=9 descent ticks=59
+Lantern side-wall regression failed: Native claimed glass crosses a passage side wall: Z=-16.806524 aspect=1.000000
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   1.48 sec
+
+The following tests FAILED:
+	 53 - horde_rt_held_item_vertical_support_rig_tests (Failed)
+Errors while running CTest

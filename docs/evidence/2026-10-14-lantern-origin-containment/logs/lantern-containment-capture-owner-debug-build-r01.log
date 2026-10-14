@@ -1,0 +1,45 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-debug\pocket-audio-core-native\Debug\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-debug\Debug\horde_gameplay_simulation.lib
+  DesktopControllerInputTests.cpp
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\tests\DesktopControllerInputTests.cpp(142,19): error C3861: 'ClaimedTorchPrimaryOwnershipValid': identifier not found [C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-debug\horde_rt_desktop_controller_input_tests.vcxproj]
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\tests\DesktopControllerInputTests.cpp(142,52): error C2131: expression did not evaluate to a constant [C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-debug\horde_rt_desktop_controller_input_tests.vcxproj]
+      C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\tests\DesktopControllerInputTests.cpp(142,52):
+      a non-constant (sub-)expression was encountered
+  
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\tests\DesktopControllerInputTests.cpp(143,19): error C3861: 'ClaimedTorchPrimaryOwnershipValid': identifier not found [C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-debug\horde_rt_desktop_controller_input_tests.vcxproj]
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\tests\DesktopControllerInputTests.cpp(143,52): error C2131: expression did not evaluate to a constant [C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-debug\horde_rt_desktop_controller_input_tests.vcxproj]
+      C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\tests\DesktopControllerInputTests.cpp(143,52):
+      a non-constant (sub-)expression was encountered
+  
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\tests\DesktopControllerInputTests.cpp(144,19): error C3861: 'ClaimedTorchPrimaryOwnershipValid': identifier not found [C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-debug\horde_rt_desktop_controller_input_tests.vcxproj]
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\tests\DesktopControllerInputTests.cpp(144,52): error C2131: expression did not evaluate to a constant [C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-debug\horde_rt_desktop_controller_input_tests.vcxproj]
+      C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\tests\DesktopControllerInputTests.cpp(144,52):
+      a non-constant (sub-)expression was encountered
+  
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\tests\DesktopControllerInputTests.cpp(145,20): error C3861: 'ClaimedTorchPrimaryOwnershipValid': identifier not found [C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-debug\horde_rt_desktop_controller_input_tests.vcxproj]
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\tests\DesktopControllerInputTests.cpp(145,53): error C2131: expression did not evaluate to a constant [C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-debug\horde_rt_desktop_controller_input_tests.vcxproj]
+      C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\tests\DesktopControllerInputTests.cpp(145,53):
+      a non-constant (sub-)expression was encountered
+  
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\tests\DesktopControllerInputTests.cpp(146,20): error C3861: 'ClaimedTorchPrimaryOwnershipValid': identifier not found [C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-debug\horde_rt_desktop_controller_input_tests.vcxproj]
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\tests\DesktopControllerInputTests.cpp(146,53): error C2131: expression did not evaluate to a constant [C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-debug\horde_rt_desktop_controller_input_tests.vcxproj]
+      C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\tests\DesktopControllerInputTests.cpp(146,53):
+      a non-constant (sub-)expression was encountered
+  
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\tests\DesktopControllerInputTests.cpp(147,20): error C3861: 'ClaimedTorchPrimaryOwnershipValid': identifier not found [C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-debug\horde_rt_desktop_controller_input_tests.vcxproj]
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\tests\DesktopControllerInputTests.cpp(147,53): error C2131: expression did not evaluate to a constant [C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-debug\horde_rt_desktop_controller_input_tests.vcxproj]
+      C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\tests\DesktopControllerInputTests.cpp(147,53):
+      a non-constant (sub-)expression was encountered
+  
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\tests\DesktopControllerInputTests.cpp(148,20): error C3861: 'ClaimedTorchPrimaryOwnershipValid': identifier not found [C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-debug\horde_rt_desktop_controller_input_tests.vcxproj]
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\tests\DesktopControllerInputTests.cpp(148,53): error C2131: expression did not evaluate to a constant [C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-debug\horde_rt_desktop_controller_input_tests.vcxproj]
+      C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\tests\DesktopControllerInputTests.cpp(148,53):
+      a non-constant (sub-)expression was encountered
+  
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\tests\DesktopControllerInputTests.cpp(149,20): error C3861: 'ClaimedTorchPrimaryOwnershipValid': identifier not found [C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-debug\horde_rt_desktop_controller_input_tests.vcxproj]
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\tests\DesktopControllerInputTests.cpp(149,53): error C2131: expression did not evaluate to a constant [C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-debug\horde_rt_desktop_controller_input_tests.vcxproj]
+      C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\tests\DesktopControllerInputTests.cpp(149,53):
+      a non-constant (sub-)expression was encountered
+  

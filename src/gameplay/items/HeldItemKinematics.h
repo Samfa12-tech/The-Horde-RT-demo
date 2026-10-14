@@ -22,6 +22,13 @@ namespace horde::gameplay::items
 // the gameplay-owned hand Grip remains fixed.
 inline constexpr float kClaimedRewardLanternScale = 0.44f;
 
+// Native glass radius .736322*.44, ring socket separation .097*.44,
+// final skinned Grip tolerance .015, and dielectric spawn .006 fit below .40.
+// The Light socket radius .515*.44 plus the same attachment/tolerance and
+// maximum Current/Higher horizontal area offset .09605 also fit below .40.
+// This constrains the shared physical hand, never a detached light or pane.
+inline constexpr float kRewardLanternHorizontalOriginEnvelope = 0.40f;
+
 inline constexpr float kSwordGripRollRadians = 1.3962634f;
 
 // Original production torch: Grip->Flame +.525 m, visible fire .34 m. Keep

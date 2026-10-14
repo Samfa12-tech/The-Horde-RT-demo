@@ -1,6 +1,8 @@
 #include "gameplay/items/HeldItemKinematics.h"
 
 #include "gameplay/CorridorCollision.h"
+#include "gameplay/HorizontalEnvelope.h"
+#include "gameplay/items/LanternPendulum.h"
 #include "scene/ShowcaseOverheadGeometry.h"
 #include "scene/DevelopmentWorldGeometry.h"
 #include "gameplay/traversal/ChapterTerrainMovement.h"
@@ -1089,6 +1091,67 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
         // Inverse-view projection of world down: IK and socket composition
         // consume this same target; do not move the flame or light separately.
         result.leftHandLocal = selectedLocal;
+    }
+    if (rewardLantern && !input.rescueExterior && !input.developmentWorldRoute &&
+        detail::InsideWalkableUnion(input.cameraX,input.cameraZ))
+    {
+        static const auto interior = RectangularUnionCover(kShowcaseWalkableRects);
+        const Vec3 worldUp{{0.0f,1.0f,0.0f}};
+        const float pitch=std::clamp(input.cameraPitchRadians,-0.32f,0.28f);
+        const Vec3 viewForward=Normalize({{forwardX,-0.05f+pitch,forwardZ}});
+        const Vec3 viewRight=Normalize(Cross(viewForward,worldUp));
+        const Vec3 viewUp=Normalize(Cross(viewRight,viewForward));
+        const Vec3 desired=Add(Vec3{{input.cameraX,EyeWorldYForSupport(input.playerSupportWorldY),input.cameraZ}},
+            ViewVectorToWorld(result.leftHandLocal,viewRight,viewUp,viewForward));
+        // The established forward response turns the cage sideways and bounds
+        // its presentation swing near a wall. A full circular bound there would
+        // retract the hand behind the camera. Bound that actual oriented pose
+        // analytically, including every permitted swing/torsion and final Grip
+        // error; intersect it with the independently valid radial envelope.
+        const float presentation=1.57079632679f*(1.0f-rewardClearanceBlend);
+        const float swingScale=1.0f-.98f*std::clamp(std::sin(std::abs(presentation)),0.0f,1.0f);
+        const float rotationBudget=swingScale*(std::sqrt(2.0f)*
+            interactions::kLanternPendulumHardLimitRadians+interactions::kLanternPendulumTorsionHardLimitRadians);
+        const auto base=interactions::ComposeLanternPendulumBodyTransform(
+            IdentityHeldItemTransform(),0,0,0,presentation);
+        // The final Grip contract bounds EACH basis-axis angle by .02. From
+        // trace(R)>=3*cos(.02), the SO(3) displacement chord is bounded by
+        // sqrt(3*(1-cos(.02))), which is larger than a single .02 rotation.
+        const float gripRotationChord=static_cast<float>(std::sqrt(3.0*(1.0-std::cos(.02))))+1e-7f;
+        RouteRect offsets{1,-1,1,-1};
+        const auto include=[&](const Vec3& point,float radius,float extraX,float extraZ) {
+            Vec3 local{};
+            for(unsigned a=0;a<3;++a)
+                local[a]=base[a]*point[0]+base[4+a]*point[1]+base[8+a]*point[2];
+            local[1]-=.097f*kClaimedRewardLanternScale;
+            const auto world=ViewVectorToWorld({{local[0],local[1],-local[2]}},viewRight,viewUp,viewForward);
+            const float delta=2.0f*radius*std::sin(std::min(3.14159265359f,rotationBudget)*.5f)+
+                (radius+.097f*kClaimedRewardLanternScale)*gripRotationChord+.015f+.006f;
+            offsets.minX=std::min(offsets.minX,world[0]+extraX-delta);
+            offsets.maxX=std::max(offsets.maxX,world[0]+extraX+delta);
+            offsets.minZ=std::min(offsets.minZ,world[2]+extraZ-delta);
+            offsets.maxZ=std::max(offsets.maxZ,world[2]+extraZ+delta);
+        };
+        for(float x:{-.193500f,.193500f})for(float y:{-.677500f,-.332500f})
+            for(float z:{-.213827f,.213827f})
+                include({{x*kClaimedRewardLanternScale,y*kClaimedRewardLanternScale,z*kClaimedRewardLanternScale}},
+                    .736323f*kClaimedRewardLanternScale,0,0);
+        for(const auto offset:std::array{std::array{-.075f,-.045f},std::array{.070f,.060f},
+             std::array{-.075f,.060f},std::array{.070f,-.045f}})
+            include({{0,-.515f*kClaimedRewardLanternScale,0}},.515f*kClaimedRewardLanternScale,offset[0],offset[1]);
+        const float radial=kRewardLanternHorizontalOriginEnvelope;
+        offsets.minX=std::max(offsets.minX,-radial);offsets.maxX=std::min(offsets.maxX,radial);
+        offsets.minZ=std::max(offsets.minZ,-radial);offsets.maxZ=std::min(offsets.maxZ,radial);
+        if (const auto fitted=ClosestHorizontalEnvelopeCentre(interior,
+                {desired[0],desired[2]},offsets))
+        {
+            const Vec3 translation{{fitted->x-desired[0],0.0f,fitted->z-desired[2]}};
+            // IK, ring, swinging cage, flame and actual Light socket all follow
+            // this gameplay-owned target. Camera, input and pendulum stay live.
+            result.leftHandLocal[0]+=Dot(translation,viewRight);
+            result.leftHandLocal[1]+=Dot(translation,viewUp);
+            result.leftHandLocal[2]+=Dot(translation,viewForward);
+        }
     }
     const float leftGripRollCos = std::cos(kLeftGripRollRadians);
     const float leftGripRollSin = std::sin(kLeftGripRollRadians);

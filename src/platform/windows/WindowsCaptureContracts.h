@@ -128,6 +128,20 @@ struct ClaimedRewardCapturePixelPolicy
     bool permitsCompleteWallRetraction = false;
 };
 
+// The frozen shader's legacy custom-index-1 counter also includes the two
+// world Keeper torch bodies. Production hand-torch metadata uses custom22.
+// Prove BOTH hand-torch TLAS slots are absent; permit nonzero legacy pixels
+// only when an actual world-torch alias is present. Keep the raw count intact.
+constexpr bool ClaimedTorchPrimaryOwnershipValid(
+    std::uint32_t legacyTorchPixels, std::uint8_t handTorchMask,
+    std::uint8_t alternateHandTorchMask, std::uint8_t firstKeeperBodyMask,
+    std::uint8_t secondKeeperBodyMask) noexcept
+{
+    return handTorchMask == 0u && alternateHandTorchMask == 0u &&
+        (legacyTorchPixels == 0u || firstKeeperBodyMask == 0x01u ||
+         secondKeeperBodyMask == 0x01u);
+}
+
 inline bool HasRescueBodyStowCaptureWitness(
     const horde::gameplay::simulation::SimulationSnapshot& snapshot) noexcept
 {

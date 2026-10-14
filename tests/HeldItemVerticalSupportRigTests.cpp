@@ -352,7 +352,8 @@ bool ComposeRewardLantern(const RigResult& rig,
                           const horde::scene::assets::StaticMeshAsset& ringAsset,
                           const horde::scene::assets::StaticMeshAsset& bodyAsset,
                           RewardLanternResult& result,
-                          std::string& diagnostic)
+                          std::string& diagnostic,
+                          float forwardSwing = 0.0f, float strafeSwing = 0.0f, float torsion = 0.0f)
 {
     const auto* gripRing = FindHeldItemSocket(ringAsset.sockets, "GripRing");
     const auto* hinge = FindHeldItemSocket(ringAsset.sockets, "Hinge");
@@ -365,8 +366,11 @@ bool ComposeRewardLantern(const RigResult& rig,
     }
 
     horde::gameplay::interactions::LanternPendulum pendulum;
-    pendulum.Reset(rig.leftGrip);
-    const auto& authored = pendulum.Snapshot();
+    pendulum.Reset(rig.leftGrip, rig.fixed.kinematics.rewardLanternPresentationYawRadians);
+    auto authored = pendulum.Snapshot();
+    authored.worldFromBody = horde::gameplay::interactions::ComposeLanternPendulumBodyTransform(
+        rig.leftGrip, forwardSwing, strafeSwing, torsion,
+        rig.fixed.kinematics.rewardLanternPresentationYawRadians);
     if (!ComposeClaimedRewardLanternVisuals(
             rig.leftGrip, gripRing->world, hinge->world, rig.leftGrip,
             authored.worldFromBody, kClaimedRewardLanternScale,
@@ -381,6 +385,110 @@ bool ComposeRewardLantern(const RigResult& rig,
         result.worldFromLanternBody, flame->world);
     result.worldFromLight = MultiplyHeldItemTransforms(
         result.worldFromLanternBody, light->world);
+    return true;
+}
+
+bool CheckLanternSideWallContainment(PlayerRenderSlot& rig,
+    const horde::scene::assets::StaticMeshAsset& ring,
+    const horde::scene::assets::StaticMeshAsset& body, std::string& diagnostic)
+{
+    // Actual chapter: simulation world-route proof is off while the player is
+    // in the tomb. These positions are valid capsule centres beside both walls
+    // of the coloured passage, where a forward-only carry query misses sides.
+    unsigned cases = 0;
+    for (unsigned wall = 0; wall < 3; ++wall)
+    for (float aspect : {1.0f, 16.0f / 9.0f})
+    for (float pitch : {-0.32f, -0.05f, 0.28f})
+    for (const auto pose : {horde::gameplay::interactions::HeldLightPose::High,
+                           horde::gameplay::interactions::HeldLightPose::Low})
+    {
+        HeldItemFixedStepInput input;
+        const bool front = wall == 2;
+        input.playerX = front ? 0.0f : -16.0f;
+        input.playerZ = front ? -9.70f : wall == 1 ? -13.84f : -16.56f;
+        input.playerYawRadians = front ? 0.0f : wall == 1 ? -1.57079632679f : 1.57079632679f;
+        input.playerPitchRadians = pitch;
+        input.playerSupportWorldY = kRouteFloorWorldY;
+        input.playerMountProfile = PlayerMountProfile::AnatomicalBody;
+        input.interaction.heldLightKind = horde::gameplay::interactions::HeldLightKind::RewardLantern;
+        input.interaction.heldLightPose = pose;
+        input.logicalViewAspect = aspect;
+        RigResult solved{};
+        if (!Solve(rig, input, 5000u + cases, solved, diagnostic)) return false;
+        // Check the reward Grip itself against the intended view basis. The
+        // old torch's detached-item agreement cannot prove reward orientation.
+        const Vec3 forward = Unit({{std::sin(input.playerYawRadians),
+                                    -0.05f + pitch, -std::cos(input.playerYawRadians)}});
+        const Vec3 right = Unit(Cross(forward, {{0.0f,1.0f,0.0f}}));
+        const Vec3 up = Unit(Cross(right, forward));
+        auto intended = solved.leftGrip;
+        for (unsigned a=0; a<3; ++a)
+        {
+            intended[a]=right[a]; intended[4+a]=up[a]; intended[8+a]=-forward[a];
+        }
+        if (MeasureTransformAgreement(intended, solved.leftGrip).orientationErrorRadians >
+            kPlayerGripOrientationToleranceRadians)
+        {
+            diagnostic="Native reward Grip exceeded the envelope's final orientation contract.";
+            return false;
+        }
+        constexpr float swingLimit = horde::gameplay::interactions::kLanternPendulumHardLimitRadians;
+        constexpr float torsionLimit = horde::gameplay::interactions::kLanternPendulumTorsionHardLimitRadians;
+        const float diagonal = swingLimit/std::sqrt(2.0f);
+        for (const auto swing : {std::array{0.0f,0.0f,0.0f}, std::array{swingLimit,0.0f,torsionLimit},
+             std::array{-swingLimit,0.0f,-torsionLimit}, std::array{0.0f,swingLimit,torsionLimit},
+             std::array{0.0f,-swingLimit,-torsionLimit}, std::array{diagonal,diagonal,torsionLimit},
+             std::array{-diagonal,diagonal,-torsionLimit}, std::array{diagonal,-diagonal,-torsionLimit},
+             std::array{-diagonal,-diagonal,torsionLimit}})
+        {
+            RewardLanternResult lantern{};
+            if (!ComposeRewardLantern(solved, ring, body, lantern, diagnostic, swing[0], swing[1], swing[2])) return false;
+            const auto inside = [front](const Vec3& point) {
+                return front ? point[0] >= -1.20f + .005f && point[0] <= 1.20f - .005f &&
+                                   point[2] >= -10.0f + .005f && point[2] <= -6.4f - .005f :
+                    point[0] >= -30.50f + .005f && point[0] <= -8.50f - .005f &&
+                    point[2] >= -16.80f + .005f && point[2] <= -13.60f - .005f;
+            };
+            for (const auto& primitive : body.primitives)
+                if (body.materials[primitive.materialIndex].transmissionFactor > .001f)
+                    for (std::size_t n = 0; n < primitive.indexCount; ++n)
+                    {
+                        const auto& point = body.vertices[primitive.vertexOffset +
+                            body.indices[primitive.indexOffset+n]].position;
+                        if (std::abs(point[0]) > .193501f || point[1] < -.677501f ||
+                            point[1] > -.332499f || std::abs(point[2]) > .213828f)
+                        {
+                            diagnostic="Native glass changed beyond the admitted carry envelope profile.";
+                            return false;
+                        }
+                        const auto& transform = lantern.worldFromLanternBody;
+                        Vec3 world{};
+                        for (unsigned a = 0; a < 3; ++a)
+                            world[a] = transform[a]*point[0] + transform[4+a]*point[1] +
+                                transform[8+a]*point[2] + transform[12+a];
+                        if (!inside(world))
+                        {
+                            diagnostic = "Native claimed glass crosses a passage side wall: Z=" +
+                                std::to_string(world[2]) + " aspect=" + std::to_string(aspect);
+                            return false;
+                        }
+                    }
+            // Pin the unchanged four source offsets used by Current/Higher.
+            // The whole range must fit, including the samples at either side.
+            for (const Vec3 offset : {Vec3{{-.075f,.03f,-.045f}}, Vec3{{.070f,.10f,.060f}},
+                                     Vec3{{-.075f,.10f,.060f}}, Vec3{{.070f,.03f,-.045f}}})
+                if (!inside({{lantern.worldFromLight[12]+offset[0],
+                              lantern.worldFromLight[13]+offset[1],
+                              lantern.worldFromLight[14]+offset[2]}}))
+                {
+                    diagnostic = "Native claimed lantern area-light sample crosses a passage side wall.";
+                    return false;
+                }
+            ++cases;
+        }
+    }
+    std::cout << "Native claimed lantern glass/light side-wall containment: " << cases
+              << " cases, side/front walls, High/Low, both aspects, full pitch range, diagonal swing and torsion.\n";
     return true;
 }
 
@@ -877,6 +985,11 @@ int main(int argc, char** argv)
     if (!CheckExactRaisedPose(rig, playerTorch, roofTriangles, diagnostic))
     {
         std::cerr << "Exact checkpoint171 regression failed: " << diagnostic << '\n';
+        return 1;
+    }
+    if (!CheckLanternSideWallContainment(rig, lanternRing, lanternBody, diagnostic))
+    {
+        std::cerr << "Lantern side-wall regression failed: " << diagnostic << '\n';
         return 1;
     }
     std::cout << "Actual cached player rig support transform passed: support delta="

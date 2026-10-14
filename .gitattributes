@@ -414,3 +414,4 @@ docs/evidence/2026-10-14-release-route-baseline/** -text whitespace=cr-at-eol
 docs/evidence/2026-10-14-release-route-baseline/**/*.log whitespace=-trailing-space,-blank-at-eof,cr-at-eol
 docs/evidence/2026-10-14-report-ui-fixed-size/logs/* -text -whitespace
 docs/evidence/2026-10-14-forest-region-provenance/logs/* -text -whitespace
+docs/evidence/2026-10-14-lantern-origin-containment/logs/* -text -whitespace

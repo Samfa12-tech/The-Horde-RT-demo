@@ -77,7 +77,13 @@ inline constexpr bool DevelopmentCheckpointRequiresAuthoredChapter(
     return checkpoint.id == 192 || checkpoint.name.starts_with("chapter-");
 }
 
-inline constexpr std::array<DevelopmentCheckpoint, 95u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 97u> kDevelopmentCheckpoints{{
+    {.id=216,.name="chapter-lantern-side-wall-high",.baseShowcaseCheckpointId=11,
+     .cameraX=-16.0f,.cameraZ=-13.84f,.yaw=-1.57079632679f,.pitch=-.05f,
+     .usesProductionRewardProps=true,.rewardPose=DevelopmentRewardPose::HeldHigh},
+    {.id=217,.name="chapter-lantern-side-wall-low",.baseShowcaseCheckpointId=11,
+     .cameraX=-16.0f,.cameraZ=-13.84f,.yaw=-1.57079632679f,.pitch=-.05f,
+     .usesProductionRewardProps=true,.rewardPose=DevelopmentRewardPose::HeldLow},
     {.id=215,.name="chapter-deadwood-bank",.baseShowcaseCheckpointId=11,
      .cameraX=-28.7f,.cameraZ=-5.8f,.yaw=.55f,.pitch=.18f,
      .stagesRescueExterior=true,.exteriorRouteStation=3u},

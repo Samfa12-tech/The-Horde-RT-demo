@@ -43,6 +43,7 @@ using horde::platform::windows::WrapRtLabFocus;
 using horde::platform::windows::ShouldPlayControllerMenuSound;
 using horde::platform::windows::WindowsChestPromptText;
 using horde::platform::windows::ClaimedRewardCapturePolicy;
+using horde::platform::windows::ClaimedTorchPrimaryOwnershipValid;
 using horde::platform::windows::FindGraphicsMenuNeighbor;
 using horde::platform::windows::GraphicsMenuDirection;
 using horde::platform::windows::GraphicsMenuRect;
@@ -139,6 +140,14 @@ int main()
 
     constexpr auto ordinaryLanternCapture =
         ClaimedRewardCapturePolicy("lantern-held-high");
+    static_assert(ClaimedTorchPrimaryOwnershipValid(0,0,0,0,0));
+    static_assert(ClaimedTorchPrimaryOwnershipValid(18,0,0,1,0));
+    static_assert(ClaimedTorchPrimaryOwnershipValid(18,0,0,0,1));
+    static_assert(!ClaimedTorchPrimaryOwnershipValid(18,0,0,0,0));
+    static_assert(!ClaimedTorchPrimaryOwnershipValid(0,2,0,1,1));
+    static_assert(!ClaimedTorchPrimaryOwnershipValid(18,0,2,1,1));
+    static_assert(!ClaimedTorchPrimaryOwnershipValid(18,0,0,2,2));
+    static_assert(!ClaimedTorchPrimaryOwnershipValid(18,2,2,1,1));
     constexpr auto maximumWallCapture =
         ClaimedRewardCapturePolicy("lantern-wall-high");
     constexpr auto chestClearanceCapture =

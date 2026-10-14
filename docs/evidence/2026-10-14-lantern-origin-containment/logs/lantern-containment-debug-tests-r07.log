@@ -1,0 +1,10 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+    Start 53: horde_rt_held_item_vertical_support_rig_tests
+1/2 Test #53: horde_rt_held_item_vertical_support_rig_tests ...   Passed    3.36 sec
+    Start 83: horde_rt_development_static_asset_tests
+2/2 Test #83: horde_rt_development_static_asset_tests .........   Passed    5.34 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   8.72 sec

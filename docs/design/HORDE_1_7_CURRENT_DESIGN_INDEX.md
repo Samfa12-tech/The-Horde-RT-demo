@@ -15,6 +15,17 @@ traversal tests. The observed font-metrics stall is retained; its particular
 font-service cause is not proved by the successor pass.
 Normal two-way static-region loading/retirement remains the next chapter milestone.
 
+The [claimed lantern containment prerequisite](../evidence/2026-10-14-lantern-origin-containment/README.md)
+repairs actual imported glass crossing a side wall by moving the shared hand,
+cage and physical light together. Continuous swing bounds and native324-case
+coverage retain the original front-wall/torch/rescue checks. Matched side-wall
+RT views pass on both backends; the direct front-wall frozen views remain
+rejected in baseline and candidate. The diagnosed Keeper-world-torch counter
+alias is handled with strict hand-slot ownership checks and unchanged shaders.
+This does not certify the retained opaque shell or authorize normal GPU eviction;
+static-region saving remains zero. Physical acceptance and controlled optimized
+route measurements remain pending. Parent ba2b8cc3 passed all six CI jobs.
+
 The [prepared forest provenance repair](../evidence/2026-10-14-forest-region-provenance/README.md)
 now keeps all 365,212 actual exterior-dressing triangles distinct from shared
 terrain and tomb detail through consolidation and bounded copying. Complete GPU

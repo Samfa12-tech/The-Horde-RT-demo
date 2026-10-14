@@ -67,8 +67,8 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 95u,
-          "development registry retains prior views, stake traversal, understory and deadwood inspection");
+    Check(kDevelopmentCheckpoints.size() == 97u,
+          "development registry retains prior views and adds two actual chapter side-wall carry inspections");
     Check(FindDevelopmentCheckpoint("chapter-understory-close") != nullptr &&
           FindShowcaseCheckpoint("chapter-understory-close") == nullptr,
           "understory camera is development-only and cannot alter release checkpoint lookup");
@@ -746,6 +746,17 @@ int main()
           "near-wall low checkpoint appends stable ID 133 with representative swing and torsion");
     const DevelopmentCheckpoint* lookUp =
         FindDevelopmentCheckpoint("lantern-held-look-up");
+    const auto* sideHigh=FindDevelopmentCheckpoint("chapter-lantern-side-wall-high");
+    const auto* sideLow=FindDevelopmentCheckpoint("chapter-lantern-side-wall-low");
+    Check(sideHigh && sideLow && sideHigh->id==216 && sideLow->id==217 &&
+          sideHigh->cameraX==-16.0f && sideHigh->cameraZ==-13.84f &&
+          sideHigh->yaw==-1.57079632679f && sideLow->cameraX==sideHigh->cameraX &&
+          sideLow->cameraZ==sideHigh->cameraZ && sideLow->yaw==sideHigh->yaw &&
+          sideHigh->rewardPose==DevelopmentRewardPose::HeldHigh &&
+          sideLow->rewardPose==DevelopmentRewardPose::HeldLow &&
+          DevelopmentCheckpointRequiresAuthoredChapter(*sideHigh) &&
+          DevelopmentCheckpointRequiresAuthoredChapter(*sideLow),
+          "side-wall capture freezes the actual chapter pose beside the coloured passage wall");
     Check(lookUp != nullptr && lookUp->id == 134 &&
               lookUp->rewardPose == DevelopmentRewardPose::HeldHigh &&
               lookUp->pitch == 0.28f,
@@ -764,7 +775,7 @@ int main()
     // A real chapter capture must retain the authored pose through BOTH reward
     // imports, including the hand target used to construct the frozen pendulum.
     for (const auto* capture : {heldHigh, heldLow, glassTransmission, motionExtreme,
-                                chestHeldHigh, wallHigh, wallLow, lookUp})
+                                chestHeldHigh, wallHigh, wallLow, lookUp, sideHigh, sideLow})
     {
         simulation::GameSimulationConfig chapterConfig;
         chapterConfig.developmentRescueJourney = true;

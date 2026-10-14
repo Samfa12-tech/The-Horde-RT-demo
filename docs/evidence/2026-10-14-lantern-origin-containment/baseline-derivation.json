@@ -1,0 +1,55 @@
+{
+  "scope": "Matched diagnostic baseline: current app objects and libraries, only HeldItemKinematics.cpp replaced by ba2b blob via explicit object linking; not a whole ba2b build",
+  "objects": [
+    {
+      "sha256": "70a3c9b6606b7b130bb0c45a539dd53137201c5c0f7d945f33e1c280a8d8c940",
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\horde_rt_diagnostic_window.dir\\Debug\\DiagnosticOverlay.obj"
+    },
+    {
+      "sha256": "3e62eb0d9a9fdcce43f3a434588c14edffb42be36145ec7b1229c0e9ad31c01b",
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\horde_rt_diagnostic_window.dir\\Debug\\DiagnosticWindow.obj"
+    },
+    {
+      "sha256": "3eb920cf17ad6bbfba132e4fd33663d0b4a9ee1887761fd7a9b1ba1a6761c91f",
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\horde_rt_diagnostic_window.dir\\Debug\\DiagnosticWindowMain.obj"
+    },
+    {
+      "sha256": "7cf13a23fdf8f77a20ba628ae41ce39e4f346d7da8d96d6d929d47f11b9744f4",
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\horde_rt_diagnostic_window.dir\\Debug\\HordeLanternRT.res"
+    },
+    {
+      "sha256": "7346315b0038e06c3662d1a852351703fa1eea03df46415ddae495e6c2ac0c91",
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\horde_rt_diagnostic_window.dir\\Debug\\MotionEvidenceLedger.obj"
+    },
+    {
+      "sha256": "e8b12af30f04b001a2c9af02e271079d764c0300b8cc55d76ca9e90e1ee855e1",
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\horde_rt_diagnostic_window.dir\\Debug\\MotionEvidenceScenario.obj"
+    },
+    {
+      "sha256": "c090333d23c0b2aa554cffe3704fb79a11e9090dc0aaf190a40ee09d0bf2acf2",
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\horde_rt_diagnostic_window.dir\\Debug\\WindowsGitHubReleaseUpdate.obj"
+    },
+    {
+      "sha256": "1978a3c7829add6dcb58df999fdfac5500558be15efd03470d95eb1c15a9268d",
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\horde_rt_diagnostic_window.dir\\Debug\\WindowsPlaytestReport.obj"
+    },
+    {
+      "sha256": "dbe3b0bfbb87c483db756cdb4512f48c1e5c90f0298a3b4a34521f5121dd2efd",
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\horde_rt_diagnostic_window.dir\\Debug\\WindowsPlaytestScreenshot.obj"
+    },
+    {
+      "sha256": "c343b1f31b47914a603ae6e4da262f82921f299ad6f947c5a05acca03abcc18e",
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\horde_rt_diagnostic_window.dir\\Debug\\WindowsPlaytestSubmission.obj"
+    },
+    {
+      "sha256": "fadce4ae78177b63d3ced0ceb80ad30430e9c5634e84209c06df2886d6d48a95",
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\horde_rt_diagnostic_window.dir\\Debug\\WindowsPlaytestVerification.obj"
+    },
+    {
+      "sha256": "ff6b0d465b8606845efdaec35410c51fc596d3c83a889f7b1ee92a5710193a7a",
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\horde_rt_diagnostic_window.dir\\Debug\\WindowsRemotePlaytestReport.obj"
+    }
+  ],
+  "sourceSha256": "50a5cc97d937bd50fe8207f24a163682f293c1e6667b89139ca1454f6adf188d",
+  "baseCommit": "ba2b8cc386489c138fff7ebae3ecd666db503609"
+}
