@@ -1,5 +1,5 @@
 param([Parameter(Mandatory=$true)][string]$Output,[switch]$Query,
- [ValidateSet('Debug','Release')][string]$Configuration='Release',[switch]$Foreground)
+ [ValidateSet('Debug','Release')][string]$Configuration='Release',[switch]$Foreground,[string]$Executable)
 $ErrorActionPreference='Stop'
 $root=(Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path
 $destination=if([IO.Path]::IsPathRooted($Output)){$Output}else{Join-Path $root $Output}
@@ -7,7 +7,7 @@ foreach($path in @($destination,($destination+'.stdout.log'),($destination+'.std
  if(Test-Path -LiteralPath $path){throw 'Choose a fresh measurement directory and receipt prefix'}
 }
 $start=[Diagnostics.ProcessStartInfo]::new()
-$start.FileName=Join-Path $root ('build/chapter-shipping-measurement/'+$Configuration+'/HordeLanternRT.exe')
+$start.FileName=if($Executable){(Resolve-Path -LiteralPath $Executable).Path}else{Join-Path $root ('build/chapter-shipping-measurement/'+$Configuration+'/HordeLanternRT.exe')}
 $start.WorkingDirectory=$root;$start.UseShellExecute=$false;$start.CreateNoWindow=$true
 $start.WindowStyle=[Diagnostics.ProcessWindowStyle]::Hidden
 $start.RedirectStandardOutput=$true;$start.RedirectStandardError=$true
@@ -30,6 +30,9 @@ foreach($source in @('src/platform/windows/DiagnosticWindow.cpp','src/platform/w
  'src/platform/windows/WindowsPresentInterval.h','CMakeLists.txt',
  'src/vulkan/raytracing/PresentableTinyRtScene.h','src/vulkan/raytracing/PresentableTinyRtScene.cpp',
  'src/vulkan/raytracing/PresentableTinyRtSceneStaticGeometry.cpp','src/vulkan/raytracing/RtStaticMeshSlot.cpp',
+ 'src/vulkan/raytracing/PresentableTinyRtSceneRegionPages.cpp',
+ 'src/vulkan/raytracing/RtRegionGeometryPreparation.cpp','src/vulkan/raytracing/RtRegionPreparationRecovery.h',
+ 'src/vulkan/raytracing/RtRegionGeometrySource.cpp','src/world/streaming/RegionStreaming.cpp',
  'src/scene/CorridorStaticDetail.h','src/scene/CorridorStaticDetailFaces.h',
  'src/gameplay/simulation/GameSimulation.cpp','src/gameplay/simulation/StaticDetailLease.h',
  'src/gameplay/validation/ChapterRouteMeasurementClock.h',

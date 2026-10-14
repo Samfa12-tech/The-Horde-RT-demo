@@ -4,6 +4,8 @@ import hashlib
 import json
 from pathlib import Path
 import shutil
+import re
+import subprocess
 
 
 def replace(path, old, new, count=1):
@@ -20,6 +22,7 @@ def main():
     parser.add_argument("--uniform-pages", action="store_true")
     parser.add_argument("--compact-symbols", action="store_true")
     parser.add_argument("--flat-table", action="store_true")
+    parser.add_argument("--correct-player-attribution", action="store_true")
     args = parser.parse_args()
     root = Path(__file__).resolve().parent.parent
     out = args.output.resolve()
@@ -29,7 +32,8 @@ def main():
     private = out / "source"
     shutil.copytree(root / "shaders", private / "shaders")
     (private / "tools").mkdir()
-    for name in ("compile-raygen.ps1", "raygen-variants.json", "raygen-variant-budgets.json"):
+    for name in ("compile-raygen.ps1", "raygen-variants.json", "raygen-variant-budgets.json",
+                 "GenerateRtPipelineVariantCatalog.ps1"):
         shutil.copy2(root / "tools" / name, private / "tools" / name)
     abi = private / "shaders/raytracing/include/rt_scene_abi.generated.glsl"
     replace(abi, "    RtInstanceMetadata values[];", "    RtInstanceMetadata values[26];\n    RtGeometryPage pages[4];")
@@ -160,8 +164,23 @@ layout(std430, set = 0, binding = 11)""")
                 text = text.replace("PV vertices =", "PV pv =").replace("PI indices =", "PI pi =")
                 text = text.replace("vertices.values[", "pv.v[").replace("indices.values[", "pi.v[")
             path.write_text(text, encoding="utf-8", newline="\n")
-    receipt = {"sourceHeadReference": "2147e26b0af6327073b9a31003897563de26d22b", "productionModified": False,
-               "method": "private BDA pages appended to metadata, common PBR and visibility lookups", "coalesced": args.coalesced, "uniformPages": args.uniform_pages, "compactSymbols": args.compact_symbols, "flatTable": args.flat_table, "files": {}}
+    if args.correct_player_attribution:
+        frame = private / "shaders/raytracing/include/rt_frame.glsl"
+        replace(frame, "(primary.instance >= 10 && primary.instance <= 13)",
+                "(primary.instance >= 10 && primary.instance <= 13 &&\n"
+                "                  (rtInstances.values[primary.instance].flags & kRtInstanceFlagStaticPbr) == 0u)")
+        if args.compact_symbols:
+            # Short local names retain executable work, scope and diagnostic
+            # fields. Avoid charging repeated serialized local OpNames for the
+            # new address-based prototype's exact ownership attribution.
+            for path in (hit, private / "shaders/raytracing/include/rt_lighting.glsl"):
+                text = re.sub(r"\binstanceMetadata\b", "im", path.read_text(encoding="utf-8"))
+                path.write_text(text, encoding="utf-8", newline="\n")
+    source_head = subprocess.run(["git", "rev-parse", "HEAD"], cwd=root,
+                                 check=True, capture_output=True, text=True).stdout.strip()
+    receipt = {"sourceHeadReference": source_head, "productionModified": False,
+               "generatorSha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+               "method": "private BDA pages appended to metadata, common PBR and visibility lookups", "coalesced": args.coalesced, "uniformPages": args.uniform_pages, "compactSymbols": args.compact_symbols, "flatTable": args.flat_table, "correctPlayerAttribution": args.correct_player_attribution, "files": {}}
     for path in sorted((private / "shaders").rglob("*.glsl")) + [private / "shaders/raytracing/minimal.rgen", private / "shaders/raytracing/minimal.comp"]:
         receipt["files"][str(path.relative_to(private))] = hashlib.sha256(path.read_bytes()).hexdigest()
     (out / "source-receipt.json").write_text(json.dumps(receipt, indent=2) + "\n")

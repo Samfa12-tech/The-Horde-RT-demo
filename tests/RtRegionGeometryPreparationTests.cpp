@@ -1,4 +1,5 @@
 #include "vulkan/raytracing/RtRegionGeometryPreparation.h"
+#include "vulkan/raytracing/RtRegionPreparationRecovery.h"
 // Reuse the unchanged allocation/mapping fault fixture; its original contract
 // remains a separate executed CTest. This does not execute Vulkan hardware.
 #define main UnusedOriginalBufferBatchContract
@@ -147,6 +148,57 @@ int main(){
         while(prep.Status()!=RtRegionGeometryPreparation::Phase::Failed && turns++<20)prep.Advance(token,256,error);
         recover(prep);
     }
-    if(ok)std::cout<<"Region offside GPU ownership/upload/build/cancel contracts passed with injected Vulkan; no device pass.\n";
+    for(bool failBegin:{true,false}) {
+        using namespace horde::world::streaming;
+        Reset();RtRegionGeometryPreparation prep(resources,Context(VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT));
+        RegionStreaming scheduler;StreamingRules rules;Plan plan;RtRegionPreparationRecovery recovery;
+        const std::array<RegionDefinition,1> catalog{{{20,{{0,0,0},{3,0,1}},false,1024,{}}}};
+        const std::array<RegionId,1> required{{20}};
+        ok&=Require(scheduler.Configure(catalog,rules,1,error) &&
+            scheduler.Evaluate({1,0,{0,0,0},{},required,{}},plan,error) && plan.count==1,"required return emits preparation");
+        const auto failed=plan.actions[0].token;
+        if(failBegin)ok&=Require(!prep.Begin(failed,nullptr,materials,error),"Begin rejection leaves idle GPU owner");
+        else {
+            ok&=Require(prep.Begin(failed,Payload(),materials,error),"Advance failure setup");
+            state.failure=Failure::Allocate;state.failureRow=1;
+            ok&=Require(!prep.Advance(failed,256,error),"recoverable Advance rejects allocation");
+        }
+        const Token wrong{failed.worldGeneration,failed.requestGeneration+1,failed.region};
+        ok&=Require(!recovery.Recover(scheduler,prep,wrong,error) &&
+            scheduler.States()[0].phase==Phase::Preparing,"stale failure cannot reset either owner");
+        ok&=Require(recovery.Recover(scheduler,prep,failed,error) && recovery.Retries()==1 &&
+            prep.Status()==RtRegionGeometryPreparation::Phase::Idle && scheduler.States()[0].phase==Phase::Absent,
+            "failure acknowledgement resets both exact owners, not only scheduler");
+        Reset();regionFence=VK_SUCCESS;
+        ok&=Require(scheduler.Evaluate({1,1,{0,0,0},{},required,{}},plan,error) && plan.count==1 &&
+            plan.actions[0].token!=failed,"later turn issues a fresh retry token");
+        const auto retry=plan.actions[0].token;
+        ok&=Require(prep.Begin(retry,Payload(),materials,error),"return retry begins");
+        unsigned turns=0;
+        while(prep.Status()!=RtRegionGeometryPreparation::Phase::Ready && turns++<20)
+            ok&=Require(prep.Advance(retry,256,error),"return retry advances bounded work");
+        RtRegionGeometryOwner restored;
+        ok&=Require(scheduler.MarkPrepared(retry,512) && prep.Take(retry,restored,error) &&
+            scheduler.MarkResident(retry) && restored.blas.address,"failed return eventually adopts actual complete owner");
+        recovery.ResetAfterAdoption();DestroyTaken(resources,restored);
+        ok&=Require(!recovery.Retries() && NoLiveResources() && !asAlive,"successful adoption rearms next loading episode");
+    }
+    {
+        using namespace horde::world::streaming;
+        Reset();RtRegionGeometryPreparation prep(resources,Context(VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT));
+        RegionStreaming scheduler;StreamingRules rules;Plan plan;RtRegionPreparationRecovery recovery;
+        const std::array<RegionDefinition,1> catalog{{{20,{{0,0,0},{3,0,1}},false,1024,{}}}};
+        const std::array<RegionId,1> required{{20}};
+        ok&=Require(scheduler.Configure(catalog,rules,1,error),"retry-bound setup");
+        for(unsigned i=0;i<2;++i){
+            ok&=Require(scheduler.Evaluate({1,double(i),{0,0,0},{},required,{}},plan,error) && plan.count==1,"retry-bound request");
+            const auto t=plan.actions[0].token;
+            ok&=Require(!prep.Begin(t,nullptr,materials,error) && recovery.Recover(scheduler,prep,t,error)==(i==0),
+                "second failure is explicit and cannot create an automatic retry storm");
+        }
+        ok&=Require(scheduler.States()[0].phase==Phase::Failed &&
+            error.find("retry exhausted")!=std::string::npos,"persistent failure retains failed request diagnostics");
+    }
+    if(ok)std::cout<<"Region offside GPU ownership/upload/build/cancel and bounded return-recovery contracts passed with injected Vulkan; no device pass.\n";
     return ok?0:1;
 }

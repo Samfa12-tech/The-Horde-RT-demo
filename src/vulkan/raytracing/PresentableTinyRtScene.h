@@ -2,6 +2,15 @@
 #ifndef HORDE_RT_CHAPTER_MEASUREMENT
 #define HORDE_RT_CHAPTER_MEASUREMENT 0
 #endif
+#ifndef HORDE_RT_REGION_PAGE_PROTOTYPE
+#define HORDE_RT_REGION_PAGE_PROTOTYPE 0
+#endif
+#if HORDE_RT_REGION_PAGE_PROTOTYPE
+#include "vulkan/raytracing/RtRegionGeometryPreparation.h"
+#include "vulkan/raytracing/RtRegionPreparationRecovery.h"
+#include "vulkan/raytracing/RtRegionGeometrySource.h"
+#include "world/streaming/GeometryPageTable.h"
+#endif
 #include "vulkan/raytracing/RtGpuWorkLease.h"
 #include "scene/atmosphere/IndoorDust.h"
 #include "scene/DevelopmentWorldGeometry.h"
@@ -824,6 +833,31 @@ private:
         const std::array<VkAccelerationStructureInstanceKHR,kTlasInstanceCount>& definitions) noexcept;
     bool BeginPreparedStaticUploads(PreparedStaticGeometry& owner, std::string& diagnostic);
     std::shared_ptr<const RtStaticMeshSlot> fullStaticGeometrySource_;
+#if HORDE_RT_REGION_PAGE_PROTOTYPE
+    friend struct PresentableTinyRtSceneRegionPageTestAccess;
+    // Chapter packing retires the legacy glass-fixture registration when Kit
+    // owns its atlas family. Metadata9 is free and outside legacy player10-13.
+    static constexpr std::uint32_t kRegionPageTlasSlot=9,kRegionPageMetadataSlot=9;
+    std::shared_ptr<const horde::world::streaming::GeometryPayload> regionPageSource_;
+    RtRegionGeometryOwner regionPageOwner_;
+    std::unique_ptr<RtRegionGeometryPreparation> regionPagePreparation_;
+    horde::world::streaming::RegionStreaming regionStreaming_;
+    enum class RegionCutover { None, Disable, Adopt };
+    RegionCutover regionCutover_=RegionCutover::None;
+    horde::world::streaming::Token regionCutoverToken_{};
+    bool regionPageVisible_=true,regionRetirementAwaitingFrame_=false;
+    RtRegionPreparationRecovery regionPreparationRecovery_;
+    std::uint64_t regionPreparationPeakBytes_=0;
+    bool PrepareRegionPageSource(std::string&);
+    bool CreateInitialRegionPage(std::string&);
+    bool ApplyRegionPage(std::array<VkAccelerationStructureInstanceKHR,kTlasInstanceCount>&,
+        std::array<RtInstanceMetadata,kRtInstanceMetadataCapacity>&,
+        horde::world::streaming::GeometryPageTable&,std::string&) const;
+    void DestroyRegionPage() noexcept;
+    bool AdvanceRegionPage(horde::gameplay::simulation::GameSimulation&,const RtSceneFrameInputs&,
+        bool safe,bool inner,bool allowEviction,StaticDetailFrame&,std::string&);
+    bool RetireCompletedRegionPage(bool (*)(void*,std::string&),void*,std::string&);
+#endif
     void AdmitOrdinaryStaticDetail();
     bool RecoverOrdinaryStaticPreparation(bool safe, StaticDetailFrame& decision, std::string& diagnostic);
     std::shared_ptr<const RtStaticTriangleOmissions> ordinaryStaticOmissions_;

@@ -127,6 +127,15 @@ bytes never stand in for device memory savings.
 
 ## Implementation and acceptance slices
 
+The current [private live integration receipt](../evidence/2026-10-15-independent-region-pages/README.md)
+closes the first cached-source hardware adoption/retirement/return slice on both
+Windows RT backends: actual V/I/P/BLAS freeing, safe reload before return and
+inspected matched rendering. It doubles scoped static savings and sharply reduces
+temporary overlap versus rebuilding the combined owner. Production/Android
+adoption and optimized Release pacing remain gated; package I/O is not inferred
+from a retained CPU payload. The existing scene currently admits one detail page
+within its unchanged instance/AS limits, despite four address-table slots.
+
 1. Add generic catalog/scheduler, compact page payload/ownership and slot leases.
    Test generation/cancellation, shared dependencies, budget reservation, pressure
    handling, hysteresis and reliable reverse demand without hardware claims.

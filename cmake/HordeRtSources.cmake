@@ -5,6 +5,7 @@ set(HORDE_RT_CORE_RELATIVE_SOURCES
     world/streaming/GeometryPartition.cpp
     vulkan/raytracing/RtRegionGeometryPreparation.cpp
     vulkan/raytracing/RtRegionGeometrySource.cpp
+    vulkan/raytracing/PresentableTinyRtSceneRegionPages.cpp
     telemetry/RtPerformanceEvidence.cpp
     telemetry/RtEvidencePublication.cpp
     telemetry/RtBenchmarkEvidenceRun.cpp

@@ -493,6 +493,18 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
 
     preparedStaticGeometry_ = std::move(other.preparedStaticGeometry_);
     fullStaticGeometrySource_ = std::move(other.fullStaticGeometrySource_);
+#if HORDE_RT_REGION_PAGE_PROTOTYPE
+    regionPageSource_=std::move(other.regionPageSource_);
+    (void)other.regionPageOwner_.TransferTo(regionPageOwner_);
+    regionPagePreparation_=std::move(other.regionPagePreparation_);
+    regionStreaming_=std::move(other.regionStreaming_);
+    regionCutover_=std::exchange(other.regionCutover_,RegionCutover::None);
+    regionCutoverToken_=std::exchange(other.regionCutoverToken_,{});
+    regionPageVisible_=std::exchange(other.regionPageVisible_,true);
+    regionRetirementAwaitingFrame_=std::exchange(other.regionRetirementAwaitingFrame_,false);
+    regionPreparationRecovery_=std::exchange(other.regionPreparationRecovery_,{});
+    regionPreparationPeakBytes_=std::exchange(other.regionPreparationPeakBytes_,0);
+#endif
     ordinaryStaticOmissions_=std::move(other.ordinaryStaticOmissions_);
     ordinaryStaticFacesVerified_=std::exchange(other.ordinaryStaticFacesVerified_,false);
     ordinaryStaticCandidate_=std::exchange(other.ordinaryStaticCandidate_,false);
@@ -1047,6 +1059,15 @@ bool PresentableTinyRtScene::ContinueInitialiseAfterPreflight(
             return CreateSelectedPipelineBundle(diagnostic);
         }))
     {
+#if HORDE_RT_REGION_PAGE_PROTOTYPE
+        if(regionPagePreparation_) {
+            const auto phase=regionPagePreparation_->Status();
+            if(phase==RtRegionGeometryPreparation::Phase::BuildWait ||
+               phase==RtRegionGeometryPreparation::Phase::CancelPending ||
+               phase==RtRegionGeometryPreparation::Phase::Quarantined)
+                return false; // Platform retains context until successful idle proof.
+        }
+#endif
         Destroy();
         return false;
     }
@@ -1112,6 +1133,9 @@ horde::gameplay::simulation::ZoneReadiness PresentableTinyRtScene::WorldZoneRead
 }
 void PresentableTinyRtScene::Destroy()
 {
+#if HORDE_RT_REGION_PAGE_PROTOTYPE
+    DestroyRegionPage();
+#endif
     // The platform proves device idle before destroying a scene. Pending upload
     // commands and staging must outlive every image referenced by that work.
     if (device_ != VK_NULL_HANDLE)
@@ -1413,6 +1437,10 @@ PresentableTinyRtScene::CaptureResourceHandles() const
 horde::telemetry::RtResourceInventory PresentableTinyRtScene::ResourceInventory() const noexcept
 {
     horde::telemetry::RtResourceInventory inventory{};
+#if HORDE_RT_REGION_PAGE_PROTOTYPE
+    regionPageOwner_.AccumulateResourceInventory(inventory);
+    if(regionPagePreparation_)regionPagePreparation_->AccumulateResourceInventory(inventory);
+#endif
     for (const Buffer* buffer : std::array{
              &vertexBuffer_, &indexBuffer_, &transformBuffer_, &instanceBuffer_,
              &heldLightBuffer_, &fireEmitterBuffer_, &qualityControlsBuffer_, &waterContactRippleBuffer_, &worldSurfaceBuffer_,
@@ -2727,6 +2755,9 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
     if (developmentRescueJourney_)
         fullStaticGeometrySource_ = std::make_shared<const RtStaticMeshSlot>(staticMeshSlot_);
     AdmitOrdinaryStaticDetail();
+#if HORDE_RT_REGION_PAGE_PROTOTYPE
+    if(!PrepareRegionPageSource(diagnostic))return false;
+#endif
     const RtInstanceMetadata playerMetadata = staticMeshSlot_.InstanceMetadata()[kPlayerWorldBodyInstanceIndex];
     if (playerMetadata.primitiveCount == 0u ||
         playerMetadata.primitiveCount != productionPlayerAsset_.primitives.size() ||
@@ -2961,9 +2992,16 @@ bool PresentableTinyRtScene::CreateStaticMeshResources(std::string& diagnostic)
     const VkBufferUsageFlags storage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
     const VkBufferUsageFlags geometry = storage |
         VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR;
+#if HORDE_RT_REGION_PAGE_PROTOTYPE
+    horde::world::streaming::GeometryPageTable initialPageTable{};
+    initialPageTable.instances=instances;
+    enqueue(&initialPageTable,sizeof(initialPageTable),storage,false,"RT region instance metadata",
+            instanceMetadataBuffer_,true);
+#else
     enqueue(instances.data(), sizeof(instances), storage, false, "RT instance metadata",
             instanceMetadataBuffer_, true);
-    enqueue(primitives.data(), primitives.size() * sizeof(RtPrimitiveMetadata), storage, false,
+#endif
+    enqueue(primitives.data(), primitives.size() * sizeof(RtPrimitiveMetadata), storage, HORDE_RT_REGION_PAGE_PROTOTYPE!=0,
             "RT primitive metadata", primitiveMetadataBuffer_);
     enqueue(materials.data(), materials.size() * sizeof(RtMaterialGpu), storage, false,
             "RT material metadata", materialMetadataBuffer_, true);
@@ -2997,6 +3035,13 @@ bool PresentableTinyRtScene::CreateStaticMeshResources(std::string& diagnostic)
         *destinations[i] = std::exchange(candidate[i], Buffer{});
     sceneMaterials_ = std::move(candidateMaterials);
     worldMaterialBase_ = candidateWorldMaterialBase;
+#if HORDE_RT_REGION_PAGE_PROTOTYPE
+    if(!CreateInitialRegionPage(diagnostic))return false;
+    std::array<VkAccelerationStructureInstanceKHR,kTlasInstanceCount> initialInstances{};
+    auto pageMetadata=instances;
+    if(!ApplyRegionPage(initialInstances,pageMetadata,initialPageTable,diagnostic) ||
+       !WriteBuffer(instanceMetadataBuffer_,&initialPageTable,sizeof(initialPageTable),"initial region page table",diagnostic))return false;
+#endif
 
     if (!genericStaticAssetEnabled_) return true;
     const RtTextureArrayCounts textureCounts = staticMeshSlot_.TextureArrayCounts();
@@ -5281,6 +5326,20 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     // reference is an inactive instance, but would force a needless definition
     // change before the first live snapshot even while the Keeper stays hidden.
     instances[kKeeperInstanceIndex] = characterSlot_.BuildActiveInstances()[2];
+#if HORDE_RT_REGION_PAGE_PROTOTYPE
+    if(!viewmodelAvailable_ || kProductionPlayerRenderRoute!=PlayerRenderRoute::ModelledViewmodel){
+        diagnostic="Region-page lane admission requires the real modelled player profile.";return false;
+    }
+    // Select the actual production profile at initial TLAS construction too.
+    // The legacy template above is a procedural fixture, not a free-slot proof.
+    const auto initialPlayerMasks=BuildPlayerRouteMasks(PlayerRenderRoute::ModelledViewmodel,playerBodyRemainderAvailable_);
+    for(std::size_t i=9;i<=16;++i)instances[i].mask=initialPlayerMasks.instanceMasks[i];
+    instances[kPlayerWorldBodyInstanceIndex].mask=initialPlayerMasks.instanceMasks[kPlayerWorldBodyInstanceIndex];
+    instances[kPlayerViewmodelInstanceIndex].mask=initialPlayerMasks.instanceMasks[kPlayerViewmodelInstanceIndex];
+    auto initialMetadata=staticMeshSlot_.InstanceMetadata();
+    horde::world::streaming::GeometryPageTable initialTable;
+    if(!ApplyRegionPage(instances,initialMetadata,initialTable,diagnostic))return false;
+#endif
     if (!CreateBuffer(sizeof(instances), VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, uploadMemory, true, instanceBuffer_, diagnostic))
     {
         return false;
@@ -7325,6 +7384,11 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             frameInstanceMetadata[9u].flags = 0u;
     }
     lastPlayerWorldBodyInstanceFlags_ = frameInstanceMetadata[kPlayerWorldBodyInstanceIndex].flags;
+#if HORDE_RT_REGION_PAGE_PROTOTYPE
+    horde::world::streaming::GeometryPageTable framePageTable;
+    if(effectivePlayerRenderRoute!=PlayerRenderRoute::ModelledViewmodel || clampedTuning.glassFixtureVisible ||
+       !ApplyRegionPage(instances,frameInstanceMetadata,framePageTable,diagnostic))return false;
+#endif
     auto frameMaterials = sceneMaterials_;
     if (!chapterActorReady_) {
     if (dielectricFixtureMaterialIndex_ >= frameMaterials.size())
@@ -7381,9 +7445,13 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                      observation) ||
         !WriteBuffer(instanceBuffer_, instances.data(), sizeof(instances),
                      "animated TLAS instance", diagnostic, observation) ||
+#if HORDE_RT_REGION_PAGE_PROTOTYPE
+        !WriteBuffer(instanceMetadataBuffer_,&framePageTable,sizeof(framePageTable),"region page metadata",diagnostic,observation) ||
+#else
         !WriteBuffer(instanceMetadataBuffer_, frameInstanceMetadata.data(),
                       sizeof(frameInstanceMetadata), "player route metadata", diagnostic,
                       observation) ||
+#endif
         !WriteBuffer(materialMetadataBuffer_, frameMaterials.data(),
                      frameMaterials.size() * sizeof(RtMaterialGpu),
                      "RT Lab dielectric material", diagnostic, observation))
@@ -8062,6 +8130,9 @@ bool PresentableTinyRtScene::PrepareThirdActorResourceLifetime(
     const RtSceneFrameInputs& frame, bool (*retireReferences)(void*, std::string&),
     void* user, std::string& diagnostic, RtSceneRecordObservation* observation)
 {
+#if HORDE_RT_REGION_PAGE_PROTOTYPE
+    if(!RetireCompletedRegionPage(retireReferences,user,diagnostic))return false;
+#endif
     if (!PrepareThirdActorVertexLifetime(frame, retireReferences, user, diagnostic, observation)) return false;
     struct Owner {
         PresentableTinyRtScene* scene;

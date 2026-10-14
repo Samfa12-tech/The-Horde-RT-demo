@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <limits>
 #include <span>
+#include <cstring>
 
 namespace horde::world::streaming {
 // Candidate ABI for independent static owners. Page0 is the retained shared
@@ -31,9 +32,12 @@ inline bool ValidRange(AddressRange range,std::uint64_t alignment,std::uint64_t 
 inline bool BuildGeometryPageTable(
     std::span<const horde::vulkan::raytracing::RtInstanceMetadata> metadata,
     const std::array<GeometryPageAddresses,kGeometryPages>& pages,
-    GeometryPageTable& output) noexcept {
+    GeometryPageTable& output,
+    std::span<const horde::vulkan::raytracing::RtInstanceMetadata> registered={},
+    std::uint64_t proceduralCodes=0) noexcept {
     using namespace horde::vulkan::raytracing;
     if(metadata.size()!=kRtInstanceMetadataCapacity)return false;
+    if(!registered.empty() && registered.size()!=metadata.size())return false;
     if(!pages[0].primitiveCount)return false;
     GeometryPageTable candidate{};
     for(std::size_t p=0;p<pages.size();++p) {
@@ -70,7 +74,22 @@ inline bool BuildGeometryPageTable(
         if(m.flags&static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr)) {
             if(!m.primitiveCount || !pages[page].primitiveCount || m.primitiveBase>=pages[page].primitiveCount ||
                m.primitiveCount>pages[page].primitiveCount-m.primitiveBase)return false;
-        } else if(m.primitiveCount)return false;
+        } else if(m.primitiveCount) {
+            // This prefix also carries procedural surface-code ranges and
+            // dormant imported rows. Neither owns a private geometry page.
+            if(page || m.flags)return false;
+            if(m.reserved1==1 && m.geometryRole==static_cast<std::uint32_t>(RtGeometryRole::Static) &&
+               !m.stableObjectId && !m.assetIndex && !m.emitterIndex) {
+                if(!proceduralCodes || m.primitiveBase>proceduralCodes ||
+                   m.primitiveCount>proceduralCodes-m.primitiveBase)return false;
+            } else {
+                if(registered.empty() || !(registered[i].flags&static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr)))return false;
+                auto dormant=registered[i];dormant.flags=0;
+                if(std::memcmp(&dormant,&m,sizeof(m)) || !pages[0].primitiveCount ||
+                   m.primitiveBase>=pages[0].primitiveCount ||
+                   m.primitiveCount>pages[0].primitiveCount-m.primitiveBase)return false;
+            }
+        }
         candidate.instances[i]=m;
     }
     output=candidate;return true;

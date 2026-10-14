@@ -141,6 +141,9 @@ bool PresentableTinyRtScene::AdvanceOrdinaryStaticDetail(
     if(frame.cameraX< -25.f || frame.cameraX> -19.f)ordinaryStaticRearm_=true;
     const bool restore=ordinaryStaticReduced_ && (!allowEviction || !safe ||
         frame.cameraX< -22.5f || frame.cameraX> -21.5f || snapshot.staticDetailLease.restoreRequested);
+#if HORDE_RT_REGION_PAGE_PROTOTYPE
+    if(regionPageSource_)return AdvanceRegionPage(simulation,frame,safe,inner,allowEviction,decision,diagnostic);
+#endif
     if(!ordinaryStaticCandidate_ && preparedStaticGeometry_) {
         // An explicit diagnostic owns its transaction, but does not make an
         // already reduced live owner safe for a changed source/fixture state.
@@ -189,6 +192,13 @@ bool PresentableTinyRtScene::AdvanceOrdinaryStaticDetail(
 
 void PresentableTinyRtScene::FinishOrdinaryStaticDetail(horde::gameplay::simulation::GameSimulation& simulation)
 {
+#if HORDE_RT_REGION_PAGE_PROTOTYPE
+    if(regionPageSource_) {
+        if(regionPageVisible_ && StaticGeometryHasCompleteContributors())
+            simulation.ReleaseStaticDetailLease(simulation.Snapshot().staticDetailLease.resourceGeneration);
+        return;
+    }
+#endif
     if(!ordinaryStaticCandidate_ || preparedStaticGeometry_)return;
     ordinaryStaticCandidate_=false;
     ordinaryStaticRestoreFailures_=0;
@@ -396,6 +406,11 @@ bool PresentableTinyRtScene::BeginStaticGeometryReplacement(
     std::string& diagnostic, const std::uint8_t retainedTriangleRegions,
     std::shared_ptr<const RtStaticTriangleOmissions> omissions)
 {
+#if HORDE_RT_REGION_PAGE_PROTOTYPE
+    if(regionPageSource_ || !regionPageOwner_.Empty()) {
+        diagnostic="Combined static preparation cannot replace an independent region-page owner.";return false;
+    }
+#endif
     if (!ready_ || !developmentRescueJourney_ || sceneProfile_ != RtSceneProfile::Showcase ||
         preparedStaticGeometry_ || staticGeometryCompletionUnproved_ || expectedGeneration == 0 ||
         expectedGeneration != staticGeometryGeneration_ || expectedGeneration == UINT64_MAX ||
@@ -689,6 +704,11 @@ bool PresentableTinyRtScene::AdvanceStaticGeometryReplacement(
 bool PresentableTinyRtScene::CommitStaticGeometryWithApi(const std::uint64_t expectedGeneration,
     const StaticCutoverApi& api, std::string& diagnostic)
 {
+#if HORDE_RT_REGION_PAGE_PROTOTYPE
+    if(regionPageSource_ || !regionPageOwner_.Empty()) {
+        diagnostic="Combined static cutover cannot replace an independent region-page owner.";return false;
+    }
+#endif
     const auto eligible = [&] {
         const bool owned = ready_ && !staticGeometryCompletionUnproved_ && expectedGeneration != 0 &&
             expectedGeneration != UINT64_MAX && expectedGeneration == staticGeometryGeneration_ &&
@@ -808,6 +828,51 @@ bool PresentableTinyRtScene::RecordTraceAndCopyWithStaticReplacement(
         diagnostic = "Static replacement requires an actual first-frame command, output and retirement proof.";
         return false;
     }
+#if HORDE_RT_REGION_PAGE_PROTOTYPE
+    if(regionPageSource_) {
+        const auto action=regionCutover_;const auto token=regionCutoverToken_;const bool wasVisible=regionPageVisible_;
+        const auto eligible=[&] {
+            return expectedGeneration==staticGeometryGeneration_ && ready_ && regionPageSource_ &&
+                action!=RegionCutover::None && regionCutover_==action && regionCutoverToken_==token &&
+                !tlasPendingDefinitionsValid_ && std::any_of(regionStreaming_.States().begin(),regionStreaming_.States().end(),
+                    [&](const auto& state){return state.token==token && !state.cancelRequested &&
+                        state.phase==(action==RegionCutover::Adopt?horde::world::streaming::Phase::Ready:horde::world::streaming::Phase::Retiring);});
+        };
+        if(!eligible() || !retireReferences(user,diagnostic) || !eligible()) {
+            if(diagnostic.empty())diagnostic="Region cutover has stale source/readiness/reference identity.";return false;
+        }
+        if(action==RegionCutover::Adopt) {
+            if(regionPageOwner_.Empty() && !regionPagePreparation_->Take(token,regionPageOwner_,diagnostic))return false;
+            if(regionPageOwner_.token!=token)return false;
+            regionPageVisible_=true;
+        }else {
+            if(!regionPageVisible_ || regionPageOwner_.Empty() || regionPageOwner_.token!=token)return false;
+            regionPageVisible_=false;
+        }
+        const bool recorded=RecordTraceAndCopy(commandBuffer,swapchainImage,swapchainImageLayout,swapchainExtent,frame,diagnostic,observation
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+            ,stagedTiming,timingFrameSlot
+#endif
+        );
+        if(!recorded){
+            regionPageVisible_=wasVisible;
+            if(action==RegionCutover::Disable)regionStreaming_.MarkRetirementCancelled(token);
+            return false;
+        }
+        if(action==RegionCutover::Adopt) {
+            if(!regionStreaming_.MarkResident(token)){diagnostic="Region adoption scheduler identity became stale.";return false;}
+            regionPreparationRecovery_.ResetAfterAdoption();
+            staticGeometryRetainedAllTriangles_=true;ordinaryStaticReduced_=false;
+            ++ordinaryStaticDetailEvidence_.restores;ordinaryStaticDetailEvidence_.savedOwnerBytes=0;
+            ordinaryStaticDetailEvidence_.omittedTriangles=0;
+        }else {
+            // Keep V/I/primitive/BLAS alive through this TLAS update's graphics
+            // completion. The next proven frame retires them, never this one.
+            regionRetirementAwaitingFrame_=true;staticGeometryRetainedAllTriangles_=false;ordinaryStaticReduced_=true;
+        }
+        regionCutover_=RegionCutover::None;diagnostic.clear();return true;
+    }
+#endif
     struct FirstFrame {
         bool (*proof)(void*, std::string&);
         void* user;

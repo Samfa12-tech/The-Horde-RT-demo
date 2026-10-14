@@ -146,6 +146,7 @@ bool IsLowerHexSha256(std::string_view value) noexcept
 }
 
 struct ReflectedModuleContract {
+    bool physicalStorageBufferAddresses=false;
     std::size_t matchingEntryPoints = 0u;
     std::size_t diagnosticsBindings = 0u;
     std::size_t atomicInstructions = 0u;
@@ -169,6 +170,10 @@ bool ReflectModule(std::span<const std::uint32_t> words,
         const std::uint16_t wordCount = static_cast<std::uint16_t>(instruction >> 16u);
         const std::uint16_t opcode = static_cast<std::uint16_t>(instruction & 0xffffu);
         if (wordCount == 0u || wordCount > words.size() - offset) { return false; }
+        // OpCapability PhysicalStorageBufferAddresses, required by the private
+        // address-based geometry profile (not inferred from descriptor absence).
+        if(opcode==17u && wordCount==2u && words[offset+1u]==5347u)
+            reflected.physicalStorageBufferAddresses=true;
         if (opcode == kOpEntryPoint) {
             const auto expectedModel = executionBackend == RtExecutionBackend::RayQueryCompute
                 ? kExecutionModelGlCompute : kExecutionModelRayGenerationKhr;
@@ -206,6 +211,13 @@ bool MatchesDescriptorBindingRoster(
     std::size_t expectedCount = 0u;
     for (std::size_t index = 0u; index < descriptorIo.bindingCount; ++index) {
         const auto binding = descriptorIo.bindings[index].binding;
+#if HORDE_RT_REGION_PAGE_PROTOTYPE
+        // Exact alternative shader-use roster. The unchanged layout keeps these
+        // compatibility descriptors, but page geometry reads their admitted BDA
+        // domains through binding11. No arbitrary missing binding is tolerated.
+        if(binding==kRtBindingPrimitiveMetadata || binding==kRtBindingStaticVertices ||
+           binding==kRtBindingStaticIndices)continue;
+#endif
         // The legacy held-light record remains layout-compatible, but current
         // world-space fire shaders source lighting from binding 21 and optimize
         // binding 20 away. All other bindings (including 23/24/25/26/27) remain required.
@@ -241,6 +253,10 @@ bool ValidateRecord(const RtPipelineVariantArtifact& record,
         return false;
     }
     ReflectedModuleContract reflected{};
+#if HORDE_RT_REGION_PAGE_PROTOTYPE
+    if(!ReflectModule(record.words,expected.executionBackend,reflected) ||
+       !reflected.physicalStorageBufferAddresses)return false;
+#endif
     if (!ReflectModule(record.words, expected.executionBackend, reflected) ||
         reflected.atomicInstructions != record.atomicInstructions ||
         !MatchesDescriptorBindingRoster(reflected, descriptorIo) ||

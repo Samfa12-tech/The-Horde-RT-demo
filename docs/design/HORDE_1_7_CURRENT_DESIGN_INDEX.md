@@ -1,5 +1,15 @@
 # Horde 1.7 current design index
 
+The [independent page integration checkpoint](../evidence/2026-10-15-independent-region-pages/README.md)
+connects the reusable scheduler to real bounded preparation, current-frame
+adoption, completed-TLAS retirement and automatic return in a private Windows
+candidate. Both complete hardware routes pass with11.88MiB actual static saving,
+4.06MiB peak above warm full and zero readiness waits. Default production remains
+on the earlier combined owner. Optimized Release pacing, private Android/phone
+admission and package-source I/O/cache lifetime remain open; Debug allocation
+and inspected image evidence are not playable FPS or complete engine acceptance.
+Existing tomb/material/niche work and budgets are preserved.
+
 The region preparation slice adds native-root/detail source conversion and
 independent bounded GPU upload/opaque-BLAS ownership with exact-token retry,
 pending cancellation and quarantine. Debug/Release affected native checks pass;

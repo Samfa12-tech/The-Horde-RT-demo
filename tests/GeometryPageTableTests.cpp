@@ -41,6 +41,15 @@ int main() {
     std::array<GeometryPageAddresses,kGeometryPages> emptyPages{};
     std::array<RtInstanceMetadata,kRtInstanceMetadataCapacity> emptyMetadata{};
     check(!BuildGeometryPageTable(emptyMetadata,emptyPages,table),"retained base domain must have a real owner");
+    bad=metadata;bad[0].flags=0;
+    check(!BuildGeometryPageTable(bad,pages,table),"dormant imported rows need explicit registered provenance");
+    check(BuildGeometryPageTable(bad,pages,table,metadata),"exact registered dormant rows preserve the shared prefix");
+    bad[0].stableObjectId=44;
+    check(!BuildGeometryPageTable(bad,pages,table,metadata),"dormant records cannot change registration identity");
+    bad=metadata;bad[17]={3,2,0,0,0,0,0,1};
+    check(!BuildGeometryPageTable(bad,pages,table,metadata,4) && BuildGeometryPageTable(bad,pages,table,metadata,5),"procedural surface range checks its separate real code domain");
+    bad[17].flags=1u<<kGeometryPageShift;
+    check(!BuildGeometryPageTable(bad,pages,table,metadata,5),"procedural rows cannot claim a private page");
     if(!failures)std::cout<<"Page table address/layout/overflow admission passed; no GPU ownership claim.\n";
     return failures?1:0;
 }
