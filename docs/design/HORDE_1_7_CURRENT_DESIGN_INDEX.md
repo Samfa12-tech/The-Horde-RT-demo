@@ -1,5 +1,13 @@
 # Horde 1.7 current design index
 
+The [host-smoke follow-up](../evidence/2026-10-14-ordinary-static-streaming/host-smoke-followup.md)
+completes all194 registered Debug checks across the retained interrupted/resumed
+runs and corrects one stale capture-source assertion from the previous owner-alias
+repair. Final Debug/Release2/2 smoke/controller checks pass with seven direct
+ownership negatives/controls and additive Vulkan-host CI coverage. Runtime/shader/
+EXE/APK bytes remain unchanged. Subsequent owner direction is the reusable engine
+region loading system, using the existing world as its validation case.
+
 The [ordinary static-detail checkpoint](../evidence/2026-10-14-ordinary-static-streaming/README.md)
 now automatically unloads84,219 distant forest triangles while the post-claim
 player backtracks inside the verified coloured passage, then restores the complete

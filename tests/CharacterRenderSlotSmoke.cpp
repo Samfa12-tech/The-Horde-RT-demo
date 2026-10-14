@@ -6,6 +6,7 @@
 #include "vulkan/raytracing/SimulationFrameAdapter.h"
 #include "vulkan/raytracing/TlasInstanceRefresh.h"
 #include "platform/android/AndroidRtLabState.h"
+#include "platform/windows/WindowsCaptureContracts.h"
 #include "KeeperLowerBodyWitnesses.h"
 #include "scene/TriangleDissolve.h"
 
@@ -1515,11 +1516,21 @@ int main()
                       windowsSource.find("IsCaptureSwordFullyStowed(simulation.heldItems[1])") != std::string::npos &&
                       windowsSource.find("instanceMasks[4] != 0x10u") != std::string::npos &&
                       windowsSource.find("instanceMasks[10] != 0x04u") != std::string::npos &&
-                      windowsSource.find("record.primaryTorchPixels != 0u") != std::string::npos &&
+                      windowsSource.find("ClaimedTorchPrimaryOwnershipValid(") != std::string::npos &&
+                      windowsSource.find("record.primaryTorchPixels, record.instanceMasks[1],") != std::string::npos &&
                       windowsSource.find("DiagnosticsAvailability()") != std::string::npos &&
                       androidBridgeSource.find("diagnosticsAvailability") != std::string::npos &&
                       windowsSource.find("rewardGripPositionErrorMetres") != std::string::npos,
                       "capture evidence must qualify diagnostic pixels by availability while retaining masks and final reward GripRing contact");
+        using horde::platform::windows::ClaimedTorchPrimaryOwnershipValid;
+        ok &= Require(ClaimedTorchPrimaryOwnershipValid(0u,0u,0u,0u,0u) &&
+                      !ClaimedTorchPrimaryOwnershipValid(7u,0u,0u,0u,0u) &&
+                      ClaimedTorchPrimaryOwnershipValid(7u,0u,0u,0x01u,0u) &&
+                      ClaimedTorchPrimaryOwnershipValid(7u,0u,0u,0u,0x01u) &&
+                      !ClaimedTorchPrimaryOwnershipValid(7u,0x02u,0u,0x01u,0u) &&
+                      !ClaimedTorchPrimaryOwnershipValid(7u,0u,0x02u,0u,0x01u) &&
+                      !ClaimedTorchPrimaryOwnershipValid(7u,0u,0u,0x02u,0x02u),
+                      "claimed capture retains raw legacy pixels, requires a real world alias and rejects either hand-torch owner");
         ok &= Require(simulationSource.find("SynchronizePausedInput") != std::string::npos &&
                       simulationSource.find("pendingToggleHeldLightPoseCommands_ = 0u") != std::string::npos &&
                       androidBridgeSource.find("RequestLifecyclePauseSynchronizationLocked") != std::string::npos &&
