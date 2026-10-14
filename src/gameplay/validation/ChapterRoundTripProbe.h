@@ -6,7 +6,7 @@
 #include <string_view>
 
 namespace horde::gameplay::validation {
-enum class ChapterProbePhase { Landing, Raise, Outbound, Lookout, Return, Descent, Lower, Ascent, Complete, Failed };
+enum class ChapterProbePhase { Landing, Raise, Outbound, Lookout, Return, Descent, Lower, TombReturn, Passage, RopeReturn, Ascent, Complete, Failed };
 inline constexpr std::string_view ChapterProbePhaseName(ChapterProbePhase phase) {
     switch(phase) {
     case ChapterProbePhase::Landing:return "landing-sweep";
@@ -16,6 +16,9 @@ inline constexpr std::string_view ChapterProbePhaseName(ChapterProbePhase phase)
     case ChapterProbePhase::Return:return "return";
     case ChapterProbePhase::Descent:return "descent";
     case ChapterProbePhase::Lower:return "lower-sweep";
+    case ChapterProbePhase::TombReturn:return "tomb-backtrack";
+    case ChapterProbePhase::Passage:return "passage-sweep";
+    case ChapterProbePhase::RopeReturn:return "rope-return";
     case ChapterProbePhase::Ascent:return "repeat-ascent";
     case ChapterProbePhase::Complete:return "complete";
     case ChapterProbePhase::Failed:return "failed";
@@ -105,7 +108,19 @@ public:
                 SetPhase(ChapterProbePhase::Lower,s,0);
             break;
         case ChapterProbePhase::Lower:
-            if(Sweep(s,input,3.14159265359f,120))SetPhase(ChapterProbePhase::Ascent,s,2);
+            if(Sweep(s,input,3.14159265359f,120)) {
+                lowerReturn_={s.playerX,s.playerZ,s.playerSupportWorldY};
+                SetPhase(ChapterProbePhase::TombReturn,s,0);
+            }
+            break;
+        case ChapterProbePhase::TombReturn:
+            if(Walk(s,input,{-22.f,-15.2f,kRouteFloorWorldY}))SetPhase(ChapterProbePhase::Passage,s,0);
+            break;
+        case ChapterProbePhase::Passage:
+            if(Sweep(s,input,1.57079632679f,360))SetPhase(ChapterProbePhase::RopeReturn,s,0);
+            break;
+        case ChapterProbePhase::RopeReturn:
+            if(Walk(s,input,lowerReturn_))SetPhase(ChapterProbePhase::Ascent,s,2);
             break;
         case ChapterProbePhase::Ascent:
             input.yawRadians=3.14159265359f;
@@ -154,5 +169,6 @@ private:
     std::uint64_t interact_=0,raise_=0,clearRun_=0;
     std::uint64_t proofTick_=0;
     bool sweepStarted_=false,raiseIssued_=false,interactionIssued_=false;
+    simulation::WorldRoutePoint lowerReturn_{};
 };
 }

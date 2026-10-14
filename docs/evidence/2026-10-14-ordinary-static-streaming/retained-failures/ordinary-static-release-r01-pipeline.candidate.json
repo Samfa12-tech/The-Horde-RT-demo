@@ -1,0 +1,22 @@
+{
+  "scope": "Release CPU with Shipping High shaders; uncovered visible wall-clock scripted out/back and tomb backtrack after staged Keeper death; automatic static-detail lifetime; not owner/phone acceptance",
+  "foregroundRequested": true,
+  "backend": "RayTracingPipeline",
+  "deadlineSeconds": 180,
+  "configure": "cmake -S . -B build/chapter-shipping-measurement -G \"Visual Studio 17 2022\" -A x64 -DHORDE_RT_INSTRUMENTATION_OVERRIDE=Shipping -DHORDE_RT_DIELECTRIC_QUALITY_OVERRIDE=High -DHORDE_RT_CHAPTER_MEASUREMENT=ON",
+  "maximumSimulationTicksPerRender": 4,
+  "executableSha256": "9fe2027ba26a655a60e6b57ecef1143b1ab2145ec3f4aabd2c1ded320025535b",
+  "sources": {
+    "src/platform/windows/DiagnosticWindow.cpp": "d59957b49bde0a917c3da5e75e55e012c5a9d7a0640cce72951fed29335a252a",
+    "src/platform/windows/WindowsAssetRoot.h": "dcf3171daee55dfcdbd96a31bd411a368e7ea4ac73b6c8d131ba31a612f98b39",
+    "src/vulkan/raytracing/PresentableTinyRtScene.cpp": "45f76e5940955e3c01a11e65e71b9ee53cc18499f7dc2c47ae8ba1b43237d59e",
+    "src/platform/windows/WindowsPresentInterval.h": "4521dcfeca420704ea4e17a2171471465710ced7e00dcd5ca9c0c66ade09e39c",
+    "src/vulkan/raytracing/PresentableTinyRtScene.h": "d36a91c961987e86f576ca0abb920b379309c5d5044b8214e789815d09b42a66",
+    "CMakeLists.txt": "0e2bb340ba426d802dc7ea5e3339f25fe6cdd4f9a973082d8bf759302762f459",
+    "src/platform/windows/WindowsChapterShippingMeasurement.inl": "9bd3ab0fd0e698764353a3e708eaef43f45293d8de55693ae9714e3cc36562c7",
+    "src/platform/windows/WindowsChapterShippingLaunch.h": "e7a1b24a3ba752963ebd29f41d0be35d89bdb02b6a2753931b94f3c607b73b7c",
+    "src/gameplay/validation/ChapterRouteMeasurementClock.h": "7a7e05ed68d0c4f5935967eec393b246103056fdf3406d6e3671be225c431edc",
+    "src/gameplay/validation/ChapterRoundTripProbe.h": "129a477304e574da834d15f81adfaefdb6c1e952d2fb716805e44f2116efbdd8"
+  },
+  "simulationHz": 60
+}

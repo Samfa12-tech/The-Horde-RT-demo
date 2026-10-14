@@ -20,7 +20,16 @@ def analyze(name, analysis_name='analysis-v3.json'):
     assert run['scope'].startswith('Optimized Release CPU')
     assert run['unoccludedClientChecks'] and 'Release CPU' in receipt['scope']
     assert len(rows)==run['completedSamples']==run['renderedFrames']
-    assert run['normalStaticRegionResidencySavingBytes']==0
+    streaming='staticDetailUnloads' in run
+    if streaming:
+        assert run['staticDetailUnloads']>0 and run['staticDetailRestores']==run['staticDetailUnloads']
+        assert run['finalStaticDetailSavingBytes']==0
+        assert max(int(r['static_saved_owner_bytes']) for r in rows)>0
+        assert max(int(r['static_omitted_triangles']) for r in rows)==84219
+        assert int(rows[-1]['static_saved_owner_bytes'])==int(rows[-1]['static_omitted_triangles'])==0
+        assert int(rows[-1]['static_restores'])==run['staticDetailRestores']
+    else:
+        assert run['normalStaticRegionResidencySavingBytes']==0
     by_serial={int(r['submission_serial']):r for r in rows}
     assert len(by_serial)==len(rows)
     serials=list(by_serial); assert serials==list(range(serials[0],serials[-1]+1))
@@ -81,6 +90,24 @@ def analyze(name, analysis_name='analysis-v3.json'):
     summary[interval_key]=stats([v/1e6 for v in intervals])
     summary[throughput_key]=len(intervals)/(sum(intervals)/1e9)
     summary['scanoutTimingMeasured']=False
+    if streaming:
+        transitions=[]
+        for previous, current in zip(rows, rows[1:]):
+            before, after = int(previous['static_saved_owner_bytes']), int(current['static_saved_owner_bytes'])
+            if before == after: continue
+            centre=float(current['elapsed_s'])
+            window=[r for r in rows if abs(float(r['elapsed_s'])-centre)<=1.0 and r['present_interval_available']=='1']
+            transitions.append(dict(kind='unload' if after>before else 'restore',
+                elapsedSeconds=centre,submissionSerial=int(current['submission_serial']),
+                phase=current['phase'],savedBytesBefore=before,savedBytesAfter=after,
+                deviceLocalBytesBefore=int(previous['device_local_bytes']),
+                deviceLocalBytesAfter=int(current['device_local_bytes']),
+                windowRadiusSeconds=1.0,
+                presentReturnMilliseconds=stats([int(r['present_return_interval_ns'])/1e6 for r in window]),
+                peakDeviceLocalBytes=max(int(r['device_local_bytes']) for r in window)))
+        assert sum(t['kind']=='unload' for t in transitions)==run['staticDetailUnloads']
+        assert sum(t['kind']=='restore' for t in transitions)==run['staticDetailRestores']
+        summary['staticDetailTransitions']=transitions
     load_path=directory/'system-load.csv'
     if not legacy:
         load=list(csv.DictReader(load_path.open()))

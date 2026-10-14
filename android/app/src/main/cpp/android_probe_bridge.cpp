@@ -4355,8 +4355,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
         // scene descriptors yet; discard other completed recorded references.
         struct ActorRetirementOwner { SwapchainContext* context; std::uint32_t image; };
         ActorRetirementOwner actorOwner{&context, imageIndex};
-        if (!context.rtScene.PrepareThirdActorResourceLifetime(frameInputs,
-                [](void* user, std::string& error) {
+        const auto retireResourceReferences=[](void* user, std::string& error) {
                     auto& owner = *static_cast<ActorRetirementOwner*>(user);
                     auto& ctx = *owner.context;
                     if (kMaxFramesInFlight != 1u ||
@@ -4370,16 +4369,41 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                             return false;
                         }
                     return true;
-                }, &actorOwner, diagnostic, evidenceFrame ? &observation : nullptr)) {
+                };
+        if (!context.rtScene.PrepareThirdActorResourceLifetime(frameInputs,
+                retireResourceReferences, &actorOwner, diagnostic, evidenceFrame ? &observation : nullptr)) {
             if (evidenceFrame) context.rtFrameEvidence.FailRecord(observation);
             __android_log_print(ANDROID_LOG_ERROR, kTag, "%s", diagnostic.c_str());
             return false;
+        }
+        using DetailFrame=horde::vulkan::raytracing::PresentableTinyRtScene::StaticDetailFrame;
+        DetailFrame detail=DetailFrame::Render;
+        if(!context.rtScene.AdvanceOrdinaryStaticDetail(gGameSimulation,frameInputs,
+            !context.captureActive && !context.routeReplayActive && !context.inAppBenchmark.IsRunning() &&
+            !context.benchmarkSampling,detail,diagnostic)) {
+            if(evidenceFrame)context.rtFrameEvidence.FailRecord(observation);
+            __android_log_print(ANDROID_LOG_ERROR,kTag,"Static detail preparation: %s",diagnostic.c_str());
+            return false;
+        }
+        if(detail==DetailFrame::WaitForRestore) {
+            if(evidenceFrame)context.rtFrameEvidence.AbortFrame();
+            if(vkResetCommandBuffer(context.commandBuffers[imageIndex],0u)!=VK_SUCCESS)return false;
+            return ConsumePendingImageAcquire(context);
         }
         gpuTimingRecording = evidenceFrame && context.gpuFrameTimingEnabled &&
             context.gpuFrameTimer.RecordBegin(context.commandBuffers[imageIndex], context.currentFrame);
         context.rtScene.SetMistEnabled(context.graphicsSettings.mistEnabled);
         context.rtScene.SetDustQuality(context.graphicsSettings.dustQuality);
-        if (!context.rtScene.RecordTraceAndCopy(context.commandBuffers[imageIndex],
+        const bool recorded=detail==DetailFrame::Cutover
+            ? context.rtScene.RecordTraceAndCopyWithStaticReplacement(context.rtScene.StaticGeometryGeneration(),
+                retireResourceReferences,&actorOwner,context.commandBuffers[imageIndex],context.swapchainImages[imageIndex],
+                context.swapchainImageLayouts[imageIndex],context.swapchainExtent,frameInputs,diagnostic,
+                evidenceFrame?&observation:nullptr
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+                ,gpuTimingRecording?&context.stagedPassTimer:nullptr,context.currentFrame
+#endif
+              )
+            : context.rtScene.RecordTraceAndCopy(context.commandBuffers[imageIndex],
                                                 context.swapchainImages[imageIndex],
                                                 context.swapchainImageLayouts[imageIndex],
                                                 context.swapchainExtent,
@@ -4389,7 +4413,9 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
 #if HORDE_RT_STAGED_PRIMARY_TIMING
                                                 , gpuTimingRecording ? &context.stagedPassTimer : nullptr, context.currentFrame
 #endif
-                                                ))
+                                                );
+        if(recorded && detail==DetailFrame::Cutover)context.rtScene.FinishOrdinaryStaticDetail(gGameSimulation);
+        if(!recorded)
         {
             if (evidenceFrame)
             {

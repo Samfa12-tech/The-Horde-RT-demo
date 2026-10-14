@@ -1,6 +1,8 @@
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
 #include "vulkan/raytracing/TlasInstanceRefresh.h"
 #include "scene/assets/StaticTriangleSelection.h"
+#include "scene/CorridorStaticDetail.h"
+#include "gameplay/simulation/GameSimulation.h"
 #include <algorithm>
 #include <chrono>
 #include <cstring>
@@ -8,6 +10,202 @@
 #include <utility>
 
 namespace horde::vulkan::raytracing {
+
+void PresentableTinyRtScene::AdmitOrdinaryStaticDetail()
+{
+    ordinaryStaticOmissions_.reset();
+    if(!fullStaticGeometrySource_ || !developmentRescueJourney_ || sceneProfile_!=RtSceneProfile::Showcase)return;
+    const auto& source=*fullStaticGeometrySource_;
+    constexpr std::array<std::uint32_t,2> transmissionOwners{{8u,kWaterDropletMetadataIndex}};
+    if(!source.TransmissionOwnersWithin(transmissionOwners))return;
+    const auto& owner=source.InstanceMetadata()[kCollapseInstanceIndex];
+    if(owner.primitiveCount!=collapseStaticAsset_.primitives.size())return;
+    std::vector<std::uint32_t> ids;
+    horde::scene::DetailBox bounds{{INFINITY,INFINITY,INFINITY},{-INFINITY,-INFINITY,-INFINITY}};
+    for(unsigned p=0;p<owner.primitiveCount;++p) {
+        const auto& local=collapseStaticAsset_.primitives[p];
+        const auto& material=collapseStaticAsset_.materials[local.materialIndex];
+        if(material.name!="ForestBark" && material.name!="ForestPine" && material.name!="ForestMoss" && material.name!="ForestAlder")continue;
+        const auto& primitive=source.PrimitiveMetadata()[owner.primitiveBase+p];
+        for(std::size_t i=primitive.indexOffset;i<primitive.indexOffset+primitive.indexCount;i+=3) {
+            bool selected=true;
+            for(unsigned k=0;k<3;++k) {
+                const auto& v=source.Vertices()[primitive.vertexOffset+source.Indices()[i+k]].position;
+                for(unsigned axis=0;axis<3;++axis)if(!std::isfinite(v[axis]))return;
+                selected&=v[2]>24.f;
+            }
+            if(!selected)continue;
+            if(source.TriangleRegions()[i/3]!=horde::scene::assets::StaticTriangleRegion::ExteriorDressing)return;
+            ids.push_back(static_cast<std::uint32_t>(i/3));
+            for(unsigned k=0;k<3;++k)for(unsigned axis=0;axis<3;++axis) {
+                const double value=source.Vertices()[primitive.vertexOffset+source.Indices()[i+k]].position[axis];
+                bounds.min[axis]=std::min(bounds.min[axis],value);bounds.max[axis]=std::max(bounds.max[axis],value);
+            }
+        }
+    }
+    if(ids.size()!=84219 || !horde::scene::DetailForestReceiverEnvelopeBlocked(bounds))return;
+    // Enclose the actual admitted panes around their body origin. All other
+    // transmission owners stay loaded. Refuse a changed lantern geometry or
+    // attachment rather than assuming an old master still bounds its queries.
+    const auto* grip=horde::gameplay::items::FindHeldItemSocket(rewardLanternRingAsset_.sockets,"GripRing");
+    const auto* hinge=horde::gameplay::items::FindHeldItemSocket(rewardLanternRingAsset_.sockets,"Hinge");
+    if(!grip || !hinge)return;
+    const auto* light=horde::gameplay::items::FindHeldItemSocket(rewardLanternBodyAsset_.sockets,"Light");
+    if(!light)return;
+    double lightRadius=0;
+    for(unsigned axis=12;axis<15;++axis)lightRadius+=double(light->world[axis])*light->world[axis];
+    if(!std::isfinite(lightRadius) || lightRadius>.515001*.515001)return;
+    double hingeRadius=0;
+    for(unsigned axis=12;axis<15;++axis)hingeRadius+=std::pow(double(grip->world[axis])-hinge->world[axis],2);
+    if(!std::isfinite(hingeRadius) || hingeRadius>.097001*.097001)return;
+    for(const auto& p:rewardLanternBodyAsset_.primitives) {
+        if(!(rewardLanternBodyAsset_.materials[p.materialIndex].flags&static_cast<unsigned>(RtMaterialFlag::Transmission)))continue;
+        for(std::size_t i=p.indexOffset;i<p.indexOffset+p.indexCount;++i) {
+            const auto& v=rewardLanternBodyAsset_.vertices[p.vertexOffset+rewardLanternBodyAsset_.indices[i]].position;
+            const double radius=double(v[0])*v[0]+double(v[1])*v[1]+double(v[2])*v[2];
+            if(!std::isfinite(radius) || radius>.736324*.736324)return;
+        }
+    }
+    std::string error;
+    ordinaryStaticOmissions_=RtStaticTriangleOmissions::Create(fullStaticGeometrySource_,kCollapseInstanceIndex,ids,error);
+}
+
+namespace {
+bool CorridorFrameSourcesInside(const RtSceneFrameInputs& f) {
+    using namespace horde::gameplay;
+    if(!f.developmentRescueJourney || f.rescue.exteriorSide || f.rescue.equipmentStowed ||
+       f.playerSupportWorldY!=kRouteFloorWorldY || f.playerMountProfile!=items::PlayerMountProfile::AnatomicalBody ||
+       f.playerRenderRoute!=kProductionPlayerRenderRoute ||
+       f.interaction.heldLightKind!=interactions::HeldLightKind::RewardLantern ||
+       f.chestReward.phase!=interactions::ChestRewardPhase::LanternClaimed ||
+       f.lich.deathDissolveProgress!=1.f || f.lich.staffLightStrength!=0.f ||
+       f.tuning.glassFixtureVisible || f.tuning.productionRewardPropsVisible || f.previewMotion)return false;
+    // Moving transmissive drops are not part of this first static certificate.
+    // Keep the full owner until they expire; never delete or mute the effect.
+    if(std::any_of(f.waterContact.droplets.begin(),f.waterContact.droplets.end(),[](const auto& d){return d.active;}))return false;
+    // 0.404 = native .736324*.44 + .097001*.44 + two validated
+    // 15 mm attachment tolerances + 6 mm dielectric spawn + outward reserve.
+    // It encloses every pane continuation and all lantern light area samples.
+    // Reverse light->candidate segments cross the same retained faces, so
+    // point-light shadows are preserved for arbitrary receiver distance. The
+    // closest area-light endpoint is >34 mm from a face (>20 mm end trim).
+    const auto& hand=f.rewardLanternWorldFromHinge;
+    if(!horde::scene::DetailSourceSphereInside({{hand[12],hand[13],hand[14]}},.404))return false;
+    // Enclose both 35 mm lateral and 17.5 mm centred vertical camera bob.
+    if(!horde::scene::DetailSourceSphereInside({{f.cameraX,.7175f,f.cameraZ}},.040))return false;
+    for(std::size_t i=0;i<f.fireEmitterCount;++i) {
+        if(i>=f.fireEmitters.size())return false;
+        const auto& e=f.fireEmitters[i];
+        if(e.strength>.001f && e.fuel>.001f && e.parentObject!=effects::FireEmitterParentObject::RewardLantern)return false;
+    }
+    // The three active passage lamp endpoints, including all four area offsets,
+    // are inside the source prism. The fourth bay is outside this lease.
+    return f.cameraX>=-27.5f && f.cameraX<=-16.6f && f.cameraZ>=-16.55f && f.cameraZ<=-13.85f;
+}
+}
+
+bool PresentableTinyRtScene::RecoverOrdinaryStaticPreparation(bool safe,StaticDetailFrame& decision,std::string& diagnostic)
+{
+    ++ordinaryStaticDetailEvidence_.preparationFailures;
+    if(staticGeometryCompletionUnproved_ || preparedStaticGeometry_)return false;
+    ordinaryStaticCandidate_=false;
+    if(!ordinaryStaticReduced_) {
+        ordinaryStaticRearm_=false; // Full owner remains valid; no per-frame retry storm.
+        decision=StaticDetailFrame::Render;diagnostic.clear();return true;
+    }
+    // One fresh bounded restore attempt. If allocation/build fails again, keep
+    // the safe-side lease and old owner and report the real failure explicitly.
+    if(++ordinaryStaticRestoreFailures_>1u)return false;
+    decision=safe?StaticDetailFrame::Render:StaticDetailFrame::WaitForRestore;
+    diagnostic.clear();return true;
+}
+
+bool PresentableTinyRtScene::AdvanceOrdinaryStaticDetail(
+    horde::gameplay::simulation::GameSimulation& simulation,const RtSceneFrameInputs& frame,
+    bool allowEviction,StaticDetailFrame& decision,std::string& diagnostic)
+{
+    decision=StaticDetailFrame::Render;
+    if(!ordinaryStaticReduced_ && !ordinaryStaticCandidate_ && StaticGeometryHasCompleteContributors() &&
+       simulation.Snapshot().staticDetailLease.resourceGeneration)
+        simulation.ReleaseStaticDetailLease(simulation.Snapshot().staticDetailLease.resourceGeneration);
+    const auto snapshot=simulation.Snapshot();
+    constexpr float identity[3][4]={{1,0,0,0},{0,1,0,0},{0,0,1,0}};
+    const bool safe=ordinaryStaticFacesVerified_ && ordinaryStaticOmissions_ &&
+        staticMeshSlot_.TransmissionOwnersWithin(std::array<std::uint32_t,2>{{8u,kWaterDropletMetadataIndex}}) &&
+        tlasInstanceDefinitionsValid_ && tlasBuiltInstances_[0].accelerationStructureReference==blas_.address &&
+        (tlasBuiltInstances_[0].mask&0x01u)!=0 &&
+        std::memcmp(tlasBuiltInstances_[0].transform.matrix,identity,sizeof(identity))==0 &&
+        playerCpuSkinCadence_==PlayerCpuSkinCadence::Hz60 && !snapshot.developmentWorldRoute &&
+        !snapshot.developmentSupportFixture && CorridorFrameSourcesInside(frame);
+    const bool inner=safe && frame.cameraX>=-24.0f && frame.cameraX<=-20.0f;
+    if(frame.cameraX< -25.f || frame.cameraX> -19.f)ordinaryStaticRearm_=true;
+    const bool restore=ordinaryStaticReduced_ && (!allowEviction || !safe ||
+        frame.cameraX< -22.5f || frame.cameraX> -21.5f || snapshot.staticDetailLease.restoreRequested);
+    if(!ordinaryStaticCandidate_ && preparedStaticGeometry_) {
+        // An explicit diagnostic owns its transaction, but does not make an
+        // already reduced live owner safe for a changed source/fixture state.
+        if(ordinaryStaticReduced_ && !safe) {
+            decision=StaticDetailFrame::WaitForRestore;++ordinaryStaticDetailEvidence_.waitFrames;
+        }
+        return true;
+    }
+    if(!ordinaryStaticCandidate_ && ((allowEviction && inner && ordinaryStaticRearm_ && !ordinaryStaticReduced_) || restore)) {
+        ordinaryStaticCandidateReduced_=!ordinaryStaticReduced_;
+        if(!BeginStaticGeometryReplacement(staticGeometryGeneration_,{},diagnostic,
+            horde::scene::assets::kAllStaticTriangleRegions,ordinaryStaticCandidateReduced_?ordinaryStaticOmissions_:nullptr))
+            return RecoverOrdinaryStaticPreparation(safe,decision,diagnostic);
+        ordinaryStaticCandidate_=true;
+    }
+    if(ordinaryStaticCandidate_ && ordinaryStaticCandidateReduced_ && (!allowEviction || !safe)) {
+        if(!CancelStaticGeometryReplacement(diagnostic)) {
+            if(staticGeometryCompletionUnproved_)return false;
+            diagnostic.clear();return true; // candidate AS fence is still pending
+        }
+        ordinaryStaticCandidate_=false;++ordinaryStaticDetailEvidence_.cancelled;
+    }
+    if(ordinaryStaticCandidate_) {
+        if(!StaticGeometryReplacementReady() && !AdvanceStaticGeometryReplacement(staticGeometryGeneration_,256u*1024u,diagnostic))
+            return RecoverOrdinaryStaticPreparation(safe,decision,diagnostic);
+        if(StaticGeometryReplacementReady()) {
+            if(ordinaryStaticCandidateReduced_) {
+                const horde::gameplay::simulation::StaticDetailLease lease{staticGeometryGeneration_,snapshot.worldRoute.generation,
+                    -27.5f,-16.6f,-16.55f,-13.85f,false};
+                if(!safe || !simulation.HoldStaticDetailLease(lease)) {
+                    if(!CancelStaticGeometryReplacement(diagnostic))return false;
+                    ordinaryStaticCandidate_=false;++ordinaryStaticDetailEvidence_.cancelled;return true;
+                }
+            }
+            decision=StaticDetailFrame::Cutover;return true;
+        }
+    }
+    // Unknown/discontinuous states get no trace with missing contributors. The
+    // platform consumes any acquisition without presenting and continues only
+    // bounded restoration. The prior successfully presented RT image remains.
+    if(ordinaryStaticReduced_ && !safe) {
+        decision=StaticDetailFrame::WaitForRestore;++ordinaryStaticDetailEvidence_.waitFrames;
+    }
+    diagnostic.clear();return true;
+}
+
+void PresentableTinyRtScene::FinishOrdinaryStaticDetail(horde::gameplay::simulation::GameSimulation& simulation)
+{
+    if(!ordinaryStaticCandidate_ || preparedStaticGeometry_)return;
+    ordinaryStaticCandidate_=false;
+    ordinaryStaticRestoreFailures_=0;
+    ordinaryStaticReduced_=!StaticGeometryHasCompleteContributors();
+    auto& e=ordinaryStaticDetailEvidence_;
+    e.peakOverlapOwnerBytes=std::max(e.peakOverlapOwnerBytes,staticGeometryReplacementMeasurements_.overlapOwnerAllocationBytes);
+    if(ordinaryStaticReduced_) {
+        ++e.unloads;e.omittedTriangles=ordinaryStaticOmissions_->Triangles().size();
+        const auto& r=staticGeometryReplacementMeasurements_;
+        e.savedOwnerBytes=r.oldOwnerAllocationBytes>r.candidateOwnerAllocationBytes?r.oldOwnerAllocationBytes-r.candidateOwnerAllocationBytes:0;
+        e.peakSavedOwnerBytes=std::max(e.peakSavedOwnerBytes,e.savedOwnerBytes);
+    }else {
+        ordinaryStaticRearm_=false;
+        ++e.restores;e.savedOwnerBytes=0;e.omittedTriangles=0;
+        simulation.ReleaseStaticDetailLease(simulation.Snapshot().staticDetailLease.resourceGeneration);
+    }
+}
 
 bool PresentableTinyRtScene::PackLoadedStaticAssets(RtStaticMeshSlot& out,
     std::span<const std::uint32_t> retainedWorldFamilies, std::string& diagnostic,
@@ -220,7 +418,7 @@ bool PresentableTinyRtScene::BeginStaticGeometryReplacement(
     if (retainedWorldFamilies.empty() && fullStaticGeometrySource_) {
         candidate->copy = std::make_unique<RtStaticMeshCopy>();
         if (!candidate->copy->Begin(fullStaticGeometrySource_, diagnostic,
-                kCollapseInstanceIndex,retainedTriangleRegions,std::move(omissions))) return false;
+                kCollapseInstanceIndex,retainedTriangleRegions,std::move(omissions),true)) return false;
         candidate->phase = PreparedStaticGeometry::Phase::Copy;
         preparedStaticGeometry_ = std::move(candidate);
         staticGeometryReplacementMeasurements_.beginMilliseconds =
@@ -282,6 +480,12 @@ bool PresentableTinyRtScene::BeginPreparedStaticUploads(
         }
     }
     candidate.definitions = tlasBuiltInstances_;
+    // The cached path preserves every vertex offset and value. Reuse only an
+    // exactly equal address domain; compact-family candidates still upload.
+    // Dynamic Kit writes stay in their existing, disjoint vertex subrange.
+    if (packed.SharesVertexPayloadWith(staticMeshSlot_) ||
+        SameBytes(packed.Vertices(), staticMeshSlot_.Vertices()))
+        candidate.sharedVertexAddress = staticVertexBuffer_.address;
     std::array<RtGpuBufferUpload, 6> uploads{};
     const VkBufferUsageFlags storage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
     const VkBufferUsageFlags geometry = storage | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR;
@@ -294,7 +498,7 @@ bool PresentableTinyRtScene::BeginPreparedStaticUploads(
         {candidate.definitions.data(), sizeof(candidate.definitions), VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, true, true, "candidate TLAS instances", 0}
     }};
     candidate.uploads = std::make_unique<RtGpuBufferPreparation>(gpuResources_);
-    if (!candidate.uploads->Begin(uploads, diagnostic)) return false;
+    if (!candidate.uploads->Begin(std::span(uploads).subspan(candidate.sharedVertexAddress ? 1u : 0u), diagnostic)) return false;
     candidate.phase = PreparedStaticGeometry::Phase::Upload;
     return true;
 }
@@ -353,7 +557,7 @@ bool PresentableTinyRtScene::AdvanceStaticGeometryReplacement(
         evidence.uploadedBytes += candidate->uploads->LastAdvanceCopiedBytes();
         if (candidate->uploads->Status() != RtGpuBufferPreparation::State::Ready) return completedStep();
         std::array<Buffer, 6> buffers{};
-        if (!candidate->uploads->Take(buffers, diagnostic)) return failBuild();
+        if (!candidate->uploads->Take(std::span(buffers).subspan(candidate->sharedVertexAddress ? 1u : 0u), diagnostic)) return failBuild();
         candidate->vertices = std::exchange(buffers[0], {});
         candidate->indices = std::exchange(buffers[1], {});
         candidate->transforms = std::exchange(buffers[2], {});
@@ -378,7 +582,8 @@ bool PresentableTinyRtScene::AdvanceStaticGeometryReplacement(
             auto& t = g.geometry.triangles;
             t.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR;
             t.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;
-            t.vertexData.deviceAddress = candidate->vertices.address + VkDeviceSize(primitive.vertexOffset)*sizeof(horde::scene::assets::StaticRtVertex);
+            t.vertexData.deviceAddress = (candidate->sharedVertexAddress ? candidate->sharedVertexAddress : candidate->vertices.address) +
+                VkDeviceSize(primitive.vertexOffset)*sizeof(horde::scene::assets::StaticRtVertex);
             t.vertexStride = sizeof(horde::scene::assets::StaticRtVertex);
             t.maxVertex = packed.PrimitiveVertexCounts()[index]-1;
             t.indexType = VK_INDEX_TYPE_UINT32;
@@ -470,6 +675,9 @@ bool PresentableTinyRtScene::AdvanceStaticGeometryReplacement(
         &candidate->instances, &candidate->primitives, &candidate->tlasInstances, &candidate->collapse.backing,
         &candidate->tlas.backing, &candidate->tlasScratch});
     evidence.overlapOwnerAllocationBytes = evidence.oldOwnerAllocationBytes + std::max(evidence.candidateOwnerAllocationBytes, candidate->collapseBuildOwnerBytes);
+    // Candidate total includes its shared resident vertex allocation; overlap
+    // counts that allocation once, and retirement never frees the borrow.
+    if (candidate->sharedVertexAddress) evidence.candidateOwnerAllocationBytes += staticVertexBuffer_.allocationSize;
     evidence.oldPrimitiveCount = static_cast<std::uint32_t>(staticMeshSlot_.PrimitiveMetadata().size());
     evidence.newPrimitiveCount = static_cast<std::uint32_t>(packed.PrimitiveMetadata().size());
     evidence.prepareMilliseconds = std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-candidate->prepareStart).count();
@@ -487,7 +695,10 @@ bool PresentableTinyRtScene::CommitStaticGeometryWithApi(const std::uint64_t exp
             preparedStaticGeometry_ && preparedStaticGeometry_->ready &&
             !preparedStaticGeometry_->buildWork.submitted &&
             preparedStaticGeometry_->sourceGeneration == expectedGeneration &&
-            tlasInstanceDefinitionsValid_ && !tlasPendingDefinitionsValid_;
+            tlasInstanceDefinitionsValid_ && !tlasPendingDefinitionsValid_ &&
+            (!preparedStaticGeometry_->sharedVertexAddress ||
+                (preparedStaticGeometry_->sharedVertexAddress == staticVertexBuffer_.address &&
+                 !preparedStaticGeometry_->vertices.buffer));
         if (!owned) return false;
         // A moving first frame cannot use a preparation-time pose as its
         // displayed TLAS. The separate recorder path must stage that frame's
@@ -509,7 +720,7 @@ bool PresentableTinyRtScene::CommitStaticGeometryWithApi(const std::uint64_t exp
     auto retired = std::move(preparedStaticGeometry_);
     const auto exchangeOwners = [&] {
         std::swap(staticMeshSlot_, retired->slot);
-        std::swap(staticVertexBuffer_, retired->vertices);
+        if (!retired->sharedVertexAddress) std::swap(staticVertexBuffer_, retired->vertices);
         std::swap(staticIndexBuffer_, retired->indices);
         std::swap(staticGeometryTransformBuffer_, retired->transforms);
         std::swap(instanceMetadataBuffer_, retired->instances);

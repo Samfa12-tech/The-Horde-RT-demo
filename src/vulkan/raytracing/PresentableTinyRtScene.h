@@ -47,6 +47,7 @@
 #endif
 
 namespace horde::graphics { class GraphicsPreviewSession; class EntryMenuSession; }
+namespace horde::gameplay::simulation { class GameSimulation; }
 
 namespace horde::vulkan::raytracing
 {
@@ -303,6 +304,16 @@ public:
         VkDeviceSize maxCopyBytes, std::string& diagnostic);
     bool StaticGeometryReplacementReady() const noexcept;
     bool StaticGeometryReplacementHasGpuWork() const noexcept;
+    enum class StaticDetailFrame { Render, WaitForRestore, Cutover };
+    bool AdvanceOrdinaryStaticDetail(horde::gameplay::simulation::GameSimulation& simulation,
+        const RtSceneFrameInputs& frame, bool allowEviction, StaticDetailFrame& decision, std::string& diagnostic);
+    void FinishOrdinaryStaticDetail(horde::gameplay::simulation::GameSimulation& simulation);
+    struct OrdinaryStaticDetailMeasurements {
+        std::uint64_t omittedTriangles=0, unloads=0, restores=0, cancelled=0, waitFrames=0;
+        std::uint64_t savedOwnerBytes=0, peakSavedOwnerBytes=0, peakOverlapOwnerBytes=0, preparationFailures=0;
+    };
+    const OrdinaryStaticDetailMeasurements& OrdinaryStaticDetailEvidence() const { return ordinaryStaticDetailEvidence_; }
+    bool OrdinaryStaticDetailAvailable() const { return ordinaryStaticFacesVerified_ && ordinaryStaticOmissions_; }
     bool RefreshStaticGeometryReplacement(std::uint64_t expectedGeneration,
         std::string& diagnostic);
     bool CancelStaticGeometryReplacement(std::string& diagnostic);
@@ -777,6 +788,9 @@ private:
         std::uint8_t retainedTriangleRegions = horde::scene::assets::kAllStaticTriangleRegions;
         bool retainedAllFamilies = true;
         bool retainedAllTriangles = true;
+        // Sparse index replacement retains the exact vertex address domain.
+        // This is a borrow from the current generation, never a second owner.
+        VkDeviceAddress sharedVertexAddress = 0;
         bool ready = false;
         Phase phase = Phase::Upload;
         std::chrono::steady_clock::time_point prepareStart;
@@ -810,6 +824,14 @@ private:
         const std::array<VkAccelerationStructureInstanceKHR,kTlasInstanceCount>& definitions) noexcept;
     bool BeginPreparedStaticUploads(PreparedStaticGeometry& owner, std::string& diagnostic);
     std::shared_ptr<const RtStaticMeshSlot> fullStaticGeometrySource_;
+    void AdmitOrdinaryStaticDetail();
+    bool RecoverOrdinaryStaticPreparation(bool safe, StaticDetailFrame& decision, std::string& diagnostic);
+    std::shared_ptr<const RtStaticTriangleOmissions> ordinaryStaticOmissions_;
+    bool ordinaryStaticFacesVerified_=false, ordinaryStaticCandidate_=false;
+    bool ordinaryStaticCandidateReduced_=false, ordinaryStaticReduced_=false;
+    bool ordinaryStaticRearm_=true;
+    unsigned ordinaryStaticRestoreFailures_=0;
+    OrdinaryStaticDetailMeasurements ordinaryStaticDetailEvidence_{};
     std::unique_ptr<PreparedStaticGeometry> preparedStaticGeometry_;
     std::uint64_t staticGeometryGeneration_ = 1;
     std::uint8_t staticGeometryRetainedTriangleRegions_ = horde::scene::assets::kAllStaticTriangleRegions;

@@ -28,6 +28,36 @@ int main(int argc,char** argv) {
  int cases=0,failures=0;
  auto check=[&](bool b,const char* m){++cases;if(!b){++failures;std::cerr<<m<<'\n';}};
  {
+  auto config=ProductionGameSimulationConfig();
+  config.developmentRescueJourney=true;config.playerStartX=-22;config.playerStartZ=-15.2f;
+  GameSimulation leased(config);
+  const auto initial=leased.Snapshot();
+  StaticDetailLease lease{41,initial.worldRoute.generation,-27.5f,-16.6f,-16.55f,-13.85f,false};
+  auto bad=lease;bad.worldGeneration++;
+  check(!leased.HoldStaticDetailLease(bad),"stale world cannot acquire a spatial resource lease");
+  bad=lease;bad.minX=bad.maxX;
+  check(!leased.HoldStaticDetailLease(bad),"degenerate lease cannot restrict traversal");
+  check(leased.HoldStaticDetailLease(lease) && !leased.HoldStaticDetailLease(lease),
+        "only one current renderer lease can own the safe-side gate");
+  InputSnapshot move;move.damageEnabled=false;move.hasAuthoritativePlayerPose=true;
+  move.authoritativePlayerX=-40;move.authoritativePlayerZ=-15.2f;move.yawRadians=1.2f;
+  leased.StepFixed(move);
+  check(leased.Snapshot().playerX==initial.playerX && leased.Snapshot().staticDetailLease.restoreRequested &&
+        leased.Snapshot().playerYawRadians==move.yawRadians,
+        "discontinuous movement requests restore and keeps translation safe while look remains responsive");
+  check(!leased.ReleaseStaticDetailLease(40),"stale release cannot remove the safe-side gate");
+  const auto beforeReset=leased.Snapshot();leased.ResetRoute();
+  check(leased.Snapshot().worldRoute.generation==beforeReset.worldRoute.generation &&
+        leased.Snapshot().staticDetailLease.restoreRequested,"reset defers until complete renderer ownership returns");
+  check(leased.ReleaseStaticDetailLease(41) && !leased.Snapshot().staticDetailLease.resourceGeneration &&
+        leased.Snapshot().worldRoute.generation==beforeReset.worldRoute.generation,
+        "completed release cannot mutate gameplay from a rendering callback");
+  move.hasAuthoritativePlayerPose=false;leased.StepFixed(move);
+  check(leased.Snapshot().worldRoute.generation>beforeReset.worldRoute.generation,
+        "deferred reset executes once on the next simulation turn");
+  check(!leased.ReleaseStaticDetailLease(41),"a consumed lease cannot release a later owner");
+ }
+ {
   using horde::gameplay::validation::ChapterRouteMeasurementClock;
   ChapterRouteMeasurementClock clock;
   check(clock.Consume(0)==0 && clock.Consume(.01)==0,
@@ -117,7 +147,7 @@ int main(int argc,char** argv) {
        "paused probe must retain its phase without advancing input or moving the player");
     }
     unsigned frames=0,raises=0;bool walkingReunion=false;std::uint64_t lastRaise=moving.Snapshot().lastConsumedToggleHeldLightPoseSequence;
-    std::array<bool,10> seen{};
+    std::array<bool,static_cast<unsigned>(ChapterProbePhase::Failed)+1> seen{};
     while(frames++<10000 && probe.Phase()!=ChapterProbePhase::Complete && probe.Phase()!=ChapterProbePhase::Failed) {
      seen[static_cast<unsigned>(probe.Phase())]=true;
      walkingReunion|=probe.Phase()==ChapterProbePhase::Raise && moving.Snapshot().chapterCompanion.walking &&
@@ -138,7 +168,8 @@ int main(int argc,char** argv) {
     check(raises==1 && s.chapterDialogue.proofAccepted && s.rescue.sawDescent && s.rescue.firstAscentCompleted &&
       s.rescue.exteriorSide && !s.rescue.equipmentStowed && s.rescue.claimCount==1 && s.rescue.deploymentCount==1,
       "probe must prove one fresh raise, lookout/return, real descent and repeat ascent without duplicate ownership");
-    for(unsigned phase=0;phase<8;++phase)check(seen[phase],"probe skipped a required moving journey phase");
+    for(unsigned phase=0;phase<static_cast<unsigned>(ChapterProbePhase::Complete);++phase)
+        check(seen[phase],"probe skipped a required moving journey phase");
     std::cout<<"native-terrain moving probe frames="<<frames<<'\n';
    }
    ChapterRoundTripProbe invalid;

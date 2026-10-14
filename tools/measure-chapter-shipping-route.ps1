@@ -29,11 +29,14 @@ foreach($source in @('src/platform/windows/DiagnosticWindow.cpp','src/platform/w
  'src/platform/windows/WindowsChapterShippingLaunch.h','src/platform/windows/WindowsAssetRoot.h',
  'src/platform/windows/WindowsPresentInterval.h','CMakeLists.txt',
  'src/vulkan/raytracing/PresentableTinyRtScene.h','src/vulkan/raytracing/PresentableTinyRtScene.cpp',
+ 'src/vulkan/raytracing/PresentableTinyRtSceneStaticGeometry.cpp','src/vulkan/raytracing/RtStaticMeshSlot.cpp',
+ 'src/scene/CorridorStaticDetail.h','src/scene/CorridorStaticDetailFaces.h',
+ 'src/gameplay/simulation/GameSimulation.cpp','src/gameplay/simulation/StaticDetailLease.h',
  'src/gameplay/validation/ChapterRouteMeasurementClock.h',
  'src/gameplay/validation/ChapterRoundTripProbe.h')){
  $sourceHashes[$source]=(Get-FileHash -LiteralPath (Join-Path $root $source) -Algorithm SHA256).Hash.ToLowerInvariant()
 }
-@{scope=($Configuration+' CPU with Shipping High shaders; uncovered visible wall-clock scripted round-trip after staged Keeper death; zero static-region residency saving; not owner/phone acceptance');
+@{scope=($Configuration+' CPU with Shipping High shaders; uncovered visible wall-clock scripted out/back and tomb backtrack after staged Keeper death; automatic static-detail lifetime; not owner/phone acceptance');
  executableSha256=(Get-FileHash -LiteralPath $start.FileName -Algorithm SHA256).Hash.ToLowerInvariant();
  sources=$sourceHashes;backend=if($Query){'RayQueryCompute'}else{'RayTracingPipeline'};
  maximumSimulationTicksPerRender=4;simulationHz=60;deadlineSeconds=180;

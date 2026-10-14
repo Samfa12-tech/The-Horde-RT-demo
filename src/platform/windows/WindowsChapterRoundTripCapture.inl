@@ -14,8 +14,8 @@ bool RunChapterRoundTripCapture(VulkanSurfaceContext& context,const std::filesys
     }
     std::ofstream rows(directory/"frames.csv"),manifest(directory/"gallery.json");
     if(!rows||!manifest) {error="Two-way evidence files could not open.";return false;}
-    rows<<"frame,phase,station,submitted_tick,simulation_ms,render_cycle_ms,completed_tick,completed_serial,gpu_status,gpu_ns,device_local_bytes,host_visible_bytes,keeper_retired_bytes,keeper_retired_memory_flags,keeper_texture_retired_device_local_bytes,keeper_texture_retired_host_visible_bytes\n";
-    manifest<<"{\"schema\":1,\"scope\":\"moving fixed-step validation after staged Keeper death and first ascent; Diagnostic, static scene resident, normal Keeper vertex and texture lifetimes active; not owner or Shipping performance acceptance\",\"maximumSimulationTicksPerRender\":4,\"simulationHz\":60,\"captures\":[\n";
+    rows<<"frame,phase,station,submitted_tick,simulation_ms,render_cycle_ms,completed_tick,completed_serial,gpu_status,gpu_ns,device_local_bytes,host_visible_bytes,keeper_retired_bytes,keeper_retired_memory_flags,keeper_texture_retired_device_local_bytes,keeper_texture_retired_host_visible_bytes,static_omitted_triangles,static_unloads,static_restores,static_saved_owner_bytes,static_peak_owner_overlap_bytes,static_wait_frames\n";
+    manifest<<"{\"schema\":2,\"scope\":\"moving fixed-step validation after staged Keeper death and first ascent; Diagnostic, automatic static detail and Keeper lifetimes; not owner or Shipping performance acceptance\",\"maximumSimulationTicksPerRender\":4,\"simulationHz\":60,\"captures\":[\n";
     struct Restore {
         VulkanSurfaceContext& ctx;bool paused,active;int sfx,voice,music;
         ~Restore() {ctx.simulationPaused=paused;ctx.sfxVolumePercent=sfx;ctx.voiceVolumePercent=voice;ctx.musicVolumePercent=music;
@@ -103,6 +103,7 @@ bool RunChapterRoundTripCapture(VulkanSurfaceContext& context,const std::filesys
         const auto inventory=context.rtScene.ResourceInventory();
         const auto keeper=context.rtScene.KeeperVertexLifetime();
         const auto keeperTextures=context.rtScene.KeeperTextureLifetime();
+        const auto detail=context.rtScene.OrdinaryStaticDetailEvidence();
         rows<<frames<<','<<ChapterProbePhaseName(phase)<<','<<station<<','<<context.simulation.Snapshot().tickIndex<<','
             <<std::chrono::duration<double,std::milli>(simulated-before).count()<<','
             <<std::chrono::duration<double,std::milli>(rendered-simulated).count()<<','
@@ -112,11 +113,13 @@ bool RunChapterRoundTripCapture(VulkanSurfaceContext& context,const std::filesys
             <<(completed.hasCompletedEvidence&&completed.completedEvidence.gpu.hasDuration?completed.completedEvidence.gpu.durationNanoseconds:0)<<','
             <<inventory.deviceLocalBytes<<','<<inventory.hostVisibleBytes<<','
             <<keeper.retiredAllocationBytes<<','<<keeper.retiredMemoryFlags<<','
-            <<keeperTextures.retiredDeviceLocalBytes<<','<<keeperTextures.retiredHostVisibleBytes<<'\n';
+            <<keeperTextures.retiredDeviceLocalBytes<<','<<keeperTextures.retiredHostVisibleBytes<<','
+            <<detail.omittedTriangles<<','<<detail.unloads<<','<<detail.restores<<','<<detail.savedOwnerBytes<<','
+            <<detail.peakOverlapOwnerBytes<<','<<detail.waitFrames<<'\n';
         if(frames%120==0)rows.flush();
         const bool transition=phase!=probe.Phase() || station!=probe.Station();
         const bool quadrant=(phase==ChapterProbePhase::Landing || phase==ChapterProbePhase::Lookout ||
-            phase==ChapterProbePhase::Lower) && quarter!=probe.SweepQuarter();
+            phase==ChapterProbePhase::Lower || phase==ChapterProbePhase::Passage) && quarter!=probe.SweepQuarter();
         const auto& actor=context.simulation.Snapshot().chapterCompanion;
         if(!kitWalkCaptured && phase==ChapterProbePhase::Raise && actor.walking && actor.animationSeconds>=.3f) {
             if(!capture("kit-walking"))return false;
@@ -157,7 +160,13 @@ bool RunChapterRoundTripCapture(VulkanSurfaceContext& context,const std::filesys
        resetState.chapterCompanion.grounded || resetState.rescue.claimCount!=0) {
         error="Ordinary reset left stale companion or retired Keeper storage.";return false;
     }
-    manifest<<"\n],\"frames\":"<<frames-1<<",\"normalPlayStaticRegionResidencySavingBytes\":0,"
+    const auto detail=context.rtScene.OrdinaryStaticDetailEvidence();
+    if(!detail.unloads || detail.restores!=detail.unloads || detail.savedOwnerBytes ||
+       !context.rtScene.StaticGeometryHasCompleteContributors()) {
+        error="Two-way capture lacks automatic static-detail unload and complete restoration.";return false;
+    }
+    manifest<<"\n],\"frames\":"<<frames-1<<",\"maximumNormalStaticOwnerSavingBytes\":"<<detail.peakSavedOwnerBytes
+        <<",\"staticDetailUnloads\":"<<detail.unloads<<",\"staticDetailRestores\":"<<detail.restores<<','
         <<"\"keeperVertexLifetime\":{\"retiredAllocationBytes\":"<<retired.retiredAllocationBytes
         <<",\"retiredMemoryFlags\":"<<retired.retiredMemoryFlags
         <<",\"retirements\":"<<restored.retirementCount<<",\"restorations\":"<<restored.restorationCount

@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <cmath>
 #include <limits>
+#include <utility>
 
 #include "gameplay/CorridorCollision.h"
 #include "gameplay/ShowcaseCheckpoints.h"
@@ -599,6 +600,26 @@ bool GameSimulation::PublishWorldZoneReadiness(WorldZoneToken token, ZoneReadine
     if((!config_.developmentWorldRoute && !config_.developmentRescueJourney) || !worldRoute_.Publish(token,readiness)) return false;
     RefreshSnapshot(lastInput_); return true;
 }
+bool GameSimulation::HoldStaticDetailLease(const StaticDetailLease& lease)
+{
+    if(!lease.Valid() || lease.worldGeneration!=worldRoute_.generation ||
+       staticDetailLease_.resourceGeneration || !lease.Contains(playerX_,playerZ_) ||
+       !config_.developmentRescueJourney || UsesRescueExterior())return false;
+    staticDetailLease_=lease;
+    // Explicit resource retirement may regress readiness; asynchronous Ready
+    // callbacks themselves still cannot regress/resurrect WorldRouteState.
+    for(std::size_t i=1;i<worldRoute_.readiness.size();++i)
+        worldRoute_.readiness[i]=ZoneReadiness::Preparing;
+    RefreshSnapshot(lastInput_);return true;
+}
+bool GameSimulation::ReleaseStaticDetailLease(std::uint64_t generation)
+{
+    if(!generation || generation!=staticDetailLease_.resourceGeneration)return false;
+    staticDetailLease_={};
+    // Deferred world actions execute on the next simulation turn, never from
+    // inside the renderer's successful current-frame cutover callback.
+    RefreshSnapshot(lastInput_);return true;
+}
 bool GameSimulation::PublishChapterTerrain(WorldZoneToken token, std::shared_ptr<const TriangleSupportSurface> terrain)
 {
     if(!config_.developmentRescueJourney || !config_.authoredChapterTerrain || !terrain ||
@@ -634,6 +655,9 @@ void GameSimulation::SetDevelopmentSupportFixture(bool enabled, std::uint64_t ge
 
 void GameSimulation::ResetRoute()
 {
+    if(staticDetailLease_.resourceGeneration) {
+        staticDetailLease_.restoreRequested=true;deferredStaticDetailReset_=true;RefreshSnapshot(lastInput_);return;
+    }
     chapterTerrain_.reset();
     chapterDialogue_.Reset();chapterCompanion_.Reset();chapterFirstExterior_=false;chapterVisibleRaise_=0;
     if(config_.developmentRescueJourney) { rescueSavedSwordValid_=false;rescueTraversal_.Reset();rescueOpeningSeconds_=0;worldRoute_.Invalidate(); }
@@ -694,6 +718,9 @@ void GameSimulation::ResetRoute()
 
 void GameSimulation::RetryEncounter()
 {
+    if(staticDetailLease_.resourceGeneration) {
+        staticDetailLease_.restoreRequested=true;deferredStaticDetailRetry_=true;RefreshSnapshot(lastInput_);return;
+    }
     if(config_.developmentRescueJourney && rescueTraversal_.Snapshot().claimCount) { RecoverRescueJourney();return; }
     legacyCombatCheckpoint_ = false;
     ApplyCheckpoint(retryCheckpoint_, true);
@@ -701,6 +728,7 @@ void GameSimulation::RetryEncounter()
 
 bool GameSimulation::ApplyShowcaseCheckpoint(std::int32_t checkpointId, bool countAsRetry)
 {
+    if(staticDetailLease_.resourceGeneration) { staticDetailLease_.restoreRequested=true;return false; }
     // Frozen evidence imports retain their historical contact/durability/cast rules.
     if (FindShowcaseCheckpoint(checkpointId) == nullptr) return false;
     legacyCombatCheckpoint_ = true;
@@ -1271,6 +1299,17 @@ void GameSimulation::LinkCombatTimingSemanticEvent(
 
 bool GameSimulation::ConsumeWorldCommand()
 {
+    if(!staticDetailLease_.resourceGeneration && deferredStaticDetailReset_) {
+        deferredStaticDetailReset_=deferredStaticDetailRetry_=false;ResetRoute();return true;
+    }
+    if(!staticDetailLease_.resourceGeneration && deferredStaticDetailRetry_) {
+        deferredStaticDetailRetry_=false;RetryEncounter();return true;
+    }
+    if(staticDetailLease_.resourceGeneration &&
+       (pendingRouteResetCommands_ || pendingRetryCommands_ || pendingTutorialReplayCommands_)) {
+        staticDetailLease_.restoreRequested=true;
+        return true; // Keep the world command pending until real restoration.
+    }
     if (pendingRouteResetCommands_ > 0u)
     {
         --pendingRouteResetCommands_;
@@ -1302,6 +1341,7 @@ bool GameSimulation::ConsumeWorldCommand()
 
 bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
 {
+    if(staticDetailLease_.resourceGeneration) { staticDetailLease_.restoreRequested=true;RefreshSnapshot(lastInput_);return false; }
     const ShowcaseCheckpoint* checkpoint = FindShowcaseCheckpoint(checkpointId);
     if (checkpoint == nullptr)
     {
@@ -1929,6 +1969,10 @@ void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSecon
         }
     }
 
+    if(staticDetailLease_.resourceGeneration && !staticDetailLease_.Contains(playerX_,playerZ_)) {
+        playerX_=previousX;playerZ_=previousZ;
+        staticDetailLease_.restoreRequested=true;
+    }
     ResolvePlayerSupport();
     const float travelled = std::hypot(playerX_ - previousX, playerZ_ - previousZ);
     if (!input.hasAuthoritativePlayerPose && dodgeRemainingSeconds_ <= 0.0f &&
@@ -2551,6 +2595,7 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.developmentWorldRoute=config_.developmentWorldRoute;
     snapshot_.stagedWorldPreparation=stagedWorldPreparation_;
     snapshot_.worldRoute=worldRoute_;
+    snapshot_.staticDetailLease=staticDetailLease_;
     snapshot_.playerSupportSurface=playerSupport_.surface;
     snapshot_.playerSupportWorldY = playerSupport_.worldY;
     snapshot_.playerHeightDelta = PlayerHeightDelta(playerSupport_.worldY);

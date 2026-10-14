@@ -1,5 +1,8 @@
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
 #include "vulkan/raytracing/TlasInstanceRefresh.h"
+#include "scene/CorridorStaticDetail.h"
+#include "scene/CorridorStaticDetailFaces.h"
+#include "gameplay/simulation/GameSimulation.h"
 #include <iostream>
 #include <type_traits>
 #include <stdexcept>
@@ -26,6 +29,7 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
         bool recordFailure=false, recordThrow=false, omitDefinitions=false, wrongWorld=false, resetDuringRecord=false;
         bool recordingCorrect=false;
         bool publicationCorrect=false, retirementCorrect=false;
+        bool sharedVertices=false;
     };
     static void Seed(Scene& s, int& oldMap, int& newMap) {
         s.ready_=true; s.staticGeometryGeneration_=41;
@@ -59,7 +63,7 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
             [](void* u,Scene& s,std::string& error) {
                 auto& p=*static_cast<Proof*>(u); ++p.publish;
                 p.publicationCorrect = p.proof==1 && p.retire==0 && s.staticGeometryGeneration_==41 &&
-                    s.staticVertexBuffer_.buffer==Handle<VkBuffer>(101) && s.tlas_.handle==Handle<VkAccelerationStructureKHR>(108);
+                    s.staticVertexBuffer_.buffer==Handle<VkBuffer>(p.sharedVertices?1:101) && s.tlas_.handle==Handle<VkAccelerationStructureKHR>(108);
                 if(p.descriptorThrow) throw std::runtime_error("Injected descriptor preparation exception");
                 if(p.descriptorFailure) error="Injected descriptor contract rejection before publication";
                 return !p.descriptorFailure;
@@ -68,10 +72,12 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
                 auto& p=*static_cast<Proof*>(u); ++p.retire;
                 p.retirementCorrect = p.publish==1 && s.staticGeometryGeneration_==42 &&
                     s.collapseBlas_.address==107*4096 && s.tlasBuiltInstances_[Scene::kCollapseInstanceIndex].accelerationStructureReference==107*4096 &&
-                    s.tlasBuiltInstances_[0].instanceCustomIndex==21 && s.tlasInstanceDefinitionsValid_ && !s.tlasPendingDefinitionsValid_ &&
+                    s.tlasBuiltInstances_[0].instanceCustomIndex==21 && s.tlasInstanceDefinitionsValid_ &&
+                    (s.tlasPendingDefinitionsValid_ == (p.record==1)) &&
+                    (!p.record || s.tlasPendingInstances_[Scene::kCollapseInstanceIndex].accelerationStructureReference==107*4096) &&
                     s.lastInstanceMasks_[0]==0x41 && s.chapterActorPoseGeneration_==UINT64_MAX && s.chapterActorPoseSeconds_<0 &&
                     s.chapterActorNeedsRefit_ && s.waterDropletGeometryVisible_ &&
-                    s.worldPlayerVertexBuffer_.buffer==Handle<VkBuffer>(10) && s.viewmodelVertexBuffer_.buffer==Handle<VkBuffer>(11) && c.vertices.buffer==Handle<VkBuffer>(1) &&
+                    s.worldPlayerVertexBuffer_.buffer==Handle<VkBuffer>(10) && s.viewmodelVertexBuffer_.buffer==Handle<VkBuffer>(11) && c.vertices.buffer==Handle<VkBuffer>(p.sharedVertices?0:1) &&
                     c.instances.buffer==Handle<VkBuffer>(4) && c.tlasInstances.buffer==Handle<VkBuffer>(6) &&
                     c.collapse.handle==Handle<VkAccelerationStructureKHR>(7) && c.tlas.handle==Handle<VkAccelerationStructureKHR>(8) &&
                     c.tlasScratch.buffer==Handle<VkBuffer>(9);
@@ -87,7 +93,7 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
         api.recordCurrentFrame=[](void* u,Scene& s,std::string& error) {
             auto& p=*static_cast<Proof*>(u);++p.record;
             p.recordingCorrect=p.proof==1 && p.publish==1 && p.retire==0 &&
-                s.staticGeometryGeneration_==41 && s.staticVertexBuffer_.buffer==Handle<VkBuffer>(101) &&
+                s.staticGeometryGeneration_==41 && s.staticVertexBuffer_.buffer==Handle<VkBuffer>(p.sharedVertices?1:101) &&
                 s.chapterActorNeedsRefit_ && s.tlasBuiltInstances_[Scene::kCollapseInstanceIndex].accelerationStructureReference==107*4096;
             if(p.recordThrow)throw std::runtime_error("Injected current-frame record exception");
             if(p.recordFailure){error="Injected current-frame record failure";return false;}
@@ -386,8 +392,102 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
     }
     static int Run() {
         int failures=0,oldMap=3,newMap=4; std::string error;
+        {
+            using namespace horde::scene;
+            using namespace corridor_detail_faces;
+            struct Vertex {float position[3];};
+            std::vector<Vertex> vertices(kExpectedImmutableTriangleCount*3);
+            std::vector<std::uint32_t> indices(vertices.size()),codes(kExpectedImmutableTriangleCount);
+            for(unsigned i=0;i<indices.size();++i)indices[i]=i;
+            const auto install=[&](const auto& face) {
+                for(const auto& t:face) {
+                    codes[t.proceduralTriangleIndex]=t.materialId;
+                    for(unsigned k=0;k<9;++k)vertices[t.proceduralTriangleIndex*3+k/3].position[k%3]=std::bit_cast<float>(t.xyzBits[k]);
+                }
+            };
+            install(kNorthPlusZ);install(kRoofPlusY);install(kFloorMinusY);
+            const auto matches=[&](bool opaque=true) {
+                return MatchesAll(std::span<const Vertex>(vertices),std::span<const std::uint32_t>(indices),
+                    std::span<const std::uint32_t>(codes),kExpectedImmutableTriangleCount,vertices.size(),opaque);
+            };
+            failures+=!Check(matches() && !matches(false),"actual blocker certificate requires exact opaque geometry");
+            const auto mutate=[&](const auto& face) {
+                for(const auto& t:face) {
+                    auto& v=vertices[t.proceduralTriangleIndex*3].position[0];
+                    const float saved=v;v=std::nextafter(v,INFINITY);
+                    failures+=!Check(!matches(),"any certified face displacement invalidates contributor admission");v=saved;
+                    ++codes[t.proceduralTriangleIndex];
+                    failures+=!Check(!matches(),"changed blocker material invalidates contributor admission");--codes[t.proceduralTriangleIndex];
+                }
+            };
+            mutate(kNorthPlusZ);mutate(kRoofPlusY);mutate(kFloorMinusY);
+            const DetailBox forest{{-23.266034,-1.162538,24.000114},{20.060220,10.271029,44.170182}};
+            failures+=!Check(DetailForestReceiverEnvelopeBlocked(forest) &&
+                DetailTargetBehindCoveredFaces({{-.8,1.27,-5.3},{.7,1.4,-3.3}}),
+                "full native target, bounded secondary and directional shadow envelope stays behind verified faces");
+            auto bad=forest;bad.min[0]=-10000;
+            failures+=!Check(!DetailForestReceiverEnvelopeBlocked(bad),"open west portal prevents an unsafe target certificate");
+            bad=forest;bad.min[2]=-13.6;
+            failures+=!Check(!DetailTargetBehindCoveredFaces(bad),"grazing or inside target cannot be omitted");
+            bad=forest;bad.max[1]=NAN;
+            failures+=!Check(!DetailTargetBehindCoveredFaces(bad),"nonfinite target fails closed");
+            failures+=!Check(DetailSourceSphereInside({{-22,.6f,-15.2f}},.404) &&
+                !DetailSourceSphereInside({{-22,.95f,-15.2f}},.404) &&
+                !DetailSourceSphereInside({{-22,.6f,-13.8f}},.404),
+                "rotated lantern envelope must fit vertically and horizontally before any sparse frame");
+        }
         failures+=KeeperVertexLifetimeChecks();
         failures+=KeeperTextureLifetimeChecks();
+        {
+            Scene s;Seed(s,oldMap,newMap);
+            horde::gameplay::simulation::GameSimulation simulation;
+            Scene::StaticDetailFrame decision{};
+            const auto* explicitCandidate=s.preparedStaticGeometry_.get();
+            s.ordinaryStaticReduced_=true;s.staticGeometryRetainedAllTriangles_=false;
+            failures+=!Check(s.AdvanceOrdinaryStaticDetail(simulation,{},false,decision,error) &&
+                decision==Scene::StaticDetailFrame::WaitForRestore &&
+                s.preparedStaticGeometry_.get()==explicitCandidate && s.OrdinaryStaticDetailEvidence().waitFrames==1,
+                "explicit diagnostic transaction cannot bypass reduced-owner safety after a source change");
+            s.ordinaryStaticReduced_=false;s.staticGeometryRetainedAllTriangles_=true;
+            failures+=!Check(s.AdvanceOrdinaryStaticDetail(simulation,{},false,decision,error) &&
+                decision==Scene::StaticDetailFrame::Render && s.preparedStaticGeometry_.get()==explicitCandidate,
+                "complete owner remains renderable while an explicit diagnostic owns preparation");
+        }
+        {
+            Scene s;Seed(s,oldMap,newMap);s.preparedStaticGeometry_.reset();s.ordinaryStaticCandidate_=true;
+            Scene::StaticDetailFrame decision{};
+            failures+=!Check(s.RecoverOrdinaryStaticPreparation(true,decision,error) &&
+                !s.ordinaryStaticCandidate_ && !s.ordinaryStaticRearm_ && decision==Scene::StaticDetailFrame::Render &&
+                s.StaticGeometryHasCompleteContributors() && s.staticVertexBuffer_.buffer==Handle<VkBuffer>(1),
+                "failed optional preparation retains full geometry and clears its cursor without retrying every frame");
+            s.ordinaryStaticReduced_=true;s.staticGeometryRetainedAllTriangles_=false;s.ordinaryStaticCandidate_=true;
+            failures+=!Check(s.RecoverOrdinaryStaticPreparation(false,decision,error) &&
+                !s.ordinaryStaticCandidate_ && decision==Scene::StaticDetailFrame::WaitForRestore &&
+                !s.StaticGeometryHasCompleteContributors(),
+                "failed return preparation allows one new bounded attempt without tracing unsafe partial geometry");
+            failures+=!Check(!s.RecoverOrdinaryStaticPreparation(false,decision,error) &&
+                s.staticVertexBuffer_.buffer==Handle<VkBuffer>(1) && !s.StaticGeometryHasCompleteContributors(),
+                "repeated restore failure reports the failure while retaining the safe-side owner");
+            s.staticGeometryCompletionUnproved_=true;
+            failures+=!Check(!s.RecoverOrdinaryStaticPreparation(true,decision,error),
+                "unproved GPU work cannot enter optional-preparation recovery");
+        }
+        for(unsigned edge=0;edge<4;++edge) {
+            Scene s;Seed(s,oldMap,newMap);Proof p{&s};p.sharedVertices=true;
+            auto& candidate=*s.preparedStaticGeometry_;
+            candidate.vertices={};candidate.sharedVertexAddress=s.staticVertexBuffer_.address;
+            auto api=FrameApi(p);
+            if(edge==1)candidate.sharedVertexAddress+=256;
+            if(edge==2)candidate.vertices=Buffer(101);
+            if(edge==3)p.descriptorFailure=true;
+            const auto committed=s.CommitStaticGeometryWithApi(41,api,error);
+            failures+=!Check(s.staticVertexBuffer_.buffer==Handle<VkBuffer>(1),
+                "borrowed static vertex owner never transfers or retires at cutover");
+            if(edge==0) failures+=!Check(committed && p.publicationCorrect && p.retirementCorrect && p.recordingCorrect,
+                "current-frame sparse cutover shares exact vertex address and retires only replaced resources");
+            else failures+=!Check(!committed && p.retire==0 && p.record==0 && s.preparedStaticGeometry_,
+                "stale vertex address, duplicate vertex ownership and rejected publication preserve the live owner");
+        }
         {
             Scene s;Seed(s,oldMap,newMap);Proof p{&s};auto api=Api(p);
             s.developmentWorldRoute_=true;s.worldRouteGeometry_.valid=true;

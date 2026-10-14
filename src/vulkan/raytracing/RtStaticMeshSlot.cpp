@@ -139,10 +139,29 @@ std::shared_ptr<const RtStaticTriangleOmissions> RtStaticTriangleOmissions::Crea
     }
 }
 
+bool RtStaticMeshSlot::TransmissionOwnersWithin(std::span<const std::uint32_t> allowed) const noexcept
+{
+    if(!admitted_)return false;
+    for(std::size_t instance=0;instance<instanceMetadata_.size();++instance) {
+        const auto& owner=instanceMetadata_[instance];
+        if(owner.primitiveBase>primitiveMetadata_.size() || owner.primitiveCount>primitiveMetadata_.size()-owner.primitiveBase)return false;
+        for(std::size_t p=owner.primitiveBase;p<owner.primitiveBase+owner.primitiveCount;++p) {
+            const auto row=primitiveMetadata_[p].materialIndex;
+            if(row>=materials_.size())return false;
+            if((materials_[row].materialFlags[0]&static_cast<std::uint32_t>(RtMaterialFlag::Transmission)) &&
+               std::find(allowed.begin(),allowed.end(),static_cast<std::uint32_t>(instance))==allowed.end())return false;
+        }
+    }
+    return true;
+}
+
 std::uint64_t RtStaticMeshSlot::PayloadBytes() const noexcept
 {
-    return vertices_.size()*sizeof(vertices_.front()) + worldBodyVertices_.size()*sizeof(worldBodyVertices_.front()) +
-        viewmodelVertices_.size()*sizeof(viewmodelVertices_.front()) + indices_.size()*sizeof(indices_.front()) +
+    // Logical payload. Shared vertex storage is counted once by its owner in
+    // allocation inventories, but remains part of this slot's address domain.
+    return Vertices().size()*sizeof(horde::scene::assets::StaticRtVertex) +
+        Vertices(RtGeometryRole::PlayerWorldBody).size()*sizeof(horde::scene::assets::StaticRtVertex) +
+        Vertices(RtGeometryRole::PlayerViewmodel).size()*sizeof(horde::scene::assets::StaticRtVertex) + indices_.size()*sizeof(indices_.front()) +
         materials_.size()*sizeof(materials_.front()) + primitiveMetadata_.size()*sizeof(primitiveMetadata_.front()) +
         primitiveVertexCounts_.size()*sizeof(primitiveVertexCounts_.front()) +
         geometryTransforms_.size()*sizeof(geometryTransforms_.front()) + triangleRegions_.size() + sizeof(instanceMetadata_) +
@@ -150,7 +169,7 @@ std::uint64_t RtStaticMeshSlot::PayloadBytes() const noexcept
 }
 bool RtStaticMeshCopy::Begin(std::shared_ptr<const RtStaticMeshSlot> source, std::string& diagnostic,
     std::uint32_t selectedInstance, std::uint8_t retainedRegions,
-    std::shared_ptr<const RtStaticTriangleOmissions> omissions)
+    std::shared_ptr<const RtStaticTriangleOmissions> omissions, bool shareImmutableVertices)
 {
     if(output_ || !source || !source->admitted_ || source->PrimitiveMetadata().empty() || source->Materials().empty() ||
         source->Indices().empty() || retainedRegions>horde::scene::assets::kAllStaticTriangleRegions ||
@@ -180,6 +199,12 @@ bool RtStaticMeshCopy::Begin(std::shared_ptr<const RtStaticMeshSlot> source, std
         output->textureArrayCounts_=source->textureArrayCounts_;
         output->measurements_=source->measurements_;
         Cancel(); source_=std::move(source); output_=std::move(output);
+        if (shareImmutableVertices) {
+            // Flatten aliases so copies never build an ownership chain. The
+            // immutable root outlives cancellation, source release and cutover.
+            output_->vertexSource_ = source_->vertexSource_ ? source_->vertexSource_ : source_;
+            row_ = 3u;
+        }
         boundaries_=std::move(boundaries);selectedBegin_=selectedBegin;selectedEnd_=selectedEnd;
         retainedRegions_=retainedRegions;
         omissions_=std::move(omissions);
@@ -209,9 +234,9 @@ bool RtStaticMeshCopy::Advance(const std::size_t maxBytes, std::string& diagnost
     };
     try {
         switch(row_) {
-        case 0: return copy(source_->vertices_,output_->vertices_);
-        case 1: return copy(source_->worldBodyVertices_,output_->worldBodyVertices_);
-        case 2: return copy(source_->viewmodelVertices_,output_->viewmodelVertices_);
+        case 0: return copy(source_->Vertices(),output_->vertices_);
+        case 1: return copy(source_->Vertices(RtGeometryRole::PlayerWorldBody),output_->worldBodyVertices_);
+        case 2: return copy(source_->Vertices(RtGeometryRole::PlayerViewmodel),output_->viewmodelVertices_);
         case 3: return copy(source_->indices_,output_->indices_);
         case 4: return copy(source_->materials_,output_->materials_);
         case 5: return copy(source_->primitiveMetadata_,output_->primitiveMetadata_);
@@ -441,6 +466,7 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
     primitiveVertexCounts_.clear();
     materials_.clear();
     vertices_.clear();
+    vertexSource_.reset();
     worldBodyVertices_.clear();
     viewmodelVertices_.clear();
     indices_.clear();

@@ -117,6 +117,8 @@ public:
     void StartLiveDevelopmentRescueJourney(bool authoredTerrain = false);
     bool PublishChapterTerrain(WorldZoneToken token, std::shared_ptr<const TriangleSupportSurface> terrain);
     bool PublishWorldZoneReadiness(WorldZoneToken token, ZoneReadiness readiness);
+    bool HoldStaticDetailLease(const StaticDetailLease& lease);
+    bool ReleaseStaticDetailLease(std::uint64_t resourceGeneration);
     void InvalidateWorldZoneReadiness();
     void ResetRoute();
     void RetryEncounter();
@@ -139,6 +141,9 @@ public:
     const FixedStepRunner& Timing() const { return fixedStepRunner_; }
 
 private:
+    StaticDetailLease staticDetailLease_{};
+    bool deferredStaticDetailReset_ = false;
+    bool deferredStaticDetailRetry_ = false;
     friend class horde::gameplay::validation::MotionEvidenceScenario;
     friend bool horde::gameplay::StageDevelopmentCheckpointSimulation(GameSimulation&,
         const horde::gameplay::DevelopmentCheckpoint&,

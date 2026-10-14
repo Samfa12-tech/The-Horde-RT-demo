@@ -1156,6 +1156,19 @@ void TestBoundedImmutableMeshCopy()
         StaticRtAssetRegistration{22,101,pbr,0,&body,nullptr,RtGeometryRole::PlayerWorldBody},
         StaticRtAssetRegistration{20,102,pbr,0,&view,nullptr,RtGeometryRole::PlayerViewmodel}};
     Check(source->Initialize(registrations,error),"immutable copy source includes all geometry roles");
+    Check(source->TransmissionOwnersWithin({}),"opaque source needs no long-continuation owner exception");
+    {
+        auto pane=world;
+        pane.materials[0].flags|=static_cast<std::uint32_t>(RtMaterialFlag::Transmission);
+        pane.materials[0].transmissionFactor=0.f;
+        RtStaticMeshSlot panes;
+        Check(panes.Initialize(std::array{StaticRtAssetRegistration{21,100,pbr,0,&pane}},error),
+            "foreign zero-strength pane fixture admits for contributor inventory");
+        Check(!panes.TransmissionOwnersWithin({}) && !panes.TransmissionOwnersWithin(std::array<std::uint32_t,1>{{8}}) &&
+            panes.TransmissionOwnersWithin(std::array<std::uint32_t,1>{{21}}),
+            "exact transmission owner roster rejects even dormant foreign panes before a later strength change");
+        Check(!RtStaticMeshSlot{}.TransmissionOwnersWithin({}),"unadmitted geometry has no usable contributor inventory");
+    }
     RtStaticMeshCopy copy;
     Check(!copy.Begin({},error) && !copy.Begin(std::make_shared<RtStaticMeshSlot>(),error),
         "null or unadmitted copy source rejects");
@@ -1187,6 +1200,39 @@ void TestBoundedImmutableMeshCopy()
             same(source->Vertices(RtGeometryRole::PlayerViewmodel),result->Vertices(RtGeometryRole::PlayerViewmodel)) &&
             source->PayloadBytes()==result->PayloadBytes(),"completed copy preserves every admitted byte and role");
         Check(!copy.Take(),"completed immutable owner transfers once");
+        {
+            const auto vertexBytes=source->Measurements().vertexBytes;
+            const auto copiedBefore=copy.CopiedBytes();
+            Check(copy.Begin(source,error,UINT32_MAX,horde::scene::assets::kAllStaticTriangleRegions,{},true),
+                "unchanged vertices can use a pinned immutable owner");
+            while(!copy.Ready()) Check(copy.Advance(512u,error) && copy.LastCopiedBytes()<=512u,
+                "shared-vertex metadata and indices retain bounded copy work");
+            const auto sharedCopied=copy.CopiedBytes();
+            auto shared=copy.Take();
+            Check(shared && shared->SharesVertexPayloadWith(*source) &&
+                &shared->Vertices()==&source->Vertices() &&
+                &shared->Vertices(RtGeometryRole::PlayerWorldBody)==&source->Vertices(RtGeometryRole::PlayerWorldBody) &&
+                &shared->Vertices(RtGeometryRole::PlayerViewmodel)==&source->Vertices(RtGeometryRole::PlayerViewmodel) &&
+                shared->PayloadBytes()==source->PayloadBytes() && sharedCopied+vertexBytes==copiedBefore,
+                "all three vertex domains alias their exact root and are excluded from copied bytes");
+            std::shared_ptr<const RtStaticMeshSlot> sharedSource(std::move(shared));
+            Check(copy.Begin(sharedSource,error),"ordinary deep copy can consume shared vertex storage");
+            while(!copy.Ready()) Check(copy.Advance(512u,error),"deep copy reads aliased source getters");
+            auto deep=copy.Take();
+            Check(deep && same(deep->Vertices(),source->Vertices()) && !deep->SharesVertexPayloadWith(*source),
+                "deep copy of shared output preserves vertices without aliasing");
+            Check(copy.Begin(sharedSource,error,UINT32_MAX,horde::scene::assets::kAllStaticTriangleRegions,{},true),
+                "a second shared copy flattens ownership");
+            std::weak_ptr<const RtStaticMeshSlot> intermediate=sharedSource;
+            while(!copy.Ready()) Check(copy.Advance(512u,error),"flattened copy advances");
+            auto flattened=copy.Take();sharedSource.reset();
+            Check(intermediate.expired() && flattened && flattened->SharesVertexPayloadWith(*source),
+                "shared descendants retain the root without retaining intermediate index owners");
+            Check(copy.Begin(source,error,UINT32_MAX,horde::scene::assets::kAllStaticTriangleRegions,{},true),
+                "shared cancellation begins");
+            copy.Cancel();Check(!copy.Take() && same(flattened->Vertices(),source->Vertices()),
+                "cancel cannot release another admitted shared vertex lease");
+        }
         for(unsigned cancelTurn=0;cancelTurn<turns;++cancelTurn) {
             Check(copy.Begin(source,error),"cancel/retry begins on preserved source");
             for(unsigned t=0;t<cancelTurn;++t) Check(copy.Advance(512u,error),"cancel boundary advances");

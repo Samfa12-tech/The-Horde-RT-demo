@@ -1,5 +1,17 @@
 # Horde 1.7 current design index
 
+The [ordinary static-detail checkpoint](../evidence/2026-10-14-ordinary-static-streaming/README.md)
+now automatically unloads84,219 distant forest triangles while the post-claim
+player backtracks inside the verified coloured passage, then restores the complete
+owner before return/ascent. Both final optimized Release RT backends measure
+**6,215,936 bytes (5.93 MiB) of normal static device-local saving**, one unload/restore,
+zero readiness waits and zero pending simulation ticks. Warm full/reduced/restored
+allocation is371,998,256/365,782,320/371,998,256 bytes; temporary peak is420,071,600.
+This is the first useful scoped slice, **not completed chapter-wide streaming**.
+Shared vertex/texture storage, coarse world, collision, distant town and uncertain
+contributors stay resident. Broader useful coverage and physical-phone performance
+remain open. The older zero-saving reports below retain their historical scope.
+
 The [sparse static selection checkpoint](../evidence/2026-10-14-sparse-static-selection/README.md)
 adds source-bound triangle omissions to the existing bounded CPU/GPU owner path.
 Mixed tomb/forest selection preserves shared geometry and identities; partial
@@ -71,9 +83,9 @@ The owner's14 October priority is **ordinary two-way detailed static-region GPU
 loading, safe publication, completed-work retirement and return reload**. Keep
 the coarse world and required distant landmarks/contributors visible. Measure
 memory overlap and sustained frame/transition timings on a representative
-optimized Release route at unchanged quality. Static-region residency saving
-remains ZERO; Keeper-only savings, Debug CPU and GPU-only timings do not close
-this milestone. Defer unrelated polish/optimization unless it directly unblocks
+optimized Release route at unchanged quality. The scoped saving above is now
+nonzero; broader useful coverage remains required. Keeper-only savings, Debug CPU
+and GPU-only timings do not close this milestone. Defer unrelated polish/optimization unless it directly unblocks
 streaming. Easy Tree/canopy and mist28 stay deferred; physical acceptance is open.
 
 The preceding checkpoint:

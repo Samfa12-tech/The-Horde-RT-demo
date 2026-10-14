@@ -6394,8 +6394,7 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         // before a binding change can invalidate its references.
         struct ActorRetirementOwner { VulkanSurfaceContext* context; std::uint32_t image; };
         ActorRetirementOwner actorOwner{&ctx, imageIndex};
-        if (!ctx.rtScene.PrepareThirdActorResourceLifetime(frameInputs,
-                [](void* user, std::string& error) {
+        const auto retireResourceReferences=[](void* user, std::string& error) {
                     auto& owner = *static_cast<ActorRetirementOwner*>(user);
                     auto& context = *owner.context;
                     if (context.inFlightFences.size() != 1u) {
@@ -6408,15 +6407,43 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
                             return false;
                         }
                     return true;
-                }, &actorOwner, diagnostic, evidenceFrame ? &observation : nullptr)) {
+                };
+        if (!ctx.rtScene.PrepareThirdActorResourceLifetime(frameInputs,
+                retireResourceReferences, &actorOwner, diagnostic, evidenceFrame ? &observation : nullptr)) {
             ctx.lastRtFrameError = diagnostic;
             if (evidenceFrame) ctx.rtFrameEvidence.FailRecord(observation);
             return false;
         }
+        using DetailFrame=horde::vulkan::raytracing::PresentableTinyRtScene::StaticDetailFrame;
+        DetailFrame detail=DetailFrame::Render;
+        if(!ctx.rtScene.AdvanceOrdinaryStaticDetail(ctx.simulation,frameInputs,
+            !previewFrame && !frozenDevelopmentCheckpoint && !ctx.nativeMotionValidation && !ctx.outputResizeValidation &&
+            !ctx.graphicsPreviewCapture && !ctx.benchmark.IsRunning(),detail,diagnostic)) {
+            ctx.lastRtFrameError=diagnostic;
+            if(evidenceFrame)ctx.rtFrameEvidence.FailRecord(observation);
+            return false;
+        }
+        if(detail==DetailFrame::WaitForRestore) {
+            if(evidenceFrame)ctx.rtFrameEvidence.AbortFrame();
+            if(vkResetCommandBuffer(ctx.commandBuffers[imageIndex],0u)!=VK_SUCCESS)return false;
+            return ConsumePendingImageAcquire(ctx);
+        }
         gpuTimingRecording = evidenceFrame && ctx.gpuFrameTimer.RecordBegin(
             ctx.commandBuffers[imageIndex], ctx.currentFrame);
+        bool recorded=false;
+        if(detail==DetailFrame::Cutover) {
+            recorded=ctx.rtScene.RecordTraceAndCopyWithStaticReplacement(ctx.rtScene.StaticGeometryGeneration(),
+                retireResourceReferences,&actorOwner,ctx.commandBuffers[imageIndex],ctx.swapchainImages[imageIndex],
+                ctx.swapchainImageLayouts[imageIndex],ctx.swapchainExtent,frameInputs,diagnostic,
+                evidenceFrame?&observation:nullptr
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+                ,gpuTimingRecording?&ctx.stagedPassTimer:nullptr,ctx.currentFrame
+#endif
+            );
+            if(recorded)ctx.rtScene.FinishOrdinaryStaticDetail(ctx.simulation);
+        }else {
 #if defined(_DEBUG)
-        const bool recorded = ctx.staticReplacementFrameRequested
+        recorded = ctx.staticReplacementFrameRequested
             ? ctx.rtScene.RecordTraceAndCopyWithStaticReplacement(
                 ctx.staticReplacementExpectedGeneration,
                 [](void* user,std::string& error) {
@@ -6442,7 +6469,7 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         if (recorded && ctx.staticReplacementFrameRequested)
         { ctx.staticReplacementFrameRequested=false;ctx.staticReplacementProofGeneration=0; }
 #else
-        const bool recorded = ctx.rtScene.RecordTraceAndCopy(ctx.commandBuffers[imageIndex],
+        recorded = ctx.rtScene.RecordTraceAndCopy(ctx.commandBuffers[imageIndex],
                                             ctx.swapchainImages[imageIndex],
                                             ctx.swapchainImageLayouts[imageIndex],
                                             ctx.swapchainExtent,
@@ -6454,6 +6481,7 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
 #endif
                                            );
 #endif
+        }
         if (!recorded)
         {
             if (evidenceFrame)

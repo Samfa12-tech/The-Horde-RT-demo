@@ -85,9 +85,10 @@ public:
         return primitiveVertexCounts_;
     }
     const std::vector<RtMaterialGpu>& Materials() const { return materials_; }
-    const std::vector<horde::scene::assets::StaticRtVertex>& Vertices() const { return vertices_; }
+    const std::vector<horde::scene::assets::StaticRtVertex>& Vertices() const { return Vertices(RtGeometryRole::Static); }
     const std::vector<horde::scene::assets::StaticRtVertex>& Vertices(RtGeometryRole role) const
     {
+        if (vertexSource_) return vertexSource_->Vertices(role);
         switch (role)
         {
         case RtGeometryRole::Static: return vertices_;
@@ -107,11 +108,21 @@ public:
     const RtTextureArrayCounts& TextureArrayCounts() const { return textureArrayCounts_; }
     const RtStaticMeshMeasurements& Measurements() const { return measurements_; }
     std::uint64_t PayloadBytes() const noexcept;
+    // An omission certificate must enumerate every possible long-continuation
+    // owner. Material flags are checked even if transmission is currently zero.
+    bool TransmissionOwnersWithin(std::span<const std::uint32_t> allowed) const noexcept;
+    // Exact immutable vertex identity, not merely equal sizes or asset labels.
+    bool SharesVertexPayloadWith(const RtStaticMeshSlot& other) const noexcept
+    {
+        return (vertexSource_ ? vertexSource_.get() : this) ==
+            (other.vertexSource_ ? other.vertexSource_.get() : &other);
+    }
 
 private:
     friend class RtStaticMeshCopy;
     friend class RtStaticTriangleOmissions;
     bool admitted_ = false;
+    std::shared_ptr<const RtStaticMeshSlot> vertexSource_;
     std::array<RtInstanceMetadata, kRtInstanceMetadataCapacity> instanceMetadata_{};
     std::vector<RtPrimitiveMetadata> primitiveMetadata_;
     std::vector<std::uint32_t> primitiveVertexCounts_;
@@ -164,7 +175,8 @@ public:
     bool Begin(std::shared_ptr<const RtStaticMeshSlot> source, std::string& diagnostic,
         std::uint32_t selectedInstance = UINT32_MAX,
         std::uint8_t retainedRegions = horde::scene::assets::kAllStaticTriangleRegions,
-        std::shared_ptr<const RtStaticTriangleOmissions> omissions = {});
+        std::shared_ptr<const RtStaticTriangleOmissions> omissions = {},
+        bool shareImmutableVertices = false);
     bool Advance(std::size_t maxBytes, std::string& diagnostic);
     bool Ready() const noexcept { return output_ && row_ == 9u &&
         ((!omissions_ && retainedRegions_ == horde::scene::assets::kAllStaticTriangleRegions) || filtered_); }

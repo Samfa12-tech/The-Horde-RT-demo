@@ -4,6 +4,7 @@
 #include "gameplay/dialogue/CompanionRouteFixture.h"
 #include "gameplay/simulation/DevelopmentSupportFixture.h"
 #include "gameplay/simulation/DevelopmentWorldRoute.h"
+#include "gameplay/simulation/StaticDetailLease.h"
 #include "gameplay/traversal/DevelopmentRescueJourney.h"
 
 #include <array>
@@ -80,6 +81,7 @@ struct SimulationSnapshot
     bool developmentWorldRoute = false;
     bool stagedWorldPreparation = false;
     WorldRouteState worldRoute{};
+    StaticDetailLease staticDetailLease{};
     bool developmentRescueJourney = false;
     horde::gameplay::traversal::RescueTraversalSnapshot rescue{};
     horde::gameplay::traversal::RescuePrompt rescuePrompt = horde::gameplay::traversal::RescuePrompt::None;

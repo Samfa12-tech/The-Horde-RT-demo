@@ -1,0 +1,181 @@
+{
+  "schema": 1,
+  "sourceBase": "d8882c1b5f6afff92d46ba715294da2d10f4b3a1",
+  "sourceBinding": "Final modified-source hashes and immutable captured artifacts; current production shaders and budgets unchanged.",
+  "scope": "First automatic normal static owner unload/restoration, not completed chapter or general region streaming",
+  "normalStaticOwnerSavingBytes": 6215936,
+  "temporaryDeviceLocalPeakBytes": 420071600,
+  "wholeChapterAccepted": false,
+  "phoneInstalled": false,
+  "artifacts": {
+    "optimizedReleaseExe": {
+      "sha256": "cbb478772a0c8e664b4f105a7f74f4029d3038c0525fbdc6edc8726c452340cf"
+    },
+    "debugExe": {
+      "sha256": "fcdc1b6fbaac7c68de0d0bbe244004b80e15822090c51afc3f281b20859eb6f5"
+    },
+    "androidDebugApk": {
+      "sha256": "850acb668dce442597e6ec6b603640620d0273219066a18e8b9f41f37a6a70f1",
+      "bytes": 183265098,
+      "deviceAcceptance": "pending; not installed"
+    }
+  },
+  "sourceHashes": {
+    "CMakeLists.txt": "65bbd699c1202d9e0eebbbf3623e10af7a1c42f533c9b8273caef8bb31ba0b22",
+    "android/app/src/main/cpp/android_probe_bridge.cpp": "f09863d5934feda980e374811295b4a06d37c007e73cc522b3ce707309ae90ce",
+    "src/gameplay/simulation/GameSimulation.cpp": "ab83576d92bdb7cf374d37d4b6570ad8e2896b87e816395811a8e17027377239",
+    "src/gameplay/simulation/GameSimulation.h": "0e677eb54eedcd05a5c1f5e7b31673af785dbd18adac1f3859cdd5d37f0c188b",
+    "src/gameplay/simulation/SimulationSnapshot.h": "290863a6067a5ee5880d03a8844e724ca869811ed816c21e8deebf442a9ada15",
+    "src/gameplay/simulation/StaticDetailLease.h": "df676e18d22656f82c1ad7c66ee4ce24181c1eb6e171107e6a9e435d760b1f92",
+    "src/gameplay/validation/ChapterRoundTripProbe.h": "129a477304e574da834d15f81adfaefdb6c1e952d2fb716805e44f2116efbdd8",
+    "src/platform/windows/DiagnosticWindow.cpp": "d59957b49bde0a917c3da5e75e55e012c5a9d7a0640cce72951fed29335a252a",
+    "src/platform/windows/WindowsChapterRoundTripCapture.inl": "9f3ce63d4647afb38cbe756730e1222191ae735d3178c1abf3d19d77787f0d54",
+    "src/platform/windows/WindowsChapterShippingMeasurement.inl": "24ca8caef78631bf04dcfd1dbf43fb7f1a269e127c8109c6512536a55d7bb4ab",
+    "src/scene/CorridorStaticDetail.h": "ca5e5f2a73f7ab6d3a715133c25412f434bd9aebf637c7645600c655a196d465",
+    "src/scene/CorridorStaticDetailFaces.h": "433af75a893cd7a0492dcd977e5fb9f588cb6a31447b5a5fd8a7c76766f17881",
+    "src/vulkan/raytracing/PresentableTinyRtScene.cpp": "2d6bb79be08ab5f003e7e0ef3f58c3670fa65668f6427971791906c77da0fa10",
+    "src/vulkan/raytracing/PresentableTinyRtScene.h": "d36a91c961987e86f576ca0abb920b379309c5d5044b8214e789815d09b42a66",
+    "src/vulkan/raytracing/PresentableTinyRtSceneStaticGeometry.cpp": "28e6e35fa6f55d061d9d2edbeaa60e74c168e68b5b733cf61cd9270fe5f81ad0",
+    "src/vulkan/raytracing/RtStaticMeshSlot.cpp": "d9cb03a54c7b2c965771bf7fe95dfd9a42c51fb35392d86f6d5f3cfd52d68dd3",
+    "src/vulkan/raytracing/RtStaticMeshSlot.h": "161cabed40a6d4ee704cab3b668036d27849d6e43689792e8bae4fbf2a04fe34",
+    "tests/RescueJourneyIntegrationTests.cpp": "371533b4a77bf52f01c43c7a917734094f227d4ea18b644edd6a68196139d4d1",
+    "tests/StaticGeometryCutoverTests.cpp": "6172a5601d6c07985e4d3d968830f53de3dc2dd7c5c2f69d51469a38b51397ea",
+    "tests/StaticGltfAssetTests.cpp": "7d26e3c010cebca976d8c1db16b7f2531805c53bed22d712e90e8b310b58dc16",
+    "tests/test_corridor_detail_certificate.py": "bfba3ff90343adeea28e04d469923dc62d4c06c2aa601853086b81d9af74644a",
+    "tools/analyze-chapter-route-measurement.py": "241dec093aa5497705958ba71c42559d2bdd4baddd25d4c39ce98a6b9478c1e6",
+    "tools/capture-chapter-roundtrip.ps1": "31b8d107a67f46de7ec638058e234209084d2466fbb1c0c917612507f393eddf",
+    "tools/measure-chapter-shipping-route.ps1": "5babe5722fabe56d0caad7d2aa779d40875a1b4669b3568dc2c346e816752632"
+  },
+  "checks": {
+    "debugFocused": "3/3 pass before final explicit-candidate regression; final Debug routes pass; full194-test sweep interrupted after106 completed and resumed from107, still pending",
+    "optimizedReleaseFocused": "4/4 pass including final fallback regression and exact certificate",
+    "android": "all four native ABIs/build/lint/package and286 fresh Java pass",
+    "exactCommitCI": "pending checkpoint push"
+  },
+  "files": {
+    "checks/ordinary-static-android-final-r01.log": {
+      "sha256": "5a957445325ba10b01c8bc9f109b816e404b4793904255428864d00f6da7f1fc",
+      "bytes": 3982
+    },
+    "checks/ordinary-static-android-java-fresh-r01.log": {
+      "sha256": "835185c78e2aa325b23174f78b4969c0ee35628dc5bb215cea14e8638d55326f",
+      "bytes": 1986
+    },
+    "checks/ordinary-static-android-java-summary-r01.log": {
+      "sha256": "3cb2d83ce0810817bec1ae1834b12aa0af3f34d900687034342e3b6d54341137",
+      "bytes": 48
+    },
+    "checks/ordinary-static-android-package-r01.log": {
+      "sha256": "4e8c41dacedf3a4e73a85f2664e52733d279d124a54a475b9cfecfa4497f54b2",
+      "bytes": 271
+    },
+    "checks/ordinary-static-release-tests-r02.log": {
+      "sha256": "17cf5811109fbe732950fbf53d7934bf392c2bc53ee95eb68c52b1ad2c6642a7",
+      "bytes": 933
+    },
+    "checks/ordinary-static-tests-r03.log": {
+      "sha256": "90716dd5bd0f2d37cf069d1bb7f04757e6ac0b7713b1b7befc0aadf65a0850a5",
+      "bytes": 625
+    },
+    "debug-pipeline-candidate.json": {
+      "sha256": "de5467359fadfaa0d842f749776a8e7c7727e6578fa6dbff7ea424e3a6786127",
+      "bytes": 1467
+    },
+    "debug-pipeline-gallery.json": {
+      "sha256": "4b98428ffe64df683b93f1e33ab0a8e9ab6ff073a7eee3e5efd92a982a1d5dcb",
+      "bytes": 122863
+    },
+    "debug-query-candidate.json": {
+      "sha256": "4783740eaa569e251d3e523f68124ac5e7e68f4537cf1172c2e5080f33c80c13",
+      "bytes": 1464
+    },
+    "debug-query-gallery.json": {
+      "sha256": "4c48842cca5d4863466fcb69a6997ee082197ad03c84b9d6f50daaede4cea348",
+      "bytes": 125014
+    },
+    "debug-r03-journals.zip": {
+      "sha256": "c1161f496866fd0675a92e26b5dc8f96bc6e5bd7beea2ca6d1c6635189fe9f60",
+      "bytes": 97428
+    },
+    "debug-route-summary.json": {
+      "sha256": "6437f1709187ea7376bbe1b3f946d2216cfff95c3eae23a282be260c07e88073",
+      "bytes": 21512
+    },
+    "gallery/pipeline-detail-unloaded.png": {
+      "sha256": "d3a2deb5a9e5e7e37503f823632fc73b3ca4a475840eb90744cbefc99358b8d3",
+      "bytes": 557428
+    },
+    "gallery/pipeline-forest-restored.png": {
+      "sha256": "529816c6f667a8ab1a96857f2bdd8bbbac6d686fd52a050ec66b7ecaef469c1c",
+      "bytes": 726097
+    },
+    "gallery/pipeline-return-passage.png": {
+      "sha256": "8938a14dbb51e3088769aedbc5d9c6d6efde8e504383b283b352a3c845968920",
+      "bytes": 650672
+    },
+    "gallery/query-detail-unloaded.png": {
+      "sha256": "7387eaa530c66cf4e3c7dab4e3959d408e8318770cdbdf150a22d84191dc7d9f",
+      "bytes": 557444
+    },
+    "gallery/query-forest-restored.png": {
+      "sha256": "ab04f52a118dabe8e6bc7e825a45b2224395bc3ffd0c198d718989c8b364191d",
+      "bytes": 726128
+    },
+    "gallery/query-return-passage.png": {
+      "sha256": "a77e5ec3a9c155eb18c9123c6191051e2db30845621f7f265e24cf0eb476f893",
+      "bytes": 650706
+    },
+    "README.md": {
+      "sha256": "50a86e717ae7b9ecf55d6d4ea2a63f6289c2f1f932ac0c731c84fd9497628f2a",
+      "bytes": 9965
+    },
+    "release-pipeline-analysis.json": {
+      "sha256": "3657042effe8cdf88116d9594318aa39dbac6a8648571c909381ccea1c98f7f0",
+      "bytes": 26694
+    },
+    "release-query-analysis.json": {
+      "sha256": "1ce5399b0f5ace4390989585990605f82644feb425ec4c4680f0de20d8ca6cea",
+      "bytes": 26739
+    },
+    "release-r04-raw.zip": {
+      "sha256": "b78bd76e7f999bb07d376347fe54012d7f1170f849984701bdb746264daa6e03",
+      "bytes": 2934769
+    },
+    "release-raw-files.json": {
+      "sha256": "e3fc8083ffd74be036cc975916bfa063e60755215f3b4ef67606b0812bd435bc",
+      "bytes": 2879
+    },
+    "retained-failures/accidental-pipeline-repeat-run.json": {
+      "sha256": "4a13698ec679876f340c1667e03d4b068af5fa4a11a63c32568e0845cdbf0761",
+      "bytes": 784
+    },
+    "retained-failures/ordinary-static-debug-build-r04.log": {
+      "sha256": "3bfa273ed3e64dd3fd6b04d291af3e2e99b15941e7337e30e98af1d0d2589e2c",
+      "bytes": 142
+    },
+    "retained-failures/ordinary-static-release-r01-pipeline.candidate.json": {
+      "sha256": "ee322c66d863e598323249acc03495e6de4a07f290a0c2d39f43130e751ef884",
+      "bytes": 1925
+    },
+    "retained-failures/ordinary-static-release-r01-pipeline.stderr.log": {
+      "sha256": "92e2735ddd113a02d92594b824a36826c32acc79411648adb0df806718731bc1",
+      "bytes": 335
+    },
+    "retained-failures/ordinary-static-release-r01-pipeline.stdout.log": {
+      "sha256": "199ee0f2cd784c12d6656ea88a06bade8452806f3d1de13dfd6a4e2d541a526e",
+      "bytes": 2841
+    },
+    "retained-failures/ordinary-static-release-r02-query.candidate.json": {
+      "sha256": "740852c02f6921ffa1929a1cf36d675191bf090575438ad525c75dbb60baa6a2",
+      "bytes": 1925
+    },
+    "retained-failures/ordinary-static-release-r02-query.stderr.log": {
+      "sha256": "779721c074f79c3203099cf7746d2ed0fd0fe7353aaa0cf3c7085385f3a18b1b",
+      "bytes": 204
+    },
+    "retained-failures/static-shared-vertices-debug-build-r01.log": {
+      "sha256": "6f8aa81e4a650c8725537639c219483a1975e3890e7f7d28c4a5acc420073b31",
+      "bytes": 393
+    }
+  }
+}

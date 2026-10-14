@@ -16,6 +16,7 @@
 #include "scene/RescueJourneyGeometry.h"
 #include "scene/ShowcaseIndoorDust.h"
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
+#include "scene/CorridorStaticDetailFaces.h"
 #include "vulkan/raytracing/SimulationFrameAdapter.h"
 #include "graphics/EntryMenuScene.h"
 #include "graphics/GraphicsPreviewSession.h"
@@ -492,6 +493,14 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
 
     preparedStaticGeometry_ = std::move(other.preparedStaticGeometry_);
     fullStaticGeometrySource_ = std::move(other.fullStaticGeometrySource_);
+    ordinaryStaticOmissions_=std::move(other.ordinaryStaticOmissions_);
+    ordinaryStaticFacesVerified_=std::exchange(other.ordinaryStaticFacesVerified_,false);
+    ordinaryStaticCandidate_=std::exchange(other.ordinaryStaticCandidate_,false);
+    ordinaryStaticCandidateReduced_=std::exchange(other.ordinaryStaticCandidateReduced_,false);
+    ordinaryStaticReduced_=std::exchange(other.ordinaryStaticReduced_,false);
+    ordinaryStaticRearm_=std::exchange(other.ordinaryStaticRearm_,true);
+    ordinaryStaticRestoreFailures_=std::exchange(other.ordinaryStaticRestoreFailures_,0u);
+    ordinaryStaticDetailEvidence_=std::exchange(other.ordinaryStaticDetailEvidence_,{});
     staticGeometryGeneration_ = std::exchange(other.staticGeometryGeneration_, 1u);
     staticGeometryRetainedTriangleRegions_ = std::exchange(other.staticGeometryRetainedTriangleRegions_,
         horde::scene::assets::kAllStaticTriangleRegions);
@@ -1116,6 +1125,11 @@ void PresentableTinyRtScene::Destroy()
         DestroyPreparedStaticGeometry(*preparedStaticGeometry_);
     preparedStaticGeometry_.reset();
     fullStaticGeometrySource_.reset();
+    ordinaryStaticOmissions_.reset();ordinaryStaticFacesVerified_=false;
+    ordinaryStaticCandidate_=ordinaryStaticCandidateReduced_=ordinaryStaticReduced_=false;
+    ordinaryStaticRearm_=true;
+    ordinaryStaticRestoreFailures_=0;
+    ordinaryStaticDetailEvidence_={};
     staticGeometryGeneration_ = 1u;
     staticGeometryRetainedTriangleRegions_ = horde::scene::assets::kAllStaticTriangleRegions;
     staticGeometryRetainedAllFamilies_ = true;
@@ -2712,6 +2726,7 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
     // on the normal application thread. This adds CPU payload, not GPU rows.
     if (developmentRescueJourney_)
         fullStaticGeometrySource_ = std::make_shared<const RtStaticMeshSlot>(staticMeshSlot_);
+    AdmitOrdinaryStaticDetail();
     const RtInstanceMetadata playerMetadata = staticMeshSlot_.InstanceMetadata()[kPlayerWorldBodyInstanceIndex];
     if (playerMetadata.primitiveCount == 0u ||
         playerMetadata.primitiveCount != productionPlayerAsset_.primitives.size() ||
@@ -4039,6 +4054,14 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
 
     if(developmentRescueJourney_) {
         rescueRopeVertexOffset_=vertices.size();
+        ordinaryStaticFacesVerified_=horde::scene::corridor_detail_faces::MatchesAll(
+            std::span<const Vertex>(vertices),std::span<const std::uint32_t>(indices),
+            std::span<const std::uint32_t>(worldSurfaceCodes),indices.size()/3u,vertices.size(),true);
+        // World thin glass can originate a new long continuation. This
+        // chapter recipe contains no such pane; a future addition must earn
+        // its own source domain before it can share this certificate.
+        ordinaryStaticFacesVerified_ &= std::none_of(worldSurfaceCodes.begin(),worldSurfaceCodes.end(),
+            [](auto code){return (code&0xffu)==SurfaceClearGlass;});
         horde::gameplay::traversal::RescueTraversal initial;
         const auto rope=horde::scene::RescueRopeTriangleVertices(initial.Snapshot());
         for(std::size_t i=0;i<rope.size();i+=3) {
@@ -4284,6 +4307,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     VkAccelerationStructureGeometryKHR blasGeometry{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR};
     blasGeometry.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
     blasGeometry.flags = VK_GEOMETRY_OPAQUE_BIT_KHR;
+    ordinaryStaticFacesVerified_ &= (blasGeometry.flags&VK_GEOMETRY_OPAQUE_BIT_KHR)!=0;
     blasGeometry.geometry.triangles.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR;
     blasGeometry.geometry.triangles.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;
     blasGeometry.geometry.triangles.vertexData.deviceAddress = vertexBuffer_.address;
