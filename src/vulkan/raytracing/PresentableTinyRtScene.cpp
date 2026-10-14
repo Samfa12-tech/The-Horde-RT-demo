@@ -7386,7 +7386,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     lastPlayerWorldBodyInstanceFlags_ = frameInstanceMetadata[kPlayerWorldBodyInstanceIndex].flags;
 #if HORDE_RT_REGION_PAGE_PROTOTYPE
     horde::world::streaming::GeometryPageTable framePageTable;
-    if(effectivePlayerRenderRoute!=PlayerRenderRoute::ModelledViewmodel || clampedTuning.glassFixtureVisible ||
+    if((regionPageSource_ && (effectivePlayerRenderRoute!=PlayerRenderRoute::ModelledViewmodel || clampedTuning.glassFixtureVisible)) ||
        !ApplyRegionPage(instances,frameInstanceMetadata,framePageTable,diagnostic))return false;
 #endif
     auto frameMaterials = sceneMaterials_;

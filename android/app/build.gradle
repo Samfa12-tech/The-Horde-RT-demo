@@ -91,7 +91,8 @@ if (hordeStagedPrimaryDebugValidation && hordeBenchmarkValidation) {
 }
 // Benchmark validation is an isolated, development-signed app. Do not even
 // read production signing environment variables for either investigation opt-in.
-def hordeValidationUnsigned = validationUnsigned || hordeBenchmarkValidation || hordeStagedPrimaryDebugValidation
+def hordeRegionPagePrototypeRootProperty = providers.gradleProperty('hordeRegionPagePrototypeRoot').orNull
+def hordeValidationUnsigned = validationUnsigned || hordeBenchmarkValidation || hordeStagedPrimaryDebugValidation || hordeRegionPagePrototypeRootProperty != null
 def releaseStoreFile = hordeValidationUnsigned ? null : System.getenv('HORDE_RELEASE_STORE_FILE')
 def releaseStorePassword = hordeValidationUnsigned ? null : System.getenv('HORDE_RELEASE_STORE_PASSWORD')
 def releaseKeyAlias = hordeValidationUnsigned ? null : System.getenv('HORDE_RELEASE_KEY_ALIAS')
@@ -177,7 +178,26 @@ def hordeRtNativePolicyArguments = { String defaultInstrumentation ->
             '-DHORDE_RT_STAGED_PRIMARY_SHADER_DIR=',
             '-DHORDE_RT_STAGED_PRIMARY_DEFAULT=OFF',
             '-DHORDE_RT_STAGED_PRIMARY_TIMING=OFF',
+            '-DHORDE_RT_REGION_PAGE_PROTOTYPE_ROOT=',
             '-DHORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION=OFF']
+}
+
+def hordeRegionPageDebugArguments = []
+if (hordeRegionPagePrototypeRootProperty != null) {
+    if (hordeRegionPagePrototypeRootProperty.isEmpty() ||
+        hordeRegionPagePrototypeRootProperty != hordeRegionPagePrototypeRootProperty.trim() ||
+        (hordeRegionPagePrototypeRootProperty =~ /[;|\r\n\u0000]/).find() ||
+        !new File(hordeRegionPagePrototypeRootProperty).isAbsolute()) {
+        throw new GradleException('hordeRegionPagePrototypeRoot requires an absolute private directory without argument delimiters.')
+    }
+    if (hordeBenchmarkValidation || hordeStagedPrimaryDebugValidation || providers.gradleProperty('hordeViewmodelCandidateDir').isPresent()) {
+        throw new GradleException('Region-page investigation must be separate from benchmark, staged and viewmodel experiments.')
+    }
+    def pageRoot = new File(hordeRegionPagePrototypeRootProperty).canonicalFile
+    if (!new File(pageRoot, 'src/vulkan/raytracing/RtRayQueryVariantCatalog.generated.h').isFile()) {
+        throw new GradleException('Region-page investigation needs a prepared private shader catalog.')
+    }
+    hordeRegionPageDebugArguments = ["-DHORDE_RT_REGION_PAGE_PROTOTYPE_ROOT=${pageRoot.path.replace('\\', '/')}"]
 }
 def hordeRtBenchmarkStagedPrimaryArguments = [
     "-DHORDE_RT_STAGED_PRIMARY_SHADER_DIR=${hordeStagedPrimaryShaderDir ?: ''}",
@@ -538,7 +558,8 @@ android {
                     arguments '-DHORDE_RT_DEBUG_CHECKPOINTS=ON',
                         "-DHORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=${viewmodelCandidate ? 'ON' : 'OFF'}",
                         *hordeRtNativePolicyArguments('Diagnostic'),
-                        *hordeRtDebugStagedPrimaryArguments
+                        *hordeRtDebugStagedPrimaryArguments,
+                        *hordeRegionPageDebugArguments
                 }
             }
         }
@@ -612,7 +633,7 @@ if (viewmodelCandidate) {
 // It intentionally reports the CMake arguments without configuring native code.
 tasks.register('printHordeRtPolicyForTest') {
     doLast {
-        println("debug=" + (hordeRtNativePolicyArguments('Diagnostic') + hordeRtDebugStagedPrimaryArguments).join('|'))
+        println("debug=" + (hordeRtNativePolicyArguments('Diagnostic') + hordeRtDebugStagedPrimaryArguments + hordeRegionPageDebugArguments).join('|'))
         println("release=" + hordeRtNativePolicyArguments('Shipping').join('|'))
         println("benchmark=" + (hordeBenchmarkValidation
             ? (hordeRtNativePolicyArguments('Shipping') + hordeRtBenchmarkStagedPrimaryArguments).join('|')

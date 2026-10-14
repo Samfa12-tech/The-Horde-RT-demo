@@ -1,0 +1,17 @@
+{
+  "scope": "Four-ABI opt-in Android preparation and default byte-restoration; Windows root-only and chapter startup. No physical Android or new Release frame-pacing claim.",
+  "debugWindowsSha256": "973ca6d1617ad9ff74d3b7b5c1a302e636b5c4df5020fd1cd6a96fcb3da88749",
+  "releaseWindowsSha256": "7541d1d10d0c7e708811dfc3acc7dd1f5288d55a2559825e324fc7bd07fa5bd7",
+  "restoredProductionAndroidSha256": "6439f9f2b891c7461ebcce0eb2855e5d44c5b5d5b9f5c50040fc1e4cb5c6d30c",
+  "restoredByteIdenticalToPreviousDefault": true,
+  "sources": {
+    "CMakeLists.txt": "c36853c071d2e4335bce61232b391d25adb8512e2f86294dad88a249093e9aec",
+    "cmake/HordeRtRegionPages.cmake": "70899ef1fc2bfde122b6c524c8424efb739b5dd172b359f2c137e4479132621f",
+    "android/app/build.gradle": "1837a1cd4484a3a15ab73dda68238a7896b5aa308266167706774b97cd019a4e",
+    "android/app/src/main/cpp/CMakeLists.txt": "783712a0ca478f2258a3d8499e53d01dd0ddf6ebac812e1de5d1f60cfefed98e",
+    "src/vulkan/raytracing/PresentableTinyRtScene.cpp": "3cfa796e6682990ee49ebf97c649acaa24d1bba31a1308bf215846b422cda03f",
+    "src/vulkan/raytracing/PresentableTinyRtSceneRegionPages.cpp": "01f7e6224d11e13175e5c74f43b388e96e1363e575fa001b0b63010deea906da",
+    "tests/RtRegionPagePreflightTests.cpp": "1567e09f77a6a2f9ebbd2244a1e8c649a159d7c0730b11e057e2fdd254eed242",
+    "tests/test_region_page_build_policy.py": "85abb4bbdcfd6058e62ba52af9bb3b2befcf9fa6c2b2864cfbde6517bbe78cd4"
+  }
+}

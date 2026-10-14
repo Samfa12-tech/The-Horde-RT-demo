@@ -23,6 +23,13 @@ struct PresentableTinyRtSceneRegionPageTestAccess {
         s.staticIndexBuffer_.address=0x20000;s.staticIndexBuffer_.size=24;
         s.primitiveMetadataBuffer_.address=0x30000;s.primitiveMetadataBuffer_.size=16;
         auto payload=std::make_shared<GeometryPayload>();payload->primitives={{0,0,6,0}};
+        std::array<VkAccelerationStructureInstanceKHR,s.kTlasInstanceCount> rootInstances{};
+        auto rootMetadata=s.staticMeshSlot_.InstanceMetadata();GeometryPageTable rootTable;
+        rootInstances[s.kRegionPageTlasSlot].mask=1; // Root-only scenes keep their ordinary lane ownership.
+        bool ok=s.PrepareRegionPageSource(error) && s.CreateInitialRegionPage(error) &&
+            !s.regionPagePreparation_ && s.ApplyRegionPage(rootInstances,rootMetadata,rootTable,error) &&
+            std::memcmp(rootTable.instances.data(),rootMetadata.data(),sizeof(rootMetadata))==0;
+        s.regionPageSource_=payload;
         auto& owner=s.regionPageOwner_;owner.payload=payload;owner.token={s.staticGeometryGeneration_,1,1};
         owner.blas.address=0x70000;
         owner.buffers[0].address=0x40000;owner.buffers[0].size=256;
@@ -30,7 +37,7 @@ struct PresentableTinyRtSceneRegionPageTestAccess {
         owner.buffers[2].address=0x60000;owner.buffers[2].size=16;
         std::array<VkAccelerationStructureInstanceKHR,s.kTlasInstanceCount> instances{};
         auto metadata=s.staticMeshSlot_.InstanceMetadata();GeometryPageTable table;
-        bool ok=s.ApplyRegionPage(instances,metadata,table,error) &&
+        ok&=s.ApplyRegionPage(instances,metadata,table,error) &&
             instances[s.kRegionPageTlasSlot].instanceCustomIndex==s.kRegionPageMetadataSlot &&
             !(s.kRegionPageMetadataSlot>=10 && s.kRegionPageMetadataSlot<=13);
         instances={};instances[5].mask=1;instances[5].instanceCustomIndex=s.kRegionPageMetadataSlot;

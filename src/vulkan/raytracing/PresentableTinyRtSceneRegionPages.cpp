@@ -7,7 +7,11 @@
 
 namespace horde::vulkan::raytracing {
 bool PresentableTinyRtScene::PrepareRegionPageSource(std::string& error) {
-    if(!developmentRescueJourney_ || !chapterActorReady_ || sceneProfile_!=RtSceneProfile::Showcase || !ordinaryStaticOmissions_ ||
+    // Android boots the ordinary root scene before adopting a chapter request.
+    // The same address shader supports this fully resident root, without taking
+    // a detail lane or inventing a preparation request.
+    if(!developmentRescueJourney_)return true;
+    if(!chapterActorReady_ || sceneProfile_!=RtSceneProfile::Showcase || !ordinaryStaticOmissions_ ||
        !fullStaticGeometrySource_ || regionPageSource_ || !regionPageOwner_.Empty()) {
         error="Private region-page prototype requires the admitted chapter source/selection.";return false;
     }
@@ -17,9 +21,15 @@ bool PresentableTinyRtScene::PrepareRegionPageSource(std::string& error) {
     staticMeshSlot_=std::move(*result.base);regionPageSource_=std::move(result.detail);return true;
 }
 bool PresentableTinyRtScene::CreateInitialRegionPage(std::string& error) {
+    if(!regionPageSource_)return true;
     VkPhysicalDeviceAccelerationStructurePropertiesKHR as{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_PROPERTIES_KHR};
     VkPhysicalDeviceProperties2 properties{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2,&as};
-    vkGetPhysicalDeviceProperties2(physicalDevice_,&properties);
+    auto getProperties=reinterpret_cast<PFN_vkGetPhysicalDeviceProperties2>(
+        vkGetInstanceProcAddr(instance_,"vkGetPhysicalDeviceProperties2"));
+    if(!getProperties)getProperties=reinterpret_cast<PFN_vkGetPhysicalDeviceProperties2>(
+        vkGetInstanceProcAddr(instance_,"vkGetPhysicalDeviceProperties2KHR"));
+    if(!getProperties){error="Region preparation cannot query hardware AS limits.";return false;}
+    getProperties(physicalDevice_,&properties);
     RtRegionGeometryBuildContext context{{device_,queue_,commandPool_},
         vkGetAccelerationStructureBuildSizesKHR_,vkCreateAccelerationStructureKHR_,
         vkGetAccelerationStructureDeviceAddressKHR_,vkCmdBuildAccelerationStructuresKHR_,
@@ -46,6 +56,18 @@ bool PresentableTinyRtScene::ApplyRegionPage(
     std::array<RtInstanceMetadata,kRtInstanceMetadataCapacity>& metadata,
     horde::world::streaming::GeometryPageTable& table,std::string& error) const {
     using namespace horde::world::streaming;
+    std::array<GeometryPageAddresses,kGeometryPages> pages{};
+    pages[0]={{staticVertexBuffer_.address,staticVertexBuffer_.size},
+        {staticIndexBuffer_.address,staticIndexBuffer_.size},
+        {primitiveMetadataBuffer_.address,primitiveMetadataBuffer_.size},
+        static_cast<std::uint32_t>(staticMeshSlot_.PrimitiveMetadata().size())};
+    if(!regionPageSource_) {
+        if(!regionPageOwner_.Empty() || !BuildGeometryPageTable(metadata,pages,table,
+            staticMeshSlot_.InstanceMetadata(),worldSurfaceBuffer_.size/sizeof(std::uint32_t))) {
+            error="Root-only address profile has an unexpected detail owner or invalid metadata.";return false;
+        }
+        return true;
+    }
     for(std::size_t i=0;i<instances.size();++i)if(i!=kRegionPageTlasSlot && instances[i].mask &&
         instances[i].instanceCustomIndex==kRegionPageMetadataSlot) {
         error="Region metadata lane is referenced by another live instance.";return false;
@@ -54,11 +76,6 @@ bool PresentableTinyRtScene::ApplyRegionPage(
        (metadata[kRegionPageMetadataSlot].flags&static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr))) {
         error="Region page cannot overwrite a live scene-profile lane.";return false;
     }
-    std::array<GeometryPageAddresses,kGeometryPages> pages{};
-    pages[0]={{staticVertexBuffer_.address,staticVertexBuffer_.size},
-        {staticIndexBuffer_.address,staticIndexBuffer_.size},
-        {primitiveMetadataBuffer_.address,primitiveMetadataBuffer_.size},
-        static_cast<std::uint32_t>(staticMeshSlot_.PrimitiveMetadata().size())};
     if(regionPageVisible_ && !regionPageOwner_.Empty()) {
         if(!regionPageOwner_.payload || !regionPageOwner_.blas.address || regionPageOwner_.token.worldGeneration!=staticGeometryGeneration_) {
             error="Region page owner has incomplete or stale GPU identity.";return false;

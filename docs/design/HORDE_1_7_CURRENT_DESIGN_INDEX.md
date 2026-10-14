@@ -1,5 +1,13 @@
 # Horde 1.7 current design index
 
+The [cross-platform preparation follow-up](../evidence/2026-10-15-independent-region-pages/platform-preparation/README.md)
+adds a separate opt-in Android page-profile candidate, fixes its API24 loader
+link boundary and supports ordinary root startup before chapter adoption. Four
+ABIs/build/lint and root-only/native policy checks pass; the default production
+APK returns byte-identically when the opt-in is removed. The candidate has not
+been installed or physically accepted. The preceding independent-owner commit
+fe73c765 passed all six exact-commit CI jobs. Release pacing remains pending.
+
 The [independent page integration checkpoint](../evidence/2026-10-15-independent-region-pages/README.md)
 connects the reusable scheduler to real bounded preparation, current-frame
 adoption, completed-TLAS retirement and automatic return in a private Windows

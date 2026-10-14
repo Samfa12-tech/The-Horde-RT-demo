@@ -1,0 +1,160 @@
+> Task :app:verifyMusicRuntimeAssets
+> Task :app:prepareRuntimeAssets UP-TO-DATE
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :app:generateDebugBuildConfig UP-TO-DATE
+> Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:generateDebugResValues UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :app:processDebugMainManifest UP-TO-DATE
+> Task :app:processDebugManifest UP-TO-DATE
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :app:processDebugResources UP-TO-DATE
+> Task :app:compileDebugJavaWithJavac UP-TO-DATE
+> Task :app:mergeDebugShaders UP-TO-DATE
+> Task :app:compileDebugShaders NO-SOURCE
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :app:mergeDebugAssets UP-TO-DATE
+> Task :app:compressDebugAssets UP-TO-DATE
+> Task :app:processDebugJavaRes NO-SOURCE
+> Task :app:mergeDebugJavaResource UP-TO-DATE
+> Task :app:checkDebugDuplicateClasses UP-TO-DATE
+> Task :app:desugarDebugFileDependencies UP-TO-DATE
+> Task :app:mergeExtDexDebug UP-TO-DATE
+> Task :app:mergeLibDexDebug UP-TO-DATE
+> Task :app:dexBuilderDebug UP-TO-DATE
+> Task :app:mergeProjectDexDebug UP-TO-DATE
+> Task :app:configureCMakeDebug[arm64-v8a]
+> Task :app:buildCMakeDebug[arm64-v8a]
+C/C++: ninja: Entering directory `C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\android\app\.cxx\Debug\s4166314\arm64-v8a'
+C/C++: cmd.exe /C "cd . && C:\Users\sam_s\AppData\Local\Android\Sdk\ndk\26.1.10909125\toolchains\llvm\prebuilt\windows-x86_64\bin\clang++.exe --target=aarch64-none-linux-android24 --sysroot=C:/Users/sam_s/AppData/Local/Android/Sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/windows-x86_64/sysroot -fPIC -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -std=c++20 -fno-limit-debug-info  -static-libstdc++ -Wl,--build-id=sha1 -Wl,--no-rosegment -Wl,--no-undefined-version -Wl,--fatal-warnings -Wl,--no-undefined -Qunused-arguments    -Wl,-z,max-page-size=16384 -Wl,-z,common-page-size=16384 -shared -Wl,-soname,libhorde_rt_probe_android.so -o "C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\android\app\build\intermediates\cxx\Debug\s4166314\obj\arm64-v8a\libhorde_rt_probe_android.so" @CMakeFiles\horde_rt_probe_android.rsp  && cd ."
+C/C++: ld.lld: error: undefined symbol: vkGetPhysicalDeviceProperties2
+C/C++: >>> referenced by PresentableTinyRtSceneRegionPages.cpp:22 (C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/src/vulkan/raytracing/PresentableTinyRtSceneRegionPages.cpp:22)
+C/C++: >>>               CMakeFiles/horde_rt_probe_android.dir/9bb369aedab083e586e228a37196f7a6/raytracing/PresentableTinyRtSceneRegionPages.cpp.o:(horde::vulkan::raytracing::PresentableTinyRtScene::CreateInitialRegionPage(std::__ndk1::basic_string<char, std::__ndk1::char_traits<char>, std::__ndk1::allocator<char>>&))
+C/C++: >>> did you mean: vkGetPhysicalDeviceProperties
+C/C++: >>> defined in: C:/Users/sam_s/AppData/Local/Android/Sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/lib/aarch64-linux-android/24/libvulkan.so
+C/C++: clang++: error: linker command failed with exit code 1 (use -v to see invocation)
+C/C++: ninja: build stopped: subcommand failed.
+
+> Task :app:buildCMakeDebug[arm64-v8a] FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:buildCMakeDebug[arm64-v8a]'.
+> com.android.ide.common.process.ProcessException: ninja: Entering directory `C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\android\app\.cxx\Debug\s4166314\arm64-v8a'
+  [1/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/audio/MusicPcmWave.cpp.o
+  [2/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/audio/AmbiencePcmLoop.cpp.o
+  [3/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/telemetry/RtBenchmarkEvidenceRun.cpp.o
+  [4/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/telemetry/RtEvidencePublication.cpp.o
+  [5/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/telemetry/BenchmarkSummary.cpp.o
+  [6/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/9cecef09a3e1fd82f8f5c0eff1214447/vulkan/raytracing/RtRegionGeometryPreparation.cpp.o
+  [7/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/audio/MusicPcmStream.cpp.o
+  [8/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/audio/MusicDirector.cpp.o
+  [9/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/world/streaming/RegionStreaming.cpp.o
+  [10/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/vulkan/raytracing/RtRegionGeometrySource.cpp.o
+  [11/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/world/streaming/GeometryPartition.cpp.o
+  [12/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/telemetry/RtBenchmarkEvidenceReport.cpp.o
+  [13/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/telemetry/RtPerformanceEvidence.cpp.o
+  [14/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/reporting/BenchmarkSummarySubmission.cpp.o
+  [15/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/gameplay/effects/FireEmitterState.cpp.o
+  [16/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/audio/MusicPcmAssetBank.cpp.o
+  [17/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/audio/MusicPlaybackSession.cpp.o
+  [18/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/gameplay/animation/PlayerIkTargets.cpp.o
+  [19/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/reporting/PlaytestReport.cpp.o
+  [20/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/reporting/BenchmarkSummaryReport.cpp.o
+  [21/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/reporting/PlaytestSubmission.cpp.o
+  [22/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/gameplay/traversal/RescueTraversal.cpp.o
+  [23/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/gameplay/interactions/InteractionState.cpp.o
+  [24/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/gameplay/animation/PlayerAnimationState.cpp.o
+  [25/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/9bb369aedab083e586e228a37196f7a6/raytracing/PresentableTinyRtSceneRegionPages.cpp.o
+  [26/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/gameplay/interactions/ChestRewardSequence.cpp.o
+  [27/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/gameplay/effects/WaterContact.cpp.o
+  [28/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/gameplay/items/HeldItemState.cpp.o
+  [29/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/gameplay/interactions/FinaleSequence.cpp.o
+  [30/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/gameplay/items/LanternPendulum.cpp.o
+  [31/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/gameplay/simulation/GameSimulationRescue.cpp.o
+  [32/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/gameplay/simulation/GameSimulationDialogue.cpp.o
+  [33/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/gameplay/items/HeldLightState.cpp.o
+  [34/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/vulkan/raytracing/RayTracingRequirements.cpp.o
+  [35/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/vulkan/DeviceCapabilities.cpp.o
+  [36/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/gameplay/ShowcaseBenchmark.cpp.o
+  [37/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/vulkan/RtCapabilityReport.cpp.o
+  [38/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/vulkan/GpuFrameTimer.cpp.o
+  [39/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/scene/BellwetherShell.cpp.o
+  [40/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/vulkan/VulkanContext.cpp.o
+  [41/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/gameplay/items/HeldItemKinematics.cpp.o
+  [42/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/gameplay/simulation/GameSimulation.cpp.o
+  [43/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/scene/ForestUnderstory.cpp.o
+  [44/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/scene/assets/AssetValidation.cpp.o
+  [45/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/scene/ForestDressing.cpp.o
+  [46/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/vulkan/raytracing/RtPipelineVariants.cpp.o
+  [47/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/scene/ForestDeadwood.cpp.o
+  [48/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/scene/ForestRockDressing.cpp.o
+  [49/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/9cecef09a3e1fd82f8f5c0eff1214447/vulkan/raytracing/RtPipelineVariantProvider.cpp.o
+  [50/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/vulkan/raytracing/HeldItemRenderSlot.cpp.o
+  [51/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/update/GitHubReleaseUpdater.cpp.o
+  [52/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/vulkan/raytracing/RtPipelineBundle.cpp.o
+  [53/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/9cecef09a3e1fd82f8f5c0eff1214447/vulkan/raytracing/RtPipelineBundleContracts.cpp.o
+  [54/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/vulkan/raytracing/RtTextureArrays.cpp.o
+  [55/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/scene/TombDressing.cpp.o
+  [56/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/vulkan/raytracing/RtGpuResources.cpp.o
+  [57/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/scene/GraveyardDressing.cpp.o
+  [58/79] Building CXX object pocket-audio-core-native/CMakeFiles/pocket_audio_native_pcm.dir/src/PcmLoopStream.cpp.o
+  [59/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/scene/assets/AssetManifest.cpp.o
+  [60/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/vulkan/raytracing/PlayerRenderSlot.cpp.o
+  [61/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/scene/assets/GltfDocument.cpp.o
+  [62/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/vulkan/raytracing/FireEmitterBuffer.cpp.o
+  [63/79] Building CXX object pocket-audio-core-native/CMakeFiles/pocket_audio_native_pcm.dir/src/PcmWave.cpp.o
+  [64/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/vulkan/raytracing/CharacterRenderSlot.cpp.o
+  [65/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/9cecef09a3e1fd82f8f5c0eff1214447/vulkan/raytracing/RtFrameEvidenceCoordinator.cpp.o
+  [66/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/telemetry/MotionEvidenceLedger.cpp.o
+  [67/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/gameplay/validation/MotionEvidenceScenario.cpp.o
+  [68/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/ui/DiagnosticOverlay.cpp.o
+  [69/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/android_ambience_playback.cpp.o
+  [70/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/vulkan/raytracing/SimulationFrameAdapter.cpp.o
+  [71/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/android_music_playback.cpp.o
+  [72/79] Linking CXX static library pocket-audio-core-native\libpocket_audio_native_pcm.a
+  [73/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/scene/assets/StaticMeshAsset.cpp.o
+  [74/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/scene/assets/SkinnedMeshAsset.cpp.o
+  [75/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/c3316caadd61ab24622d4725c242b693/PresentableTinyRtSceneStaticGeometry.cpp.o
+  [76/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/vulkan/raytracing/RtStaticMeshSlot.cpp.o
+  [77/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/android_probe_bridge.cpp.o
+  [78/79] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/vulkan/raytracing/PresentableTinyRtScene.cpp.o
+  [79/79] Linking CXX shared library "C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\android\app\build\intermediates\cxx\Debug\s4166314\obj\arm64-v8a\libhorde_rt_probe_android.so"
+  FAILED: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/android/app/build/intermediates/cxx/Debug/s4166314/obj/arm64-v8a/libhorde_rt_probe_android.so 
+  cmd.exe /C "cd . && C:\Users\sam_s\AppData\Local\Android\Sdk\ndk\26.1.10909125\toolchains\llvm\prebuilt\windows-x86_64\bin\clang++.exe --target=aarch64-none-linux-android24 --sysroot=C:/Users/sam_s/AppData/Local/Android/Sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/windows-x86_64/sysroot -fPIC -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -std=c++20 -fno-limit-debug-info  -static-libstdc++ -Wl,--build-id=sha1 -Wl,--no-rosegment -Wl,--no-undefined-version -Wl,--fatal-warnings -Wl,--no-undefined -Qunused-arguments    -Wl,-z,max-page-size=16384 -Wl,-z,common-page-size=16384 -shared -Wl,-soname,libhorde_rt_probe_android.so -o "C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\android\app\build\intermediates\cxx\Debug\s4166314\obj\arm64-v8a\libhorde_rt_probe_android.so" @CMakeFiles\horde_rt_probe_android.rsp  && cd ."
+  ld.lld: error: undefined symbol: vkGetPhysicalDeviceProperties2
+  >>> referenced by PresentableTinyRtSceneRegionPages.cpp:22 (C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/src/vulkan/raytracing/PresentableTinyRtSceneRegionPages.cpp:22)
+  >>>               CMakeFiles/horde_rt_probe_android.dir/9bb369aedab083e586e228a37196f7a6/raytracing/PresentableTinyRtSceneRegionPages.cpp.o:(horde::vulkan::raytracing::PresentableTinyRtScene::CreateInitialRegionPage(std::__ndk1::basic_string<char, std::__ndk1::char_traits<char>, std::__ndk1::allocator<char>>&))
+
+  >>> did you mean: vkGetPhysicalDeviceProperties
+
+  >>> defined in: C:/Users/sam_s/AppData/Local/Android/Sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/lib/aarch64-linux-android/24/libvulkan.so
+
+  clang++: error: linker command failed with exit code 1 (use -v to see invocation)
+
+  ninja: build stopped: subcommand failed.
+  
+  C++ build system [build] failed while executing:
+      @echo off
+      "C:\\Users\\sam_s\\AppData\\Local\\Android\\Sdk\\cmake\\3.22.1\\bin\\ninja.exe" ^
+        -C ^
+        "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\android\\app\\.cxx\\Debug\\s4166314\\arm64-v8a" ^
+        horde_rt_probe_android
+    from C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\android\app
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 48s
+28 actionable tasks: 3 executed, 25 up-to-date

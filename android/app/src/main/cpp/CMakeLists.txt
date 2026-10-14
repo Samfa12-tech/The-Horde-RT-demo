@@ -40,6 +40,8 @@ target_include_directories(horde_rt_probe_android PRIVATE
 )
 horde_rt_attach_raygen_artifacts(horde_rt_probe_android)
 horde_rt_apply_raygen_policy(horde_rt_probe_android Android)
+include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtRegionPages.cmake")
+horde_rt_attach_private_region_pages(horde_rt_probe_android)
 horde_rt_attach_staged_primary(horde_rt_probe_android "${HORDE_RT_REPO_ROOT}")
 
 target_compile_features(horde_rt_probe_android PRIVATE cxx_std_20)
