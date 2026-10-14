@@ -1,0 +1,123 @@
+# Reusable region loading and streaming
+
+Current authority: the owner's14 October direction is the **engine loading system**,
+using the existing chapter for validation. No new world art is requested. The world
+should support continuous travel on connecting paths, persistent coarse terrain and
+distant landmarks, preparation before arrival and reliable return to old regions.
+
+The measured ordinary-owner checkpoint at47aaf662 is the starting implementation,
+not the scalable architecture. It retires6.22 MB but temporarily allocates48.07 MB
+above the warm scene while rebuilding the combined static owner. Those measured
+costs justify independent region allocations; they do not justify unloading the
+whole tomb or guessing a mobile memory budget.
+
+## Chosen small architecture
+
+Implemented at the engine-foundation checkpoint: the deterministic catalog/
+scheduler, generation-bound acknowledgements, measured/reserved owner ledger,
+dependency closure, return priority and quarantine; a compact base/detail CPU
+partitioner preserving complete outside actor/held domains; and validated page
+address-table construction. These are linked shared native CPU capabilities with
+three focused Debug/Release fixtures. The renderer does not call the new page
+path yet. Its existing ordinary combined-owner unload/return remains intact.
+
+Private page-address SPIR-V feasibility passes all eight unchanged raygen budgets
+and exact structural checks. Eight private QueryCompute counterparts also compile
+and validate through the current generator. No production shader/catalog/include
+is replaced. Actual page GPU adoption, retirement, normal scheduling/provider
+connection, rendered parity and sustained measurements remain to implement.
+
+- A data catalog names regions, bounds/connecting gates, coarse fallback, shared
+  dependencies and their admitted source identities. Topo coordinates inform this
+  spatial data; they do not determine memory costs or visibility by themselves.
+- A deterministic renderer-owner scheduler has tunable preparation/retention
+  distances, hysteresis, a measured region working-set target and a bounded amount
+  of preparation/upload per turn. It prioritizes current/next traversal readiness.
+  Unknown memory headroom is reported, not replaced by an invented phone budget.
+- Coarse world and required distant landmarks stay resident. Detail can retire
+  only when its validated contribution/fallback rules permit it for primary,
+  reflected/transmitted and shadow rays. Distance or camera visibility alone is
+  insufficient. Unknown contributors remain pinned. Existing quality stays fixed.
+- Each static geometry page owns its compact vertex/index/primitive buffers and
+  BLAS. Shared materials/textures have independent dependency ownership. Preparing
+  or retiring one page does not replace the base world or the other pages.
+- Immutable loader results carry world/source/request generations. One bounded
+  producer queue handles I/O/CPU payload preparation; only the existing renderer
+  owner adopts GPU work. Cancellation/stale results cannot publish readiness.
+- A ready page enters the TLAS only after upload/AS completion and fresh frame
+  metadata recording. Retirement first removes descriptor/TLAS references, proves
+  graphics completion and invalidates obsolete command references, then frees the
+  page. Collision/render readiness precedes traversal; failed preparation keeps a
+  valid safe side and its already-present world.
+
+The scheduler is independent of named tomb objects, tree species and game dialogue.
+The first content adapter supplies the current proven forest-detail selection and
+retained coarse/tomb base. That is a validation fixture for the engine capability,
+not its hard-coded policy. Future towns/dungeons register data through the same API.
+
+## Bounded RT address/slot path to verify
+
+Production ModelledViewmodel leaves legacy limb TLAS lanes unused. A scene-profile
+slot pool can lease only lanes whose actual owner/mask state is unused; it must
+reject incompatible diagnostic rigs/fixtures rather than overwriting them. The
+current26 metadata /28 TLAS /13 logical asset /32 primitive /32 material /18 texture
+limits remain the target. The first independent page needs one free lane. More
+resident pages are constrained by the actual free pool and measured allocation
+headroom, not the number of catalog regions in the game.
+
+The shared static vertex/index bindings currently prevent releasing individual
+geometry ranges. The feasible prototype uses buffer-device-address geometry pages,
+with128 bytes appended after the unchanged832-byte instance-metadata prefix.
+Page0 names the retained base's storage; pages1–3 can name independent detail.
+One uniform material/index/static-vertex address domain avoids branching between
+old and new storage. Player body/viewmodel vertices retain their separate roles.
+Page bits8–9 are in instance flags; `reserved1` retains existing actor semantics.
+The CPU admission rejects unknown flag bits, overflowing/misaligned/truncated
+addresses, inactive owners and wrong role/primitive spans before publication.
+One common material/triangle lookup serves both RT backends. No new
+descriptor binding, texture family, shadow query, sample reduction or capacity
+increase is assumed. Actual scene slot/AS availability can impose a smaller
+resident-page count than the table permits. A private primitive page observes the32-row
+bound; shared material IDs refer to the existing table.
+
+The Khronos [uvec2 buffer-reference extension](https://github.com/KhronosGroup/GLSL/blob/main/extensions/ext/GLSL_EXT_buffer_reference_uvec2.txt)
+supports constructing addresses from two32-bit words without requiring shader
+64-bit integer arithmetic. Compiler/SPIR-V validation must establish the actual
+capabilities; the phone must establish real driver compatibility. Source wording
+alone does not admit the new shader path.
+
+The first branch-based attempt exceeded High Generic/Opaque byte budgets by
+3024/3780 bytes. Uniform addressing and reused address handles removed executable
+work; concise new record names removed serialized OpName overhead without
+stripping diagnostics/code or changing compiler strategy. Final Generic byte
+sizes exactly equal the frozen ceilings; Diagnostic High is295960 bytes,
+17618 instructions,83 functions and2 query sites. High Opaque is586624 bytes,
+32298 instructions,1 function and29 query sites. There is no Generic byte
+headroom. These are compile facts, not driver cost or visual acceptance.
+
+The CPU partition allowance counts actual returned vector capacities, provenance,
+planning storage and worst remap scratch, separately from caller-owned input/
+old output. Counting precedes result allocation. Driver allocations and real heap
+bookkeeping still need the live owner/resource inventory; CPU geometry payload
+bytes never stand in for device memory savings.
+
+## Implementation and acceptance slices
+
+1. Add generic catalog/scheduler, compact page payload/ownership and slot leases.
+   Test generation/cancellation, shared dependencies, budget reservation, pressure
+   handling, hysteresis and reliable reverse demand without hardware claims.
+2. Compile the page-address path against the unchanged frozen shader budgets and
+   structural checks. Admit one independent page in the current chapter; validate
+   both actual RT backends, retained base, pose/equipment and all query families.
+3. Connect normal location/contributor rules to bounded page preparation/adoption/
+   retirement/reload. Record actual per-owner/heap allocations and overlap. A
+   cached CPU source is labeled as such until package I/O/lifetime is proven.
+4. Measure an optimized unchanged-quality out/back route, transition hitches,
+   restoration, shadows/reflections/collision, and inspect matched full/resident
+   versus retired/restored views. Validate the concrete candidate on the connected
+   phone, including both backends, lifecycle and sustained pressure/thermal state.
+
+Do not call a planner-only API, CPU batching or a masked TLAS swap the completed
+loading system. At a pause, state the implemented slice, real savings/peak and the
+exact missing admission/physical gates. Do not replace useful existing art or
+inflate performance claims to close a gate.

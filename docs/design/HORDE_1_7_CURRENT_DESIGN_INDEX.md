@@ -1,5 +1,16 @@
 # Horde 1.7 current design index
 
+The [region-streaming engine foundation](REGION_STREAMING_ENGINE.md) now supplies
+the reusable residency scheduler, compact base/detail preparation and validated
+address table, with three Debug/Release regression fixtures and additive CI/
+sanitizer coverage. A private shader prototype fits all eight unchanged frozen
+raygen budgets; eight QueryCompute counterparts compile/validate. **Independent
+page GPU integration is not complete**. Production renderer/shaders remain on the
+measured ordinary combined-owner path below; no additional saving or new rendered/
+phone acceptance is claimed. No world art or released1.6.2 artifact is changed.
+The preceding2147e26b checkpoint passed all six
+[exact-commit CI jobs](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/38544627997).
+
 The [host-smoke follow-up](../evidence/2026-10-14-ordinary-static-streaming/host-smoke-followup.md)
 completes all194 registered Debug checks across the retained interrupted/resumed
 runs and corrects one stale capture-source assertion from the previous owner-alias

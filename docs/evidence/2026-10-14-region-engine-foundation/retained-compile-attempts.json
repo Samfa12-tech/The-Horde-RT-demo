@@ -1,0 +1,308 @@
+[
+  {
+    "attempt": "region-page-address-r01",
+    "key": "diagnostic_high_generic_dielectric",
+    "bytes": 298984,
+    "instructions": 17796,
+    "functions": 83,
+    "rayQueryInitializations": 2,
+    "sha256": "d469c594f07c0ab428cafff7df995cf77121f520435bddbbb7f87cb020c6e7a5"
+  },
+  {
+    "attempt": "region-page-address-r01",
+    "key": "diagnostic_high_opaque_fast",
+    "bytes": 599300,
+    "instructions": 32968,
+    "functions": 1,
+    "rayQueryInitializations": 29,
+    "sha256": "362a34786c11065c94e990cce1d23a60fa885d924b213b67a7d076976a168643"
+  },
+  {
+    "attempt": "region-page-address-r02",
+    "key": "diagnostic_high_generic_dielectric",
+    "bytes": 298408,
+    "instructions": 17752,
+    "functions": 83,
+    "rayQueryInitializations": 2,
+    "sha256": "1b5c2924fb94cd9bdbe93dd01982c80907cd3d48edc6466013fc7f816c7e42ea"
+  },
+  {
+    "attempt": "region-page-address-r02",
+    "key": "diagnostic_high_opaque_fast",
+    "bytes": 596612,
+    "instructions": 32782,
+    "functions": 1,
+    "rayQueryInitializations": 29,
+    "sha256": "db365edb1c00630013926fe2105954f593190ceb4f465acb20f2c8a75c44516a"
+  },
+  {
+    "attempt": "region-page-address-r03",
+    "key": "diagnostic_high_generic_dielectric",
+    "bytes": 296664,
+    "instructions": 17642,
+    "functions": 83,
+    "rayQueryInitializations": 2,
+    "sha256": "05c4f1bb9848318f35900ee793b1afeb322366f28ecb975f5edc82f98eccac9c"
+  },
+  {
+    "attempt": "region-page-address-r03",
+    "key": "diagnostic_high_opaque_fast",
+    "bytes": 586896,
+    "instructions": 32304,
+    "functions": 1,
+    "rayQueryInitializations": 29,
+    "sha256": "5e9f7a09b67fb4789d0d82d13d6d60c2750715e873d1eb8d54e1679d371d8500"
+  },
+  {
+    "attempt": "region-page-address-r04",
+    "key": "diagnostic_high_generic_dielectric",
+    "bytes": 296252,
+    "instructions": 17626,
+    "functions": 83,
+    "rayQueryInitializations": 2,
+    "sha256": "903fa5b5a62680daa9ca96b74de1dca4b6b370e4e38accd49435c307ac067780"
+  },
+  {
+    "attempt": "region-page-address-r04",
+    "key": "diagnostic_high_opaque_fast",
+    "bytes": 586896,
+    "instructions": 32304,
+    "functions": 1,
+    "rayQueryInitializations": 29,
+    "sha256": "398b60216426817d43237ca25a696632420fadf9d39ab2c60a5b53fd6fd677db"
+  },
+  {
+    "attempt": "region-page-address-r06",
+    "key": "diagnostic_high_generic_dielectric",
+    "bytes": 296168,
+    "instructions": 17626,
+    "functions": 83,
+    "rayQueryInitializations": 2,
+    "sha256": "d9ca591c26c685b01c1fc2e2e7605d24537d9bd3e1566ecce9dd23d6fcc1c70e"
+  },
+  {
+    "attempt": "region-page-address-r07",
+    "key": "diagnostic_high_generic_dielectric",
+    "bytes": 296136,
+    "instructions": 17623,
+    "functions": 83,
+    "rayQueryInitializations": 2,
+    "sha256": "726bc28c3134fadd6d48ed1946f838d081105ccf0cd0caa36c5e277ec1938401"
+  },
+  {
+    "attempt": "region-page-address-r08",
+    "key": "diagnostic_high_generic_dielectric",
+    "bytes": 296004,
+    "instructions": 17618,
+    "functions": 83,
+    "rayQueryInitializations": 2,
+    "sha256": "9f5000391e453d561c68b72df59c70fef1ae4f202ccd5bb961e25b788d62103d"
+  },
+  {
+    "attempt": "region-page-address-r08",
+    "key": "diagnostic_high_opaque_fast",
+    "bytes": 586656,
+    "instructions": 32298,
+    "functions": 1,
+    "rayQueryInitializations": 29,
+    "sha256": "6eb13a783a75b7c2d39a68b4ce498fd5f8020902c6cc8891b05d2185682b0bd6"
+  },
+  {
+    "attempt": "region-page-address-r08",
+    "key": "diagnostic_mobile_generic_dielectric",
+    "bytes": 294504,
+    "instructions": 17522,
+    "functions": 83,
+    "rayQueryInitializations": 2,
+    "sha256": "d6df0af51bcafb3e97686c564f93eee0a8b96d2d6505eccd2dce412f26dea8b6"
+  },
+  {
+    "attempt": "region-page-address-r08",
+    "key": "diagnostic_mobile_opaque_fast",
+    "bytes": 583708,
+    "instructions": 32117,
+    "functions": 1,
+    "rayQueryInitializations": 27,
+    "sha256": "ce8c8ef643b8d28038f974e295931f84f5aee2fae0c861ad84fdbdfcae4ff62e"
+  },
+  {
+    "attempt": "region-page-address-r08",
+    "key": "shipping_high_generic_dielectric",
+    "bytes": 287176,
+    "instructions": 17194,
+    "functions": 83,
+    "rayQueryInitializations": 2,
+    "sha256": "5897cb2d0a8941f00531d325a3b943ca5e48bad0643bbbabf53a6033b91abdeb"
+  },
+  {
+    "attempt": "region-page-address-r08",
+    "key": "shipping_high_opaque_fast",
+    "bytes": 582420,
+    "instructions": 32119,
+    "functions": 1,
+    "rayQueryInitializations": 29,
+    "sha256": "ac86e4118f0cbed7532fefbd9ac6ea8a0305931ef3a5ca46185a0bbaee4cb1c0"
+  },
+  {
+    "attempt": "region-page-address-r08",
+    "key": "shipping_mobile_generic_dielectric",
+    "bytes": 285676,
+    "instructions": 17098,
+    "functions": 83,
+    "rayQueryInitializations": 2,
+    "sha256": "cca5f0b6539714bf6ea920ce3fa825173337538a3df76fc9eda9847ecd402f72"
+  },
+  {
+    "attempt": "region-page-address-r08",
+    "key": "shipping_mobile_opaque_fast",
+    "bytes": 579472,
+    "instructions": 31938,
+    "functions": 1,
+    "rayQueryInitializations": 27,
+    "sha256": "00898bd11f196345ff7010746dd4a11df73e85e186dd1937a73b5670c7db0ab8"
+  },
+  {
+    "attempt": "region-page-address-r09",
+    "key": "diagnostic_high_generic_dielectric",
+    "bytes": 295968,
+    "instructions": 17618,
+    "functions": 83,
+    "rayQueryInitializations": 2,
+    "sha256": "89db07929b6a2fbe1377a311572ebe99f48dcb0bc12e1b16893f10f03400566b"
+  },
+  {
+    "attempt": "region-page-address-r09",
+    "key": "diagnostic_high_opaque_fast",
+    "bytes": 586632,
+    "instructions": 32298,
+    "functions": 1,
+    "rayQueryInitializations": 29,
+    "sha256": "a4e2c4895637b1da0f448493a54100ecf73d186adaa43f6d337fcd3edb73b03e"
+  },
+  {
+    "attempt": "region-page-address-r09",
+    "key": "diagnostic_mobile_generic_dielectric",
+    "bytes": 294468,
+    "instructions": 17522,
+    "functions": 83,
+    "rayQueryInitializations": 2,
+    "sha256": "1991bb73a03aa6bb938ad438346e1d23f44514c92fee2d7f482a8ca9a80dd9b6"
+  },
+  {
+    "attempt": "region-page-address-r09",
+    "key": "diagnostic_mobile_opaque_fast",
+    "bytes": 583684,
+    "instructions": 32117,
+    "functions": 1,
+    "rayQueryInitializations": 27,
+    "sha256": "009952ed05baf5d7cf4e878b6008bc069829d7eb68a0ddeb9cd4727154eefe52"
+  },
+  {
+    "attempt": "region-page-address-r09",
+    "key": "shipping_high_generic_dielectric",
+    "bytes": 287140,
+    "instructions": 17194,
+    "functions": 83,
+    "rayQueryInitializations": 2,
+    "sha256": "44fa183ee0a1262c309e7e29c7b4579ea56221b9471449c4e1bacffcc90514a9"
+  },
+  {
+    "attempt": "region-page-address-r09",
+    "key": "shipping_high_opaque_fast",
+    "bytes": 582396,
+    "instructions": 32119,
+    "functions": 1,
+    "rayQueryInitializations": 29,
+    "sha256": "cefc3fd77ce05ce5e7f13a6f10be81d98f2e62635069a45638fb1a2c743dc283"
+  },
+  {
+    "attempt": "region-page-address-r09",
+    "key": "shipping_mobile_generic_dielectric",
+    "bytes": 285640,
+    "instructions": 17098,
+    "functions": 83,
+    "rayQueryInitializations": 2,
+    "sha256": "724eb3fcc0762c6bf0c736fdb733a50c38f1e91e0a697ae122e21f24154ba3a9"
+  },
+  {
+    "attempt": "region-page-address-r09",
+    "key": "shipping_mobile_opaque_fast",
+    "bytes": 579448,
+    "instructions": 31938,
+    "functions": 1,
+    "rayQueryInitializations": 27,
+    "sha256": "e0c9f5deb9377a2662150f2e9a5789e2147fccf27b582e54b00dc33879894762"
+  },
+  {
+    "attempt": "region-page-address-r10",
+    "key": "diagnostic_high_generic_dielectric",
+    "bytes": 295960,
+    "instructions": 17618,
+    "functions": 83,
+    "rayQueryInitializations": 2,
+    "sha256": "b459f090fde9c39f75d87292b8ad795b1f13689b5853f34bdc7a0e943e188f85"
+  },
+  {
+    "attempt": "region-page-address-r10",
+    "key": "diagnostic_high_opaque_fast",
+    "bytes": 586624,
+    "instructions": 32298,
+    "functions": 1,
+    "rayQueryInitializations": 29,
+    "sha256": "a1b02c99e40c122d58e057235c81891344390045372d3ef6d77b0cc52c724acf"
+  },
+  {
+    "attempt": "region-page-address-r10",
+    "key": "diagnostic_mobile_generic_dielectric",
+    "bytes": 294460,
+    "instructions": 17522,
+    "functions": 83,
+    "rayQueryInitializations": 2,
+    "sha256": "302adeadeae06abd6104ca9f5ecb7e3ee50c804c1e1437c1808b4cf4b10793c3"
+  },
+  {
+    "attempt": "region-page-address-r10",
+    "key": "diagnostic_mobile_opaque_fast",
+    "bytes": 583676,
+    "instructions": 32117,
+    "functions": 1,
+    "rayQueryInitializations": 27,
+    "sha256": "ca54801e0ecf45fc76e57674d99dd6b5b7606a91448b9e9536b132281e290643"
+  },
+  {
+    "attempt": "region-page-address-r10",
+    "key": "shipping_high_generic_dielectric",
+    "bytes": 287132,
+    "instructions": 17194,
+    "functions": 83,
+    "rayQueryInitializations": 2,
+    "sha256": "dd55d00afda8315729ea92396fad44f44f4f3a9b32a00f6f79716bd6e98ca315"
+  },
+  {
+    "attempt": "region-page-address-r10",
+    "key": "shipping_high_opaque_fast",
+    "bytes": 582388,
+    "instructions": 32119,
+    "functions": 1,
+    "rayQueryInitializations": 29,
+    "sha256": "1ee2cb599688f9ec5a6896e3eea058c1cc3cc02bdc35abed7a0bbacc599db9fd"
+  },
+  {
+    "attempt": "region-page-address-r10",
+    "key": "shipping_mobile_generic_dielectric",
+    "bytes": 285632,
+    "instructions": 17098,
+    "functions": 83,
+    "rayQueryInitializations": 2,
+    "sha256": "30ae3c9d21fcb037cd0f2bbf2aa06b3c3c6f7fd61c8a6b81ed2a883a507f3bdc"
+  },
+  {
+    "attempt": "region-page-address-r10",
+    "key": "shipping_mobile_opaque_fast",
+    "bytes": 579440,
+    "instructions": 31938,
+    "functions": 1,
+    "rayQueryInitializations": 27,
+    "sha256": "2b71c86dabdbf5d435ac9c1dd08895db6adf01990ffd9716ce76fe1a25ebd8c2"
+  }
+]

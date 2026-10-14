@@ -37,7 +37,23 @@ if(WIN32 AND (BUILD_TESTING OR (HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD
 endif()
 include(cmake/HordeRtPocketAudioCore.cmake)
 horde_rt_add_pocket_audio_core("${CMAKE_CURRENT_SOURCE_DIR}" "${BUILD_TESTING}")
+add_library(horde_world_streaming STATIC
+    src/world/streaming/RegionStreaming.cpp
+    src/world/streaming/GeometryPartition.cpp)
+target_include_directories(horde_world_streaming PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 if(BUILD_TESTING)
+    add_executable(horde_rt_region_streaming_tests tests/RegionStreamingTests.cpp)
+    target_link_libraries(horde_rt_region_streaming_tests PRIVATE horde_world_streaming)
+    add_test(NAME horde_rt_region_streaming_tests COMMAND horde_rt_region_streaming_tests)
+    set_tests_properties(horde_rt_region_streaming_tests PROPERTIES TIMEOUT 10)
+    add_executable(horde_rt_geometry_page_table_tests tests/GeometryPageTableTests.cpp)
+    target_include_directories(horde_rt_geometry_page_table_tests PRIVATE src)
+    add_test(NAME horde_rt_geometry_page_table_tests COMMAND horde_rt_geometry_page_table_tests)
+    set_tests_properties(horde_rt_geometry_page_table_tests PROPERTIES TIMEOUT 10)
+    add_executable(horde_rt_geometry_partition_tests tests/GeometryPartitionTests.cpp)
+    target_link_libraries(horde_rt_geometry_partition_tests PRIVATE horde_world_streaming)
+    add_test(NAME horde_rt_geometry_partition_tests COMMAND horde_rt_geometry_partition_tests)
+    set_tests_properties(horde_rt_geometry_partition_tests PROPERTIES TIMEOUT 10)
     add_executable(horde_rt_sky_attribution_launch_tests tests/WindowsSkyAttributionLaunchTests.cpp)
     target_include_directories(horde_rt_sky_attribution_launch_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     add_test(NAME horde_rt_sky_attribution_launch_tests COMMAND horde_rt_sky_attribution_launch_tests)
@@ -156,6 +172,8 @@ foreach(source IN LISTS HORDE_RT_CORE_RELATIVE_SOURCES)
 endforeach()
 list(FILTER HORDE_RT_SOURCE_FILES EXCLUDE REGEX "/(audio/(AmbiencePcmLoop|MusicDirector|MusicPcmStream|MusicPcmWave|MusicPcmAssetBank|MusicPlaybackSession)|reporting/(PlaytestReport|PlaytestSubmission)|gameplay/(simulation/GameSimulation(Rescue|Dialogue)?|traversal/RescueTraversal|animation/(PlayerAnimationState|PlayerIkTargets)|effects/FireEmitterState|interactions/(InteractionState|ChestRewardSequence|FinaleSequence)|items/(HeldItemState|HeldItemKinematics|HeldLightState|LanternPendulum)))\\.cpp$")
 
+list(REMOVE_ITEM HORDE_RT_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/world/streaming/RegionStreaming.cpp")
+list(REMOVE_ITEM HORDE_RT_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/world/streaming/GeometryPartition.cpp")
 add_library(horde_gameplay_simulation STATIC
     src/audio/AmbiencePcmLoop.cpp
     src/audio/MusicDirector.cpp
@@ -248,7 +266,7 @@ if(HORDE_RT_BUILD_VULKAN_TARGETS)
             ${CMAKE_CURRENT_SOURCE_DIR}/third_party
     )
     target_compile_features(horde_rt_probe_core PUBLIC cxx_std_20)
-    target_link_libraries(horde_rt_probe_core PUBLIC Vulkan::Vulkan horde_gameplay_simulation)
+    target_link_libraries(horde_rt_probe_core PUBLIC Vulkan::Vulkan horde_gameplay_simulation horde_world_streaming)
     horde_rt_attach_raygen_artifacts(horde_rt_probe_core)
     horde_rt_apply_raygen_policy(horde_rt_probe_core Windows)
     horde_rt_attach_staged_primary(horde_rt_probe_core "${CMAKE_CURRENT_SOURCE_DIR}")

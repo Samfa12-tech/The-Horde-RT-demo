@@ -1,0 +1,79 @@
+{
+  "budgetSha256": "56936479b2d202dbdb9393ba94b66a1b0bc12d490b700d8af4c63de3460e53bf",
+  "passed": true,
+  "variants": [
+    {
+      "key": "diagnostic_high_generic_dielectric",
+      "bytes": 295960,
+      "instructions": 17618,
+      "functions": 83,
+      "rayQueryInitializations": 2,
+      "failures": [],
+      "spirvSha256": "b459f090fde9c39f75d87292b8ad795b1f13689b5853f34bdc7a0e943e188f85"
+    },
+    {
+      "key": "diagnostic_high_opaque_fast",
+      "bytes": 586624,
+      "instructions": 32298,
+      "functions": 1,
+      "rayQueryInitializations": 29,
+      "failures": [],
+      "spirvSha256": "a1b02c99e40c122d58e057235c81891344390045372d3ef6d77b0cc52c724acf"
+    },
+    {
+      "key": "diagnostic_mobile_generic_dielectric",
+      "bytes": 294460,
+      "instructions": 17522,
+      "functions": 83,
+      "rayQueryInitializations": 2,
+      "failures": [],
+      "spirvSha256": "302adeadeae06abd6104ca9f5ecb7e3ee50c804c1e1437c1808b4cf4b10793c3"
+    },
+    {
+      "key": "diagnostic_mobile_opaque_fast",
+      "bytes": 583676,
+      "instructions": 32117,
+      "functions": 1,
+      "rayQueryInitializations": 27,
+      "failures": [],
+      "spirvSha256": "ca54801e0ecf45fc76e57674d99dd6b5b7606a91448b9e9536b132281e290643"
+    },
+    {
+      "key": "shipping_high_generic_dielectric",
+      "bytes": 287132,
+      "instructions": 17194,
+      "functions": 83,
+      "rayQueryInitializations": 2,
+      "failures": [],
+      "spirvSha256": "dd55d00afda8315729ea92396fad44f44f4f3a9b32a00f6f79716bd6e98ca315"
+    },
+    {
+      "key": "shipping_high_opaque_fast",
+      "bytes": 582388,
+      "instructions": 32119,
+      "functions": 1,
+      "rayQueryInitializations": 29,
+      "failures": [],
+      "spirvSha256": "1ee2cb599688f9ec5a6896e3eea058c1cc3cc02bdc35abed7a0bbacc599db9fd"
+    },
+    {
+      "key": "shipping_mobile_generic_dielectric",
+      "bytes": 285632,
+      "instructions": 17098,
+      "functions": 83,
+      "rayQueryInitializations": 2,
+      "failures": [],
+      "spirvSha256": "30ae3c9d21fcb037cd0f2bbf2aa06b3c3c6f7fd61c8a6b81ed2a883a507f3bdc"
+    },
+    {
+      "key": "shipping_mobile_opaque_fast",
+      "bytes": 579440,
+      "instructions": 31938,
+      "functions": 1,
+      "rayQueryInitializations": 27,
+      "failures": [],
+      "spirvSha256": "2b71c86dabdbf5d435ac9c1dd08895db6adf01990ffd9716ce76fe1a25ebd8c2"
+    }
+  ],
+  "scope": "Private raygen compile/validator/cost feasibility only; no GPU presentation, QueryCompute or phone pass"
+}

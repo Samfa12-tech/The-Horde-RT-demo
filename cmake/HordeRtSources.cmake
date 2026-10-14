@@ -1,6 +1,8 @@
 # Shared native renderer sources. Keep platform entry points and UI shells in
 # their platform-specific targets; this list is consumed by Windows and Android.
 set(HORDE_RT_CORE_RELATIVE_SOURCES
+    world/streaming/RegionStreaming.cpp
+    world/streaming/GeometryPartition.cpp
     telemetry/RtPerformanceEvidence.cpp
     telemetry/RtEvidencePublication.cpp
     telemetry/RtBenchmarkEvidenceRun.cpp
