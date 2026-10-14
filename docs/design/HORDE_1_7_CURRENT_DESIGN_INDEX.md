@@ -1,5 +1,16 @@
 # Horde 1.7 current design index
 
+The [native niche wall-join checkpoint](../evidence/2026-10-14-niche-wall-joins/README.md)
+reproduces three real wall-cut escape rays and fits both wall planes to the
+existing rectangular/arched stone frames. Native assets and accepted contents
+remain byte-preserved; the actual builder adds24 triangles with unchanged limits.
+Debug/Release affected checks and Android286 Java/build/lint/package pass.
+Both-backend carry regressions are pixel-identical; close niche inspection frames
+remain strict arm-visibility rejections in both baseline and candidate. Native
+radial seams still obstruct an all-ray arch certificate. **Normal static saving
+remains zero**, and contributor-safe ordinary two-way loading/retirement/reload
+remains the next milestone. No new foreground pacing or physical-phone claim.
+
 The [optimized Release route baseline](../evidence/2026-10-14-release-route-baseline/README.md)
 now records matched visible Pipeline/Query out-and-back runs, constant allocation
 and zero static-region saving. Its original timestamps are post-render observations;

@@ -77,7 +77,16 @@ inline constexpr bool DevelopmentCheckpointRequiresAuthoredChapter(
     return checkpoint.id == 192 || checkpoint.name.starts_with("chapter-");
 }
 
-inline constexpr std::array<DevelopmentCheckpoint, 97u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 100u> kDevelopmentCheckpoints{{
+    {.id=218,.name="chapter-niche-rect",.baseShowcaseCheckpointId=11,
+     .cameraX=-0.40f,.cameraZ=-0.70f,.yaw=-1.57079632679f,.pitch=-0.32f,
+     .usesProductionRewardProps=true,.rewardPose=DevelopmentRewardPose::HeldHigh},
+    {.id=219,.name="chapter-niche-arch",.baseShowcaseCheckpointId=11,
+     .cameraX=-0.40f,.cameraZ=-2.60f,.yaw=-1.57079632679f,.pitch=-0.32f,
+     .usesProductionRewardProps=true,.rewardPose=DevelopmentRewardPose::HeldHigh},
+    {.id=220,.name="chapter-niche-east",.baseShowcaseCheckpointId=11,
+     .cameraX=4.55f,.cameraZ=-12.40f,.yaw=1.57079632679f,.pitch=-0.32f,
+     .usesProductionRewardProps=true,.rewardPose=DevelopmentRewardPose::HeldHigh},
     {.id=216,.name="chapter-lantern-side-wall-high",.baseShowcaseCheckpointId=11,
      .cameraX=-16.0f,.cameraZ=-13.84f,.yaw=-1.57079632679f,.pitch=-.05f,
      .usesProductionRewardProps=true,.rewardPose=DevelopmentRewardPose::HeldHigh},

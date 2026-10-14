@@ -1,0 +1,89 @@
+{
+  "scope": "Native image comparisons; close niche frames are strict rejections, not visual acceptance",
+  "niches": [
+    {
+      "backend": "pipeline",
+      "niche": "rect",
+      "changedPixels": 3703,
+      "maximumChannelDelta": 62,
+      "baselineComplete": false,
+      "candidateComplete": false,
+      "shaderIdentitiesMatch": true,
+      "settingsMatch": true,
+      "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU"
+    },
+    {
+      "backend": "pipeline",
+      "niche": "arch",
+      "changedPixels": 4468,
+      "maximumChannelDelta": 81,
+      "baselineComplete": false,
+      "candidateComplete": false,
+      "shaderIdentitiesMatch": true,
+      "settingsMatch": true,
+      "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU"
+    },
+    {
+      "backend": "pipeline",
+      "niche": "east",
+      "changedPixels": 162,
+      "maximumChannelDelta": 23,
+      "baselineComplete": false,
+      "candidateComplete": false,
+      "shaderIdentitiesMatch": true,
+      "settingsMatch": true,
+      "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU"
+    },
+    {
+      "backend": "query",
+      "niche": "rect",
+      "changedPixels": 3707,
+      "maximumChannelDelta": 62,
+      "baselineComplete": false,
+      "candidateComplete": false,
+      "shaderIdentitiesMatch": true,
+      "settingsMatch": true,
+      "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU"
+    },
+    {
+      "backend": "query",
+      "niche": "arch",
+      "changedPixels": 4467,
+      "maximumChannelDelta": 81,
+      "baselineComplete": false,
+      "candidateComplete": false,
+      "shaderIdentitiesMatch": true,
+      "settingsMatch": true,
+      "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU"
+    },
+    {
+      "backend": "query",
+      "niche": "east",
+      "changedPixels": 160,
+      "maximumChannelDelta": 23,
+      "baselineComplete": false,
+      "candidateComplete": false,
+      "shaderIdentitiesMatch": true,
+      "settingsMatch": true,
+      "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU"
+    }
+  ],
+  "passingCarryRegressions": [
+    {
+      "backend": "pipeline",
+      "changedPixels": 0,
+      "maximumChannelDelta": 0
+    },
+    {
+      "backend": "query",
+      "changedPixels": 0,
+      "maximumChannelDelta": 0
+    }
+  ],
+  "javaCounts": {
+    "tests": 286,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  }
+}

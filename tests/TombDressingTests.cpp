@@ -1,5 +1,6 @@
 #include "scene/TombDressing.h"
 #include "scene/TombStoneBevels.h"
+#include "scene/TombWallRecess.h"
 #include "scene/visibility/OpaqueStaticQuadAdmission.h"
 #include "scene/assets/AssetManifest.h"
 
@@ -157,6 +158,80 @@ void TestRayHelperFixture()
     fixture.primitives.push_back({0u, 0u, 3u, 0u, 0u});
     const float hit = NearestMasonryHit(fixture, {{-1.8f, 0.0f, -0.667f}}, {{-1.0f, 0.0f, 0.0f}});
     Check(Near(hit, 0.1f, 0.001f), "CPU triangle-ray helper hits a synthetic wall face");
+}
+
+void TestNativeNicheWallSeams(const horde::scene::assets::StaticMeshAsset& native)
+{
+    using namespace horde::scene;
+    // Actual production panel corners, native world-baked triangles, and exact
+    // failing endpoints. A bounds box must not stand in for a stone surface.
+    assets::StaticMeshAsset wall;
+    wall.materials.push_back({});
+    wall.materials[0].name="MedievalWall02";
+    const auto append=[&](float x,float logicalX,float lowZ,float highZ,float lowY,float highY) {
+        for(const auto& panel:TombWallPanels(logicalX,lowZ,highZ,lowY,highY,true)) {
+            const auto points=TombWallPanelVertices(panel,x);
+            const auto base=static_cast<std::uint32_t>(wall.vertices.size());
+            for(const auto& point:points) {
+                assets::StaticRtVertex vertex{};
+                vertex.position={{point[0],point[1],point[2],1.f}};
+                wall.vertices.push_back(vertex);
+            }
+            wall.indices.insert(wall.indices.end(),{base,base+1,base+2,base,base+2,base+3});
+        }
+    };
+    append(-1.85f,-1.85f,-6.4f,3.4f,-.95f,1.35f);
+    append(-1.92f,-1.85f,-6.47f,3.4f,-1.02f,1.42f);
+    append(6.f,6.f,-15.2f,-10.f,-.95f,1.35f);
+    append(6.07f,6.f,-15.2f,-10.f,-1.02f,1.42f);
+    wall.primitives.push_back({0u,0u,static_cast<std::uint32_t>(wall.indices.size()),0u,0u});
+    struct Segment { const char* name;std::array<float,3u> start,end; };
+    const std::array<Segment,4u> reproduced{{
+        {"rect low-Z seam",{{-1.84f,0,-1.0479f}},{{-2.17f,0,-1.0479f}}},
+        {"rect high-Z seam",{{-1.84f,0,-.3521f}},{{-2.17f,0,-.3521f}}},
+        {"arch upward seam",{{-1.7f,.19f,-2.6f}},{{-2.25f,.5475f,-2.6f}}},
+        {"east edge control",{{5.99f,0,-12.72895f}},{{6.32f,0,-12.72895f}}},
+    }};
+    for(const auto& ray:reproduced) {
+        std::array<float,3u> direction{};
+        for(unsigned axis=0;axis<3;++axis)direction[axis]=ray.end[axis]-ray.start[axis];
+        const float hit=std::min(NearestMasonryHit(native,ray.start,direction),
+                                 NearestMasonryHit(wall,ray.start,direction));
+        Check(std::isfinite(hit) && hit>0 && hit<1,ray.name);
+        std::cout<<"Native niche seam "<<ray.name<<" first hit fraction="<<hit<<'\n';
+    }
+    // Join regressions also use the real imported frame, independently of the
+    // procedural wall. A ray from either wall plane toward the room must hit
+    // the frame on every cut edge; an enclosing bounds box would miss the
+    // arch crown and shelf/jamb defects reproduced above.
+    std::size_t frameChecks=0;
+    for(std::size_t niche=0;niche<kTombWallCuts.size();++niche) {
+        const auto& cut=kTombWallCuts[niche];
+        std::vector<std::array<float,2u>> boundary;
+        boundary.push_back({cut.minimumZ,cut.minimumY});
+        boundary.push_back({cut.maximumZ,cut.minimumY});
+        for(std::size_t i=cut.topPointCount;i>0;--i)boundary.push_back(cut.topZY[i-1]);
+        const float visibleX=kTombDressingNicheOpenings[niche].wallCoordinate;
+        const float facing=niche==2 ? -1.f : 1.f;
+        for(const float plane:{visibleX,visibleX-facing*.07f}) {
+            const auto checkFrame=[&](float z,float y) {
+                const float hit=NearestMasonryHit(native,{{plane,y,z}},{{facing,0,0}});
+                Check(std::isfinite(hit) && hit>0 && hit<.15f,
+                      "native module covers the wall-cut perimeter on both wall planes");
+                ++frameChecks;
+            };
+            for(std::size_t edge=0;edge<boundary.size();++edge) {
+                const auto& a=boundary[edge];const auto& b=boundary[(edge+1)%boundary.size()];
+                for(const float fraction:{0.f,.25f,.5f,.75f})
+                    checkFrame(a[0]+fraction*(b[0]-a[0]),a[1]+fraction*(b[1]-a[1]));
+            }
+            if(niche==1) {
+                checkFrame(-2.798f,cut.minimumY);
+                checkFrame(-2.402f,cut.minimumY);
+            }
+        }
+    }
+    std::cout<<"Native fitted-frame perimeter ray checks: "<<frameChecks<<'\n';
 }
 
 void TestImportedNicheFaceNormals(const std::filesystem::path& assetRoot)
@@ -320,6 +395,7 @@ void TestPreparedDressingAppend(const std::filesystem::path& assetRoot)
     Check(AppendPreparedTombDressing(assetRoot, second, secondReport, diagnostic, false),
           diagnostic.empty() ? "second prepared source append succeeds" : diagnostic.c_str());
 
+    TestNativeNicheWallSeams(first);
     const std::array<float,12> identity{{1,0,0,0,0,1,0,0,0,0,1,0}};
     std::size_t realQuads=0,boneWitnesses=0;
     for(std::size_t p=oldPrimitives;p<first.primitives.size();++p) {

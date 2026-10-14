@@ -27,9 +27,9 @@ struct TombDressingNicheOpening
     const char* backing;
 };
 
-// These compact fitted openings cut only the visible wall at x=-1.85. Their
-// native modules retain thick returns and a sealed rear wall beyond the hidden
-// shell; the third opening is in the outer route's x=6 wall, never a portal.
+// Outer bounds of the compact native modules; these are not wall-cut profiles.
+// TombWallRecess fits the actual cut under the module's returns/lintel/shelf.
+// Two modules lie at x=-1.85; the third is at x=6 and is never a room portal.
 inline constexpr std::array<TombDressingNicheOpening, 3u> kTombDressingNicheOpenings{{
     {"entry-left-rect", TombDressingWallAxis::X, -1.85f, -0.54f, 0.285f,
      -1.048f, -0.352f, "sealed module back about 0.29 m behind the visible wall"},

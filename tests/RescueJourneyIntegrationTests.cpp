@@ -57,7 +57,7 @@ int main(int argc,char** argv) {
          "canonical chapter selections must request their actual authored GPU scene");
    chapterSelections+=expected;
   }
-  check(chapterSelections==25,"live journey and all24 chapter views retain authored-scene admission");
+  check(chapterSelections==28,"live journey and all27 chapter views retain authored-scene admission");
   const auto* landing=FindDevelopmentCheckpoint("chapter-landing-north");
   GameSimulation fresh(ProductionGameSimulationConfig());
   check(!StageDevelopmentCheckpointForScene(fresh,*landing,[]{}),

@@ -67,8 +67,8 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 97u,
-          "development registry retains prior views and adds two actual chapter side-wall carry inspections");
+    Check(kDevelopmentCheckpoints.size() == 100u,
+          "development registry retains prior views and adds three actual chapter niche inspections");
     Check(FindDevelopmentCheckpoint("chapter-understory-close") != nullptr &&
           FindShowcaseCheckpoint("chapter-understory-close") == nullptr,
           "understory camera is development-only and cannot alter release checkpoint lookup");
@@ -757,6 +757,19 @@ int main()
           DevelopmentCheckpointRequiresAuthoredChapter(*sideHigh) &&
           DevelopmentCheckpointRequiresAuthoredChapter(*sideLow),
           "side-wall capture freezes the actual chapter pose beside the coloured passage wall");
+    for(const auto& expected : std::array<std::pair<std::string_view, int>,3>{{
+        {"chapter-niche-rect",218},{"chapter-niche-arch",219},{"chapter-niche-east",220}}})
+    {
+        const auto* niche=FindDevelopmentCheckpoint(expected.first);
+        Check(niche && niche->id==expected.second &&
+              DevelopmentCheckpointRequiresAuthoredChapter(*niche) &&
+              !niche->stagesRescueExterior && !niche->primaryArmsMayBeOutsideFrame &&
+              niche->baseShowcaseCheckpointId==11 &&
+              niche->usesProductionRewardProps &&
+              niche->combatPose==DevelopmentCombatPose::Rest &&
+              niche->rewardPose==DevelopmentRewardPose::HeldHigh && niche->pitch==-.32f,
+              "niche inspection uses authored scene and keeps real primary ownership checks");
+    }
     Check(lookUp != nullptr && lookUp->id == 134 &&
               lookUp->rewardPose == DevelopmentRewardPose::HeldHigh &&
               lookUp->pitch == 0.28f,

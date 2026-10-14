@@ -415,3 +415,4 @@ docs/evidence/2026-10-14-release-route-baseline/**/*.log whitespace=-trailing-sp
 docs/evidence/2026-10-14-report-ui-fixed-size/logs/* -text -whitespace
 docs/evidence/2026-10-14-forest-region-provenance/logs/* -text -whitespace
 docs/evidence/2026-10-14-lantern-origin-containment/logs/* -text -whitespace
+docs/evidence/2026-10-14-niche-wall-joins/native-join-evidence-r01.zip filter=lfs diff=lfs merge=lfs -text

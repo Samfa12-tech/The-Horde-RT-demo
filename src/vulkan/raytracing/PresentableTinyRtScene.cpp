@@ -3573,12 +3573,14 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         float bottom, float top, SurfaceMaterial material, SurfaceNormal normal) {
         for (const auto& panel : horde::scene::TombWallPanels(logicalX, minZ, maxZ,
                 bottom, top, developmentRescueJourney_)) {
+            const auto corners=horde::scene::TombWallPanelVertices(panel,x);
+            const auto vertex=[&](std::size_t i) {
+                return Vertex{{corners[i][0],corners[i][1],corners[i][2]}};
+            };
             if (normal == SurfaceRight)
-                addWorldQuad({{x, panel.minimumY, panel.maximumZ}}, {{x, panel.minimumY, panel.minimumZ}},
-                    {{x, panel.maximumY, panel.minimumZ}}, {{x, panel.maximumY, panel.maximumZ}}, material, normal);
+                addWorldQuad(vertex(1),vertex(0),vertex(3),vertex(2),material,normal);
             else
-                addWorldQuad({{x, panel.minimumY, panel.minimumZ}}, {{x, panel.minimumY, panel.maximumZ}},
-                    {{x, panel.maximumY, panel.maximumZ}}, {{x, panel.maximumY, panel.minimumZ}}, material, normal);
+                addWorldQuad(vertex(0),vertex(1),vertex(2),vertex(3),material,normal);
         }
     };
     addRecessedWallX(-1.85f, -1.85f, -6.4f, 3.4f, kRouteFloorWorldY, 1.35f, SurfaceMossyStone, SurfaceRight);
