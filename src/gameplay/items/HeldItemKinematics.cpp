@@ -1092,7 +1092,11 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
         // consume this same target; do not move the flame or light separately.
         result.leftHandLocal = selectedLocal;
     }
-    if (rewardLantern && !input.rescueExterior && !input.developmentWorldRoute &&
+    // These asset/Grip bounds are admitted for the measured native anatomical
+    // rig. Legacy fixture attachments retain their explicit authored profile;
+    // they are not contributor-certified by this correction.
+    if (rewardLantern && input.playerMountProfile == PlayerMountProfile::AnatomicalBody &&
+        !input.rescueExterior && !input.developmentWorldRoute &&
         detail::InsideWalkableUnion(input.cameraX,input.cameraZ))
     {
         static const auto interior = RectangularUnionCover(kShowcaseWalkableRects);

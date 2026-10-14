@@ -5732,6 +5732,8 @@ public class MainActivity extends Activity {
             case "chapter-stake-repeat-ascent": return 213;
             case "chapter-understory-close": return 214;
             case "chapter-deadwood-bank": return 215;
+            case "chapter-lantern-side-wall-high": return 216;
+            case "chapter-lantern-side-wall-low": return 217;
             case "vertical-proof-ground": return 170;
             case "vertical-proof-raised": return 171;
             case "layout-c-wall-panel-upward": return 152;
@@ -6027,6 +6029,8 @@ public class MainActivity extends Activity {
             case 213: return new float[]{2.35619449f, -.32f};
             case 214: return new float[]{1.15f, .10f};
             case 215: return new float[]{.55f, .18f};
+            case 216: return new float[]{-1.57079632679f, -.05f};
+            case 217: return new float[]{-1.57079632679f, -.05f};
             case 136: return new float[]{0.0f, -0.32f};
             case 137: return new float[]{0.0f, -0.05f};
             case 138: return new float[]{0.0f, -0.28f};

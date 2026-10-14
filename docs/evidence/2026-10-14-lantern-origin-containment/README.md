@@ -4,6 +4,28 @@ Source parent: `ba2b8cc386489c138fff7ebae3ecd666db503609`. This checkpoint fixes
 reproduced side-wall crossing before any ordinary static-region eviction. It
 does **not** admit a partial GPU owner. Normal static-region savings remain zero.
 
+### CI correction after1396670a
+
+[Run38489708744](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/38489708744)
+failed all six jobs: the new bound changed a legacy attachment's strict near-wall
+pose, the authored-view count lacked the two new selections, and Android lacked
+their name/ID/camera mappings. The host failures were reproduced locally.
+The MSVC Unicode report test separately passed1.93s; this failure did not justify
+reopening its fix or changing a deadline.
+
+The successor restricts the asset/Grip envelope to the measured native
+`AnatomicalBody` profile. Legacy fixture attachments retain their existing
+contract and are not certified by this bound. The existing strict legacy pose
+assertions pass unchanged. Android now resolves216/217 to the same immutable
+native camera, and the exact authored roster is25 selections (24 named views
+plus the live route selection). Corrected Debug/Release selections pass6/6;
+all286 Java tests, four-ABI Debug build, lint and actual ASTC/package checks pass.
+Fresh Pipeline and Query confirmations pass and were opened. Their decoded
+native-profile pixels are identical to1396670a's corrected High-carry images
+(zero changed pixels on each backend). The earlier8-view/route evidence retains
+its original artifact identity; the successor artifacts and confirmation
+manifests are in `ci-correction-receipt.json`.
+
 The real imported player rig and lantern reproduced glass outside the coloured
 passage wall. The first failing native test retained Z=-16.806524 against the
 wall at -16.8. At the north wall, the old zero-swing glass reached -13.5749

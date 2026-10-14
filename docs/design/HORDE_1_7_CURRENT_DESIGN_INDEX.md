@@ -25,6 +25,10 @@ alias is handled with strict hand-slot ownership checks and unchanged shaders.
 This does not certify the retained opaque shell or authorize normal GPU eviction;
 static-region saving remains zero. Physical acceptance and controlled optimized
 route measurements remain pending. Parent ba2b8cc3 passed all six CI jobs.
+`1396670a` failed six jobs on the legacy-profile pose and new capture registration
+gaps. Those failures were reproduced; the successor scopes the proof to the
+native anatomical profile and completes Android/native registrations. Local
+Debug/Release6/6 and286 Java checks pass, with fresh native RT image parity.
 
 The [prepared forest provenance repair](../evidence/2026-10-14-forest-region-provenance/README.md)
 now keeps all 365,212 actual exterior-dressing triangles distinct from shared
