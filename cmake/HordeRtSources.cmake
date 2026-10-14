@@ -3,6 +3,8 @@
 set(HORDE_RT_CORE_RELATIVE_SOURCES
     world/streaming/RegionStreaming.cpp
     world/streaming/GeometryPartition.cpp
+    vulkan/raytracing/RtRegionGeometryPreparation.cpp
+    vulkan/raytracing/RtRegionGeometrySource.cpp
     telemetry/RtPerformanceEvidence.cpp
     telemetry/RtEvidencePublication.cpp
     telemetry/RtBenchmarkEvidenceRun.cpp

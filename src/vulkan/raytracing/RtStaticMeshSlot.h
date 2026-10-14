@@ -119,6 +119,7 @@ public:
     }
 
 private:
+    friend class RtRegionGeometrySource;
     friend class RtStaticMeshCopy;
     friend class RtStaticTriangleOmissions;
     bool admitted_ = false;

@@ -1,5 +1,14 @@
 # Horde 1.7 current design index
 
+The region preparation slice adds native-root/detail source conversion and
+independent bounded GPU upload/opaque-BLAS ownership with exact-token retry,
+pending cancellation and quarantine. Debug/Release affected native checks pass;
+this is offside/injected ownership evidence, not new live scene savings. See the
+[preparation receipt](../evidence/2026-10-14-region-gpu-preparation/README.md).
+Live page adoption/retirement/return remains the next engine milestone.
+Foundation9d126583 passed all six
+[exact-commit CI jobs](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/38557046796).
+
 The [region-streaming engine foundation](REGION_STREAMING_ENGINE.md) now supplies
 the reusable residency scheduler, compact base/detail preparation and validated
 address table, with three Debug/Release regression fixtures and additive CI/

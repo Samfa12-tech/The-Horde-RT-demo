@@ -1,0 +1,44 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+    Start   2: horde_rt_geometry_page_table_tests
+1/4 Test   #2: horde_rt_geometry_page_table_tests ......   Passed    1.75 sec
+    Start 166: horde_rt_gpu_buffer_batch_tests
+2/4 Test #166: horde_rt_gpu_buffer_batch_tests .........   Passed    4.58 sec
+    Start 167: horde_rt_region_gpu_preparation_tests
+3/4 Test #167: horde_rt_region_gpu_preparation_tests ...***Timeout  10.02 sec
+FAIL: known failure releases offside owners
+FAIL: failure retry needs exact acknowledgement
+FAIL: same owner accepts explicit retry
+FAIL: retry completes bounded preparation
+FAIL: retry completes bounded preparation
+FAIL: retry completes bounded preparation
+FAIL: retry completes bounded preparation
+FAIL: retry completes bounded preparation
+FAIL: retry completes bounded preparation
+FAIL: retry completes bounded preparation
+FAIL: retry completes bounded preparation
+FAIL: retry completes bounded preparation
+FAIL: retry completes bounded preparation
+FAIL: retry completes bounded preparation
+FAIL: retry completes bounded preparation
+FAIL: retry completes bounded preparation
+FAIL: retry completes bounded preparation
+FAIL: retry completes bounded preparation
+FAIL: retry completes bounded preparation
+FAIL: retry completes bounded preparation
+FAIL: retry completes bounded preparation
+FAIL: retry completes bounded preparation
+FAIL: retry completes bounded preparation
+FAIL: retry publishes complete owner
+Assertion failed: !work_.submitted && "Retain pending/quarantined region owners until completion or device-idle cleanup", file C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\src\vulkan\raytracing\RtRegionGeometryPreparation.cpp, line 34
+
+    Start 168: horde_rt_gpu_work_lease_tests
+4/4 Test #168: horde_rt_gpu_work_lease_tests ...........   Passed    1.96 sec
+
+75% tests passed, 1 tests failed out of 4
+
+Total Test time (real) =  18.33 sec
+
+The following tests FAILED:
+	167 - horde_rt_region_gpu_preparation_tests (Timeout)
+Errors while running CTest

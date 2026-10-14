@@ -178,6 +178,7 @@ public:
 
 private:
     friend class RtGpuBufferPreparation;
+    friend class RtRegionGeometryPreparation;
     VkPhysicalDevice physicalDevice_ = VK_NULL_HANDLE;
     VkDevice device_ = VK_NULL_HANDLE;
     PFN_vkDestroyAccelerationStructureKHR destroyAccelerationStructure_ = nullptr;

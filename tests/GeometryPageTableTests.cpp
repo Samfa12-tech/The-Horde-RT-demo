@@ -28,6 +28,8 @@ int main() {
     }
     auto bad=metadata;bad[1].geometryRole=static_cast<std::uint32_t>(RtGeometryRole::PlayerViewmodel);
     check(!BuildGeometryPageTable(bad,pages,table),"detail page cannot hijack player vertex ownership");
+    bad=metadata;bad[1].flags|=static_cast<std::uint32_t>(RtInstanceFlag::Transmissive);
+    check(!BuildGeometryPageTable(bad,pages,table),"opaque page owner cannot be paired with transmissive instance semantics");
     bad=metadata;bad[1].primitiveBase=1;check(!BuildGeometryPageTable(bad,pages,table),"primitive base overflow rejected");
     bad=metadata;bad[1].primitiveCount=2;check(!BuildGeometryPageTable(bad,pages,table),"primitive count overflow rejected");
     auto ranges=pages;ranges[1].vertices.address+=1;check(!BuildGeometryPageTable(metadata,ranges,table),"unaligned vertex address rejected");

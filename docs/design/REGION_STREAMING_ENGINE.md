@@ -21,6 +21,30 @@ address-table construction. These are linked shared native CPU capabilities with
 three focused Debug/Release fixtures. The renderer does not call the new page
 path yet. Its existing ordinary combined-owner unload/return remains intact.
 
+The next preparation slice supplies a native-source adapter and an independent
+offside GPU owner. It uploads compact vertex/index/private-primitive buffers in
+bounded copies, submits one immutable opaque BLAS build, polls its fence and
+transfers ownership only on exact-generation completion. Known failures release
+offside resources and require explicit retry; unknown submission/completion
+retains every resource until external retirement proof. Pending cancellation
+cannot free build inputs. The backend supplies its actual consumer stages, so
+QueryCompute does not receive a pipeline-only shader-stage bit.
+
+Five region fixtures now cover scheduler, partition, table, native imported
+source and injected GPU preparation. The new GPU fixture exercises allocation,
+mapping, addresses, AS/work failures, retry, cancellation and sole-owner transfer;
+it creates no hardware device. The native adapter checks byte-identical imported
+attributes/winding, shared material identity and complete held/player domains.
+Its CPU allowance covers requested storage and admitted vector capacities; a
+vector allocator may transiently over-allocate before rejection. It is not a
+hard heap cap, and source/old output/heap bookkeeping remain separate.
+
+This closes offside preparation coverage, not live page integration. Production
+still uses the measured combined-owner path; no new savings or presentation
+are claimed. The foundation at9d126583 passed all six exact-commit CI jobs in
+[run38557046796](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/38557046796),
+including55 Vulkan-host checks and all seven requested rescue/traversal checks.
+
 Private page-address SPIR-V feasibility passes all eight unchanged raygen budgets
 and exact structural checks. Eight private QueryCompute counterparts also compile
 and validate through the current generator. No production shader/catalog/include

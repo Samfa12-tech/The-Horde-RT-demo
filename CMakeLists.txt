@@ -1298,6 +1298,23 @@ if(BUILD_TESTING)
             ${CMAKE_CURRENT_SOURCE_DIR}/src ${Vulkan_INCLUDE_DIRS})
         add_test(NAME horde_rt_gpu_buffer_batch_tests
             COMMAND horde_rt_gpu_buffer_batch_tests)
+        add_executable(horde_rt_region_gpu_preparation_tests
+            tests/RtRegionGeometryPreparationTests.cpp
+            src/telemetry/RtPerformanceEvidence.cpp
+            src/vulkan/raytracing/RtGpuResources.cpp
+            src/vulkan/raytracing/RtRegionGeometryPreparation.cpp)
+        target_include_directories(horde_rt_region_gpu_preparation_tests PRIVATE src ${Vulkan_INCLUDE_DIRS})
+        target_link_libraries(horde_rt_region_gpu_preparation_tests PRIVATE Vulkan::Vulkan horde_world_streaming)
+        add_test(NAME horde_rt_region_gpu_preparation_tests COMMAND horde_rt_region_gpu_preparation_tests)
+        set_tests_properties(horde_rt_region_gpu_preparation_tests PROPERTIES TIMEOUT 10)
+
+        add_executable(horde_rt_region_geometry_source_tests tests/RtRegionGeometrySourceTests.cpp)
+        target_include_directories(horde_rt_region_geometry_source_tests PRIVATE src)
+        target_link_libraries(horde_rt_region_geometry_source_tests PRIVATE horde_rt_probe_core)
+        target_compile_definitions(horde_rt_region_geometry_source_tests PRIVATE
+            HORDE_RT_SOURCE_ASSET_ROOT="${CMAKE_CURRENT_SOURCE_DIR}/assets")
+        add_test(NAME horde_rt_region_geometry_source_tests COMMAND horde_rt_region_geometry_source_tests)
+        set_tests_properties(horde_rt_region_geometry_source_tests PROPERTIES TIMEOUT 10)
 
         add_executable(horde_rt_gpu_work_lease_tests tests/RtGpuWorkLeaseTests.cpp)
         target_include_directories(horde_rt_gpu_work_lease_tests PRIVATE

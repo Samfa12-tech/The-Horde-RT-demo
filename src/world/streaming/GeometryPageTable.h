@@ -65,6 +65,7 @@ inline bool BuildGeometryPageTable(
         if(m.flags&~allowed)return false;
         const auto page=m.flags>>kGeometryPageShift;
         if(page>=kGeometryPages || (page && (!(m.flags&static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr)) ||
+           (m.flags&static_cast<std::uint32_t>(RtInstanceFlag::Transmissive)) ||
            m.geometryRole!=static_cast<std::uint32_t>(RtGeometryRole::Static))))return false;
         if(m.flags&static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr)) {
             if(!m.primitiveCount || !pages[page].primitiveCount || m.primitiveBase>=pages[page].primitiveCount ||
