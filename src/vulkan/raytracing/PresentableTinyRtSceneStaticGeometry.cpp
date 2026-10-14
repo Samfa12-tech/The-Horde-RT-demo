@@ -140,6 +140,19 @@ bool PresentableTinyRtScene::StaticGeometryReplacementReady() const noexcept
 {
     return preparedStaticGeometry_ && preparedStaticGeometry_->ready;
 }
+
+std::shared_ptr<const RtStaticTriangleOmissions> PresentableTinyRtScene::CreateStaticGeometryTriangleOmissions(
+    std::uint64_t expectedGeneration, std::span<const std::uint32_t> triangles,
+    std::string& diagnostic) const
+{
+    if(!developmentRescueJourney_ || sceneProfile_!=RtSceneProfile::Showcase || !fullStaticGeometrySource_ ||
+       staticGeometryCompletionUnproved_ || !expectedGeneration || expectedGeneration==UINT64_MAX ||
+       expectedGeneration!=staticGeometryGeneration_) {
+        diagnostic="Triangle omission admission requires the current chapter's complete immutable source.";return {};
+    }
+    return RtStaticTriangleOmissions::Create(fullStaticGeometrySource_,kCollapseInstanceIndex,triangles,diagnostic);
+}
+
 bool PresentableTinyRtScene::StaticGeometryReplacementHasGpuWork() const noexcept
 {
     return preparedStaticGeometry_ && preparedStaticGeometry_->buildWork.submitted;
@@ -182,14 +195,17 @@ bool PresentableTinyRtScene::CancelStaticGeometryReplacement(std::string& diagno
 
 bool PresentableTinyRtScene::BeginStaticGeometryReplacement(
     const std::uint64_t expectedGeneration, std::span<const std::uint32_t> retainedWorldFamilies,
-    std::string& diagnostic, const std::uint8_t retainedTriangleRegions)
+    std::string& diagnostic, const std::uint8_t retainedTriangleRegions,
+    std::shared_ptr<const RtStaticTriangleOmissions> omissions)
 {
     if (!ready_ || !developmentRescueJourney_ || sceneProfile_ != RtSceneProfile::Showcase ||
         preparedStaticGeometry_ || staticGeometryCompletionUnproved_ || expectedGeneration == 0 ||
         expectedGeneration != staticGeometryGeneration_ || expectedGeneration == UINT64_MAX ||
         !tlasInstanceDefinitionsValid_ || tlasPendingDefinitionsValid_ ||
         retainedTriangleRegions>horde::scene::assets::kAllStaticTriangleRegions ||
-        (retainedTriangleRegions!=horde::scene::assets::kAllStaticTriangleRegions && !retainedWorldFamilies.empty())) {
+        (retainedTriangleRegions!=horde::scene::assets::kAllStaticTriangleRegions && !retainedWorldFamilies.empty()) ||
+        (omissions && (!fullStaticGeometrySource_ || !retainedWorldFamilies.empty() ||
+            retainedTriangleRegions!=horde::scene::assets::kAllStaticTriangleRegions))) {
         diagnostic = "Static geometry preparation requires the current completed chapter owner and no pending candidate.";
         return false;
     }
@@ -199,11 +215,12 @@ bool PresentableTinyRtScene::BeginStaticGeometryReplacement(
     candidate->sourceGeneration = expectedGeneration;
     candidate->retainedTriangleRegions = retainedTriangleRegions;
     candidate->retainedAllFamilies = retainedWorldFamilies.empty();
+    candidate->retainedAllTriangles = !omissions || omissions->Triangles().empty();
     staticGeometryReplacementMeasurements_ = {};
     if (retainedWorldFamilies.empty() && fullStaticGeometrySource_) {
         candidate->copy = std::make_unique<RtStaticMeshCopy>();
         if (!candidate->copy->Begin(fullStaticGeometrySource_, diagnostic,
-                kCollapseInstanceIndex,retainedTriangleRegions)) return false;
+                kCollapseInstanceIndex,retainedTriangleRegions,std::move(omissions))) return false;
         candidate->phase = PreparedStaticGeometry::Phase::Copy;
         preparedStaticGeometry_ = std::move(candidate);
         staticGeometryReplacementMeasurements_.beginMilliseconds =
@@ -503,6 +520,7 @@ bool PresentableTinyRtScene::CommitStaticGeometryWithApi(const std::uint64_t exp
         std::swap(tlasUpdateScratch_, retired->tlasScratch);
         std::swap(staticGeometryRetainedTriangleRegions_, retired->retainedTriangleRegions);
         std::swap(staticGeometryRetainedAllFamilies_, retired->retainedAllFamilies);
+        std::swap(staticGeometryRetainedAllTriangles_, retired->retainedAllTriangles);
     };
     exchangeOwners();
     // The writer rejects its contract BEFORE vkUpdateDescriptorSets. A false

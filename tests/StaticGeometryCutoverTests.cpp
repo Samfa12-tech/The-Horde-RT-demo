@@ -395,6 +395,36 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
             const horde::gameplay::simulation::WorldZoneToken token{
                 1,horde::gameplay::simulation::WorldZoneId::Lookout};
             using horde::gameplay::simulation::ZoneReadiness;
+            s.preparedStaticGeometry_->retainedAllTriangles=false;
+            p.descriptorFailure=true;
+            failures+=!Check(!s.CommitStaticGeometryWithApi(41,api,error) &&
+                s.StaticGeometryHasCompleteContributors() && s.WorldZoneReadiness(token)==ZoneReadiness::Ready &&
+                !s.preparedStaticGeometry_->retainedAllTriangles,
+                "sparse candidate rollback preserves the full owner and private omission identity");
+            p.descriptorFailure=false;p.proof=0;p.publish=0;
+            failures+=!Check(s.CommitStaticGeometryWithApi(41,api,error) &&
+                s.staticGeometryRetainedAllFamilies_ &&
+                s.staticGeometryRetainedTriangleRegions_==horde::scene::assets::kAllStaticTriangleRegions &&
+                !s.StaticGeometryHasCompleteContributors() && s.WorldZoneReadiness(token)==ZoneReadiness::Preparing,
+                "both region bits and all family rows cannot hide omitted triangles from traversal readiness");
+            Scene moved(std::move(s));
+            failures+=!Check(!moved.StaticGeometryHasCompleteContributors() &&
+                moved.WorldZoneReadiness(token)==ZoneReadiness::Preparing && s.StaticGeometryHasCompleteContributors(),
+                "move transfers sparse omission state and resets the old owner");
+            moved.staticGeometryRetainedAllTriangles_=true;
+            failures+=!Check(moved.WorldZoneReadiness(token)==ZoneReadiness::Ready,
+                "complete triangle restoration can restore traversal readiness");
+            moved.staticGeometryRetainedAllTriangles_=false;moved.Destroy();
+            failures+=!Check(moved.StaticGeometryHasCompleteContributors(),
+                "teardown clears sparse state for scene reconstruction");
+        }
+        {
+            Scene s;Seed(s,oldMap,newMap);Proof p{&s};auto api=Api(p);
+            s.developmentWorldRoute_=true;s.worldRouteGeometry_.valid=true;
+            s.vertexBuffer_=Buffer(201);s.indexBuffer_=Buffer(202);s.blas_=As(203);
+            const horde::gameplay::simulation::WorldZoneToken token{
+                1,horde::gameplay::simulation::WorldZoneId::Lookout};
+            using horde::gameplay::simulation::ZoneReadiness;
             failures+=!Check(s.WorldZoneReadiness(token)==ZoneReadiness::Ready,
                 "complete scene keeps its real zone readiness");
             s.preparedStaticGeometry_->retainedTriangleRegions=2u;

@@ -550,6 +550,61 @@ struct PresentableTinyRtSceneObservationTestAccess
             same(copied->PrimitiveVertexCounts(),scene.staticMeshSlot_.PrimitiveVertexCounts()) &&
             same(copied->GeometryTransforms(),scene.staticMeshSlot_.GeometryTransforms()) &&
             same(copied->InstanceMetadata(),instances), "native bounded copy preserves every role and metadata byte");
+        // Admission against actual native bytes, not a visibility proof. Keep
+        // the production scene full; exercise source-local triangle identity
+        // and mixed provenance in a private CPU candidate only.
+        const auto& world=instances[PresentableTinyRtScene::kCollapseInstanceIndex];
+        std::vector<std::uint32_t> omitted;
+        for(const auto wanted:{horde::scene::assets::StaticTriangleRegion::TombDressing,
+                              horde::scene::assets::StaticTriangleRegion::ExteriorDressing}) {
+            bool found=false;
+            for(std::uint32_t row=world.primitiveBase;row<world.primitiveBase+world.primitiveCount && !found;++row) {
+                const auto& p=primitives[row];
+                if(p.indexCount<=3u)continue;
+                for(std::uint32_t triangle=p.indexOffset/3u;triangle<(p.indexOffset+p.indexCount)/3u;++triangle)
+                    if(scene.staticMeshSlot_.TriangleRegions()[triangle]==wanted) {
+                        omitted.push_back(triangle);found=true;break;
+                    }
+            }
+            ok &= Require(found,"actual cached world owns both omittable dressing provenances");
+        }
+        std::sort(omitted.begin(),omitted.end());
+        std::cout<<"Native sparse fixture ("<<(compiledHigh ? "High" : "Mobile")<<") IDs: "
+            <<(omitted.empty() ? 0u : omitted.front())<<' '<<(omitted.size()<2u ? 0u : omitted.back())<<'\n';
+        auto plan=scene.CreateStaticGeometryTriangleOmissions(scene.StaticGeometryGeneration(),omitted,diagnostic);
+        ok &= Require(!scene.CreateStaticGeometryTriangleOmissions(0u,omitted,diagnostic) &&
+            !scene.CreateStaticGeometryTriangleOmissions(scene.StaticGeometryGeneration()+1u,omitted,diagnostic),
+            "scene-owned sparse admission rejects absent/stale generation before touching the source");
+        ok &= Require(plan && cpu.Begin(scene.fullStaticGeometrySource_,diagnostic,
+            PresentableTinyRtScene::kCollapseInstanceIndex,horde::scene::assets::kAllStaticTriangleRegions,plan),
+            "actual source sparse selection starts without repacking any asset");
+        copyTurns=0;
+        while(!cpu.Ready() && copyTurns++<1024u) {
+            if(!cpu.Advance(256u*1024u,diagnostic)){ok=false;break;}
+            ok &= cpu.LastCopiedBytes()<=256u*1024u && cpu.LastScannedBytes()<=256u*1024u;
+        }
+        copied=cpu.Take();
+        ok &= Require(copied && omitted.size()==2 &&
+            copied->Indices().size()+6u==scene.staticMeshSlot_.Indices().size() &&
+            copied->TriangleRegions().size()+2u==scene.staticMeshSlot_.TriangleRegions().size() &&
+            same(copied->Vertices(),scene.staticMeshSlot_.Vertices()) &&
+            same(copied->Materials(),scene.staticMeshSlot_.Materials()) &&
+            same(copied->InstanceMetadata(),instances) &&
+            same(copied->GeometryTransforms(),scene.staticMeshSlot_.GeometryTransforms()),
+            "actual sparse candidate removes exactly two triangles and preserves every shared identity");
+        if(copied && copied->TriangleRegions().size()+omitted.size()==scene.staticMeshSlot_.TriangleRegions().size() &&
+            copied->Indices().size()==copied->TriangleRegions().size()*3u) {
+            std::size_t out=0u,skip=0u;
+            for(std::size_t triangle=0u;triangle<scene.staticMeshSlot_.TriangleRegions().size();++triangle) {
+                if(skip<omitted.size() && triangle==omitted[skip]){++skip;continue;}
+                ok &= copied->TriangleRegions()[out]==scene.staticMeshSlot_.TriangleRegions()[triangle] &&
+                    std::memcmp(copied->Indices().data()+out*3u,scene.staticMeshSlot_.Indices().data()+triangle*3u,
+                        3u*sizeof(std::uint32_t))==0;
+                ++out;
+            }
+            ok &= out==copied->TriangleRegions().size() && skip==omitted.size();
+        }
+        plan.reset();
         std::weak_ptr<const RtStaticMeshSlot> sourceLease=scene.fullStaticGeometrySource_;
         ok &= Require(cpu.Begin(scene.fullStaticGeometrySource_,diagnostic) && cpu.Advance(256u,diagnostic), "native lifetime copy begins");
         PresentableTinyRtScene moved(std::move(scene));

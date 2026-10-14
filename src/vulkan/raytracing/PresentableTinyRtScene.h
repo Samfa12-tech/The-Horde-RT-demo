@@ -283,14 +283,20 @@ public:
     // Shared textures, materials, player buffers and unchanged BLAS stay owned.
     std::uint64_t StaticGeometryGeneration() const noexcept { return staticGeometryGeneration_; }
     bool StaticGeometryHasCompleteContributors() const noexcept {
-        return staticGeometryRetainedAllFamilies_ &&
+        return staticGeometryRetainedAllFamilies_ && staticGeometryRetainedAllTriangles_ &&
             staticGeometryRetainedTriangleRegions_ == horde::scene::assets::kAllStaticTriangleRegions;
     }
     bool PrepareStaticGeometryReplacement(std::uint64_t expectedGeneration,
         std::span<const std::uint32_t> retainedWorldFamilies, std::string& diagnostic);
+    // CPU admission against the scene's pinned complete source, with current
+    // generation identity. No GPU allocation, publication or visibility proof.
+    std::shared_ptr<const RtStaticTriangleOmissions> CreateStaticGeometryTriangleOmissions(
+        std::uint64_t expectedGeneration, std::span<const std::uint32_t> triangles,
+        std::string& diagnostic) const;
     bool BeginStaticGeometryReplacement(std::uint64_t expectedGeneration,
         std::span<const std::uint32_t> retainedWorldFamilies, std::string& diagnostic,
-        std::uint8_t retainedTriangleRegions = horde::scene::assets::kAllStaticTriangleRegions);
+        std::uint8_t retainedTriangleRegions = horde::scene::assets::kAllStaticTriangleRegions,
+        std::shared_ptr<const RtStaticTriangleOmissions> omissions = {});
     // One bounded CPU/upload step or one owned AS submit/nonblocking fence
     // poll. Allocation and command-record latency are not time guarantees.
     bool AdvanceStaticGeometryReplacement(std::uint64_t expectedGeneration,
@@ -770,6 +776,7 @@ private:
         std::uint64_t sourceGeneration = 0;
         std::uint8_t retainedTriangleRegions = horde::scene::assets::kAllStaticTriangleRegions;
         bool retainedAllFamilies = true;
+        bool retainedAllTriangles = true;
         bool ready = false;
         Phase phase = Phase::Upload;
         std::chrono::steady_clock::time_point prepareStart;
@@ -807,6 +814,7 @@ private:
     std::uint64_t staticGeometryGeneration_ = 1;
     std::uint8_t staticGeometryRetainedTriangleRegions_ = horde::scene::assets::kAllStaticTriangleRegions;
     bool staticGeometryRetainedAllFamilies_ = true;
+    bool staticGeometryRetainedAllTriangles_ = true;
     bool staticGeometryCompletionUnproved_ = false;
     StaticGeometryReplacementMeasurements staticGeometryReplacementMeasurements_{};
 

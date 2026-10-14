@@ -48,7 +48,96 @@ RtMaterialGpu ConvertMaterial(const horde::scene::assets::StaticMaterial& source
     return result;
 }
 
+struct OwnedTriangleSpan
+{
+    std::uint32_t primitiveBegin = 0u, primitiveEnd = 0u, indexBegin = 0u, indexEnd = 0u;
+};
+
+bool ValidateSelectedOwner(const RtStaticMeshSlot& source, std::uint32_t instance,
+    OwnedTriangleSpan& span, std::string& diagnostic)
+{
+    if(instance>=source.InstanceMetadata().size()) {
+        diagnostic="Cached selection needs an existing immutable instance.";return false;
+    }
+    const auto& owner=source.InstanceMetadata()[instance];
+    const auto& primitives=source.PrimitiveMetadata();
+    if(!owner.primitiveCount || owner.geometryRole!=static_cast<std::uint32_t>(RtGeometryRole::Static) ||
+       (owner.flags&static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr))==0u ||
+       owner.primitiveBase>=primitives.size() || owner.primitiveCount>primitives.size()-owner.primitiveBase) {
+        diagnostic="Cached selection requires a complete static primitive owner.";return false;
+    }
+    span.primitiveBegin=owner.primitiveBase;span.primitiveEnd=owner.primitiveBase+owner.primitiveCount;
+    span.indexBegin=primitives[span.primitiveBegin].indexOffset;span.indexEnd=span.indexBegin;
+    for(std::size_t i=span.primitiveBegin;i<span.primitiveEnd;++i) {
+        const auto& p=primitives[i];
+        if(p.indexOffset!=span.indexEnd || !p.indexCount || p.indexCount%3u || p.indexOffset%3u ||
+           p.indexOffset>source.Indices().size() || p.indexCount>source.Indices().size()-p.indexOffset ||
+           p.indexCount>UINT32_MAX-span.indexEnd) {
+            diagnostic="Cached selection needs contiguous owned triangle spans.";return false;
+        }
+        span.indexEnd+=p.indexCount;
+    }
+    // Selection cannot change geometry another instance/primitive still owns.
+    for(std::size_t i=0;i<source.InstanceMetadata().size();++i) if(i!=instance) {
+        const auto& other=source.InstanceMetadata()[i];
+        if(other.primitiveCount && other.primitiveBase<span.primitiveEnd &&
+           span.primitiveBegin<static_cast<std::uint64_t>(other.primitiveBase)+other.primitiveCount) {
+            diagnostic="Cached selection cannot omit another instance's shared geometry.";return false;
+        }
+    }
+    for(std::size_t i=0;i<primitives.size();++i) {
+        const auto& p=primitives[i];
+        if(p.indexOffset%3u || p.indexCount%3u || !p.indexCount ||
+           p.indexOffset>source.Indices().size() || p.indexCount>source.Indices().size()-p.indexOffset ||
+           p.indexCount>UINT32_MAX-p.indexOffset) {
+            diagnostic="Cached selection rejected an invalid admitted index boundary.";return false;
+        }
+        if((i<span.primitiveBegin || i>=span.primitiveEnd) &&
+           p.indexOffset<span.indexEnd && span.indexBegin<p.indexOffset+p.indexCount) {
+            diagnostic="Cached selection cannot omit another primitive's overlapping indices.";return false;
+        }
+    }
+    return true;
+}
+
 } // namespace
+
+std::shared_ptr<const RtStaticTriangleOmissions> RtStaticTriangleOmissions::Create(
+    std::shared_ptr<const RtStaticMeshSlot> source, std::uint32_t selectedInstance,
+    std::span<const std::uint32_t> triangles, std::string& diagnostic)
+{
+    OwnedTriangleSpan span;
+    if(!source || !source->admitted_ || source->TriangleRegions().size()!=source->Indices().size()/3u) {
+        diagnostic="Triangle omissions require an admitted immutable source.";return {};
+    }
+    if(!ValidateSelectedOwner(*source,selectedInstance,span,diagnostic))return {};
+    std::size_t primitive=span.primitiveBegin, removed=0u;
+    for(std::size_t i=0;i<triangles.size();++i) {
+        const auto triangle=triangles[i];
+        if((i && triangles[i-1]>=triangle) || triangle<span.indexBegin/3u || triangle>=span.indexEnd/3u) {
+            diagnostic="Triangle omissions must be sorted, unique and inside their exclusive owner.";return {};
+        }
+        const auto region=static_cast<std::uint8_t>(source->TriangleRegions()[triangle]);
+        if(region!=1u && region!=2u) {
+            diagnostic="Triangle omissions cannot remove Shared or corrupt provenance.";return {};
+        }
+        while(triangle>=(source->PrimitiveMetadata()[primitive].indexOffset+
+                         source->PrimitiveMetadata()[primitive].indexCount)/3u) {
+            ++primitive;removed=0u;
+        }
+        if(++removed>=source->PrimitiveMetadata()[primitive].indexCount/3u) {
+            diagnostic="Triangle omissions would empty a required primitive row.";return {};
+        }
+    }
+    try {
+        auto plan=std::shared_ptr<RtStaticTriangleOmissions>(new RtStaticTriangleOmissions);
+        plan->source_=std::move(source);plan->selectedInstance_=selectedInstance;
+        plan->triangles_.assign(triangles.begin(),triangles.end());
+        diagnostic.clear();return plan;
+    } catch(const std::exception&) {
+        diagnostic="Failed to allocate immutable triangle omissions.";return {};
+    }
+}
 
 std::uint64_t RtStaticMeshSlot::PayloadBytes() const noexcept
 {
@@ -60,56 +149,27 @@ std::uint64_t RtStaticMeshSlot::PayloadBytes() const noexcept
         sizeof(textureArrayCounts_) + sizeof(measurements_);
 }
 bool RtStaticMeshCopy::Begin(std::shared_ptr<const RtStaticMeshSlot> source, std::string& diagnostic,
-    std::uint32_t selectedInstance, std::uint8_t retainedRegions)
+    std::uint32_t selectedInstance, std::uint8_t retainedRegions,
+    std::shared_ptr<const RtStaticTriangleOmissions> omissions)
 {
     if(output_ || !source || !source->admitted_ || source->PrimitiveMetadata().empty() || source->Materials().empty() ||
         source->Indices().empty() || retainedRegions>horde::scene::assets::kAllStaticTriangleRegions ||
         source->triangleRegions_.size()!=source->indices_.size()/3u) {
         diagnostic="Immutable copy needs an admitted source and no existing candidate."; return false;
     }
+    if(omissions && (omissions->source_.get()!=source.get() || omissions->selectedInstance_!=selectedInstance ||
+        retainedRegions!=horde::scene::assets::kAllStaticTriangleRegions)) {
+        diagnostic="Triangle omissions require their exact source/owner and cannot mix with region filtering.";return false;
+    }
     try {
         std::vector<Boundary> boundaries;
         std::uint32_t selectedBegin=0u,selectedEnd=0u;
-        if(retainedRegions!=horde::scene::assets::kAllStaticTriangleRegions) {
-            if(selectedInstance>=source->instanceMetadata_.size()) {
-                diagnostic="Cached selection needs an existing immutable instance.";return false;
-            }
-            const auto& owner=source->instanceMetadata_[selectedInstance];
-            if(!owner.primitiveCount || owner.geometryRole!=static_cast<std::uint32_t>(RtGeometryRole::Static) ||
-               (owner.flags&static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr))==0u ||
-               owner.primitiveBase>=source->primitiveMetadata_.size() ||
-               owner.primitiveCount>source->primitiveMetadata_.size()-owner.primitiveBase) {
-                diagnostic="Cached selection requires a complete static primitive owner.";return false;
-            }
-            selectedBegin=source->primitiveMetadata_[owner.primitiveBase].indexOffset;
-            selectedEnd=selectedBegin;
-            for(std::size_t i=owner.primitiveBase;i<owner.primitiveBase+owner.primitiveCount;++i) {
-                const auto& p=source->primitiveMetadata_[i];
-                if(p.indexOffset!=selectedEnd || !p.indexCount || p.indexCount%3u || p.indexOffset%3u ||
-                   p.indexOffset>source->indices_.size() || p.indexCount>source->indices_.size()-p.indexOffset) {
-                    diagnostic="Cached selection needs contiguous owned triangle spans.";return false;
-                }
-                selectedEnd+=p.indexCount;
-            }
-            // Geometry shared by another instance must remain intact. Region
-            // selection is not authority to alter another owner's local BLAS.
-            for(std::size_t i=0;i<source->instanceMetadata_.size();++i) if(i!=selectedInstance) {
-                const auto& other=source->instanceMetadata_[i];
-                if(other.primitiveCount && other.primitiveBase<owner.primitiveBase+owner.primitiveCount &&
-                   owner.primitiveBase<other.primitiveBase+other.primitiveCount) {
-                    diagnostic="Cached selection cannot omit another instance's shared geometry.";return false;
-                }
-            }
+        if(omissions || retainedRegions!=horde::scene::assets::kAllStaticTriangleRegions) {
+            OwnedTriangleSpan span;
+            if(!ValidateSelectedOwner(*source,selectedInstance,span,diagnostic))return false;
+            selectedBegin=span.indexBegin;selectedEnd=span.indexEnd;
             for(std::size_t i=0;i<source->primitiveMetadata_.size();++i) {
                 const auto& p=source->primitiveMetadata_[i];
-                if(p.indexOffset%3u || p.indexCount%3u || !p.indexCount ||
-                   p.indexOffset>source->indices_.size() || p.indexCount>source->indices_.size()-p.indexOffset) {
-                    diagnostic="Cached selection rejected an invalid admitted index boundary.";return false;
-                }
-                if((i<owner.primitiveBase || i>=owner.primitiveBase+owner.primitiveCount) &&
-                   p.indexOffset<selectedEnd && selectedBegin<p.indexOffset+p.indexCount) {
-                    diagnostic="Cached selection cannot omit another primitive's overlapping indices.";return false;
-                }
                 boundaries.push_back({p.indexOffset,static_cast<std::uint32_t>(i),false});
                 boundaries.push_back({p.indexOffset+p.indexCount,static_cast<std::uint32_t>(i),true});
             }
@@ -122,6 +182,7 @@ bool RtStaticMeshCopy::Begin(std::shared_ptr<const RtStaticMeshSlot> source, std
         Cancel(); source_=std::move(source); output_=std::move(output);
         boundaries_=std::move(boundaries);selectedBegin_=selectedBegin;selectedEnd_=selectedEnd;
         retainedRegions_=retainedRegions;
+        omissions_=std::move(omissions);
     } catch(const std::exception&) {
         diagnostic="Failed to allocate an immutable CPU copy owner."; return false;
     }
@@ -167,7 +228,10 @@ bool RtStaticMeshCopy::Advance(const std::size_t maxBytes, std::string& diagnost
 bool RtStaticMeshCopy::FilterIndices(std::size_t maxBytes,std::string& diagnostic)
 {
     constexpr auto triangleBytes=3u*sizeof(std::uint32_t)+sizeof(horde::scene::assets::StaticTriangleRegion);
-    if(maxBytes<triangleBytes) {diagnostic="Cached selection budget cannot scan one triangle.";return false;}
+    // Charge the extra plan lookup conservatively even when the next omitted
+    // ID is reused. The same existing per-turn budget now scans fewer triangles.
+    const auto scanBytes=triangleBytes+(omissions_ ? sizeof(std::uint32_t) : 0u);
+    if(maxBytes<scanBytes) {diagnostic="Cached selection budget cannot scan one triangle.";return false;}
     const auto boundaries=[&] {
         while(boundary_<boundaries_.size() && boundaries_[boundary_].index==readIndex_) {
             const auto event=boundaries_[boundary_++];auto& p=output_->primitiveMetadata_[event.primitive];
@@ -175,7 +239,7 @@ bool RtStaticMeshCopy::FilterIndices(std::size_t maxBytes,std::string& diagnosti
             else p.indexOffset=static_cast<std::uint32_t>(writeIndex_);
         }
     };
-    const auto count=std::min(maxBytes/triangleBytes,(source_->indices_.size()-readIndex_)/3u);
+    const auto count=std::min(maxBytes/scanBytes,(source_->indices_.size()-readIndex_)/3u);
     const auto finish=readIndex_+count*3u;
     while(readIndex_<finish) {
         boundaries();
@@ -183,16 +247,20 @@ bool RtStaticMeshCopy::FilterIndices(std::size_t maxBytes,std::string& diagnosti
         const auto flag=static_cast<std::uint8_t>(region);
         if(flag>2u) {Cancel();diagnostic="Cached selection rejected corrupt triangle provenance.";return false;}
         const bool targeted=readIndex_>=selectedBegin_ && readIndex_<selectedEnd_;
-        if(!targeted || flag==0u || (retainedRegions_&flag)!=0u) {
+        const bool omit=omissions_ && omission_<omissions_->triangles_.size() &&
+            omissions_->triangles_[omission_]==readIndex_/3u;
+        if(omit)++omission_;
+        if(!omit && (!targeted || flag==0u || (retainedRegions_&flag)!=0u)) {
             for(unsigned i=0;i<3u;++i)output_->indices_[writeIndex_+i]=source_->indices_[readIndex_+i];
             output_->triangleRegions_[writeIndex_/3u]=region;
             writeIndex_+=3u;lastBytes_+=triangleBytes;copiedBytes_+=triangleBytes;
         }
-        readIndex_+=3u;lastScannedBytes_+=triangleBytes;scannedBytes_+=triangleBytes;
+        readIndex_+=3u;lastScannedBytes_+=scanBytes;scannedBytes_+=scanBytes;
     }
     boundaries();
     if(readIndex_==source_->indices_.size()) {
-        if(boundary_!=boundaries_.size() || std::any_of(output_->primitiveMetadata_.begin(),
+        if(boundary_!=boundaries_.size() || (omissions_ && omission_!=omissions_->triangles_.size()) ||
+            std::any_of(output_->primitiveMetadata_.begin(),
             output_->primitiveMetadata_.end(),[](const auto& p){return !p.indexCount;})) {
             Cancel();diagnostic="Cached selection would empty a required primitive row.";return false;
         }
@@ -206,13 +274,13 @@ std::unique_ptr<RtStaticMeshSlot> RtStaticMeshCopy::Take() noexcept
 {
     if(!Ready()) return {};
     output_->admitted_=true;
-    source_.reset(); row_=offset_=lastBytes_=lastScannedBytes_=0u;
+    source_.reset(); omissions_.reset();omission_=0u;row_=offset_=lastBytes_=lastScannedBytes_=0u;
     boundaries_.clear();boundary_=readIndex_=writeIndex_=0u;filtered_=false;
     retainedRegions_=horde::scene::assets::kAllStaticTriangleRegions;
     return std::move(output_);
 }
 void RtStaticMeshCopy::Cancel() noexcept
-{ output_.reset(); source_.reset(); row_=offset_=lastBytes_=lastScannedBytes_=0u; copiedBytes_=scannedBytes_=0u;
+{ output_.reset(); source_.reset(); omissions_.reset();omission_=0u;row_=offset_=lastBytes_=lastScannedBytes_=0u; copiedBytes_=scannedBytes_=0u;
   boundaries_.clear();boundary_=readIndex_=writeIndex_=0u;selectedBegin_=selectedEnd_=0u;filtered_=false;
   retainedRegions_=horde::scene::assets::kAllStaticTriangleRegions; }
 

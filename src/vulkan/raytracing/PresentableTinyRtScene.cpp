@@ -496,6 +496,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     staticGeometryRetainedTriangleRegions_ = std::exchange(other.staticGeometryRetainedTriangleRegions_,
         horde::scene::assets::kAllStaticTriangleRegions);
     staticGeometryRetainedAllFamilies_ = std::exchange(other.staticGeometryRetainedAllFamilies_, true);
+    staticGeometryRetainedAllTriangles_ = std::exchange(other.staticGeometryRetainedAllTriangles_, true);
     staticGeometryCompletionUnproved_ = std::exchange(other.staticGeometryCompletionUnproved_, false);
     staticGeometryReplacementMeasurements_ = std::exchange(other.staticGeometryReplacementMeasurements_, {});
     physicalDevice_ = std::exchange(other.physicalDevice_, nullptr);
@@ -1118,6 +1119,7 @@ void PresentableTinyRtScene::Destroy()
     staticGeometryGeneration_ = 1u;
     staticGeometryRetainedTriangleRegions_ = horde::scene::assets::kAllStaticTriangleRegions;
     staticGeometryRetainedAllFamilies_ = true;
+    staticGeometryRetainedAllTriangles_ = true;
     staticGeometryCompletionUnproved_ = false;
     staticGeometryReplacementMeasurements_ = {};
     worldRouteGeometry_ = {}; // Release CPU batches with the renderer-owned scene.

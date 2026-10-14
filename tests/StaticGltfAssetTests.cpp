@@ -1199,6 +1199,109 @@ void TestBoundedImmutableMeshCopy()
     } else Check(false,"bounded source copy must advance");
 }
 
+void TestSparseImmutableTriangleOmissions()
+{
+    using namespace horde::vulkan::raytracing;
+    using Asset=horde::scene::assets::StaticMeshAsset;
+    using Region=horde::scene::assets::StaticTriangleRegion;
+    constexpr auto all=horde::scene::assets::kAllStaticTriangleRegions;
+    const auto pbr=static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr);
+    Asset world;
+    world.nodeTransforms.resize(1);world.materials.resize(1);world.vertices.resize(129);
+    for(std::size_t i=0;i<world.vertices.size();++i)world.vertices[i].position[0]=static_cast<float>(i);
+    world.indices={0,1,2,3,4,5,6,7,8,0,1,2,3,4,5,6,7,8,9,10,11};
+    world.primitives={{0,0,9,0,0},{9,9,12,0,0}};
+    world.triangleRegions={Region::Shared,Region::TombDressing,Region::ExteriorDressing,
+        Region::TombDressing,Region::ExteriorDressing,Region::TombDressing,Region::ExteriorDressing};
+    auto foreign=world;
+    foreign.indices={2,1,0};foreign.primitives={{0,0,3,0,0}};
+    foreign.triangleRegions={Region::ExteriorDressing};
+    auto body=foreign;body.indices={0,1,2};body.triangleRegions={Region::TombDressing};
+    const std::array rows{StaticRtAssetRegistration{1,11,pbr,0,&foreign},
+        StaticRtAssetRegistration{21,100,pbr,0,&world},
+        StaticRtAssetRegistration{22,12,pbr,0,&body,nullptr,RtGeometryRole::PlayerWorldBody}};
+    auto source=std::make_shared<RtStaticMeshSlot>();std::string error;
+    Check(source->Initialize(rows,error),"sparse fixture has mixed region rows and foreign prefix/body suffix");
+    const auto same=[](const auto& a,const auto& b){return a.size()==b.size() &&
+        (a.empty() || std::memcmp(a.data(),b.data(),a.size()*sizeof(a.front()))==0);};
+    auto checkCopy=[&](const RtStaticMeshSlot& result) {
+        Check(result.Indices()==std::vector<std::uint32_t>({2,1,0,0,1,2,3,4,5,9,10,11,0,1,2}) &&
+            result.TriangleRegions()==std::vector<Region>({Region::ExteriorDressing,Region::Shared,
+                Region::ExteriorDressing,Region::ExteriorDressing,Region::TombDressing}) &&
+            result.PrimitiveMetadata()[0].indexOffset==0 && result.PrimitiveMetadata()[0].indexCount==3 &&
+            result.PrimitiveMetadata()[1].indexOffset==3 && result.PrimitiveMetadata()[1].indexCount==3 &&
+            result.PrimitiveMetadata()[2].indexOffset==6 && result.PrimitiveMetadata()[2].indexCount==6 &&
+            result.PrimitiveMetadata()[3].indexOffset==12 && result.PrimitiveMetadata()[3].indexCount==3,
+            "sparse mixed-region omissions retain exact order and rebase every affected primitive");
+        Check(same(result.Vertices(),source->Vertices()) && same(result.Materials(),source->Materials()) &&
+            same(result.InstanceMetadata(),source->InstanceMetadata()) &&
+            same(result.PrimitiveVertexCounts(),source->PrimitiveVertexCounts()) &&
+            same(result.GeometryTransforms(),source->GeometryTransforms()) &&
+            same(result.Vertices(RtGeometryRole::PlayerWorldBody),source->Vertices(RtGeometryRole::PlayerWorldBody)) &&
+            result.Measurements().indexBytes==result.Indices().size()*sizeof(std::uint32_t),
+            "sparse copy preserves all admitted vertex/material/role/instance/transform bytes");
+    };
+    std::vector<std::uint32_t> ids{2,3,4,6};
+    auto plan=RtStaticTriangleOmissions::Create(source,21,ids,error);
+    Check(plan && std::ranges::equal(plan->Triangles(),ids),"sparse plan binds a valid exclusive immutable owner");
+    if(!plan)return;
+    ids[0]=UINT32_MAX;
+    Check(plan->Triangles()[0]==2,"plan owns its IDs rather than borrowing caller mutation");
+    RtStaticMeshCopy copy;
+    auto equivalent=std::make_shared<RtStaticMeshSlot>();Check(equivalent->Initialize(rows,error),"equal-byte second source admits");
+    Check(!copy.Begin(equivalent,error,21,all,plan) && !copy.Begin(source,error,1,all,plan) &&
+        !copy.Begin(source,error,21,2u,plan),"source identity, owner and region-mask mixing reject before copying");
+    unsigned turns=0;
+    Check(copy.Begin(source,error,21,all,plan),"sparse copy starts with both region bits retained");
+    while(!copy.Ready() && turns++<300u)
+        Check(copy.Advance(128u,error) && copy.LastCopiedBytes()<=128u && copy.LastScannedBytes()<=128u,
+            "sparse copy and plan scan fit the unchanged per-turn byte budget");
+    Check(copy.Ready() && copy.ScannedBytes()==source->TriangleRegions().size()*17u,
+        "scan accounts for indices, provenance and explicit-plan reads");
+    auto result=copy.Take();Check(result!=nullptr,"only complete sparse output transfers");
+    if(result)checkCopy(*result);
+    for(unsigned cancel=0;cancel<turns;++cancel) {
+        Check(copy.Begin(source,error,21,all,plan),"sparse cancellation/retry starts");
+        for(unsigned turn=0;turn<cancel;++turn)Check(copy.Advance(128u,error),"sparse cancellation boundary advances");
+        copy.Cancel();copy.Cancel();Check(!copy.Take() && source->Indices().size()==27,
+            "no cancellation boundary exposes partial geometry or changes the source");
+    }
+    Check(copy.Begin(source,error,21,all,plan),"small scan budget negative starts");
+    while(copy.CopiedBytes()<source->PayloadBytes()-sizeof(source->InstanceMetadata())-
+          sizeof(source->TextureArrayCounts())-sizeof(source->Measurements())) {
+        if(!copy.Advance(128u,error)){Check(false,"copy reaches scan boundary");break;}
+    }
+    Check(!copy.Ready() && !copy.Take() && !copy.Advance(16u,error) && copy.LastScannedBytes()==0,
+        "retained region bits cannot expose a plan before its scan; too-small scan budget rejects");
+    while(!copy.Ready())if(!copy.Advance(128u,error)){Check(false,"scan recovers after small budget rejection");break;}
+    result=copy.Take();if(result)checkCopy(*result);else Check(false,"sparse retry transfers");
+
+    const std::vector<std::vector<std::uint32_t>> bad{{2,2},{3,2},{0},{1},{8},{UINT32_MAX},{4,5,6,7}};
+    for(const auto& invalid:bad)
+        Check(!RtStaticTriangleOmissions::Create(source,21,invalid,error),
+            "duplicates, unsorted, foreign, Shared, overflow and empty-row omissions reject");
+    Check(!RtStaticTriangleOmissions::Create({},21,{},error) &&
+        !RtStaticTriangleOmissions::Create(std::make_shared<RtStaticMeshSlot>(),21,{},error) &&
+        !RtStaticTriangleOmissions::Create(source,22,std::array{8u},error),
+        "null, unadmitted and dedicated player-role omissions reject");
+    auto shared=std::make_shared<RtStaticMeshSlot>();
+    Check(shared->Initialize(std::array{StaticRtAssetRegistration{21,100,pbr,0,&world},
+        StaticRtAssetRegistration{19,101,pbr,0,&world}},error) &&
+        !RtStaticTriangleOmissions::Create(shared,21,std::array{1u},error),
+        "sparse omission cannot alter another instance's shared primitive owner");
+    auto empty=RtStaticTriangleOmissions::Create(source,21,{},error);
+    Check(empty && copy.Begin(source,error,21,all,empty),"empty sparse plan is valid complete restoration");
+    unsigned fullTurns=0;
+    while(!copy.Ready() && fullTurns++<300u)Check(copy.Advance(128u,error),"empty-plan restoration advances");
+    result=copy.Take();Check(result && same(result->Indices(),source->Indices()) &&
+        same(result->PrimitiveMetadata(),source->PrimitiveMetadata()),"empty-plan restoration is byte-identical");
+    std::weak_ptr<const RtStaticMeshSlot> sourceLease=source;
+    std::weak_ptr<const RtStaticTriangleOmissions> planLease=plan;
+    empty.reset();Check(copy.Begin(source,error,21,all,plan),"sparse owner lifetime begins");
+    source.reset();plan.reset();Check(!sourceLease.expired() && !planLease.expired(),"copy pins both exact source and plan");
+    copy.Cancel();Check(sourceLease.expired() && planLease.expired(),"cancel releases both immutable leases");
+}
+
 void TestStaticPrimitiveRangeOwnership()
 {
     using namespace horde::vulkan::raytracing;
@@ -3091,6 +3194,7 @@ int main(int argc, char** argv)
     TestStaticPrimitiveRangeOwnership();
     TestSelectedGeometryPacking();
     TestBoundedImmutableMeshCopy();
+    TestSparseImmutableTriangleOmissions();
     TestGeometryRolePartitioning();
     TestProductionDielectricFixture();
     TestLanternGeometryQualityProfile();

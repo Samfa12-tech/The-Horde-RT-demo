@@ -1,0 +1,238 @@
+[
+  {
+    "backend": "pipeline",
+    "comparison": {
+      "01-selected": {
+        "changedPixels": 0,
+        "maxChannelDelta": 0
+      },
+      "02-restored": {
+        "changedPixels": 0,
+        "maxChannelDelta": 0
+      }
+    },
+    "device": {
+      "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+      "vendorId": 4318,
+      "deviceId": 11672
+    },
+    "presentation": {
+      "renderScale": 1.0,
+      "dispatchWidth": 960,
+      "dispatchHeight": 540,
+      "swapchainWidth": 960,
+      "swapchainHeight": 540,
+      "swapchainFormat": 44
+    },
+    "shaderBundle": {
+      "opaqueFast": {
+        "key": "diagnostic_high_opaque_fast",
+        "sha256": "b4cad65003368cce20cc95b2415e8b57a43561a44ba4d761753f9a3418eb6296"
+      },
+      "genericDielectric": {
+        "key": "diagnostic_high_generic_dielectric",
+        "sha256": "28e42e4c9683c403c0958735998d7ef44c7587640e676930121d3eac394f45a6"
+      }
+    },
+    "hops": [
+      {
+        "sourceGeneration": 1,
+        "admittedGeneration": 2,
+        "movingFirstFrame": true,
+        "poseYawDeltaRadians": 0.025,
+        "selection": "explicit-triangle-omissions",
+        "omittedTriangleCount": 2,
+        "completeContributors": false,
+        "prepareMilliseconds": 2766.93,
+        "cutoverMilliseconds": 40.0706,
+        "packMilliseconds": 44.5732,
+        "beginMilliseconds": 0.0526,
+        "maximumCpuCopyAdvanceMilliseconds": 8.9774,
+        "maximumAdvanceMilliseconds": 8.98,
+        "uploadAdvanceCount": 169,
+        "uploadedBytes": 42942260,
+        "cpuCopyAdvanceCount": 220,
+        "cpuRegionScanAdvanceCount": 35,
+        "scannedCpuPayloadBytes": 8968401,
+        "asSubmissionCount": 3,
+        "asPollCount": 4,
+        "asPendingPollCount": 1,
+        "copiedCpuPayloadBytes": 53539520,
+        "cachedCpuSourcePayloadBytes": 46682253,
+        "preparationFrames": 396,
+        "oldOwnerAllocationBytes": 69356864,
+        "candidateOwnerAllocationBytes": 69356352,
+        "overlapOwnerAllocationBytes": 160255104,
+        "oldPrimitiveCount": 32,
+        "newPrimitiveCount": 32,
+        "sceneDeviceLocalOverlap": 474906416,
+        "sceneHostVisibleOverlap": 92351392,
+        "topLevelOwnersBefore": 1,
+        "topLevelOwnersOverlap": 2,
+        "topLevelOwnersAfter": 1,
+        "sceneDeviceLocalBefore": 405552688,
+        "sceneDeviceLocalAfter": 405552176,
+        "sceneHostVisibleBefore": 49409120,
+        "sceneHostVisibleAfter": 49408864
+      },
+      {
+        "sourceGeneration": 2,
+        "admittedGeneration": 3,
+        "movingFirstFrame": true,
+        "poseYawDeltaRadians": 0.025,
+        "selection": "complete-with-graveyard",
+        "omittedTriangleCount": 0,
+        "completeContributors": true,
+        "prepareMilliseconds": 2550.65,
+        "cutoverMilliseconds": 33.0156,
+        "packMilliseconds": 20.9743,
+        "beginMilliseconds": 0.046,
+        "maximumCpuCopyAdvanceMilliseconds": 10.7755,
+        "maximumAdvanceMilliseconds": 10.7774,
+        "uploadAdvanceCount": 169,
+        "uploadedBytes": 42942284,
+        "cpuCopyAdvanceCount": 185,
+        "cpuRegionScanAdvanceCount": 0,
+        "scannedCpuPayloadBytes": 0,
+        "asSubmissionCount": 3,
+        "asPollCount": 4,
+        "asPendingPollCount": 1,
+        "copiedCpuPayloadBytes": 46681357,
+        "cachedCpuSourcePayloadBytes": 46682253,
+        "preparationFrames": 361,
+        "oldOwnerAllocationBytes": 69356352,
+        "candidateOwnerAllocationBytes": 69356864,
+        "overlapOwnerAllocationBytes": 160255232,
+        "oldPrimitiveCount": 32,
+        "newPrimitiveCount": 32,
+        "sceneDeviceLocalOverlap": 474906416,
+        "sceneHostVisibleOverlap": 92351392,
+        "topLevelOwnersBefore": 1,
+        "topLevelOwnersOverlap": 2,
+        "topLevelOwnersAfter": 1,
+        "sceneDeviceLocalBefore": 405552176,
+        "sceneDeviceLocalAfter": 405552688,
+        "sceneHostVisibleBefore": 49408864,
+        "sceneHostVisibleAfter": 49409120
+      }
+    ]
+  },
+  {
+    "backend": "query",
+    "comparison": {
+      "01-selected": {
+        "changedPixels": 0,
+        "maxChannelDelta": 0
+      },
+      "02-restored": {
+        "changedPixels": 0,
+        "maxChannelDelta": 0
+      }
+    },
+    "device": {
+      "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+      "vendorId": 4318,
+      "deviceId": 11672
+    },
+    "presentation": {
+      "renderScale": 1.0,
+      "dispatchWidth": 960,
+      "dispatchHeight": 540,
+      "swapchainWidth": 960,
+      "swapchainHeight": 540,
+      "swapchainFormat": 44
+    },
+    "shaderBundle": {
+      "opaqueFast": {
+        "key": "rayquery_compute_diagnostic_high_opaque_fast",
+        "sha256": "82f1aa6d54c5cae3d29c646996163a3480b547e9ef3903abf3cc7b01be1ae668"
+      },
+      "genericDielectric": {
+        "key": "rayquery_compute_diagnostic_high_generic_dielectric",
+        "sha256": "63d3bbb9f67940f42559f09383aacd511c3ca5b0b91dc812ecddcfc7d1468e67"
+      }
+    },
+    "hops": [
+      {
+        "sourceGeneration": 1,
+        "admittedGeneration": 2,
+        "movingFirstFrame": true,
+        "poseYawDeltaRadians": 0.025,
+        "selection": "explicit-triangle-omissions",
+        "omittedTriangleCount": 2,
+        "completeContributors": false,
+        "prepareMilliseconds": 2847.7,
+        "cutoverMilliseconds": 41.0393,
+        "packMilliseconds": 44.6842,
+        "beginMilliseconds": 0.0479,
+        "maximumCpuCopyAdvanceMilliseconds": 9.0641,
+        "maximumAdvanceMilliseconds": 9.066,
+        "uploadAdvanceCount": 169,
+        "uploadedBytes": 42942260,
+        "cpuCopyAdvanceCount": 220,
+        "cpuRegionScanAdvanceCount": 35,
+        "scannedCpuPayloadBytes": 8968401,
+        "asSubmissionCount": 3,
+        "asPollCount": 4,
+        "asPendingPollCount": 1,
+        "copiedCpuPayloadBytes": 53539520,
+        "cachedCpuSourcePayloadBytes": 46682253,
+        "preparationFrames": 396,
+        "oldOwnerAllocationBytes": 69356864,
+        "candidateOwnerAllocationBytes": 69356352,
+        "overlapOwnerAllocationBytes": 160255104,
+        "oldPrimitiveCount": 32,
+        "newPrimitiveCount": 32,
+        "sceneDeviceLocalOverlap": 474906416,
+        "sceneHostVisibleOverlap": 92350880,
+        "topLevelOwnersBefore": 1,
+        "topLevelOwnersOverlap": 2,
+        "topLevelOwnersAfter": 1,
+        "sceneDeviceLocalBefore": 405552688,
+        "sceneDeviceLocalAfter": 405552176,
+        "sceneHostVisibleBefore": 49408608,
+        "sceneHostVisibleAfter": 49408352
+      },
+      {
+        "sourceGeneration": 2,
+        "admittedGeneration": 3,
+        "movingFirstFrame": true,
+        "poseYawDeltaRadians": 0.025,
+        "selection": "complete-with-graveyard",
+        "omittedTriangleCount": 0,
+        "completeContributors": true,
+        "prepareMilliseconds": 3023.36,
+        "cutoverMilliseconds": 33.4486,
+        "packMilliseconds": 17.5252,
+        "beginMilliseconds": 0.0311,
+        "maximumCpuCopyAdvanceMilliseconds": 7.6055,
+        "maximumAdvanceMilliseconds": 7.6075,
+        "uploadAdvanceCount": 169,
+        "uploadedBytes": 42942284,
+        "cpuCopyAdvanceCount": 185,
+        "cpuRegionScanAdvanceCount": 0,
+        "scannedCpuPayloadBytes": 0,
+        "asSubmissionCount": 3,
+        "asPollCount": 4,
+        "asPendingPollCount": 1,
+        "copiedCpuPayloadBytes": 46681357,
+        "cachedCpuSourcePayloadBytes": 46682253,
+        "preparationFrames": 361,
+        "oldOwnerAllocationBytes": 69356352,
+        "candidateOwnerAllocationBytes": 69356864,
+        "overlapOwnerAllocationBytes": 160255232,
+        "oldPrimitiveCount": 32,
+        "newPrimitiveCount": 32,
+        "sceneDeviceLocalOverlap": 474906416,
+        "sceneHostVisibleOverlap": 92350880,
+        "topLevelOwnersBefore": 1,
+        "topLevelOwnersOverlap": 2,
+        "topLevelOwnersAfter": 1,
+        "sceneDeviceLocalBefore": 405552176,
+        "sceneDeviceLocalAfter": 405552688,
+        "sceneHostVisibleBefore": 49408352,
+        "sceneHostVisibleAfter": 49408608
+      }
+    ]
+  }
+]

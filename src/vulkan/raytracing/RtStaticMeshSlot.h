@@ -110,6 +110,7 @@ public:
 
 private:
     friend class RtStaticMeshCopy;
+    friend class RtStaticTriangleOmissions;
     bool admitted_ = false;
     std::array<RtInstanceMetadata, kRtInstanceMetadataCapacity> instanceMetadata_{};
     std::vector<RtPrimitiveMetadata> primitiveMetadata_;
@@ -123,6 +124,28 @@ private:
     std::vector<std::array<float, 12u>> geometryTransforms_;
     RtTextureArrayCounts textureArrayCounts_{};
     RtStaticMeshMeasurements measurements_{};
+};
+
+// Immutable CPU selection bound to one admitted source and one exclusive BLAS
+// owner. IDs are global source triangle indices, strictly increasing. Shared
+// triangles and empty primitive rows are forbidden. This is NOT a visibility
+// certificate: callers must separately prove every omission irrelevant to the
+// destination's primary, secondary and light queries before normal adoption.
+// Creation validates/copies the list; that admission cost is outside Advance's
+// byte budget. As with RtStaticMeshCopy, the source must have no mutable aliases.
+class RtStaticTriangleOmissions
+{
+public:
+    static std::shared_ptr<const RtStaticTriangleOmissions> Create(
+        std::shared_ptr<const RtStaticMeshSlot> source, std::uint32_t selectedInstance,
+        std::span<const std::uint32_t> triangles, std::string& diagnostic);
+    std::span<const std::uint32_t> Triangles() const noexcept { return triangles_; }
+private:
+    friend class RtStaticMeshCopy;
+    RtStaticTriangleOmissions() = default;
+    std::shared_ptr<const RtStaticMeshSlot> source_;
+    std::uint32_t selectedInstance_ = UINT32_MAX;
+    std::vector<std::uint32_t> triangles_;
 };
 
 // Copies an already admitted immutable source across application turns. This
@@ -140,10 +163,11 @@ class RtStaticMeshCopy
 public:
     bool Begin(std::shared_ptr<const RtStaticMeshSlot> source, std::string& diagnostic,
         std::uint32_t selectedInstance = UINT32_MAX,
-        std::uint8_t retainedRegions = horde::scene::assets::kAllStaticTriangleRegions);
+        std::uint8_t retainedRegions = horde::scene::assets::kAllStaticTriangleRegions,
+        std::shared_ptr<const RtStaticTriangleOmissions> omissions = {});
     bool Advance(std::size_t maxBytes, std::string& diagnostic);
     bool Ready() const noexcept { return output_ && row_ == 9u &&
-        (retainedRegions_ == horde::scene::assets::kAllStaticTriangleRegions || filtered_); }
+        ((!omissions_ && retainedRegions_ == horde::scene::assets::kAllStaticTriangleRegions) || filtered_); }
     std::unique_ptr<RtStaticMeshSlot> Take() noexcept;
     void Cancel() noexcept;
     std::size_t LastCopiedBytes() const noexcept { return lastBytes_; }
@@ -154,6 +178,7 @@ private:
     bool FilterIndices(std::size_t maxBytes, std::string& diagnostic);
     struct Boundary { std::uint32_t index, primitive; bool end; };
     std::shared_ptr<const RtStaticMeshSlot> source_;
+    std::shared_ptr<const RtStaticTriangleOmissions> omissions_;
     std::unique_ptr<RtStaticMeshSlot> output_;
     std::size_t row_ = 0u, offset_ = 0u, lastBytes_ = 0u;
     std::uint64_t copiedBytes_ = 0u;
@@ -161,6 +186,7 @@ private:
     std::size_t boundary_ = 0u, readIndex_ = 0u, writeIndex_ = 0u, lastScannedBytes_ = 0u;
     std::uint64_t scannedBytes_ = 0u;
     std::uint32_t selectedBegin_ = 0u, selectedEnd_ = 0u;
+    std::size_t omission_ = 0u;
     std::uint8_t retainedRegions_ = horde::scene::assets::kAllStaticTriangleRegions;
     bool filtered_ = false;
 };

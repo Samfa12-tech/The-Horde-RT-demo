@@ -1,5 +1,14 @@
 # Horde 1.7 current design index
 
+The [sparse static selection checkpoint](../evidence/2026-10-14-sparse-static-selection/README.md)
+adds source-bound triangle omissions to the existing bounded CPU/GPU owner path.
+Mixed tomb/forest selection preserves shared geometry and identities; partial
+owners fail normal readiness closed. Both actual RT backends complete cancellation,
+changed-pose adoption, completed-work retirement and restoration with pixel-identical
+matched views. This is a diagnostic ownership prerequisite: **normal static saving
+is still zero**. Contributor-safe ordinary selection/scheduling and optimized
+sustained two-way measurements remain the completion milestone. No phone operation.
+
 The [native niche wall-join checkpoint](../evidence/2026-10-14-niche-wall-joins/README.md)
 reproduces three real wall-cut escape rays and fits both wall planes to the
 existing rectangular/arched stone frames. Native assets and accepted contents

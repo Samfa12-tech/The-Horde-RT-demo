@@ -295,6 +295,7 @@ struct CaptureLaunchOptions
     bool anatomicalPlayerMount = false;
     bool validateStaticZoneCutover = false;
     bool validateStaticTriangleCutover = false;
+    std::vector<std::uint32_t> staticTriangleOmissions;
     bool validateChapterRoundTrip = false;
     bool measureChapterShippingRoute = false;
     bool measureChapterForeground = false;
@@ -797,6 +798,24 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
 #endif
             continue;
         }
+        if(argument==L"--validate-static-sparse-cutover") {
+#if defined(_DEBUG)
+            if(index+1>=argumentCount) {options.error="Sparse cutover requires one quoted list of triangle IDs.";break;}
+            std::wistringstream ids(arguments[++index]);std::uint64_t id=0u;
+            while(ids>>id) {
+                if(id>UINT32_MAX){options.error="Sparse triangle ID exceeds uint32.";break;}
+                options.staticTriangleOmissions.push_back(static_cast<std::uint32_t>(id));
+            }
+            if(!options.error.empty())break;
+            if(!ids.eof() || options.staticTriangleOmissions.empty()) {
+                options.error="Sparse cutover requires whitespace-separated unsigned triangle IDs.";break;
+            }
+            options.validateStaticZoneCutover=true;
+#else
+            options.error="--validate-static-sparse-cutover is Debug-only.";
+#endif
+            continue;
+        }
         if(argument==L"--validate-chapter-roundtrip") {
 #if defined(_DEBUG)
             options.validateChapterRoundTrip=true;
@@ -871,6 +890,8 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
     if (options.error.empty() && !options.developmentCheckpoint.empty() &&
         horde::gameplay::FindDevelopmentCheckpoint(options.developmentCheckpoint) == nullptr)
         options.error = "Unknown development checkpoint: " + options.developmentCheckpoint;
+    if(options.error.empty() && options.validateStaticTriangleCutover && !options.staticTriangleOmissions.empty())
+        options.error="Sparse cutover cannot mix with whole-region filtering.";
     if (options.error.empty() && options.validateStaticZoneCutover &&
         (!options.requested || options.developmentCheckpoint.empty()))
         options.error = "--validate-static-zone-cutover requires one frozen development capture.";
@@ -7083,7 +7104,7 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
 #if defined(_DEBUG)
 bool RunStaticGeometryCutoverCapture(VulkanSurfaceContext& context,
     const std::filesystem::path& directory, const VkClearColorValue& clear, std::string& error,
-    bool triangleSubset = false)
+    bool triangleSubset = false, std::span<const std::uint32_t> omittedTriangles = {})
 {
     using Scene = horde::vulkan::raytracing::PresentableTinyRtScene;
     const auto readback = [&](const char* filename) {
@@ -7106,6 +7127,11 @@ bool RunStaticGeometryCutoverCapture(VulkanSurfaceContext& context,
         const auto regions=static_cast<std::uint8_t>(triangleSubset && hop==0 ? 2u :
             horde::scene::assets::kAllStaticTriangleRegions);
         const auto generation=context.rtScene.StaticGeometryGeneration();
+        std::shared_ptr<const horde::vulkan::raytracing::RtStaticTriangleOmissions> omissions;
+        if(hop==0 && !omittedTriangles.empty()) {
+            omissions=context.rtScene.CreateStaticGeometryTriangleOmissions(generation,omittedTriangles,error);
+            if(!omissions)return false;
+        }
         const auto before=context.rtScene.ResourceInventory();
         const std::array<std::uint32_t,1> invalid{{UINT32_MAX}};
         if (context.rtScene.PrepareStaticGeometryReplacement(generation,invalid,error) ||
@@ -7116,14 +7142,14 @@ bool RunStaticGeometryCutoverCapture(VulkanSurfaceContext& context,
         const std::span<const std::uint32_t> retained{};
         // Prove both CPU-source and actual GPU allocation cancellation before
         // spreading reconstruction/upload across RT frames.
-        if (!context.rtScene.BeginStaticGeometryReplacement(generation,retained,error,regions) ||
+        if (!context.rtScene.BeginStaticGeometryReplacement(generation,retained,error,regions,omissions) ||
             !context.rtScene.AdvanceStaticGeometryReplacement(generation,64u*1024u,error) ||
             !context.rtScene.CancelStaticGeometryReplacement(error) ||
             context.rtScene.ResourceInventory().deviceLocalBytes != before.deviceLocalBytes ||
             context.rtScene.ResourceInventory().hostVisibleBytes != before.hostVisibleBytes) {
             error="Cancelled real candidate did not preserve the admitted allocations."; return false;
         }
-        if (!context.rtScene.BeginStaticGeometryReplacement(generation,retained,error,regions)) return false;
+        if (!context.rtScene.BeginStaticGeometryReplacement(generation,retained,error,regions,omissions)) return false;
         unsigned cancelledPreparationFrames=0;
         while (context.rtScene.StaticGeometryReplacementEvidence().uploadedBytes==0u) {
             if (++cancelledPreparationFrames>1024u ||
@@ -7138,7 +7164,7 @@ bool RunStaticGeometryCutoverCapture(VulkanSurfaceContext& context,
             context.rtScene.ResourceInventory().hostVisibleBytes != before.hostVisibleBytes) {
             error="Cancelled GPU upload did not preserve admitted allocations."; return false;
         }
-        if (!context.rtScene.BeginStaticGeometryReplacement(generation,retained,error,regions)) return false;
+        if (!context.rtScene.BeginStaticGeometryReplacement(generation,retained,error,regions,omissions)) return false;
         unsigned preparationFrames=0;
         while (!context.rtScene.StaticGeometryReplacementReady()) {
             if (++preparationFrames>1024u ||
@@ -7199,8 +7225,11 @@ bool RunStaticGeometryCutoverCapture(VulkanSurfaceContext& context,
         receipt << (hop?",":"") << "{\"sourceGeneration\":" << generation
             << ",\"admittedGeneration\":" << context.rtScene.StaticGeometryGeneration()
             << ",\"movingFirstFrame\":true,\"poseYawDeltaRadians\":0.025"
-            << ",\"selection\":\"" << (regions==2u ? "shared+graveyard-triangles" : "complete-with-graveyard")
-            << "\",\"prepareMilliseconds\":" << m.prepareMilliseconds << ",\"cutoverMilliseconds\":" << m.cutoverMilliseconds
+            << ",\"selection\":\"" << (omissions ? "explicit-triangle-omissions" :
+                regions==2u ? "shared+graveyard-triangles" : "complete-with-graveyard")
+            << "\",\"omittedTriangleCount\":" << (omissions ? omissions->Triangles().size() : 0u)
+            << ",\"completeContributors\":" << (context.rtScene.StaticGeometryHasCompleteContributors() ? "true" : "false")
+            << ",\"prepareMilliseconds\":" << m.prepareMilliseconds << ",\"cutoverMilliseconds\":" << m.cutoverMilliseconds
             << ",\"packMilliseconds\":" << m.packMilliseconds
             << ",\"beginMilliseconds\":" << m.beginMilliseconds
             << ",\"maximumCpuCopyAdvanceMilliseconds\":" << m.maximumCpuCopyAdvanceMilliseconds
@@ -7387,7 +7416,8 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         if (ParseCaptureLaunchOptions().validateStaticZoneCutover) {
             std::string cutoverError;
             if (!RunStaticGeometryCutoverCapture(context,outputDirectory,clearColor,cutoverError,
-                    ParseCaptureLaunchOptions().validateStaticTriangleCutover))
+                    ParseCaptureLaunchOptions().validateStaticTriangleCutover,
+                    ParseCaptureLaunchOptions().staticTriangleOmissions))
                 return fail("Static GPU owner cutover: "+cutoverError);
         }
 #endif
