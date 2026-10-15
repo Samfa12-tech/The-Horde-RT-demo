@@ -1,12 +1,23 @@
 # Horde 1.7 current design index
 
+The [optimized Release independent-page comparison](../evidence/2026-10-15-region-page-release/README.md)
+now completes both real RT routes with11.88MiB static saving,4.06MiB peak above
+warm full, correct restoration and zero readiness waits. Measured unload/restore
+windows stay below6.8ms. Overall Pipeline smoothness remains open: two earlier
+602/484ms gaps are unexplained, and the first launch timed out before sampling.
+Failures are retained. A tested exact host-interval partition awaits an additional
+authorised foreground run; successful retries do not prove startup reliability.
+Production adoption, physical Android acceptance and package I/O/cache lifetime
+remain open. No quality, shader or gameplay change is made by this timing slice.
+
 The [cross-platform preparation follow-up](../evidence/2026-10-15-independent-region-pages/platform-preparation/README.md)
 adds a separate opt-in Android page-profile candidate, fixes its API24 loader
 link boundary and supports ordinary root startup before chapter adoption. Four
 ABIs/build/lint and root-only/native policy checks pass; the default production
 APK returns byte-identically when the opt-in is removed. The candidate has not
 been installed or physically accepted. The preceding independent-owner commit
-fe73c765 passed all six exact-commit CI jobs. Release pacing remains pending.
+fe73c765 and successor3a20b1c3 passed all six exact-commit CI jobs. Release pacing
+is now measured above, with the explicit unresolved gaps.
 
 The [independent page integration checkpoint](../evidence/2026-10-15-independent-region-pages/README.md)
 connects the reusable scheduler to real bounded preparation, current-frame

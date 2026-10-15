@@ -9,7 +9,9 @@
 #include "platform/windows/WindowsCaptureContracts.h"
 #include "gameplay/validation/ChapterRoundTripProbe.h"
 #include "gameplay/validation/ChapterRouteMeasurementClock.h"
+#include "gameplay/validation/ChapterRouteHostPhases.h"
 #include <cmath>
+#include <numeric>
 #include <iostream>
 using namespace horde::gameplay;
 using namespace horde::gameplay::simulation;
@@ -78,6 +80,19 @@ int main(int argc,char** argv) {
   ChapterRouteMeasurementClock reset;
   check(reset.Consume(0)==0 && reset.ConsumedTicks()==0 && reset.PendingTicks()==0,
         "new measurement must have no inherited time or input debt");
+  using horde::gameplay::validation::MeasureChapterRouteHostPhases;
+  const std::array<std::uint64_t,7> marks{{100,110,120,720,730,740,750}};
+  const auto host=MeasureChapterRouteHostPhases(marks,5,true);
+  check(host && host->available && host->nanoseconds[2]==600 &&
+        std::accumulate(host->nanoseconds.begin(),host->nanoseconds.end(),std::uint64_t{})==650 &&
+        host->previousEvidenceNanoseconds==5,
+        "host clocks locate an injected message delay and exactly partition the present interval");
+  auto rewind=marks;rewind[3]=119;
+  check(!MeasureChapterRouteHostPhases(rewind,5,true) && !MeasureChapterRouteHostPhases(marks,11,true),
+        "rewound clocks and evidence outside its owning tail fail closed");
+  const auto first=MeasureChapterRouteHostPhases({},0,false);
+  check(first && !first->available && first->nanoseconds==std::array<std::uint64_t,6>{},
+        "first present cannot borrow an earlier bootstrap interval");
  }
  if(authored) {
   unsigned chapterSelections=0;

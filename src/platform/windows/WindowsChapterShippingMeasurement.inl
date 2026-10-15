@@ -57,7 +57,8 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
         const auto name=RtStageMetricName(static_cast<RtStage>(i));
         csv<<','<<name<<"_ns,"<<name<<"_invocations,"<<name<<"_bytes,"<<name<<"_operations,"<<name<<"_overflow";
     }
-    csv<<'\n';
+    for(const auto name:kChapterHostPhaseNames)csv<<','<<name;
+    csv<<",host_previous_evidence_ns,host_phases_available\n";
     struct Restore {
         VulkanSurfaceContext& ctx;bool paused,active;int sfx,voice,music;
         ~Restore() {
@@ -75,6 +76,7 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
         std::uint64_t serial=0,tick=0,simulationNanoseconds=0,presentIntervalNanoseconds=0;
         double elapsedSeconds=0;bool intervalAvailable=false,unoccluded=false,foreground=false;
         horde::vulkan::raytracing::PresentableTinyRtScene::OrdinaryStaticDetailMeasurements detail{};
+        ChapterRouteHostPhases host;
     };
     // The sole in-flight graphics owner completes before reusing its slot.
     // Tags join that committed identity, never just a repeated simulation tick.
@@ -86,6 +88,9 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
         start.time_since_epoch()).count());
     horde::platform::windows::WindowsPresentIntervals presentIntervals(startNs);
     const auto elapsed=[&] {return std::chrono::duration<double>(std::chrono::steady_clock::now()-start).count();};
+    const auto steadyNs=[] {return static_cast<std::uint64_t>(std::chrono::duration_cast<std::chrono::nanoseconds>(
+        std::chrono::steady_clock::now().time_since_epoch()).count());};
+    std::uint64_t previousPresentReturnNs=0,previousEvidenceNs=0;
     // Read aggregate machine CPU time once per second, without process names,
     // desktop pixels or a second input owner. This describes contention context;
     // it cannot attribute an individual acquire stall to another task.
@@ -146,7 +151,8 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
         for(const auto& stage:sample.scene.stages.values)
             csv<<','<<stage.durationNanoseconds<<','<<stage.workInvocationCount<<','<<stage.byteCount<<','
                 <<stage.operationCount<<','<<stage.overflowed;
-        csv<<'\n';
+        for(const auto duration:tag.host.nanoseconds)csv<<','<<duration;
+        csv<<','<<tag.host.previousEvidenceNanoseconds<<','<<tag.host.available<<'\n';
         if(samples%120==0 || tag.phase!=lastPhase) {
             std::string json;
             if(!SerializeRtPerformanceEvidenceJson(sample,json,validation)) {
@@ -191,18 +197,22 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
         return true;
     };
     while(frames++<30000 && probe.Phase()!=ChapterProbePhase::Complete) {
+        const auto iterationStartNs=steadyNs();
         sampleSystemLoad();
+        const auto systemEndNs=steadyNs();
         MSG message{};
         while(PeekMessageW(&message,nullptr,0,0,PM_REMOVE)) {
             if(message.message==WM_QUIT) {error="Route measurement closed by owner.";return false;}
             TranslateMessage(&message);DispatchMessageW(&message);
         }
+        const auto messagesEndNs=steadyNs();
         const bool visible=unoccludedClient();
         if(!visible) {error="Release route requires an uncovered visible client ("+error+"); no focus was acquired.";return false;}
         const bool foreground=GetForegroundWindow()==context.windowHandle;
         if(ParseCaptureLaunchOptions().measureChapterForeground && !foreground) {
             error="Owner-authorized foreground measurement lost foreground; no background FPS claim is allowed.";return false;
         }
+        const auto visibilityEndNs=steadyNs();
         const auto ticks=clock.Consume(elapsed());
         if(!ticks) {error="Shipping route exceeded its bounded150-second clock.";return false;}
         maximumDebt=std::max(maximumDebt,clock.PendingTicks());
@@ -216,6 +226,7 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
         const auto tick=context.simulation.Snapshot().tickIndex;
         const auto simulationNs=static_cast<std::uint64_t>(std::chrono::duration_cast<std::chrono::nanoseconds>(
             std::chrono::steady_clock::now()-simulationStart).count());
+        const auto simulationEndNs=steadyNs();
         bool presented=false;
         if(!RenderFrame(context,clear,presented) || !presented ||
            context.lastFramePresentation!=RtPresentationOutcome::Presented ||
@@ -234,11 +245,16 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
         if(!interval) {
             error="Shipping route successful present-return clock unavailable or nonmonotonic.";return false;
         }
+        const auto host=MeasureChapterRouteHostPhases({previousPresentReturnNs,iterationStartNs,systemEndNs,
+            messagesEndNs,visibilityEndNs,simulationEndNs,presentReturnNs},previousEvidenceNs,interval->available);
+        if(!host){error="Shipping route host-phase clocks lost monotonic interval ownership.";return false;}
         tags[submitted.submissionSerial%tags.size()]={probe.Phase(),static_cast<unsigned>(probe.Station()),
             submitted.submissionSerial,tick,simulationNs,interval->nanoseconds,
             static_cast<double>(presentReturnNs-startNs)*1.e-9,interval->available,visible,foreground,
-            context.rtScene.OrdinaryStaticDetailEvidence()};
+            context.rtScene.OrdinaryStaticDetailEvidence(),*host};
+        const auto evidenceStartNs=steadyNs();
         if(!append())return false;
+        previousEvidenceNs=steadyNs()-evidenceStartNs;previousPresentReturnNs=presentReturnNs;
     }
     const auto finishSeconds=elapsed();
     const auto idle=vkDeviceWaitIdle(context.device);
@@ -264,7 +280,7 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
 #else
     constexpr auto build="Optimized Release CPU";
 #endif
-    summary<<"{\"schema\":3,\"scope\":\""<<build<<" with actual Shipping High shaders; visible uncovered wall-clock two-way route after staged Keeper death; no owner or phone acceptance\","
+    summary<<"{\"schema\":4,\"scope\":\""<<build<<" with actual Shipping High shaders; visible uncovered wall-clock two-way route after staged Keeper death; no owner or phone acceptance\","
         <<"\"durationSeconds\":"<<finishSeconds<<",\"renderedFrames\":"<<frames-1<<",\"completedSamples\":"<<samples
         <<",\"simulationTicks\":"<<state.tickIndex-baseTick<<",\"maximumPendingSimulationTicks\":"<<maximumDebt
         <<",\"simulationHz\":60,\"maximumTicksPerRender\":4,\"deadlineSeconds\":150,\"warmupSeconds\":5,"

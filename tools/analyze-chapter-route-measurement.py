@@ -1,5 +1,20 @@
 import argparse, csv, json, math, pathlib, statistics
 
+HOST_SPANS=('host_previous_tail_ns','host_system_load_ns','host_messages_ns',
+            'host_visibility_ns','host_clock_simulation_ns','host_render_to_present_ns')
+HOST_FIELDS=(*HOST_SPANS,'host_previous_evidence_ns','host_phases_available')
+def verify_host_phases(row):
+    assert set(k for k in row if k.startswith('host_'))==set(HOST_FIELDS)
+    assert row['host_phases_available']==row['present_interval_available']
+    values={k:int(row[k]) for k in HOST_FIELDS[:-1]}
+    assert all(v>=0 for v in values.values())
+    if row['host_phases_available']=='1':
+        assert sum(values[k] for k in HOST_SPANS)==int(row['present_return_interval_ns'])
+        assert values['host_previous_evidence_ns']<=values['host_previous_tail_ns']
+    else:
+        assert row['host_phases_available']=='0' and not any(values.values())
+    return values
+
 def stats(values):
     if not values: return {'count': 0, 'available': False}
     v = sorted(values)
@@ -15,7 +30,7 @@ def analyze(name, analysis_name='analysis-v3.json'):
     manifest=json.loads((root/'capture-manifest.json').read_text())
     rows=list(csv.DictReader((directory/'completed-frames.csv').open()))
     identities=[json.loads(line) for line in (directory/'identities.jsonl').read_text().splitlines()]
-    assert run['schema'] in (2,3) and run['complete'] and 60<=run['durationSeconds']<=150
+    assert run['schema'] in (2,3,4) and run['complete'] and 60<=run['durationSeconds']<=150
     legacy=run['schema']==2
     assert run['scope'].startswith('Optimized Release CPU')
     assert run['unoccludedClientChecks'] and 'Release CPU' in receipt['scope']
@@ -48,7 +63,9 @@ def analyze(name, analysis_name='analysis-v3.json'):
     # journal against their independent differences with only formatting error.
     assert all(abs((float(b['elapsed_s'])-float(a['elapsed_s']))-int(b['present_return_interval_ns'])/1e9)<.0002
                for a,b in zip(rows,rows[1:]))
-    stage_columns=[k for k in rows[0] if k.endswith('_ns') and k!='gpu_ns']
+    stage_columns=[k for k in rows[0] if k.endswith('_ns') and k!='gpu_ns' and k not in HOST_FIELDS]
+    if run['schema']==4:
+        for row in rows: verify_host_phases(row)
     assert all(int(r[k])>=0 for r in rows for k in stage_columns)
     assert all(int(r[k])==0 for r in rows for k in r if k.endswith('_overflow'))
     settings=[]
@@ -89,6 +106,8 @@ def analyze(name, analysis_name='analysis-v3.json'):
         if legacy else run['intervalMeaning'])
     summary[interval_key]=stats([v/1e6 for v in intervals])
     summary[throughput_key]=len(intervals)/(sum(intervals)/1e9)
+    if run['schema']==4:
+        summary['hostMilliseconds']={k:stats([int(r[k])/1e6 for r in warm]) for k in HOST_FIELDS[:-1]}
     summary['scanoutTimingMeasured']=False
     if streaming:
         transitions=[]
@@ -120,6 +139,9 @@ def analyze(name, analysis_name='analysis-v3.json'):
     summary['largestIntervals']=[{k:r[k] for k in ('elapsed_s','present_return_interval_ns','phase','station','tick',
         'gpu_ns','simulation_step_cpu_ns','imageAcquireCpuMs_ns','frameFenceWaitCpuMs_ns','wholeFrameCycleCpuMs_ns')}
         for r in sorted(rows,key=lambda r:int(r['present_return_interval_ns']),reverse=True)[:12]]
+    if run['schema']==4:
+        for item,row in zip(summary['largestIntervals'],sorted(rows,key=lambda r:int(r['present_return_interval_ns']),reverse=True)):
+            item['hostPhasesNanoseconds']=verify_host_phases(row)
     for phase in dict.fromkeys(r['phase'] for r in warm):
         p=[r for r in warm if r['phase']==phase]
         summary['phases'][phase]=dict(samples=len(p),gpuMilliseconds=stats([int(r['gpu_ns'])/1e6 for r in p

@@ -1511,6 +1511,9 @@ if(BUILD_TESTING)
         add_test(NAME horde_rt_region_page_build_policy_tests COMMAND ${Python3_EXECUTABLE}
             ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_region_page_build_policy.py ${CMAKE_COMMAND})
         set_tests_properties(horde_rt_region_page_build_policy_tests PROPERTIES TIMEOUT 30)
+        add_test(NAME horde_rt_chapter_host_phase_analysis_tests COMMAND ${Python3_EXECUTABLE}
+            ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_chapter_host_phases.py)
+        set_tests_properties(horde_rt_chapter_host_phase_analysis_tests PROPERTIES TIMEOUT 10)
         add_test(NAME horde_rt_corridor_detail_certificate_tests COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_corridor_detail_certificate.py)
         set_tests_properties(horde_rt_corridor_detail_certificate_tests PROPERTIES TIMEOUT 10)
         add_test(NAME horde_rt_rescue_source_admission_tests COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/RescueBlockoutSourceAdmissionTests.py)

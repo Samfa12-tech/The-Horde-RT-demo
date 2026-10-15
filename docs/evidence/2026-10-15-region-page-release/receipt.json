@@ -1,0 +1,32 @@
+{
+  "scope": "Completed optimized Release focused Pipeline/Query route; initial failed bootstrap and two early Pipeline gaps unresolved. Not final smoothness, production adoption or phone acceptance.",
+  "measuredExecutableSha256": "e4ebf332f4e6e01157a6bfb3ef14f5c65a4ee0d6191fbb8529403d4195883d39",
+  "sourceReference": "3a20b1c3b4199823b54039f143a7094a849f8fc8 plus bootstrap-only markers; all measured source bytes recovered and hash-verified in archive",
+  "archiveSha256": "6d9ebb1138494f89e8a02867b086497f9ab887089fa2db0d59f397bdd3f2c868",
+  "sourceHashes": {
+    "src/gameplay/validation/ChapterRouteMeasurementClock.h": "7a7e05ed68d0c4f5935967eec393b246103056fdf3406d6e3671be225c431edc",
+    "src/platform/windows/WindowsChapterShippingLaunch.h": "e7a1b24a3ba752963ebd29f41d0be35d89bdb02b6a2753931b94f3c607b73b7c",
+    "src/vulkan/raytracing/RtRegionGeometryPreparation.cpp": "dbb54aaf01c8d49773ab66ae36ddbb6ff6cd7c67db4b06cd1f89951cd765cea3",
+    "src/scene/CorridorStaticDetailFaces.h": "433af75a893cd7a0492dcd977e5fb9f588cb6a31447b5a5fd8a7c76766f17881",
+    "src/world/streaming/RegionStreaming.cpp": "afb754c4a9b3fcda51dc177215ffcfb963778816747a6e5444b76c7e6254dacf",
+    "src/vulkan/raytracing/PresentableTinyRtSceneRegionPages.cpp": "01f7e6224d11e13175e5c74f43b388e96e1363e575fa001b0b63010deea906da",
+    "src/vulkan/raytracing/PresentableTinyRtScene.h": "14ef646c17f2a5fa1d11797213be80fd398f1e0fa113d2fecd587a233e06f4fa",
+    "src/vulkan/raytracing/RtRegionGeometrySource.cpp": "54944b70b33bf2403ed1ff7a8dd78690e7976c82e8a9844d6ba929bb318f1cfb",
+    "src/gameplay/validation/ChapterRoundTripProbe.h": "129a477304e574da834d15f81adfaefdb6c1e952d2fb716805e44f2116efbdd8",
+    "src/scene/CorridorStaticDetail.h": "ca5e5f2a73f7ab6d3a715133c25412f434bd9aebf637c7645600c655a196d465",
+    "CMakeLists.txt": "c36853c071d2e4335bce61232b391d25adb8512e2f86294dad88a249093e9aec",
+    "src/gameplay/simulation/GameSimulation.cpp": "ab83576d92bdb7cf374d37d4b6570ad8e2896b87e816395811a8e17027377239",
+    "src/vulkan/raytracing/PresentableTinyRtScene.cpp": "3cfa796e6682990ee49ebf97c649acaa24d1bba31a1308bf215846b422cda03f",
+    "src/gameplay/simulation/StaticDetailLease.h": "df676e18d22656f82c1ad7c66ee4ce24181c1eb6e171107e6a9e435d760b1f92",
+    "src/platform/windows/DiagnosticWindow.cpp": "d321e67c65f5bbd9c9ab50385ae703ee50dbabe728157dd8b01d7100b5723dc3",
+    "src/platform/windows/WindowsAssetRoot.h": "dcf3171daee55dfcdbd96a31bd411a368e7ea4ac73b6c8d131ba31a612f98b39",
+    "src/platform/windows/WindowsChapterShippingMeasurement.inl": "24ca8caef78631bf04dcfd1dbf43fb7f1a269e127c8109c6512536a55d7bb4ab",
+    "src/vulkan/raytracing/RtRegionPreparationRecovery.h": "b31e6699732da7fc4a078ff21ed0051746ef6de07a9139816c059165a15369eb",
+    "src/platform/windows/WindowsPresentInterval.h": "4521dcfeca420704ea4e17a2171471465710ced7e00dcd5ca9c0c66ade09e39c",
+    "src/vulkan/raytracing/PresentableTinyRtSceneStaticGeometry.cpp": "9cc5c6ccb208218a9e595217958d5c518ceed0c2575d4a28ea0a7abb402c7eae",
+    "src/vulkan/raytracing/RtStaticMeshSlot.cpp": "d9cb03a54c7b2c965771bf7fe95dfd9a42c51fb35392d86f6d5f3cfd52d68dd3"
+  },
+  "receiptCorrection": "Original configure field names the legacy default build directory. Actual executable was build/region-page-prototype/Release/HordeLanternRT.exe, private r10 Shipping/High; runtime manifest shader identities and exact EXE/source hashes are authoritative. Future launcher captures its actual CMake profile instead.",
+  "followupExecutableSha256": "15171b52831bbd7fe10a74009c7b4ca14cdd570d7b2c8ba303989595437b14b5",
+  "followupScope": "Schema4 exact host interval partition; host3/3 passes. Not yet foreground measured."
+}

@@ -35,23 +35,37 @@ foreach($source in @('src/platform/windows/DiagnosticWindow.cpp','src/platform/w
  'src/vulkan/raytracing/RtRegionGeometrySource.cpp','src/world/streaming/RegionStreaming.cpp',
  'src/scene/CorridorStaticDetail.h','src/scene/CorridorStaticDetailFaces.h',
  'src/gameplay/simulation/GameSimulation.cpp','src/gameplay/simulation/StaticDetailLease.h',
- 'src/gameplay/validation/ChapterRouteMeasurementClock.h',
+ 'src/gameplay/validation/ChapterRouteMeasurementClock.h','src/gameplay/validation/ChapterRouteHostPhases.h',
  'src/gameplay/validation/ChapterRoundTripProbe.h')){
  $sourceHashes[$source]=(Get-FileHash -LiteralPath (Join-Path $root $source) -Algorithm SHA256).Hash.ToLowerInvariant()
 }
+$cachePath=Join-Path (Split-Path -Parent (Split-Path -Parent $start.FileName)) 'CMakeCache.txt'
+$buildProfile=$null
+if(Test-Path -LiteralPath $cachePath) {
+ $policy=@{}
+ foreach($line in [IO.File]::ReadLines($cachePath)) {
+  if($line -match '^((?:CMAKE_(?:GENERATOR|BUILD_TYPE|CONFIGURATION_TYPES|HOME_DIRECTORY|CXX_COMPILER|CXX_FLAGS_RELEASE))|(?:HORDE_RT_(?:INSTRUMENTATION_OVERRIDE|DIELECTRIC_QUALITY_OVERRIDE|CHAPTER_MEASUREMENT|REGION_PAGE_PROTOTYPE_ROOT))):[^=]*=(.*)$') {
+   $policy[$Matches[1]]=$Matches[2]
+  }
+ }
+ $buildProfile=@{cachePath=$cachePath;cacheSha256=(Get-FileHash -LiteralPath $cachePath -Algorithm SHA256).Hash.ToLowerInvariant();configuration=$Configuration;policy=$policy}
+}
 @{scope=($Configuration+' CPU with Shipping High shaders; uncovered visible wall-clock scripted out/back and tomb backtrack after staged Keeper death; automatic static-detail lifetime; not owner/phone acceptance');
+ executablePath=$start.FileName;buildProfile=$buildProfile;
  executableSha256=(Get-FileHash -LiteralPath $start.FileName -Algorithm SHA256).Hash.ToLowerInvariant();
  sources=$sourceHashes;backend=if($Query){'RayQueryCompute'}else{'RayTracingPipeline'};
  maximumSimulationTicksPerRender=4;simulationHz=60;deadlineSeconds=180;
  foregroundRequested=[bool]$Foreground;
- configure='cmake -S . -B build/chapter-shipping-measurement -G "Visual Studio 17 2022" -A x64 -DHORDE_RT_INSTRUMENTATION_OVERRIDE=Shipping -DHORDE_RT_DIELECTRIC_QUALITY_OVERRIDE=High -DHORDE_RT_CHAPTER_MEASUREMENT=ON'
-} | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath ($destination+'.candidate.json') -Encoding utf8
+} | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath ($destination+'.candidate.json') -Encoding utf8
 $process=[Diagnostics.Process]::Start($start)
-$out=$process.StandardOutput.ReadToEndAsync();$err=$process.StandardError.ReadToEndAsync()
+$outFile=[IO.FileStream]::new($destination+'.stdout.log',[IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::Read,1,$true)
+$errFile=[IO.FileStream]::new($destination+'.stderr.log',[IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::Read,1,$true)
+$out=$process.StandardOutput.BaseStream.CopyToAsync($outFile)
+$err=$process.StandardError.BaseStream.CopyToAsync($errFile)
 $timedOut=-not $process.WaitForExit(180000)
 if($timedOut){$process.Kill();$process.WaitForExit()}
-[IO.File]::WriteAllText($destination+'.stdout.log',$out.Result)
-[IO.File]::WriteAllText($destination+'.stderr.log',$err.Result)
+try {$null=$out.GetAwaiter().GetResult();$null=$err.GetAwaiter().GetResult()}
+finally {$outFile.Dispose();$errFile.Dispose()}
 if($timedOut){throw 'Scoped measurement exceeded its180-second process deadline'}
 Write-Output ("$Output measurement exit: "+$process.ExitCode)
 if($process.ExitCode -ne 0){exit $process.ExitCode}

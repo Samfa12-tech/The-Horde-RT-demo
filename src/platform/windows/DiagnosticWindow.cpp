@@ -105,6 +105,7 @@
 #endif
 #include "platform/windows/WindowsBenchmarkLaunch.h"
 #include "platform/windows/WindowsChapterShippingLaunch.h"
+#include "gameplay/validation/ChapterRouteHostPhases.h"
 #include "platform/windows/WindowsAssetRoot.h"
 #include "platform/windows/WindowsMistCaptureLaunch.h"
 #include "platform/windows/WindowsInteractionPrompt.h"
@@ -7375,6 +7376,8 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         const horde::gameplay::ShowcaseCheckpoint& checkpoint = *checkpointPointer;
         if (checkpoint.id >= 100)
         {
+            if(ParseCaptureLaunchOptions().measureChapterShippingRoute)
+                std::cerr<<"HORDE_TIMING_BOOTSTRAP checkpoint-stage-begin"<<std::endl;
             horde::vulkan::raytracing::PublishDevelopmentWorldReadiness(context.simulation,context.rtScene);
             const auto* development =
                 horde::gameplay::FindDevelopmentCheckpoint(context.developmentCheckpoint);
@@ -7402,6 +7405,8 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
             context.simulationInput.damageEnabled = false;
             context.simulationInput.hasAuthoritativePlayerPose = false;
             MirrorSimulationSnapshot(context);
+            if(ParseCaptureLaunchOptions().measureChapterShippingRoute)
+                std::cerr<<"HORDE_TIMING_BOOTSTRAP checkpoint-stage-complete"<<std::endl;
         }
         else
         {
@@ -7414,6 +7419,8 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         {
             bool rtFramePresented = false;
             const auto frameStart = std::chrono::steady_clock::now();
+            if(frame==0 && ParseCaptureLaunchOptions().measureChapterShippingRoute)
+                std::cerr<<"HORDE_TIMING_BOOTSTRAP first-render-begin"<<std::endl;
             if (!RenderFrame(context, clearColor, rtFramePresented))
             {
                 return fail(std::string("Checkpoint '") + checkpoint.name +
@@ -7434,6 +7441,8 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
             if (!rtFramePresented || context.lastFramePresentation != horde::telemetry::RtPresentationOutcome::Presented)
                 return fail(std::string("Checkpoint '") + checkpoint.name + "' has no stable RT-presented output for readback.");
             const auto frameEnd = std::chrono::steady_clock::now();
+            if(frame==0 && ParseCaptureLaunchOptions().measureChapterShippingRoute)
+                std::cerr<<"HORDE_TIMING_BOOTSTRAP first-render-complete"<<std::endl;
             frameTimesMs.push_back(std::chrono::duration<double, std::milli>(frameEnd - frameStart).count());
             capabilities.performance.gpuRt = context.gpuRtTiming;
             capabilities.rtScene.presented = true;
