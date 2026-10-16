@@ -1,4 +1,10 @@
 #pragma once
+#ifndef HORDE_RT_FRAME_STAGE_PROBE
+#define HORDE_RT_FRAME_STAGE_PROBE 0
+#endif
+#if HORDE_RT_FRAME_STAGE_PROBE
+#include "vulkan/raytracing/RtSceneGpuStageProbe.h"
+#endif
 #ifndef HORDE_RT_CHAPTER_MEASUREMENT
 #define HORDE_RT_CHAPTER_MEASUREMENT 0
 #endif
@@ -687,6 +693,9 @@ public:
                             , experimental::StagedPrimaryTiming* stagedTiming = nullptr,
                             std::uint32_t timingFrameSlot = 0u
 #endif
+#if HORDE_RT_FRAME_STAGE_PROBE
+                            , RtSceneGpuStageProbe* gpuProbe = nullptr
+#endif
                             );
 
     // A completed offside owner can be adopted while poses keep moving only
@@ -703,6 +712,9 @@ public:
 #if HORDE_RT_STAGED_PRIMARY_TIMING
                             , experimental::StagedPrimaryTiming* stagedTiming = nullptr,
                             std::uint32_t timingFrameSlot = 0u
+#endif
+#if HORDE_RT_FRAME_STAGE_PROBE
+                            , RtSceneGpuStageProbe* gpuProbe = nullptr
 #endif
                             );
 

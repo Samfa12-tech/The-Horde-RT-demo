@@ -441,7 +441,19 @@ void ObserveAndroidMotionCompletion(SwapchainContext& context, bool completed)
             <<frame.resources.deviceLocalBytes<<','<<frame.resources.hostVisibleBytes<<','<<d.omittedTriangles<<','
             <<d.unloads<<','<<d.restores<<','<<d.savedOwnerBytes<<','<<d.peakOverlapOwnerBytes<<','<<d.waitFrames<<','
             <<tag.yaw<<','<<tag.pitch<<','<<tag.viewTicks<<','<<tag.detailCpuNs<<','
-            <<(d.unloads-run.chapterBaseline.unloads)<<','<<(d.restores-run.chapterBaseline.restores)<<'\n';
+            <<(d.unloads-run.chapterBaseline.unloads)<<','<<(d.restores-run.chapterBaseline.restores);
+#if HORDE_RT_FRAME_STAGE_PROBE
+        // This is called only after this exact slot's own successful fence/idle.
+        for(unsigned i=0;i<context.frameStageTimers.size();++i) {
+            const auto stage=context.frameStageTimers[i].CollectCompleted(frame.identity.submitted.frame.frameSlot);
+            const bool matched=tag.stageSubmitted[i] && stage.consumed && stage.hasSample &&
+                stage.status==horde::vulkan::GpuFrameTimingCollectionStatus::Valid &&
+                stage.submissionSequence==tag.serial && stage.frameSlot==frame.identity.submitted.frame.frameSlot;
+            run.chapterCsv<<','<<(matched?"valid":"unavailable-or-mismatched")<<','<<stage.submissionSequence<<',';
+            if(matched)run.chapterCsv<<static_cast<std::uint64_t>(std::llround(stage.sample.milliseconds*1e6));
+        }
+#endif
+        run.chapterCsv<<'\n';
         run.chapterLastReturnNs=tag.returnNs;
         run.chapterLastSerial=tag.serial;
         if(!run.chapterCsv)FailAndroidMotion(context,"Chapter resource ledger write failed.");
@@ -520,7 +532,11 @@ void BuildAndroidMotionInput(SwapchainContext& context,
         if(validation::IsChapterMotionScenario(run.selected)) {
             if(std::ifstream(run.path+"-resources.csv").good()) {run.finished=true;gMotionStatus.store(4);return;}
             run.chapterCsv.open(run.path+"-resources.csv");
-            run.chapterCsv<<"present_return_ns,interval_ns,serial,tick,phase,x,y,z,device_local_bytes,host_visible_bytes,omitted_triangles,unloads,restores,saved_owner_bytes,peak_overlap_bytes,wait_frames,yaw,pitch,view_ticks,detail_step_cpu_ns,run_unloads,run_restores\n";
+            run.chapterCsv<<"present_return_ns,interval_ns,serial,tick,phase,x,y,z,device_local_bytes,host_visible_bytes,omitted_triangles,unloads,restores,saved_owner_bytes,peak_overlap_bytes,wait_frames,yaw,pitch,view_ticks,detail_step_cpu_ns,run_unloads,run_restores"
+#if HORDE_RT_FRAME_STAGE_PROBE
+                <<",as_gpu_status,as_gpu_serial,as_gpu_ns,dispatch_gpu_status,dispatch_gpu_serial,dispatch_gpu_ns,transfer_gpu_status,transfer_gpu_serial,transfer_gpu_ns"
+#endif
+                <<'\n';
             if(!run.chapterCsv){FailAndroidMotion(context,"Chapter resource ledger could not open.");return;}
         }
         run.requestedNs = now;

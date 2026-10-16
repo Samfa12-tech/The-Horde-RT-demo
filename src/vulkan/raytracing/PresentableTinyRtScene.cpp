@@ -8192,6 +8192,9 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                                                 , experimental::StagedPrimaryTiming* stagedTiming,
                                                 std::uint32_t timingFrameSlot
 #endif
+#if HORDE_RT_FRAME_STAGE_PROBE
+                                                , RtSceneGpuStageProbe* gpuProbe
+#endif
                                                 )
 {
     // A prior unsubmitted recording must not advance the GPU definition cache.
@@ -8228,11 +8231,17 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
         return false;
     }
 
+#if HORDE_RT_FRAME_STAGE_PROBE
+    const bool asTiming=gpuProbe && gpuProbe->Begin(commandBuffer,0,VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR);
+#endif
     if (!UpdateDynamicInstances(commandBuffer, frame, diagnostic, observation))
     {
         return false;
     }
 
+#if HORDE_RT_FRAME_STAGE_PROBE
+    if(asTiming)gpuProbe->End(commandBuffer,0,VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR);
+#endif
     RtSceneStageScope traceCopyScope(
         observation, horde::telemetry::RtStage::TraceCopyRecord);
     if (storageImageLayout_ != VK_IMAGE_LAYOUT_GENERAL)
@@ -8316,6 +8325,10 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
     ExecuteObservedTraceCopyCommands(
         observation,
         [&]() noexcept {
+#if HORDE_RT_FRAME_STAGE_PROBE
+            const auto shaderStage=static_cast<VkPipelineStageFlagBits>(executionPolicy_.shaderPipelineStage);
+            const bool dispatchTiming=gpuProbe && gpuProbe->Begin(commandBuffer,1,shaderStage);
+#endif
 #ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
             if (stagedPrimary_) {
                 stagedPrimary_->Record(commandBuffer,
@@ -8344,6 +8357,9 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                 vkCmdDispatch(commandBuffer, computeDispatchGroups_[0],
                               computeDispatchGroups_[1], computeDispatchGroups_[2]);
             }
+#if HORDE_RT_FRAME_STAGE_PROBE
+            if(dispatchTiming)gpuProbe->End(commandBuffer,1,shaderStage);
+#endif
         },
         [&]() noexcept {
             SetImageBarrier(commandBuffer,
@@ -8355,6 +8371,9 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                             VK_ACCESS_SHADER_WRITE_BIT,
                             VK_ACCESS_TRANSFER_READ_BIT);
             storageImageLayout_ = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+#if HORDE_RT_FRAME_STAGE_PROBE
+            const bool transferTiming=gpuProbe && gpuProbe->Begin(commandBuffer,2,VK_PIPELINE_STAGE_TRANSFER_BIT);
+#endif
 
             // Both platforms acquire-wait at TRANSFER. The transition must
             // chain from that stage even when discarding UNDEFINED contents;
@@ -8403,6 +8422,9 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                                1u,
                                &copyRegion);
             }
+#if HORDE_RT_FRAME_STAGE_PROBE
+            if(transferTiming)gpuProbe->End(commandBuffer,2,VK_PIPELINE_STAGE_TRANSFER_BIT);
+#endif
         });
 
     SetImageBarrier(commandBuffer,

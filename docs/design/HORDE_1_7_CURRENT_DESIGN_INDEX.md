@@ -1,5 +1,15 @@
 # Horde 1.7 current design index
 
+The [current baseline RT stage profile](../evidence/2026-10-16-baseline-rt-profile/README.md)
+reuses the30 September observer and prior resident/streamed controls instead of
+repeating failed experiments. Two physical ordinary cycles join1,345frames:
+exterior dispatch137–142ms, AS-update interval0.53–0.55ms, transfer0.11–0.12ms.
+The same13.59MiB saving/exact restoration and12.85MiB peak overlap remain.
+Production quality/loading are unchanged; the observer is private/off by default.
+Smoothness and shader-internal attribution remain open. Further work should use
+these pinned views/data and a quality-preserving shader hypothesis, not repeat
+shadow omission, failed staged-primary or the resident/streamed matrix.
+
 The [matched physical phone comparison](../evidence/2026-10-16-phone-resident-streamed/README.md)
 now closes resident-versus-streamed attribution for one focused ordinary cycle on
 both RT backends. Same private APK a42a0651…0414808, saved40%/Current and identical

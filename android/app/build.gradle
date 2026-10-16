@@ -188,6 +188,14 @@ if (chapterRouteTimingValue != null && !(chapterRouteTimingValue in ['true', 'fa
     throw new GradleException('hordeRegionPageRouteTiming must be true or false.')
 }
 def chapterRouteTiming = chapterRouteTimingValue == 'true'
+def frameStageProbeValue = providers.gradleProperty('hordeFrameStageProbe').orNull
+if (frameStageProbeValue != null && !(frameStageProbeValue in ['true', 'false'])) {
+    throw new GradleException('hordeFrameStageProbe must be true or false.')
+}
+def frameStageProbe = frameStageProbeValue == 'true'
+if (frameStageProbe && !chapterRouteTiming) {
+    throw new GradleException('Frame stage profiling requires the private chapter route timing build.')
+}
 if (chapterRouteTiming && (hordeRegionPagePrototypeRootProperty == null ||
         hordeRtInstrumentationOverride != 'Shipping' || hordeRtDielectricQualityOverride != 'Mobile')) {
     throw new GradleException('Chapter route timing requires the private region-page Shipping/Mobile Debug profile.')
@@ -566,6 +574,7 @@ android {
                 cmake {
                     arguments '-DHORDE_RT_DEBUG_CHECKPOINTS=ON',
                         "-DHORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING=${chapterRouteTiming ? 'ON' : 'OFF'}",
+                        "-DHORDE_RT_FRAME_STAGE_PROBE=${frameStageProbe ? 'ON' : 'OFF'}",
                         "-DHORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=${viewmodelCandidate ? 'ON' : 'OFF'}",
                         *hordeRtNativePolicyArguments('Diagnostic'),
                         *hordeRtDebugStagedPrimaryArguments,

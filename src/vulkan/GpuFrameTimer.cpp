@@ -214,7 +214,8 @@ void GpuFrameTimer::SetQueryError(const VkResult result, const std::string& diag
     ++telemetry_.errorCount;
 }
 
-bool GpuFrameTimer::RecordBegin(const VkCommandBuffer commandBuffer, const std::uint32_t frameSlot)
+bool GpuFrameTimer::RecordBegin(const VkCommandBuffer commandBuffer, const std::uint32_t frameSlot,
+                                const VkPipelineStageFlagBits stage)
 {
     if (!ValidateOperationalSlot(frameSlot, "RecordBegin"))
     {
@@ -235,13 +236,14 @@ bool GpuFrameTimer::RecordBegin(const VkCommandBuffer commandBuffer, const std::
 
     const std::uint32_t firstQuery = frameSlot * 2u;
     vkCmdResetQueryPool(commandBuffer, queryPool_, firstQuery, 2u);
-    vkCmdWriteTimestamp(commandBuffer, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, queryPool_, firstQuery);
+    vkCmdWriteTimestamp(commandBuffer, stage, queryPool_, firstQuery);
     slot.recordingCommandBuffer = commandBuffer;
     slot.recording = true;
     return true;
 }
 
-bool GpuFrameTimer::RecordEnd(const VkCommandBuffer commandBuffer, const std::uint32_t frameSlot)
+bool GpuFrameTimer::RecordEnd(const VkCommandBuffer commandBuffer, const std::uint32_t frameSlot,
+                                const VkPipelineStageFlagBits stage)
 {
     if (!ValidateOperationalSlot(frameSlot, "RecordEnd"))
     {
@@ -261,7 +263,7 @@ bool GpuFrameTimer::RecordEnd(const VkCommandBuffer commandBuffer, const std::ui
     }
 
     vkCmdWriteTimestamp(commandBuffer,
-                        VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+                        stage,
                         queryPool_,
                         frameSlot * 2u + 1u);
     slot.recordingCommandBuffer = VK_NULL_HANDLE;

@@ -494,3 +494,6 @@ jobs:
 
       - name: Check strict Android motion-presentation join
         run: python -m unittest discover -s tests -p test_android_motion_present_timing.py -v
+
+      - name: Check optional GPU stage submission joins
+        run: python -m unittest discover -s tests -p test_android_rt_stage_profile.py -v

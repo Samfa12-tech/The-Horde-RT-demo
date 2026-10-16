@@ -251,6 +251,9 @@ struct AndroidMotionRun
         float x=0,y=0,z=0,yaw=0,pitch=0;
         unsigned viewTicks=0;
         std::uint64_t detailCpuNs=0;
+#if HORDE_RT_FRAME_STAGE_PROBE
+        std::array<bool,3> stageSubmitted{};
+#endif
     };
     std::array<ChapterTag,kMaxFramesInFlight> chapterTags{};
     horde::vulkan::raytracing::PresentableTinyRtScene::OrdinaryStaticDetailMeasurements chapterBaseline;
@@ -373,6 +376,9 @@ struct SwapchainContext
     horde::vulkan::DeviceCapabilities capabilities;
     horde::vulkan::raytracing::PresentableTinyRtScene rtScene;
     horde::vulkan::GpuFrameTimer gpuFrameTimer;
+#if HORDE_RT_FRAME_STAGE_PROBE
+    std::array<horde::vulkan::GpuFrameTimer,3> frameStageTimers;
+#endif
 #if HORDE_RT_STAGED_PRIMARY_TIMING
     horde::vulkan::raytracing::experimental::StagedPrimaryTiming stagedPassTimer;
     horde::vulkan::raytracing::experimental::StagedPrimaryProfile stagedPassProfile;
@@ -2888,6 +2894,9 @@ bool ReleaseSwapchainResources(SwapchainContext& context)
             horde::telemetry::RtResourceResetReason::SwapchainRecreate,
             CurrentInitialGpuEvidenceStatus(context));
     context.gpuFrameTimer.ResetAfterDeviceIdle();
+#if HORDE_RT_FRAME_STAGE_PROBE
+    for(auto& timer:context.frameStageTimers)timer.ResetAfterDeviceIdle();
+#endif
 #if HORDE_RT_STAGED_PRIMARY_TIMING
     if (idleResult == VK_SUCCESS) context.stagedPassTimer.ResetAfterDeviceIdle();
 #endif
@@ -3262,6 +3271,11 @@ bool InitialiseRtSceneForSwapchain(SwapchainContext& context)
         context.gpuFrameTimer.Initialise(
             context.physicalDevice, context.device, context.graphicsQueueFamilyIndex, kMaxFramesInFlight);
     }
+#if HORDE_RT_FRAME_STAGE_PROBE
+    for(auto& timer:context.frameStageTimers)
+        if(timer.Telemetry().status==horde::vulkan::GpuFrameTimerStatus::Uninitialised)
+            timer.Initialise(context.physicalDevice,context.device,context.graphicsQueueFamilyIndex,kMaxFramesInFlight);
+#endif
 #if HORDE_RT_STAGED_PRIMARY_TIMING
     if (context.stagedPassTimer.Status() == horde::vulkan::raytracing::experimental::StagedPrimaryTimingInitStatus::Uninitialised)
         context.stagedPassTimer.Initialise(context.physicalDevice, context.device, context.graphicsQueueFamilyIndex, kMaxFramesInFlight);
@@ -3377,6 +3391,9 @@ bool RebuildDevelopmentSupportFixtureOnOwner(
 
     CancelActiveInAppBenchmark(context);
     context.gpuFrameTimer.ResetAfterDeviceIdle();
+#if HORDE_RT_FRAME_STAGE_PROBE
+    for(auto& timer:context.frameStageTimers)timer.ResetAfterDeviceIdle();
+#endif
 #if HORDE_RT_STAGED_PRIMARY_TIMING
     context.stagedPassTimer.ResetAfterDeviceIdle();
 #endif
@@ -3628,6 +3645,9 @@ bool DestroySwapchainContext(SwapchainContext& context)
         context.pipelineCache = VK_NULL_HANDLE;
     }
     context.gpuFrameTimer.Destroy();
+#if HORDE_RT_FRAME_STAGE_PROBE
+    for(auto& timer:context.frameStageTimers)timer.Destroy();
+#endif
 #if HORDE_RT_STAGED_PRIMARY_TIMING
     context.stagedPassTimer.Destroy();
 #endif
@@ -3847,6 +3867,10 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
     }
 
     bool gpuTimingRecording = false;
+#if HORDE_RT_FRAME_STAGE_PROBE
+    horde::vulkan::raytracing::RtSceneGpuStageProbe frameStageProbe(
+        {{&context.frameStageTimers[0],&context.frameStageTimers[1],&context.frameStageTimers[2]}},context.currentFrame);
+#endif
 #if HORDE_RT_STAGED_PRIMARY_TIMING
     horde::vulkan::raytracing::experimental::StagedPrimaryRecordingGuard stagedRecordingGuard(context.stagedPassTimer, context.currentFrame);
 #endif
@@ -4430,6 +4454,9 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
 #if HORDE_RT_STAGED_PRIMARY_TIMING
                 ,gpuTimingRecording?&context.stagedPassTimer:nullptr,context.currentFrame
 #endif
+#if HORDE_RT_FRAME_STAGE_PROBE
+                ,gpuTimingRecording && context.motion && context.motion->armed && !context.motion->finished?&frameStageProbe:nullptr
+#endif
               )
             : context.rtScene.RecordTraceAndCopy(context.commandBuffers[imageIndex],
                                                 context.swapchainImages[imageIndex],
@@ -4440,6 +4467,9 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                                                 evidenceFrame ? &observation : nullptr
 #if HORDE_RT_STAGED_PRIMARY_TIMING
                                                 , gpuTimingRecording ? &context.stagedPassTimer : nullptr, context.currentFrame
+#endif
+#if HORDE_RT_FRAME_STAGE_PROBE
+                                                ,gpuTimingRecording && context.motion && context.motion->armed && !context.motion->finished?&frameStageProbe:nullptr
 #endif
                                                 );
         if(recorded && detail==DetailFrame::Cutover)context.rtScene.FinishOrdinaryStaticDetail(gGameSimulation);
@@ -4588,6 +4618,11 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                      context.rtScene.OrdinaryStaticDetailEvidence(),state.playerX,state.playerSupportWorldY,state.playerZ,
                      context.motion->chapterCameraYaw,context.motion->chapterCameraPitch,context.motion->scenario.ChapterViewTicks(),
                      context.motion->chapterDetailCpuNs};
+#if HORDE_RT_FRAME_STAGE_PROBE
+                for(unsigned i=0;i<context.frameStageTimers.size();++i)
+                    tag.stageSubmitted[i]=frameStageProbe.recorded[i] &&
+                        context.frameStageTimers[i].MarkSubmitted(context.currentFrame,owner.submissionSerial);
+#endif
             }
         }
 #endif
@@ -4886,6 +4921,9 @@ GlassGeometryApplyResult ApplyGlassGeometryOnOwner(
     context.capabilities.rtScene.presented = false;
     PublishGraphicsApplied(context, true, false);
     context.gpuFrameTimer.ResetAfterDeviceIdle();
+#if HORDE_RT_FRAME_STAGE_PROBE
+    for(auto& timer:context.frameStageTimers)timer.ResetAfterDeviceIdle();
+#endif
 #if HORDE_RT_STAGED_PRIMARY_TIMING
     context.stagedPassTimer.ResetAfterDeviceIdle();
 #endif
@@ -4963,6 +5001,9 @@ bool ApplySceneProfileOnOwner(SwapchainContext& context, const PreviewControls c
     CancelActiveInAppBenchmark(context);
     if (vkResetCommandPool(context.device, context.commandPool, 0) != VK_SUCCESS) return false;
     context.gpuFrameTimer.ResetAfterDeviceIdle();
+#if HORDE_RT_FRAME_STAGE_PROBE
+    for(auto& timer:context.frameStageTimers)timer.ResetAfterDeviceIdle();
+#endif
 #if HORDE_RT_STAGED_PRIMARY_TIMING
     context.stagedPassTimer.ResetAfterDeviceIdle();
 #endif
@@ -5171,6 +5212,9 @@ void SwapchainRenderLoop()
                         context.rtFrameEvidenceInitialised = false;
                     }
                     context.gpuFrameTimer.ResetAfterDeviceIdle();
+#if HORDE_RT_FRAME_STAGE_PROBE
+    for(auto& timer:context.frameStageTimers)timer.ResetAfterDeviceIdle();
+#endif
 #if HORDE_RT_STAGED_PRIMARY_TIMING
                     context.stagedPassTimer.ResetAfterDeviceIdle();
 #endif

@@ -1,5 +1,21 @@
 # Android RT Device Compatibility Record
 
+## 16 October baseline stage profile — SM-S948B / Android17
+
+Evidence class: **owner-authorized exact Debug/O2 install/pullback, Shipping/Mobile
+private timestamp observer, two ordinary physical routes with strict completed
+submission/stage/actual-display joins**. [Source/APK/raw evidence](evidence/2026-10-16-baseline-rt-profile/README.md).
+APK f13dda30ad56536a774004ee963c621aec2396f0a25179c490f32e72294fa527;
+SM-S948B/API37/Adreno840/Vulkan1.4.295, unchanged40%/Current576×1188,169assets
+and shader modules. Pipeline667/667, Query678/678 stage/display joins. Exterior
+dispatch137–142ms, AS-update0.53–0.55ms, transfer0.11–0.12ms; nonadditive execution
+intervals, no shader-internal/hardware-counter attribution. Whole-route actual
+median83.33ms both; smoothness remains open. Same13.59MiB unload/exact restore,
+12.85MiB observed overlap, zero readiness waits. No policy/quality/production adoption.
+Original preference bytes preserved, Debug stopped, release untouched. Current/Higher
+and Lower→Current migration physical acceptance remain pending. Older measurements
+below retain their own artifact/OS/settings scope.
+
 ## 16 October matched resident/streamed pairs — SM-S948B / Android17
 
 Evidence class: **owner-authorized exact Debug/O2 install/pullback, Shipping/Mobile

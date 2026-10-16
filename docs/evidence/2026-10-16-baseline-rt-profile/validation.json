@@ -1,0 +1,47 @@
+{
+  "defaultDebug": {
+    "sha256": "f26649a2db596f14fe05a32cb4082efdadd6cd7df877f17fcc36c302934c3640",
+    "installed": false,
+    "privateProfile": false
+  },
+  "java": {
+    "tests": 286,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "javaSuites": 45,
+  "defaultUnsignedRelease": {
+    "sha256": "6e86355b6172b6ad64d900905835623b2b374f81be19bfb7e569a6550cd4b30b",
+    "bytes": 168753989,
+    "signed": false,
+    "installed": false,
+    "privateProfile": false,
+    "nativeHashes": {
+      "lib/arm64-v8a/libhorde_rt_probe_android.so": "614664f9ff8318ef0233bdc45555d097498b3b2a9f7d92418a6fa0b2f9ad3165",
+      "lib/armeabi-v7a/libhorde_rt_probe_android.so": "4bfe9ef03c6ee6b6bbed9cf203dbe2e1e751a992d04203734403b695c58d6660",
+      "lib/x86/libhorde_rt_probe_android.so": "f3cc34ed1691cb2452a427cd303ac882349392197626797d7d2a1ad182c1e38f",
+      "lib/x86_64/libhorde_rt_probe_android.so": "ccf8eee26b2cb6c042612349cdf024b5490f426ff4b1372e7366ec1d56c3c77a"
+    }
+  },
+  "nativeReleaseTests": {
+    "passed": 2,
+    "failed": 0
+  },
+  "nativeDebugTests": {
+    "passed": 2,
+    "failed": 0
+  },
+  "stageAnalyzerTests": {
+    "passed": 5,
+    "failed": 0
+  },
+  "motionAnalyzerTests": {
+    "passed": 15,
+    "failed": 0
+  },
+  "windowsReleaseRenderer": "build passed; probe off",
+  "privateAndroid": "assemble/lint passed four ABIs",
+  "defaultAndroid": "Debug assemble/lint/unit results and unsigned Release assemble/lint passed four ABIs",
+  "negativeProfileGuard": "expected private chapter timing rejection observed"
+}

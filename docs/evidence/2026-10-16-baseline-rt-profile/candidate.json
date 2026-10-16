@@ -1,0 +1,13 @@
+{
+  "baseHead": "a3091c10e8746bdd9297828230c9fb28e1860ed7",
+  "apkSha256": "f13dda30ad56536a774004ee963c621aec2396f0a25179c490f32e72294fa527",
+  "apkBytes": 183654122,
+  "identicalAssetsToControl": 169,
+  "nativeLibraries": {
+    "lib/arm64-v8a/libhorde_rt_probe_android.so": "2611149b9a8c04fbdae08eb1c283551f3ebdbbc5d85520234d1d5ffd7de74210",
+    "lib/armeabi-v7a/libhorde_rt_probe_android.so": "a06f2bb399334067a8a8bce5eda29e9ebf182d2cfb754d218c561da58650d5e8",
+    "lib/x86/libhorde_rt_probe_android.so": "aa6c32731637e81ad55290a06fcb82e5d2ca5c908862dc0ef75100ae34000a48",
+    "lib/x86_64/libhorde_rt_probe_android.so": "3b4f2a2f503a194a31db79efcfc1c1466881b317cd5f9c14a3759caf5bbd4e41"
+  },
+  "profile": "Shipping/Mobile; private region pages; route timing; frame stage probe"
+}

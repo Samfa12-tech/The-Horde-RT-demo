@@ -1,4 +1,5 @@
 #include "vulkan/GpuFrameTimer.h"
+#include "vulkan/raytracing/RtSceneGpuStageProbe.h"
 
 #include <array>
 #include <cstdint>
@@ -19,6 +20,7 @@ enum class QueryMode
 
 QueryMode gQueryMode = QueryMode::Valid;
 std::uint64_t gQueryReadCount = 0u;
+VkPipelineStageFlagBits gBeginStage{},gEndStage{};
 
 template <typename Handle>
 Handle FakeHandle(const std::uintptr_t value)
@@ -101,10 +103,11 @@ VKAPI_ATTR void VKAPI_CALL vkCmdResetQueryPool(
 
 VKAPI_ATTR void VKAPI_CALL vkCmdWriteTimestamp(
     VkCommandBuffer,
-    VkPipelineStageFlagBits,
+    VkPipelineStageFlagBits stage,
     VkQueryPool,
-    std::uint32_t)
+    std::uint32_t query)
 {
+    (query%2u?gEndStage:gBeginStage)=stage;
 }
 
 VKAPI_ATTR VkResult VKAPI_CALL vkGetQueryPoolResults(
@@ -169,6 +172,8 @@ int main()
     };
 
     const GpuFrameTimingCollection notReady = submitAndCollect(40u, QueryMode::NotReady);
+    context.Check(gBeginStage==VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT && gEndStage==VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+                  "ordinary whole-frame timestamp endpoints must remain unchanged");
     context.Check(notReady.status == GpuFrameTimingCollectionStatus::Unavailable &&
                       notReady.consumed && notReady.frameSlot == 0u &&
                       notReady.submissionSequence == 40u && !notReady.hasSample &&
@@ -223,6 +228,31 @@ int main()
                   "duration conversion failure must consume and identify the submitted query pair");
     checkRepeatDrainWithoutQueryIo(
         "a consumed duration conversion failure must leave no query work for a repeat drain");
+
+    for(const auto stage: {VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR,
+        VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR,VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,VK_PIPELINE_STAGE_TRANSFER_BIT}) {
+        context.Check(timer.RecordBegin(commandBuffer,0,stage) && timer.RecordEnd(commandBuffer,0,stage) &&
+            gBeginStage==stage && gEndStage==stage && timer.MarkSubmitted(0,100+static_cast<unsigned>(stage)),
+            "profile timers must use the selected AS/shader/transfer execution endpoints");
+        context.Check(timer.CollectCompleted(0).hasSample,"stage-specific query must retain normal collection validity");
+    }
+    {
+        horde::vulkan::raytracing::RtSceneGpuStageProbe guard({&timer,nullptr,nullptr},0);
+        context.Check(guard.Begin(commandBuffer,0,VK_PIPELINE_STAGE_TRANSFER_BIT),"probe begins its borrowed timer");
+        guard.End(commandBuffer,0,VK_PIPELINE_STAGE_TRANSFER_BIT);
+    }
+    context.Check(timer.RecordBegin(commandBuffer,0) && timer.RecordEnd(commandBuffer,0),
+                  "aborted/unsubmitted probe scope must release its recording");
+    timer.CancelRecording(0);
+    {
+        horde::vulkan::raytracing::RtSceneGpuStageProbe guard({&timer,nullptr,nullptr},0);
+        context.Check(guard.Begin(commandBuffer,0,VK_PIPELINE_STAGE_TRANSFER_BIT),"probe records a submitted timer");
+        guard.End(commandBuffer,0,VK_PIPELINE_STAGE_TRANSFER_BIT);
+        context.Check(guard.recorded[0] && timer.MarkSubmitted(0,900),"submitted probe retains exact identity");
+    }
+    const auto retained=timer.CollectCompleted(0);
+    context.Check(retained.hasSample && retained.submissionSequence==900,
+                  "recording guard must not cancel queries owned by submitted GPU work");
 
     if (context.failures == 0)
     {

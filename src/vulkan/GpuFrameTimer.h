@@ -93,8 +93,10 @@ public:
     // idle, for example during a render-scale or swapchain transition.
     void ResetAfterDeviceIdle();
 
-    bool RecordBegin(VkCommandBuffer commandBuffer, std::uint32_t frameSlot);
-    bool RecordEnd(VkCommandBuffer commandBuffer, std::uint32_t frameSlot);
+    bool RecordBegin(VkCommandBuffer commandBuffer, std::uint32_t frameSlot,
+                     VkPipelineStageFlagBits stage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT);
+    bool RecordEnd(VkCommandBuffer commandBuffer, std::uint32_t frameSlot,
+                   VkPipelineStageFlagBits stage = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT);
     void CancelRecording(std::uint32_t frameSlot);
     bool MarkSubmitted(std::uint32_t frameSlot, std::uint64_t submissionSequence);
     GpuFrameTimingCollection CollectCompleted(std::uint32_t frameSlot);

@@ -821,6 +821,9 @@ bool PresentableTinyRtScene::RecordTraceAndCopyWithStaticReplacement(
 #if HORDE_RT_STAGED_PRIMARY_TIMING
     , experimental::StagedPrimaryTiming* stagedTiming, std::uint32_t timingFrameSlot
 #endif
+#if HORDE_RT_FRAME_STAGE_PROBE
+    , RtSceneGpuStageProbe* gpuProbe
+#endif
     )
 {
     if (!retireReferences || commandBuffer == VK_NULL_HANDLE || swapchainImage == VK_NULL_HANDLE ||
@@ -852,6 +855,9 @@ bool PresentableTinyRtScene::RecordTraceAndCopyWithStaticReplacement(
         const bool recorded=RecordTraceAndCopy(commandBuffer,swapchainImage,swapchainImageLayout,swapchainExtent,frame,diagnostic,observation
 #if HORDE_RT_STAGED_PRIMARY_TIMING
             ,stagedTiming,timingFrameSlot
+#endif
+#if HORDE_RT_FRAME_STAGE_PROBE
+            ,gpuProbe
 #endif
         );
         if(!recorded){
@@ -886,10 +892,16 @@ bool PresentableTinyRtScene::RecordTraceAndCopyWithStaticReplacement(
         experimental::StagedPrimaryTiming* stagedTiming;
         std::uint32_t timingFrameSlot;
 #endif
+#if HORDE_RT_FRAME_STAGE_PROBE
+        RtSceneGpuStageProbe* gpuProbe;
+#endif
     } first{retireReferences,user,commandBuffer,swapchainImage,&swapchainImageLayout,
         swapchainExtent,&frame,observation
 #if HORDE_RT_STAGED_PRIMARY_TIMING
         ,stagedTiming,timingFrameSlot
+#endif
+#if HORDE_RT_FRAME_STAGE_PROBE
+        ,gpuProbe
 #endif
     };
     const StaticCutoverApi api{&first,
@@ -907,6 +919,9 @@ bool PresentableTinyRtScene::RecordTraceAndCopyWithStaticReplacement(
             return scene.RecordTraceAndCopy(f.command,f.image,*f.layout,f.extent,*f.frame,error,f.observation
 #if HORDE_RT_STAGED_PRIMARY_TIMING
                 ,f.stagedTiming,f.timingFrameSlot
+#endif
+#if HORDE_RT_FRAME_STAGE_PROBE
+                ,f.gpuProbe
 #endif
             );
         }};

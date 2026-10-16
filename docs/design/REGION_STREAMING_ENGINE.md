@@ -1,5 +1,16 @@
 # Reusable region loading and streaming
 
+Current [baseline GPU stage attribution](../evidence/2026-10-16-baseline-rt-profile/README.md)
+retains the working ordinary cycle and13.59MiB saving/exact restoration on both
+phone backends. All1,345frames join; exterior shader dispatch137–142ms dominates
+AS-update0.53–0.55ms and transfer0.11–0.12ms. These are execution intervals,
+not additive hardware counters or playable FPS. No renderer/quality/policy change.
+Optional `hordeFrameStageProbe=true` requires the private Shipping/Mobile chapter
+route-timing build; default builds compile it out. Analyze a complete benchmark
+and its resources CSV with `tools/analyze_android_rt_stage_profile.py`; missing,
+mismatched or final stage rows reject the run. Reuse prior experiment dispositions
+before another replay. Smooth mobile play and shader-internal attribution remain open.
+
 Latest attribution: [matched resident/streamed phone pairs](../evidence/2026-10-16-phone-resident-streamed/README.md)
 complete four strict ordinary routes on one private Shipping/Mobile APK. Resident
 and streamed fixed views have similar large baseline GPU durations (exterior

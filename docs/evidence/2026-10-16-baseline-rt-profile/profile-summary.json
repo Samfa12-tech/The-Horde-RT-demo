@@ -1,0 +1,1629 @@
+{
+  "candidate": {
+    "baseHead": "a3091c10e8746bdd9297828230c9fb28e1860ed7",
+    "apkSha256": "f13dda30ad56536a774004ee963c621aec2396f0a25179c490f32e72294fa527",
+    "apkBytes": 183654122,
+    "identicalAssetsToControl": 169,
+    "nativeLibraries": {
+      "lib/arm64-v8a/libhorde_rt_probe_android.so": "2611149b9a8c04fbdae08eb1c283551f3ebdbbc5d85520234d1d5ffd7de74210",
+      "lib/armeabi-v7a/libhorde_rt_probe_android.so": "a06f2bb399334067a8a8bce5eda29e9ebf182d2cfb754d218c561da58650d5e8",
+      "lib/x86/libhorde_rt_probe_android.so": "aa6c32731637e81ad55290a06fcb82e5d2ca5c908862dc0ef75100ae34000a48",
+      "lib/x86_64/libhorde_rt_probe_android.so": "3b4f2a2f503a194a31db79efcfc1c1466881b317cd5f9c14a3759caf5bbd4e41"
+    },
+    "profile": "Shipping/Mobile; private region pages; route timing; frame stage probe"
+  },
+  "comparisons": {
+    "pipeline": {
+      "controlCase": "pipeline-streamed-return",
+      "profileCase": "pipeline-profile",
+      "settings": {
+        "scalePercent": 40,
+        "width": 1440,
+        "height": 2971,
+        "internalWidth": 576,
+        "internalHeight": 1188,
+        "backend": "RayTracingPipeline",
+        "water": 1,
+        "fire": 0,
+        "cap": 30,
+        "glass": false,
+        "shadow": 1,
+        "mist": true,
+        "dust": 1
+      },
+      "pipelineIdentities": [
+        {
+          "executionMode": 0,
+          "activeKey": "shipping_mobile_opaque_fast",
+          "activeSha256": "2b71c86dabdbf5d435ac9c1dd08895db6adf01990ffd9716ce76fe1a25ebd8c2",
+          "opaqueSha256": "2b71c86dabdbf5d435ac9c1dd08895db6adf01990ffd9716ce76fe1a25ebd8c2",
+          "genericSha256": "30ae3c9d21fcb037cd0f2bbf2aa06b3c3c6f7fd61c8a6b81ed2a883a507f3bdc"
+        }
+      ],
+      "views": {
+        "landing-sweep": {
+          "controlWholeGpu": {
+            "n": 40,
+            "medianMs": 142.630752,
+            "p95Ms": 144.696767,
+            "maximumMs": 146.845361
+          },
+          "profileWholeGpu": {
+            "n": 39,
+            "medianMs": 142.218642,
+            "p95Ms": 144.024424,
+            "maximumMs": 144.422496
+          },
+          "profileDisplay": {
+            "n": 39,
+            "medianMs": 158.333437,
+            "p95Ms": 162.500053,
+            "maximumMs": 162.500053
+          },
+          "stageIntervals": {
+            "as": {
+              "n": 39,
+              "medianMs": 0.552604,
+              "p95Ms": 0.668802,
+              "maximumMs": 0.944375
+            },
+            "dispatch": {
+              "n": 39,
+              "medianMs": 141.532913,
+              "p95Ms": 143.221351,
+              "maximumMs": 143.356142
+            },
+            "transfer": {
+              "n": 39,
+              "medianMs": 0.121719,
+              "p95Ms": 0.3125,
+              "maximumMs": 0.312865
+            }
+          },
+          "pose": {
+            "x": -33.6887,
+            "y": 2.05,
+            "z": -12.7842,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "poseAbsoluteDelta": {
+            "x": 0.0009000000000014552,
+            "y": 0.0,
+            "z": 0.0011999999999989797,
+            "yaw": 0.0,
+            "pitch": 0.0
+          },
+          "wholeGpuMedianChangePercent": -0.28893488551473556
+        },
+        "lower-sweep": {
+          "controlWholeGpu": {
+            "n": 51,
+            "medianMs": 68.350988,
+            "p95Ms": 69.10828,
+            "maximumMs": 69.750467
+          },
+          "profileWholeGpu": {
+            "n": 51,
+            "medianMs": 68.592238,
+            "p95Ms": 69.5263,
+            "maximumMs": 69.715623
+          },
+          "profileDisplay": {
+            "n": 51,
+            "medianMs": 75.000052,
+            "p95Ms": 83.333386,
+            "maximumMs": 83.333489
+          },
+          "stageIntervals": {
+            "as": {
+              "n": 51,
+              "medianMs": 0.377187,
+              "p95Ms": 0.390312,
+              "maximumMs": 0.393698
+            },
+            "dispatch": {
+              "n": 51,
+              "medianMs": 68.095675,
+              "p95Ms": 69.039269,
+              "maximumMs": 69.219842
+            },
+            "transfer": {
+              "n": 51,
+              "medianMs": 0.121354,
+              "p95Ms": 0.124323,
+              "maximumMs": 0.126198
+            }
+          },
+          "pose": {
+            "x": -33.7,
+            "y": -0.95,
+            "z": -15.2,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "poseAbsoluteDelta": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "yaw": 0.0,
+            "pitch": 0.0
+          },
+          "wholeGpuMedianChangePercent": 0.3529575900204973
+        },
+        "passage-sweep": {
+          "controlWholeGpu": {
+            "n": 52,
+            "medianMs": 66.401691,
+            "p95Ms": 67.215519,
+            "maximumMs": 67.656873
+          },
+          "profileWholeGpu": {
+            "n": 52,
+            "medianMs": 66.4244255,
+            "p95Ms": 67.166457,
+            "maximumMs": 67.445884
+          },
+          "profileDisplay": {
+            "n": 52,
+            "medianMs": 75.0,
+            "p95Ms": 83.333384,
+            "maximumMs": 83.333385
+          },
+          "stageIntervals": {
+            "as": {
+              "n": 52,
+              "medianMs": 0.375937,
+              "p95Ms": 0.385781,
+              "maximumMs": 0.39849
+            },
+            "dispatch": {
+              "n": 52,
+              "medianMs": 65.934738,
+              "p95Ms": 66.678644,
+              "maximumMs": 66.960415
+            },
+            "transfer": {
+              "n": 52,
+              "medianMs": 0.115286,
+              "p95Ms": 0.118958,
+              "maximumMs": 0.136823
+            }
+          },
+          "pose": {
+            "x": -22.0229,
+            "y": -0.95,
+            "z": -15.2,
+            "yaw": 1.5708,
+            "pitch": -0.15
+          },
+          "poseAbsoluteDelta": {
+            "x": 0.0016999999999995907,
+            "y": 0.0,
+            "z": 0.0,
+            "yaw": 0.0,
+            "pitch": 0.0
+          },
+          "wholeGpuMedianChangePercent": 0.03423783288891702
+        },
+        "repeat-ascent": {
+          "controlWholeGpu": {
+            "n": 40,
+            "medianMs": 142.646325,
+            "p95Ms": 144.804736,
+            "maximumMs": 150.640882
+          },
+          "profileWholeGpu": {
+            "n": 40,
+            "medianMs": 142.4694495,
+            "p95Ms": 144.579684,
+            "maximumMs": 145.213746
+          },
+          "profileDisplay": {
+            "n": 40,
+            "medianMs": 158.333386,
+            "p95Ms": 162.500001,
+            "maximumMs": 166.666667
+          },
+          "stageIntervals": {
+            "as": {
+              "n": 40,
+              "medianMs": 0.5378905,
+              "p95Ms": 0.554427,
+              "maximumMs": 0.578073
+            },
+            "dispatch": {
+              "n": 40,
+              "medianMs": 141.8032255,
+              "p95Ms": 143.908851,
+              "maximumMs": 144.55359
+            },
+            "transfer": {
+              "n": 40,
+              "medianMs": 0.12125,
+              "p95Ms": 0.126042,
+              "maximumMs": 0.127969
+            }
+          },
+          "pose": {
+            "x": -33.7,
+            "y": 2.05,
+            "z": -12.8,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "poseAbsoluteDelta": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "yaw": 0.0,
+            "pitch": 0.0
+          },
+          "wholeGpuMedianChangePercent": -0.12399583375175549
+        }
+      },
+      "profileRun": {
+        "case": "pipeline-profile",
+        "strictTiming": {
+          "eligible": true,
+          "reportSha256": "32fe8d68daa82b6c0e04413c9dd22548cf64e8f234b709ba1407b2940023ec3c",
+          "runId": "matched-pipeline-profile-r02",
+          "workload": "motion-chapter-streamed-comparison-v1",
+          "buildId": "1.6.2",
+          "settings": {
+            "scalePercent": 40,
+            "width": 1440,
+            "height": 2971,
+            "internalWidth": 576,
+            "internalHeight": 1188,
+            "backend": "RayTracingPipeline",
+            "water": 1,
+            "fire": 0,
+            "cap": 30,
+            "glass": false,
+            "shadow": 1,
+            "mist": true,
+            "dust": 1
+          },
+          "scope": {
+            "surfaceGeneration": 1,
+            "sceneEpoch": 3,
+            "measurementGeneration": 6,
+            "matchedCompletedFrames": 667,
+            "intervalCount": 666,
+            "durationNanoseconds": 69253902369,
+            "setupPresentationRowsExcluded": 0
+          },
+          "intervalsNanoseconds": {
+            "median": 83333411,
+            "p90NearestRank": 158333386,
+            "p95NearestRank": 162500000,
+            "maximum": 175000052,
+            "over33333000Nanoseconds": 666,
+            "over250000000Nanoseconds": 0
+          },
+          "observedPresentedImageRatePerSecond": 9.616787,
+          "simulation": {
+            "stateRows": 667,
+            "eventRows": 48,
+            "ticksThisFrameMaximum": 6,
+            "catchUpOverrunCountFirst": 0,
+            "catchUpOverrunCountLast": 264,
+            "catchUpOverrunDelta": 264
+          },
+          "collector": {
+            "runCounterDelta": {
+              "preparedPresents": 667,
+              "acceptedPresents": 667,
+              "rejectedPresents": 0,
+              "invalidRegistrations": 0,
+              "invalidMetadata": 0,
+              "pendingCapacityExhausted": 0,
+              "queryCalls": 1330,
+              "queryErrors": 0,
+              "incompleteQueries": 0,
+              "zeroPresentTimestamps": 0,
+              "zeroPresentIds": 0,
+              "unknownPresentIds": 0,
+              "duplicateTimings": 0,
+              "rowCapacityExhausted": 0,
+              "missingOnRebind": 0,
+              "missingOnUnbind": 0,
+              "abandonedPreparedPresents": 0
+            },
+            "queryCpuWallNanoseconds": 9287977,
+            "presentMarginAtLeast2Pow63CountIgnored": 667
+          },
+          "limits": [
+            "Bounded ordinary chapter traversal with zero mid-route image readbacks; recorder overhead remains.",
+            "One continuous resource scope; retry/rotation/lifecycle discontinuities require separate evidence.",
+            "Actual inter-present intervals; not sustained FPS, scanout, photons, GPU reciprocal time, touch latency or owner acceptance.",
+            "Trace extents are native resource observations; this analyzer does not certify appearance, thermals or power."
+          ]
+        },
+        "views": {
+          "landing-sweep": {
+            "pose": {
+              "x": -33.6887,
+              "y": 2.05,
+              "z": -12.7842,
+              "yaw": 3.14159,
+              "pitch": -0.15
+            },
+            "actualIntervals": {
+              "n": 39,
+              "medianMs": 158.333437,
+              "p95Ms": 162.500053,
+              "maximumMs": 162.500053
+            },
+            "gpu": {
+              "n": 39,
+              "medianMs": 142.218642,
+              "p95Ms": 144.024424,
+              "maximumMs": 144.422496
+            },
+            "wholeFrameCpu": {
+              "n": 39,
+              "medianMs": 160.549792,
+              "p95Ms": 163.840469,
+              "maximumMs": 164.417708
+            },
+            "simulationCpu": {
+              "n": 39,
+              "medianMs": 4.895312,
+              "p95Ms": 5.352708,
+              "maximumMs": 5.441354
+            },
+            "detailStepCpu": {
+              "n": 39,
+              "medianMs": 0.015625,
+              "p95Ms": 0.020313,
+              "maximumMs": 0.022083
+            },
+            "deviceLocalBytes": [
+              160831232
+            ]
+          },
+          "lower-sweep": {
+            "pose": {
+              "x": -33.7,
+              "y": -0.95,
+              "z": -15.2,
+              "yaw": 3.14159,
+              "pitch": -0.15
+            },
+            "actualIntervals": {
+              "n": 51,
+              "medianMs": 75.000052,
+              "p95Ms": 83.333386,
+              "maximumMs": 83.333489
+            },
+            "gpu": {
+              "n": 51,
+              "medianMs": 68.592238,
+              "p95Ms": 69.5263,
+              "maximumMs": 69.715623
+            },
+            "wholeFrameCpu": {
+              "n": 51,
+              "medianMs": 78.492031,
+              "p95Ms": 79.661407,
+              "maximumMs": 79.806823
+            },
+            "simulationCpu": {
+              "n": 51,
+              "medianMs": 0.287292,
+              "p95Ms": 0.375938,
+              "maximumMs": 0.488594
+            },
+            "detailStepCpu": {
+              "n": 51,
+              "medianMs": 0.011198,
+              "p95Ms": 0.024375,
+              "maximumMs": 0.02802
+            },
+            "deviceLocalBytes": [
+              160831232
+            ]
+          },
+          "passage-sweep": {
+            "pose": {
+              "x": -22.0229,
+              "y": -0.95,
+              "z": -15.2,
+              "yaw": 1.5708,
+              "pitch": -0.15
+            },
+            "actualIntervals": {
+              "n": 52,
+              "medianMs": 75.0,
+              "p95Ms": 83.333384,
+              "maximumMs": 83.333385
+            },
+            "gpu": {
+              "n": 52,
+              "medianMs": 66.4244255,
+              "p95Ms": 67.166457,
+              "maximumMs": 67.445884
+            },
+            "wholeFrameCpu": {
+              "n": 52,
+              "medianMs": 76.0091145,
+              "p95Ms": 77.285625,
+              "maximumMs": 77.478854
+            },
+            "simulationCpu": {
+              "n": 52,
+              "medianMs": 0.2969535,
+              "p95Ms": 0.336146,
+              "maximumMs": 0.372864
+            },
+            "detailStepCpu": {
+              "n": 52,
+              "medianMs": 0.010417,
+              "p95Ms": 0.015573,
+              "maximumMs": 0.02401
+            },
+            "deviceLocalBytes": [
+              146581568
+            ]
+          },
+          "repeat-ascent": {
+            "pose": {
+              "x": -33.7,
+              "y": 2.05,
+              "z": -12.8,
+              "yaw": 3.14159,
+              "pitch": -0.15
+            },
+            "actualIntervals": {
+              "n": 40,
+              "medianMs": 158.333386,
+              "p95Ms": 162.500001,
+              "maximumMs": 166.666667
+            },
+            "gpu": {
+              "n": 40,
+              "medianMs": 142.4694495,
+              "p95Ms": 144.579684,
+              "maximumMs": 145.213746
+            },
+            "wholeFrameCpu": {
+              "n": 40,
+              "medianMs": 159.828203,
+              "p95Ms": 162.943125,
+              "maximumMs": 163.503073
+            },
+            "simulationCpu": {
+              "n": 40,
+              "medianMs": 4.3548435,
+              "p95Ms": 5.121927,
+              "maximumMs": 5.202187
+            },
+            "detailStepCpu": {
+              "n": 40,
+              "medianMs": 0.013776,
+              "p95Ms": 0.017813,
+              "maximumMs": 0.02125
+            },
+            "deviceLocalBytes": [
+              160831232
+            ]
+          }
+        },
+        "fullDeviceLocalBytes": 160831232,
+        "minimumDeviceLocalBytes": 146581568,
+        "peakDeviceLocalBytes": 174307392,
+        "restoredDeviceLocalBytes": 160831232,
+        "runUnloads": 1,
+        "runRestores": 1,
+        "detailStepCpuAll": {
+          "n": 667,
+          "medianMs": 0.01151,
+          "p95Ms": 0.02802,
+          "maximumMs": 3.943437
+        },
+        "transitions": [
+          {
+            "serial": 604,
+            "tick": 3295,
+            "phase": "tomb-backtrack",
+            "seconds": 37.333068163,
+            "unloads": 1,
+            "restores": 0,
+            "actualIntervalWindow": {
+              "n": 27,
+              "medianMs": 74.999948,
+              "p95Ms": 83.333333,
+              "maximumMs": 83.333437
+            },
+            "detailStepCpuWindow": {
+              "n": 27,
+              "medianMs": 0.009896,
+              "p95Ms": 0.013438,
+              "maximumMs": 0.013906
+            }
+          },
+          {
+            "serial": 736,
+            "tick": 3920,
+            "phase": "rope-return",
+            "seconds": 47.762235139,
+            "unloads": 1,
+            "restores": 1,
+            "actualIntervalWindow": {
+              "n": 23,
+              "medianMs": 87.5,
+              "p95Ms": 91.666616,
+              "maximumMs": 91.666719
+            },
+            "detailStepCpuWindow": {
+              "n": 23,
+              "medianMs": 0.0175,
+              "p95Ms": 0.468178,
+              "maximumMs": 3.943437
+            }
+          }
+        ],
+        "thermalBefore": {
+          "schemaVersion": 1,
+          "temperatureSource": "current HAL",
+          "frameworkStatus": 0,
+          "sensors": {
+            "AP": {
+              "type": 0,
+              "celsius": 39.2,
+              "status": 0
+            },
+            "BAT": {
+              "type": 2,
+              "celsius": 29.8,
+              "status": 0
+            },
+            "SKIN": {
+              "type": 3,
+              "celsius": 33.9,
+              "status": 0
+            }
+          },
+          "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+        },
+        "thermalAfter": {
+          "schemaVersion": 1,
+          "temperatureSource": "current HAL",
+          "frameworkStatus": 0,
+          "sensors": {
+            "AP": {
+              "type": 0,
+              "celsius": 40.0,
+              "status": 0
+            },
+            "BAT": {
+              "type": 2,
+              "celsius": 31.4,
+              "status": 0
+            },
+            "SKIN": {
+              "type": 3,
+              "celsius": 35.3,
+              "status": 0
+            }
+          },
+          "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+        }
+      },
+      "profileStages": {
+        "joinedFrames": 667,
+        "allFrames": {
+          "as": {
+            "n": 667,
+            "medianMs": 0.394375,
+            "p95Ms": 0.564792,
+            "maximumMs": 0.982292
+          },
+          "dispatch": {
+            "n": 667,
+            "medianMs": 73.62505,
+            "p95Ms": 142.533903,
+            "maximumMs": 201.784318
+          },
+          "transfer": {
+            "n": 667,
+            "medianMs": 0.120052,
+            "p95Ms": 0.129271,
+            "maximumMs": 0.323073
+          }
+        },
+        "views": {
+          "landing-sweep": {
+            "as": {
+              "n": 39,
+              "medianMs": 0.552604,
+              "p95Ms": 0.668802,
+              "maximumMs": 0.944375
+            },
+            "dispatch": {
+              "n": 39,
+              "medianMs": 141.532913,
+              "p95Ms": 143.221351,
+              "maximumMs": 143.356142
+            },
+            "transfer": {
+              "n": 39,
+              "medianMs": 0.121719,
+              "p95Ms": 0.3125,
+              "maximumMs": 0.312865
+            }
+          },
+          "lower-sweep": {
+            "as": {
+              "n": 51,
+              "medianMs": 0.377187,
+              "p95Ms": 0.390312,
+              "maximumMs": 0.393698
+            },
+            "dispatch": {
+              "n": 51,
+              "medianMs": 68.095675,
+              "p95Ms": 69.039269,
+              "maximumMs": 69.219842
+            },
+            "transfer": {
+              "n": 51,
+              "medianMs": 0.121354,
+              "p95Ms": 0.124323,
+              "maximumMs": 0.126198
+            }
+          },
+          "passage-sweep": {
+            "as": {
+              "n": 52,
+              "medianMs": 0.375937,
+              "p95Ms": 0.385781,
+              "maximumMs": 0.39849
+            },
+            "dispatch": {
+              "n": 52,
+              "medianMs": 65.934738,
+              "p95Ms": 66.678644,
+              "maximumMs": 66.960415
+            },
+            "transfer": {
+              "n": 52,
+              "medianMs": 0.115286,
+              "p95Ms": 0.118958,
+              "maximumMs": 0.136823
+            }
+          },
+          "repeat-ascent": {
+            "as": {
+              "n": 40,
+              "medianMs": 0.5378905,
+              "p95Ms": 0.554427,
+              "maximumMs": 0.578073
+            },
+            "dispatch": {
+              "n": 40,
+              "medianMs": 141.8032255,
+              "p95Ms": 143.908851,
+              "maximumMs": 144.55359
+            },
+            "transfer": {
+              "n": 40,
+              "medianMs": 0.12125,
+              "p95Ms": 0.126042,
+              "maximumMs": 0.127969
+            }
+          }
+        },
+        "limits": "GPU stage execution intervals; not additive counters or playable FPS. AS brackets UpdateDynamicInstances; dispatch includes all shader work; transfer brackets the post-barrier transfer/copy path.",
+        "strictTiming": {
+          "eligible": true,
+          "reportSha256": "32fe8d68daa82b6c0e04413c9dd22548cf64e8f234b709ba1407b2940023ec3c",
+          "runId": "matched-pipeline-profile-r02",
+          "workload": "motion-chapter-streamed-comparison-v1",
+          "buildId": "1.6.2",
+          "settings": {
+            "scalePercent": 40,
+            "width": 1440,
+            "height": 2971,
+            "internalWidth": 576,
+            "internalHeight": 1188,
+            "backend": "RayTracingPipeline",
+            "water": 1,
+            "fire": 0,
+            "cap": 30,
+            "glass": false,
+            "shadow": 1,
+            "mist": true,
+            "dust": 1
+          },
+          "scope": {
+            "surfaceGeneration": 1,
+            "sceneEpoch": 3,
+            "measurementGeneration": 6,
+            "matchedCompletedFrames": 667,
+            "intervalCount": 666,
+            "durationNanoseconds": 69253902369,
+            "setupPresentationRowsExcluded": 0
+          },
+          "intervalsNanoseconds": {
+            "median": 83333411,
+            "p90NearestRank": 158333386,
+            "p95NearestRank": 162500000,
+            "maximum": 175000052,
+            "over33333000Nanoseconds": 666,
+            "over250000000Nanoseconds": 0
+          },
+          "observedPresentedImageRatePerSecond": 9.616787,
+          "simulation": {
+            "stateRows": 667,
+            "eventRows": 48,
+            "ticksThisFrameMaximum": 6,
+            "catchUpOverrunCountFirst": 0,
+            "catchUpOverrunCountLast": 264,
+            "catchUpOverrunDelta": 264
+          },
+          "collector": {
+            "runCounterDelta": {
+              "preparedPresents": 667,
+              "acceptedPresents": 667,
+              "rejectedPresents": 0,
+              "invalidRegistrations": 0,
+              "invalidMetadata": 0,
+              "pendingCapacityExhausted": 0,
+              "queryCalls": 1330,
+              "queryErrors": 0,
+              "incompleteQueries": 0,
+              "zeroPresentTimestamps": 0,
+              "zeroPresentIds": 0,
+              "unknownPresentIds": 0,
+              "duplicateTimings": 0,
+              "rowCapacityExhausted": 0,
+              "missingOnRebind": 0,
+              "missingOnUnbind": 0,
+              "abandonedPreparedPresents": 0
+            },
+            "queryCpuWallNanoseconds": 9287977,
+            "presentMarginAtLeast2Pow63CountIgnored": 667
+          },
+          "limits": [
+            "Bounded ordinary chapter traversal with zero mid-route image readbacks; recorder overhead remains.",
+            "One continuous resource scope; retry/rotation/lifecycle discontinuities require separate evidence.",
+            "Actual inter-present intervals; not sustained FPS, scanout, photons, GPU reciprocal time, touch latency or owner acceptance.",
+            "Trace extents are native resource observations; this analyzer does not certify appearance, thermals or power."
+          ]
+        }
+      },
+      "controlThermalBefore": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 45.8,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 36.9,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 39.2,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      }
+    },
+    "query": {
+      "controlCase": "query-streamed-final",
+      "profileCase": "query-profile",
+      "settings": {
+        "scalePercent": 40,
+        "width": 1440,
+        "height": 2971,
+        "internalWidth": 576,
+        "internalHeight": 1188,
+        "backend": "RayQueryCompute",
+        "water": 1,
+        "fire": 0,
+        "cap": 30,
+        "glass": false,
+        "shadow": 1,
+        "mist": true,
+        "dust": 1
+      },
+      "pipelineIdentities": [
+        {
+          "executionMode": 1,
+          "activeKey": "rayquery_compute_shipping_mobile_opaque_fast",
+          "activeSha256": "01289f6a4c4533e4194cde693cb1eae4b5a5d77b8bbecac663458c28e1ad6001",
+          "opaqueSha256": "01289f6a4c4533e4194cde693cb1eae4b5a5d77b8bbecac663458c28e1ad6001",
+          "genericSha256": "992e40938323dea3aac8bdf831b5df5240cd128f4ce7a44722faf485845fc4ee"
+        }
+      ],
+      "views": {
+        "landing-sweep": {
+          "controlWholeGpu": {
+            "n": 39,
+            "medianMs": 139.462601,
+            "p95Ms": 149.843486,
+            "maximumMs": 150.418278
+          },
+          "profileWholeGpu": {
+            "n": 39,
+            "medianMs": 137.423122,
+            "p95Ms": 139.158851,
+            "maximumMs": 139.268695
+          },
+          "profileDisplay": {
+            "n": 39,
+            "medianMs": 154.166666,
+            "p95Ms": 158.333385,
+            "maximumMs": 158.333386
+          },
+          "stageIntervals": {
+            "as": {
+              "n": 39,
+              "medianMs": 0.53,
+              "p95Ms": 0.78224,
+              "maximumMs": 0.788542
+            },
+            "dispatch": {
+              "n": 39,
+              "medianMs": 136.772184,
+              "p95Ms": 138.50958,
+              "maximumMs": 138.626038
+            },
+            "transfer": {
+              "n": 39,
+              "medianMs": 0.11651,
+              "p95Ms": 0.136354,
+              "maximumMs": 0.304896
+            }
+          },
+          "pose": {
+            "x": -33.6878,
+            "y": 2.05,
+            "z": -12.7829,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "poseAbsoluteDelta": {
+            "x": 0.0030000000000001137,
+            "y": 0.0,
+            "z": 0.00420000000000087,
+            "yaw": 0.0,
+            "pitch": 0.0
+          },
+          "wholeGpuMedianChangePercent": -1.462384169932407
+        },
+        "lower-sweep": {
+          "controlWholeGpu": {
+            "n": 52,
+            "medianMs": 66.5208835,
+            "p95Ms": 69.990519,
+            "maximumMs": 72.69255
+          },
+          "profileWholeGpu": {
+            "n": 52,
+            "medianMs": 66.225571,
+            "p95Ms": 67.079425,
+            "maximumMs": 67.431196
+          },
+          "profileDisplay": {
+            "n": 52,
+            "medianMs": 75.0,
+            "p95Ms": 83.333334,
+            "maximumMs": 83.333386
+          },
+          "stageIntervals": {
+            "as": {
+              "n": 52,
+              "medianMs": 0.36901,
+              "p95Ms": 0.37651,
+              "maximumMs": 0.382969
+            },
+            "dispatch": {
+              "n": 52,
+              "medianMs": 65.740519,
+              "p95Ms": 66.597759,
+              "maximumMs": 66.943748
+            },
+            "transfer": {
+              "n": 52,
+              "medianMs": 0.114036,
+              "p95Ms": 0.120573,
+              "maximumMs": 0.308021
+            }
+          },
+          "pose": {
+            "x": -33.7,
+            "y": -0.95,
+            "z": -15.2,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "poseAbsoluteDelta": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "yaw": 0.0,
+            "pitch": 0.0
+          },
+          "wholeGpuMedianChangePercent": -0.44393953366538286
+        },
+        "passage-sweep": {
+          "controlWholeGpu": {
+            "n": 53,
+            "medianMs": 65.293436,
+            "p95Ms": 70.715415,
+            "maximumMs": 72.040102
+          },
+          "profileWholeGpu": {
+            "n": 52,
+            "medianMs": 65.295155,
+            "p95Ms": 68.257603,
+            "maximumMs": 68.535519
+          },
+          "profileDisplay": {
+            "n": 52,
+            "medianMs": 75.0,
+            "p95Ms": 83.333282,
+            "maximumMs": 83.333386
+          },
+          "stageIntervals": {
+            "as": {
+              "n": 52,
+              "medianMs": 0.3710155,
+              "p95Ms": 0.382448,
+              "maximumMs": 0.41
+            },
+            "dispatch": {
+              "n": 52,
+              "medianMs": 64.7954935,
+              "p95Ms": 67.776978,
+              "maximumMs": 68.050988
+            },
+            "transfer": {
+              "n": 52,
+              "medianMs": 0.1078645,
+              "p95Ms": 0.115469,
+              "maximumMs": 0.285729
+            }
+          },
+          "pose": {
+            "x": -22.0192,
+            "y": -0.95,
+            "z": -15.2,
+            "yaw": 1.5708,
+            "pitch": -0.15
+          },
+          "poseAbsoluteDelta": {
+            "x": 0.0005000000000023874,
+            "y": 0.0,
+            "z": 0.0,
+            "yaw": 0.0,
+            "pitch": 0.0
+          },
+          "wholeGpuMedianChangePercent": 0.002632730187457355
+        },
+        "repeat-ascent": {
+          "controlWholeGpu": {
+            "n": 40,
+            "medianMs": 138.236455,
+            "p95Ms": 143.274736,
+            "maximumMs": 147.819476
+          },
+          "profileWholeGpu": {
+            "n": 40,
+            "medianMs": 137.577132,
+            "p95Ms": 139.665413,
+            "maximumMs": 140.519215
+          },
+          "profileDisplay": {
+            "n": 40,
+            "medianMs": 154.166666,
+            "p95Ms": 158.333438,
+            "maximumMs": 162.500052
+          },
+          "stageIntervals": {
+            "as": {
+              "n": 40,
+              "medianMs": 0.5304165,
+              "p95Ms": 0.541094,
+              "maximumMs": 0.949792
+            },
+            "dispatch": {
+              "n": 40,
+              "medianMs": 136.9256215,
+              "p95Ms": 139.025674,
+              "maximumMs": 139.863747
+            },
+            "transfer": {
+              "n": 40,
+              "medianMs": 0.114323,
+              "p95Ms": 0.12224,
+              "maximumMs": 0.304635
+            }
+          },
+          "pose": {
+            "x": -33.7,
+            "y": 2.05,
+            "z": -12.8,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "poseAbsoluteDelta": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "yaw": 0.0,
+            "pitch": 0.0
+          },
+          "wholeGpuMedianChangePercent": -0.47695305843888924
+        }
+      },
+      "profileRun": {
+        "case": "query-profile",
+        "strictTiming": {
+          "eligible": true,
+          "reportSha256": "dbc4d6b3f1cd6cf36f2bf893cd425678ad501ae377cff7e21b80d4a0558f8c50",
+          "runId": "matched-query-profile-r02",
+          "workload": "motion-chapter-streamed-comparison-v1",
+          "buildId": "1.6.2",
+          "settings": {
+            "scalePercent": 40,
+            "width": 1440,
+            "height": 2971,
+            "internalWidth": 576,
+            "internalHeight": 1188,
+            "backend": "RayQueryCompute",
+            "water": 1,
+            "fire": 0,
+            "cap": 30,
+            "glass": false,
+            "shadow": 1,
+            "mist": true,
+            "dust": 1
+          },
+          "scope": {
+            "surfaceGeneration": 1,
+            "sceneEpoch": 3,
+            "measurementGeneration": 6,
+            "matchedCompletedFrames": 678,
+            "intervalCount": 677,
+            "durationNanoseconds": 68062459973,
+            "setupPresentationRowsExcluded": 0
+          },
+          "intervalsNanoseconds": {
+            "median": 83333386,
+            "p90NearestRank": 154166666,
+            "p95NearestRank": 158333281,
+            "maximum": 166666614,
+            "over33333000Nanoseconds": 677,
+            "over250000000Nanoseconds": 0
+          },
+          "observedPresentedImageRatePerSecond": 9.946746,
+          "simulation": {
+            "stateRows": 678,
+            "eventRows": 48,
+            "ticksThisFrameMaximum": 6,
+            "catchUpOverrunCountFirst": 0,
+            "catchUpOverrunCountLast": 260,
+            "catchUpOverrunDelta": 260
+          },
+          "collector": {
+            "runCounterDelta": {
+              "preparedPresents": 678,
+              "acceptedPresents": 678,
+              "rejectedPresents": 0,
+              "invalidRegistrations": 0,
+              "invalidMetadata": 0,
+              "pendingCapacityExhausted": 0,
+              "queryCalls": 1354,
+              "queryErrors": 0,
+              "incompleteQueries": 0,
+              "zeroPresentTimestamps": 0,
+              "zeroPresentIds": 0,
+              "unknownPresentIds": 0,
+              "duplicateTimings": 0,
+              "rowCapacityExhausted": 0,
+              "missingOnRebind": 0,
+              "missingOnUnbind": 0,
+              "abandonedPreparedPresents": 0
+            },
+            "queryCpuWallNanoseconds": 9221615,
+            "presentMarginAtLeast2Pow63CountIgnored": 678
+          },
+          "limits": [
+            "Bounded ordinary chapter traversal with zero mid-route image readbacks; recorder overhead remains.",
+            "One continuous resource scope; retry/rotation/lifecycle discontinuities require separate evidence.",
+            "Actual inter-present intervals; not sustained FPS, scanout, photons, GPU reciprocal time, touch latency or owner acceptance.",
+            "Trace extents are native resource observations; this analyzer does not certify appearance, thermals or power."
+          ]
+        },
+        "views": {
+          "landing-sweep": {
+            "pose": {
+              "x": -33.6878,
+              "y": 2.05,
+              "z": -12.7829,
+              "yaw": 3.14159,
+              "pitch": -0.15
+            },
+            "actualIntervals": {
+              "n": 39,
+              "medianMs": 154.166666,
+              "p95Ms": 158.333385,
+              "maximumMs": 158.333386
+            },
+            "gpu": {
+              "n": 39,
+              "medianMs": 137.423122,
+              "p95Ms": 139.158851,
+              "maximumMs": 139.268695
+            },
+            "wholeFrameCpu": {
+              "n": 39,
+              "medianMs": 154.371615,
+              "p95Ms": 158.637292,
+              "maximumMs": 159.085833
+            },
+            "simulationCpu": {
+              "n": 39,
+              "medianMs": 3.991927,
+              "p95Ms": 5.236875,
+              "maximumMs": 5.33
+            },
+            "detailStepCpu": {
+              "n": 39,
+              "medianMs": 0.014167,
+              "p95Ms": 0.019323,
+              "maximumMs": 0.019791
+            },
+            "deviceLocalBytes": [
+              160830720
+            ]
+          },
+          "lower-sweep": {
+            "pose": {
+              "x": -33.7,
+              "y": -0.95,
+              "z": -15.2,
+              "yaw": 3.14159,
+              "pitch": -0.15
+            },
+            "actualIntervals": {
+              "n": 52,
+              "medianMs": 75.0,
+              "p95Ms": 83.333334,
+              "maximumMs": 83.333386
+            },
+            "gpu": {
+              "n": 52,
+              "medianMs": 66.225571,
+              "p95Ms": 67.079425,
+              "maximumMs": 67.431196
+            },
+            "wholeFrameCpu": {
+              "n": 52,
+              "medianMs": 75.9495315,
+              "p95Ms": 77.234115,
+              "maximumMs": 78.582292
+            },
+            "simulationCpu": {
+              "n": 52,
+              "medianMs": 0.2667185,
+              "p95Ms": 0.325989,
+              "maximumMs": 0.387187
+            },
+            "detailStepCpu": {
+              "n": 52,
+              "medianMs": 0.01013,
+              "p95Ms": 0.013386,
+              "maximumMs": 0.02323
+            },
+            "deviceLocalBytes": [
+              160830720
+            ]
+          },
+          "passage-sweep": {
+            "pose": {
+              "x": -22.0192,
+              "y": -0.95,
+              "z": -15.2,
+              "yaw": 1.5708,
+              "pitch": -0.15
+            },
+            "actualIntervals": {
+              "n": 52,
+              "medianMs": 75.0,
+              "p95Ms": 83.333282,
+              "maximumMs": 83.333386
+            },
+            "gpu": {
+              "n": 52,
+              "medianMs": 65.295155,
+              "p95Ms": 68.257603,
+              "maximumMs": 68.535519
+            },
+            "wholeFrameCpu": {
+              "n": 52,
+              "medianMs": 74.804245,
+              "p95Ms": 77.838385,
+              "maximumMs": 78.367188
+            },
+            "simulationCpu": {
+              "n": 52,
+              "medianMs": 0.268516,
+              "p95Ms": 0.368021,
+              "maximumMs": 0.409063
+            },
+            "detailStepCpu": {
+              "n": 52,
+              "medianMs": 0.009974,
+              "p95Ms": 0.0225,
+              "maximumMs": 0.026146
+            },
+            "deviceLocalBytes": [
+              146581056
+            ]
+          },
+          "repeat-ascent": {
+            "pose": {
+              "x": -33.7,
+              "y": 2.05,
+              "z": -12.8,
+              "yaw": 3.14159,
+              "pitch": -0.15
+            },
+            "actualIntervals": {
+              "n": 40,
+              "medianMs": 154.166666,
+              "p95Ms": 158.333438,
+              "maximumMs": 162.500052
+            },
+            "gpu": {
+              "n": 40,
+              "medianMs": 137.577132,
+              "p95Ms": 139.665413,
+              "maximumMs": 140.519215
+            },
+            "wholeFrameCpu": {
+              "n": 40,
+              "medianMs": 154.376849,
+              "p95Ms": 157.560573,
+              "maximumMs": 159.338698
+            },
+            "simulationCpu": {
+              "n": 40,
+              "medianMs": 3.8497655,
+              "p95Ms": 5.131614,
+              "maximumMs": 5.35151
+            },
+            "detailStepCpu": {
+              "n": 40,
+              "medianMs": 0.0140105,
+              "p95Ms": 0.019115,
+              "maximumMs": 0.021406
+            },
+            "deviceLocalBytes": [
+              160830720
+            ]
+          }
+        },
+        "fullDeviceLocalBytes": 160830720,
+        "minimumDeviceLocalBytes": 146581056,
+        "peakDeviceLocalBytes": 174306880,
+        "restoredDeviceLocalBytes": 160830720,
+        "runUnloads": 1,
+        "runRestores": 1,
+        "detailStepCpuAll": {
+          "n": 678,
+          "medianMs": 0.0105465,
+          "p95Ms": 0.029322,
+          "maximumMs": 4.261563
+        },
+        "transitions": [
+          {
+            "serial": 577,
+            "tick": 3293,
+            "phase": "tomb-backtrack",
+            "seconds": 36.658292485,
+            "unloads": 1,
+            "restores": 0,
+            "actualIntervalWindow": {
+              "n": 27,
+              "medianMs": 74.999948,
+              "p95Ms": 83.333385,
+              "maximumMs": 83.333386
+            },
+            "detailStepCpuWindow": {
+              "n": 27,
+              "medianMs": 0.009375,
+              "p95Ms": 0.013593,
+              "maximumMs": 0.024896
+            }
+          },
+          {
+            "serial": 711,
+            "tick": 3925,
+            "phase": "rope-return",
+            "seconds": 47.220792793,
+            "unloads": 1,
+            "restores": 1,
+            "actualIntervalWindow": {
+              "n": 23,
+              "medianMs": 87.5,
+              "p95Ms": 91.666719,
+              "maximumMs": 95.833385
+            },
+            "detailStepCpuWindow": {
+              "n": 23,
+              "medianMs": 0.012396,
+              "p95Ms": 0.723281,
+              "maximumMs": 4.261563
+            }
+          }
+        ],
+        "thermalBefore": {
+          "schemaVersion": 1,
+          "temperatureSource": "current HAL",
+          "frameworkStatus": 0,
+          "sensors": {
+            "AP": {
+              "type": 0,
+              "celsius": 41.4,
+              "status": 0
+            },
+            "BAT": {
+              "type": 2,
+              "celsius": 32.1,
+              "status": 0
+            },
+            "SKIN": {
+              "type": 3,
+              "celsius": 35.8,
+              "status": 0
+            }
+          },
+          "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+        },
+        "thermalAfter": {
+          "schemaVersion": 1,
+          "temperatureSource": "current HAL",
+          "frameworkStatus": 0,
+          "sensors": {
+            "AP": {
+              "type": 0,
+              "celsius": 42.2,
+              "status": 0
+            },
+            "BAT": {
+              "type": 2,
+              "celsius": 33.8,
+              "status": 0
+            },
+            "SKIN": {
+              "type": 3,
+              "celsius": 37.3,
+              "status": 0
+            }
+          },
+          "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+        }
+      },
+      "profileStages": {
+        "joinedFrames": 678,
+        "allFrames": {
+          "as": {
+            "n": 678,
+            "medianMs": 0.387266,
+            "p95Ms": 0.557031,
+            "maximumMs": 1.510052
+          },
+          "dispatch": {
+            "n": 678,
+            "medianMs": 74.304139,
+            "p95Ms": 137.733903,
+            "maximumMs": 203.759683
+          },
+          "transfer": {
+            "n": 678,
+            "medianMs": 0.113854,
+            "p95Ms": 0.129896,
+            "maximumMs": 0.322812
+          }
+        },
+        "views": {
+          "landing-sweep": {
+            "as": {
+              "n": 39,
+              "medianMs": 0.53,
+              "p95Ms": 0.78224,
+              "maximumMs": 0.788542
+            },
+            "dispatch": {
+              "n": 39,
+              "medianMs": 136.772184,
+              "p95Ms": 138.50958,
+              "maximumMs": 138.626038
+            },
+            "transfer": {
+              "n": 39,
+              "medianMs": 0.11651,
+              "p95Ms": 0.136354,
+              "maximumMs": 0.304896
+            }
+          },
+          "lower-sweep": {
+            "as": {
+              "n": 52,
+              "medianMs": 0.36901,
+              "p95Ms": 0.37651,
+              "maximumMs": 0.382969
+            },
+            "dispatch": {
+              "n": 52,
+              "medianMs": 65.740519,
+              "p95Ms": 66.597759,
+              "maximumMs": 66.943748
+            },
+            "transfer": {
+              "n": 52,
+              "medianMs": 0.114036,
+              "p95Ms": 0.120573,
+              "maximumMs": 0.308021
+            }
+          },
+          "passage-sweep": {
+            "as": {
+              "n": 52,
+              "medianMs": 0.3710155,
+              "p95Ms": 0.382448,
+              "maximumMs": 0.41
+            },
+            "dispatch": {
+              "n": 52,
+              "medianMs": 64.7954935,
+              "p95Ms": 67.776978,
+              "maximumMs": 68.050988
+            },
+            "transfer": {
+              "n": 52,
+              "medianMs": 0.1078645,
+              "p95Ms": 0.115469,
+              "maximumMs": 0.285729
+            }
+          },
+          "repeat-ascent": {
+            "as": {
+              "n": 40,
+              "medianMs": 0.5304165,
+              "p95Ms": 0.541094,
+              "maximumMs": 0.949792
+            },
+            "dispatch": {
+              "n": 40,
+              "medianMs": 136.9256215,
+              "p95Ms": 139.025674,
+              "maximumMs": 139.863747
+            },
+            "transfer": {
+              "n": 40,
+              "medianMs": 0.114323,
+              "p95Ms": 0.12224,
+              "maximumMs": 0.304635
+            }
+          }
+        },
+        "limits": "GPU stage execution intervals; not additive counters or playable FPS. AS brackets UpdateDynamicInstances; dispatch includes all shader work; transfer brackets the post-barrier transfer/copy path.",
+        "strictTiming": {
+          "eligible": true,
+          "reportSha256": "dbc4d6b3f1cd6cf36f2bf893cd425678ad501ae377cff7e21b80d4a0558f8c50",
+          "runId": "matched-query-profile-r02",
+          "workload": "motion-chapter-streamed-comparison-v1",
+          "buildId": "1.6.2",
+          "settings": {
+            "scalePercent": 40,
+            "width": 1440,
+            "height": 2971,
+            "internalWidth": 576,
+            "internalHeight": 1188,
+            "backend": "RayQueryCompute",
+            "water": 1,
+            "fire": 0,
+            "cap": 30,
+            "glass": false,
+            "shadow": 1,
+            "mist": true,
+            "dust": 1
+          },
+          "scope": {
+            "surfaceGeneration": 1,
+            "sceneEpoch": 3,
+            "measurementGeneration": 6,
+            "matchedCompletedFrames": 678,
+            "intervalCount": 677,
+            "durationNanoseconds": 68062459973,
+            "setupPresentationRowsExcluded": 0
+          },
+          "intervalsNanoseconds": {
+            "median": 83333386,
+            "p90NearestRank": 154166666,
+            "p95NearestRank": 158333281,
+            "maximum": 166666614,
+            "over33333000Nanoseconds": 677,
+            "over250000000Nanoseconds": 0
+          },
+          "observedPresentedImageRatePerSecond": 9.946746,
+          "simulation": {
+            "stateRows": 678,
+            "eventRows": 48,
+            "ticksThisFrameMaximum": 6,
+            "catchUpOverrunCountFirst": 0,
+            "catchUpOverrunCountLast": 260,
+            "catchUpOverrunDelta": 260
+          },
+          "collector": {
+            "runCounterDelta": {
+              "preparedPresents": 678,
+              "acceptedPresents": 678,
+              "rejectedPresents": 0,
+              "invalidRegistrations": 0,
+              "invalidMetadata": 0,
+              "pendingCapacityExhausted": 0,
+              "queryCalls": 1354,
+              "queryErrors": 0,
+              "incompleteQueries": 0,
+              "zeroPresentTimestamps": 0,
+              "zeroPresentIds": 0,
+              "unknownPresentIds": 0,
+              "duplicateTimings": 0,
+              "rowCapacityExhausted": 0,
+              "missingOnRebind": 0,
+              "missingOnUnbind": 0,
+              "abandonedPreparedPresents": 0
+            },
+            "queryCpuWallNanoseconds": 9221615,
+            "presentMarginAtLeast2Pow63CountIgnored": 678
+          },
+          "limits": [
+            "Bounded ordinary chapter traversal with zero mid-route image readbacks; recorder overhead remains.",
+            "One continuous resource scope; retry/rotation/lifecycle discontinuities require separate evidence.",
+            "Actual inter-present intervals; not sustained FPS, scanout, photons, GPU reciprocal time, touch latency or owner acceptance.",
+            "Trace extents are native resource observations; this analyzer does not certify appearance, thermals or power."
+          ]
+        }
+      },
+      "controlThermalBefore": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 1,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 47.5,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 38.6,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 40.7,
+            "status": 1
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      }
+    }
+  }
+}

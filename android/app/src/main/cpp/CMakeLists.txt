@@ -53,6 +53,12 @@ target_compile_definitions(horde_rt_probe_android PRIVATE
 )
 target_compile_definitions(horde_rt_probe_android PRIVATE
     HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION=$<BOOL:${HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION}>)
+option(HORDE_RT_FRAME_STAGE_PROBE "Private chapter GPU AS/dispatch/transfer observation" OFF)
+if(HORDE_RT_FRAME_STAGE_PROBE AND NOT HORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING)
+    message(FATAL_ERROR "Frame stage profiling requires private chapter route timing.")
+endif()
+target_compile_definitions(horde_rt_probe_android PRIVATE
+    HORDE_RT_FRAME_STAGE_PROBE=$<BOOL:${HORDE_RT_FRAME_STAGE_PROBE}>)
 if(HORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING AND
    (NOT HORDE_RT_DEBUG_CHECKPOINTS OR NOT CMAKE_BUILD_TYPE STREQUAL "Debug" OR
     NOT HORDE_RT_REGION_PAGE_PROTOTYPE_ROOT OR
