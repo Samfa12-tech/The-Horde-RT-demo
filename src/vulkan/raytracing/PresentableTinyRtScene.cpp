@@ -580,6 +580,9 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     staticIndexBuffer_ = std::exchange(other.staticIndexBuffer_, Buffer{});
     staticGeometryTransformBuffer_ = std::exchange(other.staticGeometryTransformBuffer_, Buffer{});
     instanceMetadataBuffer_ = std::exchange(other.instanceMetadataBuffer_, Buffer{});
+#if HORDE_RT_DISPATCH_CLOCK_PROBE
+    dispatchClockTicket_=std::exchange(other.dispatchClockTicket_,0u);
+#endif
     primitiveMetadataBuffer_ = std::exchange(other.primitiveMetadataBuffer_, Buffer{});
     materialMetadataBuffer_ = std::exchange(other.materialMetadataBuffer_, Buffer{});
     blas_ = std::exchange(other.blas_, AccelerationStructure{});
@@ -1681,6 +1684,22 @@ bool PresentableTinyRtScene::WriteBuffer(const Buffer& buffer,
         buffer, data, size, label, diagnostic, observation);
 }
 
+#if HORDE_RT_DISPATCH_CLOCK_PROBE
+bool PresentableTinyRtScene::CollectDispatchClocks(std::uint32_t ticket,
+    std::vector<RtDispatchClockSample>& samples,std::array<std::uint64_t,8>& totals,
+    std::string& error) const {
+    const std::uint64_t count=std::uint64_t(DispatchClockAxisSamples(dispatchExtent_.width))*
+        DispatchClockAxisSamples(dispatchExtent_.height);
+    if(!count || count>kDispatchClockCapacity){error="Invalid sparse clock extent.";return false;}
+    samples.resize(static_cast<std::size_t>(count));
+    if(!ReadBuffer(instanceMetadataBuffer_,kDispatchClockSamplesOffset,samples.data(),
+                   count*sizeof(RtDispatchClockSample),"dispatch clocks",error))return false;
+    if(!SummarizeDispatchClock(samples,ticket,dispatchExtent_.width,dispatchExtent_.height,totals)) {
+        error="Stale/mismatched/unavailable dispatch clock samples.";return false;
+    }
+    return true;
+}
+#endif
 bool PresentableTinyRtScene::ReadBuffer(const Buffer& buffer,
                                         const VkDeviceSize offset,
                                         void* data,
@@ -2995,8 +3014,15 @@ bool PresentableTinyRtScene::CreateStaticMeshResources(std::string& diagnostic)
 #if HORDE_RT_REGION_PAGE_PROTOTYPE
     horde::world::streaming::GeometryPageTable initialPageTable{};
     initialPageTable.instances=instances;
+#if HORDE_RT_DISPATCH_CLOCK_PROBE
+    std::vector<std::uint8_t> clockUpload(kDispatchClockAllocationBytes);
+    std::memcpy(clockUpload.data(),&initialPageTable,sizeof(initialPageTable));
+    enqueue(clockUpload.data(),clockUpload.size(),storage,true,"RT region metadata and private clock tail",
+            instanceMetadataBuffer_,true);
+#else
     enqueue(&initialPageTable,sizeof(initialPageTable),storage,false,"RT region instance metadata",
             instanceMetadataBuffer_,true);
+#endif
 #else
     enqueue(instances.data(), sizeof(instances), storage, false, "RT instance metadata",
             instanceMetadataBuffer_, true);
@@ -7541,6 +7567,9 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                                      VK_ACCESS_SHADER_READ_BIT;
     if (pipelineBundle_.DescriptorIo().diagnosticIo.shaderWriteBarrier)
         hostWriteBarrier.dstAccessMask |= VK_ACCESS_SHADER_WRITE_BIT;
+#if HORDE_RT_DISPATCH_CLOCK_PROBE
+    hostWriteBarrier.dstAccessMask |= VK_ACCESS_SHADER_WRITE_BIT;
+#endif
     ExecuteObservedRtSceneCommand(
         observation, RtSceneCommandEvent::HostWriteBarrier, [&]() noexcept {
             vkCmdPipelineBarrier(commandBuffer,
@@ -8242,6 +8271,22 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
 #if HORDE_RT_FRAME_STAGE_PROBE
     if(asTiming)gpuProbe->End(commandBuffer,0,VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR);
 #endif
+#if HORDE_RT_DISPATCH_CLOCK_PROBE
+    // Prefix writes remain unchanged; the tail is private, disjoint and bounded.
+    const auto columns=DispatchClockAxisSamples(dispatchExtent_.width);
+    const auto rows=DispatchClockAxisSamples(dispatchExtent_.height);
+    if(!columns || !rows || std::uint64_t(columns)*rows>kDispatchClockCapacity ||
+       !instanceMetadataBuffer_.mappedWriteData || !instanceMetadataBuffer_.address ||
+       instanceMetadataBuffer_.size<kDispatchClockAllocationBytes ||
+       dispatchClockTicket_==std::numeric_limits<std::uint32_t>::max()) {
+        diagnostic="Private dispatch-clock allocation/extent/ticket is invalid.";return false;
+    }
+    const auto address=instanceMetadataBuffer_.address+kDispatchClockSamplesOffset;
+    const std::array<std::uint32_t,4> control{std::uint32_t(address),std::uint32_t(address>>32),
+        ++dispatchClockTicket_,kDispatchClockCapacity};
+    if(!gpuResources_.WriteBufferRange(instanceMetadataBuffer_,kDispatchClockControlOffset,
+        control.data(),sizeof(control),"private clock control",diagnostic))return false;
+#endif
     RtSceneStageScope traceCopyScope(
         observation, horde::telemetry::RtStage::TraceCopyRecord);
     if (storageImageLayout_ != VK_IMAGE_LAYOUT_GENERAL)
@@ -8447,6 +8492,12 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                     VK_ACCESS_SHADER_WRITE_BIT);
     storageImageLayout_ = VK_IMAGE_LAYOUT_GENERAL;
 
+#if HORDE_RT_DISPATCH_CLOCK_PROBE
+    const VkMemoryBarrier clockRead{VK_STRUCTURE_TYPE_MEMORY_BARRIER,nullptr,
+                                    VK_ACCESS_SHADER_WRITE_BIT,VK_ACCESS_HOST_READ_BIT};
+    vkCmdPipelineBarrier(commandBuffer,executionPolicy_.shaderPipelineStage,VK_PIPELINE_STAGE_HOST_BIT,
+                         0,1,&clockRead,0,nullptr,0,nullptr);
+#endif
     storageImageFrameRecorded_ = true;
     traceCopyScope.Complete(1u);
     if (observation != nullptr && observation->recordedScene != nullptr)

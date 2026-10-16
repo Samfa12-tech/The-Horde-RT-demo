@@ -1,5 +1,18 @@
 # Horde 1.7 current design index
 
+The [17 October dispatch investigation](../evidence/2026-10-17-rt-dispatch-investigation/README.md)
+adds a private sparse device-clock observer with six byte-identical frozen image
+pairs. Both ordinary observer routes retain13.59MiB saving/exact restoration;
+1,338clock rows and2,683total display/stage joins pass. Sampled composition is
+spread over traversal/filtering, hit/material decoding, visibility and surface
+work; it is not GPU-time attribution or an optimisation. Fresh controls stay
+within15% descriptive GPU changes, but Pipeline thermal mismatch prevents a
+causal overhead bound. Instrumented binaries exceed frozen production limits
+and are not admitted. Original stage-only phone APK is restored/stopped.
+Next bounded hypothesis: reuse the ray-query inverse transform in reusable PBR
+hit decoding, only after budgets, transform correctness, matched images and
+warm uninstrumented timing. No effect-removal or staged-primary replay.
+
 The [current baseline RT stage profile](../evidence/2026-10-16-baseline-rt-profile/README.md)
 reuses the30 September observer and prior resident/streamed controls instead of
 repeating failed experiments. Two physical ordinary cycles join1,345frames:

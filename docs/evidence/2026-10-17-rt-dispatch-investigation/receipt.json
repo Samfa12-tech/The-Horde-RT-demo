@@ -1,0 +1,9 @@
+{
+  "sha256": "9a049baeb605ec410fded4cc69b5b481507f1e9581ba862a550631da162fadbb",
+  "bytes": 78540610,
+  "scope": "Exact native-build snapshots and patch, generated observer shader source/selected modules/catalogs, compiler/static failures, all image pairs, four ordinary runs, raw clock witnesses, strict analysis, checks and test tools",
+  "apkIncluded": false,
+  "unrelatedDeviceInventoryIncluded": false,
+  "observerApkSha256": "29d2de014fbb12510e6003279c07bd19fed660a6d14b6abea2255f00a60e05e9",
+  "restoredControlApkSha256": "f13dda30ad56536a774004ee963c621aec2396f0a25179c490f32e72294fa527"
+}

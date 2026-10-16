@@ -1,5 +1,15 @@
 # Reusable region loading and streaming
 
+The [17 October dispatch observation](../evidence/2026-10-17-rt-dispatch-investigation/README.md)
+keeps the existing loading path/quality intact while sampling nested shader work.
+Six frozen image pairs are byte-identical. All four ordinary cycles still save
+13.59MiB and restore with zero readiness waits; the private observer adds655,424B
+to the existing metadata allocation, with no extra descriptor/region owner.
+Device-clock tick composition is not dispatch milliseconds or playable FPS.
+The observer exceeds unchanged shader budgets and compiles out by default;
+the original stage-only phone APK is restored. Baseline shader investigation,
+not broader unloading or one-off object changes, remains the next measured step.
+
 Current [baseline GPU stage attribution](../evidence/2026-10-16-baseline-rt-profile/README.md)
 retains the working ordinary cycle and13.59MiB saving/exact restoration on both
 phone backends. All1,345frames join; exterior shader dispatch137–142ms dominates

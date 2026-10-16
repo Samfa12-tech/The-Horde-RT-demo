@@ -1,0 +1,42 @@
+{
+  "baseHead": "a9283715d68f320627efdc32533df82aaf1c27b6",
+  "source": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\region-page-address-r10\\source",
+  "method": "32x32 stratified sparse exclusive device-clock ticks; no effect omissions",
+  "categories": [
+    "other",
+    "ray traversal/filter",
+    "hit decode/material",
+    "shadow visibility",
+    "surface/transport",
+    "fire volume",
+    "mist/electricity",
+    "dust"
+  ],
+  "productionBudgetSha256": "56936479b2d202dbdb9393ba94b66a1b0bc12d490b700d8af4c63de3460e53bf",
+  "notProductionBudgetAdmission": true,
+  "files": {
+    "shaders\\README.md": "9b68e260625a9cca7e6f20cf3b3eccad45589c48033ec8bf8dac1dfe2dc98efd",
+    "shaders\\raytracing\\minimal.comp": "939c98f3b09357a4bb6f6f800300fcc074bbcc8017d0a725bf2c1cc68aef3bf7",
+    "shaders\\raytracing\\minimal.legacy.rgen.spv": "0a38ad5f234bd102e6f49927673c7e203ab7d34799caa2e15cf5a45ce0d8f1e5",
+    "shaders\\raytracing\\minimal.rchit": "59a374fa105f231f9ade604212d731a475f07f22c723fff6b0e0089dd2cd2a37",
+    "shaders\\raytracing\\minimal.rgen": "66269120c6390be1d3b077fee7cf36791c8e9e626d307c457d326585312a50ae",
+    "shaders\\raytracing\\minimal.rgen.spv": "549bd1e88ef5225d85c30ea59964fb825f2c3cc9e75263b66b0a3e7415893db4",
+    "shaders\\raytracing\\minimal.rmiss": "7bcc1b7fbdcf1802ed80ec25ccae50f20e9e7239026d767c0e7ba5f110ada936",
+    "shaders\\raytracing\\README.md": "edb0fbd2fae39809b6f4806d643d471a1fa243f393051bea59e2159447a4ac2c",
+    "shaders\\raytracing\\experimental\\staged_primary_record.glsl": "caa851350ec1f14845ea3c59e63aa6ac820685dc42ec720cd7695124edecf5bc",
+    "shaders\\raytracing\\include\\rt_atmosphere.glsl": "b8a6c41931e945b09d9fe564ad8e9900e38b8ccff374a447022af65f79e1bace",
+    "shaders\\raytracing\\include\\rt_diagnostics.glsl": "50028bb601d18546110ea546de9c9dcee0cfad89a5520ef448756e43206f2bb4",
+    "shaders\\raytracing\\include\\rt_dielectric_common.glsl": "cfb57299dc0b2b9fddd61a4fbbe22bcfbba8591f75cca9e6f5415db963f2c0a3",
+    "shaders\\raytracing\\include\\rt_dielectric_spawn.glsl": "652200988024f3bdb5f61284474f5d6b34d0777743d2989ce342203bc7fbe5c7",
+    "shaders\\raytracing\\include\\rt_dielectric_transport.glsl": "10b109115a509ef2865e68b463f200f3df6c98d50f5834633435d0dfee7a17ae",
+    "shaders\\raytracing\\include\\rt_dispatch_clock.glsl": "d4208e08fabe8f70680145627080e518e5ae789980c8c059445d228da74fb79a",
+    "shaders\\raytracing\\include\\rt_fire.glsl": "c317394b76df786f8612b033bebcf26927300b27c9e79f484e2881553de25065",
+    "shaders\\raytracing\\include\\rt_frame.glsl": "a75c7c3e1bde2ec77c1759cf57c6c21847de6e3c2d4715fbc20fd36d1067108d",
+    "shaders\\raytracing\\include\\rt_hit_decode.glsl": "bfa42bb36e7d21ed2b5263a8a308da1b882d7016e4d88ee21695e383fa6c2117",
+    "shaders\\raytracing\\include\\rt_indoor_dust.glsl": "a30b95eb08663e6c030a40d260994b039fb6ea85f5e27f8130487e475d98e483",
+    "shaders\\raytracing\\include\\rt_lighting.glsl": "57891c46e0e018339a826ef1f3d523f79ca2a6e0fa8a4bd6911aee647b483d07",
+    "shaders\\raytracing\\include\\rt_scene_abi.generated.glsl": "d52e16622f5ecca41aea6a132ba448a2c63dace256068ee5e4930b732cacc9fb",
+    "shaders\\raytracing\\include\\rt_scene_abi.glsl": "467b95c024fcee6e0fb2224680f9555c944c705a6984b14afbd8f071e8ae4577",
+    "shaders\\raytracing\\include\\rt_variant_config.glsl": "b75a99a9c7789d0dc89c180d0c5918077d64274d08ec86fb523ae092318c3f5c"
+  }
+}

@@ -193,6 +193,14 @@ if (frameStageProbeValue != null && !(frameStageProbeValue in ['true', 'false'])
     throw new GradleException('hordeFrameStageProbe must be true or false.')
 }
 def frameStageProbe = frameStageProbeValue == 'true'
+def dispatchClockValue = providers.gradleProperty('hordeDispatchClockProbe').orNull
+if (dispatchClockValue != null && !(dispatchClockValue in ['true', 'false'])) {
+    throw new GradleException('hordeDispatchClockProbe must be true or false.')
+}
+def dispatchClockProbe = dispatchClockValue == 'true'
+if (dispatchClockProbe && !frameStageProbe) {
+    throw new GradleException('Dispatch clock observation requires the private frame stage profile.')
+}
 if (frameStageProbe && !chapterRouteTiming) {
     throw new GradleException('Frame stage profiling requires the private chapter route timing build.')
 }
@@ -575,6 +583,7 @@ android {
                     arguments '-DHORDE_RT_DEBUG_CHECKPOINTS=ON',
                         "-DHORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING=${chapterRouteTiming ? 'ON' : 'OFF'}",
                         "-DHORDE_RT_FRAME_STAGE_PROBE=${frameStageProbe ? 'ON' : 'OFF'}",
+                        "-DHORDE_RT_DISPATCH_CLOCK_PROBE=${dispatchClockProbe ? 'ON' : 'OFF'}",
                         "-DHORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=${viewmodelCandidate ? 'ON' : 'OFF'}",
                         *hordeRtNativePolicyArguments('Diagnostic'),
                         *hordeRtDebugStagedPrimaryArguments,

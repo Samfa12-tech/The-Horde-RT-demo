@@ -17,6 +17,9 @@
 #include "vulkan/raytracing/RtRegionGeometrySource.h"
 #include "world/streaming/GeometryPageTable.h"
 #endif
+#if HORDE_RT_DISPATCH_CLOCK_PROBE
+#include "vulkan/raytracing/RtDispatchClockProbe.h"
+#endif
 #include "vulkan/raytracing/RtGpuWorkLease.h"
 #include "scene/atmosphere/IndoorDust.h"
 #include "scene/DevelopmentWorldGeometry.h"
@@ -682,6 +685,11 @@ public:
     void PublishCompletedDiagnostic(
         const RtDiagnosticCounterPayload& payload) noexcept;
 
+#if HORDE_RT_DISPATCH_CLOCK_PROBE
+    std::uint32_t DispatchClockTicket() const noexcept { return dispatchClockTicket_; }
+    bool CollectDispatchClocks(std::uint32_t ticket,std::vector<RtDispatchClockSample>&,
+                              std::array<std::uint64_t,8>&,std::string&) const;
+#endif
     bool RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                             VkImage swapchainImage,
                             VkImageLayout& swapchainImageLayout,
@@ -1309,6 +1317,9 @@ private:
     HeldItemBlasMeasurements heldItemBlasMeasurements_{};
 
     RtPipelineBundle pipelineBundle_;
+#if HORDE_RT_DISPATCH_CLOCK_PROBE
+    std::uint32_t dispatchClockTicket_=0;
+#endif
 #ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
     std::unique_ptr<experimental::StagedPrimaryPass> stagedPrimary_;
 #endif

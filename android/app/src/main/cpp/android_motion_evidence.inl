@@ -453,6 +453,24 @@ void ObserveAndroidMotionCompletion(SwapchainContext& context, bool completed)
             if(matched)run.chapterCsv<<static_cast<std::uint64_t>(std::llround(stage.sample.milliseconds*1e6));
         }
 #endif
+#if HORDE_RT_DISPATCH_CLOCK_PROBE
+        std::vector<horde::vulkan::raytracing::RtDispatchClockSample> clockSamples;
+        std::array<std::uint64_t,8> clockTotals{};
+        std::string clockError;
+        const bool clocksValid=context.rtScene.CollectDispatchClocks(tag.clockTicket,clockSamples,clockTotals,clockError);
+        run.chapterCsv<<','<<(clocksValid?"valid":"unavailable-or-mismatched")<<','<<tag.clockTicket<<',';
+        if(clocksValid)run.chapterCsv<<clockSamples.size();
+        for(auto ticks:clockTotals){run.chapterCsv<<',';if(clocksValid)run.chapterCsv<<ticks;}
+        // A small raw witness per held view permits independent ticket/pixel/sum checks.
+        constexpr std::array<std::string_view,4> clockViews{"landing-sweep","lower-sweep","passage-sweep","repeat-ascent"};
+        for(unsigned i=0;i<clockViews.size();++i)if(clocksValid && !run.clockRawSaved[i] &&
+            clockViews[i]==horde::gameplay::validation::ChapterProbePhaseName(tag.phase) &&
+            tag.viewTicks>=180 && tag.viewTicks<=240) {
+            std::ofstream raw(run.path+"-clock-"+std::string(clockViews[i])+"-"+std::to_string(tag.serial)+".bin",std::ios::binary);
+            raw.write(reinterpret_cast<const char*>(clockSamples.data()),clockSamples.size()*sizeof(clockSamples.front()));
+            run.clockRawSaved[i]=bool(raw);
+        }
+#endif
         run.chapterCsv<<'\n';
         run.chapterLastReturnNs=tag.returnNs;
         run.chapterLastSerial=tag.serial;
@@ -535,6 +553,9 @@ void BuildAndroidMotionInput(SwapchainContext& context,
             run.chapterCsv<<"present_return_ns,interval_ns,serial,tick,phase,x,y,z,device_local_bytes,host_visible_bytes,omitted_triangles,unloads,restores,saved_owner_bytes,peak_overlap_bytes,wait_frames,yaw,pitch,view_ticks,detail_step_cpu_ns,run_unloads,run_restores"
 #if HORDE_RT_FRAME_STAGE_PROBE
                 <<",as_gpu_status,as_gpu_serial,as_gpu_ns,dispatch_gpu_status,dispatch_gpu_serial,dispatch_gpu_ns,transfer_gpu_status,transfer_gpu_serial,transfer_gpu_ns"
+#endif
+#if HORDE_RT_DISPATCH_CLOCK_PROBE
+                <<",clock_status,clock_ticket,clock_samples,clock_other,clock_trace,clock_material,clock_shadow,clock_surface,clock_fire,clock_mist,clock_dust"
 #endif
                 <<'\n';
             if(!run.chapterCsv){FailAndroidMotion(context,"Chapter resource ledger could not open.");return;}

@@ -53,6 +53,18 @@ target_compile_definitions(horde_rt_probe_android PRIVATE
 )
 target_compile_definitions(horde_rt_probe_android PRIVATE
     HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION=$<BOOL:${HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION}>)
+option(HORDE_RT_DISPATCH_CLOCK_PROBE "Private sparse per-invocation dispatch observation" OFF)
+if(NOT "${HORDE_RT_REGION_PAGE_PROTOTYPE_ROOT}" STREQUAL "" AND
+   EXISTS "${HORDE_RT_REGION_PAGE_PROTOTYPE_ROOT}/dispatch-clock-probe.json" AND
+   NOT HORDE_RT_DISPATCH_CLOCK_PROBE)
+    message(FATAL_ERROR "Private clock shader ABI requires its matching native observer.")
+endif()
+if(HORDE_RT_DISPATCH_CLOCK_PROBE AND (NOT HORDE_RT_FRAME_STAGE_PROBE OR
+   NOT EXISTS "${HORDE_RT_REGION_PAGE_PROTOTYPE_ROOT}/dispatch-clock-probe.json"))
+    message(FATAL_ERROR "Dispatch clocks require the explicit private stage/clock shader profile.")
+endif()
+target_compile_definitions(horde_rt_probe_android PRIVATE
+    HORDE_RT_DISPATCH_CLOCK_PROBE=$<BOOL:${HORDE_RT_DISPATCH_CLOCK_PROBE}>)
 option(HORDE_RT_FRAME_STAGE_PROBE "Private chapter GPU AS/dispatch/transfer observation" OFF)
 if(HORDE_RT_FRAME_STAGE_PROBE AND NOT HORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING)
     message(FATAL_ERROR "Frame stage profiling requires private chapter route timing.")

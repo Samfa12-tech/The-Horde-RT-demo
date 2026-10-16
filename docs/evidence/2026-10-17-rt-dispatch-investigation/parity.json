@@ -1,0 +1,42 @@
+{
+  "exactDecodedRgbParity": true,
+  "views": [
+    {
+      "name": "pipeline-chapter-forest-second-bend.png",
+      "changedPixels": 0,
+      "totalPixels": 4492800,
+      "bounds": null
+    },
+    {
+      "name": "pipeline-chapter-keeper-death-retired.png",
+      "changedPixels": 0,
+      "totalPixels": 4492800,
+      "bounds": null
+    },
+    {
+      "name": "pipeline-chapter-landing-south.png",
+      "changedPixels": 0,
+      "totalPixels": 4492800,
+      "bounds": null
+    },
+    {
+      "name": "query-chapter-forest-second-bend.png",
+      "changedPixels": 0,
+      "totalPixels": 4492800,
+      "bounds": null
+    },
+    {
+      "name": "query-chapter-keeper-death-retired.png",
+      "changedPixels": 0,
+      "totalPixels": 4492800,
+      "bounds": null
+    },
+    {
+      "name": "query-chapter-landing-south.png",
+      "changedPixels": 0,
+      "totalPixels": 4492800,
+      "bounds": null
+    }
+  ],
+  "scope": "Six full 1440x3120 frozen app screenshots, three scenes per hardware RT backend; identical camera/time/output settings; no tolerance"
+}

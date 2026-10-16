@@ -1,5 +1,6 @@
 #include "vulkan/GpuFrameTimer.h"
 #include "vulkan/raytracing/RtSceneGpuStageProbe.h"
+#include "vulkan/raytracing/RtDispatchClockProbe.h"
 
 #include <array>
 #include <cstdint>
@@ -253,6 +254,29 @@ int main()
     const auto retained=timer.CollectCompleted(0);
     context.Check(retained.hasSample && retained.submissionSequence==900,
                   "recording guard must not cancel queries owned by submitted GPU work");
+
+    {
+        using namespace horde::vulkan::raytracing;
+        context.Check(DispatchClockAxisSamples(16)==0 && DispatchClockAxisSamples(17)==1 &&
+            DispatchClockAxisSamples(576)==18 && DispatchClockAxisSamples(1188)==37,
+            "sparse clock grid must match exact selected pixel centers");
+        std::array<RtDispatchClockSample,2> samples{};
+        samples[0].tag={7,16,16,0};samples[1].tag={7,48,16,1};
+        samples[0].ticks[1]={4,1};samples[1].ticks[1]={8,0};
+        std::array<std::uint64_t,8> totals{};
+        context.Check(SummarizeDispatchClock(samples,7,64,32,totals) && totals[1]==(1ull<<32)+12,
+            "clock sums must preserve both halves, instance miss and exact pixels");
+        samples[1].tag[0]=6;
+        context.Check(!SummarizeDispatchClock(samples,7,64,32,totals),"stale recording ticket rejected");
+        samples[1].tag[0]=7;samples[1].tag[1]=16;
+        context.Check(!SummarizeDispatchClock(samples,7,64,32,totals),"duplicate/wrong sample pixel rejected");
+        samples[1].tag[1]=48;
+        context.Check(!SummarizeDispatchClock(std::span(samples).first(1),7,64,32,totals),"missing clock sample rejected");
+        samples[0].ticks[1]={0xffffffffu,0xffffffffu};
+        context.Check(!SummarizeDispatchClock(samples,7,64,32,totals),"aggregate overflow rejected");
+        samples[0].ticks[1]={};samples[1].ticks[1]={};
+        context.Check(!SummarizeDispatchClock(samples,7,64,32,totals),"all-zero unavailable clock rejected");
+    }
 
     if (context.failures == 0)
     {

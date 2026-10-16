@@ -1,0 +1,38 @@
+[
+  {
+    "key": "shipping_mobile_opaque_fast",
+    "sha256": "02c16db69893515028c1fc0d1e2c81ed07bc57b3fd502342d15e0a1020a15762",
+    "bytes": 625484,
+    "words": 156371,
+    "clockSites": 86,
+    "querySites": 27,
+    "productionBudgetAdmission": false
+  },
+  {
+    "key": "rayquery_compute_shipping_mobile_opaque_fast",
+    "sha256": "95e22328500de6f28ac0ffc84249f1fa2a51f87ee4c5edc49db62939a0c676ba",
+    "bytes": 626668,
+    "words": 156667,
+    "clockSites": 86,
+    "querySites": 27,
+    "productionBudgetAdmission": false
+  },
+  {
+    "key": "shipping_mobile_generic_dielectric",
+    "sha256": "dfca6ef194db29a06e5c1902608fd09833f6599d89007922f9288772c8d6838f",
+    "bytes": 294324,
+    "words": 73581,
+    "clockSites": 2,
+    "querySites": 2,
+    "productionBudgetAdmission": false
+  },
+  {
+    "key": "rayquery_compute_shipping_mobile_generic_dielectric",
+    "sha256": "161941731dfda7299395043e6a174190e994e88dca80518e1d68bafba887a62b",
+    "bytes": 294532,
+    "words": 73633,
+    "clockSites": 2,
+    "querySites": 2,
+    "productionBudgetAdmission": false
+  }
+]

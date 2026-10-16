@@ -1,5 +1,25 @@
 # Android RT Device Compatibility Record
 
+## 17 October sparse dispatch-clock observation — SM-S948B / Android17
+
+Evidence class: **owner-authorized private Debug/O2 observer install/pullback,
+six exact frozen image pairs, four ordinary routes and strict owned GPU/stage/
+clock/actual-display joins**. [Exact inputs/results](evidence/2026-10-17-rt-dispatch-investigation/README.md).
+Observer29d2de014fbb12510e6003279c07bd19fed660a6d14b6abea2255f00a60e05e9;
+raw modelSM-S948B/API37/Adreno840/Vulkan1.4.295. Saved40%/Current unchanged.
+Native-checked/enabled shaderDeviceClock produces1,338valid per-frame sparse
+records (666invocations/frame);2,683total completed frames have display/stage
+joins. All six full frozen PNG pairs are byte-identical on both RT backends.
+Composition is sampled implementation-defined ticks, not GPU milliseconds,
+utilisation or a production speedup. Query starts match within0.9°C/status0;
+Pipeline control is warmer/status1, leaving its causal overhead unbounded.
+13.59MiB unload/exact restoration and zero waits remain; observation adds655,424B
+constant metadata allocation. Instrumented modules exceed unchanged production
+budgets and are not admitted. Default builds compile out the observer. Original
+stage-only APKf13dda30…fa527 restored/pullback verified; preferences identical,
+Debug stopped, release untouched. Smooth-play, Current/Higher and Lower→Current
+physical acceptance remain open.
+
 ## 16 October baseline stage profile — SM-S948B / Android17
 
 Evidence class: **owner-authorized exact Debug/O2 install/pullback, Shipping/Mobile

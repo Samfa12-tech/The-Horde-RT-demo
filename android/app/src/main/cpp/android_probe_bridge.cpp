@@ -253,11 +253,17 @@ struct AndroidMotionRun
         std::uint64_t detailCpuNs=0;
 #if HORDE_RT_FRAME_STAGE_PROBE
         std::array<bool,3> stageSubmitted{};
+#if HORDE_RT_DISPATCH_CLOCK_PROBE
+        std::uint32_t clockTicket=0;
+#endif
 #endif
     };
     std::array<ChapterTag,kMaxFramesInFlight> chapterTags{};
     horde::vulkan::raytracing::PresentableTinyRtScene::OrdinaryStaticDetailMeasurements chapterBaseline;
     std::uint64_t chapterDetailCpuNs=0;
+#if HORDE_RT_DISPATCH_CLOCK_PROBE
+    std::array<bool,4> clockRawSaved{};
+#endif
     float chapterCameraYaw=0,chapterCameraPitch=0;
     std::ofstream chapterCsv;
     std::uint64_t chapterLastReturnNs=0,chapterLastSerial=0;
@@ -2500,6 +2506,19 @@ bool CreateLogicalDevice(VkPhysicalDevice physicalDevice,
         features2.pNext = &presentFeatures;
     }
 
+#if HORDE_RT_DISPATCH_CLOCK_PROBE
+    if(!HasDeviceExtension(physicalDevice,VK_KHR_SHADER_CLOCK_EXTENSION_NAME))return false;
+    VkPhysicalDeviceShaderClockFeaturesKHR clocks{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_CLOCK_FEATURES_KHR};
+    VkPhysicalDeviceFeatures2 clockSupport{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2,&clocks};
+    auto getClockFeatures=reinterpret_cast<PFN_vkGetPhysicalDeviceFeatures2>(
+        vkGetInstanceProcAddr(instance,"vkGetPhysicalDeviceFeatures2"));
+    if(!getClockFeatures)return false;
+    getClockFeatures(physicalDevice,&clockSupport);
+    if(!clocks.shaderDeviceClock)return false;
+    clocks.shaderSubgroupClock=VK_FALSE;
+    clocks.pNext=features2.pNext;features2.pNext=&clocks;
+    extensions.push_back(VK_KHR_SHADER_CLOCK_EXTENSION_NAME);
+#endif
     const VkDeviceCreateInfo createInfo{
         VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
         enableRayTracing || presentCompletionMode != horde::vulkan::PresentCompletionMode::Unextended ? &features2 : nullptr,
@@ -4619,6 +4638,9 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                      context.motion->chapterCameraYaw,context.motion->chapterCameraPitch,context.motion->scenario.ChapterViewTicks(),
                      context.motion->chapterDetailCpuNs};
 #if HORDE_RT_FRAME_STAGE_PROBE
+#if HORDE_RT_DISPATCH_CLOCK_PROBE
+                tag.clockTicket=context.rtScene.DispatchClockTicket();
+#endif
                 for(unsigned i=0;i<context.frameStageTimers.size();++i)
                     tag.stageSubmitted[i]=frameStageProbe.recorded[i] &&
                         context.frameStageTimers[i].MarkSubmitted(context.currentFrame,owner.submissionSerial);
