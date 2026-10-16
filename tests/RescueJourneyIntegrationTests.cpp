@@ -10,6 +10,7 @@
 #include "gameplay/validation/ChapterRoundTripProbe.h"
 #include "gameplay/validation/ChapterRouteMeasurementClock.h"
 #include "gameplay/validation/ChapterRouteHostPhases.h"
+#include "gameplay/validation/MotionEvidenceScenario.h"
 #include <cmath>
 #include <numeric>
 #include <iostream>
@@ -186,6 +187,40 @@ int main(int argc,char** argv) {
     for(unsigned phase=0;phase<static_cast<unsigned>(ChapterProbePhase::Complete);++phase)
         check(seen[phase],"probe skipped a required moving journey phase");
     std::cout<<"native-terrain moving probe frames="<<frames<<'\n';
+   }
+   for(unsigned ticksPerFrame:{1u,3u,4u,6u,5u}) {
+    const auto selected=ticksPerFrame==5?MotionScenario::ChapterStreamingCycle:MotionScenario::ChapterRoundTrip;
+    GameSimulation phone(captureConfig);
+    for(std::size_t zone=1;zone<kWorldZones.size();++zone)
+     phone.PublishChapterTerrain({phone.Snapshot().worldRoute.generation,static_cast<WorldZoneId>(zone)},terrain);
+    check(StageDevelopmentCheckpointSimulation(phone,*reunion),"phone motion requires existing admitted reunion");
+    MotionEvidenceScenario motion;
+    std::uint64_t now=1'000'000'000ull;unsigned frame=0;
+    const auto generation=phone.Snapshot().worldRoute.generation,tick=phone.Snapshot().tickIndex;
+    check(motion.Begin(selected,phone,now) &&
+          phone.Snapshot().worldRoute.generation==generation && phone.Snapshot().tickIndex==tick,
+          "phone route admission must not reseed or mutate the existing rendered chapter");
+    for(unsigned n=0;n<3;++n) {
+     const auto command=motion.BuildInput(phone.Snapshot(),{},now,false);
+     check(command.paused && command.moveForward==0,"phone route cannot move before real current presentation");
+    }
+    InputSnapshot published;
+    while(++frame<8000 && !motion.Complete() && !motion.Failed()) {
+     now+=ticksPerFrame*16'666'667ull;
+     const auto command=motion.BuildInput(phone.Snapshot(),published,now,true);
+     check(!command.hasAuthoritativePlayerPose && !command.commands.attack && !command.commands.dodge,
+           "phone chapter measurement must use ordinary movement/context input");
+     phone.AdvanceFrame(command,static_cast<double>(ticksPerFrame)/60,frame);
+     motion.ObserveAdvance(phone.Snapshot(),phone.Events().Events());phone.ClearEvents();
+     phone.AcknowledgeChapterPresentation(phone.Snapshot().tickIndex,phone.Snapshot().chapterDialogue.generation);
+    }
+    std::cout<<"phone chapter mode="<<MotionScenarioName(selected)<<" ticks/frame="<<ticksPerFrame<<" frames="<<frame<<" stage="<<MotionStageName(motion.Stage())
+             <<" phase="<<ChapterProbePhaseName(motion.ChapterPhase())<<" failure="<<motion.Failure()<<'\n';
+    check(motion.Complete() && phone.Snapshot().rescue.sawDescent && phone.Snapshot().rescue.exteriorSide,
+          "phone wall-clock multi-tick route must complete descent, passage and return ascent");
+    MotionEvidenceScenario invalidMotion;
+    GameSimulation wrong(captureConfig);
+    check(!invalidMotion.Begin(MotionScenario::ChapterRoundTrip,wrong,now),"unready phone chapter cannot be fabricated by measurement");
    }
    ChapterRoundTripProbe invalid;
    auto bad=state;bad.rescue.equipmentStowed=true;

@@ -1,5 +1,19 @@
 # Horde 1.7 current design index
 
+The [physical phone streaming checkpoint](../evidence/2026-10-16-phone-streaming-cycle/README.md)
+proves one ordinary certified forest-detail unload/reload on both RT backends:
+13.59MiB device-local saving, exact restoration,12.85MiB observed peak above full
+and zero readiness waits. Owner-approved APK a6b7a00c…8b33d76 uses Debug/O2 native
+code and Shipping/Mobile private shaders at the unchanged saved40%/Current settings.
+All521/530 completed frames join actual display timestamps. This closes the focused
+residency cycle, **not smooth-play or full-chapter acceptance**: median presentation
+interval83ms, max167/163ms,139/141 simulation overruns. Both longer routes failed
+the unchanged120s limit before unloading; their119.9s timing/failure evidence is
+retained. Default builds disable the explicit route/timing profile; production
+page adoption remains gated. Next compare resident versus paged mobile views to
+attribute rendering/transition cost, without weakening quality or budgets.
+Original preferences match byte-for-byte; owned Debug is stopped; release untouched.
+
 The [mobile region-source correction](../evidence/2026-10-16-mobile-region-source-admission/README.md)
 closes the reproduced private chapter-start failure caused by legitimate unused
 quality-profile backing indices. Strict partition ownership, active geometry,

@@ -1,5 +1,14 @@
 # Reusable region loading and streaming
 
+Latest measured slice: the [16 October phone cycles](../evidence/2026-10-16-phone-streaming-cycle/README.md)
+close one ordinary two-way private page residency path on both real RT backends:
+13.59MiB actual device-local saving, exact restoration,12.85MiB observed peak above
+full, zero readiness waits. This is cached-source loading, not package I/O. Smooth
+mobile play remains blocked (83ms median focused presentation intervals and frame
+clock overruns); longer full routes hit their120s deadline before unloading.
+Keep production unchanged pending matched mobile baseline/transition attribution,
+broader lifecycle/pressure and coverage checks. No phone budget is inferred.
+
 Current authority: the owner's14 October direction is the **engine loading system**,
 using the existing chapter for validation. No new world art is requested. The world
 should support continuous travel on connecting paths, persistent coarse terrain and

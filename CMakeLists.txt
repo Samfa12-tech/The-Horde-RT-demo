@@ -1491,7 +1491,8 @@ if(BUILD_TESTING)
 endif()
 
 if(BUILD_TESTING AND TARGET horde_rt_probe_core)
-    add_executable(horde_rt_rescue_journey_integration_tests tests/RescueJourneyIntegrationTests.cpp)
+    add_executable(horde_rt_rescue_journey_integration_tests tests/RescueJourneyIntegrationTests.cpp
+        src/gameplay/validation/MotionEvidenceScenario.cpp)
     target_link_libraries(horde_rt_rescue_journey_integration_tests PRIVATE horde_rt_probe_core)
     target_compile_definitions(horde_rt_rescue_journey_integration_tests PRIVATE HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
     add_test(NAME horde_rt_rescue_journey_integration_tests COMMAND horde_rt_rescue_journey_integration_tests)

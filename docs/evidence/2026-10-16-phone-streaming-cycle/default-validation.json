@@ -1,0 +1,11 @@
+{
+  "java": {
+    "tests": 286,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "suiteCount": 45,
+  "defaultApkSha256": "f5af3915ee07479cea15192d752a6ace771da4dc4924e3589c0fd98a6aca0e08",
+  "installed": false
+}

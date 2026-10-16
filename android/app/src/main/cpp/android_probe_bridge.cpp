@@ -75,7 +75,7 @@
 #include "vulkan/RtCapabilityReport.h"
 #include "vulkan/VulkanContext.h"
 #include "vulkan/PresentCompletion.h"
-#if HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION
+#if HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION || HORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING
 #include "vulkan/PresentTimingEvidence.h"
 #endif
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
@@ -244,6 +244,15 @@ void DestroyAndroidCompiledPipelineObjects(
 #if HORDE_RT_ANDROID_MOTION_EVIDENCE
 struct AndroidMotionRun
 {
+    struct ChapterTag {
+        std::uint64_t serial=0,returnNs=0;
+        horde::gameplay::validation::ChapterProbePhase phase{};
+        horde::vulkan::raytracing::PresentableTinyRtScene::OrdinaryStaticDetailMeasurements detail;
+        float x=0,y=0,z=0;
+    };
+    std::array<ChapterTag,kMaxFramesInFlight> chapterTags{};
+    std::ofstream chapterCsv;
+    std::uint64_t chapterLastReturnNs=0,chapterLastSerial=0;
     horde::gameplay::validation::MotionEvidenceScenario scenario;
     horde::gameplay::validation::MotionScenario selected{};
     horde::telemetry::MotionEvidenceLedger ledger;
@@ -264,7 +273,7 @@ struct AndroidMotionRun
     bool equipmentSeedActive = false;
     bool terminalTimingDrainPending = false;
     std::uint64_t terminalTimingDrainStartedNs = 0u;
-#if HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION
+#if HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION || HORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING
     std::size_t timingRowBaseline = 0u;
     horde::vulkan::PresentTimingEvidence::Counters timingCountersBaseline{};
 #endif
@@ -349,7 +358,7 @@ struct SwapchainContext
     horde::vulkan::PresentCompletionMode presentCompletionMode = horde::vulkan::PresentCompletionMode::Unextended;
     horde::vulkan::PresentCompletionFences presentCompletionFences;
     bool presentTimingExtensionEnabled = false;
-#if HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION
+#if HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION || HORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING
     std::unique_ptr<horde::vulkan::PresentTimingEvidence> presentTiming;
     std::uint64_t presentTimingPollCpuNs = 0u;
 #endif
@@ -1198,7 +1207,7 @@ horde::reporting::OwnedPlaytestReportContext PlaytestContextOnRenderOwner(const 
         context.capabilities.performance.internalRenderHeight, context.capabilities.rtScene.presented};
 }
 
-#if HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION
+#if HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION || HORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING
 void PollPresentTimingOnOwner(SwapchainContext& context)
 {
     if (!context.presentTiming || !context.presentTiming->Bound()) return;
@@ -1635,7 +1644,7 @@ void FinishInAppBenchmark(SwapchainContext& context)
         context.stagedPassProfile.Json(context.benchmarkEvidence.ExpectedCount(), context.stagedPassTimer,
                                       context.rtScene.ExecutionOrganisationJson()));
 #endif
-#if HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION
+#if HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION || HORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING
     PollPresentTimingOnOwner(context); // Asynchronous; unresolved tail stays explicit.
     const auto closingBrace = json.find_last_of('}');
     if (closingBrace != std::string::npos)
@@ -2427,7 +2436,7 @@ bool CreateLogicalDevice(VkPhysicalDevice physicalDevice,
     if (const auto* completionExtension = horde::vulkan::PresentCompletionExtension(presentCompletionMode))
         extensions.push_back(completionExtension);
     presentTimingExtensionEnabled = false;
-#if HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION
+#if HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION || HORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING
     // Investigation-only capability. Never a rendering/backend requirement.
     presentTimingExtensionEnabled = HasDeviceExtension(physicalDevice, VK_GOOGLE_DISPLAY_TIMING_EXTENSION_NAME);
     if (presentTimingExtensionEnabled) extensions.push_back(VK_GOOGLE_DISPLAY_TIMING_EXTENSION_NAME);
@@ -2789,7 +2798,7 @@ bool CreateSwapchain(SwapchainContext& context)
     if (!context.presentCompletionFences.Create(context.device, context.swapchainImages.size(),
         context.presentCompletionMode != horde::vulkan::PresentCompletionMode::Unextended)) return false;
 
-#if HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION
+#if HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION || HORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING
     if (context.presentTiming) (void)context.presentTiming->BindSwapchain(context.device, context.swapchain, context.surfaceGeneration);
 #endif
     return true;
@@ -2922,7 +2931,7 @@ bool ReleaseSwapchainResources(SwapchainContext& context)
 
     if (context.swapchain != VK_NULL_HANDLE)
     {
-#if HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION
+#if HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION || HORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING
         PollPresentTimingOnOwner(context);
         if (context.presentTiming) context.presentTiming->UnbindSwapchain();
         (void)WriteTextFile(context.reportDirectory + "/HordeLanternRT-present-timing-latest.json", PresentTimingJson(context));
@@ -3665,7 +3674,7 @@ bool DestroySwapchainContext(SwapchainContext& context)
     }
     if (context.swapchain != VK_NULL_HANDLE)
     {
-#if HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION
+#if HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION || HORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING
         PollPresentTimingOnOwner(context);
         if (context.presentTiming) context.presentTiming->UnbindSwapchain();
         (void)WriteTextFile(context.reportDirectory + "/HordeLanternRT-present-timing-latest.json", PresentTimingJson(context));
@@ -4553,6 +4562,12 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
             if (!context.rtFrameEvidence.TryGetCommittedIdentity(context.currentFrame, owner) ||
                 !context.motion->ledger.BindSubmittedFrame(context.surfaceGeneration, owner))
                 FailAndroidMotion(context, "Motion frame could not bind its actual submitted simulation owner.");
+            else if(horde::gameplay::validation::IsChapterMotionScenario(context.motion->selected)) {
+                auto& tag=context.motion->chapterTags[context.currentFrame];
+                const auto& state=gGameSimulation.Snapshot();
+                tag={owner.submissionSerial,0,context.motion->scenario.ChapterPhase(),
+                     context.rtScene.OrdinaryStaticDetailEvidence(),state.playerX,state.playerSupportWorldY,state.playerZ};
+            }
         }
 #endif
 #if HORDE_RT_STAGED_PRIMARY_TIMING
@@ -4587,7 +4602,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
     presentInfo.swapchainCount = 1u;
     presentInfo.pSwapchains = &context.swapchain;
     presentInfo.pImageIndices = &imageIndex;
-#if HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION
+#if HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION || HORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING
     VkPresentTimeGOOGLE measuredPresentTime{};
     VkPresentTimesInfoGOOGLE measuredPresentInfo{VK_STRUCTURE_TYPE_PRESENT_TIMES_INFO_GOOGLE};
     horde::telemetry::RtSubmittedFrameIdentity measuredFrame{};
@@ -4649,7 +4664,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
     presentScope.Complete(1u, 0u, 1u);
     wholeFrameScope.Complete(1u, 0u, 1u);
     const auto presentDone = std::chrono::steady_clock::now();
-#if HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION
+#if HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION || HORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING
     if (measuredPresent)
     {
         horde::vulkan::PresentTimingFrameMetadata metadata;
@@ -5165,12 +5180,21 @@ void SwapchainRenderLoop()
             }
             if (applied) context.graphicsSettings = graphicsCommand.requested;
         }
-#if HORDE_RT_ANDROID_MOTION_VALIDATION
+#if HORDE_RT_ANDROID_MOTION_EVIDENCE
         if (gSwapchainContext.motion && gSwapchainContext.motion->terminalTimingDrainPending)
         {
+#if HORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING
+            if(horde::gameplay::validation::IsChapterMotionScenario(gSwapchainContext.motion->selected))
+                PollAndroidChapterTerminalTimingDrain(gSwapchainContext);
+            else
+#endif
+            {
+#if HORDE_RT_ANDROID_MOTION_VALIDATION
             if (gInAppBenchmarkCancelRequested.exchange(false, std::memory_order_acq_rel))
                 CancelActiveInAppBenchmark(gSwapchainContext);
             PollAndroidMotionTerminalTimingDrain(gSwapchainContext);
+#endif
+            }
             const auto pollFinished = std::chrono::steady_clock::now();
             previousFrameStart = pollFinished;
             gSwapchainContext.lastInputOwnerSteadyNs = GraphicsSteadyNs();
@@ -5503,7 +5527,7 @@ bool StartSurfaceInternal(ANativeWindow* window,
         DestroySwapchainContext(context);
         return false;
     }
-#if HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION
+#if HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION || HORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING
     if (context.presentTimingExtensionEnabled)
     {
         const auto timingQuery = reinterpret_cast<PFN_vkGetPastPresentationTimingGOOGLE>(
@@ -6846,6 +6870,9 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestDebugMotionEvidence(
     const std::string id(idText);
     env->ReleaseStringUTFChars(runId, idText);
     if (!admitted || !horde::platform::android::AndroidMotionRunIdValid(id)) return JNI_FALSE;
+#if !HORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING
+    if(horde::gameplay::validation::IsChapterMotionScenario(scenario))return JNI_FALSE;
+#endif
     std::lock_guard<std::mutex> admissionLock(gDebugRequestAdmissionMutex);
     if (!horde::platform::android::CanRequestCombatPractice(
             ReadDebugRequestAdmissionStateLocked())) return JNI_FALSE;

@@ -1,0 +1,331 @@
+{
+  "scope": "Focused ordinary phone forest-detail unload/reload, exact completed-frame resources and actual display timing; full routes remain failed and smoothness/thermal acceptance open",
+  "apkSha256": "a6b7a00ccd813bc903250079926970f03096ff7436fb4f50c117e86b58b33d76",
+  "settingsByteIdentical": true,
+  "ownedDebugStopped": true,
+  "releaseAppUntouched": true,
+  "runs": {
+    "pipeline": {
+      "eligibleResidencyCycle": true,
+      "fullDeviceLocalBytes": 160831232,
+      "reducedDeviceLocalBytes": 146581568,
+      "restoredDeviceLocalBytes": 160831232,
+      "savingBytes": 14249664,
+      "observedPeakDeviceLocalBytes": 174307392,
+      "observedPeakAboveFullBytes": 13476160,
+      "fullHostVisibleBytes": 48121792,
+      "reducedHostVisibleBytes": 40880640,
+      "observedPeakHostVisibleBytes": 48121792,
+      "omittedTriangles": 84219,
+      "unloads": 1,
+      "restores": 1,
+      "waitFrames": 0,
+      "transitions": [
+        {
+          "phase": "tomb-backtrack",
+          "serial": 324,
+          "tick": 2684,
+          "elapsedSeconds": 23.187358532,
+          "unloads": 1,
+          "restores": 0,
+          "windowSamples": 27,
+          "windowMaximumIntervalMs": 83.333333
+        },
+        {
+          "phase": "rope-return",
+          "serial": 482,
+          "tick": 3308,
+          "elapsedSeconds": 33.599858789,
+          "unloads": 1,
+          "restores": 1,
+          "windowSamples": 23,
+          "windowMaximumIntervalMs": 95.833333
+        }
+      ],
+      "timing": {
+        "eligible": true,
+        "reportSha256": "ac8e86853afcbe88bb63b1ab148ec206d37ca4046e3931376bfe1c9da697a5ab",
+        "runId": "phone-cycle-pipeline-r02",
+        "workload": "motion-chapter-streaming-cycle-v1",
+        "buildId": "1.6.2",
+        "settings": {
+          "scalePercent": 40,
+          "width": 1440,
+          "height": 2971,
+          "internalWidth": 576,
+          "internalHeight": 1188,
+          "backend": "RayTracingPipeline",
+          "water": 1,
+          "fire": 0,
+          "cap": 30,
+          "glass": false,
+          "shadow": 1,
+          "mist": true,
+          "dust": 1
+        },
+        "scope": {
+          "surfaceGeneration": 1,
+          "sceneEpoch": 3,
+          "measurementGeneration": 5,
+          "matchedCompletedFrames": 521,
+          "intervalCount": 520,
+          "durationNanoseconds": 45462359045,
+          "setupPresentationRowsExcluded": 80
+        },
+        "intervalsNanoseconds": {
+          "median": 83333333,
+          "p90NearestRank": 133333333,
+          "p95NearestRank": 141666666,
+          "maximum": 166597239,
+          "over33333000Nanoseconds": 520,
+          "over250000000Nanoseconds": 0
+        },
+        "observedPresentedImageRatePerSecond": 11.438034,
+        "simulation": {
+          "stateRows": 521,
+          "eventRows": 48,
+          "ticksThisFrameMaximum": 6,
+          "catchUpOverrunCountFirst": 0,
+          "catchUpOverrunCountLast": 139,
+          "catchUpOverrunDelta": 139
+        },
+        "collector": {
+          "runCounterDelta": {
+            "preparedPresents": 521,
+            "acceptedPresents": 521,
+            "rejectedPresents": 0,
+            "invalidRegistrations": 0,
+            "invalidMetadata": 0,
+            "pendingCapacityExhausted": 0,
+            "queryCalls": 1033,
+            "queryErrors": 0,
+            "incompleteQueries": 0,
+            "zeroPresentTimestamps": 0,
+            "zeroPresentIds": 0,
+            "unknownPresentIds": 0,
+            "duplicateTimings": 0,
+            "rowCapacityExhausted": 0,
+            "missingOnRebind": 0,
+            "missingOnUnbind": 0,
+            "abandonedPreparedPresents": 0
+          },
+          "queryCpuWallNanoseconds": 8299791,
+          "presentMarginAtLeast2Pow63CountIgnored": 521
+        },
+        "limits": [
+          "Bounded ordinary chapter traversal with zero mid-route image readbacks; recorder overhead remains.",
+          "One continuous resource scope; retry/rotation/lifecycle discontinuities require separate evidence.",
+          "Actual inter-present intervals; not sustained FPS, scanout, photons, GPU reciprocal time, touch latency or owner acceptance.",
+          "Trace extents are native resource observations; this analyzer does not certify appearance, thermals or power."
+        ]
+      },
+      "thermalBefore": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 33.7,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 30.7,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 32.8,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "thermalAfter": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 40.5,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 34.4,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 37.3,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      }
+    },
+    "query": {
+      "eligibleResidencyCycle": true,
+      "fullDeviceLocalBytes": 160830720,
+      "reducedDeviceLocalBytes": 146581056,
+      "restoredDeviceLocalBytes": 160830720,
+      "savingBytes": 14249664,
+      "observedPeakDeviceLocalBytes": 174306880,
+      "observedPeakAboveFullBytes": 13476160,
+      "fullHostVisibleBytes": 48121280,
+      "reducedHostVisibleBytes": 40880128,
+      "observedPeakHostVisibleBytes": 48121280,
+      "omittedTriangles": 84219,
+      "unloads": 1,
+      "restores": 1,
+      "waitFrames": 0,
+      "transitions": [
+        {
+          "phase": "tomb-backtrack",
+          "serial": 464,
+          "tick": 2682,
+          "elapsedSeconds": 23.149623846,
+          "unloads": 1,
+          "restores": 0,
+          "windowSamples": 26,
+          "windowMaximumIntervalMs": 83.333385
+        },
+        {
+          "phase": "rope-return",
+          "serial": 625,
+          "tick": 3310,
+          "elapsedSeconds": 33.628790717,
+          "unloads": 1,
+          "restores": 1,
+          "windowSamples": 23,
+          "windowMaximumIntervalMs": 100.000001
+        }
+      ],
+      "timing": {
+        "eligible": true,
+        "reportSha256": "7745960de5b9b48cb61ba85feb55fe000028c42ed35f2313e7c6bd789ae73eac",
+        "runId": "phone-cycle-query-r02",
+        "workload": "motion-chapter-streaming-cycle-v1",
+        "buildId": "1.6.2",
+        "settings": {
+          "scalePercent": 40,
+          "width": 1440,
+          "height": 2971,
+          "internalWidth": 576,
+          "internalHeight": 1188,
+          "backend": "RayQueryCompute",
+          "water": 1,
+          "fire": 0,
+          "cap": 30,
+          "glass": false,
+          "shadow": 1,
+          "mist": true,
+          "dust": 1
+        },
+        "scope": {
+          "surfaceGeneration": 1,
+          "sceneEpoch": 3,
+          "measurementGeneration": 6,
+          "matchedCompletedFrames": 530,
+          "intervalCount": 529,
+          "durationNanoseconds": 45387124306,
+          "setupPresentationRowsExcluded": 215
+        },
+        "intervalsNanoseconds": {
+          "median": 83333332,
+          "p90NearestRank": 133333385,
+          "p95NearestRank": 141666667,
+          "maximum": 162500105,
+          "over33333000Nanoseconds": 529,
+          "over250000000Nanoseconds": 0
+        },
+        "observedPresentedImageRatePerSecond": 11.655288,
+        "simulation": {
+          "stateRows": 530,
+          "eventRows": 48,
+          "ticksThisFrameMaximum": 6,
+          "catchUpOverrunCountFirst": 0,
+          "catchUpOverrunCountLast": 141,
+          "catchUpOverrunDelta": 141
+        },
+        "collector": {
+          "runCounterDelta": {
+            "preparedPresents": 530,
+            "acceptedPresents": 530,
+            "rejectedPresents": 0,
+            "invalidRegistrations": 0,
+            "invalidMetadata": 0,
+            "pendingCapacityExhausted": 0,
+            "queryCalls": 1058,
+            "queryErrors": 0,
+            "incompleteQueries": 0,
+            "zeroPresentTimestamps": 0,
+            "zeroPresentIds": 0,
+            "unknownPresentIds": 0,
+            "duplicateTimings": 0,
+            "rowCapacityExhausted": 0,
+            "missingOnRebind": 0,
+            "missingOnUnbind": 0,
+            "abandonedPreparedPresents": 0
+          },
+          "queryCpuWallNanoseconds": 12843203,
+          "presentMarginAtLeast2Pow63CountIgnored": 530
+        },
+        "limits": [
+          "Bounded ordinary chapter traversal with zero mid-route image readbacks; recorder overhead remains.",
+          "One continuous resource scope; retry/rotation/lifecycle discontinuities require separate evidence.",
+          "Actual inter-present intervals; not sustained FPS, scanout, photons, GPU reciprocal time, touch latency or owner acceptance.",
+          "Trace extents are native resource observations; this analyzer does not certify appearance, thermals or power."
+        ]
+      },
+      "thermalBefore": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 39.7,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 33.9,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 36.8,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "thermalAfter": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 1,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 44.8,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 37.1,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 39.7,
+            "status": 1
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      }
+    }
+  }
+}

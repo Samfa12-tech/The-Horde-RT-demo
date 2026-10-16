@@ -3,6 +3,7 @@
 #include "gameplay/simulation/SimulationSnapshot.h"
 #include "gameplay/traversal/RescueTraversal.h"
 #include <cmath>
+#include <algorithm>
 #include <string_view>
 
 namespace horde::gameplay::validation {
@@ -31,7 +32,7 @@ inline constexpr std::string_view ChapterProbePhaseName(ChapterProbePhase phase)
 // raise only through the existing successful-presentation authority.
 class ChapterRoundTripProbe {
 public:
-    bool Start(const simulation::SimulationSnapshot& s) {
+    bool Start(const simulation::SimulationSnapshot& s,bool regionCycle=false) {
         *this={};
         for(unsigned zone=1;zone<4;++zone)
             if(s.worldRoute.readiness[zone]!=simulation::ZoneReadiness::Ready)return false;
@@ -47,9 +48,12 @@ public:
         generation_=s.worldRoute.generation;lastTick_=phaseTick_=s.tickIndex;
         interact_=s.lastConsumedInteractSequence;raise_=s.lastConsumedToggleHeldLightPoseSequence;
         clearRun_=s.lastConsumedClearRunIntentSequence+1;
-        phase_=ChapterProbePhase::Landing;station_=2;return true;
+        // The focused residency test starts at the same genuine ready reunion,
+        // then walks straight back to the rope. Full chapter coverage is separate.
+        phase_=regionCycle?ChapterProbePhase::Return:ChapterProbePhase::Landing;station_=2;return true;
     }
-    simulation::InputSnapshot Next(const simulation::SimulationSnapshot& s,bool paused=false) {
+    simulation::InputSnapshot Next(const simulation::SimulationSnapshot& s,bool paused=false,unsigned inputTicks=1) {
+        inputTicks_=std::clamp(inputTicks,1u,8u);
         simulation::InputSnapshot input;
         input.damageEnabled=false;input.tutorialEnabled=false;
         input.yawRadians=s.playerYawRadians;input.pitchRadians=-.15f;
@@ -152,8 +156,8 @@ private:
         if(s.rescue.equipmentStowed)return false;
         const float dx=destination.x-s.playerX,dz=destination.z-s.playerZ,distance=std::hypot(dx,dz);
         if(distance<.025f)return true;
-        input.yawRadians=std::atan2(dx,-dz);input.moveForward=std::min(1.f,distance/.055f);
-        input.runHeld=distance>.3f;return false;
+        input.yawRadians=std::atan2(dx,-dz);input.moveForward=std::min(1.f,distance/(.055f*inputTicks_));
+        input.runHeld=distance>std::max(.3f,.11f*inputTicks_);return false;
     }
     bool Sweep(const simulation::SimulationSnapshot& s,simulation::InputSnapshot& input,
                float yaw,unsigned ticks) {
@@ -164,6 +168,7 @@ private:
     }
     ChapterProbePhase phase_=ChapterProbePhase::Failed;
     unsigned station_=0;
+    unsigned inputTicks_=1;
     unsigned sweepTicks_=1;
     std::uint64_t generation_=0,lastTick_=0,phaseTick_=0,sweepTick_=0;
     std::uint64_t interact_=0,raise_=0,clearRun_=0;

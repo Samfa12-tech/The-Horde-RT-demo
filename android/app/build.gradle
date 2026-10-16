@@ -183,6 +183,15 @@ def hordeRtNativePolicyArguments = { String defaultInstrumentation ->
 }
 
 def hordeRegionPageDebugArguments = []
+def chapterRouteTimingValue = providers.gradleProperty('hordeRegionPageRouteTiming').orNull
+if (chapterRouteTimingValue != null && !(chapterRouteTimingValue in ['true', 'false'])) {
+    throw new GradleException('hordeRegionPageRouteTiming must be true or false.')
+}
+def chapterRouteTiming = chapterRouteTimingValue == 'true'
+if (chapterRouteTiming && (hordeRegionPagePrototypeRootProperty == null ||
+        hordeRtInstrumentationOverride != 'Shipping' || hordeRtDielectricQualityOverride != 'Mobile')) {
+    throw new GradleException('Chapter route timing requires the private region-page Shipping/Mobile Debug profile.')
+}
 if (hordeRegionPagePrototypeRootProperty != null) {
     if (hordeRegionPagePrototypeRootProperty.isEmpty() ||
         hordeRegionPagePrototypeRootProperty != hordeRegionPagePrototypeRootProperty.trim() ||
@@ -556,6 +565,7 @@ android {
             externalNativeBuild {
                 cmake {
                     arguments '-DHORDE_RT_DEBUG_CHECKPOINTS=ON',
+                        "-DHORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING=${chapterRouteTiming ? 'ON' : 'OFF'}",
                         "-DHORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=${viewmodelCandidate ? 'ON' : 'OFF'}",
                         *hordeRtNativePolicyArguments('Diagnostic'),
                         *hordeRtDebugStagedPrimaryArguments,

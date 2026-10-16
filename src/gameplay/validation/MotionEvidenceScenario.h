@@ -6,6 +6,7 @@
 #include <string_view>
 
 #include "gameplay/simulation/GameSimulation.h"
+#include "gameplay/validation/ChapterRoundTripProbe.h"
 
 namespace horde::gameplay::validation
 {
@@ -20,7 +21,12 @@ enum class MotionScenario : std::uint8_t
     KeeperRetryReward,
     WaterfallEquipment,
     TorchDrench,
+    ChapterRoundTrip,
+    ChapterStreamingCycle,
 };
+inline constexpr bool IsChapterMotionScenario(MotionScenario scenario) noexcept {
+    return scenario==MotionScenario::ChapterRoundTrip || scenario==MotionScenario::ChapterStreamingCycle;
+}
 
 enum class MotionStage : std::uint8_t
 {
@@ -65,9 +71,11 @@ public:
     [[nodiscard]] bool Failed() const noexcept { return stage_ == MotionStage::Failed; }
     [[nodiscard]] std::string_view Failure() const noexcept;
     [[nodiscard]] double SimulationSeconds() const noexcept { return simulationSeconds_; }
+    [[nodiscard]] ChapterProbePhase ChapterPhase() const noexcept { return chapter_.Phase(); }
     [[nodiscard]] std::span<const std::uint32_t> EventCounts() const noexcept { return eventCounts_; }
 
 private:
+    ChapterRoundTripProbe chapter_;
     void Enter(MotionStage stage) noexcept;
     void MoveTowards(simulation::InputSnapshot& input,
                      const simulation::SimulationSnapshot& state, float x, float z) const noexcept;

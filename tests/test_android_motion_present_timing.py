@@ -64,6 +64,22 @@ def encoded(report):
 
 
 class AndroidMotionPresentTimingTests(unittest.TestCase):
+    def test_chapter_without_readbacks_still_requires_every_actual_timing_owner(self):
+        report = make_report()
+        for value in (report, report['motionManifest'], report['motionEvidence']):
+            value['scenario'] = 'chapter-round-trip'
+        report['workload'] = 'motion-chapter-round-trip-v1'
+        report['motionManifest']['captures'] = 0
+        report['motionImageCaptures'] = []
+        self.assertTrue(analyze_bytes(encoded(report))['eligible'])
+        missing = copy.deepcopy(report)
+        missing['imagePresentationTiming']['capture']['rows'].pop()
+        self.reject(missing, 'count|timestamp|join|completed|missing|counter')
+        adverse = copy.deepcopy(report)
+        adverse['imagePresentationTiming']['counterDelta']['queryErrors'] = 1
+        adverse['imagePresentationTiming']['capture']['counters']['queryErrors'] = 1
+        self.reject(adverse, 'queryErrors|adverse')
+
     def reject(self, report, fragment):
         with self.assertRaisesRegex(AnalysisError, fragment):
             analyze_bytes(encoded(report))

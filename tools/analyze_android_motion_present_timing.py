@@ -23,7 +23,8 @@ from analyze_android_present_timing import (
 
 U64_MAX = (1 << 64) - 1
 SCENARIOS = frozenset(("torch-low-opening", "shaft-up", "keeper-first-entry",
-                       "keeper-retry-reward", "waterfall-equipment", "torch-drench"))
+                       "keeper-retry-reward", "waterfall-equipment", "torch-drench", "chapter-round-trip", "chapter-streaming-cycle"))
+CHAPTER_SCENARIOS = frozenset(("chapter-round-trip", "chapter-streaming-cycle"))
 POLICY = ("shared GameSimulation.AdvanceFrame with raw monotonic input-owner delta and normal "
           "fixed-step catch-up; generated motion axes/edges enter through the existing "
           "InputMailbox owner; no per-render fixed-delta override")
@@ -116,7 +117,9 @@ def analyze_bytes(raw: bytes) -> dict[str, Any]:
     for field in ("water", "fire", "cap", "glass", "shadow", "mist", "dust"):
         if type(manifest.get(field)) is not type(settings[field]) or manifest[field] != settings[field]:
             raise AnalysisError(f"manifest {field} differs from actual settings")
-    _integer(manifest.get("captures"), "manifest.captures", 1, 64)
+    _integer(manifest.get("captures"), "manifest.captures", 0 if scenario in CHAPTER_SCENARIOS else 1, 64)
+    if scenario in CHAPTER_SCENARIOS and manifest["captures"] != 0:
+        raise AnalysisError("chapter pacing interval must not contain image readbacks")
     if _integer(evidence.get("pendingSubmissionCount"), "ledger.pendingSubmissionCount") != 0 or evidence.get("currentScopePresented") is not True:
         raise AnalysisError("motion ledger has pending work or no current-scope presentation")
     if _array(evidence.get("retiredSubmissions"), "retiredSubmissions", 16384):
@@ -282,7 +285,7 @@ def analyze_bytes(raw: bytes) -> dict[str, Any]:
         "collector": {"runCounterDelta": delta,
             "queryCpuWallNanoseconds": _u64(wrapper.get("queryCpuWallNanoseconds"), "queryCpuWallNanoseconds"),
             "presentMarginAtLeast2Pow63CountIgnored": sum(timing["presentMargin"] >= (1 << 63) for _, timing in ordered)},
-        "limits": ["Short harness-generated moving scenario with milestone RT readbacks; total instrumentation affects pacing.",
+        "limits": [("Bounded ordinary chapter traversal with zero mid-route image readbacks; recorder overhead remains." if scenario in CHAPTER_SCENARIOS else "Short harness-generated moving scenario with milestone RT readbacks; total instrumentation affects pacing."),
                    "One continuous resource scope; retry/rotation/lifecycle discontinuities require separate evidence.",
                    "Actual inter-present intervals; not sustained FPS, scanout, photons, GPU reciprocal time, touch latency or owner acceptance.",
                    "Trace extents are native resource observations; this analyzer does not certify appearance, thermals or power."]}

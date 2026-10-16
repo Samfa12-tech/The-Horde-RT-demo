@@ -30,7 +30,8 @@ bool ParseMotionScenario(std::string_view text, MotionScenario& scenario) noexce
 {
     for (auto candidate : {MotionScenario::TorchLowOpening, MotionScenario::ShaftUp,
                            MotionScenario::KeeperFirstEntry, MotionScenario::KeeperRetryReward,
-                           MotionScenario::WaterfallEquipment, MotionScenario::TorchDrench})
+                           MotionScenario::WaterfallEquipment, MotionScenario::TorchDrench,
+                           MotionScenario::ChapterRoundTrip, MotionScenario::ChapterStreamingCycle})
         if (text == MotionScenarioName(candidate)) { scenario = candidate; return true; }
     return false;
 }
@@ -44,6 +45,8 @@ const char* MotionScenarioName(MotionScenario scenario) noexcept
     case MotionScenario::KeeperRetryReward: return "keeper-retry-reward";
     case MotionScenario::WaterfallEquipment: return "waterfall-equipment";
     case MotionScenario::TorchDrench: return "torch-drench";
+    case MotionScenario::ChapterRoundTrip: return "chapter-round-trip";
+    case MotionScenario::ChapterStreamingCycle: return "chapter-streaming-cycle";
     default: return "invalid";
     }
 }
@@ -84,7 +87,11 @@ bool MotionEvidenceScenario::Begin(MotionScenario scenario, GameSimulation& simu
     if (std::string_view(MotionScenarioName(scenario)) == "invalid" || now == 0u ||
         simulation.Snapshot().playerMountProfile != items::PlayerMountProfile::AnatomicalBody)
     { Fail("Motion evidence requires an admitted scenario, clock and production simulation profile."); return false; }
-    const bool seeded = scenario == MotionScenario::WaterfallEquipment
+    // Chapter measurement observes an already rendered/admitted reunion. It
+    // neither fabricates readiness nor seeds progression inside the timed run.
+    const bool seeded = IsChapterMotionScenario(scenario)
+        ? chapter_.Start(simulation.Snapshot(),scenario==MotionScenario::ChapterStreamingCycle)
+        : scenario == MotionScenario::WaterfallEquipment
         ? simulation.BeginMotionEvidenceEquipmentSeed()
         : simulation.ApplyShowcaseCheckpoint(
             scenario == MotionScenario::TorchLowOpening ? 0 :
@@ -176,6 +183,21 @@ InputSnapshot MotionEvidenceScenario::BuildInput(const SimulationSnapshot& state
     else if (startWall_ != 0u && now - startWall_ > kMaximumWallNanoseconds) Fail("Motion evidence wall deadline exceeded.");
     latestWall_ = std::max(latestWall_, now);
     input.paused = published.paused || !ready || Failed() || Complete() || stage_ == MotionStage::NotStarted;
+    if (IsChapterMotionScenario(scenario_)) {
+        const auto generated = chapter_.Next(state, input.paused,FixedStepRunner::kMaximumStepsPerAdvance);
+        input.moveForward=generated.moveForward;input.moveStrafe=generated.moveStrafe;
+        input.yawRadians=generated.yawRadians;input.pitchRadians=generated.pitchRadians;
+        input.runHeld=generated.runHeld;input.paused=generated.paused;
+        input.tutorialEnabled=false;
+        // Preserve consumed unrelated edges; only the probe owns these three.
+        commands_.interact=generated.commands.interact;
+        commands_.toggleHeldLightPose=generated.commands.toggleHeldLightPose;
+        commands_.clearRunIntent=generated.commands.clearRunIntent;
+        input.commands=commands_;
+        if(chapter_.Phase()==ChapterProbePhase::Failed)Fail("Chapter route lost readiness, generation or progress.");
+        if(Failed()){input.paused=true;input.moveForward=input.moveStrafe=0;}
+        return input;
+    }
     if (!input.paused)
     {
         const float elapsed = static_cast<float>(simulationSeconds_ - stageStartSeconds_);
@@ -352,6 +374,10 @@ void MotionEvidenceScenario::ObserveAdvance(const SimulationSnapshot& state,
             torchExtinguishedSequence_ = event.sequence;
         }
         impact = impact || event.type == GameplayEventType::LichImpact;
+    }
+    if (IsChapterMotionScenario(scenario_)) {
+        if(chapter_.Phase()==ChapterProbePhase::Complete)Enter(MotionStage::Complete);
+        return;
     }
     if (scenario_ == MotionScenario::TorchDrench)
     {

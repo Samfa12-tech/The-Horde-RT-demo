@@ -1,5 +1,40 @@
 # Android RT Device Compatibility Record
 
+## 16 October ordinary private streaming cycles — SM-S948B / Android17
+
+Evidence class: **owner-approved exact Debug/O2 install/pullback, two failed full
+routes and two successful focused ordinary residency cycles with actual display
+timing**. Full-route APK51d7d58b…367c1046 fails both unchanged120s deadlines before
+unloading (Pipeline lower landing, Query tomb backtrack); actual joined median/max
+intervals133/242 and129/250ms,607/589 simulation overruns. No memory saving is
+claimed for those failed routes.
+
+Focused APK `a6b7a00ccd813bc903250079926970f03096ff7436fb4f50c117e86b58b33d76`
+adopts the ready reunion, walks to the rope, descends/backtracks, then returns and
+ascends through normal simulation/input and existing safety gates. Both hardware
+backends retire/reload one certified84,219-triangle forest detail owner. Device-local
+full/retired/restored: Pipeline160,831,232 /146,581,568 /160,831,232B;
+Query160,830,720 /146,581,056 /160,830,720B. Actual saving14,249,664B (13.59MiB),
+observed peaks174,307,392 /174,306,880B (12.85MiB above full), zero readiness waits.
+Cached CPU sources/coarse world/shared/uncertain contributors stay resident.
+
+Raw modelSM-S948B, Android17/API37, Adreno840/Vulkan1.4.295. Native optimizedDebug,
+actual Shipping/Mobile private shaders, saved40% /Current,576×1188 inside1440×2971.
+No mid-route image readbacks. Exact521/530 completed-frame/display joins pass with
+no adverse collector counters.45.46/45.39s spans: median83.33ms,p95141.67ms,
+max166.60/162.50ms;139/141 overrun deltas. These are actual display-timing intervals,
+not GPU-reciprocal FPS, scanout or a smooth-play pass. Post-run current-HAL framework
+status0/1, skin37.3/39.7°C; starting thermal states differ, no causal/backend ranking
+or sustained thermal claim. Restored visible forest/ground shadows/rope prompt were
+inspected after timing; matched primary/reflection/transmission coverage remains open.
+
+Four ABI/lint and default286 Java checks pass, native Debug/Release2/2 each,
+timing analyzer14/14 and build policy1/1. Default build profile restored, not
+installed. Same signer/version, preference bytes preserved, owned Debug stopped,
+release untouched. Full route/continuous performance, lifecycle/pressure during
+transitions, broader residency/I/O and Current/Higher/Lower migration remain open.
+[Exact receipts, failed runs, focused cycles and acceptance limits](evidence/2026-10-16-phone-streaming-cycle/README.md).
+
 ## 16 October private region-page startup correction — SM-S948B / Android17
 
 Evidence class: **approved exact Debug replacement/pullback, both-backend frozen
