@@ -1,5 +1,19 @@
 # Horde 1.7 current design index
 
+The [inverse-transform experiment](../evidence/2026-10-17-inverse-transform/README.md)
+tests that next hypothesis without production adoption. All four Opaque policies
+fit fixed limits; all four Generic policies fail bytes+64/words+16. Only the
+passing Shipping/Mobile Opaque pair is substituted experimentally. Eight phone
+image pairs retain six exact/two one-code-value differences; four ordinary routes
+join2,708frames, retain13.59MiB saving/exact restoration and zero waits. Pipeline
+dispatch is descriptively6–8% lower inside/3% outside with close starting
+temperatures, but this is one pair, not repeated causal proof. Query's hotter
+control is excluded from gain claims. The frozen legacy Keeper still view
+changes less than1%; actual wind-up/lightning worst-frame cost remains open.
+Retain the experiment; do not raise Generic ceilings or claim the Keeper fixed.
+Original phone control is restored/stopped. Tomb/material/niche/loading work,
+quality and production shaders are unchanged.
+
 The [17 October dispatch investigation](../evidence/2026-10-17-rt-dispatch-investigation/README.md)
 adds a private sparse device-clock observer with six byte-identical frozen image
 pairs. Both ordinary observer routes retain13.59MiB saving/exact restoration;
@@ -9,7 +23,7 @@ work; it is not GPU-time attribution or an optimisation. Fresh controls stay
 within15% descriptive GPU changes, but Pipeline thermal mismatch prevents a
 causal overhead bound. Instrumented binaries exceed frozen production limits
 and are not admitted. Original stage-only phone APK is restored/stopped.
-Next bounded hypothesis: reuse the ray-query inverse transform in reusable PBR
+Initial hypothesis (now tested above): reuse the ray-query inverse transform in reusable PBR
 hit decoding, only after budgets, transform correctness, matched images and
 warm uninstrumented timing. No effect-removal or staged-primary replay.
 

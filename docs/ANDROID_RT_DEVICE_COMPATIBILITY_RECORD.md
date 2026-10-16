@@ -1,5 +1,30 @@
 # Android RT Device Compatibility Record
 
+## 17 October inverse-transform experiment — SM-S948B / Android17
+
+Evidence class: **owner-authorized private Debug/O2 install/pullback, eight
+matched frozen image pairs, four ordinary routes and four legacy Keeper still
+benchmarks**. [Exact scope/results](evidence/2026-10-17-inverse-transform/README.md).
+Candidate84e878a3dd8bbc0b56f5ead59fb9304e46c07a83f0bc4c8de25e63c760c7ce2d;
+API37/Adreno840/Vulkan1.4.295, saved40%/Current and all169 asset payloads unchanged.
+Only Shipping/Mobile Opaque changes on both real RT backends; Generic retains
+the exact original modules. Six pixel-exact/two near-identical image pairs
+(50pixels each, at most1/255 channel change); actual frames inspected. All2,708
+route frames join to owned stages/actual display; all four unload/restore once
+with13.59MiB saving/exact restoration and zero readiness waits.
+Pipeline single-pair dispatch observations are6–8% lower inside/3% outside;
+starts match within0.4°C/status1 but end temperatures differ. No repeatable
+causal gain or smooth-play acceptance. Query control starts at status2 versus0
+and is excluded from speedup claims. Legacy frozen maintaining-range Keeper
+snapshots differ less than1% on Pipeline; periodic390-sample GPU aggregates
+include warmup and are not final phase medians or live fight performance.
+Active lightning/charge worst-frame cost is not reproduced. All four Generic
+source variants exceed unchanged bytes/words ceilings; no production adoption.
+Original f13dda30…fa527 control restored/pullback-verified, Debug stopped,
+preference bytes preserved and release app untouched. No signing/publication.
+Windows optimized candidate compiles; no new Windows RT image/performance claim.
+Current/Higher and Lower→Current migration physical acceptance remain pending.
+
 ## 17 October sparse dispatch-clock observation — SM-S948B / Android17
 
 Evidence class: **owner-authorized private Debug/O2 observer install/pullback,

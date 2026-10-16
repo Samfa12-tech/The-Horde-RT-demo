@@ -1,0 +1,9 @@
+{
+  "nativeBaseHead": "db4c00a05211738d5d3b046c6e5a2dddd1ea59f2",
+  "shaderProfile": "r10 private region page input matching all four installed control modules; only Opaque pair substituted",
+  "apkSha256": "84e878a3dd8bbc0b56f5ead59fb9304e46c07a83f0bc4c8de25e63c760c7ce2d",
+  "apkBytes": 183655002,
+  "identicalAssetPayloads": 169,
+  "bothCandidateModulesEmbedded": true,
+  "productionAdoption": false
+}

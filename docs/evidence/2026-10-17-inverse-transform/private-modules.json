@@ -1,0 +1,20 @@
+{
+  "modules": [
+    {
+      "key": "shipping_mobile_opaque_fast",
+      "sha256": "aaa1901fd3631ac009042ac207a5077e96facff41bd7af8d225aad3cc5857c6e",
+      "bytes": 579920,
+      "matrixInverseSites": 0,
+      "worldToObjectSites": 6
+    },
+    {
+      "key": "rayquery_compute_shipping_mobile_opaque_fast",
+      "sha256": "93defa178bd2cb348c68670b8468110e3477ad761b4e791e15a5474752c60a41",
+      "bytes": 581052,
+      "matrixInverseSites": 0,
+      "worldToObjectSites": 6
+    }
+  ],
+  "productionAdoption": false,
+  "scope": "Only Shipping/Mobile Opaque changes in the executable; Generic and other policies retain exact baseline artifacts."
+}

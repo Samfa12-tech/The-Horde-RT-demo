@@ -1,0 +1,94 @@
+[
+  {
+    "key": "diagnostic_high_generic_dielectric",
+    "bytes": 296024,
+    "instructions": 17621,
+    "exceeds": {
+      "bytes": {
+        "actual": 296024,
+        "max": 295960,
+        "over": 64
+      },
+      "words": {
+        "actual": 74006,
+        "max": 73990,
+        "over": 16
+      }
+    }
+  },
+  {
+    "key": "diagnostic_high_opaque_fast",
+    "bytes": 587104,
+    "instructions": 32322,
+    "exceeds": {}
+  },
+  {
+    "key": "diagnostic_mobile_generic_dielectric",
+    "bytes": 294524,
+    "instructions": 17525,
+    "exceeds": {
+      "bytes": {
+        "actual": 294524,
+        "max": 294460,
+        "over": 64
+      },
+      "words": {
+        "actual": 73631,
+        "max": 73615,
+        "over": 16
+      }
+    }
+  },
+  {
+    "key": "diagnostic_mobile_opaque_fast",
+    "bytes": 584156,
+    "instructions": 32141,
+    "exceeds": {}
+  },
+  {
+    "key": "shipping_high_generic_dielectric",
+    "bytes": 287196,
+    "instructions": 17197,
+    "exceeds": {
+      "bytes": {
+        "actual": 287196,
+        "max": 287132,
+        "over": 64
+      },
+      "words": {
+        "actual": 71799,
+        "max": 71783,
+        "over": 16
+      }
+    }
+  },
+  {
+    "key": "shipping_high_opaque_fast",
+    "bytes": 582868,
+    "instructions": 32143,
+    "exceeds": {}
+  },
+  {
+    "key": "shipping_mobile_generic_dielectric",
+    "bytes": 285696,
+    "instructions": 17101,
+    "exceeds": {
+      "bytes": {
+        "actual": 285696,
+        "max": 285632,
+        "over": 64
+      },
+      "words": {
+        "actual": 71424,
+        "max": 71408,
+        "over": 16
+      }
+    }
+  },
+  {
+    "key": "shipping_mobile_opaque_fast",
+    "bytes": 579920,
+    "instructions": 31962,
+    "exceeds": {}
+  }
+]

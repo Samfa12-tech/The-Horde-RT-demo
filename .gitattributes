@@ -442,3 +442,4 @@ docs/evidence/2026-10-16-phone-resident-streamed/*.zip filter=lfs diff=lfs merge
 docs/evidence/2026-10-16-baseline-rt-profile/*.zip filter=lfs diff=lfs merge=lfs -text
 
 docs/evidence/2026-10-17-rt-dispatch-investigation/*.zip filter=lfs diff=lfs merge=lfs -text
+docs/evidence/2026-10-17-inverse-transform/*.zip filter=lfs diff=lfs merge=lfs -text

@@ -502,3 +502,6 @@ jobs:
 
       - name: Check private sparse clock evidence admission
         run: python -m unittest discover -s tests -p test_android_dispatch_clock.py -v
+
+      - name: Check isolated inverse-transform normal and tangent regressions
+        run: python -m unittest discover -s tests -p test_inverse_transform_candidate.py -v

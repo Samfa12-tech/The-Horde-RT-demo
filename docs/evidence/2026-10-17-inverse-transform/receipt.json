@@ -1,0 +1,8 @@
+{
+  "sha256": "caf9cd88ddf7c6605d3234bbd66a33b487ef07da6d914cd6fe4622fbeae92603",
+  "bytes": 98591187,
+  "entries": 346,
+  "scope": "Exact baseline/candidate private shader profiles, selected module headers, all8 compiled matrix inputs/outputs, all image pairs, four routes and Keeper still observations, strict analyses/build/failure logs and scripts",
+  "apksIncluded": false,
+  "productionAdoption": false
+}

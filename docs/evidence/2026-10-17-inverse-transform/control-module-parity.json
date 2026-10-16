@@ -1,0 +1,22 @@
+[
+  {
+    "key": "shipping_mobile_opaque_fast",
+    "sha256": "2b71c86dabdbf5d435ac9c1dd08895db6adf01990ffd9716ce76fe1a25ebd8c2",
+    "matchesInstalledControl": true
+  },
+  {
+    "key": "shipping_mobile_generic_dielectric",
+    "sha256": "30ae3c9d21fcb037cd0f2bbf2aa06b3c3c6f7fd61c8a6b81ed2a883a507f3bdc",
+    "matchesInstalledControl": true
+  },
+  {
+    "key": "rayquery_compute_shipping_mobile_opaque_fast",
+    "sha256": "01289f6a4c4533e4194cde693cb1eae4b5a5d77b8bbecac663458c28e1ad6001",
+    "matchesInstalledControl": true
+  },
+  {
+    "key": "rayquery_compute_shipping_mobile_generic_dielectric",
+    "sha256": "992e40938323dea3aac8bdf831b5df5240cd128f4ce7a44722faf485845fc4ee",
+    "matchesInstalledControl": true
+  }
+]
