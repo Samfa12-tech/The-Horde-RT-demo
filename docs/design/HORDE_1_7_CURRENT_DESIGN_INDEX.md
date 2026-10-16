@@ -1,5 +1,21 @@
 # Horde 1.7 current design index
 
+The [matched physical phone comparison](../evidence/2026-10-16-phone-resident-streamed/README.md)
+now closes resident-versus-streamed attribution for one focused ordinary cycle on
+both RT backends. Same private APK a42a0651…0414808, saved40%/Current and identical
+shader identities; all2639 completed frames join actual display timestamps.
+Each streamed run frees13.59MiB, restores exactly, peaks12.85MiB above full and has
+zero readiness waits. Fixed exterior GPU durations remain138–149ms with resident
+or streamed detail; measured streaming-step CPU maxima4.60/4.41ms. No transition
+window exceeds the slower exterior pacing. Smooth/full-chapter play remains open.
+Keep production unchanged; next profile baseline RT cost from the matched views,
+without lowering quality or guessing a memory budget. Default Debug/unsigned Release
+four-ABI builds and lint pass;286Java tests and affected native/timing tests pass.
+The startup-ID timing failure was reproduced and fixed at collection start,
+with strict terminal joins/deadlines preserved. APK/source/raw failure identities
+are sealed in that report. Phone settings match original bytes; Debug is stopped.
+The older receipts below retain their historical artifact/install state.
+
 The [physical phone streaming checkpoint](../evidence/2026-10-16-phone-streaming-cycle/README.md)
 proves one ordinary certified forest-detail unload/reload on both RT backends:
 13.59MiB device-local saving, exact restoration,12.85MiB observed peak above full

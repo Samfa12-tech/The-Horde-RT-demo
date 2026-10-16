@@ -1,0 +1,26 @@
+{
+  "basedOn": "867b817555bae2ff18c3700cc34ab7c43197674f",
+  "apkSha256": "a42a0651dc9282eaceb13e1627b19e5348688127352c18f1b36be9f0c0414808",
+  "bytes": 183633178,
+  "scope": "private Debug/O2 Shipping/Mobile matched resident/streamed route, timing IDs only after arm",
+  "sourceHashes": {
+    "src/gameplay/validation/ChapterRoundTripProbe.h": "0849b063f6eff53c08a5d078dbc61a38b1612178e15c0d4fddafee940d1e1c59",
+    "src/gameplay/validation/MotionEvidenceScenario.h": "cc66345855b5e02bfc8cbd8f31cb8aee4346ddc98ddb2ce69d4de5ac8ec089af",
+    "src/gameplay/validation/MotionEvidenceScenario.cpp": "ac1b3543fa7fef264f2a2d8ee6ed4cad7118c34f7352209ea35ba22f30ae0bf5",
+    "android/app/src/main/cpp/android_probe_bridge.cpp": "f209d8a4a30ca8386816484b16c40b9f47214a19e895ad97aaa4965a63bd6a5d",
+    "android/app/src/main/cpp/android_motion_evidence.inl": "321726cc927fb420bba81feff25dfac750ab5e4c914b61fc51556e4705a3c47c",
+    "src/platform/android/AndroidMotionEvidencePolicy.h": "fd977c3d3f7623353e8bda46c06cfd932e13bb38c0032eaf70b3fddb8d2f5e26",
+    "tests/AndroidMotionEvidencePolicyTests.cpp": "90c5ad577081e97a4f02ea0b18cfdbadc13adf3f487d7ae6c62ebbcab1566851",
+    "tools/analyze_android_motion_present_timing.py": "8412d8391f42748508dcb21b96d379fd43c256e32d36b81ab4510c499d09c385",
+    "tests/RescueJourneyIntegrationTests.cpp": "ff600d0f8bce16fb2475f0ab54852282dc7ba26697e13e565d47e96cca048bbf",
+    "tests/test_android_motion_present_timing.py": "53e37ab0ff0168c6c699165f5579e50622cb7a102d1f6df9b6bd1701560f8b24"
+  },
+  "assetsByteIdentical": true,
+  "assetCount": 169,
+  "nativeHashes": {
+    "lib/arm64-v8a/libhorde_rt_probe_android.so": "ecb1895b0a36ad9d0821362e826a0830048c5a5a1830ac2d74da9dd40c74e46a",
+    "lib/armeabi-v7a/libhorde_rt_probe_android.so": "06e03a0b026514960a68f1bd25220dbbd5e91399512b358b63ad29b5e74a7446",
+    "lib/x86/libhorde_rt_probe_android.so": "e72a653a8b26eace527bc3eecee3d3007bc480cc519111ca2c63e2705de748cd",
+    "lib/x86_64/libhorde_rt_probe_android.so": "04145a1e146f05817325051c6fa81aa9700a43a4c8d49696863c78628f423128"
+  }
+}

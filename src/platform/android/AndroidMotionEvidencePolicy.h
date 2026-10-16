@@ -51,6 +51,13 @@ struct AndroidMotionEvidenceScope
 
 // A terminal gameplay state is not an evidence completion while its graphics
 // submissions remain owned by the renderer.
+// A chapter-only timing candidate measures its armed route, not occluded boot
+// or checkpoint setup. No accepted timing ID may be silently dropped at arm.
+[[nodiscard]] inline bool AndroidMotionTimingCollectionActive(
+    bool chapterOnly, bool armed, bool finished) noexcept {
+    return !chapterOnly || (armed && !finished);
+}
+
 [[nodiscard]] inline bool AndroidMotionTerminalOwnerReady(
     const bool scenarioComplete, const bool pendingSubmissions,
     const bool pendingPresentationTimings) noexcept

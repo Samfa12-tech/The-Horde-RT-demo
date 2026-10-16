@@ -31,7 +31,8 @@ bool ParseMotionScenario(std::string_view text, MotionScenario& scenario) noexce
     for (auto candidate : {MotionScenario::TorchLowOpening, MotionScenario::ShaftUp,
                            MotionScenario::KeeperFirstEntry, MotionScenario::KeeperRetryReward,
                            MotionScenario::WaterfallEquipment, MotionScenario::TorchDrench,
-                           MotionScenario::ChapterRoundTrip, MotionScenario::ChapterStreamingCycle})
+                           MotionScenario::ChapterRoundTrip, MotionScenario::ChapterStreamingCycle,
+                           MotionScenario::ChapterResidentComparison, MotionScenario::ChapterStreamedComparison})
         if (text == MotionScenarioName(candidate)) { scenario = candidate; return true; }
     return false;
 }
@@ -47,6 +48,8 @@ const char* MotionScenarioName(MotionScenario scenario) noexcept
     case MotionScenario::TorchDrench: return "torch-drench";
     case MotionScenario::ChapterRoundTrip: return "chapter-round-trip";
     case MotionScenario::ChapterStreamingCycle: return "chapter-streaming-cycle";
+    case MotionScenario::ChapterResidentComparison: return "chapter-resident-comparison";
+    case MotionScenario::ChapterStreamedComparison: return "chapter-streamed-comparison";
     default: return "invalid";
     }
 }
@@ -90,7 +93,8 @@ bool MotionEvidenceScenario::Begin(MotionScenario scenario, GameSimulation& simu
     // Chapter measurement observes an already rendered/admitted reunion. It
     // neither fabricates readiness nor seeds progression inside the timed run.
     const bool seeded = IsChapterMotionScenario(scenario)
-        ? chapter_.Start(simulation.Snapshot(),scenario==MotionScenario::ChapterStreamingCycle)
+        ? chapter_.Start(simulation.Snapshot(),scenario!=MotionScenario::ChapterRoundTrip,
+            scenario==MotionScenario::ChapterResidentComparison || scenario==MotionScenario::ChapterStreamedComparison)
         : scenario == MotionScenario::WaterfallEquipment
         ? simulation.BeginMotionEvidenceEquipmentSeed()
         : simulation.ApplyShowcaseCheckpoint(

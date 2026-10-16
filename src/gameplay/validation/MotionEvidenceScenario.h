@@ -23,9 +23,20 @@ enum class MotionScenario : std::uint8_t
     TorchDrench,
     ChapterRoundTrip,
     ChapterStreamingCycle,
+    ChapterResidentComparison,
+    ChapterStreamedComparison,
 };
 inline constexpr bool IsChapterMotionScenario(MotionScenario scenario) noexcept {
-    return scenario==MotionScenario::ChapterRoundTrip || scenario==MotionScenario::ChapterStreamingCycle;
+    return scenario==MotionScenario::ChapterRoundTrip || scenario==MotionScenario::ChapterStreamingCycle ||
+        scenario==MotionScenario::ChapterResidentComparison || scenario==MotionScenario::ChapterStreamedComparison;
+}
+
+// Lifetime counters are cumulative across a scene; validation owns only its delta.
+inline constexpr bool ChapterResidencyCountersValid(bool retain, std::uint64_t beforeUnloads,
+    std::uint64_t beforeRestores,std::uint64_t afterUnloads,std::uint64_t afterRestores) noexcept {
+    return afterUnloads>=beforeUnloads && afterRestores>=beforeRestores &&
+        (retain?afterUnloads==beforeUnloads && afterRestores==beforeRestores:
+         afterUnloads>beforeUnloads && afterUnloads-beforeUnloads==afterRestores-beforeRestores);
 }
 
 enum class MotionStage : std::uint8_t
@@ -72,6 +83,8 @@ public:
     [[nodiscard]] std::string_view Failure() const noexcept;
     [[nodiscard]] double SimulationSeconds() const noexcept { return simulationSeconds_; }
     [[nodiscard]] ChapterProbePhase ChapterPhase() const noexcept { return chapter_.Phase(); }
+    [[nodiscard]] unsigned ChapterViewTicks() const noexcept { return chapter_.ComparisonViewTicks(); }
+    [[nodiscard]] bool RetainChapterDetail() const noexcept { return scenario_==MotionScenario::ChapterResidentComparison; }
     [[nodiscard]] std::span<const std::uint32_t> EventCounts() const noexcept { return eventCounts_; }
 
 private:

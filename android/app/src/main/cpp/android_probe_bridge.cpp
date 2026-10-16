@@ -248,9 +248,14 @@ struct AndroidMotionRun
         std::uint64_t serial=0,returnNs=0;
         horde::gameplay::validation::ChapterProbePhase phase{};
         horde::vulkan::raytracing::PresentableTinyRtScene::OrdinaryStaticDetailMeasurements detail;
-        float x=0,y=0,z=0;
+        float x=0,y=0,z=0,yaw=0,pitch=0;
+        unsigned viewTicks=0;
+        std::uint64_t detailCpuNs=0;
     };
     std::array<ChapterTag,kMaxFramesInFlight> chapterTags{};
+    horde::vulkan::raytracing::PresentableTinyRtScene::OrdinaryStaticDetailMeasurements chapterBaseline;
+    std::uint64_t chapterDetailCpuNs=0;
+    float chapterCameraYaw=0,chapterCameraPitch=0;
     std::ofstream chapterCsv;
     std::uint64_t chapterLastReturnNs=0,chapterLastSerial=0;
     horde::gameplay::validation::MotionEvidenceScenario scenario;
@@ -4387,13 +4392,27 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
         }
         using DetailFrame=horde::vulkan::raytracing::PresentableTinyRtScene::StaticDetailFrame;
         DetailFrame detail=DetailFrame::Render;
+        bool retainComparisonDetail=false;
+#if HORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING
+        retainComparisonDetail=context.motion && context.motion->armed && !context.motion->finished &&
+            context.motion->scenario.RetainChapterDetail();
+        const auto detailStepStartNs=GraphicsSteadyNs();
+#endif
         if(!context.rtScene.AdvanceOrdinaryStaticDetail(gGameSimulation,frameInputs,
             !context.captureActive && !context.routeReplayActive && !context.inAppBenchmark.IsRunning() &&
-            !context.benchmarkSampling,detail,diagnostic)) {
+            !context.benchmarkSampling && !retainComparisonDetail,detail,diagnostic)) {
             if(evidenceFrame)context.rtFrameEvidence.FailRecord(observation);
             __android_log_print(ANDROID_LOG_ERROR,kTag,"Static detail preparation: %s",diagnostic.c_str());
             return false;
         }
+
+#if HORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING
+        if(context.motion) {
+            context.motion->chapterDetailCpuNs=GraphicsSteadyNs()-detailStepStartNs;
+            context.motion->chapterCameraYaw=frameInputs.cameraYaw;
+            context.motion->chapterCameraPitch=frameInputs.cameraPitch;
+        }
+#endif
         if(detail==DetailFrame::WaitForRestore) {
             if(evidenceFrame)context.rtFrameEvidence.AbortFrame();
             if(vkResetCommandBuffer(context.commandBuffers[imageIndex],0u)!=VK_SUCCESS)return false;
@@ -4566,7 +4585,9 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                 auto& tag=context.motion->chapterTags[context.currentFrame];
                 const auto& state=gGameSimulation.Snapshot();
                 tag={owner.submissionSerial,0,context.motion->scenario.ChapterPhase(),
-                     context.rtScene.OrdinaryStaticDetailEvidence(),state.playerX,state.playerSupportWorldY,state.playerZ};
+                     context.rtScene.OrdinaryStaticDetailEvidence(),state.playerX,state.playerSupportWorldY,state.playerZ,
+                     context.motion->chapterCameraYaw,context.motion->chapterCameraPitch,context.motion->scenario.ChapterViewTicks(),
+                     context.motion->chapterDetailCpuNs};
             }
         }
 #endif
@@ -4606,7 +4627,12 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
     VkPresentTimeGOOGLE measuredPresentTime{};
     VkPresentTimesInfoGOOGLE measuredPresentInfo{VK_STRUCTURE_TYPE_PRESENT_TIMES_INFO_GOOGLE};
     horde::telemetry::RtSubmittedFrameIdentity measuredFrame{};
-    const bool measuredPresent = evidenceFrame && useRtFrame &&
+    bool timingMeasurementActive=true;
+#if HORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING && !HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION
+    timingMeasurementActive=horde::platform::android::AndroidMotionTimingCollectionActive(true,
+        context.motion && context.motion->armed,context.motion && context.motion->finished);
+#endif
+    const bool measuredPresent = timingMeasurementActive && evidenceFrame && useRtFrame &&
         context.sceneProfile == horde::vulkan::raytracing::RtSceneProfile::Showcase &&
         context.rtFrameEvidence.TryGetCommittedIdentity(context.currentFrame, measuredFrame) &&
         context.presentTiming && context.presentTiming->PrepareNext(measuredPresentTime);

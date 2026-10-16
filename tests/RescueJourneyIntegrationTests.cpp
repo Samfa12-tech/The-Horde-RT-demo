@@ -188,8 +188,17 @@ int main(int argc,char** argv) {
         check(seen[phase],"probe skipped a required moving journey phase");
     std::cout<<"native-terrain moving probe frames="<<frames<<'\n';
    }
-   for(unsigned ticksPerFrame:{1u,3u,4u,6u,5u}) {
-    const auto selected=ticksPerFrame==5?MotionScenario::ChapterStreamingCycle:MotionScenario::ChapterRoundTrip;
+   check(ChapterResidencyCountersValid(true,4,4,4,4) && !ChapterResidencyCountersValid(true,4,4,5,5) &&
+         !ChapterResidencyCountersValid(false,4,4,4,4) && ChapterResidencyCountersValid(false,4,4,5,5) &&
+         !ChapterResidencyCountersValid(false,4,4,3,3) && !ChapterResidencyCountersValid(false,4,4,5,4),
+         "residency validation must use only monotonic run-local unload/restore pairs");
+   for(unsigned trial=0;trial<9;++trial) {
+    const unsigned ticksPerFrame=std::array<unsigned,9>{1,3,4,6,5,3,6,3,6}[trial];
+    const auto selected=trial>=7?MotionScenario::ChapterStreamedComparison:
+        trial>=5?MotionScenario::ChapterResidentComparison:
+        ticksPerFrame==5?MotionScenario::ChapterStreamingCycle:MotionScenario::ChapterRoundTrip;
+    MotionScenario parsed{};
+    check(ParseMotionScenario(MotionScenarioName(selected),parsed) && parsed==selected,"comparison mode identity must round-trip");
     GameSimulation phone(captureConfig);
     for(std::size_t zone=1;zone<kWorldZones.size();++zone)
      phone.PublishChapterTerrain({phone.Snapshot().worldRoute.generation,static_cast<WorldZoneId>(zone)},terrain);
@@ -204,12 +213,20 @@ int main(int argc,char** argv) {
      const auto command=motion.BuildInput(phone.Snapshot(),{},now,false);
      check(command.paused && command.moveForward==0,"phone route cannot move before real current presentation");
     }
+    check(motion.RetainChapterDetail()==(selected==MotionScenario::ChapterResidentComparison),
+          "only the explicit resident comparison may suppress eviction");
+    std::array<unsigned,static_cast<unsigned>(ChapterProbePhase::Failed)+1> viewSamples{};
     InputSnapshot published;
     while(++frame<8000 && !motion.Complete() && !motion.Failed()) {
      now+=ticksPerFrame*16'666'667ull;
      const auto command=motion.BuildInput(phone.Snapshot(),published,now,true);
      check(!command.hasAuthoritativePlayerPose && !command.commands.attack && !command.commands.dodge,
            "phone chapter measurement must use ordinary movement/context input");
+     if(motion.ChapterViewTicks()>=60) {
+      ++viewSamples[static_cast<unsigned>(motion.ChapterPhase())];
+      check(command.moveForward==0 && command.moveStrafe==0 && command.pitchRadians==-.15f,
+            "matched view must retain stationary ordinary input and fixed pitch");
+     }
      phone.AdvanceFrame(command,static_cast<double>(ticksPerFrame)/60,frame);
      motion.ObserveAdvance(phone.Snapshot(),phone.Events().Events());phone.ClearEvents();
      phone.AcknowledgeChapterPresentation(phone.Snapshot().tickIndex,phone.Snapshot().chapterDialogue.generation);
@@ -218,6 +235,9 @@ int main(int argc,char** argv) {
              <<" phase="<<ChapterProbePhaseName(motion.ChapterPhase())<<" failure="<<motion.Failure()<<'\n';
     check(motion.Complete() && phone.Snapshot().rescue.sawDescent && phone.Snapshot().rescue.exteriorSide,
           "phone wall-clock multi-tick route must complete descent, passage and return ascent");
+    if(trial>=5)for(const auto phase:{ChapterProbePhase::Landing,ChapterProbePhase::Lower,ChapterProbePhase::Passage,ChapterProbePhase::Ascent})
+     check(viewSamples[static_cast<unsigned>(phase)]>=45,"comparison omitted a stable matched view");
+    motion.End(phone);
     MotionEvidenceScenario invalidMotion;
     GameSimulation wrong(captureConfig);
     check(!invalidMotion.Begin(MotionScenario::ChapterRoundTrip,wrong,now),"unready phone chapter cannot be fabricated by measurement");

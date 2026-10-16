@@ -1,5 +1,30 @@
 # Android RT Device Compatibility Record
 
+## 16 October matched resident/streamed pairs — SM-S948B / Android17
+
+Evidence class: **owner-authorized exact Debug/O2 install/pullback, Shipping/Mobile
+private profile, four ordinary matched-view routes, strict actual display joins**.
+[Exact source/APK/raw receipts](evidence/2026-10-16-phone-resident-streamed/README.md).
+APK a42a0651dc9282eaceb13e1627b19e5348688127352c18f1b36be9f0c0414808;
+raw modelSM-S948B, API37, Adreno840/Vulkan1.4.295. Saved40%/Current,
+576×1188 internal,1440×2971 swapchain, all169 assets/shaders unchanged.
+Pipeline resident/streamed647/667 frames, Query652/673, every completed frame
+matched to actual display time. Resident allocation is constant; each streamed
+run frees14,249,664B, restores exactly and has zero readiness waits; observed peak
+13,476,160B above full. GPU medians remain expensive even resident: exterior
+142ms Pipeline,147–149ms Query resident versus138–139ms Query streamed. Pipeline
+matched GPU changes −0.17% to+1.29%; Query −6.30% to+0.67% is one paired observation,
+not an attributed speedup. Starts match within1.5°C at equal framework status
+(Pipeline0; Query1); no clock/power or sustained thermal claim. Measured
+streaming-step CPU maxima4.60/4.41ms exclude separate retirement/commit/AS GPU work.
+Display median83/88ms and overrun deltas263–269 still fail smooth-play expectations.
+A preceding Query route failed strict terminal validation because boot/setup IDs
+remained pending; the private collector now registers IDs only after arming.
+No rows/checks/deadlines were removed. All corrected runs start with zero setup
+IDs and end with zero pending. Original preferences remain byte-identical,
+Debug is stopped and release app untouched. Broader lifecycle/pressure/full-route,
+Current/Higher and saved Lower migration and production acceptance remain pending.
+
 ## 16 October ordinary private streaming cycles — SM-S948B / Android17
 
 Evidence class: **owner-approved exact Debug/O2 install/pullback, two failed full

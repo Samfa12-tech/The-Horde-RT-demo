@@ -1,5 +1,16 @@
 # Reusable region loading and streaming
 
+Latest attribution: [matched resident/streamed phone pairs](../evidence/2026-10-16-phone-resident-streamed/README.md)
+complete four strict ordinary routes on one private Shipping/Mobile APK. Resident
+and streamed fixed views have similar large baseline GPU durations (exterior
+138–149ms); the measured preparation-step CPU peaks4.60/4.41ms. Both streamed
+backends retain13.59MiB saving/exact restoration,12.85MiB observed peak above full,
+zero readiness waits. This supports retaining the independent-owner design while
+profiling baseline RT cost; it does not establish smooth gameplay, total loading
+cost, a phone pressure budget or production adoption. All timing rows join exactly;
+failed setup-ID evidence and its collection-start correction remain recorded.
+The following earlier measurements remain artifact-specific history.
+
 Latest measured slice: the [16 October phone cycles](../evidence/2026-10-16-phone-streaming-cycle/README.md)
 close one ordinary two-way private page residency path on both real RT backends:
 13.59MiB actual device-local saving, exact restoration,12.85MiB observed peak above

@@ -1,0 +1,10 @@
+{
+  "javaSuites": 45,
+  "tests": 286,
+  "failures": 0,
+  "errors": 0,
+  "skips": 0,
+  "privateProfileDisabled": true,
+  "installed": false,
+  "defaultApkSha256": "b49c49859e096e0be980b52bf8f60b74d2ce38a526f506878c66d327769fd040"
+}

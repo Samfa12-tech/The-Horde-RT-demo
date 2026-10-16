@@ -80,6 +80,21 @@ class AndroidMotionPresentTimingTests(unittest.TestCase):
         adverse['imagePresentationTiming']['capture']['counters']['queryErrors'] = 1
         self.reject(adverse, 'queryErrors|adverse')
 
+    def test_comparison_modes_keep_strict_timing_and_distinct_identity(self):
+        for scenario in ('chapter-resident-comparison', 'chapter-streamed-comparison'):
+            report = make_report()
+            for value in (report, report['motionManifest'], report['motionEvidence']):
+                value['scenario'] = scenario
+            report['workload'] = f'motion-{scenario}-v1'
+            report['motionManifest']['captures'] = 0
+            report['motionImageCaptures'] = []
+            self.assertTrue(analyze_bytes(encoded(report))['eligible'])
+            broken = copy.deepcopy(report)
+            broken['motionManifest']['scenario'] = 'chapter-streaming-cycle'
+            self.reject(broken, 'scenario|identity')
+            report['imagePresentationTiming']['capture']['rows'].pop()
+            self.reject(report, 'count|timestamp|join|completed|missing|counter')
+
     def reject(self, report, fragment):
         with self.assertRaisesRegex(AnalysisError, fragment):
             analyze_bytes(encoded(report))

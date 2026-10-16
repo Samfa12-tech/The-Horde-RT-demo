@@ -32,7 +32,7 @@ inline constexpr std::string_view ChapterProbePhaseName(ChapterProbePhase phase)
 // raise only through the existing successful-presentation authority.
 class ChapterRoundTripProbe {
 public:
-    bool Start(const simulation::SimulationSnapshot& s,bool regionCycle=false) {
+    bool Start(const simulation::SimulationSnapshot& s,bool regionCycle=false,bool matchedViews=false) {
         *this={};
         for(unsigned zone=1;zone<4;++zone)
             if(s.worldRoute.readiness[zone]!=simulation::ZoneReadiness::Ready)return false;
@@ -50,7 +50,8 @@ public:
         clearRun_=s.lastConsumedClearRunIntentSequence+1;
         // The focused residency test starts at the same genuine ready reunion,
         // then walks straight back to the rope. Full chapter coverage is separate.
-        phase_=regionCycle?ChapterProbePhase::Return:ChapterProbePhase::Landing;station_=2;return true;
+        matchedViews_=matchedViews;
+        phase_=(regionCycle && !matchedViews)?ChapterProbePhase::Return:ChapterProbePhase::Landing;station_=2;return true;
     }
     simulation::InputSnapshot Next(const simulation::SimulationSnapshot& s,bool paused=false,unsigned inputTicks=1) {
         inputTicks_=std::clamp(inputTicks,1u,8u);
@@ -73,7 +74,9 @@ public:
         switch(phase_) {
         case ChapterProbePhase::Landing:
             if(!Walk(s,input,simulation::kWorldRoutePoints[2]))break;
-            if(Sweep(s,input,3.14159265359f,240))SetPhase(ChapterProbePhase::Raise,s,3);
+            if(matchedViews_) {
+                if(HoldView(s,input,3.14159265359f,360))SetPhase(ChapterProbePhase::Return,s,2);
+            } else if(Sweep(s,input,3.14159265359f,240))SetPhase(ChapterProbePhase::Raise,s,3);
             break;
         case ChapterProbePhase::Raise:
             if(!Walk(s,input,simulation::kWorldRoutePoints[3]))break;
@@ -112,7 +115,7 @@ public:
                 SetPhase(ChapterProbePhase::Lower,s,0);
             break;
         case ChapterProbePhase::Lower:
-            if(Sweep(s,input,3.14159265359f,120)) {
+            if(matchedViews_?HoldView(s,input,3.14159265359f,360):Sweep(s,input,3.14159265359f,120)) {
                 lowerReturn_={s.playerX,s.playerZ,s.playerSupportWorldY};
                 SetPhase(ChapterProbePhase::TombReturn,s,0);
             }
@@ -121,7 +124,8 @@ public:
             if(Walk(s,input,{-22.f,-15.2f,kRouteFloorWorldY}))SetPhase(ChapterProbePhase::Passage,s,0);
             break;
         case ChapterProbePhase::Passage:
-            if(Sweep(s,input,1.57079632679f,360))SetPhase(ChapterProbePhase::RopeReturn,s,0);
+            if(matchedViews_?HoldView(s,input,1.57079632679f,360):Sweep(s,input,1.57079632679f,360))
+                SetPhase(ChapterProbePhase::RopeReturn,s,0);
             break;
         case ChapterProbePhase::RopeReturn:
             if(Walk(s,input,lowerReturn_))SetPhase(ChapterProbePhase::Ascent,s,2);
@@ -132,11 +136,15 @@ public:
                 ++interact_;input.commands.interact=interact_;interactionIssued_=true;
             }
             if(interactionIssued_ && s.rescue.exteriorSide && !s.rescue.equipmentStowed &&
-               s.rescue.sawDescent && s.rescue.sawLanding)SetPhase(ChapterProbePhase::Complete,s,2);
+               s.rescue.sawDescent && s.rescue.sawLanding &&
+               (!matchedViews_ || HoldView(s,input,3.14159265359f,360)))SetPhase(ChapterProbePhase::Complete,s,2);
             break;
         default:break;
         }
         return input;
+    }
+    unsigned ComparisonViewTicks() const {
+        return matchedViews_ && sweepStarted_?static_cast<unsigned>(lastTick_-sweepTick_):0;
     }
     ChapterProbePhase Phase() const { return phase_; }
     unsigned Station() const { return station_; }
@@ -159,6 +167,11 @@ private:
         input.yawRadians=std::atan2(dx,-dz);input.moveForward=std::min(1.f,distance/(.055f*inputTicks_));
         input.runHeld=distance>std::max(.3f,.11f*inputTicks_);return false;
     }
+    bool HoldView(const simulation::SimulationSnapshot& s,simulation::InputSnapshot& input,float yaw,unsigned ticks) {
+        if(!sweepStarted_) {sweepTick_=s.tickIndex;sweepStarted_=true;}
+        input.yawRadians=yaw;input.pitchRadians=-.15f;
+        return s.tickIndex-sweepTick_>=ticks;
+    }
     bool Sweep(const simulation::SimulationSnapshot& s,simulation::InputSnapshot& input,
                float yaw,unsigned ticks) {
         if(!sweepStarted_) {sweepTick_=s.tickIndex;sweepTicks_=ticks;sweepStarted_=true;}
@@ -173,6 +186,7 @@ private:
     std::uint64_t generation_=0,lastTick_=0,phaseTick_=0,sweepTick_=0;
     std::uint64_t interact_=0,raise_=0,clearRun_=0;
     std::uint64_t proofTick_=0;
+    bool matchedViews_=false;
     bool sweepStarted_=false,raiseIssued_=false,interactionIssued_=false;
     simulation::WorldRoutePoint lowerReturn_{};
 };

@@ -63,7 +63,9 @@ void PollAndroidChapterTerminalTimingDrain(SwapchainContext& context)
     if(context.presentTiming->PendingCount()==0) {
         const auto& s=gGameSimulation.Snapshot();const auto& d=context.rtScene.OrdinaryStaticDetailEvidence();
         if(!run.scenario.Complete() || run.ledger.HasPendingSubmissions() ||
-           !d.unloads || d.restores!=d.unloads || d.savedOwnerBytes || d.preparationFailures ||
+           !horde::gameplay::validation::ChapterResidencyCountersValid(run.scenario.RetainChapterDetail(),
+               run.chapterBaseline.unloads,run.chapterBaseline.restores,d.unloads,d.restores) ||
+           d.savedOwnerBytes || d.preparationFailures ||
            !context.rtScene.StaticGeometryHasCompleteContributors() || s.staticDetailLease.resourceGeneration) {
             FailAndroidMotion(context,"Chapter did not restore complete contributor ownership after its ordinary unload.");return;
         }
@@ -437,7 +439,9 @@ void ObserveAndroidMotionCompletion(SwapchainContext& context, bool completed)
             <<frame.identity.submitted.submissionSerial<<','<<frame.identity.submitted.frame.simulationTick<<','
             <<horde::gameplay::validation::ChapterProbePhaseName(tag.phase)<<','<<tag.x<<','<<tag.y<<','<<tag.z<<','
             <<frame.resources.deviceLocalBytes<<','<<frame.resources.hostVisibleBytes<<','<<d.omittedTriangles<<','
-            <<d.unloads<<','<<d.restores<<','<<d.savedOwnerBytes<<','<<d.peakOverlapOwnerBytes<<','<<d.waitFrames<<'\n';
+            <<d.unloads<<','<<d.restores<<','<<d.savedOwnerBytes<<','<<d.peakOverlapOwnerBytes<<','<<d.waitFrames<<','
+            <<tag.yaw<<','<<tag.pitch<<','<<tag.viewTicks<<','<<tag.detailCpuNs<<','
+            <<(d.unloads-run.chapterBaseline.unloads)<<','<<(d.restores-run.chapterBaseline.restores)<<'\n';
         run.chapterLastReturnNs=tag.returnNs;
         run.chapterLastSerial=tag.serial;
         if(!run.chapterCsv)FailAndroidMotion(context,"Chapter resource ledger write failed.");
@@ -516,7 +520,7 @@ void BuildAndroidMotionInput(SwapchainContext& context,
         if(validation::IsChapterMotionScenario(run.selected)) {
             if(std::ifstream(run.path+"-resources.csv").good()) {run.finished=true;gMotionStatus.store(4);return;}
             run.chapterCsv.open(run.path+"-resources.csv");
-            run.chapterCsv<<"present_return_ns,interval_ns,serial,tick,phase,x,y,z,device_local_bytes,host_visible_bytes,omitted_triangles,unloads,restores,saved_owner_bytes,peak_overlap_bytes,wait_frames\n";
+            run.chapterCsv<<"present_return_ns,interval_ns,serial,tick,phase,x,y,z,device_local_bytes,host_visible_bytes,omitted_triangles,unloads,restores,saved_owner_bytes,peak_overlap_bytes,wait_frames,yaw,pitch,view_ticks,detail_step_cpu_ns,run_unloads,run_restores\n";
             if(!run.chapterCsv){FailAndroidMotion(context,"Chapter resource ledger could not open.");return;}
         }
         run.requestedNs = now;
@@ -610,6 +614,7 @@ void BuildAndroidMotionInput(SwapchainContext& context,
         { FailAndroidMotion(context, "Motion seed has no current evidence scope."); input.paused = true; return; }
         gGameSimulation.ResetTiming(); gGameSimulation.ClearEvents();
         context.lastInputOwnerSteadyNs = now;
+        run.chapterBaseline=context.rtScene.OrdinaryStaticDetailEvidence();
         run.armed = true;
         if (context.motionValidationRun) input.paused = false;
         gMotionStatus.store(2, std::memory_order_release);

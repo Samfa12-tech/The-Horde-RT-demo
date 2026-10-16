@@ -86,6 +86,10 @@ int main()
     check(AndroidMotionCanArm(false, false));
     check(AndroidMotionCanArm(true, true)); // Isolated validation waits paused for a completed RT owner.
     check(AndroidMotionCanArm(true, false));
+    check(!AndroidMotionTimingCollectionActive(true,false,false)); // Boot/setup must not leave unrelated pending IDs.
+    check(AndroidMotionTimingCollectionActive(true,true,false)); // Every armed-route present is still owned.
+    check(!AndroidMotionTimingCollectionActive(true,true,true));
+    check(AndroidMotionTimingCollectionActive(false,false,false)); // Existing all-present validation is unchanged.
     check(!AndroidMotionTerminalOwnerReady(false, false, false));
     check(!AndroidMotionTerminalOwnerReady(true, true, false)); // A terminal state cannot discard owned graphics work.
     check(!AndroidMotionTerminalOwnerReady(true, false, true)); // Nor unresolved display timing IDs.
