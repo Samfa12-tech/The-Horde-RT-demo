@@ -1,0 +1,19 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/region-page-prototype
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/region-page-prototype
+    Start 169: horde_rt_region_geometry_source_tests
+1/1 Test #169: horde_rt_region_geometry_source_tests ...***Failed    1.80 sec
+Profile High glass=0
+High/Mobile and Glass On/Off native source conversion: Invalid or unowned source primitive boundary.
+Profile Mobile glass=1
+High/Mobile and Glass On/Off native source conversion: Invalid or unowned source primitive boundary.
+Profile Mobile glass=0
+High/Mobile and Glass On/Off native source conversion: Invalid or unowned source primitive boundary.
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   1.82 sec
+
+The following tests FAILED:
+	169 - horde_rt_region_geometry_source_tests (Failed)
+Errors while running CTest

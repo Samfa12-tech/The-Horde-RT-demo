@@ -1,5 +1,31 @@
 # Android RT Device Compatibility Record
 
+## 16 October private region-page startup correction — SM-S948B / Android17
+
+Evidence class: **approved exact Debug replacement/pullback, both-backend frozen
+chapter presentation and one Query Home/resume**, not full route or sustained
+streaming acceptance. APK `6db07c3889ccd440f462e9affcc059cfd5784e26bbcc7645fcefd48f28ab1e30`
+is pinned to482ebaff plus source/test hashes. The prior installed ground build
+was identified/backed up once; failed approved candidatec0545439 is retained.
+Its CPU-side `Invalid or unowned source primitive boundary` failure reproduced
+with actual High/Glass Off and Mobile lantern profiles. The source adapter now
+normalizes only referenced index ranges under existing bounds; strict partition
+checks and all active attributes/identities remain intact. Debug/Release2/2,
+four ABI build and lint pass. All169 assets/shaders match the failed candidate.
+
+Raw modelSM-S948B, Android17/API37, Adreno840, Vulkan1.4.295. Saved40% scale,
+Current shadows, Diagnostic/Mobile, internal576×1188 / swapchain1440×2971.
+Both real backends present12 stable frozen landing frames with completed-frame
+identity; inspected RGB images are identical. Frozen Pipeline/Query allocations
+are166,119,424 /166,118,912 device-local bytes and49,445,056 /49,444,544 host-visible
+bytes,21BLAS/1TLAS/28instances. Last GPU samples54.724322/54.184322ms are not
+playable FPS or sustained performance. Query Home/resume advances native surface
+1→3, scene3→5 and measurement6→10 with fresh presentation; unchanged capture
+request generation2 is not used as a resource epoch. Original preferences are
+byte-identical; owned Debug app stopped; release app untouched. No full phone
+out/back, savings/restoration, sustained/thermal, Current/Higher or Lower migration
+pass is inferred. [Failure, fix, exact receipts and inspected gallery](evidence/2026-10-16-mobile-region-source-admission/README.md).
+
 ## 13 October 1.7 chapter resume — 42d00817 / SM-S948B
 
 Evidence class: **authorized exact Debug update/pullback, four frozen chapter

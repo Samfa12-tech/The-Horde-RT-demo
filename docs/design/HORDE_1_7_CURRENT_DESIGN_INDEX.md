@@ -1,5 +1,18 @@
 # Horde 1.7 current design index
 
+The [mobile region-source correction](../evidence/2026-10-16-mobile-region-source-admission/README.md)
+closes the reproduced private chapter-start failure caused by legitimate unused
+quality-profile backing indices. Strict partition ownership, active geometry,
+quality and budgets are preserved. Debug/Release partition/source checks pass2/2
+each; four Android ABIs and lint pass. Owner-approved APK6db07c38…ab1e30 is
+installed and byte-verified on SM-S948B / Android17. Both hardware backends
+present the same frozen landing image; one Query Home/resume reconstructs a new
+native surface/scene epoch. Original preferences remain byte-identical and the
+Debug app is stopped. This supersedes earlier preparation-only/uninstalled status,
+not full phone out/back, savings, sustained performance or production adoption.
+The default profile is restored in build outputs; the corrected native default
+APK is not byte-identical to its predecessor and was not installed.
+
 The [authorised host-phase Pipeline follow-up](../evidence/2026-10-16-region-page-host-followup/README.md)
 completes the optimized Release route with11.88MiB saving,4.06MiB peak above full,
 one unload/restore, zero readiness waits and no simulation backlog. Warm median/

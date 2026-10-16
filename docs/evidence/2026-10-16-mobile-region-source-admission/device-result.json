@@ -1,0 +1,28 @@
+{
+  "scope": "Debug Diagnostic/Mobile private page startup, both-backend frozen landing and one Query Home/resume; no full route, phone savings or sustained performance",
+  "apkSha256": "6db07c3889ccd440f462e9affcc059cfd5784e26bbcc7645fcefd48f28ab1e30",
+  "model": "SM-S948B",
+  "androidRelease": "17",
+  "api": 37,
+  "pipelineQueryPixelIdentical": true,
+  "sceneEpochBefore": 3,
+  "sceneEpochAfter": 5,
+  "measurementBefore": 6,
+  "measurementAfter": 10,
+  "surfaceGenerationBefore": 1,
+  "surfaceGenerationAfter": 3,
+  "captureGenerationUnchanged": 2,
+  "captureGenerationScope": "request identity, not surface/resource epoch",
+  "settingsByteIdentical": true,
+  "ownedDebugStopped": true,
+  "releasePackageUntouched": true,
+  "scale": 0.4,
+  "internalExtent": {
+    "width": 576,
+    "height": 1188
+  },
+  "swapchainExtent": {
+    "width": 1440,
+    "height": 2971
+  }
+}

@@ -1,5 +1,6 @@
 #include "vulkan/raytracing/RtRegionGeometrySource.h"
 #include "scene/assets/AssetManifest.h"
+#include "vulkan/raytracing/RtLanternGeometryProfile.h"
 #include <cstring>
 #include <iostream>
 #include <algorithm>
@@ -71,6 +72,94 @@ int main() {
     check(std::all_of(seen.begin(),seen.end(),[](auto n){return n==1;}),"every original triangle owned exactly once");
     const auto* previous=result.base.get();const auto* page=result.detail.get();
     check(!RtRegionGeometrySource::Prepare(source,17,selected,1,result,error) && result.base.get()==previous && result.detail.get()==page,"failed preparation preserves prior usable CPU owners");
+    const auto lanternRoot=root/"models/props/runtime/reward-lantern-body";
+    StaticMeshAsset canonicalLantern;AssetManifest lanternManifest;
+    check(AssetManifest::Load(lanternRoot/"asset.manifest.json",lanternManifest,error) &&
+        StaticMeshAsset::Load(lanternRoot/"reward-lantern-body-lod0.runtime.glb",lanternManifest,canonicalLantern,error),
+        "native canonical lantern admission");
+    if(!ok)return 1;
+    for(auto quality:{DielectricQuality::High,DielectricQuality::Mobile})for(bool glass:{true,false})for(bool suffix:{false,true}) {
+        auto lantern=canonicalLantern;
+        const bool selectedProfile=SelectLanternGeometryForQuality(lantern,quality,error,glass);
+        check(selectedProfile,"native optical geometry profile");if(!selectedProfile)continue;
+        if(suffix) {
+            const std::array<std::uint32_t,3> unused{{lantern.indices[0],lantern.indices[1],lantern.indices[2]}};
+            lantern.indices.insert(lantern.indices.end(),unused.begin(),unused.end());
+            if(!lantern.triangleRegions.empty())lantern.triangleRegions.push_back(lantern.triangleRegions.front());
+        }
+        RtStaticMeshSlot profiled;
+        std::array<StaticRtAssetRegistration,4> rows{{
+            {8,108,pbr|static_cast<std::uint32_t>(RtInstanceFlag::Transmissive),0,&lantern},
+            {4,104,pbr,0,&assets[1],nullptr,RtGeometryRole::PlayerWorldBody},
+            {20,120,pbr,0,&assets[2],&assets[1],RtGeometryRole::PlayerViewmodel},
+            {17,117,pbr,0,&assets[3]}}};
+        if(suffix)std::rotate(rows.begin(),rows.begin()+1,rows.end());
+        const bool admitted=profiled.Initialize(rows,error);
+        check(admitted,"profile retains canonical backing storage");if(!admitted)continue;
+        const auto& world=profiled.InstanceMetadata()[17];
+        const std::array<std::uint32_t,1> pick{{profiled.PrimitiveMetadata()[world.primitiveBase].indexOffset/3}};
+        RtRegionGeometrySourceResult prepared;
+        const bool ready=RtRegionGeometrySource::Prepare(profiled,17,pick,128ull*1024*1024,prepared,error);
+        if(!ready)std::cerr<<"Profile "<<(quality==DielectricQuality::High?"High":"Mobile")<<" glass="<<glass<<'\n';
+        check(ready,"High/Mobile and Glass On/Off native source conversion");
+        if(!ready)continue;
+        std::size_t activeIndices=0;
+        for(const auto& row:profiled.PrimitiveMetadata())activeIndices+=row.indexCount;
+        check(prepared.base->Indices().size()+prepared.detail->indices.size()==activeIndices,
+              "all active triangles retained exactly once; excluded pane backing is not rendered");
+        check(prepared.detail->sourceTriangles==std::vector<std::uint32_t>(pick.begin(),pick.end()),
+              "source-global selected triangle identity survives excluded pane ranges");
+        check(prepared.base->Materials().size()==profiled.Materials().size() &&
+              !std::memcmp(prepared.base->Materials().data(),profiled.Materials().data(),profiled.Materials().size()*sizeof(RtMaterialGpu)) &&
+              !std::memcmp(prepared.base->InstanceMetadata().data(),profiled.InstanceMetadata().data(),sizeof(profiled.InstanceMetadata())),
+              "optical material, instance and texture identities remain unchanged");
+        check(prepared.base->GeometryTransforms()==profiled.GeometryTransforms(),"sparse primitive transforms preserved");
+        for(auto role:{RtGeometryRole::PlayerWorldBody,RtGeometryRole::PlayerViewmodel})
+            check(prepared.base->Vertices(role).size()==profiled.Vertices(role).size() &&
+                  !std::memcmp(prepared.base->Vertices(role).data(),profiled.Vertices(role).data(),profiled.Vertices(role).size()*sizeof(StaticRtVertex)),
+                  "sparse conversion preserves complete pose/grip vertex domains");
+        for(std::size_t p=0;p<profiled.PrimitiveMetadata().size();++p) {
+            const auto& old=profiled.PrimitiveMetadata()[p];const auto& retained=prepared.base->PrimitiveMetadata()[p];
+            RtGeometryRole role=RtGeometryRole::Static;
+            for(const auto& owner:profiled.InstanceMetadata())if(p>=owner.primitiveBase && p<owner.primitiveBase+owner.primitiveCount)
+                role=static_cast<RtGeometryRole>(owner.geometryRole);
+            std::size_t offset=retained.indexOffset;
+            for(std::size_t i=old.indexOffset;i<old.indexOffset+old.indexCount;i+=3) {
+                if(i/3==pick[0])continue;
+                for(unsigned k=0;k<3;++k) {
+                    const auto& a=prepared.base->Vertices(role)[retained.vertexOffset+prepared.base->Indices()[offset+k]];
+                    const auto& b=profiled.Vertices(role)[old.vertexOffset+profiled.Indices()[i+k]];
+                    check(!std::memcmp(&a,&b,sizeof(a)),"profiled active attributes and winding preserved exactly");
+                }
+                offset+=3;
+            }
+        }
+        const auto* acceptedBase=prepared.base.get();const auto* acceptedPage=prepared.detail.get();
+        const auto unchanged=[&]{return prepared.base.get()==acceptedBase && prepared.detail.get()==acceptedPage;};
+        check(!RtRegionGeometrySource::Prepare(profiled,17,pick,64u*1024u,prepared,error) && unchanged(),
+              "bounded source preparation failure retains both accepted owners");
+        const std::array<std::uint32_t,2> duplicate{{pick[0],pick[0]}};
+        check(!RtRegionGeometrySource::Prepare(profiled,17,duplicate,128ull*1024*1024,prepared,error) && unchanged(),
+              "normalization does not admit duplicate selections");
+        const std::array<std::uint32_t,1> otherOwner{{profiled.PrimitiveMetadata().front().indexOffset/3}};
+        check(!RtRegionGeometrySource::Prepare(profiled,17,otherOwner,128ull*1024*1024,prepared,error) && unchanged(),
+              "normalization cannot transfer another owner's referenced triangle");
+        std::size_t nextIndex=0;
+        for(const auto& row:profiled.PrimitiveMetadata()) {
+            if(row.indexOffset>nextIndex) {
+                const std::array<std::uint32_t,1> orphan{{static_cast<std::uint32_t>(nextIndex/3)}};
+                check(!RtRegionGeometrySource::Prepare(profiled,17,orphan,128ull*1024*1024,prepared,error) && unchanged(),
+                      "unreferenced quality backing cannot become selectable geometry");
+            }
+            nextIndex=row.indexOffset+row.indexCount;
+        }
+        if(suffix) {
+            check(nextIndex<profiled.Indices().size(),"explicit unreferenced suffix exists");
+            const std::array<std::uint32_t,1> orphan{{static_cast<std::uint32_t>(nextIndex/3)}};
+            check(!RtRegionGeometrySource::Prepare(profiled,17,orphan,128ull*1024*1024,prepared,error) && unchanged(),
+                  "trailing unreferenced source storage remains unselectable");
+        }
+    }
     if(ok)std::cout<<"Native root/detail source preparation preserves attributes, actor/held domains and shared materials; no GPU admission claim.\n";
     return ok?0:1;
 }
