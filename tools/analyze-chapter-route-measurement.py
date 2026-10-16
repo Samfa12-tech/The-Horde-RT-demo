@@ -4,7 +4,10 @@ HOST_SPANS=('host_previous_tail_ns','host_system_load_ns','host_messages_ns',
             'host_visibility_ns','host_clock_simulation_ns','host_render_to_present_ns')
 HOST_FIELDS=(*HOST_SPANS,'host_previous_evidence_ns','host_phases_available')
 def verify_host_phases(row):
-    assert set(k for k in row if k.startswith('host_'))==set(HOST_FIELDS)
+    # Existing scene allocation telemetry shares the host_ prefix; it is not
+    # part of the timing partition. Every other unknown host field still fails.
+    assert set(k for k in row if k.startswith('host_'))-{'host_visible_bytes'}==set(HOST_FIELDS)
+    if 'host_visible_bytes' in row: assert int(row['host_visible_bytes'])>=0
     assert row['host_phases_available']==row['present_interval_available']
     values={k:int(row[k]) for k in HOST_FIELDS[:-1]}
     assert all(v>=0 for v in values.values())

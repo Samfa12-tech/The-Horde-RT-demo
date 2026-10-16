@@ -1,5 +1,15 @@
 # Horde 1.7 current design index
 
+The [authorised host-phase Pipeline follow-up](../evidence/2026-10-16-region-page-host-followup/README.md)
+completes the optimized Release route with11.88MiB saving,4.06MiB peak above full,
+one unload/restore, zero readiness waits and no simulation backlog. Warm median/
+p95/max present-return intervals are6.06/7.69/13.94ms; transition windows peak
+6.47/7.26ms. All15069 frames validate exact host interval partitioning after a
+focused analyzer fix distinguishes the existing allocation field from timing.
+The earlier602/484ms stalls and startup hang did not reproduce; their cause
+remains open. This completes the requested bounded desktop check, not production
+adoption or physical Android acceptance. No further foreground session requested.
+
 The [optimized Release independent-page comparison](../evidence/2026-10-15-region-page-release/README.md)
 now completes both real RT routes with11.88MiB static saving,4.06MiB peak above
 warm full, correct restoration and zero readiness waits. Measured unload/restore

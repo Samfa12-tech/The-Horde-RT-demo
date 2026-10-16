@@ -1,5 +1,6 @@
 import importlib.util
 import pathlib
+import csv
 
 repo=pathlib.Path(__file__).resolve().parents[1]
 spec=importlib.util.spec_from_file_location('measurement',repo/'tools/analyze-chapter-route-measurement.py')
@@ -17,6 +18,16 @@ reject(host_messages_ns='599')
 reject(host_system_load_ns='-1')
 reject(host_phases_available='0')
 reject(host_unknown_ns='1')
+reject(host_unknown_bytes='1')
+reject(host_visible_bytes='-1')
+# Actual first two completed frames from the c80df058 Release hardware run.
+# This includes the pre-existing memory field that the synthetic row omitted.
+fixture=repo/'tests/fixtures/chapter-route-host-phases/schema4-completed-frames.csv'
+with fixture.open() as captured:
+    actual=list(csv.DictReader(captured))
+assert len(actual)==2 and all('host_visible_bytes' in r for r in actual)
+assert [r['present_interval_available'] for r in actual]==['0','1']
+for captured in actual: m.verify_host_phases(captured)
 first={k:'0' for k in m.HOST_FIELDS}
 first.update(present_interval_available='0',present_return_interval_ns='0')
 assert not any(m.verify_host_phases(first).values())

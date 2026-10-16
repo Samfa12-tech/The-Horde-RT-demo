@@ -1,5 +1,8 @@
 # Independent region pages: optimized Release route
 
+The subsequently approved [host-phase follow-up](../2026-10-16-region-page-host-followup/README.md)
+has now run. The pending-run statements below describe this earlier checkpoint.
+
 The private page candidate completed the unchanged out-and-back route on both
 real RT backends. Each run automatically unloaded and restored the selected
 84,219-triangle forest detail owner, saving **12,453,440 bytes (11.88 MiB)** with

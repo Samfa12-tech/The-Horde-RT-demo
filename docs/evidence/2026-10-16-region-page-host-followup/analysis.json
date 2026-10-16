@@ -1,0 +1,1175 @@
+{
+  "scope": "Optimized Release CPU with actual Shipping High shaders; visible uncovered wall-clock two-way route after staged Keeper death; no owner or phone acceptance",
+  "backend": "RayTracingPipeline",
+  "executableSha256": "15171b52831bbd7fe10a74009c7b4ca14cdd570d7b2c8ba303989595437b14b5",
+  "hardware": {
+    "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "vendorId": 4318,
+    "deviceId": 11672
+  },
+  "run": {
+    "schema": 4,
+    "scope": "Optimized Release CPU with actual Shipping High shaders; visible uncovered wall-clock two-way route after staged Keeper death; no owner or phone acceptance",
+    "durationSeconds": 96.4627,
+    "renderedFrames": 15069,
+    "completedSamples": 15069,
+    "simulationTicks": 5787,
+    "maximumPendingSimulationTicks": 0,
+    "simulationHz": 60,
+    "maximumTicksPerRender": 4,
+    "deadlineSeconds": 150,
+    "warmupSeconds": 5,
+    "unoccludedClientChecks": true,
+    "intervalMeaning": "wall time between successful present API returns, not GPU-only or exact display scanout timestamps",
+    "foregroundRequested": true,
+    "staticDetailUnloads": 1,
+    "staticDetailRestores": 1,
+    "maximumNormalStaticOwnerSavingBytes": 12453440,
+    "finalStaticDetailSavingBytes": 0,
+    "staticPeakOwnerOverlapBytes": 16709568,
+    "staticReadinessWaitFrames": 0,
+    "complete": true
+  },
+  "settings": [
+    "current",
+    "high",
+    "High",
+    0
+  ],
+  "warmSamples": 14337,
+  "gpuStatusCounts": {
+    "valid": 14337
+  },
+  "shaderIdentities": [
+    "dd55d00afda8315729ea92396fad44f44f4f3a9b32a00f6f79716bd6e98ca315"
+  ],
+  "resourcePeaks": {
+    "device_local_bytes": 376298736,
+    "host_visible_bytes": 48123248
+  },
+  "cpuMilliseconds": {
+    "present_return_interval_ns": {
+      "count": 14337,
+      "mean": 6.3795986608077,
+      "median": 6.0623,
+      "p95": 7.6883,
+      "p99": 8.422,
+      "maximum": 13.9391,
+      "minimum": 3.4571
+    },
+    "simulation_step_cpu_ns": {
+      "count": 14337,
+      "mean": 0.13976113552347075,
+      "median": 0.0001,
+      "p95": 0.3558,
+      "p99": 2.7277,
+      "maximum": 5.0807,
+      "minimum": 0.0
+    },
+    "simulationStepCpuMs_ns": {
+      "count": 14337,
+      "mean": 0.0,
+      "median": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "maximum": 0.0,
+      "minimum": 0.0
+    },
+    "skinCpuMs_ns": {
+      "count": 14337,
+      "mean": 0.6949430006277464,
+      "median": 0.0,
+      "p95": 1.9355,
+      "p99": 2.1136,
+      "maximum": 4.2838,
+      "minimum": 0.0
+    },
+    "playerSkinCpuMs_ns": {
+      "count": 14337,
+      "mean": 0.6949430006277464,
+      "median": 0.0,
+      "p95": 1.9355,
+      "p99": 2.1136,
+      "maximum": 4.2838,
+      "minimum": 0.0
+    },
+    "characterSkinCpuMs_ns": {
+      "count": 14337,
+      "mean": 0.0,
+      "median": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "maximum": 0.0,
+      "minimum": 0.0
+    },
+    "dynamicUploadCpuMs_ns": {
+      "count": 14337,
+      "mean": 0.14375245867336262,
+      "median": 0.0116,
+      "p95": 0.4573,
+      "p99": 0.532,
+      "maximum": 1.5376,
+      "minimum": 0.0091
+    },
+    "blasRefitRecordCpuMs_ns": {
+      "count": 14337,
+      "mean": 0.03746658994210783,
+      "median": 0.0322,
+      "p95": 0.0592,
+      "p99": 0.0948,
+      "maximum": 0.2532,
+      "minimum": 0.0106
+    },
+    "tlasUpdateRecordCpuMs_ns": {
+      "count": 14337,
+      "mean": 0.0069762921113203594,
+      "median": 0.0064,
+      "p95": 0.0089,
+      "p99": 0.0136,
+      "maximum": 0.4153,
+      "minimum": 0.0037
+    },
+    "traceCopyRecordCpuMs_ns": {
+      "count": 14337,
+      "mean": 0.030469317151426378,
+      "median": 0.0291,
+      "p95": 0.0406,
+      "p99": 0.0707,
+      "maximum": 1.2485,
+      "minimum": 0.0126
+    },
+    "frameFenceWaitCpuMs_ns": {
+      "count": 14337,
+      "mean": 0.5966561763269861,
+      "median": 0.0052,
+      "p95": 3.0776,
+      "p99": 3.4632,
+      "maximum": 5.6194,
+      "minimum": 0.0012
+    },
+    "imageAcquireCpuMs_ns": {
+      "count": 14337,
+      "mean": 0.005667984934086628,
+      "median": 0.0048,
+      "p95": 0.0101,
+      "p99": 0.0251,
+      "maximum": 0.2253,
+      "minimum": 0.0016
+    },
+    "queueSubmitCpuMs_ns": {
+      "count": 14337,
+      "mean": 0.055341933458882615,
+      "median": 0.0485,
+      "p95": 0.0907,
+      "p99": 0.1375,
+      "maximum": 1.1702,
+      "minimum": 0.02
+    },
+    "presentCallCpuMs_ns": {
+      "count": 14337,
+      "mean": 3.5322344214270767,
+      "median": 3.5929,
+      "p95": 5.722,
+      "p99": 5.7678,
+      "maximum": 6.3823,
+      "minimum": 0.0305
+    },
+    "wholeFrameCycleCpuMs_ns": {
+      "count": 14337,
+      "mean": 6.15535592522843,
+      "median": 5.9792,
+      "p95": 7.2548,
+      "p99": 7.6165,
+      "maximum": 13.561,
+      "minimum": 3.3806
+    }
+  },
+  "phases": {
+    "landing-sweep": {
+      "samples": 546,
+      "gpuMilliseconds": {
+        "count": 546,
+        "mean": 2.164320761904762,
+        "median": 1.7436479999999999,
+        "p95": 3.231744,
+        "p99": 3.418624,
+        "maximum": 3.974368,
+        "minimum": 1.44288
+      },
+      "cpuCycleMilliseconds": {
+        "count": 546,
+        "mean": 6.143620879120879,
+        "median": 5.9837,
+        "p95": 7.2399,
+        "p99": 7.5406,
+        "maximum": 7.8311,
+        "minimum": 3.4493
+      },
+      "simulationStepMilliseconds": {
+        "count": 546,
+        "mean": 0.254020695970696,
+        "median": 0.0001,
+        "p95": 0.5009,
+        "p99": 3.7916,
+        "maximum": 4.2915,
+        "minimum": 0.0
+      },
+      "presentReturnIntervalMilliseconds": {
+        "count": 546,
+        "mean": 6.482599084249085,
+        "median": 6.065300000000001,
+        "p95": 7.8941,
+        "p99": 9.3093,
+        "maximum": 10.6459,
+        "minimum": 3.6365
+      },
+      "resources": {
+        "device_local_bytes": {
+          "minimum": 372042608,
+          "maximum": 372042608
+        },
+        "host_visible_bytes": {
+          "minimum": 48123248,
+          "maximum": 48123248
+        }
+      }
+    },
+    "fresh-raise": {
+      "samples": 705,
+      "gpuMilliseconds": {
+        "count": 705,
+        "mean": 2.3501763631205677,
+        "median": 1.870144,
+        "p95": 3.32128,
+        "p99": 3.487616,
+        "maximum": 3.602816,
+        "minimum": 1.635744
+      },
+      "cpuCycleMilliseconds": {
+        "count": 705,
+        "mean": 6.270471063829787,
+        "median": 5.9889,
+        "p95": 7.3073,
+        "p99": 7.63,
+        "maximum": 11.7434,
+        "minimum": 5.3088
+      },
+      "simulationStepMilliseconds": {
+        "count": 705,
+        "mean": 0.11757078014184397,
+        "median": 0.0001,
+        "p95": 0.3367,
+        "p99": 0.4292,
+        "maximum": 0.5796,
+        "minimum": 0.0
+      },
+      "presentReturnIntervalMilliseconds": {
+        "count": 705,
+        "mean": 6.472187943262411,
+        "median": 6.0642,
+        "p95": 7.6702,
+        "p99": 8.0314,
+        "maximum": 12.1353,
+        "minimum": 5.4202
+      },
+      "resources": {
+        "device_local_bytes": {
+          "minimum": 372042608,
+          "maximum": 372042608
+        },
+        "host_visible_bytes": {
+          "minimum": 48123248,
+          "maximum": 48123248
+        }
+      }
+    },
+    "outbound": {
+      "samples": 3313,
+      "gpuMilliseconds": {
+        "count": 3313,
+        "mean": 2.32264473769997,
+        "median": 1.915168,
+        "p95": 3.371968,
+        "p99": 3.555648,
+        "maximum": 4.023584,
+        "minimum": 1.375296
+      },
+      "cpuCycleMilliseconds": {
+        "count": 3313,
+        "mean": 6.281189012979173,
+        "median": 5.9849,
+        "p95": 7.4109,
+        "p99": 7.676,
+        "maximum": 13.561,
+        "minimum": 4.0182
+      },
+      "simulationStepMilliseconds": {
+        "count": 3313,
+        "mean": 0.125110775731965,
+        "median": 0.0001,
+        "p95": 0.3672,
+        "p99": 0.4858,
+        "maximum": 0.861,
+        "minimum": 0.0
+      },
+      "presentReturnIntervalMilliseconds": {
+        "count": 3313,
+        "mean": 6.491009236341684,
+        "median": 6.0651,
+        "p95": 7.8058,
+        "p99": 8.0616,
+        "maximum": 13.9391,
+        "minimum": 4.0975
+      },
+      "resources": {
+        "device_local_bytes": {
+          "minimum": 372042608,
+          "maximum": 372042608
+        },
+        "host_visible_bytes": {
+          "minimum": 48123248,
+          "maximum": 48123248
+        }
+      }
+    },
+    "lookout-sweep": {
+      "samples": 618,
+      "gpuMilliseconds": {
+        "count": 618,
+        "mean": 2.109668090614887,
+        "median": 1.729344,
+        "p95": 3.15584,
+        "p99": 3.320224,
+        "maximum": 3.432288,
+        "minimum": 1.277952
+      },
+      "cpuCycleMilliseconds": {
+        "count": 618,
+        "mean": 6.2926197411003235,
+        "median": 5.99285,
+        "p95": 7.2832,
+        "p99": 7.5713,
+        "maximum": 8.1292,
+        "minimum": 3.6732
+      },
+      "simulationStepMilliseconds": {
+        "count": 618,
+        "mean": 0.11726294498381878,
+        "median": 0.0001,
+        "p95": 0.3268,
+        "p99": 0.4534,
+        "maximum": 0.5625,
+        "minimum": 0.0
+      },
+      "presentReturnIntervalMilliseconds": {
+        "count": 618,
+        "mean": 6.491374919093851,
+        "median": 6.0642499999999995,
+        "p95": 7.6685,
+        "p99": 7.9322,
+        "maximum": 8.5233,
+        "minimum": 3.7636
+      },
+      "resources": {
+        "device_local_bytes": {
+          "minimum": 372042608,
+          "maximum": 372042608
+        },
+        "host_visible_bytes": {
+          "minimum": 48123248,
+          "maximum": 48123248
+        }
+      }
+    },
+    "return": {
+      "samples": 3699,
+      "gpuMilliseconds": {
+        "count": 3699,
+        "mean": 2.3738862871046225,
+        "median": 1.92752,
+        "p95": 3.398048,
+        "p99": 3.587552,
+        "maximum": 4.297696,
+        "minimum": 1.368064
+      },
+      "cpuCycleMilliseconds": {
+        "count": 3699,
+        "mean": 6.228534982427684,
+        "median": 5.9859,
+        "p95": 7.2648,
+        "p99": 7.6847,
+        "maximum": 8.802,
+        "minimum": 3.3806
+      },
+      "simulationStepMilliseconds": {
+        "count": 3699,
+        "mean": 0.23758104893214382,
+        "median": 0.0001,
+        "p95": 0.399,
+        "p99": 4.3798,
+        "maximum": 5.0807,
+        "minimum": 0.0
+      },
+      "presentReturnIntervalMilliseconds": {
+        "count": 3699,
+        "mean": 6.551594484995945,
+        "median": 6.0655,
+        "p95": 7.9166,
+        "p99": 9.7432,
+        "maximum": 10.9495,
+        "minimum": 3.4571
+      },
+      "resources": {
+        "device_local_bytes": {
+          "minimum": 372042608,
+          "maximum": 372042608
+        },
+        "host_visible_bytes": {
+          "minimum": 48123248,
+          "maximum": 48123248
+        }
+      }
+    },
+    "descent": {
+      "samples": 1555,
+      "gpuMilliseconds": {
+        "count": 1555,
+        "mean": 2.2306559382636655,
+        "median": 1.841504,
+        "p95": 3.306368,
+        "p99": 3.530208,
+        "maximum": 3.753952,
+        "minimum": 1.360352
+      },
+      "cpuCycleMilliseconds": {
+        "count": 1555,
+        "mean": 6.089908102893891,
+        "median": 5.9759,
+        "p95": 7.3307,
+        "p99": 7.6803,
+        "maximum": 8.5299,
+        "minimum": 3.6361
+      },
+      "simulationStepMilliseconds": {
+        "count": 1555,
+        "mean": 0.2283284887459807,
+        "median": 0.0001,
+        "p95": 1.8365,
+        "p99": 2.6725,
+        "maximum": 3.0746,
+        "minimum": 0.0
+      },
+      "presentReturnIntervalMilliseconds": {
+        "count": 1555,
+        "mean": 6.401430289389067,
+        "median": 6.0633,
+        "p95": 7.7526,
+        "p99": 8.097,
+        "maximum": 8.7469,
+        "minimum": 3.7217
+      },
+      "resources": {
+        "device_local_bytes": {
+          "minimum": 372042608,
+          "maximum": 372042608
+        },
+        "host_visible_bytes": {
+          "minimum": 48123248,
+          "maximum": 48123248
+        }
+      }
+    },
+    "lower-sweep": {
+      "samples": 332,
+      "gpuMilliseconds": {
+        "count": 332,
+        "mean": 2.535409734939759,
+        "median": 2.138832,
+        "p95": 3.424224,
+        "p99": 3.499808,
+        "maximum": 3.682752,
+        "minimum": 1.907808
+      },
+      "cpuCycleMilliseconds": {
+        "count": 332,
+        "mean": 5.963900903614458,
+        "median": 5.9731000000000005,
+        "p95": 6.0047,
+        "p99": 6.1202,
+        "maximum": 6.2375,
+        "minimum": 5.1091
+      },
+      "simulationStepMilliseconds": {
+        "count": 332,
+        "mean": 0.01561566265060241,
+        "median": 0.0001,
+        "p95": 0.0466,
+        "p99": 0.0594,
+        "maximum": 0.0939,
+        "minimum": 0.0
+      },
+      "presentReturnIntervalMilliseconds": {
+        "count": 332,
+        "mean": 6.062690361445783,
+        "median": 6.05975,
+        "p95": 6.0898,
+        "p99": 6.2277,
+        "maximum": 6.3051,
+        "minimum": 5.831
+      },
+      "resources": {
+        "device_local_bytes": {
+          "minimum": 372042608,
+          "maximum": 372042608
+        },
+        "host_visible_bytes": {
+          "minimum": 48123248,
+          "maximum": 48123248
+        }
+      }
+    },
+    "tomb-backtrack": {
+      "samples": 641,
+      "gpuMilliseconds": {
+        "count": 641,
+        "mean": 2.5407600624024957,
+        "median": 2.217152,
+        "p95": 3.375616,
+        "p99": 3.551232,
+        "maximum": 3.866944,
+        "minimum": 1.891456
+      },
+      "cpuCycleMilliseconds": {
+        "count": 641,
+        "mean": 5.96348096723869,
+        "median": 5.9713,
+        "p95": 6.0022,
+        "p99": 6.1032,
+        "maximum": 6.395,
+        "minimum": 3.898
+      },
+      "simulationStepMilliseconds": {
+        "count": 641,
+        "mean": 0.015230109204368174,
+        "median": 0.0001,
+        "p95": 0.0456,
+        "p99": 0.0505,
+        "maximum": 0.0755,
+        "minimum": 0.0
+      },
+      "presentReturnIntervalMilliseconds": {
+        "count": 641,
+        "mean": 6.062142277691108,
+        "median": 6.0599,
+        "p95": 6.0776,
+        "p99": 6.1816,
+        "maximum": 6.4697,
+        "minimum": 5.8861
+      },
+      "resources": {
+        "device_local_bytes": {
+          "minimum": 359589168,
+          "maximum": 372042608
+        },
+        "host_visible_bytes": {
+          "minimum": 40881968,
+          "maximum": 48123248
+        }
+      }
+    },
+    "passage-sweep": {
+      "samples": 992,
+      "gpuMilliseconds": {
+        "count": 992,
+        "mean": 2.7129617096774195,
+        "median": 2.351376,
+        "p95": 3.704832,
+        "p99": 3.89488,
+        "maximum": 4.052064,
+        "minimum": 1.984608
+      },
+      "cpuCycleMilliseconds": {
+        "count": 992,
+        "mean": 5.969087197580645,
+        "median": 5.9722,
+        "p95": 6.0077,
+        "p99": 6.1558,
+        "maximum": 6.6454,
+        "minimum": 5.6533
+      },
+      "simulationStepMilliseconds": {
+        "count": 992,
+        "mean": 0.015431854838709678,
+        "median": 0.0001,
+        "p95": 0.046,
+        "p99": 0.0561,
+        "maximum": 0.1029,
+        "minimum": 0.0
+      },
+      "presentReturnIntervalMilliseconds": {
+        "count": 992,
+        "mean": 6.064916633064516,
+        "median": 6.0601,
+        "p95": 6.0845,
+        "p99": 6.2711,
+        "maximum": 6.7664,
+        "minimum": 5.9096
+      },
+      "resources": {
+        "device_local_bytes": {
+          "minimum": 359589168,
+          "maximum": 359589168
+        },
+        "host_visible_bytes": {
+          "minimum": 40881968,
+          "maximum": 40881968
+        }
+      }
+    },
+    "rope-return": {
+      "samples": 640,
+      "gpuMilliseconds": {
+        "count": 640,
+        "mean": 2.7508698,
+        "median": 2.480384,
+        "p95": 3.762432,
+        "p99": 3.879456,
+        "maximum": 4.139104,
+        "minimum": 2.005184
+      },
+      "cpuCycleMilliseconds": {
+        "count": 640,
+        "mean": 5.96552328125,
+        "median": 5.97275,
+        "p95": 6.0091,
+        "p99": 6.0785,
+        "maximum": 7.112,
+        "minimum": 5.3257
+      },
+      "simulationStepMilliseconds": {
+        "count": 640,
+        "mean": 0.0154315625,
+        "median": 0.0001,
+        "p95": 0.0461,
+        "p99": 0.0553,
+        "maximum": 0.0869,
+        "minimum": 0.0
+      },
+      "presentReturnIntervalMilliseconds": {
+        "count": 640,
+        "mean": 6.0641820312500005,
+        "median": 6.0597,
+        "p95": 6.0842,
+        "p99": 6.1899,
+        "maximum": 7.2603,
+        "minimum": 5.8846
+      },
+      "resources": {
+        "device_local_bytes": {
+          "minimum": 359589168,
+          "maximum": 376298736
+        },
+        "host_visible_bytes": {
+          "minimum": 40881968,
+          "maximum": 48123248
+        }
+      }
+    },
+    "repeat-ascent": {
+      "samples": 1295,
+      "gpuMilliseconds": {
+        "count": 1295,
+        "mean": 2.1461526733590732,
+        "median": 1.74368,
+        "p95": 3.118176,
+        "p99": 3.245344,
+        "maximum": 3.737632,
+        "minimum": 1.413984
+      },
+      "cpuCycleMilliseconds": {
+        "count": 1295,
+        "mean": 5.959435212355213,
+        "median": 5.968,
+        "p95": 6.0047,
+        "p99": 6.0769,
+        "maximum": 6.8432,
+        "minimum": 5.3731
+      },
+      "simulationStepMilliseconds": {
+        "count": 1295,
+        "mean": 0.01616857142857143,
+        "median": 0.0001,
+        "p95": 0.0482,
+        "p99": 0.0606,
+        "maximum": 0.2506,
+        "minimum": 0.0
+      },
+      "presentReturnIntervalMilliseconds": {
+        "count": 1295,
+        "mean": 6.064227104247104,
+        "median": 6.06,
+        "p95": 6.0945,
+        "p99": 6.1888,
+        "maximum": 7.1591,
+        "minimum": 5.7565
+      },
+      "resources": {
+        "device_local_bytes": {
+          "minimum": 372042608,
+          "maximum": 372042608
+        },
+        "host_visible_bytes": {
+          "minimum": 48123248,
+          "maximum": 48123248
+        }
+      }
+    },
+    "complete": {
+      "samples": 1,
+      "gpuMilliseconds": {
+        "count": 1,
+        "mean": 3.103104,
+        "median": 3.103104,
+        "p95": 3.103104,
+        "p99": 3.103104,
+        "maximum": 3.103104,
+        "minimum": 3.103104
+      },
+      "cpuCycleMilliseconds": {
+        "count": 1,
+        "mean": 7.3182,
+        "median": 7.3182,
+        "p95": 7.3182,
+        "p99": 7.3182,
+        "maximum": 7.3182,
+        "minimum": 7.3182
+      },
+      "simulationStepMilliseconds": {
+        "count": 1,
+        "mean": 0.2793,
+        "median": 0.2793,
+        "p95": 0.2793,
+        "p99": 0.2793,
+        "maximum": 0.2793,
+        "minimum": 0.2793
+      },
+      "presentReturnIntervalMilliseconds": {
+        "count": 1,
+        "mean": 7.6647,
+        "median": 7.6647,
+        "p95": 7.6647,
+        "p99": 7.6647,
+        "maximum": 7.6647,
+        "minimum": 7.6647
+      },
+      "resources": {
+        "device_local_bytes": {
+          "minimum": 372042608,
+          "maximum": 372042608
+        },
+        "host_visible_bytes": {
+          "minimum": 48123248,
+          "maximum": 48123248
+        }
+      }
+    }
+  },
+  "gpuMilliseconds": {
+    "count": 14337,
+    "mean": 2.3569459764246354,
+    "median": 2.057568,
+    "p95": 3.42752,
+    "p99": 3.68688,
+    "maximum": 4.297696,
+    "minimum": 1.277952
+  },
+  "verifiedIntervalMeaning": "wall time between successful present API returns, not GPU-only or exact display scanout timestamps",
+  "presentReturnIntervalMilliseconds": {
+    "count": 14337,
+    "mean": 6.3795986608077,
+    "median": 6.0623,
+    "p95": 7.6883,
+    "p99": 8.422,
+    "maximum": 13.9391,
+    "minimum": 3.4571
+  },
+  "presentReturnThroughputHz": 156.74967238039287,
+  "hostMilliseconds": {
+    "host_previous_tail_ns": {
+      "count": 14337,
+      "mean": 0.048224998256260025,
+      "median": 0.041,
+      "p95": 0.086,
+      "p99": 0.1487,
+      "maximum": 2.0676,
+      "minimum": 0.0274
+    },
+    "host_system_load_ns": {
+      "count": 14337,
+      "mean": 0.000713656971472414,
+      "median": 0.0002,
+      "p95": 0.0004,
+      "p99": 0.001,
+      "maximum": 0.8823,
+      "minimum": 0.0
+    },
+    "host_messages_ns": {
+      "count": 14337,
+      "mean": 0.0026039896770593566,
+      "median": 0.002,
+      "p95": 0.0032,
+      "p99": 0.0072,
+      "maximum": 0.5989,
+      "minimum": 0.0006
+    },
+    "host_visibility_ns": {
+      "count": 14337,
+      "mean": 0.03341410336890563,
+      "median": 0.0319,
+      "p95": 0.0447,
+      "p99": 0.0745,
+      "maximum": 0.2766,
+      "minimum": 0.0144
+    },
+    "host_clock_simulation_ns": {
+      "count": 14337,
+      "mean": 0.1399361512171305,
+      "median": 0.0003,
+      "p95": 0.3559,
+      "p99": 2.7278,
+      "maximum": 5.0809,
+      "minimum": 0.0001
+    },
+    "host_render_to_present_ns": {
+      "count": 14337,
+      "mean": 6.1547057613168725,
+      "median": 5.9785,
+      "p95": 7.254,
+      "p99": 7.6153,
+      "maximum": 13.5607,
+      "minimum": 3.3807
+    },
+    "host_previous_evidence_ns": {
+      "count": 14337,
+      "mean": 0.04462623282416126,
+      "median": 0.0375,
+      "p95": 0.081,
+      "p99": 0.1443,
+      "maximum": 2.0643,
+      "minimum": 0.0262
+    }
+  },
+  "scanoutTimingMeasured": false,
+  "staticDetailTransitions": [
+    {
+      "kind": "unload",
+      "elapsedSeconds": 78.3226,
+      "submissionSerial": 12090,
+      "phase": "tomb-backtrack",
+      "savedBytesBefore": 0,
+      "savedBytesAfter": 12453440,
+      "deviceLocalBytesBefore": 372042608,
+      "deviceLocalBytesAfter": 359589168,
+      "windowRadiusSeconds": 1.0,
+      "presentReturnMilliseconds": {
+        "count": 329,
+        "mean": 6.062597568389058,
+        "median": 6.0604,
+        "p95": 6.0798,
+        "p99": 6.1975,
+        "maximum": 6.4697,
+        "minimum": 5.8861
+      },
+      "peakDeviceLocalBytes": 372042608
+    },
+    {
+      "kind": "restore",
+      "elapsedSeconds": 85.7523,
+      "submissionSerial": 13315,
+      "phase": "rope-return",
+      "savedBytesBefore": 12453440,
+      "savedBytesAfter": 0,
+      "deviceLocalBytesBefore": 372042608,
+      "deviceLocalBytesAfter": 372042608,
+      "windowRadiusSeconds": 1.0,
+      "presentReturnMilliseconds": {
+        "count": 329,
+        "mean": 6.06557811550152,
+        "median": 6.0595,
+        "p95": 6.088,
+        "p99": 6.251,
+        "maximum": 7.2603,
+        "minimum": 5.8846
+      },
+      "peakDeviceLocalBytes": 376298736
+    }
+  ],
+  "machineCpuBusyPercent": {
+    "count": 96,
+    "mean": 15.207505833333334,
+    "median": 13.8762,
+    "p95": 25.0986,
+    "p99": 50.719,
+    "maximum": 50.719,
+    "minimum": 9.71503
+  },
+  "machineLoadScope": "aggregate machine CPU time sampled about once per second; no process or per-stall attribution",
+  "foregroundFrameCounts": {
+    "0": 0,
+    "1": 15069
+  },
+  "largestIntervals": [
+    {
+      "elapsed_s": "1.45139",
+      "present_return_interval_ns": "16248300",
+      "phase": "landing-sweep",
+      "station": "2",
+      "tick": "1522",
+      "gpu_ns": "3204448",
+      "simulation_step_cpu_ns": "264900",
+      "imageAcquireCpuMs_ns": "5500",
+      "frameFenceWaitCpuMs_ns": "1375800",
+      "wholeFrameCycleCpuMs_ns": "15902200",
+      "hostPhasesNanoseconds": {
+        "host_previous_tail_ns": 39500,
+        "host_system_load_ns": 1000,
+        "host_messages_ns": 1600,
+        "host_visibility_ns": 39500,
+        "host_clock_simulation_ns": 265000,
+        "host_render_to_present_ns": 15901700,
+        "host_previous_evidence_ns": 37300
+      }
+    },
+    {
+      "elapsed_s": "2.16932",
+      "present_return_interval_ns": "15051600",
+      "phase": "landing-sweep",
+      "station": "2",
+      "tick": "1565",
+      "gpu_ns": "3255072",
+      "simulation_step_cpu_ns": "5482600",
+      "imageAcquireCpuMs_ns": "10100",
+      "frameFenceWaitCpuMs_ns": "16800",
+      "wholeFrameCycleCpuMs_ns": "9443000",
+      "hostPhasesNanoseconds": {
+        "host_previous_tail_ns": 66700,
+        "host_system_load_ns": 400,
+        "host_messages_ns": 3700,
+        "host_visibility_ns": 55000,
+        "host_clock_simulation_ns": 5483400,
+        "host_render_to_present_ns": 9442400,
+        "host_previous_evidence_ns": 60600
+      }
+    },
+    {
+      "elapsed_s": "2.08501",
+      "present_return_interval_ns": "14443900",
+      "phase": "landing-sweep",
+      "station": "2",
+      "tick": "1560",
+      "gpu_ns": "3200704",
+      "simulation_step_cpu_ns": "5683000",
+      "imageAcquireCpuMs_ns": "8500",
+      "frameFenceWaitCpuMs_ns": "15900",
+      "wholeFrameCycleCpuMs_ns": "8632900",
+      "hostPhasesNanoseconds": {
+        "host_previous_tail_ns": 62800,
+        "host_system_load_ns": 300,
+        "host_messages_ns": 5300,
+        "host_visibility_ns": 60200,
+        "host_clock_simulation_ns": 5683200,
+        "host_render_to_present_ns": 8632100,
+        "host_previous_evidence_ns": 57800
+      }
+    },
+    {
+      "elapsed_s": "2.14817",
+      "present_return_interval_ns": "14358600",
+      "phase": "landing-sweep",
+      "station": "2",
+      "tick": "1564",
+      "gpu_ns": "3293376",
+      "simulation_step_cpu_ns": "5060100",
+      "imageAcquireCpuMs_ns": "9800",
+      "frameFenceWaitCpuMs_ns": "12300",
+      "wholeFrameCycleCpuMs_ns": "9193000",
+      "hostPhasesNanoseconds": {
+        "host_previous_tail_ns": 46200,
+        "host_system_load_ns": 200,
+        "host_messages_ns": 5700,
+        "host_visibility_ns": 53700,
+        "host_clock_simulation_ns": 5060200,
+        "host_render_to_present_ns": 9192600,
+        "host_previous_evidence_ns": 42500
+      }
+    },
+    {
+      "elapsed_s": "2.07057",
+      "present_return_interval_ns": "14272400",
+      "phase": "landing-sweep",
+      "station": "2",
+      "tick": "1559",
+      "gpu_ns": "3367040",
+      "simulation_step_cpu_ns": "5109700",
+      "imageAcquireCpuMs_ns": "8900",
+      "frameFenceWaitCpuMs_ns": "16100",
+      "wholeFrameCycleCpuMs_ns": "8969800",
+      "hostPhasesNanoseconds": {
+        "host_previous_tail_ns": 135500,
+        "host_system_load_ns": 500,
+        "host_messages_ns": 4700,
+        "host_visibility_ns": 52300,
+        "host_clock_simulation_ns": 5110100,
+        "host_render_to_present_ns": 8969300,
+        "host_previous_evidence_ns": 128700
+      }
+    },
+    {
+      "elapsed_s": "2.11589",
+      "present_return_interval_ns": "14076100",
+      "phase": "landing-sweep",
+      "station": "2",
+      "tick": "1562",
+      "gpu_ns": "3367456",
+      "simulation_step_cpu_ns": "5054900",
+      "imageAcquireCpuMs_ns": "9400",
+      "frameFenceWaitCpuMs_ns": "15600",
+      "wholeFrameCycleCpuMs_ns": "8905700",
+      "hostPhasesNanoseconds": {
+        "host_previous_tail_ns": 64000,
+        "host_system_load_ns": 400,
+        "host_messages_ns": 3500,
+        "host_visibility_ns": 47600,
+        "host_clock_simulation_ns": 5055100,
+        "host_render_to_present_ns": 8905500,
+        "host_previous_evidence_ns": 58500
+      }
+    },
+    {
+      "elapsed_s": "29.3023",
+      "present_return_interval_ns": "13939100",
+      "phase": "outbound",
+      "station": "7",
+      "tick": "3193",
+      "gpu_ns": "2994528",
+      "simulation_step_cpu_ns": "315300",
+      "imageAcquireCpuMs_ns": "3100",
+      "frameFenceWaitCpuMs_ns": "3100",
+      "wholeFrameCycleCpuMs_ns": "13561000",
+      "hostPhasesNanoseconds": {
+        "host_previous_tail_ns": 35500,
+        "host_system_load_ns": 100,
+        "host_messages_ns": 2100,
+        "host_visibility_ns": 25300,
+        "host_clock_simulation_ns": 315400,
+        "host_render_to_present_ns": 13560700,
+        "host_previous_evidence_ns": 33000
+      }
+    },
+    {
+      "elapsed_s": "2.18316",
+      "present_return_interval_ns": "13837800",
+      "phase": "landing-sweep",
+      "station": "2",
+      "tick": "1566",
+      "gpu_ns": "3428256",
+      "simulation_step_cpu_ns": "4853200",
+      "imageAcquireCpuMs_ns": "8700",
+      "frameFenceWaitCpuMs_ns": "9900",
+      "wholeFrameCycleCpuMs_ns": "8706100",
+      "hostPhasesNanoseconds": {
+        "host_previous_tail_ns": 214300,
+        "host_system_load_ns": 1000,
+        "host_messages_ns": 3800,
+        "host_visibility_ns": 59300,
+        "host_clock_simulation_ns": 4853300,
+        "host_render_to_present_ns": 8706100,
+        "host_previous_evidence_ns": 210000
+      }
+    },
+    {
+      "elapsed_s": "1.7503",
+      "present_return_interval_ns": "13634500",
+      "phase": "landing-sweep",
+      "station": "2",
+      "tick": "1540",
+      "gpu_ns": "2961600",
+      "simulation_step_cpu_ns": "5067200",
+      "imageAcquireCpuMs_ns": "8100",
+      "frameFenceWaitCpuMs_ns": "11900",
+      "wholeFrameCycleCpuMs_ns": "8475900",
+      "hostPhasesNanoseconds": {
+        "host_previous_tail_ns": 48900,
+        "host_system_load_ns": 400,
+        "host_messages_ns": 2600,
+        "host_visibility_ns": 39500,
+        "host_clock_simulation_ns": 5067600,
+        "host_render_to_present_ns": 8475500,
+        "host_previous_evidence_ns": 43900
+      }
+    },
+    {
+      "elapsed_s": "2.24764",
+      "present_return_interval_ns": "13369800",
+      "phase": "landing-sweep",
+      "station": "2",
+      "tick": "1570",
+      "gpu_ns": "3233120",
+      "simulation_step_cpu_ns": "5359600",
+      "imageAcquireCpuMs_ns": "8800",
+      "frameFenceWaitCpuMs_ns": "14200",
+      "wholeFrameCycleCpuMs_ns": "7890100",
+      "hostPhasesNanoseconds": {
+        "host_previous_tail_ns": 62400,
+        "host_system_load_ns": 400,
+        "host_messages_ns": 4300,
+        "host_visibility_ns": 53200,
+        "host_clock_simulation_ns": 5359800,
+        "host_render_to_present_ns": 7889700,
+        "host_previous_evidence_ns": 58300
+      }
+    },
+    {
+      "elapsed_s": "2.3146",
+      "present_return_interval_ns": "13356600",
+      "phase": "landing-sweep",
+      "station": "2",
+      "tick": "1574",
+      "gpu_ns": "3223392",
+      "simulation_step_cpu_ns": "3867300",
+      "imageAcquireCpuMs_ns": "6500",
+      "frameFenceWaitCpuMs_ns": "6200",
+      "wholeFrameCycleCpuMs_ns": "9390600",
+      "hostPhasesNanoseconds": {
+        "host_previous_tail_ns": 46700,
+        "host_system_load_ns": 200,
+        "host_messages_ns": 3600,
+        "host_visibility_ns": 48300,
+        "host_clock_simulation_ns": 3867500,
+        "host_render_to_present_ns": 9390300,
+        "host_previous_evidence_ns": 43500
+      }
+    },
+    {
+      "elapsed_s": "2.23427",
+      "present_return_interval_ns": "13356100",
+      "phase": "landing-sweep",
+      "station": "2",
+      "tick": "1569",
+      "gpu_ns": "3429280",
+      "simulation_step_cpu_ns": "5087300",
+      "imageAcquireCpuMs_ns": "9100",
+      "frameFenceWaitCpuMs_ns": "16200",
+      "wholeFrameCycleCpuMs_ns": "8133300",
+      "hostPhasesNanoseconds": {
+        "host_previous_tail_ns": 63800,
+        "host_system_load_ns": 300,
+        "host_messages_ns": 3400,
+        "host_visibility_ns": 68000,
+        "host_clock_simulation_ns": 5087600,
+        "host_render_to_present_ns": 8133000,
+        "host_previous_evidence_ns": 58200
+      }
+    }
+  ]
+}
