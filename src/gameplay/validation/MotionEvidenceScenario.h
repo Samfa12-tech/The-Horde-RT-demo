@@ -25,10 +25,14 @@ enum class MotionScenario : std::uint8_t
     ChapterStreamingCycle,
     ChapterResidentComparison,
     ChapterStreamedComparison,
+    KeeperTorchTransition,
 };
 inline constexpr bool IsChapterMotionScenario(MotionScenario scenario) noexcept {
     return scenario==MotionScenario::ChapterRoundTrip || scenario==MotionScenario::ChapterStreamingCycle ||
         scenario==MotionScenario::ChapterResidentComparison || scenario==MotionScenario::ChapterStreamedComparison;
+}
+inline constexpr bool IsTimedMotionScenario(MotionScenario scenario) noexcept {
+    return IsChapterMotionScenario(scenario) || scenario==MotionScenario::KeeperTorchTransition;
 }
 
 // Lifetime counters are cumulative across a scene; validation owns only its delta.
@@ -46,6 +50,7 @@ enum class MotionStage : std::uint8_t
     AwaitDeath, RetryRequested, Recognition, RetryTelegraph, Fight,
     Reward, TerminalReentry, Complete, Failed,
     TorchDrenchGuttering, TorchDrenchFalling, TorchDrenchSettled,
+    TorchBaseline, TorchActivation, TorchLit,
 };
 
 [[nodiscard]] bool ParseMotionScenario(std::string_view text, MotionScenario& scenario) noexcept;
@@ -159,6 +164,7 @@ private:
     std::uint64_t swordAttachmentSequence_ = 0u;
     std::uint64_t swordSwingSequence_ = 0u;
     bool equipmentSeedOwned_ = false;
+    unsigned torchRouteWaypoint_ = 0;
 };
 
 } // namespace horde::gameplay::validation

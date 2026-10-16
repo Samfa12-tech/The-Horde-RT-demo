@@ -1,5 +1,18 @@
 # Horde 1.7 current design index
 
+The [two-torch activation profile](../evidence/2026-10-17-keeper-torch-transition/README.md)
+now reproduces the owner's reveal dip in the actual authored chapter on both
+phone RT backends. All1,212 completed frames join their own GPU stages and real
+display timestamps. At the first uploaded IDs3/4 frame, dispatch rises from
+about66–67ms to105–110ms and stays elevated; AS remains below0.5ms with flat
+memory/instance counts. Settled display intervals rise75→117–121ms, with fixed
+step catch-up overruns. This is a bounded natural reveal, with6.33cm arrival
+movement and co-activated presentation, not a light-only counterfactual or
+sustained smooth-play acceptance. The next bounded attribution should target
+the added light shader paths, preserving appearance/shadows and all budgets.
+No production correction is adopted. Original phone Debug is restored/stopped;
+the existing loading, tomb/material/niche and deferred-roadmap decisions remain.
+
 The [inverse-transform experiment](../evidence/2026-10-17-inverse-transform/README.md)
 tests that next hypothesis without production adoption. All four Opaque policies
 fit fixed limits; all four Generic policies fail bytes+64/words+16. Only the

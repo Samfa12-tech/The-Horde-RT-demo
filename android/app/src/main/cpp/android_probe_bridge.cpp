@@ -251,6 +251,7 @@ struct AndroidMotionRun
         float x=0,y=0,z=0,yaw=0,pitch=0;
         unsigned viewTicks=0;
         std::uint64_t detailCpuNs=0;
+        horde::gameplay::validation::MotionStage motionStage{};
 #if HORDE_RT_FRAME_STAGE_PROBE
         std::array<bool,3> stageSubmitted{};
 #if HORDE_RT_DISPATCH_CLOCK_PROBE
@@ -4630,13 +4631,13 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
             if (!context.rtFrameEvidence.TryGetCommittedIdentity(context.currentFrame, owner) ||
                 !context.motion->ledger.BindSubmittedFrame(context.surfaceGeneration, owner))
                 FailAndroidMotion(context, "Motion frame could not bind its actual submitted simulation owner.");
-            else if(horde::gameplay::validation::IsChapterMotionScenario(context.motion->selected)) {
+            else if(horde::gameplay::validation::IsTimedMotionScenario(context.motion->selected)) {
                 auto& tag=context.motion->chapterTags[context.currentFrame];
                 const auto& state=gGameSimulation.Snapshot();
                 tag={owner.submissionSerial,0,context.motion->scenario.ChapterPhase(),
                      context.rtScene.OrdinaryStaticDetailEvidence(),state.playerX,state.playerSupportWorldY,state.playerZ,
                      context.motion->chapterCameraYaw,context.motion->chapterCameraPitch,context.motion->scenario.ChapterViewTicks(),
-                     context.motion->chapterDetailCpuNs};
+                     context.motion->chapterDetailCpuNs,context.motion->scenario.Stage()};
 #if HORDE_RT_FRAME_STAGE_PROBE
 #if HORDE_RT_DISPATCH_CLOCK_PROBE
                 tag.clockTicket=context.rtScene.DispatchClockTicket();
@@ -5276,7 +5277,7 @@ void SwapchainRenderLoop()
         if (gSwapchainContext.motion && gSwapchainContext.motion->terminalTimingDrainPending)
         {
 #if HORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING
-            if(horde::gameplay::validation::IsChapterMotionScenario(gSwapchainContext.motion->selected))
+            if(horde::gameplay::validation::IsTimedMotionScenario(gSwapchainContext.motion->selected))
                 PollAndroidChapterTerminalTimingDrain(gSwapchainContext);
             else
 #endif
@@ -6963,7 +6964,7 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestDebugMotionEvidence(
     env->ReleaseStringUTFChars(runId, idText);
     if (!admitted || !horde::platform::android::AndroidMotionRunIdValid(id)) return JNI_FALSE;
 #if !HORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING
-    if(horde::gameplay::validation::IsChapterMotionScenario(scenario))return JNI_FALSE;
+    if(horde::gameplay::validation::IsTimedMotionScenario(scenario))return JNI_FALSE;
 #endif
     std::lock_guard<std::mutex> admissionLock(gDebugRequestAdmissionMutex);
     if (!horde::platform::android::CanRequestCombatPractice(

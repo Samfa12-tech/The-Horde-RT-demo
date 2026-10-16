@@ -32,7 +32,8 @@ bool ParseMotionScenario(std::string_view text, MotionScenario& scenario) noexce
                            MotionScenario::KeeperFirstEntry, MotionScenario::KeeperRetryReward,
                            MotionScenario::WaterfallEquipment, MotionScenario::TorchDrench,
                            MotionScenario::ChapterRoundTrip, MotionScenario::ChapterStreamingCycle,
-                           MotionScenario::ChapterResidentComparison, MotionScenario::ChapterStreamedComparison})
+                           MotionScenario::ChapterResidentComparison, MotionScenario::ChapterStreamedComparison,
+                           MotionScenario::KeeperTorchTransition})
         if (text == MotionScenarioName(candidate)) { scenario = candidate; return true; }
     return false;
 }
@@ -50,6 +51,7 @@ const char* MotionScenarioName(MotionScenario scenario) noexcept
     case MotionScenario::ChapterStreamingCycle: return "chapter-streaming-cycle";
     case MotionScenario::ChapterResidentComparison: return "chapter-resident-comparison";
     case MotionScenario::ChapterStreamedComparison: return "chapter-streamed-comparison";
+    case MotionScenario::KeeperTorchTransition: return "keeper-torch-transition";
     default: return "invalid";
     }
 }
@@ -78,6 +80,9 @@ const char* MotionStageName(MotionStage stage) noexcept
     case MotionStage::TorchDrenchGuttering: return "torch-drench-guttering";
     case MotionStage::TorchDrenchFalling: return "torch-drench-falling";
     case MotionStage::TorchDrenchSettled: return "torch-drench-settled";
+    case MotionStage::TorchBaseline: return "torch-baseline";
+    case MotionStage::TorchActivation: return "torch-activation";
+    case MotionStage::TorchLit: return "torch-lit";
     default: return "invalid";
     }
 }
@@ -92,7 +97,11 @@ bool MotionEvidenceScenario::Begin(MotionScenario scenario, GameSimulation& simu
     { Fail("Motion evidence requires an admitted scenario, clock and production simulation profile."); return false; }
     // Chapter measurement observes an already rendered/admitted reunion. It
     // neither fabricates readiness nor seeds progression inside the timed run.
-    const bool seeded = IsChapterMotionScenario(scenario)
+    const auto& initial = simulation.Snapshot();
+    const bool seeded = scenario==MotionScenario::KeeperTorchTransition
+        ? initial.developmentRescueJourney && !initial.lich.revealStarted &&
+          initial.playerAlive && Distance(initial,kPlayerSpawn.x,kPlayerSpawn.z)<0.01f
+        : IsChapterMotionScenario(scenario)
         ? chapter_.Start(simulation.Snapshot(),scenario!=MotionScenario::ChapterRoundTrip,
             scenario==MotionScenario::ChapterResidentComparison || scenario==MotionScenario::ChapterStreamedComparison)
         : scenario == MotionScenario::WaterfallEquipment
@@ -200,6 +209,27 @@ InputSnapshot MotionEvidenceScenario::BuildInput(const SimulationSnapshot& state
         input.commands=commands_;
         if(chapter_.Phase()==ChapterProbePhase::Failed)Fail("Chapter route lost readiness, generation or progress.");
         if(Failed()){input.paused=true;input.moveForward=input.moveStrafe=0;}
+        return input;
+    }
+    if (scenario_==MotionScenario::KeeperTorchTransition) {
+        // Observe the live chapter, never import an encounter phase/light or
+        // override delta. Ordinary axes traverse the collision-resolved route.
+        input.tutorialEnabled=false;
+        input.damageEnabled=false; // transit probe, not a combat balance test
+        input.yawRadians=-kPi*0.5f;input.pitchRadians=0;
+        if (!input.paused) {
+            constexpr std::array<RoutePosition,6> route{{
+                {0,-9.5f},{4.2f,-9.5f},{4.2f,-15.2f},{-2,-15.2f},{-8,-15.2f},{-30.46f,-15.2f}}};
+            if (stage_==MotionStage::Approach) {
+                const auto target=route[torchRouteWaypoint_];
+                MoveTowards(input,state,target.x,target.z);
+                if (Distance(state,target.x,target.z)<0.035f) {
+                    if (++torchRouteWaypoint_==route.size()) Enter(MotionStage::TorchBaseline);
+                }
+            } else if (stage_==MotionStage::TorchActivation)
+                MoveTowards(input,state,kKeeperRetryPosition.x,kKeeperRetryPosition.z);
+        }
+        input.commands=commands_;
         return input;
     }
     if (!input.paused)
@@ -351,6 +381,38 @@ void MotionEvidenceScenario::ObserveAdvance(const SimulationSnapshot& state,
     const bool advanced = state.tickIndex > previousTick_;
     simulationSeconds_ += static_cast<double>(state.tickIndex - previousTick_) * FixedStepRunner::kFixedDeltaSeconds;
     previousTick_ = state.tickIndex;
+    if (scenario_==MotionScenario::KeeperTorchTransition) {
+        for(const auto& event:events) {
+            if(event.sequence<=previousEventSequence_ || static_cast<std::size_t>(event.type)>=eventCounts_.size()) {
+                Fail("Torch probe event sequence/type is invalid.");return;
+            }
+            previousEventSequence_=event.sequence;
+            ++eventCounts_[static_cast<std::size_t>(event.type)];
+        }
+        const double elapsed=simulationSeconds_-stageStartSeconds_;
+        if(elapsed>45) {Fail("Torch transition stage made no bounded progress.");return;}
+        if(!state.developmentRescueJourney || state.eventQueueOverflowCount || !state.playerAlive || state.lich.health!=3 ||
+           state.lich.damagePulse || state.lich.staffLightStrength!=0 ||
+           eventCounts_[static_cast<std::size_t>(GameplayEventType::KeeperRevealStarted)]>1) {
+            Fail("Torch probe lost live chapter/reveal-only safety.");return;
+        }
+        if(stage_==MotionStage::Approach || stage_==MotionStage::TorchBaseline) {
+            if(state.lich.revealStarted) {Fail("Keeper activated before the measured arrival crossing.");return;}
+            if(stage_==MotionStage::TorchBaseline && elapsed>=6) Enter(MotionStage::TorchActivation);
+        } else if(stage_==MotionStage::TorchActivation && state.lich.revealStarted) {
+            revealHeldX_=state.playerX;revealHeldZ_=state.playerZ;Enter(MotionStage::TorchLit);
+        } else if(stage_==MotionStage::TorchLit) {
+            if(Distance(state,revealHeldX_,revealHeldZ_)>0.0001f) {
+                Fail("Torch probe moved during the held reveal view.");return;
+            }
+            if(state.lich.revealComplete) {
+                if(eventCounts_[static_cast<std::size_t>(GameplayEventType::KeeperRevealStarted)]!=1)
+                    Fail("Torch probe did not observe the authoritative reveal event.");
+                else Enter(MotionStage::Complete);
+            }
+        }
+        return;
+    }
     if (state.eventQueueOverflowCount != 0u) { Fail("Semantic gameplay event queue overflowed."); return; }
     bool impact = false;
     for (const auto& event : events)

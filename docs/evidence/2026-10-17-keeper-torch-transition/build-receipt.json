@@ -1,0 +1,28 @@
+{
+  "baseHead": "4cb9145747e5441d787294dd99d57d3f8298ede6",
+  "patchSha256": "43bf0b536d41d2081a11c6e7ef79cde0587ecefaee495d0f235dfad2746f31ab",
+  "sourceFiles": {
+    ".github/workflows/shared-simulation-host.yml": "2f41d57a6637114f52a4693f23a6e35bac746a7cea63a9791de907d941f631eb",
+    "android/app/src/main/cpp/android_motion_evidence.inl": "ed6159530845dc903c3104156a88b4544b7a2951e2e9b5133c701176549f4e64",
+    "android/app/src/main/cpp/android_probe_bridge.cpp": "4f1a4d53bf2c6085ba5625e919e43d610c22fe9f30b0fd0662d60cb3705c7bd2",
+    "src/gameplay/validation/MotionEvidenceScenario.cpp": "c198068ff68d1f5707e2f99d75a39374216ccad72d82c14f59b61e2aaef1fecd",
+    "src/gameplay/validation/MotionEvidenceScenario.h": "0f3a8c3bcb0cc109c92528325f5e291b09967a1210745e5b20fdaf22377d3889",
+    "tests/MotionEvidenceScenarioTests.cpp": "7f7772ffab77394b175ce80c19bd6c6c8ded23403bd163d38da8429f17a1cb13",
+    "tests/test_android_motion_present_timing.py": "907107139fd3104ec1b007a08ad004ad016266b66094ff5f35069ba9a0a174d6",
+    "tools/analyze_android_motion_present_timing.py": "78da41d2dc72a1abce43b841323275b72cb0303a830fca5c9b2acc6db9b164c9",
+    "tools/analyze_android_rt_stage_profile.py": "b0ce507a6f56f1fbe86f2797617281bc6ed96b97b54dd25f27a65b3c63727c25",
+    "tools/analyze_keeper_torch_transition.py": "84380fde5134c3a91a6b8007375f8d63cf89c8dcec8af52f9ee1fc659b36fa12",
+    "tests/test_keeper_torch_transition.py": "b162785def8aef2832bfaec26cbc7e20f2781955ede3d992d8bbe6b2664c1999"
+  },
+  "apkSha256": "6d43d5dc3fa9325a7be4b85ffc3521f536e5ad41d63db7b7ac71ae5ff3d625e8",
+  "apkBytes": 183656522,
+  "assetsIdentical": 169,
+  "signerSha256": "2bc406088b23ac80f2a00a40e2d5d8daa012844dc62f31ad6145d129f5566736",
+  "nativeLibraries": {
+    "lib/arm64-v8a/libhorde_rt_probe_android.so": "8d29dff4dbac3c781193f30fb3209ac1546ac5494bf14a50e43410d408a3118c",
+    "lib/armeabi-v7a/libhorde_rt_probe_android.so": "a49cb63a5510712a39fc9d278c29ec2e3e784241c2988069c578a124832ca3f5",
+    "lib/x86/libhorde_rt_probe_android.so": "49ece0696091b89ef2d78f2ad1838a477191fea56d212a2ce35c75ffbd84557f",
+    "lib/x86_64/libhorde_rt_probe_android.so": "a3f2f4aeb8171da37250b905cde223f395f3633460595a5e2849d33f2cd29d84"
+  },
+  "budgetsSha256": "56936479b2d202dbdb9393ba94b66a1b0bc12d490b700d8af4c63de3460e53bf"
+}

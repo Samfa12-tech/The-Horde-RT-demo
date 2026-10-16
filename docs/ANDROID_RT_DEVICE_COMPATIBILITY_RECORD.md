@@ -1,5 +1,33 @@
 # Android RT Device Compatibility Record
 
+## 17 October real Keeper torch activation — SM-S948B / Android17
+
+Evidence class: **authorized private Debug/O2 install/hash verification,
+natural live-chapter transition on both hardware RT backends, strict GPU-stage/
+actual-display joins and separately inspected foreground screenshots**.
+[Exact artifacts, captures, analysis and limitations](evidence/2026-10-17-keeper-torch-transition/README.md).
+APK6d43d5dc3fa9325a7be4b85ffc3521f536e5ad41d63db7b7ac71ae5ff3d625e8,
+183,656,522B; API37/Adreno840/Vulkan1.4.295/driver2150932499.
+Current saved40%/CURRENT,576×1188 internal,169 matching asset payloads and
+unchanged original Shipping/Mobile shaders. No inverse-transform or clock
+treatment. Source4cb91457 plus archived exact native patch/hashes; this is the
+existing private r10 page/stage profile, not a production release candidate.
+
+All608 Pipeline and604 Query frames pass owned stage/display joins. Unlit/lit
+dispatch medians66.304→104.590ms and67.056→109.951ms; display intervals
+75→116.667ms and75→120.833ms. AS medians stay0.36–0.44ms, allocations and
+28 TLAS/21 BLAS counts stay flat. All50 settled lit frames reach the existing
+six-tick cap and overrun; none of64 settled unlit frames do. Framework thermal
+status0 at both boundaries. The ordinary crossing moves6.33cm and co-activates
+reveal presentation; attribution to individual light/shadow/volume paths is
+still open. Short observations are not sustained FPS or owner acceptance.
+
+No production rendering, quality, streaming or budget change. Original
+f13dda30…fa527 restored/installed-hash verified, preferences byte-identical,
+Debug stopped, release app untouched. Current/Higher and Lower→Current
+migration physical acceptance, complete route/lifecycle and owner play/listen/
+haptic acceptance remain pending. No other phone is certified by this result.
+
 ## 17 October inverse-transform experiment — SM-S948B / Android17
 
 Evidence class: **owner-authorized private Debug/O2 install/pullback, eight

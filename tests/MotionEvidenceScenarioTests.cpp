@@ -846,6 +846,50 @@ int main(int argc, char** argv)
     TestRearLookCannotBeSkipped();
     for (int rate : {15, 30, 60, 120})
     {
+        {
+            GameSimulation live(ProductionGameSimulationConfig());
+            MotionEvidenceScenario probe;
+            Check(!probe.Begin(MotionScenario::KeeperTorchTransition,live,1),
+                "torch probe rejects the legacy showcase instead of silently profiling it");
+            live.StartLiveDevelopmentRescueJourney(true);
+            const auto initialTick=live.Snapshot().tickIndex;
+            Check(probe.Begin(MotionScenario::KeeperTorchTransition,live,1) &&
+                  live.Snapshot().tickIndex==initialTick,
+                "torch probe observes live chapter without reseeding/advancing it");
+            std::uint64_t now=1,publication=1;
+            bool baseline=false,lit=false,pauseChecked=false;
+            for(int frame=0;frame<rate*115 && !probe.Complete() && !probe.Failed();++frame) {
+                now+=1'000'000'000ull/rate;
+                const auto input=probe.BuildInput(live.Snapshot(),{},now,true);
+                Check(!input.hasAuthoritativePlayerPose && !input.tutorialEnabled,
+                    "torch probe retains ordinary movement and normal simulation time");
+                live.AdvanceFrame(input,1.0/rate,publication++);
+                probe.ObserveAdvance(live.Snapshot(),live.Events().Events());live.ClearEvents();
+                if(probe.Stage()==MotionStage::TorchBaseline || probe.Stage()==MotionStage::TorchLit) {
+                    unsigned litSources=0;
+                    for(unsigned i=0;i<live.Snapshot().fireEmitterCount;++i) {
+                        const auto& e=live.Snapshot().fireEmitters[i];
+                        if((e.stableId==3 || e.stableId==4) && e.strength>0)++litSources;
+                    }
+                    Check(litSources==(probe.Stage()==MotionStage::TorchLit?2u:0u),
+                        "both production torches switch at the real reveal, never during baseline");
+                    if(!pauseChecked && probe.Stage()==MotionStage::TorchLit) {
+                        const auto tick=live.Snapshot().tickIndex;
+                        InputSnapshot pause;pause.paused=true;
+                        const auto held=probe.BuildInput(live.Snapshot(),pause,now,false);
+                        live.AdvanceFrame(held,1.0/rate,publication++);
+                        probe.ObserveAdvance(live.Snapshot(),live.Events().Events());live.ClearEvents();
+                        Check(held.paused && live.Snapshot().tickIndex==tick,
+                            "foreground/readiness loss freezes the ordinary reveal rather than forcing it");
+                        pauseChecked=true;
+                    }
+                }
+                baseline=baseline || probe.Stage()==MotionStage::TorchBaseline;
+                lit=lit || probe.Stage()==MotionStage::TorchLit;
+            }
+            if(!probe.Complete())std::cerr<<"Torch probe: "<<probe.Failure()<<" stage "<<MotionStageName(probe.Stage())<<" at "<<live.Snapshot().playerX<<","<<live.Snapshot().playerZ<<'\n';
+            Check(probe.Complete() && baseline && lit,"live torch crossing completes baseline and actual reveal");
+        }
         TestWaterfallEquipmentSeedOwnership(rate);
         RunTorchDrench(rate);
         for (const auto kind : {MotionScenario::TorchLowOpening, MotionScenario::ShaftUp,

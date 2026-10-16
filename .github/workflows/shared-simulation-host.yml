@@ -500,6 +500,9 @@ jobs:
       - name: Check optional GPU stage submission joins
         run: python -m unittest discover -s tests -p test_android_rt_stage_profile.py -v
 
+      - name: Check authored Keeper torch-transition attribution
+        run: python -m unittest discover -s tests -p test_keeper_torch_transition.py -v
+
       - name: Check private sparse clock evidence admission
         run: python -m unittest discover -s tests -p test_android_dispatch_clock.py -v
 

@@ -36,7 +36,7 @@ def unsigned(value: str | None, label: str) -> int:
     return number
 
 
-def join_stages(rows: list[dict], frames: list[dict]) -> dict:
+def join_stages(rows: list[dict], frames: list[dict], *, held_views=VIEWS) -> dict:
     """Require every completed frame, including cutovers and the final frame."""
     if not rows or len(rows) != len(frames):
         raise AnalysisError("stage rows must match every completed frame")
@@ -56,7 +56,7 @@ def join_stages(rows: list[dict], frames: list[dict]) -> dict:
                 raise AnalysisError(f"row {index}: {stage} borrowed another submission")
             observations[stage].append(unsigned(row.get(stage + "_gpu_ns"), stage + " ns"))
     views = {}
-    for phase in VIEWS:
+    for phase in held_views:
         indices = [i for i, row in enumerate(rows) if i and row["phase"] == phase
                    and rows[i-1]["phase"] == phase
                    and 60 <= unsigned(row.get("view_ticks"), "view ticks") <= 300
