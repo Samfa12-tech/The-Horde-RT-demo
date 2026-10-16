@@ -59,7 +59,8 @@ def join_transition(report, rows):
                 raise AnalysisError(label + ' camera is not held')
         groups[label] = {
             'firstSubmission': frames[indices[0]]['submission'], 'lastSubmission': frames[indices[-1]]['submission'],
-            'camera': {a: float(rows[indices[0]][a]) for a in ('x', 'y', 'z', 'yaw', 'pitch')},
+            'viewAnchor': {a: float(rows[indices[0]][a]) for a in ('x', 'y', 'z', 'yaw', 'pitch')},
+            'viewAnchorConvention': 'x/z player origin; y player support height, not optical eye; yaw/pitch are rendered view angles',
             'actualInterPresent': summary([times[i]-times[i-1] for i in indices]),
             'gpuStages': {s: summary([int(rows[i][s+'_gpu_ns']) for i in indices]) for s in STAGES},
             'deviceLocalBytes': sorted({frames[i]['deviceLocalBytes'] for i in indices}),

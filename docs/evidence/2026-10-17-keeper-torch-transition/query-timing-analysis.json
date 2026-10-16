@@ -28,13 +28,14 @@
     "unlit": {
       "firstSubmission": 488,
       "lastSubmission": 551,
-      "camera": {
+      "viewAnchor": {
         "x": -30.4456,
         "y": -0.95,
         "z": -15.2,
         "yaw": -1.5708,
         "pitch": 0.0
       },
+      "viewAnchorConvention": "x/z player origin; y player support height, not optical eye; yaw/pitch are rendered view angles",
       "actualInterPresent": {
         "n": 64,
         "medianMs": 75.0,
@@ -154,13 +155,14 @@
     "lit": {
       "firstSubmission": 563,
       "lastSubmission": 612,
-      "camera": {
+      "viewAnchor": {
         "x": -30.509,
         "y": -0.95,
         "z": -15.2,
         "yaw": -1.5708,
         "pitch": 0.0
       },
+      "viewAnchorConvention": "x/z player origin; y player support height, not optical eye; yaw/pitch are rendered view angles",
       "actualInterPresent": {
         "n": 50,
         "medianMs": 120.833333,

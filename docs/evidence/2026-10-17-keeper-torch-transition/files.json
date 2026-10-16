@@ -8,16 +8,20 @@
     "sha256": "ddbbe78e456d5d652ab733ee43463d5dfe1e4ab319a8c3eeb8f992f976f90d85"
   },
   "pipeline-timing-analysis.json": {
-    "bytes": 27034,
-    "sha256": "5e71ad0b9420be850a2da75294ed9bb3f787ddccae872f28d654cd9e103015eb"
+    "bytes": 27302,
+    "sha256": "9098b00d13dc9d74af384470c1508c4af296e20a132965ecc763276735652688"
   },
   "query-timing-analysis.json": {
-    "bytes": 27016,
-    "sha256": "d2d98b9728ddd69da4420b6ea965769317ab227494846c5f02fd234178805f1f"
+    "bytes": 27284,
+    "sha256": "b63ce8d9019675ae165944cd6a02c98447a2df21f077755f146d859b4d9ac360"
   },
   "raw-evidence.zip": {
-    "bytes": 1315719,
-    "sha256": "5e8041e9173c4fabb62bd7b3bbb54495bb034dea6ed616154633fadfbffa0975"
+    "bytes": 1316106,
+    "sha256": "3eb87c700881bac0175b4ca69034bee11e9bd4325f94d3791d596ad86578e1d3"
+  },
+  "README.md": {
+    "bytes": 10101,
+    "sha256": "0a7fff85860807b58f99d93688fb822a2d4063d21848ccd4256d1af1b02ab8e4"
   },
   "torch-baseline.png": {
     "bytes": 1279344,

@@ -36,6 +36,7 @@ class TorchTransitionTests(unittest.TestCase):
         result = join_transition(report, rows)
         self.assertEqual(result['firstLitSubmission'], 61)
         self.assertEqual(result['heldViews']['lit']['actualInterPresent']['medianMs'], 50)
+        self.assertIn('support height, not optical eye', result['heldViews']['lit']['viewAnchorConvention'])
 
     def test_light_before_event(self):
         report, rows = fixture()
