@@ -1,5 +1,18 @@
 # Horde 1.7 current design index
 
+The [production-bank performance checkpoint](../evidence/2026-10-17-production-performance/README.md)
+supersedes private-bank timings as the current normal-shader control. One
+Opaque inverse-transform trial was tested and reverted: no repeatable gain is
+established. Six short phone runs join 4,164 actual presentations; eight matched
+image pairs retain appearance. A hotter Query run is rejected for a missing
+first display timestamp, and a reverse-order control remains pending after the
+notification shade interrupted foreground. No shader, quality or budget change
+is adopted; outdoor expansion stays behind the performance gate. The normal
+bank now records one 7.65 MiB static-owner saving/exact return, distinct from
+the prior private 13.59 MiB profile; peak overlap and sustained acceptance remain
+open. Completed chapter assets, tomb/material/niche fixes and loading work are
+preserved; Easy Tree/canopy and mist issue28 remain deferred.
+
 The [two-torch activation profile](../evidence/2026-10-17-keeper-torch-transition/README.md)
 now reproduces the owner's reveal dip in the actual authored chapter on both
 phone RT backends. All1,212 completed frames join their own GPU stages and real

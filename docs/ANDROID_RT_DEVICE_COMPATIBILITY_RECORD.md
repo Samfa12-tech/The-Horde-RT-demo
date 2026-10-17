@@ -1,5 +1,30 @@
 # Android RT Device Compatibility Record
 
+## 17 October normal production-bank optimization loop — SM-S948B / Android17
+
+Evidence class: **authorized same-signer Debug/O2 phone update, normal
+Shipping/Mobile shaders, six short out-and-back runs with strict actual-display
+joins, eight frozen image comparisons and inspected representative frames**. See the
+[exact revision/artifacts, temperatures, results and limitations](evidence/2026-10-17-production-performance/README.md).
+Runtime base3252820f, control APKa49955a2…95a8d6c, trialfbfdf02a…ef4e2a7;
+API37/Adreno840/Vulkan1.4.295/driver2150932499. Saved40%/CURRENT and all169
+assets are unchanged. No private stage/clock shader observer is used.
+
+All4,164 accepted frame/display joins pass. Opaque-only inverse transpose is
+**not adopted**: small mixed observations are thermally confounded, and a
+matched reverse-order control stopped before input when NotificationShade
+covered the game. One hotter Query run rejects691 completed submissions with
+only690 actual timestamps, leaving the first present ID unresolved. The
+two-second drain and strict coverage remain unchanged. Six image pairs are
+pixel-identical; two differ at50pixels by at most1/255 in a channel.
+
+Normal-bank routes retain one7.65MiB static-owner saving/exact restoration and
+zero readiness waits; larger observed overlap and UMA accounting are documented
+without claiming whole-process RAM savings. No sustained30FPS, live combat,
+Current/Higher migration, lifecycle or owner visual/audio/haptic acceptance is
+established. Shader edits/artifacts and default build products are restored;
+unrelated chapter work, release app, data and saved settings are preserved.
+
 ## 17 October real Keeper torch activation — SM-S948B / Android17
 
 Evidence class: **authorized private Debug/O2 install/hash verification,

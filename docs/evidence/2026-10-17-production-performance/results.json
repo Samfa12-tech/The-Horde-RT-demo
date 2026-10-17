@@ -1,0 +1,3096 @@
+{
+  "runtimeBaseRevision": "3252820f6f443d127b128840621ed8846282172f",
+  "disposition": "not adopted; no repeatable thermally matched gain established; trial source restored",
+  "runs": [
+    {
+      "case": "pipeline-baseline-03",
+      "strict": {
+        "eligible": true,
+        "reportSha256": "6c69859819f9d854d6241bcdf51ebd4070cfd9deff46bfaf570187528b8120d8",
+        "runId": "prod-pipeline-baseline-03",
+        "workload": "motion-chapter-performance-route-v1",
+        "buildId": "1.6.2",
+        "settings": {
+          "scalePercent": 40,
+          "width": 1440,
+          "height": 2971,
+          "internalWidth": 576,
+          "internalHeight": 1188,
+          "backend": "RayTracingPipeline",
+          "water": 1,
+          "fire": 0,
+          "cap": 30,
+          "glass": false,
+          "shadow": 1,
+          "mist": true,
+          "dust": 1
+        },
+        "scope": {
+          "surfaceGeneration": 1,
+          "sceneEpoch": 3,
+          "measurementGeneration": 5,
+          "matchedCompletedFrames": 686,
+          "intervalCount": 685,
+          "durationNanoseconds": 69845662005,
+          "setupPresentationRowsExcluded": 0
+        },
+        "intervalsNanoseconds": {
+          "median": 87499947,
+          "p90NearestRank": 154113697,
+          "p95NearestRank": 154166667,
+          "maximum": 162435260,
+          "over33333000Nanoseconds": 685,
+          "over250000000Nanoseconds": 0
+        },
+        "observedPresentedImageRatePerSecond": 9.807338,
+        "simulation": {
+          "stateRows": 686,
+          "eventRows": 48,
+          "ticksThisFrameMaximum": 6,
+          "catchUpOverrunCountFirst": 0,
+          "catchUpOverrunCountLast": 259,
+          "catchUpOverrunDelta": 259
+        },
+        "collector": {
+          "runCounterDelta": {
+            "preparedPresents": 686,
+            "acceptedPresents": 686,
+            "rejectedPresents": 0,
+            "invalidRegistrations": 0,
+            "invalidMetadata": 0,
+            "pendingCapacityExhausted": 0,
+            "queryCalls": 1365,
+            "queryErrors": 0,
+            "incompleteQueries": 0,
+            "zeroPresentTimestamps": 0,
+            "zeroPresentIds": 0,
+            "unknownPresentIds": 0,
+            "duplicateTimings": 0,
+            "rowCapacityExhausted": 0,
+            "missingOnRebind": 0,
+            "missingOnUnbind": 0,
+            "abandonedPreparedPresents": 0
+          },
+          "queryCpuWallNanoseconds": 9391868,
+          "presentMarginAtLeast2Pow63CountIgnored": 686
+        },
+        "limits": [
+          "Bounded ordinary chapter traversal with zero mid-route image readbacks; recorder overhead remains.",
+          "One continuous resource scope; retry/rotation/lifecycle discontinuities require separate evidence.",
+          "Actual inter-present intervals; not sustained FPS, scanout, photons, GPU reciprocal time, touch latency or owner acceptance.",
+          "Trace extents are native resource observations; this analyzer does not certify appearance, thermals or power."
+        ]
+      },
+      "views": {
+        "landing-sweep": {
+          "pose": {
+            "x": -33.6867,
+            "y": 2.05,
+            "z": -12.7813,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 39,
+            "medianMs": 135.82484,
+            "p95Ms": 138.258799,
+            "maximumMs": 138.264476,
+            "over33_333ms": 39,
+            "over250ms": 0
+          },
+          "display": {
+            "n": 39,
+            "medianMs": 150.000104,
+            "p95Ms": 158.333386,
+            "maximumMs": 158.333386,
+            "over33_333ms": 39,
+            "over250ms": 0
+          },
+          "cpu": {
+            "n": 39,
+            "medianMs": 152.907187,
+            "p95Ms": 157.615,
+            "maximumMs": 157.706458,
+            "over33_333ms": 39,
+            "over250ms": 0
+          },
+          "simulationOverruns": 39
+        },
+        "lower-sweep": {
+          "pose": {
+            "x": -33.7,
+            "y": -0.95,
+            "z": -15.2,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 49,
+            "medianMs": 71.124165,
+            "p95Ms": 72.143748,
+            "maximumMs": 72.419686,
+            "over33_333ms": 49,
+            "over250ms": 0
+          },
+          "display": {
+            "n": 49,
+            "medianMs": 83.333281,
+            "p95Ms": 83.333386,
+            "maximumMs": 83.333438,
+            "over33_333ms": 49,
+            "over250ms": 0
+          },
+          "cpu": {
+            "n": 49,
+            "medianMs": 80.432344,
+            "p95Ms": 81.952552,
+            "maximumMs": 82.335104,
+            "over33_333ms": 49,
+            "over250ms": 0
+          },
+          "simulationOverruns": 0
+        },
+        "passage-sweep": {
+          "pose": {
+            "x": -22.0231,
+            "y": -0.95,
+            "z": -15.2,
+            "yaw": 1.5708,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 51,
+            "medianMs": 68.606665,
+            "p95Ms": 69.664269,
+            "maximumMs": 71.750988,
+            "over33_333ms": 51,
+            "over250ms": 0
+          },
+          "display": {
+            "n": 51,
+            "medianMs": 75.000052,
+            "p95Ms": 83.333334,
+            "maximumMs": 83.333386,
+            "over33_333ms": 51,
+            "over250ms": 0
+          },
+          "cpu": {
+            "n": 51,
+            "medianMs": 77.354323,
+            "p95Ms": 79.979219,
+            "maximumMs": 82.802084,
+            "over33_333ms": 51,
+            "over250ms": 0
+          },
+          "simulationOverruns": 0
+        },
+        "repeat-ascent": {
+          "pose": {
+            "x": -33.7,
+            "y": 2.05,
+            "z": -12.8,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 40,
+            "medianMs": 135.1869235,
+            "p95Ms": 136.531351,
+            "maximumMs": 136.809476,
+            "over33_333ms": 40,
+            "over250ms": 0
+          },
+          "display": {
+            "n": 40,
+            "medianMs": 150.000053,
+            "p95Ms": 158.333281,
+            "maximumMs": 158.333385,
+            "over33_333ms": 40,
+            "over250ms": 0
+          },
+          "cpu": {
+            "n": 40,
+            "medianMs": 152.1060935,
+            "p95Ms": 155.709062,
+            "maximumMs": 157.316875,
+            "over33_333ms": 40,
+            "over250ms": 0
+          },
+          "simulationOverruns": 40
+        }
+      },
+      "thermals": [
+        {
+          "phase": "before-prepare",
+          "hostMonotonic": 243872.0,
+          "thermal": {
+            "schemaVersion": 1,
+            "temperatureSource": "current HAL",
+            "frameworkStatus": 0,
+            "sensors": {
+              "AP": {
+                "type": 0,
+                "celsius": 42.5,
+                "status": 0
+              },
+              "BAT": {
+                "type": 2,
+                "celsius": 32.4,
+                "status": 0
+              },
+              "SKIN": {
+                "type": 3,
+                "celsius": 36.5,
+                "status": 0
+              }
+            },
+            "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+          }
+        },
+        {
+          "phase": "before-route",
+          "hostMonotonic": 243891.281,
+          "thermal": {
+            "schemaVersion": 1,
+            "temperatureSource": "current HAL",
+            "frameworkStatus": 0,
+            "sensors": {
+              "AP": {
+                "type": 0,
+                "celsius": 45.1,
+                "status": 0
+              },
+              "BAT": {
+                "type": 2,
+                "celsius": 33.3,
+                "status": 0
+              },
+              "SKIN": {
+                "type": 3,
+                "celsius": 37.6,
+                "status": 0
+              }
+            },
+            "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+          }
+        },
+        {
+          "phase": "running",
+          "hostMonotonic": 243907.078,
+          "thermal": {
+            "schemaVersion": 1,
+            "temperatureSource": "current HAL",
+            "frameworkStatus": 0,
+            "sensors": {
+              "AP": {
+                "type": 0,
+                "celsius": 43.7,
+                "status": 0
+              },
+              "BAT": {
+                "type": 2,
+                "celsius": 33.6,
+                "status": 0
+              },
+              "SKIN": {
+                "type": 3,
+                "celsius": 37.7,
+                "status": 0
+              }
+            },
+            "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+          }
+        },
+        {
+          "phase": "running",
+          "hostMonotonic": 243922.781,
+          "thermal": {
+            "schemaVersion": 1,
+            "temperatureSource": "current HAL",
+            "frameworkStatus": 0,
+            "sensors": {
+              "AP": {
+                "type": 0,
+                "celsius": 43.7,
+                "status": 0
+              },
+              "BAT": {
+                "type": 2,
+                "celsius": 33.6,
+                "status": 0
+              },
+              "SKIN": {
+                "type": 3,
+                "celsius": 37.6,
+                "status": 0
+              }
+            },
+            "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+          }
+        },
+        {
+          "phase": "running",
+          "hostMonotonic": 243938.484,
+          "thermal": {
+            "schemaVersion": 1,
+            "temperatureSource": "current HAL",
+            "frameworkStatus": 0,
+            "sensors": {
+              "AP": {
+                "type": 0,
+                "celsius": 43.9,
+                "status": 0
+              },
+              "BAT": {
+                "type": 2,
+                "celsius": 33.9,
+                "status": 0
+              },
+              "SKIN": {
+                "type": 3,
+                "celsius": 37.7,
+                "status": 0
+              }
+            },
+            "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+          }
+        },
+        {
+          "phase": "running",
+          "hostMonotonic": 243954.218,
+          "thermal": {
+            "schemaVersion": 1,
+            "temperatureSource": "current HAL",
+            "frameworkStatus": 0,
+            "sensors": {
+              "AP": {
+                "type": 0,
+                "celsius": 43.9,
+                "status": 0
+              },
+              "BAT": {
+                "type": 2,
+                "celsius": 34.2,
+                "status": 0
+              },
+              "SKIN": {
+                "type": 3,
+                "celsius": 37.7,
+                "status": 0
+              }
+            },
+            "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+          }
+        },
+        {
+          "phase": "after-route",
+          "hostMonotonic": 243964.359,
+          "thermal": {
+            "schemaVersion": 1,
+            "temperatureSource": "current HAL",
+            "frameworkStatus": 0,
+            "sensors": {
+              "AP": {
+                "type": 0,
+                "celsius": 43.1,
+                "status": 0
+              },
+              "BAT": {
+                "type": 2,
+                "celsius": 34.3,
+                "status": 0
+              },
+              "SKIN": {
+                "type": 3,
+                "celsius": 37.9,
+                "status": 0
+              }
+            },
+            "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+          }
+        }
+      ],
+      "resources": {
+        "device_local_bytes": {
+          "first": 160793152,
+          "min": 152775488,
+          "max": 262915584,
+          "last": 160793152
+        },
+        "host_visible_bytes": {
+          "first": 48085184,
+          "min": 47074560,
+          "max": 53409920,
+          "last": 48085184
+        },
+        "saved_owner_bytes": {
+          "first": 0,
+          "min": 0,
+          "max": 8017664,
+          "last": 0
+        },
+        "run_unloads": {
+          "first": 0,
+          "min": 0,
+          "max": 1,
+          "last": 1
+        },
+        "run_restores": {
+          "first": 0,
+          "min": 0,
+          "max": 1,
+          "last": 1
+        },
+        "wait_frames": {
+          "first": 0,
+          "min": 0,
+          "max": 0,
+          "last": 0
+        },
+        "peak_overlap_bytes": {
+          "first": 0,
+          "min": 0,
+          "max": 180592064,
+          "last": 180592064
+        }
+      },
+      "rawFiles": {
+        "android-motion-prod-pipeline-baseline-03-ledger.json": {
+          "sha256": "6360f6573a5f0948e7263b881cba3cb15fa89744c89205f1b48d8e08825f7466",
+          "bytes": 1591054
+        },
+        "android-motion-prod-pipeline-baseline-03-manifest.json": {
+          "sha256": "3b58a4edbd3cf05822a0c9863e31246b7e01473cbd91b79da7096cc42322b68e",
+          "bytes": 683
+        },
+        "android-motion-prod-pipeline-baseline-03-present-timing.json": {
+          "sha256": "4a734077f80633463c9a432f3855e0b71737063294edf308ac6433db7b76f14d",
+          "bytes": 264612
+        },
+        "android-motion-prod-pipeline-baseline-03-resources.csv": {
+          "sha256": "788cef72f857bd53a710144f64485cd9af0f13acf1f4b829939635977e422a1f",
+          "bytes": 92626
+        },
+        "HordeLanternRT-benchmark-latest.json": {
+          "sha256": "6c69859819f9d854d6241bcdf51ebd4070cfd9deff46bfaf570187528b8120d8",
+          "bytes": 1858532
+        },
+        "launch.txt": {
+          "sha256": "a1fbca2fdad261994ea4c350264d4ed2400f30e1bae4ccb03c996657788e1c5f",
+          "bytes": 268
+        },
+        "motion-launch.txt": {
+          "sha256": "1134bb5377fcdaff8755d20f77d73dbff1e4d75b5cb75180ab3d54777c980112",
+          "bytes": 369
+        },
+        "owned-final.log": {
+          "sha256": "3050440bb69d245af0fa4591704093999121c2586f365e765d2d726e9ddd938e",
+          "bytes": 168096
+        },
+        "prestart-capability.json": {
+          "sha256": "b7c1ac4dd02365a04a1507788362e19d082de4ce88917a9a4e93dccd53de099a",
+          "bytes": 2523
+        },
+        "prestart.log": {
+          "sha256": "fbd4058bf19aa5de0c8a4dfdbb91706bfe3fdc3339020b54abcbdf759cda0f3f",
+          "bytes": 57659
+        },
+        "settings-after.xml": {
+          "sha256": "e3966b09cd9c354cb92833496b7f812139178dd7b2a906a4f809dbf9538c3dee",
+          "bytes": 1351
+        },
+        "strict-analysis.json": {
+          "sha256": "0bc80a984f1ab73f66db59761f9a42303cb924cebde1234bce983dd193d3f782",
+          "bytes": 2436
+        },
+        "summary.json": {
+          "sha256": "f4a7282588937510745c87954f6f744cca499b6969310a632f97d0d37efb9b1c",
+          "bytes": 13643
+        },
+        "thermals.json": {
+          "sha256": "9ea13534697f012fbaac41441b43980e031420a36602eab80772525dfc85be17",
+          "bytes": 4420
+        },
+        "vulkan_capability_report.json": {
+          "sha256": "a4d4a206db41e0a4f504f3679b48a2adba99b0fbf9c764c5254c5df400d12e90",
+          "bytes": 5633
+        }
+      }
+    },
+    {
+      "case": "query-baseline-01",
+      "strict": {
+        "eligible": true,
+        "reportSha256": "9ceb0c2972b81e06b29d395d2d02f103c93d568d71abc530481afa961a1d338c",
+        "runId": "prod-query-baseline-01",
+        "workload": "motion-chapter-performance-route-v1",
+        "buildId": "1.6.2",
+        "settings": {
+          "scalePercent": 40,
+          "width": 1440,
+          "height": 2971,
+          "internalWidth": 576,
+          "internalHeight": 1188,
+          "backend": "RayQueryCompute",
+          "water": 1,
+          "fire": 0,
+          "cap": 30,
+          "glass": false,
+          "shadow": 1,
+          "mist": true,
+          "dust": 1
+        },
+        "scope": {
+          "surfaceGeneration": 1,
+          "sceneEpoch": 3,
+          "measurementGeneration": 5,
+          "matchedCompletedFrames": 700,
+          "intervalCount": 699,
+          "durationNanoseconds": 68274792006,
+          "setupPresentationRowsExcluded": 0
+        },
+        "intervalsNanoseconds": {
+          "median": 83333385,
+          "p90NearestRank": 149999895,
+          "p95NearestRank": 150000000,
+          "maximum": 158268073,
+          "over33333000Nanoseconds": 699,
+          "over250000000Nanoseconds": 0
+        },
+        "observedPresentedImageRatePerSecond": 10.238039,
+        "simulation": {
+          "stateRows": 700,
+          "eventRows": 48,
+          "ticksThisFrameMaximum": 6,
+          "catchUpOverrunCountFirst": 0,
+          "catchUpOverrunCountLast": 248,
+          "catchUpOverrunDelta": 248
+        },
+        "collector": {
+          "runCounterDelta": {
+            "preparedPresents": 700,
+            "acceptedPresents": 700,
+            "rejectedPresents": 0,
+            "invalidRegistrations": 0,
+            "invalidMetadata": 0,
+            "pendingCapacityExhausted": 0,
+            "queryCalls": 1388,
+            "queryErrors": 0,
+            "incompleteQueries": 0,
+            "zeroPresentTimestamps": 0,
+            "zeroPresentIds": 0,
+            "unknownPresentIds": 0,
+            "duplicateTimings": 0,
+            "rowCapacityExhausted": 0,
+            "missingOnRebind": 0,
+            "missingOnUnbind": 0,
+            "abandonedPreparedPresents": 0
+          },
+          "queryCpuWallNanoseconds": 9881870,
+          "presentMarginAtLeast2Pow63CountIgnored": 700
+        },
+        "limits": [
+          "Bounded ordinary chapter traversal with zero mid-route image readbacks; recorder overhead remains.",
+          "One continuous resource scope; retry/rotation/lifecycle discontinuities require separate evidence.",
+          "Actual inter-present intervals; not sustained FPS, scanout, photons, GPU reciprocal time, touch latency or owner acceptance.",
+          "Trace extents are native resource observations; this analyzer does not certify appearance, thermals or power."
+        ]
+      },
+      "views": {
+        "landing-sweep": {
+          "pose": {
+            "x": -33.6892,
+            "y": 2.05,
+            "z": -12.7848,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 39,
+            "medianMs": 130.311038,
+            "p95Ms": 132.715726,
+            "maximumMs": 133.17057,
+            "over33_333ms": 39,
+            "over250ms": 0
+          },
+          "display": {
+            "n": 39,
+            "medianMs": 149.999947,
+            "p95Ms": 150.000053,
+            "maximumMs": 150.000105,
+            "over33_333ms": 39,
+            "over250ms": 0
+          },
+          "cpu": {
+            "n": 39,
+            "medianMs": 146.004583,
+            "p95Ms": 150.596042,
+            "maximumMs": 151.381667,
+            "over33_333ms": 39,
+            "over250ms": 0
+          },
+          "simulationOverruns": 39
+        },
+        "lower-sweep": {
+          "pose": {
+            "x": -33.7,
+            "y": -0.95,
+            "z": -15.2,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 52,
+            "medianMs": 67.1743215,
+            "p95Ms": 68.475415,
+            "maximumMs": 69.355259,
+            "over33_333ms": 52,
+            "over250ms": 0
+          },
+          "display": {
+            "n": 52,
+            "medianMs": 75.0,
+            "p95Ms": 83.333385,
+            "maximumMs": 83.333385,
+            "over33_333ms": 52,
+            "over250ms": 0
+          },
+          "cpu": {
+            "n": 52,
+            "medianMs": 76.1045575,
+            "p95Ms": 77.526094,
+            "maximumMs": 78.869114,
+            "over33_333ms": 52,
+            "over250ms": 0
+          },
+          "simulationOverruns": 0
+        },
+        "passage-sweep": {
+          "pose": {
+            "x": -22.0177,
+            "y": -0.95,
+            "z": -15.2,
+            "yaw": 1.5708,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 51,
+            "medianMs": 67.745207,
+            "p95Ms": 69.299582,
+            "maximumMs": 69.401352,
+            "over33_333ms": 51,
+            "over250ms": 0
+          },
+          "display": {
+            "n": 51,
+            "medianMs": 75.0,
+            "p95Ms": 83.333385,
+            "maximumMs": 83.333385,
+            "over33_333ms": 51,
+            "over250ms": 0
+          },
+          "cpu": {
+            "n": 51,
+            "medianMs": 77.033229,
+            "p95Ms": 79.681875,
+            "maximumMs": 81.335885,
+            "over33_333ms": 51,
+            "over250ms": 0
+          },
+          "simulationOverruns": 0
+        },
+        "repeat-ascent": {
+          "pose": {
+            "x": -33.7,
+            "y": 2.05,
+            "z": -12.8,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 40,
+            "medianMs": 129.045205,
+            "p95Ms": 131.309476,
+            "maximumMs": 132.362288,
+            "over33_333ms": 40,
+            "over250ms": 0
+          },
+          "display": {
+            "n": 40,
+            "medianMs": 149.999921,
+            "p95Ms": 150.000052,
+            "maximumMs": 150.000053,
+            "over33_333ms": 40,
+            "over250ms": 0
+          },
+          "cpu": {
+            "n": 40,
+            "medianMs": 145.7599215,
+            "p95Ms": 148.701094,
+            "maximumMs": 149.49401,
+            "over33_333ms": 40,
+            "over250ms": 0
+          },
+          "simulationOverruns": 40
+        }
+      },
+      "thermals": [
+        {
+          "phase": "before-prepare",
+          "hostMonotonic": 244000.781,
+          "thermal": {
+            "schemaVersion": 1,
+            "temperatureSource": "current HAL",
+            "frameworkStatus": 0,
+            "sensors": {
+              "AP": {
+                "type": 0,
+                "celsius": 36.9,
+                "status": 0
+              },
+              "BAT": {
+                "type": 2,
+                "celsius": 32.5,
+                "status": 0
+              },
+              "SKIN": {
+                "type": 3,
+                "celsius": 34.9,
+                "status": 0
+              }
+            },
+            "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+          }
+        },
+        {
+          "phase": "before-route",
+          "hostMonotonic": 244013.453,
+          "thermal": {
+            "schemaVersion": 1,
+            "temperatureSource": "current HAL",
+            "frameworkStatus": 0,
+            "sensors": {
+              "AP": {
+                "type": 0,
+                "celsius": 43.1,
+                "status": 0
+              },
+              "BAT": {
+                "type": 2,
+                "celsius": 32.8,
+                "status": 0
+              },
+              "SKIN": {
+                "type": 3,
+                "celsius": 36.8,
+                "status": 0
+              }
+            },
+            "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+          }
+        },
+        {
+          "phase": "running",
+          "hostMonotonic": 244029.281,
+          "thermal": {
+            "schemaVersion": 1,
+            "temperatureSource": "current HAL",
+            "frameworkStatus": 0,
+            "sensors": {
+              "AP": {
+                "type": 0,
+                "celsius": 42.9,
+                "status": 0
+              },
+              "BAT": {
+                "type": 2,
+                "celsius": 33.7,
+                "status": 0
+              },
+              "SKIN": {
+                "type": 3,
+                "celsius": 37.4,
+                "status": 0
+              }
+            },
+            "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+          }
+        },
+        {
+          "phase": "running",
+          "hostMonotonic": 244044.968,
+          "thermal": {
+            "schemaVersion": 1,
+            "temperatureSource": "current HAL",
+            "frameworkStatus": 0,
+            "sensors": {
+              "AP": {
+                "type": 0,
+                "celsius": 44.8,
+                "status": 0
+              },
+              "BAT": {
+                "type": 2,
+                "celsius": 34.4,
+                "status": 0
+              },
+              "SKIN": {
+                "type": 3,
+                "celsius": 37.9,
+                "status": 0
+              }
+            },
+            "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+          }
+        },
+        {
+          "phase": "running",
+          "hostMonotonic": 244060.687,
+          "thermal": {
+            "schemaVersion": 1,
+            "temperatureSource": "current HAL",
+            "frameworkStatus": 0,
+            "sensors": {
+              "AP": {
+                "type": 0,
+                "celsius": 44.7,
+                "status": 0
+              },
+              "BAT": {
+                "type": 2,
+                "celsius": 35.0,
+                "status": 0
+              },
+              "SKIN": {
+                "type": 3,
+                "celsius": 38.5,
+                "status": 0
+              }
+            },
+            "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+          }
+        },
+        {
+          "phase": "running",
+          "hostMonotonic": 244076.406,
+          "thermal": {
+            "schemaVersion": 1,
+            "temperatureSource": "current HAL",
+            "frameworkStatus": 0,
+            "sensors": {
+              "AP": {
+                "type": 0,
+                "celsius": 45.0,
+                "status": 0
+              },
+              "BAT": {
+                "type": 2,
+                "celsius": 35.3,
+                "status": 0
+              },
+              "SKIN": {
+                "type": 3,
+                "celsius": 38.8,
+                "status": 0
+              }
+            },
+            "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+          }
+        },
+        {
+          "phase": "after-route",
+          "hostMonotonic": 244083.359,
+          "thermal": {
+            "schemaVersion": 1,
+            "temperatureSource": "current HAL",
+            "frameworkStatus": 0,
+            "sensors": {
+              "AP": {
+                "type": 0,
+                "celsius": 44.8,
+                "status": 0
+              },
+              "BAT": {
+                "type": 2,
+                "celsius": 35.5,
+                "status": 0
+              },
+              "SKIN": {
+                "type": 3,
+                "celsius": 38.8,
+                "status": 0
+              }
+            },
+            "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+          }
+        }
+      ],
+      "resources": {
+        "device_local_bytes": {
+          "first": 160792640,
+          "min": 152774976,
+          "max": 262915072,
+          "last": 160792640
+        },
+        "host_visible_bytes": {
+          "first": 48084672,
+          "min": 47074048,
+          "max": 53409408,
+          "last": 48084672
+        },
+        "saved_owner_bytes": {
+          "first": 0,
+          "min": 0,
+          "max": 8017664,
+          "last": 0
+        },
+        "run_unloads": {
+          "first": 0,
+          "min": 0,
+          "max": 1,
+          "last": 1
+        },
+        "run_restores": {
+          "first": 0,
+          "min": 0,
+          "max": 1,
+          "last": 1
+        },
+        "wait_frames": {
+          "first": 0,
+          "min": 0,
+          "max": 0,
+          "last": 0
+        },
+        "peak_overlap_bytes": {
+          "first": 0,
+          "min": 0,
+          "max": 180592064,
+          "last": 180592064
+        }
+      },
+      "rawFiles": {
+        "android-motion-prod-query-baseline-01-ledger.json": {
+          "sha256": "5e155828fa377374898d13420679aac9fa9c9269fac64107259cca3406482839",
+          "bytes": 1622292
+        },
+        "android-motion-prod-query-baseline-01-manifest.json": {
+          "sha256": "c0c255c3a1db1d8ad5921e28bfeef475d38eddf9859f9f3e6ed6c150dbaa1dcc",
+          "bytes": 677
+        },
+        "android-motion-prod-query-baseline-01-present-timing.json": {
+          "sha256": "c03d45b5f66668b49d30928b13c555dc95711505e8df7ab2baf10c83951ef8d1",
+          "bytes": 267902
+        },
+        "android-motion-prod-query-baseline-01-resources.csv": {
+          "sha256": "c1c1c483d0e2cd14634bf54c1017d13ab365618af0775bfb5db049d3219abdbe",
+          "bytes": 94523
+        },
+        "HordeLanternRT-benchmark-latest.json": {
+          "sha256": "9ceb0c2972b81e06b29d395d2d02f103c93d568d71abc530481afa961a1d338c",
+          "bytes": 1893048
+        },
+        "launch.txt": {
+          "sha256": "39d28f08626d3bc1abe5f50ee2822e9a792f8652fd0ac7bd5404cfd4f202801c",
+          "bytes": 268
+        },
+        "motion-launch.txt": {
+          "sha256": "8b790058e3abe1418aa53a07a009339088001fa89334aef2889f566389c1f843",
+          "bytes": 369
+        },
+        "owned-final.log": {
+          "sha256": "50f141e842e73a6865aacb8f866d8c04ea392ba957e84cebcec11a8de9aa9850",
+          "bytes": 165862
+        },
+        "prestart-capability.json": {
+          "sha256": "bca1d64b02efa8bf2692d80b8abea9df0adea538b27ff78b00d4263a7cb68e8b",
+          "bytes": 2520
+        },
+        "prestart.log": {
+          "sha256": "fb94cd5f86bee1b3a57a062ad305693aab1a5e49d813139d3c232c4d20378d9c",
+          "bytes": 57600
+        },
+        "settings-after.xml": {
+          "sha256": "e3966b09cd9c354cb92833496b7f812139178dd7b2a906a4f809dbf9538c3dee",
+          "bytes": 1351
+        },
+        "strict-analysis.json": {
+          "sha256": "020091d078a752c8aa1c81428cbf282d5448b527ef14f4d1a6f0797f51efb297",
+          "bytes": 2431
+        },
+        "summary.json": {
+          "sha256": "f3b3da4052f462fc4adf3e8b5bc5b091d03d5ca08067f9941c59921c43ce609b",
+          "bytes": 13618
+        },
+        "thermals.json": {
+          "sha256": "0d210db88517a6f29ea9dc4697aa24616407ab54b3ad1254d620d2b2a243f6e1",
+          "bytes": 4422
+        },
+        "vulkan_capability_report.json": {
+          "sha256": "19512b055591ed90303de4dfaa8abcdbfdb5c39ea1f1de800690424edc61caa5",
+          "bytes": 5695
+        }
+      }
+    },
+    {
+      "case": "pipeline-candidate-01",
+      "strict": {
+        "eligible": true,
+        "reportSha256": "971ceeb4a35fc8e11c1c4ecee3975db6301f457815e52d54241902d09eb2d68b",
+        "runId": "prod-pipeline-candidate-01",
+        "workload": "motion-chapter-performance-route-v1",
+        "buildId": "1.6.2",
+        "settings": {
+          "scalePercent": 40,
+          "width": 1440,
+          "height": 2971,
+          "internalWidth": 576,
+          "internalHeight": 1188,
+          "backend": "RayTracingPipeline",
+          "water": 1,
+          "fire": 0,
+          "cap": 30,
+          "glass": false,
+          "shadow": 1,
+          "mist": true,
+          "dust": 1
+        },
+        "scope": {
+          "surfaceGeneration": 1,
+          "sceneEpoch": 3,
+          "measurementGeneration": 5,
+          "matchedCompletedFrames": 688,
+          "intervalCount": 687,
+          "durationNanoseconds": 70170488255,
+          "setupPresentationRowsExcluded": 0
+        },
+        "intervalsNanoseconds": {
+          "median": 87499844,
+          "p90NearestRank": 154166615,
+          "p95NearestRank": 154166719,
+          "maximum": 166666719,
+          "over33333000Nanoseconds": 687,
+          "over250000000Nanoseconds": 0
+        },
+        "observedPresentedImageRatePerSecond": 9.790441,
+        "simulation": {
+          "stateRows": 688,
+          "eventRows": 48,
+          "ticksThisFrameMaximum": 6,
+          "catchUpOverrunCountFirst": 0,
+          "catchUpOverrunCountLast": 257,
+          "catchUpOverrunDelta": 257
+        },
+        "collector": {
+          "runCounterDelta": {
+            "preparedPresents": 688,
+            "acceptedPresents": 688,
+            "rejectedPresents": 0,
+            "invalidRegistrations": 0,
+            "invalidMetadata": 0,
+            "pendingCapacityExhausted": 0,
+            "queryCalls": 1370,
+            "queryErrors": 0,
+            "incompleteQueries": 0,
+            "zeroPresentTimestamps": 0,
+            "zeroPresentIds": 0,
+            "unknownPresentIds": 0,
+            "duplicateTimings": 0,
+            "rowCapacityExhausted": 0,
+            "missingOnRebind": 0,
+            "missingOnUnbind": 0,
+            "abandonedPreparedPresents": 0
+          },
+          "queryCpuWallNanoseconds": 9893669,
+          "presentMarginAtLeast2Pow63CountIgnored": 687
+        },
+        "limits": [
+          "Bounded ordinary chapter traversal with zero mid-route image readbacks; recorder overhead remains.",
+          "One continuous resource scope; retry/rotation/lifecycle discontinuities require separate evidence.",
+          "Actual inter-present intervals; not sustained FPS, scanout, photons, GPU reciprocal time, touch latency or owner acceptance.",
+          "Trace extents are native resource observations; this analyzer does not certify appearance, thermals or power."
+        ]
+      },
+      "views": {
+        "landing-sweep": {
+          "pose": {
+            "x": -33.689,
+            "y": 2.05,
+            "z": -12.7846,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 39,
+            "medianMs": 134.917653,
+            "p95Ms": 137.020674,
+            "maximumMs": 138.190882,
+            "over33_333ms": 39,
+            "over250ms": 0
+          },
+          "display": {
+            "n": 39,
+            "medianMs": 150.000104,
+            "p95Ms": 158.333281,
+            "maximumMs": 158.333386,
+            "over33_333ms": 39,
+            "over250ms": 0
+          },
+          "cpu": {
+            "n": 39,
+            "medianMs": 152.41849,
+            "p95Ms": 155.502917,
+            "maximumMs": 157.002188,
+            "over33_333ms": 39,
+            "over250ms": 0
+          },
+          "simulationOverruns": 39
+        },
+        "lower-sweep": {
+          "pose": {
+            "x": -33.7,
+            "y": -0.95,
+            "z": -15.2,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 49,
+            "medianMs": 70.334425,
+            "p95Ms": 71.231509,
+            "maximumMs": 71.426665,
+            "over33_333ms": 49,
+            "over250ms": 0
+          },
+          "display": {
+            "n": 49,
+            "medianMs": 83.333281,
+            "p95Ms": 83.333386,
+            "maximumMs": 83.333438,
+            "over33_333ms": 49,
+            "over250ms": 0
+          },
+          "cpu": {
+            "n": 49,
+            "medianMs": 80.098698,
+            "p95Ms": 81.133542,
+            "maximumMs": 81.273958,
+            "over33_333ms": 49,
+            "over250ms": 0
+          },
+          "simulationOverruns": 0
+        },
+        "passage-sweep": {
+          "pose": {
+            "x": -22.018,
+            "y": -0.95,
+            "z": -15.2,
+            "yaw": 1.5708,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 49,
+            "medianMs": 69.380832,
+            "p95Ms": 74.853904,
+            "maximumMs": 75.938904,
+            "over33_333ms": 49,
+            "over250ms": 0
+          },
+          "display": {
+            "n": 49,
+            "medianMs": 83.333282,
+            "p95Ms": 87.499999,
+            "maximumMs": 87.500001,
+            "over33_333ms": 49,
+            "over250ms": 0
+          },
+          "cpu": {
+            "n": 49,
+            "medianMs": 79.259323,
+            "p95Ms": 85.230625,
+            "maximumMs": 89.580729,
+            "over33_333ms": 49,
+            "over250ms": 0
+          },
+          "simulationOverruns": 0
+        },
+        "repeat-ascent": {
+          "pose": {
+            "x": -33.7,
+            "y": 2.05,
+            "z": -12.8,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 40,
+            "medianMs": 134.738669,
+            "p95Ms": 146.65734,
+            "maximumMs": 147.611351,
+            "over33_333ms": 40,
+            "over250ms": 0
+          },
+          "display": {
+            "n": 40,
+            "medianMs": 154.166667,
+            "p95Ms": 162.499949,
+            "maximumMs": 166.666719,
+            "over33_333ms": 40,
+            "over250ms": 0
+          },
+          "cpu": {
+            "n": 40,
+            "medianMs": 152.907578,
+            "p95Ms": 164.324687,
+            "maximumMs": 165.504114,
+            "over33_333ms": 40,
+            "over250ms": 0
+          },
+          "simulationOverruns": 40
+        }
+      },
+      "thermals": [
+        {
+          "phase": "before-prepare",
+          "hostMonotonic": 244860.109,
+          "thermal": {
+            "schemaVersion": 1,
+            "temperatureSource": "current HAL",
+            "frameworkStatus": 0,
+            "sensors": {
+              "AP": {
+                "type": 0,
+                "celsius": 37.2,
+                "status": 0
+              },
+              "BAT": {
+                "type": 2,
+                "celsius": 34.9,
+                "status": 0
+              },
+              "SKIN": {
+                "type": 3,
+                "celsius": 36.0,
+                "status": 0
+              }
+            },
+            "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+          }
+        },
+        {
+          "phase": "before-route",
+          "hostMonotonic": 244879.156,
+          "thermal": {
+            "schemaVersion": 1,
+            "temperatureSource": "current HAL",
+            "frameworkStatus": 1,
+            "sensors": {
+              "AP": {
+                "type": 0,
+                "celsius": 48.9,
+                "status": 0
+              },
+              "BAT": {
+                "type": 2,
+                "celsius": 36.3,
+                "status": 0
+              },
+              "SKIN": {
+                "type": 3,
+                "celsius": 40.0,
+                "status": 1
+              }
+            },
+            "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+          }
+        },
+        {
+          "phase": "running",
+          "hostMonotonic": 244894.937,
+          "thermal": {
+            "schemaVersion": 1,
+            "temperatureSource": "current HAL",
+            "frameworkStatus": 1,
+            "sensors": {
+              "AP": {
+                "type": 0,
+                "celsius": 46.2,
+                "status": 0
+              },
+              "BAT": {
+                "type": 2,
+                "celsius": 37.7,
+                "status": 0
+              },
+              "SKIN": {
+                "type": 3,
+                "celsius": 40.2,
+                "status": 1
+              }
+            },
+            "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+          }
+        },
+        {
+          "phase": "running",
+          "hostMonotonic": 244910.656,
+          "thermal": {
+            "schemaVersion": 1,
+            "temperatureSource": "current HAL",
+            "frameworkStatus": 1,
+            "sensors": {
+              "AP": {
+                "type": 0,
+                "celsius": 47.1,
+                "status": 0
+              },
+              "BAT": {
+                "type": 2,
+                "celsius": 38.2,
+                "status": 0
+              },
+              "SKIN": {
+                "type": 3,
+                "celsius": 40.4,
+                "status": 1
+              }
+            },
+            "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+          }
+        },
+        {
+          "phase": "running",
+          "hostMonotonic": 244926.406,
+          "thermal": {
+            "schemaVersion": 1,
+            "temperatureSource": "current HAL",
+            "frameworkStatus": 1,
+            "sensors": {
+              "AP": {
+                "type": 0,
+                "celsius": 47.2,
+                "status": 0
+              },
+              "BAT": {
+                "type": 2,
+                "celsius": 38.6,
+                "status": 0
+              },
+              "SKIN": {
+                "type": 3,
+                "celsius": 40.8,
+                "status": 1
+              }
+            },
+            "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+          }
+        },
+        {
+          "phase": "running",
+          "hostMonotonic": 244942.125,
+          "thermal": {
+            "schemaVersion": 1,
+            "temperatureSource": "current HAL",
+            "frameworkStatus": 1,
+            "sensors": {
+              "AP": {
+                "type": 0,
+                "celsius": 47.9,
+                "status": 0
+              },
+              "BAT": {
+                "type": 2,
+                "celsius": 38.9,
+                "status": 0
+              },
+              "SKIN": {
+                "type": 3,
+                "celsius": 41.1,
+                "status": 1
+              }
+            },
+            "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+          }
+        },
+        {
+          "phase": "after-route",
+          "hostMonotonic": 244952.25,
+          "thermal": {
+            "schemaVersion": 1,
+            "temperatureSource": "current HAL",
+            "frameworkStatus": 1,
+            "sensors": {
+              "AP": {
+                "type": 0,
+                "celsius": 47.3,
+                "status": 0
+              },
+              "BAT": {
+                "type": 2,
+                "celsius": 39.0,
+                "status": 0
+              },
+              "SKIN": {
+                "type": 3,
+                "celsius": 40.8,
+                "status": 1
+              }
+            },
+            "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+          }
+        }
+      ],
+      "resources": {
+        "device_local_bytes": {
+          "first": 160793152,
+          "min": 152775488,
+          "max": 262915584,
+          "last": 160793152
+        },
+        "host_visible_bytes": {
+          "first": 48085184,
+          "min": 47074560,
+          "max": 53409920,
+          "last": 48085184
+        },
+        "saved_owner_bytes": {
+          "first": 0,
+          "min": 0,
+          "max": 8017664,
+          "last": 0
+        },
+        "run_unloads": {
+          "first": 0,
+          "min": 0,
+          "max": 1,
+          "last": 1
+        },
+        "run_restores": {
+          "first": 0,
+          "min": 0,
+          "max": 1,
+          "last": 1
+        },
+        "wait_frames": {
+          "first": 0,
+          "min": 0,
+          "max": 0,
+          "last": 0
+        },
+        "peak_overlap_bytes": {
+          "first": 0,
+          "min": 0,
+          "max": 180592064,
+          "last": 180592064
+        }
+      },
+      "rawFiles": {
+        "android-motion-prod-pipeline-candidate-01-ledger.json": {
+          "sha256": "588bacf2d5bdb932dbb72bb300adb939a2d8eec118a6ce78d0d3ca91100ed01d",
+          "bytes": 1595121
+        },
+        "android-motion-prod-pipeline-candidate-01-manifest.json": {
+          "sha256": "9110ef1ebb40244f981a197fd483df55c9e97eb27a55d98aea076c7ee4f53201",
+          "bytes": 684
+        },
+        "android-motion-prod-pipeline-candidate-01-present-timing.json": {
+          "sha256": "ee7d3faf5a3a915e3a6b970b00f6feb9bbfb7a902f9fb7fa6ffbc05e1918e98d",
+          "bytes": 265361
+        },
+        "android-motion-prod-pipeline-candidate-01-resources.csv": {
+          "sha256": "333a214cdd3ba85bd9ce9f07ade2f33bb3fc5b75811e72b3bffcdd9d786329ad",
+          "bytes": 92729
+        },
+        "HordeLanternRT-benchmark-latest.json": {
+          "sha256": "971ceeb4a35fc8e11c1c4ecee3975db6301f457815e52d54241902d09eb2d68b",
+          "bytes": 1863349
+        },
+        "launch.txt": {
+          "sha256": "f77d920e92e819974d064a70eedddbc49d747cd893bd8be3d1cc8d3c816793e0",
+          "bytes": 268
+        },
+        "motion-launch.txt": {
+          "sha256": "1134bb5377fcdaff8755d20f77d73dbff1e4d75b5cb75180ab3d54777c980112",
+          "bytes": 369
+        },
+        "owned-final.log": {
+          "sha256": "84c6c4933b12c842b1f230e4787427afbad7c003ae45b8cb22ca8a0b11c039db",
+          "bytes": 168370
+        },
+        "prestart-capability.json": {
+          "sha256": "b7c1ac4dd02365a04a1507788362e19d082de4ce88917a9a4e93dccd53de099a",
+          "bytes": 2523
+        },
+        "prestart.log": {
+          "sha256": "88c59589e7c97197945ece758db0c2f27e64172100fe334e7bf8706efe426847",
+          "bytes": 58911
+        },
+        "settings-after.xml": {
+          "sha256": "e3966b09cd9c354cb92833496b7f812139178dd7b2a906a4f809dbf9538c3dee",
+          "bytes": 1351
+        },
+        "strict-analysis.json": {
+          "sha256": "bebf3651666ff3eb6c4e3ac263c30dc01ff4144b8e9f328c863e485800e0280b",
+          "bytes": 2437
+        },
+        "summary.json": {
+          "sha256": "bc3c4ab807b6a0bd5053c069556a60d6890367ccc000f8dbef138af0000123a8",
+          "bytes": 13648
+        },
+        "thermals.json": {
+          "sha256": "38fda59e2201c83a6d3537bd46a9db1811e84625d66412e60f7631f608c59efc",
+          "bytes": 4421
+        },
+        "vulkan_capability_report.json": {
+          "sha256": "9a18c5d5b1af518f33addf75d7f20c08b2b652bd6997a08c76d21ca1c0a5526a",
+          "bytes": 5632
+        }
+      }
+    },
+    {
+      "case": "query-candidate-01",
+      "strict": {
+        "eligible": true,
+        "reportSha256": "332f83f303d3db9f6d829d9000dabdfa02d0cf9e8f65a69aeb45809347d19e49",
+        "runId": "prod-query-candidate-01",
+        "workload": "motion-chapter-performance-route-v1",
+        "buildId": "1.6.2",
+        "settings": {
+          "scalePercent": 40,
+          "width": 1440,
+          "height": 2971,
+          "internalWidth": 576,
+          "internalHeight": 1188,
+          "backend": "RayQueryCompute",
+          "water": 1,
+          "fire": 0,
+          "cap": 30,
+          "glass": false,
+          "shadow": 1,
+          "mist": true,
+          "dust": 1
+        },
+        "scope": {
+          "surfaceGeneration": 1,
+          "sceneEpoch": 3,
+          "measurementGeneration": 5,
+          "matchedCompletedFrames": 707,
+          "intervalCount": 706,
+          "durationNanoseconds": 68574733515,
+          "setupPresentationRowsExcluded": 0
+        },
+        "intervalsNanoseconds": {
+          "median": 83333334,
+          "p90NearestRank": 149999948,
+          "p95NearestRank": 150000051,
+          "maximum": 162500052,
+          "over33333000Nanoseconds": 706,
+          "over250000000Nanoseconds": 0
+        },
+        "observedPresentedImageRatePerSecond": 10.295337,
+        "simulation": {
+          "stateRows": 707,
+          "eventRows": 48,
+          "ticksThisFrameMaximum": 6,
+          "catchUpOverrunCountFirst": 0,
+          "catchUpOverrunCountLast": 247,
+          "catchUpOverrunDelta": 247
+        },
+        "collector": {
+          "runCounterDelta": {
+            "preparedPresents": 707,
+            "acceptedPresents": 707,
+            "rejectedPresents": 0,
+            "invalidRegistrations": 0,
+            "invalidMetadata": 0,
+            "pendingCapacityExhausted": 0,
+            "queryCalls": 1398,
+            "queryErrors": 0,
+            "incompleteQueries": 0,
+            "zeroPresentTimestamps": 0,
+            "zeroPresentIds": 0,
+            "unknownPresentIds": 0,
+            "duplicateTimings": 0,
+            "rowCapacityExhausted": 0,
+            "missingOnRebind": 0,
+            "missingOnUnbind": 0,
+            "abandonedPreparedPresents": 0
+          },
+          "queryCpuWallNanoseconds": 11502339,
+          "presentMarginAtLeast2Pow63CountIgnored": 707
+        },
+        "limits": [
+          "Bounded ordinary chapter traversal with zero mid-route image readbacks; recorder overhead remains.",
+          "One continuous resource scope; retry/rotation/lifecycle discontinuities require separate evidence.",
+          "Actual inter-present intervals; not sustained FPS, scanout, photons, GPU reciprocal time, touch latency or owner acceptance.",
+          "Trace extents are native resource observations; this analyzer does not certify appearance, thermals or power."
+        ]
+      },
+      "views": {
+        "landing-sweep": {
+          "pose": {
+            "x": -33.6878,
+            "y": 2.05,
+            "z": -12.7829,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 39,
+            "medianMs": 130.806507,
+            "p95Ms": 133.63807,
+            "maximumMs": 135.344632,
+            "over33_333ms": 39,
+            "over250ms": 0
+          },
+          "display": {
+            "n": 39,
+            "medianMs": 149.999947,
+            "p95Ms": 154.166666,
+            "maximumMs": 154.166719,
+            "over33_333ms": 39,
+            "over250ms": 0
+          },
+          "cpu": {
+            "n": 39,
+            "medianMs": 147.29526,
+            "p95Ms": 152.521666,
+            "maximumMs": 152.612812,
+            "over33_333ms": 39,
+            "over250ms": 0
+          },
+          "simulationOverruns": 39
+        },
+        "lower-sweep": {
+          "pose": {
+            "x": -33.7,
+            "y": -0.95,
+            "z": -15.2,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 51,
+            "medianMs": 67.308332,
+            "p95Ms": 68.389373,
+            "maximumMs": 68.572655,
+            "over33_333ms": 51,
+            "over250ms": 0
+          },
+          "display": {
+            "n": 51,
+            "medianMs": 75.0,
+            "p95Ms": 83.333385,
+            "maximumMs": 83.333541,
+            "over33_333ms": 51,
+            "over250ms": 0
+          },
+          "cpu": {
+            "n": 51,
+            "medianMs": 76.68276,
+            "p95Ms": 78.277448,
+            "maximumMs": 79.001197,
+            "over33_333ms": 51,
+            "over250ms": 0
+          },
+          "simulationOverruns": 0
+        },
+        "passage-sweep": {
+          "pose": {
+            "x": -22.0165,
+            "y": -0.95,
+            "z": -15.2,
+            "yaw": 1.5708,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 52,
+            "medianMs": 67.0086705,
+            "p95Ms": 68.341196,
+            "maximumMs": 68.433957,
+            "over33_333ms": 52,
+            "over250ms": 0
+          },
+          "display": {
+            "n": 52,
+            "medianMs": 74.999999,
+            "p95Ms": 83.333385,
+            "maximumMs": 83.333386,
+            "over33_333ms": 52,
+            "over250ms": 0
+          },
+          "cpu": {
+            "n": 52,
+            "medianMs": 76.1584115,
+            "p95Ms": 78.517656,
+            "maximumMs": 81.658333,
+            "over33_333ms": 52,
+            "over250ms": 0
+          },
+          "simulationOverruns": 0
+        },
+        "repeat-ascent": {
+          "pose": {
+            "x": -33.7,
+            "y": 2.05,
+            "z": -12.8,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 40,
+            "medianMs": 131.600257,
+            "p95Ms": 142.331559,
+            "maximumMs": 145.594319,
+            "over33_333ms": 40,
+            "over250ms": 0
+          },
+          "display": {
+            "n": 40,
+            "medianMs": 149.999948,
+            "p95Ms": 162.499948,
+            "maximumMs": 162.500052,
+            "over33_333ms": 40,
+            "over250ms": 0
+          },
+          "cpu": {
+            "n": 40,
+            "medianMs": 149.8870055,
+            "p95Ms": 158.983594,
+            "maximumMs": 163.324843,
+            "over33_333ms": 40,
+            "over250ms": 0
+          },
+          "simulationOverruns": 40
+        }
+      },
+      "thermals": [
+        {
+          "phase": "before-prepare",
+          "hostMonotonic": 244376.796,
+          "thermal": {
+            "schemaVersion": 1,
+            "temperatureSource": "current HAL",
+            "frameworkStatus": 0,
+            "sensors": {
+              "AP": {
+                "type": 0,
+                "celsius": 40.4,
+                "status": 0
+              },
+              "BAT": {
+                "type": 2,
+                "celsius": 34.5,
+                "status": 0
+              },
+              "SKIN": {
+                "type": 3,
+                "celsius": 36.8,
+                "status": 0
+              }
+            },
+            "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+          }
+        },
+        {
+          "phase": "before-route",
+          "hostMonotonic": 244389.39,
+          "thermal": {
+            "schemaVersion": 1,
+            "temperatureSource": "current HAL",
+            "frameworkStatus": 0,
+            "sensors": {
+              "AP": {
+                "type": 0,
+                "celsius": 44.9,
+                "status": 0
+              },
+              "BAT": {
+                "type": 2,
+                "celsius": 35.5,
+                "status": 0
+              },
+              "SKIN": {
+                "type": 3,
+                "celsius": 38.6,
+                "status": 0
+              }
+            },
+            "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+          }
+        },
+        {
+          "phase": "running",
+          "hostMonotonic": 244405.203,
+          "thermal": {
+            "schemaVersion": 1,
+            "temperatureSource": "current HAL",
+            "frameworkStatus": 0,
+            "sensors": {
+              "AP": {
+                "type": 0,
+                "celsius": 45.7,
+                "status": 0
+              },
+              "BAT": {
+                "type": 2,
+                "celsius": 36.7,
+                "status": 0
+              },
+              "SKIN": {
+                "type": 3,
+                "celsius": 39.7,
+                "status": 0
+              }
+            },
+            "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+          }
+        },
+        {
+          "phase": "running",
+          "hostMonotonic": 244420.89,
+          "thermal": {
+            "schemaVersion": 1,
+            "temperatureSource": "current HAL",
+            "frameworkStatus": 1,
+            "sensors": {
+              "AP": {
+                "type": 0,
+                "celsius": 46.4,
+                "status": 0
+              },
+              "BAT": {
+                "type": 2,
+                "celsius": 37.3,
+                "status": 0
+              },
+              "SKIN": {
+                "type": 3,
+                "celsius": 40.0,
+                "status": 1
+              }
+            },
+            "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+          }
+        },
+        {
+          "phase": "running",
+          "hostMonotonic": 244436.609,
+          "thermal": {
+            "schemaVersion": 1,
+            "temperatureSource": "current HAL",
+            "frameworkStatus": 1,
+            "sensors": {
+              "AP": {
+                "type": 0,
+                "celsius": 46.9,
+                "status": 0
+              },
+              "BAT": {
+                "type": 2,
+                "celsius": 37.8,
+                "status": 0
+              },
+              "SKIN": {
+                "type": 3,
+                "celsius": 40.4,
+                "status": 1
+              }
+            },
+            "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+          }
+        },
+        {
+          "phase": "running",
+          "hostMonotonic": 244452.312,
+          "thermal": {
+            "schemaVersion": 1,
+            "temperatureSource": "current HAL",
+            "frameworkStatus": 1,
+            "sensors": {
+              "AP": {
+                "type": 0,
+                "celsius": 47.3,
+                "status": 0
+              },
+              "BAT": {
+                "type": 2,
+                "celsius": 38.2,
+                "status": 0
+              },
+              "SKIN": {
+                "type": 3,
+                "celsius": 40.8,
+                "status": 1
+              }
+            },
+            "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+          }
+        },
+        {
+          "phase": "after-route",
+          "hostMonotonic": 244459.312,
+          "thermal": {
+            "schemaVersion": 1,
+            "temperatureSource": "current HAL",
+            "frameworkStatus": 1,
+            "sensors": {
+              "AP": {
+                "type": 0,
+                "celsius": 47.0,
+                "status": 0
+              },
+              "BAT": {
+                "type": 2,
+                "celsius": 38.4,
+                "status": 0
+              },
+              "SKIN": {
+                "type": 3,
+                "celsius": 40.9,
+                "status": 1
+              }
+            },
+            "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+          }
+        }
+      ],
+      "resources": {
+        "device_local_bytes": {
+          "first": 160792640,
+          "min": 152774976,
+          "max": 262915072,
+          "last": 160792640
+        },
+        "host_visible_bytes": {
+          "first": 48084672,
+          "min": 47074048,
+          "max": 53409408,
+          "last": 48084672
+        },
+        "saved_owner_bytes": {
+          "first": 0,
+          "min": 0,
+          "max": 8017664,
+          "last": 0
+        },
+        "run_unloads": {
+          "first": 0,
+          "min": 0,
+          "max": 1,
+          "last": 1
+        },
+        "run_restores": {
+          "first": 0,
+          "min": 0,
+          "max": 1,
+          "last": 1
+        },
+        "wait_frames": {
+          "first": 0,
+          "min": 0,
+          "max": 0,
+          "last": 0
+        },
+        "peak_overlap_bytes": {
+          "first": 0,
+          "min": 0,
+          "max": 180592064,
+          "last": 180592064
+        }
+      },
+      "rawFiles": {
+        "android-motion-prod-query-candidate-01-ledger.json": {
+          "sha256": "7ba6b32c55f2fe8406e2e49ba6b637df311db3d7b2a4ce854804edd9b00e46c1",
+          "bytes": 1638251
+        },
+        "android-motion-prod-query-candidate-01-manifest.json": {
+          "sha256": "9e1de6f0c61a6e77726f43a0eaf742a8c4668e7b463778c75f8ec01ac4747f8b",
+          "bytes": 678
+        },
+        "android-motion-prod-query-candidate-01-present-timing.json": {
+          "sha256": "46f3cd349a70f9c07421d8f15daa6763e33ecc27f9ee4865828e50478afa29cc",
+          "bytes": 270565
+        },
+        "android-motion-prod-query-candidate-01-resources.csv": {
+          "sha256": "2b70c23062afdcec0f575f04defa663e3f159e368c1d741d6412622ff6323af6",
+          "bytes": 95440
+        },
+        "HordeLanternRT-benchmark-latest.json": {
+          "sha256": "332f83f303d3db9f6d829d9000dabdfa02d0cf9e8f65a69aeb45809347d19e49",
+          "bytes": 1911669
+        },
+        "launch.txt": {
+          "sha256": "83dda12e429db242beeb15f3c845d76886eda8a4ebcd94ea76abfc705ed66863",
+          "bytes": 268
+        },
+        "motion-launch.txt": {
+          "sha256": "8b790058e3abe1418aa53a07a009339088001fa89334aef2889f566389c1f843",
+          "bytes": 369
+        },
+        "owned-final.log": {
+          "sha256": "a53a081a7deeac36963eb788d6f9d06616893f23f9dd9f544237711f9d9b953e",
+          "bytes": 164257
+        },
+        "prestart-capability.json": {
+          "sha256": "bca1d64b02efa8bf2692d80b8abea9df0adea538b27ff78b00d4263a7cb68e8b",
+          "bytes": 2520
+        },
+        "prestart.log": {
+          "sha256": "3c75a66d2b50f4781fd5f9fc282c08caae0608c7a57e98bdf9f32b6dc48fc87a",
+          "bytes": 56845
+        },
+        "settings-after.xml": {
+          "sha256": "e3966b09cd9c354cb92833496b7f812139178dd7b2a906a4f809dbf9538c3dee",
+          "bytes": 1351
+        },
+        "strict-analysis.json": {
+          "sha256": "726b01568db4f04889c00d588bcbd0af7d81fd9eab79fc2e2af8d9a4a31c0eb0",
+          "bytes": 2433
+        },
+        "summary.json": {
+          "sha256": "255793dd7d2f82ccaa2d81190daaeb074c890c2b11af63a8b955473e9e2d5508",
+          "bytes": 13627
+        },
+        "thermals.json": {
+          "sha256": "09b6b8009607014fcc4ed79c0e7fdf4247932cc4ff28494c0e0749281f18009d",
+          "bytes": 4420
+        },
+        "vulkan_capability_report.json": {
+          "sha256": "17411066a7130214ef1ace8c86c6ecaf6a2bb0484fe0d631dc264f41ca8aee9d",
+          "bytes": 5695
+        }
+      }
+    },
+    {
+      "case": "pipeline-candidate-02",
+      "strict": {
+        "eligible": true,
+        "reportSha256": "ac8570cc65484fb14379b8d7fac73ade4d0db155acd445ccc6e21bc1bff1e954",
+        "runId": "prod-pipeline-candidate-02",
+        "workload": "motion-chapter-performance-route-v1",
+        "buildId": "1.6.2",
+        "settings": {
+          "scalePercent": 40,
+          "width": 1440,
+          "height": 2971,
+          "internalWidth": 576,
+          "internalHeight": 1188,
+          "backend": "RayTracingPipeline",
+          "water": 1,
+          "fire": 0,
+          "cap": 30,
+          "glass": false,
+          "shadow": 1,
+          "mist": true,
+          "dust": 1
+        },
+        "scope": {
+          "surfaceGeneration": 1,
+          "sceneEpoch": 3,
+          "measurementGeneration": 5,
+          "matchedCompletedFrames": 685,
+          "intervalCount": 684,
+          "durationNanoseconds": 70437181171,
+          "setupPresentationRowsExcluded": 0
+        },
+        "intervalsNanoseconds": {
+          "median": 87500000,
+          "p90NearestRank": 150000052,
+          "p95NearestRank": 154166667,
+          "maximum": 166666666,
+          "over33333000Nanoseconds": 684,
+          "over250000000Nanoseconds": 0
+        },
+        "observedPresentedImageRatePerSecond": 9.71078,
+        "simulation": {
+          "stateRows": 685,
+          "eventRows": 48,
+          "ticksThisFrameMaximum": 6,
+          "catchUpOverrunCountFirst": 0,
+          "catchUpOverrunCountLast": 259,
+          "catchUpOverrunDelta": 259
+        },
+        "collector": {
+          "runCounterDelta": {
+            "preparedPresents": 685,
+            "acceptedPresents": 685,
+            "rejectedPresents": 0,
+            "invalidRegistrations": 0,
+            "invalidMetadata": 0,
+            "pendingCapacityExhausted": 0,
+            "queryCalls": 1363,
+            "queryErrors": 0,
+            "incompleteQueries": 0,
+            "zeroPresentTimestamps": 0,
+            "zeroPresentIds": 0,
+            "unknownPresentIds": 0,
+            "duplicateTimings": 0,
+            "rowCapacityExhausted": 0,
+            "missingOnRebind": 0,
+            "missingOnUnbind": 0,
+            "abandonedPreparedPresents": 0
+          },
+          "queryCpuWallNanoseconds": 9422821,
+          "presentMarginAtLeast2Pow63CountIgnored": 685
+        },
+        "limits": [
+          "Bounded ordinary chapter traversal with zero mid-route image readbacks; recorder overhead remains.",
+          "One continuous resource scope; retry/rotation/lifecycle discontinuities require separate evidence.",
+          "Actual inter-present intervals; not sustained FPS, scanout, photons, GPU reciprocal time, touch latency or owner acceptance.",
+          "Trace extents are native resource observations; this analyzer does not certify appearance, thermals or power."
+        ]
+      },
+      "views": {
+        "landing-sweep": {
+          "pose": {
+            "x": -33.6882,
+            "y": 2.05,
+            "z": -12.7834,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 39,
+            "medianMs": 134.585726,
+            "p95Ms": 136.673799,
+            "maximumMs": 137.147497,
+            "over33_333ms": 39,
+            "over250ms": 0
+          },
+          "display": {
+            "n": 39,
+            "medianMs": 150.000052,
+            "p95Ms": 154.16672,
+            "maximumMs": 158.333333,
+            "over33_333ms": 39,
+            "over250ms": 0
+          },
+          "cpu": {
+            "n": 39,
+            "medianMs": 152.337761,
+            "p95Ms": 156.355417,
+            "maximumMs": 157.433229,
+            "over33_333ms": 39,
+            "over250ms": 0
+          },
+          "simulationOverruns": 39
+        },
+        "lower-sweep": {
+          "pose": {
+            "x": -33.7,
+            "y": -0.95,
+            "z": -15.2,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 49,
+            "medianMs": 70.739061,
+            "p95Ms": 77.37104,
+            "maximumMs": 80.165258,
+            "over33_333ms": 49,
+            "over250ms": 0
+          },
+          "display": {
+            "n": 49,
+            "medianMs": 83.333333,
+            "p95Ms": 87.499948,
+            "maximumMs": 87.500053,
+            "over33_333ms": 49,
+            "over250ms": 0
+          },
+          "cpu": {
+            "n": 49,
+            "medianMs": 80.216823,
+            "p95Ms": 86.306563,
+            "maximumMs": 90.307187,
+            "over33_333ms": 49,
+            "over250ms": 0
+          },
+          "simulationOverruns": 0
+        },
+        "passage-sweep": {
+          "pose": {
+            "x": -22.021,
+            "y": -0.95,
+            "z": -15.2,
+            "yaw": 1.5708,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 47,
+            "medianMs": 74.349165,
+            "p95Ms": 79.310311,
+            "maximumMs": 80.800415,
+            "over33_333ms": 47,
+            "over250ms": 0
+          },
+          "display": {
+            "n": 47,
+            "medianMs": 83.333334,
+            "p95Ms": 91.666666,
+            "maximumMs": 91.666719,
+            "over33_333ms": 47,
+            "over250ms": 0
+          },
+          "cpu": {
+            "n": 47,
+            "medianMs": 83.68302,
+            "p95Ms": 89.641146,
+            "maximumMs": 91.164791,
+            "over33_333ms": 47,
+            "over250ms": 0
+          },
+          "simulationOverruns": 0
+        },
+        "repeat-ascent": {
+          "pose": {
+            "x": -33.7,
+            "y": 2.05,
+            "z": -12.8,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 40,
+            "medianMs": 134.395101,
+            "p95Ms": 145.610361,
+            "maximumMs": 146.142809,
+            "over33_333ms": 40,
+            "over250ms": 0
+          },
+          "display": {
+            "n": 40,
+            "medianMs": 154.166615,
+            "p95Ms": 158.33328,
+            "maximumMs": 166.666614,
+            "over33_333ms": 40,
+            "over250ms": 0
+          },
+          "cpu": {
+            "n": 40,
+            "medianMs": 152.4032815,
+            "p95Ms": 158.014895,
+            "maximumMs": 166.338021,
+            "over33_333ms": 40,
+            "over250ms": 0
+          },
+          "simulationOverruns": 40
+        }
+      },
+      "thermals": [
+        {
+          "phase": "before-prepare",
+          "hostMonotonic": 245206.25,
+          "thermal": {
+            "schemaVersion": 1,
+            "temperatureSource": "current HAL",
+            "frameworkStatus": 0,
+            "sensors": {
+              "AP": {
+                "type": 0,
+                "celsius": 37.8,
+                "status": 0
+              },
+              "BAT": {
+                "type": 2,
+                "celsius": 35.4,
+                "status": 0
+              },
+              "SKIN": {
+                "type": 3,
+                "celsius": 36.5,
+                "status": 0
+              }
+            },
+            "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+          }
+        },
+        {
+          "phase": "before-route",
+          "hostMonotonic": 245225.546,
+          "thermal": {
+            "schemaVersion": 1,
+            "temperatureSource": "current HAL",
+            "frameworkStatus": 0,
+            "sensors": {
+              "AP": {
+                "type": 0,
+                "celsius": 44.9,
+                "status": 0
+              },
+              "BAT": {
+                "type": 2,
+                "celsius": 36.7,
+                "status": 0
+              },
+              "SKIN": {
+                "type": 3,
+                "celsius": 39.1,
+                "status": 0
+              }
+            },
+            "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+          }
+        },
+        {
+          "phase": "running",
+          "hostMonotonic": 245241.359,
+          "thermal": {
+            "schemaVersion": 1,
+            "temperatureSource": "current HAL",
+            "frameworkStatus": 0,
+            "sensors": {
+              "AP": {
+                "type": 0,
+                "celsius": 45.9,
+                "status": 0
+              },
+              "BAT": {
+                "type": 2,
+                "celsius": 37.5,
+                "status": 0
+              },
+              "SKIN": {
+                "type": 3,
+                "celsius": 39.6,
+                "status": 0
+              }
+            },
+            "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+          }
+        },
+        {
+          "phase": "running",
+          "hostMonotonic": 245257.109,
+          "thermal": {
+            "schemaVersion": 1,
+            "temperatureSource": "current HAL",
+            "frameworkStatus": 1,
+            "sensors": {
+              "AP": {
+                "type": 0,
+                "celsius": 47.5,
+                "status": 0
+              },
+              "BAT": {
+                "type": 2,
+                "celsius": 38.2,
+                "status": 0
+              },
+              "SKIN": {
+                "type": 3,
+                "celsius": 40.6,
+                "status": 1
+              }
+            },
+            "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+          }
+        },
+        {
+          "phase": "running",
+          "hostMonotonic": 245272.828,
+          "thermal": {
+            "schemaVersion": 1,
+            "temperatureSource": "current HAL",
+            "frameworkStatus": 1,
+            "sensors": {
+              "AP": {
+                "type": 0,
+                "celsius": 47.5,
+                "status": 0
+              },
+              "BAT": {
+                "type": 2,
+                "celsius": 38.8,
+                "status": 0
+              },
+              "SKIN": {
+                "type": 3,
+                "celsius": 40.8,
+                "status": 1
+              }
+            },
+            "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+          }
+        },
+        {
+          "phase": "running",
+          "hostMonotonic": 245288.515,
+          "thermal": {
+            "schemaVersion": 1,
+            "temperatureSource": "current HAL",
+            "frameworkStatus": 1,
+            "sensors": {
+              "AP": {
+                "type": 0,
+                "celsius": 48.1,
+                "status": 0
+              },
+              "BAT": {
+                "type": 2,
+                "celsius": 39.1,
+                "status": 0
+              },
+              "SKIN": {
+                "type": 3,
+                "celsius": 41.2,
+                "status": 1
+              }
+            },
+            "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+          }
+        },
+        {
+          "phase": "after-route",
+          "hostMonotonic": 245298.578,
+          "thermal": {
+            "schemaVersion": 1,
+            "temperatureSource": "current HAL",
+            "frameworkStatus": 1,
+            "sensors": {
+              "AP": {
+                "type": 0,
+                "celsius": 47.9,
+                "status": 0
+              },
+              "BAT": {
+                "type": 2,
+                "celsius": 39.3,
+                "status": 0
+              },
+              "SKIN": {
+                "type": 3,
+                "celsius": 41.1,
+                "status": 1
+              }
+            },
+            "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+          }
+        }
+      ],
+      "resources": {
+        "device_local_bytes": {
+          "first": 160793152,
+          "min": 152775488,
+          "max": 262915584,
+          "last": 160793152
+        },
+        "host_visible_bytes": {
+          "first": 48085184,
+          "min": 47074560,
+          "max": 53409920,
+          "last": 48085184
+        },
+        "saved_owner_bytes": {
+          "first": 0,
+          "min": 0,
+          "max": 8017664,
+          "last": 0
+        },
+        "run_unloads": {
+          "first": 0,
+          "min": 0,
+          "max": 1,
+          "last": 1
+        },
+        "run_restores": {
+          "first": 0,
+          "min": 0,
+          "max": 1,
+          "last": 1
+        },
+        "wait_frames": {
+          "first": 0,
+          "min": 0,
+          "max": 0,
+          "last": 0
+        },
+        "peak_overlap_bytes": {
+          "first": 0,
+          "min": 0,
+          "max": 180592064,
+          "last": 180592064
+        }
+      },
+      "rawFiles": {
+        "android-motion-prod-pipeline-candidate-02-ledger.json": {
+          "sha256": "4a983c3c5a71dfd95073e8b0416d9509b616c3b013c5964399fe2349834c9c3e",
+          "bytes": 1588212
+        },
+        "android-motion-prod-pipeline-candidate-02-manifest.json": {
+          "sha256": "65d38d7f7a9d1d13d31364acc216db9de880c2aad57df6c869e0bdd5e48401d1",
+          "bytes": 684
+        },
+        "android-motion-prod-pipeline-candidate-02-present-timing.json": {
+          "sha256": "b0f3d1cd19f22539e4a2f1717d4def2b1fee6b9c0dad80ce6818a0195aae37f5",
+          "bytes": 264221
+        },
+        "android-motion-prod-pipeline-candidate-02-resources.csv": {
+          "sha256": "93152287817e9591e55a191d96155a145e51881f8a39a6dde17148905a34b70a",
+          "bytes": 92376
+        },
+        "HordeLanternRT-benchmark-latest.json": {
+          "sha256": "ac8570cc65484fb14379b8d7fac73ade4d0db155acd445ccc6e21bc1bff1e954",
+          "bytes": 1855301
+        },
+        "launch.txt": {
+          "sha256": "b674a9484733601133ba5bc7b79097dad1354858b1ed2a6c9d77385624f9fe26",
+          "bytes": 268
+        },
+        "motion-launch.txt": {
+          "sha256": "8b790058e3abe1418aa53a07a009339088001fa89334aef2889f566389c1f843",
+          "bytes": 369
+        },
+        "owned-final.log": {
+          "sha256": "b7c4d960750b7a9c7037bb3bbd754774c7258dddf7c57eaa72d3f79a072d6abf",
+          "bytes": 167536
+        },
+        "prestart-capability.json": {
+          "sha256": "b7c1ac4dd02365a04a1507788362e19d082de4ce88917a9a4e93dccd53de099a",
+          "bytes": 2523
+        },
+        "prestart.log": {
+          "sha256": "6c50858200c04b84da9bb5263c70ecd4250054cc1f59e6a1497d95e81a36f11c",
+          "bytes": 56682
+        },
+        "settings-after.xml": {
+          "sha256": "e3966b09cd9c354cb92833496b7f812139178dd7b2a906a4f809dbf9538c3dee",
+          "bytes": 1351
+        },
+        "strict-analysis.json": {
+          "sha256": "eecddcee571d210671e2a0d3b10e79f0b039ac6866fae4b216c318ed20745851",
+          "bytes": 2436
+        },
+        "summary.json": {
+          "sha256": "c956687e1b419962f4702013662174334f9f5e951f30bf6e2273ecf3a85c85c6",
+          "bytes": 13647
+        },
+        "thermals.json": {
+          "sha256": "a67f10de7ffe4ddd2ebf69e48f64aea77fb8a1ba8f210e9122cc8aed1d6194ee",
+          "bytes": 4421
+        },
+        "vulkan_capability_report.json": {
+          "sha256": "fc0990f34666844dff2057e664ff8fe039364c2910e710aa0cee03dee6e95cb4",
+          "bytes": 5632
+        }
+      }
+    },
+    {
+      "case": "query-candidate-03",
+      "strict": {
+        "eligible": true,
+        "reportSha256": "b81920f36c7e67d2f4223193fced0167d460b9935635da7e1daeb2c849617b6a",
+        "runId": "prod-query-candidate-03",
+        "workload": "motion-chapter-performance-route-v1",
+        "buildId": "1.6.2",
+        "settings": {
+          "scalePercent": 40,
+          "width": 1440,
+          "height": 2971,
+          "internalWidth": 576,
+          "internalHeight": 1188,
+          "backend": "RayQueryCompute",
+          "water": 1,
+          "fire": 0,
+          "cap": 30,
+          "glass": false,
+          "shadow": 1,
+          "mist": true,
+          "dust": 1
+        },
+        "scope": {
+          "surfaceGeneration": 1,
+          "sceneEpoch": 3,
+          "measurementGeneration": 5,
+          "matchedCompletedFrames": 698,
+          "intervalCount": 697,
+          "durationNanoseconds": 68737156016,
+          "setupPresentationRowsExcluded": 0
+        },
+        "intervalsNanoseconds": {
+          "median": 83333438,
+          "p90NearestRank": 149999948,
+          "p95NearestRank": 150000051,
+          "maximum": 162500051,
+          "over33333000Nanoseconds": 697,
+          "over250000000Nanoseconds": 0
+        },
+        "observedPresentedImageRatePerSecond": 10.140076,
+        "simulation": {
+          "stateRows": 698,
+          "eventRows": 48,
+          "ticksThisFrameMaximum": 6,
+          "catchUpOverrunCountFirst": 0,
+          "catchUpOverrunCountLast": 258,
+          "catchUpOverrunDelta": 258
+        },
+        "collector": {
+          "runCounterDelta": {
+            "preparedPresents": 698,
+            "acceptedPresents": 698,
+            "rejectedPresents": 0,
+            "invalidRegistrations": 0,
+            "invalidMetadata": 0,
+            "pendingCapacityExhausted": 0,
+            "queryCalls": 1383,
+            "queryErrors": 0,
+            "incompleteQueries": 0,
+            "zeroPresentTimestamps": 0,
+            "zeroPresentIds": 0,
+            "unknownPresentIds": 0,
+            "duplicateTimings": 0,
+            "rowCapacityExhausted": 0,
+            "missingOnRebind": 0,
+            "missingOnUnbind": 0,
+            "abandonedPreparedPresents": 0
+          },
+          "queryCpuWallNanoseconds": 10065489,
+          "presentMarginAtLeast2Pow63CountIgnored": 697
+        },
+        "limits": [
+          "Bounded ordinary chapter traversal with zero mid-route image readbacks; recorder overhead remains.",
+          "One continuous resource scope; retry/rotation/lifecycle discontinuities require separate evidence.",
+          "Actual inter-present intervals; not sustained FPS, scanout, photons, GPU reciprocal time, touch latency or owner acceptance.",
+          "Trace extents are native resource observations; this analyzer does not certify appearance, thermals or power."
+        ]
+      },
+      "views": {
+        "landing-sweep": {
+          "pose": {
+            "x": -33.6866,
+            "y": 2.05,
+            "z": -12.7812,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 39,
+            "medianMs": 131.076976,
+            "p95Ms": 132.692288,
+            "maximumMs": 132.708226,
+            "over33_333ms": 39,
+            "over250ms": 0
+          },
+          "display": {
+            "n": 39,
+            "medianMs": 149.999948,
+            "p95Ms": 154.166666,
+            "maximumMs": 154.166719,
+            "over33_333ms": 39,
+            "over250ms": 0
+          },
+          "cpu": {
+            "n": 39,
+            "medianMs": 146.340677,
+            "p95Ms": 151.727291,
+            "maximumMs": 152.131406,
+            "over33_333ms": 39,
+            "over250ms": 0
+          },
+          "simulationOverruns": 39
+        },
+        "lower-sweep": {
+          "pose": {
+            "x": -33.7,
+            "y": -0.95,
+            "z": -15.2,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 51,
+            "medianMs": 67.244946,
+            "p95Ms": 68.99104,
+            "maximumMs": 69.573748,
+            "over33_333ms": 51,
+            "over250ms": 0
+          },
+          "display": {
+            "n": 51,
+            "medianMs": 75.0,
+            "p95Ms": 83.333385,
+            "maximumMs": 83.333386,
+            "over33_333ms": 51,
+            "over250ms": 0
+          },
+          "cpu": {
+            "n": 51,
+            "medianMs": 76.470886,
+            "p95Ms": 79.494739,
+            "maximumMs": 80.464531,
+            "over33_333ms": 51,
+            "over250ms": 0
+          },
+          "simulationOverruns": 0
+        },
+        "passage-sweep": {
+          "pose": {
+            "x": -22.0221,
+            "y": -0.95,
+            "z": -15.2,
+            "yaw": 1.5708,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 50,
+            "medianMs": 67.9287225,
+            "p95Ms": 74.215415,
+            "maximumMs": 75.005259,
+            "over33_333ms": 50,
+            "over250ms": 0
+          },
+          "display": {
+            "n": 50,
+            "medianMs": 83.333255,
+            "p95Ms": 83.333386,
+            "maximumMs": 83.333437,
+            "over33_333ms": 50,
+            "over250ms": 0
+          },
+          "cpu": {
+            "n": 50,
+            "medianMs": 78.157552,
+            "p95Ms": 83.345573,
+            "maximumMs": 84.318593,
+            "over33_333ms": 50,
+            "over250ms": 0
+          },
+          "simulationOverruns": 0
+        },
+        "repeat-ascent": {
+          "pose": {
+            "x": -33.7,
+            "y": 2.05,
+            "z": -12.8,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 40,
+            "medianMs": 131.2973665,
+            "p95Ms": 142.167653,
+            "maximumMs": 143.060622,
+            "over33_333ms": 40,
+            "over250ms": 0
+          },
+          "display": {
+            "n": 40,
+            "medianMs": 150.0,
+            "p95Ms": 154.166719,
+            "maximumMs": 158.333438,
+            "over33_333ms": 40,
+            "over250ms": 0
+          },
+          "cpu": {
+            "n": 40,
+            "medianMs": 149.220703,
+            "p95Ms": 156.484062,
+            "maximumMs": 159.964219,
+            "over33_333ms": 40,
+            "over250ms": 0
+          },
+          "simulationOverruns": 40
+        }
+      },
+      "thermals": [
+        {
+          "phase": "before-prepare",
+          "hostMonotonic": 245419.781,
+          "thermal": {
+            "schemaVersion": 1,
+            "temperatureSource": "current HAL",
+            "frameworkStatus": 0,
+            "sensors": {
+              "AP": {
+                "type": 0,
+                "celsius": 38.1,
+                "status": 0
+              },
+              "BAT": {
+                "type": 2,
+                "celsius": 35.5,
+                "status": 0
+              },
+              "SKIN": {
+                "type": 3,
+                "celsius": 36.6,
+                "status": 0
+              }
+            },
+            "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+          }
+        },
+        {
+          "phase": "before-route",
+          "hostMonotonic": 245432.64,
+          "thermal": {
+            "schemaVersion": 1,
+            "temperatureSource": "current HAL",
+            "frameworkStatus": 0,
+            "sensors": {
+              "AP": {
+                "type": 0,
+                "celsius": 45.8,
+                "status": 0
+              },
+              "BAT": {
+                "type": 2,
+                "celsius": 36.1,
+                "status": 0
+              },
+              "SKIN": {
+                "type": 3,
+                "celsius": 39.0,
+                "status": 0
+              }
+            },
+            "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+          }
+        },
+        {
+          "phase": "running",
+          "hostMonotonic": 245448.453,
+          "thermal": {
+            "schemaVersion": 1,
+            "temperatureSource": "current HAL",
+            "frameworkStatus": 0,
+            "sensors": {
+              "AP": {
+                "type": 0,
+                "celsius": 46.0,
+                "status": 0
+              },
+              "BAT": {
+                "type": 2,
+                "celsius": 37.4,
+                "status": 0
+              },
+              "SKIN": {
+                "type": 3,
+                "celsius": 39.7,
+                "status": 0
+              }
+            },
+            "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+          }
+        },
+        {
+          "phase": "running",
+          "hostMonotonic": 245464.171,
+          "thermal": {
+            "schemaVersion": 1,
+            "temperatureSource": "current HAL",
+            "frameworkStatus": 1,
+            "sensors": {
+              "AP": {
+                "type": 0,
+                "celsius": 47.5,
+                "status": 0
+              },
+              "BAT": {
+                "type": 2,
+                "celsius": 38.2,
+                "status": 0
+              },
+              "SKIN": {
+                "type": 3,
+                "celsius": 40.2,
+                "status": 1
+              }
+            },
+            "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+          }
+        },
+        {
+          "phase": "running",
+          "hostMonotonic": 245479.89,
+          "thermal": {
+            "schemaVersion": 1,
+            "temperatureSource": "current HAL",
+            "frameworkStatus": 1,
+            "sensors": {
+              "AP": {
+                "type": 0,
+                "celsius": 47.8,
+                "status": 0
+              },
+              "BAT": {
+                "type": 2,
+                "celsius": 38.7,
+                "status": 0
+              },
+              "SKIN": {
+                "type": 3,
+                "celsius": 40.9,
+                "status": 1
+              }
+            },
+            "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+          }
+        },
+        {
+          "phase": "running",
+          "hostMonotonic": 245495.609,
+          "thermal": {
+            "schemaVersion": 1,
+            "temperatureSource": "current HAL",
+            "frameworkStatus": 1,
+            "sensors": {
+              "AP": {
+                "type": 0,
+                "celsius": 48.1,
+                "status": 0
+              },
+              "BAT": {
+                "type": 2,
+                "celsius": 39.0,
+                "status": 0
+              },
+              "SKIN": {
+                "type": 3,
+                "celsius": 41.2,
+                "status": 1
+              }
+            },
+            "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+          }
+        },
+        {
+          "phase": "after-route",
+          "hostMonotonic": 245505.703,
+          "thermal": {
+            "schemaVersion": 1,
+            "temperatureSource": "current HAL",
+            "frameworkStatus": 1,
+            "sensors": {
+              "AP": {
+                "type": 0,
+                "celsius": 47.5,
+                "status": 0
+              },
+              "BAT": {
+                "type": 2,
+                "celsius": 39.2,
+                "status": 0
+              },
+              "SKIN": {
+                "type": 3,
+                "celsius": 41.1,
+                "status": 1
+              }
+            },
+            "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+          }
+        }
+      ],
+      "resources": {
+        "device_local_bytes": {
+          "first": 160792640,
+          "min": 152774976,
+          "max": 262915072,
+          "last": 160792640
+        },
+        "host_visible_bytes": {
+          "first": 48084672,
+          "min": 47074048,
+          "max": 53409408,
+          "last": 48084672
+        },
+        "saved_owner_bytes": {
+          "first": 0,
+          "min": 0,
+          "max": 8017664,
+          "last": 0
+        },
+        "run_unloads": {
+          "first": 0,
+          "min": 0,
+          "max": 1,
+          "last": 1
+        },
+        "run_restores": {
+          "first": 0,
+          "min": 0,
+          "max": 1,
+          "last": 1
+        },
+        "wait_frames": {
+          "first": 0,
+          "min": 0,
+          "max": 0,
+          "last": 0
+        },
+        "peak_overlap_bytes": {
+          "first": 0,
+          "min": 0,
+          "max": 180592064,
+          "last": 180592064
+        }
+      },
+      "rawFiles": {
+        "android-motion-prod-query-candidate-03-ledger.json": {
+          "sha256": "391f96c752ad919315e0100442997845454c769e93dfc44167d7f64cb875e916",
+          "bytes": 1618855
+        },
+        "android-motion-prod-query-candidate-03-manifest.json": {
+          "sha256": "aa435c3d5269a18663157e8bd0f61f0c1ed45fc823f4edccae821bbcf9e3efb1",
+          "bytes": 678
+        },
+        "android-motion-prod-query-candidate-03-present-timing.json": {
+          "sha256": "c69eaf81d365f6da6226c079d9921e5fa6b63155e5b773eee65d8c4846802992",
+          "bytes": 267125
+        },
+        "android-motion-prod-query-candidate-03-resources.csv": {
+          "sha256": "f0de84d466009f7d32e1df9c3a19a9ce9fe420d6ad6b2281a0f84ca17ebb1941",
+          "bytes": 94232
+        },
+        "HordeLanternRT-benchmark-latest.json": {
+          "sha256": "b81920f36c7e67d2f4223193fced0167d460b9935635da7e1daeb2c849617b6a",
+          "bytes": 1888836
+        },
+        "launch.txt": {
+          "sha256": "504733460703bb3a02203ac52e604474f392e5abe427ae5eb8dbc438f0d543e6",
+          "bytes": 268
+        },
+        "motion-launch.txt": {
+          "sha256": "1134bb5377fcdaff8755d20f77d73dbff1e4d75b5cb75180ab3d54777c980112",
+          "bytes": 369
+        },
+        "owned-final.log": {
+          "sha256": "bb09f29bf6d3045f7eb4b4f3cf78cc2ee5d76238aab3df5522bd604ae35087fa",
+          "bytes": 168368
+        },
+        "prestart-capability.json": {
+          "sha256": "bca1d64b02efa8bf2692d80b8abea9df0adea538b27ff78b00d4263a7cb68e8b",
+          "bytes": 2520
+        },
+        "prestart.log": {
+          "sha256": "093ea69a92eb04791efc7b0d18bb0b1062919f7776cbbcb8d0bf7ed425288f54",
+          "bytes": 57499
+        },
+        "settings-after.xml": {
+          "sha256": "e3966b09cd9c354cb92833496b7f812139178dd7b2a906a4f809dbf9538c3dee",
+          "bytes": 1351
+        },
+        "strict-analysis.json": {
+          "sha256": "c9ece518ff3101c078ce11e86584b5ccc4b48415ca677f633d1a74e2abbdf8a3",
+          "bytes": 2433
+        },
+        "summary.json": {
+          "sha256": "95a0a3a4466d7c043bd541eb396c907550d18fe32007529a7ecfa8e806bfeb95",
+          "bytes": 13623
+        },
+        "thermals.json": {
+          "sha256": "de2bc73742a243a369656cd12985cca4f03b11dbcadc14afe6b9a7617029bb3d",
+          "bytes": 4420
+        },
+        "vulkan_capability_report.json": {
+          "sha256": "cb49935501bb5ee7490cc811ce58d3e690f43ef05f0ee1a4454b86211bcdaa95",
+          "bytes": 5695
+        }
+      }
+    }
+  ]
+}

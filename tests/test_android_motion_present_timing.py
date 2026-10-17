@@ -95,6 +95,26 @@ class AndroidMotionPresentTimingTests(unittest.TestCase):
             report['imagePresentationTiming']['capture']['rows'].pop()
             self.reject(report, 'count|timestamp|join|completed|missing|counter')
 
+    def test_first_armed_image_cannot_disappear_from_an_otherwise_completed_route(self):
+        report = make_report()
+        for value in (report, report['motionManifest'], report['motionEvidence']):
+            value['scenario'] = 'chapter-performance-route'
+        report['workload'] = 'motion-chapter-performance-route-v1'
+        report['motionManifest']['captures'] = 0
+        report['motionImageCaptures'] = []
+        # Phone reproduction: all submissions fenced; only the first accepted
+        # image stays unresolved while later display timestamps are returned.
+        wrapper = report['imagePresentationTiming']
+        missing = wrapper['capture']['rows'].pop(1)
+        missing.update(actualPresentTime=0, earliestPresentTime=0, presentMargin=0)
+        wrapper['capture']['unresolved'] = [missing]
+        wrapper['capture']['status']['pendingCount'] = 1
+        self.reject(report, 'unresolved|pending|count')
+        # Removing the pending record is not a valid way to turn this into a pass.
+        wrapper['capture']['unresolved'] = []
+        wrapper['capture']['status']['pendingCount'] = 0
+        self.reject(report, 'count|timestamp|join|completed|missing|counter')
+
     def reject(self, report, fragment):
         with self.assertRaisesRegex(AnalysisError, fragment):
             analyze_bytes(encoded(report))

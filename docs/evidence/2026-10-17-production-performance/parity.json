@@ -1,0 +1,58 @@
+[
+  {
+    "view": "pipeline-chapter-forest-second-bend",
+    "changedPixels": 50,
+    "pixels": 4492800,
+    "maxChannel": 1,
+    "meanAbs": 4.006410256410256e-06
+  },
+  {
+    "view": "pipeline-chapter-keeper-death-retired",
+    "changedPixels": 0,
+    "pixels": 4492800,
+    "maxChannel": 0,
+    "meanAbs": 0.0
+  },
+  {
+    "view": "pipeline-chapter-landing-south",
+    "changedPixels": 0,
+    "pixels": 4492800,
+    "maxChannel": 0,
+    "meanAbs": 0.0
+  },
+  {
+    "view": "pipeline-lich",
+    "changedPixels": 0,
+    "pixels": 4492800,
+    "maxChannel": 0,
+    "meanAbs": 0.0
+  },
+  {
+    "view": "query-chapter-forest-second-bend",
+    "changedPixels": 50,
+    "pixels": 4492800,
+    "maxChannel": 1,
+    "meanAbs": 4.006410256410256e-06
+  },
+  {
+    "view": "query-chapter-keeper-death-retired",
+    "changedPixels": 0,
+    "pixels": 4492800,
+    "maxChannel": 0,
+    "meanAbs": 0.0
+  },
+  {
+    "view": "query-chapter-landing-south",
+    "changedPixels": 0,
+    "pixels": 4492800,
+    "maxChannel": 0,
+    "meanAbs": 0.0
+  },
+  {
+    "view": "query-lich",
+    "changedPixels": 0,
+    "pixels": 4492800,
+    "maxChannel": 0,
+    "meanAbs": 0.0
+  }
+]
