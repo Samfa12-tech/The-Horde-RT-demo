@@ -3,17 +3,18 @@
 ## 17 October normal production-bank optimization loop — SM-S948B / Android17
 
 Evidence class: **authorized same-signer Debug/O2 phone update, normal
-Shipping/Mobile shaders, six short out-and-back runs with strict actual-display
+Shipping/Mobile shaders, eight short out-and-back runs with strict actual-display
 joins, eight frozen image comparisons and inspected representative frames**. See the
 [exact revision/artifacts, temperatures, results and limitations](evidence/2026-10-17-production-performance/README.md).
 Runtime base3252820f, control APKa49955a2…95a8d6c, trialfbfdf02a…ef4e2a7;
 API37/Adreno840/Vulkan1.4.295/driver2150932499. Saved40%/CURRENT and all169
 assets are unchanged. No private stage/clock shader observer is used.
 
-All4,164 accepted frame/display joins pass. Opaque-only inverse transpose is
-**not adopted**: small mixed observations are thermally confounded, and a
-matched reverse-order control stopped before input when NotificationShade
-covered the game. One hotter Query run rejects691 completed submissions with
+All5,554 completed frame/display joins pass. Opaque-only inverse transpose is
+**not adopted**: small mixed observations are thermally confounded. Both final
+reverse-order controls completed after the excluded NotificationShade attempt;
+neither matches the trial's starting temperatures, and landing/passage positions
+differ by at most2.2mm. These remain descriptive comparisons. One hotter Query run rejects691 completed submissions with
 only690 actual timestamps, leaving the first present ID unresolved. The
 two-second drain and strict coverage remain unchanged. Six image pairs are
 pixel-identical; two differ at50pixels by at most1/255 in a channel.

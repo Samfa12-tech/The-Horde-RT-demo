@@ -3,10 +3,11 @@
 The [production-bank performance checkpoint](../evidence/2026-10-17-production-performance/README.md)
 supersedes private-bank timings as the current normal-shader control. One
 Opaque inverse-transform trial was tested and reverted: no repeatable gain is
-established. Six short phone runs join 4,164 actual presentations; eight matched
-image pairs retain appearance. A hotter Query run is rejected for a missing
-first display timestamp, and a reverse-order control remains pending after the
-notification shade interrupted foreground. No shader, quality or budget change
+established. Eight short phone runs join 5,554 actual presentations; eight matched
+image pairs retain appearance. The final reverse-order controls completed after
+the notification-shade interruption, but cooler starting temperatures and small
+ordinary-route pose differences disqualify causal gain claims. A hotter Query
+run remains rejected for a missing first display timestamp. No shader, quality or budget change
 is adopted; outdoor expansion stays behind the performance gate. The normal
 bank now records one 7.65 MiB static-owner saving/exact return, distinct from
 the prior private 13.59 MiB profile; peak overlap and sustained acceptance remain

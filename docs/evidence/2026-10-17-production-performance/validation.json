@@ -338,7 +338,8 @@
     "cool-run.py": "c3f790a75fce254d74b8a393df85df3594a532a8997794aedc3536d6b88e3196",
     "capture-parity.py": "1562e82a9aa5c58d69ccece7f9156b3e5b554619bdf940e0b46c6751d8c3f732",
     "capture-windows.ps1": "0e481a08c85782f119f57743d11ec6dc54cbe6951b716f06aaab4d80ccb63b1b",
-    "analyze.py": "f8734f1372c4a410a68f92bf84b04fcca2ecea458257e06a9251e8f5ea658843"
+    "analyze.py": "f8734f1372c4a410a68f92bf84b04fcca2ecea458257e06a9251e8f5ea658843",
+    "final-controls.py": "acc7e8fa56b392919bf0199413a68ea1e05721d502874c59b2c3b95b39d93e52"
   },
   "logHashes": {
     "host-debug-tests.log": "865045e05f3963a5465e8de372ad49a7598ff868c6be62d4c374da5b4a23027a",
@@ -358,9 +359,42 @@
     "pipeline-baseline-04": "NotificationShade covered game; foreground guard aborted before route input; Debug stopped"
   },
   "pending": [
-    "thermally matched reverse-order controls after phone foreground confirmation",
     "long warm gameplay and 30 FPS acceptance",
     "live combat on current production bank",
     "Current/Higher and saved Lower migration acceptance"
-  ]
+  ],
+  "finalControls": {
+    "cases": [
+      "pipeline-baseline-05",
+      "query-baseline-02"
+    ],
+    "matchedCompletedFrames": 1390,
+    "strictDisplayJoins": "pass; all completed frames have an owned actual display timestamp",
+    "savedOwnerBytes": 8017664,
+    "restoration": "exact starting allocation totals; one unload/restore each; zero readiness waits",
+    "temperatureComparison": "both rejected by existing 1.5 C per-sensor comparison; no causal gain estimate",
+    "poseComparison": "up to 2.2 mm positional drift at ordinary walk stops; exact eligibility retained; unchanged per-hold stationarity check",
+    "focusedPoseEligibilityChecks": 3,
+    "strictAnalyzerRegressionTests": 16,
+    "runtimeOrShaderChanges": "none; same installed control APK; no additional experiment",
+    "thermalParserRegressionTests": 9
+  },
+  "priorExactCommitCi": {
+    "sha": "3a9db850c67b680451597f435e1e971b31e08da2",
+    "runId": 39004383384,
+    "result": "all six jobs passed",
+    "msvc": "attempt 1 reached unchanged 15-minute job deadline; one MSVC-only fresh-worker retry passed all 146 Windows tests; runner delay cause unproven; deadlines/assertions unchanged"
+  },
+  "notEstablished": [
+    "Thermally comparable causal optimization gain; trial closed without adoption",
+    "Exact cross-run timed camera poses at ordinary walk stops (separate frozen correctness captures remain exact)"
+  ],
+  "phoneDisposition": {
+    "installedDebugSha256": "a49955a2638ae5bf0fc5e3ddc8bdf83c43a9335e5ada64f231503e66c95a8d6c",
+    "state": "baseline installed; both final controls complete; Debug stopped; release app untouched",
+    "verifiedUtc": "2026-10-17T05:40:42.245338+00:00",
+    "preferencesByteIdentical": true,
+    "preferencesSha256": "e3966b09cd9c354cb92833496b7f812139178dd7b2a906a4f809dbf9538c3dee",
+    "noInstallDuringFinalControls": true
+  }
 }
