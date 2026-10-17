@@ -1,5 +1,17 @@
 # Horde 1.7 current design index
 
+The [18 October cleared-mist optimisation](../evidence/2026-10-18-zero-mist-exit/README.md)
+now banks an output-preserving exact-zero early exit. Six normal Shipping/Mobile
+phone routes join4,324 actual presentations; two trials per backend repeat
+17.6–18.8% lower GPU time in the exact cleared-tomb view, with display median
+66.7ms and26 pixel-identical image pairs. All shader metrics/budgets and the
+normal7.65MiB unload/exact-return path remain unchanged. This supersedes the
+no-adopted-optimisation disposition below; the inverse-transform trial stays
+reverted. Outdoor and live two-torch headroom, sustained30FPS, owner acceptance
+and an unattributed checkpoint-startup failure remain open. The bounded pass
+stops here without stacking a third experiment. Chapter/material/niche/loading
+work and the Easy Tree/issue28 deferrals are preserved.
+
 The [production-bank performance checkpoint](../evidence/2026-10-17-production-performance/README.md)
 supersedes private-bank timings as the current normal-shader control. One
 Opaque inverse-transform trial was tested and reverted: no repeatable gain is

@@ -77,7 +77,15 @@ inline constexpr bool DevelopmentCheckpointRequiresAuthoredChapter(
     return checkpoint.id == 192 || checkpoint.name.starts_with("chapter-");
 }
 
-inline constexpr std::array<DevelopmentCheckpoint, 100u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 102u> kDevelopmentCheckpoints{{
+    // Actual fixed-step mist states; body dissolve checkpoints below have
+    // earlier clocks and must not stand in for halfway/zero mist evidence.
+    {.id=221,.name="chapter-keeper-mist-fading",.baseShowcaseCheckpointId=10,
+     .cameraX=-31.9f,.cameraZ=-15.2f,.yaw=-1.57079632679f,.pitch=-.35f,
+     .keeperDeathFixedTicks=268u},
+    {.id=222,.name="chapter-keeper-mist-cleared",.baseShowcaseCheckpointId=10,
+     .cameraX=-31.9f,.cameraZ=-15.2f,.yaw=-1.57079632679f,.pitch=-.35f,
+     .keeperDeathFixedTicks=300u},
     {.id=218,.name="chapter-niche-rect",.baseShowcaseCheckpointId=11,
      .cameraX=-0.40f,.cameraZ=-0.70f,.yaw=-1.57079632679f,.pitch=-0.32f,
      .usesProductionRewardProps=true,.rewardPose=DevelopmentRewardPose::HeldHigh},

@@ -170,8 +170,8 @@ try {
     $legacyHashBefore = Get-RawFileHash $legacyIncludePath
     # Include the shared grave-lid shading admitted at 6e41b014. Fresh compatibility
     # compilation independently verified these words; matrix compilation must not mutate them.
-    Assert-True ((Get-CanonicalShaderTextHash $genericIncludePath) -eq '5afa3381e53e10e723e0e2b496fced346a7cfaebbda8e19cb96111f1692187cd') 'Generic include hash changed before matrix compilation.'
-    Assert-True ((Get-CanonicalShaderTextHash $legacyIncludePath) -eq '4e94536f79922a4e1cf5da96bf6bbdf937686fd82fd5bc550c9a0dcb8ae90412') 'Legacy include hash changed before matrix compilation.'
+    Assert-True ((Get-CanonicalShaderTextHash $genericIncludePath) -eq 'c96c4e361e28f9bc4b4f69ebcb5a25e91ed1586e3f968f7761693443fea4fd6f') 'Generic include hash changed before matrix compilation.'
+    Assert-True ((Get-CanonicalShaderTextHash $legacyIncludePath) -eq '114ace155e401bc19ed27ef0ba8dc6c97e619a4bed21933bd516f4c3871e9d8f') 'Legacy include hash changed before matrix compilation.'
 
     $matrixOutputRoot = Join-Path $temporaryRoot 'matrix'
     $matrixCompilerOutput = @(& $compiler -Matrix -OutputDirectory $matrixOutputRoot)

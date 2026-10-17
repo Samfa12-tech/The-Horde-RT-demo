@@ -5724,6 +5724,8 @@ public class MainActivity extends Activity {
             case "chapter-keeper-death-held": return 204;
             case "chapter-keeper-death-dissolve": return 205;
             case "chapter-keeper-death-retired": return 206;
+            case "chapter-keeper-mist-fading": return 221;
+            case "chapter-keeper-mist-cleared": return 222;
             case "chapter-kit-reunion": return 207;
             case "chapter-kit-departure": return 208;
             case "chapter-stake-ascent": return 210;
@@ -6024,6 +6026,8 @@ public class MainActivity extends Activity {
             case 204: return new float[]{-1.57079632679f, -0.35f};
             case 205: return new float[]{-1.57079632679f, -0.35f};
             case 206: return new float[]{-1.57079632679f, -0.35f};
+            case 221: return new float[]{-1.57079632679f, -0.35f};
+            case 222: return new float[]{-1.57079632679f, -0.35f};
             case 207: return new float[]{1.57079632679f, -0.10f};
             case 208: return new float[]{1.57079632679f, -0.10f};
             case 210: return new float[]{2.35619449f, -.32f};

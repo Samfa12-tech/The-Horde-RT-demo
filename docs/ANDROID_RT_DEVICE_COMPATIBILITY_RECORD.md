@@ -1,5 +1,21 @@
 # Android RT Device Compatibility Record
 
+## 2026-10-18 — exact-zero mist optimisation, bounded physical evidence
+
+SM-S948B / Adreno840 / API37 / Vulkan1.4.295 / driver2150932499: both
+hardware RT backends present the normal Shipping/Mobile bank at the preserved
+40%/CURRENT settings. Six short routes join4,324 actual presentations; repeated
+cleared-tomb GPU medians improve71.082→57.754/57.716ms (Pipeline) and
+67.611→55.709/55.727ms (Query), with display median66.667ms. Fourteen phone
+image pairs are pixel-identical; all routes retain7.65MiB saving/exact return.
+Final Debug APK SHA-256 `d0363ad6649aecdf3482fa2de7e6d635a8b4a23c2b101fb04929372723817dd0`
+is installed/byte-verified and stopped, with identical saved preferences and
+untouched release app. [Artifacts, matched-start thermals, images, failed attempts
+and limitations](evidence/2026-10-18-zero-mist-exit/README.md). This is not a
+signed Release, long-session/live-combat30FPS, CURRENT/HIGHER migration or owner
+acceptance pass. One earlier checkpoint-staging failure remains unattributed.
+
+
 ## 17 October normal production-bank optimization loop — SM-S948B / Android17
 
 Evidence class: **authorized same-signer Debug/O2 phone update, normal

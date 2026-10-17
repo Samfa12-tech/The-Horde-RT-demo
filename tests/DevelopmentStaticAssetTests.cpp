@@ -1,6 +1,7 @@
 #include "gameplay/CorridorCollision.h"
 #include "gameplay/DevelopmentCheckpoints.h"
 #include "gameplay/DevelopmentCheckpointSimulation.h"
+#include "gameplay/effects/KeeperCastPresentation.h"
 #include "gameplay/ShowcaseCheckpoints.h"
 #include "vulkan/raytracing/DevelopmentStaticAssetPolicy.h"
 #include "platform/windows/WindowsCaptureContracts.h"
@@ -67,8 +68,8 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 100u,
-          "development registry retains prior views and adds three actual chapter niche inspections");
+    Check(kDevelopmentCheckpoints.size() == 102u,
+          "development registry retains prior views and adds two actual fixed-step room-mist states");
     Check(FindDevelopmentCheckpoint("chapter-understory-close") != nullptr &&
           FindShowcaseCheckpoint("chapter-understory-close") == nullptr,
           "understory camera is development-only and cannot alter release checkpoint lookup");
@@ -149,6 +150,29 @@ int main()
         if (death && death->id == 204) Check(keeper.deathDissolveProgress == 0.0f, "held corpse precedes dissolve");
         if (death && death->id == 206) Check(keeper.deathDissolveProgress == 1.0f, "last capture retires corpse");
         previousDissolve = keeper.deathDissolveProgress;
+    }
+    for (const auto name : {"chapter-keeper-mist-fading", "chapter-keeper-mist-cleared"})
+    {
+        const auto* checkpoint = FindDevelopmentCheckpoint(name);
+        auto config = simulation::ProductionGameSimulationConfig();
+        config.developmentRescueJourney = true;
+        simulation::GameSimulation staged(config);
+        Check(checkpoint && FindShowcaseCheckpoint(name) == nullptr &&
+                  FindDevelopmentCheckpoint(checkpoint->id) == checkpoint &&
+                  StageDevelopmentCheckpointSimulation(staged, *checkpoint),
+              "mist captures remain development-only and use real accepted-hit/death fixed steps");
+        const auto& keeper = staged.Snapshot().lich;
+        Check(keeper.phase == LichPhase::Dead && keeper.deathAnimationComplete &&
+                  keeper.deathDissolveProgress == 1.0f && !keeper.damagePulse,
+              "mist-state capture cannot restore the retired Keeper or pending attack");
+        const float kind = effects::KeeperShaderPresentationKind(true, keeper);
+        if (checkpoint && checkpoint->id == 221)
+            Check(std::abs(keeper.roomMistDensityScale - .5f) < .002f && kind > .75f &&
+                      std::abs(kind - .875f) < .001f,
+                  "268 actual death ticks capture positive half mist, not body dissolve");
+        if (checkpoint && checkpoint->id == 222)
+            Check(keeper.roomMistDensityScale == 0.0f && kind == .75f,
+                  "300 actual death ticks reach the exact-zero mist gate without an epsilon");
     }
     for(const auto name:{"chapter-kit-reunion","chapter-kit-departure"}) {
         const auto* kit=FindDevelopmentCheckpoint(name);
