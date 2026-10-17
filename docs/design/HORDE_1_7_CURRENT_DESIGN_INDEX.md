@@ -1,5 +1,12 @@
 # Horde 1.7 current design index
 
+The [bounded active-light review](../evidence/2026-10-17-shadow-investigation/README.md)
+found the first-confirmed-blocker hypothesis already rejected by measured
+evidence; it is not reintroduced. With no new equivalent candidate supported,
+the authorized fallback maps the [next logical-save slice](HORDE_1_7_SAVE_SLICE.md).
+No renderer change, new performance claim, phone use or save implementation is
+made by this proposal. The rendering acceptance gap remains open.
+
 The [continuation checkpoint and current milestone map](../evidence/2026-10-17-checkpoint-admission/README.md)
 identify the existing active working folder, verified optimisation outcome and
 remaining critical path. Checkpoint staging now reports shared failure reasons

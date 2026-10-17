@@ -1,0 +1,120 @@
+{
+  "recordedUtc": "2026-10-17T23:19:28.291238+00:00",
+  "sourceParent": "f3c494ee8b39c4f8503412ecd35361d927750a7a",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "workingPath": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+  "disposition": "No candidate: first-confirmed-blocker hypothesis already measured/rejected; authorized save-gap mapping fallback.",
+  "inspectedSource": [
+    {
+      "path": "shaders/raytracing/include/rt_lighting.glsl",
+      "sha256": "bf833307850b4681e67c2168318a564835a3e0667fb4f83af8f7275d01692df5",
+      "gitBlob": "bb069c8c2274ec6c716f260eb696628628053ff4"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_atmosphere.glsl",
+      "sha256": "a453f3b150df6e382bcf9c6f0e8dc33cc3cbff7006ac7e6d7001e3d2e9630de4",
+      "gitBlob": "27b71d266a7ee00ab4943ab660bfd333c9b001ee"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_fire.glsl",
+      "sha256": "74b5130bc37f2b601fca6181736bcb402a583e2a7c1fcf8a1be8b7c07c7cc57f",
+      "gitBlob": "f5cd42000ef2c32a556b871dd6f9ccdf71c119a4"
+    },
+    {
+      "path": "src/gameplay/simulation/GameSimulation.cpp",
+      "sha256": "ab83576d92bdb7cf374d37d4b6570ad8e2896b87e816395811a8e17027377239",
+      "gitBlob": "eeff87c51d7ba25fc15fe6efe70dbaf26a0f41de"
+    },
+    {
+      "path": "src/gameplay/simulation/GameSimulationRescue.cpp",
+      "sha256": "eae88e762f6a520ece582be91060a348844b86e98bef1ccca49a1097dfbc02e4",
+      "gitBlob": "1591226bdd20fa31f3919628869a21f58e4d0969"
+    },
+    {
+      "path": "src/gameplay/simulation/GameSimulationDialogue.cpp",
+      "sha256": "c2922dab69bedf7428fee36a666866a55eb86b5234f8bb7e3b96d3052254be82",
+      "gitBlob": "0bc31e003c7f9dfc885b227be2c31e143fdfefa9"
+    },
+    {
+      "path": "src/gameplay/simulation/SimulationSnapshot.h",
+      "sha256": "290863a6067a5ee5880d03a8844e724ca869811ed816c21e8deebf442a9ada15",
+      "gitBlob": "2d763806db7c4cc5dee4a9f6ce43af16871acfe2"
+    },
+    {
+      "path": "src/gameplay/dialogue/ChapterDialogue.h",
+      "sha256": "5151904afff075bac39420a2b097579e8a70b4825bd28eca784ea82555182aed",
+      "gitBlob": "506172c26ba74e73bd87ccf981e102eff364042c"
+    },
+    {
+      "path": "src/gameplay/dialogue/CompanionRouteFixture.h",
+      "sha256": "a6f55a89dc56f71682da40926f1972d076ad6af0867dd09d286805f3cd1ef1d2",
+      "gitBlob": "22479192bfd515bd4a0423e298d7e289e7d6061b"
+    },
+    {
+      "path": "src/gameplay/traversal/RescueTraversal.cpp",
+      "sha256": "aaa7227fbc8495be641534423a044d17838c65c5cfb7ad4089df9fd46dea52f5",
+      "gitBlob": "36b13c3bb503d1c55d9bfe72b300245175bef1fe"
+    },
+    {
+      "path": "tests/CharacterRenderSlotSmoke.cpp",
+      "sha256": "dd66d4b6d6812c2def94cbbf8985c5d4e4f08eeec05434240b26389c85c6fff1",
+      "gitBlob": "2f3a3c0e2f83dac92cbf4c93a3ba5cf1f2261da0"
+    }
+  ],
+  "preservedEvidence": [
+    {
+      "path": "docs/evidence/2026-09-30-first-blocker/README.md",
+      "sha256": "bd5df0a9abbf9874a2afb9d64bb56aa1854116cf91b36c4dfc6f7096c258912e",
+      "gitBlob": "966136b21cc08ab1b3e9abc3eb2ada7ee1607872"
+    },
+    {
+      "path": "docs/evidence/2026-09-30-first-blocker/DECISION.md",
+      "sha256": "4a358efbb1758b422ecfb62adc25b98721a703605682c82cc08f5a72778e6e93",
+      "gitBlob": "3020517268cc2694ffd72fcb06b4b7700f936347"
+    },
+    {
+      "path": "docs/evidence/2026-10-17-keeper-torch-transition/README.md",
+      "sha256": "0a7fff85860807b58f99d93688fb822a2d4063d21848ccd4256d1af1b02ab8e4",
+      "gitBlob": "bf183683e77454f9f4ddda5754aecc183a6808c3"
+    },
+    {
+      "path": "docs/evidence/2026-10-18-zero-mist-exit/README.md",
+      "sha256": "8a728d262688e9c2a6d0a8451a48c7f894c7275dd17de894084598fb8115e01b",
+      "gitBlob": "5e89209fdb1c62a4bca1b8a42131e8a5636ac1d6"
+    },
+    {
+      "path": "docs/evidence/2026-10-18-zero-mist-exit/measurements.json",
+      "sha256": "2e6400a912245ec91581effbce1ef6c67b6f7baf02e9724a21e5373eb18b25e3",
+      "gitBlob": "7df858f48fdfc94298ef0f9e0c70af1ca16ae7d3"
+    },
+    {
+      "path": "docs/evidence/2026-10-18-zero-mist-exit/visual-parity.json",
+      "sha256": "5754f9d7be4e6a6da6432916ddb4b271c6b1c5a6c00d25eebd3f88e6430d76e1",
+      "gitBlob": "95ebea38335fe049cb4ac166ba86c305649d92d2"
+    },
+    {
+      "path": "docs/evidence/2026-10-18-zero-mist-exit/failed-attempts.json",
+      "sha256": "b4e44d56bd5c56f1629e39ad822a49118caf043a1b156177e545fbfae77d4fad",
+      "gitBlob": "f6013fc11bfc725883b39a7c6739d128c3ff2680"
+    },
+    {
+      "path": "docs/evidence/2026-10-17-checkpoint-admission/validation.json",
+      "sha256": "59bcd3877f38fdea45b3498987883ca80fd57a1554ad1a846eda794bafbc9a73",
+      "gitBlob": "9bf5e9a9bde70698c0d9d5be5f0d3de0aaccab82"
+    }
+  ],
+  "checks": {
+    "runtimeSourceDiff": "empty",
+    "firstBlockerFlagAbsent": true,
+    "relativeLinksChecked": 117,
+    "newGameBuildOrHostTest": "not run: documentation-only after source inspection",
+    "newDeviceEvidence": false,
+    "phoneOrDeviceOperation": false,
+    "newCandidate": false,
+    "newPerformanceClaim": false,
+    "f3c494eePreserved": true
+  },
+  "saveProposal": "docs/design/HORDE_1_7_SAVE_SLICE.md",
+  "nextImplementation": "Logical lower-claim and grounded-exit capture/restore with real simulation/terrain tests, before durable storage/UI.",
+  "decisionBeforeStorage": "Confirm three slots and manual latest-safe-checkpoint versus separate manual snapshot retention."
+}
