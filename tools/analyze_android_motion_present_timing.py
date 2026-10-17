@@ -23,8 +23,8 @@ from analyze_android_present_timing import (
 
 U64_MAX = (1 << 64) - 1
 SCENARIOS = frozenset(("keeper-torch-transition", "torch-low-opening", "shaft-up", "keeper-first-entry",
-                       "keeper-retry-reward", "waterfall-equipment", "torch-drench", "chapter-round-trip", "chapter-streaming-cycle", "chapter-resident-comparison", "chapter-streamed-comparison"))
-CHAPTER_SCENARIOS = frozenset(("keeper-torch-transition", "chapter-round-trip", "chapter-streaming-cycle", "chapter-resident-comparison", "chapter-streamed-comparison"))
+                       "keeper-retry-reward", "waterfall-equipment", "torch-drench", "chapter-round-trip", "chapter-streaming-cycle", "chapter-resident-comparison", "chapter-streamed-comparison", "chapter-performance-route"))
+CHAPTER_SCENARIOS = frozenset(("keeper-torch-transition", "chapter-round-trip", "chapter-streaming-cycle", "chapter-resident-comparison", "chapter-streamed-comparison", "chapter-performance-route"))
 POLICY = ("shared GameSimulation.AdvanceFrame with raw monotonic input-owner delta and normal "
           "fixed-step catch-up; generated motion axes/edges enter through the existing "
           "InputMailbox owner; no per-render fixed-delta override")

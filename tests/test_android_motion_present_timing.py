@@ -81,7 +81,7 @@ class AndroidMotionPresentTimingTests(unittest.TestCase):
         self.reject(adverse, 'queryErrors|adverse')
 
     def test_comparison_modes_keep_strict_timing_and_distinct_identity(self):
-        for scenario in ('chapter-resident-comparison', 'chapter-streamed-comparison', 'keeper-torch-transition'):
+        for scenario in ('chapter-resident-comparison', 'chapter-streamed-comparison', 'keeper-torch-transition', 'chapter-performance-route'):
             report = make_report()
             for value in (report, report['motionManifest'], report['motionEvidence']):
                 value['scenario'] = scenario

@@ -63,9 +63,12 @@ void PollAndroidChapterTerminalTimingDrain(SwapchainContext& context)
     if(context.presentTiming->PendingCount()==0) {
         const auto& s=gGameSimulation.Snapshot();const auto& d=context.rtScene.OrdinaryStaticDetailEvidence();
         if(!run.scenario.Complete() || run.ledger.HasPendingSubmissions() ||
-           !horde::gameplay::validation::ChapterResidencyCountersValid(run.scenario.RetainChapterDetail() ||
+           !(run.selected==horde::gameplay::validation::MotionScenario::ChapterPerformanceRoute
+             ? horde::gameplay::validation::ChapterPerformanceCountersValid(
+                 run.chapterBaseline.unloads,run.chapterBaseline.restores,d.unloads,d.restores)
+             : horde::gameplay::validation::ChapterResidencyCountersValid(run.scenario.RetainChapterDetail() ||
                run.selected==horde::gameplay::validation::MotionScenario::KeeperTorchTransition,
-               run.chapterBaseline.unloads,run.chapterBaseline.restores,d.unloads,d.restores) ||
+               run.chapterBaseline.unloads,run.chapterBaseline.restores,d.unloads,d.restores)) ||
            d.savedOwnerBytes || d.preparationFailures ||
            !context.rtScene.StaticGeometryHasCompleteContributors() || s.staticDetailLease.resourceGeneration) {
             FailAndroidMotion(context,"Chapter did not restore complete contributor ownership after its ordinary unload.");return;

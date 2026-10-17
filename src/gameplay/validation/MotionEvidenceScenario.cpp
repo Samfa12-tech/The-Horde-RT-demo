@@ -33,7 +33,7 @@ bool ParseMotionScenario(std::string_view text, MotionScenario& scenario) noexce
                            MotionScenario::WaterfallEquipment, MotionScenario::TorchDrench,
                            MotionScenario::ChapterRoundTrip, MotionScenario::ChapterStreamingCycle,
                            MotionScenario::ChapterResidentComparison, MotionScenario::ChapterStreamedComparison,
-                           MotionScenario::KeeperTorchTransition})
+                           MotionScenario::KeeperTorchTransition, MotionScenario::ChapterPerformanceRoute})
         if (text == MotionScenarioName(candidate)) { scenario = candidate; return true; }
     return false;
 }
@@ -52,6 +52,7 @@ const char* MotionScenarioName(MotionScenario scenario) noexcept
     case MotionScenario::ChapterResidentComparison: return "chapter-resident-comparison";
     case MotionScenario::ChapterStreamedComparison: return "chapter-streamed-comparison";
     case MotionScenario::KeeperTorchTransition: return "keeper-torch-transition";
+    case MotionScenario::ChapterPerformanceRoute: return "chapter-performance-route";
     default: return "invalid";
     }
 }
@@ -103,7 +104,8 @@ bool MotionEvidenceScenario::Begin(MotionScenario scenario, GameSimulation& simu
           initial.playerAlive && Distance(initial,kPlayerSpawn.x,kPlayerSpawn.z)<0.01f
         : IsChapterMotionScenario(scenario)
         ? chapter_.Start(simulation.Snapshot(),scenario!=MotionScenario::ChapterRoundTrip,
-            scenario==MotionScenario::ChapterResidentComparison || scenario==MotionScenario::ChapterStreamedComparison)
+            scenario==MotionScenario::ChapterResidentComparison || scenario==MotionScenario::ChapterStreamedComparison ||
+            scenario==MotionScenario::ChapterPerformanceRoute)
         : scenario == MotionScenario::WaterfallEquipment
         ? simulation.BeginMotionEvidenceEquipmentSeed()
         : simulation.ApplyShowcaseCheckpoint(

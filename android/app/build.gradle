@@ -183,9 +183,15 @@ def hordeRtNativePolicyArguments = { String defaultInstrumentation ->
 }
 
 def hordeRegionPageDebugArguments = []
-def chapterRouteTimingValue = providers.gradleProperty('hordeRegionPageRouteTiming').orNull
+def legacyRouteTimingValue = providers.gradleProperty('hordeRegionPageRouteTiming').orNull
+def productionRouteTimingValue = providers.gradleProperty('hordeRtRouteTiming').orNull
+if (legacyRouteTimingValue != null && productionRouteTimingValue != null &&
+        legacyRouteTimingValue != productionRouteTimingValue) {
+    throw new GradleException('Conflicting route timing properties.')
+}
+def chapterRouteTimingValue = productionRouteTimingValue ?: legacyRouteTimingValue
 if (chapterRouteTimingValue != null && !(chapterRouteTimingValue in ['true', 'false'])) {
-    throw new GradleException('hordeRegionPageRouteTiming must be true or false.')
+    throw new GradleException('Route timing properties must be true or false.')
 }
 def chapterRouteTiming = chapterRouteTimingValue == 'true'
 def frameStageProbeValue = providers.gradleProperty('hordeFrameStageProbe').orNull
@@ -201,12 +207,11 @@ def dispatchClockProbe = dispatchClockValue == 'true'
 if (dispatchClockProbe && !frameStageProbe) {
     throw new GradleException('Dispatch clock observation requires the private frame stage profile.')
 }
-if (frameStageProbe && !chapterRouteTiming) {
+if (frameStageProbe && (!chapterRouteTiming || hordeRegionPagePrototypeRootProperty == null)) {
     throw new GradleException('Frame stage profiling requires the private chapter route timing build.')
 }
-if (chapterRouteTiming && (hordeRegionPagePrototypeRootProperty == null ||
-        hordeRtInstrumentationOverride != 'Shipping' || hordeRtDielectricQualityOverride != 'Mobile')) {
-    throw new GradleException('Chapter route timing requires the private region-page Shipping/Mobile Debug profile.')
+if (chapterRouteTiming && (hordeRtInstrumentationOverride != 'Shipping' || hordeRtDielectricQualityOverride != 'Mobile')) {
+    throw new GradleException('Route timing requires Shipping/Mobile Debug; production shaders are used unless an explicit private root is supplied.')
 }
 if (hordeRegionPagePrototypeRootProperty != null) {
     if (hordeRegionPagePrototypeRootProperty.isEmpty() ||

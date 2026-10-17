@@ -73,10 +73,9 @@ target_compile_definitions(horde_rt_probe_android PRIVATE
     HORDE_RT_FRAME_STAGE_PROBE=$<BOOL:${HORDE_RT_FRAME_STAGE_PROBE}>)
 if(HORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING AND
    (NOT HORDE_RT_DEBUG_CHECKPOINTS OR NOT CMAKE_BUILD_TYPE STREQUAL "Debug" OR
-    NOT HORDE_RT_REGION_PAGE_PROTOTYPE_ROOT OR
     NOT HORDE_RT_ANDROID_DEFAULT_INSTRUMENTATION STREQUAL "Shipping" OR
     NOT HORDE_RT_ANDROID_DEFAULT_DIELECTRIC_QUALITY STREQUAL "Mobile"))
-    message(FATAL_ERROR "Chapter route timing requires the explicit private Debug page/timing profile.")
+    message(FATAL_ERROR "Route timing requires explicit Debug Shipping/Mobile policy.")
 endif()
 target_compile_definitions(horde_rt_probe_android PRIVATE
     HORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING=$<BOOL:${HORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING}>)

@@ -26,10 +26,19 @@ enum class MotionScenario : std::uint8_t
     ChapterResidentComparison,
     ChapterStreamedComparison,
     KeeperTorchTransition,
+    ChapterPerformanceRoute,
 };
 inline constexpr bool IsChapterMotionScenario(MotionScenario scenario) noexcept {
     return scenario==MotionScenario::ChapterRoundTrip || scenario==MotionScenario::ChapterStreamingCycle ||
-        scenario==MotionScenario::ChapterResidentComparison || scenario==MotionScenario::ChapterStreamedComparison;
+        scenario==MotionScenario::ChapterResidentComparison || scenario==MotionScenario::ChapterStreamedComparison ||
+        scenario==MotionScenario::ChapterPerformanceRoute;
+}
+// Performance observes ordinary residency; zero savings is a valid measured
+// outcome, but unfinished restoration is not. Streaming proof stays stricter.
+inline constexpr bool ChapterPerformanceCountersValid(std::uint64_t beforeUnloads,
+    std::uint64_t beforeRestores,std::uint64_t afterUnloads,std::uint64_t afterRestores) noexcept {
+    return afterUnloads>=beforeUnloads && afterRestores>=beforeRestores &&
+        afterUnloads-beforeUnloads==afterRestores-beforeRestores;
 }
 inline constexpr bool IsTimedMotionScenario(MotionScenario scenario) noexcept {
     return IsChapterMotionScenario(scenario) || scenario==MotionScenario::KeeperTorchTransition;

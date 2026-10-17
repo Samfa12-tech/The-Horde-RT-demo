@@ -192,9 +192,14 @@ int main(int argc,char** argv) {
          !ChapterResidencyCountersValid(false,4,4,4,4) && ChapterResidencyCountersValid(false,4,4,5,5) &&
          !ChapterResidencyCountersValid(false,4,4,3,3) && !ChapterResidencyCountersValid(false,4,4,5,4),
          "residency validation must use only monotonic run-local unload/restore pairs");
-   for(unsigned trial=0;trial<9;++trial) {
-    const unsigned ticksPerFrame=std::array<unsigned,9>{1,3,4,6,5,3,6,3,6}[trial];
-    const auto selected=trial>=7?MotionScenario::ChapterStreamedComparison:
+   check(ChapterPerformanceCountersValid(4,4,4,4) && ChapterPerformanceCountersValid(4,4,5,5) &&
+         !ChapterPerformanceCountersValid(4,4,3,3) && !ChapterPerformanceCountersValid(4,4,5,4) &&
+         !ChapterPerformanceCountersValid(4,4,4,5),
+         "performance permits measured zero savings but never counter rollback or unfinished restoration");
+   for(unsigned trial=0;trial<11;++trial) {
+    const unsigned ticksPerFrame=std::array<unsigned,11>{1,3,4,6,5,3,6,3,6,3,6}[trial];
+    const auto selected=trial>=9?MotionScenario::ChapterPerformanceRoute:
+        trial>=7?MotionScenario::ChapterStreamedComparison:
         trial>=5?MotionScenario::ChapterResidentComparison:
         ticksPerFrame==5?MotionScenario::ChapterStreamingCycle:MotionScenario::ChapterRoundTrip;
     MotionScenario parsed{};
