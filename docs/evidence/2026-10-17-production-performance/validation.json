@@ -396,5 +396,24 @@
     "preferencesByteIdentical": true,
     "preferencesSha256": "e3966b09cd9c354cb92833496b7f812139178dd7b2a906a4f809dbf9538c3dee",
     "noInstallDuringFinalControls": true
+  },
+  "artifactInventoryCorrection": {
+    "cause": "Rerunning local analyze.py included the previous derived summary.json in its own rawFiles inventory",
+    "affectedCases": [
+      "pipeline-baseline-03",
+      "query-baseline-01",
+      "pipeline-candidate-01",
+      "query-candidate-01",
+      "pipeline-candidate-02",
+      "query-candidate-03"
+    ],
+    "correction": "Exclude the derived summary output; retain and verify every source artifact hash",
+    "timingOrCaptureDataChanged": false,
+    "negativeChecks": [
+      "self-referencing summary rejected",
+      "changed source artifact hash rejected"
+    ],
+    "methodSha256": "2fd22737b491240a0d0a49d79c745fd419c7f13a80d36443cce8405c7b68d1ad",
+    "correctedAnalyzerSha256": "0ec465bd66e2e16205bbc92c679b75ca213874465d2f960739df118a09af948e"
   }
 }

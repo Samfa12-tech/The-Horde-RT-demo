@@ -503,10 +503,6 @@
           "sha256": "0bc80a984f1ab73f66db59761f9a42303cb924cebde1234bce983dd193d3f782",
           "bytes": 2436
         },
-        "summary.json": {
-          "sha256": "f4a7282588937510745c87954f6f744cca499b6969310a632f97d0d37efb9b1c",
-          "bytes": 13643
-        },
         "thermals.json": {
           "sha256": "9ea13534697f012fbaac41441b43980e031420a36602eab80772525dfc85be17",
           "bytes": 4420
@@ -1017,10 +1013,6 @@
         "strict-analysis.json": {
           "sha256": "020091d078a752c8aa1c81428cbf282d5448b527ef14f4d1a6f0797f51efb297",
           "bytes": 2431
-        },
-        "summary.json": {
-          "sha256": "f3b3da4052f462fc4adf3e8b5bc5b091d03d5ca08067f9941c59921c43ce609b",
-          "bytes": 13618
         },
         "thermals.json": {
           "sha256": "0d210db88517a6f29ea9dc4697aa24616407ab54b3ad1254d620d2b2a243f6e1",
@@ -1533,10 +1525,6 @@
           "sha256": "bebf3651666ff3eb6c4e3ac263c30dc01ff4144b8e9f328c863e485800e0280b",
           "bytes": 2437
         },
-        "summary.json": {
-          "sha256": "bc3c4ab807b6a0bd5053c069556a60d6890367ccc000f8dbef138af0000123a8",
-          "bytes": 13648
-        },
         "thermals.json": {
           "sha256": "38fda59e2201c83a6d3537bd46a9db1811e84625d66412e60f7631f608c59efc",
           "bytes": 4421
@@ -2047,10 +2035,6 @@
         "strict-analysis.json": {
           "sha256": "726b01568db4f04889c00d588bcbd0af7d81fd9eab79fc2e2af8d9a4a31c0eb0",
           "bytes": 2433
-        },
-        "summary.json": {
-          "sha256": "255793dd7d2f82ccaa2d81190daaeb074c890c2b11af63a8b955473e9e2d5508",
-          "bytes": 13627
         },
         "thermals.json": {
           "sha256": "09b6b8009607014fcc4ed79c0e7fdf4247932cc4ff28494c0e0749281f18009d",
@@ -2563,10 +2547,6 @@
           "sha256": "eecddcee571d210671e2a0d3b10e79f0b039ac6866fae4b216c318ed20745851",
           "bytes": 2436
         },
-        "summary.json": {
-          "sha256": "c956687e1b419962f4702013662174334f9f5e951f30bf6e2273ecf3a85c85c6",
-          "bytes": 13647
-        },
         "thermals.json": {
           "sha256": "a67f10de7ffe4ddd2ebf69e48f64aea77fb8a1ba8f210e9122cc8aed1d6194ee",
           "bytes": 4421
@@ -3077,10 +3057,6 @@
         "strict-analysis.json": {
           "sha256": "c9ece518ff3101c078ce11e86584b5ccc4b48415ca677f633d1a74e2abbdf8a3",
           "bytes": 2433
-        },
-        "summary.json": {
-          "sha256": "95a0a3a4466d7c043bd541eb396c907550d18fe32007529a7ecfa8e806bfeb95",
-          "bytes": 13623
         },
         "thermals.json": {
           "sha256": "de2bc73742a243a369656cd12985cca4f03b11dbcadc14afe6b9a7617029bb3d",

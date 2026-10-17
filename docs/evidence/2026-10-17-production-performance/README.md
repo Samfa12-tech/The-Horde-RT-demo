@@ -22,6 +22,8 @@ Current phone settings are preserved: 40% dimensions (576×1188 internal, 1440×
 
 Raw APKs, ledgers, logs, temperature samples and full-size images remain in the ignored local `reports/production-performance-2026-10-17-r01/` directory. The pre-existing Debug APK (`f13dda30…4fa527`) and byte-identical saved preferences are preserved there by reference. No release application, app data, rendering quality or production residency defaults were changed.
 
+Every inventoried source artifact matches its preserved local bytes. The derived summary is excluded from its own inventory: six stale references to previous summary versions were corrected without changing captures or timing results. Focused negative checks reject both self-references and changed source hashes; the correction and method identities are recorded in [validation](validation.json).
+
 ## One experiment: Opaque inverse transform
 
 **Not adopted. The trial shader, generated artifacts and trial-only test edits have been restored to the benchmark checkpoint.** There is no demonstrated meaningful performance gain. No second optimization is started at this checkpoint.
