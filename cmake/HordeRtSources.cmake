@@ -24,6 +24,7 @@ set(HORDE_RT_CORE_RELATIVE_SOURCES
     gameplay/simulation/GameSimulation.cpp
     gameplay/simulation/GameSimulationRescue.cpp
     gameplay/simulation/GameSimulationDialogue.cpp
+    gameplay/simulation/GameSimulationCampaign.cpp
     gameplay/traversal/RescueTraversal.cpp
     gameplay/animation/PlayerAnimationState.cpp
     gameplay/animation/PlayerIkTargets.cpp

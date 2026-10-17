@@ -123,6 +123,14 @@ public:
         snapshot_ = {};
     }
 
+    bool RestoreCampaignVitality(int vitality)
+    {
+        if (vitality < 1 || vitality > kMaxVitality) return false;
+        snapshot_ = {};
+        snapshot_.vitality = vitality;
+        return true;
+    }
+
     const PlayerVitalsSnapshot& Snapshot() const { return snapshot_; }
 
     static constexpr int kMaxVitality = 3;
@@ -780,6 +788,23 @@ public:
         snapshot_.revealStarted = true;
         snapshot_.revealComplete = true;
         legacyCapture_ = true;
+    }
+
+    void RestoreCampaignDefeated()
+    {
+        Reset();
+        chapterDeathPresentation_ = true;
+        snapshot_.phase = LichPhase::Dead;
+        snapshot_.revealPhase = KeeperRevealPhase::Defeated;
+        snapshot_.revealStarted = snapshot_.revealComplete = true;
+        snapshot_.health = 0;
+        snapshot_.deathAnimationComplete = true;
+        snapshot_.deathDissolveProgress = 1.0f;
+        snapshot_.roomMistDensityScale = 0.0f;
+        snapshot_.animationTime = kDeathAnimationDuration;
+        snapshot_.phaseTime = kDeathAnimationDuration;
+        snapshot_.y = deathStartY_ = kBaseY;
+        deathPresentationTime_ = kDeathAnimationDuration + kMistDeathDelay + kMistDeathFade + 1.0f;
     }
 
     void BeginRetryRecognition()

@@ -18,6 +18,11 @@ class CompanionRouteFixture {
 public:
     const CompanionSnapshot& State() const {return state_;}
     void Reset() { const auto gen=state_.generation;state_={};state_.generation=gen==UINT64_MAX?gen:gen+1; }
+    void RestoreCampaignReunion(bool exterior, float playerX, float playerZ,
+        const simulation::TriangleSupportSurface* terrain, std::uint64_t generationFloor) {
+        state_={};state_.generation=generationFloor+1;
+        if(exterior) Step(1.0f/60.0f,playerX,playerZ,true,false,false,terrain,true);
+    }
     void Step(float dt,float playerX,float playerZ,bool exterior,bool proof,bool paused,
               const simulation::TriangleSupportSurface* terrain=nullptr,bool requireTerrain=false) {
         if(paused) {state_.wait=CompanionWait::Paused;return;}

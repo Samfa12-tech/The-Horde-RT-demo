@@ -532,6 +532,18 @@ void RescueTraversal::Reset(Vec3 safePosition, float safeSupportWorldY)
     RefreshPrompt();
 }
 
+void RescueTraversal::RestoreCampaignSafeSide(bool upper, bool firstAscent, std::uint64_t generationFloor)
+{
+    *this = RescueTraversal{};
+    snapshot_.generation = generationFloor + 1;
+    snapshot_.claimCount = snapshot_.deploymentCount = 1;
+    snapshot_.lanternClaimed = snapshot_.ropeDeployed = snapshot_.ropeReady = true;
+    snapshot_.deploymentPhase = RopeDeploymentPhase::Ready;
+    snapshot_.firstAscentCompleted = firstAscent;
+    deploymentPaidOutLength_ = kRopeLength;
+    RollbackToSafeEndpoint(upper);
+}
+
 void RescueTraversal::RecoverForReconstruction()
 {
     const bool descentSide = snapshot_.phase == Phase::UpperSafe || snapshot_.exteriorSide ||

@@ -183,6 +183,21 @@ public:
         PublishSnapshot();
     }
 
+    // Validated campaign restore only: settled corpses, no combat/input debt.
+    void RestoreCampaignDefeated(const std::array<SkeletonSpawnPose, kSkeletonCombatantCapacity>& poses)
+    {
+        Reset(kSkeletonCombatantCapacity, {}, &poses);
+        for (auto& combatant : combatants_)
+        {
+            combatant.health = 0;
+            combatant.action = EnemyCombatAction::Dead;
+            combatant.animation = EnemyAnimation::Dead;
+            combatant.animationTime = 10.0f; // terminal clamped non-looping death pose
+            combatant.walkAnimationHold = 0.0f;
+        }
+        PublishSnapshot();
+    }
+
     PlayerAttackCut RequestAttack()
     {
         if (CanAcceptUpwardSlice())

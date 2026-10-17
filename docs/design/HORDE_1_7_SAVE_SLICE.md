@@ -1,14 +1,19 @@
-# Next bounded save slice: logical safe-checkpoint round trip
+# Logical safe-checkpoint round trip and next storage boundary
 
-Proposal inspected at `f3c494ee8b39c4f8503412ecd35361d927750a7a`; no campaign
-save implementation is added by this document. This is the authorized fallback
+The logical two-boundary slice below is implemented; the
+[implementation and validation receipt](../evidence/2026-10-17-logical-save/README.md)
+defines its supported state and remaining integration limits. It has no disk
+codec, durable writes, slot UI or automatic checkpoint coordinator. The remainder
+of this document preserves the design inspected at
+`f3c494ee8b39c4f8503412ecd35361d927750a7a`, including its still-open storage policy.
+This is the authorized fallback
 from the [bounded shadow investigation](../evidence/2026-10-17-shadow-investigation/README.md).
 The [accepted design section12](../references/horde-1.7/d37f1638/docs/superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md#12-save-replay-and-recovery)
 requires durable lower-claim, safe-exit and forest-end recovery. Three slots
-and manual-save retention policy remain proposals; no arbitrary-position,
+are the current direction; manual-save retention policy remains unresolved. No arbitrary-position,
 mid-climb, cloud-save or new inventory system is implied.
 
-## What exists and what is missing
+## Owners inspected before implementation
 
 | Current owner | Reusable behavior | Missing save seam |
 | --- | --- | --- |
@@ -19,12 +24,12 @@ mid-climb, cloud-save or new inventory system is implied.
 | [CompanionRouteFixture](../../src/gameplay/dialogue/CompanionRouteFixture.h) | Grounded path/wait state and fresh generation | Compatible grounded reconstruction at a checkpoint; waypoint indices and current animation clocks are not durable identities. |
 | [Android preferences](../../android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java), [Windows settings](../../src/platform/windows/DiagnosticWindow.cpp) | Existing graphics/audio/controls/subtitles and RT Lab persistence | Separate campaign storage adapter, slot ownership and transactional writes. Reusing the settings blob would conflate different lifetimes. |
 
-Search of `src`, `android/app/src/main` and `tests` found no campaign-save,
+The pre-implementation search of `src`, `android/app/src/main` and `tests` found no campaign-save,
 campaign-slot, SaveGame/LoadGame or autosave implementation. The sole autosave
 match configures WebView password behavior. This source search supports the
 gap alongside the inspected owners; it is not proof based only on filenames.
 
-## One implementable next milestone
+## Implemented logical milestone specification
 
 Implement **CPU-only logical capture/restore for two authored safe boundaries**:
 the claimed-lantern lower safe point and grounded exterior exit. Defer the
@@ -109,10 +114,11 @@ receipts from a replaced session/slot cannot advance it. Exercise injected
 open/write/flush/replace failure, old/new/corrupt records, process interruption,
 slot isolation and migration-source preservation before claiming durability.
 
-Before implementing that UI/storage policy, confirm: **three independent slots,
-and manual Save stores the active slot's latest safe checkpoint**, or separate
-retention for manual snapshots versus autosaves. The former is the accepted
-plan's bounded proposal, not a newly chosen product decision. No answer is
-needed to prepare the logical two-boundary slice above. Settings and RT Lab
+Before implementing UI/storage overwrite policy, resolve whether **manual Save
+stores the active slot's latest safe checkpoint**, or retains manual snapshots
+separately from autosaves. Three independent slots remain the direction; this
+slice chooses no destructive overwrite semantics. No owner interruption is
+needed for logical recovery or an isolated failure-injected codec/file adapter.
+Settings and RT Lab
 unlock remain separate. The forest endpoint, platform process-death tests and
 Save/Load/New Game menus then receive their own reviewable checkpoints.

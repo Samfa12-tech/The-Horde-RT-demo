@@ -53,9 +53,119 @@ struct Context {
     bool lanternLow=false,lanternHigh=false;
     std::uint64_t manualRaiseSequence=0,visibleRaiseSequence=0;
 };
+// Logical story recovery only: active speech restarts, with no audio clock,
+// callback identity, presentation receipt or renderer state crossing sessions.
+struct Progress {
+    Line activeLine=Line::None;
+    std::array<Line,8> continuations{};
+    std::size_t continuationCount=0;
+    bool grateConsumed=false,rescueConsumed=false,reunionStarted=false;
+    bool waitingForRaise=false,proofAccepted=false,reminderConsumed=false;
+    bool forestNightConsumed=false,forestWaystoneConsumed=false;
+    bool forestClueConsumed=false,forestVillageConsumed=false;
+};
 class Director {
 public:
     const Snapshot& State() const { return state_; }
+    Progress ExportProgress() const {
+        Progress p;
+        p.activeLine=state_.line;p.continuations=continuations_;p.continuationCount=continuationCount_;
+        p.grateConsumed=state_.grateConsumed;p.rescueConsumed=state_.rescueConsumed;
+        p.reunionStarted=state_.reunionStarted;p.waitingForRaise=state_.waitingForRaise;
+        p.proofAccepted=state_.proofAccepted;p.reminderConsumed=state_.reminderConsumed;
+        p.forestNightConsumed=state_.forestNightConsumed;
+        p.forestWaystoneConsumed=state_.forestWaystoneConsumed;
+        p.forestClueConsumed=state_.forestClueConsumed;p.forestVillageConsumed=state_.forestVillageConsumed;
+        return p;
+    }
+    static bool ValidateProgress(const Progress& p) {
+        const auto recoverable=[](Line line) {
+            // Keeper speech belongs to a live combat emitter, not either safe
+            // campaign boundary. ForestWait currently has no logical trigger.
+            return static_cast<std::uint32_t>(line)<kLines.size() &&
+                line!=Line::KeeperSense && line!=Line::KeeperCloser && line!=Line::ForestWait;
+        };
+        if(!recoverable(p.activeLine) || p.continuationCount>p.continuations.size() ||
+           (p.waitingForRaise && (!p.reunionStarted || p.proofAccepted)) ||
+           (p.reunionStarted && !p.waitingForRaise && !p.proofAccepted) ||
+           (p.proofAccepted && !p.reunionStarted) ||
+           (p.reunionStarted && !p.rescueConsumed) ||
+           (p.reminderConsumed && !p.reunionStarted) ||
+           ((p.forestNightConsumed||p.forestWaystoneConsumed||p.forestClueConsumed||
+             p.forestVillageConsumed) && !p.proofAccepted) ||
+           (p.forestWaystoneConsumed && !p.forestNightConsumed) ||
+           (p.forestClueConsumed && !p.forestWaystoneConsumed) ||
+           (p.forestVillageConsumed && !p.forestClueConsumed)) return false;
+        const auto validStory=[&](Line line,bool queued) {
+            switch(line) {
+            case Line::RescueFound: case Line::RescueRope: return p.rescueConsumed;
+            case Line::ReunionQuestion: return p.reunionStarted;
+            case Line::ReunionHint: return p.reunionStarted&&p.reminderConsumed;
+            case Line::ReunionProof: case Line::ReunionFirstPiece: case Line::ReunionDepart:
+                return p.proofAccepted;
+            case Line::ForestNight: return p.proofAccepted && (!queued||!p.forestNightConsumed);
+            case Line::ForestWaystone: return p.proofAccepted && (!queued||!p.forestWaystoneConsumed);
+            case Line::ForestClue: return p.proofAccepted && (!queued||!p.forestClueConsumed);
+            case Line::ForestVillage: return p.proofAccepted && (!queued||!p.forestVillageConsumed);
+            case Line::Grate: return !p.grateConsumed;
+            default: return true;
+            }
+        };
+        if(!validStory(p.activeLine,false)) return false;
+        unsigned previous=static_cast<unsigned>(p.activeLine);
+        for(std::size_t i=0;i<p.continuations.size();++i) {
+            const auto line=p.continuations[i];
+            if(i>=p.continuationCount) {if(line!=Line::None) return false;continue;}
+            // Only generated continuation identities are admitted, in their
+            // existing story order; duplicates cannot replay completed speech.
+            const auto order=static_cast<unsigned>(line);
+            if(!recoverable(line) || line==Line::None || line==Line::Grate ||
+               line==Line::RescueFound || line==Line::ReunionHint || line==p.activeLine ||
+               order<=previous || !validStory(line,true)) return false;
+            previous=order;
+        }
+        // These responses are committed together at proof acceptance. An
+        // interrupted response must retain its remaining suffix; otherwise a
+        // superficially valid record would silently drop required dialogue.
+        const auto hasSuffix=[&](Line line,std::size_t next) {
+            if(line==Line::ReunionProof) {
+                if(next>=p.continuationCount || p.continuations[next]!=Line::ReunionFirstPiece) return false;
+                ++next;
+            }
+            if(line==Line::ReunionProof || line==Line::ReunionFirstPiece)
+                return next<p.continuationCount && p.continuations[next]==Line::ReunionDepart;
+            return true;
+        };
+        if(!hasSuffix(p.activeLine,0)) return false;
+        for(std::size_t i=0;i<p.continuationCount;++i)
+            if(!hasSuffix(p.continuations[i],i+1)) return false;
+        return true;
+    }
+    bool RestoreProgress(const Progress& p,const Context& c,
+                         std::uint64_t generationFloor,std::uint64_t raiseFloor) {
+        const auto finite=[](Tuple t) {return std::isfinite(t.x)&&std::isfinite(t.y)&&std::isfinite(t.z);};
+        // Leave room for Start's second identity advance and reject saturation
+        // instead of allowing an old completion to identify a restored line.
+        const auto floor=std::max(state_.generation,generationFloor);
+        if(!ValidateProgress(p) || floor>=UINT64_MAX-1 || !finite(c.player) ||
+           !finite(c.listener) || !std::isfinite(c.yaw) || !c.alive || c.traversing) return false;
+        state_={};state_.generation=Next(floor);state_.paused=c.paused;
+        state_.grateConsumed=p.grateConsumed;state_.rescueConsumed=p.rescueConsumed;
+        state_.reunionStarted=p.reunionStarted;state_.waitingForRaise=p.waitingForRaise;
+        state_.proofAccepted=p.proofAccepted;state_.reminderConsumed=p.reminderConsumed;
+        state_.forestNightConsumed=p.forestNightConsumed;
+        state_.forestWaystoneConsumed=p.forestWaystoneConsumed;
+        state_.forestClueConsumed=p.forestClueConsumed;state_.forestVillageConsumed=p.forestVillageConsumed;
+        pending_=Line::None;continuations_=p.continuations;continuationCount_=p.continuationCount;
+        raiseFloor_=std::max(raiseFloor,c.manualRaiseSequence);waitingSeconds_=0;
+        if(p.activeLine!=Line::None) {
+            const Tuple source=p.activeLine==Line::Grate?Tuple{2.6f,.30f,-8.6f}:
+                (p.activeLine==Line::RescueFound||p.activeLine==Line::RescueRope?
+                 Tuple{-33.7f,2.8f,-12.8f}:SourceFor(p.activeLine));
+            Start(p.activeLine,source,c);
+        }
+        return true;
+    }
     // Pause/surface reflow preserves the active line and its bounded queue;
     // reconstruction/reset still cancels and advances the generation.
     void Pause() { state_.paused=true; }

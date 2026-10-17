@@ -2,6 +2,8 @@
 
 #include <array>
 #include <cstdint>
+#include <optional>
+#include "gameplay/campaign/CampaignCheckpoint.h"
 
 #include "gameplay/ShowcaseGameplay.h"
 #include "gameplay/SpatialAudio.h"
@@ -136,11 +138,33 @@ public:
     bool AcknowledgeChapterPresentation(std::uint64_t simulationTick,
         std::uint64_t dialogueGeneration);
 
+    // Logical-only owner-thread API. Begin leaves live gameplay untouched.
+    // Commit consumes actual destination readiness and current input floors;
+    // it waits paused for a newer neutral publication rebased to the saved
+    // yaw/pitch (sequence zero is the direct-host stepping convention).
+    // No storage, automatic checkpoint activation or platform calls occur.
+    std::optional<campaign::Checkpoint> CaptureCampaignCheckpoint(campaign::CheckpointId id) const;
+    std::optional<campaign::RestoreToken> BeginCampaignRestore(const campaign::Checkpoint& checkpoint);
+    bool CommitCampaignRestore(campaign::RestoreToken token, WorldZoneToken readyDestination,
+        std::shared_ptr<const TriangleSupportSurface> terrain, const InputSnapshot& currentInput,
+        std::uint64_t currentInputPublicationSequence = 0);
+    void CancelCampaignRestore() { pendingCampaignRestore_.reset(); }
+
     const SimulationSnapshot& Snapshot() const { return snapshot_; }
     const BoundedGameplayEventQueue& Events() const { return events_; }
     const FixedStepRunner& Timing() const { return fixedStepRunner_; }
 
 private:
+    struct PendingCampaignRestore {
+        campaign::Checkpoint checkpoint;
+        campaign::RestoreToken token;
+        std::uint64_t sourceGeneration = 0;
+    };
+    std::optional<PendingCampaignRestore> pendingCampaignRestore_;
+    std::uint64_t campaignRequestSequence_ = 0;
+    std::uint64_t campaignDestinationGeneration_ = 0;
+    std::optional<std::uint64_t> campaignInputPublicationFloor_;
+    InputSnapshot FilterCampaignInput(const InputSnapshot& input, std::uint64_t publicationSequence);
     StaticDetailLease staticDetailLease_{};
     bool deferredStaticDetailReset_ = false;
     bool deferredStaticDetailRetry_ = false;

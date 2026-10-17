@@ -13,6 +13,7 @@ hordeTargets=(
   pocket_audio_native_pcm_tests
   horde_rt_simulation_timing_tests
   horde_rt_simulation_gameplay_tests
+  horde_rt_campaign_checkpoint_tests
   horde_rt_player_animation_tests
   horde_rt_held_item_socket_tests
   horde_rt_dielectric_math_tests

@@ -110,11 +110,12 @@ GameSimulation::GameSimulation(GameSimulationConfig config)
     RefreshSnapshot(lastInput_);
 }
 
-std::uint32_t GameSimulation::AdvanceFrame(const InputSnapshot& input,
+std::uint32_t GameSimulation::AdvanceFrame(const InputSnapshot& publishedInput,
                                            double frameDeltaSeconds,
                                            std::uint64_t inputPublicationSequence,
                                            std::uint64_t ownerAdvanceSteadyNs)
 {
+    const auto input=FilterCampaignInput(publishedInput,inputPublicationSequence);
     lastInput_ = input;
     inputPublicationSequence_ = inputPublicationSequence;
     if(input.paused) { chapterDialogue_.Pause(); chapterSkipFloor_=std::max(chapterSkipFloor_,input.commands.dialogueSkip); }
@@ -216,10 +217,11 @@ std::uint32_t GameSimulation::AdvanceFrame(const InputSnapshot& input,
     return ticks;
 }
 
-void GameSimulation::StepFixed(const InputSnapshot& input,
+void GameSimulation::StepFixed(const InputSnapshot& publishedInput,
                                float fixedDeltaSeconds,
                                std::uint64_t inputPublicationSequence)
 {
+    const auto input=FilterCampaignInput(publishedInput,inputPublicationSequence);
     // Direct deterministic stepping is also a valid presentation boundary.
     combatPresentation_.AdvanceFrame(fixedDeltaSeconds, input.paused);
     StepFixedTick(input, fixedDeltaSeconds, inputPublicationSequence, false);
@@ -585,6 +587,7 @@ void GameSimulation::ResolveMovementCollision(float previousX, float previousZ)
 }
 void GameSimulation::SetDevelopmentWorldRoute(bool enabled, bool stagedPreparation)
 {
+    CancelCampaignRestore();
     config_.developmentWorldRoute=enabled;
     stagedWorldPreparation_=stagedPreparation;
     worldRoute_.Invalidate();
@@ -632,6 +635,7 @@ bool GameSimulation::PublishChapterTerrain(WorldZoneToken token, std::shared_ptr
 }
 void GameSimulation::InvalidateWorldZoneReadiness()
 {
+    CancelCampaignRestore();
     if(config_.developmentRescueJourney) { RecoverRescueJourney(); return; }
     if(!config_.developmentWorldRoute) return;
     worldRoute_.Invalidate(true); playerX_=worldRoute_.safeX; playerZ_=worldRoute_.safeZ;
@@ -641,6 +645,7 @@ void GameSimulation::InvalidateWorldZoneReadiness()
 void GameSimulation::SetDevelopmentSupportFixture(bool enabled, std::uint64_t generation)
 {
     if (generation != 0u && generation < supportGeneration_) return;
+    CancelCampaignRestore();
     config_.developmentSupportFixture = enabled && generation != 0u;
     supportGeneration_ = std::max(supportGeneration_, generation);
     ResetPlayerSupport();
@@ -655,9 +660,11 @@ void GameSimulation::SetDevelopmentSupportFixture(bool enabled, std::uint64_t ge
 
 void GameSimulation::ResetRoute()
 {
+    CancelCampaignRestore();
     if(staticDetailLease_.resourceGeneration) {
         staticDetailLease_.restoreRequested=true;deferredStaticDetailReset_=true;RefreshSnapshot(lastInput_);return;
     }
+    campaignInputPublicationFloor_.reset();
     chapterTerrain_.reset();
     chapterDialogue_.Reset();chapterCompanion_.Reset();chapterFirstExterior_=false;chapterVisibleRaise_=0;
     if(config_.developmentRescueJourney) { rescueSavedSwordValid_=false;rescueTraversal_.Reset();rescueOpeningSeconds_=0;worldRoute_.Invalidate(); }
@@ -718,6 +725,7 @@ void GameSimulation::ResetRoute()
 
 void GameSimulation::RetryEncounter()
 {
+    CancelCampaignRestore();
     if(staticDetailLease_.resourceGeneration) {
         staticDetailLease_.restoreRequested=true;deferredStaticDetailRetry_=true;RefreshSnapshot(lastInput_);return;
     }
@@ -793,6 +801,7 @@ void GameSimulation::ImportRewardCheckpointState(
     const horde::gameplay::interactions::LanternPendulumSnapshot* pendulum,
     RewardCheckpointPlacement placement)
 {
+    CancelCampaignRestore();
     const bool authoredCapture = placement == RewardCheckpointPlacement::AuthoredCapture;
     const float authoredX = playerX_, authoredZ = playerZ_;
     const auto authoredSupport = playerSupport_;
@@ -1348,6 +1357,7 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
         return false;
     }
 
+    CancelCampaignRestore();
     chapterDialogue_.Reset(checkpointId!=0);chapterVisibleRaise_=0;
     pendingTutorialReplayCommands_ = 0u;
     pendingTutorialSkipCommands_ = 0u;

@@ -3,6 +3,7 @@
 #include "platform/windows/WindowsChapterDialogue.h"
 #include <cstdlib>
 #include <iostream>
+#include <limits>
 using namespace horde::gameplay;
 using namespace horde::gameplay::dialogue;
 void Check(bool value,const char* msg) { if(!value) {std::cerr<<msg<<'\n';std::exit(1);} }
@@ -61,6 +62,95 @@ int main() {
     interrupted.Request(static_cast<Line>(kLines.size()),{1,2,3},claim);
     Check(interrupted.State().line==validLine.line && interrupted.State().generation==validLine.generation,
         "unknown line at the catalog boundary cannot replace a valid line");
+    // Logical recovery restarts only unfinished speech, with fresh identities
+    // and current spatial tuples; no audio clock or presentation receipt loads.
+    Director saved;Context recovery;recovery.claimed=true;
+    saved.Step(.05f,recovery);
+    const auto savedFound=saved.State();const auto foundProgress=saved.ExportProgress();
+    Check(Director::ValidateProgress(foundProgress),"actual rescue progress validates");
+    Director restored;recovery.listener={8,9,10};recovery.yaw=.4f;
+    Check(restored.RestoreProgress(foundProgress,recovery,savedFound.generation,70),
+        "unfinished rescue restores into a fresh director");
+    Check(restored.State().line==Line::RescueFound && restored.State().elapsed==0 &&
+        restored.State().generation>savedFound.generation && restored.State().listener.x==8 &&
+        restored.State().source.x==-33.7f && restored.State().listenerYaw==.4f,
+        "restored speech has fresh callback identity and current listener tuple");
+    Check(!restored.Complete(savedFound.line,savedFound.generation),"old matching line completion is stale after restore");
+    restored.Skip();restored.Step(.016f,recovery);
+    Check(restored.State().line==Line::RescueRope,"restored rescue keeps its ordered rope response");
+    restored.Skip();recovery.exterior=true;recovery.lanternLow=true;
+    recovery.manualRaiseSequence=70;restored.Step(.016f,recovery);
+    const auto pendingProof=restored.ExportProgress();
+    Check(pendingProof.waitingForRaise && Director::ValidateProgress(pendingProof),"pending proof exports logical waiting state");
+    Director pending;recovery.lanternLow=false;recovery.lanternHigh=true;
+    recovery.manualRaiseSequence=80;recovery.visibleRaiseSequence=80;
+    Check(pending.RestoreProgress(pendingProof,recovery,restored.State().generation,80),"pending proof restores");
+    pending.Step(.016f,recovery);
+    Check(!pending.State().proofAccepted,"restored visible held pose cannot satisfy a fresh manual raise");
+    recovery.manualRaiseSequence=81;recovery.visibleRaiseSequence=80;pending.Step(.016f,recovery);
+    Check(!pending.State().proofAccepted,"restored proof rejects an unpresented fresh raise");
+    recovery.visibleRaiseSequence=81;pending.Step(.016f,recovery);
+    const auto proofProgress=pending.ExportProgress();
+    Check(proofProgress.proofAccepted && proofProgress.activeLine==Line::ReunionProof &&
+        proofProgress.continuationCount==2 && Director::ValidateProgress(proofProgress),
+        "accepted proof retains its unfinished response chain");
+    Director accepted;
+    Check(accepted.RestoreProgress(proofProgress,recovery,pending.State().generation,81),"accepted proof restores");
+    accepted.Skip();accepted.Step(.016f,recovery);
+    Check(accepted.State().line==Line::ReunionFirstPiece,"accepted proof recovery keeps first piece");
+    accepted.Skip();accepted.Step(.016f,recovery);
+    Check(accepted.State().line==Line::ReunionDepart,"accepted proof recovery keeps departure");
+    accepted.Skip();accepted.Step(.016f,recovery);
+    const auto completedProgress=accepted.ExportProgress();Director completed;
+    Check(completed.RestoreProgress(completedProgress,recovery,accepted.State().generation,81),"completed reunion restores");
+    completed.Step(.016f,recovery);
+    Check(completed.State().proofAccepted && completed.State().line==Line::None,
+        "completed reunion does not replay proof or response lines");
+    const auto beforeInvalid=completed.State();
+    const auto rejects=[&](const Progress& bad) {
+        Check(!Director::ValidateProgress(bad) &&
+            !completed.RestoreProgress(bad,recovery,100,81) &&
+            completed.State().generation==beforeInvalid.generation &&
+            completed.State().line==beforeInvalid.line && completed.State().proofAccepted,
+            "malformed logical progress fails without mutation");
+    };
+    auto bad=proofProgress;bad.waitingForRaise=true;rejects(bad);
+    bad=proofProgress;bad.continuationCount=9;rejects(bad);
+    bad=proofProgress;bad.continuations[1]=bad.continuations[0];rejects(bad);
+    bad=proofProgress;bad.continuations[2]=Line::ForestNight;rejects(bad);
+    bad=proofProgress;bad.activeLine=static_cast<Line>(kLines.size());rejects(bad);
+    bad=proofProgress;bad.continuations[0]=Line::ReunionDepart;bad.continuations[1]=Line::ReunionFirstPiece;rejects(bad);
+    bad=proofProgress;bad.proofAccepted=false;rejects(bad);
+    bad=proofProgress;bad.continuations={};bad.continuationCount=0;rejects(bad);
+    bad=proofProgress;bad.continuations[1]=Line::None;bad.continuationCount=1;rejects(bad);
+    bad=proofProgress;bad.activeLine=Line::ReunionFirstPiece;
+    bad.continuations={};bad.continuationCount=0;rejects(bad);
+    bad=proofProgress;bad.activeLine=Line::None;bad.continuations[0]=Line::ReunionProof;
+    bad.continuations[1]=Line::ReunionDepart;rejects(bad);
+    auto queuedProof=proofProgress;queuedProof.activeLine=Line::None;
+    queuedProof.continuations[0]=Line::ReunionProof;queuedProof.continuations[1]=Line::ReunionFirstPiece;
+    queuedProof.continuations[2]=Line::ReunionDepart;queuedProof.continuationCount=3;
+    Check(Director::ValidateProgress(queuedProof),"queued interrupted proof retains its complete required response suffix");
+    bad=completedProgress;bad.forestClueConsumed=true;rejects(bad);
+    auto forestProgress=completedProgress;forestProgress.activeLine=Line::ForestNight;
+    forestProgress.forestNightConsumed=true;
+    forestProgress.continuations[0]=Line::ForestWaystone;
+    forestProgress.continuations[1]=Line::ForestClue;forestProgress.continuationCount=2;
+    Director forestRecovery;
+    Check(forestRecovery.RestoreProgress(forestProgress,recovery,100,81) &&
+        forestRecovery.State().line==Line::ForestNight && forestRecovery.State().forestNightConsumed,
+        "forest once flag set at line start does not drop interrupted active speech");
+    forestRecovery.Skip();forestRecovery.Step(.016f,recovery);
+    Check(forestRecovery.State().line==Line::ForestWaystone,"forest recovery preserves queued waystone order");
+    forestRecovery.Skip();forestRecovery.Step(.016f,recovery);
+    Check(forestRecovery.State().line==Line::ForestClue,"forest recovery preserves queued clue order");
+    auto invalidContext=recovery;invalidContext.listener.x=std::numeric_limits<float>::infinity();
+    Check(!completed.RestoreProgress(completedProgress,invalidContext,100,81) &&
+        completed.State().generation==beforeInvalid.generation,
+        "nonfinite restoration context fails without mutation");
+    Check(!completed.RestoreProgress(completedProgress,recovery,UINT64_MAX-1,81) &&
+        completed.State().generation==beforeInvalid.generation,
+        "exhausted callback generation cannot restore by reusing identity");
     auto config=simulation::ProductionGameSimulationConfig();config.developmentRescueJourney=true;
     simulation::GameSimulation sim(config);simulation::InputSnapshot input;
     input.damageEnabled=false;input.hasAuthoritativePlayerPose=true;

@@ -138,6 +138,9 @@ public:
     // Resource reconstruction returns to the active direction's safe endpoint,
     // invalidates callbacks, and retains claim/deployment history.
     void RecoverForReconstruction();
+    // Reconstruct a completed deployment at an authored safe side, without
+    // importing rope velocities, animation clocks or readiness from a save.
+    void RestoreCampaignSafeSide(bool upper, bool firstAscent, std::uint64_t generationFloor);
 
     const RescueTraversalSnapshot& Snapshot() const { return snapshot_; }
     bool IsActive() const;

@@ -188,6 +188,7 @@ add_library(horde_gameplay_simulation STATIC
     src/gameplay/effects/WaterContact.cpp
     src/gameplay/simulation/GameSimulationRescue.cpp
     src/gameplay/simulation/GameSimulationDialogue.cpp
+    src/gameplay/simulation/GameSimulationCampaign.cpp
     src/gameplay/traversal/RescueTraversal.cpp
     src/gameplay/animation/PlayerAnimationState.cpp
     src/gameplay/animation/PlayerIkTargets.cpp
@@ -212,6 +213,14 @@ if(BUILD_TESTING)
     target_link_libraries(horde_rt_chapter_dialogue_tests PRIVATE horde_gameplay_simulation)
     target_compile_definitions(horde_rt_chapter_dialogue_tests PRIVATE HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
     add_test(NAME horde_rt_chapter_dialogue_tests COMMAND horde_rt_chapter_dialogue_tests)
+    add_executable(horde_rt_campaign_checkpoint_tests tests/CampaignCheckpointTests.cpp
+        src/scene/assets/AssetManifest.cpp src/scene/assets/AssetValidation.cpp
+        src/scene/assets/GltfDocument.cpp src/scene/assets/StaticMeshAsset.cpp)
+    target_link_libraries(horde_rt_campaign_checkpoint_tests PRIVATE horde_gameplay_simulation)
+    target_include_directories(horde_rt_campaign_checkpoint_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/third_party)
+    target_compile_definitions(horde_rt_campaign_checkpoint_tests PRIVATE HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
+    add_test(NAME horde_rt_campaign_checkpoint_tests COMMAND horde_rt_campaign_checkpoint_tests)
+    set_tests_properties(horde_rt_campaign_checkpoint_tests PROPERTIES TIMEOUT 60)
     add_executable(horde_rt_windows_vitality_layout_tests tests/WindowsVitalityHudLayoutTests.cpp)
     target_include_directories(horde_rt_windows_vitality_layout_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     target_compile_features(horde_rt_windows_vitality_layout_tests PRIVATE cxx_std_20)

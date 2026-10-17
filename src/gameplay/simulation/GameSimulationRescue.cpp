@@ -16,6 +16,7 @@ void GameSimulation::StartLiveDevelopmentRescueJourney(bool authoredTerrain) {
     ResetRoute();
 }
 void GameSimulation::SetDevelopmentRescueJourney(bool enabled, bool authoredTerrain) {
+    CancelCampaignRestore();
     RestoreRescueEquipment();
     config_.developmentRescueJourney=enabled;
     config_.authoredChapterTerrain=enabled&&authoredTerrain;chapterTerrain_.reset();
@@ -34,6 +35,7 @@ void GameSimulation::SetDevelopmentRescueJourney(bool enabled, bool authoredTerr
     ResolvePlayerAnimation(0);ResolveFireEmitters(0);RefreshSnapshot(lastInput_);
 }
 void GameSimulation::RecoverRescueJourney() {
+    CancelCampaignRestore();
     chapterTerrain_.reset();
     // Only traversal owns a rollback destination. Ordinary play (including
     // pre-claim play) retains the simulation's current support and zone.
