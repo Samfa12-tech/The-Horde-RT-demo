@@ -1,5 +1,15 @@
 # Horde 1.7 current design index
 
+The [typed codec and isolated storage checkpoint](../evidence/2026-10-18-campaign-storage/README.md)
+adds a closed 162-byte logical format, exact-content update admission and
+failure-injected same-directory publication. Windows temporary-directory tests
+cover corruption, partial writes, replacement denial, active readers and owned
+process interruption. Android compiles the POSIX backend; its filesystem runtime
+and power-loss acceptance remain open. No actual save location, migration,
+slot/menu overwrite policy or platform load/camera adapter is connected. The
+next review boundary is the asynchronous receipt/session coordinator and POSIX
+runtime acceptance, with existing owner files preserved.
+
 The [logical recovery checkpoint](../evidence/2026-10-17-logical-save/README.md)
 adds versioned, validated lower-claim/exterior records and fresh-simulation
 reconstruction behind an owner-thread preparation/commit boundary. It preserves
@@ -7,8 +17,8 @@ completed tomb victory, equipment, hearts, night and interrupted dialogue, and
 blocks stale readiness, callbacks and unreleased controls. Storage, slot policy,
 load menus, platform preparation/camera adapters and physical acceptance remain
 open. This is a bounded logical-save milestone, with no new rendering or
-performance claim. The next slice is a separate failure-injected codec/atomic
-storage adapter; see the [save slice](HORDE_1_7_SAVE_SLICE.md).
+performance claim. Its proposed codec/atomic adapter is now recorded above;
+see the [save slice](HORDE_1_7_SAVE_SLICE.md) for the remaining coordinator/policy boundary.
 
 The [bounded active-light review](../evidence/2026-10-17-shadow-investigation/README.md)
 found the first-confirmed-blocker hypothesis already rejected by measured

@@ -208,7 +208,20 @@ target_include_directories(horde_gameplay_simulation
 target_compile_features(horde_gameplay_simulation PUBLIC cxx_std_20)
 target_link_libraries(horde_gameplay_simulation PUBLIC pocket_audio_native_pcm)
 
+add_library(horde_campaign_persistence STATIC
+    src/gameplay/campaign/CampaignCheckpointCodec.cpp
+    src/gameplay/campaign/CampaignCheckpointStorage.cpp)
+target_include_directories(horde_campaign_persistence PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_compile_features(horde_campaign_persistence PUBLIC cxx_std_20)
+
 if(BUILD_TESTING)
+    add_executable(horde_rt_campaign_codec_tests tests/CampaignCheckpointCodecTests.cpp)
+    target_link_libraries(horde_rt_campaign_codec_tests PRIVATE horde_campaign_persistence)
+    add_test(NAME horde_rt_campaign_codec_tests COMMAND horde_rt_campaign_codec_tests)
+    add_executable(horde_rt_campaign_storage_tests tests/CampaignCheckpointStorageTests.cpp)
+    target_link_libraries(horde_rt_campaign_storage_tests PRIVATE horde_campaign_persistence)
+    add_test(NAME horde_rt_campaign_storage_tests COMMAND horde_rt_campaign_storage_tests)
+    set_tests_properties(horde_rt_campaign_codec_tests horde_rt_campaign_storage_tests PROPERTIES TIMEOUT 60)
     add_executable(horde_rt_chapter_dialogue_tests tests/ChapterDialogueTests.cpp)
     target_link_libraries(horde_rt_chapter_dialogue_tests PRIVATE horde_gameplay_simulation)
     target_compile_definitions(horde_rt_chapter_dialogue_tests PRIVATE HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")

@@ -1,0 +1,251 @@
+{
+  "scope": "Isolated typed codec and failure-aware file storage; no application save path or UI integration",
+  "sourceParent": "3badb64652e3df0244cc3d4df5fbc0e70a8b3572",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "worktree": "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof",
+  "recordedUtc": "2026-10-17T23:56:45.1690476Z",
+  "folderDateBasis": "2026-10-18 local AEDT; exact timestamps UTC",
+  "sourceManifest": "implementation-files.json",
+  "sourceManifestMeaning": "SHA256 of final compiled working-file bytes before Git newline normalization; unchanged dependencies are pinned by sourceParent",
+  "codec": {
+    "envelopeVersion": 1,
+    "checkpointSchema": 1,
+    "contentRevision": 1,
+    "fileBytes": 162,
+    "payloadBytes": 142,
+    "maxInputBytes": 4096,
+    "payloadCrc32Golden": "01703382",
+    "integers": "LE32",
+    "floats": "IEEE754 binary32 bits",
+    "booleans": "strict single byte0/1",
+    "autoMigration": false
+  },
+  "windows": {
+    "os": "Microsoft Windows NT 10.0.26300.0",
+    "filesystem": "NTFS",
+    "debug": {
+      "selectedPassed": 4,
+      "failed": 0,
+      "durationSeconds": 12.4,
+      "codecChecks": 1970,
+      "storageChecks": 1178,
+      "logicalRestoreChecks": 722,
+      "concurrentReaderObservations": 395
+    },
+    "release": {
+      "selectedPassed": 4,
+      "failed": 0,
+      "durationSeconds": 3.63,
+      "codecChecks": 1970,
+      "storageChecks": 1178,
+      "logicalRestoreChecks": 722,
+      "concurrentReaderObservations": 350
+    },
+    "buildExitCodes": {
+      "Debug": 0,
+      "Release": 0
+    },
+    "buildTargets": [
+      "horde_rt_campaign_codec_tests",
+      "horde_rt_campaign_storage_tests",
+      "horde_rt_campaign_checkpoint_tests",
+      "horde_rt_chapter_dialogue_tests",
+      "horde_rt_diagnostic_window"
+    ],
+    "buildCommand": "cmake --build build/presets/windows-x64-{debug|release} --config {Debug|Release} --target <buildTargets> --parallel 2",
+    "testCommand": "ctest --test-dir build/presets/windows-x64-{debug|release} -C {Debug|Release} -R <selectionRegex> --verbose",
+    "selectionRegex": "^horde_rt_(campaign_(codec|storage|checkpoint)|chapter_dialogue)_tests$",
+    "publication": "SetFileInformationByHandle(FileRenameInfoEx), same-directory full path; replace uses REPLACE_IF_EXISTS|POSIX_SEMANTICS, create-only uses no replacement flag",
+    "durability": "FileFlushed only; no directory fsync or physical power-loss claim",
+    "symlinkReparseRuntimeFixture": "NOT_RUN: optional fixture could not create a symlink without extra privilege; nonregular target rejection passed"
+  },
+  "android": {
+    "command": "android/gradlew.bat assembleDebug --offline --console=plain",
+    "exitCode": 0,
+    "durationSeconds": 55,
+    "abis": [
+      "arm64-v8a",
+      "armeabi-v7a",
+      "x86",
+      "x86_64"
+    ],
+    "nativeEntries": [
+      {
+        "entry": "lib/arm64-v8a/libhorde_rt_probe_android.so",
+        "bytes": 5123800
+      },
+      {
+        "entry": "lib/armeabi-v7a/libhorde_rt_probe_android.so",
+        "bytes": 4456024
+      },
+      {
+        "entry": "lib/x86/libhorde_rt_probe_android.so",
+        "bytes": 5669932
+      },
+      {
+        "entry": "lib/x86_64/libhorde_rt_probe_android.so",
+        "bytes": 5363488
+      }
+    ],
+    "scope": "Compilation/linking of codec and POSIX backend only",
+    "installed": false,
+    "launched": false,
+    "posixFilesystemRuntime": "NOT_RUN; WSL unavailable and no device interaction authorized"
+  },
+  "storageGuarantees": [
+    "Create-only never replaces an existing file",
+    "Update requires valid exact-byte expected record and matching normalized target under cooperative nonblocking lock",
+    "Malformed/corrupt/unsupported existing bytes are never migrated or overwritten",
+    "Prepublication failures retain existing target; exclusive own temporary cleanup is best effort",
+    "Readers observe complete old or new files",
+    "POSIX successful commit requires fsync(file), name publication, fsync(directory)",
+    "Windows successful commit confirms file flush and name cutover only",
+    "Postpublication/unknown failures require readback and cannot advance a durable checkpoint automatically",
+    "AlreadyCurrent is no-op/Unchanged/None with no new flush claim",
+    "Abandoned partial temporaries are ignored and never swept"
+  ],
+  "failureCoverage": {
+    "existingTruncationLengths": 162,
+    "partialWriteBoundaries": 161,
+    "faultOperations": [
+      "Read",
+      "OpenTemporary",
+      "Write",
+      "FlushFile",
+      "CloseFile",
+      "Publish",
+      "AfterPublish"
+    ],
+    "ownedSelfExitingChildren": 4,
+    "childExitCode": 73,
+    "interruptionStages": [
+      "partial temp write",
+      "before file flush",
+      "before publish after flushed temp",
+      "after publish before durability acknowledgement"
+    ],
+    "activeReaderUpdates": 30,
+    "realOsDenials": [
+      "Windows sharing conflict",
+      "Windows read-only target"
+    ],
+    "isolation": "Three distinct disposable target names; other-target expected receipts rejected",
+    "temporaryDirectoryPolicy": "Exclusively created direct child of system temp; ownership/location verified before cleanup; uncertain child timeout preserves root and stops test",
+    "ownerSavesUsed": false
+  },
+  "artifacts": [
+    {
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+      "bytes": 13369344,
+      "sha256": "ea4b8e22a7efd367429d70d884a33a622ef03567ec411478da561e1c2f3d50d5"
+    },
+    {
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+      "bytes": 4549632,
+      "sha256": "bff1f38f2e37fe024bae2c93ff6725e1b07aa123280cc9b0e9fbc0c49cf046b5"
+    },
+    {
+      "path": "build/presets/windows-x64-debug/Debug/horde_rt_campaign_codec_tests.exe",
+      "bytes": 2466816,
+      "sha256": "e91130a9ea358bd2bce43ac75021d1a4f0ac28102f0972e0daec239fc0b3153e"
+    },
+    {
+      "path": "build/presets/windows-x64-debug/Debug/horde_rt_campaign_storage_tests.exe",
+      "bytes": 2815488,
+      "sha256": "dcbcfeb43f72ffd6cf3e9cb8f27837adb07a7a4f3ab3fc7f563a422a4695bd2b"
+    },
+    {
+      "path": "build/presets/windows-x64-release/Release/horde_rt_campaign_codec_tests.exe",
+      "bytes": 292864,
+      "sha256": "311739ecbdf23989647bfaa50d7ee2c0da890c40c5bfc2b94ce9dc49df2dfbc7"
+    },
+    {
+      "path": "build/presets/windows-x64-release/Release/horde_rt_campaign_storage_tests.exe",
+      "bytes": 396288,
+      "sha256": "d96a781254e6a941a26dcaab6637535a603f9f1203af521784af7719612c4c03"
+    },
+    {
+      "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "bytes": 183611898,
+      "sha256": "4cb2219f110e8b1dd5ca86bc6ff0314e77d80382faf47ae7899d323c6e639153"
+    }
+  ],
+  "acceptedLocalLogHashes": [
+    {
+      "path": "reports/campaign-storage-2026-10-18/debug-sealed-build.log",
+      "sha256": "1c390048bb87583698a9a7a18dd40f2b619a34749377f076306ef3e7bdc90441"
+    },
+    {
+      "path": "reports/campaign-storage-2026-10-18/release-sealed-build.log",
+      "sha256": "4efe60247d5364d0df4770b2a7adf4e1d976bba8738ed94a29ac16a9bd5bc68e"
+    },
+    {
+      "path": "reports/campaign-storage-2026-10-18/debug-sealed-tests.log",
+      "sha256": "47c053db829ad6e9e4ac819f7b7b5209d8c1a8cc5e699a034d43bf616fc124d7"
+    },
+    {
+      "path": "reports/campaign-storage-2026-10-18/release-sealed-tests.log",
+      "sha256": "fc699239359df1f0fa210b5598dd8bd8092b108b3b92c8a7ba457878dbf3bdd8"
+    },
+    {
+      "path": "reports/campaign-storage-2026-10-18/android-sealed-build.log",
+      "sha256": "638d0f6869934b7ddc661eddebd690d618deaa064cb87d44df8b3fc605bb46f6"
+    }
+  ],
+  "rejectedDevelopmentRuns": [
+    {
+      "run": "first storage",
+      "failedAssertions": 12,
+      "cause": "MoveFileEx open-reader replacement restriction",
+      "preservedOldBytes": true,
+      "readerPartialObservations": 0
+    },
+    {
+      "run": "diagnostic storage",
+      "failedAssertions": 6,
+      "nativeError": 5,
+      "cause": "ERROR_ACCESS_DENIED under active readers",
+      "disposition": "Changed implementation to FileRenameInfoEx; preserved the30-update assertion"
+    },
+    {
+      "run": "intermediate native relative-directory form",
+      "nativeError": 87,
+      "cause": "ERROR_INVALID_PARAMETER, then initial harness continued without fixture and crashed",
+      "disposition": "Harness now fails safely on setup; documented full-path form passes"
+    }
+  ],
+  "rejectedLocalLogHashes": [
+    {
+      "path": "reports/campaign-storage-2026-10-18/release-first-tests.log",
+      "sha256": "5378b8eb4f3ded6a94be7cf31a191f82861c48bc18b3c477695c4e5eab0982e8"
+    },
+    {
+      "path": "reports/campaign-storage-2026-10-18/release-concurrency-test.log",
+      "sha256": "0684da8ecb57d9ee4092f6c8e0c350d616bd2f6076365ca24b737592ccc6c61b"
+    },
+    {
+      "path": "reports/campaign-storage-2026-10-18/release-native-rename-tests.log",
+      "sha256": "366ab22df4a780c7fdd33ccfc29d3488ea43663eaed45f553a8a98ecb12e82bc"
+    }
+  ],
+  "remainingGaps": [
+    "POSIX runtime/interruption/directory-fsync evidence",
+    "physical power loss",
+    "Windows reparse runtime fixture",
+    "current-source cloud CI and sanitizers before authorized push",
+    "session/request-bound asynchronous receipt coordinator",
+    "platform load/camera adapter",
+    "actual save directory and slot/menu/manual-autosave policy"
+  ],
+  "identityLimit": "Expected identity is normalized target plus exact valid bytes; not inode/history or ABA detection; assumes caller-owned directory and cooperating writers",
+  "notChanged": [
+    "renderer/shaders/quality",
+    "assets/licences",
+    "GameSimulation behavior",
+    "menus/platform UI",
+    "owner saves/settings",
+    "Reef Sweep or its preview server"
+  ],
+  "audioHapticManualRevalidationRequired": false,
+  "nextReviewBoundary": "Review publication/durability API and obtain disposable POSIX runtime evidence; then independently test asynchronous session/request receipt coordination, without slot/menu overwrite policy"
+}

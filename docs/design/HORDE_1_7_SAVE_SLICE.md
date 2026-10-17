@@ -3,7 +3,11 @@
 The logical two-boundary slice below is implemented; the
 [implementation and validation receipt](../evidence/2026-10-17-logical-save/README.md)
 defines its supported state and remaining integration limits. It has no disk
-codec, durable writes, slot UI or automatic checkpoint coordinator. The remainder
+or platform integration of its own. The subsequent
+[typed codec and isolated storage adapter](../evidence/2026-10-18-campaign-storage/README.md)
+now supplies bounded byte validation and failure-aware file publication;
+platform durability acceptance, slot UI and automatic checkpoint coordination
+remain open. The remainder
 of this document preserves the design inspected at
 `f3c494ee8b39c4f8503412ecd35361d927750a7a`, including its still-open storage policy.
 This is the authorized fallback
@@ -105,6 +109,12 @@ Host round trips close **logical recovery only**. They do not close durable
 storage, process death, physical RT, touch/audio or performance acceptance.
 
 ## Follow-on storage and the decision it needs
+
+The typed codec and isolated file adapter in the receipt above implement the
+storage portion of this specification in disposable test locations. No actual
+owner-save root is selected. The active-slot/session receipt coordinator below
+is still a separate follow-on; the adapter's exact publication and durability
+outcomes must be respected rather than treating every failure as unchanged.
 
 After logical recovery passes, add a separate bounded atomic file adapter and
 active-slot commit coordinator. Build a candidate record, write/flush/replace

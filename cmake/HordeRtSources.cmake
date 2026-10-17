@@ -25,6 +25,8 @@ set(HORDE_RT_CORE_RELATIVE_SOURCES
     gameplay/simulation/GameSimulationRescue.cpp
     gameplay/simulation/GameSimulationDialogue.cpp
     gameplay/simulation/GameSimulationCampaign.cpp
+    gameplay/campaign/CampaignCheckpointCodec.cpp
+    gameplay/campaign/CampaignCheckpointStorage.cpp
     gameplay/traversal/RescueTraversal.cpp
     gameplay/animation/PlayerAnimationState.cpp
     gameplay/animation/PlayerIkTargets.cpp
