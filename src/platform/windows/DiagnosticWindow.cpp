@@ -7381,14 +7381,19 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
             horde::vulkan::raytracing::PublishDevelopmentWorldReadiness(context.simulation,context.rtScene);
             const auto* development =
                 horde::gameplay::FindDevelopmentCheckpoint(context.developmentCheckpoint);
+            horde::gameplay::DevelopmentCheckpointStageEvidence stageEvidence;
             if (development == nullptr ||
                 !horde::gameplay::StageDevelopmentCheckpointSimulation(
-                    context.simulation, *development))
+                    context.simulation, *development, &stageEvidence))
             {
                 const auto& state=context.simulation.Snapshot();
                 std::ostringstream trace;
                 trace << "Development checkpoint '" << checkpoint.name
-                    << "' could not stage its authoritative combat pose; player=("
+                    << "' could not stage its authoritative state; reason="
+                    << (development == nullptr ? "unknown-checkpoint" :
+                        horde::gameplay::DevelopmentCheckpointStageFailureName(stageEvidence.failure))
+                    << ", admissionWorldGeneration=" << stageEvidence.worldGeneration
+                    << ", admissionTerrainGeneration=" << stageEvidence.terrainGeneration << "; player=("
                     << state.playerX << ',' << state.playerZ << "), rescuePhase="
                     << static_cast<unsigned>(state.rescue.phase) << ", stowed="
                     << state.rescue.equipmentStowed << ", ropeReady=" << state.rescue.ropeReady

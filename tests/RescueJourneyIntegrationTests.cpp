@@ -106,20 +106,54 @@ int main(int argc,char** argv) {
   check(chapterSelections==30,"live journey and all29 chapter views, including both mist states, retain authored-scene admission");
   const auto* landing=FindDevelopmentCheckpoint("chapter-landing-north");
   GameSimulation fresh(ProductionGameSimulationConfig());
-  check(!StageDevelopmentCheckpointForScene(fresh,*landing,[]{}),
+  DevelopmentCheckpointStageEvidence stageEvidence;
+  stageEvidence.playerSwingEvents=17;
+  stageEvidence.consumedAttackEdges=12;
+  stageEvidence.terrainGeneration=999;
+  check(!StageDevelopmentCheckpointSimulation(fresh,*landing,&stageEvidence) &&
+        stageEvidence.failure==DevelopmentCheckpointStageFailure::AuthoredTerrainRequired &&
+        stageEvidence.playerSwingEvents==0 && stageEvidence.consumedAttackEdges==0 &&
+        stageEvidence.terrainGeneration!=999 && fresh.Snapshot().tickIndex==0,
+        "early rejection must identify missing authored mode and clear prior capture evidence without stepping");
+  check(!StageDevelopmentCheckpointForScene(fresh,*landing,[]{},false,&stageEvidence),
         "missing renderer readiness must reject the landing capture instead of naming a start frame ready");
+  check(stageEvidence.failure==DevelopmentCheckpointStageFailure::MissingTerrain &&
+        stageEvidence.worldGeneration==fresh.Snapshot().worldRoute.generation &&
+        std::string_view(DevelopmentCheckpointStageFailureName(stageEvidence.failure))=="missing-terrain" &&
+        fresh.Snapshot().tickIndex==0,
+        "missing terrain must retain its admission generation and a readable reason before any fixed step");
   const auto staleGeneration=fresh.Snapshot().worldRoute.generation;
   check(!StageDevelopmentCheckpointForScene(fresh,*landing,[&]{
     fresh.PublishChapterTerrain({staleGeneration,WorldZoneId::TombExterior},terrain);
-   }),"stale scene generation must not admit a frozen landing");
+   },false,&stageEvidence),"stale scene generation must not admit a frozen landing");
+  check(stageEvidence.failure==DevelopmentCheckpointStageFailure::MissingTerrain &&
+        stageEvidence.worldGeneration>staleGeneration,
+        "rejected stale publication must report absent current terrain, not a successful renderer callback");
+  {
+   GameSimulation stale(ProductionGameSimulationConfig());
+   stale.SetDevelopmentRescueJourney(true,true);
+   const auto admittedGeneration=stale.Snapshot().worldRoute.generation;
+   check(stale.PublishChapterTerrain({admittedGeneration,WorldZoneId::TombExterior},terrain),
+         "stale diagnostic setup must first admit real terrain");
+   stale.SetDevelopmentWorldRoute(true,false);
+   check(!StageDevelopmentCheckpointSimulation(stale,*landing,&stageEvidence) &&
+         stageEvidence.failure==DevelopmentCheckpointStageFailure::StaleTerrain &&
+         stageEvidence.terrainGeneration==admittedGeneration &&
+         stageEvidence.worldGeneration==stale.Snapshot().worldRoute.generation &&
+         stageEvidence.worldGeneration>stageEvidence.terrainGeneration && stale.Snapshot().tickIndex==0,
+         "retained old terrain must be distinguished from missing terrain without admitting or advancing it");
+  }
   unsigned publications=0;
   const bool staged=StageDevelopmentCheckpointForScene(fresh,*landing,[&]{
    ++publications;
    for(std::size_t zone=1;zone<kWorldZones.size();++zone)
     check(fresh.PublishChapterTerrain({fresh.Snapshot().worldRoute.generation,
      static_cast<WorldZoneId>(zone)},terrain),"ready exported terrain must publish against the current selected scene");
-  });
+  },false,&stageEvidence);
   check(staged && publications==1,"fresh production profile must stage the real landing only after current readiness");
+  check(stageEvidence.failure==DevelopmentCheckpointStageFailure::None &&
+        stageEvidence.worldGeneration==stageEvidence.terrainGeneration,
+        "successful native ascent must replace the earlier failure with its current admitted identities");
   if(staged) {
    const auto& snapshot=fresh.Snapshot();
    check(snapshot.developmentRescueJourney && snapshot.rescue.exteriorSide && snapshot.tickIndex>400 &&
@@ -127,17 +161,29 @@ int main(int argc,char** argv) {
          std::hypot(snapshot.playerX-landing->cameraX,snapshot.playerZ-landing->cameraZ)<.02f,
          "admitted landing must prove actual journey, camera, progression and equipment rather than a checkpoint label");
   }
+  auto invalidStart=*FindDevelopmentCheckpoint("rescue-journey-start");
+  invalidStart.baseShowcaseCheckpointId=-1;
+  stageEvidence.playerSwingEvents=17;
+  check(!StageDevelopmentCheckpointForScene(fresh,invalidStart,[]{},false,&stageEvidence) &&
+        stageEvidence.failure==DevelopmentCheckpointStageFailure::BaseCheckpointRejected &&
+        stageEvidence.playerSwingEvents==0 && stageEvidence.worldGeneration==0,
+        "platform-boundary rejection cannot reuse the preceding successful capture's evidence");
  }
  if(authored) {
   auto captureConfig=ProductionGameSimulationConfig();
   captureConfig.developmentRescueJourney=true;
   captureConfig.authoredChapterTerrain=true;
-  GameSimulation capture(captureConfig);
-  for(std::size_t zone=1;zone<kWorldZones.size();++zone)
-   check(capture.PublishChapterTerrain({capture.Snapshot().worldRoute.generation,static_cast<WorldZoneId>(zone)},terrain),
-         "Kit capture terrain preparation failed");
+  GameSimulation capture(ProductionGameSimulationConfig());
   const auto* reunion=FindDevelopmentCheckpoint("chapter-kit-reunion");
-  check(reunion && StageDevelopmentCheckpointSimulation(capture,*reunion),"Kit capture native ascent failed");
+  DevelopmentCheckpointStageEvidence reunionEvidence;
+  check(reunion && StageDevelopmentCheckpointForScene(capture,*reunion,[&]{
+   for(std::size_t zone=1;zone<kWorldZones.size();++zone)
+    check(capture.PublishChapterTerrain({capture.Snapshot().worldRoute.generation,static_cast<WorldZoneId>(zone)},terrain),
+          "Kit capture terrain preparation failed");
+  },false,&reunionEvidence),"checkpoint207 must stage through the platform boundary from a fresh production simulation");
+  check(reunionEvidence.failure==DevelopmentCheckpointStageFailure::None &&
+        reunionEvidence.worldGeneration==reunionEvidence.terrainGeneration,
+        "checkpoint207 must consume current terrain and report successful admission");
   const auto& state=capture.Snapshot();
   check(state.chapterCompanion.grounded && !state.chapterCompanion.walking &&
         state.lich.deathDissolveProgress==1 && state.rescue.exteriorSide && !state.rescue.equipmentStowed,

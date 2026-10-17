@@ -1803,10 +1803,17 @@ bool ApplyDebugCheckpointSimulation(
         {
             gDebugCheckpointInProgress.store(false, std::memory_order_release);
             __android_log_print(ANDROID_LOG_ERROR, kTag,
-                "HORDE_CHECKPOINT_STAGE_FAILED id=%d requested=%s tick=%llu chapter=%d",
+                "HORDE_CHECKPOINT_STAGE_FAILED id=%d requested=%s tick=%llu chapter=%d "
+                "reason=%s admission_world_generation=%llu admission_terrain_generation=%llu "
+                "scene_ready=%d scene_terrain=%d",
                 selection.checkpoint.id, selection.checkpoint.name,
                 static_cast<unsigned long long>(gGameSimulation.Snapshot().tickIndex),
-                gGameSimulation.Snapshot().developmentRescueJourney ? 1 : 0);
+                gGameSimulation.Snapshot().developmentRescueJourney ? 1 : 0,
+                horde::gameplay::DevelopmentCheckpointStageFailureName(evidence.failure),
+                static_cast<unsigned long long>(evidence.worldGeneration),
+                static_cast<unsigned long long>(evidence.terrainGeneration),
+                context.rtScene.IsReady() ? 1 : 0,
+                context.rtScene.ChapterTerrainSurface() ? 1 : 0);
             return false;
         }
         if (selection.development->combatPose ==

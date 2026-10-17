@@ -1,5 +1,12 @@
 # Horde 1.7 current design index
 
+The [continuation checkpoint and current milestone map](../evidence/2026-10-17-checkpoint-admission/README.md)
+identify the existing active working folder, verified optimisation outcome and
+remaining critical path. Checkpoint staging now reports shared failure reasons
+and admission generations; the historical tick0 phone failure remains
+unattributed. This is local diagnostic hardening, with no new shader or physical
+performance acceptance. Older rows below retain their dated scope.
+
 The [18 October cleared-mist optimisation](../evidence/2026-10-18-zero-mist-exit/README.md)
 now banks an output-preserving exact-zero early exit. Six normal Shipping/Mobile
 phone routes join4,324 actual presentations; two trials per backend repeat

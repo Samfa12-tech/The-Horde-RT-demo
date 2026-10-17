@@ -1,0 +1,215 @@
+{
+  "recordedUtc": "2026-10-17T23:14:25.548029+00:00",
+  "sourceParent": "bd55878d1c51ec4b0a560ca34603dde7511560ef",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "workingPath": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+  "scope": "Checkpoint admission diagnostics and evidence reset; historical phone failure remains unattributed.",
+  "changedSourceOnDisk": [
+    {
+      "path": "src/gameplay/DevelopmentCheckpointSimulation.h",
+      "bytes": 25596,
+      "sha256": "7b28c958f0904d07d55f97f49d94962ced365539b0831bcd51b87d7bdf5e168c",
+      "gitBlob": "9eea143226a2ff30e776f36636e0ae5d8f9217cb"
+    },
+    {
+      "path": "android/app/src/main/cpp/android_probe_bridge.cpp",
+      "bytes": 356981,
+      "sha256": "e4bd9e6da4c47d076f5317bc9de586048d70f39e6e9325cd1b37142dcc45b7b5",
+      "gitBlob": "5f523a571d1b52f4f878c021d4f79faf3cdded94"
+    },
+    {
+      "path": "src/platform/windows/DiagnosticWindow.cpp",
+      "bytes": 583525,
+      "sha256": "361a4558a47542b90669c59cf7f36561074f72cc496b6a3808f9ad7a02bc968e",
+      "gitBlob": "1f5e87bf9637991de3dbbad237bdd089b60ec941"
+    },
+    {
+      "path": "tests/RescueJourneyIntegrationTests.cpp",
+      "bytes": 53901,
+      "sha256": "8b80d9f1e315cdabb1c2678ab67d876481aa3bedadc8cae9dc17d3d2c13b37dd",
+      "gitBlob": "fd07a91556adf83050202a573d067c420e6f808b"
+    }
+  ],
+  "sourcePatch": {
+    "path": "reports/checkpoint-admission-2026-10-17/source.patch",
+    "bytes": 15559,
+    "sha256": "ee454e7f75a04b773770f60a9c03e50d2b5119c8d92afe388605cd9337c5fe5c"
+  },
+  "windowsBuilds": [
+    {
+      "configuration": "Debug",
+      "status": "passed",
+      "log": {
+        "path": "reports/checkpoint-admission-2026-10-17/windows-debug-build.log",
+        "bytes": 17097,
+        "sha256": "170b17c76bc352a8293ccd990bc532d0ddbb885cc1633600f88e13e067e9230d"
+      },
+      "application": {
+        "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+        "bytes": 13339136,
+        "sha256": "c346a3ecf15d394df103b457d40f60f3f30d030aef662394650128bbf061108e"
+      }
+    },
+    {
+      "configuration": "Release",
+      "status": "passed",
+      "log": {
+        "path": "reports/checkpoint-admission-2026-10-17/windows-release-build.log",
+        "bytes": 17217,
+        "sha256": "2382c1dcadf2590ccea16ef28c70cbecac3f0efb14815be503eef395db3c0856"
+      },
+      "application": {
+        "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+        "bytes": 4548608,
+        "sha256": "fa56cd57df039eac963530827e18472f357809796ebf4c3d3b6a90ad6c2d198f"
+      }
+    }
+  ],
+  "hostTests": [
+    {
+      "log": {
+        "path": "reports/checkpoint-admission-2026-10-17/windows-debug-tests.log",
+        "bytes": 788,
+        "sha256": "cfaeb20304f68b30c45795a0ba8668ddd43a2f955d74ff5dc9f13510327a35e7"
+      },
+      "status": "passed",
+      "passed": [
+        "1/3 Test  #86: horde_rt_development_static_asset_tests .....   Passed    5.42 sec",
+        "2/3 Test #188: horde_rt_rescue_journey_integration_tests ...   Passed    8.54 sec",
+        "3/3 Test #189: horde_rt_chapter_terrain_journey_tests ......   Passed  219.10 sec"
+      ],
+      "totalSeconds": [
+        "233.08"
+      ]
+    },
+    {
+      "log": {
+        "path": "reports/checkpoint-admission-2026-10-17/windows-release-tests.log",
+        "bytes": 792,
+        "sha256": "2301d666cb063044d83e1666f9cdb6c63e5651dfe0ad4d5ed99bf4438b0029bc"
+      },
+      "status": "passed",
+      "passed": [
+        "1/3 Test  #86: horde_rt_development_static_asset_tests .....   Passed    1.40 sec",
+        "2/3 Test #188: horde_rt_rescue_journey_integration_tests ...   Passed    1.76 sec",
+        "3/3 Test #189: horde_rt_chapter_terrain_journey_tests ......   Passed   18.25 sec"
+      ],
+      "totalSeconds": [
+        "21.43"
+      ]
+    },
+    {
+      "log": {
+        "path": "reports/checkpoint-admission-2026-10-17/windows-debug-final-fixture-tests.log",
+        "bytes": 505,
+        "sha256": "d6a9ccc49bfa56ea10103412192ac0e2235d28820300d661a29386b1e8cda6fa"
+      },
+      "status": "passed",
+      "passed": [
+        "1/1 Test #189: horde_rt_chapter_terrain_journey_tests ...   Passed  207.50 sec"
+      ],
+      "totalSeconds": [
+        "207.52"
+      ]
+    }
+  ],
+  "fixtureVersionNote": "Initial Debug 3/3 covers final production code and admission negatives. Final Debug 1/1 reruns the authored fixture after adding fresh-production checkpoint207. Final Release 3/3 includes that addition.",
+  "android": {
+    "command": ".\\gradlew.bat assembleDebug --offline --console=plain",
+    "status": "passed",
+    "elapsed": "1m 53s",
+    "completionTailOnly": {
+      "path": "reports/checkpoint-admission-2026-10-17/android-completion-tail.log",
+      "bytes": 739,
+      "sha256": "4bb5f38cea659a5a377f8656533c0f21071bb63e562fabb4ce48971ef2362bab"
+    },
+    "apk": {
+      "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "bytes": 183491290,
+      "sha256": "db8a0bbe74b3ee943f60addaf7c0a70950ddee4602da13453a86ec02af82d7af"
+    },
+    "packagedLibraries": [
+      {
+        "path": "lib/arm64-v8a/libhorde_rt_probe_android.so",
+        "bytes": 5090104,
+        "sha256": "6bebbc13cef1337eeddba5b469a1754e268027144b21acc0b56d6bb49fdf398c"
+      },
+      {
+        "path": "lib/armeabi-v7a/libhorde_rt_probe_android.so",
+        "bytes": 4430712,
+        "sha256": "c12464c36f03516c8dcd71acf04a4782dfdc44f158bf37bb429a3ad99b49af29"
+      },
+      {
+        "path": "lib/x86/libhorde_rt_probe_android.so",
+        "bytes": 5627756,
+        "sha256": "9863b89dabd38b46d2f2c6b141cd100d1596403c9823c534a3e595f15ee15059"
+      },
+      {
+        "path": "lib/x86_64/libhorde_rt_probe_android.so",
+        "bytes": 5324800,
+        "sha256": "8e9c75eb12af5c211eb40effbf752c496ce63d2ba5ca83648890f7a0b019a65d"
+      }
+    ],
+    "installed": false,
+    "physicalValidation": "not run"
+  },
+  "parentPrObserved": {
+    "number": 27,
+    "head": "bd55878d1c51ec4b0a560ca34603dde7511560ef",
+    "isDraft": true,
+    "mergeable": "CONFLICTING",
+    "allSixChecksPassed": true,
+    "snapshot": {
+      "path": "reports/checkpoint-admission-2026-10-17/pr27-observed.json",
+      "bytes": 2361,
+      "sha256": "cb6d5c818a42bd17652fbdf77fef460b6c1fe16790ea38d0ffe192899e4d95a9"
+    }
+  },
+  "shaderAndAssetSourceDiff": "empty against parent; no shader regeneration or new visual/performance claim",
+  "frozenShaderBudget": {
+    "path": "tools/raygen-variant-budgets.json",
+    "bytes": 6425,
+    "sha256": "56936479b2d202dbdb9393ba94b66a1b0bc12d490b700d8af4c63de3460e53bf"
+  },
+  "incompleteAttempts": [
+    {
+      "action": "Read Win32 process inventory",
+      "result": "sandbox CIM access unavailable; escalated read succeeded before editing"
+    },
+    {
+      "action": "Sandbox native build",
+      "result": "no progress; own process interrupted, not a pass; escalated builds subsequently passed"
+    },
+    {
+      "action": "Sandbox Android build",
+      "result": "Gradle wrapper cache lock access denied; escalated build subsequently passed"
+    },
+    {
+      "action": "Windows build using HordeLanternRT target",
+      "result": "MSB1009 target project absent; corrected to actual horde_rt_diagnostic_window target"
+    },
+    {
+      "action": "PR read through connector / sandbox CLI",
+      "result": "connector transport closed / sandbox network unavailable; escalated read-only CLI subsequently succeeded"
+    }
+  ],
+  "warnings": [
+    "Android SDK XML3/XML4 tool mismatch warning",
+    "MSVC C4244 at pre-existing optional<float> assignment in authored test"
+  ],
+  "acceptance": {
+    "historicalStartupFailureFixed": false,
+    "newHardwareEvidence": false,
+    "sustained30Fps": false,
+    "pushed": false,
+    "newRemoteCi": "not run; local commit only",
+    "remaining": [
+      "physical checkpoint207 startup/reconstruction reproduction",
+      "live two-torch/exterior performance",
+      "long warm combat and pressure/lifecycle",
+      "CURRENT/HIGHER and Lower-to-Current migration",
+      "full chapter visual/audio/haptic/touch owner acceptance",
+      "durable campaign save policy and implementation"
+    ]
+  }
+}

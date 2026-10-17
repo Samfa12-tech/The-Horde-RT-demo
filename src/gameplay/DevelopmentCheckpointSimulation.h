@@ -6,8 +6,37 @@
 namespace horde::gameplay
 {
 
+enum class DevelopmentCheckpointStageFailure : std::uint8_t
+{
+    None,
+    AuthoredTerrainRequired,
+    MissingTerrain,
+    StaleTerrain,
+    BaseCheckpointRejected,
+    SimulationStateNotReached,
+};
+
+inline constexpr const char* DevelopmentCheckpointStageFailureName(
+    DevelopmentCheckpointStageFailure failure) noexcept
+{
+    switch (failure)
+    {
+    case DevelopmentCheckpointStageFailure::None: return "none";
+    case DevelopmentCheckpointStageFailure::AuthoredTerrainRequired: return "authored-terrain-required";
+    case DevelopmentCheckpointStageFailure::MissingTerrain: return "missing-terrain";
+    case DevelopmentCheckpointStageFailure::StaleTerrain: return "stale-terrain";
+    case DevelopmentCheckpointStageFailure::BaseCheckpointRejected: return "base-checkpoint-rejected";
+    case DevelopmentCheckpointStageFailure::SimulationStateNotReached: return "simulation-state-not-reached";
+    }
+    return "unknown";
+}
+
 struct DevelopmentCheckpointStageEvidence
 {
+    DevelopmentCheckpointStageFailure failure = DevelopmentCheckpointStageFailure::None;
+    // Admission-time identities, before checkpoint imports can change them.
+    std::uint64_t worldGeneration = 0u;
+    std::uint64_t terrainGeneration = 0u;
     std::uint32_t consumedAttackEdges = 0u;
     std::uint32_t consumedParryEdges = 0u;
     std::uint32_t playerSwingEvents = 0u;
@@ -38,9 +67,28 @@ inline bool StageDevelopmentCheckpointSimulation(
     DevelopmentCheckpointStageEvidence* evidence = nullptr,
     const DevelopmentCheckpointStepFixedObservation* stepObservation = nullptr)
 {
+    if (evidence != nullptr)
+    {
+        *evidence = {};
+        evidence->worldGeneration = gameSimulation.worldRoute_.generation;
+        evidence->terrainGeneration = gameSimulation.chapterTerrainGeneration_;
+        evidence->failure = DevelopmentCheckpointStageFailure::SimulationStateNotReached;
+    }
+    const auto reject = [&](DevelopmentCheckpointStageFailure failure)
+    {
+        if (evidence != nullptr) evidence->failure = failure;
+        return false;
+    };
     const auto chapterTerrain=gameSimulation.chapterTerrain_;
-    if(checkpoint.stagesRescueExterior && (!gameSimulation.config_.authoredChapterTerrain ||
-       !chapterTerrain || gameSimulation.chapterTerrainGeneration_!=gameSimulation.worldRoute_.generation))return false;
+    if (checkpoint.stagesRescueExterior)
+    {
+        if (!gameSimulation.config_.authoredChapterTerrain)
+            return reject(DevelopmentCheckpointStageFailure::AuthoredTerrainRequired);
+        if (!chapterTerrain)
+            return reject(DevelopmentCheckpointStageFailure::MissingTerrain);
+        if (gameSimulation.chapterTerrainGeneration_ != gameSimulation.worldRoute_.generation)
+            return reject(DevelopmentCheckpointStageFailure::StaleTerrain);
+    }
     if (checkpoint.stagesWaterfallGuards &&
         (checkpoint.waterfallGuardFixedTicks > 30u ||
          checkpoint.combatPose != DevelopmentCombatPose::Rest ||
@@ -49,7 +97,7 @@ inline bool StageDevelopmentCheckpointSimulation(
     if (!gameSimulation.ApplyShowcaseCheckpoint(checkpoint.baseShowcaseCheckpointId))
     {
         if (checkpoint.stagesWaterfallGuards) gameSimulation.EndMotionEvidenceEquipmentSeed();
-        return false;
+        return reject(DevelopmentCheckpointStageFailure::BaseCheckpointRejected);
     }
 
     if(checkpoint.developmentWorldRoute || gameSimulation.Snapshot().developmentWorldRoute)
@@ -81,7 +129,8 @@ inline bool StageDevelopmentCheckpointSimulation(
     {
         if (evidence != nullptr)
         {
-            *evidence = {};
+            evidence->failure = staged ? DevelopmentCheckpointStageFailure::None
+                : DevelopmentCheckpointStageFailure::SimulationStateNotReached;
             evidence->consumedAttackEdges = static_cast<std::uint32_t>(
                 gameSimulation.Snapshot().lastConsumedAttackSequence -
                 initialConsumedAttackSequence);
@@ -388,6 +437,9 @@ template<class PublishReadyWorld>
     DevelopmentCheckpointStageEvidence* evidence = nullptr,
     const DevelopmentCheckpointStepFixedObservation* stepObservation = nullptr)
 {
+    // Early platform-boundary rejection must not retain a prior successful
+    // capture's events, identities or failure disposition.
+    if (evidence != nullptr) *evidence = {};
     const bool chapter = DevelopmentCheckpointRequiresAuthoredChapter(checkpoint);
     if (checkpoint.id == 192)
     {
@@ -396,7 +448,11 @@ template<class PublishReadyWorld>
         else
         {
             if (!gameSimulation.ApplyShowcaseCheckpoint(checkpoint.baseShowcaseCheckpointId))
+            {
+                if (evidence != nullptr)
+                    evidence->failure = DevelopmentCheckpointStageFailure::BaseCheckpointRejected;
                 return false;
+            }
             gameSimulation.SetDevelopmentRescueJourney(true, true);
         }
         publishReadyWorld();
