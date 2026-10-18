@@ -3230,3 +3230,30 @@ occurred. Earlier wrong-camera and corrected opening-only APK observations are
 retained separately in the receipt. No sustained performance, full traversal,
 power-loss durability or audio/haptic acceptance is claimed.
 [Exact blocked receipt, prior attempts, hashes and remaining gates](evidence/2026-10-18-android-campaign-device/README.md).
+
+### 18 October - upper-return readiness and fresh-process persistence follow-up
+
+Owner-authorized **SM-S948B**, Android **17 / API 37**, build
+`CP2A.260605.016.S948BXXS4BZIG`. Source commit
+`6d4033d3058efdf4ccacf73923615fc65ce1972a`, same-signer Debug code 10 APK,
+SHA-256 `5eb3282a6f5551df5db24067b7854fa340c4d4e14a35c8415ae0928df0269128`
+(183,957,818 bytes), installed compatibly in place and matched by device hash.
+
+Evidence class: bounded **seeded persistence fixture** follow-up using only the
+existing test namespace. Upper autosave loads with 3/3 hearts and real RT
+presentation; explicit Resume exposes enabled Descend rescue rope. One tap
+produces the actual Traversing rescue rope state. Immediate pause and explicit
+Quit stop before landing; no record changes. After only the known cached test
+process is terminated with `am kill`, a proven different PID reloads the earlier
+actual Slot 2 manual save: native completion, 1/3 hearts, lower rope/lantern view,
+enabled Climb rescue rope and normal HUD, no retained traversal. Terminal explicit
+Quit leaves zero Horde activities, unchanged settings, unchanged 281-path
+inventory and all six test-record hashes; owner `campaign-v1` remains absent.
+
+The earlier blocked candidate remains a failed dated result. This follow-up
+accepts descent admission and fresh-process save recovery only, not full descent,
+normal chapter completion/autosaves, active-IO interruption, power-loss durability,
+full controls/route/art/audio/haptic acceptance or sustained performance. No app
+data clearing, save deletion, owner process termination, settings rollback,
+Release/desktop/Reef action or APK copy/pull occurred.
+[Exact artifact, finite sequence, process identities and custody](evidence/2026-10-18-android-campaign-readiness-followup/README.md).

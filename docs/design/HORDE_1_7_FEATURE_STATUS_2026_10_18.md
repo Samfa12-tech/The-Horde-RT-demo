@@ -80,28 +80,49 @@ exists. These labels do not turn all remaining proposals into required features.
 | Opening storytelling and tomb-floor debris | [TombDressing](../../src/scene/TombDressing.h), [scene contract](../AGENT_ENGINE_CONTRACTS.md#renderer-and-assets), latest owner direction above | Tomb niches/burial dressing exist, but a deliberate opening composition replacing the material-tech-demo collection and small floor stones/rubble/debris are firm remaining art work. Nearby kick reaction is conditional on a bounded design; use static/instanced distant scatter, sleep/cull inactive pieces, preserve traversal/nav/combat readability and deterministic save behavior. Require baseline/candidate frame and RT geometry cost; optional detail setting if cost is material. No unlimited per-stone physics or paid assets. |
 | Water contact and surface feedback | [WaterContact](../../src/gameplay/effects/WaterContact.h), [WaterContactTests](../../tests/WaterContactTests.cpp), plan 5.5/6.1 | Shared bounded wet-step, stream-entry, drop/ripple state and semantic ownership exist. This is not acceptance of splash/ripple visibility or mix on current phone. The plan's vines/contact additions are optional measured exploration; do not require a new destruction/physics engine. |
 | Town / lookout endpoint | [BellwetherShell](../../src/scene/BellwetherShell.cpp), [shell admission](../evidence/2026-10-12-bellwether-shell/README.md), plan 4.6/approved geography | Distant grounded village/shrine shell and lookout composition exist. The admitted shell is 342 triangles, with inspected desktop RT views. Playable town pads, doors, interiors, NPC activity and onward route remain 1.8; town art source candidates are not permission to expand 1.7 gameplay. |
-| Checkpoints and Save/Load | [logical restore](../../src/gameplay/simulation/GameSimulationCampaign.cpp), [codec/storage](../evidence/2026-10-18-campaign-storage/README.md), [receipt coordinator](../evidence/2026-10-18-campaign-save-coordinator/README.md), plan 12 | Lower/exterior logical restore, codec/atomic storage, [worker and six-record host transaction](../evidence/2026-10-18-campaign-session/README.md), shared safe-boundary/autosave facade, and Android private-root/menu/native resource-input-presentation integration are implemented. [Java menu evidence](../evidence/2026-10-18-android-save-menu/README.md) passes 81/81; the coordinating host matrix reports 15/15 Debug and 15/15 Release. These are implementation checks, not full save acceptance. Seeded physical manual/auto load and restart remain pending, as do Windows adapter, death-screen Load, forest-end record, full-route recovery, platform process-death and power-loss acceptance. The first phone New Game reached play but exposed wrong opening yaw; that result is retained as a defect and the corrected candidate is rebuilding. This inventory neither accesses nor migrates owner records. |
+| Checkpoints and Save/Load | [logical restore](../../src/gameplay/simulation/GameSimulationCampaign.cpp), [codec/storage](../evidence/2026-10-18-campaign-storage/README.md), [Android integration](../evidence/2026-10-18-android-campaign-integration/README.md), plan 12 | Implemented lower/exterior logical restore, six-record worker/storage, shared safe-boundary/autosave facade and Android menu/private-root/resource/input/presentation transaction (`7d894450`, readiness fix `6d4033d3`). Full selected host matrix 15/15 Debug + 15/15 Release; Java initial 81/81 + final affected 24/24; Windows apps and four Android ABIs build. [Phone candidate ca08919a](../evidence/2026-10-18-android-campaign-device/README.md) confirms lower manual/one heart/RT, cancellation isolation and exact Slot 2 manual replacement with the other five unchanged and Slot 1 still active. Upper auto/three hearts/night/RT/same-generation Home passed, but Descend stayed Preparing and restart was not run. [Resident Dungeon readiness repair](../evidence/2026-10-18-android-campaign-integration/readiness-fix.json) passes 4/4 focused suites in both native configurations, with 25 new adapter checks. Separate [5eb3282a follow-up](../evidence/2026-10-18-android-campaign-readiness-followup/README.md), source `6d4033d3`, passes upper RT/three hearts/enabled Descend with one actual Traversing admission, then pause/Quit before landing; a proven fresh process reloads the earlier saved Slot 2 manual with one heart/current RT/lower pose/enabled Climb/normal controls. All six records and settings remain unchanged; owner saves remain absent. Bounded isolated persistence is accepted, while the earlier ca08919a readiness failure stays historical. Windows adapter, death Load, forest-end/full-route, interruption/power-loss, audio and performance acceptance remain incomplete. |
 
 ## Critical path after the bounded useful save integration
 
-The Android three-slot path is now an implemented integration milestone, with
-separate manual/latest-auto records, safe-boundary capture, private namespace,
-renderer preparation, paused Java camera/input rebasing and current restored-RT
-presentation before explicit Resume. Its [Java receipt](../evidence/2026-10-18-android-save-menu/README.md)
-is host evidence. The coordinating run reports 15/15 selected Debug and 15/15
-Release host suites plus an Android four-ABI build; an opening-camera correction
-requires a newer exact build. The initial phone New Game reached gameplay but
-used the wrong yaw, so it does not close the camera or Save/Load acceptance gate.
-The final build/phone receipt is still coordinator-owned and pending.
+The Android three-slot path is implemented and locally committed at `7d894450`,
+with resident-Dungeon readiness correction `6d4033d3`. The
+[integration receipt](../evidence/2026-10-18-android-campaign-integration/README.md)
+joins the selected Debug/Release host matrix, separate initial 81-test and final
+24-test Java runs, Windows applications and four-ABI Android builds. The
+[phone receipt](../evidence/2026-10-18-android-campaign-device/README.md) preserves
+the rejected first opening camera and the corrected view accepted on `bb4175ff`;
+the camera correction is no longer awaiting a rebuild.
 
-The next bounded acceptance checkpoint is an isolated seeded lower/exterior
-manual-and-auto load, Home/return and restart round trip, checking actual camera,
-hearts, equipment, dialogue, neutral controls and RT presentation. Windows
-adapter/menu, death-screen Load, forest-end/full-route recovery and physical
-power-loss acceptance remain incomplete. Retention is settled; no history,
-migration or broader save architecture is needed to proceed. After this useful
-integration checkpoint, prioritize an existing confirmed route/performance
-blocker rather than letting save infrastructure monopolize 1.7.
+Candidate `ca08919a` physically restored the seeded lower manual record with one
+heart/RT and the opened rescue view, preserved all six records on Keep records,
+and replaced only Slot 2 manual while the other five and Slot 1 active selection
+remained intact. Its upper autosave restored three hearts/night/RT and returned
+through same-generation Home, but Descend remained Preparing. That real blocker
+stopped testing before restart. The adapter had omitted Dungeon zone 0; the
+[bounded repair](../evidence/2026-10-18-android-campaign-integration/readiness-fix.json)
+now publishes its actual resident scene readiness, retaining real GPU proof.
+Four focused suites pass in both native configurations, including 25 adapter
+checks; this does not retroactively pass the blocked physical candidate.
+
+The bounded isolated persistence acceptance is now complete on sealed
+`5eb3282a`, source `6d4033d3`, in a
+[separate physical follow-up](../evidence/2026-10-18-android-campaign-readiness-followup/README.md).
+Upper Load presented three hearts/current RT and enabled Descend; one tap
+actually entered Traversing, then testing paused and quit before landing. After
+a verified fresh application process, the prior actual Slot 2 manual save loaded
+one heart/current RT/lower pose with enabled Climb and normal controls. All six
+records and settings stayed unchanged, prior paths were retained and the owner
+save root remained absent. The blocked earlier candidate is not relabelled.
+
+Windows adapter/menu and death-screen Load are the next implementation seams.
+Full descent/landing, earning checkpoints/autosaves through normal chapter play,
+forest-end/full-route recovery, active-IO interruption, power-loss, audio/controller
+comfort and sustained performance remain unaccepted. The separate torch motion
+probe's [crouch-input repair](../evidence/2026-10-18-live-torch-crouch-probe/README.md)
+passes Debug/Release at all four input rates, preserving ordinary collision.
+Its later APK was not installed and supplies no new GPU timing evidence. Retention is settled; no history
+or migration is needed. Prioritize a confirmed route/performance blocker rather
+than letting save infrastructure monopolize the remaining 1.7 update.
 
 The reproduced Android shadow-cycle crash is now corrected locally with a
 production UI regression and [focused Java evidence](../evidence/2026-10-18-mobile-shadow-cycle/README.md).

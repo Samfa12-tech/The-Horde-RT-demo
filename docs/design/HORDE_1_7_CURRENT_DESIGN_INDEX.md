@@ -12,20 +12,52 @@ a current restored RT presentation before explicit Resume. See the
 [current feature map](HORDE_1_7_FEATURE_STATUS_2026_10_18.md) and
 [save-slice update](HORDE_1_7_SAVE_SLICE.md).
 
-The coordinating run reports 15/15 selected Debug and 15/15 Release host suites,
-81/81 focused Java host tests and an Android four-ABI build. These are scoped
-checks, not a full playable-save acceptance pass. The first phone New Game
-reached play but exposed incorrect opening yaw; that rejected result prompted
-an authored-camera rebase correction and a newer exact build. Final corrected
-build/phone results are pending the coordinator's sealed receipt.
+The [Android integration receipt](../evidence/2026-10-18-android-campaign-integration/README.md)
+records source checkpoint `7d894450` and the later readiness correction
+`6d4033d3`. The full selected host matrix passed 15/15 Debug and 15/15 Release;
+the initial Java selection passed 81/81 and the final affected decoder/Activity
+selection passed 24/24, each with its own tested hashes. Both Windows applications
+and all four Android ABIs build. These checks do not establish full playable-save
+or release acceptance.
 
-Physical seeded lower/exterior manual/auto load and restart are still pending.
-Windows adapter/menu, death-screen Load entry, forest-end/full-route recovery,
-platform process-death, power-loss and complete physical camera/audio/controller
-acceptance are not complete. Existing files are preserved; no migration or owner
-save exercise is implied. Historical headings/receipts below retain their dated
-scope, including former missing-integration and unresolved-retention statements;
-the current update and Project Decisions supersede those status statements.
+The [sealed phone receipt](../evidence/2026-10-18-android-campaign-device/README.md)
+retains both the rejected initial opening yaw and the corrected doorway-facing
+opening on `bb4175ff`. On later candidate `ca08919a`, lower manual Load restored
+one heart and presented the opened rescue view; Keep records cancellation left
+all six records unchanged. Explicit Slot 2 manual replacement changed only that
+record, preserved the other five, and kept Slot 1 active for autosaves. Upper
+autosave Load restored three hearts/night/RT and survived same-generation Home,
+but Descend remained Preparing. Testing stopped before fresh-process reload;
+this is a blocked candidate with scoped positive results, not full acceptance.
+
+The adapter had skipped resident Dungeon zone 0. The
+[readiness repair](../evidence/2026-10-18-android-campaign-integration/readiness-fix.json)
+restores its actual scene readiness publication without weakening GPU proof.
+Four focused native suites pass in both Debug and Release, including 25 new
+adapter checks. The separately sealed
+[physical follow-up](../evidence/2026-10-18-android-campaign-readiness-followup/README.md)
+on APK `5eb3282a`, source `6d4033d3`, now passes the bounded isolated persistence
+gate: upper Load presents three hearts/current RT, enabled Descend admits one
+actual Traversing action, then pause/Quit occurs before landing. A proven fresh
+application process reloads the earlier actual Slot 2 manual save with one heart,
+current RT, lower pose, enabled Climb and normal controls without retained
+traversal. All six record hashes and the settings hash stay unchanged; all 274
+prior paths remain, the 281-path inventory is unchanged, and owner `campaign-v1`
+remains absent. Terminal Quit leaves zero activities and logs show no fatal lines.
+This separate pass does not rewrite the earlier blocked candidate's result.
+
+The bounded seeded persistence milestone is complete. Windows adapter/menu and
+death-screen Load remain next implementation seams. Full descent/landing,
+chapter-earned saves/autosaves, forest-end/full-route recovery, active-IO
+interruption, power-loss, audio/controller/comfort and sustained performance are
+not accepted by these fixtures. The independent torch motion probe's
+[crouch-input repair](../evidence/2026-10-18-live-torch-crouch-probe/README.md)
+passes Debug/Release at all four input rates and both application builds; its
+later diagnostic APK was not installed. This repairs measurement coverage,
+without a new GPU timing claim. Existing owner data is
+preserved and seeded work stays confined to an isolated test namespace. Historical headings
+and receipts below retain their dated scope; current updates and Project
+Decisions supersede old missing-integration/unresolved-retention statements.
 
 The [playable crouch/root checkpoint](../evidence/2026-10-18-crouch-playable/README.md)
 connects shared standing/crouching collision, blocked standing, existing platform

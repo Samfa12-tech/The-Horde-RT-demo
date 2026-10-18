@@ -1,5 +1,16 @@
 # Android campaign Save/Load checkpoint
 
+The bounded isolated phone milestone is now accepted in the separately sealed
+[upper-return and fresh-process follow-up](../2026-10-18-android-campaign-readiness-followup/README.md)
+on source `6d4033d3` / installed APK `5eb3282a…9128`. Combined with the earlier
+actual durable manual replacement, it covers both supported checkpoint sides,
+record isolation, real RT presentation and reload of that saved record after
+process restart. Earlier defects below retain their own failed outcomes. The
+later [torch diagnostic repair](../2026-10-18-live-torch-crouch-probe/README.md)
+passes its affected host checks; its APK was not installed. Windows/death-screen
+Load, chapter-earned saves, full route/audio and power-loss/performance acceptance
+remain open.
+
 Continues the existing `codex/horde-1.7-wp2-vertical-proof` worktree from
 `766078a416b51052521f4e0db8b1e8beaa2e0c89`. No new checkout, branch switch,
 public push, release or owner-data migration is part of this checkpoint.
@@ -38,7 +49,7 @@ tests in Debug (273.95 s) and Release (31.12 s), and both Windows applications
 built. All 81 focused Java/Robolectric tests passed. Android Debug assembled for
 arm64-v8a, armeabi-v7a, x86 and x86_64. The final startup-corrected applications
 and APK were rebuilt; source identities, exact artifacts and supplemental tests
-are in [validation.json](validation.json). The final four-ABI Debug APK is
+are in [validation.json](validation.json). The pre-readiness four-ABI Debug APK was
 `ca08919a8c63aac269b4fc68a02bde706131a25a92d8765acd550297841918a9`
 (183,957,866 bytes; 38 s build). The later Java notice correction passes all
 24 selected decoder/Activity tests; the earlier complete 81-test run retains
@@ -71,7 +82,8 @@ configurations. These are affected checks, not a complete release gate.
   live torch probe sends standing movement beneath the crouch slice's low beam
   and stalls at approximately `(0, -2.995)`. The save-route fixture traverses it
   with actual crouch input. This diagnostic input gap is retained for the next
-  bounded fix; it is not an RT/performance pass or a reason to weaken collision.
+  bounded fix, now separately recorded in the successful torch diagnostic repair
+  linked above; it is not an RT/performance pass or a reason to weaken collision.
 - On exact final candidate `ca08919a…18a9`, the seeded lower manual load reached
   RT presentation and its opened live view showed one heart at the rescue anchor.
   Keep records cancellation preserved all six hashes. Explicit replacement of
@@ -93,7 +105,8 @@ configurations. These are affected checks, not a complete release gate.
   native suites pass in Debug and Release, including 25 new adapter checks and
   actual CPU motor descent. Both Windows applications and all four Android ABIs
   build. New APK `5eb3282a…9128` is sealed for only upper descent admission and
-  fresh-process reload; that physical follow-up is still pending.
+  fresh-process reload. That then-pending physical follow-up is now accepted in
+  the separate receipt linked at the top; the earlier failed result stays intact.
 - Death-menu Load, the Windows adapter, later campaign checkpoints, power-loss
   durability, full audio/route acceptance and sustained performance remain open.
   Existing exterior/two-torch performance blockers are not closed by this work.

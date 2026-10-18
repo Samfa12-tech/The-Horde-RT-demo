@@ -1,0 +1,321 @@
+{
+  "outcome": "PASS for bounded upper descent admission and fresh-process saved-slot reload only",
+  "evidenceClass": "Actual physical UI and RT presentation using existing seeded persistence fixtures, not chapter completion",
+  "sourceCommit": "6d4033d3058efdf4ccacf73923615fc65ce1972a",
+  "previousBlockedReceipt": "../2026-10-18-android-campaign-device/validation.json",
+  "compiledSourceManifest": {
+    "path": "reports/2026-10-18-dungeon-readiness-compiled-sources.json",
+    "files": 26,
+    "sha256": "9844fcfaea400c4ae0d5ce8a2d9be33d4baeb41afe067bb2df31de28741564f3"
+  },
+  "worktree": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+  "device": {
+    "model": "SM-S948B",
+    "serial": "R5GL219SZGK",
+    "android": 17,
+    "api": 37,
+    "build": "CP2A.260605.016.S948BXXS4BZIG",
+    "user": 0
+  },
+  "package": {
+    "name": "com.samfa12.hordelanternrt.debug",
+    "versionCode": 10,
+    "versionName": "1.6.2-debug",
+    "sha256": "5eb3282a6f5551df5db24067b7854fa340c4d4e14a35c8415ae0928df0269128",
+    "bytes": 183957818,
+    "publicV2CertificateSha256": "2bc406088b23ac80f2a00a40e2d5d8daa012844dc62f31ad6145d129f5566736",
+    "install": "adb install -r, compatible same signer/package/code",
+    "installedHashMatches": true,
+    "extraApkCopyPull": false,
+    "artifactIdentityBasis": "Captured installed SHA-256 in readiness-installed.sha256, not the later local file at the reused Gradle output path",
+    "reusedLocalOutputPath": "android/app/build/outputs/apk/debug/app-debug.apk",
+    "laterDiagnosticLocalOutputInstalled": false
+  },
+  "testNamespace": {
+    "name": "sl-20261018-r1-8b14",
+    "relativePath": "files/campaign-tests/sl-20261018-r1-8b14",
+    "freshSeedPerformed": false,
+    "existingRecordHashesVerifiedBeforeInstall": true,
+    "ownerCampaignRootUsed": false
+  },
+  "cases": [
+    {
+      "case": "Upper Slot 1 autosave Load and Resume",
+      "result": "PASS",
+      "request": 2,
+      "surfaceGeneration": 1,
+      "rebaseToken": 1,
+      "phase": 7,
+      "error": 0,
+      "presented": 1,
+      "hearts": 3,
+      "context": "Descend rescue rope enabled",
+      "actualEvidence": "49-readiness-descend-enabled.xml/png"
+    },
+    {
+      "case": "One descent admission, early pause and Quit",
+      "result": "PASS for admission only",
+      "interactTaps": 1,
+      "boundedDelayBeforeImageMs": 400,
+      "actualEvidence": "50-readiness-traversing.png",
+      "observed": "Traversing rescue rope; changed camera and stowed held props",
+      "pausedBeforeLanding": true,
+      "fullDescentCompleted": false,
+      "allSixRecordHashesUnchanged": true,
+      "newBoundaryAutosave": false
+    },
+    {
+      "case": "Actual isolated fresh process",
+      "result": "PASS",
+      "oldPid": 20339,
+      "activityRowsBefore": 0,
+      "foregroundBefore": "Samsung launcher",
+      "termination": "am kill --user 0 com.samfa12.hordelanternrt.debug",
+      "onlyKnownCachedTestPidMatched": true,
+      "pidAbsentAfter": true,
+      "newPid": 22859,
+      "uninstall": false,
+      "dataClear": false
+    },
+    {
+      "case": "Fresh Slot 2 manual reload and Resume",
+      "result": "PASS",
+      "savedRecordOrigin": "Actual manual replacement in prior candidate, not pushed again",
+      "recordSha256": "72e136f8b3d673aa80fc390659a95e6fc3e960365a07dd460766ea685dbbddf8",
+      "request": 2,
+      "surfaceGeneration": 1,
+      "rebaseToken": 1,
+      "phase": 7,
+      "error": 0,
+      "presented": 1,
+      "activeSlot": 2,
+      "hearts": 1,
+      "actualView": "lower rope/lantern anchor",
+      "controls": "Climb rescue rope enabled; Crouch, Dodge, Run, Parry, Swing",
+      "retainedTraversalPrompt": false,
+      "actualEvidence": "57-fresh-slot2-loaded.png;59-fresh-slot2-live.xml/png"
+    },
+    {
+      "case": "Terminal explicit Quit and custody",
+      "result": "PASS",
+      "actualEvidence": "readiness-terminal.json"
+    }
+  ],
+  "upperNativeTransitions": [
+    "HORDE_SURFACE_PRESENTED generation=1",
+    "HORDE_CAMPAIGN request=2 generation=1 phase=3 error=0 active_slot=-1 latest=0 rebase=0 presented=0 action=3 isolated=1 durability=0",
+    "HORDE_CAMPAIGN_RESOURCE_PREP request=2 ready=1 previous_scene_retained=1 diagnostic=",
+    "HORDE_CAMPAIGN request=2 generation=1 phase=5 error=0 active_slot=0 latest=1 rebase=1 presented=0 action=3 isolated=1 durability=0",
+    "HORDE_CAMPAIGN request=2 generation=1 phase=6 error=0 active_slot=0 latest=1 rebase=1 presented=0 action=3 isolated=1 durability=0",
+    "HORDE_CAMPAIGN request=2 generation=1 phase=7 error=0 active_slot=0 latest=1 rebase=1 presented=1 action=3 isolated=1 durability=0"
+  ],
+  "freshNativeTransitions": [
+    "HORDE_SURFACE_PRESENTED generation=1",
+    "HORDE_CAMPAIGN request=2 generation=1 phase=3 error=0 active_slot=-1 latest=0 rebase=0 presented=0 action=3 isolated=1 durability=0",
+    "HORDE_CAMPAIGN_RESOURCE_PREP request=2 ready=1 previous_scene_retained=1 diagnostic=",
+    "HORDE_CAMPAIGN request=2 generation=1 phase=5 error=0 active_slot=1 latest=1 rebase=1 presented=0 action=3 isolated=1 durability=0",
+    "HORDE_CAMPAIGN request=2 generation=1 phase=6 error=0 active_slot=1 latest=1 rebase=1 presented=0 action=3 isolated=1 durability=0",
+    "HORDE_CAMPAIGN request=2 generation=1 phase=7 error=0 active_slot=1 latest=1 rebase=1 presented=1 action=3 isolated=1 durability=0"
+  ],
+  "processReceipt": {
+    "oldPid": "20339",
+    "hordeActivityRowsBefore": 0,
+    "foreground": "Samsung launcher",
+    "sixRecordsUnchanged": true,
+    "termination": "am kill --user 0 com.samfa12.hordelanternrt.debug, only matching cached test PID",
+    "pidAfterTermination": null,
+    "dataClear": false,
+    "uninstall": false
+  },
+  "terminalCustody": {
+    "hordeActivityRows": 0,
+    "settingsSha256": "e3966b09cd9c354cb92833496b7f812139178dd7b2a906a4f809dbf9538c3dee",
+    "filePaths": 281,
+    "removedOriginalPaths": 0,
+    "addedOutsideTestNamespace": 0,
+    "pathDifferenceFromPreFollowup": 0,
+    "ownerCampaignRootExists": false,
+    "recordsUnchanged": 6,
+    "freshFatalLines": 0,
+    "upperFatalLines": 0,
+    "oldTestPid": "20339",
+    "freshTestPid": "22859",
+    "terminal": "Explicit observed QUIT DEMO",
+    "fullDescentCompleted": false,
+    "newAutosave": false,
+    "freshLoadSlot": 2,
+    "freshLoadHearts": 1,
+    "freshLoadContext": "Climb rescue rope, enabled; no traversing prompt"
+  },
+  "terminalRecordHashes": [
+    {
+      "name": "slot-1-auto.hrd",
+      "sha256": "26fc5a83d0810cee2087ec1a6474d1aa09ff7a84264b22e9dbc054649667d343"
+    },
+    {
+      "name": "slot-1-manual.hrd",
+      "sha256": "72e136f8b3d673aa80fc390659a95e6fc3e960365a07dd460766ea685dbbddf8"
+    },
+    {
+      "name": "slot-2-auto.hrd",
+      "sha256": "68ddd7cc1af4307696d5f8c8aef66c74ac8d965f5381567b0d0d4828b4ad37ee"
+    },
+    {
+      "name": "slot-2-manual.hrd",
+      "sha256": "72e136f8b3d673aa80fc390659a95e6fc3e960365a07dd460766ea685dbbddf8"
+    },
+    {
+      "name": "slot-3-auto.hrd",
+      "sha256": "7712e9ffcbd0bbaa48ae2f73216ad4981148bab32fea66c867f792ffbb12f1d0"
+    },
+    {
+      "name": "slot-3-manual.hrd",
+      "sha256": "31fc5afe9cc616e284cfc534361a2b451e0d70f5a33449257e90ed4476bb1fd5"
+    }
+  ],
+  "rtPresentation": {
+    "surfaceGeneration": 1,
+    "dispatch": "576x1188",
+    "swapchain": "1440x2971",
+    "savedScale": 0.4,
+    "actualRtPresentationObserved": true,
+    "sustainedPerformanceClaim": false
+  },
+  "openedScreenshots": [
+    {
+      "path": "reports/android-campaign-device-2026-10-18/49-readiness-descend-enabled.png",
+      "bytes": 2658763,
+      "sha256": "a3d917167bb3f48e56348567437aeaee99b2c735f91bf8104b8f7693e7cefbd9",
+      "opened": true
+    },
+    {
+      "path": "reports/android-campaign-device-2026-10-18/50-readiness-traversing.png",
+      "bytes": 2977817,
+      "sha256": "b4ed9ff633c48411359a1c5fe67e500de5306619e4b349588fb0dba1cfdaf381",
+      "opened": true
+    },
+    {
+      "path": "reports/android-campaign-device-2026-10-18/57-fresh-slot2-loaded.png",
+      "bytes": 771160,
+      "sha256": "3952a8334ca8e96867b42b3cac3fa50c6c67b62e9acdac0c16c6a897fb68b57f",
+      "opened": true
+    },
+    {
+      "path": "reports/android-campaign-device-2026-10-18/59-fresh-slot2-live.png",
+      "bytes": 3638060,
+      "sha256": "d8c9b6541803d5c93c433a7685b3bf09d3c643fea50475b8f06e7599099cf0b2",
+      "opened": true
+    }
+  ],
+  "supportingArtifacts": [
+    {
+      "path": "reports/android-campaign-device-2026-10-18/readiness-signer.txt",
+      "bytes": 315,
+      "sha256": "70d5134e183887600f1ca213d744c5979affb6d1d3ef1d861e8f6928aa25480f"
+    },
+    {
+      "path": "reports/android-campaign-device-2026-10-18/readiness-installed.sha256",
+      "bytes": 171,
+      "sha256": "1c870418b3c45735098928f605985323301df050f338a3b5de1c3fc7130ec809"
+    },
+    {
+      "path": "reports/android-campaign-device-2026-10-18/readiness-process-restart.json",
+      "bytes": 309,
+      "sha256": "5c59e1d1dc3d69110c26de9fd41ec5ea179e34ddc4a0ccd827f8ca0c6de530cd"
+    },
+    {
+      "path": "reports/android-campaign-device-2026-10-18/readiness-terminal.json",
+      "bytes": 641,
+      "sha256": "355f9968e1e01d9ade944d79afb3b23400e11d9cf33b5f514914fe53f794cf9a"
+    },
+    {
+      "path": "reports/android-campaign-device-2026-10-18/readiness-record-hashes-terminal.json",
+      "bytes": 761,
+      "sha256": "ef31b1909f78d62873703aa8e22c59fff8fcd03d23d0383db54ae46390b5bd4a"
+    },
+    {
+      "path": "reports/android-campaign-device-2026-10-18/readiness-settings-terminal.sha256",
+      "bytes": 113,
+      "sha256": "6985584381d326b4a6dba30913ed977ded963f7648e96d6f1527769ad1e0db01"
+    },
+    {
+      "path": "reports/android-campaign-device-2026-10-18/readiness-inventory-terminal.txt",
+      "bytes": 20162,
+      "sha256": "d329e1956ecb22f1c6e0197f6a20107ac63849163da41504db1dcc990fce8d7d"
+    },
+    {
+      "path": "reports/android-campaign-device-2026-10-18/49-readiness-upper-logcat.txt",
+      "bytes": 14780,
+      "sha256": "d41e34f9720970e9e40d35e896f7da0a60d7453c705ed8791ffd19ca50444e70"
+    },
+    {
+      "path": "reports/android-campaign-device-2026-10-18/52-readiness-descent-terminal-logcat.txt",
+      "bytes": 18031,
+      "sha256": "4f974e5a41e23703adc9420b0e699ee55744917b0292a7b1afe8118842b0e9cd"
+    },
+    {
+      "path": "reports/android-campaign-device-2026-10-18/59-fresh-slot2-logcat.txt",
+      "bytes": 10530,
+      "sha256": "a80f34afeedce0a53fc4e7deb0ebaed48b0c5a487efe2ab776d291ab92d65935"
+    },
+    {
+      "path": "reports/android-campaign-device-2026-10-18/readiness-fresh-terminal-logcat.txt",
+      "bytes": 12279,
+      "sha256": "d27f9e3b6ea395c42a3881b09e177ed919b8673f2ad7ff98a21128fb52553435"
+    },
+    {
+      "path": "reports/android-campaign-device-2026-10-18/49-readiness-descend-enabled.xml",
+      "bytes": 5459,
+      "sha256": "826b9e453f56542043599cfdd127285260df897451f3b99ac1d619e2013f77a9"
+    },
+    {
+      "path": "reports/android-campaign-device-2026-10-18/51-readiness-traversal-paused.xml",
+      "bytes": 8144,
+      "sha256": "94aba130eaaa5d6041b48308754eb0acb06b833e746c27dbf39dea19a5be38e6"
+    },
+    {
+      "path": "reports/android-campaign-device-2026-10-18/57-fresh-slot2-loaded.xml",
+      "bytes": 8361,
+      "sha256": "309edc3b360fa9b5fd809dc4e4ba14a143522e6fc13643389f248194cacc7025"
+    },
+    {
+      "path": "reports/android-campaign-device-2026-10-18/59-fresh-slot2-live.xml",
+      "bytes": 5455,
+      "sha256": "dd77e3d301cba74f988a0732e05e7b3037b615c2f4d70816801c06498fec261a"
+    }
+  ],
+  "pendingSamples": {
+    "retained": [
+      "45-readiness-upper-menu.xml",
+      "55-fresh-load-menu.xml"
+    ],
+    "boundedReadinessChecksPerProcess": 1,
+    "duplicateActionWhileToolReceiptPending": false
+  },
+  "custodyScope": {
+    "ownerProcessTerminated": false,
+    "isolatedKnownCachedTestProcessTerminated": true,
+    "uninstall": false,
+    "dataClear": false,
+    "saveDelete": false,
+    "settingsRestoration": false,
+    "securityChange": false,
+    "releaseTargeted": false,
+    "desktopInput": false,
+    "reefInteraction": false,
+    "publicActions": false,
+    "wholeAppDataByteEqualityClaim": false
+  },
+  "unaccepted": [
+    "Complete descent/landing",
+    "Normal chapter-earned checkpoints/autosaves",
+    "Full chapter traversal",
+    "Lifecycle interruption during active save/load",
+    "Actual power-loss/filesystem-fault recovery",
+    "Broad controls/orientation/accessibility matrix",
+    "Movement/combat/root acceptance",
+    "Sustained performance",
+    "Audio/haptics/comfort"
+  ],
+  "deviceActionsFinished": true
+}

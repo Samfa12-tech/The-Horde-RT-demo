@@ -107,3 +107,12 @@ Still unaccepted on this candidate: upper descent/playability, fresh-process
 save recovery, interruption during an in-flight save/load, power-loss/fault
 recovery, normal chapter-earned autosaves, full chapter traversal, movement/
 combat/root acceptance, sustained performance, audio/haptics and comfort.
+
+## Separately sealed follow-up
+
+The [upper-return and fresh-process follow-up](../2026-10-18-android-campaign-readiness-followup/README.md)
+records successful bounded descent admission and the previously unrun saved-slot
+restart case on commit `6d4033d3058efdf4ccacf73923615fc65ce1972a` / APK
+`5eb3282a6f5551df5db24067b7854fa340c4d4e14a35c8415ae0928df0269128`.
+The failed upper-readiness result and unrun restart in this receipt remain facts
+about the earlier candidate.

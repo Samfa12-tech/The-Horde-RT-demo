@@ -243,5 +243,6 @@
     "ordinary host boundary journey disables damage",
     "seeded fixtures do not prove earning checkpoint on phone",
     "Windows adapter/death Load/full-route/power-loss/audio/performance remain open"
-  ]
+  ],
+  "later_physical_followup": "../2026-10-18-android-campaign-readiness-followup/validation.json: bounded isolated cases PASS on source6d4033d3 / installed5eb3282a, earlier candidate outcomes retained"
 }

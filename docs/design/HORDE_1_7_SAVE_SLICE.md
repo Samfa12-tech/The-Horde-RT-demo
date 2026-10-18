@@ -11,21 +11,51 @@ pause exposes manual Save. Separate record states, occupied confirmation,
 cancellation, resource preparation, Java neutral camera/input acknowledgement
 and current restored-RT presentation precede explicit Resume.
 
-The [Java receipt](../evidence/2026-10-18-android-save-menu/README.md) passes 81/81
-focused host tests. The coordinating run reports 15/15 selected Debug and 15/15
-Release host suites and an Android four-ABI build. The first phone New Game
-reached play but exposed wrong opening yaw. That defect is retained; the authored
-opening-camera correction requires a newer exact build, with final coordinator
-build/phone evidence still pending. No physical Save/Load pass follows from the
-older build or the Java tests.
+The [Android integration receipt](../evidence/2026-10-18-android-campaign-integration/README.md)
+records local source `7d894450`, followed by resident-Dungeon readiness correction
+`6d4033d3`. The selected full host matrix passes 15/15 Debug and 15/15 Release;
+[Java evidence](../evidence/2026-10-18-android-save-menu/README.md) preserves the
+initial 81/81 run and final affected 24/24 run with their separate source hashes.
+Both Windows applications and all four Android ABIs build. The rejected first
+New Game camera remains in the [phone receipt](../evidence/2026-10-18-android-campaign-device/README.md);
+the corrected doorway-facing opening was physically accepted on `bb4175ff`.
+There is no current opening-camera rebuild blocker.
 
-Still incomplete: physical seeded lower/exterior manual-and-auto load and restart,
-Home/return camera/control/audio checks, Windows adapter/menu, death-screen Load,
-forest-end and complete route recovery, platform process-death and power-loss
-acceptance. The next acceptance checkpoint uses an isolated test namespace and
-compares the restored live game with the seeded records; it must not migrate,
-clear or overwrite owner saves. Durable receipt distinctions and uncertain-write
-refresh remain part of that check. No further retention decision is needed.
+On `ca08919a`, seeded lower manual Load restored one heart, RT presentation and
+the opened rescue view. Keep records left all six records unchanged. Explicit
+Slot 2 manual replacement changed only that target; the other five remained
+unchanged and Slot 1 stayed active for autosaves. Upper autosave Load restored
+three hearts/night/RT and survived same-generation Home. However Descend stayed
+Preparing, so testing stopped before fresh-process reload. The exact results
+remain a blocked-candidate receipt, not a full Save/Load acceptance pass.
+
+The renderer adapter had skipped resident Dungeon zone 0. The
+[readiness repair](../evidence/2026-10-18-android-campaign-integration/readiness-fix.json)
+queries that zone through real scene readiness and preserves GPU proof. All four
+focused native suites pass in Debug and Release, including 25 new adapter checks.
+The separately sealed
+[physical follow-up](../evidence/2026-10-18-android-campaign-readiness-followup/README.md)
+on `5eb3282a`, source `6d4033d3`, now passes the bounded isolated persistence
+acceptance. Upper Load restored three hearts/current RT and enabled Descend. One
+tap entered actual Traversing, followed by pause/Quit before landing. After zero
+activities and termination of only the verified cached test process, a proven
+fresh process loaded the prior actual Slot 2 manual record: one heart/current RT,
+lower pose, enabled Climb and normal controls, without retained traversal.
+Terminal Quit left zero activities. All six record hashes and settings remained
+unchanged, all 274 prior paths were retained, current 281-path inventory was
+unchanged and owner `campaign-v1` remained absent; logs contained no fatal lines.
+This scoped pass does not replace the earlier blocked candidate's history.
+
+Windows adapter/menu and death-screen Load remain the next implementation seams.
+Full descent/landing, earning checkpoints/autosaves through normal phone gameplay,
+forest-end/full-route recovery, interruption during active save/load, power-loss,
+audio/controller/comfort and sustained performance are not accepted. Reported
+file/directory flush is not a physical power-loss test. The independent torch
+motion probe's [crouch-input repair](../evidence/2026-10-18-live-torch-crouch-probe/README.md)
+now passes Debug/Release at all four input rates. The later diagnostic APK was
+not installed and supplies no new physical/performance claim. Owner records are untouched; use only the isolated
+namespace for any future fixture, without migration, data clearing or destructive
+cleanup. Retention is settled.
 
 Earlier unresolved-policy and stop-for-review wording below belongs to its
 preserved pre-implementation snapshot. This update and Project Decisions

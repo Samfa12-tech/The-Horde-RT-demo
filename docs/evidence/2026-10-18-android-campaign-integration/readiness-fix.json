@@ -192,5 +192,6 @@
       "sha256": "a862de1922ee6de51e434b31a312e642f226db82c6658128ae540db5c3ebfee7",
       "bytes": 2232
     }
-  ]
+  ],
+  "later_physical_followup": "../2026-10-18-android-campaign-readiness-followup/validation.json: bounded isolated cases PASS on source6d4033d3 / installed5eb3282a, earlier candidate outcomes retained"
 }
