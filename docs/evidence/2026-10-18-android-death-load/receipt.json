@@ -1,0 +1,78 @@
+{
+  "date": "2026-10-18",
+  "scope": "Android death-screen Load UI; real Activity methods with immutable fake JNI, no native storage/device",
+  "command_from_android": ".\\gradlew.bat --offline --no-daemon --max-workers=2 testDebugUnitTest --tests com.samfa12.hordelanternrt.CampaignMenuStateTest --tests com.samfa12.hordelanternrt.CampaignMenuIntegrationTest --tests com.samfa12.hordelanternrt.DeathRecoveryTest --tests com.samfa12.hordelanternrt.AndroidControllerIntegrationTest --tests com.samfa12.hordelanternrt.SurfaceSuspensionLifecycleTest --tests com.samfa12.hordelanternrt.GameplayTouchCancellationTest --console=plain",
+  "observed_gradle_result": "BUILD SUCCESSFUL in 26s",
+  "exit_code": 0,
+  "tests": 82,
+  "failures": 0,
+  "errors": 0,
+  "suites": [
+    {
+      "suite": "CampaignMenuStateTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xml_sha256": "06f49b9e06406bd9c6a655045d85c244084e705be86b0898f2028817a04e37e0"
+    },
+    {
+      "suite": "CampaignMenuIntegrationTest",
+      "tests": 26,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xml_sha256": "ed8366b3c0962d09d9557b1f48933b72c0a63513ed342cb927d4562d1f497ac3"
+    },
+    {
+      "suite": "DeathRecoveryTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xml_sha256": "796dd1cf485f4b901acef8b235130c6b628d18063c050dd45d06484eb4b8f713"
+    },
+    {
+      "suite": "AndroidControllerIntegrationTest",
+      "tests": 35,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xml_sha256": "372c8bb3d539df5d237f9cd6530b13d91436a9aed78d8dbeec6f7ecc7e0dcc09"
+    },
+    {
+      "suite": "SurfaceSuspensionLifecycleTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xml_sha256": "a36c8206c14aa53d3b73f0151a4201550393d343ea0cd1429565c74dbe2e0c5b"
+    },
+    {
+      "suite": "GameplayTouchCancellationTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xml_sha256": "bc66dc5b623db8a5ad37094096275a6a01369e79a224674dc2d4ab9d4360a23a"
+    }
+  ],
+  "sources_sha256": {
+    "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java": "384f68137f556f26414d3c48c8027d4b957b4d41cc1a6c74fdfbb4bf587d116c",
+    "android/app/src/test/java/com/samfa12/hordelanternrt/CampaignMenuIntegrationTest.java": "b9a7fb66b0d04aa68b8c00916e27c7cc940f855ed169fac5830b4bb46fdb5ab5"
+  },
+  "baseline": {
+    "result": "1 test failed: Death card needs Load",
+    "xml_sha256": "7ed42ba9a91a9ceb8f9f0a8969b773fd386bcd39173cf3d44d1bba6a74b54c75",
+    "source": {
+      "MainActivity.java_sha256": "419d409a8ddd618fec018b3bd8b4b2992514d5951404f0a6a86882b377670035"
+    }
+  },
+  "raw_directory": "reports/2026-10-18-android-death-load",
+  "acceptance_limits": [
+    "No Android assemble/native build or phone interaction by this subagent",
+    "No real owner saves or storage IO in Java tests",
+    "Physical death -> Load -> paused restore -> alive Resume/controller/Home acceptance remains untested",
+    "No Windows/CMake/chapter-earned hook changes"
+  ]
+}

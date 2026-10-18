@@ -500,6 +500,9 @@ public class MainActivity extends Activity {
             "Save state is unavailable for the current game surface.";
     private CampaignMenuState campaignState;
     private boolean campaignMenuVisible, campaignConfigured, campaignLoadedReady, campaignPublicationValid;
+    private boolean campaignFromDeath, campaignDeathLoadCommitted, campaignReturnToDeathWhenSettled;
+    private long campaignDeathLoadRequest;
+    private String campaignDeathMessage;
     private volatile boolean campaignDestroyed;
     private String campaignTestNamespace, campaignLocalMessage;
     private int campaignMenuAction=CampaignMenuState.LOAD, campaignAction;
@@ -1360,8 +1363,14 @@ public class MainActivity extends Activity {
 
     private void showCampaignMenu(int action) {
         if(campaignState!=null && campaignState.pending()) return;
+        if(deathOverlayVisible && (action!=CampaignMenuState.LOAD || retryPending)) return;
+        campaignFromDeath=deathOverlayVisible;
+        campaignDeathLoadCommitted=false;
+        campaignReturnToDeathWhenSettled=false;
+        campaignDeathLoadRequest=0;
+        campaignDeathMessage=null;
         cancelPendingEntryPlay();
-        showMainMenu(false);
+        if(!campaignFromDeath) showMainMenu(false);
         campaignMenuAction=action;
         campaignMenuVisible=true;
         campaignLoadedReady=false;
@@ -1487,6 +1496,11 @@ public class MainActivity extends Activity {
             campaignAction=action;
             campaignLocalMessage=null;
             if(action==CampaignMenuState.LOAD || action==CampaignMenuState.NEW_GAME) campaignLoadedReady=false;
+            if(campaignFromDeath && action==CampaignMenuState.LOAD) {
+                campaignDeathLoadRequest=request;
+                campaignDeathLoadCommitted=false;
+                campaignReturnToDeathWhenSettled=false;
+            }
         }
         renderCampaignMenu();
     }
@@ -1513,6 +1527,18 @@ public class MainActivity extends Activity {
         if(!changed) state=campaignState;
         campaignPublicationValid=true;
         campaignState=state;
+        if(campaignFromDeath && campaignDeathLoadRequest>0 && state.ackRequest>=campaignDeathLoadRequest &&
+                state.lastOperation==CampaignMenuState.LOAD &&
+                (state.phase==CampaignMenuState.REBASE || state.phase==CampaignMenuState.PRESENTING ||
+                        (state.phase==CampaignMenuState.SUCCESS && state.presented))) campaignDeathLoadCommitted=true;
+        if(campaignFromDeath && !campaignDeathLoadCommitted &&
+                ((campaignReturnToDeathWhenSettled && state.ackRequest==campaignRequest && !state.pending()) ||
+                 (campaignDeathLoadRequest>0 && state.ackRequest>=campaignDeathLoadRequest &&
+                        state.lastOperation==CampaignMenuState.LOAD && state.phase==CampaignMenuState.FAILED))) {
+            campaignDeathMessage=state.error==0 ? null : state.message();
+            returnToDeathFromCampaign();
+            return;
+        }
         if(CAMPAIGN_SURFACE_UNAVAILABLE.equals(campaignLocalMessage) && state.error==0 &&
                 (state.phase==CampaignMenuState.READY || state.phase==CampaignMenuState.SUCCESS))
             campaignLocalMessage=null;
@@ -1582,9 +1608,17 @@ public class MainActivity extends Activity {
     private void backFromCampaignMenu() {
         dismissCampaignConfirmation();
         if(campaignBusy() || (campaignState!=null && campaignState.pending())) {
+            if(campaignFromDeath && !campaignDeathLoadCommitted) campaignReturnToDeathWhenSettled=true;
             sendCampaignRequest(CampaignMenuState.CANCEL,0,0);
             campaignLocalMessage="Cancellation requested. The game remains paused; checking the outcome…";
             renderCampaignMenu();
+            return;
+        }
+        if(campaignFromDeath) {
+            if(campaignDeathLoadCommitted) {
+                campaignLocalMessage="The checkpoint is loaded. Choose Resume after restoration finishes.";
+                renderCampaignMenu();
+            } else returnToDeathFromCampaign();
             return;
         }
         if(campaignLoadedReady) { resumeLoadedCampaign(false); return; }
@@ -1594,12 +1628,42 @@ public class MainActivity extends Activity {
         showMainMenu(false);
     }
 
+    private void returnToDeathFromCampaign() {
+        campaignMenuVisible=false;
+        campaignRequest=0;
+        campaignLoadedReady=false;
+        campaignReturnToDeathWhenSettled=false;
+        handler.removeCallbacks(refreshCampaignMenu);
+        renderDeathOverlay();
+    }
+
     private void resumeLoadedCampaign() { resumeLoadedCampaign(true); }
 
     private void resumeLoadedCampaign(boolean resume) {
         if(!campaignLoadedReady || campaignBusy() || !campaignPublicationValid || campaignState==null || !campaignState.current(surfaceRequestGeneration) ||
                 campaignState.phase!=CampaignMenuState.SUCCESS || campaignState.lastOperation!=CampaignMenuState.LOAD ||
                 campaignState.error!=0 || !campaignState.presented) return;
+        if(campaignFromDeath) {
+            if(!resume) return;
+            final int life;
+            final long vitality;
+            try { life=ProbeBridge.getPlayerLifePhase(); vitality=ProbeBridge.getPlayerVitalityState(); }
+            catch(RuntimeException | LinkageError unavailable) { return; }
+            final int current=(int)vitality, maximum=(int)(vitality>>>32);
+            if(life!=PLAYER_ALIVE || current<=0 || maximum<=0 || current>maximum) {
+                campaignLocalMessage="Waiting for the restored living player. The game remains paused.";
+                renderCampaignMenu();
+                return;
+            }
+            rebaseCampaignInput(campaignState);
+            deathOverlayVisible=false;
+            retryPending=false;
+            lastPlayerLifePhase=life;
+            updateVitalityHud(current,maximum);
+            campaignFromDeath=false;
+            campaignDeathLoadCommitted=false;
+            campaignDeathMessage=null;
+        }
         campaignMenuVisible=false; campaignRequest=0; campaignLoadedReady=false;
         entryPlayRequested=false; entryMenuEnabled=false; entryMenuSidePage=false; firstMenu=false;
         handler.removeCallbacks(refreshEntryMenu);
@@ -5069,6 +5133,10 @@ public class MainActivity extends Activity {
 
     private void showDeathOverlay() {
         if (deathOverlayVisible || graphicsVisible || playtestReportVisible || benchmarkRunning || debugCaptureUiSuppressed) return;
+        renderDeathOverlay();
+    }
+
+    private void renderDeathOverlay() {
         deathOverlayVisible = true;
         menuVisible = true;
         setGameplayPaused(true);
@@ -5087,6 +5155,8 @@ public class MainActivity extends Activity {
         menuScrim.removeAllViews();
 
         final LinearLayout panel = createPanel(getString(R.string.you_fell), getString(R.string.death_message));
+        if(campaignDeathMessage!=null) addBody(panel,campaignDeathMessage);
+        addMenuButton(panel,"Load checkpoint",() -> showCampaignMenu(CampaignMenuState.LOAD));
         addMenuButtonRow(panel,
                 getString(R.string.retry_encounter), this::retryEncounter,
                 getString(R.string.restart_route), this::restartAfterDeath);
@@ -5551,8 +5621,17 @@ public class MainActivity extends Activity {
         hideMenu();
     }
 
+    private void updateDeathRecoveryPresentation(int lifePhase) {
+        lastPlayerLifePhase=lifePhase;
+        if(deathOverlayVisible && lifePhase==PLAYER_ALIVE && !campaignFromDeath) {
+            deathOverlayVisible=false;
+            if(retryPending) { retryPending=false; firstMenu=false; hideMenu(); }
+            else showMainMenu(false);
+        }
+    }
+
     private void retryEncounter() {
-        if (retryPending) {
+        if (retryPending || (campaignFromDeath && campaignMenuVisible)) {
             return;
         }
         clearVerticalProofFeedbackSelection();
@@ -5562,6 +5641,8 @@ public class MainActivity extends Activity {
             return;
         }
         ++delayedGameplayFeedbackGeneration;
+        campaignFromDeath=false;
+        campaignDeathMessage=null;
         retryPending = true;
         suspendAndResetWaterfall();
         applyCheckpointViewPose(checkpoint);
@@ -5571,7 +5652,9 @@ public class MainActivity extends Activity {
     }
 
     private void restartAfterDeath() {
-        if (retryPending) return;
+        if (retryPending || (campaignFromDeath && campaignMenuVisible)) return;
+        campaignFromDeath=false;
+        campaignDeathMessage=null;
         // Keep the death menu paused until the simulation owner acknowledges
         // Alive, just as Retry Encounter does. An old Dead publication must
         // not reopen the menu between the reset request and its application.
@@ -5617,17 +5700,7 @@ public class MainActivity extends Activity {
                     final int finaleEndingPhase = ProbeBridge.getFinaleEndingPhase();
                     if (vitality != lastPlayerVitality || maximumVitality != lastPlayerMaxVitality)
                         updateVitalityHud(vitality, maximumVitality);
-                    lastPlayerLifePhase = lifePhase;
-                    if (deathOverlayVisible && lifePhase == PLAYER_ALIVE) {
-                        deathOverlayVisible = false;
-                        if (retryPending) {
-                            retryPending = false;
-                            firstMenu = false;
-                            hideMenu();
-                        } else {
-                            showMainMenu(false);
-                        }
-                    }
+                    updateDeathRecoveryPresentation(lifePhase);
                     final boolean showHud = preferences.getBoolean("show_hud", true);
                     if (!menuVisible && !benchmarkRunning && !debugCaptureUiSuppressed)
                         rtStatus.setVisibility(showHud && InterfacePreferences.read(preferences).routineStatus ? View.VISIBLE : View.GONE);
@@ -7642,9 +7715,14 @@ public class MainActivity extends Activity {
         campaignRebaseAttemptToken=campaignRebaseAttemptGeneration=campaignRebaseAttemptRevision=0;
         dismissCampaignConfirmation();
         if(campaignRequest!=0 || (campaignState!=null && campaignState.pending())) {
-            try { ProbeBridge.requestCampaign(CampaignMenuState.CANCEL,0,0,surfaceRequestGeneration); }
+            long cancellation=0;
+            try { cancellation=ProbeBridge.requestCampaign(CampaignMenuState.CANCEL,0,0,surfaceRequestGeneration); }
             catch(RuntimeException | LinkageError ignored) { /* Native lifecycle also revokes stale work. */ }
             campaignRequest=0;
+            if(campaignFromDeath && !campaignDeathLoadCommitted) {
+                campaignReturnToDeathWhenSettled=true;
+                if(cancellation>0) { campaignRequest=cancellation; campaignAction=CampaignMenuState.CANCEL; }
+            }
             campaignLocalMessage="Request interrupted. Refresh to check the records.";
         }
         handler.removeCallbacks(refreshCampaignMenu);
@@ -7692,7 +7770,7 @@ public class MainActivity extends Activity {
         ++delayedGameplayFeedbackGeneration;
         suspendAndResetWaterfall();
         if (vibrator != null) vibrator.cancel();
-        if (deathOverlayVisible || retryPending || endingOverlayVisible) {
+        if (!campaignFromDeath && (deathOverlayVisible || retryPending || endingOverlayVisible)) {
             retryPending = false;
             deathOverlayVisible = false;
             endingOverlayVisible = false;

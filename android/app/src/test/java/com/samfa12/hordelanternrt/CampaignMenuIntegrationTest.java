@@ -30,7 +30,8 @@ public final class CampaignMenuIntegrationTest {
     public static final class Bridge {
         static long[] state;
         static long next, ackToken, ackGeneration;
-        static int ackCalls, configurations;
+        static int ackCalls, configurations, lifePhase, retries, resets;
+        static long vitality;
         static String configuredPath;
         static boolean paused, acceptAck;
         static float yaw,pitch,x,z;
@@ -45,6 +46,11 @@ public final class CampaignMenuIntegrationTest {
         @Implementation protected static void setViewControls(float y,float p,float light,float xx,float zz,boolean c){yaw=y;pitch=p;x=xx;z=zz;order.add("input");}
         @Implementation protected static void setEntryMenu(boolean e,boolean s,boolean r,boolean p,long g){if(p)order.add("play");}
         @Implementation protected static int getSurfaceRuntimeState(long g){return 1;}
+        @Implementation protected static int getPlayerLifePhase(){return lifePhase;}
+        @Implementation protected static long getPlayerVitalityState(){return vitality;}
+        @Implementation protected static int retryEncounter(){retries++;return 2;}
+        @Implementation protected static void requestRouteReset(){resets++;}
+        @Implementation protected static boolean setDiagnosticSurfaceSuspended(long generation,boolean suspended){return true;}
         @Implementation protected static int getContextualControlState(){return 0;}
         @Implementation protected static void clearRunIntent(){}
         @Implementation protected static void clearCrouchIntent(){}
@@ -89,6 +95,7 @@ public final class CampaignMenuIntegrationTest {
         Bridge.state=CampaignMenuStateTest.ready(); Bridge.state[7]=1;
         Bridge.next=Bridge.ackToken=Bridge.ackGeneration=0; Bridge.paused=false; Bridge.acceptAck=true;Bridge.ackCalls=Bridge.configurations=0;Bridge.configuredPath=null;
         Bridge.actions.clear();Bridge.order.clear();Bridge.yaw=Bridge.pitch=Bridge.x=Bridge.z=0;
+        Bridge.lifePhase=Bridge.retries=Bridge.resets=0;Bridge.vitality=(3L<<32)|3;
         a=Robolectric.buildActivity(MainActivity.class).get();a.setContentView(R.layout.activity_main);
         set("preferences",a.getSharedPreferences("campaign-menu",Context.MODE_PRIVATE));
         set("resumed",true);set("firstMenu",false);set("surfaceStarted",true);set("surfaceRequestGeneration",31L);
@@ -265,5 +272,106 @@ public final class CampaignMenuIntegrationTest {
         set("campaignLocalMessage","Write outcome is uncertain. Refresh before saving again.");
         Bridge.state[2]++;call("pollCampaignMenu");
         assertTrue(menuText(a.findViewById(R.id.menu_scrim)).contains("Write outcome is uncertain."));
+    }
+    private void openDeathLoad()throws Exception {
+        Bridge.lifePhase=2;Bridge.vitality=3L<<32;
+        set("lastPlayerLifePhase",2);set("lastPlayerVitality",0);
+        call("showDeathOverlay");
+        Button load=find("Load checkpoint");assertNotNull("Death card needs Load",load);load.performClick();
+        Bridge.state[3]=Bridge.next;Bridge.state[2]++;call("pollCampaignMenu");
+    }
+    private void validLowerManual() {Bridge.state[12]=3;Bridge.state[13]=1;Bridge.state[14]=1;}
+    private void publishDeathLoadRebase()throws Exception {
+        Bridge.lifePhase=0;Bridge.vitality=(3L<<32)|1;
+        Bridge.state[2]++;Bridge.state[3]=Bridge.next;Bridge.state[4]=5;Bridge.state[8]=95;
+        Bridge.state[9]=Float.floatToIntBits(2.5f);Bridge.state[10]=Float.floatToIntBits(-.15f);Bridge.state[30]=3;
+        call("pollCampaignMenu");
+    }
+    private void publishDeathLoadSuccess()throws Exception {
+        Bridge.state[2]++;Bridge.state[3]=Bridge.next;Bridge.state[4]=7;Bridge.state[11]=1;call("pollCampaignMenu");
+    }
+    @Test public void deathCardLoadUsesExistingManualAutoChooserWithoutRetryResetOrUnpause()throws Exception {
+        validLowerManual();Bridge.state[15]=3;Bridge.state[16]=2;Bridge.state[17]=3;
+        float[] controls=(float[])field("viewControls").get(a);controls[7]=.5f;controls[8]=.6f;
+        openDeathLoad();
+        assertTrue(field("deathOverlayVisible").getBoolean(a));assertTrue(field("campaignFromDeath").getBoolean(a));
+        assertTrue(find("Load manual").isEnabled());assertTrue(find("Load latest autosave").isEnabled());
+        assertEquals(0,Bridge.x,0);assertEquals(0,Bridge.z,0);assertTrue(Bridge.paused);
+        assertEquals(0,Bridge.retries);assertEquals(0,Bridge.resets);assertFalse(Bridge.order.contains("unpaused"));
+    }
+    @Test public void deathLoadBackAndPrecommitCancelReturnDeathCardPaused()throws Exception {
+        validLowerManual();openDeathLoad();a.onBackPressed();
+        assertFalse(field("campaignMenuVisible").getBoolean(a));assertNotNull(find(a.getString(R.string.retry_encounter)));
+        assertTrue(field("deathOverlayVisible").getBoolean(a));assertTrue(Bridge.paused);
+        find("Load checkpoint").performClick();Bridge.state[2]++;Bridge.state[3]=Bridge.next;call("pollCampaignMenu");
+        choose(3,0,0);Bridge.state[2]++;Bridge.state[3]=Bridge.next;Bridge.state[4]=4;Bridge.state[30]=3;call("pollCampaignMenu");
+        a.onBackPressed();assertTrue(field("campaignMenuVisible").getBoolean(a));
+        Bridge.state[2]++;Bridge.state[3]=Bridge.next;Bridge.state[4]=1;Bridge.state[5]=8;call("pollCampaignMenu");
+        assertFalse(field("campaignMenuVisible").getBoolean(a));assertNotNull(find(a.getString(R.string.retry_encounter)));
+        assertTrue(field("deathOverlayVisible").getBoolean(a));assertTrue(Bridge.paused);assertEquals(0,Bridge.retries);
+    }
+    @Test public void failedDeathLoadReturnsOriginalDeathCardWithVisibleError()throws Exception {
+        validLowerManual();openDeathLoad();choose(3,0,0);
+        Bridge.state[2]++;Bridge.state[3]=Bridge.next;Bridge.state[4]=8;Bridge.state[5]=6;Bridge.state[30]=3;call("pollCampaignMenu");
+        assertFalse(field("campaignMenuVisible").getBoolean(a));assertTrue(field("deathOverlayVisible").getBoolean(a));
+        assertTrue(menuText(a.findViewById(R.id.menu_scrim)).contains("Storage could not complete"));
+        assertNotNull(find(a.getString(R.string.retry_encounter)));assertTrue(Bridge.paused);
+        assertEquals(2,field("lastPlayerLifePhase").getInt(a));assertFalse(Bridge.order.contains("unpaused"));
+    }
+    @Test public void deathLoadAlivePublicationAndHomeCannotTakeOverPendingMenu()throws Exception {
+        validLowerManual();openDeathLoad();choose(3,0,0);publishDeathLoadRebase();
+        call("updateDeathRecoveryPresentation",new Class<?>[]{int.class},0);
+        assertTrue(field("deathOverlayVisible").getBoolean(a));assertTrue(field("campaignMenuVisible").getBoolean(a));
+        a.onPause();assertTrue(field("campaignFromDeath").getBoolean(a));assertTrue(field("deathOverlayVisible").getBoolean(a));
+        assertTrue(field("campaignMenuVisible").getBoolean(a));assertTrue(Bridge.paused);
+        int oldAcks=Bridge.ackCalls;Bridge.state[2]++;Bridge.state[8]=96;call("pollCampaignMenu");assertEquals(oldAcks,Bridge.ackCalls);
+        set("resumed",true);call("pollCampaignMenu");assertEquals(96,Bridge.ackToken);
+        assertTrue(field("deathOverlayVisible").getBoolean(a));assertTrue(Bridge.paused);
+    }
+    @Test public void committedDeathLoadBackCompletesHandshakeAndOnlyExplicitAliveResumeClearsDeath()throws Exception {
+        validLowerManual();openDeathLoad();choose(3,0,0);publishDeathLoadRebase();a.onBackPressed();
+        assertEquals(95,Bridge.ackToken);assertTrue(field("campaignMenuVisible").getBoolean(a));
+        call("updateDeathRecoveryPresentation",new Class<?>[]{int.class},0);publishDeathLoadSuccess();
+        a.onBackPressed();assertTrue(field("campaignMenuVisible").getBoolean(a));
+        assertTrue(field("deathOverlayVisible").getBoolean(a));assertNotNull(find("Resume"));assertTrue(Bridge.paused);
+        float[] controls=(float[])field("viewControls").get(a);controls[7]=.7f;controls[8]=.5f;
+        find("Resume").performClick();
+        assertFalse(field("deathOverlayVisible").getBoolean(a));assertFalse(field("campaignFromDeath").getBoolean(a));
+        assertFalse(field("menuVisible").getBoolean(a));assertFalse(Bridge.paused);
+        assertEquals(0,field("lastPlayerLifePhase").getInt(a));assertEquals(1,field("lastPlayerVitality").getInt(a));
+        assertEquals(0,Bridge.x,0);assertEquals(0,Bridge.z,0);assertEquals(0,Bridge.retries);assertEquals(0,Bridge.resets);
+    }
+    @Test public void deathLoadCannotResumeIfNativeStillReportsDead()throws Exception {
+        validLowerManual();openDeathLoad();choose(3,0,0);publishDeathLoadRebase();publishDeathLoadSuccess();
+        Bridge.lifePhase=2;Bridge.vitality=3L<<32;find("Resume").performClick();
+        assertTrue(field("deathOverlayVisible").getBoolean(a));assertTrue(field("campaignMenuVisible").getBoolean(a));assertTrue(Bridge.paused);
+    }
+    @Test public void returnedDeathCardRetryKeepsItsAliveAcknowledgementPolicy()throws Exception {
+        validLowerManual();openDeathLoad();a.onBackPressed();find(a.getString(R.string.retry_encounter)).performClick();
+        assertEquals(1,Bridge.retries);assertTrue(field("retryPending").getBoolean(a));assertTrue(Bridge.paused);
+        call("updateDeathRecoveryPresentation",new Class<?>[]{int.class},0);
+        assertFalse(field("deathOverlayVisible").getBoolean(a));assertFalse(Bridge.paused);
+    }
+    @Test public void homeBeforeDeathLoadCommitReturnsDeathOnlyAfterMatchingCancelResult()throws Exception {
+        validLowerManual();openDeathLoad();choose(3,0,0);
+        Bridge.state[2]++;Bridge.state[3]=Bridge.next;Bridge.state[4]=4;Bridge.state[30]=3;call("pollCampaignMenu");
+        a.onPause();assertTrue(field("campaignFromDeath").getBoolean(a));assertTrue(field("deathOverlayVisible").getBoolean(a));
+        assertTrue(field("campaignMenuVisible").getBoolean(a));assertEquals(Bridge.next,field("campaignRequest").getLong(a));
+        Bridge.state[2]++;Bridge.state[3]=Bridge.next;Bridge.state[4]=1;Bridge.state[5]=8;
+        set("resumed",true);call("pollCampaignMenu");
+        assertFalse(field("campaignMenuVisible").getBoolean(a));assertTrue(field("deathOverlayVisible").getBoolean(a));
+        assertNotNull(find(a.getString(R.string.retry_encounter)));assertTrue(Bridge.paused);
+        assertFalse(Bridge.order.contains("unpaused"));
+    }
+    @Test public void detachedDeathRetryRestartCannotMutatePendingLoadAndReturnedRestartKeepsAckPolicy()throws Exception {
+        validLowerManual();Bridge.lifePhase=2;Bridge.vitality=3L<<32;set("lastPlayerLifePhase",2);call("showDeathOverlay");
+        Button retry=find(a.getString(R.string.retry_encounter)), restart=find(a.getString(R.string.restart_route));
+        find("Load checkpoint").performClick();Bridge.state[2]++;Bridge.state[3]=Bridge.next;call("pollCampaignMenu");
+        choose(3,0,0);retry.performClick();restart.performClick();assertEquals(0,Bridge.retries);assertEquals(0,Bridge.resets);
+        a.onBackPressed();Bridge.state[2]++;Bridge.state[3]=Bridge.next;Bridge.state[4]=1;Bridge.state[5]=8;call("pollCampaignMenu");
+        find(a.getString(R.string.restart_route)).performClick();assertEquals(1,Bridge.resets);
+        assertTrue(field("retryPending").getBoolean(a));assertTrue(field("deathOverlayVisible").getBoolean(a));assertTrue(Bridge.paused);
+        call("updateDeathRecoveryPresentation",new Class<?>[]{int.class},0);
+        assertFalse(field("deathOverlayVisible").getBoolean(a));assertFalse(Bridge.paused);
     }
 }
