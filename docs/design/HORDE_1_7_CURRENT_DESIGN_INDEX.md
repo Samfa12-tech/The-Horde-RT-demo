@@ -1,5 +1,11 @@
 # Horde 1.7 current design index
 
+The [Android Back confirmation](../evidence/2026-10-18-android-back-confirmation/README.md)
+now guards both top-level Back exits with a native Stay/Quit dialog. Stay is
+focused; stale taps and lifecycle dismissal cannot exit later. Sixty focused
+Java checks pass. Physical current-build interaction remains open. This is
+separate from the older sealed phone startup proof below.
+
 The [current full host save/load checkpoint](../evidence/2026-10-18-campaign-session/README.md)
 connects real bounded IO, three separate manual/latest-autosave pairs, actual
 simulation capture and token-bound terrain/simulation/camera/input transaction.

@@ -472,6 +472,28 @@ public final class GraphicsPreviewOptionsTest {
         }
         return null;
     }
+    @Test public void backFromPreviewKeepsGraphicsRestoreAndPendingSettingsInsteadOfExiting() throws Exception {
+        MainActivity activity=livePreviewFixture();
+        SharedPreferences prefs=(SharedPreferences)get(activity,"preferences");
+        assertTrue(GraphicsPreferences.markPending(prefs,confirmed));
+        activity.onBackPressed();
+        assertEquals(false,get(activity,"graphicsPreviewWanted"));
+        assertEquals(true,get(activity,"graphicsVisible"));
+        assertEquals(true,get(activity,"graphicsSceneRestoring"));
+        assertEquals(true,get(activity,"graphicsAwaitingRestore"));
+        assertEquals(false,get(activity,"graphicsCloseAfterRevert"));
+        assertSame(draft,get(activity,"graphicsRestoreDraftAfterPreview"));
+        assertTrue(GraphicsPreferences.hasPending(prefs));
+        assertTrue(GraphicsPreferences.confirmed(prefs).same(confirmed));
+        assertFalse(activity.isFinishing());
+        assertNull(org.robolectric.shadows.ShadowAlertDialog.getLatestAlertDialog());
+        activity.onBackPressed(); // Still on Graphics: close must wait for the normal restore ACK.
+        assertEquals(true,get(activity,"graphicsCloseAfterRevert"));
+        assertEquals(true,get(activity,"graphicsAwaitingRestore"));
+        assertTrue(GraphicsPreferences.hasPending(prefs));assertFalse(activity.isFinishing());
+        assertNull(org.robolectric.shadows.ShadowAlertDialog.getLatestAlertDialog());
+    }
+
     @Test public void productionShadowPreviewMenuOffersOnlyCurrentAndHigher() throws Exception {
         MainActivity activity=livePreviewFixture(); GraphicsBridgeShadow.epoch=10;
         ((Runnable)get(activity,"refreshGraphics")).run();

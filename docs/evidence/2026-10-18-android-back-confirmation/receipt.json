@@ -1,0 +1,49 @@
+{
+  "date": "2026-10-18",
+  "worktree": "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof",
+  "headObservedAfterTests": "b7f8e169fa57486f9ac4d4341590454695362944",
+  "changesUncommittedAtReceipt": true,
+  "testedSha256": {
+    "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java": "DFA721E3EAF290EAE17767B99471D0970AA0506CACECE2E5C2D00AAF5493FDDD",
+    "android/app/src/test/java/com/samfa12/hordelanternrt/AndroidControllerIntegrationTest.java": "B7B8F1C9E50110A33F5027AACA67B89B33ACB7236044B7C8CCD5BC9413625191",
+    "android/app/src/test/java/com/samfa12/hordelanternrt/GraphicsPreviewOptionsTest.java": "BF9AB897A734BEEBC961AB528E096C37FF85A8698400F51413CE21996175861F"
+  },
+  "baseline": {
+    "tests": 1,
+    "failures": 1,
+    "errors": 0,
+    "skipped": 0,
+    "assertion": "Back must not close the Activity before explicit confirmation",
+    "junitSeconds": 5.313,
+    "gradleExitCode": 1,
+    "gradleSeconds": 23
+  },
+  "intermediateFailures": [
+    {
+      "tests": 58,
+      "failures": 1,
+      "gradleSeconds": 43,
+      "cause": "Host assertion preceded native negative-button posted dismissal; drain the UI message before asserting."
+    },
+    {
+      "tests": 60,
+      "failures": 1,
+      "gradleSeconds": 30,
+      "cause": "Queued positive tap after cancel was admitted before onDismiss cleared ownership; fixed by also requiring dialog.isShowing()."
+    }
+  ],
+  "fixed": {
+    "AndroidControllerIntegrationTest": { "tests": 31, "failures": 0, "errors": 0, "skipped": 0, "junitSeconds": 11.438 },
+    "GraphicsPreviewOptionsTest": { "tests": 19, "failures": 0, "errors": 0, "skipped": 0, "junitSeconds": 3.530 },
+    "GraphicsMenuLifecycleTest": { "tests": 3, "failures": 0, "errors": 0, "skipped": 0, "junitSeconds": 3.087 },
+    "MainActivityPlaytestReportLifecycleTest": { "tests": 7, "failures": 0, "errors": 0, "skipped": 0, "junitSeconds": 3.195 },
+    "totalTests": 60,
+    "gradleExitCode": 0,
+    "gradleSeconds": 42
+  },
+  "evidenceClass": "Production Java compiled; host UI/lifecycle/controller checks with Robolectric SDK34 and existing JNI shadows",
+  "nativeAndroidBuild": false,
+  "deviceInteraction": false,
+  "ownerSaveAccess": false,
+  "remainingAcceptance": "Current-build physical Back/button/gesture, native dialog focus/touch, background return and controller interaction."
+}

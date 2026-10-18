@@ -353,6 +353,7 @@ public class MainActivity extends Activity {
     private boolean diagnosticsErrorState;
     private boolean autoDiagnosticsShown;
     private boolean firstMenu = true;
+    private AlertDialog backExitDialog;
     private int swingVariant;
     private int playerStepVariant;
     private int enemyStepVariant;
@@ -6963,8 +6964,54 @@ public class MainActivity extends Activity {
         }
     }
 
+    private boolean isBackExitBoundary() {
+        return menuVisible && (entryMenuEnabled || firstMenu) && !entryMenuSidePage &&
+                !entryPlayRequested && !interfaceVisible && !graphicsVisible && !graphicsSceneRestoring &&
+                !playtestReportVisible && !diagnosticsVisible && !rtLabVisible &&
+                !benchmarkSummaryVisible && !benchmarkReportVisible && !benchmarkRunning &&
+                benchmarkAutomationId == null && !deathOverlayVisible && !endingOverlayVisible;
+    }
+
+    private void dismissBackExitConfirmation() {
+        final AlertDialog dialog = backExitDialog;
+        backExitDialog = null;
+        if (dialog != null) dialog.dismiss();
+    }
+
+    private void showBackExitConfirmation() {
+        if (!isBackExitBoundary() || isFinishing() || isDestroyed()) return;
+        if (backExitDialog != null && backExitDialog.isShowing()) return;
+        final AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("Exit The Horde?")
+                .setMessage("Close The Horde and return to Android?")
+                .setNegativeButton("Stay", null)
+                .setPositiveButton(R.string.quit, null)
+                .create();
+        backExitDialog = dialog;
+        dialog.setOnDismissListener(ignored -> {
+            if (backExitDialog == dialog) backExitDialog = null;
+        });
+        dialog.setCanceledOnTouchOutside(true);
+        dialog.show();
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(view -> {
+            // A delayed tap cannot exit after navigation, lifecycle cancellation or a newer dialog.
+            final boolean current = backExitDialog == dialog && dialog.isShowing() && isBackExitBoundary() &&
+                    !isFinishing() && !isDestroyed();
+            dialog.dismiss();
+            if (current) finishAndRemoveTask();
+        });
+        installControllerDialog(dialog);
+        final Button stay = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+        stay.setFocusableInTouchMode(true);
+        stay.requestFocus();
+    }
+
     @Override
     public void onBackPressed() {
+        if (backExitDialog != null && backExitDialog.isShowing()) {
+            backExitDialog.cancel();
+            return;
+        }
         if (benchmarkSummaryVisible) {
             showBenchmarkReport(true);
             return;
@@ -7001,8 +7048,9 @@ public class MainActivity extends Activity {
         }
         if (entryMenuEnabled && menuVisible) {
             // The Entry front page owns Back until native reports current Showcase
-            // presentation; never fall through to a path that hides or unpauses it.
+            // presentation; staying in the confirmation never hides or unpauses it.
             playSound("ui_back", 0.18f);
+            showBackExitConfirmation();
             return;
         }
         if (deathOverlayVisible) {
@@ -7030,7 +7078,7 @@ public class MainActivity extends Activity {
             showMainMenu(false);
         } else {
             if (firstMenu) {
-                finishAndRemoveTask();
+                showBackExitConfirmation();
             } else {
                 playSound("ui_back", 0.18f);
                 hideMenu();
@@ -7181,6 +7229,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onPause() {
+        dismissBackExitConfirmation();
         pauseChapterVoice(true);
         cancelCombatTeachingPromptPoll();
         clearCombatTeachingPrompt();
@@ -7255,6 +7304,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
+        dismissBackExitConfirmation();
         logSurfaceLifecycle("destroy");
         handler.removeCallbacks(controllerFrame);
         if (inputManager != null) inputManager.unregisterInputDeviceListener(controllerDevices);

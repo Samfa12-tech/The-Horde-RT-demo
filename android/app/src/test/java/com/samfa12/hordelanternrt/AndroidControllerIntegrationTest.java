@@ -28,6 +28,7 @@ import org.robolectric.annotation.Config;
 import org.robolectric.annotation.Implementation;
 import org.robolectric.annotation.Implements;
 import org.robolectric.shadows.ShadowSystemClock;
+import org.robolectric.shadows.ShadowAlertDialog;
 import java.time.Duration;
 
 @RunWith(RobolectricTestRunner.class)
@@ -216,6 +217,78 @@ public class AndroidControllerIntegrationTest {
         View root=(View)field("menuScrim").get(a);Button b=findButton(root,text);assertNotNull(text,b);
         b.setFocusableInTouchMode(true);assertTrue(b.requestFocus());press(KeyEvent.KEYCODE_BUTTON_A);
     }
+    @Test public void backAtFirstMenuRequiresExplicitExitConfirmation()throws Exception {
+        set("menuVisible",true);set("firstMenu",true);
+        a.onBackPressed();
+        assertFalse("Back must not close the Activity before explicit confirmation",a.isFinishing());
+        AlertDialog dialog=ShadowAlertDialog.getLatestAlertDialog();
+        assertNotNull(dialog);assertTrue(dialog.isShowing());
+        assertEquals("Stay",dialog.getButton(AlertDialog.BUTTON_NEGATIVE).getText().toString());
+        assertTrue(dialog.getButton(AlertDialog.BUTTON_NEGATIVE).hasFocus());
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
+        assertTrue("only the explicit Exit choice closes the Activity",a.isFinishing());
+    }
+
+    @Test public void entryBackStayCancelAndRepeatedBackPreserveTheCurrentMenuAndPreferences()throws Exception {
+        set("entryMenuEnabled",true);call("showEntryMenu",new Class<?>[]{boolean.class},false);
+        android.content.SharedPreferences prefs=a.getSharedPreferences("controller-integration",Context.MODE_PRIVATE);
+        prefs.edit().putInt("voice_volume",43).commit();java.util.Map<String,?> saved=prefs.getAll();
+        a.onBackPressed();AlertDialog first=ShadowAlertDialog.getLatestAlertDialog();
+        assertNotNull(first);assertTrue(first.isShowing());assertFalse(a.isFinishing());
+        a.onBackPressed();assertFalse(first.isShowing());assertFalse(a.isFinishing());
+        a.onBackPressed();AlertDialog stay=ShadowAlertDialog.getLatestAlertDialog();
+        assertNotSame(first,stay);stay.getButton(AlertDialog.BUTTON_NEGATIVE).performClick();
+        org.robolectric.shadows.ShadowLooper.idleMainLooper(); // Native button dismissal is posted.
+        assertFalse(a.isFinishing());assertFalse(stay.isShowing());
+        a.onBackPressed();AlertDialog cancel=ShadowAlertDialog.getLatestAlertDialog();cancel.cancel();
+        assertFalse(cancel.isShowing());assertFalse(a.isFinishing());
+        // A dismissed view can still receive a queued/accessibility click; it must not close the game.
+        cancel.getButton(AlertDialog.BUTTON_POSITIVE).performClick();assertFalse(a.isFinishing());
+        assertTrue(field("menuVisible").getBoolean(a));assertTrue(Bridge.paused);
+        assertFalse(field("entryPlayRequested").getBoolean(a));assertEquals(saved,prefs.getAll());
+    }
+
+    @Test public void exitConfirmationRejectsStaleNavigationAndControllerCancelDoesNotLeakIntoGameplay()throws Exception {
+        set("entryMenuEnabled",true);call("showEntryMenu",new Class<?>[]{boolean.class},false);
+        a.onBackPressed();AlertDialog stale=ShadowAlertDialog.getLatestAlertDialog();
+        call("showSettings",new Class<?>[]{});stale.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
+        assertFalse(a.isFinishing());assertTrue(field("entryMenuSidePage").getBoolean(a));
+        a.onBackPressed();assertFalse(field("entryMenuSidePage").getBoolean(a));
+        set("controllerMode",true);a.onBackPressed();AlertDialog dialog=ShadowAlertDialog.getLatestAlertDialog();
+        focusDialog(dialog,true);
+        dialog.dispatchKeyEvent(key(KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_BUTTON_B,0));
+        dialog.dispatchKeyEvent(key(KeyEvent.ACTION_UP,KeyEvent.KEYCODE_BUTTON_B,0));
+        assertFalse(dialog.isShowing());assertFalse(a.isFinishing());
+        a.onBackPressed();AlertDialog defaultStay=ShadowAlertDialog.getLatestAlertDialog();
+        focusDialog(defaultStay,true);
+        defaultStay.dispatchKeyEvent(key(KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_BUTTON_A,0));
+        defaultStay.dispatchKeyEvent(key(KeyEvent.ACTION_UP,KeyEvent.KEYCODE_BUTTON_A,0));
+        org.robolectric.shadows.ShadowLooper.idleMainLooper();
+        assertFalse(defaultStay.isShowing());assertFalse(a.isFinishing());
+        assertEquals(0,Bridge.dodges);assertEquals(0,Bridge.interacts);assertEquals(0,Bridge.attacks);
+    }
+
+    @Test public void sidePagePendingPlayAndGameplayBackKeepTheirExistingReturnPaths()throws Exception {
+        set("entryMenuEnabled",true);call("showEntryMenu",new Class<?>[]{boolean.class},false);
+        call("showSettings",new Class<?>[]{});a.onBackPressed();
+        assertFalse(field("entryMenuSidePage").getBoolean(a));assertNull(ShadowAlertDialog.getLatestAlertDialog());
+        set("entryPlayRequested",true);a.onBackPressed();
+        assertFalse(field("entryPlayRequested").getBoolean(a));assertNull(ShadowAlertDialog.getLatestAlertDialog());
+        set("entryMenuEnabled",false);set("firstMenu",false);set("menuVisible",false);
+        a.onBackPressed();assertTrue(field("menuVisible").getBoolean(a));assertTrue(Bridge.paused);
+        a.onBackPressed();assertFalse(field("menuVisible").getBoolean(a));assertFalse(Bridge.paused);
+        assertFalse(a.isFinishing());assertNull(ShadowAlertDialog.getLatestAlertDialog());
+    }
+
+    @Test public void pauseRevokesExitConfirmationAndDelayedPositiveTapCannotExit()throws Exception {
+        set("entryMenuEnabled",true);call("showEntryMenu",new Class<?>[]{boolean.class},false);
+        a.onBackPressed();AlertDialog dialog=ShadowAlertDialog.getLatestAlertDialog();
+        assertTrue(dialog.isShowing());a.onPause();
+        assertFalse(dialog.isShowing());assertNull(field("backExitDialog").get(a));
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();assertFalse(a.isFinishing());
+        assertTrue(field("menuVisible").getBoolean(a));assertTrue(Bridge.paused);
+    }
+
     @Test public void startPauseSettingsAndGraphicsAreRealNativeControllerRoutes()throws Exception {
         set("firstMenu",false);press(KeyEvent.KEYCODE_BUTTON_START);assertTrue(field("menuVisible").getBoolean(a));assertTrue(Bridge.paused);
         confirmLabel(a.getString(R.string.settings));
