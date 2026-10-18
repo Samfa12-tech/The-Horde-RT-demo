@@ -72,10 +72,28 @@ configurations. These are affected checks, not a complete release gate.
   and stalls at approximately `(0, -2.995)`. The save-route fixture traverses it
   with actual crouch input. This diagnostic input gap is retained for the next
   bounded fix; it is not an RT/performance pass or a reason to weaken collision.
-- Seeded physical load/save/Home/restart acceptance is pending the replacement
-  exact APK. Seeded records will be labelled as persistence fixtures, not proof
-  of earning either checkpoint through phone gameplay. Debug test files use a
-  visibly isolated namespace; normal owner save records remain untouched.
+- On exact final candidate `ca08919a…18a9`, the seeded lower manual load reached
+  RT presentation and its opened live view showed one heart at the rescue anchor.
+  Keep records cancellation preserved all six hashes. Explicit replacement of
+  Slot 2 manual succeeded with `FileAndDirectoryFlushed`; its 162 bytes exactly
+  matched the lower fixture, the other five records stayed unchanged, and Slot 1
+  remained active for autosaves. The upper autosave restored three hearts and
+  presented the night exterior, including same-generation Home/return, but the
+  contextual descent control stayed disabled as Preparing rescue route. Testing
+  stopped and Quit cleanly before restart. All 274 prior file paths and the
+  settings hash were preserved; only seven test-namespace files were added.
+  The renderer adapter skipped the resident dungeon zone, leaving its reconstructed
+  readiness unprepared. That is a real acceptance defect, not a full Save/Load
+  pass. The bounded adapter repair and upper/restart follow-up are pending.
+  Seeded records prove persistence behavior, not earning either checkpoint through
+  phone gameplay; normal owner save records remain untouched.
+- The [bounded readiness repair](readiness-fix.json) now queries resident Dungeon
+  zone 0 through the existing real scene readiness API. Exterior publications
+  still require the scene's terrain; the GPU proof is unchanged. All four selected
+  native suites pass in Debug and Release, including 25 new adapter checks and
+  actual CPU motor descent. Both Windows applications and all four Android ABIs
+  build. New APK `5eb3282a…9128` is sealed for only upper descent admission and
+  fresh-process reload; that physical follow-up is still pending.
 - Death-menu Load, the Windows adapter, later campaign checkpoints, power-loss
   durability, full audio/route acceptance and sustained performance remain open.
   Existing exterior/two-torch performance blockers are not closed by this work.

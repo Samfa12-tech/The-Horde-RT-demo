@@ -3202,3 +3202,31 @@ and comfort remain unaccepted. This does not establish Save/Load, process-death
 recovery or platform/power-loss durability. No extra forest or performance trial
 ran, and no redundant APK copy/pull occurred.
 [Exact sequence, limits, screenshots and custody hashes](evidence/2026-10-18-android-crouch-device/README.md).
+
+### 18 October - isolated persistence review, upper return blocked
+
+Owner-authorized **SM-S948B**, Android **17 / API 37**, build
+`CP2A.260605.016.S948BXXS4BZIG`. Source commit
+`7d89445030727a9099524c3728c190dfd636e51b`, same-signer Debug code 10 APK,
+SHA-256 `ca08919a8c63aac269b4fc68a02bde706131a25a92d8765acd550297841918a9`
+(183,957,866 bytes), installed compatibly in place and matched by device hash.
+
+Evidence class: six tiny **seeded persistence fixtures**, actual UI and opened
+phone screenshots, native rebase/presentation transitions. Isolated namespace
+`sl-20261018-r1-8b14` only. Lower manual load/Resume shows 1/3 hearts and the rope
+anchor; Keep records cancellation preserves all six hashes. Confirmed manual
+replacement in Slot 2 reports `FileAndDirectoryFlushed` and becomes byte-identical
+to the lower fixture; other five records remain unchanged. Upper autosave loads
+and presents with 3/3 hearts, but disabled Preparing rescue route persists before/
+after same-generation Home/resume and one bounded final check. Upper descent is
+**blocked**, not accepted; the fresh-process reload was not run after this failure.
+This is not a completed Save/Load or normal chapter-completion certification.
+
+Terminal explicit Quit leaves zero Horde activities. The 274 original paths and
+Horde settings bytes are preserved; seven added files are confined to the test
+namespace. Owner `campaign-v1` remains absent. No uninstall, clearing, deletion,
+settings rollback, process kill, Release/desktop/Reef action or APK copy/pull
+occurred. Earlier wrong-camera and corrected opening-only APK observations are
+retained separately in the receipt. No sustained performance, full traversal,
+power-loss durability or audio/haptic acceptance is claimed.
+[Exact blocked receipt, prior attempts, hashes and remaining gates](evidence/2026-10-18-android-campaign-device/README.md).
