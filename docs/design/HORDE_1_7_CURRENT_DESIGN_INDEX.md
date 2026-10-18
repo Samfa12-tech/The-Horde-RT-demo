@@ -1,5 +1,24 @@
 # Horde 1.7 current design index
 
+## Current Windows parity and earned recovery checkpoint - 18 October 2026
+
+The [Windows campaign menu/owner receipt](../evidence/2026-10-18-windows-campaign/README.md)
+records three-slot New Game/Save/Load, retained-game resource preparation, neutral
+input/camera rebase, fresh RT presentation, explicit Resume and combat-death Load.
+Its native HWND/worker/RT validation stays hidden and preserves foreground focus;
+visible/controller acceptance remains open. The [Android death Load receipt](../evidence/2026-10-18-android-death-load/README.md)
+records 82 host checks and four-ABI Debug/unsigned Release builds, with no new
+installation or attribution of older phone evidence to the new APKs.
+
+The [chapter-earned recovery receipt](../evidence/2026-10-18-earned-campaign-recovery/README.md)
+connects ordinary-input lower/upper milestones to real disk manual/autosaves and
+fresh production-session interrupted/full descent recovery (106 checks per
+configuration). It closes a host proof gap without changing checkpoint policy or
+schema. Physical earning, death Load on the fresh APK, forest-end/full-route,
+audio/controller/comfort and the recorded rendering/performance gates remain.
+Prioritize a bounded physical acceptance pass or a quality-preserving hypothesis
+against the pinned performance blocker before adding heavy outside content.
+
 ## Current Android save milestone - 18 October 2026
 
 The Android three-slot menu/native path is implemented: New Game slot choice,
@@ -46,9 +65,9 @@ prior paths remain, the 281-path inventory is unchanged, and owner `campaign-v1`
 remains absent. Terminal Quit leaves zero activities and logs show no fatal lines.
 This separate pass does not rewrite the earlier blocked candidate's result.
 
-The bounded seeded persistence milestone is complete. Windows adapter/menu and
-death-screen Load remain next implementation seams. Full descent/landing,
-chapter-earned saves/autosaves, forest-end/full-route recovery, active-IO
+The earlier bounded seeded Android persistence milestone is complete. The current
+Windows/death-Load and earned host recovery checkpoints are recorded above.
+Physical full descent/landing and chapter-earned saves/autosaves, forest-end/full-route recovery, active-IO
 interruption, power-loss, audio/controller/comfort and sustained performance are
 not accepted by these fixtures. The independent torch motion probe's
 [crouch-input repair](../evidence/2026-10-18-live-torch-crouch-probe/README.md)

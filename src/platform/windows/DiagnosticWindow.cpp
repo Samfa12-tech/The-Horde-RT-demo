@@ -5,6 +5,9 @@
 #include "platform/windows/WindowsSkyAttributionLaunch.h"
 #include "platform/windows/WindowsMusicPlayback.h"
 #include "platform/windows/WindowsMusicFocus.h"
+#include "platform/windows/WindowsCampaignMenu.h"
+#include "gameplay/campaign/CampaignPlaySession.h"
+#include "gameplay/campaign/CampaignLoadBarrier.h"
 #include "platform/windows/GraphicsMenuNavigation.h"
 #include "platform/windows/WindowsPlaytestReport.h"
 #include "platform/windows/WindowsRemotePlaytestReport.h"
@@ -22,6 +25,7 @@
 
 #include <algorithm>
 #include <array>
+#include <atomic>
 #include <chrono>
 #include <cmath>
 #include <cstdint>
@@ -55,6 +59,7 @@
 #include <xinput.h>
 #include <bcrypt.h>
 #include <commdlg.h>
+#include <shlobj.h>
 #include <commctrl.h>
 #include <dwmapi.h>
 #include <mmsystem.h>
@@ -139,6 +144,19 @@ namespace
 {
 
 constexpr char kWindowClassName[] = "HordeRtDiagnosticWindowClass";
+constexpr int kCampaignSaveButtonId=4300,kCampaignLoadButtonId=4301;
+// Debug validation owns only an unshown HWND, isolated save directory and RT
+// targets. It must never acquire foreground input or touch the owner's INI.
+bool gCampaignHiddenValidation=false;
+bool gCampaignValidationHoldPreparation=false;
+std::filesystem::path gCampaignValidationDirectory;
+int GameMessageBoxA(HWND owner,const char* text,const char* title,UINT flags) {
+    if(gCampaignHiddenValidation){std::cerr<<"Hidden campaign validation suppressed dialog: "<<text<<'\n';return IDCANCEL;}
+    return ::MessageBoxA(owner,text,title,flags);
+}
+void FocusGameControl(HWND control) {
+    if(!gCampaignHiddenValidation && control) ::SetFocus(control);
+}
 constexpr char kWindowTitle[] = "Horde Lantern RT - Showcase Alpha " HORDE_RT_DISPLAY_VERSION;
 constexpr char kHudStartingText[] = "ALPHA " HORDE_RT_DISPLAY_VERSION "  |  VULKAN RT STARTING...  |  F1 CONTROLS  |  ESC MENU";
 constexpr char kHudActiveText[] = "RT ACTIVE | DIAGNOSTICS";
@@ -664,6 +682,19 @@ struct VulkanSurfaceContext
     bool benchmarkCompletionHandled = false;
     bool benchmarkReportsSaved = false;
     bool unattendedBenchmark = false;
+    std::unique_ptr<horde::gameplay::campaign::PlaySession> campaign;
+    std::unique_ptr<horde::platform::windows::WindowsCampaignMenu> campaignMenu;
+    std::optional<horde::platform::windows::WindowsCampaignMenu::Command> campaignCommand;
+    horde::gameplay::campaign::CampaignLoadBarrier campaignBarrier;
+    std::optional<horde::gameplay::campaign::LoadPreparation> campaignPreparation;
+    std::unique_ptr<horde::vulkan::raytracing::PresentableTinyRtScene> campaignPreparedScene;
+    horde::platform::windows::WindowsCampaignMenu::Phase campaignPhase=
+        horde::platform::windows::WindowsCampaignMenu::Phase::Unavailable;
+    std::string campaignMessage,campaignStorageWarning;
+    std::uint64_t campaignSerial=0,campaignSurfaceGeneration=1,campaignFrameTick=0,campaignFrameWorld=0;
+    std::uint64_t campaignUncertaintyRecheck=0,campaignVerifiedUncertainty=0;
+    std::chrono::steady_clock::time_point campaignStarted{};
+    bool campaignPause=false,campaignIsolated=false,campaignRetirementUnproved=false,campaignNewGame=false;
     uint32_t currentFrame = 0u;
 };
 
@@ -677,6 +708,10 @@ void UpdateChestPrompt(VulkanSurfaceContext& context);
 int ScaleForDpi(HWND window, int logicalPixels);
 void LayoutOverlayControls(HWND window, int width, int height);
 void ApplyDpiScaledFonts(HWND window);
+void OpenCampaignMenu(VulkanSurfaceContext&,horde::platform::windows::WindowsCampaignMenu::Page);
+void RefreshCampaignMenu(VulkanSurfaceContext&);
+void PumpCampaign(VulkanSurfaceContext&);
+void ObserveCampaignPresentation(VulkanSurfaceContext&,bool);
 std::string WindowSafeText(const std::string& value);
 void RefreshGpuTimingTelemetry(
     VulkanSurfaceContext& context,
@@ -1289,6 +1324,7 @@ void SaveRtLabProgress(const VulkanSurfaceContext& context)
 
 void SaveSettings(const VulkanSurfaceContext& context)
 {
+    if(gCampaignHiddenValidation)return;
     if (context.graphicsPreviewCapture || context.outputResizeValidation || context.nativeMotionValidation) return;
     const std::string path = SettingsPath().string();
     const std::string sfxVolume = std::to_string(
@@ -1345,7 +1381,7 @@ void ReplaceFontProperty(HWND window, const char* propertyName, HFONT font);
 
 void PlaySoundEffect(const VulkanSurfaceContext& context, const char* filename)
 {
-    if (context.sfxVolumePercent <= 0)
+    if (gCampaignHiddenValidation || context.sfxVolumePercent <= 0)
     {
         return;
     }
@@ -1364,7 +1400,7 @@ void PlayAmbientSoundEffect(const VulkanSurfaceContext& context,
                             const char* filename,
                             const float cueGain = 1.0f)
 {
-    if (context.sfxVolumePercent <= 0)
+    if (gCampaignHiddenValidation || context.sfxVolumePercent <= 0)
     {
         return;
     }
@@ -1843,6 +1879,7 @@ bool PlayXAudioFile(const std::filesystem::path& path,
 
 void UpdateChapterDialogueAudio(VulkanSurfaceContext& context)
 {
+    if(gCampaignHiddenValidation)return;
     using horde::gameplay::dialogue::Line;
     const auto& dialogue = context.simulation.Snapshot().chapterDialogue;
     const auto line = dialogue.line;
@@ -2057,6 +2094,7 @@ void UpdateWaterfallAmbience(const VulkanSurfaceContext& context)
 
 void StopMenuAmbience(VulkanSurfaceContext& context)
 {
+    if(gCampaignHiddenValidation)return;
     auto &engine = SpatialAudioEngine();
     for (const auto key : {"menu_room", "menu_chain"}) engine.StopLoop(key);
     context.menuCreakDelivery.Suspend();
@@ -2064,6 +2102,7 @@ void StopMenuAmbience(VulkanSurfaceContext& context)
 
 void UpdateMenuAmbience(VulkanSurfaceContext& context)
 {
+    if(gCampaignHiddenValidation)return;
     const auto menu = context.entryMenu.Snapshot();
     const bool audible = context.useRtPath && context.rtScene.IsReady() &&
         context.rtScene.Profile() == horde::vulkan::raytracing::RtSceneProfile::EntryMenu &&
@@ -2095,7 +2134,7 @@ void PlayPositionalSoundEffect(const VulkanSurfaceContext& context,
                                const horde::gameplay::simulation::GameplayEvent& event,
                                const char* collection = "filmcow")
 {
-    if (context.sfxVolumePercent <= 0)
+    if (gCampaignHiddenValidation || context.sfxVolumePercent <= 0)
     {
         return;
     }
@@ -2119,6 +2158,7 @@ void PlayPositionalSoundEffect(const VulkanSurfaceContext& context,
 
 void PublishMusicPlayback(VulkanSurfaceContext& context, const bool focusLossNotification = false)
 {
+    if(gCampaignHiddenValidation)return;
     if (context.musicPlayback)
     {
         // Copy before the existing SFX drain. No worker accesses GameSimulation.
@@ -2157,6 +2197,7 @@ void PublishMusicPlayback(VulkanSurfaceContext& context, const bool focusLossNot
 
 void DrainGameplayEvents(VulkanSurfaceContext& context)
 {
+    if(gCampaignHiddenValidation){context.simulation.ClearEvents();return;}
     using horde::gameplay::simulation::EntityId;
     using horde::gameplay::simulation::GameplayEvent;
     using horde::gameplay::simulation::GameplayEventType;
@@ -2744,7 +2785,8 @@ bool MeasurementPausedByUi(const VulkanSurfaceContext& context)
     const bool pauseVisible = context.pauseMenuVisible && !context.settingsVisible &&
                               !context.diagnosticsVisible &&
                               !context.benchmarkReportVisible && !context.rtLabVisible;
-    return pauseVisible || context.settingsVisible || context.rtLabVisible ||
+    return context.campaignPause || (context.campaignMenu && context.campaignMenu->Visible()) ||
+           pauseVisible || context.settingsVisible || context.rtLabVisible ||
            context.diagnosticsVisible || context.benchmarkReportVisible;
 }
 
@@ -2999,6 +3041,19 @@ void ApplyOverlayState(VulkanSurfaceContext& context)
     }
     UpdateSettingsLabels(context);
     if (context.rtLabVisible) UpdateRtLabLabels(context);
+    const bool campaignVisible=context.campaignMenu && context.campaignMenu->Visible();
+    SetControlVisible(context.windowHandle,kCampaignSaveButtonId,pauseVisible && !campaignVisible &&
+        !context.entryMenuVisible && !context.deathOverlayVisible && !context.endingOverlayVisible);
+    SetControlVisible(context.windowHandle,kCampaignLoadButtonId,pauseVisible && !campaignVisible &&
+        (!context.entryMenuVisible || context.entryMoreVisible) && !context.endingOverlayVisible);
+    if(campaignVisible) {
+        EnumChildWindows(context.windowHandle,[](HWND child,LPARAM)->BOOL {
+            const int id=GetDlgCtrlID(child);
+            if(id<4100 || id>4123)ShowWindow(child,SW_HIDE);
+            return TRUE;
+        },0);
+        RefreshCampaignMenu(context);
+    }
 }
 
 horde::graphics::GraphicsSettings CurrentGraphicsSettings(const VulkanSurfaceContext& context)
@@ -3054,7 +3109,7 @@ void CloseGraphicsPage(VulkanSurfaceContext& context)
     ApplyOverlayState(context);
     RECT client{}; GetClientRect(context.windowHandle, &client);
     LayoutOverlayControls(context.windowHandle, client.right, client.bottom);
-    SetFocus(GetDlgItem(context.windowHandle, kGraphicsOpenButtonId));
+    FocusGameControl(GetDlgItem(context.windowHandle, kGraphicsOpenButtonId));
 }
 
 bool QueueGraphicsCommand(VulkanSurfaceContext& context,
@@ -3157,7 +3212,7 @@ void OpenRtLab(VulkanSurfaceContext& context)
     RECT client{};
     GetClientRect(context.windowHandle, &client);
     LayoutOverlayControls(context.windowHandle, client.right, client.bottom);
-    SetFocus(GetDlgItem(context.windowHandle, kRtLabWaterfallSliderId));
+    FocusGameControl(GetDlgItem(context.windowHandle, kRtLabWaterfallSliderId));
 }
 
 void CloseRtLab(VulkanSurfaceContext& context)
@@ -3172,7 +3227,7 @@ void CloseRtLab(VulkanSurfaceContext& context)
     RECT client{};
     GetClientRect(context.windowHandle, &client);
     LayoutOverlayControls(context.windowHandle, client.right, client.bottom);
-    SetFocus(GetDlgItem(context.windowHandle, kRtLabButtonId));
+    FocusGameControl(GetDlgItem(context.windowHandle, kRtLabButtonId));
 }
 
 void ShowPauseMenu(VulkanSurfaceContext& context, const bool visible)
@@ -3207,12 +3262,12 @@ void ShowPauseMenu(VulkanSurfaceContext& context, const bool visible)
     if (visible)
     {
         PlaySoundEffect(context, "menu_toggle.wav");
-        SetFocus(GetDlgItem(context.windowHandle, kResumeButtonId));
+        FocusGameControl(GetDlgItem(context.windowHandle, kResumeButtonId));
     }
     else
     {
         PlaySoundEffect(context, "ui_back.wav");
-        SetFocus(context.windowHandle);
+        FocusGameControl(context.windowHandle);
     }
 }
 
@@ -3348,6 +3403,7 @@ void ResetRoute(VulkanSurfaceContext& context, const bool preserveBenchmark = fa
 
 void TryGrantRtLabUnlock(VulkanSurfaceContext& context, const bool finaleComplete)
 {
+    if(gCampaignHiddenValidation)return;
     const horde::platform::windows::RtLabUnlockContext decision{
         .finaleComplete = finaleComplete,
         .capture = GetPropA(context.windowHandle, kCaptureModeProperty) != nullptr,
@@ -3381,7 +3437,7 @@ void ShowDeathMenu(VulkanSurfaceContext& context)
     LayoutOverlayControls(context.windowHandle,
                           clientRect.right - clientRect.left,
                           clientRect.bottom - clientRect.top);
-    SetFocus(GetDlgItem(context.windowHandle, kResumeButtonId));
+    FocusGameControl(GetDlgItem(context.windowHandle, kResumeButtonId));
 }
 
 void ShowEndingMenu(VulkanSurfaceContext& context)
@@ -3403,7 +3459,7 @@ void ShowEndingMenu(VulkanSurfaceContext& context)
     LayoutOverlayControls(context.windowHandle,
                           clientRect.right - clientRect.left,
                           clientRect.bottom - clientRect.top);
-    SetFocus(GetDlgItem(context.windowHandle, kResumeButtonId));
+    FocusGameControl(GetDlgItem(context.windowHandle, kResumeButtonId));
 }
 bool ApplyPlayerRetryCheckpoint(VulkanSurfaceContext& context, const std::int32_t checkpointId)
 {
@@ -3436,7 +3492,7 @@ bool ApplyPlayerRetryCheckpoint(VulkanSurfaceContext& context, const std::int32_
     context.benchmarkReportVisible = false;
     ApplyOverlayState(context);
     UpdateVitalityHud(context);
-    SetFocus(context.windowHandle);
+    FocusGameControl(context.windowHandle);
     return true;
 }
 
@@ -3541,7 +3597,7 @@ void StartBenchmark(VulkanSurfaceContext& context,
     LayoutOverlayControls(context.windowHandle, benchmarkClient.right, benchmarkClient.bottom);
     UpdateBenchmarkHud(context);
     PlaySoundEffect(context, "ui_select.wav");
-    SetFocus(context.windowHandle);
+    FocusGameControl(context.windowHandle);
 }
 
 void LogBenchmarkCancellation(const VulkanSurfaceContext& context, const char* trigger)
@@ -3646,7 +3702,7 @@ void CompleteBenchmark(VulkanSurfaceContext& context,
     RECT client{};
     GetClientRect(context.windowHandle, &client);
     LayoutOverlayControls(context.windowHandle, client.right - client.left, client.bottom - client.top);
-    SetFocus(GetDlgItem(context.windowHandle, kEditControlId));
+    FocusGameControl(GetDlgItem(context.windowHandle, kEditControlId));
 }
 
 void ToggleFullscreen(VulkanSurfaceContext& context)
@@ -4027,8 +4083,8 @@ void ClearDesktopInput(VulkanSurfaceContext& context)
     context.xInputUserIndex.reset();
     context.legacyJoystickId.reset();
     context.legacyRightStickAxes = {};
-    ClipCursor(nullptr);
-    if (context.mouseCursorHidden)
+    if(!gCampaignHiddenValidation && GetCapture()==context.windowHandle)ClipCursor(nullptr);
+    if (context.mouseCursorHidden && !gCampaignHiddenValidation)
     {
         ShowCursor(TRUE);
         SetCursorPos(context.mouseRestorePosition.x, context.mouseRestorePosition.y);
@@ -4059,11 +4115,20 @@ void DiscardDesktopPendingCommands(VulkanSurfaceContext& context)
 
 std::vector<HWND> VisibleControllerMenuControls(const VulkanSurfaceContext& context)
 {
+    if(context.campaignMenu && context.campaignMenu->Visible()) {
+        std::vector<HWND> controls;
+        for(int id:{4110,4111,4112,4113,4114,4115,4120,4121,4122,4123}) {
+            HWND control=GetDlgItem(context.windowHandle,id);
+            if(control && IsWindowVisible(control) && IsWindowEnabled(control))controls.push_back(control);
+        }
+        return controls;
+    }
     constexpr auto controlIds = std::to_array<int>({
         kResumeButtonId,
         kEntryMoreButtonId,
         kEntryBackButtonId,
         kRestartButtonId,
+        kCampaignSaveButtonId,kCampaignLoadButtonId,
         kControlsButtonId,
         kSettingsButtonId,
         kReportProblemButtonId,
@@ -4180,7 +4245,7 @@ void NavigateControllerMenu(VulkanSurfaceContext& context, const int direction)
         GetClientRect(context.windowHandle, &client);
         LayoutOverlayControls(context.windowHandle, client.right, client.bottom);
     }
-    SetFocus(controls[index]);
+    FocusGameControl(controls[index]);
     if (horde::platform::windows::ShouldPlayControllerMenuSound(context.rtLabVisible))
         PlaySoundEffect(context, "ui_select.wav");
 }
@@ -4231,13 +4296,16 @@ void NavigateGraphicsMenu(VulkanSurfaceContext& context,
     const auto neighbor = horde::platform::windows::FindGraphicsMenuNeighbor(
         rectangles, currentIndex, direction);
     if (!neighbor) return;
-    SetFocus(controls[*neighbor]);
+    FocusGameControl(controls[*neighbor]);
     if (horde::platform::windows::ShouldPlayControllerMenuSound(context.rtLabVisible))
         PlaySoundEffect(context, "ui_select.wav");
 }
 
 void CancelControllerMenu(VulkanSurfaceContext& context)
 {
+    if(context.campaignMenu && context.campaignMenu->Visible()) {
+        context.campaignMenu->HandleCommand(4121);return;
+    }
     int command = context.entryMenuVisible ? kEntryBackButtonId : kResumeButtonId;
     if (context.rtLabVisible)
     {
@@ -4398,7 +4466,7 @@ void HandleControllerMenuEdges(
         const std::vector<HWND> controls = VisibleControllerMenuControls(context);
         if (std::find(controls.begin(), controls.end(), focused) == controls.end())
         {
-            if (!controls.empty()) SetFocus(controls.front());
+            if (!controls.empty()) FocusGameControl(controls.front());
         }
         else
         {
@@ -5511,6 +5579,15 @@ bool ReleaseSwapchainResources(VulkanSurfaceContext& ctx)
 #endif
     ctx.gpuFrameTimingTotalMs = 0.0;
     ctx.gpuFrameTimingSampleCount = 0u;
+    ctx.campaignBarrier.SurfaceRetired(ctx.campaignSurfaceGeneration++);
+    if(ctx.campaign && !ctx.campaignBarrier.State().loaded){
+        ctx.campaign->Cancel();ctx.campaignPreparation.reset();
+        if(ctx.campaignPhase==horde::platform::windows::WindowsCampaignMenu::Phase::Reading || ctx.campaignPhase==horde::platform::windows::WindowsCampaignMenu::Phase::Preparing){
+            ctx.campaignPhase=horde::platform::windows::WindowsCampaignMenu::Phase::Failed;
+            ctx.campaignMessage="Load cancelled after output recreation. Current game retained.";
+        }
+    }
+    ctx.campaignPreparedScene.reset();
     ctx.simulation.InvalidateWorldZoneReadiness();
     ctx.rtScene.Destroy();
 
@@ -5682,7 +5759,7 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx, const bool startup
     {
         std::cerr << "Failed to initialise presentable RT scene: " << diagnostic << '\n';
         ctx.lastRtFrameError = diagnostic;
-        if (startupFailureDialog && !ctx.unattendedBenchmark) MessageBoxA(ctx.windowHandle,
+        if (startupFailureDialog && !ctx.unattendedBenchmark) GameMessageBoxA(ctx.windowHandle,
                     ("The native RT scene could not start.\n\n" + diagnostic +
                      "\n\nKeep the packaged assets folder beside HordeLanternRT.exe. No fallback renderer will be used.").c_str(),
                     "Horde Lantern RT - startup error",
@@ -5829,6 +5906,15 @@ bool DestroyRenderContext(VulkanSurfaceContext& ctx)
         (void)ctx.rtFrameEvidence.Destroy();
         ctx.rtFrameEvidenceInitialised = false;
     }
+    ctx.campaignBarrier.SurfaceRetired(ctx.campaignSurfaceGeneration++);
+    if(ctx.campaign && !ctx.campaignBarrier.State().loaded){
+        ctx.campaign->Cancel();ctx.campaignPreparation.reset();
+        if(ctx.campaignPhase==horde::platform::windows::WindowsCampaignMenu::Phase::Reading || ctx.campaignPhase==horde::platform::windows::WindowsCampaignMenu::Phase::Preparing){
+            ctx.campaignPhase=horde::platform::windows::WindowsCampaignMenu::Phase::Failed;
+            ctx.campaignMessage="Load cancelled after output recreation. Current game retained.";
+        }
+    }
+    ctx.campaignPreparedScene.reset();
     ctx.simulation.InvalidateWorldZoneReadiness();
     ctx.rtScene.Destroy();
     if (ctx.pipelineCache != VK_NULL_HANDLE)
@@ -5903,6 +5989,8 @@ bool DestroyRenderContext(VulkanSurfaceContext& ctx)
     ctx = {};
     return true;
 }
+
+#include "windows_campaign_owner.inl"
 
 bool ApplyPendingSceneReplacement(VulkanSurfaceContext& context,
                                   horde::vulkan::DeviceCapabilities& capabilities,
@@ -6125,7 +6213,7 @@ bool ApplyPendingOutputResize(VulkanSurfaceContext& context,
                 UpdateSettingsLabels(context);
                 std::cerr << "RT render scale was restored after resize failure: "
                           << resizeDiagnostic << '\n';
-                if (!context.unattendedBenchmark && !context.outputResizeValidation) MessageBoxA(hWnd,
+                if (!context.unattendedBenchmark && !context.outputResizeValidation) GameMessageBoxA(hWnd,
                     ("The requested render resolution could not be applied. Your previous setting was restored.\n\n" +
                      resizeDiagnostic).c_str(), "Horde Lantern RT - graphics", MB_OK | MB_ICONWARNING);
             }
@@ -6226,7 +6314,7 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         horde::telemetry::RtStage::FrameFenceWait);
     const VkResult waitResult = vkWaitForFences(
         ctx.device, 1u, &ctx.inFlightFences[ctx.currentFrame], VK_TRUE,
-        (ctx.graphicsPreviewCapture || ctx.outputResizeValidation || ctx.nativeMotionValidation) ? 2'000'000'000ull : UINT64_MAX);
+        (gCampaignHiddenValidation || ctx.graphicsPreviewCapture || ctx.outputResizeValidation || ctx.nativeMotionValidation) ? 2'000'000'000ull : UINT64_MAX);
     fenceScope.Complete(1u, 0u, 1u);
     if (waitResult != VK_SUCCESS)
     {
@@ -6272,7 +6360,7 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
     const VkResult acquireResult = vkAcquireNextImageKHR(
         ctx.device,
         ctx.swapchain,
-        (ctx.graphicsPreviewCapture || ctx.outputResizeValidation || ctx.nativeMotionValidation) ? 2'000'000'000ull : UINT64_MAX,
+        (gCampaignHiddenValidation || ctx.graphicsPreviewCapture || ctx.outputResizeValidation || ctx.nativeMotionValidation) ? 2'000'000'000ull : UINT64_MAX,
         ctx.imageAvailableSemaphores[ctx.currentFrame],
         VK_NULL_HANDLE,
         &imageIndex);
@@ -6319,7 +6407,7 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
 #endif
     if (useRtFrame)
     {
-        if (!ctx.graphicsPreviewCapture && !ctx.outputResizeValidation && !ctx.nativeMotionValidation)
+        if (!gCampaignHiddenValidation && !ctx.graphicsPreviewCapture && !ctx.outputResizeValidation && !ctx.nativeMotionValidation)
         {
             SpatialAudioEngine().Update();
             const auto completion = SpatialAudioEngine().TakeDialogueCompletion();
@@ -6342,7 +6430,7 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         {
             UpdateDesktopSceneControls(ctx, evidenceFrame ? &observation : nullptr);
         }
-        if (!previewFrame && !ctx.outputResizeValidation && !ctx.nativeMotionValidation) UpdateWaterfallAmbience(ctx);
+        if (!gCampaignHiddenValidation && !previewFrame && !ctx.outputResizeValidation && !ctx.nativeMotionValidation) UpdateWaterfallAmbience(ctx);
         const horde::gameplay::simulation::SimulationSnapshot& simulation =
             ctx.simulation.Snapshot();
         UpdateChapterDialogueAudio(ctx);
@@ -6361,6 +6449,7 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         if (!ctx.graphicsPreviewCapture && !ctx.outputResizeValidation && !ctx.nativeMotionValidation) PublishMusicPlayback(ctx);
         if (!previewFrame && !ctx.outputResizeValidation) DrainGameplayEvents(ctx);
         horde::vulkan::raytracing::PublishDevelopmentWorldReadiness(ctx.simulation,ctx.rtScene);
+        ctx.campaignFrameTick=simulation.tickIndex;ctx.campaignFrameWorld=simulation.worldRoute.generation;
         horde::vulkan::raytracing::RtSceneFrameInputs frameInputs =
             horde::vulkan::raytracing::BuildRtSceneFrameInputs(
                 simulation, ctx.outputExposure, ctx.waterQuality, ctx.rtSceneTuning,
@@ -8146,6 +8235,8 @@ int RunEntryMenuCapture(VulkanSurfaceContext &context,
 #endif
 #endif
 
+#include "windows_campaign_validation.inl"
+
 int RunDiagnosticSwapchainWindow(HWND hWnd,
                                  horde::vulkan::DeviceCapabilities& capabilities,
                                  const std::filesystem::path& textReportPath,
@@ -8253,7 +8344,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         context.developmentWorldRoute = proof != nullptr && proof->developmentWorldRoute;
         context.stagedWorldPreparation = proof != nullptr && proof->stagedWorldPreparation;
     }
-    if (!graphicsPreviewCapture && !outputResizeValidation && !context.nativeMotionValidation) LoadSettings(context);
+    if (!gCampaignHiddenValidation && !graphicsPreviewCapture && !outputResizeValidation && !context.nativeMotionValidation) LoadSettings(context);
 #if defined(_DEBUG)
     // Explicit owner-playtest setup; ordinary launches keep their saved choice.
     if (GetCommandLineW() != nullptr) {
@@ -8415,7 +8506,26 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
 #endif
         if (context.entryMenuVisible)
             ApplyDpiScaledFonts(hWnd);
-        if (captureDirectory == nullptr)
+        if(captureDirectory==nullptr && !unattendedBenchmark && !graphicsPreviewCapture && !outputResizeValidation && !context.nativeMotionValidation) {
+            const auto directory=gCampaignHiddenValidation?gCampaignValidationDirectory:WindowsCampaignDirectory();
+            std::error_code campaignDirectoryError;
+            if(!directory.empty())std::filesystem::create_directories(directory,campaignDirectoryError);
+            if(directory.empty() || campaignDirectoryError)context.campaignStorageWarning="Campaign storage unavailable. New games can start, but saves cannot be guaranteed. Recheck records before writing.";
+            {
+                context.campaignIsolated=gCampaignHiddenValidation;
+                horde::gameplay::campaign::storage::FaultInjector* campaignFaults=nullptr;
+#if defined(_DEBUG)
+                if(gCampaignHiddenValidation)campaignFaults=&gHiddenCampaignFaults;
+#endif
+                context.campaign=std::make_unique<horde::gameplay::campaign::PlaySession>(context.simulation,directory,campaignFaults);
+                context.campaignMenu=std::make_unique<horde::platform::windows::WindowsCampaignMenu>([&context](auto command){
+                    QueueCampaignCommand(context,command);
+                });
+                if(!context.campaignMenu->Create(hWnd)){(void)renderOwner.Retire();return 1;}
+                context.campaignPhase=horde::platform::windows::WindowsCampaignMenu::Phase::Ready;
+            }
+        }
+        if (captureDirectory == nullptr && !gCampaignHiddenValidation)
         {
             // Normal gameplay and benchmark runs include music. Frozen image
             // capture mode deliberately has no playback, as with existing SFX.
@@ -8441,7 +8551,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
             if (context.rtLabDebugInjection) OpenRtLab(context);
             else
 #endif
-                SetFocus(GetDlgItem(hWnd, kResumeButtonId));
+                FocusGameControl(GetDlgItem(hWnd, kResumeButtonId));
         }
     }
 
@@ -8508,6 +8618,13 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     (void)captureDirectory;
 #endif
 
+#if defined(_DEBUG)
+    if(gCampaignHiddenValidation){
+        context.sfxVolumePercent=context.musicVolumePercent=context.voiceVolumePercent=0;
+        const int result=RunHiddenCampaignValidation(context);
+        return renderOwner.Retire()?result:1;
+    }
+#endif
     if (unattendedBenchmark)
     {
         if (!context.controlsEnabled)
@@ -8554,6 +8671,8 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
             break;
         }
 
+        PumpCampaign(context);
+        if(context.campaignRetirementUnproved){renderFailed=true;break;}
         const auto ownerFrameStart = std::chrono::steady_clock::now();
         const bool graphicsTransition = context.sceneProfileDirty || context.glassGeometryDirty ||
             context.renderScaleDirty || context.graphicsCommand.has_value();
@@ -8619,7 +8738,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
                 : horde::graphics::ForegroundPauseScene::Showcase;
         pauseCadenceInput.currentRtOutputValid = context.useRtPath && context.rtScene.IsReady() &&
             capabilities.rtScene.presented;
-        pauseCadenceInput.wakeRequested = graphicsTransition || context.sceneProfileDirty ||
+        pauseCadenceInput.wakeRequested = context.campaignBarrier.HasPendingCommittedLoad() || graphicsTransition || context.sceneProfileDirty ||
             context.glassGeometryDirty || context.renderScaleDirty || context.graphicsCommand.has_value() ||
             context.entryPlayQueued || context.entryPlayHandoffPending || context.rtLabVisible ||
             context.graphicsPreviewCapture || context.outputResizeValidation || context.nativeMotionValidation ||
@@ -8656,6 +8775,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         context.expectedBenchmarkFrame.reset();
         const bool frameRendered = RenderFrame(context, clearColor, rtFramePresented);
         FinishGraphicsFrame(context, frameRendered && rtFramePresented);
+        ObserveCampaignPresentation(context,frameRendered && rtFramePresented);
         QueuePresentedEntryPlay(context, rtFramePresented);
         FinishEntryLoadingAfterPresentation(context, rtFramePresented);
         if (context.expectedBenchmarkFrame &&
@@ -8689,7 +8809,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
                 << "\nRescue equipment stowed: " << failedSnapshot.rescue.equipmentStowed << '\n';
             (void)WriteReportFile(textReportPath.parent_path() / "windows_render_failure.txt",
                                   failureReport.str());
-            if (!unattendedBenchmark) MessageBoxA(hWnd,
+            if (!unattendedBenchmark) GameMessageBoxA(hWnd,
                         "The native RT render loop stopped unexpectedly. Check the reports folder for diagnostics.",
                         "Horde Lantern RT - renderer stopped",
                         MB_OK | MB_ICONERROR);
@@ -9215,6 +9335,10 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
                    std::max(ScaleForDpi(window, 100), height - inset * 2), TRUE);
     }
     auto* sceneContext = reinterpret_cast<VulkanSurfaceContext*>(GetWindowLongPtrA(window, GWLP_USERDATA));
+    if(sceneContext && sceneContext->campaignMenu && sceneContext->campaignMenu->Visible()) {
+        RECT bounds{inset,inset,width-inset,height-inset};
+        sceneContext->campaignMenu->Layout(bounds);return;
+    }
     if (sceneContext && sceneContext->benchmarkReportVisible)
     {
         const int reportTitleHeight = ScaleForDpi(window, 42);
@@ -9295,7 +9419,8 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
 
     const int buttonWidth = std::min(ScaleForDpi(window, 420),
                                      std::max(ScaleForDpi(window, 220), width - ScaleForDpi(window, 64)));
-    const int buttonHeight = ScaleForDpi(window, 38);
+    const int buttonHeight = std::min(ScaleForDpi(window,38),std::max(ScaleForDpi(window,24),
+        (height-ScaleForDpi(window,24+54+11*8))/12));
     const int gap = ScaleForDpi(window, 8);
     const int titleHeight = ScaleForDpi(window, 48);
     const int titleAdvance = ScaleForDpi(window, 54);
@@ -9304,12 +9429,12 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
     const bool compactOverlayLayout = layoutContext != nullptr &&
                                       (layoutContext->deathOverlayVisible || endingLayout);
     const int endingBodyHeight = endingLayout ? ScaleForDpi(window, 132) : 0;
-    const int compactButtonCount = endingLayout ? 4 : 3;
+    const int compactButtonCount = 4;
     const int pauseTotal = compactOverlayLayout
         ? titleHeight + endingBodyHeight + (endingLayout ? gap : 0) + compactButtonCount * buttonHeight + compactButtonCount * gap
-        : titleHeight + 10 * buttonHeight + 9 * gap;
+        : titleHeight + 12 * buttonHeight + 11 * gap;
     const int pauseX = (width - buttonWidth) / 2;
-    int y = std::max(ScaleForDpi(window, 54), (height - pauseTotal) / 2);
+    int y = std::max(ScaleForDpi(window, 12), (height - pauseTotal) / 2);
     if (HWND title = GetDlgItem(window, kPauseTitleId)) MoveWindow(title, pauseX, y, buttonWidth, titleHeight, TRUE);
     y += titleAdvance;
     if (endingLayout)
@@ -9341,7 +9466,7 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
     else if (layoutContext && layoutContext->entryMenuVisible && layoutContext->entryMoreVisible)
     {
         const int moreHeight = ScaleForDpi(window, 48);
-        for (const int id : {kControlsButtonId, kReportProblemButtonId, kDiagnosticsButtonId,
+        for (const int id : {kCampaignLoadButtonId,kControlsButtonId, kReportProblemButtonId, kDiagnosticsButtonId,
                              kMoreBySamfa12ButtonId, kExitButtonId, kEntryBackButtonId})
         {
             MoveWindow(GetDlgItem(window, id), pauseX, y, buttonWidth, moreHeight, TRUE);
@@ -9350,16 +9475,16 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
     }
     else if (compactOverlayLayout)
     {
-        for (const int id : {kRtLabButtonId, kResumeButtonId, kRestartButtonId, kExitButtonId})
+        for (const int id : {kRtLabButtonId, kResumeButtonId, kCampaignLoadButtonId,kRestartButtonId, kExitButtonId})
         {
-            if (!endingLayout && id == kRtLabButtonId) continue;
+            if ((!endingLayout && id == kRtLabButtonId) || (endingLayout && id==kCampaignLoadButtonId)) continue;
             if (HWND control = GetDlgItem(window, id)) MoveWindow(control, pauseX, y, buttonWidth, buttonHeight, TRUE);
             y += buttonHeight + gap;
         }
     }
     else
     {
-        for (const int id : {kResumeButtonId, kRestartButtonId, kControlsButtonId, kSettingsButtonId,
+        for (const int id : {kResumeButtonId, kCampaignSaveButtonId,kCampaignLoadButtonId,kRestartButtonId, kControlsButtonId, kSettingsButtonId,
                              kReportProblemButtonId, kRtLabButtonId, kDiagnosticsButtonId,
                              kRunBenchmarkButtonId, kMoreBySamfa12ButtonId, kExitButtonId})
         {
@@ -9581,7 +9706,7 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
 
 void ShowControlsHelp(HWND window)
 {
-    MessageBoxA(window,
+    GameMessageBoxA(window,
                 "WASD  Move and strafe\n"
                 "Shift  Hold to run    Caps Lock  Toggle run\n"
                 "Ctrl  Hold to crouch\n"
@@ -9612,7 +9737,7 @@ void ShowControlsHelp(HWND window)
 
 void ShowCredits(HWND window)
 {
-    MessageBoxA(window,
+    GameMessageBoxA(window,
                 "Environment materials: Poly Haven (CC0).\n"
                 "Sound effects: FilmCow Royalty Free Sound Effects Library.\n"
                 "Menu lantern creak: Irhouen via Pixabay (Pixabay Content License).\n"
@@ -9637,7 +9762,7 @@ void OpenSamfa12Website(HWND window)
     const HINSTANCE result = ShellExecuteA(window, "open", "https://samfa12.com/", nullptr, nullptr, SW_SHOWNORMAL);
     if (reinterpret_cast<INT_PTR>(result) <= 32)
     {
-        MessageBoxA(window,
+        GameMessageBoxA(window,
                     "Samfa12.com could not be opened in your default browser.",
                     "Horde Lantern RT",
                     MB_OK | MB_ICONERROR);
@@ -9683,7 +9808,7 @@ void SaveBenchmarkReportAs(HWND window, const std::string& report)
     dialog.Flags = OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST;
     if (GetSaveFileNameA(&dialog) && !WriteReportFile(path, report))
     {
-        MessageBoxA(window, "The benchmark report could not be saved to that location.",
+        GameMessageBoxA(window, "The benchmark report could not be saved to that location.",
                     "Horde Lantern RT", MB_OK | MB_ICONERROR);
     }
 }
@@ -9696,7 +9821,7 @@ void ToggleDiagnostics(VulkanSurfaceContext& context)
     context.pauseMenuVisible = context.diagnosticsVisible;
     ApplyOverlayState(context);
     PlaySoundEffect(context, context.diagnosticsVisible ? "ui_select.wav" : "ui_back.wav");
-    SetFocus(context.diagnosticsVisible ? GetDlgItem(context.windowHandle, kEditControlId) : context.windowHandle);
+    FocusGameControl(context.diagnosticsVisible ? GetDlgItem(context.windowHandle, kEditControlId) : context.windowHandle);
 }
 
 void OpenSettings(VulkanSurfaceContext& context)
@@ -9712,7 +9837,7 @@ void OpenSettings(VulkanSurfaceContext& context)
     ApplyOverlayState(context);
     UpdateSettingsLabels(context);
     PlaySoundEffect(context, "ui_select.wav");
-    SetFocus(GetDlgItem(context.windowHandle, kSfxVolumeSliderId));
+    FocusGameControl(GetDlgItem(context.windowHandle, kSfxVolumeSliderId));
 }
 
 bool NativeUiUsesHighContrast()
@@ -9928,6 +10053,9 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 return 0;
             }
             const int commandId = LOWORD(wParam);
+            if(sceneContext->campaignMenu && sceneContext->campaignMenu->HandleCommand(commandId))return 0;
+            if(sceneContext->campaignMenu && sceneContext->campaignMenu->Visible() &&
+               commandId!=kExitButtonId && commandId!=kMenuExitId)return 0;
             if (!sceneContext->rtLabVisible &&
                 (sceneContext->deathOverlayVisible || sceneContext->endingOverlayVisible) &&
                 commandId != kResumeButtonId && commandId != kRestartButtonId &&
@@ -9935,12 +10063,16 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 commandId != kMenuRestartId && commandId != kExitButtonId &&
                 commandId != kMenuExitId && commandId != kMenuTeachingEnabledId &&
                 commandId != kMenuTeachingSlowdownId && commandId != kMenuTeachingSkipId &&
-                commandId != kMenuTeachingReplayId)
+                commandId != kMenuTeachingReplayId && commandId != kCampaignLoadButtonId)
             {
                 return 0;
             }
             switch (commandId)
             {
+            case kCampaignSaveButtonId:
+                OpenCampaignMenu(*sceneContext,horde::platform::windows::WindowsCampaignMenu::Page::Save);return 0;
+            case kCampaignLoadButtonId:
+                OpenCampaignMenu(*sceneContext,horde::platform::windows::WindowsCampaignMenu::Page::Load);return 0;
             case kMenuTeachingEnabledId:
                 sceneContext->combatTeachingEnabled = !sceneContext->combatTeachingEnabled;
                 SaveSettings(*sceneContext);
@@ -9975,7 +10107,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                     GetClientRect(hWnd, &client);
                     LayoutOverlayControls(hWnd, client.right, client.bottom);
                 }
-                SetFocus(GetDlgItem(hWnd, kControlsButtonId));
+                FocusGameControl(GetDlgItem(hWnd, kControlsButtonId));
                 return 0;
             case kEntryBackButtonId:
                 sceneContext->entryMoreVisible = false;
@@ -9986,26 +10118,19 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                     GetClientRect(hWnd, &client);
                     LayoutOverlayControls(hWnd, client.right, client.bottom);
                 }
-                SetFocus(GetDlgItem(hWnd, kEntryMoreButtonId));
+                FocusGameControl(GetDlgItem(hWnd, kEntryMoreButtonId));
                 return 0;
             case kResumeButtonId:
                 if (sceneContext->entryMenuVisible)
                 {
-                    sceneContext->entryPlayQueued = true;
-                    sceneContext->entryMenu.Play();
-                    for (const int id :
-                         {kPauseTitleId, kResumeButtonId, kSettingsButtonId, kEntryMoreButtonId})
-                    {
-                        EnableWindow(GetDlgItem(hWnd, id), FALSE);
-                        ShowWindow(GetDlgItem(hWnd, id), SW_HIDE);
-                    }
+                    OpenCampaignMenu(*sceneContext,horde::platform::windows::WindowsCampaignMenu::Page::NewGame);
                     return 0;
                 }
                 if (sceneContext->deathOverlayVisible)
                 {
                     if (!ApplyPlayerRetryCheckpoint(*sceneContext, sceneContext->playerRetryCheckpoint))
                     {
-                        MessageBoxA(hWnd, "The encounter checkpoint could not be restored.", "Horde Lantern RT", MB_OK | MB_ICONERROR);
+                        GameMessageBoxA(hWnd, "The encounter checkpoint could not be restored.", "Horde Lantern RT", MB_OK | MB_ICONERROR);
                     }
                     else
                     {
@@ -10131,7 +10256,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                     RECT client{}; GetClientRect(hWnd, &client);
                     LayoutOverlayControls(hWnd, client.right, client.bottom);
                 }
-                SetFocus(GetDlgItem(hWnd, kGraphicsPresetButtonId));
+                FocusGameControl(GetDlgItem(hWnd, kGraphicsPresetButtonId));
                 return 0;
             case kGraphicsPresetButtonId:
                 if (sceneContext->graphicsEdit)
@@ -10273,7 +10398,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 sceneContext->pauseMenuVisible = true;
                 ApplyOverlayState(*sceneContext);
                 PlaySoundEffect(*sceneContext, "ui_back.wav");
-                SetFocus(GetDlgItem(hWnd, kResumeButtonId));
+                FocusGameControl(GetDlgItem(hWnd, kResumeButtonId));
                 return 0;
             case kSettingsMoreId:
                 sceneContext->settingsDialoguePage = !sceneContext->settingsDialoguePage;
@@ -10284,7 +10409,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                     GetClientRect(hWnd, &client);
                     LayoutOverlayControls(hWnd, client.right, client.bottom);
                 }
-                SetFocus(GetDlgItem(hWnd, sceneContext->settingsDialoguePage
+                FocusGameControl(GetDlgItem(hWnd, sceneContext->settingsDialoguePage
                     ? kVoiceVolumeSliderId : kSfxVolumeSliderId));
                 return 0;
             case kSubtitlesButtonId:
@@ -10299,7 +10424,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 SaveSettings(*sceneContext);
                 return 0;
             case kMenuAboutId:
-                MessageBoxA(hWnd,
+                GameMessageBoxA(hWnd,
                             kAboutText,
                             "About Horde Lantern RT",
                             MB_OK | MB_ICONINFORMATION);
@@ -10323,7 +10448,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
             case kBenchmarkCopyButtonId:
                 if (!CopyTextToClipboard(hWnd, sceneContext->benchmarkReport))
                 {
-                    MessageBoxA(hWnd, "The benchmark report could not be copied to the clipboard.",
+                    GameMessageBoxA(hWnd, "The benchmark report could not be copied to the clipboard.",
                                 "Horde Lantern RT", MB_OK | MB_ICONERROR);
                 }
                 return 0;
@@ -10339,7 +10464,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                     GetClientRect(hWnd, &client);
                     LayoutOverlayControls(hWnd, client.right - client.left, client.bottom - client.top);
                 }
-                SetFocus(GetDlgItem(hWnd, kRunBenchmarkButtonId));
+                FocusGameControl(GetDlgItem(hWnd, kRunBenchmarkButtonId));
                 return 0;
             case kExitButtonId:
             case kMenuExitId:
@@ -10355,6 +10480,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         if (sceneContext && sceneContext->controlsEnabled)
         {
             sceneContext->teachingControllerGlyphs = false;
+            if(wParam==VK_ESCAPE && sceneContext->campaignMenu && sceneContext->campaignMenu->Visible()){sceneContext->campaignMenu->HandleCommand(4121);return 0;}
             if (sceneContext->simulationPaused && wParam == VK_TAB && (lParam & (1ll << 30)) == 0)
             {
                 NavigateControllerMenu(*sceneContext,
@@ -10419,6 +10545,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
             }
             if (wParam == VK_ESCAPE)
             {
+                if(sceneContext->campaignMenu && sceneContext->campaignMenu->Visible()){sceneContext->campaignMenu->HandleCommand(4121);return 0;}
                 if ((lParam & (1ll << 30)) != 0) return 0;
                 if (sceneContext->graphicsVisible && sceneContext->graphicsEdit)
                 {
@@ -10656,7 +10783,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
             }
             if (clickAction == DesktopClickAction::AcquireCapture)
             {
-                SetFocus(hWnd);
+                FocusGameControl(hWnd);
                 SetCapture(hWnd);
                 GetCursorPos(&sceneContext->mouseRestorePosition);
                 ShowCursor(FALSE);
@@ -11326,6 +11453,8 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     createButton(kEntryBackButtonId, "BACK");
     createButton(kResumeButtonId, "ENTER THE RUIN / RESUME");
     createButton(kRestartButtonId, "RESTART ROUTE");
+    createButton(kCampaignSaveButtonId,"SAVE CHECKPOINT...");
+    createButton(kCampaignLoadButtonId,"LOAD...");
     createButton(kControlsButtonId, "CONTROLS");
     createButton(kSettingsButtonId, "SETTINGS");
     createButton(kReportProblemButtonId, "REPORT A PROBLEM...");
@@ -11509,14 +11638,14 @@ int CreateAndShowWindow(const std::string& diagnosticText,
 #if defined(_DEBUG)
     if (!nativeMotionScenario.empty()) showMode=SW_SHOWNORMAL;
 #endif
-    ShowWindow(hWnd,showMode);
+    if(!gCampaignHiddenValidation)ShowWindow(hWnd,showMode);
     // Only the explicitly owner-authorized foreground comparison may raise the
     // window. Background measurements fail closed if another app covers it.
-    if(ParseCaptureLaunchOptions().measureChapterForeground)
+    if(!gCampaignHiddenValidation && ParseCaptureLaunchOptions().measureChapterForeground)
         SetWindowPos(hWnd,HWND_TOPMOST,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE|SWP_NOACTIVATE);
-    if(ParseCaptureLaunchOptions().measureChapterForeground) {
+    if(!gCampaignHiddenValidation && ParseCaptureLaunchOptions().measureChapterForeground) {
         SetForegroundWindow(hWnd);
-        SetFocus(hWnd);
+        FocusGameControl(hWnd);
     }
     UpdateWindow(hWnd);
     if (captureDirectory != nullptr)
@@ -11532,10 +11661,10 @@ int CreateAndShowWindow(const std::string& diagnosticText,
                          (actualClientRect.bottom - actualClientRect.top),
                      SWP_NOMOVE | SWP_NOACTIVATE | SWP_NOZORDER);
     }
-    if (captureDirectory == nullptr)
+    if (captureDirectory == nullptr && !gCampaignHiddenValidation)
     {
         SetForegroundWindow(hWnd);
-        SetFocus(sceneMode ? hWnd : edit);
+        FocusGameControl(sceneMode ? hWnd : edit);
     }
 
     const int result = RunDiagnosticSwapchainWindow(
@@ -11544,7 +11673,7 @@ int CreateAndShowWindow(const std::string& diagnosticText,
         benchmarkRtWorkloadPreset,
         anatomicalPlayerMount, graphicsPreviewCapture, outputResizeValidation, nativeMotionScenario, nativeMotionRtWorkloadPreset,
         captureDustQuality);
-    if ((captureDirectory != nullptr || unattendedBenchmark) && IsWindow(hWnd))
+    if ((gCampaignHiddenValidation || captureDirectory != nullptr || unattendedBenchmark) && IsWindow(hWnd))
     {
         DestroyWindow(hWnd);
     }
@@ -11561,7 +11690,9 @@ int RunDiagnosticWindow(const int showCommand)
     (void)showCommand;
     SetProcessDPIAware();
 
+    if(!ConfigureHiddenCampaignValidation())return 2;
     const CaptureLaunchOptions launchOptions = ParseCaptureLaunchOptions();
+    if(gCampaignHiddenValidation && (launchOptions.requested || launchOptions.benchmark.requested)){std::cerr<<"Hidden campaign validation cannot combine with capture or benchmark modes.\n";return 2;}
     if (!launchOptions.error.empty())
     {
         std::cerr << launchOptions.error << '\n';
@@ -11601,7 +11732,7 @@ int RunDiagnosticWindow(const int showCommand)
     std::cout << diagnosticText << "\n\n";
 
     std::error_code error;
-    const std::filesystem::path reportDirectory = (launchOptions.graphicsPreview || launchOptions.outputResizeValidation || !launchOptions.nativeMotionScenario.empty())
+    const std::filesystem::path reportDirectory = gCampaignHiddenValidation?gCampaignValidationDirectory:(launchOptions.graphicsPreview || launchOptions.outputResizeValidation || !launchOptions.nativeMotionScenario.empty())
         ? launchOptions.outputDirectory
         : launchOptions.benchmark.requested
         ? std::filesystem::absolute(std::filesystem::path(launchOptions.benchmark.outputDirectory))

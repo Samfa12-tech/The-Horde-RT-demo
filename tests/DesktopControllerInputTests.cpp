@@ -482,12 +482,16 @@ int main()
             windowsSource.find("context.rtSceneTuning = {};") != std::string::npos &&
             measurementPauseBegin != std::string::npos && measurementPauseEnd != std::string::npos &&
             windowsSource.substr(measurementPauseBegin, measurementPauseEnd - measurementPauseBegin)
-                    .find("return pauseVisible || context.settingsVisible || context.rtLabVisible") != std::string::npos &&
+                    .find("pauseVisible || context.settingsVisible || context.rtLabVisible") != std::string::npos &&
+            windowsSource.substr(measurementPauseBegin, measurementPauseEnd - measurementPauseBegin)
+                    .find("context.campaignPause ||") != std::string::npos &&
+            windowsSource.substr(measurementPauseBegin, measurementPauseEnd - measurementPauseBegin)
+                    .find("(context.campaignMenu && context.campaignMenu->Visible()) ||") != std::string::npos &&
             windowsSource.substr(measurementPauseBegin, measurementPauseEnd - measurementPauseBegin)
                     .find("context.diagnosticsVisible || context.benchmarkReportVisible;") != std::string::npos &&
             windowsSource.find("context.simulationPaused = MeasurementPausedByUi(context);") != std::string::npos &&
             windowsSource.find("context.simulationInput.paused = context.simulationPaused;") != std::string::npos,
-            "Windows RT Lab must pass route-local tuning to the renderer while pausing simulation through the shared UI helper");
+            "Windows RT Lab must retain route-local renderer tuning and shared UI pausing, including campaign pause and chooser visibility");
     Require(windowsSource.find("RT LAB UNLOCKED") != std::string::npos &&
             windowsSource.find("OPEN RT LAB") != std::string::npos &&
             windowsSource.find("RESTORE AUTHORED") != std::string::npos &&

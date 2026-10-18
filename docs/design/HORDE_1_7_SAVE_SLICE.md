@@ -46,8 +46,20 @@ unchanged, all 274 prior paths were retained, current 281-path inventory was
 unchanged and owner `campaign-v1` remained absent; logs contained no fatal lines.
 This scoped pass does not replace the earlier blocked candidate's history.
 
-Windows adapter/menu and death-screen Load remain the next implementation seams.
-Full descent/landing, earning checkpoints/autosaves through normal phone gameplay,
+Windows now has the [native three-slot menu/owner handoff](../evidence/2026-10-18-windows-campaign/README.md),
+with real hidden HWND commands, worker IO, fresh hardware-RT Load/Resume,
+combat-death recovery and New Game evidence. Android also has the
+[death-screen Load path](../evidence/2026-10-18-android-death-load/README.md),
+82 affected Java host passes and fresh Debug/unsigned Release four-ABI builds;
+these APKs have not been installed and inherit no earlier device acceptance.
+The [earned chapter persistence proof](../evidence/2026-10-18-earned-campaign-recovery/README.md)
+now joins ordinary-input guards/Keeper/claim/ascent to actual manual/autosave disk
+records, fresh production-session reload and interrupted/full return descent.
+It uses CPU readiness injection with damage/teaching disabled; physical earned
+progress, survival and teaching remain separate. These are bounded implementation
+and host/hidden-RT checkpoints, not complete physical acceptance.
+
+Physical full descent/landing and earning checkpoints/autosaves through normal phone gameplay,
 forest-end/full-route recovery, interruption during active save/load, power-loss,
 audio/controller/comfort and sustained performance are not accepted. Reported
 file/directory flush is not a physical power-loss test. The independent torch

@@ -226,6 +226,18 @@ add_library(horde_campaign_session STATIC src/gameplay/campaign/CampaignSession.
     src/gameplay/campaign/CampaignPlaySession.cpp)
 target_link_libraries(horde_campaign_session PUBLIC horde_campaign_persistence horde_gameplay_simulation)
 
+if(WIN32)
+    add_library(horde_windows_campaign_ui STATIC src/platform/windows/WindowsCampaignMenu.cpp)
+    target_include_directories(horde_windows_campaign_ui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_link_libraries(horde_windows_campaign_ui PUBLIC horde_campaign_session user32 gdi32)
+    if(BUILD_TESTING)
+        add_executable(horde_rt_windows_campaign_menu_tests tests/WindowsCampaignMenuTests.cpp)
+        target_link_libraries(horde_rt_windows_campaign_menu_tests PRIVATE horde_windows_campaign_ui)
+        add_test(NAME horde_rt_windows_campaign_menu_tests COMMAND horde_rt_windows_campaign_menu_tests)
+        set_tests_properties(horde_rt_windows_campaign_menu_tests PROPERTIES TIMEOUT 30)
+    endif()
+endif()
+
 if(BUILD_TESTING)
     add_executable(horde_rt_android_campaign_load_barrier_tests tests/AndroidCampaignLoadBarrierTests.cpp)
     target_include_directories(horde_rt_android_campaign_load_barrier_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
@@ -436,6 +448,7 @@ if(HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW AN
     )
 
     target_link_libraries(horde_rt_diagnostic_window PRIVATE
+        horde_windows_campaign_ui
         horde_rt_probe_core
         horde_windows_music
         horde_rt_report_webview2

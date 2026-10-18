@@ -1,0 +1,47 @@
+{
+  "evidenceClass": "six exported seeded records; isolated Windows r3 root",
+  "records": [
+    {
+      "name": "slot-1-auto.hrd",
+      "before": "26fc5a83d0810cee2087ec1a6474d1aa09ff7a84264b22e9dbc054649667d343",
+      "after": "26fc5a83d0810cee2087ec1a6474d1aa09ff7a84264b22e9dbc054649667d343",
+      "bytes": 162,
+      "changed": false
+    },
+    {
+      "name": "slot-1-manual.hrd",
+      "before": "72e136f8b3d673aa80fc390659a95e6fc3e960365a07dd460766ea685dbbddf8",
+      "after": "72e136f8b3d673aa80fc390659a95e6fc3e960365a07dd460766ea685dbbddf8",
+      "bytes": 162,
+      "changed": false
+    },
+    {
+      "name": "slot-2-auto.hrd",
+      "before": "68ddd7cc1af4307696d5f8c8aef66c74ac8d965f5381567b0d0d4828b4ad37ee",
+      "after": "68ddd7cc1af4307696d5f8c8aef66c74ac8d965f5381567b0d0d4828b4ad37ee",
+      "bytes": 162,
+      "changed": false
+    },
+    {
+      "name": "slot-2-manual.hrd",
+      "before": "4f8ce6b60c205821e475f21419228dc0461206ea0e13ac4b0e090d9cc4ade70d",
+      "after": "4f8ce6b60c205821e475f21419228dc0461206ea0e13ac4b0e090d9cc4ade70d",
+      "bytes": 162,
+      "changed": false
+    },
+    {
+      "name": "slot-3-auto.hrd",
+      "before": "7712e9ffcbd0bbaa48ae2f73216ad4981148bab32fea66c867f792ffbb12f1d0",
+      "after": "7712e9ffcbd0bbaa48ae2f73216ad4981148bab32fea66c867f792ffbb12f1d0",
+      "bytes": 162,
+      "changed": false
+    },
+    {
+      "name": "slot-3-manual.hrd",
+      "before": "31fc5afe9cc616e284cfc534361a2b451e0d70f5a33449257e90ed4476bb1fd5",
+      "after": "72e136f8b3d673aa80fc390659a95e6fc3e960365a07dd460766ea685dbbddf8",
+      "bytes": 162,
+      "changed": true
+    }
+  ]
+}

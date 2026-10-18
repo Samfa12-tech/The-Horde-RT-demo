@@ -1,0 +1,55 @@
+{
+  "sourceParent": "0a9d75882f6e64fc2f2b57465733bb63d6feb825",
+  "files": [
+    {
+      "path": "CMakeLists.txt",
+      "bytes": 109191,
+      "sha256": "5ebb1e80c4e9379f19b3f39293b3ce74c3ff4ef692f61012f878b97784c3275f"
+    },
+    {
+      "path": "src/platform/windows/DiagnosticWindow.cpp",
+      "bytes": 596476,
+      "sha256": "480f6c3f24f0946ef9e1082a93d946b827d3c7b7cc71f0843453e354be182fae"
+    },
+    {
+      "path": "src/platform/windows/windows_campaign_owner.inl",
+      "bytes": 17589,
+      "sha256": "aa718da0d108a3275f558d812ed4fc62e2f66bc09d650cef259d6d05b218726a"
+    },
+    {
+      "path": "src/platform/windows/windows_campaign_validation.inl",
+      "bytes": 14285,
+      "sha256": "d015fcd6702adccd87c636d4117d61ae77e627093ba87f9b4e492cde1c7d279e"
+    },
+    {
+      "path": "src/platform/windows/WindowsCampaignMenu.h",
+      "bytes": 2353,
+      "sha256": "2dc43761e0184b2b10755feffe0be2b97d9409a04797ee9ed6dd691e8b0801b1"
+    },
+    {
+      "path": "src/platform/windows/WindowsCampaignMenu.cpp",
+      "bytes": 9831,
+      "sha256": "9c182206e31bc1dd4cf549a33abb07da652277c87de18185925f29af88f43022"
+    },
+    {
+      "path": "tests/WindowsCampaignMenuTests.cpp",
+      "bytes": 9269,
+      "sha256": "1372c2e074daee8c1a2db5313254ac601233fedbdbd43c3a9f072a2c8bd28717"
+    },
+    {
+      "path": "src/gameplay/campaign/CampaignLoadBarrier.h",
+      "bytes": 8763,
+      "sha256": "0b6b5520e3ce4b46192fd6fc8968a17f67450863a0e0f3baf368ec7e46fda731"
+    },
+    {
+      "path": "src/platform/android/AndroidCampaignLoadBarrier.h",
+      "bytes": 264,
+      "sha256": "3f85cf870e38431a6151cd6e1e101dd3e6a8f5d2c1da383e10a8c39ed98d941a"
+    },
+    {
+      "path": "tests/DesktopControllerInputTests.cpp",
+      "bytes": 49378,
+      "sha256": "025a68b19d54bee40a75160aacdc258649b9695244af1a97c188f84ccc008a1b"
+    }
+  ]
+}
