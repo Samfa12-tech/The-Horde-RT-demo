@@ -149,6 +149,10 @@ public:
         std::shared_ptr<const TriangleSupportSurface> terrain, const InputSnapshot& currentInput,
         std::uint64_t currentInputPublicationSequence = 0);
     void CancelCampaignRestore() { pendingCampaignRestore_.reset(); }
+    bool CancelCampaignRestore(campaign::RestoreToken token) {
+        if(!pendingCampaignRestore_ || pendingCampaignRestore_->token!=token) return false;
+        pendingCampaignRestore_.reset();return true;
+    }
 
     const SimulationSnapshot& Snapshot() const { return snapshot_; }
     const BoundedGameplayEventQueue& Events() const { return events_; }

@@ -1,5 +1,18 @@
 # Horde 1.7 current design index
 
+The [current full host save/load checkpoint](../evidence/2026-10-18-campaign-session/README.md)
+connects real bounded IO, three separate manual/latest-autosave pairs, actual
+simulation capture and token-bound terrain/simulation/camera/input transaction.
+Platform menus/roots, upstream native controls, renderer preparation, automatic
+hooks and physical save/lifecycle/durability gates remain open. Retention is
+confirmed, not pending. The [complete reconciled feature map](HORDE_1_7_FEATURE_STATUS_2026_10_18.md)
+records later owner decisions, including roots/crouch, map/river, forest ambience
+and measured tomb debris. Continue bounded implementation while owner testing
+is pending; the earlier stop-for-review checkpoints below retain their dated scope.
+The [Android shadow cycle fix](../evidence/2026-10-18-mobile-shadow-cycle/README.md)
+passes 38 host UI/preference checks. The separate [cold phone startup checks](../evidence/2026-10-18-phone-checkpoint-review/README.md)
+pass on sealed 0d6c22d6; they do not certify the newer save/load code.
+
 The [combined five-commit review](../evidence/2026-10-18-campaign-combined-review/README.md)
 corrects moving torch-release checkpoint admission/reconstruction, a stale load
 input barrier after explicit diagnostic checkpoint replacement, and restored

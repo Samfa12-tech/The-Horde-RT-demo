@@ -218,7 +218,18 @@ target_include_directories(horde_campaign_persistence PUBLIC ${CMAKE_CURRENT_SOU
 target_compile_features(horde_campaign_persistence PUBLIC cxx_std_20)
 target_link_libraries(horde_campaign_persistence PUBLIC Threads::Threads)
 
+add_library(horde_campaign_session STATIC src/gameplay/campaign/CampaignSession.cpp)
+target_link_libraries(horde_campaign_session PUBLIC horde_campaign_persistence horde_gameplay_simulation)
+
 if(BUILD_TESTING)
+    add_executable(horde_rt_campaign_session_tests tests/CampaignSessionTests.cpp
+        src/scene/assets/AssetManifest.cpp src/scene/assets/AssetValidation.cpp
+        src/scene/assets/GltfDocument.cpp src/scene/assets/StaticMeshAsset.cpp)
+    target_link_libraries(horde_rt_campaign_session_tests PRIVATE horde_campaign_session)
+    target_include_directories(horde_rt_campaign_session_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/third_party)
+    target_compile_definitions(horde_rt_campaign_session_tests PRIVATE HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
+    add_test(NAME horde_rt_campaign_session_tests COMMAND horde_rt_campaign_session_tests)
+    set_tests_properties(horde_rt_campaign_session_tests PROPERTIES TIMEOUT 30)
     add_executable(horde_rt_campaign_save_worker_tests tests/CampaignSaveWorkerTests.cpp)
     target_link_libraries(horde_rt_campaign_save_worker_tests PRIVATE horde_campaign_persistence)
     add_test(NAME horde_rt_campaign_save_worker_tests COMMAND horde_rt_campaign_save_worker_tests)

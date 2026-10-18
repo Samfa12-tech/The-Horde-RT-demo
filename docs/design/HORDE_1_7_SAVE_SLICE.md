@@ -1,5 +1,15 @@
 # Logical safe-checkpoint round trip and next storage boundary
 
+**18 October update:** retention is now confirmed: exactly three slots, each
+with a separate manual record and latest autosave; autosaving cannot replace
+manual. The [real worker](../evidence/2026-10-18-campaign-worker/README.md) and
+[full host save/load path](../evidence/2026-10-18-campaign-session/README.md)
+are implemented and tested in disposable directories. Menus, owner-save roots,
+platform input/camera/resource adapters and physical durability/lifecycle gates
+remain open. Earlier unresolved-policy and stop-for-review wording below belongs
+to its preserved pre-implementation snapshot; it is superseded by this update and
+the current Project Decisions record.
+
 The logical two-boundary slice below is implemented; the
 [implementation and validation receipt](../evidence/2026-10-17-logical-save/README.md)
 defines its supported state and remaining integration limits. It has no disk
