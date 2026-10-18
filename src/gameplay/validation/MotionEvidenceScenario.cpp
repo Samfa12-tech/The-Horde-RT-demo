@@ -170,6 +170,7 @@ InputSnapshot MotionEvidenceScenario::BuildInput(const SimulationSnapshot& state
     input.moveForward = input.moveStrafe = 0.0f;
     input.hasAuthoritativePlayerPose = false;
     input.runHeld = false;
+    input.crouchHeld = false;
     input.authoritativePlayerX = input.authoritativePlayerZ = 0.0f;
     input.damageEnabled = KeeperScenario(scenario_);
     input.torchLightStrength = 1.8f;
@@ -187,11 +188,19 @@ InputSnapshot MotionEvidenceScenario::BuildInput(const SimulationSnapshot& state
     merge(commands_.runToggle, published.commands.runToggle, state.lastConsumedRunToggleSequence);
     merge(commands_.clearRunIntent, published.commands.clearRunIntent,
           state.lastConsumedClearRunIntentSequence);
+    if (scenario_==MotionScenario::KeeperTorchTransition) {
+        merge(commands_.crouchToggle,published.commands.crouchToggle,state.lastConsumedCrouchToggleSequence);
+        merge(commands_.clearCrouchIntent,published.commands.clearCrouchIntent,state.lastConsumedClearCrouchIntentSequence);
+    }
     if (!runClearSent_)
     {
         const std::uint64_t runClearBase = std::max(
             commands_.clearRunIntent, state.lastConsumedClearRunIntentSequence);
         commands_.clearRunIntent = runClearBase == UINT64_MAX ? runClearBase : runClearBase + 1u;
+        if (scenario_==MotionScenario::KeeperTorchTransition) {
+            const auto floor=commands_.clearCrouchIntent;
+            commands_.clearCrouchIntent=floor==UINT64_MAX?floor:floor+1u;
+        }
         runClearSent_ = true;
     }
     if (now < latestWall_ || now < startWall_) Fail("Monotonic motion clock regressed.");
@@ -225,6 +234,15 @@ InputSnapshot MotionEvidenceScenario::BuildInput(const SimulationSnapshot& state
             if (stage_==MotionStage::Approach) {
                 const auto target=route[torchRouteWaypoint_];
                 MoveTowards(input,state,target.x,target.z);
+                // The live opening now requires actual crouch input. Predict
+                // standing clearance through the shared authored body query;
+                // preserve the ordinary motor, collision and transition time.
+                const float dx=target.x-state.playerX,dz=target.z-state.playerZ;
+                const float distance=std::hypot(dx,dz);
+                const float scale=distance>.0001f?std::min(distance,.30f)/distance:0.f;
+                input.crouchHeld=!AuthoredBodySweepClear(state.playerX,state.playerZ,
+                    state.playerX+dx*scale,state.playerZ+dz*scale,state.playerSupportWorldY,
+                    kStandingBodyHeight,kPlayerCollisionRadius);
                 if (Distance(state,target.x,target.z)<0.035f) {
                     if (++torchRouteWaypoint_==route.size()) Enter(MotionStage::TorchBaseline);
                 }

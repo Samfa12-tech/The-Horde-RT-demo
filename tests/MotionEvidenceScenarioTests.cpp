@@ -852,18 +852,24 @@ int main(int argc, char** argv)
             Check(!probe.Begin(MotionScenario::KeeperTorchTransition,live,1),
                 "torch probe rejects the legacy showcase instead of silently profiling it");
             live.StartLiveDevelopmentRescueJourney(true);
+            InputSnapshot owner;owner.crouchHeld=true;owner.commands.crouchToggle=5;
+            live.StepFixed(owner);live.ClearEvents();
             const auto initialTick=live.Snapshot().tickIndex;
             Check(probe.Begin(MotionScenario::KeeperTorchTransition,live,1) &&
                   live.Snapshot().tickIndex==initialTick,
                 "torch probe observes live chapter without reseeding/advancing it");
             std::uint64_t now=1,publication=1;
-            bool baseline=false,lit=false,pauseChecked=false;
+            bool baseline=false,lit=false,pauseChecked=false,crouchSeen=false,standingAgain=false;
             for(int frame=0;frame<rate*115 && !probe.Complete() && !probe.Failed();++frame) {
                 now+=1'000'000'000ull/rate;
-                const auto input=probe.BuildInput(live.Snapshot(),{},now,true);
+                const auto input=probe.BuildInput(live.Snapshot(),owner,now,true);
+                if(frame==0)Check(!input.crouchHeld && input.commands.clearCrouchIntent>owner.commands.clearCrouchIntent,
+                    "live probe releases inherited held/toggled crouch before steering its own route");
                 Check(!input.hasAuthoritativePlayerPose && !input.tutorialEnabled,
                     "torch probe retains ordinary movement and normal simulation time");
                 live.AdvanceFrame(input,1.0/rate,publication++);
+                crouchSeen=crouchSeen || (live.Snapshot().playerZ<-3.f && live.Snapshot().playerCrouchDropMetres>.5f);
+                standingAgain=standingAgain || (crouchSeen && live.Snapshot().playerZ<-4.f && !live.Snapshot().crouchActive);
                 probe.ObserveAdvance(live.Snapshot(),live.Events().Events());live.ClearEvents();
                 if(probe.Stage()==MotionStage::TorchBaseline || probe.Stage()==MotionStage::TorchLit) {
                     unsigned litSources=0;
@@ -889,6 +895,9 @@ int main(int argc, char** argv)
             }
             if(!probe.Complete())std::cerr<<"Torch probe: "<<probe.Failure()<<" stage "<<MotionStageName(probe.Stage())<<" at "<<live.Snapshot().playerX<<","<<live.Snapshot().playerZ<<'\n';
             Check(probe.Complete() && baseline && lit,"live torch crossing completes baseline and actual reveal");
+            Check(crouchSeen && standingAgain,"live torch route crouches under the opening and stands when clear");
+            std::cout<<"live-torch-crouch rate="<<rate<<" complete="<<probe.Complete()
+                     <<" crouch="<<crouchSeen<<" standingAgain="<<standingAgain<<'\n';
         }
         TestWaterfallEquipmentSeedOwnership(rate);
         RunTorchDrench(rate);
