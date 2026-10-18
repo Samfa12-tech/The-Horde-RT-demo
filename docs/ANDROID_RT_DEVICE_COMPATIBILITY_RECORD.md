@@ -3150,3 +3150,30 @@ Query, Save/Load, menus/touch, Home/resume, process-death save recovery,
 POSIX/power-loss durability, sustained warm performance and owner visual/audio/
 haptic acceptance remain untested on this candidate. No other device is certified.
 [Exact scope, custody, frame identities and hashes](evidence/2026-10-18-phone-checkpoint-review/README.md).
+
+### 18 October - physical entry Back exit-confirmation acceptance
+
+Owner-authorized **SM-S948B**, Android **17 / API 37**, build
+`CP2A.260605.016.S948BXXS4BZIG`. Exact source checkpoint
+`a447bb731612c45ab494ab63a5ac4a9eac71c810` contains the `ad5857ed` Back fix.
+Separate development-signed Debug APK, code 10 / `1.6.2-debug`, SHA-256
+`6d865599c74828bc15165693e7ea23e31454e2909c7ddd0b66123cf0534809d6`
+(183,787,786 bytes), installed in place and matched by on-device hash.
+
+Evidence class: finite physical entry-menu Back/Stay/cancel/Home/resume/explicit
+Quit/relaunch behavior, verified by Android UI hierarchy and an opened app-only
+dialog screenshot. Stay is focused by default. Stay and Back cancel preserve
+entry PLAY; Home/resume revokes the old dialog; explicit Quit removes the task;
+relaunch returns to a clean entry menu. The terminal test session also exited
+through explicit Quit. No process kill, uninstall or data clearing occurred.
+Horde settings are byte-identical and all 274 `files/`/`shared_prefs/` paths are
+unchanged. No owner-running Horde process was displaced, release app targeted,
+desktop input used or Reef interaction performed.
+
+This receipt does not validate root stepping, crouch/headroom, Save/Load,
+process-death save recovery, platform durability, gameplay, Query or sustained
+performance. The earlier startup/checkpoint receipt remains bound to its older
+APK; no additional startup/performance loop was run. An initial large-APK
+copy/pull preflight was denied before execution by automatic approval review;
+the suggested compact hash-only alternative completed without retrying that
+copy/pull. [Exact sequence, custody, denial and artifact hashes](evidence/2026-10-18-android-back-device/README.md).

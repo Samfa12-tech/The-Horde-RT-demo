@@ -1,0 +1,545 @@
+{
+  "scope": "Finite current-build physical Android entry-menu Back confirmation only",
+  "sourceCommit": "a447bb731612c45ab494ab63a5ac4a9eac71c810",
+  "backImplementationCommit": "ad5857edfc38fb309eb2c0b94a687ba1a7215121",
+  "recordedUtc": "2026-10-18T01:18:51.2876601Z",
+  "worktree": "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof",
+  "device": {
+    "serial": "R5GL219SZGK",
+    "model": "SM-S948B",
+    "androidVersion": "17",
+    "api": 37,
+    "build": "CP2A.260605.016.S948BXXS4BZIG",
+    "user": 0,
+    "initialForeground": "Android launcher",
+    "initialHordeProcesses": 0
+  },
+  "package": {
+    "name": "com.samfa12.hordelanternrt.debug",
+    "version": "1.6.2-debug",
+    "code": 10,
+    "candidate": {
+      "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "bytes": 183787786,
+      "sha256": "6d865599c74828bc15165693e7ea23e31454e2909c7ddd0b66123cf0534809d6"
+    },
+    "installedBeforeSha256": "24e286544a801035a65e1b8f75d7259a27f5792b907d32552bc29882cb5cedfa",
+    "installedAfterSha256": "6d865599c74828bc15165693e7ea23e31454e2909c7ddd0b66123cf0534809d6",
+    "publicV2CertificateSha256": "2bc406088b23ac80f2a00a40e2d5d8daa012844dc62f31ad6145d129f5566736",
+    "installedSignerBasis": "On-device pre-install APK hash matches prior physically pulled/public-signer-verified artifact; current local public signer verified independently",
+    "installCommand": "adb -s R5GL219SZGK install -r android/app/build/outputs/apk/debug/app-debug.apk",
+    "installOutcome": "Success",
+    "largeApkCopyOrPullExecuted": false
+  },
+  "cases": [
+    {
+      "name": "Back opens confirmation",
+      "result": "PASS",
+      "proof": "02-dialog.xml",
+      "stayDefaultFocus": true
+    },
+    {
+      "name": "Stay preserves entry",
+      "result": "PASS",
+      "proof": "03-after-stay.xml"
+    },
+    {
+      "name": "Back cancels confirmation",
+      "result": "PASS",
+      "before": "04-cancel-dialog.xml",
+      "after": "05-after-back-cancel.xml"
+    },
+    {
+      "name": "Home/resume revokes confirmation",
+      "result": "PASS",
+      "before": "06-before-background.xml",
+      "after": "08-after-resume.xml",
+      "resumeObservation": "Existing task brought to front"
+    },
+    {
+      "name": "Explicit Quit removes task",
+      "result": "PASS",
+      "proof": "09-before-quit.xml plus zero-row activity query observed in command result",
+      "activityRowsAfter": 0
+    },
+    {
+      "name": "Relaunch clean entry",
+      "result": "PASS",
+      "proof": "11-after-relaunch.xml"
+    },
+    {
+      "name": "Terminal explicit Quit",
+      "result": "PASS",
+      "proof": "12-final-dialog.xml and 13-terminal-task-state.json",
+      "state": {
+        "activeHordeActivityRows": 0,
+        "explicitQuit": true,
+        "processKill": false
+      }
+    }
+  ],
+  "uiFacts": [
+    {
+      "snapshot": "01-entry",
+      "entryPlayPresent": true,
+      "exitDialogPresent": false,
+      "controls": [
+        {
+          "text": "PLAY",
+          "resourceId": "",
+          "bounds": "[516,2316][923,2541]",
+          "focused": false,
+          "package": "com.samfa12.hordelanternrt.debug"
+        }
+      ]
+    },
+    {
+      "snapshot": "02-dialog",
+      "entryPlayPresent": false,
+      "exitDialogPresent": true,
+      "controls": [
+        {
+          "text": "Exit The Horde?",
+          "resourceId": "android:id/alertTitle",
+          "bounds": "[120,2648][1320,2740]",
+          "focused": false,
+          "package": "com.samfa12.hordelanternrt.debug"
+        },
+        {
+          "text": "Close The Horde and return to Android?",
+          "resourceId": "android:id/message",
+          "bounds": "[134,2782][1306,2868]",
+          "focused": false,
+          "package": "com.samfa12.hordelanternrt.debug"
+        },
+        {
+          "text": "Stay",
+          "resourceId": "android:id/button2",
+          "bounds": "[120,2896][608,3022]",
+          "focused": true,
+          "package": "com.samfa12.hordelanternrt.debug"
+        },
+        {
+          "text": "QUIT DEMO",
+          "resourceId": "android:id/button1",
+          "bounds": "[612,2896][1320,3022]",
+          "focused": false,
+          "package": "com.samfa12.hordelanternrt.debug"
+        }
+      ]
+    },
+    {
+      "snapshot": "03-after-stay",
+      "entryPlayPresent": true,
+      "exitDialogPresent": false,
+      "controls": [
+        {
+          "text": "PLAY",
+          "resourceId": "",
+          "bounds": "[516,2316][923,2541]",
+          "focused": false,
+          "package": "com.samfa12.hordelanternrt.debug"
+        }
+      ]
+    },
+    {
+      "snapshot": "04-cancel-dialog",
+      "entryPlayPresent": false,
+      "exitDialogPresent": true,
+      "controls": [
+        {
+          "text": "Exit The Horde?",
+          "resourceId": "android:id/alertTitle",
+          "bounds": "[120,2648][1320,2740]",
+          "focused": false,
+          "package": "com.samfa12.hordelanternrt.debug"
+        },
+        {
+          "text": "Close The Horde and return to Android?",
+          "resourceId": "android:id/message",
+          "bounds": "[134,2782][1306,2868]",
+          "focused": false,
+          "package": "com.samfa12.hordelanternrt.debug"
+        },
+        {
+          "text": "Stay",
+          "resourceId": "android:id/button2",
+          "bounds": "[120,2896][608,3022]",
+          "focused": true,
+          "package": "com.samfa12.hordelanternrt.debug"
+        },
+        {
+          "text": "QUIT DEMO",
+          "resourceId": "android:id/button1",
+          "bounds": "[612,2896][1320,3022]",
+          "focused": false,
+          "package": "com.samfa12.hordelanternrt.debug"
+        }
+      ]
+    },
+    {
+      "snapshot": "05-after-back-cancel",
+      "entryPlayPresent": true,
+      "exitDialogPresent": false,
+      "controls": [
+        {
+          "text": "PLAY",
+          "resourceId": "",
+          "bounds": "[516,2316][923,2541]",
+          "focused": false,
+          "package": "com.samfa12.hordelanternrt.debug"
+        }
+      ]
+    },
+    {
+      "snapshot": "06-before-background",
+      "entryPlayPresent": false,
+      "exitDialogPresent": true,
+      "controls": [
+        {
+          "text": "Exit The Horde?",
+          "resourceId": "android:id/alertTitle",
+          "bounds": "[120,2648][1320,2740]",
+          "focused": false,
+          "package": "com.samfa12.hordelanternrt.debug"
+        },
+        {
+          "text": "Close The Horde and return to Android?",
+          "resourceId": "android:id/message",
+          "bounds": "[134,2782][1306,2868]",
+          "focused": false,
+          "package": "com.samfa12.hordelanternrt.debug"
+        },
+        {
+          "text": "Stay",
+          "resourceId": "android:id/button2",
+          "bounds": "[120,2896][608,3022]",
+          "focused": true,
+          "package": "com.samfa12.hordelanternrt.debug"
+        },
+        {
+          "text": "QUIT DEMO",
+          "resourceId": "android:id/button1",
+          "bounds": "[612,2896][1320,3022]",
+          "focused": false,
+          "package": "com.samfa12.hordelanternrt.debug"
+        }
+      ]
+    },
+    {
+      "snapshot": "08-after-resume",
+      "entryPlayPresent": true,
+      "exitDialogPresent": false,
+      "controls": [
+        {
+          "text": "PLAY",
+          "resourceId": "",
+          "bounds": "[516,2316][923,2541]",
+          "focused": false,
+          "package": "com.samfa12.hordelanternrt.debug"
+        }
+      ]
+    },
+    {
+      "snapshot": "09-before-quit",
+      "entryPlayPresent": false,
+      "exitDialogPresent": true,
+      "controls": [
+        {
+          "text": "Exit The Horde?",
+          "resourceId": "android:id/alertTitle",
+          "bounds": "[120,2648][1320,2740]",
+          "focused": false,
+          "package": "com.samfa12.hordelanternrt.debug"
+        },
+        {
+          "text": "Close The Horde and return to Android?",
+          "resourceId": "android:id/message",
+          "bounds": "[134,2782][1306,2868]",
+          "focused": false,
+          "package": "com.samfa12.hordelanternrt.debug"
+        },
+        {
+          "text": "Stay",
+          "resourceId": "android:id/button2",
+          "bounds": "[120,2896][608,3022]",
+          "focused": true,
+          "package": "com.samfa12.hordelanternrt.debug"
+        },
+        {
+          "text": "QUIT DEMO",
+          "resourceId": "android:id/button1",
+          "bounds": "[612,2896][1320,3022]",
+          "focused": false,
+          "package": "com.samfa12.hordelanternrt.debug"
+        }
+      ]
+    },
+    {
+      "snapshot": "11-after-relaunch",
+      "entryPlayPresent": true,
+      "exitDialogPresent": false,
+      "controls": [
+        {
+          "text": "PLAY",
+          "resourceId": "",
+          "bounds": "[516,2316][923,2541]",
+          "focused": false,
+          "package": "com.samfa12.hordelanternrt.debug"
+        }
+      ]
+    },
+    {
+      "snapshot": "12-final-dialog",
+      "entryPlayPresent": false,
+      "exitDialogPresent": true,
+      "controls": [
+        {
+          "text": "Exit The Horde?",
+          "resourceId": "android:id/alertTitle",
+          "bounds": "[120,2648][1320,2740]",
+          "focused": false,
+          "package": "com.samfa12.hordelanternrt.debug"
+        },
+        {
+          "text": "Close The Horde and return to Android?",
+          "resourceId": "android:id/message",
+          "bounds": "[134,2782][1306,2868]",
+          "focused": false,
+          "package": "com.samfa12.hordelanternrt.debug"
+        },
+        {
+          "text": "Stay",
+          "resourceId": "android:id/button2",
+          "bounds": "[120,2896][608,3022]",
+          "focused": true,
+          "package": "com.samfa12.hordelanternrt.debug"
+        },
+        {
+          "text": "QUIT DEMO",
+          "resourceId": "android:id/button1",
+          "bounds": "[612,2896][1320,3022]",
+          "focused": false,
+          "package": "com.samfa12.hordelanternrt.debug"
+        }
+      ]
+    }
+  ],
+  "screenshot": {
+    "artifact": {
+      "path": "reports/android-back-device-2026-10-18/02-dialog.png",
+      "bytes": 2129153,
+      "sha256": "bf822b00c56a79336eddfd78f6edb5e06f5852451853f452e4b34200ba4404ec"
+    },
+    "opened": true,
+    "observed": "Entry scene dimmed behind Android exit confirmation, separate Stay and QUIT DEMO, Stay focused"
+  },
+  "custody": {
+    "settingsSha256Before": "e3966b09cd9c354cb92833496b7f812139178dd7b2a906a4f809dbf9538c3dee",
+    "settingsSha256AfterInstall": "e3966b09cd9c354cb92833496b7f812139178dd7b2a906a4f809dbf9538c3dee",
+    "settingsSha256After": "e3966b09cd9c354cb92833496b7f812139178dd7b2a906a4f809dbf9538c3dee",
+    "filesSharedPrefsPathsBefore": 274,
+    "filesSharedPrefsPathsAfter": 274,
+    "inventoryDifferenceCount": 0,
+    "saveCampaignCheckpointNamedPaths": 0,
+    "wholeAppDataBytesClaimedIdentical": false,
+    "playPressed": false,
+    "saveLoadInvoked": false,
+    "releaseTargeted": false,
+    "desktopInput": false,
+    "ReefInteraction": false,
+    "uninstall": false,
+    "dataClear": false,
+    "securityChange": false,
+    "processKill": false,
+    "finalActivityRows": 0,
+    "cachedProcessExitClaimed": false
+  },
+  "commands": {
+    "launch": "adb -s R5GL219SZGK shell am start --user 0 --activity-single-top -n com.samfa12.hordelanternrt.debug/com.samfa12.hordelanternrt.MainActivity",
+    "back": "adb -s R5GL219SZGK shell input keyevent KEYCODE_BACK",
+    "home": "adb -s R5GL219SZGK shell input keyevent KEYCODE_HOME",
+    "buttonInput": "adb -s R5GL219SZGK shell input tap <center computed from observed button bounds>",
+    "hierarchy": "adb -s R5GL219SZGK shell uiautomator dump /data/local/tmp/horde-back-20261018-<case>.xml; adb pull of that small XML",
+    "logcat": "adb -s R5GL219SZGK logcat -d -b main -b crash -v threadtime -T <device timestamp> --pid=<actual-app-PID> -s HordeRtProbeBridge HordeLanternAudio AndroidRuntime libc"
+  },
+  "fatalExceptionOrSignalCount": 0,
+  "approvalReview": {
+    "action": "Combined preflight command copying local candidate APK to reports and pulling installed base APK",
+    "targets": [
+      "reports/android-back-device-2026-10-18/candidate-a447bb73.apk",
+      "reports/android-back-device-2026-10-18/installed-before.apk"
+    ],
+    "status": "DENIED BEFORE EXECUTION",
+    "partialExecution": false,
+    "exactRejection": "This action was rejected due to unacceptable risk. Reason: Although the inspection and signer checks are authorized and non-destructive, the command unnecessarily copies and pulls roughly 183 MB APK artifacts, conflicting with the explicit compact-evidence/no-big-artifacts restriction; hash-only verification would suffice. Do not bypass this rejection through a workaround or indirect execution. Continue with a safer alternative, or carry out checks to prove that the action is authorized or low risk before trying again. Complete unaffected work without asking for confirmation. Report anything that remains blocked, clarify why it was blocked by auto-review, inform the user of the risk and ask for approval.",
+    "deniedCopyPullRetried": false,
+    "saferAlternative": "Suggested hash-only installed artifact verification plus current local public signer verification",
+    "saferAlternativeResult": "COMPLETED",
+    "remainingBlocker": null
+  },
+  "limits": [
+    "This APK includes movement changes but this test provides NO root stepping/crouch/headroom acceptance",
+    "No gameplay Save/Load or process-death save recovery",
+    "No POSIX or physical power-loss durability",
+    "No gameplay launch via PLAY, Query or sustained performance",
+    "No delayed detached Java callback or real gamepad event device claim",
+    "Prior checkpoint207 startup evidence remains tied to older source/APK"
+  ],
+  "audioHapticManualRevalidation": "NO additional requirement from this menu acceptance pass",
+  "sourceFiles": [
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java",
+      "bytes": 420173,
+      "sha256": "dfa721e3eaf290eae17767b99471d0970aa0506cacece2e5c2d00aaf5493fddd"
+    },
+    {
+      "path": "android/app/src/test/java/com/samfa12/hordelanternrt/AndroidControllerIntegrationTest.java",
+      "bytes": 37465,
+      "sha256": "b7b8f1c9e50110a33f5027aaca67b89b33acb7236044b7c8ccd5bc9413625191"
+    }
+  ],
+  "localArtifacts": [
+    {
+      "path": "reports/android-back-device-2026-10-18/01-entry.xml",
+      "bytes": 5848,
+      "sha256": "7f52d8de5f87b3100182b1334c8567a2f59b71749deed3d555020bc0114dfbdd"
+    },
+    {
+      "path": "reports/android-back-device-2026-10-18/02-dialog.png",
+      "bytes": 2129153,
+      "sha256": "bf822b00c56a79336eddfd78f6edb5e06f5852451853f452e4b34200ba4404ec"
+    },
+    {
+      "path": "reports/android-back-device-2026-10-18/02-dialog.xml",
+      "bytes": 6776,
+      "sha256": "8707e88290634dcda4efdd7187e64c73857a32bd8a48c8d466edd182bdae67bb"
+    },
+    {
+      "path": "reports/android-back-device-2026-10-18/03-after-stay.xml",
+      "bytes": 4703,
+      "sha256": "96f945e2f34e807ff0bccd0d8425bde599d3f69403fe65f0ac9d8bbd173d4ab7"
+    },
+    {
+      "path": "reports/android-back-device-2026-10-18/04-cancel-dialog.xml",
+      "bytes": 6776,
+      "sha256": "8707e88290634dcda4efdd7187e64c73857a32bd8a48c8d466edd182bdae67bb"
+    },
+    {
+      "path": "reports/android-back-device-2026-10-18/05-after-back-cancel.xml",
+      "bytes": 4703,
+      "sha256": "96f945e2f34e807ff0bccd0d8425bde599d3f69403fe65f0ac9d8bbd173d4ab7"
+    },
+    {
+      "path": "reports/android-back-device-2026-10-18/06-before-background.xml",
+      "bytes": 6776,
+      "sha256": "8707e88290634dcda4efdd7187e64c73857a32bd8a48c8d466edd182bdae67bb"
+    },
+    {
+      "path": "reports/android-back-device-2026-10-18/07-background-foreground.txt",
+      "bytes": 119,
+      "sha256": "21ade0e2a94b81273754390cbe23b6e23b00ed8bb6e82f8f498e8c6784ade148"
+    },
+    {
+      "path": "reports/android-back-device-2026-10-18/08-after-resume.xml",
+      "bytes": 5848,
+      "sha256": "7f52d8de5f87b3100182b1334c8567a2f59b71749deed3d555020bc0114dfbdd"
+    },
+    {
+      "path": "reports/android-back-device-2026-10-18/09-before-quit.xml",
+      "bytes": 6776,
+      "sha256": "8707e88290634dcda4efdd7187e64c73857a32bd8a48c8d466edd182bdae67bb"
+    },
+    {
+      "path": "reports/android-back-device-2026-10-18/11-after-relaunch.xml",
+      "bytes": 4703,
+      "sha256": "96f945e2f34e807ff0bccd0d8425bde599d3f69403fe65f0ac9d8bbd173d4ab7"
+    },
+    {
+      "path": "reports/android-back-device-2026-10-18/12-final-dialog.xml",
+      "bytes": 6776,
+      "sha256": "8707e88290634dcda4efdd7187e64c73857a32bd8a48c8d466edd182bdae67bb"
+    },
+    {
+      "path": "reports/android-back-device-2026-10-18/13-terminal-task-state.json",
+      "bytes": 88,
+      "sha256": "bc49eeb9ec914bae408aa1b3fe64364efee5862e0bf5053a0028099156eaf3dd"
+    },
+    {
+      "path": "reports/android-back-device-2026-10-18/app-logcat.txt",
+      "bytes": 27489,
+      "sha256": "7d04ff771b9070e8074461b9e77f416573313b5091c219d50fe5684cbae3e9bf"
+    },
+    {
+      "path": "reports/android-back-device-2026-10-18/app-pid-1.txt",
+      "bytes": 7,
+      "sha256": "375d9fcea886fe63cefcfbd0a657b3e733e00e432157a3591cfd25c4d3857a92"
+    },
+    {
+      "path": "reports/android-back-device-2026-10-18/install.txt",
+      "bytes": 38,
+      "sha256": "c4aa470acafcf8576c15b0f0b5ae7e852d1ec5413372d0e6a9272e788e1306d3"
+    },
+    {
+      "path": "reports/android-back-device-2026-10-18/installed-after.sha256",
+      "bytes": 171,
+      "sha256": "6aca91fe549f0dea4b90cf0ded5ad47361f5b90febf6d1ebb4f91924b1c8ea51"
+    },
+    {
+      "path": "reports/android-back-device-2026-10-18/installed-before.sha256",
+      "bytes": 171,
+      "sha256": "b52220cbaa57c07c1ba87f33fb34ebeb2e6a10a8c9921d5f0ce99881c7481507"
+    },
+    {
+      "path": "reports/android-back-device-2026-10-18/inventory-after.txt",
+      "bytes": 19742,
+      "sha256": "5a95102852739fe9adf60918d91261dc07ea31834e47f42c8bf5b51780955fb9"
+    },
+    {
+      "path": "reports/android-back-device-2026-10-18/inventory-before.txt",
+      "bytes": 19742,
+      "sha256": "5a95102852739fe9adf60918d91261dc07ea31834e47f42c8bf5b51780955fb9"
+    },
+    {
+      "path": "reports/android-back-device-2026-10-18/launch-1.txt",
+      "bytes": 114,
+      "sha256": "4c8263c3039203b16e7af565535c922ff4ebd95fb904675e33bf3f2083381db1"
+    },
+    {
+      "path": "reports/android-back-device-2026-10-18/log-start.txt",
+      "bytes": 22,
+      "sha256": "1c4d223e3ab176553afc0b18b0b434ffae4ca452cf690d856723e466eb3edb02"
+    },
+    {
+      "path": "reports/android-back-device-2026-10-18/relaunch.txt",
+      "bytes": 114,
+      "sha256": "4c8263c3039203b16e7af565535c922ff4ebd95fb904675e33bf3f2083381db1"
+    },
+    {
+      "path": "reports/android-back-device-2026-10-18/resume.txt",
+      "bytes": 114,
+      "sha256": "4c8263c3039203b16e7af565535c922ff4ebd95fb904675e33bf3f2083381db1"
+    },
+    {
+      "path": "reports/android-back-device-2026-10-18/settings-after-install.sha256",
+      "bytes": 113,
+      "sha256": "6985584381d326b4a6dba30913ed977ded963f7648e96d6f1527769ad1e0db01"
+    },
+    {
+      "path": "reports/android-back-device-2026-10-18/settings-after.sha256",
+      "bytes": 113,
+      "sha256": "6985584381d326b4a6dba30913ed977ded963f7648e96d6f1527769ad1e0db01"
+    },
+    {
+      "path": "reports/android-back-device-2026-10-18/settings-before.sha256",
+      "bytes": 113,
+      "sha256": "6985584381d326b4a6dba30913ed977ded963f7648e96d6f1527769ad1e0db01"
+    },
+    {
+      "path": "reports/android-back-device-2026-10-18/signer-candidate.txt",
+      "bytes": 315,
+      "sha256": "70d5134e183887600f1ca213d744c5979affb6d1d3ef1d861e8f6928aa25480f"
+    }
+  ],
+  "commitCreated": false
+}
