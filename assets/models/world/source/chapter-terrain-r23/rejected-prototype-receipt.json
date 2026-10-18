@@ -1,0 +1,119 @@
+{
+  "status": "PRESERVED REJECTED TRIALS; these are NOT accepted r23 outcomes",
+  "plainGridFailure": [
+    {
+      "atlasEN": [
+        214.0,
+        430.0
+      ],
+      "waterY": 47.45,
+      "coverageMiterHalfWidth": 5.0,
+      "banks": [
+        {
+          "side": "positiveEast",
+          "groundMinusWaterAtCoverageEdge": -0.16093982500622417,
+          "firstDry": 110.41875957911672,
+          "intersectsBeforeCoverageWith1mmGuard": false
+        },
+        {
+          "side": "negativeEast",
+          "groundMinusWaterAtCoverageEdge": -0.18775553813025425,
+          "firstDry": null,
+          "intersectsBeforeCoverageWith1mmGuard": false
+        }
+      ]
+    }
+  ],
+  "blanketAnalyticGlobalCapFailure": {
+    "crestVertices": 320,
+    "maximumAbsoluteDelta": 4.060752150754606,
+    "failedVertices": 7,
+    "failed": [
+      {
+        "vertex": 17669,
+        "atlasEN": [
+          56.18250306,
+          -92.095972202
+        ],
+        "oldY": -25.524120915269478,
+        "newAnalyticY": -28.639999902363535,
+        "delta": -3.1158789870940566,
+        "actualPlannedWaterY": -28.839939703114087,
+        "clearance": 0.19993980075055262
+      },
+      {
+        "vertex": 17676,
+        "atlasEN": [
+          55.98694401300001,
+          -95.02935792000001
+        ],
+        "oldY": -24.647693418879776,
+        "newAnalyticY": -28.70844556963438,
+        "delta": -4.060752150754606,
+        "actualPlannedWaterY": -28.91034074787457,
+        "clearance": 0.2018951782401892
+      },
+      {
+        "vertex": 17680,
+        "atlasEN": [
+          55.910431351000014,
+          -96.177047839
+        ],
+        "oldY": -25.284095577157352,
+        "newAnalyticY": -28.735225000639826,
+        "delta": -3.451129423482474,
+        "actualPlannedWaterY": -28.937885222805086,
+        "clearance": 0.20266022216526025
+      },
+      {
+        "vertex": 17684,
+        "atlasEN": [
+          55.73556787400001,
+          -98.8
+        ],
+        "oldY": -28.174405296639286,
+        "newAnalyticY": -28.79642721796867,
+        "delta": -0.6220219213293845,
+        "actualPlannedWaterY": -29.000835884684413,
+        "clearance": 0.20440866671574298
+      },
+      {
+        "vertex": 17693,
+        "atlasEN": [
+          129.64306315200002,
+          220.466466191
+        ],
+        "oldY": 8.857293401066666,
+        "newAnalyticY": 8.325573005692771,
+        "delta": -0.5317203953738954,
+        "actualPlannedWaterY": 8.125661233791147,
+        "clearance": 0.19991177190162368
+      },
+      {
+        "vertex": 19009,
+        "atlasEN": [
+          -50.935615498,
+          -512.936441114
+        ],
+        "oldY": -33.640156411540204,
+        "newAnalyticY": -32.54280216063395,
+        "delta": 1.0973542509062568,
+        "actualPlannedWaterY": -32.742780570054165,
+        "clearance": 0.19997840942021838
+      },
+      {
+        "vertex": 19017,
+        "atlasEN": [
+          -51.178542582999995,
+          -513.224354696
+        ],
+        "oldY": -33.67962589135843,
+        "newAnalyticY": -32.550000000266316,
+        "delta": 1.129625891092111,
+        "actualPlannedWaterY": -32.75000000000591,
+        "clearance": 0.19999999973959603
+      }
+    ]
+  },
+  "laterAuthorization": "Never lower dry crests; only deficientnewcrests corrected, cap.50m; only two measured terminalcoordinates cap1.25m. Final receipts retain this narrow distinction."
+}

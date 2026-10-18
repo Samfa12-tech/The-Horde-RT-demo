@@ -274,8 +274,9 @@ def main():
     water_conformance=None
     if regional:
         # Split only coarse outer faces at the unchanged atlas water outlines.
-        # Preserve every accepted local triangle and sample new positions from
-        # the same regional heightfield; water heights never alter ground.
+        # Preserve every accepted local triangle. Ordinary inserts use the
+        # same heightfield; only deficient NEW5m crests have the explicitly
+        # bounded continuous-carve/endcap authoring policy in the helper.
         closed_envelope_faces=2*sum(len(side)-1 for side in inner_sides)+2
         engine_vertices=[(x,y,-z) for x,z,y in vertices]
         engine_vertices,faces,source_faces,water_conformance=conform_water(
@@ -393,7 +394,8 @@ def main():
         'boundsEngine':[[all_bounds[0][0],bottom_y,all_bounds[0][2]],all_bounds[1]],
         'regional':{'east':[-150,410],'north':[-510,440],'ringCount':len(rings),
                     'layoutSha256':digest(args.regional_layout)} if regional else None,
-        'waterConformance':water_conformance}
+        'waterConformance':water_conformance,
+        'newBankCrestHeightPolicy':'Preserve dry bilinear samples; only deficient new5m crests use continuous carve, max+.50m except two exact outflow endcaps max+1.25m; no original/grid/core changes' if regional else None}
     (out/'surface.json').write_text(json.dumps(surface,separators=(',',':'))+'\n')
     # Derive the candidate manifest from actual exporter output, not Blender's
     # pre-split vertex count. This is a new asset envelope, not a renderer cap.
@@ -422,6 +424,7 @@ def main():
         'regionalRecipeSha256':digest(Path(__file__).with_name('chapter_regional_terrain.py')) if regional else None,
         'waterConformance':water_conformance,
         'waterConformanceRecipeSha256':digest(Path(__file__).with_name('chapter_water_conformance.py')) if regional else None,
+        'newBankCrestHeightPolicy':surface['newBankCrestHeightPolicy'],
         'gridSpacing':('1m near; stitched 4/8/16m regional rings; coarse surrounding envelope beyond 10km ray reach' if regional
                        else '1m near; 2/4m mid; 8m far; exact shaft/skylight interfaces'),
         'adjustments':['Five-tap separable planning-height smoothing','2.4m graded trail; 6.4m/7m pockets',

@@ -1,8 +1,9 @@
 """Bounded source-only terrain/water planar constraint overlay.
 
-Preserve all original vertices and nonintersecting triangles. Only admitted
-outer triangles are split; inserted heights come from the unchanged regional
-heightfield, never from a raised water surface or synthetic collision floor.
+Preserve all original vertices and unaffected triangles. Only admitted outer
+triangles and required edge neighbours are split. Ordinary inserts use the
+unchanged regional heightfield. Deficient NEW five-metre bank crests have the
+explicit bounded continuous-profile exception documented by bank_crest_heights.
 No Blender, exporter, runtime dependency or filesystem mutation.
 """
 import math
@@ -44,10 +45,10 @@ def triangulate(polygon):
     return result
 
 
-def water_footprints(regional):
-    """Exact atlas lake and six-metre mitered ribbons, in engine X/Z."""
+def ribbon_geometry(regional,half_width):
+    """Source X/Z constraints, crest edges and the renderer's 3D diagonal."""
     engine=lambda p:(float(p[0])+78.3,126.2-float(p[1]))
-    polygons=[list(map(engine,regional.lake_outline))]
+    polygons=[];edges=[];triangles=[]
     for river in regional.river_water:
         points=np.asarray(river,dtype=float)
         directions=np.diff(points[:,:2],axis=0)
@@ -56,11 +57,71 @@ def water_footprints(regional):
         left=[];right=[]
         for i,p in enumerate(points):
             before,after=normals[max(0,i-1)],normals[min(i,len(normals)-1)]
-            m=before+after;m*=3./np.dot(m,before)
-            left.append(engine(p[:2]+m));right.append(engine(p[:2]-m))
+            m=before+after;m*=half_width/np.dot(m,before)
+            x,z=engine(p[:2]+m);left.append((x,float(p[2])-31.55,z))
+            x,z=engine(p[:2]-m);right.append((x,float(p[2])-31.55,z))
         # Separate quads match the renderer's shared miter vertices at bends.
-        polygons.extend([[left[i],right[i],right[i+1],left[i+1]] for i in range(len(points)-1)])
-    return [p if area(p)>0 else p[::-1] for p in polygons]
+        for i in range(len(points)-1):
+            polygons.append([(p[0],p[2]) for p in (left[i],right[i],right[i+1],left[i+1])])
+            edges.extend(((left[i],left[i+1]),(right[i],right[i+1])))
+            # Our atlas normal is opposite the C++ engine normal, so these
+            # use C++ left=right here and retain its exact shared diagonal.
+            triangles.extend(((right[i],left[i+1],left[i]),(right[i],right[i+1],left[i+1])))
+    return [p if area(p)>0 else p[::-1] for p in polygons],edges,triangles
+
+
+def water_footprints(regional,half_width=3.):
+    """Exact atlas lake and mitered ribbons, in engine X/Z."""
+    lake=[(float(p[0])+78.3,126.2-float(p[1])) for p in regional.lake_outline]
+    return [lake if area(lake)>0 else lake[::-1]]+ribbon_geometry(regional,half_width)[0]
+
+
+def bank_crest_heights(points,old_heights,regional):
+    """Raise only deficient newly inserted five-metre longitudinal crests.
+
+    Preserve dry bilinear samples (>=1cm above actual widened ribbon faces).
+    Otherwise use max(old, continuous unblended carve profile). Positive delta
+    is capped at .50m, except TWO approved outflow endcap samples <=3.3m beyond
+    the source grid, capped at1.25m. No original vertex or grid value changes.
+    """
+    from chapter_regional_terrain import nearest
+    _,edges,triangles=ribbon_geometry(regional,5.)
+    # Include the joined lake as well; a lower outflow face must not hide a
+    # higher lake datum when checking the actual finite surface union.
+    lake=water_footprints(regional,5.)[0]
+    triangles.extend(tuple((x,-31.55,z) for x,z in face) for face in triangulate(lake))
+    ids=[i for i,p in enumerate(points) if any(on_segment(tuple(p),(a[0],a[2]),(b[0],b[2])) for a,b in edges)]
+    result=np.asarray(old_heights,dtype=float).copy();changes=[]
+    if not ids:return result,dict(crestVertices=0,raisedVertices=0,maximumPositiveDelta=0.,minimumClearance=None,repairs=[])
+    p=np.asarray(points)[ids];water=np.full(len(p),-np.inf)
+    for triangle in triangles:
+        a,b,c=np.asarray(triangle);den=(b[2]-c[2])*(a[0]-c[0])+(c[0]-b[0])*(a[2]-c[2])
+        u=((b[2]-c[2])*(p[:,0]-c[0])+(c[0]-b[0])*(p[:,1]-c[2]))/den
+        v=((c[2]-a[2])*(p[:,0]-c[0])+(a[0]-c[0])*(p[:,1]-c[2]))/den
+        inside=(u>=-1e-6)&(v>=-1e-6)&(u+v<=1.000001)
+        water=np.where(inside,np.maximum(water,u*a[1]+v*b[1]+(1-u-v)*c[1]),water)
+    distances=[];elevations=[]
+    for river in regional.river_water:
+        d,e=nearest(p[:,0]-78.3,126.2-p[:,1],river);distances.append(d);elevations.append(e)
+    distances=np.asarray(distances);elevations=np.asarray(elevations)
+    selected=np.argmin(distances,axis=0);rows=np.arange(len(p))
+    d=distances[selected,rows];up=elevations[selected,rows]
+    analytic=up-1+np.maximum(d-3,0)*.6-31.55
+    allowed_endcaps=((-50.935615498,-512.936441114),(-51.178542583,-513.224354696))
+    clearances=[]
+    for j,i in enumerate(ids):
+        old=float(old_heights[i]);datum=float(water[j])
+        if not math.isfinite(datum):raise ValueError('Bank crest has no actual widened water face')
+        if old-datum>=.01:new=old
+        else:new=max(old,float(analytic[j]))
+        delta=new-old;east=float(p[j,0]-78.3);north=float(126.2-p[j,1])
+        terminal=any(math.hypot(east-x,north-y)<=1e-5 for x,y in allowed_endcaps)
+        cap=1.25 if terminal else .50
+        if delta<0 or delta>cap+1e-9:raise ValueError(f'Bank positive correction exceeds {cap}m at EN({east},{north}): {delta}')
+        if new-datum<.01:raise ValueError(f'Bank crest cannot clear actual water by1cm at EN({east},{north})')
+        result[i]=new;clearances.append(new-datum)
+        if delta>0:changes.append(dict(insertedIndex=int(i),atlasEN=[east,north],oldBilinearY=old,newAnalyticY=new,positiveDelta=delta,actualWaterY=datum,clearance=new-datum,approvedOutflowEndcap=terminal))
+    return result,dict(crestVertices=len(ids),raisedVertices=len(changes),maximumPositiveDelta=max((r['positiveDelta'] for r in changes),default=0.),minimumClearance=min(clearances),repairs=changes)
 
 
 def inset(polygon,distance):
@@ -124,7 +185,8 @@ def conform_water(vertices,faces,outer,regional,maximum_faces=39618):
     # The original one-metre lake mask has a sharp shore. A two-metre inner
     # sample contour prevents triangles from interpolating a distant dry-bank
     # corner across the submerged interior; the exact outer shoreline stays.
-    constraints=[list(t) for polygon in footprints+[inset(footprints[0],2.)] for t in triangulate(polygon)]
+    bank_footprints=ribbon_geometry(regional,5.)[0]
+    constraints=[list(t) for polygon in footprints+bank_footprints+[inset(footprints[0],2.)] for t in triangulate(polygon)]
     bounds=lambda p:(min(q[0] for q in p),max(q[0] for q in p),min(q[1] for q in p),max(q[1] for q in p))
     constraint_bounds=[bounds(c) for c in constraints]
     overlap=lambda a,b:a[0]<=b[1]+EPS and a[1]>=b[0]-EPS and a[2]<=b[3]+EPS and a[3]>=b[2]-EPS
@@ -197,11 +259,12 @@ def conform_water(vertices,faces,outer,regional,maximum_faces=39618):
         result_faces.extend(ids);sources.extend([source]*len(ids))
         if len(result_faces)>maximum_faces:raise ValueError('Water conformance exceeds existing triangle budget')
     if len(result_faces)>maximum_faces:raise ValueError('Water conformance exceeds existing triangle budget')
-    inserted=result_vertices[len(vertices):]
+    inserted=result_vertices[len(vertices):];bank_receipt=None
     if inserted:
         p=np.asarray(inserted)
         heights=regional.sample(p[:,0]-78.3,126.2-p[:,2])-31.55
         if not np.isfinite(heights).all():raise ValueError('Nonfinite water conformance sample')
+        heights,bank_receipt=bank_crest_heights(p[:,[0,2]],heights,regional)
         for i,h in enumerate(heights):result_vertices[len(vertices)+i]=(inserted[i][0],float(h),inserted[i][2])
     return result_vertices,result_faces,sources,dict(originalFaces=len(faces),faces=len(result_faces),
-        insertedVertices=len(inserted),changedOuterFaces=len(changed),protectedFaces=sum(not v for v in outer))
+        insertedVertices=len(inserted),changedOuterFaces=len(changed),protectedFaces=sum(not v for v in outer),bankCrest=bank_receipt)

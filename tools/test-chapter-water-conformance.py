@@ -5,13 +5,15 @@ from pathlib import Path
 import unittest
 import numpy as np
 from chapter_regional_terrain import RegionalTerrain
-from chapter_water_conformance import area,conform_water,cross,triangulate,water_footprints
+from chapter_water_conformance import area,bank_crest_heights,conform_water,cross,ribbon_geometry,triangulate,water_footprints
 
 ROOT=Path(__file__).resolve().parents[1]
 
 
 def highest(vertices,faces,points):
-    triangles=np.asarray(vertices)[np.asarray(faces)]
+    # Native support uses double barycentric arithmetic on imported float32
+    # coordinates. Keep the coordinate quantization, not float32 cancellation.
+    triangles=np.asarray(vertices,dtype=float)[np.asarray(faces)]
     a,b,c=triangles[:,0],triangles[:,1],triangles[:,2]
     denominator=(b[:,2]-c[:,2])*(a[:,0]-c[:,0])+(c[:,0]-b[:,0])*(a[:,2]-c[:,2])
     low=triangles[:,:,[0,2]].min(axis=1);high=triangles[:,:,[0,2]].max(axis=1)
@@ -35,7 +37,8 @@ class WaterConformanceTests(unittest.TestCase):
             ROOT/'docs/references/horde-1.7/d37f1638/docs/design/world/dungeons/baseline/shared-coordinate-layout.json')
         cls.outer=[c==[-2,-2,-2] for c in cls.old['cells']]
         cls.vertices,cls.faces,cls.sources,cls.receipt=conform_water(cls.old['vertices'],cls.old['faces'],cls.outer,cls.regional)
-        print('source-only water conformance:',json.dumps(cls.receipt),flush=True)
+        summary=dict(cls.receipt);summary['bankCrest']={k:v for k,v in cls.receipt['bankCrest'].items() if k!='repairs'}
+        print('source-only water conformance:',json.dumps(summary),flush=True)
 
     def test_original_vertices_protected_core_and_envelope_unchanged(self):
         self.assertEqual(self.vertices[:len(self.old['vertices'])],[tuple(v) for v in self.old['vertices']])
@@ -45,10 +48,72 @@ class WaterConformanceTests(unittest.TestCase):
         self.assertEqual(np.min(self.vertices,axis=0).tolist(),np.min(self.old['vertices'],axis=0).tolist())
         self.assertEqual(np.max(self.vertices,axis=0).tolist(),np.max(self.old['vertices'],axis=0).tolist())
 
-    def test_sampled_heights_are_unchanged_authoritative_heightfield(self):
+    def test_sampled_heights_preserve_field_except_explicit_deficient_new_crests(self):
         inserted=np.asarray(self.vertices[len(self.old['vertices']):])
         expected=self.regional.sample(inserted[:,0]-78.3,126.2-inserted[:,2])-31.55
-        np.testing.assert_array_equal(inserted[:,1],expected)
+        repairs=self.receipt['bankCrest']['repairs'];ids={r['insertedIndex'] for r in repairs}
+        ordinary=[i for i in range(len(inserted)) if i not in ids]
+        np.testing.assert_array_equal(inserted[ordinary,1],expected[ordinary])
+        endcaps=[]
+        for repair in repairs:
+            i=repair['insertedIndex'];self.assertEqual(expected[i],repair['oldBilinearY'])
+            self.assertEqual(inserted[i,1],repair['newAnalyticY']);self.assertGreater(repair['positiveDelta'],0)
+            self.assertGreaterEqual(repair['clearance'],.01)
+            self.assertLessEqual(repair['positiveDelta'],1.25 if repair['approvedOutflowEndcap'] else .5)
+            if repair['approvedOutflowEndcap']:endcaps.append(repair)
+        self.assertEqual(len(endcaps),2)
+        self.assertTrue(all(-513.3<r['atlasEN'][1]<-510 for r in endcaps))
+        self.assertLessEqual(self.receipt['bankCrest']['maximumPositiveDelta'],1.25)
+
+    def test_all_thirteen_river_station_bank_edges_clear_actual_water(self):
+        # All exact five-metre row endpoints, including the formerly submerged
+        # 214/430 source endpoint. Float32 mirrors exported position precision.
+        river=np.asarray(self.regional.river_water[0]);delta=np.diff(river[:,:2],axis=0)
+        normals=np.stack((-delta[:,1],delta[:,0]),axis=1);normals/=np.linalg.norm(normals,axis=1)[:,None]
+        points=[];datums=[]
+        for i,p in enumerate(river):
+            before=normals[max(0,i-1)];after=normals[min(i,len(normals)-1)];m=before+after;m*=5/np.dot(m,before)
+            for sign in (-1,1):points.append((p[0]+sign*m[0]+78.3,126.2-p[1]-sign*m[1]));datums.append(p[2]-31.55)
+        ground=highest(np.asarray(self.vertices,dtype=np.float32),self.faces,points)
+        self.assertTrue(np.isfinite(ground).all())
+        print('minimum13-row bank edge clearance:',float(np.min(ground-datums)),flush=True)
+        self.assertTrue(np.all(ground-np.asarray(datums)>=.01))
+
+    def test_bank_correction_caps_fail_before_return(self):
+        _,edges,_=ribbon_geometry(self.regional,5.)
+        a,b=edges[8];point=np.array([[(a[0]+b[0])*.5,(a[2]+b[2])*.5]])
+        with self.assertRaisesRegex(ValueError,'correction exceeds'):
+            bank_crest_heights(point,np.array([-100.]),self.regional)
+        terminal=np.array([[-51.178542583+78.3,126.2+513.224354696]])
+        with self.assertRaisesRegex(ValueError,'exceeds 1.25'):
+            bank_crest_heights(terminal,np.array([-100.]),self.regional)
+        preserved,receipt=bank_crest_heights(point,np.array([100.]),self.regional)
+        self.assertEqual(preserved[0],100.)
+        self.assertEqual(receipt['raisedVertices'],0)
+
+    def test_every_new_crest_survives_float32_water_clearance(self):
+        _,edges,water=ribbon_geometry(self.regional,5.)
+        points=[]
+        for p in self.vertices[len(self.old['vertices']):]:
+            matches=[(a,b) for a,b in edges if abs(cross((a[0],a[2]),(b[0],b[2]),(p[0],p[2])))<=1e-7*np.hypot(b[0]-a[0],b[2]-a[2]) and
+                   min(a[0],b[0])-1e-7<=p[0]<=max(a[0],b[0])+1e-7 and
+                   min(a[2],b[2])-1e-7<=p[2]<=max(a[2],b[2])+1e-7]
+            if matches:
+                # Probe the ACTUAL quantized water edge. A pre-export double
+                # position can sit micrometres outside its finite float32 face.
+                a,b=np.asarray(matches[0],dtype=np.float32).astype(float)[:,[0,2]]
+                d=b-a;t=np.clip(np.dot(np.array([p[0],p[2]])-a,d)/np.dot(d,d),0,1)
+                points.append(tuple(a+t*d))
+        lake=water_footprints(self.regional)[0]
+        water.extend(tuple((x,-31.55,z) for x,z in t) for t in triangulate(lake))
+        vertices=[p for t in water for p in t];faces=[(i,i+1,i+2) for i in range(0,len(vertices),3)]
+        datum=highest(np.asarray(vertices,dtype=np.float32),faces,points)
+        ground=highest(np.asarray(self.vertices,dtype=np.float32),self.faces,points)
+        bad=np.flatnonzero(~np.isfinite(ground-datum))
+        if len(bad):print('nonfinite float32 crest probes:',[(points[i],float(ground[i]),float(datum[i])) for i in bad],flush=True)
+        self.assertEqual(len(points),self.receipt['bankCrest']['crestVertices'])
+        self.assertTrue(np.isfinite(ground-datum).all())
+        self.assertTrue(np.all(ground-datum>=.01))
 
     def test_float32_export_positions_keep_nonzero_triangles(self):
         exported=np.asarray(self.vertices,dtype=np.float32).astype(float)

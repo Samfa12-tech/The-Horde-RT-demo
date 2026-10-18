@@ -1,0 +1,4 @@
+# Preserve reproducible local masters; distribute the admitted GLB once.
+/chapter-terrain-r23.blend
+/chapter-terrain-r23.glb
+/surface.json
