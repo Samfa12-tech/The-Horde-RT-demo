@@ -208,13 +208,20 @@ target_include_directories(horde_gameplay_simulation
 target_compile_features(horde_gameplay_simulation PUBLIC cxx_std_20)
 target_link_libraries(horde_gameplay_simulation PUBLIC pocket_audio_native_pcm)
 
+find_package(Threads REQUIRED)
 add_library(horde_campaign_persistence STATIC
     src/gameplay/campaign/CampaignCheckpointCodec.cpp
-    src/gameplay/campaign/CampaignCheckpointStorage.cpp)
+    src/gameplay/campaign/CampaignCheckpointStorage.cpp
+    src/gameplay/campaign/CampaignSaveCoordinator.cpp)
 target_include_directories(horde_campaign_persistence PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_compile_features(horde_campaign_persistence PUBLIC cxx_std_20)
+target_link_libraries(horde_campaign_persistence PUBLIC Threads::Threads)
 
 if(BUILD_TESTING)
+    add_executable(horde_rt_campaign_save_coordinator_tests tests/CampaignSaveCoordinatorTests.cpp)
+    target_link_libraries(horde_rt_campaign_save_coordinator_tests PRIVATE horde_campaign_persistence)
+    add_test(NAME horde_rt_campaign_save_coordinator_tests COMMAND horde_rt_campaign_save_coordinator_tests)
+    set_tests_properties(horde_rt_campaign_save_coordinator_tests PROPERTIES TIMEOUT 30)
     add_executable(horde_rt_campaign_codec_tests tests/CampaignCheckpointCodecTests.cpp)
     target_link_libraries(horde_rt_campaign_codec_tests PRIVATE horde_campaign_persistence)
     add_test(NAME horde_rt_campaign_codec_tests COMMAND horde_rt_campaign_codec_tests)

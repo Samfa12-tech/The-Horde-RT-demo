@@ -1,0 +1,37 @@
+[
+  {
+    "path": ".github/workflows/shared-simulation-host.yml",
+    "sha256": "bc18a08233305c4c93e774c2e90d1f9d53fb47a65dc6de378fa51d6069ef4d5f",
+    "bytes": 37040
+  },
+  {
+    "path": "CMakeLists.txt",
+    "sha256": "675e0a163ec98add7082aadb5d26eea6308ddd8ceb3252fc369b98337eab1fa8",
+    "bytes": 103684
+  },
+  {
+    "path": "cmake/HordeRtSources.cmake",
+    "sha256": "6b89c62af67bb2c31669d71c4ac4f979e7a90f8d90424e0584bd51943370395d",
+    "bytes": 3261
+  },
+  {
+    "path": "tools/run-host-sanitizer-validation.sh",
+    "sha256": "a961665c8e3685d68fadcb2c9b48b58dfbefabe546bc8b9488f8622033cd2ca4",
+    "bytes": 1930
+  },
+  {
+    "path": "src/gameplay/campaign/CampaignSaveCoordinator.h",
+    "sha256": "026476b7d0ee62f4640b7db37e875aed525db2c56983a94c50928457a8413cba",
+    "bytes": 4293
+  },
+  {
+    "path": "src/gameplay/campaign/CampaignSaveCoordinator.cpp",
+    "sha256": "2b5f4b4896b64860bed4756f93c4b18f30b7e7984b2b2cd7926aa374bf18dc61",
+    "bytes": 11448
+  },
+  {
+    "path": "tests/CampaignSaveCoordinatorTests.cpp",
+    "sha256": "b52c9791d4cb23c434ae509569d60c05d6999be935af27790328a9bf9ccc94d0",
+    "bytes": 27088
+  }
+]

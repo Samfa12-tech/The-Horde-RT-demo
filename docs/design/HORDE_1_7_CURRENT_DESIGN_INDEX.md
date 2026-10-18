@@ -1,5 +1,14 @@
 # Horde 1.7 current design index
 
+The [session/request receipt coordinator](../evidence/2026-10-18-campaign-save-coordinator/README.md)
+now supplies weak single-use worker tickets, revocable publication permission,
+explicit read decisions and revision-aware acknowledgement, tested with fake
+storage and delayed/concurrent completions. It connects no real worker, owner
+save path, platform load transaction or menu policy. Development stops at this
+review checkpoint. The receipt maps remaining playable three-slot work and
+separates Sam's manual/autosave retention choice from normal implementation.
+POSIX runtime and physical durability remain explicit untested gates.
+
 The [typed codec and isolated storage checkpoint](../evidence/2026-10-18-campaign-storage/README.md)
 adds a closed 162-byte logical format, exact-content update admission and
 failure-injected same-directory publication. Windows temporary-directory tests
@@ -7,8 +16,8 @@ cover corruption, partial writes, replacement denial, active readers and owned
 process interruption. Android compiles the POSIX backend; its filesystem runtime
 and power-loss acceptance remain open. No actual save location, migration,
 slot/menu overwrite policy or platform load/camera adapter is connected. The
-next review boundary is the asynchronous receipt/session coordinator and POSIX
-runtime acceptance, with existing owner files preserved.
+receipt/session arbitration is now recorded above; real worker integration and
+POSIX runtime acceptance remain open, with existing owner files preserved.
 
 The [logical recovery checkpoint](../evidence/2026-10-17-logical-save/README.md)
 adds versioned, validated lower-claim/exterior records and fresh-simulation

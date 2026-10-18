@@ -112,8 +112,10 @@ storage, process death, physical RT, touch/audio or performance acceptance.
 
 The typed codec and isolated file adapter in the receipt above implement the
 storage portion of this specification in disposable test locations. No actual
-owner-save root is selected. The active-slot/session receipt coordinator below
-is still a separate follow-on; the adapter's exact publication and durability
+owner-save root is selected. The separate
+[session/request coordinator](../evidence/2026-10-18-campaign-save-coordinator/README.md)
+now arbitrates fake asynchronous work; its real worker/slot integration is still
+a follow-on. The adapter's exact publication and durability
 outcomes must be respected rather than treating every failure as unchanged.
 
 After logical recovery passes, add a separate bounded atomic file adapter and
@@ -132,3 +134,7 @@ needed for logical recovery or an isolated failure-injected codec/file adapter.
 Settings and RT Lab
 unlock remain separate. The forest endpoint, platform process-death tests and
 Save/Load/New Game menus then receive their own reviewable checkpoints.
+
+The coordinator receipt is the current stop-for-review boundary. It includes a
+short remaining-playability map; it does not authorize connecting real owner
+paths, installing a device build or choosing manual/autosave retention.
