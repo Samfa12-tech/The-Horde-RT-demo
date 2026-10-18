@@ -472,6 +472,46 @@ public final class GraphicsPreviewOptionsTest {
         }
         return null;
     }
+    @Test public void productionShadowPreviewMenuOffersOnlyCurrentAndHigher() throws Exception {
+        MainActivity activity=livePreviewFixture(); GraphicsBridgeShadow.epoch=10;
+        ((Runnable)get(activity,"refreshGraphics")).run();
+        Button shadows=((Button[])get(activity,"graphicsOptionButtons"))[GraphicsPreviewOptions.SHADOW];
+        assertTrue(shadows.isEnabled());
+        Method menu=MainActivity.class.getDeclaredMethod("showGraphicsPreviewOptionMenu",Button.class,int.class);
+        menu.setAccessible(true); menu.invoke(activity,shadows,GraphicsPreviewOptions.SHADOW);
+        PopupMenu popup=(PopupMenu)get(activity,"graphicsOptionsPopup");
+        assertEquals(2,popup.getMenu().size()); assertNull(popup.getMenu().findItem(0));
+        assertEquals("Current",popup.getMenu().findItem(GraphicsPreferences.SHADOW_CURRENT).getTitle());
+        assertEquals("Higher",popup.getMenu().findItem(GraphicsPreferences.SHADOW_HIGHER).getTitle());
+        assertTrue(popup.getMenu().performIdentifierAction(GraphicsPreferences.SHADOW_HIGHER,0));
+        assertEquals(GraphicsPreferences.SHADOW_HIGHER,GraphicsBridgeShadow.requested.shadow);
+        assertTrue(GraphicsPreferences.confirmed((SharedPreferences)get(activity,"preferences")).same(confirmed));
+        assertEquals(0,GraphicsBridgeShadow.applyCalls);
+    }
+
+    @Test public void ordinaryGraphicsShadowCycleStaysCurrentOrHigherWithoutApplyingOrSaving() throws Exception {
+        MainActivity activity=livePreviewFixture(); set(activity,"graphicsPreviewWanted",false);
+        GraphicsPreferences.Values initial=new GraphicsPreferences.Values(75,2,2,30,false,
+                GraphicsPreferences.SHADOW_HIGHER,false,2);
+        set(activity,"graphicsDraft",initial);
+        Method show=MainActivity.class.getDeclaredMethod("showGraphicsPage"); show.setAccessible(true);
+        show.invoke(activity);
+        for(int expected:new int[]{GraphicsPreferences.SHADOW_CURRENT,GraphicsPreferences.SHADOW_HIGHER,
+                GraphicsPreferences.SHADOW_CURRENT,GraphicsPreferences.SHADOW_HIGHER}) {
+            GraphicsPreferences.Values before=(GraphicsPreferences.Values)get(activity,"graphicsDraft");
+            Button button=findButton((android.view.View)get(activity,"menuScrim"),
+                    "Shadows: "+GraphicsPreviewOptions.shadowLabel(before.shadow));
+            assertNotNull(button); assertTrue(button.performClick());
+            GraphicsPreferences.Values after=(GraphicsPreferences.Values)get(activity,"graphicsDraft");
+            assertTrue(after.same(new GraphicsPreferences.Values(initial.scale,initial.water,initial.fire,
+                    initial.cap,initial.glassEnabled,expected,initial.mistEnabled,initial.dust)));
+        }
+        SharedPreferences prefs=(SharedPreferences)get(activity,"preferences");
+        assertTrue(GraphicsPreferences.confirmed(prefs).same(confirmed));
+        assertFalse(GraphicsPreferences.hasPending(prefs));
+        assertEquals(0,GraphicsBridgeShadow.applyCalls); assertEquals(0,GraphicsBridgeShadow.compareCalls);
+    }
+
     @Test public void ordinaryGraphicsPageStagesClearlyLabelledExperimentsWithoutSaving() throws Exception {
         assertEquals(33,BuildConfig.MIN_RENDER_SCALE_PERCENT);
         MainActivity activity=livePreviewFixture(); set(activity,"graphicsPreviewWanted",false);

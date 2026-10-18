@@ -3476,7 +3476,9 @@ public class MainActivity extends Activity {
             showGraphicsPage();
         });
         addGraphicsButton(panel, "Shadows: " + GraphicsPreviewOptions.shadowLabel(graphicsDraft.shadow), () -> {
-            graphicsDraft = GraphicsPreviewOptions.withChoice(graphicsDraft, GraphicsPreviewOptions.SHADOW, (graphicsDraft.shadow + 1) % 3);
+            final int next = graphicsDraft.shadow == GraphicsPreferences.SHADOW_CURRENT ?
+                    GraphicsPreferences.SHADOW_HIGHER : GraphicsPreferences.SHADOW_CURRENT;
+            graphicsDraft = GraphicsPreviewOptions.withChoice(graphicsDraft, GraphicsPreviewOptions.SHADOW, next);
             showGraphicsPage();
         });
         addGraphicsButton(panel, "Preview shadows", () -> openGraphicsPreview(GraphicsPreviewOptions.SHADOW));

@@ -2,6 +2,28 @@
 
 This file records locked decisions for the native Vulkan hardware ray-tracing demo.
 
+## 1.7 scope and save retention reconciliation - 2026-10-18
+
+Three slots each retain a separate manual save and one latest autosave. Autosaving
+must never replace the manual record; no indefinite history is requested. Manual
+Save uses the supported safe-checkpoint state, not arbitrary mid-rope/combat state.
+
+The owner's reconciled [1.7 feature checklist](docs/design/HORDE_1_7_FEATURE_STATUS_2026_10_18.md)
+supersedes earlier exploratory exclusions where explicit: small-root stepping /
+mantle and crouching are agreed directions; free jump/slide remain deferred.
+Full low-detail geography includes correctly placed terrain, major locations and
+river/lake representation, with distant Bellwether shell; playable town is 1.8.
+Kit's approved WAV voice, named configurable subtitles, hearts, licensed forest
+ambience, mobile interaction/pause fixes and deliberate tomb storytelling remain
+1.7 work. Tomb floor rubble/debris is agreed; nearby kicking is conditional on
+bounded measured cost, with static/instanced distant detail and optional detail
+controls if material. Preserve collision, readability, determinism and saves.
+
+Continue bounded tested implementation while physical owner playtesting is
+pending. Owner availability is not a blanket development stop. Exact-device,
+visual, audio and performance acceptance remain explicit gates; no release,
+public push or merge follows from this continuation authorization.
+
 ## 1.6.2 defaults and release hold - 2026-10-05
 
 The owner selects fresh-install and staged Reset Defaults on Android at 50%

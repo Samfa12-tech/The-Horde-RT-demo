@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-18",
+  "worktree": "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof",
+  "headObservedAfterTests": "bd0dd9504eca03a2c73d565f782defea0aa24121",
+  "changesUncommittedAtReceipt": true,
+  "testedSha256": {
+    "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java": "08F5FA9451B9708B7FFBACCF2E1A8381BBBD73D5A8F4F4D3EC240E8875468CA6",
+    "android/app/src/test/java/com/samfa12/hordelanternrt/GraphicsPreviewOptionsTest.java": "D7B0C22527CCDC7B9FA95CCA447C81A616BDD3301A8D9B8BFDB4EA8D8436B8ED"
+  },
+  "baseline": {
+    "tests": 1,
+    "failures": 1,
+    "exception": "java.lang.IllegalArgumentException: Invalid live graphics value",
+    "productionFrame": "MainActivity.java:3479",
+    "junitSeconds": 4.008,
+    "gradleExitCode": 1,
+    "gradleSeconds": 17
+  },
+  "fixed": {
+    "GraphicsPreviewOptionsTest": { "tests": 18, "failures": 0, "errors": 0, "skipped": 0, "junitSeconds": 6.385 },
+    "GraphicsPreferencesTest": { "tests": 20, "failures": 0, "errors": 0, "skipped": 0, "junitSeconds": 1.811 },
+    "gradleExitCode": 0,
+    "gradleSeconds": 21
+  },
+  "evidenceClass": "host Java UI and preference tests, Robolectric SDK34",
+  "nativeAndroidBuild": false,
+  "deviceInteraction": false,
+  "rendererQualityOrDefaultChange": false,
+  "remainingAcceptance": "Current-build device Graphics Higher/Current taps, preview return and physical interaction"
+}
