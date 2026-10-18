@@ -6,6 +6,7 @@
 #include <cstdio>
 #include <cstring>
 #include <limits>
+#include <utility>
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
@@ -188,44 +189,85 @@ Handle CreateTemporary(Handle directory,const std::filesystem::path& target) {
     return openat(directory,target.filename().c_str(),O_WRONLY|O_CREAT|O_EXCL|O_NOFOLLOW|O_CLOEXEC,0600);
 #endif
 }
-void RemoveTemporary(Handle directory,const std::filesystem::path& path) {
-#ifdef _WIN32
-    (void)directory;DeleteFileW(path.c_str());
-#else
-    unlinkat(directory,path.filename().c_str(),0);
-#endif
-}
-struct PendingFile {
-    Handle directory;std::filesystem::path path;Owned file;
-    PendingFile(Handle dir,std::filesystem::path p,Handle h):directory(dir),path(std::move(p)),file(h){}
-    ~PendingFile(){Close(file.value);file.value=Invalid;RemoveTemporary(directory,path);}
-};
-bool Publish(Handle directory,const std::filesystem::path& temp,const std::filesystem::path& target,bool replace) {
-#ifdef _WIN32
-    // Windows10+ same-volume name cutover. POSIX semantics retain old reader
-    // handles while subsequent opens see the new file; no copy/delete fallback.
-    Owned file(CreateFileW(temp.c_str(),DELETE|GENERIC_WRITE,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,
-        nullptr,OPEN_EXISTING,FILE_FLAG_OPEN_REPARSE_POINT,nullptr));
-    if(file.value==Invalid) return false;
-    (void)directory;
-    const auto name=target.wstring();
-    const auto size=offsetof(FILE_RENAME_INFO,FileName)+(name.size()+1)*sizeof(wchar_t);
-    std::vector<std::byte> buffer(size);
-    auto* rename=reinterpret_cast<FILE_RENAME_INFO*>(buffer.data());
-    rename->Flags=replace?(FILE_RENAME_FLAG_REPLACE_IF_EXISTS|FILE_RENAME_FLAG_POSIX_SEMANTICS):0;
-    rename->RootDirectory=nullptr;rename->FileNameLength=static_cast<DWORD>(name.size()*sizeof(wchar_t));
-    std::memcpy(rename->FileName,name.c_str(),(name.size()+1)*sizeof(wchar_t));
-    const bool success=SetFileInformationByHandle(file.value,FileRenameInfoEx,rename,static_cast<DWORD>(size))!=FALSE;
-    const auto error=Error();Close(file.value);file.value=Invalid;SetLastError(error);return success;
-#else
-    if(replace) return renameat(directory,temp.filename().c_str(),directory,target.filename().c_str())==0;
-    // linkat is a same-filesystem, no-clobber publication even on API24 Android;
-    // a raced create cannot be overwritten. The owned temp link is removed next.
-    if(linkat(directory,temp.filename().c_str(),directory,target.filename().c_str(),0)!=0) return false;
-    return true;
-#endif
-}
 } // namespace
+
+struct PreparedWrite::Impl {
+    Owned directory,lock,file;
+    std::filesystem::path target,temp;
+    std::vector<std::byte> encoded;
+    std::optional<StoredCheckpoint> expected;
+    FaultInjector* faults=nullptr;
+    bool ownsTemp=false,attempted=false,published=false;
+    std::uint32_t nativeError=0;
+#ifdef _WIN32
+    Owned renameFile;
+    std::vector<std::byte> renameInfo;
+#else
+    std::string tempName,targetName;
+#endif
+    void Cleanup() noexcept {
+        Close(file.value);file.value=Invalid;
+#ifdef _WIN32
+        Close(renameFile.value);renameFile.value=Invalid;
+#endif
+        if(ownsTemp) {
+#ifdef _WIN32
+            DeleteFileW(temp.c_str());
+#else
+            unlinkat(directory.value,tempName.c_str(),0);
+#endif
+            ownsTemp=false;
+        }
+    }
+    ~Impl() noexcept {Cleanup();}
+};
+
+PreparedWrite::PreparedWrite()=default;
+PreparedWrite::~PreparedWrite()=default;
+PreparedWrite::PreparedWrite(PreparedWrite&&) noexcept=default;
+PreparedWrite& PreparedWrite::operator=(PreparedWrite&&) noexcept=default;
+PreparedWrite::operator bool() const noexcept {return bool(impl_);}
+bool PreparedWrite::Publish() noexcept {
+    if(!impl_ || impl_->attempted) return false;
+    auto& work=*impl_;work.attempted=true;
+#ifdef _WIN32
+    work.published=SetFileInformationByHandle(work.renameFile.value,FileRenameInfoEx,
+        work.renameInfo.data(),static_cast<DWORD>(work.renameInfo.size()))!=FALSE;
+#else
+    work.published=work.expected ?
+        renameat(work.directory.value,work.tempName.c_str(),work.directory.value,work.targetName.c_str())==0 :
+        linkat(work.directory.value,work.tempName.c_str(),work.directory.value,work.targetName.c_str(),0)==0;
+#endif
+    if(!work.published) work.nativeError=Error();
+    return work.published;
+}
+Result PreparedWrite::Finish() {
+    if(!impl_) return Failure(Status::PublishFailed);
+    auto work=std::move(impl_);
+    if(!work->attempted) return Failure(Status::PublishFailed);
+    if(!work->published) {
+        StoredCheckpoint observed;
+        const auto read=ReadAt(work->directory.value,work->target,observed,nullptr);
+        if(read.status==Status::Read && observed.encoded==work->encoded)
+            return {Status::PublishedDurabilityUnknown,Publication::Published,Durability::None,codec::Error::None,work->nativeError};
+        if(SameExpected(read,observed,work->expected)) return Failure(Status::PublishFailed,work->nativeError);
+        return {Status::PublishOutcomeUnknown,Publication::Unknown,Durability::None,codec::Error::None,work->nativeError};
+    }
+    // Remove the owned temporary link before directory fsync. The lock and
+    // pinned directory remain owned until classification has completed.
+    work->Cleanup();
+    if(Fail(work->faults,Operation::AfterPublish))
+        return {Status::PublishedDurabilityUnknown,Publication::Published};
+#ifdef _WIN32
+    return {Status::Committed,Publication::Published,Durability::FileFlushed};
+#else
+    int flush;
+    do {flush=fsync(work->directory.value);} while(flush!=0 && errno==EINTR);
+    if(flush!=0)
+        return {Status::PublishedDurabilityUnknown,Publication::Published,Durability::None,codec::Error::None,Error()};
+    return {Status::Committed,Publication::Published,Durability::FileAndDirectoryFlushed};
+#endif
+}
 
 Result Read(const std::filesystem::path& directory,std::string_view name,StoredCheckpoint& output,FaultInjector* faults) {
     std::filesystem::path target;
@@ -235,8 +277,9 @@ Result Read(const std::filesystem::path& directory,std::string_view name,StoredC
     return ReadAt(dir.value,target,output,faults);
 }
 
-Result Write(const std::filesystem::path& directory,std::string_view name,const Checkpoint& candidate,
-             const std::optional<StoredCheckpoint>& expected,FaultInjector* faults) {
+Result Prepare(const std::filesystem::path& directory,std::string_view name,const Checkpoint& candidate,
+               const std::optional<StoredCheckpoint>& expected,PreparedWrite& output,FaultInjector* faults) {
+    if(output) return Failure(Status::Busy);
     std::vector<std::byte> encoded;codec::Error codecError=codec::Error::None;
     if(!codec::Encode(candidate,encoded,codecError)) return Failure(Status::InvalidCandidate,0,codecError);
     std::filesystem::path target;
@@ -255,22 +298,30 @@ Result Write(const std::filesystem::path& directory,std::string_view name,const 
     if(!SameExpected(read,current,expected)) return Failure(Status::Conflict);
     if(expected && encoded==expected->encoded)
         return {Status::AlreadyCurrent}; // no write, no new durability claim
+    auto work=std::make_unique<PreparedWrite::Impl>();
+    work->directory.value=std::exchange(dir.value,Invalid);
+    work->lock.value=std::exchange(lock.value,Invalid);
+    work->target=target;work->encoded=std::move(encoded);work->expected=expected;work->faults=faults;
     if(Fail(faults,Operation::OpenTemporary)) return Failure(Status::OpenFailed);
-    const auto temp=Temporary(target);const auto handle=CreateTemporary(dir.value,temp);
+    work->temp=Temporary(target);
+#ifndef _WIN32
+    work->tempName=work->temp.filename().string();work->targetName=target.filename().string();
+#endif
+    const auto handle=CreateTemporary(work->directory.value,work->temp);
     if(handle==Invalid) return Failure(Status::OpenFailed,Error());
-    PendingFile pending(dir.value,temp,handle);
+    work->file.value=handle;work->ownsTemp=true;
     std::size_t completed=0;
-    while(completed<encoded.size()) {
+    while(completed<work->encoded.size()) {
         if(Fail(faults,Operation::Write,completed)) return Failure(Status::WriteFailed);
-        auto requested=encoded.size()-completed;
+        auto requested=work->encoded.size()-completed;
         if(faults) requested=std::min(requested,faults->WriteLimit(requested));
         if(requested==0) return Failure(Status::WriteFailed);
 #ifdef _WIN32
         DWORD count=0;
-        if(!WriteFile(handle,encoded.data()+completed,static_cast<DWORD>(requested),&count,nullptr))
+        if(!WriteFile(handle,work->encoded.data()+completed,static_cast<DWORD>(requested),&count,nullptr))
             return Failure(Status::WriteFailed,Error());
 #else
-        const auto count=write(handle,encoded.data()+completed,requested);
+        const auto count=write(handle,work->encoded.data()+completed,requested);
         if(count<0 && errno==EINTR) continue;
         if(count<0) return Failure(Status::WriteFailed,Error());
 #endif
@@ -286,7 +337,7 @@ Result Write(const std::filesystem::path& directory,std::string_view name,const 
     if(flush!=0) return Failure(Status::FlushFailed,Error());
 #endif
     if(Fail(faults,Operation::CloseFile)) return Failure(Status::CloseFailed);
-    pending.file.value=Invalid;
+    work->file.value=Invalid;
 #ifdef _WIN32
     if(!CloseHandle(handle)) return Failure(Status::CloseFailed,Error());
 #else
@@ -294,31 +345,34 @@ Result Write(const std::filesystem::path& directory,std::string_view name,const 
 #endif
     // Recheck after preparation. The lock serializes participating writers;
     // hostile/uncoordinated directory mutation is outside this adapter contract.
-    StoredCheckpoint latest;read=ReadAt(dir.value,target,latest,faults);
+    StoredCheckpoint latest;read=ReadAt(work->directory.value,target,latest,faults);
     if(read.status!=Status::Read && read.status!=Status::NotFound) return read;
     if(!SameExpected(read,latest,expected)) return Failure(Status::Conflict);
-    if(Fail(faults,Operation::Publish)) return Failure(Status::PublishFailed);
-    if(!Publish(dir.value,temp,target,expected.has_value())) {
-        const auto nativeError=Error();StoredCheckpoint observed;
-        const auto observedRead=ReadAt(dir.value,target,observed,nullptr);
-        if(observedRead.status==Status::Read && observed.encoded==encoded)
-            return {Status::PublishedDurabilityUnknown,Publication::Published,Durability::None,codec::Error::None,nativeError};
-        if(SameExpected(observedRead,observed,expected)) return Failure(Status::PublishFailed,nativeError);
-        return {Status::PublishOutcomeUnknown,Publication::Unknown,Durability::None,codec::Error::None,nativeError};
-    }
-    // On POSIX create-only publication temporarily owns two links. Both names
-    // refer to complete flushed bytes; readers may safely open the final name.
-    RemoveTemporary(dir.value,temp);
-    if(Fail(faults,Operation::AfterPublish))
-        return {Status::PublishedDurabilityUnknown,Publication::Published};
 #ifdef _WIN32
-    return {Status::Committed,Publication::Published,Durability::FileFlushed};
-#else
-    int flushDirectory;
-    do {flushDirectory=fsync(dir.value);} while(flushDirectory!=0 && errno==EINTR);
-    if(flushDirectory!=0)
-        return {Status::PublishedDurabilityUnknown,Publication::Published,Durability::None,codec::Error::None,Error()};
-    return {Status::Committed,Publication::Published,Durability::FileAndDirectoryFlushed};
+    // Open and allocate all native rename inputs before entering a lifecycle
+    // publication gate. The cutover itself only uses this retained handle.
+    work->renameFile.value=CreateFileW(work->temp.c_str(),DELETE|GENERIC_WRITE,
+        FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,nullptr,OPEN_EXISTING,
+        FILE_FLAG_OPEN_REPARSE_POINT,nullptr);
+    if(work->renameFile.value==Invalid) return Failure(Status::OpenFailed,Error());
+    const auto nativeName=target.wstring();
+    const auto renameBytes=offsetof(FILE_RENAME_INFO,FileName)+(nativeName.size()+1)*sizeof(wchar_t);
+    work->renameInfo.resize(renameBytes);
+    auto* rename=reinterpret_cast<FILE_RENAME_INFO*>(work->renameInfo.data());
+    rename->Flags=expected?(FILE_RENAME_FLAG_REPLACE_IF_EXISTS|FILE_RENAME_FLAG_POSIX_SEMANTICS):0;
+    rename->RootDirectory=nullptr;rename->FileNameLength=static_cast<DWORD>(nativeName.size()*sizeof(wchar_t));
+    std::memcpy(rename->FileName,nativeName.c_str(),(nativeName.size()+1)*sizeof(wchar_t));
 #endif
+    if(Fail(faults,Operation::Publish)) return Failure(Status::PublishFailed);
+    output.impl_=std::move(work);
+    return {Status::Prepared};
+}
+Result Write(const std::filesystem::path& directory,std::string_view name,const Checkpoint& candidate,
+             const std::optional<StoredCheckpoint>& expected,FaultInjector* faults) {
+    PreparedWrite work;
+    const auto result=Prepare(directory,name,candidate,expected,work,faults);
+    if(result.status!=Status::Prepared) return result;
+    work.Publish();
+    return work.Finish();
 }
 } // namespace horde::gameplay::campaign::storage

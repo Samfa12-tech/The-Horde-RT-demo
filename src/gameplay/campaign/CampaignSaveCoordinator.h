@@ -34,11 +34,13 @@ public:
     bool CompleteRead(Completion completion) const;
     // Queue rejection/preparation failure: no publication permission granted.
     bool CompleteWriteFailure(Completion completion) const;
-    // Execute at most once, only while the request/session is current. A future
-    // real adapter must prepare IO offside and put ONLY final name publication
-    // inside this gate, not an entire blocking storage::Write call. Lifecycle
+    // Real storage prepares/flushes offside, gates ONLY the final name cutover,
+    // then finishes cleanup/durability/readback offside before completing.
+    bool TryPublishPrepared(const std::function<void()>& publish) const;
+    bool CompletePublishedWrite(Completion completion) const;
+    // Convenience for a fully prepared fake/bounded publisher. Lifecycle
     // revocation serializes with this bounded callback; it must not reenter
-    // Coordinator/Request methods. No real IO is wired here.
+    // Coordinator/Request methods.
     bool PublishWrite(const std::function<Completion()>& publish) const;
 private:
     friend class Coordinator;

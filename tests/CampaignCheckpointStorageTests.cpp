@@ -7,6 +7,7 @@
 #include <iostream>
 #include <limits>
 #include <thread>
+#include <type_traits>
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
@@ -70,6 +71,15 @@ struct Fault:store::FaultInjector {
         if(crash) std::_Exit(73);return true;
     }
     std::size_t WriteLimit(std::size_t requested) override {return std::min(requested,limit);}
+};
+struct TracedFault:Fault {
+    unsigned callbacks=0;
+    bool Fail(store::Operation operation,std::size_t done) override {
+        ++callbacks;return Fault::Fail(operation,done);
+    }
+    std::size_t WriteLimit(std::size_t requested) override {
+        ++callbacks;return Fault::WriteLimit(requested);
+    }
 };
 std::vector<fs::path> Pending(const fs::path& root) {
     std::vector<fs::path> out;
@@ -152,6 +162,68 @@ int main(int argc,char** argv) {
     const auto noChange=store::Write(root,"slot-a.sav",initial,a);
     Check(noChange.status==store::Status::AlreadyCurrent && noChange.publication==store::Publication::Unchanged &&
         noChange.durability==store::Durability::None,"identical expected candidate is a no-op without a new persistence claim");
+    static_assert(!std::is_copy_constructible_v<store::PreparedWrite> &&
+        !std::is_copy_assignable_v<store::PreparedWrite> &&
+        std::is_nothrow_move_constructible_v<store::PreparedWrite> &&
+        std::is_nothrow_move_assignable_v<store::PreparedWrite>);
+    {
+        store::PreparedWrite empty;
+        Check(!empty && !empty.Publish() && empty.Finish().status==store::Status::PublishFailed,
+            "empty prepared work cannot publish or claim success");
+        Check(store::Prepare(root,"slot-a.sav",initial,a,empty).status==store::Status::AlreadyCurrent && !empty,
+            "preparing an unchanged expected record creates no prepared publication");
+        TracedFault trace;trace.active=false;
+        const auto prepared=store::Prepare(root,"split.sav",initial,std::nullopt,empty,&trace);
+        Check(prepared.status==store::Status::Prepared && prepared.publication==store::Publication::Unchanged &&
+            prepared.durability==store::Durability::None && bool(empty) && !fs::exists(root/"split.sav"),
+            "preparation flushes an owned sibling without publishing a target");
+        Check(Pending(root).size()==1 && store::Write(root,"split.sav",changed).status==store::Status::Busy,
+            "prepared work retains its temp and cooperative target lock");
+        Check(store::Prepare(root,"never-split.sav",changed,std::nullopt,empty).status==store::Status::Busy &&
+            bool(empty) && !fs::exists(root/"never-split.sav"),"prepare cannot silently replace owned pending work");
+        store::PreparedWrite moved(std::move(empty));
+        Check(!empty && bool(moved) && !empty.Publish(),"moving prepared work transfers unique publication ownership");
+        const auto callbacks=trace.callbacks;
+        const bool published=moved.Publish();
+        store::StoredCheckpoint visible;
+        Check(published && trace.callbacks==callbacks && store::Read(root,"split.sav",visible).status==store::Status::Read && visible.encoded==initialBytes,
+            "publication exposes complete bytes without invoking any fault callback");
+        Check(!moved.Publish() && trace.callbacks==callbacks,"native publication is attempted at most once");
+        Check(store::Write(root,"split.sav",changed).status==store::Status::Busy,
+            "publication retains its lock until off-gate finish");
+        const auto finished=moved.Finish();
+        Check(finished.status==store::Status::Committed && finished.publication==store::Publication::Published &&
+            !moved && trace.callbacks==callbacks+1 && Pending(root).empty(),
+            "off-gate finish alone runs postpublication seam and releases owned resources");
+        Check(moved.Finish().status==store::Status::PublishFailed,
+            "consumed finish cannot repeat flushes or publication");
+    }
+    {
+        store::PreparedWrite cancelled;
+        const auto split=Read(root,"split.sav");
+        Check(store::Prepare(root,"split.sav",changed,split,cancelled).status==store::Status::Prepared,
+            "replacement can prepare against an exact expected record");
+        auto invalidPrepare=initial;invalidPrepare.vitality=0;
+        store::PreparedWrite failed;
+        Check(store::Prepare(root,"invalid-split.sav",invalidPrepare,std::nullopt,failed).status==store::Status::InvalidCandidate &&
+            !failed,"failed preparation leaves empty output untouched");
+        cancelled=store::PreparedWrite{};
+        Check(Bytes(root/"split.sav")==initialBytes && Pending(root).empty(),
+            "destroying unsubmitted preparation cancels only its own sibling and preserves exact target");
+        Check(store::Prepare(root,"cancelled-split.sav",changed,std::nullopt,cancelled).status==store::Status::Prepared &&
+            cancelled.Finish().status==store::Status::PublishFailed && !cancelled && !fs::exists(root/"cancelled-split.sav") &&
+            Pending(root).empty(),"finish before publication cancels without inventing a storage success");
+        TracedFault trace;trace.operation=store::Operation::AfterPublish;
+        Check(store::Prepare(root,"split.sav",changed,split,cancelled,&trace).status==store::Status::Prepared,
+            "postpublication failure is deferred beyond preparation");
+        const auto callbacks=trace.callbacks;
+        Check(cancelled.Publish() && trace.callbacks==callbacks,
+            "even an armed postpublication seam never executes inside publication");
+        const auto result=cancelled.Finish();
+        Check(result.status==store::Status::PublishedDurabilityUnknown && result.publication==store::Publication::Published &&
+            result.durability==store::Durability::None && Bytes(root/"split.sav")==changedBytes && Pending(root).empty(),
+            "off-gate postpublication failure preserves honest visible-new durability uncertainty");
+    }
     const auto committed=store::Write(root,"slot-a.sav",changed,a);
     Check(committed.status==store::Status::Committed && committed.publication==store::Publication::Published,"exact expected valid record can update");
 #ifdef _WIN32

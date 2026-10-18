@@ -87,21 +87,34 @@ bool Request::CompleteRead(Completion completion) const {
 bool Request::CompleteWriteFailure(Completion completion) const {
     if(description_->token.operation!=Operation::Write) return false;
     const auto state=state_.lock();if(!state) return false;
-    std::lock_guard lock(state->mutex);if(!state->enabled || state->done) return false;
+    std::lock_guard lock(state->mutex);if(!state->enabled || state->done || state->publicationAuthorized) return false;
     Deliver(*state,std::move(completion));return true;
 }
-bool Request::PublishWrite(const std::function<Completion()>& publish) const {
+bool Request::TryPublishPrepared(const std::function<void()>& publish) const {
     if(description_->token.operation!=Operation::Write || !publish) return false;
     const auto state=state_.lock();if(!state) return false;
-    std::lock_guard lock(state->mutex);if(!state->enabled || state->done) return false;
-    state->publicationAuthorized=true;state->done=true;
-    try {Deliver(*state,publish());}
+    std::lock_guard lock(state->mutex);if(!state->enabled || state->done || state->publicationAuthorized) return false;
+    state->publicationAuthorized=true;
+    try {publish();}
     catch(...) {
         Completion uncertain;uncertain.target=description_->boundTarget;
         uncertain.result={storage::Status::PublishOutcomeUnknown,storage::Publication::Unknown};
         Deliver(*state,std::move(uncertain));
     }
     return true;
+}
+bool Request::CompletePublishedWrite(Completion completion) const {
+    if(description_->token.operation!=Operation::Write) return false;
+    const auto state=state_.lock();if(!state) return false;
+    std::lock_guard lock(state->mutex);
+    if(!state->enabled || state->done || !state->publicationAuthorized) return false;
+    Deliver(*state,std::move(completion));return true;
+}
+bool Request::PublishWrite(const std::function<Completion()>& publish) const {
+    if(!publish) return false;
+    Completion completion;
+    if(!TryPublishPrepared([&]{completion=publish();})) return false;
+    CompletePublishedWrite(std::move(completion));return true;
 }
 
 Coordinator::Coordinator():owner_(OwnerIdentity()){}
@@ -174,15 +187,19 @@ std::optional<storage::StoredCheckpoint> Coordinator::ReadCandidate(Token token)
 }
 bool Coordinator::AcceptRead(Token token,bool adopt) {
     if(!CurrentRead(token) || (adopt && (!prepared_->observed || state_.logicalRevision==UINT64_MAX))) return false;
-    boundTarget_=prepared_->target;state_.confirmed=prepared_->observed;
-    state_.durability=storage::Durability::None;state_.acknowledgedRevision=0;
-    if(adopt) {state_.logicalCheckpoint=prepared_->observed->checkpoint;++state_.logicalRevision;}
-    if(state_.logicalCheckpoint && state_.confirmed) {
+    // Allocate/copy offside. A caller may couple adoption with a no-throw
+    // simulation/camera swap; allocation failure must leave this decision live.
+    auto next=state_;auto target=prepared_->target;next.confirmed=prepared_->observed;
+    next.durability=storage::Durability::None;next.acknowledgedRevision=0;
+    if(adopt) {next.logicalCheckpoint=prepared_->observed->checkpoint;++next.logicalRevision;}
+    if(next.logicalCheckpoint && next.confirmed) {
         std::vector<std::byte> logical;codec::Error error{};
-        if(codec::Encode(*state_.logicalCheckpoint,logical,error) && logical==state_.confirmed->encoded)
-            state_.acknowledgedRevision=state_.logicalRevision;
+        if(codec::Encode(*next.logicalCheckpoint,logical,error) && logical==next.confirmed->encoded)
+            next.acknowledgedRevision=next.logicalRevision;
     }
-    baselineReady_=true;prepared_.reset();state_.preparedRead.reset();state_.phase=Phase::Ready;state_.error=Error::None;return true;
+    next.preparedRead.reset();next.phase=Phase::Ready;next.error=Error::None;
+    state_=std::move(next);boundTarget_=std::move(target);
+    baselineReady_=true;prepared_.reset();return true;
 }
 bool Coordinator::UseReadAsWriteBaseline(Token token) {return AcceptRead(token,false);}
 bool Coordinator::AdoptRead(Token token) {return AcceptRead(token,true);}

@@ -17,6 +17,7 @@ hordeTargets=(
   horde_rt_campaign_codec_tests
   horde_rt_campaign_storage_tests
   horde_rt_campaign_save_coordinator_tests
+  horde_rt_campaign_save_worker_tests
   horde_rt_player_animation_tests
   horde_rt_held_item_socket_tests
   horde_rt_dielectric_math_tests

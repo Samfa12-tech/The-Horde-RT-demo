@@ -1,0 +1,135 @@
+{
+  "sourceParent": "0d6c22d698604d527b85fddb33f6db1fadedf2ed",
+  "recordedUtc": "2026-10-18T00:48:10.5326324Z",
+  "worktree": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+  "sourceMeaning": "SHA256 final compiled working bytes before Git newline normalization; unchanged dependencies pinned to sourceParent",
+  "sources": [
+    {
+      "path": ".github/workflows/shared-simulation-host.yml",
+      "sha256": "fe1b725fc3c87762044133a33d5dcc40f171485e882a8be24a0eb5345198a921"
+    },
+    {
+      "path": "CMakeLists.txt",
+      "sha256": "97a95e28bc003d1a96288278c91df4b59c6f0a9383c158095d360cbe96421f2a"
+    },
+    {
+      "path": "cmake/HordeRtSources.cmake",
+      "sha256": "2da1b83f686a6066163e83744a3361046d3738ec65b5b7631700ad2d40e189de"
+    },
+    {
+      "path": "tools/run-host-sanitizer-validation.sh",
+      "sha256": "a69b0ba57f63e7eea2206ac27e22f152ba38106b5197973aa33a302f9af96165"
+    },
+    {
+      "path": "src/gameplay/campaign/CampaignCheckpointStorage.h",
+      "sha256": "d7e9fb11e0c0c511e743ed223569a8fd9f9d5835ec4302ac236b6cb2e70f6944"
+    },
+    {
+      "path": "src/gameplay/campaign/CampaignCheckpointStorage.cpp",
+      "sha256": "a0de7a1c2e66b5eeef42d9c5e5ae29703da66a1294b26a28fdc508bb78124c86"
+    },
+    {
+      "path": "src/gameplay/campaign/CampaignSaveCoordinator.h",
+      "sha256": "68fd76486c3445e23105c21c2defe8f3f0fbcf5ad89d8be00828c2e6cb72415a"
+    },
+    {
+      "path": "src/gameplay/campaign/CampaignSaveCoordinator.cpp",
+      "sha256": "d115da39a01de3f9fbc4a4bbac214c6e841cc0118181736ab0b1b692ee8a2f29"
+    },
+    {
+      "path": "src/gameplay/campaign/CampaignSaveWorker.h",
+      "sha256": "2e60cdfe280a5d608dd1bfef128c317a0e9c9eaaf9ec4f804fb3fe8fdf9356f4"
+    },
+    {
+      "path": "src/gameplay/campaign/CampaignSaveWorker.cpp",
+      "sha256": "6e806fe8ebbc934878e927b28232301bbd4819347cc85fa041bc607d242e523a"
+    },
+    {
+      "path": "src/gameplay/campaign/CampaignSlots.h",
+      "sha256": "842b867245c75b367ca32152a510260bad2cf07998195e1f39c3abf189246de4"
+    },
+    {
+      "path": "tests/CampaignSaveWorkerTests.cpp",
+      "sha256": "c71055ea7cf9d4c2c542ac82c4913b017d2ad7d7d52f5bd5826de036a7e8a962"
+    },
+    {
+      "path": "tests/CampaignCheckpointStorageTests.cpp",
+      "sha256": "3e23164128c1d259de544c7ac40a912405b1b6ad7f52666e332ba2d17b594f5c"
+    }
+  ],
+  "logs": [
+    {
+      "path": "reports/campaign-worker-2026-10-18/release-build.log",
+      "sha256": "988e3420eb46fc3e6074eb6608fcccddd3fb1b6c86f76461d666c1c13855e9f3"
+    },
+    {
+      "path": "reports/campaign-worker-2026-10-18/release-tests.log",
+      "sha256": "a317472e733422966b6f2b96ef5c028e4506485cad054b70d3e8e9b9b70dd72c"
+    },
+    {
+      "path": "reports/campaign-worker-2026-10-18/release-storage-fix-build.log",
+      "sha256": "9528db67bcf219b11c4460dbe7eb280bc6e204d8ea8ba787493c132894b07c60"
+    },
+    {
+      "path": "reports/campaign-worker-2026-10-18/release-final-tests.log",
+      "sha256": "54c4f4eb0d8931722d05470ead4623665e28eb49d46ec646b0eb4e11c93a8afe"
+    },
+    {
+      "path": "reports/campaign-worker-2026-10-18/debug-build.log",
+      "sha256": "c7dfde75b1bb54b42d80f4720690bea4722c020aa72f8ce6c04eeea05747b2d4"
+    },
+    {
+      "path": "reports/campaign-worker-2026-10-18/debug-tests.log",
+      "sha256": "9cbf863e208bd3c3a42adf6eedee02e12cf79a4be8d891840004f40d69d35a3b"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "build/presets/windows-x64-debug/Debug/horde_rt_campaign_save_worker_tests.exe",
+      "sha256": "51891923223397962008db95934ccd597418beb281272e2580549f0d929148a1"
+    },
+    {
+      "path": "build/presets/windows-x64-release/Release/horde_rt_campaign_save_worker_tests.exe",
+      "sha256": "bbcaf424bb3aca1c2621f38b889aad0f46c8fe23741727cde47d1c440299cece"
+    }
+  ],
+  "command": "cmake --build build/presets/windows-x64-{debug|release} --config {Debug|Release} --target horde_rt_campaign_save_worker_tests horde_rt_campaign_save_coordinator_tests horde_rt_campaign_storage_tests horde_rt_campaign_codec_tests --parallel 2",
+  "testRegex": "^horde_rt_campaign_(save_worker|save_coordinator|storage|codec)_tests$",
+  "debug": {
+    "passed": 4,
+    "failed": 0,
+    "seconds": 12.17,
+    "workerChecks": 79,
+    "storageChecks": 1197,
+    "coordinatorChecks": 306,
+    "codecChecks": 1991,
+    "concurrentReads": 295
+  },
+  "release": {
+    "passed": 4,
+    "failed": 0,
+    "seconds": 1.62,
+    "workerChecks": 79,
+    "storageChecks": 1197,
+    "coordinatorChecks": 306,
+    "codecChecks": 1991,
+    "concurrentReads": 398
+  },
+  "initialRelease": {
+    "passed": 3,
+    "failed": 1,
+    "storageChecks": 1197,
+    "storageFailures": 1,
+    "reason": "New generic-stream visibility fixture incompatible with retained Windows writer handle; application sharing-compatible Read verifies exact published bytes; gate implementation unchanged",
+    "retainedLog": "reports/campaign-worker-2026-10-18/release-tests.log"
+  },
+  "policy": "Exactly three slots, separate manual and latest autosave; no alias or history",
+  "limits": [
+    "Disposable Windows host filesystem tests only",
+    "No POSIX filesystem runtime/directory-fsync acceptance",
+    "Windows FileFlushed only, no physical power-loss claim",
+    "No phone worker/save/load evidence; phone checkpoint receipt belongs to parent build",
+    "No current cloud CI or sanitizer run"
+  ],
+  "publicPush": false
+}
