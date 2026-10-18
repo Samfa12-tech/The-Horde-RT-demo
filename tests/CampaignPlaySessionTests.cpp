@@ -86,8 +86,50 @@ int ExportFixtures(const fs::path& requested) {
     manifest<<"]}\n";manifest.close();if(!manifest)return 1;
     std::cout<<"Exported exactly six seeded .hrd records and manifest to "<<directory.string()<<'\n';return 0;
 }
-// No checkpoint imports, restore seeds, authoritative poses or direct logical
-// mutation: movement, sword edges, chest interaction and rope motor only.
+bool LoadEarnedBoundary(cp::PlaySession& play,sim::GameSimulation& game,cp::SaveKind kind,
+    const io::StoredCheckpoint& earned,const std::shared_ptr<const sim::TriangleSupportSurface>& terrain,
+    sim::InputSnapshot& input,std::uint64_t& publication) {
+    const bool read=play.Load(0,kind) && Until(play,[&]{return play.State().phase==cp::SessionPhase::LoadReady;});
+    Check(read,"fresh production session reads the chapter-earned record through the real worker");
+    if(!read)return false;
+    const auto preparation=play.PrepareLoad();
+    Check(preparation.has_value(),"earned record prepares a fresh logical restore");
+    if(!preparation)return false;
+    input.damageEnabled=false;input.tutorialEnabled=false;
+    input.moveForward=1;input.runHeld=true;input.crouchHeld=true;
+    input.commands.attack=71;input.commands.interact=72;input.commands.parry=73;input.commands.dodge=74;
+    const bool committed=play.CommitLoad(*preparation,preparation->destination,terrain,input,++publication);
+    Check(committed,"matching CPU resource readiness commits the actual earned record, not a fixture import");
+    if(!committed)return false;
+    const auto recaptured=game.CaptureCampaignCheckpoint(earned.checkpoint.id);
+    std::vector<std::byte> encoded;cp::codec::Error error{};
+    Check(recaptured && cp::codec::Encode(*recaptured,encoded,error) && encoded==earned.encoded,
+          "fresh restored simulation round trips every earned schema-1 checkpoint byte");
+    const auto& restored=game.Snapshot();
+    Check(restored.playerAlive && restored.playerGrounded && !restored.rescue.equipmentStowed &&
+          restored.playerVitals.vitality==earned.checkpoint.vitality && restored.rescue.claimCount==1 &&
+          restored.rescue.deploymentCount==1 && restored.skeletonEnemies[0].dead && restored.skeletonEnemies[1].dead &&
+          restored.lich.phase==horde::gameplay::LichPhase::Dead &&
+          restored.chestReward.phase==horde::gameplay::interactions::ChestRewardPhase::LanternClaimed,
+          "earned load preserves living support, victory, one reward and one deployed rope");
+    // CPU resource injection only: real imported terrain/collision is admitted,
+    // while GPU residency/presentation still belongs to the platform adapter.
+    const auto generation=restored.worldRoute.generation;
+    Check(game.PublishWorldZoneReadiness({generation,sim::WorldZoneId::Dungeon},sim::ZoneReadiness::Ready),
+          "resident CPU Dungeon readiness is republished for earned recovery");
+    for(std::size_t zone=1;zone<sim::kWorldZones.size();++zone)
+        Check(game.PublishChapterTerrain({generation,static_cast<sim::WorldZoneId>(zone)},terrain),
+              "earned recovery admits actual imported terrain for CPU route continuation");
+    game.StepFixed(input,1.f/60.f,++publication);game.ClearEvents();
+    Check(input.moveForward==0 && !input.runHeld && !input.crouchHeld &&
+          game.Snapshot().playerCombat.action==horde::gameplay::PlayerCombatAction::Idle && !game.Snapshot().dodgeActive &&
+          !game.Snapshot().rescue.equipmentStowed,
+          "fresh neutral publication releases earned restore without replaying old action or traversal debt");
+    return true;
+}
+// Earning uses no checkpoint imports, restore seeds, authoritative poses or
+// direct logical mutation: movement, sword edges, chest interaction and rope
+// motor only. Recovery then loads only the records this journey really wrote.
 void NormalBoundaryJourney(const std::shared_ptr<const sim::TriangleSupportSurface>& terrain) {
     using namespace horde::gameplay;
     namespace tr=horde::gameplay::traversal;
@@ -158,6 +200,25 @@ void NormalBoundaryJourney(const std::shared_ptr<const sim::TriangleSupportSurfa
     if(!lower)return;
     Check(play.ObserveSafeBoundary() && play.LatestCheckpoint()->id==cp::CheckpointId::LowerClaimed,
           "facade consumes actual fixed-tick lower milestone");
+    Check(Until(play,[&]{return play.State().operation==cp::PlayOperation::Autosave &&
+          play.State().outcome==cp::PlayOutcome::Succeeded;}),"chapter-earned lower autosave completes real disk publication");
+    const auto earnedLower=Read(directory,0,cp::SaveKind::Autosave);
+    Check(earnedLower.checkpoint.id==cp::CheckpointId::LowerClaimed &&
+          earnedLower.checkpoint.position==tr::kLowerLanding &&
+          play.State().result.publication==io::Publication::Published,
+          "earned lower autosave is the supported canonical safe anchor and has a real publication receipt");
+    Check(play.SaveManual(0) && Done(play) && play.State().outcome==cp::PlayOutcome::Succeeded,
+          "chapter-earned lower manual checkpoint completes real disk publication");
+    const auto retainedManual=Raw(Path(directory,0,cp::SaveKind::Manual));
+    Check(retainedManual==earnedLower.encoded,"earned lower manual and automatic records contain the same coherent checkpoint");
+    {
+        sim::GameSimulation fresh(sim::ProductionGameSimulationConfig());cp::PlaySession reloaded(fresh,directory.path);
+        sim::InputSnapshot freshInput;std::uint64_t freshPublication=0;
+        if(!LoadEarnedBoundary(reloaded,fresh,cp::SaveKind::Manual,earnedLower,terrain,freshInput,freshPublication))return;
+        Check(!fresh.Snapshot().rescue.exteriorSide && !fresh.Snapshot().rescue.firstAscentCompleted &&
+              fresh.Snapshot().rescuePrompt==tr::RescuePrompt::Climb,
+              "actual earned lower save restores before first ascent with usable rope");
+    }
     Check(!game.CaptureAuthoredCampaignBoundary(cp::CheckpointId::SafeExit),"claim cannot project an uncompleted ascent");
     if(!walk(-33.7f,-15.9f)){Check(false,"normal input reaches broad rope approach");return;}
     input.moveForward=0;++input.commands.interact;step();
@@ -178,6 +239,49 @@ void NormalBoundaryJourney(const std::shared_ptr<const sim::TriangleSupportSurfa
           "actual ascent boundary survives held movement and multi-tick AdvanceFrame");
     Check(play.ObserveSafeBoundary() && play.LatestCheckpoint()->id==cp::CheckpointId::SafeExit,
           "facade receives retained upper boundary after leaving exact endpoint");
+    const auto beforeUpperAuto=play.State().operationRevision;
+    Check(Until(play,[&]{return play.State().operationRevision>beforeUpperAuto &&
+          play.State().operation==cp::PlayOperation::Autosave && play.State().outcome==cp::PlayOutcome::Succeeded;}),
+          "chapter-earned upper autosave completes a new real disk publication");
+    const auto earnedUpper=Read(directory,0,cp::SaveKind::Autosave);
+    Check(earnedUpper.checkpoint.id==cp::CheckpointId::SafeExit && earnedUpper.checkpoint.firstAscentCompleted &&
+          earnedUpper.checkpoint.position==tr::kExteriorLanding && retainedManual==Raw(Path(directory,0,cp::SaveKind::Manual)),
+          "committed earned exterior autosave retains the earlier lower manual bytes");
+    {
+        sim::GameSimulation fresh(sim::ProductionGameSimulationConfig());cp::PlaySession reloaded(fresh,directory.path);
+        sim::InputSnapshot freshInput;std::uint64_t freshPublication=0;
+        if(!LoadEarnedBoundary(reloaded,fresh,cp::SaveKind::Autosave,earnedUpper,terrain,freshInput,freshPublication))return;
+        Check(fresh.Snapshot().rescue.exteriorSide && fresh.Snapshot().rescuePrompt==tr::RescuePrompt::Descend,
+              "actual earned upper autosave restores outside with usable return descent");
+        ++freshInput.commands.interact;fresh.StepFixed(freshInput,1.f/60.f,++freshPublication);
+        for(int tick=0;tick<60;++tick){fresh.StepFixed(freshInput,1.f/60.f,++freshPublication);reloaded.ObserveSafeBoundary();reloaded.Poll();}
+        Check(fresh.Snapshot().rescue.equipmentStowed && fresh.LatestCampaignBoundary() &&
+              fresh.LatestCampaignBoundary()->id==cp::CheckpointId::SafeExit &&
+              Raw(Path(directory,0,cp::SaveKind::Autosave))==earnedUpper.encoded,
+              "interrupted earned return descent retains the committed exterior record, never a mid-rope save");
+    }
+    {
+        sim::GameSimulation fresh(sim::ProductionGameSimulationConfig());cp::PlaySession reloaded(fresh,directory.path);
+        sim::InputSnapshot freshInput;std::uint64_t freshPublication=0;
+        if(!LoadEarnedBoundary(reloaded,fresh,cp::SaveKind::Autosave,earnedUpper,terrain,freshInput,freshPublication))return;
+        Check(fresh.Snapshot().rescue.exteriorSide && !fresh.Snapshot().rescue.equipmentStowed,
+              "fresh recovery after interrupted return starts on the last committed exterior safe side");
+        ++freshInput.commands.interact;fresh.StepFixed(freshInput,1.f/60.f,++freshPublication);
+        for(int tick=0;tick<1800 && fresh.Snapshot().rescue.equipmentStowed;++tick)
+            fresh.StepFixed(freshInput,1.f/60.f,++freshPublication);
+        Check(!fresh.Snapshot().rescue.exteriorSide && !fresh.Snapshot().rescue.equipmentStowed &&
+              fresh.Snapshot().rescue.firstAscentCompleted && fresh.Snapshot().playerGrounded &&
+              fresh.Snapshot().rescue.sawDescent && fresh.Snapshot().rescue.sawLanding &&
+              std::abs(fresh.Snapshot().playerSupportWorldY-tr::kLowerSupportWorldY)<.001f &&
+              fresh.Snapshot().rescue.claimCount==1 && fresh.Snapshot().rescue.deploymentCount==1,
+              "earned upper recovery completes actual ordinary-input descent and landing without duplicate reward or rope");
+        Check(Raw(Path(directory,0,cp::SaveKind::Autosave))==earnedUpper.encoded &&
+              Raw(Path(directory,0,cp::SaveKind::Manual))==retainedManual,
+              "continuation alone cannot rewrite the stored earned records without a facade boundary observation");
+    }
+    Check(!fs::exists(Path(directory,1,cp::SaveKind::Manual)) && !fs::exists(Path(directory,1,cp::SaveKind::Autosave)) &&
+          !fs::exists(Path(directory,2,cp::SaveKind::Manual)) && !fs::exists(Path(directory,2,cp::SaveKind::Autosave)),
+          "chapter-earned persistence and recovery never touch unselected slots");
     const auto oldGeneration=game.Snapshot().worldRoute.generation;
     game.InvalidateWorldZoneReadiness();
     Check(!game.CaptureAuthoredCampaignBoundary(cp::CheckpointId::SafeExit) &&
