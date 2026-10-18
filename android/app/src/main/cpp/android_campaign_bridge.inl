@@ -229,6 +229,16 @@ void PumpCampaignOnOwnerImpl(SwapchainContext& context)
         gCampaignLastAction=0;gCampaignPhase=2;
     }
     if(completion && completion->outcome==campaign::PlayOutcome::Failed) {
+        // Keep the underlying failure at the owner completion boundary. The
+        // public menu error intentionally groups IO failures; device evidence
+        // still needs the actual operation, errno and publication certainty.
+        const auto& result=completion->result;
+        __android_log_print(ANDROID_LOG_ERROR,kTag,
+            "HORDE_CAMPAIGN_STORAGE_FAILURE operation=%d slot=%u kind=%d status=%d system_error=%u codec_error=%d publication=%d durability=%d",
+            static_cast<int>(completion->operation),completion->operationSlot,
+            static_cast<int>(completion->operationKind),static_cast<int>(result.status),
+            result.systemError,static_cast<int>(result.codecError),
+            static_cast<int>(result.publication),static_cast<int>(result.durability));
         FailCampaignOnOwner(CampaignStorageError(completion->result));
     }
     else if(completion && completion->operation!=campaign::PlayOperation::Load &&

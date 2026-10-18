@@ -16,6 +16,10 @@
 #include <sys/file.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#ifdef __ANDROID__
+#include <linux/fs.h>
+#include <sys/syscall.h>
+#endif
 #endif
 
 namespace horde::gameplay::campaign::storage {
@@ -233,6 +237,15 @@ bool PreparedWrite::Publish() noexcept {
 #ifdef _WIN32
     work.published=SetFileInformationByHandle(work.renameFile.value,FileRenameInfoEx,
         work.renameInfo.data(),static_cast<DWORD>(work.renameInfo.size()))!=FALSE;
+#elif defined(__ANDROID__)
+    // App-private Android storage can deny hard links. Keep create-only cutover
+    // atomic and no-replace using the kernel operation; the libc renameat2
+    // wrapper is API 30+, while this application retains minSdk 24. Unsupported
+    // kernels/filesystems fail with their real errno; never weaken to renameat.
+    work.published=work.expected ?
+        renameat(work.directory.value,work.tempName.c_str(),work.directory.value,work.targetName.c_str())==0 :
+        syscall(SYS_renameat2,work.directory.value,work.tempName.c_str(),
+            work.directory.value,work.targetName.c_str(),RENAME_NOREPLACE)==0;
 #else
     work.published=work.expected ?
         renameat(work.directory.value,work.tempName.c_str(),work.directory.value,work.targetName.c_str())==0 :
@@ -253,7 +266,7 @@ Result PreparedWrite::Finish() {
         if(SameExpected(read,observed,work->expected)) return Failure(Status::PublishFailed,work->nativeError);
         return {Status::PublishOutcomeUnknown,Publication::Unknown,Durability::None,codec::Error::None,work->nativeError};
     }
-    // Remove the owned temporary link before directory fsync. The lock and
+    // Remove any owned temporary name before directory fsync. The lock and
     // pinned directory remain owned until classification has completed.
     work->Cleanup();
     if(Fail(work->faults,Operation::AfterPublish))

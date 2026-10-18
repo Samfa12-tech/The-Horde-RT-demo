@@ -199,6 +199,24 @@ int main(int argc,char** argv) {
             "consumed finish cannot repeat flushes or publication");
     }
     {
+        // A nonparticipating creator can appear after Prepare's last read.
+        // The final native create-only operation must still refuse replacement.
+        store::PreparedWrite pending;
+        Check(store::Prepare(root,"late-create.sav",initial,std::nullopt,pending).status==store::Status::Prepared,
+            "create-only race fixture prepares while destination is absent");
+        Raw(root/"late-create.sav",changedBytes);
+        Check(!pending.Publish() && Bytes(root/"late-create.sav")==changedBytes,
+            "destination created after preparation is never replaced at publication");
+        const auto result=pending.Finish();
+        Check(result.status==store::Status::PublishOutcomeUnknown &&
+            result.publication==store::Publication::Unknown && result.durability==store::Durability::None &&
+            result.systemError!=0 && Bytes(root/"late-create.sav")==changedBytes && Pending(root).empty(),
+            "late destination collision preserves its exact bytes, reports native failure and requires reread");
+        Check(store::Write(root,"late-create.sav",initial).status==store::Status::Conflict &&
+            Bytes(root/"late-create.sav")==changedBytes,
+            "later create-only retry cannot overwrite the independently created record");
+    }
+    {
         store::PreparedWrite cancelled;
         const auto split=Read(root,"split.sav");
         Check(store::Prepare(root,"split.sav",changed,split,cancelled).status==store::Status::Prepared,

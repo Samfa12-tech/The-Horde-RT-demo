@@ -1,5 +1,22 @@
 # Horde 1.7 current design index
 
+## Current earned-save failure and bounded ambience candidate - 18 October 2026
+
+The [first physical earned-save trial](../evidence/2026-10-18-android-earned-recovery/README.md)
+reaches guards, Keeper victory and lantern claim through ordinary touch input
+with damage enabled, but first autosave and empty-slot manual creation fail.
+Earlier seeded replacement/reload passes do not close fresh record creation.
+The [Android publication repair](../evidence/2026-10-18-android-create-publication/README.md)
+now creates a new record with file/directory flush in a separate seeded diagnostic.
+Preserve the earned failure; a new earned-save/death recovery pass remains required
+before claiming that gate or adding heavier outside content.
+
+The [sparse distant bird candidate](../evidence/2026-10-18-forest-bird/README.md)
+adds one licensed finite recording, shared fixed-tick suppression/cadence and both
+native platform mappings. Host checks and platform compilation pass; actual
+listening, species/night suitability and mix remain unaccepted. It adds no RT
+geometry or quality reduction and does not complete the forest species bed.
+
 ## Current Windows parity and earned recovery checkpoint - 18 October 2026
 
 The [Windows campaign menu/owner receipt](../evidence/2026-10-18-windows-campaign/README.md)

@@ -1,5 +1,13 @@
 # Logical safe-checkpoint round trip and next storage boundary
 
+**Latest physical gate:** the [earned Android trial](../evidence/2026-10-18-android-earned-recovery/README.md)
+reaches lantern claim with ordinary touch input and damage enabled, then fails
+first autosave and empty-slot manual creation. No records are created. Existing
+seeded replacement/reload passes remain valid for their own scopes. The separate
+[Android first-create repair](../evidence/2026-10-18-android-create-publication/README.md)
+now physically creates and flushes a new isolated record. A new earned-save/death
+recovery pass remains the immediate acceptance gate.
+
 **18 October integration update:** retention is confirmed: exactly three slots,
 each retaining a separate manual record and its latest autosave. Autosaving
 cannot replace manual; there is no history archive or automatic migration.

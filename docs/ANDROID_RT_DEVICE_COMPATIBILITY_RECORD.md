@@ -3257,3 +3257,38 @@ full controls/route/art/audio/haptic acceptance or sustained performance. No app
 data clearing, save deletion, owner process termination, settings rollback,
 Release/desktop/Reef action or APK copy/pull occurred.
 [Exact artifact, finite sequence, process identities and custody](evidence/2026-10-18-android-campaign-readiness-followup/README.md).
+
+### 18 October - earned-save failure and first-create repair
+
+Owner-authorized **SM-S948B**, Android **17 / API 37**, same device build
+`CP2A.260605.016.S948BXXS4BZIG`. Same-signer Debug code 10 APK
+`e9ce289a8a527083aa1d6d2ca2976da5ba439768f8cc933b3a34e20f153701c8`
+reached the opening, crouch passage, guards, Keeper victory and actual lantern
+claim through ordinary touch input with damage enabled and 3/3 hearts. Evidence
+class: **physical earned progression followed by failed persistence**. Both first
+Slot 1 autosave and empty Slot 2 manual creation failed; no records were created.
+The earlier seeded replacement/reload passes did not cover this first-create path.
+The settings hash, all 281 prior paths and six prior test records were preserved.
+Two locks were added only in the new earned-test namespace. The failed result
+remains [separately recorded](evidence/2026-10-18-android-earned-recovery/README.md).
+
+A separate **seeded storage diagnostic**, APK
+`00f196f24eb07cc4eacf4e096f05496912b069f79505f98350812ada657a42b1`,
+identified create-only `linkat` publication returning `EACCES (13)`, unchanged
+publication and no durability. This identifies the failing operation; no specific
+SELinux policy is inferred. Android now uses atomic no-replace `renameat2` via
+the kernel syscall, retaining minSdk 24, real errors and no unsafe fallback.
+The repaired four-ABI Debug APK
+`4c84eb456f97717df055245410196101ea681a3bc55d0c9776eb42a59d591073`
+matches its installed hash and creates the previously empty Slot 2 manual record
+with `FileAndDirectoryFlushed`, preserving the source and active Slot 1. Evidence
+class: **bounded physical first-create repair using an isolated seeded fixture**;
+after verified termination of only the cached test process, a fresh PID reloads
+that newly created Slot 2 record, explicitly Resumes alive with one heart/current
+RT/enabled Climb, then Quits to zero activities. All 281 prior paths, six prior
+test records and settings remain unchanged; five added files stay within the two
+test namespaces, and owner saves remain absent. This accepts bounded creation and
+fresh-process recovery only;
+this does not retroactively pass the earned candidate or establish earned auto,
+death Load, whole-route, interruption/power-loss, audio or sustained performance.
+[Exact diagnostic and repair receipt](evidence/2026-10-18-android-create-publication/README.md).
