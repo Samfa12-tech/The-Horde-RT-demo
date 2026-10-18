@@ -303,6 +303,25 @@ public:
 
     const TorchFailureSnapshot& Snapshot() const { return snapshot_; }
 
+    // Validated campaign recovery only. The completed release anchor need not
+    // still lie in the original drench trigger; no live sequence is replayed.
+    void RestoreCampaignSettled(float x,float z,float yaw,float viewPitch)
+    {
+        snapshot_ = {};
+        snapshot_.phase = TorchFailurePhase::Settled;
+        snapshot_.sequenceTime = std::max(kSettleTime,kArmLowerEnd);
+        snapshot_.phaseTime = snapshot_.sequenceTime-kSettleTime;
+        snapshot_.triggered = true;
+        snapshot_.heldByPlayer = false;
+        snapshot_.flameStrength = 0.0f;
+        snapshot_.fallProgress = snapshot_.leftArmLowerBlend = 1.0f;
+        snapshot_.droppedX = x; snapshot_.droppedZ = z;
+        snapshot_.droppedY = kRouteFloorWorldY;
+        snapshot_.droppedYawRadians = yaw;
+        snapshot_.droppedViewPitchRadians = viewPitch;
+        snapshot_.droppedPitchRadians = 1.36f;
+    }
+
     static constexpr float kReleaseTime = 0.70f;
     static constexpr float kFallDuration = 0.45f;
     static constexpr float kSettleTime = kReleaseTime + kFallDuration;

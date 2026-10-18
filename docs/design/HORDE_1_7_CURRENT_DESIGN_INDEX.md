@@ -1,5 +1,12 @@
 # Horde 1.7 current design index
 
+The [combined five-commit review](../evidence/2026-10-18-campaign-combined-review/README.md)
+corrects moving torch-release checkpoint admission/reconstruction, a stale load
+input barrier after explicit diagnostic checkpoint replacement, and restored
+input publication identity. The save format remains unchanged. Real save/load
+integration and Sam's manual/autosave retention choice remain pending; development
+stops after these focused review fixes.
+
 The [session/request receipt coordinator](../evidence/2026-10-18-campaign-save-coordinator/README.md)
 now supplies weak single-use worker tickets, revocable publication permission,
 explicit read decisions and revision-aware acknowledgement, tested with fake

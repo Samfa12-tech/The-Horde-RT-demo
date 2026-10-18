@@ -1,4 +1,5 @@
 #include "gameplay/simulation/GameSimulation.h"
+#include "gameplay/DevelopmentCheckpointSimulation.h"
 #include "scene/ChapterTerrainSurface.h"
 #include "scene/assets/AssetManifest.h"
 #include <cmath>
@@ -122,6 +123,52 @@ int main() {
         const auto again=second.CaptureCampaignCheckpoint(c.id);
         Check(again && SameRecord(*again,*captured),"fresh simulation capture/restore/capture is lossless");
         CheckClean(second.Snapshot());
+    }
+    {
+        auto config=ProductionGameSimulationConfig();
+        config.playerStartX=-1.80f;config.playerStartZ=-15.2f;
+        config.playerStartYawRadians=-1.57079632679f;
+        GameSimulation walking(config);
+        InputSnapshot in;in.damageEnabled=false;in.moveForward=1;
+        in.yawRadians=config.playerStartYawRadians;in.pitchRadians=.1f;
+        for(int tick=0;tick<90;++tick) walking.StepFixed(in);
+        const auto drop=walking.Snapshot().torchFailure;
+        Check(drop.phase==TorchFailurePhase::Settled && !drop.heldByPlayer &&
+            !IsTorchFailureTriggerPosition(drop.droppedX,drop.droppedZ),
+            "ordinary walking releases the torch beyond the drench trigger rectangle");
+        for(bool upper:{false,true}) {
+            auto c=Record(upper);c.torchDropX=drop.droppedX;c.torchDropZ=drop.droppedZ;
+            c.torchDropYaw=drop.droppedYawRadians;c.torchDropPitch=drop.droppedViewPitchRadians;
+            Check(cp::Validate(c),"ordinary moving torch release is a valid logical anchor");
+            GameSimulation loaded(ProductionGameSimulationConfig());
+            if(!Restore(loaded,c,terrain)) {Check(false,"moving-release checkpoint restores");continue;}
+            const auto settled=loaded.Snapshot().torchFailure;
+            Check(settled.triggered && !settled.heldByPlayer && settled.phase==TorchFailurePhase::Settled &&
+                settled.flameStrength==0 && settled.fallProgress==1 && settled.leftArmLowerBlend==1 &&
+                settled.droppedX==drop.droppedX && settled.droppedZ==drop.droppedZ &&
+                settled.droppedYawRadians==drop.droppedYawRadians && settled.droppedViewPitchRadians==drop.droppedViewPitchRadians,
+                "restore reconstructs a settled nonemitting torch at the actual moving release anchor");
+            const auto captured=loaded.CaptureCampaignCheckpoint(c.id);
+            Check(captured && SameRecord(*captured,c),"moving-release anchor survives actual safe-boundary capture");
+        }
+    }
+    {
+        GameSimulation sim(ProductionGameSimulationConfig());const auto c=Record();
+        const auto token=sim.BeginCampaignRestore(c);InputSnapshot held;
+        held.commands.attack=4;held.moveForward=1;
+        Check(token && sim.CommitCampaignRestore(*token,{token->worldGeneration,c.zone},terrain,held,100),
+            "replacement checkpoint setup commits behind a live input barrier");
+        Check(sim.Snapshot().inputPublicationSequence==100 && sim.Snapshot().lastConsumedAttackSequence==4,
+            "restore snapshot identifies the coherent current input whose commands it consumed");
+        const auto* replacement=FindDevelopmentCheckpoint("chapter-keeper-death-held");
+        Check(replacement!=nullptr,"accepted replacement fixture exists");
+        if(replacement) {Check(StageDevelopmentCheckpointForScene(sim,*replacement,[&]{
+            const auto generation=sim.Snapshot().worldRoute.generation;
+            sim.PublishChapterTerrain({generation,WorldZoneId::TombExterior},terrain);
+        }),"explicit authored checkpoint replacement stages successfully");
+        Check(!sim.Snapshot().paused && sim.Snapshot().playerX==replacement->cameraX &&
+            sim.Snapshot().playerZ==replacement->cameraZ && sim.Snapshot().playerYawRadians==replacement->yaw,
+            "explicit authored replacement reaches its requested pose without the prior load input barrier");}
     }
     for(bool upper:{false,true}) {
         GameSimulation sim(ProductionGameSimulationConfig());const auto c=Record(upper);
@@ -260,7 +307,7 @@ int main() {
         bad=good;bad.dialogue=Record(true).dialogue;reject(bad);
         bad=good;bad.position.z+=.2f;reject(bad);bad=good;bad.position.y+=.1f;reject(bad);
         bad=good;bad.pitch=.5f;reject(bad);bad=good;bad.guards[0].x=-100;reject(bad);
-        bad=good;bad.torchDropX=0;reject(bad);
+        bad=good;bad.torchDropX=100;reject(bad);
         for(float value:{std::numeric_limits<float>::infinity(),std::numeric_limits<float>::quiet_NaN()}) {
             bad=good;bad.position.x=value;reject(bad);bad=good;bad.position.y=value;reject(bad);
             bad=good;bad.position.z=value;reject(bad);bad=good;bad.yaw=value;reject(bad);

@@ -126,9 +126,7 @@ bool GameSimulation::CommitCampaignRestore(campaign::RestoreToken token, WorldZo
     interactions::EquipRewardLantern(next.interactionState_);
     next.interactionState_.heldLightPose=c.lanternHigh?interactions::HeldLightPose::High:interactions::HeldLightPose::Low;
     next.interactionState_.heldLightPoseProgress=1.0f;
-    // Rebuild the completed original-torch trajectory from its logical anchor.
-    for(int tick=0;tick<45;++tick)
-        next.torchFailure_.Update(.05f,c.torchDropX,c.torchDropZ,c.torchDropYaw,c.torchDropPitch);
+    next.torchFailure_.RestoreCampaignSettled(c.torchDropX,c.torchDropZ,c.torchDropYaw,c.torchDropPitch);
     next.torchFailureSnapshot_=next.torchFailure_.Snapshot();
     items::ImportHeldItemCheckpoint(next.heldItems_,false,next.tickIndex_);next.ResetSwordEquipment();
     // Saved equipment belongs to this session. A later New Game/reset keeps
@@ -139,7 +137,7 @@ bool GameSimulation::CommitCampaignRestore(campaign::RestoreToken token, WorldZo
     if(upper && !next.chapterCompanion_.State().grounded) return false;
     // Consume the live session's published edges, never saved input identities.
     next.SynchronizePausedInput(lastInput_,inputPublicationSequence_);
-    next.SynchronizePausedInput(currentInput,inputPublicationSequence_);
+    next.SynchronizePausedInput(currentInput,currentInputPublicationSequence);
     next.campaignInputPublicationFloor_=std::max(inputPublicationSequence_,currentInputPublicationSequence);
     InputSnapshot neutral=next.lastInput_;
     neutral.moveForward=neutral.moveStrafe=0;neutral.runHeld=false;neutral.hasAuthoritativePlayerPose=false;

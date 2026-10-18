@@ -1358,6 +1358,9 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
     }
 
     CancelCampaignRestore();
+    // An accepted explicit checkpoint replaces the loaded session's pose.
+    // Its staging/practice input must not wait for the superseded camera rebase.
+    campaignInputPublicationFloor_.reset();
     chapterDialogue_.Reset(checkpointId!=0);chapterVisibleRaise_=0;
     pendingTutorialReplayCommands_ = 0u;
     pendingTutorialSkipCommands_ = 0u;

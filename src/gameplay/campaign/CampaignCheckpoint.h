@@ -1,6 +1,7 @@
 #pragma once
 
 #include "gameplay/dialogue/ChapterDialogue.h"
+#include "gameplay/CorridorCollision.h"
 #include "gameplay/traversal/RescueTraversal.h"
 #include <array>
 #include <cmath>
@@ -51,10 +52,15 @@ inline bool Validate(const Checkpoint& c) {
     for (const auto& g : c.guards)
         if (!std::isfinite(g.x) || !std::isfinite(g.z) || !std::isfinite(g.yaw) ||
             g.x < -8.5f || g.x > -2.5f || g.z < -18.0f || g.z > -12.4f) return false;
+    // Preserve every original schema-1 trigger anchor, including its edges.
+    const bool originalTorchAnchor=c.torchDropX>=-2.48f && c.torchDropX<=-1.78f &&
+        c.torchDropZ>=-16.4f && c.torchDropZ<=-14.0f;
     if (!std::isfinite(c.torchDropX) || !std::isfinite(c.torchDropZ) ||
         !std::isfinite(c.torchDropYaw) || !std::isfinite(c.torchDropPitch) ||
-        c.torchDropX < -2.48f || c.torchDropX > -1.78f ||
-        c.torchDropZ < -16.4f || c.torchDropZ > -14.0f ||
+        // The live torch follows the player until release, 0.70 seconds after
+        // the drench trigger. Its anchor belongs to the walkable route, not
+        // the trigger rectangle; walking, running or turning can leave it.
+        (!originalTorchAnchor && !IsShowcasePlayerPositionWalkable(c.torchDropX,c.torchDropZ)) ||
         c.torchDropPitch < -.32f || c.torchDropPitch > .28f) return false;
     return true;
 }

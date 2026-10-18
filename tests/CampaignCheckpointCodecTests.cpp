@@ -94,6 +94,10 @@ int main() {
         c.dialogue.forestWaystoneConsumed=c.dialogue.forestClueConsumed=c.dialogue.forestVillageConsumed=true;RoundTrip(c);
         c=cp::Checkpoint{};c.dialogue.activeLine=dlg::Line::Grate;RoundTrip(c);
         c=cp::Checkpoint{};c.yaw=-0.0f;c.pitch=-0.0f;c.guards[0].yaw=-0.0f;RoundTrip(c);
+        // Live guttering tracks a moving player beyond the trigger rectangle.
+        c=cp::Checkpoint{};c.torchDropX=-3.1f;c.torchDropZ=-15.2f;RoundTrip(c);
+        c=Upper();c.torchDropX=-3.1f;c.torchDropZ=-15.2f;RoundTrip(c);
+        c=cp::Checkpoint{};c.torchDropX=-2.48f;c.torchDropZ=-16.4f;RoundTrip(c); // original schema-1 edge anchor
     }
     // Every possible truncation boundary fails without modifying output.
     for(std::size_t length=0;length<baseline.size();++length)
