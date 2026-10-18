@@ -9,7 +9,12 @@ bool GameSimulation::UsesRescueExterior() const {
     return config_.developmentRescueJourney && rescueTraversal_.Snapshot().exteriorSide;
 }
 void GameSimulation::StartLiveDevelopmentRescueJourney(bool authoredTerrain) {
+    const float openingYaw=config_.playerStartYawRadians;
     SetDevelopmentRescueJourney(true,authoredTerrain);
+    // The generic fixture setter faces the historical rescue landing. Live
+    // play starts at the caller's opening, whose camera must survive the
+    // platform's neutral-input rebase and subsequent new-game resets.
+    config_.playerStartYawRadians=openingYaw;
     // ResetRoute clears historical capture policy, dialogue consumption and
     // transient teaching/input state. A frozen checkpoint import must not do
     // this implicitly: its accepted timing/visual evidence stays unchanged.

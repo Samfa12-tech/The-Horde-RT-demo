@@ -26,6 +26,12 @@ public:
     ~Session();
     bool SelectSlot(unsigned slot); // zero-based, exactly three slots
     bool Save(SaveKind kind,CheckpointId checkpoint);
+    // Explicit immutable simulation-authored boundary; does not recapture the
+    // current player position. Platform adapters must not fabricate records.
+    bool SaveCheckpoint(SaveKind kind,const Checkpoint& checkpoint);
+    // Read-only catalogue work shares this session's bounded worker without
+    // selecting a slot, adopting a record or changing gameplay/session state.
+    bool SubmitCatalogueRead(const async::Request& request);
     bool Load(SaveKind kind);
     bool Poll();
     std::optional<LoadPreparation> PrepareLoad();

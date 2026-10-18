@@ -27,10 +27,17 @@ bool Session::Submit(std::optional<async::Request> request) {
     return true; // Typed failure is consumed by owner Poll, never silently lost.
 }
 bool Session::Save(SaveKind kind,CheckpointId checkpoint) {
-    if(!SaveTarget(state_.slot,kind) || (state_.phase!=SessionPhase::Idle && state_.phase!=SessionPhase::Failed))return false;
     const auto captured=simulation_.CaptureCampaignCheckpoint(checkpoint);if(!captured)return false;
+    return SaveCheckpoint(kind,*captured);
+}
+bool Session::SubmitCatalogueRead(const async::Request& request) {
+    return request.Work().token.operation==async::Operation::Read && worker_.Submit(request);
+}
+bool Session::SaveCheckpoint(SaveKind kind,const Checkpoint& captured) {
+    if(!Validate(captured) || !SaveTarget(state_.slot,kind) ||
+       (state_.phase!=SessionPhase::Idle && state_.phase!=SessionPhase::Failed))return false;
     state_.kind=kind;
-    if(!Current().NoteCheckpoint(*captured) || !Submit(Current().BeginRead()))return false;
+    if(!Current().NoteCheckpoint(captured) || !Submit(Current().BeginRead()))return false;
     state_.phase=SessionPhase::Saving;return true;
 }
 bool Session::Load(SaveKind kind) {

@@ -222,10 +222,23 @@ target_include_directories(horde_campaign_persistence PUBLIC ${CMAKE_CURRENT_SOU
 target_compile_features(horde_campaign_persistence PUBLIC cxx_std_20)
 target_link_libraries(horde_campaign_persistence PUBLIC Threads::Threads)
 
-add_library(horde_campaign_session STATIC src/gameplay/campaign/CampaignSession.cpp)
+add_library(horde_campaign_session STATIC src/gameplay/campaign/CampaignSession.cpp
+    src/gameplay/campaign/CampaignPlaySession.cpp)
 target_link_libraries(horde_campaign_session PUBLIC horde_campaign_persistence horde_gameplay_simulation)
 
 if(BUILD_TESTING)
+    add_executable(horde_rt_android_campaign_load_barrier_tests tests/AndroidCampaignLoadBarrierTests.cpp)
+    target_include_directories(horde_rt_android_campaign_load_barrier_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_compile_features(horde_rt_android_campaign_load_barrier_tests PRIVATE cxx_std_20)
+    add_test(NAME horde_rt_android_campaign_load_barrier_tests COMMAND horde_rt_android_campaign_load_barrier_tests)
+    add_executable(horde_rt_campaign_play_session_tests tests/CampaignPlaySessionTests.cpp
+        src/scene/assets/AssetManifest.cpp src/scene/assets/AssetValidation.cpp
+        src/scene/assets/GltfDocument.cpp src/scene/assets/StaticMeshAsset.cpp)
+    target_link_libraries(horde_rt_campaign_play_session_tests PRIVATE horde_campaign_session)
+    target_include_directories(horde_rt_campaign_play_session_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/third_party)
+    target_compile_definitions(horde_rt_campaign_play_session_tests PRIVATE HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
+    add_test(NAME horde_rt_campaign_play_session_tests COMMAND horde_rt_campaign_play_session_tests)
+    set_tests_properties(horde_rt_campaign_play_session_tests PROPERTIES TIMEOUT 30)
     add_executable(horde_rt_campaign_session_tests tests/CampaignSessionTests.cpp
         src/scene/assets/AssetManifest.cpp src/scene/assets/AssetValidation.cpp
         src/scene/assets/GltfDocument.cpp src/scene/assets/StaticMeshAsset.cpp)

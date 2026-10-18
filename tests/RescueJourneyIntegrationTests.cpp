@@ -418,6 +418,12 @@ int main(int argc,char** argv) {
  GameSimulation launch(ProductionGameSimulationConfig());
  check(launch.ApplyShowcaseCheckpoint(0),"legacy capture seed unavailable");
  launch.StartLiveDevelopmentRescueJourney();
+ check(std::abs(launch.Snapshot().playerYawRadians)<.001f,
+       "live new game faces away from the authored opening");
+ auto facingConfig=ProductionGameSimulationConfig();facingConfig.playerStartYawRadians=.4f;
+ GameSimulation facingLaunch(facingConfig);facingLaunch.StartLiveDevelopmentRescueJourney();
+ check(std::abs(facingLaunch.Snapshot().playerYawRadians-.4f)<.001f,
+       "live new game discards caller-configured opening yaw");
  InputSnapshot launchInput;launchInput.tutorialEnabled=true;launchInput.tutorialSlowdownEnabled=true;
  check(launch.Snapshot().playerVitals.vitality==3 && launch.Snapshot().playerVitals.maxVitality==3,
        "development journey launch did not start with three hearts");
@@ -438,6 +444,8 @@ int main(int argc,char** argv) {
  GameSimulation frozen(ProductionGameSimulationConfig());
  check(frozen.ApplyShowcaseCheckpoint(0),"frozen capture seed unavailable");
  frozen.SetDevelopmentRescueJourney(true);
+ check(std::abs(frozen.Snapshot().playerYawRadians-3.14159265359f)<.001f,
+       "live opening fix changed frozen rescue fixture facing");
  for(int frame=0;frame<30;++frame)frozen.StepFixed(launchInput);
  check(!frozen.Snapshot().combatTeaching.enabled && !frozen.Snapshot().lich.readableCastPresentation,
        "live launch correction changed historical frozen capture rules");
@@ -448,6 +456,8 @@ int main(int argc,char** argv) {
  check(ending.EndingPhaseForUi()==interactions::FinaleEndingPhase::Complete,
        "ordinary demo lost its accepted ending overlay");
  launchInput.commands.routeReset=1;launch.StepFixed(launchInput);
+ check(std::abs(launch.Snapshot().playerYawRadians)<.001f,
+       "live route reset loses its authored opening yaw");
  check(launch.Snapshot().playerVitals.vitality==3 && launch.Snapshot().playerVitals.maxVitality==3,
        "development journey reset did not restore three hearts");
 

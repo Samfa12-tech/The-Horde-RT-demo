@@ -383,6 +383,7 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
     // movement and poses still share the teaching time scale; pause freezes both.
     UpdateChapterDialogue(input,dialogueDeltaSeconds);
     RefreshSnapshot(input);
+    if(fixedDeltaSeconds>0 && !input.paused)LatchCampaignBoundary();
     snapshot_.eventsEmittedThisTick = events_.Size() - eventsBefore;
 }
 
@@ -685,6 +686,7 @@ void GameSimulation::SetDevelopmentSupportFixture(bool enabled, std::uint64_t ge
 
 void GameSimulation::ResetRoute()
 {
+    ClearCampaignBoundary();
     CancelCampaignRestore();
     if(staticDetailLease_.resourceGeneration) {
         staticDetailLease_.restoreRequested=true;deferredStaticDetailReset_=true;RefreshSnapshot(lastInput_);return;
@@ -1387,6 +1389,7 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
     }
 
     CancelCampaignRestore();
+    ClearCampaignBoundary();
     // An accepted explicit checkpoint replaces the loaded session's pose.
     // Its staging/practice input must not wait for the superseded camera rebase.
     campaignInputPublicationFloor_.reset();

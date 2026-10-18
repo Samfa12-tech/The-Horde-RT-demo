@@ -1,5 +1,32 @@
 # Horde 1.7 current design index
 
+## Current Android save milestone - 18 October 2026
+
+The Android three-slot menu/native path is implemented: New Game slot choice,
+Entry > More/pause Load, pause manual Save, separate manual/latest-autosave rows,
+private normal/debug-isolated roots, occupied confirmation and cancellation.
+The shared safe-boundary facade feeds bounded IO; native preparation retains the
+old game until a valid commit, then requires Java neutral-input/camera rebase and
+a current restored RT presentation before explicit Resume. See the
+[Java menu receipt](../evidence/2026-10-18-android-save-menu/README.md),
+[current feature map](HORDE_1_7_FEATURE_STATUS_2026_10_18.md) and
+[save-slice update](HORDE_1_7_SAVE_SLICE.md).
+
+The coordinating run reports 15/15 selected Debug and 15/15 Release host suites,
+81/81 focused Java host tests and an Android four-ABI build. These are scoped
+checks, not a full playable-save acceptance pass. The first phone New Game
+reached play but exposed incorrect opening yaw; that rejected result prompted
+an authored-camera rebase correction and a newer exact build. Final corrected
+build/phone results are pending the coordinator's sealed receipt.
+
+Physical seeded lower/exterior manual/auto load and restart are still pending.
+Windows adapter/menu, death-screen Load entry, forest-end/full-route recovery,
+platform process-death, power-loss and complete physical camera/audio/controller
+acceptance are not complete. Existing files are preserved; no migration or owner
+save exercise is implied. Historical headings/receipts below retain their dated
+scope, including former missing-integration and unresolved-retention statements;
+the current update and Project Decisions supersede those status statements.
+
 The [playable crouch/root checkpoint](../evidence/2026-10-18-crouch-playable/README.md)
 connects shared standing/crouching collision, blocked standing, existing platform
 controls, camera/held-item/listener height and grounded idle/walk posing. One
@@ -28,8 +55,9 @@ validate current saves, root stepping, crouch or sustained performance.
 The [current full host save/load checkpoint](../evidence/2026-10-18-campaign-session/README.md)
 connects real bounded IO, three separate manual/latest-autosave pairs, actual
 simulation capture and token-bound terrain/simulation/camera/input transaction.
-Platform menus/roots, upstream native controls, renderer preparation, automatic
-hooks and physical save/lifecycle/durability gates remain open. Retention is
+Android menus/private roots, native controls/resource handoff and the shared
+safe-boundary facade are implemented in the current milestone above. Windows
+adaptation and physical save/lifecycle/durability gates remain open. Retention is
 confirmed, not pending. The [complete reconciled feature map](HORDE_1_7_FEATURE_STATUS_2026_10_18.md)
 records later owner decisions, including roots/crouch, map/river, forest ambience
 and measured tomb debris. Continue bounded implementation while owner testing

@@ -386,9 +386,11 @@ public class AndroidControllerIntegrationTest {
         press(KeyEvent.KEYCODE_BUTTON_B);assertFalse(field("entryMenuSidePage").getBoolean(a));
         confirmLabel(a.getString(R.string.settings));assertTrue(field("entryMenuSidePage").getBoolean(a));
         press(KeyEvent.KEYCODE_BUTTON_B);assertFalse(field("entryMenuSidePage").getBoolean(a));
-        confirmLabel(a.getString(R.string.entry_play));assertTrue(field("entryPlayRequested").getBoolean(a));
+        confirmLabel(a.getString(R.string.entry_play));assertFalse(field("entryPlayRequested").getBoolean(a));
+        assertTrue(field("campaignMenuVisible").getBoolean(a));
         assertTrue(field("menuVisible").getBoolean(a));assertTrue(Bridge.paused);
-        press(KeyEvent.KEYCODE_BUTTON_B);assertFalse(field("entryPlayRequested").getBoolean(a));assertTrue(field("menuVisible").getBoolean(a));
+        press(KeyEvent.KEYCODE_BUTTON_B);assertFalse(field("campaignMenuVisible").getBoolean(a));
+        assertFalse(field("entryPlayRequested").getBoolean(a));assertTrue(field("menuVisible").getBoolean(a));
     }
     @Test public void sidePagesResizeInBothLandscapeDirectionsAndPortraitWithoutRebuild()throws Exception {
         set("menuVisible",true);call("showSettings",new Class<?>[]{});press(KeyEvent.KEYCODE_BUTTON_Y);

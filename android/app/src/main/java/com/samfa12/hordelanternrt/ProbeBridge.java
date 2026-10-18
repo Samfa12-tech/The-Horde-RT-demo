@@ -88,6 +88,14 @@ public final class ProbeBridge {
     public static native void setEntryMenu(boolean enabled, boolean sidePage,
             boolean reducedMotion, boolean play, long generation);
     public static native long[] getEntryMenuState();
+    /** Publishes one app-private namespace; no save IO runs on the caller thread. */
+    public static native boolean configureCampaign(String privateRoot);
+    /** Admission only: actions Refresh=1, SaveManual=2, Load=3, Cancel=4, NewGame=5. */
+    public static native long requestCampaign(int action, int slot, int kind, long lifecycleGeneration);
+    /** Version 1, 33 words; decoded only by CampaignMenuState. */
+    public static native long[] getCampaignState();
+    /** Admit the paused neutral Java input/camera rebase; owner completion is asynchronous. */
+    public static native boolean acknowledgeCampaignInput(long token, long surfaceGeneration);
     public static native long[] getMenuAmbienceState();
     // epoch,presents/s,loop ms,CPU ms,GPU ms (-1 unavailable),tracked device/host bytes,
     // transition count,sample count, then loop-ms/transition pairs (at most128).

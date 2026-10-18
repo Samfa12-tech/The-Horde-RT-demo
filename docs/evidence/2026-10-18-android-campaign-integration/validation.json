@@ -1,0 +1,247 @@
+{
+  "date": "2026-10-18",
+  "source_parent": "766078a416b51052521f4e0db8b1e8beaa2e0c89",
+  "source_state": "local implementation before commit",
+  "sources": [
+    {
+      "path": ".github/workflows/shared-simulation-host.yml",
+      "sha256": "628d899994aaaaf7a8730586504a1114b811279550d91e7a18a61b02ea3c76b2",
+      "bytes": 37634
+    },
+    {
+      "path": "android/app/src/main/cpp/android_campaign_bridge.inl",
+      "sha256": "54940e819166a0e785916927e0726b70e8901d4ed4fb3c5c6296ad3071151541",
+      "bytes": 21896
+    },
+    {
+      "path": "android/app/src/main/cpp/android_campaign_state.inl",
+      "sha256": "5ef37f0a5d4d6524fc8231104efa8a91a07294ccfa1e340b9790e32734f4f1cd",
+      "bytes": 1537
+    },
+    {
+      "path": "android/app/src/main/cpp/android_probe_bridge.cpp",
+      "sha256": "f808f2b5a8af52df29efa1c6f8086dccecafc0d353d7cdf164e6c91ffb1b9d78",
+      "bytes": 364416
+    },
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/CampaignMenuState.java",
+      "sha256": "1176f739bd96d3892da6ef1f5017fed25d73c6d061da7d443f0d817b69162258",
+      "bytes": 6172
+    },
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java",
+      "sha256": "419d409a8ddd618fec018b3bd8b4b2992514d5951404f0a6a86882b377670035",
+      "bytes": 446106
+    },
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/ProbeBridge.java",
+      "sha256": "b7d4bf4f1b20efddfa869da78c6770e4003a5e6c8dabdd2b6c6bec790fb800d4",
+      "bytes": 10866
+    },
+    {
+      "path": "android/app/src/test/java/com/samfa12/hordelanternrt/AndroidControllerIntegrationTest.java",
+      "sha256": "ba4fc08971d3320fa9574db9b6957b0de2136ecb16618b41e3c1ac8d65eb4832",
+      "bytes": 43377
+    },
+    {
+      "path": "android/app/src/test/java/com/samfa12/hordelanternrt/CampaignMenuIntegrationTest.java",
+      "sha256": "c102e2a20183cf503310fb30041acf6b73f61f47277b08a83f45a66435f1cfe6",
+      "bytes": 19443
+    },
+    {
+      "path": "android/app/src/test/java/com/samfa12/hordelanternrt/CampaignMenuStateTest.java",
+      "sha256": "8e34626afeed4ee8de27967b45a71992d3224b89558bd58ca954098d33697374",
+      "bytes": 4124
+    },
+    {
+      "path": "cmake/HordeRtSources.cmake",
+      "sha256": "0b669f03637609d6aada77ba75677c0f131fe35244da3ea111b8e4493457b098",
+      "bytes": 3397
+    },
+    {
+      "path": "CMakeLists.txt",
+      "sha256": "0108a05165cd237bd82e43bf8ae611b277b19980030978fd8aaa8729290ea507",
+      "bytes": 107820
+    },
+    {
+      "path": "src/gameplay/campaign/CampaignPlaySession.cpp",
+      "sha256": "4a8028fbbddfc1a7454e694588f60bc18e1cbefce2a71223fc448c5147fd761e",
+      "bytes": 7537
+    },
+    {
+      "path": "src/gameplay/campaign/CampaignPlaySession.h",
+      "sha256": "bf146ecd7f41cd40a541c471620af752793ca89913fd7c3cdc704bb9b1edd440",
+      "bytes": 3717
+    },
+    {
+      "path": "src/gameplay/campaign/CampaignSession.cpp",
+      "sha256": "6136c21c2687d6fe3c53a15fe0dae61607e8fa9862149b57b3ca722385d80556",
+      "bytes": 6091
+    },
+    {
+      "path": "src/gameplay/campaign/CampaignSession.h",
+      "sha256": "1e3adfda44fe308e4b1ddebd5c6ec642abdf36dc9178416b5fcfbd7babcb5e0c",
+      "bytes": 2372
+    },
+    {
+      "path": "src/gameplay/simulation/GameSimulation.cpp",
+      "sha256": "3515ebee641be9229c4c415716ac82c0e351f4d8c30fd7f6f49359832d1429e7",
+      "bytes": 134505
+    },
+    {
+      "path": "src/gameplay/simulation/GameSimulation.h",
+      "sha256": "3b4487ba6731639f6ae9d8151e7b0ddf9788be056d166889b33a4d6805788a16",
+      "bytes": 21661
+    },
+    {
+      "path": "src/gameplay/simulation/GameSimulationCampaign.cpp",
+      "sha256": "e1ad3ba301cfe5585bd940af9418316534b0f1e25a62d16ee50f8bb37d5fec5a",
+      "bytes": 15599
+    },
+    {
+      "path": "src/gameplay/simulation/GameSimulationRescue.cpp",
+      "sha256": "88dbc3e97387d9f1183d56aede57cd0359aecb58ae680f7ce0ac17b5aca2f55f",
+      "bytes": 11595
+    },
+    {
+      "path": "src/platform/android/AndroidCampaignLoadBarrier.h",
+      "sha256": "e2accd0ebf4e32b4d91ca3267a272f1937b523e019dd02d66fde2f77a95aba37",
+      "bytes": 8639
+    },
+    {
+      "path": "tests/AndroidCampaignLoadBarrierTests.cpp",
+      "sha256": "dcc59370117bddbb1f0147841495bc2e3d968920e64312c80e5422c8813dc508",
+      "bytes": 10982
+    },
+    {
+      "path": "tests/CampaignPlaySessionTests.cpp",
+      "sha256": "1add5b432a82de4359bd8adb5bc93c7fc4f4b2a691091f4c822a28acdc58b63b",
+      "bytes": 25368
+    },
+    {
+      "path": "tests/RescueJourneyIntegrationTests.cpp",
+      "sha256": "4f74eeda398a48f99fdebae95fd8465fe69b4be0f54a4ee4adea0b56d1e8e533",
+      "bytes": 55030
+    }
+  ],
+  "apk": {
+    "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+    "sha256": "ca08919a8c63aac269b4fc68a02bde706131a25a92d8765acd550297841918a9",
+    "bytes": 183957866,
+    "abis": [
+      "arm64-v8a",
+      "armeabi-v7a",
+      "x86",
+      "x86_64"
+    ]
+  },
+  "checks": [
+    {
+      "name": "pre-camera selected native matrix",
+      "debug": "15/15 PASS,273.95s",
+      "release": "15/15 PASS,31.12s",
+      "scope": "campaign facade/session/checkpoint/worker/coordinator/codec/storage; Android barrier; chapter dialogue/step/terrain journey; vertical support; gameplay; mailbox; rescue journey"
+    },
+    {
+      "name": "focused Java host fake JNI",
+      "result": "81/81 PASS before notice follow-up;24/24 affected suites PASS after",
+      "receipt": "../2026-10-18-android-save-menu/receipt.json"
+    },
+    {
+      "name": "post-camera focused native matrix",
+      "debug": "2/3 PASS,28.33s",
+      "release": "2/3 PASS,4.41s",
+      "passed": [
+        "horde_rt_campaign_play_session_tests",
+        "horde_rt_rescue_journey_integration_tests"
+      ],
+      "failed": "horde_rt_motion_evidence_scenario_tests",
+      "reason": "ordinary live torch benchmark does not crouch under the low opening, stalls at (0,-2.995)",
+      "disposition": "retained, next bounded diagnostic-input repair; no performance acceptance"
+    },
+    {
+      "name": "post-camera applications",
+      "result": "Windows Debug and Release PASS; Android Debug 4ABI PASS"
+    },
+    {
+      "name": "final load-admission policy",
+      "debug": "1/1PASS,1.73s",
+      "release": "1/1PASS,0.98s",
+      "scope": "exact camera nextafter/NaN;completed load followed by failed new game;existing lifecycle identities"
+    },
+    {
+      "name": "final Android Debug",
+      "result": "4ABI PASS,38s",
+      "review": "both bounded native findings addressed; no remaining material findings in follow-up"
+    }
+  ],
+  "physical": "opening-only initial candidate; replacement seeded Save/Load/restart pending",
+  "logs": [
+    {
+      "path": "reports/2026-10-18-android-campaign-debug-build.log",
+      "sha256": "4b70a4bf85823a77840604b6394caa5bb1ca0628ed10b765be791026e2914754",
+      "bytes": 24986
+    },
+    {
+      "path": "reports/2026-10-18-android-campaign-release-build.log",
+      "sha256": "02855f70f63ef068ab2a51334db689c0609a40ff86f3fe76b38b8bf077772f23",
+      "bytes": 25832
+    },
+    {
+      "path": "reports/2026-10-18-android-campaign-debug-tests.log",
+      "sha256": "17b5e393b7a570deca1c90a3911c727f030d8129b7a3b30e748bae918d714b54",
+      "bytes": 2496
+    },
+    {
+      "path": "reports/2026-10-18-android-campaign-release-tests.log",
+      "sha256": "c69c04e14a2951a70bdf718751140bfbeab33e30c90f847315db484ab35abe01",
+      "bytes": 2500
+    },
+    {
+      "path": "reports/2026-10-18-campaign-camera-debug-build.log",
+      "sha256": "f31eec7bd86c8fb83ca4cc681821652861b60030ddbb9ad380f10565a316a07c",
+      "bytes": 18354
+    },
+    {
+      "path": "reports/2026-10-18-campaign-camera-release-build.log",
+      "sha256": "b7f3947d4e26600c003734ee5eacdb0ec70ecb34b041576f452eace3e6f36673",
+      "bytes": 18494
+    },
+    {
+      "path": "reports/2026-10-18-campaign-camera-android-build.log",
+      "sha256": "0d8275eb357dad287f2248fc5bed5958140162fb923b53ff55efa8ef208fc99f",
+      "bytes": 2232
+    },
+    {
+      "path": "reports/2026-10-18-campaign-camera-debug-tests.log",
+      "sha256": "4ea358f1c0eb3996cd2deec3124c62ac6d4301523194141a1e2d15ba58798114",
+      "bytes": 5095
+    },
+    {
+      "path": "reports/2026-10-18-campaign-camera-release-tests.log",
+      "sha256": "23d79a21ca0b65590d65cdba4573aa7387de6a869770c7816534d3ba586cff53",
+      "bytes": 5097
+    },
+    {
+      "path": "reports/2026-10-18-campaign-final-android-build.log",
+      "sha256": "f6d8b43767221554e95eef31e94cc58671b064dfd2c73dd00e65e9c238d9921c",
+      "bytes": 2210
+    },
+    {
+      "path": "reports/2026-10-18-campaign-admission-debug-tests.log",
+      "sha256": "a373d8c150c9c7f0077f734699a0e60c899dc6f80f94fbc25984a0357814af6e",
+      "bytes": 359
+    },
+    {
+      "path": "reports/2026-10-18-campaign-admission-release-tests.log",
+      "sha256": "008a7c7db4d8f411201a7bad8762666bfb0632bca04477392d83423c89c45718",
+      "bytes": 361
+    }
+  ],
+  "limits": [
+    "CPU host does not prove Vulkan presentation",
+    "ordinary host boundary journey disables damage",
+    "seeded fixtures do not prove earning checkpoint on phone",
+    "Windows adapter/death Load/full-route/power-loss/audio/performance remain open"
+  ]
+}

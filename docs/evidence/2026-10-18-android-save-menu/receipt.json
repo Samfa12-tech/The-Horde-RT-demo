@@ -1,0 +1,126 @@
+{
+  "date": "2026-10-18",
+  "evidence_class": "Java host / Robolectric fake JNI; no storage or Vulkan/device execution",
+  "current_change": "Observed stale surface-unavailable notice clears on valid current READY/SUCCESS error0; other operation notices remain",
+  "command_from_android": ".\\gradlew.bat --offline --no-daemon --max-workers=2 testDebugUnitTest --tests com.samfa12.hordelanternrt.CampaignMenuStateTest --tests com.samfa12.hordelanternrt.CampaignMenuIntegrationTest --console=plain",
+  "observed_gradle_exit": 0,
+  "observed_gradle_result": "BUILD SUCCESSFUL in 22s",
+  "tests": 24,
+  "failures": 0,
+  "errors": 0,
+  "suites": [
+    {
+      "suite": "CampaignMenuStateTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xml_sha256": "894faa9bcd7576a2acd1dd17874107d8b17851f8f8507c4d2ccdc4023bd3f5c5"
+    },
+    {
+      "suite": "CampaignMenuIntegrationTest",
+      "tests": 17,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xml_sha256": "2cfc0dc1b3b32a1dc6763ff56036a48348ead2101a3272bf0f242209a9842ba4"
+    }
+  ],
+  "source_sha256": {
+    "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java": "419d409a8ddd618fec018b3bd8b4b2992514d5951404f0a6a86882b377670035",
+    "android/app/src/main/java/com/samfa12/hordelanternrt/ProbeBridge.java": "b7d4bf4f1b20efddfa869da78c6770e4003a5e6c8dabdd2b6c6bec790fb800d4",
+    "android/app/src/main/java/com/samfa12/hordelanternrt/CampaignMenuState.java": "1176f739bd96d3892da6ef1f5017fed25d73c6d061da7d443f0d817b69162258",
+    "android/app/src/test/java/com/samfa12/hordelanternrt/CampaignMenuStateTest.java": "8e34626afeed4ee8de27967b45a71992d3224b89558bd58ca954098d33697374",
+    "android/app/src/test/java/com/samfa12/hordelanternrt/CampaignMenuIntegrationTest.java": "c102e2a20183cf503310fb30041acf6b73f61f47277b08a83f45a66435f1cfe6",
+    "android/app/src/test/java/com/samfa12/hordelanternrt/AndroidControllerIntegrationTest.java": "ba4fc08971d3320fa9574db9b6957b0de2136ecb16618b41e3c1ac8d65eb4832"
+  },
+  "raw_xml_root": "reports/2026-10-18-android-save-menu/stale-surface-notice",
+  "limits": [
+    "Only decoder and Activity integration suites rerun for this bounded follow-up",
+    "Earlier full 81-test run below retains its original tested hashes and XMLs",
+    "No native Android build, device action, owner save access or physical load acceptance by this subagent"
+  ],
+  "earlier_full_affected_run": {
+    "date": "2026-10-18",
+    "evidence_class": "Java host / Robolectric fake JNI; no storage or Vulkan/device execution",
+    "command_from_android": ".\\gradlew.bat --offline --no-daemon --max-workers=2 testDebugUnitTest --tests com.samfa12.hordelanternrt.CampaignMenuStateTest --tests com.samfa12.hordelanternrt.CampaignMenuIntegrationTest --tests com.samfa12.hordelanternrt.AndroidControllerIntegrationTest --tests com.samfa12.hordelanternrt.SurfaceSuspensionLifecycleTest --tests com.samfa12.hordelanternrt.GameplayTouchCancellationTest --tests com.samfa12.hordelanternrt.EntryMenuStateTest --tests com.samfa12.hordelanternrt.InterfaceLayoutTest --console=plain",
+    "observed_gradle_exit": 0,
+    "observed_gradle_result": "BUILD SUCCESSFUL in 45s",
+    "tests": 81,
+    "failures": 0,
+    "errors": 0,
+    "suites": [
+      {
+        "suite": "CampaignMenuStateTest",
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "xml_sha256": "5b9b54663a1cc8525f04b0e82fa887334f0b69bb15efef9b2f3eec02ad9cd45c"
+      },
+      {
+        "suite": "CampaignMenuIntegrationTest",
+        "tests": 16,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "xml_sha256": "2b9de50a547f825a2d9122c33a840cc977df4e076ef0f278be1de48d5a9abe26"
+      },
+      {
+        "suite": "AndroidControllerIntegrationTest",
+        "tests": 35,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "xml_sha256": "650a292721f972ada836a1a56ab4918adaf65c82ec879cfafe9cbc1f32fe94b4"
+      },
+      {
+        "suite": "SurfaceSuspensionLifecycleTest",
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "xml_sha256": "700f63c39cc374079118a11df3f33e75a2b98942c838b9e52d6759ad9e84fbfe"
+      },
+      {
+        "suite": "GameplayTouchCancellationTest",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "xml_sha256": "f8c5e78331ea2e7bf42531b39c905334a330416b2bdf8bb6601f5b526e312e96"
+      },
+      {
+        "suite": "EntryMenuStateTest",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "xml_sha256": "9c1a26e71e9b517cd1820be30b40ca9ac372acd505e1090d7e110c60fbf799f2"
+      },
+      {
+        "suite": "InterfaceLayoutTest",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "xml_sha256": "7dd1435b9dc02dc33d54499d7200e3dd9613589276ce66af8a1d058570e84a31"
+      }
+    ],
+    "source_sha256": {
+      "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java": "e182f4b4c95693f61cd2a1b1e76f2c80d648831a6a2875dc99d626b5457a9ab1",
+      "android/app/src/main/java/com/samfa12/hordelanternrt/ProbeBridge.java": "b7d4bf4f1b20efddfa869da78c6770e4003a5e6c8dabdd2b6c6bec790fb800d4",
+      "android/app/src/main/java/com/samfa12/hordelanternrt/CampaignMenuState.java": "1176f739bd96d3892da6ef1f5017fed25d73c6d061da7d443f0d817b69162258",
+      "android/app/src/test/java/com/samfa12/hordelanternrt/CampaignMenuStateTest.java": "8e34626afeed4ee8de27967b45a71992d3224b89558bd58ca954098d33697374",
+      "android/app/src/test/java/com/samfa12/hordelanternrt/CampaignMenuIntegrationTest.java": "3b4bde2e3419a942a2041b67a44e7ffd8ec8bf326dbdf379003b8e0b8a6ca385",
+      "android/app/src/test/java/com/samfa12/hordelanternrt/AndroidControllerIntegrationTest.java": "ba4fc08971d3320fa9574db9b6957b0de2136ecb16618b41e3c1ac8d65eb4832"
+    },
+    "raw_xml_root": "reports/2026-10-18-android-save-menu",
+    "limits": [
+      "No real native save IO in these Java tests",
+      "No APK/native build or device action by this subagent",
+      "Native request/resource/presentation integration validated separately by parent",
+      "No owner save access, migration or deletion"
+    ]
+  }
+}

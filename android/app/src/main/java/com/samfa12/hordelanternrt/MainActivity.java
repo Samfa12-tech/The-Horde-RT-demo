@@ -493,9 +493,31 @@ public class MainActivity extends Activity {
             handler.postDelayed(this, 250L);
         }
     };
+    private static final java.util.concurrent.atomic.AtomicLong campaignActivityEpochs=
+            new java.util.concurrent.atomic.AtomicLong();
+    private final long campaignConfigurationEpoch=campaignActivityEpochs.incrementAndGet();
+    private static final String CAMPAIGN_SURFACE_UNAVAILABLE=
+            "Save state is unavailable for the current game surface.";
+    private CampaignMenuState campaignState;
+    private boolean campaignMenuVisible, campaignConfigured, campaignLoadedReady, campaignPublicationValid;
+    private volatile boolean campaignDestroyed;
+    private String campaignTestNamespace, campaignLocalMessage;
+    private int campaignMenuAction=CampaignMenuState.LOAD, campaignAction;
+    private long campaignRequest, campaignAcknowledgedToken, campaignAcknowledgedGeneration;
+    private long campaignRebaseAttemptToken, campaignRebaseAttemptGeneration, campaignRebaseAttemptRevision;
+    private AlertDialog campaignConfirmation;
+    private final Runnable refreshCampaignMenu = new Runnable() {
+        @Override public void run() {
+            if(campaignDestroyed || !resumed || (!campaignMenuVisible && campaignRequest==0)) return;
+            pollCampaignMenu();
+            handler.postDelayed(this, 150L);
+        }
+    };
+
     private final Runnable refreshEntryMenu = new Runnable() {
         @Override public void run() {
             if (!entryMenuEnabled || !resumed || surfaceRequestGeneration == 0) return;
+            if(campaignMenuVisible) { handler.postDelayed(this,200L); return; }
             final EntryMenuState state;
             try { state = EntryMenuState.decode(ProbeBridge.getEntryMenuState()); }
             catch (RuntimeException | LinkageError unavailable) {
@@ -507,7 +529,7 @@ public class MainActivity extends Activity {
                 handler.postDelayed(this, 100L);
                 return;
             }
-            if (entryPlayRequested && state.completedPlay(surfaceRequestGeneration)) {
+            if (!campaignMenuVisible && entryPlayRequested && state.completedPlay(surfaceRequestGeneration)) {
                 entryPlayRequested = false;
                 entryMenuEnabled = false;
                 handler.removeCallbacks(this);
@@ -641,10 +663,46 @@ public class MainActivity extends Activity {
             catch (RuntimeException | LinkageError unavailable) { /* Report through the entry screen after views exist. */ }
         }
         configureSurface();
+        configureCampaignStorage();
         collectInitialDiagnostics();
         showMainMenu(true);
         handler.post(runtimePoll);
         scheduleStartupUpdateCheck();
+    }
+
+    private void configureCampaignStorage() {
+        final String requested=getIntent()==null ? null : getIntent().getStringExtra("campaign_test_namespace");
+        campaignTestNamespace=CampaignMenuState.testNamespace(BuildConfig.DEBUG, requested);
+        if(BuildConfig.DEBUG && requested!=null && campaignTestNamespace==null) {
+            campaignLocalMessage="Invalid test save namespace. Save storage has not been opened.";
+            return; // A malformed test launch must never fall back to owner records.
+        }
+        final File directory=campaignTestNamespace==null ? new File(getFilesDir(), "campaign-v1") :
+                new File(new File(getFilesDir(), "campaign-tests"), campaignTestNamespace);
+        final Thread preparation=new Thread(() -> {
+            boolean ready=false;
+            try {
+                if(!campaignDestroyed) ready=directory.isDirectory() || directory.mkdirs();
+            } catch(RuntimeException unavailable) { /* Honest unavailable state below. */ }
+            final boolean prepared=ready;
+            handler.post(() -> completeCampaignConfiguration(directory.getAbsolutePath(),prepared));
+        }, "HordeCampaignDirectory");
+        preparation.setDaemon(true);
+        preparation.start();
+    }
+
+    private void completeCampaignConfiguration(String directory,boolean prepared) {
+        // Metadata-only native admission runs on UI, after BOTH lifetime and newer-Activity checks.
+        if(campaignDestroyed || campaignActivityEpochs.get()!=campaignConfigurationEpoch) return;
+        boolean configured=false;
+        try { if(prepared) configured=ProbeBridge.configureCampaign(directory); }
+        catch(RuntimeException | LinkageError unavailable) { /* Keep unavailable visible, without retrying another root. */ }
+        campaignConfigured=configured;
+        campaignLocalMessage=configured ? null : "The private save directory is unavailable.";
+        if(campaignMenuVisible) {
+            if(configured) sendCampaignRequest(CampaignMenuState.REFRESH,0,0);
+            else renderCampaignMenu();
+        }
     }
 
     private void collectInitialDiagnostics() {
@@ -988,6 +1046,8 @@ public class MainActivity extends Activity {
             firstMenu = false;
             hideMenu();
         });
+        addMenuButtonRow(panel, "Save checkpoint", () -> showCampaignMenu(CampaignMenuState.SAVE_MANUAL),
+                "Load checkpoint", () -> showCampaignMenu(CampaignMenuState.LOAD));
         final Runnable restartAction = () -> {
             playSound("ui_select", 0.18f);
             resetRoute();
@@ -1284,6 +1344,7 @@ public class MainActivity extends Activity {
         menuScrim.removeAllViews();
         final LinearLayout panel = createPanel("HORDE LANTERN", getString(R.string.entry_more_eyebrow));
         addBody(panel, getString(R.string.entry_more_description));
+        addEntryMenuButton(panel, "Load checkpoint", () -> showCampaignMenu(CampaignMenuState.LOAD), false);
         addEntryMenuButton(panel, getString(R.string.controls), this::showControls, false);
         addEntryMenuButton(panel, getString(R.string.credits), this::showCredits, false);
         addEntryMenuButton(panel, getString(R.string.playtest_report), this::showPlaytestReport, false);
@@ -1297,7 +1358,263 @@ public class MainActivity extends Activity {
         attachEntryMenuPanel(panel);
     }
 
+    private void showCampaignMenu(int action) {
+        if(campaignState!=null && campaignState.pending()) return;
+        cancelPendingEntryPlay();
+        showMainMenu(false);
+        campaignMenuAction=action;
+        campaignMenuVisible=true;
+        campaignLoadedReady=false;
+        if(campaignConfigured) campaignLocalMessage=null;
+        else if(campaignLocalMessage==null) campaignLocalMessage="Preparing private save storage…";
+        entryMenuSidePage=entryMenuEnabled;
+        publishEntryMenuState();
+        setGameplayPaused(true);
+        clearTouchState();
+        renderCampaignMenu();
+        if(campaignConfigured) sendCampaignRequest(CampaignMenuState.REFRESH,0,0);
+        handler.removeCallbacks(refreshCampaignMenu);
+        handler.post(refreshCampaignMenu);
+    }
+
+    private boolean campaignBusy() {
+        return campaignRequest!=0 && (campaignState==null ||
+                campaignState.ackRequest!=campaignRequest || campaignState.pending());
+    }
+
+    private void renderCampaignMenu() {
+        if(!campaignMenuVisible || campaignDestroyed) return;
+        menuVisible=true;
+        menuScrim.setVisibility(View.VISIBLE);
+        menuScrim.removeAllViews();
+        String title=campaignMenuAction==CampaignMenuState.NEW_GAME ? "NEW GAME" :
+                campaignMenuAction==CampaignMenuState.SAVE_MANUAL ? "SAVE CHECKPOINT" : "LOAD CHECKPOINT";
+        final LinearLayout panel=createPanel(title,"THREE SLOTS · MANUAL + LATEST AUTOSAVE");
+        if(campaignTestNamespace!=null) addBody(panel,"TEST SAVES ONLY · "+campaignTestNamespace);
+        addBody(panel,campaignLocalMessage!=null ? campaignLocalMessage :
+                campaignState==null ? "Checking save availability…" : campaignState.message());
+        final CampaignMenuState shown=campaignState;
+        final boolean ready=campaignConfigured && campaignPublicationValid && shown!=null && shown.current(surfaceRequestGeneration) &&
+                shown.phase!=CampaignMenuState.UNAVAILABLE && shown.error==0 && !campaignBusy() && !shown.pending();
+        if(campaignMenuAction==CampaignMenuState.SAVE_MANUAL) {
+            addBody(panel,"Save the latest supported safe checkpoint. A manual save never replaces the autosave.");
+            if(shown!=null && !shown.canSaveLatest) addBody(panel,"No safe checkpoint is available yet. Reach a supported checkpoint first.");
+        }
+        for(int i=0;i<3;i++) {
+            final int slot=i;
+            addBody(panel,"SLOT "+(slot+1)+(shown!=null && shown.activeSlot==slot ? " · Active" : ""));
+            for(int kind=0;kind<2;kind++) {
+                final int recordKind=kind;
+                addBody(panel,shown==null ? (kind==0 ? "Manual: Not checked" : "Latest autosave: Not checked") :
+                        shown.description(slot,kind));
+                if(campaignMenuAction==CampaignMenuState.LOAD) {
+                    Button load=addEntryMenuButton(panel,kind==0 ? "Load manual" : "Load latest autosave",
+                            () -> chooseCampaignRecord(CampaignMenuState.LOAD,slot,recordKind,shown),false);
+                    load.setEnabled(ready && shown.status(slot,kind)==CampaignMenuState.VALID);
+                }
+            }
+            if(campaignMenuAction!=CampaignMenuState.LOAD) {
+                Button choose=addEntryMenuButton(panel,
+                        (campaignMenuAction==CampaignMenuState.NEW_GAME ? "Begin in Slot " : "Save manual in Slot ")+(slot+1),
+                        () -> chooseCampaignRecord(campaignMenuAction,slot,CampaignMenuState.MANUAL,shown),false);
+                boolean checked=shown!=null && shown.status(slot,0)>=CampaignMenuState.EMPTY &&
+                        shown.status(slot,1)>=CampaignMenuState.EMPTY;
+                // Invalid/unreadable files are retained; this UI never offers destructive repair.
+                boolean manualWritable=shown!=null && (shown.status(slot,0)==CampaignMenuState.EMPTY ||
+                        shown.status(slot,0)==CampaignMenuState.VALID);
+                choose.setEnabled(ready && checked && (campaignMenuAction==CampaignMenuState.NEW_GAME ||
+                        (shown.canSaveLatest && manualWritable)));
+            }
+        }
+        if(campaignLoadedReady) addEntryMenuButton(panel,"Resume",this::resumeLoadedCampaign,true);
+        Button refresh=addEntryMenuButton(panel,"Refresh records",
+                () -> sendCampaignRequest(CampaignMenuState.REFRESH,0,0),false);
+        refresh.setEnabled(campaignConfigured && !campaignLoadedReady && !campaignBusy() && (shown==null || !shown.pending()));
+        addEntryMenuButton(panel,campaignBusy() || (shown!=null && shown.pending()) ? "Cancel request" : "Back",
+                this::backFromCampaignMenu,false);
+        attachPanel(panel);
+    }
+
+    private void chooseCampaignRecord(int action,int slot,int kind,CampaignMenuState shown) {
+        if(!campaignMenuVisible || !campaignPublicationValid || shown==null || shown!=campaignState || campaignBusy() || shown.pending() ||
+                !shown.current(surfaceRequestGeneration)) return;
+        if(shown.error!=0 || slot<0 || slot>2 || kind<0 || kind>1) return;
+        if(action==CampaignMenuState.LOAD && shown.status(slot,kind)!=CampaignMenuState.VALID) return;
+        if(action==CampaignMenuState.SAVE_MANUAL && (!shown.canSaveLatest ||
+                (shown.status(slot,0)!=CampaignMenuState.EMPTY && shown.status(slot,0)!=CampaignMenuState.VALID))) return;
+        boolean confirm=action==CampaignMenuState.NEW_GAME ? shown.occupied(slot) :
+                action==CampaignMenuState.SAVE_MANUAL && shown.status(slot,0)==CampaignMenuState.VALID;
+        if(!confirm) { sendCampaignRequest(action,slot,kind); return; }
+        dismissCampaignConfirmation();
+        final long generation=surfaceRequestGeneration;
+        final AlertDialog dialog=new AlertDialog.Builder(this)
+                .setTitle(action==CampaignMenuState.NEW_GAME ? "Use occupied Slot "+(slot+1)+"?" : "Replace manual checkpoint?")
+                .setMessage(action==CampaignMenuState.NEW_GAME ?
+                        "Future autosaves replace this slot’s latest autosave. Its manual checkpoint is kept." :
+                        "Replace the manual checkpoint in Slot "+(slot+1)+"? Its latest autosave is kept.")
+                .setNegativeButton("Keep records",(d,w) -> {})
+                .setPositiveButton(action==CampaignMenuState.NEW_GAME ? "Begin new game" : "Replace manual",null).create();
+        campaignConfirmation=dialog;
+        dialog.setOnDismissListener(d -> { if(campaignConfirmation==d) campaignConfirmation=null; });
+        dialog.show();
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(view -> {
+            boolean current=campaignConfirmation==dialog && dialog.isShowing() && campaignMenuVisible && resumed &&
+                    generation==surfaceRequestGeneration && !campaignBusy() && campaignState==shown;
+            dismissCampaignConfirmation();
+            if(current) sendCampaignRequest(action,slot,kind);
+        });
+        installControllerDialog(dialog);
+        Button keep=dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+        keep.setFocusableInTouchMode(true);
+        keep.requestFocus();
+    }
+
+    private void dismissCampaignConfirmation() {
+        final AlertDialog dialog=campaignConfirmation;
+        campaignConfirmation=null;
+        if(dialog!=null) { if(controllerDialog==dialog) controllerDialog=null; dialog.dismiss(); }
+    }
+
+    private void sendCampaignRequest(int action,int slot,int kind) {
+        if(campaignDestroyed || !resumed || surfaceRequestGeneration<=0 || !campaignConfigured) return;
+        if(action!=CampaignMenuState.CANCEL && campaignBusy()) return;
+        long request=0;
+        try { request=ProbeBridge.requestCampaign(action,slot,kind,surfaceRequestGeneration); }
+        catch(RuntimeException | LinkageError unavailable) { /* Keep the old publication and show failure. */ }
+        if(request==0) campaignLocalMessage="The request was not accepted. The game remains paused.";
+        else {
+            campaignRequest=request;
+            campaignAction=action;
+            campaignLocalMessage=null;
+            if(action==CampaignMenuState.LOAD || action==CampaignMenuState.NEW_GAME) campaignLoadedReady=false;
+        }
+        renderCampaignMenu();
+    }
+
+    private void pollCampaignMenu() {
+        if(!resumed || campaignDestroyed) return;
+        CampaignMenuState state=null;
+        try { state=CampaignMenuState.decode(ProbeBridge.getCampaignState()); }
+        catch(RuntimeException | LinkageError unavailable) { /* Native API absent: visible unavailable, never success. */ }
+        if(state==null || !state.current(surfaceRequestGeneration)) {
+            boolean wasValid=campaignPublicationValid;
+            campaignPublicationValid=false;
+            campaignLoadedReady=false;
+            if(campaignLocalMessage==null || wasValid) {
+                campaignLocalMessage=CAMPAIGN_SURFACE_UNAVAILABLE;
+                renderCampaignMenu();
+            }
+            return;
+        }
+        if(campaignState!=null && campaignState.surfaceGeneration==state.surfaceGeneration &&
+                state.revision<campaignState.revision) return;
+        final boolean changed=!campaignPublicationValid || campaignState==null || campaignState.revision!=state.revision ||
+                campaignState.surfaceGeneration!=state.surfaceGeneration;
+        if(!changed) state=campaignState;
+        campaignPublicationValid=true;
+        campaignState=state;
+        if(CAMPAIGN_SURFACE_UNAVAILABLE.equals(campaignLocalMessage) && state.error==0 &&
+                (state.phase==CampaignMenuState.READY || state.phase==CampaignMenuState.SUCCESS))
+            campaignLocalMessage=null;
+
+        if(state.phase!=CampaignMenuState.SUCCESS || state.lastOperation!=CampaignMenuState.LOAD ||
+                state.error!=0 || !state.presented) campaignLoadedReady=false;
+        if(state.phase==CampaignMenuState.REBASE &&
+                (campaignAcknowledgedToken!=state.rebaseToken || campaignAcknowledgedGeneration!=state.surfaceGeneration) &&
+                (campaignRebaseAttemptToken!=state.rebaseToken || campaignRebaseAttemptGeneration!=state.surfaceGeneration ||
+                        campaignRebaseAttemptRevision!=state.revision)) {
+            campaignRebaseAttemptToken=state.rebaseToken;
+            campaignRebaseAttemptGeneration=state.surfaceGeneration;
+            campaignRebaseAttemptRevision=state.revision;
+            rebaseCampaignInput(state);
+            try {
+                if(ProbeBridge.acknowledgeCampaignInput(state.rebaseToken,state.surfaceGeneration)) {
+                    campaignAcknowledgedToken=state.rebaseToken;
+                    campaignAcknowledgedGeneration=state.surfaceGeneration;
+                }
+            } catch(RuntimeException | LinkageError unavailable) {
+                campaignLocalMessage="Camera restoration was not accepted. The game remains paused.";
+            }
+        }
+        if(state.completes(campaignRequest,campaignAction,surfaceRequestGeneration)) {
+            final int operation=campaignAction;
+            campaignRequest=0;
+            campaignLocalMessage=null;
+            if(operation==CampaignMenuState.NEW_GAME && campaignMenuVisible) {
+                rebaseCampaignInput(state);
+                campaignMenuVisible=false;
+                showEntryMenu(false);
+                beginPreparedEntryPlay();
+                return;
+            }
+            if(operation==CampaignMenuState.LOAD) campaignLoadedReady=true;
+        } else if(state.ackRequest==campaignRequest && !state.pending()) {
+            campaignRequest=0;
+        }
+        // An interrupted post-commit load still needs an explicit Resume after native rebase/presentation.
+        if(state.phase==CampaignMenuState.SUCCESS && state.error==0 && state.lastOperation==CampaignMenuState.LOAD && state.presented &&
+                campaignAcknowledgedGeneration==state.surfaceGeneration && campaignAcknowledgedToken!=0 &&
+                state.rebaseToken==campaignAcknowledgedToken &&
+                (campaignRequest==0 || state.ackRequest==campaignRequest)) {
+            campaignLoadedReady=true;
+            campaignLocalMessage=null;
+        }
+        if(changed) { if(!state.pending()) dismissCampaignConfirmation(); renderCampaignMenu(); }
+    }
+
+    private void rebaseCampaignInput(CampaignMenuState state) {
+        // Publish the absolute camera and a neutral, paused input sample before native owner acknowledgement.
+        setGameplayPaused(true);
+        clearTouchState();
+        ++delayedGameplayFeedbackGeneration;
+        clearVerticalProofFeedbackSelection();
+        suspendAndResetWaterfall();
+        stopChapterVoice();
+        chapterSubtitleGeneration=Long.MIN_VALUE;
+        chapterDialogueSkipPendingGeneration=Long.MIN_VALUE;
+        if(chapterSubtitlePanel!=null) chapterSubtitlePanel.setVisibility(View.GONE);
+        cancelCombatTeachingPromptPoll(); clearCombatTeachingPrompt();
+        if(vibrator!=null) vibrator.cancel();
+        viewControls[0]=state.yaw; viewControls[1]=state.pitch;
+        pushViewControls();
+    }
+
+    private void backFromCampaignMenu() {
+        dismissCampaignConfirmation();
+        if(campaignBusy() || (campaignState!=null && campaignState.pending())) {
+            sendCampaignRequest(CampaignMenuState.CANCEL,0,0);
+            campaignLocalMessage="Cancellation requested. The game remains paused; checking the outcome…";
+            renderCampaignMenu();
+            return;
+        }
+        if(campaignLoadedReady) { resumeLoadedCampaign(false); return; }
+        campaignMenuVisible=false;
+        campaignRequest=0;
+        handler.removeCallbacks(refreshCampaignMenu);
+        showMainMenu(false);
+    }
+
+    private void resumeLoadedCampaign() { resumeLoadedCampaign(true); }
+
+    private void resumeLoadedCampaign(boolean resume) {
+        if(!campaignLoadedReady || campaignBusy() || !campaignPublicationValid || campaignState==null || !campaignState.current(surfaceRequestGeneration) ||
+                campaignState.phase!=CampaignMenuState.SUCCESS || campaignState.lastOperation!=CampaignMenuState.LOAD ||
+                campaignState.error!=0 || !campaignState.presented) return;
+        campaignMenuVisible=false; campaignRequest=0; campaignLoadedReady=false;
+        entryPlayRequested=false; entryMenuEnabled=false; entryMenuSidePage=false; firstMenu=false;
+        handler.removeCallbacks(refreshEntryMenu);
+        handler.removeCallbacks(refreshCampaignMenu);
+        try { ProbeBridge.setEntryMenu(false,false,isReducedMotionEnabled(),false,surfaceRequestGeneration); }
+        catch(RuntimeException | LinkageError unavailable) { /* Native load gate keeps the game paused if unavailable. */ }
+        if(resume) hideMenu(); else showMainMenu(false);
+    }
+
     private void requestEntryPlay() {
+        if (!entryMenuEnabled || entryPlayRequested) return;
+        showCampaignMenu(CampaignMenuState.NEW_GAME);
+    }
+
+    private void beginPreparedEntryPlay() {
         if (!entryMenuEnabled || entryPlayRequested) return;
         playSound("ui_select", 0.18f);
         entryMenuSidePage = false;
@@ -1332,7 +1649,7 @@ public class MainActivity extends Activity {
         }
         publishEntryMenuState();
         handler.postDelayed(() -> {
-            if (!entryMenuEnabled || surfaceRequestGeneration <= 0) return;
+            if (!entryMenuEnabled || campaignMenuVisible || surfaceRequestGeneration <= 0) return;
             entryPlayRequested = true;
             applyEntryMenuAvailability(null);
             publishEntryMenuState();
@@ -2553,6 +2870,7 @@ public class MainActivity extends Activity {
     }
 
     private void hideMenu() {
+        if(campaignMenuVisible || (campaignState!=null && campaignState.loadBarrier())) return;
         if (entryMenuEnabled) {
             cancelPendingEntryPlay();
             if (!menuVisible) showEntryMenu(false);
@@ -4653,6 +4971,7 @@ public class MainActivity extends Activity {
     }
 
     private void setGameplayPaused(boolean paused) {
+        if(!paused && (campaignMenuVisible || (campaignState!=null && campaignState.loadBarrier()))) paused=true;
         if (paused) { clearRunIntent(); clearCrouchIntent(); }
         if (paused) suspendAndResetWaterfall(); // Same generation retains the Core cursor.
         if (musicPlayback != null) musicPlayback.setSuspended(paused || !resumed ||
@@ -7090,6 +7409,10 @@ public class MainActivity extends Activity {
 
     @Override
     public void onBackPressed() {
+        if(campaignConfirmation!=null && campaignConfirmation.isShowing()) {
+            dismissCampaignConfirmation(); return;
+        }
+        if(campaignMenuVisible) { backFromCampaignMenu(); return; }
         if (backExitDialog != null && backExitDialog.isShowing()) {
             backExitDialog.cancel();
             return;
@@ -7261,6 +7584,10 @@ public class MainActivity extends Activity {
         logSurfaceLifecycle("resume");
         if (musicPlayback != null) musicPlayback.setSuspended(true); // Wait for a ready new surface.
         resumed = true;
+        if(campaignMenuVisible || campaignRequest!=0) {
+            handler.removeCallbacks(refreshCampaignMenu);
+            handler.post(refreshCampaignMenu);
+        }
         handler.removeCallbacks(menuAmbienceFrame);
         handler.post(menuAmbienceFrame);
         controllerInput.suspend(SystemClock.uptimeMillis());
@@ -7311,6 +7638,16 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onPause() {
+        campaignAcknowledgedToken=campaignAcknowledgedGeneration=0;
+        campaignRebaseAttemptToken=campaignRebaseAttemptGeneration=campaignRebaseAttemptRevision=0;
+        dismissCampaignConfirmation();
+        if(campaignRequest!=0 || (campaignState!=null && campaignState.pending())) {
+            try { ProbeBridge.requestCampaign(CampaignMenuState.CANCEL,0,0,surfaceRequestGeneration); }
+            catch(RuntimeException | LinkageError ignored) { /* Native lifecycle also revokes stale work. */ }
+            campaignRequest=0;
+            campaignLocalMessage="Request interrupted. Refresh to check the records.";
+        }
+        handler.removeCallbacks(refreshCampaignMenu);
         dismissBackExitConfirmation();
         pauseChapterVoice(true);
         cancelCombatTeachingPromptPoll();
@@ -7386,6 +7723,8 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
+        campaignDestroyed=true;
+        dismissCampaignConfirmation();
         dismissBackExitConfirmation();
         logSurfaceLifecycle("destroy");
         handler.removeCallbacks(controllerFrame);

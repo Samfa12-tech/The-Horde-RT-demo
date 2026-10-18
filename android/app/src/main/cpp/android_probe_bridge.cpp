@@ -63,6 +63,8 @@
 #include "gameplay/simulation/GameSimulation.h"
 #include "gameplay/simulation/BoundedTransportQueue.h"
 #include "gameplay/simulation/InputMailbox.h"
+#include "gameplay/campaign/CampaignPlaySession.h"
+#include "platform/android/AndroidCampaignLoadBarrier.h"
 #include "platform/android/AndroidRtLabState.h"
 #include "platform/android/AndroidMusicPlayback.h"
 #include "platform/android/SurfaceSessionMailbox.h"
@@ -533,6 +535,7 @@ std::uint64_t gLifecycleDiscardGeneration = 0u;
 std::uint64_t gLifecycleDiscardAcknowledgedGeneration = 0u;
 bool gLifecycleUnpausePending = false;
 bool gLifecycleMeasurementPaused = true;
+#include "android_campaign_state.inl"
 horde::telemetry::RtLifecycleSeeds gPreservedRtEvidenceSeeds = [] {
     horde::telemetry::RtLifecycleSeeds seeds{};
     seeds.sceneEpoch = 1u;
@@ -577,6 +580,8 @@ horde::graphics::GraphicsScene GraphicsSceneForProfile(
 horde::vulkan::raytracing::RtSceneProfile DesiredProfile(
     const SwapchainContext& context, const PreviewControls& preview)
 {
+    if (gCampaignShowcaseOverride.load(std::memory_order_acquire))
+        return horde::vulkan::raytracing::RtSceneProfile::Showcase;
     const bool currentPreview = (preview.generation == 0u ||
         preview.generation == context.surfaceGeneration) && preview.enabled;
     switch (context.entryHandoff.DesiredScene(currentPreview))
@@ -783,6 +788,7 @@ horde::platform::android::DebugRequestAdmissionState ReadDebugRequestAdmissionSt
 
 bool CanQueueCompetingDebugRequestLocked()
 {
+    if(gCampaignPauseGate.load(std::memory_order_acquire))return false;
     return horde::platform::android::CanRequestCompetingDebugMode(
         ReadDebugRequestAdmissionStateLocked());
 }
@@ -3756,6 +3762,7 @@ bool DestroySwapchainContext(SwapchainContext& context)
 
 bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resourceRecreated)
 {
+    gCampaignFrameTick=0;gCampaignFrameWorld=0;
     const auto frameStart = std::chrono::steady_clock::now();
     const auto frameStartCount = std::chrono::duration_cast<std::chrono::nanoseconds>(
         frameStart.time_since_epoch()).count();
@@ -4065,6 +4072,13 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                 simulationInput.commands.retry > beforeCommands.lastConsumedRetrySequence;
             if (routeResetPending)
             {
+                if(gCampaignSession) {
+                    const auto active=gCampaignSession->State().activeSlot;
+                    if(active)gCampaignSession->BeginNewGame(*active);else gCampaignSession->Cancel();
+                    gCampaignPreparation.reset();gCampaignBarrier.Cancel(gCampaignBarrier.State().request);
+                    gCampaignPhase=1;gCampaignError=0;
+                    gCampaignPauseGate.store(false,std::memory_order_release);
+                }
                 if (context.inAppBenchmark.IsRunning() ||
                     context.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Allocated ||
                     context.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Measuring)
@@ -4336,7 +4350,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                 horde::platform::android::ShouldPersistRtLabUnlock({
                     renderedSimulation.finaleComplete,
                     gRtLabDebugAutomationSession.load(std::memory_order_acquire) ||
-                        gRtLabBenchmarkRoute.load(std::memory_order_acquire),
+                        gRtLabBenchmarkRoute.load(std::memory_order_acquire) || gCampaignIsolated,
                     context.captureActive,
                     context.routeReplayActive,
                     benchmarkActive}),
@@ -4394,6 +4408,8 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                         static_cast<int>(context.graphicsSettings.waterQuality)),
                     rtLabTuning);
             submittedDialogueTick = renderedSimulation.tickIndex;
+            gCampaignFrameTick=renderedSimulation.tickIndex;
+            gCampaignFrameWorld=renderedSimulation.worldRoute.generation;
             submittedDialogueGeneration = renderedSimulation.chapterDialogue.generation;
             showcaseDialogueFrame = context.sceneProfile ==
                 horde::vulkan::raytracing::RtSceneProfile::Showcase;
@@ -4453,7 +4469,8 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
 #endif
         if(!context.rtScene.AdvanceOrdinaryStaticDetail(gGameSimulation,frameInputs,
             !context.captureActive && !context.routeReplayActive && !context.inAppBenchmark.IsRunning() &&
-            !context.benchmarkSampling && !retainComparisonDetail,detail,diagnostic)) {
+            !context.benchmarkSampling && !retainComparisonDetail &&
+            !gCampaignPauseGate.load(std::memory_order_acquire),detail,diagnostic)) {
             if(evidenceFrame)context.rtFrameEvidence.FailRecord(observation);
             __android_log_print(ANDROID_LOG_ERROR,kTag,"Static detail preparation: %s",diagnostic.c_str());
             return false;
@@ -5094,6 +5111,8 @@ bool ApplySceneProfileOnOwner(SwapchainContext& context, const PreviewControls c
     return true;
 }
 
+#include "android_campaign_bridge.inl"
+
 void SwapchainRenderLoop()
 {
     auto previousFrameStart = std::chrono::steady_clock::now();
@@ -5136,6 +5155,7 @@ void SwapchainRenderLoop()
                 gSurfaceSessions.Publish(gSwapchainContext.surfaceGeneration, 3);
                 break; // Normal proved-retirement path still owns all resources.
             }
+            SuspendCampaignOnOwner(gSwapchainContext);
             CancelActiveInAppBenchmark(gSwapchainContext);
             ClearPlatformGameplayEvents();
 #if HORDE_RT_ANDROID_MOTION_EVIDENCE
@@ -5306,6 +5326,11 @@ void SwapchainRenderLoop()
             continue;
         }
 #endif
+        PumpCampaignOnOwner(gSwapchainContext);
+        if(gCampaignRetirementUnproved) {
+            gSurfaceSessions.Publish(gSwapchainContext.surfaceGeneration,3);
+            break; // Retain both owners until genuine GPU retirement is proved.
+        }
         if (!PrepareFixtureChangingCheckpointOnOwner(gSwapchainContext, sceneTransition))
         {
             gSwapchainContext.entryHandoff.FailLoad();
@@ -5328,7 +5353,7 @@ void SwapchainRenderLoop()
             gSwapchainContext.rtScene.IsReady() && gSwapchainContext.capabilities.rtScene.presented;
         pauseCadenceInput.wakeRequested = sceneTransition || gSwapchainContext.graphicsLatency.active ||
             gSwapchainContext.inAppBenchmark.IsRunning() || gSwapchainContext.captureActive ||
-            gSwapchainContext.routeReplayActive;
+            gSwapchainContext.routeReplayActive || gCampaignPauseGate.load(std::memory_order_acquire);
         const auto cadenceDecision = pausedRenderCadence.Evaluate(
             std::chrono::steady_clock::now(), pauseCadenceInput);
         horde::graphics::ForegroundPauseRenderAggregate cadenceAggregate{};
@@ -5389,6 +5414,8 @@ void SwapchainRenderLoop()
         // A SUBOPTIMAL old frame counts as a successful presentation, but the
         // replacement output is not acknowledged until it presents its own frame.
         const bool currentOutputPresented = rtFramePresented && !resourceRecreated;
+        if(resourceRecreated)RebindCampaignResourcesOnOwner(gSwapchainContext);
+        ObserveCampaignPresentationOnOwner(gSwapchainContext,currentOutputPresented);
         sceneTransition = sceneTransition || resourceRecreated;
         if (resourceRecreated) {
             gSwapchainContext.previewPerformance.BeginScope(++gSwapchainContext.previewEpoch);
@@ -5505,11 +5532,12 @@ void SwapchainRenderLoop()
     }
 
     const auto retiredGeneration = gSwapchainContext.surfaceGeneration;
+    const bool campaignRetired=RetireCampaignOnOwner(retiredGeneration);
 #if HORDE_RT_ANDROID_MOTION_EVIDENCE
     FailAndroidMotion(gSwapchainContext, "Motion interrupted by surface/lifecycle retirement.");
     RestoreAndroidMotionEquipmentSeed(gSwapchainContext);
 #endif
-    const bool retired = DestroySwapchainContext(gSwapchainContext);
+    const bool retired = campaignRetired && DestroySwapchainContext(gSwapchainContext);
     gSurfaceRetirementBlocked.store(!retired, std::memory_order_release);
     if (!retired) gSurfaceSessions.Publish(retiredGeneration, 3);
 }
@@ -5710,7 +5738,8 @@ bool StartSurfaceInternal(ANativeWindow* window,
     catch (...)
     {
         gSwapchainRunning.store(false, std::memory_order_release);
-        gSurfaceRetirementBlocked.store(!DestroySwapchainContext(gSwapchainContext), std::memory_order_release);
+        gSurfaceRetirementBlocked.store(!(RetireCampaignOnOwner(gSwapchainContext.surfaceGeneration) &&
+            DestroySwapchainContext(gSwapchainContext)), std::memory_order_release);
         throw;
     }
 
@@ -5741,7 +5770,8 @@ void StopSurfaceInternal()
         gSwapchainThread.join();
     }
     if (gSurfaceRetirementBlocked.load(std::memory_order_acquire))
-        gSurfaceRetirementBlocked.store(!DestroySwapchainContext(gSwapchainContext), std::memory_order_release);
+        gSurfaceRetirementBlocked.store(!(RetireCampaignOnOwner(gSwapchainContext.surfaceGeneration) &&
+            DestroySwapchainContext(gSwapchainContext)), std::memory_order_release);
     // Home/surface teardown is an ownership boundary. Never replay an immediate
     // gameplay cue (including ChestUnlocked) into the next Activity surface.
     ClearPlatformGameplayEvents();
@@ -6471,10 +6501,12 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestToggleHeldLightPose(JNIEnv*, 
 extern "C" JNIEXPORT void JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_requestRouteReset(JNIEnv*, jclass)
 {
+    if(gCampaignPauseGate.load(std::memory_order_acquire))return;
     gRtLabState.Reset();
     gRtLabUnlockEligible.store(false, std::memory_order_release);
     gRtLabBenchmarkRoute.store(false, std::memory_order_release);
     std::lock_guard<std::mutex> lock(gInputPublisherMutex);
+    if(gCampaignPauseGate.load(std::memory_order_acquire))return;
     if (gInputPublisherState.commands.routeReset != UINT64_MAX)
     {
         ++gInputPublisherState.commands.routeReset;
@@ -6514,6 +6546,7 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_getContextualControlState(JNIEnv*, j
 extern "C" JNIEXPORT jint JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_retryEncounter(JNIEnv*, jclass)
 {
+    if(gCampaignPauseGate.load(std::memory_order_acquire))return -1;
     if (gSurfaceSessions.State() != 1 ||
         gPlayerLifePhase.load(std::memory_order_acquire) !=
             static_cast<int>(horde::gameplay::PlayerLifePhase::Dead))
@@ -6527,6 +6560,7 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_retryEncounter(JNIEnv*, jclass)
     }
     {
         std::lock_guard<std::mutex> lock(gInputPublisherMutex);
+        if(gCampaignPauseGate.load(std::memory_order_acquire))return -1;
         if (gInputPublisherState.commands.retry != UINT64_MAX)
         {
             ++gInputPublisherState.commands.retry;
@@ -6540,8 +6574,83 @@ extern "C" JNIEXPORT void JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_setSimulationPaused(JNIEnv*, jclass, jboolean paused)
 {
     std::lock_guard<std::mutex> lock(gInputPublisherMutex);
-    RequestLifecyclePauseSynchronizationLocked(paused != JNI_TRUE,
+    RequestLifecyclePauseSynchronizationLocked(paused != JNI_TRUE &&
+        !gCampaignPauseGate.load(std::memory_order_acquire),
         horde::gameplay::simulation::PausedInputPolicy::PreserveWorldCommands);
+}
+
+extern "C" JNIEXPORT jboolean JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_configureCampaign(JNIEnv* env,jclass,jstring directory)
+{
+    if(!directory)return JNI_FALSE;
+    const char* bytes=env->GetStringUTFChars(directory,nullptr);if(!bytes)return JNI_FALSE;
+    std::string root(bytes);env->ReleaseStringUTFChars(directory,bytes);
+    if(root.empty() || root.size()>1024)return JNI_FALSE;
+    std::lock_guard lock(gCampaignMutex);
+    // A delayed Activity worker cannot redirect a running session to another
+    // directory. A new namespace is admitted between surface sessions only.
+    if(!gCampaignConfiguredRoot.empty() && gCampaignConfiguredRoot!=root &&
+       gSwapchainRunning.load(std::memory_order_acquire))return JNI_FALSE;
+    gCampaignConfiguredRoot=std::move(root);return JNI_TRUE;
+}
+
+extern "C" JNIEXPORT jlong JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_requestCampaign(
+    JNIEnv*,jclass,jint action,jint slot,jint kind,jlong generation)
+{
+    if(action<1 || action>5 || slot<0 || slot>=3 || kind<0 || kind>1 || generation<=0)return 0;
+    std::lock_guard inputLock(gInputPublisherMutex);
+    std::lock_guard commandLock(gCampaignMutex);
+    if(!gSurfaceSessions.IsCurrent(static_cast<std::uint64_t>(generation)) ||
+       gSurfaceSessions.IsSuspended(static_cast<std::uint64_t>(generation)) ||
+       gCampaignConfiguredRoot.empty() || gCampaignRequestSerial==static_cast<std::uint64_t>(INT64_MAX) ||
+       (gCampaignCommand && action!=4))return 0;
+    if((action==2 || action==3 || action==5) && gCampaignUi[4]>=2 && gCampaignUi[4]<=6)return 0;
+    const auto serial=++gCampaignRequestSerial;
+    gCampaignCommand=CampaignCommand{action,slot,kind,serial,static_cast<std::uint64_t>(generation)};
+    __android_log_print(ANDROID_LOG_INFO,kTag,
+        "HORDE_CAMPAIGN_REQUEST request=%llu generation=%lld action=%d slot=%d kind=%d accepted=1",
+        static_cast<unsigned long long>(serial),static_cast<long long>(generation),action,slot,kind);
+    if(action==3 || action==5) {
+        gCampaignPauseGate.store(true,std::memory_order_release);
+        RequestLifecyclePauseSynchronizationLocked(false);
+    }
+    return static_cast<jlong>(serial);
+}
+
+extern "C" JNIEXPORT jlongArray JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_getCampaignState(JNIEnv* env,jclass)
+{
+    std::array<jlong,33> state;
+    {std::lock_guard lock(gCampaignMutex);state=gCampaignUi;}
+    auto result=env->NewLongArray(static_cast<jsize>(state.size()));
+    if(result)env->SetLongArrayRegion(result,0,static_cast<jsize>(state.size()),state.data());
+    return result;
+}
+
+extern "C" JNIEXPORT jboolean JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_acknowledgeCampaignInput(
+    JNIEnv*,jclass,jlong token,jlong generation)
+{
+    if(token<=0 || generation<=0)return JNI_FALSE;
+    std::lock_guard inputLock(gInputPublisherMutex);
+    std::lock_guard commandLock(gCampaignMutex);
+    if(gCampaignUi[4]!=5 || gCampaignUi[8]!=token || gCampaignUi[1]!=generation ||
+       !gSurfaceSessions.IsCurrent(static_cast<std::uint64_t>(generation)) ||
+       gSurfaceSessions.IsSuspended(static_cast<std::uint64_t>(generation)) ||
+       gInputMailbox.PublishedSequence()<=gCampaignLoadPublication)return JNI_FALSE;
+    CampaignBarrier::Status expected;
+    expected.yaw=std::bit_cast<float>(static_cast<std::uint32_t>(gCampaignUi[9]));
+    expected.pitch=std::bit_cast<float>(static_cast<std::uint32_t>(gCampaignUi[10]));
+    if(!CampaignNeutralInput(gInputPublisherState,expected))return JNI_FALSE;
+    // The Java owner has released input/audio and rebased its absolute pose.
+    // Clear only transient transport metadata, retaining monotonic commands.
+    gInputPublisherState.combatEdgeHistory={};
+    gInputPublisherState.dialogueCompletionLine=0;gInputPublisherState.dialogueCompletionGeneration=0;
+    gCampaignAckPublication=PublishInputLocked();
+    gCampaignAckToken=static_cast<std::uint64_t>(token);
+    gCampaignAckGeneration=static_cast<std::uint64_t>(generation);
+    return JNI_TRUE; // Admission only; render owner consumes and presents later.
 }
 
 namespace
@@ -6609,6 +6718,8 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_setEntryMenu(
     gEntryControls.sidePage = sidePage == JNI_TRUE;
     gEntryControls.reducedMotion = reducedMotion == JNI_TRUE;
     gEntryControls.play = nextPlay;
+    if (!nextEnabled || (generation == 0 && !gCampaignPauseGate.load(std::memory_order_acquire)))
+        gCampaignShowcaseOverride.store(false, std::memory_order_release);
     gEntryControls.generation = static_cast<std::uint64_t>(generation);
 }
 

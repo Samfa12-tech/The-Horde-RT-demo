@@ -1,14 +1,36 @@
 # Logical safe-checkpoint round trip and next storage boundary
 
-**18 October update:** retention is now confirmed: exactly three slots, each
-with a separate manual record and latest autosave; autosaving cannot replace
-manual. The [real worker](../evidence/2026-10-18-campaign-worker/README.md) and
-[full host save/load path](../evidence/2026-10-18-campaign-session/README.md)
-are implemented and tested in disposable directories. Menus, owner-save roots,
-platform input/camera/resource adapters and physical durability/lifecycle gates
-remain open. Earlier unresolved-policy and stop-for-review wording below belongs
-to its preserved pre-implementation snapshot; it is superseded by this update and
-the current Project Decisions record.
+**18 October integration update:** retention is confirmed: exactly three slots,
+each retaining a separate manual record and its latest autosave. Autosaving
+cannot replace manual; there is no history archive or automatic migration.
+The [real worker](../evidence/2026-10-18-campaign-worker/README.md),
+[full host transaction](../evidence/2026-10-18-campaign-session/README.md), shared
+safe-boundary/autosave facade, and Android private-root/menu/native load path are
+implemented. Android PLAY chooses New Game, Entry > More/pause expose Load and
+pause exposes manual Save. Separate record states, occupied confirmation,
+cancellation, resource preparation, Java neutral camera/input acknowledgement
+and current restored-RT presentation precede explicit Resume.
+
+The [Java receipt](../evidence/2026-10-18-android-save-menu/README.md) passes 81/81
+focused host tests. The coordinating run reports 15/15 selected Debug and 15/15
+Release host suites and an Android four-ABI build. The first phone New Game
+reached play but exposed wrong opening yaw. That defect is retained; the authored
+opening-camera correction requires a newer exact build, with final coordinator
+build/phone evidence still pending. No physical Save/Load pass follows from the
+older build or the Java tests.
+
+Still incomplete: physical seeded lower/exterior manual-and-auto load and restart,
+Home/return camera/control/audio checks, Windows adapter/menu, death-screen Load,
+forest-end and complete route recovery, platform process-death and power-loss
+acceptance. The next acceptance checkpoint uses an isolated test namespace and
+compares the restored live game with the seeded records; it must not migrate,
+clear or overwrite owner saves. Durable receipt distinctions and uncertain-write
+refresh remain part of that check. No further retention decision is needed.
+
+Earlier unresolved-policy and stop-for-review wording below belongs to its
+preserved pre-implementation snapshot. This update and Project Decisions
+supersede those status statements, while historical evidence, rejected results
+and original receipt headings remain intact.
 
 The logical two-boundary slice below is implemented; the
 [implementation and validation receipt](../evidence/2026-10-17-logical-save/README.md)
@@ -16,8 +38,8 @@ defines its supported state and remaining integration limits. It has no disk
 or platform integration of its own. The subsequent
 [typed codec and isolated storage adapter](../evidence/2026-10-18-campaign-storage/README.md)
 now supplies bounded byte validation and failure-aware file publication;
-platform durability acceptance, slot UI and automatic checkpoint coordination
-remain open. The remainder
+Android slot UI and shared checkpoint coordination are recorded above; Windows
+adaptation and physical durability acceptance remain open. The remainder
 of this document preserves the design inspected at
 `f3c494ee8b39c4f8503412ecd35361d927750a7a`, including its still-open storage policy.
 This is the authorized fallback

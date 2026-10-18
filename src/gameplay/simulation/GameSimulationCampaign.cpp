@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <cmath>
 #include <limits>
+#include <tuple>
 
 namespace horde::gameplay::simulation {
 namespace {
@@ -17,9 +18,26 @@ bool SafeSupport(const campaign::Checkpoint& c, const TriangleSupportSurface& te
         traversal::ChapterExteriorMovementClear(terrain,c.position.x,c.position.z,
             c.position.x,c.position.z,c.position.y,kPlayerCollisionRadius);
 }
+bool SameBoundary(const campaign::Checkpoint& a,const campaign::Checkpoint& b) {
+    const auto facts=[](const campaign::Checkpoint& c){return std::tie(c.schema,c.contentRevision,c.id,c.zone,
+        c.position.x,c.position.y,c.position.z,c.yaw,c.pitch,c.vitality,c.defeatedGuards,c.keeperDefeated,
+        c.lanternClaimed,c.lidOpen,c.ropeReady,c.night,c.firstAscentCompleted,c.swordStowed,c.lanternHigh,
+        c.torchDropX,c.torchDropZ,c.torchDropYaw,c.torchDropPitch,c.guards,
+        c.dialogue.activeLine,c.dialogue.continuations,c.dialogue.continuationCount,
+        c.dialogue.grateConsumed,c.dialogue.rescueConsumed,c.dialogue.reunionStarted,c.dialogue.waitingForRaise,
+        c.dialogue.proofAccepted,c.dialogue.reminderConsumed,c.dialogue.forestNightConsumed,
+        c.dialogue.forestWaystoneConsumed,c.dialogue.forestClueConsumed,c.dialogue.forestVillageConsumed);};
+    return facts(a)==facts(b);
+}
 }
 
 std::optional<campaign::Checkpoint> GameSimulation::CaptureCampaignCheckpoint(campaign::CheckpointId id) const {
+    return BuildCampaignCheckpoint(id,false);
+}
+std::optional<campaign::Checkpoint> GameSimulation::CaptureAuthoredCampaignBoundary(campaign::CheckpointId id) const {
+    return BuildCampaignCheckpoint(id,true);
+}
+std::optional<campaign::Checkpoint> GameSimulation::BuildCampaignCheckpoint(campaign::CheckpointId id,bool canonical) const {
     using namespace interactions;
     const auto& s=snapshot_;
     const bool upper=id==campaign::CheckpointId::SafeExit;
@@ -28,24 +46,42 @@ std::optional<campaign::Checkpoint> GameSimulation::CaptureCampaignCheckpoint(ca
         !chapterTerrain_ || chapterTerrainGeneration_!=worldRoute_.generation ||
         staticDetailLease_.resourceGeneration || pendingCampaignRestore_ ||
         !s.playerAlive || !s.playerGrounded || posture_.Active() || crouchToggleActive_ || lastInput_.crouchHeld || s.rescue.equipmentStowed || rescueTraversal_.IsActive() ||
-        s.rescue.exteriorSide!=upper || !s.rescue.ropeReady || rescueOpeningSeconds_<1.0f ||
+        s.rescue.exteriorSide!=upper || (upper && !s.rescue.firstAscentCompleted) ||
+        !s.rescue.ropeReady || rescueOpeningSeconds_<1.0f ||
         s.lich.phase!=LichPhase::Dead || !s.lich.deathAnimationComplete ||
         s.lich.deathDissolveProgress<1.0f || s.lich.roomMistDensityScale>0.0f ||
         s.chestReward.phase!=ChestRewardPhase::LanternClaimed ||
         s.interaction.heldLightKind!=HeldLightKind::RewardLantern || s.interaction.heldLightPoseProgress<1.0f ||
         s.skeletonEnemyCount!=2 || s.playerCombat.action!=PlayerCombatAction::Idle ||
-        s.dodgeActive || s.runActive || s.playerMovementSpeedMetresPerSecond>.0001f ||
+        s.dodgeActive || (!canonical && (s.runActive || s.playerMovementSpeedMetresPerSecond>.0001f)) ||
         heldItems_[1].transition.active ||
         (heldItems_[1].parentMode!=items::HeldItemParentMode::HandSocket &&
          heldItems_[1].parentMode!=items::HeldItemParentMode::BodyStow) ||
         pendingAttackCommands_ || pendingParryCommands_ || pendingDodgeCommands_ ||
         pendingInteractCommands_ || pendingToggleHeldLightPoseCommands_ || pendingRouteResetCommands_ || pendingRetryCommands_)
         return std::nullopt;
+    if(canonical && (!s.rescue.lanternClaimed || !s.rescue.ropeDeployed ||
+        !s.finale.lichDefeated || !s.finale.lanternClaimed || s.chestReward.lidOpenProgress<1.0f ||
+        s.torchFailure.phase!=TorchFailurePhase::Settled || s.torchFailure.heldByPlayer ||
+        heldItems_[0].parentMode==items::HeldItemParentMode::HandSocket))return std::nullopt;
     const auto zone=campaign::Destination(id);
     if(worldRoute_.readiness[static_cast<std::size_t>(zone)]!=ZoneReadiness::Ready) return std::nullopt;
     campaign::Checkpoint c;
     c.id=id;c.zone=zone;c.position={s.playerX,s.playerSupportWorldY,s.playerZ};
     c.yaw=s.playerYawRadians;c.pitch=s.playerPitchRadians;c.vitality=s.playerVitals.vitality;
+    if(canonical) {
+        c.position=upper?traversal::kExteriorLanding:traversal::kLowerLanding;
+        c.yaw=upper?0.0f:-1.57079632679f;c.pitch=0.0f;
+        // Respawn standing at the authored anchor must itself be safe. Live
+        // pose/velocity is discarded; geometry/readiness and durable facts are
+        // still admitted from the current simulation, never from a platform.
+        if(!AuthoredBodySweepClear(c.position.x,c.position.z,c.position.x,c.position.z,
+                c.position.y,kStandingBodyHeight,kPlayerCollisionRadius))return std::nullopt;
+        if(upper && (!chapterTerrain_->HorizontalBodyVolumeClear(c.position.x,c.position.z,
+                c.position.x,c.position.z,c.position.y,kStandingBodyHeight,kPlayerCollisionRadius) ||
+            !traversal::ChapterExteriorObstacleClear(*chapterTerrain_,c.position.x,c.position.z,c.position.x,c.position.z,
+                c.position.y+.001f,c.position.y+kStandingBodyHeight,kPlayerCollisionRadius)))return std::nullopt;
+    }
     c.firstAscentCompleted=s.rescue.firstAscentCompleted;
     c.swordStowed=heldItems_[1].parentMode==items::HeldItemParentMode::BodyStow;
     c.lanternHigh=s.interaction.heldLightPose==HeldLightPose::High;
@@ -58,6 +94,18 @@ std::optional<campaign::Checkpoint> GameSimulation::CaptureCampaignCheckpoint(ca
     }
     if(!campaign::Validate(c) || !SafeSupport(c,*chapterTerrain_)) return std::nullopt;
     return c;
+}
+void GameSimulation::ClearCampaignBoundary() {
+    campaignBoundary_.reset();
+    if(campaignBoundaryRevision_!=UINT64_MAX)++campaignBoundaryRevision_;
+}
+void GameSimulation::LatchCampaignBoundary() {
+    if(campaignBoundaryRevision_==UINT64_MAX)return;
+    const auto id=snapshot_.rescue.exteriorSide?campaign::CheckpointId::SafeExit:campaign::CheckpointId::LowerClaimed;
+    const auto candidate=CaptureAuthoredCampaignBoundary(id);
+    if(candidate && (!campaignBoundary_ || !SameBoundary(*candidate,*campaignBoundary_))) {
+        campaignBoundary_=*candidate;++campaignBoundaryRevision_;
+    }
 }
 
 std::optional<campaign::RestoreToken> GameSimulation::BeginCampaignRestore(const campaign::Checkpoint& c) {
@@ -80,7 +128,7 @@ bool GameSimulation::CommitCampaignRestore(campaign::RestoreToken token, WorldZo
        pendingCampaignRestore_->sourceGeneration!=worldRoute_.generation || staticDetailLease_.resourceGeneration ||
        token.worldGeneration!=readyDestination.generation ||
        readyDestination.zone!=pendingCampaignRestore_->checkpoint.zone ||
-       !terrain || !terrain->TriangleCount() || tickIndex_==UINT64_MAX ||
+       !terrain || !terrain->TriangleCount() || tickIndex_==UINT64_MAX || campaignBoundaryRevision_==UINT64_MAX ||
        chapterDialogue_.State().generation>=UINT64_MAX-2 ||
        chapterCompanion_.State().generation==UINT64_MAX || rescueTraversal_.Snapshot().generation==UINT64_MAX)
         return false;
@@ -158,6 +206,7 @@ bool GameSimulation::CommitCampaignRestore(campaign::RestoreToken token, WorldZo
         next.heldItemFixedStepState_.kinematics.rewardLanternPresentationYawRadians);
     next.lanternPendulumResetPending_=true;
     next.ResolvePlayerAnimation(0);next.ResolveFireEmitters(0);next.RefreshSnapshot(neutral);
+    next.campaignBoundary_=c;next.campaignBoundaryRevision_=campaignBoundaryRevision_+1;
     next.ClearEvents();
     *this=std::move(next);
     return true;

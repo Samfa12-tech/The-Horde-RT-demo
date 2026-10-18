@@ -143,8 +143,13 @@ public:
     // Commit consumes actual destination readiness and current input floors;
     // it waits paused for a newer neutral publication rebased to the saved
     // yaw/pitch (sequence zero is the direct-host stepping convention).
-    // No storage, automatic checkpoint activation or platform calls occur.
+    // No storage or platform calls occur.
     std::optional<campaign::Checkpoint> CaptureCampaignCheckpoint(campaign::CheckpointId id) const;
+    // Separate milestone policy: only canonical authored respawn anchors are
+    // stored; current movement/camera pose never becomes a saved position.
+    std::optional<campaign::Checkpoint> CaptureAuthoredCampaignBoundary(campaign::CheckpointId id) const;
+    const std::optional<campaign::Checkpoint>& LatestCampaignBoundary() const {return campaignBoundary_;}
+    std::uint64_t CampaignBoundaryRevision() const {return campaignBoundaryRevision_;}
     std::optional<campaign::RestoreToken> BeginCampaignRestore(const campaign::Checkpoint& checkpoint);
     bool CommitCampaignRestore(campaign::RestoreToken token, WorldZoneToken readyDestination,
         std::shared_ptr<const TriangleSupportSurface> terrain, const InputSnapshot& currentInput,
@@ -166,6 +171,11 @@ private:
         std::uint64_t sourceGeneration = 0;
     };
     std::optional<PendingCampaignRestore> pendingCampaignRestore_;
+    std::optional<campaign::Checkpoint> campaignBoundary_;
+    std::uint64_t campaignBoundaryRevision_=0;
+    std::optional<campaign::Checkpoint> BuildCampaignCheckpoint(campaign::CheckpointId,bool canonical) const;
+    void LatchCampaignBoundary();
+    void ClearCampaignBoundary();
     std::uint64_t campaignRequestSequence_ = 0;
     std::uint64_t campaignDestinationGeneration_ = 0;
     std::optional<std::uint64_t> campaignInputPublicationFloor_;
