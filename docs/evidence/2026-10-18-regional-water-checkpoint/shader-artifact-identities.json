@@ -1,0 +1,164 @@
+{
+  "recordedAtUtc": "2026-10-18T06:12:29.153794+00:00",
+  "headContext": "48662cc1cccf1a227408f1969ecb9eaacf68ff31",
+  "phase": "look2 appearance correction, frozen width5 banks",
+  "scope": "Read-only final look2 frozen artifact/dependency/generated-catalog identity. Separate from earlier14 compiled Release tests; no shader compiler or GPU execution.",
+  "files": [
+    {
+      "path": "src/vulkan/raytracing/RtSceneAbi.def",
+      "bytes": 10334,
+      "sha256": "2226f3deaaf17ad4f3031b6c148cea3ef396eb21f90ed1156348ba3a5fcf4e0a"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtSceneAbi.generated.h",
+      "bytes": 16339,
+      "sha256": "e7f3a672fba1b59fecabcc70605f596228cef2df6d0928f896e1a36c57b4b59c"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_scene_abi.generated.glsl",
+      "bytes": 7849,
+      "sha256": "f4ef574a36e0c83533092b4b0769eb40fa9b7b09fbcebc4e071185876a73e943"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtPipelineVariantCatalog.generated.h",
+      "bytes": 4575,
+      "sha256": "5e0ddb44337114fc162eac8fdd6bb5b5b1ab4c53c348a3d00f28338ef345e63c"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtRayQueryVariantCatalog.generated.h",
+      "bytes": 4820,
+      "sha256": "508019e135daaca52b29886adbec865823400b45171e1b9edb1f9364e0e47ab7"
+    },
+    {
+      "path": "tools/raygen-variant-catalog.json",
+      "bytes": 39062,
+      "sha256": "ba8cab1bd22e0a2f75c0d16cb0cecd4a2c0e13c90959ec585659295f7eea97e3"
+    },
+    {
+      "path": "tools/rayquery-variant-catalog.json",
+      "bytes": 43742,
+      "sha256": "53e949f6571b91974cc3c24ddaf0034961f680cb5ea6d3b0024fb1969a0c20e2"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_regional_water_bounds.generated.glsl",
+      "bytes": 673,
+      "sha256": "8f4f269c1c3704f01ff19d4e3d79b7d8c082b76d6fd4e634df26500c0a7a8970"
+    }
+  ],
+  "variants": [
+    {
+      "key": "diagnostic_high_generic_dielectric",
+      "words": 62583,
+      "spirvSha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a",
+      "status": "PASS",
+      "failures": []
+    },
+    {
+      "key": "diagnostic_high_opaque_fast",
+      "words": 140949,
+      "spirvSha256": "990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3",
+      "status": "PASS",
+      "failures": []
+    },
+    {
+      "key": "diagnostic_mobile_generic_dielectric",
+      "words": 62310,
+      "spirvSha256": "6c00dcd3695be0620a0790aebb18ecfcd91c4020fc00d7543a8cfc46c53221bd",
+      "status": "PASS",
+      "failures": []
+    },
+    {
+      "key": "diagnostic_mobile_opaque_fast",
+      "words": 140212,
+      "spirvSha256": "b6b9e6605597b2f11ec1004c4d48eecf8b110f5bdbbee49b12ceee2fa529c932",
+      "status": "PASS",
+      "failures": []
+    },
+    {
+      "key": "shipping_high_generic_dielectric",
+      "words": 60303,
+      "spirvSha256": "92dd391e8da2b17451efac78773ac17f65362b0bc3e9e7bd837ae837005dc46f",
+      "status": "PASS",
+      "failures": []
+    },
+    {
+      "key": "shipping_high_opaque_fast",
+      "words": 139890,
+      "spirvSha256": "1b6271dde4002cb4e9a32668682c173373a05cbea81bd9c26f4c204ec0a00c27",
+      "status": "PASS",
+      "failures": []
+    },
+    {
+      "key": "shipping_mobile_generic_dielectric",
+      "words": 60030,
+      "spirvSha256": "a1edeb782800c91a58b073c1f789c2e14d68cc56cd8ff1b0b535d628d1e9ee38",
+      "status": "PASS",
+      "failures": []
+    },
+    {
+      "key": "shipping_mobile_opaque_fast",
+      "words": 139153,
+      "spirvSha256": "1b026affab5bf26b44d2dab0ef10f1c17104190a5ad18d45aa2fda85dbcfdec9",
+      "status": "PASS",
+      "failures": []
+    },
+    {
+      "key": "rayquery_compute_diagnostic_high_generic_dielectric",
+      "words": 62645,
+      "spirvSha256": "359469cc391aa787011c9d3c9ba4c84d99779cbb9a0fbe7ce5723f1783b6ab5f",
+      "status": "PASS",
+      "failures": []
+    },
+    {
+      "key": "rayquery_compute_diagnostic_high_opaque_fast",
+      "words": 141250,
+      "spirvSha256": "98cec0ff16f511aac0d3a41c2a91542d2a18ebfc431ec3edd75d9abc5b10761b",
+      "status": "PASS",
+      "failures": []
+    },
+    {
+      "key": "rayquery_compute_diagnostic_mobile_generic_dielectric",
+      "words": 62372,
+      "spirvSha256": "af64e0f590e1643d8ba6868141c90cdcf29ab2828c610a3fb59a336292599574",
+      "status": "PASS",
+      "failures": []
+    },
+    {
+      "key": "rayquery_compute_diagnostic_mobile_opaque_fast",
+      "words": 140513,
+      "spirvSha256": "6bc16f6be1c5a9ff5f8782e97645fdd1bd258c1a6cec1b829e6512a7da59e47f",
+      "status": "PASS",
+      "failures": []
+    },
+    {
+      "key": "rayquery_compute_shipping_high_generic_dielectric",
+      "words": 60365,
+      "spirvSha256": "8c044be265d512e914bc46e15fc57ff6f82d25d3bcfdd614a32bab421a3baaae",
+      "status": "PASS",
+      "failures": []
+    },
+    {
+      "key": "rayquery_compute_shipping_high_opaque_fast",
+      "words": 140191,
+      "spirvSha256": "5126f98082b8687104aad7544dd1a04ffe23b63d09f17c5b59732c5194e48bec",
+      "status": "PASS",
+      "failures": []
+    },
+    {
+      "key": "rayquery_compute_shipping_mobile_generic_dielectric",
+      "words": 60092,
+      "spirvSha256": "5d5b4e282579efad72af0a8a4c98588d290e052f70685d6717a1bc2b849f43ab",
+      "status": "PASS",
+      "failures": []
+    },
+    {
+      "key": "rayquery_compute_shipping_mobile_opaque_fast",
+      "words": 139454,
+      "spirvSha256": "5b40845d914117b0f79fb567a717fbccdf9d420c8a20f3e71aba58f8a3e89c4b",
+      "status": "PASS",
+      "failures": []
+    }
+  ],
+  "failures": [],
+  "status": "PASS"
+}

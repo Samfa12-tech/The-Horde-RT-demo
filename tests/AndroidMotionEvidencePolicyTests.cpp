@@ -1,4 +1,5 @@
 #include "platform/android/AndroidMotionEvidencePolicy.h"
+#include "platform/android/AndroidEnvironmentSurveyPolicy.h"
 
 #include <array>
 #include <iostream>
@@ -192,6 +193,52 @@ int main()
         history.edges[4].steadyTimeNanoseconds == 130u &&
         SameHistory(validNext.combatEdgeHistory, history));
 
-    std::cout << "Android motion evidence policy failures=" << failures << '\n';
+    // Survey policy proves only immutable request/frame admission. Native RT
+    // completion and presentation must be independently supplied by its owner.
+    {
+        AndroidEnvironmentSurveyPolicy survey;
+        check(survey.Phase()==0 && survey.Frames()==0);
+        for(const auto* invalid:{"","../other","a/b","with space","x.json","a\\b"})
+            check(!survey.Configure(invalid,false));
+        check(!survey.Configure(std::string(65,'a'),false));
+        check(survey.Configure("river_A-1",true));
+        const auto serial=survey.Serial();
+        check(serial!=0 && survey.WaterDisabled() && survey.Phase()==1);
+        check(!survey.Configure("parallel",false) && !survey.Bind(serial+1,8) && !survey.Bind(serial,0));
+        check(!survey.AcceptFrame(8,1,1,1) && !survey.Complete());
+        check(survey.Bind(serial,8) && !survey.Bind(serial,9));
+        check(!survey.AcceptFrame(9,1,1,1) && !survey.AcceptFrame(8,0,1,1) &&
+            !survey.AcceptFrame(8,1,0,1) && !survey.AcceptFrame(8,1,1,0));
+        check(survey.AcceptFrame(8,10,20,100));
+        check(!survey.AcceptFrame(8,10,20,100) && !survey.AcceptFrame(8,11,20,101) &&
+            !survey.AcceptFrame(8,10,21,101) && survey.Frames()==1);
+        check(EnvironmentSurveyTime(0)==0 && EnvironmentSurveyTime(60)==1 &&
+            EnvironmentSurveyTime(119)>1.98f && EnvironmentSurveyTime(119)<2.f);
+        for(unsigned i=1;i<kEnvironmentSurveyFrames;++i)
+            check(survey.AcceptFrame(8,10,20,100+i));
+        check(!survey.AcceptFrame(8,10,20,220) && survey.Complete() && survey.Phase()==2);
+        survey.Cancel();check(survey.Phase()==2);
+        check(!survey.Configure("river_A-1",false));
+        check(survey.Configure("river_B-1",false) && survey.Serial()>serial && !survey.WaterDisabled() &&
+            survey.Frames()==0 && survey.Surface()==0);
+        check(!survey.Bind(serial,9) && survey.Bind(survey.Serial(),9));
+        survey.Cancel();
+        check(survey.Phase()==3 && !survey.AcceptFrame(9,1,1,1) && !survey.Complete());
+        check(survey.Configure("river_C-1",false));
+        survey.Cancel();check(survey.Phase()==3 && !survey.Bind(survey.Serial(),10));
+        const auto camera=RiverBendSurveyCamera();
+        const auto approved=horde::scene::ChapterWaterFromAtlas(56,-5,0);
+        check(camera.x==approved[0] && camera.z==approved[2] && std::isfinite(camera.yaw));
+        const auto& lake=horde::scene::ChapterRegionalWaterTriangles()[0];
+        EnvironmentSurveyCamera aboveLake;
+        for(unsigned i=0;i<3;++i) {
+            aboveLake.x+=lake[i][0]/3.f;aboveLake.z+=lake[i][2]/3.f;
+        }
+        aboveLake.supportY=horde::scene::kChapterLakeWorldY+2.f;
+        const auto water=SurveyWaterFacts(aboveLake,aboveLake.supportY+1.f);
+        check(water.waterAboveOrBelowCamera && std::abs(water.waterY-horde::scene::kChapterLakeWorldY)<.001f &&
+            std::abs(water.footDistance-2.f)<.001f && std::abs(water.eyeDistance-3.f)<.001f);
+    }
+    std::cout << "Android motion/environment evidence policy failures=" << failures << '\n';
     return failures == 0 ? 0 : 1;
 }

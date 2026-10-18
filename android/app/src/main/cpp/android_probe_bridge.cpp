@@ -14,6 +14,8 @@
 #include <cstring>
 #include <ctime>
 #include <fstream>
+#include <iomanip>
+#include <locale>
 #include <limits>
 #include <memory>
 #include <mutex>
@@ -38,6 +40,8 @@
 #include "graphics/EntryMenuHandoff.h"
 #include "graphics/ForegroundPauseRenderCadence.h"
 #include "telemetry/InputPresentationTrace.h"
+#include "platform/android/AndroidEnvironmentSurveyPolicy.h"
+#include "vulkan/raytracing/EnvironmentSurveyFrame.h"
 #include "graphics/GraphicsPreviewPerformance.h"
 #if (defined(HORDE_RT_DEBUG_CHECKPOINTS) && !defined(NDEBUG)) || HORDE_RT_ANDROID_MOTION_VALIDATION
 #include "platform/android/AndroidMotionEvidencePolicy.h"
@@ -429,6 +433,11 @@ struct SwapchainContext
     bool benchmarkSampling = false;
     bool captureActive = false;
     std::uint32_t capturePresentedFrames = 0u;
+    bool environmentSurvey=false,environmentSurveyWaterDisabled=false;
+    std::uint64_t environmentSurveySerial=0;
+    std::string environmentSurveyId;
+    float environmentSurveyTime=0;
+    horde::platform::android::EnvironmentSurveyCamera environmentSurveyCamera{};
     horde::gameplay::ShowcaseRouteReplay routeReplay;
     bool routeReplayActive = false;
     horde::gameplay::ShowcaseBenchmarkRun inAppBenchmark;
@@ -466,8 +475,11 @@ struct SurfaceStartRequest
 {
     std::unique_ptr<ANativeWindow, NativeWindowRelease> window;
     std::string reportDirectory;
+    bool environmentSurvey=false;
+    std::uint64_t environmentSurveySerial=0;
 };
 horde::platform::android::SurfaceSessionMailbox<SurfaceStartRequest> gSurfaceSessions;
+#include "android_environment_survey_state.inl"
 std::mutex gReportMutex;
 std::string gLatestTextReport;
 std::string gLatestJsonReport;
@@ -580,6 +592,7 @@ horde::graphics::GraphicsScene GraphicsSceneForProfile(
 horde::vulkan::raytracing::RtSceneProfile DesiredProfile(
     const SwapchainContext& context, const PreviewControls& preview)
 {
+    if(context.environmentSurvey)return horde::vulkan::raytracing::RtSceneProfile::Showcase;
     if (gCampaignShowcaseOverride.load(std::memory_order_acquire))
         return horde::vulkan::raytracing::RtSceneProfile::Showcase;
     const bool currentPreview = (preview.generation == 0u ||
@@ -788,6 +801,7 @@ horde::platform::android::DebugRequestAdmissionState ReadDebugRequestAdmissionSt
 
 bool CanQueueCompetingDebugRequestLocked()
 {
+    if(EnvironmentSurveyPending())return false;
     if(gCampaignPauseGate.load(std::memory_order_acquire))return false;
     return horde::platform::android::CanRequestCompetingDebugMode(
         ReadDebugRequestAdmissionStateLocked());
@@ -1259,6 +1273,7 @@ std::string PresentTimingJson(const SwapchainContext& context)
 void PublishRuntimeReports(const SwapchainContext& context,
     const horde::telemetry::RtLifecyclePublishedState* finalPublication = nullptr)
 {
+    if(context.environmentSurvey)return; // Own request-scoped report only.
     if (!gSurfaceSessions.IsCurrent(context.surfaceGeneration)) return;
     const auto publication = finalPublication ? *finalPublication
         : context.rtFrameEvidence.PublishedStateByValue();
@@ -3232,6 +3247,10 @@ bool InitialiseRtSceneForSwapchain(SwapchainContext& context)
     context.rtScene.SetDevelopmentWorldRoute(context.developmentWorldRoute,context.stagedWorldPreparation);
     context.rtScene.SetDevelopmentRescueJourney(context.developmentRescueJourney);
     context.rtScene.SetDevelopmentSupportFixture(context.developmentSupportFixture);
+#if defined(HORDE_RT_DEBUG_CHECKPOINTS)
+    if(context.environmentSurvey && !context.rtScene.SetRegionalWaterDiagnosticEnabled(
+            !context.environmentSurveyWaterDisabled))return false;
+#endif
     const bool initialised = context.rtScene.Initialise(context.instance,
                                     context.physicalDevice,
                                     context.device,
@@ -3663,9 +3682,9 @@ bool DestroySwapchainContext(SwapchainContext& context)
             "Presentation retirement could not be proved; renderer resources retained.");
         return false;
     }
-    CancelActiveInAppBenchmark(context);
+    if(!context.environmentSurvey)CancelActiveInAppBenchmark(context);
     DestroyRtEvidenceOnOwnerThread(context);
-    gGameSimulation.InvalidateWorldZoneReadiness();
+    if(!context.environmentSurvey)gGameSimulation.InvalidateWorldZoneReadiness();
     context.rtScene.Destroy();
     if (context.compiledPipelineCache != nullptr)
     {
@@ -3766,7 +3785,7 @@ bool DestroySwapchainContext(SwapchainContext& context)
 
 bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resourceRecreated)
 {
-    gCampaignFrameTick=0;gCampaignFrameWorld=0;
+    if(!context.environmentSurvey){gCampaignFrameTick=0;gCampaignFrameWorld=0;}
     const auto frameStart = std::chrono::steady_clock::now();
     const auto frameStartCount = std::chrono::duration_cast<std::chrono::nanoseconds>(
         frameStart.time_since_epoch()).count();
@@ -3797,7 +3816,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
         horde::telemetry::RtStage::FrameFenceWait);
     const VkResult waitResult = vkWaitForFences(
         context.device, 1u, &context.inFlightFences[context.currentFrame],
-        VK_TRUE, UINT64_MAX);
+        VK_TRUE, context.environmentSurvey ? 2'000'000'000ull : UINT64_MAX);
     fenceScope.Complete(1u, 0u, 1u);
     const auto fenceDone = std::chrono::steady_clock::now();
     if (!gSurfaceSessions.IsCurrent(context.surfaceGeneration))
@@ -3851,7 +3870,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
     const VkResult acquireResult = vkAcquireNextImageKHR(
         context.device,
         context.swapchain,
-        UINT64_MAX,
+        context.environmentSurvey ? 2'000'000'000ull : UINT64_MAX,
         context.imageAvailableSemaphores[context.currentFrame],
         VK_NULL_HANDLE,
         &imageIndex);
@@ -3870,7 +3889,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
             context.rtFrameEvidence.AbortFrame();
         }
         resourceRecreated = true;
-        return RecreateSwapchain(context);
+        return !context.environmentSurvey && RecreateSwapchain(context);
     }
     if (acquireResult != VK_SUCCESS && acquireResult != VK_SUBOPTIMAL_KHR)
     {
@@ -3918,8 +3937,9 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
     const auto recordStart = std::chrono::steady_clock::now();
     if (useRtFrame)
     {
-        const horde::vulkan::raytracing::RtSceneTuning rtLabTuning = gRtLabState.Snapshot();
-        if (context.sceneProfile == horde::vulkan::raytracing::RtSceneProfile::Showcase)
+        const horde::vulkan::raytracing::RtSceneTuning rtLabTuning = context.environmentSurvey
+            ? horde::vulkan::raytracing::RtSceneTuning{} : gRtLabState.Snapshot();
+        if (!context.environmentSurvey && context.sceneProfile == horde::vulkan::raytracing::RtSceneProfile::Showcase)
         {
             if (gInAppBenchmarkRequested.exchange(false, std::memory_order_acq_rel))
             {
@@ -4360,7 +4380,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                     benchmarkActive}),
                 std::memory_order_release);
         }
-        horde::vulkan::raytracing::PublishDevelopmentWorldReadiness(gGameSimulation,context.rtScene);
+        if(!context.environmentSurvey)horde::vulkan::raytracing::PublishDevelopmentWorldReadiness(gGameSimulation,context.rtScene);
         horde::vulkan::raytracing::RtSceneFrameInputs frameInputs;
         if (context.sceneProfile == horde::vulkan::raytracing::RtSceneProfile::GraphicsPreview)
         {
@@ -4412,10 +4432,10 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                         static_cast<int>(context.graphicsSettings.waterQuality)),
                     rtLabTuning);
             submittedDialogueTick = renderedSimulation.tickIndex;
-            gCampaignFrameTick=renderedSimulation.tickIndex;
-            gCampaignFrameWorld=renderedSimulation.worldRoute.generation;
+            if(!context.environmentSurvey){gCampaignFrameTick=renderedSimulation.tickIndex;
+                gCampaignFrameWorld=renderedSimulation.worldRoute.generation;}
             submittedDialogueGeneration = renderedSimulation.chapterDialogue.generation;
-            showcaseDialogueFrame = context.sceneProfile ==
+            showcaseDialogueFrame = !context.environmentSurvey && context.sceneProfile ==
                 horde::vulkan::raytracing::RtSceneProfile::Showcase;
             frameInputs.fireDetail = horde::vulkan::raytracing::ResolveFireEmitterQuality(context.graphicsSettings.fireDetail);
             frameInputs.shadowQuality = context.graphicsSettings.shadowQuality;
@@ -4434,6 +4454,18 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
         }
         frameInputs.presentationTransform = context.rtPresentationTransform;
         std::string diagnostic;
+#if defined(HORDE_RT_DEBUG_CHECKPOINTS)
+        if(context.environmentSurvey) {
+            const auto& camera=context.environmentSurveyCamera;
+            if(!horde::vulkan::raytracing::RebaseEnvironmentSurveyFrame(frameInputs,
+                    {camera.x,camera.z,camera.supportY,camera.yaw,camera.pitch,context.environmentSurveyTime},diagnostic)) {
+                if(evidenceFrame)context.rtFrameEvidence.AbortFrame();
+                __android_log_print(ANDROID_LOG_ERROR,kTag,"Survey frame rebase rejected: %s",diagnostic.c_str());
+                return false;
+            }
+            frameInputs.tuning.fogDensityScale=.004f;
+        }
+#endif
         if (evidenceFrame)
         {
             (void)context.rtFrameEvidence.BeginRecord(frameInputs.tickIndex);
@@ -4471,7 +4503,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
             context.motion->scenario.RetainChapterDetail();
         const auto detailStepStartNs=GraphicsSteadyNs();
 #endif
-        if(!context.rtScene.AdvanceOrdinaryStaticDetail(gGameSimulation,frameInputs,
+        if(!context.environmentSurvey && !context.rtScene.AdvanceOrdinaryStaticDetail(gGameSimulation,frameInputs,
             !context.captureActive && !context.routeReplayActive && !context.inAppBenchmark.IsRunning() &&
             !context.benchmarkSampling && !retainComparisonDetail &&
             !gCampaignPauseGate.load(std::memory_order_acquire),detail,diagnostic)) {
@@ -4831,7 +4863,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
             PublishBenchmarkProgress(context);
         }
         resourceRecreated = true;
-        const bool recreated = RecreateSwapchain(context);
+        const bool recreated = !context.environmentSurvey && RecreateSwapchain(context);
         return recreated;
     }
     if (presentResult != VK_SUCCESS)
@@ -5116,9 +5148,25 @@ bool ApplySceneProfileOnOwner(SwapchainContext& context, const PreviewControls c
 }
 
 #include "android_campaign_bridge.inl"
+#if defined(HORDE_RT_DEBUG_CHECKPOINTS)
+#include "android_environment_survey.inl"
+#endif
 
 void SwapchainRenderLoop()
 {
+#if defined(HORDE_RT_DEBUG_CHECKPOINTS)
+    if(gSwapchainContext.environmentSurvey){
+        const auto serial=gSwapchainContext.environmentSurveySerial;
+        try {RunAndRetireAndroidEnvironmentSurvey(gSwapchainContext);}
+        catch(...) {
+            gSwapchainRunning.store(false,std::memory_order_release);
+            const bool retired=DestroySwapchainContext(gSwapchainContext);
+            gSurfaceRetirementBlocked.store(!retired,std::memory_order_release);
+            FailEnvironmentSurvey(serial,"native-survey-exception");
+        }
+        return;
+    }
+#endif
     auto previousFrameStart = std::chrono::steady_clock::now();
     horde::graphics::ForegroundPauseRenderCadence pausedRenderCadence;
 #if defined(HORDE_RT_DEBUG_CHECKPOINTS)
@@ -5549,7 +5597,7 @@ void SwapchainRenderLoop()
 bool StartSurfaceInternal(ANativeWindow* window,
                           horde::vulkan::DeviceCapabilities capabilities,
                           const std::string& reportDirectory,
-                          const std::uint64_t generation)
+                          const std::uint64_t generation,bool environmentSurvey=false,std::uint64_t surveySerial=0)
 {
     if (window == nullptr)
     {
@@ -5566,6 +5614,7 @@ bool StartSurfaceInternal(ANativeWindow* window,
     }
 
     SwapchainContext context;
+    context.environmentSurvey=environmentSurvey; // Even cancelled pre-bind cleanup stays isolated.
     context.window = window;
     context.surfaceGeneration = generation;
     struct Cleanup
@@ -5585,13 +5634,22 @@ bool StartSurfaceInternal(ANativeWindow* window,
     context.developmentSupportFixture =
         gGameSimulation.Snapshot().developmentSupportFixture;
     context.reportDirectory = reportDirectory;
-    const auto startupGraphics = ReadRequestedGraphics();
-    context.graphicsSettings = startupGraphics.requested;
-    context.graphicsRequested = startupGraphics.requested;
-    context.graphicsSerial = startupGraphics.serial;
+    if(environmentSurvey) {
+        if(!BindEnvironmentSurvey(context,surveySerial,generation))return false;
+        context.developmentSupportFixtureOverride=false;
+        context.developmentWorldRouteOverride=true;
+        context.developmentRescueJourneyOverride=true;
+        context.stagedWorldPreparationOverride=false;
+        context.graphicsRequested=context.graphicsSettings;
+    } else {
+        const auto startupGraphics = ReadRequestedGraphics();
+        context.graphicsSettings = startupGraphics.requested;
+        context.graphicsRequested = startupGraphics.requested;
+        context.graphicsSerial = startupGraphics.serial;
+    }
     context.renderScale = context.graphicsSettings.renderScalePercent / 100.0f;
-    context.gpuFrameTimingEnabled = gRequestedGpuFrameTimingEnabled.load(std::memory_order_acquire);
-    const bool requireRayQueryCompute = gRequiredRayQueryCompute.load(std::memory_order_acquire);
+    context.gpuFrameTimingEnabled = context.environmentSurvey || gRequestedGpuFrameTimingEnabled.load(std::memory_order_acquire);
+    const bool requireRayQueryCompute = !context.environmentSurvey && gRequiredRayQueryCompute.load(std::memory_order_acquire);
     context.clearColor = ClearColorForMode(capabilities.rtMode);
     __android_log_print(ANDROID_LOG_INFO,
                         kTag,
@@ -5601,10 +5659,10 @@ bool StartSurfaceInternal(ANativeWindow* window,
     // Refresh the probe snapshot off the UI thread even on later startup failure;
     // this does not certify an RT-presented frame.
     PublishRuntimeReports(context);
-    ClearPlatformGameplayEvents();
+    if(!context.environmentSurvey)ClearPlatformGameplayEvents();
     {
-        std::lock_guard<std::mutex> inputLock(gInputPublisherMutex);
-        PublishInputLocked();
+        if(!context.environmentSurvey){std::lock_guard<std::mutex> inputLock(gInputPublisherMutex);
+            PublishInputLocked();}
     }
 
     if (!CreateInstance(context.instance, context.presentSurfaceSupport) || !gSurfaceSessions.IsCurrent(generation))
@@ -5721,19 +5779,16 @@ bool StartSurfaceInternal(ANativeWindow* window,
         DestroySwapchainContext(context);
         return false;
     }
-    context.entryHandoff.Observe(ReadEntryControls(), generation);
+    if(!context.environmentSurvey)context.entryHandoff.Observe(ReadEntryControls(), generation);
     context.sceneProfile = DesiredProfile(context, ReadPreviewControls());
-    context.entryHandoff.BeginLoad();
-    PublishEntryState(context, false);
+    if(!context.environmentSurvey){context.entryHandoff.BeginLoad();PublishEntryState(context, false);}
     if (!InitialiseRtSceneForSwapchain(context) || !gSurfaceSessions.IsCurrent(generation))
     {
-        context.entryHandoff.FailLoad();
-        PublishEntryState(context, false);
+        if(!context.environmentSurvey){context.entryHandoff.FailLoad();PublishEntryState(context, false);}
         DestroySwapchainContext(context);
         return false;
     }
-    context.entryHandoff.EndLoad();
-    PublishEntryState(context, false);
+    if(!context.environmentSurvey){context.entryHandoff.EndLoad();PublishEntryState(context, false);}
 
     gSwapchainContext = std::move(context);
     cleanup.transferred = true;
@@ -5742,7 +5797,7 @@ bool StartSurfaceInternal(ANativeWindow* window,
     catch (...)
     {
         gSwapchainRunning.store(false, std::memory_order_release);
-        gSurfaceRetirementBlocked.store(!(RetireCampaignOnOwner(gSwapchainContext.surfaceGeneration) &&
+        gSurfaceRetirementBlocked.store(!((gSwapchainContext.environmentSurvey || RetireCampaignOnOwner(gSwapchainContext.surfaceGeneration)) &&
             DestroySwapchainContext(gSwapchainContext)), std::memory_order_release);
         throw;
     }
@@ -5750,8 +5805,18 @@ bool StartSurfaceInternal(ANativeWindow* window,
     return true;
 }
 
-void StopSurfaceInternal()
+void StopSurfaceInternal(bool preserveGameplay=false)
 {
+    preserveGameplay=preserveGameplay || gEnvironmentSurveyPreserveStops.load(std::memory_order_acquire);
+    if(preserveGameplay) {
+        gSwapchainRunning.store(false,std::memory_order_release);
+        if(gSwapchainThread.joinable())gSwapchainThread.join();
+        if(gSurfaceRetirementBlocked.load(std::memory_order_acquire))
+            gSurfaceRetirementBlocked.store(!DestroySwapchainContext(gSwapchainContext),std::memory_order_release);
+        if(!gSurfaceRetirementBlocked.load(std::memory_order_acquire))
+            gEnvironmentSurveyActiveSurface.store(0,std::memory_order_release);
+        return;
+    }
     {
         std::lock_guard<std::mutex> admissionLock(gDebugRequestAdmissionMutex);
         gCombatPracticeRequested.store(-1, std::memory_order_release);
@@ -5799,15 +5864,19 @@ private:
     {
         while (auto action = gSurfaceSessions.Take())
         {
-            StopSurfaceInternal();
+            StopSurfaceInternal(action->request && action->request->environmentSurvey);
             if (gSurfaceRetirementBlocked.load(std::memory_order_acquire))
             {
+                if(action->request && action->request->environmentSurvey)
+                    FailEnvironmentSurvey(action->request->environmentSurveySerial,"prior-GPU-retirement-unproved");
                 gSurfaceSessions.Publish(action->generation, 3);
                 __android_log_print(ANDROID_LOG_ERROR, kTag,
                     "Surface lifecycle blocked until retained presentation resources can be retired.");
                 continue;
             }
             if (!action->request || !gSurfaceSessions.IsCurrent(action->generation)) continue;
+            if(!action->request->environmentSurvey)
+                gEnvironmentSurveyPreserveStops.store(false,std::memory_order_release);
             // A pending cold start may be paused before driver work begins.
             gSurfaceSessions.WaitWhileSuspended(action->generation);
             if (!gSurfaceSessions.IsCurrent(action->generation)) continue;
@@ -5818,12 +5887,14 @@ private:
                 if (!gSurfaceSessions.IsCurrent(action->generation)) continue;
                 if (!EnsureDirectoryExists(request.reportDirectory))
                 {
+                    if(request.environmentSurvey)FailEnvironmentSurvey(request.environmentSurveySerial,"request-report-directory-unavailable");
                     gSurfaceSessions.Publish(action->generation, 3);
                     continue;
                 }
                 if (!StartSurfaceInternal(request.window.release(), capabilities,
-                                          request.reportDirectory, action->generation))
+                                          request.reportDirectory, action->generation,request.environmentSurvey,request.environmentSurveySerial))
                 {
+                if(request.environmentSurvey)FailEnvironmentSurvey(request.environmentSurveySerial,"surface-start-failed");
                     if (gSurfaceSessions.State(action->generation) == 0)
                         gSurfaceSessions.Publish(action->generation, 3);
                     continue;
@@ -5834,6 +5905,7 @@ private:
             catch (const std::exception& error)
             {
                 StopSurfaceInternal();
+                if(request.environmentSurvey)FailEnvironmentSurvey(request.environmentSurveySerial,"surface-owner-startup-exception");
                 gSurfaceSessions.Publish(action->generation, 3);
                 __android_log_print(ANDROID_LOG_ERROR, kTag, "Native surface startup failed: %s", error.what());
             }
@@ -6202,6 +6274,7 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_writeReports(JNIEnv* env, jclass, js
 extern "C" JNIEXPORT jlong JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_startDiagnosticSurface(JNIEnv* env, jclass, jobject surface, jstring baseDirectory)
 {
+    if(EnvironmentSurveyPending())return 0;
     if (surface == nullptr)
     {
         __android_log_print(ANDROID_LOG_ERROR, kTag, "startDiagnosticSurface called with null Java Surface.");
@@ -7534,3 +7607,4 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_drainPlatformEvents(JNIEnv* env, jcl
     }
     return result;
 }
+#include "android_environment_survey_jni.inl"

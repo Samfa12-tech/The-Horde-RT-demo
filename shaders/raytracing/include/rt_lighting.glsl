@@ -597,20 +597,25 @@ vec3 compactShadowTransmittanceMask(vec3 origin, vec3 direction,
     return clamp(transmittance * vec3(0.08), vec3(0.0), vec3(1.0));
 }
 
+#include "rt_regional_water_bounds.generated.glsl"
+
 bool shadowSegmentIntersectsBounds(vec3 origin, vec3 direction,
                                    float maxDistance,
                                    vec3 boundsMin, vec3 boundsMax)
 {
-    vec3 safeDirection = sign(direction + vec3(0.0000001)) *
-        max(abs(direction), vec3(0.0001));
-    vec3 first = (boundsMin - origin) / safeDirection;
-    vec3 second = (boundsMax - origin) / safeDirection;
-    vec3 nearPlane = min(first, second);
-    vec3 farPlane = max(first, second);
-    float intervalStart = max(max(nearPlane.x, nearPlane.y), nearPlane.z);
-    float intervalEnd = min(min(farPlane.x, farPlane.y), farPlane.z);
-    return intervalEnd > max(intervalStart, 0.0) &&
-           intervalStart < maxDistance;
+    // Do not clamp a near-parallel direction: at regional distances that can
+    // incorrectly exclude a real crossing and make opaque water cast shadows.
+    bvec3 parallel = lessThan(abs(direction), vec3(1e-20));
+    bvec3 outside = notEqual(clamp(origin, boundsMin, boundsMax), origin);
+    if (any(notEqual(uvec3(parallel) * uvec3(outside), uvec3(0u)))) return false;
+    vec3 reciprocal = 1.0 / mix(direction, vec3(1.0), parallel);
+    vec3 a = (boundsMin - origin) * reciprocal;
+    vec3 b = (boundsMax - origin) * reciprocal;
+    vec3 nearPlane = mix(min(a, b), vec3(-1e30), parallel);
+    vec3 farPlane = mix(max(a, b), vec3(1e30), parallel);
+    float first = max(max(nearPlane.x, nearPlane.y), max(nearPlane.z, 0.0));
+    float last = min(min(farPlane.x, farPlane.y), min(farPlane.z, maxDistance));
+    return last >= first && maxDistance > 0.0;
 }
 
 bool shadowSegmentCrossesTransparentWorld(vec3 origin, vec3 direction,
@@ -622,6 +627,15 @@ bool shadowSegmentCrossesTransparentWorld(vec3 origin, vec3 direction,
     // tunable waterfall envelope. Only segments that can touch those surfaces
     // need NoOpaque candidate filtering; elsewhere Vulkan can commit opaque
     // stone/metal in hardware and expose only imported dielectric geometry.
+    if (rtWaterContactRipple.surfaceMetadata.x > 0u)
+    {
+        if (shadowSegmentIntersectsBounds(origin, direction, maxDistance,
+            chapterRegionalWaterBoundsMin[0] - vec3(0.01), chapterRegionalWaterBoundsMax[0] + vec3(0.01))) return true;
+        if (shadowSegmentIntersectsBounds(origin, direction, maxDistance,
+            chapterRegionalWaterBoundsMin[1] - vec3(0.01), chapterRegionalWaterBoundsMax[1] + vec3(0.01))) return true;
+        if (shadowSegmentIntersectsBounds(origin, direction, maxDistance,
+            chapterRegionalWaterBoundsMin[2] - vec3(0.01), chapterRegionalWaterBoundsMax[2] + vec3(0.01))) return true;
+    }
     return shadowSegmentIntersectsBounds(
                origin, direction, maxDistance,
                vec3(-0.80, 1.27, -5.30), vec3(0.70, 1.40, -3.30)) ||

@@ -1,6 +1,8 @@
 # Nature audio attribution
 
-All four derivatives are prepared candidates; only runtime/ is packaged.
+All four recordings remain unheard here; only runtime/ is packaged.
+The pond cut is admitted only beside actual shared regional water surfaces;
+the periodical cicada remains excluded. Native mix/listening acceptance is pending.
 Cricket derivative remains CC BY-SA 4.0. No endorsement is implied.
 
 Tawny owl calling at night in Tuntorp, Brastad, Sweden — W.carter
@@ -19,7 +21,7 @@ Nature sounds ambience in a Dordogne pond — Glaneur de sons
 https://commons.wikimedia.org/wiki/File:Nature_sounds_ambience_in_a_Dordogne_pond.ogg
 CC-BY-3.0 https://creativecommons.org/licenses/by/3.0/
 Excerpt from 2s for 8s; mono downmix, 24kHz resample, PCM16, -12dB gain, 150ms fades; no loop/pitch/noise filtering
-Mixed frogs/crickets at dusk, Dordogne, 2007-05-02. Exact species unspecified. No exterior water footprint exists in current runtime.
+Mixed frogs/crickets at dusk, Dordogne, 2007-05-02. Exact species unspecified.
 
 Calling song of Magicicada septendecim - Audio S1, pone.0000892 — Kathryn M. Fontaine, John R. Cooley, Chris Simon
 https://commons.wikimedia.org/wiki/File:Calling_song_of_Magicicada_septendecim_-_pone.0000892.s001.oga

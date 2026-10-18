@@ -1,0 +1,117 @@
+{
+  "date": "2026-10-18",
+  "outcome": "PASS bounded source/shared Debug+Release host and WAV/package policy contracts; app/device playback, night mix/listening and performance remain unaccepted",
+  "scope": "Source-only bounded regional water pond cue; no app launch, device action, playback or performance measurement",
+  "eventId": 31,
+  "eventName": "PondFrogs",
+  "maximumWaterDistanceMetres": 18,
+  "waterPolicy": "3D distance to actual shared triangle faces, ready same-night grounded exterior; no guessed forest pond or tomb runoff",
+  "quietTicks": 720,
+  "intervalTicks": 2400,
+  "finiteVoiceCount": 1,
+  "looping": false,
+  "source": {
+    "creator": "Glaneur de sons",
+    "license": "CC-BY-3.0",
+    "page": "https://commons.wikimedia.org/wiki/File:Nature_sounds_ambience_in_a_Dordogne_pond.ogg",
+    "sha256": "ebc99f767a1832608ef5a8e2fd170a19c01720a8ba957fd7521f291bba57b21f",
+    "metadata": "Mixed frogs/crickets at dusk, Dordogne, 2007-05-02; exact species unspecified"
+  },
+  "runtime": {
+    "path": "assets/audio/night-ambience/runtime/pond_frogs_crickets.wav",
+    "bytes": 384078,
+    "seconds": 8,
+    "channels": 1,
+    "sampleRate": 24000,
+    "bits": 16,
+    "sha256": "bb13e7ebaff3fdc0b3a872cbdfe0bda22a210a7a77fe401b50981c5e02763b76",
+    "byteExactFromPreparedCandidate": true
+  },
+  "checks": {
+    "debug": {
+      "status": "PASS",
+      "checks": 94,
+      "failures": 0,
+      "ctestPassed": 1,
+      "seconds": 42.36,
+      "buildLog": "reports/2026-10-19-pond-ambience-debug-build.log",
+      "testLog": "reports/2026-10-19-pond-ambience-debug-tests.log"
+    },
+    "release": {
+      "status": "PASS",
+      "checks": 94,
+      "failures": 0,
+      "ctestPassed": 1,
+      "seconds": 4.24,
+      "buildLog": "reports/2026-10-19-pond-ambience-release-build-r02.log",
+      "testLog": "reports/2026-10-19-pond-ambience-release-tests.log",
+      "preservedConfigureFailures": [
+        {
+          "log": "reports/2026-10-19-pond-ambience-release-build.log",
+          "reason": "CMake regeneration caught stale shipping_high_generic_dielectric during parent shader generation"
+        },
+        {
+          "log": "reports/2026-10-19-pond-ambience-release-build-r01.log",
+          "reason": "Generated RT catalog adapter stale after bank regeneration; parent ran normal -Write then -Check PASS before final successful build"
+        }
+      ],
+      "gateBypassed": false
+    },
+    "wav": {
+      "status": "PASS",
+      "passed": 1,
+      "total": 1,
+      "log": "reports/2026-10-19-pond-ambience-wav-tests.log"
+    },
+    "windowsPackagePolicy": {
+      "status": "PASS",
+      "stagedFiles": 5,
+      "admittedWavs": 3,
+      "allAdmittedHashesMatch": true,
+      "cicadaExcluded": true,
+      "identicalRepeatAccepted": true,
+      "differentDisposableStagedAssetRefused": true,
+      "receipt": "reports/2026-10-19-pond-ambience-package-policy.json",
+      "finalStageContainsIntentionalCorruptionForRefusalTest": true
+    },
+    "androidPackageExecution": "NOT RUN; existing runtime WAV include inspected",
+    "diffCheck": "PASS"
+  },
+  "acceptance": {
+    "audioManualRevalidationRequired": true,
+    "reason": "New playable cue/asset and habitat transition",
+    "heard": false,
+    "nightMixAccepted": false,
+    "exactSpeciesVerified": false,
+    "devicePlayback": false,
+    "windowsAppPlayback": false,
+    "performanceMeasured": false,
+    "ordinaryRouteToWaterProven": false
+  },
+  "cicadaAdmitted": false,
+  "protected": {
+    "noSaveFields": true,
+    "noQualityOrLightingChange": true,
+    "noGeometryChangeInAudioSlice": true,
+    "noOwnerDataTouched": true,
+    "noDownloadsOrPaidCalls": true,
+    "noCommitOrPush": true
+  },
+  "sourceFilesSha256": {
+    "src/gameplay/simulation/ForestBirdAmbience.h": "2f3090eab432005dbbc980bcd648ea5ff659c25da15b55df5b2d4452f3cd512a",
+    "src/gameplay/simulation/GameSimulation.cpp": "2b0e48ff91282a86a5939ca80999dbb58124eb2a8267c015f7d75ec77e70ffa4",
+    "src/gameplay/simulation/GameplayEvent.h": "c4d50465d0daa81b099681b6b2cedb241817ff5504bdbbd4c5462a4898a16247",
+    "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java": "37c6feea84ec4a79091a5c9c7d03f18dd0f8955deaccdbbec7d8abe7a894d3f3",
+    "assets/audio/night-ambience/manifest.json": "2c9b775dcbe66706d61e56318c621857a1df2492b03cafeb04c99fe8538441a5",
+    "assets/audio/night-ambience/NOTICE.md": "0ea7722f7437b93523a4f388960c499fdd06990e198bc75593a4f6242642ff11",
+    "tools/horde-night-audio-policy.ps1": "c97a3e49c44b0ce54881430b3b5bb966c0829733c20cf4ad84fbcbfaa68889fd",
+    "tools/prepare-night-ambience.py": "e17115f7da884dbd0263f702aa5f91fb3fa5d5c674c3398d59cdb7f79b470d6d",
+    "tests/ForestBirdAmbienceTests.cpp": "454417c242b02de03e4b73bedf41455fd4ad86d3fafdb05685ce41238e6be7e9",
+    "tests/test_night_ambience_audio.py": "a094b127c108dbfc5ea232fe6cad59da9c11e1574abc9249cd96855fee28f79d"
+  },
+  "hostTestBinarySha256": {
+    "Debug": "24371fdfa89ccee6cf8c2627f6a5f1be0dbfdca165371a7643e85978d7f0751a",
+    "Release": "65ba93830e2cefdc6e4cfd76367b45550baa2971e9d1bae6934affb89ebf8557"
+  },
+  "windowsSharedFileScope": "DiagnosticWindow.cpp only ambience suppression/playback mapping near1908 and2240; parent owns other concurrent capture/renderer integration and final app seal"
+}

@@ -2,15 +2,17 @@
 
 const int kKeeperInstanceMetadataIndex = 25;
 
+#include "rt_regional_water.glsl"
+
 vec3 normalForSurfaceCode(uint code)
 {
     uint normalCode = (code >> 8u) & 0xffu;
-    if (normalCode == 0u) return vec3(0.0, 1.0, 0.0);
-    if (normalCode == 1u) return vec3(0.0, -1.0, 0.0);
-    if (normalCode == 2u) return vec3(1.0, 0.0, 0.0);
-    if (normalCode == 3u) return vec3(-1.0, 0.0, 0.0);
-    if (normalCode == 4u) return vec3(0.0, 0.0, 1.0);
-    if (normalCode == 5u) return vec3(0.0, 0.0, -1.0);
+    if (normalCode < 6u)
+    {
+        uint axis = normalCode / 2u;
+        vec3 unitAxis = vec3(axis == 1u, axis == 0u, axis == 2u);
+        return unitAxis * (1.0 - 2.0 * float(normalCode & 1u));
+    }
     return normalize(vec3(0.46, 0.42, 0.0));
 }
 
@@ -19,18 +21,11 @@ const float kWaterStreamTopY = 2.16;
 const float kWaterStreamBottomScale = 0.70;
 const float kWaterStreamTaperSlope = 0.30 / (kWaterStreamTopY - kWaterStreamBottomY);
 
-float waterStreamScale(float y)
-{
-    return kWaterStreamBottomScale
-        + clamp(y - kWaterStreamBottomY, 0.0,
-                kWaterStreamTopY - kWaterStreamBottomY)
-        * kWaterStreamTaperSlope;
-}
-
 void waterStreamProfile(vec3 p, out float centreZ, out float radiusX,
-                        out float radiusZ)
+                        out float radiusZ, out float scale)
 {
-    float scale = waterStreamScale(p.y);
+    scale = kWaterStreamBottomScale + clamp(p.y - kWaterStreamBottomY,
+        0.0, kWaterStreamTopY - kWaterStreamBottomY) * kWaterStreamTaperSlope;
     float widthScale = controls.waterfallWidthScale;
     centreZ = -15.26;
     radiusX = 0.006;
@@ -69,17 +64,46 @@ vec3 waterBaseNormal(vec3 p, vec3 geometricNormal)
     float centreZ = 0.0;
     float radiusX = 0.0;
     float radiusZ = 0.0;
-    waterStreamProfile(p, centreZ, radiusX, radiusZ);
-    float scale = waterStreamScale(p.y);
+    float scale;
+    waterStreamProfile(p, centreZ, radiusX, radiusZ, scale);
     vec3 radialGradient = vec3((p.x + 2.32) / (radiusX * radiusX),
                                -scale * kWaterStreamTaperSlope,
                                (p.z - centreZ) / (radiusZ * radiusZ));
     return normalize(radialGradient);
 }
 
-vec3 waterSurfaceNormal(vec3 p, vec3 geometricNormal)
+vec3 waterSurfaceNormal(vec3 p, vec3 geometricNormal, int profileIndex)
 {
     vec3 n = waterBaseNormal(p, geometricNormal);
+    if (profileIndex >= 0)
+    {
+        vec4 coordinate;
+        vec3 alongGradient, bankGradient;
+        waterProfileCoordinates(profileIndex, p, coordinate, alongGradient, bankGradient);
+        vec3 gradient;
+        if (coordinate.w > 0.5)
+        {
+            float phase = coordinate.x - coordinate.z * controls.time;
+            // Two small advected height bands with continuous phase warping.
+            // Analytic chain-rule derivatives avoid rigid cross-channel stripes.
+            float warpA = phase * 0.41 + coordinate.y * 0.77;
+            float warpB = phase * 0.73 - coordinate.y * 1.17;
+            float a = phase * 5.1 + coordinate.y * 0.35 + 0.9 * sin(warpA);
+            float b = phase * 12.7 + coordinate.y * 2.9 + 0.65 * sin(warpB);
+            gradient = alongGradient * (0.004 * (5.1 + 0.369 * cos(warpA)) * cos(a)
+                + 0.0015 * (12.7 + 0.4745 * cos(warpB)) * cos(b)) +
+                bankGradient * (0.004 * (0.35 + 0.693 * cos(warpA)) * cos(a)
+                + 0.0015 * (2.9 - 0.7605 * cos(warpB)) * cos(b));
+        }
+        else
+        {
+            float a = dot(p.xz, vec2(2.2, 1.8)) - controls.time * 0.9;
+            float b = dot(p.xz, vec2(-4.1, 3.2)) - controls.time * 0.7;
+            vec2 slope = vec2(2.2, 1.8) * (0.008 * cos(a)) + vec2(-4.1, 3.2) * (0.003 * cos(b));
+            gradient = vec3(slope.x, 0.0, slope.y);
+        }
+        return normalize(n - gradient);
+    }
     bool runoff = abs(n.y) > 0.65;
     vec3 flow = runoff ? vec3(-1.0, 0.0, 0.0) : vec3(0.0, -1.0, 0.0);
     vec3 across = normalize(cross(flow, n));
@@ -118,7 +142,8 @@ bool waterStreamExit(vec3 entryPoint, vec3 insideDirection,
     float centreZ = 0.0;
     float radiusX = 0.0;
     float radiusZ = 0.0;
-    waterStreamProfile(entryPoint, centreZ, radiusX, radiusZ);
+    float entryScale;
+    waterStreamProfile(entryPoint, centreZ, radiusX, radiusZ, entryScale);
 
     // The stream is the exact implicit surface
     //   dx^2/rx^2 + dz^2/rz^2 - scale(y)^2 = 0.
@@ -130,7 +155,8 @@ bool waterStreamExit(vec3 entryPoint, vec3 insideDirection,
     float localZ = insideStart.z - centreZ;
     float inverseRadiusXSquared = 1.0 / (radiusX * radiusX);
     float inverseRadiusZSquared = 1.0 / (radiusZ * radiusZ);
-    float scale = waterStreamScale(insideStart.y);
+    float scale = kWaterStreamBottomScale + clamp(insideStart.y - kWaterStreamBottomY,
+        0.0, kWaterStreamTopY - kWaterStreamBottomY) * kWaterStreamTaperSlope;
     float scaleRate = kWaterStreamTaperSlope * insideDirection.y;
     float a = insideDirection.x * insideDirection.x * inverseRadiusXSquared
             + insideDirection.z * insideDirection.z * inverseRadiusZSquared
@@ -162,7 +188,8 @@ bool waterStreamExit(vec3 entryPoint, vec3 insideDirection,
     }
 
     exitPoint = insideStart + insideDirection * exitDistance;
-    float exitScale = waterStreamScale(exitPoint.y);
+    float exitScale = kWaterStreamBottomScale + clamp(exitPoint.y - kWaterStreamBottomY,
+        0.0, kWaterStreamTopY - kWaterStreamBottomY) * kWaterStreamTaperSlope;
     exitOutwardNormal = normalize(vec3(
         (exitPoint.x + 2.32) * inverseRadiusXSquared,
         -exitScale * kWaterStreamTaperSlope,
@@ -199,7 +226,9 @@ void materialForPrimitive(int primitive,
     {
         material = kMaterialWater;
         geometricNormal = waterBaseNormal(p, vec3(1.0, 0.0, 0.0));
-        normal = waterSurfaceNormal(p, geometricNormal);
+        // Secondary water hits terminate at the geometric interface. Animated
+        // normals belong to the primary water shader, not every hit decode.
+        normal = geometricNormal;
         base = vec3(1.0);
         metallic = 0.0;
         reflectivity = 0.0204;
@@ -354,8 +383,11 @@ void materialForPrimitive(int primitive,
     else if (material == kMaterialWater)
     {
         base = vec3(1.0);
-        geometricNormal = waterBaseNormal(p, geometricNormal);
-        normal = waterSurfaceNormal(p, geometricNormal);
+        int waterProfile = waterProfileIndex(code);
+        geometricNormal = waterProfile >= 0
+            ? rtWaterContactRipple.surfaces[waterProfile].normalKind.xyz
+            : waterBaseNormal(p, geometricNormal);
+        normal = geometricNormal;
         metallic = 0.0;
         reflectivity = 0.0204;
     }

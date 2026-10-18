@@ -1,6 +1,7 @@
 #include "gameplay/simulation/DevelopmentWorldRoute.h"
 #include "gameplay/simulation/ForestTreePlacementContract.h"
 #include "scene/ForestDressing.h"
+#include "scene/CorridorRegionalWaterClosure.h"
 #include "scene/ForestUnderstory.h"
 #include "scene/ForestRockDressing.h"
 #include "scene/ForestDeadwood.h"
@@ -17,6 +18,7 @@
 
 #include <algorithm>
 #include <array>
+#include <bit>
 #include <cmath>
 #include <cstring>
 #include <chrono>
@@ -536,6 +538,41 @@ void TestNativeChapterPrimitiveOwnership()
     Check(completeReady,
           "real combined chapter static route initializes");
     if (!completeReady) return;
+    {
+        // Mirror normal admission's selection against the ACTUAL native packed
+        // forest owner. No rounded report envelope or asset-name bounds certify
+        // the omitted triangle list. This remains host geometry, not GPU proof.
+        std::size_t omittedCount=0;bool exterior=true,bitExact=true;
+        DetailBox omitted{{INFINITY,INFINITY,INFINITY},{-INFINITY,-INFINITY,-INFINITY}};
+        const auto& registryOwner=complete.InstanceMetadata()[21];
+        for(std::size_t p=0;p<registryOwner.primitiveCount;++p) {
+            const auto& original=owner.primitives[p];
+            const auto& name=owner.materials[original.materialIndex].name;
+            if(name!="ForestBark" && name!="ForestPine" && name!="ForestMoss" && name!="ForestAlder")continue;
+            const auto& primitive=complete.PrimitiveMetadata()[registryOwner.primitiveBase+p];
+            for(std::size_t n=0;n<primitive.indexCount;n+=3) {
+                bool selected=true;
+                for(std::size_t k=0;k<3;++k)
+                    selected=selected&&complete.Vertices()[primitive.vertexOffset+complete.Indices()[primitive.indexOffset+n+k]].position[2]>24.f;
+                if(!selected)continue;
+                ++omittedCount;
+                exterior=exterior&&complete.TriangleRegions()[(primitive.indexOffset+n)/3]==StaticTriangleRegion::ExteriorDressing;
+                for(std::size_t k=0;k<3;++k) {
+                    const auto& v=complete.Vertices()[primitive.vertexOffset+complete.Indices()[primitive.indexOffset+n+k]].position;
+                    const auto& source=owner.vertices[original.vertexOffset+owner.indices[original.indexOffset+n+k]].position;
+                    for(std::size_t axis=0;axis<3;++axis) {
+                        bitExact=bitExact&&std::bit_cast<std::uint32_t>(v[axis])==std::bit_cast<std::uint32_t>(source[axis]);
+                        omitted.min[axis]=std::min(omitted.min[axis],double(v[axis]));
+                        omitted.max[axis]=std::max(omitted.max[axis],double(v[axis]));
+                    }
+                }
+            }
+        }
+        Check(omittedCount==84219 && exterior && bitExact,
+              "actual ordinary omission roster retains all 84219 exterior-only registry triangles and float-bit source identities");
+        Check(DetailRegionalWaterQueriesSeparated(omitted,ChapterRegionalWaterTriangles()),
+              "actual packed omission bounds preserve old opaque/source-prism proof plus regional water bounded-query closure");
+    }
     {
         auto unclassified = owner;
         unclassified.triangleRegions.clear();

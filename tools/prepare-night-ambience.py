@@ -25,8 +25,9 @@ SOURCES = [
          title="Nature sounds ambience in a Dordogne pond", creator="Glaneur de sons",
          page="https://commons.wikimedia.org/wiki/File:Nature_sounds_ambience_in_a_Dordogne_pond.ogg",
          license="CC-BY-3.0", licenseUrl="https://creativecommons.org/licenses/by/3.0/",
-         metadata="Mixed frogs/crickets at dusk, Dordogne, 2007-05-02. Exact species unspecified. No exterior water footprint exists in current runtime.",
-         start=2, seconds=8, gainDb=-12, admitted=False),
+         metadata="Mixed frogs/crickets at dusk, Dordogne, 2007-05-02. Exact species unspecified.",
+         runtimePolicy="Finite cue only within 18m Euclidean distance of actual ChapterRegionalWater faces, in ready same-night grounded exterior without dialogue/pause; mix/listening pending.",
+         start=2, seconds=8, gainDb=-12, admitted=True),
     dict(key="periodical_cicada", source="periodical-cicada.oga", sha256="3a0cf77a2f6034e602d61da75b180838cd1a68c998c5a4fe026479312012262a",
          title="Calling song of Magicicada septendecim - Audio S1, pone.0000892", creator="Kathryn M. Fontaine, John R. Cooley, Chris Simon",
          page="https://commons.wikimedia.org/wiki/File:Calling_song_of_Magicicada_septendecim_-_pone.0000892.s001.oga",
@@ -68,7 +69,9 @@ def prepare(source_directory, output_directory):
         record['sourceSha256']=record.pop('sha256')
         records.append(record)
     (output_directory/'manifest.json').write_text(json.dumps(dict(schema=1, assets=records),indent=2)+'\n',encoding='utf-8')
-    notice=['# Nature audio attribution', '', 'All four derivatives are prepared candidates; only runtime/ is packaged.',
+    notice=['# Nature audio attribution', '', 'All four recordings remain unheard here; only runtime/ is packaged.',
+            'The pond cut is admitted only beside actual shared regional water surfaces;',
+            'the periodical cicada remains excluded. Native mix/listening acceptance is pending.',
             'Cricket derivative remains CC BY-SA 4.0. No endorsement is implied.', '']
     for record in records:
         notice.extend([record['title']+' — '+record['creator'],record['page'],record['license']+' '+record['licenseUrl'],

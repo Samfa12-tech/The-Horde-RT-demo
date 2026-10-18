@@ -295,8 +295,12 @@ function Invoke-ComputeVariantCompilation
     }
     else
     {
-        @('--eliminate-dead-functions', '--eliminate-dead-code-aggressive',
-          '--simplify-instructions', '--eliminate-dead-branches', '--cfg-cleanup',
+        # Match the function-retaining raygen cleanup; never inline traversal.
+        @('--eliminate-dead-functions', '--eliminate-local-single-block',
+          '--eliminate-local-single-store', '--eliminate-local-multi-store',
+          '--eliminate-dead-code-aggressive', '--simplify-instructions', '--if-conversion',
+          '--ccp', '--eliminate-dead-branches', '--eliminate-dead-code-aggressive',
+          '--cfg-cleanup', '--merge-blocks',
           '<input>', '-o', '<output>')
     }
     $optimizerArguments = @($optimizerMetadata)

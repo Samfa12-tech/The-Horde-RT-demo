@@ -385,12 +385,13 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
     UpdateChapterDialogue(input,dialogueDeltaSeconds);
     RefreshSnapshot(input);
     if(dialogueDeltaSeconds>0) {
-        const auto bird=forestBird_.Step(ForestBirdAmbience::Eligible(snapshot_));
+        const auto bird=forestBird_.Step(snapshot_);
         // Preserve a centred ambient
         // source/listener tuple rather than invent a perched gameplay actor.
         if(bird!=ForestBirdAmbience::Cue::None)
             Emit(bird==ForestBirdAmbience::Cue::Play?GameplayEventType::ForestBird:
-                 bird==ForestBirdAmbience::Cue::PlayCrickets?GameplayEventType::ForestCrickets:GameplayEventType::ForestBirdStopped,
+                 bird==ForestBirdAmbience::Cue::PlayCrickets?GameplayEventType::ForestCrickets:
+                 bird==ForestBirdAmbience::Cue::PlayPondFrogs?GameplayEventType::PondFrogs:GameplayEventType::ForestBirdStopped,
                 EntityId::Invalid,EntityId::Invalid,playerX_,playerZ_,1.f,0,playerSupport_.worldY);
     }
     if(fixedDeltaSeconds>0 && !input.paused)LatchCampaignBoundary();

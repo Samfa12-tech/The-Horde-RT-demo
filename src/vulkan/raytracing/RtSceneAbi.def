@@ -147,6 +147,18 @@
       ]
     },
     {
+      "name": "RtWaterSurfaceGpu", "alignment": 16, "size": 112,
+      "fields": [
+        { "name": "aAlong", "type": "float4", "offset": 0, "comment": "Triangle vertex XYZ and continuous downstream distance in metres." },
+        { "name": "bAlong", "type": "float4", "offset": 16 },
+        { "name": "cAlong", "type": "float4", "offset": 32 },
+        { "name": "aFlow", "type": "float4", "offset": 48, "comment": "Per-vertex downstream XZ direction, signed bank coordinate metres, speed metres/second." },
+        { "name": "bFlow", "type": "float4", "offset": 64 },
+        { "name": "cFlow", "type": "float4", "offset": 80 },
+        { "name": "normalKind", "type": "float4", "offset": 96, "comment": "Exact triangle normal XYZ; w=0 standing water, w=1 channel. No actor-specific shading." }
+      ]
+    },
+    {
       "name": "RtQualityControlsGpu", "alignment": 16, "size": 16,
       "fields": [
         { "name": "controls", "type": "uint4", "offset": 0, "comment": "shadow mode and resolved primary samples; flags bit0 mistDisabled, bits1-2 Dust Off0/Low1/Standard2, other bits zero. Fixed dust arrays follow this 16-byte header at binding26." }

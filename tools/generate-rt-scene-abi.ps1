@@ -283,6 +283,10 @@ layout(std430, set = 0, binding = $($b.qualityControls)) readonly buffer RtQuali
 layout(std430, set = 0, binding = $($b.waterContactRipple)) readonly buffer RtWaterContactRippleBuffer
 {
     vec4 value;
+    // Preserve the original ripple prefix. Immutable authored water profiles
+    // follow it; per-frame writes touch only the first 16 bytes.
+    uvec4 surfaceMetadata;
+    RtWaterSurfaceGpu surfaces[42];
 } rtWaterContactRipple;
 #if !defined(HORDE_RT_VARIANT_INSTRUMENTATION) || HORDE_RT_VARIANT_INSTRUMENTATION == 1
 layout(std430, set = 0, binding = $($b.dielectricDiagnostics)) restrict buffer RtDielectricDiagnosticsBuffer

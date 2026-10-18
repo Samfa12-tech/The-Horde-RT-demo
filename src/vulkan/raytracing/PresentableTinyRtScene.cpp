@@ -42,6 +42,7 @@
 #include "vulkan/raytracing/RtLanternGeometryProfile.h"
 #include "vulkan/raytracing/TlasInstanceRefresh.h"
 #include "vulkan/raytracing/WaterContactRenderGeometry.h"
+#include "vulkan/raytracing/RegionalWaterRenderData.h"
 
 #include <algorithm>
 #include <array>
@@ -792,6 +793,8 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     developmentSupportFixture_ = std::exchange(other.developmentSupportFixture_, false);
     developmentWorldRoute_=std::exchange(other.developmentWorldRoute_,false);
     developmentRescueJourney_=std::exchange(other.developmentRescueJourney_,false);
+    regionalWaterDiagnosticEnabled_=std::exchange(other.regionalWaterDiagnosticEnabled_,true);
+    regionalWaterFaces_=std::move(other.regionalWaterFaces_);
     rescueWorldUpdateScratch_=std::exchange(other.rescueWorldUpdateScratch_,Buffer{});
     rescueWorldVertices_=std::move(other.rescueWorldVertices_);
     rescueWorldSurfaceCodes_=std::move(other.rescueWorldSurfaceCodes_);
@@ -1212,6 +1215,7 @@ void PresentableTinyRtScene::Destroy()
     DestroyBuffer(waterDropletBlasUpdateScratch_);
     rescueWorldVertices_.clear();
     rescueWorldSurfaceCodes_.clear();
+    regionalWaterFaces_.clear();
     finaleRoofSurfaceBase_=0; finaleRoofSurfaceCount_=0;
     characterSlot_.DestroyGpuResources(gpuResources_);
     chapterActor_ = {};
@@ -3310,7 +3314,7 @@ bool PresentableTinyRtScene::BuildPreviewAccelerationStructures(std::string& dia
     const auto initialQuality = *ResolveRtQualityControls(std::nullopt, RtWorkloadPreset::Authored,
         pipelineBundle_.Request().quality == DielectricQuality::High);
     const QualityDustUpload initialDustQuality{initialQuality,{}};
-    const WaterContactRippleGpu initialWaterContactRipple{};
+    const auto initialWaterContactRipple = MakeRegionalWaterRenderData(false);
     if (!upload(vertices.data(), vertices.size() * sizeof(Vertex), geometryUsage, true, "preview world vertices", vertexBuffer_) ||
         !upload(indices.data(), indices.size() * sizeof(std::uint32_t), geometryUsage, true, "preview world indices", indexBuffer_) ||
         !upload(surfaceCodes.data(), surfaceCodes.size() * sizeof(std::uint32_t), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, false,
@@ -3520,6 +3524,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         SurfaceForward = 4u,
         SurfaceBack = 5u,
         SurfaceGalleryCant = 6u,
+        SurfaceAuthoredWater = 7u,
     };
     const auto surfaceCode = [this](SurfaceMaterial material, SurfaceNormal normal, std::uint32_t authoredIndexPlusOne = 0u) {
         const auto materialId = static_cast<std::uint32_t>(material);
@@ -4124,7 +4129,6 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
                  SurfaceMirror, SurfaceRight);
 
     if(developmentRescueJourney_) {
-        rescueRopeVertexOffset_=vertices.size();
         ordinaryStaticFacesVerified_=horde::scene::corridor_detail_faces::MatchesAll(
             std::span<const Vertex>(vertices),std::span<const std::uint32_t>(indices),
             std::span<const std::uint32_t>(worldSurfaceCodes),indices.size()/3u,vertices.size(),true);
@@ -4133,6 +4137,35 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         // its own source domain before it can share this certificate.
         ordinaryStaticFacesVerified_ &= std::none_of(worldSurfaceCodes.begin(),worldSurfaceCodes.end(),
             [](auto code){return (code&0xffu)==SurfaceClearGlass;});
+        // Append after the immutable corridor certificate, retaining all of its
+        // triangle identities. Geometry and shader profiles share this order.
+        const auto& regionalWater = horde::scene::ChapterRegionalWaterTriangles();
+        const auto regionalFirstIndex = indices.size();
+        regionalWaterFaces_.clear();
+        for (std::size_t i = 0; regionalWaterDiagnosticEnabled_ && i < regionalWater.size(); ++i) {
+            const auto& triangle = regionalWater[i];
+            addTriangle(Vertex{{triangle[0][0],triangle[0][1],triangle[0][2]}},
+                        Vertex{{triangle[1][0],triangle[1][1],triangle[1][2]}},
+                        Vertex{{triangle[2][0],triangle[2][1],triangle[2][2]}});
+            worldSurfaceCodes.push_back(surfaceCode(SurfaceWater,SurfaceAuthoredWater,
+                                                    static_cast<std::uint32_t>(i+1u)));
+        }
+        // Certify the actual appended BLAS inputs, including order and codes;
+        // the closure guard must not validate a separate canonical constant.
+        for (std::size_t i = regionalFirstIndex; i < indices.size(); i += 3u) {
+            horde::scene::ChapterWaterTriangle actual{};
+            for (std::size_t corner = 0; corner < 3u; ++corner) {
+                const auto& vertex = vertices[indices[i+corner]];
+                actual[corner] = {vertex.position[0],vertex.position[1],vertex.position[2]};
+            }
+            if (worldSurfaceCodes[i/3u] != surfaceCode(SurfaceWater,SurfaceAuthoredWater,
+                    static_cast<std::uint32_t>((i-regionalFirstIndex)/3u+1u))) {
+                diagnostic = "Regional water BLAS metadata does not match its immutable profile.";
+                return false;
+            }
+            regionalWaterFaces_.push_back(actual);
+        }
+        rescueRopeVertexOffset_=vertices.size();
         horde::gameplay::traversal::RescueTraversal initial;
         const auto rope=horde::scene::RescueRopeTriangleVertices(initial.Snapshot());
         for(std::size_t i=0;i<rope.size();i+=3) {
@@ -4340,7 +4373,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
                       uploadMemory, false, fireEmitterBuffer_, diagnostic) ||
         !CreateBuffer(sizeof(QualityDustUpload), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
                       uploadMemory, false, qualityControlsBuffer_, diagnostic) ||
-        !CreateBuffer(sizeof(WaterContactRippleGpu), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+        !CreateBuffer(sizeof(RegionalWaterRenderData), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
                       uploadMemory, false, waterContactRippleBuffer_, diagnostic) ||
         !CreateBuffer(worldSurfaceBufferSize, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
                       uploadMemory, false, worldSurfaceBuffer_, diagnostic, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT))
@@ -4351,7 +4384,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     const auto initialQuality = *ResolveRtQualityControls(std::nullopt, RtWorkloadPreset::Authored,
         pipelineBundle_.Request().quality == DielectricQuality::High);
     const QualityDustUpload initialDustQuality{initialQuality,{}};
-    const WaterContactRippleGpu initialWaterContactRipple{};
+    const auto initialWaterContactRipple = MakeRegionalWaterRenderData(developmentRescueJourney_ && regionalWaterDiagnosticEnabled_);
     const RtHeldLightGpu initialHeldLight{};
     const std::array<RtFireEmitterGpu, kRtFireEmitterCapacity> initialFireEmitters{};
     if (!gpuResources_.MapBufferForHostWrites(heldLightBuffer_, diagnostic) ||

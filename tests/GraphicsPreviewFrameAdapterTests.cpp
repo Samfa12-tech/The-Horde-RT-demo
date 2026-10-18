@@ -1,4 +1,7 @@
 #include "vulkan/raytracing/SimulationFrameAdapter.h"
+#include "vulkan/raytracing/EnvironmentSurveyFrame.h"
+#include "vulkan/raytracing/PlayerRenderSlot.h"
+#include "gameplay/simulation/GameSimulation.h"
 
 #include <algorithm>
 #include <array>
@@ -130,5 +133,132 @@ int main()
     check(entry.ReadyToPlay() && black.outputExposure==0 &&
           game.tickIndex==417 && game.playerX==.31f,
           "Play reaches explicit black presentation without advancing paused gameplay");
+    // Reproduce the first hidden survey failure through the ordinary fresh
+    // production snapshot; no pose/checkpoint import or simulation advancement.
+    using namespace horde::gameplay::items;
+    auto config=horde::gameplay::simulation::ProductionGameSimulationConfig();
+    config.developmentRescueJourney=true;
+    horde::gameplay::simulation::GameSimulation simulation(config);
+    const auto frozen=simulation.Snapshot();
+    auto surveySource=BuildRtSceneFrameInputs(frozen,.62f,WaterQuality::High);
+    const auto leftGripFor=[](const RtSceneFrameInputs& f) {
+        const float y=std::clamp(f.cameraPitch,-.32f,.28f)-.05f;
+        const float inv=1.f/std::sqrt(1.f+y*y),sy=std::sin(f.cameraYaw),cy=std::cos(f.cameraYaw);
+        const std::array<float,3> right{cy,0,sy},up{-sy*y*inv,inv,cy*y*inv},forward{sy*inv,y*inv,-cy*inv};
+        auto out=IdentityHeldItemTransform();
+        const auto& k=f.heldItemKinematics;
+        const std::array<std::array<float,3>,3> local{k.leftGripXInView,k.leftGripYInView,k.leftGripZInView};
+        for(unsigned axis=0;axis<3;++axis)for(unsigned row=0;row<3;++row)
+            out[axis*4+row]=right[row]*local[axis][0]+up[row]*local[axis][1]+forward[row]*local[axis][2];
+        for(unsigned row=0;row<3;++row)
+            out[12+row]=right[row]*k.leftHandLocal[0]+up[row]*k.leftHandLocal[1]+forward[row]*k.leftHandLocal[2];
+        out[12]+=f.cameraX;
+        out[13]+=horde::gameplay::simulation::PlayerEyeWorldY(f.playerSupportWorldY)-f.playerCrouchDropMetres;
+        out[14]+=f.cameraZ;return out;
+    };
+    const auto gripError=[&](const RtSceneFrameInputs& f) {
+        HeldItemTransform visual{};std::string error;
+        if(!ComposeWorldFromItem(leftGripFor(f),PlayerRagTorchGripSocketTransform(),visual,error))return 1000000.f;
+        auto rendered=f.heldItems[0];rendered.worldFromItem=visual;
+        return MeasurePlayerGripAgreement(f.heldItems[0],rendered).positionErrorMetres;
+    };
+    check(gripError(surveySource)<.001f,"fresh ordinary production frame has coherent held torch Grip");
+    const EnvironmentSurveyPose pose{136.3f,131.2f,-24.4464f,3.14159265f,-.1368f,.5f};
+    auto oldBroken=surveySource;oldBroken.cameraX=pose.x;oldBroken.cameraZ=pose.z;
+    oldBroken.cameraYaw=pose.yaw;oldBroken.cameraPitch=pose.pitch;oldBroken.playerSupportWorldY=pose.supportY;
+    check(gripError(oldBroken)>100.f,"camera-only survey override reproduces actual distant held Grip failure");
+    std::string rebaseError;
+    auto survey=surveySource;
+    check(RebaseEnvironmentSurveyFrame(survey,pose,rebaseError) && rebaseError.empty(),"coherent render-only survey frame is admitted");
+    check(gripError(survey)<.001f,"rebase preserves ordinary final held Grip tolerance at nonzero yaw/pitch and distant support");
+    const auto rigidError=MeasureTransformAgreement(
+        MultiplyHeldItemTransforms(survey.heldItems[0].worldFromItem,PlayerRagTorchLightSocketTransform()),
+        survey.heldLight.worldFromLight);
+    check(rigidError.positionErrorMetres<.001f && rigidError.orientationErrorRadians<.002f,
+          "held light remains on the same real item socket after rebase");
+    check(survey.playerAnimation==surveySource.playerAnimation &&
+          survey.heldItemKinematics.leftHandLocal==surveySource.heldItemKinematics.leftHandLocal &&
+          survey.heldItemKinematics.leftGripXInView==surveySource.heldItemKinematics.leftGripXInView &&
+          survey.tickIndex==frozen.tickIndex && survey.chestReward==frozen.chestReward &&
+          survey.rescue.firstAscentCompleted==frozen.rescue.firstAscentCompleted &&
+          survey.lich.x==surveySource.lich.x && survey.lich.z==surveySource.lich.z &&
+          simulation.Snapshot().playerX==frozen.playerX && simulation.Snapshot().playerZ==frozen.playerZ &&
+          simulation.Snapshot().tickIndex==frozen.tickIndex && simulation.Snapshot().heldItems[0].worldFromItem==frozen.heldItems[0].worldFromItem,
+          "survey changes render inputs only, retaining local IK and all frozen simulation/progression");
+    // Body stow uses the body yaw/height frame, not the camera's pitched frame.
+    const auto sourceSword=surveySource.heldItems[1].worldFromItem;
+    check(surveySource.heldItems[1].parentMode==HeldItemParentMode::BodyStow &&
+          std::abs(survey.heldItems[1].worldFromItem[13]-sourceSword[13]-(pose.supportY-surveySource.playerSupportWorldY))<.001f,
+          "stowed sword follows grounded body height without camera pitch rotation");
+    auto roundTrip=survey;
+    check(RebaseEnvironmentSurveyFrame(roundTrip,{surveySource.cameraX,surveySource.cameraZ,
+          surveySource.playerSupportWorldY,surveySource.cameraYaw,surveySource.cameraPitch,surveySource.walkTime},rebaseError) &&
+          MeasureTransformAgreement(roundTrip.heldItems[0].worldFromItem,surveySource.heldItems[0].worldFromItem).positionErrorMetres<.001f,
+          "render-only rigid rebase round trip does not accumulate an item offset");
+    auto emitters=surveySource;emitters.fireEmitterCount=2;
+    emitters.fireEmitters[0].parentObject=horde::gameplay::effects::FireEmitterParentObject::OriginalTorch;
+    emitters.fireEmitters[0].worldFromFlame=emitters.heldLight.worldFromFlame;
+    emitters.fireEmitters[0].worldFromLight=emitters.heldLight.worldFromLight;
+    emitters.fireEmitters[0].previousPivotPosition={1,2,3};
+    emitters.fireEmitters[0].previousPivotVelocity={.2f,.3f,.4f};
+    emitters.fireEmitters[0].leanX=.1f;emitters.fireEmitters[0].leanZ=-.1f;
+    emitters.fireEmitters[1].parentObject=horde::gameplay::effects::FireEmitterParentObject::WorldObject;
+    emitters.fireEmitters[1].worldFromFlame[12]=29;
+    const auto worldFire=emitters.fireEmitters[1];
+    check(RebaseEnvironmentSurveyFrame(emitters,pose,rebaseError) &&
+          MeasureTransformAgreement(emitters.fireEmitters[0].worldFromLight,emitters.heldLight.worldFromLight).positionErrorMetres<.001f &&
+          emitters.fireEmitters[0].previousPivotPosition!=std::array<float,3>{1,2,3} &&
+          emitters.fireEmitters[0].leanX==.1f && emitters.fireEmitters[0].leanZ==-.1f &&
+          emitters.fireEmitters[1].worldFromFlame==worldFire.worldFromFlame &&
+          emitters.fireEmitters[1].worldFromLight==worldFire.worldFromLight,
+          "only attached player fire transforms/history rebase; local lean and world lights remain fixed");
+    auto dropped=surveySource;dropped.heldItems[0].parentMode=HeldItemParentMode::AuthoredWorldTrajectory;
+    dropped.heldItems[0].detached=true;dropped.fireEmitterCount=1;
+    dropped.fireEmitters[0].parentObject=horde::gameplay::effects::FireEmitterParentObject::OriginalTorch;
+    const auto droppedBefore=dropped;
+    check(RebaseEnvironmentSurveyFrame(dropped,pose,rebaseError) &&
+          dropped.heldItems[0].worldFromItem==droppedBefore.heldItems[0].worldFromItem &&
+          dropped.heldItems[0].worldFromDetach==droppedBefore.heldItems[0].worldFromDetach &&
+          dropped.heldLight.worldFromLight==droppedBefore.heldLight.worldFromLight &&
+          dropped.fireEmitters[0].worldFromFlame==droppedBefore.fireEmitters[0].worldFromFlame &&
+          dropped.torchFailure.droppedX==droppedBefore.torchFailure.droppedX,
+          "detached torch trajectory and its world light remain at actual world position");
+    auto lantern=surveySource;
+    lantern.heldItems[0].id=HeldItemId::RewardLantern;
+    lantern.rewardLanternWorldFromHinge=lantern.heldItems[0].worldFromItem;
+    lantern.lanternPendulum.worldFromBody=lantern.rewardLanternWorldFromHinge;
+    lantern.lanternPendulum.worldFromBody[13]-=.4f;
+    lantern.lanternPendulum.previousPivotPosition={1,2,3};
+    lantern.lanternPendulum.previousHandForward={0,0,1};
+    lantern.fireEmitterCount=1;
+    lantern.fireEmitters[0].parentObject=horde::gameplay::effects::FireEmitterParentObject::RewardLantern;
+    lantern.fireEmitters[0].worldFromLight=lantern.heldLight.worldFromLight;
+    check(RebaseEnvironmentSurveyFrame(lantern,pose,rebaseError) &&
+          MeasureTransformAgreement(lantern.rewardLanternWorldFromHinge,lantern.heldItems[0].worldFromItem).positionErrorMetres<.001f &&
+          std::abs(std::hypot(std::hypot(lantern.lanternPendulum.worldFromBody[12]-lantern.rewardLanternWorldFromHinge[12],
+              lantern.lanternPendulum.worldFromBody[13]-lantern.rewardLanternWorldFromHinge[13]),
+              lantern.lanternPendulum.worldFromBody[14]-lantern.rewardLanternWorldFromHinge[14])-.4f)<.001f &&
+          MeasureTransformAgreement(lantern.fireEmitters[0].worldFromLight,lantern.heldLight.worldFromLight).positionErrorMetres<.001f,
+          "carried lantern hinge, pendulum body and matching emitter share one rigid render rebase");
+    auto corrupt=surveySource;corrupt.fireEmitterCount=1;
+    corrupt.fireEmitters[0].previousPivotVelocity[0]=std::numeric_limits<float>::quiet_NaN();
+    const auto corruptBefore=corrupt;
+    check(!RebaseEnvironmentSurveyFrame(corrupt,pose,rebaseError) &&
+          corrupt.heldItems[0].worldFromItem==corruptBefore.heldItems[0].worldFromItem &&
+          corrupt.cameraX==corruptBefore.cameraX,
+          "late nonfinite attached fire history rejects without partially rebasing earlier fields");
+    for(unsigned badCase=0;badCase<5;++badCase) {
+        auto invalid=surveySource;auto badPose=pose;
+        if(badCase==0)badPose.pitch=-.698f;
+        if(badCase==1)badPose.x=std::numeric_limits<float>::quiet_NaN();
+        if(badCase==2)invalid.walkAmount=.2f;
+        if(badCase==3)invalid.rescue.phase=horde::gameplay::traversal::Phase::Ascent;
+        if(badCase==4)invalid.heldItems[1].visualStowBlend=.5f;
+        const auto before=invalid;
+        check(!RebaseEnvironmentSurveyFrame(invalid,badPose,rebaseError) && !rebaseError.empty() &&
+              invalid.cameraX==before.cameraX && invalid.heldItems[0].worldFromItem==before.heldItems[0].worldFromItem &&
+              invalid.playerAnimation==before.playerAnimation && invalid.tickIndex==before.tickIndex,
+              "invalid or unsettled survey request rejects without frame mutation");
+    }
     return passed ? 0 : 1;
 }

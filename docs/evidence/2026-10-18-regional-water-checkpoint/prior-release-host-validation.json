@@ -1,0 +1,160 @@
+{
+  "recordedAtUtc": "2026-10-18T06:10:16.778480+00:00",
+  "status": "PASS",
+  "scope": "Release ABI/generated layout, exact pipeline/compute selector metadata and frozen artifact ownership; CPU/tooling only, no shader recompile or RT/device/performance acceptance.",
+  "ctest": {
+    "configuration": "Release",
+    "passed": 14,
+    "failed": 0,
+    "seconds": 82.81,
+    "parallelJobs": 2,
+    "perTestTimeoutSeconds": 300,
+    "tests": [
+      {
+        "test": "horde_rt_provider_diagnostic_mobile_fixture_evidence",
+        "status": "PASS",
+        "seconds": 42.85
+      },
+      {
+        "test": "horde_rt_provider_diagnostic_high_fixture_evidence",
+        "status": "PASS",
+        "seconds": 43.03
+      },
+      {
+        "test": "horde_rt_provider_shipping_high_fixture_evidence",
+        "status": "PASS",
+        "seconds": 33.83
+      },
+      {
+        "test": "horde_rt_provider_shipping_mobile_fixture_evidence",
+        "status": "PASS",
+        "seconds": 33.77
+      },
+      {
+        "test": "horde_rt_scene_abi_generator_tests",
+        "status": "PASS",
+        "seconds": 1.59
+      },
+      {
+        "test": "horde_rt_pipeline_variant_provider_tests",
+        "status": "PASS",
+        "seconds": 1.54
+      },
+      {
+        "test": "horde_rt_raygen_artifact_ownership_tests",
+        "status": "PASS",
+        "seconds": 1.66
+      },
+      {
+        "test": "horde_rt_pipeline_bundle_contracts_tests",
+        "status": "PASS",
+        "seconds": 1.66
+      },
+      {
+        "test": "horde_rt_provider_shipping_mobile_fixture",
+        "status": "PASS",
+        "seconds": 0.04
+      },
+      {
+        "test": "horde_rt_provider_shipping_high_fixture",
+        "status": "PASS",
+        "seconds": 0.03
+      },
+      {
+        "test": "horde_rt_provider_diagnostic_high_fixture",
+        "status": "PASS",
+        "seconds": 0.03
+      },
+      {
+        "test": "horde_rt_provider_diagnostic_mobile_fixture",
+        "status": "PASS",
+        "seconds": 1.39
+      },
+      {
+        "test": "horde_rt_pipeline_variants_tests",
+        "status": "PASS",
+        "seconds": 2.72
+      },
+      {
+        "test": "horde_rt_scene_abi_tests",
+        "status": "PASS",
+        "seconds": 1.35
+      }
+    ]
+  },
+  "checks": {
+    "pipelineCatalogGeneratorCheck": "PASS",
+    "all16FrozenVariantIdentity": "PASS: raw SPIR-V/magic/counts, canonical include/dependency hashes and generated metadata",
+    "abiCatalogFilesUnchangedByChecks": "PASS"
+  },
+  "evidence": [
+    {
+      "path": "reports/regional-water-final-abi-selector-release-build.log",
+      "bytes": 6276,
+      "sha256": "94d9856f8b579b24bcc3f6b0606139dca81ae964c92cf075bda2a00364deb982"
+    },
+    {
+      "path": "reports/regional-water-final-abi-selector-release-ctest.log",
+      "bytes": 2559,
+      "sha256": "4a34c8c7d4f4f918b920fb7f256a205c372b324a3d5eee04d2358cce9b363093"
+    },
+    {
+      "path": "reports/regional-water-final-catalog-check.log",
+      "bytes": 42,
+      "sha256": "7ad4629a61d1463cefde8a750dcf8a06e758943016b13e879fe398ed4d7548ce"
+    },
+    {
+      "path": "reports/regional-water-final-abi-catalog-hashes.json",
+      "bytes": 5496,
+      "sha256": "058be73d20117ab6087335aed20074ed85d18d4bd1706c841ee54969fd3a679d"
+    }
+  ],
+  "frozenIdentities": [
+    {
+      "path": "src/vulkan/raytracing/RtSceneAbi.def",
+      "bytes": 10334,
+      "sha256": "2226f3deaaf17ad4f3031b6c148cea3ef396eb21f90ed1156348ba3a5fcf4e0a"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtSceneAbi.generated.h",
+      "bytes": 16339,
+      "sha256": "e7f3a672fba1b59fecabcc70605f596228cef2df6d0928f896e1a36c57b4b59c"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_scene_abi.generated.glsl",
+      "bytes": 7849,
+      "sha256": "f4ef574a36e0c83533092b4b0769eb40fa9b7b09fbcebc4e071185876a73e943"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtPipelineVariantCatalog.generated.h",
+      "bytes": 4575,
+      "sha256": "e201e5b063df504d1c78688de31bc29269247b0ba4337628228fd2d8d5af2320"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtRayQueryVariantCatalog.generated.h",
+      "bytes": 4820,
+      "sha256": "afe60047dbfcf74187c0650f101c8c492bb7ecba5212a0825ebd6a0c17fae14a"
+    },
+    {
+      "path": "tools/raygen-variant-catalog.json",
+      "bytes": 39062,
+      "sha256": "a9984295aa6df5a74200d57d50d4e2a5415bf088391403722b5f3abb1c5a2673"
+    },
+    {
+      "path": "tools/rayquery-variant-catalog.json",
+      "bytes": 43742,
+      "sha256": "a5bb5898c41336e2a02290eeeb31b2e3e08370826d6db3e1c5fa626d6ed3c8e1"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_regional_water_bounds.generated.glsl",
+      "bytes": 673,
+      "sha256": "8f4f269c1c3704f01ff19d4e3d79b7d8c082b76d6fd4e634df26500c0a7a8970"
+    }
+  ],
+  "exclusions": [
+    "RaygenVariantManifestTests, RaygenVariantArtifactTests and compute generator -Check recompile SPIR-V, so were not repeated. Root owns already completed full 16-bank compiler/budget evidence.",
+    "No Windows application or Android build/device work in this lane.",
+    "No terrain/source/test edits or owner-data changes."
+  ],
+  "failures": []
+}

@@ -2,6 +2,7 @@
 #include "vulkan/raytracing/TlasInstanceRefresh.h"
 #include "scene/assets/StaticTriangleSelection.h"
 #include "scene/CorridorStaticDetail.h"
+#include "scene/CorridorRegionalWaterClosure.h"
 #include "gameplay/simulation/GameSimulation.h"
 #include <algorithm>
 #include <chrono>
@@ -44,6 +45,10 @@ void PresentableTinyRtScene::AdmitOrdinaryStaticDetail()
         }
     }
     if(ids.size()!=84219 || !horde::scene::DetailForestReceiverEnvelopeBlocked(bounds))return;
+    // New water-origin bounded queries cannot reach the actual omitted forest.
+    // Existing source-prism coverage still owns primary/reverse local-light rays.
+    if(regionalWaterDiagnosticEnabled_ && !horde::scene::DetailRegionalWaterQueriesSeparated(
+        bounds,regionalWaterFaces_))return;
     // Enclose the actual admitted panes around their body origin. All other
     // transmission owners stay loaded. Refuse a changed lantern geometry or
     // attachment rather than assuming an old master still bounds its queries.

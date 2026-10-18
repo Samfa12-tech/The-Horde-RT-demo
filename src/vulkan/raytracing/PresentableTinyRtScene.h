@@ -23,6 +23,7 @@
 #include "vulkan/raytracing/RtGpuWorkLease.h"
 #include "scene/atmosphere/IndoorDust.h"
 #include "scene/DevelopmentWorldGeometry.h"
+#include "scene/ChapterRegionalWater.h"
 #include "gameplay/simulation/TriangleSupportSurface.h"
 #include "gameplay/traversal/RescueTraversal.h"
 
@@ -210,7 +211,7 @@ public:
         bool succeeded = false;
     };
 
-#ifndef NDEBUG
+#if defined(_DEBUG) || (defined(HORDE_RT_DEBUG_CHECKPOINTS) && HORDE_RT_DEBUG_CHECKPOINTS)
     // Process-local opaque identities, read on the render owner thread after
     // completion. No device addresses, resource contents or ownership transfer.
     struct ResourceHandleSnapshot
@@ -293,6 +294,14 @@ public:
     // Set before Initialise; geometry admission is explicit and development-only.
     void SetDevelopmentSupportFixture(bool enabled) { developmentSupportFixture_ = enabled; }
     void SetDevelopmentRescueJourney(bool enabled) { developmentRescueJourney_=enabled; }
+#ifndef NDEBUG
+    // Survey A/B only; call before initialization. Does not change settings.
+    bool SetRegionalWaterDiagnosticEnabled(bool enabled) {
+        if (ready_ || device_ != VK_NULL_HANDLE) return false;
+        regionalWaterDiagnosticEnabled_ = enabled;
+        return true;
+    }
+#endif
     void SetDevelopmentWorldRoute(bool enabled, bool staged = false) { developmentWorldRoute_=enabled; stagedWorldPreparation_=staged; }
     horde::gameplay::simulation::ZoneReadiness WorldZoneReadiness(horde::gameplay::simulation::WorldZoneToken token) const;
     const horde::scene::DevelopmentWorldGeometry& WorldRouteGeometry() const { return worldRouteGeometry_; }
@@ -1187,6 +1196,8 @@ private:
     bool developmentWorldRoute_ = false;
     bool stagedWorldPreparation_ = false;
     bool developmentRescueJourney_ = false;
+    bool regionalWaterDiagnosticEnabled_ = true;
+    std::vector<horde::scene::ChapterWaterTriangle> regionalWaterFaces_;
     Buffer rescueWorldUpdateScratch_;
     std::vector<std::array<float,3>> rescueWorldVertices_;
     std::vector<std::uint32_t> rescueWorldSurfaceCodes_;

@@ -98,6 +98,11 @@ import java.util.UUID;
 import org.json.JSONObject;
 
 public class MainActivity extends Activity {
+    private boolean environmentSurveyMode;
+    private boolean environmentSurveyFinishing;
+    private EnvironmentSurveyRequest environmentSurveyRequest;
+    private long environmentSurveyStartedAt;
+
     private static final String TAG = "HordeLanternAudio";
     private static final String PREFS = "horde_lantern_alpha_settings";
     private static final String PREF_MUSIC_VOLUME = "music_volume";
@@ -224,6 +229,7 @@ public class MainActivity extends Activity {
     private static final int PLATFORM_EVENT_FOREST_BIRD = 28;
     private static final int PLATFORM_EVENT_FOREST_BIRD_STOPPED = 29;
     private static final int PLATFORM_EVENT_FOREST_CRICKETS = 30;
+    private static final int PLATFORM_EVENT_POND_FROGS = 31;
     private static final int EQUIPMENT_AUDIO_SWORD_DRAW = 1;
     private static final int EQUIPMENT_AUDIO_SWORD_SHEATH = 2;
     private static final int ENTITY_LICH = 3;
@@ -565,6 +571,13 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Consume the explicit diagnostic action before any normal settings, input,
+        // campaign worker, entry menu or SurfaceView is configured.
+        if (EnvironmentSurveyRequest.isSurvey(getIntent())) {
+            environmentSurveyMode = true;
+            createEnvironmentSurvey(savedInstanceState);
+            return;
+        }
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_main);
@@ -678,6 +691,121 @@ public class MainActivity extends Activity {
         scheduleStartupUpdateCheck();
     }
 
+    private void createEnvironmentSurvey(Bundle restored) {
+        environmentSurveyRequest = EnvironmentSurveyRequest.parse(getIntent(), BuildConfig.DEBUG, restored == null);
+        if (environmentSurveyRequest == null) {
+            Log.e("HordeEnvironmentSurvey", "Rejected survey: Debug cold start and closed typed request required");
+            environmentSurveyFinishing = true;
+            finishAndRemoveTask();
+            return;
+        }
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        try {
+            // Reading confirmed quality does not begin/recover/commit a preference transaction.
+            final GraphicsPreferences.Values quality = GraphicsPreferences.confirmed(getSharedPreferences(PREFS, MODE_PRIVATE));
+            stageRuntimeAssetCache();
+            if (!ProbeBridge.configureEnvironmentSurvey(environmentSurveyRequest.requestId,
+                    environmentSurveyRequest.waterDisabled, quality.scale, quality.water, quality.fire,
+                    quality.cap, quality.glassEnabled, quality.shadow, quality.mistEnabled, quality.dust)) {
+                finishEnvironmentSurvey(3);
+                return;
+            }
+            environmentSurveyStartedAt = SystemClock.elapsedRealtime();
+            surfaceView = new SurfaceView(this);
+            setContentView(surfaceView);
+            surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
+                @Override public void surfaceCreated(SurfaceHolder holder) {
+                    if (environmentSurveyFinishing) return;
+                    currentSurface = holder.getSurface();
+                    surfaceAvailable = true;
+                    startEnvironmentSurveySurface();
+                }
+                @Override public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+                    // Native owns the immutable survey camera and actual swapchain extent.
+                }
+                @Override public void surfaceDestroyed(SurfaceHolder holder) {
+                    surfaceAvailable = false;
+                    currentSurface = null;
+                    if (!environmentSurveyFinishing) finishEnvironmentSurvey(3);
+                    stopEnvironmentSurveySurface();
+                }
+            });
+            handler.post(environmentSurveyPoll);
+        } catch (RuntimeException | LinkageError failure) {
+            Log.e("HordeEnvironmentSurvey", "Survey configuration failed", failure);
+            finishEnvironmentSurvey(3);
+        }
+    }
+
+    private void startEnvironmentSurveySurface() {
+        if (environmentSurveyFinishing || !resumed || !surfaceAvailable ||
+                currentSurface == null || surfaceRequestGeneration != 0) return;
+        try {
+            surfaceRequestGeneration = ProbeBridge.startEnvironmentSurveySurface(currentSurface,
+                    getFilesDir().getAbsolutePath(), environmentSurveyRequest.requestId);
+            if (surfaceRequestGeneration == 0) finishEnvironmentSurvey(3);
+        } catch (RuntimeException | LinkageError failure) {
+            Log.e("HordeEnvironmentSurvey", "Survey surface failed", failure);
+            finishEnvironmentSurvey(3);
+        }
+    }
+
+    private void stopEnvironmentSurveySurface() {
+        final long generation = surfaceRequestGeneration;
+        surfaceRequestGeneration = 0;
+        if (generation == 0) return;
+        try { ProbeBridge.stopEnvironmentSurveySurface(generation); }
+        catch (RuntimeException | LinkageError failure) { Log.e("HordeEnvironmentSurvey", "Survey retirement failed", failure); }
+    }
+
+    private final Runnable environmentSurveyPoll = new Runnable() {
+        @Override public void run() {
+            if (environmentSurveyFinishing || environmentSurveyRequest == null) return;
+            int phase = 3;
+            try {
+                final long[] status = ProbeBridge.getEnvironmentSurveyStatus();
+                if (status != null && status.length > 0 && status[0] >= 0 && status[0] <= 3) phase = (int)status[0];
+            } catch (RuntimeException | LinkageError unavailable) { /* Record unavailable as failed. */ }
+            if (phase == 2 || phase == 3 || SystemClock.elapsedRealtime() - environmentSurveyStartedAt > 180000L) {
+                finishEnvironmentSurvey(phase == 2 ? 2 : 3);
+                return;
+            }
+            handler.postDelayed(this, 200L);
+        }
+    };
+
+    private void finishEnvironmentSurvey(final int phase) {
+        if (environmentSurveyFinishing) return;
+        environmentSurveyFinishing = true; // Never rearm after interruption or export failure.
+        handler.removeCallbacks(environmentSurveyPoll);
+        if (phase != 2) {
+            try { ProbeBridge.cancelEnvironmentSurvey(); }
+            catch (RuntimeException | LinkageError unavailable) { /* Export retains missing/failed evidence. */ }
+        }
+        stopEnvironmentSurveySurface();
+        if (environmentSurveyRequest == null) { finishAndRemoveTask(); return; }
+        final EnvironmentSurveyRequest request = environmentSurveyRequest;
+        final File reports = new File(getFilesDir(), REPORT_DIRECTORY);
+        final File external = getExternalFilesDir(null);
+        final Thread export = new Thread(() -> {
+            try {
+                // Stop is asynchronous. Lifecycle cancellation must not race a
+                // native image write or the failed manifest published at retirement.
+                final int terminalPhase = EnvironmentSurveyTerminalAwait.await(
+                        ProbeBridge::getEnvironmentSurveyStatus, SystemClock::elapsedRealtime,
+                        Thread::sleep, EnvironmentSurveyTerminalAwait.MAX_WAIT_MILLIS);
+                final EnvironmentSurveyExport.Result result = EnvironmentSurveyExport.export(
+                        reports, external, request.requestId, request.waterDisabled, terminalPhase);
+                Log.i("HordeEnvironmentSurvey", "Export successful=" + result.successful + " directory=" + result.directory + " detail=" + result.detail);
+            } catch (Exception failure) {
+                Log.e("HordeEnvironmentSurvey", "Survey export failed; existing evidence was preserved", failure);
+            } finally { handler.post(() -> finishAndRemoveTask()); }
+        }, "HordeEnvironmentSurveyExport");
+        export.setDaemon(true);
+        export.start();
+    }
+
     private void configureCampaignStorage() {
         final String requested=getIntent()==null ? null : getIntent().getStringExtra("campaign_test_namespace");
         campaignTestNamespace=CampaignMenuState.testNamespace(BuildConfig.DEBUG, requested);
@@ -713,17 +841,10 @@ public class MainActivity extends Activity {
         }
     }
 
-    private void collectInitialDiagnostics() {
-        try {
-            final String textReport = ProbeBridge.getTextReport();
-            final String jsonReport = ProbeBridge.getJsonReport();
-            final String filesRoot = getFilesDir().getAbsolutePath();
+    /** Only the existing closed runtime cache roster; no reports, settings or save storage. */
+    private boolean[] stageRuntimeAssetCache() {
             final boolean skeletonStaged = stageAsset(SKELETON_ASSET, SKELETON_FILE);
             final boolean lichStaged = stageAsset(LICH_ASSET, LICH_FILE);
-            for (final String legacy : new String[]{"diff-array-512.rgba", "normal-array-512.rgba", "arm-array-512.rgba"}) {
-                final File stale = new File(getFilesDir(), legacy);
-                if (stale.exists()) stale.delete();
-            }
             final boolean materialsStaged = stageAsset("textures/polyhaven/mobile_1k/diff-array-512-astc6x6.ktx2", "diff-array-512-astc6x6.ktx2")
                     && stageAsset("textures/polyhaven/mobile_1k/normal-array-512-astc4x4.ktx2", "normal-array-512-astc4x4.ktx2")
                     && stageAsset("textures/polyhaven/mobile_1k/arm-array-512-astc6x6.ktx2", "arm-array-512-astc6x6.ktx2")
@@ -838,6 +959,21 @@ public class MainActivity extends Activity {
                     "models/player/viewmodel/runtime/candidate-receipt.json")) {
                 throw new IllegalStateException("Opt-in viewmodel candidate receipt could not be staged.");
             }
+        return new boolean[]{skeletonStaged, lichStaged, materialsStaged, heldItemsStaged};
+    }
+
+    private void collectInitialDiagnostics() {
+        try {
+            final String textReport = ProbeBridge.getTextReport();
+            final String jsonReport = ProbeBridge.getJsonReport();
+            final String filesRoot = getFilesDir().getAbsolutePath();
+            for (final String legacy : new String[]{"diff-array-512.rgba", "normal-array-512.rgba", "arm-array-512.rgba"}) {
+                final File stale = new File(getFilesDir(), legacy);
+                if (stale.exists()) stale.delete();
+            }
+            final boolean[] staged = stageRuntimeAssetCache();
+            final boolean skeletonStaged = staged[0], lichStaged = staged[1];
+            final boolean materialsStaged = staged[2], heldItemsStaged = staged[3];
             final boolean written = ProbeBridge.writeReports(filesRoot);
             final StringBuilder output = new StringBuilder(textReport).append('\n');
             if (textReport.contains("RT mode: Unsupported")) {
@@ -5889,7 +6025,7 @@ public class MainActivity extends Activity {
                     int latestForestSignal=-1;
                     for(int i=0;i+2<platformEvents.length;i+=3) {
                         final int type=(int)(platformEvents[i]&0xffL);
-                        if(type==PLATFORM_EVENT_FOREST_BIRD || type==PLATFORM_EVENT_FOREST_CRICKETS ||
+                        if(type==PLATFORM_EVENT_FOREST_BIRD || type==PLATFORM_EVENT_FOREST_CRICKETS || type==PLATFORM_EVENT_POND_FROGS ||
                                 type==PLATFORM_EVENT_FOREST_BIRD_STOPPED)latestForestSignal=i;
                     }
                     for (int eventIndex = 0; !debugMotionActive && eventIndex + 2 < platformEvents.length; eventIndex += 3) {
@@ -5906,6 +6042,9 @@ public class MainActivity extends Activity {
                             break;
                         case PLATFORM_EVENT_FOREST_CRICKETS:
                             if(eventIndex==latestForestSignal)playForestBird(stereoGains, "forest_evening_cricket");
+                            break;
+                        case PLATFORM_EVENT_POND_FROGS:
+                            if(eventIndex==latestForestSignal)playForestBird(stereoGains, "pond_frogs_crickets");
                             break;
                         case PLATFORM_EVENT_FOREST_BIRD_STOPPED:
                             if(eventIndex==latestForestSignal)stopForestBird();
@@ -6591,6 +6730,7 @@ public class MainActivity extends Activity {
         loadSound("water_stream_contact", "audio/pixabay/water_stream_contact_core.wav");
         loadSound("forest_night_owl", "audio/night-ambience/runtime/tawny_owl.wav");
         loadSound("forest_evening_cricket", "audio/night-ambience/runtime/evening_cricket.wav");
+        loadSound("pond_frogs_crickets", "audio/night-ambience/runtime/pond_frogs_crickets.wav");
         loadSound("skeleton_step_1", "audio/filmcow/skeleton_step_1.wav");
         loadSound("skeleton_step_2", "audio/filmcow/skeleton_step_2.wav");
         loadSound("skeleton_attack", "audio/filmcow/skeleton_attack.wav");
@@ -7057,6 +7197,11 @@ public class MainActivity extends Activity {
     }
 
     @Override public boolean dispatchKeyEvent(KeyEvent event) {
+        if (environmentSurveyMode) {
+            if (event != null && event.getKeyCode() == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP)
+                finishEnvironmentSurvey(3);
+            return true;
+        }
         if (!AndroidControllerInput.isControllerKey(event)) {
             if (event != null && event.isFromSource(InputDevice.SOURCE_KEYBOARD) &&
                     (event.getKeyCode() == KeyEvent.KEYCODE_CTRL_LEFT || event.getKeyCode() == KeyEvent.KEYCODE_CTRL_RIGHT)) {
@@ -7091,6 +7236,7 @@ public class MainActivity extends Activity {
     }
 
     @Override public boolean dispatchGenericMotionEvent(MotionEvent event) {
+        if (environmentSurveyMode) return true;
         if (isMouseSubtitleInput(event))
             observeSubtitleInputMode(SUBTITLE_INPUT_KEYBOARD_MOUSE_CONTROLLER);
         if (!AndroidControllerInput.isControllerMotion(event)) return super.dispatchGenericMotionEvent(event);
@@ -7105,6 +7251,7 @@ public class MainActivity extends Activity {
     }
 
     @Override public boolean dispatchTouchEvent(MotionEvent event) {
+        if (environmentSurveyMode) return true;
         if (isMouseSubtitleInput(event))
             observeSubtitleInputMode(SUBTITLE_INPUT_KEYBOARD_MOUSE_CONTROLLER);
         else if (isTouchSubtitleInput(event)) observeSubtitleInputMode(SUBTITLE_INPUT_TOUCH);
@@ -7119,6 +7266,7 @@ public class MainActivity extends Activity {
 
     @Override public void onWindowFocusChanged(boolean focused) {
         super.onWindowFocusChanged(focused);
+        if (environmentSurveyMode) return;
         logSurfaceLifecycle(focused ? "focusGain" : "focusLoss");
         controllerWindowFocused=focused;
         currentControllerDialog();
@@ -7539,6 +7687,7 @@ public class MainActivity extends Activity {
 
     @Override
     public void onBackPressed() {
+        if (environmentSurveyMode) { finishEnvironmentSurvey(3); return; }
         if(campaignConfirmation!=null && campaignConfirmation.isShowing()) {
             dismissCampaignConfirmation(); return;
         }
@@ -7659,6 +7808,7 @@ public class MainActivity extends Activity {
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+        if (environmentSurveyMode) { finishEnvironmentSurvey(3); return; }
         final Configuration previous = lastAppliedConfiguration;
         final boolean viewportChanged = viewportConfigurationChanged(previous, newConfig);
         lastAppliedConfiguration = new Configuration(newConfig);
@@ -7711,6 +7861,12 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        if (environmentSurveyMode) {
+            resumed = true;
+            enterImmersiveMode();
+            startEnvironmentSurveySurface();
+            return;
+        }
         logSurfaceLifecycle("resume");
         if (musicPlayback != null) musicPlayback.setSuspended(true); // Wait for a ready new surface.
         resumed = true;
@@ -7745,6 +7901,10 @@ public class MainActivity extends Activity {
     @Override
     protected void onNewIntent(final Intent intent) {
         super.onNewIntent(intent);
+        if (environmentSurveyMode || EnvironmentSurveyRequest.isSurvey(intent)) {
+            Log.w("HordeEnvironmentSurvey", "Survey intents require a fresh Activity; no live reconfiguration");
+            return;
+        }
         setIntent(intent);
         if (consumeBenchmarkAutomationIntent(intent, false)) {
             clearVerticalProofFeedbackSelection();
@@ -7768,6 +7928,12 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onPause() {
+        if (environmentSurveyMode) {
+            resumed = false;
+            finishEnvironmentSurvey(3);
+            super.onPause();
+            return;
+        }
         stopForestBird();
         campaignAcknowledgedToken=campaignAcknowledgedGeneration=0;
         campaignRebaseAttemptToken=campaignRebaseAttemptGeneration=campaignRebaseAttemptRevision=0;
@@ -7853,6 +8019,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onStop() {
+        if (environmentSurveyMode) { stopEnvironmentSurveySurface(); super.onStop(); return; }
         logSurfaceLifecycle("stop");
         stopSurface();
         super.onStop();
@@ -7860,6 +8027,14 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
+        if (environmentSurveyMode) {
+            finishEnvironmentSurvey(3);
+            stopEnvironmentSurveySurface();
+            reportExecutor.shutdownNow();
+            updateExecutor.shutdownNow();
+            super.onDestroy();
+            return;
+        }
         campaignDestroyed=true;
         dismissCampaignConfirmation();
         dismissBackExitConfirmation();

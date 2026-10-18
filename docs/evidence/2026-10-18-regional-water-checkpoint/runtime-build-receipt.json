@@ -1,0 +1,644 @@
+{
+  "schema": 1,
+  "recordedAtUtc": "2026-10-18T06:15:27.459467+00:00",
+  "status": "paused at owner request; source/build/finite Windows presentation checkpoint, not final visual/device/gameplay acceptance",
+  "runs": [
+    {
+      "tag": "regional-water-runtime-b4",
+      "manifestSha256": "5a69310b5d704e84e9c1cdbacf61279e0f8c9276a63b7688a8af0871de725abf",
+      "executableSha256": "fc2997bd424f8f3e026a58a1b9673c9207802578e87961b8cb5412fbf154d746",
+      "terrainSha256": "c636a67911b7f5c5381c30ec7a49e5d4ff15c70fe688b368ba52efe77b537774",
+      "backend": "RayTracingPipeline",
+      "waterEnabled": false,
+      "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+      "driverVersion": 2559295488,
+      "renderScale": 1,
+      "extent": [
+        960,
+        540
+      ],
+      "waterQuality": 2,
+      "shaderPair": {
+        "opaque": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3"
+        },
+        "generic": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a"
+        }
+      },
+      "camera": {
+        "atlasEast": 56,
+        "atlasNorth": -5,
+        "x": 134.300003,
+        "z": 131.199997,
+        "supportY": -23.3716984,
+        "yaw": 3.041924,
+        "pitch": -0.14046517,
+        "eyeY": -21.7216969,
+        "targetAtlasEast": 58,
+        "targetAtlasNorth": -25,
+        "targetAtlasUp": 6,
+        "terrainFound": true,
+        "terrainWalkable": true,
+        "terrainTriangle": 17369,
+        "testedTriangles": 18,
+        "terrainNormal": [
+          0.409621537,
+          0.898744226,
+          0.156425774
+        ]
+      },
+      "frames": 120,
+      "snapshotBytesUnchanged": true,
+      "samplePolicy": "GPU command-buffer timestamps; discard first20; remaining100; readback and final idle serialize frames; not sustained display FPS",
+      "gpuMs": {
+        "mean": 1.01319936,
+        "median": 1.016432,
+        "min": 0.950112,
+        "max": 1.833248
+      },
+      "resources": {
+        "bufferCount": 52,
+        "memoryAllocationCount": 63,
+        "bottomLevelAccelerationStructureCount": 20,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 2,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 49584848,
+        "deviceLocalBytes": 405962032
+      },
+      "images": [
+        {
+          "file": "river-bend-009.png",
+          "sha256": "1f810ba92ac7e1d06b8695b4ad3bc38cacd5faa0c26ca08d9c17cdc8c4f07491",
+          "animationSeconds": 0.150000006
+        },
+        {
+          "file": "river-bend-019.png",
+          "sha256": "1f810ba92ac7e1d06b8695b4ad3bc38cacd5faa0c26ca08d9c17cdc8c4f07491",
+          "animationSeconds": 0.316666663
+        },
+        {
+          "file": "river-bend-029.png",
+          "sha256": "1f810ba92ac7e1d06b8695b4ad3bc38cacd5faa0c26ca08d9c17cdc8c4f07491",
+          "animationSeconds": 0.483333319
+        },
+        {
+          "file": "river-bend-039.png",
+          "sha256": "1f810ba92ac7e1d06b8695b4ad3bc38cacd5faa0c26ca08d9c17cdc8c4f07491",
+          "animationSeconds": 0.649999976
+        },
+        {
+          "file": "river-bend-049.png",
+          "sha256": "1f810ba92ac7e1d06b8695b4ad3bc38cacd5faa0c26ca08d9c17cdc8c4f07491",
+          "animationSeconds": 0.816666663
+        },
+        {
+          "file": "river-bend-059.png",
+          "sha256": "1f810ba92ac7e1d06b8695b4ad3bc38cacd5faa0c26ca08d9c17cdc8c4f07491",
+          "animationSeconds": 0.983333349
+        },
+        {
+          "file": "river-bend-069.png",
+          "sha256": "1f810ba92ac7e1d06b8695b4ad3bc38cacd5faa0c26ca08d9c17cdc8c4f07491",
+          "animationSeconds": 1.14999998
+        },
+        {
+          "file": "river-bend-079.png",
+          "sha256": "1f810ba92ac7e1d06b8695b4ad3bc38cacd5faa0c26ca08d9c17cdc8c4f07491",
+          "animationSeconds": 1.31666672
+        },
+        {
+          "file": "river-bend-089.png",
+          "sha256": "1f810ba92ac7e1d06b8695b4ad3bc38cacd5faa0c26ca08d9c17cdc8c4f07491",
+          "animationSeconds": 1.48333335
+        },
+        {
+          "file": "river-bend-099.png",
+          "sha256": "1f810ba92ac7e1d06b8695b4ad3bc38cacd5faa0c26ca08d9c17cdc8c4f07491",
+          "animationSeconds": 1.64999998
+        },
+        {
+          "file": "river-bend-109.png",
+          "sha256": "1f810ba92ac7e1d06b8695b4ad3bc38cacd5faa0c26ca08d9c17cdc8c4f07491",
+          "animationSeconds": 1.81666672
+        },
+        {
+          "file": "river-bend-119.png",
+          "sha256": "1f810ba92ac7e1d06b8695b4ad3bc38cacd5faa0c26ca08d9c17cdc8c4f07491",
+          "animationSeconds": 1.98333335
+        }
+      ]
+    },
+    {
+      "tag": "regional-water-runtime-a4",
+      "manifestSha256": "27a16af6bb9ed217eed7f753e31bdcef314423b0ad1848969a56ffed9daf46ab",
+      "executableSha256": "fc2997bd424f8f3e026a58a1b9673c9207802578e87961b8cb5412fbf154d746",
+      "terrainSha256": "c636a67911b7f5c5381c30ec7a49e5d4ff15c70fe688b368ba52efe77b537774",
+      "backend": "RayTracingPipeline",
+      "waterEnabled": true,
+      "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+      "driverVersion": 2559295488,
+      "renderScale": 1,
+      "extent": [
+        960,
+        540
+      ],
+      "waterQuality": 2,
+      "shaderPair": {
+        "opaque": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3"
+        },
+        "generic": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a"
+        }
+      },
+      "camera": {
+        "atlasEast": 56,
+        "atlasNorth": -5,
+        "x": 134.300003,
+        "z": 131.199997,
+        "supportY": -23.3716984,
+        "yaw": 3.041924,
+        "pitch": -0.14046517,
+        "eyeY": -21.7216969,
+        "targetAtlasEast": 58,
+        "targetAtlasNorth": -25,
+        "targetAtlasUp": 6,
+        "terrainFound": true,
+        "terrainWalkable": true,
+        "terrainTriangle": 17369,
+        "testedTriangles": 18,
+        "terrainNormal": [
+          0.409621537,
+          0.898744226,
+          0.156425774
+        ]
+      },
+      "frames": 120,
+      "snapshotBytesUnchanged": true,
+      "samplePolicy": "GPU command-buffer timestamps; discard first20; remaining100; readback and final idle serialize frames; not sustained display FPS",
+      "gpuMs": {
+        "mean": 1.32117216,
+        "median": 1.296672,
+        "min": 1.277376,
+        "max": 1.721376
+      },
+      "resources": {
+        "bufferCount": 52,
+        "memoryAllocationCount": 63,
+        "bottomLevelAccelerationStructureCount": 20,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 2,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 49587072,
+        "deviceLocalBytes": 405970400
+      },
+      "images": [
+        {
+          "file": "river-bend-009.png",
+          "sha256": "8edacf0cf71e3e87cd80c8d1bf94c5baec8436283c556f485ba77a07ec156230",
+          "animationSeconds": 0.150000006
+        },
+        {
+          "file": "river-bend-019.png",
+          "sha256": "d739e2dc6d82b6b5d8ec9c6b737527ccb0a6459d12fe7c8760293be31cf662ed",
+          "animationSeconds": 0.316666663
+        },
+        {
+          "file": "river-bend-029.png",
+          "sha256": "66220caa034808c90072110bfa61df3887503e9d3f14bfd99a8f1332c7854e19",
+          "animationSeconds": 0.483333319
+        },
+        {
+          "file": "river-bend-039.png",
+          "sha256": "45ec9cf39b259e3f9e69647d8e6dc90932e05a0337508ccf4522b872138e2678",
+          "animationSeconds": 0.649999976
+        },
+        {
+          "file": "river-bend-049.png",
+          "sha256": "28347ba90fff61f7ca7e4f2c15e864e0ddf9ffaaa80ece6f1df4aa600fb02fee",
+          "animationSeconds": 0.816666663
+        },
+        {
+          "file": "river-bend-059.png",
+          "sha256": "b9c386872e324f278cc90fb64ffb05ed465bc0cfb30e860f4f534830a64e3715",
+          "animationSeconds": 0.983333349
+        },
+        {
+          "file": "river-bend-069.png",
+          "sha256": "a6323487786e4fd68d7a1ddf8e6847890dcca0b9556b982c755e600b99d7ad3e",
+          "animationSeconds": 1.14999998
+        },
+        {
+          "file": "river-bend-079.png",
+          "sha256": "ff351e5199842d659002762b2f633a4584b00d367e22b002d2920288cfb32ff0",
+          "animationSeconds": 1.31666672
+        },
+        {
+          "file": "river-bend-089.png",
+          "sha256": "4102919f4da5d2b4a9645ecf313887274c1636bed4d791aae1a9618069663f06",
+          "animationSeconds": 1.48333335
+        },
+        {
+          "file": "river-bend-099.png",
+          "sha256": "8de6a05fce3a1ad90fdb4d958511a6e7e04bb62cc326164a20e9158f6e892201",
+          "animationSeconds": 1.64999998
+        },
+        {
+          "file": "river-bend-109.png",
+          "sha256": "63b520da2a7f76f159e14eabec1f23bae1daebc24bcd9fbfe54943fe1355ab7a",
+          "animationSeconds": 1.81666672
+        },
+        {
+          "file": "river-bend-119.png",
+          "sha256": "7ce59e4da85a57ed6b8fdc8b02aa72e664951517f8d010037752aaca81ba3799",
+          "animationSeconds": 1.98333335
+        }
+      ]
+    },
+    {
+      "tag": "regional-water-compute-b4",
+      "manifestSha256": "35b313485d49305a529f529e8126df3162950e89b8764b9f36ba7a8fae95decd",
+      "executableSha256": "fc2997bd424f8f3e026a58a1b9673c9207802578e87961b8cb5412fbf154d746",
+      "terrainSha256": "c636a67911b7f5c5381c30ec7a49e5d4ff15c70fe688b368ba52efe77b537774",
+      "backend": "RayQueryCompute",
+      "waterEnabled": false,
+      "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+      "driverVersion": 2559295488,
+      "renderScale": 1,
+      "extent": [
+        960,
+        540
+      ],
+      "waterQuality": 2,
+      "shaderPair": {
+        "opaque": {
+          "key": "rayquery_compute_diagnostic_high_opaque_fast",
+          "sha256": "98cec0ff16f511aac0d3a41c2a91542d2a18ebfc431ec3edd75d9abc5b10761b"
+        },
+        "generic": {
+          "key": "rayquery_compute_diagnostic_high_generic_dielectric",
+          "sha256": "359469cc391aa787011c9d3c9ba4c84d99779cbb9a0fbe7ce5723f1783b6ab5f"
+        }
+      },
+      "camera": {
+        "atlasEast": 56,
+        "atlasNorth": -5,
+        "x": 134.300003,
+        "z": 131.199997,
+        "supportY": -23.3716984,
+        "yaw": 3.041924,
+        "pitch": -0.14046517,
+        "eyeY": -21.7216969,
+        "targetAtlasEast": 58,
+        "targetAtlasNorth": -25,
+        "targetAtlasUp": 6,
+        "terrainFound": true,
+        "terrainWalkable": true,
+        "terrainTriangle": 17369,
+        "testedTriangles": 18,
+        "terrainNormal": [
+          0.409621537,
+          0.898744226,
+          0.156425774
+        ]
+      },
+      "frames": 120,
+      "snapshotBytesUnchanged": true,
+      "samplePolicy": "GPU command-buffer timestamps; discard first20; remaining100; readback and final idle serialize frames; not sustained display FPS",
+      "gpuMs": {
+        "mean": 1.00830048,
+        "median": 0.991984,
+        "min": 0.97616,
+        "max": 1.518528
+      },
+      "resources": {
+        "bufferCount": 50,
+        "memoryAllocationCount": 61,
+        "bottomLevelAccelerationStructureCount": 20,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 0,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 49584336,
+        "deviceLocalBytes": 405962032
+      },
+      "images": [
+        {
+          "file": "river-bend-009.png",
+          "sha256": "b703a25813fb869d2bde0473b062a0b8e25c61ee36fbff2a20e8bb66c863b344",
+          "animationSeconds": 0.150000006
+        },
+        {
+          "file": "river-bend-019.png",
+          "sha256": "b703a25813fb869d2bde0473b062a0b8e25c61ee36fbff2a20e8bb66c863b344",
+          "animationSeconds": 0.316666663
+        },
+        {
+          "file": "river-bend-029.png",
+          "sha256": "b703a25813fb869d2bde0473b062a0b8e25c61ee36fbff2a20e8bb66c863b344",
+          "animationSeconds": 0.483333319
+        },
+        {
+          "file": "river-bend-039.png",
+          "sha256": "b703a25813fb869d2bde0473b062a0b8e25c61ee36fbff2a20e8bb66c863b344",
+          "animationSeconds": 0.649999976
+        },
+        {
+          "file": "river-bend-049.png",
+          "sha256": "b703a25813fb869d2bde0473b062a0b8e25c61ee36fbff2a20e8bb66c863b344",
+          "animationSeconds": 0.816666663
+        },
+        {
+          "file": "river-bend-059.png",
+          "sha256": "b703a25813fb869d2bde0473b062a0b8e25c61ee36fbff2a20e8bb66c863b344",
+          "animationSeconds": 0.983333349
+        },
+        {
+          "file": "river-bend-069.png",
+          "sha256": "b703a25813fb869d2bde0473b062a0b8e25c61ee36fbff2a20e8bb66c863b344",
+          "animationSeconds": 1.14999998
+        },
+        {
+          "file": "river-bend-079.png",
+          "sha256": "b703a25813fb869d2bde0473b062a0b8e25c61ee36fbff2a20e8bb66c863b344",
+          "animationSeconds": 1.31666672
+        },
+        {
+          "file": "river-bend-089.png",
+          "sha256": "b703a25813fb869d2bde0473b062a0b8e25c61ee36fbff2a20e8bb66c863b344",
+          "animationSeconds": 1.48333335
+        },
+        {
+          "file": "river-bend-099.png",
+          "sha256": "b703a25813fb869d2bde0473b062a0b8e25c61ee36fbff2a20e8bb66c863b344",
+          "animationSeconds": 1.64999998
+        },
+        {
+          "file": "river-bend-109.png",
+          "sha256": "b703a25813fb869d2bde0473b062a0b8e25c61ee36fbff2a20e8bb66c863b344",
+          "animationSeconds": 1.81666672
+        },
+        {
+          "file": "river-bend-119.png",
+          "sha256": "b703a25813fb869d2bde0473b062a0b8e25c61ee36fbff2a20e8bb66c863b344",
+          "animationSeconds": 1.98333335
+        }
+      ]
+    },
+    {
+      "tag": "regional-water-compute-a4",
+      "manifestSha256": "1778da7bafed8b5c000d143ab931d9411da5d1f770e22aa58bee03f95d46c078",
+      "executableSha256": "fc2997bd424f8f3e026a58a1b9673c9207802578e87961b8cb5412fbf154d746",
+      "terrainSha256": "c636a67911b7f5c5381c30ec7a49e5d4ff15c70fe688b368ba52efe77b537774",
+      "backend": "RayQueryCompute",
+      "waterEnabled": true,
+      "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+      "driverVersion": 2559295488,
+      "renderScale": 1,
+      "extent": [
+        960,
+        540
+      ],
+      "waterQuality": 2,
+      "shaderPair": {
+        "opaque": {
+          "key": "rayquery_compute_diagnostic_high_opaque_fast",
+          "sha256": "98cec0ff16f511aac0d3a41c2a91542d2a18ebfc431ec3edd75d9abc5b10761b"
+        },
+        "generic": {
+          "key": "rayquery_compute_diagnostic_high_generic_dielectric",
+          "sha256": "359469cc391aa787011c9d3c9ba4c84d99779cbb9a0fbe7ce5723f1783b6ab5f"
+        }
+      },
+      "camera": {
+        "atlasEast": 56,
+        "atlasNorth": -5,
+        "x": 134.300003,
+        "z": 131.199997,
+        "supportY": -23.3716984,
+        "yaw": 3.041924,
+        "pitch": -0.14046517,
+        "eyeY": -21.7216969,
+        "targetAtlasEast": 58,
+        "targetAtlasNorth": -25,
+        "targetAtlasUp": 6,
+        "terrainFound": true,
+        "terrainWalkable": true,
+        "terrainTriangle": 17369,
+        "testedTriangles": 18,
+        "terrainNormal": [
+          0.409621537,
+          0.898744226,
+          0.156425774
+        ]
+      },
+      "frames": 120,
+      "snapshotBytesUnchanged": true,
+      "samplePolicy": "GPU command-buffer timestamps; discard first20; remaining100; readback and final idle serialize frames; not sustained display FPS",
+      "gpuMs": {
+        "mean": 1.35038592,
+        "median": 1.344752,
+        "min": 1.332512,
+        "max": 1.415104
+      },
+      "resources": {
+        "bufferCount": 50,
+        "memoryAllocationCount": 61,
+        "bottomLevelAccelerationStructureCount": 20,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 0,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 49586560,
+        "deviceLocalBytes": 405970400
+      },
+      "images": [
+        {
+          "file": "river-bend-009.png",
+          "sha256": "a966c76901b89b0eea9599be013afc19d88489008f6d4f85e02a0b9848bf3b36",
+          "animationSeconds": 0.150000006
+        },
+        {
+          "file": "river-bend-019.png",
+          "sha256": "65e1d0bf9159515aaa0a766c7c640fbeae358b53dea2f116542545292d77fd23",
+          "animationSeconds": 0.316666663
+        },
+        {
+          "file": "river-bend-029.png",
+          "sha256": "b9cd9d1f081c8c2a97970b7adbe355af903d85611c49fa3ffa9d087a126db6e6",
+          "animationSeconds": 0.483333319
+        },
+        {
+          "file": "river-bend-039.png",
+          "sha256": "2339e2db9a47489c444621138fdb0ef95ada18751179c60478cc1482b2e01c4e",
+          "animationSeconds": 0.649999976
+        },
+        {
+          "file": "river-bend-049.png",
+          "sha256": "a2ec87b76191a03298a4dbc533972115caa42ca7e24fb3d8b0038d90d8178cdc",
+          "animationSeconds": 0.816666663
+        },
+        {
+          "file": "river-bend-059.png",
+          "sha256": "f2d23fc1df19839c38c0f2beee8f71717c541e340286340f53ff3cf831580c5b",
+          "animationSeconds": 0.983333349
+        },
+        {
+          "file": "river-bend-069.png",
+          "sha256": "62aca546959067c68f7cc1f3a9f7d61e168c962a804c50c3757c1db4182537f2",
+          "animationSeconds": 1.14999998
+        },
+        {
+          "file": "river-bend-079.png",
+          "sha256": "3c9b451ebb11e1cc6e8021dec144242edf0e79fcb847bca66bd1fae4ebdb2972",
+          "animationSeconds": 1.31666672
+        },
+        {
+          "file": "river-bend-089.png",
+          "sha256": "a3575ce3a66c286133768bd5e9fdf6cb2b9e2f9b94aeb8355fda9d68906c7200",
+          "animationSeconds": 1.48333335
+        },
+        {
+          "file": "river-bend-099.png",
+          "sha256": "875a7452b322677326dcb1d742c4aaa3868be9912cef620962a6ad322453d072",
+          "animationSeconds": 1.64999998
+        },
+        {
+          "file": "river-bend-109.png",
+          "sha256": "d629e3cf7efd7f259274b1ec07e87c870fa1213af4f58b9a70d74150a6d32b6b",
+          "animationSeconds": 1.81666672
+        },
+        {
+          "file": "river-bend-119.png",
+          "sha256": "2af849c78f31112e8b0418c88d1c894b860db3edd9eadb841dee1f8c3e77c7ce",
+          "animationSeconds": 1.98333335
+        }
+      ]
+    }
+  ],
+  "pairs": [
+    {
+      "backend": "RayTracingPipeline",
+      "baseline": "regional-water-runtime-b4",
+      "candidate": "regional-water-runtime-a4",
+      "meanGpuDeltaMs": 0.30797279999999994,
+      "medianGpuDeltaMs": 0.28024000000000004,
+      "resourceDeltas": {
+        "bufferCount": 0,
+        "memoryAllocationCount": 0,
+        "bottomLevelAccelerationStructureCount": 0,
+        "topLevelAccelerationStructureCount": 0,
+        "tlasInstanceCount": 0,
+        "pipelineCount": 0,
+        "shaderBindingTableCount": 0,
+        "descriptorSetCount": 0,
+        "hostVisibleBytes": 2224,
+        "deviceLocalBytes": 8368
+      }
+    },
+    {
+      "backend": "RayQueryCompute",
+      "baseline": "regional-water-compute-b4",
+      "candidate": "regional-water-compute-a4",
+      "meanGpuDeltaMs": 0.34208543999999996,
+      "medianGpuDeltaMs": 0.35276799999999997,
+      "resourceDeltas": {
+        "bufferCount": 0,
+        "memoryAllocationCount": 0,
+        "bottomLevelAccelerationStructureCount": 0,
+        "topLevelAccelerationStructureCount": 0,
+        "tlasInstanceCount": 0,
+        "pipelineCount": 0,
+        "shaderBindingTableCount": 0,
+        "descriptorSetCount": 0,
+        "hostVisibleBytes": 2224,
+        "deviceLocalBytes": 8368
+      }
+    }
+  ],
+  "rejectedRuns": [
+    {
+      "tag": "regional-water-runtime-b1",
+      "manifestSha256": "81c64249da7ef2a4510107e16b30bb7803c2ba5180446da8a4f743f30ef984fe",
+      "complete": false,
+      "error": "A survey frame did not reach an actual successful RT presentation: Final composed player item Grip exceeded position/orientation tolerance: left=196.034180m/1.570796rad right=0.000000m/0.000000rad.",
+      "attemptedFrames": 1
+    },
+    {
+      "tag": "regional-water-runtime-b2",
+      "manifestSha256": "57c1af4bd3fe1ca35e59b2a7dbab349f2a3668422829a402a66986ba20415bb5",
+      "complete": false,
+      "error": "Render-only survey changed the published simulation snapshot bytes.",
+      "attemptedFrames": 1
+    }
+  ],
+  "rejectedAppearance": {
+    "tag": "regional-water-runtime-a3",
+    "reason": "Actual image repeated bright bank foam and regular cross-channel ripple bands; replaced by lower-amplitude phase-warped analytic normals and restrained irregular shallow foam; no budget or quality reduction"
+  },
+  "androidUnitTests": {
+    "tests": 354,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "androidBuildLogSha256": "28348e6f934f2173af6b3a818dff96a8c8c8dd33105ef760aba8a4b7ef6799a7",
+  "androidApk": {
+    "apkSha256": "b85d9e554638f65395987c9441db1efb9cd24628c8eac9706ffd08bb96341c4e",
+    "bytes": 186096453,
+    "entries": [
+      {
+        "path": "assets/audio/night-ambience/runtime/pond_frogs_crickets.wav",
+        "bytes": 384078,
+        "sha256": "bb13e7ebaff3fdc0b3a872cbdfe0bda22a210a7a77fe401b50981c5e02763b76"
+      },
+      {
+        "path": "assets/models/world/runtime/chapter-terrain-v1/chapter-terrain-lod0.runtime.glb",
+        "bytes": 18441928,
+        "sha256": "c636a67911b7f5c5381c30ec7a49e5d4ff15c70fe688b368ba52efe77b537774"
+      },
+      {
+        "path": "lib/arm64-v8a/libhorde_rt_probe_android.so",
+        "bytes": 5150680,
+        "sha256": "de448c341237eda6740b0cb9555bf5b038b763cb080bb83f5aa0491ee13d9b5e"
+      },
+      {
+        "path": "lib/armeabi-v7a/libhorde_rt_probe_android.so",
+        "bytes": 4447352,
+        "sha256": "544a860d2513b3d35705b6687b5e124b0e73cd3a57bbca411e9f5673037aaac2"
+      },
+      {
+        "path": "lib/x86/libhorde_rt_probe_android.so",
+        "bytes": 5727308,
+        "sha256": "50bd4e8908a633885068f1719fcc5c48d8f9851c3934e5a8be11d9ed2c8399f9"
+      },
+      {
+        "path": "lib/x86_64/libhorde_rt_probe_android.so",
+        "bytes": 5406256,
+        "sha256": "db964248a53291f9fef0e810c5464a5c972e9cfcbac189d326373f79991aa4a9"
+      }
+    ],
+    "cicadaPackaged": false
+  },
+  "phone": "APK not installed; no survey launch/input/device gameplay; existing SM-S948B Debug installation retained; owner settings/save custody captured read-only",
+  "pending": [
+    "Android physical RT survey and paired GPU cost",
+    "Physical cancellation/export",
+    "Full river/lake/headwater shoreline and temporal visual review",
+    "Actual video encoding from retained 6Hz samples",
+    "Night ambience listening/mix",
+    "Natural combat/checkpoint acceptance and sustained performance"
+  ]
+}

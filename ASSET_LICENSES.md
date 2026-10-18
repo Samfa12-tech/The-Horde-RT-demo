@@ -393,6 +393,25 @@ and original six texture-array hashes; no new provider content or licence is
 introduced. The original manifest and reproduction recipe stay in source, and
 only the admitted material sidecar accompanies runtime assets.
 
+`chapter-terrain-r22` subdivides only the original Horde regional mesh's coarse
+water-intersecting outer triangles and necessary shared edges. Added vertices
+sample the unchanged owner-designated heightfield; the exact core, route,
+openings, bounds, two embedded material/image payloads and existing platform
+arrays are preserved. No external asset or new licence is introduced. Its
+compact source receipt pins the recipes and local reproducible master/export;
+the admitted runtime GLB is SHA-256
+`12c0c577a67c5fc8e88fe0528a9eaa5b2ec950ba409bbffe969560b7c54ee060`.
+The existing runtime manifest and Forest Ground material factor remain exact.
+
+`chapter-terrain-r23` adds bounded bank-crest sampling to r22 without changing
+the owner atlas, original vertices, grid, route/core or admitted material images.
+Its documented authoring exception raises only 42 deficient NEW crest samples
+using the original continuous carve profile: 40 capped at 0.50 m and two exact
+outflow endcaps capped at 1.25 m. Dry samples are never lowered. No external asset
+or licence is introduced. The runtime GLB is SHA-256
+`c636a67911b7f5c5381c30ec7a49e5d4ff15c70fe688b368ba52efe77b537774`;
+the compact source receipts pin all changes and preserve rejected trials.
+
 ### Kit preserved runtime derivative (11 October 2026)
 
 `assets/models/characters/runtime/kit-warden-v1/` is a prepared derivative of the
@@ -480,7 +499,7 @@ acceptance. All four cuts remain unheard here; final native mix is pending.
 | --- | --- | --- |
 | `runtime/tawny_owl.wav` | W.carter, [Tawny owl calling at night in Tuntorp, Brastad, Sweden](https://commons.wikimedia.org/wiki/File:Tawny_owl_calling_at_night_in_Tuntorp,_Brastad,_Sweden.ogg), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Original already contains cuts from two locations and background-noise reduction; these prior changes are retained in the manifest. | Eight-second finite candidate in the shared forest cue, superseding the generic FilmCow bird mapping. Author identifies Strix aluco and night recording; no independent species or listening claim. |
 | `runtime/evening_cricket.wav` | Gunther Tschuch, [Oecanthus pellucens song 23C](https://commons.wikimedia.org/wiki/File:Oecanthus_pellucens_song_23C.wav), [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). **The adapted audio remains CC BY-SA 4.0**, with attribution, source/licence links and disclosed changes; no endorsement is implied. | Eight-second finite candidate in alternating quiet gaps. Author records male Italian tree cricket at 21:04; darkness is not independently established. |
-| `candidates/pond_frogs_crickets.wav` | Glaneur de sons, [Nature sounds ambience in a Dordogne pond](https://commons.wikimedia.org/wiki/File:Nature_sounds_ambience_in_a_Dordogne_pond.ogg), [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/), as recorded by Commons and its 2014 licence review. | Prepared eight-second mixed dusk pond candidate, **excluded from runtime packages/playback**. Frog proximity awaits real exterior water surfaces; do not use tomb runoff as exterior water. Exact species unspecified. |
+| `runtime/pond_frogs_crickets.wav` | Glaneur de sons, [Nature sounds ambience in a Dordogne pond](https://commons.wikimedia.org/wiki/File:Nature_sounds_ambience_in_a_Dordogne_pond.ogg), [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/), as recorded by Commons and its 2014 licence review. | Eight-second finite mixed dusk pond candidate admitted byte-exact from preparation, only within 18 m of actual shared regional water faces in the ready same-night grounded exterior. Tomb runoff and guessed forest ponds do not admit it. Source species are unspecified; recording remains unheard and native mix/listening acceptance is pending. |
 | `candidates/periodical_cicada.wav` | Kathryn M. Fontaine, John R. Cooley and Chris Simon, [Calling song of Magicicada septendecim / Audio S1](https://commons.wikimedia.org/wiki/File:Calling_song_of_Magicicada_septendecim_-_pone.0000892.s001.oga), PLOS ONE 2007, doi:10.1371/journal.pone.0000892; [CC BY 2.5](https://creativecommons.org/licenses/by/2.5/). | Prepared 5.8-second candidate, **excluded from runtime packages/playback**. North American species with no night metadata; it is not admitted as nocturnal European ambience. |
 
 The earlier FilmCow candidate and its provenance remain preserved, but Android

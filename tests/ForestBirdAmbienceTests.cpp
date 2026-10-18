@@ -3,6 +3,7 @@
 #include "scene/ChapterTerrainSurface.h"
 #include "scene/assets/AssetManifest.h"
 #include <iostream>
+#include <limits>
 #include <memory>
 #include <vector>
 using namespace horde::gameplay::simulation;
@@ -21,6 +22,8 @@ int main() {
     static_assert(static_cast<unsigned>(GameplayEventType::ForestBird)==28);
     static_assert(static_cast<unsigned>(GameplayEventType::ForestBirdStopped)==29);
     static_assert(static_cast<unsigned>(GameplayEventType::ForestCrickets)==30);
+    static_assert(static_cast<unsigned>(GameplayEventType::PondFrogs)==31);
+    static_assert(kGameplayEventTypeCount==32);
     auto s=Exterior();Check(ForestBirdAmbience::Eligible(s),"ready grounded same-night forest admitted");
     for(unsigned mode=0;mode<9;++mode) {
         auto bad=s;
@@ -31,10 +34,39 @@ int main() {
         case 6:bad.chapterDialogue.proofAccepted=false;break;case 7:bad.worldRoute.readiness[2]=ZoneReadiness::Preparing;break;
         case 8:bad.playerGrounded=false;break;}
         Check(!ForestBirdAmbience::Eligible(bad),"pause/death/tomb/legacy/traversal/VO/proof/readiness/airborne suppress cue");
+        const auto river=horde::scene::ChapterWaterFromAtlas(60,-110,2.3f);
+        bad.playerX=river[0];bad.playerSupportWorldY=river[1];bad.playerZ=river[2];
+        Check(!ForestBirdAmbience::PondEligible(bad),"same lifecycle and dialogue gates suppress pond cue beside actual river");
     }
     s.worldRoute.current=WorldZoneId::TombExterior;Check(!ForestBirdAmbience::Eligible(s),"rescue clearing is not forest ambience");
     s.worldRoute.current=WorldZoneId::Lookout;s.worldRoute.readiness[3]=ZoneReadiness::Ready;
     Check(ForestBirdAmbience::Eligible(s),"lookout remains part of admitted forest");
+    {
+        // Policy fixture only: these explicit snapshots test actual authored
+        // surface coordinates, not a claim that gameplay reached the lake.
+        auto pond=Exterior();pond.worldRoute.current=WorldZoneId::TombExterior;
+        pond.worldRoute.readiness[1]=ZoneReadiness::Ready;
+        const auto shore=horde::scene::ChapterWaterFromAtlas(166,-349,0);
+        pond.playerX=shore[0];pond.playerSupportWorldY=shore[1]+1;pond.playerZ=shore[2];
+        Check(!ForestBirdAmbience::Eligible(pond) && ForestBirdAmbience::PondEligible(pond),
+            "pond uses actual shore in a ready same-night exterior without requiring forest zone");
+        const auto river=horde::scene::ChapterWaterFromAtlas(60,-110,2.3f);
+        pond.playerX=river[0];pond.playerSupportWorldY=river[1]-1;pond.playerZ=river[2];
+        Check(ForestBirdAmbience::PondEligible(pond),"actual regional ribbon admits nearby grounded exterior pond ambience");
+        pond.playerSupportWorldY=river[1]+ForestBirdAmbience::kPondProximityMetres+1;
+        Check(!ForestBirdAmbience::PondEligible(pond),"vertical separation excludes a high ledge over the same river XZ");
+        pond.playerSupportWorldY=river[1];pond.worldRoute.current=WorldZoneId::Dungeon;
+        Check(!ForestBirdAmbience::PondEligible(pond),"dungeon cannot borrow regional exterior water even at matching coordinates");
+        pond.worldRoute.current=WorldZoneId::TombExterior;pond.worldRoute.readiness[1]=ZoneReadiness::Preparing;
+        Check(!ForestBirdAmbience::PondEligible(pond),"unready exterior cannot admit pond ambience");
+        pond=Exterior();Check(!ForestBirdAmbience::PondEligible(pond),"ordinary forest coordinate is not an invented nearby pond");
+        const auto notch=horde::scene::ChapterWaterFromAtlas(-15,-275,0);
+        pond.playerX=notch[0];pond.playerSupportWorldY=notch[1];pond.playerZ=notch[2];
+        Check(!horde::scene::IsNearChapterRegionalWater(pond.playerX,pond.playerSupportWorldY,pond.playerZ,1.f),
+            "water query retains actual concave shore rather than a lake bounding box");
+        pond.playerSupportWorldY=std::numeric_limits<float>::quiet_NaN();
+        Check(!ForestBirdAmbience::PondEligible(pond),"nonfinite support cannot admit pond cue");
+    }
     for(unsigned rate:{15,30,60,120}) {
         ForestBirdAmbience bird;FixedStepRunner runner;std::vector<unsigned> ticks,crickets;unsigned tick=0;
         for(unsigned frame=0;frame<rate*100;++frame)runner.Advance(1.0/rate,false,[&](float){
@@ -48,16 +80,31 @@ int main() {
         unsigned plays=0;for(unsigned tick=0;tick<719;++tick)plays+=bird.Step(true)==ForestBirdAmbience::Cue::Play;
         Check(plays==0 && bird.Step(true)==ForestBirdAmbience::Cue::Play,"reentry requires a new twelve-second quiet interval");
         bird.Reset();Check(bird.Step(true)==ForestBirdAmbience::Cue::None,"reset/load must not replay last cue");
+        ForestBirdAmbience pond;FixedStepRunner pondRunner;std::vector<unsigned> pondTicks;unsigned pondTick=0;bool foreignCue=false;
+        for(unsigned frame=0;frame<rate*100;++frame)pondRunner.Advance(1.0/rate,false,[&](float){
+            const auto cue=pond.Step(false,true);++pondTick;
+            if(cue==ForestBirdAmbience::Cue::PlayPondFrogs)pondTicks.push_back(pondTick);
+            foreignCue|=cue==ForestBirdAmbience::Cue::Play || cue==ForestBirdAmbience::Cue::PlayCrickets;});
+        Check(!foreignCue,"pond-only exterior never borrows forest owl or cricket eligibility");
+        Check(pondTicks==std::vector<unsigned>({720,1440,3120,3840,5520}),"pond cadence remains sparse and independent of render grouping");
+        Check(pond.Step(true,false)==ForestBirdAmbience::Cue::Stop,"leaving water immediately stops pond voice even while forest remains eligible");
+        Check(pond.Step(true,false)==ForestBirdAmbience::Cue::None,"leaving water produces only one stop and no replacement burst");
+        pond.Reset();unsigned resetPond=0;
+        for(unsigned i=0;i<719;++i)resetPond+=pond.Step(false,true)!=ForestBirdAmbience::Cue::None;
+        Check(resetPond==0 && pond.Step(false,true)==ForestBirdAmbience::Cue::PlayPondFrogs,"pond reset/load requires full quiet interval");
+        Check(pond.Step(false,false)==ForestBirdAmbience::Cue::Stop,"all pond eligibility loss stops finite voice");
     }
     GameplayEvent event;event.type=GameplayEventType::ForestBird;event.sequence=57;
     const auto packed=horde::platform::android::PackGameplayEventMetadata(event);
     Check((packed&255)==28 && (packed>>32)==57,"appended cue preserves compact ordered Android transport");
     event.type=GameplayEventType::ForestCrickets;
     Check((horde::platform::android::PackGameplayEventMetadata(event)&255)==30,"cricket event uses its appended transport ID");
+    event.type=GameplayEventType::PondFrogs;
+    Check((horde::platform::android::PackGameplayEventMetadata(event)&255)==31,"pond event uses append-only transport ID31");
     auto game=std::make_unique<GameSimulation>(ProductionGameSimulationConfig());
     InputSnapshot input;input.damageEnabled=false;
     unsigned cues=0;for(unsigned tick=0;tick<800;++tick){game->StepFixed(input);
-        for(const auto& e:game->Events().Events())cues+=e.type==GameplayEventType::ForestBird || e.type==GameplayEventType::ForestCrickets;game->ClearEvents();}
+        for(const auto& e:game->Events().Events())cues+=e.type==GameplayEventType::ForestBird || e.type==GameplayEventType::ForestCrickets || e.type==GameplayEventType::PondFrogs;game->ClearEvents();}
     Check(cues==0,"real ordinary tomb fixed ticks never generate an exterior cue");
     std::cout<<"forest-bird ordinary journey starting\n";
     // Actual ordinary-input journey. Damage/teaching disabled CPU fixture;
@@ -161,7 +208,7 @@ int main() {
     Check(cricketCues==1,"ordinary forest simulation emits exactly one later cricket cue");
     input.paused=true;game->StepFixed(input);cues=0;
     input.paused=false;for(unsigned tick=0;tick<719;++tick){game->StepFixed(input);
-        for(const auto& e:game->Events().Events())cues+=e.type==GameplayEventType::ForestBird || e.type==GameplayEventType::ForestCrickets;game->ClearEvents();}
+        for(const auto& e:game->Events().Events())cues+=e.type==GameplayEventType::ForestBird || e.type==GameplayEventType::ForestCrickets || e.type==GameplayEventType::PondFrogs;game->ClearEvents();}
     Check(cues==0,"native pause/resume restarts quiet interval without an old cue burst");
     const auto earned=game->CaptureAuthoredCampaignBoundary(horde::gameplay::campaign::CheckpointId::SafeExit);
     Check(earned.has_value(),"recovery record comes from the actual completed ordinary-input journey");
@@ -172,7 +219,7 @@ int main() {
             "fresh session loads only an actually earned logical boundary");
         InputSnapshot neutral;neutral.damageEnabled=false;neutral.yawRadians=earned->yaw;neutral.pitchRadians=earned->pitch;
         unsigned replay=0;for(unsigned tick=0;tick<800;++tick){fresh->StepFixed(neutral);
-            for(const auto& e:fresh->Events().Events())replay+=e.type==GameplayEventType::ForestBird || e.type==GameplayEventType::ForestCrickets;fresh->ClearEvents();}
+            for(const auto& e:fresh->Events().Events())replay+=e.type==GameplayEventType::ForestBird || e.type==GameplayEventType::ForestCrickets || e.type==GameplayEventType::PondFrogs;fresh->ClearEvents();}
         Check(replay==0,"earned load does not replay forest audio debt at the safe exterior clearing");
     }
     std::cout<<checks<<" forest bird policy/transport/simulation checks, "<<failures<<" failures; listening and device mix unaccepted\n";

@@ -1,7 +1,8 @@
-# Explicit small roster: prepared pond/cicada candidates are never copied.
+# Explicit small roster: the unadmitted cicada candidate is never copied.
 function Get-HordeNightAudioRuntimeFiles {
     @('audio/night-ambience/runtime/tawny_owl.wav',
       'audio/night-ambience/runtime/evening_cricket.wav',
+      'audio/night-ambience/runtime/pond_frogs_crickets.wav',
       'audio/night-ambience/manifest.json', 'audio/night-ambience/NOTICE.md')
 }
 

@@ -1,19 +1,13 @@
 vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection);
 vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection);
 
-float dielectricSchlickFromR0(float incidentCosine, float r0)
-{
-    float cosine = clamp(incidentCosine, 0.0, 1.0);
-    float reflectance = clamp(r0, 0.0, 1.0);
-    return reflectance + (1.0 - reflectance) * pow(1.0 - cosine, 5.0);
-}
-
 float dielectricSchlick(float incidentCosine, float incidentIor, float transmittedIor)
 {
     float etaI = clamp(incidentIor, 1.0, 4.0);
     float etaT = clamp(transmittedIor, 1.0, 4.0);
     float ratio = (etaI - etaT) / max(etaI + etaT, 0.000001);
-    return dielectricSchlickFromR0(incidentCosine, ratio * ratio);
+    float r0 = ratio * ratio;
+    return r0 + (1.0 - r0) * pow(1.0 - clamp(incidentCosine, 0.0, 1.0), 5.0);
 }
 
 float dielectricEffectiveFresnel(float incidentCosine, float incidentIor,
@@ -89,6 +83,11 @@ vec3 dielectricBeerLambert(vec3 attenuationColor, float pathLength,
 
 vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
 {
+    int waterProfile = -1;
+    if ((rtInstances.values[h.instance].flags & kRtInstanceFlagStaticPbr) == 0u)
+        waterProfile = waterProfileIndex(worldSurfaces.codes[uint(h.primitive) + rtInstances.values[h.instance].primitiveBase]);
+    bool regionalWater = waterProfile >= 0;
+    h.normal = waterSurfaceNormal(h.position, h.geometricNormal, waterProfile);
     vec3 baseNormal = waterBaseNormal(h.position, h.geometricNormal);
     vec3 geometricNormal = dot(baseNormal, -rayDirection) < 0.0
         ? -baseNormal : baseNormal;
@@ -113,14 +112,20 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
             insideDirection = rayDirection;
         }
 
-        if (runoff)
+        if (regionalWater)
+        {
+            // A lake/river has one real top interface. Continue inside it to
+            // the actual RT riverbed; never invent a six-millimetre back face.
+            transmissionDirection = insideDirection;
+        }
+        else if (runoff)
         {
             // The catchment and runnel are a six-millimetre parallel film.
             waterPathLength = 0.006 /
                 max(-dot(insideDirection, geometricNormal), 0.18);
             exitPoint += insideDirection * waterPathLength;
             exitSurfaceNormal = waterSurfaceNormal(
-                exitPoint + vec3(-0.08, 0.0, 0.012), geometricNormal);
+                exitPoint + vec3(-0.08, 0.0, 0.012), geometricNormal, -1);
         }
         else
         {
@@ -132,7 +137,7 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
                                 exitOutwardNormal, waterPathLength))
             {
                 exitSurfaceNormal = waterSurfaceNormal(
-                    exitPoint + vec3(0.0, -0.08, 0.0), exitOutwardNormal);
+                    exitPoint + vec3(0.0, -0.08, 0.0), exitOutwardNormal, -1);
             }
             else
             {
@@ -144,25 +149,35 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
                 exitSurfaceNormal = surfaceNormal;
             }
         }
-        if (dot(exitSurfaceNormal, -insideDirection) < 0.0)
+        if (!regionalWater)
         {
-            exitSurfaceNormal = -exitSurfaceNormal;
-        }
-        transmissionDirection = refract(insideDirection, exitSurfaceNormal, waterIor);
-        if (dot(transmissionDirection, transmissionDirection) < 0.25)
-        {
-            // Total internal reflection has no transmitted path. High mode still
-            // traces its one reflected ray; Mobile uses analytic reflection.
-            transmissionAvailable = false;
+            if (dot(exitSurfaceNormal, -insideDirection) < 0.0)
+                exitSurfaceNormal = -exitSurfaceNormal;
+            transmissionDirection = refract(insideDirection, exitSurfaceNormal, waterIor);
+            if (dot(transmissionDirection, transmissionDirection) < 0.25)
+            {
+                // Total internal reflection has no transmitted path.
+                transmissionAvailable = false;
+            }
         }
     }
     vec3 transmitted = vec3(0.0);
+    float receiverDepth = 12.0;
+    bool bedHit = false;
     if (transmissionAvailable)
     {
         HitInfo transmittedHit = traceScene(exitPoint + transmissionDirection * 0.004,
                                              transmissionDirection, 12.0, 0x23u,
                                              0.002, true, false);
-        transmittedHit.t += h.t + waterPathLength;
+        if (regionalWater)
+        {
+            waterPathLength = transmittedHit.hit ? min(transmittedHit.t, 12.0) : 12.0;
+            receiverDepth = waterPathLength * max(-dot(transmissionDirection, geometricNormal), 0.0);
+            bedHit = transmittedHit.hit;
+        }
+        // The bed-hit distance already includes travel inside regional water;
+        // the thin-film path starts its query after a separate exit distance.
+        transmittedHit.t += h.t + waterPathLength * float(!regionalWater);
         transmitted = shadeOpaqueSecondary(transmittedHit, transmissionDirection);
         transmitted *= exp(-vec3(0.060, 0.018, 0.008) * waterPathLength);
     }
@@ -192,7 +207,7 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
 
     float viewCosine = clamp(dot(surfaceNormal, -rayDirection), 0.0, 1.0);
     float fresnel = transmissionAvailable
-        ? dielectricSchlickFromR0(viewCosine, 0.0204) : 1.0;
+        ? 0.0204 + 0.9796 * pow(1.0 - viewCosine, 5.0) : 1.0;
     vec3 localPosition;
     vec3 localColor;
     float localStrength;
@@ -209,7 +224,7 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
     // the pool and drain runnel black at approach angles. This remains an
     // interface reflection, now shadowed by the same world/player geometry as
     // every ordinary direct-light sample.
-    float runoffLocalHighlight = runoff
+    float runoffLocalHighlight = runoff && !regionalWater
         ? pow(max(dot(surfaceNormal, localHalf), 0.0), 14.0) : 0.0;
     bool genericTransmissionActive = genericTransmissionEnabled();
     vec3 localInterfaceTransmittance = localStrength > 0.001
@@ -260,7 +275,7 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
         + sin(h.position.y * 7.3 - controls.time * 5.1) * 0.27
         + sin(h.position.y * 13.7 + h.position.z * 17.0
               - controls.time * 8.4) * 0.17, 0.0, 1.0);
-    float entrainedAir = runoff ? 0.004
+    float entrainedAir = regionalWater ? 0.0 : runoff ? 0.004
         : 0.010 + pow(breakup, 3.0) * 0.028 + surfaceTurbulence * 0.010;
     // Clear water has no opaque-surface fire diffuse lobe. Only its existing
     // entrained-air fraction scatters direct fire light; keep the specular lobe
@@ -271,7 +286,7 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
     // The legacy path returns replicated scalar visibility; the generic path
     // returns RGB transmittance. Both use the same interface expression.
     interfaceLight += skyRadiance * skyInterfaceTransmittance * skyHighlight * 0.10;
-    if (runoff && h.position.x > -2.88)
+    if (!regionalWater && runoff && h.position.x > -2.88)
     {
         float impactDistance = length(h.position.xz - vec2(-2.32, -15.26));
         float impactCrest = pow(0.5 + 0.5 * sin(
@@ -291,6 +306,21 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
             + localColor * localStrength * localInterfaceVisibility * 0.18
         : skyRadiance * skyInterfaceTransmittance * 0.38
             + localColor * localInterfaceTransmittance * localStrength * 0.18;
+    if (regionalWater)
+    {
+        vec4 coordinate;
+        vec3 alongGradient, bankGradient;
+        waterProfileCoordinates(waterProfile, h.position, coordinate, alongGradient, bankGradient);
+        float phase = coordinate.x - coordinate.z * controls.time;
+        float bank = coordinate.w > 0.5 ? smoothstep(3.7, 4.8, abs(coordinate.y)) : 1.0;
+        // Foam only where an actual opaque receiver is shallow. It moves with
+        // the channel phase, scatters existing visible lights, and adds no ray.
+        float shallow = bedHit ? 1.0 - smoothstep(0.04, 0.30, receiverDepth) : 0.0;
+        float breakup = smoothstep(0.25, 0.72,
+            sin(phase * 2.1 + coordinate.y * 4.3) * sin(phase * 3.71 - coordinate.y * 2.8));
+        float foam = shallow * mix(0.015, 0.12, bank) * breakup;
+        return mix(surfaceRadiance, scatteringRadiance, foam);
+    }
     return mix(surfaceRadiance, scatteringRadiance, entrainedAir);
 }
 
@@ -397,7 +427,7 @@ vec3 shadePrimary(HitInfo h, vec3 rayDirection)
             ? bounceSample(transmittedHit, rayDirection, false) : skyColor(rayDirection);
         vec3 tint = vec3(0.82, 0.94, 1.0);
         float viewCosine = clamp(dot(h.geometricNormal, -rayDirection), 0.0, 1.0);
-        float fresnel = dielectricSchlickFromR0(viewCosine, 0.04);
+        float fresnel = 0.04 + 0.96 * pow(1.0 - viewCosine, 5.0);
         vec3 reflected = skyColor(reflect(rayDirection, h.geometricNormal));
         float transmission = 0.88;
         return mix(transmitted * tint * transmission, reflected, fresnel);

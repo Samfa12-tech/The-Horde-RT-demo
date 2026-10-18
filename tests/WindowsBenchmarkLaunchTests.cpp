@@ -1,4 +1,5 @@
 #include <array>
+#include <algorithm>
 #include <iostream>
 #include <string_view>
 #include <vector>
@@ -8,6 +9,8 @@
 #include "platform/windows/WindowsChapterShippingLaunch.h"
 #include "platform/windows/WindowsAssetRoot.h"
 #include "platform/windows/WindowsPresentInterval.h"
+#include "platform/windows/WindowsHiddenCaptureLaunch.h"
+#include "platform/windows/WindowsEnvironmentSurveyLaunch.h"
 
 int main()
 {
@@ -281,5 +284,74 @@ int main()
           "Debug native-motion capture admits explicit dust choice");
     check(!ParseWindowsMistCaptureLaunch(std::array<std::wstring_view, 6>{L"--capture-showcase", L"reports", L"--capture-dust", L"low", L"--capture-dust", L"off"}, true).error.empty(),
           "duplicate dust capture option rejects");
+    using horde::platform::windows::ParseWindowsHiddenCaptureLaunch;
+    check(!ParseWindowsHiddenCaptureLaunch(ordinary, true).hidden &&
+          ParseWindowsHiddenCaptureLaunch(ordinary, true).error.empty(),
+          "ordinary launch preserves default visibility");
+    const std::array<std::wstring_view, 3> hiddenCapture{
+        L"--capture-showcase", L"reports/hidden", L"--capture-hidden"};
+    check(ParseWindowsHiddenCaptureLaunch(hiddenCapture, true).hidden &&
+          ParseWindowsHiddenCaptureLaunch(hiddenCapture, true).error.empty(),
+          "Debug showcase accepts explicit hidden modifier");
+    check(ParseWindowsHiddenCaptureLaunch(
+              std::array<std::wstring_view, 3>{L"--capture-hidden", L"--capture-showcase", L"reports"}, true).error.empty(),
+          "hidden modifier is independent of argument order");
+    check(!ParseWindowsHiddenCaptureLaunch(hiddenCapture, false).error.empty(),
+          "Release rejects hidden capture before renderer startup");
+    check(!ParseWindowsHiddenCaptureLaunch(
+              std::array<std::wstring_view, 1>{L"--capture-hidden"}, true).error.empty() &&
+          !ParseWindowsHiddenCaptureLaunch(
+              std::array<std::wstring_view, 2>{L"--capture-showcase", L"--capture-hidden"}, true).error.empty(),
+          "hidden cannot launch an interactive window or consume a missing output path");
+    check(!ParseWindowsHiddenCaptureLaunch(
+              std::array<std::wstring_view, 4>{L"--capture-showcase", L"reports", L"--capture-hidden", L"--capture-hidden"}, true).error.empty(),
+          "duplicate hidden modifier rejects");
+    for (const auto conflict : {L"--benchmark-showcase", L"--measure-chapter-shipping-route",
+             L"--measure-chapter-foreground", L"--validate-native-motion",
+             L"--validate-output-resize", L"--capture-graphics-preview"})
+        check(!ParseWindowsHiddenCaptureLaunch(
+                  std::array<std::wstring_view, 4>{L"--capture-showcase", L"reports", L"--capture-hidden", conflict}, true).error.empty(),
+              "hidden showcase rejects conflicting benchmark/foreground/validation path");
+    check(ParseWindowsHiddenCaptureLaunch(
+              std::array<std::wstring_view, 5>{L"--capture-showcase", L"reports", L"--capture-hidden",
+                  L"--capture-portrait", L"--require-rayquery-compute"}, true).error.empty(),
+          "hidden leaves existing portrait and RT backend modifiers available");
+    using namespace horde::platform::windows;
+    const std::array<std::wstring_view,6> survey{L"--development-rescue-journey",L"--capture-showcase",L"reports",
+        L"--capture-hidden",L"--capture-environment-survey",L"river-bend"};
+    check(ParseWindowsEnvironmentSurveyLaunch(survey,true).requested &&
+          !ParseWindowsEnvironmentSurveyLaunch(survey,true).waterDisabled &&
+          ParseWindowsEnvironmentSurveyLaunch(survey,true).error.empty(),"hidden Debug survey admits one bounded camera profile");
+    check(!ParseWindowsEnvironmentSurveyLaunch(survey,false).error.empty(),"survey rejects Release");
+    std::vector<std::wstring_view> baseline(survey.begin(),survey.end());baseline.push_back(L"--survey-water-disabled");
+    check(ParseWindowsEnvironmentSurveyLaunch(baseline,true).waterDisabled &&
+          ParseWindowsEnvironmentSurveyLaunch(baseline,true).error.empty(),"explicit survey baseline permits water omission only");
+    for(const auto required:{L"--development-rescue-journey",L"--capture-hidden"}) {
+        auto missing=std::vector<std::wstring_view>(survey.begin(),survey.end());
+        missing.erase(std::find(missing.begin(),missing.end(),required));
+        check(!ParseWindowsEnvironmentSurveyLaunch(missing,true).error.empty(),"survey requires hidden native chapter setup");
+    }
+    for(const auto conflict:{L"--development-checkpoint",L"--validate-chapter-roundtrip",L"--benchmark-showcase",
+            L"--measure-chapter-foreground",L"--validate-native-motion",L"--capture-sky-attribution",L"--rt-lab-scale"}) {
+        auto invalid=std::vector<std::wstring_view>(survey.begin(),survey.end());invalid.push_back(conflict);
+        check(!ParseWindowsEnvironmentSurveyLaunch(invalid,true).error.empty(),"survey excludes gameplay staging and competing validation/tuning");
+    }
+    check(!ParseWindowsEnvironmentSurveyLaunch(std::array<std::wstring_view,1>{L"--survey-water-disabled"},true).error.empty(),
+          "water omission cannot affect an ordinary launch");
+    auto duplicateSurveyProfile=std::vector<std::wstring_view>(survey.begin(),survey.end());
+    duplicateSurveyProfile.push_back(L"--capture-environment-survey");duplicateSurveyProfile.push_back(L"river-bend");
+    check(!ParseWindowsEnvironmentSurveyLaunch(duplicateSurveyProfile,true).error.empty(),"duplicate environment profiles reject");
+    auto unknown=survey;unknown.back()=L"arbitrary-camera";
+    check(!ParseWindowsEnvironmentSurveyLaunch(unknown,true).error.empty(),"unknown survey profile rejects");
+    const auto plan=RiverBendSurveyCamera();
+    check(std::abs(plan.x-126.3f)<.0001f && std::abs(plan.z-151.2f)<.0001f &&
+          std::abs(plan.yaw-1.5707963f)<.0001f,"shore camera follows the original atlas transform");
+    unsigned pngCount=0;
+    for(unsigned frame=0;frame<kEnvironmentSurveyFrames;++frame) {
+        if((frame+1)%kEnvironmentSurveyCaptureStride==0)++pngCount;
+        if(frame)check(EnvironmentSurveyTime(frame)>EnvironmentSurveyTime(frame-1),"render time strictly advances without simulation input");
+    }
+    check(pngCount==12 && kEnvironmentSurveyFrames==120 && EnvironmentSurveyTime(0)==0 &&
+          std::abs(EnvironmentSurveyTime(119)-119.f/60.f)<.00001f,"survey retains fixed frame, image and time budgets");
     return passed ? 0 : 1;
 }

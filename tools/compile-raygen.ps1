@@ -18,6 +18,13 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+# Preserve retained generic transport functions while eliminating redundant
+# function-local loads/stores. No inlining or transport-budget change.
+$genericOptimizationPasses = @('--eliminate-dead-functions', '--eliminate-local-single-block',
+    '--eliminate-local-single-store', '--eliminate-local-multi-store',
+    '--eliminate-dead-code-aggressive', '--simplify-instructions', '--if-conversion',
+    '--ccp', '--eliminate-dead-branches', '--eliminate-dead-code-aggressive',
+    '--cfg-cleanup', '--merge-blocks')
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 if ([string]::IsNullOrWhiteSpace($VulkanSdk))
 {
@@ -362,7 +369,7 @@ function New-RaygenVariantCatalog
         if ($definition.strategy -eq 'LegacyInlined') { [void]$optimizerArguments.Add('-O') }
         else
         {
-            foreach ($pass in @('--eliminate-dead-functions', '--eliminate-dead-code-aggressive', '--simplify-instructions', '--eliminate-dead-branches', '--cfg-cleanup'))
+            foreach ($pass in $genericOptimizationPasses)
             { [void]$optimizerArguments.Add($pass) }
         }
         $variantRows += [ordered]@{
@@ -756,8 +763,7 @@ function Invoke-RaygenVariantCompilation
     }
     else
     {
-        & $optimizer --eliminate-dead-functions --eliminate-dead-code-aggressive `
-            --simplify-instructions --eliminate-dead-branches --cfg-cleanup $spirv -o $optimizedSpirv
+        & $optimizer @genericOptimizationPasses $spirv -o $optimizedSpirv
     }
     if ($LASTEXITCODE -ne 0) { throw "Raygen variant optimization failed with exit code $LASTEXITCODE." }
     [IO.File]::Copy($optimizedSpirv, $spirv, $true)
@@ -1220,11 +1226,7 @@ if ($LASTEXITCODE -ne 0)
 $optimizedSpirv = "$spirv.optimized"
 if (-not $Legacy)
 {
-    & $optimizer --eliminate-dead-functions `
-        --eliminate-dead-code-aggressive `
-        --simplify-instructions `
-        --eliminate-dead-branches `
-        --cfg-cleanup $spirv -o $optimizedSpirv
+    & $optimizer @genericOptimizationPasses $spirv -o $optimizedSpirv
 }
 else
 {

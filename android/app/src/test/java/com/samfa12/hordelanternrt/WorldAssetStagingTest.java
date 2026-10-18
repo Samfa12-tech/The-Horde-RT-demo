@@ -25,12 +25,20 @@ public final class WorldAssetStagingTest {
         final int publish = activity.indexOf("final boolean written = ProbeBridge.writeReports(filesRoot);", start);
         assertTrue("Native startup publication must follow asset staging", start >= 0 && publish > start);
         final String startup = activity.substring(start, publish);
+        assertTrue("Normal startup must invoke the shared cache roster before publication",
+                startup.contains("final boolean[] staged = stageRuntimeAssetCache();"));
+        final int cacheStart = activity.indexOf("private boolean[] stageRuntimeAssetCache()");
+        final int cacheEnd = activity.indexOf("return new boolean[]{skeletonStaged", cacheStart);
+        assertTrue("The shared asset-only cache roster must exist", cacheStart >= 0 && cacheEnd > cacheStart);
+        final String cache = activity.substring(cacheStart, cacheEnd);
+        assertFalse("Asset staging must not publish ordinary reports", cache.contains("ProbeBridge."));
+        assertFalse("Asset staging must not delete owner files", cache.contains(".delete()"));
         final Matcher included = Pattern.compile("(?m)^\\s*include '(models/world/runtime/[^']+)'\\s*$").matcher(gradle);
         int count = 0;
         while (included.find()) {
             final String path = included.group(1);
             final Matcher staged = Pattern.compile("stageAsset\\(\\s*\"" + Pattern.quote(path)
-                    + "\",\\s*\"" + Pattern.quote(path) + "\"\\s*\\)").matcher(startup);
+                    + "\",\\s*\"" + Pattern.quote(path) + "\"\\s*\\)").matcher(cache);
             int copies = 0;
             while (staged.find()) ++copies;
             assertEquals("Filesystem importer dependency must be staged once at its exact path: " + path,

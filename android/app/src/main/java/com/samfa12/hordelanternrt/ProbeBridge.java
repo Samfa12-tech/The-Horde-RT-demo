@@ -7,6 +7,17 @@ public final class ProbeBridge {
 
     private ProbeBridge() {}
 
+    /** Debug-only cold surface diagnostic; no gameplay or campaign authority. */
+    public static native boolean configureEnvironmentSurvey(String requestId, boolean waterDisabled,
+            int scale, int water, int fire, int cap, boolean glass, int shadow, boolean mist, int dust);
+    /** Explicit request identity prevents cancelled diagnostic starts falling into gameplay. */
+    public static native long startEnvironmentSurveySurface(android.view.Surface surface,
+            String baseDirectory, String requestId);
+    public static native void stopEnvironmentSurveySurface(long generation);
+    /** First element: 0 idle, 1 armed/running, 2 complete, 3 failed/cancelled. */
+    public static native long[] getEnvironmentSurveyStatus();
+    public static native void cancelEnvironmentSurvey();
+
     public static native String getTextReport();
     public static native String getJsonReport();
     // One status byte (0=ready), then strict UTF-8 JSON/error text. No modified UTF-8.

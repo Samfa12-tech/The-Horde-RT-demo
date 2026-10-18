@@ -34,7 +34,10 @@ class NightAmbienceAudioTests(unittest.TestCase):
                 self.assertAlmostEqual(peak,asset['peakDbfs'],places=6)
         cricket=next(a for a in manifest['assets'] if a['key']=='evening_cricket')
         self.assertEqual(cricket['license'],'CC-BY-SA-4.0')
-        for key in ['pond_frogs_crickets','periodical_cicada']:
-            self.assertFalse(next(a for a in manifest['assets'] if a['key']==key)['admitted'])
+        pond=next(a for a in manifest['assets'] if a['key']=='pond_frogs_crickets')
+        self.assertTrue(pond['admitted'])
+        self.assertEqual(pond['license'],'CC-BY-3.0')
+        self.assertEqual(pond['runtimeSha256'],'bb13e7ebaff3fdc0b3a872cbdfe0bda22a210a7a77fe401b50981c5e02763b76')
+        self.assertFalse(next(a for a in manifest['assets'] if a['key']=='periodical_cicada')['admitted'])
 
 if __name__=='__main__': unittest.main()
