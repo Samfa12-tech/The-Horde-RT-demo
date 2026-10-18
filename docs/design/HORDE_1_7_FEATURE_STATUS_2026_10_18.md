@@ -84,6 +84,16 @@ exists. These labels do not turn all remaining proposals into required features.
 
 ## Critical path after the bounded useful save integration
 
+Latest [repaired-artifact natural follow-up](../evidence/2026-10-18-android-earned-repair/README.md):
+incomplete before lantern claim, Keeper health 2, no newly earned save. It does
+not disprove the separate successful seeded creation/fresh-process reload, nor
+pass physical autosave/manual separation or death Load. All prior record bytes,
+286 paths and owner settings are unchanged after Quit. The old `damage ON`
+overlay omitted lesson protection; diagnostics are corrected without changing
+combat. Obtain bounded current contact evidence before retrying the phone gate;
+the host wall-contact hypothesis did not reproduce. No heavy content or species
+bed has been added while that gate is pending.
+
 The [first physical earned-save pass](../evidence/2026-10-18-android-earned-recovery/README.md)
 has now reached actual lantern claim with damage enabled, but first autosave and
 empty-slot manual creation both fail with no record created. This is the immediate

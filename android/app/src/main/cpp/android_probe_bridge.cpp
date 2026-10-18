@@ -1077,8 +1077,10 @@ horde::ui::DeveloperOverlaySnapshot BuildDeveloperOverlaySnapshot(const Swapchai
     snapshot.playerLifePhase = horde::gameplay::PlayerLifePhaseName(playerVitals.phase);
     snapshot.playerVitality = playerVitals.vitality;
     snapshot.playerMaxVitality = playerVitals.maxVitality;
+    snapshot.playerSafePractice = simulation.combatTeaching.safePractice;
     snapshot.playerDamageEnabled =
         playerVitals.phase == horde::gameplay::PlayerLifePhase::Alive &&
+        !snapshot.playerSafePractice &&
         !simulation.paused &&
         !context.inAppBenchmark.IsRunning() &&
         !context.routeReplayActive && !context.benchmarkSampling && !context.captureActive;
@@ -1902,6 +1904,7 @@ void WriteShowcaseDebugState(const SwapchainContext& context, const char* status
     const horde::vulkan::raytracing::RtSceneTuning rtLab = gRtLabState.Snapshot();
     const bool playerDamageEnabled =
         playerVitals.phase == horde::gameplay::PlayerLifePhase::Alive &&
+        !simulation.combatTeaching.safePractice &&
         !simulation.paused &&
         !context.inAppBenchmark.IsRunning() &&
         !context.routeReplayActive && !context.benchmarkSampling && !context.captureActive;
@@ -1918,7 +1921,8 @@ void WriteShowcaseDebugState(const SwapchainContext& context, const char* status
          << ", \"vitality\": " << playerVitals.vitality
          << ", \"maxVitality\": " << playerVitals.maxVitality
          << ", \"lifePhase\": \"" << horde::gameplay::PlayerLifePhaseName(playerVitals.phase) << "\""
-         << ", \"damageEnabled\": " << (playerDamageEnabled ? "true" : "false") << "},\n"
+         << ", \"damageEnabled\": " << (playerDamageEnabled ? "true" : "false")
+         << ", \"safePractice\": " << (simulation.combatTeaching.safePractice ? "true" : "false") << "},\n"
          << "  \"playerCombat\": {\"action\": \""
          << DebugPlayerCombatActionName(simulation.playerCombat.action)
          << "\", \"actionTime\": " << simulation.playerCombat.actionTime

@@ -3825,7 +3825,8 @@ horde::ui::DeveloperOverlaySnapshot BuildDeveloperOverlaySnapshot(
     snapshot.playerLifePhase = horde::gameplay::PlayerLifePhaseName(player.phase);
     snapshot.playerVitality = player.vitality;
     snapshot.playerMaxVitality = player.maxVitality;
-    snapshot.playerDamageEnabled = IsPlayerDamageEnabled(context);
+    snapshot.playerSafePractice = simulation.combatTeaching.safePractice;
+    snapshot.playerDamageEnabled = IsPlayerDamageEnabled(context) && !snapshot.playerSafePractice;
     snapshot.simulationTicksThisFrame = simulation.simulationTicksThisFrame;
     snapshot.fixedStepAccumulatorSeconds = simulation.fixedStepAccumulatorSeconds;
     snapshot.catchUpOverrunCount = simulation.catchUpOverrunCount;

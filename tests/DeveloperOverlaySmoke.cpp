@@ -94,6 +94,16 @@ int main()
                           "COMBAT 2 active  |  attacker 2  |  player parry-active  |  enemy attack-active  |  pose buckets 2");
     ok &= RequireContains(text, "MAT ASTC test route");
 
+    snapshot.playerLifePhase = "alive";
+    snapshot.playerVitality = 3;
+    snapshot.playerDamageEnabled = true;
+    snapshot.playerSafePractice = true;
+    ok &= RequireContains(horde::ui::BuildDeveloperOverlayText(snapshot),
+                          "PLAYER alive  |  vitality 3/3  |  damage OFF (lesson)");
+    snapshot.playerSafePractice = false;
+    ok &= RequireContains(horde::ui::BuildDeveloperOverlayText(snapshot),
+                          "PLAYER alive  |  vitality 3/3  |  damage ON");
+
     snapshot.presented = false;
     snapshot.selectedEnemy = "none";
     snapshot.encounterPhase = "inactive";

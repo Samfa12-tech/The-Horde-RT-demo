@@ -1,5 +1,15 @@
 # Logical safe-checkpoint round trip and next storage boundary
 
+**Latest repaired-artifact follow-up:** the
+[unseeded phone attempt](../evidence/2026-10-18-android-earned-repair/README.md)
+stops at Keeper health 2 before lantern claim; it creates no checkpoint and
+does not exercise the repaired publication branch. Physical earned manual/auto
+separation, upper replacement and death Load remain pending. The separate
+seeded first creation and fresh-process reload remain passed. The older
+`damage ON` label omitted enabled lesson protection; a diagnostic-only fix now
+reports that protection explicitly. Do not infer unprotected survival from
+the older wording. Current live contact evidence is needed before more retries.
+
 **Latest physical gate:** the [earned Android trial](../evidence/2026-10-18-android-earned-recovery/README.md)
 reaches lantern claim with ordinary touch input and damage enabled, then fails
 first autosave and empty-slot manual creation. No records are created. Existing

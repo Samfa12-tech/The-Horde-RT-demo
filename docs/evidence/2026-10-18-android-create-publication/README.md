@@ -3,8 +3,9 @@
 **Seeded diagnostic: fresh Slot 2 manual creation now succeeds.** The earlier
 diagnostic failed at create-only publication with native EACCES (13). The repaired
 Android candidate reports success with file-and-directory durability and produces
-the expected record bytes. Fresh-process reload and terminal custody are pending
-root's separate completion; this receipt currently certifies creation only.
+the expected record bytes. The completed fresh-process reload and terminal
+custody checks are recorded below; the separate natural earned/death gate remains
+open. This receipt certifies bounded seeded creation and reload only.
 
 ## Failure and repair
 

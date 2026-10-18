@@ -1,5 +1,27 @@
 # Horde 1.7 current design index
 
+## Repaired-artifact earned route remains incomplete - 18 October 2026
+
+The [unseeded follow-up](../evidence/2026-10-18-android-earned-repair/README.md)
+on installed APK `4c84eb45` reaches the Keeper with ordinary touch input, defeats
+the guards and confirms one Keeper hit, but stops with Keeper health 2. It does
+not reach lantern claim or exercise new save publication; no new records exist.
+Natural autosave/manual separation, upper replacement and physical death Load
+remain open. Existing seeded creation/fresh-process recovery evidence remains
+valid for its own scope. Terminal Quit preserves all eight prior records, all
+286 paths and owner settings, with zero Horde activities.
+
+The old overlay's `damage ON` describes the platform request and overlooks
+lesson safe practice. Earlier wording alone therefore does not establish
+unprotected combat. A diagnostic-only correction now labels lesson protection
+on both platforms and in Android debug JSON; it changes no gameplay. Current
+phone range/aim is unmeasured after the bounded trace fills. A host wall-contact
+probe does not reproduce a collision failure. Stop blind retries; capture a
+bounded current contact diagnostic before another phone combat acceptance run.
+The [nocturnal source review](../evidence/2026-10-18-android-earned-repair/nocturnal-source-review.md)
+identifies an attributed night-owl candidate and a dusk pond bed, without
+downloading, auditioning or adding runtime content before this recovery gate.
+
 ## Current earned-save failure and bounded ambience candidate - 18 October 2026
 
 The [first physical earned-save trial](../evidence/2026-10-18-android-earned-recovery/README.md)

@@ -1,5 +1,18 @@
 # Android RT Device Compatibility Record
 
+## 2026-10-18 - repaired checkpoint artifact, incomplete natural route
+
+SM-S948B / Android 17 / API 37 / Adreno 840 / Vulkan 1.4.295, installed Debug
+APK `4c84eb456f97717df055245410196101ea681a3bc55d0c9776eb42a59d591073`:
+an isolated, unseeded New Game reaches the Keeper through ordinary phone touch,
+with RT-produced presentation observed, but stops with Keeper health 2 before
+lantern claim. No new record is created; earned autosave/manual separation,
+ascent replacement and physical death Load are **not accepted**. The old overlay
+omits lesson protection, so `damage ON` is not unprotected-combat evidence.
+All eight existing test records, 286 paths and owner settings are unchanged;
+normal Quit leaves zero activities. This is an incomplete route receipt, not a
+new compatibility/performance pass. [Exact evidence and diagnostic correction](evidence/2026-10-18-android-earned-repair/README.md).
+
 ## 2026-10-18 — exact-zero mist optimisation, bounded physical evidence
 
 SM-S948B / Adreno840 / API37 / Vulkan1.4.295 / driver2150932499: both

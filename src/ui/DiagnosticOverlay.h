@@ -44,6 +44,7 @@ struct DeveloperOverlaySnapshot
     int playerVitality = 3;
     int playerMaxVitality = 3;
     bool playerDamageEnabled = true;
+    bool playerSafePractice = false;
     float renderScale = 1.0f;
     float fps = 0.0f;
     float frameTimeMs = 0.0f;
