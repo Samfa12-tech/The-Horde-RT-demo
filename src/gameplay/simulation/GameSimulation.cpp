@@ -512,8 +512,11 @@ void GameSimulation::ResolvePlayerSupport()
     if (config_.developmentRescueJourney && rescueTraversal_.IsActive()) return;
     if (UsesRescueExterior()) {
         if(config_.authoredChapterTerrain) {
-            if(chapterTerrain_ && chapterTerrainGeneration_==worldRoute_.generation)
-                playerSupport_=horde::gameplay::traversal::ChapterExteriorSupport(chapterTerrain_.get(),playerX_,playerZ_);
+            if(chapterTerrain_ && chapterTerrainGeneration_==worldRoute_.generation) {
+                playerSupport_=CurrentCombatRules() && chapterTerrain_->StepTriangleCount()?
+                    horde::gameplay::traversal::ChapterExteriorStepSupport(*chapterTerrain_,playerX_,playerZ_,kPlayerCollisionRadius):
+                    horde::gameplay::traversal::ChapterExteriorSupport(chapterTerrain_.get(),playerX_,playerZ_);
+            }
             return; // retain the last safe support while reconstruction is pending
         }
         playerSupport_ = horde::gameplay::traversal::RescueExteriorSupport(playerX_,playerZ_); return;
@@ -534,21 +537,33 @@ void GameSimulation::ResolvePlayerSupport()
 void GameSimulation::ResolveMovementCollision(float previousX, float previousZ)
 {
     if (UsesRescueExterior()) {
-        const auto support=config_.authoredChapterTerrain?
+        auto support=config_.authoredChapterTerrain?
             horde::gameplay::traversal::ChapterExteriorSupport(chapterTerrain_.get(),playerX_,playerZ_):
             horde::gameplay::traversal::RescueExteriorSupport(playerX_,playerZ_);
         const auto p=ProjectWorldRoute(playerX_,playerZ_);
         const auto zone=support.id==static_cast<PlayerSupportId>(130)?WorldZoneId::TombExterior:
             (p.valid&&p.distance<=kWorldRouteHalfWidth?ZoneForRouteSegment(p.segment):WorldZoneId::TombExterior);
         const bool ready=worldRoute_.readiness[static_cast<std::size_t>(zone)]==ZoneReadiness::Ready;
-        const bool clear=config_.authoredChapterTerrain ?
+        const bool stepMotor=CurrentCombatRules() && config_.authoredChapterTerrain && chapterTerrain_ &&
+           chapterTerrainGeneration_==worldRoute_.generation && chapterTerrain_->StepTriangleCount() &&
+           !horde::gameplay::traversal::OnRescueLanding(previousX,previousZ) &&
+           !horde::gameplay::traversal::OnRescueLanding(playerX_,playerZ_);
+        bool clear=!stepMotor && (config_.authoredChapterTerrain ?
             (chapterTerrain_ && chapterTerrainGeneration_==worldRoute_.generation && horde::gameplay::traversal::ChapterExteriorMovementClear(
                 *chapterTerrain_,previousX,previousZ,playerX_,playerZ_,playerSupport_.worldY,kPlayerCollisionRadius)) :
             (horde::gameplay::traversal::RescueExteriorMovementClear(
             previousX,previousZ,playerX_,playerZ_,playerSupport_.worldY,kPlayerCollisionRadius) &&
             WorldRouteBlockoutMovementClear(previousX,previousZ,playerX_,playerZ_,playerSupport_.worldY,kPlayerCollisionRadius,true) &&
             (support.id==static_cast<PlayerSupportId>(130) ||
-             WorldRouteTerrainMovementClear(previousX,previousZ,playerX_,playerZ_,playerSupport_.worldY,kPlayerCollisionRadius)));
+             WorldRouteTerrainMovementClear(previousX,previousZ,playerX_,playerZ_,playerSupport_.worldY,kPlayerCollisionRadius))));
+        // Only explicitly admitted step geometry opts into the bounded motor.
+        // Frozen historical captures and the authored rope landing retain their
+        // existing contracts. No runtime root asset is implicitly promoted.
+        if(stepMotor) {
+            const auto movement=horde::gameplay::traversal::ResolveChapterStepMovement(
+                *chapterTerrain_,previousX,previousZ,playerX_,playerZ_,playerSupport_.worldY,kPlayerCollisionRadius);
+            clear=movement.accepted;support=movement.support;
+        }
         if(!support.grounded||!ready||!clear||std::abs(support.worldY-playerSupport_.worldY)>kWorldRouteMaximumStep) {
             playerX_=previousX;playerZ_=previousZ;worldRoute_.blocked=true;++worldRoute_.rollbackCount;
         } else {

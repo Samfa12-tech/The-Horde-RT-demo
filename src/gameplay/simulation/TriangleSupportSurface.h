@@ -81,7 +81,8 @@ public:
     static std::shared_ptr<const TriangleSupportSurface> WithNonWalkableGeometry(
         const TriangleSupportSurface& ground, std::span<const Triangle> input, std::string& diagnostic)
     {
-        if(ground.nonWalkable_ || input.size()>kMaximumTriangles-ground.TriangleCount()) {
+        const auto retained=ground.TriangleCount()+ground.StepTriangleCount();
+        if(ground.nonWalkable_ || retained>kMaximumTriangles || input.size()>kMaximumTriangles-retained) {
             diagnostic="Nonwalkable geometry was already attached or exceeds bounded intake.";return {};
         }
         auto contact=Build(input,diagnostic);
@@ -90,7 +91,44 @@ public:
         result->nonWalkable_=std::move(contact);diagnostic.clear();return result;
     }
     bool NonWalkableVolumeClear(float x0,float z0,float x1,float z1,float y0,float y1,float radius) const {
-        return !nonWalkable_ || nonWalkable_->HorizontalVolumeClear(x0,z0,x1,z1,y0,y1,radius);
+        return UnsteppableVolumeClear(x0,z0,x1,z1,y0,y1,radius)&&
+            StepVolumeClear(x0,z0,x1,z1,y0,y1,radius);
+    }
+    // Explicit authored step geometry remains solid to held props and legacy
+    // movement. Only the locomotion resolver may consider its eligible tops.
+    // Bare Query() and tree/root placement never observe this separate lane.
+    static std::shared_ptr<const TriangleSupportSurface> WithStepGeometry(
+        const TriangleSupportSurface& ground,std::span<const Triangle> input,std::string& diagnostic)
+    {
+        const auto retained=ground.TriangleCount()+ground.NonWalkableTriangleCount();
+        if(ground.steps_ || input.empty() || retained>kMaximumTriangles || input.size()>kMaximumTriangles-retained) {
+            diagnostic="Step geometry is empty, already attached or exceeds bounded intake.";return {};
+        }
+        auto steps=Build(input,diagnostic);
+        if(!steps)return {};
+        auto result=std::shared_ptr<TriangleSupportSurface>(new TriangleSupportSurface(ground));
+        result->steps_=std::move(steps);diagnostic.clear();return result;
+    }
+    std::size_t StepTriangleCount() const {return steps_?steps_->TriangleCount():0;}
+    bool UnsteppableVolumeClear(float x0,float z0,float x1,float z1,float y0,float y1,float radius) const {
+        return ValidVolume(x0,z0,x1,z1,y0,y1,radius)&&
+            (!nonWalkable_ || nonWalkable_->HorizontalVolumeClear(x0,z0,x1,z1,y0,y1,radius));
+    }
+    bool StepVolumeClear(float x0,float z0,float x1,float z1,float y0,float y1,float radius) const {
+        return ValidVolume(x0,z0,x1,z1,y0,y1,radius)&&
+            (!steps_ || steps_->HorizontalVolumeClear(x0,z0,x1,z1,y0,y1,radius));
+    }
+    // Highest eligible upward face touched by the swept circular footprint.
+    // worldY is the conservative maximum of the height-clipped face, not a
+    // point sample or a full capsule/grounded-landing certificate. GroundSweep
+    // and body/headroom clearance remain independent admission requirements.
+    Sample StepSupport(float fromX,float fromZ,float toX,float toZ,
+                       float minimumY,float maximumY,float radius) const
+    {
+        Sample result;
+        if(!steps_ || !ValidVolume(fromX,fromZ,toX,toZ,minimumY,maximumY,radius))return result;
+        steps_->StepSupportNode(0,fromX,fromZ,toX,toZ,minimumY,maximumY,radius,result);
+        return result;
     }
     // Append real imported prop triangles without replacing earlier contact or
     // promoting their tops to ground. Both generations stay immutable.
@@ -98,8 +136,8 @@ public:
         const TriangleSupportSurface& ground, std::span<const Triangle> input, std::string& diagnostic)
     {
         const auto oldCount=ground.NonWalkableTriangleCount();
-        if(input.empty() || oldCount>kMaximumTriangles-ground.TriangleCount() ||
-           input.size()>kMaximumTriangles-ground.TriangleCount()-oldCount) {
+        const auto retained=ground.TriangleCount()+oldCount+ground.StepTriangleCount();
+        if(input.empty() || retained>kMaximumTriangles || input.size()>kMaximumTriangles-retained) {
             diagnostic="Additional nonwalkable geometry is empty or exceeds bounded intake.";return {};
         }
         std::vector<Triangle> combined;
@@ -119,11 +157,21 @@ public:
     bool HorizontalVolumeClear(float fromX,float fromZ,float toX,float toZ,
                                float minimumY,float maximumY,float radius) const
     {
-        for(float v:{fromX,fromZ,toX,toZ,minimumY,maximumY,radius})
-            if(!std::isfinite(v)||std::abs(v)>1000000.f)return false;
-        if(minimumY>maximumY||radius<=0||radius>2||
-           std::hypot(toX-fromX,toZ-fromZ)>16)return false;
+        if(!ValidVolume(fromX,fromZ,toX,toZ,minimumY,maximumY,radius))return false;
         return HorizontalVolumeNodeClear(0,fromX,fromZ,toX,toZ,minimumY,maximumY,radius);
+    }
+    // Terrain-only body sweep with a conservative floor-band exemption.
+    // Upward walkable faces are clipped to the part above the footprint's
+    // permitted slope band. Remote high vertices cannot block local ground
+    // contact. Vertical/steep/downward faces retain the full body band.
+    // Attached prop/step lanes require their separate clearance queries.
+    bool HorizontalBodyVolumeClear(float fromX,float fromZ,float toX,float toZ,
+                                   float footY,float bodyHeight,float radius) const
+    {
+        if(!std::isfinite(footY)||!std::isfinite(bodyHeight)||bodyHeight<.5f||bodyHeight>2.5f ||
+           !ValidVolume(fromX,fromZ,toX,toZ,footY+.001f,footY+bodyHeight,radius))return false;
+        return HorizontalVolumeNodeClear(0,fromX,fromZ,toX,toZ,footY+.001f,footY+bodyHeight,radius,
+            footY+radius*kMaximumWalkableSlope+.001f);
     }
     // Ground-footprint sweep only. Authored obstacle/body-clearance tests remain
     // separate; this cannot certify capsule clearance under branches or roofs.
@@ -161,7 +209,8 @@ public:
     }
     std::size_t TriangleCount() const { return triangles_.size(); }
     std::size_t RetainedBytes() const {
-        return (nonWalkable_?nonWalkable_->RetainedBytes():0)+triangles_.capacity()*sizeof(Triangle)+normals_.capacity()*sizeof(Point)+
+        return (nonWalkable_?nonWalkable_->RetainedBytes():0)+(steps_?steps_->RetainedBytes():0)+
+               triangles_.capacity()*sizeof(Triangle)+normals_.capacity()*sizeof(Point)+
                order_.capacity()*sizeof(std::uint32_t)+nodes_.capacity()*sizeof(Node);
     }
 private:
@@ -170,10 +219,18 @@ private:
     struct Node { Point minimum{},maximum{};std::uint32_t begin=0,count=0,left=0,right=0; };
     std::vector<Triangle> triangles_;
     std::shared_ptr<const TriangleSupportSurface> nonWalkable_;
+    std::shared_ptr<const TriangleSupportSurface> steps_;
     std::vector<Point> normals_;
     std::vector<std::uint32_t> order_;
     std::vector<Node> nodes_;
     using Polygon=std::array<Point,6>;
+    static bool ValidVolume(float fromX,float fromZ,float toX,float toZ,
+                            float minimumY,float maximumY,float radius)
+    {
+        for(float v:{fromX,fromZ,toX,toZ,minimumY,maximumY,radius})
+            if(!std::isfinite(v)||std::abs(v)>1000000.f)return false;
+        return minimumY<=maximumY&&radius>0&&radius<=2&&std::hypot(toX-fromX,toZ-fromZ)<=16;
+    }
     static std::size_t ClipHeight(const Polygon& input,std::size_t count,
                                   float height,bool keepAbove,Polygon& output)
     {
@@ -230,27 +287,63 @@ private:
         }
         return std::abs(area)>1e-12&&!(positive&&negative);
     }
+    static bool SweptFootprintTouches(const Polygon& polygon,std::size_t count,
+        Point from,Point to,double radiusSquared)
+    {
+        if(ProjectedPolygonContains(polygon,count,from)||ProjectedPolygonContains(polygon,count,to))return true;
+        for(std::size_t edge=0;edge<count;++edge)
+            if(SegmentDistanceSquared(from,to,polygon[edge],polygon[(edge+1)%count])<=radiusSquared)return true;
+        return false;
+    }
+    void StepSupportNode(std::uint32_t index,float x,float z,float toX,float toZ,
+                         float minY,float maxY,float radius,Sample& result) const
+    {
+        const auto& node=nodes_[index];
+        if(std::max(x,toX)+radius<node.minimum[0]||std::min(x,toX)-radius>node.maximum[0]||
+           std::max(z,toZ)+radius<node.minimum[2]||std::min(z,toZ)-radius>node.maximum[2]||
+           maxY<node.minimum[1]||minY>node.maximum[1])return;
+        if(!node.count) {
+            StepSupportNode(node.left,x,z,toX,toZ,minY,maxY,radius,result);
+            StepSupportNode(node.right,x,z,toX,toZ,minY,maxY,radius,result);return;
+        }
+        const Point from{x,0,z},to{toX,0,toZ};
+        const double radiusSquared=double(radius)*radius;
+        for(auto i=node.begin;i<node.begin+node.count;++i) {
+            const auto id=order_[i];const auto n=normals_[id];++result.testedTriangles;
+            if(n[1]<=1e-7f || std::hypot(n[0],n[2])>kMaximumWalkableSlope*n[1]+1e-7f)continue;
+            Polygon a{},b{};const auto& triangle=triangles_[id];
+            std::copy(triangle.points.begin(),triangle.points.end(),a.begin());
+            const auto first=ClipHeight(a,3,minY,true,b);
+            const auto count=ClipHeight(b,first,maxY,false,a);
+            if(!count || !SweptFootprintTouches(a,count,from,to,radiusSquared))continue;
+            float height=minY;
+            for(std::size_t vertex=0;vertex<count;++vertex)height=std::max(height,a[vertex][1]);
+            if(result.found && (height<result.worldY || (height==result.worldY && id>result.triangle)))continue;
+            result.found=result.walkable=true;result.worldY=height;result.normal=n;
+            result.surface=triangle.surface;result.triangle=id;
+        }
+    }
     bool HorizontalVolumeNodeClear(std::uint32_t index,float x,float z,float toX,float toZ,
-                                  float minY,float maxY,float radius) const
+                                  float minY,float maxY,float radius,
+                                  float ignoredWalkableBelow=-std::numeric_limits<float>::infinity()) const
     {
         const auto& node=nodes_[index];
         if(std::max(x,toX)+radius<node.minimum[0]||std::min(x,toX)-radius>node.maximum[0]||
            std::max(z,toZ)+radius<node.minimum[2]||std::min(z,toZ)-radius>node.maximum[2]||
            maxY<node.minimum[1]||minY>node.maximum[1])return true;
-        if(!node.count)return HorizontalVolumeNodeClear(node.left,x,z,toX,toZ,minY,maxY,radius)&&
-                               HorizontalVolumeNodeClear(node.right,x,z,toX,toZ,minY,maxY,radius);
+        if(!node.count)return HorizontalVolumeNodeClear(node.left,x,z,toX,toZ,minY,maxY,radius,ignoredWalkableBelow)&&
+                               HorizontalVolumeNodeClear(node.right,x,z,toX,toZ,minY,maxY,radius,ignoredWalkableBelow);
         const Point from{x,0,z},to{toX,0,toZ};
         const double radiusSquared=double(radius)*radius;
         for(auto i=node.begin;i<node.begin+node.count;++i) {
             Polygon a{},b{};
-            const auto& triangle=triangles_[order_[i]];
+            const auto id=order_[i];const auto& triangle=triangles_[id];const auto n=normals_[id];
+              const bool walkable=n[1]>1e-7f && std::hypot(n[0],n[2])<=kMaximumWalkableSlope*n[1]+1e-7f;
             std::copy(triangle.points.begin(),triangle.points.end(),a.begin());
-            const auto first=ClipHeight(a,3,minY,true,b);
+              const auto first=ClipHeight(a,3,walkable?std::max(minY,ignoredWalkableBelow):minY,true,b);
             const auto count=ClipHeight(b,first,maxY,false,a);
             if(!count)continue;
-            if(ProjectedPolygonContains(a,count,from)||ProjectedPolygonContains(a,count,to))return false;
-            for(std::size_t edge=0;edge<count;++edge)
-                if(SegmentDistanceSquared(from,to,a[edge],a[(edge+1)%count])<=radiusSquared)return false;
+            if(SweptFootprintTouches(a,count,from,to,radiusSquared))return false;
         }
         return true;
     }

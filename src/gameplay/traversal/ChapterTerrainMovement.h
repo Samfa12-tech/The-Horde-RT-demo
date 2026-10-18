@@ -15,10 +15,12 @@ inline simulation::PlayerSupportResolution ChapterExteriorSupport(
             ground.found&&ground.walkable,ground.surface};
 }
 inline bool ChapterExteriorObstacleClear(const simulation::TriangleSupportSurface& terrain,
-    float fromX,float fromZ,float toX,float toZ,float minimumY,float maximumY,float radius)
+    float fromX,float fromZ,float toX,float toZ,float minimumY,float maximumY,float radius,
+    bool includeSteps=true)
 {
     if(!RescueExteriorVolumeClear(fromX,fromZ,toX,toZ,minimumY,maximumY,radius))return false;
-    if(!terrain.NonWalkableVolumeClear(fromX,fromZ,toX,toZ,minimumY,maximumY,radius))return false;
+    if(!(includeSteps?terrain.NonWalkableVolumeClear(fromX,fromZ,toX,toZ,minimumY,maximumY,radius):
+                     terrain.UnsteppableVolumeClear(fromX,fromZ,toX,toZ,minimumY,maximumY,radius)))return false;
     // Trunk horizontal bounds remain the measured admitted bark bounds. The
     // vertical origin follows the very same terrain sample used for rendering.
     for(const auto& tree:simulation::kForestTreePlacementContract) {
@@ -36,6 +38,56 @@ inline bool ChapterExteriorObstacleClear(const simulation::TriangleSupportSurfac
            axis(fromZ,toZ,tree.trunkMinZ-radius,tree.trunkMaxZ+radius))return false;
     }
     return true;
+}
+// Separate opt-in step support: bare ground remains the terrain/tree-placement
+// authority. This footprint maximum is deliberately conservative around roots.
+inline simulation::PlayerSupportResolution ChapterExteriorStepSupport(
+    const simulation::TriangleSupportSurface& terrain,float x,float z,float radius)
+{
+    auto support=ChapterExteriorSupport(&terrain,x,z);
+    if(!support.grounded || OnRescueLanding(x,z))return support;
+    const auto step=terrain.StepSupport(x,z,x,z,support.worldY,
+        support.worldY+simulation::kWorldRouteMaximumStep,radius);
+    if(step.found && step.worldY>support.worldY &&
+       terrain.StepVolumeClear(x,z,x,z,step.worldY+.001f,step.worldY+1.8f,radius)) {
+        support.worldY=step.worldY;support.surface=step.surface;
+        // Distinct from bare ground and the authored landing identities.
+        support.id=static_cast<simulation::PlayerSupportId>(100000+step.triangle);
+    }
+    return support;
+}
+struct ChapterStepMovement {
+    bool accepted=false;
+    simulation::PlayerSupportResolution support{};
+};
+inline ChapterStepMovement ResolveChapterStepMovement(
+    const simulation::TriangleSupportSurface& terrain,float fromX,float fromZ,float toX,float toZ,
+    float previousFootY,float radius,float bodyHeight=1.8f)
+{
+    using namespace simulation;
+    ChapterStepMovement result;
+    if(!std::isfinite(bodyHeight)||bodyHeight<.5f||bodyHeight>2.5f||!std::isfinite(previousFootY))return result;
+    const auto start=ChapterExteriorSupport(&terrain,fromX,fromZ);
+    const auto end=ChapterExteriorSupport(&terrain,toX,toZ);
+    if(!start.grounded||!end.grounded || OnRescueLanding(fromX,fromZ)||OnRescueLanding(toX,toZ))return result;
+    const auto current=ChapterExteriorStepSupport(terrain,fromX,fromZ,radius);
+    if(std::abs(current.worldY-previousFootY)>.001f ||
+       !terrain.GroundSweep(fromX,fromZ,toX,toZ,start.worldY,radius,kWorldRouteMaximumStep))return result;
+    result.support=ChapterExteriorStepSupport(terrain,toX,toZ,radius);
+    const float limit=std::min(previousFootY+kWorldRouteMaximumStep,
+                              std::min(start.worldY,end.worldY)+kWorldRouteMaximumStep);
+    const auto swept=terrain.StepSupport(fromX,fromZ,toX,toZ,std::min(start.worldY,end.worldY),limit,radius);
+    const float raisedFoot=std::max({previousFootY,result.support.worldY,swept.found?swept.worldY:previousFootY});
+    if(std::abs(result.support.worldY-previousFootY)>kWorldRouteMaximumStep+.0001f ||
+       raisedFoot-previousFootY>kWorldRouteMaximumStep+.0001f)return result;
+    // Never exempt an entire step object: taller/steep/downward faces remain
+    // solid above the raised foot. Ordinary props cannot be stepped over even
+    // when their height happens to fit below the raised horizontal sweep.
+    const float bottom=std::min(previousFootY,result.support.worldY)+.001f,top=raisedFoot+bodyHeight;
+    result.accepted=ChapterExteriorObstacleClear(terrain,fromX,fromZ,toX,toZ,bottom,top,radius,false) &&
+        terrain.StepVolumeClear(fromX,fromZ,toX,toZ,raisedFoot+.001f,top,radius) &&
+        terrain.HorizontalBodyVolumeClear(fromX,fromZ,toX,toZ,raisedFoot,bodyHeight,radius);
+    return result;
 }
 inline bool ChapterExteriorMovementClear(const simulation::TriangleSupportSurface& terrain,
     float fromX,float fromZ,float toX,float toZ,float supportY,float radius)

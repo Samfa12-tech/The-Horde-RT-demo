@@ -1,0 +1,225 @@
+{
+  "recordedUtc": "2026-10-18T01:13:29.7390924Z",
+  "sourceParent": "ad5857ed",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "worktree": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+  "sourceMeaning": "SHA256 of frozen compiled working bytes before Git newline normalization; implementation committed with this receipt",
+  "sources": [
+    {
+      "path": ".github/workflows/shared-simulation-host.yml",
+      "sha256": "10f193f0faffa235fa975b9ef556011ba0f530eb0afc21e7affd4a9fe3a81baa",
+      "bytes": 37372
+    },
+    {
+      "path": "CMakeLists.txt",
+      "sha256": "9b25a8b4e935081c4ef17bc39eafd9885f0eb2c7939e87f7b849a700dc16c489",
+      "bytes": 106239
+    },
+    {
+      "path": "tools/run-host-sanitizer-validation.sh",
+      "sha256": "15a8d3b18882873b20752a631335be099e88de76f18298d7773486faef7ca879",
+      "bytes": 2082
+    },
+    {
+      "path": "src/gameplay/simulation/GameSimulation.cpp",
+      "sha256": "3d2ab48e6d2c9a8188dfb31916b00637df519fe1e9543515e3fc4817ae3543e2",
+      "bytes": 130164
+    },
+    {
+      "path": "src/gameplay/simulation/TriangleSupportSurface.h",
+      "sha256": "62e8a2c9f1a4713b96126ac9a3223fe134e19ab5bd28a974babcda72a676b2a6",
+      "bytes": 26783
+    },
+    {
+      "path": "src/gameplay/traversal/ChapterTerrainMovement.h",
+      "sha256": "11ba6e412dbd7778997b09c40ae882d4d073849e5ee65172bdf145971ebde6eb",
+      "bytes": 6418
+    },
+    {
+      "path": "tests/CharacterStepGeometryTests.cpp",
+      "sha256": "cbc9fb3dc77c1cce3a59c5825524771b63eb347e5709511aae0a91e77f1e5b52",
+      "bytes": 11576
+    },
+    {
+      "path": "tests/ChapterStepMovementTests.cpp",
+      "sha256": "71befac0dac1a19d2026a582a423fa4f7fd8f1be63bd08ac6cd576c87c7f7373",
+      "bytes": 9893
+    },
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java",
+      "sha256": "dfa721e3eaf290eae17767b99471d0970aa0506cacece2e5c2d00aaf5493fddd",
+      "bytes": 420173
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+      "sha256": "12c31bf64852b713d87c97df2a92b3b52de4425f79adb3641e5c9efc74fd9523",
+      "bytes": 13383168
+    },
+    {
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+      "sha256": "0b46ad95300dbcdb56049e0d1e151c6f2bac60e18177e75cc5aac0624c52896e",
+      "bytes": 4555776
+    },
+    {
+      "path": "build/presets/windows-x64-debug/Debug/horde_rt_character_step_geometry_tests.exe",
+      "sha256": "992368b5213ff53b5be96059fab20c362db52c23d5d847fdbb5e68644e852cd5",
+      "bytes": 2586112
+    },
+    {
+      "path": "build/presets/windows-x64-debug/Debug/horde_rt_chapter_step_movement_tests.exe",
+      "sha256": "1bba4c5d45379c4ab29a8fd16abc5380760c07f89863074ba72f288be49d2122",
+      "bytes": 4120064
+    },
+    {
+      "path": "build/presets/windows-x64-release/Release/horde_rt_character_step_geometry_tests.exe",
+      "sha256": "b4fc7ccfef45e6bcbc64de56b6e158e12993e7c77115f313c05953dea6ad697a",
+      "bytes": 326656
+    },
+    {
+      "path": "build/presets/windows-x64-release/Release/horde_rt_chapter_step_movement_tests.exe",
+      "sha256": "38a6306e609708cccbf3630512d77f7afaefa6b057c0f38a06d5a19ca728a8ba",
+      "bytes": 860160
+    },
+    {
+      "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "sha256": "6d865599c74828bc15165693e7ea23e31454e2909c7ddd0b66123cf0534809d6",
+      "bytes": 183787786
+    }
+  ],
+  "logs": [
+    {
+      "path": "reports/2026-10-18-step-android-build.log",
+      "sha256": "edbf2d5d1c2feee2459b8743616abda3fceb11504b3a10a073773b8bbeadbff2",
+      "bytes": 2213
+    },
+    {
+      "path": "reports/2026-10-18-step-debug-build.log",
+      "sha256": "c809da60b4aea375a76b42a942cfd009993688fbb761f76e79cbc619a7f85e96",
+      "bytes": 2682
+    },
+    {
+      "path": "reports/2026-10-18-step-debug-final-build.log",
+      "sha256": "46911bcea5496816fcc40a11bd0dee0c077ca0b20a905b81478d6b55d3da3ff6",
+      "bytes": 21809
+    },
+    {
+      "path": "reports/2026-10-18-step-debug-final-tests.log",
+      "sha256": "f8c95f8f4be5cee2b2c1f58ebb7ddf36f80cdbc501aea556fdc4393fbb9481df",
+      "bytes": 2899
+    },
+    {
+      "path": "reports/2026-10-18-step-debug-initial-tests.log",
+      "sha256": "87057e0fc25217d60b6fab88753231abf2925c23656fb870492af2a830ea9ff4",
+      "bytes": 1020
+    },
+    {
+      "path": "reports/2026-10-18-step-debug-rebuild.log",
+      "sha256": "2625c27caba7bae5c96ff3d2c049b280a1069ec3a7be6fcc19bbe60498db1e0a",
+      "bytes": 705
+    },
+    {
+      "path": "reports/2026-10-18-step-debug-refined-build.log",
+      "sha256": "d4d183a280f39f6e5a14f76244f0efea42c6676faaead49d0a4c612eebda63fe",
+      "bytes": 1267
+    },
+    {
+      "path": "reports/2026-10-18-step-debug-refined-tests.log",
+      "sha256": "912e5b56da5b907f9dbe6380e227b539cc3365fbed1d5e92c6a81322ac7666f7",
+      "bytes": 634
+    },
+    {
+      "path": "reports/2026-10-18-step-debug-second-tests.log",
+      "sha256": "8c1d2ef70f612484c5fffa54b3c9fccf3ee5f25ece8e81532e853099dbec71b6",
+      "bytes": 414
+    },
+    {
+      "path": "reports/2026-10-18-step-debug-session-isolated.log",
+      "sha256": "bdccd5d7c00acd8ddc3b4758ba9f9416a8d53879941cb7ce416fd2262ae0cd15",
+      "bytes": 40
+    },
+    {
+      "path": "reports/2026-10-18-step-release-final-build.log",
+      "sha256": "a2f34b999150f8df4919aa5f3a966171446bc2826749b25c6dc1e1f69754a74c",
+      "bytes": 23636
+    },
+    {
+      "path": "reports/2026-10-18-step-release-final-tests.log",
+      "sha256": "b114f14f24570a21ef8756539924b2127c5f0244295b39e95e367cf3220e4f0e",
+      "bytes": 2903
+    },
+    {
+      "path": "reports/2026-10-18-step-release-session-isolated.log",
+      "sha256": "bdccd5d7c00acd8ddc3b4758ba9f9416a8d53879941cb7ce416fd2262ae0cd15",
+      "bytes": 40
+    }
+  ],
+  "debug": {
+    "buildExitCode": 0,
+    "restrictedCtest": {
+      "exitCode": 8,
+      "passed": 7,
+      "failed": 1,
+      "seconds": 294.22,
+      "failedTest": "horde_rt_campaign_session_tests",
+      "authoredJourneySeconds": 260.48
+    },
+    "isolatedNormalSession": {
+      "exitCode": 0,
+      "checks": 58,
+      "failures": 0
+    },
+    "geometryChecks": 42,
+    "movementChecks": 27
+  },
+  "release": {
+    "buildExitCode": 0,
+    "restrictedCtest": {
+      "exitCode": 8,
+      "passed": 7,
+      "failed": 1,
+      "seconds": 29.87,
+      "failedTest": "horde_rt_campaign_session_tests",
+      "authoredJourneySeconds": 20.53
+    },
+    "isolatedNormalSession": {
+      "exitCode": 0,
+      "checks": 58,
+      "failures": 0
+    },
+    "geometryChecks": 42,
+    "movementChecks": 27
+  },
+  "android": {
+    "buildExitCode": 0,
+    "reportedDuration": "2m 35s",
+    "abis": [
+      "arm64-v8a",
+      "armeabi-v7a",
+      "x86",
+      "x86_64"
+    ],
+    "evidenceClass": "BUILD_ONLY at this commit; physical Back follow-up separately sealed",
+    "installedByThisReceipt": false
+  },
+  "backJava": {
+    "commit": "ad5857ed",
+    "focusedChecks": 60,
+    "failures": 0,
+    "evidence": "../2026-10-18-android-back-confirmation/receipt.json"
+  },
+  "failures": [
+    "Initial movement fixture omitted matching neutral restored yaw; fixture corrected, not production load barrier",
+    "Second movement run exposed broad-triangle floor-band false rejection; local clipped floor band and separate above-band blocker regression added",
+    "Restricted CTest real-file campaign test failed in both configs; exact unchanged executables each passed 58 checks outside restricted subprocess sandbox; precise native error not captured"
+  ],
+  "limits": [
+    "No active runtime STEP assets or visible root model admitted",
+    "No crouch input, transitioning body/eye/hand/grounded walking pose or blocked-standing gameplay yet",
+    "Existing nine-probe ground plus fixed-height footprint/cylinder approximation, not full capsule or interior-solid physics",
+    "Conservative face-height maximum; no exact foot IK or full mantle/gravity solver",
+    "No physical RT/root/crouch feel, sustained performance, new cloud CI or sanitizer execution claim"
+  ],
+  "publicPush": false
+}

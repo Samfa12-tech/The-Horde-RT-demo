@@ -68,7 +68,7 @@ exists. These labels do not turn all remaining proposals into required features.
 | Parry/dodge/riposte teaching | [CombatTeaching.h](../../src/gameplay/simulation/CombatTeaching.h), [CombatFoundationTests](../../tests/CombatFoundationTests.cpp), [WP2a closeout](../evidence/2026-10-10-wp2a-closeout/receipt.json), plan prologue teaching and WP2a | Shared timing, cues, safe practice, skip/replay, optional 0.25 teaching time scale and existing defensive mechanics are implemented. WP2a is explicitly not fully complete. The receipt provisionally retains forgiving contact for first playtest and records seeded wall-contact defects whose production reachability is unproven. First-time learning, live contact/pacing and supported touch/controller feel remain acceptance work; later skill-tree combos/perks remain proposals. |
 | Walking, run and outdoor pace | [GameSimulationConfig](../../src/gameplay/simulation/GameSimulation.h), [UpdateMovement](../../src/gameplay/simulation/GameSimulation.cpp), [InputSnapshot](../../src/gameplay/simulation/InputSnapshot.h), plan 5.5 | Implemented analog/diagonal movement, explicit run hold/toggle and interruption/reset logic. Current defaults are 1.9 m/s walking and 3.2 m/s running with acceleration. No automatic indoor/outdoor speed switch is required: the plan explicitly chooses player-controlled running. Actual route timing, stopping/clearance, Kit timing and owner comfort remain unaccepted tuning; do not silently increase speed or add stamina. |
 | Player directional motion / low-clearance hands | [PlayerAnimationState](../../src/gameplay/animation/PlayerAnimationState.h), [held-item kinematics](../../src/gameplay/items/HeldItemKinematics.cpp), [directional rig test](../../tests/PlayerDirectionalRigTests.cpp), [rope hand alternation](../../src/gameplay/traversal/RescueTraversal.cpp) | Directional rig fixtures, `SwordOverheadLowering` and alternating rope grip advancement exist. Full direction/speed/dodge acting, held-prop clearance and physical acceptance remain bounded gaps. Crouching is now firm owner direction; the old plan's exclusion no longer decides its scope. |
-| Root stepping/mantle and crouch | [InputSnapshot](../../src/gameplay/simulation/InputSnapshot.h), [movement](../../src/gameplay/simulation/GameSimulation.cpp), [route admission](../../src/gameplay/traversal/ChapterTerrainMovement.h), [animation](../../src/gameplay/animation/PlayerAnimationState.h) | Firm 1.7, incomplete. Existing bounded ground-step support is not a general automatic small-root mantle; no general crouch command/motor exists. The scripted rescue descent `Crouch` phase is not player crouching. Imported clips are not mechanics. Implement a bounded shared motor/clearance/input slice before adding route obstacles that require it; preserve terrain support, equipment, deterministic recovery and camera comfort. |
+| Root stepping/mantle and crouch | [bounded shared motor](../evidence/2026-10-18-small-root-motor/README.md), [movement](../../src/gameplay/simulation/GameSimulation.cpp), [clearance](../../src/gameplay/traversal/ChapterTerrainMovement.h) | Firm 1.7, partial. The explicitly admitted small-root lane, bounded 18 cm motor and standing/shorter-body clearance fixtures now run against imported production terrain and actual 60 Hz simulation. No visible STEP asset is admitted yet. General crouch input, collision-height transition, blocked standing, camera/hands/grounded walking pose and physical comfort remain next. Scripted rescue Crouch is not player crouching; free jump/slide remain deferred. |
 | Free jump, slide and arbitrary auto-hop | [InputSnapshot](../../src/gameplay/simulation/InputSnapshot.h), [GameSimulation](../../src/gameplay/simulation/GameSimulation.h), old plan 5.5/5.7 | No general jump/slide command or motor is implemented. Free jump and slide are deferred exploratory ideas. Automatic small-root traversal above is firm and must not be conflated with arbitrary jumping or unrestricted auto-hop. |
 | Themed touch/desktop controls and menus | [Android MainActivity](../../android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java), [Windows owner](../../src/platform/windows/DiagnosticWindow.cpp), plan 10 | Existing movement/look/action controls, mobile Run, native settings/preferences and controller routing are implemented. Full theme/layout/accessibility/one-hand-held-input acceptance remains partial. Save/Load/New Game slot entrypoints are not delivered by backend files; stable touch controls must stay connected to the existing semantic inputs. |
 | Pause power policy | [ForegroundPauseRenderCadence.h](../../src/graphics/ForegroundPauseRenderCadence.h), [policy test](../../tests/ForegroundPauseRenderCadenceTests.cpp), plan 10.3b | Implemented policy suppresses redundant foreground-paused Showcase RT frames, with 500ms fallback and wake/invalid-output handling. It claims no FPS/power result. Final physical device pause/wake/battery acceptance is distinct from source-level policy. |
@@ -83,18 +83,21 @@ exists. These labels do not turn all remaining proposals into required features.
 
 ## Critical path after the bounded useful save integration
 
-Finish the currently authorized worker/storage-to-real-host simulation transaction,
-its failure/staleness tests and the six-record isolation proof. Stop its scope
-at a reviewable backend milestone; it must not consume the rest of 1.7 through
-speculative history, migration, generic job systems or menu design.
+The worker/storage-to-real-host transaction and six-record isolation proof are
+now a reviewable backend milestone. Platform roots/menus, automatic gates and
+physical save lifecycle remain separate work; speculative history, migration or
+generic job systems should not consume the remaining update.
 
 The reproduced Android shadow-cycle crash is now corrected locally with a
 production UI regression and [focused Java evidence](../evidence/2026-10-18-mobile-shadow-cycle/README.md).
-After integrating that correction and the useful save bridge, prefer a shared small-root/crouch route fixture
-and one bounded motor/clearance implementation to further save abstraction or
-unmeasured heavy outside content. This is an implementation gap in firm scope,
-not a new request for Sam to approve jumping. Android Back confirmation is another
-small independently reviewable confirmed UI gap.
+The [small-root motor](../evidence/2026-10-18-small-root-motor/README.md) now has
+explicit geometry ownership, production-terrain movement and clearance fixtures.
+Next implement shared crouch posture, safe blocked standing, coherent platform
+controls and grounded moving-body posing before adding an obstacle that needs it.
+The [Back confirmation](../evidence/2026-10-18-android-back-confirmation/README.md)
+is also implemented with focused host UI evidence; current physical interaction
+acceptance remains separate. These confirmed gaps do not reopen free jump/slide
+or authorize unmeasured heavy outside content.
 
 Rendering acceptance remains a critical blocker alongside these host-safe slices.
 The measured rendering gate is already concrete: the [live two-torch reveal](../evidence/2026-10-17-keeper-torch-transition/README.md)

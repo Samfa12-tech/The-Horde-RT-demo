@@ -1,5 +1,11 @@
 # Horde 1.7 current design index
 
+The [small-root motor checkpoint](../evidence/2026-10-18-small-root-motor/README.md)
+adds explicit immutable step geometry, bounded shared stepping and separate body
+clearance with actual imported terrain and ordinary-input simulation fixtures.
+Visible root admission and first-class crouch controls/posture/grounded walking
+remain unfinished. This adds no heavy scene content or new performance claim.
+
 The [Android Back confirmation](../evidence/2026-10-18-android-back-confirmation/README.md)
 now guards both top-level Back exits with a native Stay/Quit dialog. Stay is
 focused; stale taps and lifecycle dismissal cannot exit later. Sixty focused
