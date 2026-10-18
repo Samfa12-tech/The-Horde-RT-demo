@@ -75,7 +75,8 @@ bool CorridorFrameSourcesInside(const RtSceneFrameInputs& f) {
     using namespace horde::gameplay;
     if(!f.developmentRescueJourney || f.rescue.exteriorSide || f.rescue.equipmentStowed ||
        f.playerSupportWorldY!=kRouteFloorWorldY || f.playerMountProfile!=items::PlayerMountProfile::AnatomicalBody ||
-       f.playerRenderRoute!=kProductionPlayerRenderRoute ||
+       f.playerRenderRoute!=kProductionPlayerRenderRoute || !std::isfinite(f.playerCrouchDropMetres) ||
+       f.playerCrouchDropMetres<0 || f.playerCrouchDropMetres>.6f ||
        f.interaction.heldLightKind!=interactions::HeldLightKind::RewardLantern ||
        f.chestReward.phase!=interactions::ChestRewardPhase::LanternClaimed ||
        f.lich.deathDissolveProgress!=1.f || f.lich.staffLightStrength!=0.f ||
@@ -92,7 +93,8 @@ bool CorridorFrameSourcesInside(const RtSceneFrameInputs& f) {
     const auto& hand=f.rewardLanternWorldFromHinge;
     if(!horde::scene::DetailSourceSphereInside({{hand[12],hand[13],hand[14]}},.404))return false;
     // Enclose both 35 mm lateral and 17.5 mm centred vertical camera bob.
-    if(!horde::scene::DetailSourceSphereInside({{f.cameraX,.7175f,f.cameraZ}},.040))return false;
+    const float cameraY=simulation::PlayerEyeWorldY(f.playerSupportWorldY)+.0175f-f.playerCrouchDropMetres;
+    if(!horde::scene::DetailSourceSphereInside({{f.cameraX,cameraY,f.cameraZ}},.040))return false;
     for(std::size_t i=0;i<f.fireEmitterCount;++i) {
         if(i>=f.fireEmitters.size())return false;
         const auto& e=f.fireEmitters[i];

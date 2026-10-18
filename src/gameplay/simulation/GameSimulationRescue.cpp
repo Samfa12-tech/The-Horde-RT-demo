@@ -71,6 +71,7 @@ void GameSimulation::StepRescueJourney(bool paused) {
         rescueTraversal_.RecoverForReconstruction();
     rescueMovementSuppressedThisTick_=wasActive||rescueTraversal_.IsActive();
     if(rescueMovementSuppressedThisTick_) {
+        posture_={};ClearCrouchIntent();
         const auto& s=rescueTraversal_.Snapshot();
         playerX_=s.playerPosition.x;playerZ_=s.playerPosition.z;
         playerSupport_={s.supportWorldY,static_cast<PlayerSupportId>(132),!rescueTraversal_.IsActive()};
@@ -91,6 +92,7 @@ void GameSimulation::StepRescueJourney(bool paused) {
     }
 }
 bool GameSimulation::TryRescueInteraction() {
+    if(posture_.Active())return false;
     const auto& s=rescueTraversal_.Snapshot();
     const Vec3 player{playerX_,playerSupport_.worldY,playerZ_};
     if(rescueTraversal_.IsActive() || !AtRopeEndpoint(playerX_,playerZ_,s.exteriorSide) ||
@@ -156,6 +158,7 @@ void GameSimulation::ApplyRescuePresentation() {
 void GameSimulation::PublishRescueSnapshot() {
     snapshot_.developmentRescueJourney=config_.developmentRescueJourney;
     snapshot_.rescue=rescueTraversal_.Snapshot();snapshot_.rescuePrompt=RescuePrompt::None;
+    snapshot_.playerAnimation.crouchPelvisDropMetres=snapshot_.rescue.equipmentStowed?0.f:posture_.drop;
     snapshot_.playerAnimation.plantedPelvisDropMetres=snapshot_.rescue.equipmentStowed
         ?snapshot_.rescue.plantedPelvisDropMetres:0.0f;
     if(!config_.developmentRescueJourney) return;
@@ -169,7 +172,7 @@ void GameSimulation::PublishRescueSnapshot() {
         snapshot_.rescuePrompt=RescuePrompt::Traversing;
         snapshot_.playerAnimation.swordHandGripBlend=0;
         snapshot_.playerAnimation.swordStowBlend=1;
-    } else if(snapshot_.rescue.deploymentCount && AtRopeEndpoint(playerX_,playerZ_,snapshot_.rescue.exteriorSide) &&
+    } else if(!posture_.Active() && snapshot_.rescue.deploymentCount && AtRopeEndpoint(playerX_,playerZ_,snapshot_.rescue.exteriorSide) &&
               CanApproachRopeEndpoint({playerX_,playerSupport_.worldY,playerZ_},playerSupport_.worldY,
                                       snapshot_.rescue.exteriorSide)) {
         const auto zone=snapshot_.rescue.exteriorSide?WorldZoneId::Dungeon:WorldZoneId::TombExterior;

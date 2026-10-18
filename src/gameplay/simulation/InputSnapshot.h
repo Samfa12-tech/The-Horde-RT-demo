@@ -22,6 +22,8 @@ struct SimulationCommandSequences
     std::uint64_t tutorialSkip = 0;
     std::uint64_t tutorialReplay = 0;
     std::uint64_t dialogueSkip = 0;
+    std::uint64_t crouchToggle = 0;
+    std::uint64_t clearCrouchIntent = 0;
 };
 
 enum class CombatInputEdgeKind : std::uint8_t
@@ -76,6 +78,8 @@ struct InputSnapshot
     // Holds run only while a physical key/controller button remains down.
     // The Android HUD uses the monotonic runToggle edge instead.
     bool runHeld = false;
+    // Physical keyboard/controller hold. Touch uses monotonic crouchToggle.
+    bool crouchHeld = false;
     bool tutorialEnabled = true;
     bool tutorialSlowdownEnabled = false;
     std::uint32_t dialogueCompletionLine = 0;

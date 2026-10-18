@@ -428,3 +428,15 @@ Original painted bark/end-grain/stump maps remain preserved. No new generation,
 decimation, transparency, light or shader feature is added. Exact world triangles
 supply nonwalkable contact; the open snag is not claimed as a closed volume.
 Phone performance and final owner art acceptance remain separate gates.
+
+### Original low trail root (18 October 2026)
+
+`src/scene/ForestDeadwood.cpp` authors one new tapered twenty-triangle trail root
+directly from numeric rings. This is original project geometry created for Horde,
+not a derivative/copy of the supplied 548-triangle root tangle, imported art or
+paid generation. It reuses the already admitted ForestBark material/maps and
+existing static native RT owner; it adds no texture, external file or licence.
+The exact final world-space RT triangles also form its explicit STEP contacts.
+The ten original off-trail deadwood placements remain nonwalkable and retain
+their individual provenance above. Physical performance and final visual
+acceptance of the new root remain separate gates.

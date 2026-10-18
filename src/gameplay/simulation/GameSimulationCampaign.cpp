@@ -27,7 +27,7 @@ std::optional<campaign::Checkpoint> GameSimulation::CaptureCampaignCheckpoint(ca
         !config_.developmentRescueJourney || !config_.authoredChapterTerrain || legacyCombatCheckpoint_ ||
         !chapterTerrain_ || chapterTerrainGeneration_!=worldRoute_.generation ||
         staticDetailLease_.resourceGeneration || pendingCampaignRestore_ ||
-        !s.playerAlive || !s.playerGrounded || s.rescue.equipmentStowed || rescueTraversal_.IsActive() ||
+        !s.playerAlive || !s.playerGrounded || posture_.Active() || crouchToggleActive_ || lastInput_.crouchHeld || s.rescue.equipmentStowed || rescueTraversal_.IsActive() ||
         s.rescue.exteriorSide!=upper || !s.rescue.ropeReady || rescueOpeningSeconds_<1.0f ||
         s.lich.phase!=LichPhase::Dead || !s.lich.deathAnimationComplete ||
         s.lich.deathDissolveProgress<1.0f || s.lich.roomMistDensityScale>0.0f ||
@@ -140,7 +140,7 @@ bool GameSimulation::CommitCampaignRestore(campaign::RestoreToken token, WorldZo
     next.SynchronizePausedInput(currentInput,currentInputPublicationSequence);
     next.campaignInputPublicationFloor_=std::max(inputPublicationSequence_,currentInputPublicationSequence);
     InputSnapshot neutral=next.lastInput_;
-    neutral.moveForward=neutral.moveStrafe=0;neutral.runHeld=false;neutral.hasAuthoritativePlayerPose=false;
+    neutral.moveForward=neutral.moveStrafe=0;neutral.runHeld=false;neutral.crouchHeld=false;neutral.hasAuthoritativePlayerPose=false;
     neutral.authoritativePlayerX=neutral.authoritativePlayerZ=0;
     neutral.yawRadians=c.yaw;neutral.pitchRadians=c.pitch;
     neutral.dialogueCompletionLine=0;neutral.dialogueCompletionGeneration=0;neutral.combatEdgeHistory={};
@@ -170,7 +170,7 @@ InputSnapshot GameSimulation::FilterCampaignInput(const InputSnapshot& input, st
     // a replay-only authoritative pose, must never move a freshly loaded player.
     const bool fresh=publicationSequence>*campaignInputPublicationFloor_ ||
         (publicationSequence==0 && *campaignInputPublicationFloor_==0);
-    const bool neutral=input.moveForward==0 && input.moveStrafe==0 && !input.runHeld &&
+    const bool neutral=input.moveForward==0 && input.moveStrafe==0 && !input.runHeld && !input.crouchHeld &&
         !input.hasAuthoritativePlayerPose && input.yawRadians==playerYawRadians_ &&
         input.pitchRadians==playerPitchRadians_;
     if(fresh && neutral) {
@@ -178,7 +178,7 @@ InputSnapshot GameSimulation::FilterCampaignInput(const InputSnapshot& input, st
         return input;
     }
     auto blocked=input;
-    blocked.paused=true;blocked.moveForward=blocked.moveStrafe=0;blocked.runHeld=false;
+    blocked.paused=true;blocked.moveForward=blocked.moveStrafe=0;blocked.runHeld=false;blocked.crouchHeld=false;
     blocked.hasAuthoritativePlayerPose=false;
     blocked.yawRadians=playerYawRadians_;blocked.pitchRadians=playerPitchRadians_;
     blocked.dialogueCompletionLine=0;blocked.dialogueCompletionGeneration=0;

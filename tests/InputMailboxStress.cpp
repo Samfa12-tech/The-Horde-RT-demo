@@ -36,6 +36,7 @@ InputSnapshot MakeSnapshot(std::uint64_t sequence)
     input.damageEnabled = !input.paused;
     input.hasAuthoritativePlayerPose = (sequence & 2u) != 0u;
     input.runHeld = (sequence & 4u) != 0u;
+    input.crouchHeld = (sequence & 32u) != 0u;
     input.tutorialEnabled = (sequence & 8u) != 0u;
     input.tutorialSlowdownEnabled = (sequence & 16u) != 0u;
     input.commands.attack = sequence;
@@ -49,6 +50,8 @@ InputSnapshot MakeSnapshot(std::uint64_t sequence)
     input.commands.clearRunIntent = sequence + 43u;
     input.commands.tutorialSkip = sequence + 47u;
     input.commands.tutorialReplay = sequence + 53u;
+    input.commands.crouchToggle = sequence + 59u;
+    input.commands.clearCrouchIntent = sequence + 61u;
     return input;
 }
 
@@ -73,6 +76,7 @@ bool MatchesSequence(const PublishedInput& published)
            actual.damageEnabled == expected.damageEnabled &&
            actual.hasAuthoritativePlayerPose == expected.hasAuthoritativePlayerPose &&
            actual.runHeld == expected.runHeld &&
+           actual.crouchHeld == expected.crouchHeld &&
            actual.tutorialEnabled == expected.tutorialEnabled &&
            actual.tutorialSlowdownEnabled == expected.tutorialSlowdownEnabled &&
            actual.commands.attack == expected.commands.attack &&
@@ -84,6 +88,8 @@ bool MatchesSequence(const PublishedInput& published)
            actual.commands.toggleHeldLightPose == expected.commands.toggleHeldLightPose &&
            actual.commands.runToggle == expected.commands.runToggle &&
            actual.commands.clearRunIntent == expected.commands.clearRunIntent &&
+           actual.commands.crouchToggle == expected.commands.crouchToggle &&
+           actual.commands.clearCrouchIntent == expected.commands.clearCrouchIntent &&
            actual.commands.tutorialSkip == expected.commands.tutorialSkip &&
            actual.commands.tutorialReplay == expected.commands.tutorialReplay;
 }

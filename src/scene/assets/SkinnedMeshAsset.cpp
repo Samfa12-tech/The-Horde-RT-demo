@@ -1661,7 +1661,7 @@ bool SkinnedMeshAsset::EvaluatePlayerPose(
     const SkinnedClip clipId, const float timeSeconds,
     const SkinnedArmIkTarget& leftArm, const SkinnedArmIkTarget& rightArm,
     SkinnedPlayerPose& outputPose, std::string& diagnostic,
-    const float plantedPelvisDropMetres) const
+    const float plantedPelvisDropMetres, const float crouchPelvisDropMetres) const
 {
     if (!outputPose.data_) outputPose.data_ = std::make_unique<SkinnedPlayerPoseData>();
     auto& solved = *outputPose.data_;
@@ -1689,6 +1689,15 @@ bool SkinnedMeshAsset::EvaluatePlayerPose(
     if (plantedPelvisDropMetres > 0.0f && clipId != SkinnedClip::Idle)
     {
         diagnostic = "Planted player stance requires the stationary Idle clip.";
+        return false;
+    }
+    if (!std::isfinite(crouchPelvisDropMetres) || crouchPelvisDropMetres < 0.0f ||
+        crouchPelvisDropMetres > kMaximumPlayerCrouchPelvisDropMetres ||
+        (crouchPelvisDropMetres > 0.0f &&
+         (plantedPelvisDropMetres > 0.0f ||
+          (clipId != SkinnedClip::Idle && clipId != SkinnedClip::Walking))))
+    {
+        diagnostic = "Player crouch requires a finite admitted drop, Idle/Walking and no planted stance.";
         return false;
     }
     const auto finiteArm = [](const SkinnedArmIkTarget& arm) {
@@ -1788,7 +1797,8 @@ bool SkinnedMeshAsset::EvaluatePlayerPose(
         }
         return false;
     };
-    if (plantedPelvisDropMetres > 0.0f)
+    const float pelvisDrop = plantedPelvisDropMetres + crouchPelvisDropMetres;
+    if (pelvisDrop > 0.0f)
     {
         const std::array<std::array<std::size_t, 3u>, 2u> legs{{
             {{findNode("LeftUpLeg"), findNode("LeftLeg"), findNode("LeftFoot")}},
@@ -1813,7 +1823,7 @@ bool SkinnedMeshAsset::EvaluatePlayerPose(
         for (std::size_t node = 0u; node < globals.size(); ++node)
             if (isDescendant(node, hipsNode))
             {
-                globals[node].m[13] -= plantedPelvisDropMetres;
+                globals[node].m[13] -= pelvisDrop;
                 globals[node].m[14] -= plantedPelvisDropMetres * kPlayerPlantedPelvisSetbackPerDrop;
             }
         const auto position = [](const Matrix& m) { return Vec3{m.m[12], m.m[13], m.m[14]}; };
@@ -1837,8 +1847,27 @@ bool SkinnedMeshAsset::EvaluatePlayerPose(
             const Vec3 direction = Normalise(request);
             // The imported player is +Z forward. A supported squat opens the
             // knees outward while both feet retain their exact clip pose.
-            const Vec3 pole{side == 0u ? 1.0f : -1.0f, 0.0f, 1.0f};
+            // A moving ankle can rise above the deeply lowered hip. Give the
+            // crouch bend an upward component so the knee (and its weighted
+            // cloth/shin surface) folds above the contact plane, not below it.
+            // The separately admitted rescue recipe stays byte-identical.
+            const Vec3 pole{side == 0u ? 1.0f : -1.0f,
+                            crouchPelvisDropMetres > 0.0f ? 1.0f : 0.0f, 1.0f};
             Vec3 projectedPole = Subtract(pole, Scale(direction, Dot(pole, direction)));
+            if (crouchPelvisDropMetres > 0.0f)
+            {
+                // Retain the animated knee direction at crouch onset; blend
+                // towards the bounded squat pole as the torso lowers. This
+                // avoids snapping a moving knee to the rescue pose at epsilon.
+                const Vec3 authoredBend = Subtract(Subtract(originalKnee, hip),
+                    Scale(direction, Dot(Subtract(originalKnee, hip), direction)));
+                if (Length(authoredBend) > 0.0001f && Length(projectedPole) > 0.0001f)
+                {
+                    const float blend = std::clamp(crouchPelvisDropMetres / 0.3f, 0.0f, 1.0f);
+                    projectedPole = Add(Scale(Normalise(authoredBend), 1.0f - blend),
+                                        Scale(Normalise(projectedPole), blend));
+                }
+            }
             if (Length(projectedPole) < 0.0001f)
             {
                 const Vec3 fallback = std::abs(direction.y) < 0.9f

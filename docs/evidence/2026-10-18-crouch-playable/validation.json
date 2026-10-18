@@ -1,0 +1,518 @@
+{
+  "recordedUtc": "2026-10-18T01:47:12.4474831Z",
+  "sourceParent": "1bf8921a565dd92f40ca2c8b4c6edf651ff0e2c9",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "worktree": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+  "sourceMeaning": "Frozen compiled working-file SHA256 before Git newline normalization; implementation and this receipt committed together.",
+  "sources": [
+    {
+      "path": ".github/workflows/shared-simulation-host.yml",
+      "sha256": "1b84073cbaa0af083a376a24575e5b276f6803650b3e8b1ea2d6edc2dcbecd81",
+      "bytes": 37448
+    },
+    {
+      "path": "android/app/src/main/cpp/android_probe_bridge.cpp",
+      "sha256": "8c8f18f8cfa6fca5c7f49c12fe2ffee01a025d8c62f6a5a4b5060e8a97a127ea",
+      "bytes": 357906
+    },
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/AndroidControllerInput.java",
+      "sha256": "0380149674de8ceb6a78c2d0722335bde5b21e8408582513f15cd9afa6bc24b4",
+      "bytes": 28410
+    },
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java",
+      "sha256": "50f1a809499455143512e5a451826b2096c35cffe1cd56f7b9a923058c166d39",
+      "bytes": 425518
+    },
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/ProbeBridge.java",
+      "sha256": "1af9afae9c61dfa808aa9d0fe50be1013449882d2602a821d5b8d5d6b22efaf9",
+      "bytes": 10196
+    },
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/UiControlLayout.java",
+      "sha256": "c41ced9aca863046949d6d7338eb0dcc47ed1ccaf195c7a95b6820b04cf728d7",
+      "bytes": 4301
+    },
+    {
+      "path": "android/app/src/main/res/layout/activity_main.xml",
+      "sha256": "cf5e284df0260f32d304d8455ffe125d2845db990c7c56eca41bd1d772f2f682",
+      "bytes": 10708
+    },
+    {
+      "path": "android/app/src/main/res/values/strings.xml",
+      "sha256": "c5415ab9870edfde62da79d4728a3c880e47255dda901cd5d95b29ceea9e23cf",
+      "bytes": 25010
+    },
+    {
+      "path": "android/app/src/test/java/com/samfa12/hordelanternrt/AndroidControllerInputTest.java",
+      "sha256": "90d2d54ac71c6a580ee3777feb69ffeec6b64489a52cafef44b8a7d2c9a61b7e",
+      "bytes": 16571
+    },
+    {
+      "path": "android/app/src/test/java/com/samfa12/hordelanternrt/AndroidControllerIntegrationTest.java",
+      "sha256": "38a16952e08b6853f9f5c1c801606887090b01d0116eee8eff5baa6c713c2dd7",
+      "bytes": 43219
+    },
+    {
+      "path": "android/app/src/test/java/com/samfa12/hordelanternrt/CombatTeachingUiSchedulingTest.java",
+      "sha256": "57e9983dd71e39607929ea0b786de707e335bd58b3119b2e6e9f3106ef5abaf5",
+      "bytes": 8099
+    },
+    {
+      "path": "android/app/src/test/java/com/samfa12/hordelanternrt/DeathRecoveryTest.java",
+      "sha256": "4f4779d742f8935f43c0a80000ada759062effd20d087a65e214fa8b9cabebdb",
+      "bytes": 2636
+    },
+    {
+      "path": "android/app/src/test/java/com/samfa12/hordelanternrt/GameplayTouchCancellationTest.java",
+      "sha256": "074994459be5c36aba1efbad80e69c00adf6bf3d33270575425592a8f509590f",
+      "bytes": 11100
+    },
+    {
+      "path": "android/app/src/test/java/com/samfa12/hordelanternrt/InterfaceLayoutTest.java",
+      "sha256": "ed9a6b7c4c64ff2c6be71199e4143f799441e3717eff225e164b695cd893fb4e",
+      "bytes": 11233
+    },
+    {
+      "path": "android/app/src/test/java/com/samfa12/hordelanternrt/SurfaceSuspensionLifecycleTest.java",
+      "sha256": "b638f1001263ac4180cd396dd96e867fe054e21a0304e9b7ea2c76a4b82db373",
+      "bytes": 7352
+    },
+    {
+      "path": "ASSET_LICENSES.md",
+      "sha256": "d54dbda112323294ac01665ec37e0eb2e590d5bf06182e88ee82a495321c8727",
+      "bytes": 60729
+    },
+    {
+      "path": "CMakeLists.txt",
+      "sha256": "c5a1dc712504f28b57877c40def8438ad0f76a7c61378b84b0ca75bb688d725e",
+      "bytes": 106547
+    },
+    {
+      "path": "src/gameplay/animation/PlayerAnimationState.cpp",
+      "sha256": "1c4940abde9621d5e2e329e640be82fb603d82fbfa480049a69aacc52b88f8ce",
+      "bytes": 8492
+    },
+    {
+      "path": "src/gameplay/animation/PlayerAnimationState.h",
+      "sha256": "0cf4cf46f4a44339e81a74e41af5c0d5b73220b26d3e59c04c68efeb2986d2b4",
+      "bytes": 3901
+    },
+    {
+      "path": "src/gameplay/campaign/CampaignSession.cpp",
+      "sha256": "452e7ce746bc3e84ec9b8dcc17db73911cfde842f2d5930671150e4603e1cc8a",
+      "bytes": 5781
+    },
+    {
+      "path": "src/gameplay/items/HeldItemKinematics.cpp",
+      "sha256": "9d8279199d9b5610663315145353b6582133fc0dcfeff903ad7581f15abb9e29",
+      "bytes": 70753
+    },
+    {
+      "path": "src/gameplay/items/HeldItemKinematics.h",
+      "sha256": "76e00680b91f85c7ba94efb087a20f00a5e66b8dc41a9fbe9c147d241e7251ba",
+      "bytes": 13151
+    },
+    {
+      "path": "src/gameplay/simulation/CharacterPosture.h",
+      "sha256": "6d8c0578ec546bb349939311b862a8af615f9c21e91ca879c8915e37ef880ce7",
+      "bytes": 2847
+    },
+    {
+      "path": "src/gameplay/simulation/GameSimulation.cpp",
+      "sha256": "d1531b49fcda6e214d3b2814ea12bde98477ec3369143ad072fa486b5d32299c",
+      "bytes": 134375
+    },
+    {
+      "path": "src/gameplay/simulation/GameSimulation.h",
+      "sha256": "675b39f9b51e9b77356fc515cecc96d91d35d8369cd32e7df9678b7cc84a8710",
+      "bytes": 20947
+    },
+    {
+      "path": "src/gameplay/simulation/GameSimulationCampaign.cpp",
+      "sha256": "a88d6eee0f3fd0f26e12a23fc823e0353cdfca6ef9b3e293133132fe1b38d974",
+      "bytes": 12157
+    },
+    {
+      "path": "src/gameplay/simulation/GameSimulationDialogue.cpp",
+      "sha256": "2778f5701929e7be4df8262f1eed40766d38751616e4116a5fcbe2ccd1efac67",
+      "bytes": 2943
+    },
+    {
+      "path": "src/gameplay/simulation/GameSimulationRescue.cpp",
+      "sha256": "c9fe5403499f6c3f79654ecf508f886ec39a4b48b1ba5b7fe8540933986a41f5",
+      "bytes": 11265
+    },
+    {
+      "path": "src/gameplay/simulation/InputSnapshot.h",
+      "sha256": "07c4de969e244208fcbcd863e175de94c894e485fff8252a1d2ba4136cf8e394",
+      "bytes": 4662
+    },
+    {
+      "path": "src/gameplay/simulation/SimulationSnapshot.h",
+      "sha256": "a5e4ed787444a6f8c62df5b56079dc82e63511a5a47ce706c9c097b0330470ca",
+      "bytes": 8076
+    },
+    {
+      "path": "src/gameplay/traversal/ChapterTerrainMovement.h",
+      "sha256": "d9dc4967f5073042731f9e8e03909cae47692bdda10e925e3bc8a41633982b04",
+      "bytes": 6635
+    },
+    {
+      "path": "src/platform/windows/DiagnosticWindow.cpp",
+      "sha256": "43e3e02aa01906e4e071e260ea3eb66b03da993022b47f447acf4820020b436b",
+      "bytes": 586724
+    },
+    {
+      "path": "src/scene/assets/SkinnedMeshAsset.cpp",
+      "sha256": "b7d1b4f91ce19bd6bdd7da0cc486ba51d9e0f61051d18a25f4e9e2641e190ed9",
+      "bytes": 101450
+    },
+    {
+      "path": "src/scene/assets/SkinnedMeshAsset.h",
+      "sha256": "728de5d04e137779df5740bbca63a07b7463204c6044b01bd3795d7e2106d4b1",
+      "bytes": 11517
+    },
+    {
+      "path": "src/scene/ForestDeadwood.cpp",
+      "sha256": "223b06356215935e9ec6dfff89e7f9e388f714b105afd801b874a0f4f1f5b25d",
+      "bytes": 16330
+    },
+    {
+      "path": "src/scene/ForestDeadwood.h",
+      "sha256": "08c9633edce0921249ddb8b2ac17d47494ae1cbc44e02d11eb9c70b86d77cb93",
+      "bytes": 968
+    },
+    {
+      "path": "src/vulkan/raytracing/PlayerRenderSlot.cpp",
+      "sha256": "6adedb64d1b12f90d64536c31870937def9870e022b75bf7a3ac27840d038c24",
+      "bytes": 44225
+    },
+    {
+      "path": "src/vulkan/raytracing/PresentableTinyRtScene.cpp",
+      "sha256": "bfb83483acc3784e6db9a13844734bb34353960e60efe70423e748afd9a9a1e4",
+      "bytes": 486707
+    },
+    {
+      "path": "src/vulkan/raytracing/PresentableTinyRtScene.h",
+      "sha256": "7ec75cfdab08528446d007308365102cf7698d4951fb60b501481e8776ee1691",
+      "bytes": 67855
+    },
+    {
+      "path": "src/vulkan/raytracing/PresentableTinyRtSceneStaticGeometry.cpp",
+      "sha256": "a753b0a593a19115b701be9d9d45e19c3c2daa15d53454aeccfb0b42c93562a7",
+      "bytes": 58079
+    },
+    {
+      "path": "src/vulkan/raytracing/SimulationFrameAdapter.cpp",
+      "sha256": "81ca8de9c96a2dbbb772e28255685d1c0486fd74f89e2d4bf2c16a42727f93a1",
+      "bytes": 8976
+    },
+    {
+      "path": "tests/CampaignSessionTests.cpp",
+      "sha256": "55b640a6486ff78eca2980838ee7c90424cae107c04108cb070446286cfe22b8",
+      "bytes": 11997
+    },
+    {
+      "path": "tests/ChapterStepMovementTests.cpp",
+      "sha256": "c9ae8099c76a4917a96ff6ead9e0bfbb9c8fcbc62fd1b340ff334037b43199c9",
+      "bytes": 15560
+    },
+    {
+      "path": "tests/ForestDeadwoodTests.cpp",
+      "sha256": "13f28dfd8592e1058570a91fbcd1c85e933ad51f39dd541daf277c2061f237d5",
+      "bytes": 14809
+    },
+    {
+      "path": "tests/ForestDressingTests.cpp",
+      "sha256": "7734123f0c358b7e2492ccefed48032dcc33b5d71f8bff4c4bf8f4528cd12843",
+      "bytes": 50302
+    },
+    {
+      "path": "tests/InputMailboxStress.cpp",
+      "sha256": "e084da3942205e258ed526faee6510ee1e79768e996fc505374460a79ec20a1e",
+      "bytes": 9752
+    },
+    {
+      "path": "tests/PlayerCrouchRigTests.cpp",
+      "sha256": "432d6549566cf8270768dbf8ae4329d44c87039e8301c77d654f8e9c414a8c14",
+      "bytes": 9454
+    },
+    {
+      "path": "tests/RescueJourneyIntegrationTests.cpp",
+      "sha256": "2711846acee375b4f22371b5a0683c15be6e9e9a68478a0f36e6fb3c3c52317c",
+      "bytes": 54324
+    },
+    {
+      "path": "tests/RtSceneResourceInventoryTests.cpp",
+      "sha256": "7e8ab1255329828db15566455485095f47eb9f0bd01203771490542a21203139",
+      "bytes": 128634
+    },
+    {
+      "path": "tests/VerticalSupportTests.cpp",
+      "sha256": "30279cafa322bbd695c7b6058bef39b63d564d0c6d1e4dbe8facdfd51ab2a9d4",
+      "bytes": 8488
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+      "sha256": "ecf2aba3d3b531311ab9f50d54be1d590f5a3f401131dd93074e09fffa76b4f9",
+      "bytes": 13416960
+    },
+    {
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+      "sha256": "eddc8c7f298e0f8160261b8954cd77bbe59fb4d3cf55944aea0c2233c27fae84",
+      "bytes": 4569600
+    },
+    {
+      "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "sha256": "b1f266f69adf6b92eda2c18fe7c02aa967cbb626d853ef4dd910ab1394f82211",
+      "bytes": 183853322
+    }
+  ],
+  "ctestSelection": [
+    "horde_rt_campaign_session_tests",
+    "horde_rt_chapter_step_movement_tests",
+    "horde_rt_vertical_support_tests",
+    "horde_rt_held_item_vertical_support_rig_tests",
+    "horde_rt_player_directional_rig_tests",
+    "horde_rt_player_crouch_rig_tests",
+    "horde_rt_player_animation_tests",
+    "horde_rt_forest_deadwood_tests",
+    "horde_rt_forest_dressing_tests",
+    "horde_rt_simulation_gameplay_tests",
+    "horde_rt_input_mailbox_stress",
+    "horde_rt_scene_resource_inventory_tests",
+    "horde_rt_rescue_journey_integration_tests",
+    "horde_rt_chapter_terrain_journey_tests",
+    "horde_rt_rescue_rig_attachment_tests"
+  ],
+  "checkEnvironment": "Authorized normal local builds/CTest; default restricted build attempt retained separately.",
+  "checks": {
+    "windowsDebugBuildExit": 0,
+    "windowsReleaseBuildExit": 0,
+    "debugSelectedCtest": {
+      "passed": 15,
+      "failed": 0
+    },
+    "releaseSelectedCtest": {
+      "passed": 15,
+      "failed": 0
+    },
+    "androidAssembleDebug": {
+      "exit": 0,
+      "abis": [
+        "arm64-v8a",
+        "armeabi-v7a",
+        "x86",
+        "x86_64"
+      ],
+      "seconds": 97
+    },
+    "javaFocused": {
+      "passed": 68,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "receipt": "java-controls.json"
+    },
+    "rigSweep": {
+      "samples": 288,
+      "failures": 0
+    },
+    "gitDiffCheckExit": 0
+  },
+  "rootAsset": {
+    "authoredTriangles": 20,
+    "nativeVertices": 60,
+    "nativeIndices": 60,
+    "nativeGeometryBytes": 4080,
+    "regionBytes": 20,
+    "maximumRiseMetres": 0.1,
+    "oldNonwalkableTriangles": 11884,
+    "combinedTriangles": 11904,
+    "gpuMemoryMeasured": false
+  },
+  "logs": [
+    {
+      "path": "reports/2026-10-18-crouch-android-build.log",
+      "sha256": "6a10f932e90e860e1bb7835d218ca2ef475af29bd877ccf5430a72bc3246301b",
+      "bytes": 2202
+    },
+    {
+      "path": "reports/2026-10-18-crouch-controls/AndroidControllerInputTest.xml",
+      "sha256": "2d43a5468f3863b31355eade12f38ed4b88a60c898f760ce18042edf04fe45b4",
+      "bytes": 2286
+    },
+    {
+      "path": "reports/2026-10-18-crouch-controls/AndroidControllerIntegrationTest.xml",
+      "sha256": "c2d870ab96bcbf3f7138ae3ec2904ae61fe942284ec18126dcd0d8fa05ee12f5",
+      "bytes": 13716
+    },
+    {
+      "path": "reports/2026-10-18-crouch-controls/CombatTeachingUiSchedulingTest.xml",
+      "sha256": "f3bd7979e7a7b8cc6f4d200eef35bebe423e1498ac9c2b8a66c031fe87a6dcea",
+      "bytes": 668
+    },
+    {
+      "path": "reports/2026-10-18-crouch-controls/DeathRecoveryTest.xml",
+      "sha256": "0a12407ec0835caa79c5cf488b6285495e13ace00764bb9eb9b48a8dd533ec9e",
+      "bytes": 491
+    },
+    {
+      "path": "reports/2026-10-18-crouch-controls/first-layout-failure.log",
+      "sha256": "8696fb2cab0764d3f1df91d3261e3b69df3f3873d9aaa42db3a189350f56ba27",
+      "bytes": 2854
+    },
+    {
+      "path": "reports/2026-10-18-crouch-controls/first-layout-failure.xml",
+      "sha256": "4f28dca9e4553042a9a66ccc18e3980ee6b2787866962dd178725a0462727a7e",
+      "bytes": 2846
+    },
+    {
+      "path": "reports/2026-10-18-crouch-controls/GameplayTouchCancellationTest.xml",
+      "sha256": "82ef9da98551890a148c0358541af133d95424302486ac00356c02ed08bae7ef",
+      "bytes": 1338
+    },
+    {
+      "path": "reports/2026-10-18-crouch-controls/host-tests.log",
+      "sha256": "813fd9dac091aa79b343964461d093d48dfb939e4dab7b076b67261b0f7f9e0b",
+      "bytes": 2316
+    },
+    {
+      "path": "reports/2026-10-18-crouch-controls/InterfaceLayoutTest.xml",
+      "sha256": "34cdcb2f6003581fd8dd0a4cb88692e3760beb75011975900ed72d5a13f0607c",
+      "bytes": 1102
+    },
+    {
+      "path": "reports/2026-10-18-crouch-controls/receipt.json",
+      "sha256": "7c8ac156ec785498ef9b20434ee314cb7485047e3dfb19b4da64b30bfb81d72f",
+      "bytes": 3097
+    },
+    {
+      "path": "reports/2026-10-18-crouch-controls/SurfaceSuspensionLifecycleTest.xml",
+      "sha256": "70aeb104716ee2348e7128c0af9d39d43c50e6ce419bdd9d576894688ca0e766",
+      "bytes": 25222
+    },
+    {
+      "path": "reports/2026-10-18-crouch-controls/takeover-reproduction.log",
+      "sha256": "3d0923f914f7823d1ad175869290de3077b48d8da361d4a497e9bc78f2525412",
+      "bytes": 2943
+    },
+    {
+      "path": "reports/2026-10-18-crouch-controls/takeover-reproduction.xml",
+      "sha256": "b471bb5e14b3e5a9d07cbd31fa5cd4b938a168c33cb7b2daa3699ac3fcba84f7",
+      "bytes": 2495
+    },
+    {
+      "path": "reports/2026-10-18-crouch-debug-final-build-v2.log",
+      "sha256": "5bc32b3ed09399ce3de2f0882631962f401685e044f6e6ccc607ed403ddaa30e",
+      "bytes": 28679
+    },
+    {
+      "path": "reports/2026-10-18-crouch-debug-final-build.log",
+      "sha256": "547b1360871c0b215ddad69466a2a8290ebff356e4f8a2a1b2cf9e677f7aabe4",
+      "bytes": 6637
+    },
+    {
+      "path": "reports/2026-10-18-crouch-debug-final-tests.log",
+      "sha256": "1143cfd85f38876d51758fe1b68b3b6ece3890a1792df9170320275c9271a7a0",
+      "bytes": 2511
+    },
+    {
+      "path": "reports/2026-10-18-crouch-initial-build.log",
+      "sha256": "8ca2c92542c3f70878f01e3c0072b9fe323c435fe75c6c2532d87528a1e6bf94",
+      "bytes": 6158
+    },
+    {
+      "path": "reports/2026-10-18-crouch-initial-tests.log",
+      "sha256": "33bce1d70f8c1f530ff8981a96dcf417928b14986d77d66874ac360dd3153d32",
+      "bytes": 935
+    },
+    {
+      "path": "reports/2026-10-18-crouch-release-final-build.log",
+      "sha256": "4c30a23ddda5ad2f48342a52598bcafc0c2758c884a94ba5f5617a7af4e14b3e",
+      "bytes": 30322
+    },
+    {
+      "path": "reports/2026-10-18-crouch-release-final-tests.log",
+      "sha256": "68059aa052b0f238eab74d1c6b7d2b52f5fa6b48bca2f0c93d242d2284abd199",
+      "bytes": 2515
+    },
+    {
+      "path": "reports/2026-10-18-crouch-rig-diagnostic-build.log",
+      "sha256": "a32c803df937070eba06633e3ef2478c0c2dedc163533d03da40998a40a92563",
+      "bytes": 1215
+    },
+    {
+      "path": "reports/2026-10-18-crouch-rig-direct.log",
+      "sha256": "ec34b42f2da992f6efbf8daa9a8a883ca256ca9b5a827556ea18858257bee0b3",
+      "bytes": 572
+    },
+    {
+      "path": "reports/2026-10-18-crouch-rig-upward-knee.log",
+      "sha256": "9897f2ee3ee42bca7759c0fefb97b94f268abaa7ec30dcdfff9b93dace1fca13",
+      "bytes": 75
+    },
+    {
+      "path": "reports/2026-10-18-crouch-second-build.log",
+      "sha256": "e24c46477ad05d7b7c1e0c0374212834c77deddb52fa01dbe63c3a272673d97f",
+      "bytes": 3564
+    },
+    {
+      "path": "reports/2026-10-18-trail-root-diagnostic-build.log",
+      "sha256": "9602d5f532a6c9430d01edc1ca2846d3a5504c650283e61d929544498ba5f6f6",
+      "bytes": 285
+    },
+    {
+      "path": "reports/2026-10-18-trail-root-diagnostic-test.log",
+      "sha256": "ae9fb1575389915ffa8f3ee9d6d72d562215a766a1cf7861adeb09ddc276b2c0",
+      "bytes": 3224
+    },
+    {
+      "path": "reports/2026-10-18-trail-root-initializer-build.log",
+      "sha256": "9602d5f532a6c9430d01edc1ca2846d3a5504c650283e61d929544498ba5f6f6",
+      "bytes": 285
+    },
+    {
+      "path": "reports/2026-10-18-trail-root-initializer-test.log",
+      "sha256": "15092167883879ead2e115fbcad4a3e4a7b75ab21386746d80368b3abda23445",
+      "bytes": 2464
+    },
+    {
+      "path": "reports/2026-10-18-trail-root-outline-build.log",
+      "sha256": "7c3163b485bd8cd4e26d0d4267394e29c7d21fe175486dbe48e92de80988cb31",
+      "bytes": 280
+    },
+    {
+      "path": "reports/2026-10-18-trail-root-outline-test.log",
+      "sha256": "5ad92daa8b54fbd6138b1995792077804b5e9ae735018750173548f876f4a202",
+      "bytes": 2148
+    }
+  ],
+  "retainedFailures": [
+    "Initial missing DevelopmentWorldGeometry include and namespace compile errors corrected",
+    "Initial test roof initializer corrected",
+    "First flared root base blocked ordinary crossing; equal upper/lower outline fixed geometry without weakening checks",
+    "Initial rig CTest BAD_COMMAND did not run binary; direct execution exposed seven of 288 walking samples sinking skin below boots",
+    "Upward crouch knee pole and smooth onset corrected all 288 samples; rescue pole unchanged",
+    "320px/85% stance button overlap corrected with layout regression",
+    "Controller takeover cleared fresh L1; preserved held publication with regression",
+    "Owned restricted-environment MSBuild child-start hang canceled; final builds used authorized normal environment"
+  ],
+  "acceptance": {
+    "physicalFullRoute": false,
+    "physicalCrouchComfort": false,
+    "physicalRootWalk": false,
+    "audioHaptics": false,
+    "manualAudioHapticRevalidationRequired": true,
+    "windowsRtxPresentation": false,
+    "newSustainedPerformance": false,
+    "cloudCi": false,
+    "sanitizers": false,
+    "phone": "Separate exact-APK bounded receipt; no numeric eye-height or full root route acceptance inferred."
+  }
+}

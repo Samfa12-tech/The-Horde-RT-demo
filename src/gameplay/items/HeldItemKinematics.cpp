@@ -909,7 +909,7 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
         const SwordGripBasisInView basis = EvaluateSwordGripBasisInView(
             sword.swordRadians, sword.swordForwardRadians, kSwordGripRollRadians);
         const Vec3 initialGripWorld = Add(
-            Vec3{{input.cameraX, EyeWorldYForSupport(input.playerSupportWorldY), input.cameraZ}},
+            Vec3{{input.cameraX, (EyeWorldYForSupport(input.playerSupportWorldY)-std::clamp(input.playerCrouchDropMetres,0.f,.6f)), input.cameraZ}},
             ViewVectorToWorld(result.rightHandLocal, viewRight, viewUp, viewForward));
         const float initialLowering = SwordOverheadLowering(
             initialGripWorld,
@@ -950,7 +950,7 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
         const Vec3 viewRight = Normalize(Cross(viewForward, worldUp));
         const Vec3 viewUp = Normalize(Cross(viewRight, viewForward));
         const Vec3 gripWorld = Add(
-            Vec3{{input.cameraX, EyeWorldYForSupport(input.playerSupportWorldY), input.cameraZ}},
+            Vec3{{input.cameraX, (EyeWorldYForSupport(input.playerSupportWorldY)-std::clamp(input.playerCrouchDropMetres,0.f,.6f)), input.cameraZ}},
             Add(Scale(viewRight, result.leftHandLocal[0]),
                 Add(Scale(viewUp, result.leftHandLocal[1]),
                     Scale(viewForward, result.leftHandLocal[2]))));
@@ -1105,7 +1105,7 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
         const Vec3 viewForward=Normalize({{forwardX,-0.05f+pitch,forwardZ}});
         const Vec3 viewRight=Normalize(Cross(viewForward,worldUp));
         const Vec3 viewUp=Normalize(Cross(viewRight,viewForward));
-        const Vec3 desired=Add(Vec3{{input.cameraX,EyeWorldYForSupport(input.playerSupportWorldY),input.cameraZ}},
+        const Vec3 desired=Add(Vec3{{input.cameraX,(EyeWorldYForSupport(input.playerSupportWorldY)-std::clamp(input.playerCrouchDropMetres,0.f,.6f)),input.cameraZ}},
             ViewVectorToWorld(result.leftHandLocal,viewRight,viewUp,viewForward));
         // The established forward response turns the cage sideways and bounds
         // its presentation swing near a wall. A full circular bound there would
@@ -1271,7 +1271,7 @@ bool ResolveHeldItemsFixedStep(HeldItemStates& items,
         input.playerMountProfile,
         input.playerPitchRadians,
         input.logicalViewAspect,
-        input.playerSupportWorldY,input.developmentWorldRoute,input.readableCombatPose,input.rescueExterior,input.chapterTerrain});
+        input.playerSupportWorldY,input.developmentWorldRoute,input.readableCombatPose,input.rescueExterior,input.chapterTerrain,input.playerCrouchDropMetres});
     if (input.swordItemState != nullptr &&
         input.swordItemState->id == HeldItemId::Sword)
     {
@@ -1288,7 +1288,7 @@ bool ResolveHeldItemsFixedStep(HeldItemStates& items,
         -std::cos(input.playerYawRadians)}});
     const Vec3 viewRight = Normalize(Cross(viewForward, worldUp));
     const Vec3 viewUp = Normalize(Cross(viewRight, viewForward));
-    const Vec3 eye{{input.playerX, EyeWorldYForSupport(input.playerSupportWorldY),
+    const Vec3 eye{{input.playerX, (EyeWorldYForSupport(input.playerSupportWorldY)-std::clamp(input.playerCrouchDropMetres,0.f,.6f)),
                     input.playerZ}};
     const auto toWorld = [&](const std::array<float, 3u>& local) {
         return Add(Add(Add(eye, Scale(viewRight, local[0])),

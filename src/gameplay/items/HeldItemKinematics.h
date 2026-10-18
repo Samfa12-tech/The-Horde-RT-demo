@@ -80,6 +80,7 @@ struct HeldItemKinematicsInput
     // Borrowed only during the synchronous fixed-step solve; never published
     // in a snapshot. The simulation supplies its generation-validated owner.
     const simulation::TriangleSupportSurface* chapterTerrain = nullptr;
+    float playerCrouchDropMetres=0;
 };
 
 struct HeldSwordPose
@@ -155,6 +156,7 @@ struct HeldItemFixedStepInput
     // Borrowed only during the synchronous fixed-step solve; never published
     // in a snapshot. The simulation supplies its generation-validated owner.
     const simulation::TriangleSupportSurface* chapterTerrain = nullptr;
+    float playerCrouchDropMetres=0;
 };
 
 inline constexpr float kHeldItemSpreadStartAspect = 1.0f;

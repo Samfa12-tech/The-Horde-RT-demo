@@ -76,6 +76,25 @@ int main()
     check(rejected(0,0,false,1,1),"disabled support not rejected");
     const auto preview=BuildEntryMenuFrameInputs({},.92f,FireEmitterQuality::High,horde::graphics::ShadowQuality::Higher);
     check(preview.playerSupportWorldY==kRouteFloorWorldY && BuildPlayerFrameLight({},preview.playerSupportWorldY).playerTransform[0]==0,"menu baseline transform");
+    {
+        GameSimulation stance(ProductionGameSimulationConfig());InputSnapshot crouch;crouch.damageEnabled=false;crouch.crouchHeld=true;
+        for(int tick=0;tick<20;++tick)stance.StepFixed(crouch);
+        const auto s=stance.Snapshot();const auto frame=BuildRtSceneFrameInputs(s,.92f);
+        const auto payload=BuildPlayerFrameLight({1,2,3,4},frame.playerSupportWorldY,-frame.playerCrouchDropMetres);
+        check(near(s.playerSupportWorldY,kRouteFloorWorldY) && near(frame.playerCrouchDropMetres,.6f) &&
+              near(frame.playerAnimation.crouchPelvisDropMetres,frame.playerCrouchDropMetres),
+              "immutable camera/body frame shares stance while foot support stays fixed");
+        check(near(payload.playerTransform[0],s.playerHeightDelta-.6f) && payload.positionStrength==std::array<float,4>{1,2,3,4},
+              "both RT backends receive crouch via existing view-height channel without shifting physical light");
+        stance.ClearEvents();crouch.moveForward=1;crouch.runHeld=true;crouch.commands.dodge=1;
+        bool heardStep=false;
+        for(int tick=0;tick<120;++tick){stance.StepFixed(crouch);
+            check(!stance.Snapshot().runActive && !stance.Snapshot().dodgeActive && stance.Snapshot().playerMovementSpeedMetresPerSecond<=1.001f,
+                  "crouch caps actual movement and consumes incompatible run/dodge requests");}
+        for(const auto& event:stance.Events().Events())if(event.type==GameplayEventType::PlayerFootstep){heardStep=true;
+            check(near(event.listenerY,PlayerEyeWorldY(kRouteFloorWorldY)-.6f),"event-time listener follows shared crouch eye");}
+        check(heardStep,"crouch listener check observes actual semantic footsteps");
+    }
     std::cout<<"Vertical support proof cases="<<cases<<" failures="<<failures<<" fixed-walk directions=2\n";
     return failures?1:0;
 }

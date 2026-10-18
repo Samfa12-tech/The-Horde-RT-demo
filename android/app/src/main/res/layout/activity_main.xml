@@ -154,6 +154,21 @@
         android:textSize="16sp"
         android:textStyle="bold" />
 
+    <Button
+        android:id="@+id/crouch_button"
+        android:layout_width="104dp"
+        android:layout_height="72dp"
+        android:layout_gravity="bottom|start"
+        android:layout_marginStart="24dp"
+        android:layout_marginBottom="116dp"
+        android:text="@string/crouch"
+        android:contentDescription="@string/crouch"
+        android:autoSizeTextType="uniform"
+        android:autoSizeMinTextSize="10sp"
+        android:autoSizeMaxTextSize="16sp"
+        android:maxLines="2"
+        android:visibility="gone" />
+
     <TextView
         android:id="@+id/combat_teaching_prompt"
         android:layout_width="wrap_content"

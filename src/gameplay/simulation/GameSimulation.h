@@ -20,6 +20,7 @@
 #include "gameplay/simulation/CombatPresentation.h"
 #include "gameplay/simulation/CombatInputTiming.h"
 #include "gameplay/simulation/FixedStepRunner.h"
+#include "gameplay/simulation/CharacterPosture.h"
 #include "gameplay/simulation/GameplayEvent.h"
 #include "gameplay/simulation/InputSnapshot.h"
 #include "gameplay/simulation/SimulationSnapshot.h"
@@ -221,6 +222,9 @@ private:
     void ResetPlayerSupport();
     void UpdateMovement(const InputSnapshot& input, float deltaSeconds);
     void ClearRunIntent();
+    void ClearCrouchIntent();
+    void UpdatePosture(const InputSnapshot& input,float seconds);
+    bool BodyHeightClear(float height) const;
     bool CurrentCombatRules() const;
     void CancelCombatTransients();
     void BeginKeeperRepel();
@@ -342,6 +346,11 @@ private:
     bool runToggleActive_ = false;
     bool runActive_ = false;
     bool runInputBlockedUntilRelease_ = false;
+    CharacterPosture posture_{};
+    bool crouchToggleActive_=false,crouchInputBlockedUntilRelease_=false;
+    std::uint64_t latestCrouchToggleSequence_=0,latestClearCrouchIntentSequence_=0;
+    std::uint64_t lastConsumedCrouchToggleSequence_=0,lastConsumedClearCrouchIntentSequence_=0;
+    std::uint64_t pendingCrouchToggleCommands_=0,pendingClearCrouchIntentCommands_=0;
     std::int32_t retryCheckpoint_ = 0;
     std::uint32_t retryGeneration_ = 0u;
     std::uint64_t tickIndex_ = 0u;

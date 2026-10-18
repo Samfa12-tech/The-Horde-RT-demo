@@ -71,6 +71,9 @@ struct PlayerAnimationSnapshot
     // Stationary traversal may publish the bounded native planted-leg pose.
     // Ordinary animation keeps this zero; it is not a crouch movement control.
     float plantedPelvisDropMetres = 0.0f;
+    // Grounded Idle/Walk crouch lowers the torso while retaining animated feet.
+    // Published separately from the stationary rescue stance; [0, 0.6] metres.
+    float crouchPelvisDropMetres = 0.0f;
     PlayerArmIkTarget leftIk{};
     PlayerArmIkTarget rightIk{};
     PlayerVisibilityFlags visibility{};

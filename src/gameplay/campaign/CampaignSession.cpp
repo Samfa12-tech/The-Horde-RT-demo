@@ -73,7 +73,7 @@ bool Session::CommitLoad(const LoadPreparation& preparation,simulation::WorldZon
     if(!candidate->CommitCampaignRestore(preparation.restore,ready,std::move(terrain),ownerInput,publicationSequence))return false;
     auto rebased=ownerInput;const auto& loaded=candidate->Snapshot();
     rebased.yawRadians=loaded.playerYawRadians;rebased.pitchRadians=loaded.playerPitchRadians;
-    rebased.moveForward=rebased.moveStrafe=0;rebased.runHeld=false;rebased.hasAuthoritativePlayerPose=false;
+    rebased.moveForward=rebased.moveStrafe=0;rebased.runHeld=false;rebased.crouchHeld=false;rebased.hasAuthoritativePlayerPose=false;
     rebased.authoritativePlayerX=rebased.authoritativePlayerZ=0;
     rebased.combatEdgeHistory={};rebased.dialogueCompletionLine=0;rebased.dialogueCompletionGeneration=0;
     // Adoption allocates offside and has a no-throw commit. No owner methods can

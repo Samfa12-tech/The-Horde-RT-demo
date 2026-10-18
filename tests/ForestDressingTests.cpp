@@ -443,7 +443,7 @@ void TestNativeChapterPrimitiveOwnership()
     if (!prepared) return;
     Check(understory.placements.size()==18 && understory.triangles==17712,
           "real exported terrain supports all bounded understory clumps before native owner packing");
-    Check(deadwood.placements.size()==10 && deadwood.triangles==11884,
+    Check(deadwood.placements.size()==10 && deadwood.triangles==11904 && deadwood.nonWalkableTriangles==11884 && deadwood.stepTriangles==20,
           "real exported terrain supports all four prepared deadwood assets with exact contact");
     constexpr std::array<std::string_view,11> families{{
         "Boulder01Rock", "MedievalWall02", "TombBoneWax", "TombEarthenware", "TombCharredWick",
@@ -481,7 +481,8 @@ void TestNativeChapterPrimitiveOwnership()
             std::any_of(rocks.placements.begin(),rocks.placements.end(),
                 [&](const auto& p){return inside(p.minimum,p.maximum);}) ||
             std::any_of(deadwood.placements.begin(),deadwood.placements.end(),
-                [&](const auto& p){return inside(p.minimum,p.maximum);});
+                [&](const auto& p){return inside(p.minimum,p.maximum);}) ||
+            inside(deadwood.trailRoot.minimum,deadwood.trailRoot.maximum);
         Check(authored,"exterior provenance must still identify actual authored placements after reordering");
     }
     StaticMeshAsset selected, restored;

@@ -30,6 +30,16 @@ bool ValidatePlantedStance(
         diagnostic = "Planted player stance requires the stationary Idle clip.";
         return false;
     }
+    const float crouch = animation.crouchPelvisDropMetres;
+    if (!std::isfinite(crouch) || crouch < 0.0f ||
+        crouch > horde::scene::kMaximumPlayerCrouchPelvisDropMetres ||
+        (crouch > 0.0f && (drop > 0.0f ||
+         (animation.locomotionClip != horde::gameplay::animation::PlayerLocomotionClip::Idle &&
+          animation.locomotionClip != horde::gameplay::animation::PlayerLocomotionClip::Walk))))
+    {
+        diagnostic = "Player crouch requires a finite admitted drop, Idle/Walk and no planted stance.";
+        return false;
+    }
     return true;
 }
 
@@ -40,7 +50,7 @@ void ApplyPlantedTorsoTranslation(
     std::array<float, 3u>& position,
     const horde::gameplay::animation::PlayerAnimationSnapshot& animation)
 {
-    position[1] -= animation.plantedPelvisDropMetres;
+    position[1] -= animation.plantedPelvisDropMetres + animation.crouchPelvisDropMetres;
     position[2] -= animation.plantedPelvisDropMetres *
                    horde::scene::kPlayerPlantedPelvisSetbackPerDrop;
 }
@@ -854,7 +864,7 @@ bool PlayerRenderSlot::PreparePose(
     RtSceneStageScope skinScope(observation, horde::telemetry::RtStage::PlayerSkin);
     if (!asset_.EvaluatePlayerPose(
             clip, animation.locomotionTime, left, right, solvedPose_, diagnostic,
-            animation.plantedPelvisDropMetres) ||
+            animation.plantedPelvisDropMetres, animation.crouchPelvisDropMetres) ||
         !asset_.SkinPlayerPoseUniqueTextured(
             solvedPose_, uniqueVertices_, uniqueTangents_, diagnostic))
     {

@@ -32,7 +32,7 @@ public final class GameplayTouchCancellationTest {
         @Implementation protected static int getPlayerLifePhase() { return 0; }
         @Implementation protected static int getFinaleEndingPhase() { return 0; }
         @Implementation protected static int getContextualControlState() { return 0; }
-        @Implementation protected static void setViewControls(float yaw,float pitch,float light,float x,float z) {
+        @Implementation protected static void setViewControls(float yaw,float pitch,float light,float x,float z,boolean crouch) {
             strafe=x; forward=z;
         }
         @Implementation protected static void setSimulationPaused(boolean paused) {}

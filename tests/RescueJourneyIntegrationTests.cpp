@@ -509,11 +509,12 @@ int main(int argc,char** argv) {
  if(authored)check(!sim.PublishWorldZoneReadiness(token,ZoneReadiness::Ready),"readiness admitted without authored support");
  check(publish(token),"current readiness could not be admitted");
  for(int cycle=0;cycle<2;++cycle) {
-  ++input.commands.interact;++input.commands.attack;sim.StepFixed(input);
+  ++input.commands.interact;++input.commands.attack;++input.commands.crouchToggle;input.crouchHeld=true;sim.StepFixed(input);
   check(sim.Snapshot().rescue.equipmentStowed,"ascent failed to commit from lower endpoint");
   check(sim.Snapshot().playerCombat.action==PlayerCombatAction::Idle,
       "simultaneous traversal intent leaked a combat action before taking ownership");
   input.commands.attack+=3;input.commands.parry+=2;input.commands.dodge+=2;input.commands.toggleHeldLightPose+=2;
+  input.commands.crouchToggle+=3;
   input.moveForward=1;input.runHeld=true;input.yawRadians=1.1f;
   for(int tick=0;tick<1200 && sim.Snapshot().rescue.equipmentStowed;++tick) {
    sim.StepFixed(input);
@@ -536,6 +537,8 @@ int main(int argc,char** argv) {
    check(f.rescue.ropeNodes==s.rescue.ropeNodes && f.playerSupportWorldY==s.playerSupportWorldY,"frame adapter lost loaded rope/root");
   }
   check(sim.Snapshot().rescue.exteriorSide && !sim.Snapshot().rescue.equipmentStowed,"ascent never reached exterior safe side");
+  check(!sim.Snapshot().crouchActive && sim.Snapshot().lastConsumedCrouchToggleSequence==input.commands.crouchToggle,
+        "traversal consumes simultaneous and in-flight stance edges without replay");
   std::cout<<"cycle="<<cycle<<" ascent-end phase="<<static_cast<int>(sim.Snapshot().rescue.phase)
            <<" root="<<sim.Snapshot().playerX<<","<<sim.Snapshot().playerSupportWorldY<<","<<sim.Snapshot().playerZ<<'\n';
   check(std::abs(sim.Snapshot().playerSupportWorldY-kUpperSupportWorldY)<.001f,"upper landing support incorrect");
@@ -544,6 +547,8 @@ int main(int argc,char** argv) {
   input.moveForward=0;input.runHeld=false;input.yawRadians=2.250f;
   sim.StepFixed(input);
   const auto& upperCarry=sim.Snapshot();
+  check(!upperCarry.crouchActive,"held stance from traversal requires release at the safe endpoint");
+  input.crouchHeld=false;
   std::cout<<"upper lantern hand depth="<<upperCarry.heldItemKinematics.leftHandLocal[2]
            <<" localY="<<upperCarry.heldItemKinematics.leftHandLocal[1]<<'\n';
   check(upperCarry.heldItemKinematics.leftHandLocal[2]>.45f,

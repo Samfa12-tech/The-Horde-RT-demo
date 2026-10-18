@@ -107,6 +107,7 @@ RtSceneFrameInputs BuildRtSceneFrameInputs(
     frame.torchLightStrength = simulation.torchLightStrength * simulation.torchFailure.flameStrength;
     frame.walkTime = simulation.walkTime;
     frame.playerSupportWorldY = simulation.playerSupportWorldY;
+    frame.playerCrouchDropMetres=simulation.playerCrouchDropMetres;
     frame.cameraX = simulation.playerX;
     frame.cameraZ = simulation.playerZ;
     frame.walkAmount = simulation.walkAmount;
@@ -132,7 +133,7 @@ RtSceneFrameInputs BuildRtSceneFrameInputs(
             // the aperture. There is no timer, cached state or side-flag pop.
             const float eyeY = horde::gameplay::simulation::PlayerEyeWorldY(
                 simulation.playerSupportWorldY) +
-                horde::gameplay::traversal::RescueTorsoOffset(simulation.rescue).y;
+                horde::gameplay::traversal::RescueTorsoOffset(simulation.rescue).y-simulation.playerCrouchDropMetres;
             if (std::isfinite(eyeY))
             {
                 const float t = std::clamp((eyeY - 1.70f) / .90f, 0.f, 1.f);

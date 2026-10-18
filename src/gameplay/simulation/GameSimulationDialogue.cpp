@@ -7,7 +7,7 @@ void GameSimulation::UpdateChapterDialogue(const InputSnapshot& input,float seco
     using namespace horde::gameplay::dialogue;
     Context c;
     c.player={playerX_,playerSupport_.worldY,playerZ_};
-    c.listener={playerX_,kShowcaseEyeWorldY+PlayerHeightDelta(playerSupport_.worldY),playerZ_};
+    c.listener={playerX_,kShowcaseEyeWorldY+PlayerHeightDelta(playerSupport_.worldY)-posture_.drop,playerZ_};
     c.yaw=playerYawRadians_;c.paused=input.paused;
     c.alive=playerVitals_.Snapshot().phase==PlayerLifePhase::Alive;
     c.combat=combatSnapshot_.attackerIndex>=0 || lichEncounter_.Snapshot().phase==LichPhase::Charging;

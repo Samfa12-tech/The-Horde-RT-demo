@@ -21,8 +21,9 @@ std::vector<Surface::Triangle> Box(float x,float z,float y,float height) {
             {{a,e,h},sim::SupportSurface::Wood},{{a,h,d},sim::SupportSurface::Wood},
             {{b,c,g},sim::SupportSurface::Wood},{{b,g,f},sim::SupportSurface::Wood}};
 }
-bool WalkTo(sim::GameSimulation& game,float x,float z) {
+bool WalkTo(sim::GameSimulation& game,float x,float z,bool crouch=false) {
     sim::InputSnapshot input;
+    input.crouchHeld=crouch;
     for(unsigned tick=0;tick<6000;++tick) {
         const auto& s=game.Snapshot();const float dx=x-s.playerX,dz=z-s.playerZ;
         if(std::hypot(dx,dz)<.012f)return true;
@@ -74,6 +75,11 @@ int main() {
           "standing body cannot step into a low ceiling");
     Check(ceiling && tr::ResolveChapterStepMovement(*ceiling,x-.5f,z,x,z,from.worldY,radius,1.2f).accepted,
           "explicit shorter body clearance is independent of foot support (no crouch input/pose claim)");
+    auto rootAndRoof=root;rootAndRoof.insert(rootAndRoof.end(),roof.begin(),roof.end());
+    const auto taggedRoof=Surface::WithStepGeometry(*ground,rootAndRoof,error);
+    const auto lowProfile=tr::ResolveChapterStepMovement(*taggedRoof,x-.5f,z,x,z,from.worldY,radius,1.2f);
+    Check(lowProfile.accepted && std::abs(lowProfile.support.worldY-(base.worldY+.12f))<.0001f,
+          "shorter support admission preserves root top even with overhead faces in the same STEP lane");
     Check(!tr::ChapterExteriorCarryClear(*ceiling,x-.5f,z,x,z,from.worldY,radius),
           "raised held-item clearance remains solid to the roof");
     const auto flatQuad=[&](float a,float b) {
@@ -125,6 +131,67 @@ int main() {
     const auto oldGeneration=game.Snapshot().worldRoute.generation;game.InvalidateWorldZoneReadiness();
     Check(!game.PublishChapterTerrain({oldGeneration,sim::WorldZoneId::ForestApproach},terrain),
           "retired terrain generation cannot resurrect step support after reconstruction");
+    {
+        sim::GameSimulation crouching(config);
+        const auto restore=crouching.BeginCampaignRestore(c);
+        Check(restore && crouching.CommitCampaignRestore(*restore,{restore->worldGeneration,c.zone},ceiling,{}),
+              "crouch fixture restores real terrain and low roof");
+        for(std::size_t zone=1;zone<sim::kWorldZones.size();++zone)
+            crouching.PublishChapterTerrain({crouching.Snapshot().worldRoute.generation,static_cast<sim::WorldZoneId>(zone)},ceiling);
+        neutral.yawRadians=c.yaw;neutral.pitchRadians=c.pitch;crouching.StepFixed(neutral);
+        const auto standingSave=crouching.CaptureCampaignCheckpoint(c.id);
+        Check(standingSave.has_value(),"standing safe-exit fixture is actually saveable before stance rejection");
+        auto toggle=neutral;toggle.commands.crouchToggle=1;
+        for(int tick=0;tick<20;++tick)crouching.StepFixed(toggle);
+        Check(crouching.Snapshot().crouchActive && crouching.Snapshot().lastConsumedCrouchToggleSequence==1,
+              "touch toggle is consumed once and holds crouch across repeated publications");
+        toggle.commands.crouchToggle=2;
+        for(int tick=0;tick<20;++tick)crouching.StepFixed(toggle);
+        Check(!crouching.Snapshot().crouchActive,"fresh toggle returns to standing");
+        toggle.commands.clearCrouchIntent=1;toggle.crouchHeld=true;crouching.StepFixed(toggle);
+        Check(!crouching.Snapshot().crouchActive,"clear with held stance requires physical release");
+        toggle.crouchHeld=false;crouching.StepFixed(toggle);toggle.crouchHeld=true;crouching.StepFixed(toggle);
+        Check(crouching.Snapshot().crouchActive,"consumed neutral clear does not swallow next fresh hold");
+        toggle.crouchHeld=false;for(int tick=0;tick<20;++tick)crouching.StepFixed(toggle);
+        auto controls=neutral;controls.crouchHeld=true;
+        const auto support=crouching.Snapshot().playerSupportWorldY;
+        float previousDrop=0;
+        for(int tick=0;tick<20;++tick){crouching.StepFixed(controls);const auto& s=crouching.Snapshot();
+            Check(s.playerCrouchDropMetres>=previousDrop && s.playerCrouchDropMetres-previousDrop<=.0401f &&
+                  s.playerSupportWorldY==support,"crouch eye transition is bounded and never lowers foot support");previousDrop=s.playerCrouchDropMetres;}
+        Check(crouching.Snapshot().crouchActive && std::abs(previousDrop-.6f)<.0001f &&
+              !crouching.CaptureCampaignCheckpoint(c.id),"active crouch rejects saves that would restore standing");
+        const auto crouched=crouching.Snapshot();controls.paused=true;
+        Check(crouching.AdvanceFrame(controls,.25)==0 && crouching.Snapshot().playerCrouchDropMetres==crouched.playerCrouchDropMetres,
+              "pause freezes crouch camera/body without expanding through geometry");
+        controls.paused=false;controls.crouchHeld=false;
+        for(int tick=0;tick<20;++tick)crouching.StepFixed(controls);
+        Check(!crouching.Snapshot().crouchActive,"open standing clearance permits smooth return");
+        Check(WalkTo(crouching,sim::kWorldRoutePoints[2].x,sim::kWorldRoutePoints[2].z) &&
+              WalkTo(crouching,sim::kWorldRoutePoints[3].x,sim::kWorldRoutePoints[3].z) && WalkTo(crouching,x-.7f,z),
+              "crouch fixture approaches roof by actual production route");
+        const auto approach=crouching.Snapshot();controls={};controls.moveForward=1;controls.yawRadians=1.57079632679f;
+        for(int tick=0;tick<40;++tick)crouching.StepFixed(controls);
+        Check(crouching.Snapshot().playerX<x-.2f,"standing player cannot enter low root/ceiling volume");
+        controls.moveForward=0;controls.crouchHeld=true;
+        for(int tick=0;tick<20;++tick)crouching.StepFixed(controls);
+        Check(WalkTo(crouching,x,z,true),"fully crouched player can step onto root beneath roof");
+        controls={};controls.yawRadians=crouching.Snapshot().playerYawRadians;
+        for(int tick=0;tick<20;++tick)crouching.StepFixed(controls);
+        Check(crouching.Snapshot().crouchStandingBlocked && std::abs(crouching.Snapshot().playerCrouchDropMetres-.6f)<.0001f,
+              "release beneath ceiling retains safe posture and reports blocked standing");
+        Check(WalkTo(crouching,x+1,z,true),"crouched player can leave the roof safely");
+        controls.yawRadians=crouching.Snapshot().playerYawRadians;
+        for(int tick=0;tick<20;++tick)crouching.StepFixed(controls);
+        Check(!crouching.Snapshot().crouchActive && !crouching.Snapshot().crouchStandingBlocked,
+              "standing resumes once full clearance is available");
+        controls.crouchHeld=true;for(int tick=0;tick<20;++tick)crouching.StepFixed(controls);
+        const auto fresh=crouching.BeginCampaignRestore(c);
+        Check(fresh && crouching.CommitCampaignRestore(*fresh,{fresh->worldGeneration,c.zone},ceiling,controls) &&
+              !crouching.Snapshot().crouchActive,"load reconstructs standing at safe authored checkpoint");
+        crouching.StepFixed(controls);
+        Check(crouching.Snapshot().paused,"held stance cannot cross load neutral-release barrier");
+    }
     std::cout<<checks<<" chapter step movement checks, "<<failures<<" failures; retained step bytes="
              <<terrain->RetainedBytes()-ground->RetainedBytes()<<'\n';return failures?1:0;
 }

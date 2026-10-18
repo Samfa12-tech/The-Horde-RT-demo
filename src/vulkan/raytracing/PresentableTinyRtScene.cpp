@@ -6544,7 +6544,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     const Vec3 worldUp{0.0f, 1.0f, 0.0f};
     const auto rescueTorsoOffset=horde::gameplay::traversal::RescueTorsoOffset(frame.rescue);
     const Vec3 eye{cameraX+rescueTorsoOffset.x,
-        horde::gameplay::simulation::PlayerEyeWorldY(frame.playerSupportWorldY)+rescueTorsoOffset.y,
+        horde::gameplay::simulation::PlayerEyeWorldY(frame.playerSupportWorldY)+rescueTorsoOffset.y-frame.playerCrouchDropMetres,
         cameraZ+rescueTorsoOffset.z};
     const float bodyYaw=frame.developmentRescueJourney && frame.rescue.equipmentStowed
         ?frame.rescue.bodyYawRadians:cameraYaw;
@@ -7309,7 +7309,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         renderedTorchLight.worldFromLight[12],
         renderedTorchLight.worldFromLight[13],
         renderedTorchLight.worldFromLight[14],
-        frame.heldLight.active ? frame.torchLightStrength : 0.0f}, frame.playerSupportWorldY,rescueTorsoOffset.y);
+        frame.heldLight.active ? frame.torchLightStrength : 0.0f}, frame.playerSupportWorldY,rescueTorsoOffset.y-frame.playerCrouchDropMetres);
     if (productionLanternVisible)
     {
         heldLightGpu.positionStrength = {{
@@ -7900,7 +7900,7 @@ bool PresentableTinyRtScene::WriteDustQuality(const RtQualityControlsGpu& qualit
     const float step=frame.walkTime*6.2f;
     const auto offset=horde::gameplay::traversal::RescueTorsoOffset(frame.rescue);
     DustCamera camera{{frame.cameraX+offset.x+std::sin(step*0.5f)*0.035f*frame.walkAmount,
-        horde::gameplay::simulation::PlayerEyeWorldY(frame.playerSupportWorldY)+offset.y+std::abs(std::sin(step))*0.035f*frame.walkAmount,frame.cameraZ+offset.z},
+        horde::gameplay::simulation::PlayerEyeWorldY(frame.playerSupportWorldY)+offset.y-frame.playerCrouchDropMetres+std::abs(std::sin(step))*0.035f*frame.walkAmount,frame.cameraZ+offset.z},
         frame.cameraYaw,frame.cameraPitch+std::sin(step)*0.012f*frame.walkAmount,
         float(dispatchExtent_.width)/float(std::max(dispatchExtent_.height,1u))};
     const auto rotation=static_cast<unsigned>(frame.presentationTransform)&3u;

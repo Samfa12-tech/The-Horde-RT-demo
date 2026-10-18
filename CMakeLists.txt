@@ -545,6 +545,9 @@ if(BUILD_TESTING)
         target_link_libraries(horde_rt_player_directional_rig_tests PRIVATE horde_rt_probe_core)
         add_test(NAME horde_rt_player_directional_rig_tests
             COMMAND horde_rt_player_directional_rig_tests ${CMAKE_CURRENT_SOURCE_DIR})
+        add_executable(horde_rt_player_crouch_rig_tests tests/PlayerCrouchRigTests.cpp)
+        target_link_libraries(horde_rt_player_crouch_rig_tests PRIVATE horde_rt_probe_core)
+        add_test(NAME horde_rt_player_crouch_rig_tests COMMAND horde_rt_player_crouch_rig_tests ${CMAKE_CURRENT_SOURCE_DIR})
 
         add_executable(horde_rt_final_held_torch_clearance_tests tests/FinalHeldTorchClearanceTests.cpp)
         target_link_libraries(horde_rt_final_held_torch_clearance_tests PRIVATE horde_rt_probe_core)

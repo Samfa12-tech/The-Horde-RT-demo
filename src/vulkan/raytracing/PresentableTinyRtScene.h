@@ -123,6 +123,7 @@ struct RtSceneFrameInputs
     horde::gameplay::traversal::RescueTraversalSnapshot rescue{};
     horde::gameplay::dialogue::CompanionSnapshot chapterCompanion{};
     float playerSupportWorldY = horde::gameplay::kRouteFloorWorldY;
+    float playerCrouchDropMetres=0;
     std::uint64_t tickIndex = 0u;
     float cameraYaw = 0.0f;
     float cameraPitch = 0.0f;

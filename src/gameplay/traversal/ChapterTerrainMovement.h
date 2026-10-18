@@ -42,14 +42,16 @@ inline bool ChapterExteriorObstacleClear(const simulation::TriangleSupportSurfac
 // Separate opt-in step support: bare ground remains the terrain/tree-placement
 // authority. This footprint maximum is deliberately conservative around roots.
 inline simulation::PlayerSupportResolution ChapterExteriorStepSupport(
-    const simulation::TriangleSupportSurface& terrain,float x,float z,float radius)
+    const simulation::TriangleSupportSurface& terrain,float x,float z,float radius,float bodyHeight=1.8f)
 {
+    if(!std::isfinite(bodyHeight)||bodyHeight<.5f||bodyHeight>2.5f)
+        return {horde::gameplay::kRouteFloorWorldY,simulation::PlayerSupportId::RouteFloor,false};
     auto support=ChapterExteriorSupport(&terrain,x,z);
     if(!support.grounded || OnRescueLanding(x,z))return support;
     const auto step=terrain.StepSupport(x,z,x,z,support.worldY,
         support.worldY+simulation::kWorldRouteMaximumStep,radius);
     if(step.found && step.worldY>support.worldY &&
-       terrain.StepVolumeClear(x,z,x,z,step.worldY+.001f,step.worldY+1.8f,radius)) {
+       terrain.StepVolumeClear(x,z,x,z,step.worldY+.001f,step.worldY+bodyHeight,radius)) {
         support.worldY=step.worldY;support.surface=step.surface;
         // Distinct from bare ground and the authored landing identities.
         support.id=static_cast<simulation::PlayerSupportId>(100000+step.triangle);
@@ -70,10 +72,10 @@ inline ChapterStepMovement ResolveChapterStepMovement(
     const auto start=ChapterExteriorSupport(&terrain,fromX,fromZ);
     const auto end=ChapterExteriorSupport(&terrain,toX,toZ);
     if(!start.grounded||!end.grounded || OnRescueLanding(fromX,fromZ)||OnRescueLanding(toX,toZ))return result;
-    const auto current=ChapterExteriorStepSupport(terrain,fromX,fromZ,radius);
+    const auto current=ChapterExteriorStepSupport(terrain,fromX,fromZ,radius,bodyHeight);
     if(std::abs(current.worldY-previousFootY)>.001f ||
        !terrain.GroundSweep(fromX,fromZ,toX,toZ,start.worldY,radius,kWorldRouteMaximumStep))return result;
-    result.support=ChapterExteriorStepSupport(terrain,toX,toZ,radius);
+    result.support=ChapterExteriorStepSupport(terrain,toX,toZ,radius,bodyHeight);
     const float limit=std::min(previousFootY+kWorldRouteMaximumStep,
                               std::min(start.worldY,end.worldY)+kWorldRouteMaximumStep);
     const auto swept=terrain.StepSupport(fromX,fromZ,toX,toZ,std::min(start.worldY,end.worldY),limit,radius);

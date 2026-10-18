@@ -33,6 +33,31 @@ final class UiControlLayout {
         place(interact,contextWidth,Math.max(minimum,contextHeight),edge,above);
         place(light,contextWidth,Math.max(minimum,contextHeight),edge+contextWidth+gap,above);
     }
+    static void applyStance(Context c,InterfacePreferences.Values v,Button run,Button crouch,int safeLeft,int safeBottom,
+                            int availableWidth,Button... combatControls) {
+        if(crouch==null)return;
+        int width=HordeUiTokens.dp(c,Math.round((v.compact?88:104)*v.scale/100f));
+        int height=Math.max(HordeUiTokens.dp(c,48),HordeUiTokens.dp(c,Math.round((v.compact?64:72)*v.scale/100f)));
+        int bottom=HordeUiTokens.dp(c,32)+safeBottom;
+        FrameLayout.LayoutParams p=new FrameLayout.LayoutParams(width,height);
+        p.gravity=Gravity.BOTTOM|Gravity.START;p.setMarginStart(HordeUiTokens.dp(c,24)+safeLeft);
+        int runHeight=run!=null && run.getLayoutParams()!=null && run.getLayoutParams().height>0
+                ?run.getLayoutParams().height:HordeUiTokens.dp(c,72);
+        int gap=HordeUiTokens.dp(c,12);
+        p.bottomMargin=bottom+runHeight+gap;
+        // Keep the existing action/context slots fixed. In narrow compact layouts
+        // their leftmost context slot can reach this column; move only Crouch above it.
+        for(Button control:combatControls) {
+            if(control==null || !(control.getLayoutParams() instanceof FrameLayout.LayoutParams))continue;
+            FrameLayout.LayoutParams obstacle=(FrameLayout.LayoutParams)control.getLayoutParams();
+            int right=availableWidth-obstacle.getMarginEnd(),left=right-obstacle.width;
+            if(p.getMarginStart()<right && p.getMarginStart()+width>left &&
+                    p.bottomMargin<obstacle.bottomMargin+obstacle.height &&
+                    p.bottomMargin+height>obstacle.bottomMargin)
+                p.bottomMargin=obstacle.bottomMargin+obstacle.height+gap;
+        }
+        crouch.setLayoutParams(p);
+    }
     private static void place(Button b,int width,int height,int right,int bottom) {
         FrameLayout.LayoutParams p=new FrameLayout.LayoutParams(width,height);
         p.gravity=Gravity.BOTTOM|Gravity.END; p.setMarginEnd(right); p.bottomMargin=bottom;

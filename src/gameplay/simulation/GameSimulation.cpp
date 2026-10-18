@@ -155,6 +155,7 @@ std::uint32_t GameSimulation::AdvanceFrame(const InputSnapshot& publishedInput,
     }
     if (input.paused)
     {
+        ClearCrouchIntent();
         combatContactTrace_.Clear();
         gameplayTimeScale_ = 1.0f;
         ClearQueuedDrawAttack();
@@ -262,6 +263,7 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
     const bool playerAlive = playerVitals_.Snapshot().phase == PlayerLifePhase::Alive;
     if (input.paused || !playerAlive)
     {
+        ClearCrouchIntent();
         ClearQueuedDrawAttack();
         if (!playerAlive && heldItems_[1].transition.active)
         {
@@ -445,6 +447,9 @@ void GameSimulation::SynchronizePausedInput(const InputSnapshot& input,
                 lastConsumedRunToggleSequence_);
     synchronize(input.commands.clearRunIntent, latestClearRunIntentSequence_,
                 lastConsumedClearRunIntentSequence_);
+    synchronize(input.commands.crouchToggle,latestCrouchToggleSequence_,lastConsumedCrouchToggleSequence_);
+    synchronize(input.commands.clearCrouchIntent,latestClearCrouchIntentSequence_,lastConsumedClearCrouchIntentSequence_);
+    ClearCrouchIntent();
 
     pendingAttackCommands_ = 0u;
     pendingParryCommands_ = 0u;
@@ -506,6 +511,7 @@ void GameSimulation::SetPresentationAspect(const float logicalViewAspect)
 void GameSimulation::ResetPlayerSupport()
 {
     playerSupport_ = {};
+    posture_={};ClearCrouchIntent();
 }
 void GameSimulation::ResolvePlayerSupport()
 {
@@ -514,7 +520,7 @@ void GameSimulation::ResolvePlayerSupport()
         if(config_.authoredChapterTerrain) {
             if(chapterTerrain_ && chapterTerrainGeneration_==worldRoute_.generation) {
                 playerSupport_=CurrentCombatRules() && chapterTerrain_->StepTriangleCount()?
-                    horde::gameplay::traversal::ChapterExteriorStepSupport(*chapterTerrain_,playerX_,playerZ_,kPlayerCollisionRadius):
+                    horde::gameplay::traversal::ChapterExteriorStepSupport(*chapterTerrain_,playerX_,playerZ_,kPlayerCollisionRadius,posture_.Height()):
                     horde::gameplay::traversal::ChapterExteriorSupport(chapterTerrain_.get(),playerX_,playerZ_);
             }
             return; // retain the last safe support while reconstruction is pending
@@ -545,7 +551,7 @@ void GameSimulation::ResolveMovementCollision(float previousX, float previousZ)
             (p.valid&&p.distance<=kWorldRouteHalfWidth?ZoneForRouteSegment(p.segment):WorldZoneId::TombExterior);
         const bool ready=worldRoute_.readiness[static_cast<std::size_t>(zone)]==ZoneReadiness::Ready;
         const bool stepMotor=CurrentCombatRules() && config_.authoredChapterTerrain && chapterTerrain_ &&
-           chapterTerrainGeneration_==worldRoute_.generation && chapterTerrain_->StepTriangleCount() &&
+           chapterTerrainGeneration_==worldRoute_.generation &&
            !horde::gameplay::traversal::OnRescueLanding(previousX,previousZ) &&
            !horde::gameplay::traversal::OnRescueLanding(playerX_,playerZ_);
         bool clear=!stepMotor && (config_.authoredChapterTerrain ?
@@ -561,9 +567,11 @@ void GameSimulation::ResolveMovementCollision(float previousX, float previousZ)
         // existing contracts. No runtime root asset is implicitly promoted.
         if(stepMotor) {
             const auto movement=horde::gameplay::traversal::ResolveChapterStepMovement(
-                *chapterTerrain_,previousX,previousZ,playerX_,playerZ_,playerSupport_.worldY,kPlayerCollisionRadius);
+                *chapterTerrain_,previousX,previousZ,playerX_,playerZ_,playerSupport_.worldY,kPlayerCollisionRadius,posture_.Height());
             clear=movement.accepted;support=movement.support;
         }
+        if(CurrentCombatRules())clear=clear && AuthoredBodySweepClear(previousX,previousZ,playerX_,playerZ_,
+            std::max(playerSupport_.worldY,support.worldY),posture_.Height(),kPlayerCollisionRadius);
         if(!support.grounded||!ready||!clear||std::abs(support.worldY-playerSupport_.worldY)>kWorldRouteMaximumStep) {
             playerX_=previousX;playerZ_=previousZ;worldRoute_.blocked=true;++worldRoute_.rollbackCount;
         } else {
@@ -578,6 +586,8 @@ void GameSimulation::ResolveMovementCollision(float previousX, float previousZ)
             !horde::scene::TombDressingMovementClear(previousX, previousZ, playerX_, playerZ_)) {
             playerX_ = previousX; playerZ_ = previousZ;
         }
+        if(CurrentCombatRules() && !AuthoredBodySweepClear(previousX,previousZ,playerX_,playerZ_,
+            playerSupport_.worldY,posture_.Height(),kPlayerCollisionRadius)) {playerX_=previousX;playerZ_=previousZ;}
         return;
     }
     auto projection=ProjectWorldRoute(playerX_,playerZ_);
@@ -930,6 +940,8 @@ void GameSimulation::IngestCommands(const InputSnapshot& input, const bool inges
         SequenceDelta(input.commands.runToggle, latestRunToggleSequence_));
     pendingClearRunIntentCommands_ = SaturatingAdd(pendingClearRunIntentCommands_,
         SequenceDelta(input.commands.clearRunIntent, latestClearRunIntentSequence_));
+    pendingCrouchToggleCommands_=SaturatingAdd(pendingCrouchToggleCommands_,SequenceDelta(input.commands.crouchToggle,latestCrouchToggleSequence_));
+    pendingClearCrouchIntentCommands_=SaturatingAdd(pendingClearCrouchIntentCommands_,SequenceDelta(input.commands.clearCrouchIntent,latestClearCrouchIntentSequence_));
     pendingTutorialSkipCommands_ = SaturatingAdd(pendingTutorialSkipCommands_,
         SequenceDelta(input.commands.tutorialSkip, latestTutorialSkipSequence_));
     pendingTutorialReplayCommands_ = SaturatingAdd(pendingTutorialReplayCommands_,
@@ -948,6 +960,8 @@ void GameSimulation::IngestCommands(const InputSnapshot& input, const bool inges
                                         input.commands.runToggle);
     latestClearRunIntentSequence_ = std::max(latestClearRunIntentSequence_,
         input.commands.clearRunIntent);
+    latestCrouchToggleSequence_=std::max(latestCrouchToggleSequence_,input.commands.crouchToggle);
+    latestClearCrouchIntentSequence_=std::max(latestClearCrouchIntentSequence_,input.commands.clearCrouchIntent);
 }
 
 void GameSimulation::AddCombatTimingTrace(
@@ -1540,7 +1554,7 @@ void GameSimulation::ResolveHeldItems()
         presentationAspect_,
         playerSupport_.worldY,config_.developmentWorldRoute, false, UsesRescueExterior(),
         config_.authoredChapterTerrain && chapterTerrainGeneration_==worldRoute_.generation
-            ? chapterTerrain_.get() : nullptr};
+            ? chapterTerrain_.get() : nullptr,posture_.drop};
     // Simulation owns the transition/visual blend. Kinematics keeps a stable
     // hand-endpoint matrix for gameplay; PlayerRenderSlot composes its single
     // rendered matrix from that endpoint and the animated Hips mount.
@@ -1830,8 +1844,42 @@ void GameSimulation::ClearRunIntent()
         lastConsumedClearRunIntentSequence_, latestClearRunIntentSequence_);
 }
 
+void GameSimulation::ClearCrouchIntent()
+{
+    crouchToggleActive_=false;crouchInputBlockedUntilRelease_=lastInput_.crouchHeld;
+    pendingCrouchToggleCommands_=pendingClearCrouchIntentCommands_=0;
+    lastConsumedCrouchToggleSequence_=std::max(lastConsumedCrouchToggleSequence_,latestCrouchToggleSequence_);
+    lastConsumedClearCrouchIntentSequence_=std::max(lastConsumedClearCrouchIntentSequence_,latestClearCrouchIntentSequence_);
+}
+bool GameSimulation::BodyHeightClear(float height) const
+{
+    if(!AuthoredBodySweepClear(playerX_,playerZ_,playerX_,playerZ_,playerSupport_.worldY,height,kPlayerCollisionRadius))return false;
+    if(UsesRescueExterior() && config_.authoredChapterTerrain) {
+        if(!chapterTerrain_||chapterTerrainGeneration_!=worldRoute_.generation)return false;
+        return horde::gameplay::traversal::ChapterExteriorObstacleClear(*chapterTerrain_,playerX_,playerZ_,playerX_,playerZ_,
+            playerSupport_.worldY+.001f,playerSupport_.worldY+height,kPlayerCollisionRadius) &&
+            chapterTerrain_->HorizontalBodyVolumeClear(playerX_,playerZ_,playerX_,playerZ_,playerSupport_.worldY,height,kPlayerCollisionRadius);
+    }
+    return true;
+}
+void GameSimulation::UpdatePosture(const InputSnapshot& input,float seconds)
+{
+    if(!input.crouchHeld)crouchInputBlockedUntilRelease_=false;
+    if(pendingClearCrouchIntentCommands_)ClearCrouchIntent();
+    if(pendingCrouchToggleCommands_) {
+        if(pendingCrouchToggleCommands_&1u)crouchToggleActive_=!crouchToggleActive_;
+        lastConsumedCrouchToggleSequence_=SaturatingAdd(lastConsumedCrouchToggleSequence_,pendingCrouchToggleCommands_);
+        pendingCrouchToggleCommands_=0;
+    }
+    const bool requested=CurrentCombatRules() && playerSupport_.grounded && !rescueTraversal_.IsActive() &&
+        (crouchToggleActive_ || (input.crouchHeld&&!crouchInputBlockedUntilRelease_));
+    posture_.Step(requested,seconds,[&](float height){return BodyHeightClear(height);});
+    if(requested||posture_.Active()) {ClearRunIntent();dodgeRemainingSeconds_=0;}
+}
+
 void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSeconds)
 {
+    UpdatePosture(input,deltaSeconds);
     playerYawRadians_ = FiniteOr(input.yawRadians, playerYawRadians_);
     playerPitchRadians_ = std::clamp(FiniteOr(input.pitchRadians, playerPitchRadians_),
                                      kMinimumPitch,
@@ -1880,7 +1928,8 @@ void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSecon
         MarkCombatTimingConsumed(CombatInputEdgeKind::Dodge, oldDodgeConsumed,
                                  lastConsumedDodgeSequence_);
         pendingDodgeCommands_ = 0u;
-        if (dodgeRemainingSeconds_ <= 0.0f && dodgeCooldownRemainingSeconds_ <= 0.0f)
+        if (!posture_.Active() && !crouchToggleActive_ && !input.crouchHeld &&
+            dodgeRemainingSeconds_ <= 0.0f && dodgeCooldownRemainingSeconds_ <= 0.0f)
         {
             float forward = pendingDodgeForward_;
             float strafe = pendingDodgeStrafe_;
@@ -1915,7 +1964,7 @@ void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSecon
     if (actionInterruptsRun)
         ClearRunIntent();
 
-    const bool runRequested = !runInputBlockedUntilRelease_ &&
+    const bool runRequested = !posture_.Active() && !crouchToggleActive_ && !input.crouchHeld && !runInputBlockedUntilRelease_ &&
         (runToggleActive_ || input.runHeld) && !actionInterruptsRun;
     runActive_ = false;
 
@@ -1956,12 +2005,13 @@ void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSecon
             const float forwardZ = -std::cos(playerYawRadians_);
             const float rightX = std::cos(playerYawRadians_);
             const float rightZ = std::sin(playerYawRadians_);
-            const float maximumSpeed = runRequested
+            const float maximumSpeed = posture_.Active()?std::min(1.f,config_.movementSpeedMetresPerSecond):runRequested
                 ? kRunSpeedMetresPerSecond
                 : config_.movementSpeedMetresPerSecond;
             const float targetSpeed = magnitude > 0.001f
                 ? maximumSpeed * std::min(1.0f, magnitude)
                 : 0.0f;
+            if(posture_.Active())playerMovementSpeed_=std::min(playerMovementSpeed_,maximumSpeed);
             const bool rampMovement = runRequested || config_.developmentWorldRoute ||
                 playerMovementSpeed_ > config_.movementSpeedMetresPerSecond;
             if (rampMovement)
@@ -2405,7 +2455,7 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
     {
         Emit(GameplayEventType::KeeperRevealStarted, EntityId::Lich, EntityId::Player, lich.x, lich.z);
         if(CurrentCombatRules()) {
-            dialogue::Context c;c.listener={playerX_,kShowcaseEyeWorldY+PlayerHeightDelta(playerSupport_.worldY),playerZ_};
+            dialogue::Context c;c.listener={playerX_,kShowcaseEyeWorldY+PlayerHeightDelta(playerSupport_.worldY)-posture_.drop,playerZ_};
             c.yaw=playerYawRadians_;
             chapterDialogue_.Request(dialogue::Line::KeeperSense,{lich.x,lich.y,lich.z},c);
         }
@@ -2415,7 +2465,7 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
     {
         Emit(GameplayEventType::KeeperWarning, EntityId::Lich, EntityId::Player, lich.x, lich.z);
         if(CurrentCombatRules()) {
-            dialogue::Context c;c.listener={playerX_,kShowcaseEyeWorldY+PlayerHeightDelta(playerSupport_.worldY),playerZ_};
+            dialogue::Context c;c.listener={playerX_,kShowcaseEyeWorldY+PlayerHeightDelta(playerSupport_.worldY)-posture_.drop,playerZ_};
             c.yaw=playerYawRadians_;
             chapterDialogue_.Request(dialogue::Line::KeeperCloser,{lich.x,lich.y,lich.z},c);
         }
@@ -2591,7 +2641,7 @@ std::uint64_t GameSimulation::Emit(GameplayEventType type,
     event.worldZ = z;
     event.worldY = worldY;
     const auto rescueTorsoOffset=traversal::RescueTorsoOffset(rescueTraversal_.Snapshot());
-    event.listenerY = PlayerEyeWorldY(playerSupport_.worldY)+rescueTorsoOffset.y;
+    event.listenerY = PlayerEyeWorldY(playerSupport_.worldY)+rescueTorsoOffset.y-posture_.drop;
     event.listenerX = playerX_+rescueTorsoOffset.x;
     event.listenerZ = playerZ_+rescueTorsoOffset.z;
     event.listenerYawRadians = playerYawRadians_;
@@ -2655,6 +2705,10 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.gameplayTimeScale = gameplayTimeScale_;
     snapshot_.runActive = runActive_;
     snapshot_.runToggleActive = runToggleActive_;
+    snapshot_.playerCrouchDropMetres=posture_.drop;
+    snapshot_.crouchActive=posture_.Active();snapshot_.crouchStandingBlocked=posture_.standingBlocked;
+    snapshot_.lastConsumedCrouchToggleSequence=lastConsumedCrouchToggleSequence_;
+    snapshot_.lastConsumedClearCrouchIntentSequence=lastConsumedClearCrouchIntentSequence_;
     snapshot_.dodgeCooldownRemainingSeconds = dodgeCooldownRemainingSeconds_;
     snapshot_.zone = QueryShowcaseZone(playerX_, playerZ_);
     snapshot_.activeEnemyKind = activeEnemyKind_;
@@ -2720,6 +2774,7 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.automaticSwordDrawBlocksDefense = SwordDrawBlocksDefense();
     snapshot_.heldItemKinematics = heldItemFixedStepState_.kinematics;
     snapshot_.playerAnimation = playerAnimationState_.Snapshot();
+    snapshot_.playerAnimation.crouchPelvisDropMetres=posture_.drop;
     snapshot_.heldLight = heldItemFixedStepState_.light;
     snapshot_.enemyRoster = enemyDirector_.Snapshot();
     snapshot_.swordCombat = combatSnapshot_;

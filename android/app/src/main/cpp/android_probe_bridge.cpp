@@ -1005,6 +1005,8 @@ void PublishSimulationUiState()
                 contextualControls |= 4;
         }
     }
+    if (simulation.crouchActive) contextualControls |= 1 << 10;
+    if (simulation.crouchStandingBlocked) contextualControls |= 1 << 11;
     gContextualControlState.store(contextualControls, std::memory_order_release);
     const horde::gameplay::SpatialAudioGains waterfallGains =
         horde::gameplay::CalculateSpatialAudio(
@@ -6256,7 +6258,7 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_getSurfaceRuntimeState(JNIEnv*, jcla
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_samfa12_hordelanternrt_ProbeBridge_setViewControls(JNIEnv*, jclass, jfloat yaw, jfloat pitch, jfloat torchLightStrength, jfloat moveStrafe, jfloat moveForward)
+Java_com_samfa12_hordelanternrt_ProbeBridge_setViewControls(JNIEnv*, jclass, jfloat yaw, jfloat pitch, jfloat torchLightStrength, jfloat moveStrafe, jfloat moveForward, jboolean crouchHeld)
 {
     std::lock_guard<std::mutex> lock(gInputPublisherMutex);
     gInputPublisherState.yawRadians = static_cast<float>(yaw);
@@ -6265,6 +6267,26 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_setViewControls(JNIEnv*, jclass, jfl
         std::clamp(static_cast<float>(torchLightStrength), 0.65f, 2.4f);
     gInputPublisherState.moveStrafe = std::clamp(static_cast<float>(moveStrafe), -1.0f, 1.0f);
     gInputPublisherState.moveForward = std::clamp(static_cast<float>(moveForward), -1.0f, 1.0f);
+    gInputPublisherState.crouchHeld = crouchHeld == JNI_TRUE;
+    PublishInputLocked();
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_requestToggleCrouch(JNIEnv*, jclass)
+{
+    std::lock_guard<std::mutex> lock(gInputPublisherMutex);
+    if (gInputPublisherState.commands.crouchToggle != UINT64_MAX)
+        ++gInputPublisherState.commands.crouchToggle;
+    PublishInputLocked();
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_clearCrouchIntent(JNIEnv*, jclass)
+{
+    std::lock_guard<std::mutex> lock(gInputPublisherMutex);
+    gInputPublisherState.crouchHeld = false;
+    if (gInputPublisherState.commands.clearCrouchIntent != UINT64_MAX)
+        ++gInputPublisherState.commands.clearCrouchIntent;
     PublishInputLocked();
 }
 

@@ -66,8 +66,8 @@ final class AndroidControllerInput {
     private long lastObservedTimeMs = Long.MIN_VALUE;
     private long suspendBoundaryMs = Long.MIN_VALUE;
     private boolean suspended;
-    private final boolean[] keyDown = new boolean[13];
-    private final boolean[] blockedUntilUp = new boolean[13];
+    private final boolean[] keyDown = new boolean[14];
+    private final boolean[] blockedUntilUp = new boolean[14];
     private final DeviceCandidate[] candidates = new DeviceCandidate[MAX_DEVICE_CANDIDATES];
     private long candidateSequence;
     private boolean leftStickSeeded;
@@ -87,6 +87,7 @@ final class AndroidControllerInput {
     private float lookX;
     private float lookY;
     private boolean runHeld;
+    private boolean crouchHeld;
     private float leftFlatX = 0.12f;
     private float leftFlatY = 0.12f;
     private float rightFlatX = 0.12f;
@@ -111,6 +112,12 @@ final class AndroidControllerInput {
     float lookX() { return lookX; }
     float lookY() { return lookY; }
     boolean runHeld() { return runHeld; }
+    boolean crouchHeld() { return crouchHeld; }
+    void clearCrouchHold() {
+        blockedUntilUp[13] |= keyDown[13];
+        keyDown[13] = false;
+        crouchHeld = false;
+    }
 
     static boolean isControllerKey(KeyEvent event) {
         return isControllerKey(event, event == null ? null : event.getDevice());
@@ -147,6 +154,7 @@ final class AndroidControllerInput {
                 keyDown[slot] = false;
                 blockedUntilUp[slot] = false;
                 if (event.getKeyCode() == KeyEvent.KEYCODE_BUTTON_R1) runHeld = false;
+                if (event.getKeyCode() == KeyEvent.KEYCODE_BUTTON_L1) crouchHeld = false;
                 updateDpad(event.getKeyCode(), false);
                 updateDigitalTrigger(event.getKeyCode(), false);
             }
@@ -166,6 +174,7 @@ final class AndroidControllerInput {
         keyDown[slot] = true;
         final int keyCode = event.getKeyCode();
         if (keyCode == KeyEvent.KEYCODE_BUTTON_R1) runHeld = true;
+        if (keyCode == KeyEvent.KEYCODE_BUTTON_L1) crouchHeld = true;
         updateDpad(keyCode, true);
         final int actions = updateDigitalTrigger(keyCode, true) | actionForKey(keyCode);
         return result(true, true, actions, 0, 0);
@@ -333,6 +342,7 @@ final class AndroidControllerInput {
         suspendBoundaryMs = Math.max(nowMs, lastObservedTimeMs);
         suspended = true;
         runHeld = false;
+        crouchHeld = false;
         for (int i = 0; i < keyDown.length; ++i) {
             blockedUntilUp[i] |= keyDown[i];
             keyDown[i] = false;
@@ -364,6 +374,7 @@ final class AndroidControllerInput {
     private void resetForDevice(int deviceId) {
         activeDeviceId = deviceId;
         runHeld = false;
+        crouchHeld = false;
         for (int i = 0; i < keyDown.length; ++i) {
             keyDown[i] = false;
             blockedUntilUp[i] = false;
@@ -507,6 +518,7 @@ final class AndroidControllerInput {
             case KeyEvent.KEYCODE_DPAD_UP: return 10;
             case KeyEvent.KEYCODE_DPAD_DOWN: return 11;
             case KeyEvent.KEYCODE_BUTTON_R1: return 12;
+            case KeyEvent.KEYCODE_BUTTON_L1: return 13;
             default: return -1;
         }
     }

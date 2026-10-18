@@ -70,6 +70,7 @@ int main(){
         Check(session.SelectSlot(0) && session.Load(cp::SaveKind::Manual) && Finish(session),"manual load worker reads requested slot");
         const auto before=game.Snapshot();controls.moveForward=1;controls.runHeld=true;controls.yawRadians=2;controls.pitchRadians=.2f;
         controls.commands.attack=90;controls.commands.interact=91;controls.commands.toggleHeldLightPose=92;
+        controls.crouchHeld=true;controls.commands.crouchToggle=93;controls.commands.clearCrouchIntent=94;
         controls.dialogueCompletionGeneration=77;controls.dialogueCompletionLine=5;
         const auto publication=mailbox.Publish(controls);const auto plan=session.PrepareLoad();
         Check(plan && game.Snapshot().tickIndex==before.tickIndex && game.Snapshot().playerX==before.playerX,
@@ -88,13 +89,15 @@ int main(){
             const auto loaded=game.Snapshot();
             Check(loaded.tickIndex>newestTick,"load derives fresh identities from current live state after resource delay");
             Check(loaded.playerVitals.vitality==1 && loaded.worldRoute.current==sim::WorldZoneId::Dungeon && loaded.paused &&
-                controls.moveForward==0 && !controls.runHeld && controls.yawRadians==loaded.playerYawRadians && controls.pitchRadians==loaded.playerPitchRadians &&
+                controls.moveForward==0 && !controls.runHeld && !controls.crouchHeld && !loaded.crouchActive && controls.yawRadians==loaded.playerYawRadians && controls.pitchRadians==loaded.playerPitchRadians &&
                 controls.commands.attack==90 && controls.commands.interact==91 && controls.dialogueCompletionGeneration==0,
                 "successful swap atomically restores manual gameplay and rebases camera/input while preserving command floors");
             Check(!session.CommitLoad(*plan,plan->destination,terrain,controls,publication),"same load cannot apply twice");
             game.AdvanceFrame(original,.02,publication);
             Check(game.Snapshot().paused && game.Snapshot().playerX==loaded.playerX,"old held publication cannot move the loaded player");
-            auto paused=controls;paused.paused=true;auto p=mailbox.Publish(paused);game.AdvanceFrame(paused,.02,p);
+            auto heldStance=controls;heldStance.crouchHeld=true;auto p=mailbox.Publish(heldStance);game.AdvanceFrame(heldStance,.02,p);
+            Check(game.Snapshot().paused && !game.Snapshot().crouchActive,"fresh held stance alone cannot pass the load release barrier");
+            auto paused=controls;paused.paused=true;p=mailbox.Publish(paused);game.AdvanceFrame(paused,.02,p);
             p=mailbox.Publish(controls);game.AdvanceFrame(controls,.02,p);
             Check(!game.Snapshot().paused && game.Snapshot().playerCombat.action==horde::gameplay::PlayerCombatAction::Idle,
                 "new coherent neutral camera publication resumes with no attack debt");

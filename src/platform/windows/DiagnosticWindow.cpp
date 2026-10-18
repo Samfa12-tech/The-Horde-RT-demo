@@ -564,6 +564,11 @@ struct VulkanSurfaceContext
     bool runHeld = false;
     bool controllerRunHeld = false;
     bool controllerRunBlockedUntilRelease = false;
+    bool crouchHeld = false;
+    bool crouchKeyBlockedUntilRelease = false;
+    bool controllerCrouchHeld = false;
+    bool controllerCrouchBlockedUntilRelease = true;
+    bool crouchTraversalOwned = false;
     bool runToggleKeyDown = false;
     bool mouseLookActive = false;
     bool chestInteractionPromptPresented = false;
@@ -622,6 +627,8 @@ struct VulkanSurfaceContext
     std::uint64_t toggleHeldLightPoseSequence = 0u;
     std::uint64_t runToggleSequence = 0u;
     std::uint64_t clearRunIntentSequence = 0u;
+    std::uint64_t crouchToggleSequence = 0u;
+    std::uint64_t clearCrouchIntentSequence = 0u;
     int playerSwingVariant = 0;
     horde::gameplay::DelayedGameplayFeedbackQueue delayedFeedback;
     // Legacy mirrors retained only for Win32 overlays, capture manifests, and
@@ -3987,6 +3994,11 @@ bool HasDeviceExtension(VkPhysicalDevice physicalDevice, const char* extensionNa
 
 void ClearDesktopInput(VulkanSurfaceContext& context)
 {
+    if (context.crouchHeld) context.crouchKeyBlockedUntilRelease = true;
+    context.crouchHeld = false;
+    context.controllerCrouchHeld = false;
+    context.controllerCrouchBlockedUntilRelease = true;
+    if (context.clearCrouchIntentSequence != UINT64_MAX) ++context.clearCrouchIntentSequence;
     const auto& runSnapshot = context.simulation.Snapshot();
     if (context.controllerRunHeld)
         context.controllerRunBlockedUntilRelease = true;
@@ -4037,6 +4049,9 @@ void DiscardDesktopPendingCommands(VulkanSurfaceContext& context)
         context.combatTeachingSkipSequence, context.combatTeachingReplaySequence,
         context.dialogueSkipSequence};
     input.runHeld = false;
+    input.crouchHeld = false;
+    input.commands.crouchToggle = context.crouchToggleSequence;
+    input.commands.clearCrouchIntent = context.clearCrouchIntentSequence;
     input.moveForward = input.moveStrafe = 0.0f;
     context.simulation.SynchronizePausedInput(input, 0u,
         horde::gameplay::simulation::PausedInputPolicy::PreserveWorldCommands);
@@ -4421,6 +4436,8 @@ void PollDesktopController(VulkanSurfaceContext& context)
         context.controllerFocusLatch.Observe(GetForegroundWindow() == context.windowHandle);
     if (pollDisposition == horde::platform::windows::ControllerPollDisposition::Suppress)
     {
+        context.controllerCrouchHeld = false;
+        context.controllerCrouchBlockedUntilRelease = true;
         context.controllerRunHeld = false;
         context.controllerForward = 0.0f;
         context.controllerStrafe = 0.0f;
@@ -4464,6 +4481,8 @@ void PollDesktopController(VulkanSurfaceContext& context)
     const bool xinputConnected = xinputUser.has_value();
     if (!xinputConnected)
     {
+        context.controllerCrouchHeld = false; // No guessed WinMM shoulder mapping.
+        context.controllerCrouchBlockedUntilRelease = true;
         context.controllerRunHeld = false;
         context.xInputUserIndex.reset();
         JOYINFOEX legacy{};
@@ -4612,6 +4631,16 @@ void PollDesktopController(VulkanSurfaceContext& context)
         return;
     }
     const bool rightShoulderHeld = (state.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) != 0u;
+    const bool leftShoulderHeld = (state.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER) != 0u;
+    const bool crouchReseed = context.xInputUserIndex != xinputUser ||
+        pollDisposition != horde::platform::windows::ControllerPollDisposition::Deliver;
+    if (context.simulationPaused || context.crouchTraversalOwned)
+        context.controllerCrouchBlockedUntilRelease = true;
+    else if (crouchReseed)
+        context.controllerCrouchBlockedUntilRelease = leftShoulderHeld;
+    else if (!leftShoulderHeld) context.controllerCrouchBlockedUntilRelease = false;
+    context.controllerCrouchHeld = !crouchReseed && !context.simulationPaused && !context.crouchTraversalOwned &&
+        leftShoulderHeld && !context.controllerCrouchBlockedUntilRelease;
     if (!rightShoulderHeld) context.controllerRunBlockedUntilRelease = false;
     context.controllerRunHeld = rightShoulderHeld && !context.controllerRunBlockedUntilRelease;
     if (context.xInputUserIndex != xinputUser)
@@ -4736,6 +4765,16 @@ void UpdateDesktopSceneControls(
     }
 
     horde::gameplay::simulation::InputSnapshot input = context.simulationInput;
+    const bool crouchTraversalOwned = context.simulation.Snapshot().rescuePrompt ==
+        horde::gameplay::traversal::RescuePrompt::Traversing;
+    if (crouchTraversalOwned && !context.crouchTraversalOwned)
+    {
+        if (context.crouchHeld) context.crouchKeyBlockedUntilRelease = true;
+        context.crouchHeld = context.controllerCrouchHeld = false;
+        context.controllerCrouchBlockedUntilRelease = true;
+        if (context.clearCrouchIntentSequence != UINT64_MAX) ++context.clearCrouchIntentSequence;
+    }
+    context.crouchTraversalOwned = crouchTraversalOwned;
     input.yawRadians = context.cameraYaw;
     input.pitchRadians = context.cameraPitch;
     input.torchLightStrength = context.torchLightStrength;
@@ -4750,6 +4789,8 @@ void UpdateDesktopSceneControls(
     input.commands.toggleHeldLightPose = context.toggleHeldLightPoseSequence;
     input.commands.runToggle = context.runToggleSequence;
     input.commands.clearRunIntent = context.clearRunIntentSequence;
+    input.commands.crouchToggle = context.crouchToggleSequence;
+    input.commands.clearCrouchIntent = context.clearCrouchIntentSequence;
     input.tutorialEnabled = context.combatTeachingEnabled;
     input.tutorialSlowdownEnabled = context.combatTeachingSlowdown;
     input.commands.tutorialSkip = context.combatTeachingSkipSequence;
@@ -4758,6 +4799,7 @@ void UpdateDesktopSceneControls(
     input.dialogueCompletionLine = context.dialogueCompletionLine;
     input.dialogueCompletionGeneration = context.dialogueCompletionGeneration;
     input.runHeld = context.runHeld || context.controllerRunHeld;
+    input.crouchHeld = !context.crouchTraversalOwned && (context.crouchHeld || context.controllerCrouchHeld);
     input.waterfallWidthScale = horde::vulkan::raytracing::ClampRtSceneTuning(
         context.rtSceneTuning).waterfallWidthScale;
     input.hasAuthoritativePlayerPose = false;
@@ -4842,6 +4884,9 @@ void UpdateDesktopSceneControls(
         input.dialogueCompletionLine = context.dialogueCompletionLine;
         input.dialogueCompletionGeneration = context.dialogueCompletionGeneration;
         input.runHeld = false;
+        input.crouchHeld = false;
+        input.commands.crouchToggle = context.crouchToggleSequence;
+        input.commands.clearCrouchIntent = context.clearCrouchIntentSequence;
         if (advance.replay.waypointReached || advance.lapStarted || advance.finished)
         {
             UpdateBenchmarkHud(context);
@@ -4938,6 +4983,12 @@ bool SetDesktopMovementKey(VulkanSurfaceContext& context, const WPARAM key, cons
 {
     switch (key)
     {
+    case VK_CONTROL:
+    case VK_LCONTROL:
+    case VK_RCONTROL:
+        if (!held) context.crouchKeyBlockedUntilRelease = false;
+        context.crouchHeld = held && !context.crouchKeyBlockedUntilRelease && !context.crouchTraversalOwned;
+        return true;
     case 'W':
         context.forwardHeld = held;
         return true;
@@ -9533,6 +9584,7 @@ void ShowControlsHelp(HWND window)
     MessageBoxA(window,
                 "WASD  Move and strafe\n"
                 "Shift  Hold to run    Caps Lock  Toggle run\n"
+                "Ctrl  Hold to crouch\n"
                 "Click once to capture mouse; then free look\n"
                 "Left mouse  Swing / indicated chest interaction\n"
                 "Q  Parry skeleton strike\n"
@@ -9540,6 +9592,7 @@ void ShowControlsHelp(HWND window)
                 "E  Raise / lower claimed lantern    Right mouse  Reserved\n"
                 "Controller left stick  Move and strafe; click L3 to toggle run\n"
                 "Controller right stick  Camera look\n"
+                "LB / L1  Hold to crouch (XInput controllers)\n"
                 "RT  Attack    LT  Parry    B / Circle  Dodge\n"
                 "A  Interact    Y  Raise / lower claimed lantern\n"
                 "Tab  Skip current chapter line    X  Skip line\n"

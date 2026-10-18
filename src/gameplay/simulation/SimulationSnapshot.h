@@ -116,6 +116,9 @@ struct SimulationSnapshot
     float gameplayTimeScale = 1.0f;
     bool runActive = false;
     bool runToggleActive = false;
+    float playerCrouchDropMetres=0;
+    bool crouchActive=false,crouchStandingBlocked=false;
+    std::uint64_t lastConsumedCrouchToggleSequence=0,lastConsumedClearCrouchIntentSequence=0;
 
     ShowcaseZone zone = ShowcaseZone::Opening;
     EnemyKind activeEnemyKind = EnemyKind::Skeleton;
