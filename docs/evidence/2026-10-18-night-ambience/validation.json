@@ -1,0 +1,411 @@
+{
+  "date": "2026-10-18",
+  "sourceBase": "023dba37",
+  "outcome": "PASS bounded owl/evening-cricket source/host/build/package integration; physical listening and complete species bed remain unaccepted",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "worktree": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+  "assets": [
+    {
+      "key": "tawny_owl",
+      "original": {
+        "path": "reports/night-ambience-2026-10-18/source/tawny-owl.ogg",
+        "bytes": 21603448,
+        "sha256": "c3752121e30b9a481d602cc2a959962b713fb19ac6582605b8096bc3fce279fb"
+      },
+      "prepared": {
+        "path": "assets/audio/night-ambience/runtime/tawny_owl.wav",
+        "bytes": 384078,
+        "sha256": "c4b96bbfc5713ad98ddf28f510de9a124cef71dd3b35d76aed6d92a500d25717"
+      },
+      "license": "CC-BY-4.0",
+      "creator": "W.carter",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Tawny_owl_calling_at_night_in_Tuntorp,_Brastad,_Sweden.ogg",
+      "runtimeMapped": true,
+      "acceptance": "Unheard candidate; source metadata only. Native mix/listening acceptance pending."
+    },
+    {
+      "key": "evening_cricket",
+      "original": {
+        "path": "reports/night-ambience-2026-10-18/source/evening-cricket.wav",
+        "bytes": 2541002,
+        "sha256": "8beca03203ddc3c4c9d341167eaef4f9af568ccb15712da2972069d4c6289baa"
+      },
+      "prepared": {
+        "path": "assets/audio/night-ambience/runtime/evening_cricket.wav",
+        "bytes": 384078,
+        "sha256": "8745d55f7ecf481d0ea7fb3656fecaa475bda339a49d12dbe09b0ee058e559ea"
+      },
+      "license": "CC-BY-SA-4.0",
+      "creator": "Gunther Tschuch",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Oecanthus_pellucens_song_23C.wav",
+      "runtimeMapped": true,
+      "acceptance": "Unheard candidate; source metadata only. Native mix/listening acceptance pending."
+    },
+    {
+      "key": "pond_frogs_crickets",
+      "original": {
+        "path": "reports/night-ambience-2026-10-18/source/pond-dusk.ogg",
+        "bytes": 1034975,
+        "sha256": "ebc99f767a1832608ef5a8e2fd170a19c01720a8ba957fd7521f291bba57b21f"
+      },
+      "prepared": {
+        "path": "assets/audio/night-ambience/candidates/pond_frogs_crickets.wav",
+        "bytes": 384078,
+        "sha256": "bb13e7ebaff3fdc0b3a872cbdfe0bda22a210a7a77fe401b50981c5e02763b76"
+      },
+      "license": "CC-BY-3.0",
+      "creator": "Glaneur de sons",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Nature_sounds_ambience_in_a_Dordogne_pond.ogg",
+      "runtimeMapped": false,
+      "acceptance": "Unheard candidate; source metadata only. Native mix/listening acceptance pending."
+    },
+    {
+      "key": "periodical_cicada",
+      "original": {
+        "path": "reports/night-ambience-2026-10-18/source/periodical-cicada.oga",
+        "bytes": 33417,
+        "sha256": "3a0cf77a2f6034e602d61da75b180838cd1a68c998c5a4fe026479312012262a"
+      },
+      "prepared": {
+        "path": "assets/audio/night-ambience/candidates/periodical_cicada.wav",
+        "bytes": 278478,
+        "sha256": "631faeee740a0011d7ea1f6193a49d1d9af97331538f930cd6bb45a41126e237"
+      },
+      "license": "CC-BY-2.5",
+      "creator": "Kathryn M. Fontaine, John R. Cooley, Chris Simon",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Calling_song_of_Magicicada_septendecim_-_pone.0000892.s001.oga",
+      "runtimeMapped": false,
+      "acceptance": "Unheard candidate; source metadata only. Native mix/listening acceptance pending."
+    }
+  ],
+  "policy": {
+    "clock": "Shared 60Hz unscaled active fixed tick",
+    "owlTicks": [
+      720,
+      3120,
+      5520
+    ],
+    "cricketTicks": [
+      1440,
+      3840
+    ],
+    "clipSeconds": 8,
+    "maxConcurrentVoices": 1,
+    "looping": false,
+    "saveFieldsAdded": false,
+    "rtGeometryAdded": false,
+    "qualityChanged": false,
+    "staleSignals": "Latest only; missed cues dropped",
+    "suppression": [
+      "unready/tomb/legacy route",
+      "airborne/stowed/traversal",
+      "dialogue",
+      "pause/menu",
+      "death",
+      "focus/lifecycle",
+      "muted SFX"
+    ]
+  },
+  "nativeTests": [
+    {
+      "configuration": "debug",
+      "checks": 52,
+      "failures": 0,
+      "seconds": 42.11,
+      "log": {
+        "path": "reports/night-ambience-2026-10-18/native-debug-tests.log",
+        "bytes": 1765,
+        "sha256": "0ef2c4eda22a901e10fab4c6179577b76024d641caa9d15add3ede94ff3e45bd"
+      }
+    },
+    {
+      "configuration": "release",
+      "checks": 52,
+      "failures": 0,
+      "seconds": 4.68,
+      "log": {
+        "path": "reports/night-ambience-2026-10-18/native-release-tests.log",
+        "bytes": 1777,
+        "sha256": "0407f56a2ceaf856a7ab30a363bae0c0c78586f4d15c8c7555f8ed80bc43dac3"
+      }
+    }
+  ],
+  "androidHostTests": [
+    {
+      "suite": "AndroidControllerIntegrationTest",
+      "tests": 35,
+      "failures": 0,
+      "errors": 0,
+      "result": {
+        "path": "android/app/build/test-results/testDebugUnitTest/TEST-com.samfa12.hordelanternrt.AndroidControllerIntegrationTest.xml",
+        "bytes": 13713,
+        "sha256": "62eb5d29e1a1d3b15dfddd6c4c6a09bc804309702e224079e50be90d20399b5f"
+      }
+    },
+    {
+      "suite": "CampaignMenuIntegrationTest",
+      "tests": 26,
+      "failures": 0,
+      "errors": 0,
+      "result": {
+        "path": "android/app/build/test-results/testDebugUnitTest/TEST-com.samfa12.hordelanternrt.CampaignMenuIntegrationTest.xml",
+        "bytes": 10279,
+        "sha256": "e885f277982cbe1df2649fa33964d5b9089642edda5955622afd30ba6512c205"
+      }
+    },
+    {
+      "suite": "SurfaceSuspensionLifecycleTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "result": {
+        "path": "android/app/build/test-results/testDebugUnitTest/TEST-com.samfa12.hordelanternrt.SurfaceSuspensionLifecycleTest.xml",
+        "bytes": 6441,
+        "sha256": "87a8564e3bce6d6244c73d085cb5a4314f1d94446648a7d4e303db79a023cda3"
+      }
+    }
+  ],
+  "androidBuildSeconds": 103,
+  "androidDebugAbis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+  ],
+  "androidPackage": {
+    "outcome": "PASS",
+    "apk": {
+      "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "bytes": 183959356,
+      "sha256": "f3e9c5da544db1dc0fc9ed08baa354d732662c6c7db5f8e180db8aa10334b99d"
+    },
+    "roster": [
+      "assets/audio/night-ambience/NOTICE.md",
+      "assets/audio/night-ambience/manifest.json",
+      "assets/audio/night-ambience/runtime/evening_cricket.wav",
+      "assets/audio/night-ambience/runtime/tawny_owl.wav"
+    ],
+    "candidateAudioIncluded": false,
+    "retiredGenericWavIncluded": false,
+    "exactLicenceLedgerIncluded": true,
+    "abis": [
+      "arm64-v8a",
+      "armeabi-v7a",
+      "x86",
+      "x86_64"
+    ]
+  },
+  "newApkInstalled": false,
+  "windowsDebugApplication": {
+    "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+    "bytes": 13769216,
+    "sha256": "6f62f89e69ffd7972504834cb7e4a809c2d2630c375047d9aff1381a6ec077fa"
+  },
+  "windowsApplicationLaunched": false,
+  "activePcmBytes": 768000,
+  "previousGenericPcmBytes": 795662,
+  "activeWavBytes": 768156,
+  "preparedFiles": [
+    {
+      "path": "assets/audio/night-ambience/candidates/periodical_cicada.wav",
+      "bytes": 278478,
+      "sha256": "631faeee740a0011d7ea1f6193a49d1d9af97331538f930cd6bb45a41126e237"
+    },
+    {
+      "path": "assets/audio/night-ambience/candidates/pond_frogs_crickets.wav",
+      "bytes": 384078,
+      "sha256": "bb13e7ebaff3fdc0b3a872cbdfe0bda22a210a7a77fe401b50981c5e02763b76"
+    },
+    {
+      "path": "assets/audio/night-ambience/manifest.json",
+      "bytes": 5461,
+      "sha256": "e5e3045596427e6d46d2193caeecd15c0e68366b49fd73fe1e63bf526e2fbb31"
+    },
+    {
+      "path": "assets/audio/night-ambience/NOTICE.md",
+      "bytes": 2072,
+      "sha256": "ba71cd62d03745f01cf3842332e9887d1f8778cd6ae3da14ac134eaadc792cf5"
+    },
+    {
+      "path": "assets/audio/night-ambience/runtime/evening_cricket.wav",
+      "bytes": 384078,
+      "sha256": "8745d55f7ecf481d0ea7fb3656fecaa475bda339a49d12dbe09b0ee058e559ea"
+    },
+    {
+      "path": "assets/audio/night-ambience/runtime/tawny_owl.wav",
+      "bytes": 384078,
+      "sha256": "c4b96bbfc5713ad98ddf28f510de9a124cef71dd3b35d76aed6d92a500d25717"
+    }
+  ],
+  "reproduction": "All six prepared files byte-identical",
+  "windowsAssetCopy": "Four explicit files; identical re-admission succeeds; different destination refused with sentinel preserved",
+  "rejectedFirstRecipe": {
+    "result": "Two fade endpoint failures retained",
+    "cause": "Output seek did not reset filter time",
+    "repair": "Resample, atrim, asetpts before gain/fades; original endpoint assertions retained",
+    "log": {
+      "path": "reports/night-ambience-2026-10-18/audio-tests.log",
+      "bytes": 2178,
+      "sha256": "b18ebc963eb2635324ff5d79c6129bf2aca596d04a82a2aa91aca461cc728293"
+    }
+  },
+  "contactFollowup": {
+    "outcome": "NO CURRENT KEEPER RANGE EVIDENCE; combat retry remains blocked",
+    "currentSeparationAvailable": false,
+    "naturalEarnedSavePassed": false,
+    "deniedCombatRetried": false,
+    "activities": 0,
+    "cachedPid": 32269,
+    "ownerWrites": false,
+    "readOnlyReceipt": "contact-diagnostic-followup.json",
+    "requiredNextEvidence": "Bounded paused immutable player/target/tick/scene/separation/support/safe-practice and recent contact outcomes; report before any retry"
+  },
+  "deferred": {
+    "frogReason": "No admitted exterior water surfaces or proximity query; tomb runoff is not exterior water",
+    "frogPreparedButPackaged": false,
+    "cicadaReason": "Identified North American source has no night metadata; not admitted as verified nocturnal bed",
+    "cicadaPreparedButPackaged": false,
+    "listening": false,
+    "physicalNativeMix": false,
+    "fullSpeciesBed": false,
+    "performanceClaim": false
+  },
+  "changedSources": [
+    {
+      "path": "tools/prepare-night-ambience.py",
+      "bytes": 6067,
+      "sha256": "dbec235c404a25c1f65a40cb4f4e0c56a6b95e961ac5355846d8663949b73eea"
+    },
+    {
+      "path": "tools/horde-night-audio-policy.ps1",
+      "bytes": 1224,
+      "sha256": "098cb52ad0930e370fae544f7cddba587d35be31ae86f8e007017c3d9d2bded0"
+    },
+    {
+      "path": "tools/package-alpha.ps1",
+      "bytes": 37330,
+      "sha256": "122843798f702a3db253ec0c538ba11ca35fffb759d039a00f33d5fe633dff7c"
+    },
+    {
+      "path": "android/app/build.gradle",
+      "bytes": 41795,
+      "sha256": "6bf994f4068024f42266ee0819ef6604c6f24eb4001e4ede0315ed1e0b350905"
+    },
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java",
+      "bytes": 453638,
+      "sha256": "204890385f7e2f84b41ef9332ca212ee2e43aca37201d3d25d0022ddf484b502"
+    },
+    {
+      "path": "src/gameplay/simulation/ForestBirdAmbience.h",
+      "bytes": 1914,
+      "sha256": "07ecdc6e973274baaf366e27a14d956ffc713ac83c7a4cd24d8f34ad2b9131bf"
+    },
+    {
+      "path": "src/gameplay/simulation/GameplayEvent.h",
+      "bytes": 3466,
+      "sha256": "4f547203324bcc9f471cf4759c62df54add20678afe268e69ba34dd3285bca27"
+    },
+    {
+      "path": "src/gameplay/simulation/GameSimulation.cpp",
+      "bytes": 135199,
+      "sha256": "8d5c589bbe2ba9f2cb63720b5b621c05345287f3f1c77c3897fce62e53017023"
+    },
+    {
+      "path": "src/platform/windows/DiagnosticWindow.cpp",
+      "bytes": 598646,
+      "sha256": "451d8731906e654f67db02fe604e2d89028dcef3e80043d142881762906bc068"
+    },
+    {
+      "path": "tests/ForestBirdAmbienceTests.cpp",
+      "bytes": 14016,
+      "sha256": "60b1bf921335a49fae67d27f50d663f0abe69d16357a46d28981a02966ac74bf"
+    },
+    {
+      "path": "tests/test_night_ambience_audio.py",
+      "bytes": 2162,
+      "sha256": "46115254e7373940272ef23137284bd7a528f63d138f6a3ff7e06bc759215fd3"
+    },
+    {
+      "path": "ASSET_LICENSES.md",
+      "bytes": 65436,
+      "sha256": "18968fd5af0ae8b21d0f16f78972622acc5a9e39aba8511ac959d0190bab188e"
+    }
+  ],
+  "rawArtifacts": [
+    {
+      "path": "reports/night-ambience-2026-10-18/windows-debug-build.log",
+      "bytes": 3548,
+      "sha256": "7e740ccbbd9fb61f9cc44ddcdfa5f0d8d3696f50dc1fe9e69c35ac8af4afb74e"
+    },
+    {
+      "path": "reports/night-ambience-2026-10-18/windows-release-build.log",
+      "bytes": 1586,
+      "sha256": "579a0c03bee56c01695cca7878934b0ef989783fa3dd47e15f8d786fcc93b101"
+    },
+    {
+      "path": "reports/night-ambience-2026-10-18/native-debug-fixture-build.log",
+      "bytes": 1064,
+      "sha256": "4614216afd73c250628de9129a4398052dea86e5fa36d6bd943321f31581fe4a"
+    },
+    {
+      "path": "reports/night-ambience-2026-10-18/native-release-fixture-build.log",
+      "bytes": 1084,
+      "sha256": "b7016edae097a0bc0a9f97521dc3d40cc08b7869c55fcb908433c0d638dd54f4"
+    },
+    {
+      "path": "reports/night-ambience-2026-10-18/android-build-tests.log",
+      "bytes": 2999,
+      "sha256": "3d5df4d3c6e185c269bdd27f6f565d509bbcef3253759a37daa0fe8a68f78077"
+    },
+    {
+      "path": "reports/night-ambience-2026-10-18/audio-tests-final.log",
+      "bytes": 308,
+      "sha256": "343acb86810dce8cf1e6e643d1f708aab0d150a18c5ef930e4b934491b32877f"
+    },
+    {
+      "path": "reports/night-ambience-2026-10-18/audio-tests-v2.log",
+      "bytes": 308,
+      "sha256": "6b7669242644eed453179ffecb48babce1bf79d4e0a0ef1371871f7fe6975883"
+    },
+    {
+      "path": "reports/night-ambience-2026-10-18/reproduction.log",
+      "bytes": 559,
+      "sha256": "d05be964d74cd89369547b17076ffa7138c840967f3d3b70638e24069d8bcf73"
+    },
+    {
+      "path": "reports/night-ambience-2026-10-18/windows-assets-test.log",
+      "bytes": 1140,
+      "sha256": "af9b2e02a2ddbc267a529aaab17d02f825862bd775d115b5a2e665761a4b1ac2"
+    },
+    {
+      "path": "reports/night-ambience-2026-10-18/windows-assets-test-result.log",
+      "bytes": 112,
+      "sha256": "f06021e4bb48478ce9109315464b0a107084f06c07f33857cab66996b9b1d74d"
+    },
+    {
+      "path": "reports/night-ambience-2026-10-18/android-package-check-final.json",
+      "bytes": 653,
+      "sha256": "4183aa3dfaba3340e6cc16c8985d0cf16383a7f79326db1c923f55da6191fa17"
+    },
+    {
+      "path": "reports/night-ambience-2026-10-18/package-script-parse.log",
+      "bytes": 74,
+      "sha256": "19929d55171b73737c767ca4b4c11059874f35bda0b9208024fa9d065f70fb7a"
+    }
+  ],
+  "scope": {
+    "noCombatResume": true,
+    "noAttackInput": true,
+    "noInstallation": true,
+    "ownerSettingsUnchanged": true,
+    "ownerDataChanged": false,
+    "paidService": false,
+    "credentialChange": false,
+    "desktopForegroundTaken": false,
+    "releasePackagerExecuted": false,
+    "publicPush": false,
+    "merge": false,
+    "largeSourceAudioInGit": false
+  }
+}

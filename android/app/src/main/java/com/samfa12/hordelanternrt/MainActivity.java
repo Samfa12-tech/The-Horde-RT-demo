@@ -223,6 +223,7 @@ public class MainActivity extends Activity {
     private static final int PLATFORM_EVENT_WATERFALL_CONTACT = 27;
     private static final int PLATFORM_EVENT_FOREST_BIRD = 28;
     private static final int PLATFORM_EVENT_FOREST_BIRD_STOPPED = 29;
+    private static final int PLATFORM_EVENT_FOREST_CRICKETS = 30;
     private static final int EQUIPMENT_AUDIO_SWORD_DRAW = 1;
     private static final int EQUIPMENT_AUDIO_SWORD_SHEATH = 2;
     private static final int ENTITY_LICH = 3;
@@ -5888,7 +5889,8 @@ public class MainActivity extends Activity {
                     int latestForestSignal=-1;
                     for(int i=0;i+2<platformEvents.length;i+=3) {
                         final int type=(int)(platformEvents[i]&0xffL);
-                        if(type==PLATFORM_EVENT_FOREST_BIRD || type==PLATFORM_EVENT_FOREST_BIRD_STOPPED)latestForestSignal=i;
+                        if(type==PLATFORM_EVENT_FOREST_BIRD || type==PLATFORM_EVENT_FOREST_CRICKETS ||
+                                type==PLATFORM_EVENT_FOREST_BIRD_STOPPED)latestForestSignal=i;
                     }
                     for (int eventIndex = 0; !debugMotionActive && eventIndex + 2 < platformEvents.length; eventIndex += 3) {
                     final long metadata = platformEvents[eventIndex];
@@ -5900,7 +5902,10 @@ public class MainActivity extends Activity {
                     final long eventSequence = (metadata >>> 32) & 0xffffffffL;
                     switch (eventType) {
                         case PLATFORM_EVENT_FOREST_BIRD:
-                            if(eventIndex==latestForestSignal)playForestBird(stereoGains);
+                            if(eventIndex==latestForestSignal)playForestBird(stereoGains, "forest_night_owl");
+                            break;
+                        case PLATFORM_EVENT_FOREST_CRICKETS:
+                            if(eventIndex==latestForestSignal)playForestBird(stereoGains, "forest_evening_cricket");
                             break;
                         case PLATFORM_EVENT_FOREST_BIRD_STOPPED:
                             if(eventIndex==latestForestSignal)stopForestBird();
@@ -6584,7 +6589,8 @@ public class MainActivity extends Activity {
         loadSound("water_wet_step_3", "audio/pixabay/water_wet_step_3_core.wav");
         loadSound("water_wet_step_4", "audio/pixabay/water_wet_step_4_core.wav");
         loadSound("water_stream_contact", "audio/pixabay/water_stream_contact_core.wav");
-        loadSound("forest_distant_bird", "audio/filmcow/forest_distant_bird.wav");
+        loadSound("forest_night_owl", "audio/night-ambience/runtime/tawny_owl.wav");
+        loadSound("forest_evening_cricket", "audio/night-ambience/runtime/evening_cricket.wav");
         loadSound("skeleton_step_1", "audio/filmcow/skeleton_step_1.wav");
         loadSound("skeleton_step_2", "audio/filmcow/skeleton_step_2.wav");
         loadSound("skeleton_attack", "audio/filmcow/skeleton_attack.wav");
@@ -6732,9 +6738,9 @@ public class MainActivity extends Activity {
         forestBirdStream=0;
     }
 
-    private void playForestBird(long packedStereoGains) {
+    private void playForestBird(long packedStereoGains, String soundKey) {
         if (!forestBirdAudible() || soundPool==null) return;
-        final Integer id=sounds.get("forest_distant_bird");
+        final Integer id=sounds.get(soundKey);
         if (id==null) return;
         synchronized(loadedSounds) { if (!loadedSounds.contains(id)) return; }
         stopForestBird(); // One finite voice; never queue/retry a missed ambience cue.

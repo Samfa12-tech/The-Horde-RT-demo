@@ -1,5 +1,17 @@
 # Horde 1.7 current design index
 
+## Nocturnal ambience progresses independently - 18 October 2026
+
+The [bounded nature-audio slice](../evidence/2026-10-18-night-ambience/README.md)
+replaces the generic bird mapping with an attributed night-owl cut and adds a
+finite evening-cricket cut in its quiet gap. Both native platforms share the
+same suppression and one-voice lifecycle. Two additional licensed pond/cicada
+cuts are prepared but excluded from packages/playback: exterior water surfaces
+are not integrated, and the cicada recording has no night metadata. No listening
+or physical mix claim is made. No phone gameplay or denied combat retry occurs.
+The read-only follow-up finds player-only late rows, no current Keeper separation;
+natural earned-save/death acceptance remains incomplete.
+
 ## Repaired-artifact earned route remains incomplete - 18 October 2026
 
 The [unseeded follow-up](../evidence/2026-10-18-android-earned-repair/README.md)

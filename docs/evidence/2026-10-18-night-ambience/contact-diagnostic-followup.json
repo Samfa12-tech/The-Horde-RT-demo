@@ -1,0 +1,211 @@
+{
+  "outcome": "NO CURRENT KEEPER RANGE EVIDENCE; combat retry remains blocked",
+  "readOnly": true,
+  "device": "SM-S948B",
+  "cachedPid": 32269,
+  "debugActivityRecords": 0,
+  "installedApkSha256FromPriorReceipt": "4c84eb456f97717df055245410196101ea681a3bc55d0c9776eb42a59d591073",
+  "installedApkRehashedNow": false,
+  "traceCounts": [
+    {
+      "typeAndEpoch": "combat-contact, 5",
+      "count": 123
+    },
+    {
+      "typeAndEpoch": "combat-timing, 5",
+      "count": 5
+    },
+    {
+      "typeAndEpoch": "combat-timing, 7",
+      "count": 20
+    },
+    {
+      "typeAndEpoch": "input-presentation, 5",
+      "count": 256
+    },
+    {
+      "typeAndEpoch": "input-presentation, 7",
+      "count": 80
+    }
+  ],
+  "lastSurvivingPausedPlayerRow": {
+    "type": "input-presentation",
+    "inputPublication": 965,
+    "poseTick": 6314,
+    "moveForward": 0,
+    "moveStrafe": 0,
+    "playerX": -36.6373,
+    "playerZ": -12.2577,
+    "yaw": -1.75437,
+    "pitch": 0,
+    "paused": true,
+    "consumedAttack": 20,
+    "consumedParry": 0,
+    "consumedDodge": 0,
+    "playerAction": 0,
+    "dodgeActive": false,
+    "sceneEpoch": 7,
+    "record": 9294,
+    "submission": 9294,
+    "presentCallAcceptedNs": 185677823743123,
+    "displayTimeMeasured": false
+  },
+  "lastContact": {
+    "type": "combat-contact",
+    "sample": 123,
+    "generation": 310,
+    "overwrittenSamples": 93,
+    "command": 5,
+    "consumedTick": 2011,
+    "attackId": 5,
+    "cut": 1,
+    "contactSampleTick": 2043,
+    "phase": 2,
+    "phaseSeconds": 0.37,
+    "target": 0,
+    "outcome": 0,
+    "semanticEvent": 0,
+    "supportWorldY": -0.95,
+    "dodgeElapsedSeconds": 0,
+    "separationMetres": null,
+    "bladeStart": null,
+    "bladeEnd": null,
+    "fixedStepSwordMatrix": [
+      -0.41874,
+      -0.492991,
+      -0.762638,
+      0,
+      -0.899329,
+      0.341608,
+      0.272968,
+      0,
+      0.125953,
+      0.800165,
+      -0.586406,
+      0,
+      -2.7274,
+      0.0306615,
+      -15.587,
+      1
+    ],
+    "targetXZ": [
+      0,
+      0
+    ],
+    "poseTick": 2048,
+    "sampleTickWasPresented": false,
+    "targetReactionMayReplaceContactPose": false,
+    "sceneEpoch": 5,
+    "record": 6723,
+    "submission": 6723,
+    "presentCallAcceptedNs": 184813551152359,
+    "displayTimeMeasured": false
+  },
+  "allContactTargets": [
+    0
+  ],
+  "epoch7ContactCount": 0,
+  "debugFile": {
+    "path": "files/reports/showcase_debug_state.json",
+    "deviceTimestamp": "2026-10-18 11:43",
+    "status": "capture-ready",
+    "checkpoint": "opening",
+    "player": {
+      "x": 0.0,
+      "z": 1.85,
+      "yaw": 0.0,
+      "pitch": -0.05,
+      "vitality": 3,
+      "maxVitality": 3,
+      "lifePhase": "alive",
+      "damageEnabled": false
+    },
+    "lich": {
+      "phase": "dormant",
+      "health": 3,
+      "roofProgress": 0.0,
+      "ending": "inactive",
+      "dawnProgress": 0.0
+    },
+    "simulationTick": 0,
+    "currentLateEncounter": false
+  },
+  "diagnosticGap": "Latest surviving paused player pose has no current target pose, contact separation, blade sample or outcome. Earlier null-separation rows and opening JSON cannot establish current Keeper range.",
+  "nextTestRequirements": [
+    "Before any resumed input, expose a bounded Debug-only immutable owner-thread snapshot while paused: simulation tick, surface/scene identity, player position/yaw/support and effective safe-practice, Keeper health/phase/position plus separation",
+    "Retain a bounded recent contact ring or encounter-triggered capture rather than silently exhaust all rows before the Keeper; include command/tick/target/phase/outcome/range/blade obstruction data",
+    "Evaluate any code failure against that evidence; do not infer it from screenshots or a stale player pose",
+    "Only after materially new diagnostic evidence and authorization addressing the rejection, propose one finite range-qualified action with a stop condition; no blind retries"
+  ],
+  "blockedAction": {
+    "action": "Resume/turnaround/Swing phone-combat sequence",
+    "target": "Existing isolated earned-fix phone encounter",
+    "status": "DENIED by automatic approval review; not executed or retried",
+    "reason": "This is another blind phone-combat retry after repeated non-contact results and diagnostics showing no valid target separation; the user explicitly instructed stopping repeated failing paths when a code-level issue may be involved."
+  },
+  "completed": "Supported read-only ADB model/PID/activity dump/PID log-buffer/file stat+read and local source inspection only",
+  "attemptNotes": [
+    "Initial restricted ADB daemon startup failed; no device response",
+    "Escalated standard read-only ADB succeeded",
+    "Initial files/showcase_debug_state.json read returned missing; verified inventory located actual files/reports path and that read succeeded"
+  ],
+  "scope": {
+    "input": false,
+    "resume": false,
+    "attack": false,
+    "install": false,
+    "processKill": false,
+    "appDataOrSettingsWrite": false,
+    "shippingEdit": false,
+    "deviceStateAfterRead": "No debug activities; process remains cached; no new gameplay"
+  },
+  "artifacts": [
+    {
+      "path": "reports/android-contact-readonly-2026-10-18/device-state.txt",
+      "bytes": 8,
+      "sha256": "5a49c5eb1807bf1dd12637504e6a6e49f1c9c4bce601ae34c9984843074b129c"
+    },
+    {
+      "path": "reports/android-contact-readonly-2026-10-18/model.txt",
+      "bytes": 10,
+      "sha256": "6f932e05113edb335489bb11398953252ae32183626c9a67e47934e2ab6c72a8"
+    },
+    {
+      "path": "reports/android-contact-readonly-2026-10-18/pid.txt",
+      "bytes": 7,
+      "sha256": "5015ad3c331b34e3cd926b2136a6c09609610bffa9e98eb64e4e220e5c8c6885"
+    },
+    {
+      "path": "reports/android-contact-readonly-2026-10-18/activity-activities.txt",
+      "bytes": 178912,
+      "sha256": "29f01a542845eff16240f064dfffa99f6a468db9560e2d87db49ef5bbf797c9a"
+    },
+    {
+      "path": "reports/android-contact-readonly-2026-10-18/debug-state-stat.txt",
+      "bytes": 92,
+      "sha256": "5a100c2e98abb3fe19cc0ce3266a631218a88334d472de63707fab2824837398"
+    },
+    {
+      "path": "reports/android-contact-readonly-2026-10-18/debug-state.json",
+      "bytes": 7539,
+      "sha256": "a46af78c0dfd7051a0c21d5c76d4a0bf770dce1a63d896abad08445d23b2c2e5"
+    },
+    {
+      "path": "reports/android-contact-readonly-2026-10-18/pid-32269-current-buffer.log",
+      "bytes": 1375980,
+      "sha256": "9a857d077f453e98cb1bb528a8ca0ea4c1b5d46901052b30b1c8d20a2f4955b2"
+    }
+  ],
+  "sourceLimits": [
+    {
+      "path": "src/telemetry/CombatTimingTrace.h",
+      "bytes": 9453,
+      "sha256": "47dcdd49342c2300c6289f13a432d450da178899cff3ac30cac1fb1ac6d74baf"
+    },
+    {
+      "path": "src/telemetry/InputPresentationTrace.h",
+      "bytes": 3927,
+      "sha256": "fd363655141fc601f4f7283e90762a17801f4e37249b09cce497043533a386d0"
+    }
+  ]
+}

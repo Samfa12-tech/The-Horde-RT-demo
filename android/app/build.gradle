@@ -477,6 +477,10 @@ tasks.register('prepareRuntimeAssets', Sync) {
         include 'audio/menu/asset.manifest.json'
         include 'audio/filmcow/*.wav'
         include 'audio/filmcow/forest-distant-bird.manifest.json'
+        exclude 'audio/filmcow/forest_distant_bird.wav' // Superseded unheard generic candidate; retained source provenance.
+        include 'audio/night-ambience/runtime/*.wav'
+        include 'audio/night-ambience/manifest.json'
+        include 'audio/night-ambience/NOTICE.md'
         include 'audio/filmcow/equipment/sword_draw.wav'
         include 'audio/filmcow/equipment/sword_sheath.wav'
         include 'audio/filmcow/equipment/asset.manifest.json'

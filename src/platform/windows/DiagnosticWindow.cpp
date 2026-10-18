@@ -2212,12 +2212,14 @@ void DrainGameplayEvents(VulkanSurfaceContext& context)
 
     std::uint64_t latestForestSignal=0;
     for(const auto& event:context.simulation.Events().Events())
-        if(event.type==GameplayEventType::ForestBird || event.type==GameplayEventType::ForestBirdStopped)latestForestSignal=event.sequence;
+        if(event.type==GameplayEventType::ForestBird || event.type==GameplayEventType::ForestCrickets ||
+           event.type==GameplayEventType::ForestBirdStopped)latestForestSignal=event.sequence;
     for (const GameplayEvent& event : context.simulation.Events().Events())
     {
         switch (event.type)
         {
         case GameplayEventType::ForestBird:
+        case GameplayEventType::ForestCrickets:
             if(event.sequence!=latestForestSignal)break;
             if(context.controlsEnabled && !context.simulationPaused && context.sfxVolumePercent>0 &&
                GetForegroundWindow()==context.windowHandle &&
@@ -2226,7 +2228,9 @@ void DrainGameplayEvents(VulkanSurfaceContext& context)
                 const auto gains=horde::gameplay::CalculateSpatialAudio(
                     {event.worldX,event.worldZ,event.intensity,1.f,14.f,event.worldY},
                     {event.listenerX,event.listenerZ,event.listenerYawRadians,event.listenerY});
-                (void)audio.Play(ResolveAssetRoot()/"audio/filmcow/forest_distant_bird.wav",gains.left,gains.right,
+                const auto clip=event.type==GameplayEventType::ForestCrickets?
+                    "audio/night-ambience/runtime/evening_cricket.wav":"audio/night-ambience/runtime/tawny_owl.wav";
+                (void)audio.Play(ResolveAssetRoot()/clip,gains.left,gains.right,
                     "forest_bird",0,0,horde::platform::windows::WindowsSfxSourceGain(1.f,context.sfxVolumePercent));
             }
             break;

@@ -10,6 +10,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 . (Join-Path $PSScriptRoot "release-version-policy.ps1")
+. (Join-Path $PSScriptRoot "horde-night-audio-policy.ps1")
 Assert-HordeReleaseVersionIsMutable -Version $Version -VersionCode $VersionCode
 
 function Find-LatestVersionedTool {
@@ -197,8 +198,10 @@ foreach ($copy in $assetCopies) {
 }
 $audioDestination = Join-Path $windowsStage "assets\audio\filmcow"
 New-Item -ItemType Directory -Force -Path $audioDestination | Out-Null
-Copy-Item -Path (Join-Path $repoRoot "assets\audio\filmcow\*.wav") -Destination $audioDestination
+Get-ChildItem -Path (Join-Path $repoRoot "assets\audio\filmcow\*.wav") |
+    Where-Object Name -ne 'forest_distant_bird.wav' | Copy-Item -Destination $audioDestination
 Copy-Item -LiteralPath (Join-Path $repoRoot "assets\audio\filmcow\forest-distant-bird.manifest.json") -Destination $audioDestination
+Copy-HordeNightAudioRuntimeAssets -RepositoryRoot $repoRoot -AssetRoot (Join-Path $windowsStage 'assets')
 $null = Copy-Horde162RuntimeAssets -RepositoryRoot $repoRoot -AssetRoot (Join-Path $windowsStage "assets") -Platform Windows
 $null = Copy-HordeMusicRuntimeAssets -RepositoryRoot $repoRoot -AssetRoot (Join-Path $windowsStage "assets")
 

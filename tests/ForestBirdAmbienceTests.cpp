@@ -20,6 +20,7 @@ int main() {
     static_assert(static_cast<unsigned>(GameplayEventType::WaterfallContact)==27);
     static_assert(static_cast<unsigned>(GameplayEventType::ForestBird)==28);
     static_assert(static_cast<unsigned>(GameplayEventType::ForestBirdStopped)==29);
+    static_assert(static_cast<unsigned>(GameplayEventType::ForestCrickets)==30);
     auto s=Exterior();Check(ForestBirdAmbience::Eligible(s),"ready grounded same-night forest admitted");
     for(unsigned mode=0;mode<9;++mode) {
         auto bad=s;
@@ -35,10 +36,13 @@ int main() {
     s.worldRoute.current=WorldZoneId::Lookout;s.worldRoute.readiness[3]=ZoneReadiness::Ready;
     Check(ForestBirdAmbience::Eligible(s),"lookout remains part of admitted forest");
     for(unsigned rate:{15,30,60,120}) {
-        ForestBirdAmbience bird;FixedStepRunner runner;std::vector<unsigned> ticks;unsigned tick=0;
+        ForestBirdAmbience bird;FixedStepRunner runner;std::vector<unsigned> ticks,crickets;unsigned tick=0;
         for(unsigned frame=0;frame<rate*100;++frame)runner.Advance(1.0/rate,false,[&](float){
-            if(bird.Step(true)==ForestBirdAmbience::Cue::Play)ticks.push_back(tick+1);++tick;});
+            const auto cue=bird.Step(true);
+            if(cue==ForestBirdAmbience::Cue::Play)ticks.push_back(tick+1);
+            if(cue==ForestBirdAmbience::Cue::PlayCrickets)crickets.push_back(tick+1);++tick;});
         Check(ticks==std::vector<unsigned>({720,3120,5520}),"render catchup grouping cannot change cadence or emit a burst");
+        Check(crickets==std::vector<unsigned>({1440,3840}),"crickets occupy the quiet gap without overlapping eight-second owl cuts");
         Check(bird.Step(false)==ForestBirdAmbience::Cue::Stop && bird.Step(false)==ForestBirdAmbience::Cue::None,
             "ineligible transition stops exactly once");
         unsigned plays=0;for(unsigned tick=0;tick<719;++tick)plays+=bird.Step(true)==ForestBirdAmbience::Cue::Play;
@@ -48,10 +52,12 @@ int main() {
     GameplayEvent event;event.type=GameplayEventType::ForestBird;event.sequence=57;
     const auto packed=horde::platform::android::PackGameplayEventMetadata(event);
     Check((packed&255)==28 && (packed>>32)==57,"appended cue preserves compact ordered Android transport");
+    event.type=GameplayEventType::ForestCrickets;
+    Check((horde::platform::android::PackGameplayEventMetadata(event)&255)==30,"cricket event uses its appended transport ID");
     auto game=std::make_unique<GameSimulation>(ProductionGameSimulationConfig());
     InputSnapshot input;input.damageEnabled=false;
     unsigned cues=0;for(unsigned tick=0;tick<800;++tick){game->StepFixed(input);
-        for(const auto& e:game->Events().Events())cues+=e.type==GameplayEventType::ForestBird;game->ClearEvents();}
+        for(const auto& e:game->Events().Events())cues+=e.type==GameplayEventType::ForestBird || e.type==GameplayEventType::ForestCrickets;game->ClearEvents();}
     Check(cues==0,"real ordinary tomb fixed ticks never generate an exterior cue");
     std::cout<<"forest-bird ordinary journey starting\n";
     // Actual ordinary-input journey. Damage/teaching disabled CPU fixture;
@@ -137,7 +143,7 @@ int main() {
     Check(walk(kWorldRoutePoints[3].x,kWorldRoutePoints[3].z) && walk(kWorldRoutePoints[4].x,kWorldRoutePoints[4].z),
         "ordinary collision-resolved axes reach actual forest after earned ascent");
     for(unsigned tick=0;tick<200;++tick)step();
-    Check(ForestBirdAmbience::Eligible(game->Snapshot()),"native forest snapshot admits quiet generic bird policy");
+    Check(ForestBirdAmbience::Eligible(game->Snapshot()),"native forest snapshot admits quiet night ambience policy");
     std::cout<<"forest-bird forest tick="<<game->Snapshot().tickIndex<<" eligible="<<ForestBirdAmbience::Eligible(game->Snapshot())<<'\n';
     game->SynchronizePausedInput(input);game->ClearEvents();cues=0;
     for(unsigned tick=0;tick<720;++tick){game->StepFixed(input);
@@ -146,9 +152,16 @@ int main() {
                 "real semantic cue carries event-time listener and tick, without fabricated bird geometry");}
         game->ClearEvents();}
     Check(cues==1,"native 60Hz production simulation emits exactly one finite request after quiet interval");
+    unsigned cricketCues=0;
+    for(unsigned tick=0;tick<720;++tick){game->StepFixed(input);
+        for(const auto& e:game->Events().Events())if(e.type==GameplayEventType::ForestCrickets){++cricketCues;
+            Check(e.worldX==e.listenerX && e.worldZ==e.listenerZ && e.tickIndex==game->Snapshot().tickIndex,
+                  "real cricket event carries current fixed-step listener/tick");}
+        game->ClearEvents();}
+    Check(cricketCues==1,"ordinary forest simulation emits exactly one later cricket cue");
     input.paused=true;game->StepFixed(input);cues=0;
     input.paused=false;for(unsigned tick=0;tick<719;++tick){game->StepFixed(input);
-        for(const auto& e:game->Events().Events())cues+=e.type==GameplayEventType::ForestBird;game->ClearEvents();}
+        for(const auto& e:game->Events().Events())cues+=e.type==GameplayEventType::ForestBird || e.type==GameplayEventType::ForestCrickets;game->ClearEvents();}
     Check(cues==0,"native pause/resume restarts quiet interval without an old cue burst");
     const auto earned=game->CaptureAuthoredCampaignBoundary(horde::gameplay::campaign::CheckpointId::SafeExit);
     Check(earned.has_value(),"recovery record comes from the actual completed ordinary-input journey");
@@ -159,7 +172,7 @@ int main() {
             "fresh session loads only an actually earned logical boundary");
         InputSnapshot neutral;neutral.damageEnabled=false;neutral.yawRadians=earned->yaw;neutral.pitchRadians=earned->pitch;
         unsigned replay=0;for(unsigned tick=0;tick<800;++tick){fresh->StepFixed(neutral);
-            for(const auto& e:fresh->Events().Events())replay+=e.type==GameplayEventType::ForestBird;fresh->ClearEvents();}
+            for(const auto& e:fresh->Events().Events())replay+=e.type==GameplayEventType::ForestBird || e.type==GameplayEventType::ForestCrickets;fresh->ClearEvents();}
         Check(replay==0,"earned load does not replay forest audio debt at the safe exterior clearing");
     }
     std::cout<<checks<<" forest bird policy/transport/simulation checks, "<<failures<<" failures; listening and device mix unaccepted\n";

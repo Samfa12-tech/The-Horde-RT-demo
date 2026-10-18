@@ -2,11 +2,12 @@
 #include "gameplay/simulation/SimulationSnapshot.h"
 
 namespace horde::gameplay::simulation {
-// One generic recorded distant bird, pending listening/night-art acceptance.
+// Finite owl/evening-cricket candidates, pending listening/mix acceptance.
+// Historical class/event names preserve the existing transport contract.
 // Runtime-only cadence: no random source, save fields, backlog or mixer.
 class ForestBirdAmbience {
 public:
-    enum class Cue { None, Play, Stop };
+    enum class Cue { None, Play, Stop, PlayCrickets };
     static constexpr unsigned kInitialQuietTicks=720, kIntervalTicks=2400;
     static bool Eligible(const SimulationSnapshot& s) {
         const auto zone=s.worldRoute.current;
@@ -22,6 +23,9 @@ public:
         if(!eligible){const bool stop=eligible_;Reset();return stop?Cue::Stop:Cue::None;}
         eligible_=true;
         if(++quietTicks_>=nextTicks_){quietTicks_=0;nextTicks_=kIntervalTicks;return Cue::Play;}
+        // Eight-second cuts occupy one platform voice, twelve seconds apart.
+        // Missing/late cues are dropped; they never queue or overlap.
+        if(nextTicks_==kIntervalTicks && quietTicks_==kInitialQuietTicks)return Cue::PlayCrickets;
         return Cue::None;
     }
     void Reset(){eligible_=false;quietTicks_=0;nextTicks_=kInitialQuietTicks;}

@@ -4,6 +4,13 @@ The runtime currently uses animated skeleton/placeholder-lich assets, production
 
 ## Asset rules
 
+The 1.7 [bounded nature-audio slice](evidence/2026-10-18-night-ambience/README.md)
+uses two attributed finite mono PCM16 owl/cricket cuts and preserves prepared
+pond/cicada candidates outside the runtime roster. Its own manifest/recipe pins
+24kHz source transformations and exact hashes. Cricket audio remains CC BY-SA 4.0;
+the other clips retain their individual attribution licences. Technical admission
+and source metadata do not establish listening/mix or water-proximity acceptance.
+
 The1.6.1 player pair is admitted as a five-region `WorldBody` plus two-region
 `Viewmodel`. Exact runtime hashes are `f2c3f62b...` and `6f06d77e...`; manifests,
 clip semantics and processing receipts must agree. The body remainder shares
