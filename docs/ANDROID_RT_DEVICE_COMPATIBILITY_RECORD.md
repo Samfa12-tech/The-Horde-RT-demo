@@ -3177,3 +3177,28 @@ APK; no additional startup/performance loop was run. An initial large-APK
 copy/pull preflight was denied before execution by automatic approval review;
 the suggested compact hash-only alternative completed without retrying that
 copy/pull. [Exact sequence, custody, denial and artifact hashes](evidence/2026-10-18-android-back-device/README.md).
+
+### 18 October - ordinary-play crouch and bounded lifecycle pass
+
+Owner-authorized **SM-S948B**, Android **17 / API 37**, build
+`CP2A.260605.016.S948BXXS4BZIG`. Source commit
+`1906a733b8b401672643c7f22d0327a500bdd211`, separate same-signer Debug APK/code 10,
+SHA-256 `b1f266f69adf6b92eda2c18fe7c02aa967cbb626d853ef4dd910ab1394f82211`
+(183,853,322 bytes), installed in place and matched by on-device hash.
+
+Evidence class: finite ordinary entry PLAY -> native Crouch/Stand HUD acceptance
+with four opened actual app-only screenshots, pause/resume and Android Home/
+resume stance-request release. The view visibly lowers/restores while torch and
+hands remain present. First loading and resumed-surface pending samples were
+retained before one bounded readiness check each. Native RT presentation is
+logged for opening and resumed generation 3, at saved 40%/576x1188 into 1440x2971.
+Terminal explicit Quit removes the test activity/task; settings are byte-identical,
+all 274 `files/`/`shared_prefs/` paths unchanged, and scoped logs have no fatal crash.
+Release, owner saves, security settings, desktop and Reef were not targeted.
+
+Full-body mesh, physical root walking/low-ceiling blocking, numeric 0.6 m eye drop,
+controller/gesture/font/orientation matrix, sustained performance, audio/haptics
+and comfort remain unaccepted. This does not establish Save/Load, process-death
+recovery or platform/power-loss durability. No extra forest or performance trial
+ran, and no redundant APK copy/pull occurred.
+[Exact sequence, limits, screenshots and custody hashes](evidence/2026-10-18-android-crouch-device/README.md).

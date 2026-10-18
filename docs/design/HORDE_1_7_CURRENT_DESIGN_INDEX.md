@@ -6,6 +6,9 @@ controls, camera/held-item/listener height and grounded idle/walk posing. One
 original 20-triangle, 10 cm trail root enters the existing RT owner and immutable
 STEP lane from identical geometry. Host checks distinguish implementation from
 physical route, audio/comfort and sustained performance acceptance.
+The separate [sealed phone pass](../evidence/2026-10-18-android-crouch-device/README.md)
+confirms ordinary-play Crouch/Stand, visible camera lowering/return and pause/Home
+request release on SM-S948B. Full-body, root/ceiling walking and audio remain open.
 
 The [small-root motor checkpoint](../evidence/2026-10-18-small-root-motor/README.md)
 adds explicit immutable step geometry, bounded shared stepping and separate body

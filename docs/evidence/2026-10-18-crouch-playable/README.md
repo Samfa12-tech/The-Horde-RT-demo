@@ -10,6 +10,10 @@ pass in each configuration. All 68 focused Java tests pass, and Android Debug
 assembles for arm64-v8a, armeabi-v7a, x86 and x86_64. The exact APK is
 `b1f266f69adf6b92eda2c18fe7c02aa967cbb626d853ef4dd910ab1394f82211`
 (183,853,322 bytes). These are affected checks, not a complete release gate.
+The later [exact-APK phone pass](../2026-10-18-android-crouch-device/README.md)
+records accepted Crouch/Stand controls, opened camera/hand views and pause/Home
+request release on SM-S948B. It does not accept physical root/ceiling traversal,
+full-body appearance, audio or sustained performance.
 
 Shared 60 Hz simulation now owns a bounded 1.8 m standing / 1.2 m crouching
 profile with a 0.25 s transition. Standing requires full-height clearance;
