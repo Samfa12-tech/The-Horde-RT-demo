@@ -16,6 +16,7 @@ import bpy
 import numpy as np
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from chapter_regional_terrain import RegionalTerrain, ring_coordinates, stitch_sides
+from chapter_water_conformance import conform_water
 
 
 def digest(path):
@@ -270,6 +271,19 @@ def main():
         for tri in stitch_sides(inner_sides,sides,vertices):
             faces.append(tri);materials.append(1);cells.append((-2,-2,-2))
         inner_sides=sides
+    water_conformance=None
+    if regional:
+        # Split only coarse outer faces at the unchanged atlas water outlines.
+        # Preserve every accepted local triangle and sample new positions from
+        # the same regional heightfield; water heights never alter ground.
+        closed_envelope_faces=2*sum(len(side)-1 for side in inner_sides)+2
+        engine_vertices=[(x,y,-z) for x,z,y in vertices]
+        engine_vertices,faces,source_faces,water_conformance=conform_water(
+            engine_vertices,faces,[cell==(-2,-2,-2) for cell in cells],regional,
+            maximum_faces=39618-closed_envelope_faces)
+        vertices=[(x,-z,y) for x,y,z in engine_vertices]
+        materials=[materials[i] for i in source_faces]
+        cells=[cells[i] for i in source_faces]
     surface_face_count = len(faces)
     # Close only the distant outer perimeter, never extrude every near cell
     # through the tomb. The underside is below all occupied tomb volumes.
@@ -378,7 +392,8 @@ def main():
         'entryEnvelopes':entry_envelopes,'sourceGlbSha256':digest(out/(version+'.glb')),
         'boundsEngine':[[all_bounds[0][0],bottom_y,all_bounds[0][2]],all_bounds[1]],
         'regional':{'east':[-150,410],'north':[-510,440],'ringCount':len(rings),
-                    'layoutSha256':digest(args.regional_layout)} if regional else None}
+                    'layoutSha256':digest(args.regional_layout)} if regional else None,
+        'waterConformance':water_conformance}
     (out/'surface.json').write_text(json.dumps(surface,separators=(',',':'))+'\n')
     # Derive the candidate manifest from actual exporter output, not Blender's
     # pre-split vertex count. This is a new asset envelope, not a renderer cap.
@@ -386,6 +401,9 @@ def main():
     raw=(out/(version+'.glb')).read_bytes()
     length=struct.unpack_from('<I',raw,12)[0]
     gltf=json.loads(raw[20:20+length]);primitives=[p for m in gltf['meshes'] for p in m['primitives']]
+    exported_vertices=sum(gltf['accessors'][p['attributes']['POSITION']]['count'] for p in primitives)
+    if regional and (exported_vertices>21134 or len(faces)>39618):
+        raise RuntimeError('Conformed source exceeds the unchanged runtime terrain vertex/triangle budgets')
     manifest={'schema':1,'asset':version,'metresPerUnit':1.0,
         'coordinateSystem':{'up':'+Y','forward':'+Z'},
         'budgets':{'maxVertices':sum(gltf['accessors'][p['attributes']['POSITION']]['count'] for p in primitives),
@@ -402,6 +420,8 @@ def main():
         'boundsEngine':surface['boundsEngine'],
         'regional':surface['regional'],
         'regionalRecipeSha256':digest(Path(__file__).with_name('chapter_regional_terrain.py')) if regional else None,
+        'waterConformance':water_conformance,
+        'waterConformanceRecipeSha256':digest(Path(__file__).with_name('chapter_water_conformance.py')) if regional else None,
         'gridSpacing':('1m near; stitched 4/8/16m regional rings; coarse surrounding envelope beyond 10km ray reach' if regional
                        else '1m near; 2/4m mid; 8m far; exact shaft/skylight interfaces'),
         'adjustments':['Five-tap separable planning-height smoothing','2.4m graded trail; 6.4m/7m pockets',

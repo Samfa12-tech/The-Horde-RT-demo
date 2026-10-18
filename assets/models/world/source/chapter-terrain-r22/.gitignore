@@ -1,0 +1,5 @@
+# Reproducible local candidates; the admitted GLB lives once in runtime.
+# Preserve these local files, but avoid another large Git blob/master duplicate.
+/chapter-terrain-r22.blend
+/chapter-terrain-r22.glb
+/surface.json

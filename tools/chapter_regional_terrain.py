@@ -86,6 +86,11 @@ class RegionalTerrain:
             d=np.maximum(abs(X-x)-w/2,abs(Y-y)-h/2);blend=np.clip((5-d)/5,0,1)
             Z=Z*(1-blend)+z*blend
         self.height=Z
+        # Geometry constraints only: the sampled heightfield above is unchanged.
+        # These are the same outlines/centrelines as ChapterRegionalWater.h.
+        self.lake_outline=lake.tolist()
+        self.river_water=[layout['river_surface']+[[170,290,51],[193,360,65],[214,430,79]],
+                          [[0,-448,0],[-28,-478,-.4],[-55,-510,-1.2]]]
 
     def sample(self,east,north):
         value=bilinear(self.x,self.y,self.height,east,north)

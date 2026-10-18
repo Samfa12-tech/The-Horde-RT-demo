@@ -1,0 +1,19 @@
+{
+  "status": "PASS",
+  "triangles": 36746,
+  "supportTriangleMultisetMatchesGlb": true,
+  "shaftAndTwoSkylightsOpen": true,
+  "landBehindAndAroundRope": true,
+  "maxUvError": 1.52587890625e-05,
+  "minimumVertexNormalY": -1.0,
+  "routeCapsuleSamples": 2781,
+  "routeCapsuleRadius": 0.24,
+  "maxRouteHeightError": 0.08170607807587227,
+  "occupiedTombVolumesChecked": 9,
+  "thinDiagonalClippingNegativeCases": true,
+  "entryRoofTriangleIntersections": 263,
+  "minimumEntryRoofCoverMetres": 0.3938442831599785,
+  "regionalTriangleCoverageProbes": 57,
+  "glbSha256": "12c0c577a67c5fc8e88fe0528a9eaa5b2ec950ba409bbffe969560b7c54ee060",
+  "visualAcceptance": false
+}

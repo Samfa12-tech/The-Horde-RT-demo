@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "author": "Original Horde authoring from owner-supplied r2 topo",
+  "entryAuditSha256": "c0cae7d7cda070669241093105178638ef2e9d84fefc1fc18cec24057252e618",
+  "sourceNpzSha256": "251126186fa4923f9902524ec4ac2cc76d0f7a1c82cb1feac9901cc7832bb0ba",
+  "recipeSha256": "b1ba792d2720b71c44b54d851d90c3a839288abf4d28892edd7fae098ad98136",
+  "blender": "5.2.0 LTS",
+  "vertices": 18473,
+  "triangles": 36746,
+  "materials": 2,
+  "uvRepeatsPerMetre": {
+    "trail": 0.42,
+    "forest": 0.5
+  },
+  "textures": [
+    {
+      "path": "assets/textures/polyhaven/mobile_1k/damp_sand/diff.jpg",
+      "sha256": "3b26e6033205d4c774bb8c48bda8081b5a369e01ac701a0dcaa7ddc1f484f1de"
+    },
+    {
+      "path": "assets/textures/polyhaven/mobile_1k/damp_sand/normal.jpg",
+      "sha256": "1bda846d2361eeba2938700e68771711a29880299da61733bd2bcdd7af83c1f4"
+    },
+    {
+      "path": "assets/textures/polyhaven/mobile_1k/damp_sand/arm.jpg",
+      "sha256": "a54ba44a05381a87b4506c6e75d92e096b11cb45c5d7d052957b1d36eee4aef9"
+    },
+    {
+      "path": "assets/textures/polyhaven/source/forrest_ground_01-1k-v1/diff.png",
+      "sha256": "c4bae8c86c8f9f50f2cd0fa627b097e089de3427f071e3446e69bf8e39132896"
+    },
+    {
+      "path": "assets/textures/polyhaven/source/forrest_ground_01-1k-v1/normal.png",
+      "sha256": "879a84565d016743583421a644bae72df26f4031ea8852fc6d6275feb967353e"
+    },
+    {
+      "path": "assets/textures/polyhaven/source/forrest_ground_01-1k-v1/arm.png",
+      "sha256": "f4a137f68021a6e84495ea990323bdc471d4e34dad3f393bdf608a211aebe772"
+    }
+  ],
+  "boundsEngine": [
+    [
+      -12926.0,
+      -67.0,
+      -12910.0
+    ],
+    [
+      12905.0,
+      55.42475891113281,
+      12929.0
+    ]
+  ],
+  "regional": {
+    "east": [
+      -150,
+      410
+    ],
+    "north": [
+      -510,
+      440
+    ],
+    "ringCount": 49,
+    "layoutSha256": "0a4da29bf8d988145c0f7b3f1c7afaf415a5da9b14c34bbd53bd1e00e3a86e59"
+  },
+  "regionalRecipeSha256": "c0c7d86c72460fae04793bf9545c4cbc1f4dad709c23d4b97ee05137fee4c368",
+  "waterConformance": {
+    "originalFaces": 33912,
+    "faces": 36608,
+    "insertedVertices": 1348,
+    "changedOuterFaces": 459,
+    "protectedFaces": 15472
+  },
+  "waterConformanceRecipeSha256": "90093a71d17cc986e733ad3b0f8fd7966841a2ef515ec54cbb8f8c682a862fef",
+  "gridSpacing": "1m near; stitched 4/8/16m regional rings; coarse surrounding envelope beyond 10km ray reach",
+  "adjustments": [
+    "Five-tap separable planning-height smoothing",
+    "2.4m graded trail; 6.4m/7m pockets",
+    "Clue trail cut into exterior mound shoulder; occupied roofs and rising stairs retained",
+    "Banks and retained tomb roof/collapse mound clearance",
+    "Exact 2.05m apron and three separate open shafts"
+  ],
+  "files": [
+    {
+      "path": "asset.manifest.json",
+      "bytes": 680,
+      "sha256": "7eca8a98b1c86f48ed8f70d1777734ebdaa7decef24c069858a98d66d8c5e540"
+    },
+    {
+      "path": "chapter-terrain-r22.blend",
+      "bytes": 21851629,
+      "sha256": "4f1b7d5d353fe8b1a5bd92984c2984bc6f01cab161c74705af98cb9bc7965b98"
+    },
+    {
+      "path": "chapter-terrain-r22.glb",
+      "bytes": 18408928,
+      "sha256": "12c0c577a67c5fc8e88fe0528a9eaa5b2ec950ba409bbffe969560b7c54ee060"
+    },
+    {
+      "path": "surface.json",
+      "bytes": 2250325,
+      "sha256": "a5b7135d2ec60581c5c9e3275171ee81f20b33adc77cef18c0ddb4aee8a70dd1"
+    }
+  ],
+  "status": "Authored source candidate; NOT runtime admission or visual acceptance"
+}
