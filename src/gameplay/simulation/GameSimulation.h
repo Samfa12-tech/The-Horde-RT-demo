@@ -24,6 +24,7 @@
 #include "gameplay/simulation/GameplayEvent.h"
 #include "gameplay/simulation/InputSnapshot.h"
 #include "gameplay/simulation/SimulationSnapshot.h"
+#include "gameplay/simulation/ForestBirdAmbience.h"
 #include "gameplay/simulation/DevelopmentSupportFixture.h"
 #include "gameplay/simulation/DevelopmentWorldRoute.h"
 #include "gameplay/simulation/TriangleSupportSurface.h"
@@ -302,6 +303,7 @@ private:
     std::uint64_t pendingTutorialReplayCommands_ = 0u;
     SimulationSnapshot snapshot_{};
     horde::gameplay::dialogue::Director chapterDialogue_{};
+    ForestBirdAmbience forestBird_{};
     horde::gameplay::dialogue::CompanionRouteFixture chapterCompanion_{};
     std::uint64_t chapterSkipFloor_=0,chapterVisibleRaise_=0;
     bool chapterFirstExterior_=false;

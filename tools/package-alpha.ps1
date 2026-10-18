@@ -198,6 +198,7 @@ foreach ($copy in $assetCopies) {
 $audioDestination = Join-Path $windowsStage "assets\audio\filmcow"
 New-Item -ItemType Directory -Force -Path $audioDestination | Out-Null
 Copy-Item -Path (Join-Path $repoRoot "assets\audio\filmcow\*.wav") -Destination $audioDestination
+Copy-Item -LiteralPath (Join-Path $repoRoot "assets\audio\filmcow\forest-distant-bird.manifest.json") -Destination $audioDestination
 $null = Copy-Horde162RuntimeAssets -RepositoryRoot $repoRoot -AssetRoot (Join-Path $windowsStage "assets") -Platform Windows
 $null = Copy-HordeMusicRuntimeAssets -RepositoryRoot $repoRoot -AssetRoot (Join-Path $windowsStage "assets")
 

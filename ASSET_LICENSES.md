@@ -1,5 +1,28 @@
 # Asset Licenses
 
+## Generic distant forest bird candidate (1.7 development)
+
+`assets/audio/filmcow/forest_distant_bird.wav` derives from the existing private
+FilmCow Recorded SFX archive's exact `distand bird.wav` (source SHA-256
+`eeec1e8ebae3af6395640fb0086cb2ebf006724efbb4859e93fb9c5b4a9de8a4`).
+FilmCow's custom royalty-free project-use terms apply, as for the existing
+showcase/equipment subsets below: personal/commercial project use is permitted;
+national-government, law-enforcement and SPLC/CAHN-designated hate-group uses
+are prohibited. This is **not CC0**; do not claim authorship or redistribute the
+private original as a standalone sound library. Official source/terms:
+https://filmcow.itch.io/filmcow-sfx . Voluntary credit: FilmCow Royalty Free Sound
+Effects Library - FilmCow.
+
+Only one mono 48 kHz PCM16 runtime derivative and its compact provenance
+manifest enter packages. `tools/prepare-forest-bird.py` reproduces the inspected
+FFmpeg 9 conversion without gain, pitch, crop, filters or looping; original
+source remains private and unchanged. Runtime SHA-256:
+`811c2a1d10a565615dd786ef4b99fda5dd0e4465aa121e36ad9158531d6902ff`.
+It is an 8.288-second **generic distant bird candidate**, not an identified
+nocturnal species or complete forest soundscape. Listening, night suitability,
+mix and exact-device acceptance remain pending. This repository-native recipe
+does not claim canonical game-dev CLI package admission.
+
 ## Prepared original woodland rocks (1.7 development)
 
 The low boulder, upright crag and split shelf are the three original Horde

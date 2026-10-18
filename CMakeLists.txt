@@ -1282,6 +1282,15 @@ if(BUILD_TESTING)
     add_test(NAME horde_rt_input_mailbox_stress COMMAND horde_rt_input_mailbox_stress)
 
     add_executable(horde_rt_desktop_controller_input_tests tests/DesktopControllerInputTests.cpp)
+    if(TARGET horde_rt_probe_core)
+        add_executable(horde_rt_forest_bird_ambience_tests tests/ForestBirdAmbienceTests.cpp)
+        target_link_libraries(horde_rt_forest_bird_ambience_tests PRIVATE horde_rt_probe_core)
+        target_compile_definitions(horde_rt_forest_bird_ambience_tests PRIVATE HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
+        add_test(NAME horde_rt_forest_bird_ambience_tests COMMAND horde_rt_forest_bird_ambience_tests)
+        # The ordinary-input production-terrain fixture measures ~47s in Debug,
+        # versus ~4s in Release; retain room for unoptimised CI execution.
+        set_tests_properties(horde_rt_forest_bird_ambience_tests PROPERTIES TIMEOUT 120)
+    endif()
     target_include_directories(horde_rt_desktop_controller_input_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     target_link_libraries(horde_rt_desktop_controller_input_tests PRIVATE horde_gameplay_simulation)
     add_test(NAME horde_rt_desktop_controller_input_tests COMMAND horde_rt_desktop_controller_input_tests)

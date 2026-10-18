@@ -1880,6 +1880,9 @@ bool PlayXAudioFile(const std::filesystem::path& path,
 void UpdateChapterDialogueAudio(VulkanSurfaceContext& context)
 {
     if(gCampaignHiddenValidation)return;
+    if(!horde::gameplay::simulation::ForestBirdAmbience::Eligible(context.simulation.Snapshot()) ||
+       !context.controlsEnabled || MeasurementPausedByUi(context) || context.sfxVolumePercent<=0 ||
+       GetForegroundWindow()!=context.windowHandle)SpatialAudioEngine().StopLoop("forest_bird");
     using horde::gameplay::dialogue::Line;
     const auto& dialogue = context.simulation.Snapshot().chapterDialogue;
     const auto line = dialogue.line;
@@ -2207,10 +2210,29 @@ void DrainGameplayEvents(VulkanSurfaceContext& context)
         PlayPositionalSoundEffect(context, "skeleton_falling_bones.wav", 0.36f, event, "pixabay");
     });
 
+    std::uint64_t latestForestSignal=0;
+    for(const auto& event:context.simulation.Events().Events())
+        if(event.type==GameplayEventType::ForestBird || event.type==GameplayEventType::ForestBirdStopped)latestForestSignal=event.sequence;
     for (const GameplayEvent& event : context.simulation.Events().Events())
     {
         switch (event.type)
         {
+        case GameplayEventType::ForestBird:
+            if(event.sequence!=latestForestSignal)break;
+            if(context.controlsEnabled && !context.simulationPaused && context.sfxVolumePercent>0 &&
+               GetForegroundWindow()==context.windowHandle &&
+               horde::gameplay::simulation::ForestBirdAmbience::Eligible(context.simulation.Snapshot())) {
+                auto& audio=SpatialAudioEngine();audio.StopLoop("forest_bird");
+                const auto gains=horde::gameplay::CalculateSpatialAudio(
+                    {event.worldX,event.worldZ,event.intensity,1.f,14.f,event.worldY},
+                    {event.listenerX,event.listenerZ,event.listenerYawRadians,event.listenerY});
+                (void)audio.Play(ResolveAssetRoot()/"audio/filmcow/forest_distant_bird.wav",gains.left,gains.right,
+                    "forest_bird",0,0,horde::platform::windows::WindowsSfxSourceGain(1.f,context.sfxVolumePercent));
+            }
+            break;
+        case GameplayEventType::ForestBirdStopped:
+            if(event.sequence!=latestForestSignal)break;
+            SpatialAudioEngine().StopLoop("forest_bird");break;
         case GameplayEventType::PlayerWetFootstep:
         {
             const unsigned variant = static_cast<unsigned>(context.playerFootstepVariant++) & 3u;
@@ -4050,6 +4072,7 @@ bool HasDeviceExtension(VkPhysicalDevice physicalDevice, const char* extensionNa
 
 void ClearDesktopInput(VulkanSurfaceContext& context)
 {
+    if(!gCampaignHiddenValidation)SpatialAudioEngine().StopLoop("forest_bird");
     if (context.crouchHeld) context.crouchKeyBlockedUntilRelease = true;
     context.crouchHeld = false;
     context.controllerCrouchHeld = false;

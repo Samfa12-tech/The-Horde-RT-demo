@@ -221,6 +221,8 @@ public class MainActivity extends Activity {
     private static final float PLAYER_DRY_FOOTSTEP_GAIN = 0.29f;
     private static final float PLAYER_WET_FOOTSTEP_GAIN = 1.0f;
     private static final int PLATFORM_EVENT_WATERFALL_CONTACT = 27;
+    private static final int PLATFORM_EVENT_FOREST_BIRD = 28;
+    private static final int PLATFORM_EVENT_FOREST_BIRD_STOPPED = 29;
     private static final int EQUIPMENT_AUDIO_SWORD_DRAW = 1;
     private static final int EQUIPMENT_AUDIO_SWORD_SHEATH = 2;
     private static final int ENTITY_LICH = 3;
@@ -279,6 +281,8 @@ public class MainActivity extends Activity {
     private int latestSubtitleInputMode = SUBTITLE_INPUT_TOUCH;
     private long chapterVoiceGeneration = Long.MIN_VALUE;
     private int chapterVoiceStream;
+    private int forestBirdStream;
+    private boolean forestBirdDialogueActive;
     private boolean chapterVoicePaused;
     private boolean chapterSubtitleOverflowReported;
     private String combatTeachingFadeText = "";
@@ -909,6 +913,7 @@ public class MainActivity extends Activity {
     }
 
     private void stopSurface() {
+        stopForestBird();
         cancelCombatTeachingPromptPoll();
         clearCombatTeachingPrompt();
         stopMenuAmbience();
@@ -1592,6 +1597,7 @@ public class MainActivity extends Activity {
         // Publish the absolute camera and a neutral, paused input sample before native owner acknowledgement.
         setGameplayPaused(true);
         clearTouchState();
+        stopForestBird();
         ++delayedGameplayFeedbackGeneration;
         clearVerticalProofFeedbackSelection();
         suspendAndResetWaterfall();
@@ -3237,6 +3243,7 @@ public class MainActivity extends Activity {
     }
 
     private void updateChapterDialoguePresentation(int surfaceState) {
+        forestBirdDialogueActive = true; // Fail closed while the coherent line is unavailable.
         if (chapterSubtitlePanel == null) return;
         final long[] state;
         final String text;
@@ -3264,6 +3271,7 @@ public class MainActivity extends Activity {
         }
         final int line = (int) state[0];
         if (line <= 0 || text == null || text.isEmpty()) {
+            forestBirdDialogueActive = false;
             chapterSubtitlePanel.setVisibility(View.GONE);
             chapterSubtitleGeneration = Long.MIN_VALUE;
             chapterDialogueSkipPendingGeneration = Long.MIN_VALUE;
@@ -3279,6 +3287,7 @@ public class MainActivity extends Activity {
             return;
         }
         final long generation = state[1];
+        stopForestBird(); // Kit has priority even when captions or Voice gain are muted.
         if (chapterDialogueSkipPendingGeneration != generation)
             chapterDialogueSkipPendingGeneration = Long.MIN_VALUE;
         final boolean hiddenByUi = !resumed || !surfaceStarted || surfaceState != 1 || menuVisible ||
@@ -3345,6 +3354,7 @@ public class MainActivity extends Activity {
     }
 
     private void pauseChapterVoice(boolean paused) {
+        if (paused) stopForestBird();
         if (chapterVoiceStream == 0 || soundPool == null || chapterVoicePaused == paused) return;
         if (paused) soundPool.pause(chapterVoiceStream);
         else soundPool.resume(chapterVoiceStream);
@@ -5035,6 +5045,7 @@ public class MainActivity extends Activity {
     }
 
     private void setGameplayPaused(boolean paused) {
+        if (paused) stopForestBird();
         if(!paused && (campaignMenuVisible || (campaignState!=null && campaignState.loadBarrier()))) paused=true;
         if (paused) { clearRunIntent(); clearCrouchIntent(); }
         if (paused) suspendAndResetWaterfall(); // Same generation retains the Core cursor.
@@ -5100,6 +5111,7 @@ public class MainActivity extends Activity {
 
     private void resetRoute() {
         clearRunIntent();
+        stopForestBird();
         ++delayedGameplayFeedbackGeneration;
         clearVerticalProofFeedbackSelection();
         suspendAndResetWaterfall();
@@ -5640,6 +5652,7 @@ public class MainActivity extends Activity {
             Toast.makeText(this, R.string.retry_unavailable, Toast.LENGTH_LONG).show();
             return;
         }
+        stopForestBird();
         ++delayedGameplayFeedbackGeneration;
         campaignFromDeath=false;
         campaignDeathMessage=null;
@@ -5872,6 +5885,11 @@ public class MainActivity extends Activity {
                 // the new surface resumes.
                 if (resumed && surfaceStarted && state == 1) {
                     final long[] platformEvents = ProbeBridge.drainPlatformEvents();
+                    int latestForestSignal=-1;
+                    for(int i=0;i+2<platformEvents.length;i+=3) {
+                        final int type=(int)(platformEvents[i]&0xffL);
+                        if(type==PLATFORM_EVENT_FOREST_BIRD || type==PLATFORM_EVENT_FOREST_BIRD_STOPPED)latestForestSignal=i;
+                    }
                     for (int eventIndex = 0; !debugMotionActive && eventIndex + 2 < platformEvents.length; eventIndex += 3) {
                     final long metadata = platformEvents[eventIndex];
                     final long stereoGains = platformEvents[eventIndex + 1];
@@ -5881,6 +5899,12 @@ public class MainActivity extends Activity {
                     final int equipmentAudioCue = (int) ((metadata >>> 24) & 0xffL);
                     final long eventSequence = (metadata >>> 32) & 0xffffffffL;
                     switch (eventType) {
+                        case PLATFORM_EVENT_FOREST_BIRD:
+                            if(eventIndex==latestForestSignal)playForestBird(stereoGains);
+                            break;
+                        case PLATFORM_EVENT_FOREST_BIRD_STOPPED:
+                            if(eventIndex==latestForestSignal)stopForestBird();
+                            break;
                         case PLATFORM_EVENT_PLAYER_WET_FOOTSTEP:
                             playSpatialSound(wetFootstepSoundKey(playerStepVariant++), PLAYER_WET_FOOTSTEP_GAIN,
                                     stereoGains, verticalMetadata);
@@ -6560,6 +6584,7 @@ public class MainActivity extends Activity {
         loadSound("water_wet_step_3", "audio/pixabay/water_wet_step_3_core.wav");
         loadSound("water_wet_step_4", "audio/pixabay/water_wet_step_4_core.wav");
         loadSound("water_stream_contact", "audio/pixabay/water_stream_contact_core.wav");
+        loadSound("forest_distant_bird", "audio/filmcow/forest_distant_bird.wav");
         loadSound("skeleton_step_1", "audio/filmcow/skeleton_step_1.wav");
         loadSound("skeleton_step_2", "audio/filmcow/skeleton_step_2.wav");
         loadSound("skeleton_attack", "audio/filmcow/skeleton_attack.wav");
@@ -6653,6 +6678,7 @@ public class MainActivity extends Activity {
     }
 
     private void updateWaterfallLoop() {
+        if (!forestBirdAudible()) stopForestBird();
         if (waterfallPlayback == null) return;
         final boolean audible = resumed && surfaceStarted && !menuVisible && !diagnosticsVisible &&
                 !benchmarkRunning && preferences.getBoolean("sfx_enabled", true) &&
@@ -6691,6 +6717,30 @@ public class MainActivity extends Activity {
         } catch (final Exception exception) {
             Log.e(TAG, "Failed to stage " + assetPath, exception);
         }
+    }
+
+    private boolean forestBirdAudible() {
+        return resumed && surfaceStarted && hasWindowFocus() && !forestBirdDialogueActive &&
+                !menuVisible && !campaignMenuVisible && !diagnosticsVisible && !graphicsVisible &&
+                !rtLabVisible && !playtestReportVisible && !benchmarkRunning && !debugMotionActive &&
+                !deathOverlayVisible && !endingOverlayVisible && preferences.getBoolean("sfx_enabled", true) &&
+                preferences.getInt("sfx_volume", 70)>0;
+    }
+
+    private void stopForestBird() {
+        if (soundPool!=null && forestBirdStream!=0) soundPool.stop(forestBirdStream);
+        forestBirdStream=0;
+    }
+
+    private void playForestBird(long packedStereoGains) {
+        if (!forestBirdAudible() || soundPool==null) return;
+        final Integer id=sounds.get("forest_distant_bird");
+        if (id==null) return;
+        synchronized(loadedSounds) { if (!loadedSounds.contains(id)) return; }
+        stopForestBird(); // One finite voice; never queue/retry a missed ambience cue.
+        final float gain=preferences.getInt("sfx_volume",70)/100.f;
+        forestBirdStream=soundPool.play(id,gain*clamp(Float.intBitsToFloat((int)packedStereoGains),0,1),
+                gain*clamp(Float.intBitsToFloat((int)(packedStereoGains>>>32)),0,1),0,0,1.f);
     }
 
     private void playSound(final String key, final float mixGain) {
@@ -7067,6 +7117,7 @@ public class MainActivity extends Activity {
         controllerWindowFocused=focused;
         currentControllerDialog();
         if (!focused) {
+            stopForestBird();
             clearRunIntent();
             clearCrouchIntent();
             stopMenuAmbience();
@@ -7711,6 +7762,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onPause() {
+        stopForestBird();
         campaignAcknowledgedToken=campaignAcknowledgedGeneration=0;
         campaignRebaseAttemptToken=campaignRebaseAttemptGeneration=campaignRebaseAttemptRevision=0;
         dismissCampaignConfirmation();
@@ -7767,6 +7819,7 @@ public class MainActivity extends Activity {
         handler.removeCallbacks(runStartupUpdateCheck);
         startupUpdateCheckScheduled = false;
         handler.removeCallbacks(refreshRtLabTelemetry);
+        stopForestBird();
         ++delayedGameplayFeedbackGeneration;
         suspendAndResetWaterfall();
         if (vibrator != null) vibrator.cancel();

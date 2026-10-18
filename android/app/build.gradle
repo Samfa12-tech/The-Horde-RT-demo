@@ -476,6 +476,7 @@ tasks.register('prepareRuntimeAssets', Sync) {
         include 'audio/menu/menu_chain.wav'
         include 'audio/menu/asset.manifest.json'
         include 'audio/filmcow/*.wav'
+        include 'audio/filmcow/forest-distant-bird.manifest.json'
         include 'audio/filmcow/equipment/sword_draw.wav'
         include 'audio/filmcow/equipment/sword_sheath.wav'
         include 'audio/filmcow/equipment/asset.manifest.json'

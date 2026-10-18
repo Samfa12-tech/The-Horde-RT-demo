@@ -155,6 +155,7 @@ std::uint32_t GameSimulation::AdvanceFrame(const InputSnapshot& publishedInput,
     }
     if (input.paused)
     {
+        forestBird_.Reset();
         ClearCrouchIntent();
         combatContactTrace_.Clear();
         gameplayTimeScale_ = 1.0f;
@@ -383,6 +384,14 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
     // movement and poses still share the teaching time scale; pause freezes both.
     UpdateChapterDialogue(input,dialogueDeltaSeconds);
     RefreshSnapshot(input);
+    if(dialogueDeltaSeconds>0) {
+        const auto bird=forestBird_.Step(ForestBirdAmbience::Eligible(snapshot_));
+        // Distance is already in the recording. Preserve a centred ambient
+        // source/listener tuple rather than invent a perched gameplay actor.
+        if(bird!=ForestBirdAmbience::Cue::None)
+            Emit(bird==ForestBirdAmbience::Cue::Play?GameplayEventType::ForestBird:GameplayEventType::ForestBirdStopped,
+                EntityId::Invalid,EntityId::Invalid,playerX_,playerZ_,1.f,0,playerSupport_.worldY);
+    }
     if(fixedDeltaSeconds>0 && !input.paused)LatchCampaignBoundary();
     snapshot_.eventsEmittedThisTick = events_.Size() - eventsBefore;
 }
@@ -391,6 +400,7 @@ void GameSimulation::SynchronizePausedInput(const InputSnapshot& input,
                                             const std::uint64_t inputPublicationSequence,
                                             const PausedInputPolicy policy)
 {
+    forestBird_.Reset();
     lastInput_ = input;
     lastInput_.paused = true;
     combatContactTrace_.Clear();
@@ -686,6 +696,7 @@ void GameSimulation::SetDevelopmentSupportFixture(bool enabled, std::uint64_t ge
 
 void GameSimulation::ResetRoute()
 {
+    forestBird_.Reset();
     ClearCampaignBoundary();
     CancelCampaignRestore();
     if(staticDetailLease_.resourceGeneration) {
