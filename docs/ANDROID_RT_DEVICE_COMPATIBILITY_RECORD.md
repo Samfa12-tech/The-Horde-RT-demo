@@ -3116,3 +3116,37 @@ removed the phone. No more device work until it returns. Current/Higher and
 saved Lower normalization on this candidate, complete live chapter, lifecycle,
 sustained performance and owner audio/haptic/visual acceptance remain pending.
 [Exact receipt and separate Windows Release baseline](evidence/2026-10-14-release-route-baseline/README.md).
+
+### 18 October - bounded cold checkpoint 207 and ordinary opening review
+
+Owner-authorized Samsung **SM-S948B**, freshly inspected Android **17 / API 37**,
+build `CP2A.260605.016.S948BXXS4BZIG`, Adreno 840, Vulkan 1.4.295 / raw driver
+2150932499. Separate Debug APK from local commit
+`0d6c22d698604d527b85fddb33f6db1fadedf2ed`, SHA-256
+`24e286544a801035a65e1b8f75d7259a27f5792b907d32552bc29882cb5cedfa`
+(183,665,114 bytes), was installed in place after package/code10 and identical
+public development-signer verification; installed bytes matched. Horde was not
+running beforehand. Release app, security settings and owner saves were not
+targeted. No uninstall or data clearing occurred.
+
+Evidence class: two finite cold-start Pipeline Diagnostic/Mobile captures with
+opened foreground screenshots and current fence-owned completed RT frames.
+`chapter-kit-reunion`/207 reaches 12 stable presented frames at tick 1436,
+X -28.7023 / Z -5.8033; the fresh ordinary `opening` control also reaches 12. Both
+show 3/3 hearts, genuine RT-produced swapchain presentation and the saved 40%
+576x1188 dispatch into 1440x2971 swapchain, CURRENT shadows and unchanged quality.
+The historical 207 tick 0 failure did **not recur**; its cause remains unattributed,
+and this result is not a claim that the failure was fixed. Early capability-file
+completed-frame snapshots remain pending; the later showcase states carry the
+actual current completed/presented identities.
+
+Latest individual GPU samples are 187.054318 ms at reunion and 19.715416 ms at
+opening; they are frozen-view Diagnostic observations, not sustained FPS or a
+matched comparison with earlier Shipping workloads. No performance loop ran.
+The 274 `files/`/`shared_prefs/` path inventory and Horde settings bytes are
+unchanged; Android's framework activity-ID preference changed normally on
+launch and was not restored. Debug was stopped after the isolated cases.
+Query, Save/Load, menus/touch, Home/resume, process-death save recovery,
+POSIX/power-loss durability, sustained warm performance and owner visual/audio/
+haptic acceptance remain untested on this candidate. No other device is certified.
+[Exact scope, custody, frame identities and hashes](evidence/2026-10-18-phone-checkpoint-review/README.md).
