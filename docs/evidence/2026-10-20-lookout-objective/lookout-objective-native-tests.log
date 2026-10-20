@@ -1,0 +1,18 @@
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+    Start 32: horde_rt_windows_lookout_objective_panel_tests
+1/3 Test #32: horde_rt_windows_lookout_objective_panel_tests ...***Failed    1.60 sec
+FAIL: hidden fixture preserves foreground owner throughout
+42 Windows lookout panel checks, 1 failures
+
+    Start 35: horde_rt_campaign_play_session_tests
+2/3 Test #35: horde_rt_campaign_play_session_tests .............   Passed    4.80 sec
+    Start 43: horde_rt_campaign_checkpoint_tests
+3/3 Test #43: horde_rt_campaign_checkpoint_tests ...............   Passed    2.50 sec
+
+67% tests passed, 1 tests failed out of 3
+
+Total Test time (real) =   8.92 sec
+
+The following tests FAILED:
+	 32 - horde_rt_windows_lookout_objective_panel_tests (Failed)
+Errors while running CTest

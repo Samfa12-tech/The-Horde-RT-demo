@@ -1,5 +1,23 @@
 # Horde 1.7 current design index
 
+## Player-opened lookout objective - local milestone, 20 October 2026
+
+The [optional lookout objective](../evidence/2026-10-20-lookout-objective/README.md)
+is now implemented in Android/Windows pause menus after completed-story lookout
+eligibility. No automatic arrival modal; Continue/Back/Escape/controller cancel
+clear input, and Return uses the existing RT entry path without save/reset.
+All 381 Java tests, 1026 checkpoint/145 play-session/44 native panel checks and
+Windows/four-ABI builds pass. The first panel foreground failure is preserved
+with unknown cause; the safer hidden rerun records unchanged foreground HWNDs.
+
+Sam's direct mobile Mist Off instruction is preserved verbatim. The phone was
+released idle at his unplug request, with all settings/12 campaign files
+unchanged and no new install, transfer, fixture staging or launch. Physical
+panel/endpoint acceptance is deferred. Continue with isolated hidden Windows RT
+lookout load/panel/Return evidence; wider natural route/contact/controller/audio/
+warm-performance gates remain open. Earlier entries retain their dated scope.
+
+
 ## Forest endpoint and corrected graphics follow-up - local milestone, 20 October 2026
 
 The [forest checkpoint slice](../evidence/2026-10-20-forest-endpoint/README.md)

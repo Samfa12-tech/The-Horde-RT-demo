@@ -1,4 +1,5 @@
 #include "gameplay/simulation/GameSimulation.h"
+#include "gameplay/campaign/LookoutObjective.h"
 #include "gameplay/DevelopmentCheckpointSimulation.h"
 #include "gameplay/traversal/ChapterTerrainMovement.h"
 #include "scene/ChapterTerrainSurface.h"
@@ -419,6 +420,21 @@ int main() {
         GameSimulation sim(ProductionGameSimulationConfig());
         if(!Restore(sim,c,terrain)) {Check(false,"forest endpoint restores into fresh production simulation");continue;}
         const auto loaded=sim.Snapshot();CheckClean(loaded);
+        Check(cp::LookoutObjectiveAvailable(loaded,sim.LatestCampaignBoundary()),
+            "completed grounded lookout restore permits an explicit objective request");
+        auto unavailable=loaded;unavailable.playerAlive=false;
+        Check(!cp::LookoutObjectiveAvailable(unavailable,sim.LatestCampaignBoundary()) &&
+            !cp::LookoutObjectiveAvailable(loaded,std::nullopt),
+            "death or an unearned boundary cannot expose a chapter-completion panel");
+        unavailable=loaded;unavailable.chapterDialogue.line=dlg::Line::ForestVillage;
+        Check(!cp::LookoutObjectiveAvailable(unavailable,sim.LatestCampaignBoundary()),
+            "active final speech keeps the optional objective unavailable");
+        unavailable=loaded;unavailable.playerX-=3.f;
+        Check(!cp::LookoutObjectiveAvailable(unavailable,sim.LatestCampaignBoundary()),
+            "the completed objective does not follow the player away from the lookout");
+        unavailable=loaded;unavailable.worldRoute.readiness[static_cast<std::size_t>(WorldZoneId::Lookout)]=ZoneReadiness::Preparing;
+        Check(!cp::LookoutObjectiveAvailable(unavailable,sim.LatestCampaignBoundary()),
+            "unready resources cannot expose the lookout panel");
         const auto playerGround=tr::ChapterExteriorSupport(terrain.get(),c.position.x,c.position.z);
         const auto kitGround=terrain->Query(c.position.x+1.f,c.position.z);
         Check(loaded.worldRoute.current==WorldZoneId::Lookout && loaded.rescue.exteriorSide &&

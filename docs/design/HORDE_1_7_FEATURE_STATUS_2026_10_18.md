@@ -22,8 +22,11 @@ adds exact-artifact Home recovery and preview/Image/rotation UI evidence, and
 saves the owner's latest explicit Mist Off while preserving all campaign bytes.
 Controller hardware, renderer orientation/aspect and broader physical acceptance
 remain open. The feature rows below retain their dated evidence; forest endpoint
-is no longer a missing implementation, while the player-opened endpoint objective
-panel and Kit acting remain missing/partial integration.
+is no longer a missing implementation. The [player-opened endpoint objective
+panel](../evidence/2026-10-20-lookout-objective/README.md) is now implemented on both
+platforms with 381 Java tests and focused native checks/builds passing; physical
+panel/endpoint acceptance is deferred at the owner's phone-unplug request.
+Kit acting remains partial integration.
 
 ## Authority and status meanings
 

@@ -1,5 +1,16 @@
 # Android RT Device Compatibility Record
 
+## 2026-10-20 - phone idle release; lookout panel build only
+
+SM-S948B / Android 17 API 37 remains on corrected Debug APK c5a11bb2. A completed
+read-only check confirms no Debug PID, saved Mist Off/pending false and exact
+previous settings/all 12 campaign records/locks. Sam then requested unplug;
+phone work stopped before any install, transfer, fixture staging or launch.
+The new lookout objective candidate passes 381 Java tests and all four Debug
+ABIs **only**; no new physical endpoint/panel/controller/RT acceptance is claimed.
+[Exact build identity, idle custody and deferred gates](evidence/2026-10-20-lookout-objective/README.md).
+
+
 ## 2026-10-20 - single Apply/save noncombat UI acceptance
 
 SM-S948B / Android 17 API 37 normal-entry portrait UI at existing font scale 1.7 and
@@ -35,7 +46,7 @@ Pipeline RT. This is a frozen noncombat preparation evidence class only.
 Native rejects an empty arm token, retires successfully and records zero timed
 frames. Whole sequence stops; Off/closing requests never launch, no retry or new
 performance claim. Host missing-file guard is corrected;11 offline guard tests
-and23 analyzer tests pass. No Debug process, byte-exact settings/all12 campaign
+and23 analyzer tests pass. No Debug process, byte-exact settings/all 12 campaign
 records/locks, Release untouched. Next gate: exact arm transport/readback before
 publication; prospective host correction is not physically exercised.
 [Receipt and preserved failure](evidence/2026-10-20-keeper-mist/renewed/README.md).

@@ -73,6 +73,7 @@
 #include "platform/android/AndroidRtLabState.h"
 #include "platform/android/AndroidMusicPlayback.h"
 #include "platform/android/SurfaceSessionMailbox.h"
+#include "gameplay/campaign/LookoutObjective.h"
 #include "platform/android/SurfacePresentationPolicy.h"
 #include "platform/android/GameplayEventMetadata.h"
 #include "platform/android/AndroidDebugRequestAdmission.h"
@@ -771,6 +772,7 @@ std::atomic<std::uint64_t> gCombatTeachingUiState{0u};
 std::mutex gChapterDialogueUiMutex;
 horde::gameplay::dialogue::Snapshot gChapterDialogueUiSnapshot{};
 std::string gChapterDialogueUiText;
+std::array<jlong,4> gLookoutObjectiveUiState{}; // guarded by gChapterDialogueUiMutex
 std::mutex gDebugRequestAdmissionMutex;
 
 horde::platform::android::DebugRequestAdmissionState ReadDebugRequestAdmissionStateLocked()
@@ -981,6 +983,10 @@ void PublishSimulationUiState()
     {
         std::lock_guard<std::mutex> lock(gChapterDialogueUiMutex);
         gChapterDialogueUiSnapshot = simulation.chapterDialogue;
+        gLookoutObjectiveUiState={1,static_cast<jlong>(gSwapchainContext.surfaceGeneration),
+            static_cast<jlong>(simulation.worldRoute.generation),
+            horde::gameplay::campaign::LookoutObjectiveAvailable(simulation,
+                gGameSimulation.LatestCampaignBoundary())?1:0};
         const auto& line = horde::gameplay::dialogue::Spec(simulation.chapterDialogue.line);
         gChapterDialogueUiText = simulation.chapterDialogue.line ==
                 horde::gameplay::dialogue::Line::None
@@ -6537,6 +6543,20 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_getChapterDialogueText(JNIEnv* env, 
     if (static_cast<jlong>(gChapterDialogueUiSnapshot.generation) != generation)
         return env->NewStringUTF("");
     return env->NewStringUTF(gChapterDialogueUiText.c_str());
+}
+
+extern "C" JNIEXPORT jlongArray JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_getLookoutObjectiveState(JNIEnv* env, jclass, jlong generation)
+{
+    std::array<jlong,4> state{};
+    {
+        std::lock_guard<std::mutex> lock(gChapterDialogueUiMutex);
+        if(generation>0 && gSurfaceSessions.State(static_cast<std::uint64_t>(generation))==1 &&
+            gLookoutObjectiveUiState[1]==generation)state=gLookoutObjectiveUiState;
+    }
+    const auto result=env->NewLongArray(static_cast<jsize>(state.size()));
+    if(result)env->SetLongArrayRegion(result,0,static_cast<jsize>(state.size()),state.data());
+    return result;
 }
 
 extern "C" JNIEXPORT jlong JNICALL

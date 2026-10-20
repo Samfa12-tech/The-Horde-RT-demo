@@ -523,6 +523,10 @@ public class MainActivity extends Activity {
     private long campaignRequest, campaignAcknowledgedToken, campaignAcknowledgedGeneration;
     private long campaignRebaseAttemptToken, campaignRebaseAttemptGeneration, campaignRebaseAttemptRevision;
     private AlertDialog campaignConfirmation;
+    private boolean lookoutObjectiveVisible;
+    private long lookoutObjectiveEpoch;
+    private LookoutObjectiveState lookoutObjectiveState;
+    private LinearLayout lookoutObjectivePanel;
     private final Runnable refreshCampaignMenu = new Runnable() {
         @Override public void run() {
             if(campaignDestroyed || !resumed || (!campaignMenuVisible && campaignRequest==0)) return;
@@ -1160,6 +1164,7 @@ public class MainActivity extends Activity {
     }
 
     private void showMainMenu(final boolean firstLaunch) {
+        invalidateLookoutObjective();
         if (shouldUseEntryMenu(firstLaunch)) {
             entryMenuEnabled = true;
             entryMenuSidePage = false;
@@ -1205,6 +1210,13 @@ public class MainActivity extends Activity {
         });
         addMenuButtonRow(panel, "Save checkpoint", () -> showCampaignMenu(CampaignMenuState.SAVE_MANUAL),
                 "Load checkpoint", () -> showCampaignMenu(CampaignMenuState.LOAD));
+        final LookoutObjectiveState lookout=readLookoutObjective();
+        if(lookout!=null && lookout.available) {
+            final long menuEpoch=lookoutObjectiveEpoch;
+            addMenuButton(panel,"Lookout objective",() -> {
+                if(menuEpoch==lookoutObjectiveEpoch)showLookoutObjective(lookout);
+            });
+        }
         final Runnable restartAction = () -> {
             playSound("ui_select", 0.18f);
             resetRoute();
@@ -1229,6 +1241,55 @@ public class MainActivity extends Activity {
                 getString(R.string.credits), this::showCredits,
                 getString(R.string.quit), this::finishAndRemoveTask);
         attachPanel(panel);
+    }
+
+    private LookoutObjectiveState readLookoutObjective() {
+        if(!resumed || entryMenuEnabled || deathOverlayVisible || endingOverlayVisible ||
+                graphicsVisible || graphicsSceneRestoring || campaignMenuVisible ||
+                (campaignState!=null && campaignState.loadBarrier()) ||
+                ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration)!=1)return null;
+        try {
+            return LookoutObjectiveState.decode(ProbeBridge.getLookoutObjectiveState(surfaceRequestGeneration),
+                    surfaceRequestGeneration);
+        } catch(RuntimeException | LinkageError unavailable) {return null;}
+    }
+
+    private void invalidateLookoutObjective() {
+        lookoutObjectiveVisible=false;lookoutObjectiveState=null;lookoutObjectivePanel=null;++lookoutObjectiveEpoch;
+    }
+
+    private void showLookoutObjective(LookoutObjectiveState expected) {
+        if(!menuVisible || !controllerWindowFocused || expected==null || !expected.matches(readLookoutObjective()))return;
+        // Opening is an explicit pause-menu action. No arrival poll invokes this page.
+        clearTouchState();setGameplayPaused(true);
+        invalidateLookoutObjective();lookoutObjectiveVisible=true;lookoutObjectiveState=expected;
+        final long epoch=lookoutObjectiveEpoch;
+        menuScrim.removeAllViews();
+        final LinearLayout panel=createPanel("The road ahead","FOREST LOOKOUT");
+        lookoutObjectivePanel=panel;
+        addBody(panel,"The village lies beyond the trees. Continue exploring the lookout with Kit.");
+        addBody(panel,"The onward journey to the village belongs to a future chapter.");
+        final Button exploring=createMenuButton("Continue exploring",() -> finishLookoutObjective(epoch,expected,false));
+        panel.addView(exploring,menuButtonLayoutParams());
+        addMenuButton(panel,"Return to menu",() -> finishLookoutObjective(epoch,expected,true));
+        attachPanel(panel);
+        if(controllerMode)ControllerNavigation.ensureFocus(menuScrim);
+        else exploring.requestFocus();
+    }
+
+    private void finishLookoutObjective(long epoch,LookoutObjectiveState expected,boolean returnToMenu) {
+        if(!lookoutObjectiveVisible || epoch!=lookoutObjectiveEpoch || !resumed || !controllerWindowFocused)return;
+        ViewParent owner=lookoutObjectivePanel==null?null:lookoutObjectivePanel.getParent();
+        while(owner instanceof View && owner!=menuScrim)owner=owner.getParent();
+        if(owner!=menuScrim)return;
+        if(!expected.matches(readLookoutObjective())) {
+            showMainMenu(false);return; // A replaced world remains paused; old UI cannot resume it.
+        }
+        invalidateLookoutObjective();clearTouchState();
+        if(returnToMenu) {
+            entryMenuEnabled=true;entryMenuSidePage=false;entryPlayRequested=false;entryMenuFailed=false;
+            showEntryMenu(false);
+        } else hideMenu();
     }
 
     private boolean isReducedMotionEnabled() {
@@ -1258,6 +1319,7 @@ public class MainActivity extends Activity {
     }
 
     private void showEntryMenu(final boolean sidePage) {
+        invalidateLookoutObjective();
         closeBenchmarkSummaryReview();
         interfaceVisible = false;
         menuVisible = true;
@@ -3089,6 +3151,7 @@ public class MainActivity extends Activity {
     }
 
     private void hideMenu() {
+        invalidateLookoutObjective();
         if(campaignMenuVisible || (campaignState!=null && campaignState.loadBarrier())) return;
         if (entryMenuEnabled) {
             cancelPendingEntryPlay();
@@ -5248,6 +5311,7 @@ public class MainActivity extends Activity {
     }
 
     private void showDiagnostics(final boolean errorState) {
+        invalidateLookoutObjective();
         menuVisible = true;
         diagnosticsVisible = true;
         diagnosticsErrorState = errorState;
@@ -5321,6 +5385,7 @@ public class MainActivity extends Activity {
     }
 
     private void renderDeathOverlay() {
+        invalidateLookoutObjective();
         deathOverlayVisible = true;
         menuVisible = true;
         setGameplayPaused(true);
@@ -7032,6 +7097,7 @@ public class MainActivity extends Activity {
     }
 
     private void attachPanel(final LinearLayout panel) {
+        if(lookoutObjectiveVisible && panel!=lookoutObjectivePanel)invalidateLookoutObjective();
         if (entryMenuEnabled) ensureEntryMenuTargets(panel);
         menuScrim.setBackgroundColor(0xC7080706);
         final ScrollView scroller = new ScrollView(this);
@@ -7268,6 +7334,12 @@ public class MainActivity extends Activity {
                 finishEnvironmentSurvey(3);
             return true;
         }
+        if(lookoutObjectiveVisible && event!=null && event.isFromSource(InputDevice.SOURCE_KEYBOARD) &&
+                event.getKeyCode()==KeyEvent.KEYCODE_ESCAPE) {
+            if(event.getAction()==KeyEvent.ACTION_UP)
+                finishLookoutObjective(lookoutObjectiveEpoch,lookoutObjectiveState,false);
+            return true;
+        }
         if (!AndroidControllerInput.isControllerKey(event)) {
             if (event != null && event.isFromSource(InputDevice.SOURCE_KEYBOARD) &&
                     (event.getKeyCode() == KeyEvent.KEYCODE_CTRL_LEFT || event.getKeyCode() == KeyEvent.KEYCODE_CTRL_RIGHT)) {
@@ -7337,6 +7409,7 @@ public class MainActivity extends Activity {
         controllerWindowFocused=focused;
         currentControllerDialog();
         if (!focused) {
+            if(lookoutObjectiveVisible)showMainMenu(false);
             stopForestBird();
             clearRunIntent();
             clearCrouchIntent();
@@ -7758,6 +7831,9 @@ public class MainActivity extends Activity {
             dismissCampaignConfirmation(); return;
         }
         if(campaignMenuVisible) { backFromCampaignMenu(); return; }
+        if(lookoutObjectiveVisible) {
+            finishLookoutObjective(lookoutObjectiveEpoch,lookoutObjectiveState,false);return;
+        }
         if (backExitDialog != null && backExitDialog.isShowing()) {
             backExitDialog.cancel();
             return;
@@ -7994,6 +8070,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onPause() {
+        if(lookoutObjectiveVisible)showMainMenu(false);
         if (environmentSurveyMode) {
             resumed = false;
             finishEnvironmentSurvey(3);
@@ -8100,6 +8177,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
+        invalidateLookoutObjective();
         if (environmentSurveyMode) {
             finishEnvironmentSurvey(3);
             stopEnvironmentSurveySurface();

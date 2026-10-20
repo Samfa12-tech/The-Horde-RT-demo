@@ -12,6 +12,10 @@ unchanged. [Exact artifact and file hashes](receipt.json).
 | Ordinary draft after preview | Back preserves the pre-preview unsaved Mist On draft and correctly labels it Not saved, while Saved/effective remain Off. Restore explicitly discards that draft and requested/Saved/effective all become Off. [Before Restore](27-preview-back.xml), [after](28-ordinary-restored.xml). |
 | Controller | No external controller/joystick was attached. Actual input inventory was read; no synthetic gamepad acceptance is claimed. This physical gate remains open. |
 
+The direct request from Sam in this Horde thread was:
+
+> mist off on mobile because when it is on, during the keeper fight, we also have those two lights on and all together it was pretty chuggy.
+
 The owner explicitly requested **Mist Off** during this follow-up. It therefore
 remains saved Off, superseding the earlier request to restore the original On.
 Resolution stays 40%, water/fire Mobile, cap 30, Glass Off, Current shadows and

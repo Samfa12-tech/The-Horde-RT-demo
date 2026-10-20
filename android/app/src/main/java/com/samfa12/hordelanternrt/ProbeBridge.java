@@ -62,6 +62,8 @@ public final class ProbeBridge {
     public static native void requestCombatTeachingReplay();
     /** Coherent immutable chapter dialogue publication: line, generation, elapsed/duration ms, paused. */
     public static native long[] getChapterDialogueState();
+    /** Coherent lookout availability: schema, surface generation, world generation, available. */
+    public static native long[] getLookoutObjectiveState(long surfaceGeneration);
     /** Speaker and exact catalog text from the same render-owner publication. */
     public static native String getChapterDialogueText(long generation);
     /** Packed Float left/right planar gains from the shared spatial-audio model. */

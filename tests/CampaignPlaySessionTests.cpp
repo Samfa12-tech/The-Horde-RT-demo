@@ -51,7 +51,7 @@ struct Faults:io::FaultInjector {
         return op==io::Operation::Write && failWrite.load();
     }
 };
-int ExportFixtures(const fs::path& requested) {
+int ExportFixtures(const fs::path& requested,const std::shared_ptr<const sim::TriangleSupportSurface>& lookout={}) {
     std::error_code error;
     const auto directory=fs::absolute(requested,error).lexically_normal();
     if(error || !directory.filename().string().starts_with("horde-campaign-fixtures-") ||
@@ -61,6 +61,27 @@ int ExportFixtures(const fs::path& requested) {
     const auto reports=fs::canonical(fs::path(HORDE_RT_SOURCE_DIR)/"reports",error);if(error)return 2;
     const auto temporary=fs::canonical(fs::temp_directory_path(),error);if(error || (parent!=reports && parent!=temporary)){
         std::cerr<<"Fixture directory must be a direct child of repository reports or system temporary directory.\n";return 2;}
+    if(lookout) {
+        auto c=Record(2,true);c.id=cp::CheckpointId::ForestEndpoint;c.contentRevision=2;
+        c.zone=sim::WorldZoneId::Lookout;
+        const auto p=sim::kWorldRoutePoints.back();
+        const auto ground=lookout->Query(p.x,p.z);
+        if(!ground.found || !ground.walkable)return 1;
+        c.position={p.x,ground.worldY,p.z};c.yaw=2.51f;c.pitch=-.15f;
+        c.dialogue.waitingForRaise=false;c.dialogue.proofAccepted=true;
+        c.dialogue.forestNightConsumed=c.dialogue.forestWaystoneConsumed=true;
+        c.dialogue.forestClueConsumed=c.dialogue.forestVillageConsumed=true;
+        sim::GameSimulation probe(sim::ProductionGameSimulationConfig());
+        if(!Seed(probe,c,lookout))return 1;
+        const auto name=cp::SaveBasename(*cp::SaveTarget(0,cp::SaveKind::Autosave));
+        if(io::Write(directory,name,c).status!=io::Status::Committed)return 1;
+        std::ofstream manifest(directory/"manifest.json",std::ios::binary);
+        manifest<<"{\"evidenceClass\":\"seeded noncombat lookout recovery; not earned progression\","
+            "\"record\":\""<<name<<"\",\"checkpoint\":\"ForestEndpoint\",\"contentRevision\":2,\"hearts\":2}\n";
+        manifest.close();
+        if(!manifest)return 1;
+        std::cout<<"Exported one create-only seeded lookout autosave to "<<directory.string()<<'\n';return 0;
+    }
     std::ofstream manifest(directory/"manifest.json",std::ios::binary);
     if(!manifest)return 2;
     manifest<<"{\"evidenceClass\":\"seeded persistence fixtures; not normal campaign completion\",\"hashAlgorithm\":\"fnv1a64\",\"records\":[";
@@ -449,13 +470,15 @@ void EndpointWriteFailure(const std::shared_ptr<const sim::TriangleSupportSurfac
 }
 int main(int argc,char** argv){
     if(argc==3 && std::string_view(argv[1])=="--export-fixtures")return ExportFixtures(argv[2]);
-    if(argc!=1)return 2;
+    const bool exportLookout=argc==3 && std::string_view(argv[1])=="--export-lookout-fixture";
+    if(argc!=1 && !exportLookout)return 2;
     const auto assets=fs::path(HORDE_RT_SOURCE_DIR)/"assets/models/world/runtime/chapter-terrain-v1";
     horde::scene::assets::AssetManifest manifest;horde::scene::assets::StaticMeshAsset mesh;std::string error;
     if(!horde::scene::assets::AssetManifest::Load(assets/"asset.manifest.json",manifest,error) ||
        !horde::scene::assets::StaticMeshAsset::Load(assets/"chapter-terrain-lod0.runtime.glb",manifest,mesh,error)){
         std::cerr<<error;return 1;}
     const auto terrain=horde::scene::PrepareChapterTerrainSurface(mesh,error);if(!terrain){std::cerr<<error;return 1;}
+    if(exportLookout)return ExportFixtures(argv[2],terrain);
     Directory directory;Faults faults;
     Check(io::Write(directory.path,cp::SaveBasename(*cp::SaveTarget(0,cp::SaveKind::Manual)),Record(1)).status==io::Status::Committed,"seed first manual");
     Check(io::Write(directory.path,cp::SaveBasename(*cp::SaveTarget(2,cp::SaveKind::Manual)),Record(2,true)).status==io::Status::Committed,"seed third manual");

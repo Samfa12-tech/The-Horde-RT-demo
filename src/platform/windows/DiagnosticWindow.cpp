@@ -9,6 +9,8 @@
 #include "platform/windows/WindowsMusicPlayback.h"
 #include "platform/windows/WindowsMusicFocus.h"
 #include "platform/windows/WindowsCampaignMenu.h"
+#include "platform/windows/WindowsLookoutObjectivePanel.h"
+#include "gameplay/campaign/LookoutObjective.h"
 #include "gameplay/campaign/CampaignPlaySession.h"
 #include "gameplay/campaign/CampaignLoadBarrier.h"
 #include "platform/windows/GraphicsMenuNavigation.h"
@@ -148,6 +150,8 @@ namespace
 
 constexpr char kWindowClassName[] = "HordeRtDiagnosticWindowClass";
 constexpr int kCampaignSaveButtonId=4300,kCampaignLoadButtonId=4301;
+constexpr int kLookoutObjectiveButtonId=4302;
+using LookoutPanel=horde::platform::windows::WindowsLookoutObjectivePanel;
 // Debug validation owns only an unshown HWND, isolated save directory and RT
 // targets. It must never acquire foreground input or touch the owner's INI.
 bool gCampaignHiddenValidation=false;
@@ -479,6 +483,8 @@ struct VulkanSurfaceContext
     bool entryPlayQueued = false;
     bool entryPlayHandoffPending = false;
     bool entryLoadingVisible = false;
+    bool lookoutAppActive=true,lookoutMovementNeedsFreshKeyDown=false;
+    std::unique_ptr<LookoutPanel> lookoutObjective;
     horde::graphics::EntryMenuSession entryMenu;
     horde::audio::MenuCreakDelivery menuCreakDelivery;
     horde::vulkan::raytracing::RtSceneProfile graphicsReturnProfile =
@@ -717,6 +723,8 @@ void UpdateChestPrompt(VulkanSurfaceContext& context);
 int ScaleForDpi(HWND window, int logicalPixels);
 void LayoutOverlayControls(HWND window, int width, int height);
 void ApplyDpiScaledFonts(HWND window);
+void InstallControllerFocusOutline(HWND control);
+void SetEntryLoadingVisible(VulkanSurfaceContext&,bool);
 void OpenCampaignMenu(VulkanSurfaceContext&,horde::platform::windows::WindowsCampaignMenu::Page);
 void RefreshCampaignMenu(VulkanSurfaceContext&);
 void PumpCampaign(VulkanSurfaceContext&);
@@ -2842,7 +2850,8 @@ bool MeasurementPausedByUi(const VulkanSurfaceContext& context)
     const bool pauseVisible = context.pauseMenuVisible && !context.settingsVisible &&
                               !context.diagnosticsVisible &&
                               !context.benchmarkReportVisible && !context.rtLabVisible;
-    return context.campaignPause || (context.campaignMenu && context.campaignMenu->Visible()) ||
+    return (context.lookoutObjective && context.lookoutObjective->Visible()) ||
+           context.campaignPause || (context.campaignMenu && context.campaignMenu->Visible()) ||
            pauseVisible || context.settingsVisible || context.rtLabVisible ||
            context.diagnosticsVisible || context.benchmarkReportVisible;
 }
@@ -2911,11 +2920,25 @@ void RefreshCombatTeachingPrompt(VulkanSurfaceContext& context)
     SetControlVisible(context.windowHandle, kCombatTeachingPromptId, true);
 }
 
+LookoutPanel::View CurrentLookoutObjectiveView(const VulkanSurfaceContext& context)
+{
+    const auto& snapshot=context.simulation.Snapshot();
+    const bool available=context.controlsEnabled && context.pauseMenuVisible && !context.entryMenuVisible &&
+        !context.settingsVisible && !context.diagnosticsVisible && !context.benchmarkReportVisible &&
+        !context.graphicsVisible && !context.rtLabVisible && !context.deathOverlayVisible && !context.endingOverlayVisible &&
+        !context.campaignPause && !(context.campaignMenu && context.campaignMenu->Visible()) &&
+        !context.benchmark.IsRunning() && context.rtScene.Profile()==horde::vulkan::raytracing::RtSceneProfile::Showcase &&
+        horde::gameplay::campaign::LookoutObjectiveAvailable(snapshot,context.simulation.LatestCampaignBoundary());
+    return {available,context.lookoutAppActive,snapshot.worldRoute.generation,context.campaignSurfaceGeneration};
+}
+
 void ApplyOverlayState(VulkanSurfaceContext& context)
 {
+    if(context.lookoutObjective)context.lookoutObjective->Refresh(CurrentLookoutObjectiveView(context));
+    const bool lookoutVisible=context.lookoutObjective && context.lookoutObjective->Visible();
     const bool pauseVisible = context.pauseMenuVisible && !context.settingsVisible &&
                               !context.diagnosticsVisible && !context.benchmarkReportVisible &&
-                              !context.rtLabVisible;
+                              !context.rtLabVisible && !lookoutVisible;
     for (const int id : {kPauseTitleId, kResumeButtonId, kRestartButtonId, kExitButtonId})
     {
         SetControlVisible(context.windowHandle, id, pauseVisible);
@@ -3103,6 +3126,8 @@ void ApplyOverlayState(VulkanSurfaceContext& context)
         !context.entryMenuVisible && !context.deathOverlayVisible && !context.endingOverlayVisible);
     SetControlVisible(context.windowHandle,kCampaignLoadButtonId,pauseVisible && !campaignVisible &&
         (!context.entryMenuVisible || context.entryMoreVisible) && !context.endingOverlayVisible);
+    const auto lookoutView=CurrentLookoutObjectiveView(context);
+    SetControlVisible(context.windowHandle,kLookoutObjectiveButtonId,pauseVisible && lookoutView.available && lookoutView.active);
     if(campaignVisible) {
         EnumChildWindows(context.windowHandle,[](HWND child,LPARAM)->BOOL {
             const int id=GetDlgCtrlID(child);
@@ -3110,6 +3135,13 @@ void ApplyOverlayState(VulkanSurfaceContext& context)
             return TRUE;
         },0);
         RefreshCampaignMenu(context);
+    }
+    if(lookoutVisible) {
+        EnumChildWindows(context.windowHandle,[](HWND child,LPARAM)->BOOL {
+            const int id=GetDlgCtrlID(child);
+            if(id<LookoutPanel::TitleId || id>LookoutPanel::BackId)ShowWindow(child,SW_HIDE);
+            return TRUE;
+        },0);
     }
 }
 
@@ -3359,6 +3391,64 @@ horde::platform::windows::WindowsPlaytestReportContext CapturePlaytestReportCont
     return report;
 }
 
+void OpenLookoutObjective(VulkanSurfaceContext& context)
+{
+    const auto view=CurrentLookoutObjectiveView(context);
+    if(!view.available || !view.active)return;
+    if(!context.lookoutObjective)context.lookoutObjective=std::make_unique<LookoutPanel>();
+    const auto font=reinterpret_cast<HFONT>(SendMessageA(GetDlgItem(context.windowHandle,kResumeButtonId),WM_GETFONT,0,0));
+    if(!context.lookoutObjective->Open(context.windowHandle,view,font))return;
+    for(auto control:context.lookoutObjective->ActionControls())InstallControllerFocusOutline(control);
+    ApplyOverlayState(context);
+    RECT client{};GetClientRect(context.windowHandle,&client);
+    LayoutOverlayControls(context.windowHandle,client.right,client.bottom);
+    FocusGameControl(GetDlgItem(context.windowHandle,LookoutPanel::ContinueId));
+}
+
+void FinishLookoutObjective(VulkanSurfaceContext& context,LookoutPanel::Action action)
+{
+    if(context.lookoutObjective)context.lookoutObjective->Close();
+    ClearDesktopInput(context);DiscardDesktopPendingCommands(context);
+    const auto& snapshot=context.simulation.Snapshot();
+    context.cameraYaw=snapshot.playerYawRadians;context.cameraPitch=snapshot.playerPitchRadians;
+    context.simulationInput.yawRadians=context.cameraYaw;context.simulationInput.pitchRadians=context.cameraPitch;
+    context.simulationInput.hasAuthoritativePlayerPose=false;context.simulationInput.combatEdgeHistory={};
+    context.simulationInput.dialogueCompletionLine=0;context.simulationInput.dialogueCompletionGeneration=0;
+    context.lookoutMovementNeedsFreshKeyDown=true;context.lastControlSteadyNs=0;
+    if(action==LookoutPanel::Action::ContinueExploring) {ShowPauseMenu(context,false);return;}
+    // Reuse the branded RT entry profile. Its existing retirement path retains
+    // the paused logical simulation and latest boundary; no reset/save/write.
+    context.entryMenu.Reset();context.entryMenu.SetReducedMotion(context.reducedMotionEnabled);
+    context.entryMenuVisible=true;context.entryMoreVisible=false;
+    context.entryPlayQueued=context.entryPlayHandoffPending=false;
+    SetEntryLoadingVisible(context,false);
+    context.pauseMenuVisible=true;context.settingsVisible=context.diagnosticsVisible=context.benchmarkReportVisible=false;
+    context.sceneProfile=horde::vulkan::raytracing::RtSceneProfile::EntryMenu;
+    context.sceneProfileDirty=context.rtScene.Profile()!=context.sceneProfile;
+    ApplyOverlayState(context);ApplyDpiScaledFonts(context.windowHandle);
+    RECT client{};GetClientRect(context.windowHandle,&client);
+    LayoutOverlayControls(context.windowHandle,client.right,client.bottom);
+    FocusGameControl(GetDlgItem(context.windowHandle,kResumeButtonId));
+}
+
+void CancelLookoutObjective(VulkanSurfaceContext& context)
+{
+    if(!context.lookoutObjective || !context.lookoutObjective->Visible())return;
+    // Dispatch the native command directly. Keyboard/controller cancellation
+    // must not synthesize mouse/focus behavior, including in an unshown owner.
+    SendMessageA(context.windowHandle,WM_COMMAND,MAKEWPARAM(LookoutPanel::BackId,BN_CLICKED),
+        reinterpret_cast<LPARAM>(GetDlgItem(context.windowHandle,LookoutPanel::BackId)));
+}
+
+void RevokeLookoutObjective(VulkanSurfaceContext& context)
+{
+    if(!context.lookoutObjective || !context.lookoutObjective->Visible())return;
+    context.lookoutObjective->Close();context.pauseMenuVisible=true;
+    ApplyOverlayState(context);
+    RECT client{};GetClientRect(context.windowHandle,&client);
+    LayoutOverlayControls(context.windowHandle,client.right,client.bottom);
+}
+
 void OpenPlaytestReport(VulkanSurfaceContext& context)
 {
     // The form is only reachable from paused/menu UI. A Help-menu request made
@@ -3424,6 +3514,7 @@ void OpenPlaytestReport(VulkanSurfaceContext& context)
 
 void ResetRoute(VulkanSurfaceContext& context, const bool preserveBenchmark = false)
 {
+    if(context.lookoutObjective)context.lookoutObjective->Close();
     if (!preserveBenchmark)
     {
         context.benchmarkEvidence.Cancel();
@@ -3479,6 +3570,7 @@ void TryGrantRtLabUnlock(VulkanSurfaceContext& context, const bool finaleComplet
 
 void ShowDeathMenu(VulkanSurfaceContext& context)
 {
+    if(context.lookoutObjective)context.lookoutObjective->Close();
     if (context.deathOverlayVisible)
     {
         return;
@@ -4175,6 +4267,12 @@ void DiscardDesktopPendingCommands(VulkanSurfaceContext& context)
 
 std::vector<HWND> VisibleControllerMenuControls(const VulkanSurfaceContext& context)
 {
+    if(context.lookoutObjective && context.lookoutObjective->Visible()) {
+        std::vector<HWND> controls;
+        for(auto control:context.lookoutObjective->ActionControls())
+            if(control && IsWindowVisible(control) && IsWindowEnabled(control))controls.push_back(control);
+        return controls;
+    }
     if(context.campaignMenu && context.campaignMenu->Visible()) {
         std::vector<HWND> controls;
         for(int id:{4110,4111,4112,4113,4114,4115,4120,4121,4122,4123}) {
@@ -4188,7 +4286,7 @@ std::vector<HWND> VisibleControllerMenuControls(const VulkanSurfaceContext& cont
         kEntryMoreButtonId,
         kEntryBackButtonId,
         kRestartButtonId,
-        kCampaignSaveButtonId,kCampaignLoadButtonId,
+        kCampaignSaveButtonId,kCampaignLoadButtonId,kLookoutObjectiveButtonId,
         kControlsButtonId,
         kSettingsButtonId,
         kReportProblemButtonId,
@@ -4363,6 +4461,7 @@ void NavigateGraphicsMenu(VulkanSurfaceContext& context,
 
 void CancelControllerMenu(VulkanSurfaceContext& context)
 {
+    if(context.lookoutObjective && context.lookoutObjective->Visible()) {CancelLookoutObjective(context);return;}
     if(context.campaignMenu && context.campaignMenu->Visible()) {
         context.campaignMenu->HandleCommand(4121);return;
     }
@@ -4479,6 +4578,7 @@ void HandleControllerMenuEdges(
 {
     if (edges.togglePause)
     {
+        if(context.lookoutObjective && context.lookoutObjective->Visible()) {CancelLookoutObjective(context);return;}
         if (context.rtLabVisible)
         {
             CloseRtLab(context);
@@ -8781,6 +8881,11 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         if (!ApplyPendingOutputResize(context, capabilities, timingSamples))
         { renderFailed = true; break; }
 
+        if(context.lookoutObjective && context.lookoutObjective->Visible() &&
+           !context.lookoutObjective->Refresh(CurrentLookoutObjectiveView(context))) {
+            ApplyOverlayState(context);
+            RECT client{};GetClientRect(hWnd,&client);LayoutOverlayControls(hWnd,client.right,client.bottom);
+        }
         if (!context.graphicsPreviewCapture && !context.outputResizeValidation && !context.nativeMotionValidation)
             PollDesktopController(context);
 
@@ -9248,6 +9353,8 @@ void ApplyDpiScaledFonts(HWND window)
                          kPauseTitleId,
                          kEndingBodyId,
                          kResumeButtonId,
+                         kLookoutObjectiveButtonId,
+                         LookoutPanel::TitleId,LookoutPanel::BodyId,LookoutPanel::ContinueId,LookoutPanel::MenuId,LookoutPanel::BackId,
                          kEntryMoreButtonId,
                          kEntryBackButtonId,
                          kRestartButtonId,
@@ -9427,6 +9534,9 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
         RECT bounds{inset,inset,width-inset,height-inset};
         sceneContext->campaignMenu->Layout(bounds);return;
     }
+    if(sceneContext && sceneContext->lookoutObjective && sceneContext->lookoutObjective->Visible()) {
+        sceneContext->lookoutObjective->Layout({inset,inset,width-inset,height-inset},ScaleForDpi(window,96));return;
+    }
     if (sceneContext && sceneContext->benchmarkReportVisible)
     {
         const int reportTitleHeight = ScaleForDpi(window, 42);
@@ -9507,8 +9617,10 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
 
     const int buttonWidth = std::min(ScaleForDpi(window, 420),
                                      std::max(ScaleForDpi(window, 220), width - ScaleForDpi(window, 64)));
+    const bool lookoutEntryShown=sceneContext && IsWindowVisible(GetDlgItem(window,kLookoutObjectiveButtonId));
+    const int pauseButtonCount=12+(lookoutEntryShown?1:0);
     const int buttonHeight = std::min(ScaleForDpi(window,38),std::max(ScaleForDpi(window,24),
-        (height-ScaleForDpi(window,24+54+11*8))/12));
+        (height-ScaleForDpi(window,24+54+(pauseButtonCount-1)*8))/pauseButtonCount));
     const int gap = ScaleForDpi(window, 8);
     const int titleHeight = ScaleForDpi(window, 48);
     const int titleAdvance = ScaleForDpi(window, 54);
@@ -9520,7 +9632,7 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
     const int compactButtonCount = 4;
     const int pauseTotal = compactOverlayLayout
         ? titleHeight + endingBodyHeight + (endingLayout ? gap : 0) + compactButtonCount * buttonHeight + compactButtonCount * gap
-        : titleHeight + 12 * buttonHeight + 11 * gap;
+        : titleHeight + pauseButtonCount * buttonHeight + (pauseButtonCount-1) * gap;
     const int pauseX = (width - buttonWidth) / 2;
     int y = std::max(ScaleForDpi(window, 12), (height - pauseTotal) / 2);
     if (HWND title = GetDlgItem(window, kPauseTitleId)) MoveWindow(title, pauseX, y, buttonWidth, titleHeight, TRUE);
@@ -9572,10 +9684,11 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
     }
     else
     {
-        for (const int id : {kResumeButtonId, kCampaignSaveButtonId,kCampaignLoadButtonId,kRestartButtonId, kControlsButtonId, kSettingsButtonId,
+        for (const int id : {kResumeButtonId,kLookoutObjectiveButtonId,kCampaignSaveButtonId,kCampaignLoadButtonId,kRestartButtonId, kControlsButtonId, kSettingsButtonId,
                              kReportProblemButtonId, kRtLabButtonId, kDiagnosticsButtonId,
                              kRunBenchmarkButtonId, kMoreBySamfa12ButtonId, kExitButtonId})
         {
+            if(id==kLookoutObjectiveButtonId && !lookoutEntryShown)continue;
             if (HWND control = GetDlgItem(window, id)) MoveWindow(control, pauseX, y, buttonWidth, buttonHeight, TRUE);
             y += buttonHeight + gap;
         }
@@ -10141,6 +10254,20 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 return 0;
             }
             const int commandId = LOWORD(wParam);
+            if(LookoutPanel::Handles(commandId)) {
+                if(sceneContext->lookoutObjective) {
+                    const bool visible=sceneContext->lookoutObjective->Visible();
+                    const auto action=sceneContext->lookoutObjective->Consume(commandId,reinterpret_cast<HWND>(lParam),
+                        CurrentLookoutObjectiveView(*sceneContext));
+                    if(action)FinishLookoutObjective(*sceneContext,*action);
+                    else if(visible && !sceneContext->lookoutObjective->Visible())ApplyOverlayState(*sceneContext);
+                }
+                return 0;
+            }
+            if(sceneContext->lookoutObjective && sceneContext->lookoutObjective->Visible()) {
+                if(commandId==kMenuPauseId)CancelLookoutObjective(*sceneContext);
+                if(commandId!=kExitButtonId && commandId!=kMenuExitId)return 0;
+            }
             if(sceneContext->campaignMenu && sceneContext->campaignMenu->HandleCommand(commandId))return 0;
             if(sceneContext->campaignMenu && sceneContext->campaignMenu->Visible() &&
                commandId!=kExitButtonId && commandId!=kMenuExitId)return 0;
@@ -10157,6 +10284,10 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
             }
             switch (commandId)
             {
+            case kLookoutObjectiveButtonId:
+                if(HIWORD(wParam)==BN_CLICKED && reinterpret_cast<HWND>(lParam)==GetDlgItem(hWnd,kLookoutObjectiveButtonId))
+                    OpenLookoutObjective(*sceneContext);
+                return 0;
             case kCampaignSaveButtonId:
                 OpenCampaignMenu(*sceneContext,horde::platform::windows::WindowsCampaignMenu::Page::Save);return 0;
             case kCampaignLoadButtonId:
@@ -10568,6 +10699,10 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         if (sceneContext && sceneContext->controlsEnabled)
         {
             sceneContext->teachingControllerGlyphs = false;
+            if(wParam==VK_ESCAPE && sceneContext->lookoutObjective && sceneContext->lookoutObjective->Visible()) {
+                if((lParam & (1ll<<30))==0)CancelLookoutObjective(*sceneContext);
+                return 0;
+            }
             if(wParam==VK_ESCAPE && sceneContext->campaignMenu && sceneContext->campaignMenu->Visible()){sceneContext->campaignMenu->HandleCommand(4121);return 0;}
             if (sceneContext->simulationPaused && wParam == VK_TAB && (lParam & (1ll << 30)) == 0)
             {
@@ -10787,7 +10922,8 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 return 0;
             }
 #endif
-            if (wParam == 'R' && !sceneContext->simulationPaused)
+            if (wParam == 'R' && !sceneContext->simulationPaused &&
+                (!sceneContext->lookoutMovementNeedsFreshKeyDown || (lParam & (1ll<<30))==0))
             {
                 ResetRoute(*sceneContext);
                 PlaySoundEffect(*sceneContext, "ui_select.wav");
@@ -10826,7 +10962,9 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                     ++sceneContext->runToggleSequence;
                 return 0;
             }
-            if (IsDesktopGameplayAvailable(*sceneContext) && SetDesktopMovementKey(*sceneContext, wParam, true))
+            if (IsDesktopGameplayAvailable(*sceneContext) &&
+                (!sceneContext->lookoutMovementNeedsFreshKeyDown || (lParam & (1ll<<30))==0) &&
+                SetDesktopMovementKey(*sceneContext, wParam, true))
             {
                 return 0;
             }
@@ -10945,6 +11083,8 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
     case WM_ACTIVATEAPP:
         if (sceneContext)
         {
+            sceneContext->lookoutAppActive=wParam!=FALSE;
+            if(wParam==FALSE)RevokeLookoutObjective(*sceneContext);
             if (wParam == FALSE) { ClearDesktopInput(*sceneContext); DiscardDesktopPendingCommands(*sceneContext); sceneContext->controllerFocusLatch.LoseFocus(); StopMenuAmbience(*sceneContext); }
             PublishMusicPlayback(*sceneContext, wParam == FALSE);
         }
@@ -10956,11 +11096,14 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
     case WM_ACTIVATE:
         if (sceneContext)
         {
+            sceneContext->lookoutAppActive=LOWORD(wParam)!=WA_INACTIVE;
+            if(LOWORD(wParam)==WA_INACTIVE)RevokeLookoutObjective(*sceneContext);
             if (LOWORD(wParam) == WA_INACTIVE) { ClearDesktopInput(*sceneContext); DiscardDesktopPendingCommands(*sceneContext); sceneContext->controllerFocusLatch.LoseFocus(); StopMenuAmbience(*sceneContext); }
             PublishMusicPlayback(*sceneContext, LOWORD(wParam) == WA_INACTIVE);
         }
         break;
     case WM_SIZE:
+        if(sceneContext && wParam==SIZE_MINIMIZED)RevokeLookoutObjective(*sceneContext);
         if (sceneContext && sceneContext->benchmark.IsRunning() && wParam != SIZE_MINIMIZED)
         {
             CancelBenchmark(*sceneContext, true, "window-size");
@@ -11540,6 +11683,7 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     createButton(kEntryMoreButtonId, "MORE");
     createButton(kEntryBackButtonId, "BACK");
     createButton(kResumeButtonId, "ENTER THE RUIN / RESUME");
+    createButton(kLookoutObjectiveButtonId,"LOOKOUT OBJECTIVE");
     createButton(kRestartButtonId, "RESTART ROUTE");
     createButton(kCampaignSaveButtonId,"SAVE CHECKPOINT...");
     createButton(kCampaignLoadButtonId,"LOAD...");
