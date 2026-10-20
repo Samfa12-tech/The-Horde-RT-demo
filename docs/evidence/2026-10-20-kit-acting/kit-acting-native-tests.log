@@ -1,0 +1,29 @@
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+      Start  35: horde_rt_campaign_play_session_tests
+ 1/12 Test  #35: horde_rt_campaign_play_session_tests ............   Passed    4.44 sec
+      Start  36: horde_rt_campaign_session_tests
+ 2/12 Test  #36: horde_rt_campaign_session_tests .................   Passed    1.21 sec
+      Start  40: horde_rt_campaign_codec_tests
+ 3/12 Test  #40: horde_rt_campaign_codec_tests ...................   Passed    0.02 sec
+      Start  42: horde_rt_chapter_dialogue_tests
+ 4/12 Test  #42: horde_rt_chapter_dialogue_tests .................   Passed    1.03 sec
+      Start  43: horde_rt_companion_acting_tests
+ 5/12 Test  #43: horde_rt_companion_acting_tests .................   Passed    0.02 sec
+      Start  44: horde_rt_campaign_checkpoint_tests
+ 6/12 Test  #44: horde_rt_campaign_checkpoint_tests ..............   Passed    2.33 sec
+      Start  56: horde_rt_graphics_preview_frame_adapter_tests
+ 7/12 Test  #56: horde_rt_graphics_preview_frame_adapter_tests ...   Passed    0.93 sec
+      Start  96: horde_rt_skinned_node_pose_batch_tests
+ 8/12 Test  #96: horde_rt_skinned_node_pose_batch_tests ..........   Passed    1.16 sec
+      Start 191: horde_rt_static_geometry_cutover_tests
+ 9/12 Test #191: horde_rt_static_geometry_cutover_tests ..........   Passed    1.25 sec
+      Start 207: horde_rt_rescue_journey_integration_tests
+10/12 Test #207: horde_rt_rescue_journey_integration_tests .......   Passed    1.49 sec
+      Start 208: horde_rt_chapter_terrain_journey_tests
+11/12 Test #208: horde_rt_chapter_terrain_journey_tests ..........   Passed   16.23 sec
+      Start 209: horde_rt_kit_source_intake_tests
+12/12 Test #209: horde_rt_kit_source_intake_tests ................   Passed    1.81 sec
+
+100% tests passed, 0 tests failed out of 12
+
+Total Test time (real) =  31.95 sec

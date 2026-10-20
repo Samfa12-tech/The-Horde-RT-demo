@@ -1,0 +1,115 @@
+HORDE_LOOKOUT_FOREGROUND stage=fixture-admitted sample=1 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000000000 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=owner-created sample=2 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_PIPELINE_CACHE_CREATE attempted=1 result=0 available=1
+HORDE_LOOKOUT_FOREGROUND stage=runner-entered sample=3 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_CHECK isolated exported fixture and explicitly nonactivating hidden owner pass=1
+HORDE_LOOKOUT_FOREGROUND stage=before-native-command sample=4 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=after-native-command sample=5 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=before-native-command sample=6 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=after-native-command sample=7 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=owner-pump sample=8 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=after-owner-pump sample=9 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_CHECK ordinary entry More and Load controls finish read-only catalogue pass=1
+HORDE_LOOKOUT_FOREGROUND stage=before-native-command sample=32 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=after-native-command sample=33 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=owner-pump sample=34 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=after-owner-pump sample=35 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=before-rt-frame sample=36 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=after-rt-frame sample=37 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_WINDOWS_CAMPAIGN prepare ready=1 previous_scene_retained=1 diagnostic=
+HORDE_LOOKOUT_FOREGROUND stage=after-owner-pump sample=39 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=before-rt-frame sample=40 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=after-rt-frame sample=41 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=after-owner-pump sample=43 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_CHECK only slot one autosave loads through owner input rebase and matching successful RT presentation pass=1
+HORDE_LOOKOUT_FOREGROUND stage=before-gpu-drain sample=44 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=after-gpu-drain sample=45 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_CHECK loaded player and Kit use actual grounded forest support with completed quiet story and no automatic panel pass=1
+HORDE_LOOKOUT_FOREGROUND stage=before-lookout-image sample=46 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=after-lookout-image sample=47 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_CHECK original paused lookout RT storage image read back separately from logical support evidence pass=1
+HORDE_LOOKOUT_FOREGROUND stage=before-rt-frame sample=48 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=after-rt-frame sample=49 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=before-gpu-drain sample=50 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=after-gpu-drain sample=51 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_CHECK seeded Kit pose-only inspection has completed real RT and leaves logical story and acting unchanged pass=1
+HORDE_LOOKOUT_FOREGROUND stage=before-rt-frame sample=52 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=after-rt-frame sample=53 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=before-gpu-drain sample=54 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=after-gpu-drain sample=55 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_CHECK seeded Kit pose-only inspection has completed real RT and leaves logical story and acting unchanged pass=1
+HORDE_LOOKOUT_FOREGROUND stage=before-rt-frame sample=56 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=after-rt-frame sample=57 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=before-gpu-drain sample=58 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=after-gpu-drain sample=59 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_CHECK seeded Kit pose-only inspection has completed real RT and leaves logical story and acting unchanged pass=1
+HORDE_LOOKOUT_FOREGROUND stage=before-rt-frame sample=60 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=after-rt-frame sample=61 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_CHECK ordinary saved camera and neutral Kit pose return after diagnostic inspection pass=1
+HORDE_LOOKOUT_FOREGROUND stage=before-native-command sample=62 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=after-native-command sample=63 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_CHECK explicit native Resume queues exactly the production owner command pass=1
+HORDE_LOOKOUT_FOREGROUND stage=after-resume-owner-pump sample=64 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_CHECK one normal owner pump consumes Resume without failure pass=1
+HORDE_LOOKOUT_CHECK Resume owner command closes load chooser pass=1
+HORDE_LOOKOUT_CHECK Resume owner command releases both pause owners pass=1
+HORDE_LOOKOUT_CHECK Resume retains neutral input without automatically opening objective pass=1
+HORDE_LOOKOUT_FOREGROUND stage=before-rt-frame sample=65 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=after-rt-frame sample=66 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_CHECK first neutral live RT frame presents after Resume pass=1
+HORDE_LOOKOUT_FOREGROUND stage=before-rt-frame sample=67 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=after-rt-frame sample=68 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_CHECK second neutral live RT frame presents after Resume pass=1
+HORDE_LOOKOUT_CHECK neutral live simulation advances without replaying completed dialogue or opening objective pass=1
+HORDE_LOOKOUT_CHECK live endpoint capture independently confirms no active speech or queued continuation after Resume pass=1
+HORDE_LOOKOUT_FOREGROUND stage=before-pause-menu-command sample=69 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=after-pause-menu-command sample=70 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=before-native-command sample=71 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=after-native-command sample=72 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_CHECK explicit pause-menu Lookout objective opens the current native panel pass=1
+HORDE_LOOKOUT_FOREGROUND stage=before-native-command sample=73 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=after-native-command sample=74 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_CHECK native Continue releases panel input and resumes existing game pass=1
+HORDE_LOOKOUT_FOREGROUND stage=before-rt-frame sample=75 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=after-rt-frame sample=76 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_CHECK held-key autorepeat cannot move or reset the recovered game after Continue pass=1
+HORDE_LOOKOUT_FOREGROUND stage=before-pause-menu-command sample=77 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=after-pause-menu-command sample=78 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=before-native-command sample=79 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=after-native-command sample=80 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=before-native-command sample=81 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=after-native-command sample=82 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_CHECK reopened native Back safely continues without replacing checkpoint pass=1
+HORDE_LOOKOUT_FOREGROUND stage=before-pause-menu-command sample=83 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=after-pause-menu-command sample=84 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=before-native-command sample=85 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=after-native-command sample=86 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_CHECK objective explicitly reopens for keyboard cancel pass=1
+HORDE_LOOKOUT_FOREGROUND stage=after-own-window-escape sample=87 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_CHECK own-window Escape uses production cancellation without focus or physical input pass=1
+HORDE_LOOKOUT_FOREGROUND stage=before-pause-menu-command sample=88 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=after-pause-menu-command sample=89 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=before-native-command sample=90 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=after-native-command sample=91 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_CHECK objective explicitly reopens for controller cancel pass=1
+HORDE_LOOKOUT_FOREGROUND stage=after-controller-cancel sample=92 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_CHECK production controller cancel edge safely continues without polling a device pass=1
+HORDE_LOOKOUT_FOREGROUND stage=before-pause-menu-command sample=93 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=after-pause-menu-command sample=94 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=before-native-command sample=95 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=after-native-command sample=96 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=before-native-command sample=97 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=after-native-command sample=98 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_CHECK explicit Return to menu requests branded entry profile while retaining paused campaign pass=1
+HORDE_LOOKOUT_FOREGROUND stage=before-entry-replacement sample=99 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=after-entry-replacement sample=100 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=before-rt-frame sample=101 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=after-rt-frame sample=102 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=before-gpu-drain sample=103 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=after-gpu-drain sample=104 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_CHECK actual EntryMenu scene replacement and completed RT present retain player Kit story and checkpoint without save operation pass=1
+HORDE_LOOKOUT_CHECK source autosave and manifest bytes unchanged with zero attempted campaign writes pass=1
+HORDE_LOOKOUT_FOREGROUND stage=runner-finished sample=105 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_CHECK foreground continuity and hidden owner preserved within ninety-second stage budget pass=1
+HORDE_LOOKOUT_FOREGROUND stage=before-owner-destroy sample=106 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=owner-destroyed sample=107 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000920900 ours=0 shown=0

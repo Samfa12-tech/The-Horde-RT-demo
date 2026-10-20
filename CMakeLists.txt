@@ -298,6 +298,11 @@ if(BUILD_TESTING)
     target_link_libraries(horde_rt_chapter_dialogue_tests PRIVATE horde_gameplay_simulation)
     target_compile_definitions(horde_rt_chapter_dialogue_tests PRIVATE HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
     add_test(NAME horde_rt_chapter_dialogue_tests COMMAND horde_rt_chapter_dialogue_tests)
+    add_executable(horde_rt_companion_acting_tests tests/CompanionActingTests.cpp)
+    target_include_directories(horde_rt_companion_acting_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_compile_features(horde_rt_companion_acting_tests PRIVATE cxx_std_20)
+    add_test(NAME horde_rt_companion_acting_tests COMMAND horde_rt_companion_acting_tests)
+    set_tests_properties(horde_rt_companion_acting_tests PROPERTIES TIMEOUT 10)
     add_executable(horde_rt_campaign_checkpoint_tests tests/CampaignCheckpointTests.cpp
         src/scene/assets/AssetManifest.cpp src/scene/assets/AssetValidation.cpp
         src/scene/assets/GltfDocument.cpp src/scene/assets/StaticMeshAsset.cpp)

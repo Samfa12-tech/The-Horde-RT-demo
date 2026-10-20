@@ -1231,6 +1231,7 @@ private:
     std::uint64_t chapterActorPoseGeneration_ = UINT64_MAX;
     float chapterActorPoseSeconds_ = -1.0f;
     bool chapterActorWalking_ = false;
+    horde::gameplay::dialogue::CompanionActingPose chapterActorActing_{};
     PlayerRenderSlot playerRenderSlot_;
     horde::scene::assets::StaticMeshAsset developmentStaticAsset_;
     horde::scene::assets::StaticMeshAsset collapseStaticAsset_;

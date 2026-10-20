@@ -1616,7 +1616,8 @@ void SkinnedMeshAsset::CopyUniqueTextured(std::vector<TexturedSkinnedRtVertex>& 
 
 bool SkinnedMeshAsset::SkinUniquePbr(SkinnedClip clip, float time,
     std::vector<TexturedSkinnedRtVertex>& output,
-    std::vector<SkinnedPbrTangent>& tangents, std::string& diagnostic) const
+    std::vector<SkinnedPbrTangent>& tangents, std::string& diagnostic,
+    std::span<const SkinnedNodeRotation> additiveNodeRotations) const
 {
     output.clear();
     tangents.clear();
@@ -1625,7 +1626,7 @@ bool SkinnedMeshAsset::SkinUniquePbr(SkinnedClip clip, float time,
         diagnostic = "PBR clip skinning requires UVs, tangents and finite time.";
         return false;
     }
-    if (!SkinUniqueGeometry(clip, time, diagnostic, {}, &tangents))
+    if (!SkinUniqueGeometry(clip, time, diagnostic, additiveNodeRotations, &tangents))
     {
         tangents.clear();
         return false;

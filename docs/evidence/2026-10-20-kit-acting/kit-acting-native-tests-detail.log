@@ -1,0 +1,262 @@
+Start testing: Oct 20 22:15 AUS Eastern Summer Time
+----------------------------------------------------------
+35/220 Testing: horde_rt_campaign_play_session_tests
+35/220 Test: horde_rt_campaign_play_session_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_campaign_play_session_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_campaign_play_session_tests" start time: Oct 20 22:15 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+ordinary lower live=-34.0119,-17.5184 boundary=1 rope=1
+ordinary upper live=-33.7,-13.3383 speed=1.9 boundary=1
+145 campaign play session checks, 0 failures
+<end of output>
+Test time =   4.44 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_campaign_play_session_tests" end time: Oct 20 22:15 AUS Eastern Summer Time
+"horde_rt_campaign_play_session_tests" time elapsed: 00:00:04
+----------------------------------------------------------
+
+36/220 Testing: horde_rt_campaign_session_tests
+36/220 Test: horde_rt_campaign_session_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_campaign_session_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_campaign_session_tests" start time: Oct 20 22:15 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+77 campaign session checks, 0 failures
+<end of output>
+Test time =   1.21 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_campaign_session_tests" end time: Oct 20 22:15 AUS Eastern Summer Time
+"horde_rt_campaign_session_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+40/220 Testing: horde_rt_campaign_codec_tests
+40/220 Test: horde_rt_campaign_codec_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_campaign_codec_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_campaign_codec_tests" start time: Oct 20 22:15 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+2283 campaign codec checks, 0 failures
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_campaign_codec_tests" end time: Oct 20 22:15 AUS Eastern Summer Time
+"horde_rt_campaign_codec_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+42/220 Testing: horde_rt_chapter_dialogue_tests
+42/220 Test: horde_rt_chapter_dialogue_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_chapter_dialogue_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_chapter_dialogue_tests" start time: Oct 20 22:15 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+chapter dialogue: local/ordered/once/fallback/stale/manual-presented/real-simulation/layout cases passed
+<end of output>
+Test time =   1.03 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_chapter_dialogue_tests" end time: Oct 20 22:15 AUS Eastern Summer Time
+"horde_rt_chapter_dialogue_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+43/220 Testing: horde_rt_companion_acting_tests
+43/220 Test: horde_rt_companion_acting_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_companion_acting_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_companion_acting_tests" start time: Oct 20 22:15 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+150 companion acting checks, 0 failures
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_companion_acting_tests" end time: Oct 20 22:15 AUS Eastern Summer Time
+"horde_rt_companion_acting_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+44/220 Testing: horde_rt_campaign_checkpoint_tests
+44/220 Test: horde_rt_campaign_checkpoint_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_campaign_checkpoint_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_campaign_checkpoint_tests" start time: Oct 20 22:15 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+1026 campaign checkpoint checks, 0 failures
+<end of output>
+Test time =   2.33 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_campaign_checkpoint_tests" end time: Oct 20 22:15 AUS Eastern Summer Time
+"horde_rt_campaign_checkpoint_tests" time elapsed: 00:00:02
+----------------------------------------------------------
+
+56/220 Testing: horde_rt_graphics_preview_frame_adapter_tests
+56/220 Test: horde_rt_graphics_preview_frame_adapter_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_graphics_preview_frame_adapter_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_graphics_preview_frame_adapter_tests" start time: Oct 20 22:15 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.93 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_graphics_preview_frame_adapter_tests" end time: Oct 20 22:15 AUS Eastern Summer Time
+"horde_rt_graphics_preview_frame_adapter_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+96/220 Testing: horde_rt_skinned_node_pose_batch_tests
+96/220 Test: horde_rt_skinned_node_pose_batch_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_skinned_node_pose_batch_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_skinned_node_pose_batch_tests" start time: Oct 20 22:15 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+PASS: 763 cached/legacy normal cases including determinant boundaries
+PASS: batched skeleton node-pose sampling and rejection contracts
+<end of output>
+Test time =   1.16 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_skinned_node_pose_batch_tests" end time: Oct 20 22:15 AUS Eastern Summer Time
+"horde_rt_skinned_node_pose_batch_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+191/220 Testing: horde_rt_static_geometry_cutover_tests
+191/220 Test: horde_rt_static_geometry_cutover_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_static_geometry_cutover_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_static_geometry_cutover_tests" start time: Oct 20 22:15 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Keeper vertex lifetime checks: PASS
+<end of output>
+Test time =   1.25 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_static_geometry_cutover_tests" end time: Oct 20 22:15 AUS Eastern Summer Time
+"horde_rt_static_geometry_cutover_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+207/220 Testing: horde_rt_rescue_journey_integration_tests
+207/220 Test: horde_rt_rescue_journey_integration_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_rescue_journey_integration_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_rescue_journey_integration_tests" start time: Oct 20 22:15 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+claim-site position=-34,-17.55 prompt=0 phase=4
+cycle=0 ascent-end phase=4 root=-33.7,2.05,-12.8
+upper lantern hand depth=0.69 localY=0.0511613
+unready-edge start=-33.7,-12.8 end=-33.0742,-11.9239 blocked=1
+cycle=1 ascent-end phase=4 root=-33.7,2.05,-12.8
+upper lantern hand depth=0.69 localY=0.0511825
+Combined CPU preparation resident_ns=223000 staged_ns=172100 resident_retained_bytes=25344 staged_retained_bytes=25344 resident_peak_capacity_bytes=48096 staged_peak_capacity_bytes=48096 gpu_residency_comparison=NOT_MEASURED
+Rescue journey integration cases=16234 failures=0 retained_triangles=528
+<end of output>
+Test time =   1.49 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_rescue_journey_integration_tests" end time: Oct 20 22:15 AUS Eastern Summer Time
+"horde_rt_rescue_journey_integration_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+208/220 Testing: horde_rt_chapter_terrain_journey_tests
+208/220 Test: horde_rt_chapter_terrain_journey_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_rescue_journey_integration_tests.exe" "--authored-terrain"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_chapter_terrain_journey_tests" start time: Oct 20 22:15 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+native-terrain moving probe frames=5788
+phone chapter mode=chapter-round-trip ticks/frame=1 frames=6280 stage=complete phase=complete failure=
+phone chapter mode=chapter-round-trip ticks/frame=3 frames=2097 stage=complete phase=complete failure=
+phone chapter mode=chapter-round-trip ticks/frame=4 frames=1572 stage=complete phase=complete failure=
+phone chapter mode=chapter-round-trip ticks/frame=6 frames=1047 stage=complete phase=complete failure=
+phone chapter mode=chapter-streaming-cycle ticks/frame=5 frames=482 stage=complete phase=complete failure=
+phone chapter mode=chapter-resident-comparison ticks/frame=3 frames=1118 stage=complete phase=complete failure=
+phone chapter mode=chapter-resident-comparison ticks/frame=6 frames=563 stage=complete phase=complete failure=
+phone chapter mode=chapter-streamed-comparison ticks/frame=3 frames=1118 stage=complete phase=complete failure=
+phone chapter mode=chapter-streamed-comparison ticks/frame=6 frames=563 stage=complete phase=complete failure=
+phone chapter mode=chapter-performance-route ticks/frame=3 frames=1118 stage=complete phase=complete failure=
+phone chapter mode=chapter-performance-route ticks/frame=6 frames=563 stage=complete phase=complete failure=
+lookout held-item clearance=2.7
+shaft carry clearance=1.68
+claim-site position=-34,-17.55 prompt=0 phase=4
+cycle=0 ascent-end phase=4 root=-33.7,2.05,-12.8
+upper lantern hand depth=0.69 localY=0.0511613
+unready-edge start=-33.7,-12.8 end=-33.0742,-11.9239 blocked=1
+cycle=1 ascent-end phase=4 root=-33.7,2.05,-12.8
+upper lantern hand depth=0.69 localY=0.0511825
+Combined CPU preparation resident_ns=234400 staged_ns=183800 resident_retained_bytes=25344 staged_retained_bytes=25344 resident_peak_capacity_bytes=48096 staged_peak_capacity_bytes=48096 gpu_residency_comparison=NOT_MEASURED
+Rescue journey integration cases=47773 failures=0 retained_triangles=528
+<end of output>
+Test time =  16.23 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_chapter_terrain_journey_tests" end time: Oct 20 22:15 AUS Eastern Summer Time
+"horde_rt_chapter_terrain_journey_tests" time elapsed: 00:00:16
+----------------------------------------------------------
+
+209/220 Testing: horde_rt_kit_source_intake_tests
+209/220 Test: horde_rt_kit_source_intake_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_kit_source_intake_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_kit_source_intake_tests" start time: Oct 20 22:15 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Kit native acting recipe=speaking-peak upper_changed=9457 planted_low_vertices=2071 maximum_displacement_m=0.011135
+Kit native acting recipe=recognition-peak upper_changed=9531 planted_low_vertices=2071 maximum_displacement_m=0.0405345
+Warden|idle phase=0 duration=2 vertices=77904 height=1.8 minY=-1.02273e-06 maxY=1.8
+Warden|idle phase=0.25 duration=2 vertices=77904 height=1.8 minY=-1.02273e-06 maxY=1.8
+Warden|idle phase=0.5 duration=2 vertices=77904 height=1.80016 minY=-1.02273e-06 maxY=1.80016
+Warden|idle phase=0.75 duration=2 vertices=77904 height=1.79998 minY=-1.02273e-06 maxY=1.79998
+Warden|idle phase=1 duration=2 vertices=77904 height=1.8 minY=-1.02273e-06 maxY=1.8
+Warden|walk phase=0 duration=0.833333 vertices=77904 height=1.79616 minY=-0.0130672 maxY=1.78309
+Warden|walk phase=0.25 duration=0.833333 vertices=77904 height=1.73033 minY=-0.00824328 maxY=1.72209
+Warden|walk phase=0.5 duration=0.833333 vertices=77904 height=1.76996 minY=-0.0165889 maxY=1.75337
+Warden|walk phase=0.75 duration=0.833333 vertices=77904 height=1.73425 minY=-0.00956464 maxY=1.72469
+Warden|walk phase=1 duration=0.833333 vertices=77904 height=1.78595 minY=-0.0134074 maxY=1.77255
+Warden|run phase=0 duration=0.533333 vertices=77904 height=1.69676 minY=-0.00450717 maxY=1.69225
+Warden|run phase=0.25 duration=0.533333 vertices=77904 height=1.71094 minY=0.0385231 maxY=1.74947
+Warden|run phase=0.5 duration=0.533333 vertices=77904 height=1.68057 minY=-0.00351482 maxY=1.67706
+Warden|run phase=0.75 duration=0.533333 vertices=77904 height=1.70327 minY=0.0441332 maxY=1.7474
+Warden|run phase=1 duration=0.533333 vertices=77904 height=1.69676 minY=-0.00450746 maxY=1.69225
+Warden|jump phase=0 duration=0.8 vertices=77904 height=1.78325 minY=0.0715855 maxY=1.85484
+Warden|jump phase=0.25 duration=0.8 vertices=77904 height=1.79413 minY=-0.0191978 maxY=1.77494
+Warden|jump phase=0.5 duration=0.8 vertices=77904 height=1.79873 minY=-0.0416475 maxY=1.75708
+Warden|jump phase=0.75 duration=0.8 vertices=77904 height=1.78991 minY=0.0222505 maxY=1.81216
+Warden|jump phase=1 duration=0.8 vertices=77904 height=1.8 minY=-1.02273e-06 maxY=1.8
+Warden|fall phase=0 duration=0.666667 vertices=77904 height=1.79861 minY=-0.0304022 maxY=1.76821
+Warden|fall phase=0.25 duration=0.666667 vertices=77904 height=1.79349 minY=-0.0187385 maxY=1.77475
+Warden|fall phase=0.5 duration=0.666667 vertices=77904 height=1.79794 minY=-0.0168376 maxY=1.7811
+Warden|fall phase=0.75 duration=0.666667 vertices=77904 height=1.79349 minY=-0.0187385 maxY=1.77475
+Warden|fall phase=1 duration=0.666667 vertices=77904 height=1.79861 minY=-0.0304022 maxY=1.76821
+Warden|slide phase=0 duration=0.8 vertices=77904 height=1.71697 minY=0.228703 maxY=1.94567
+Warden|slide phase=0.25 duration=0.8 vertices=77904 height=1.71371 minY=0.227394 maxY=1.9411
+Warden|slide phase=0.5 duration=0.8 vertices=77904 height=1.70997 minY=0.226484 maxY=1.93645
+Warden|slide phase=0.75 duration=0.8 vertices=77904 height=1.71371 minY=0.227394 maxY=1.9411
+Warden|slide phase=1 duration=0.8 vertices=77904 height=1.71697 minY=0.228703 maxY=1.94567
+Warden|mantle phase=0 duration=1 vertices=77904 height=1.79174 minY=-1.02273e-06 maxY=1.79174
+Warden|mantle phase=0.25 duration=1 vertices=77904 height=1.80526 minY=-0.0774578 maxY=1.72781
+Warden|mantle phase=0.5 duration=1 vertices=77904 height=1.80496 minY=-0.157781 maxY=1.64718
+Warden|mantle phase=0.75 duration=1 vertices=77904 height=1.80485 minY=-0.101791 maxY=1.70306
+Warden|mantle phase=1 duration=1 vertices=77904 height=1.8 minY=-1.02273e-06 maxY=1.8
+Kit source intake clips=7 sampled_poses=35 failures=0 runtime_admission=NO
+<end of output>
+Test time =   1.81 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_kit_source_intake_tests" end time: Oct 20 22:15 AUS Eastern Summer Time
+"horde_rt_kit_source_intake_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+End testing: Oct 20 22:15 AUS Eastern Summer Time

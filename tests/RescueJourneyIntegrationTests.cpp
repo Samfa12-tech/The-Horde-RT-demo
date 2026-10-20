@@ -208,12 +208,16 @@ int main(int argc,char** argv) {
        moving.Snapshot().playerX==paused.playerX && probe.Phase()==ChapterProbePhase::Landing,
        "paused probe must retain its phase without advancing input or moving the player");
     }
-    unsigned frames=0,raises=0;bool walkingReunion=false;std::uint64_t lastRaise=moving.Snapshot().lastConsumedToggleHeldLightPoseSequence;
+    unsigned frames=0,raises=0;bool walkingReunion=false,recognition=false;std::uint64_t lastRaise=moving.Snapshot().lastConsumedToggleHeldLightPoseSequence;
     std::array<bool,static_cast<unsigned>(ChapterProbePhase::Failed)+1> seen{};
     while(frames++<10000 && probe.Phase()!=ChapterProbePhase::Complete && probe.Phase()!=ChapterProbePhase::Failed) {
      seen[static_cast<unsigned>(probe.Phase())]=true;
      walkingReunion|=probe.Phase()==ChapterProbePhase::Raise && moving.Snapshot().chapterCompanion.walking &&
         moving.Snapshot().chapterCompanion.animationSeconds>=.3f;
+     recognition|=moving.Snapshot().chapterDialogue.proofAccepted && moving.Snapshot().chapterCompanion.acting.recognitionActive &&
+        moving.Snapshot().chapterCompanion.acting.headPitch>.03f;
+     check(moving.Snapshot().chapterDialogue.proofAccepted || !moving.Snapshot().chapterCompanion.acting.recognitionActive,
+        "Kit recognition cannot precede the fresh presented lantern-proof transaction");
      const auto command=probe.Next(moving.Snapshot());
      check(!command.hasAuthoritativePlayerPose && !command.commands.attack && !command.commands.parry &&
        !command.commands.dodge,"two-way probe must use normal movement/context input without pose injection or combat edges");
@@ -226,6 +230,7 @@ int main(int argc,char** argv) {
     }
     check(probe.Phase()==ChapterProbePhase::Complete && frames<10000,"actual terrain two-way probe stalled or failed");
     check(walkingReunion,"probe did not inspect the available walking clip after a real fresh raise");
+    check(recognition,"actual shared fresh-raise journey must publish Kit recognition motion");
     const auto& s=moving.Snapshot();
     check(raises==1 && s.chapterDialogue.proofAccepted && s.rescue.sawDescent && s.rescue.firstAscentCompleted &&
       s.rescue.exteriorSide && !s.rescue.equipmentStowed && s.rescue.claimCount==1 && s.rescue.deploymentCount==1,

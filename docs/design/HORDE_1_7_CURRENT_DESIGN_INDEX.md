@@ -1,5 +1,22 @@
 # Horde 1.7 current design index
 
+## Kit speech/recognition and facing - local milestone, 20 October 2026
+
+The [bounded Kit slice](../evidence/2026-10-20-kit-acting/README.md) adds transient
+60 Hz head/chest speech and a one-shot recognition beat from existing verified
+fresh-proof admission. Restore cannot replay recognition; pause/skip/reset and
+neutral legacy posing are covered. The real rig exposes a mirrored sideways
+model-facing convention, now corrected with cardinal/native mesh regressions.
+
+Twelve focused Release suites, both Windows builds and four Android ABIs pass.
+Thirty hidden real-RT checks preserve records/settings and show full Kit/boots
+in a matched diagnostic front view with seeded poses; live native recognition
+and artistic/physical phone acceptance remain open. The ordinary village-facing
+view still crops peripheral Kit as predicted; no forced camera/position or quality
+change hides it. No phone, paid asset, public or Reef work. Next measure current
+walk stride and inspect start-stop/turn-foot joins using the admitted clips.
+
+
 ## Hidden Windows lookout RT acceptance - local milestone, 20 October 2026
 
 The [bounded noncombat Windows run](../evidence/2026-10-20-windows-lookout/README.md)

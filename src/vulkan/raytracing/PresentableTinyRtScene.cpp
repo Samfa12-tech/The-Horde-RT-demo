@@ -7,6 +7,7 @@
 #include "scene/BellwetherShell.h"
 #include "scene/GraveyardDressing.h"
 #include "scene/RescueLidFinish.h"
+#include "scene/CompanionPose.h"
 #include "vulkan/raytracing/RtWorldSurfaceRange.h"
 #include "scene/assets/StaticPrimitiveGrouping.h"
 #include "vulkan/raytracing/RtWorldMaterialPalette.h"
@@ -627,6 +628,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     chapterActorPoseGeneration_ = std::exchange(other.chapterActorPoseGeneration_, UINT64_MAX);
     chapterActorPoseSeconds_ = std::exchange(other.chapterActorPoseSeconds_, -1.0f);
     chapterActorWalking_ = std::exchange(other.chapterActorWalking_, false);
+    chapterActorActing_ = std::exchange(other.chapterActorActing_, horde::gameplay::dialogue::CompanionActingPose{});
     other.characterSlot_ = {};
     playerRenderSlot_ = std::move(other.playerRenderSlot_);
     other.playerRenderSlot_ = {};
@@ -1224,6 +1226,7 @@ void PresentableTinyRtScene::Destroy()
     chapterActorPoseGeneration_ = UINT64_MAX;
     chapterActorPoseSeconds_ = -1.0f;
     chapterActorWalking_ = false;
+    chapterActorActing_ = {};
     DestroyBuffer(skinnedPlayerBlasUpdateScratch_);
     DestroyBuffer(viewmodelBlasUpdateScratch_);
     DestroyAccelerationStructure(viewmodelBlas_);
@@ -6922,14 +6925,16 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     }
     if (thirdActorIsCompanion_ && (chapterActorPoseGeneration_ != frame.chapterCompanion.generation ||
         chapterActorPoseSeconds_ != frame.chapterCompanion.animationSeconds ||
-        chapterActorWalking_ != frame.chapterCompanion.walking)) {
+        chapterActorWalking_ != frame.chapterCompanion.walking ||
+        chapterActorActing_ != frame.chapterCompanion.acting)) {
         const auto clip = frame.chapterCompanion.walking ? horde::scene::SkinnedClip::Walking : horde::scene::SkinnedClip::Idle;
         const float duration = chapterActor_.Duration(clip);
         const float time = std::fmod(frame.chapterCompanion.animationSeconds, duration);
         // Pose owns clip skinning plus its inseparable floor/bounds/static-PBR
         // repack. CharacterSkin therefore includes that CPU preparation here.
         RtSceneStageScope companionSkinScope(observation, horde::telemetry::RtStage::CharacterSkin);
-        if (!chapterActor_.Pose(clip, time, diagnostic)) {
+        const auto acting=horde::scene::CompanionUpperBodyRotations(frame.chapterCompanion.acting);
+        if (!chapterActor_.Pose(clip, time, diagnostic, acting)) {
             companionSkinScope.Cancel();
             return false;
         }
@@ -6943,6 +6948,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         chapterActorPoseGeneration_ = frame.chapterCompanion.generation;
         chapterActorPoseSeconds_ = frame.chapterCompanion.animationSeconds;
         chapterActorWalking_ = frame.chapterCompanion.walking;
+        chapterActorActing_ = frame.chapterCompanion.acting;
         chapterActorNeedsRefit_ = true;
     }
     if (!characterSlot_.PrepareFrame(frame.skeletonEnemies,
@@ -7020,7 +7026,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     if (thirdActorIsCompanion_) {
         auto& actor = instances[kKeeperInstanceIndex];
         const auto& pose = frame.chapterCompanion;
-        const float yaw = pose.yaw + 3.14159265359f;
+        const float yaw = horde::scene::CompanionModelYaw(pose.yaw);
         const float c = std::cos(yaw), q = std::sin(yaw);
         actor.transform = {{c,0,q,pose.x, 0,1,0,pose.y, -q,0,c,pose.z}};
         actor.mask = 0x01u;

@@ -24,9 +24,10 @@ public:
             node.world = {1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1};
         return Pose(SkinnedClip::Idle, 0, diagnostic);
     }
-    bool Pose(SkinnedClip clip, float time, std::string& diagnostic)
+    bool Pose(SkinnedClip clip, float time, std::string& diagnostic,
+              std::span<const SkinnedNodeRotation> additiveNodeRotations = {})
     {
-        if (!skin_.SkinUniquePbr(clip, time, posed_, tangents_, diagnostic) ||
+        if (!skin_.SkinUniquePbr(clip, time, posed_, tangents_, diagnostic, additiveNodeRotations) ||
             posed_.size() != asset_.vertices.size()) return false;
         float floor = std::numeric_limits<float>::infinity();
         for (const auto& vertex : posed_) floor = std::min(floor, vertex.position[1]);

@@ -70,6 +70,8 @@ bool HiddenLookoutFilesAllowed(const std::filesystem::path& directory,bool after
         if(name==".slot-1-auto.hrd.lock") {if(item.file_size(error)!=0 || error)return false;continue;}
         if(afterRun && (name==kTextReportFilename || name==kJsonReportFilename ||
             name=="windows-lookout-validation.json" || name=="windows-loaded-lookout.png"))continue;
+        if(afterRun && gLookoutInspectKit && (name=="windows-kit-neutral.png" ||
+            name=="windows-kit-speaking.png" || name=="windows-kit-recognition.png"))continue;
         return false;
     }
     return !error && sourceFiles==2;
@@ -166,7 +168,7 @@ int RunHiddenLookoutValidation(VulkanSurfaceContext& ctx,horde::vulkan::DeviceCa
             kit.grounded && !kit.walking && kit.waypoint==simulation::kWorldRoutePoints.size() &&
             std::hypot(kit.x-(p.x+1),kit.z-p.z)<.001f && boundarySame();
     };
-    std::string loadedEvidence,entryEvidence;
+    std::string loadedEvidence,entryEvidence;std::ostringstream kitEvidence;
     const auto completed=[&](bool entry,std::string& json){
         if(!safe("before-gpu-drain") || !DrainCampaignResources(ctx) || !safe("after-gpu-drain"))return false;
         const auto publication=ctx.rtFrameEvidence.PublishedStateByValue();const auto& e=publication.completedEvidence;
@@ -220,6 +222,37 @@ int RunHiddenLookoutValidation(VulkanSurfaceContext& ctx,horde::vulkan::DeviceCa
         proceed=check(safe("before-lookout-image") && ctx.rtScene.CaptureStorageImage(image,error) &&
             WriteRgbaPng(gCampaignValidationDirectory/"windows-loaded-lookout.png",image,error) && safe("after-lookout-image"),
             "original paused lookout RT storage image read back separately from logical support evidence");
+    }
+    if(proceed && gLookoutInspectKit) {
+        // A labelled render-only pose fixture, not proof of a live recognition
+        // event. Shared-simulation tests separately own the fresh-raise gate.
+        // Camera/quality/idle phase/lighting match across these three images.
+        const auto& kit=ctx.simulation.Snapshot().chapterCompanion;
+        const auto originalActing=kit.acting;
+        ctx.lookoutKitInspectionPose=horde::vulkan::raytracing::EnvironmentSurveyPose{
+            kit.x-3.f,kit.z,kit.y,1.57079632679f,-.15f,0};
+        std::array<dialogue::CompanionActingPose,3> poses{};
+        dialogue::CompanionActing speaking,recognition;dialogue::Snapshot line;
+        line.line=dialogue::Line::ReunionQuestion;line.duration=dialogue::Spec(line.line).duration;
+        for(int i=0;i<30;++i){line.elapsed=i/60.f;speaking.Step(1.f/60,line,true,true,true,false,false);}
+        poses[1]=speaking.State();line={};line.proofAccepted=true;
+        for(int i=0;i<36;++i)recognition.Step(1.f/60,line,true,true,true,false,i==0);
+        poses[2]=recognition.State();
+        constexpr std::array<const char*,3> names{"neutral","speaking","recognition"};
+        for(unsigned i=0;i<poses.size() && proceed;++i) {
+            ctx.lookoutKitInspectionActing=poses[i];std::string evidence,error;
+            horde::vulkan::raytracing::PresentableTinyRtScene::StorageImageCapture image;
+            proceed=check(render() && completed(false,evidence) && ctx.rtScene.CaptureStorageImage(image,error) &&
+                WriteRgbaPng(gCampaignValidationDirectory/(std::string("windows-kit-")+names[i]+".png"),image,error) &&
+                ctx.simulation.Snapshot().chapterCompanion.acting==originalActing && storySame() && neutral(),
+                "seeded Kit pose-only inspection has completed real RT and leaves logical story and acting unchanged");
+            if(i)kitEvidence<<',';
+            kitEvidence<<"{\"pose\":\""<<names[i]<<"\",\"angles\":["<<poses[i].headPitch<<','<<poses[i].headYaw<<','<<poses[i].chestPitch
+                <<"],\"rtEvidence\":"<<(evidence.empty()?"null":evidence)<<'}';
+        }
+        ctx.lookoutKitInspectionPose.reset();ctx.lookoutKitInspectionActing={};
+        if(proceed)proceed=check(render() && storySame() && ctx.simulation.Snapshot().chapterCompanion.acting==originalActing,
+            "ordinary saved camera and neutral Kit pose return after diagnostic inspection");
     }
     if(proceed){
         // Native notification queues owner work; the normal owner pump owns its
@@ -314,6 +347,8 @@ int RunHiddenLookoutValidation(VulkanSurfaceContext& ctx,horde::vulkan::DeviceCa
         <<",\"renderCalls\":"<<renderCalls<<",\"loadedTick\":"<<loadedTick<<",\"sourceBytes\":"<<gHiddenLookout.source.encoded.size()
         <<",\"loadedRtEvidence\":"<<(loadedEvidence.empty()?"null":loadedEvidence)
         <<",\"entryRtEvidence\":"<<(entryEvidence.empty()?"null":entryEvidence)
+        <<",\"kitPoseInspection\":{\"requested\":"<<(gLookoutInspectKit?"true":"false")
+        <<",\"evidenceClass\":\"seeded render-only pose; not live fresh-raise acceptance\",\"cameraOffset\":[-3,0,0],\"poses\":["<<kitEvidence.str()<<"]}"
         <<",\"physicalVisibleAcceptance\":false,\"performanceEvidence\":false,\"ownerSettingsReadOrWritten\":false";
     return proceed && !failures?0:1;
 }
@@ -483,20 +518,21 @@ int RunHiddenCampaignValidation(VulkanSurfaceContext& ctx)
 bool ConfigureHiddenCampaignValidation()
 {
     int count=0;auto args=CommandLineToArgvW(GetCommandLineW(),&count);if(!args)return false;
-    bool requested=false,lookoutRequested=false;std::filesystem::path directory;
+    bool requested=false,lookoutRequested=false,inspectKit=false;std::filesystem::path directory;
     for(int i=1;i<count;++i) {
         const std::wstring_view arg=args[i];
         if(arg==L"--campaign-validate-hidden")requested=true;
         if(arg==L"--lookout-validate-hidden")lookoutRequested=true;
+        if(arg==L"--lookout-inspect-kit")inspectKit=true;
         if(arg==L"--campaign-test-root" && i+1<count)directory=args[++i];
     }
     LocalFree(args);
-    if(!requested && !lookoutRequested && directory.empty())return true;
+    if(!requested && !lookoutRequested && !inspectKit && directory.empty())return true;
 #if defined(_DEBUG) && defined(HORDE_RT_SOURCE_DIR)
     std::error_code error;
     const auto absolute=std::filesystem::absolute(directory,error).lexically_normal();
     const auto reports=std::filesystem::canonical(std::filesystem::path(HORDE_RT_SOURCE_DIR)/"reports",error);
-    if(requested==lookoutRequested || directory.empty() || error || !directory.is_absolute() ||
+    if(requested==lookoutRequested || (inspectKit && !lookoutRequested) || directory.empty() || error || !directory.is_absolute() ||
         !absolute.filename().string().starts_with("horde-campaign-fixtures-") ||
         std::filesystem::canonical(absolute.parent_path(),error)!=reports || error ||
         std::filesystem::canonical(absolute,error)!=absolute || error || !std::filesystem::is_directory(absolute,error) || error ||
@@ -508,6 +544,7 @@ bool ConfigureHiddenCampaignValidation()
         std::cerr<<"Hidden lookout validation requires the unchanged caller-exported single ForestEndpoint autosave and canonical manifest only.\n";return false;
     }
     gLookoutHiddenValidation=lookoutRequested;
+    gLookoutInspectKit=inspectKit;
     gCampaignHiddenValidation=true;gCampaignValidationDirectory=absolute;return true;
 #else
     std::cerr<<"Hidden campaign validation is Debug-only.\n";return false;

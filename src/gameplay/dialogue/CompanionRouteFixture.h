@@ -1,4 +1,5 @@
 #pragma once
+#include "gameplay/dialogue/CompanionActing.h"
 #include "gameplay/simulation/DevelopmentWorldRoute.h"
 #include "gameplay/traversal/ChapterTerrainMovement.h"
 #include <algorithm>
@@ -13,19 +14,24 @@ struct CompanionSnapshot {
     float z=simulation::kWorldRoutePoints[3].z;
     float y=simulation::kWorldRoutePoints[3].y,yaw=0,animationSeconds=0;
     std::size_t waypoint=4;std::uint64_t generation=1;
+    CompanionActingPose acting{};
 };
 class CompanionRouteFixture {
 public:
     const CompanionSnapshot& State() const {return state_;}
-    void Reset() { const auto gen=state_.generation;state_={};state_.generation=gen==UINT64_MAX?gen:gen+1; }
+    void Reset() { const auto gen=state_.generation;state_={};acting_.Reset();state_.generation=gen==UINT64_MAX?gen:gen+1; }
+    void AdvanceActing(float seconds,const Snapshot& speech,bool exterior,bool alive,bool freshVisibleProof) {
+        acting_.Step(seconds,speech,exterior,alive,state_.grounded,state_.walking,freshVisibleProof);
+        state_.acting=acting_.State();
+    }
     void RestoreCampaignReunion(bool exterior, float playerX, float playerZ,
         const simulation::TriangleSupportSurface* terrain, std::uint64_t generationFloor) {
-        state_={};state_.generation=generationFloor+1;
+        state_={};acting_.Reset();state_.generation=generationFloor+1;
         if(exterior) Step(1.0f/60.0f,playerX,playerZ,true,false,false,terrain,true);
     }
     void RestoreCampaignLookout(float playerX, float playerZ,
         const simulation::TriangleSupportSurface* terrain, std::uint64_t generationFloor) {
-        state_={};state_.generation=generationFloor+1;
+        state_={};acting_.Reset();state_.generation=generationFloor+1;
         const auto endpoint=simulation::kWorldRoutePoints.back();
         state_.x=endpoint.x+1.0f;state_.z=endpoint.z;
         state_.waypoint=simulation::kWorldRoutePoints.size();
@@ -96,5 +102,6 @@ private:
         state_.yaw=std::atan2(dx,-dz);
     }
     CompanionSnapshot state_{};
+    CompanionActing acting_{};
 };
 } // namespace horde::gameplay::dialogue

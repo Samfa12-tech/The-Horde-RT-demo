@@ -204,7 +204,8 @@ public:
     bool SkinUniquePbr(SkinnedClip clip, float timeSeconds,
                        std::vector<TexturedSkinnedRtVertex>& output,
                        std::vector<SkinnedPbrTangent>& outputTangents,
-                       std::string& diagnostic) const;
+                       std::string& diagnostic,
+                       std::span<const SkinnedNodeRotation> additiveNodeRotations = {}) const;
     bool SkinPlayerUniqueTextured(SkinnedClip clip,
                                   float timeSeconds,
                                   const SkinnedArmIkTarget& leftArm,

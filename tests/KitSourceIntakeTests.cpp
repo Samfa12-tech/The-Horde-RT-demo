@@ -1,12 +1,14 @@
 #include "scene/assets/SkinnedMeshAsset.h"
 #include "scene/assets/StaticMeshAsset.h"
 #include "scene/assets/SkinnedPbrActor.h"
+#include "scene/CompanionPose.h"
 #include <algorithm>
 #include <array>
 #include <cmath>
 #include <iostream>
 #include <limits>
 #include <cstring>
+#include <tuple>
 
 namespace {
 bool CheckAnalyticTangentFrames() {
@@ -34,6 +36,168 @@ bool CheckAnalyticTangentFrames() {
     if(model.SkinUniquePbr(SkinnedClip::Walking,.5f,vertices,tangents,diagnostic)||!vertices.empty()||!tangents.empty()) return false;
     return true;
 }
+
+template<class T> bool SameBytes(const std::vector<T>& a,const std::vector<T>& b) {
+    return a.size()==b.size() && (a.empty() || std::memcmp(a.data(),b.data(),a.size()*sizeof(T))==0);
+}
+
+bool SameActorContract(const horde::scene::assets::StaticMeshAsset& a,
+                       const horde::scene::assets::StaticMeshAsset& b) {
+    if(a.indices!=b.indices || a.triangleRegions!=b.triangleRegions || a.vertices.size()!=b.vertices.size() ||
+       a.primitives.size()!=b.primitives.size() || a.materials.size()!=b.materials.size() ||
+       a.nodeTransforms.size()!=b.nodeTransforms.size() || a.sockets.size()!=b.sockets.size())return false;
+    for(std::size_t i=0;i<a.vertices.size();++i)if(a.vertices[i].uv0!=b.vertices[i].uv0)return false;
+    for(std::size_t i=0;i<a.primitives.size();++i) {
+        const auto fields=[](const auto& p){return std::tie(p.vertexOffset,p.indexOffset,p.indexCount,p.materialIndex,p.nodeTransformIndex);};
+        if(fields(a.primitives[i])!=fields(b.primitives[i]))return false;
+    }
+    for(std::size_t i=0;i<a.materials.size();++i) {
+        const auto fields=[](const auto& m){return std::tie(m.name,m.baseColorFactor,m.emissiveFactor,m.attenuationColor,
+            m.emissiveStrength,m.metallicFactor,m.roughnessFactor,m.occlusionStrength,m.normalScale,m.textureScale,
+            m.transmissionFactor,m.ior,m.thicknessFactor,m.attenuationDistance,m.numericalSpawnMinimumWidth,
+            m.numericalSpawnGeometryError,m.baseColorTexture,m.normalTexture,m.ormTexture,m.emissiveTexture,
+            m.textureGroup,m.deferTextureAllocation,m.flags);};
+        if(fields(a.materials[i])!=fields(b.materials[i]))return false;
+    }
+    for(std::size_t i=0;i<a.nodeTransforms.size();++i)
+        if(a.nodeTransforms[i].name!=b.nodeTransforms[i].name || a.nodeTransforms[i].world!=b.nodeTransforms[i].world)return false;
+    for(std::size_t i=0;i<a.sockets.size();++i)
+        if(a.sockets[i].name!=b.sockets[i].name || a.sockets[i].nodeTransformIndex!=b.sockets[i].nodeTransformIndex ||
+           a.sockets[i].world!=b.sockets[i].world)return false;
+    return true;
+}
+
+bool SameAdmittedActor(const horde::scene::assets::StaticMeshAsset& a,
+                       const horde::scene::assets::StaticMeshAsset& b) {
+    return SameActorContract(a,b) && SameBytes(a.vertices,b.vertices) &&
+        a.bounds.minimum==b.bounds.minimum && a.bounds.maximum==b.bounds.maximum;
+}
+
+bool ValidActorFrames(const horde::scene::assets::StaticMeshAsset& actor) {
+    std::array<float,3> minimum{},maximum{};
+    minimum.fill(std::numeric_limits<float>::infinity());maximum.fill(-std::numeric_limits<float>::infinity());
+    for(const auto& v:actor.vertices) {
+        for(std::size_t axis=0;axis<4;++axis)
+            if(!std::isfinite(v.position[axis]) || !std::isfinite(v.normal[axis]) ||
+               !std::isfinite(v.tangent[axis]) || !std::isfinite(v.uv0[axis]))return false;
+        float normalLength=0,tangentLength=0,dot=0;
+        for(std::size_t axis=0;axis<3;++axis) {
+            minimum[axis]=std::min(minimum[axis],v.position[axis]);maximum[axis]=std::max(maximum[axis],v.position[axis]);
+            normalLength+=v.normal[axis]*v.normal[axis];tangentLength+=v.tangent[axis]*v.tangent[axis];
+            dot+=v.normal[axis]*v.tangent[axis];
+        }
+        if(std::abs(normalLength-1)>1e-4f || std::abs(tangentLength-1)>1e-4f ||
+           std::abs(dot)>1e-4f || std::abs(v.tangent[3])!=1)return false;
+    }
+    return !actor.vertices.empty() && minimum==actor.bounds.minimum && maximum==actor.bounds.maximum &&
+        std::abs(minimum[1])<1e-5f && maximum[1]>=1.4f && maximum[1]<=2.3f;
+}
+
+bool CheckCompanionRig(horde::scene::assets::SkinnedPbrActor& actor,
+                       const std::filesystem::path& path,const horde::scene::SkinnedClipSet& clips) {
+    using namespace horde::scene;
+    namespace dialogue=horde::gameplay::dialogue;
+    const auto check=[](bool ok,const char* message){if(!ok)std::cerr<<"FAIL: Kit acting rig: "<<message<<'\n';return ok;};
+    SkinnedMeshAsset skin;std::string diagnostic;
+    if(!check(skin.LoadClips(path.string(),clips,diagnostic),"native indexed Kit rig imports for additive regression"))return false;
+    constexpr std::array<std::string_view,6> names{"Head","headfront","Spine","Hips","LeftFoot","RightFoot"};
+    std::array<SkinnedNodeTransform,names.size()> nodes{};
+    if(!check(skin.NodeTransforms(SkinnedClip::Idle,0,names,nodes,diagnostic),"native idle-zero semantic nodes resolve"))return false;
+    std::array<float,3> front{};float frontLength=0;
+    for(std::size_t axis=0;axis<3;++axis){front[axis]=nodes[1][12+axis]-nodes[0][12+axis];frontLength+=front[axis]*front[axis];}
+    frontLength=std::sqrt(frontLength);
+    if(!check(std::isfinite(frontLength) && frontLength>1e-5f,"Head to headfront is a finite nondegenerate native direction"))return false;
+    for(auto& value:front)value/=frontLength;
+    if(!check(front[2]>.999f,"actual native Kit idle faces imported positive Z"))return false;
+    constexpr float pi=3.14159265359f;
+    for(float logical:{0.f,pi*.5f,-pi*.5f,pi}) {
+        const float model=CompanionModelYaw(logical),c=std::cos(model),s=std::sin(model);
+        const std::array<float,3> worldFront{c*front[0]+s*front[2],front[1],-s*front[0]+c*front[2]};
+        const float agreement=worldFront[0]*std::sin(logical)-worldFront[2]*std::cos(logical);
+        // Columns of the production yaw's proper Y rotation; a reflection or
+        // scale cannot repair the historical mirrored X heading.
+        const float determinant=c*c+s*s;
+        if(!check(agreement>.999f && std::abs(determinant-1)<1e-5f,
+            "four cardinal production model yaws preserve handedness and face logical forward"))return false;
+    }
+
+    constexpr float phase=0;
+    if(!check(actor.Pose(SkinnedClip::Idle,phase,diagnostic),"plain idle phase is admitted"))return false;
+    const auto plain=actor.Asset();
+    std::vector<TexturedSkinnedRtVertex> rawPlain,rawNeutral;
+    std::vector<SkinnedPbrTangent> tangentPlain,tangentNeutral;
+    const auto neutral=CompanionUpperBodyRotations({});
+    if(!check(skin.SkinUniquePbr(SkinnedClip::Idle,phase,rawPlain,tangentPlain,diagnostic) &&
+        skin.SkinUniquePbr(SkinnedClip::Idle,phase,rawNeutral,tangentNeutral,diagnostic,neutral) &&
+        SameBytes(rawPlain,rawNeutral) && SameBytes(tangentPlain,tangentNeutral) &&
+        actor.Pose(SkinnedClip::Idle,phase,diagnostic,neutral) && SameAdmittedActor(plain,actor.Asset()),
+        "neutral production recipe preserves exact native PBR vertices tangents and actor asset"))return false;
+
+    // Select peaks from the real transient controller rather than inventing a
+    // golden deformation. Both recipes are applied to the same authored idle.
+    std::array<dialogue::CompanionActingPose,2> peaks{};
+    for(std::size_t recipe=0;recipe<peaks.size();++recipe) {
+        dialogue::CompanionActing acting;dialogue::Snapshot speech{};speech.duration=2;
+        speech.line=recipe==0?dialogue::Line::ReunionQuestion:dialogue::Line::None;
+        speech.proofAccepted=recipe==1;float maximum=0;
+        for(unsigned tick=1;tick<=120;++tick) {
+            speech.elapsed=static_cast<float>(tick)/60;
+            acting.Step(1.f/60,speech,true,true,true,false,recipe==1 && tick==1);
+            const auto pose=acting.State();const float magnitude=std::abs(pose.headPitch)+std::abs(pose.headYaw)+std::abs(pose.chestPitch);
+            if(magnitude>maximum){maximum=magnitude;peaks[recipe]=pose;}
+        }
+        if(!check(maximum>1e-5f,"production speaking and recognition each produce a nonneutral peak"))return false;
+    }
+    for(std::size_t recipe=0;recipe<peaks.size();++recipe) {
+        const auto rotations=CompanionUpperBodyRotations(peaks[recipe]);
+        if(!check(actor.Pose(SkinnedClip::Idle,phase,diagnostic,rotations),"production peak recipe skins on the real Kit rig"))return false;
+        const auto& posed=actor.Asset();
+        if(!check(SameActorContract(plain,posed) && ValidActorFrames(posed) && skin.ValidateStaticVertexLayout(posed,diagnostic),
+            "acting preserves topology UV material bindings node palette ground bounds and normalized PBR frames"))return false;
+        float maximumDisplacement=0;std::size_t upperChanged=0,headChanged=0,chestChanged=0,lowVertices=0,leftBoot=0,rightBoot=0;
+        for(std::size_t i=0;i<posed.vertices.size();++i) {
+            const auto& before=plain.vertices[i];const auto& after=posed.vertices[i];float distance=0;
+            for(std::size_t axis=0;axis<3;++axis){const float d=after.position[axis]-before.position[axis];distance+=d*d;}
+            distance=std::sqrt(distance);maximumDisplacement=std::max(maximumDisplacement,distance);
+            if(before.position[1]>plain.bounds.maximum[1]*.65f && distance>1e-5f)++upperChanged;
+            if(before.position[1]>plain.bounds.maximum[1]*.85f && distance>1e-5f)++headChanged;
+            if(before.position[1]>plain.bounds.maximum[1]*.65f && before.position[1]<plain.bounds.maximum[1]*.8f &&
+               distance>1e-5f)++chestChanged;
+            // A conservative boot/low-shin band, far below the hip and chest
+            // weighting boundary; count both sides so an empty subset cannot pass.
+            if(before.position[1]<.25f) {
+                ++lowVertices;if(before.position[0]<-.05f)++leftBoot;if(before.position[0]>.05f)++rightBoot;
+                if(!check(std::memcmp(&before,&after,sizeof(before))==0,
+                    "upper-body acting leaves every low boot/shin vertex normal tangent and UV exactly planted"))return false;
+            }
+        }
+        if(!check(upperChanged>0 && headChanged>0 && chestChanged>0 && lowVertices>0 && leftBoot>0 && rightBoot>0 &&
+            maximumDisplacement>1e-5f && maximumDisplacement<.25f,
+            "acting moves the upper silhouette within a modest quarter-metre envelope while both boots remain fixed"))return false;
+        std::cout<<"Kit native acting recipe="<<(recipe==0?"speaking-peak":"recognition-peak")
+            <<" upper_changed="<<upperChanged<<" planted_low_vertices="<<lowVertices
+            <<" maximum_displacement_m="<<maximumDisplacement<<'\n';
+    }
+
+    const auto admitted=actor.Asset();
+    std::array<std::array<SkinnedNodeRotation,2>,3> invalid{};
+    for(auto& rotations:invalid)rotations=CompanionUpperBodyRotations(peaks[1]);
+    invalid[0][1].nodeName="MissingKitUpperChest";
+    invalid[1][1].rotation[0]=std::numeric_limits<float>::quiet_NaN();
+    invalid[2][1].rotation[1]=std::numeric_limits<float>::infinity();
+    for(const auto& rotations:invalid) {
+        rawNeutral=rawPlain;tangentNeutral=tangentPlain;
+        if(!check(!skin.SkinUniquePbr(SkinnedClip::Idle,phase,rawNeutral,tangentNeutral,diagnostic,rotations) &&
+            rawNeutral.empty() && tangentNeutral.empty() && !diagnostic.empty(),
+            "invalid additive node or nonfinite quaternion rejects without partial indexed PBR output"))return false;
+        if(!check(!actor.Pose(SkinnedClip::Idle,phase,diagnostic,rotations) && !diagnostic.empty() && SameAdmittedActor(admitted,actor.Asset()),
+            "invalid additive pose leaves the last admitted complete actor asset unchanged"))return false;
+    }
+    std::array<SkinnedNodeTransform,names.size()> afterNodes{};
+    return check(skin.NodeTransforms(SkinnedClip::Idle,phase,names,afterNodes,diagnostic) && nodes==afterNodes &&
+        actor.Pose(SkinnedClip::Idle,phase,diagnostic) && SameAdmittedActor(plain,actor.Asset()),
+        "acting and rejected requests never mutate the imported node palette and neutral posing remains exact");
+}
 }
 
 int main() {
@@ -59,6 +223,7 @@ int main() {
     if(!actor.Load(runtimeDirectory,"kit-warden-lod0.runtime.glb",actorClips,admission)) {
         std::cerr<<"Scene actor import failed: "<<admission<<'\n';return 1;
     }
+    if(!CheckCompanionRig(actor,runtimePath,actorClips))++failures;
     for(const auto clip:{SkinnedClip::Idle,SkinnedClip::Walking}) {
         for(float fraction:{0.f,.25f,.5f,.75f}) {
             if(!actor.Pose(clip,fraction*actor.Duration(clip),admission)) return 1;

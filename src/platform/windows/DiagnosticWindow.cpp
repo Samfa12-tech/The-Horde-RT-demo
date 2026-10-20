@@ -156,6 +156,7 @@ using LookoutPanel=horde::platform::windows::WindowsLookoutObjectivePanel;
 // targets. It must never acquire foreground input or touch the owner's INI.
 bool gCampaignHiddenValidation=false;
 bool gLookoutHiddenValidation=false;
+bool gLookoutInspectKit=false;
 bool gShowcaseCaptureHidden=false;
 bool gCampaignValidationHoldPreparation=false;
 std::filesystem::path gCampaignValidationDirectory;
@@ -460,6 +461,10 @@ struct VulkanSurfaceContext
     // copied report context on this same application thread.
     const horde::vulkan::DeviceCapabilities* capabilitySnapshot = nullptr;
     bool useRtPath = false;
+#if defined(_DEBUG)
+    std::optional<horde::vulkan::raytracing::EnvironmentSurveyPose> lookoutKitInspectionPose;
+    horde::gameplay::dialogue::CompanionActingPose lookoutKitInspectionActing{};
+#endif
     horde::vulkan::RtExecutionBackend executionBackend = horde::vulkan::RtExecutionBackend::Unsupported;
     std::string developmentCheckpoint;
     std::string lastRtFrameError;
@@ -6691,6 +6696,17 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         }
         std::string diagnostic;
 #if defined(_DEBUG)
+        if(ctx.lookoutKitInspectionPose) {
+            // Explicit hidden pose inspection only. Reuse the coherent camera/
+            // attachment adapter without the exterior survey's fog override.
+            if(!gCampaignHiddenValidation || !gLookoutHiddenValidation || !gLookoutInspectKit ||
+               !horde::vulkan::raytracing::RebaseEnvironmentSurveyFrame(frameInputs,*ctx.lookoutKitInspectionPose,diagnostic)) {
+                ctx.lastRtFrameError="Hidden Kit inspection rebase rejected: "+diagnostic;
+                if(evidenceFrame)ctx.rtFrameEvidence.FailRecord(observation);
+                return false;
+            }
+            frameInputs.chapterCompanion.acting=ctx.lookoutKitInspectionActing;
+        }
         if(ctx.environmentSurveyActive)
         {
             const auto& camera=ctx.environmentSurveyCamera;
