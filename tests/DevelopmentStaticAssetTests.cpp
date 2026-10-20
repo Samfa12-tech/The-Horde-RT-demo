@@ -10,6 +10,7 @@
 #include <cmath>
 #include <cstdint>
 #include <filesystem>
+#include <iomanip>
 #include <iostream>
 #include <limits>
 #include <string>
@@ -853,6 +854,116 @@ int main()
               chapterCapture.Snapshot().playerZ == traversal::kLowerLanding.z &&
               chapterCapture.Snapshot().playerSupportWorldY == kRouteFloorWorldY,
               "public reward import retains lower-side rescue recovery");
+    }
+    {
+        // Match the Windows chapter-capture launch, rather than the historical
+        // default-config reward fixtures above. This checks frozen pose inputs;
+        // it neither projects the rig nor admits a zero-arm RT capture.
+        const auto* niche = FindDevelopmentCheckpoint("chapter-niche-rect");
+        simulation::GameSimulation nicheCapture(simulation::ProductionGameSimulationConfig());
+        nicheCapture.SetDevelopmentRescueJourney(true, true);
+        nicheCapture.SetPresentationAspect(16.0f / 9.0f);
+        const auto before = nicheCapture.Snapshot();
+        StepFixedObservationCounter steps{};
+        const DevelopmentCheckpointStepFixedObservation observer{
+            &steps, BeginObservedStepFixed, CompleteObservedStepFixed};
+        const bool staged = niche != nullptr && StageDevelopmentCheckpointSimulation(
+            nicheCapture, *niche, nullptr, &observer);
+        Check(staged, "production rect-niche pose stages through the Windows generic capture path");
+        if (staged)
+        {
+            const auto pose = nicheCapture.Snapshot();
+            const auto torso = traversal::RescueTorsoOffset(pose.rescue);
+            Check(pose.playerX == niche->cameraX && pose.playerZ == niche->cameraZ &&
+                      pose.playerYawRadians == niche->yaw && pose.playerPitchRadians == niche->pitch &&
+                      pose.playerSupportWorldY == kRouteFloorWorldY && pose.playerHeightDelta == 0.0f &&
+                      pose.playerGrounded,
+                  "production rect-niche retains the authored camera and actual lower-floor support");
+            const auto* base = FindShowcaseCheckpoint(niche->baseShowcaseCheckpointId);
+            const float expectedStageTravel = base != nullptr
+                ? std::hypot(niche->cameraX - base->x, niche->cameraZ - base->z)
+                : std::numeric_limits<float>::quiet_NaN();
+            const auto movementDiagnosticPrecision = std::cout.precision();
+            std::cout << std::setprecision(9) << "rect-niche displacement-components walkTime="
+                      << before.walkTime << "->" << pose.walkTime << " walkAmount=" << pose.walkAmount
+                      << " speed=" << pose.playerMovementSpeedMetresPerSecond
+                      << " authoritativeTravel=" << pose.playerTravelledThisTick
+                      << " crouch=" << pose.crouchActive << " crouchDrop=" << pose.playerCrouchDropMetres
+                      << " equipmentStowed=" << pose.rescue.equipmentStowed
+                      << " ropeHands=" << pose.rescue.ropeHandsActive
+                      << " torso=" << torso.x << ',' << torso.y << ',' << torso.z;
+            std::cout << " baseToAuthoredDistance=" << expectedStageTravel;
+            std::cout << '\n';
+            std::cout.precision(movementDiagnosticPrecision);
+            Check(pose.walkAmount == 0.0f && pose.walkTime == before.walkTime &&
+                      pose.playerMovementSpeedMetresPerSecond == 0.0f && base != nullptr &&
+                      std::abs(pose.playerTravelledThisTick - expectedStageTravel) < 0.00001f &&
+                      !pose.crouchActive && pose.playerCrouchDropMetres == 0.0f &&
+                      !pose.rescue.equipmentStowed && !pose.rescue.ropeHandsActive &&
+                      torso.x == 0.0f && torso.y == 0.0f && torso.z == 0.0f,
+                  "zero-delta rect-niche records its authored relocation without rendered walking, crouch or rope displacement");
+            Check(pose.interaction.heldLightKind == interactions::HeldLightKind::RewardLantern &&
+                      pose.interaction.heldLightPose == interactions::HeldLightPose::High &&
+                      pose.interaction.heldLightPoseProgress == 1.0f &&
+                      pose.chestReward.phase == interactions::ChestRewardPhase::LanternClaimed,
+                  "production rect-niche imports the actual fully raised claimed lantern");
+            Check(steps.started == 1u && steps.completed == 1u && !steps.active && !steps.invalidPairing &&
+                      pose.tickIndex == before.tickIndex + 1u && pose.walkTime == 0.0f &&
+                      pose.playerAnimation.locomotionTime == 0.0f && nicheCapture.Events().Empty(),
+                  "rect-niche observes one zero-delta publication without elapsed locomotion or feedback");
+            const auto& hinge = pose.rewardLanternWorldFromHinge;
+            const auto expectedBody = interactions::ComposeLanternPendulumBodyTransform(
+                hinge, niche->rewardForwardAngleRadians, niche->rewardStrafeAngleRadians,
+                niche->rewardTorsionAngleRadians,
+                pose.heldItemKinematics.rewardLanternPresentationYawRadians);
+            Check(pose.lanternPendulum.initialized && pose.lanternPendulum.worldFromBody == expectedBody &&
+                      pose.lanternPendulum.previousPivotPosition ==
+                          std::array<float, 3>{{hinge[12], hinge[13], hinge[14]}} &&
+                      pose.lanternPendulum.previousHandForward ==
+                          std::array<float, 3>{{hinge[8], hinge[9], hinge[10]}},
+                  "rect-niche pendulum is composed from the final authored hand hinge");
+            bool finite = true;
+            for (float value : hinge) finite = finite && std::isfinite(value);
+            for (float value : pose.lanternPendulum.worldFromBody) finite = finite && std::isfinite(value);
+            for (float value : pose.heldItemKinematics.leftHandLocal) finite = finite && std::isfinite(value);
+            for (float value : pose.heldItemKinematics.rightHandLocal) finite = finite && std::isfinite(value);
+            Check(finite, "rect-niche publishes finite projection inputs and rigid carried transforms");
+            const bool restaged = StageDevelopmentCheckpointSimulation(nicheCapture, *niche);
+            const auto& reimported = nicheCapture.Snapshot();
+            const auto restageDiagnosticPrecision = std::cout.precision();
+            std::cout << std::setprecision(9) << "rect-niche restage-components staged=" << restaged
+                      << " tick=" << pose.tickIndex << "->" << reimported.tickIndex
+                      << " walkTime=" << pose.walkTime << "->" << reimported.walkTime
+                      << " locomotionTime=" << pose.playerAnimation.locomotionTime << "->"
+                      << reimported.playerAnimation.locomotionTime
+                      << " camera=" << (reimported.playerX == pose.playerX && reimported.playerZ == pose.playerZ &&
+                          reimported.playerYawRadians == pose.playerYawRadians &&
+                          reimported.playerPitchRadians == pose.playerPitchRadians)
+                      << " support=" << (reimported.playerSupportWorldY == pose.playerSupportWorldY)
+                      << " hinge=" << (reimported.rewardLanternWorldFromHinge == hinge)
+                      << " pendulum=" << (reimported.lanternPendulum == pose.lanternPendulum)
+                      << " eventsEmpty=" << nicheCapture.Events().Empty() << '\n';
+            std::cout.precision(restageDiagnosticPrecision);
+            Check(restaged && reimported.tickIndex == pose.tickIndex + 1u &&
+                      reimported.walkTime == pose.walkTime &&
+                      reimported.playerAnimation.locomotionTime == pose.playerAnimation.locomotionTime &&
+                      reimported.playerX == pose.playerX && reimported.playerZ == pose.playerZ &&
+                      reimported.playerYawRadians == pose.playerYawRadians &&
+                      reimported.playerPitchRadians == pose.playerPitchRadians &&
+                      reimported.playerSupportWorldY == pose.playerSupportWorldY &&
+                      reimported.rewardLanternWorldFromHinge == hinge &&
+                      reimported.lanternPendulum == pose.lanternPendulum && nicheCapture.Events().Empty(),
+                  "restaging publishes one zero-delta tick with unchanged camera, hinge, pendulum and elapsed time");
+            const auto precision = std::cout.precision();
+            std::cout << std::setprecision(9) << "rect-niche projection-inputs yaw=" << pose.playerYawRadians
+                      << " pitch=" << pose.playerPitchRadians << " supportY=" << pose.playerSupportWorldY
+                      << " left=" << pose.heldItemKinematics.leftHandLocal[0] << ','
+                      << pose.heldItemKinematics.leftHandLocal[1] << ',' << pose.heldItemKinematics.leftHandLocal[2]
+                      << " right=" << pose.heldItemKinematics.rightHandLocal[0] << ','
+                      << pose.heldItemKinematics.rightHandLocal[1] << ',' << pose.heldItemKinematics.rightHandLocal[2]
+                      << " visibility=NOT_EVALUATED\n";
+            std::cout.precision(precision);
+        }
     }
     horde::gameplay::simulation::GameSimulation stagedWallHigh;
     horde::gameplay::simulation::GameSimulation stagedWallLow;

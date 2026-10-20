@@ -1,0 +1,9 @@
+{
+  "scope": "Read-only independent HEAD source check; no claim of an old executable run",
+  "baseCommit": "180ba11104ad53be57bde8c4fd7c9da2069f34f2",
+  "headRegistrySha256": "83bc936e8c9d6f64ab3e6d3abbe0511636c42f007fc379f3b1007578787e99f9",
+  "headTestSha256": "41290eb2400a94e22408f9a56c5aec569c6fddf0d75841c6fa892613157d98e6",
+  "headAssertedCount": 30,
+  "headActualAuthoredSelections": 33,
+  "reason": "Three accepted pine diagnostic views already exist in HEAD; original fixed roster assertion was stale."
+}

@@ -1,5 +1,23 @@
 # Horde 1.7 current design index
 
+## Frozen arm framing diagnosis - local checkpoint, 20 October 2026
+
+The [bounded diagnosis](../evidence/2026-10-20-arm-capture-framing/README.md)
+explains both zero-arm shots: neither 14,370-triangle viewmodel intersects the
+image; closest horizontally clipped Y is 557.40/640.15 for height 540. Fresh repeats retain
+strict rejection and byte-identical PNGs/meshes/poses. A current first-bend control
+passes with 22,391 primary player pixels and visible arm/hand. No runtime, camera,
+crop-policy or gate change is justified; these two full shots stay unadmitted.
+
+Twenty added staging checks distinguish authored relocation/publication from
+rendered motion/elapsed time and historical frozen from configured live start.
+Three focused host registrations pass; original failed fixture expectations and
+the stale 30-versus-33 registry assertion remain documented. Only tests/evidence
+change. Next prioritize exact-candidate owner route/save/death/control/audio and
+art acceptance, plus disposition of unfinished effects; do not invent a renderer
+fix or another polish loop. The six recovery choices and listening remain pending.
+Owner work, saves, lighting and mobile Mist Off persist; no phone/public action.
+
 ## Opening-tomb inspection and capture gap - local checkpoint, 20 October 2026
 
 The [fresh native inspection](../evidence/2026-10-20-opening-tomb-inspection/README.md)
@@ -10,10 +28,9 @@ rectangular-niche full captures separately fail their unchanged primary-arms gat
 with zero arm pixels. Their images remain unadmitted, and further full-capture
 shots stop. Whole-opening art/equipment coverage is therefore still incomplete.
 
-Next diagnose those retained exact uploaded meshes/poses through the actual shader
-camera, then make one discriminating native capture only if a specific cause is
-established. Preserve the gate; zero pixels do not by themselves prove a live arm
-bug. No geometry, source, assets, lighting, collision, teaching or save change.
+That selected diagnosis is now closed by the framing evidence above. The two
+strict full captures remain unadmitted; neither missing geometry nor a production
+arm bug is demonstrated, and the gate remains intact. No geometry, source, assets, lighting, collision, teaching or save change.
 Audio listening and all six recovery choices remain pending; mobile Mist Off and
 owner work persist. No phone/public operation occurred.
 

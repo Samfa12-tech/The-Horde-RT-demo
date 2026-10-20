@@ -1,6 +1,6 @@
 # Horde 1.7 remaining scope - 20 October 2026
 
-Current reconciliation after the [opening-tomb inspection](../evidence/2026-10-20-opening-tomb-inspection/README.md),
+Current reconciliation after the [frozen-arm diagnosis](../evidence/2026-10-20-arm-capture-framing/README.md),
 in the existing WP2 worktree/branch and draft PR 27. Read with the
 [accepted master](../references/horde-1.7/d37f1638/docs/superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md)
 and [milestone map](HORDE_1_7_MILESTONE_MAP_2026_10_20.md). This inventory changes
@@ -41,10 +41,15 @@ completes 120 render-only native RT frames/two views without a demonstrated
 placement/path defect requiring a production edit. Initial retreat/niche full
 captures separately fail the strict primary-arm evidence gate (zero pixels),
 and later shots stop. Their PNGs remain unadmitted context; full-opening artistic
-and equipment coverage remains incomplete. Next diagnose the retained uploaded
-meshes/poses with actual camera equations and compare staging before making one
-justified fix/discriminating capture. Neither the survey nor zero pixels proves
-a production arm bug. Recovery policy remains pending without blocking that work.
+and equipment coverage remains incomplete. The [subsequent diagnosis](../evidence/2026-10-20-arm-capture-framing/README.md)
+shows both uploaded arm meshes entirely below frame, with fresh byte-identical
+strict rejections and a current positive control passing with visible arms. No
+runtime, camera, crop-policy or gate change is justified. Twenty staging checks
+and three affected host registrations pass; historical frozen and configured-live
+scenario identity stays distinct. The useful next milestone is exact-candidate
+route/save/death/control/audio/art acceptance and existing scope disposition,
+not an invented renderer fix or another polish loop. Recovery policy remains
+pending without choosing values.
 
 ## Implemented, with exact-candidate acceptance still open
 

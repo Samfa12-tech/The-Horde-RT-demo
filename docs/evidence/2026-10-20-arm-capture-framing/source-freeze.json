@@ -1,0 +1,61 @@
+{
+  "baseCommit": "180ba11104ad53be57bde8c4fd7c9da2069f34f2",
+  "workingDirectory": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+  "scope": "Final test/diagnostic source identities. Production source/assets unchanged from referenced prior custody checkpoint; no new app or Android build.",
+  "files": {
+    "tests/DevelopmentStaticAssetTests.cpp": {
+      "exists": true,
+      "bytes": 74545,
+      "sha256": "06b583fab1b3203af017737546e9385ea99adce0f86bc34994abcae49e8a8659"
+    },
+    "tests/RescueJourneyIntegrationTests.cpp": {
+      "exists": true,
+      "bytes": 60579,
+      "sha256": "9a767c5077ce023f317bbe1c2ec93db3f44bfa792b901506da62a75780cad78f"
+    },
+    "src/platform/windows/WindowsCaptureContracts.h": {
+      "exists": true,
+      "bytes": 11868,
+      "sha256": "8d0a01bde2b0311015661af65cc4b79d9b1cde606f792376f5d3e77bbecf256f"
+    },
+    "shaders/raytracing/include/rt_frame.glsl": {
+      "exists": true,
+      "bytes": 5029,
+      "sha256": "6541ff4011f3051ed89752c04de6beb2af90a002011b705f63c96fdf8ab835b2"
+    },
+    "src/gameplay/DevelopmentCheckpointSimulation.h": {
+      "exists": true,
+      "bytes": 25596,
+      "sha256": "7b28c958f0904d07d55f97f49d94962ced365539b0831bcd51b87d7bdf5e168c"
+    },
+    "src/gameplay/simulation/DevelopmentSupportFixture.h": {
+      "exists": true,
+      "bytes": 1903,
+      "sha256": "406ed690aaef8c0f568e3510215aca597850fd37e752e030f0249b9a51661f9f"
+    }
+  },
+  "executable": {
+    "exists": true,
+    "bytes": 14035968,
+    "sha256": "223b1f02398f852f05bbf6d26239a748b996b2d4e0d448d16cad899827c85579"
+  },
+  "releaseTestExecutables": {
+    "build/presets/windows-x64-release/Release/horde_rt_development_static_asset_tests.exe": {
+      "exists": true,
+      "bytes": 646656,
+      "sha256": "70f173df58ac4fb71d84861914c4635d6a60f2926371b75a0767be15abbeff95"
+    },
+    "build/presets/windows-x64-release/Release/horde_rt_rescue_journey_integration_tests.exe": {
+      "exists": true,
+      "bytes": 2664960,
+      "sha256": "d99aee7d303490dbe509b837941584c1e2fc7d60e9cdc23066cfd3778d9c8d14"
+    }
+  },
+  "priorCustodyCheckpoint": {
+    "path": "docs\\evidence\\2026-10-20-opening-tomb-inspection\\source-freeze.json",
+    "exists": true,
+    "bytes": 8714,
+    "sha256": "5cad818774a163bd4e62cbe7e2a2d33749587e13714ff89d33c3c158bce965ec"
+  },
+  "priorSourcesAssetsSettingsOwnerCampaignPreserved": true
+}

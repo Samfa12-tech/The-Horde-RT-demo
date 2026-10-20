@@ -1,0 +1,17 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  DevelopmentStaticAssetTests.cpp
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\tests\DevelopmentStaticAssetTests.cpp(915,95): error C2248: 'horde::gameplay::simulation::GameSimulation::RewardCheckpointPlacement': cannot access private enum declared in class 'horde::gameplay::simulation::GameSimulation' [C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-release\horde_rt_development_static_asset_tests.vcxproj]
+      C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\src\gameplay\simulation\GameSimulation.h(202,16):
+      see declaration of 'horde::gameplay::simulation::GameSimulation::RewardCheckpointPlacement'
+      C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\src\gameplay\simulation\GameSimulation.h(96,7):
+      see declaration of 'horde::gameplay::simulation::GameSimulation'
+  
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\tests\DevelopmentStaticAssetTests.cpp(914,26): error C2248: 'horde::gameplay::simulation::GameSimulation::ImportRewardCheckpointState': cannot access private member declared in class 'horde::gameplay::simulation::GameSimulation' [C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-release\horde_rt_development_static_asset_tests.vcxproj]
+      C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\src\gameplay\simulation\GameSimulation.h(203,10):
+      see declaration of 'horde::gameplay::simulation::GameSimulation::ImportRewardCheckpointState'
+      C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\src\gameplay\simulation\GameSimulation.h(96,7):
+      see declaration of 'horde::gameplay::simulation::GameSimulation'
+  

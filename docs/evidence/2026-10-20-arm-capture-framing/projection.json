@@ -1,0 +1,430 @@
+{
+  "shader": "shaders/raytracing/include/rt_frame.glsl:29-43",
+  "assumptions": "960x540 unrotated, walkAmount=0, no crouch/rope offset; support Y converted to eye Y",
+  "numericMethod": "CPU double evaluation of shader equations using exact captured float32 model matrix and authored float32 camera inputs; diagnostic pose text independently agrees within 1e-5. Not GPU floating-point/occlusion simulation.",
+  "rows": [
+    {
+      "file": "reports\\tomb-composition-20261020-r1\\blocked-retreat\\192-rescue-journey-start.obj",
+      "sha256": "d635d9b5a07a72419566f9cb99e415db0a91bfec2e708c84210d4cfa10502633",
+      "vertices": 15855,
+      "triangles": 14370,
+      "transformRowMajor3x4": [
+        1.0,
+        0.0,
+        -8.74227766e-08,
+        0.0,
+        -0.0,
+        1.0,
+        0.0,
+        -0.949749291,
+        8.74227766e-08,
+        0.0,
+        1.0,
+        1.85000002
+      ],
+      "poseSupportYawPitch": [
+        0.0,
+        -0.949999988079071,
+        1.850000023841858,
+        3.1415927410125732,
+        -0.05000000074505806
+      ],
+      "shaderEye": [
+        0.0,
+        0.7000000119209289,
+        1.850000023841858
+      ],
+      "forward": [
+        -8.698891736883527e-08,
+        -0.09950371975501918,
+        0.9950371901365832
+      ],
+      "right": [
+        -0.9999999999999962,
+        0.0,
+        -8.742278000372475e-08
+      ],
+      "up": [
+        -8.698891801695322e-09,
+        0.9950371901365871,
+        0.09950371975501882
+      ],
+      "localBounds": [
+        [
+          -0.306708068,
+          1.14514124,
+          -0.113877237
+        ],
+        [
+          0.29025209,
+          1.45896876,
+          0.411649555
+        ]
+      ],
+      "cameraBounds": [
+        [
+          -0.29025209000000113,
+          -0.4958863864383892,
+          -0.07928946515682979
+        ],
+        [
+          0.30670806800000056,
+          -0.19309206845044882,
+          0.4448356144244319
+        ]
+      ],
+      "trianglesWithAnyPositiveForwardDepth": 13849,
+      "frustumIntersectingTriangles": 0,
+      "horizontalClippedScreenYRange": [
+        557.395914347499,
+        2227.0069165750774
+      ],
+      "clippedScreenBounds": null,
+      "scope": "CPU exact uploaded triangles + captured float32 model transform, shader camera equations; no visibility/occlusion or GPU-hit claim"
+    },
+    {
+      "file": "reports\\tomb-composition-20261020-r1\\blocked-retreat\\192-rescue-journey-start.player-world-body.obj",
+      "sha256": "fd3e1e4a6d59931fc0161a26b03bf296a933f2f1dec88e2b14d1dec52ca51adf",
+      "vertices": 34304,
+      "triangles": 27815,
+      "transformRowMajor3x4": [
+        1.0,
+        0.0,
+        -8.74227766e-08,
+        0.0,
+        -0.0,
+        1.0,
+        0.0,
+        -0.949749291,
+        8.74227766e-08,
+        0.0,
+        1.0,
+        1.85000002
+      ],
+      "poseSupportYawPitch": [
+        0.0,
+        -0.949999988079071,
+        1.850000023841858,
+        3.1415927410125732,
+        -0.05000000074505806
+      ],
+      "shaderEye": [
+        0.0,
+        0.7000000119209289,
+        1.850000023841858
+      ],
+      "forward": [
+        -8.698891736883527e-08,
+        -0.09950371975501918,
+        0.9950371901365832
+      ],
+      "right": [
+        -0.9999999999999962,
+        0.0,
+        -8.742278000372475e-08
+      ],
+      "up": [
+        -8.698891801695322e-09,
+        0.9950371901365871,
+        0.09950371975501882
+      ],
+      "localBounds": [
+        [
+          -0.306708068,
+          -7.0677072e-07,
+          -0.307680964
+        ],
+        [
+          0.316645145,
+          1.79999924,
+          0.411649555
+        ]
+      ],
+      "cameraBounds": [
+        [
+          -0.31664514500000196,
+          -1.662980441684797,
+          -0.2874540922489697
+        ],
+        [
+          0.30670806800000056,
+          0.1411478139808392,
+          0.4448356144244319
+        ]
+      ],
+      "trianglesWithAnyPositiveForwardDepth": 20286,
+      "frustumIntersectingTriangles": 9,
+      "horizontalClippedScreenYRange": [
+        -1943685649.7522852,
+        40395001316.22554
+      ],
+      "clippedScreenBounds": [
+        [
+          5.3290705182007514e-14,
+          -5.995204332975845e-14
+        ],
+        [
+          960.0000000000002,
+          540.0
+        ]
+      ],
+      "scope": "CPU exact uploaded triangles + captured float32 model transform, shader camera equations; no visibility/occlusion or GPU-hit claim"
+    },
+    {
+      "file": "reports\\tomb-composition-20261020-r1\\rect-niche\\218-chapter-niche-rect.obj",
+      "sha256": "b7279f8835c37d0df9830aed9e1335b81b48d97c4b0330566e6c47a5cab598ad",
+      "vertices": 15855,
+      "triangles": 14370,
+      "transformRowMajor3x4": [
+        4.37113883e-08,
+        0.0,
+        -1.0,
+        -0.400000006,
+        -0.0,
+        1.0,
+        0.0,
+        -0.949749291,
+        1.0,
+        0.0,
+        4.37113883e-08,
+        -0.699999988
+      ],
+      "poseSupportYawPitch": [
+        -0.4000000059604645,
+        -0.949999988079071,
+        -0.699999988079071,
+        -1.5707963705062866,
+        -0.3199999928474426
+      ],
+      "shaderEye": [
+        -0.4000000059604645,
+        0.7000000119209289,
+        -0.699999988079071
+      ],
+      "forward": [
+        -0.9378618448643574,
+        -0.34700887589170193,
+        4.099524486873215e-08
+      ],
+      "right": [
+        -4.371139000186241e-08,
+        0.0,
+        -0.999999999999999
+      ],
+      "up": [
+        -0.3470088758917016,
+        0.9378618448643583,
+        1.5168240308210055e-08
+      ],
+      "localBounds": [
+        [
+          -0.306753516,
+          1.10727155,
+          -0.197574601
+        ],
+        [
+          0.560618699,
+          1.57773423,
+          0.244186521
+        ]
+      ],
+      "cameraBounds": [
+        [
+          -0.5606186990790715,
+          -0.529200606420521,
+          -0.0988768167639541
+        ],
+        [
+          0.30675351592092953,
+          -0.022349327848970205,
+          0.378819391447934
+        ]
+      ],
+      "trianglesWithAnyPositiveForwardDepth": 13996,
+      "frustumIntersectingTriangles": 0,
+      "horizontalClippedScreenYRange": [
+        640.1490021517735,
+        2431.035248456534
+      ],
+      "clippedScreenBounds": null,
+      "scope": "CPU exact uploaded triangles + captured float32 model transform, shader camera equations; no visibility/occlusion or GPU-hit claim"
+    },
+    {
+      "file": "reports\\tomb-composition-20261020-r1\\rect-niche\\218-chapter-niche-rect.player-world-body.obj",
+      "sha256": "b64e194d33487f299cdee7069b538d062dd23de7a8ed6e1e10e55714cbe17d46",
+      "vertices": 34304,
+      "triangles": 27815,
+      "transformRowMajor3x4": [
+        4.37113883e-08,
+        0.0,
+        -1.0,
+        -0.400000006,
+        -0.0,
+        1.0,
+        0.0,
+        -0.949749291,
+        1.0,
+        0.0,
+        4.37113883e-08,
+        -0.699999988
+      ],
+      "poseSupportYawPitch": [
+        -0.4000000059604645,
+        -0.949999988079071,
+        -0.699999988079071,
+        -1.5707963705062866,
+        -0.3199999928474426
+      ],
+      "shaderEye": [
+        -0.4000000059604645,
+        0.7000000119209289,
+        -0.699999988079071
+      ],
+      "forward": [
+        -0.9378618448643574,
+        -0.34700887589170193,
+        4.099524486873215e-08
+      ],
+      "right": [
+        -4.371139000186241e-08,
+        0.0,
+        -0.999999999999999
+      ],
+      "up": [
+        -0.3470088758917016,
+        0.9378618448643583,
+        1.5168240308210055e-08
+      ],
+      "localBounds": [
+        [
+          -0.306753516,
+          -7.0677072e-07,
+          -0.303328753
+        ],
+        [
+          0.60018456,
+          1.79999924,
+          0.244186521
+        ]
+      ],
+      "cameraBounds": [
+        [
+          -0.6001845600790714,
+          -1.6238639159258985,
+          -0.22594312326584579
+        ],
+        [
+          0.30675351592092953,
+          0.120291804572234,
+          0.6232650087495593
+        ]
+      ],
+      "trianglesWithAnyPositiveForwardDepth": 24530,
+      "frustumIntersectingTriangles": 17,
+      "horizontalClippedScreenYRange": [
+        -592424668.5981799,
+        33323441845.34361
+      ],
+      "clippedScreenBounds": [
+        [
+          -1.0658141036401503e-13,
+          -1.7985612998927536e-13
+        ],
+        [
+          960.0,
+          540.0
+        ]
+      ],
+      "scope": "CPU exact uploaded triangles + captured float32 model transform, shader camera equations; no visibility/occlusion or GPU-hit claim"
+    },
+    {
+      "file": "reports\\arm-admission-20261020-r1\\positive-forest\\201-chapter-forest-first-bend.obj",
+      "sha256": "d6a02a994d00eb69dc8b351c47c48373b2ba115f5d98f65c0dc8ffad333116d6",
+      "vertices": 15855,
+      "triangles": 14370,
+      "transformRowMajor3x4": [
+        0.991222501,
+        0.0,
+        -0.132204413,
+        -15.6942625,
+        -0.0,
+        1.0,
+        0.0,
+        0.551179171,
+        0.132204413,
+        0.0,
+        0.991222501,
+        0.202647597
+      ],
+      "poseSupportYawPitch": [
+        -15.694263,
+        0.550928,
+        0.202648,
+        -3.009,
+        -0.15
+      ],
+      "shaderEye": [
+        -15.694263,
+        2.200928,
+        0.202648
+      ],
+      "forward": [
+        -0.12963715886935778,
+        -0.19611613513818407,
+        0.9719735945892474
+      ],
+      "right": [
+        -0.9912224651014989,
+        0.0,
+        -0.13220448055231665
+      ],
+      "up": [
+        -0.02592743177387156,
+        0.9805806756909202,
+        0.1943947189178495
+      ],
+      "localBounds": [
+        [
+          -0.307266653,
+          1.1410358,
+          -0.0535673499
+        ],
+        [
+          0.28592056,
+          1.48237717,
+          0.639954805
+        ]
+      ],
+      "cameraBounds": [
+        [
+          -0.28592102995957586,
+          -0.4294756233159052,
+          -0.013884832670485975
+        ],
+        [
+          0.30726618644462617,
+          -0.0891094540998832,
+          0.6778472806724207
+        ]
+      ],
+      "trianglesWithAnyPositiveForwardDepth": 14369,
+      "frustumIntersectingTriangles": 7489,
+      "horizontalClippedScreenYRange": [
+        331.71143331498286,
+        1496.2442745153983
+      ],
+      "clippedScreenBounds": [
+        [
+          198.07621176672657,
+          331.71143331498286
+        ],
+        [
+          668.5742452835977,
+          540.0
+        ]
+      ],
+      "scope": "CPU exact uploaded triangles + captured float32 model transform, shader camera equations; no visibility/occlusion or GPU-hit claim; fresh current positive control; same executable as both predicted-negative captures",
+      "nativePrimaryPlayerPixels": 22391
+    }
+  ]
+}

@@ -13,7 +13,9 @@
 #include "gameplay/validation/MotionEvidenceScenario.h"
 #include <cmath>
 #include <numeric>
+#include <iomanip>
 #include <iostream>
+#include <utility>
 using namespace horde::gameplay;
 using namespace horde::gameplay::simulation;
 using namespace horde::gameplay::traversal;
@@ -103,7 +105,7 @@ int main(int argc,char** argv) {
          "canonical chapter selections must request their actual authored GPU scene");
    chapterSelections+=expected;
   }
-  check(chapterSelections==30,"live journey and all29 chapter views, including both mist states, retain authored-scene admission");
+  check(chapterSelections==33,"live journey and all32 chapter views, including both mist states and the three pine views, retain authored-scene admission");
   const auto* landing=FindDevelopmentCheckpoint("chapter-landing-north");
   GameSimulation fresh(ProductionGameSimulationConfig());
   DevelopmentCheckpointStageEvidence stageEvidence;
@@ -416,6 +418,74 @@ int main(int argc,char** argv) {
   check(lake.found && lake.worldY < -34.f,"regional lake basin no longer lies below proposed water datum");
   check(ridge.found && ridge.worldY > 40.f,"regional northeast ridge was flattened to the local sheet edge");
   check(terrain->TriangleCount()<=39618u,"regional land exceeded the existing terrain derivative triangle envelope");
+ }
+ {
+  // Mirror Windows' pre-staging chapter setter and logical viewport. Keep
+  // historical frozen policy distinct from an explicitly configured live
+  // opening; changing that identity is not evidence of primary arm pixels.
+  const auto* start=FindDevelopmentCheckpoint("rescue-journey-start");
+  check(start!=nullptr,"opening diagnostic checkpoint must remain available");
+  if(start) {
+   auto config=ProductionGameSimulationConfig();
+   config.playerStartYawRadians=start->yaw;
+   config.playerStartPitchRadians=0.0f;
+   GameSimulation genericStart(config),frozenStart(config),liveStart(config);
+   for(auto* simulation:{&genericStart,&frozenStart,&liveStart}) {
+    simulation->SetDevelopmentRescueJourney(true,true);
+    simulation->SetPresentationAspect(16.0f/9.0f);
+   }
+   const auto initialTick=genericStart.Snapshot().tickIndex;
+   check(StageDevelopmentCheckpointSimulation(genericStart,*start),
+         "Windows generic opening staging must succeed without elapsed gameplay");
+   unsigned publications=0;
+   check(StageDevelopmentCheckpointForScene(frozenStart,*start,[&]{++publications;},false),
+         "frozen scene-wrapper opening staging must succeed without invented renderer readiness");
+   liveStart.StartLiveDevelopmentRescueJourney(true);
+   const auto generic=genericStart.Snapshot(),frozen=frozenStart.Snapshot(),live=liveStart.Snapshot();
+   check(!generic.modernCombatRules && !frozen.modernCombatRules && live.modernCombatRules &&
+         !generic.lich.readableCastPresentation && !frozen.lich.readableCastPresentation &&
+         live.lich.readableCastPresentation,
+         "generic and frozen-wrapper imports retain historical policy while actual live start resets it");
+   check(generic.playerYawRadians==start->yaw && frozen.playerYawRadians==start->yaw &&
+         live.playerYawRadians==config.playerStartYawRadians &&
+         generic.playerPitchRadians==start->pitch && frozen.playerPitchRadians==start->pitch &&
+         live.playerPitchRadians==config.playerStartPitchRadians && live.playerPitchRadians!=generic.playerPitchRadians,
+         "live opening retains configured pitch instead of silently becoming the frozen capture pose");
+   check(generic.tickIndex==initialTick+1u && frozen.tickIndex==initialTick && live.tickIndex==initialTick &&
+         publications==1u && genericStart.Events().Empty() && frozenStart.Events().Empty() && liveStart.Events().Empty(),
+         "generic staging publishes once at zero delta while wrapper and live resets do not step or emit feedback");
+   for(const auto* pose:{&generic,&frozen,&live}) {
+    const auto torso=RescueTorsoOffset(pose->rescue);
+    check(pose->developmentRescueJourney && pose->playerX==start->cameraX && pose->playerZ==start->cameraZ &&
+          pose->playerSupportWorldY==kRouteFloorWorldY && pose->playerGrounded && pose->playerHeightDelta==0.0f &&
+          pose->walkTime==0.0f && pose->walkAmount==0.0f && pose->playerAnimation.locomotionTime==0.0f &&
+          pose->playerMovementSpeedMetresPerSecond==0.0f && pose->playerTravelledThisTick==0.0f &&
+          !pose->crouchActive && pose->playerCrouchDropMetres==0.0f &&
+          !pose->rescue.equipmentStowed && !pose->rescue.ropeHandsActive &&
+          torso.x==0.0f && torso.y==0.0f && torso.z==0.0f,
+          "all opening staging paths retain a stationary grounded lower start with no hidden eye displacement");
+    bool finite=true;
+    for(float value:pose->heldItemKinematics.leftHandLocal)finite=finite&&std::isfinite(value);
+    for(float value:pose->heldItemKinematics.rightHandLocal)finite=finite&&std::isfinite(value);
+    check(finite && pose->interaction.heldLightKind==interactions::HeldLightKind::Torch &&
+          pose->torchFailure.heldByPlayer && pose->heldItemKinematics.swordStowBlend==1.0f,
+          "each opening path retains finite hand targets, original torch and the production stowed sword");
+   }
+   const auto precision=std::cout.precision();std::cout<<std::setprecision(9);
+   for(const auto& row:std::array<std::pair<const char*,const SimulationSnapshot*>,3>{{
+       {"generic",&generic},{"frozen-wrapper",&frozen},{"configured-live",&live}}}) {
+    const auto& pose=*row.second;
+    std::cout<<"opening projection-inputs path="<<row.first<<" tick="<<pose.tickIndex
+             <<" modern="<<pose.modernCombatRules<<" yaw="<<pose.playerYawRadians
+             <<" pitch="<<pose.playerPitchRadians<<" supportY="<<pose.playerSupportWorldY
+             <<" left="<<pose.heldItemKinematics.leftHandLocal[0]<<','
+             <<pose.heldItemKinematics.leftHandLocal[1]<<','<<pose.heldItemKinematics.leftHandLocal[2]
+             <<" right="<<pose.heldItemKinematics.rightHandLocal[0]<<','
+             <<pose.heldItemKinematics.rightHandLocal[1]<<','<<pose.heldItemKinematics.rightHandLocal[2]
+             <<" visibility=NOT_EVALUATED\n";
+   }
+   std::cout.precision(precision);
+  }
  }
  InputSnapshot input;input.damageEnabled=false;
  // The real development launch does not seed missing health, even while paused

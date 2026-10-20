@@ -1,0 +1,108 @@
+{
+  "scope": "Framing/staging diagnosis; strict full-capture rejection preserved. Tests/evidence only; no runtime, camera, crop policy, renderer, shader, asset, save, lighting or audio edit.",
+  "classification": "Both frozen viewmodel meshes legitimately lie below the image frustum; zero hits are explained by framing. No missing-geometry or GPU-hit failure demonstrated.",
+  "negativeProjection": [
+    {
+      "file": "reports\\tomb-composition-20261020-r1\\blocked-retreat\\192-rescue-journey-start.obj",
+      "triangles": 14370,
+      "frustumIntersectingTriangles": 0,
+      "minimumYAfterHorizontalClipping": 557.395914347499,
+      "viewportHeight": 540,
+      "pixelsBelowBottom": 17.395914347499
+    },
+    {
+      "file": "reports\\tomb-composition-20261020-r1\\rect-niche\\218-chapter-niche-rect.obj",
+      "triangles": 14370,
+      "frustumIntersectingTriangles": 0,
+      "minimumYAfterHorizontalClipping": 640.1490021517735,
+      "viewportHeight": 540,
+      "pixelsBelowBottom": 100.14900215177352
+    }
+  ],
+  "projectionMethod": "CPU double evaluation of shader equations using exact captured float32 model matrix and authored float32 camera inputs; diagnostic pose text independently agrees within 1e-5. Not GPU floating-point/occlusion simulation.",
+  "nativeNegativeControls": {
+    "names": [
+      "rescue-journey-start",
+      "chapter-niche-rect"
+    ],
+    "nativeExitCodes": [
+      1,
+      1
+    ],
+    "status": "UNADMITTED full captures, expected strict-gate rejections; NOT passes",
+    "allPngMeshPoseBytesEqualOriginals": true
+  },
+  "freshPositiveControl": {
+    "checkpoint": "chapter-forest-first-bend",
+    "nativeExitCode": 0,
+    "complete": true,
+    "executionBackend": "RayTracingPipeline",
+    "image": {
+      "path": "positive-forest/201-chapter-forest-first-bend.png",
+      "exists": true,
+      "bytes": 911782,
+      "sha256": "da26345d5d17b2958494ed0aa0c85f83250be26601c9af7b3f2dcc7db2c12775"
+    },
+    "nativePrimaryPlayerPixels": 22391,
+    "projectedViewmodelTriangles": 7489,
+    "completedFrameIdentity": {
+      "sceneEpoch": 2,
+      "measurementGeneration": 1,
+      "recordAttemptSerial": 12,
+      "recordSerial": 12,
+      "submissionSerial": 12,
+      "completionSerial": 12,
+      "simulationTick": 1720,
+      "frameSlot": 0
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "gpu": {
+      "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+      "vendorId": 4318,
+      "deviceId": 11672
+    },
+    "presentationSettings": {
+      "renderScale": 1.0,
+      "dispatchWidth": 960,
+      "dispatchHeight": 540,
+      "swapchainWidth": 960,
+      "swapchainHeight": 540,
+      "swapchainFormat": 44
+    },
+    "shaderPair": {
+      "opaqueFast": {
+        "key": "diagnostic_high_opaque_fast",
+        "sha256": "990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3"
+      },
+      "genericDielectric": {
+        "key": "diagnostic_high_generic_dielectric",
+        "sha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a"
+      }
+    }
+  },
+  "stagingFinding": "ID192 frozen generic/wrapper use historical rules and pitch-.05; configured live start uses current rules/pitch0. This scenario identity difference is not an evidenced cause of either framing result and is left unchanged. ID218 preserves authored camera/support/hinge/pendulum; zero rendered motion is confirmed.",
+  "newHostChecks": 20,
+  "hostCtestRegistrations": 3,
+  "hostCtestFinalPass": true,
+  "hostCtestSeconds": 18.68,
+  "initialFailuresRetained": [
+    "private API access in added fixture, corrected to existing public stager",
+    "new fixture mistook authoritative relocation metadata for rendered motion and publication tick for elapsed time; diagnostic values retained and checks corrected",
+    "pre-existing HEAD authored-registry assertion30 was stale; actual registry33 includes existing three pine views; closed roster corrected"
+  ],
+  "ownerDataSettingsCampaignPreserved": true,
+  "allOwnProcessesExited": true,
+  "noProcessKilled": true,
+  "foregroundObservation": "All sampled foreground HWNDs were null and unchanged; does not prove a particular external HWND. Native captures requested unshown mode.",
+  "phoneOperations": false,
+  "publicOperations": false,
+  "audioListeningPerformed": false,
+  "newAudioHapticManualRevalidationRequired": false,
+  "priorAudioAcceptanceStillPending": true,
+  "noRuntimeCorrectionJustified": true
+}
