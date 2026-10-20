@@ -1,0 +1,16 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+    Start  62: horde_rt_windows_benchmark_launch_tests
+1/2 Test  #62: horde_rt_windows_benchmark_launch_tests ...***Failed    1.21 sec
+shore camera follows the original atlas transform
+
+    Start 106: horde_rt_tomb_dressing_tests
+2/2 Test #106: horde_rt_tomb_dressing_tests ..............   Passed    1.19 sec
+
+50% tests passed, 1 tests failed out of 2
+
+Total Test time (real) =   2.41 sec
+
+The following tests FAILED:
+	 62 - horde_rt_windows_benchmark_launch_tests (Failed)
+Errors while running CTest

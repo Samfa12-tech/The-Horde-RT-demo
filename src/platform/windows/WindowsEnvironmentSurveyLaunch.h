@@ -4,12 +4,14 @@
 #include <string>
 #include <string_view>
 #include "scene/ChapterRegionalWater.h"
+#include "gameplay/ShowcaseRoute.h"
+#include "gameplay/CorridorCollision.h"
 
 namespace horde::platform::windows
 {
 struct WindowsEnvironmentSurveyLaunch
 {
-    bool requested = false, waterDisabled = false;
+    bool requested = false, waterDisabled = false, debrisDisabled = false;
     std::string profile, error;
 };
 inline WindowsEnvironmentSurveyLaunch ParseWindowsEnvironmentSurveyLaunch(
@@ -22,14 +24,19 @@ inline WindowsEnvironmentSurveyLaunch ParseWindowsEnvironmentSurveyLaunch(
         const auto a=arguments[i];
         if(a==L"--capture-environment-survey")
         {
-            if(result.requested || i+1==arguments.size() || arguments[i+1]!=L"river-bend")
-            {result.error="Environment survey requires exactly one river-bend profile.";return result;}
-            result.requested=true;result.profile="river-bend";++i;
+            if(result.requested || i+1==arguments.size() || (arguments[i+1]!=L"river-bend" && arguments[i+1]!=L"tomb-debris"))
+            {result.error="Environment survey requires exactly one river-bend or tomb-debris profile.";return result;}
+            result.requested=true;result.profile=arguments[i+1]==L"tomb-debris"?"tomb-debris":"river-bend";++i;
         }
         else if(a==L"--survey-water-disabled")
         {
             if(result.waterDisabled){result.error="Duplicate survey water baseline modifier.";return result;}
             result.waterDisabled=true;
+        }
+        else if(a==L"--survey-debris-disabled")
+        {
+            if(result.debrisDisabled){result.error="Duplicate survey debris baseline modifier.";return result;}
+            result.debrisDisabled=true;
         }
         else if(a==L"--capture-showcase")
         {if(capture)conflict=true;capture=i+1<arguments.size() && !arguments[i+1].starts_with(L"--");if(capture)++i;}
@@ -38,8 +45,10 @@ inline WindowsEnvironmentSurveyLaunch ParseWindowsEnvironmentSurveyLaunch(
         else if(a==L"--require-rayquery-compute"){} // Same scene, explicit real RT backend.
         else conflict=true; // No gameplay seed, camera, tuning or another validation path.
     }
-    if(result.waterDisabled && !result.requested)
-        result.error="--survey-water-disabled requires an explicit environment survey.";
+    if(result.waterDisabled && (!result.requested || result.profile!="river-bend"))
+        result.error="--survey-water-disabled requires an explicit river-bend survey.";
+    if(result.debrisDisabled && (!result.requested || result.profile!="tomb-debris"))
+        result.error="--survey-debris-disabled requires an explicit tomb-debris survey.";
     if(result.requested && (!debugBuild || !capture || !hidden || !chapter || conflict))
         result.error="Environment survey requires a hidden Debug chapter showcase capture without gameplay staging or another validation mode.";
     return result;
@@ -56,6 +65,14 @@ inline EnvironmentSurveyCamera RiverBendSurveyCamera()
     const auto shore=horde::scene::ChapterWaterFromAtlas(56,-5,0);
     const auto target=horde::scene::ChapterWaterFromAtlas(58,-25,6);
     return {shore[0],shore[2],0,std::atan2(target[0]-shore[0],shore[2]-target[2]),-.18f};
+}
+inline EnvironmentSurveyCamera TombDebrisSurveyCamera(unsigned frame)
+{
+    // Retain the ordinary spawn view, then a labelled legal-position inspection
+    // of the fractured shoulder. No game state/fixture or FOV/light override.
+    return frame<60 ? EnvironmentSurveyCamera{gameplay::kPlayerSpawn.x,gameplay::kPlayerSpawn.z,
+        gameplay::kRouteFloorWorldY,0.f,-.15f} : EnvironmentSurveyCamera{.9f,1.3f,
+        gameplay::kRouteFloorWorldY,2.74571f,-.32f};
 }
 inline constexpr unsigned kEnvironmentSurveyFrames=120;
 inline constexpr unsigned kEnvironmentSurveyCaptureStride=10;

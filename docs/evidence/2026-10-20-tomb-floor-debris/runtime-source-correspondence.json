@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "evidenceClass": "Read-only source/runtime GLB geometry correspondence and production floor source, no game execution",
+  "rows": [
+    {
+      "path": "assets/models/world/source/chapter-entry-return-r03/collapsed-entry-lod0.glb",
+      "sha256File": "f886a68e24278f6d1f18bdfea2d8939073ce0bb2c0ea9cd8e8f31949a2846b5e",
+      "positionsIndicesSha256Canonical": "4a917130cbac65485ef4a21fc5890eee685b64eeec3afe12ce7aee164d60feec",
+      "primitives": [
+        {
+          "positions": {
+            "count": 9365,
+            "sha256Canonical": "267dfdbdb28e1def0ba71dd619c92b3ea1bf2210cc496a5ef16ef2276d1138be"
+          },
+          "indices": {
+            "count": 20622,
+            "sha256Canonical": "053b1770fbfbc45dd2f91edbff46f89e9b7f88d9ac0da1920848ac08ecc94f21"
+          }
+        },
+        {
+          "positions": {
+            "count": 2766,
+            "sha256Canonical": "e7f347d95f614db6c225cefbce5a5bd35b8a4682e698a7d40507dc367f072ede"
+          },
+          "indices": {
+            "count": 4140,
+            "sha256Canonical": "ae66696cfdbbb2d7cf78380c28171cb67bf4fb9902f6a2df9cfb37decbd8183e"
+          }
+        }
+      ],
+      "nodes": [
+        {
+          "mesh": 0,
+          "name": "ChapterEntryReturn"
+        }
+      ]
+    },
+    {
+      "path": "assets/models/world/runtime/chapter-entry-return-v1/collapsed-entry-lod0.runtime.glb",
+      "sha256File": "29cd8b3ad46cd0b115c2bef8264be3b404281ac048c2cfb495c18324a5189c69",
+      "positionsIndicesSha256Canonical": "4a917130cbac65485ef4a21fc5890eee685b64eeec3afe12ce7aee164d60feec",
+      "primitives": [
+        {
+          "positions": {
+            "count": 9365,
+            "sha256Canonical": "267dfdbdb28e1def0ba71dd619c92b3ea1bf2210cc496a5ef16ef2276d1138be"
+          },
+          "indices": {
+            "count": 20622,
+            "sha256Canonical": "053b1770fbfbc45dd2f91edbff46f89e9b7f88d9ac0da1920848ac08ecc94f21"
+          }
+        },
+        {
+          "positions": {
+            "count": 2766,
+            "sha256Canonical": "e7f347d95f614db6c225cefbce5a5bd35b8a4682e698a7d40507dc367f072ede"
+          },
+          "indices": {
+            "count": 4140,
+            "sha256Canonical": "ae66696cfdbbb2d7cf78380c28171cb67bf4fb9902f6a2df9cfb37decbd8183e"
+          }
+        }
+      ],
+      "nodes": [
+        {
+          "mesh": 0,
+          "name": "ChapterEntryReturn"
+        }
+      ]
+    }
+  ],
+  "positionsAndIndicesIdentical": true,
+  "floorSourceLiteral": "addWorldQuad({{-1.85f, kRouteFloorWorldY, 3.4f}}, {{1.85f, kRouteFloorWorldY, 3.4f}}, {{1.85f, kRouteFloorWorldY, -6.4f}}, {{-1.85f, kRouteFloorWorldY, -6.4f}}, SurfaceWetCobble, SurfaceUp);",
+  "floorAuthority": "src/gameplay/ShowcaseRoute.h:kRouteFloorWorldY=-0.95",
+  "runtimeTransform": "One mesh, one node, no TRS/matrix transform in runtime; positions are already world-baked."
+}

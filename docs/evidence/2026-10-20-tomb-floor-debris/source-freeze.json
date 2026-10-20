@@ -1,0 +1,75 @@
+{
+  "sourceBase": "25ba90c8a396745463712b4cbc6dc3f13c78dc21",
+  "sources": {
+    "src/scene/TombFloorDebris.h": {
+      "bytes": 2645,
+      "sha256": "46030df8920eb96541c385a69557d72b0e02a1b026cb990372b76ceb8d7aa43e",
+      "gitBlob": "edcaec59776300a2a80abc0fcf624f020d40d085"
+    },
+    "src/scene/TombDressing.h": {
+      "bytes": 2985,
+      "sha256": "3016d9d0ed3b245b9203cfab0d9c9877ef7daf04b2abe866bee2155795ef6870",
+      "gitBlob": "4d555bd379de1e44533c39dde4aae098c1e894c3"
+    },
+    "src/scene/TombDressing.cpp": {
+      "bytes": 31447,
+      "sha256": "1bc20a107ace84a0ee53f679f9e697a7e5c017bf2f8ad6dc8c3112b594ea06d4",
+      "gitBlob": "34d1b4673f2d1e3f8ebf0b1ddef026f934d74c32"
+    },
+    "src/vulkan/raytracing/PresentableTinyRtScene.h": {
+      "bytes": 68772,
+      "sha256": "dd2a10261b7d8ad0b6c61e017a0c9fdd44d7a58d45b6df53c86d9a630a000a4f",
+      "gitBlob": "a55efa422dc0df9c51111fd4b2b9a42a7d0a2442"
+    },
+    "src/vulkan/raytracing/PresentableTinyRtScene.cpp": {
+      "bytes": 490640,
+      "sha256": "28d02f30807f0af44b288012ecca22f89f73249ad6fccdef6db727349d5c5611",
+      "gitBlob": "8940f51098a5dd32b9bd5cf595f0eb21579fd56e"
+    },
+    "src/platform/windows/WindowsEnvironmentSurveyLaunch.h": {
+      "bytes": 3868,
+      "sha256": "984df559ba43b1d686334482db37d766dcacb582448b6de2f063cf0d7f8e90bc",
+      "gitBlob": "f1b6ff77e8d43287a91f161797506cee5fd47e88"
+    },
+    "src/platform/windows/WindowsEnvironmentSurveyCapture.inl": {
+      "bytes": 14357,
+      "sha256": "21df97858320828340875bea855f4f97043256af7afcf6b8a38a675b5d67ea42",
+      "gitBlob": "91deb7bf78ff0232e6b9b2a8bfefe3d0699c82f5"
+    },
+    "src/platform/windows/DiagnosticWindow.cpp": {
+      "bytes": 602956,
+      "sha256": "868c7eb0255cdf58d4011516d171ce5b126b11e153ffeaa3932b781f7f27b7c5",
+      "gitBlob": "c64dfe8b2d44be8e7c55845a3152ff1e3636a211"
+    },
+    "tests/TombDressingTests.cpp": {
+      "bytes": 57210,
+      "sha256": "db78734af8f66f362a81ee81f572af8169bddbbae6c63431cb1c5d75c33880d4",
+      "gitBlob": "9042c7a7119684e0dc2d6cec71f7062da8f821fe"
+    },
+    "tests/WindowsBenchmarkLaunchTests.cpp": {
+      "bytes": 32007,
+      "sha256": "ee164dd4d3b50689941eb68edcfca65cfa1cad00785c228e4d29f33f5feaf481",
+      "gitBlob": "205be79f0802cd6febd69b9512e1784bf44c4791"
+    },
+    "src/graphics/GraphicsSettings.h": {
+      "bytes": 23455,
+      "sha256": "2ce5d0af2aea26ead64ce347012377d768cb2c3132bb44da7a79b18aa154680e",
+      "gitBlob": "29ba50013dfa286a3707b7d04dd19b4248c7e551"
+    },
+    "android/app/src/main/java/com/samfa12/hordelanternrt/GraphicsPreferences.java": {
+      "bytes": 12287,
+      "sha256": "f3aab7d3428a2cd32cb4776ab27146a6a48cb977bfced07bd3473beba8c2d41b",
+      "gitBlob": "018c313732d845495ce09c6af68189d075be0f47"
+    }
+  },
+  "canonicalOwnerFiles": {
+    "ASSET_LICENSES.md": {
+      "bytes": 30507,
+      "sha256": "3a6cff3d34421d2ec751b1f64ec44b6c3ee801cdc1d6d1123c3cb479c0b92387"
+    },
+    "PROJECT_MEMORY.md": {
+      "bytes": 51219,
+      "sha256": "9cfbea7667b50a9a960396c8f13c68905791aebd42121ecb353a8354b8cd406e"
+    }
+  }
+}

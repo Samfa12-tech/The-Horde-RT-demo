@@ -612,7 +612,8 @@ struct VulkanSurfaceContext
     bool chestInteractionPromptPresented = false;
     bool rescueInteractionPromptPresented = false;
     bool mouseCursorHidden = false;
-    bool environmentSurveyActive=false,environmentSurveyWaterDisabled=false;
+    bool environmentSurveyActive=false,environmentSurveyWaterDisabled=false,environmentSurveyDebrisDisabled=false;
+    std::string environmentSurveyProfile;
     float environmentSurveyTime=0;
     horde::platform::windows::EnvironmentSurveyCamera environmentSurveyCamera{};
     POINT mouseRestorePosition{};
@@ -6720,7 +6721,7 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
                 return false;
             }
             // Render-only exterior survey: no simulated pose/progress import.
-            frameInputs.tuning.fogDensityScale=.004f;
+            if(ctx.environmentSurveyProfile=="river-bend")frameInputs.tuning.fogDensityScale=.004f;
         }
 #endif
         if (evidenceFrame)
@@ -8502,6 +8503,8 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     context.nativeMotionValidation = !nativeMotionScenario.empty();
     context.environmentSurveyActive=ParseCaptureLaunchOptions().environmentSurvey.requested;
     context.environmentSurveyWaterDisabled=ParseCaptureLaunchOptions().environmentSurvey.waterDisabled;
+    context.environmentSurveyDebrisDisabled=ParseCaptureLaunchOptions().environmentSurvey.debrisDisabled;
+    context.environmentSurveyProfile=ParseCaptureLaunchOptions().environmentSurvey.profile;
 #if defined(_DEBUG)
     if(captureDirectory != nullptr) context.skyAttribution=ParseCaptureLaunchOptions().skyAttribution;
     if (context.nativeMotionValidation) context.motionRequestedRtPreset = nativeMotionRtWorkloadPreset;
@@ -8687,9 +8690,10 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         return 1;
     }
     #if defined(_DEBUG)
-    if(context.environmentSurveyActive && !context.rtScene.SetRegionalWaterDiagnosticEnabled(
-            !context.environmentSurveyWaterDisabled))
-    {std::cerr<<"Environment survey water selection was not admitted before scene initialization.\n";(void)renderOwner.Retire();return 1;}
+    if(context.environmentSurveyActive && (!context.rtScene.SetFloorDebrisDiagnosticEnabled(
+            !context.environmentSurveyDebrisDisabled) || !context.rtScene.SetRegionalWaterDiagnosticEnabled(
+            !context.environmentSurveyWaterDisabled)))
+    {std::cerr<<"Environment survey geometry selection was not admitted before scene initialization.\n";(void)renderOwner.Retire();return 1;}
     #endif
     if (!InitialiseRtSceneForSwapchain(context))
     {

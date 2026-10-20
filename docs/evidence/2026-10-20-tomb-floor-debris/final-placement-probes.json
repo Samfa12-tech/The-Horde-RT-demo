@@ -1,0 +1,2324 @@
+{
+  "schema": 1,
+  "evidenceClass": "One final offline CPU vertex/centroid probe against finished recipe and current native runtime GLB; not a game run, GPU lighting/readability, contact, device or owner acceptance",
+  "files": {
+    "recipe": {
+      "path": "src\\scene\\TombFloorDebris.h",
+      "sha256": "46030df8920eb96541c385a69557d72b0e02a1b026cb990372b76ceb8d7aa43e"
+    },
+    "runtime": {
+      "path": "assets\\models\\world\\runtime\\chapter-entry-return-v1\\collapsed-entry-lod0.runtime.glb",
+      "sha256": "29cd8b3ad46cd0b115c2bef8264be3b404281ac048c2cfb495c18324a5189c69"
+    },
+    "camera": {
+      "path": "src\\platform\\windows\\WindowsEnvironmentSurveyLaunch.h",
+      "sha256": "984df559ba43b1d686334482db37d766dcacb582448b6de2f063cf0d7f8e90bc"
+    },
+    "floor": {
+      "path": "src\\vulkan\\raytracing\\PresentableTinyRtScene.cpp",
+      "sha256": "28d02f30807f0af44b288012ecca22f89f73249ad6fccdef6db727349d5c5611"
+    },
+    "route": {
+      "path": "src\\gameplay\\ShowcaseRoute.h",
+      "sha256": "d99d1a587aae1c2e3997fa7cd7df88699a9dd2b00de5cce670b03a91b731d870"
+    },
+    "projection": {
+      "path": "shaders\\raytracing\\include\\rt_frame.glsl",
+      "sha256": "6541ff4011f3051ed89752c04de6beb2af90a002011b705f63c96fdf8ab835b2"
+    }
+  },
+  "runtimeTriangleCount": 8254,
+  "generatedChipTriangles": 72,
+  "recipeEvaluation": "Float32 emulation of stored specs, arithmetic and trig results; intersection uses doubles and ignores last 1e-5 segment fraction to avoid endpoint self hits. This is not a native C++ execution.",
+  "cameras": [
+    {
+      "name": "ordinary-spawn",
+      "origin": [
+        0,
+        0.7,
+        1.85
+      ],
+      "yaw": 0.0,
+      "pitch": -0.15
+    },
+    {
+      "name": "actual-debris-diagnostic",
+      "origin": [
+        0.9,
+        0.7,
+        1.3
+      ],
+      "yaw": 2.7457098960876465,
+      "pitch": -0.3199999928474426
+    }
+  ],
+  "projectionExtent": [
+    960,
+    540
+  ],
+  "actualCombinedBounds": [
+    [
+      1.6366357803344727,
+      -0.9509999752044678,
+      3.1460483074188232
+    ],
+    [
+      1.790576457977295,
+      -0.890999972820282,
+      3.360384702682495
+    ]
+  ],
+  "stones": [
+    {
+      "stone": 0,
+      "spec": [
+        1.67,
+        3.19,
+        0.055,
+        0.075,
+        0.055,
+        -0.3
+      ],
+      "actualVertices": [
+        [
+          1.6548103094100952,
+          -0.9509999752044678,
+          3.1460483074188232
+        ],
+        [
+          1.7058022022247314,
+          -0.9509999752044678,
+          3.1673171520233154
+        ],
+        [
+          1.679935336112976,
+          -0.9509999752044678,
+          3.2323265075683594
+        ],
+        [
+          1.6366357803344727,
+          -0.9509999752044678,
+          3.204801321029663
+        ],
+        [
+          1.6601141691207886,
+          -0.9113999605178833,
+          3.158679723739624
+        ],
+        [
+          1.693906307220459,
+          -0.8959999680519104,
+          3.1722731590270996
+        ],
+        [
+          1.6725295782089233,
+          -0.9207499623298645,
+          3.2190449237823486
+        ],
+        [
+          1.6453790664672852,
+          -0.9113999605178833,
+          3.1988701820373535
+        ]
+      ],
+      "bounds": [
+        [
+          1.6366357803344727,
+          -0.9509999752044678,
+          3.1460483074188232
+        ],
+        [
+          1.7058022022247314,
+          -0.8959999680519104,
+          3.2323265075683594
+        ]
+      ],
+      "bottomOverlapMetres": 0.0009999871253967285,
+      "topHeightAboveFloorMetres": 0.054000020027160645
+    },
+    {
+      "stone": 1,
+      "spec": [
+        1.75,
+        3.2,
+        0.065,
+        0.08,
+        0.045,
+        0.25
+      ],
+      "actualVertices": [
+        [
+          1.7086142301559448,
+          -0.9509999752044678,
+          3.1692841053009033
+        ],
+        [
+          1.7729789018630981,
+          -0.9509999752044678,
+          3.1586287021636963
+        ],
+        [
+          1.7850878238677979,
+          -0.9509999752044678,
+          3.2323241233825684
+        ],
+        [
+          1.724843978881836,
+          -0.9509999752044678,
+          3.232844829559326
+        ],
+        [
+          1.7214617729187012,
+          -0.9185999631881714,
+          3.177562952041626
+        ],
+        [
+          1.7638198137283325,
+          -0.9059999585151672,
+          3.1700499057769775
+        ],
+        [
+          1.7697211503982544,
+          -0.9262499809265137,
+          3.2246885299682617
+        ],
+        [
+          1.7302242517471313,
+          -0.9185999631881714,
+          3.222388744354248
+        ]
+      ],
+      "bounds": [
+        [
+          1.7086142301559448,
+          -0.9509999752044678,
+          3.1586287021636963
+        ],
+        [
+          1.7850878238677979,
+          -0.9059999585151672,
+          3.232844829559326
+        ]
+      ],
+      "bottomOverlapMetres": 0.0009999871253967285,
+      "topHeightAboveFloorMetres": 0.04400002956390381
+    },
+    {
+      "stone": 2,
+      "spec": [
+        1.672,
+        3.26,
+        0.06,
+        0.055,
+        0.03,
+        -0.55
+      ],
+      "actualVertices": [
+        [
+          1.660798192024231,
+          -0.9509999752044678,
+          3.2208750247955322
+        ],
+        [
+          1.709937334060669,
+          -0.9509999752044678,
+          3.2555184364318848
+        ],
+        [
+          1.678086757659912,
+          -0.9509999752044678,
+          3.2959887981414795
+        ],
+        [
+          1.6372250318527222,
+          -0.9509999752044678,
+          3.259323835372925
+        ],
+        [
+          1.6649577617645264,
+          -0.9293999671936035,
+          3.232457160949707
+        ],
+        [
+          1.6975678205490112,
+          -0.9210000038146973,
+          3.255031108856201
+        ],
+        [
+          1.6718811988830566,
+          -0.934499979019165,
+          3.2831523418426514
+        ],
+        [
+          1.646525502204895,
+          -0.9293999671936035,
+          3.2579293251037598
+        ]
+      ],
+      "bounds": [
+        [
+          1.6372250318527222,
+          -0.9509999752044678,
+          3.2208750247955322
+        ],
+        [
+          1.709937334060669,
+          -0.9210000038146973,
+          3.2959887981414795
+        ]
+      ],
+      "bottomOverlapMetres": 0.0009999871253967285,
+      "topHeightAboveFloorMetres": 0.02899998426437378
+    },
+    {
+      "stone": 3,
+      "spec": [
+        1.758,
+        3.265,
+        0.045,
+        0.07,
+        0.06,
+        0.5
+      ],
+      "actualVertices": [
+        [
+          1.721474528312683,
+          -0.9509999752044678,
+          3.2450716495513916
+        ],
+        [
+          1.7633148431777954,
+          -0.9509999752044678,
+          3.227797746658325
+        ],
+        [
+          1.790576457977295,
+          -0.9509999752044678,
+          3.287086009979248
+        ],
+        [
+          1.7489935159683228,
+          -0.9509999752044678,
+          3.295444965362549
+        ],
+        [
+          1.7324914932250977,
+          -0.9077999591827393,
+          3.25022029876709
+        ],
+        [
+          1.759898066520691,
+          -0.890999972820282,
+          3.238438606262207
+        ],
+        [
+          1.7779797315597534,
+          -0.9179999828338623,
+          3.2828001976013184
+        ],
+        [
+          1.750040888786316,
+          -0.9077999591827393,
+          3.2860987186431885
+        ]
+      ],
+      "bounds": [
+        [
+          1.721474528312683,
+          -0.9509999752044678,
+          3.227797746658325
+        ],
+        [
+          1.790576457977295,
+          -0.890999972820282,
+          3.295444965362549
+        ]
+      ],
+      "bottomOverlapMetres": 0.0009999871253967285,
+      "topHeightAboveFloorMetres": 0.05900001525878906
+    },
+    {
+      "stone": 4,
+      "spec": [
+        1.67,
+        3.325,
+        0.035,
+        0.055,
+        0.04,
+        0.7
+      ],
+      "actualVertices": [
+        [
+          1.638899326324463,
+          -0.9509999752044678,
+          3.3152408599853516
+        ],
+        [
+          1.6681488752365112,
+          -0.9509999752044678,
+          3.295637607574463
+        ],
+        [
+          1.6984236240386963,
+          -0.9509999752044678,
+          3.3370139598846436
+        ],
+        [
+          1.6679534912109375,
+          -0.9509999752044678,
+          3.3497350215911865
+        ],
+        [
+          1.6481428146362305,
+          -0.9221999645233154,
+          3.3175222873687744
+        ],
+        [
+          1.6672279834747314,
+          -0.9109999537467957,
+          3.304323673248291
+        ],
+        [
+          1.6881093978881836,
+          -0.9289999604225159,
+          3.335634469985962
+        ],
+        [
+          1.6672682762145996,
+          -0.9221999645233154,
+          3.3424019813537598
+        ]
+      ],
+      "bounds": [
+        [
+          1.638899326324463,
+          -0.9509999752044678,
+          3.295637607574463
+        ],
+        [
+          1.6984236240386963,
+          -0.9109999537467957,
+          3.3497350215911865
+        ]
+      ],
+      "bottomOverlapMetres": 0.0009999871253967285,
+      "topHeightAboveFloorMetres": 0.03900003433227539
+    },
+    {
+      "stone": 5,
+      "spec": [
+        1.75,
+        3.33,
+        0.055,
+        0.05,
+        0.025,
+        -0.3
+      ],
+      "actualVertices": [
+        [
+          1.7311162948608398,
+          -0.9509999752044678,
+          3.297989845275879
+        ],
+        [
+          1.782625436782837,
+          -0.9509999752044678,
+          3.317586898803711
+        ],
+        [
+          1.76362943649292,
+          -0.9509999752044678,
+          3.360384702682495
+        ],
+        [
+          1.718999981880188,
+          -0.9509999752044678,
+          3.337158679962158
+        ],
+        [
+          1.7374545335769653,
+          -0.9329999685287476,
+          3.3072776794433594
+        ],
+        [
+          1.7715421915054321,
+          -0.9259999990463257,
+          3.319915533065796
+        ],
+        [
+          1.755189299583435,
+          -0.9372499585151672,
+          3.3504467010498047
+        ],
+        [
+          1.7269304990768433,
+          -0.9329999685287476,
+          3.3338544368743896
+        ]
+      ],
+      "bounds": [
+        [
+          1.718999981880188,
+          -0.9509999752044678,
+          3.297989845275879
+        ],
+        [
+          1.782625436782837,
+          -0.9259999990463257,
+          3.360384702682495
+        ]
+      ],
+      "bottomOverlapMetres": 0.0009999871253967285,
+      "topHeightAboveFloorMetres": 0.02399998903274536
+    }
+  ],
+  "topSamples": [
+    {
+      "stone": 0,
+      "sample": "top-vertex-4",
+      "point": [
+        1.6601141691207886,
+        -0.9113999605178833,
+        3.158679723739624
+      ],
+      "views": [
+        {
+          "camera": "ordinary-spawn",
+          "projection": {
+            "inFront": false,
+            "inFrame": false,
+            "cameraForwardDepth": -0.9672445153490175,
+            "uv": null
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        },
+        {
+          "camera": "actual-debris-diagnostic",
+          "projection": {
+            "inFront": true,
+            "inFrame": true,
+            "cameraForwardDepth": 2.4424344896806858,
+            "uv": [
+              0.5021669827383387,
+              0.7748820647127939
+            ]
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        }
+      ]
+    },
+    {
+      "stone": 0,
+      "sample": "top-vertex-5",
+      "point": [
+        1.693906307220459,
+        -0.8959999680519104,
+        3.1722731590270996
+      ],
+      "views": [
+        {
+          "camera": "ordinary-spawn",
+          "projection": {
+            "inFront": false,
+            "inFrame": false,
+            "cameraForwardDepth": -0.983594162311755,
+            "uv": null
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        },
+        {
+          "camera": "actual-debris-diagnostic",
+          "projection": {
+            "inFront": true,
+            "inFrame": true,
+            "cameraForwardDepth": 2.461074582110576,
+            "uv": [
+              0.4985344687887711,
+              0.764990155993477
+            ]
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        }
+      ]
+    },
+    {
+      "stone": 0,
+      "sample": "top-vertex-6",
+      "point": [
+        1.6725295782089233,
+        -0.9207499623298645,
+        3.2190449237823486
+      ],
+      "views": [
+        {
+          "camera": "ordinary-spawn",
+          "projection": {
+            "inFront": false,
+            "inFrame": false,
+            "cameraForwardDepth": -1.0246037777762291,
+            "uv": null
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        },
+        {
+          "camera": "actual-debris-diagnostic",
+          "projection": {
+            "inFront": true,
+            "inFrame": true,
+            "cameraForwardDepth": 2.5024046685220935,
+            "uv": [
+              0.503736203951331,
+              0.7642692568913136
+            ]
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        }
+      ]
+    },
+    {
+      "stone": 0,
+      "sample": "top-vertex-7",
+      "point": [
+        1.6453790664672852,
+        -0.9113999605178833,
+        3.1988701820373535
+      ],
+      "views": [
+        {
+          "camera": "ordinary-spawn",
+          "projection": {
+            "inFront": false,
+            "inFrame": false,
+            "cameraForwardDepth": -1.006654502102933,
+            "uv": null
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        },
+        {
+          "camera": "actual-debris-diagnostic",
+          "projection": {
+            "inFront": true,
+            "inFrame": true,
+            "cameraForwardDepth": 2.4718831605066276,
+            "uv": [
+              0.5061797104683644,
+              0.7679736654240246
+            ]
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        }
+      ]
+    },
+    {
+      "stone": 0,
+      "sample": "top-triangle-centroid-0",
+      "point": [
+        1.675516684850057,
+        -0.9093832969665527,
+        3.183332602183024
+      ],
+      "views": [
+        {
+          "camera": "ordinary-spawn",
+          "projection": {
+            "inFront": false,
+            "inFrame": false,
+            "cameraForwardDepth": -0.9918141518123338,
+            "uv": null
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        },
+        {
+          "camera": "actual-debris-diagnostic",
+          "projection": {
+            "inFront": true,
+            "inFrame": true,
+            "cameraForwardDepth": 2.468637913437785,
+            "uv": [
+              0.5014900829745973,
+              0.7680088729985578
+            ]
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        }
+      ]
+    },
+    {
+      "stone": 0,
+      "sample": "top-triangle-centroid-1",
+      "point": [
+        1.6593409379323323,
+        -0.9145166277885437,
+        3.1921982765197754
+      ],
+      "views": [
+        {
+          "camera": "ordinary-spawn",
+          "projection": {
+            "inFront": false,
+            "inFrame": false,
+            "cameraForwardDepth": -0.9995009317427266,
+            "uv": null
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        },
+        {
+          "camera": "actual-debris-diagnostic",
+          "projection": {
+            "inFront": true,
+            "inFrame": true,
+            "cameraForwardDepth": 2.472240772903136,
+            "uv": [
+              0.5040338209450163,
+              0.7689988330328787
+            ]
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        }
+      ]
+    },
+    {
+      "stone": 1,
+      "sample": "top-vertex-4",
+      "point": [
+        1.7214617729187012,
+        -0.9185999631881714,
+        3.177562952041626
+      ],
+      "views": [
+        {
+          "camera": "ordinary-spawn",
+          "projection": {
+            "inFront": false,
+            "inFrame": false,
+            "cameraForwardDepth": -0.9843490074199389,
+            "uv": null
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        },
+        {
+          "camera": "actual-debris-diagnostic",
+          "projection": {
+            "inFront": true,
+            "inFrame": true,
+            "cameraForwardDepth": 2.48346010301914,
+            "uv": [
+              0.4953167993995338,
+              0.7678508881319468
+            ]
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        }
+      ]
+    },
+    {
+      "stone": 1,
+      "sample": "top-vertex-5",
+      "point": [
+        1.7638198137283325,
+        -0.9059999585151672,
+        3.1700499057769775
+      ],
+      "views": [
+        {
+          "camera": "ordinary-spawn",
+          "projection": {
+            "inFront": false,
+            "inFrame": false,
+            "cameraForwardDepth": -0.9794529236564455,
+            "uv": null
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        },
+        {
+          "camera": "actual-debris-diagnostic",
+          "projection": {
+            "inFront": true,
+            "inFrame": true,
+            "cameraForwardDepth": 2.487905816211248,
+            "uv": [
+              0.48953552473637657,
+              0.7623758499673396
+            ]
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        }
+      ]
+    },
+    {
+      "stone": 1,
+      "sample": "top-vertex-6",
+      "point": [
+        1.7697211503982544,
+        -0.9262499809265137,
+        3.2246885299682617
+      ],
+      "views": [
+        {
+          "camera": "ordinary-spawn",
+          "projection": {
+            "inFront": false,
+            "inFrame": false,
+            "cameraForwardDepth": -1.0290591465529824,
+            "uv": null
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        },
+        {
+          "camera": "actual-debris-diagnostic",
+          "projection": {
+            "inFront": true,
+            "inFrame": true,
+            "cameraForwardDepth": 2.544347167994479,
+            "uv": [
+              0.4918748104915228,
+              0.7567850625360857
+            ]
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        }
+      ]
+    },
+    {
+      "stone": 1,
+      "sample": "top-vertex-7",
+      "point": [
+        1.7302242517471313,
+        -0.9185999631881714,
+        3.222388744354248
+      ],
+      "views": [
+        {
+          "camera": "ordinary-spawn",
+          "projection": {
+            "inFront": false,
+            "inFrame": false,
+            "cameraForwardDepth": -1.0283043131342309,
+            "uv": null
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        },
+        {
+          "camera": "actual-debris-diagnostic",
+          "projection": {
+            "inFront": true,
+            "inFrame": true,
+            "cameraForwardDepth": 2.5254179983645395,
+            "uv": [
+              0.4966447464405942,
+              0.7583334073105779
+            ]
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        }
+      ]
+    },
+    {
+      "stone": 1,
+      "sample": "top-triangle-centroid-0",
+      "point": [
+        1.751667579015096,
+        -0.9169499675432841,
+        3.1907671292622886
+      ],
+      "views": [
+        {
+          "camera": "ordinary-spawn",
+          "projection": {
+            "inFront": false,
+            "inFrame": false,
+            "cameraForwardDepth": -0.9976203592097891,
+            "uv": null
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        },
+        {
+          "camera": "actual-debris-diagnostic",
+          "projection": {
+            "inFront": true,
+            "inFrame": true,
+            "cameraForwardDepth": 2.5052376957416223,
+            "uv": [
+              0.49223779926722644,
+              0.762292309614485
+            ]
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        }
+      ]
+    },
+    {
+      "stone": 1,
+      "sample": "top-triangle-centroid-1",
+      "point": [
+        1.7404690583546956,
+        -0.9211499691009521,
+        3.2082134087880454
+      ],
+      "views": [
+        {
+          "camera": "ordinary-spawn",
+          "projection": {
+            "inFront": false,
+            "inFrame": false,
+            "cameraForwardDepth": -1.0139041557023842,
+            "uv": null
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        },
+        {
+          "camera": "actual-debris-diagnostic",
+          "projection": {
+            "inFront": true,
+            "inFrame": true,
+            "cameraForwardDepth": 2.5177417564593862,
+            "uv": [
+              0.49460134432183267,
+              0.7609411353415311
+            ]
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        }
+      ]
+    },
+    {
+      "stone": 2,
+      "sample": "top-vertex-4",
+      "point": [
+        1.6649577617645264,
+        -0.9293999671936035,
+        3.232457160949707
+      ],
+      "views": [
+        {
+          "camera": "ordinary-spawn",
+          "projection": {
+            "inFront": false,
+            "inFrame": false,
+            "cameraForwardDepth": -1.0360591528375214,
+            "uv": null
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        },
+        {
+          "camera": "actual-debris-diagnostic",
+          "projection": {
+            "inFront": true,
+            "inFrame": true,
+            "cameraForwardDepth": 2.5142738020681814,
+            "uv": [
+              0.5053778128288335,
+              0.7646057766560913
+            ]
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        }
+      ]
+    },
+    {
+      "stone": 2,
+      "sample": "top-vertex-5",
+      "point": [
+        1.6975678205490112,
+        -0.9210000038146973,
+        3.255031108856201
+      ],
+      "views": [
+        {
+          "camera": "ordinary-spawn",
+          "projection": {
+            "inFront": false,
+            "inFrame": false,
+            "cameraForwardDepth": -1.0598420982818564,
+            "uv": null
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        },
+        {
+          "camera": "actual-debris-diagnostic",
+          "projection": {
+            "inFront": true,
+            "inFrame": true,
+            "cameraForwardDepth": 2.5426865109635712,
+            "uv": [
+              0.5024321921819981,
+              0.7553371912569569
+            ]
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        }
+      ]
+    },
+    {
+      "stone": 2,
+      "sample": "top-vertex-6",
+      "point": [
+        1.6718811988830566,
+        -0.934499979019165,
+        3.2831523418426514
+      ],
+      "views": [
+        {
+          "camera": "ordinary-spawn",
+          "projection": {
+            "inFront": false,
+            "inFrame": false,
+            "cameraForwardDepth": -1.08476967296341,
+            "uv": null
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        },
+        {
+          "camera": "actual-debris-diagnostic",
+          "projection": {
+            "inFront": true,
+            "inFrame": true,
+            "cameraForwardDepth": 2.5624152620419904,
+            "uv": [
+              0.507039160667574,
+              0.7556536566883867
+            ]
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        }
+      ]
+    },
+    {
+      "stone": 2,
+      "sample": "top-vertex-7",
+      "point": [
+        1.646525502204895,
+        -0.9293999671936035,
+        3.2579293251037598
+      ],
+      "views": [
+        {
+          "camera": "ordinary-spawn",
+          "projection": {
+            "inFront": false,
+            "inFrame": false,
+            "cameraForwardDepth": -1.0610366647750125,
+            "uv": null
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        },
+        {
+          "camera": "actual-debris-diagnostic",
+          "projection": {
+            "inFront": true,
+            "inFrame": true,
+            "cameraForwardDepth": 2.5296492575377707,
+            "uv": [
+              0.5089842869315587,
+              0.7611436571004074
+            ]
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        }
+      ]
+    },
+    {
+      "stone": 2,
+      "sample": "top-triangle-centroid-0",
+      "point": [
+        1.678135593732198,
+        -0.9282999833424886,
+        3.256880203882853
+      ],
+      "views": [
+        {
+          "camera": "ordinary-spawn",
+          "projection": {
+            "inFront": false,
+            "inFrame": false,
+            "cameraForwardDepth": -1.060223641360929,
+            "uv": null
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        },
+        {
+          "camera": "actual-debris-diagnostic",
+          "projection": {
+            "inFront": true,
+            "inFrame": true,
+            "cameraForwardDepth": 2.539791858357914,
+            "uv": [
+              0.5049535356953961,
+              0.7585021064216023
+            ]
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        }
+      ]
+    },
+    {
+      "stone": 2,
+      "sample": "top-triangle-centroid-1",
+      "point": [
+        1.6611214876174927,
+        -0.9310999711354574,
+        3.2578462759653726
+      ],
+      "views": [
+        {
+          "camera": "ordinary-spawn",
+          "projection": {
+            "inFront": false,
+            "inFrame": false,
+            "cameraForwardDepth": -1.0606218301919812,
+            "uv": null
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        },
+        {
+          "camera": "actual-debris-diagnostic",
+          "projection": {
+            "inFront": true,
+            "inFrame": true,
+            "cameraForwardDepth": 2.5354461072159804,
+            "uv": [
+              0.5071368954554578,
+              0.7604385945434828
+            ]
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        }
+      ]
+    },
+    {
+      "stone": 3,
+      "sample": "top-vertex-4",
+      "point": [
+        1.7324914932250977,
+        -0.9077999591827393,
+        3.25022029876709
+      ],
+      "views": [
+        {
+          "camera": "ordinary-spawn",
+          "projection": {
+            "inFront": false,
+            "inFrame": false,
+            "cameraForwardDepth": -1.057713452610926,
+            "uv": null
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        },
+        {
+          "camera": "actual-debris-diagnostic",
+          "projection": {
+            "inFront": true,
+            "inFrame": true,
+            "cameraForwardDepth": 2.5465735952013957,
+            "uv": [
+              0.4978368531140258,
+              0.7499259494298921
+            ]
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        }
+      ]
+    },
+    {
+      "stone": 3,
+      "sample": "top-vertex-5",
+      "point": [
+        1.759898066520691,
+        -0.890999972820282,
+        3.238438606262207
+      ],
+      "views": [
+        {
+          "camera": "ordinary-spawn",
+          "projection": {
+            "inFront": false,
+            "inFrame": false,
+            "cameraForwardDepth": -1.0494553010094847,
+            "uv": null
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        },
+        {
+          "camera": "actual-debris-diagnostic",
+          "projection": {
+            "inFront": true,
+            "inFrame": true,
+            "cameraForwardDepth": 2.540460752333012,
+            "uv": [
+              0.4938026672964971,
+              0.7454488066427984
+            ]
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        }
+      ]
+    },
+    {
+      "stone": 3,
+      "sample": "top-vertex-6",
+      "point": [
+        1.7779797315597534,
+        -0.9179999828338623,
+        3.2828001976013184
+      ],
+      "views": [
+        {
+          "camera": "ordinary-spawn",
+          "projection": {
+            "inFront": false,
+            "inFrame": false,
+            "cameraForwardDepth": -1.0876602826069592,
+            "uv": null
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        },
+        {
+          "camera": "actual-debris-diagnostic",
+          "projection": {
+            "inFront": true,
+            "inFrame": true,
+            "cameraForwardDepth": 2.5947565919557736,
+            "uv": [
+              0.4939883738122329,
+              0.7430764492381312
+            ]
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        }
+      ]
+    },
+    {
+      "stone": 3,
+      "sample": "top-vertex-7",
+      "point": [
+        1.750040888786316,
+        -0.9077999591827393,
+        3.2860987186431885
+      ],
+      "views": [
+        {
+          "camera": "ordinary-spawn",
+          "projection": {
+            "inFront": false,
+            "inFrame": false,
+            "cameraForwardDepth": -1.0928951378157534,
+            "uv": null
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        },
+        {
+          "camera": "actual-debris-diagnostic",
+          "projection": {
+            "inFront": true,
+            "inFrame": true,
+            "cameraForwardDepth": 2.5839669958873044,
+            "uv": [
+              0.49755523350353825,
+              0.7418954412265774
+            ]
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        }
+      ]
+    },
+    {
+      "stone": 3,
+      "sample": "top-triangle-centroid-0",
+      "point": [
+        1.756789763768514,
+        -0.9055999716122946,
+        3.257153034210205
+      ],
+      "views": [
+        {
+          "camera": "ordinary-spawn",
+          "projection": {
+            "inFront": false,
+            "inFrame": false,
+            "cameraForwardDepth": -1.0649430120757901,
+            "uv": null
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        },
+        {
+          "camera": "actual-debris-diagnostic",
+          "projection": {
+            "inFront": true,
+            "inFrame": true,
+            "cameraForwardDepth": 2.5605969798300605,
+            "uv": [
+              0.49520275932863494,
+              0.7461316791175434
+            ]
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        }
+      ]
+    },
+    {
+      "stone": 3,
+      "sample": "top-triangle-centroid-1",
+      "point": [
+        1.7535040378570557,
+        -0.9111999670664469,
+        3.2730397383371987
+      ],
+      "views": [
+        {
+          "camera": "ordinary-spawn",
+          "projection": {
+            "inFront": false,
+            "inFrame": false,
+            "cameraForwardDepth": -1.0794229576778793,
+            "uv": null
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        },
+        {
+          "camera": "actual-debris-diagnostic",
+          "projection": {
+            "inFront": true,
+            "inFrame": true,
+            "cameraForwardDepth": 2.5750990610148246,
+            "uv": [
+              0.4964500374922603,
+              0.7449392993348909
+            ]
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        }
+      ]
+    },
+    {
+      "stone": 4,
+      "sample": "top-vertex-4",
+      "point": [
+        1.6481428146362305,
+        -0.9221999645233154,
+        3.3175222873687744
+      ],
+      "views": [
+        {
+          "camera": "ordinary-spawn",
+          "projection": {
+            "inFront": false,
+            "inFrame": false,
+            "cameraForwardDepth": -1.1208844086759457,
+            "uv": null
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        },
+        {
+          "camera": "actual-debris-diagnostic",
+          "projection": {
+            "inFront": true,
+            "inFrame": true,
+            "cameraForwardDepth": 2.579302952101535,
+            "uv": [
+              0.5116699076842796,
+              0.7477914083778742
+            ]
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        }
+      ]
+    },
+    {
+      "stone": 4,
+      "sample": "top-vertex-5",
+      "point": [
+        1.6672279834747314,
+        -0.9109999537467957,
+        3.304323673248291
+      ],
+      "views": [
+        {
+          "camera": "ordinary-spawn",
+          "projection": {
+            "inFront": false,
+            "inFrame": false,
+            "cameraForwardDepth": -1.1101386055504954,
+            "uv": null
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        },
+        {
+          "camera": "actual-debris-diagnostic",
+          "projection": {
+            "inFront": true,
+            "inFrame": true,
+            "cameraForwardDepth": 2.5708977268290085,
+            "uv": [
+              0.5086785721636319,
+              0.7457696237063589
+            ]
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        }
+      ]
+    },
+    {
+      "stone": 4,
+      "sample": "top-vertex-6",
+      "point": [
+        1.6881093978881836,
+        -0.9289999604225159,
+        3.335634469985962
+      ],
+      "views": [
+        {
+          "camera": "ordinary-spawn",
+          "projection": {
+            "inFront": false,
+            "inFrame": false,
+            "cameraForwardDepth": -1.137311276030238,
+            "uv": null
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        },
+        {
+          "camera": "actual-debris-diagnostic",
+          "projection": {
+            "inFront": true,
+            "inFrame": true,
+            "cameraForwardDepth": 2.611789875162324,
+            "uv": [
+              0.5075978135851502,
+              0.7432038635566077
+            ]
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        }
+      ]
+    },
+    {
+      "stone": 4,
+      "sample": "top-vertex-7",
+      "point": [
+        1.6672682762145996,
+        -0.9221999645233154,
+        3.3424019813537598
+      ],
+      "views": [
+        {
+          "camera": "ordinary-spawn",
+          "projection": {
+            "inFront": false,
+            "inFrame": false,
+            "cameraForwardDepth": -1.1452809558147257,
+            "uv": null
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        },
+        {
+          "camera": "actual-debris-diagnostic",
+          "projection": {
+            "inFront": true,
+            "inFrame": true,
+            "cameraForwardDepth": 2.6077488890782448,
+            "uv": [
+              0.5104831283642515,
+              0.7417614300075934
+            ]
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        }
+      ]
+    },
+    {
+      "stone": 4,
+      "sample": "top-triangle-centroid-0",
+      "point": [
+        1.667826731999715,
+        -0.9207332928975424,
+        3.3191601435343423
+      ],
+      "views": [
+        {
+          "camera": "ordinary-spawn",
+          "projection": {
+            "inFront": false,
+            "inFrame": false,
+            "cameraForwardDepth": -1.122778096752226,
+            "uv": null
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        },
+        {
+          "camera": "actual-debris-diagnostic",
+          "projection": {
+            "inFront": true,
+            "inFrame": true,
+            "cameraForwardDepth": 2.5873301846976218,
+            "uv": [
+              0.5093089318880172,
+              0.7455781224156651
+            ]
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        }
+      ]
+    },
+    {
+      "stone": 4,
+      "sample": "top-triangle-centroid-1",
+      "point": [
+        1.6678401629130046,
+        -0.924466629823049,
+        3.331852912902832
+      ],
+      "views": [
+        {
+          "camera": "ordinary-spawn",
+          "projection": {
+            "inFront": false,
+            "inFrame": false,
+            "cameraForwardDepth": -1.13449221350697,
+            "uv": null
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        },
+        {
+          "camera": "actual-debris-diagnostic",
+          "projection": {
+            "inFront": true,
+            "inFrame": true,
+            "cameraForwardDepth": 2.599613905447368,
+            "uv": [
+              0.5099093543750071,
+              0.7442387817802288
+            ]
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        }
+      ]
+    },
+    {
+      "stone": 5,
+      "sample": "top-vertex-4",
+      "point": [
+        1.7374545335769653,
+        -0.9329999685287476,
+        3.3072776794433594
+      ],
+      "views": [
+        {
+          "camera": "ordinary-spawn",
+          "projection": {
+            "inFront": false,
+            "inFrame": false,
+            "cameraForwardDepth": -1.1087206890692312,
+            "uv": null
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        },
+        {
+          "camera": "actual-debris-diagnostic",
+          "projection": {
+            "inFront": true,
+            "inFrame": true,
+            "cameraForwardDepth": 2.6064863001237377,
+            "uv": [
+              0.500180245477634,
+              0.7456681801988418
+            ]
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        }
+      ]
+    },
+    {
+      "stone": 5,
+      "sample": "top-vertex-5",
+      "point": [
+        1.7715421915054321,
+        -0.9259999990463257,
+        3.319915533065796
+      ],
+      "views": [
+        {
+          "camera": "ordinary-spawn",
+          "projection": {
+            "inFront": false,
+            "inFrame": false,
+            "cameraForwardDepth": -1.1224859310745807,
+            "uv": null
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        },
+        {
+          "camera": "actual-debris-diagnostic",
+          "projection": {
+            "inFront": true,
+            "inFrame": true,
+            "cameraForwardDepth": 2.6273212649901843,
+            "uv": [
+              0.49670779326870146,
+              0.7389595581002943
+            ]
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        }
+      ]
+    },
+    {
+      "stone": 5,
+      "sample": "top-vertex-6",
+      "point": [
+        1.755189299583435,
+        -0.9372499585151672,
+        3.3504467010498047
+      ],
+      "views": [
+        {
+          "camera": "ordinary-spawn",
+          "projection": {
+            "inFront": false,
+            "inFrame": false,
+            "cameraForwardDepth": -1.1502179058344828,
+            "uv": null
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        },
+        {
+          "camera": "actual-debris-diagnostic",
+          "projection": {
+            "inFront": true,
+            "inFrame": true,
+            "cameraForwardDepth": 2.651730261427956,
+            "uv": [
+              0.5002139009795485,
+              0.7376813485353266
+            ]
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        }
+      ]
+    },
+    {
+      "stone": 5,
+      "sample": "top-vertex-7",
+      "point": [
+        1.7269304990768433,
+        -0.9329999685287476,
+        3.3338544368743896
+      ],
+      "views": [
+        {
+          "camera": "ordinary-spawn",
+          "projection": {
+            "inFront": false,
+            "inFrame": false,
+            "cameraForwardDepth": -1.1347813438286245,
+            "uv": null
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        },
+        {
+          "camera": "actual-debris-diagnostic",
+          "projection": {
+            "inFront": true,
+            "inFrame": true,
+            "cameraForwardDepth": 2.6256776830721242,
+            "uv": [
+              0.502787138397264,
+              0.741643282596723
+            ]
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        }
+      ]
+    },
+    {
+      "stone": 5,
+      "sample": "top-triangle-centroid-0",
+      "point": [
+        1.7547286748886108,
+        -0.9320833086967468,
+        3.32587997118632
+      ],
+      "views": [
+        {
+          "camera": "ordinary-spawn",
+          "projection": {
+            "inFront": false,
+            "inFrame": false,
+            "cameraForwardDepth": -1.1271415086594314,
+            "uv": null
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        },
+        {
+          "camera": "actual-debris-diagnostic",
+          "projection": {
+            "inFront": true,
+            "inFrame": true,
+            "cameraForwardDepth": 2.6285126088472923,
+            "uv": [
+              0.4990346036183187,
+              0.7407471932519836
+            ]
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        }
+      ]
+    },
+    {
+      "stone": 5,
+      "sample": "top-triangle-centroid-1",
+      "point": [
+        1.7398581107457478,
+        -0.9344166318575541,
+        3.330526272455851
+      ],
+      "views": [
+        {
+          "camera": "ordinary-spawn",
+          "projection": {
+            "inFront": false,
+            "inFrame": false,
+            "cameraForwardDepth": -1.131239979577446,
+            "uv": null
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        },
+        {
+          "camera": "actual-debris-diagnostic",
+          "projection": {
+            "inFront": true,
+            "inFrame": true,
+            "cameraForwardDepth": 2.6279647482079387,
+            "uv": [
+              0.5010597734950031,
+              0.7416413622278555
+            ]
+          },
+          "existingRuntimeBlocker": null,
+          "chipBlocker": null,
+          "firstBlockerClass": "clear",
+          "firstBlocker": null
+        }
+      ]
+    }
+  ],
+  "topSummary": {
+    "ordinary-spawn": {
+      "sampleCount": 36,
+      "firstBlockerClasses": {
+        "clear": 36
+      },
+      "existingRuntimeClear": 36,
+      "inFrame": 0,
+      "clearAndInFrame": 0
+    },
+    "actual-debris-diagnostic": {
+      "sampleCount": 36,
+      "firstBlockerClasses": {
+        "clear": 36
+      },
+      "existingRuntimeClear": 36,
+      "inFrame": 36,
+      "clearAndInFrame": 36
+    }
+  },
+  "lowVerticalQueries": [
+    {
+      "stone": 0,
+      "sample": "base-corner-0",
+      "xz": [
+        1.6548103094100952,
+        3.1460483074188232
+      ],
+      "withinActualOrdinaryFloorQuad": true,
+      "floorY": -0.949999988079071,
+      "existingRuntimeLowVerticalBlocker": null,
+      "otherChipLowVerticalBlocker": null
+    },
+    {
+      "stone": 0,
+      "sample": "base-corner-1",
+      "xz": [
+        1.7058022022247314,
+        3.1673171520233154
+      ],
+      "withinActualOrdinaryFloorQuad": true,
+      "floorY": -0.949999988079071,
+      "existingRuntimeLowVerticalBlocker": null,
+      "otherChipLowVerticalBlocker": null
+    },
+    {
+      "stone": 0,
+      "sample": "base-corner-2",
+      "xz": [
+        1.679935336112976,
+        3.2323265075683594
+      ],
+      "withinActualOrdinaryFloorQuad": true,
+      "floorY": -0.949999988079071,
+      "existingRuntimeLowVerticalBlocker": null,
+      "otherChipLowVerticalBlocker": null
+    },
+    {
+      "stone": 0,
+      "sample": "base-corner-3",
+      "xz": [
+        1.6366357803344727,
+        3.204801321029663
+      ],
+      "withinActualOrdinaryFloorQuad": true,
+      "floorY": -0.949999988079071,
+      "existingRuntimeLowVerticalBlocker": null,
+      "otherChipLowVerticalBlocker": null
+    },
+    {
+      "stone": 0,
+      "sample": "centre",
+      "xz": [
+        1.67,
+        3.19
+      ],
+      "withinActualOrdinaryFloorQuad": true,
+      "floorY": -0.949999988079071,
+      "existingRuntimeLowVerticalBlocker": null,
+      "otherChipLowVerticalBlocker": null
+    },
+    {
+      "stone": 1,
+      "sample": "base-corner-0",
+      "xz": [
+        1.7086142301559448,
+        3.1692841053009033
+      ],
+      "withinActualOrdinaryFloorQuad": true,
+      "floorY": -0.949999988079071,
+      "existingRuntimeLowVerticalBlocker": null,
+      "otherChipLowVerticalBlocker": null
+    },
+    {
+      "stone": 1,
+      "sample": "base-corner-1",
+      "xz": [
+        1.7729789018630981,
+        3.1586287021636963
+      ],
+      "withinActualOrdinaryFloorQuad": true,
+      "floorY": -0.949999988079071,
+      "existingRuntimeLowVerticalBlocker": null,
+      "otherChipLowVerticalBlocker": null
+    },
+    {
+      "stone": 1,
+      "sample": "base-corner-2",
+      "xz": [
+        1.7850878238677979,
+        3.2323241233825684
+      ],
+      "withinActualOrdinaryFloorQuad": true,
+      "floorY": -0.949999988079071,
+      "existingRuntimeLowVerticalBlocker": null,
+      "otherChipLowVerticalBlocker": null
+    },
+    {
+      "stone": 1,
+      "sample": "base-corner-3",
+      "xz": [
+        1.724843978881836,
+        3.232844829559326
+      ],
+      "withinActualOrdinaryFloorQuad": true,
+      "floorY": -0.949999988079071,
+      "existingRuntimeLowVerticalBlocker": null,
+      "otherChipLowVerticalBlocker": null
+    },
+    {
+      "stone": 1,
+      "sample": "centre",
+      "xz": [
+        1.75,
+        3.2
+      ],
+      "withinActualOrdinaryFloorQuad": true,
+      "floorY": -0.949999988079071,
+      "existingRuntimeLowVerticalBlocker": null,
+      "otherChipLowVerticalBlocker": null
+    },
+    {
+      "stone": 2,
+      "sample": "base-corner-0",
+      "xz": [
+        1.660798192024231,
+        3.2208750247955322
+      ],
+      "withinActualOrdinaryFloorQuad": true,
+      "floorY": -0.949999988079071,
+      "existingRuntimeLowVerticalBlocker": null,
+      "otherChipLowVerticalBlocker": null
+    },
+    {
+      "stone": 2,
+      "sample": "base-corner-1",
+      "xz": [
+        1.709937334060669,
+        3.2555184364318848
+      ],
+      "withinActualOrdinaryFloorQuad": true,
+      "floorY": -0.949999988079071,
+      "existingRuntimeLowVerticalBlocker": null,
+      "otherChipLowVerticalBlocker": null
+    },
+    {
+      "stone": 2,
+      "sample": "base-corner-2",
+      "xz": [
+        1.678086757659912,
+        3.2959887981414795
+      ],
+      "withinActualOrdinaryFloorQuad": true,
+      "floorY": -0.949999988079071,
+      "existingRuntimeLowVerticalBlocker": null,
+      "otherChipLowVerticalBlocker": null
+    },
+    {
+      "stone": 2,
+      "sample": "base-corner-3",
+      "xz": [
+        1.6372250318527222,
+        3.259323835372925
+      ],
+      "withinActualOrdinaryFloorQuad": true,
+      "floorY": -0.949999988079071,
+      "existingRuntimeLowVerticalBlocker": null,
+      "otherChipLowVerticalBlocker": null
+    },
+    {
+      "stone": 2,
+      "sample": "centre",
+      "xz": [
+        1.672,
+        3.26
+      ],
+      "withinActualOrdinaryFloorQuad": true,
+      "floorY": -0.949999988079071,
+      "existingRuntimeLowVerticalBlocker": null,
+      "otherChipLowVerticalBlocker": null
+    },
+    {
+      "stone": 3,
+      "sample": "base-corner-0",
+      "xz": [
+        1.721474528312683,
+        3.2450716495513916
+      ],
+      "withinActualOrdinaryFloorQuad": true,
+      "floorY": -0.949999988079071,
+      "existingRuntimeLowVerticalBlocker": null,
+      "otherChipLowVerticalBlocker": null
+    },
+    {
+      "stone": 3,
+      "sample": "base-corner-1",
+      "xz": [
+        1.7633148431777954,
+        3.227797746658325
+      ],
+      "withinActualOrdinaryFloorQuad": true,
+      "floorY": -0.949999988079071,
+      "existingRuntimeLowVerticalBlocker": null,
+      "otherChipLowVerticalBlocker": {
+        "kind": "chip",
+        "stone": 1,
+        "face": "side",
+        "faceIndex": 4,
+        "triangleInFace": 1,
+        "fraction": 0.11378482835582222,
+        "point": [
+          1.7633148431777954,
+          -0.936257187159208,
+          3.227797746658325
+        ]
+      }
+    },
+    {
+      "stone": 3,
+      "sample": "base-corner-2",
+      "xz": [
+        1.790576457977295,
+        3.287086009979248
+      ],
+      "withinActualOrdinaryFloorQuad": true,
+      "floorY": -0.949999988079071,
+      "existingRuntimeLowVerticalBlocker": null,
+      "otherChipLowVerticalBlocker": null
+    },
+    {
+      "stone": 3,
+      "sample": "base-corner-3",
+      "xz": [
+        1.7489935159683228,
+        3.295444965362549
+      ],
+      "withinActualOrdinaryFloorQuad": true,
+      "floorY": -0.949999988079071,
+      "existingRuntimeLowVerticalBlocker": null,
+      "otherChipLowVerticalBlocker": null
+    },
+    {
+      "stone": 3,
+      "sample": "centre",
+      "xz": [
+        1.758,
+        3.265
+      ],
+      "withinActualOrdinaryFloorQuad": true,
+      "floorY": -0.949999988079071,
+      "existingRuntimeLowVerticalBlocker": null,
+      "otherChipLowVerticalBlocker": null
+    },
+    {
+      "stone": 4,
+      "sample": "base-corner-0",
+      "xz": [
+        1.638899326324463,
+        3.3152408599853516
+      ],
+      "withinActualOrdinaryFloorQuad": true,
+      "floorY": -0.949999988079071,
+      "existingRuntimeLowVerticalBlocker": null,
+      "otherChipLowVerticalBlocker": null
+    },
+    {
+      "stone": 4,
+      "sample": "base-corner-1",
+      "xz": [
+        1.6681488752365112,
+        3.295637607574463
+      ],
+      "withinActualOrdinaryFloorQuad": true,
+      "floorY": -0.949999988079071,
+      "existingRuntimeLowVerticalBlocker": null,
+      "otherChipLowVerticalBlocker": null
+    },
+    {
+      "stone": 4,
+      "sample": "base-corner-2",
+      "xz": [
+        1.6984236240386963,
+        3.3370139598846436
+      ],
+      "withinActualOrdinaryFloorQuad": true,
+      "floorY": -0.949999988079071,
+      "existingRuntimeLowVerticalBlocker": null,
+      "otherChipLowVerticalBlocker": null
+    },
+    {
+      "stone": 4,
+      "sample": "base-corner-3",
+      "xz": [
+        1.6679534912109375,
+        3.3497350215911865
+      ],
+      "withinActualOrdinaryFloorQuad": true,
+      "floorY": -0.949999988079071,
+      "existingRuntimeLowVerticalBlocker": null,
+      "otherChipLowVerticalBlocker": null
+    },
+    {
+      "stone": 4,
+      "sample": "centre",
+      "xz": [
+        1.67,
+        3.325
+      ],
+      "withinActualOrdinaryFloorQuad": true,
+      "floorY": -0.949999988079071,
+      "existingRuntimeLowVerticalBlocker": null,
+      "otherChipLowVerticalBlocker": null
+    },
+    {
+      "stone": 5,
+      "sample": "base-corner-0",
+      "xz": [
+        1.7311162948608398,
+        3.297989845275879
+      ],
+      "withinActualOrdinaryFloorQuad": true,
+      "floorY": -0.949999988079071,
+      "existingRuntimeLowVerticalBlocker": null,
+      "otherChipLowVerticalBlocker": null
+    },
+    {
+      "stone": 5,
+      "sample": "base-corner-1",
+      "xz": [
+        1.782625436782837,
+        3.317586898803711
+      ],
+      "withinActualOrdinaryFloorQuad": true,
+      "floorY": -0.949999988079071,
+      "existingRuntimeLowVerticalBlocker": null,
+      "otherChipLowVerticalBlocker": null
+    },
+    {
+      "stone": 5,
+      "sample": "base-corner-2",
+      "xz": [
+        1.76362943649292,
+        3.360384702682495
+      ],
+      "withinActualOrdinaryFloorQuad": true,
+      "floorY": -0.949999988079071,
+      "existingRuntimeLowVerticalBlocker": null,
+      "otherChipLowVerticalBlocker": null
+    },
+    {
+      "stone": 5,
+      "sample": "base-corner-3",
+      "xz": [
+        1.718999981880188,
+        3.337158679962158
+      ],
+      "withinActualOrdinaryFloorQuad": true,
+      "floorY": -0.949999988079071,
+      "existingRuntimeLowVerticalBlocker": null,
+      "otherChipLowVerticalBlocker": null
+    },
+    {
+      "stone": 5,
+      "sample": "centre",
+      "xz": [
+        1.75,
+        3.33
+      ],
+      "withinActualOrdinaryFloorQuad": true,
+      "floorY": -0.949999988079071,
+      "existingRuntimeLowVerticalBlocker": null,
+      "otherChipLowVerticalBlocker": null
+    }
+  ],
+  "floorSourceLiteral": "addWorldQuad({{-1.85f, kRouteFloorWorldY, 3.4f}}, {{1.85f, kRouteFloorWorldY, 3.4f}}, {{1.85f, kRouteFloorWorldY, -6.4f}}, {{-1.85f, kRouteFloorWorldY, -6.4f}}, SurfaceWetCobble, SurfaceUp);",
+  "lowVerticalSummary": {
+    "count": 30,
+    "allWithinActualFloorQuad": true,
+    "existingRuntimeBlockers": 0,
+    "otherChipBlockers": 1
+  },
+  "limits": [
+    "Ordinary spawn has yaw zero and faces away from the chips: clear geometric segments do not mean chips appear in its unchanged view.",
+    "Loaded player/held-item meshes and procedural scene geometry other than the verified floor are not included in this GLB probe. Native RT must inspect their visibility, light, shadows and material readability.",
+    "Cosmetic only; unchanged collision and no stone contact, kicking, simulation or save state.",
+    "Rejected pocket and earlier reports remain unchanged."
+  ]
+}

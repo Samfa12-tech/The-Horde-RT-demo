@@ -1,4 +1,5 @@
 #include "scene/TombDressing.h"
+#include "scene/TombFloorDebris.h"
 #include "scene/TombStoneBevels.h"
 
 #include "scene/assets/AssetManifest.h"
@@ -270,7 +271,8 @@ bool AppendPreparedTombDressing(const std::filesystem::path& assetRoot,
                                 assets::StaticMeshAsset& existingOwner,
                                 TombDressingBuildReport& report,
                                 std::string& diagnostic,
-                                bool includeStoneArchitecture)
+                                bool includeStoneArchitecture,
+                                bool includeFloorDebris)
 {
     report = {};
     if (existingOwner.vertices.empty() || existingOwner.indices.empty() ||
@@ -498,6 +500,19 @@ bool AppendPreparedTombDressing(const std::filesystem::path& assetRoot,
     const auto bevelIndexStart = masonryIndices.size();
     if (includeStoneArchitecture) AppendTombStoneBevels(masonryVertices, masonryIndices);
     candidateReport.bevelTriangles = (masonryIndices.size() - bevelIndexStart) / 3u;
+    const auto debrisVertexStart=masonryVertices.size();
+    const auto debrisTriangleStart=masonryIndices.size()/3u;
+    if(includeStoneArchitecture && includeFloorDebris) {
+        AppendTombFloorDebris(masonryVertices,masonryIndices);
+        candidateReport.floorDebrisTriangles=masonryIndices.size()/3u-debrisTriangleStart;
+        candidateReport.floorDebrisBounds.minimum.fill(std::numeric_limits<float>::max());
+        candidateReport.floorDebrisBounds.maximum.fill(std::numeric_limits<float>::lowest());
+        for(auto i=debrisVertexStart;i<masonryVertices.size();++i)
+            for(unsigned axis=0;axis<3;++axis) {
+                candidateReport.floorDebrisBounds.minimum[axis]=std::min(candidateReport.floorDebrisBounds.minimum[axis],masonryVertices[i].position[axis]);
+                candidateReport.floorDebrisBounds.maximum[axis]=std::max(candidateReport.floorDebrisBounds.maximum[axis],masonryVertices[i].position[axis]);
+            }
+    }
     for (auto i = bevelVertexStart; i < masonryVertices.size(); ++i)
         for (std::size_t axis = 0; axis < 3; ++axis)
         {
@@ -532,6 +547,9 @@ bool AppendPreparedTombDressing(const std::filesystem::path& assetRoot,
         staged.triangleRegions.resize(staged.indices.size()/3u, assets::StaticTriangleRegion::Shared);
         staged.triangleRegions.insert(staged.triangleRegions.end(), primitive.indexCount/3u,
             family == 0u ? assets::StaticTriangleRegion::Shared : assets::StaticTriangleRegion::TombDressing);
+        if(family==0 && candidateReport.floorDebrisTriangles)
+            std::fill(staged.triangleRegions.end()-candidateReport.floorDebrisTriangles,
+                      staged.triangleRegions.end(),assets::StaticTriangleRegion::TombDressing);
         staged.vertices.insert(staged.vertices.end(), groupedVertices[family].begin(), groupedVertices[family].end());
         staged.indices.insert(staged.indices.end(), groupedIndices[family].begin(), groupedIndices[family].end());
         staged.primitives.push_back(primitive);

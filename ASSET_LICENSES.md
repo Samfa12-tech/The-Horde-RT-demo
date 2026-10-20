@@ -1,5 +1,16 @@
 # Asset Licenses
 
+## Original tomb-floor masonry chips (1.7 development)
+
+`src/scene/TombFloorDebris.h` authors six small closed fractured-stone meshes in
+metres, placed beneath the existing broken right roof shoulder. The deterministic
+recipe is original Horde geometry, using the existing shared static PBR path and
+CC0 Poly Haven MedievalWall02 material/texture family documented below. No new
+third-party model, texture layer, generated/downloaded asset, licence change or
+paid production is involved. These are static cosmetic pieces; no kick/contact,
+collision or save state is introduced. Disabled construction omits their geometry.
+
+
 ## Generic distant forest bird candidate (1.7 development)
 
 `assets/audio/filmcow/forest_distant_bird.wav` derives from the existing private

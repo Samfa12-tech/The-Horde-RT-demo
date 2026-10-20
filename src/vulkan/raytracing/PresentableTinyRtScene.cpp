@@ -797,6 +797,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     developmentWorldRoute_=std::exchange(other.developmentWorldRoute_,false);
     developmentRescueJourney_=std::exchange(other.developmentRescueJourney_,false);
     regionalWaterDiagnosticEnabled_=std::exchange(other.regionalWaterDiagnosticEnabled_,true);
+    floorDebrisEnabled_=std::exchange(other.floorDebrisEnabled_,true);
     regionalWaterFaces_=std::move(other.regionalWaterFaces_);
     rescueWorldUpdateScratch_=std::exchange(other.rescueWorldUpdateScratch_,Buffer{});
     rescueWorldVertices_=std::move(other.rescueWorldVertices_);
@@ -2709,7 +2710,7 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
         if (!ConfigureChapterTextureAliases(gothicChestBaseAsset_, gothicChestLidAsset_,
                 rewardLanternRingAsset_, rewardLanternBodyAsset_, diagnostic)) return false;
         horde::scene::TombDressingBuildReport dressing;
-        if (!horde::scene::AppendPreparedTombDressing(root, collapseStaticAsset_, dressing, diagnostic))
+        if (!horde::scene::AppendPreparedTombDressing(root, collapseStaticAsset_, dressing, diagnostic, true, floorDebrisEnabled_))
             return false;
         if (!horde::scene::AppendChapterTerrain(root, collapseStaticAsset_, chapterTerrainSurface_, diagnostic))
             return false;

@@ -343,9 +343,32 @@ int main()
     check(!ParseWindowsEnvironmentSurveyLaunch(duplicateSurveyProfile,true).error.empty(),"duplicate environment profiles reject");
     auto unknown=survey;unknown.back()=L"arbitrary-camera";
     check(!ParseWindowsEnvironmentSurveyLaunch(unknown,true).error.empty(),"unknown survey profile rejects");
+    auto tombSurvey=survey;tombSurvey.back()=L"tomb-debris";
+    const auto tombLaunch=ParseWindowsEnvironmentSurveyLaunch(tombSurvey,true);
+    check(tombLaunch.requested && tombLaunch.profile=="tomb-debris" && !tombLaunch.debrisDisabled &&
+          tombLaunch.error.empty(),"hidden tomb survey admits only its explicit bounded profile");
+    auto debrisBaseline=std::vector<std::wstring_view>(tombSurvey.begin(),tombSurvey.end());
+    debrisBaseline.push_back(L"--survey-debris-disabled");
+    check(ParseWindowsEnvironmentSurveyLaunch(debrisBaseline,true).debrisDisabled &&
+          ParseWindowsEnvironmentSurveyLaunch(debrisBaseline,true).error.empty(),"tomb baseline omits only the optional static chip geometry");
+    check(!ParseWindowsEnvironmentSurveyLaunch(debrisBaseline,false).error.empty(),"tomb survey rejects Release");
+    auto wrongProfile=std::vector<std::wstring_view>(survey.begin(),survey.end());wrongProfile.push_back(L"--survey-debris-disabled");
+    check(!ParseWindowsEnvironmentSurveyLaunch(wrongProfile,true).error.empty(),"debris baseline cannot change river survey");
+    auto waterInTomb=std::vector<std::wstring_view>(tombSurvey.begin(),tombSurvey.end());waterInTomb.push_back(L"--survey-water-disabled");
+    check(!ParseWindowsEnvironmentSurveyLaunch(waterInTomb,true).error.empty(),"tomb survey cannot silently change regional water");
+    check(!ParseWindowsEnvironmentSurveyLaunch(std::array<std::wstring_view,1>{L"--survey-debris-disabled"},true).error.empty(),
+          "debris omission cannot affect ordinary launches");
+    debrisBaseline.push_back(L"--survey-debris-disabled");
+    check(!ParseWindowsEnvironmentSurveyLaunch(debrisBaseline,true).error.empty(),"duplicate debris modifier rejects");
+    const auto opening=TombDebrisSurveyCamera(0),chips=TombDebrisSurveyCamera(60);
+    check(opening.x==horde::gameplay::kPlayerSpawn.x && opening.z==horde::gameplay::kPlayerSpawn.z && opening.yaw==0 &&
+          horde::gameplay::IsShowcasePlayerPositionWalkable(opening.x,opening.z) &&
+          horde::gameplay::IsShowcasePlayerPositionWalkable(chips.x,chips.z) &&
+          opening.supportY==horde::gameplay::kRouteFloorWorldY && chips.supportY==opening.supportY && chips.pitch>=-.32f,
+          "tomb survey retains ordinary spawn view and legal shared-floor diagnostic camera");
     const auto plan=RiverBendSurveyCamera();
-    check(std::abs(plan.x-126.3f)<.0001f && std::abs(plan.z-151.2f)<.0001f &&
-          std::abs(plan.yaw-1.5707963f)<.0001f,"shore camera follows the original atlas transform");
+    check(std::abs(plan.x-134.3f)<.0001f && std::abs(plan.z-131.2f)<.0001f &&
+          std::abs(plan.yaw-3.041924f)<.0001f,"shore camera follows authored E56 N-5 toward E58 N-25 with the original atlas transform");
     unsigned pngCount=0;
     for(unsigned frame=0;frame<kEnvironmentSurveyFrames;++frame) {
         if((frame+1)%kEnvironmentSurveyCaptureStride==0)++pngCount;

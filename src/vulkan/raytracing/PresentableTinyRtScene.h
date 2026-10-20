@@ -301,6 +301,11 @@ public:
         regionalWaterDiagnosticEnabled_ = enabled;
         return true;
     }
+    bool SetFloorDebrisDiagnosticEnabled(bool enabled) {
+        if (ready_ || device_ != VK_NULL_HANDLE) return false;
+        floorDebrisEnabled_ = enabled;
+        return true;
+    }
 #endif
     void SetDevelopmentWorldRoute(bool enabled, bool staged = false) { developmentWorldRoute_=enabled; stagedWorldPreparation_=staged; }
     horde::gameplay::simulation::ZoneReadiness WorldZoneReadiness(horde::gameplay::simulation::WorldZoneToken token) const;
@@ -1197,6 +1202,7 @@ private:
     bool stagedWorldPreparation_ = false;
     bool developmentRescueJourney_ = false;
     bool regionalWaterDiagnosticEnabled_ = true;
+    bool floorDebrisEnabled_ = true;
     std::vector<horde::scene::ChapterWaterTriangle> regionalWaterFaces_;
     Buffer rescueWorldUpdateScratch_;
     std::vector<std::array<float,3>> rescueWorldVertices_;

@@ -1,8 +1,10 @@
 #include "scene/TombDressing.h"
+#include "scene/TombFloorDebris.h"
 #include "scene/TombStoneBevels.h"
 #include "scene/TombWallRecess.h"
 #include "scene/visibility/OpaqueStaticQuadAdmission.h"
 #include "scene/assets/AssetManifest.h"
+#include "gameplay/traversal/RescueTraversal.h"
 
 #include <algorithm>
 #include <array>
@@ -16,6 +18,7 @@
 #include <map>
 #include <string>
 #include <string_view>
+#include <tuple>
 #include <vector>
 
 #ifndef HORDE_RT_SOURCE_DIR
@@ -626,7 +629,7 @@ void TestStoneArchitecture(const std::filesystem::path& assetRoot)
     Check(LoadCollapsedOwner(assetRoot, asset, diagnostic), "load existing masonry owner for stone finish");
     const auto firstPrimitive=asset.primitives.size();
     const auto oldMaterialCount=asset.materials.size();
-    Check(AppendPreparedTombDressing(assetRoot,asset,report,diagnostic), diagnostic.c_str());
+    Check(AppendPreparedTombDressing(assetRoot,asset,report,diagnostic,true,false), diagnostic.c_str());
     Check(report.bevelTriangles==656 && report.addedTriangles==17680+656,
           "twelve bevelled solids and sixteen corner joins add exactly 656 triangles");
     Check(asset.primitives.size()==firstPrimitive+4 && asset.materials.size()==oldMaterialCount+3,
@@ -684,6 +687,215 @@ void TestStoneArchitecture(const std::filesystem::path& assetRoot)
     }
 }
 
+template<class T> bool SameBytes(const std::vector<T>& a,const std::vector<T>& b)
+{
+    return a.size()==b.size() && (a.empty() || std::memcmp(a.data(),b.data(),a.size()*sizeof(T))==0);
+}
+
+bool SameMaterial(const horde::scene::assets::StaticMaterial& a,
+                  const horde::scene::assets::StaticMaterial& b)
+{
+    const auto fields=[](const auto& m) { return std::tie(m.name,m.baseColorFactor,m.emissiveFactor,
+        m.attenuationColor,m.emissiveStrength,m.metallicFactor,m.roughnessFactor,m.occlusionStrength,
+        m.normalScale,m.textureScale,m.transmissionFactor,m.ior,m.thicknessFactor,m.attenuationDistance,
+        m.numericalSpawnMinimumWidth,m.numericalSpawnGeometryError,m.baseColorTexture,m.normalTexture,
+        m.ormTexture,m.emissiveTexture,m.textureGroup,m.deferTextureAllocation,m.flags); };
+    return fields(a)==fields(b);
+}
+
+bool SameOwner(const horde::scene::assets::StaticMeshAsset& a,const horde::scene::assets::StaticMeshAsset& b)
+{
+    if(!SameBytes(a.vertices,b.vertices) || a.indices!=b.indices || a.triangleRegions!=b.triangleRegions ||
+       a.bounds.minimum!=b.bounds.minimum || a.bounds.maximum!=b.bounds.maximum ||
+       a.primitives.size()!=b.primitives.size() || a.materials.size()!=b.materials.size() ||
+       a.nodeTransforms.size()!=b.nodeTransforms.size() || a.sockets.size()!=b.sockets.size()) return false;
+    for(std::size_t i=0;i<a.primitives.size();++i) {
+        const auto& x=a.primitives[i];const auto& y=b.primitives[i];
+        if(std::tie(x.vertexOffset,x.indexOffset,x.indexCount,x.materialIndex,x.nodeTransformIndex)!=
+           std::tie(y.vertexOffset,y.indexOffset,y.indexCount,y.materialIndex,y.nodeTransformIndex))return false;
+    }
+    for(std::size_t i=0;i<a.materials.size();++i)if(!SameMaterial(a.materials[i],b.materials[i]))return false;
+    for(std::size_t i=0;i<a.nodeTransforms.size();++i)
+        if(a.nodeTransforms[i].name!=b.nodeTransforms[i].name || a.nodeTransforms[i].world!=b.nodeTransforms[i].world)return false;
+    for(std::size_t i=0;i<a.sockets.size();++i)
+        if(a.sockets[i].name!=b.sockets[i].name || a.sockets[i].nodeTransformIndex!=b.sockets[i].nodeTransformIndex ||
+           a.sockets[i].world!=b.sockets[i].world)return false;
+    return true;
+}
+
+void TestFloorFragmentGeometry()
+{
+    using namespace horde::scene;
+    using namespace stone_bevel;
+    Check(kTombFloorFragments.size()==6,"debris is a fixed six-fragment pocket");
+    std::vector<assets::StaticRtVertex> all,again;std::vector<std::uint32_t> allIndices,againIndices;
+    AppendTombFloorDebris(all,allIndices);AppendTombFloorDebris(again,againIndices);
+    Check(allIndices.size()==72u*3u && all.size()==72u*3u && SameBytes(all,again) && allIndices==againIndices,
+          "six closed chips have exactly 72 deterministic triangles and split PBR vertices");
+    for(const auto& stone:kTombFloorFragments) {
+        std::vector<assets::StaticRtVertex> vertices;std::vector<std::uint32_t> indices;
+        AppendStoneFragment(vertices,indices,stone);
+        Check(indices.size()==36 && vertices.size()==36,"one fractured chip has twelve triangles");
+        using Key=std::array<long long,3>;using Edge=std::pair<Key,Key>;
+        std::map<Edge,std::pair<int,int>> edges;
+        const auto key=[](const auto& v){return Key{std::llround(v.position[0]*100000),
+            std::llround(v.position[1]*100000),std::llround(v.position[2]*100000)};};
+        const Point inside{stone.x,horde::gameplay::kRouteFloorWorldY-.001f+stone.height*.3f,stone.z};
+        float minimumY=INFINITY,maximumY=-INFINITY;
+        for(std::size_t i=0;i<indices.size();i+=3) {
+            const auto& a=vertices.at(indices[i]);const auto& b=vertices.at(indices[i+1]);const auto& c=vertices.at(indices[i+2]);
+            const Point pa{a.position[0],a.position[1],a.position[2]},pb{b.position[0],b.position[1],b.position[2]},
+                pc{c.position[0],c.position[1],c.position[2]};
+            const auto face=Cross(Sub(pb,pa),Sub(pc,pa));
+            Check(Dot(face,face)>1e-12f && Dot(face,Sub(pa,inside))>0 &&
+                  Dot(Unit(face),{a.normal[0],a.normal[1],a.normal[2]})>.9999f,
+                  "chip triangles are nondegenerate, outward and agree with their shading normals");
+            for(unsigned k=0;k<3;++k) {
+                auto from=key(vertices[indices[i+k]]),to=key(vertices[indices[i+(k+1)%3]]);
+                const int direction=from<to?1:-1;if(to<from)std::swap(from,to);
+                auto& edge=edges[{from,to}];++edge.first;edge.second+=direction;
+            }
+        }
+        for(const auto& [edge,uses]:edges)Check(uses.first==2 && uses.second==0,
+            "welded fragment edges have exactly two opposite uses, including the closed bottom");
+        for(const auto& v:vertices) {
+            const Point n{v.normal[0],v.normal[1],v.normal[2]},t{v.tangent[0],v.tangent[1],v.tangent[2]};
+            const float dx=v.position[0]-stone.x,dz=v.position[2]-stone.z;
+            const float localX=std::cos(stone.yaw)*dx-std::sin(stone.yaw)*dz,
+                localZ=std::sin(stone.yaw)*dx+std::cos(stone.yaw)*dz;
+            Check(Finite(v) && Near(Dot(n,n),1,1e-4f) && Near(Dot(t,t),1,1e-4f) &&
+                  std::abs(Dot(n,t))<1e-4f && std::abs(v.tangent[3])==1,
+                  "each chip has finite UVs and normalized orthogonal tangent frames");
+            Check(std::abs(localX)<=stone.width*.5f+1e-5f && std::abs(localZ)<=stone.length*.5f+1e-5f,
+                  "yawed chip stays inside its declared dimensions");
+            minimumY=std::min(minimumY,v.position[1]);maximumY=std::max(maximumY,v.position[1]);
+        }
+        Check(Near(minimumY,horde::gameplay::kRouteFloorWorldY-.001f,1e-5f) &&
+              Near(maximumY-minimumY,stone.height,1e-5f) && stone.height<=.10f,
+              "chip bottom is grounded with one millimetre overlap and bounded relief");
+    }
+    const auto valid=kTombFloorFragments.front();
+    std::vector<StoneFragmentSpec> invalid;
+    for(unsigned component=0;component<6;++component)for(float bad:{INFINITY,std::numeric_limits<float>::quiet_NaN()}) {
+        auto s=valid;std::array<float*,6> fields{&s.x,&s.z,&s.width,&s.length,&s.height,&s.yaw};
+        *fields[component]=bad;invalid.push_back(s);
+    }
+    for(unsigned dimension=0;dimension<3;++dimension)for(float bad:{0.f,-.01f,dimension==2?.101f:.251f}) {
+        auto s=valid;std::array<float*,3> fields{&s.width,&s.length,&s.height};
+        *fields[dimension]=bad;invalid.push_back(s);
+    }
+    for(const auto& bad:invalid) {
+        auto vertices=all;auto indices=allIndices;bool rejected=false;
+        try{AppendStoneFragment(vertices,indices,bad);}catch(const std::invalid_argument&){rejected=true;}
+        Check(rejected && SameBytes(vertices,all) && indices==allIndices,
+              "nonfinite, nonpositive or oversized fragment rejects without changing an existing prefix");
+    }
+}
+
+void TestFloorDebrisOwner(const std::filesystem::path& assetRoot)
+{
+    using namespace horde::scene;
+    assets::StaticMeshAsset original;std::string diagnostic;
+    if(!LoadCollapsedOwner(assetRoot,original,diagnostic)){Check(false,"load owner for debris admission");return;}
+    auto off=original,on=original,repeat=original,legacyOff=original,legacyOn=original;
+    TombDressingBuildReport offReport,onReport,repeatReport,legacyOffReport,legacyOnReport;
+    const bool prepared=AppendPreparedTombDressing(assetRoot,off,offReport,diagnostic,true,false) &&
+        AppendPreparedTombDressing(assetRoot,on,onReport,diagnostic,true,true) &&
+        AppendPreparedTombDressing(assetRoot,repeat,repeatReport,diagnostic,true,true) &&
+        AppendPreparedTombDressing(assetRoot,legacyOff,legacyOffReport,diagnostic,false,false) &&
+        AppendPreparedTombDressing(assetRoot,legacyOn,legacyOnReport,diagnostic,false,true);
+    Check(prepared,diagnostic.c_str());if(!prepared)return;
+    Check(SameOwner(on,repeat),"complete debris-enabled owner admission is deterministic");
+    Check(SameOwner(legacyOff,legacyOn) && legacyOnReport.floorDebrisTriangles==0 &&
+          legacyOnReport.addedTriangles==17680,"legacy architecture=false fixture omits debris independently of its detail flag");
+    Check(offReport.floorDebrisTriangles==0 && offReport.addedTriangles==17680+656 &&
+          onReport.bevelTriangles==656 && onReport.floorDebrisTriangles==72 &&
+          onReport.addedTriangles==offReport.addedTriangles+72 && on.indices.size()==off.indices.size()+216 &&
+          on.vertices.size()==off.vertices.size()+216,"detail switch preserves old architecture cost and adds exactly 72 triangles");
+    Check(on.primitives.size()==off.primitives.size() && on.materials.size()==off.materials.size() &&
+          on.nodeTransforms.size()==off.nodeTransforms.size() && onReport.placedInstances==offReport.placedInstances &&
+          onReport.addedPrimitives==offReport.addedPrimitives && onReport.addedMaterials==offReport.addedMaterials,
+          "chips reuse the admitted masonry primitive/material/transform without adding prop owners");
+    if(on.primitives.size()!=off.primitives.size() || on.materials.size()!=off.materials.size())return;
+    for(std::size_t i=0;i<off.materials.size();++i)Check(SameMaterial(on.materials[i],off.materials[i]),
+        "all PBR factors, texture references and material families remain exact with detail on");
+    Check(std::memcmp(on.vertices.data(),original.vertices.data(),original.vertices.size()*sizeof(original.vertices[0]))==0 &&
+          std::equal(original.indices.begin(),original.indices.end(),on.indices.begin()),
+          "original collapsed owner vertex/index prefix survives debris admission byte-exact");
+    std::vector<assets::StaticRtVertex> expected;std::vector<std::uint32_t> expectedIndices;
+    AppendTombFloorDebris(expected,expectedIndices);
+    const auto masonry=original.primitives.size();
+    for(std::size_t p=0;p<off.primitives.size();++p) {
+        const auto& a=off.primitives[p];const auto& b=on.primitives[p];
+        const auto end=p+1<off.primitives.size()?off.primitives[p+1].vertexOffset:off.vertices.size();
+        const auto count=end-a.vertexOffset;
+        Check(a.materialIndex==b.materialIndex && a.nodeTransformIndex==b.nodeTransformIndex &&
+              b.indexCount==a.indexCount+(p==masonry?216u:0u) &&
+              std::memcmp(off.vertices.data()+a.vertexOffset,on.vertices.data()+b.vertexOffset,count*sizeof(off.vertices[0]))==0 &&
+              std::equal(off.indices.begin()+a.indexOffset,off.indices.begin()+a.indexOffset+a.indexCount,on.indices.begin()+b.indexOffset),
+              "every old material group retains exact vertex/index content despite suffix offset shifts");
+        for(std::size_t t=0;t<a.indexCount/3;++t)Check(off.triangleRegions[a.indexOffset/3+t]==on.triangleRegions[b.indexOffset/3+t],
+            "every pre-existing triangle retains its region provenance");
+        if(p!=masonry)continue;
+        Check(on.materials[b.materialIndex].name=="MedievalWall02" &&
+              std::memcmp(on.vertices.data()+b.vertexOffset+count,expected.data(),expected.size()*sizeof(expected[0]))==0,
+              "new fragment geometry lives in the existing masonry group");
+        for(std::size_t i=0;i<expectedIndices.size();++i)Check(on.indices[b.indexOffset+a.indexCount+i]==count+expectedIndices[i],
+            "masonry fragment suffix rebases all local indices exactly once");
+        for(std::size_t t=0;t<72;++t)Check(on.triangleRegions[(b.indexOffset+a.indexCount)/3+t]==assets::StaticTriangleRegion::TombDressing,
+            "decorative chips remain TombDressing even when sharing structural masonry material");
+    }
+    TombDressingBounds actual;actual.minimum.fill(INFINITY);actual.maximum.fill(-INFINITY);
+    for(const auto& v:expected)for(unsigned axis=0;axis<3;++axis) {
+        actual.minimum[axis]=std::min(actual.minimum[axis],v.position[axis]);actual.maximum[axis]=std::max(actual.maximum[axis],v.position[axis]);
+    }
+    Check(actual.minimum==onReport.floorDebrisBounds.minimum && actual.maximum==onReport.floorDebrisBounds.maximum,
+          "debris report bounds exactly cover the generated world-space vertices");
+    std::cout<<"Floor debris metrics: triangles="<<onReport.floorDebrisTriangles
+        <<" vertices="<<on.vertices.size()-off.vertices.size()<<" indices="<<on.indices.size()-off.indices.size()
+        <<" vertexBytes="<<(on.vertices.size()-off.vertices.size())*sizeof(assets::StaticRtVertex)
+        <<" indexBytes="<<(on.indices.size()-off.indices.size())*sizeof(std::uint32_t)
+        <<" primitivesDelta="<<on.primitives.size()-off.primitives.size()<<" materialsDelta="<<on.materials.size()-off.materials.size()
+        <<" bounds=["<<actual.minimum[0]<<','<<actual.minimum[1]<<','<<actual.minimum[2]<<"]-["
+        <<actual.maximum[0]<<','<<actual.maximum[1]<<','<<actual.maximum[2]<<"]\n";
+    Check(actual.minimum[0]>1.60f && actual.maximum[0]<1.85f && actual.minimum[2]>3.10f && actual.maximum[2]<3.39f,
+          "bounded pocket stays in front of the actual collapse wall below its right fractured shoulder");
+    // Cosmetic chips are not promised to avoid every possible perimeter foot.
+    // Prove the accepted spawn/central route, chest approach and durable lower
+    // checkpoint paths instead, using conservative swept-capsule AABBs.
+    using horde::gameplay::RoutePosition;
+    const auto lower=horde::gameplay::traversal::kLowerLanding;
+    const auto upper=horde::gameplay::traversal::kExteriorLanding;
+    const std::array<RoutePosition,18> route{{
+        {0,2.9f},horde::gameplay::kPlayerSpawn,{0,-1},{0,-4.8f},{0,-9.4f},{4.2f,-9.4f},
+        {4.2f,-14.6f},{-2,-14.6f},horde::gameplay::kSkylightChamberCenter,
+        horde::gameplay::kTorchBayCenters[0],horde::gameplay::kTorchBayCenters[1],
+        horde::gameplay::kTorchBayCenters[2],horde::gameplay::kTorchBayCenters[3],
+        horde::gameplay::kTransmissionThresholdCenter,horde::gameplay::kFinaleCenter,
+        {horde::gameplay::kRewardChestRoutePosition.x+1.30f,horde::gameplay::kRewardChestRoutePosition.z},
+        {lower.x,lower.z},{upper.x,upper.z}
+    }};
+    for(std::size_t i=1;i<route.size();++i) {
+        const float lowX=std::min(route[i-1].x,route[i].x),highX=std::max(route[i-1].x,route[i].x),
+            lowZ=std::min(route[i-1].z,route[i].z),highZ=std::max(route[i-1].z,route[i].z);
+        const float gapX=std::max({lowX-actual.maximum[0],actual.minimum[0]-highX,0.f}),
+            gapZ=std::max({lowZ-actual.maximum[2],actual.minimum[2]-highZ,0.f});
+        Check(std::hypot(gapX,gapZ)>horde::gameplay::kPlayerCollisionRadius,
+              "rendered pocket clears the accepted central route, grate/bier passage, combat and chest/checkpoint approaches");
+    }
+    for(unsigned mode=0;mode<6;++mode) {
+        auto bad=original;
+        if(mode==0)bad.materials.resize(32);if(mode==1)bad.primitives.resize(32);
+        if(mode==2)bad.materials.resize(30);if(mode==3)bad.primitives.resize(30);
+        if(mode==4)bad.triangleRegions.assign(bad.indices.size()/3+1,assets::StaticTriangleRegion::Shared);
+        if(mode==5)bad.vertices.clear();
+        const auto before=bad;TombDressingBuildReport report;report.floorDebrisTriangles=999;
+        Check(!AppendPreparedTombDressing(assetRoot,bad,report,diagnostic,true,true) && SameOwner(before,bad) &&
+              report.floorDebrisTriangles==0 && !diagnostic.empty(),
+              "capacity, malformed provenance and empty owners reject atomically with cleared debris report");
+    }
+}
+
 } // namespace
 
 int main()
@@ -697,6 +909,8 @@ int main()
     TestImportedNicheFaceNormals(assetRoot);
     TestPreparedDressingAppend(assetRoot);
     TestStoneArchitecture(assetRoot);
+    TestFloorFragmentGeometry();
+    TestFloorDebrisOwner(assetRoot);
     if (const char* baseline = std::getenv("HORDE_RT_NICHE_BASELINE_DIR"); baseline != nullptr)
         TestOriginalNicheBaseline(assetRoot, baseline);
     if (failures == 0)

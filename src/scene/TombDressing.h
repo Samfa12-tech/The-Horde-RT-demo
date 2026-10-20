@@ -63,6 +63,8 @@ struct TombDressingBuildReport
     std::size_t addedMaterials = 0u;
     std::size_t placedInstances = 0u;
     std::size_t bevelTriangles = 0u;
+    std::size_t floorDebrisTriangles = 0u;
+    TombDressingBounds floorDebrisBounds{};
     TombDressingBounds addedBounds{};
     std::array<TombDressingPlacementBounds, 16u> placementBounds{};
     TombDressingBounds entryLintelShelfBounds{};
@@ -77,6 +79,7 @@ bool AppendPreparedTombDressing(const std::filesystem::path& assetRoot,
                                 assets::StaticMeshAsset& existingOwner,
                                 TombDressingBuildReport& report,
                                 std::string& diagnostic,
-                                bool includeStoneArchitecture = true);
+                                bool includeStoneArchitecture = true,
+                                bool includeFloorDebris = true);
 
 } // namespace horde::scene

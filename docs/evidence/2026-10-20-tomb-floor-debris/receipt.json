@@ -1,0 +1,1033 @@
+{
+  "date": "2026-10-20",
+  "worktree": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "draftPr": 27,
+  "sourceBase": "25ba90c8a396745463712b4cbc6dc3f13c78dc21",
+  "runs": {
+    "pipeline-off": {
+      "manifest": {
+        "path": "reports/tomb-debris-20261020-r1/pipeline-off/environment-survey.json",
+        "bytes": 415702,
+        "sha256": "956fa5a8fec4e95f0b46ec799dedf29d339c2b19e5939af926682a5d80982e11"
+      },
+      "processManifest": {
+        "path": "reports/tomb-debris-20261020-r1/pipeline-off.process.json",
+        "bytes": 2333,
+        "sha256": "e3e6d70ad64188758986eaa159847af8fe044dd1df347de7591c894220c0819c"
+      },
+      "nativeMetadata": {
+        "schema": 1,
+        "complete": true,
+        "evidenceClass": "Debug render-only environment survey; no earned progress, equipment or frame-pacing acceptance",
+        "profile": "tomb-debris",
+        "hidden": true,
+        "source": "rt-storage-image",
+        "animationClock": "render-only controls.time, fixed 1/60 s; simulation frozen",
+        "nominalAnimationSeconds": 2,
+        "frameBudget": 120,
+        "pngBudget": 12,
+        "attemptedFrames": 120,
+        "deadlineSeconds": 60,
+        "executableSha256": "dbd7067cee1c52880479add6d28ae3aaf2bc2613cdc1a82cb07987d1018e2206",
+        "terrainSha256": "c636a67911b7f5c5381c30ec7a49e5d4ff15c70fe688b368ba52efe77b537774",
+        "atlasSha256": "0a4da29bf8d988145c0f7b3f1c7afaf415a5da9b14c34bbd53bd1e00e3a86e59",
+        "regionalWaterRequested": true,
+        "floorDebrisRequested": false,
+        "simulationTick": 0,
+        "simulationSnapshotObjectBytesUnchanged": true,
+        "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "driverVersion": 2559295488,
+        "backend": "RayTracingPipeline",
+        "renderScale": 1,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "surfaceWidth": 960,
+        "surfaceHeight": 540,
+        "outputExposure": 0.620000005,
+        "waterQuality": 2,
+        "surveyFogDensityScale": null,
+        "shaderPair": {
+          "opaque": {
+            "key": "diagnostic_high_opaque_fast",
+            "sha256": "990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3"
+          },
+          "generic": {
+            "key": "diagnostic_high_generic_dielectric",
+            "sha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a"
+          }
+        },
+        "supportSource": "resident dungeon shared floor and legal opening union; no imported terrain query",
+        "cameras": [
+          {
+            "view": "opening",
+            "x": 0,
+            "z": 1.85000002,
+            "supportY": -0.949999988,
+            "yaw": 0,
+            "pitch": -0.150000006
+          },
+          {
+            "view": "debris",
+            "x": 0.899999976,
+            "z": 1.29999995,
+            "supportY": -0.949999988,
+            "yaw": 2.7457099,
+            "pitch": -0.319999993
+          }
+        ],
+        "error": null
+      },
+      "frameCount": 120,
+      "allMatchingCompletedRtFrames": true,
+      "resourcesStableAllFrames": true,
+      "resources": {
+        "bufferCount": 52,
+        "memoryAllocationCount": 63,
+        "bottomLevelAccelerationStructureCount": 20,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 2,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 49587072,
+        "deviceLocalBytes": 405970400
+      },
+      "gpuMs": {
+        "opening": {
+          "count": 50,
+          "median": 1.810432,
+          "p95NearestRank": 2.464992,
+          "maximum": 5.179296
+        },
+        "debris": {
+          "count": 50,
+          "median": 2.2134080000000003,
+          "p95NearestRank": 2.997344,
+          "maximum": 7.389312
+        }
+      },
+      "pngs": [
+        {
+          "frame": 9,
+          "path": "reports/tomb-debris-20261020-r1/pipeline-off/tomb-debris-009.png",
+          "bytes": 742645,
+          "sha256": "88fa2cd300635a9ec8419bf0bc049b544a5f3a518a590796d9478aa81162fc70"
+        },
+        {
+          "frame": 19,
+          "path": "reports/tomb-debris-20261020-r1/pipeline-off/tomb-debris-019.png",
+          "bytes": 742650,
+          "sha256": "0e85197ddcdcb43e4a68996755a3fa1143ee62ec81f150215dff5ee69d1e8e21"
+        },
+        {
+          "frame": 29,
+          "path": "reports/tomb-debris-20261020-r1/pipeline-off/tomb-debris-029.png",
+          "bytes": 742640,
+          "sha256": "055792071a0132a95cc6a9ebc9cd2192e1785530b3221a4d39e1c1c0dfc4fe95"
+        },
+        {
+          "frame": 39,
+          "path": "reports/tomb-debris-20261020-r1/pipeline-off/tomb-debris-039.png",
+          "bytes": 742645,
+          "sha256": "11e7762c2a079f5180c27e5808d3c842f6e07764331083eac8e998c31bf7d9b5"
+        },
+        {
+          "frame": 49,
+          "path": "reports/tomb-debris-20261020-r1/pipeline-off/tomb-debris-049.png",
+          "bytes": 742647,
+          "sha256": "7f2eac3394192bdc269a11ab9797547e83b3555f0daacd8c49782dab5d7b7fbc"
+        },
+        {
+          "frame": 59,
+          "path": "reports/tomb-debris-20261020-r1/pipeline-off/tomb-debris-059.png",
+          "bytes": 742648,
+          "sha256": "c2dd56148e623553a13e0dc7640c0c9c35ae75323f942c0313ae7d6064f6c500"
+        },
+        {
+          "frame": 69,
+          "path": "reports/tomb-debris-20261020-r1/pipeline-off/tomb-debris-069.png",
+          "bytes": 793370,
+          "sha256": "384f560e50b4dcd58f5f395d3d70fa1e380b98e707cbd1f8236bef28e8fdd295"
+        },
+        {
+          "frame": 79,
+          "path": "reports/tomb-debris-20261020-r1/pipeline-off/tomb-debris-079.png",
+          "bytes": 793370,
+          "sha256": "384f560e50b4dcd58f5f395d3d70fa1e380b98e707cbd1f8236bef28e8fdd295"
+        },
+        {
+          "frame": 89,
+          "path": "reports/tomb-debris-20261020-r1/pipeline-off/tomb-debris-089.png",
+          "bytes": 793370,
+          "sha256": "384f560e50b4dcd58f5f395d3d70fa1e380b98e707cbd1f8236bef28e8fdd295"
+        },
+        {
+          "frame": 99,
+          "path": "reports/tomb-debris-20261020-r1/pipeline-off/tomb-debris-099.png",
+          "bytes": 793370,
+          "sha256": "384f560e50b4dcd58f5f395d3d70fa1e380b98e707cbd1f8236bef28e8fdd295"
+        },
+        {
+          "frame": 109,
+          "path": "reports/tomb-debris-20261020-r1/pipeline-off/tomb-debris-109.png",
+          "bytes": 793370,
+          "sha256": "384f560e50b4dcd58f5f395d3d70fa1e380b98e707cbd1f8236bef28e8fdd295"
+        },
+        {
+          "frame": 119,
+          "path": "reports/tomb-debris-20261020-r1/pipeline-off/tomb-debris-119.png",
+          "bytes": 793370,
+          "sha256": "384f560e50b4dcd58f5f395d3d70fa1e380b98e707cbd1f8236bef28e8fdd295"
+        }
+      ],
+      "process": {
+        "pid": 46764,
+        "exitCode": 0,
+        "pending": false,
+        "seconds": 28.202999999994063,
+        "executable": {
+          "exists": true,
+          "bytes": 13857792,
+          "sha256": "dbd7067cee1c52880479add6d28ae3aaf2bc2613cdc1a82cb07987d1018e2206"
+        },
+        "settingsBefore": {
+          "exists": true,
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "settingsAfter": {
+          "exists": true,
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "foregroundBefore": null,
+        "foregroundAfter": null,
+        "settingsUnchanged": true,
+        "foregroundSamplesUnchanged": true
+      },
+      "foregroundSampleCount": 102,
+      "foregroundUniqueSamples": [
+        "None"
+      ]
+    },
+    "pipeline-on": {
+      "manifest": {
+        "path": "reports/tomb-debris-20261020-r1/pipeline-on/environment-survey.json",
+        "bytes": 415674,
+        "sha256": "c59a80ef4832a0997ebe9288c77886bcb2711f01a5b233a69be8af1ae7438377"
+      },
+      "processManifest": {
+        "path": "reports/tomb-debris-20261020-r1/pipeline-on.process.json",
+        "bytes": 2453,
+        "sha256": "a724ff65dc82a32ab67b5699e56c5aba6dafc907b3eee80b034e9c02a11bf5eb"
+      },
+      "nativeMetadata": {
+        "schema": 1,
+        "complete": true,
+        "evidenceClass": "Debug render-only environment survey; no earned progress, equipment or frame-pacing acceptance",
+        "profile": "tomb-debris",
+        "hidden": true,
+        "source": "rt-storage-image",
+        "animationClock": "render-only controls.time, fixed 1/60 s; simulation frozen",
+        "nominalAnimationSeconds": 2,
+        "frameBudget": 120,
+        "pngBudget": 12,
+        "attemptedFrames": 120,
+        "deadlineSeconds": 60,
+        "executableSha256": "dbd7067cee1c52880479add6d28ae3aaf2bc2613cdc1a82cb07987d1018e2206",
+        "terrainSha256": "c636a67911b7f5c5381c30ec7a49e5d4ff15c70fe688b368ba52efe77b537774",
+        "atlasSha256": "0a4da29bf8d988145c0f7b3f1c7afaf415a5da9b14c34bbd53bd1e00e3a86e59",
+        "regionalWaterRequested": true,
+        "floorDebrisRequested": true,
+        "simulationTick": 0,
+        "simulationSnapshotObjectBytesUnchanged": true,
+        "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "driverVersion": 2559295488,
+        "backend": "RayTracingPipeline",
+        "renderScale": 1,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "surfaceWidth": 960,
+        "surfaceHeight": 540,
+        "outputExposure": 0.620000005,
+        "waterQuality": 2,
+        "surveyFogDensityScale": null,
+        "shaderPair": {
+          "opaque": {
+            "key": "diagnostic_high_opaque_fast",
+            "sha256": "990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3"
+          },
+          "generic": {
+            "key": "diagnostic_high_generic_dielectric",
+            "sha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a"
+          }
+        },
+        "supportSource": "resident dungeon shared floor and legal opening union; no imported terrain query",
+        "cameras": [
+          {
+            "view": "opening",
+            "x": 0,
+            "z": 1.85000002,
+            "supportY": -0.949999988,
+            "yaw": 0,
+            "pitch": -0.150000006
+          },
+          {
+            "view": "debris",
+            "x": 0.899999976,
+            "z": 1.29999995,
+            "supportY": -0.949999988,
+            "yaw": 2.7457099,
+            "pitch": -0.319999993
+          }
+        ],
+        "error": null
+      },
+      "frameCount": 120,
+      "allMatchingCompletedRtFrames": true,
+      "resourcesStableAllFrames": true,
+      "resources": {
+        "bufferCount": 52,
+        "memoryAllocationCount": 63,
+        "bottomLevelAccelerationStructureCount": 20,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 2,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 49601920,
+        "deviceLocalBytes": 405991648
+      },
+      "gpuMs": {
+        "opening": {
+          "count": 50,
+          "median": 1.6690239999999998,
+          "p95NearestRank": 1.681696,
+          "maximum": 1.684832
+        },
+        "debris": {
+          "count": 50,
+          "median": 2.162448,
+          "p95NearestRank": 2.19344,
+          "maximum": 2.443296
+        }
+      },
+      "pngs": [
+        {
+          "frame": 9,
+          "path": "reports/tomb-debris-20261020-r1/pipeline-on/tomb-debris-009.png",
+          "bytes": 742646,
+          "sha256": "e6eef003c3c6de9c3d343e1ce61d33744bfa5b693962b616c4462d100102ff12"
+        },
+        {
+          "frame": 19,
+          "path": "reports/tomb-debris-20261020-r1/pipeline-on/tomb-debris-019.png",
+          "bytes": 742650,
+          "sha256": "05abd3598010526e3e2af815f02ae64857257c496542fefb63911341e3013b51"
+        },
+        {
+          "frame": 29,
+          "path": "reports/tomb-debris-20261020-r1/pipeline-on/tomb-debris-029.png",
+          "bytes": 742641,
+          "sha256": "fcd3c3b1ef98aa8c16874bd6ba12606eadb0e0d7d9416bfb7f4a4c7eba2889b5"
+        },
+        {
+          "frame": 39,
+          "path": "reports/tomb-debris-20261020-r1/pipeline-on/tomb-debris-039.png",
+          "bytes": 742646,
+          "sha256": "6c5438cab009fb82d8646ff5742f021d6b7480fc6efa569b31ad44d490ebab53"
+        },
+        {
+          "frame": 49,
+          "path": "reports/tomb-debris-20261020-r1/pipeline-on/tomb-debris-049.png",
+          "bytes": 742647,
+          "sha256": "c450150ec79bf7759076b734e06580721ff36b8b7ecec131b0ad28dd1ee97469"
+        },
+        {
+          "frame": 59,
+          "path": "reports/tomb-debris-20261020-r1/pipeline-on/tomb-debris-059.png",
+          "bytes": 742649,
+          "sha256": "7f8588894fd03c49753dd980bc82b17a5ea81b2fe3105dea525d5cff92fdfb2a"
+        },
+        {
+          "frame": 69,
+          "path": "reports/tomb-debris-20261020-r1/pipeline-on/tomb-debris-069.png",
+          "bytes": 793707,
+          "sha256": "1b13b84da7804ce3dd6f43f6b1efd013a6da1566983b4c364c38d8ca204df8be"
+        },
+        {
+          "frame": 79,
+          "path": "reports/tomb-debris-20261020-r1/pipeline-on/tomb-debris-079.png",
+          "bytes": 793707,
+          "sha256": "1b13b84da7804ce3dd6f43f6b1efd013a6da1566983b4c364c38d8ca204df8be"
+        },
+        {
+          "frame": 89,
+          "path": "reports/tomb-debris-20261020-r1/pipeline-on/tomb-debris-089.png",
+          "bytes": 793707,
+          "sha256": "1b13b84da7804ce3dd6f43f6b1efd013a6da1566983b4c364c38d8ca204df8be"
+        },
+        {
+          "frame": 99,
+          "path": "reports/tomb-debris-20261020-r1/pipeline-on/tomb-debris-099.png",
+          "bytes": 793707,
+          "sha256": "1b13b84da7804ce3dd6f43f6b1efd013a6da1566983b4c364c38d8ca204df8be"
+        },
+        {
+          "frame": 109,
+          "path": "reports/tomb-debris-20261020-r1/pipeline-on/tomb-debris-109.png",
+          "bytes": 793707,
+          "sha256": "1b13b84da7804ce3dd6f43f6b1efd013a6da1566983b4c364c38d8ca204df8be"
+        },
+        {
+          "frame": 119,
+          "path": "reports/tomb-debris-20261020-r1/pipeline-on/tomb-debris-119.png",
+          "bytes": 793707,
+          "sha256": "1b13b84da7804ce3dd6f43f6b1efd013a6da1566983b4c364c38d8ca204df8be"
+        }
+      ],
+      "process": {
+        "pid": 42684,
+        "exitCode": 0,
+        "pending": false,
+        "seconds": 29.172000000005937,
+        "executable": {
+          "exists": true,
+          "bytes": 13857792,
+          "sha256": "dbd7067cee1c52880479add6d28ae3aaf2bc2613cdc1a82cb07987d1018e2206"
+        },
+        "settingsBefore": {
+          "exists": true,
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "settingsAfter": {
+          "exists": true,
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "foregroundBefore": null,
+        "foregroundAfter": null,
+        "settingsUnchanged": true,
+        "foregroundSamplesUnchanged": true
+      },
+      "foregroundSampleCount": 116,
+      "foregroundUniqueSamples": [
+        "None"
+      ]
+    },
+    "compute-off": {
+      "manifest": {
+        "path": "reports/tomb-debris-20261020-r1/compute-off/environment-survey.json",
+        "bytes": 423533,
+        "sha256": "5b35d50c1cbbc094c16e425a8b87e29e68dc6857aa5dc524dd6d389fc8f21c83"
+      },
+      "processManifest": {
+        "path": "reports/tomb-debris-20261020-r1/compute-off.process.json",
+        "bytes": 1894,
+        "sha256": "57e2d94ed092af6e5dd635f5783dc4b38ce9ad03790d5f6401441aa1764c0c9b"
+      },
+      "nativeMetadata": {
+        "schema": 1,
+        "complete": true,
+        "evidenceClass": "Debug render-only environment survey; no earned progress, equipment or frame-pacing acceptance",
+        "profile": "tomb-debris",
+        "hidden": true,
+        "source": "rt-storage-image",
+        "animationClock": "render-only controls.time, fixed 1/60 s; simulation frozen",
+        "nominalAnimationSeconds": 2,
+        "frameBudget": 120,
+        "pngBudget": 12,
+        "attemptedFrames": 120,
+        "deadlineSeconds": 60,
+        "executableSha256": "dbd7067cee1c52880479add6d28ae3aaf2bc2613cdc1a82cb07987d1018e2206",
+        "terrainSha256": "c636a67911b7f5c5381c30ec7a49e5d4ff15c70fe688b368ba52efe77b537774",
+        "atlasSha256": "0a4da29bf8d988145c0f7b3f1c7afaf415a5da9b14c34bbd53bd1e00e3a86e59",
+        "regionalWaterRequested": true,
+        "floorDebrisRequested": false,
+        "simulationTick": 0,
+        "simulationSnapshotObjectBytesUnchanged": true,
+        "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "driverVersion": 2559295488,
+        "backend": "RayQueryCompute",
+        "renderScale": 1,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "surfaceWidth": 960,
+        "surfaceHeight": 540,
+        "outputExposure": 0.620000005,
+        "waterQuality": 2,
+        "surveyFogDensityScale": null,
+        "shaderPair": {
+          "opaque": {
+            "key": "rayquery_compute_diagnostic_high_opaque_fast",
+            "sha256": "98cec0ff16f511aac0d3a41c2a91542d2a18ebfc431ec3edd75d9abc5b10761b"
+          },
+          "generic": {
+            "key": "rayquery_compute_diagnostic_high_generic_dielectric",
+            "sha256": "359469cc391aa787011c9d3c9ba4c84d99779cbb9a0fbe7ce5723f1783b6ab5f"
+          }
+        },
+        "supportSource": "resident dungeon shared floor and legal opening union; no imported terrain query",
+        "cameras": [
+          {
+            "view": "opening",
+            "x": 0,
+            "z": 1.85000002,
+            "supportY": -0.949999988,
+            "yaw": 0,
+            "pitch": -0.150000006
+          },
+          {
+            "view": "debris",
+            "x": 0.899999976,
+            "z": 1.29999995,
+            "supportY": -0.949999988,
+            "yaw": 2.7457099,
+            "pitch": -0.319999993
+          }
+        ],
+        "error": null
+      },
+      "frameCount": 120,
+      "allMatchingCompletedRtFrames": true,
+      "resourcesStableAllFrames": true,
+      "resources": {
+        "bufferCount": 50,
+        "memoryAllocationCount": 61,
+        "bottomLevelAccelerationStructureCount": 20,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 0,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 49586560,
+        "deviceLocalBytes": 405970400
+      },
+      "gpuMs": {
+        "opening": {
+          "count": 50,
+          "median": 1.7248,
+          "p95NearestRank": 2.2872,
+          "maximum": 3.35792
+        },
+        "debris": {
+          "count": 50,
+          "median": 2.151792,
+          "p95NearestRank": 3.042528,
+          "maximum": 5.708832
+        }
+      },
+      "pngs": [
+        {
+          "frame": 9,
+          "path": "reports/tomb-debris-20261020-r1/compute-off/tomb-debris-009.png",
+          "bytes": 742648,
+          "sha256": "a44a407af1466e3d94f591589bb5dc3c9c2657911e31ccf6a172e8cbc947c1b2"
+        },
+        {
+          "frame": 19,
+          "path": "reports/tomb-debris-20261020-r1/compute-off/tomb-debris-019.png",
+          "bytes": 742651,
+          "sha256": "2bb7536309cd27c49244de287cd7551bcad1e776f3d842f88cb0f75553c75847"
+        },
+        {
+          "frame": 29,
+          "path": "reports/tomb-debris-20261020-r1/compute-off/tomb-debris-029.png",
+          "bytes": 742643,
+          "sha256": "cd6fbc48c8552d4baead2d6446a5e18d6b5dee50f846e2f8984551bfe3c23c69"
+        },
+        {
+          "frame": 39,
+          "path": "reports/tomb-debris-20261020-r1/compute-off/tomb-debris-039.png",
+          "bytes": 742647,
+          "sha256": "e4aa3e7e3d3f168a932d1c3f65b6218398b170a3a0dd30a90067155bcecf488a"
+        },
+        {
+          "frame": 49,
+          "path": "reports/tomb-debris-20261020-r1/compute-off/tomb-debris-049.png",
+          "bytes": 742651,
+          "sha256": "55c93904e6d537bb7665ecf622567ff460fefb73fb519013d655e1250025d8e5"
+        },
+        {
+          "frame": 59,
+          "path": "reports/tomb-debris-20261020-r1/compute-off/tomb-debris-059.png",
+          "bytes": 742653,
+          "sha256": "082c38c81f6b99fe9ddfcbee60df50b400637bc64a38b3310fca4f62630b72ef"
+        },
+        {
+          "frame": 69,
+          "path": "reports/tomb-debris-20261020-r1/compute-off/tomb-debris-069.png",
+          "bytes": 793391,
+          "sha256": "eee139c34cac4e9aba5b922715f1a0522cd262d2b2c66f1f815df93948a5a5d0"
+        },
+        {
+          "frame": 79,
+          "path": "reports/tomb-debris-20261020-r1/compute-off/tomb-debris-079.png",
+          "bytes": 793391,
+          "sha256": "eee139c34cac4e9aba5b922715f1a0522cd262d2b2c66f1f815df93948a5a5d0"
+        },
+        {
+          "frame": 89,
+          "path": "reports/tomb-debris-20261020-r1/compute-off/tomb-debris-089.png",
+          "bytes": 793391,
+          "sha256": "eee139c34cac4e9aba5b922715f1a0522cd262d2b2c66f1f815df93948a5a5d0"
+        },
+        {
+          "frame": 99,
+          "path": "reports/tomb-debris-20261020-r1/compute-off/tomb-debris-099.png",
+          "bytes": 793391,
+          "sha256": "eee139c34cac4e9aba5b922715f1a0522cd262d2b2c66f1f815df93948a5a5d0"
+        },
+        {
+          "frame": 109,
+          "path": "reports/tomb-debris-20261020-r1/compute-off/tomb-debris-109.png",
+          "bytes": 793391,
+          "sha256": "eee139c34cac4e9aba5b922715f1a0522cd262d2b2c66f1f815df93948a5a5d0"
+        },
+        {
+          "frame": 119,
+          "path": "reports/tomb-debris-20261020-r1/compute-off/tomb-debris-119.png",
+          "bytes": 793391,
+          "sha256": "eee139c34cac4e9aba5b922715f1a0522cd262d2b2c66f1f815df93948a5a5d0"
+        }
+      ],
+      "process": {
+        "pid": 44428,
+        "exitCode": 0,
+        "pending": false,
+        "seconds": 14.780999999988126,
+        "executable": {
+          "exists": true,
+          "bytes": 13857792,
+          "sha256": "dbd7067cee1c52880479add6d28ae3aaf2bc2613cdc1a82cb07987d1018e2206"
+        },
+        "settingsBefore": {
+          "exists": true,
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "settingsAfter": {
+          "exists": true,
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "foregroundBefore": null,
+        "foregroundAfter": null,
+        "settingsUnchanged": true,
+        "foregroundSamplesUnchanged": true
+      },
+      "foregroundSampleCount": 59,
+      "foregroundUniqueSamples": [
+        "None"
+      ]
+    },
+    "compute-on": {
+      "manifest": {
+        "path": "reports/tomb-debris-20261020-r1/compute-on/environment-survey.json",
+        "bytes": 423537,
+        "sha256": "51213a1f747e7ac64fb7139601796a26dfe3d99ee0e362808441c052c926fb8a"
+      },
+      "processManifest": {
+        "path": "reports/tomb-debris-20261020-r1/compute-on.process.json",
+        "bytes": 1871,
+        "sha256": "ee55295da212c8694c863018b9633406930fb8c8e379839afd959e56d6fbdae8"
+      },
+      "nativeMetadata": {
+        "schema": 1,
+        "complete": true,
+        "evidenceClass": "Debug render-only environment survey; no earned progress, equipment or frame-pacing acceptance",
+        "profile": "tomb-debris",
+        "hidden": true,
+        "source": "rt-storage-image",
+        "animationClock": "render-only controls.time, fixed 1/60 s; simulation frozen",
+        "nominalAnimationSeconds": 2,
+        "frameBudget": 120,
+        "pngBudget": 12,
+        "attemptedFrames": 120,
+        "deadlineSeconds": 60,
+        "executableSha256": "dbd7067cee1c52880479add6d28ae3aaf2bc2613cdc1a82cb07987d1018e2206",
+        "terrainSha256": "c636a67911b7f5c5381c30ec7a49e5d4ff15c70fe688b368ba52efe77b537774",
+        "atlasSha256": "0a4da29bf8d988145c0f7b3f1c7afaf415a5da9b14c34bbd53bd1e00e3a86e59",
+        "regionalWaterRequested": true,
+        "floorDebrisRequested": true,
+        "simulationTick": 0,
+        "simulationSnapshotObjectBytesUnchanged": true,
+        "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "driverVersion": 2559295488,
+        "backend": "RayQueryCompute",
+        "renderScale": 1,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "surfaceWidth": 960,
+        "surfaceHeight": 540,
+        "outputExposure": 0.620000005,
+        "waterQuality": 2,
+        "surveyFogDensityScale": null,
+        "shaderPair": {
+          "opaque": {
+            "key": "rayquery_compute_diagnostic_high_opaque_fast",
+            "sha256": "98cec0ff16f511aac0d3a41c2a91542d2a18ebfc431ec3edd75d9abc5b10761b"
+          },
+          "generic": {
+            "key": "rayquery_compute_diagnostic_high_generic_dielectric",
+            "sha256": "359469cc391aa787011c9d3c9ba4c84d99779cbb9a0fbe7ce5723f1783b6ab5f"
+          }
+        },
+        "supportSource": "resident dungeon shared floor and legal opening union; no imported terrain query",
+        "cameras": [
+          {
+            "view": "opening",
+            "x": 0,
+            "z": 1.85000002,
+            "supportY": -0.949999988,
+            "yaw": 0,
+            "pitch": -0.150000006
+          },
+          {
+            "view": "debris",
+            "x": 0.899999976,
+            "z": 1.29999995,
+            "supportY": -0.949999988,
+            "yaw": 2.7457099,
+            "pitch": -0.319999993
+          }
+        ],
+        "error": null
+      },
+      "frameCount": 120,
+      "allMatchingCompletedRtFrames": true,
+      "resourcesStableAllFrames": true,
+      "resources": {
+        "bufferCount": 50,
+        "memoryAllocationCount": 61,
+        "bottomLevelAccelerationStructureCount": 20,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 0,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 49601408,
+        "deviceLocalBytes": 405991648
+      },
+      "gpuMs": {
+        "opening": {
+          "count": 50,
+          "median": 1.717952,
+          "p95NearestRank": 1.830048,
+          "maximum": 4.36416
+        },
+        "debris": {
+          "count": 50,
+          "median": 2.14984,
+          "p95NearestRank": 2.85504,
+          "maximum": 5.14384
+        }
+      },
+      "pngs": [
+        {
+          "frame": 9,
+          "path": "reports/tomb-debris-20261020-r1/compute-on/tomb-debris-009.png",
+          "bytes": 742648,
+          "sha256": "926233c804cc6b2a16e7686a3167bd914bef2d554c9e711cbc782d085de25a53"
+        },
+        {
+          "frame": 19,
+          "path": "reports/tomb-debris-20261020-r1/compute-on/tomb-debris-019.png",
+          "bytes": 742652,
+          "sha256": "8f2d98210402e364f17cd2cb15c5d35b81d95b8b4571c355e053968f86301a60"
+        },
+        {
+          "frame": 29,
+          "path": "reports/tomb-debris-20261020-r1/compute-on/tomb-debris-029.png",
+          "bytes": 742644,
+          "sha256": "09f2370f8a8e37f162a1528eecada648e2df1a0da4dd3a297e5d873942c0d4b1"
+        },
+        {
+          "frame": 39,
+          "path": "reports/tomb-debris-20261020-r1/compute-on/tomb-debris-039.png",
+          "bytes": 742648,
+          "sha256": "4c31d12866fded0501a2e06255764712be943c6d1f21b8d70509544f41e39233"
+        },
+        {
+          "frame": 49,
+          "path": "reports/tomb-debris-20261020-r1/compute-on/tomb-debris-049.png",
+          "bytes": 742652,
+          "sha256": "3a2d6957a9dae714ba3ad982f197c77287c5de8b78576817d787dab7ec2779d8"
+        },
+        {
+          "frame": 59,
+          "path": "reports/tomb-debris-20261020-r1/compute-on/tomb-debris-059.png",
+          "bytes": 742653,
+          "sha256": "9c62969a86779ab3f71e06397b76b53c615f9e7983688689484e4b9efb99962b"
+        },
+        {
+          "frame": 69,
+          "path": "reports/tomb-debris-20261020-r1/compute-on/tomb-debris-069.png",
+          "bytes": 793734,
+          "sha256": "c33452fa6b632bf9e97b3a1b5536896f118b5e6c97840582d278ec3d950186fd"
+        },
+        {
+          "frame": 79,
+          "path": "reports/tomb-debris-20261020-r1/compute-on/tomb-debris-079.png",
+          "bytes": 793734,
+          "sha256": "c33452fa6b632bf9e97b3a1b5536896f118b5e6c97840582d278ec3d950186fd"
+        },
+        {
+          "frame": 89,
+          "path": "reports/tomb-debris-20261020-r1/compute-on/tomb-debris-089.png",
+          "bytes": 793734,
+          "sha256": "c33452fa6b632bf9e97b3a1b5536896f118b5e6c97840582d278ec3d950186fd"
+        },
+        {
+          "frame": 99,
+          "path": "reports/tomb-debris-20261020-r1/compute-on/tomb-debris-099.png",
+          "bytes": 793734,
+          "sha256": "c33452fa6b632bf9e97b3a1b5536896f118b5e6c97840582d278ec3d950186fd"
+        },
+        {
+          "frame": 109,
+          "path": "reports/tomb-debris-20261020-r1/compute-on/tomb-debris-109.png",
+          "bytes": 793734,
+          "sha256": "c33452fa6b632bf9e97b3a1b5536896f118b5e6c97840582d278ec3d950186fd"
+        },
+        {
+          "frame": 119,
+          "path": "reports/tomb-debris-20261020-r1/compute-on/tomb-debris-119.png",
+          "bytes": 793734,
+          "sha256": "c33452fa6b632bf9e97b3a1b5536896f118b5e6c97840582d278ec3d950186fd"
+        }
+      ],
+      "process": {
+        "pid": 44552,
+        "exitCode": 0,
+        "pending": false,
+        "seconds": 15.031000000002678,
+        "executable": {
+          "exists": true,
+          "bytes": 13857792,
+          "sha256": "dbd7067cee1c52880479add6d28ae3aaf2bc2613cdc1a82cb07987d1018e2206"
+        },
+        "settingsBefore": {
+          "exists": true,
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "settingsAfter": {
+          "exists": true,
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "foregroundBefore": null,
+        "foregroundAfter": null,
+        "settingsUnchanged": true,
+        "foregroundSamplesUnchanged": true
+      },
+      "foregroundSampleCount": 60,
+      "foregroundUniqueSamples": [
+        "None"
+      ]
+    }
+  },
+  "pairs": {
+    "pipeline": {
+      "matchedSettingsAndShaders": true,
+      "resourceDeltas": {
+        "bufferCount": 0,
+        "memoryAllocationCount": 0,
+        "bottomLevelAccelerationStructureCount": 0,
+        "topLevelAccelerationStructureCount": 0,
+        "tlasInstanceCount": 0,
+        "pipelineCount": 0,
+        "shaderBindingTableCount": 0,
+        "descriptorSetCount": 0,
+        "hostVisibleBytes": 14848,
+        "deviceLocalBytes": 21248
+      },
+      "gpuMs": {
+        "opening": {
+          "offMedianMs": 1.810432,
+          "onMedianMs": 1.6690239999999998,
+          "deltaMs": -0.1414080000000002,
+          "deltaPercent": -7.810732466063364
+        },
+        "debris": {
+          "offMedianMs": 2.2134080000000003,
+          "onMedianMs": 2.162448,
+          "deltaMs": -0.05096000000000034,
+          "deltaPercent": -2.3023319695239297
+        }
+      },
+      "pixels": {
+        "59": {
+          "changedRgbPixels": 1,
+          "differenceBounds": [
+            439,
+            171,
+            440,
+            172
+          ],
+          "size": [
+            960,
+            540
+          ]
+        },
+        "119": {
+          "changedRgbPixels": 410,
+          "differenceBounds": [
+            468,
+            398,
+            492,
+            429
+          ],
+          "size": [
+            960,
+            540
+          ]
+        }
+      }
+    },
+    "compute": {
+      "matchedSettingsAndShaders": true,
+      "resourceDeltas": {
+        "bufferCount": 0,
+        "memoryAllocationCount": 0,
+        "bottomLevelAccelerationStructureCount": 0,
+        "topLevelAccelerationStructureCount": 0,
+        "tlasInstanceCount": 0,
+        "pipelineCount": 0,
+        "shaderBindingTableCount": 0,
+        "descriptorSetCount": 0,
+        "hostVisibleBytes": 14848,
+        "deviceLocalBytes": 21248
+      },
+      "gpuMs": {
+        "opening": {
+          "offMedianMs": 1.7248,
+          "onMedianMs": 1.717952,
+          "deltaMs": -0.006848000000000187,
+          "deltaPercent": -0.39703153988869255
+        },
+        "debris": {
+          "offMedianMs": 2.151792,
+          "onMedianMs": 2.14984,
+          "deltaMs": -0.0019519999999997317,
+          "deltaPercent": -0.09071508770363002
+        }
+      },
+      "pixels": {
+        "59": {
+          "changedRgbPixels": 1,
+          "differenceBounds": [
+            439,
+            171,
+            440,
+            172
+          ],
+          "size": [
+            960,
+            540
+          ]
+        },
+        "119": {
+          "changedRgbPixels": 410,
+          "differenceBounds": [
+            468,
+            398,
+            492,
+            429
+          ],
+          "size": [
+            960,
+            540
+          ]
+        }
+      }
+    }
+  },
+  "artifacts": {
+    "windowsDebug": {
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+      "bytes": 13857792,
+      "sha256": "dbd7067cee1c52880479add6d28ae3aaf2bc2613cdc1a82cb07987d1018e2206"
+    },
+    "windowsRelease": {
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+      "bytes": 4610048,
+      "sha256": "44e1fad2328f2e4ff76488b1a842849e6d5425cec77bf1c3db8a9280a581eb1b"
+    },
+    "androidApkBuildOnly": {
+      "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "bytes": 186155925,
+      "sha256": "1586fcc82d841b697c0239c2e56be66c90f4068e56a5ce79aca5af4f9503f5a5"
+    }
+  },
+  "androidPackagedAbis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+  ],
+  "androidGraphicsUnitTests": [
+    {
+      "name": "com.samfa12.hordelanternrt.GraphicsPreferencesTest",
+      "tests": "20",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.PerformanceProfileRequestTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    }
+  ],
+  "sourceFreezeMatches": true,
+  "canonicalOwnerFilesUnchanged": true,
+  "limits": [
+    "One Debug render-only off/on pair per native hardware RT backend at 960x540; 50 retained timed frames per view after 10 settling frames. No sustained FPS, phone performance, thermal, earned journey, collision/contact, player artistic or owner acceptance claim.",
+    "Signed timing deltas are observations and do not prove chips improve performance.",
+    "Host-visible and device-local classifications may overlap and must not be summed.",
+    "The final test-only yaw correction did not change either executable or production camera. Earlier failed test logs remain retained."
+  ],
+  "geometry": {
+    "stones": 6,
+    "triangles": 72,
+    "vertices": 216,
+    "indices": 216,
+    "vertexBytes": 13824,
+    "indexBytes": 864,
+    "payloadBytes": 14688,
+    "mergedPropBlasDeltaBytes": 6400,
+    "materialPrimitiveOwnerDelta": 0,
+    "collisionSimulationSaveChanges": false,
+    "kickInteractionImplemented": false,
+    "playerFacingDebrisOptionImplemented": false
+  },
+  "hostTests": {
+    "affectedRegistrationsPassing": 15,
+    "firstTwoTestRun": "1 pass, 1 stale pre-existing river-camera assertion failure",
+    "baselineReproductionExitCode": 1,
+    "affectedRun": "14 pass, 1 still-incorrect test yaw failure",
+    "finalCorrectedLaunchTest": "1 pass; production river camera unchanged"
+  },
+  "mobileMistOwnerDirection": "mist off on mobile because when it is on, during the keeper fight, we also have those two lights on and all together it was pretty chuggy.",
+  "mobileMistDisposition": "Shared and Android startup/Reset remain Off; 26 local preference/profile tests pass. Saved choices preserved. No phone read/write/installation/launch.",
+  "audioHapticManualRevalidationRequired": false,
+  "audioHapticReason": "Static visual geometry changes no semantic events, source/listener inputs, corridor audio obstruction, playback or haptic ownership.",
+  "phoneOperations": false,
+  "publicPushMergeRelease": false,
+  "ReefOperations": false,
+  "visualInspectionOriginals": [
+    "pipeline-off/059",
+    "pipeline-on/059",
+    "pipeline-off/119",
+    "pipeline-on/119",
+    "compute-off/119",
+    "compute-on/119"
+  ],
+  "nextSlice": "Dedicated visual presentation for four existing dodge directions through transient immutable animation state, preserving current trajectories/defensive rules/aim/grips; see current milestone map."
+}
