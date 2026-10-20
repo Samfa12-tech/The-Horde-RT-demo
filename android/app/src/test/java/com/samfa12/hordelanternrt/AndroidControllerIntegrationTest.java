@@ -46,6 +46,8 @@ public class AndroidControllerIntegrationTest {
         @Implementation protected static void clearCrouchIntent(){crouchClears++;crouchHeld=false;}
         @Implementation protected static void setSimulationPaused(boolean p){paused=p;}
         @Implementation protected static int retryEncounter(){retries++;return 2;}
+        @Implementation protected static long setGraphicsSettings(int scale,int water,int fire,int cap,boolean glass,int shadow,boolean mist,int dust){return 43;}
+        @Implementation protected static void setGraphicsPreview(boolean enabled,boolean paused,boolean motion,int camera,boolean reset,long generation){}
         @Implementation protected static void beginGraphicsEdit(int scale,int water,int fire,int cap,boolean glass,int shadow,boolean mist,int dust){}
         @Implementation protected static void setEntryMenu(boolean enabled,boolean side,boolean reduced,boolean play,long generation){}
         @Implementation protected static void requestAttack(){attacks++;}
@@ -359,9 +361,26 @@ public class AndroidControllerIntegrationTest {
         set("firstMenu",false);press(KeyEvent.KEYCODE_BUTTON_START);assertTrue(field("menuVisible").getBoolean(a));assertTrue(Bridge.paused);
         confirmLabel(a.getString(R.string.settings));
         confirmLabel(a.getString(R.string.graphics_settings));assertTrue(field("graphicsVisible").getBoolean(a));
-        assertNotNull(findButton((View)field("menuScrim").get(a),"Use"));
-        assertFalse(((Button)field("graphicsConfirm").get(a)).isEnabled());
+        Button apply=findButton((View)field("menuScrim").get(a),"Apply");
+        assertNotNull(apply); assertTrue(apply.getContentDescription().toString().contains("Apply and save"));
+        assertNull(findButton((View)field("menuScrim").get(a),"Keep"));
         assertFalse(a.getSharedPreferences("controller-integration",Context.MODE_PRIVATE).contains("graphics_pending"));
+        assertEquals(0,Bridge.attacks);assertEquals(0,Bridge.interacts);
+    }
+    @Test public void backgroundingGraphicsRevokesPendingApplyAndLateCompletionCannotSave()throws Exception {
+        call("openGraphics",new Class<?>[]{});
+        android.content.SharedPreferences prefs=a.getSharedPreferences("controller-integration",Context.MODE_PRIVATE);
+        GraphicsPreferences.Values saved=GraphicsPreferences.confirmed(prefs);
+        GraphicsPreferences.Values candidate=GraphicsPreviewOptions.withChoice(saved,GraphicsPreviewOptions.MIST,1);
+        assertTrue(GraphicsPreferences.markPending(prefs,candidate));
+        set("graphicsSubmitted",candidate);set("graphicsRequestSerial",42L);set("graphicsSaveSerial",42L);
+        set("graphicsSaveGeneration",7L);set("surfaceRequestGeneration",7L);
+        a.onPause();
+        assertEquals(0L,field("graphicsSaveSerial").getLong(a));assertEquals(0L,field("graphicsSaveGeneration").getLong(a));
+        assertFalse(field("resumed").getBoolean(a));assertFalse(field("graphicsVisible").getBoolean(a));
+        call("confirmGraphicsSelection",new Class<?>[]{});
+        assertTrue(GraphicsPreferences.confirmed(prefs).same(saved));assertTrue(GraphicsPreferences.hasPending(prefs));
+        assertTrue(field("graphicsRecovering").getBoolean(a));
         assertEquals(0,Bridge.attacks);assertEquals(0,Bridge.interacts);
     }
     @Test public void disconnectPausesAndReconnectCannotReplayHeldMotion()throws Exception {

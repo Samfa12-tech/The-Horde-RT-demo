@@ -2,6 +2,19 @@
 
 This file records locked decisions for the native Vulkan hardware ray-tracing demo.
 
+## Android single Apply/save flow - 2026-10-20
+
+The approved 1.7 graphics simplification replaces separate Use/Keep with one
+Apply action. It requests the complete clicked tuple and saves only after current
+serial/surface, requested/effective settings and successful hardware-RT
+presentation match, with native confirmation. Transient draft/preview edits do
+not save. Restore, Back, failure or lifecycle interruption revokes outstanding
+save intent; storage failure restores the previous saved native settings. This
+supersedes the October5 two-step confirmation UX below. Mobile fresh/reset Mist
+Off and explicit saved choices remain as directed. The
+[local checkpoint](docs/evidence/2026-10-20-graphics-single-apply/README.md) has
+build/host UI evidence; physical interaction/lifecycle acceptance remains open.
+
 ## Mobile Mist Off default and bounded performance trials — 2026-10-20
 
 The owner now selects Mist Off for Android fresh-install and staged Reset Defaults

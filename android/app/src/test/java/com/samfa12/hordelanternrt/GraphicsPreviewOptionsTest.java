@@ -31,14 +31,26 @@ public final class GraphicsPreviewOptionsTest {
         static long[] applied;
         static double epoch=9, confirmationSeconds;
         static int confirmationCalls;
-        static int compareCalls, applyCalls;
+        static int compareCalls, applyCalls, confirmCalls;
+        static boolean allowConfirm=true;
+        static long revertSerial=43;
         static GraphicsPreferences.Values requested;
         @Implementation protected static void __staticInitializer__() { }
-        @Implementation protected static boolean confirmGraphicsSettings(long serial,long generation) { return (serial==42 || serial==45) && generation==7; }
+        @Implementation protected static boolean confirmGraphicsSettings(long serial,long generation) {
+            ++confirmCalls;
+            boolean accepted=allowConfirm && (serial==42 || serial==45) && generation==7;
+            if(accepted && applied!=null) applied[2]=3;
+            return accepted;
+        }
         @Implementation protected static void beginGraphicsEdit(int scale,int water,int fire,int cap,boolean glassEnabled,int shadowQuality,boolean mistEnabled,int dustQuality) {
             rebased=new GraphicsPreferences.Values(scale,water,fire,cap,glassEnabled,shadowQuality,mistEnabled,dustQuality);
+            if(applied!=null) applied[2]=0;
         }
-        @Implementation protected static long revertGraphicsSettings(long generation) { return generation==7?43:0; }
+        @Implementation protected static long setGraphicsSettings(int scale,int water,int fire,int cap,boolean glassEnabled,int shadowQuality,boolean mistEnabled,int dustQuality) {
+            requested=new GraphicsPreferences.Values(scale,water,fire,cap,glassEnabled,shadowQuality,mistEnabled,dustQuality);
+            return 46;
+        }
+        @Implementation protected static long revertGraphicsSettings(long generation) { return generation==7?revertSerial:0; }
         @Implementation protected static long compareGraphicsPreview(int scale,int water,int fire,int cap,boolean glassEnabled,int shadowQuality,boolean mistEnabled,int dustQuality,long generation) {
             if(generation!=7) return 0;
             ++compareCalls; requested=new GraphicsPreferences.Values(scale,water,fire,cap,glassEnabled,shadowQuality,mistEnabled,dustQuality); return 44;
@@ -233,12 +245,12 @@ public final class GraphicsPreviewOptionsTest {
         set(activity,"graphicsPreviewPerformanceGeneration",7L); set(activity,"graphicsPreviewPerformanceEpochFloor",9.0);
         GraphicsBridgeShadow.applied=snapshot(); GraphicsBridgeShadow.epoch=9;
         GraphicsBridgeShadow.confirmationSeconds=0; GraphicsBridgeShadow.confirmationCalls=0;
-        GraphicsBridgeShadow.compareCalls=0; GraphicsBridgeShadow.applyCalls=0; GraphicsBridgeShadow.requested=null;
+        GraphicsBridgeShadow.compareCalls=0; GraphicsBridgeShadow.applyCalls=0; GraphicsBridgeShadow.confirmCalls=0; GraphicsBridgeShadow.allowConfirm=true; GraphicsBridgeShadow.revertSerial=43; GraphicsBridgeShadow.requested=null; GraphicsBridgeShadow.rebased=null;
         Method show=MainActivity.class.getDeclaredMethod("showGraphicsPreviewPage"); show.setAccessible(true); show.invoke(activity);
         return activity;
     }
 
-    @Test public void nativeGlassPopupStagesWholeLiveTupleAndOnlyCurrentOffAckAllowsApplyKeep() throws Exception {
+    @Test public void nativeGlassPopupStagesWholeLiveTupleAndOnlyCurrentOffAckAllowsOneApplySave() throws Exception {
         MainActivity activity=livePreviewFixture();
         GraphicsBridgeShadow.epoch=10;
         Runnable poll=(Runnable)get(activity,"refreshGraphics"); poll.run();
@@ -269,13 +281,14 @@ public final class GraphicsPreviewOptionsTest {
         assertEquals(1,GraphicsBridgeShadow.applyCalls); assertTrue(GraphicsBridgeShadow.requested.same(off));
         assertTrue(GraphicsPreferences.confirmed(prefs).same(confirmed));
         GraphicsBridgeShadow.applied[0]=45; GraphicsBridgeShadow.applied[2]=2; GraphicsBridgeShadow.epoch=12;
-        poll.run(); assertEquals("Keep",((Button)get(activity,"graphicsConfirm")).getText().toString());
-        Button use=(Button)get(activity,"graphicsApply"); use.setEnabled(true); // Exercise a stale enabled Use event after ACK.
-        use.performClick();
-        assertEquals("Use can never save, even if an old enabled tap arrives after ACK",1,GraphicsBridgeShadow.applyCalls);
-        assertTrue(GraphicsPreferences.hasPending(prefs)); assertTrue(GraphicsPreferences.confirmed(prefs).same(confirmed));
-        ((Button)get(activity,"graphicsConfirm")).performClick();
+        poll.run();
         assertTrue(GraphicsPreferences.confirmed(prefs).same(off)); assertFalse(GraphicsPreferences.hasPending(prefs));
+        assertEquals("one Apply completes after exact RT ACK",1,GraphicsBridgeShadow.confirmCalls);
+        Button apply=(Button)get(activity,"graphicsApply"); apply.setEnabled(true);
+        apply.performClick(); // A stale enabled action cannot resubmit while the previous transition is busy.
+        poll.run(); poll.run();
+        assertEquals(1,GraphicsBridgeShadow.applyCalls); assertEquals(1,GraphicsBridgeShadow.confirmCalls);
+
     }
 
     @Test public void failedGlassRebuildClosesModalPreservesConfirmedAndRequiresRestoredAckToClearPending() throws Exception {
@@ -290,7 +303,7 @@ public final class GraphicsPreviewOptionsTest {
         Runnable poll=(Runnable)get(activity,"refreshGraphics"); poll.run();
         assertNull(get(activity,"graphicsOptionsPopup"));
         assertTrue(((TextView)get(activity,"graphicsTelemetry")).getText().toString().contains("Choice failed; Restore saved"));
-        assertFalse(((Button)get(activity,"graphicsConfirm")).isEnabled());
+        assertFalse(((Button)get(activity,"graphicsApply")).isEnabled());
         assertTrue(((Button)get(activity,"graphicsRevert")).isEnabled());
         assertTrue(GraphicsPreferences.hasPending(prefs)); assertTrue(GraphicsPreferences.confirmed(prefs).same(confirmed));
         ((Button)get(activity,"graphicsRevert")).performClick();
@@ -395,18 +408,22 @@ public final class GraphicsPreviewOptionsTest {
         set(activity,"graphicsSubmitted",pendingLow); set(activity,"graphicsDraft",pendingLow);
         set(activity,"graphicsOriginalPreviewDraft",draft); set(activity,"graphicsPreviewWanted",true);
         set(activity,"graphicsRequestSerial",42L); set(activity,"surfaceRequestGeneration",7L);
+        set(activity,"graphicsSaveSerial",42L); set(activity,"graphicsSaveGeneration",7L);
+        set(activity,"graphicsVisible",true); set(activity,"resumed",true);
+        GraphicsBridgeShadow.allowConfirm=true; GraphicsBridgeShadow.revertSerial=0;
         set(activity,"graphicsPreviewPerformanceGeneration",7L);
         GraphicsBridgeShadow.rebased=null; GraphicsBridgeShadow.resetCount=0; GraphicsBridgeShadow.epoch=9;
         Method confirm=MainActivity.class.getDeclaredMethod("confirmGraphicsSelection");
         confirm.setAccessible(true); confirm.invoke(activity);
         assertTrue(GraphicsBridgeShadow.rebased.same(savedHigher));
         assertSame(savedHigher,get(activity,"graphicsDraft")); assertSame(draft,get(activity,"graphicsOriginalPreviewDraft"));
-        assertEquals(43L,get(activity,"graphicsRequestSerial")); assertEquals(true,get(activity,"graphicsAwaitingRestore"));
+        assertEquals(46L,get(activity,"graphicsRequestSerial")); assertEquals(true,get(activity,"graphicsAwaitingRestore"));
+        assertEquals(true,get(activity,"graphicsRecovering"));
         assertEquals(1,GraphicsBridgeShadow.resetCount);
         assertEquals(9,(double)get(activity,"graphicsPreviewPerformanceEpochFloor"),0);
-        long[] restored=snapshot(); restored[0]=43; restored[22]=2; restored[23]=2;
-        assertTrue(GraphicsPreviewOptions.presented(restored,7,43,(GraphicsPreferences.Values)get(activity,"graphicsDraft")));
-        assertFalse(GraphicsPreviewOptions.presented(restored,7,43,draft));
+        long[] restored=snapshot(); restored[0]=46; restored[22]=2; restored[23]=2;
+        assertTrue(GraphicsPreviewOptions.presented(restored,7,46,(GraphicsPreferences.Values)get(activity,"graphicsDraft")));
+        assertFalse(GraphicsPreviewOptions.presented(restored,7,46,draft));
         assertTrue(GraphicsPreferences.confirmed(stored).same(savedHigher));
     }
 
@@ -435,7 +452,7 @@ public final class GraphicsPreviewOptionsTest {
             assertTrue(GraphicsPreviewOptions.maximumOverlayHeight(height,gap)+gap <= height*.35);
         assertEquals(1,GraphicsPreviewOptions.maximumOverlayHeight(0,0));
     }
-    @Test public void nativeMistPopupRequiresOffResourceAckAndExplicitUseThenKeepBeforeSaving() throws Exception {
+    @Test public void nativeMistPopupRequiresOffResourceAckAndOneApplyBeforeSaving() throws Exception {
         MainActivity activity=livePreviewFixture();
         GraphicsBridgeShadow.epoch=10;
         Runnable poll=(Runnable)get(activity,"refreshGraphics"); poll.run();
@@ -460,8 +477,8 @@ public final class GraphicsPreviewOptionsTest {
         assertEquals(1,GraphicsBridgeShadow.applyCalls); assertTrue(GraphicsBridgeShadow.requested.same(off));
         assertTrue(GraphicsPreferences.confirmed(prefs).same(confirmed));
         GraphicsBridgeShadow.applied[0]=45; GraphicsBridgeShadow.applied[2]=2; GraphicsBridgeShadow.epoch=12; poll.run();
-        assertEquals("Keep",((Button)get(activity,"graphicsConfirm")).getText().toString());
-        ((Button)get(activity,"graphicsConfirm")).performClick();
+        assertEquals("Apply",((Button)get(activity,"graphicsApply")).getText().toString());
+        assertEquals(1,GraphicsBridgeShadow.confirmCalls);
         assertTrue(GraphicsPreferences.confirmed(prefs).same(off)); assertFalse(GraphicsPreferences.hasPending(prefs));
     }
     private static Button findButton(android.view.View view,String text) {
@@ -550,7 +567,7 @@ public final class GraphicsPreviewOptionsTest {
         assertNotNull(findButton((android.view.View)get(activity,"menuScrim"),"Return to 50% resolution"));
     }
 
-    @Test public void experimentalResolutionRequiresUseAndExactAckBeforeKeep() throws Exception {
+    @Test public void experimentalResolutionRequiresApplyAndExactAckBeforeSaving() throws Exception {
         assertEquals(33,BuildConfig.MIN_RENDER_SCALE_PERCENT);
         for (int scale : new int[]{33,40}) {
             MainActivity activity=livePreviewFixture(); GraphicsBridgeShadow.epoch=10;
@@ -574,10 +591,118 @@ public final class GraphicsPreviewOptionsTest {
             ((Button)get(activity,"graphicsApply")).performClick();
             assertTrue(GraphicsPreferences.confirmed(prefs).same(confirmed)); assertEquals(1,GraphicsBridgeShadow.applyCalls);
             ack[0]=45; ack[2]=2; GraphicsBridgeShadow.epoch=12; poll.run();
-            assertEquals("Keep",((Button)get(activity,"graphicsConfirm")).getText().toString());
-            ((Button)get(activity,"graphicsConfirm")).performClick();
+            assertEquals("Apply",((Button)get(activity,"graphicsApply")).getText().toString());
+            assertEquals(1,GraphicsBridgeShadow.confirmCalls);
             assertTrue(GraphicsPreferences.confirmed(prefs).same(choice)); assertFalse(GraphicsPreferences.hasPending(prefs));
         }
+    }
+
+    private long[] acknowledgement(GraphicsPreferences.Values values,long serial,int state) {
+        long[] a=snapshot(); a[0]=serial; a[2]=state;
+        a[3]=a[15]=values.scale; a[4]=a[16]=values.water; a[5]=a[17]=values.fire;
+        a[6]=a[18]=values.cap; a[20]=a[21]=values.glassEnabled?1:0;
+        a[22]=a[23]=values.shadow; a[24]=a[25]=values.mistEnabled?1:0; a[26]=a[27]=values.dust;
+        return a;
+    }
+
+    private MainActivity applyingOrdinaryMobileDefaults() throws Exception {
+        MainActivity activity=livePreviewFixture(); set(activity,"graphicsPreviewWanted",false);
+        set(activity,"graphicsDraft",GraphicsPreferences.mobileDefaults());
+        Method show=MainActivity.class.getDeclaredMethod("showGraphicsPage"); show.setAccessible(true); show.invoke(activity);
+        ((Runnable)get(activity,"refreshGraphics")).run();
+        ((Button)get(activity,"graphicsApply")).performClick();
+        assertEquals(1,GraphicsBridgeShadow.applyCalls);
+        assertFalse(((Button)get(activity,"graphicsApply")).isEnabled());
+        return activity;
+    }
+
+    @Test public void ordinaryApplySavesOnceOnlyAfterFullCurrentPresentedTuple() throws Exception {
+        MainActivity activity=applyingOrdinaryMobileDefaults();
+        SharedPreferences prefs=(SharedPreferences)get(activity,"preferences");
+        Runnable poll=(Runnable)get(activity,"refreshGraphics");
+        long[] exact=acknowledgement(GraphicsPreferences.mobileDefaults(),45,2);
+        for(int index:new int[]{0,1,3,4,5,6,7,8,9,10,12,13,15,16,17,18,20,21,22,23,24,25,26,27}) {
+            long[] stale=exact.clone();
+            if(index==7 || index==8 || index==9 || index==10 || index==12 || index==13) stale[index]=0;
+            else stale[index]=exact[index]==0?1:exact[index]-1;
+            GraphicsBridgeShadow.applied=stale; poll.run();
+            assertTrue("wrong receipt field "+index+" cannot persist",GraphicsPreferences.confirmed(prefs).same(confirmed));
+            assertEquals(0,GraphicsBridgeShadow.confirmCalls);
+        }
+        GraphicsBridgeShadow.applied=exact; poll.run(); poll.run();
+        assertTrue(GraphicsPreferences.confirmed(prefs).same(GraphicsPreferences.mobileDefaults()));
+        assertFalse(GraphicsPreferences.hasPending(prefs)); assertEquals(1,GraphicsBridgeShadow.confirmCalls);
+        assertEquals(0L,get(activity,"graphicsSaveSerial"));
+    }
+
+    @Test public void comparisonWithoutApplyCannotSaveEvenWithPresentedTrialState() throws Exception {
+        MainActivity activity=livePreviewFixture();
+        GraphicsBridgeShadow.applied[2]=2;
+        ((Runnable)get(activity,"refreshGraphics")).run();
+        assertEquals(0,GraphicsBridgeShadow.confirmCalls);
+        assertTrue(GraphicsPreferences.confirmed((SharedPreferences)get(activity,"preferences")).same(confirmed));
+    }
+
+    @Test public void restoreFailureOrSurfaceReplacementRevokesSaveBeforeLateAck() throws Exception {
+        for(int cancellation=0;cancellation<3;++cancellation) {
+            MainActivity activity=applyingOrdinaryMobileDefaults();
+            Runnable poll=(Runnable)get(activity,"refreshGraphics");
+            if(cancellation==0) ((Button)get(activity,"graphicsRevert")).performClick();
+            else if(cancellation==1) { GraphicsBridgeShadow.applied[2]=5; poll.run(); }
+            else { set(activity,"surfaceRequestGeneration",8L); poll.run(); set(activity,"surfaceRequestGeneration",7L); }
+            assertEquals(0L,get(activity,"graphicsSaveSerial"));
+            GraphicsBridgeShadow.applied=acknowledgement(GraphicsPreferences.mobileDefaults(),45,2); poll.run();
+            assertEquals(0,GraphicsBridgeShadow.confirmCalls);
+            assertTrue(GraphicsPreferences.confirmed((SharedPreferences)get(activity,"preferences")).same(confirmed));
+        }
+    }
+
+    @Test public void priorFailureReceiptCannotCancelNewApplyWhileItsFrameIsPending() throws Exception {
+        MainActivity activity=applyingOrdinaryMobileDefaults();
+        GraphicsBridgeShadow.applied[2]=1; GraphicsBridgeShadow.applied[14]=64; // Old serial42; new Apply45 is pending.
+        Runnable poll=(Runnable)get(activity,"refreshGraphics"); poll.run();
+        assertEquals(45L,get(activity,"graphicsSaveSerial"));
+        GraphicsBridgeShadow.applied=acknowledgement(GraphicsPreferences.mobileDefaults(),45,2); poll.run();
+        assertTrue(GraphicsPreferences.confirmed((SharedPreferences)get(activity,"preferences")).same(GraphicsPreferences.mobileDefaults()));
+        assertEquals(1,GraphicsBridgeShadow.confirmCalls);
+    }
+
+    @Test public void previewAckMustMatchClickedImmutableTupleEvenIfAnOldEditorChangesDraft() throws Exception {
+        MainActivity activity=livePreviewFixture(); Runnable poll=(Runnable)get(activity,"refreshGraphics"); poll.run();
+        ((Button)get(activity,"graphicsApply")).performClick();
+        GraphicsPreferences.Values different=GraphicsPreferences.mobileDefaults();
+        set(activity,"graphicsDraft",different); // Simulate a stale editor callback during the submitted transition.
+        GraphicsBridgeShadow.applied=acknowledgement(different,45,2); poll.run();
+        assertEquals(0,GraphicsBridgeShadow.confirmCalls);
+        GraphicsBridgeShadow.applied=acknowledgement(confirmed,45,2); poll.run();
+        assertEquals(1,GraphicsBridgeShadow.confirmCalls);
+        assertTrue(((GraphicsPreferences.Values)get(activity,"graphicsDraft")).same(confirmed));
+    }
+
+    @Test public void zeroRevertFallbackRequiresExactReceiptThenRebasesAndEnablesApply() throws Exception {
+        MainActivity activity=applyingOrdinaryMobileDefaults(); GraphicsBridgeShadow.revertSerial=0;
+        ((Button)get(activity,"graphicsRevert")).performClick();
+        assertEquals(46L,get(activity,"graphicsRequestSerial")); assertTrue(GraphicsBridgeShadow.requested.same(confirmed));
+        SharedPreferences prefs=(SharedPreferences)get(activity,"preferences"); Runnable poll=(Runnable)get(activity,"refreshGraphics");
+        GraphicsBridgeShadow.applied=acknowledgement(confirmed,42,4); poll.run();
+        assertTrue(GraphicsPreferences.hasPending(prefs)); assertEquals(true,get(activity,"graphicsAwaitingRestore"));
+        GraphicsBridgeShadow.applied=acknowledgement(confirmed,46,4); GraphicsBridgeShadow.applied[25]=0; poll.run();
+        assertTrue(GraphicsPreferences.hasPending(prefs)); assertNull(GraphicsBridgeShadow.rebased);
+        GraphicsBridgeShadow.applied=acknowledgement(confirmed,46,4); poll.run(); poll.run();
+        assertTrue(GraphicsBridgeShadow.rebased.same(confirmed)); assertFalse(GraphicsPreferences.hasPending(prefs));
+        assertEquals(false,get(activity,"graphicsRecovering"));assertEquals(false,get(activity,"graphicsAwaitingRestore"));
+        assertTrue(((Button)get(activity,"graphicsApply")).isEnabled());
+        assertTrue(GraphicsPreferences.confirmed(prefs).same(confirmed)); assertEquals(0,GraphicsBridgeShadow.confirmCalls);
+    }
+
+    @Test public void nativeConfirmationRejectionRestoresWithoutPersisting() throws Exception {
+        MainActivity activity=applyingOrdinaryMobileDefaults(); GraphicsBridgeShadow.allowConfirm=false;
+        GraphicsBridgeShadow.applied=acknowledgement(GraphicsPreferences.mobileDefaults(),45,2);
+        ((Runnable)get(activity,"refreshGraphics")).run();
+        assertEquals(1,GraphicsBridgeShadow.confirmCalls); assertEquals(true,get(activity,"graphicsAwaitingRestore"));
+        assertEquals(43L,get(activity,"graphicsRequestSerial")); assertEquals(0L,get(activity,"graphicsSaveSerial"));
+        SharedPreferences prefs=(SharedPreferences)get(activity,"preferences");
+        assertTrue(GraphicsPreferences.hasPending(prefs)); assertTrue(GraphicsPreferences.confirmed(prefs).same(confirmed));
     }
 
     @Test public void productionResetStagesMobileDefaultsWithoutSavingOrChangingUnrelatedPrefs() throws Exception {

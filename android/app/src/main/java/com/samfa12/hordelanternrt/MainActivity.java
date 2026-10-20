@@ -441,7 +441,9 @@ public class MainActivity extends Activity {
     private int graphicsLatencyPollCount;
     private TextView graphicsTelemetry;
     private String graphicsDetailedStatus = "";
-    private Button graphicsApply, graphicsConfirm, graphicsRevert, graphicsBack;
+    private Button graphicsApply, graphicsRevert, graphicsBack;
+    // Only an explicit Apply owns persistence; live preview comparisons never do.
+    private long graphicsSaveSerial, graphicsSaveGeneration;
     private boolean rtLabReturnToEnding;
     private TextView rtLabTelemetry;
     private int rtWaterfallWidthPercent = 100;
@@ -3931,8 +3933,8 @@ public class MainActivity extends Activity {
             menuAmbience.setMixPercent(menuAmbienceMix[0], menuAmbienceMix[1]);
     }
 
-    private void setNativeGraphics(GraphicsPreferences.Values values) {
-        ProbeBridge.setGraphicsSettings(values.scale, values.water, values.fire, values.cap, values.glassEnabled, values.shadow, values.mistEnabled, values.dust);
+    private long setNativeGraphics(GraphicsPreferences.Values values) {
+        return ProbeBridge.setGraphicsSettings(values.scale, values.water, values.fire, values.cap, values.glassEnabled, values.shadow, values.mistEnabled, values.dust);
     }
 
     private void openGraphics() {
@@ -3940,6 +3942,7 @@ public class MainActivity extends Activity {
         clearTouchState();
         graphicsPageViewport.reset();
         graphicsPreviewViewport.reset();
+        cancelGraphicsSave();
         graphicsConfirmed = GraphicsPreferences.confirmed(preferences);
         graphicsDraft = graphicsConfirmed;
         graphicsRestoreDraftAfterPreview = null;
@@ -4059,28 +4062,13 @@ public class MainActivity extends Activity {
         final LinearLayout dock = addGraphicsActionDock(page);
         dock.addView(graphicsTelemetry, 0, matchWrap());
         graphicsPanel = page;
-        graphicsApply = graphicsActionButton("Use", "graphics-page-action-use", () -> {
-            graphicsSubmitted = graphicsDraft;
-            if (!GraphicsPreferences.markPending(preferences, graphicsSubmitted)) {
-                graphicsTelemetry.setText(R.string.graphics_storage_failed); return;
-            }
-            graphicsRequestSerial = requestTimedGraphicsApply(graphicsDraft);
-            if (graphicsRequestSerial == 0) {
-                graphicsTelemetry.setText(R.string.graphics_not_ready);
-                return; // Keep recovery marker until an acknowledged restore.
-            }
-            graphicsConfirmationStarted = 0;
-            graphicsBusy = graphicsRequestSerial != 0;
-            setGraphicsEditorsEnabled(graphicsPanel, !graphicsBusy);
-        }, "Use these settings for a temporary trial. Saved settings change only after a matching RT presentation and Keep and save.");
-        graphicsConfirm = graphicsActionButton("Keep", "graphics-page-action-keep", this::confirmGraphicsSelection,
-                "Keep the acknowledged trial settings as Saved settings.");
-        graphicsConfirm.setEnabled(false);
+        graphicsApply = graphicsActionButton("Apply", "graphics-page-action-apply", this::applyGraphicsSelection,
+                "Apply and save these settings after a matching RT frame is presented.");
         graphicsRevert = graphicsActionButton("Restore", "graphics-page-action-restore",
-                () -> requestGraphicsRevert(false), "Discard the trial and restore Saved settings.");
+                () -> requestGraphicsRevert(false), "Discard unsaved changes and restore Saved settings.");
         graphicsBack = graphicsActionButton("Back", "graphics-page-action-back",
                 () -> requestGraphicsRevert(true), "Restore Saved settings and leave Graphics.");
-        addGraphicsActionButtons(dock, graphicsApply, graphicsConfirm, graphicsRevert, graphicsBack);
+        addGraphicsActionButtons(dock, graphicsApply, graphicsRevert, graphicsBack);
         // Scroll/reflow at system font scales. Native buttons retain minimum 48dp hit areas.
         final WindowInsets insets = menuScrim.getRootWindowInsets();
         int left = dp(16), right = dp(16), top = dp(20), bottom = dp(20);
@@ -4103,7 +4091,6 @@ public class MainActivity extends Activity {
         if (entryMenuEnabled) ensureEntryMenuTargets(page);
         menuScrim.addView(page, layout);
         setGraphicsEditorsEnabled(page, !graphicsBusy);
-        graphicsConfirm.setEnabled(false);
         graphicsPageViewport.restoreAfterLayout(menuScrim);
         logGraphicsUiBuild("graphics", uiBuildStartedNs);
     }
@@ -4138,11 +4125,12 @@ public class MainActivity extends Activity {
 
     private void addGraphicsActionButtons(LinearLayout dock, Button... buttons) {
         // Short labels fit one native row on landscape phones, preserving more of the RT image.
-        if (graphicsActionsUseLandscapeRow() && buttons.length == 4) {
+        if (graphicsActionsUseLandscapeRow()) {
             addGraphicsActionRow(dock, buttons);
         } else {
             for (int i = 0; i < buttons.length; i += 2) {
-                addGraphicsActionRow(dock, buttons[i], buttons[Math.min(i + 1, buttons.length - 1)]);
+                if (i + 1 < buttons.length) addGraphicsActionRow(dock, buttons[i], buttons[i + 1]);
+                else addGraphicsActionRow(dock, buttons[i]);
             }
         }
     }
@@ -4174,29 +4162,14 @@ public class MainActivity extends Activity {
     }
 
     private void addGraphicsPreviewActions(LinearLayout dock) {
-        graphicsApply = graphicsActionButton("Use", "graphics-preview-action-use", () -> {
-            // Disabled native controls may still receive programmatic/stale click events. Guard
-            // readiness here too, before touching the JNI bridge.
-            if (graphicsApply == null || !graphicsApply.isEnabled()) return;
-            final long[] applied = ProbeBridge.getGraphicsSnapshot();
-            if (!GraphicsPreviewOptions.presented(applied, surfaceRequestGeneration, graphicsRequestSerial, previewSelection())) return;
-            if (applied[2] == 2) return; // Use never saves; Keep owns that decision.
-            if (GraphicsPreferences.markPending(preferences, previewSelection())) {
-                resetGraphicsPreviewTimeline();
-                graphicsSubmitted = previewSelection(); graphicsDraft = graphicsSubmitted;
-                graphicsRequestSerial = requestTimedGraphicsApply(graphicsSubmitted);
-                graphicsBusy = graphicsRequestSerial != 0; graphicsConfirmationStarted = 0;
-            }
-        }, "Use these acknowledged preview settings for a temporary trial. This does not save.");
-        graphicsConfirm = graphicsActionButton("Keep", "graphics-preview-action-keep",
-                this::confirmGraphicsSelection, "Save only the settings confirmed by a matching RT presentation.");
+        graphicsApply = graphicsActionButton("Apply", "graphics-preview-action-apply", this::applyGraphicsSelection,
+                "Apply and save these preview settings after a matching RT frame is presented.");
         graphicsRevert = graphicsActionButton("Restore", "graphics-preview-action-restore",
                 () -> requestGraphicsRevert(false), getString(R.string.graphics_revert));
         graphicsBack = graphicsActionButton("Back", "graphics-preview-action-back",
                 this::returnFromGraphicsPreview, "Revert live settings and return to Graphics.");
-        addGraphicsActionButtons(dock, graphicsApply, graphicsConfirm, graphicsRevert, graphicsBack);
+        addGraphicsActionButtons(dock, graphicsApply, graphicsRevert, graphicsBack);
         graphicsApply.setEnabled(false);
-        graphicsConfirm.setEnabled(false);
     }
 
     private void showGraphicsSettingsDetails() {
@@ -4207,8 +4180,8 @@ public class MainActivity extends Activity {
                 "Glass enables only glass supported by this build; mobile lantern panes remain absent. Shadows select Current or Higher RT sampling. " +
                 "Mist toggles keeper-room ground mist; fire, smoke and electricity stay enabled. The compact authored preview has no ground mist.\n" +
                 "Indoor dust controls the bounded room effect; the preview reports uploaded quality even where no motes are visible.\n\n" +
-                "Changing a choice edits the draft. Use starts a temporary trial only after the RT request is accepted. Keep and save is enabled only after a matching RT frame is presented. " +
-                "Unconfirmed settings restore after 15 visible seconds or when backgrounded. Preview measurements are not full-game performance guarantees." +
+                "Changing a choice edits the draft. Apply saves it automatically only after the exact requested settings appear in a successful RT presentation. " +
+                "Back, Restore or backgrounding cancels an outstanding Apply. Interrupted or failed changes restore Saved settings. Preview measurements are not full-game performance guarantees." +
                 (graphicsDetailedStatus.isEmpty() ? "" : "\n\nCurrent status\n" + graphicsDetailedStatus));
         details.setTextColor(HordeUiTokens.PARCHMENT);
         details.setTextSize(15);
@@ -4230,8 +4203,7 @@ public class MainActivity extends Activity {
         if (view instanceof ViewGroup) {
             final ViewGroup group = (ViewGroup)view;
             for (int i = 0; i < group.getChildCount(); ++i) setGraphicsEditorsEnabled(group.getChildAt(i), enabled);
-        } else if ((view instanceof SeekBar || view instanceof Button) && view != graphicsConfirm &&
-                view != graphicsRevert && view != graphicsBack && view != graphicsDetailsButton &&
+        } else if ((view instanceof SeekBar || view instanceof Button) && view != graphicsRevert && view != graphicsBack && view != graphicsDetailsButton &&
                 view != graphicsImageButton && view != graphicsControlsButton) view.setEnabled(enabled);
     }
 
@@ -4278,6 +4250,7 @@ public class MainActivity extends Activity {
     }
 
     private void compareGraphicsPreview(GraphicsPreferences.Values values) {
+        cancelGraphicsSave();
         graphicsPreviewImageOnly = false;
         if (!GraphicsPreferences.markPending(preferences, values)) {
             graphicsLiveChoiceError = getString(R.string.graphics_storage_failed); return;
@@ -4433,7 +4406,7 @@ public class MainActivity extends Activity {
         graphicsTelemetry.setContentDescription("Preview status and current graphics request details are available here.");
         // Reserve the dock's two-line status height before budgeting the viewport. Later telemetry
         // can change the text but must not unexpectedly consume the first option target.
-        graphicsTelemetry.setText("Preview FPS: waiting for RT\nKeep or Restore: 15 s");
+        graphicsTelemetry.setText("Preview FPS: waiting for RT\nNot saved; choose Apply");
         final LinearLayout optionsRow = addPreviewControlRow(panel);
         for (int choice = 0; choice < graphicsOptionButtons.length; ++choice) {
             final int selectedChoice = choice;
@@ -4632,7 +4605,7 @@ public class MainActivity extends Activity {
         graphicsGraph.setSamples(graphicsPreviewDetailsSamples);
         panel.addView(graphicsGraph, new LinearLayout.LayoutParams(-1, dp(56)));
         addBody(panel, "Choose settings directly in this scene. Each choice retains the other live settings. Preview changes do not save. " +
-                "Use these settings starts a 15-second trial; Keep and save makes that choice your Saved settings. Restore saved or Back discards the trial. " +
+                "Apply saves the selected settings after their matching RT frame is presented. Restore or Back cancels unsaved changes. " +
                 "Preview FPS counts successful RT swapchain presents per second, not display scanout FPS or full-game performance. Image hides the strip; Controls restores it.");
         addBody(panel, "Timing display is a snapshot while Details is open. Rendering and measurement continue; closing Details refreshes the display.");
         final Button pause = addGraphicsButton(panel, graphicsPreviewPaused ? "Resume preview animation" : "Pause preview animation", () -> {
@@ -4706,9 +4679,8 @@ public class MainActivity extends Activity {
         }
         final boolean matching = GraphicsPreviewOptions.presented(applied, surfaceRequestGeneration,
                 graphicsRequestSerial, previewSelection());
-        final String state = graphicsLiveChoiceError != null ? "choice unavailable; Restore saved" : applied[2] == 2 && matching ? "Keep and save? " + Math.max(0, 15 -
-                (SystemClock.elapsedRealtime() - graphicsConfirmationStarted) / 1000) + "s" : matching ?
-                (graphicsConfirmed != null && graphicsDraft.same(graphicsConfirmed) ? "Saved settings shown" : "Not saved; Use then Keep") :
+        final String state = graphicsLiveChoiceError != null ? "choice unavailable; Restore saved" : applied[2] == 2 && matching ? "Applying and saving" : matching ?
+                (graphicsConfirmed != null && graphicsDraft.same(graphicsConfirmed) ? "Saved settings shown" : "Not saved; choose Apply") :
                 (applied[14] & 64) != 0 ? "unavailable; previous output retained" : "waiting for RT";
         final String[] cameras = {"Overview", "Materials", "Glass", "Water", "Skeleton", "Mirror"};
         final double[] p = matching ? ProbeBridge.getGraphicsPreviewPerformance() : null;
@@ -4773,8 +4745,47 @@ public class MainActivity extends Activity {
 
     private String waterName(int quality) { return quality == 2 ? "High" : quality == 1 ? "Mobile" : "Off"; }
 
+    private void cancelGraphicsSave() {
+        graphicsSaveSerial = 0;
+        graphicsSaveGeneration = 0;
+    }
+
+    private void applyGraphicsSelection() {
+        // Revalidate stale/programmatic clicks against the current native state as well as UI state.
+        if (!graphicsVisible || !resumed || graphicsApply == null || !graphicsApply.isEnabled() ||
+                graphicsBusy || graphicsAwaitingRestore || graphicsSceneRestoring || graphicsSaveSerial != 0 ||
+                ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) != 1) return;
+        final long[] applied = ProbeBridge.getGraphicsSnapshot();
+        if (applied == null || applied.length != 28 || applied[2] == 1 || applied[2] == 2 || applied[2] == 4) return;
+        if (graphicsPreviewWanted && (graphicsLiveChoiceError != null ||
+                !GraphicsPreviewOptions.presented(applied, surfaceRequestGeneration, graphicsRequestSerial, previewSelection()))) return;
+        final GraphicsPreferences.Values candidate = graphicsDraft;
+        if (!GraphicsPreferences.markPending(preferences, candidate)) {
+            graphicsTelemetry.setText(R.string.graphics_storage_failed);
+            return;
+        }
+        graphicsSubmitted = candidate;
+        graphicsRequestSerial = requestTimedGraphicsApply(candidate);
+        if (graphicsRequestSerial == 0) {
+            graphicsTelemetry.setText(R.string.graphics_not_ready);
+            return; // Retain the durable recovery marker, without a save intent.
+        }
+        graphicsSaveSerial = graphicsRequestSerial;
+        graphicsSaveGeneration = surfaceRequestGeneration;
+        graphicsBusy = true;
+        graphicsConfirmationStarted = 0;
+        if (graphicsPreviewWanted) resetGraphicsPreviewTimeline();
+        setGraphicsEditorsEnabled(graphicsPanel, false);
+    }
+
     private void confirmGraphicsSelection() {
-        if (!ProbeBridge.confirmGraphicsSettings(graphicsRequestSerial, surfaceRequestGeneration)) return;
+        if (!graphicsVisible || !resumed || graphicsAwaitingRestore || graphicsSaveSerial == 0 ||
+                graphicsSaveSerial != graphicsRequestSerial || graphicsSaveGeneration != surfaceRequestGeneration) return;
+        cancelGraphicsSave(); // Consume once, including native/storage rejection.
+        if (!ProbeBridge.confirmGraphicsSettings(graphicsRequestSerial, surfaceRequestGeneration)) {
+            requestGraphicsRevert(false);
+            return;
+        }
         if (GraphicsPreferences.confirm(preferences, graphicsSubmitted)) {
             graphicsConfirmed = graphicsSubmitted; graphicsDraft = graphicsSubmitted;
             updateGraphicsSelectionSummary(true);
@@ -4790,8 +4801,9 @@ public class MainActivity extends Activity {
                 resetGraphicsPreviewTimeline();
             }
             graphicsAwaitingRestore = true;
+            graphicsBusy = true;
             graphicsRequestSerial = ProbeBridge.revertGraphicsSettings(surfaceRequestGeneration);
-            if (graphicsRequestSerial == 0) { setNativeGraphics(graphicsConfirmed); graphicsRecovering = true; }
+            if (graphicsRequestSerial == 0) { graphicsRequestSerial = setNativeGraphics(graphicsConfirmed); graphicsRecovering = true; }
             Toast.makeText(this, R.string.graphics_save_failed, Toast.LENGTH_LONG).show();
         }
         graphicsConfirmationStarted = 0;
@@ -4989,6 +5001,7 @@ public class MainActivity extends Activity {
     }
 
     private void requestGraphicsRevert(boolean close) {
+        cancelGraphicsSave();
         dismissGraphicsPreviewDetails();
         if (close) graphicsPreviewImageOnly = false;
         graphicsLiveChoiceError = null;
@@ -5006,7 +5019,7 @@ public class MainActivity extends Activity {
         graphicsRequestSerial = requestTimedGraphicsRevert();
         graphicsConfirmationStarted = 0;
         if (graphicsRequestSerial == 0) {
-            setNativeGraphics(graphicsConfirmed);
+            graphicsRequestSerial = setNativeGraphics(graphicsConfirmed);
             graphicsRecovering = true;
             if (close) { graphicsVisible = false; showSettings(); }
         }
@@ -5014,16 +5027,8 @@ public class MainActivity extends Activity {
 
     private void updateGraphicsActionButtons(boolean draftApplyReady, int state,
             boolean busy, boolean ready, boolean previewReady) {
-        // Use submits the temporary trial; Keep remains a separate control and
-        // is enabled only for the matching acknowledged RT presentation.
-        if (graphicsApply != graphicsConfirm) {
-            graphicsApply.setEnabled(graphicsPreviewWanted
-                    ? previewReady && graphicsLiveChoiceError == null && !busy && state != 2
-                    : draftApplyReady);
-        }
-        graphicsConfirm.setEnabled(graphicsPreviewWanted
-                ? previewReady && graphicsLiveChoiceError == null && state == 2 && ready
-                : state == 2 && ready);
+        graphicsApply.setEnabled(!graphicsAwaitingRestore && !graphicsSceneRestoring && graphicsSaveSerial == 0 &&
+                !busy && (graphicsPreviewWanted ? previewReady && graphicsLiveChoiceError == null && state != 2 : draftApplyReady));
     }
 
     private void addGraphicsSelectionSummary(LinearLayout panel) {
@@ -5063,11 +5068,22 @@ public class MainActivity extends Activity {
             }
             final double seconds = graphicsPollTime == 0 ? 0 : Math.max(0, now - graphicsPollTime) / 1000.0;
             graphicsPollTime = now;
+            if (graphicsSaveGeneration != surfaceRequestGeneration) cancelGraphicsSave();
             final long[] a = ProbeBridge.getGraphicsSnapshot();
             if (a == null || a.length != 28) { scheduleGraphicsPoll(this); return; }
             final boolean presented = GraphicsPreferences.presented(a, surfaceRequestGeneration);
-            if (graphicsRecovering && presented && GraphicsPreferences.matchesEffective(a, graphicsConfirmed)) {
+            if (graphicsRecovering && presented && (a[14] & 64) == 0 &&
+                    GraphicsPreferences.matchesEffective(a, graphicsConfirmed) &&
+                    GraphicsPreferences.matchesRequested(a, graphicsConfirmed) &&
+                    (!graphicsAwaitingRestore || (graphicsRequestSerial > 0 && a[0] == graphicsRequestSerial))) {
                 if (GraphicsPreferences.clearAfterRestore(preferences)) {
+                    if (graphicsAwaitingRestore) {
+                        // The direct fallback bypassed the edit session's pending Revert. Rebase
+                        // only after this exact restored RT receipt, so editing can resume safely.
+                        ProbeBridge.beginGraphicsEdit(graphicsConfirmed.scale, graphicsConfirmed.water,
+                                graphicsConfirmed.fire, graphicsConfirmed.cap, graphicsConfirmed.glassEnabled,
+                                graphicsConfirmed.shadow, graphicsConfirmed.mistEnabled, graphicsConfirmed.dust);
+                    }
                     graphicsRecovering = false;
                     Toast.makeText(MainActivity.this, R.string.graphics_restored, Toast.LENGTH_LONG).show();
                 }
@@ -5076,15 +5092,18 @@ public class MainActivity extends Activity {
             if (graphicsSceneRestoring && presented && a[19] == restoredProfile) graphicsSceneRestoring = false;
             if (graphicsVisible) {
                 final int state = (int)a[2];
+                if (state == 5 || ((a[14] & 64) != 0 && a[0] == graphicsSaveSerial &&
+                        a[1] == graphicsSaveGeneration)) cancelGraphicsSave();
                 final boolean busy = state == 1 || state == 2 || state == 4;
                 graphicsBusy = busy;
                 setGraphicsEditorsEnabled(graphicsPanel, !busy);
                 if (graphicsDetailsPanel != null) setGraphicsEditorsEnabled(graphicsDetailsPanel, !busy);
                 final GraphicsPreferences.Values expected = graphicsAwaitingRestore ? graphicsConfirmed :
                         graphicsSubmitted != null ? graphicsSubmitted : graphicsConfirmed;
-                final boolean ready = presented && a[0] == graphicsRequestSerial && (graphicsPreviewWanted ?
-                        GraphicsPreviewOptions.presented(a, surfaceRequestGeneration, graphicsRequestSerial, previewSelection()) :
-                        GraphicsPreferences.matchesEffective(a, expected) && GraphicsPreferences.matchesRequested(a, expected));
+                final boolean ready = presented && a[0] == graphicsRequestSerial &&
+                        GraphicsPreferences.matchesEffective(a, expected) && GraphicsPreferences.matchesRequested(a, expected) &&
+                        (!graphicsPreviewWanted || GraphicsPreviewOptions.presented(a,
+                                surfaceRequestGeneration, graphicsRequestSerial, expected));
                 if (ready && graphicsLatencySerial == a[0]) {
                     Log.i("HordeGraphicsLatency", "UI_ACK_SEEN serial=" + a[0] +
                             " generation=" + surfaceRequestGeneration + " state=" + state +
@@ -5093,6 +5112,11 @@ public class MainActivity extends Activity {
                             " polls=" + graphicsLatencyPollCount + " max_poll_lateness_ms=" +
                             graphicsLatencyMaxPollLatenessNs / 1.0e6);
                     graphicsLatencySerial = 0; // One observation per accepted UI request.
+                }
+                if (state == 2 && ready && graphicsSaveSerial == graphicsRequestSerial && graphicsSaveSerial != 0) {
+                    confirmGraphicsSelection();
+                    scheduleGraphicsPoll(this);
+                    return; // Await the native post-confirm/restore state before enabling editors.
                 }
                 if (state == 2 && ready) {
                     final boolean firstConfirmationPoll = graphicsConfirmationStarted == 0;
@@ -5121,7 +5145,7 @@ public class MainActivity extends Activity {
                 }
                 final boolean previewReady = graphicsPreviewWanted && GraphicsPreviewOptions.presented(a,
                         surfaceRequestGeneration, graphicsRequestSerial, previewSelection());
-                final boolean draftApplyReady = graphicsApply != graphicsConfirm && !busy &&
+                final boolean draftApplyReady = !busy &&
                         ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) == 1;
                 updateGraphicsActionButtons(draftApplyReady, state, busy, ready, previewReady);
                 updateGraphicsSelectionSummary(previewReady);
@@ -5142,10 +5166,10 @@ public class MainActivity extends Activity {
                         "Accepted 1.6.1 baseline" : graphicsDraft.same(GraphicsPreferences.mobileDefaults()) ? "Mobile defaults" : "Custom";
                 final String status = state == 1 ? "Waiting for RT frame · Saved unchanged" : state == 4 ? "Restoring saved settings" :
                         state == 5 ? "Trial failed · previous output retained" : state == 2 ?
-                        (ready ? "Keep or Restore: " + Math.max(0, 15 - (now - graphicsConfirmationStarted) / 1000) + " s" :
+                        (ready ? "Waiting to save or restore settings" :
                         "Waiting for current RT frame · Saved unchanged") : state == 3 ? "Confirmed and saved" :
                         graphicsConfirmed != null && graphicsDraft.same(graphicsConfirmed) ? "Saved settings selected" :
-                        "Not saved · choose Use, then Keep";
+                        "Not saved · choose Apply";
                 final String settingsText = preset + "\n" + status + "\nRequested: " + graphicsDraft.scale + "% / water " +
                         waterName(graphicsDraft.water) + " / fire " + GraphicsPreviewOptions.fireLabel(graphicsDraft.fire) +
                         " / glass " + (graphicsDraft.glassEnabled ? "On" : "Off") +
@@ -8013,6 +8037,7 @@ public class MainActivity extends Activity {
                 catch (RuntimeException | LinkageError ignored) { /* Lifecycle cleanup is best effort. */ }
             }
         }
+        cancelGraphicsSave();
         graphicsPreviewImageOnly = false;
         dismissGraphicsPreviewDetails();
         if (keeperRevealTitle != null) keeperRevealTitle.setVisibility(View.GONE);
@@ -8020,7 +8045,7 @@ public class MainActivity extends Activity {
             graphicsPreviewWanted = false;
             graphicsSceneRestoring = false;
             ProbeBridge.setGraphicsPreview(false, true, false, 0, false, 0);
-            setNativeGraphics(graphicsConfirmed); // New surface starts from confirmed settings.
+            graphicsRequestSerial = setNativeGraphics(graphicsConfirmed); // New surface starts from confirmed settings.
             graphicsRecovering = GraphicsPreferences.hasPending(preferences);
             graphicsVisible = false;
             handler.removeCallbacks(refreshGraphics);
