@@ -4,6 +4,8 @@ int RunEnvironmentSurveyCapture(VulkanSurfaceContext& context,
     horde::vulkan::DeviceCapabilities& capabilities,const std::filesystem::path& directory)
 {
     using namespace horde::platform::windows;
+    if(context.environmentSurveyProfile=="player-dodge")
+        return RunPlayerDodgeCapture(context,capabilities,directory);
     constexpr unsigned deadlineSeconds=60;
     struct Row {unsigned index=0;float seconds=0;double renderMs=0,readbackMs=0;
         std::string completed,file,sha256;};

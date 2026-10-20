@@ -5,6 +5,9 @@
 #include "platform/windows/WindowsSkyAttributionLaunch.h"
 #include "platform/windows/WindowsHiddenCaptureLaunch.h"
 #include "platform/windows/WindowsEnvironmentSurveyLaunch.h"
+#if defined(_DEBUG)
+#include "gameplay/validation/PlayerDodgePoseFixture.h"
+#endif
 #include "vulkan/raytracing/EnvironmentSurveyFrame.h"
 #include "platform/windows/WindowsMusicPlayback.h"
 #include "platform/windows/WindowsMusicFocus.h"
@@ -614,6 +617,10 @@ struct VulkanSurfaceContext
     bool mouseCursorHidden = false;
     bool environmentSurveyActive=false,environmentSurveyWaterDisabled=false,environmentSurveyDebrisDisabled=false;
     std::string environmentSurveyProfile;
+#if defined(_DEBUG)
+    std::optional<horde::gameplay::simulation::SimulationSnapshot> playerDodgeInspectionSnapshot;
+    bool playerDodgeInspectionDisabled=false;
+#endif
     float environmentSurveyTime=0;
     horde::platform::windows::EnvironmentSurveyCamera environmentSurveyCamera{};
     POINT mouseRestorePosition{};
@@ -6601,6 +6608,9 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         }
         if (!gCampaignHiddenValidation && !ctx.environmentSurveyActive && !previewFrame && !ctx.outputResizeValidation && !ctx.nativeMotionValidation) UpdateWaterfallAmbience(ctx);
         const horde::gameplay::simulation::SimulationSnapshot& simulation =
+#if defined(_DEBUG)
+            ctx.playerDodgeInspectionSnapshot ? *ctx.playerDodgeInspectionSnapshot :
+#endif
             ctx.simulation.Snapshot();
         if(!ctx.environmentSurveyActive)UpdateChapterDialogueAudio(ctx);
         if(!ctx.environmentSurveyActive) {
@@ -6711,7 +6721,7 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
             if(ctx.lookoutKitInspectionMotion)frameInputs.chapterCompanion=*ctx.lookoutKitInspectionMotion;
             frameInputs.chapterCompanion.acting=ctx.lookoutKitInspectionActing;
         }
-        if(ctx.environmentSurveyActive)
+        if(ctx.environmentSurveyActive && ctx.environmentSurveyProfile!="player-dodge")
         {
             const auto& camera=ctx.environmentSurveyCamera;
             if(!horde::vulkan::raytracing::RebaseEnvironmentSurveyFrame(frameInputs,
@@ -8430,6 +8440,7 @@ int RunEntryMenuCapture(VulkanSurfaceContext &context,
 #if defined(_DEBUG)
 #include "platform/windows/WindowsOutputResizeValidation.inl"
 #include "platform/windows/WindowsMotionEvidenceValidation.inl"
+#include "platform/windows/WindowsPlayerDodgeCapture.inl"
 #include "platform/windows/WindowsEnvironmentSurveyCapture.inl"
 #endif
 #endif
@@ -8505,6 +8516,9 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     context.environmentSurveyWaterDisabled=ParseCaptureLaunchOptions().environmentSurvey.waterDisabled;
     context.environmentSurveyDebrisDisabled=ParseCaptureLaunchOptions().environmentSurvey.debrisDisabled;
     context.environmentSurveyProfile=ParseCaptureLaunchOptions().environmentSurvey.profile;
+#if defined(_DEBUG)
+    context.playerDodgeInspectionDisabled=ParseCaptureLaunchOptions().environmentSurvey.dodgeDisabled;
+#endif
 #if defined(_DEBUG)
     if(captureDirectory != nullptr) context.skyAttribution=ParseCaptureLaunchOptions().skyAttribution;
     if (context.nativeMotionValidation) context.motionRequestedRtPreset = nativeMotionRtWorkloadPreset;

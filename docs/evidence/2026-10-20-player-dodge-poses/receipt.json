@@ -1,0 +1,3477 @@
+{
+  "date": "2026-10-20",
+  "worktree": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+  "sourceBase": "2c9fe54a6a072ff0b2756e8840a489c97a5eda19",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "draftPr": 27,
+  "runs": {
+    "pipeline-off": {
+      "manifest": {
+        "path": "reports/player-dodge-20261020-r1/pipeline-off/player-dodge-survey.json",
+        "bytes": 243427,
+        "sha256": "74c3392952b88ddb1fadbd166de950f14b6300e971fef269e067592f18a91488"
+      },
+      "metadata": {
+        "schema": 1,
+        "profile": "player-dodge",
+        "complete": true,
+        "evidenceClass": "seeded noncombat immutable shared-simulation pose snapshots; first-person RT and exact CPU-upload mesh, not live input, earned progression, contact or sustained performance",
+        "hidden": true,
+        "dodgePoseRequested": false,
+        "executableSha256": "c3c55dcae7c6381dd6dfd7d291f1b58182394d83850f1232c894c14a7b0241d9",
+        "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "driverVersion": 2559295488,
+        "backend": "RayTracingPipeline",
+        "renderScale": 1,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "snapshotFrameBudget": 64,
+        "deadlineSeconds": 90,
+        "applicationSnapshotObjectBytesUnchanged": true,
+        "error": null
+      },
+      "frameCount": 64,
+      "allMatchingCompletedRtFrames": true,
+      "resourcesStable": true,
+      "resources": {
+        "bufferCount": 52,
+        "memoryAllocationCount": 63,
+        "bottomLevelAccelerationStructureCount": 20,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 2,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 49601920,
+        "deviceLocalBytes": 405991648
+      },
+      "activePoseTimings": {
+        "wholeRtGpuMs": {
+          "count": 34,
+          "median": 8.323184000000001,
+          "p95NearestRank": 15.555008,
+          "maximum": 25.374848
+        },
+        "playerSkinCpuMs": {
+          "count": 34,
+          "median": 20.7682,
+          "p95NearestRank": 27.2771,
+          "maximum": 28.8402
+        },
+        "blasRefitRecordCpuMs": {
+          "count": 34,
+          "median": 0.061,
+          "p95NearestRank": 0.0909,
+          "maximum": 0.1047
+        },
+        "tlasUpdateRecordCpuMs": {
+          "count": 34,
+          "median": 0.00745,
+          "p95NearestRank": 0.017,
+          "maximum": 0.0211
+        }
+      },
+      "maximumSocketErrorMicrometres": 10,
+      "files": [
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/torch-forward-before.png",
+          "bytes": 701425,
+          "sha256": "c3e8236c4335a0c4a5df299e2a7a9a8e022c7ee63bd3aa9d478ceaeb82caa8f5"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/torch-forward-before.obj",
+          "bytes": 5104901,
+          "sha256": "3268f793dbfe74cd2622c8958bf82b5e13b66861d7ef8e10e0b7b5f9d4888e8f"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/torch-forward-1.png",
+          "bytes": 699803,
+          "sha256": "78ab556c42bdd0b394e9a6100aba508dc5c456515ef6e84e1df784094f53624b"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/torch-forward-3.png",
+          "bytes": 703295,
+          "sha256": "ac8077fa58395a65408764abd1ffd09afe83121548016afd68359f21367b5dc2"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/torch-forward-6.png",
+          "bytes": 708631,
+          "sha256": "258f2e208a8bbd311d5fab97dd3ba7b52ec1a3a8b156162be23cf8a33275e01a"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/torch-forward-6.obj",
+          "bytes": 5102733,
+          "sha256": "60ff5b14c493c0cd622649ba84e95f965fb64204d871e42ee928f91c832d668f"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/torch-forward-9.png",
+          "bytes": 714826,
+          "sha256": "9e3d3df5c62bd901d661a17b51d7409cad41147551716e773279f0f667abe543"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/torch-forward-12.png",
+          "bytes": 719716,
+          "sha256": "0a3cdec2ecfb323299f0b918a29a141f6ce5008a910d52ead50a1c0b72ccfb6a"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/torch-forward-18.png",
+          "bytes": 718516,
+          "sha256": "35f6260ab7158bfd902b369efb3155c6e65f5e54eaa76faa99d7dd4cb6edec9f"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/torch-back-before.png",
+          "bytes": 701425,
+          "sha256": "c3e8236c4335a0c4a5df299e2a7a9a8e022c7ee63bd3aa9d478ceaeb82caa8f5"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/torch-back-before.obj",
+          "bytes": 5104901,
+          "sha256": "3268f793dbfe74cd2622c8958bf82b5e13b66861d7ef8e10e0b7b5f9d4888e8f"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/torch-back-1.png",
+          "bytes": 698409,
+          "sha256": "e1e64fb6057fa1b3c7e123399952642aab7820666381dbfd6cce145047cc260c"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/torch-back-3.png",
+          "bytes": 696901,
+          "sha256": "722481e4d48971674009298dd8daa2d1104beb9b661a187004b3924e7ba78a81"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/torch-back-6.png",
+          "bytes": 698011,
+          "sha256": "502534cf3468219296ce1596959541e508f0c4179f49ba0c48510bf80b0f553f"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/torch-back-6.obj",
+          "bytes": 5102734,
+          "sha256": "0ab89c9ef9f4f446699b4ed67d574524565c49e8d81f5f3727ecc956ae74677e"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/torch-back-9.png",
+          "bytes": 697714,
+          "sha256": "fb62fd0d5738cc961531a38544867a2c58b3cc4e1cc97bf8e348100e2de88ad9"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/torch-back-12.png",
+          "bytes": 696885,
+          "sha256": "c6390935b0cbf3a4d555b8b7c125b974d97233aa298a34b4d101a740df215552"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/torch-back-18.png",
+          "bytes": 694552,
+          "sha256": "94012bcedf12987cfe80d841bb1ccf43b75bbb1101d0f0f4a6e6666d9596ff6f"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/torch-left-before.png",
+          "bytes": 701425,
+          "sha256": "c3e8236c4335a0c4a5df299e2a7a9a8e022c7ee63bd3aa9d478ceaeb82caa8f5"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/torch-left-before.obj",
+          "bytes": 5104901,
+          "sha256": "3268f793dbfe74cd2622c8958bf82b5e13b66861d7ef8e10e0b7b5f9d4888e8f"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/torch-left-1.png",
+          "bytes": 699692,
+          "sha256": "0cb2d00854a80f095a75b6a678c63181bac246b441c860057e2234bd6a6d9053"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/torch-left-3.png",
+          "bytes": 698857,
+          "sha256": "a2b40df654ce579d09e357822d31bd25868592c6fbba12f22f358794b6f3982d"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/torch-left-6.png",
+          "bytes": 699444,
+          "sha256": "dac3521a7aa68d2bec9b98ef3975a26c634df6b4712d2e41480ccf17010dd843"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/torch-left-6.obj",
+          "bytes": 5102734,
+          "sha256": "ddbb95002fae83a64cea3f0def35588c59733c855da01874628ac35c80b364c3"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/torch-left-9.png",
+          "bytes": 702647,
+          "sha256": "a770dd5f06d8b18a8dbced9c9c637e3532dbf5830d106cba4784328aea1b5e2c"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/torch-left-12.png",
+          "bytes": 702665,
+          "sha256": "350d0a8ee7e7cbd2a07b1d28686842172d622f3393ffc0a64be79ad697bf60ca"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/torch-left-18.png",
+          "bytes": 701646,
+          "sha256": "fbaf4578f5bbbd1daf121dd4a3cefd6baf2ad70ff3f13229d74595f6700f9120"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/torch-right-before.png",
+          "bytes": 701425,
+          "sha256": "c3e8236c4335a0c4a5df299e2a7a9a8e022c7ee63bd3aa9d478ceaeb82caa8f5"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/torch-right-before.obj",
+          "bytes": 5104901,
+          "sha256": "3268f793dbfe74cd2622c8958bf82b5e13b66861d7ef8e10e0b7b5f9d4888e8f"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/torch-right-1.png",
+          "bytes": 699406,
+          "sha256": "4e6e1ac5bfb6ec197bb7f7e1120b0110c71d6998c08666afc67a291c938311e4"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/torch-right-3.png",
+          "bytes": 700031,
+          "sha256": "a4d18991bc07e72b28c2cebb2c43ff1162009932472560d4c4406ec7be4c176f"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/torch-right-6.png",
+          "bytes": 704703,
+          "sha256": "7d75af8b7f47838092b44e7ad92aa670d4dc6125ca617e93fb412a55d75b769a"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/torch-right-6.obj",
+          "bytes": 5102733,
+          "sha256": "874999f8dbbe473d51e25b6f7aeea78a5328db247f8b7cc989ccf7ca7ee5a0ab"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/torch-right-9.png",
+          "bytes": 712150,
+          "sha256": "fa6b4dd18f97220eef0701028f1941383ec2408221633920c8de544758ad0198"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/torch-right-12.png",
+          "bytes": 721503,
+          "sha256": "6d810718710a179fd77f46bd49bce7f4f2a8563458170a9a6099a8dfc0a37111"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/torch-right-18.png",
+          "bytes": 719806,
+          "sha256": "fa4ebe9c9e96bfc4b8874e9da3d101f738b752b1cac4b11943d5da69000c7aac"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/torch-right-pause-before.png",
+          "bytes": 708083,
+          "sha256": "6dc62a72c3395de58552b509a44a0224098584a6a7616c2d713e3671fe2a31e9"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/torch-right-paused.png",
+          "bytes": 707901,
+          "sha256": "72eb58d49f041b3c8efb6bd7b8c6df0dc162bda864313043f39921b35b5ec75c"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/torch-right-resumed.png",
+          "bytes": 707257,
+          "sha256": "be4c0f82def1081aebdc70e0ee1e2816621e9d168334ae627dd53db7be88242c"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/torch-right-reset.png",
+          "bytes": 701425,
+          "sha256": "c3e8236c4335a0c4a5df299e2a7a9a8e022c7ee63bd3aa9d478ceaeb82caa8f5"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/lantern-forward-before.png",
+          "bytes": 772103,
+          "sha256": "27b12c44513c7132bebc861c49d8292dcaeac9f912e86dadb193dd0af42639b7"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/lantern-forward-before.obj",
+          "bytes": 5104797,
+          "sha256": "9ebf2c09b8a60255dd7e42cd0cfb2fc63a7417c4ff28a58e4e0ff73faa51eb3d"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/lantern-forward-1.png",
+          "bytes": 778710,
+          "sha256": "ff3f2060baf99e540848e2653c634a397d03af62e6d48521f3743a29a1d5ffbf"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/lantern-forward-3.png",
+          "bytes": 787196,
+          "sha256": "c9fdd12b5f3cf3e65113af56b6baa1dc4a28815ba4bcd2bf4865bf7c47fc1deb"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/lantern-forward-6.png",
+          "bytes": 796296,
+          "sha256": "e2d97ffaad0d4a2c02a048eec490f6fef7ffe199c94981dbbb4144a5c9c5b96b"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/lantern-forward-6.obj",
+          "bytes": 5103628,
+          "sha256": "2970a5de86dca68c37bf3fd008067b3b672c93fd32ba0c364c30d8eadb81bfe6"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/lantern-forward-9.png",
+          "bytes": 806693,
+          "sha256": "99bb31b56cfe21caadea3b98408f099ab14d35a880af50862b6e09eb13cc5ad3"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/lantern-forward-12.png",
+          "bytes": 818762,
+          "sha256": "a52e8073ab8d826e6d4b4a9a2e5b507e32d825a6b2d261fcdfbb1da7c6e563db"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/lantern-forward-18.png",
+          "bytes": 814644,
+          "sha256": "2652aeb6e11acb7a94dd16e068241a0983be43e06e4b173634cc268401d238f2"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/lantern-back-before.png",
+          "bytes": 772103,
+          "sha256": "27b12c44513c7132bebc861c49d8292dcaeac9f912e86dadb193dd0af42639b7"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/lantern-back-before.obj",
+          "bytes": 5104797,
+          "sha256": "9ebf2c09b8a60255dd7e42cd0cfb2fc63a7417c4ff28a58e4e0ff73faa51eb3d"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/lantern-back-1.png",
+          "bytes": 774539,
+          "sha256": "e7f059ae2cd95fb17258e5e32d43297a390e9278c2c90445e165e77950885458"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/lantern-back-3.png",
+          "bytes": 769718,
+          "sha256": "51cb11d748b4b54d194eb970ab7d2ec2f755de04da563b794be4af5b5d3f3b52"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/lantern-back-6.png",
+          "bytes": 771832,
+          "sha256": "bce211fad2c84b4981d5ad3e1e600517a96df41724add8cdfd788aecb51cc143"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/lantern-back-6.obj",
+          "bytes": 5103742,
+          "sha256": "68e0e1ae09a7098e7c6736a78eaca3a778be5f163a78b70d344de374d0cf0fd3"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/lantern-back-9.png",
+          "bytes": 776362,
+          "sha256": "18433eaebf979c7118aae7d8ad2ab2dfd5d43c462b0359b7f73fcb47444ef10c"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/lantern-back-12.png",
+          "bytes": 775497,
+          "sha256": "e5e99fef80029edfbeeebb49ae187f780c229cfbaed7d045107c5a8a753f03c9"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/lantern-back-18.png",
+          "bytes": 770383,
+          "sha256": "6778f0dd8339b9c002662f2e617a78ca2698ae8d13afb50e6bab94e154b67909"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/lantern-left-before.png",
+          "bytes": 772103,
+          "sha256": "27b12c44513c7132bebc861c49d8292dcaeac9f912e86dadb193dd0af42639b7"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/lantern-left-before.obj",
+          "bytes": 5104797,
+          "sha256": "9ebf2c09b8a60255dd7e42cd0cfb2fc63a7417c4ff28a58e4e0ff73faa51eb3d"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/lantern-left-1.png",
+          "bytes": 775195,
+          "sha256": "e55f67ea06483398a42840aa0eb89d4df73140f70c5fbaab904a398f851c4405"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/lantern-left-3.png",
+          "bytes": 780325,
+          "sha256": "137cfcc51ed40222c45b99beb1defe0fc400b7eb4e5f502bf86d2e7552870aac"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/lantern-left-6.png",
+          "bytes": 779480,
+          "sha256": "5d10381ca9c7d96495a2634abff0afd5a3be8cd9b9291b2b652c93fea467c69a"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/lantern-left-6.obj",
+          "bytes": 5103836,
+          "sha256": "4ec0f87f948af512a5534d4af4a8e803c613b1953ac29e5484664a0adfdd5f13"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/lantern-left-9.png",
+          "bytes": 781850,
+          "sha256": "7bf9f8e950ab492fb79c791d6fa09c6aad2e07a41ed5ad3a68995c098370ba4e"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/lantern-left-12.png",
+          "bytes": 780383,
+          "sha256": "47bf9847c437836b10e2aa8f1ce191e5e26e33410ddac3cabd665831abb128fc"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/lantern-left-18.png",
+          "bytes": 782245,
+          "sha256": "6b6acb7cf75cca69267da58772209979d4f3315f60bf3a29adcc8d5ff1366de3"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/lantern-right-before.png",
+          "bytes": 772103,
+          "sha256": "27b12c44513c7132bebc861c49d8292dcaeac9f912e86dadb193dd0af42639b7"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/lantern-right-before.obj",
+          "bytes": 5104797,
+          "sha256": "9ebf2c09b8a60255dd7e42cd0cfb2fc63a7417c4ff28a58e4e0ff73faa51eb3d"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/lantern-right-1.png",
+          "bytes": 776783,
+          "sha256": "668a643e90bc240084bcd265a9630e872c44be5049f30a0313b90fc4c0e21793"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/lantern-right-3.png",
+          "bytes": 778309,
+          "sha256": "2a0b2e7ed3b2faeea84426739d25558143eecd3a337bc134bce545d5867fd07a"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/lantern-right-6.png",
+          "bytes": 783890,
+          "sha256": "e2ab98b518b0478d2f2ba5cddf042dde83c2527c034b5ce83ea936e2b0229be1"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/lantern-right-6.obj",
+          "bytes": 5103851,
+          "sha256": "9daf651e544966705be806bd8d6df5cf5b917869b40f6053ca3ac3f2c9009822"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/lantern-right-9.png",
+          "bytes": 791082,
+          "sha256": "ae7207f6e159602430f058429b9d96cbad308129d5f0fa0e7b5a26db1c2cba56"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/lantern-right-12.png",
+          "bytes": 804743,
+          "sha256": "302acea6d5ff33011bccd09f1e491efe748d2b563195bc3b4e9221d537ea085e"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/lantern-right-18.png",
+          "bytes": 807388,
+          "sha256": "f09adf7bdbe1dac8fb88e14c4497ead90e0f3f2308b15a869afbd1404503c653"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/lantern-right-pause-before.png",
+          "bytes": 803240,
+          "sha256": "502efd717c443bbe22e0c25637aad3716e95b4a6c5bef099d34d749a3139c29b"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/lantern-right-paused.png",
+          "bytes": 804181,
+          "sha256": "2ee7b1796943ec3a517d92b86213223540057edea95a4a8a250f0b78cee042ea"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/lantern-right-resumed.png",
+          "bytes": 805989,
+          "sha256": "e7ed5dfee1c68888bf223a6b5114f1e811c4543767a1a45e049c012b9648e237"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-off/lantern-right-reset.png",
+          "bytes": 701425,
+          "sha256": "c3e8236c4335a0c4a5df299e2a7a9a8e022c7ee63bd3aa9d478ceaeb82caa8f5"
+        }
+      ],
+      "process": {
+        "pid": 31184,
+        "exitCode": 0,
+        "pending": false,
+        "seconds": 46.78100000000268,
+        "executable": {
+          "exists": true,
+          "bytes": 13920768,
+          "sha256": "c3c55dcae7c6381dd6dfd7d291f1b58182394d83850f1232c894c14a7b0241d9"
+        },
+        "settingsBefore": {
+          "exists": true,
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "settingsAfter": {
+          "exists": true,
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "foregroundBefore": null,
+        "foregroundAfter": null,
+        "settingsUnchanged": true,
+        "foregroundSamplesUnchanged": true
+      },
+      "foregroundSampleCount": 175,
+      "foregroundUniqueSamples": [
+        "None"
+      ]
+    },
+    "pipeline-on": {
+      "manifest": {
+        "path": "reports/player-dodge-20261020-r1/pipeline-on/player-dodge-survey.json",
+        "bytes": 243415,
+        "sha256": "ccbdb71cb9c1f8f61d99d4f9f22c5a9a09d5f56e41e3741472719f08986a7916"
+      },
+      "metadata": {
+        "schema": 1,
+        "profile": "player-dodge",
+        "complete": true,
+        "evidenceClass": "seeded noncombat immutable shared-simulation pose snapshots; first-person RT and exact CPU-upload mesh, not live input, earned progression, contact or sustained performance",
+        "hidden": true,
+        "dodgePoseRequested": true,
+        "executableSha256": "c3c55dcae7c6381dd6dfd7d291f1b58182394d83850f1232c894c14a7b0241d9",
+        "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "driverVersion": 2559295488,
+        "backend": "RayTracingPipeline",
+        "renderScale": 1,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "snapshotFrameBudget": 64,
+        "deadlineSeconds": 90,
+        "applicationSnapshotObjectBytesUnchanged": true,
+        "error": null
+      },
+      "frameCount": 64,
+      "allMatchingCompletedRtFrames": true,
+      "resourcesStable": true,
+      "resources": {
+        "bufferCount": 52,
+        "memoryAllocationCount": 63,
+        "bottomLevelAccelerationStructureCount": 20,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 2,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 49601920,
+        "deviceLocalBytes": 405991648
+      },
+      "activePoseTimings": {
+        "wholeRtGpuMs": {
+          "count": 34,
+          "median": 8.275824,
+          "p95NearestRank": 15.47104,
+          "maximum": 25.5536
+        },
+        "playerSkinCpuMs": {
+          "count": 34,
+          "median": 21.1019,
+          "p95NearestRank": 22.9514,
+          "maximum": 24.7246
+        },
+        "blasRefitRecordCpuMs": {
+          "count": 34,
+          "median": 0.05815,
+          "p95NearestRank": 0.2183,
+          "maximum": 0.2809
+        },
+        "tlasUpdateRecordCpuMs": {
+          "count": 34,
+          "median": 0.0071,
+          "p95NearestRank": 0.0188,
+          "maximum": 0.027
+        }
+      },
+      "maximumSocketErrorMicrometres": 10,
+      "files": [
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/torch-forward-before.png",
+          "bytes": 701425,
+          "sha256": "c3e8236c4335a0c4a5df299e2a7a9a8e022c7ee63bd3aa9d478ceaeb82caa8f5"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/torch-forward-before.obj",
+          "bytes": 5104901,
+          "sha256": "3268f793dbfe74cd2622c8958bf82b5e13b66861d7ef8e10e0b7b5f9d4888e8f"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/torch-forward-1.png",
+          "bytes": 699569,
+          "sha256": "7111170e621aebea0aac0755a4fc60992508f3131d39e0e36523d7f8e8637c7f"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/torch-forward-3.png",
+          "bytes": 703724,
+          "sha256": "9e075085f5fb0289be46583a1e03ed068c003dc2a35eb220954695dcc2d6b74a"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/torch-forward-6.png",
+          "bytes": 708514,
+          "sha256": "a593ef692a5724500a87f7bf987e45381daba6f5b685c54e330f60daf9c954b1"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/torch-forward-6.obj",
+          "bytes": 5096500,
+          "sha256": "8d519ab9ac217bd7b38980873da7d2e410d17b5dbd703e9ae6406682ef3fe084"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/torch-forward-9.png",
+          "bytes": 714873,
+          "sha256": "bd84ffba07a552a457a5f45f2677cc5dc5fccd8c13ca1c2c9130fed15abd8012"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/torch-forward-12.png",
+          "bytes": 719716,
+          "sha256": "0a3cdec2ecfb323299f0b918a29a141f6ce5008a910d52ead50a1c0b72ccfb6a"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/torch-forward-18.png",
+          "bytes": 718516,
+          "sha256": "35f6260ab7158bfd902b369efb3155c6e65f5e54eaa76faa99d7dd4cb6edec9f"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/torch-back-before.png",
+          "bytes": 701425,
+          "sha256": "c3e8236c4335a0c4a5df299e2a7a9a8e022c7ee63bd3aa9d478ceaeb82caa8f5"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/torch-back-before.obj",
+          "bytes": 5104901,
+          "sha256": "3268f793dbfe74cd2622c8958bf82b5e13b66861d7ef8e10e0b7b5f9d4888e8f"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/torch-back-1.png",
+          "bytes": 698025,
+          "sha256": "9f3b2e4c474fac415d00dd1547c419e477e1e46bb5539d575433ec5aed07d7ea"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/torch-back-3.png",
+          "bytes": 697236,
+          "sha256": "42e2b432e2bd26af8378a8db1a2a36ad8c25db33f437909481fec6c8a80b10c1"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/torch-back-6.png",
+          "bytes": 698963,
+          "sha256": "38564a5a554965d1d46a0f299a48dfaed8c5e91750e54e8135977ac3c0a01566"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/torch-back-6.obj",
+          "bytes": 5103558,
+          "sha256": "d62dc700ac116ec12817de59e836d1131fc7de8db2c124928fea50cb9f02a18b"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/torch-back-9.png",
+          "bytes": 697673,
+          "sha256": "4cd6b5e5672ffc49b15a8a5053b094ab81c1c95eb4e451e088958c857108bbdb"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/torch-back-12.png",
+          "bytes": 696885,
+          "sha256": "c6390935b0cbf3a4d555b8b7c125b974d97233aa298a34b4d101a740df215552"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/torch-back-18.png",
+          "bytes": 694552,
+          "sha256": "94012bcedf12987cfe80d841bb1ccf43b75bbb1101d0f0f4a6e6666d9596ff6f"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/torch-left-before.png",
+          "bytes": 701425,
+          "sha256": "c3e8236c4335a0c4a5df299e2a7a9a8e022c7ee63bd3aa9d478ceaeb82caa8f5"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/torch-left-before.obj",
+          "bytes": 5104901,
+          "sha256": "3268f793dbfe74cd2622c8958bf82b5e13b66861d7ef8e10e0b7b5f9d4888e8f"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/torch-left-1.png",
+          "bytes": 699496,
+          "sha256": "2524869087b595a15196ca6939931e0ceb48c3481d55e60b2c73fd4be911db1b"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/torch-left-3.png",
+          "bytes": 698594,
+          "sha256": "9b75115633d61d5fbe1be714b3be9e94c3ca619e7c126b8e2d04f7cd8fdc2855"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/torch-left-6.png",
+          "bytes": 699579,
+          "sha256": "cedc7d4f6254fdbcf31f2ba6cd1d72ed369c649b20ef07192dcd2e2da7f59262"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/torch-left-6.obj",
+          "bytes": 5099552,
+          "sha256": "2fa1fabd1f4828320ca129e4d847961daa2b20878782313ef3faa3b1b50b78c1"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/torch-left-9.png",
+          "bytes": 702519,
+          "sha256": "9d78e9e1428cce7591016597a963257ae4095a98cf8786df0cfa28733a438727"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/torch-left-12.png",
+          "bytes": 702665,
+          "sha256": "350d0a8ee7e7cbd2a07b1d28686842172d622f3393ffc0a64be79ad697bf60ca"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/torch-left-18.png",
+          "bytes": 701646,
+          "sha256": "fbaf4578f5bbbd1daf121dd4a3cefd6baf2ad70ff3f13229d74595f6700f9120"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/torch-right-before.png",
+          "bytes": 701425,
+          "sha256": "c3e8236c4335a0c4a5df299e2a7a9a8e022c7ee63bd3aa9d478ceaeb82caa8f5"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/torch-right-before.obj",
+          "bytes": 5104901,
+          "sha256": "3268f793dbfe74cd2622c8958bf82b5e13b66861d7ef8e10e0b7b5f9d4888e8f"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/torch-right-1.png",
+          "bytes": 699107,
+          "sha256": "aa64e5c348e82f871ae67ba9fc7772e4a7c1b5f426b8c80d15e350c8fa381109"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/torch-right-3.png",
+          "bytes": 700083,
+          "sha256": "de4587ac14f6bae078a4f53eb270d6e2d1f34343089fab5da2806a27313ca782"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/torch-right-6.png",
+          "bytes": 705465,
+          "sha256": "fd2427ea6d6ada4bf998fe2f5adf2f4ce2bab703fdd6149537e6a638ac748b13"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/torch-right-6.obj",
+          "bytes": 5101874,
+          "sha256": "88916f286ae2149317081b8e85610665b2d6fa05fb37d4d53ea962425066e97b"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/torch-right-9.png",
+          "bytes": 712259,
+          "sha256": "a4f0de494fbedae3f2ed3ba87be238b947e028516affd090540bcc3a24417fe4"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/torch-right-12.png",
+          "bytes": 721503,
+          "sha256": "6d810718710a179fd77f46bd49bce7f4f2a8563458170a9a6099a8dfc0a37111"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/torch-right-18.png",
+          "bytes": 719806,
+          "sha256": "fa4ebe9c9e96bfc4b8874e9da3d101f738b752b1cac4b11943d5da69000c7aac"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/torch-right-pause-before.png",
+          "bytes": 706949,
+          "sha256": "bf8a45efb45e6481e9d894ef625214b411e51050c5b41dea78d99c78987e9842"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/torch-right-paused.png",
+          "bytes": 707901,
+          "sha256": "72eb58d49f041b3c8efb6bd7b8c6df0dc162bda864313043f39921b35b5ec75c"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/torch-right-resumed.png",
+          "bytes": 707257,
+          "sha256": "be4c0f82def1081aebdc70e0ee1e2816621e9d168334ae627dd53db7be88242c"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/torch-right-reset.png",
+          "bytes": 701425,
+          "sha256": "c3e8236c4335a0c4a5df299e2a7a9a8e022c7ee63bd3aa9d478ceaeb82caa8f5"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/lantern-forward-before.png",
+          "bytes": 772103,
+          "sha256": "27b12c44513c7132bebc861c49d8292dcaeac9f912e86dadb193dd0af42639b7"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/lantern-forward-before.obj",
+          "bytes": 5104797,
+          "sha256": "9ebf2c09b8a60255dd7e42cd0cfb2fc63a7417c4ff28a58e4e0ff73faa51eb3d"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/lantern-forward-1.png",
+          "bytes": 779116,
+          "sha256": "140e1799832ba7c97407654c0e1bcb94d9d5d6aa7996789c45210dff70446f07"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/lantern-forward-3.png",
+          "bytes": 788992,
+          "sha256": "331b2bf9db40ef338cda92d4181822744e99e81dbc96b82f1d082239ff02babf"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/lantern-forward-6.png",
+          "bytes": 799565,
+          "sha256": "d56331c4c50c142bc49b7746124fe128c7f13bdfe7503e132971ae32761a5956"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/lantern-forward-6.obj",
+          "bytes": 5097459,
+          "sha256": "4f6eb147316cdc66e21486466b340ba5c077f372be6758eeb3fca574e39d9814"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/lantern-forward-9.png",
+          "bytes": 807353,
+          "sha256": "33db7cefddff641e69be25d2738fa0bca6fd85fc5648c2b6776db6112e9553c1"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/lantern-forward-12.png",
+          "bytes": 818762,
+          "sha256": "a52e8073ab8d826e6d4b4a9a2e5b507e32d825a6b2d261fcdfbb1da7c6e563db"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/lantern-forward-18.png",
+          "bytes": 814644,
+          "sha256": "2652aeb6e11acb7a94dd16e068241a0983be43e06e4b173634cc268401d238f2"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/lantern-back-before.png",
+          "bytes": 772103,
+          "sha256": "27b12c44513c7132bebc861c49d8292dcaeac9f912e86dadb193dd0af42639b7"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/lantern-back-before.obj",
+          "bytes": 5104797,
+          "sha256": "9ebf2c09b8a60255dd7e42cd0cfb2fc63a7417c4ff28a58e4e0ff73faa51eb3d"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/lantern-back-1.png",
+          "bytes": 775198,
+          "sha256": "43f7e4ac97d32534e259783135b337c82a48aa0a4aa243f9aff021d086b4b454"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/lantern-back-3.png",
+          "bytes": 771889,
+          "sha256": "ce9c605cf86d4a1b869a64e8f68e55a8d2b5cfe77b0246196b9273a0e68640ca"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/lantern-back-6.png",
+          "bytes": 772663,
+          "sha256": "64949de9ef692ad52dbb281fe9a01c2121897066d744689fceb3db36141c9b7f"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/lantern-back-6.obj",
+          "bytes": 5104626,
+          "sha256": "de8e4ebe070c6e96515e5e603dd65e993403706603d6915dc9ef964d108899b4"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/lantern-back-9.png",
+          "bytes": 776140,
+          "sha256": "2a81adfbbc122c2a0e7284e0fd06c9acc55f5c2dc73cb38a125386424a48c4c9"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/lantern-back-12.png",
+          "bytes": 775497,
+          "sha256": "e5e99fef80029edfbeeebb49ae187f780c229cfbaed7d045107c5a8a753f03c9"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/lantern-back-18.png",
+          "bytes": 770383,
+          "sha256": "6778f0dd8339b9c002662f2e617a78ca2698ae8d13afb50e6bab94e154b67909"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/lantern-left-before.png",
+          "bytes": 772103,
+          "sha256": "27b12c44513c7132bebc861c49d8292dcaeac9f912e86dadb193dd0af42639b7"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/lantern-left-before.obj",
+          "bytes": 5104797,
+          "sha256": "9ebf2c09b8a60255dd7e42cd0cfb2fc63a7417c4ff28a58e4e0ff73faa51eb3d"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/lantern-left-1.png",
+          "bytes": 775452,
+          "sha256": "51caae1365861d5f39607dcaa3b2c36323fc6b7c8a5f92097dbea4934bf1c834"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/lantern-left-3.png",
+          "bytes": 782674,
+          "sha256": "0fb9eeecd36eb4d31ca107c3626c23ac6e32536ff6dc5f8cb1027c664f209594"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/lantern-left-6.png",
+          "bytes": 780366,
+          "sha256": "76e6cfa005392035080a58745357068271be207165d875029ff858ac27ff2533"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/lantern-left-6.obj",
+          "bytes": 5100736,
+          "sha256": "5cbb994b1a8249ec4261702e6a0b5fdb738138d5d76c564794076d785e128148"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/lantern-left-9.png",
+          "bytes": 781384,
+          "sha256": "3c13526865d9b61627306f49db49e8777251576e87f49cf123bf2899a9d43a10"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/lantern-left-12.png",
+          "bytes": 780383,
+          "sha256": "47bf9847c437836b10e2aa8f1ce191e5e26e33410ddac3cabd665831abb128fc"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/lantern-left-18.png",
+          "bytes": 782245,
+          "sha256": "6b6acb7cf75cca69267da58772209979d4f3315f60bf3a29adcc8d5ff1366de3"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/lantern-right-before.png",
+          "bytes": 772103,
+          "sha256": "27b12c44513c7132bebc861c49d8292dcaeac9f912e86dadb193dd0af42639b7"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/lantern-right-before.obj",
+          "bytes": 5104797,
+          "sha256": "9ebf2c09b8a60255dd7e42cd0cfb2fc63a7417c4ff28a58e4e0ff73faa51eb3d"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/lantern-right-1.png",
+          "bytes": 777692,
+          "sha256": "380a3f3199be0d8aa179ca983773fb03457614e578acdc98fa3a43b0b07db68f"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/lantern-right-3.png",
+          "bytes": 780613,
+          "sha256": "057034ce19f2012584bc68923d548f7dc82b4a61dd9a5b607f5f6d683934bfdf"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/lantern-right-6.png",
+          "bytes": 785585,
+          "sha256": "6091ba5e89365227e4ae105741b8f5bcfb73d5da28eb9773b21c070e1d2768c7"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/lantern-right-6.obj",
+          "bytes": 5102843,
+          "sha256": "785393f9edd2ad5aba403f736f5741b8f7db354a53a833cda4d3d285a632544f"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/lantern-right-9.png",
+          "bytes": 792981,
+          "sha256": "132a8e33838dfa97cc854051cfc73f1bc128015e8ae074087431281ccea8d80e"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/lantern-right-12.png",
+          "bytes": 804743,
+          "sha256": "302acea6d5ff33011bccd09f1e491efe748d2b563195bc3b4e9221d537ea085e"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/lantern-right-18.png",
+          "bytes": 807388,
+          "sha256": "f09adf7bdbe1dac8fb88e14c4497ead90e0f3f2308b15a869afbd1404503c653"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/lantern-right-pause-before.png",
+          "bytes": 804936,
+          "sha256": "d9f7f3ba8e51b7b3010dce926a72e268308f1f4ae9a970c12afc81650f05ee11"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/lantern-right-paused.png",
+          "bytes": 804181,
+          "sha256": "2ee7b1796943ec3a517d92b86213223540057edea95a4a8a250f0b78cee042ea"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/lantern-right-resumed.png",
+          "bytes": 805989,
+          "sha256": "e7ed5dfee1c68888bf223a6b5114f1e811c4543767a1a45e049c012b9648e237"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/pipeline-on/lantern-right-reset.png",
+          "bytes": 701425,
+          "sha256": "c3e8236c4335a0c4a5df299e2a7a9a8e022c7ee63bd3aa9d478ceaeb82caa8f5"
+        }
+      ],
+      "process": {
+        "pid": 46928,
+        "exitCode": 0,
+        "pending": false,
+        "seconds": 42.82799999999406,
+        "executable": {
+          "exists": true,
+          "bytes": 13920768,
+          "sha256": "c3c55dcae7c6381dd6dfd7d291f1b58182394d83850f1232c894c14a7b0241d9"
+        },
+        "settingsBefore": {
+          "exists": true,
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "settingsAfter": {
+          "exists": true,
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "foregroundBefore": null,
+        "foregroundAfter": null,
+        "settingsUnchanged": true,
+        "foregroundSamplesUnchanged": true
+      },
+      "foregroundSampleCount": 171,
+      "foregroundUniqueSamples": [
+        "None"
+      ]
+    },
+    "compute-off": {
+      "manifest": {
+        "path": "reports/player-dodge-20261020-r1/compute-off/player-dodge-survey.json",
+        "bytes": 247580,
+        "sha256": "ceb9b6a59aeb27ba3c77e92cd0156b8d9b6e85a66cb81d9303b465b948a53c73"
+      },
+      "metadata": {
+        "schema": 1,
+        "profile": "player-dodge",
+        "complete": true,
+        "evidenceClass": "seeded noncombat immutable shared-simulation pose snapshots; first-person RT and exact CPU-upload mesh, not live input, earned progression, contact or sustained performance",
+        "hidden": true,
+        "dodgePoseRequested": false,
+        "executableSha256": "c3c55dcae7c6381dd6dfd7d291f1b58182394d83850f1232c894c14a7b0241d9",
+        "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "driverVersion": 2559295488,
+        "backend": "RayQueryCompute",
+        "renderScale": 1,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "snapshotFrameBudget": 64,
+        "deadlineSeconds": 90,
+        "applicationSnapshotObjectBytesUnchanged": true,
+        "error": null
+      },
+      "frameCount": 64,
+      "allMatchingCompletedRtFrames": true,
+      "resourcesStable": true,
+      "resources": {
+        "bufferCount": 50,
+        "memoryAllocationCount": 61,
+        "bottomLevelAccelerationStructureCount": 20,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 0,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 49601408,
+        "deviceLocalBytes": 405991648
+      },
+      "activePoseTimings": {
+        "wholeRtGpuMs": {
+          "count": 34,
+          "median": 7.958288,
+          "p95NearestRank": 14.85296,
+          "maximum": 25.344672
+        },
+        "playerSkinCpuMs": {
+          "count": 34,
+          "median": 20.8291,
+          "p95NearestRank": 24.2872,
+          "maximum": 25.145
+        },
+        "blasRefitRecordCpuMs": {
+          "count": 34,
+          "median": 0.0587,
+          "p95NearestRank": 0.2471,
+          "maximum": 0.255
+        },
+        "tlasUpdateRecordCpuMs": {
+          "count": 34,
+          "median": 0.00695,
+          "p95NearestRank": 0.0243,
+          "maximum": 0.0374
+        }
+      },
+      "maximumSocketErrorMicrometres": 10,
+      "files": [
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/torch-forward-before.png",
+          "bytes": 701422,
+          "sha256": "3baade9cafde263101d5930047f418422212004bf2b1b837af3617619cf1159b"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/torch-forward-before.obj",
+          "bytes": 5104901,
+          "sha256": "3268f793dbfe74cd2622c8958bf82b5e13b66861d7ef8e10e0b7b5f9d4888e8f"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/torch-forward-1.png",
+          "bytes": 699813,
+          "sha256": "2367db74ff5ae28fc1b7c5f3097a1c21387e18fdcd3ca9e7b978cbda01f5e960"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/torch-forward-3.png",
+          "bytes": 703294,
+          "sha256": "fd67cf18b5a85f068cbd6ead5fa584524a68362a5c33822952e6368dbf76d59b"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/torch-forward-6.png",
+          "bytes": 708648,
+          "sha256": "4ee515a735f13ed94c3a1a41741e9c7cd5fff58c7e0856f73dbe107557070984"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/torch-forward-6.obj",
+          "bytes": 5102733,
+          "sha256": "60ff5b14c493c0cd622649ba84e95f965fb64204d871e42ee928f91c832d668f"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/torch-forward-9.png",
+          "bytes": 714814,
+          "sha256": "d270440a470fea82aaf7b45f5e0ae195cea9c20671c8b9aeabff767eb7790c18"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/torch-forward-12.png",
+          "bytes": 719721,
+          "sha256": "e0925e60e8808020b738dda3f56ada94700a9eb0893ed55dbc4a15fa642a0aa2"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/torch-forward-18.png",
+          "bytes": 718516,
+          "sha256": "f026272c6d48250e125c87c889e279eabd138f3317dd0a2611a226a71f11ff9d"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/torch-back-before.png",
+          "bytes": 701422,
+          "sha256": "3baade9cafde263101d5930047f418422212004bf2b1b837af3617619cf1159b"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/torch-back-before.obj",
+          "bytes": 5104901,
+          "sha256": "3268f793dbfe74cd2622c8958bf82b5e13b66861d7ef8e10e0b7b5f9d4888e8f"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/torch-back-1.png",
+          "bytes": 698412,
+          "sha256": "cd5b288498211610066f70993d472a5e35fa72e47e371126a7593af139f52313"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/torch-back-3.png",
+          "bytes": 696924,
+          "sha256": "ce61cd0477512afd434f3ca9546ba5318c7a59b3b16f6fddf092fb28c16ca25c"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/torch-back-6.png",
+          "bytes": 698026,
+          "sha256": "aa88dd958b161bceabb413a54de0b16b53b8c1948591b89dd96f98cc0dc24383"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/torch-back-6.obj",
+          "bytes": 5102734,
+          "sha256": "0ab89c9ef9f4f446699b4ed67d574524565c49e8d81f5f3727ecc956ae74677e"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/torch-back-9.png",
+          "bytes": 697718,
+          "sha256": "75cf5a870d034e79b6b0b994977f90c9a4dddfd9ae091a78333e773d06dba069"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/torch-back-12.png",
+          "bytes": 696892,
+          "sha256": "75b40552bfb0d2180f13f2eb1ffb0d55a7d20ed6b96adb9dd5213707e46837cf"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/torch-back-18.png",
+          "bytes": 694552,
+          "sha256": "ba13e1ad27aa6e86f8393b3bd363ab8eb76c54c9e22aafdd9f7e4c002037e075"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/torch-left-before.png",
+          "bytes": 701422,
+          "sha256": "3baade9cafde263101d5930047f418422212004bf2b1b837af3617619cf1159b"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/torch-left-before.obj",
+          "bytes": 5104901,
+          "sha256": "3268f793dbfe74cd2622c8958bf82b5e13b66861d7ef8e10e0b7b5f9d4888e8f"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/torch-left-1.png",
+          "bytes": 699693,
+          "sha256": "0a9d1ed8677702571008c91823ccb1a18d473c532712c0b050e1c86cb10d8c73"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/torch-left-3.png",
+          "bytes": 698847,
+          "sha256": "c3fd743ee5f91908d535b44da9a3e8339902ea268453777b8a7a0f7cceaee35a"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/torch-left-6.png",
+          "bytes": 699441,
+          "sha256": "50607850ca52eb114768c6c98cc4b545c19f4fe29c0b508d7eef4eda970a5095"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/torch-left-6.obj",
+          "bytes": 5102734,
+          "sha256": "ddbb95002fae83a64cea3f0def35588c59733c855da01874628ac35c80b364c3"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/torch-left-9.png",
+          "bytes": 702642,
+          "sha256": "e5cb72faf327a999d0e53427e4fcfa4ca6c5f5c52646466d114f059444ae064e"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/torch-left-12.png",
+          "bytes": 702671,
+          "sha256": "6a7972c4620c1c18e5d3e9a3bf570b7a7e6418e0d99f0d40a693e30db3c6e001"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/torch-left-18.png",
+          "bytes": 701650,
+          "sha256": "2779dbfc8d9fec0dad89d649a4b87be0695ef9289584defb8d91957c8279f6df"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/torch-right-before.png",
+          "bytes": 701422,
+          "sha256": "3baade9cafde263101d5930047f418422212004bf2b1b837af3617619cf1159b"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/torch-right-before.obj",
+          "bytes": 5104901,
+          "sha256": "3268f793dbfe74cd2622c8958bf82b5e13b66861d7ef8e10e0b7b5f9d4888e8f"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/torch-right-1.png",
+          "bytes": 699406,
+          "sha256": "65a9e76adeaaaf0f8ccb41de8aa991e083b83127cc3e9cc888cb3da0db2f7720"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/torch-right-3.png",
+          "bytes": 700021,
+          "sha256": "d50274e92287806840851be8f975b649508d76cb823af2b544f41e09e5f2bc8d"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/torch-right-6.png",
+          "bytes": 704701,
+          "sha256": "3057d66715a3e7286c1d10ed77dca97a3a3e587f4c51391fe1731d207b6890d2"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/torch-right-6.obj",
+          "bytes": 5102733,
+          "sha256": "874999f8dbbe473d51e25b6f7aeea78a5328db247f8b7cc989ccf7ca7ee5a0ab"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/torch-right-9.png",
+          "bytes": 712142,
+          "sha256": "5f4aebe56092fbbf104a679f2d1165e428bf876e5aee98037f51ecc4e6511c2d"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/torch-right-12.png",
+          "bytes": 721498,
+          "sha256": "9ade13b73740c72963c1c11d0fe505572359c6d080f32125375b50651ec21e24"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/torch-right-18.png",
+          "bytes": 719799,
+          "sha256": "16a81d847698e4315dac03dac4fcc0865948080fe1e2510810c0783264a5e6fc"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/torch-right-pause-before.png",
+          "bytes": 708074,
+          "sha256": "f9eac28dd2ac2f9409e38a06533a5f0efcd3390e1ab5ac46aa58a3f82f7bfe6c"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/torch-right-paused.png",
+          "bytes": 707909,
+          "sha256": "e58dcf15ff5849ffc0410070eb7734a63a2522449ef5d63d84f5a1658aa0a2fc"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/torch-right-resumed.png",
+          "bytes": 707261,
+          "sha256": "4461ec0f25e8eab7d88909160c329b44b250adfb959fddeef41e5ee091a4a562"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/torch-right-reset.png",
+          "bytes": 701422,
+          "sha256": "3baade9cafde263101d5930047f418422212004bf2b1b837af3617619cf1159b"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/lantern-forward-before.png",
+          "bytes": 772114,
+          "sha256": "444ecf625de8578daa45ff4c9086e7f012028e90ab788ccc7215ba03cc513e0b"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/lantern-forward-before.obj",
+          "bytes": 5104797,
+          "sha256": "9ebf2c09b8a60255dd7e42cd0cfb2fc63a7417c4ff28a58e4e0ff73faa51eb3d"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/lantern-forward-1.png",
+          "bytes": 778711,
+          "sha256": "66ffc3d63becbe8375616f190810a11f2b98ad70137cc1f4af17b9c43ed11adc"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/lantern-forward-3.png",
+          "bytes": 787197,
+          "sha256": "e71ff2d95e0f820cbec4e41339702d25c3d7544a67609280e836cb3e31321488"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/lantern-forward-6.png",
+          "bytes": 796319,
+          "sha256": "557d967f56a6285cd47134cad1023f6f134c0ef48f85cb13cecddace7a427ee8"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/lantern-forward-6.obj",
+          "bytes": 5103628,
+          "sha256": "2970a5de86dca68c37bf3fd008067b3b672c93fd32ba0c364c30d8eadb81bfe6"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/lantern-forward-9.png",
+          "bytes": 806683,
+          "sha256": "3e351ff128d3035f301d1bca7f99a4d8dd0dc090ea954626d3ff2b02769fbb38"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/lantern-forward-12.png",
+          "bytes": 818772,
+          "sha256": "ff4efd5f93e992fe524032ea9ffdaa05aabb5ee705d76a2a503e8405f3a6cd74"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/lantern-forward-18.png",
+          "bytes": 814652,
+          "sha256": "68effcca3f09d3245614fa83245f7699a367064814bb4d354e079f2b7c6276f0"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/lantern-back-before.png",
+          "bytes": 772114,
+          "sha256": "444ecf625de8578daa45ff4c9086e7f012028e90ab788ccc7215ba03cc513e0b"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/lantern-back-before.obj",
+          "bytes": 5104797,
+          "sha256": "9ebf2c09b8a60255dd7e42cd0cfb2fc63a7417c4ff28a58e4e0ff73faa51eb3d"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/lantern-back-1.png",
+          "bytes": 774536,
+          "sha256": "54b95ca6802b2230c7bf19138b6b4ce35c31c9647ef0253dd8e75e2379e85800"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/lantern-back-3.png",
+          "bytes": 769732,
+          "sha256": "9bd2d8b34b45826f606b72c44f9046be004e9a938f94dd88c3c9abebae2826cc"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/lantern-back-6.png",
+          "bytes": 771820,
+          "sha256": "ffbc146e073fc282e73d295696682fa85543ff7f17a734f9c0054b4fb71b625c"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/lantern-back-6.obj",
+          "bytes": 5103742,
+          "sha256": "68e0e1ae09a7098e7c6736a78eaca3a778be5f163a78b70d344de374d0cf0fd3"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/lantern-back-9.png",
+          "bytes": 776369,
+          "sha256": "701c538e7dc7750d767518039f8f27b596e249b1ae81a0d6569f90c0e4ccd7a0"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/lantern-back-12.png",
+          "bytes": 775509,
+          "sha256": "8959f22f168a1b684e75e316f8451139b914f08c3f65a6b0ee7d8e8f65d7f75a"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/lantern-back-18.png",
+          "bytes": 770384,
+          "sha256": "45d6035146466400c056fe09dd880c0a3cf5060a5f02e8123cf602df5f0e7df1"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/lantern-left-before.png",
+          "bytes": 772114,
+          "sha256": "444ecf625de8578daa45ff4c9086e7f012028e90ab788ccc7215ba03cc513e0b"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/lantern-left-before.obj",
+          "bytes": 5104797,
+          "sha256": "9ebf2c09b8a60255dd7e42cd0cfb2fc63a7417c4ff28a58e4e0ff73faa51eb3d"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/lantern-left-1.png",
+          "bytes": 775093,
+          "sha256": "b829956afeab7f94a96743c6833baf43aa36c0afb3918604755fc988dc77efb8"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/lantern-left-3.png",
+          "bytes": 780327,
+          "sha256": "bdc5ce4c97dd0b7697e618a870b5af06cac6d87f228644d689f050ba9ae3064a"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/lantern-left-6.png",
+          "bytes": 779465,
+          "sha256": "9f5a10eb275ec12a6e0d8316b1b4f5fc7a9970397bced0864e41834772170edd"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/lantern-left-6.obj",
+          "bytes": 5103836,
+          "sha256": "4ec0f87f948af512a5534d4af4a8e803c613b1953ac29e5484664a0adfdd5f13"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/lantern-left-9.png",
+          "bytes": 781808,
+          "sha256": "3a2d311778e490ea9a40a9551e5b5ba6331b39ca34cef45f547edb4da94e00e0"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/lantern-left-12.png",
+          "bytes": 780378,
+          "sha256": "73352f426881e4b35d73c200bae105421e676d55a7d2c4da3fee4bbdc403f2ba"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/lantern-left-18.png",
+          "bytes": 782232,
+          "sha256": "37fdbbffa0afaedfc397207cd2b38a283757e39cd5b9df367b6bc1c1ce6e3ac3"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/lantern-right-before.png",
+          "bytes": 772114,
+          "sha256": "444ecf625de8578daa45ff4c9086e7f012028e90ab788ccc7215ba03cc513e0b"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/lantern-right-before.obj",
+          "bytes": 5104797,
+          "sha256": "9ebf2c09b8a60255dd7e42cd0cfb2fc63a7417c4ff28a58e4e0ff73faa51eb3d"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/lantern-right-1.png",
+          "bytes": 776787,
+          "sha256": "4fb6fdc4f74af3741551016d4bafa100fd8843be011284809068991d793e595b"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/lantern-right-3.png",
+          "bytes": 778317,
+          "sha256": "26695241e53cf09d3d2f584c59c0a06105ef9c347425cda3380220ff53229905"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/lantern-right-6.png",
+          "bytes": 783871,
+          "sha256": "f875e198a8718c41665d91ddaaedbc78a46a4d1b561b086276a7deb8d0ce7ebe"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/lantern-right-6.obj",
+          "bytes": 5103851,
+          "sha256": "9daf651e544966705be806bd8d6df5cf5b917869b40f6053ca3ac3f2c9009822"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/lantern-right-9.png",
+          "bytes": 791110,
+          "sha256": "d6b199a122b4553bbb06621753a83049f9726d58bd61508108a6f63defa0aa85"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/lantern-right-12.png",
+          "bytes": 804798,
+          "sha256": "e5615d7c05e7a11f16a6a71723a2fc2d2585214580f84722e98e9c707d700536"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/lantern-right-18.png",
+          "bytes": 807378,
+          "sha256": "a838bb51d80e0fc9d7c75e119893de07c3d195cefbd4bffba558739863061ca7"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/lantern-right-pause-before.png",
+          "bytes": 803217,
+          "sha256": "44b0dee0fcd37bbe45418c06347ee4b21feffaa1623712d1af7e88b1d412101f"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/lantern-right-paused.png",
+          "bytes": 804173,
+          "sha256": "325232a9553793952db6787d19459b86d1d87b256d73eeb12dd49605d0ca0e1b"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/lantern-right-resumed.png",
+          "bytes": 805983,
+          "sha256": "8e23530418a10c99a1cf102dbc6a02d2c5cc9c0cf29f2a2dae989404806fa011"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-off/lantern-right-reset.png",
+          "bytes": 701422,
+          "sha256": "3baade9cafde263101d5930047f418422212004bf2b1b837af3617619cf1159b"
+        }
+      ],
+      "process": {
+        "pid": 46028,
+        "exitCode": 0,
+        "pending": false,
+        "seconds": 43.078000000008615,
+        "executable": {
+          "exists": true,
+          "bytes": 13920768,
+          "sha256": "c3c55dcae7c6381dd6dfd7d291f1b58182394d83850f1232c894c14a7b0241d9"
+        },
+        "settingsBefore": {
+          "exists": true,
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "settingsAfter": {
+          "exists": true,
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "foregroundBefore": null,
+        "foregroundAfter": null,
+        "settingsUnchanged": true,
+        "foregroundSamplesUnchanged": true
+      },
+      "foregroundSampleCount": 172,
+      "foregroundUniqueSamples": [
+        "None"
+      ]
+    },
+    "compute-on": {
+      "manifest": {
+        "path": "reports/player-dodge-20261020-r1/compute-on/player-dodge-survey.json",
+        "bytes": 247574,
+        "sha256": "7a41d7a4fc8d565ad68ee8a03d77a96b4b18bb94043121b73237574c98f6608a"
+      },
+      "metadata": {
+        "schema": 1,
+        "profile": "player-dodge",
+        "complete": true,
+        "evidenceClass": "seeded noncombat immutable shared-simulation pose snapshots; first-person RT and exact CPU-upload mesh, not live input, earned progression, contact or sustained performance",
+        "hidden": true,
+        "dodgePoseRequested": true,
+        "executableSha256": "c3c55dcae7c6381dd6dfd7d291f1b58182394d83850f1232c894c14a7b0241d9",
+        "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "driverVersion": 2559295488,
+        "backend": "RayQueryCompute",
+        "renderScale": 1,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "snapshotFrameBudget": 64,
+        "deadlineSeconds": 90,
+        "applicationSnapshotObjectBytesUnchanged": true,
+        "error": null
+      },
+      "frameCount": 64,
+      "allMatchingCompletedRtFrames": true,
+      "resourcesStable": true,
+      "resources": {
+        "bufferCount": 50,
+        "memoryAllocationCount": 61,
+        "bottomLevelAccelerationStructureCount": 20,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 0,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 49601408,
+        "deviceLocalBytes": 405991648
+      },
+      "activePoseTimings": {
+        "wholeRtGpuMs": {
+          "count": 34,
+          "median": 7.942736,
+          "p95NearestRank": 14.879712,
+          "maximum": 25.084288
+        },
+        "playerSkinCpuMs": {
+          "count": 34,
+          "median": 20.76895,
+          "p95NearestRank": 25.5347,
+          "maximum": 29.6656
+        },
+        "blasRefitRecordCpuMs": {
+          "count": 34,
+          "median": 0.0596,
+          "p95NearestRank": 0.1208,
+          "maximum": 0.3296
+        },
+        "tlasUpdateRecordCpuMs": {
+          "count": 34,
+          "median": 0.0075,
+          "p95NearestRank": 0.0232,
+          "maximum": 0.0267
+        }
+      },
+      "maximumSocketErrorMicrometres": 10,
+      "files": [
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/torch-forward-before.png",
+          "bytes": 701422,
+          "sha256": "3baade9cafde263101d5930047f418422212004bf2b1b837af3617619cf1159b"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/torch-forward-before.obj",
+          "bytes": 5104901,
+          "sha256": "3268f793dbfe74cd2622c8958bf82b5e13b66861d7ef8e10e0b7b5f9d4888e8f"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/torch-forward-1.png",
+          "bytes": 699575,
+          "sha256": "2406a1d8f6a2b67d456e908d264aa5eb0933fb59d6d0f82a430bcefd47ff9cf1"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/torch-forward-3.png",
+          "bytes": 703725,
+          "sha256": "dcea1e28057f33096c36bf3db4fdd01ec4d48b1912f4cf207302d8ad7ba1e666"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/torch-forward-6.png",
+          "bytes": 708518,
+          "sha256": "7974af013dbb8c0daaf2ade55d61731a0526c7ac88d13c5d7c9ff6d949aa0551"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/torch-forward-6.obj",
+          "bytes": 5096500,
+          "sha256": "8d519ab9ac217bd7b38980873da7d2e410d17b5dbd703e9ae6406682ef3fe084"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/torch-forward-9.png",
+          "bytes": 714878,
+          "sha256": "e46cc2e1b1ba2938112f1e2d9a1d8d9507094058148ef24be23b40725da6f098"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/torch-forward-12.png",
+          "bytes": 719691,
+          "sha256": "af483f1ba1c341facbaab06f0a63c3d69f728e38b1fd0465a6048851d22b24ac"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/torch-forward-18.png",
+          "bytes": 718550,
+          "sha256": "5b7d2d50ccc116017761c9b48b83e944d17a6a7f2bd929ed72642f95a37ff02e"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/torch-back-before.png",
+          "bytes": 701422,
+          "sha256": "3baade9cafde263101d5930047f418422212004bf2b1b837af3617619cf1159b"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/torch-back-before.obj",
+          "bytes": 5104901,
+          "sha256": "3268f793dbfe74cd2622c8958bf82b5e13b66861d7ef8e10e0b7b5f9d4888e8f"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/torch-back-1.png",
+          "bytes": 698030,
+          "sha256": "a3192cd338cf52dc560d333c58ce7fbc8a44577c51bd06d26ea2d41773fb3251"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/torch-back-3.png",
+          "bytes": 697235,
+          "sha256": "7c202cd47f0d8c903c17fc61ac2bd865dfb07cce2947f517ad1045a195ea315a"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/torch-back-6.png",
+          "bytes": 698898,
+          "sha256": "31e742c4e080871cd524be30040476f202bea778a118a61300fa8c1867f5f870"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/torch-back-6.obj",
+          "bytes": 5103558,
+          "sha256": "d62dc700ac116ec12817de59e836d1131fc7de8db2c124928fea50cb9f02a18b"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/torch-back-9.png",
+          "bytes": 697681,
+          "sha256": "f9f42be497ac536a60ad9faf47d15c5c5268a26320f1773e69f4c0e1e5b0e8e1"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/torch-back-12.png",
+          "bytes": 696892,
+          "sha256": "75b40552bfb0d2180f13f2eb1ffb0d55a7d20ed6b96adb9dd5213707e46837cf"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/torch-back-18.png",
+          "bytes": 694552,
+          "sha256": "ba13e1ad27aa6e86f8393b3bd363ab8eb76c54c9e22aafdd9f7e4c002037e075"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/torch-left-before.png",
+          "bytes": 701422,
+          "sha256": "3baade9cafde263101d5930047f418422212004bf2b1b837af3617619cf1159b"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/torch-left-before.obj",
+          "bytes": 5104901,
+          "sha256": "3268f793dbfe74cd2622c8958bf82b5e13b66861d7ef8e10e0b7b5f9d4888e8f"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/torch-left-1.png",
+          "bytes": 699490,
+          "sha256": "5b97adf262f9b7a894a0dadad3df3365042e235d9c6e421602c309f507d8006e"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/torch-left-3.png",
+          "bytes": 698582,
+          "sha256": "dfcfb9beba3d632c7b8e7622cdb31fc5ce75a4e887960f2acd535c3fdb99e33b"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/torch-left-6.png",
+          "bytes": 699576,
+          "sha256": "952745224b7612c79ea4e1cf6e1057379989e8cbbcd37c0b39d4e9b0020b753b"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/torch-left-6.obj",
+          "bytes": 5099552,
+          "sha256": "2fa1fabd1f4828320ca129e4d847961daa2b20878782313ef3faa3b1b50b78c1"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/torch-left-9.png",
+          "bytes": 702511,
+          "sha256": "4de56af9a71b78c88bde05011dfd336cf7262e20a9a9dc4ad5d2feb54f943dd3"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/torch-left-12.png",
+          "bytes": 702671,
+          "sha256": "6a7972c4620c1c18e5d3e9a3bf570b7a7e6418e0d99f0d40a693e30db3c6e001"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/torch-left-18.png",
+          "bytes": 701650,
+          "sha256": "2779dbfc8d9fec0dad89d649a4b87be0695ef9289584defb8d91957c8279f6df"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/torch-right-before.png",
+          "bytes": 701422,
+          "sha256": "3baade9cafde263101d5930047f418422212004bf2b1b837af3617619cf1159b"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/torch-right-before.obj",
+          "bytes": 5104901,
+          "sha256": "3268f793dbfe74cd2622c8958bf82b5e13b66861d7ef8e10e0b7b5f9d4888e8f"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/torch-right-1.png",
+          "bytes": 699106,
+          "sha256": "de34d55d1c18cc6ae793949105e375a6d6a3a837f42496c08802c61bd02458a2"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/torch-right-3.png",
+          "bytes": 700087,
+          "sha256": "997b81758071fa374c01d95197520c8c2328ad1828b8de65ba7a0772e33cc59a"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/torch-right-6.png",
+          "bytes": 705456,
+          "sha256": "8f2bf927412054675973e6e453c13a0b1ea25acd97bff050abafc67e751664c6"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/torch-right-6.obj",
+          "bytes": 5101874,
+          "sha256": "88916f286ae2149317081b8e85610665b2d6fa05fb37d4d53ea962425066e97b"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/torch-right-9.png",
+          "bytes": 712252,
+          "sha256": "bb6584f00c307b468579e973bc8f3bd692478044c05c6606854619f147f1a4c8"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/torch-right-12.png",
+          "bytes": 721498,
+          "sha256": "9ade13b73740c72963c1c11d0fe505572359c6d080f32125375b50651ec21e24"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/torch-right-18.png",
+          "bytes": 719799,
+          "sha256": "16a81d847698e4315dac03dac4fcc0865948080fe1e2510810c0783264a5e6fc"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/torch-right-pause-before.png",
+          "bytes": 706939,
+          "sha256": "7cab1e4aebf0f202e150e111439097f88555cf7e6dcca8a1c2ac032717544083"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/torch-right-paused.png",
+          "bytes": 707909,
+          "sha256": "e58dcf15ff5849ffc0410070eb7734a63a2522449ef5d63d84f5a1658aa0a2fc"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/torch-right-resumed.png",
+          "bytes": 707261,
+          "sha256": "4461ec0f25e8eab7d88909160c329b44b250adfb959fddeef41e5ee091a4a562"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/torch-right-reset.png",
+          "bytes": 701422,
+          "sha256": "3baade9cafde263101d5930047f418422212004bf2b1b837af3617619cf1159b"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/lantern-forward-before.png",
+          "bytes": 772114,
+          "sha256": "444ecf625de8578daa45ff4c9086e7f012028e90ab788ccc7215ba03cc513e0b"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/lantern-forward-before.obj",
+          "bytes": 5104797,
+          "sha256": "9ebf2c09b8a60255dd7e42cd0cfb2fc63a7417c4ff28a58e4e0ff73faa51eb3d"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/lantern-forward-1.png",
+          "bytes": 779092,
+          "sha256": "2885867b62efabb6e426bd49c4fa16a0262981fc42d2c1a85e198c418a59fe80"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/lantern-forward-3.png",
+          "bytes": 789004,
+          "sha256": "0b34c86d0b69d56dfa2a05061770eee1c7245f664a40b7ce5a9eac813b6421af"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/lantern-forward-6.png",
+          "bytes": 799570,
+          "sha256": "36b06d15581da85c1485753b781ba0a8db761cde4bb2465554563492a23a8a99"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/lantern-forward-6.obj",
+          "bytes": 5097459,
+          "sha256": "4f6eb147316cdc66e21486466b340ba5c077f372be6758eeb3fca574e39d9814"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/lantern-forward-9.png",
+          "bytes": 807317,
+          "sha256": "dace51b31242bf23773d2dd512f88c5a24181154200f2afdbbc70ec16289ed8a"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/lantern-forward-12.png",
+          "bytes": 818772,
+          "sha256": "ff4efd5f93e992fe524032ea9ffdaa05aabb5ee705d76a2a503e8405f3a6cd74"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/lantern-forward-18.png",
+          "bytes": 814652,
+          "sha256": "68effcca3f09d3245614fa83245f7699a367064814bb4d354e079f2b7c6276f0"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/lantern-back-before.png",
+          "bytes": 772114,
+          "sha256": "444ecf625de8578daa45ff4c9086e7f012028e90ab788ccc7215ba03cc513e0b"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/lantern-back-before.obj",
+          "bytes": 5104797,
+          "sha256": "9ebf2c09b8a60255dd7e42cd0cfb2fc63a7417c4ff28a58e4e0ff73faa51eb3d"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/lantern-back-1.png",
+          "bytes": 775208,
+          "sha256": "325ab2953e3e42bd698434062086dd694121bfbf50f2a57f7b3ee4b2860d3702"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/lantern-back-3.png",
+          "bytes": 771892,
+          "sha256": "4161531b73d1b8ade77d71e2581abf5e02ffd3866b6f7d96b9b4dd279b8e2bfa"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/lantern-back-6.png",
+          "bytes": 772654,
+          "sha256": "08cfce809949e92979edf21c7d13e77494c1a89585da9507aa2e945d1b00a954"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/lantern-back-6.obj",
+          "bytes": 5104626,
+          "sha256": "de8e4ebe070c6e96515e5e603dd65e993403706603d6915dc9ef964d108899b4"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/lantern-back-9.png",
+          "bytes": 776129,
+          "sha256": "fd22bafbfbb6f31f06716b42e24464767ecb2129848841fe9a2c28d73b9858c2"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/lantern-back-12.png",
+          "bytes": 775509,
+          "sha256": "8959f22f168a1b684e75e316f8451139b914f08c3f65a6b0ee7d8e8f65d7f75a"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/lantern-back-18.png",
+          "bytes": 770384,
+          "sha256": "45d6035146466400c056fe09dd880c0a3cf5060a5f02e8123cf602df5f0e7df1"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/lantern-left-before.png",
+          "bytes": 772114,
+          "sha256": "444ecf625de8578daa45ff4c9086e7f012028e90ab788ccc7215ba03cc513e0b"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/lantern-left-before.obj",
+          "bytes": 5104797,
+          "sha256": "9ebf2c09b8a60255dd7e42cd0cfb2fc63a7417c4ff28a58e4e0ff73faa51eb3d"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/lantern-left-1.png",
+          "bytes": 775436,
+          "sha256": "acaa576b303b48c2f41fa2f77d923962af2147df820967a1ff7b60b965a69560"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/lantern-left-3.png",
+          "bytes": 782672,
+          "sha256": "05a6eccf2e8495ce99403869b6de005effa81e53e8676258847e09b0befe7a0b"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/lantern-left-6.png",
+          "bytes": 780365,
+          "sha256": "27eb24f9ff3076802c4fbcab442c7a9c4cea3eba106d7d7dbf4fc7e209cf80fd"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/lantern-left-6.obj",
+          "bytes": 5100736,
+          "sha256": "5cbb994b1a8249ec4261702e6a0b5fdb738138d5d76c564794076d785e128148"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/lantern-left-9.png",
+          "bytes": 781385,
+          "sha256": "114aea3924d8018d391ce33968bbd5f3be6404c5bbac879ac73e798c36b193c1"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/lantern-left-12.png",
+          "bytes": 780378,
+          "sha256": "73352f426881e4b35d73c200bae105421e676d55a7d2c4da3fee4bbdc403f2ba"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/lantern-left-18.png",
+          "bytes": 782232,
+          "sha256": "37fdbbffa0afaedfc397207cd2b38a283757e39cd5b9df367b6bc1c1ce6e3ac3"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/lantern-right-before.png",
+          "bytes": 772114,
+          "sha256": "444ecf625de8578daa45ff4c9086e7f012028e90ab788ccc7215ba03cc513e0b"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/lantern-right-before.obj",
+          "bytes": 5104797,
+          "sha256": "9ebf2c09b8a60255dd7e42cd0cfb2fc63a7417c4ff28a58e4e0ff73faa51eb3d"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/lantern-right-1.png",
+          "bytes": 777677,
+          "sha256": "774b64bf0a92db9f28ed4c3aae8764e06e3b2ba029437f080529920f33835410"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/lantern-right-3.png",
+          "bytes": 780605,
+          "sha256": "1d80ba1399ac59f885f000b2927b00753eb4572516e686c4af9bd7b572a5e612"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/lantern-right-6.png",
+          "bytes": 785587,
+          "sha256": "3e4cd3c335aa68783355c765ed2202cb4fdb6d16110265fe766a5e3f58554126"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/lantern-right-6.obj",
+          "bytes": 5102843,
+          "sha256": "785393f9edd2ad5aba403f736f5741b8f7db354a53a833cda4d3d285a632544f"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/lantern-right-9.png",
+          "bytes": 792997,
+          "sha256": "50987653cd373498d8af31a7356c96b90d40c9e47f0eb426dc693839161b73cf"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/lantern-right-12.png",
+          "bytes": 804798,
+          "sha256": "e5615d7c05e7a11f16a6a71723a2fc2d2585214580f84722e98e9c707d700536"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/lantern-right-18.png",
+          "bytes": 807378,
+          "sha256": "a838bb51d80e0fc9d7c75e119893de07c3d195cefbd4bffba558739863061ca7"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/lantern-right-pause-before.png",
+          "bytes": 804971,
+          "sha256": "71919fe02fc95780318000ea2c90167ff076e131e420dae52b495a3d7770568c"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/lantern-right-paused.png",
+          "bytes": 804173,
+          "sha256": "325232a9553793952db6787d19459b86d1d87b256d73eeb12dd49605d0ca0e1b"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/lantern-right-resumed.png",
+          "bytes": 805983,
+          "sha256": "8e23530418a10c99a1cf102dbc6a02d2c5cc9c0cf29f2a2dae989404806fa011"
+        },
+        {
+          "path": "reports/player-dodge-20261020-r1/compute-on/lantern-right-reset.png",
+          "bytes": 701422,
+          "sha256": "3baade9cafde263101d5930047f418422212004bf2b1b837af3617619cf1159b"
+        }
+      ],
+      "process": {
+        "pid": 36452,
+        "exitCode": 0,
+        "pending": false,
+        "seconds": 42.82799999999406,
+        "executable": {
+          "exists": true,
+          "bytes": 13920768,
+          "sha256": "c3c55dcae7c6381dd6dfd7d291f1b58182394d83850f1232c894c14a7b0241d9"
+        },
+        "settingsBefore": {
+          "exists": true,
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "settingsAfter": {
+          "exists": true,
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "foregroundBefore": null,
+        "foregroundAfter": null,
+        "settingsUnchanged": true,
+        "foregroundSamplesUnchanged": true
+      },
+      "foregroundSampleCount": 171,
+      "foregroundUniqueSamples": [
+        "None"
+      ]
+    }
+  },
+  "pairs": {
+    "pipeline": {
+      "matchedSimulationCameraSettingsAndShaders": true,
+      "resourceDeltas": {
+        "bufferCount": 0,
+        "memoryAllocationCount": 0,
+        "bottomLevelAccelerationStructureCount": 0,
+        "topLevelAccelerationStructureCount": 0,
+        "tlasInstanceCount": 0,
+        "pipelineCount": 0,
+        "shaderBindingTableCount": 0,
+        "descriptorSetCount": 0,
+        "hostVisibleBytes": 0,
+        "deviceLocalBytes": 0
+      },
+      "activePoseMedianDeltas": {
+        "wholeRtGpuMs": -0.04736000000000118,
+        "playerSkinCpuMs": 0.33370000000000033,
+        "blasRefitRecordCpuMs": -0.0028499999999999984,
+        "tlasUpdateRecordCpuMs": -0.0003499999999999996
+      }
+    },
+    "compute": {
+      "matchedSimulationCameraSettingsAndShaders": true,
+      "resourceDeltas": {
+        "bufferCount": 0,
+        "memoryAllocationCount": 0,
+        "bottomLevelAccelerationStructureCount": 0,
+        "topLevelAccelerationStructureCount": 0,
+        "tlasInstanceCount": 0,
+        "pipelineCount": 0,
+        "shaderBindingTableCount": 0,
+        "descriptorSetCount": 0,
+        "hostVisibleBytes": 0,
+        "deviceLocalBytes": 0
+      },
+      "activePoseMedianDeltas": {
+        "wholeRtGpuMs": -0.015551999999999566,
+        "playerSkinCpuMs": -0.06015000000000015,
+        "blasRefitRecordCpuMs": 0.000899999999999998,
+        "tlasUpdateRecordCpuMs": 0.0005500000000000001
+      }
+    }
+  },
+  "geometryMidpointComparisons": {
+    "forward": {
+      "vertices": 34304,
+      "triangles": 27815,
+      "maximumVertexDisplacementMetres": 0.16959799832020014,
+      "offBounds": [
+        [
+          -0.28972289,
+          -0.0134182675,
+          -0.294035822
+        ],
+        [
+          0.309279382,
+          1.77982605,
+          0.578065574
+        ]
+      ],
+      "onBounds": [
+        [
+          -0.292391688,
+          -0.0134182675,
+          -0.277152568
+        ],
+        [
+          0.309977502,
+          1.699826,
+          0.578065634
+        ]
+      ]
+    },
+    "back": {
+      "vertices": 34304,
+      "triangles": 27815,
+      "maximumVertexDisplacementMetres": 0.12542973256878717,
+      "offBounds": [
+        [
+          -0.28972289,
+          -0.0134182675,
+          -0.294035822
+        ],
+        [
+          0.309279382,
+          1.77982605,
+          0.578065574
+        ]
+      ],
+      "onBounds": [
+        [
+          -0.293153524,
+          -0.0134182675,
+          -0.357137233
+        ],
+        [
+          0.311765999,
+          1.699826,
+          0.578065634
+        ]
+      ]
+    },
+    "left": {
+      "vertices": 34304,
+      "triangles": 27815,
+      "maximumVertexDisplacementMetres": 0.16208888886424125,
+      "offBounds": [
+        [
+          -0.28972289,
+          -0.0134182675,
+          -0.294035822
+        ],
+        [
+          0.309279382,
+          1.77982605,
+          0.578065574
+        ]
+      ],
+      "onBounds": [
+        [
+          -0.273623675,
+          -0.0134182675,
+          -0.297678173
+        ],
+        [
+          0.366181314,
+          1.699826,
+          0.578065634
+        ]
+      ]
+    },
+    "right": {
+      "vertices": 34304,
+      "triangles": 27815,
+      "maximumVertexDisplacementMetres": 0.19077808388268375,
+      "offBounds": [
+        [
+          -0.28972289,
+          -0.0134182675,
+          -0.294035822
+        ],
+        [
+          0.309279382,
+          1.77982605,
+          0.578065574
+        ]
+      ],
+      "onBounds": [
+        [
+          -0.35360831,
+          -0.0134182675,
+          -0.29924649
+        ],
+        [
+          0.286196679,
+          1.699826,
+          0.578065634
+        ]
+      ]
+    }
+  },
+  "geometryPlot": {
+    "path": "reports/player-dodge-20261020-r1/dodge-geometry-overlay.png",
+    "bytes": 110429,
+    "sha256": "72676a93b3471f6ad8ffc59b6fdc056488dace5f91ae9fb71e33a889ff085093"
+  },
+  "sharedTimeline": [
+    {
+      "name": "torch-forward-before",
+      "simulationTick": 0,
+      "position": [
+        -5.5,
+        -0.949999988,
+        -13.5
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 1,
+      "dodgeActive": false,
+      "dodgeElapsedSeconds": 0,
+      "publishedPose": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "torch-forward-1",
+      "simulationTick": 1,
+      "position": [
+        -5.47079372,
+        -0.949999988,
+        -13.5690794
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 1,
+      "dodgeActive": true,
+      "dodgeElapsedSeconds": 0.0166666657,
+      "publishedPose": [
+        0.093364194,
+        -0.00027567675,
+        0.99999994
+      ]
+    },
+    {
+      "name": "torch-forward-3",
+      "simulationTick": 3,
+      "position": [
+        -5.41238117,
+        -0.949999988,
+        -13.7072382
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 1,
+      "dodgeActive": true,
+      "dodgeElapsedSeconds": 0.049999997,
+      "publishedPose": [
+        0.562499881,
+        -0.00470520882,
+        0.999988914
+      ]
+    },
+    {
+      "name": "torch-forward-6",
+      "simulationTick": 6,
+      "position": [
+        -5.32476234,
+        -0.949999988,
+        -13.9144764
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 1,
+      "dodgeActive": true,
+      "dodgeElapsedSeconds": 0.099999994,
+      "publishedPose": [
+        0.999999881,
+        -0.0196038242,
+        0.999807835
+      ]
+    },
+    {
+      "name": "torch-forward-9",
+      "simulationTick": 9,
+      "position": [
+        -5.23714352,
+        -0.949999988,
+        -14.1217146
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 1,
+      "dodgeActive": true,
+      "dodgeElapsedSeconds": 0.149999991,
+      "publishedPose": [
+        0.562500179,
+        -0.0358677879,
+        0.999356568
+      ]
+    },
+    {
+      "name": "torch-forward-12",
+      "simulationTick": 12,
+      "position": [
+        -5.14952469,
+        -0.949999988,
+        -14.3289528
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 1,
+      "dodgeActive": true,
+      "dodgeElapsedSeconds": 0.199999988,
+      "publishedPose": [
+        5.68434121e-14,
+        -0.047570698,
+        0.998867869
+      ]
+    },
+    {
+      "name": "torch-forward-18",
+      "simulationTick": 18,
+      "position": [
+        -5.14952469,
+        -0.949999988,
+        -14.3289528
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 1,
+      "dodgeActive": false,
+      "dodgeElapsedSeconds": 0,
+      "publishedPose": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "torch-back-before",
+      "simulationTick": 0,
+      "position": [
+        -5.5,
+        -0.949999988,
+        -13.5
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 1,
+      "dodgeActive": false,
+      "dodgeElapsedSeconds": 0,
+      "publishedPose": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "torch-back-1",
+      "simulationTick": 1,
+      "position": [
+        -5.52920628,
+        -0.949999988,
+        -13.4309206
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 1,
+      "dodgeActive": true,
+      "dodgeElapsedSeconds": 0.0166666657,
+      "publishedPose": [
+        0.093364194,
+        0.00027567675,
+        -0.99999994
+      ]
+    },
+    {
+      "name": "torch-back-3",
+      "simulationTick": 3,
+      "position": [
+        -5.58761883,
+        -0.949999988,
+        -13.2927618
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 1,
+      "dodgeActive": true,
+      "dodgeElapsedSeconds": 0.049999997,
+      "publishedPose": [
+        0.562499881,
+        0.00470520882,
+        -0.999988914
+      ]
+    },
+    {
+      "name": "torch-back-6",
+      "simulationTick": 6,
+      "position": [
+        -5.67523766,
+        -0.949999988,
+        -13.0855236
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 1,
+      "dodgeActive": true,
+      "dodgeElapsedSeconds": 0.099999994,
+      "publishedPose": [
+        0.999999881,
+        0.0196038242,
+        -0.999807835
+      ]
+    },
+    {
+      "name": "torch-back-9",
+      "simulationTick": 9,
+      "position": [
+        -5.76285648,
+        -0.949999988,
+        -12.8782854
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 1,
+      "dodgeActive": true,
+      "dodgeElapsedSeconds": 0.149999991,
+      "publishedPose": [
+        0.562500179,
+        0.0358677879,
+        -0.999356568
+      ]
+    },
+    {
+      "name": "torch-back-12",
+      "simulationTick": 12,
+      "position": [
+        -5.85047531,
+        -0.949999988,
+        -12.6710472
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 1,
+      "dodgeActive": true,
+      "dodgeElapsedSeconds": 0.199999988,
+      "publishedPose": [
+        5.68434121e-14,
+        0.047570698,
+        -0.998867869
+      ]
+    },
+    {
+      "name": "torch-back-18",
+      "simulationTick": 18,
+      "position": [
+        -5.85047531,
+        -0.949999988,
+        -12.6710472
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 1,
+      "dodgeActive": false,
+      "dodgeElapsedSeconds": 0,
+      "publishedPose": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "torch-left-before",
+      "simulationTick": 0,
+      "position": [
+        -5.5,
+        -0.949999988,
+        -13.5
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 1,
+      "dodgeActive": false,
+      "dodgeElapsedSeconds": 0,
+      "publishedPose": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "torch-left-1",
+      "simulationTick": 1,
+      "position": [
+        -5.5690794,
+        -0.949999988,
+        -13.5292063
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 1,
+      "dodgeActive": true,
+      "dodgeElapsedSeconds": 0.0166666657,
+      "publishedPose": [
+        0.093364194,
+        0.99999994,
+        0.00027567675
+      ]
+    },
+    {
+      "name": "torch-left-3",
+      "simulationTick": 3,
+      "position": [
+        -5.7072382,
+        -0.949999988,
+        -13.5876188
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 1,
+      "dodgeActive": true,
+      "dodgeElapsedSeconds": 0.049999997,
+      "publishedPose": [
+        0.562499881,
+        0.999988914,
+        0.00470520882
+      ]
+    },
+    {
+      "name": "torch-left-6",
+      "simulationTick": 6,
+      "position": [
+        -5.91447639,
+        -0.949999988,
+        -13.6752377
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 1,
+      "dodgeActive": true,
+      "dodgeElapsedSeconds": 0.099999994,
+      "publishedPose": [
+        0.999999881,
+        0.999807835,
+        0.0196038242
+      ]
+    },
+    {
+      "name": "torch-left-9",
+      "simulationTick": 9,
+      "position": [
+        -6.12171459,
+        -0.949999988,
+        -13.7628565
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 1,
+      "dodgeActive": true,
+      "dodgeElapsedSeconds": 0.149999991,
+      "publishedPose": [
+        0.562500179,
+        0.999356568,
+        0.0358677879
+      ]
+    },
+    {
+      "name": "torch-left-12",
+      "simulationTick": 12,
+      "position": [
+        -6.32895279,
+        -0.949999988,
+        -13.8504753
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 1,
+      "dodgeActive": true,
+      "dodgeElapsedSeconds": 0.199999988,
+      "publishedPose": [
+        5.68434121e-14,
+        0.998867869,
+        0.047570698
+      ]
+    },
+    {
+      "name": "torch-left-18",
+      "simulationTick": 18,
+      "position": [
+        -6.32895279,
+        -0.949999988,
+        -13.8504753
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 1,
+      "dodgeActive": false,
+      "dodgeElapsedSeconds": 0,
+      "publishedPose": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "torch-right-before",
+      "simulationTick": 0,
+      "position": [
+        -5.5,
+        -0.949999988,
+        -13.5
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 1,
+      "dodgeActive": false,
+      "dodgeElapsedSeconds": 0,
+      "publishedPose": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "torch-right-1",
+      "simulationTick": 1,
+      "position": [
+        -5.4309206,
+        -0.949999988,
+        -13.4707937
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 1,
+      "dodgeActive": true,
+      "dodgeElapsedSeconds": 0.0166666657,
+      "publishedPose": [
+        0.093364194,
+        -0.99999994,
+        -0.00027567675
+      ]
+    },
+    {
+      "name": "torch-right-3",
+      "simulationTick": 3,
+      "position": [
+        -5.2927618,
+        -0.949999988,
+        -13.4123812
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 1,
+      "dodgeActive": true,
+      "dodgeElapsedSeconds": 0.049999997,
+      "publishedPose": [
+        0.562499881,
+        -0.999988914,
+        -0.00470520882
+      ]
+    },
+    {
+      "name": "torch-right-6",
+      "simulationTick": 6,
+      "position": [
+        -5.08552361,
+        -0.949999988,
+        -13.3247623
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 1,
+      "dodgeActive": true,
+      "dodgeElapsedSeconds": 0.099999994,
+      "publishedPose": [
+        0.999999881,
+        -0.999807835,
+        -0.0196038242
+      ]
+    },
+    {
+      "name": "torch-right-9",
+      "simulationTick": 9,
+      "position": [
+        -4.87828541,
+        -0.949999988,
+        -13.2371435
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 1,
+      "dodgeActive": true,
+      "dodgeElapsedSeconds": 0.149999991,
+      "publishedPose": [
+        0.562500179,
+        -0.999356568,
+        -0.0358677879
+      ]
+    },
+    {
+      "name": "torch-right-12",
+      "simulationTick": 12,
+      "position": [
+        -4.67104721,
+        -0.949999988,
+        -13.1495247
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 1,
+      "dodgeActive": true,
+      "dodgeElapsedSeconds": 0.199999988,
+      "publishedPose": [
+        5.68434121e-14,
+        -0.998867869,
+        -0.047570698
+      ]
+    },
+    {
+      "name": "torch-right-18",
+      "simulationTick": 18,
+      "position": [
+        -4.67104721,
+        -0.949999988,
+        -13.1495247
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 1,
+      "dodgeActive": false,
+      "dodgeElapsedSeconds": 0,
+      "publishedPose": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "torch-right-pause-before",
+      "simulationTick": 48,
+      "position": [
+        -4.49580956,
+        -0.949999988,
+        -13.5640011
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 1,
+      "dodgeActive": true,
+      "dodgeElapsedSeconds": 0.099999994,
+      "publishedPose": [
+        0.999999881,
+        0.0331463851,
+        0.999450505
+      ]
+    },
+    {
+      "name": "torch-right-paused",
+      "simulationTick": 48,
+      "position": [
+        -4.49580956,
+        -0.949999988,
+        -13.5640011
+      ],
+      "yaw": 0.400000006,
+      "paused": true,
+      "heldLightKind": 1,
+      "dodgeActive": false,
+      "dodgeElapsedSeconds": 0,
+      "publishedPose": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "torch-right-resumed",
+      "simulationTick": 49,
+      "position": [
+        -4.49580956,
+        -0.949999988,
+        -13.5640011
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 1,
+      "dodgeActive": false,
+      "dodgeElapsedSeconds": 0,
+      "publishedPose": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "torch-right-reset",
+      "simulationTick": 49,
+      "position": [
+        -5.5,
+        -0.949999988,
+        -13.5
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 1,
+      "dodgeActive": false,
+      "dodgeElapsedSeconds": 0,
+      "publishedPose": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "lantern-forward-before",
+      "simulationTick": 0,
+      "position": [
+        -5.5,
+        -0.949999988,
+        -13.5
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 2,
+      "dodgeActive": false,
+      "dodgeElapsedSeconds": 0,
+      "publishedPose": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "lantern-forward-1",
+      "simulationTick": 1,
+      "position": [
+        -5.47079372,
+        -0.949999988,
+        -13.5690794
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 2,
+      "dodgeActive": true,
+      "dodgeElapsedSeconds": 0.0166666657,
+      "publishedPose": [
+        0.093364194,
+        -0.00027567675,
+        0.99999994
+      ]
+    },
+    {
+      "name": "lantern-forward-3",
+      "simulationTick": 3,
+      "position": [
+        -5.41238117,
+        -0.949999988,
+        -13.7072382
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 2,
+      "dodgeActive": true,
+      "dodgeElapsedSeconds": 0.049999997,
+      "publishedPose": [
+        0.562499881,
+        -0.00470520882,
+        0.999988914
+      ]
+    },
+    {
+      "name": "lantern-forward-6",
+      "simulationTick": 6,
+      "position": [
+        -5.32476234,
+        -0.949999988,
+        -13.9144764
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 2,
+      "dodgeActive": true,
+      "dodgeElapsedSeconds": 0.099999994,
+      "publishedPose": [
+        0.999999881,
+        -0.0196038242,
+        0.999807835
+      ]
+    },
+    {
+      "name": "lantern-forward-9",
+      "simulationTick": 9,
+      "position": [
+        -5.23714352,
+        -0.949999988,
+        -14.1217146
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 2,
+      "dodgeActive": true,
+      "dodgeElapsedSeconds": 0.149999991,
+      "publishedPose": [
+        0.562500179,
+        -0.0358677879,
+        0.999356568
+      ]
+    },
+    {
+      "name": "lantern-forward-12",
+      "simulationTick": 12,
+      "position": [
+        -5.14952469,
+        -0.949999988,
+        -14.3289528
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 2,
+      "dodgeActive": true,
+      "dodgeElapsedSeconds": 0.199999988,
+      "publishedPose": [
+        5.68434121e-14,
+        -0.047570698,
+        0.998867869
+      ]
+    },
+    {
+      "name": "lantern-forward-18",
+      "simulationTick": 18,
+      "position": [
+        -5.14952469,
+        -0.949999988,
+        -14.3289528
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 2,
+      "dodgeActive": false,
+      "dodgeElapsedSeconds": 0,
+      "publishedPose": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "lantern-back-before",
+      "simulationTick": 0,
+      "position": [
+        -5.5,
+        -0.949999988,
+        -13.5
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 2,
+      "dodgeActive": false,
+      "dodgeElapsedSeconds": 0,
+      "publishedPose": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "lantern-back-1",
+      "simulationTick": 1,
+      "position": [
+        -5.52920628,
+        -0.949999988,
+        -13.4309206
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 2,
+      "dodgeActive": true,
+      "dodgeElapsedSeconds": 0.0166666657,
+      "publishedPose": [
+        0.093364194,
+        0.00027567675,
+        -0.99999994
+      ]
+    },
+    {
+      "name": "lantern-back-3",
+      "simulationTick": 3,
+      "position": [
+        -5.58761883,
+        -0.949999988,
+        -13.2927618
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 2,
+      "dodgeActive": true,
+      "dodgeElapsedSeconds": 0.049999997,
+      "publishedPose": [
+        0.562499881,
+        0.00470520882,
+        -0.999988914
+      ]
+    },
+    {
+      "name": "lantern-back-6",
+      "simulationTick": 6,
+      "position": [
+        -5.67523766,
+        -0.949999988,
+        -13.0855236
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 2,
+      "dodgeActive": true,
+      "dodgeElapsedSeconds": 0.099999994,
+      "publishedPose": [
+        0.999999881,
+        0.0196038242,
+        -0.999807835
+      ]
+    },
+    {
+      "name": "lantern-back-9",
+      "simulationTick": 9,
+      "position": [
+        -5.76285648,
+        -0.949999988,
+        -12.8782854
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 2,
+      "dodgeActive": true,
+      "dodgeElapsedSeconds": 0.149999991,
+      "publishedPose": [
+        0.562500179,
+        0.0358677879,
+        -0.999356568
+      ]
+    },
+    {
+      "name": "lantern-back-12",
+      "simulationTick": 12,
+      "position": [
+        -5.85047531,
+        -0.949999988,
+        -12.6710472
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 2,
+      "dodgeActive": true,
+      "dodgeElapsedSeconds": 0.199999988,
+      "publishedPose": [
+        5.68434121e-14,
+        0.047570698,
+        -0.998867869
+      ]
+    },
+    {
+      "name": "lantern-back-18",
+      "simulationTick": 18,
+      "position": [
+        -5.85047531,
+        -0.949999988,
+        -12.6710472
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 2,
+      "dodgeActive": false,
+      "dodgeElapsedSeconds": 0,
+      "publishedPose": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "lantern-left-before",
+      "simulationTick": 0,
+      "position": [
+        -5.5,
+        -0.949999988,
+        -13.5
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 2,
+      "dodgeActive": false,
+      "dodgeElapsedSeconds": 0,
+      "publishedPose": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "lantern-left-1",
+      "simulationTick": 1,
+      "position": [
+        -5.5690794,
+        -0.949999988,
+        -13.5292063
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 2,
+      "dodgeActive": true,
+      "dodgeElapsedSeconds": 0.0166666657,
+      "publishedPose": [
+        0.093364194,
+        0.99999994,
+        0.00027567675
+      ]
+    },
+    {
+      "name": "lantern-left-3",
+      "simulationTick": 3,
+      "position": [
+        -5.7072382,
+        -0.949999988,
+        -13.5876188
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 2,
+      "dodgeActive": true,
+      "dodgeElapsedSeconds": 0.049999997,
+      "publishedPose": [
+        0.562499881,
+        0.999988914,
+        0.00470520882
+      ]
+    },
+    {
+      "name": "lantern-left-6",
+      "simulationTick": 6,
+      "position": [
+        -5.91447639,
+        -0.949999988,
+        -13.6752377
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 2,
+      "dodgeActive": true,
+      "dodgeElapsedSeconds": 0.099999994,
+      "publishedPose": [
+        0.999999881,
+        0.999807835,
+        0.0196038242
+      ]
+    },
+    {
+      "name": "lantern-left-9",
+      "simulationTick": 9,
+      "position": [
+        -6.12171459,
+        -0.949999988,
+        -13.7628565
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 2,
+      "dodgeActive": true,
+      "dodgeElapsedSeconds": 0.149999991,
+      "publishedPose": [
+        0.562500179,
+        0.999356568,
+        0.0358677879
+      ]
+    },
+    {
+      "name": "lantern-left-12",
+      "simulationTick": 12,
+      "position": [
+        -6.32895279,
+        -0.949999988,
+        -13.8504753
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 2,
+      "dodgeActive": true,
+      "dodgeElapsedSeconds": 0.199999988,
+      "publishedPose": [
+        5.68434121e-14,
+        0.998867869,
+        0.047570698
+      ]
+    },
+    {
+      "name": "lantern-left-18",
+      "simulationTick": 18,
+      "position": [
+        -6.32895279,
+        -0.949999988,
+        -13.8504753
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 2,
+      "dodgeActive": false,
+      "dodgeElapsedSeconds": 0,
+      "publishedPose": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "lantern-right-before",
+      "simulationTick": 0,
+      "position": [
+        -5.5,
+        -0.949999988,
+        -13.5
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 2,
+      "dodgeActive": false,
+      "dodgeElapsedSeconds": 0,
+      "publishedPose": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "lantern-right-1",
+      "simulationTick": 1,
+      "position": [
+        -5.4309206,
+        -0.949999988,
+        -13.4707937
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 2,
+      "dodgeActive": true,
+      "dodgeElapsedSeconds": 0.0166666657,
+      "publishedPose": [
+        0.093364194,
+        -0.99999994,
+        -0.00027567675
+      ]
+    },
+    {
+      "name": "lantern-right-3",
+      "simulationTick": 3,
+      "position": [
+        -5.2927618,
+        -0.949999988,
+        -13.4123812
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 2,
+      "dodgeActive": true,
+      "dodgeElapsedSeconds": 0.049999997,
+      "publishedPose": [
+        0.562499881,
+        -0.999988914,
+        -0.00470520882
+      ]
+    },
+    {
+      "name": "lantern-right-6",
+      "simulationTick": 6,
+      "position": [
+        -5.08552361,
+        -0.949999988,
+        -13.3247623
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 2,
+      "dodgeActive": true,
+      "dodgeElapsedSeconds": 0.099999994,
+      "publishedPose": [
+        0.999999881,
+        -0.999807835,
+        -0.0196038242
+      ]
+    },
+    {
+      "name": "lantern-right-9",
+      "simulationTick": 9,
+      "position": [
+        -4.87828541,
+        -0.949999988,
+        -13.2371435
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 2,
+      "dodgeActive": true,
+      "dodgeElapsedSeconds": 0.149999991,
+      "publishedPose": [
+        0.562500179,
+        -0.999356568,
+        -0.0358677879
+      ]
+    },
+    {
+      "name": "lantern-right-12",
+      "simulationTick": 12,
+      "position": [
+        -4.67104721,
+        -0.949999988,
+        -13.1495247
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 2,
+      "dodgeActive": true,
+      "dodgeElapsedSeconds": 0.199999988,
+      "publishedPose": [
+        5.68434121e-14,
+        -0.998867869,
+        -0.047570698
+      ]
+    },
+    {
+      "name": "lantern-right-18",
+      "simulationTick": 18,
+      "position": [
+        -4.67104721,
+        -0.949999988,
+        -13.1495247
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 2,
+      "dodgeActive": false,
+      "dodgeElapsedSeconds": 0,
+      "publishedPose": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "lantern-right-pause-before",
+      "simulationTick": 48,
+      "position": [
+        -4.49580956,
+        -0.949999988,
+        -13.5640011
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 2,
+      "dodgeActive": true,
+      "dodgeElapsedSeconds": 0.099999994,
+      "publishedPose": [
+        0.999999881,
+        0.0331463851,
+        0.999450505
+      ]
+    },
+    {
+      "name": "lantern-right-paused",
+      "simulationTick": 48,
+      "position": [
+        -4.49580956,
+        -0.949999988,
+        -13.5640011
+      ],
+      "yaw": 0.400000006,
+      "paused": true,
+      "heldLightKind": 2,
+      "dodgeActive": false,
+      "dodgeElapsedSeconds": 0,
+      "publishedPose": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "lantern-right-resumed",
+      "simulationTick": 49,
+      "position": [
+        -4.49580956,
+        -0.949999988,
+        -13.5640011
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 2,
+      "dodgeActive": false,
+      "dodgeElapsedSeconds": 0,
+      "publishedPose": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "lantern-right-reset",
+      "simulationTick": 49,
+      "position": [
+        -5.5,
+        -0.949999988,
+        -13.5
+      ],
+      "yaw": 0.400000006,
+      "paused": false,
+      "heldLightKind": 1,
+      "dodgeActive": false,
+      "dodgeElapsedSeconds": 0,
+      "publishedPose": [
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "artifacts": {
+    "windowsDebug": {
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+      "bytes": 13920768,
+      "sha256": "c3c55dcae7c6381dd6dfd7d291f1b58182394d83850f1232c894c14a7b0241d9"
+    },
+    "windowsRelease": {
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+      "bytes": 4613120,
+      "sha256": "fc02a0dddffbaafa9a9a3149f39a095effd7881568abf63b776304bcaea19599"
+    },
+    "androidApkBuildOnly": {
+      "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "bytes": 186158741,
+      "sha256": "8fe8abf46e170a1a6dfdf8ae5cf9d8cc269c36b2747cbb8a341ee95d40e275d0"
+    }
+  },
+  "androidPackagedAbis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+  ],
+  "sourceFreezeMatches": true,
+  "canonicalOwnerFilesUnchanged": true,
+  "timingLimits": "One finite Debug pair per hardware backend, at matching 960x540/100%/High quality. Timings use the same 34 active-pose snapshot rows, even for the visual-off control. They exclude fixture construction and include captured presentation/readback scheduling effects. No sustained FPS, release CPU cost, phone/thermal or improvement claim.",
+  "hostTests": {
+    "affectedRegistrationsPassing": 16,
+    "presentationChecks": 750,
+    "rigSamples": 562,
+    "rigChecks": 9230,
+    "lifecycleChecks": 28,
+    "firstFixtureFailure": "Reset correctly restored torch; one fixture-label expectation incorrectly retained imported lantern. Corrected assertion; original failure retained."
+  },
+  "visualInspection": {
+    "originalFrames": [
+      "pipeline-off/torch-forward-6",
+      "pipeline-on/torch-forward-1",
+      "pipeline-on/torch-forward-6",
+      "pipeline-on/torch-forward-18",
+      "pipeline-on/torch-back-6",
+      "pipeline-on/torch-left-6",
+      "pipeline-on/torch-right-6",
+      "pipeline-on/lantern-forward-1",
+      "pipeline-on/lantern-forward-6",
+      "pipeline-on/lantern-forward-18",
+      "pipeline-on/lantern-back-6",
+      "pipeline-on/lantern-left-6",
+      "pipeline-on/lantern-right-6",
+      "pipeline-on/lantern-right-paused",
+      "compute-on/lantern-right-6",
+      "compute-on/torch-left-6"
+    ],
+    "geometryPlotViewed": true,
+    "observation": "Held torch/lantern and sword remain attached in sampled onset/midpoint/recovery and paused frames. Orthographic actual-upload overlays show bounded dip and directional ankle/knee changes. First-person images do not establish full boot visibility, all shadow/reflection composition or owner artistic/feel acceptance."
+  },
+  "sourceBehavior": "Existing world dodge direction, 0.20s timer, 0.90m path, protection, input, camera and serialized saves unchanged. New visual derived only for current modern production rules, after final lifecycle/traversal publication.",
+  "mobileMistDisposition": "Existing mobile startup/Reset Off and prior owner Off direction preserved; no phone read or change. PC Mist On preserved in these native captures.",
+  "debrisLimitations": "Static; kicking and player-facing debris toggle remain unimplemented.",
+  "audioHapticManualRevalidationRequired": false,
+  "audioHapticReason": "Presentation only; gameplay event timing/identity, listener/source data, audio playback and haptic inputs unchanged.",
+  "phoneOperations": false,
+  "publicPushMergeRelease": false,
+  "ReefOperations": false,
+  "interruptedBatch": "Orchestrator call interrupted after source freeze; read-only checks found no started builds/logs. Individually started authorized builds completed. No pending process or approval rejection.",
+  "remaining": [
+    "Physical controller/phone artistic motion and comfort",
+    "Natural earned full-route/return saves and visible death Load",
+    "New hostile same-tick death pose check not exercised; denied contact tests not repeated",
+    "Sustained warm Keeper/exterior cost with mobile Mist Off"
+  ],
+  "nextSlice": "Surface-aware dry footstep dispatch using existing actual support tags and event/audio owners; audit licensed cue availability before material selection, preserve water/cadence/suppression, no spending/new bridge/new audio engine.",
+  "runtimeAssets": {
+    "assets/models/player/runtime/gothic-traveller-lod0.runtime.glb": {
+      "bytes": 2568508,
+      "sha256": "46a88dac9dd569117be5a17a35540fecf3e0e6026d3ad404dd5fdbc85a9ad54f",
+      "gitBlob": "1e3b6b9e70b0cde462be82cb29e189de8e70a1dc",
+      "headBlob": "1e3b6b9e70b0cde462be82cb29e189de8e70a1dc"
+    },
+    "assets/models/player/viewmodel/runtime/gothic-traveller-viewmodel.runtime.glb": {
+      "bytes": 1228828,
+      "sha256": "eaa0db3abb8ff2dae616247054c190031a08c542dd95396cc6dc1e18a7462488",
+      "gitBlob": "c7e1aac731318f850e0de3240fb86f0fe87a31a4",
+      "headBlob": "c7e1aac731318f850e0de3240fb86f0fe87a31a4"
+    }
+  },
+  "independentReview": "Final read-only publication/cache/mount/leg-solver/Debug-isolation review found no actionable defect; no movement/protection/event/codec/save writer changed."
+}

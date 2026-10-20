@@ -11,7 +11,7 @@ namespace horde::platform::windows
 {
 struct WindowsEnvironmentSurveyLaunch
 {
-    bool requested = false, waterDisabled = false, debrisDisabled = false;
+    bool requested = false, waterDisabled = false, debrisDisabled = false, dodgeDisabled = false;
     std::string profile, error;
 };
 inline WindowsEnvironmentSurveyLaunch ParseWindowsEnvironmentSurveyLaunch(
@@ -24,9 +24,9 @@ inline WindowsEnvironmentSurveyLaunch ParseWindowsEnvironmentSurveyLaunch(
         const auto a=arguments[i];
         if(a==L"--capture-environment-survey")
         {
-            if(result.requested || i+1==arguments.size() || (arguments[i+1]!=L"river-bend" && arguments[i+1]!=L"tomb-debris"))
-            {result.error="Environment survey requires exactly one river-bend or tomb-debris profile.";return result;}
-            result.requested=true;result.profile=arguments[i+1]==L"tomb-debris"?"tomb-debris":"river-bend";++i;
+            if(result.requested || i+1==arguments.size() || (arguments[i+1]!=L"river-bend" && arguments[i+1]!=L"tomb-debris" && arguments[i+1]!=L"player-dodge"))
+            {result.error="Environment survey requires exactly one river-bend, tomb-debris or player-dodge profile.";return result;}
+            result.requested=true;result.profile=arguments[i+1]==L"player-dodge"?"player-dodge":arguments[i+1]==L"tomb-debris"?"tomb-debris":"river-bend";++i;
         }
         else if(a==L"--survey-water-disabled")
         {
@@ -37,6 +37,11 @@ inline WindowsEnvironmentSurveyLaunch ParseWindowsEnvironmentSurveyLaunch(
         {
             if(result.debrisDisabled){result.error="Duplicate survey debris baseline modifier.";return result;}
             result.debrisDisabled=true;
+        }
+        else if(a==L"--survey-dodge-disabled")
+        {
+            if(result.dodgeDisabled){result.error="Duplicate dodge pose baseline modifier.";return result;}
+            result.dodgeDisabled=true;
         }
         else if(a==L"--capture-showcase")
         {if(capture)conflict=true;capture=i+1<arguments.size() && !arguments[i+1].starts_with(L"--");if(capture)++i;}
@@ -49,6 +54,8 @@ inline WindowsEnvironmentSurveyLaunch ParseWindowsEnvironmentSurveyLaunch(
         result.error="--survey-water-disabled requires an explicit river-bend survey.";
     if(result.debrisDisabled && (!result.requested || result.profile!="tomb-debris"))
         result.error="--survey-debris-disabled requires an explicit tomb-debris survey.";
+    if(result.dodgeDisabled && (!result.requested || result.profile!="player-dodge"))
+        result.error="--survey-dodge-disabled requires an explicit player-dodge survey.";
     if(result.requested && (!debugBuild || !capture || !hidden || !chapter || conflict))
         result.error="Environment survey requires a hidden Debug chapter showcase capture without gameplay staging or another validation mode.";
     return result;

@@ -13,6 +13,11 @@ namespace horde::vulkan::raytracing
 
 namespace
 {
+horde::scene::SkinnedPlayerDodgePose DodgePose(
+    const horde::gameplay::animation::PlayerAnimationSnapshot& animation)
+{
+    return {animation.dodge.weight,animation.dodge.modelX,animation.dodge.modelZ};
+}
 bool ValidatePlantedStance(
     const horde::gameplay::animation::PlayerAnimationSnapshot& animation,
     std::string& diagnostic)
@@ -40,6 +45,12 @@ bool ValidatePlantedStance(
         diagnostic = "Player crouch requires a finite admitted drop, Idle/Walk and no planted stance.";
         return false;
     }
+    if (!horde::scene::ValidPlayerDodgePose(DodgePose(animation)) ||
+        (animation.dodge.weight > 0.0f && (drop > 0.0f || crouch > 0.0f)))
+    {
+        diagnostic = "Player dodge layer is invalid or overlaps a grounded stance.";
+        return false;
+    }
     return true;
 }
 
@@ -53,6 +64,8 @@ void ApplyPlantedTorsoTranslation(
     position[1] -= animation.plantedPelvisDropMetres + animation.crouchPelvisDropMetres;
     position[2] -= animation.plantedPelvisDropMetres *
                    horde::scene::kPlayerPlantedPelvisSetbackPerDrop;
+    const auto dodge = horde::scene::PlayerDodgeTorsoOffset(DodgePose(animation));
+    for (unsigned axis=0;axis<3;++axis) position[axis] += dodge[axis];
 }
 } // namespace
 
@@ -864,7 +877,8 @@ bool PlayerRenderSlot::PreparePose(
     RtSceneStageScope skinScope(observation, horde::telemetry::RtStage::PlayerSkin);
     if (!asset_.EvaluatePlayerPose(
             clip, animation.locomotionTime, left, right, solvedPose_, diagnostic,
-            animation.plantedPelvisDropMetres, animation.crouchPelvisDropMetres) ||
+            animation.plantedPelvisDropMetres, animation.crouchPelvisDropMetres,
+            DodgePose(animation)) ||
         !asset_.SkinPlayerPoseUniqueTextured(
             solvedPose_, uniqueVertices_, uniqueTangents_, diagnostic))
     {

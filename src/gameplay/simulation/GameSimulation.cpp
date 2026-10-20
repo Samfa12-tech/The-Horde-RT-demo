@@ -8,6 +8,7 @@
 #include <utility>
 
 #include "gameplay/CorridorCollision.h"
+#include "gameplay/ShowcaseGameplay.h"
 #include "gameplay/ShowcaseCheckpoints.h"
 #include "gameplay/effects/KeeperTorchLighting.h"
 
@@ -2817,6 +2818,21 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.eventQueueHighWaterMark = events_.HighWaterMark();
     snapshot_.eventQueueOverflowCount = events_.OverflowCount();
     PublishRescueSnapshot();
+    // Derive after all death/traversal/capture overrides. No new gameplay clock,
+    // accepted command or save state: cancellation uses the existing accepted
+    // transient flag, so a timer left suspended by traversal cannot resurrect it.
+    snapshot_.playerAnimation.dodge = {};
+    if (CurrentCombatRules() && dodgeProtectionAccepted_ && snapshot_.dodgeActive &&
+            snapshot_.playerAlive && !snapshot_.paused && !snapshot_.crouchActive &&
+            !snapshot_.rescue.equipmentStowed && !rescueMovementSuppressedThisTick_ &&
+            !input.hasAuthoritativePlayerPose && !IsKeeperRevealing(snapshot_.lich.revealPhase))
+    {
+        const auto lowerBody = EvaluateLowerBodyPose(snapshot_.walkTime, snapshot_.walkAmount);
+        snapshot_.playerAnimation.dodge = animation::EvaluatePlayerDodgePresentation(true,
+            snapshot_.dodgeElapsedSeconds, kDodgeDurationSeconds,
+            dodgeDirectionX_, dodgeDirectionZ_, snapshot_.playerYawRadians,
+            lowerBody.torsoTwistRadians);
+    }
 }
 
 } // namespace horde::gameplay::simulation

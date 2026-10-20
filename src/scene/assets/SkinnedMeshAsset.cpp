@@ -1692,7 +1692,8 @@ bool SkinnedMeshAsset::EvaluatePlayerPose(
     const SkinnedClip clipId, const float timeSeconds,
     const SkinnedArmIkTarget& leftArm, const SkinnedArmIkTarget& rightArm,
     SkinnedPlayerPose& outputPose, std::string& diagnostic,
-    const float plantedPelvisDropMetres, const float crouchPelvisDropMetres) const
+    const float plantedPelvisDropMetres, const float crouchPelvisDropMetres,
+    const SkinnedPlayerDodgePose dodge) const
 {
     if (!outputPose.data_) outputPose.data_ = std::make_unique<SkinnedPlayerPoseData>();
     auto& solved = *outputPose.data_;
@@ -1729,6 +1730,13 @@ bool SkinnedMeshAsset::EvaluatePlayerPose(
           (clipId != SkinnedClip::Idle && clipId != SkinnedClip::Walking))))
     {
         diagnostic = "Player crouch requires a finite admitted drop, Idle/Walking and no planted stance.";
+        return false;
+    }
+    if (!ValidPlayerDodgePose(dodge) || (dodge.weight > 0.0f &&
+        (plantedPelvisDropMetres > 0.0f || crouchPelvisDropMetres > 0.0f ||
+         (clipId != SkinnedClip::Idle && clipId != SkinnedClip::Walking))))
+    {
+        diagnostic = "Player dodge requires a finite bounded direction/weight, Idle/Walking and no grounded drop.";
         return false;
     }
     const auto finiteArm = [](const SkinnedArmIkTarget& arm) {
@@ -1828,7 +1836,8 @@ bool SkinnedMeshAsset::EvaluatePlayerPose(
         }
         return false;
     };
-    const float pelvisDrop = plantedPelvisDropMetres + crouchPelvisDropMetres;
+    const auto dodgeOffset = PlayerDodgeTorsoOffset(dodge);
+    const float pelvisDrop = plantedPelvisDropMetres + crouchPelvisDropMetres - dodgeOffset[1];
     if (pelvisDrop > 0.0f)
     {
         const std::array<std::array<std::size_t, 3u>, 2u> legs{{
@@ -1855,7 +1864,8 @@ bool SkinnedMeshAsset::EvaluatePlayerPose(
             if (isDescendant(node, hipsNode))
             {
                 globals[node].m[13] -= pelvisDrop;
-                globals[node].m[14] -= plantedPelvisDropMetres * kPlayerPlantedPelvisSetbackPerDrop;
+                globals[node].m[12] += dodgeOffset[0];
+                globals[node].m[14] += dodgeOffset[2] - plantedPelvisDropMetres * kPlayerPlantedPelvisSetbackPerDrop;
             }
         const auto position = [](const Matrix& m) { return Vec3{m.m[12], m.m[13], m.m[14]}; };
         for (std::size_t side = 0u; side < legs.size(); ++side)
@@ -1864,7 +1874,12 @@ bool SkinnedMeshAsset::EvaluatePlayerPose(
             const Vec3 hip = position(globals[leg[0]]);
             const Vec3 originalKnee = position(globals[leg[1]]);
             const Vec3 originalFoot = position(globals[leg[2]]);
-            const Vec3 plantedFoot = position(authoredGlobals[leg[2]]);
+            // Continuous leading-foot bias avoids a side-switch discontinuity
+            // when the player turns aim during an already accepted world dodge.
+            const float bias = std::clamp(dodge.modelX + .5f*dodge.modelZ, -1.0f, 1.0f);
+            const float step = .04f*dodge.weight*(1.0f+(side==0u?bias:-bias));
+            const Vec3 ankleOffset{dodge.modelX*step,0.0f,dodge.modelZ*step};
+            const Vec3 plantedFoot = Add(position(authoredGlobals[leg[2]]),ankleOffset);
             const float thigh = Length(Subtract(originalKnee, hip));
             const float shin = Length(Subtract(originalFoot, originalKnee));
             const Vec3 request = Subtract(plantedFoot, hip);
@@ -1883,9 +1898,9 @@ bool SkinnedMeshAsset::EvaluatePlayerPose(
             // cloth/shin surface) folds above the contact plane, not below it.
             // The separately admitted rescue recipe stays byte-identical.
             const Vec3 pole{side == 0u ? 1.0f : -1.0f,
-                            crouchPelvisDropMetres > 0.0f ? 1.0f : 0.0f, 1.0f};
+                            crouchPelvisDropMetres > 0.0f ? 1.0f : dodge.weight*.35f, 1.0f};
             Vec3 projectedPole = Subtract(pole, Scale(direction, Dot(pole, direction)));
-            if (crouchPelvisDropMetres > 0.0f)
+            if (crouchPelvisDropMetres > 0.0f || dodge.weight > 0.0f)
             {
                 // Retain the animated knee direction at crouch onset; blend
                 // towards the bounded squat pole as the torso lowers. This
@@ -1894,7 +1909,8 @@ bool SkinnedMeshAsset::EvaluatePlayerPose(
                     Scale(direction, Dot(Subtract(originalKnee, hip), direction)));
                 if (Length(authoredBend) > 0.0001f && Length(projectedPole) > 0.0001f)
                 {
-                    const float blend = std::clamp(crouchPelvisDropMetres / 0.3f, 0.0f, 1.0f);
+                    const float blend = crouchPelvisDropMetres > 0.0f
+                        ? std::clamp(crouchPelvisDropMetres / 0.3f, 0.0f, 1.0f) : dodge.weight;
                     projectedPole = Add(Scale(Normalise(authoredBend), 1.0f - blend),
                                         Scale(Normalise(projectedPole), blend));
                 }
@@ -1918,7 +1934,11 @@ bool SkinnedMeshAsset::EvaluatePlayerPose(
                                                    Subtract(plantedFoot, knee)), originalKnee));
             for (std::size_t node = 0u; node < globals.size(); ++node)
             {
-                if (isDescendant(node, leg[2])) globals[node] = authoredGlobals[node];
+                if (isDescendant(node, leg[2])) {
+                    globals[node] = authoredGlobals[node];
+                    globals[node].m[12] += ankleOffset.x;
+                    globals[node].m[14] += ankleOffset.z;
+                }
                 else if (isDescendant(node, leg[1])) globals[node] = Multiply(lowerDelta, globals[node]);
                 else if (isDescendant(node, leg[0])) globals[node] = Multiply(upperDelta, globals[node]);
             }

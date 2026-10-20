@@ -597,6 +597,12 @@ if(BUILD_TESTING)
         target_link_libraries(horde_rt_player_directional_rig_tests PRIVATE horde_rt_probe_core)
         add_test(NAME horde_rt_player_directional_rig_tests
             COMMAND horde_rt_player_directional_rig_tests ${CMAKE_CURRENT_SOURCE_DIR})
+        add_executable(horde_rt_player_dodge_rig_tests tests/PlayerDodgeRigTests.cpp)
+        target_link_libraries(horde_rt_player_dodge_rig_tests PRIVATE horde_rt_probe_core)
+        add_test(NAME horde_rt_player_dodge_rig_tests COMMAND horde_rt_player_dodge_rig_tests ${CMAKE_CURRENT_SOURCE_DIR})
+        add_executable(horde_rt_player_dodge_lifecycle_tests tests/PlayerDodgeLifecycleTests.cpp)
+        target_link_libraries(horde_rt_player_dodge_lifecycle_tests PRIVATE horde_rt_probe_core)
+        add_test(NAME horde_rt_player_dodge_lifecycle_tests COMMAND horde_rt_player_dodge_lifecycle_tests ${CMAKE_CURRENT_SOURCE_DIR})
         add_executable(horde_rt_player_crouch_rig_tests tests/PlayerCrouchRigTests.cpp)
         target_link_libraries(horde_rt_player_crouch_rig_tests PRIVATE horde_rt_probe_core)
         add_test(NAME horde_rt_player_crouch_rig_tests COMMAND horde_rt_player_crouch_rig_tests ${CMAKE_CURRENT_SOURCE_DIR})
@@ -820,6 +826,11 @@ if(BUILD_TESTING)
     target_include_directories(horde_rt_player_animation_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     target_link_libraries(horde_rt_player_animation_tests PRIVATE horde_gameplay_simulation)
     add_test(NAME horde_rt_player_animation_tests COMMAND horde_rt_player_animation_tests)
+
+    add_executable(horde_rt_player_dodge_presentation_tests tests/PlayerDodgePresentationTests.cpp)
+    target_include_directories(horde_rt_player_dodge_presentation_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_link_libraries(horde_rt_player_dodge_presentation_tests PRIVATE horde_gameplay_simulation)
+    add_test(NAME horde_rt_player_dodge_presentation_tests COMMAND horde_rt_player_dodge_presentation_tests)
 
     add_executable(horde_rt_fire_emitter_tests
         tests/FireEmitterTests.cpp

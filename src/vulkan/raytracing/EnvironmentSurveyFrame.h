@@ -76,7 +76,7 @@ inline bool RebaseEnvironmentSurveyFrame(RtSceneFrameInputs& frame,
     using gameplay::traversal::Phase;
     if(frame.walkAmount!=0 || frame.rescue.equipmentStowed || frame.rescue.ropeHandsActive ||
        (frame.rescue.phase!=Phase::LowerSafe && frame.rescue.phase!=Phase::UpperSafe) ||
-       frame.playerAnimation.plantedPelvisDropMetres!=0)
+       frame.playerAnimation.plantedPelvisDropMetres!=0 || frame.playerAnimation.dodge.weight!=0)
         return fail("Survey rebase requires stationary settled player ownership.");
     if(frame.fireEmitterCount>frame.fireEmitters.size())return fail("Survey fire emitter count is invalid.");
     for(const auto& item:frame.heldItems)

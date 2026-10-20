@@ -57,6 +57,20 @@ struct PlayerVisibilityFlags
     bool operator==(const PlayerVisibilityFlags&) const = default;
 };
 
+// Transient visual layer only. Direction is in the current +Z-forward,
+// +X-anatomical-left model basis, derived from the accepted world-space dodge.
+struct PlayerDodgePresentation
+{
+    float weight = 0.0f;
+    float modelX = 0.0f;
+    float modelZ = 0.0f;
+    bool operator==(const PlayerDodgePresentation&) const = default;
+};
+
+PlayerDodgePresentation EvaluatePlayerDodgePresentation(bool active,
+    float elapsedSeconds, float durationSeconds, float acceptedWorldX,
+    float acceptedWorldZ, float yawRadians, float torsoTwistRadians);
+
 struct PlayerAnimationSnapshot
 {
     PlayerLocomotionClip locomotionClip = PlayerLocomotionClip::Idle;
@@ -74,6 +88,7 @@ struct PlayerAnimationSnapshot
     // Grounded Idle/Walk crouch lowers the torso while retaining animated feet.
     // Published separately from the stationary rescue stance; [0, 0.6] metres.
     float crouchPelvisDropMetres = 0.0f;
+    PlayerDodgePresentation dodge{};
     PlayerArmIkTarget leftIk{};
     PlayerArmIkTarget rightIk{};
     PlayerVisibilityFlags visibility{};

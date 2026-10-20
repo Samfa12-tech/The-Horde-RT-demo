@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
@@ -127,6 +128,24 @@ inline constexpr float kMaximumPlayerCrouchPelvisDropMetres = 0.6f;
 // In the imported +Z-forward frame, the deepest admitted pose sets back 18 cm.
 inline constexpr float kPlayerPlantedPelvisSetbackPerDrop = 0.25f;
 
+struct SkinnedPlayerDodgePose
+{
+    float weight = 0.0f;
+    float modelX = 0.0f;
+    float modelZ = 0.0f;
+};
+inline bool ValidPlayerDodgePose(const SkinnedPlayerDodgePose& pose)
+{
+    return std::isfinite(pose.weight) && pose.weight >= 0.0f && pose.weight <= 1.0f &&
+        std::isfinite(pose.modelX) && std::isfinite(pose.modelZ) &&
+        (pose.weight == 0.0f || std::abs(std::hypot(pose.modelX,pose.modelZ)-1.0f) < .002f);
+}
+inline std::array<float,3> PlayerDodgeTorsoOffset(const SkinnedPlayerDodgePose& pose)
+{
+    return {pose.modelX * pose.weight * .04f, -pose.weight * .08f,
+            pose.modelZ * pose.weight * .04f};
+}
+
 struct SkinnedPlayerPoseData;
 struct SkinnedPlayerRigLayout;
 
@@ -231,13 +250,17 @@ public:
     // the torso while preserving each animated ankle/foot descendant transform.
     // The two drops are mutually exclusive. Arm targets remain caller-owned in
     // the same model frame (including the shared lowered eye); no extra shift.
-    // These are pose constraints, not movement/collision or foot support queries.
+    // Optional dodge translates the pelvis and articulates directional ankle
+    // targets in model space before the same arm solve. It is exclusive with
+    // the grounded drops; zero retains the exact original palette. These are
+    // visual pose constraints, not movement/collision or world-foot locking.
     bool EvaluatePlayerPose(SkinnedClip clip, float timeSeconds,
                             const SkinnedArmIkTarget& leftArm,
                             const SkinnedArmIkTarget& rightArm,
                             SkinnedPlayerPose& pose, std::string& diagnostic,
                             float plantedPelvisDropMetres = 0.0f,
-                            float crouchPelvisDropMetres = 0.0f) const;
+                            float crouchPelvisDropMetres = 0.0f,
+                            SkinnedPlayerDodgePose dodge = {}) const;
     // Requires exact ordered joint names and inverse-bind agreement. A successful
     // binding is cached by immutable rig identity, never by raw asset addresses.
     bool SkinPlayerPoseUniqueTextured(const SkinnedPlayerPose& pose,

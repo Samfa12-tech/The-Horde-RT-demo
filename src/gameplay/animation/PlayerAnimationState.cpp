@@ -25,6 +25,26 @@ float Normalized(const float elapsed, const float total)
 
 } // namespace
 
+PlayerDodgePresentation EvaluatePlayerDodgePresentation(const bool active,
+    const float elapsedSeconds, const float durationSeconds, const float acceptedWorldX,
+    const float acceptedWorldZ, const float yawRadians, const float torsoTwistRadians)
+{
+    if (!active || !std::isfinite(elapsedSeconds) || !std::isfinite(durationSeconds) ||
+        durationSeconds <= 0.0f || elapsedSeconds <= 0.0f || elapsedSeconds >= durationSeconds ||
+        !std::isfinite(acceptedWorldX) || !std::isfinite(acceptedWorldZ) ||
+        !std::isfinite(yawRadians) || !std::isfinite(torsoTwistRadians)) return {};
+    const float length = std::hypot(acceptedWorldX, acceptedWorldZ);
+    if (!std::isfinite(length) || length < 0.0001f) return {};
+    const float p = elapsedSeconds / durationSeconds;
+    const float weight = 16.0f * p * p * (1.0f-p) * (1.0f-p);
+    // Same lower-body axes as the renderer, including its existing torso twist.
+    const float s = std::sin(yawRadians), c = std::cos(yawRadians);
+    const float t = std::sin(torsoTwistRadians), u = std::cos(torsoTwistRadians);
+    const float forward = (acceptedWorldX * s - acceptedWorldZ * c) / length;
+    const float right = (acceptedWorldX * c + acceptedWorldZ * s) / length;
+    return {std::clamp(weight, 0.0f, 1.0f), -(right*u-forward*t), forward*u+right*t};
+}
+
 PlayerLocomotionClip MapPlayerLocomotionClip(const float locomotionBlend)
 {
     return locomotionBlend > 0.01f ? PlayerLocomotionClip::Walk

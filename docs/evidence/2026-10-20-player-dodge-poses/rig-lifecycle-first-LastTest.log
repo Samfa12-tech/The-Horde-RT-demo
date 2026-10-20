@@ -1,0 +1,53 @@
+Start testing: Oct 20 23:58 AUS Eastern Summer Time
+----------------------------------------------------------
+74/224 Testing: horde_rt_player_dodge_rig_tests
+74/224 Test: horde_rt_player_dodge_rig_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_player_dodge_rig_tests.exe" "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_player_dodge_rig_tests" start time: Oct 20 23:58 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+dodge_rig_samples=562 checks=9230 failures=0; native CPU runtime-asset rig only, GPU/device acceptance not measured
+<end of output>
+Test time =   3.27 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_player_dodge_rig_tests" end time: Oct 20 23:58 AUS Eastern Summer Time
+"horde_rt_player_dodge_rig_tests" time elapsed: 00:00:03
+----------------------------------------------------------
+
+75/224 Testing: horde_rt_player_dodge_lifecycle_tests
+75/224 Test: horde_rt_player_dodge_lifecycle_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_player_dodge_lifecycle_tests.exe" "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_player_dodge_lifecycle_tests" start time: Oct 20 23:58 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+28 dodge lifecycle checks, 0 failures
+CPU restore fixtures and actual rope motor only; same-tick hostile death is not covered.
+<end of output>
+Test time =   1.50 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_player_dodge_lifecycle_tests" end time: Oct 20 23:58 AUS Eastern Summer Time
+"horde_rt_player_dodge_lifecycle_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+101/224 Testing: horde_rt_player_dodge_presentation_tests
+101/224 Test: horde_rt_player_dodge_presentation_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_player_dodge_presentation_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_player_dodge_presentation_tests" start time: Oct 20 23:58 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+FAIL: snapshot equipment identity matches the labelled original torch or imported lantern fixture
+Player dodge presentation: 750 checks, 1 failures
+<end of output>
+Test time =   0.96 sec
+----------------------------------------------------------
+Test Failed.
+"horde_rt_player_dodge_presentation_tests" end time: Oct 20 23:58 AUS Eastern Summer Time
+"horde_rt_player_dodge_presentation_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 20 23:58 AUS Eastern Summer Time

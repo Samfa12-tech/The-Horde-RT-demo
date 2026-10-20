@@ -361,6 +361,18 @@ int main()
     debrisBaseline.push_back(L"--survey-debris-disabled");
     check(!ParseWindowsEnvironmentSurveyLaunch(debrisBaseline,true).error.empty(),"duplicate debris modifier rejects");
     const auto opening=TombDebrisSurveyCamera(0),chips=TombDebrisSurveyCamera(60);
+    auto dodgeSurvey=std::vector<std::wstring_view>(survey.begin(),survey.end());dodgeSurvey.back()=L"player-dodge";
+    check(ParseWindowsEnvironmentSurveyLaunch(dodgeSurvey,true).error.empty() &&
+          !ParseWindowsEnvironmentSurveyLaunch(dodgeSurvey,false).error.empty(),"player dodge snapshot inspection is hidden Debug only");
+    dodgeSurvey.push_back(L"--survey-dodge-disabled");
+    check(ParseWindowsEnvironmentSurveyLaunch(dodgeSurvey,true).dodgeDisabled &&
+          ParseWindowsEnvironmentSurveyLaunch(dodgeSurvey,true).error.empty(),"player dodge A/B baseline is an explicit pose-only omission");
+    dodgeSurvey.push_back(L"--survey-dodge-disabled");
+    check(!ParseWindowsEnvironmentSurveyLaunch(dodgeSurvey,true).error.empty() &&
+          !ParseWindowsEnvironmentSurveyLaunch(std::array<std::wstring_view,1>{L"--survey-dodge-disabled"},true).error.empty(),
+          "duplicate or unbound dodge omission rejects");
+    auto wrongDodge=std::vector<std::wstring_view>(survey.begin(),survey.end());wrongDodge.push_back(L"--survey-dodge-disabled");
+    check(!ParseWindowsEnvironmentSurveyLaunch(wrongDodge,true).error.empty(),"dodge omission cannot affect a river survey");
     check(opening.x==horde::gameplay::kPlayerSpawn.x && opening.z==horde::gameplay::kPlayerSpawn.z && opening.yaw==0 &&
           horde::gameplay::IsShowcasePlayerPositionWalkable(opening.x,opening.z) &&
           horde::gameplay::IsShowcasePlayerPositionWalkable(chips.x,chips.z) &&

@@ -247,13 +247,14 @@ int main()
           corrupt.heldItems[0].worldFromItem==corruptBefore.heldItems[0].worldFromItem &&
           corrupt.cameraX==corruptBefore.cameraX,
           "late nonfinite attached fire history rejects without partially rebasing earlier fields");
-    for(unsigned badCase=0;badCase<5;++badCase) {
+    for(unsigned badCase=0;badCase<6;++badCase) {
         auto invalid=surveySource;auto badPose=pose;
         if(badCase==0)badPose.pitch=-.698f;
         if(badCase==1)badPose.x=std::numeric_limits<float>::quiet_NaN();
         if(badCase==2)invalid.walkAmount=.2f;
         if(badCase==3)invalid.rescue.phase=horde::gameplay::traversal::Phase::Ascent;
         if(badCase==4)invalid.heldItems[1].visualStowBlend=.5f;
+        if(badCase==5)invalid.playerAnimation.dodge={.5f,0,1};
         const auto before=invalid;
         check(!RebaseEnvironmentSurveyFrame(invalid,badPose,rebaseError) && !rebaseError.empty() &&
               invalid.cameraX==before.cameraX && invalid.heldItems[0].worldFromItem==before.heldItems[0].worldFromItem &&
