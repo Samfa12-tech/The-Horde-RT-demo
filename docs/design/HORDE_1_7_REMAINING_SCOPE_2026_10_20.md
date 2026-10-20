@@ -25,10 +25,16 @@ The later [route inspection](../evidence/2026-10-20-outdoor-route-inspection/REA
 fixes legacy-policy diagnostic staging at the real root and inspects current bend/
 lookout RT views without changing production placement or collision. No new
 demonstrated float/intersection justified moving geometry in those views. Wind
-and runtime LOD remain unimplemented; a one-pine static LOD2 comparison is selected
-as the smaller reversible next investigation, with actual existing payload counts
-and required native comparison measurements recorded. No derivative or saving is
-adopted. Recovery policy remains pending without blocking that independent work.
+and runtime LOD remain unimplemented. The subsequent
+[one-pine LOD2 comparison](../evidence/2026-10-20-pine-lod2/README.md) is closed and
+rejected for production adoption: 57,088 device bytes saved versus 53.67–65.64 ms
+adoption and 32,981,504 extra device-overlap bytes, without an attributed steady
+GPU win. Six native A/B/A comparisons preserve exact original restoration;
+automatic distance transitions and whole near-crown acceptance remain open.
+The derivative is unadmitted. Next bounded source action is suitability/provenance
+inspection for one quiet forest wind/foliage cue within the existing finite voice
+budget, not a renderer wind or heavy-effects expansion. Recovery policy remains
+pending without blocking independent work.
 
 ## Implemented, with exact-candidate acceptance still open
 

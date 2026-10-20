@@ -68,8 +68,8 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 102u,
-          "development registry retains prior views and adds two actual fixed-step room-mist states");
+    Check(kDevelopmentCheckpoints.size() == 105u,
+          "development registry retains prior views and adds three bounded pine inspection views");
     Check(FindDevelopmentCheckpoint("chapter-understory-close") != nullptr &&
           FindShowcaseCheckpoint("chapter-understory-close") == nullptr,
           "understory camera is development-only and cannot alter release checkpoint lookup");
@@ -130,6 +130,18 @@ int main()
               forest->exteriorRouteStation < simulation::kWorldRoutePoints.size() &&
               !forest->primaryArmsMayBeOutsideFrame,
               "woodland views require real rescue/native-route staging and retain strict equipment visibility");
+    }
+    for (const auto name : {"chapter-pine-near", "chapter-pine-mid", "chapter-pine-far"})
+    {
+        const auto* pine = FindDevelopmentCheckpoint(name);
+        Check(pine && pine->id >= 223 && pine->id <= 225 &&
+              FindDevelopmentCheckpoint(pine->id) == pine && FindShowcaseCheckpoint(name) == nullptr &&
+              pine->stagesRescueExterior && pine->keeperDeathFixedTicks == 240u &&
+              pine->exteriorRouteStation >= 3u && pine->exteriorRouteStation <= 5u &&
+              std::abs(pine->cameraX - simulation::kWorldRoutePoints[pine->exteriorRouteStation].x) < .00001f &&
+              std::abs(pine->cameraZ - simulation::kWorldRoutePoints[pine->exteriorRouteStation].z) < .00001f &&
+              !pine->primaryArmsMayBeOutsideFrame,
+              "pine comparison views retain accepted route positions, current rules and ordinary equipment");
     }
     float previousDissolve = -1.0f;
     for (const auto name : {"chapter-keeper-death-held", "chapter-keeper-death-dissolve", "chapter-keeper-death-retired"})

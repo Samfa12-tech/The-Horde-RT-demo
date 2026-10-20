@@ -77,7 +77,18 @@ inline constexpr bool DevelopmentCheckpointRequiresAuthoredChapter(
     return checkpoint.id == 192 || checkpoint.name.starts_with("chapter-");
 }
 
-inline constexpr std::array<DevelopmentCheckpoint, 102u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 105u> kDevelopmentCheckpoints{{
+    // Fixed accepted-route positions looking toward one owned pine. Debug
+    // source comparisons only; no automatic distance-LOD or route extension.
+    {.id=223,.name="chapter-pine-near",.baseShowcaseCheckpointId=11,
+     .cameraX=-17.7f,.cameraZ=15.2f,.yaw=-2.068f,.pitch=.28f,
+     .stagesRescueExterior=true,.exteriorRouteStation=5u,.keeperDeathFixedTicks=240u},
+    {.id=224,.name="chapter-pine-mid",.baseShowcaseCheckpointId=11,
+     .cameraX=-15.7f,.cameraZ=.2f,.yaw=-2.781f,.pitch=.18f,
+     .stagesRescueExterior=true,.exteriorRouteStation=4u,.keeperDeathFixedTicks=240u},
+    {.id=225,.name="chapter-pine-far",.baseShowcaseCheckpointId=11,
+     .cameraX=-28.7f,.cameraZ=-5.8f,.yaw=2.876f,.pitch=.14f,
+     .stagesRescueExterior=true,.exteriorRouteStation=3u,.keeperDeathFixedTicks=240u},
     // Actual fixed-step mist states; body dissolve checkpoints below have
     // earlier clocks and must not stand in for halfway/zero mist evidence.
     {.id=221,.name="chapter-keeper-mist-fading",.baseShowcaseCheckpointId=10,

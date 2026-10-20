@@ -1,0 +1,2445 @@
+{
+  "schema": 1,
+  "scope": "Debug 12 warm +60 unique completed serialized RT submissions per phase; no pacing/sustained/mobile acceptance",
+  "sampleCount": 1080,
+  "percentile": "nearest rank p95; median average middle pair",
+  "imageDifferenceBoundary": "upper300 is image region, not an object mask; ground region includes held props; inspect A/B/A controls",
+  "runs": [
+    {
+      "label": "near-pipeline",
+      "executable": {
+        "exists": true,
+        "bytes": 14029824,
+        "sha256": "6c4b2cb1b2953a1815543cf519a2082f892c6eb9e4f41dc02f4b4a3ae5387e78"
+      },
+      "seconds": 51.34299999999348,
+      "camera": {
+        "x": -17.700905,
+        "z": 15.206802,
+        "yaw": -2.068,
+        "pitch": 0.28
+      },
+      "device": {
+        "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "vendorId": 4318,
+        "deviceId": 11672
+      },
+      "presentation": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "shaderPair": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a"
+        }
+      },
+      "phases": {
+        "before": {
+          "staticGeneration": 1,
+          "firstIdentity": {
+            "sceneEpoch": 2,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 25,
+            "recordSerial": 25,
+            "submissionSerial": 25,
+            "completionSerial": 25,
+            "simulationTick": 2018,
+            "frameSlot": 0
+          },
+          "lastIdentity": {
+            "sceneEpoch": 2,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 84,
+            "recordSerial": 84,
+            "submissionSerial": 84,
+            "completionSerial": 84,
+            "simulationTick": 2018,
+            "frameSlot": 0
+          },
+          "gpuMs": {
+            "count": 60,
+            "median": 1.9796960000000001,
+            "p95": 1.995456,
+            "minimum": 1.960704,
+            "maximum": 2.093696
+          },
+          "renderCallCpuMs": {
+            "count": 60,
+            "median": 5.536099999999999,
+            "p95": 5.5839,
+            "minimum": 3.2057,
+            "maximum": 5.9997
+          },
+          "wholeFrameCycleCpuMs": {
+            "count": 60,
+            "median": 5.526,
+            "p95": 5.5753,
+            "minimum": 3.1996,
+            "maximum": 5.9897
+          },
+          "resources": {
+            "bufferCount": 51,
+            "memoryAllocationCount": 60,
+            "bottomLevelAccelerationStructureCount": 20,
+            "topLevelAccelerationStructureCount": 1,
+            "tlasInstanceCount": 28,
+            "pipelineCount": 2,
+            "shaderBindingTableCount": 2,
+            "descriptorSetCount": 1,
+            "hostVisibleBytes": 48278656,
+            "deviceLocalBytes": 372437216
+          }
+        },
+        "candidate": {
+          "staticGeneration": 2,
+          "firstIdentity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 266,
+            "recordSerial": 266,
+            "submissionSerial": 266,
+            "completionSerial": 266,
+            "simulationTick": 2020,
+            "frameSlot": 0
+          },
+          "lastIdentity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 325,
+            "recordSerial": 325,
+            "submissionSerial": 325,
+            "completionSerial": 325,
+            "simulationTick": 2020,
+            "frameSlot": 0
+          },
+          "gpuMs": {
+            "count": 60,
+            "median": 1.982416,
+            "p95": 1.993312,
+            "minimum": 1.965472,
+            "maximum": 2.001536
+          },
+          "renderCallCpuMs": {
+            "count": 60,
+            "median": 5.51445,
+            "p95": 5.5563,
+            "minimum": 5.2177,
+            "maximum": 5.5923
+          },
+          "wholeFrameCycleCpuMs": {
+            "count": 60,
+            "median": 5.503550000000001,
+            "p95": 5.5453,
+            "minimum": 5.2085,
+            "maximum": 5.5801
+          },
+          "resources": {
+            "bufferCount": 51,
+            "memoryAllocationCount": 60,
+            "bottomLevelAccelerationStructureCount": 20,
+            "topLevelAccelerationStructureCount": 1,
+            "tlasInstanceCount": 28,
+            "pipelineCount": 2,
+            "shaderBindingTableCount": 2,
+            "descriptorSetCount": 1,
+            "hostVisibleBytes": 48269440,
+            "deviceLocalBytes": 372380128
+          }
+        },
+        "restored": {
+          "staticGeneration": 3,
+          "firstIdentity": {
+            "sceneEpoch": 4,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 437,
+            "recordSerial": 437,
+            "submissionSerial": 437,
+            "completionSerial": 437,
+            "simulationTick": 2022,
+            "frameSlot": 0
+          },
+          "lastIdentity": {
+            "sceneEpoch": 4,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 496,
+            "recordSerial": 496,
+            "submissionSerial": 496,
+            "completionSerial": 496,
+            "simulationTick": 2022,
+            "frameSlot": 0
+          },
+          "gpuMs": {
+            "count": 60,
+            "median": 1.977296,
+            "p95": 1.991296,
+            "minimum": 1.96656,
+            "maximum": 2.271328
+          },
+          "renderCallCpuMs": {
+            "count": 60,
+            "median": 5.56245,
+            "p95": 5.5963,
+            "minimum": 5.1037,
+            "maximum": 6.005
+          },
+          "wholeFrameCycleCpuMs": {
+            "count": 60,
+            "median": 5.55285,
+            "p95": 5.5888,
+            "minimum": 5.0948,
+            "maximum": 5.9952
+          },
+          "resources": {
+            "bufferCount": 51,
+            "memoryAllocationCount": 60,
+            "bottomLevelAccelerationStructureCount": 20,
+            "topLevelAccelerationStructureCount": 1,
+            "tlasInstanceCount": 28,
+            "pipelineCount": 2,
+            "shaderBindingTableCount": 2,
+            "descriptorSetCount": 1,
+            "hostVisibleBytes": 48278656,
+            "deviceLocalBytes": 372437216
+          }
+        }
+      },
+      "rawArtifacts": {
+        "static-timing-before.json": {
+          "bytes": 204466,
+          "sha256": "88ba163eddbe909e250c8fc60f1706d9810f7884c3478329c0167c3ea7eabfd0"
+        },
+        "static-timing-candidate.json": {
+          "bytes": 204949,
+          "sha256": "f963053631e5d15c46df54070edd32ca7d5f0eb9f686d7746e4b6e11cf6404bd"
+        },
+        "static-timing-restored.json": {
+          "bytes": 204946,
+          "sha256": "48a0c58a687396467fb687fde6f3133d5c749cd88bc7ff78c923df5952055f41"
+        },
+        "cutover-00-before.png": {
+          "bytes": 522565,
+          "sha256": "4d1697426618a41337c00b15178eaad57f43a08c1e00bac1aafcec4dbf3e64e1"
+        },
+        "cutover-01-selected.png": {
+          "bytes": 523137,
+          "sha256": "602eca339be17e237d1195fe919dfdca163a4ff3945ef4d543d52e9cfb6421cd"
+        },
+        "cutover-02-restored.png": {
+          "bytes": 522565,
+          "sha256": "4d1697426618a41337c00b15178eaad57f43a08c1e00bac1aafcec4dbf3e64e1"
+        },
+        "static-world-source.json": {
+          "bytes": 7557,
+          "sha256": "2a8b513ecf93a0bb3a6b41e9d376024f7f5394671b9e07206bef51661ad17403"
+        },
+        "static-zone-cutover.json": {
+          "bytes": 2364,
+          "sha256": "d816691712946491bc68bbbd678435aba01a868377e0f740ea89567bdac24b6e"
+        },
+        "capture-manifest.json": {
+          "bytes": 10678,
+          "sha256": "792e5e9d1f51493697d3680b7074e901790f51bb1bad4d2fa01d7c3c0b40d580"
+        }
+      },
+      "treeBaseDistanceM": 5.229323838100146,
+      "gpuMedianPercentChanges": {
+        "candidateVsBefore": 0.1373948323378782,
+        "candidateVsRestored": 0.2589394809881851,
+        "restoredVsBefore": -0.12123073441580035
+      },
+      "gpuMedianBudgetBands": {
+        "before": {
+          "within16_667Ms": true,
+          "within20Ms": true,
+          "within33_333Ms": true
+        },
+        "candidate": {
+          "within16_667Ms": true,
+          "within20Ms": true,
+          "within33_333Ms": true
+        },
+        "restored": {
+          "within16_667Ms": true,
+          "within20Ms": true,
+          "within33_333Ms": true
+        }
+      },
+      "cutovers": [
+        {
+          "sourceGeneration": 1,
+          "admittedGeneration": 2,
+          "movingFirstFrame": true,
+          "poseYawDeltaRadians": 0.025,
+          "selection": "explicit-triangle-omissions",
+          "omittedTriangleCount": 768,
+          "completeContributors": false,
+          "prepareMilliseconds": 605.739,
+          "cutoverMilliseconds": 55.9038,
+          "packMilliseconds": 35.0289,
+          "beginMilliseconds": 0.0866,
+          "maximumCpuCopyAdvanceMilliseconds": 4.7209,
+          "maximumAdvanceMilliseconds": 4.7221,
+          "uploadAdvanceCount": 29,
+          "uploadedBytes": 6372748,
+          "cpuCopyAdvanceCount": 67,
+          "cpuRegionScanAdvanceCount": 35,
+          "scannedCpuPayloadBytes": 9034497,
+          "asSubmissionCount": 3,
+          "asPollCount": 3,
+          "asPendingPollCount": 0,
+          "copiedCpuPayloadBytes": 13813498,
+          "cachedCpuSourcePayloadBytes": 46871933,
+          "preparationFrames": 102,
+          "oldOwnerAllocationBytes": 69787456,
+          "candidateOwnerAllocationBytes": 69730368,
+          "overlapOwnerAllocationBytes": 124471040,
+          "oldPrimitiveCount": 32,
+          "newPrimitiveCount": 32,
+          "sceneDeviceLocalOverlap": 405418720,
+          "sceneHostVisibleOverlap": 54651584,
+          "topLevelOwnersBefore": 1,
+          "topLevelOwnersOverlap": 2,
+          "topLevelOwnersAfter": 1,
+          "sceneDeviceLocalBefore": 372437216,
+          "sceneDeviceLocalAfter": 372380128,
+          "sceneHostVisibleBefore": 48278656,
+          "sceneHostVisibleAfter": 48269440
+        },
+        {
+          "sourceGeneration": 2,
+          "admittedGeneration": 3,
+          "movingFirstFrame": true,
+          "poseYawDeltaRadians": 0.025,
+          "selection": "complete-with-graveyard",
+          "omittedTriangleCount": 0,
+          "completeContributors": true,
+          "prepareMilliseconds": 394.138,
+          "cutoverMilliseconds": 61.8872,
+          "packMilliseconds": 3.6901,
+          "beginMilliseconds": 0.0277,
+          "maximumCpuCopyAdvanceMilliseconds": 1.379,
+          "maximumAdvanceMilliseconds": 1.3802,
+          "uploadAdvanceCount": 29,
+          "uploadedBytes": 6381964,
+          "cpuCopyAdvanceCount": 32,
+          "cpuRegionScanAdvanceCount": 0,
+          "scannedCpuPayloadBytes": 0,
+          "asSubmissionCount": 3,
+          "asPollCount": 3,
+          "asPendingPollCount": 0,
+          "copiedCpuPayloadBytes": 6914749,
+          "cachedCpuSourcePayloadBytes": 46871933,
+          "preparationFrames": 67,
+          "oldOwnerAllocationBytes": 69730368,
+          "candidateOwnerAllocationBytes": 69787456,
+          "overlapOwnerAllocationBytes": 124510080,
+          "oldPrimitiveCount": 32,
+          "newPrimitiveCount": 32,
+          "sceneDeviceLocalOverlap": 405418720,
+          "sceneHostVisibleOverlap": 54651584,
+          "topLevelOwnersBefore": 1,
+          "topLevelOwnersOverlap": 2,
+          "topLevelOwnersAfter": 1,
+          "sceneDeviceLocalBefore": 372380128,
+          "sceneDeviceLocalAfter": 372437216,
+          "sceneHostVisibleBefore": 48269440,
+          "sceneHostVisibleAfter": 48278656
+        }
+      ],
+      "imageDifferences": {
+        "candidateVsBefore": {
+          "bbox": [
+            185,
+            2,
+            552,
+            417
+          ],
+          "full": {
+            "pixels": 518400,
+            "changed": 887,
+            "over8": 527,
+            "over32": 73,
+            "meanAbsoluteRgb": 0.023057484567901236
+          },
+          "upper300": {
+            "pixels": 288000,
+            "changed": 350,
+            "over8": 4,
+            "over32": 0,
+            "meanAbsoluteRgb": 0.002935185185185185
+          },
+          "groundAndHeldProps": {
+            "pixels": 230400,
+            "changed": 537,
+            "over8": 523,
+            "over32": 73,
+            "meanAbsoluteRgb": 0.048210358796296295
+          }
+        },
+        "restoredVsBefore": {
+          "bbox": null,
+          "full": {
+            "pixels": 518400,
+            "changed": 0,
+            "over8": 0,
+            "over32": 0,
+            "meanAbsoluteRgb": 0.0
+          },
+          "upper300": {
+            "pixels": 288000,
+            "changed": 0,
+            "over8": 0,
+            "over32": 0,
+            "meanAbsoluteRgb": 0.0
+          },
+          "groundAndHeldProps": {
+            "pixels": 230400,
+            "changed": 0,
+            "over8": 0,
+            "over32": 0,
+            "meanAbsoluteRgb": 0.0
+          }
+        }
+      }
+    },
+    {
+      "label": "mid-pipeline",
+      "executable": {
+        "exists": true,
+        "bytes": 14029824,
+        "sha256": "6c4b2cb1b2953a1815543cf519a2082f892c6eb9e4f41dc02f4b4a3ae5387e78"
+      },
+      "seconds": 23.546000000002095,
+      "camera": {
+        "x": -15.694263,
+        "z": 0.202648,
+        "yaw": -2.781,
+        "pitch": 0.18
+      },
+      "device": {
+        "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "vendorId": 4318,
+        "deviceId": 11672
+      },
+      "presentation": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "shaderPair": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a"
+        }
+      },
+      "phases": {
+        "before": {
+          "staticGeneration": 1,
+          "firstIdentity": {
+            "sceneEpoch": 2,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 25,
+            "recordSerial": 25,
+            "submissionSerial": 25,
+            "completionSerial": 25,
+            "simulationTick": 1720,
+            "frameSlot": 0
+          },
+          "lastIdentity": {
+            "sceneEpoch": 2,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 84,
+            "recordSerial": 84,
+            "submissionSerial": 84,
+            "completionSerial": 84,
+            "simulationTick": 1720,
+            "frameSlot": 0
+          },
+          "gpuMs": {
+            "count": 60,
+            "median": 2.56088,
+            "p95": 4.119712,
+            "minimum": 2.544352,
+            "maximum": 4.555744
+          },
+          "renderCallCpuMs": {
+            "count": 60,
+            "median": 5.4908,
+            "p95": 5.5733,
+            "minimum": 1.4972,
+            "maximum": 5.6689
+          },
+          "wholeFrameCycleCpuMs": {
+            "count": 60,
+            "median": 5.48235,
+            "p95": 5.5653,
+            "minimum": 1.4929,
+            "maximum": 5.6187
+          },
+          "resources": {
+            "bufferCount": 51,
+            "memoryAllocationCount": 60,
+            "bottomLevelAccelerationStructureCount": 20,
+            "topLevelAccelerationStructureCount": 1,
+            "tlasInstanceCount": 28,
+            "pipelineCount": 2,
+            "shaderBindingTableCount": 2,
+            "descriptorSetCount": 1,
+            "hostVisibleBytes": 48278656,
+            "deviceLocalBytes": 372437216
+          }
+        },
+        "candidate": {
+          "staticGeneration": 2,
+          "firstIdentity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 266,
+            "recordSerial": 266,
+            "submissionSerial": 266,
+            "completionSerial": 266,
+            "simulationTick": 1722,
+            "frameSlot": 0
+          },
+          "lastIdentity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 325,
+            "recordSerial": 325,
+            "submissionSerial": 325,
+            "completionSerial": 325,
+            "simulationTick": 1722,
+            "frameSlot": 0
+          },
+          "gpuMs": {
+            "count": 60,
+            "median": 2.55344,
+            "p95": 2.570752,
+            "minimum": 2.542464,
+            "maximum": 3.031392
+          },
+          "renderCallCpuMs": {
+            "count": 60,
+            "median": 5.5238499999999995,
+            "p95": 5.5669,
+            "minimum": 5.1109,
+            "maximum": 5.5759
+          },
+          "wholeFrameCycleCpuMs": {
+            "count": 60,
+            "median": 5.515650000000001,
+            "p95": 5.555,
+            "minimum": 5.0993,
+            "maximum": 5.5672
+          },
+          "resources": {
+            "bufferCount": 51,
+            "memoryAllocationCount": 60,
+            "bottomLevelAccelerationStructureCount": 20,
+            "topLevelAccelerationStructureCount": 1,
+            "tlasInstanceCount": 28,
+            "pipelineCount": 2,
+            "shaderBindingTableCount": 2,
+            "descriptorSetCount": 1,
+            "hostVisibleBytes": 48269440,
+            "deviceLocalBytes": 372380128
+          }
+        },
+        "restored": {
+          "staticGeneration": 3,
+          "firstIdentity": {
+            "sceneEpoch": 4,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 437,
+            "recordSerial": 437,
+            "submissionSerial": 437,
+            "completionSerial": 437,
+            "simulationTick": 1724,
+            "frameSlot": 0
+          },
+          "lastIdentity": {
+            "sceneEpoch": 4,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 496,
+            "recordSerial": 496,
+            "submissionSerial": 496,
+            "completionSerial": 496,
+            "simulationTick": 1724,
+            "frameSlot": 0
+          },
+          "gpuMs": {
+            "count": 60,
+            "median": 2.55208,
+            "p95": 2.562368,
+            "minimum": 2.539904,
+            "maximum": 2.966944
+          },
+          "renderCallCpuMs": {
+            "count": 60,
+            "median": 5.53115,
+            "p95": 5.5626,
+            "minimum": 5.2547,
+            "maximum": 5.5726
+          },
+          "wholeFrameCycleCpuMs": {
+            "count": 60,
+            "median": 5.5219000000000005,
+            "p95": 5.555,
+            "minimum": 5.2445,
+            "maximum": 5.5621
+          },
+          "resources": {
+            "bufferCount": 51,
+            "memoryAllocationCount": 60,
+            "bottomLevelAccelerationStructureCount": 20,
+            "topLevelAccelerationStructureCount": 1,
+            "tlasInstanceCount": 28,
+            "pipelineCount": 2,
+            "shaderBindingTableCount": 2,
+            "descriptorSetCount": 1,
+            "hostVisibleBytes": 48278656,
+            "deviceLocalBytes": 372437216
+          }
+        }
+      },
+      "rawArtifacts": {
+        "static-timing-before.json": {
+          "bytes": 204346,
+          "sha256": "587541d2f3c51d7a90e7faffa44c5f816ba9f790bba005980ec99b03b231dd70"
+        },
+        "static-timing-candidate.json": {
+          "bytes": 204835,
+          "sha256": "5fcd985f45ac52efa545b327bc7636b8ddd4ea2ca9b644e549c675d7d9250c8f"
+        },
+        "static-timing-restored.json": {
+          "bytes": 204833,
+          "sha256": "de212dc98311ffeff524f8571b0a421c295d9a50254848bfa63f8219532d01c4"
+        },
+        "cutover-00-before.png": {
+          "bytes": 662302,
+          "sha256": "0f6c0004310b4c95d4643b5bfb24b6d6a71ccb4d6c2e1779264992b75a9d9400"
+        },
+        "cutover-01-selected.png": {
+          "bytes": 661988,
+          "sha256": "c40c9701775e98c5c7106a1a370cce54b2c289b50a40414960d8ae935fe84957"
+        },
+        "cutover-02-restored.png": {
+          "bytes": 662302,
+          "sha256": "0f6c0004310b4c95d4643b5bfb24b6d6a71ccb4d6c2e1779264992b75a9d9400"
+        },
+        "static-world-source.json": {
+          "bytes": 7556,
+          "sha256": "2c632e2088fa4cf7e6c06dd00ab095022d09706c0555ef6d0616dcbe806d1c1e"
+        },
+        "static-zone-cutover.json": {
+          "bytes": 2364,
+          "sha256": "64ecfec0d1aa99a4d027ef1af9505542222bcfc527f63e77d330d741d9baaca4"
+        },
+        "capture-manifest.json": {
+          "bytes": 10664,
+          "sha256": "6b32e35e679bd1c044eb1a3f68dc6548c22dacb2ae23f728200cbf04a6ba2576"
+        }
+      },
+      "treeBaseDistanceM": 18.70125587325583,
+      "gpuMedianPercentChanges": {
+        "candidateVsBefore": -0.2905251319858748,
+        "candidateVsRestored": 0.05328986552146642,
+        "restoredVsBefore": -0.34363187654243843
+      },
+      "gpuMedianBudgetBands": {
+        "before": {
+          "within16_667Ms": true,
+          "within20Ms": true,
+          "within33_333Ms": true
+        },
+        "candidate": {
+          "within16_667Ms": true,
+          "within20Ms": true,
+          "within33_333Ms": true
+        },
+        "restored": {
+          "within16_667Ms": true,
+          "within20Ms": true,
+          "within33_333Ms": true
+        }
+      },
+      "cutovers": [
+        {
+          "sourceGeneration": 1,
+          "admittedGeneration": 2,
+          "movingFirstFrame": true,
+          "poseYawDeltaRadians": 0.025,
+          "selection": "explicit-triangle-omissions",
+          "omittedTriangleCount": 768,
+          "completeContributors": false,
+          "prepareMilliseconds": 605.061,
+          "cutoverMilliseconds": 65.6407,
+          "packMilliseconds": 34.5029,
+          "beginMilliseconds": 0.0452,
+          "maximumCpuCopyAdvanceMilliseconds": 5.8502,
+          "maximumAdvanceMilliseconds": 5.8529,
+          "uploadAdvanceCount": 29,
+          "uploadedBytes": 6372748,
+          "cpuCopyAdvanceCount": 67,
+          "cpuRegionScanAdvanceCount": 35,
+          "scannedCpuPayloadBytes": 9034497,
+          "asSubmissionCount": 3,
+          "asPollCount": 3,
+          "asPendingPollCount": 0,
+          "copiedCpuPayloadBytes": 13813498,
+          "cachedCpuSourcePayloadBytes": 46871933,
+          "preparationFrames": 102,
+          "oldOwnerAllocationBytes": 69787456,
+          "candidateOwnerAllocationBytes": 69730368,
+          "overlapOwnerAllocationBytes": 124471040,
+          "oldPrimitiveCount": 32,
+          "newPrimitiveCount": 32,
+          "sceneDeviceLocalOverlap": 405418720,
+          "sceneHostVisibleOverlap": 54651584,
+          "topLevelOwnersBefore": 1,
+          "topLevelOwnersOverlap": 2,
+          "topLevelOwnersAfter": 1,
+          "sceneDeviceLocalBefore": 372437216,
+          "sceneDeviceLocalAfter": 372380128,
+          "sceneHostVisibleBefore": 48278656,
+          "sceneHostVisibleAfter": 48269440
+        },
+        {
+          "sourceGeneration": 2,
+          "admittedGeneration": 3,
+          "movingFirstFrame": true,
+          "poseYawDeltaRadians": 0.025,
+          "selection": "complete-with-graveyard",
+          "omittedTriangleCount": 0,
+          "completeContributors": true,
+          "prepareMilliseconds": 392.253,
+          "cutoverMilliseconds": 56.0716,
+          "packMilliseconds": 3.4941,
+          "beginMilliseconds": 0.0228,
+          "maximumCpuCopyAdvanceMilliseconds": 1.245,
+          "maximumAdvanceMilliseconds": 1.2454,
+          "uploadAdvanceCount": 29,
+          "uploadedBytes": 6381964,
+          "cpuCopyAdvanceCount": 32,
+          "cpuRegionScanAdvanceCount": 0,
+          "scannedCpuPayloadBytes": 0,
+          "asSubmissionCount": 3,
+          "asPollCount": 3,
+          "asPendingPollCount": 0,
+          "copiedCpuPayloadBytes": 6914749,
+          "cachedCpuSourcePayloadBytes": 46871933,
+          "preparationFrames": 67,
+          "oldOwnerAllocationBytes": 69730368,
+          "candidateOwnerAllocationBytes": 69787456,
+          "overlapOwnerAllocationBytes": 124510080,
+          "oldPrimitiveCount": 32,
+          "newPrimitiveCount": 32,
+          "sceneDeviceLocalOverlap": 405418720,
+          "sceneHostVisibleOverlap": 54651584,
+          "topLevelOwnersBefore": 1,
+          "topLevelOwnersOverlap": 2,
+          "topLevelOwnersAfter": 1,
+          "sceneDeviceLocalBefore": 372380128,
+          "sceneDeviceLocalAfter": 372437216,
+          "sceneHostVisibleBefore": 48269440,
+          "sceneHostVisibleAfter": 48278656
+        }
+      ],
+      "imageDifferences": {
+        "candidateVsBefore": {
+          "bbox": [
+            359,
+            147,
+            507,
+            361
+          ],
+          "full": {
+            "pixels": 518400,
+            "changed": 247,
+            "over8": 123,
+            "over32": 9,
+            "meanAbsoluteRgb": 0.0037737911522633745
+          },
+          "upper300": {
+            "pixels": 288000,
+            "changed": 213,
+            "over8": 92,
+            "over32": 1,
+            "meanAbsoluteRgb": 0.004300925925925926
+          },
+          "groundAndHeldProps": {
+            "pixels": 230400,
+            "changed": 34,
+            "over8": 31,
+            "over32": 8,
+            "meanAbsoluteRgb": 0.0031148726851851854
+          }
+        },
+        "restoredVsBefore": {
+          "bbox": null,
+          "full": {
+            "pixels": 518400,
+            "changed": 0,
+            "over8": 0,
+            "over32": 0,
+            "meanAbsoluteRgb": 0.0
+          },
+          "upper300": {
+            "pixels": 288000,
+            "changed": 0,
+            "over8": 0,
+            "over32": 0,
+            "meanAbsoluteRgb": 0.0
+          },
+          "groundAndHeldProps": {
+            "pixels": 230400,
+            "changed": 0,
+            "over8": 0,
+            "over32": 0,
+            "meanAbsoluteRgb": 0.0
+          }
+        }
+      }
+    },
+    {
+      "label": "far-pipeline",
+      "executable": {
+        "exists": true,
+        "bytes": 14029824,
+        "sha256": "6c4b2cb1b2953a1815543cf519a2082f892c6eb9e4f41dc02f4b4a3ae5387e78"
+      },
+      "seconds": 23.797000000005937,
+      "camera": {
+        "x": -28.702318,
+        "z": -5.80325,
+        "yaw": 2.876,
+        "pitch": 0.14
+      },
+      "device": {
+        "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "vendorId": 4318,
+        "deviceId": 11672
+      },
+      "presentation": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "shaderPair": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a"
+        }
+      },
+      "phases": {
+        "before": {
+          "staticGeneration": 1,
+          "firstIdentity": {
+            "sceneEpoch": 2,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 25,
+            "recordSerial": 25,
+            "submissionSerial": 25,
+            "completionSerial": 25,
+            "simulationTick": 1436,
+            "frameSlot": 0
+          },
+          "lastIdentity": {
+            "sceneEpoch": 2,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 84,
+            "recordSerial": 84,
+            "submissionSerial": 84,
+            "completionSerial": 84,
+            "simulationTick": 1436,
+            "frameSlot": 0
+          },
+          "gpuMs": {
+            "count": 60,
+            "median": 4.1904959999999996,
+            "p95": 4.282272,
+            "minimum": 2.43328,
+            "maximum": 4.303008
+          },
+          "renderCallCpuMs": {
+            "count": 60,
+            "median": 1.8892,
+            "p95": 5.574,
+            "minimum": 1.5483,
+            "maximum": 5.6545
+          },
+          "wholeFrameCycleCpuMs": {
+            "count": 60,
+            "median": 1.88395,
+            "p95": 5.5633,
+            "minimum": 1.5427,
+            "maximum": 5.6456
+          },
+          "resources": {
+            "bufferCount": 51,
+            "memoryAllocationCount": 60,
+            "bottomLevelAccelerationStructureCount": 20,
+            "topLevelAccelerationStructureCount": 1,
+            "tlasInstanceCount": 28,
+            "pipelineCount": 2,
+            "shaderBindingTableCount": 2,
+            "descriptorSetCount": 1,
+            "hostVisibleBytes": 48278656,
+            "deviceLocalBytes": 372437216
+          }
+        },
+        "candidate": {
+          "staticGeneration": 2,
+          "firstIdentity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 266,
+            "recordSerial": 266,
+            "submissionSerial": 266,
+            "completionSerial": 266,
+            "simulationTick": 1438,
+            "frameSlot": 0
+          },
+          "lastIdentity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 325,
+            "recordSerial": 325,
+            "submissionSerial": 325,
+            "completionSerial": 325,
+            "simulationTick": 1438,
+            "frameSlot": 0
+          },
+          "gpuMs": {
+            "count": 60,
+            "median": 2.6946399999999997,
+            "p95": 3.043904,
+            "minimum": 2.444416,
+            "maximum": 3.095104
+          },
+          "renderCallCpuMs": {
+            "count": 60,
+            "median": 5.5435,
+            "p95": 5.5678,
+            "minimum": 1.6307,
+            "maximum": 5.5784
+          },
+          "wholeFrameCycleCpuMs": {
+            "count": 60,
+            "median": 5.53335,
+            "p95": 5.5558,
+            "minimum": 1.6253,
+            "maximum": 5.5688
+          },
+          "resources": {
+            "bufferCount": 51,
+            "memoryAllocationCount": 60,
+            "bottomLevelAccelerationStructureCount": 20,
+            "topLevelAccelerationStructureCount": 1,
+            "tlasInstanceCount": 28,
+            "pipelineCount": 2,
+            "shaderBindingTableCount": 2,
+            "descriptorSetCount": 1,
+            "hostVisibleBytes": 48269440,
+            "deviceLocalBytes": 372380128
+          }
+        },
+        "restored": {
+          "staticGeneration": 3,
+          "firstIdentity": {
+            "sceneEpoch": 4,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 437,
+            "recordSerial": 437,
+            "submissionSerial": 437,
+            "completionSerial": 437,
+            "simulationTick": 1440,
+            "frameSlot": 0
+          },
+          "lastIdentity": {
+            "sceneEpoch": 4,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 496,
+            "recordSerial": 496,
+            "submissionSerial": 496,
+            "completionSerial": 496,
+            "simulationTick": 1440,
+            "frameSlot": 0
+          },
+          "gpuMs": {
+            "count": 60,
+            "median": 2.450288,
+            "p95": 2.470976,
+            "minimum": 2.43568,
+            "maximum": 2.598848
+          },
+          "renderCallCpuMs": {
+            "count": 60,
+            "median": 5.5309,
+            "p95": 5.5813,
+            "minimum": 3.3887,
+            "maximum": 5.6386
+          },
+          "wholeFrameCycleCpuMs": {
+            "count": 60,
+            "median": 5.52145,
+            "p95": 5.5679,
+            "minimum": 3.3811,
+            "maximum": 5.6238
+          },
+          "resources": {
+            "bufferCount": 51,
+            "memoryAllocationCount": 60,
+            "bottomLevelAccelerationStructureCount": 20,
+            "topLevelAccelerationStructureCount": 1,
+            "tlasInstanceCount": 28,
+            "pipelineCount": 2,
+            "shaderBindingTableCount": 2,
+            "descriptorSetCount": 1,
+            "hostVisibleBytes": 48278656,
+            "deviceLocalBytes": 372437216
+          }
+        }
+      },
+      "rawArtifacts": {
+        "static-timing-before.json": {
+          "bytes": 204338,
+          "sha256": "adbf482f9c12c9eb046f58c094171a267290106574301a6d33f7e0f0bb37d3fe"
+        },
+        "static-timing-candidate.json": {
+          "bytes": 204829,
+          "sha256": "b814f889a8cd2110f06471dbc7d73423b1eaf48a6b0040f83ab85440ceb8b894"
+        },
+        "static-timing-restored.json": {
+          "bytes": 204824,
+          "sha256": "dcb2fc11957f0496574e3899bca9db2d0b322f845e1edccb3f69ce43ed54afa5"
+        },
+        "cutover-00-before.png": {
+          "bytes": 666662,
+          "sha256": "42159c1917d8b555238d2a524993b2ae5a059e39048e97ac8394fbe68b2c019a"
+        },
+        "cutover-01-selected.png": {
+          "bytes": 666756,
+          "sha256": "63f18c6c9c3f9034d32f9e8b6e58149bf9a76c932bea17cd9cef79ced3d56fe2"
+        },
+        "cutover-02-restored.png": {
+          "bytes": 666662,
+          "sha256": "42159c1917d8b555238d2a524993b2ae5a059e39048e97ac8394fbe68b2c019a"
+        },
+        "static-world-source.json": {
+          "bytes": 7556,
+          "sha256": "a4f1778982a7c5d1bfd7ef8a0a7018d15c9a239a817bf0b14c260ec451835e7b"
+        },
+        "static-zone-cutover.json": {
+          "bytes": 2365,
+          "sha256": "94041582c0878a83d424f5b13560eada334ca7184fcb6d47189e1860b2146f49"
+        },
+        "capture-manifest.json": {
+          "bytes": 10674,
+          "sha256": "0b8a312df2482c03bb8a5be98410a384e9c43ee5f0147ba90b1831d85a5da2ef"
+        }
+      },
+      "treeBaseDistanceM": 24.359291151087966,
+      "gpuMedianPercentChanges": {
+        "candidateVsBefore": -35.696394889769614,
+        "candidateVsRestored": 9.972378757109347,
+        "restoredVsBefore": -41.527494597298265
+      },
+      "gpuMedianBudgetBands": {
+        "before": {
+          "within16_667Ms": true,
+          "within20Ms": true,
+          "within33_333Ms": true
+        },
+        "candidate": {
+          "within16_667Ms": true,
+          "within20Ms": true,
+          "within33_333Ms": true
+        },
+        "restored": {
+          "within16_667Ms": true,
+          "within20Ms": true,
+          "within33_333Ms": true
+        }
+      },
+      "cutovers": [
+        {
+          "sourceGeneration": 1,
+          "admittedGeneration": 2,
+          "movingFirstFrame": true,
+          "poseYawDeltaRadians": 0.025,
+          "selection": "explicit-triangle-omissions",
+          "omittedTriangleCount": 768,
+          "completeContributors": false,
+          "prepareMilliseconds": 1116.53,
+          "cutoverMilliseconds": 54.1827,
+          "packMilliseconds": 34.2597,
+          "beginMilliseconds": 0.0549,
+          "maximumCpuCopyAdvanceMilliseconds": 5.4958,
+          "maximumAdvanceMilliseconds": 5.4969,
+          "uploadAdvanceCount": 29,
+          "uploadedBytes": 6372748,
+          "cpuCopyAdvanceCount": 67,
+          "cpuRegionScanAdvanceCount": 35,
+          "scannedCpuPayloadBytes": 9034497,
+          "asSubmissionCount": 3,
+          "asPollCount": 3,
+          "asPendingPollCount": 0,
+          "copiedCpuPayloadBytes": 13813498,
+          "cachedCpuSourcePayloadBytes": 46871933,
+          "preparationFrames": 102,
+          "oldOwnerAllocationBytes": 69787456,
+          "candidateOwnerAllocationBytes": 69730368,
+          "overlapOwnerAllocationBytes": 124471040,
+          "oldPrimitiveCount": 32,
+          "newPrimitiveCount": 32,
+          "sceneDeviceLocalOverlap": 405418720,
+          "sceneHostVisibleOverlap": 54651584,
+          "topLevelOwnersBefore": 1,
+          "topLevelOwnersOverlap": 2,
+          "topLevelOwnersAfter": 1,
+          "sceneDeviceLocalBefore": 372437216,
+          "sceneDeviceLocalAfter": 372380128,
+          "sceneHostVisibleBefore": 48278656,
+          "sceneHostVisibleAfter": 48269440
+        },
+        {
+          "sourceGeneration": 2,
+          "admittedGeneration": 3,
+          "movingFirstFrame": true,
+          "poseYawDeltaRadians": 0.025,
+          "selection": "complete-with-graveyard",
+          "omittedTriangleCount": 0,
+          "completeContributors": true,
+          "prepareMilliseconds": 392.869,
+          "cutoverMilliseconds": 57.6945,
+          "packMilliseconds": 3.8549,
+          "beginMilliseconds": 0.0283,
+          "maximumCpuCopyAdvanceMilliseconds": 1.6441,
+          "maximumAdvanceMilliseconds": 1.6454,
+          "uploadAdvanceCount": 29,
+          "uploadedBytes": 6381964,
+          "cpuCopyAdvanceCount": 32,
+          "cpuRegionScanAdvanceCount": 0,
+          "scannedCpuPayloadBytes": 0,
+          "asSubmissionCount": 3,
+          "asPollCount": 3,
+          "asPendingPollCount": 0,
+          "copiedCpuPayloadBytes": 6914749,
+          "cachedCpuSourcePayloadBytes": 46871933,
+          "preparationFrames": 67,
+          "oldOwnerAllocationBytes": 69730368,
+          "candidateOwnerAllocationBytes": 69787456,
+          "overlapOwnerAllocationBytes": 124510080,
+          "oldPrimitiveCount": 32,
+          "newPrimitiveCount": 32,
+          "sceneDeviceLocalOverlap": 405418720,
+          "sceneHostVisibleOverlap": 54651584,
+          "topLevelOwnersBefore": 1,
+          "topLevelOwnersOverlap": 2,
+          "topLevelOwnersAfter": 1,
+          "sceneDeviceLocalBefore": 372380128,
+          "sceneDeviceLocalAfter": 372437216,
+          "sceneHostVisibleBefore": 48269440,
+          "sceneHostVisibleAfter": 48278656
+        }
+      ],
+      "imageDifferences": {
+        "candidateVsBefore": {
+          "bbox": [
+            457,
+            188,
+            513,
+            338
+          ],
+          "full": {
+            "pixels": 518400,
+            "changed": 50,
+            "over8": 27,
+            "over32": 7,
+            "meanAbsoluteRgb": 0.00113940329218107
+          },
+          "upper300": {
+            "pixels": 288000,
+            "changed": 49,
+            "over8": 26,
+            "over32": 7,
+            "meanAbsoluteRgb": 0.001962962962962963
+          },
+          "groundAndHeldProps": {
+            "pixels": 230400,
+            "changed": 1,
+            "over8": 1,
+            "over32": 0,
+            "meanAbsoluteRgb": 0.0001099537037037037
+          }
+        },
+        "restoredVsBefore": {
+          "bbox": null,
+          "full": {
+            "pixels": 518400,
+            "changed": 0,
+            "over8": 0,
+            "over32": 0,
+            "meanAbsoluteRgb": 0.0
+          },
+          "upper300": {
+            "pixels": 288000,
+            "changed": 0,
+            "over8": 0,
+            "over32": 0,
+            "meanAbsoluteRgb": 0.0
+          },
+          "groundAndHeldProps": {
+            "pixels": 230400,
+            "changed": 0,
+            "over8": 0,
+            "over32": 0,
+            "meanAbsoluteRgb": 0.0
+          }
+        }
+      }
+    },
+    {
+      "label": "near-query",
+      "executable": {
+        "exists": true,
+        "bytes": 14029824,
+        "sha256": "6c4b2cb1b2953a1815543cf519a2082f892c6eb9e4f41dc02f4b4a3ae5387e78"
+      },
+      "seconds": 55.10899999999674,
+      "camera": {
+        "x": -17.700905,
+        "z": 15.206802,
+        "yaw": -2.068,
+        "pitch": 0.28
+      },
+      "device": {
+        "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "vendorId": 4318,
+        "deviceId": 11672
+      },
+      "presentation": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "shaderPair": {
+        "opaqueFast": {
+          "key": "rayquery_compute_diagnostic_high_opaque_fast",
+          "sha256": "98cec0ff16f511aac0d3a41c2a91542d2a18ebfc431ec3edd75d9abc5b10761b"
+        },
+        "genericDielectric": {
+          "key": "rayquery_compute_diagnostic_high_generic_dielectric",
+          "sha256": "359469cc391aa787011c9d3c9ba4c84d99779cbb9a0fbe7ce5723f1783b6ab5f"
+        }
+      },
+      "phases": {
+        "before": {
+          "staticGeneration": 1,
+          "firstIdentity": {
+            "sceneEpoch": 2,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 25,
+            "recordSerial": 25,
+            "submissionSerial": 25,
+            "completionSerial": 25,
+            "simulationTick": 2018,
+            "frameSlot": 0
+          },
+          "lastIdentity": {
+            "sceneEpoch": 2,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 84,
+            "recordSerial": 84,
+            "submissionSerial": 84,
+            "completionSerial": 84,
+            "simulationTick": 2018,
+            "frameSlot": 0
+          },
+          "gpuMs": {
+            "count": 60,
+            "median": 1.946464,
+            "p95": 2.538304,
+            "minimum": 1.93392,
+            "maximum": 2.554176
+          },
+          "renderCallCpuMs": {
+            "count": 60,
+            "median": 5.5275,
+            "p95": 5.5871,
+            "minimum": 5.3484,
+            "maximum": 5.6973
+          },
+          "wholeFrameCycleCpuMs": {
+            "count": 60,
+            "median": 5.51865,
+            "p95": 5.5755,
+            "minimum": 5.3387,
+            "maximum": 5.6821
+          },
+          "resources": {
+            "bufferCount": 49,
+            "memoryAllocationCount": 58,
+            "bottomLevelAccelerationStructureCount": 20,
+            "topLevelAccelerationStructureCount": 1,
+            "tlasInstanceCount": 28,
+            "pipelineCount": 2,
+            "shaderBindingTableCount": 0,
+            "descriptorSetCount": 1,
+            "hostVisibleBytes": 48278144,
+            "deviceLocalBytes": 372437216
+          }
+        },
+        "candidate": {
+          "staticGeneration": 2,
+          "firstIdentity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 266,
+            "recordSerial": 266,
+            "submissionSerial": 266,
+            "completionSerial": 266,
+            "simulationTick": 2020,
+            "frameSlot": 0
+          },
+          "lastIdentity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 325,
+            "recordSerial": 325,
+            "submissionSerial": 325,
+            "completionSerial": 325,
+            "simulationTick": 2020,
+            "frameSlot": 0
+          },
+          "gpuMs": {
+            "count": 60,
+            "median": 1.946272,
+            "p95": 1.952992,
+            "minimum": 1.93616,
+            "maximum": 1.954912
+          },
+          "renderCallCpuMs": {
+            "count": 60,
+            "median": 5.5493500000000004,
+            "p95": 5.59,
+            "minimum": 5.244,
+            "maximum": 5.8763
+          },
+          "wholeFrameCycleCpuMs": {
+            "count": 60,
+            "median": 5.54175,
+            "p95": 5.5806,
+            "minimum": 5.2366,
+            "maximum": 5.8689
+          },
+          "resources": {
+            "bufferCount": 49,
+            "memoryAllocationCount": 58,
+            "bottomLevelAccelerationStructureCount": 20,
+            "topLevelAccelerationStructureCount": 1,
+            "tlasInstanceCount": 28,
+            "pipelineCount": 2,
+            "shaderBindingTableCount": 0,
+            "descriptorSetCount": 1,
+            "hostVisibleBytes": 48268928,
+            "deviceLocalBytes": 372380128
+          }
+        },
+        "restored": {
+          "staticGeneration": 3,
+          "firstIdentity": {
+            "sceneEpoch": 4,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 437,
+            "recordSerial": 437,
+            "submissionSerial": 437,
+            "completionSerial": 437,
+            "simulationTick": 2022,
+            "frameSlot": 0
+          },
+          "lastIdentity": {
+            "sceneEpoch": 4,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 496,
+            "recordSerial": 496,
+            "submissionSerial": 496,
+            "completionSerial": 496,
+            "simulationTick": 2022,
+            "frameSlot": 0
+          },
+          "gpuMs": {
+            "count": 60,
+            "median": 1.948912,
+            "p95": 1.957088,
+            "minimum": 1.940576,
+            "maximum": 1.959104
+          },
+          "renderCallCpuMs": {
+            "count": 60,
+            "median": 5.5492,
+            "p95": 5.6055,
+            "minimum": 4.8946,
+            "maximum": 5.6806
+          },
+          "wholeFrameCycleCpuMs": {
+            "count": 60,
+            "median": 5.53775,
+            "p95": 5.5911,
+            "minimum": 4.883,
+            "maximum": 5.6717
+          },
+          "resources": {
+            "bufferCount": 49,
+            "memoryAllocationCount": 58,
+            "bottomLevelAccelerationStructureCount": 20,
+            "topLevelAccelerationStructureCount": 1,
+            "tlasInstanceCount": 28,
+            "pipelineCount": 2,
+            "shaderBindingTableCount": 0,
+            "descriptorSetCount": 1,
+            "hostVisibleBytes": 48278144,
+            "deviceLocalBytes": 372437216
+          }
+        }
+      },
+      "rawArtifacts": {
+        "static-timing-before.json": {
+          "bytes": 208365,
+          "sha256": "24be0d57a950ba58098d4734de02b434366af24a9d036ef6bc1383355d04e9c6"
+        },
+        "static-timing-candidate.json": {
+          "bytes": 208840,
+          "sha256": "28a570daf9762bb6fc95d001735609dd5403e2f8649fcce1cb0d08111d7137db"
+        },
+        "static-timing-restored.json": {
+          "bytes": 208845,
+          "sha256": "fa2f1d52a687ec721cbccbf47617a413dca3cefd85cf626914fdf7e72519d37b"
+        },
+        "cutover-00-before.png": {
+          "bytes": 522536,
+          "sha256": "8baba2ec83716254e486d5d3c385872d15810770fda48c5578115cd1dcd559c1"
+        },
+        "cutover-01-selected.png": {
+          "bytes": 523129,
+          "sha256": "1f88690f8ed78f74d793e00f3498385194e09e94e1cefd9bda6cdb1ba18bc89b"
+        },
+        "cutover-02-restored.png": {
+          "bytes": 522536,
+          "sha256": "8baba2ec83716254e486d5d3c385872d15810770fda48c5578115cd1dcd559c1"
+        },
+        "static-world-source.json": {
+          "bytes": 7557,
+          "sha256": "2a8b513ecf93a0bb3a6b41e9d376024f7f5394671b9e07206bef51661ad17403"
+        },
+        "static-zone-cutover.json": {
+          "bytes": 2365,
+          "sha256": "ffaea82f8c1e6055a90727f16d9d2729143b6fc54591cb380b1483fee3cbe688"
+        },
+        "capture-manifest.json": {
+          "bytes": 10774,
+          "sha256": "6bf61a90013473b24443f1ba4314f75f6ab0b0702ecbee0d86bcb01aa9f60bc2"
+        }
+      },
+      "treeBaseDistanceM": 5.229323838100146,
+      "gpuMedianPercentChanges": {
+        "candidateVsBefore": -0.009864040639850913,
+        "candidateVsRestored": -0.13546019522687747,
+        "restoredVsBefore": 0.12576651815805473
+      },
+      "gpuMedianBudgetBands": {
+        "before": {
+          "within16_667Ms": true,
+          "within20Ms": true,
+          "within33_333Ms": true
+        },
+        "candidate": {
+          "within16_667Ms": true,
+          "within20Ms": true,
+          "within33_333Ms": true
+        },
+        "restored": {
+          "within16_667Ms": true,
+          "within20Ms": true,
+          "within33_333Ms": true
+        }
+      },
+      "cutovers": [
+        {
+          "sourceGeneration": 1,
+          "admittedGeneration": 2,
+          "movingFirstFrame": true,
+          "poseYawDeltaRadians": 0.025,
+          "selection": "explicit-triangle-omissions",
+          "omittedTriangleCount": 768,
+          "completeContributors": false,
+          "prepareMilliseconds": 605.982,
+          "cutoverMilliseconds": 53.6686,
+          "packMilliseconds": 32.9862,
+          "beginMilliseconds": 0.0484,
+          "maximumCpuCopyAdvanceMilliseconds": 4.7886,
+          "maximumAdvanceMilliseconds": 4.7898,
+          "uploadAdvanceCount": 29,
+          "uploadedBytes": 6372748,
+          "cpuCopyAdvanceCount": 67,
+          "cpuRegionScanAdvanceCount": 35,
+          "scannedCpuPayloadBytes": 9034497,
+          "asSubmissionCount": 3,
+          "asPollCount": 3,
+          "asPendingPollCount": 0,
+          "copiedCpuPayloadBytes": 13813498,
+          "cachedCpuSourcePayloadBytes": 46871933,
+          "preparationFrames": 102,
+          "oldOwnerAllocationBytes": 69787456,
+          "candidateOwnerAllocationBytes": 69730368,
+          "overlapOwnerAllocationBytes": 124471040,
+          "oldPrimitiveCount": 32,
+          "newPrimitiveCount": 32,
+          "sceneDeviceLocalOverlap": 405418720,
+          "sceneHostVisibleOverlap": 54651072,
+          "topLevelOwnersBefore": 1,
+          "topLevelOwnersOverlap": 2,
+          "topLevelOwnersAfter": 1,
+          "sceneDeviceLocalBefore": 372437216,
+          "sceneDeviceLocalAfter": 372380128,
+          "sceneHostVisibleBefore": 48278144,
+          "sceneHostVisibleAfter": 48268928
+        },
+        {
+          "sourceGeneration": 2,
+          "admittedGeneration": 3,
+          "movingFirstFrame": true,
+          "poseYawDeltaRadians": 0.025,
+          "selection": "complete-with-graveyard",
+          "omittedTriangleCount": 0,
+          "completeContributors": true,
+          "prepareMilliseconds": 393.168,
+          "cutoverMilliseconds": 57.0895,
+          "packMilliseconds": 3.5687,
+          "beginMilliseconds": 0.0294,
+          "maximumCpuCopyAdvanceMilliseconds": 1.4224,
+          "maximumAdvanceMilliseconds": 1.4232,
+          "uploadAdvanceCount": 29,
+          "uploadedBytes": 6381964,
+          "cpuCopyAdvanceCount": 32,
+          "cpuRegionScanAdvanceCount": 0,
+          "scannedCpuPayloadBytes": 0,
+          "asSubmissionCount": 3,
+          "asPollCount": 3,
+          "asPendingPollCount": 0,
+          "copiedCpuPayloadBytes": 6914749,
+          "cachedCpuSourcePayloadBytes": 46871933,
+          "preparationFrames": 67,
+          "oldOwnerAllocationBytes": 69730368,
+          "candidateOwnerAllocationBytes": 69787456,
+          "overlapOwnerAllocationBytes": 124510080,
+          "oldPrimitiveCount": 32,
+          "newPrimitiveCount": 32,
+          "sceneDeviceLocalOverlap": 405418720,
+          "sceneHostVisibleOverlap": 54651072,
+          "topLevelOwnersBefore": 1,
+          "topLevelOwnersOverlap": 2,
+          "topLevelOwnersAfter": 1,
+          "sceneDeviceLocalBefore": 372380128,
+          "sceneDeviceLocalAfter": 372437216,
+          "sceneHostVisibleBefore": 48268928,
+          "sceneHostVisibleAfter": 48278144
+        }
+      ],
+      "imageDifferences": {
+        "candidateVsBefore": {
+          "bbox": [
+            185,
+            2,
+            552,
+            417
+          ],
+          "full": {
+            "pixels": 518400,
+            "changed": 887,
+            "over8": 527,
+            "over32": 73,
+            "meanAbsoluteRgb": 0.023056198559670782
+          },
+          "upper300": {
+            "pixels": 288000,
+            "changed": 350,
+            "over8": 4,
+            "over32": 0,
+            "meanAbsoluteRgb": 0.002935185185185185
+          },
+          "groundAndHeldProps": {
+            "pixels": 230400,
+            "changed": 537,
+            "over8": 523,
+            "over32": 73,
+            "meanAbsoluteRgb": 0.04820746527777778
+          }
+        },
+        "restoredVsBefore": {
+          "bbox": null,
+          "full": {
+            "pixels": 518400,
+            "changed": 0,
+            "over8": 0,
+            "over32": 0,
+            "meanAbsoluteRgb": 0.0
+          },
+          "upper300": {
+            "pixels": 288000,
+            "changed": 0,
+            "over8": 0,
+            "over32": 0,
+            "meanAbsoluteRgb": 0.0
+          },
+          "groundAndHeldProps": {
+            "pixels": 230400,
+            "changed": 0,
+            "over8": 0,
+            "over32": 0,
+            "meanAbsoluteRgb": 0.0
+          }
+        }
+      }
+    },
+    {
+      "label": "mid-query",
+      "executable": {
+        "exists": true,
+        "bytes": 14029824,
+        "sha256": "6c4b2cb1b2953a1815543cf519a2082f892c6eb9e4f41dc02f4b4a3ae5387e78"
+      },
+      "seconds": 22.312999999994645,
+      "camera": {
+        "x": -15.694263,
+        "z": 0.202648,
+        "yaw": -2.781,
+        "pitch": 0.18
+      },
+      "device": {
+        "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "vendorId": 4318,
+        "deviceId": 11672
+      },
+      "presentation": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "shaderPair": {
+        "opaqueFast": {
+          "key": "rayquery_compute_diagnostic_high_opaque_fast",
+          "sha256": "98cec0ff16f511aac0d3a41c2a91542d2a18ebfc431ec3edd75d9abc5b10761b"
+        },
+        "genericDielectric": {
+          "key": "rayquery_compute_diagnostic_high_generic_dielectric",
+          "sha256": "359469cc391aa787011c9d3c9ba4c84d99779cbb9a0fbe7ce5723f1783b6ab5f"
+        }
+      },
+      "phases": {
+        "before": {
+          "staticGeneration": 1,
+          "firstIdentity": {
+            "sceneEpoch": 2,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 25,
+            "recordSerial": 25,
+            "submissionSerial": 25,
+            "completionSerial": 25,
+            "simulationTick": 1720,
+            "frameSlot": 0
+          },
+          "lastIdentity": {
+            "sceneEpoch": 2,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 84,
+            "recordSerial": 84,
+            "submissionSerial": 84,
+            "completionSerial": 84,
+            "simulationTick": 1720,
+            "frameSlot": 0
+          },
+          "gpuMs": {
+            "count": 60,
+            "median": 2.604704,
+            "p95": 3.847712,
+            "minimum": 2.515936,
+            "maximum": 3.8576
+          },
+          "renderCallCpuMs": {
+            "count": 60,
+            "median": 2.3326000000000002,
+            "p95": 5.5736,
+            "minimum": 1.4593,
+            "maximum": 5.6367
+          },
+          "wholeFrameCycleCpuMs": {
+            "count": 60,
+            "median": 2.3263499999999997,
+            "p95": 5.5673,
+            "minimum": 1.4554,
+            "maximum": 5.6279
+          },
+          "resources": {
+            "bufferCount": 49,
+            "memoryAllocationCount": 58,
+            "bottomLevelAccelerationStructureCount": 20,
+            "topLevelAccelerationStructureCount": 1,
+            "tlasInstanceCount": 28,
+            "pipelineCount": 2,
+            "shaderBindingTableCount": 0,
+            "descriptorSetCount": 1,
+            "hostVisibleBytes": 48278144,
+            "deviceLocalBytes": 372437216
+          }
+        },
+        "candidate": {
+          "staticGeneration": 2,
+          "firstIdentity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 266,
+            "recordSerial": 266,
+            "submissionSerial": 266,
+            "completionSerial": 266,
+            "simulationTick": 1722,
+            "frameSlot": 0
+          },
+          "lastIdentity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 325,
+            "recordSerial": 325,
+            "submissionSerial": 325,
+            "completionSerial": 325,
+            "simulationTick": 1722,
+            "frameSlot": 0
+          },
+          "gpuMs": {
+            "count": 60,
+            "median": 2.8424,
+            "p95": 2.88352,
+            "minimum": 2.605184,
+            "maximum": 2.898496
+          },
+          "renderCallCpuMs": {
+            "count": 60,
+            "median": 5.53645,
+            "p95": 5.6257,
+            "minimum": 3.0274,
+            "maximum": 5.7223
+          },
+          "wholeFrameCycleCpuMs": {
+            "count": 60,
+            "median": 5.52815,
+            "p95": 5.6155,
+            "minimum": 3.0207,
+            "maximum": 5.7126
+          },
+          "resources": {
+            "bufferCount": 49,
+            "memoryAllocationCount": 58,
+            "bottomLevelAccelerationStructureCount": 20,
+            "topLevelAccelerationStructureCount": 1,
+            "tlasInstanceCount": 28,
+            "pipelineCount": 2,
+            "shaderBindingTableCount": 0,
+            "descriptorSetCount": 1,
+            "hostVisibleBytes": 48268928,
+            "deviceLocalBytes": 372380128
+          }
+        },
+        "restored": {
+          "staticGeneration": 3,
+          "firstIdentity": {
+            "sceneEpoch": 4,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 437,
+            "recordSerial": 437,
+            "submissionSerial": 437,
+            "completionSerial": 437,
+            "simulationTick": 1724,
+            "frameSlot": 0
+          },
+          "lastIdentity": {
+            "sceneEpoch": 4,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 496,
+            "recordSerial": 496,
+            "submissionSerial": 496,
+            "completionSerial": 496,
+            "simulationTick": 1724,
+            "frameSlot": 0
+          },
+          "gpuMs": {
+            "count": 60,
+            "median": 2.7653119999999998,
+            "p95": 2.77952,
+            "minimum": 2.515808,
+            "maximum": 2.993184
+          },
+          "renderCallCpuMs": {
+            "count": 60,
+            "median": 5.537100000000001,
+            "p95": 5.5757,
+            "minimum": 3.0241,
+            "maximum": 5.8611
+          },
+          "wholeFrameCycleCpuMs": {
+            "count": 60,
+            "median": 5.52885,
+            "p95": 5.5675,
+            "minimum": 3.0154,
+            "maximum": 5.8519
+          },
+          "resources": {
+            "bufferCount": 49,
+            "memoryAllocationCount": 58,
+            "bottomLevelAccelerationStructureCount": 20,
+            "topLevelAccelerationStructureCount": 1,
+            "tlasInstanceCount": 28,
+            "pipelineCount": 2,
+            "shaderBindingTableCount": 0,
+            "descriptorSetCount": 1,
+            "hostVisibleBytes": 48278144,
+            "deviceLocalBytes": 372437216
+          }
+        }
+      },
+      "rawArtifacts": {
+        "static-timing-before.json": {
+          "bytes": 208247,
+          "sha256": "0fd7eb74bd6c2e8b5a42aff5877ba2ddd425658445cb2c2e4ae953867a9698bb"
+        },
+        "static-timing-candidate.json": {
+          "bytes": 208729,
+          "sha256": "3e787fc41121dd1de42c57361cf9ff5daf8255c6a1656848dabace26b8d7bcd8"
+        },
+        "static-timing-restored.json": {
+          "bytes": 208730,
+          "sha256": "18eceafbe7768f0e9345f8d165abc67b009cf9987392a0eb66504f77ba8a9fdb"
+        },
+        "cutover-00-before.png": {
+          "bytes": 662385,
+          "sha256": "9093e82888d54172aef5c99a10c31d974df3f51e5f0344150c85df0eb70290b7"
+        },
+        "cutover-01-selected.png": {
+          "bytes": 662078,
+          "sha256": "b4db3b27bc46892101071fef818ba4b4823054c8d80b00241015fec3737e953f"
+        },
+        "cutover-02-restored.png": {
+          "bytes": 662385,
+          "sha256": "9093e82888d54172aef5c99a10c31d974df3f51e5f0344150c85df0eb70290b7"
+        },
+        "static-world-source.json": {
+          "bytes": 7556,
+          "sha256": "2c632e2088fa4cf7e6c06dd00ab095022d09706c0555ef6d0616dcbe806d1c1e"
+        },
+        "static-zone-cutover.json": {
+          "bytes": 2364,
+          "sha256": "33998e85872558c3d233f9d9191d00215d81a13c0db05d4e6bcc6a9c7d200413"
+        },
+        "capture-manifest.json": {
+          "bytes": 10758,
+          "sha256": "5776852e0cc04c393d0f4e8126388f7426ca66ca7b52642ae8473e7167016116"
+        }
+      },
+      "treeBaseDistanceM": 18.70125587325583,
+      "gpuMedianPercentChanges": {
+        "candidateVsBefore": 9.125643451232857,
+        "candidateVsRestored": 2.787678207739308,
+        "restoredVsBefore": 6.166074916765973
+      },
+      "gpuMedianBudgetBands": {
+        "before": {
+          "within16_667Ms": true,
+          "within20Ms": true,
+          "within33_333Ms": true
+        },
+        "candidate": {
+          "within16_667Ms": true,
+          "within20Ms": true,
+          "within33_333Ms": true
+        },
+        "restored": {
+          "within16_667Ms": true,
+          "within20Ms": true,
+          "within33_333Ms": true
+        }
+      },
+      "cutovers": [
+        {
+          "sourceGeneration": 1,
+          "admittedGeneration": 2,
+          "movingFirstFrame": true,
+          "poseYawDeltaRadians": 0.025,
+          "selection": "explicit-triangle-omissions",
+          "omittedTriangleCount": 768,
+          "completeContributors": false,
+          "prepareMilliseconds": 1106.7,
+          "cutoverMilliseconds": 62.1345,
+          "packMilliseconds": 34.9479,
+          "beginMilliseconds": 0.0478,
+          "maximumCpuCopyAdvanceMilliseconds": 5.5306,
+          "maximumAdvanceMilliseconds": 5.5317,
+          "uploadAdvanceCount": 29,
+          "uploadedBytes": 6372748,
+          "cpuCopyAdvanceCount": 67,
+          "cpuRegionScanAdvanceCount": 35,
+          "scannedCpuPayloadBytes": 9034497,
+          "asSubmissionCount": 3,
+          "asPollCount": 3,
+          "asPendingPollCount": 0,
+          "copiedCpuPayloadBytes": 13813498,
+          "cachedCpuSourcePayloadBytes": 46871933,
+          "preparationFrames": 102,
+          "oldOwnerAllocationBytes": 69787456,
+          "candidateOwnerAllocationBytes": 69730368,
+          "overlapOwnerAllocationBytes": 124471040,
+          "oldPrimitiveCount": 32,
+          "newPrimitiveCount": 32,
+          "sceneDeviceLocalOverlap": 405418720,
+          "sceneHostVisibleOverlap": 54651072,
+          "topLevelOwnersBefore": 1,
+          "topLevelOwnersOverlap": 2,
+          "topLevelOwnersAfter": 1,
+          "sceneDeviceLocalBefore": 372437216,
+          "sceneDeviceLocalAfter": 372380128,
+          "sceneHostVisibleBefore": 48278144,
+          "sceneHostVisibleAfter": 48268928
+        },
+        {
+          "sourceGeneration": 2,
+          "admittedGeneration": 3,
+          "movingFirstFrame": true,
+          "poseYawDeltaRadians": 0.025,
+          "selection": "complete-with-graveyard",
+          "omittedTriangleCount": 0,
+          "completeContributors": true,
+          "prepareMilliseconds": 392.805,
+          "cutoverMilliseconds": 53.8945,
+          "packMilliseconds": 3.2012,
+          "beginMilliseconds": 0.0234,
+          "maximumCpuCopyAdvanceMilliseconds": 1.2142,
+          "maximumAdvanceMilliseconds": 1.2158,
+          "uploadAdvanceCount": 29,
+          "uploadedBytes": 6381964,
+          "cpuCopyAdvanceCount": 32,
+          "cpuRegionScanAdvanceCount": 0,
+          "scannedCpuPayloadBytes": 0,
+          "asSubmissionCount": 3,
+          "asPollCount": 3,
+          "asPendingPollCount": 0,
+          "copiedCpuPayloadBytes": 6914749,
+          "cachedCpuSourcePayloadBytes": 46871933,
+          "preparationFrames": 67,
+          "oldOwnerAllocationBytes": 69730368,
+          "candidateOwnerAllocationBytes": 69787456,
+          "overlapOwnerAllocationBytes": 124510080,
+          "oldPrimitiveCount": 32,
+          "newPrimitiveCount": 32,
+          "sceneDeviceLocalOverlap": 405418720,
+          "sceneHostVisibleOverlap": 54651072,
+          "topLevelOwnersBefore": 1,
+          "topLevelOwnersOverlap": 2,
+          "topLevelOwnersAfter": 1,
+          "sceneDeviceLocalBefore": 372380128,
+          "sceneDeviceLocalAfter": 372437216,
+          "sceneHostVisibleBefore": 48268928,
+          "sceneHostVisibleAfter": 48278144
+        }
+      ],
+      "imageDifferences": {
+        "candidateVsBefore": {
+          "bbox": [
+            359,
+            147,
+            507,
+            361
+          ],
+          "full": {
+            "pixels": 518400,
+            "changed": 247,
+            "over8": 123,
+            "over32": 9,
+            "meanAbsoluteRgb": 0.0037731481481481483
+          },
+          "upper300": {
+            "pixels": 288000,
+            "changed": 213,
+            "over8": 92,
+            "over32": 1,
+            "meanAbsoluteRgb": 0.004300925925925926
+          },
+          "groundAndHeldProps": {
+            "pixels": 230400,
+            "changed": 34,
+            "over8": 31,
+            "over32": 8,
+            "meanAbsoluteRgb": 0.0031134259259259257
+          }
+        },
+        "restoredVsBefore": {
+          "bbox": null,
+          "full": {
+            "pixels": 518400,
+            "changed": 0,
+            "over8": 0,
+            "over32": 0,
+            "meanAbsoluteRgb": 0.0
+          },
+          "upper300": {
+            "pixels": 288000,
+            "changed": 0,
+            "over8": 0,
+            "over32": 0,
+            "meanAbsoluteRgb": 0.0
+          },
+          "groundAndHeldProps": {
+            "pixels": 230400,
+            "changed": 0,
+            "over8": 0,
+            "over32": 0,
+            "meanAbsoluteRgb": 0.0
+          }
+        }
+      }
+    },
+    {
+      "label": "far-query",
+      "executable": {
+        "exists": true,
+        "bytes": 14029824,
+        "sha256": "6c4b2cb1b2953a1815543cf519a2082f892c6eb9e4f41dc02f4b4a3ae5387e78"
+      },
+      "seconds": 21.531000000002678,
+      "camera": {
+        "x": -28.702318,
+        "z": -5.80325,
+        "yaw": 2.876,
+        "pitch": 0.14
+      },
+      "device": {
+        "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "vendorId": 4318,
+        "deviceId": 11672
+      },
+      "presentation": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "shaderPair": {
+        "opaqueFast": {
+          "key": "rayquery_compute_diagnostic_high_opaque_fast",
+          "sha256": "98cec0ff16f511aac0d3a41c2a91542d2a18ebfc431ec3edd75d9abc5b10761b"
+        },
+        "genericDielectric": {
+          "key": "rayquery_compute_diagnostic_high_generic_dielectric",
+          "sha256": "359469cc391aa787011c9d3c9ba4c84d99779cbb9a0fbe7ce5723f1783b6ab5f"
+        }
+      },
+      "phases": {
+        "before": {
+          "staticGeneration": 1,
+          "firstIdentity": {
+            "sceneEpoch": 2,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 25,
+            "recordSerial": 25,
+            "submissionSerial": 25,
+            "completionSerial": 25,
+            "simulationTick": 1436,
+            "frameSlot": 0
+          },
+          "lastIdentity": {
+            "sceneEpoch": 2,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 84,
+            "recordSerial": 84,
+            "submissionSerial": 84,
+            "completionSerial": 84,
+            "simulationTick": 1436,
+            "frameSlot": 0
+          },
+          "gpuMs": {
+            "count": 60,
+            "median": 2.3876,
+            "p95": 4.024992,
+            "minimum": 2.373856,
+            "maximum": 4.04512
+          },
+          "renderCallCpuMs": {
+            "count": 60,
+            "median": 5.28245,
+            "p95": 5.5772,
+            "minimum": 1.4616,
+            "maximum": 5.6601
+          },
+          "wholeFrameCycleCpuMs": {
+            "count": 60,
+            "median": 5.2726500000000005,
+            "p95": 5.5689,
+            "minimum": 1.4575,
+            "maximum": 5.6419
+          },
+          "resources": {
+            "bufferCount": 49,
+            "memoryAllocationCount": 58,
+            "bottomLevelAccelerationStructureCount": 20,
+            "topLevelAccelerationStructureCount": 1,
+            "tlasInstanceCount": 28,
+            "pipelineCount": 2,
+            "shaderBindingTableCount": 0,
+            "descriptorSetCount": 1,
+            "hostVisibleBytes": 48278144,
+            "deviceLocalBytes": 372437216
+          }
+        },
+        "candidate": {
+          "staticGeneration": 2,
+          "firstIdentity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 266,
+            "recordSerial": 266,
+            "submissionSerial": 266,
+            "completionSerial": 266,
+            "simulationTick": 1438,
+            "frameSlot": 0
+          },
+          "lastIdentity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 325,
+            "recordSerial": 325,
+            "submissionSerial": 325,
+            "completionSerial": 325,
+            "simulationTick": 1438,
+            "frameSlot": 0
+          },
+          "gpuMs": {
+            "count": 60,
+            "median": 2.489968,
+            "p95": 2.498048,
+            "minimum": 2.479456,
+            "maximum": 2.49984
+          },
+          "renderCallCpuMs": {
+            "count": 60,
+            "median": 5.5515,
+            "p95": 5.6025,
+            "minimum": 5.2243,
+            "maximum": 5.7473
+          },
+          "wholeFrameCycleCpuMs": {
+            "count": 60,
+            "median": 5.542,
+            "p95": 5.5939,
+            "minimum": 5.2149,
+            "maximum": 5.7344
+          },
+          "resources": {
+            "bufferCount": 49,
+            "memoryAllocationCount": 58,
+            "bottomLevelAccelerationStructureCount": 20,
+            "topLevelAccelerationStructureCount": 1,
+            "tlasInstanceCount": 28,
+            "pipelineCount": 2,
+            "shaderBindingTableCount": 0,
+            "descriptorSetCount": 1,
+            "hostVisibleBytes": 48268928,
+            "deviceLocalBytes": 372380128
+          }
+        },
+        "restored": {
+          "staticGeneration": 3,
+          "firstIdentity": {
+            "sceneEpoch": 4,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 437,
+            "recordSerial": 437,
+            "submissionSerial": 437,
+            "completionSerial": 437,
+            "simulationTick": 1440,
+            "frameSlot": 0
+          },
+          "lastIdentity": {
+            "sceneEpoch": 4,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 496,
+            "recordSerial": 496,
+            "submissionSerial": 496,
+            "completionSerial": 496,
+            "simulationTick": 1440,
+            "frameSlot": 0
+          },
+          "gpuMs": {
+            "count": 60,
+            "median": 2.83528,
+            "p95": 2.858368,
+            "minimum": 2.372064,
+            "maximum": 2.936224
+          },
+          "renderCallCpuMs": {
+            "count": 60,
+            "median": 5.54235,
+            "p95": 5.7422,
+            "minimum": 3.1042,
+            "maximum": 491.0418
+          },
+          "wholeFrameCycleCpuMs": {
+            "count": 60,
+            "median": 5.5335,
+            "p95": 5.7284,
+            "minimum": 3.0972,
+            "maximum": 491.036
+          },
+          "resources": {
+            "bufferCount": 49,
+            "memoryAllocationCount": 58,
+            "bottomLevelAccelerationStructureCount": 20,
+            "topLevelAccelerationStructureCount": 1,
+            "tlasInstanceCount": 28,
+            "pipelineCount": 2,
+            "shaderBindingTableCount": 0,
+            "descriptorSetCount": 1,
+            "hostVisibleBytes": 48278144,
+            "deviceLocalBytes": 372437216
+          }
+        }
+      },
+      "rawArtifacts": {
+        "static-timing-before.json": {
+          "bytes": 208245,
+          "sha256": "878938b8e975f581ea711af3ea8ecd46500fd2c6733e315169fc5cb0cb9f6051"
+        },
+        "static-timing-candidate.json": {
+          "bytes": 208730,
+          "sha256": "452afabd9fd93d7392f6e0e5f1f161f157c3d270a4aca6b12c3b0a2a1e53ca96"
+        },
+        "static-timing-restored.json": {
+          "bytes": 208736,
+          "sha256": "273ae9791f52c834f1fd90e7954c0f38e906652a4bca3d431a0cd6d4a1026422"
+        },
+        "cutover-00-before.png": {
+          "bytes": 666655,
+          "sha256": "67daa198548cd1a351df18d0b8c3f2509619060932d489ef3c52106eb38f53b6"
+        },
+        "cutover-01-selected.png": {
+          "bytes": 666748,
+          "sha256": "2b82946f56d55ad553f8d87236c09783c0af8296d3533e44f31d1c454546f7d6"
+        },
+        "cutover-02-restored.png": {
+          "bytes": 666655,
+          "sha256": "67daa198548cd1a351df18d0b8c3f2509619060932d489ef3c52106eb38f53b6"
+        },
+        "static-world-source.json": {
+          "bytes": 7556,
+          "sha256": "a4f1778982a7c5d1bfd7ef8a0a7018d15c9a239a817bf0b14c260ec451835e7b"
+        },
+        "static-zone-cutover.json": {
+          "bytes": 2363,
+          "sha256": "a44d3705036443ab3d8ec82d7f48760f919b9322ca9e1ff7b02942e6aa641897"
+        },
+        "capture-manifest.json": {
+          "bytes": 10770,
+          "sha256": "a7dc597f235425b76d8859e2f751fee5fea139d646b48406d5f330ef16a852ea"
+        }
+      },
+      "treeBaseDistanceM": 24.359291151087966,
+      "gpuMedianPercentChanges": {
+        "candidateVsBefore": 4.287485340928132,
+        "candidateVsRestored": -12.179114584802909,
+        "restoredVsBefore": 18.750209415312447
+      },
+      "gpuMedianBudgetBands": {
+        "before": {
+          "within16_667Ms": true,
+          "within20Ms": true,
+          "within33_333Ms": true
+        },
+        "candidate": {
+          "within16_667Ms": true,
+          "within20Ms": true,
+          "within33_333Ms": true
+        },
+        "restored": {
+          "within16_667Ms": true,
+          "within20Ms": true,
+          "within33_333Ms": true
+        }
+      },
+      "cutovers": [
+        {
+          "sourceGeneration": 1,
+          "admittedGeneration": 2,
+          "movingFirstFrame": true,
+          "poseYawDeltaRadians": 0.025,
+          "selection": "explicit-triangle-omissions",
+          "omittedTriangleCount": 768,
+          "completeContributors": false,
+          "prepareMilliseconds": 1108.9,
+          "cutoverMilliseconds": 53.7493,
+          "packMilliseconds": 32.7153,
+          "beginMilliseconds": 0.0488,
+          "maximumCpuCopyAdvanceMilliseconds": 4.4074,
+          "maximumAdvanceMilliseconds": 4.4083,
+          "uploadAdvanceCount": 29,
+          "uploadedBytes": 6372748,
+          "cpuCopyAdvanceCount": 67,
+          "cpuRegionScanAdvanceCount": 35,
+          "scannedCpuPayloadBytes": 9034497,
+          "asSubmissionCount": 3,
+          "asPollCount": 3,
+          "asPendingPollCount": 0,
+          "copiedCpuPayloadBytes": 13813498,
+          "cachedCpuSourcePayloadBytes": 46871933,
+          "preparationFrames": 102,
+          "oldOwnerAllocationBytes": 69787456,
+          "candidateOwnerAllocationBytes": 69730368,
+          "overlapOwnerAllocationBytes": 124471040,
+          "oldPrimitiveCount": 32,
+          "newPrimitiveCount": 32,
+          "sceneDeviceLocalOverlap": 405418720,
+          "sceneHostVisibleOverlap": 54651072,
+          "topLevelOwnersBefore": 1,
+          "topLevelOwnersOverlap": 2,
+          "topLevelOwnersAfter": 1,
+          "sceneDeviceLocalBefore": 372437216,
+          "sceneDeviceLocalAfter": 372380128,
+          "sceneHostVisibleBefore": 48278144,
+          "sceneHostVisibleAfter": 48268928
+        },
+        {
+          "sourceGeneration": 2,
+          "admittedGeneration": 3,
+          "movingFirstFrame": true,
+          "poseYawDeltaRadians": 0.025,
+          "selection": "complete-with-graveyard",
+          "omittedTriangleCount": 0,
+          "completeContributors": true,
+          "prepareMilliseconds": 392.69,
+          "cutoverMilliseconds": 53.6676,
+          "packMilliseconds": 3.4502,
+          "beginMilliseconds": 0.0244,
+          "maximumCpuCopyAdvanceMilliseconds": 1.2533,
+          "maximumAdvanceMilliseconds": 1.2538,
+          "uploadAdvanceCount": 29,
+          "uploadedBytes": 6381964,
+          "cpuCopyAdvanceCount": 32,
+          "cpuRegionScanAdvanceCount": 0,
+          "scannedCpuPayloadBytes": 0,
+          "asSubmissionCount": 3,
+          "asPollCount": 3,
+          "asPendingPollCount": 0,
+          "copiedCpuPayloadBytes": 6914749,
+          "cachedCpuSourcePayloadBytes": 46871933,
+          "preparationFrames": 67,
+          "oldOwnerAllocationBytes": 69730368,
+          "candidateOwnerAllocationBytes": 69787456,
+          "overlapOwnerAllocationBytes": 124510080,
+          "oldPrimitiveCount": 32,
+          "newPrimitiveCount": 32,
+          "sceneDeviceLocalOverlap": 405418720,
+          "sceneHostVisibleOverlap": 54651072,
+          "topLevelOwnersBefore": 1,
+          "topLevelOwnersOverlap": 2,
+          "topLevelOwnersAfter": 1,
+          "sceneDeviceLocalBefore": 372380128,
+          "sceneDeviceLocalAfter": 372437216,
+          "sceneHostVisibleBefore": 48268928,
+          "sceneHostVisibleAfter": 48278144
+        }
+      ],
+      "imageDifferences": {
+        "candidateVsBefore": {
+          "bbox": [
+            457,
+            188,
+            513,
+            338
+          ],
+          "full": {
+            "pixels": 518400,
+            "changed": 50,
+            "over8": 27,
+            "over32": 7,
+            "meanAbsoluteRgb": 0.00113940329218107
+          },
+          "upper300": {
+            "pixels": 288000,
+            "changed": 49,
+            "over8": 26,
+            "over32": 7,
+            "meanAbsoluteRgb": 0.001962962962962963
+          },
+          "groundAndHeldProps": {
+            "pixels": 230400,
+            "changed": 1,
+            "over8": 1,
+            "over32": 0,
+            "meanAbsoluteRgb": 0.0001099537037037037
+          }
+        },
+        "restoredVsBefore": {
+          "bbox": null,
+          "full": {
+            "pixels": 518400,
+            "changed": 0,
+            "over8": 0,
+            "over32": 0,
+            "meanAbsoluteRgb": 0.0
+          },
+          "upper300": {
+            "pixels": 288000,
+            "changed": 0,
+            "over8": 0,
+            "over32": 0,
+            "meanAbsoluteRgb": 0.0
+          },
+          "groundAndHeldProps": {
+            "pixels": 230400,
+            "changed": 0,
+            "over8": 0,
+            "over32": 0,
+            "meanAbsoluteRgb": 0.0
+          }
+        }
+      }
+    }
+  ]
+}

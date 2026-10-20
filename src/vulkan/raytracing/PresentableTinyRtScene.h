@@ -312,6 +312,18 @@ public:
     const horde::scene::DevelopmentWorldGeometry& WorldRouteGeometry() const { return worldRouteGeometry_; }
     std::shared_ptr<const horde::gameplay::simulation::TriangleSupportSurface> ChapterTerrainSurface() const { return chapterTerrainSurface_; }
     bool IsReady() const { return ready_; }
+#if defined(_DEBUG)
+    // Inspection only: the pinned complete CPU source, never the mutable active
+    // GPU candidate. No mutable aliases or ownership operations cross this seam.
+    std::shared_ptr<const RtStaticMeshSlot> DebugCachedCompleteStaticWorldSource() const noexcept {
+        return ready_ && developmentRescueJourney_ && sceneProfile_ == RtSceneProfile::Showcase
+            ? fullStaticGeometrySource_ : nullptr;
+    }
+    const horde::scene::assets::StaticMeshAsset* DebugCollapseStaticAsset() const noexcept {
+        return ready_ && developmentRescueJourney_ && sceneProfile_ == RtSceneProfile::Showcase
+            ? &collapseStaticAsset_ : nullptr;
+    }
+#endif
     // Offside GPU preparation only. The caller supplies a conservative retained
     // world-family set; an empty set restores the complete admitted geometry.
     // Shared textures, materials, player buffers and unchanged BLAS stay owned.

@@ -1,5 +1,18 @@
 # Horde 1.7 current design index
 
+## One-pine LOD2 comparison — closed, 20 October 2026
+
+The [owned-source comparison](../evidence/2026-10-20-pine-lod2/README.md) is
+**rejected for production adoption**. Six native A/B/A runs retain 1,080 completed
+RT GPU samples and pixel-identical full restorations. Saving 57,088 device bytes
+does not justify 53.67–65.64 ms adoption and 32,981,504 extra device-overlap bytes;
+unstable far controls invalidate an apparent gain. The derivative stays
+unadmitted; current LOD1, collision, assets and settings remain. Reusable Debug
+source inspection/comparison tools are retained. Wind and runtime distance LOD
+remain gaps. Next bounded source action is suitability/provenance inspection for
+one quiet forest wind/foliage cue using the existing finite voice budget. The six
+recovery choices remain pending in the morning handoff.
+
 ## Outdoor route inspection - local checkpoint, 20 October 2026
 
 The [route inspection checkpoint](../evidence/2026-10-20-outdoor-route-inspection/README.md)
@@ -9,8 +22,8 @@ bounded motor; no production placement, collision, route, save or lighting chang
 Six affected CTests and four hidden native RT shots pass, with Windows/Android
 Debug builds. Selected views retain trail/landmark readability; this is not a
 full composition or physical acceptance pass. The failed capture and red tests
-remain. A one-pine static LOD2 A/B is the selected small next investigation;
-no derivative, wind owner, new capacity or measured saving is adopted. The six
+remain. Its selected one-pine investigation is now closed by the result above;
+no derivative, wind owner, new capacity or production saving is adopted. The six
 recovery choices remain pending without blocking independent work.
 
 ## Dialogue bed balance and complete remaining scope - local milestone, 20 October 2026

@@ -1,0 +1,12 @@
+{
+  "command": "python reports/pine-lod2-20261020/derive_pine_lod2.py",
+  "sourceSha256": "db2d45547ad2f629c48ab8c994db845eb5d097a7db5bed6192b837e29f7a1b3f",
+  "identicalRerun": true,
+  "sha256": {
+    "derive_pine_lod2.py": "a8945e481ea69160faef6ddf4d3e8141aec40ed10902e14bb37dd874599a7a65",
+    "candidate.glb": "181e8e447ea4994b0851bdc6706ba5eaf1d5ef7784fb88cdc0de48e43885cef0",
+    "omitted-needle-triangles.json": "de845763c921f8d865eb8481609d3c8f18ef20db9119342020aa126aa7b6ed3e",
+    "derivation-receipt.json": "929a512db2385ea3b930fca9935b4147f8d40d3459a1843f1392a4038d754cbe",
+    "cpu-projected-coverage.png": "8eddfd0b8aaa4dd0c76d4adc949752f757ce73b2c89b271cd5cc8b3e8a6ccfaa"
+  }
+}

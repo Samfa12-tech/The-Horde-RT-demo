@@ -79,10 +79,15 @@ deepen after speech stops, and release/reentry begins at current gain. Actual
 listening and platform output recovery remain separate acceptance gates.
 
 Keep **first recovery's six morning choices pending for Sam** while independent
-work continues. The next selected small outdoor investigation is one original
-pine LOD2 derivative in a Debug-only static-bake A/B with exact payload/resource
-and native near/mid/far/secondary-view comparison. Current trees remain LOD1;
-no wind owner, runtime LOD transition, capacity increase or saving is claimed.
+work continues. The [one-pine LOD2 comparison](../evidence/2026-10-20-pine-lod2/README.md)
+is closed: retain current LOD1 and reject production adoption. Six native A/B/A
+comparisons and 1,080 completed samples show 57,088 device bytes saved, costly
+53.67–65.64 ms adoption, extra device overlap and no reliably attributed GPU win.
+Original restoration is pixel-identical; full near crown, automatic distance
+transitions and combined workload gates remain open. Reusable Debug inspection
+tools are retained; the derivative is unadmitted. Next inspect existing licensed
+material for one suitable quiet forest wind/foliage cue within the existing finite
+voice budget. No renderer wind, new voice layer or capacity increase is selected.
 Validate the coherent natural route/save/death path when owner testing resumes.
 The [remaining-scope inventory](HORDE_1_7_REMAINING_SCOPE_2026_10_20.md)
 retains participating mist/fireflies/wind and authored composition gaps; it adds

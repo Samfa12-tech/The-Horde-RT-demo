@@ -1,0 +1,6 @@
+near-pipeline {'before': 1.979696, 'candidate': 1.982416, 'restored': 1.977296} {'candidateVsBefore': 0.1373948323378782, 'candidateVsRestored': 0.2589394809881851, 'restoredVsBefore': -0.12123073441580035} 0
+mid-pipeline {'before': 2.56088, 'candidate': 2.55344, 'restored': 2.55208} {'candidateVsBefore': -0.2905251319858748, 'candidateVsRestored': 0.05328986552146642, 'restoredVsBefore': -0.34363187654243843} 0
+far-pipeline {'before': 4.190496, 'candidate': 2.69464, 'restored': 2.450288} {'candidateVsBefore': -35.696394889769614, 'candidateVsRestored': 9.972378757109347, 'restoredVsBefore': -41.527494597298265} 0
+near-query {'before': 1.946464, 'candidate': 1.946272, 'restored': 1.948912} {'candidateVsBefore': -0.009864040639850913, 'candidateVsRestored': -0.13546019522687747, 'restoredVsBefore': 0.12576651815805473} 0
+mid-query {'before': 2.604704, 'candidate': 2.8424, 'restored': 2.765312} {'candidateVsBefore': 9.125643451232857, 'candidateVsRestored': 2.787678207739308, 'restoredVsBefore': 6.166074916765973} 0
+far-query {'before': 2.3876, 'candidate': 2.489968, 'restored': 2.83528} {'candidateVsBefore': 4.287485340928132, 'candidateVsRestored': -12.179114584802909, 'restoredVsBefore': 18.750209415312447} 0

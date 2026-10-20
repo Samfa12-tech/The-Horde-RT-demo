@@ -1,0 +1,68 @@
+{
+  "workingDirectory": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+  "head": "d44fd8f2e46e95ffc79315662f62f1902e3fe1db",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "scope": "uncommitted exact comparison sources; no runtime asset admission",
+  "files": [
+    {
+      "path": "src/gameplay/DevelopmentCheckpoints.h",
+      "bytes": 24650,
+      "sha256": "705221f6f202ef4b8193e8c68adbeec3193a4988eea1c6819d94b6a9061c76f7"
+    },
+    {
+      "path": "src/platform/windows/DiagnosticWindow.cpp",
+      "bytes": 618892,
+      "sha256": "5b51df711ddbb7a88f26e7dcb5846da4533c0620b86c0f0f4d6f1342abe845b5"
+    },
+    {
+      "path": "src/platform/windows/WindowsStaticGeometryComparison.inl",
+      "bytes": 7110,
+      "sha256": "2d05923e7f7fcacea5cd551792d1d9476e62dd1332ee2021e89442d9404a14a5"
+    },
+    {
+      "path": "src/platform/windows/WindowsStaticGeometrySourceInspection.inl",
+      "bytes": 13488,
+      "sha256": "f948dc53a4da011fa83b6354b46659a8bea247492cfbf1f1065e1e15b020af38"
+    },
+    {
+      "path": "src/vulkan/raytracing/PresentableTinyRtScene.h",
+      "bytes": 69457,
+      "sha256": "26780884c2b4221a527edc9a591536feb80073ab83db02b0f81319be3cf484de"
+    },
+    {
+      "path": "tests/DevelopmentStaticAssetTests.cpp",
+      "bytes": 66704,
+      "sha256": "d7e99fc790ea6634146652396149cf576ba2011eb5222bc12462976fce2fe1f8"
+    },
+    {
+      "path": "assets/models/world/runtime/forest-tree-pair-v1/horde-irregular-pine-v1-lod1.glb",
+      "bytes": 1402952,
+      "sha256": "db2d45547ad2f629c48ab8c994db845eb5d097a7db5bed6192b837e29f7a1b3f"
+    },
+    {
+      "path": "assets/models/world/source/forest-tree-pair-v1/README.txt",
+      "bytes": 4798,
+      "sha256": "17dfaab3456f3ef4778243b04a71735cdba554b4fad888431ab0e82907088430"
+    },
+    {
+      "path": "src/scene/ForestDressing.cpp",
+      "bytes": 22076,
+      "sha256": "846f4ce1d2b6f423d6ce5ee3260316118af13d108f79cec85b752f93889678ae"
+    },
+    {
+      "path": "src/gameplay/simulation/ForestTreePlacementContract.h",
+      "bytes": 10495,
+      "sha256": "b56b76f7122361edfddbfa371e7096416bd74b7c160e9c7a66bc5f9fce4bc1d8"
+    },
+    {
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+      "bytes": 14029824,
+      "sha256": "6c4b2cb1b2953a1815543cf519a2082f892c6eb9e4f41dc02f4b4a3ae5387e78"
+    },
+    {
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.settings.ini",
+      "bytes": 471,
+      "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+    }
+  ]
+}

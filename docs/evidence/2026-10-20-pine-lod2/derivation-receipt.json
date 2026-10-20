@@ -1,0 +1,1079 @@
+{
+  "experiment": "one-pine closed interior lens pruning; candidate only",
+  "source": "assets/models/world/runtime/forest-tree-pair-v1/horde-irregular-pine-v1-lod1.glb",
+  "sourceSha256": "db2d45547ad2f629c48ab8c994db845eb5d097a7db5bed6192b837e29f7a1b3f",
+  "provenance": {
+    "readme": "assets/models/world/source/forest-tree-pair-v1/README.txt",
+    "readmeSha256": "17dfaab3456f3ef4778243b04a71735cdba554b4fad888431ab0e82907088430",
+    "authoring": "assets/models/world/source/forest-tree-pair-v1/source/build_horde_trees.py",
+    "authoringSha256": "f2642f6ad5ca89efef100423ef09688a2ca06400ad9326444d330408b8c61ec0",
+    "rights": "Owner-authored originals; existing owner-controlled rights unchanged; no new license assigned"
+  },
+  "scriptSha256": "a8945e481ea69160faef6ddf4d3e8141aec40ed10902e14bb37dd874599a7a65",
+  "candidateSha256": "181e8e447ea4994b0851bdc6706ba5eaf1d5ef7784fb88cdc0de48e43885cef0",
+  "sourceBytes": 1402952,
+  "candidateBytes": 1352264,
+  "fileBytesRemoved": 50688,
+  "sourceGeometryPayloadBytes": 298896,
+  "candidateGeometryPayloadBytes": 248208,
+  "geometryPayloadBytesRemoved": 50688,
+  "fullSourceBounds": {
+    "min": [
+      -1.8599222898483276,
+      -0.0037124399095773697,
+      -1.8350584506988525
+    ],
+    "max": [
+      1.8909538984298706,
+      8.686391830444336,
+      1.5585356950759888
+    ]
+  },
+  "fullCandidateBounds": {
+    "min": [
+      -1.8599222898483276,
+      -0.0037124399095773697,
+      -1.8350584506988525
+    ],
+    "max": [
+      1.8909538984298706,
+      8.686391830444336,
+      1.5585356950759888
+    ]
+  },
+  "sourceTotalVertices": 5602,
+  "candidateTotalVertices": 4642,
+  "sourceTotalTriangles": 5000,
+  "candidateTotalTriangles": 4232,
+  "foliage": {
+    "sourceVertices": 3660,
+    "candidateVertices": 2700,
+    "sourceTriangles": 2928,
+    "candidateTriangles": 2160,
+    "sourceComponents": 366,
+    "candidateComponents": 270,
+    "omittedComponents": 96,
+    "reductionFraction": 0.26229508196721313,
+    "sourceBounds": {
+      "min": [
+        -1.8599222898483276,
+        3.422983407974243,
+        -1.8350584506988525
+      ],
+      "max": [
+        1.8909538984298706,
+        8.686391830444336,
+        1.5585356950759888
+      ]
+    },
+    "candidateBounds": {
+      "min": [
+        -1.8599222898483276,
+        3.422983407974243,
+        -1.8350584506988525
+      ],
+      "max": [
+        1.8909538984298706,
+        8.686391830444336,
+        1.5585356950759888
+      ]
+    },
+    "allSourceAndRetainedComponentsClosed": true,
+    "componentWeldedVertices": 6,
+    "componentEdges": 12,
+    "componentTriangles": 8,
+    "componentEulerCharacteristic": 2,
+    "minimumSourceAbsoluteVolumeM3": 0.00010409131739707953,
+    "minimumCandidateAbsoluteVolumeM3": 0.00010630698496149241
+  },
+  "selection": {
+    "heightBands": 24,
+    "horizontalBandHullVertexCoordinatesExact": true,
+    "supportDirections": 936,
+    "maximumSupportExtremumErrorM": 0.0,
+    "protectedComponentIds": [
+      0,
+      2,
+      5,
+      6,
+      7,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      25,
+      26,
+      27,
+      28,
+      29,
+      31,
+      34,
+      35,
+      36,
+      37,
+      39,
+      40,
+      41,
+      42,
+      43,
+      46,
+      47,
+      48,
+      49,
+      52,
+      53,
+      54,
+      55,
+      56,
+      59,
+      61,
+      62,
+      63,
+      69,
+      70,
+      75,
+      76,
+      77,
+      78,
+      79,
+      80,
+      82,
+      83,
+      84,
+      89,
+      90,
+      91,
+      94,
+      95,
+      97,
+      98,
+      99,
+      102,
+      104,
+      105,
+      107,
+      108,
+      109,
+      111,
+      112,
+      113,
+      117,
+      118,
+      119,
+      121,
+      123,
+      124,
+      125,
+      126,
+      128,
+      130,
+      131,
+      132,
+      133,
+      139,
+      140,
+      144,
+      145,
+      146,
+      147,
+      149,
+      151,
+      153,
+      154,
+      157,
+      158,
+      159,
+      160,
+      161,
+      163,
+      164,
+      167,
+      168,
+      174,
+      175,
+      180,
+      181,
+      182,
+      185,
+      186,
+      187,
+      188,
+      189,
+      193,
+      194,
+      195,
+      196,
+      197,
+      200,
+      201,
+      202,
+      203,
+      209,
+      210,
+      211,
+      215,
+      216,
+      217,
+      220,
+      222,
+      223,
+      224,
+      229,
+      230,
+      231,
+      236,
+      237,
+      238,
+      244,
+      245,
+      250,
+      251,
+      252,
+      255,
+      256,
+      257,
+      258,
+      259,
+      264,
+      265,
+      266,
+      269,
+      272,
+      273,
+      278,
+      279,
+      280,
+      281,
+      282,
+      286,
+      287,
+      291,
+      292,
+      293,
+      294,
+      295,
+      299,
+      300,
+      301,
+      305,
+      307,
+      308,
+      314,
+      315,
+      319,
+      321,
+      322,
+      324,
+      325,
+      326,
+      327,
+      328,
+      329,
+      333,
+      334,
+      335,
+      336,
+      340,
+      341,
+      342,
+      343,
+      345,
+      349,
+      350,
+      351,
+      352,
+      353,
+      354,
+      355,
+      356,
+      357,
+      358,
+      359,
+      360,
+      361,
+      362,
+      363,
+      364,
+      365
+    ],
+    "sprigWindows": [
+      {
+        "firstComponent": 0,
+        "omitted": [
+          1,
+          3
+        ],
+        "retained": 5
+      },
+      {
+        "firstComponent": 7,
+        "omitted": [
+          8
+        ],
+        "retained": 6
+      },
+      {
+        "firstComponent": 14,
+        "omitted": [
+          16,
+          15
+        ],
+        "retained": 5
+      },
+      {
+        "firstComponent": 21,
+        "omitted": [
+          23,
+          24
+        ],
+        "retained": 5
+      },
+      {
+        "firstComponent": 28,
+        "omitted": [
+          33,
+          30
+        ],
+        "retained": 5
+      },
+      {
+        "firstComponent": 35,
+        "omitted": [
+          38
+        ],
+        "retained": 6
+      },
+      {
+        "firstComponent": 42,
+        "omitted": [
+          44,
+          45
+        ],
+        "retained": 5
+      },
+      {
+        "firstComponent": 49,
+        "omitted": [
+          50,
+          51
+        ],
+        "retained": 5
+      },
+      {
+        "firstComponent": 56,
+        "omitted": [
+          57,
+          60
+        ],
+        "retained": 5
+      },
+      {
+        "firstComponent": 63,
+        "omitted": [
+          67,
+          64
+        ],
+        "retained": 5
+      },
+      {
+        "firstComponent": 70,
+        "omitted": [
+          72,
+          71
+        ],
+        "retained": 5
+      },
+      {
+        "firstComponent": 77,
+        "omitted": [
+          81
+        ],
+        "retained": 6
+      },
+      {
+        "firstComponent": 84,
+        "omitted": [
+          86,
+          85
+        ],
+        "retained": 5
+      },
+      {
+        "firstComponent": 91,
+        "omitted": [
+          93,
+          92
+        ],
+        "retained": 5
+      },
+      {
+        "firstComponent": 98,
+        "omitted": [
+          101,
+          103
+        ],
+        "retained": 5
+      },
+      {
+        "firstComponent": 105,
+        "omitted": [
+          106,
+          110
+        ],
+        "retained": 5
+      },
+      {
+        "firstComponent": 112,
+        "omitted": [
+          115,
+          116
+        ],
+        "retained": 5
+      },
+      {
+        "firstComponent": 119,
+        "omitted": [
+          120,
+          122
+        ],
+        "retained": 5
+      },
+      {
+        "firstComponent": 126,
+        "omitted": [
+          127,
+          129
+        ],
+        "retained": 5
+      },
+      {
+        "firstComponent": 133,
+        "omitted": [
+          135,
+          138
+        ],
+        "retained": 5
+      },
+      {
+        "firstComponent": 140,
+        "omitted": [
+          142,
+          141
+        ],
+        "retained": 5
+      },
+      {
+        "firstComponent": 147,
+        "omitted": [
+          148,
+          150
+        ],
+        "retained": 5
+      },
+      {
+        "firstComponent": 154,
+        "omitted": [
+          156,
+          155
+        ],
+        "retained": 5
+      },
+      {
+        "firstComponent": 161,
+        "omitted": [
+          162,
+          165
+        ],
+        "retained": 5
+      },
+      {
+        "firstComponent": 168,
+        "omitted": [
+          169,
+          172
+        ],
+        "retained": 5
+      },
+      {
+        "firstComponent": 175,
+        "omitted": [
+          176,
+          178
+        ],
+        "retained": 5
+      },
+      {
+        "firstComponent": 182,
+        "omitted": [
+          183,
+          184
+        ],
+        "retained": 5
+      },
+      {
+        "firstComponent": 189,
+        "omitted": [
+          190,
+          192
+        ],
+        "retained": 5
+      },
+      {
+        "firstComponent": 196,
+        "omitted": [
+          199,
+          198
+        ],
+        "retained": 5
+      },
+      {
+        "firstComponent": 203,
+        "omitted": [
+          208,
+          206
+        ],
+        "retained": 5
+      },
+      {
+        "firstComponent": 210,
+        "omitted": [
+          212,
+          214
+        ],
+        "retained": 5
+      },
+      {
+        "firstComponent": 217,
+        "omitted": [
+          219,
+          218
+        ],
+        "retained": 5
+      },
+      {
+        "firstComponent": 224,
+        "omitted": [
+          225,
+          226
+        ],
+        "retained": 5
+      },
+      {
+        "firstComponent": 231,
+        "omitted": [
+          233,
+          232
+        ],
+        "retained": 5
+      },
+      {
+        "firstComponent": 238,
+        "omitted": [
+          242,
+          240
+        ],
+        "retained": 5
+      },
+      {
+        "firstComponent": 245,
+        "omitted": [
+          246,
+          247
+        ],
+        "retained": 5
+      },
+      {
+        "firstComponent": 252,
+        "omitted": [
+          254,
+          253
+        ],
+        "retained": 5
+      },
+      {
+        "firstComponent": 259,
+        "omitted": [
+          261,
+          260
+        ],
+        "retained": 5
+      },
+      {
+        "firstComponent": 266,
+        "omitted": [
+          268,
+          267
+        ],
+        "retained": 5
+      },
+      {
+        "firstComponent": 273,
+        "omitted": [
+          275,
+          277
+        ],
+        "retained": 5
+      },
+      {
+        "firstComponent": 280,
+        "omitted": [
+          283,
+          285
+        ],
+        "retained": 5
+      },
+      {
+        "firstComponent": 287,
+        "omitted": [
+          288,
+          289
+        ],
+        "retained": 5
+      },
+      {
+        "firstComponent": 294,
+        "omitted": [
+          296,
+          297
+        ],
+        "retained": 5
+      },
+      {
+        "firstComponent": 301,
+        "omitted": [
+          302,
+          303
+        ],
+        "retained": 5
+      },
+      {
+        "firstComponent": 308,
+        "omitted": [
+          311,
+          309
+        ],
+        "retained": 5
+      },
+      {
+        "firstComponent": 315,
+        "omitted": [
+          316,
+          318
+        ],
+        "retained": 5
+      },
+      {
+        "firstComponent": 322,
+        "omitted": [
+          323
+        ],
+        "retained": 6
+      },
+      {
+        "firstComponent": 329,
+        "omitted": [
+          330,
+          332
+        ],
+        "retained": 5
+      },
+      {
+        "firstComponent": 336,
+        "omitted": [
+          337,
+          339
+        ],
+        "retained": 5
+      },
+      {
+        "firstComponent": 343,
+        "omitted": [
+          347,
+          344
+        ],
+        "retained": 5
+      }
+    ],
+    "leaderLensesRetained": 16,
+    "maximumOmittedPerSevenLensSpray": 2,
+    "meaningOfInterior": "No ownership of height-band hull vertices or sampled 3D support extrema; endpoints/leader protected"
+  },
+  "preservation": {
+    "keptVertexAttributeBytesExact": [
+      "POSITION",
+      "NORMAL",
+      "TEXCOORD_0",
+      "TANGENT"
+    ],
+    "keptTriangleOrderAndWindingExact": true,
+    "allCandidateVerticesReferenced": true,
+    "allNonNeedleAccessorsExact": true,
+    "barkRootMossGeometryExact": true,
+    "materialsImagesTexturesSamplersNodesScenesExact": true,
+    "unchangedBufferViewPayloads": [
+      {
+        "bufferView": 0,
+        "bytes": 1872,
+        "sha256": "a2eb9a4668bde864567d240e4e57a17a2b25088c69da0f12e3806ded73141cf7",
+        "exact": true
+      },
+      {
+        "bufferView": 1,
+        "bytes": 1872,
+        "sha256": "d971f9c286bc6a48e9005e3c286a4f37634501133407205e1aeb140e9813882e",
+        "exact": true
+      },
+      {
+        "bufferView": 2,
+        "bytes": 1248,
+        "sha256": "cc19998326951e2c932e21465bccf38fecdc5751be23297556818c8e4b55a411",
+        "exact": true
+      },
+      {
+        "bufferView": 3,
+        "bytes": 2496,
+        "sha256": "76dd0d57c8ece9d35388f41a0405ea14a94625f130f957ae3d7073c90ddffc7e",
+        "exact": true
+      },
+      {
+        "bufferView": 4,
+        "bytes": 936,
+        "sha256": "46a3635c701598963da6e531d44e585de7ffe97a3f2e4b97f19403d8ba6cd0d4",
+        "exact": true
+      },
+      {
+        "bufferView": 5,
+        "bytes": 112637,
+        "sha256": "e9140e672e54a4b073351b4f17b76f15238ff8cc70e8c16158a54e0ddc092822",
+        "exact": true
+      },
+      {
+        "bufferView": 11,
+        "bytes": 70601,
+        "sha256": "6fdeb17cd4ff08e25396926b42827dcd9ab88945d03a604da0a74d762ecd28b7",
+        "exact": true
+      },
+      {
+        "bufferView": 12,
+        "bytes": 21432,
+        "sha256": "0d9590e271f1d23236e201672a013e4fa3b2e644b9a67cc6a0aebd7d1efa31dd",
+        "exact": true
+      },
+      {
+        "bufferView": 13,
+        "bytes": 21432,
+        "sha256": "e616908ced85844f5477337d248433e922b735e481cfa589794fe6ff9140aeb9",
+        "exact": true
+      },
+      {
+        "bufferView": 14,
+        "bytes": 14288,
+        "sha256": "e2ba25907f3101f2341c88bb066b337a76f85c75b2f64655d6d2f94d6baa920c",
+        "exact": true
+      },
+      {
+        "bufferView": 15,
+        "bytes": 28576,
+        "sha256": "aefbaa576ceb9acafdb1657c26bac8cd36113e76df712504b0c4b5c5d7e3488f",
+        "exact": true
+      },
+      {
+        "bufferView": 16,
+        "bytes": 11496,
+        "sha256": "ad6dba1d9b674086c1788cd7cec091ded95cd0aa9273c2b9e9c2db5897081cde",
+        "exact": true
+      },
+      {
+        "bufferView": 17,
+        "bytes": 529212,
+        "sha256": "73785defa7ea75739f403bc0b1e0710d7dca0435fed542cecd8efc9496b98e06",
+        "exact": true
+      },
+      {
+        "bufferView": 18,
+        "bytes": 242353,
+        "sha256": "c9cc184f0edb207c5081b78a70e7564e221dcd2c5d40f2c74449d065eeb7d27b",
+        "exact": true
+      },
+      {
+        "bufferView": 19,
+        "bytes": 144593,
+        "sha256": "bab9da5a1d72edcb5949fafeb1be5963fc73b457230fbb1f055cb09e52fcd66e",
+        "exact": true
+      }
+    ],
+    "changedBufferViewsOnly": [
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "bufferOffsets": "Repacked with four-byte alignment; unaffected payload bytes remain exact"
+  },
+  "cpuProjectedCoverage": [
+    {
+      "azimuthDegrees": 0,
+      "elevationDegrees": 0,
+      "sourceFoliagePixels": 11265,
+      "candidateFoliagePixels": 9873,
+      "lostCoverageFraction": 0.12356857523302267
+    },
+    {
+      "azimuthDegrees": 0,
+      "elevationDegrees": 15,
+      "sourceFoliagePixels": 10707,
+      "candidateFoliagePixels": 9188,
+      "lostCoverageFraction": 0.14186980480059774
+    },
+    {
+      "azimuthDegrees": 0,
+      "elevationDegrees": 30,
+      "sourceFoliagePixels": 12195,
+      "candidateFoliagePixels": 10430,
+      "lostCoverageFraction": 0.14473144731447318
+    },
+    {
+      "azimuthDegrees": 30,
+      "elevationDegrees": 0,
+      "sourceFoliagePixels": 11379,
+      "candidateFoliagePixels": 9978,
+      "lostCoverageFraction": 0.12312153967835482
+    },
+    {
+      "azimuthDegrees": 30,
+      "elevationDegrees": 15,
+      "sourceFoliagePixels": 11399,
+      "candidateFoliagePixels": 9976,
+      "lostCoverageFraction": 0.12483551188700759
+    },
+    {
+      "azimuthDegrees": 30,
+      "elevationDegrees": 30,
+      "sourceFoliagePixels": 13836,
+      "candidateFoliagePixels": 11980,
+      "lostCoverageFraction": 0.13414281584272914
+    },
+    {
+      "azimuthDegrees": 60,
+      "elevationDegrees": 0,
+      "sourceFoliagePixels": 11783,
+      "candidateFoliagePixels": 10210,
+      "lostCoverageFraction": 0.13349741152507855
+    },
+    {
+      "azimuthDegrees": 60,
+      "elevationDegrees": 15,
+      "sourceFoliagePixels": 13089,
+      "candidateFoliagePixels": 11348,
+      "lostCoverageFraction": 0.13301245320498123
+    },
+    {
+      "azimuthDegrees": 60,
+      "elevationDegrees": 30,
+      "sourceFoliagePixels": 15871,
+      "candidateFoliagePixels": 13755,
+      "lostCoverageFraction": 0.13332493226639786
+    },
+    {
+      "azimuthDegrees": 90,
+      "elevationDegrees": 0,
+      "sourceFoliagePixels": 11959,
+      "candidateFoliagePixels": 10434,
+      "lostCoverageFraction": 0.12751902332970988
+    },
+    {
+      "azimuthDegrees": 90,
+      "elevationDegrees": 15,
+      "sourceFoliagePixels": 14466,
+      "candidateFoliagePixels": 12503,
+      "lostCoverageFraction": 0.13569749758053362
+    },
+    {
+      "azimuthDegrees": 90,
+      "elevationDegrees": 30,
+      "sourceFoliagePixels": 18073,
+      "candidateFoliagePixels": 15293,
+      "lostCoverageFraction": 0.15382061638908873
+    },
+    {
+      "azimuthDegrees": 120,
+      "elevationDegrees": 0,
+      "sourceFoliagePixels": 12248,
+      "candidateFoliagePixels": 10647,
+      "lostCoverageFraction": 0.1307152188112345
+    },
+    {
+      "azimuthDegrees": 120,
+      "elevationDegrees": 15,
+      "sourceFoliagePixels": 14598,
+      "candidateFoliagePixels": 12453,
+      "lostCoverageFraction": 0.14693793670365807
+    },
+    {
+      "azimuthDegrees": 120,
+      "elevationDegrees": 30,
+      "sourceFoliagePixels": 15108,
+      "candidateFoliagePixels": 12843,
+      "lostCoverageFraction": 0.14992057188244634
+    },
+    {
+      "azimuthDegrees": 150,
+      "elevationDegrees": 0,
+      "sourceFoliagePixels": 11281,
+      "candidateFoliagePixels": 9775,
+      "lostCoverageFraction": 0.13349880329758002
+    },
+    {
+      "azimuthDegrees": 150,
+      "elevationDegrees": 15,
+      "sourceFoliagePixels": 12576,
+      "candidateFoliagePixels": 10924,
+      "lostCoverageFraction": 0.13136132315521631
+    },
+    {
+      "azimuthDegrees": 150,
+      "elevationDegrees": 30,
+      "sourceFoliagePixels": 14743,
+      "candidateFoliagePixels": 12892,
+      "lostCoverageFraction": 0.12555110900088173
+    },
+    {
+      "azimuthDegrees": 180,
+      "elevationDegrees": 0,
+      "sourceFoliagePixels": 11263,
+      "candidateFoliagePixels": 9871,
+      "lostCoverageFraction": 0.1235905176240788
+    },
+    {
+      "azimuthDegrees": 180,
+      "elevationDegrees": 15,
+      "sourceFoliagePixels": 12294,
+      "candidateFoliagePixels": 10831,
+      "lostCoverageFraction": 0.11900113876687812
+    },
+    {
+      "azimuthDegrees": 180,
+      "elevationDegrees": 30,
+      "sourceFoliagePixels": 15030,
+      "candidateFoliagePixels": 13105,
+      "lostCoverageFraction": 0.12807717897538262
+    },
+    {
+      "azimuthDegrees": 210,
+      "elevationDegrees": 0,
+      "sourceFoliagePixels": 11432,
+      "candidateFoliagePixels": 10018,
+      "lostCoverageFraction": 0.12368789363191046
+    },
+    {
+      "azimuthDegrees": 210,
+      "elevationDegrees": 15,
+      "sourceFoliagePixels": 11407,
+      "candidateFoliagePixels": 9914,
+      "lostCoverageFraction": 0.13088454457789078
+    },
+    {
+      "azimuthDegrees": 210,
+      "elevationDegrees": 30,
+      "sourceFoliagePixels": 12285,
+      "candidateFoliagePixels": 10718,
+      "lostCoverageFraction": 0.12755392755392758
+    },
+    {
+      "azimuthDegrees": 240,
+      "elevationDegrees": 0,
+      "sourceFoliagePixels": 11749,
+      "candidateFoliagePixels": 10186,
+      "lostCoverageFraction": 0.13303259851902294
+    },
+    {
+      "azimuthDegrees": 240,
+      "elevationDegrees": 15,
+      "sourceFoliagePixels": 10636,
+      "candidateFoliagePixels": 9271,
+      "lostCoverageFraction": 0.12833772094772466
+    },
+    {
+      "azimuthDegrees": 240,
+      "elevationDegrees": 30,
+      "sourceFoliagePixels": 11236,
+      "candidateFoliagePixels": 9720,
+      "lostCoverageFraction": 0.13492346030615876
+    },
+    {
+      "azimuthDegrees": 270,
+      "elevationDegrees": 0,
+      "sourceFoliagePixels": 12015,
+      "candidateFoliagePixels": 10445,
+      "lostCoverageFraction": 0.1306699958385351
+    },
+    {
+      "azimuthDegrees": 270,
+      "elevationDegrees": 15,
+      "sourceFoliagePixels": 10404,
+      "candidateFoliagePixels": 9101,
+      "lostCoverageFraction": 0.12524029219530952
+    },
+    {
+      "azimuthDegrees": 270,
+      "elevationDegrees": 30,
+      "sourceFoliagePixels": 10953,
+      "candidateFoliagePixels": 9497,
+      "lostCoverageFraction": 0.13293161690860955
+    },
+    {
+      "azimuthDegrees": 300,
+      "elevationDegrees": 0,
+      "sourceFoliagePixels": 12188,
+      "candidateFoliagePixels": 10621,
+      "lostCoverageFraction": 0.1285690843452576
+    },
+    {
+      "azimuthDegrees": 300,
+      "elevationDegrees": 15,
+      "sourceFoliagePixels": 10989,
+      "candidateFoliagePixels": 9605,
+      "lostCoverageFraction": 0.12594412594412596
+    },
+    {
+      "azimuthDegrees": 300,
+      "elevationDegrees": 30,
+      "sourceFoliagePixels": 11257,
+      "candidateFoliagePixels": 9665,
+      "lostCoverageFraction": 0.14142311450652922
+    },
+    {
+      "azimuthDegrees": 330,
+      "elevationDegrees": 0,
+      "sourceFoliagePixels": 11286,
+      "candidateFoliagePixels": 9784,
+      "lostCoverageFraction": 0.13308523834839625
+    },
+    {
+      "azimuthDegrees": 330,
+      "elevationDegrees": 15,
+      "sourceFoliagePixels": 10990,
+      "candidateFoliagePixels": 9488,
+      "lostCoverageFraction": 0.13666969972702459
+    },
+    {
+      "azimuthDegrees": 330,
+      "elevationDegrees": 30,
+      "sourceFoliagePixels": 11739,
+      "candidateFoliagePixels": 9916,
+      "lostCoverageFraction": 0.15529431808501581
+    }
+  ],
+  "maximumProjectedFoliageCoverageLoss": 0.15529431808501581,
+  "validationBoundary": "Static GLB, exact payload, welded closedness, CPU orthographic coverage only. No game import, RT image, LOD cutover, GPU timing, device, listening, package admission or public release acceptance.",
+  "gameDevCli": "Not available on PATH; custom deterministic Python inspection/derivation used; no package validation claim"
+}

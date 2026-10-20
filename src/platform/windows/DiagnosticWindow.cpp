@@ -331,6 +331,7 @@ struct CaptureLaunchOptions
     bool validateStaticZoneCutover = false;
     bool validateStaticTriangleCutover = false;
     std::vector<std::uint32_t> staticTriangleOmissions;
+    std::string inspectStaticWorldMaterial;
     bool validateChapterRoundTrip = false;
     bool measureChapterShippingRoute = false;
     bool measureChapterForeground = false;
@@ -910,6 +911,24 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
 #endif
             continue;
         }
+        if(argument==L"--inspect-static-world-source") {
+#if defined(_DEBUG)
+            if(!options.inspectStaticWorldMaterial.empty() || index+1>=argumentCount ||
+               arguments[index+1][0]==L'-' || arguments[index+1][0]==L'\0') {
+                options.error="--inspect-static-world-source requires one material name, once.";break;
+            }
+            const auto name=std::filesystem::path(arguments[++index]).u8string();
+            options.inspectStaticWorldMaterial.assign(name.begin(),name.end());
+            if(options.inspectStaticWorldMaterial.size()>128u ||
+               std::any_of(options.inspectStaticWorldMaterial.begin(),options.inspectStaticWorldMaterial.end(),
+                   [](unsigned char c){return c<0x20u || c==0x7fu;})) {
+                options.error="Static world inspection material name is invalid or too long.";break;
+            }
+#else
+            options.error="--inspect-static-world-source is Debug-only.";break;
+#endif
+            continue;
+        }
         if(argument==L"--validate-chapter-roundtrip") {
 #if defined(_DEBUG)
             options.validateChapterRoundTrip=true;
@@ -984,6 +1003,13 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
     if (options.error.empty() && !options.developmentCheckpoint.empty() &&
         horde::gameplay::FindDevelopmentCheckpoint(options.developmentCheckpoint) == nullptr)
         options.error = "Unknown development checkpoint: " + options.developmentCheckpoint;
+    if(options.error.empty() && !options.inspectStaticWorldMaterial.empty()) {
+        const auto* checkpoint=horde::gameplay::FindDevelopmentCheckpoint(options.developmentCheckpoint);
+        if(!options.requested || !options.captureHidden || !checkpoint ||
+           !horde::gameplay::DevelopmentCheckpointRequiresAuthoredChapter(*checkpoint) ||
+           options.validateChapterRoundTrip)
+            options.error="--inspect-static-world-source requires one hidden Debug authored-chapter showcase capture.";
+    }
     if(options.error.empty() && options.validateStaticTriangleCutover && !options.staticTriangleOmissions.empty())
         options.error="Sparse cutover cannot mix with whole-region filtering.";
     if (options.error.empty() && options.validateStaticZoneCutover &&
@@ -7489,6 +7515,8 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
 }
 
 #if defined(_DEBUG)
+#include "platform/windows/WindowsStaticGeometrySourceInspection.inl"
+#include "platform/windows/WindowsStaticGeometryComparison.inl"
 bool RunStaticGeometryCutoverCapture(VulkanSurfaceContext& context,
     const std::filesystem::path& directory, const VkClearColorValue& clear, std::string& error,
     bool triangleSubset = false, std::span<const std::uint32_t> omittedTriangles = {})
@@ -7500,6 +7528,8 @@ bool RunStaticGeometryCutoverCapture(VulkanSurfaceContext& context,
         Scene::StorageImageCapture image;
         return context.rtScene.CaptureStorageImage(image,error) && WriteRgbaPng(directory/filename,image,error);
     };
+    const bool measure=!omittedTriangles.empty();
+    if (measure && !MeasureStaticGeometryPhase(context,directory,clear,"before",error)) return false;
     if (!readback("cutover-00-before.png")) return false;
     std::ostringstream receipt;
     receipt << "{\"schema\":1,\"scope\":\"diagnostic GPU owner replacement; shared textures/materials/unchanged BLAS retained\",\"backend\":"
@@ -7643,12 +7673,13 @@ bool RunStaticGeometryCutoverCapture(VulkanSurfaceContext& context,
             << ",\"topLevelOwnersAfter\":" << after.topLevelAccelerationStructureCount
             << ",\"sceneDeviceLocalBefore\":" << before.deviceLocalBytes << ",\"sceneDeviceLocalAfter\":" << after.deviceLocalBytes
             << ",\"sceneHostVisibleBefore\":" << before.hostVisibleBytes << ",\"sceneHostVisibleAfter\":" << after.hostVisibleBytes << "}";
-        for (int frame=0;frame<kCaptureSettlingFrames;++frame) {
+        for (int frame=0;frame<(measure ? 0 : kCaptureSettlingFrames);++frame) {
             bool presented=false;
             if (!RenderFrame(context,clear,presented) || !presented) {
                 error="Replacement owner did not produce a real RT-presented frame: "+context.lastRtFrameError; return false;
             }
         }
+        if (measure && !MeasureStaticGeometryPhase(context,directory,clear,hop?"restored":"candidate",error)) return false;
         if (!readback(hop?"cutover-02-restored.png":"cutover-01-selected.png")) return false;
     }
     receipt << "]}\n";
@@ -7813,6 +7844,12 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         }
 
 #if defined(_DEBUG)
+        if (!ParseCaptureLaunchOptions().inspectStaticWorldMaterial.empty()) {
+            std::string inspectionError;
+            if (!InspectStaticWorldSource(context,outputDirectory,
+                    ParseCaptureLaunchOptions().inspectStaticWorldMaterial,inspectionError))
+                return fail("Static world source inspection: "+inspectionError);
+        }
         if (ParseCaptureLaunchOptions().validateStaticZoneCutover) {
             std::string cutoverError;
             if (!RunStaticGeometryCutoverCapture(context,outputDirectory,clearColor,cutoverError,
