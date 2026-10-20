@@ -17,6 +17,13 @@ def analyze(report:bytes,resources:str):
     if len(resources.encode('utf-8'))>MAX_REPORT_BYTES:raise AnalysisError('CPU CSV exceeds bound')
     rows=list(csv.DictReader(io.StringIO(resources)));j=json.loads(report)
     frames=j['motionEvidence']['completedRtFrames']
+    def identity(r):
+        return tuple(r.get(a,r.get(b)) for a,b in [('surfaceGeneration','surfaceGeneration'),
+            ('sceneEpoch','sceneEpoch'),('measurementGeneration','measurementGeneration'),
+            ('record','recordSerial'),('submission','submissionSerial'),('tick','simulationTick')])
+    actual={identity(r):r['actualPresentTime'] for r in j['imagePresentationTiming']['capture']['rows']}
+    try:present=[actual[identity(f)] for f in frames]
+    except KeyError as e:raise AnalysisError('Missing owning actual display timestamp') from e
     if not rows or len(rows)!=len(frames):raise AnalysisError('CPU rows must match every completed frame')
     last=0
     for r,f in zip(rows,frames):
@@ -42,7 +49,8 @@ def analyze(report:bytes,resources:str):
         pose={k:[float(rows[i][k]) for i in ix] for k in ('x','y','z','yaw','pitch')}
         if any(not all(math.isfinite(x) for x in v) or max(v)-min(v)>=.0001 for v in pose.values()):raise AnalysisError(phase+': moving view')
         views[phase]={'pose':{k:statistics.median(v) for k,v in pose.items()},'cpu':summarize(ix),
-                      'gpu':stats([frames[i]['gpuNs'] for i in ix])}
+                      'gpu':stats([frames[i]['gpuNs'] for i in ix]),
+                      'actualDisplay':stats([present[i]-present[i-1] for i in ix])}
     return {'strictPresentation':strict,'joinedFrames':len(frames),'allRouteCpu':summarize(range(len(rows))),
             'views':views,'limits':'Completed owning CPU stages; Skin aggregates PlayerSkin+CharacterSkin. PoseCopy is separate player CPU repack output, not bus traffic. Companion CharacterSkin includes inseparable repack. Never add GPU to CPU/wait durations or infer display FPS from GPU.'}
 if __name__=='__main__':

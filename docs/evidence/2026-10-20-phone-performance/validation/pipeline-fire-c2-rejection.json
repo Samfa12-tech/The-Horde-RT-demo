@@ -1,0 +1,27 @@
+{
+  "case": "pipeline-fire-c2",
+  "outcome": "rejected-ownership",
+  "timedAttempt": true,
+  "complete": false,
+  "reason": "Profile change reached the native owner after motion armed. Existing isolation guard aborted Motion interrupted by UI/input/profile/resource ownership. Manifest fire0 confirms no FireLow timing acceptance.",
+  "furtherTrials": "Stopped pending code-level ordering fix; no guard relaxed.",
+  "ownerSettingsUnchanged": true,
+  "artifacts": {
+    "android-motion-cpu20-pipeline-fire-c2-ledger.json": "346b59622419ad8a1a27ca68ad3ffbca3b7a6b9a7e92f3341a72d355ebd47b62",
+    "android-motion-cpu20-pipeline-fire-c2-manifest.json": "c6c4179b3a85f58bc7236bf8d78dafdf81e7cfe4d56cc7c4aaf755ed9d20058e",
+    "android-motion-cpu20-pipeline-fire-c2-present-timing.json": "61cf27215650fd828448293f2b2e9ab1142958711ff226cdf93c726b439f55bc",
+    "android-motion-cpu20-pipeline-fire-c2-resources.csv": "51b2c2fa9527f2c6913fb3753e5141d1ec639f5c1c41f20aa38712bcc4b3569f",
+    "battery-after.txt": "6acbb5d9e8347b051b5d64cee7c6e8832299934ab62ae67712f702180949f5f4",
+    "battery-before.txt": "23457d5072633add224068cf823b82fa9810b084389de293ad38ea8154b3a3cd",
+    "HordeLanternRT-benchmark-latest.json": "8bc6bf15f7ddc3dd507e448f6c8345043a764d327ea32f761909bbee1819a891",
+    "launch.txt": "7e67de64ef616b03382e3db298b8dc4dbb278e1485565c5616bc46e032f36a2f",
+    "motion-launch.txt": "1134bb5377fcdaff8755d20f77d73dbff1e4d75b5cb75180ab3d54777c980112",
+    "owned-final.log": "89496d75ac74a099a028b72af4204bd30031603ea8f59c879a617bee15d1dd07",
+    "prestart-capability.json": "b7c1ac4dd02365a04a1507788362e19d082de4ce88917a9a4e93dccd53de099a",
+    "request.json": "79a33c6adb70bb646a70f4bead5c90addf2949c9a855f9e0e035edd42e46b53e",
+    "settings-after.xml": "e3966b09cd9c354cb92833496b7f812139178dd7b2a906a4f809dbf9538c3dee",
+    "thermal-admission.json": "38a95634383acfe55f0605dafc33cc4da3529bf475911dcae548667bfcead86b",
+    "thermals.json": "97a1a544e764f4eb1f64dd60aca41fc948c68507539284527642e9fb4f95df36",
+    "vulkan_capability_report.json": "b7c1ac4dd02365a04a1507788362e19d082de4ce88917a9a4e93dccd53de099a"
+  }
+}

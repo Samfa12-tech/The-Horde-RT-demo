@@ -5,7 +5,7 @@ import analyze_android_cpu_profile as profile
 
 class CpuProfileJoinTests(unittest.TestCase):
     def fixture(self):
-        rows=[];frames=[]
+        rows=[];frames=[];timing=[]
         for phase in profile.VIEWS:
             for tick in range(59,82):
                 serial=len(rows)+1
@@ -13,8 +13,11 @@ class CpuProfileJoinTests(unittest.TestCase):
                 for s in profile.CPU:r[s+'_cpu_ns']=0;r[s+'_calls']=0
                 r.update(skin_cpu_ns=3_000_000,player_skin_cpu_ns=2_000_000,character_skin_cpu_ns=1_000_000,
                          skin_calls=2,player_skin_calls=1,character_skin_calls=1,whole_frame_cpu_ns=8_000_000,whole_frame_calls=1)
-                rows.append(r);frames.append({'submission':serial,'tick':serial,'wholeFrameCpuNs':8_000_000,'gpuNs':12_000_000})
-        return rows,{'motionEvidence':{'completedRtFrames':frames}}
+                rows.append(r);frames.append({'surfaceGeneration':1,'sceneEpoch':2,'measurementGeneration':3,
+                    'record':serial,'submission':serial,'tick':serial,'wholeFrameCpuNs':8_000_000,'gpuNs':12_000_000})
+                timing.append({'surfaceGeneration':1,'sceneEpoch':2,'measurementGeneration':3,
+                    'recordSerial':serial,'submissionSerial':serial,'simulationTick':serial,'actualPresentTime':serial*16_666_667})
+        return rows,{'motionEvidence':{'completedRtFrames':frames},'imagePresentationTiming':{'capture':{'rows':timing}}}
     def run_join(self,rows,report):
         out=io.StringIO();w=csv.DictWriter(out,fieldnames=rows[0]);w.writeheader();w.writerows(rows)
         # Isolate this CPU join; the real runner always calls the existing strict
@@ -27,6 +30,10 @@ class CpuProfileJoinTests(unittest.TestCase):
         self.assertEqual(r['allRouteCpu']['skin']['all']['medianMs'],3)
         self.assertIsNone(r['allRouteCpu']['pose_copy']['active'])
         self.assertEqual(r['views']['lower-sweep']['gpu']['medianMs'],12)
+        self.assertAlmostEqual(r['views']['lower-sweep']['actualDisplay']['medianMs'],16.666667)
+    def test_rejects_borrowed_display_owner(self):
+        rows,j=self.fixture();j['imagePresentationTiming']['capture']['rows'][0]['submissionSerial']=999
+        with self.assertRaises(profile.AnalysisError):self.run_join(rows,j)
     def test_rejects_reordered_or_wrong_tick_or_missing_owner(self):
         for kind in ('serial','tick','row'):
             rows,j=self.fixture()

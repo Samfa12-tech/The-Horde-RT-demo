@@ -6872,15 +6872,16 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_getKeeperRevealTitleOpacity(JNIEnv*,
     return gKeeperTitleOpacity.load(std::memory_order_acquire);
 }
 
-extern "C" JNIEXPORT void JNICALL
+extern "C" JNIEXPORT jlong JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_setGraphicsSettings(JNIEnv*, jclass, jint scale, jint water, jint fire, jint cap, jboolean glass, jint shadow, jboolean mist, jint dust)
 {
     const auto receivedNs = GraphicsSteadyNs();
     const auto settings = GraphicsTuple(scale, water, fire, cap, glass, shadow, mist, dust);
-    if (!horde::graphics::ValidGraphicsSettings(settings)) return;
+    if (!horde::graphics::ValidGraphicsSettings(settings)) return 0;
     std::lock_guard lock(gGraphicsMutex);
     PublishGraphicsCommandLocked({gGraphicsSerial + 1u, 0u,
         horde::graphics::GraphicsCommandKind::Revert, settings}, receivedNs);
+    return static_cast<jlong>(gGraphicsSerial);
 }
 
 extern "C" JNIEXPORT void JNICALL

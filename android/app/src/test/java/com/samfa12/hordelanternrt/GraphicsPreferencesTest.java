@@ -281,7 +281,7 @@ public final class GraphicsPreferencesTest {
     }
     @Test public void noGraphicsKeysUseMobileDefaultsWithoutWritingOrChangingUnrelatedSettings() {
         GraphicsPreferences.Values mobile = GraphicsPreferences.mobileDefaults();
-        assertTrue(mobile.same(new GraphicsPreferences.Values(50,1,0,30,false,1,true,1)));
+        assertTrue(mobile.same(new GraphicsPreferences.Values(50,1,0,30,false,1,false,1)));
         assertTrue(GraphicsPreferences.baseline().same(new GraphicsPreferences.Values(75,1,0,30,true,1,true)));
         assertFalse(GraphicsPreferences.hasGraphicsSettings(prefs));
         assertTrue(GraphicsPreferences.confirmed(prefs).same(mobile));

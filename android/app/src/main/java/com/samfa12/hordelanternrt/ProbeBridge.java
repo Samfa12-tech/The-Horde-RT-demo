@@ -80,7 +80,7 @@ public final class ProbeBridge {
     public static native int getContextualControlState();
     public static native int retryEncounter();
     public static native void setSimulationPaused(boolean paused);
-    public static native void setGraphicsSettings(int scale, int water, int fire, int cap, boolean glass, int shadow, boolean mistEnabled, int dustQuality);
+    public static native long setGraphicsSettings(int scale, int water, int fire, int cap, boolean glass, int shadow, boolean mistEnabled, int dustQuality);
     public static native void beginGraphicsEdit(int scale, int water, int fire, int cap, boolean glass, int shadow, boolean mistEnabled, int dustQuality);
     public static native long applyGraphicsSettings(int scale, int water, int fire, int cap, boolean glass, int shadow, boolean mistEnabled, int dustQuality, long generation);
     public static native long compareGraphicsPreview(int scale, int water, int fire, int cap, boolean glass, int shadow, boolean mistEnabled, int dustQuality, long generation);

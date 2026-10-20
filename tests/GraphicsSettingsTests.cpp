@@ -337,8 +337,8 @@ void TestPlatformDefaultsAndMist()
 {
     const auto mobile = PlatformDefaultGraphicsSettings(GraphicsPlatform::Android);
     const auto desktop = PlatformDefaultGraphicsSettings(GraphicsPlatform::Windows);
-    Check(mobile == GraphicsSettings{50, WaterQuality::Mobile, FireDetail::Mobile, 30, false, ShadowQuality::Current, true, DustQuality::Low},
-          "fresh mobile defaults keep50/Mobile/Mobile/30/GlassOff/Current/MistOn with owner-approved DustLow");
+    Check(mobile == GraphicsSettings{50, WaterQuality::Mobile, FireDetail::Mobile, 30, false, ShadowQuality::Current, false, DustQuality::Low},
+          "fresh mobile defaults keep50/Mobile/Mobile/30/GlassOff/Current/MistOff with owner-approved DustLow");
     Check(desktop == GraphicsSettings{100, WaterQuality::High, FireDetail::High, 30, true, ShadowQuality::Current, true, DustQuality::Low},
           "fresh desktop defaults preserve High appearance and MistOn with owner-approved DustLow");
     Check(MatchGraphicsPreset(mobile, GraphicsPlatform::Android) == GraphicsPreset::PlatformDefault &&
@@ -364,19 +364,19 @@ void TestPlatformDefaultsAndMist()
     auto legacyMobile = mobile; legacyMobile.dustQuality = DustQuality::Off;
     const auto migrated = RecoverGraphicsSettings({4u, off, mobile}, GraphicsPlatform::Android);
     Check(migrated.startup == off && migrated.retainedRequested == legacyMobile,
-          "schema4 preserves independently saved Off and interrupted On candidate while migrating DustOff");
+          "schema4 preserves independently saved Off and interrupted Off candidate while migrating DustOff");
     GraphicsEditSession edit(off);
     Check(edit.ResetDraft(GraphicsPlatform::Android) && edit.Draft() == mobile && edit.Committed() == off &&
           !edit.Persistence().pending, "Reset stages defaults; it does not save or issue native work");
     const auto apply = edit.RequestApply(10u);
     if (apply)
     {
-        auto old = Presented(*apply); old.effective.mistEnabled = false;
-        Check(!edit.Acknowledge(old, true) && !edit.Confirm(), "old Off frame cannot acknowledge requested MistOn");
+        auto old = Presented(*apply); old.effective.mistEnabled = true;
+        Check(!edit.Acknowledge(old, true) && !edit.Confirm(), "old On frame cannot acknowledge requested MistOff");
         Check(edit.Persistence().pending == mobile && edit.Committed() == off,
               "pending Reset intent preserves last saved Off until current presented ACK and Keep");
         Check(edit.Acknowledge(Presented(*apply), true) && edit.Committed() == off && edit.Confirm() &&
-              edit.Committed() == mobile && !edit.Persistence().pending, "only current exact MistOn presentation and Keep saves Reset");
+              edit.Committed() == mobile && !edit.Persistence().pending, "only current exact MistOff presentation and Keep saves Reset");
     }
     using namespace horde::vulkan::raytracing;
     for (const bool high : {false, true})

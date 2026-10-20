@@ -378,6 +378,7 @@ public class MainActivity extends Activity {
     private boolean pendingDebugCapture;
     private boolean pendingDebugReplay;
     private String pendingDebugMotion, pendingDebugMotionId;
+    private PerformanceProfileRequest.PresentationGate pendingDebugMotionGraphics;
     private boolean debugMotionActive;
     private boolean debugAutomationAutostart;
     private boolean developerOverlayVisible;
@@ -5831,6 +5832,17 @@ public class MainActivity extends Activity {
                         Log.i(TAG, "Debug motion evidence finished: status=" + motionStatus);
                     }
                 }
+                int motionGraphicsState = PerformanceProfileRequest.PresentationGate.READY;
+                if (pendingDebugMotion != null && pendingDebugMotionGraphics != null) {
+                    motionGraphicsState = pendingDebugMotionGraphics.poll(ProbeBridge.getGraphicsSnapshot(),
+                            surfaceRequestGeneration, SystemClock.elapsedRealtime());
+                    if (motionGraphicsState == PerformanceProfileRequest.PresentationGate.FAILED) {
+                        pendingDebugMotion = pendingDebugMotionId = null;
+                        pendingDebugMotionGraphics = null;
+                        debugAutomationAutostart = false;
+                        Log.e(TAG, "Performance motion cancelled before arming: graphics ownership or30s deadline.");
+                    }
+                }
                 surfaceStarted = resumed && surfaceAvailable && surfaceRequestGeneration != 0 && state == 1;
                 updateChapterDialoguePresentation(state);
                 if (updateCombatTeachingPrompt(state)) scheduleCombatTeachingPromptPoll();
@@ -5890,17 +5902,21 @@ public class MainActivity extends Activity {
                         }
                         showEndingOverlay();
                     }
-                    if (debugAutomationAutostart && menuVisible && !deathOverlayVisible && !endingOverlayVisible) hideMenu();
+                    if (debugAutomationAutostart && menuVisible && !deathOverlayVisible && !endingOverlayVisible &&
+                            (pendingDebugMotionGraphics == null || motionGraphicsState == PerformanceProfileRequest.PresentationGate.READY)) hideMenu();
                     if (pendingDebugMotion != null) {
-                        final String scenario = pendingDebugMotion, runId = pendingDebugMotionId;
-                        pendingDebugMotion = pendingDebugMotionId = null;
-                        suppressUiForDebugCapture();
-                        debugMotionActive = ProbeBridge.requestDebugMotionEvidence(scenario, runId);
-                        if (!debugMotionActive) {
-                            restoreUiAfterDebugMotion();
-                            Log.e(TAG, "Debug motion evidence request rejected.");
+                        if (motionGraphicsState == PerformanceProfileRequest.PresentationGate.READY) {
+                            pendingDebugMotionGraphics = null;
+                            final String scenario = pendingDebugMotion, runId = pendingDebugMotionId;
+                            pendingDebugMotion = pendingDebugMotionId = null;
+                            suppressUiForDebugCapture();
+                            debugMotionActive = ProbeBridge.requestDebugMotionEvidence(scenario, runId);
+                            if (!debugMotionActive) {
+                                restoreUiAfterDebugMotion();
+                                Log.e(TAG, "Debug motion evidence request rejected.");
+                            }
+                            debugAutomationAutostart = false;
                         }
-                        debugAutomationAutostart = false;
                     } else if (pendingDebugCheckpoint >= 0) {
                         applyCheckpointViewPose(pendingDebugCheckpoint);
                         clearTouchState();
@@ -6522,12 +6538,28 @@ public class MainActivity extends Activity {
             if (requestedDustQuality >= 0) waterCapture = withDebugDustQuality(waterCapture, requestedDustQuality);
             if (waterCapture != null) setNativeGraphics(waterCapture);
         }
+        PerformanceProfileRequest.PresentationGate motionGraphics = null;
+        if (intent.hasExtra(PerformanceProfileRequest.EXTRA)) {
+            final GraphicsPreferences.Values performance = PerformanceProfileRequest.resolve(
+                    intent, BuildConfig.DEBUG, motionRequested, hasRtLabIntent, graphicsConfirmed);
+            if (performance == null) {
+                Log.w(TAG, "Rejected performance profile outside the typed noncombat 40% Debug route.");
+                return;
+            }
+            // Coherent native publication only. Saved/confirmed preferences stay intact.
+            final long serial = ProbeBridge.setGraphicsSettings(performance.scale, performance.water,
+                    performance.fire, performance.cap, performance.glassEnabled, performance.shadow,
+                    performance.mistEnabled, performance.dust);
+            motionGraphics = new PerformanceProfileRequest.PresentationGate(performance,
+                    serial, surfaceRequestGeneration, SystemClock.elapsedRealtime());
+        }
         if (requestedCheckpoint >= 0 || requestedReplay || hasRtLabIntent || motionRequested) {
             ProbeBridge.markRtLabDebugAutomation();
         }
         if (motionRequested) {
             pendingDebugMotion = requestedMotion;
             pendingDebugMotionId = requestedMotionId;
+            pendingDebugMotionGraphics = motionGraphics;
         } else if (requestedCheckpoint >= 0) {
             pendingDebugCheckpoint = requestedCheckpoint;
             pendingDebugCapture = requestedCapture;
@@ -7933,6 +7965,12 @@ public class MainActivity extends Activity {
             finishEnvironmentSurvey(3);
             super.onPause();
             return;
+        }
+        if (pendingDebugMotionGraphics != null) {
+            pendingDebugMotion = pendingDebugMotionId = null;
+            pendingDebugMotionGraphics = null;
+            debugAutomationAutostart = false;
+            Log.w(TAG, "Pending performance motion cancelled by pause before arming.");
         }
         stopForestBird();
         campaignAcknowledgedToken=campaignAcknowledgedGeneration=0;

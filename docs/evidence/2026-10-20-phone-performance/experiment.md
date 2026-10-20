@@ -55,7 +55,37 @@ limits. This finite route cannot certify sustained 30 FPS, touch/audio/lifecycle
 the full chapter or a signed Release build.
 
 The instrumentation baseline A1 precedes the transient-profile/default patch.
-Quality comparisons form a separate same-APK cohort, beginning at control A2
-and ending at control A3; only that cohort uses A2's 1.5 C start reference.
-Do not attribute a difference between different APK cohorts to a quality choice.
-Any final screenshots are captured only after the finite recorder is terminal.
+Quality comparisons form a separate same-APK cohort. A2 and Mist Off B1 use
+A2's 1.5 C start reference. B1 has no useful saving in this cleared route.
+Before any Fire/Dust/combined trial, declare a warm A3 control as that cohort's
+reference and A4 as its closing control, retaining the same 1.5 C gate. This
+separates the colder startup cohort from warm measurements; it does not change
+the metric, 3% decision threshold or eight timed-attempt maximum. Remaining
+budget is exactly A3, Fire Low, Dust Off, combined and A4. Report cross-cohort
+differences descriptively, without causal gain claims. Terminal A2 screenshot
+restored the pause menu and is rejected as scene-quality evidence; no Resume or
+combat action is used to replace it. Visual tier acceptance remains pending.
+
+Fire preparation C1 did not launch a timed route: AP40.1 C versus A3 AP42.5 C
+failed the unchanged1.5 C start gate. Its copied common latest report is stale
+and excluded. Before the remaining four possible timed routes, allow up to30 s
+of stationary preparation settling in5 s observations only when below the band;
+upper-band or nonzero thermal status aborts immediately. Fire C2, Dust, combined
+and closing A4 use this same method. No further preparation retry or reference
+change is allowed for a failed candidate. This predeclared method adjustment is
+a comparison limitation; the same stationary60-tick sampled warmup remains.
+
+Fire C2 admitted the unchanged start gate but failed immediately after arming:
+the ordinary graphics command was observed after the motion captured FireMobile.
+The native profile/resource guard correctly aborted; no FireLow samples are
+adopted. Fix the asynchronous request ordering by waiting for exact serial,
+surface, requested/effective tuple and successful Showcase RT presentation,
+with the original30 s bound and lifecycle cancellation. No guard is weakened.
+
+This fix changes the APK. Five timed attempts are now consumed (four complete,
+one failed); C1 was rejected before launch. The three remaining attempts are a
+new same-APK A5 control, combined E1 and closing A6. They use A5's unchanged1.5 C
+start gate, the same bounded settling protocol and current-HAL/power collection.
+Individual FireLow and DustOff remain unmeasured, and old A3 does not become a
+causal control for this new binary. Stop the phone lane on any further ownership
+or strict presentation failure. No budget extension or candidate retry is allowed.

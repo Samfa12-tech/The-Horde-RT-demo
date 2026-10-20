@@ -2,6 +2,18 @@
 
 This file records locked decisions for the native Vulkan hardware ray-tracing demo.
 
+## Mobile Mist Off default and bounded performance trials — 2026-10-20
+
+The owner now selects Mist Off for Android fresh-install and staged Reset Defaults
+while lower-cost mist is investigated. This supersedes only the Mist On part of
+the October 5 mobile default below. Preserve all existing explicit saved choices,
+the historical accepted preset and Windows defaults. The owner's accepted 40%
+resolution is permitted for measured phone trials; it is not a silent new default.
+Fire Low, Dust Off, Current shadows and Mobile water may be compared individually
+and together using transient Debug noncombat profiles, without saving over owner
+preferences. Real Vulkan hardware RT, scene identity and honest absolute timing
+remain required. No signed release or public publication is authorized.
+
 ## 1.7 scope and save retention reconciliation - 2026-10-18
 
 Three slots each retain a separate manual save and one latest autosave. Autosaving
