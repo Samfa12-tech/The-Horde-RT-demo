@@ -1,5 +1,22 @@
 # Horde 1.7 current design index
 
+## Opening-tomb inspection and capture gap - local checkpoint, 20 October 2026
+
+The [fresh native inspection](../evidence/2026-10-20-opening-tomb-inspection/README.md)
+finds no demonstrated grounding/path defect requiring a production edit in two
+completed render-only survey views. All 120 RT frames have matching presented/
+completed identities; three relevant host tests pass. The initial retreat and
+rectangular-niche full captures separately fail their unchanged primary-arms gate
+with zero arm pixels. Their images remain unadmitted, and further full-capture
+shots stop. Whole-opening art/equipment coverage is therefore still incomplete.
+
+Next diagnose those retained exact uploaded meshes/poses through the actual shader
+camera, then make one discriminating native capture only if a specific cause is
+established. Preserve the gate; zero pixels do not by themselves prove a live arm
+bug. No geometry, source, assets, lighting, collision, teaching or save change.
+Audio listening and all six recovery choices remain pending; mobile Mist Off and
+owner work persist. No phone/public operation occurred.
+
 ## Finite forest foliage - local checkpoint, 20 October 2026
 
 The [bounded foliage checkpoint](../evidence/2026-10-20-forest-foliage/README.md)
@@ -12,9 +29,9 @@ coalescing and focus/lifecycle cleanup preserve the current audio budget.
 recorded. No output was auditioned; character, mix and real cleanup need manual
 acceptance. Saved gains, ducking, saves, mobile Mist Off and owner work persist.
 
-The measured pine rejection/retained LOD1 remain. Next inspect opening-tomb
-burial-story composition and grounding in actual native RT, selecting at most
-one demonstrated defect using existing owned assets/budgets. Recovery's six
+The measured pine rejection/retained LOD1 remain. Its selected opening-tomb
+inspection now has the checkpoint above; no geometry edit is justified in the
+completed views, and full-capture admission needs diagnosis. Recovery's six
 morning choices remain pending; natural route/save/death, controls, listening
 and warm performance gates remain open. No phone/public operation occurred.
 

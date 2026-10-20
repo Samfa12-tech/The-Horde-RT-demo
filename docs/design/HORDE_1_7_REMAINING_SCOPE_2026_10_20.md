@@ -1,6 +1,6 @@
 # Horde 1.7 remaining scope - 20 October 2026
 
-Current reconciliation after the [finite foliage checkpoint](../evidence/2026-10-20-forest-foliage/README.md),
+Current reconciliation after the [opening-tomb inspection](../evidence/2026-10-20-opening-tomb-inspection/README.md),
 in the existing WP2 worktree/branch and draft PR 27. Read with the
 [accepted master](../references/horde-1.7/d37f1638/docs/superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md)
 and [milestone map](HORDE_1_7_MILESTONE_MAP_2026_10_20.md). This inventory changes
@@ -36,10 +36,15 @@ The derivative is unadmitted. The subsequent
 0.90-second licensed leaf rustle within the existing voice, with 12 m range and
 44/40-second quiet cadence. Host tests/builds and exact package bytes pass; no
 listening or actual output cleanup pass is claimed. Renderer wind and heavy
-effects remain unchanged. Next inspect the accepted opening tomb's burial-story
-composition/grounding in native RT and correct at most one demonstrated defect
-using existing owned assets/budgets. Recovery policy remains pending without
-blocking independent work.
+effects remain unchanged. The [fresh opening-tomb inspection](../evidence/2026-10-20-opening-tomb-inspection/README.md)
+completes 120 render-only native RT frames/two views without a demonstrated
+placement/path defect requiring a production edit. Initial retreat/niche full
+captures separately fail the strict primary-arm evidence gate (zero pixels),
+and later shots stop. Their PNGs remain unadmitted context; full-opening artistic
+and equipment coverage remains incomplete. Next diagnose the retained uploaded
+meshes/poses with actual camera equations and compare staging before making one
+justified fix/discriminating capture. Neither the survey nor zero pixels proves
+a production arm bug. Recovery policy remains pending without blocking that work.
 
 ## Implemented, with exact-candidate acceptance still open
 

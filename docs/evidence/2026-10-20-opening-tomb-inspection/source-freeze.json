@@ -1,0 +1,201 @@
+{
+  "baseCommit": "075e49ef22e388842ebb313bf4b5370ce8032684",
+  "workingDirectory": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+  "scope": "Native RT opening-tomb composition inspection; no source, setting, save, lighting or asset edits",
+  "executable": {
+    "exists": true,
+    "bytes": 14035968,
+    "sha256": "223b1f02398f852f05bbf6d26239a748b996b2d4e0d448d16cad899827c85579"
+  },
+  "sources": {
+    "AGENTS.md": {
+      "exists": true,
+      "bytes": 4958,
+      "sha256": "b103969146103a903a1bc503774bbf014a8035fae9b7946773fc608f1108fd92"
+    },
+    "src/scene/TombDressing.cpp": {
+      "exists": true,
+      "bytes": 31447,
+      "sha256": "1bc20a107ace84a0ee53f679f9e697a7e5c017bf2f8ad6dc8c3112b594ea06d4"
+    },
+    "src/scene/TombDressing.h": {
+      "exists": true,
+      "bytes": 2985,
+      "sha256": "3016d9d0ed3b245b9203cfab0d9c9877ef7daf04b2abe866bee2155795ef6870"
+    },
+    "src/scene/TombDressingContact.h": {
+      "exists": true,
+      "bytes": 1301,
+      "sha256": "0a0df909715a84b074fa95428722866f4676f70cf1e95ee041af3949cc54a543"
+    },
+    "src/scene/TombFloorDebris.h": {
+      "exists": true,
+      "bytes": 2645,
+      "sha256": "46030df8920eb96541c385a69557d72b0e02a1b026cb990372b76ceb8d7aa43e"
+    },
+    "src/scene/TombWallRecess.h": {
+      "exists": true,
+      "bytes": 4239,
+      "sha256": "d49df0a6e5856863dff1419717f5a73e32aa1bee8aa3d7980e6aac1f34404d4c"
+    },
+    "src/scene/TombStoneBevels.h": {
+      "exists": true,
+      "bytes": 6735,
+      "sha256": "0c695ea7e70305b4804c1c271de21efd1e270d4dcb02bb0b6e5219f0b18bc7c4"
+    },
+    "src/gameplay/DevelopmentCheckpoints.h": {
+      "exists": true,
+      "bytes": 24650,
+      "sha256": "705221f6f202ef4b8193e8c68adbeec3193a4988eea1c6819d94b6a9061c76f7"
+    },
+    "src/gameplay/ShowcaseRoute.h": {
+      "exists": true,
+      "bytes": 13479,
+      "sha256": "d99d1a587aae1c2e3997fa7cd7df88699a9dd2b00de5cce670b03a91b731d870"
+    },
+    "src/platform/windows/DiagnosticWindow.cpp": {
+      "exists": true,
+      "bytes": 619496,
+      "sha256": "6de7774895cbc0259cf888eebaac6eac9f382d814afa90b78d095fba161ee114"
+    },
+    "src/platform/windows/WindowsEnvironmentSurveyLaunch.h": {
+      "exists": true,
+      "bytes": 4377,
+      "sha256": "913aaf395484e4103911075a0381d294f5e6f0123be9f7e45626f555e2fad5cb"
+    },
+    "src/platform/windows/WindowsEnvironmentSurveyCapture.inl": {
+      "exists": true,
+      "bytes": 14484,
+      "sha256": "2e1ecb6da790b7317654ad77ead6353b98d728a918d62c8e8c306ebd1c3fb0d1"
+    },
+    "src/platform/windows/WindowsHiddenCaptureLaunch.h": {
+      "exists": true,
+      "bytes": 1745,
+      "sha256": "89717d7a381ca52d1246ab4de72395898ca3a6ee839f683ff7487e1a7a3cdbf7"
+    },
+    "src/vulkan/raytracing/PresentableTinyRtScene.cpp": {
+      "exists": true,
+      "bytes": 490640,
+      "sha256": "28d02f30807f0af44b288012ecca22f89f73249ad6fccdef6db727349d5c5611"
+    }
+  },
+  "trackedTombAssets": {
+    "assets/models/world/runtime/prepared-funerary-v01/t02-native-import-candidates/README.md": {
+      "exists": true,
+      "bytes": 564,
+      "sha256": "f08e64df3342c30eea448b0f0d65f7caa8bf526f450ba9d08a9a6a514a104561"
+    },
+    "assets/models/world/runtime/prepared-funerary-v01/t02-native-import-candidates/derivation-receipt.json": {
+      "exists": true,
+      "bytes": 3465,
+      "sha256": "390b57a453a0cb883bdd01938b0edb0dcae35e117a74eb324e4387b64022d1b8"
+    },
+    "assets/models/world/runtime/prepared-funerary-v01/t02-native-import-candidates/femur/tomb-femur-lod0.runtime.glb": {
+      "exists": true,
+      "bytes": 10580,
+      "sha256": "bdf24bb2b71290b3acf843ea48c2eb280e7d75300463ae0096e0da4796c4c608"
+    },
+    "assets/models/world/runtime/prepared-funerary-v01/t02-native-import-candidates/humerus/tomb-humerus-lod0.runtime.glb": {
+      "exists": true,
+      "bytes": 8564,
+      "sha256": "f39dc48c4b0faf1668e748f8927f219dbd3e4d1c90e6e90c71ec9f8a97c192af"
+    },
+    "assets/models/world/runtime/prepared-funerary-v01/t02-native-import-candidates/skull-jaw/tomb-skull-jaw-lod0.runtime.glb": {
+      "exists": true,
+      "bytes": 127212,
+      "sha256": "07d00188f183de5fd1ea1d24051e7e3c993953f02aaf85fcc9349d4b38105c4f"
+    },
+    "assets/models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/derivation-receipt.json": {
+      "exists": true,
+      "bytes": 5134,
+      "sha256": "6c138994f57a3b3e10bf3113d591d6a47f47493b63618acc20932e9d79ee2f2f"
+    },
+    "assets/models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_candle_stub_1.glb": {
+      "exists": true,
+      "bytes": 34992,
+      "sha256": "5e454e5aa302e3d081c9857e00a9c8d005c5454a5a7e04d6f212fdbf56c20823"
+    },
+    "assets/models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_candle_stub_2.glb": {
+      "exists": true,
+      "bytes": 38456,
+      "sha256": "01d24d1c097267b87bafe4a7545d0cdde50292f2fe7af12a70022c590a82d125"
+    },
+    "assets/models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_candle_stub_3.glb": {
+      "exists": true,
+      "bytes": 30440,
+      "sha256": "1a7967a9ae3a82a1e470067b9a344804aa5f40b36b7ba13b401538c6b8fa30a3"
+    },
+    "assets/models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_displaced_lid.glb": {
+      "exists": true,
+      "bytes": 67240,
+      "sha256": "e93203b35e8e1979ba16a67f31044076b20127fa8bfbc60b96512d2a5e777962"
+    },
+    "assets/models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_offering_bowl.glb": {
+      "exists": true,
+      "bytes": 45880,
+      "sha256": "6e193a9b36656bffa8c972dab0958884208c0a4f38b72333a4677ad2ceab302b"
+    },
+    "assets/models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_urn_broken_base.glb": {
+      "exists": true,
+      "bytes": 87384,
+      "sha256": "c0ed7c0261a125385f821109927567c4fc8f1ff0799d0c3c479d4149e09ad594"
+    },
+    "assets/models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_urn_rim_shard.glb": {
+      "exists": true,
+      "bytes": 56588,
+      "sha256": "63a76503741ae51f9230e7b23201037bb1e4402d348bbd27323000a82605f1ad"
+    },
+    "assets/models/world/runtime/tomb-dressing-v01/tomb-niche-arched/asset.manifest.json": {
+      "exists": true,
+      "bytes": 723,
+      "sha256": "3f67e0906b49664cb17de8657c4be71a87b3bbd806358ac615df956e88e63c04"
+    },
+    "assets/models/world/runtime/tomb-dressing-v01/tomb-niche-arched/candidate-receipt.json": {
+      "exists": true,
+      "bytes": 951,
+      "sha256": "9742c991425ea277277bf7c7f4dc933c343cf9c19857b93b35971e6df6cfdf01"
+    },
+    "assets/models/world/runtime/tomb-dressing-v01/tomb-niche-arched/tomb-niche-arched-lod0.runtime.glb": {
+      "exists": true,
+      "bytes": 99856,
+      "sha256": "fe78a2108e94814967f49387c3285476776ce7a6a04f82a610d2dbf5e0f20934"
+    },
+    "assets/models/world/runtime/tomb-dressing-v01/tomb-niche-rect/asset.manifest.json": {
+      "exists": true,
+      "bytes": 721,
+      "sha256": "cad866e741683d054a944afe7bb082e8b435cad6d0e27c85252ee8e1ee082abc"
+    },
+    "assets/models/world/runtime/tomb-dressing-v01/tomb-niche-rect/candidate-receipt.json": {
+      "exists": true,
+      "bytes": 948,
+      "sha256": "5cd5c866c5b304431bbc8132adbf117485a87b8e1d0aec7dbea792d05bc112ea"
+    },
+    "assets/models/world/runtime/tomb-dressing-v01/tomb-niche-rect/tomb-niche-rect-lod0.runtime.glb": {
+      "exists": true,
+      "bytes": 85684,
+      "sha256": "55643831df0b1f8adb118d1dde53435d86aa1898271552781c7289307c2eca62"
+    }
+  },
+  "protected": {
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.settings.ini": {
+      "exists": true,
+      "bytes": 471,
+      "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\ASSET_LICENSES.md": {
+      "exists": true,
+      "bytes": 30507,
+      "sha256": "3a6cff3d34421d2ec751b1f64ec44b6c3ee801cdc1d6d1123c3cb479c0b92387"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\PROJECT_MEMORY.md": {
+      "exists": true,
+      "bytes": 51219,
+      "sha256": "9cfbea7667b50a9a960396c8f13c68905791aebd42121ecb353a8354b8cd406e"
+    }
+  },
+  "campaignDirectory": {
+    "path": "C:\\Users\\sam_s\\AppData\\Local\\Packages\\sandbox.{a3bad69b-65b3-43f8-ae2a-6a7d8d4e6886}\\AC\\HordeLanternRT\\campaign-v1",
+    "exists": false,
+    "files": {}
+  }
+}

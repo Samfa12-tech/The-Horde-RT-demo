@@ -1,0 +1,12 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+    Start 108: horde_rt_tomb_wall_recess_tests
+1/3 Test #108: horde_rt_tomb_wall_recess_tests .........   Passed    0.02 sec
+    Start 109: horde_rt_tomb_dressing_tests
+2/3 Test #109: horde_rt_tomb_dressing_tests ............   Passed    0.15 sec
+    Start 159: horde_rt_tomb_terrain_exclusion_tests
+3/3 Test #159: horde_rt_tomb_terrain_exclusion_tests ...   Passed    0.02 sec
+
+100% tests passed, 0 tests failed out of 3
+
+Total Test time (real) =   0.21 sec
