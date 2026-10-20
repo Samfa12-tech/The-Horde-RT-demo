@@ -1,5 +1,25 @@
 # Horde 1.7 current design index
 
+## Rescue/forest music and recovery choices - local milestone, 20 October 2026
+
+The [chapter music checkpoint](../evidence/2026-10-20-chapter-music/README.md)
+adds shared post-Keeper interior F, one existing G on first live rope arrival,
+then exterior/forest H. Loads select their bed directly; return, pause/menu,
+retry/mode and replacement queue lifetime are covered without new assets or
+saved music state. 65 new host checks, 13 affected CTests, 19 selected Java tests
+and Windows/four-ABI Android builds pass. The initial Git LFS asset-audit helper
+failure is retained; the corrected audit proves admitted audio/Core unchanged.
+Synthetic PCM and actual terrain/rope fixtures do not establish listening or
+naturally earned saves. H's exterior suitability still needs owner listening.
+
+The [current milestone map](HORDE_1_7_MILESTONE_MAP_2026_10_20.md) supersedes the
+older music-gap notes below. Next audit existing licensed tomb/rope ambience for
+one bounded location/event path. The [morning recovery record](HORDE_1_7_RECOVERY_DECISIONS_FOR_MORNING_2026_10_20.md)
+lists the still-undecided method, capacity, refill, use/interruption, death and
+save-migration choices, with existing health resets and save format. No healing
+policy is invented. Physical route/earned-save/death/contact/controls/listening
+and sustained warm Keeper/exterior acceptance remain open, with mobile Mist Off.
+
 ## Surface-aware footsteps and remaining chapter gaps - local milestone, 20 October 2026
 
 The [bounded dry-footstep checkpoint](../evidence/2026-10-20-surface-aware-footsteps/README.md)

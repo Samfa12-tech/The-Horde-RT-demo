@@ -41,9 +41,15 @@ now carries actual support and alternating cues through the existing event/audio
 paths. It reuses admitted dirt cuts, retains the generic Stone/Wood fallback and
 adds no asset or layer. Grounded/teleport/rope/pause/restore and actual terrain
 boundary checks pass; cue listening, Wood/stone suitability and physical route
-acceptance remain open. Master 11's rescue/forest music-state continuation still
-needs reconciliation against the existing owner pack; this is a source gap,
-not a request for another engine or paid score.
+acceptance remain open. The later [chapter music checkpoint](../evidence/2026-10-20-chapter-music/README.md)
+now adds explicit shared F/G/H route-state selection, first-ascent timing,
+pause/menu/return/restore behavior and correct Windows queue lifetime. It reuses
+the owner pack unchanged. 65 new host checks, 13 affected CTests, 19 Java tests
+and Windows/four-ABI builds pass; actual listening and naturally earned saves
+remain open. The [morning recovery choices](HORDE_1_7_RECOVERY_DECISIONS_FOR_MORNING_2026_10_20.md)
+record the genuinely undecided healing policy without changing health/save rules.
+Local tomb/rope ambience is the next bounded source audit; physical critical-path
+and warm mobile Mist Off acceptance remain higher-priority owner testing.
 
 ## Authority and status meanings
 

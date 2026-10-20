@@ -1,0 +1,40 @@
+{
+  "sourceBase": "cbfc13f66040ad694532b42442ac278c5f5d1923",
+  "sources": {
+    "CMakeLists.txt": {
+      "bytes": 113439,
+      "sha256": "c1525fd431695cbe260471827e171842856c3de2265e480bab42e32886399ee8",
+      "gitBlob": "7e652e2458dafb0266b8586eb3ab1b0db9783ea0"
+    },
+    "src/audio/MusicDirector.cpp": {
+      "bytes": 17030,
+      "sha256": "37bfa6b6272e27f8b00ef2dde090b95d12d090bbfd9a93ed204ae00e1301a8ce",
+      "gitBlob": "69c1aec620582182f559162c0226b1c705763f9e"
+    },
+    "src/audio/MusicDirector.h": {
+      "bytes": 3420,
+      "sha256": "8adae34f76f29b12418a36c4c5f41d2564ca4e3505da86fbdf15d0e7f7ddc91d",
+      "gitBlob": "461e79cb2ea0c7535d933d5c872cea9b8cf23047"
+    },
+    "src/platform/windows/DiagnosticWindow.cpp": {
+      "bytes": 603640,
+      "sha256": "6be22710b93d88bfb473619917d42fe2b201bac8cd817754b0b180018ec8ae35",
+      "gitBlob": "f9d89e76d875fe3049f70e272b259e5d481f8f34"
+    },
+    "src/platform/windows/windows_campaign_owner.inl": {
+      "bytes": 17677,
+      "sha256": "1cdc5373499d1eebe9fd93637effd9414ce0ad26d71d5ffedf9476935499da59",
+      "gitBlob": "af5d9a707b6891d2434440b7af3c40cf6606fb01"
+    },
+    "tests/WindowsMusicFocusTests.cpp": {
+      "bytes": 2866,
+      "sha256": "fa9c6637e97293066edc48355ef882733b5d2451cf6f085c6d32d4ce1c224f5a",
+      "gitBlob": "5b73cef9809f1abd71e3a7a9504383e20b1d2e37"
+    },
+    "tests/ChapterMusicTests.cpp": {
+      "bytes": 22038,
+      "sha256": "e551f285f78a86beb00b767872406b57a8ff6b89cb8aa60e4e64757f042ee59c",
+      "gitBlob": "cc28f278d470d5756bc9b13b95893eb44881266e"
+    }
+  }
+}

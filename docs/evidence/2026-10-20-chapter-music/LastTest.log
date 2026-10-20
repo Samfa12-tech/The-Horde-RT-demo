@@ -1,0 +1,239 @@
+Start testing: Oct 21 01:02 AUS Eastern Summer Time
+----------------------------------------------------------
+35/226 Testing: horde_rt_campaign_play_session_tests
+35/226 Test: horde_rt_campaign_play_session_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_campaign_play_session_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_campaign_play_session_tests" start time: Oct 21 01:02 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+ordinary lower live=-34.0119,-17.5184 boundary=1 rope=1
+ordinary upper live=-33.7,-13.3383 speed=1.9 boundary=1
+145 campaign play session checks, 0 failures
+<end of output>
+Test time =   4.33 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_campaign_play_session_tests" end time: Oct 21 01:02 AUS Eastern Summer Time
+"horde_rt_campaign_play_session_tests" time elapsed: 00:00:04
+----------------------------------------------------------
+
+40/226 Testing: horde_rt_campaign_codec_tests
+40/226 Test: horde_rt_campaign_codec_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_campaign_codec_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_campaign_codec_tests" start time: Oct 21 01:02 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+2283 campaign codec checks, 0 failures
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_campaign_codec_tests" end time: Oct 21 01:02 AUS Eastern Summer Time
+"horde_rt_campaign_codec_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+45/226 Testing: horde_rt_campaign_checkpoint_tests
+45/226 Test: horde_rt_campaign_checkpoint_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_campaign_checkpoint_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_campaign_checkpoint_tests" start time: Oct 21 01:02 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+1026 campaign checkpoint checks, 0 failures
+<end of output>
+Test time =   2.35 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_campaign_checkpoint_tests" end time: Oct 21 01:02 AUS Eastern Summer Time
+"horde_rt_campaign_checkpoint_tests" time elapsed: 00:00:02
+----------------------------------------------------------
+
+153/226 Testing: horde_rt_music_director_tests
+153/226 Test: horde_rt_music_director_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_music_director_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_music_director_tests" start time: Oct 21 01:02 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Shared adaptive music resolver tests passed.
+<end of output>
+Test time =   1.06 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_music_director_tests" end time: Oct 21 01:02 AUS Eastern Summer Time
+"horde_rt_music_director_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+154/226 Testing: horde_rt_chapter_music_tests
+154/226 Test: horde_rt_chapter_music_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_chapter_music_tests.exe" "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_chapter_music_tests" start time: Oct 21 01:02 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+65 chapter music host checks, 0 failures
+Synthetic PCM has no output device. Rope/terrain and logical restores are CPU fixtures, not natural victory, physically earned saves, listening or platform playback acceptance.
+<end of output>
+Test time =   1.53 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_chapter_music_tests" end time: Oct 21 01:02 AUS Eastern Summer Time
+"horde_rt_chapter_music_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+159/226 Testing: horde_rt_windows_music_focus_tests
+159/226 Test: horde_rt_windows_music_focus_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_windows_music_focus_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof
+"horde_rt_windows_music_focus_tests" start time: Oct 21 01:02 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+PASS: 16 focus/ready/menu/loss combinations and actual-window publication wiring
+<end of output>
+Test time =   1.06 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_windows_music_focus_tests" end time: Oct 21 01:02 AUS Eastern Summer Time
+"horde_rt_windows_music_focus_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+160/226 Testing: horde_rt_music_pcm_stream_tests
+160/226 Test: horde_rt_music_pcm_stream_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_music_pcm_stream_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_music_pcm_stream_tests" start time: Oct 21 01:02 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Shared PCM music stream tests passed.
+<end of output>
+Test time =   3.09 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_music_pcm_stream_tests" end time: Oct 21 01:02 AUS Eastern Summer Time
+"horde_rt_music_pcm_stream_tests" time elapsed: 00:00:03
+----------------------------------------------------------
+
+161/226 Testing: horde_rt_music_pcm_wave_tests
+161/226 Test: horde_rt_music_pcm_wave_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_music_pcm_wave_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_music_pcm_wave_tests" start time: Oct 21 01:02 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   1.09 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_music_pcm_wave_tests" end time: Oct 21 01:02 AUS Eastern Summer Time
+"horde_rt_music_pcm_wave_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+162/226 Testing: horde_rt_music_pcm_asset_bank_tests
+162/226 Test: horde_rt_music_pcm_asset_bank_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_music_pcm_asset_bank_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_music_pcm_asset_bank_tests" start time: Oct 21 01:02 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   1.38 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_music_pcm_asset_bank_tests" end time: Oct 21 01:02 AUS Eastern Summer Time
+"horde_rt_music_pcm_asset_bank_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+163/226 Testing: horde_rt_music_playback_session_tests
+163/226 Test: horde_rt_music_playback_session_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_music_playback_session_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_music_playback_session_tests" start time: Oct 21 01:02 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   1.88 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_music_playback_session_tests" end time: Oct 21 01:02 AUS Eastern Summer Time
+"horde_rt_music_playback_session_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+211/226 Testing: horde_rt_rescue_traversal_tests
+211/226 Test: horde_rt_rescue_traversal_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_rescue_traversal_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_rescue_traversal_tests" start time: Oct 21 01:02 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Rescue traversal cases=98612 failures=0 max_root_step=0.0249996 max_landing_root_step=0.0197426
+<end of output>
+Test time =   1.03 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_rescue_traversal_tests" end time: Oct 21 01:02 AUS Eastern Summer Time
+"horde_rt_rescue_traversal_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+213/226 Testing: horde_rt_rescue_journey_integration_tests
+213/226 Test: horde_rt_rescue_journey_integration_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_rescue_journey_integration_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_rescue_journey_integration_tests" start time: Oct 21 01:02 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+claim-site position=-34,-17.55 prompt=0 phase=4
+cycle=0 ascent-end phase=4 root=-33.7,2.05,-12.8
+upper lantern hand depth=0.69 localY=0.0511613
+unready-edge start=-33.7,-12.8 end=-33.0742,-11.9239 blocked=1
+cycle=1 ascent-end phase=4 root=-33.7,2.05,-12.8
+upper lantern hand depth=0.69 localY=0.0511825
+Combined CPU preparation resident_ns=249200 staged_ns=198400 resident_retained_bytes=25344 staged_retained_bytes=25344 resident_peak_capacity_bytes=48096 staged_peak_capacity_bytes=48096 gpu_residency_comparison=NOT_MEASURED
+Rescue journey integration cases=16234 failures=0 retained_triangles=528
+<end of output>
+Test time =   1.53 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_rescue_journey_integration_tests" end time: Oct 21 01:02 AUS Eastern Summer Time
+"horde_rt_rescue_journey_integration_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+214/226 Testing: horde_rt_chapter_terrain_journey_tests
+214/226 Test: horde_rt_chapter_terrain_journey_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_rescue_journey_integration_tests.exe" "--authored-terrain"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_chapter_terrain_journey_tests" start time: Oct 21 01:02 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+native-terrain moving probe frames=5788
+phone chapter mode=chapter-round-trip ticks/frame=1 frames=6280 stage=complete phase=complete failure=
+phone chapter mode=chapter-round-trip ticks/frame=3 frames=2097 stage=complete phase=complete failure=
+phone chapter mode=chapter-round-trip ticks/frame=4 frames=1572 stage=complete phase=complete failure=
+phone chapter mode=chapter-round-trip ticks/frame=6 frames=1047 stage=complete phase=complete failure=
+phone chapter mode=chapter-streaming-cycle ticks/frame=5 frames=482 stage=complete phase=complete failure=
+phone chapter mode=chapter-resident-comparison ticks/frame=3 frames=1118 stage=complete phase=complete failure=
+phone chapter mode=chapter-resident-comparison ticks/frame=6 frames=563 stage=complete phase=complete failure=
+phone chapter mode=chapter-streamed-comparison ticks/frame=3 frames=1118 stage=complete phase=complete failure=
+phone chapter mode=chapter-streamed-comparison ticks/frame=6 frames=563 stage=complete phase=complete failure=
+phone chapter mode=chapter-performance-route ticks/frame=3 frames=1118 stage=complete phase=complete failure=
+phone chapter mode=chapter-performance-route ticks/frame=6 frames=563 stage=complete phase=complete failure=
+lookout held-item clearance=2.7
+shaft carry clearance=1.68
+claim-site position=-34,-17.55 prompt=0 phase=4
+cycle=0 ascent-end phase=4 root=-33.7,2.05,-12.8
+upper lantern hand depth=0.69 localY=0.0511613
+unready-edge start=-33.7,-12.8 end=-33.0742,-11.9239 blocked=1
+cycle=1 ascent-end phase=4 root=-33.7,2.05,-12.8
+upper lantern hand depth=0.69 localY=0.0511825
+Combined CPU preparation resident_ns=254600 staged_ns=173600 resident_retained_bytes=25344 staged_retained_bytes=25344 resident_peak_capacity_bytes=48096 staged_peak_capacity_bytes=48096 gpu_residency_comparison=NOT_MEASURED
+Rescue journey integration cases=47773 failures=0 retained_triangles=528
+<end of output>
+Test time =  16.08 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_chapter_terrain_journey_tests" end time: Oct 21 01:03 AUS Eastern Summer Time
+"horde_rt_chapter_terrain_journey_tests" time elapsed: 00:00:16
+----------------------------------------------------------
+
+End testing: Oct 21 01:03 AUS Eastern Summer Time

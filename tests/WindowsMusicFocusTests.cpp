@@ -39,6 +39,19 @@ int main()
         std::cerr << "Windows publisher must sample foreground and honor immediate app/window loss\n";
         return 3;
     }
+    std::ifstream ownerSource("src/platform/windows/windows_campaign_owner.inl", std::ios::binary);
+    std::ostringstream ownerText;
+    ownerText << ownerSource.rdbuf();
+    const auto owner = ownerText.str();
+    const auto commit = owner.find("void FinishCampaignCommit(VulkanSurfaceContext& ctx)");
+    const auto pump = owner.find("void PumpCampaign(VulkanSurfaceContext& ctx)", commit);
+    if (!ownerSource || commit == std::string::npos || pump == std::string::npos ||
+        window.find("context.simulation.Events().Events(), context.musicEventLifetimeToken, context.musicResetToken") == std::string::npos ||
+        owner.substr(commit, pump - commit).find("++ctx.musicEventLifetimeToken;") == std::string::npos)
+    {
+        std::cerr << "Windows campaign queue replacement must publish a new music event lifetime\n";
+        return 4;
+    }
     std::cout << "PASS: 16 focus/ready/menu/loss combinations and actual-window publication wiring\n";
     return 0;
 }

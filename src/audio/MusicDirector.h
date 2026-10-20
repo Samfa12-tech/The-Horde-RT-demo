@@ -61,6 +61,9 @@ private:
         const gameplay::simulation::SimulationSnapshot& snapshot) const noexcept;
     MusicCue ResolvePersistentBed(
         const gameplay::simulation::SimulationSnapshot& snapshot) const noexcept;
+    void UpdateChapterMusic(const gameplay::simulation::SimulationSnapshot& snapshot,
+                            bool firstAscentEdge, double clockDelta,
+                            bool& discontinuity) noexcept;
 
     MusicCue cue_ = MusicCue::None;
     bool looping_ = false;
@@ -72,6 +75,7 @@ private:
     std::uint64_t eventLifetimeToken_ = 0;
     std::uint64_t lastEventSequence_ = 0;
     bool routeIdentityInitialized_ = false;
+    bool chapterMode_ = false;
     std::uint32_t retryGeneration_ = 0;
     std::uint64_t routeResetSequence_ = 0;
 
@@ -87,6 +91,9 @@ private:
     float revealGain_ = 1.0f;
     bool finalePhaseInitialized_ = false;
     bool skylightHReached_ = false;
+    bool chapterStateSeen_ = false;
+    bool chapterPreviousAscentCompleted_ = false;
+    bool chapterRevealActive_ = false;
     gameplay::interactions::FinaleSequencePhase previousFinalePhase_ =
         gameplay::interactions::FinaleSequencePhase::Inactive;
 };

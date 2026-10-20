@@ -91,12 +91,15 @@ MusicSelection MusicDirector::Update(
         routeIdentityInitialized_ = true;
         retryGeneration_ = snapshot.retryGeneration;
         routeResetSequence_ = snapshot.lastConsumedRouteResetSequence;
+        chapterMode_ = snapshot.developmentRescueJourney;
     }
     else if (retryGeneration_ != snapshot.retryGeneration ||
-             routeResetSequence_ != snapshot.lastConsumedRouteResetSequence)
+             routeResetSequence_ != snapshot.lastConsumedRouteResetSequence ||
+             chapterMode_ != snapshot.developmentRescueJourney)
     {
         retryGeneration_ = snapshot.retryGeneration;
         routeResetSequence_ = snapshot.lastConsumedRouteResetSequence;
+        chapterMode_ = snapshot.developmentRescueJourney;
         ResetSession(false);
         sessionChanged = true;
     }
@@ -192,6 +195,15 @@ MusicSelection MusicDirector::Update(
 
     torchFailureLatched_ = torchFailureLatched_ || IsActualTorchFailure(snapshot);
 
+    // Durable traversal state identifies a first live arrival. A fresh attachment
+    // or loaded checkpoint selects its bed directly, without replaying a reveal.
+    const bool firstAscentEdge = chapterMode_ && chapterStateSeen_ &&
+        !chapterPreviousAscentCompleted_ && snapshot.rescue.firstAscentCompleted;
+    if (chapterMode_)
+    {
+        chapterStateSeen_ = true;
+        chapterPreviousAscentCompleted_ = snapshot.rescue.firstAscentCompleted;
+    }
     const FinaleSequencePhase finalePhase = snapshot.finale.phase;
     const bool endingFlowStarted = snapshot.finale.lichDefeated ||
                                    finalePhase != FinaleSequencePhase::Inactive;
@@ -204,7 +216,15 @@ MusicSelection MusicDirector::Update(
 
     if (dead)
     {
+        chapterRevealActive_ = false;
         SetCue(MusicCue::None, false, 0.0, discontinuity, discontinuity);
+    }
+    else if (chapterMode_ &&
+             (snapshot.finale.lichDefeated || snapshot.lich.phase == LichPhase::Dead))
+    {
+        // Chapter continuation owns its route beds before the legacy ending's
+        // G/H latch. The night route is not a completed showcase dawn.
+        UpdateChapterMusic(snapshot, firstAscentEdge, clockDelta, discontinuity);
     }
     else if (skylightHReached_)
     {
@@ -340,6 +360,9 @@ void MusicDirector::ResetSession(const bool resetEventSequence) noexcept
     clockInitialized_ = false;
     finalePhaseInitialized_ = false;
     skylightHReached_ = false;
+    chapterStateSeen_ = false;
+    chapterPreviousAscentCompleted_ = false;
+    chapterRevealActive_ = false;
     forceDiscontinuity_ = true;
     revealGain_ = 1.0f;
 }
@@ -365,6 +388,40 @@ void MusicDirector::SetCue(const MusicCue cue,
     positionSeconds_ = cue == MusicCue::None
         ? 0.0
         : (looping ? std::fmod(safePosition, kLoopSeconds) : safePosition);
+}
+
+void MusicDirector::UpdateChapterMusic(const SimulationSnapshot& snapshot,
+                                      const bool firstAscentEdge,
+                                      const double clockDelta,
+                                      bool& discontinuity) noexcept
+{
+    if (!snapshot.rescue.exteriorSide)
+    {
+        chapterRevealActive_ = false;
+    }
+    else if (firstAscentEdge && snapshot.rescue.lanternClaimed)
+    {
+        chapterRevealActive_ = true;
+        SetCue(MusicCue::G, false, 0.0, true, discontinuity);
+        return;
+    }
+    else if (chapterRevealActive_)
+    {
+        const double nextPosition = positionSeconds_ + clockDelta;
+        if (nextPosition + kSampleBoundaryEpsilon < kSkylightCueSeconds)
+        {
+            SetCue(MusicCue::G, false, nextPosition, false, discontinuity);
+            return;
+        }
+        chapterRevealActive_ = false;
+        SetCue(MusicCue::H, true, std::max(0.0, nextPosition - kSkylightCueSeconds),
+               false, discontinuity);
+        return;
+    }
+    const auto bed = snapshot.rescue.exteriorSide ? MusicCue::H : MusicCue::F;
+    const double nextPosition = cue_ == bed && looping_
+        ? std::fmod(positionSeconds_ + clockDelta, kLoopSeconds) : 0.0;
+    SetCue(bed, true, nextPosition, false, discontinuity);
 }
 
 double MusicDirector::ReconstructSkylightPosition(

@@ -1,0 +1,7 @@
+ninja: Entering directory `C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\android\app\.cxx\Debug\4g1z6us2\x86'
+[1/6] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/audio/MusicPcmStream.cpp.o
+[2/6] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/audio/MusicPcmAssetBank.cpp.o
+[3/6] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3bfd802d66f2ac3f7e48ccd5949f7a59/horde-1.7-wp2-vertical-proof/src/audio/MusicDirector.cpp.o
+[4/6] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/audio/MusicPlaybackSession.cpp.o
+[5/6] Building CXX object CMakeFiles/horde_rt_probe_android.dir/android_music_playback.cpp.o
+[6/6] Linking CXX shared library "C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\android\app\build\intermediates\cxx\Debug\4g1z6us2\obj\x86\libhorde_rt_probe_android.so"

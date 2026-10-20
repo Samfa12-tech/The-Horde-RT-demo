@@ -139,6 +139,7 @@ void FinishCampaignCommit(VulkanSurfaceContext& ctx)
     ctx.entryLoadingVisible=false;ctx.deathOverlayVisible=ctx.endingOverlayVisible=false;
     ctx.sceneProfileDirty=ctx.glassGeometryDirty=ctx.renderScaleDirty=false;
     ctx.delayedFeedback.Clear();ctx.simulation.ClearEvents();++ctx.musicResetToken;
+    ++ctx.musicEventLifetimeToken; // Load/New Game replaced the semantic event queue.
     if(!gCampaignHiddenValidation)SpatialAudioEngine().StopLoop("chapter_dialogue");
     ctx.playingDialogueLine=0;ctx.playingDialogueGeneration=0;
     ctx.dialogueCompletionLine=0;ctx.dialogueCompletionGeneration=0;

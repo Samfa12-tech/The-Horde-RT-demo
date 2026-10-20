@@ -595,6 +595,7 @@ struct VulkanSurfaceContext
     std::uint64_t lastChapterPresentationAckTick = 0u;
     std::uint64_t lastChapterPresentationAckGeneration = 0u;
     std::unique_ptr<horde::platform::windows::WindowsMusicPlayback> musicPlayback;
+    std::uint64_t musicEventLifetimeToken = 1u;
     std::uint64_t musicResetToken = 0u;
     int musicLastLoggedGate = -1;
     bool fullscreen = false;
@@ -2221,7 +2222,7 @@ void PublishMusicPlayback(VulkanSurfaceContext& context, const bool focusLossNot
         const bool suspended = horde::platform::windows::WindowsMusicShouldSuspend(
             gameForeground, context.controlsEnabled, context.simulationPaused, focusLossNotification);
         const bool accepted = context.musicPlayback->Publish(snapshot,
-            context.simulation.Events().Events(), 1u, context.musicResetToken,
+            context.simulation.Events().Events(), context.musicEventLifetimeToken, context.musicResetToken,
             suspended,
             context.musicVolumePercent);
         // Bounded transition observations distinguish an explicit loss from a

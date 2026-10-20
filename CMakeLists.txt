@@ -1168,6 +1168,14 @@ if(BUILD_TESTING)
     target_link_libraries(horde_rt_music_director_tests PRIVATE horde_gameplay_simulation)
     add_test(NAME horde_rt_music_director_tests COMMAND horde_rt_music_director_tests)
 
+    add_executable(horde_rt_chapter_music_tests tests/ChapterMusicTests.cpp
+        src/scene/assets/AssetManifest.cpp src/scene/assets/AssetValidation.cpp
+        src/scene/assets/GltfDocument.cpp src/scene/assets/StaticMeshAsset.cpp)
+    target_include_directories(horde_rt_chapter_music_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/third_party)
+    target_link_libraries(horde_rt_chapter_music_tests PRIVATE horde_gameplay_simulation)
+    add_test(NAME horde_rt_chapter_music_tests COMMAND horde_rt_chapter_music_tests ${CMAKE_CURRENT_SOURCE_DIR})
+    set_tests_properties(horde_rt_chapter_music_tests PROPERTIES TIMEOUT 60)
+
     add_executable(horde_rt_entry_portal_cap_geometry_tests tests/EntryPortalCapGeometryTests.cpp)
     target_include_directories(horde_rt_entry_portal_cap_geometry_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     add_test(NAME horde_rt_entry_portal_cap_geometry_tests COMMAND horde_rt_entry_portal_cap_geometry_tests)
