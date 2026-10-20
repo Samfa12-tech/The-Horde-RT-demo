@@ -1,0 +1,3 @@
+# Preserve hashed raw Android exports, including their original whitespace.
+* -text
+*.xml -diff

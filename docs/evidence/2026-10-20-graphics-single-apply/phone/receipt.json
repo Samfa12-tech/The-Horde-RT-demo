@@ -95,6 +95,7 @@
   "nextMilestone": "existing WP2a current contact/earned lantern-to-checkpoint/death recovery acceptance remains highest priority; no combat retry or heavy outdoor expansion started",
   "audioHapticManualRevalidationRequired": false,
   "evidenceSha256": {
+    ".gitattributes": "4cde1db182d281e3427cf105e8f129ca59cc66ca310e0b0be4de4283cb8d4d0a",
     "after-custody.json": "4695265f3d65bcd6a54bd70dc5c148b281722371d8dce0a987c7e86f1c8a1b1d",
     "after-settings.xml": "59fe30e8180851a016c612fbed866f8a5dbc20477fac60487c2ca2192c6867e7",
     "back-settings.xml": "9658e26a6ba7f65ed6b2b6e2f9191daa67f17ba4a74ea61e6f802e00dfdb509f",
@@ -117,5 +118,6 @@
     "rejected-launch.json": "bacf249ac7d3a7a0ee32112ca88056935a2f69d8318e2b2989d6f84bcf734cd6",
     "resolved-launch.txt": "3c4c6257287a2c107072234eaee790db14fbc8f508688278ebd2b2d1516e229a",
     "restored-graphics.xml": "81649456603e5dd9135476bd9beb1c6548c7996c8eab8fd79bdaae69e7fd3701"
-  }
+  },
+  "evidenceBytePolicy": "folder-local -text preserves raw exported bytes across Git checkout; XML uses binary diffs to retain original trailing whitespace"
 }
