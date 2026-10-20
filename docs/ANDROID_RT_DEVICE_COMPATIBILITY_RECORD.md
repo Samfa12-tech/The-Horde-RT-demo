@@ -1,5 +1,29 @@
 # Android RT Device Compatibility Record
 
+## 2026-10-20 — fresh CPU/GPU baseline at preserved 40% settings
+
+SM-S948B / Android 17 API 37 / Adreno 840 / driver 2150932499 presents the
+current r23 scene through real RayTracingPipeline using production Shipping/Mobile
+shaders in optimized Debug. Exact installed baseline APK:
+`01b414878a57f16a9001b1ff28394a8d2c7c5da4b5c867ecd63ebde94d7f9d5a`,
+source `b2d548a2` plus the archived measurement-only patch. The existing noncombat
+chapter route strictly joins 704 completed RT frames to actual display evidence
+at 40% (576 × 1188 internal, 1440 × 2971 output), Mist On, Mobile fire/water,
+Low dust, Glass Off and Current shadows. Whole-route display median is 75.000 ms,
+p95 158.333 ms. Exterior GPU medians are about 137 ms, with 10–11 ms skinning;
+the lower-room GPU/skin medians are 54.008 / 6.608 ms. These are current measured
+costs, not a sustained 30 FPS pass or proof from the old October 1 timings.
+
+Current-HAL framework thermal status stayed 0; starting AP/BAT/SKIN were
+41.4/28.4/33.5 C and ending 39.1/31.4/35.1 C. GPU clocks/power level and initial
+battery state were not captured. All 286 pre-existing file hashes matched after
+compatible `install -r`; after launch, save/lock records and Horde preferences
+remain unchanged. Android's ActivityThread ID metadata changed. No combat input,
+data clear, earned-save claim, public release or release-app update occurred.
+Evidence class: **bounded physical production-shader route timing with exact CPU
+stage and actual-presentation joins**. See the [baseline receipt](evidence/2026-10-20-phone-performance/baseline-receipt.json)
+and [CPU preparation evaluation](evidence/2026-10-20-phone-performance/cpu-preparation.md).
+
 ## 2026-10-18 - repaired checkpoint artifact, incomplete natural route
 
 SM-S948B / Android 17 / API 37 / Adreno 840 / Vulkan 1.4.295, installed Debug

@@ -605,6 +605,7 @@ const char* RtStageMetricName(const RtStage stage) noexcept
     case RtStage::QueueSubmit: return "queueSubmitCpuMs";
     case RtStage::PresentCall: return "presentCallCpuMs";
     case RtStage::WholeFrameCycle: return "wholeFrameCycleCpuMs";
+    case RtStage::PoseCopy: return "poseCopyCpuMs";
     default: return nullptr;
     }
 }

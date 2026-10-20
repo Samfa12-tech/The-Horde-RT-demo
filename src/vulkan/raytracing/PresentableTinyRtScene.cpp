@@ -6809,6 +6809,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                 diagnostic = "Skinned player pose/tangent frame does not match its static-PBR vertex stream.";
                 return false;
             }
+            RtSceneStageScope poseCopyScope(observation, horde::telemetry::RtStage::PoseCopy);
             skinnedPlayerUpload_ = productionPlayerAsset_.vertices;
             for (std::size_t vertex = 0u; vertex < skinned.size(); ++vertex)
             {
@@ -6819,6 +6820,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                 std::copy_n(skinnedTangents[vertex].tangent, 4u,
                             skinnedPlayerUpload_[vertex].tangent.begin());
             }
+            poseCopyScope.Complete(1u, skinnedPlayerUpload_.size() *
+                sizeof(horde::scene::assets::StaticRtVertex), 1u);
             const VkDeviceSize playerOffset =
                 static_cast<VkDeviceSize>(playerStaticVertexBase_) *
                 sizeof(horde::scene::assets::StaticRtVertex);
@@ -6842,6 +6845,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                 viewSkinScope.Cancel();
                 return false;
             }
+            viewSkinScope.Complete(1u);
             playerSkinTotalMilliseconds_ += std::chrono::duration<double, std::milli>(
                 std::chrono::steady_clock::now() - viewSkinBegin).count();
             if (!updateSkinnedPlayer) ++playerSkinUpdateCount_;
@@ -6849,9 +6853,9 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                 viewmodelPoseTangents_.size() != viewmodelPoseVertices_.size())
             {
                 diagnostic = "Viewmodel skin output disagrees with its independent static-PBR stream.";
-                viewSkinScope.Cancel();
                 return false;
             }
+            RtSceneStageScope poseCopyScope(observation, horde::telemetry::RtStage::PoseCopy);
             if (viewmodelUpload_.empty()) viewmodelUpload_ = viewmodelAsset_.vertices;
             for (std::size_t vertex = 0u; vertex < viewmodelUpload_.size(); ++vertex)
             {
@@ -6859,7 +6863,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                 std::copy_n(viewmodelPoseVertices_[vertex].normal, 4u, viewmodelUpload_[vertex].normal.begin());
                 std::copy_n(viewmodelPoseTangents_[vertex].tangent, 4u, viewmodelUpload_[vertex].tangent.begin());
             }
-            viewSkinScope.Complete(1u);
+            poseCopyScope.Complete(1u, viewmodelUpload_.size() *
+                sizeof(horde::scene::assets::StaticRtVertex), 1u);
             if (!gpuResources_.WriteBuffer(viewmodelVertexBuffer_, viewmodelUpload_.data(),
                     viewmodelUpload_.size() * sizeof(viewmodelUpload_.front()),
                     "modelled player viewmodel vertices", diagnostic, observation)) return false;
@@ -6921,7 +6926,14 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         const auto clip = frame.chapterCompanion.walking ? horde::scene::SkinnedClip::Walking : horde::scene::SkinnedClip::Idle;
         const float duration = chapterActor_.Duration(clip);
         const float time = std::fmod(frame.chapterCompanion.animationSeconds, duration);
-        if (!chapterActor_.Pose(clip, time, diagnostic)) return false;
+        // Pose owns clip skinning plus its inseparable floor/bounds/static-PBR
+        // repack. CharacterSkin therefore includes that CPU preparation here.
+        RtSceneStageScope companionSkinScope(observation, horde::telemetry::RtStage::CharacterSkin);
+        if (!chapterActor_.Pose(clip, time, diagnostic)) {
+            companionSkinScope.Cancel();
+            return false;
+        }
+        companionSkinScope.Complete(1u);
         const auto& metadata = staticMeshSlot_.InstanceMetadata()[CharacterRenderSlot::kKeeperMetadataIndex];
         const auto& primitive = staticMeshSlot_.PrimitiveMetadata()[metadata.primitiveBase];
         const auto& vertices = chapterActor_.Asset().vertices;

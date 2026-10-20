@@ -426,8 +426,9 @@ void RestoreAndroidMotionEquipmentSeed(SwapchainContext& context)
 void ObserveAndroidMotionCompletion(SwapchainContext& context, bool completed)
 {
     if (!context.motion || !context.motion->armed || context.motion->finished || !completed) return;
+    const auto published = context.rtFrameEvidence.PublishedStateByValue();
     if (!context.motion->ledger.AppendCompletedFrame(context.surfaceGeneration,
-            context.rtFrameEvidence.PublishedStateByValue()))
+            published))
         FailAndroidMotion(context, context.motion->ledger.Failure());
     else if(horde::gameplay::validation::IsTimedMotionScenario(context.motion->selected)) {
         auto& run=*context.motion;const auto frames=run.ledger.Frames();
@@ -435,6 +436,8 @@ void ObserveAndroidMotionCompletion(SwapchainContext& context, bool completed)
         const auto& frame=frames.back();auto& tag=run.chapterTags[frame.identity.submitted.frame.frameSlot];
         if(frame.identity.submitted.submissionSerial==run.chapterLastSerial)return;
         if(tag.serial!=frame.identity.submitted.submissionSerial || !tag.returnNs ||
+           !published.hasCompletedEvidence ||
+           published.completedEvidence.identity.submitted.submissionSerial!=tag.serial ||
            (run.chapterLastReturnNs && tag.returnNs<=run.chapterLastReturnNs)) {
             FailAndroidMotion(context,"Chapter completion lost its submitted resource/return timestamp tag.");return;
         }
@@ -450,6 +453,18 @@ void ObserveAndroidMotionCompletion(SwapchainContext& context, bool completed)
             <<(d.unloads-run.chapterBaseline.unloads)<<','<<(d.restores-run.chapterBaseline.restores);
         run.chapterCsv<<','<<frame.resources.tlasInstanceCount<<','
             <<frame.resources.bottomLevelAccelerationStructureCount;
+        // The same immutable completed publication admitted by the ledger above.
+        // Never sample mutable current-record work or borrow a previous serial.
+        const auto& cpu = published.completedEvidence.scene.stages;
+        run.chapterCsv<<','<<horde::telemetry::RtSampleStatusName(cpu.status);
+        for (const auto stage : {horde::telemetry::RtStage::SimulationStep,
+                horde::telemetry::RtStage::Skin, horde::telemetry::RtStage::PlayerSkin,
+                horde::telemetry::RtStage::CharacterSkin, horde::telemetry::RtStage::PoseCopy,
+                horde::telemetry::RtStage::DynamicUpload, horde::telemetry::RtStage::FrameFenceWait,
+                horde::telemetry::RtStage::QueueSubmit, horde::telemetry::RtStage::WholeFrameCycle}) {
+            const auto& value = cpu.values[horde::telemetry::RtStageIndex(stage)];
+            run.chapterCsv<<','<<value.durationNanoseconds<<','<<value.workInvocationCount;
+        }
 #if HORDE_RT_FRAME_STAGE_PROBE
         // This is called only after this exact slot's own successful fence/idle.
         for(unsigned i=0;i<context.frameStageTimers.size();++i) {
@@ -560,6 +575,11 @@ void BuildAndroidMotionInput(SwapchainContext& context,
             run.chapterCsv.open(run.path+"-resources.csv");
             run.chapterCsv<<"present_return_ns,interval_ns,serial,tick,phase,x,y,z,device_local_bytes,host_visible_bytes,omitted_triangles,unloads,restores,saved_owner_bytes,peak_overlap_bytes,wait_frames,yaw,pitch,view_ticks,detail_step_cpu_ns,run_unloads,run_restores"
                 <<",tlas_instances,blas_count"
+                <<",cpu_stage_status,simulation_cpu_ns,simulation_calls,skin_cpu_ns,skin_calls"
+                <<",player_skin_cpu_ns,player_skin_calls,character_skin_cpu_ns,character_skin_calls"
+                <<",pose_copy_cpu_ns,pose_copy_calls,dynamic_upload_cpu_ns,dynamic_upload_calls"
+                <<",fence_wait_cpu_ns,fence_wait_calls,queue_submit_cpu_ns,queue_submit_calls"
+                <<",whole_frame_cpu_ns,whole_frame_calls"
 #if HORDE_RT_FRAME_STAGE_PROBE
                 <<",as_gpu_status,as_gpu_serial,as_gpu_ns,dispatch_gpu_status,dispatch_gpu_serial,dispatch_gpu_ns,transfer_gpu_status,transfer_gpu_serial,transfer_gpu_ns"
 #endif

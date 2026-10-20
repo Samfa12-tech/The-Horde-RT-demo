@@ -257,6 +257,9 @@ enum class RtStage : std::uint8_t
     QueueSubmit,
     PresentCall,
     WholeFrameCycle,
+    // CPU StaticRtVertex repack only; output bytes, not GPU upload traffic.
+    // Append new stages to preserve the existing serialized count-array order.
+    PoseCopy,
     Count,
 };
 

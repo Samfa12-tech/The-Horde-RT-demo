@@ -517,6 +517,19 @@ void TestFixedTextAndEnums(TestContext& context)
 
 void TestStageAccumulatorAndConversion(TestContext& context)
 {
+    constexpr std::array<RtStage, 13u> originalStageOrder{{
+        RtStage::SimulationStep, RtStage::Skin, RtStage::PlayerSkin,
+        RtStage::CharacterSkin, RtStage::DynamicUpload, RtStage::BlasRefitRecord,
+        RtStage::TlasUpdateRecord, RtStage::TraceCopyRecord, RtStage::FrameFenceWait,
+        RtStage::ImageAcquire, RtStage::QueueSubmit, RtStage::PresentCall,
+        RtStage::WholeFrameCycle}};
+    for (std::size_t index = 0u; index < originalStageOrder.size(); ++index)
+        context.Check(RtStageIndex(originalStageOrder[index]) == index,
+                      "appended pose-copy stage must preserve every existing count-array index");
+    context.Check(RtStageIndex(RtStage::PoseCopy) == originalStageOrder.size() &&
+                      kRtStageCount == originalStageOrder.size() + 1u &&
+                      std::string_view(RtStageMetricName(RtStage::PoseCopy)) == "poseCopyCpuMs",
+                  "pose-copy metric must append one named stage after the original roster");
     std::uint64_t nanoseconds = 0u;
     context.Check(CheckedMillisecondsToNanoseconds(1.25, nanoseconds) &&
                       nanoseconds == 1'250'000u,
@@ -568,6 +581,9 @@ void TestStageAccumulatorAndConversion(TestContext& context)
     context.Check(accumulator.Accumulate(RtStage::PlayerSkin, 50u, 1u, 0u, 1u) &&
                       accumulator.Accumulate(RtStage::CharacterSkin, 70u, 2u, 0u, 2u),
                   "player and character skin contributions must accumulate independently");
+    context.Check(accumulator.Accumulate(RtStage::PoseCopy, 20u, 1u, 1024u, 1u) &&
+                      accumulator.Accumulate(RtStage::PoseCopy, 30u, 1u, 512u, 1u),
+                  "world-body and viewmodel repacks must retain independent contributions");
     context.Check(!accumulator.Accumulate(RtStage::Skin, 999u, 1u, 0u, 1u),
                   "derived total skin timing must reject direct contributions that could double count");
     RtStageFrameSample committed{};
@@ -583,6 +599,11 @@ void TestStageAccumulatorAndConversion(TestContext& context)
     context.Check(upload.durationNanoseconds == 400u && upload.byteCount == 4096u &&
                       upload.operationCount == 2u,
                   "dynamic upload scope must retain duration, bytes and operations");
+    const RtStageValue& poseCopy = committed.values[RtStageIndex(RtStage::PoseCopy)];
+    context.Check(poseCopy.durationNanoseconds == 50u &&
+                      poseCopy.workInvocationCount == 2u && poseCopy.byteCount == 1536u &&
+                      poseCopy.operationCount == 2u,
+                  "pose repacks must count output bytes without changing skin or GPU upload totals");
     const RtStageValue& playerSkin = committed.values[RtStageIndex(RtStage::PlayerSkin)];
     const RtStageValue& characterSkin = committed.values[RtStageIndex(RtStage::CharacterSkin)];
     const RtStageValue& totalSkin = committed.values[RtStageIndex(RtStage::Skin)];
@@ -2001,10 +2022,10 @@ void TestValidatorAndSerializers(TestContext& context)
         "\"blasRefitRecordCpuMs\":0.000005,\"tlasUpdateRecordCpuMs\":0.000006,"
         "\"traceCopyRecordCpuMs\":0.000007,\"frameFenceWaitCpuMs\":0.000008,"
         "\"imageAcquireCpuMs\":0.000009,\"queueSubmitCpuMs\":0.000010,"
-        "\"presentCallCpuMs\":0.000011,\"wholeFrameCycleCpuMs\":0.000012,"
-        "\"workInvocationCounts\":[1,0,0,0,0,0,0,0,0,0,0,0,0],"
-        "\"byteCounts\":[0,0,0,0,64,0,0,0,0,0,0,0,0],"
-        "\"operationCounts\":[0,0,0,0,2,0,0,0,0,0,0,0,0]},"
+        "\"presentCallCpuMs\":0.000011,\"wholeFrameCycleCpuMs\":0.000012,\"poseCopyCpuMs\":0.000013,"
+        "\"workInvocationCounts\":[1,0,0,0,0,0,0,0,0,0,0,0,0,0],"
+        "\"byteCounts\":[0,0,0,0,64,0,0,0,0,0,0,0,0,0],"
+        "\"operationCounts\":[0,0,0,0,2,0,0,0,0,0,0,0,0,0]},"
         "\"presentation\":{\"outcome\":\"presented\",\"presented\":true,"
         "\"lastSuccessfulPresentSubmissionSerial\":1,\"finalIdleCompletion\":false},"
         "\"cpuBenchmarkEligible\":true,\"benchmarkEligible\":true}\n";
@@ -2025,7 +2046,7 @@ void TestValidatorAndSerializers(TestContext& context)
         "Presentation: presented last-successful-submission=1 final-idle=no cpu-benchmark-eligible=yes benchmark-eligible=yes\n"
         "Dielectric diagnostics: compiled-out counters=N/A reads=0 resets=0\n"
         "Whole RT GPU: disabled value=N/A\n"
-        "Stages (CPU wall/record): simulationStepCpuMs=0.000000 skinCpuMs=0.000005 playerSkinCpuMs=0.000002 characterSkinCpuMs=0.000003 dynamicUploadCpuMs=0.000004 blasRefitRecordCpuMs=0.000005 tlasUpdateRecordCpuMs=0.000006 traceCopyRecordCpuMs=0.000007 frameFenceWaitCpuMs=0.000008 imageAcquireCpuMs=0.000009 queueSubmitCpuMs=0.000010 presentCallCpuMs=0.000011 wholeFrameCycleCpuMs=0.000012\n";
+        "Stages (CPU wall/record): simulationStepCpuMs=0.000000 skinCpuMs=0.000005 playerSkinCpuMs=0.000002 characterSkinCpuMs=0.000003 dynamicUploadCpuMs=0.000004 blasRefitRecordCpuMs=0.000005 tlasUpdateRecordCpuMs=0.000006 traceCopyRecordCpuMs=0.000007 frameFenceWaitCpuMs=0.000008 imageAcquireCpuMs=0.000009 queueSubmitCpuMs=0.000010 presentCallCpuMs=0.000011 wholeFrameCycleCpuMs=0.000012 poseCopyCpuMs=0.000013\n";
     context.Check(shippingText == expectedShippingText,
                   "Shipping text must match the hand-derived canonical golden projection");
     context.Check(shippingText.find("N/A") != std::string::npos,
