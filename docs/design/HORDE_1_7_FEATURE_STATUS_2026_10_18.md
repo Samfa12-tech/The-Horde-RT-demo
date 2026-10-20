@@ -48,8 +48,14 @@ the owner pack unchanged. 65 new host checks, 13 affected CTests, 19 Java tests
 and Windows/four-ABI builds pass; actual listening and naturally earned saves
 remain open. The [morning recovery choices](HORDE_1_7_RECOVERY_DECISIONS_FOR_MORNING_2026_10_20.md)
 record the genuinely undecided healing policy without changing health/save rules.
-Local tomb/rope ambience is the next bounded source audit; physical critical-path
-and warm mobile Mist Off acceptance remain higher-priority owner testing.
+The later [local ambience checkpoint](../evidence/2026-10-20-local-ambience/README.md)
+now adds finite runoff drips and actual grip-travel rope contacts using two
+licensed cuts and existing single-voice ownership. 107 new native checks, 16
+affected CTests, 28 Java tests and both-platform builds pass; listening remains
+open. Smooth dialogue ducking for music/ambient beds is the next accepted source
+gap. Healing policy is the main unresolved gameplay decision; debris reaction/
+option remains conditional. Physical critical-path and warm mobile Mist Off
+acceptance remain higher-priority owner testing.
 
 ## Authority and status meanings
 

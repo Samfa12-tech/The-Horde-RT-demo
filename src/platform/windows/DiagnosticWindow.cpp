@@ -1932,9 +1932,10 @@ void UpdateChapterDialogueAudio(VulkanSurfaceContext& context)
 {
     if(gCampaignHiddenValidation)return;
     if((!horde::gameplay::simulation::ForestBirdAmbience::Eligible(context.simulation.Snapshot()) &&
-        !horde::gameplay::simulation::ForestBirdAmbience::PondEligible(context.simulation.Snapshot())) ||
+        !horde::gameplay::simulation::ForestBirdAmbience::PondEligible(context.simulation.Snapshot()) &&
+        !horde::gameplay::simulation::ChapterLocalAmbience::Eligible(context.simulation.Snapshot())) ||
        !context.controlsEnabled || MeasurementPausedByUi(context) || context.sfxVolumePercent<=0 ||
-       GetForegroundWindow()!=context.windowHandle)SpatialAudioEngine().StopLoop("forest_bird");
+       GetForegroundWindow()!=context.windowHandle)SpatialAudioEngine().StopLoop("chapter_ambience");
     using horde::gameplay::dialogue::Line;
     const auto& dialogue = context.simulation.Snapshot().chapterDialogue;
     const auto line = dialogue.line;
@@ -2262,10 +2263,9 @@ void DrainGameplayEvents(VulkanSurfaceContext& context)
         PlayPositionalSoundEffect(context, "skeleton_falling_bones.wav", 0.36f, event, "pixabay");
     });
 
-    std::uint64_t latestForestSignal=0;
+    std::uint64_t latestAmbienceSignal=0;
     for(const auto& event:context.simulation.Events().Events())
-        if(event.type==GameplayEventType::ForestBird || event.type==GameplayEventType::ForestCrickets || event.type==GameplayEventType::PondFrogs ||
-           event.type==GameplayEventType::ForestBirdStopped)latestForestSignal=event.sequence;
+        if(horde::gameplay::simulation::IsChapterAmbienceEvent(event.type))latestAmbienceSignal=event.sequence;
     for (const GameplayEvent& event : context.simulation.Events().Events())
     {
         switch (event.type)
@@ -2273,26 +2273,35 @@ void DrainGameplayEvents(VulkanSurfaceContext& context)
         case GameplayEventType::ForestBird:
         case GameplayEventType::ForestCrickets:
         case GameplayEventType::PondFrogs:
-            if(event.sequence!=latestForestSignal)break;
+        case GameplayEventType::TombDrip:
+        case GameplayEventType::RopeContact:
+            if(event.sequence!=latestAmbienceSignal)break;
             if(context.controlsEnabled && !context.simulationPaused && context.sfxVolumePercent>0 &&
                GetForegroundWindow()==context.windowHandle &&
-               (event.type==GameplayEventType::PondFrogs?
+               (event.type==GameplayEventType::TombDrip?
+                   horde::gameplay::simulation::ChapterLocalAmbience::DripEligible(context.simulation.Snapshot()):
+                event.type==GameplayEventType::RopeContact?
+                   horde::gameplay::simulation::ChapterLocalAmbience::RopeEligible(context.simulation.Snapshot()):
+                event.type==GameplayEventType::PondFrogs?
                    horde::gameplay::simulation::ForestBirdAmbience::PondEligible(context.simulation.Snapshot()):
                    horde::gameplay::simulation::ForestBirdAmbience::Eligible(context.simulation.Snapshot()))) {
-                auto& audio=SpatialAudioEngine();audio.StopLoop("forest_bird");
+                auto& audio=SpatialAudioEngine();audio.StopLoop("chapter_ambience");
                 const auto gains=horde::gameplay::CalculateSpatialAudio(
                     {event.worldX,event.worldZ,event.intensity,1.f,14.f,event.worldY},
                     {event.listenerX,event.listenerZ,event.listenerYawRadians,event.listenerY});
-                const auto clip=event.type==GameplayEventType::PondFrogs?
+                const auto clip=event.type==GameplayEventType::TombDrip?
+                    "audio/chapter-local-ambience/runtime/tomb_drip.wav":event.type==GameplayEventType::RopeContact?
+                    "audio/chapter-local-ambience/runtime/rope_contact.wav":event.type==GameplayEventType::PondFrogs?
                     "audio/night-ambience/runtime/pond_frogs_crickets.wav":event.type==GameplayEventType::ForestCrickets?
                     "audio/night-ambience/runtime/evening_cricket.wav":"audio/night-ambience/runtime/tawny_owl.wav";
                 (void)audio.Play(ResolveAssetRoot()/clip,gains.left,gains.right,
-                    "forest_bird",0,0,horde::platform::windows::WindowsSfxSourceGain(1.f,context.sfxVolumePercent));
+                    "chapter_ambience",0,0,horde::platform::windows::WindowsSfxSourceGain(1.f,context.sfxVolumePercent));
             }
             break;
         case GameplayEventType::ForestBirdStopped:
-            if(event.sequence!=latestForestSignal)break;
-            SpatialAudioEngine().StopLoop("forest_bird");break;
+        case GameplayEventType::ChapterLocalAmbienceStopped:
+            if(event.sequence!=latestAmbienceSignal)break;
+            SpatialAudioEngine().StopLoop("chapter_ambience");break;
         case GameplayEventType::PlayerWetFootstep:
         {
             const unsigned variant = static_cast<unsigned>(context.playerFootstepVariant++) & 3u;
@@ -4218,7 +4227,7 @@ bool HasDeviceExtension(VkPhysicalDevice physicalDevice, const char* extensionNa
 
 void ClearDesktopInput(VulkanSurfaceContext& context)
 {
-    if(!gCampaignHiddenValidation)SpatialAudioEngine().StopLoop("forest_bird");
+    if(!gCampaignHiddenValidation)SpatialAudioEngine().StopLoop("chapter_ambience");
     if (context.crouchHeld) context.crouchKeyBlockedUntilRelease = true;
     context.crouchHeld = false;
     context.controllerCrouchHeld = false;

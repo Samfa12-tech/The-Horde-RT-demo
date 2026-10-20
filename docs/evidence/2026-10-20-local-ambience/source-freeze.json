@@ -1,0 +1,100 @@
+{
+  "sourceBase": "55b252d3a7eb3cbbedb11853f7f88565873998e7",
+  "sources": {
+    "CMakeLists.txt": {
+      "bytes": 114325,
+      "sha256": "f0ba0d50e2ccb58ad59751e128b524eedd11e0260e39da98fc3ac1f3ad989e52",
+      "gitBlob": "efedb6f2b095206dd938a890a72b5bc3ce1adb11"
+    },
+    "android/app/build.gradle": {
+      "bytes": 42003,
+      "sha256": "2a97a2902fe003209215c01102f871761f4ea4931377d6750fa5640e7c387ce5",
+      "gitBlob": "a972da8cbaf8d91bf20571fbe908d860736741f4"
+    },
+    "android/app/src/main/java/com/samfa12/hordelanternrt/ChapterAmbienceFeedback.java": {
+      "bytes": 676,
+      "sha256": "bea6ffe3a4a2b7dbd4292018a752d9ca460da49d1ed651155797312fb8d0c022",
+      "gitBlob": "32a355d165c2190e336a5161de2acf87d57b51c9"
+    },
+    "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java": {
+      "bytes": 472725,
+      "sha256": "c84c0904031daf7f5e1af59a2e31ad8bb3d8d05ed92dfc37afce8c4e3479c165",
+      "gitBlob": "e8782642860b44d6732f0917896b76d473fb7b53"
+    },
+    "android/app/src/test/java/com/samfa12/hordelanternrt/ChapterAmbienceFeedbackTest.java": {
+      "bytes": 1042,
+      "sha256": "0d7f866a2f9ae839edf9837c45712213a77ac4b5c8fa066ee466efc9c298c923",
+      "gitBlob": "fd86b94c491763ba72c6343bd205c4d99fd6ce54"
+    },
+    "assets/audio/chapter-local-ambience/asset.manifest.json": {
+      "bytes": 2923,
+      "sha256": "b217e0a5ec2f5f4046285dbbf6499bb779485dac7f3ee25ec0001b9af43c68dc",
+      "gitBlob": "5aac3a772fdd174b307767c2554ad60817bbc0ef"
+    },
+    "assets/audio/chapter-local-ambience/runtime/rope_contact.wav": {
+      "bytes": 95244,
+      "sha256": "37948f94da011a1fdb41c8ae29ace65560bc9ee6e344bce49e718dd76303e303",
+      "gitBlob": "40f8087a0563df7cfbef2512f062c53bd91e8fc6"
+    },
+    "assets/audio/chapter-local-ambience/runtime/tomb_drip.wav": {
+      "bytes": 96044,
+      "sha256": "9cff09fae048b84e60a03b5e7d546c8f1fe3e479bd1094ce4df17a3f628135c8",
+      "gitBlob": "fd467935c81b370942dd587b270b85204cc16a4a"
+    },
+    "src/gameplay/simulation/ChapterLocalAmbience.h": {
+      "bytes": 5432,
+      "sha256": "40eb88872157e88f4478d44a4461e7d3537c9692a14a0c640670c3377ccc2cc0",
+      "gitBlob": "0565b4e7734074af5ea47226effa15a44e71e0c5"
+    },
+    "src/gameplay/simulation/GameSimulation.cpp": {
+      "bytes": 137100,
+      "sha256": "061598d399659f257b625fa4a6f74dd9c6ace860e059976ad412af6bf1866c1e",
+      "gitBlob": "1217afcbfb0f3f84512e51632d782f03f22e6b41"
+    },
+    "src/gameplay/simulation/GameSimulation.h": {
+      "bytes": 22029,
+      "sha256": "ad7f071c08070404efc4165f128787f72c83f0307452556d84b75c45da484d42",
+      "gitBlob": "e39e5809e7d4531acf5974ea5e41ec1548d49284"
+    },
+    "src/gameplay/simulation/GameplayEvent.h": {
+      "bytes": 3562,
+      "sha256": "5c67c0d8ad4cd6fe3b7fa406888b70c789ee25fa4f7c764b2ed2f90be5cf1eb2",
+      "gitBlob": "a540f0460f7b313cd6743fac8de059fbafc7aa21"
+    },
+    "src/platform/windows/DiagnosticWindow.cpp": {
+      "bytes": 616446,
+      "sha256": "b8e69649966953607a55c753a5f52f99024c5b870a3a2c4ba436d8bca12594ba",
+      "gitBlob": "7d9031e3e56acf843a659a22510673b29bfe53ab"
+    },
+    "src/platform/windows/windows_campaign_owner.inl": {
+      "bytes": 17756,
+      "sha256": "9143ce4ce29049e08a3948207924afb18686eb570d25993051a3f8e0ad3f709a",
+      "gitBlob": "ccdb95e809abcdf512ff5dd2d404d7ac6c80d50b"
+    },
+    "tests/ChapterLocalAmbienceTests.cpp": {
+      "bytes": 25432,
+      "sha256": "af573e20804a6829839f30bdb25e66a56190a497040f7efcca9df197faa78547",
+      "gitBlob": "75d787e82b7fb6ec6743511498bc2fd0901b87a6"
+    },
+    "tests/ForestBirdAmbienceTests.cpp": {
+      "bytes": 18462,
+      "sha256": "944031916e8ab8828127e708ba26558266f9bd2d636cc2827c57a5a902535215",
+      "gitBlob": "155ba5d6f9e301b4610a4549cba8204c7434b5ff"
+    },
+    "tests/test_chapter_local_audio.py": {
+      "bytes": 3000,
+      "sha256": "69299c8edd7d4a70b68c08471c669e158a1b3ec97608d6ef9f6aedd3d4e2e7ab",
+      "gitBlob": "3dd3a4158f3fb40473f761f1c8a5a71afc25f443"
+    },
+    "tools/horde-night-audio-policy.ps1": {
+      "bytes": 1466,
+      "sha256": "64159aa6faa02c21b0446325479b518c3722f372512d3a98134f9ccc8a168521",
+      "gitBlob": "a4d29472d1b36abed0981a3f0c3545f68661f1e5"
+    },
+    "tools/prepare-chapter-local-ambience.py": {
+      "bytes": 5310,
+      "sha256": "468cdfd2b07e3fc91cd79df96a87bda6a39b6aa98bf1e91a01595ec4227ce6e9",
+      "gitBlob": "a61d9493e20b1bf853706e13da9aebeb97396a28"
+    }
+  }
+}

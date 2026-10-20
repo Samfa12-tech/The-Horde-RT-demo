@@ -156,7 +156,7 @@ std::uint32_t GameSimulation::AdvanceFrame(const InputSnapshot& publishedInput,
     }
     if (input.paused)
     {
-        forestBird_.Reset();
+        forestBird_.Reset();localAmbience_.Reset();
         ClearCrouchIntent();
         combatContactTrace_.Clear();
         gameplayTimeScale_ = 1.0f;
@@ -394,6 +394,12 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
                  bird==ForestBirdAmbience::Cue::PlayCrickets?GameplayEventType::ForestCrickets:
                  bird==ForestBirdAmbience::Cue::PlayPondFrogs?GameplayEventType::PondFrogs:GameplayEventType::ForestBirdStopped,
                 EntityId::Invalid,EntityId::Invalid,playerX_,playerZ_,1.f,0,playerSupport_.worldY);
+        const auto local=localAmbience_.Step(snapshot_);
+        if(local.cue!=ChapterLocalAmbience::Cue::None)
+            Emit(local.cue==ChapterLocalAmbience::Cue::Drip?GameplayEventType::TombDrip:
+                 local.cue==ChapterLocalAmbience::Cue::Rope?GameplayEventType::RopeContact:
+                 GameplayEventType::ChapterLocalAmbienceStopped,
+                EntityId::Invalid,EntityId::Invalid,local.position.x,local.position.z,local.gain,0,local.position.y);
     }
     if(fixedDeltaSeconds>0 && !input.paused)LatchCampaignBoundary();
     snapshot_.eventsEmittedThisTick = events_.Size() - eventsBefore;
@@ -403,7 +409,7 @@ void GameSimulation::SynchronizePausedInput(const InputSnapshot& input,
                                             const std::uint64_t inputPublicationSequence,
                                             const PausedInputPolicy policy)
 {
-    forestBird_.Reset();
+    forestBird_.Reset();localAmbience_.Reset();
     lastInput_ = input;
     lastInput_.paused = true;
     combatContactTrace_.Clear();
@@ -699,7 +705,7 @@ void GameSimulation::SetDevelopmentSupportFixture(bool enabled, std::uint64_t ge
 
 void GameSimulation::ResetRoute()
 {
-    forestBird_.Reset();
+    forestBird_.Reset();localAmbience_.Reset();
     ClearCampaignBoundary();
     CancelCampaignRestore();
     if(staticDetailLease_.resourceGeneration) {

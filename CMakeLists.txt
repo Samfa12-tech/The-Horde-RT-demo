@@ -1176,6 +1176,14 @@ if(BUILD_TESTING)
     add_test(NAME horde_rt_chapter_music_tests COMMAND horde_rt_chapter_music_tests ${CMAKE_CURRENT_SOURCE_DIR})
     set_tests_properties(horde_rt_chapter_music_tests PROPERTIES TIMEOUT 60)
 
+    add_executable(horde_rt_chapter_local_ambience_tests tests/ChapterLocalAmbienceTests.cpp
+        src/scene/assets/AssetManifest.cpp src/scene/assets/AssetValidation.cpp
+        src/scene/assets/GltfDocument.cpp src/scene/assets/StaticMeshAsset.cpp)
+    target_include_directories(horde_rt_chapter_local_ambience_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/third_party)
+    target_link_libraries(horde_rt_chapter_local_ambience_tests PRIVATE horde_gameplay_simulation)
+    add_test(NAME horde_rt_chapter_local_ambience_tests COMMAND horde_rt_chapter_local_ambience_tests ${CMAKE_CURRENT_SOURCE_DIR})
+    set_tests_properties(horde_rt_chapter_local_ambience_tests PROPERTIES TIMEOUT 60 WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
+
     add_executable(horde_rt_entry_portal_cap_geometry_tests tests/EntryPortalCapGeometryTests.cpp)
     target_include_directories(horde_rt_entry_portal_cap_geometry_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     add_test(NAME horde_rt_entry_portal_cap_geometry_tests COMMAND horde_rt_entry_portal_cap_geometry_tests)
@@ -1677,6 +1685,7 @@ if(BUILD_TESTING)
         set_tests_properties(horde_rt_corridor_detail_certificate_tests PROPERTIES TIMEOUT 10)
         add_test(NAME horde_rt_rescue_source_admission_tests COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/RescueBlockoutSourceAdmissionTests.py)
         add_test(NAME horde_rt_water_contact_audio_tests COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_water_contact_audio.py)
+        add_test(NAME horde_rt_chapter_local_audio_tests COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_chapter_local_audio.py)
         add_test(NAME horde_rt_keeper_death_audio_tests COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_keeper_death_audio.py)
         add_test(NAME horde_rt_kit_audio_tests COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_kit_audio.py)
         add_test(NAME horde_rt_chapter_texture_alias_payload_tests COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_chapter_texture_aliases.py)

@@ -45,3 +45,17 @@ cuts. Windows uses its generation-owned XAudio2 speech voice; Android reuses
 its finite SoundPool speech mapping. Both use persisted independent Voice gain
 and the shared subtitle/skip/fallback owner. `forest.wait` is admitted and mapped
 but remains catalog-only until a separate gameplay trigger is accepted.
+
+## Local tomb and rope incidental cues (1.7 development)
+
+`chapter-local-ambience/` contains two finite mono48k PCM16 FilmCow derivatives:
+one second of dripping-water activity and the complete 0.991667-second labelled
+rope-tightening sound. The manifest and reproducible read-only-source recipe pin
+licence, source and runtime identity. Originals stay private. No continuous bed,
+metal substitute, stone-creak or listening acceptance is implied.
+
+Shared simulation schedules sparse drips only near the existing waterfall runoff
+in the cleared room, and rope contact only after actual grip travel during loaded
+ascent/descent. Speech, pause, death, reconstruction and area exit suppress or
+rebase cadence. Both platforms reuse the existing single finite nature/incidental
+voice, SFX setting and lifecycle cleanup. No separate mixer or save field is added.

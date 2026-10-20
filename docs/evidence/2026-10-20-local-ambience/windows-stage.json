@@ -1,0 +1,42 @@
+[
+  {
+    "path": "audio/night-ambience/runtime/tawny_owl.wav",
+    "bytes": 384078,
+    "sha256": "c4b96bbfc5713ad98ddf28f510de9a124cef71dd3b35d76aed6d92a500d25717"
+  },
+  {
+    "path": "audio/night-ambience/runtime/evening_cricket.wav",
+    "bytes": 384078,
+    "sha256": "8745d55f7ecf481d0ea7fb3656fecaa475bda339a49d12dbe09b0ee058e559ea"
+  },
+  {
+    "path": "audio/night-ambience/runtime/pond_frogs_crickets.wav",
+    "bytes": 384078,
+    "sha256": "bb13e7ebaff3fdc0b3a872cbdfe0bda22a210a7a77fe401b50981c5e02763b76"
+  },
+  {
+    "path": "audio/night-ambience/manifest.json",
+    "bytes": 5598,
+    "sha256": "2c9b775dcbe66706d61e56318c621857a1df2492b03cafeb04c99fe8538441a5"
+  },
+  {
+    "path": "audio/night-ambience/NOTICE.md",
+    "bytes": 2174,
+    "sha256": "0ea7722f7437b93523a4f388960c499fdd06990e198bc75593a4f6242642ff11"
+  },
+  {
+    "path": "audio/chapter-local-ambience/asset.manifest.json",
+    "bytes": 2923,
+    "sha256": "b217e0a5ec2f5f4046285dbbf6499bb779485dac7f3ee25ec0001b9af43c68dc"
+  },
+  {
+    "path": "audio/chapter-local-ambience/runtime/tomb_drip.wav",
+    "bytes": 96044,
+    "sha256": "9cff09fae048b84e60a03b5e7d546c8f1fe3e479bd1094ce4df17a3f628135c8"
+  },
+  {
+    "path": "audio/chapter-local-ambience/runtime/rope_contact.wav",
+    "bytes": 95244,
+    "sha256": "37948f94da011a1fdb41c8ae29ace65560bc9ee6e344bce49e718dd76303e303"
+  }
+]

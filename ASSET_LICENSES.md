@@ -516,3 +516,24 @@ acceptance. All four cuts remain unheard here; final native mix is pending.
 The earlier FilmCow candidate and its provenance remain preserved, but Android
 no longer packages its unused WAV. No blanket CC0 or software-licence claim
 applies to these separately attributed recordings. No paid generation was used.
+
+## 1.7 finite local tomb and rope cues
+
+`assets/audio/chapter-local-ambience/` admits two small game-integrated FilmCow
+derivatives from the existing private Possum Cafe archive: the full `rope tighten
+1.wav` (0.991667 s) and a one-second activity window from `ambience - dripping
+water 1.wav` at source frames [5,083,200, 5,131,200). Jason Steele / FilmCow's
+custom royalty-free project-use licence applies, **not CC0**; the existing
+[licence record](docs/licenses/README.md) and owner-supplied
+[PDF](docs/licenses/filmcow-sfx-license.pdf) retain its personal/commercial media
+permission and authorship/resale/government/law-enforcement/hate-group restrictions.
+Voluntary credit: FilmCow Royalty Free Sound Effects Library — FilmCow.
+
+The manifest pins original and runtime hashes, source crop, PCM format and
+licence-PDF identity. `tools/prepare-chapter-local-ambience.py` reads the original
+mono 48 kHz PCM24 files without modification, converts to PCM16 and applies only
+10/80 ms edge fades. The two runtime WAVs total 191,288 bytes. Originals stay
+private and are excluded from packages. Purpose labels and PCM activity support
+these bounded candidates; actual listening, character and mix remain unverified.
+No generic rock handling is admitted as structural creaking, and no continuous
+drip bed, live-collapse sound or paid generation is added.

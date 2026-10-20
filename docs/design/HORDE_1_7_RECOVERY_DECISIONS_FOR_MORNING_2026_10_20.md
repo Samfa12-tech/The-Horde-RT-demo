@@ -57,15 +57,19 @@ recovery from loading an existing record.
 
 The [rescue/forest music checkpoint](../evidence/2026-10-20-chapter-music/README.md)
 now implements shared chapter state selection; actual listening remains open.
-Local tomb/rope ambience remains an accepted source gap in master 4.1b/8.4/11:
-audit existing licensed cues, then add one bounded real-location/event path with
-pause/mute/speech protection and later listening acceptance. Existing forest/
-pond calls and waterfall audio are already implemented.
+The [local tomb/rope checkpoint](../evidence/2026-10-20-local-ambience/README.md)
+now implements sparse wet-room drips and grip-travel rope contacts with finite
+shared voice ownership; actual listening remains open. Next accepted source gap:
+master 11's gentle dialogue ducking/smooth recovery for music and ambient beds.
+Finite cues currently stop for Kit, while music/waterfall lack that envelope.
+Existing forest/pond calls and waterfall audio are already implemented.
 
 Nearby debris reaction remains conditional on measured cost; the six chips are
 currently static. A player-facing debris detail option is absent. A later slice
 can use the existing primitive/material owner and preserve collision/saves,
-without an unbounded physics system or heavy outdoor content.
+without an unbounded physics system or heavy outdoor content. This conditional
+detail work is lower priority than recovery and coherent story/audio behavior;
+the option/omission requirement depends on unacceptable measured cost.
 
 Natural full-route/return, earned saves/death Load, first-time teaching/contact,
 controller/touch/listening and warm Keeper/exterior performance with mobile Mist

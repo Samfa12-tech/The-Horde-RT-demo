@@ -1,0 +1,274 @@
+{
+  "date": "2026-10-20",
+  "worktree": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+  "sourceBase": "55b252d3a7eb3cbbedb11853f7f88565873998e7",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "draftPr": 27,
+  "finalFrozenFilesVerified": 19,
+  "binaries": [
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\android\\app\\build\\outputs\\apk\\debug\\app-debug.apk",
+      "bytes": 186117227,
+      "sha256": "b01ee0318b13b50cf4c7694e7d3aca3cb1de77f4232198b30708b4c2f88d5795"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+      "bytes": 13933056,
+      "sha256": "413e1c3c604c68878bddfd2f8c7159624a364bfc58e33e32c6f137be2bbc41a6"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-release\\Release\\HordeLanternRT.exe",
+      "bytes": 4617216,
+      "sha256": "dba1b8d06abe7838fce532a45d2eb7584eead033a727751bf824723bc07deb13"
+    }
+  ],
+  "builds": {
+    "WindowsRelease": "PASS exit0",
+    "WindowsDebug": "PASS exit0",
+    "AndroidDebug": "PASS exit0, offline max-workers2",
+    "androidFlags": [
+      {
+        "abi": "arm64-v8a",
+        "CMAKE_BUILD_TYPE": "Debug",
+        "HORDE_RT_ANDROID_DEFAULT_INSTRUMENTATION": "Shipping",
+        "HORDE_RT_ANDROID_DEFAULT_DIELECTRIC_QUALITY": "Mobile"
+      },
+      {
+        "abi": "armeabi-v7a",
+        "CMAKE_BUILD_TYPE": "Debug",
+        "HORDE_RT_ANDROID_DEFAULT_INSTRUMENTATION": "Shipping",
+        "HORDE_RT_ANDROID_DEFAULT_DIELECTRIC_QUALITY": "Mobile"
+      },
+      {
+        "abi": "x86",
+        "CMAKE_BUILD_TYPE": "Debug",
+        "HORDE_RT_ANDROID_DEFAULT_INSTRUMENTATION": "Shipping",
+        "HORDE_RT_ANDROID_DEFAULT_DIELECTRIC_QUALITY": "Mobile"
+      },
+      {
+        "abi": "x86_64",
+        "CMAKE_BUILD_TYPE": "Debug",
+        "HORDE_RT_ANDROID_DEFAULT_INSTRUMENTATION": "Shipping",
+        "HORDE_RT_ANDROID_DEFAULT_DIELECTRIC_QUALITY": "Mobile"
+      }
+    ],
+    "packagedNativeLibraries": [
+      {
+        "abi": "arm64-v8a",
+        "bytes": 5162776,
+        "sha256": "021a03e58515a81e099bd11dd2293d5efa7d0c6b6b7cb6bc594e81dfeef20284",
+        "elfClass": 2,
+        "elfMachine": 183
+      },
+      {
+        "abi": "armeabi-v7a",
+        "bytes": 4454008,
+        "sha256": "608765915f8962a3058215eddf826816417b2ec52aaab119b98a69a48fd6797a",
+        "elfClass": 1,
+        "elfMachine": 40
+      },
+      {
+        "abi": "x86",
+        "bytes": 5755116,
+        "sha256": "1646053c9038e957a8fdd7ef331cc77774b6197ac3c27236a3d8f2fc4decca79",
+        "elfClass": 1,
+        "elfMachine": 3
+      },
+      {
+        "abi": "x86_64",
+        "bytes": 5426720,
+        "sha256": "560f7715426119a119014d7e4517d94ff4cec4be66ff8597bf50ed141169baf1",
+        "elfClass": 2,
+        "elfMachine": 62
+      }
+    ]
+  },
+  "hostTests": {
+    "selectedRegistrations": [
+      "horde_rt_campaign_play_session_tests",
+      "horde_rt_campaign_codec_tests",
+      "horde_rt_campaign_checkpoint_tests",
+      "horde_rt_simulation_gameplay_tests",
+      "horde_rt_dry_footstep_tests",
+      "horde_rt_chapter_music_tests",
+      "horde_rt_chapter_local_ambience_tests",
+      "horde_rt_sfx_volume_tests",
+      "horde_rt_windows_music_focus_tests",
+      "horde_rt_music_playback_session_tests",
+      "horde_rt_forest_bird_ambience_tests",
+      "horde_rt_spatial_audio_smoke",
+      "horde_rt_rescue_traversal_tests",
+      "horde_rt_rescue_journey_integration_tests",
+      "horde_rt_chapter_terrain_journey_tests",
+      "horde_rt_chapter_local_audio_tests"
+    ],
+    "passed": 16,
+    "failed": 0,
+    "newChapterLocalChecks": 107,
+    "seconds": 38.21,
+    "boundary": "CPU policy/terrain/motor and logical defeated-state fixtures; no earned victory/save, output playback, listening or hardware RT"
+  },
+  "testBinaries": [
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-release\\Release\\horde_rt_chapter_local_ambience_tests.exe",
+      "bytes": 910848,
+      "sha256": "b11cb9908f1bf17a9d061374dc1ab76f4c3389cc4d6ad9650ee96659bdb77371"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-release\\Release\\horde_rt_forest_bird_ambience_tests.exe",
+      "bytes": 888320,
+      "sha256": "5433ba79170beebccf97712c6e62fee068303fb7a3fbf150d76dda364f68b562"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-release\\Release\\horde_rt_chapter_music_tests.exe",
+      "bytes": 910848,
+      "sha256": "07c773616a4492653ffb70f42d572478ccba723a12e1a7b6a4cbc991b43b3b45"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-release\\Release\\horde_rt_campaign_play_session_tests.exe",
+      "bytes": 1041408,
+      "sha256": "5cbcf416ffee4c0dac85c3a9af60b551bbe2b343cd000e04026f044e5675b4a8"
+    }
+  ],
+  "selectedJavaTests": [
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\android\\app\\build\\test-results\\testDebugUnitTest\\TEST-com.samfa12.hordelanternrt.ChapterAmbienceFeedbackTest.xml",
+      "bytes": 630,
+      "sha256": "c4080c469509d5050bee8aa0258dcfae48a70ef5f3b35ac37c8d6d08f10f7037",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\android\\app\\build\\test-results\\testDebugUnitTest\\TEST-com.samfa12.hordelanternrt.MenuAmbiencePlaybackTest.xml",
+      "bytes": 1386,
+      "sha256": "d53a26c252b40b5b9f32a847b9c8e510119568b6a7c9f996142183e718ba48ec",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\android\\app\\build\\test-results\\testDebugUnitTest\\TEST-com.samfa12.hordelanternrt.MusicAudioFocusTest.xml",
+      "bytes": 1686,
+      "sha256": "5f6475caa7066dd46f609b3eb3fc0b46122ae717489b4084bcf25a1ccc7e4868",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\android\\app\\build\\test-results\\testDebugUnitTest\\TEST-com.samfa12.hordelanternrt.MusicOutputBufferTest.xml",
+      "bytes": 1078,
+      "sha256": "ce86b774796c5c55b79d20e38406266740bf0a7b14aae35bd782895a567da745",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\android\\app\\build\\test-results\\testDebugUnitTest\\TEST-com.samfa12.hordelanternrt.MusicOutputGainTest.xml",
+      "bytes": 1085,
+      "sha256": "9e5e7a1695e23e5e490c4547108bbcfd14382279e386dd0e6d8828fc2566b3ab",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "javaTestsPassed": 28,
+  "packagedNewAudio": [
+    {
+      "entry": "assets/audio/chapter-local-ambience/runtime/tomb_drip.wav",
+      "bytes": 96044,
+      "sha256": "9cff09fae048b84e60a03b5e7d546c8f1fe3e479bd1094ce4df17a3f628135c8"
+    },
+    {
+      "entry": "assets/audio/chapter-local-ambience/runtime/rope_contact.wav",
+      "bytes": 95244,
+      "sha256": "37948f94da011a1fdb41c8ae29ace65560bc9ee6e344bce49e718dd76303e303"
+    }
+  ],
+  "packagedManifestExact": true,
+  "privateOriginalFilenamesExcluded": true,
+  "all16PackagedMusicWavsMatchAdmittedManifest": true,
+  "assets": {
+    "runtimeWavBytes": 191288,
+    "decodedPcmBytes": 191200,
+    "finiteCues": 2,
+    "maxDurationSeconds": 1,
+    "reproduction": "PASS byte-exact in memory --verify; private sources read-only",
+    "manifest": {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\assets\\audio\\chapter-local-ambience\\asset.manifest.json",
+      "bytes": 2923,
+      "sha256": "b217e0a5ec2f5f4046285dbbf6499bb779485dac7f3ee25ec0001b9af43c68dc"
+    },
+    "license": {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\docs\\licenses\\filmcow-sfx-license.pdf",
+      "bytes": 30703,
+      "sha256": "bda56a077aa8ba8e053ae916dd4c19038baa12cd33d10209658646ac9351b73f"
+    },
+    "existingRuntimeAudioAndCoreTrackedBytesUnchanged": true,
+    "listening": false
+  },
+  "windowsStage": {
+    "result": "PASS 8 admitted audio/metadata paths staged twice byte-exact through existing helper",
+    "receipt": "windows-stage.json",
+    "releasePackageProduced": false
+  },
+  "canonicalOwnerFiles": [
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\ASSET_LICENSES.md",
+      "bytes": 30507,
+      "sha256": "3a6cff3d34421d2ec751b1f64ec44b6c3ee801cdc1d6d1123c3cb479c0b92387",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\PROJECT_MEMORY.md",
+      "bytes": 51219,
+      "sha256": "9cfbea7667b50a9a960396c8f13c68905791aebd42121ecb353a8354b8cd406e",
+      "unchanged": true
+    }
+  ],
+  "morningRecoveryDecisionAndCurrentHealthSaveAuditUnchanged": true,
+  "voiceOwnership": {
+    "sharedFiniteIncidentalVoicesPerPlatform": 1,
+    "newOutputBackend": false,
+    "minimumRopeIntervalSeconds": 1.2,
+    "gripTravelMetres": 0.35,
+    "dripInitialSeconds": 6,
+    "dripIntervalsSeconds": [
+      18,
+      24,
+      21
+    ],
+    "heightMetadataRetained": true,
+    "spatialMixer": "Existing planar pan/attenuation; no elevation claim"
+  },
+  "independentReview": "No actionable defects; freeze matches. Checked mutually exclusive habitat Stop interaction, latest-signal coalescing, identity/cadence/grip source, finite loop0/cleanup, one intensity application, provenance and package roster. Reviewer made no edits/builds/playback/device actions.",
+  "preflightFailure": "One combined documentation/registration patch rejected exact text context before writes; separate corrected patch succeeded. Retained in patch-preflight.log; no native/Java/build failure occurred.",
+  "audioHapticManualRevalidationRequired": true,
+  "reason": "New audible cues/events and shared finite voice routing; haptics unchanged",
+  "platformAudioPlayback": false,
+  "listeningAcceptance": false,
+  "phoneOperations": false,
+  "hardwareRtPresentation": false,
+  "newPerformanceClaim": false,
+  "mobileMistOffPreserved": true,
+  "publicPushMergeRelease": false,
+  "ReefOperations": false,
+  "priorities": [
+    "Next independent accepted source slice: master11 shared dialogue ducking/smooth recovery for music and ambient beds; preserve combat SFX, Voice, settings and cue cursors.",
+    "Main gameplay-policy decision: first recovery. Morning method/availability, capacity/amount, refill, use/interruption, death and migration choices remain pending.",
+    "Debris reaction/option remains conditional and lower priority; no extra mandatory story/progression source gap identified in this bounded audit."
+  ],
+  "remaining": [
+    "Actual listening/audibility, mix/pan and platform playback cleanup",
+    "Suitable grit/stone-creak material unverified",
+    "Natural full route/return, physically earned saves/death Load, teaching/contact/controller/touch acceptance",
+    "Sustained warm Keeper two-light and exterior performance with mobile Mist Off"
+  ],
+  "stagingWhitespaceFailure": "Initial cached diff check exit2 on four MSBuild-log blank lines with spaces. Original output retained; scoped raw-log .gitattributes convention preserves bytes. Source/build/test files unchanged.",
+  "stagingRawLogFailure": "All 19 source/runtime blobs matched; raw log assertion stopped before commit because Git retained prior LF-normalized index entries. CRLF-only diagnosis retained. Scoped reapplication of -text to this evidence folder logs preserves original bytes; no code/build changes."
+}

@@ -1,5 +1,23 @@
 # Horde 1.7 current design index
 
+## Finite tomb/rope sound and gameplay priorities - local milestone, 20 October 2026
+
+The [local ambience checkpoint](../evidence/2026-10-20-local-ambience/README.md)
+adds sparse drips at the cleared room's actual runoff and rope contacts from
+grip travel, using two bounded FilmCow cuts and the existing single incidental
+voice. 107 new native checks, 16 selected CTests, 28 Java tests and Windows/four-
+ABI Android builds pass. Both cuts reproduce byte-exact; originals stay private.
+Listening, audible level/character and real output cleanup remain unverified;
+the mixer remains planar. Stone creaks/grit are not claimed.
+
+The [milestone map](HORDE_1_7_MILESTONE_MAP_2026_10_20.md) now prioritizes accepted
+smooth dialogue ducking of existing music/ambient beds. Finite cues stop for Kit,
+but this is not the missing music/waterfall envelope. First recovery remains the
+main gameplay-policy choice in the unchanged [morning decision table](HORDE_1_7_RECOVERY_DECISIONS_FOR_MORNING_2026_10_20.md).
+Conditional debris kicking/option is lower priority, not a progression blocker.
+Natural route/earned-save/death/contact/control/listening and warm mobile Mist
+Off acceptance remain open. Older entries retain their dated scope.
+
 ## Rescue/forest music and recovery choices - local milestone, 20 October 2026
 
 The [chapter music checkpoint](../evidence/2026-10-20-chapter-music/README.md)
