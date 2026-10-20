@@ -1,5 +1,12 @@
 # Horde 1.7 milestone map - 20 October 2026
 
+**Owner pause checkpoint:** [exact phone return/reload, lifecycle and warm lookout evidence](../evidence/2026-10-20-phone-return-checkpoint/README.md).
+Phone is released safely; original saves/settings preserved. Isolated continuation
+passes do not close natural victory/death or full-route gates. Warm lookout
+remains above budget. Sam's portrait touch-clutter feedback is a future redesign
+requirement; no new layout or recovery policy was implemented. Resume only on
+Sam's instruction, with the six-choice recovery proposal still pending approval.
+
 Working path: `C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof`.
 Branch `codex/horde-1.7-wp2-vertical-proof`, continuing existing draft PR 27.
 Read with the [accepted master](../references/horde-1.7/d37f1638/docs/superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md)

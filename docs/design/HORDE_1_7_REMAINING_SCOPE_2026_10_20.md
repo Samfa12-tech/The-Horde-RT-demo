@@ -1,5 +1,17 @@
 # Horde 1.7 remaining scope - 20 October 2026
 
+**Paused by Sam after the [bounded phone checkpoint](../evidence/2026-10-20-phone-return-checkpoint/README.md).**
+Actual isolated lower-return load/repeat ascent/upper auto/manual reload and hot
+Home/resume now have exact-SM-S948B evidence. Earlier victory/claim remains seeded.
+Warm noncombat lookout CPU present-loop median is 57.107 ms at owner 40% / Mist
+Off; no two-light Keeper, display-spacing or 30-FPS pass. Phone released with
+original saves/settings byte-exact. Sam reports touchscreen controls are too
+crowded, especially in portrait: future touch-layout redesign/decluttering and
+physical acceptance are required. No redesign was started. First recovery's
+[six-choice recommendation](HORDE_1_7_RECOVERY_DECISIONS_FOR_MORNING_2026_10_20.md#recommended-package-for-sam-to-approve)
+is pending approval and unimplemented. Licensed grit/creak audit admitted no new
+cue; listening remains pending. No further work starts until Horde is resumed.
+
 Current reconciliation after the [actual lower-return recovery checkpoint](../evidence/2026-10-20-return-save-recovery/README.md)
 and [unadmitted Kit turn comparison](../evidence/2026-10-20-kit-turn-admission/README.md),
 in the existing WP2 worktree/branch and draft PR 27. Read with the

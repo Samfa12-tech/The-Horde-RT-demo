@@ -1,0 +1,24 @@
+10-21 05:47:25.045 27981 28143 I HordeRtProbeBridge: HORDE_SURFACE_PRESENTATION generation=1 window=1440x2971 current_extent=1440x2971 current_transform=0x00000001 supported_transforms=0x000001ff pre_transform=0x00000001 swapchain=1440x2971 rt_dispatch=576x1188 rt_pre_rotation_required=0
+10-21 05:48:35.871 27981 27981 I HordeRtProbeBridge: HORDE_CAMPAIGN_REQUEST request=1 generation=1 action=1 slot=0 kind=0 accepted=1
+10-21 05:49:01.648 27981 27981 I HordeRtProbeBridge: HORDE_CAMPAIGN_REQUEST request=2 generation=1 action=3 slot=0 kind=1 accepted=1
+10-21 05:49:02.540 27981 28221 I HordeRtProbeBridge: HORDE_CAMPAIGN request=2 generation=1 phase=7 error=0 active_slot=0 latest=1 rebase=1 presented=1 action=3 isolated=1 durability=0
+10-21 05:53:04.265 27981 28221 I HordeRtProbeBridge: HORDE_CAMPAIGN request=2 generation=1 phase=7 error=0 active_slot=0 latest=1 rebase=1 presented=1 action=0 isolated=1 durability=2
+10-21 05:54:05.779 27981 27981 I HordeRtProbeBridge: HORDE_CAMPAIGN_REQUEST request=3 generation=1 action=1 slot=0 kind=0 accepted=1
+10-21 05:54:28.118 27981 27981 I HordeRtProbeBridge: HORDE_CAMPAIGN_REQUEST request=4 generation=1 action=2 slot=1 kind=0 accepted=1
+10-21 05:54:28.168 27981 28221 I HordeRtProbeBridge: HORDE_CAMPAIGN request=4 generation=1 phase=7 error=0 active_slot=0 latest=1 rebase=1 presented=1 action=2 isolated=1 durability=2
+10-21 05:55:56.326 27981 28143 I HordeRtProbeBridge: HORDE_SURFACE_PRESENTATION generation=3 window=1440x2971 current_extent=1440x2971 current_transform=0x00000001 supported_transforms=0x000001ff pre_transform=0x00000001 swapchain=1440x2971 rt_dispatch=576x1188 rt_pre_rotation_required=0
+10-21 05:55:56.326 27981   455 I HordeRtProbeBridge: HORDE_CAMPAIGN request=4 generation=3 phase=7 error=0 active_slot=0 latest=1 rebase=1 presented=1 action=2 isolated=1 durability=2
+10-21 05:57:09.720 27981 27981 I HordeRtProbeBridge: HORDE_CAMPAIGN_REQUEST request=5 generation=3 action=1 slot=0 kind=0 accepted=1
+10-21 05:57:40.832 27981 27981 I HordeRtProbeBridge: HORDE_CAMPAIGN_REQUEST request=6 generation=3 action=3 slot=1 kind=0 accepted=1
+10-21 05:57:41.015 27981   455 I HordeRtProbeBridge: HORDE_CAMPAIGN request=6 generation=3 phase=7 error=0 active_slot=1 latest=1 rebase=2 presented=1 action=3 isolated=1 durability=0
+10-21 05:58:51.635 27981   455 I HordeRtProbeBridge: HORDE_BENCH begin generation=1 checkpoint=chapter-forest-lookout scale=40 warmup_frames=120 sample_frames=120 windows=3 zone=finale
+10-21 05:59:05.291 27981   455 I HordeRtProbeBridge: HORDE_BENCH sample generation=1 checkpoint=chapter-forest-lookout scale=40 window=1 frames=120 total_ms=57.078 fence_ms=55.644 record_ms=0.593 present_ms=0.636 zone=outside presented=1
+10-21 05:59:12.155 27981   455 I HordeRtProbeBridge: HORDE_BENCH sample generation=1 checkpoint=chapter-forest-lookout scale=40 window=2 frames=120 total_ms=57.138 fence_ms=55.656 record_ms=0.625 present_ms=0.661 zone=outside presented=1
+10-21 05:59:19.030 27981   455 I HordeRtProbeBridge: HORDE_BENCH sample generation=1 checkpoint=chapter-forest-lookout scale=40 window=3 frames=120 total_ms=57.230 fence_ms=55.697 record_ms=0.646 present_ms=0.692 zone=outside presented=1
+10-21 05:59:19.030 27981   455 I HordeRtProbeBridge: HORDE_BENCH complete generation=1 checkpoint=chapter-forest-lookout scale=40 windows=3
+10-21 05:59:19.030 27981   455 I HordeRtProbeBridge: HORDE_CAMPAIGN request=6 generation=3 phase=7 error=0 active_slot=1 latest=0 rebase=2 presented=1 action=3 isolated=1 durability=0
+10-21 05:59:51.677 27981   455 I HordeRtProbeBridge: HORDE_BENCH begin generation=2 checkpoint=chapter-forest-lookout scale=40 warmup_frames=120 sample_frames=120 windows=3 zone=finale
+10-21 06:00:05.322 27981   455 I HordeRtProbeBridge: HORDE_BENCH sample generation=2 checkpoint=chapter-forest-lookout scale=40 window=1 frames=120 total_ms=57.107 fence_ms=55.660 record_ms=0.617 present_ms=0.647 zone=outside presented=1
+10-21 06:00:12.180 27981   455 I HordeRtProbeBridge: HORDE_BENCH sample generation=2 checkpoint=chapter-forest-lookout scale=40 window=2 frames=120 total_ms=57.090 fence_ms=55.617 record_ms=0.633 present_ms=0.652 zone=outside presented=1
+10-21 06:00:19.040 27981   455 I HordeRtProbeBridge: HORDE_BENCH sample generation=2 checkpoint=chapter-forest-lookout scale=40 window=3 frames=120 total_ms=57.111 fence_ms=55.655 record_ms=0.618 present_ms=0.642 zone=outside presented=1
+10-21 06:00:19.041 27981   455 I HordeRtProbeBridge: HORDE_BENCH complete generation=2 checkpoint=chapter-forest-lookout scale=40 windows=3

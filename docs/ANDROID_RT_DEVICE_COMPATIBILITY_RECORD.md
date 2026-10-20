@@ -1,5 +1,26 @@
 # Android RT Device Compatibility Record
 
+## 2026-10-20 - isolated return/reload and warm lookout; paused
+
+SM-S948B / Android 17 API 37 / Adreno 840, exact compatible Debug APK
+`d1a052dd29fd8b6f61e70d247f0446373053bfb7e7c9af4bce07f84636b2ec43`
+from accepted runtime at 811852fa. Native UI loads the actual Windows lower-return
+test record, completes repeat ascent, saves upper auto/manual and reloads manual
+Slot 2 with two hearts. Hot Home/resume restores successful Pipeline RT on a new
+surface generation. These are isolated post-Keeper continuation checks, not
+naturally earned phone victory/claim, process-death or full-route acceptance.
+
+Same-process noncombat lookout baseline at unchanged owner 40% / Mist Off and
+Shipping/Mobile records three warm 120-frame CPU present-loop means:
+57.107 / 57.090 / 57.111 ms. Final valid GPU frame is 55.589738 ms. No actual
+display-spacing, GPU-window, thermal-equilibrium, two-light Keeper or sustained
+30-FPS claim. All prior 12 campaign files/locks and settings remain byte-exact;
+only the new isolated namespace was added. Ordinary Quit returns to launcher;
+cached Debug PID remains, no install/capture/transfer active. **Phone safe to
+disconnect; Horde paused at owner's request.** Portrait touch clutter is recorded
+for future redesign, with no implementation during the pause.
+[Exact receipt, retained controls/failures and limits](evidence/2026-10-20-phone-return-checkpoint/README.md).
+
 ## 2026-10-20 - phone idle release; lookout panel build only
 
 SM-S948B / Android 17 API 37 remains on corrected Debug APK c5a11bb2. A completed

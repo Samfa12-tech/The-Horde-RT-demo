@@ -34,6 +34,35 @@ resource consumption need shared simulation rules and explicit tests.
 These choices remain pending for morning. No candidate quantity, use timing,
 automatic refill or checkpoint heal is selected here.
 
+## Recommended package for Sam to approve
+
+**Proposal only, not an agreed rule or implementation.** The master section 10.5
+already points toward a limited flask and deliberate rest. The quantities,
+timings and new Rest interaction below are recommendations, not recovered
+agreement. Existing three-heart health and exact checkpoint restoration remain
+unchanged until Sam chooses a policy.
+
+Player-facing proposal: carry one drink that restores one heart. Stand still to
+drink; an interrupted drink costs nothing. After claiming the lantern, deliberately
+rest at the lower rope landing to recover fully and refill. Walking over a
+checkpoint or loading a save gives no free healing.
+
+| Decision | Recommended first slice |
+| --- | --- |
+| Method and availability | One carried flask, filled on New Game and usable before the first fight. No pickup quest, upgrade tree or new art requirement. |
+| Capacity and amount | One charge; restore one heart, capped at three. Full-health, empty, dead or unavailable use is rejected without cost. |
+| Refill/rest | Add an explicit two-second Rest action within one metre of the existing lower rope landing, after Keeper defeat and lantern claim. Require grounded, ready terrain and no combat, climb or active dialogue. Completion restores three hearts and one charge; repeatable and free. This proposes a new interaction at an existing location, not an already-authored refill prop. |
+| Use/interruption | Drink for 1.25 seconds while grounded and stationary; looking is allowed. Movement, attack, parry, dodge, climb, damage, menu, pause or lifecycle interruption cancels without cost. Damage/cancellation wins a completion-tick tie. Consume and heal atomically once on completion; no invulnerability. |
+| Death/retry | Load and post-claim death restore committed health/charges exactly. Retain the existing explicit pre-claim encounter retry's three-heart reset and propose one charge for that deliberately restarted attempt. Ordinary encounter selection must not refill the flask. |
+| Migration/entitlement | Version the save payload to store charges; capacity stays fixed at one. Older records retain their exact health and migrate with an empty flask. Starter fill occurs only on New Game; an eligible deliberate Rest can refill old saves. Retain originals until successful replacement, and reject unsupported newer formats. |
+
+This gives one recoverable mistake and one clear recovery place without a wider
+resource economy. Implementation would still require an explicit input/control,
+shared interruption ordering and save-version/duplicate-grant tests. In
+particular, old pre-claim records must have a viable explicit retry path; migration
+must not quietly grant a drink on every load. No part of this proposal has been
+implemented or admitted by the later phone acceptance pass.
+
 ## Existing behavior that the decision must account for
 
 [`PlayerVitals`](../../src/gameplay/ShowcaseGameplay.h) currently owns fixed

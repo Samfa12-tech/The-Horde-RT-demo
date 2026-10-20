@@ -1,0 +1,10 @@
+{
+  "utcUnixMs": 1792522730575,
+  "pid": "27981",
+  "checkpoint": "chapter-forest-lookout",
+  "method": "existing native checkpoint benchmark, 120 warm + 3 x 120 sampled frames; first run is conditioning; second is retained warm baseline",
+  "minimumConditioningSeconds": 60,
+  "perRunTimeoutSeconds": 180,
+  "comparison": false,
+  "limits": "seeded noncombat exterior only, no earned victory, no live Keeper, CPU-present-loop averages are not actual-display intervals or GPU percentiles; no settings overrides"
+}
