@@ -5,6 +5,9 @@ Branch `codex/horde-1.7-wp2-vertical-proof`, continuing existing draft PR 27.
 Read with the [accepted master](../references/horde-1.7/d37f1638/docs/superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md)
 and [feature inventory](HORDE_1_7_FEATURE_STATUS_2026_10_18.md).
 This is a current reconciliation, not release approval or new feature scope.
+The [complete remaining-scope inventory](HORDE_1_7_REMAINING_SCOPE_2026_10_20.md)
+separates unfinished implementation/content, physical acceptance and conditional
+work, with the six unchanged healing choices for morning.
 
 | Milestone | Implemented and evidenced | Remaining acceptance or implementation |
 | --- | --- | --- |
@@ -12,10 +15,12 @@ This is a current reconciliation, not release approval or new feature scope.
 | Recovery and interaction | Three slots each retain independent manual/latest-auto records; safe-boundary restore, platform menus/death Load, hearts, subtitles/skip/Voice, optional player-opened lookout objective, run/crouch/18 cm root step and Back confirmation. | Physical interruption/controller/accessibility/comfort matrix and recovery through normal play remain open. No save-retention decision is outstanding. A first healing method is not implemented; the [morning choices](HORDE_1_7_RECOVERY_DECISIONS_FOR_MORNING_2026_10_20.md) retain master 10.5's method/capacity/refill/use/death/migration decisions and existing encounter health resets. No implicit checkpoint healing or full economy. |
 | Kit movement/acting | Approved rig, idle/walk and transient head/chest speech/recognition; proper model facing. Current bounded locomotion evidence records measured cadence and clip joins. | Artistic/live sequence/physical acceptance remains open. Stationary foot pivots remain unresolved; straight walk at zero route speed is a rejected substitute because its stance foot slides. Do not remain indefinitely on small acting refinements. |
 | Regional world and sound | r23 terrain has 37,846 triangles; 42 atlas-derived finite river/lake/outflow faces and real RT depth/transport have paired native backend surveys. Pond frog/cricket playback uses actual water proximity; owl/cricket cuts also exist. | Full-map/shoreline/lookout composition, night listening and phone warm cost remain unaccepted. Cicadas remain excluded. Playable town stays 1.8. These are existing implementations, not missing work to repeat. |
+| Unfinished planned outdoor effects | Terrain/water and baked static LOD1 pine/alder exist. Current haze is a surface-distance-fog multiplier. | Outdoor participating mist/occluded moon shafts and fireflies are explicitly unimplemented. Foliage wind and representative near/mid/far/combined readiness are unfinished/unproven. These are source/content gaps, not acceptance-only or optional polish. Preserve owner canopy/Easy Tree and mist-28 deferrals/performance gates; reconcile final 1.7 disposition before expansion. |
 | Tomb story/decay | Campaign omits legacy material/demo cards and swatches; burial bier, niches, remains, candles, displaced lid and Keeper offerings establish a partial story composition. [Six sparse original floor chips](../evidence/2026-10-20-tomb-floor-debris/README.md) now sit beneath damaged masonry: 72 triangles, 14,688 payload bytes, existing material/primitive and unchanged collision/save ownership. Both native RT backends have matched off/on evidence. | Whole-opening art, live movement/contact and phone readability/warm cost remain open. Kicking and a player-facing debris option are not implemented. Debug omission verifies disabled geometry only; add an actual option or omit the detail if mobile cost proves unacceptable. |
 | Player movement presentation | Walk/run/back/strafe, shared four-direction dodge displacement/protection, low-ceiling sword lowering and alternating rope hand targets exist. [Dedicated procedural dodge presentation](../evidence/2026-10-20-player-dodge-poses/README.md) now uses the existing accepted direction/timer, with 562 native rig samples, real rope/restore cancellation tests and paired native RT transitions with torch/lantern. | Full artistic/live movement, physical motion/aim/grip/comfort and warm phone acceptance remain open. Idle/Walking remain the imported locomotion clips; the new dodge is an explicit procedural layer, not new imported run/back/strafe clips. |
 | Surface-aware travel sound | [Shared dry-contact selection](../evidence/2026-10-20-surface-aware-footsteps/README.md) now carries actual support and alternating variants from simulation through both platforms. Earth reuses admitted dirt 17/18; Stone retains the accepted generic dirt 9/14 pair. Existing distance cadence/wet priority, grounded/teleport/rope/pause/restore gates have host coverage. | Listening, Earth/default mix and run-tail overlap remain unaccepted; Earth full-file RMS is about 6 dB lower. Wood uses the explicit generic fallback; no suitable wood-floor/verified new stone recording is admitted. This is bounded dispatch, not completion of every 5.5 audio/physical gate. |
-| Local tomb/rope sound | [Finite localized cues](../evidence/2026-10-20-local-ambience/README.md) now add sparse drips at actual cleared water-room runoff and rope contact from actual grip travel. Two licensed FilmCow cuts total 191,288 WAV bytes; existing forest/incidental voice is reused with ordered stop, pause/speech/restore/exit gates. 107 new native checks, 16 affected CTests, 28 Java tests and both-platform builds pass. | Cue character/audibility, pan/mix and actual playback cleanup remain unaccepted. The existing mixer is planar. Suitable grit/stone creaks remain unverified. Master 11's smooth dialogue ducking for music/ambient beds is still a source gap; finite incidental suppression alone does not implement it. |
+| Local tomb/rope sound | [Finite localized cues](../evidence/2026-10-20-local-ambience/README.md) now add sparse drips at actual cleared water-room runoff and rope contact from actual grip travel. Two licensed FilmCow cuts total 191,288 WAV bytes; existing forest/incidental voice is reused with ordered stop, pause/speech/restore/exit gates. 107 new native checks, 16 affected CTests, 28 Java tests and both-platform builds pass. | Cue character/audibility, pan/mix and actual playback cleanup remain unaccepted. The existing mixer is planar. Suitable grit/stone creaks and quiet wind/foliage material remain unverified. Shared dialogue ducking is now a separate implemented checkpoint, with listening still open. |
+| Dialogue and bed balance | [Shared smooth envelope](../evidence/2026-10-20-dialogue-ducking/README.md) now publishes one transient music/waterfall multiplier: 0.20 s attack to 0.65, 0.35 s gap hold, 0.90 s release. Pause/reconstruction preserve it; explicit replacement starts fresh. | Actual depth/timing, interrupted output recovery, intelligibility and both-platform listening remain unaccepted. Voice/combat SFX, settings, cue cursors, PCM/Core, assets and saves are unchanged. |
 | Chapter music continuation | [Shared chapter selection](../evidence/2026-10-20-chapter-music/README.md) now keeps post-Keeper interior F, plays existing G once on observed first completed ascent, then H for exterior/forest. Lower/upper/Forest Load selects its bed directly; return/pause/menu/retry and Windows replacement-queue identity have host coverage. Admitted A-H/Core bytes and existing timing/gains remain unchanged. | Actual F/G/H suitability, transitions/tails, mix, mute and both-platform lifecycle listening remain unaccepted. 65 new host checks, 13 affected CTests, 19 Java tests and Windows/four-ABI Android builds are local evidence, not naturally earned saves, physical listening or warm-performance acceptance. No new engine or score. |
 | Performance and final candidate | Exact-zero mist early exit measured about 18% GPU improvement in a cleared tomb. Rejected quality/thermal-confounded trials stay rejected. Sam explicitly selected mobile Mist Off; current startup/reset policy also has it Off. | Keeper two-light cost, exterior display spacing and sustained warm 30 FPS remain unresolved. No new phone action is authorized by this map, no sustained gain is inferred from host captures, and no final release matrix is complete. |
 
@@ -62,20 +67,26 @@ pause, restore, source/listener transport and source-wiring checks pass. Audible
 character/level and real playback cleanup remain unaccepted; no structural creak,
 elevation mixing, natural-save or new performance claim is implied.
 
-Next implement **gentle dialogue ducking and smooth recovery** for existing music
-and ambient beds, accepted master 11. Music currently has only the Keeper reveal
-gain envelope; waterfall remains spatial gain times SFX. Finite chapter cues
-stop for Kit, but this does not implement that shared envelope. Keep combat SFX,
-Voice, stored settings and music cursors unchanged; test completion/skip, pause,
-reset/load and stale identity, then retain actual listening as a separate gate.
-Do not invent another engine, new score or extra ambient layers.
+The [dialogue ducking checkpoint](../evidence/2026-10-20-dialogue-ducking/README.md)
+now implements master 11's missing envelope once in shared simulation. Music
+composes it with the existing Keeper gain; both waterfall paths apply the same
+multiplier once. Short gaps hold current gain, an interrupted attack does not
+deepen after speech stops, and release/reentry begins at current gain. Actual
+listening and platform output recovery remain separate acceptance gates.
+
+Next reconcile **first recovery's six morning choices and unfinished outdoor
+features**, then validate the coherent natural route/save/death path when owner
+testing resumes. The [remaining-scope inventory](HORDE_1_7_REMAINING_SCOPE_2026_10_20.md)
+retains participating mist/fireflies/wind and authored composition gaps; it adds
+no authority for heavy expansion or another open-ended audio-polish loop.
 
 First usable recovery still needs the [bounded morning choices](HORDE_1_7_RECOVERY_DECISIONS_FOR_MORNING_2026_10_20.md)
 for method/capacity/refill/use/death/save migration. This is the main unresolved
 gameplay-policy change. Nearby debris kicking remains feasibility-dependent;
 a player-facing detail option/omission is conditional on unacceptable measured
 cost. Neither is a progression blocker. No other mandatory story/progression
-mechanism was found missing in this bounded audit. Low-ceiling weapon lowering, alternating rope hands,
+mechanism was found missing in this bounded audit; unfinished planned outdoor
+effects remain separate source/content work. Low-ceiling weapon lowering, alternating rope hands,
 regional water and species calls are already implemented. Keep whole-opening art,
 live control/audio and sustained cost acceptance explicit instead of expanding
 heavy outdoor content or looping indefinitely on polish.

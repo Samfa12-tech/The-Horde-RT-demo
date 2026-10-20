@@ -2144,7 +2144,7 @@ void UpdateWaterfallAmbience(const VulkanSurfaceContext& context)
         engine.StopLoop(loopKey);
         return;
     }
-    const float sfxGain = horde::platform::windows::WindowsSfxSourceGain(1.0f, context.sfxVolumePercent);
+    const float sfxGain = horde::platform::windows::WindowsSfxSourceGain(horde::audio::DialogueBedGain(simulation), context.sfxVolumePercent);
     engine.StartOrUpdateLoop(loopKey, path, gains.left, gains.right, sfxGain);
 }
 

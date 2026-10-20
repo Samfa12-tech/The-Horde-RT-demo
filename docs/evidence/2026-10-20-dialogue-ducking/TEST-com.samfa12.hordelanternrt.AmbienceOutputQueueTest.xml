@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.samfa12.hordelanternrt.AmbienceOutputQueueTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-10-20T14:47:59" hostname="SAM_LAPPY" time="0.003">
+  <properties/>
+  <testcase name="exhaustionAndInjectedUnderflowKeepCursorOwnership" classname="com.samfa12.hordelanternrt.AmbienceOutputQueueTest" time="0.001"/>
+  <testcase name="generatedPcmCannotReplacePartialBlock" classname="com.samfa12.hordelanternrt.AmbienceOutputQueueTest" time="0.0"/>
+  <testcase name="lifecycleResetDiscardsOldPartialBlockAndHead" classname="com.samfa12.hordelanternrt.AmbienceOutputQueueTest" time="0.0"/>
+  <testcase name="oddPartialFrameIsRejected" classname="com.samfa12.hordelanternrt.AmbienceOutputQueueTest" time="0.0"/>
+  <testcase name="unexpectedHeadResetIsRejected" classname="com.samfa12.hordelanternrt.AmbienceOutputQueueTest" time="0.001"/>
+  <testcase name="partialAndZeroWritesRetainEverySampleExactlyOnce" classname="com.samfa12.hordelanternrt.AmbienceOutputQueueTest" time="0.0"/>
+  <testcase name="acceptedSamplesCannotExceedDeviceBound" classname="com.samfa12.hordelanternrt.AmbienceOutputQueueTest" time="0.0"/>
+  <testcase name="backendFailureIsRejected" classname="com.samfa12.hordelanternrt.AmbienceOutputQueueTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

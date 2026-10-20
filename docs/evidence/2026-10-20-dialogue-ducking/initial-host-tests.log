@@ -1,0 +1,82 @@
+[OUTPUT] 
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+
+[HANDLER_OUTPUT] 
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+
+      Start   7: horde_rt_menu_ambience_tests
+ 1/18 Test   #7: horde_rt_menu_ambience_tests ................   Passed    1.09 sec
+      Start  35: horde_rt_campaign_play_session_tests
+ 2/18 Test  #35: horde_rt_campaign_play_session_tests ........***Timeout  30.01 sec
+FAIL: seed first manual
+FAIL: seed third manual
+FAIL: catalogue distinguishes six fixed records with actual checkpoint/hearts
+FAIL: first strict boundary autosaves only after explicit active slot
+FAIL: saved target reads
+FAIL: manual can save latest boundary after moving/crouching
+FAIL: saved target reads
+FAIL: successful completion is delivered once while State retains success
+FAIL: prepare another existing slot
+FAIL: cancelled load leaves game active slot and live simulation unchanged
+FAIL: different load target reads
+FAIL: load target is not active before commit
+FAIL: new authored boundary autosaves active loaded slot
+FAIL: saved target reads
+FAIL: upper autosave preserves lower manual checkpoint
+FAIL: saved target reads
+FAIL: explicit retry yields one fresh success receipt
+FAIL: postpublish uncertainty cannot report saved
+ordinary lower live=-34.0119,-17.5184 boundary=1 rope=1
+FAIL: chapter-earned lower autosave completes real disk publication
+FAIL: saved target reads
+FAIL: earned lower autosave is the supported canonical safe anchor and has a real publication receipt
+FAIL: chapter-earned lower manual checkpoint completes real disk publication
+
+      Start  40: horde_rt_campaign_codec_tests
+ 3/18 Test  #40: horde_rt_campaign_codec_tests ...............   Passed    0.02 sec
+      Start  42: horde_rt_chapter_dialogue_tests
+ 4/18 Test  #42: horde_rt_chapter_dialogue_tests .............   Passed    1.49 sec
+      Start  45: horde_rt_campaign_checkpoint_tests
+ 5/18 Test  #45: horde_rt_campaign_checkpoint_tests ..........   Passed    2.25 sec
+      Start  52: horde_rt_ambience_pcm_loop_tests
+ 6/18 Test  #52: horde_rt_ambience_pcm_loop_tests ............   Passed    1.45 sec
+      Start 148: horde_rt_simulation_gameplay_tests
+ 7/18 Test #148: horde_rt_simulation_gameplay_tests ..........   Passed    1.56 sec
+      Start 153: horde_rt_music_director_tests
+ 8/18 Test #153: horde_rt_music_director_tests ...............   Passed    1.47 sec
+      Start 154: horde_rt_chapter_music_tests
+ 9/18 Test #154: horde_rt_chapter_music_tests ................   Passed    1.86 sec
+      Start 155: horde_rt_chapter_local_ambience_tests
+10/18 Test #155: horde_rt_chapter_local_ambience_tests .......   Passed    1.68 sec
+      Start 156: horde_rt_dialogue_ducking_tests
+11/18 Test #156: horde_rt_dialogue_ducking_tests .............***Failed    1.09 sec
+FAIL: real skip enters the quiet hold instead of immediately restoring full volume
+FAIL: skipped Grate fully restores the bed with no permanent reduction
+146 dialogue ducking host checks, 2 failures
+Synthetic PCM and logical terrain-backed restores use no output device or owner saves. Listening, physical lifecycle, voice intelligibility and perceived mix remain unaccepted.
+
+      Start 160: horde_rt_sfx_volume_tests
+12/18 Test #160: horde_rt_sfx_volume_tests ...................   Passed    0.02 sec
+      Start 161: horde_rt_windows_music_focus_tests
+13/18 Test #161: horde_rt_windows_music_focus_tests ..........   Passed    0.02 sec
+      Start 165: horde_rt_music_playback_session_tests
+14/18 Test #165: horde_rt_music_playback_session_tests .......   Passed    2.48 sec
+      Start 181: horde_rt_forest_bird_ambience_tests
+15/18 Test #181: horde_rt_forest_bird_ambience_tests .........   Passed    4.49 sec
+      Start 213: horde_rt_rescue_traversal_tests
+16/18 Test #213: horde_rt_rescue_traversal_tests .............   Passed    1.47 sec
+      Start 215: horde_rt_rescue_journey_integration_tests
+17/18 Test #215: horde_rt_rescue_journey_integration_tests ...   Passed    2.74 sec
+      Start 216: horde_rt_chapter_terrain_journey_tests
+18/18 Test #216: horde_rt_chapter_terrain_journey_tests ......   Passed   16.19 sec
+
+89% tests passed, 2 tests failed out of 18
+
+Total Test time (real) =  71.43 sec
+
+The following tests FAILED:
+	 35 - horde_rt_campaign_play_session_tests (Timeout)
+	156 - horde_rt_dialogue_ducking_tests (Failed)
+[ERROR_MESSAGE] 
+Errors while running CTest
+

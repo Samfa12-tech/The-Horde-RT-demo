@@ -1,0 +1,65 @@
+{
+  "sourceBase": "53d43604336171fe645e2ec273a482b66baae30e",
+  "sources": {
+    "CMakeLists.txt": {
+      "bytes": 115020,
+      "sha256": "fe51d1e7ff94cd37c588692a3ee53e44e3a950c3ee9dd7de07e135a33e9a52ff",
+      "gitBlob": "eb6f9651e476619f40e071ce042f36cdcfffea7b"
+    },
+    "android/app/src/main/cpp/android_probe_bridge.cpp": {
+      "bytes": 379584,
+      "sha256": "d2cb73268e12569237cf4e3728e11b7af601999af7eaaf21129362022ea9e380",
+      "gitBlob": "e64daefd3f6a82a0f7c5abaefa2cb1a1e85aa785"
+    },
+    "src/audio/DialogueDucking.h": {
+      "bytes": 2459,
+      "sha256": "497713dc7ca70f47c190895ab333f76ebfed80a5a2b075ffa33bd55506779ef8",
+      "gitBlob": "fd58ee92037c3fa839ffadcfaf5f41c54db0a5a0"
+    },
+    "src/audio/MusicDirector.cpp": {
+      "bytes": 17094,
+      "sha256": "8b7fc8f9ed18e779fcca6086f59aab0b4017b3ab1f123b14fb81aa41b4e5844e",
+      "gitBlob": "f4499d412875f172fbb3bd66a043ddde5ffbfc48"
+    },
+    "src/audio/MusicDirector.h": {
+      "bytes": 3480,
+      "sha256": "8b79d898661e53d3bd145e97dff1da0998d8d003ffc375e65516c7ccdb2b455b",
+      "gitBlob": "f63fbab7e053e954d066dc9a48fdcdc43fbd9858"
+    },
+    "src/gameplay/dialogue/ChapterDialogue.h": {
+      "bytes": 20375,
+      "sha256": "f19f87aa328b17b8d2c64d5f87111db9224ef8c26463fad2e33b1ac19cc7ad29",
+      "gitBlob": "0f7ce389ecaa6a6e4816916b58fbd0dbc216163a"
+    },
+    "src/gameplay/simulation/GameSimulation.cpp": {
+      "bytes": 137607,
+      "sha256": "2fc5eb628ba9817dad1ba38e0c8ed423419809da1147bc87ec70e2018d1cd6b4",
+      "gitBlob": "d5874a325b37354671a495bbdea3dca43e131129"
+    },
+    "src/gameplay/simulation/GameSimulation.h": {
+      "bytes": 22120,
+      "sha256": "ded00e7da45fb5c21612311b913ee4a2c0a0fde196b2440bc01041957df64ddb",
+      "gitBlob": "1c8de22a86b00b7361f1102d4be83817b0388be8"
+    },
+    "src/gameplay/simulation/GameSimulationRescue.cpp": {
+      "bytes": 11659,
+      "sha256": "e980f21dc660072af7cbe591e7e57326900b7ed2cef8637263a5cdc2d6fd2f4a",
+      "gitBlob": "ff97e543d109ef856c2d47919bad86c08dbab8fd"
+    },
+    "src/gameplay/simulation/SimulationSnapshot.h": {
+      "bytes": 8186,
+      "sha256": "30e2a1f49e43cad5dc819cbcf992a743351eaf0e3b6a18d05e4336dc0bd7072f",
+      "gitBlob": "c23f522e954f016958ea83f984f1038862db245b"
+    },
+    "src/platform/windows/DiagnosticWindow.cpp": {
+      "bytes": 616483,
+      "sha256": "a707b31584165a06e0c2a5c77b645b9d16f2b5e33da8703db5565c307a827cd5",
+      "gitBlob": "6e5c89e1e69f75e1f8bf976636a3610019b7e563"
+    },
+    "tests/DialogueDuckingTests.cpp": {
+      "bytes": 23541,
+      "sha256": "c06603a3da1baa58dce8378507f101085be20fd9722b7b6178caddded9f6d1e0",
+      "gitBlob": "e4f6f98e2fea0b0db8fed98dbab5cd50f82fa21a"
+    }
+  }
+}

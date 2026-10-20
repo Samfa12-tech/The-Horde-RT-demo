@@ -24,6 +24,7 @@ void GameSimulation::SetDevelopmentRescueJourney(bool enabled, bool authoredTerr
     CancelCampaignRestore();
     RestoreRescueEquipment();
     config_.developmentRescueJourney=enabled;
+    dialogueDucking_.Reset();
     config_.authoredChapterTerrain=enabled&&authoredTerrain;chapterTerrain_.reset();
     rescueTraversal_.Reset(); rescueOpeningSeconds_=0;worldRoute_.Invalidate();
     worldRoute_.current=WorldZoneId::Dungeon;

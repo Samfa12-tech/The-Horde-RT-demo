@@ -30,7 +30,8 @@ struct MusicSelection
     bool clockValid = true;
     double positionSeconds = 0.0;
     std::uint64_t revision = 0;
-    // Presentation envelope, multiplied by independent user music volume at
+    // Combined Keeper-reveal/dialogue presentation gain (historical field name),
+    // multiplied by independent user music volume at
     // the existing device output. It never changes saved volume or cue PCM.
     float revealGain = 1.0f;
 };

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.samfa12.hordelanternrt.MenuAmbiencePlaybackTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-10-20T14:47:59" hostname="SAM_LAPPY" time="0.002">
+  <properties/>
+  <testcase name="invalidAndStalePublicationsStopWithoutReplayingMissedCreaks" classname="com.samfa12.hordelanternrt.MenuAmbiencePlaybackTest" time="0.002"/>
+  <testcase name="liveMixIsIndependentAndZeroRetiresOnlyItsOwnedVoice" classname="com.samfa12.hordelanternrt.MenuAmbiencePlaybackTest" time="0.0"/>
+  <testcase name="closeStopsEveryOwnedStreamAndIsIdempotent" classname="com.samfa12.hordelanternrt.MenuAmbiencePlaybackTest" time="0.0"/>
+  <testcase name="fadeScalesAllOwnedSoundsAndPlayStopsThemIdempotently" classname="com.samfa12.hordelanternrt.MenuAmbiencePlaybackTest" time="0.0"/>
+  <testcase name="delayedLoopStartRetriesOnlyMissingLoopAndDroppedCreakIsNotReplayed" classname="com.samfa12.hordelanternrt.MenuAmbiencePlaybackTest" time="0.0"/>
+  <testcase name="muteFocusLossAndCompletedFadeStopAndRebaseCreaks" classname="com.samfa12.hordelanternrt.MenuAmbiencePlaybackTest" time="0.0"/>
+  <testcase name="repeatedMenuPublicationsKeepExactlyOneLoop" classname="com.samfa12.hordelanternrt.MenuAmbiencePlaybackTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

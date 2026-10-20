@@ -384,6 +384,10 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
     // Speech duration follows the unscaled active fixed-step clock. Combat,
     // movement and poses still share the teaching time scale; pause freezes both.
     UpdateChapterDialogue(input,dialogueDeltaSeconds);
+    if(!config_.developmentRescueJourney || playerVitals_.Snapshot().phase!=PlayerLifePhase::Alive)
+        dialogueDucking_.Reset();
+    else if(!input.paused)
+        dialogueDucking_.Step(chapterDialogue_.State().line!=dialogue::Line::None,dialogueDeltaSeconds);
     RefreshSnapshot(input);
     if(dialogueDeltaSeconds>0) {
         const auto bird=forestBird_.Step(snapshot_);
@@ -713,7 +717,7 @@ void GameSimulation::ResetRoute()
     }
     campaignInputPublicationFloor_.reset();
     chapterTerrain_.reset();
-    chapterDialogue_.Reset();chapterCompanion_.Reset();chapterFirstExterior_=false;chapterVisibleRaise_=0;
+    chapterDialogue_.Reset();dialogueDucking_.Reset();chapterCompanion_.Reset();chapterFirstExterior_=false;chapterVisibleRaise_=0;
     if(config_.developmentRescueJourney) { rescueSavedSwordValid_=false;rescueTraversal_.Reset();rescueOpeningSeconds_=0;worldRoute_.Invalidate(); }
     legacyCombatCheckpoint_ = false;
     combatTeaching_.Reset(config_.combatFoundation1_7 && lastInput_.tutorialEnabled);
@@ -853,7 +857,7 @@ void GameSimulation::ImportRewardCheckpointState(
     const float authoredX = playerX_, authoredZ = playerZ_;
     const auto authoredSupport = playerSupport_;
     events_.Clear();
-    chapterDialogue_.Reset(true);chapterVisibleRaise_=0;
+    chapterDialogue_.Reset(true);dialogueDucking_.Reset();chapterVisibleRaise_=0;
     combatPresentation_.Reset();
     dodgeRemainingSeconds_ = 0.0f;
     CancelCombatTransients();
@@ -1413,7 +1417,7 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
     // An accepted explicit checkpoint replaces the loaded session's pose.
     // Its staging/practice input must not wait for the superseded camera rebase.
     campaignInputPublicationFloor_.reset();
-    chapterDialogue_.Reset(checkpointId!=0);chapterVisibleRaise_=0;
+    chapterDialogue_.Reset(checkpointId!=0);dialogueDucking_.Reset();chapterVisibleRaise_=0;
     pendingTutorialReplayCommands_ = 0u;
     pendingTutorialSkipCommands_ = 0u;
     gameplayTimeScale_ = 1.0f;
@@ -2680,6 +2684,8 @@ std::uint64_t GameSimulation::Emit(GameplayEventType type,
 void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
 {
     snapshot_.chapterDialogue=chapterDialogue_.State();
+    snapshot_.dialogueBedGain=config_.developmentRescueJourney &&
+        playerVitals_.Snapshot().phase==PlayerLifePhase::Alive ? dialogueDucking_.Gain():1.f;
     snapshot_.chapterCompanion=chapterCompanion_.State();
     snapshot_.tickIndex = tickIndex_;
     snapshot_.combatContactTrace = combatContactTrace_;

@@ -1,5 +1,22 @@
 # Horde 1.7 current design index
 
+## Dialogue bed balance and complete remaining scope - local milestone, 20 October 2026
+
+The [dialogue ducking checkpoint](../evidence/2026-10-20-dialogue-ducking/README.md)
+uses one transient shared envelope for music and waterfall, with smooth attack/
+release and a short gap hold. Consecutive lines retain attenuation; pause freezes
+it and explicit session replacement clears it. Stored gains, Voice, combat SFX,
+PCM/Core, assets, cue cursor ownership and saves remain unchanged. Listening is
+still required; the receipt records the affected checks and exact builds.
+
+The [complete remaining-scope inventory](HORDE_1_7_REMAINING_SCOPE_2026_10_20.md)
+corrects acceptance-only descriptions: participating outdoor mist/occluded shafts,
+fireflies and selected foliage wind remain unfinished/deferred source work. Static
+trees and distance haze do not implement them. Content/art, audio material,
+physical acceptance and conditional details are distinguished. The exact six
+healing questions remain pending; all performance gates, owner deferrals and
+mobile Mist Off persist. Older entries retain their dated scope.
+
 ## Finite tomb/rope sound and gameplay priorities - local milestone, 20 October 2026
 
 The [local ambience checkpoint](../evidence/2026-10-20-local-ambience/README.md)

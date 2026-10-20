@@ -1,4 +1,5 @@
 #include "audio/MusicDirector.h"
+#include "audio/DialogueDucking.h"
 
 #include <algorithm>
 #include <cmath>
@@ -310,7 +311,7 @@ MusicSelection MusicDirector::Update(
 
     // Reveal time is fixed-step gameplay time. A paused/background adapter
     // keeps the last envelope rather than accumulating wall-clock duck time.
-    if (!suspended) revealGain_ = ResolveRevealGain(snapshot);
+    if (!suspended) revealGain_ = ResolveRevealGain(snapshot) * DialogueBedGain(snapshot);
 
     if (forceDiscontinuity_)
     {

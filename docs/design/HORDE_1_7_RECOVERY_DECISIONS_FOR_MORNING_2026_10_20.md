@@ -59,9 +59,9 @@ The [rescue/forest music checkpoint](../evidence/2026-10-20-chapter-music/README
 now implements shared chapter state selection; actual listening remains open.
 The [local tomb/rope checkpoint](../evidence/2026-10-20-local-ambience/README.md)
 now implements sparse wet-room drips and grip-travel rope contacts with finite
-shared voice ownership; actual listening remains open. Next accepted source gap:
-master 11's gentle dialogue ducking/smooth recovery for music and ambient beds.
-Finite cues currently stop for Kit, while music/waterfall lack that envelope.
+shared voice ownership; actual listening remains open. Master 11's gentle dialogue
+ducking/smooth recovery is now implemented by the [shared envelope checkpoint](../evidence/2026-10-20-dialogue-ducking/README.md).
+Finite cues stop for Kit; music/waterfall consume one transient shared multiplier.
 Existing forest/pond calls and waterfall audio are already implemented.
 
 Nearby debris reaction remains conditional on measured cost; the six chips are

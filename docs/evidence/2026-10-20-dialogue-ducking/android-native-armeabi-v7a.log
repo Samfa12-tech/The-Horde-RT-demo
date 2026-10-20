@@ -1,0 +1,26 @@
+ninja: Entering directory `C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\android\app\.cxx\Debug\4g1z6us2\armeabi-v7a'
+[1/25] Building CXX object CMakeFiles/horde_rt_probe_android.dir/9cecef09a3e1fd82f8f5c0eff1214447/gameplay/campaign/CampaignCheckpointCodec.cpp.o
+[2/25] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/audio/MusicPcmStream.cpp.o
+[3/25] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/audio/MusicDirector.cpp.o
+[4/25] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/audio/MusicPcmAssetBank.cpp.o
+[5/25] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/audio/MusicPlaybackSession.cpp.o
+[6/25] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/ui/DiagnosticOverlay.cpp.o
+[7/25] Building CXX object CMakeFiles/horde_rt_probe_android.dir/android_music_playback.cpp.o
+[8/25] Building CXX object CMakeFiles/horde_rt_probe_android.dir/9cecef09a3e1fd82f8f5c0eff1214447/gameplay/campaign/CampaignCheckpointStorage.cpp.o
+[9/25] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/gameplay/simulation/GameSimulationRescue.cpp.o
+[10/25] Building CXX object CMakeFiles/horde_rt_probe_android.dir/9bb369aedab083e586e228a37196f7a6/raytracing/PresentableTinyRtSceneRegionPages.cpp.o
+[11/25] Building CXX object CMakeFiles/horde_rt_probe_android.dir/9cecef09a3e1fd82f8f5c0eff1214447/gameplay/simulation/GameSimulationDialogue.cpp.o
+[12/25] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/gameplay/campaign/CampaignSaveWorker.cpp.o
+[13/25] Building CXX object CMakeFiles/horde_rt_probe_android.dir/9cecef09a3e1fd82f8f5c0eff1214447/gameplay/simulation/GameSimulationCampaign.cpp.o
+[14/25] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/gameplay/campaign/CampaignPlaySession.cpp.o
+[15/25] Building CXX object CMakeFiles/horde_rt_probe_android.dir/9cecef09a3e1fd82f8f5c0eff1214447/gameplay/campaign/CampaignSaveCoordinator.cpp.o
+[16/25] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/gameplay/campaign/CampaignSession.cpp.o
+[17/25] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/vulkan/raytracing/CharacterRenderSlot.cpp.o
+[18/25] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/vulkan/raytracing/SimulationFrameAdapter.cpp.o
+[19/25] Building CXX object CMakeFiles/horde_rt_probe_android.dir/9cecef09a3e1fd82f8f5c0eff1214447/gameplay/validation/MotionEvidenceScenario.cpp.o
+[20/25] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/gameplay/simulation/GameSimulation.cpp.o
+[21/25] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/telemetry/MotionEvidenceLedger.cpp.o
+[22/25] Building CXX object CMakeFiles/horde_rt_probe_android.dir/c3316caadd61ab24622d4725c242b693/PresentableTinyRtSceneStaticGeometry.cpp.o
+[23/25] Building CXX object CMakeFiles/horde_rt_probe_android.dir/android_probe_bridge.cpp.o
+[24/25] Building CXX object CMakeFiles/horde_rt_probe_android.dir/3b050102f4ccf8812591c12b3b7f05b6/src/vulkan/raytracing/PresentableTinyRtScene.cpp.o
+[25/25] Linking CXX shared library "C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\android\app\build\intermediates\cxx\Debug\4g1z6us2\obj\armeabi-v7a\libhorde_rt_probe_android.so"

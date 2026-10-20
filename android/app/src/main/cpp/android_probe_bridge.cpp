@@ -1041,8 +1041,9 @@ void PublishSimulationUiState()
         horde::gameplay::CalculateSpatialAudio(
             {-2.32f, -15.26f, 0.52f, 0.65f, 10.0f},
             {simulation.playerX, simulation.playerZ, simulation.playerYawRadians});
+    const float dialogueBedGain=horde::audio::DialogueBedGain(simulation);
     gWaterfallStereoGains.store(
-        PackStereoGains(waterfallGains.left, waterfallGains.right),
+        PackStereoGains(waterfallGains.left*dialogueBedGain, waterfallGains.right*dialogueBedGain),
         std::memory_order_release);
 }
 

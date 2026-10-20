@@ -213,7 +213,9 @@ public:
             if(c.combat) state_.grateConsumed=true;
             Cancel();
         }
-        if(c.claimed) pending_=Line::None;
+        // Active Grate ticks can leave a pending local request. Completion or
+        // skip consumes that call; discard its request before it can restart.
+        if(c.claimed || state_.grateConsumed) pending_=Line::None;
         if(!state_.grateConsumed && !c.claimed && audible) pending_=Line::Grate;
         if(!audible) pending_=Line::None;
         if(pending_==Line::Grate && !c.combat && state_.line==Line::None) {
