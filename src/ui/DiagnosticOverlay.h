@@ -5,6 +5,7 @@
 #include <string>
 
 #include "gameplay/SwordCombat.h"
+#include "telemetry/CombatTargetObservation.h"
 #include "vulkan/DeviceCapabilities.h"
 
 namespace horde::ui
@@ -45,6 +46,7 @@ struct DeveloperOverlaySnapshot
     int playerMaxVitality = 3;
     bool playerDamageEnabled = true;
     bool playerSafePractice = false;
+    telemetry::CombatTargetObservation combatObservation{};
     float renderScale = 1.0f;
     float fps = 0.0f;
     float frameTimeMs = 0.0f;

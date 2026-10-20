@@ -116,6 +116,26 @@ std::string BuildDeveloperOverlayText(const DeveloperOverlaySnapshot& snapshot)
         << "  |  enemy " << (snapshot.hasAttackerCombatAction
             ? EnemyCombatActionName(snapshot.attackerCombatAction) : "none")
         << "  |  pose buckets " << snapshot.skeletonPoseBucketCount << '\n';
+    const auto& contact=snapshot.combatObservation;
+    out << "TARGET sim tick " << contact.tick << (contact.paused ? " paused" : "") << "  |  ";
+    if(contact.hasTarget)
+    {
+        out << '#' << static_cast<unsigned>(contact.target) << " centerXZ " << contact.centerDistance << " m";
+        if(contact.hasBearing)out << "  |  bearing " << contact.bearingDegrees << " deg (+right)";
+        else out << "  |  bearing N/A";
+        out << "\nPOSE player " << contact.playerX << ',' << contact.playerZ
+            << " target " << contact.targetX << ',' << contact.targetZ;
+    }
+    else out << "no active finite target";
+    out << "\nLAST SWORD SAMPLE ";
+    if(contact.hasContact)
+        out << "sample " << contact.contactSequence << " tick " << contact.contactTick
+            << " age " << contact.contactAgeTicks << " ticks  |  target #"
+            << static_cast<unsigned>(contact.contactTarget) << "  |  "
+            << (contact.outcome==gameplay::simulation::CombatContactOutcome::AcceptedSwordContact
+                ? "accepted sword contact" : "no contact at sample");
+    else out << "unavailable";
+    out << "  |  mesh gap N/A\n";
     out << "MAT " << snapshot.materialEncoding;
     return out.str();
 }

@@ -93,3 +93,23 @@ def validate_image_response(report: dict, request_id: str, returncode: int,
     if returncode != 0 or stderr or not isinstance(stdout, bytes) or len(stdout) != image["width"] * image["height"] * 4:
         raise PreparationReadError("image read must contain the exact RGBA payload")
     return stdout
+
+def publish_verified_arm(run, package: str, request_id: str) -> None:
+    """Explicit caller-owned transport; no subprocess/device access on import.
+    Tests supply a fake runner. A caller must already own an admitted fixture.
+    Echo and file readback must both be exact before atomic publication; no retry.
+    """
+    if package != "com.samfa12.hordelanternrt.debug":
+        raise PreparationReadError("only the isolated Debug fixture is supported")
+    final = request_path(request_id, "report")[:-5] + ".arm"
+    temporary = final + ".tmp"
+    token = arm_token(request_id)
+    for args, data in ((("shell", "-T", "run-as", package, "tee", temporary), token),
+                       (("exec-out", "run-as", package, "cat", temporary), None)):
+        result = run(*args, data=data)
+        if result.returncode != 0 or result.stderr:
+            raise PreparationReadError("arm staging/readback failed; do not publish")
+        validate_arm_readback(request_id, result.stdout)
+    result = run("shell", "run-as", package, "mv", temporary, final)
+    if result.returncode != 0 or result.stdout or result.stderr:
+        raise PreparationReadError("arm publication unconfirmed; stop without retry")

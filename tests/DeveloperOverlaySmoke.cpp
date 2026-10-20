@@ -78,6 +78,11 @@ int main()
     snapshot.consumedRouteResetSequence = 2;
     snapshot.consumedRetrySequence = 1;
     snapshot.presented = true;
+    auto& observed=snapshot.combatObservation;
+    observed.tick=500;observed.hasTarget=true;observed.target=horde::gameplay::simulation::EntityId::Lich;
+    observed.centerDistance=1.25f;observed.hasBearing=true;observed.bearingDegrees=20;
+    observed.hasContact=true;observed.contactSequence=32;observed.contactTick=490;observed.contactAgeTicks=10;
+
 
     const std::string text = horde::ui::BuildDeveloperOverlayText(snapshot);
     bool ok = true;
@@ -92,6 +97,9 @@ int main()
     ok &= RequireContains(text, "AS 9 BLAS / 1 TLAS / 19 inst  |  skinned 2");
     ok &= RequireContains(text,
                           "COMBAT 2 active  |  attacker 2  |  player parry-active  |  enemy attack-active  |  pose buckets 2");
+    ok &= RequireContains(text, "TARGET sim tick 500  |  #3 centerXZ 1.2 m  |  bearing 20.0 deg (+right)");
+    ok &= RequireContains(text, "LAST SWORD SAMPLE sample 32 tick 490 age 10 ticks");
+    ok &= RequireContains(text, "no contact at sample  |  mesh gap N/A");
     ok &= RequireContains(text, "MAT ASTC test route");
 
     snapshot.playerLifePhase = "alive";

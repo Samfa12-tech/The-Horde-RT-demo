@@ -1097,6 +1097,11 @@ if(BUILD_TESTING)
         endif()
     endif()
 
+    add_executable(horde_rt_combat_target_observation_tests tests/CombatTargetObservationTests.cpp)
+    target_include_directories(horde_rt_combat_target_observation_tests PRIVATE src)
+    target_link_libraries(horde_rt_combat_target_observation_tests PRIVATE horde_gameplay_simulation)
+    add_test(NAME horde_rt_combat_target_observation_tests COMMAND horde_rt_combat_target_observation_tests)
+
     add_executable(horde_rt_keeper_mist_fixture_tests tests/KeeperMistFixtureTests.cpp)
     target_include_directories(horde_rt_keeper_mist_fixture_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     target_link_libraries(horde_rt_keeper_mist_fixture_tests PRIVATE horde_gameplay_simulation)

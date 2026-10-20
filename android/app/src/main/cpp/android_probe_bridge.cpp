@@ -1095,6 +1095,7 @@ horde::ui::DeveloperOverlaySnapshot BuildDeveloperOverlaySnapshot(const Swapchai
     snapshot.playerVitality = playerVitals.vitality;
     snapshot.playerMaxVitality = playerVitals.maxVitality;
     snapshot.playerSafePractice = simulation.combatTeaching.safePractice;
+    snapshot.combatObservation = horde::telemetry::ObserveCombatTarget(simulation);
     snapshot.playerDamageEnabled =
         playerVitals.phase == horde::gameplay::PlayerLifePhase::Alive &&
         !snapshot.playerSafePractice &&

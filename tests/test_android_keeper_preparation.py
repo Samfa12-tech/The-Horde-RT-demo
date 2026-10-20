@@ -3,8 +3,9 @@ import json
 from pathlib import Path
 import sys
 import unittest
+from types import SimpleNamespace
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
-from android_keeper_preparation import PreparationReadError, request_path, request_json_response, pid_response, arm_token, validate_arm_readback, validate_image_response
+from android_keeper_preparation import PreparationReadError, request_path, request_json_response, pid_response, arm_token, validate_arm_readback, validate_image_response, publish_verified_arm
 
 class PreparationTests(unittest.TestCase):
     def setUp(self):
@@ -84,6 +85,42 @@ class PreparationTests(unittest.TestCase):
         for image in ({**report["image"],"file":"other.rgba"},{**report["image"],"width":5}):
             with self.assertRaises(PreparationReadError):
                 validate_image_response({**report,"image":image},self.id,0,b"x"*32,b"")
+
+    def test_arm_publication_requires_echo_and_readback_before_rename(self):
+        calls = []
+        def fake(*args, data=None):
+            calls.append((args,data))
+            return SimpleNamespace(returncode=0, stdout=arm_token(self.id) if len(calls)<3 else b"", stderr=b"")
+        publish_verified_arm(fake,"com.samfa12.hordelanternrt.debug",self.id)
+        self.assertEqual(len(calls),3)
+        self.assertEqual(calls[0][0][:2],("shell","-T"))
+        self.assertEqual(calls[0][1],b"keeper20r-a1")
+        self.assertEqual(calls[1][0][0],"exec-out")
+        self.assertEqual(calls[2][0][3],"mv")
+        self.assertEqual(calls[2][0][-1],"files/reports/environment-survey-keeper20r-a1.arm")
+    def test_arm_transport_failures_never_publish_or_retry(self):
+        for failure_index in (0,1):
+            for bad in (b"",b"old",b"keeper20r-a1\\r\\n",b"cat: missing file"):
+                calls = []
+                def fake(*args,data=None):
+                    calls.append(args)
+                    return SimpleNamespace(returncode=0,stdout=bad if len(calls)-1==failure_index else arm_token(self.id),stderr=b"")
+                with self.subTest(index=failure_index,bad=bad),self.assertRaises(PreparationReadError):
+                    publish_verified_arm(fake,"com.samfa12.hordelanternrt.debug",self.id)
+                self.assertEqual(len(calls),failure_index+1)
+                self.assertFalse(any("mv" in args for args in calls))
+    def test_arm_permission_or_publish_failure_stops_without_retry(self):
+        for failure_index in (0,1,2):
+            calls = []
+            def fake(*args,data=None):
+                calls.append(args)
+                return SimpleNamespace(returncode=1 if len(calls)-1==failure_index else 0,
+                    stdout=arm_token(self.id) if len(calls)<3 else b"",stderr=b"permission denied" if len(calls)-1==failure_index else b"")
+            with self.assertRaises(PreparationReadError):
+                publish_verified_arm(fake,"com.samfa12.hordelanternrt.debug",self.id)
+            self.assertEqual(len(calls),failure_index+1)
+        with self.assertRaises(PreparationReadError):
+            publish_verified_arm(lambda *args,**kwargs: self.fail("must not run"),"com.samfa12.hordelanternrt",self.id)
 
     def test_request_paths_are_closed(self):
         for identity in ("../x","", "x"*65,"a b","x;touch"):

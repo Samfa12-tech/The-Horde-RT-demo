@@ -3861,6 +3861,7 @@ horde::ui::DeveloperOverlaySnapshot BuildDeveloperOverlaySnapshot(
     snapshot.playerVitality = player.vitality;
     snapshot.playerMaxVitality = player.maxVitality;
     snapshot.playerSafePractice = simulation.combatTeaching.safePractice;
+    snapshot.combatObservation = horde::telemetry::ObserveCombatTarget(simulation);
     snapshot.playerDamageEnabled = IsPlayerDamageEnabled(context) && !snapshot.playerSafePractice;
     snapshot.simulationTicksThisFrame = simulation.simulationTicksThisFrame;
     snapshot.fixedStepAccumulatorSeconds = simulation.fixedStepAccumulatorSeconds;

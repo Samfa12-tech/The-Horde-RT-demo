@@ -1,5 +1,23 @@
 # Horde 1.7 current design index
 
+## Current target/contact observation - local milestone, 20 October 2026
+
+The [planned contact diagnostic](../evidence/2026-10-20-current-contact/README.md)
+now shows selected current target centerXZ range/bearing/positions and simulation
+tick in both developer overlays, independent of exhausted trace export quotas.
+Latest sword-sample target/tick/age stays separate; mesh gap remains unavailable.
+Three focused host tests, Windows application build and four-ABI Android build
+pass; 361 Java tests pass. New build is compile-only: no physical overlay/combat,
+save, lifecycle or performance acceptance. No phone operations this milestone.
+
+The arm helper now verifies exact echo plus staged-file readback before rename,
+with 14 offline guard/transport tests; no physical transport retry occurred.
+Previous Keeper timing remains inconclusive. Banked optimizations/mobile Mist Off
+stay applied; no hit-rule/quality change or heavy expansion. Current observation
+is the next informed acceptance aid for the existing WP2a/progression blockers;
+the earlier combat denial remains in force.
+
+
 ## Corrected guard and renewed Keeper attempt - 20 October 2026
 
 After Sam's explicit renewed approval, the [corrected host guard](../evidence/2026-10-20-keeper-mist/renewed/README.md)
