@@ -1,5 +1,23 @@
 # Horde 1.7 current design index
 
+## Corrected guard and renewed Keeper attempt - 20 October 2026
+
+After Sam's explicit renewed approval, the [corrected host guard](../evidence/2026-10-20-keeper-mist/renewed/README.md)
+distinguishes exact missing-file text from native JSON and transport failures.
+One R04 physical preparation passes with real RT, live reveal/full room mist,
+both production lights and saved 40%. Native then rejects an empty arm file
+before timing. The sequence stops immediately: no Off/closing run, no retry,
+zero timed frames. Final settings/all12 records/locks match and Debug is idle.
+11 guard tests and23 analyzer tests pass; no performance gain is claimed.
+
+Keep verified optimizations already in the branch, including the exact-zero-mist
+exit, and owner's fresh/reset Android Mist Off. No new quality/CPU change is
+adopted from an inconclusive trial. The next phone gate is byte-exact arm
+transport before publication; prospective host code is offline-only. Parent
+review then returns to the existing 1.7 roadmap/acceptance, with no endless
+repeated trial or heavy content expansion.
+
+
 ## Keeper two-light diagnostic checkpoint - 20 October 2026
 
 The [isolated Keeper/mist fixture](../evidence/2026-10-20-keeper-mist/README.md)

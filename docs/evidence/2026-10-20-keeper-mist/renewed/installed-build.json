@@ -1,0 +1,11 @@
+{
+  "sourceHead": "084a73c5457c9f71d1c9ed8070e1ffe451e564e4",
+  "apkSha256": "b7e387d16c2876abf532ce461b9b71bb1e77d60220192a9f5333031098bb819d",
+  "bytes": 186143925,
+  "assetCount": 175,
+  "assetsByteExactToPrior175": true,
+  "signerSha256": "2bc406088b23ac80f2a00a40e2d5d8daa012844dc62f31ad6145d129f5566736",
+  "sourceManifestSha256": "6f2539f3080b5ac52204653012066327e0d0c62dbe86956153b567444d31209c",
+  "policy": "optimized Debug Shipping/Mobile RayTracingPipeline; route timing on; stage/clock probes off",
+  "installedPullbackSha256": "b7e387d16c2876abf532ce461b9b71bb1e77d60220192a9f5333031098bb819d"
+}

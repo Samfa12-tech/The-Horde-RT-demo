@@ -1,5 +1,13 @@
 # Keeper two-light fixture checkpoint - 20 October 2026
 
+Latest: [the newly authorized comparison](renewed/README.md) reaches the real
+two-light/Mist On prepared state on exact R04, then stops at an empty arm token.
+Native rejects before timing; zero samples, no Off or closing run, no new gain.
+R04 is now installed and custody verified. The earlier 084a73c5 snapshot below
+records its own then-compile-only status and prior denial; it is not the latest
+device state. No rejected trial is adopted.
+
+
 The isolated fixture is implemented and passes host/build checks. **No new phone
 timing result exists.** Two preparations stopped before timing; automatic approval
 review rejected another preparation beyond the declared rejection bound. No retry

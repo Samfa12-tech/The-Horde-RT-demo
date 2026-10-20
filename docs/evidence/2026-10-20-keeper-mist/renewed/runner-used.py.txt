@@ -1,0 +1,163 @@
+"""Finite isolated Keeper workload. No input, campaign or preference writes."""
+from pathlib import Path
+import hashlib,json,subprocess,sys,time,zipfile,os,traceback
+sys.path.insert(0,str(Path('tools').resolve()))
+from android_current_thermal_state import parse_current_thermal_state,admit_start
+ROOT=Path(__file__).resolve().parent
+from android_keeper_preparation import request_json_response, request_path, pid_response
+from analyze_keeper_mist_fixture import analyze, compare
+ADB=['C:/Users/sam_s/AppData/Local/Android/Sdk/platform-tools/adb.exe','-s','R5GL219SZGK']
+PKG='com.samfa12.hordelanternrt.debug'
+APK=Path('android/app/build/outputs/apk/debug/app-debug.apk').resolve()
+SIGNER='2bc406088b23ac80f2a00a40e2d5d8daa012844dc62f31ad6145d129f5566736'
+def sha(b):return hashlib.sha256(b).hexdigest()
+def proc(*args,data=None,timeout=35):
+ return subprocess.run(ADB+list(args),input=data,stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=timeout)
+def call(*args,data=None,timeout=35):
+ p=proc(*args,data=data,timeout=timeout)
+ if p.returncode:raise RuntimeError((args,p.returncode,p.stdout.decode(errors="replace"),p.stderr.decode(errors="replace")))
+ return p.stdout
+def pid_now():
+ p=proc('shell','pidof',PKG)
+ return pid_response(p.returncode,p.stdout,p.stderr)
+def read_request(rid,kind,mist):
+ p=proc('exec-out','run-as',PKG,'cat',request_path(rid,kind))
+ try:j=request_json_response(p.returncode,p.stdout,p.stderr,rid,kind,mist)
+ except ValueError:
+  print('rejected request read',kind,p.returncode,repr(p.stdout[:300]),repr(p.stderr[:300]),flush=True);raise
+ return p.stdout,j
+def prefs():return call('exec-out','run-as',PKG,'cat','shared_prefs/horde_lantern_alpha_settings.xml')
+def idle():
+ pid=pid_now()
+ if pid:raise RuntimeError('Existing process is not owned: '+pid)
+def inventory():
+ names=call('exec-out','run-as',PKG,'find','files','-type','f').decode().splitlines()
+ names=sorted(n for n in names if n.endswith('.hrd') or n.endswith('.hrd.lock'))
+ raw=call('exec-out','run-as',PKG,'sha256sum',*names).decode().splitlines()
+ result={line.split('  ',1)[1]:line.split('  ',1)[0] for line in raw}
+ assert sorted(result)==names
+ return result
+def thermal():return parse_current_thermal_state(call('shell','dumpsys','thermalservice').decode())
+def save(path,obj):path.write_text(json.dumps(obj,indent=2)+'\n')
+def assets(apk):
+ with zipfile.ZipFile(apk) as z:return {n:sha(z.read(n)) for n in z.namelist() if n.startswith('assets/') and not n.endswith('/')}
+def preflight():
+ idle()
+ assert call('shell','getprop','ro.product.model').decode().strip()=='SM-S948B'
+ original=prefs()
+ assert original==Path('reports/keeper-mist-2026-10-20/owner-settings.xml').read_bytes()
+ (ROOT/'owner-settings.xml').write_bytes(original)
+ inv=inventory();assert len(inv)==12;save(ROOT/'owner-before.json',inv)
+ p=proc('exec-out','run-as',PKG,'cat',request_path('keeper20r-read-probe','report'))
+ save(ROOT/'actual-missing-file-read.json',{'exit':p.returncode,'stdout':p.stdout.decode(),'stderr':p.stderr.decode()})
+ assert request_json_response(p.returncode,p.stdout,p.stderr,'keeper20r-read-probe','report',True) is None
+ old=call('shell','pm','path',PKG).decode().strip()
+ assert old.startswith('package:') and '\n' not in old
+ call('pull',old[8:],str(ROOT/'installed-before.apk'),timeout=60)
+ assert sha((ROOT/'installed-before.apk').read_bytes())=='33d301a5825a5da2ec1d3b5eaeb21150281a8a42384b8011f4ca41bcb2ff769c'
+ assert assets(APK)==assets(ROOT/'installed-before.apk')
+ verify=subprocess.check_output(['C:/Users/sam_s/AppData/Local/Android/Sdk/build-tools/36.1.0/apksigner.bat','verify','--print-certs',str(APK)],stderr=subprocess.STDOUT)
+ (ROOT/'signer.txt').write_bytes(verify);assert SIGNER.encode() in verify.lower()
+ code=subprocess.check_output(['git','ls-files','src','android/app/src','CMakeLists.txt','tools/raygen-variant-catalog.json','tools/rayquery-variant-catalog.json']).decode().splitlines()
+ code+=['src/gameplay/validation/KeeperMistFixture.h','android/app/src/main/cpp/android_keeper_mist_fixture.inl']
+ manifest={n:sha(Path(n).read_bytes()) for n in sorted(set(code)) if Path(n).is_file()}
+ save(ROOT/'build-source-manifest.json',manifest)
+ (ROOT/'source.patch').write_bytes(subprocess.check_output(['git','diff','--binary']))
+ receipt={'sourceHead':subprocess.check_output(['git','rev-parse','HEAD']).decode().strip(),'apkSha256':sha(APK.read_bytes()),'bytes':APK.stat().st_size,
+          'assetCount':len(assets(APK)),'assetsByteExactToPrior175':True,'signerSha256':SIGNER,'sourceManifestSha256':sha((ROOT/'build-source-manifest.json').read_bytes()),
+          'policy':'optimized Debug Shipping/Mobile RayTracingPipeline; route timing on; stage/clock probes off'}
+ (ROOT/'install.txt').write_bytes(call('install','-r',str(APK),timeout=90))
+ installed=call('shell','pm','path',PKG).decode().strip()[8:]
+ call('pull',installed,str(ROOT/'installed-exact.apk'),timeout=60)
+ receipt['installedPullbackSha256']=sha((ROOT/'installed-exact.apk').read_bytes());assert receipt['installedPullbackSha256']==receipt['apkSha256']
+ assert prefs()==original and inventory()==inv
+ save(ROOT/'build.json',receipt);print(json.dumps(receipt),flush=True)
+def run(case,mist):
+ assert case in ('a1','b1','b2','a2') and mist in ('on','off')
+ assert mist==('on' if case.startswith('a') else 'off')
+ idle();out=ROOT/case;out.mkdir(exist_ok=False);rid='keeper20r-'+case
+ original=(ROOT/'owner-settings.xml').read_bytes();inv=json.loads((ROOT/'owner-before.json').read_text())
+ assert prefs()==original and inventory()==inv
+ samples=[];pid=None;armed=False
+ def temp(label):
+  t=thermal();samples.append({'phase':label,'hostMonotonic':time.monotonic(),'thermal':t});save(out/'thermals.json',samples)
+  print(case,label,t['frameworkStatus'],{k:v['celsius'] for k,v in t['sensors'].items()},flush=True);return t
+ ref=None
+ if case!='a1':
+  ref=next(t['thermal'] for t in json.loads((ROOT/'a1/thermals.json').read_text()) if t['phase']=='before-run')
+ deadline=time.monotonic()+180
+ while True:
+  t=temp('passive-cooldown')
+  good=t['frameworkStatus']==0 and (ref is None or all(t['sensors'][k]['celsius']<=ref['sensors'][k]['celsius']+(0 if k=='AP' else .5) for k in ('AP','BAT','SKIN')))
+  if good:break
+  if time.monotonic()>=deadline:raise RuntimeError('180s passive cooldown bound reached; request not launched')
+  time.sleep(10)
+ (out/'battery-before.txt').write_bytes(call('shell','dumpsys','battery'))
+ save(out/'request.json',{'requestId':rid,'mist':mist,'runnerSha256':sha(Path(__file__).read_bytes()),'declaredExperimentSha256':sha(Path('docs/evidence/2026-10-20-keeper-mist/renewed-experiment.md').read_bytes())})
+ prefix='files/reports/environment-survey-'+rid
+ try:
+  (out/'launch.txt').write_bytes(call('shell','am','start','-W','--user','0','-n',PKG+'/com.samfa12.hordelanternrt.MainActivity','-a','com.samfa12.hordelanternrt.ENVIRONMENT_SURVEY',
+   '--es','request_id',rid,'--es','profile','keeper-mist','--ez','mist_enabled','true' if mist=='on' else 'false'))
+  pid=pid_now();assert pid and pid.isdecimal(),'Expected one owned process'
+  deadline=time.monotonic()+70
+  while time.monotonic()<deadline:
+   ready,ready_value=read_request(rid,'ready',mist=='on')
+   raw,terminal_value=read_request(rid,'report',mist=='on')
+   if terminal_value is not None:
+    (out/'native.json').write_bytes(raw)
+    raise RuntimeError('Native terminated before arm: '+str(terminal_value.get('error')))
+   if ready_value is not None:
+    (out/'ready.json').write_bytes(ready);break
+   time.sleep(1)
+  else:raise RuntimeError('70s readiness bound reached; no timed launch')
+  start=temp('prepared');settle=time.monotonic()+20
+  while True:
+   decision=admit_start(start,ref,max_delta_c=1.5,required_status=0)
+   save(out/'thermal-admission.json',decision)
+   if decision['admitted']:break
+   if time.monotonic()>=settle:raise RuntimeError('20s host settling bound reached; no arm')
+   time.sleep(2);start=temp('settling')
+  samples.append({'phase':'before-run','hostMonotonic':time.monotonic(),'thermal':start});save(out/'thermals.json',samples)
+  assert prefs()==original
+  # Constant validated request identity only; atomic request-scoped diagnostic token.
+  call('exec-in','run-as',PKG,'dd','of='+prefix+'.arm.tmp',data=(rid+'\n').encode())
+  call('shell','run-as',PKG,'mv',prefix+'.arm.tmp',prefix+'.arm')
+  armed=True;deadline=time.monotonic()+80;next_temp=time.monotonic()+10
+  while time.monotonic()<deadline:
+   raw,j=read_request(rid,'report',mist=='on')
+   if j is not None:
+    (out/'native.json').write_bytes(raw)
+    print(case,'terminal',j['result'],j.get('error'),len(j.get('frames',[])),flush=True);break
+   if time.monotonic()>=next_temp:
+    observation=temp('running');next_temp=time.monotonic()+10
+    if observation['frameworkStatus']!=0:raise RuntimeError('Framework status changed; stop experiment')
+   time.sleep(1)
+  else:raise RuntimeError('80s terminal bound exceeded')
+  temp('after-run')
+  if j.get('image'):
+   (out/'final.rgba').write_bytes(call('exec-out','run-as',PKG,'cat','files/reports/'+j['image']['file']))
+  assert j['result']=='complete',j.get('error')
+  analysis=analyze(j,samples)
+  save(out/'analysis.json',analysis)
+  print(case,'accepted GPU',analysis['gpu'],flush=True)
+ finally:
+  if not any(t['phase']=='after-run' for t in samples):temp('after-rejected')
+  (out/'battery-after.txt').write_bytes(call('shell','dumpsys','battery'))
+  (out/'settings-after.xml').write_bytes(prefs())
+  if pid:
+   (out/'owned.log').write_bytes(call('logcat','-d','--pid='+pid))
+   now=pid_now()
+   if now==pid:call('shell','am','force-stop',PKG)
+   elif now:raise RuntimeError('PID changed: leave unknown process untouched')
+  after=inventory();save(out/'owner-after.json',after)
+  assert prefs()==original and after==inv
+  save(out/'custody.json',{'armed':armed,'ownerSettingsByteExact':True,'campaignRecordsAndLocksByteExact':len(after),'debugPidAfter':pid_now()})
+if __name__=='__main__':
+ try:
+  if sys.argv[1]=='preflight':preflight()
+  elif sys.argv[1]=='final':
+   idle();assert prefs()==(ROOT/'owner-settings.xml').read_bytes();assert inventory()==json.loads((ROOT/'owner-before.json').read_text())
+   save(ROOT/'final-custody.json',{'debugPid':None,'ownerSettingsByteExact':True,'campaignRecordsAndLocksByteExact':12,'settingsSha256':sha(prefs())})
+  else:run(*sys.argv[1:3])
+ except Exception as e:
+  traceback.print_exc();raise SystemExit(2)

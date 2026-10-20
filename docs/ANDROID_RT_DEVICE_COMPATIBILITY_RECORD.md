@@ -1,5 +1,23 @@
 # Android RT Device Compatibility Record
 
+## 2026-10-20 - R04 prepared two-light Keeper; arm transport fails
+
+SM-S948B / Android17 API37 / Adreno840 / driver2150932499 now has exact R04
+Debug b7e387d16c2876abf532ce461b9b71bb1e77d60220192a9f5333031098bb819d,
+matching signer/pullback and175 unchanged assets. Fresh authorized keeper20r-a1
+passes12 native preparation frames with live reveal, both production lights,
+full room mist, actual MistOn and40% (576x1188 / 1440x2971), Shipping/Mobile real
+Pipeline RT. This is a frozen noncombat preparation evidence class only.
+
+Native rejects an empty arm token, retires successfully and records zero timed
+frames. Whole sequence stops; Off/closing requests never launch, no retry or new
+performance claim. Host missing-file guard is corrected;11 offline guard tests
+and23 analyzer tests pass. No Debug process, byte-exact settings/all12 campaign
+records/locks, Release untouched. Next gate: exact arm transport/readback before
+publication; prospective host correction is not physically exercised.
+[Receipt and preserved failure](evidence/2026-10-20-keeper-mist/renewed/README.md).
+
+
 ## 2026-10-20 - Keeper fixture built; phone timing blocked
 
 SM-S948B / Android 17 API 37 / Adreno 840 / driver 2150932499 receives exact
