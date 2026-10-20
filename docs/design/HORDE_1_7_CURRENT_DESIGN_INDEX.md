@@ -1,5 +1,28 @@
 # Horde 1.7 current design index
 
+## Keeper two-light diagnostic checkpoint - 20 October 2026
+
+The [isolated Keeper/mist fixture](../evidence/2026-10-20-keeper-mist/README.md)
+freezes shared-simulation live reveal with both production torch lights, ordinary
+RT shading and saved 40% scale. Host setup/policy tests, 23 synthetic evidence
+tests and 361 Android tests pass. Two existing native failures are independently
+reproduced and classified, not hidden.
+
+**No new phone performance sample exists.** An ADB prelaunch read and then a host
+missing-file guard stopped two preparations before timing. Automatic review
+denied another preparation beyond the declared rejection bound; no retry occurred.
+Final settings and all 12 campaign records/locks match; Debug is idle. Final R04
+is compile-only; installed R03 is separately identified. Mobile fresh/reset Mist
+Off remains owner-selected, with explicit saved choices preserved.
+
+A wider hidden Windows landing capture succeeds but stays dark/noisy and
+diagnostic. No promotional replacement is accepted. Device work needs renewed
+bounded authorization after offline host read handling is corrected. Current
+target/contact and natural earned-save/whole-chapter gates remain open.
+No CPU reorder or extra quality default is adopted; the same-order immutable
+owned preparation bundle is the next reversible CPU prerequisite.
+
+
 ## Current phone cost and mobile Mist Off checkpoint - 20 October 2026
 
 The [fresh physical performance checkpoint](../evidence/2026-10-20-phone-performance/README.md)

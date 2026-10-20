@@ -1,0 +1,52 @@
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+    Start  64: horde_rt_android_motion_evidence_policy_tests
+1/4 Test  #64: horde_rt_android_motion_evidence_policy_tests ...   Passed    0.02 sec
+    Start 139: horde_rt_keeper_mist_fixture_tests
+2/4 Test #139: horde_rt_keeper_mist_fixture_tests ..............   Passed    0.02 sec
+    Start 189: horde_rt_scene_resource_inventory_tests
+3/4 Test #189: horde_rt_scene_resource_inventory_tests .........***Failed    1.47 sec
+Resource integration: existing readback/mist/torch contracts
+Actual development static admission materials=30 primitives=31 layers=18,15,15,1
+Native sparse fixture (Mobile) IDs: 75693 91585
+Actual development static admission materials=30 primitives=32 layers=18,15,15,1
+Native sparse fixture (High) IDs: 75693 91585
+FAIL: real dressed tomb/forest production registration exceeds its unchanged resource contracts
+Resource integration: descriptor contracts
+Resource integration: TLAS and water geometry
+Resource integration: actual tomb intake
+Integrated intake invariants: baseline indices=25266 expected=25266; baseline top=12.24; entry top=6 expected=6; chapter indices=1291902 expected=1280514
+Integrated native tomb static roster: 31 primitives, 30 materials
+Matched CPU intake only (baseline first; cache/order bias possible): 59.3213 / 413.51 ms; additional static vertices/indices bytes: 33008832 / 5378016; no GPU allocation, AS build or presentation measurement
+FAIL: actual combined native tomb asset intake retains the frozen primitive/material capacities
+Resource integration: water owner lifetime
+Water lifetime: populate
+Water lifetime: move
+Water lifetime: destroy
+Resource integration: resize contracts
+Resource integration: command/resource observations
+Resource integration: command execution fixtures
+Resource integration: not-ready rejection
+Resource integration: preview inventory
+Resource integration: populated inventory
+
+    Start 198: horde_rt_character_render_slot_smoke
+4/4 Test #198: horde_rt_character_render_slot_smoke ............***Failed    1.88 sec
+FAIL: CPU/GLSL world normal codes must retain their signed-axis agreement
+FAIL: CPU/GLSL world normal codes must retain their signed-axis agreement
+FAIL: CPU/GLSL world normal codes must retain their signed-axis agreement
+FAIL: CPU/GLSL world normal codes must retain their signed-axis agreement
+FAIL: CPU/GLSL world normal codes must retain their signed-axis agreement
+FAIL: CPU/GLSL world normal codes must retain their signed-axis agreement
+FAIL: secondary water hits must preserve accumulated camera-path distance for fog and distance lighting
+FAIL: Android renderer must consume exactly one mutex-protected RT tuning snapshot and reset it with the route
+Keeper audited staff centroids: neutral=(0.972983, 0.800802, 0.605775) lifted=(0.466067, 1.09768, 1.11467) forward=(0.0265056, 1.30031, 1.17645)
+
+
+50% tests passed, 2 tests failed out of 4
+
+Total Test time (real) =   3.41 sec
+
+The following tests FAILED:
+	189 - horde_rt_scene_resource_inventory_tests (Failed)
+	198 - horde_rt_character_render_slot_smoke (Failed)
+Errors while running CTest

@@ -1,0 +1,36 @@
+{
+  "sourceBase": "eaffada89b02cd0ce542a622ee656f67ae989952",
+  "compiledOnlyR04": {
+    "apkSha256": "b7e387d16c2876abf532ce461b9b71bb1e77d60220192a9f5333031098bb819d",
+    "bytes": 186143925,
+    "installed": false,
+    "sourceManifestSha256": "6f2539f3080b5ac52204653012066327e0d0c62dbe86956153b567444d31209c",
+    "assetCount": 175,
+    "assetsByteExactToInstalledR03": true,
+    "policy": "optimized Debug; Shipping/Mobile; RayTracingPipeline; route timing on; stage and clock probes off",
+    "buildLogSha256": "788e49ac07291ff9d7f42d96c3fc65d4827abe38c8ebe5b4eafeffdf81038429"
+  },
+  "installedR03": {
+    "sourceHead": "eaffada89b02cd0ce542a622ee656f67ae989952",
+    "apkSha256": "33d301a5825a5da2ec1d3b5eaeb21150281a8a42384b8011f4ca41bcb2ff769c",
+    "bytes": 186143909,
+    "assetCount": 175,
+    "assetsByteExactToPrior175": true,
+    "signerSha256": "2bc406088b23ac80f2a00a40e2d5d8daa012844dc62f31ad6145d129f5566736",
+    "sourceManifestSha256": "3a139e9f23d2d905b789794884bdb508297c7749bd44c362cf6404b0c5432fa3",
+    "policy": "optimized Debug Shipping/Mobile RayTracingPipeline; route timing on; stage/clock probes off",
+    "installedPullbackSha256": "33d301a5825a5da2ec1d3b5eaeb21150281a8a42384b8011f4ca41bcb2ff769c"
+  },
+  "phoneMeasurement": {
+    "timedRuns": 0,
+    "acceptedFrames": 0,
+    "rejectedPreparations": 2,
+    "closingControl": "not launched; further preparation denied"
+  },
+  "custody": {
+    "debugPid": null,
+    "ownerSettingsByteExact": true,
+    "campaignRecordsAndLocksByteExact": 12,
+    "settingsSha256": "e3966b09cd9c354cb92833496b7f812139178dd7b2a906a4f809dbf9538c3dee"
+  }
+}

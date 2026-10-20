@@ -1,5 +1,26 @@
 # Android RT Device Compatibility Record
 
+## 2026-10-20 - Keeper fixture built; phone timing blocked
+
+SM-S948B / Android 17 API 37 / Adreno 840 / driver 2150932499 receives exact
+compatible Debug R03 APK
+33d301a5825a5da2ec1d3b5eaeb21150281a8a42384b8011f4ca41bcb2ff769c
+with matching installed pullback, preserved settings and all 12 campaign
+records/locks. No new timing, completed fixture or physical fight acceptance
+exists: ADB custody failure and a host missing-file guard stopped two preparations
+before arm. Automatic review denied another preparation beyond the declared
+rejection bound; it was not retried. Debug stopped; Release untouched.
+
+Final R04 APK b7e387d16c2876abf532ce461b9b71bb1e77d60220192a9f5333031098bb819d
+adds a request-serial cancellation safeguard, compiles all four ABIs and passes
+361 Java tests; **not installed or device validated**. Both focused fixture/policy
+host tests and 23 synthetic evidence tests pass; two independently classified
+older native failures remain. All 175 packaged assets are unchanged.
+Evidence class: **build/install/custody and failed preparations only; no Keeper
+performance result**.
+[Receipts, rejection, fixture differences and next gate](evidence/2026-10-20-keeper-mist/README.md).
+
+
 ## 2026-10-20 - mobile Mist Off default and bounded quality comparison
 
 Exact SM-S948B / Android 17 API 37 / Adreno 840 / driver 2150932499 evidence:

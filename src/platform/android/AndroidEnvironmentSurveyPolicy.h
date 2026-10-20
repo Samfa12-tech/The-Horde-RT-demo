@@ -20,9 +20,9 @@ inline bool EnvironmentSurveyIdValid(std::string_view id) {
 class AndroidEnvironmentSurveyPolicy
 {
 public:
-    bool Configure(std::string_view id,bool disabled) {
-        if(!EnvironmentSurveyIdValid(id) || phase_==1 || id==id_ || serial_==UINT64_MAX)return false;
-        id_=id;disabled_=disabled;++serial_;phase_=1;frames_=0;surface_=scene_=measurement_=submission_=0;return true;
+    bool Configure(std::string_view id,bool disabled,unsigned frameLimit=kEnvironmentSurveyFrames) {
+        if((frameLimit!=120 && frameLimit!=180) || !EnvironmentSurveyIdValid(id) || phase_==1 || id==id_ || serial_==UINT64_MAX)return false;
+        id_=id;disabled_=disabled;frameLimit_=frameLimit;++serial_;phase_=1;frames_=0;surface_=scene_=measurement_=submission_=0;return true;
     }
     bool Bind(std::uint64_t serial,std::uint64_t surface) {
         if(phase_!=1 || serial!=serial_ || !surface || surface_)return false;
@@ -30,17 +30,17 @@ public:
     }
     bool AcceptFrame(std::uint64_t surface,std::uint64_t scene,std::uint64_t measurement,std::uint64_t submission) {
         if(phase_!=1 || !surface_ || surface!=surface_ || !scene || !measurement || !submission ||
-           frames_>=kEnvironmentSurveyFrames || submission<=submission_ ||
+           frames_>=frameLimit_ || submission<=submission_ ||
            (frames_ && (scene!=scene_ || measurement!=measurement_)))return false;
         scene_=scene;measurement_=measurement;submission_=submission;++frames_;return true;
     }
-    bool Complete() {if(phase_!=1 || frames_!=kEnvironmentSurveyFrames)return false;phase_=2;return true;}
+    bool Complete() {if(phase_!=1 || frames_!=frameLimit_)return false;phase_=2;return true;}
     void Cancel() {if(phase_==1)phase_=3;}
     unsigned Phase()const{return phase_;} unsigned Frames()const{return frames_;}
     std::uint64_t Serial()const{return serial_;} std::uint64_t Surface()const{return surface_;}
     const std::string& Id()const{return id_;} bool WaterDisabled()const{return disabled_;}
 private:
-    std::string id_;bool disabled_=false;unsigned phase_=0,frames_=0;
+    std::string id_;bool disabled_=false;unsigned phase_=0,frames_=0,frameLimit_=kEnvironmentSurveyFrames;
     std::uint64_t serial_=0,surface_=0,scene_=0,measurement_=0,submission_=0;
 };
 struct EnvironmentSurveyCamera {float x=0,z=0,supportY=0,yaw=0,pitch=0;};

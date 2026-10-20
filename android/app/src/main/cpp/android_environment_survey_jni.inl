@@ -1,8 +1,7 @@
 // Explicit Debug request, armed before any Surface. No ordinary lifecycle/input
 // synchronisation, campaign service, preference publisher or report replacement.
-extern "C" JNIEXPORT jboolean JNICALL
-Java_com_samfa12_hordelanternrt_ProbeBridge_configureEnvironmentSurvey(
-    JNIEnv* env,jclass,jstring requestId,jboolean disabled,jint scale,jint water,jint fire,jint cap,
+static jboolean ConfigureRenderSurvey(
+    JNIEnv* env,jstring requestId,jboolean disabled,bool keeper,jint scale,jint water,jint fire,jint cap,
     jboolean glass,jint shadow,jboolean mist,jint dust)
 {
 #if defined(HORDE_RT_DEBUG_CHECKPOINTS)
@@ -10,7 +9,7 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_configureEnvironmentSurvey(
     const char* text=env->GetStringUTFChars(requestId,nullptr);if(!text)return JNI_FALSE;
     const std::string id(text);env->ReleaseStringUTFChars(requestId,text);
     const auto settings=GraphicsTuple(scale,water,fire,cap,glass,shadow,mist,dust);
-    if(!horde::graphics::ValidGraphicsSettings(settings))return JNI_FALSE;
+    if(!horde::graphics::ValidGraphicsSettings(settings) || (keeper && scale!=40))return JNI_FALSE;
     std::lock_guard admission(gDebugRequestAdmissionMutex);
     const auto state=ReadDebugRequestAdmissionStateLocked();
     if(gSwapchainRunning.load(std::memory_order_acquire) ||
@@ -20,13 +19,26 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_configureEnvironmentSurvey(
        state.capturePending || state.replayPending || state.benchmarkPendingOrActive ||
        state.motionPendingOrActive)return JNI_FALSE;
     std::lock_guard lock(gEnvironmentSurveyMutex);
-    if(!gEnvironmentSurveyPolicy.Configure(id,disabled==JNI_TRUE))return JNI_FALSE;
-    gEnvironmentSurveyGraphics=settings;
+    if(!gEnvironmentSurveyPolicy.Configure(id,disabled==JNI_TRUE,keeper ? 180u : 120u))return JNI_FALSE;
+    gEnvironmentSurveyGraphics=settings;gEnvironmentSurveyKeeperMist=keeper;
     gEnvironmentSurveyRequestedSurface.store(0,std::memory_order_release);
     return JNI_TRUE;
 #else
     return JNI_FALSE;
 #endif
+}
+
+extern "C" JNIEXPORT jboolean JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_configureEnvironmentSurvey(
+    JNIEnv* env,jclass,jstring id,jboolean disabled,jint scale,jint water,jint fire,jint cap,
+    jboolean glass,jint shadow,jboolean mist,jint dust) {
+    return ConfigureRenderSurvey(env,id,disabled,false,scale,water,fire,cap,glass,shadow,mist,dust);
+}
+extern "C" JNIEXPORT jboolean JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_configureKeeperMistFixture(
+    JNIEnv* env,jclass,jstring id,jint scale,jint water,jint fire,jint cap,
+    jboolean glass,jint shadow,jboolean mist,jint dust) {
+    return ConfigureRenderSurvey(env,id,JNI_FALSE,true,scale,water,fire,cap,glass,shadow,mist,dust);
 }
 
 extern "C" JNIEXPORT jlong JNICALL
@@ -50,7 +62,8 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_startEnvironmentSurveySurface(
         struct stat status{};return lstat(path.c_str(),&status)!=0 && errno==ENOENT;
     };
     const auto prefix=reports+"/environment-survey-"+id;
-    bool fresh=unused(prefix+".json");
+    bool fresh=unused(prefix+".json") && unused(prefix+".arm") && unused(prefix+"-ready.json") &&
+        unused(prefix+".arm.tmp") && unused(prefix+"-ready.tmp") && unused(prefix+"-final.rgba");
     for(unsigned i=0;fresh && i<horde::platform::android::kEnvironmentSurveyImages;++i)
         fresh=unused(prefix+"-"+std::to_string(i)+".rgba");
     if(!fresh){FailEnvironmentSurvey(serial,"request-output-already-exists-or-unreadable");return 0;}

@@ -193,6 +193,17 @@ int main()
         history.edges[4].steadyTimeNanoseconds == 130u &&
         SameHistory(validNext.combatEdgeHistory, history));
 
+    {
+        AndroidEnvironmentSurveyPolicy fixture;
+        check(!fixture.Configure("keeper-invalid",false,179));
+        check(fixture.Configure("keeper-180",false,180));
+        check(fixture.Bind(fixture.Serial(),9));
+        for(unsigned i=0;i<180;++i) {
+            check(!fixture.Complete());
+            check(fixture.AcceptFrame(9,10,11,i+1));
+        }
+        check(!fixture.AcceptFrame(9,10,11,181) && fixture.Complete());
+    }
     // Survey policy proves only immutable request/frame admission. Native RT
     // completion and presentation must be independently supplied by its owner.
     {

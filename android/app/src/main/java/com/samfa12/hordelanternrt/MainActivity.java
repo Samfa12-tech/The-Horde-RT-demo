@@ -706,12 +706,15 @@ public class MainActivity extends Activity {
             // Reading confirmed quality does not begin/recover/commit a preference transaction.
             final GraphicsPreferences.Values quality = GraphicsPreferences.confirmed(getSharedPreferences(PREFS, MODE_PRIVATE));
             stageRuntimeAssetCache();
-            if (!ProbeBridge.configureEnvironmentSurvey(environmentSurveyRequest.requestId,
+            final boolean keeper=environmentSurveyRequest.keeperMist;
+            if (keeper && quality.scale!=40) {finishEnvironmentSurvey(3);return;}
+            final boolean configured=keeper ? ProbeBridge.configureKeeperMistFixture(environmentSurveyRequest.requestId,
+                    quality.scale,quality.water,quality.fire,quality.cap,quality.glassEnabled,quality.shadow,
+                    environmentSurveyRequest.mistEnabled,quality.dust) :
+                ProbeBridge.configureEnvironmentSurvey(environmentSurveyRequest.requestId,
                     environmentSurveyRequest.waterDisabled, quality.scale, quality.water, quality.fire,
-                    quality.cap, quality.glassEnabled, quality.shadow, quality.mistEnabled, quality.dust)) {
-                finishEnvironmentSurvey(3);
-                return;
-            }
+                    quality.cap, quality.glassEnabled, quality.shadow, quality.mistEnabled, quality.dust);
+            if (!configured) {finishEnvironmentSurvey(3);return;}
             environmentSurveyStartedAt = SystemClock.elapsedRealtime();
             surfaceView = new SurfaceView(this);
             setContentView(surfaceView);
@@ -796,9 +799,15 @@ public class MainActivity extends Activity {
                 final int terminalPhase = EnvironmentSurveyTerminalAwait.await(
                         ProbeBridge::getEnvironmentSurveyStatus, SystemClock::elapsedRealtime,
                         Thread::sleep, EnvironmentSurveyTerminalAwait.MAX_WAIT_MILLIS);
+                if(request.keeperMist) {
+                    // Host pulls request-scoped native evidence after proven retirement.
+                    // Do not run the unrelated river-image exporter or open campaign storage.
+                    Log.i("HordeEnvironmentSurvey", "Keeper fixture terminal phase="+terminalPhase+" id="+request.requestId);
+                } else {
                 final EnvironmentSurveyExport.Result result = EnvironmentSurveyExport.export(
                         reports, external, request.requestId, request.waterDisabled, terminalPhase);
                 Log.i("HordeEnvironmentSurvey", "Export successful=" + result.successful + " directory=" + result.directory + " detail=" + result.detail);
+                }
             } catch (Exception failure) {
                 Log.e("HordeEnvironmentSurvey", "Survey export failed; existing evidence was preserved", failure);
             } finally { handler.post(() -> finishAndRemoveTask()); }

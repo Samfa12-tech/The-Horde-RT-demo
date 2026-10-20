@@ -6,6 +6,7 @@ std::atomic<std::uint64_t> gEnvironmentSurveyRequestedSurface{0};
 std::atomic<bool> gEnvironmentSurveyPreserveStops{false};
 horde::platform::android::AndroidEnvironmentSurveyPolicy gEnvironmentSurveyPolicy;
 horde::graphics::GraphicsSettings gEnvironmentSurveyGraphics{};
+bool gEnvironmentSurveyKeeperMist=false;
 bool EnvironmentSurveyPending() {
     std::lock_guard lock(gEnvironmentSurveyMutex);return gEnvironmentSurveyPolicy.Phase()==1;
 }
@@ -14,6 +15,7 @@ bool BindEnvironmentSurvey(SwapchainContext& context,std::uint64_t serial,std::u
     if(!gEnvironmentSurveyPolicy.Bind(serial,generation))return false;
     context.environmentSurvey=true;context.environmentSurveySerial=serial;
     context.environmentSurveyId=gEnvironmentSurveyPolicy.Id();
+    context.keeperMistRequested=gEnvironmentSurveyKeeperMist;
     context.environmentSurveyWaterDisabled=gEnvironmentSurveyPolicy.WaterDisabled();
     context.graphicsSettings=gEnvironmentSurveyGraphics;
     gEnvironmentSurveyActiveSurface.store(generation,std::memory_order_release);

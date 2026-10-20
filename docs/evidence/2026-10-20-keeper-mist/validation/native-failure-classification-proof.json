@@ -1,0 +1,59 @@
+{
+  "baseline": "eaffada89b02cd0ce542a622ee656f67ae989952",
+  "runtimeAsset": "assets/models/world/runtime/chapter-terrain-v1/chapter-terrain-lod0.runtime.glb",
+  "runtimeSha256": "c636a67911b7f5c5381c30ec7a49e5d4ff15c70fe688b368ba52efe77b537774",
+  "runtimeTrianglesFromGlbIndexAccessors": 37846,
+  "staleExpectedTerrainTriangles": 34050,
+  "chapterActualIndices": 1291902,
+  "chapterExpectedIndices": 1280514,
+  "observedIndexDifference": 11388,
+  "terrainIndexDifference": 11388,
+  "history": [
+    "8b098d370: existing support triangle pin 34050",
+    "1906a733b: aggregate index formula still includes 34050",
+    "11b768dd: r21 34050 -> r22 36746",
+    "48662cc1: r22 36746 -> r23 37846 within unchanged ceilings",
+    "b2d548a2: compact equivalent normal decoder, regional water distance conditional, isolated survey RT tuning defaults"
+  ],
+  "sourceIdentity": [
+    {
+      "path": "tests/RtSceneResourceInventoryTests.cpp",
+      "baselineGitBlob": "a85c0827f2e42024eb7a93b8e171b655664621d4",
+      "workingGitBlob": "a85c0827f2e42024eb7a93b8e171b655664621d4",
+      "matchesBaseline": true
+    },
+    {
+      "path": "tests/CharacterRenderSlotSmoke.cpp",
+      "baselineGitBlob": "2f3a3c0e2f83dac92cbf4c93a3ba5cf1f2261da0",
+      "workingGitBlob": "2f3a3c0e2f83dac92cbf4c93a3ba5cf1f2261da0",
+      "matchesBaseline": true
+    },
+    {
+      "path": "shaders/raytracing/include/rt_hit_decode.glsl",
+      "baselineGitBlob": "7ea8f510a2f77b4a28eb6434ac63d22905ff2e74",
+      "workingGitBlob": "7ea8f510a2f77b4a28eb6434ac63d22905ff2e74",
+      "matchesBaseline": true
+    },
+    {
+      "path": "shaders/raytracing/include/rt_dielectric_common.glsl",
+      "baselineGitBlob": "e30be53101fc44694d199846db331bcef4afac9e",
+      "workingGitBlob": "e30be53101fc44694d199846db331bcef4afac9e",
+      "matchesBaseline": true
+    },
+    {
+      "path": "android/app/src/main/cpp/android_probe_bridge.cpp",
+      "baselineGitBlob": "f9f6a182072fba0a4e85ee93e9c58156c94511e8",
+      "workingGitBlob": "f9f6a182072fba0a4e85ee93e9c58156c94511e8",
+      "matchesBaseline": true
+    },
+    {
+      "path": "src/scene/ChapterTerrainAdmission.h",
+      "baselineGitBlob": "84524a5682fb48d639951141c72bfa1928a40b5b",
+      "workingGitBlob": "84524a5682fb48d639951141c72bfa1928a40b5b",
+      "matchesBaseline": true
+    }
+  ],
+  "runtimeCommittedLfsSha256": "c636a67911b7f5c5381c30ec7a49e5d4ff15c70fe688b368ba52efe77b537774",
+  "runtimeMatchesBaselineLfsObject": true,
+  "assetIdentityMethod": "Raw file SHA-256 equals committed LFS pointer oid. Filtered git hash-object could not start Git LFS MSYS sh (NtCreateDirectoryObject access denied); no filtered blob result is asserted."
+}

@@ -2,6 +2,7 @@
 // input, checkpoint staging, event drain or resumed ordinary render loop.
 void RunAndRetireAndroidEnvironmentSurvey(SwapchainContext& context)
 {
+    if(context.keeperMistSnapshot){RunAndRetireAndroidKeeperMistFixture(context);return;}
     using namespace horde::platform::android;
     constexpr unsigned deadlineSeconds=60;
     const auto serial=context.environmentSurveySerial,generation=context.surfaceGeneration;

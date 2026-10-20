@@ -44,6 +44,19 @@ public final class EnvironmentSurveyRequestTest {
             assertNull(extra, EnvironmentSurveyRequest.parse(request().putExtra(extra, "ignored"), true, true));
     }
 
+    @Test public void keeperFixtureRequiresItsOwnTypedClosedInputsAndColdDebugAdmission() {
+        Intent fixture=new Intent(EnvironmentSurveyRequest.ACTION).putExtra("request_id","keeper-A1")
+                .putExtra("profile",EnvironmentSurveyRequest.KEEPER_PROFILE).putExtra("mist_enabled",true);
+        EnvironmentSurveyRequest parsed=EnvironmentSurveyRequest.parse(fixture,true,true);
+        assertNotNull(parsed);assertTrue(parsed.keeperMist);assertTrue(parsed.mistEnabled);assertFalse(parsed.waterDisabled);
+        assertFalse(EnvironmentSurveyRequest.parse(fixture.putExtra("mist_enabled",false),true,true).mistEnabled);
+        assertNull(EnvironmentSurveyRequest.parse(fixture,false,true));
+        assertNull(EnvironmentSurveyRequest.parse(fixture,true,false));
+        assertNull(EnvironmentSurveyRequest.parse(new Intent(fixture).putExtra("mist_enabled","false"),true,true));
+        for(String key:new String[]{"water_disabled","horde.debug.motion","horde.debug.checkpoint","horde.debug.performance_profile","campaign_test_namespace"})
+            assertNull(EnvironmentSurveyRequest.parse(new Intent(fixture).putExtra(key,false),true,true));
+    }
+
     @Test public void activityAdmissionPrecedesNormalInitializationAndNeverUsesGameplayLaunch() throws Exception {
         final String source = new String(Files.readAllBytes(Path.of("src/main/java/com/samfa12/hordelanternrt/MainActivity.java")), StandardCharsets.UTF_8);
         final String create = between(source, "protected void onCreate(", "private void createEnvironmentSurvey(");

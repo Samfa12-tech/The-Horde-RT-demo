@@ -41,6 +41,7 @@
 #include "graphics/ForegroundPauseRenderCadence.h"
 #include "telemetry/InputPresentationTrace.h"
 #include "platform/android/AndroidEnvironmentSurveyPolicy.h"
+#include "gameplay/validation/KeeperMistFixture.h"
 #include "vulkan/raytracing/EnvironmentSurveyFrame.h"
 #include "graphics/GraphicsPreviewPerformance.h"
 #if (defined(HORDE_RT_DEBUG_CHECKPOINTS) && !defined(NDEBUG)) || HORDE_RT_ANDROID_MOTION_VALIDATION
@@ -433,7 +434,9 @@ struct SwapchainContext
     bool benchmarkSampling = false;
     bool captureActive = false;
     std::uint32_t capturePresentedFrames = 0u;
-    bool environmentSurvey=false,environmentSurveyWaterDisabled=false;
+    bool environmentSurvey=false,environmentSurveyWaterDisabled=false,keeperMistRequested=false;
+    std::optional<horde::gameplay::simulation::SimulationSnapshot> keeperMistSnapshot;
+    unsigned keeperMistSetupTicks=0;
     std::uint64_t environmentSurveySerial=0;
     std::string environmentSurveyId;
     float environmentSurveyTime=0;
@@ -3002,7 +3005,8 @@ bool ReleaseSwapchainResources(SwapchainContext& context)
 #if HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION || HORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING
         PollPresentTimingOnOwner(context);
         if (context.presentTiming) context.presentTiming->UnbindSwapchain();
-        (void)WriteTextFile(context.reportDirectory + "/HordeLanternRT-present-timing-latest.json", PresentTimingJson(context));
+        if (!context.environmentSurvey)
+            (void)WriteTextFile(context.reportDirectory + "/HordeLanternRT-present-timing-latest.json", PresentTimingJson(context));
 #endif
         vkDestroySwapchainKHR(context.device, context.swapchain, nullptr);
         context.swapchain = VK_NULL_HANDLE;
@@ -3248,7 +3252,7 @@ bool InitialiseRtSceneForSwapchain(SwapchainContext& context)
     context.rtScene.SetDevelopmentRescueJourney(context.developmentRescueJourney);
     context.rtScene.SetDevelopmentSupportFixture(context.developmentSupportFixture);
 #if defined(HORDE_RT_DEBUG_CHECKPOINTS)
-    if(context.environmentSurvey && !context.rtScene.SetRegionalWaterDiagnosticEnabled(
+    if(context.environmentSurvey && !context.keeperMistSnapshot && !context.rtScene.SetRegionalWaterDiagnosticEnabled(
             !context.environmentSurveyWaterDisabled))return false;
 #endif
     const bool initialised = context.rtScene.Initialise(context.instance,
@@ -3760,7 +3764,8 @@ bool DestroySwapchainContext(SwapchainContext& context)
 #if HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION || HORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING
         PollPresentTimingOnOwner(context);
         if (context.presentTiming) context.presentTiming->UnbindSwapchain();
-        (void)WriteTextFile(context.reportDirectory + "/HordeLanternRT-present-timing-latest.json", PresentTimingJson(context));
+        if (!context.environmentSurvey)
+            (void)WriteTextFile(context.reportDirectory + "/HordeLanternRT-present-timing-latest.json", PresentTimingJson(context));
 #endif
         vkDestroySwapchainKHR(context.device, context.swapchain, nullptr);
     }
@@ -4423,7 +4428,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
         else
         {
             const horde::gameplay::simulation::SimulationSnapshot& renderedSimulation =
-                gGameSimulation.Snapshot();
+                context.keeperMistSnapshot ? *context.keeperMistSnapshot : gGameSimulation.Snapshot();
             frameInputs =
                 horde::vulkan::raytracing::BuildRtSceneFrameInputs(
                     renderedSimulation,
@@ -4455,7 +4460,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
         frameInputs.presentationTransform = context.rtPresentationTransform;
         std::string diagnostic;
 #if defined(HORDE_RT_DEBUG_CHECKPOINTS)
-        if(context.environmentSurvey) {
+        if(context.environmentSurvey && !context.keeperMistSnapshot) {
             const auto& camera=context.environmentSurveyCamera;
             if(!horde::vulkan::raytracing::RebaseEnvironmentSurveyFrame(frameInputs,
                     {camera.x,camera.z,camera.supportY,camera.yaw,camera.pitch,context.environmentSurveyTime},diagnostic)) {
@@ -4749,7 +4754,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
     horde::telemetry::RtSubmittedFrameIdentity measuredFrame{};
     bool timingMeasurementActive=true;
 #if HORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING && !HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION
-    timingMeasurementActive=horde::platform::android::AndroidMotionTimingCollectionActive(true,
+    timingMeasurementActive=context.keeperMistSnapshot.has_value() || horde::platform::android::AndroidMotionTimingCollectionActive(true,
         context.motion && context.motion->armed,context.motion && context.motion->finished);
 #endif
     const bool measuredPresent = timingMeasurementActive && evidenceFrame && useRtFrame &&
@@ -5149,6 +5154,7 @@ bool ApplySceneProfileOnOwner(SwapchainContext& context, const PreviewControls c
 
 #include "android_campaign_bridge.inl"
 #if defined(HORDE_RT_DEBUG_CHECKPOINTS)
+#include "android_keeper_mist_fixture.inl"
 #include "android_environment_survey.inl"
 #endif
 
@@ -5636,6 +5642,10 @@ bool StartSurfaceInternal(ANativeWindow* window,
     context.reportDirectory = reportDirectory;
     if(environmentSurvey) {
         if(!BindEnvironmentSurvey(context,surveySerial,generation))return false;
+        if(context.keeperMistRequested) {
+            context.keeperMistSnapshot.emplace();
+            if(!horde::gameplay::validation::BuildKeeperMistFixture(*context.keeperMistSnapshot,context.keeperMistSetupTicks))return false;
+        }
         context.developmentSupportFixtureOverride=false;
         context.developmentWorldRouteOverride=true;
         context.developmentRescueJourneyOverride=true;
