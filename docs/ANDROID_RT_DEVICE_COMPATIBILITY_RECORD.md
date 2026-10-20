@@ -1,5 +1,28 @@
 # Android RT Device Compatibility Record
 
+## 2026-10-20 - single Apply/save noncombat UI acceptance
+
+SM-S948B / Android 17 API 37 normal-entry portrait UI at existing font scale 1.7 and
+density 560. Compatible Debug ed44d417 APK
+e62249b98b5996c5dc74165475565db24accf3d6d89155214b339df14050b62d
+passes one Mist Off Apply/current Pipeline RT acknowledgement, draft Restore,
+Back and outstanding 100% Apply→Home/hot-resume recovery to saved 40%.
+A stale Confirmed and saved label on later drafts was found and corrected.
+
+Corrected APK c5a11bb287327900327b2266c313f53d4a77ad02d2b94d5787ef81cb23269707
+is installed with matching remote hash/signer, then passes Apply of the original
+owner 40% tuple, explicit Not saved 50% draft, Restore and Back. Home interruption
+was not repeated on this second APK; only the status predicate changed. All 370
+Java checks/four-ABI Debug build pass. No performance, Keeper/combat, physical
+resource/storage-failure or preview/controller/rotation-matrix acceptance claim.
+
+Original owner graphics/settings types and values restored, 12 campaign records/
+locks byte-exact, production save directory empty, Debug process stopped. Raw
+settings XML differs only by a trailing blank line; exact before/after hashes are
+retained. No data clearing, security change or public release.
+[APK-specific screens, custody and limits](evidence/2026-10-20-graphics-single-apply/phone/README.md).
+
+
 ## 2026-10-20 - R04 prepared two-light Keeper; arm transport fails
 
 SM-S948B / Android17 API37 / Adreno840 / driver2150932499 now has exact R04

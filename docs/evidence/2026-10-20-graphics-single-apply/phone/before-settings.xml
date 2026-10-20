@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='utf-8' standalone='yes' ?>
+<map>
+    <boolean name="graphics_glass_enabled" value="false" />
+    <boolean name="combat_teaching_enabled" value="true" />
+    <boolean name="combat_teaching_slowdown" value="true" />
+    <int name="graphics_shadow_quality" value="1" />
+    <boolean name="graphics_pending_glass" value="false" />
+    <int name="graphics_pending_dust" value="1" />
+    <boolean name="graphics_mist_enabled" value="true" />
+    <boolean name="rt_lab_unlocked" value="true" />
+    <int name="graphics_pending_fire" value="0" />
+    <int name="graphics_pending_water" value="1" />
+    <int name="fire_detail" value="0" />
+    <int name="graphics_pending_shadow" value="1" />
+    <int name="graphics_pending_cap" value="30" />
+    <int name="graphics_schema" value="5" />
+    <int name="chapter_subtitle_position" value="0" />
+    <int name="graphics_pending_schema" value="5" />
+    <int name="graphics_preview_cap" value="30" />
+    <boolean name="graphics_unstored_mobile_defaults" value="false" />
+    <int name="water_quality" value="1" />
+    <boolean name="graphics_pending" value="false" />
+    <int name="graphics_dust_quality" value="1" />
+    <int name="render_scale" value="40" />
+    <int name="graphics_pending_scale" value="40" />
+    <boolean name="graphics_pending_mist" value="true" />
+</map>
+

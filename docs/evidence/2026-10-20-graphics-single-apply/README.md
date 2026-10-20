@@ -1,5 +1,9 @@
 # Android single Apply/save - local 1.7 checkpoint
 
+Later [bounded phone acceptance and status-label correction](phone/README.md)
+records the installed exact APKs, actual results and restored owner custody.
+The implementation/build-only record below preserves its original ed44d417 snapshot.
+
 Continues a050d779 in the existing WP2 worktree and draft PR27. The approved
 [feature inventory](../../design/HORDE_1_7_FEATURE_STATUS_2026_10_18.md) identified
 separate Use/Keep as an unimplemented player-facing 1.7 simplification. Existing

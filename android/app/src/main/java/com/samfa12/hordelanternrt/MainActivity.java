@@ -5167,7 +5167,8 @@ public class MainActivity extends Activity {
                 final String status = state == 1 ? "Waiting for RT frame · Saved unchanged" : state == 4 ? "Restoring saved settings" :
                         state == 5 ? "Trial failed · previous output retained" : state == 2 ?
                         (ready ? "Waiting to save or restore settings" :
-                        "Waiting for current RT frame · Saved unchanged") : state == 3 ? "Confirmed and saved" :
+                        "Waiting for current RT frame · Saved unchanged") :
+                        state == 3 && graphicsConfirmed != null && graphicsDraft.same(graphicsConfirmed) ? "Confirmed and saved" :
                         graphicsConfirmed != null && graphicsDraft.same(graphicsConfirmed) ? "Saved settings selected" :
                         "Not saved · choose Apply";
                 final String settingsText = preset + "\n" + status + "\nRequested: " + graphicsDraft.scale + "% / water " +

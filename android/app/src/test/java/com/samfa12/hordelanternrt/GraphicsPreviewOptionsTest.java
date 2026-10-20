@@ -705,6 +705,18 @@ public final class GraphicsPreviewOptionsTest {
         assertTrue(GraphicsPreferences.hasPending(prefs)); assertTrue(GraphicsPreferences.confirmed(prefs).same(confirmed));
     }
 
+    @Test public void ordinaryCommittedReceiptCannotLabelLaterUnsavedDraftAsSaved() throws Exception {
+        MainActivity activity=livePreviewFixture();set(activity,"graphicsPreviewWanted",false);
+        GraphicsBridgeShadow.applied[2]=3;
+        Method show=MainActivity.class.getDeclaredMethod("showGraphicsPage");show.setAccessible(true);show.invoke(activity);
+        Runnable poll=(Runnable)get(activity,"refreshGraphics");poll.run();
+        assertEquals("Confirmed and saved",((TextView)get(activity,"graphicsTelemetry")).getText().toString());
+        set(activity,"graphicsDraft",GraphicsPreferences.mobileDefaults());poll.run();
+        assertEquals("Not saved · choose Apply",((TextView)get(activity,"graphicsTelemetry")).getText().toString());
+        assertTrue(GraphicsPreferences.confirmed((SharedPreferences)get(activity,"preferences")).same(confirmed));
+        assertEquals(0,GraphicsBridgeShadow.applyCalls);assertEquals(0,GraphicsBridgeShadow.confirmCalls);
+    }
+
     @Test public void productionResetStagesMobileDefaultsWithoutSavingOrChangingUnrelatedPrefs() throws Exception {
         MainActivity activity=livePreviewFixture();
         set(activity,"graphicsPreviewWanted",false);

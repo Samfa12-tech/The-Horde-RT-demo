@@ -1,0 +1,8 @@
+--------- beginning of main
+10-20 20:30:44.433 17069 17069 I HordeGraphicsLatency: UI_BUILD page=graphics serial=0 generation=1 build_wall_ms=5.415833 root_children=1
+10-20 20:31:02.706 17069 17069 I HordeGraphicsLatency: UI_REQUEST action=apply serial=2 generation=1 request_elapsed_ns=479531281884961 returned_elapsed_ns=479531281990742 jni_wall_ms=0.105781
+10-20 20:31:02.735 17069 17069 I HordeGraphicsLatency: UI_ACK_SEEN serial=2 generation=1 state=2 profile=2 observed_elapsed_ns=479531310984908 request_to_observation_wall_ms=29.099947 polls=1 max_poll_lateness_ms=0.853385
+10-20 20:31:15.337 17069 17069 I HordeGraphicsLatency: UI_BUILD page=graphics serial=2 generation=1 build_wall_ms=8.97052 root_children=1
+10-20 20:31:49.820 17069 17069 I HordeGraphicsLatency: UI_REQUEST action=restore serial=3 generation=1 request_elapsed_ns=479578395935307 returned_elapsed_ns=479578396016297 jni_wall_ms=0.08099
+10-20 20:31:49.897 17069 17069 I HordeGraphicsLatency: UI_ACK_SEEN serial=3 generation=1 state=0 profile=2 observed_elapsed_ns=479578472465463 request_to_observation_wall_ms=76.530156 polls=1 max_poll_lateness_ms=0.394947
+10-20 20:31:49.901 17069 17069 I HordeGraphicsLatency: UI_BUILD page=graphics serial=3 generation=1 build_wall_ms=4.416458 root_children=1

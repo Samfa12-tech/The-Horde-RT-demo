@@ -1,0 +1,121 @@
+{
+  "sourceBase": "ed44d41757dc9653eabd700ed51ee448734a6ce9",
+  "worktree": "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "device": {
+    "model": "SM-S948B",
+    "androidRelease": "17",
+    "sdk": "37",
+    "fontScale": "1.7",
+    "density": "Physical density: 600\r\nOverride density: 560",
+    "screen": "Physical size: 1440x3120",
+    "debugPid": null
+  },
+  "signerSha256": "2bc406088b23ac80f2a00a40e2d5d8daa012844dc62f31ad6145d129f5566736",
+  "updateMode": "two adb install -r compatible same-package versionCode10 Debug updates; no uninstall/clear/grant/downgrade",
+  "originalInstalledApkSha256": "b7e387d16c2876abf532ce461b9b71bb1e77d60220192a9f5333031098bb819d",
+  "testedArtifacts": [
+    {
+      "source": "ed44d417",
+      "apkSha256": "e62249b98b5996c5dc74165475565db24accf3d6d89155214b339df14050b62d",
+      "installedRemoteHashMatched": true,
+      "scope": [
+        "ordinary MistOn-to-Off single Apply saved after RT acknowledgement",
+        "draft Restore and Back",
+        "outstanding100% Apply cancelled by Home; hot task resume;40% last-saved RT recovered",
+        "original graphics restored through Apply"
+      ],
+      "observedDefect": "state3 status still said Confirmed and saved after a later unsaved draft; source and physical correction follow"
+    },
+    {
+      "source": "ed44d417 plus status-label predicate and regression in this commit",
+      "apkSha256": "c5a11bb287327900327b2266c313f53d4a77ad02d2b94d5787ef81cb23269707",
+      "apkBytes": 186146629,
+      "installedRemoteHashMatched": true,
+      "scope": [
+        "Apply of original owner40% tuple reaches acknowledged native committed state",
+        "later50% draft explicitly Not saved; Saved/effective remain40%",
+        "Restore and Back; final original settings/campaign custody"
+      ],
+      "notRepeated": [
+        "outstanding Apply/Home interruption was not repeated on this second APK; transaction/lifecycle/native implementation unchanged"
+      ]
+    }
+  ],
+  "sourceSha256": {
+    "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java": "5285f2a407b086f1564a03e741babb143e7b6d2b3cf5660a67ce89126251991f",
+    "android/app/src/test/java/com/samfa12/hordelanternrt/GraphicsPreviewOptionsTest.java": "501f4d41386f8fdccd846d0ffcbc798d9d97857905061acad379e1ce6c326ba3"
+  },
+  "checks": {
+    "suites": 51,
+    "tests": 370,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "androidAbis": [
+      "arm64-v8a",
+      "armeabi-v7a",
+      "x86",
+      "x86_64"
+    ],
+    "buildLogSha256": "efa98780678fd767c32d18eaca77bd3f96253d1cfaf12b287e19244f6e65c3f8"
+  },
+  "custody": {
+    "settingsBeforeSha256": "e3966b09cd9c354cb92833496b7f812139178dd7b2a906a4f809dbf9538c3dee",
+    "settingsAfterSha256": "59fe30e8180851a016c612fbed866f8a5dbc20477fac60487c2ca2192c6867e7",
+    "settingsRawByteExact": false,
+    "settingsAllTypesAndValuesExact": true,
+    "settingsSerializationDifference": "only trailing whitespace: before has one additional blank line after </map>",
+    "campaignFilesAndLocks": 12,
+    "campaignByteExact": true,
+    "productionSaveDirectoryEmptyBeforeAndAfter": true,
+    "originalGraphics": {
+      "scale": 40,
+      "water": 1,
+      "fire": 0,
+      "cap": 30,
+      "glass": false,
+      "shadow": 1,
+      "mist": true,
+      "dust": 1
+    },
+    "finalDebugPid": null
+  },
+  "limits": [
+    "portrait ordinary Graphics only; owner existing font scale 1.7 and density 560 preserved",
+    "controller/rotation/font matrix and preview/Image physical acceptance not performed",
+    "resource/storage failure not forced on phone; injected host rejection tests remain separate",
+    "no Keeper preparation/arm/timing or combat operations; earlier denial remains stopped",
+    "no new performance claim, security setting changes, public push/release or Reef operations"
+  ],
+  "launchErrorsResolved": [
+    "unsupported --activity-new-task rejected before launch",
+    "short .MainActivity expanded to nonexistent .debug.MainActivity; resolved launcher component from Android before successful launch"
+  ],
+  "nextMilestone": "existing WP2a current contact/earned lantern-to-checkpoint/death recovery acceptance remains highest priority; no combat retry or heavy outdoor expansion started",
+  "audioHapticManualRevalidationRequired": false,
+  "evidenceSha256": {
+    "after-custody.json": "4695265f3d65bcd6a54bd70dc5c148b281722371d8dce0a987c7e86f1c8a1b1d",
+    "after-settings.xml": "59fe30e8180851a016c612fbed866f8a5dbc20477fac60487c2ca2192c6867e7",
+    "back-settings.xml": "9658e26a6ba7f65ed6b2b6e2f9191daa67f17ba4a74ea61e6f802e00dfdb509f",
+    "before-custody.json": "f27b22457af9cedf2b74429881ec97ea391849b34f97d8e57c24d65b3071efd7",
+    "before-settings.xml": "e3966b09cd9c354cb92833496b7f812139178dd7b2a906a4f809dbf9538c3dee",
+    "corrected-apk-graphics-log.txt": "eee50ee760b41fa84669212c33d70184fe3713eaa66f56acfc98079e746c07ae",
+    "corrected-unsaved-draft.png": "8ce470111018428ee68da3eed80e4e08d21c64845c0ee5b4f45d32575d876d78",
+    "corrected-unsaved-draft.xml": "565a93bf646502a5f4a40e8e4d7a4e9434de712cad3a38215cf439ebe761841c",
+    "device.json": "2ad25c171cc1215fd516585616332c54fdc5cb28a915b86cd2cab63734c03450",
+    "hot-resume.json": "7af3487c57f23f87f255375a2e365e4b078242d7a4e407ad32c53b63d522f7e0",
+    "interrupted-apply-custody.json": "9c986507f15465e4db86b6544503d9d330b685d0e4bdb46638c36a57742c78d8",
+    "mist-off-saved.png": "d9697bd17afe037ed9e7156c1abcdefebfb2ea901eed6a69ac555d1e6823d25d",
+    "mist-off-saved.xml": "97d4a18f2a34141f871a2ba704c48400b2056cf4f76bf018f6f8c677ee140727",
+    "old-stale-saved-label.png": "3bd253fc2663d2deba992dc8d7368dc2b3fb227cda0e7e3032cba2cbf57839d6",
+    "old-stale-saved-label.xml": "596fd4a7d5bdbcb40a5176533d1edcd87231abc526d728ed1d141a3c5f28d95d",
+    "original-apk-graphics-log.txt": "b893df8f61eb5ee958fa7a1ad647d14bc04234675624d75967ad1f53fc4fcfbf",
+    "README.md": "ba255e3ab316b03ec178d68ec6b81add6fb39520696497e98279ec7445a21f1b",
+    "recovered-custody.json": "91af0aaea8dcdb25b3adc736626b60178bcf1e689a47b7e15574e5e2ede634aa",
+    "recovered-graphics.xml": "2a13ff34cc20a740e9c47829cf501a13adef49c0fe5769d10dd2972d1999bb27",
+    "rejected-launch.json": "bacf249ac7d3a7a0ee32112ca88056935a2f69d8318e2b2989d6f84bcf734cd6",
+    "resolved-launch.txt": "3c4c6257287a2c107072234eaee790db14fbc8f508688278ebd2b2d1516e229a",
+    "restored-graphics.xml": "81649456603e5dd9135476bd9beb1c6548c7996c8eab8fd79bdaae69e7fd3701"
+  }
+}
