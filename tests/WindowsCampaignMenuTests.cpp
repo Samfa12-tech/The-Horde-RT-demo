@@ -56,6 +56,19 @@ int main() {
         Click(parent,4113);Check(commands.empty(),"programmatic invalid choice cannot dispatch");
         Click(parent,4115);Check(commands.size()==1 && commands.back().action==Menu::Action::Load &&
             commands.back().slot==2 && commands.back().kind==cp::SaveKind::Autosave,"sixth native command selects slot three latest auto");
+        auto forest=Record(2,true);
+        forest.checkpoint->id=cp::CheckpointId::ForestEndpoint;forest.checkpoint->contentRevision=2;
+        forest.checkpoint->zone=horde::gameplay::simulation::WorldZoneId::Lookout;
+        const auto endpoint=horde::gameplay::simulation::kWorldRoutePoints.back();
+        forest.checkpoint->position={endpoint.x,endpoint.y,endpoint.z};
+        auto& story=forest.checkpoint->dialogue;
+        story.rescueConsumed=story.reunionStarted=story.proofAccepted=true;
+        story.forestNightConsumed=story.forestWaystoneConsumed=story.forestClueConsumed=story.forestVillageConsumed=true;
+        view.catalogue[5]=forest;++view.catalogueRevision;menu.Refresh(view);commands.clear();
+        Check(Enabled(parent,4115) && Text(parent,4115).find("Forest lookout | Hearts 2/3")!=std::string::npos,
+            "forest checkpoint is an independently named loadable autosave");
+        Click(parent,4115);Check(commands.size()==1 && commands.back().action==Menu::Action::Load &&
+            commands.back().slot==2 && commands.back().kind==cp::SaveKind::Autosave,"forest choice retains exact slot and record kind");
         commands.clear();menu.Open(Menu::Page::Save,Menu::Origin::Pause);
         Check(!Enabled(parent,4111) && Enabled(parent,4112),"manual invalid slot blocked; independent empty manual allowed");
         Click(parent,4110);Check(commands.empty() && Shown(parent,Menu::ConfirmId),"occupied manual requires explicit confirmation");

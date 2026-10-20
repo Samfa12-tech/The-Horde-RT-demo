@@ -8,7 +8,7 @@
 #include <cstdint>
 
 namespace horde::gameplay::campaign {
-enum class CheckpointId : std::uint32_t { LowerClaimed = 1, SafeExit = 2 };
+enum class CheckpointId : std::uint32_t { LowerClaimed = 1, SafeExit = 2, ForestEndpoint = 3 };
 struct GuardPose {
     float x = -4.0f, z = -15.2f, yaw = 0.0f;
     bool operator==(const GuardPose&) const = default;
@@ -32,19 +32,36 @@ struct Checkpoint {
     dialogue::Progress dialogue{};
 };
 inline simulation::WorldZoneId Destination(CheckpointId id) {
+    if (id == CheckpointId::ForestEndpoint) return simulation::WorldZoneId::Lookout;
     return id == CheckpointId::SafeExit ? simulation::WorldZoneId::TombExterior
                                      : simulation::WorldZoneId::Dungeon;
 }
+inline bool CompletedForestProgress(const dialogue::Progress& p) {
+    return p.proofAccepted && p.forestNightConsumed && p.forestWaystoneConsumed &&
+        p.forestClueConsumed && p.forestVillageConsumed &&
+        p.activeLine == dialogue::Line::None && p.continuationCount == 0;
+}
 inline bool Validate(const Checkpoint& c) {
-    if (c.schema != 1 || c.contentRevision != 1 ||
-        (c.id != CheckpointId::LowerClaimed && c.id != CheckpointId::SafeExit) ||
+    const bool forest = c.id == CheckpointId::ForestEndpoint;
+    // Revision 1 records keep their exact bytes and interpretation. Revision 2
+    // retains completed forest progress at the lookout and later safe-side
+    // returns, with the same logical payload. Old executables reject revision 2.
+    const bool completedForest = c.contentRevision == 2;
+    if (c.schema != 1 || (c.contentRevision != 1 && !completedForest) ||
+        (forest && !completedForest) ||
+        (c.id != CheckpointId::LowerClaimed && c.id != CheckpointId::SafeExit && !forest) ||
         c.zone != Destination(c.id) || c.vitality < 1 || c.vitality > 3 ||
         c.defeatedGuards != 3 || !c.keeperDefeated || !c.lanternClaimed ||
         !c.lidOpen || !c.ropeReady || !c.night || !dialogue::Director::ValidateProgress(c.dialogue)) return false;
-    const bool upper = c.id == CheckpointId::SafeExit;
-    if (upper && !c.firstAscentCompleted) return false;
-    if (!upper && (c.dialogue.reunionStarted || c.dialogue.proofAccepted)) return false;
-    const auto safe = upper ? traversal::kExteriorLanding : traversal::kLowerLanding;
+    const bool upper = c.id != CheckpointId::LowerClaimed;
+    if ((upper || completedForest) && !c.firstAscentCompleted) return false;
+    if (!upper && !completedForest && (c.dialogue.reunionStarted || c.dialogue.proofAccepted)) return false;
+    if (completedForest && !CompletedForestProgress(c.dialogue)) return false;
+    const auto endpoint = simulation::kWorldRoutePoints.back();
+    // Forest height is checked against the actual terrain at restore admission,
+    // rather than the earlier route blockout's nominal elevation.
+    const auto safe = forest ? traversal::Vec3{endpoint.x,c.position.y,endpoint.z} :
+        (upper ? traversal::kExteriorLanding : traversal::kLowerLanding);
     if (!std::isfinite(c.position.x) || !std::isfinite(c.position.y) || !std::isfinite(c.position.z) ||
         !std::isfinite(c.yaw) || !std::isfinite(c.pitch) || c.pitch < -.32f || c.pitch > .28f ||
         std::abs(c.position.x-safe.x) > .04f || std::abs(c.position.y-safe.y) > .001f ||

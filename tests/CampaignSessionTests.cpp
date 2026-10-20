@@ -3,8 +3,10 @@
 #include "scene/ChapterTerrainSurface.h"
 #include "scene/assets/AssetManifest.h"
 #include <chrono>
+#include <cmath>
 #include <fstream>
 #include <iostream>
+#include <utility>
 
 namespace cp=horde::gameplay::campaign;
 namespace sim=horde::gameplay::simulation;
@@ -26,6 +28,16 @@ cp::Checkpoint Record(int health,bool upper=false){cp::Checkpoint c;c.vitality=h
         c.position=horde::gameplay::traversal::kExteriorLanding;c.firstAscentCompleted=true;
         c.dialogue.reunionStarted=c.dialogue.waitingForRaise=true;}
     return c;
+}
+cp::Checkpoint ForestRecord(const sim::TriangleSupportSurface& terrain) {
+    auto c=Record(3,true);c.contentRevision=2;c.id=cp::CheckpointId::ForestEndpoint;
+    c.zone=sim::WorldZoneId::Lookout;const auto p=sim::kWorldRoutePoints.back();
+    const auto ground=terrain.Query(p.x,p.z);
+    Check(ground.found && ground.walkable,"forest session fixture uses admitted lookout terrain");
+    c.position={p.x,ground.worldY,p.z};c.yaw=2.51f;c.pitch=-.15f;
+    c.dialogue.waitingForRaise=false;c.dialogue.proofAccepted=true;
+    c.dialogue.forestNightConsumed=c.dialogue.forestWaystoneConsumed=true;
+    c.dialogue.forestClueConsumed=c.dialogue.forestVillageConsumed=true;return c;
 }
 bool Seed(sim::GameSimulation& game,const cp::Checkpoint& c,const std::shared_ptr<const sim::TriangleSupportSurface>& terrain){
     auto r=game.BeginCampaignRestore(c);return r && game.CommitCampaignRestore(*r,{r->worldGeneration,c.zone},terrain,{});
@@ -131,6 +143,63 @@ int main(){
         Check(p && fresh.CommitLoad(*p,p->destination,terrain,controls,mailbox.PublishedSequence()) &&
             game.Snapshot().playerVitals.vitality==3 && game.Snapshot().rescue.exteriorSide,
             "new controller reconstructs saved exterior via real disk, terrain, simulation and controls");
+    }
+    {
+        const auto endpoint=ForestRecord(*terrain);
+        std::vector<std::pair<fs::path,std::vector<std::byte>>> otherRecords;
+        for(unsigned slot=0;slot<3;++slot)for(auto kind:{cp::SaveKind::Manual,cp::SaveKind::Autosave}) {
+            if(slot==2 && kind==cp::SaveKind::Autosave)continue;
+            const auto path=directory.path/cp::SaveBasename(*cp::SaveTarget(slot,kind));
+            otherRecords.emplace_back(path,Raw(path));
+        }
+        {
+            cp::Session endpointSession(game,directory.path);
+            Check(endpointSession.SelectSlot(2) && Seed(game,endpoint,terrain) &&
+                endpointSession.Save(cp::SaveKind::Autosave,cp::CheckpointId::ForestEndpoint) && Finish(endpointSession) &&
+                endpointSession.State().phase==cp::SessionPhase::Idle,
+                "forest checkpoint captures actual simulation and replaces only its selected latest auto");
+        }
+        const auto stored=Read(directory.path,2,cp::SaveKind::Autosave);
+        Check(stored.checkpoint.id==cp::CheckpointId::ForestEndpoint && stored.checkpoint.contentRevision==2,
+            "real disk record identifies forest endpoint content independently of old boundary records");
+        cp::Session fresh(game,directory.path);
+        Check(fresh.SelectSlot(2) && fresh.Load(cp::SaveKind::Autosave) && Finish(fresh),
+            "fresh session reads persisted endpoint through the worker");
+        const auto plan=fresh.PrepareLoad();const auto before=game.Snapshot();
+        controls.moveForward=1;controls.runHeld=true;controls.hasAuthoritativePlayerPose=true;
+        controls.authoritativePlayerX=-33.7f;controls.authoritativePlayerZ=-12.8f;
+        controls.commands.attack=500;controls.commands.toggleHeldLightPose=501;
+        controls.dialogueCompletionLine=static_cast<std::uint32_t>(horde::gameplay::dialogue::Line::ForestVillage);
+        controls.dialogueCompletionGeneration=before.chapterDialogue.generation;
+        const auto old=controls;const auto published=mailbox.Publish(controls);
+        Check(plan && plan->destination.zone==sim::WorldZoneId::Lookout,
+            "forest preparation requests real Lookout resources rather than summit residency");
+        if(plan) {
+            Check(!fresh.CommitLoad(*plan,{plan->destination.generation,sim::WorldZoneId::TombExterior},terrain,controls,published) &&
+                game.Snapshot().tickIndex==before.tickIndex && controls.moveForward==old.moveForward,
+                "summit readiness cannot substitute for the endpoint destination or mutate controls");
+            Check(fresh.CommitLoad(*plan,plan->destination,terrain,controls,published),
+                "matching Lookout preparation commits persisted endpoint atomically");
+            const auto loaded=game.Snapshot();
+            Check(loaded.worldRoute.current==sim::WorldZoneId::Lookout && loaded.playerSupportWorldY==endpoint.position.y &&
+                loaded.chapterCompanion.grounded && loaded.chapterCompanion.waypoint==sim::kWorldRoutePoints.size() &&
+                std::abs(loaded.chapterCompanion.x-(endpoint.position.x+1.f))<.001f &&
+                loaded.chapterDialogue.line==horde::gameplay::dialogue::Line::None && loaded.chapterDialogue.forestVillageConsumed &&
+                controls.moveForward==0 && !controls.runHeld && !controls.hasAuthoritativePlayerPose &&
+                controls.dialogueCompletionGeneration==0,
+                "persisted endpoint restores grounded player/Kit, completed speech and neutral owner input");
+            game.StepFixed(old,1.f/60.f,published);
+            Check(game.Snapshot().paused && game.Snapshot().playerX==endpoint.position.x,
+                "old coherent publication cannot move or teleport the loaded forest player");
+            const auto neutral=mailbox.Publish(controls);game.StepFixed(controls,1.f/60.f,neutral);
+            Check(!game.Snapshot().paused && game.Snapshot().playerCombat.action==horde::gameplay::PlayerCombatAction::Idle &&
+                game.Snapshot().chapterDialogue.line==horde::gameplay::dialogue::Line::None,
+                "fresh neutral endpoint publication resumes without stale combat or speech");
+        }
+        Check(Read(directory.path,2,cp::SaveKind::Autosave).encoded==stored.encoded,
+            "endpoint read/prepare/commit does not rewrite its source record");
+        for(const auto& [path,bytes]:otherRecords)Check(Raw(path)==bytes,
+            "endpoint persistence and restore leave every other manual/auto record byte-identical");
     }
     unsigned files=0;for(const auto& f:fs::directory_iterator(directory.path))if(f.path().extension()==".hrd")++files;
     Check(files==6,"three slots retain exactly manual and latest autosave, no history");

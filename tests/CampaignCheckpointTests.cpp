@@ -1,5 +1,6 @@
 #include "gameplay/simulation/GameSimulation.h"
 #include "gameplay/DevelopmentCheckpointSimulation.h"
+#include "gameplay/traversal/ChapterTerrainMovement.h"
 #include "scene/ChapterTerrainSurface.h"
 #include "scene/assets/AssetManifest.h"
 #include <cmath>
@@ -27,6 +28,17 @@ cp::Checkpoint Record(bool upper=false) {
         c.position=tr::kExteriorLanding;c.firstAscentCompleted=true;
         c.dialogue.reunionStarted=true;c.dialogue.waitingForRaise=true;
     }
+    return c;
+}
+cp::Checkpoint Endpoint(const TriangleSupportSurface& terrain) {
+    auto c=Record(true);c.contentRevision=2;c.id=cp::CheckpointId::ForestEndpoint;
+    c.zone=WorldZoneId::Lookout;const auto p=kWorldRoutePoints.back();
+    const auto ground=terrain.Query(p.x,p.z);
+    Check(ground.found && ground.walkable,"endpoint fixture uses actual imported lookout support");
+    c.position={p.x,ground.worldY,p.z};c.yaw=2.51f;c.pitch=-.15f;
+    c.dialogue.waitingForRaise=false;c.dialogue.proofAccepted=true;
+    c.dialogue.forestNightConsumed=c.dialogue.forestWaystoneConsumed=true;
+    c.dialogue.forestClueConsumed=c.dialogue.forestVillageConsumed=true;
     return c;
 }
 bool SameProgress(const dlg::Progress& a,const dlg::Progress& b) {
@@ -401,6 +413,151 @@ int main() {
         InputSnapshot neutral;neutral.yawRadians=c.yaw;neutral.pitchRadians=c.pitch;completed.StepFixed(neutral);
         Check(completed.Snapshot().chapterDialogue.proofAccepted && completed.Snapshot().chapterDialogue.line==dlg::Line::None,
             "completed reunion does not replay lesson after reload");
+    }
+    for(int vitality:{1,2,3}) for(bool stowed:{false,true}) for(bool high:{false,true}) {
+        auto c=Endpoint(*terrain);c.vitality=vitality;c.swordStowed=stowed;c.lanternHigh=high;
+        GameSimulation sim(ProductionGameSimulationConfig());
+        if(!Restore(sim,c,terrain)) {Check(false,"forest endpoint restores into fresh production simulation");continue;}
+        const auto loaded=sim.Snapshot();CheckClean(loaded);
+        const auto playerGround=tr::ChapterExteriorSupport(terrain.get(),c.position.x,c.position.z);
+        const auto kitGround=terrain->Query(c.position.x+1.f,c.position.z);
+        Check(loaded.worldRoute.current==WorldZoneId::Lookout && loaded.rescue.exteriorSide &&
+            loaded.rescue.firstAscentCompleted && loaded.playerSupportWorldY==c.position.y &&
+            loaded.playerVitals.vitality==vitality,"forest restore retains actual support, exterior progression and saved hearts");
+        Check(playerGround.grounded && loaded.playerSupportId==playerGround.id &&
+            loaded.playerSupportId!=static_cast<PlayerSupportId>(130) && loaded.playerSupportSurface==playerGround.surface,
+            "restored forest support identity/surface comes from the actual triangle rather than summit id 130");
+        Check(kitGround.found && loaded.chapterCompanion.grounded && !loaded.chapterCompanion.walking &&
+            loaded.chapterCompanion.waypoint==kWorldRoutePoints.size() &&
+            std::abs(loaded.chapterCompanion.x-(c.position.x+1.f))<.001f &&
+            std::abs(loaded.chapterCompanion.z-c.position.z)<.001f &&
+            std::abs(loaded.chapterCompanion.y-kitGround.worldY)<.001f,
+            "forest restore places Kit at its completed grounded endpoint rather than the reunion");
+        Check(loaded.heldItems[1].parentMode==(stowed?items::HeldItemParentMode::BodyStow:items::HeldItemParentMode::HandSocket) &&
+            (loaded.interaction.heldLightPose==interactions::HeldLightPose::High)==high,
+            "endpoint restore preserves sword attachment and lantern pose");
+        const auto captured=sim.CaptureCampaignCheckpoint(c.id);
+        Check(captured && SameRecord(*captured,c),"forest endpoint capture/restore preserves every logical value");
+        InputSnapshot in;in.damageEnabled=false;in.yawRadians=c.yaw;in.pitchRadians=c.pitch;
+        for(int tick=0;tick<180;++tick)sim.StepFixed(in);
+        const auto after=sim.Snapshot();
+        Check(after.chapterDialogue.line==dlg::Line::None && after.chapterDialogue.proofAccepted &&
+            after.chapterDialogue.forestNightConsumed && after.chapterDialogue.forestWaystoneConsumed &&
+            after.chapterDialogue.forestClueConsumed && after.chapterDialogue.forestVillageConsumed &&
+            after.chapterCompanion.waypoint==kWorldRoutePoints.size() && !after.chapterCompanion.walking,
+            "loaded endpoint neither replays completed speech nor sends Kit walking from the reunion");
+    }
+    for(bool upper:{false,true}) {
+        auto c=Endpoint(*terrain);c.id=upper?cp::CheckpointId::SafeExit:cp::CheckpointId::LowerClaimed;
+        c.zone=upper?WorldZoneId::TombExterior:WorldZoneId::Dungeon;
+        c.position=upper?tr::kExteriorLanding:tr::kLowerLanding;c.yaw=upper?0.f:-1.57079632679f;c.pitch=0;
+        GameSimulation sim(ProductionGameSimulationConfig());
+        Check(Restore(sim,c,terrain),"completed forest content restores at either later rope safe side");
+        const auto captured=sim.CaptureCampaignCheckpoint(c.id);
+        Check(captured && SameRecord(*captured,c),"returned safe-side capture keeps completed forest content revision 2");
+        Check(sim.Snapshot().rescue.exteriorSide==upper && sim.Snapshot().chapterCompanion.grounded &&
+            sim.Snapshot().chapterCompanion.waypoint==kWorldRoutePoints.size() &&
+            std::abs(sim.Snapshot().chapterCompanion.x-(kWorldRoutePoints.back().x+1.f))<.001f,
+            "returned player does not drag completed Kit back from lookout to reunion or dungeon");
+        InputSnapshot in;in.damageEnabled=false;in.yawRadians=c.yaw;in.pitchRadians=c.pitch;
+        for(int tick=0;tick<180;++tick)sim.StepFixed(in);
+        Check(sim.Snapshot().chapterDialogue.line==dlg::Line::None && sim.Snapshot().chapterDialogue.forestVillageConsumed,
+            "returned safe-side restore retains completed forest speech without replay");
+        auto bad=c;bad.dialogue.forestVillageConsumed=false;
+        Check(!cp::Validate(bad),"revision-2 safe side cannot omit the completed forest boundary facts");
+    }
+    {
+        auto c=Endpoint(*terrain);GameSimulation sim(ProductionGameSimulationConfig());
+        const auto original=sim.Snapshot();
+        const auto reject=[&](const cp::Checkpoint& bad) {
+            Check(!cp::Validate(bad) && !sim.BeginCampaignRestore(bad),"incoherent forest record rejects before restore");
+            Check(SameSession(original,sim.Snapshot()),"rejected forest record preserves live gameplay");
+        };
+        auto bad=c;bad.contentRevision=1;reject(bad);
+        bad=c;bad.contentRevision=3;reject(bad);
+        bad=c;bad.zone=WorldZoneId::TombExterior;reject(bad);
+        bad=c;bad.firstAscentCompleted=false;reject(bad);
+        bad=c;bad.dialogue.proofAccepted=false;reject(bad);
+        bad=c;bad.dialogue.waitingForRaise=true;reject(bad);
+        for(unsigned missing=0;missing<4;++missing) {
+            bad=c;
+            if(missing==0)bad.dialogue.forestNightConsumed=false;
+            if(missing==1)bad.dialogue.forestWaystoneConsumed=false;
+            if(missing==2)bad.dialogue.forestClueConsumed=false;
+            if(missing==3)bad.dialogue.forestVillageConsumed=false;
+            reject(bad);
+        }
+        bad=c;bad.dialogue.activeLine=dlg::Line::ForestVillage;reject(bad);
+        bad=c;bad.dialogue.continuationCount=1;bad.dialogue.continuations[0]=dlg::Line::ForestVillage;reject(bad);
+        bad=c;bad.position.x+=1.f;reject(bad);
+        bad=c;bad.position.y+=.05f;
+        const auto wrongHeight=sim.BeginCampaignRestore(bad);
+        Check(!wrongHeight || !sim.CommitCampaignRestore(*wrongHeight,{wrongHeight->worldGeneration,bad.zone},terrain,{}),
+            "forest restore cannot accept a serialized height above the actual terrain");
+        Check(SameSession(original,sim.Snapshot()),"failed forest terrain admission leaves the old session intact");
+        sim.CancelCampaignRestore();
+        const auto kitGround=terrain->Query(c.position.x+1.f,c.position.z);
+        const float x=c.position.x+1.f,z=c.position.z,y=kitGround.worldY+1.5f;
+        const std::array<TriangleSupportSurface::Triangle,2> kitRoof{{
+            {{{{x-.35f,y,z-.35f},{x+.35f,y,z+.35f},{x-.35f,y,z+.35f}}},SupportSurface::Wood},
+            {{{{x-.35f,y,z-.35f},{x+.35f,y,z-.35f},{x+.35f,y,z+.35f}}},SupportSurface::Wood}}};
+        const auto unsafeKit=TriangleSupportSurface::WithAdditionalNonWalkableGeometry(*terrain,kitRoof,error);
+        const auto blockedKit=sim.BeginCampaignRestore(c);
+        Check(unsafeKit && blockedKit &&
+            !sim.CommitCampaignRestore(*blockedKit,{blockedKit->worldGeneration,c.zone},unsafeKit,{}) &&
+            SameSession(original,sim.Snapshot()),
+            "blocked standing clearance at Kit alone rejects the complete endpoint restore atomically");
+        sim.CancelCampaignRestore();
+        auto playerRoof=kitRoof;
+        for(auto& triangle:playerRoof)for(auto& point:triangle.points) {
+            point[0]-=1.f;point[1]=c.position.y+1.5f;
+        }
+        const auto unsafePlayer=TriangleSupportSurface::WithAdditionalNonWalkableGeometry(*terrain,playerRoof,error);
+        const auto blockedPlayer=sim.BeginCampaignRestore(c);
+        Check(unsafePlayer && blockedPlayer &&
+            !sim.CommitCampaignRestore(*blockedPlayer,{blockedPlayer->worldGeneration,c.zone},unsafePlayer,{}) &&
+            SameSession(original,sim.Snapshot()),
+            "blocked standing clearance at the canonical player alone rejects endpoint restore atomically");
+        sim.CancelCampaignRestore();
+        Check(Restore(sim,c,terrain),"endpoint admission guard setup restores actual terrain");
+        const auto pending=sim.BeginCampaignRestore(c);
+        Check(pending && !sim.CaptureAuthoredCampaignBoundary(c.id),"pending restore cannot publish another forest boundary");
+        sim.CancelCampaignRestore();
+        InputSnapshot in;in.damageEnabled=false;in.yawRadians=c.yaw;in.pitchRadians=c.pitch;
+        sim.StepFixed(in);in.crouchHeld=true;
+        for(int tick=0;tick<18;++tick)sim.StepFixed(in);
+        Check(sim.Snapshot().crouchActive && !sim.CaptureAuthoredCampaignBoundary(c.id),
+            "forest boundary requires standing even at its safe anchor");
+        in.crouchHeld=false;for(int tick=0;tick<18;++tick)sim.StepFixed(in);
+        Check(bool(sim.CaptureAuthoredCampaignBoundary(c.id)),"standing again restores endpoint admission before invalidation");
+        const auto generation=sim.Snapshot().worldRoute.generation;
+        sim.InvalidateWorldZoneReadiness();
+        Check(!sim.CaptureAuthoredCampaignBoundary(c.id) &&
+            !sim.PublishChapterTerrain({generation,WorldZoneId::Lookout},terrain),
+            "invalidated endpoint resources and stale Lookout readiness cannot publish a checkpoint");
+    }
+    {
+        const auto c=Endpoint(*terrain);GameSimulation sim(ProductionGameSimulationConfig());
+        InputSnapshot old;old.moveForward=1;old.runHeld=true;old.yawRadians=1.f;
+        old.hasAuthoritativePlayerPose=true;old.authoritativePlayerX=-33.7f;old.authoritativePlayerZ=-12.8f;
+        old.commands.attack=17;old.commands.toggleHeldLightPose=18;
+        const auto before=sim.Snapshot();old.dialogueCompletionLine=static_cast<std::uint32_t>(dlg::Line::ForestVillage);
+        old.dialogueCompletionGeneration=before.chapterDialogue.generation;
+        const auto token=sim.BeginCampaignRestore(c);
+        Check(token && sim.CommitCampaignRestore(*token,{token->worldGeneration,c.zone},terrain,old,100),
+            "forest restore consumes current movement, action and callback floors");
+        sim.StepFixed(old,1.f/60.f,100);
+        Check(sim.Snapshot().paused && sim.Snapshot().playerX==c.position.x && sim.Snapshot().playerZ==c.position.z,
+            "old held or authoritative pose publication cannot move a restored endpoint");
+        auto neutral=old;neutral.moveForward=0;neutral.runHeld=false;neutral.hasAuthoritativePlayerPose=false;
+        neutral.yawRadians=c.yaw;neutral.pitchRadians=c.pitch;
+        sim.StepFixed(neutral,1.f/60.f,100);Check(sim.Snapshot().paused,"stale neutral endpoint publication cannot release load");
+        sim.StepFixed(neutral,1.f/60.f,101);
+        Check(!sim.Snapshot().paused && sim.Snapshot().chapterDialogue.line==dlg::Line::None &&
+            sim.Snapshot().chapterDialogue.proofAccepted && sim.Snapshot().playerCombat.action==PlayerCombatAction::Idle,
+            "fresh rebased endpoint input resumes without stale dialogue or combat debt");
+        Check(!sim.AcknowledgeChapterPresentation(before.tickIndex,before.chapterDialogue.generation),
+            "pre-load presentation cannot acknowledge a restored endpoint");
     }
     std::cout<<checks<<" campaign checkpoint checks, "<<failures<<" failures\n";
     return failures?1:0;

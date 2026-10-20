@@ -14,6 +14,11 @@ bool SafeSupport(const campaign::Checkpoint& c, const TriangleSupportSurface& te
         return IsShowcasePlayerPositionWalkable(c.position.x,c.position.z) &&
             scene::TombDressingMovementClear(c.position.x,c.position.z,c.position.x,c.position.z);
     const auto support=traversal::ChapterExteriorSupport(&terrain,c.position.x,c.position.z);
+    if(c.id==campaign::CheckpointId::ForestEndpoint &&
+       (!terrain.HorizontalBodyVolumeClear(c.position.x,c.position.z,c.position.x,c.position.z,
+            c.position.y,kStandingBodyHeight,kPlayerCollisionRadius) ||
+        !traversal::ChapterExteriorObstacleClear(terrain,c.position.x,c.position.z,c.position.x,c.position.z,
+            c.position.y+.001f,c.position.y+kStandingBodyHeight,kPlayerCollisionRadius)))return false;
     return support.grounded && std::abs(support.worldY-c.position.y)<.001f &&
         traversal::ChapterExteriorMovementClear(terrain,c.position.x,c.position.z,
             c.position.x,c.position.z,c.position.y,kPlayerCollisionRadius);
@@ -40,7 +45,8 @@ std::optional<campaign::Checkpoint> GameSimulation::CaptureAuthoredCampaignBound
 std::optional<campaign::Checkpoint> GameSimulation::BuildCampaignCheckpoint(campaign::CheckpointId id,bool canonical) const {
     using namespace interactions;
     const auto& s=snapshot_;
-    const bool upper=id==campaign::CheckpointId::SafeExit;
+    const bool forest=id==campaign::CheckpointId::ForestEndpoint;
+    const bool upper=id==campaign::CheckpointId::SafeExit || forest;
     if (!config_.combatFoundation1_7 || !config_.waterfallSkeletonEncounter ||
         !config_.developmentRescueJourney || !config_.authoredChapterTerrain || legacyCombatCheckpoint_ ||
         !chapterTerrain_ || chapterTerrainGeneration_!=worldRoute_.generation ||
@@ -66,12 +72,33 @@ std::optional<campaign::Checkpoint> GameSimulation::BuildCampaignCheckpoint(camp
         heldItems_[0].parentMode==items::HeldItemParentMode::HandSocket))return std::nullopt;
     const auto zone=campaign::Destination(id);
     if(worldRoute_.readiness[static_cast<std::size_t>(zone)]!=ZoneReadiness::Ready) return std::nullopt;
+    const auto progress=chapterDialogue_.ExportProgress();
+    if(forest && !campaign::CompletedForestProgress(progress))return std::nullopt;
+    const auto endpoint=kWorldRoutePoints.back();
+    if(forest) {
+        const auto& kit=chapterCompanion_.State();
+        if(worldRoute_.current!=WorldZoneId::Lookout ||
+           std::hypot(s.playerX-endpoint.x,s.playerZ-endpoint.z)>2.0f ||
+           !kit.grounded || kit.walking || kit.waypoint!=kWorldRoutePoints.size() ||
+           std::hypot(kit.x-(endpoint.x+1.0f),kit.z-endpoint.z)>.07f)return std::nullopt;
+        dialogue::CompanionRouteFixture restoredKit;
+        restoredKit.RestoreCampaignLookout(endpoint.x,endpoint.z,chapterTerrain_.get(),0);
+        if(!restoredKit.State().grounded)return std::nullopt;
+    }
     campaign::Checkpoint c;
+    // Speech flags alone can finish before Kit reaches the lookout. Only the
+    // admitted endpoint (or its retained later safe side) establishes content 2.
+    c.contentRevision=forest || (campaignBoundary_ && campaignBoundary_->contentRevision==2)?2u:1u;
     c.id=id;c.zone=zone;c.position={s.playerX,s.playerSupportWorldY,s.playerZ};
     c.yaw=s.playerYawRadians;c.pitch=s.playerPitchRadians;c.vitality=s.playerVitals.vitality;
     if(canonical) {
         c.position=upper?traversal::kExteriorLanding:traversal::kLowerLanding;
         c.yaw=upper?0.0f:-1.57079632679f;c.pitch=0.0f;
+        if(forest) {
+            const auto support=traversal::ChapterExteriorSupport(chapterTerrain_.get(),endpoint.x,endpoint.z);
+            if(!support.grounded)return std::nullopt;
+            c.position={endpoint.x,support.worldY,endpoint.z};c.yaw=2.51f;c.pitch=-.15f;
+        }
         // Respawn standing at the authored anchor must itself be safe. Live
         // pose/velocity is discarded; geometry/readiness and durable facts are
         // still admitted from the current simulation, never from a platform.
@@ -87,7 +114,7 @@ std::optional<campaign::Checkpoint> GameSimulation::BuildCampaignCheckpoint(camp
     c.lanternHigh=s.interaction.heldLightPose==HeldLightPose::High;
     c.torchDropX=s.torchFailure.droppedX;c.torchDropZ=s.torchFailure.droppedZ;
     c.torchDropYaw=s.torchFailure.droppedYawRadians;c.torchDropPitch=s.torchFailure.droppedViewPitchRadians;
-    c.dialogue=chapterDialogue_.ExportProgress();
+    c.dialogue=progress;
     for(std::size_t i=0;i<c.guards.size();++i) {
         if(!s.skeletonEnemies[i].dead || s.skeletonEnemies[i].health!=0) return std::nullopt;
         c.guards[i]={s.skeletonEnemies[i].x,s.skeletonEnemies[i].z,s.skeletonEnemies[i].facingRadians};
@@ -101,6 +128,18 @@ void GameSimulation::ClearCampaignBoundary() {
 }
 void GameSimulation::LatchCampaignBoundary() {
     if(campaignBoundaryRevision_==UINT64_MAX)return;
+    // The last earned exterior boundary survives exploration away from its
+    // arrival radius. A completed return descent may still earn the lower side.
+    if(snapshot_.rescue.exteriorSide) {
+        if(campaignBoundary_ && campaignBoundary_->id==campaign::CheckpointId::ForestEndpoint)return;
+        const auto endpoint=CaptureAuthoredCampaignBoundary(campaign::CheckpointId::ForestEndpoint);
+        if(endpoint) {
+            if(!campaignBoundary_ || !SameBoundary(*endpoint,*campaignBoundary_)) {
+                campaignBoundary_=*endpoint;++campaignBoundaryRevision_;
+            }
+            return;
+        }
+    }
     const auto id=snapshot_.rescue.exteriorSide?campaign::CheckpointId::SafeExit:campaign::CheckpointId::LowerClaimed;
     const auto candidate=CaptureAuthoredCampaignBoundary(id);
     if(candidate && (!campaignBoundary_ || !SameBoundary(*candidate,*campaignBoundary_))) {
@@ -134,7 +173,8 @@ bool GameSimulation::CommitCampaignRestore(campaign::RestoreToken token, WorldZo
         return false;
     const auto c=pendingCampaignRestore_->checkpoint;
     if(!campaign::Validate(c) || !SafeSupport(c,*terrain)) return false;
-    const bool upper=c.id==campaign::CheckpointId::SafeExit;
+    const bool completedForest=c.contentRevision==2;
+    const bool upper=c.id==campaign::CheckpointId::SafeExit || c.id==campaign::CheckpointId::ForestEndpoint;
     auto config=config_;
     config.developmentRescueJourney=true;config.authoredChapterTerrain=true;
     config.developmentWorldRoute=false;config.developmentSupportFixture=false;
@@ -146,7 +186,8 @@ bool GameSimulation::CommitCampaignRestore(campaign::RestoreToken token, WorldZo
     if(!next.worldRoute_.Publish(readyDestination,ZoneReadiness::Ready)) return false;
     next.playerX_=c.position.x;next.playerZ_=c.position.z;
     next.playerYawRadians_=c.yaw;next.playerPitchRadians_=c.pitch;
-    next.playerSupport_={c.position.y,upper?static_cast<PlayerSupportId>(130):PlayerSupportId::RouteFloor,true};
+    next.playerSupport_=upper?traversal::ChapterExteriorSupport(next.chapterTerrain_.get(),c.position.x,c.position.z):
+        PlayerSupportResolution{c.position.y,PlayerSupportId::RouteFloor,true};
     next.worldRoute_.safeX=c.position.x;next.worldRoute_.safeZ=c.position.z;next.worldRoute_.safeSupport=next.playerSupport_;
     next.tickIndex_=tickIndex_+1; // old presentation acknowledgements cannot match
     next.presentationAspect_=presentationAspect_;
@@ -180,9 +221,11 @@ bool GameSimulation::CommitCampaignRestore(campaign::RestoreToken token, WorldZo
     // Saved equipment belongs to this session. A later New Game/reset keeps
     // the caller's configured opening equipment policy.
     next.config_.swordStartsStowed=config_.swordStartsStowed;
-    next.chapterCompanion_.RestoreCampaignReunion(upper,c.position.x,c.position.z,
+    if(completedForest)next.chapterCompanion_.RestoreCampaignLookout(c.position.x,c.position.z,
         next.chapterTerrain_.get(),chapterCompanion_.State().generation);
-    if(upper && !next.chapterCompanion_.State().grounded) return false;
+    else next.chapterCompanion_.RestoreCampaignReunion(upper,c.position.x,c.position.z,
+        next.chapterTerrain_.get(),chapterCompanion_.State().generation);
+    if((upper || completedForest) && !next.chapterCompanion_.State().grounded) return false;
     // Consume the live session's published edges, never saved input identities.
     next.SynchronizePausedInput(lastInput_,inputPublicationSequence_);
     next.SynchronizePausedInput(currentInput,currentInputPublicationSequence);

@@ -1,6 +1,5 @@
 {
   "date": "2026-10-20",
-  "sourceCommit": "54347496",
   "package": "com.samfa12.hordelanternrt.debug",
   "device": "SM-S948B",
   "android": "17 / API 37",
@@ -108,5 +107,8 @@
       "bytes": 244,
       "sha256": "51b62a6f1ab32056e1823052ef8880a5c8e2613f03125bdd89ff99834dba1c38"
     }
-  }
+  },
+  "observationBaseCommit": "54347496",
+  "apkSourceDescription": "ed44d417 plus the graphics saved-status predicate and regression committed as 99912848; no later native source changes in this installed APK",
+  "apkSourceEvidence": "../2026-10-20-graphics-single-apply/phone/receipt.json"
 }

@@ -37,6 +37,16 @@ cp::Checkpoint Upper() {
     c.dialogue.grateConsumed=c.dialogue.rescueConsumed=c.dialogue.reunionStarted=true;
     c.dialogue.waitingForRaise=true;return c;
 }
+cp::Checkpoint Endpoint() {
+    auto c=Upper();c.contentRevision=2;c.id=cp::CheckpointId::ForestEndpoint;
+    c.zone=sim::WorldZoneId::Lookout;
+    const auto p=sim::kWorldRoutePoints.back();c.position={p.x,p.y,p.z};
+    c.yaw=2.51f;c.pitch=-.15f;
+    c.dialogue.waitingForRaise=false;c.dialogue.proofAccepted=true;
+    c.dialogue.forestNightConsumed=c.dialogue.forestWaystoneConsumed=true;
+    c.dialogue.forestClueConsumed=c.dialogue.forestVillageConsumed=true;
+    return c;
+}
 std::vector<std::byte> Encode(const cp::Checkpoint& c) {
     std::vector<std::byte> bytes;codec::Error error=codec::Error::Corrupt;
     Check(codec::Encode(c,bytes,error) && error==codec::Error::None,"valid record encodes without residual error");
@@ -71,6 +81,27 @@ int main() {
     Check(baseline==golden && golden.size()==162,"default checkpoint exactly matches golden bytes and checksum");
     Check(ReferenceCrc(std::span<const std::byte>(golden).subspan(20))==0x01703382u,"golden payload checksum is fixed independently");
     RoundTrip(cp::Checkpoint{});
+    // The new logical content uses the same envelope/payload; historical lower
+    // and summit bytes retain revision 1 and require no rewrite or migration.
+    Check(cp::Checkpoint{}.contentRevision==1 && Upper().contentRevision==1,
+        "old boundary content revisions remain unchanged");
+    for(int health:{1,2,3}) for(bool sword:{false,true}) for(bool high:{false,true}) {
+        auto endpoint=Endpoint();endpoint.vitality=health;
+        endpoint.swordStowed=sword;endpoint.lanternHigh=high;RoundTrip(endpoint);
+        auto returned=endpoint;returned.id=cp::CheckpointId::LowerClaimed;
+        returned.zone=sim::WorldZoneId::Dungeon;returned.position=tr::kLowerLanding;
+        returned.yaw=-1.57079632679f;returned.pitch=0;RoundTrip(returned);
+        returned.id=cp::CheckpointId::SafeExit;returned.zone=sim::WorldZoneId::TombExterior;
+        returned.position=tr::kExteriorLanding;returned.yaw=0;RoundTrip(returned);
+    }
+    {
+        const auto encoded=Encode(Endpoint());
+        Check(encoded.size()==golden.size() && encoded[8]==std::byte{1} && encoded[12]==std::byte{142},
+            "forest content keeps format 1 and the exact bounded payload length");
+        auto historical=Upper();codec::Error error{};
+        Check(codec::Decode(golden,historical,error) && Encode(historical)==golden,
+            "revision-1 golden still decodes and re-encodes byte-for-byte after endpoint support");
+    }
     for(bool upper:{false,true}) for(int health:{1,2,3}) for(bool sword:{false,true}) for(bool high:{false,true}) {
         auto c=upper?Upper():cp::Checkpoint{};c.vitality=health;c.swordStowed=sword;c.lanternHigh=high;
         c.yaw=.43f;c.pitch=-.12f;c.torchDropX=-2.2f;c.torchDropZ=-15.4f;
@@ -124,7 +155,18 @@ int main() {
     // closed enum set, finite floats, strict bools and story invariants.
     for(std::uint32_t version:{0u,2u,0xffffffffu}) {
         auto bad=baseline;Put(bad,20,version);Rechecksum(bad);Reject(bad,codec::Error::UnsupportedSchema);
-        bad=baseline;Put(bad,24,version);Rechecksum(bad);Reject(bad,codec::Error::UnsupportedContent);
+    }
+    for(std::uint32_t version:{0u,3u,0xffffffffu}) {
+        auto bad=baseline;
+        Put(bad,24,version);Rechecksum(bad);Reject(bad,codec::Error::UnsupportedContent);
+    }
+    {
+        auto bad=baseline;Put(bad,24,2);Rechecksum(bad);Reject(bad,codec::Error::InvalidCheckpoint);
+        bad=Encode(Upper());Put(bad,24,2);Rechecksum(bad);Reject(bad,codec::Error::InvalidCheckpoint);
+        bad=Encode(Endpoint());Put(bad,24,1);Rechecksum(bad);Reject(bad,codec::Error::InvalidCheckpoint);
+        bad=Encode(Endpoint());Put(bad,28,4);Rechecksum(bad);Reject(bad,codec::Error::InvalidCheckpoint);
+        bad=Encode(Endpoint());Put(bad,32,static_cast<std::uint32_t>(sim::WorldZoneId::TombExterior));
+        Rechecksum(bad);Reject(bad,codec::Error::InvalidCheckpoint);
     }
     constexpr std::array<std::size_t,18> boolOffsets{44,45,46,47,48,49,50,51,132,133,134,135,136,137,138,139,140,141};
     for(auto offset:boolOffsets) for(unsigned value:{2u,255u}) {
@@ -157,7 +199,23 @@ int main() {
             "invalid encode leaves the caller's complete byte output untouched");
     };
     auto invalid=cp::Checkpoint{};invalid.schema=2;invalidEncode(invalid,codec::Error::UnsupportedSchema);
-    invalid=cp::Checkpoint{};invalid.contentRevision=2;invalidEncode(invalid,codec::Error::UnsupportedContent);
+    invalid=cp::Checkpoint{};invalid.contentRevision=3;invalidEncode(invalid,codec::Error::UnsupportedContent);
+    invalid=cp::Checkpoint{};invalid.contentRevision=2;invalidEncode(invalid,codec::Error::InvalidCheckpoint);
+    invalid=Upper();invalid.contentRevision=2;invalidEncode(invalid,codec::Error::InvalidCheckpoint);
+    invalid=Endpoint();invalid.contentRevision=1;invalidEncode(invalid,codec::Error::InvalidCheckpoint);
+    for(unsigned missing=0;missing<7;++missing) {
+        invalid=Endpoint();
+        if(missing==0)invalid.firstAscentCompleted=false;
+        if(missing==1)invalid.dialogue.proofAccepted=false;
+        if(missing==2)invalid.dialogue.forestNightConsumed=false;
+        if(missing==3)invalid.dialogue.forestWaystoneConsumed=false;
+        if(missing==4)invalid.dialogue.forestClueConsumed=false;
+        if(missing==5)invalid.dialogue.forestVillageConsumed=false;
+        if(missing==6)invalid.dialogue.activeLine=dlg::Line::ForestVillage;
+        invalidEncode(invalid,codec::Error::InvalidCheckpoint);
+    }
+    invalid=Endpoint();invalid.dialogue.continuationCount=1;invalid.dialogue.continuations[0]=dlg::Line::ForestVillage;
+    invalidEncode(invalid,codec::Error::InvalidCheckpoint);
     invalid=cp::Checkpoint{};invalid.vitality=0;invalidEncode(invalid,codec::Error::InvalidCheckpoint);
     invalid=queue;invalid.dialogue.continuationCount=9;invalidEncode(invalid,codec::Error::InvalidCheckpoint);
     std::cout<<checks<<" campaign codec checks, "<<failures<<" failures\n";

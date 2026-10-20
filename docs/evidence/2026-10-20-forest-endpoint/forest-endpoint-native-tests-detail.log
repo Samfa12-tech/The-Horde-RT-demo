@@ -1,0 +1,166 @@
+Start testing: Oct 20 21:09 AUS Eastern Summer Time
+----------------------------------------------------------
+31/218 Testing: horde_rt_windows_campaign_menu_tests
+31/218 Test: horde_rt_windows_campaign_menu_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_windows_campaign_menu_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_windows_campaign_menu_tests" start time: Oct 20 21:09 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+45 Windows campaign menu checks, 0 failures; hidden HWND UI/CPU only, no RT presentation claim
+<end of output>
+Test time =   1.82 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_windows_campaign_menu_tests" end time: Oct 20 21:09 AUS Eastern Summer Time
+"horde_rt_windows_campaign_menu_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+33/218 Testing: horde_rt_android_campaign_load_barrier_tests
+33/218 Test: horde_rt_android_campaign_load_barrier_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_android_campaign_load_barrier_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_android_campaign_load_barrier_tests" start time: Oct 20 21:09 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Android campaign load barrier tests passed
+<end of output>
+Test time =   1.48 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_android_campaign_load_barrier_tests" end time: Oct 20 21:09 AUS Eastern Summer Time
+"horde_rt_android_campaign_load_barrier_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+34/218 Testing: horde_rt_campaign_play_session_tests
+34/218 Test: horde_rt_campaign_play_session_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_campaign_play_session_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_campaign_play_session_tests" start time: Oct 20 21:09 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+ordinary lower live=-34.0119,-17.5184 boundary=1 rope=1
+ordinary upper live=-33.7,-13.3383 speed=1.9 boundary=1
+145 campaign play session checks, 0 failures
+<end of output>
+Test time =   7.52 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_campaign_play_session_tests" end time: Oct 20 21:09 AUS Eastern Summer Time
+"horde_rt_campaign_play_session_tests" time elapsed: 00:00:07
+----------------------------------------------------------
+
+35/218 Testing: horde_rt_campaign_session_tests
+35/218 Test: horde_rt_campaign_session_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_campaign_session_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_campaign_session_tests" start time: Oct 20 21:09 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+77 campaign session checks, 0 failures
+<end of output>
+Test time =   1.53 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_campaign_session_tests" end time: Oct 20 21:09 AUS Eastern Summer Time
+"horde_rt_campaign_session_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+37/218 Testing: horde_rt_campaign_save_worker_tests
+37/218 Test: horde_rt_campaign_save_worker_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_campaign_save_worker_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_campaign_save_worker_tests" start time: Oct 20 21:09 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+79 campaign worker checks, 0 failures
+<end of output>
+Test time =   1.44 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_campaign_save_worker_tests" end time: Oct 20 21:09 AUS Eastern Summer Time
+"horde_rt_campaign_save_worker_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+38/218 Testing: horde_rt_campaign_save_coordinator_tests
+38/218 Test: horde_rt_campaign_save_coordinator_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_campaign_save_coordinator_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_campaign_save_coordinator_tests" start time: Oct 20 21:09 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+306 campaign coordinator checks, 0 failures
+<end of output>
+Test time =   1.37 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_campaign_save_coordinator_tests" end time: Oct 20 21:09 AUS Eastern Summer Time
+"horde_rt_campaign_save_coordinator_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+39/218 Testing: horde_rt_campaign_codec_tests
+39/218 Test: horde_rt_campaign_codec_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_campaign_codec_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_campaign_codec_tests" start time: Oct 20 21:09 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+2283 campaign codec checks, 0 failures
+<end of output>
+Test time =   1.51 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_campaign_codec_tests" end time: Oct 20 21:09 AUS Eastern Summer Time
+"horde_rt_campaign_codec_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+40/218 Testing: horde_rt_campaign_storage_tests
+40/218 Test: horde_rt_campaign_storage_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_campaign_storage_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_campaign_storage_tests" start time: Oct 20 21:09 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Windows symlink fixture unavailable; nonregular rejection tested; reparse runtime fixture NOT_RUN
+1202 campaign storage checks, 0 failures; concurrent reads=485
+<end of output>
+Test time =   1.68 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_campaign_storage_tests" end time: Oct 20 21:09 AUS Eastern Summer Time
+"horde_rt_campaign_storage_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+41/218 Testing: horde_rt_chapter_dialogue_tests
+41/218 Test: horde_rt_chapter_dialogue_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_chapter_dialogue_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_chapter_dialogue_tests" start time: Oct 20 21:09 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+chapter dialogue: local/ordered/once/fallback/stale/manual-presented/real-simulation/layout cases passed
+<end of output>
+Test time =   0.95 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_chapter_dialogue_tests" end time: Oct 20 21:09 AUS Eastern Summer Time
+"horde_rt_chapter_dialogue_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+42/218 Testing: horde_rt_campaign_checkpoint_tests
+42/218 Test: horde_rt_campaign_checkpoint_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_campaign_checkpoint_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_campaign_checkpoint_tests" start time: Oct 20 21:09 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+966 campaign checkpoint checks, 0 failures
+<end of output>
+Test time =   2.70 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_campaign_checkpoint_tests" end time: Oct 20 21:09 AUS Eastern Summer Time
+"horde_rt_campaign_checkpoint_tests" time elapsed: 00:00:02
+----------------------------------------------------------
+
+End testing: Oct 20 21:09 AUS Eastern Summer Time

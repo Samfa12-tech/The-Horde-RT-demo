@@ -45,7 +45,7 @@ private:
 };
 Error VersionError(const Checkpoint& c) {
     if(c.schema!=1) return Error::UnsupportedSchema;
-    if(c.contentRevision!=1) return Error::UnsupportedContent;
+    if(c.contentRevision!=1 && c.contentRevision!=2) return Error::UnsupportedContent;
     return Error::None;
 }
 }

@@ -142,7 +142,15 @@ void NormalBoundaryJourney(const std::shared_ptr<const sim::TriangleSupportSurfa
     cp::PlaySession play(game,directory.path);Check(play.BeginNewGame(0),"ordinary journey selects new game slot");
     sim::InputSnapshot input;input.damageEnabled=false;input.tutorialEnabled=false;
     std::uint64_t publication=0;
-    const auto step=[&](){game.StepFixed(input,1.f/60.f,++publication);game.ClearEvents();};
+    bool observedVillageSpeech=false;
+    const auto step=[&](){
+        game.StepFixed(input,1.f/60.f,++publication);game.ClearEvents();
+        if(!observedVillageSpeech && game.Snapshot().chapterDialogue.line==dialogue::Line::ForestVillage) {
+            observedVillageSpeech=true;
+            Check(!game.CaptureAuthoredCampaignBoundary(cp::CheckpointId::ForestEndpoint),
+                  "village consumed-at-start flag cannot publish endpoint while final speech is active");
+        }
+    };
     const auto aimMove=[&](float x,float z,float stop=.03f){
         const auto& s=game.Snapshot();const float dx=x-s.playerX,dz=z-s.playerZ,d=std::hypot(dx,dz);
         input.yawRadians=std::atan2(dx,-dz);input.pitchRadians=0;input.moveStrafe=0;
@@ -279,6 +287,108 @@ void NormalBoundaryJourney(const std::shared_ptr<const sim::TriangleSupportSurfa
               Raw(Path(directory,0,cp::SaveKind::Manual))==retainedManual,
               "continuation alone cannot rewrite the stored earned records without a facade boundary observation");
     }
+    // Continue the SAME normally earned campaign. Only the existing host
+    // presentation protocol is acknowledged here; this is not GPU evidence.
+    Check(!game.CaptureAuthoredCampaignBoundary(cp::CheckpointId::ForestEndpoint),
+          "summit arrival cannot project an unearned forest endpoint");
+    const auto reunion=sim::kWorldRoutePoints[3];
+    if(!walk(reunion.x,reunion.z)){Check(false,"earned campaign walks to the actual reunion");return;}
+    input.moveForward=0;input.runHeld=false;input.crouchHeld=false;
+    for(int tick=0;tick<600 && !game.Snapshot().chapterDialogue.waitingForRaise;++tick)step();
+    Check(game.Snapshot().chapterDialogue.waitingForRaise && !game.Snapshot().chapterDialogue.proofAccepted,
+          "earned forest progression begins with the real fresh-raise lesson");
+    ++input.commands.toggleHeldLightPose;
+    for(int tick=0;tick<60;++tick)step();
+    Check(!game.Snapshot().chapterDialogue.proofAccepted,"new lantern raise still requires matching presentation");
+    const auto shown=game.Snapshot();
+    Check(game.AcknowledgeChapterPresentation(shown.tickIndex,shown.chapterDialogue.generation),
+          "host owner acknowledges only the current earned lantern publication");
+    step();Check(game.Snapshot().chapterDialogue.proofAccepted,"fresh raised publication unlocks earned forest route");
+    for(int tick=0;tick<900 && game.Snapshot().chapterDialogue.line!=dialogue::Line::None;++tick)step();
+    for(std::size_t station=4;station<sim::kWorldRoutePoints.size();++station) {
+        const auto p=sim::kWorldRoutePoints[station];
+        if(!walk(p.x,p.z)){Check(false,"ordinary movement follows the full earned forest trail");return;}
+    }
+    input.moveForward=0;input.runHeld=false;input.crouchHeld=false;input.yawRadians=2.51f;input.pitchRadians=-.15f;
+    for(int tick=0;tick<1800;++tick) {
+        if(game.LatestCampaignBoundary() && game.LatestCampaignBoundary()->id==cp::CheckpointId::ForestEndpoint)break;
+        step();
+    }
+    const auto endpoint=game.LatestCampaignBoundary();
+    Check(observedVillageSpeech,"ordinary F04 arrival reaches the actual admitted village speech");
+    Check(endpoint && endpoint->id==cp::CheckpointId::ForestEndpoint && endpoint->contentRevision==2 &&
+          endpoint->zone==sim::WorldZoneId::Lookout && endpoint->dialogue.proofAccepted &&
+          endpoint->dialogue.forestNightConsumed && endpoint->dialogue.forestWaystoneConsumed &&
+          endpoint->dialogue.forestClueConsumed && endpoint->dialogue.forestVillageConsumed &&
+          endpoint->dialogue.activeLine==dialogue::Line::None && endpoint->dialogue.continuationCount==0,
+          "actual completed trail and quiescent speech earn one coherent forest checkpoint");
+    if(!endpoint || endpoint->id!=cp::CheckpointId::ForestEndpoint)return;
+    const auto ground=terrain->Query(sim::kWorldRoutePoints.back().x,sim::kWorldRoutePoints.back().z);
+    Check(ground.found && std::abs(endpoint->position.y-ground.worldY)<.001f &&
+          std::abs(endpoint->position.x-sim::kWorldRoutePoints.back().x)<.001f &&
+          std::abs(endpoint->position.z-sim::kWorldRoutePoints.back().z)<.001f &&
+          endpoint->yaw==2.51f && endpoint->pitch==-.15f && game.Snapshot().chapterCompanion.grounded &&
+          game.Snapshot().chapterCompanion.waypoint==sim::kWorldRoutePoints.size(),
+          "earned endpoint uses actual ground, authored view and completed grounded companion");
+    const auto beforeEndpointAuto=play.State().operationRevision;
+    Check(play.ObserveSafeBoundary() && Until(play,[&]{return play.State().operationRevision>beforeEndpointAuto &&
+          play.State().operation==cp::PlayOperation::Autosave && play.State().outcome==cp::PlayOutcome::Succeeded;}),
+          "earned endpoint publishes a fresh autosave through the real worker");
+    const auto earnedEndpoint=Read(directory,0,cp::SaveKind::Autosave);
+    Check(earnedEndpoint.checkpoint.id==cp::CheckpointId::ForestEndpoint &&
+          Raw(Path(directory,0,cp::SaveKind::Manual))==retainedManual,
+          "forest latest auto replaces summit while preserving the original lower manual bytes");
+    const auto endpointOperation=play.State().operationRevision;
+    const auto backtrack=sim::kWorldRoutePoints[6];
+    if(!walk(backtrack.x,backtrack.z)){Check(false,"endpoint owner can keep exploring away from F04");return;}
+    input.moveForward=0;
+    for(int tick=0;tick<120;++tick){step();play.ObserveSafeBoundary();play.Poll();}
+    Check(game.LatestCampaignBoundary() && game.LatestCampaignBoundary()->id==cp::CheckpointId::ForestEndpoint &&
+          play.LatestCheckpoint() && play.LatestCheckpoint()->id==cp::CheckpointId::ForestEndpoint &&
+          play.State().operationRevision==endpointOperation && Raw(Path(directory,0,cp::SaveKind::Autosave))==earnedEndpoint.encoded,
+          "exterior exploration cannot downgrade the endpoint or repeatedly autosave it");
+    {
+        sim::GameSimulation fresh(sim::ProductionGameSimulationConfig());cp::PlaySession reloaded(fresh,directory.path);
+        sim::InputSnapshot freshInput;std::uint64_t freshPublication=0;
+        if(!LoadEarnedBoundary(reloaded,fresh,cp::SaveKind::Autosave,earnedEndpoint,terrain,freshInput,freshPublication))return;
+        const auto operation=reloaded.State().operationRevision;
+        for(int tick=0;tick<120;++tick){fresh.StepFixed(freshInput,1.f/60.f,++freshPublication);reloaded.ObserveSafeBoundary();reloaded.Poll();}
+        Check(reloaded.State().operationRevision==operation && Raw(Path(directory,0,cp::SaveKind::Autosave))==earnedEndpoint.encoded &&
+              fresh.Snapshot().chapterDialogue.line==dialogue::Line::None && fresh.Snapshot().chapterCompanion.grounded &&
+              fresh.Snapshot().chapterCompanion.waypoint==sim::kWorldRoutePoints.size(),
+              "fresh endpoint load resumes completed Kit/story without rewriting or autosaving the loaded record");
+        const auto returnTo=[&](float x,float z) {
+            for(int tick=0;tick<2400;++tick) {
+                const auto s=fresh.Snapshot();const float dx=x-s.playerX,dz=z-s.playerZ,d=std::hypot(dx,dz);
+                freshInput.yawRadians=std::atan2(dx,-dz);freshInput.moveStrafe=0;freshInput.moveForward=d<.035f?0:std::min(1.f,d/.15f);
+                freshInput.runHeld=false;freshInput.crouchHeld=false;
+                fresh.StepFixed(freshInput,1.f/60.f,++freshPublication);fresh.ClearEvents();
+                if(d<.035f)return true;
+            }
+            return false;
+        };
+        for(std::size_t station=sim::kWorldRoutePoints.size()-1;station-->2;) {
+            const auto p=sim::kWorldRoutePoints[station];
+            if(!returnTo(p.x,p.z)){Check(false,"earned endpoint restore walks back along the actual forest route");return;}
+        }
+        const auto landing=tr::kExteriorLanding;
+        if(!returnTo(landing.x,landing.z)){Check(false,"earned endpoint restore reaches the actual return rope");return;}
+        ++freshInput.commands.interact;fresh.StepFixed(freshInput,1.f/60.f,++freshPublication);
+        Check(fresh.Snapshot().rescue.equipmentStowed,"endpoint return begins actual descent with both items stowed");
+        for(int tick=0;tick<1800 && fresh.Snapshot().rescue.equipmentStowed;++tick)
+            fresh.StepFixed(freshInput,1.f/60.f,++freshPublication);
+        for(int tick=0;tick<60;++tick)fresh.StepFixed(freshInput,1.f/60.f,++freshPublication);
+        const auto lowerReturn=fresh.LatestCampaignBoundary();
+        Check(fresh.Snapshot().rescue.sawLanding && !fresh.Snapshot().rescue.exteriorSide &&
+              lowerReturn && lowerReturn->id==cp::CheckpointId::LowerClaimed && lowerReturn->contentRevision==2 &&
+              lowerReturn->dialogue.proofAccepted && lowerReturn->dialogue.forestVillageConsumed &&
+              fresh.Snapshot().chapterCompanion.waypoint==sim::kWorldRoutePoints.size(),
+              "completed descent replaces endpoint with coherent lower safe side while Kit/story remain completed");
+        // Do not observe/save this return: preserve the earned endpoint record
+        // for independent failure/no-rewrite receipts above.
+        Check(Raw(Path(directory,0,cp::SaveKind::Autosave))==earnedEndpoint.encoded,
+              "unobserved return boundary does not itself perform filesystem IO");
+    }
     Check(!fs::exists(Path(directory,1,cp::SaveKind::Manual)) && !fs::exists(Path(directory,1,cp::SaveKind::Autosave)) &&
           !fs::exists(Path(directory,2,cp::SaveKind::Manual)) && !fs::exists(Path(directory,2,cp::SaveKind::Autosave)),
           "chapter-earned persistence and recovery never touch unselected slots");
@@ -298,6 +408,43 @@ void NormalBoundaryJourney(const std::shared_ptr<const sim::TriangleSupportSurfa
           "standing respawn headroom is checked at canonical anchor even when current player has left it");
     game.ResetRoute();Check(!game.LatestCampaignBoundary(),"actual route reset clears shared checkpoint latch");
     play.ObserveSafeBoundary();Check(!play.LatestCheckpoint(),"facade discards old game latch after actual reset");
+}
+void EndpointWriteFailure(const std::shared_ptr<const sim::TriangleSupportSurface>& terrain) {
+    Directory directory;Faults faults;sim::GameSimulation game(sim::ProductionGameSimulationConfig());
+    cp::PlaySession play(game,directory.path,&faults);
+    Check(play.BeginNewGame(0) && Seed(game,Record(2,true),terrain) && play.ObserveSafeBoundary() &&
+          Until(play,[&]{return play.State().operation==cp::PlayOperation::Autosave && play.State().outcome==cp::PlayOutcome::Succeeded;}),
+          "endpoint failure fixture commits a real prior summit autosave");
+    Check(play.SaveManual(0) && Done(play) && play.State().outcome==cp::PlayOutcome::Succeeded,
+          "endpoint failure fixture retains an independent prior manual");
+    const auto priorAuto=Raw(Path(directory,0,cp::SaveKind::Autosave));
+    const auto priorManual=Raw(Path(directory,0,cp::SaveKind::Manual));
+    auto endpoint=Record(2,true);endpoint.contentRevision=2;endpoint.id=cp::CheckpointId::ForestEndpoint;
+    endpoint.zone=sim::WorldZoneId::Lookout;const auto p=sim::kWorldRoutePoints.back();
+    const auto ground=terrain->Query(p.x,p.z);
+    Check(ground.found && ground.walkable,"endpoint failure fixture derives actual terrain support");
+    endpoint.position={p.x,ground.worldY,p.z};endpoint.yaw=2.51f;endpoint.pitch=-.15f;
+    endpoint.dialogue.waitingForRaise=false;endpoint.dialogue.proofAccepted=true;
+    endpoint.dialogue.forestNightConsumed=endpoint.dialogue.forestWaystoneConsumed=true;
+    endpoint.dialogue.forestClueConsumed=endpoint.dialogue.forestVillageConsumed=true;
+    const auto oldOperation=play.State().operationRevision;
+    faults.failWrite=true;
+    Check(Seed(game,endpoint,terrain) && play.ObserveSafeBoundary() && Until(play,[&]{
+        return play.State().operationRevision>oldOperation && play.State().operation==cp::PlayOperation::Autosave &&
+               play.State().outcome==cp::PlayOutcome::Failed;}),
+          "failed endpoint autosave has a fresh explicit failure receipt");
+    Check(Raw(Path(directory,0,cp::SaveKind::Autosave))==priorAuto && Raw(Path(directory,0,cp::SaveKind::Manual))==priorManual,
+          "failed endpoint autosave preserves both prior valid record byte strings");
+    Check(play.SaveManual(0) && Done(play) && play.State().outcome==cp::PlayOutcome::Failed &&
+          Raw(Path(directory,0,cp::SaveKind::Manual))==priorManual,
+          "failed manual endpoint replacement cannot destroy or report the older manual as newly saved");
+    faults.failWrite=false;
+    Check(play.SaveManual(0) && Done(play) && play.State().outcome==cp::PlayOutcome::Succeeded &&
+          Read(directory,0,cp::SaveKind::Manual).checkpoint.id==cp::CheckpointId::ForestEndpoint &&
+          Raw(Path(directory,0,cp::SaveKind::Autosave))==priorAuto,
+          "explicit endpoint manual retry succeeds without claiming the failed auto was replaced");
+    for(unsigned slot=1;slot<3;++slot)for(auto kind:{cp::SaveKind::Manual,cp::SaveKind::Autosave})
+        Check(!fs::exists(Path(directory,slot,kind)),"endpoint write failure/retry cannot create records in other slots");
 }
 }
 int main(int argc,char** argv){
@@ -419,5 +566,6 @@ int main(int argc,char** argv){
     Check(uncertainReceipt && uncertainReceipt->outcome==cp::PlayOutcome::Failed &&
           Until(play,[&]{return CatalogueDone(play);}) && !play.TakeCompletion(),"uncertain publication is delivered once, fresh catalogue is read-only");
     NormalBoundaryJourney(terrain);
+    EndpointWriteFailure(terrain);
     std::cout<<checks<<" campaign play session checks, "<<failures<<" failures\n";return failures?1:0;
 }

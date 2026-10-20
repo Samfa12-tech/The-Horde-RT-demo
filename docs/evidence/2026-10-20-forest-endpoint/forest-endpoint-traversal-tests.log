@@ -1,0 +1,9 @@
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+    Start 205: horde_rt_rescue_journey_integration_tests
+1/2 Test #205: horde_rt_rescue_journey_integration_tests ...   Passed    1.96 sec
+    Start 206: horde_rt_chapter_terrain_journey_tests
+2/2 Test #206: horde_rt_chapter_terrain_journey_tests ......   Passed   16.29 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =  18.27 sec

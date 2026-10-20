@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.samfa12.hordelanternrt.CampaignMenuIntegrationTest" tests="27" skipped="0" failures="0" errors="0" timestamp="2026-10-20T10:03:48" hostname="SAM_LAPPY" time="2.613">
+  <properties/>
+  <testcase name="returnedDeathCardRetryKeepsItsAliveAcknowledgementPolicy" classname="com.samfa12.hordelanternrt.CampaignMenuIntegrationTest" time="0.123"/>
+  <testcase name="cancelAfterCommitRequiresExactRebaseTokenBeforeOfferingResume" classname="com.samfa12.hordelanternrt.CampaignMenuIntegrationTest" time="0.17"/>
+  <testcase name="staleOrMalformedSnapshotCannotRebaseCameraOrAcknowledge" classname="com.samfa12.hordelanternrt.CampaignMenuIntegrationTest" time="0.084"/>
+  <testcase name="currentReadyCatalogueClearsOnlyStaleSurfaceUnavailableNotice" classname="com.samfa12.hordelanternrt.CampaignMenuIntegrationTest" time="0.077"/>
+  <testcase name="failedDeathLoadReturnsOriginalDeathCardWithVisibleError" classname="com.samfa12.hordelanternrt.CampaignMenuIntegrationTest" time="0.108"/>
+  <testcase name="uncertainWriteNeverDisplaysSavedOrEnablesBlindRetry" classname="com.samfa12.hordelanternrt.CampaignMenuIntegrationTest" time="0.085"/>
+  <testcase name="committedDeathLoadBackCompletesHandshakeAndOnlyExplicitAliveResumeClearsDeath" classname="com.samfa12.hordelanternrt.CampaignMenuIntegrationTest" time="0.127"/>
+  <testcase name="deathCardLoadUsesExistingManualAutoChooserWithoutRetryResetOrUnpause" classname="com.samfa12.hordelanternrt.CampaignMenuIntegrationTest" time="0.085"/>
+  <testcase name="invalidatedLoadedPublicationDoesNotTrapBackOrReuseResume" classname="com.samfa12.hordelanternrt.CampaignMenuIntegrationTest" time="0.137"/>
+  <testcase name="detachedDeathRetryRestartCannotMutatePendingLoadAndReturnedRestartKeepsAckPolicy" classname="com.samfa12.hordelanternrt.CampaignMenuIntegrationTest" time="0.122"/>
+  <testcase name="entryPlaySelectsSlotBeforeRequestingNativePlay" classname="com.samfa12.hordelanternrt.CampaignMenuIntegrationTest" time="0.067"/>
+  <testcase name="deathLoadCannotResumeIfNativeStillReportsDead" classname="com.samfa12.hordelanternrt.CampaignMenuIntegrationTest" time="0.124"/>
+  <testcase name="malformedReplacementSnapshotDisablesFormerlyValidLoadButton" classname="com.samfa12.hordelanternrt.CampaignMenuIntegrationTest" time="0.09"/>
+  <testcase name="queuedSecondLoadCannotReusePriorSuccessBeforeCurrentRequestAcknowledgement" classname="com.samfa12.hordelanternrt.CampaignMenuIntegrationTest" time="0.098"/>
+  <testcase name="deniedRebaseWaitsForFreshPublicationAndPauseRevokesPendingRequest" classname="com.samfa12.hordelanternrt.CampaignMenuIntegrationTest" time="0.099"/>
+  <testcase name="backRequestsCancellationButCannotResumePendingOrCommittedUnrebasedLoad" classname="com.samfa12.hordelanternrt.CampaignMenuIntegrationTest" time="0.082"/>
+  <testcase name="deathLoadBackAndPrecommitCancelReturnDeathCardPaused" classname="com.samfa12.hordelanternrt.CampaignMenuIntegrationTest" time="0.132"/>
+  <testcase name="occupiedManualRequiresFreshExplicitConfirmationAndCancelledButtonCannotWrite" classname="com.samfa12.hordelanternrt.CampaignMenuIntegrationTest" time="0.096"/>
+  <testcase name="homeBeforeDeathLoadCommitReturnsDeathOnlyAfterMatchingCancelResult" classname="com.samfa12.hordelanternrt.CampaignMenuIntegrationTest" time="0.057"/>
+  <testcase name="delayedOlderDirectoryWorkerCannotConfigureAfterNewActivityExistsEvenBeforeOldDestroy" classname="com.samfa12.hordelanternrt.CampaignMenuIntegrationTest" time="0.073"/>
+  <testcase name="deathLoadAlivePublicationAndHomeCannotTakeOverPendingMenu" classname="com.samfa12.hordelanternrt.CampaignMenuIntegrationTest" time="0.096"/>
+  <testcase name="onlyMatchingNewGameAcknowledgementStartsExistingEntryHandoff" classname="com.samfa12.hordelanternrt.CampaignMenuIntegrationTest" time="0.089"/>
+  <testcase name="forestAutosaveUsesExistingPausedLoadAndPresentationBarrier" classname="com.samfa12.hordelanternrt.CampaignMenuIntegrationTest" time="0.093"/>
+  <testcase name="unavailableDirectoryDoesNotInvokeNativeConfigurationOrClaimReady" classname="com.samfa12.hordelanternrt.CampaignMenuIntegrationTest" time="0.038"/>
+  <testcase name="loadRebaseClearsHeldInputsPublishesPausedCameraBeforeAckAndWaitsForPresentation" classname="com.samfa12.hordelanternrt.CampaignMenuIntegrationTest" time="0.086"/>
+  <testcase name="changedCatalogueRevokesConfirmationRatherThanReplacingUnreviewedRecord" classname="com.samfa12.hordelanternrt.CampaignMenuIntegrationTest" time="0.076"/>
+  <testcase name="emptyAndInvalidRecordsCannotLoadAndManualSaveUsesNativeSafeGate" classname="com.samfa12.hordelanternrt.CampaignMenuIntegrationTest" time="0.096"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+]]></system-err>
+</testsuite>

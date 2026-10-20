@@ -121,6 +121,19 @@ public final class CampaignMenuIntegrationTest {
         open(CampaignMenuState.SAVE_MANUAL);
         assertFalse(find("Save manual in Slot 1").isEnabled());
     }
+    @Test public void forestAutosaveUsesExistingPausedLoadAndPresentationBarrier()throws Exception {
+        Bridge.state[15]=CampaignMenuState.VALID;Bridge.state[16]=3;Bridge.state[17]=2;
+        open(CampaignMenuState.LOAD);
+        assertTrue(menuText(a.findViewById(R.id.menu_scrim)).contains("Forest lookout"));
+        assertTrue(find("Load latest autosave").isEnabled());
+        choose(CampaignMenuState.LOAD,0,CampaignMenuState.AUTO);
+        assertEquals(List.of(CampaignMenuState.REFRESH,CampaignMenuState.LOAD),Bridge.actions);
+        assertTrue(Bridge.paused);
+        Bridge.state[3]=Bridge.next;Bridge.state[30]=CampaignMenuState.LOAD;
+        Bridge.state[4]=CampaignMenuState.SUCCESS;Bridge.state[11]=0;Bridge.state[2]++;
+        call("pollCampaignMenu");
+        assertNull(find("Resume"));assertTrue(Bridge.paused);
+    }
     @Test public void occupiedManualRequiresFreshExplicitConfirmationAndCancelledButtonCannotWrite()throws Exception {
         Bridge.state[12]=3;Bridge.state[13]=1;Bridge.state[14]=3;
         open(CampaignMenuState.SAVE_MANUAL);choose(2,0,0);

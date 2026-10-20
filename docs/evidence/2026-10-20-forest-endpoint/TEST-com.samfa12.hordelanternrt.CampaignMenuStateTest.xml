@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.samfa12.hordelanternrt.CampaignMenuStateTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-10-20T10:03:51" hostname="SAM_LAPPY" time="0.002">
+  <properties/>
+  <testcase name="onlyMatchingRequestSurfaceAndPresentedLoadCanComplete" classname="com.samfa12.hordelanternrt.CampaignMenuStateTest" time="0.001"/>
+  <testcase name="unknownErrorNeverBecomesSuccessOrSpecificCorruptionClaim" classname="com.samfa12.hordelanternrt.CampaignMenuStateTest" time="0.0"/>
+  <testcase name="forestEndpointIsNamedAndUnknownCheckpointIsRejected" classname="com.samfa12.hordelanternrt.CampaignMenuStateTest" time="0.0"/>
+  <testcase name="autosaveAndManualTerminalReceiptsHaveDistinctMessages" classname="com.samfa12.hordelanternrt.CampaignMenuStateTest" time="0.0"/>
+  <testcase name="debugNamespaceIsBoundedAndNeverAdmitsPathComponents" classname="com.samfa12.hordelanternrt.CampaignMenuStateTest" time="0.0"/>
+  <testcase name="signedAndUnsignedFloatBitsRemainExact" classname="com.samfa12.hordelanternrt.CampaignMenuStateTest" time="0.0"/>
+  <testcase name="rejectsUnsupportedMalformedAndNonfinitePublications" classname="com.samfa12.hordelanternrt.CampaignMenuStateTest" time="0.0"/>
+  <testcase name="immutableCatalogueKeepsManualAndAutosaveDistinct" classname="com.samfa12.hordelanternrt.CampaignMenuStateTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

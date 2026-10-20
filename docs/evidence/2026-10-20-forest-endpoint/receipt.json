@@ -1,0 +1,128 @@
+{
+  "date": "2026-10-20",
+  "worktree": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "sourceBase": "74388288a777105f261bd9955e51d9027e04aecb",
+  "evidenceClass": "Host gameplay/persistence/native UI and compilation only; no forest endpoint physical RT acceptance",
+  "sources": {
+    "android/app/src/main/java/com/samfa12/hordelanternrt/CampaignMenuState.java": {
+      "sha256": "b8a5ef2ac71bac9bb6bbaf93ed24eb3acc69884154f1694522294fd75d40890b",
+      "gitBlob": "431c660f7c9eb44e792e1243e5142fadd530ad03"
+    },
+    "android/app/src/test/java/com/samfa12/hordelanternrt/CampaignMenuIntegrationTest.java": {
+      "sha256": "d9ec6e8cc50691bb06c5463ff93b0b7d26b0d5a1a279bc1c9c77788acc9dfd3d",
+      "gitBlob": "0bf6bc88b322d8b6b6f48ac00b22679b12283609"
+    },
+    "android/app/src/test/java/com/samfa12/hordelanternrt/CampaignMenuStateTest.java": {
+      "sha256": "5f88e58386e548c322c6a982b7141b5b347d6416f4ae311412d07cf169dcfc29",
+      "gitBlob": "0a90b6897a3c1e9ad9ef9d712ded5967d8cb22cf"
+    },
+    "src/gameplay/campaign/CampaignCheckpoint.h": {
+      "sha256": "4c817803fae28012aa10593317ac363d679c63048088149eec6fb0696e4fd854",
+      "gitBlob": "27cf508f232e443377330cf3129a5c4a71926593"
+    },
+    "src/gameplay/campaign/CampaignCheckpointCodec.cpp": {
+      "sha256": "7e309a732f9dc8b960f01d28733ec46bc68804f1b91eb7aec0895f7424224a62",
+      "gitBlob": "250ecd1fd1bca99309b0917da25137ed2080ec6f"
+    },
+    "src/gameplay/dialogue/CompanionRouteFixture.h": {
+      "sha256": "3256bdf771018024d5a560d57341dcc10fcc6682a0426d7bdceeeb1f7a45c4a0",
+      "gitBlob": "87eecd1d1d90de0bea8ede6b10c52377a55ab1e7"
+    },
+    "src/gameplay/simulation/GameSimulationCampaign.cpp": {
+      "sha256": "9621fd9f9748dd17a47dd80ab0c7e163c26b788835a5e7cbe7fd4c2eefab79aa",
+      "gitBlob": "46089f2a09084f68de13470f288d9c4df406b4dd"
+    },
+    "src/platform/windows/WindowsCampaignMenu.cpp": {
+      "sha256": "6aefe289d9bb037a6a096775f57042769336e1891e2835980333b5a4725b62b6",
+      "gitBlob": "48c63b2b69edc37668eb9740851fbdaf6d4c91a2"
+    },
+    "tests/CampaignCheckpointCodecTests.cpp": {
+      "sha256": "fcb8ded564674ebd881812400d970485b7b5d71aee8ba650743cfd6c7f3ac114",
+      "gitBlob": "1c66ebacbb7dd3cd955722eb38de6eb83fda49c4"
+    },
+    "tests/CampaignCheckpointTests.cpp": {
+      "sha256": "c24dff4a64278a3c0750e59b56cc0cd06e115980dc3091e63805c61d4bd6bbbc",
+      "gitBlob": "7792e895394e74cdccc605a8a48e4548fe8ad026"
+    },
+    "tests/CampaignPlaySessionTests.cpp": {
+      "sha256": "2d659092009d80b99b0e3bd7811d9baca05f5a8f0eed8368221aaf13530b1a08",
+      "gitBlob": "897355522988c462f8038a0d1def692d3e111a68"
+    },
+    "tests/CampaignSessionTests.cpp": {
+      "sha256": "e02f8f781fb1c242c5702ef42703e4b29e658dc00af7accafddaa4c2809aac58",
+      "gitBlob": "9a30398d89a28391f0c289212bc1c1b72cf635ac"
+    },
+    "tests/WindowsCampaignMenuTests.cpp": {
+      "sha256": "a100fabe0e5541867ce9089b72bd1afb3a53f94eb29dbc517bd9f417f9f169f4",
+      "gitBlob": "20056f8648eb3e0b6ec331ca210411f24b23729b"
+    }
+  },
+  "native": {
+    "configuration": "windows-x64-release",
+    "suitesPassed": 12,
+    "failures": 0,
+    "scope": "10 campaign/dialogue/load-barrier/hidden-menu suites plus 2 rescue/imported-terrain journey suites"
+  },
+  "java": {
+    "suites": 51,
+    "tests": 372,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "artifacts": {
+    "androidDebug": {
+      "path": "android\\app\\build\\outputs\\apk\\debug\\app-debug.apk",
+      "bytes": 186149109,
+      "sha256": "c7a0b2fb2a445a044ad5b56604e98761b0b5016e71dd69cbb483dc6961b50b9c",
+      "installedOrLaunched": false,
+      "nativeAbis": [
+        "arm64-v8a",
+        "armeabi-v7a",
+        "x86",
+        "x86_64"
+      ]
+    },
+    "windowsRelease": {
+      "path": "build\\presets\\windows-x64-release\\Release\\HordeLanternRT.exe",
+      "bytes": 4593152,
+      "sha256": "3ba11e7104e238642af5904f2dfe4cb37b12b9cee86f6ed68a885d5e1987b30d",
+      "installedOrLaunched": false
+    }
+  },
+  "reports": {
+    "forest-endpoint-native-build.log": {
+      "bytes": 1763,
+      "sha256": "8f7604d82dd6507cbbb2beb4937295600320e8ebdb5535868befea8743740235"
+    },
+    "forest-endpoint-native-build-2.log": {
+      "bytes": 25107,
+      "sha256": "94b40ccf105e8f53570fb48733e71af16b9c58e07cd46c1d20765ad45f9197dc"
+    },
+    "forest-endpoint-native-tests.log": {
+      "bytes": 1614,
+      "sha256": "cc77694c73a50fad5fa6a3d3133b404ad5bec1b6f661abb59a1eb369031d4991"
+    },
+    "forest-endpoint-native-tests-detail.log": {
+      "bytes": 9833,
+      "sha256": "1944148082344dc1bc0c53c95182382f20e526ef49d36eaa07074e3248fad707"
+    },
+    "forest-endpoint-traversal-tests.log": {
+      "bytes": 495,
+      "sha256": "ae8d5c8455f22d3dfe802538fe8d8f1b73bb1fa4d3022e8988661c0b79d1a447"
+    },
+    "forest-endpoint-traversal-tests-detail.log": {
+      "bytes": 4543,
+      "sha256": "be99cece30afaf7426ce7797215c461ded7957d0d17dd5c3ecf025de55352b94"
+    },
+    "forest-endpoint-java.log": {
+      "bytes": 1981,
+      "sha256": "14ba6f41621bd5fa12fa40de7cce615742b8555461465d8978c11f7a43a3201e"
+    },
+    "forest-endpoint-android-build.log": {
+      "bytes": 2213,
+      "sha256": "477b47866d9c60725380df31692a97f1e3d5118935e8244f7ed51b1c1c0925a2"
+    }
+  }
+}

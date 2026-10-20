@@ -42,6 +42,12 @@ public final class CampaignMenuStateTest {
         v[5]=10; s=CampaignMenuState.decode(v); assertFalse(s.completes(42,3,31));
         assertFalse(s.message().contains("saved")); assertTrue(s.message().contains("uncertain"));
     }
+    @Test public void forestEndpointIsNamedAndUnknownCheckpointIsRejected() {
+        long[] v=ready();v[15]=CampaignMenuState.VALID;v[16]=3;v[17]=2;
+        CampaignMenuState s=CampaignMenuState.decode(v);assertNotNull(s);
+        assertEquals("Latest autosave: Forest lookout · 2 / 3 hearts",s.description(0,1));
+        v[16]=4;assertNull(CampaignMenuState.decode(v));
+    }
     @Test public void unknownErrorNeverBecomesSuccessOrSpecificCorruptionClaim() {
         long[] v=ready(); v[4]=8; v[5]=99;
         CampaignMenuState s=CampaignMenuState.decode(v); assertNotNull(s);

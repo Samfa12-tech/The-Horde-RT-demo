@@ -11,6 +11,20 @@ dated observations below. The
 [current design index](HORDE_1_7_CURRENT_DESIGN_INDEX.md)
 remains the chronological evidence entrypoint.
 
+## 20 October bounded follow-up
+
+The [forest endpoint implementation](../evidence/2026-10-20-forest-endpoint/README.md)
+now adds the previously missing third durable boundary, coherent completed-story
+safe-side returns and the Forest lookout labels. Twelve selected native suites,
+372 Java tests and Windows/four-ABI Android builds pass; the new artifact is not
+installed. The [corrected graphics APK follow-up](../evidence/2026-10-20-graphics-followup/README.md)
+adds exact-artifact Home recovery and preview/Image/rotation UI evidence, and
+saves the owner's latest explicit Mist Off while preserving all campaign bytes.
+Controller hardware, renderer orientation/aspect and broader physical acceptance
+remain open. The feature rows below retain their dated evidence; forest endpoint
+is no longer a missing implementation, while the player-opened endpoint objective
+panel and Kit acting remain missing/partial integration.
+
 ## Authority and status meanings
 
 The scoped authority is the preserved [Beyond the Tomb plan](../references/horde-1.7/d37f1638/docs/superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md),

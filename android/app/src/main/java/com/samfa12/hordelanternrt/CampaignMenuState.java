@@ -28,7 +28,7 @@ final class CampaignMenuState {
                 v[30]<0 || v[30]>NEW_GAME || v[31]<0 || v[31]>2 || !bit(v[32])) return null;
         for(int i=0;i<6;i++) {
             int p=12+3*i;
-            if(v[p]<UNKNOWN || v[p]>READ_ERROR || v[p+1]<0 || v[p+1]>2 || v[p+2]<0 || v[p+2]>3) return null;
+            if(v[p]<UNKNOWN || v[p]>READ_ERROR || v[p+1]<0 || v[p+1]>3 || v[p+2]<0 || v[p+2]>3) return null;
             if(v[p]==VALID && (v[p+1]<1 || v[p+2]<1)) return null;
         }
         float yaw=Float.intBitsToFloat((int)v[9]), pitch=Float.intBitsToFloat((int)v[10]);
@@ -54,7 +54,8 @@ final class CampaignMenuState {
         switch(entries[p]) {
             case EMPTY:return prefix+"Empty";
             case CHECKING:return prefix+"Checking…";
-            case VALID:return prefix+(entries[p+1]==1 ? "Lower chamber" : "Safe exit")+" · "+entries[p+2]+" / 3 hearts";
+            case VALID:return prefix+(entries[p+1]==1 ? "Lower chamber" :
+                    entries[p+1]==2 ? "Safe exit" : "Forest lookout")+" · "+entries[p+2]+" / 3 hearts";
             case INVALID:return prefix+"Unavailable or unsupported record";
             case READ_ERROR:return prefix+"Could not read record";
             default:return prefix+"Not checked";

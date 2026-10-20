@@ -23,6 +23,21 @@ public:
         state_={};state_.generation=generationFloor+1;
         if(exterior) Step(1.0f/60.0f,playerX,playerZ,true,false,false,terrain,true);
     }
+    void RestoreCampaignLookout(float playerX, float playerZ,
+        const simulation::TriangleSupportSurface* terrain, std::uint64_t generationFloor) {
+        state_={};state_.generation=generationFloor+1;
+        const auto endpoint=simulation::kWorldRoutePoints.back();
+        state_.x=endpoint.x+1.0f;state_.z=endpoint.z;
+        state_.waypoint=simulation::kWorldRoutePoints.size();
+        const auto support=traversal::ChapterExteriorSupport(terrain,state_.x,state_.z);
+        state_.grounded=support.grounded && terrain && traversal::ChapterExteriorMovementClear(
+            *terrain,state_.x,state_.z,state_.x,state_.z,support.worldY,.24f) &&
+            terrain->HorizontalBodyVolumeClear(state_.x,state_.z,state_.x,state_.z,support.worldY,1.8f,.24f) &&
+            traversal::ChapterExteriorObstacleClear(*terrain,state_.x,state_.z,state_.x,state_.z,
+                support.worldY+.001f,support.worldY+1.8f,.24f);
+        state_.y=support.worldY;state_.wait=state_.grounded?CompanionWait::Lookout:CompanionWait::Obstacle;
+        state_.yaw=std::atan2(playerX-state_.x,state_.z-playerZ);
+    }
     void Step(float dt,float playerX,float playerZ,bool exterior,bool proof,bool paused,
               const simulation::TriangleSupportSurface* terrain=nullptr,bool requireTerrain=false) {
         if(paused) {state_.wait=CompanionWait::Paused;return;}

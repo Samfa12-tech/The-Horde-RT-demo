@@ -2,6 +2,24 @@
 
 This file records locked decisions for the native Vulkan hardware ray-tracing demo.
 
+## Forest endpoint and completed return recovery - 2026-10-20
+
+The approved forest endpoint now uses stable checkpoint ID 3 (Forest lookout),
+with the existing format/schema/payload. Content revision 1 remains byte-exact
+and supported; revision 2 records the admitted completed forest and later safe
+lower/summit returns without resetting Kit or consumed speech. No eager record
+rewrite. The endpoint requires completed Kit movement, quiescent finished story,
+current terrain/support/standing clearance and existing reward/ascent/readiness
+proof. Exterior exploration retains the earned boundary; completed descent may
+replace it with a coherent lower safe side. See the
+[local implementation/evidence](docs/evidence/2026-10-20-forest-endpoint/README.md).
+Host/build acceptance is separate from physical exact-APK acceptance.
+
+The owner also explicitly selects **saved Mist Off on the connected phone** for
+the Keeper two-light case. This supersedes restoring that phone's former On
+choice. Other preference values and all campaign files remain preserved in the
+[corrected-APK graphics follow-up](docs/evidence/2026-10-20-graphics-followup/README.md).
+
 ## Android single Apply/save flow - 2026-10-20
 
 The approved 1.7 graphics simplification replaces separate Use/Keep with one

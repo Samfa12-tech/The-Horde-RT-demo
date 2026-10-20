@@ -1,5 +1,31 @@
 # Horde 1.7 current design index
 
+## Forest endpoint and corrected graphics follow-up - local milestone, 20 October 2026
+
+The [forest checkpoint slice](../evidence/2026-10-20-forest-endpoint/README.md)
+closes a real missing approved feature: F04 progress can now autosave and restore
+player/Kit at the grounded lookout after the story finishes, rather than summit
+recovery. Existing records retain their bytes; content revision 2 preserves
+completed forest state on later safe-side returns. Twelve focused native suites,
+372 Java tests, Windows Release and four Android Debug ABIs pass. The new APK is
+build-only; physical endpoint/load/Kit/audio acceptance remains open.
+
+The [corrected installed graphics APK](../evidence/2026-10-20-graphics-followup/README.md)
+now has fresh Home-interruption recovery, preview Apply/Restore/Details/Image/
+Controls/Back and portrait/landscape UI reflow evidence. The owner's latest saved
+Mist Off is verified; other preference values, 12 campaign files/locks and original
+rotation/font/density are preserved. No controller was attached; full renderer
+orientation/aspect and remaining matrix acceptance are not inferred.
+
+Next is bounded exact-APK lookout recovery acceptance. A separate remaining small
+player-facing implementation is the approved player-opened lookout objective
+panel; Kit acting and opening art/geography remain partial. Combat/contact,
+natural earned-save/death/full-route and sustained warm performance gates remain
+open. No Keeper timing or denied blind combat action was retried, and no heavy
+outside content or public operation was added. Earlier dated scopes below remain
+historical; they are not retroactively upgraded by these checks.
+
+
 ## Current target/contact observation - local milestone, 20 October 2026
 
 The [planned contact diagnostic](../evidence/2026-10-20-current-contact/README.md)

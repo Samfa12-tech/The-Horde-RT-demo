@@ -16,7 +16,8 @@ std::string RecordLabel(const cp::CatalogueEntry& entry) {
     case cp::CatalogueStatus::ReadError:return "Unreadable - preserved";
     case cp::CatalogueStatus::Valid:
         if(entry.checkpoint && cp::Validate(*entry.checkpoint))
-            return std::string(entry.checkpoint->id==cp::CheckpointId::SafeExit?"Safe exit":"Lower claimed")+
+            return std::string(entry.checkpoint->id==cp::CheckpointId::ForestEndpoint?"Forest lookout":
+                entry.checkpoint->id==cp::CheckpointId::SafeExit?"Safe exit":"Lower claimed")+
                 " | Hearts "+std::to_string(entry.checkpoint->vitality)+"/3";
         return "Invalid - preserved";
     }
