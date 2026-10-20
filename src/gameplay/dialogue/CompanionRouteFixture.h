@@ -77,9 +77,9 @@ private:
         if(paused) {state_.wait=CompanionWait::Paused;return;}
         if(!exterior) {state_.wait=CompanionWait::PlayerInTomb;return;}
         if(requireTerrain) {
-            const auto under=traversal::ChapterExteriorSupport(terrain,state_.x,state_.z);
-            state_.grounded=under.grounded&&traversal::ChapterExteriorMovementClear(
-                *terrain,state_.x,state_.z,state_.x,state_.z,under.worldY,.24f);
+            const auto under=traversal::ChapterExteriorStepSupport(*terrain,state_.x,state_.z,.24f);
+            state_.grounded=under.grounded&&traversal::ResolveChapterStepMovement(
+                *terrain,state_.x,state_.z,state_.x,state_.z,under.worldY,.24f).accepted;
             if(!state_.grounded) {state_.wait=CompanionWait::Obstacle;return;}
             state_.y=under.worldY;
         }
@@ -94,10 +94,12 @@ private:
         if(distance<.06f) {++state_.waypoint;return;}
         const float travel=std::min(distance,std::clamp(dt,0.0f,.05f)*1.8f);
         const float x=state_.x+dx/distance*travel,z=state_.z+dz/distance*travel;
-        const auto support=requireTerrain?traversal::ChapterExteriorSupport(terrain,x,z):
-            simulation::ResolveWorldRouteSupport(x,z);
-        const bool clear=requireTerrain?traversal::ChapterExteriorMovementClear(
-            *terrain,state_.x,state_.z,x,z,state_.y,.24f):
+        // Use the same bounded STEP lane as the player. Ordinary props, trunks,
+        // headroom and unsupported edges remain solid; no per-root exception.
+        const auto step=requireTerrain?traversal::ResolveChapterStepMovement(
+            *terrain,state_.x,state_.z,x,z,state_.y,.24f):traversal::ChapterStepMovement{};
+        const auto support=requireTerrain?step.support:simulation::ResolveWorldRouteSupport(x,z);
+        const bool clear=requireTerrain?step.accepted:
             simulation::WorldRouteBlockoutMovementClear(state_.x,state_.z,x,z,state_.y,.24f,true);
         if(!support.grounded||!clear) {
             state_.wait=CompanionWait::Obstacle;return;

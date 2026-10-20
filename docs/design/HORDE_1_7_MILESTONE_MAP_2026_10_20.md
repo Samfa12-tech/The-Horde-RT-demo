@@ -5,6 +5,12 @@ Branch `codex/horde-1.7-wp2-vertical-proof`, continuing existing draft PR 27.
 Read with the [accepted master](../references/horde-1.7/d37f1638/docs/superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md)
 and [feature inventory](HORDE_1_7_FEATURE_STATUS_2026_10_18.md).
 This is a current reconciliation, not release approval or new feature scope.
+The [latest bounded Windows continuation](../evidence/2026-10-20-native-route-recovery/README.md)
+fixes Kit's demonstrated STEP-root collision blocker and passes 12 native checks
+over 1,724 RT frames: actual ascent/escort/endpoint save/return/descent and recovery
+of this run's saved endpoint. Its earlier victory/claim seed is explicit; physical
+and natural death acceptance remain open. The next independent bounded check is
+recovery/repeat ascent from its actual lower-return revision-two auto.
 The [complete remaining-scope inventory](HORDE_1_7_REMAINING_SCOPE_2026_10_20.md)
 separates unfinished implementation/content, physical acceptance and conditional
 work, with the six unchanged healing choices for morning.

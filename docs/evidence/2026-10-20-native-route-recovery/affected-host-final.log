@@ -1,0 +1,14 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+    Start  42: horde_rt_chapter_dialogue_tests
+1/4 Test  #42: horde_rt_chapter_dialogue_tests .......   Passed    2.07 sec
+    Start  43: horde_rt_companion_acting_tests
+2/4 Test  #43: horde_rt_companion_acting_tests .......   Passed    2.69 sec
+    Start  44: horde_rt_companion_locomotion_tests
+3/4 Test  #44: horde_rt_companion_locomotion_tests ...   Passed    4.73 sec
+    Start 116: horde_rt_forest_dressing_tests
+4/4 Test #116: horde_rt_forest_dressing_tests ........   Passed   25.27 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Total Test time (real) =  34.78 sec

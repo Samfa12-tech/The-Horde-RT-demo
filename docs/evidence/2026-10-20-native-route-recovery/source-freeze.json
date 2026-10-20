@@ -1,0 +1,35 @@
+{
+  "baseCommit": "6b349cee20bfee4f670818abb1db121affb6b90d",
+  "workingDirectory": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+  "files": {
+    "src/gameplay/dialogue/CompanionRouteFixture.h": {
+      "bytes": 7017,
+      "sha256": "aa2a7683c80108255743017705aae59e46b679e7241da4f57cf43ab3971a0564"
+    },
+    "src/platform/windows/DiagnosticWindow.cpp": {
+      "bytes": 619767,
+      "sha256": "297a702758a0d353be43a14e21fc0cba7e7177b1c6b0331631cd403357674db2"
+    },
+    "src/platform/windows/windows_campaign_validation.inl": {
+      "bytes": 46305,
+      "sha256": "df2d15e040c9a881b5264bd48b2769910fd526eda88615fc75712c13962af95f"
+    },
+    "src/platform/windows/windows_route_validation.inl": {
+      "bytes": 19247,
+      "sha256": "85490e18a590a95cf705d8038f98fbc9dbafda5b34592f39dd9a640df7e02f39"
+    },
+    "tests/CampaignPlaySessionTests.cpp": {
+      "bytes": 48181,
+      "sha256": "128c135aaa39369cc3e1d608f06448fca57d7420f7af41de48044b626e7539a2"
+    },
+    "tests/ForestDressingTests.cpp": {
+      "bytes": 60599,
+      "sha256": "4991c74a027f321bf9482ba9e98f65b40dafb0ddb539da3e73b9f5c00ff8897b"
+    },
+    "tools/validate-windows-route.py": {
+      "bytes": 4007,
+      "sha256": "3837b4e61b1e182ba43f5ff2e08b09b6958b6d12d626e68bd65eb15eb7c29949"
+    }
+  },
+  "priorCustody": "../2026-10-20-arm-capture-framing/source-freeze.json"
+}

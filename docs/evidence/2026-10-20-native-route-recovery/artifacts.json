@@ -1,0 +1,32 @@
+{
+  "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe": {
+    "bytes": 14071296,
+    "sha256": "d101855aff7bf7f635427f682bb3fb33b1961d47569b8e8aec4f86d75501df48"
+  },
+  "build/presets/windows-x64-release/Release/HordeLanternRT.exe": {
+    "bytes": 4620288,
+    "sha256": "ef0e418113ccfd403fc5ccb503bea7e06329cc47a4e6c3f9dd1bc0e190275be8"
+  },
+  "android/app/build/outputs/apk/debug/app-debug.apk": {
+    "bytes": 186120153,
+    "sha256": "e9e0c4c441e58332c5371c51d6188d7f7ffb1535e9febafb7656ecd8dee9cd38"
+  },
+  "androidNativeLibraries": {
+    "lib/arm64-v8a/libhorde_rt_probe_android.so": {
+      "bytes": 5165224,
+      "sha256": "104303b7fc63ba40d18d05185b4a4b875b6285e24f78bae35881887feefcba12"
+    },
+    "lib/armeabi-v7a/libhorde_rt_probe_android.so": {
+      "bytes": 4456552,
+      "sha256": "ae25417320027305263f09348b2dbb3a51c858980c6c144464b3697204753a76"
+    },
+    "lib/x86/libhorde_rt_probe_android.so": {
+      "bytes": 5758060,
+      "sha256": "74021e0015fec9be276ec760887c7784f98afcb2dec36a05ed0bb93e8eeb1a11"
+    },
+    "lib/x86_64/libhorde_rt_probe_android.so": {
+      "bytes": 5429456,
+      "sha256": "b9434b3ea70566294780006ed41290b4f6d5a7c45404e12e42002d9bf942d3b4"
+    }
+  }
+}

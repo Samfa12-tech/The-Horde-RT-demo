@@ -1,0 +1,13 @@
+{
+  "pid": 46852,
+  "command": [
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+    "--route-validate-hidden",
+    "--campaign-test-root",
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\horde-campaign-fixtures-route-20261020-r3"
+  ],
+  "executable": {
+    "bytes": 14071296,
+    "sha256": "d101855aff7bf7f635427f682bb3fb33b1961d47569b8e8aec4f86d75501df48"
+  }
+}

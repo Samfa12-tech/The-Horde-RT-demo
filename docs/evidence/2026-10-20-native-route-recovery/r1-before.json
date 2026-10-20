@@ -1,0 +1,39 @@
+{
+  "files": {
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe": {
+      "bytes": 14035968,
+      "sha256": "c074787b0601d43e1d3fe6ba5488966c7139d8edbf2c178ba13e538eb334de9f"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\horde_rt_campaign_play_session_tests.exe": {
+      "bytes": 4614144,
+      "sha256": "d831bd61f3102d5384457794452907c7384fc5c3d76715a860c20059fe42f068"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.ini": null,
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\ASSET_LICENSES.md": {
+      "bytes": 30507,
+      "sha256": "3a6cff3d34421d2ec751b1f64ec44b6c3ee801cdc1d6d1123c3cb479c0b92387"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\PROJECT_MEMORY.md": {
+      "bytes": 51219,
+      "sha256": "9cfbea7667b50a9a960396c8f13c68905791aebd42121ecb353a8354b8cd406e"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\src\\platform\\windows\\DiagnosticWindow.cpp": {
+      "bytes": 619767,
+      "sha256": "297a702758a0d353be43a14e21fc0cba7e7177b1c6b0331631cd403357674db2"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\src\\platform\\windows\\windows_campaign_validation.inl": {
+      "bytes": 46305,
+      "sha256": "df2d15e040c9a881b5264bd48b2769910fd526eda88615fc75712c13962af95f"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\src\\platform\\windows\\windows_route_validation.inl": {
+      "bytes": 18143,
+      "sha256": "0bc3bdb6438ad7249c06e7182164159be7aa5a3c9804573a3d033b30f1a42885"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\tests\\CampaignPlaySessionTests.cpp": {
+      "bytes": 48181,
+      "sha256": "128c135aaa39369cc3e1d608f06448fca57d7420f7af41de48044b626e7539a2"
+    }
+  },
+  "ownerCampaignExists": false,
+  "ownerCampaignFiles": {}
+}

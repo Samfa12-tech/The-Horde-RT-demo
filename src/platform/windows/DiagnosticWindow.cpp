@@ -159,6 +159,7 @@ using LookoutPanel=horde::platform::windows::WindowsLookoutObjectivePanel;
 // targets. It must never acquire foreground input or touch the owner's INI.
 bool gCampaignHiddenValidation=false;
 bool gLookoutHiddenValidation=false;
+bool gRouteHiddenValidation=false;
 bool gLookoutInspectKit=false;
 bool gLookoutInspectKitMotion=false;
 bool gShowcaseCaptureHidden=false;
@@ -8902,7 +8903,8 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
 #if defined(_DEBUG)
     if(gCampaignHiddenValidation){
         context.sfxVolumePercent=context.musicVolumePercent=context.voiceVolumePercent=0;
-        const int result=gLookoutHiddenValidation?RunHiddenLookoutValidation(context,capabilities):RunHiddenCampaignValidation(context);
+        const int result=gRouteHiddenValidation?RunHiddenRouteValidation(context):
+            gLookoutHiddenValidation?RunHiddenLookoutValidation(context,capabilities):RunHiddenCampaignValidation(context);
         return renderOwner.Retire()?result:1;
     }
 #endif
@@ -11678,7 +11680,7 @@ int CreateAndShowWindow(const std::string& diagnosticText,
         windowHeight = captureRect.bottom - captureRect.top;
     }
     HWND hWnd = CreateWindowExA(
-        gLookoutHiddenValidation ? WS_EX_NOACTIVATE|WS_EX_TOOLWINDOW :
+        (gLookoutHiddenValidation || gRouteHiddenValidation) ? WS_EX_NOACTIVATE|WS_EX_TOOLWINDOW :
             (gShowcaseCaptureHidden ? WS_EX_NOACTIVATE : 0),
         kWindowClassName,
         kWindowTitle,
@@ -11697,7 +11699,7 @@ int CreateAndShowWindow(const std::string& diagnosticText,
         return 1;
     }
 #if defined(_DEBUG)
-    if(gLookoutHiddenValidation && !ObserveHiddenLookoutForeground(hWnd,"owner-created")) {
+    if((gLookoutHiddenValidation || gRouteHiddenValidation) && !ObserveHiddenLookoutForeground(hWnd,"owner-created")) {
         DestroyWindow(hWnd);return 1;
     }
 #endif
@@ -12008,12 +12010,13 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     if ((gCampaignHiddenValidation || captureDirectory != nullptr || unattendedBenchmark) && IsWindow(hWnd))
     {
 #if defined(_DEBUG)
-        if(gLookoutHiddenValidation && !ObserveHiddenLookoutForeground(hWnd,"before-owner-destroy"))result=1;
+        if((gLookoutHiddenValidation || gRouteHiddenValidation) && !ObserveHiddenLookoutForeground(hWnd,"before-owner-destroy"))result=1;
 #endif
         DestroyWindow(hWnd);
     }
 #if defined(_DEBUG)
     if(gLookoutHiddenValidation)result=FinishHiddenLookoutValidation(hWnd,result);
+    if(gRouteHiddenValidation)result=FinishHiddenRouteValidation(hWnd,result);
 #endif
     return result;
 }

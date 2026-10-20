@@ -1,6 +1,6 @@
 # Horde 1.7 remaining scope - 20 October 2026
 
-Current reconciliation after the [frozen-arm diagnosis](../evidence/2026-10-20-arm-capture-framing/README.md),
+Current reconciliation after the [Windows route/recovery checkpoint](../evidence/2026-10-20-native-route-recovery/README.md),
 in the existing WP2 worktree/branch and draft PR 27. Read with the
 [accepted master](../references/horde-1.7/d37f1638/docs/superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md)
 and [milestone map](HORDE_1_7_MILESTONE_MAP_2026_10_20.md). This inventory changes
@@ -14,6 +14,17 @@ no gameplay policy, deferral, validation gate or authority to expand content.
 | Outdoor effects, master 8.1/8.3/13.1 | Outdoor participating mist/occluded moon shafts and fireflies are explicitly unimplemented in [the current geometry contract](../../src/scene/RescueJourneyGeometry.h). [Current haze](../../src/vulkan/raytracing/SimulationFrameAdapter.cpp) is a surface-distance-fog multiplier; existing Keeper mist does not close this gap. [Trees are baked static LOD1](../../src/scene/ForestDressing.h); selected foliage wind and representative near/mid/far transitions plus combined workload readiness remain unfinished/unproven. Preserve owner canopy/Easy Tree and mist-28 deferrals/performance gates. These are unfinished planned outdoor presentation, not optional effects already accepted or authority to start heavy work now. Reconcile their final 1.7 disposition explicitly. |
 | Sound material, master 4.1b/5.5/8.4/11 | Licensed finite drips/rope, species calls, water, surface dispatch, music continuation and shared dialogue ducking now exist. One licensed finite foliage cue now has bounded host/build evidence. Its audible character/mix and real output cleanup remain unaccepted; no listening occurred. Suitable settling grit/structural stone creaks and any continuous forest wind material remain unverified/unadmitted. Stone retains accepted generic dirt 9/14; Earth uses dirt 17/18; Wood retains generic fallback. Do not relabel metal/impact cuts to fill a roster. |
 | Authored composition and movement presentation | Whole-opening burial storytelling, canopy/ground/shoreline/lookout composition and final artistic quality remain incomplete/unaccepted. Kit gait cadence and start/stop joins exist, but stationary planted turning remains unresolved; straight walk-as-pivot was rejected for sliding. Imported locomotion remains Idle/Walking; run/back/strafe/dodge use current shared/procedural presentation. This warrants bounded quality work, not endless new animation or content scope. |
+
+The [bounded Windows continuation](../evidence/2026-10-20-native-route-recovery/README.md)
+subsequently demonstrated and fixed Kit's legacy collision stop at the admitted
+trail root, using the player's existing bounded STEP support. A fully dressed
+regression fails before and passes after the fix. Twelve native checks/1,724 RT
+frames now cover ordinary first ascent, fresh presented raise, escort to the quiet
+endpoint, actual auto/manual saves, return descent and native recovery of this
+run's endpoint record. Earlier victories/claim are explicitly seeded; natural
+combat/death, physical controls, listening and warm acceptance remain open.
+Next unblocked check is isolated recovery/repeat ascent from that run's actual
+revision-two lower-return auto, preserving completed story and single ownership.
 
 The core tomb-to-lookout/return story mechanisms are present: lantern reward,
 same-night opening, dynamic rope/equipment ownership, Kit reunion and fresh

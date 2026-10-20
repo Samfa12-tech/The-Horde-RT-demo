@@ -464,6 +464,26 @@ void TestNativeChapterPrimitiveOwnership()
               onto.support.surface==sim::SupportSurface::Wood && onto.support.worldY>root[1],
               "same actual prepared root blocks legacy collision but admits bounded STEP support");
 
+        // Bare terrain companion fixtures miss the appended trail root. Walk
+        // Kit against the actual production dressing/collision owner, keeping
+        // the observed player nearby so the escort distance gate stays valid.
+        gameplay::dialogue::CompanionRouteFixture kit;
+        bool crossedRoot=false,bounded=true,raisedOnWood=false;
+        for(unsigned tick=0;tick<6000 && kit.State().waypoint<sim::kWorldRoutePoints.size();++tick) {
+            const auto previous=kit.State();
+            kit.Step(1.f/60.f,previous.x,previous.z,true,true,false,terrain.get(),true);
+            const auto& current=kit.State();
+            const auto bare=terrain->Query(current.x,current.z);
+            const auto support=tr::ChapterExteriorStepSupport(*terrain,current.x,current.z,.24f);
+            bounded&=current.grounded && std::hypot(current.x-previous.x,current.z-previous.z)<=.0301f &&
+                std::abs(current.y-previous.y)<=sim::kWorldRouteMaximumStep+.0001f;
+            raisedOnWood|=bare.found && support.surface==sim::SupportSurface::Wood && current.y>bare.worldY+.01f;
+            crossedRoot|=(current.x-root[0])*fx+(current.z-root[2])*fz>.6f;
+        }
+        Check(bounded && crossedRoot && raisedOnWood,"Kit crosses the actual prepared root with grounded bounded shared STEP movement");
+        Check(kit.State().waypoint==sim::kWorldRoutePoints.size() && kit.State().grounded,
+              "Kit reaches the actual dressed lookout without bypassing collision or escort distance");
+
         struct RouteObservation {
             const sim::GameSimulation* game;
             const sim::TriangleSupportSurface* terrain;
