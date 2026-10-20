@@ -9,8 +9,13 @@ The [latest bounded Windows continuation](../evidence/2026-10-20-native-route-re
 fixes Kit's demonstrated STEP-root collision blocker and passes 12 native checks
 over 1,724 RT frames: actual ascent/escort/endpoint save/return/descent and recovery
 of this run's saved endpoint. Its earlier victory/claim seed is explicit; physical
-and natural death acceptance remain open. The next independent bounded check is
-recovery/repeat ascent from its actual lower-return revision-two auto.
+and natural death acceptance remain open. The [lower-return follow-up](../evidence/2026-10-20-return-save-recovery/README.md)
+now fixes first-arrival lantern lowering being wrongly reapplied after completed
+forest recovery and passes ten native checks/226 RT frames through repeat ascent,
+upper auto and native reload. Health, equipment and story are preserved. Those
+passing fixtures are parked; the next milestone is a recovery-policy/content
+choice or remaining physical acceptance. The unchanged Debug campaign 30-second
+timing gate remains open despite full diagnostic and Release behavior passes.
 The [complete remaining-scope inventory](HORDE_1_7_REMAINING_SCOPE_2026_10_20.md)
 separates unfinished implementation/content, physical acceptance and conditional
 work, with the six unchanged healing choices for morning.

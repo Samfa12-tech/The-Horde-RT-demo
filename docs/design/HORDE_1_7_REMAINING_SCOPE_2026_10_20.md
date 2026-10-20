@@ -1,6 +1,6 @@
 # Horde 1.7 remaining scope - 20 October 2026
 
-Current reconciliation after the [Windows route/recovery checkpoint](../evidence/2026-10-20-native-route-recovery/README.md),
+Current reconciliation after the [actual lower-return recovery checkpoint](../evidence/2026-10-20-return-save-recovery/README.md),
 in the existing WP2 worktree/branch and draft PR 27. Read with the
 [accepted master](../references/horde-1.7/d37f1638/docs/superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md)
 and [milestone map](HORDE_1_7_MILESTONE_MAP_2026_10_20.md). This inventory changes
@@ -23,8 +23,15 @@ frames now cover ordinary first ascent, fresh presented raise, escort to the qui
 endpoint, actual auto/manual saves, return descent and native recovery of this
 run's endpoint record. Earlier victories/claim are explicitly seeded; natural
 combat/death, physical controls, listening and warm acceptance remain open.
-Next unblocked check is isolated recovery/repeat ascent from that run's actual
-revision-two lower-return auto, preserving completed story and single ownership.
+The [actual lower-return follow-up](../evidence/2026-10-20-return-save-recovery/README.md)
+now passes ten native checks/226 RT frames after fixing restoration that wrongly
+re-applied first-arrival lantern lowering on completed-forest repeat ascent.
+It preserves the original two hearts, held configuration, completed Kit/story
+and one reward/rope, then saves and reloads the new upper auto. No new completion
+flags or recovery policy were granted. These passing post-Keeper cases are now
+parked until a relevant change or failure. The next milestone choice is the
+pending recovery policy/implementation, bounded remaining content, or physical
+acceptance rather than another identical route/recovery run.
 
 The core tomb-to-lookout/return story mechanisms are present: lantern reward,
 same-night opening, dynamic rope/equipment ownership, Kit reunion and fresh
@@ -75,6 +82,10 @@ pending without choosing values.
   menus/death Load exist. Physical overwrite/cancel/failure isolation, interruption,
   process restart/power loss, surface/lifecycle recovery and accessibility remain.
   Retention is decided and must not be reopened as an owner question.
+- **Validation timing:** the current Debug campaign suite exceeds its unchanged
+  30-second CTest gate; one isolated diagnostic run completes 145 checks without
+  failure in 39.609 seconds. Final Release CTest passes in 4.34 seconds. The Debug
+  gate remains open; no contention cause or regression origin is inferred.
 - **Audio, speech and haptics:** voice/subtitles/skip and independent gains exist.
   Listening must cover cue suitability, spatial balance/planar pan, music tails,
   new ducking, speech/combat intelligibility, mute/zero, pause/focus/menu/restore

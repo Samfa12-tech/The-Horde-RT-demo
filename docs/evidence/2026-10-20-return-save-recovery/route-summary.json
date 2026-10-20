@@ -1,0 +1,581 @@
+{
+  "r1": {
+    "rows": 164,
+    "first": {
+      "frame": "1",
+      "tick": "0",
+      "world_generation": "1",
+      "x": "0",
+      "y": "-0.95",
+      "z": "1.85",
+      "grounded": "1",
+      "modern_rules": "1",
+      "rope_phase": "0",
+      "exterior": "0",
+      "stowed": "0",
+      "proof": "0",
+      "line": "0",
+      "kit_grounded": "0",
+      "kit_waypoint": "4",
+      "boundary": "0",
+      "boundary_revision": "0",
+      "operation_revision": "1",
+      "outcome": "1",
+      "kit_x": "-27.7",
+      "kit_z": "-5.8",
+      "kit_wait": "0",
+      "forest_night": "0",
+      "forest_waystone": "0",
+      "forest_clue": "0",
+      "forest_village": "0",
+      "hearts": "3",
+      "lantern_high": "1",
+      "saw_ascent": "0",
+      "saw_pull_up": "0"
+    },
+    "last": {
+      "frame": "164",
+      "tick": "650",
+      "world_generation": "2",
+      "x": "-33.7",
+      "y": "2.05",
+      "z": "-12.8",
+      "grounded": "1",
+      "modern_rules": "1",
+      "rope_phase": "4",
+      "exterior": "1",
+      "stowed": "0",
+      "proof": "1",
+      "line": "0",
+      "kit_grounded": "1",
+      "kit_waypoint": "8",
+      "boundary": "2",
+      "boundary_revision": "2",
+      "operation_revision": "1",
+      "outcome": "2",
+      "kit_x": "14.3",
+      "kit_z": "36.2",
+      "kit_wait": "1",
+      "forest_night": "1",
+      "forest_waystone": "1",
+      "forest_clue": "1",
+      "forest_village": "1",
+      "hearts": "2",
+      "lantern_high": "0",
+      "saw_ascent": "1",
+      "saw_pull_up": "1"
+    },
+    "allModernRules": true,
+    "hearts": [
+      2,
+      3
+    ],
+    "lanternHighValues": [
+      0,
+      1
+    ],
+    "allProofRetained": false,
+    "quietAllFrames": true,
+    "kitWaypoints": [
+      4,
+      8
+    ],
+    "checks": 7,
+    "failures": 1,
+    "complete": false,
+    "milestones": {
+      "route-lower.png": {
+        "sceneEpoch": 3,
+        "measurementGeneration": 1,
+        "recordAttemptSerial": 2,
+        "recordSerial": 2,
+        "submissionSerial": 2,
+        "completionSerial": 2,
+        "simulationTick": 2,
+        "frameSlot": 0
+      },
+      "route-return.png": {
+        "sceneEpoch": 3,
+        "measurementGeneration": 2,
+        "recordAttemptSerial": 164,
+        "recordSerial": 164,
+        "submissionSerial": 164,
+        "completionSerial": 164,
+        "simulationTick": 650,
+        "frameSlot": 0
+      }
+    },
+    "sourceWitness": {
+      "bytes": 162,
+      "sha256": "031ced0a83a136861833ab4e9930ae6ea28c7c6e86d47c61c80ba24e8778472b",
+      "schema": 1,
+      "contentRevision": 2,
+      "checkpointId": 1,
+      "zone": 0,
+      "position": [
+        -33.70000076293945,
+        -0.949999988079071,
+        -15.199999809265137
+      ],
+      "yawPitch": [
+        -1.5707963705062866,
+        0.0
+      ],
+      "hearts": 2,
+      "flags": {
+        "keeperDefeated": true,
+        "lanternClaimed": true,
+        "lidOpen": true,
+        "ropeReady": true,
+        "night": true,
+        "firstAscentCompleted": true,
+        "swordStowed": false,
+        "lanternHigh": true
+      },
+      "story": {
+        "grateConsumed": true,
+        "rescueConsumed": true,
+        "reunionStarted": true,
+        "waitingForRaise": false,
+        "proofAccepted": true,
+        "reminderConsumed": false,
+        "forestNightConsumed": true,
+        "forestWaystoneConsumed": true,
+        "forestClueConsumed": true,
+        "forestVillageConsumed": true
+      }
+    },
+    "workingAuto": {
+      "bytes": 162,
+      "sha256": "031ced0a83a136861833ab4e9930ae6ea28c7c6e86d47c61c80ba24e8778472b",
+      "schema": 1,
+      "contentRevision": 2,
+      "checkpointId": 1,
+      "zone": 0,
+      "position": [
+        -33.70000076293945,
+        -0.949999988079071,
+        -15.199999809265137
+      ],
+      "yawPitch": [
+        -1.5707963705062866,
+        0.0
+      ],
+      "hearts": 2,
+      "flags": {
+        "keeperDefeated": true,
+        "lanternClaimed": true,
+        "lidOpen": true,
+        "ropeReady": true,
+        "night": true,
+        "firstAscentCompleted": true,
+        "swordStowed": false,
+        "lanternHigh": true
+      },
+      "story": {
+        "grateConsumed": true,
+        "rescueConsumed": true,
+        "reunionStarted": true,
+        "waitingForRaise": false,
+        "proofAccepted": true,
+        "reminderConsumed": false,
+        "forestNightConsumed": true,
+        "forestWaystoneConsumed": true,
+        "forestClueConsumed": true,
+        "forestVillageConsumed": true
+      }
+    }
+  },
+  "r2": {
+    "rows": 226,
+    "first": {
+      "frame": "1",
+      "tick": "0",
+      "world_generation": "1",
+      "x": "0",
+      "y": "-0.95",
+      "z": "1.85",
+      "grounded": "1",
+      "modern_rules": "1",
+      "rope_phase": "0",
+      "exterior": "0",
+      "stowed": "0",
+      "proof": "0",
+      "line": "0",
+      "kit_grounded": "0",
+      "kit_waypoint": "4",
+      "boundary": "0",
+      "boundary_revision": "0",
+      "operation_revision": "1",
+      "outcome": "1",
+      "kit_x": "-27.7",
+      "kit_z": "-5.8",
+      "kit_wait": "0",
+      "forest_night": "0",
+      "forest_waystone": "0",
+      "forest_clue": "0",
+      "forest_village": "0",
+      "hearts": "3",
+      "lantern_high": "1",
+      "saw_ascent": "0",
+      "saw_pull_up": "0"
+    },
+    "last": {
+      "frame": "226",
+      "tick": "892",
+      "world_generation": "3",
+      "x": "-33.7",
+      "y": "2.05",
+      "z": "-12.8",
+      "grounded": "1",
+      "modern_rules": "1",
+      "rope_phase": "4",
+      "exterior": "1",
+      "stowed": "0",
+      "proof": "1",
+      "line": "0",
+      "kit_grounded": "1",
+      "kit_waypoint": "8",
+      "boundary": "2",
+      "boundary_revision": "3",
+      "operation_revision": "3",
+      "outcome": "2",
+      "kit_x": "14.3",
+      "kit_z": "36.2",
+      "kit_wait": "1",
+      "forest_night": "1",
+      "forest_waystone": "1",
+      "forest_clue": "1",
+      "forest_village": "1",
+      "hearts": "2",
+      "lantern_high": "1",
+      "saw_ascent": "0",
+      "saw_pull_up": "0"
+    },
+    "allModernRules": true,
+    "hearts": [
+      2,
+      3
+    ],
+    "lanternHighValues": [
+      1
+    ],
+    "allProofRetained": false,
+    "quietAllFrames": true,
+    "kitWaypoints": [
+      4,
+      8
+    ],
+    "checks": 10,
+    "failures": 0,
+    "complete": true,
+    "milestones": {
+      "route-lower.png": {
+        "sceneEpoch": 3,
+        "measurementGeneration": 1,
+        "recordAttemptSerial": 2,
+        "recordSerial": 2,
+        "submissionSerial": 2,
+        "completionSerial": 2,
+        "simulationTick": 2,
+        "frameSlot": 0
+      },
+      "route-return.png": {
+        "sceneEpoch": 3,
+        "measurementGeneration": 2,
+        "recordAttemptSerial": 164,
+        "recordSerial": 164,
+        "submissionSerial": 164,
+        "completionSerial": 164,
+        "simulationTick": 650,
+        "frameSlot": 0
+      },
+      "route-recovered.png": {
+        "sceneEpoch": 4,
+        "measurementGeneration": 2,
+        "recordAttemptSerial": 196,
+        "recordSerial": 196,
+        "submissionSerial": 196,
+        "completionSerial": 196,
+        "simulationTick": 772,
+        "frameSlot": 0
+      }
+    },
+    "sourceWitness": {
+      "bytes": 162,
+      "sha256": "031ced0a83a136861833ab4e9930ae6ea28c7c6e86d47c61c80ba24e8778472b",
+      "schema": 1,
+      "contentRevision": 2,
+      "checkpointId": 1,
+      "zone": 0,
+      "position": [
+        -33.70000076293945,
+        -0.949999988079071,
+        -15.199999809265137
+      ],
+      "yawPitch": [
+        -1.5707963705062866,
+        0.0
+      ],
+      "hearts": 2,
+      "flags": {
+        "keeperDefeated": true,
+        "lanternClaimed": true,
+        "lidOpen": true,
+        "ropeReady": true,
+        "night": true,
+        "firstAscentCompleted": true,
+        "swordStowed": false,
+        "lanternHigh": true
+      },
+      "story": {
+        "grateConsumed": true,
+        "rescueConsumed": true,
+        "reunionStarted": true,
+        "waitingForRaise": false,
+        "proofAccepted": true,
+        "reminderConsumed": false,
+        "forestNightConsumed": true,
+        "forestWaystoneConsumed": true,
+        "forestClueConsumed": true,
+        "forestVillageConsumed": true
+      }
+    },
+    "workingAuto": {
+      "bytes": 162,
+      "sha256": "7e03e25e7de99214a3229c5ab3b415104e273dd3a67502504820156010bf781f",
+      "schema": 1,
+      "contentRevision": 2,
+      "checkpointId": 2,
+      "zone": 1,
+      "position": [
+        -33.70000076293945,
+        2.049999952316284,
+        -12.800000190734863
+      ],
+      "yawPitch": [
+        0.0,
+        0.0
+      ],
+      "hearts": 2,
+      "flags": {
+        "keeperDefeated": true,
+        "lanternClaimed": true,
+        "lidOpen": true,
+        "ropeReady": true,
+        "night": true,
+        "firstAscentCompleted": true,
+        "swordStowed": false,
+        "lanternHigh": true
+      },
+      "story": {
+        "grateConsumed": true,
+        "rescueConsumed": true,
+        "reunionStarted": true,
+        "waitingForRaise": false,
+        "proofAccepted": true,
+        "reminderConsumed": false,
+        "forestNightConsumed": true,
+        "forestWaystoneConsumed": true,
+        "forestClueConsumed": true,
+        "forestVillageConsumed": true
+      }
+    }
+  },
+  "r3": {
+    "rows": 226,
+    "first": {
+      "frame": "1",
+      "tick": "0",
+      "world_generation": "1",
+      "x": "0",
+      "y": "-0.95",
+      "z": "1.85",
+      "grounded": "1",
+      "modern_rules": "1",
+      "rope_phase": "0",
+      "exterior": "0",
+      "stowed": "0",
+      "proof": "0",
+      "line": "0",
+      "kit_grounded": "0",
+      "kit_waypoint": "4",
+      "boundary": "0",
+      "boundary_revision": "0",
+      "operation_revision": "1",
+      "outcome": "1",
+      "kit_x": "-27.7",
+      "kit_z": "-5.8",
+      "kit_wait": "0",
+      "forest_night": "0",
+      "forest_waystone": "0",
+      "forest_clue": "0",
+      "forest_village": "0",
+      "hearts": "3",
+      "lantern_high": "1",
+      "saw_ascent": "0",
+      "saw_pull_up": "0"
+    },
+    "last": {
+      "frame": "226",
+      "tick": "892",
+      "world_generation": "3",
+      "x": "-33.7",
+      "y": "2.05",
+      "z": "-12.8",
+      "grounded": "1",
+      "modern_rules": "1",
+      "rope_phase": "4",
+      "exterior": "1",
+      "stowed": "0",
+      "proof": "1",
+      "line": "0",
+      "kit_grounded": "1",
+      "kit_waypoint": "8",
+      "boundary": "2",
+      "boundary_revision": "3",
+      "operation_revision": "3",
+      "outcome": "2",
+      "kit_x": "14.3",
+      "kit_z": "36.2",
+      "kit_wait": "1",
+      "forest_night": "1",
+      "forest_waystone": "1",
+      "forest_clue": "1",
+      "forest_village": "1",
+      "hearts": "2",
+      "lantern_high": "1",
+      "saw_ascent": "0",
+      "saw_pull_up": "0"
+    },
+    "allModernRules": true,
+    "hearts": [
+      2,
+      3
+    ],
+    "lanternHighValues": [
+      1
+    ],
+    "allProofRetained": false,
+    "quietAllFrames": true,
+    "kitWaypoints": [
+      4,
+      8
+    ],
+    "checks": 10,
+    "failures": 0,
+    "complete": true,
+    "milestones": {
+      "route-lower.png": {
+        "sceneEpoch": 3,
+        "measurementGeneration": 1,
+        "recordAttemptSerial": 2,
+        "recordSerial": 2,
+        "submissionSerial": 2,
+        "completionSerial": 2,
+        "simulationTick": 2,
+        "frameSlot": 0
+      },
+      "route-return.png": {
+        "sceneEpoch": 3,
+        "measurementGeneration": 2,
+        "recordAttemptSerial": 164,
+        "recordSerial": 164,
+        "submissionSerial": 164,
+        "completionSerial": 164,
+        "simulationTick": 650,
+        "frameSlot": 0
+      },
+      "route-recovered.png": {
+        "sceneEpoch": 4,
+        "measurementGeneration": 2,
+        "recordAttemptSerial": 196,
+        "recordSerial": 196,
+        "submissionSerial": 196,
+        "completionSerial": 196,
+        "simulationTick": 772,
+        "frameSlot": 0
+      }
+    },
+    "sourceWitness": {
+      "bytes": 162,
+      "sha256": "031ced0a83a136861833ab4e9930ae6ea28c7c6e86d47c61c80ba24e8778472b",
+      "schema": 1,
+      "contentRevision": 2,
+      "checkpointId": 1,
+      "zone": 0,
+      "position": [
+        -33.70000076293945,
+        -0.949999988079071,
+        -15.199999809265137
+      ],
+      "yawPitch": [
+        -1.5707963705062866,
+        0.0
+      ],
+      "hearts": 2,
+      "flags": {
+        "keeperDefeated": true,
+        "lanternClaimed": true,
+        "lidOpen": true,
+        "ropeReady": true,
+        "night": true,
+        "firstAscentCompleted": true,
+        "swordStowed": false,
+        "lanternHigh": true
+      },
+      "story": {
+        "grateConsumed": true,
+        "rescueConsumed": true,
+        "reunionStarted": true,
+        "waitingForRaise": false,
+        "proofAccepted": true,
+        "reminderConsumed": false,
+        "forestNightConsumed": true,
+        "forestWaystoneConsumed": true,
+        "forestClueConsumed": true,
+        "forestVillageConsumed": true
+      }
+    },
+    "workingAuto": {
+      "bytes": 162,
+      "sha256": "7e03e25e7de99214a3229c5ab3b415104e273dd3a67502504820156010bf781f",
+      "schema": 1,
+      "contentRevision": 2,
+      "checkpointId": 2,
+      "zone": 1,
+      "position": [
+        -33.70000076293945,
+        2.049999952316284,
+        -12.800000190734863
+      ],
+      "yawPitch": [
+        0.0,
+        0.0
+      ],
+      "hearts": 2,
+      "flags": {
+        "keeperDefeated": true,
+        "lanternClaimed": true,
+        "lidOpen": true,
+        "ropeReady": true,
+        "night": true,
+        "firstAscentCompleted": true,
+        "swordStowed": false,
+        "lanternHigh": true
+      },
+      "story": {
+        "grateConsumed": true,
+        "rescueConsumed": true,
+        "reunionStarted": true,
+        "waitingForRaise": false,
+        "proofAccepted": true,
+        "reminderConsumed": false,
+        "forestNightConsumed": true,
+        "forestWaystoneConsumed": true,
+        "forestClueConsumed": true,
+        "forestVillageConsumed": true
+      }
+    }
+  }
+}

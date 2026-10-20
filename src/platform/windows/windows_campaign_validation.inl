@@ -582,23 +582,24 @@ int RunHiddenCampaignValidation(VulkanSurfaceContext& ctx)
 bool ConfigureHiddenCampaignValidation()
 {
     int count=0;auto args=CommandLineToArgvW(GetCommandLineW(),&count);if(!args)return false;
-    bool requested=false,lookoutRequested=false,routeRequested=false,inspectKit=false,inspectMotion=false;std::filesystem::path directory;
+    bool requested=false,lookoutRequested=false,routeRequested=false,returnRequested=false,inspectKit=false,inspectMotion=false;std::filesystem::path directory;
     for(int i=1;i<count;++i) {
         const std::wstring_view arg=args[i];
         if(arg==L"--campaign-validate-hidden")requested=true;
         if(arg==L"--lookout-validate-hidden")lookoutRequested=true;
         if(arg==L"--route-validate-hidden")routeRequested=true;
+        if(arg==L"--route-return-recovery-hidden")returnRequested=true;
         if(arg==L"--lookout-inspect-kit")inspectKit=true;
         if(arg==L"--lookout-inspect-kit-motion"){inspectKit=true;inspectMotion=true;}
         if(arg==L"--campaign-test-root" && i+1<count)directory=args[++i];
     }
     LocalFree(args);
-    if(!requested && !lookoutRequested && !routeRequested && !inspectKit && directory.empty())return true;
+    if(!requested && !lookoutRequested && !routeRequested && !returnRequested && !inspectKit && directory.empty())return true;
 #if defined(_DEBUG) && defined(HORDE_RT_SOURCE_DIR)
     std::error_code error;
     const auto absolute=std::filesystem::absolute(directory,error).lexically_normal();
     const auto reports=std::filesystem::canonical(std::filesystem::path(HORDE_RT_SOURCE_DIR)/"reports",error);
-    if(unsigned(requested)+unsigned(lookoutRequested)+unsigned(routeRequested)!=1 || (inspectKit && !lookoutRequested) || directory.empty() || error || !directory.is_absolute() ||
+    if(unsigned(requested)+unsigned(lookoutRequested)+unsigned(routeRequested)+unsigned(returnRequested)!=1 || (inspectKit && !lookoutRequested) || directory.empty() || error || !directory.is_absolute() ||
         !absolute.filename().string().starts_with("horde-campaign-fixtures-") ||
         std::filesystem::canonical(absolute.parent_path(),error)!=reports || error ||
         std::filesystem::canonical(absolute,error)!=absolute || error || !std::filesystem::is_directory(absolute,error) || error ||
@@ -609,11 +610,12 @@ bool ConfigureHiddenCampaignValidation()
     if(lookoutRequested && !PrepareHiddenLookoutFixture(absolute)){
         std::cerr<<"Hidden lookout validation requires the unchanged caller-exported single ForestEndpoint autosave and canonical manifest only.\n";return false;
     }
-    if(routeRequested && !PrepareHiddenRouteFixture(absolute)){
+    gRouteReturnRecovery=returnRequested;
+    if((routeRequested || returnRequested) && !PrepareHiddenRouteFixture(absolute)){
         std::cerr<<"Hidden route validation requires the unchanged exported single LowerClaimed manual record and canonical manifest only.\n";return false;
     }
     gLookoutHiddenValidation=lookoutRequested;
-    gRouteHiddenValidation=routeRequested;
+    gRouteHiddenValidation=routeRequested || returnRequested;
     gLookoutInspectKit=inspectKit;gLookoutInspectKitMotion=inspectMotion;
     gCampaignHiddenValidation=true;gCampaignValidationDirectory=absolute;return true;
 #else

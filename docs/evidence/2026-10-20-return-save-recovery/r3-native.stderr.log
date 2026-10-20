@@ -1,0 +1,37 @@
+HORDE_LOOKOUT_FOREGROUND stage=route-fixture-admitted sample=1 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000000000 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=owner-created sample=2 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000DB04B6 ours=0 shown=0
+HORDE_PIPELINE_CACHE_CREATE attempted=1 result=0 available=1
+HORDE_LOOKOUT_FOREGROUND stage=route-entered sample=3 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000DB04B6 ours=0 shown=0
+HORDE_ROUTE_CHECK isolated exported seed and hidden nonactivating native owner pass=1
+HORDE_LOOKOUT_FOREGROUND stage=route-before-command sample=4 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000DB04B6 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=route-after-command sample=5 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000DB04B6 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=route-before-command sample=6 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000DB04B6 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=route-after-command sample=7 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000DB04B6 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=route-before-command sample=31 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000DB04B6 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=route-after-command sample=32 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000DB04B6 ours=0 shown=0
+HORDE_WINDOWS_CAMPAIGN prepare ready=1 previous_scene_retained=1 diagnostic=
+HORDE_ROUTE_CHECK admitted record loads through ordinary native commands input rebase and fresh RT barrier pass=1
+HORDE_LOOKOUT_FOREGROUND stage=route-before-readback sample=42 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000DB04B6 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=route-after-readback sample=43 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000DB04B6 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=route-before-command sample=44 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000DB04B6 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=route-after-command sample=45 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000DB04B6 ours=0 shown=0
+HORDE_ROUTE_CHECK actual lower-return auto restores saved health held pose completed story grounded Kit and single ownership pass=1
+HORDE_ROUTE_CHECK resumed lower return remains quiet and does not heal or rewrite the loaded checkpoint pass=1
+HORDE_LOOKOUT_FOREGROUND stage=route-before-readback sample=370 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000DB04B6 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=route-after-readback sample=371 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000DB04B6 ours=0 shown=0
+HORDE_ROUTE_CHECK ordinary repeated climb traverses stow ascent pull-up and grounded upper release without replay or duplicate ownership pass=1
+HORDE_ROUTE_CHECK repeat ascent restores the prior saved lantern configuration after the already completed reunion pass=1
+HORDE_ROUTE_CHECK actual repeat ascent durably replaces only working auto with coherent upper revision two and unchanged health equipment story pass=1
+HORDE_LOOKOUT_FOREGROUND stage=route-before-command sample=433 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000DB04B6 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=route-after-command sample=434 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000DB04B6 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=route-before-command sample=458 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000DB04B6 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=route-after-command sample=459 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000DB04B6 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=route-before-readback sample=469 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000DB04B6 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=route-after-readback sample=470 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000DB04B6 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=route-before-command sample=471 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000DB04B6 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=route-after-command sample=472 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000DB04B6 ours=0 shown=0
+HORDE_ROUTE_CHECK this-run upper autosave recovers through native Load fresh RT and explicit Resume pass=1
+HORDE_ROUTE_CHECK recovered repeat-ascent result remains quiet without repeated auto save healing or story restart pass=1
+HORDE_ROUTE_CHECK bounded per-frame return recovery receipt written pass=1
+HORDE_LOOKOUT_FOREGROUND stage=before-owner-destroy sample=533 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000DB04B6 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=route-owner-destroyed sample=534 initial=0000000000000000 previous=0000000000000000 current=0000000000000000 owner=0000000000DB04B6 ours=0 shown=0

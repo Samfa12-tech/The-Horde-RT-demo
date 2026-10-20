@@ -1,0 +1,126 @@
+{
+  "reports\\horde-campaign-fixtures-route-return-20261020-r1\\manifest.json": {
+    "bytes": 217,
+    "sha256": "cd3452a4600b89f9838458e393ac345734a4612d739184435a4e0a85b6ca5550"
+  },
+  "reports\\horde-campaign-fixtures-route-return-20261020-r1\\route-frames.csv": {
+    "bytes": 14150,
+    "sha256": "adc250c09722cbcbf9999e0d20cc8522753bc456f483934de7d213c98ee17ba6"
+  },
+  "reports\\horde-campaign-fixtures-route-return-20261020-r1\\route-lower.png": {
+    "bytes": 990013,
+    "sha256": "19fd8daeea6ebcf990a5e6a4c91d3bbee9988bfda4858342e1e81301a2604e30"
+  },
+  "reports\\horde-campaign-fixtures-route-return-20261020-r1\\route-return.png": {
+    "bytes": 1190711,
+    "sha256": "e4053ea09154241e9d6473edfb9ee6fca89c30d931502b25922636aeabcd63f2"
+  },
+  "reports\\horde-campaign-fixtures-route-return-20261020-r1\\slot-1-auto.hrd": {
+    "bytes": 162,
+    "sha256": "031ced0a83a136861833ab4e9930ae6ea28c7c6e86d47c61c80ba24e8778472b"
+  },
+  "reports\\horde-campaign-fixtures-route-return-20261020-r1\\slot-1-manual.hrd": {
+    "bytes": 162,
+    "sha256": "031ced0a83a136861833ab4e9930ae6ea28c7c6e86d47c61c80ba24e8778472b"
+  },
+  "reports\\horde-campaign-fixtures-route-return-20261020-r1\\vulkan_capability_report.json": {
+    "bytes": 2350,
+    "sha256": "edbfd82dd27a13bcf64ba5a7a5eb7c4114d44dc775a19c224b17783e14ed629b"
+  },
+  "reports\\horde-campaign-fixtures-route-return-20261020-r1\\vulkan_capability_report.txt": {
+    "bytes": 1500,
+    "sha256": "10b6ed6802f8c9146089143ba2c9177dcf96916b5c1e99fe7c98adea82b9149b"
+  },
+  "reports\\horde-campaign-fixtures-route-return-20261020-r1\\windows-route-validation.json": {
+    "bytes": 10143,
+    "sha256": "49a3ec11051ce6f3626e7f6804d1f8cc0b4a8b870dd31b4f6c636aa8c5754d9a"
+  },
+  "reports\\horde-campaign-fixtures-route-return-20261020-r2\\.slot-1-auto.hrd.lock": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "reports\\horde-campaign-fixtures-route-return-20261020-r2\\manifest.json": {
+    "bytes": 217,
+    "sha256": "cd3452a4600b89f9838458e393ac345734a4612d739184435a4e0a85b6ca5550"
+  },
+  "reports\\horde-campaign-fixtures-route-return-20261020-r2\\route-frames.csv": {
+    "bytes": 19234,
+    "sha256": "2adf3adb1f61c738df9d3f825d5abb60518b6faaf615c3eaa22a1160660124b4"
+  },
+  "reports\\horde-campaign-fixtures-route-return-20261020-r2\\route-lower.png": {
+    "bytes": 990013,
+    "sha256": "19fd8daeea6ebcf990a5e6a4c91d3bbee9988bfda4858342e1e81301a2604e30"
+  },
+  "reports\\horde-campaign-fixtures-route-return-20261020-r2\\route-recovered.png": {
+    "bytes": 1324199,
+    "sha256": "b13f63f47ce745c279f1cacddc7c602d9b28d8ad4d335748332511d95a2d3093"
+  },
+  "reports\\horde-campaign-fixtures-route-return-20261020-r2\\route-return.png": {
+    "bytes": 1115872,
+    "sha256": "b2f0ec09c19c5e73f25f358b10ffbb3780b83f7cd7f949b9f098f8c89f172099"
+  },
+  "reports\\horde-campaign-fixtures-route-return-20261020-r2\\slot-1-auto.hrd": {
+    "bytes": 162,
+    "sha256": "7e03e25e7de99214a3229c5ab3b415104e273dd3a67502504820156010bf781f"
+  },
+  "reports\\horde-campaign-fixtures-route-return-20261020-r2\\slot-1-manual.hrd": {
+    "bytes": 162,
+    "sha256": "031ced0a83a136861833ab4e9930ae6ea28c7c6e86d47c61c80ba24e8778472b"
+  },
+  "reports\\horde-campaign-fixtures-route-return-20261020-r2\\vulkan_capability_report.json": {
+    "bytes": 2350,
+    "sha256": "edbfd82dd27a13bcf64ba5a7a5eb7c4114d44dc775a19c224b17783e14ed629b"
+  },
+  "reports\\horde-campaign-fixtures-route-return-20261020-r2\\vulkan_capability_report.txt": {
+    "bytes": 1500,
+    "sha256": "10b6ed6802f8c9146089143ba2c9177dcf96916b5c1e99fe7c98adea82b9149b"
+  },
+  "reports\\horde-campaign-fixtures-route-return-20261020-r2\\windows-route-validation.json": {
+    "bytes": 14929,
+    "sha256": "247e6cb0332268837e503841c5e9cde3406e398b438a92229682394302d26d3b"
+  },
+  "reports\\horde-campaign-fixtures-route-return-20261020-r3\\.slot-1-auto.hrd.lock": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "reports\\horde-campaign-fixtures-route-return-20261020-r3\\manifest.json": {
+    "bytes": 217,
+    "sha256": "cd3452a4600b89f9838458e393ac345734a4612d739184435a4e0a85b6ca5550"
+  },
+  "reports\\horde-campaign-fixtures-route-return-20261020-r3\\route-frames.csv": {
+    "bytes": 19234,
+    "sha256": "2adf3adb1f61c738df9d3f825d5abb60518b6faaf615c3eaa22a1160660124b4"
+  },
+  "reports\\horde-campaign-fixtures-route-return-20261020-r3\\route-lower.png": {
+    "bytes": 990013,
+    "sha256": "19fd8daeea6ebcf990a5e6a4c91d3bbee9988bfda4858342e1e81301a2604e30"
+  },
+  "reports\\horde-campaign-fixtures-route-return-20261020-r3\\route-recovered.png": {
+    "bytes": 1324199,
+    "sha256": "b13f63f47ce745c279f1cacddc7c602d9b28d8ad4d335748332511d95a2d3093"
+  },
+  "reports\\horde-campaign-fixtures-route-return-20261020-r3\\route-return.png": {
+    "bytes": 1115872,
+    "sha256": "b2f0ec09c19c5e73f25f358b10ffbb3780b83f7cd7f949b9f098f8c89f172099"
+  },
+  "reports\\horde-campaign-fixtures-route-return-20261020-r3\\slot-1-auto.hrd": {
+    "bytes": 162,
+    "sha256": "7e03e25e7de99214a3229c5ab3b415104e273dd3a67502504820156010bf781f"
+  },
+  "reports\\horde-campaign-fixtures-route-return-20261020-r3\\slot-1-manual.hrd": {
+    "bytes": 162,
+    "sha256": "031ced0a83a136861833ab4e9930ae6ea28c7c6e86d47c61c80ba24e8778472b"
+  },
+  "reports\\horde-campaign-fixtures-route-return-20261020-r3\\vulkan_capability_report.json": {
+    "bytes": 2350,
+    "sha256": "edbfd82dd27a13bcf64ba5a7a5eb7c4114d44dc775a19c224b17783e14ed629b"
+  },
+  "reports\\horde-campaign-fixtures-route-return-20261020-r3\\vulkan_capability_report.txt": {
+    "bytes": 1500,
+    "sha256": "10b6ed6802f8c9146089143ba2c9177dcf96916b5c1e99fe7c98adea82b9149b"
+  },
+  "reports\\horde-campaign-fixtures-route-return-20261020-r3\\windows-route-validation.json": {
+    "bytes": 14928,
+    "sha256": "ba0ee0fc0b557e0edb919860b994177ab3d32f4a737c7869da1f6f7a7b82edf8"
+  }
+}

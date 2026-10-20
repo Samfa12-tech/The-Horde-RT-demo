@@ -195,7 +195,10 @@ bool GameSimulation::CommitCampaignRestore(campaign::RestoreToken token, WorldZo
     next.campaignDestinationGeneration_=campaignDestinationGeneration_;
     next.rescueTraversal_.RestoreCampaignSafeSide(upper,c.firstAscentCompleted,rescueTraversal_.Snapshot().generation);
     next.rescueOpeningSeconds_=1.0f;
-    next.chapterFirstExterior_=upper;
+    // Completed-forest returns have already passed the first-arrival lesson.
+    // Preserve their restored held configuration on repeat ascent; revision-one
+    // lower restores still enter the original lowered-lantern teaching path.
+    next.chapterFirstExterior_=upper || completedForest;
     next.lichEncounter_.RestoreCampaignDefeated();
     next.combatTeaching_.Skip();
     next.waterfallWarningEmitted_=true;

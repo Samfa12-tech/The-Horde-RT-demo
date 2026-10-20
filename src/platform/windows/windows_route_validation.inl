@@ -2,12 +2,13 @@
 // native input/persistence harness, not a natural victory or physical playtest.
 bool HiddenRouteFilesAllowed(const std::filesystem::path& directory,bool after)
 {
-    unsigned sources=0;std::error_code error;
+    unsigned sources=0,workingAuto=0;std::error_code error;
     for(const auto& item:std::filesystem::directory_iterator(directory,error)) {
         if(error || item.is_symlink(error) || error || !item.is_regular_file(error) || error)return false;
         const auto name=item.path().filename().string();
         if(name=="manifest.json" || name=="slot-1-manual.hrd"){++sources;continue;}
-        if(name==".slot-1-manual.hrd.lock" || (after && (name==".slot-1-auto.hrd.lock" || name==".slot-2-manual.hrd.lock"))) {
+        if(gRouteReturnRecovery && name=="slot-1-auto.hrd"){++workingAuto;continue;}
+        if(name==".slot-1-manual.hrd.lock" || ((after || gRouteReturnRecovery) && name==".slot-1-auto.hrd.lock") || (after && name==".slot-2-manual.hrd.lock")) {
             if(item.file_size(error)!=0 || error)return false;continue;
         }
         if(after && (name=="slot-1-auto.hrd" || name=="slot-2-manual.hrd" || name==kTextReportFilename ||
@@ -15,20 +16,31 @@ bool HiddenRouteFilesAllowed(const std::filesystem::path& directory,bool after)
             name=="route-lower.png" || name=="route-lookout.png" || name=="route-return.png" || name=="route-recovered.png"))continue;
         return false;
     }
-    return !error && sources==2;
+    return !error && sources==2 && (!gRouteReturnRecovery || workingAuto==1);
 }
 
 bool PrepareHiddenRouteFixture(const std::filesystem::path& directory)
 {
-    constexpr std::string_view manifest="{\"evidenceClass\":\"seeded post-Keeper lower start; subsequent input-driven progression\",\"record\":\"slot-1-manual.hrd\",\"checkpoint\":\"LowerClaimed\",\"contentRevision\":1,\"hearts\":2}\n";
+    const std::string_view manifest=gRouteReturnRecovery?
+        "{\"evidenceClass\":\"recovery of actual R3 lower-return autosave; original post-Keeper seed remains explicit\",\"record\":\"slot-1-auto.hrd\",\"sourceSha256\":\"031ced0a83a136861833ab4e9930ae6ea28c7c6e86d47c61c80ba24e8778472b\"}\n":
+        "{\"evidenceClass\":\"seeded post-Keeper lower start; subsequent input-driven progression\",\"record\":\"slot-1-manual.hrd\",\"checkpoint\":\"LowerClaimed\",\"contentRevision\":1,\"hearts\":2}\n";
     if(!HiddenRouteFilesAllowed(directory,false) || !ReadHiddenLookoutManifest(directory/"manifest.json",gHiddenLookout.manifest) ||
         gHiddenLookout.manifest!=manifest || campaign::storage::Read(directory,"slot-1-manual.hrd",gHiddenLookout.source).status!=campaign::storage::Status::Read)return false;
+    if(gRouteReturnRecovery) {
+        campaign::storage::StoredCheckpoint working;
+        const auto& c=gHiddenLookout.source.checkpoint;
+        if(!horde::gameplay::validation::IsRecordedR3LowerReturn(gHiddenLookout.source.encoded) ||
+            campaign::storage::Read(directory,"slot-1-auto.hrd",working).status!=campaign::storage::Status::Read ||
+            working.encoded!=gHiddenLookout.source.encoded || !campaign::Validate(c) || c.schema!=1 || c.contentRevision!=2 ||
+            c.id!=campaign::CheckpointId::LowerClaimed || c.vitality!=2 || !c.firstAscentCompleted || !campaign::CompletedForestProgress(c.dialogue))return false;
+    } else {
     // Exact exporter value: two hearts, both victories and the claim seeded;
     // ascent, reunion, proof and every forest completion flag remain unset.
     campaign::Checkpoint expected;expected.vitality=2;
     expected.dialogue.grateConsumed=expected.dialogue.rescueConsumed=true;
     std::vector<std::byte> encoded;campaign::codec::Error error{};
     if(!campaign::codec::Encode(expected,encoded,error) || encoded!=gHiddenLookout.source.encoded)return false;
+    }
     gHiddenLookout.started=std::chrono::steady_clock::now();
     gHiddenLookout.initialForeground=gHiddenLookout.previousForeground=GetForegroundWindow();
     return ObserveHiddenLookoutForeground(nullptr,"route-fixture-admitted");
@@ -41,7 +53,9 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
     unsigned checks=0,failures=0,frames=0;
     std::ostringstream milestones;bool hasMilestone=false;
     auto& receipt=gHiddenLookout.receipt;
-    receipt<<"{\"schema\":1,\"evidenceClass\":\"hidden native RT input-driven continuation from seeded post-Keeper lower checkpoint; not natural victory or physical play\",\"checks\":[";
+    receipt<<"{\"schema\":1,\"evidenceClass\":\""<<(gRouteReturnRecovery?
+        "hidden native RT recovery and repeat ascent from actual R3 lower-return autosave; original post-Keeper seed remains explicit":
+        "hidden native RT input-driven continuation from seeded post-Keeper lower checkpoint; not natural victory or physical play")<<"\",\"checks\":[";
     const auto check=[&](bool ok,const char* name){
         if(checks++)receipt<<',';if(!ok)++failures;
         receipt<<"{\"name\":\""<<name<<"\",\"pass\":"<<(ok?"true":"false")<<'}';
@@ -63,7 +77,7 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
     struct Restore {VulkanSurfaceContext& c;bool active;~Restore(){c.chapterRoundTripCaptureActive=active;}} restore{ctx,ctx.chapterRoundTripCaptureActive};
     ctx.chapterRoundTripCaptureActive=true;
     std::ofstream rows(gCampaignValidationDirectory/"route-frames.csv");
-    rows<<"frame,tick,world_generation,x,y,z,grounded,modern_rules,rope_phase,exterior,stowed,proof,line,kit_grounded,kit_waypoint,boundary,boundary_revision,operation_revision,outcome,kit_x,kit_z,kit_wait,forest_night,forest_waystone,forest_clue,forest_village\n";
+    rows<<"frame,tick,world_generation,x,y,z,grounded,modern_rules,rope_phase,exterior,stowed,proof,line,kit_grounded,kit_waypoint,boundary,boundary_revision,operation_revision,outcome,kit_x,kit_z,kit_wait,forest_night,forest_waystone,forest_clue,forest_village,hearts,lantern_high,saw_ascent,saw_pull_up\n";
     const auto render=[&]{
         if(++frames>6000 || !safe("route-before-frame",false))return false;
         const auto tick=ctx.simulation.Snapshot().tickIndex;
@@ -78,7 +92,8 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
             <<','<<ctx.simulation.CampaignBoundaryRevision()<<','<<state.operationRevision<<','<<unsigned(state.outcome)
             <<','<<s.chapterCompanion.x<<','<<s.chapterCompanion.z<<','<<unsigned(s.chapterCompanion.wait)
             <<','<<s.chapterDialogue.forestNightConsumed<<','<<s.chapterDialogue.forestWaystoneConsumed
-            <<','<<s.chapterDialogue.forestClueConsumed<<','<<s.chapterDialogue.forestVillageConsumed<<'\n';
+            <<','<<s.chapterDialogue.forestClueConsumed<<','<<s.chapterDialogue.forestVillageConsumed<<','<<s.playerVitals.vitality
+            <<','<<(s.interaction.heldLightPose==interactions::HeldLightPose::High)<<','<<s.rescue.sawAscent<<','<<s.rescue.sawPullUp<<'\n';
         if(frames%120==0)rows.flush();
         return presented && ctx.lastFramePresentation==horde::telemetry::RtPresentationOutcome::Presented &&
             s.tickIndex==tick && safe("route-after-frame",false);
@@ -120,7 +135,64 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
         (GetWindowLongPtrA(ctx.windowHandle,GWL_EXSTYLE)&(WS_EX_NOACTIVATE|WS_EX_TOOLWINDOW))==(WS_EX_NOACTIVATE|WS_EX_TOOLWINDOW) && safe("route-entered"),
         "isolated exported seed and hidden nonactivating native owner");
     if(proceed){ApplyOverlayState(ctx);proceed=check(click(kEntryMoreButtonId) && click(kCampaignLoadButtonId) && until(catalogue,false) &&
-        click(CampaignMenu::FirstChoiceId) && until(loadComplete,true),"seed loads through ordinary native commands input rebase and fresh RT barrier");}
+        click(CampaignMenu::FirstChoiceId+(gRouteReturnRecovery?1:0)) && until(loadComplete,true),"admitted record loads through ordinary native commands input rebase and fresh RT barrier");}
+    if(gRouteReturnRecovery) {
+        const auto& original=gHiddenLookout.source.checkpoint;
+        const auto coherent=[&](bool upper){const auto& s=ctx.simulation.Snapshot();
+            return s.modernCombatRules && s.playerAlive && s.playerVitals.vitality==original.vitality && s.playerGrounded &&
+                s.rescue.exteriorSide==upper && !s.rescue.equipmentStowed && s.rescue.firstAscentCompleted &&
+                s.rescue.claimCount==1 && s.rescue.deploymentCount==1 && s.rescue.ropeReady &&
+                s.chapterDialogue.proofAccepted && !s.chapterDialogue.waitingForRaise && s.chapterDialogue.line==dialogue::Line::None &&
+                s.chapterDialogue.forestNightConsumed && s.chapterDialogue.forestWaystoneConsumed &&
+                s.chapterDialogue.forestClueConsumed && s.chapterDialogue.forestVillageConsumed &&
+                s.chapterCompanion.grounded && s.chapterCompanion.waypoint==simulation::kWorldRoutePoints.size() &&
+                (s.heldItems[1].parentMode==items::HeldItemParentMode::BodyStow)==original.swordStowed;};
+        const auto originalPose=[&]{return (ctx.simulation.Snapshot().interaction.heldLightPose==interactions::HeldLightPose::High)==original.lanternHigh;};
+        if(proceed)proceed=check(coherent(false) && originalPose() && ctx.campaignPause && ctx.simulationPaused &&
+            capture("route-lower.png") && click(CampaignMenu::ResumeId),"actual lower-return auto restores saved health held pose completed story grounded Kit and single ownership");
+        PumpCampaign(ctx);
+        const auto initialOperation=ctx.campaign->State().operationRevision;
+        for(unsigned tick=0;tick<120 && proceed;++tick){proceed=step(neutral());if(tick%4==3 && proceed)proceed=render();}
+        if(proceed)proceed=check(coherent(false) && originalPose() && ctx.campaign->State().operationRevision==initialOperation,
+            "resumed lower return remains quiet and does not heal or rewrite the loaded checkpoint");
+        bool issued=false,stowed=false,ascent=false,pullUp=false;unsigned ticks=0;
+        while(proceed && ticks<1800 && !(ctx.simulation.Snapshot().rescue.exteriorSide && !ctx.simulation.Snapshot().rescue.equipmentStowed)) {
+            for(unsigned n=0;n<4;++n){auto input=neutral();
+                if(!issued && ctx.simulation.Snapshot().rescuePrompt==traversal::RescuePrompt::Climb){++input.commands.interact;issued=true;}
+                proceed=step(input);++ticks;const auto& s=ctx.simulation.Snapshot();
+                stowed|=s.rescue.equipmentStowed;ascent|=s.rescue.phase==traversal::Phase::Ascent;pullUp|=s.rescue.phase==traversal::Phase::PullUp;
+                if(!proceed)break;
+            }
+            if(proceed)proceed=render();
+        }
+        if(proceed)proceed=check(issued && stowed && ascent && pullUp && coherent(true) && capture("route-return.png"),
+            "ordinary repeated climb traverses stow ascent pull-up and grounded upper release without replay or duplicate ownership");
+        if(proceed)proceed=check(originalPose(),"repeat ascent restores the prior saved lantern configuration after the already completed reunion");
+        for(unsigned tick=0;tick<120 && proceed;++tick){proceed=step(neutral());if(tick%4==3 && proceed)proceed=render();}
+        campaign::storage::StoredCheckpoint upper;
+        if(proceed)proceed=check(until([&]{return ctx.campaign->State().outcome!=campaign::PlayOutcome::Pending;},false) &&
+            ctx.campaign->State().outcome==campaign::PlayOutcome::Succeeded &&
+            campaign::storage::Read(gCampaignValidationDirectory,"slot-1-auto.hrd",upper).status==campaign::storage::Status::Read &&
+            upper.checkpoint.id==campaign::CheckpointId::SafeExit && upper.checkpoint.contentRevision==2 &&
+            upper.checkpoint.vitality==original.vitality && upper.checkpoint.lanternHigh==original.lanternHigh &&
+            campaign::CompletedForestProgress(upper.checkpoint.dialogue) && upper.encoded!=gHiddenLookout.source.encoded,
+            "actual repeat ascent durably replaces only working auto with coherent upper revision two and unchanged health equipment story");
+        if(proceed){const auto generation=ctx.simulation.Snapshot().worldRoute.generation;
+            ShowPauseMenu(ctx,true);proceed=click(kCampaignLoadButtonId) && until(catalogue,false) && click(CampaignMenu::FirstChoiceId+1) && until(loadComplete,true);
+            proceed=check(proceed && coherent(true) && originalPose() && ctx.simulation.Snapshot().worldRoute.generation>generation &&
+                capture("route-recovered.png") && click(CampaignMenu::ResumeId),"this-run upper autosave recovers through native Load fresh RT and explicit Resume");PumpCampaign(ctx);
+        }
+        if(proceed){const auto operation=ctx.campaign->State().operationRevision;
+            for(unsigned tick=0;tick<120 && proceed;++tick){proceed=step(neutral());if(tick%4==3 && proceed)proceed=render();}
+            proceed=check(proceed && coherent(true) && originalPose() && ctx.campaign->State().operationRevision==operation,
+                "recovered repeat-ascent result remains quiet without repeated auto save healing or story restart");
+        }
+        if(!proceed && !failures)check(false,"bounded return recovery stopped before all stages");
+        rows.flush();check(bool(rows),"bounded per-frame return recovery receipt written");
+        receipt<<"],\"milestones\":{"<<milestones.str()<<"},\"count\":"<<checks<<",\"failures\":"<<failures<<",\"frames\":"<<frames
+            <<",\"stagesComplete\":"<<(!failures?"true":"false")<<",\"deathRecoveryTested\":false,\"physicalPlayTested\":false,\"audioListened\":false";
+        return failures?1:0;
+    }
     if(proceed){const auto& s=ctx.simulation.Snapshot();proceed=check(s.modernCombatRules && s.playerVitals.vitality==2 &&
         !s.rescue.firstAscentCompleted && !s.rescue.exteriorSide && !s.chapterDialogue.proofAccepted && !s.chapterDialogue.forestVillageConsumed &&
         capture("route-lower.png") && click(CampaignMenu::ResumeId),"current rules two hearts and genuinely unset post-seed progression");PumpCampaign(ctx);}

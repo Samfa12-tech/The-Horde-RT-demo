@@ -1,0 +1,48 @@
+{
+  "cases": [
+    {
+      "case": "missing-root",
+      "exitCode": 2,
+      "pass": true
+    },
+    {
+      "case": "mixed-modes",
+      "exitCode": 2,
+      "pass": true
+    },
+    {
+      "case": "nonfixture-root",
+      "exitCode": 2,
+      "pass": true
+    },
+    {
+      "case": "used-fixture",
+      "exitCode": 2,
+      "pass": true
+    },
+    {
+      "case": "mismatched-copy",
+      "exitCode": 2,
+      "pass": true
+    },
+    {
+      "case": "bad-manifest",
+      "exitCode": 2,
+      "pass": true
+    }
+  ],
+  "existingFixtureBytesUnchanged": true,
+  "fixtureSha256": {
+    ".slot-1-auto.hrd.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "manifest.json": "cd3452a4600b89f9838458e393ac345734a4612d739184435a4e0a85b6ca5550",
+    "route-frames.csv": "2adf3adb1f61c738df9d3f825d5abb60518b6faaf615c3eaa22a1160660124b4",
+    "route-lower.png": "19fd8daeea6ebcf990a5e6a4c91d3bbee9988bfda4858342e1e81301a2604e30",
+    "route-recovered.png": "b13f63f47ce745c279f1cacddc7c602d9b28d8ad4d335748332511d95a2d3093",
+    "route-return.png": "b2f0ec09c19c5e73f25f358b10ffbb3780b83f7cd7f949b9f098f8c89f172099",
+    "slot-1-auto.hrd": "7e03e25e7de99214a3229c5ab3b415104e273dd3a67502504820156010bf781f",
+    "slot-1-manual.hrd": "031ced0a83a136861833ab4e9930ae6ea28c7c6e86d47c61c80ba24e8778472b",
+    "vulkan_capability_report.json": "edbfd82dd27a13bcf64ba5a7a5eb7c4114d44dc775a19c224b17783e14ed629b",
+    "vulkan_capability_report.txt": "10b6ed6802f8c9146089143ba2c9177dcf96916b5c1e99fe7c98adea82b9149b",
+    "windows-route-validation.json": "247e6cb0332268837e503841c5e9cde3406e398b438a92229682394302d26d3b"
+  }
+}

@@ -1,4 +1,5 @@
 #include "gameplay/campaign/CampaignPlaySession.h"
+#include "gameplay/validation/RecordedReturnCheckpoint.h"
 #include "scene/ChapterTerrainSurface.h"
 #include "scene/assets/AssetManifest.h"
 #include <atomic>
@@ -154,6 +155,61 @@ bool LoadEarnedBoundary(cp::PlaySession& play,sim::GameSimulation& game,cp::Save
           !game.Snapshot().rescue.equipmentStowed,
           "fresh neutral publication releases earned restore without replaying old action or traversal debt");
     return true;
+}
+// Read the real lower-return record copied by the scoped native launcher. This
+// CPU continuation grants no new story flags and never writes a checkpoint.
+int CheckActualReturnRecovery(const fs::path& requested,const std::shared_ptr<const sim::TriangleSupportSurface>& terrain) {
+    using namespace horde::gameplay;
+    std::error_code error;const auto directory=fs::absolute(requested,error).lexically_normal();
+    const auto reports=fs::canonical(fs::path(HORDE_RT_SOURCE_DIR)/"reports",error);
+    if(error || !directory.filename().string().starts_with("horde-campaign-fixtures-") ||
+       fs::canonical(directory,error)!=directory || error || fs::canonical(directory.parent_path(),error)!=reports || error)return 2;
+    std::ifstream manifest(directory/"manifest.json",std::ios::binary);
+    const std::string metadata((std::istreambuf_iterator<char>(manifest)),{});
+    if(metadata.size()>4096 || metadata.find("recovery of actual R3 lower-return autosave; original post-Keeper seed remains explicit")==std::string::npos)return 2;
+    io::StoredCheckpoint original;
+    if(io::Read(directory,"slot-1-manual.hrd",original).status!=io::Status::Read ||
+       !validation::IsRecordedR3LowerReturn(original.encoded) ||
+       original.checkpoint.id!=cp::CheckpointId::LowerClaimed || original.checkpoint.contentRevision!=2 ||
+       !cp::CompletedForestProgress(original.checkpoint.dialogue))return 2;
+    const auto& saved=original.checkpoint;
+    sim::GameSimulation game(sim::ProductionGameSimulationConfig());
+    Check(Seed(game,saved,terrain),"actual copied lower-return record commits without new logical flags");
+    const auto generation=game.Snapshot().worldRoute.generation;
+    for(std::size_t zone=1;zone<sim::kWorldZones.size();++zone)
+        Check(game.PublishChapterTerrain({generation,static_cast<sim::WorldZoneId>(zone)},terrain),"CPU continuation admits actual bare terrain, not native GPU readiness");
+    sim::InputSnapshot input;input.damageEnabled=input.tutorialEnabled=false;
+    input.yawRadians=saved.yaw;input.pitchRadians=saved.pitch;input.paused=true;
+    std::uint64_t publication=0;
+    game.SynchronizePausedInput(input,++publication);game.StepFixed(input,0,++publication);input.paused=false;
+    const auto step=[&]{game.StepFixed(input,1.f/60.f,++publication);game.ClearEvents();};
+    for(unsigned tick=0;tick<120;++tick)step();
+    const auto coherent=[&]{const auto& s=game.Snapshot();return s.modernCombatRules && s.playerVitals.vitality==saved.vitality &&
+        s.rescue.claimCount==1 && s.rescue.deploymentCount==1 && s.rescue.firstAscentCompleted &&
+        s.chapterDialogue.proofAccepted && s.chapterDialogue.forestVillageConsumed && s.chapterDialogue.line==dialogue::Line::None &&
+        s.chapterCompanion.grounded && s.chapterCompanion.waypoint==sim::kWorldRoutePoints.size();};
+    Check(coherent() && !game.Snapshot().rescue.exteriorSide &&
+        (game.Snapshot().interaction.heldLightPose==interactions::HeldLightPose::High)==saved.lanternHigh,
+        "lower load preserves original health equipment and completed story before repeat ascent");
+    Check(game.Snapshot().rescuePrompt==traversal::RescuePrompt::Climb,"actual loaded lower safe side offers ordinary Climb");
+    ++input.commands.interact;bool stowed=false,ascent=false,pullUp=false;
+    for(unsigned tick=0;tick<1800;++tick){step();const auto& s=game.Snapshot();
+        stowed|=s.rescue.equipmentStowed;ascent|=s.rescue.sawAscent;pullUp|=s.rescue.sawPullUp;
+        if(s.rescue.exteriorSide && !s.rescue.equipmentStowed)break;}
+    for(unsigned tick=0;tick<120;++tick)step();
+    const auto& s=game.Snapshot();
+    Check(stowed && ascent && pullUp && s.rescue.exteriorSide && s.playerGrounded && coherent(),
+        "ordinary repeated ascent retains grounded story and one reward without healing or combat");
+    Check((s.interaction.heldLightPose==interactions::HeldLightPose::High)==saved.lanternHigh,
+        "completed reunion return load must not reapply first-arrival lantern lowering");
+    const auto upper=game.LatestCampaignBoundary();
+    Check(upper && upper->id==cp::CheckpointId::SafeExit && upper->contentRevision==2 &&
+        upper->lanternHigh==saved.lanternHigh && upper->vitality==saved.vitality && cp::CompletedForestProgress(upper->dialogue),
+        "repeat ascent latches coherent upper revision two with the original held configuration");
+    io::StoredCheckpoint retained;
+    Check(io::Read(directory,"slot-1-manual.hrd",retained).status==io::Status::Read && retained.encoded==original.encoded,
+        "CPU continuation preserves the actual source record bytes");
+    std::cout<<checks<<" actual-return recovery checks, "<<failures<<" failures\n";return failures?1:0;
 }
 // Earning uses no checkpoint imports, restore seeds, authoritative poses or
 // direct logical mutation: movement, sword edges, chest interaction and rope
@@ -479,7 +535,8 @@ int main(int argc,char** argv){
     if(argc==3 && std::string_view(argv[1])=="--export-fixtures")return ExportFixtures(argv[2]);
     if(argc==3 && std::string_view(argv[1])=="--export-route-fixture")return ExportFixtures(argv[2],{},true);
     const bool exportLookout=argc==3 && std::string_view(argv[1])=="--export-lookout-fixture";
-    if(argc!=1 && !exportLookout)return 2;
+    const bool actualReturn=argc==3 && std::string_view(argv[1])=="--check-actual-return-recovery";
+    if(argc!=1 && !exportLookout && !actualReturn)return 2;
     const auto assets=fs::path(HORDE_RT_SOURCE_DIR)/"assets/models/world/runtime/chapter-terrain-v1";
     horde::scene::assets::AssetManifest manifest;horde::scene::assets::StaticMeshAsset mesh;std::string error;
     if(!horde::scene::assets::AssetManifest::Load(assets/"asset.manifest.json",manifest,error) ||
@@ -487,6 +544,7 @@ int main(int argc,char** argv){
         std::cerr<<error;return 1;}
     const auto terrain=horde::scene::PrepareChapterTerrainSurface(mesh,error);if(!terrain){std::cerr<<error;return 1;}
     if(exportLookout)return ExportFixtures(argv[2],terrain);
+    if(actualReturn)return CheckActualReturnRecovery(argv[2],terrain);
     Directory directory;Faults faults;
     Check(io::Write(directory.path,cp::SaveBasename(*cp::SaveTarget(0,cp::SaveKind::Manual)),Record(1)).status==io::Status::Committed,"seed first manual");
     Check(io::Write(directory.path,cp::SaveBasename(*cp::SaveTarget(2,cp::SaveKind::Manual)),Record(2,true)).status==io::Status::Committed,"seed third manual");

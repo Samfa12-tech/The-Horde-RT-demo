@@ -112,6 +112,7 @@
 #if defined(_DEBUG) || HORDE_RT_CHAPTER_MEASUREMENT
 #include "gameplay/validation/MotionEvidenceScenario.h"
 #include "gameplay/validation/ChapterRoundTripProbe.h"
+#include "gameplay/validation/RecordedReturnCheckpoint.h"
 #include "gameplay/validation/ChapterRouteMeasurementClock.h"
 #include "platform/windows/WindowsPresentInterval.h"
 #include "telemetry/MotionEvidenceLedger.h"
@@ -160,6 +161,7 @@ using LookoutPanel=horde::platform::windows::WindowsLookoutObjectivePanel;
 bool gCampaignHiddenValidation=false;
 bool gLookoutHiddenValidation=false;
 bool gRouteHiddenValidation=false;
+bool gRouteReturnRecovery=false;
 bool gLookoutInspectKit=false;
 bool gLookoutInspectKitMotion=false;
 bool gShowcaseCaptureHidden=false;
