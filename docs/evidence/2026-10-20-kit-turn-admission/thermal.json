@@ -1,0 +1,452 @@
+[
+  {
+    "run": "control-a1",
+    "group": "walk",
+    "index": "0",
+    "name": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "driver_version": "610.47",
+    "temperature.gpu": "42",
+    "clocks.gr": "780",
+    "clocks.mem": "810",
+    "power.draw": "12.24",
+    "pstate": "P5",
+    "utilization.gpu": "0",
+    "utcUnixMs": 1792521056143,
+    "powerStatus": {
+      "ac": 1,
+      "percent": 80
+    }
+  },
+  {
+    "run": "control-a1",
+    "group": "walk",
+    "index": "0",
+    "name": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "driver_version": "610.47",
+    "temperature.gpu": "43",
+    "clocks.gr": "705",
+    "clocks.mem": "405",
+    "power.draw": "12.02",
+    "pstate": "P8",
+    "utilization.gpu": "24",
+    "utcUnixMs": 1792521057194,
+    "powerStatus": {
+      "ac": 1,
+      "percent": 80
+    }
+  },
+  {
+    "run": "control-a1",
+    "group": "walk",
+    "index": "0",
+    "name": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "driver_version": "610.47",
+    "temperature.gpu": "43",
+    "clocks.gr": "787",
+    "clocks.mem": "810",
+    "power.draw": "19.91",
+    "pstate": "P5",
+    "utilization.gpu": "21",
+    "utcUnixMs": 1792521058226,
+    "powerStatus": {
+      "ac": 1,
+      "percent": 80
+    }
+  },
+  {
+    "run": "control-a1",
+    "group": "walk",
+    "index": "0",
+    "name": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "driver_version": "610.47",
+    "temperature.gpu": "43",
+    "clocks.gr": "750",
+    "clocks.mem": "810",
+    "power.draw": "11.22",
+    "pstate": "P5",
+    "utilization.gpu": "20",
+    "utcUnixMs": 1792521059272,
+    "powerStatus": {
+      "ac": 1,
+      "percent": 80
+    }
+  },
+  {
+    "run": "control-a1",
+    "group": "walk",
+    "index": "0",
+    "name": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "driver_version": "610.47",
+    "temperature.gpu": "43",
+    "clocks.gr": "810",
+    "clocks.mem": "810",
+    "power.draw": "13.56",
+    "pstate": "P5",
+    "utilization.gpu": "25",
+    "utcUnixMs": 1792521060316,
+    "powerStatus": {
+      "ac": 1,
+      "percent": 80
+    }
+  },
+  {
+    "run": "control-a1",
+    "group": "turn",
+    "index": "0",
+    "name": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "driver_version": "610.47",
+    "temperature.gpu": "43",
+    "clocks.gr": "990",
+    "clocks.mem": "810",
+    "power.draw": "13.69",
+    "pstate": "P5",
+    "utilization.gpu": "25",
+    "utcUnixMs": 1792521062382,
+    "powerStatus": {
+      "ac": 1,
+      "percent": 80
+    }
+  },
+  {
+    "run": "control-a1",
+    "group": "turn",
+    "index": "0",
+    "name": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "driver_version": "610.47",
+    "temperature.gpu": "42",
+    "clocks.gr": "322",
+    "clocks.mem": "9001",
+    "power.draw": "6.47",
+    "pstate": "P4",
+    "utilization.gpu": "0",
+    "utcUnixMs": 1792521063410,
+    "powerStatus": {
+      "ac": 1,
+      "percent": 80
+    }
+  },
+  {
+    "run": "control-a1",
+    "group": "turn",
+    "index": "0",
+    "name": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "driver_version": "610.47",
+    "temperature.gpu": "43",
+    "clocks.gr": "337",
+    "clocks.mem": "9001",
+    "power.draw": "11.99",
+    "pstate": "P4",
+    "utilization.gpu": "0",
+    "utcUnixMs": 1792521064466,
+    "powerStatus": {
+      "ac": 1,
+      "percent": 80
+    }
+  },
+  {
+    "run": "candidate-b",
+    "group": "walk",
+    "index": "0",
+    "name": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "driver_version": "610.47",
+    "temperature.gpu": "43",
+    "clocks.gr": "750",
+    "clocks.mem": "810",
+    "power.draw": "12.65",
+    "pstate": "P5",
+    "utilization.gpu": "19",
+    "utcUnixMs": 1792521081196,
+    "powerStatus": {
+      "ac": 1,
+      "percent": 80
+    }
+  },
+  {
+    "run": "candidate-b",
+    "group": "walk",
+    "index": "0",
+    "name": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "driver_version": "610.47",
+    "temperature.gpu": "44",
+    "clocks.gr": "690",
+    "clocks.mem": "9001",
+    "power.draw": "11.92",
+    "pstate": "P4",
+    "utilization.gpu": "14",
+    "utcUnixMs": 1792521082227,
+    "powerStatus": {
+      "ac": 1,
+      "percent": 80
+    }
+  },
+  {
+    "run": "candidate-b",
+    "group": "walk",
+    "index": "0",
+    "name": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "driver_version": "610.47",
+    "temperature.gpu": "43",
+    "clocks.gr": "510",
+    "clocks.mem": "9001",
+    "power.draw": "10.96",
+    "pstate": "P4",
+    "utilization.gpu": "5",
+    "utcUnixMs": 1792521083274,
+    "powerStatus": {
+      "ac": 1,
+      "percent": 80
+    }
+  },
+  {
+    "run": "candidate-b",
+    "group": "walk",
+    "index": "0",
+    "name": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "driver_version": "610.47",
+    "temperature.gpu": "44",
+    "clocks.gr": "750",
+    "clocks.mem": "810",
+    "power.draw": "10.97",
+    "pstate": "P5",
+    "utilization.gpu": "16",
+    "utcUnixMs": 1792521084306,
+    "powerStatus": {
+      "ac": 1,
+      "percent": 80
+    }
+  },
+  {
+    "run": "candidate-b",
+    "group": "walk",
+    "index": "0",
+    "name": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "driver_version": "610.47",
+    "temperature.gpu": "43",
+    "clocks.gr": "750",
+    "clocks.mem": "810",
+    "power.draw": "14.15",
+    "pstate": "P5",
+    "utilization.gpu": "26",
+    "utcUnixMs": 1792521085349,
+    "powerStatus": {
+      "ac": 1,
+      "percent": 80
+    }
+  },
+  {
+    "run": "candidate-b",
+    "group": "turn",
+    "index": "0",
+    "name": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "driver_version": "610.47",
+    "temperature.gpu": "43",
+    "clocks.gr": "322",
+    "clocks.mem": "9001",
+    "power.draw": "6.41",
+    "pstate": "P4",
+    "utilization.gpu": "0",
+    "utcUnixMs": 1792521087436,
+    "powerStatus": {
+      "ac": 1,
+      "percent": 80
+    }
+  },
+  {
+    "run": "candidate-b",
+    "group": "turn",
+    "index": "0",
+    "name": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "driver_version": "610.47",
+    "temperature.gpu": "43",
+    "clocks.gr": "405",
+    "clocks.mem": "9001",
+    "power.draw": "11.34",
+    "pstate": "P4",
+    "utilization.gpu": "0",
+    "utcUnixMs": 1792521088466,
+    "powerStatus": {
+      "ac": 1,
+      "percent": 80
+    }
+  },
+  {
+    "run": "candidate-b",
+    "group": "turn",
+    "index": "0",
+    "name": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "driver_version": "610.47",
+    "temperature.gpu": "43",
+    "clocks.gr": "472",
+    "clocks.mem": "9001",
+    "power.draw": "6.54",
+    "pstate": "P4",
+    "utilization.gpu": "0",
+    "utcUnixMs": 1792521089487,
+    "powerStatus": {
+      "ac": 1,
+      "percent": 80
+    }
+  },
+  {
+    "run": "control-a2",
+    "group": "walk",
+    "index": "0",
+    "name": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "driver_version": "610.47",
+    "temperature.gpu": "44",
+    "clocks.gr": "577",
+    "clocks.mem": "810",
+    "power.draw": "12.83",
+    "pstate": "P5",
+    "utilization.gpu": "22",
+    "utcUnixMs": 1792521107190,
+    "powerStatus": {
+      "ac": 1,
+      "percent": 80
+    }
+  },
+  {
+    "run": "control-a2",
+    "group": "walk",
+    "index": "0",
+    "name": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "driver_version": "610.47",
+    "temperature.gpu": "45",
+    "clocks.gr": "802",
+    "clocks.mem": "810",
+    "power.draw": "12.60",
+    "pstate": "P5",
+    "utilization.gpu": "16",
+    "utcUnixMs": 1792521107754,
+    "powerStatus": {
+      "ac": 1,
+      "percent": 80
+    }
+  },
+  {
+    "run": "control-a2",
+    "group": "walk",
+    "index": "0",
+    "name": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "driver_version": "610.47",
+    "temperature.gpu": "44",
+    "clocks.gr": "787",
+    "clocks.mem": "810",
+    "power.draw": "7.22",
+    "pstate": "P5",
+    "utilization.gpu": "21",
+    "utcUnixMs": 1792521108318,
+    "powerStatus": {
+      "ac": 1,
+      "percent": 80
+    }
+  },
+  {
+    "run": "control-a2",
+    "group": "walk",
+    "index": "0",
+    "name": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "driver_version": "610.47",
+    "temperature.gpu": "44",
+    "clocks.gr": "787",
+    "clocks.mem": "810",
+    "power.draw": "11.11",
+    "pstate": "P5",
+    "utilization.gpu": "20",
+    "utcUnixMs": 1792521108876,
+    "powerStatus": {
+      "ac": 1,
+      "percent": 80
+    }
+  },
+  {
+    "run": "control-a2",
+    "group": "walk",
+    "index": "0",
+    "name": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "driver_version": "610.47",
+    "temperature.gpu": "44",
+    "clocks.gr": "727",
+    "clocks.mem": "810",
+    "power.draw": "13.48",
+    "pstate": "P5",
+    "utilization.gpu": "24",
+    "utcUnixMs": 1792521109442,
+    "powerStatus": {
+      "ac": 1,
+      "percent": 80
+    }
+  },
+  {
+    "run": "control-a2",
+    "group": "walk",
+    "index": "0",
+    "name": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "driver_version": "610.47",
+    "temperature.gpu": "44",
+    "clocks.gr": "667",
+    "clocks.mem": "810",
+    "power.draw": "11.47",
+    "pstate": "P5",
+    "utilization.gpu": "9",
+    "utcUnixMs": 1792521110195,
+    "powerStatus": {
+      "ac": 1,
+      "percent": 80
+    }
+  },
+  {
+    "run": "control-a2",
+    "group": "turn",
+    "index": "0",
+    "name": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "driver_version": "610.47",
+    "temperature.gpu": "45",
+    "clocks.gr": "735",
+    "clocks.mem": "9001",
+    "power.draw": "10.03",
+    "pstate": "P4",
+    "utilization.gpu": "15",
+    "utcUnixMs": 1792521112262,
+    "powerStatus": {
+      "ac": 1,
+      "percent": 80
+    }
+  },
+  {
+    "run": "control-a2",
+    "group": "turn",
+    "index": "0",
+    "name": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "driver_version": "610.47",
+    "temperature.gpu": "45",
+    "clocks.gr": "675",
+    "clocks.mem": "9001",
+    "power.draw": "14.34",
+    "pstate": "P4",
+    "utilization.gpu": "13",
+    "utcUnixMs": 1792521113291,
+    "powerStatus": {
+      "ac": 1,
+      "percent": 80
+    }
+  },
+  {
+    "run": "control-a2",
+    "group": "turn",
+    "index": "0",
+    "name": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "driver_version": "610.47",
+    "temperature.gpu": "45",
+    "clocks.gr": "622",
+    "clocks.mem": "9001",
+    "power.draw": "14.65",
+    "pstate": "P4",
+    "utilization.gpu": "13",
+    "utcUnixMs": 1792521114349,
+    "powerStatus": {
+      "ac": 1,
+      "percent": 80
+    }
+  }
+]

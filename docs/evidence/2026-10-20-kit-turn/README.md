@@ -1,5 +1,12 @@
 # Kit stationary turn articulation - 20 October 2026
 
+**Subsequent admission decision: UNADMITTED.** The
+[bounded control/candidate/control comparison](../2026-10-20-kit-turn-admission/README.md)
+could not establish acceptable comparable cost. The owned turn runtime and its
+dependent tests are restored to the pre-experiment version in a later local
+commit. This original record remains an honest historical experiment; its
+measurements, failures and artifact identities below have not been rewritten.
+
 Kit now takes restrained alternating in-place steps while turning at rest. The
 existing route root, 2.4 rad/s facing limit, movement/collision, dialogue clocks,
 save schema and story rules are unchanged. A 0.36 s sin-squared step folds the

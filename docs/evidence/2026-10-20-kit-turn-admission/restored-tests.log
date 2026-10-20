@@ -1,0 +1,15 @@
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+    Start  42: horde_rt_chapter_dialogue_tests
+1/5 Test  #42: horde_rt_chapter_dialogue_tests .......   Passed    1.50 sec
+    Start  43: horde_rt_companion_acting_tests
+2/5 Test  #43: horde_rt_companion_acting_tests .......   Passed    0.94 sec
+    Start  44: horde_rt_companion_locomotion_tests
+3/5 Test  #44: horde_rt_companion_locomotion_tests ...   Passed    1.31 sec
+    Start  45: horde_rt_campaign_checkpoint_tests
+4/5 Test  #45: horde_rt_campaign_checkpoint_tests ....   Passed    2.25 sec
+    Start 218: horde_rt_kit_source_intake_tests
+5/5 Test #218: horde_rt_kit_source_intake_tests ......   Passed    2.60 sec
+
+100% tests passed, 0 tests failed out of 5
+
+Total Test time (real) =   8.63 sec

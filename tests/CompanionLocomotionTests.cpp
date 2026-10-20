@@ -31,31 +31,6 @@ int main(){
     for(int i=0;i<600;++i)motion.Step(dt,.03f,true);
     Check(motion.State().walkPhase>=0 && motion.State().walkPhase<1 && motion.State().walkWeight==1,"long walking keeps a finite bounded gait phase");
 
-    for(float direction:{-1.f,1.f}) {
-        motion.Reset();float leftPeak=0,rightPeak=0;
-        for(int i=0;i<44;++i) {
-            motion.Step(dt,0,false,direction*.04f);
-            const auto pose=motion.State();
-            leftPeak=std::max(leftPeak,pose.leftTurnStep);rightPeak=std::max(rightPeak,pose.rightTurnStep);
-            Check(pose.walkWeight==0 && pose.walkPhase==0 && pose.leftTurnStep>=0 && pose.leftTurnStep<=1 &&
-                pose.rightTurnStep>=0 && pose.rightTurnStep<=1,"stationary turn alternates bounded legs without walking in place");
-            Check(std::min(pose.leftTurnStep,pose.rightTurnStep)<.02f,"one boot remains the support leg during each turn step");
-        }
-        Check(leftPeak>.98f && rightPeak>.98f,"both turn directions admit a full step on each side");
-        for(int i=0;i<30;++i)motion.Step(dt,0,false);
-        Check(motion.State().leftTurnStep==0 && motion.State().rightTurnStep==0,"settled facing finishes its step and returns both feet to idle");
-        for(int i=0;i<10;++i)motion.Step(dt,0,false,.04f);
-        const auto turning=motion.State();
-        motion.Step(0,0,false,.04f);motion.Step(dt,0,false,std::numeric_limits<float>::quiet_NaN());
-        Check(motion.State()==turning,"invalid delta or yaw freezes a finite turn pose");
-        motion.Step(dt,.03f,true);
-        Check(motion.State().leftTurnStep<turning.leftTurnStep && motion.State().walkWeight>0,
-            "movement resumes immediately while a lifted turn foot fades without a snap");
-        for(int i=0;i<11;++i)motion.Step(dt,.03f,true);
-        Check(motion.State().leftTurnStep==0 && motion.State().rightTurnStep==0 && motion.State().walkWeight==1,
-            "full route walking retains the exact admitted walk pose without turn offsets");
-    }
-
     using Terrain=simulation::TriangleSupportSurface;
     const std::array<Terrain::Triangle,2> land{{
         {{{{-1000,7,-1000},{-1000,7,1000},{1000,7,1000}}}},

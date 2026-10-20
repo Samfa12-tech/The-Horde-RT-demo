@@ -6939,7 +6939,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         // Pose owns clip skinning plus its inseparable floor/bounds/static-PBR
         // repack. CharacterSkin therefore includes that CPU preparation here.
         RtSceneStageScope companionSkinScope(observation, horde::telemetry::RtStage::CharacterSkin);
-        const auto acting=horde::scene::CompanionPoseRotations(frame.chapterCompanion.acting,frame.chapterCompanion.locomotion);
+        const auto acting=horde::scene::CompanionUpperBodyRotations(frame.chapterCompanion.acting);
         if (!chapterActor_.Pose(clip, time, diagnostic, acting, &blend)) {
             companionSkinScope.Cancel();
             return false;

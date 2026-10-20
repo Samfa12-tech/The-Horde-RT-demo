@@ -164,6 +164,7 @@ bool gRouteHiddenValidation=false;
 bool gRouteReturnRecovery=false;
 bool gLookoutInspectKit=false;
 bool gLookoutInspectKitMotion=false;
+bool gLookoutInspectKitTiming=false;
 bool gShowcaseCaptureHidden=false;
 bool gCampaignValidationHoldPreparation=false;
 std::filesystem::path gCampaignValidationDirectory;

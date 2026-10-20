@@ -200,113 +200,6 @@ bool CheckCompanionRig(horde::scene::assets::SkinnedPbrActor& actor,
         "acting and rejected requests never mutate the imported node palette and neutral posing remains exact");
 }
 
-bool CheckCompanionTurn(horde::scene::assets::SkinnedPbrActor& actor,
-                        const std::filesystem::path& path,const horde::scene::SkinnedClipSet& clips) {
-    using namespace horde::scene;
-    const auto check=[](bool ok,const char* message){if(!ok)std::cerr<<"FAIL: Kit turn: "<<message<<'\n';return ok;};
-    std::string diagnostic;SkinnedMeshAsset skin;
-    if(!skin.LoadClips(path.string(),clips,diagnostic))return false;
-    if(!actor.Pose(SkinnedClip::Idle,0,diagnostic))return false;
-    std::array<std::vector<std::size_t>,2> boots;
-    for(std::size_t i=0;i<actor.Asset().vertices.size();++i) {
-        const auto& p=actor.Asset().vertices[i].position;
-        if(p[1]<.2f && std::abs(p[0])>.035f)boots[p[0]>0?0:1].push_back(i);
-    }
-    if(!check(boots[0].size()>100 && boots[1].size()>100,"both geometric low-boot contact proxies are nonempty"))return false;
-    for(float time:{0.f,.37f,1.4f}) {
-        if(!actor.Pose(SkinnedClip::Idle,time,diagnostic))return false;
-        const auto baseline=actor.Asset();
-        std::vector<TexturedSkinnedRtVertex> rawBase,rawTurn;std::vector<SkinnedPbrTangent> tangents;
-        if(!skin.SkinUniquePbr(SkinnedClip::Idle,time,rawBase,tangents,diagnostic))return false;
-        const auto neutral=CompanionPoseRotations({},{});
-        if(!check(actor.Pose(SkinnedClip::Idle,time,diagnostic,neutral) && SameAdmittedActor(baseline,actor.Asset()),
-            "zero turn recipe preserves exact existing idle geometry and PBR frames"))return false;
-        for(unsigned side=0;side<2;++side) {
-            horde::gameplay::dialogue::CompanionLocomotionPose motion;
-            (side==0?motion.leftTurnStep:motion.rightTurnStep)=1;
-            const auto recipe=CompanionPoseRotations({},motion);
-            if(!check(actor.Pose(SkinnedClip::Idle,time,diagnostic,recipe) &&
-                skin.SkinUniquePbr(SkinnedClip::Idle,time,rawTurn,tangents,diagnostic,recipe) &&
-                SameActorContract(baseline,actor.Asset()) && ValidActorFrames(actor.Asset()),
-                "turn leg fold retains actual rig topology material grounded bounds and normalized PBR frames"))return false;
-            std::array<float,2> low{100,100},beforeLow{100,100},rawLow{100,100},rawBeforeLow{100,100};
-            float supportShift=0,horizontal=0,rawSupportShift=0;
-            for(unsigned boot=0;boot<2;++boot)for(auto index:boots[boot]) {
-                const auto& a=baseline.vertices[index].position;const auto& b=actor.Asset().vertices[index].position;
-                low[boot]=std::min(low[boot],b[1]);beforeLow[boot]=std::min(beforeLow[boot],a[1]);
-                const auto& ra=rawBase[index].position;const auto& rb=rawTurn[index].position;
-                rawLow[boot]=std::min(rawLow[boot],rb[1]);rawBeforeLow[boot]=std::min(rawBeforeLow[boot],ra[1]);
-                if(boot!=side)rawSupportShift=std::max(rawSupportShift,std::hypot(rb[0]-ra[0],rb[1]-ra[1],rb[2]-ra[2]));
-                if(boot!=side)supportShift=std::max(supportShift,std::hypot(b[0]-a[0],b[1]-a[1],b[2]-a[2]));
-                else horizontal=std::max(horizontal,std::hypot(b[0]-a[0],b[2]-a[2]));
-            }
-            const float lift=low[side]-beforeLow[side];
-            std::cout<<"Kit native turn time="<<time<<" side="<<side<<" boot_vertices="<<boots[side].size()
-                <<" sole_lift_m="<<lift<<" raw_sole_lift_m="<<rawLow[side]-rawBeforeLow[side]
-                <<" raw_support_shift_m="<<rawSupportShift<<" support_local_shift_m="<<supportShift<<" swing_horizontal_m="<<horizontal<<'\n';
-            if(!check(lift>.015f && lift<.12f && rawLow[side]-rawBeforeLow[side]>.015f &&
-                rawSupportShift<.001f && supportShift<.01f && horizontal<.12f,
-                "each real boot lifts modestly while the support boot remains locally planted without a walking sweep"))return false;
-        }
-    }
-    // Compare the complete turn and settle through the production route owner.
-    // Low geometric boot subsets are contact proxies, not world-foot locks.
-    horde::gameplay::dialogue::CompanionRouteFixture route;
-    using Terrain=horde::gameplay::simulation::TriangleSupportSurface;
-    const std::array<Terrain::Triangle,2> land{{
-        {{{{-1000,7,-1000},{-1000,7,1000},{1000,7,1000}}}},
-        {{{{-1000,7,-1000},{1000,7,1000},{1000,7,-1000}}}}
-    }};
-    const auto terrain=Terrain::Build(land,diagnostic);if(!terrain)return false;
-    constexpr float dt=1.f/60;
-    for(unsigned i=0;i<90;++i) {
-        const auto p=route.State();route.Step(dt,p.x+3,p.z+1,true,false,false,terrain.get(),true);
-    }
-    using Point=std::array<float,3>;
-    std::array<std::array<Point,2>,2> previous{};
-    std::array<std::array<float,2>,2> previousLow{};
-    std::array<float,2> contactTravel{};unsigned liftedFrames=0;float peakLift=0,peakStep=0;
-    const auto origin=route.State();
-    for(unsigned tick=0;tick<=200;++tick) {
-        const auto p=route.State();
-        if(tick)route.Step(dt,p.x+(tick<=100?-3.f:3.f),p.z,true,false,false,terrain.get(),true);
-        const auto pose=route.State();
-        if(!check(pose.x==origin.x && pose.z==origin.z && pose.y==origin.y && !pose.walking && pose.grounded,
-            "stationary turn retains supported collision root without entering route walking"))return false;
-        bool lifted=false;
-        for(unsigned variant=0;variant<2;++variant) {
-            const auto recipe=variant?CompanionPoseRotations(pose.acting,pose.locomotion):CompanionPoseRotations(pose.acting,{});
-            if(!actor.Pose(SkinnedClip::Idle,pose.animationSeconds,diagnostic,recipe))return false;
-            const float yaw=CompanionModelYaw(pose.yaw),c=std::cos(yaw),s=std::sin(yaw);
-            for(unsigned side=0;side<2;++side) {
-                Point centroid{};float low=100;
-                for(auto index:boots[side]) {
-                    const auto& v=actor.Asset().vertices[index].position;
-                    centroid[0]+=(c*v[0]+s*v[2])/boots[side].size();
-                    centroid[1]+=v[1]/boots[side].size();centroid[2]+=(-s*v[0]+c*v[2])/boots[side].size();
-                    low=std::min(low,v[1]);
-                }
-                if(variant){peakLift=std::max(peakLift,low);lifted=lifted || low>.015f;}
-                if(tick) {
-                    const auto& old=previous[variant][side];
-                    const float travel=std::hypot(centroid[0]-old[0],centroid[2]-old[2]);
-                    if(low<.015f && previousLow[variant][side]<.015f)contactTravel[variant]+=travel;
-                    if(variant)peakStep=std::max(peakStep,std::hypot(centroid[0]-old[0],centroid[1]-old[1],centroid[2]-old[2]));
-                }
-                previous[variant][side]=centroid;previousLow[variant][side]=low;
-            }
-        }
-        if(lifted)++liftedFrames;
-    }
-    std::cout<<"Kit native turn_sequence frames=201 lifted_frames="<<liftedFrames<<" peak_sole_m="<<peakLift
-        <<" baseline_low_contact_centroid_travel_m="<<contactTravel[0]<<" candidate_low_contact_centroid_travel_m="<<contactTravel[1]
-        <<" peak_candidate_centroid_step_m="<<peakStep<<'\n';
-    if(!check(liftedFrames>60 && peakLift>.03f && peakLift<.08f && peakStep<.025f && contactTravel[1]<contactTravel[0] &&
-        route.State().locomotion.leftTurnStep==0 && route.State().locomotion.rightTurnStep==0,
-        "two real-rig turn directions lift and replace boots smoothly, reduce low-contact arc and finish settled"))return false;
-    return true;
-}
-
 bool CheckCompanionBlend(horde::scene::assets::SkinnedPbrActor& actor,
                          const std::filesystem::path& path,const horde::scene::SkinnedClipSet& clips) {
     using namespace horde::scene;
@@ -430,8 +323,7 @@ bool CheckCompanionBlend(horde::scene::assets::SkinnedPbrActor& actor,
     for(const auto& frame:frames) {
         const auto& pose=frame.pose;
         const SkinnedClipBlend blend{SkinnedClip::Walking,pose.locomotion.walkPhase*duration,pose.locomotion.walkWeight};
-        const auto rotations=CompanionPoseRotations(pose.acting,pose.locomotion);
-        if(!check(actor.Pose(SkinnedClip::Idle,pose.animationSeconds,diagnostic,rotations,&blend) &&
+        if(!check(actor.Pose(SkinnedClip::Idle,pose.animationSeconds,diagnostic,{},&blend) &&
             SameActorContract(contract,actor.Asset()) && ValidActorFrames(actor.Asset()),"production snapshot admits one grounded blended PBR pose"))return false;
         const auto newCurrent=worldBoots(pose);
         if(!check(actor.Pose(pose.walking?SkinnedClip::Walking:SkinnedClip::Idle,frame.legacySeconds,diagnostic),
@@ -478,7 +370,6 @@ int main() {
     }
     if(!CheckCompanionRig(actor,runtimePath,actorClips))++failures;
     if(!CheckCompanionBlend(actor,runtimePath,actorClips))++failures;
-    if(!CheckCompanionTurn(actor,runtimePath,actorClips))++failures;
     for(const auto clip:{SkinnedClip::Idle,SkinnedClip::Walking}) {
         for(float fraction:{0.f,.25f,.5f,.75f}) {
             if(!actor.Pose(clip,fraction*actor.Duration(clip),admission)) return 1;

@@ -1,17 +1,17 @@
 # KIT ANIMATION PLAN 1 7 — WP0 custody and reconciliation
 
-## Bounded stationary turn checkpoint - 20 October 2026
+## Stationary turn experiment unadmitted - 20 October 2026
 
-The [measured turn layer](evidence/2026-10-20-kit-turn/README.md) adds restrained
-alternating leg folds through the existing rig and single skin pass, while route
-roots, facing speed, collision, dialogue and saves remain unchanged. Actual raw
-and admitted soles lift about 48 mm; two production-route turn directions and
-fresh native RT show lift/replacement and return to idle. This is partial
-articulation: world-space planted-foot locking and physical/artistic acceptance
-remain open. Straight walking in place remains rejected. Five focused Release
-suites, Windows builds and four build-only Android ABIs pass. The first failed
-RT fixture admission and the rejected knee-sign draft remain recorded. Keep the
-passing route fixtures parked and return to the existing remaining-scope list.
+The [measured turn trial](evidence/2026-10-20-kit-turn/README.md) demonstrated
+48 mm alternating boot lifts through the existing rig, with unchanged route,
+facing, collision, dialogue and saves. Its later
+[desktop control/candidate/control admission check](evidence/2026-10-20-kit-turn-admission/README.md)
+did not establish comparable acceptable cost. The owned runtime and dependent
+tests are restored to their pre-experiment version; the trial, rejected signs,
+fixture failure and measurements remain retained. Stationary turning is still
+unresolved and world-space foot locking/physical quality remain open. Straight
+walking in place remains rejected. Keep passing route fixtures parked and use
+the existing remaining-scope list rather than extending this experiment.
 
 ## Bounded locomotion checkpoint - 20 October 2026
 
