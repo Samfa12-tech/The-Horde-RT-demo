@@ -1,5 +1,23 @@
 # Horde 1.7 current design index
 
+## Surface-aware footsteps and remaining chapter gaps - local milestone, 20 October 2026
+
+The [bounded dry-footstep checkpoint](../evidence/2026-10-20-surface-aware-footsteps/README.md)
+connects actual support to one simulation-selected cue and reuses four admitted
+FilmCow dirt cuts. Grounded actual travel retains 0.24/0.72 m cadence, wet priority
+and no stationary/wall/pause/rope/teleport/restore contacts. 459 new checks,
+thirteen affected host registrations across retained runs, five selected Java
+tests and both-platform builds pass; initial failures remain in the receipt.
+Audio data is checked; actual listening, Wood/stone cue suitability and physical
+acceptance remain open. Mobile Mist Off, saves and owner work are preserved.
+
+The [current milestone map](HORDE_1_7_MILESTONE_MAP_2026_10_20.md) supersedes older
+next-slice notes below. Debris and directional dodge presentation now have local
+checkpoints. Next reconcile master 11's rescue/forest music continuation against
+the existing owner pack and shared resolver; do not invent a score or new engine.
+Healing policy, debris kicking/option, whole-opening art and physical full-route/
+earned-save/death/listening/warm-performance gates remain substantive gaps.
+
 ## Kit locomotion and current scope - local milestone, 20 October 2026
 
 The [measured locomotion checkpoint](../evidence/2026-10-20-kit-locomotion/README.md)

@@ -396,8 +396,9 @@ int main()
               windowsSource.find("kSfxVolumeSliderId") != std::string::npos &&
               windowsSource.find("kSfxButtonId") == std::string::npos,
               "Windows must persist a separate SFX slider and quiet player footsteps without another primary toggle");
-        check(androidSource.find("\"player_step_1\" : \"player_step_2\", PLAYER_DRY_FOOTSTEP_GAIN,") !=
+        check(androidSource.find("DryFootstepFeedback.soundKey(eventAudioCue)") !=
                   std::string::npos &&
+              androidSource.find("playSpatialSound(dryStepKey, PLAYER_DRY_FOOTSTEP_GAIN,") != std::string::npos &&
               androidSource.find("PLAYER_DRY_FOOTSTEP_GAIN = 0.29f") != std::string::npos &&
               androidSource.find("PLAYER_WET_FOOTSTEP_GAIN = 1.0f") != std::string::npos &&
               androidSource.find("wetFootstepSoundKey(playerStepVariant++)") != std::string::npos &&
@@ -436,7 +437,7 @@ int main()
               androidSource.find("platformEvents[eventIndex + 2]") != std::string::npos,
               "Android must retain bounded ordered event transport with visible overflow");
         const std::size_t androidStopBegin =
-            androidBridgeSource.find("void StopSurfaceInternal()");
+            androidBridgeSource.find("void StopSurfaceInternal(bool preserveGameplay=false)");
         const std::size_t androidStopEnd =
             androidBridgeSource.find("} // namespace", androidStopBegin);
         check(androidStopBegin != std::string::npos && androidStopEnd != std::string::npos &&

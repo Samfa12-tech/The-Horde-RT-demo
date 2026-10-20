@@ -36,6 +36,15 @@ front view includes the full body/boots, while ordinary peripheral crop and
 artistic/live-sequence/physical acceptance remain distinct. Locomotion joins,
 turn-foot quality and fuller acting remain partial integration.
 
+The [surface-aware dry-footstep follow-up](../evidence/2026-10-20-surface-aware-footsteps/README.md)
+now carries actual support and alternating cues through the existing event/audio
+paths. It reuses admitted dirt cuts, retains the generic Stone/Wood fallback and
+adds no asset or layer. Grounded/teleport/rope/pause/restore and actual terrain
+boundary checks pass; cue listening, Wood/stone suitability and physical route
+acceptance remain open. Master 11's rescue/forest music-state continuation still
+needs reconciliation against the existing owner pack; this is a source gap,
+not a request for another engine or paid score.
+
 ## Authority and status meanings
 
 The scoped authority is the preserved [Beyond the Tomb plan](../references/horde-1.7/d37f1638/docs/superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md),

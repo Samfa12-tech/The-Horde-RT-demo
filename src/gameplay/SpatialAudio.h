@@ -86,10 +86,10 @@ private:
 class TravelFootstepCadence
 {
 public:
-    bool Update(float travelledMetres, bool movementIntended)
+    bool Update(float travelledMetres, bool movementIntended, bool grounded = true)
     {
         travelledMetres = std::max(0.0f, travelledMetres);
-        if (!movementIntended)
+        if (!movementIntended || !grounded)
         {
             Reset();
             return false;

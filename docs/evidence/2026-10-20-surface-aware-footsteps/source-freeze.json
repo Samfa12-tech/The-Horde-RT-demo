@@ -1,0 +1,70 @@
+{
+  "sourceBase": "d15be5e000602e96e000a3da8b7b0a540efa6903",
+  "sources": {
+    "CMakeLists.txt": {
+      "bytes": 112813,
+      "sha256": "1d7c891ceb17ad6f30b6059003053a6d9519e202dcc83458174aa38b3dc8cd39",
+      "gitBlob": "4d73fe6ff7f475045ff1b1a080abc9dea08b8bf7"
+    },
+    "src/gameplay/DryFootstepFeedback.h": {
+      "bytes": 3153,
+      "sha256": "94ec96f876c80914ce25911e47741f3b114fc4c1a8ff831c4b16cb8c89b8c3f8",
+      "gitBlob": "f9aa3f2f92d00647138ef777a4db23c91c68de0a"
+    },
+    "src/gameplay/SpatialAudio.h": {
+      "bytes": 7452,
+      "sha256": "8a8b830666ced8ed2fb9a165823c3cf74d505d21594d88e57e57b085f6881070",
+      "gitBlob": "b210441f706baaac03fb6bb01fd451716b7e9a1f"
+    },
+    "src/gameplay/simulation/GameSimulation.h": {
+      "bytes": 21930,
+      "sha256": "bccc6c7e762f823b5fa7ce9bcbf0ca9837d4144af16be7e0f25083e084bd7bcd",
+      "gitBlob": "f2b4eae374d5ad0bb6d4264cb0016bd73754de9b"
+    },
+    "src/gameplay/simulation/GameSimulation.cpp": {
+      "bytes": 136549,
+      "sha256": "9cd39cb8e2a1e42b3d24b2591f71609b75d1f1919bd9bb4470d0bb7407d2f93b",
+      "gitBlob": "e9fb44eb82648b87e9ac25f12fa44c8c3601510b"
+    },
+    "src/gameplay/simulation/GameSimulationRescue.cpp": {
+      "bytes": 11628,
+      "sha256": "6db10869ade03e08930c96a1803f01eb30e93f4d3434f7e025fdd371b0527c97",
+      "gitBlob": "65385c8c91eded861b2f417182460405ccae18d4"
+    },
+    "src/platform/android/GameplayEventMetadata.h": {
+      "bytes": 1937,
+      "sha256": "81925c4b35eef66f355525a347fedd05d01f4ce7ba80a37912cb89bf181bf13a",
+      "gitBlob": "aff37ca8ec64b67bd54c25c5dccefb6eaadef9fa"
+    },
+    "src/platform/windows/DiagnosticWindow.cpp": {
+      "bytes": 603563,
+      "sha256": "022143a0cf2bfe8adb0d0a09c4c2a3c63b368548af0f11ad264dea7ad5aaeaca",
+      "gitBlob": "2eb600fe966884bbfb349ebb08cd1a5e2ceb3bee"
+    },
+    "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java": {
+      "bytes": 472587,
+      "sha256": "f2d0a11ed331e45d2cd26ac252e420f2fa8f05730209021fef1ac2f17bc57e49",
+      "gitBlob": "dc3a12416ba5505b48e0c186cee67f69abc5b9c6"
+    },
+    "android/app/src/main/java/com/samfa12/hordelanternrt/DryFootstepFeedback.java": {
+      "bytes": 558,
+      "sha256": "5fce305b5afb5d7fc577f3187a312207a5dfdaa5854d9cdec3480fa213402ecd",
+      "gitBlob": "3a5d802d20bb2de3dd87e331eb06e5ba397c5a2e"
+    },
+    "android/app/src/test/java/com/samfa12/hordelanternrt/DryFootstepFeedbackTest.java": {
+      "bytes": 799,
+      "sha256": "96dd819c603aec45327f21d2273dd8f345a032a2341fe89070c28859af6d401e",
+      "gitBlob": "8e892c04a70bce272b313fbed91db1b7bf36b569"
+    },
+    "tests/SpatialAudioSmoke.cpp": {
+      "bytes": 37724,
+      "sha256": "0189803aac9326337434a103d3415f2e62bca33363fbe8978cfdf2ce170558c9",
+      "gitBlob": "23f55331e799395f93b343fef9e18d96188e4e30"
+    },
+    "tests/DryFootstepTests.cpp": {
+      "bytes": 20683,
+      "sha256": "3e80d05a663ff5b4806c4c287d1811b5653c73a7c7effe00fe68c443bb258538",
+      "gitBlob": "af2b20ff7f404c3d4021012afc9a77e6eb9a6ef3"
+    }
+  }
+}

@@ -1148,6 +1148,14 @@ if(BUILD_TESTING)
     target_link_libraries(horde_rt_water_contact_tests PRIVATE horde_gameplay_simulation)
     add_test(NAME horde_rt_water_contact_tests COMMAND horde_rt_water_contact_tests)
 
+    add_executable(horde_rt_dry_footstep_tests tests/DryFootstepTests.cpp
+        src/scene/assets/AssetManifest.cpp src/scene/assets/AssetValidation.cpp
+        src/scene/assets/GltfDocument.cpp src/scene/assets/StaticMeshAsset.cpp)
+    target_include_directories(horde_rt_dry_footstep_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/third_party)
+    target_link_libraries(horde_rt_dry_footstep_tests PRIVATE horde_gameplay_simulation)
+    add_test(NAME horde_rt_dry_footstep_tests COMMAND horde_rt_dry_footstep_tests ${CMAKE_CURRENT_SOURCE_DIR})
+    set_tests_properties(horde_rt_dry_footstep_tests PROPERTIES TIMEOUT 60)
+
     add_executable(horde_rt_waterfall_production_route_tests tests/WaterfallProductionRouteTests.cpp)
     target_include_directories(horde_rt_waterfall_production_route_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     target_link_libraries(horde_rt_waterfall_production_route_tests PRIVATE horde_gameplay_simulation)

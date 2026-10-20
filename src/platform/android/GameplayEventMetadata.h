@@ -1,6 +1,7 @@
 #pragma once
 
 #include "gameplay/EquipmentFeedback.h"
+#include "gameplay/DryFootstepFeedback.h"
 
 #include <bit>
 #include <cstdint>
@@ -18,10 +19,13 @@ static_assert(static_cast<std::uint8_t>(gameplay::simulation::GameplayEventType:
 [[nodiscard]] constexpr std::uint64_t PackGameplayEventMetadata(
     const gameplay::simulation::GameplayEvent& event) noexcept
 {
+    const auto cue = event.type == gameplay::simulation::GameplayEventType::PlayerFootstep
+        ? static_cast<std::uint8_t>(gameplay::DryFootstepCueForEvent(event))
+        : static_cast<std::uint8_t>(gameplay::EquipmentCueForEvent(event));
     return static_cast<std::uint64_t>(event.type) |
         (static_cast<std::uint64_t>(event.source) << 8u) |
         (static_cast<std::uint64_t>(event.target) << 16u) |
-        (static_cast<std::uint64_t>(gameplay::EquipmentCueForEvent(event)) << 24u) |
+        (static_cast<std::uint64_t>(cue) << 24u) |
         ((event.sequence & 0xffffffffu) << 32u);
 }
 

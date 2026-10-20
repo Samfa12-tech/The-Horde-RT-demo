@@ -76,6 +76,7 @@ void GameSimulation::StepRescueJourney(bool paused) {
         rescueTraversal_.RecoverForReconstruction();
     rescueMovementSuppressedThisTick_=wasActive||rescueTraversal_.IsActive();
     if(rescueMovementSuppressedThisTick_) {
+        ResetPlayerFootsteps();
         posture_={};ClearCrouchIntent();
         const auto& s=rescueTraversal_.Snapshot();
         playerX_=s.playerPosition.x;playerZ_=s.playerPosition.z;

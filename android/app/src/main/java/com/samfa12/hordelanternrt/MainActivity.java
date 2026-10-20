@@ -6149,7 +6149,7 @@ public class MainActivity extends Activity {
                     final long verticalMetadata = platformEvents[eventIndex + 2];
                     final int eventType = (int) (metadata & 0xffL);
                     final int targetEntity = (int) ((metadata >>> 16) & 0xffL);
-                    final int equipmentAudioCue = (int) ((metadata >>> 24) & 0xffL);
+                    final int eventAudioCue = (int) ((metadata >>> 24) & 0xffL);
                     final long eventSequence = (metadata >>> 32) & 0xffffffffL;
                     switch (eventType) {
                         case PLATFORM_EVENT_FOREST_BIRD:
@@ -6173,8 +6173,8 @@ public class MainActivity extends Activity {
                                     stereoGains, verticalMetadata);
                             break;
                         case PLATFORM_EVENT_PLAYER_FOOTSTEP:
-                            playSpatialSound((playerStepVariant++ & 1) == 0 ?
-                                    "player_step_1" : "player_step_2", PLAYER_DRY_FOOTSTEP_GAIN,
+                            final String dryStepKey = DryFootstepFeedback.soundKey(eventAudioCue);
+                            if (dryStepKey != null) playSpatialSound(dryStepKey, PLAYER_DRY_FOOTSTEP_GAIN,
                                     stereoGains, verticalMetadata);
                             break;
                         case PLATFORM_EVENT_PLAYER_SWING:
@@ -6267,12 +6267,12 @@ public class MainActivity extends Activity {
                             break;
                         case PLATFORM_EVENT_PLAYER_SWORD_ATTACHMENT_CHANGED:
                             final String equipmentKey = EquipmentAudioFeedback.soundKey(
-                                    eventType, equipmentAudioCue, !menuVisible &&
+                                    eventType, eventAudioCue, !menuVisible &&
                                     !diagnosticsVisible && !graphicsVisible &&
                                     !deathOverlayVisible && !endingOverlayVisible);
                             if (equipmentKey != null) {
                                 playSound(equipmentKey,
-                                        equipmentAudioCue == EQUIPMENT_AUDIO_SWORD_DRAW ? 0.26f : 0.24f);
+                                        eventAudioCue == EQUIPMENT_AUDIO_SWORD_DRAW ? 0.26f : 0.24f);
                             }
                             break;
                         case PLATFORM_EVENT_KEEPER_REVEAL_STARTED:

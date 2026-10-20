@@ -14,7 +14,8 @@ This is a current reconciliation, not release approval or new feature scope.
 | Regional world and sound | r23 terrain has 37,846 triangles; 42 atlas-derived finite river/lake/outflow faces and real RT depth/transport have paired native backend surveys. Pond frog/cricket playback uses actual water proximity; owl/cricket cuts also exist. | Full-map/shoreline/lookout composition, night listening and phone warm cost remain unaccepted. Cicadas remain excluded. Playable town stays 1.8. These are existing implementations, not missing work to repeat. |
 | Tomb story/decay | Campaign omits legacy material/demo cards and swatches; burial bier, niches, remains, candles, displaced lid and Keeper offerings establish a partial story composition. [Six sparse original floor chips](../evidence/2026-10-20-tomb-floor-debris/README.md) now sit beneath damaged masonry: 72 triangles, 14,688 payload bytes, existing material/primitive and unchanged collision/save ownership. Both native RT backends have matched off/on evidence. | Whole-opening art, live movement/contact and phone readability/warm cost remain open. Kicking and a player-facing debris option are not implemented. Debug omission verifies disabled geometry only; add an actual option or omit the detail if mobile cost proves unacceptable. |
 | Player movement presentation | Walk/run/back/strafe, shared four-direction dodge displacement/protection, low-ceiling sword lowering and alternating rope hand targets exist. [Dedicated procedural dodge presentation](../evidence/2026-10-20-player-dodge-poses/README.md) now uses the existing accepted direction/timer, with 562 native rig samples, real rope/restore cancellation tests and paired native RT transitions with torch/lantern. | Full artistic/live movement, physical motion/aim/grip/comfort and warm phone acceptance remain open. Idle/Walking remain the imported locomotion clips; the new dodge is an explicit procedural layer, not new imported run/back/strafe clips. |
-| Surface-aware travel sound | Actual support already classifies Stone/Earth/Wood; authored terrain distinguishes earth/stone. Distance cadence and shallow-water contact/cues exist. | Dry step events still carry payload zero and use the same two generic clips. Surface-to-event/cue dispatch is the next planned bounded implementation, subject to suitable existing/licensed material cues and later listening acceptance. No new bridge or audio engine. |
+| Surface-aware travel sound | [Shared dry-contact selection](../evidence/2026-10-20-surface-aware-footsteps/README.md) now carries actual support and alternating variants from simulation through both platforms. Earth reuses admitted dirt 17/18; Stone retains the accepted generic dirt 9/14 pair. Existing distance cadence/wet priority, grounded/teleport/rope/pause/restore gates have host coverage. | Listening, Earth/default mix and run-tail overlap remain unaccepted; Earth full-file RMS is about 6 dB lower. Wood uses the explicit generic fallback; no suitable wood-floor/verified new stone recording is admitted. This is bounded dispatch, not completion of every 5.5 audio/physical gate. |
+| Chapter music continuation | Existing owner-supplied A-H pack, shared MusicDirector and accepted audio backend are integrated. Keeper reveal has its existing gain envelope. | Master 11's rescue/forest continuation has no explicit route-state selection. Legacy F/G/H logic applies: inactive defeated states resolve F; natural pickup can run G then H. Reconcile natural/restored chapter transitions and existing cue roles before a bounded shared resolver/test slice. No new engine, score purchase or unreviewed recomposition. |
 | Performance and final candidate | Exact-zero mist early exit measured about 18% GPU improvement in a cleared tomb. Rejected quality/thermal-confounded trials stay rejected. Sam explicitly selected mobile Mist Off; current startup/reset policy also has it Off. | Keeper two-light cost, exterior display spacing and sustained warm 30 FPS remain unresolved. No new phone action is authorized by this map, no sustained gain is inferred from host captures, and no final release matrix is complete. |
 
 ## Next source slice
@@ -33,25 +34,31 @@ native RT frames pass. Real rope/restore host fixtures cannot establish naturall
 earned saves, physical feel or a new hostile-death pass. Pause keeps its existing
 dodge-cancellation policy. Short Debug timing is not sustained or phone evidence.
 
-Next finish **surface-aware dry footstep dispatch**, accepted master 5.5.
-[Support triangles](../../src/gameplay/simulation/TriangleSupportSurface.h) already
-carry Stone/Earth/Wood, and
-[authored terrain](../../src/scene/ChapterTerrainSurface.h) assigns earth/stone.
-Do not rebuild that classification. The missing link is the actual supporting
-surface in dry-footstep event payloads and shared cue selection: current
-[emission](../../src/gameplay/simulation/GameSimulation.cpp) uses payload zero,
-while platform playback alternates the same two dry clips.
+The [surface-aware dry footstep checkpoint](../evidence/2026-10-20-surface-aware-footsteps/README.md)
+now implements that missing dispatch using actual support, two simulation-selected
+variants per audible family and already admitted PCM. It adds no assets or audio
+layer. 459 new host checks, thirteen affected registrations across retained runs,
+five selected Java tests and Windows/four-ABI Android builds pass. The original
+restricted-run save timeout and stale source-contract failure remain recorded.
+Wood/verified stone cue suitability and actual listening are still open. Do not
+relabel this as physical acceptance or require new audio simply to fill a roster.
 
-First audit local licensed cue availability, then implement the small typed
-surface/event/cue mapping for surfaces genuinely present. Keep the existing
-cadence, normalized movement, wall/pause/rope/restore suppression, water contact
-priority and safe untagged-ground default. Boundary changes must not replay a
-contact. Preserve provenance; if no suitable material cue exists, retain that
-asset gap rather than inventing a surface sound or spending. This subsequent
-audio/transport change needs listening revalidation; it is not part of the
-current visual checkpoint. Low-ceiling weapon lowering and alternating rope
-hands are already implemented. Healing still requires the master's bounded
-policy decision rather than invented refill rules.
+Next reconcile **rescue/forest music continuation**, accepted master 11. The
+existing [MusicDirector](../../src/audio/MusicDirector.cpp) has no explicit
+rescue/exterior/forest state selection. Legacy F/G/H rules apply: defeated
+inactive states resolve F; natural pickup can run G then H. This source finding
+is not listening evidence. The [owner-supplied A-H pack](../../assets/audio/music/what-the-dark-keeps/asset.manifest.json)
+exists. Audit those admitted cue roles against natural/restored chapter transitions, then
+define the smallest shared resolver/transition-test slice and its listening gate.
+Do not add an audio engine, recompose the accepted pack or buy/generate a score.
+This follow-up is identified, not implemented by the dry-footstep checkpoint.
+
+First usable recovery still needs master 10.5's bounded capacity/refill/use/death/
+save decision; nearby debris kicking and a player-facing debris option remain
+substantial source gaps. Low-ceiling weapon lowering, alternating rope hands,
+regional water and species calls are already implemented. Keep whole-opening art,
+live control/audio and sustained cost acceptance explicit instead of expanding
+heavy outdoor content or looping indefinitely on polish.
 
 When Sam resumes physical testing, the highest-priority acceptance is the coherent
 normal tomb-to-lookout/return and save/death path on the exact candidate, with

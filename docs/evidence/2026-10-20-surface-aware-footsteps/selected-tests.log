@@ -1,0 +1,63 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+      Start  35: horde_rt_campaign_play_session_tests
+ 1/13 Test  #35: horde_rt_campaign_play_session_tests ........***Timeout  30.01 sec
+FAIL: seed first manual
+FAIL: seed third manual
+FAIL: catalogue distinguishes six fixed records with actual checkpoint/hearts
+FAIL: first strict boundary autosaves only after explicit active slot
+FAIL: saved target reads
+FAIL: manual can save latest boundary after moving/crouching
+FAIL: saved target reads
+FAIL: successful completion is delivered once while State retains success
+FAIL: prepare another existing slot
+FAIL: cancelled load leaves game active slot and live simulation unchanged
+FAIL: different load target reads
+FAIL: load target is not active before commit
+FAIL: new authored boundary autosaves active loaded slot
+FAIL: saved target reads
+FAIL: upper autosave preserves lower manual checkpoint
+FAIL: saved target reads
+FAIL: explicit retry yields one fresh success receipt
+FAIL: postpublish uncertainty cannot report saved
+ordinary lower live=-34.0119,-17.5184 boundary=1 rope=1
+FAIL: chapter-earned lower autosave completes real disk publication
+FAIL: saved target reads
+FAIL: earned lower autosave is the supported canonical safe anchor and has a real publication receipt
+FAIL: chapter-earned lower manual checkpoint completes real disk publication
+
+      Start  40: horde_rt_campaign_codec_tests
+ 2/13 Test  #40: horde_rt_campaign_codec_tests ...............   Passed    0.03 sec
+      Start  45: horde_rt_campaign_checkpoint_tests
+ 3/13 Test  #45: horde_rt_campaign_checkpoint_tests ..........   Passed    2.69 sec
+      Start  47: horde_rt_combat_foundation_tests
+ 4/13 Test  #47: horde_rt_combat_foundation_tests ............   Passed    1.42 sec
+      Start 101: horde_rt_player_dodge_presentation_tests
+ 5/13 Test #101: horde_rt_player_dodge_presentation_tests ....   Passed    1.49 sec
+      Start 148: horde_rt_simulation_gameplay_tests
+ 6/13 Test #148: horde_rt_simulation_gameplay_tests ..........   Passed    1.48 sec
+      Start 149: horde_rt_water_contact_tests
+ 7/13 Test #149: horde_rt_water_contact_tests ................   Passed    1.41 sec
+      Start 150: horde_rt_dry_footstep_tests
+ 8/13 Test #150: horde_rt_dry_footstep_tests .................   Passed    1.81 sec
+      Start 157: horde_rt_sfx_volume_tests
+ 9/13 Test #157: horde_rt_sfx_volume_tests ...................   Passed    1.29 sec
+      Start 184: horde_rt_spatial_audio_smoke
+10/13 Test #184: horde_rt_spatial_audio_smoke ................***Failed    1.36 sec
+Spatial audio smoke failed: Android Home teardown must clear queued immediate cues and runtime polling must dispatch only for the resumed active surface
+
+      Start 210: horde_rt_rescue_traversal_tests
+11/13 Test #210: horde_rt_rescue_traversal_tests .............   Passed    1.55 sec
+      Start 212: horde_rt_rescue_journey_integration_tests
+12/13 Test #212: horde_rt_rescue_journey_integration_tests ...   Passed    1.45 sec
+      Start 213: horde_rt_chapter_terrain_journey_tests
+13/13 Test #213: horde_rt_chapter_terrain_journey_tests ......   Passed   17.67 sec
+
+85% tests passed, 2 tests failed out of 13
+
+Total Test time (real) =  63.70 sec
+
+The following tests FAILED:
+	 35 - horde_rt_campaign_play_session_tests (Timeout)
+	184 - horde_rt_spatial_audio_smoke (Failed)
+Errors while running CTest

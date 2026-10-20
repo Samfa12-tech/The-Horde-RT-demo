@@ -2308,9 +2308,9 @@ void DrainGameplayEvents(VulkanSurfaceContext& context)
             break;
         case GameplayEventType::PlayerFootstep:
         {
-            const char* clip = (context.playerFootstepVariant++ & 1) == 0
-                ? "player_step_1.wav" : "player_step_2.wav";
-            PlayAmbientSoundEffect(context, clip, horde::audio::kPlayerFootstepCueGain);
+            const char* clip = horde::gameplay::DryFootstepClip(
+                horde::gameplay::DryFootstepCueForEvent(event));
+            if (clip) PlayAmbientSoundEffect(context, clip, horde::audio::kPlayerFootstepCueGain);
             break;
         }
         case GameplayEventType::PlayerSwing:

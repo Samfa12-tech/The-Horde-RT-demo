@@ -183,7 +183,7 @@ std::uint32_t GameSimulation::AdvanceFrame(const InputSnapshot& publishedInput,
         CancelCombatTransients();
         walkVisualAmount_ = 0.0f;
         snapshot_.playerTravelledThisTick = 0.0f;
-        playerFootsteps_.Reset();
+        ResetPlayerFootsteps();
         for (PlayerFootstepCadence& cadence : enemyFootsteps_)
         {
             cadence.Reset();
@@ -351,7 +351,7 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
         StepRescueJourney(true);
         snapshot_.playerTravelledThisTick = 0.0f;
         walkVisualAmount_ = 0.0f;
-        playerFootsteps_.Reset();
+        ResetPlayerFootsteps();
         for (PlayerFootstepCadence& cadence : enemyFootsteps_)
         {
             cadence.Reset();
@@ -478,7 +478,7 @@ void GameSimulation::SynchronizePausedInput(const InputSnapshot& input,
     CancelCombatTransients();
     ClearRunIntent();
     walkVisualAmount_ = 0.0f;
-    playerFootsteps_.Reset();
+    ResetPlayerFootsteps();
     for (PlayerFootstepCadence& cadence : enemyFootsteps_)
         cadence.Reset();
     fixedStepRunner_.ResetAccumulator();
@@ -1505,7 +1505,7 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
                           lichHasLineOfSight,
                           finaleActive);
     playerVitals_.ResetForEncounter();
-    playerFootsteps_.Reset();
+    ResetPlayerFootsteps();
     for (PlayerFootstepCadence& cadence : enemyFootsteps_)
     {
         cadence.Reset();
@@ -1935,7 +1935,7 @@ void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSecon
         ClearRunIntent();
         snapshot_.playerTravelledThisTick = 0.0f;
         walkVisualAmount_ = 0.0f;
-        playerFootsteps_.Reset();
+        ResetPlayerFootsteps();
         return;
     }
     if (pendingDodgeCommands_ > 0u)
@@ -2087,7 +2087,9 @@ void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSecon
     runActive_ = runRequested && travelled > 0.00001f && dodgeRemainingSeconds_ <= 0.0f;
     const float blend = std::clamp(deltaSeconds * 8.0f, 0.0f, 1.0f);
     walkVisualAmount_ += (movementIntent - walkVisualAmount_) * blend;
-    const bool footstep = playerFootsteps_.Update(travelled, movementIntent > 0.02f);
+    const bool footstep = playerFootsteps_.Update(travelled,
+                                                movementIntent > 0.02f && !input.hasAuthoritativePlayerPose,
+                                                playerSupport_.grounded);
     const auto wetContact = CurrentCombatRules() ? waterContact_.Step(deltaSeconds,
         playerX_,playerSupport_.worldY,playerZ_,playerSupport_.grounded,footstep,
         deltaSeconds>0 ? travelled/deltaSeconds : 0,lastInput_.waterfallWidthScale)
@@ -2097,12 +2099,13 @@ void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSecon
              playerX_,playerZ_,.35f,0,playerSupport_.worldY+.85f);
     if (footstep)
     {
-        Emit(wetContact.wetStep && config_.combatFoundation1_7 && !legacyCombatCheckpoint_
-                 ? GameplayEventType::PlayerWetFootstep : GameplayEventType::PlayerFootstep,
+        const bool wetStep = wetContact.wetStep && CurrentCombatRules();
+        Emit(wetStep ? GameplayEventType::PlayerWetFootstep : GameplayEventType::PlayerFootstep,
              EntityId::Player,
              EntityId::Invalid,
              playerX_,
-             playerZ_,wetContact.wetStep ? wetContact.intensity : 1.f,0,
+             playerZ_,wetContact.wetStep ? wetContact.intensity : 1.f,
+             wetStep ? 0 : dryFootstepCues_.Next(playerSupport_.surface),
              wetContact.wetStep ? playerSupport_.worldY : 0.f);
     }
 }

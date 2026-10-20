@@ -7,6 +7,7 @@
 
 #include "gameplay/ShowcaseGameplay.h"
 #include "gameplay/SpatialAudio.h"
+#include "gameplay/DryFootstepFeedback.h"
 #include "gameplay/SwordCombat.h"
 #include "gameplay/effects/FireEmitterState.h"
 #include "gameplay/effects/WaterContact.h"
@@ -229,6 +230,7 @@ private:
     bool ConsumeWorldCommand();
     bool ApplyCheckpoint(std::int32_t checkpointId, bool isRetry);
     void ResolvePlayerSupport();
+    void ResetPlayerFootsteps() { playerFootsteps_.Reset(); dryFootstepCues_.Reset(); }
     void ResolveMovementCollision(float previousX, float previousZ);
     void ResetPlayerSupport();
     void UpdateMovement(const InputSnapshot& input, float deltaSeconds);
@@ -319,6 +321,7 @@ private:
     horde::gameplay::interactions::LanternPendulum lanternPendulum_{};
     PlayerVitals playerVitals_{};
     TravelFootstepCadence playerFootsteps_{};
+    DryFootstepSequence dryFootstepCues_{};
     horde::gameplay::effects::WaterContact waterContact_{};
     std::array<PlayerFootstepCadence, kSkeletonEnemyCapacity> enemyFootsteps_{};
     std::array<double, kSkeletonEnemyCapacity> skeletonIncidentalIdleSeconds_{};
