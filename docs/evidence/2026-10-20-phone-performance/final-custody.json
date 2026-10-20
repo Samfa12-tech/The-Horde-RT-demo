@@ -1,0 +1,18 @@
+{
+  "package": "com.samfa12.hordelanternrt.debug",
+  "deviceSerial": "R5GL219SZGK",
+  "model": "SM-S948B",
+  "installedApkSha256": "e699bfa82a784827ade52b440e40eb0e4df39da4faa03f3c269959566e09d57e",
+  "debugPid": null,
+  "campaignRecordsAndLocksByteExact": 12,
+  "ownerSettingsSha256": "e3966b09cd9c354cb92833496b7f812139178dd7b2a906a4f809dbf9538c3dee",
+  "ownerSettingsByteExact": true,
+  "ownerSavedMist": true,
+  "newStartupResetMistDefault": false,
+  "releaseAppTouched": false,
+  "dataCleared": false,
+  "combatInputs": 0,
+  "publicPush": false,
+  "reefOperations": 0,
+  "note": "Android-maintained ActivityThread ID metadata changed earlier; no restoration attempted. Existing explicit MistOn preserved throughout diagnostic comparisons."
+}

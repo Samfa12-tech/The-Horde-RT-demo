@@ -1,5 +1,26 @@
 # Horde 1.7 current design index
 
+## Current phone cost and mobile Mist Off checkpoint - 20 October 2026
+
+The [fresh physical performance checkpoint](../evidence/2026-10-20-phone-performance/README.md)
+measures current player/Kit skinning and separate pose-copy cost, retains honest
+failed quality trials and fixes exact graphics presentation before motion arming.
+Android fresh/reset defaults now select Mist Off for the owner's chuggy two-light
+Keeper case; existing explicit choices remain saved. Neither Mist Off nor the
+combined low-cost profile establishes useful extra saving in the cleared route.
+No CPU reorder or additional Fire/Dust default is adopted. Seven finite timed
+attempts include one rejected ownership run; a closing control fails preparation.
+Android 360/360 and focused tests pass, while two old native inventory/source
+checks and natural combat/save/whole-chapter acceptance remain open.
+
+Current r23 regional terrain and bounded real-RT water are already local on the
+existing WP2 branch. Two original hidden Windows RT devlog images are saved in
+Library with exact diagnostic provenance; they are not mobile or earned-route
+acceptance. No heavy asset expansion, public push/release, Reef interference or
+retry of the denied phone combat action occurs. The next bounded slice is current
+contact/target-separation evidence plus a noncombat live two-light fixture;
+immutable CPU preparation needs ownership/freshness proof before an overlap trial.
+
 ## Nocturnal ambience progresses independently - 18 October 2026
 
 The [bounded nature-audio slice](../evidence/2026-10-18-night-ambience/README.md)

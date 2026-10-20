@@ -5,7 +5,8 @@ This file records locked decisions for the native Vulkan hardware ray-tracing de
 ## Mobile Mist Off default and bounded performance trials — 2026-10-20
 
 The owner now selects Mist Off for Android fresh-install and staged Reset Defaults
-while lower-cost mist is investigated. This supersedes only the Mist On part of
+because mist plus the two lights made the Keeper fight chuggy on the phone.
+This supersedes only the Mist On part of
 the October 5 mobile default below. Preserve all existing explicit saved choices,
 the historical accepted preset and Windows defaults. The owner's accepted 40%
 resolution is permitted for measured phone trials; it is not a silent new default.

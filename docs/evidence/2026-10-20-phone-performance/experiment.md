@@ -89,3 +89,10 @@ start gate, the same bounded settling protocol and current-HAL/power collection.
 Individual FireLow and DustOff remain unmeasured, and old A3 does not become a
 causal control for this new binary. Stop the phone lane on any further ownership
 or strict presentation failure. No budget extension or candidate retry is allowed.
+
+A5 completed after exact graphics serial2 presented before the motion armed;
+its starting AP/BAT/SKIN were42.3/29.6/34.6 C. Prepare the remaining attempts
+only below AP33.3/BAT29.4/SKIN32.0 C within the existing180 s passive bound,
+then retain the actual unchanged1.5 C per-sensor A5 admission. These preparation
+ceilings do not replace or relax the route-start gate. No causal inference from
+thermal status alone or control/trial differences below3% is permitted.

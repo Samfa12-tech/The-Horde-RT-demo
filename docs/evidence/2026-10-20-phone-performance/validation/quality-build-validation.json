@@ -9,5 +9,5 @@
   "logSha256": "749874651c941ffa8a2c32ac2f296ede6d80a92db8ec820468b163f1e46dcb14",
   "pythonCpuAnalyzer": "5/5 passed",
   "nativeGraphicsDefaults": "Release1/1 passed; prior source summary",
-  "limits": "Robolectric JNI shadow validates rejected replacement gate retention; native current-device ownership integration pending."
+  "limits": "360 Java/Robolectric tests pass; actual A5 and combinedE1 device logs prove exact graphics serial2 presented before motion armed. Environment-survey earlyreturn regression was caught, preserved and repaired. No touch/lifecycle owner acceptance claimed."
 }

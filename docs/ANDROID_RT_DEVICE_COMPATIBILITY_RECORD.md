@@ -1,5 +1,35 @@
 # Android RT Device Compatibility Record
 
+## 2026-10-20 - mobile Mist Off default and bounded quality comparison
+
+Exact SM-S948B / Android 17 API 37 / Adreno 840 / driver 2150932499 evidence:
+installed Debug APK `e699bfa82a784827ade52b440e40eb0e4df39da4faa03f3c269959566e09d57e`
+from 9f9da695 uses real Pipeline RT, production Shipping/Mobile shaders and 40%
+(576 x 1188 internal / 1440 x 2971 output). New Android fresh/reset defaults select
+Mist Off following the owner's two-light Keeper report; existing saved choices
+are preserved. The current saved phone choice remains Mist On.
+
+One combined Mist Off / Fire Low / Dust Off trial has exact lower-room GPU
+54.419 ms versus 53.992 ms control, actual display medians 62.500/62.500 ms;
+repeat-ascent GPU 137.623 versus 137.023 ms, display 154.167/154.167 ms. The earlier
+same-APK Mist Off pair is also below the 3% useful-gain threshold. Neither admits
+an additional quality default or tests the live Keeper fight. Current-HAL start
+and end comparisons pass the unchanged 1.5 C gate at framework 0, with USB charging
+recorded but GPU clocks/power unmeasured. Closing control fails its 180 s passive
+preparation bound before launch. Individual Fire/Dust and visual acceptance stay
+open. Whole-route intervals remain far above 33.333 ms; no sustained 30 FPS claim.
+
+A failed Fire attempt exposed asynchronous graphics/motion ordering; the native
+ownership guard aborted correctly. The fixed path waits exact serial/surface/
+full tuple/successful RT presentation before arming, with 30 s timeout and pause
+cancellation. Corrected control and combined runs strictly join actual display
+ownership. All 360 Android tests pass. Six valid routes / 4,209 completed frames,
+one failed timed attempt and two rejected preparations are preserved. All 12
+campaign records/locks and Horde settings remain byte-exact, Debug stopped,
+release app untouched. Evidence class: **bounded noncombat production-shader
+quality timing; incomplete comparison, no earned/live-combat acceptance**.
+[Checkpoint, limits, failures and exact receipts](evidence/2026-10-20-phone-performance/README.md).
+
 ## 2026-10-20 — fresh CPU/GPU baseline at preserved 40% settings
 
 SM-S948B / Android 17 API 37 / Adreno 840 / driver 2150932499 presents the
