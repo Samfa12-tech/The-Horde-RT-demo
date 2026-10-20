@@ -1,5 +1,18 @@
 # Horde 1.7 current design index
 
+## Outdoor route inspection - local checkpoint, 20 October 2026
+
+The [route inspection checkpoint](../evidence/2026-10-20-outdoor-route-inspection/README.md)
+repairs three diagnostic fixtures that used legacy movement and stopped at the
+real trail root. Existing accepted-hit/death seeding now enables the current
+bounded motor; no production placement, collision, route, save or lighting change.
+Six affected CTests and four hidden native RT shots pass, with Windows/Android
+Debug builds. Selected views retain trail/landmark readability; this is not a
+full composition or physical acceptance pass. The failed capture and red tests
+remain. A one-pine static LOD2 A/B is the selected small next investigation;
+no derivative, wind owner, new capacity or measured saving is adopted. The six
+recovery choices remain pending without blocking independent work.
+
 ## Dialogue bed balance and complete remaining scope - local milestone, 20 October 2026
 
 The [dialogue ducking checkpoint](../evidence/2026-10-20-dialogue-ducking/README.md)

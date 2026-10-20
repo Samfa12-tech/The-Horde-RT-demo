@@ -8,6 +8,10 @@ This is a current reconciliation, not release approval or new feature scope.
 The [complete remaining-scope inventory](HORDE_1_7_REMAINING_SCOPE_2026_10_20.md)
 separates unfinished implementation/content, physical acceptance and conditional
 work, with the six unchanged healing choices for morning.
+The [current route inspection](../evidence/2026-10-20-outdoor-route-inspection/README.md)
+repairs three legacy-policy diagnostic fixtures and verifies actual root traversal
+before fresh native RT shots. It makes no production placement/collision change;
+selected bend/lookout views retain trail and distant-landmark readability.
 
 | Milestone | Implemented and evidenced | Remaining acceptance or implementation |
 | --- | --- | --- |
@@ -74,9 +78,13 @@ multiplier once. Short gaps hold current gain, an interrupted attack does not
 deepen after speech stops, and release/reentry begins at current gain. Actual
 listening and platform output recovery remain separate acceptance gates.
 
-Next reconcile **first recovery's six morning choices and unfinished outdoor
-features**, then validate the coherent natural route/save/death path when owner
-testing resumes. The [remaining-scope inventory](HORDE_1_7_REMAINING_SCOPE_2026_10_20.md)
+Keep **first recovery's six morning choices pending for Sam** while independent
+work continues. The next selected small outdoor investigation is one original
+pine LOD2 derivative in a Debug-only static-bake A/B with exact payload/resource
+and native near/mid/far/secondary-view comparison. Current trees remain LOD1;
+no wind owner, runtime LOD transition, capacity increase or saving is claimed.
+Validate the coherent natural route/save/death path when owner testing resumes.
+The [remaining-scope inventory](HORDE_1_7_REMAINING_SCOPE_2026_10_20.md)
 retains participating mist/fireflies/wind and authored composition gaps; it adds
 no authority for heavy expansion or another open-ended audio-polish loop.
 

@@ -1,4 +1,5 @@
 #include "gameplay/simulation/DevelopmentWorldRoute.h"
+#include "gameplay/DevelopmentCheckpointSimulation.h"
 #include "gameplay/simulation/ForestTreePlacementContract.h"
 #include "scene/ForestDressing.h"
 #include "scene/CorridorRegionalWaterClosure.h"
@@ -447,6 +448,88 @@ void TestNativeChapterPrimitiveOwnership()
           "real exported terrain supports all bounded understory clumps before native owner packing");
     Check(deadwood.placements.size()==10 && deadwood.triangles==11904 && deadwood.nonWalkableTriangles==11884 && deadwood.stepTriangles==20,
           "real exported terrain supports all four prepared deadwood assets with exact contact");
+    {
+        namespace sim=gameplay::simulation;
+        namespace tr=gameplay::traversal;
+        const auto a=sim::kWorldRoutePoints[3],b=sim::kWorldRoutePoints[4];
+        const float length=std::hypot(b.x-a.x,b.z-a.z),fx=(b.x-a.x)/length,fz=(b.z-a.z)/length;
+        const auto root=deadwood.trailRoot.origin;
+        const float fromX=root[0]-fx*.6f,fromZ=root[2]-fz*.6f;
+        const auto from=tr::ChapterExteriorStepSupport(*terrain,fromX,fromZ,gameplay::kPlayerCollisionRadius);
+        const auto onto=tr::ResolveChapterStepMovement(*terrain,fromX,fromZ,root[0],root[2],
+            from.worldY,gameplay::kPlayerCollisionRadius);
+        Check(terrain->StepTriangleCount()==20u && from.grounded &&
+              !tr::ChapterExteriorMovementClear(*terrain,fromX,fromZ,root[0],root[2],
+                  from.worldY,gameplay::kPlayerCollisionRadius) && onto.accepted &&
+              onto.support.surface==sim::SupportSurface::Wood && onto.support.worldY>root[1],
+              "same actual prepared root blocks legacy collision but admits bounded STEP support");
+
+        struct RouteObservation {
+            const sim::GameSimulation* game;
+            const sim::TriangleSupportSurface* terrain;
+            std::array<float,3> root;
+            float fx,fz,lastX=0,lastZ=0,maximumTravel=0;
+            bool previousExterior=false,ascent=false,pullUp=false,before=false,after=false,wood=false;
+            static void Begin(void*) noexcept {}
+            static void Complete(void* user) noexcept {
+                auto& o=*static_cast<RouteObservation*>(user);
+                const auto& s=o.game->Snapshot();
+                o.ascent|=s.rescue.phase==tr::Phase::Ascent;
+                o.pullUp|=s.rescue.phase==tr::Phase::PullUp;
+                const bool exterior=s.rescue.exteriorSide&&!s.rescue.equipmentStowed;
+                if(exterior) {
+                    if(o.previousExterior)o.maximumTravel=std::max(o.maximumTravel,
+                        std::hypot(s.playerX-o.lastX,s.playerZ-o.lastZ));
+                    const float along=(s.playerX-o.root[0])*o.fx+(s.playerZ-o.root[2])*o.fz;
+                    o.before|=along<-.5f;o.after|=along>.5f;
+                    const auto ground=o.terrain->Query(s.playerX,s.playerZ);
+                    o.wood|=std::abs(along)<.4f && s.playerGrounded && ground.found &&
+                        s.playerSupportSurface==sim::SupportSurface::Wood &&
+                        s.playerSupportWorldY>ground.worldY+.001f;
+                }
+                o.lastX=s.playerX;o.lastZ=s.playerZ;o.previousExterior=exterior;
+            }
+        };
+        for(const auto name:{"chapter-forest-first-bend","chapter-forest-second-bend","chapter-forest-lookout"}) {
+            const auto* checkpoint=gameplay::FindDevelopmentCheckpoint(name);
+            Check(checkpoint && checkpoint->keeperDeathFixedTicks==240u,
+                  "canonical exterior route capture explicitly seeds accepted Keeper death/current rules");
+            if(!checkpoint)continue;
+            sim::GameSimulation capture(sim::ProductionGameSimulationConfig());
+            RouteObservation observed{&capture,terrain.get(),root,fx,fz};
+            const gameplay::DevelopmentCheckpointStepFixedObservation observer{
+                &observed,RouteObservation::Begin,RouteObservation::Complete};
+            gameplay::DevelopmentCheckpointStageEvidence evidence;
+            const bool staged=gameplay::StageDevelopmentCheckpointForScene(capture,*checkpoint,[&] {
+                for(std::size_t zone=1;zone<sim::kWorldZones.size();++zone)
+                    Check(capture.PublishChapterTerrain({capture.Snapshot().worldRoute.generation,
+                        static_cast<sim::WorldZoneId>(zone)},terrain),"canonical route capture publishes actual prepared terrain");
+            },false,&evidence,&observer);
+            Check(staged,std::string(name)+" stages through real ascent and prepared root traversal");
+            if(!staged) {
+                std::cerr<<name<<": "<<gameplay::DevelopmentCheckpointStageFailureName(evidence.failure)
+                         <<" at ("<<capture.Snapshot().playerX<<','<<capture.Snapshot().playerZ<<")\n";
+                continue;
+            }
+            const auto& s=capture.Snapshot();
+            const auto support=tr::ChapterExteriorStepSupport(*terrain,s.playerX,s.playerZ,gameplay::kPlayerCollisionRadius);
+            Check(evidence.failure==gameplay::DevelopmentCheckpointStageFailure::None &&
+                  evidence.worldGeneration!=0 && evidence.worldGeneration==evidence.terrainGeneration &&
+                  s.modernCombatRules && s.lich.phase==gameplay::LichPhase::Dead && s.lich.health==0 &&
+                  s.lich.deathAnimationComplete && s.lich.deathDissolveProgress==1.f && s.lich.roomMistDensityScale==0.f,
+                  "canonical exterior capture retains current rules and fully retired diagnostic Keeper");
+            Check(observed.ascent && observed.pullUp && observed.before && observed.after && observed.wood &&
+                  observed.maximumTravel<=.056f && s.rescue.firstAscentCompleted && s.rescue.exteriorSide &&
+                  !s.rescue.equipmentStowed && s.rescue.claimCount==1u && s.rescue.deploymentCount==1u,
+                  "route capture crosses root on Wood through bounded fixed-step movement after one physical ascent");
+            Check(std::hypot(s.playerX-checkpoint->cameraX,s.playerZ-checkpoint->cameraZ)<.01f &&
+                  Near(s.playerYawRadians,checkpoint->yaw) && Near(s.playerPitchRadians,checkpoint->pitch) &&
+                  s.playerGrounded && support.grounded && s.playerSupportId==support.id &&
+                  Near(s.playerSupportWorldY,support.worldY,.0001f) && s.playerSupportSurface==support.surface &&
+                  Near(s.playerHeightDelta,sim::PlayerHeightDelta(support.worldY),.0001f),
+                  "canonical route camera and player height retain the exact current native terrain support");
+        }
+    }
     constexpr std::array<std::string_view,11> families{{
         "Boulder01Rock", "MedievalWall02", "TombBoneWax", "TombEarthenware", "TombCharredWick",
         "ChapterTrailDampSand", "ChapterForestGround", "ForestBark", "ForestPine", "ForestMoss", "ForestAlder"}};

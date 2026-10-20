@@ -135,15 +135,18 @@ inline constexpr std::array<DevelopmentCheckpoint, 102u> kDevelopmentCheckpoints
     {.id = 206, .name = "chapter-keeper-death-retired", .baseShowcaseCheckpointId = 10,
      .cameraX = -31.9f, .cameraZ = -15.2f, .yaw = -1.57079632679f, .pitch = -0.35f,
      .keeperDeathFixedTicks = 240u},
+    // Current exterior inspections use the same accepted-death seed as the
+    // reunion, so their real walk consumes the current bounded STEP motor.
+    // Historical showcase imports retain their separate legacy movement rules.
     {.id = 201, .name = "chapter-forest-first-bend", .baseShowcaseCheckpointId = 11,
      .cameraX = -15.7f, .cameraZ = .2f, .yaw = -3.009f, .pitch = -0.15f,
-     .stagesRescueExterior = true, .exteriorRouteStation = 4u},
+     .stagesRescueExterior = true, .exteriorRouteStation = 4u, .keeperDeathFixedTicks = 240u},
     {.id = 202, .name = "chapter-forest-second-bend", .baseShowcaseCheckpointId = 11,
      .cameraX = -17.7f, .cameraZ = 15.2f, .yaw = 1.914f, .pitch = -0.15f,
-     .stagesRescueExterior = true, .exteriorRouteStation = 5u},
+     .stagesRescueExterior = true, .exteriorRouteStation = 5u, .keeperDeathFixedTicks = 240u},
     {.id = 203, .name = "chapter-forest-lookout", .baseShowcaseCheckpointId = 11,
      .cameraX = 13.3f, .cameraZ = 36.2f, .yaw = 2.51f, .pitch = -0.15f,
-     .stagesRescueExterior = true, .exteriorRouteStation = 7u},
+     .stagesRescueExterior = true, .exteriorRouteStation = 7u, .keeperDeathFixedTicks = 240u},
     {.id = 198, .name = "chapter-stone-portal-front", .baseShowcaseCheckpointId = 0,
      .cameraX = 0.0f, .cameraZ = -4.9f, .yaw = 0, .pitch = -0.15f},
     {.id = 199, .name = "chapter-stone-portal-rear", .baseShowcaseCheckpointId = 0,

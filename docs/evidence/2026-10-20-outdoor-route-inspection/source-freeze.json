@@ -1,0 +1,20 @@
+{
+  "sourceBase": "4cd8681e43e645b8a7e5699cd33de5a62efdf450",
+  "sources": {
+    "CMakeLists.txt": {
+      "bytes": 115112,
+      "sha256": "45d81eb57659dee286098d6be7c22ffa58b62ed063320b0808c92f3361defcb6",
+      "gitBlob": "7c8f4ff1f8dfd447441cdec604672ed534285290"
+    },
+    "tests/ForestDressingTests.cpp": {
+      "bytes": 59057,
+      "sha256": "fd8de4f77acf5bb16d900ab5bbe50d5c517a4236a91f5a6703b69c7690f17b73",
+      "gitBlob": "a98adf09ff81847d352566c7ef44819b1c0ad2f0"
+    },
+    "src/gameplay/DevelopmentCheckpoints.h": {
+      "bytes": 23837,
+      "sha256": "506cecaeaaf45d8b7bb8b767963a87f5619fbe519c7189ec6db7a74d44f84fac",
+      "gitBlob": "41b470b7ad7dc697c647b10e3c870704c2c67be4"
+    }
+  }
+}

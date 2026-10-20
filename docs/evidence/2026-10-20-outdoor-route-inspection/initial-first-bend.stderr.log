@@ -1,0 +1,9 @@
+HORDE_PIPELINE_CACHE_CREATE attempted=1 result=0 available=1
+HORDE_CHAPTER_INITIALISE begin checkpoint=chapter-forest-first-bend
+HORDE_CHAPTER_INITIALISE scene-ready checkpoint=chapter-forest-first-bend
+HORDE_CAPTURE_HOST scene-admitted
+HORDE_CAPTURE_HOST callbacks-attached
+HORDE_SHOWCASE_CAPTURE enter checkpoint=chapter-forest-first-bend
+HORDE_SHOWCASE_CAPTURE options-ready
+HORDE_SHOWCASE_CAPTURE directory-result=0
+Showcase capture failed: Development checkpoint 'chapter-forest-first-bend' could not stage its authoritative state; reason=simulation-state-not-reached, admissionWorldGeneration=2, admissionTerrainGeneration=2; player=(-23.8234,-3.55062), rescuePhase=4, stowed=0, ropeReady=1, exterior=1, worldGeneration=3, terrain=1,2,2,2,2

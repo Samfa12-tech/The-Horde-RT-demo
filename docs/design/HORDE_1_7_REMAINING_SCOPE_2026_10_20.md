@@ -21,6 +21,15 @@ presented-lantern lesson, companion route/waiting, forest beats, durable endpoin
 and optional player-opened objective. No additional missing mandatory story
 progression mechanism was identified in this audit. That is not physical acceptance.
 
+The later [route inspection](../evidence/2026-10-20-outdoor-route-inspection/README.md)
+fixes legacy-policy diagnostic staging at the real root and inspects current bend/
+lookout RT views without changing production placement or collision. No new
+demonstrated float/intersection justified moving geometry in those views. Wind
+and runtime LOD remain unimplemented; a one-pine static LOD2 comparison is selected
+as the smaller reversible next investigation, with actual existing payload counts
+and required native comparison measurements recorded. No derivative or saving is
+adopted. Recovery policy remains pending without blocking that independent work.
+
 ## Implemented, with exact-candidate acceptance still open
 
 - **Critical playable path:** natural Keeper victory through lookout and return;

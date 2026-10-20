@@ -953,6 +953,7 @@ if(BUILD_TESTING)
         src/scene/assets/GltfDocument.cpp src/scene/assets/StaticMeshAsset.cpp
         src/vulkan/raytracing/RtStaticMeshSlot.cpp)
     target_include_directories(horde_rt_forest_dressing_tests PRIVATE src third_party)
+    target_link_libraries(horde_rt_forest_dressing_tests PRIVATE horde_gameplay_simulation)
     target_compile_definitions(horde_rt_forest_dressing_tests PRIVATE HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
     add_test(NAME horde_rt_forest_dressing_tests COMMAND horde_rt_forest_dressing_tests)
     find_package(Python3 COMPONENTS Interpreter REQUIRED)
