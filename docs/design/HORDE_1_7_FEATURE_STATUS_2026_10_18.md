@@ -26,7 +26,11 @@ is no longer a missing implementation. The [player-opened endpoint objective
 panel](../evidence/2026-10-20-lookout-objective/README.md) is now implemented on both
 platforms with 381 Java tests and focused native checks/builds passing; physical
 panel/endpoint acceptance is deferred at the owner's phone-unplug request.
-Kit acting remains partial integration.
+The [hidden Windows lookout follow-up](../evidence/2026-10-20-windows-lookout/README.md)
+now passes 26/26 real RT recovery/panel/Return checks with unchanged fixture/INI
+bytes; it preserves the earlier harness-sequencing failure and does not close
+physical touch/controller, full-body visual or phone gates. Kit acting remains
+partial integration.
 
 ## Authority and status meanings
 

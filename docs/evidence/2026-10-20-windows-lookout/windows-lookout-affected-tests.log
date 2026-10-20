@@ -1,0 +1,15 @@
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+    Start  11: horde_rt_entry_menu_handoff_tests
+1/5 Test  #11: horde_rt_entry_menu_handoff_tests ................   Passed    1.03 sec
+    Start  12: horde_rt_foreground_pause_render_cadence_tests
+2/5 Test  #12: horde_rt_foreground_pause_render_cadence_tests ...   Passed    1.28 sec
+    Start  31: horde_rt_windows_campaign_menu_tests
+3/5 Test  #31: horde_rt_windows_campaign_menu_tests .............   Passed    0.04 sec
+    Start  34: horde_rt_android_campaign_load_barrier_tests
+4/5 Test  #34: horde_rt_android_campaign_load_barrier_tests .....   Passed    0.01 sec
+    Start 173: horde_rt_desktop_controller_input_tests
+5/5 Test #173: horde_rt_desktop_controller_input_tests ..........   Passed    0.21 sec
+
+100% tests passed, 0 tests failed out of 5
+
+Total Test time (real) =   2.60 sec

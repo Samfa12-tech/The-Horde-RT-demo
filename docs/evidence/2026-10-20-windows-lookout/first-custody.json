@@ -1,0 +1,57 @@
+{
+  "run": {
+    "pid": 16580,
+    "exitCode": 1,
+    "seconds": 19.765,
+    "foregroundBefore": 132868,
+    "foregroundAfter": 132868,
+    "pending": false
+  },
+  "sourceFixtureBefore": {
+    ".slot-1-auto.hrd.lock": {
+      "exists": true,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "manifest.json": {
+      "exists": true,
+      "bytes": 166,
+      "sha256": "84315162c255558767f9ded6fc6596a85960c82a450e58cf96ece623ccca15a7"
+    },
+    "slot-1-auto.hrd": {
+      "exists": true,
+      "bytes": 162,
+      "sha256": "73b513b21f12de701c38aff0f0e4f4fecce0abbc625b20851218f5050b1d41ea"
+    }
+  },
+  "sourceFixtureAfter": {
+    "manifest.json": {
+      "exists": true,
+      "bytes": 166,
+      "sha256": "84315162c255558767f9ded6fc6596a85960c82a450e58cf96ece623ccca15a7"
+    },
+    "slot-1-auto.hrd": {
+      "exists": true,
+      "bytes": 162,
+      "sha256": "73b513b21f12de701c38aff0f0e4f4fecce0abbc625b20851218f5050b1d41ea"
+    },
+    ".slot-1-auto.hrd.lock": {
+      "exists": true,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "sourceFixtureUnchanged": true,
+  "settingsBefore": {
+    "exists": true,
+    "bytes": 471,
+    "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+  },
+  "settingsAfter": {
+    "exists": true,
+    "bytes": 471,
+    "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+  },
+  "ownerIniUnchanged": true,
+  "runtimeReceipt": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\horde-campaign-fixtures-lookout-objective-20261020\\windows-lookout-validation.json"
+}

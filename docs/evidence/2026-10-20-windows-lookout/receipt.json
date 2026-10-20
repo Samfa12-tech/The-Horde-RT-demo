@@ -1,0 +1,141 @@
+{
+  "date": "2026-10-20",
+  "worktree": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "sourceBase": "f522e2454da4335b33a19d60ba115fc29e512e49",
+  "evidenceClass": "Seeded noncombat hidden native menu/worker/recovery/panel/RT acceptance; no visible or physical controller acceptance",
+  "sources": {
+    "src/platform/windows/DiagnosticWindow.cpp": {
+      "sha256": "0b1b387dfb32dcaf51d5419b3ea6a4f6a4c8bdb435be37926faa0da29ad52516",
+      "gitBlob": "ed164a9b94668607847b69d1778404a17ea4bbb3"
+    },
+    "src/platform/windows/windows_campaign_validation.inl": {
+      "sha256": "199f72d196dd8daaca826f2e980e5f0a5db48a2bfb136e7a8928882cd5d4fffb",
+      "gitBlob": "86891d2c54b885f35395451c6d3f96896acc6120"
+    }
+  },
+  "artifacts": {
+    "debug": {
+      "path": "build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+      "bytes": 13819392,
+      "sha256": "c55c6e01f00c0163ed21b02104a8ab86e7640d77841d27a7967326a4663eef03"
+    },
+    "release": {
+      "path": "build\\presets\\windows-x64-release\\Release\\HordeLanternRT.exe",
+      "bytes": 4600832,
+      "sha256": "adc0f0c9d19e5b3c224d8fe4b9f5bddd0904114260863dee65678bebda3d94d7"
+    }
+  },
+  "runtime": {
+    "checks": 26,
+    "failures": 0,
+    "renderCalls": 6,
+    "complete": true,
+    "seconds": 23.922,
+    "frameIdentities": {
+      "loadedRtEvidence": {
+        "sceneEpoch": 3,
+        "measurementGeneration": 1,
+        "recordAttemptSerial": 2,
+        "recordSerial": 2,
+        "submissionSerial": 2,
+        "completionSerial": 2,
+        "simulationTick": 2,
+        "frameSlot": 0
+      },
+      "entryRtEvidence": {
+        "sceneEpoch": 4,
+        "measurementGeneration": 6,
+        "recordAttemptSerial": 6,
+        "recordSerial": 6,
+        "submissionSerial": 6,
+        "completionSerial": 6,
+        "simulationTick": 0,
+        "frameSlot": 0
+      }
+    },
+    "foregroundSampleCount": 93,
+    "storedForegroundSamples": 69,
+    "foregroundAtLaunchAndExit": null,
+    "foregroundContinuous": true,
+    "ownerObservedForeground": false,
+    "ownerShown": false,
+    "normalScale": "100%; 1232x803 swapchain and RT storage image; no setting/quality overrides",
+    "actualPipeline": "RayTracingPipeline; Diagnostic/High; real BLAS/TLAS; requested/actual Mist On (Windows normal defaults)",
+    "sourceFixtureUnchanged": true,
+    "ownerIniUnchanged": true,
+    "campaignWriteAttempts": 0
+  },
+  "image": {
+    "path": "reports\\horde-campaign-fixtures-lookout-objective-20261020-r2\\windows-loaded-lookout.png",
+    "bytes": 1384997,
+    "sha256": "aded6df716fd0d35f68a5f528e0be3299e615af12a9ed165ccfded056f4d551a"
+  },
+  "imageInspection": "Original image inspected. Dark/noisy distant village silhouettes, modeled held lantern/sword, companion torso clipped at left with feet out of view. No full-body visual grounding, final composition or visible desktop acceptance.",
+  "firstRun": {
+    "checks": 8,
+    "failures": 1,
+    "seconds": 19.765,
+    "cause": "Validator checked queued Resume effects before normal owner PumpCampaign; production Resume unchanged.",
+    "imageSha256": "aded6df716fd0d35f68a5f528e0be3299e615af12a9ed165ccfded056f4d551a",
+    "recordsSettingsForegroundUnchanged": true,
+    "processExited": true,
+    "correctiveRun": "One reviewed fix, fresh create-only fixture; no in-run retry."
+  },
+  "regressions": {
+    "configuration": "windows-x64-release",
+    "suites": 5,
+    "failures": 0,
+    "scope": [
+      "desktop controller input",
+      "entry menu handoff",
+      "foreground pause cadence",
+      "Windows campaign menu",
+      "shared load barrier"
+    ]
+  },
+  "guards": {
+    "releaseReject": 2,
+    "outsideRootReject": 2,
+    "combinedModesReject": 2,
+    "beforeVulkanOrWindow": true,
+    "initialArtifactScope": {
+      "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe": "bd5b130b969f6b619b5f8981da27bd2558e4bbb67f72fed7e91e9a59843684ab",
+      "build/presets/windows-x64-release/Release/HordeLanternRT.exe": "a85999e5b8cf75e3743177a0851566e907719b3bcea82128a2899a1a23bc91d1"
+    },
+    "finalReleaseReject": {
+      "exitCode": 2,
+      "foregroundBefore": null,
+      "foregroundAfter": null,
+      "stdoutBytes": 0,
+      "stderr": "Hidden campaign validation is Debug-only."
+    },
+    "finalReleaseSha256": "adc0f0c9d19e5b3c224d8fe4b9f5bddd0904114260863dee65678bebda3d94d7"
+  },
+  "phoneOperations": false,
+  "publicPushMergeRelease": false,
+  "ReefOperations": false,
+  "limits": [
+    "Seeded recovery is not naturally earned progression",
+    "No physical touch/controller/lifecycle or endpoint acceptance",
+    "No combat, death, New Game, Save action, Keeper preparation/arm/timing or performance test",
+    "Foreground API returned null throughout final run; no active external window was available to attribute. First run retained its non-null foreground HWND.",
+    "No audio listening; previous endpoint restore listening gate remains open",
+    "Initial capability report predates RT frames; final native runtime receipt proves subsequent completed presentations"
+  ],
+  "gpu": {
+    "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "vendorId": 4318,
+    "deviceId": 11672,
+    "driverVersion": 2559295488,
+    "driverProperties": {
+      "available": true,
+      "driverId": 4,
+      "driverName": "NVIDIA",
+      "driverInfo": "610.47",
+      "conformanceVersion": "1.4.3.3"
+    },
+    "vulkanApiVersionText": "1.4.341",
+    "executionBackend": "RayTracingPipeline"
+  }
+}

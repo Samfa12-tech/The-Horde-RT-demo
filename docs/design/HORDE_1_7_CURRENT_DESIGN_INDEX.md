@@ -1,5 +1,24 @@
 # Horde 1.7 current design index
 
+## Hidden Windows lookout RT acceptance - local milestone, 20 October 2026
+
+The [bounded noncombat Windows run](../evidence/2026-10-20-windows-lookout/README.md)
+passes 26/26 native integration checks: isolated seeded Forest lookout Load,
+current completed RT proof, actual terrain/Kit support, quiet completed dialogue,
+explicit Resume, player-opened panel/reopen/input cancellation and actual RT
+EntryMenu return retaining checkpoint/story/Kit. Source record/manifest/lock and
+owner INI are unchanged; window stays hidden and owned process exits. Final
+foreground API is null throughout; first run preserves a non-null HWND.
+
+The first test-sequencing failure is retained separately; correcting its missing
+normal Resume owner pump changes no production behavior. Both Windows builds and
+five affected native suites pass. The original image remains dark/noisy with Kit
+clipped at left, so final composition/full-body visual acceptance is open. No
+phone, combat, performance, heavy-content, public or Reef work occurs. Exact-APK
+phone endpoint/panel/return-side and listening acceptance remains deferred at
+Sam's unplug request; natural-save/full-route/contact/warm gates stay distinct.
+
+
 ## Player-opened lookout objective - local milestone, 20 October 2026
 
 The [optional lookout objective](../evidence/2026-10-20-lookout-objective/README.md)

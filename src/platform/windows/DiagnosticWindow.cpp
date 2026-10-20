@@ -155,6 +155,7 @@ using LookoutPanel=horde::platform::windows::WindowsLookoutObjectivePanel;
 // Debug validation owns only an unshown HWND, isolated save directory and RT
 // targets. It must never acquire foreground input or touch the owner's INI.
 bool gCampaignHiddenValidation=false;
+bool gLookoutHiddenValidation=false;
 bool gShowcaseCaptureHidden=false;
 bool gCampaignValidationHoldPreparation=false;
 std::filesystem::path gCampaignValidationDirectory;
@@ -8809,7 +8810,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
 #if defined(_DEBUG)
     if(gCampaignHiddenValidation){
         context.sfxVolumePercent=context.musicVolumePercent=context.voiceVolumePercent=0;
-        const int result=RunHiddenCampaignValidation(context);
+        const int result=gLookoutHiddenValidation?RunHiddenLookoutValidation(context,capabilities):RunHiddenCampaignValidation(context);
         return renderOwner.Retire()?result:1;
     }
 #endif
@@ -11585,7 +11586,8 @@ int CreateAndShowWindow(const std::string& diagnosticText,
         windowHeight = captureRect.bottom - captureRect.top;
     }
     HWND hWnd = CreateWindowExA(
-        gShowcaseCaptureHidden ? WS_EX_NOACTIVATE : 0,
+        gLookoutHiddenValidation ? WS_EX_NOACTIVATE|WS_EX_TOOLWINDOW :
+            (gShowcaseCaptureHidden ? WS_EX_NOACTIVATE : 0),
         kWindowClassName,
         kWindowTitle,
         windowStyle,
@@ -11602,6 +11604,11 @@ int CreateAndShowWindow(const std::string& diagnosticText,
         std::cerr << "Failed to create diagnostic window." << std::endl;
         return 1;
     }
+#if defined(_DEBUG)
+    if(gLookoutHiddenValidation && !ObserveHiddenLookoutForeground(hWnd,"owner-created")) {
+        DestroyWindow(hWnd);return 1;
+    }
+#endif
 
     if (captureDirectory != nullptr)
     {
@@ -11900,7 +11907,7 @@ int CreateAndShowWindow(const std::string& diagnosticText,
         FocusGameControl(sceneMode ? hWnd : edit);
     }
 
-    const int result = RunDiagnosticSwapchainWindow(
+    int result = RunDiagnosticSwapchainWindow(
         hWnd, capabilities, textReportPath, jsonReportPath, captureDirectory,
         developmentCheckpoint, requireRayQueryCompute, unattendedBenchmark, benchmarkWorkload,
         benchmarkRtWorkloadPreset,
@@ -11908,8 +11915,14 @@ int CreateAndShowWindow(const std::string& diagnosticText,
         captureDustQuality);
     if ((gCampaignHiddenValidation || captureDirectory != nullptr || unattendedBenchmark) && IsWindow(hWnd))
     {
+#if defined(_DEBUG)
+        if(gLookoutHiddenValidation && !ObserveHiddenLookoutForeground(hWnd,"before-owner-destroy"))result=1;
+#endif
         DestroyWindow(hWnd);
     }
+#if defined(_DEBUG)
+    if(gLookoutHiddenValidation)result=FinishHiddenLookoutValidation(hWnd,result);
+#endif
     return result;
 }
 
