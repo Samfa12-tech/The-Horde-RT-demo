@@ -1,3 +1,6 @@
-# Preserve hashed raw Android exports, including their original whitespace.
-* -text
-*.xml -diff
+# Preserve raw device exports; host records and prose use canonical LF.
+*.xml -text -diff
+*.txt -text -diff
+*.json text eol=lf
+*.md text eol=lf
+.gitattributes text eol=lf
