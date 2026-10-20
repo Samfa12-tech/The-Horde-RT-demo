@@ -75,7 +75,8 @@ bool HiddenLookoutFilesAllowed(const std::filesystem::path& directory,bool after
         if(afterRun && gLookoutInspectKitMotion) {
             bool allowed=false;
             for(const char* step:{"start-0","start-1","start-4","start-8","walk-20","walk-35","walk-50","walk-65","walk-80","walk-100",
-                "stop-0","stop-1","stop-4","stop-8","stop-11","turn-0","turn-10","turn-20","turn-30","turn-40"})
+                "stop-0","stop-1","stop-4","stop-8","stop-11","turn-0","turn-10","turn-20","turn-30","turn-40",
+                "turn-60","turn-80","turn-100"})
                 allowed|=name==std::string("windows-kit-motion-")+step+".png";
             if(allowed)continue;
         }
@@ -286,7 +287,8 @@ int RunHiddenLookoutValidation(VulkanSurfaceContext& ctx,horde::vulkan::DeviceCa
             motionEvidence<<"{\"stage\":\""<<stage<<"\",\"root\":["<<pose.x<<','<<pose.y<<','<<pose.z
                 <<"],\"yaw\":"<<pose.yaw<<",\"walking\":"<<(pose.walking?"true":"false")
                 <<",\"idleSeconds\":"<<pose.animationSeconds<<",\"walkPhase\":"<<pose.locomotion.walkPhase
-                <<",\"walkWeight\":"<<pose.locomotion.walkWeight<<",\"rtEvidence\":"<<(evidence.empty()?"null":evidence)<<'}';
+                <<",\"walkWeight\":"<<pose.locomotion.walkWeight<<",\"leftTurnStep\":"<<pose.locomotion.leftTurnStep
+                <<",\"rightTurnStep\":"<<pose.locomotion.rightTurnStep<<",\"rtEvidence\":"<<(evidence.empty()?"null":evidence)<<'}';
             return ok;
         };
         proceed=capture("start-0");
@@ -306,10 +308,11 @@ int RunHiddenLookoutValidation(VulkanSurfaceContext& ctx,horde::vulkan::DeviceCa
             if(name)proceed=capture(name);
         }
         if(proceed)proceed=capture("turn-0");
-        for(unsigned tick=1;tick<=40 && proceed;++tick) {
+        for(unsigned tick=1;tick<=100 && proceed;++tick) {
             const auto before=route.State();
             route.Step(1.f/60,before.x-3,before.z,true,false,false,terrain.get(),true);
-            const char* name=tick==10?"turn-10":tick==20?"turn-20":tick==30?"turn-30":tick==40?"turn-40":nullptr;
+            const char* name=tick==10?"turn-10":tick==20?"turn-20":tick==30?"turn-30":tick==40?"turn-40":
+                tick==60?"turn-60":tick==80?"turn-80":tick==100?"turn-100":nullptr;
             if(name)proceed=capture(name);
         }
         ctx.lookoutKitInspectionMotion.reset();ctx.lookoutKitInspectionPose.reset();ctx.lookoutKitInspectionActing={};

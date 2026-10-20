@@ -1,0 +1,37 @@
+[
+  {
+    "path": "src/gameplay/dialogue/CompanionLocomotion.h",
+    "bytes": 2481,
+    "sha256": "85137b3bd3ac7f0016ffa889b31bde2cfdb1cedf36b3e8b66600ccde265a66ff"
+  },
+  {
+    "path": "src/gameplay/dialogue/CompanionRouteFixture.h",
+    "bytes": 7035,
+    "sha256": "b6514612c1bbcfa62b1171ab3ae28e638b8fe0830373b0316578df55b8c83822"
+  },
+  {
+    "path": "src/scene/CompanionPose.h",
+    "bytes": 1734,
+    "sha256": "c4fd6f7d82f9ef9dea42b571c34f6770261c4e9f795d3df12afdb3041c27f1df"
+  },
+  {
+    "path": "src/vulkan/raytracing/PresentableTinyRtScene.cpp",
+    "bytes": 490669,
+    "sha256": "cbcb82aa6d9d931cbca7fb346220bc03ac25d16d37c57839a2bbe3794ef4f364"
+  },
+  {
+    "path": "src/platform/windows/windows_campaign_validation.inl",
+    "bytes": 46775,
+    "sha256": "db1de5f5cf3a9b844e217c1cca0e05865e7ba0d286e920abe0146eec2c5cfe3e"
+  },
+  {
+    "path": "tests/CompanionLocomotionTests.cpp",
+    "bytes": 7648,
+    "sha256": "74ab392d0947abda3dc9754ca8139ff14a5c81efb1cef3e714a629e7c27756a6"
+  },
+  {
+    "path": "tests/KitSourceIntakeTests.cpp",
+    "bytes": 40937,
+    "sha256": "0747bb8a5b5f5d62934ef50690832742b380adf968694f20b7daa6ea4de284d3"
+  }
+]

@@ -66,7 +66,7 @@ public:
         const float difference=std::remainder(target-oldYaw,6.28318530718f);
         state_.yaw=oldYaw+std::clamp(difference,-2.4f*dt,2.4f*dt);
         state_.animationSeconds+=dt;
-        locomotion_.Step(dt,std::hypot(state_.x-oldX,state_.z-oldZ),state_.walking);
+        locomotion_.Step(dt,std::hypot(state_.x-oldX,state_.z-oldZ),state_.walking,state_.yaw-oldYaw);
         state_.locomotion=locomotion_.State();
     }
 private:

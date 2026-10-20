@@ -1,0 +1,3143 @@
+{
+  "evidenceClass": "matched seeded fixed-step route snapshots in hidden native RT, not live input or sustained performance",
+  "sameRootYawWalkingClocksPhaseWeightOnAll20MatchedStages": true,
+  "matchedMediansShortDebugReadbacksOnly": {
+    "baseline-r1": {
+      "characterSkinCpuMs": 25.2564,
+      "gpuMs": 10.454784
+    },
+    "candidate-r2": {
+      "characterSkinCpuMs": 23.086750000000002,
+      "gpuMs": 12.2656
+    }
+  },
+  "baselineCandidatePngIdentical": [
+    "windows-kit-motion-start-4.png",
+    "windows-kit-motion-start-8.png",
+    "windows-kit-motion-stop-0.png",
+    "windows-kit-motion-stop-1.png",
+    "windows-kit-motion-stop-11.png",
+    "windows-kit-motion-stop-4.png",
+    "windows-kit-motion-stop-8.png",
+    "windows-kit-motion-turn-0.png",
+    "windows-kit-motion-walk-100.png",
+    "windows-kit-motion-walk-20.png",
+    "windows-kit-motion-walk-35.png",
+    "windows-kit-motion-walk-50.png",
+    "windows-kit-motion-walk-65.png",
+    "windows-kit-motion-walk-80.png",
+    "windows-kit-neutral.png",
+    "windows-kit-recognition.png",
+    "windows-kit-speaking.png",
+    "windows-loaded-lookout.png"
+  ],
+  "candidateR1R2PngIdentical": true,
+  "images": {
+    "baseline-r1": {
+      "windows-kit-motion-start-0.png": {
+        "bytes": 1425605,
+        "sha256": "0583a470c7a28f68225520cf191134b75eeb62ca8ff6cad12db1e637aa197909"
+      },
+      "windows-kit-motion-start-1.png": {
+        "bytes": 1426868,
+        "sha256": "2df676ab11b0f841758418040f114be3e0639feb30028d2b09d936fc13e2c150"
+      },
+      "windows-kit-motion-start-4.png": {
+        "bytes": 1427583,
+        "sha256": "84cb0b3ab03c9331a7ac32fd69689d3de355d370021df3dd2cd9a55622b819ba"
+      },
+      "windows-kit-motion-start-8.png": {
+        "bytes": 1429154,
+        "sha256": "1f60c0133c4e892eeab3660430ec2e0ade87f0d1f717ce9b03543680d7c1a6df"
+      },
+      "windows-kit-motion-stop-0.png": {
+        "bytes": 1439156,
+        "sha256": "1a896521f430460d9506e525e4003b8368c1d55270a71333da6d1a0929e48150"
+      },
+      "windows-kit-motion-stop-1.png": {
+        "bytes": 1439325,
+        "sha256": "a113a0bc34e01545b600b340cddbf5ada364599c5532b26b2fd83a98870a74c8"
+      },
+      "windows-kit-motion-stop-11.png": {
+        "bytes": 1439483,
+        "sha256": "ad61923bf5fd57168cbe6f5c55d20fa41593fbb058bb0edf23350a06b2995614"
+      },
+      "windows-kit-motion-stop-4.png": {
+        "bytes": 1439401,
+        "sha256": "15c11a03ab3bfa17624015ad035d7f6b6ac67e4803dad42049a4e2ba846957a4"
+      },
+      "windows-kit-motion-stop-8.png": {
+        "bytes": 1439865,
+        "sha256": "a593457b3071907cd17e451cb8465ccc448bd42d2028ea11f9b426b6ea1f303a"
+      },
+      "windows-kit-motion-turn-0.png": {
+        "bytes": 1439483,
+        "sha256": "ad61923bf5fd57168cbe6f5c55d20fa41593fbb058bb0edf23350a06b2995614"
+      },
+      "windows-kit-motion-turn-10.png": {
+        "bytes": 1438432,
+        "sha256": "e112bb2e57d9346c5932fedc18ae10ddf987eb45a7f2b8b836150c417933ae73"
+      },
+      "windows-kit-motion-turn-20.png": {
+        "bytes": 1437617,
+        "sha256": "e15fe89840736ee0bf5442f15fbdb1d462ab09a1bf4989d446e854da0ce6b0e7"
+      },
+      "windows-kit-motion-turn-30.png": {
+        "bytes": 1438169,
+        "sha256": "48cdb661d00f52d2af1b81748114edd6ed48501e5b02d41c2b1f21a156a6eac8"
+      },
+      "windows-kit-motion-turn-40.png": {
+        "bytes": 1436665,
+        "sha256": "b449f778175ae748999d526208bf1e49789195fe0b5742f81a11e1a61f1b5018"
+      },
+      "windows-kit-motion-walk-100.png": {
+        "bytes": 1439156,
+        "sha256": "1a896521f430460d9506e525e4003b8368c1d55270a71333da6d1a0929e48150"
+      },
+      "windows-kit-motion-walk-20.png": {
+        "bytes": 1431305,
+        "sha256": "abda16cfdf47a92c47db38ce6a1d35b249397456099250322a686234739ee378"
+      },
+      "windows-kit-motion-walk-35.png": {
+        "bytes": 1436556,
+        "sha256": "f4839ff06365f3a0c88fd59c855e6d4bf50c1f8de85ed22cb3dabab20afc9010"
+      },
+      "windows-kit-motion-walk-50.png": {
+        "bytes": 1436165,
+        "sha256": "b75c6f9155e2ac58894139e1f10e52bff251d230e9a391a68a05a0de9a4a6eac"
+      },
+      "windows-kit-motion-walk-65.png": {
+        "bytes": 1439022,
+        "sha256": "7b53493c5ba068d9d950b99e745b54a901bd4cbecd294dcb0ee6a2ca14995987"
+      },
+      "windows-kit-motion-walk-80.png": {
+        "bytes": 1438526,
+        "sha256": "2d557e8d71d6a42cdb73556a428d5ffb1822f919ffd751d1e2b4782152a4539b"
+      },
+      "windows-kit-neutral.png": {
+        "bytes": 1469276,
+        "sha256": "dd627d930ff1375ffbd94c49bcc874196f0db3bc8990221409f81644a4d05052"
+      },
+      "windows-kit-recognition.png": {
+        "bytes": 1469255,
+        "sha256": "51638c30d607fa9775f0dbd96f1553875196460d602c7405df72a08ca2999f8c"
+      },
+      "windows-kit-speaking.png": {
+        "bytes": 1469296,
+        "sha256": "d423c5a5853830ef08ef4694ec28a0b0788f64be82ab8cfe72aa94a196bb53dd"
+      },
+      "windows-loaded-lookout.png": {
+        "bytes": 1403116,
+        "sha256": "1b1ab43226a40b16f4d0547701c83d5e85ec2c324caddc46deef9c78d2ceca8a"
+      }
+    },
+    "candidate-r1": {
+      "windows-kit-motion-start-0.png": {
+        "bytes": 1425657,
+        "sha256": "81332acde5ac592fd6b6ce1e63c070e38b500e71223af911e25e5d4d8babfae3"
+      },
+      "windows-kit-motion-start-1.png": {
+        "bytes": 1426891,
+        "sha256": "2e64480ace5b38d7b07a26edb5954da10b95947ed7e873a8553c04d028c07fd0"
+      },
+      "windows-kit-motion-start-4.png": {
+        "bytes": 1427583,
+        "sha256": "84cb0b3ab03c9331a7ac32fd69689d3de355d370021df3dd2cd9a55622b819ba"
+      },
+      "windows-kit-motion-start-8.png": {
+        "bytes": 1429154,
+        "sha256": "1f60c0133c4e892eeab3660430ec2e0ade87f0d1f717ce9b03543680d7c1a6df"
+      },
+      "windows-kit-motion-stop-0.png": {
+        "bytes": 1439156,
+        "sha256": "1a896521f430460d9506e525e4003b8368c1d55270a71333da6d1a0929e48150"
+      },
+      "windows-kit-motion-stop-1.png": {
+        "bytes": 1439325,
+        "sha256": "a113a0bc34e01545b600b340cddbf5ada364599c5532b26b2fd83a98870a74c8"
+      },
+      "windows-kit-motion-stop-11.png": {
+        "bytes": 1439483,
+        "sha256": "ad61923bf5fd57168cbe6f5c55d20fa41593fbb058bb0edf23350a06b2995614"
+      },
+      "windows-kit-motion-stop-4.png": {
+        "bytes": 1439401,
+        "sha256": "15c11a03ab3bfa17624015ad035d7f6b6ac67e4803dad42049a4e2ba846957a4"
+      },
+      "windows-kit-motion-stop-8.png": {
+        "bytes": 1439865,
+        "sha256": "a593457b3071907cd17e451cb8465ccc448bd42d2028ea11f9b426b6ea1f303a"
+      },
+      "windows-kit-motion-turn-0.png": {
+        "bytes": 1439483,
+        "sha256": "ad61923bf5fd57168cbe6f5c55d20fa41593fbb058bb0edf23350a06b2995614"
+      },
+      "windows-kit-motion-turn-10.png": {
+        "bytes": 1438201,
+        "sha256": "c8dcc70d720e2a29d08c9c0a9e7edd46d335f333902f3f8c6f1572243699cf15"
+      },
+      "windows-kit-motion-turn-100.png": {
+        "bytes": 1436241,
+        "sha256": "ef2d4cdc8379e77e7bea0798571890c721669c7f2f0a56cca19991e91438706b"
+      },
+      "windows-kit-motion-turn-20.png": {
+        "bytes": 1437557,
+        "sha256": "ad753e97ad865b3714b5e50ddf8ee11b400d6d56b54489846b991deb301e7a7f"
+      },
+      "windows-kit-motion-turn-30.png": {
+        "bytes": 1437709,
+        "sha256": "beb7b9206dff1b8e542594413c0e539eab4b1b6832a93d82a1a4da9612b9d4e9"
+      },
+      "windows-kit-motion-turn-40.png": {
+        "bytes": 1436830,
+        "sha256": "81468bce61952ea28a9912bb248a1dd13b6b231203480e7182b0aae077f720df"
+      },
+      "windows-kit-motion-turn-60.png": {
+        "bytes": 1435035,
+        "sha256": "e261de2eca9e031d48f7d32e46298abc53b7db379d04c9b8d0a81d9dce5455a8"
+      },
+      "windows-kit-motion-turn-80.png": {
+        "bytes": 1436041,
+        "sha256": "fdccbb09f6570cf71d56965b88abf1582b811f51a9268f244e1769ebf0398f76"
+      },
+      "windows-kit-motion-walk-100.png": {
+        "bytes": 1439156,
+        "sha256": "1a896521f430460d9506e525e4003b8368c1d55270a71333da6d1a0929e48150"
+      },
+      "windows-kit-motion-walk-20.png": {
+        "bytes": 1431305,
+        "sha256": "abda16cfdf47a92c47db38ce6a1d35b249397456099250322a686234739ee378"
+      },
+      "windows-kit-motion-walk-35.png": {
+        "bytes": 1436556,
+        "sha256": "f4839ff06365f3a0c88fd59c855e6d4bf50c1f8de85ed22cb3dabab20afc9010"
+      },
+      "windows-kit-motion-walk-50.png": {
+        "bytes": 1436165,
+        "sha256": "b75c6f9155e2ac58894139e1f10e52bff251d230e9a391a68a05a0de9a4a6eac"
+      },
+      "windows-kit-motion-walk-65.png": {
+        "bytes": 1439022,
+        "sha256": "7b53493c5ba068d9d950b99e745b54a901bd4cbecd294dcb0ee6a2ca14995987"
+      },
+      "windows-kit-motion-walk-80.png": {
+        "bytes": 1438526,
+        "sha256": "2d557e8d71d6a42cdb73556a428d5ffb1822f919ffd751d1e2b4782152a4539b"
+      },
+      "windows-kit-neutral.png": {
+        "bytes": 1469276,
+        "sha256": "dd627d930ff1375ffbd94c49bcc874196f0db3bc8990221409f81644a4d05052"
+      },
+      "windows-kit-recognition.png": {
+        "bytes": 1469255,
+        "sha256": "51638c30d607fa9775f0dbd96f1553875196460d602c7405df72a08ca2999f8c"
+      },
+      "windows-kit-speaking.png": {
+        "bytes": 1469296,
+        "sha256": "d423c5a5853830ef08ef4694ec28a0b0788f64be82ab8cfe72aa94a196bb53dd"
+      },
+      "windows-loaded-lookout.png": {
+        "bytes": 1403116,
+        "sha256": "1b1ab43226a40b16f4d0547701c83d5e85ec2c324caddc46deef9c78d2ceca8a"
+      }
+    },
+    "candidate-r2": {
+      "windows-kit-motion-start-0.png": {
+        "bytes": 1425657,
+        "sha256": "81332acde5ac592fd6b6ce1e63c070e38b500e71223af911e25e5d4d8babfae3"
+      },
+      "windows-kit-motion-start-1.png": {
+        "bytes": 1426891,
+        "sha256": "2e64480ace5b38d7b07a26edb5954da10b95947ed7e873a8553c04d028c07fd0"
+      },
+      "windows-kit-motion-start-4.png": {
+        "bytes": 1427583,
+        "sha256": "84cb0b3ab03c9331a7ac32fd69689d3de355d370021df3dd2cd9a55622b819ba"
+      },
+      "windows-kit-motion-start-8.png": {
+        "bytes": 1429154,
+        "sha256": "1f60c0133c4e892eeab3660430ec2e0ade87f0d1f717ce9b03543680d7c1a6df"
+      },
+      "windows-kit-motion-stop-0.png": {
+        "bytes": 1439156,
+        "sha256": "1a896521f430460d9506e525e4003b8368c1d55270a71333da6d1a0929e48150"
+      },
+      "windows-kit-motion-stop-1.png": {
+        "bytes": 1439325,
+        "sha256": "a113a0bc34e01545b600b340cddbf5ada364599c5532b26b2fd83a98870a74c8"
+      },
+      "windows-kit-motion-stop-11.png": {
+        "bytes": 1439483,
+        "sha256": "ad61923bf5fd57168cbe6f5c55d20fa41593fbb058bb0edf23350a06b2995614"
+      },
+      "windows-kit-motion-stop-4.png": {
+        "bytes": 1439401,
+        "sha256": "15c11a03ab3bfa17624015ad035d7f6b6ac67e4803dad42049a4e2ba846957a4"
+      },
+      "windows-kit-motion-stop-8.png": {
+        "bytes": 1439865,
+        "sha256": "a593457b3071907cd17e451cb8465ccc448bd42d2028ea11f9b426b6ea1f303a"
+      },
+      "windows-kit-motion-turn-0.png": {
+        "bytes": 1439483,
+        "sha256": "ad61923bf5fd57168cbe6f5c55d20fa41593fbb058bb0edf23350a06b2995614"
+      },
+      "windows-kit-motion-turn-10.png": {
+        "bytes": 1438201,
+        "sha256": "c8dcc70d720e2a29d08c9c0a9e7edd46d335f333902f3f8c6f1572243699cf15"
+      },
+      "windows-kit-motion-turn-100.png": {
+        "bytes": 1436241,
+        "sha256": "ef2d4cdc8379e77e7bea0798571890c721669c7f2f0a56cca19991e91438706b"
+      },
+      "windows-kit-motion-turn-20.png": {
+        "bytes": 1437557,
+        "sha256": "ad753e97ad865b3714b5e50ddf8ee11b400d6d56b54489846b991deb301e7a7f"
+      },
+      "windows-kit-motion-turn-30.png": {
+        "bytes": 1437709,
+        "sha256": "beb7b9206dff1b8e542594413c0e539eab4b1b6832a93d82a1a4da9612b9d4e9"
+      },
+      "windows-kit-motion-turn-40.png": {
+        "bytes": 1436830,
+        "sha256": "81468bce61952ea28a9912bb248a1dd13b6b231203480e7182b0aae077f720df"
+      },
+      "windows-kit-motion-turn-60.png": {
+        "bytes": 1435035,
+        "sha256": "e261de2eca9e031d48f7d32e46298abc53b7db379d04c9b8d0a81d9dce5455a8"
+      },
+      "windows-kit-motion-turn-80.png": {
+        "bytes": 1436041,
+        "sha256": "fdccbb09f6570cf71d56965b88abf1582b811f51a9268f244e1769ebf0398f76"
+      },
+      "windows-kit-motion-walk-100.png": {
+        "bytes": 1439156,
+        "sha256": "1a896521f430460d9506e525e4003b8368c1d55270a71333da6d1a0929e48150"
+      },
+      "windows-kit-motion-walk-20.png": {
+        "bytes": 1431305,
+        "sha256": "abda16cfdf47a92c47db38ce6a1d35b249397456099250322a686234739ee378"
+      },
+      "windows-kit-motion-walk-35.png": {
+        "bytes": 1436556,
+        "sha256": "f4839ff06365f3a0c88fd59c855e6d4bf50c1f8de85ed22cb3dabab20afc9010"
+      },
+      "windows-kit-motion-walk-50.png": {
+        "bytes": 1436165,
+        "sha256": "b75c6f9155e2ac58894139e1f10e52bff251d230e9a391a68a05a0de9a4a6eac"
+      },
+      "windows-kit-motion-walk-65.png": {
+        "bytes": 1439022,
+        "sha256": "7b53493c5ba068d9d950b99e745b54a901bd4cbecd294dcb0ee6a2ca14995987"
+      },
+      "windows-kit-motion-walk-80.png": {
+        "bytes": 1438526,
+        "sha256": "2d557e8d71d6a42cdb73556a428d5ffb1822f919ffd751d1e2b4782152a4539b"
+      },
+      "windows-kit-neutral.png": {
+        "bytes": 1469276,
+        "sha256": "dd627d930ff1375ffbd94c49bcc874196f0db3bc8990221409f81644a4d05052"
+      },
+      "windows-kit-recognition.png": {
+        "bytes": 1469255,
+        "sha256": "51638c30d607fa9775f0dbd96f1553875196460d602c7405df72a08ca2999f8c"
+      },
+      "windows-kit-speaking.png": {
+        "bytes": 1469296,
+        "sha256": "d423c5a5853830ef08ef4694ec28a0b0788f64be82ab8cfe72aa94a196bb53dd"
+      },
+      "windows-loaded-lookout.png": {
+        "bytes": 1403116,
+        "sha256": "1b1ab43226a40b16f4d0547701c83d5e85ec2c324caddc46deef9c78d2ceca8a"
+      }
+    }
+  },
+  "runs": {
+    "baseline-r1": {
+      "process": {
+        "pid": 41180,
+        "exitCode": 0,
+        "seconds": 13.422,
+        "foregroundBefore": null,
+        "foregroundAfter": null,
+        "pending": false
+      },
+      "count": 51,
+      "failures": 0,
+      "complete": true,
+      "renderCalls": 31,
+      "failedChecks": [],
+      "foregroundSamples": 189,
+      "ownerShown": false,
+      "ownerObservedForeground": false,
+      "foregroundContinuous": true,
+      "resources": [
+        {
+          "bottomLevelAccelerationStructureCount": 20,
+          "bufferCount": 51,
+          "descriptorSetCount": 1,
+          "deviceLocalBytes": 374395104,
+          "hostVisibleBytes": 48278656,
+          "memoryAllocationCount": 60,
+          "pipelineCount": 2,
+          "shaderBindingTableCount": 2,
+          "tlasInstanceCount": 28,
+          "topLevelAccelerationStructureCount": 1
+        }
+      ],
+      "custody": {
+        "run": {
+          "pid": 41180,
+          "exitCode": 0,
+          "seconds": 13.422,
+          "foregroundBefore": null,
+          "foregroundAfter": null,
+          "pending": false
+        },
+        "fixtureBefore": {
+          ".slot-1-auto.hrd.lock": {
+            "exists": true,
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "manifest.json": {
+            "exists": true,
+            "bytes": 166,
+            "sha256": "84315162c255558767f9ded6fc6596a85960c82a450e58cf96ece623ccca15a7"
+          },
+          "slot-1-auto.hrd": {
+            "exists": true,
+            "bytes": 162,
+            "sha256": "73b513b21f12de701c38aff0f0e4f4fecce0abbc625b20851218f5050b1d41ea"
+          }
+        },
+        "fixtureAfter": {
+          ".slot-1-auto.hrd.lock": {
+            "exists": true,
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "manifest.json": {
+            "exists": true,
+            "bytes": 166,
+            "sha256": "84315162c255558767f9ded6fc6596a85960c82a450e58cf96ece623ccca15a7"
+          },
+          "slot-1-auto.hrd": {
+            "exists": true,
+            "bytes": 162,
+            "sha256": "73b513b21f12de701c38aff0f0e4f4fecce0abbc625b20851218f5050b1d41ea"
+          }
+        },
+        "fixtureUnchanged": true,
+        "settingsBefore": {
+          "exists": true,
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "settingsAfter": {
+          "exists": true,
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "settingsUnchanged": true
+      },
+      "frames": [
+        {
+          "stage": "start-0",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "yaw": 1.89255,
+          "walking": false,
+          "idleSeconds": 1,
+          "walkPhase": 0,
+          "walkWeight": 0,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 7,
+            "recordSerial": 7,
+            "submissionSerial": 7,
+            "completionSerial": 7,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 7,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 24.497,
+          "gpuMs": 9.45536
+        },
+        {
+          "stage": "start-1",
+          "root": [
+            -27.6728,
+            1.39265,
+            -5.78743
+          ],
+          "yaw": 1.93255,
+          "walking": true,
+          "idleSeconds": 1.01667,
+          "walkPhase": 0.0192308,
+          "walkWeight": 0.0925926,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 8,
+            "recordSerial": 8,
+            "submissionSerial": 8,
+            "completionSerial": 8,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 8,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 24.3986,
+          "gpuMs": 9.279264
+        },
+        {
+          "stage": "start-4",
+          "root": [
+            -27.591,
+            1.38668,
+            -5.74971
+          ],
+          "yaw": 2.0032,
+          "walking": true,
+          "idleSeconds": 1.06667,
+          "walkPhase": 0.0769233,
+          "walkWeight": 0.37037,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 9,
+            "recordSerial": 9,
+            "submissionSerial": 9,
+            "completionSerial": 9,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 9,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 23.9341,
+          "gpuMs": 9.192704
+        },
+        {
+          "stage": "start-8",
+          "root": [
+            -27.4821,
+            1.37873,
+            -5.69943
+          ],
+          "yaw": 2.0032,
+          "walking": true,
+          "idleSeconds": 1.13333,
+          "walkPhase": 0.153847,
+          "walkWeight": 0.740741,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 10,
+            "recordSerial": 10,
+            "submissionSerial": 10,
+            "completionSerial": 10,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 10,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 26.9187,
+          "gpuMs": 16.273344
+        },
+        {
+          "stage": "walk-20",
+          "root": [
+            -27.1552,
+            1.35486,
+            -5.54856
+          ],
+          "yaw": 2.0032,
+          "walking": true,
+          "idleSeconds": 1.33333,
+          "walkPhase": 0.384616,
+          "walkWeight": 1,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 11,
+            "recordSerial": 11,
+            "submissionSerial": 11,
+            "completionSerial": 11,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 11,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 33.5617,
+          "gpuMs": 11.278048
+        },
+        {
+          "stage": "walk-35",
+          "root": [
+            -26.7466,
+            1.32656,
+            -5.35999
+          ],
+          "yaw": 2.0032,
+          "walking": true,
+          "idleSeconds": 1.58333,
+          "walkPhase": 0.673079,
+          "walkWeight": 1,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 12,
+            "recordSerial": 12,
+            "submissionSerial": 12,
+            "completionSerial": 12,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 12,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 32.1721,
+          "gpuMs": 9.446368
+        },
+        {
+          "stage": "walk-50",
+          "root": [
+            -26.3381,
+            1.2992,
+            -5.17141
+          ],
+          "yaw": 2.0032,
+          "walking": true,
+          "idleSeconds": 1.83333,
+          "walkPhase": 0.961542,
+          "walkWeight": 1,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 13,
+            "recordSerial": 13,
+            "submissionSerial": 13,
+            "completionSerial": 13,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 13,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 28.122,
+          "gpuMs": 9.63152
+        },
+        {
+          "stage": "walk-65",
+          "root": [
+            -25.9295,
+            1.27214,
+            -4.98283
+          ],
+          "yaw": 2.0032,
+          "walking": true,
+          "idleSeconds": 2.08333,
+          "walkPhase": 0.250004,
+          "walkWeight": 1,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 14,
+            "recordSerial": 14,
+            "submissionSerial": 14,
+            "completionSerial": 14,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 14,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 29.1711,
+          "gpuMs": 9.606336
+        },
+        {
+          "stage": "walk-80",
+          "root": [
+            -25.5209,
+            1.2476,
+            -4.79426
+          ],
+          "yaw": 2.0032,
+          "walking": true,
+          "idleSeconds": 2.33333,
+          "walkPhase": 0.538466,
+          "walkWeight": 1,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 15,
+            "recordSerial": 15,
+            "submissionSerial": 15,
+            "completionSerial": 15,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 15,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 24.8155,
+          "gpuMs": 18.106368
+        },
+        {
+          "stage": "walk-100",
+          "root": [
+            -24.9761,
+            1.21496,
+            -4.54282
+          ],
+          "yaw": 2.0032,
+          "walking": true,
+          "idleSeconds": 2.66666,
+          "walkPhase": 0.923083,
+          "walkWeight": 1,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 16,
+            "recordSerial": 16,
+            "submissionSerial": 16,
+            "completionSerial": 16,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 16,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 23.2758,
+          "gpuMs": 12.393344
+        },
+        {
+          "stage": "stop-0",
+          "root": [
+            -24.9761,
+            1.21496,
+            -4.54282
+          ],
+          "yaw": 2.0032,
+          "walking": true,
+          "idleSeconds": 2.66666,
+          "walkPhase": 0.923083,
+          "walkWeight": 1,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 17,
+            "recordSerial": 17,
+            "submissionSerial": 17,
+            "completionSerial": 17,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 17,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 0.0,
+          "gpuMs": 12.031616
+        },
+        {
+          "stage": "stop-1",
+          "root": [
+            -24.9761,
+            1.21496,
+            -4.54282
+          ],
+          "yaw": 1.9632,
+          "walking": false,
+          "idleSeconds": 2.68333,
+          "walkPhase": 0.923083,
+          "walkWeight": 0.907407,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 18,
+            "recordSerial": 18,
+            "submissionSerial": 18,
+            "completionSerial": 18,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 18,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 26.95,
+          "gpuMs": 8.67168
+        },
+        {
+          "stage": "stop-4",
+          "root": [
+            -24.9761,
+            1.21496,
+            -4.54282
+          ],
+          "yaw": 1.89255,
+          "walking": false,
+          "idleSeconds": 2.73333,
+          "walkPhase": 0.923083,
+          "walkWeight": 0.62963,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 19,
+            "recordSerial": 19,
+            "submissionSerial": 19,
+            "completionSerial": 19,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 19,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 24.9988,
+          "gpuMs": 12.551648
+        },
+        {
+          "stage": "stop-8",
+          "root": [
+            -24.9761,
+            1.21496,
+            -4.54282
+          ],
+          "yaw": 1.89255,
+          "walking": false,
+          "idleSeconds": 2.8,
+          "walkPhase": 0.923083,
+          "walkWeight": 0.259259,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 20,
+            "recordSerial": 20,
+            "submissionSerial": 20,
+            "completionSerial": 20,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 20,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 25.8675,
+          "gpuMs": 7.013344
+        },
+        {
+          "stage": "stop-11",
+          "root": [
+            -24.9761,
+            1.21496,
+            -4.54282
+          ],
+          "yaw": 1.89255,
+          "walking": false,
+          "idleSeconds": 2.85,
+          "walkPhase": 0.923083,
+          "walkWeight": 0,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 21,
+            "recordSerial": 21,
+            "submissionSerial": 21,
+            "completionSerial": 21,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 21,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 25.0593,
+          "gpuMs": 7.045472
+        },
+        {
+          "stage": "turn-0",
+          "root": [
+            -24.9761,
+            1.21496,
+            -4.54282
+          ],
+          "yaw": 1.89255,
+          "walking": false,
+          "idleSeconds": 2.85,
+          "walkPhase": 0.923083,
+          "walkWeight": 0,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 22,
+            "recordSerial": 22,
+            "submissionSerial": 22,
+            "completionSerial": 22,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 22,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 0.0,
+          "gpuMs": 12.125216
+        },
+        {
+          "stage": "turn-10",
+          "root": [
+            -24.9761,
+            1.21496,
+            -4.54282
+          ],
+          "yaw": 2.29255,
+          "walking": false,
+          "idleSeconds": 3.01666,
+          "walkPhase": 0.923083,
+          "walkWeight": 0,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 23,
+            "recordSerial": 23,
+            "submissionSerial": 23,
+            "completionSerial": 23,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 23,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 31.216,
+          "gpuMs": 12.357728
+        },
+        {
+          "stage": "turn-20",
+          "root": [
+            -24.9761,
+            1.21496,
+            -4.54282
+          ],
+          "yaw": 2.69255,
+          "walking": false,
+          "idleSeconds": 3.18333,
+          "walkPhase": 0.923083,
+          "walkWeight": 0,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 24,
+            "recordSerial": 24,
+            "submissionSerial": 24,
+            "completionSerial": 24,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 24,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 24.0592,
+          "gpuMs": 12.350976
+        },
+        {
+          "stage": "turn-30",
+          "root": [
+            -24.9761,
+            1.21496,
+            -4.54282
+          ],
+          "yaw": 3.09255,
+          "walking": false,
+          "idleSeconds": 3.35,
+          "walkPhase": 0.923083,
+          "walkWeight": 0,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 25,
+            "recordSerial": 25,
+            "submissionSerial": 25,
+            "completionSerial": 25,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 25,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 27.109,
+          "gpuMs": 24.232512
+        },
+        {
+          "stage": "turn-40",
+          "root": [
+            -24.9761,
+            1.21496,
+            -4.54282
+          ],
+          "yaw": 3.49255,
+          "walking": false,
+          "idleSeconds": 3.51666,
+          "walkPhase": 0.923083,
+          "walkWeight": 0,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 26,
+            "recordSerial": 26,
+            "submissionSerial": 26,
+            "completionSerial": 26,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 26,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 25.4535,
+          "gpuMs": 9.063104
+        }
+      ]
+    },
+    "candidate-r1": {
+      "process": {
+        "pid": 46216,
+        "exitCode": 1,
+        "seconds": 12.953,
+        "foregroundBefore": null,
+        "foregroundAfter": null,
+        "pending": false
+      },
+      "count": 54,
+      "failures": 1,
+      "complete": false,
+      "renderCalls": 34,
+      "failedChecks": [
+        {
+          "name": "source autosave and manifest bytes unchanged with zero attempted campaign writes",
+          "pass": false
+        }
+      ],
+      "foregroundSamples": 201,
+      "ownerShown": false,
+      "ownerObservedForeground": false,
+      "foregroundContinuous": true,
+      "resources": [
+        {
+          "bottomLevelAccelerationStructureCount": 20,
+          "bufferCount": 51,
+          "descriptorSetCount": 1,
+          "deviceLocalBytes": 374395104,
+          "hostVisibleBytes": 48278656,
+          "memoryAllocationCount": 60,
+          "pipelineCount": 2,
+          "shaderBindingTableCount": 2,
+          "tlasInstanceCount": 28,
+          "topLevelAccelerationStructureCount": 1
+        }
+      ],
+      "custody": {
+        "run": {
+          "pid": 46216,
+          "exitCode": 1,
+          "seconds": 12.953,
+          "foregroundBefore": null,
+          "foregroundAfter": null,
+          "pending": false
+        },
+        "fixtureBefore": {
+          ".slot-1-auto.hrd.lock": {
+            "exists": true,
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "manifest.json": {
+            "exists": true,
+            "bytes": 166,
+            "sha256": "84315162c255558767f9ded6fc6596a85960c82a450e58cf96ece623ccca15a7"
+          },
+          "slot-1-auto.hrd": {
+            "exists": true,
+            "bytes": 162,
+            "sha256": "73b513b21f12de701c38aff0f0e4f4fecce0abbc625b20851218f5050b1d41ea"
+          }
+        },
+        "fixtureAfter": {
+          "slot-1-auto.hrd": {
+            "exists": true,
+            "bytes": 162,
+            "sha256": "73b513b21f12de701c38aff0f0e4f4fecce0abbc625b20851218f5050b1d41ea"
+          },
+          ".slot-1-auto.hrd.lock": {
+            "exists": true,
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "manifest.json": {
+            "exists": true,
+            "bytes": 166,
+            "sha256": "84315162c255558767f9ded6fc6596a85960c82a450e58cf96ece623ccca15a7"
+          }
+        },
+        "fixtureUnchanged": true,
+        "settingsBefore": {
+          "exists": true,
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "settingsAfter": {
+          "exists": true,
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "settingsUnchanged": true
+      },
+      "frames": [
+        {
+          "stage": "start-0",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "yaw": 1.89255,
+          "walking": false,
+          "idleSeconds": 1,
+          "walkPhase": 0,
+          "walkWeight": 0,
+          "leftTurnStep": 0.420261,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 7,
+            "recordSerial": 7,
+            "submissionSerial": 7,
+            "completionSerial": 7,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 7,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 23.031,
+          "gpuMs": 9.322848
+        },
+        {
+          "stage": "start-1",
+          "root": [
+            -27.6728,
+            1.39265,
+            -5.78743
+          ],
+          "yaw": 1.93255,
+          "walking": true,
+          "idleSeconds": 1.01667,
+          "walkPhase": 0.0192308,
+          "walkWeight": 0.0925926,
+          "leftTurnStep": 0.281372,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 8,
+            "recordSerial": 8,
+            "submissionSerial": 8,
+            "completionSerial": 8,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 8,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 24.7637,
+          "gpuMs": 16.776896
+        },
+        {
+          "stage": "start-4",
+          "root": [
+            -27.591,
+            1.38668,
+            -5.74971
+          ],
+          "yaw": 2.0032,
+          "walking": true,
+          "idleSeconds": 1.06667,
+          "walkPhase": 0.0769233,
+          "walkWeight": 0.37037,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 9,
+            "recordSerial": 9,
+            "submissionSerial": 9,
+            "completionSerial": 9,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 9,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 23.7093,
+          "gpuMs": 16.846176
+        },
+        {
+          "stage": "start-8",
+          "root": [
+            -27.4821,
+            1.37873,
+            -5.69943
+          ],
+          "yaw": 2.0032,
+          "walking": true,
+          "idleSeconds": 1.13333,
+          "walkPhase": 0.153847,
+          "walkWeight": 0.740741,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 10,
+            "recordSerial": 10,
+            "submissionSerial": 10,
+            "completionSerial": 10,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 10,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 23.9122,
+          "gpuMs": 17.008064
+        },
+        {
+          "stage": "walk-20",
+          "root": [
+            -27.1552,
+            1.35486,
+            -5.54856
+          ],
+          "yaw": 2.0032,
+          "walking": true,
+          "idleSeconds": 1.33333,
+          "walkPhase": 0.384616,
+          "walkWeight": 1,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 11,
+            "recordSerial": 11,
+            "submissionSerial": 11,
+            "completionSerial": 11,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 11,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 22.8296,
+          "gpuMs": 17.165472
+        },
+        {
+          "stage": "walk-35",
+          "root": [
+            -26.7466,
+            1.32656,
+            -5.35999
+          ],
+          "yaw": 2.0032,
+          "walking": true,
+          "idleSeconds": 1.58333,
+          "walkPhase": 0.673079,
+          "walkWeight": 1,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 12,
+            "recordSerial": 12,
+            "submissionSerial": 12,
+            "completionSerial": 12,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 12,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 23.2411,
+          "gpuMs": 9.360992
+        },
+        {
+          "stage": "walk-50",
+          "root": [
+            -26.3381,
+            1.2992,
+            -5.17141
+          ],
+          "yaw": 2.0032,
+          "walking": true,
+          "idleSeconds": 1.83333,
+          "walkPhase": 0.961542,
+          "walkWeight": 1,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 13,
+            "recordSerial": 13,
+            "submissionSerial": 13,
+            "completionSerial": 13,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 13,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 23.8999,
+          "gpuMs": 17.7376
+        },
+        {
+          "stage": "walk-65",
+          "root": [
+            -25.9295,
+            1.27214,
+            -4.98283
+          ],
+          "yaw": 2.0032,
+          "walking": true,
+          "idleSeconds": 2.08333,
+          "walkPhase": 0.250004,
+          "walkWeight": 1,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 14,
+            "recordSerial": 14,
+            "submissionSerial": 14,
+            "completionSerial": 14,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 14,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 23.1968,
+          "gpuMs": 17.94512
+        },
+        {
+          "stage": "walk-80",
+          "root": [
+            -25.5209,
+            1.2476,
+            -4.79426
+          ],
+          "yaw": 2.0032,
+          "walking": true,
+          "idleSeconds": 2.33333,
+          "walkPhase": 0.538466,
+          "walkWeight": 1,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 15,
+            "recordSerial": 15,
+            "submissionSerial": 15,
+            "completionSerial": 15,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 15,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 23.3555,
+          "gpuMs": 17.999712
+        },
+        {
+          "stage": "walk-100",
+          "root": [
+            -24.9761,
+            1.21496,
+            -4.54282
+          ],
+          "yaw": 2.0032,
+          "walking": true,
+          "idleSeconds": 2.66666,
+          "walkPhase": 0.923083,
+          "walkWeight": 1,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 16,
+            "recordSerial": 16,
+            "submissionSerial": 16,
+            "completionSerial": 16,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 16,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 23.6995,
+          "gpuMs": 12.513792
+        },
+        {
+          "stage": "stop-0",
+          "root": [
+            -24.9761,
+            1.21496,
+            -4.54282
+          ],
+          "yaw": 2.0032,
+          "walking": true,
+          "idleSeconds": 2.66666,
+          "walkPhase": 0.923083,
+          "walkWeight": 1,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 17,
+            "recordSerial": 17,
+            "submissionSerial": 17,
+            "completionSerial": 17,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 17,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 0.0,
+          "gpuMs": 12.044832
+        },
+        {
+          "stage": "stop-1",
+          "root": [
+            -24.9761,
+            1.21496,
+            -4.54282
+          ],
+          "yaw": 1.9632,
+          "walking": false,
+          "idleSeconds": 2.68333,
+          "walkPhase": 0.923083,
+          "walkWeight": 0.907407,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 18,
+            "recordSerial": 18,
+            "submissionSerial": 18,
+            "completionSerial": 18,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 18,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 24.2624,
+          "gpuMs": 12.344704
+        },
+        {
+          "stage": "stop-4",
+          "root": [
+            -24.9761,
+            1.21496,
+            -4.54282
+          ],
+          "yaw": 1.89255,
+          "walking": false,
+          "idleSeconds": 2.73333,
+          "walkPhase": 0.923083,
+          "walkWeight": 0.62963,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 19,
+            "recordSerial": 19,
+            "submissionSerial": 19,
+            "completionSerial": 19,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 19,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 24.2303,
+          "gpuMs": 6.920672
+        },
+        {
+          "stage": "stop-8",
+          "root": [
+            -24.9761,
+            1.21496,
+            -4.54282
+          ],
+          "yaw": 1.89255,
+          "walking": false,
+          "idleSeconds": 2.8,
+          "walkPhase": 0.923083,
+          "walkWeight": 0.259259,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 20,
+            "recordSerial": 20,
+            "submissionSerial": 20,
+            "completionSerial": 20,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 20,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 23.0972,
+          "gpuMs": 12.409856
+        },
+        {
+          "stage": "stop-11",
+          "root": [
+            -24.9761,
+            1.21496,
+            -4.54282
+          ],
+          "yaw": 1.89255,
+          "walking": false,
+          "idleSeconds": 2.85,
+          "walkPhase": 0.923083,
+          "walkWeight": 0,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 21,
+            "recordSerial": 21,
+            "submissionSerial": 21,
+            "completionSerial": 21,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 21,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 23.4639,
+          "gpuMs": 12.485632
+        },
+        {
+          "stage": "turn-0",
+          "root": [
+            -24.9761,
+            1.21496,
+            -4.54282
+          ],
+          "yaw": 1.89255,
+          "walking": false,
+          "idleSeconds": 2.85,
+          "walkPhase": 0.923083,
+          "walkWeight": 0,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 22,
+            "recordSerial": 22,
+            "submissionSerial": 22,
+            "completionSerial": 22,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 22,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 0.0,
+          "gpuMs": 6.886304
+        },
+        {
+          "stage": "turn-10",
+          "root": [
+            -24.9761,
+            1.21496,
+            -4.54282
+          ],
+          "yaw": 2.29255,
+          "walking": false,
+          "idleSeconds": 3.01666,
+          "walkPhase": 0.923083,
+          "walkWeight": 0,
+          "leftTurnStep": 0.986522,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 23,
+            "recordSerial": 23,
+            "submissionSerial": 23,
+            "completionSerial": 23,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 23,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 25.0392,
+          "gpuMs": 12.4656
+        },
+        {
+          "stage": "turn-20",
+          "root": [
+            -24.9761,
+            1.21496,
+            -4.54282
+          ],
+          "yaw": 2.69255,
+          "walking": false,
+          "idleSeconds": 3.18333,
+          "walkPhase": 0.923083,
+          "walkWeight": 0,
+          "leftTurnStep": 0.0531834,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 24,
+            "recordSerial": 24,
+            "submissionSerial": 24,
+            "completionSerial": 24,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 24,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 23.2958,
+          "gpuMs": 12.225344
+        },
+        {
+          "stage": "turn-30",
+          "root": [
+            -24.9761,
+            1.21496,
+            -4.54282
+          ],
+          "yaw": 3.09255,
+          "walking": false,
+          "idleSeconds": 3.35,
+          "walkPhase": 0.923083,
+          "walkWeight": 0,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0.883023,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 25,
+            "recordSerial": 25,
+            "submissionSerial": 25,
+            "completionSerial": 25,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 25,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 24.6022,
+          "gpuMs": 6.88432
+        },
+        {
+          "stage": "turn-40",
+          "root": [
+            -24.9761,
+            1.21496,
+            -4.54282
+          ],
+          "yaw": 3.49255,
+          "walking": false,
+          "idleSeconds": 3.51666,
+          "walkPhase": 0.923083,
+          "walkWeight": 0,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0.20142,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 26,
+            "recordSerial": 26,
+            "submissionSerial": 26,
+            "completionSerial": 26,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 26,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 22.9067,
+          "gpuMs": 12.150112
+        },
+        {
+          "stage": "turn-60",
+          "root": [
+            -24.9761,
+            1.21496,
+            -4.54282
+          ],
+          "yaw": 4.29254,
+          "walking": false,
+          "idleSeconds": 3.85,
+          "walkPhase": 0.923083,
+          "walkWeight": 0,
+          "leftTurnStep": 0.420261,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 27,
+            "recordSerial": 27,
+            "submissionSerial": 27,
+            "completionSerial": 27,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 27,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 23.8437,
+          "gpuMs": 12.364384
+        },
+        {
+          "stage": "turn-80",
+          "root": [
+            -24.9761,
+            1.21496,
+            -4.54282
+          ],
+          "yaw": 4.71239,
+          "walking": false,
+          "idleSeconds": 4.18333,
+          "walkPhase": 0.923083,
+          "walkWeight": 0,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0.6434,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 28,
+            "recordSerial": 28,
+            "submissionSerial": 28,
+            "completionSerial": 28,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 28,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 23.6413,
+          "gpuMs": 12.264896
+        },
+        {
+          "stage": "turn-100",
+          "root": [
+            -24.9761,
+            1.21496,
+            -4.54282
+          ],
+          "yaw": 4.71239,
+          "walking": false,
+          "idleSeconds": 4.51667,
+          "walkPhase": 0.923083,
+          "walkWeight": 0,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 29,
+            "recordSerial": 29,
+            "submissionSerial": 29,
+            "completionSerial": 29,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 29,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 27.0216,
+          "gpuMs": 6.98688
+        }
+      ]
+    },
+    "candidate-r2": {
+      "process": {
+        "pid": 37196,
+        "exitCode": 0,
+        "seconds": 13.266,
+        "foregroundBefore": null,
+        "foregroundAfter": null,
+        "pending": false
+      },
+      "count": 54,
+      "failures": 0,
+      "complete": true,
+      "renderCalls": 34,
+      "failedChecks": [],
+      "foregroundSamples": 201,
+      "ownerShown": false,
+      "ownerObservedForeground": false,
+      "foregroundContinuous": true,
+      "resources": [
+        {
+          "bottomLevelAccelerationStructureCount": 20,
+          "bufferCount": 51,
+          "descriptorSetCount": 1,
+          "deviceLocalBytes": 374395104,
+          "hostVisibleBytes": 48278656,
+          "memoryAllocationCount": 60,
+          "pipelineCount": 2,
+          "shaderBindingTableCount": 2,
+          "tlasInstanceCount": 28,
+          "topLevelAccelerationStructureCount": 1
+        }
+      ],
+      "custody": {
+        "run": {
+          "pid": 37196,
+          "exitCode": 0,
+          "seconds": 13.266,
+          "foregroundBefore": null,
+          "foregroundAfter": null,
+          "pending": false
+        },
+        "fixtureBefore": {
+          ".slot-1-auto.hrd.lock": {
+            "exists": true,
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "manifest.json": {
+            "exists": true,
+            "bytes": 166,
+            "sha256": "84315162c255558767f9ded6fc6596a85960c82a450e58cf96ece623ccca15a7"
+          },
+          "slot-1-auto.hrd": {
+            "exists": true,
+            "bytes": 162,
+            "sha256": "73b513b21f12de701c38aff0f0e4f4fecce0abbc625b20851218f5050b1d41ea"
+          }
+        },
+        "fixtureAfter": {
+          ".slot-1-auto.hrd.lock": {
+            "exists": true,
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "manifest.json": {
+            "exists": true,
+            "bytes": 166,
+            "sha256": "84315162c255558767f9ded6fc6596a85960c82a450e58cf96ece623ccca15a7"
+          },
+          "slot-1-auto.hrd": {
+            "exists": true,
+            "bytes": 162,
+            "sha256": "73b513b21f12de701c38aff0f0e4f4fecce0abbc625b20851218f5050b1d41ea"
+          }
+        },
+        "fixtureUnchanged": true,
+        "settingsBefore": {
+          "exists": true,
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "settingsAfter": {
+          "exists": true,
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "settingsUnchanged": true
+      },
+      "frames": [
+        {
+          "stage": "start-0",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "yaw": 1.89255,
+          "walking": false,
+          "idleSeconds": 1,
+          "walkPhase": 0,
+          "walkWeight": 0,
+          "leftTurnStep": 0.420261,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 7,
+            "recordSerial": 7,
+            "submissionSerial": 7,
+            "completionSerial": 7,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 7,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 23.5207,
+          "gpuMs": 9.376384
+        },
+        {
+          "stage": "start-1",
+          "root": [
+            -27.6728,
+            1.39265,
+            -5.78743
+          ],
+          "yaw": 1.93255,
+          "walking": true,
+          "idleSeconds": 1.01667,
+          "walkPhase": 0.0192308,
+          "walkWeight": 0.0925926,
+          "leftTurnStep": 0.281372,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 8,
+            "recordSerial": 8,
+            "submissionSerial": 8,
+            "completionSerial": 8,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 8,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 22.6578,
+          "gpuMs": 16.629856
+        },
+        {
+          "stage": "start-4",
+          "root": [
+            -27.591,
+            1.38668,
+            -5.74971
+          ],
+          "yaw": 2.0032,
+          "walking": true,
+          "idleSeconds": 1.06667,
+          "walkPhase": 0.0769233,
+          "walkWeight": 0.37037,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 9,
+            "recordSerial": 9,
+            "submissionSerial": 9,
+            "completionSerial": 9,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 9,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 23.1564,
+          "gpuMs": 17.01296
+        },
+        {
+          "stage": "start-8",
+          "root": [
+            -27.4821,
+            1.37873,
+            -5.69943
+          ],
+          "yaw": 2.0032,
+          "walking": true,
+          "idleSeconds": 1.13333,
+          "walkPhase": 0.153847,
+          "walkWeight": 0.740741,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 10,
+            "recordSerial": 10,
+            "submissionSerial": 10,
+            "completionSerial": 10,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 10,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 22.7141,
+          "gpuMs": 9.088352
+        },
+        {
+          "stage": "walk-20",
+          "root": [
+            -27.1552,
+            1.35486,
+            -5.54856
+          ],
+          "yaw": 2.0032,
+          "walking": true,
+          "idleSeconds": 1.33333,
+          "walkPhase": 0.384616,
+          "walkWeight": 1,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 11,
+            "recordSerial": 11,
+            "submissionSerial": 11,
+            "completionSerial": 11,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 11,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 24.1829,
+          "gpuMs": 17.099168
+        },
+        {
+          "stage": "walk-35",
+          "root": [
+            -26.7466,
+            1.32656,
+            -5.35999
+          ],
+          "yaw": 2.0032,
+          "walking": true,
+          "idleSeconds": 1.58333,
+          "walkPhase": 0.673079,
+          "walkWeight": 1,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 12,
+            "recordSerial": 12,
+            "submissionSerial": 12,
+            "completionSerial": 12,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 12,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 23.0171,
+          "gpuMs": 17.362176
+        },
+        {
+          "stage": "walk-50",
+          "root": [
+            -26.3381,
+            1.2992,
+            -5.17141
+          ],
+          "yaw": 2.0032,
+          "walking": true,
+          "idleSeconds": 1.83333,
+          "walkPhase": 0.961542,
+          "walkWeight": 1,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 13,
+            "recordSerial": 13,
+            "submissionSerial": 13,
+            "completionSerial": 13,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 13,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 23.6897,
+          "gpuMs": 17.697344
+        },
+        {
+          "stage": "walk-65",
+          "root": [
+            -25.9295,
+            1.27214,
+            -4.98283
+          ],
+          "yaw": 2.0032,
+          "walking": true,
+          "idleSeconds": 2.08333,
+          "walkPhase": 0.250004,
+          "walkWeight": 1,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 14,
+            "recordSerial": 14,
+            "submissionSerial": 14,
+            "completionSerial": 14,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 14,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 22.7444,
+          "gpuMs": 18.099072
+        },
+        {
+          "stage": "walk-80",
+          "root": [
+            -25.5209,
+            1.2476,
+            -4.79426
+          ],
+          "yaw": 2.0032,
+          "walking": true,
+          "idleSeconds": 2.33333,
+          "walkPhase": 0.538466,
+          "walkWeight": 1,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 15,
+            "recordSerial": 15,
+            "submissionSerial": 15,
+            "completionSerial": 15,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 15,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 22.9478,
+          "gpuMs": 12.21056
+        },
+        {
+          "stage": "walk-100",
+          "root": [
+            -24.9761,
+            1.21496,
+            -4.54282
+          ],
+          "yaw": 2.0032,
+          "walking": true,
+          "idleSeconds": 2.66666,
+          "walkPhase": 0.923083,
+          "walkWeight": 1,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 16,
+            "recordSerial": 16,
+            "submissionSerial": 16,
+            "completionSerial": 16,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 16,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 23.3174,
+          "gpuMs": 6.892128
+        },
+        {
+          "stage": "stop-0",
+          "root": [
+            -24.9761,
+            1.21496,
+            -4.54282
+          ],
+          "yaw": 2.0032,
+          "walking": true,
+          "idleSeconds": 2.66666,
+          "walkPhase": 0.923083,
+          "walkWeight": 1,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 17,
+            "recordSerial": 17,
+            "submissionSerial": 17,
+            "completionSerial": 17,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 17,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 0.0,
+          "gpuMs": 12.223744
+        },
+        {
+          "stage": "stop-1",
+          "root": [
+            -24.9761,
+            1.21496,
+            -4.54282
+          ],
+          "yaw": 1.9632,
+          "walking": false,
+          "idleSeconds": 2.68333,
+          "walkPhase": 0.923083,
+          "walkWeight": 0.907407,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 18,
+            "recordSerial": 18,
+            "submissionSerial": 18,
+            "completionSerial": 18,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 18,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 22.3092,
+          "gpuMs": 12.423936
+        },
+        {
+          "stage": "stop-4",
+          "root": [
+            -24.9761,
+            1.21496,
+            -4.54282
+          ],
+          "yaw": 1.89255,
+          "walking": false,
+          "idleSeconds": 2.73333,
+          "walkPhase": 0.923083,
+          "walkWeight": 0.62963,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 19,
+            "recordSerial": 19,
+            "submissionSerial": 19,
+            "completionSerial": 19,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 19,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 22.6796,
+          "gpuMs": 12.305504
+        },
+        {
+          "stage": "stop-8",
+          "root": [
+            -24.9761,
+            1.21496,
+            -4.54282
+          ],
+          "yaw": 1.89255,
+          "walking": false,
+          "idleSeconds": 2.8,
+          "walkPhase": 0.923083,
+          "walkWeight": 0.259259,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 20,
+            "recordSerial": 20,
+            "submissionSerial": 20,
+            "completionSerial": 20,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 20,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 22.3131,
+          "gpuMs": 6.947136
+        },
+        {
+          "stage": "stop-11",
+          "root": [
+            -24.9761,
+            1.21496,
+            -4.54282
+          ],
+          "yaw": 1.89255,
+          "walking": false,
+          "idleSeconds": 2.85,
+          "walkPhase": 0.923083,
+          "walkWeight": 0,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 21,
+            "recordSerial": 21,
+            "submissionSerial": 21,
+            "completionSerial": 21,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 21,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 24.1694,
+          "gpuMs": 13.394624
+        },
+        {
+          "stage": "turn-0",
+          "root": [
+            -24.9761,
+            1.21496,
+            -4.54282
+          ],
+          "yaw": 1.89255,
+          "walking": false,
+          "idleSeconds": 2.85,
+          "walkPhase": 0.923083,
+          "walkWeight": 0,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 22,
+            "recordSerial": 22,
+            "submissionSerial": 22,
+            "completionSerial": 22,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 22,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 0.0,
+          "gpuMs": 6.04368
+        },
+        {
+          "stage": "turn-10",
+          "root": [
+            -24.9761,
+            1.21496,
+            -4.54282
+          ],
+          "yaw": 2.29255,
+          "walking": false,
+          "idleSeconds": 3.01666,
+          "walkPhase": 0.923083,
+          "walkWeight": 0,
+          "leftTurnStep": 0.986522,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 23,
+            "recordSerial": 23,
+            "submissionSerial": 23,
+            "completionSerial": 23,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 23,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 24.2686,
+          "gpuMs": 6.951936
+        },
+        {
+          "stage": "turn-20",
+          "root": [
+            -24.9761,
+            1.21496,
+            -4.54282
+          ],
+          "yaw": 2.69255,
+          "walking": false,
+          "idleSeconds": 3.18333,
+          "walkPhase": 0.923083,
+          "walkWeight": 0,
+          "leftTurnStep": 0.0531834,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 24,
+            "recordSerial": 24,
+            "submissionSerial": 24,
+            "completionSerial": 24,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 24,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 24.112,
+          "gpuMs": 12.33712
+        },
+        {
+          "stage": "turn-30",
+          "root": [
+            -24.9761,
+            1.21496,
+            -4.54282
+          ],
+          "yaw": 3.09255,
+          "walking": false,
+          "idleSeconds": 3.35,
+          "walkPhase": 0.923083,
+          "walkWeight": 0,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0.883023,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 25,
+            "recordSerial": 25,
+            "submissionSerial": 25,
+            "completionSerial": 25,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 25,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 23.2499,
+          "gpuMs": 12.225696
+        },
+        {
+          "stage": "turn-40",
+          "root": [
+            -24.9761,
+            1.21496,
+            -4.54282
+          ],
+          "yaw": 3.49255,
+          "walking": false,
+          "idleSeconds": 3.51666,
+          "walkPhase": 0.923083,
+          "walkWeight": 0,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0.20142,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 26,
+            "recordSerial": 26,
+            "submissionSerial": 26,
+            "completionSerial": 26,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 26,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 29.0557,
+          "gpuMs": 12.202528
+        },
+        {
+          "stage": "turn-60",
+          "root": [
+            -24.9761,
+            1.21496,
+            -4.54282
+          ],
+          "yaw": 4.29254,
+          "walking": false,
+          "idleSeconds": 3.85,
+          "walkPhase": 0.923083,
+          "walkWeight": 0,
+          "leftTurnStep": 0.420261,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 27,
+            "recordSerial": 27,
+            "submissionSerial": 27,
+            "completionSerial": 27,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 27,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 22.8031,
+          "gpuMs": 12.399072
+        },
+        {
+          "stage": "turn-80",
+          "root": [
+            -24.9761,
+            1.21496,
+            -4.54282
+          ],
+          "yaw": 4.71239,
+          "walking": false,
+          "idleSeconds": 4.18333,
+          "walkPhase": 0.923083,
+          "walkWeight": 0,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0.6434,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 28,
+            "recordSerial": 28,
+            "submissionSerial": 28,
+            "completionSerial": 28,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 28,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 22.9019,
+          "gpuMs": 7.374464
+        },
+        {
+          "stage": "turn-100",
+          "root": [
+            -24.9761,
+            1.21496,
+            -4.54282
+          ],
+          "yaw": 4.71239,
+          "walking": false,
+          "idleSeconds": 4.51667,
+          "walkPhase": 0.923083,
+          "walkWeight": 0,
+          "leftTurnStep": 0,
+          "rightTurnStep": 0,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 29,
+            "recordSerial": 29,
+            "submissionSerial": 29,
+            "completionSerial": 29,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 29,
+            "finalIdleCompletion": true
+          },
+          "characterSkinCpuMs": 22.5824,
+          "gpuMs": 12.362016
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,269 @@
+{
+  "sealedAtUtc": "2026-10-20T18:19:14.704034+00:00",
+  "sourceBase": "feef147183ddedbb65c4b900e3c6d3b8319cc352",
+  "worktree": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "artifacts": {
+    "windowsDebug": {
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+      "bytes": 14088192,
+      "sha256": "f604ae7d82686064f6651b6636efdfb170def54eb1fb91e211b368c1b394caf3"
+    },
+    "windowsRelease": {
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+      "bytes": 4621312,
+      "sha256": "f5d07195ed0c490f7ccf8ddf990ef3a8f4647f33371da2e1832631c40fa9f65d"
+    },
+    "androidDebugShippingMobile": {
+      "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "bytes": 186121801,
+      "sha256": "c28fbb0213221d0b2b106e5ea8194aa8843b30a3e1cdb5accb94b7ac6baef1e5"
+    }
+  },
+  "packagedAndroidAbis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+  ],
+  "phoneOperations": false,
+  "publicOperations": false,
+  "ownerFiles": {
+    "ASSET_LICENSES.md": {
+      "bytes": 30507,
+      "sha256": "3a6cff3d34421d2ec751b1f64ec44b6c3ee801cdc1d6d1123c3cb479c0b92387"
+    },
+    "PROJECT_MEMORY.md": {
+      "bytes": 51219,
+      "sha256": "9cfbea7667b50a9a960396c8f13c68905791aebd42121ecb353a8354b8cd406e"
+    }
+  },
+  "ownerCampaignExists": false,
+  "settings": {
+    "bytes": 471,
+    "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+  },
+  "audioHapticManualRevalidationRequired": false,
+  "rawFiles": {
+    "comparison.json": {
+      "original": "reports/kit-turn-20261020-comparison.json",
+      "bytes": 97400,
+      "sha256": "0a64176d04a376ae94fa0c5c4fe099b2accdcbf03cf26bc159c2dafdba9883ec"
+    },
+    "compare.py": {
+      "original": "reports/compare-kit-turn-20261020.py",
+      "bytes": 3044,
+      "sha256": "6ff5e121940b0ee7c4c00d372e28a791fe0e8301d7c2c5d4f32c9907034283b2"
+    },
+    "hidden-rt-runner.py": {
+      "original": "reports/kit-turn-20261020-runner.py",
+      "bytes": 3920,
+      "sha256": "a4f8751dc6476197a266503f863157b486a04fbdcbe8e764514c3857d03f9f48"
+    },
+    "source-freeze.json": {
+      "original": "reports/kit-turn-20261020-source-freeze.json",
+      "bytes": 1196,
+      "sha256": "e3be7b4e6d760d344e1949f682ac3f0d6b01c0923a60238170d990fee5c34530"
+    },
+    "rejected-axis-recipe.diff": {
+      "original": "reports/kit-turn-20261020-rejected-axis-recipe.diff",
+      "bytes": 1573,
+      "sha256": "eee3d921531cf7224e775906affc49455f676f9f420aaabf6af2c9024491310c"
+    },
+    "focused-tests.log": {
+      "original": "reports/kit-turn-20261020-focused-tests-r1.log",
+      "bytes": 849,
+      "sha256": "9c884bbdc9e3cd5ef03d559dfc6aa094c4d3ad8ceec2f4d0224fa1cee2856747"
+    },
+    "focused-LastTest.log": {
+      "original": "reports/kit-turn-20261020-focused-LastTest-r1.log",
+      "bytes": 10075,
+      "sha256": "8dd38b273ca63ab676e87e3f78975c724f7c4d4a31f361e0cd21d8e08ae12a81"
+    },
+    "initial-corrected-native-rig.log": {
+      "original": "reports/kit-turn-20261020-native-rig-r1.log",
+      "bytes": 5061,
+      "sha256": "36ae71fd6339f3974b4127704607bde8083f89273d2d66fb008a4eced8685f19"
+    },
+    "initial-locomotion.log": {
+      "original": "reports/kit-turn-20261020-locomotion-r1.log",
+      "bytes": 61,
+      "sha256": "f77227ffc94a2155ae5442563721e25dfab9f5442eb166d7882b2c221f14e964"
+    },
+    "debug-locomotion.log": {
+      "original": "reports/kit-turn-20261020-debug-locomotion.log",
+      "bytes": 61,
+      "sha256": "f77227ffc94a2155ae5442563721e25dfab9f5442eb166d7882b2c221f14e964"
+    },
+    "rejected-axis-build.log": {
+      "original": "reports/kit-turn-20261020-host-build-r1.log",
+      "bytes": 2292,
+      "sha256": "de728b0de34249c85f083567f9409fc9d316bc90ee8b62344f5b2b33c7ba7a8b"
+    },
+    "corrected-host-build.log": {
+      "original": "reports/kit-turn-20261020-host-build-r2.log",
+      "bytes": 1788,
+      "sha256": "dd524a9f55bc489dc908149aee53403152d30a5999c823158cdbd60bf01cf0f4"
+    },
+    "focused-build.log": {
+      "original": "reports/kit-turn-20261020-focused-build.log",
+      "bytes": 3465,
+      "sha256": "aedc7129114886107da5595c69b4a93a477497b4484057cd729585e14c93f42e"
+    },
+    "windows-debug-build-r1.log": {
+      "original": "reports/kit-turn-20261020-windows-debug-build.log",
+      "bytes": 3212,
+      "sha256": "7ada89264dccdf27356cfdc470eeadf3008c45049f42bd58560020b8699a212a"
+    },
+    "windows-debug-build-r2.log": {
+      "original": "reports/kit-turn-20261020-windows-debug-build-r2.log",
+      "bytes": 1775,
+      "sha256": "b647e72ef1c5c9677b41f7ab3db61ea8a3efc64dd8e6cb100af66e16bb5d3035"
+    },
+    "windows-release-build.log": {
+      "original": "reports/kit-turn-20261020-windows-release-build.log",
+      "bytes": 1985,
+      "sha256": "417b07515c51909a4ea7c73b7f42c259ceed307dbc6b32252e7266888387185f"
+    },
+    "android-build.log": {
+      "original": "reports/kit-turn-20261020-android-build.log",
+      "bytes": 2995,
+      "sha256": "02faac175235d55b044edb97cb3c072de895db2a56d1281a9221942e5a6bbe85"
+    },
+    "baseline-r1-before.json": {
+      "original": "reports/kit-turn-20261020-baseline-r1/before.json",
+      "bytes": 980,
+      "sha256": "005d4e1fdc4a862349935699b29a72ecfb9d5f367b772abc090f33e5cee0be6d"
+    },
+    "baseline-r1-custody.json": {
+      "original": "reports/kit-turn-20261020-baseline-r1/custody.json",
+      "bytes": 1502,
+      "sha256": "b94a0c3d0007610ee889917b989c1be059290a181d5bce10c562ca2d5c1fed49"
+    },
+    "baseline-r1-guards.json": {
+      "original": "reports/kit-turn-20261020-baseline-r1/guards.json",
+      "bytes": 518,
+      "sha256": "32107a813aa03be0dcbc57d49b89bcf0fc21dd7ca319a41dd9c1465674a778a1"
+    },
+    "baseline-r1-hidden-rt.json": {
+      "original": "reports/kit-turn-20261020-baseline-r1/hidden-rt.json",
+      "bytes": 132,
+      "sha256": "831cc06f80afe8cb81b05590594ea5be971e58ffdd0c4c488e483cc19b50af78"
+    },
+    "baseline-r1-hidden-rt.stdout.log": {
+      "original": "reports/kit-turn-20261020-baseline-r1/hidden-rt.stdout.log",
+      "bytes": 2835,
+      "sha256": "9bd68a4ffd20ac2ecf19f0683cd317ffde27ae92dd3d2be80d179ace5283019d"
+    },
+    "baseline-r1-hidden-rt.stderr.log": {
+      "original": "reports/kit-turn-20261020-baseline-r1/hidden-rt.stderr.log",
+      "bytes": 34529,
+      "sha256": "49ba8ad219d978eb6241ad2b21822919b83415e78d05e3bfd1ee6f3cf36de6bd"
+    },
+    "baseline-r1-fixture-export.log": {
+      "original": "reports/kit-turn-20261020-baseline-r1/fixture-export.log",
+      "bytes": 198,
+      "sha256": "5dc5475426e466b255fe987b5edd605a0969a747f1de1216be1e78d0e663fd74"
+    },
+    "baseline-r1-native.json": {
+      "original": "reports/horde-campaign-fixtures-kit-turn-20261020-baseline-r1/windows-lookout-validation.json",
+      "bytes": 113678,
+      "sha256": "dfd5e828f402bf32742b18038824ecfd8839066ec2e3ddc9a32b8290a076e5c2"
+    },
+    "baseline-r1-capability.json": {
+      "original": "reports/horde-campaign-fixtures-kit-turn-20261020-baseline-r1/vulkan_capability_report.json",
+      "bytes": 2350,
+      "sha256": "edbfd82dd27a13bcf64ba5a7a5eb7c4114d44dc775a19c224b17783e14ed629b"
+    },
+    "candidate-r1-before.json": {
+      "original": "reports/kit-turn-20261020-candidate-r1/before.json",
+      "bytes": 980,
+      "sha256": "d29e406d488a58462c5fd6831bec1eae728482a48a9414c53a788014c1514574"
+    },
+    "candidate-r1-custody.json": {
+      "original": "reports/kit-turn-20261020-candidate-r1/custody.json",
+      "bytes": 1502,
+      "sha256": "24d7e2a309d7e04c1f52a0cf3e840f1cacef6030a8bd71d5038fea05477b76f6"
+    },
+    "candidate-r1-guards.json": {
+      "original": "reports/kit-turn-20261020-candidate-r1/guards.json",
+      "bytes": 517,
+      "sha256": "88d9ce1965938afc08387ac3e7cff3ba2da3a990a65a9782a07087b193db1ac9"
+    },
+    "candidate-r1-hidden-rt.json": {
+      "original": "reports/kit-turn-20261020-candidate-r1/hidden-rt.json",
+      "bytes": 132,
+      "sha256": "ffbaa39334df28b39cf410ab7a0aee270e4bc71ea28931d569b8d123ce4c8525"
+    },
+    "candidate-r1-hidden-rt.stdout.log": {
+      "original": "reports/kit-turn-20261020-candidate-r1/hidden-rt.stdout.log",
+      "bytes": 2837,
+      "sha256": "5b0dcb7be6f749c9485e70fe2197add8f289c14da116edfee9b1740a7f4feefa"
+    },
+    "candidate-r1-hidden-rt.stderr.log": {
+      "original": "reports/kit-turn-20261020-candidate-r1/hidden-rt.stderr.log",
+      "bytes": 36971,
+      "sha256": "70b2f26a7938120520f422efeb3daccb42cbf9d2e973079310797ff21706dc5c"
+    },
+    "candidate-r1-fixture-export.log": {
+      "original": "reports/kit-turn-20261020-candidate-r1/fixture-export.log",
+      "bytes": 199,
+      "sha256": "be12f409db5197105184dfc7b5ba423d485747ac28a6879c0e692b040b45129e"
+    },
+    "candidate-r1-native.json": {
+      "original": "reports/horde-campaign-fixtures-kit-turn-20261020-candidate-r1/windows-lookout-validation.json",
+      "bytes": 126897,
+      "sha256": "1d151c3847db8ef6fc1a6614a8bce40c2b489b2e4c88de1e9ad9471b5e8f4979"
+    },
+    "candidate-r1-capability.json": {
+      "original": "reports/horde-campaign-fixtures-kit-turn-20261020-candidate-r1/vulkan_capability_report.json",
+      "bytes": 2350,
+      "sha256": "edbfd82dd27a13bcf64ba5a7a5eb7c4114d44dc775a19c224b17783e14ed629b"
+    },
+    "candidate-r2-before.json": {
+      "original": "reports/kit-turn-20261020-candidate-r2/before.json",
+      "bytes": 980,
+      "sha256": "53051857ba5bfdf1660cca5ebdf3020112dbc477131df34fde4b184243894d18"
+    },
+    "candidate-r2-custody.json": {
+      "original": "reports/kit-turn-20261020-candidate-r2/custody.json",
+      "bytes": 1502,
+      "sha256": "eab37be8d6164de5c52f567b476a5d440335cc8048120169a24903aeba38bdc0"
+    },
+    "candidate-r2-guards.json": {
+      "original": "reports/kit-turn-20261020-candidate-r2/guards.json",
+      "bytes": 518,
+      "sha256": "e1122fdb48b247773e0d1ba4f45bb0d4e5df56af8c5419407711f5c1dadfadf5"
+    },
+    "candidate-r2-hidden-rt.json": {
+      "original": "reports/kit-turn-20261020-candidate-r2/hidden-rt.json",
+      "bytes": 132,
+      "sha256": "2b4d42d7641328dc9e3fb2e7d16db5a9126be891a83bcc501791477f56657ed9"
+    },
+    "candidate-r2-hidden-rt.stdout.log": {
+      "original": "reports/kit-turn-20261020-candidate-r2/hidden-rt.stdout.log",
+      "bytes": 2837,
+      "sha256": "5cae2f471a27862484d9793c668b0f2aae43a2d2d3cb29f62b7dbaec2c9c037d"
+    },
+    "candidate-r2-hidden-rt.stderr.log": {
+      "original": "reports/kit-turn-20261020-candidate-r2/hidden-rt.stderr.log",
+      "bytes": 36971,
+      "sha256": "33903a36d541edca2a3f2c8fa748869cf3684bd796a32c6bfc471383f5eeb45a"
+    },
+    "candidate-r2-fixture-export.log": {
+      "original": "reports/kit-turn-20261020-candidate-r2/fixture-export.log",
+      "bytes": 199,
+      "sha256": "7fd05fdd0a2a78fe022eddd63512ec5391772e8dbcf178204059d15877d031c4"
+    },
+    "candidate-r2-native.json": {
+      "original": "reports/horde-campaign-fixtures-kit-turn-20261020-candidate-r2/windows-lookout-validation.json",
+      "bytes": 126899,
+      "sha256": "3b643a91840fe840752b936fb85f4b4a9ed592d858902b31b6f035cc3223d41b"
+    },
+    "candidate-r2-capability.json": {
+      "original": "reports/horde-campaign-fixtures-kit-turn-20261020-candidate-r2/vulkan_capability_report.json",
+      "bytes": 2350,
+      "sha256": "edbfd82dd27a13bcf64ba5a7a5eb7c4114d44dc775a19c224b17783e14ed629b"
+    }
+  }
+}
