@@ -1,0 +1,12 @@
+{
+  "rotation": "lock 0",
+  "accelerometer_rotation": "0",
+  "user_rotation": "0",
+  "font_scale": "1.7",
+  "density": "Physical density: 600\r\nOverride density: 560",
+  "pidof": {
+    "returnCode": 1,
+    "stdout": "",
+    "stderr": ""
+  }
+}

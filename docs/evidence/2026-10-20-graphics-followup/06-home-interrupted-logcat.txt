@@ -1,0 +1,4 @@
+--------- beginning of main
+10-20 20:45:41.343 20739 20739 I HordeGraphicsLatency: UI_BUILD page=graphics serial=0 generation=1 build_wall_ms=5.72875 root_children=1
+10-20 20:46:01.793 20739 20739 I HordeGraphicsLatency: UI_BUILD page=graphics serial=0 generation=1 build_wall_ms=5.485573 root_children=1
+10-20 20:46:17.182 20739 20739 I HordeGraphicsLatency: UI_REQUEST action=apply serial=2 generation=1 request_elapsed_ns=480445758040445 returned_elapsed_ns=480445758147841 jni_wall_ms=0.107396

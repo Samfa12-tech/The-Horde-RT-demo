@@ -3421,3 +3421,18 @@ fresh-process recovery only;
 this does not retroactively pass the earned candidate or establish earned auto,
 death Load, whole-route, interruption/power-loss, audio or sustained performance.
 [Exact diagnostic and repair receipt](evidence/2026-10-18-android-create-publication/README.md).
+
+### 20 October — corrected graphics APK lifecycle and preview follow-up
+
+SM-S948B / Android 17 API 37, same installed Debug APK SHA-256
+`c5a11bb287327900327b2266c313f53d4a77ad02d2b94d5787ef81cb23269707`.
+Evidence class: bounded noncombat native UI/settings lifecycle checks. Fresh
+Home-during-Apply recovery, preview live compare/single Apply, Details/Image/
+Restore/Controls/Back and portrait/landscape UI reflow were observed on this exact
+artifact. The owner's new explicit Mist Off request was saved after a matching
+hardware RT presentation; other preference values and all 12 campaign files/locks
+are preserved. Rotation policy/font/density restored; test-started Debug stopped.
+Controller hardware was absent; renderer orientation/aspect, fault injection,
+combat and sustained performance remain unaccepted. Read-only UI idle failures
+and retained pre-preview draft behavior are preserved in the
+[follow-up receipt](evidence/2026-10-20-graphics-followup/README.md).
