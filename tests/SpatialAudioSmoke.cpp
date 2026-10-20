@@ -380,9 +380,13 @@ int main()
               windowsSource.find("if (active.dialogueLine != 0u) (void)active.voice->SetVolume(gain)") != std::string::npos &&
               windowsSource.find("PlaySoundA(") == std::string::npos,
               "Windows centered/positional/loop SFX must use its own source gain, separate from dialogue, without an unscaled fallback");
-        check(windowsSource.find("14.0f, event.worldY}") != std::string::npos &&
+          const auto chapterEmitter = ReadTextFile(root / "src/gameplay/simulation/ChapterLocalAmbience.h");
+          check(windowsSource.find("14.0f, event.worldY}") != std::string::npos &&
+                windowsSource.find("ChapterAmbienceEmitter(event)") != std::string::npos &&
               windowsSource.find("event.listenerYawRadians, event.listenerY}") != std::string::npos &&
-              androidBridgeSource.find("14.0f, event.worldY}") != std::string::npos &&
+                androidBridgeSource.find("ChapterAmbienceEmitter(event)") != std::string::npos &&
+                chapterEmitter.find("event.worldX,event.worldZ") != std::string::npos &&
+                chapterEmitter.find("14.f,event.worldY}") != std::string::npos &&
               androidBridgeSource.find("event.listenerYawRadians, event.listenerY}") != std::string::npos,
               "both native positional-audio consumers must pass source and event-time listener Y metadata");
         check(windowsSource.find("PlayAmbientSoundEffect(context, clip, horde::audio::kPlayerFootstepCueGain)") !=

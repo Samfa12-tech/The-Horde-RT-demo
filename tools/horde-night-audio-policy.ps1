@@ -6,7 +6,9 @@ function Get-HordeNightAudioRuntimeFiles {
       'audio/night-ambience/manifest.json', 'audio/night-ambience/NOTICE.md',
       'audio/chapter-local-ambience/asset.manifest.json',
       'audio/chapter-local-ambience/runtime/tomb_drip.wav',
-      'audio/chapter-local-ambience/runtime/rope_contact.wav')
+      'audio/chapter-local-ambience/runtime/rope_contact.wav',
+      'audio/forest-foliage/asset.manifest.json',
+      'audio/forest-foliage/runtime/leaf_rustle.wav')
 }
 
 function Copy-HordeNightAudioRuntimeAssets {

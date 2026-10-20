@@ -1,0 +1,107 @@
+{
+  "scope": "Local builds, host/mocked Java tests, exact package bytes and preservation only; no playback/listening or phone operation",
+  "artifacts": {
+    "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe": {
+      "bytes": 14035968,
+      "sha256": "223b1f02398f852f05bbf6d26239a748b996b2d4e0d448d16cad899827c85579"
+    },
+    "build/presets/windows-x64-release/Release/HordeLanternRT.exe": {
+      "bytes": 4619264,
+      "sha256": "7b338dd1c1feff6e5d998697cc1c359be149b67583c1fccd06eb7fc3a86599bb"
+    },
+    "android/app/build/outputs/apk/debug/app-debug.apk": {
+      "bytes": 186120793,
+      "sha256": "2eb15fc118308b9471c2343e675c5e777f5b5d3961d900cd73ac3b3286b40843"
+    }
+  },
+  "androidAbis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+  ],
+  "java": [
+    {
+      "name": "com.samfa12.hordelanternrt.ChapterAmbienceFeedbackTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.MenuAmbiencePlaybackTest",
+      "tests": "7",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.MusicAudioFocusTest",
+      "tests": "9",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.MusicOutputBufferTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.MusicOutputGainTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    }
+  ],
+  "javaTests": 31,
+  "stagedRuntimeFiles": {
+    "audio/chapter-local-ambience/asset.manifest.json": {
+      "bytes": 2923,
+      "sha256": "b217e0a5ec2f5f4046285dbbf6499bb779485dac7f3ee25ec0001b9af43c68dc"
+    },
+    "audio/forest-foliage/asset.manifest.json": {
+      "bytes": 2796,
+      "sha256": "e000b0337507b3b79296eddc561e402818d71577450504436fb65197d387a197"
+    },
+    "audio/night-ambience/manifest.json": {
+      "bytes": 5598,
+      "sha256": "2c9b775dcbe66706d61e56318c621857a1df2492b03cafeb04c99fe8538441a5"
+    },
+    "audio/night-ambience/NOTICE.md": {
+      "bytes": 2174,
+      "sha256": "0ea7722f7437b93523a4f388960c499fdd06990e198bc75593a4f6242642ff11"
+    },
+    "audio/chapter-local-ambience/runtime/rope_contact.wav": {
+      "bytes": 95244,
+      "sha256": "37948f94da011a1fdb41c8ae29ace65560bc9ee6e344bce49e718dd76303e303"
+    },
+    "audio/chapter-local-ambience/runtime/tomb_drip.wav": {
+      "bytes": 96044,
+      "sha256": "9cff09fae048b84e60a03b5e7d546c8f1fe3e479bd1094ce4df17a3f628135c8"
+    },
+    "audio/forest-foliage/runtime/leaf_rustle.wav": {
+      "bytes": 86610,
+      "sha256": "8126b71f00621241084e663535ab7fa5da47ac3db64419feb1532a4fd05319a8"
+    },
+    "audio/night-ambience/runtime/evening_cricket.wav": {
+      "bytes": 384078,
+      "sha256": "8745d55f7ecf481d0ea7fb3656fecaa475bda339a49d12dbe09b0ee058e559ea"
+    },
+    "audio/night-ambience/runtime/pond_frogs_crickets.wav": {
+      "bytes": 384078,
+      "sha256": "bb13e7ebaff3fdc0b3a872cbdfe0bda22a210a7a77fe401b50981c5e02763b76"
+    },
+    "audio/night-ambience/runtime/tawny_owl.wav": {
+      "bytes": 384078,
+      "sha256": "c4b96bbfc5713ad98ddf28f510de9a124cef71dd3b35d76aed6d92a500d25717"
+    }
+  },
+  "stagingTwiceIdempotent": true,
+  "priorAudioSettingsOwnerFilesUnchangedSinceFreeze": true,
+  "apkAllTenRuntimeBytesMatch": true,
+  "privateLeafOriginalAbsent": true
+}

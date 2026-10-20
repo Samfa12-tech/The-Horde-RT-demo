@@ -1,5 +1,7 @@
 #pragma once
 #include "gameplay/simulation/SimulationSnapshot.h"
+#include "gameplay/simulation/ForestBirdAmbience.h"
+#include "gameplay/SpatialAudio.h"
 #include <algorithm>
 #include <cmath>
 
@@ -92,6 +94,14 @@ inline bool IsChapterAmbienceEvent(GameplayEventType type) {
     return type==GameplayEventType::ForestBird || type==GameplayEventType::ForestCrickets ||
         type==GameplayEventType::PondFrogs || type==GameplayEventType::ForestBirdStopped ||
         type==GameplayEventType::TombDrip || type==GameplayEventType::RopeContact ||
-        type==GameplayEventType::ChapterLocalAmbienceStopped;
+        type==GameplayEventType::ChapterLocalAmbienceStopped || type==GameplayEventType::ForestFoliage;
+}
+// Both platform transports use one event-time source/gain calculation. Other
+// semantic events retain their existing 1/14 metre emitter contract.
+inline SpatialAudioEmitter ChapterAmbienceEmitter(const GameplayEvent& event) {
+    const bool foliage=event.type==GameplayEventType::ForestFoliage;
+    return {event.worldX,event.worldZ,std::max(0.f,event.intensity),
+        foliage?ForestBirdAmbience::kFoliageReferenceDistance:1.f,
+        foliage?ForestBirdAmbience::kFoliageMaximumDistance:14.f,event.worldY};
 }
 } // namespace horde::gameplay::simulation

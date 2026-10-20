@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.samfa12.hordelanternrt.ChapterAmbienceFeedbackTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-10-20T16:23:51" hostname="SAM_LAPPY" time="0.007">
+  <properties/>
+  <testcase name="laterEligibleStartsReplaceOldStopsAndOtherFamilyStarts" classname="com.samfa12.hordelanternrt.ChapterAmbienceFeedbackTest" time="0.005"/>
+  <testcase name="finiteLocalAndExistingNatureCuesKeepTheirIdentity" classname="com.samfa12.hordelanternrt.ChapterAmbienceFeedbackTest" time="0.0"/>
+  <testcase name="laterStopsSuppressOlderFoliageAcrossTheCombinedFamily" classname="com.samfa12.hordelanternrt.ChapterAmbienceFeedbackTest" time="0.0"/>
+  <testcase name="stopAndUnknownEventsCannotSelectAudio" classname="com.samfa12.hordelanternrt.ChapterAmbienceFeedbackTest" time="0.001"/>
+  <testcase name="nonAmbientAndIncompleteTuplesCannotReplaceAValidSignal" classname="com.samfa12.hordelanternrt.ChapterAmbienceFeedbackTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

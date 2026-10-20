@@ -668,7 +668,10 @@ public class MainActivity extends Activity {
         initialiseAudio();
         musicPlayback = new HordeMusicPlayback(this, musicVolumePercent());
         musicPlayback.setOnFocusChanged(() -> {
-            if (!isMusicAudioFocusGranted() && menuAmbience != null) menuAmbience.stop();
+            if (!isMusicAudioFocusGranted()) {
+                if (menuAmbience != null) menuAmbience.stop();
+                stopChapterAmbience();
+            }
         });
         handler.post(menuAmbienceFrame);
         menuButton.setOnClickListener(view -> {
@@ -6137,11 +6140,7 @@ public class MainActivity extends Activity {
                 // the new surface resumes.
                 if (resumed && surfaceStarted && state == 1) {
                     final long[] platformEvents = ProbeBridge.drainPlatformEvents();
-                    int latestAmbienceSignal=-1;
-                    for(int i=0;i+2<platformEvents.length;i+=3) {
-                        final int type=(int)(platformEvents[i]&0xffL);
-                        if(ChapterAmbienceFeedback.isSignal(type))latestAmbienceSignal=i;
-                    }
+                    final int latestAmbienceSignal=ChapterAmbienceFeedback.latestSignalIndex(platformEvents);
                     for (int eventIndex = 0; !debugMotionActive && eventIndex + 2 < platformEvents.length; eventIndex += 3) {
                     final long metadata = platformEvents[eventIndex];
                     final long stereoGains = platformEvents[eventIndex + 1];
@@ -6156,6 +6155,7 @@ public class MainActivity extends Activity {
                         case PLATFORM_EVENT_POND_FROGS:
                         case ChapterAmbienceFeedback.TOMB_DRIP:
                         case ChapterAmbienceFeedback.ROPE_CONTACT:
+                        case ChapterAmbienceFeedback.FOREST_FOLIAGE:
                             if(eventIndex==latestAmbienceSignal)
                                 playChapterAmbience(stereoGains, ChapterAmbienceFeedback.soundKey(eventType));
                             break;
@@ -6863,6 +6863,7 @@ public class MainActivity extends Activity {
         loadSound("pond_frogs_crickets", "audio/night-ambience/runtime/pond_frogs_crickets.wav");
         loadSound("tomb_drip", "audio/chapter-local-ambience/runtime/tomb_drip.wav");
         loadSound("rope_contact", "audio/chapter-local-ambience/runtime/rope_contact.wav");
+        loadSound("forest_leaf_rustle", "audio/forest-foliage/runtime/leaf_rustle.wav");
         loadSound("skeleton_step_1", "audio/filmcow/skeleton_step_1.wav");
         loadSound("skeleton_step_2", "audio/filmcow/skeleton_step_2.wav");
         loadSound("skeleton_attack", "audio/filmcow/skeleton_attack.wav");
@@ -6998,7 +6999,7 @@ public class MainActivity extends Activity {
     }
 
     private boolean chapterAmbienceAudible() {
-        return resumed && surfaceStarted && hasWindowFocus() && !chapterAmbienceDialogueActive &&
+        return resumed && surfaceStarted && hasWindowFocus() && isMusicAudioFocusGranted() && !chapterAmbienceDialogueActive &&
                 !menuVisible && !campaignMenuVisible && !diagnosticsVisible && !graphicsVisible &&
                 !rtLabVisible && !playtestReportVisible && !benchmarkRunning && !debugMotionActive &&
                 !deathOverlayVisible && !endingOverlayVisible && preferences.getBoolean("sfx_enabled", true) &&

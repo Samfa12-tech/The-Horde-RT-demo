@@ -926,7 +926,7 @@ std::uint64_t PlatformGameplayEventOverflowCount()
 void EnqueuePlatformGameplayEvent(const horde::gameplay::simulation::GameplayEvent& event)
 {
     const horde::gameplay::SpatialAudioGains gains = horde::gameplay::CalculateSpatialAudio(
-        {event.worldX, event.worldZ, std::max(0.0f, event.intensity), 1.0f, 14.0f, event.worldY},
+        horde::gameplay::simulation::ChapterAmbienceEmitter(event),
         {event.listenerX, event.listenerZ, event.listenerYawRadians, event.listenerY});
     const std::uint64_t metadata = horde::platform::android::PackGameplayEventMetadata(event);
     const std::uint64_t verticalMetadata =
@@ -949,8 +949,25 @@ void EnqueuePlatformGameplayEvent(const horde::gameplay::simulation::GameplayEve
 
 void DrainSimulationEventsToPlatform()
 {
-    for (const horde::gameplay::simulation::GameplayEvent& event : gGameSimulation.Events().Events())
+    using namespace horde::gameplay::simulation;
+    const auto events=gGameSimulation.Events().Events();
+    std::uint64_t latestAmbienceSignal=0;
+    for(const auto& event:events)
+        if(IsChapterAmbienceEvent(event.type))latestAmbienceSignal=event.sequence;
+    const auto& current=gGameSimulation.Snapshot();
+    for (const auto& event : events)
     {
+        if(IsChapterAmbienceEvent(event.type) && event.sequence!=latestAmbienceSignal)continue;
+        // The render owner rechecks its current immutable publication. Never
+        // expose live simulation to the JNI UI thread or replay an old start.
+        if(event.type==GameplayEventType::ForestFoliage &&
+           (!ForestBirdAmbience::FoliageEligible(current) || ForestBirdAmbience::FoliageRangeGain(current)<=0.f)) {
+            auto stopped=event;
+            stopped.type=GameplayEventType::ForestBirdStopped;
+            stopped.intensity=0.f;
+            EnqueuePlatformGameplayEvent(stopped);
+            continue;
+        }
         EnqueuePlatformGameplayEvent(event);
     }
     gGameSimulation.ClearEvents();

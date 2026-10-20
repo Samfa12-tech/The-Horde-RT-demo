@@ -1,0 +1,227 @@
+Start testing: Oct 21 03:19 AUS Eastern Summer Time
+----------------------------------------------------------
+40/230 Testing: horde_rt_campaign_codec_tests
+40/230 Test: horde_rt_campaign_codec_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_campaign_codec_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_campaign_codec_tests" start time: Oct 21 03:19 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+2283 campaign codec checks, 0 failures
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_campaign_codec_tests" end time: Oct 21 03:19 AUS Eastern Summer Time
+"horde_rt_campaign_codec_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+41/230 Testing: horde_rt_campaign_storage_tests
+41/230 Test: horde_rt_campaign_storage_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_campaign_storage_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_campaign_storage_tests" start time: Oct 21 03:19 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+create-only storage publishes complete checkpoint
+initial publication status=15 native=5
+<end of output>
+Test time =   1.29 sec
+----------------------------------------------------------
+Test Failed.
+"horde_rt_campaign_storage_tests" end time: Oct 21 03:19 AUS Eastern Summer Time
+"horde_rt_campaign_storage_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+45/230 Testing: horde_rt_campaign_checkpoint_tests
+45/230 Test: horde_rt_campaign_checkpoint_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_campaign_checkpoint_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_campaign_checkpoint_tests" start time: Oct 21 03:19 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+1026 campaign checkpoint checks, 0 failures
+<end of output>
+Test time =   2.38 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_campaign_checkpoint_tests" end time: Oct 21 03:19 AUS Eastern Summer Time
+"horde_rt_campaign_checkpoint_tests" time elapsed: 00:00:02
+----------------------------------------------------------
+
+148/230 Testing: horde_rt_simulation_gameplay_tests
+148/230 Test: horde_rt_simulation_gameplay_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_simulation_gameplay_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_simulation_gameplay_tests" start time: Oct 21 03:19 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+lich/chest delayed finale events hits/defeat/unlock=3/1/1 phase=1 pending=0 time=0 sequence=7/8
+open shaft actual X/Z=-5.5/-14.5 mount torch lowering/left Y legacy=0/-0.41 anatomical=0/-0.31
+Shared simulation command, event, seam-persistence, and retry tests passed.
+<end of output>
+Test time =   1.13 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_simulation_gameplay_tests" end time: Oct 21 03:20 AUS Eastern Summer Time
+"horde_rt_simulation_gameplay_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+153/230 Testing: horde_rt_music_director_tests
+153/230 Test: horde_rt_music_director_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_music_director_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_music_director_tests" start time: Oct 21 03:20 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Shared adaptive music resolver tests passed.
+<end of output>
+Test time =   1.17 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_music_director_tests" end time: Oct 21 03:20 AUS Eastern Summer Time
+"horde_rt_music_director_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+154/230 Testing: horde_rt_chapter_music_tests
+154/230 Test: horde_rt_chapter_music_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_chapter_music_tests.exe" "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_chapter_music_tests" start time: Oct 21 03:20 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+65 chapter music host checks, 0 failures
+Synthetic PCM has no output device. Rope/terrain and logical restores are CPU fixtures, not natural victory, physically earned saves, listening or platform playback acceptance.
+<end of output>
+Test time =   1.97 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_chapter_music_tests" end time: Oct 21 03:20 AUS Eastern Summer Time
+"horde_rt_chapter_music_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+155/230 Testing: horde_rt_chapter_local_ambience_tests
+155/230 Test: horde_rt_chapter_local_ambience_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_chapter_local_ambience_tests.exe" "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof
+"horde_rt_chapter_local_ambience_tests" start time: Oct 21 03:20 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+110 chapter local ambience host checks, 0 failures
+Logical defeated-state restores, actual CPU terrain/motor and event transport only; no naturally earned victory/save, listening, device or output-voice acceptance is claimed.
+<end of output>
+Test time =   1.79 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_chapter_local_ambience_tests" end time: Oct 21 03:20 AUS Eastern Summer Time
+"horde_rt_chapter_local_ambience_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+156/230 Testing: horde_rt_forest_foliage_ambience_tests
+156/230 Test: horde_rt_forest_foliage_ambience_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_forest_foliage_ambience_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_forest_foliage_ambience_tests" start time: Oct 21 03:20 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+148 forest foliage policy/spatial/transport checks, 0 failures
+Host scheduling and event contracts only; no actual listening, platform output or device acceptance.
+<end of output>
+Test time =   1.25 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_forest_foliage_ambience_tests" end time: Oct 21 03:20 AUS Eastern Summer Time
+"horde_rt_forest_foliage_ambience_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+157/230 Testing: horde_rt_dialogue_ducking_tests
+157/230 Test: horde_rt_dialogue_ducking_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_dialogue_ducking_tests.exe" "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof
+"horde_rt_dialogue_ducking_tests" start time: Oct 21 03:20 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+160 dialogue ducking host checks, 0 failures
+Synthetic PCM and logical terrain-backed restores use no output device or owner saves. Listening, physical lifecycle, voice intelligibility and perceived mix remain unaccepted.
+<end of output>
+Test time =   1.07 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_dialogue_ducking_tests" end time: Oct 21 03:20 AUS Eastern Summer Time
+"horde_rt_dialogue_ducking_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+162/230 Testing: horde_rt_windows_music_focus_tests
+162/230 Test: horde_rt_windows_music_focus_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_windows_music_focus_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof
+"horde_rt_windows_music_focus_tests" start time: Oct 21 03:20 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+PASS: 16 focus/ready/menu/loss combinations and actual-window publication wiring
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_windows_music_focus_tests" end time: Oct 21 03:20 AUS Eastern Summer Time
+"horde_rt_windows_music_focus_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+182/230 Testing: horde_rt_forest_bird_ambience_tests
+182/230 Test: horde_rt_forest_bird_ambience_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_forest_bird_ambience_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_forest_bird_ambience_tests" start time: Oct 21 03:20 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+forest-bird ordinary journey starting
+forest-bird guards tick=1941
+forest-bird Keeper tick=3507
+forest-bird exterior tick=4611
+forest-bird forest tick=5706 eligible=1
+101 forest bird policy/transport/simulation checks, 0 failures; listening and device mix unaccepted
+<end of output>
+Test time =   5.61 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_forest_bird_ambience_tests" end time: Oct 21 03:20 AUS Eastern Summer Time
+"horde_rt_forest_bird_ambience_tests" time elapsed: 00:00:05
+----------------------------------------------------------
+
+188/230 Testing: horde_rt_spatial_audio_smoke
+188/230 Test: horde_rt_spatial_audio_smoke
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_spatial_audio_smoke.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof
+"horde_rt_spatial_audio_smoke" start time: Oct 21 03:20 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Spatial audio smoke failed: both native positional-audio consumers must pass source and event-time listener Y metadata
+<end of output>
+Test time =   1.05 sec
+----------------------------------------------------------
+Test Failed.
+"horde_rt_spatial_audio_smoke" end time: Oct 21 03:20 AUS Eastern Summer Time
+"horde_rt_spatial_audio_smoke" time elapsed: 00:00:01
+----------------------------------------------------------
+
+224/230 Testing: horde_rt_chapter_local_audio_tests
+224/230 Test: horde_rt_chapter_local_audio_tests
+Command: "C:/Users/sam_s/AppData/Local/Programs/Python/Python312/python.exe" "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/tests/test_chapter_local_audio.py"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_chapter_local_audio_tests" start time: Oct 21 03:20 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+....
+----------------------------------------------------------------------
+Ran 4 tests in 0.015s
+
+OK
+<end of output>
+Test time =   0.14 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_chapter_local_audio_tests" end time: Oct 21 03:20 AUS Eastern Summer Time
+"horde_rt_chapter_local_audio_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 21 03:20 AUS Eastern Summer Time

@@ -2301,10 +2301,17 @@ void DrainGameplayEvents(VulkanSurfaceContext& context)
         case GameplayEventType::PondFrogs:
         case GameplayEventType::TombDrip:
         case GameplayEventType::RopeContact:
+        case GameplayEventType::ForestFoliage:
             if(event.sequence!=latestAmbienceSignal)break;
+            if(event.type==GameplayEventType::ForestFoliage &&
+               !horde::gameplay::simulation::ForestBirdAmbience::FoliageEligible(context.simulation.Snapshot())) {
+                SpatialAudioEngine().StopLoop("chapter_ambience");break;
+            }
             if(context.controlsEnabled && !context.simulationPaused && context.sfxVolumePercent>0 &&
                GetForegroundWindow()==context.windowHandle &&
-               (event.type==GameplayEventType::TombDrip?
+               (event.type==GameplayEventType::ForestFoliage?
+                   horde::gameplay::simulation::ForestBirdAmbience::FoliageEligible(context.simulation.Snapshot()):
+                event.type==GameplayEventType::TombDrip?
                    horde::gameplay::simulation::ChapterLocalAmbience::DripEligible(context.simulation.Snapshot()):
                 event.type==GameplayEventType::RopeContact?
                    horde::gameplay::simulation::ChapterLocalAmbience::RopeEligible(context.simulation.Snapshot()):
@@ -2313,9 +2320,10 @@ void DrainGameplayEvents(VulkanSurfaceContext& context)
                    horde::gameplay::simulation::ForestBirdAmbience::Eligible(context.simulation.Snapshot()))) {
                 auto& audio=SpatialAudioEngine();audio.StopLoop("chapter_ambience");
                 const auto gains=horde::gameplay::CalculateSpatialAudio(
-                    {event.worldX,event.worldZ,event.intensity,1.f,14.f,event.worldY},
+                    horde::gameplay::simulation::ChapterAmbienceEmitter(event),
                     {event.listenerX,event.listenerZ,event.listenerYawRadians,event.listenerY});
-                const auto clip=event.type==GameplayEventType::TombDrip?
+                const auto clip=event.type==GameplayEventType::ForestFoliage?
+                    "audio/forest-foliage/runtime/leaf_rustle.wav":event.type==GameplayEventType::TombDrip?
                     "audio/chapter-local-ambience/runtime/tomb_drip.wav":event.type==GameplayEventType::RopeContact?
                     "audio/chapter-local-ambience/runtime/rope_contact.wav":event.type==GameplayEventType::PondFrogs?
                     "audio/night-ambience/runtime/pond_frogs_crickets.wav":event.type==GameplayEventType::ForestCrickets?

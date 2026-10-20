@@ -1,0 +1,41 @@
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+      Start  40: horde_rt_campaign_codec_tests
+ 1/13 Test  #40: horde_rt_campaign_codec_tests ............   Passed    0.02 sec
+      Start  41: horde_rt_campaign_storage_tests
+ 2/13 Test  #41: horde_rt_campaign_storage_tests ..........***Failed    1.29 sec
+create-only storage publishes complete checkpoint
+initial publication status=15 native=5
+
+      Start  45: horde_rt_campaign_checkpoint_tests
+ 3/13 Test  #45: horde_rt_campaign_checkpoint_tests .......   Passed    2.38 sec
+      Start 148: horde_rt_simulation_gameplay_tests
+ 4/13 Test #148: horde_rt_simulation_gameplay_tests .......   Passed    1.13 sec
+      Start 153: horde_rt_music_director_tests
+ 5/13 Test #153: horde_rt_music_director_tests ............   Passed    1.17 sec
+      Start 154: horde_rt_chapter_music_tests
+ 6/13 Test #154: horde_rt_chapter_music_tests .............   Passed    1.97 sec
+      Start 155: horde_rt_chapter_local_ambience_tests
+ 7/13 Test #155: horde_rt_chapter_local_ambience_tests ....   Passed    1.79 sec
+      Start 156: horde_rt_forest_foliage_ambience_tests
+ 8/13 Test #156: horde_rt_forest_foliage_ambience_tests ...   Passed    1.25 sec
+      Start 157: horde_rt_dialogue_ducking_tests
+ 9/13 Test #157: horde_rt_dialogue_ducking_tests ..........   Passed    1.07 sec
+      Start 162: horde_rt_windows_music_focus_tests
+10/13 Test #162: horde_rt_windows_music_focus_tests .......   Passed    0.03 sec
+      Start 182: horde_rt_forest_bird_ambience_tests
+11/13 Test #182: horde_rt_forest_bird_ambience_tests ......   Passed    5.61 sec
+      Start 188: horde_rt_spatial_audio_smoke
+12/13 Test #188: horde_rt_spatial_audio_smoke .............***Failed    1.05 sec
+Spatial audio smoke failed: both native positional-audio consumers must pass source and event-time listener Y metadata
+
+      Start 224: horde_rt_chapter_local_audio_tests
+13/13 Test #224: horde_rt_chapter_local_audio_tests .......   Passed    0.14 sec
+
+85% tests passed, 2 tests failed out of 13
+
+Total Test time (real) =  18.91 sec
+
+The following tests FAILED:
+	 41 - horde_rt_campaign_storage_tests (Failed)
+	188 - horde_rt_spatial_audio_smoke (Failed)
+Errors while running CTest

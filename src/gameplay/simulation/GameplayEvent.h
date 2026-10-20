@@ -60,10 +60,11 @@ enum class GameplayEventType : std::uint8_t
     TombDrip,
     RopeContact,
     ChapterLocalAmbienceStopped,
+    ForestFoliage,
 };
 
 inline constexpr std::size_t kGameplayEventTypeCount =
-    static_cast<std::size_t>(GameplayEventType::ChapterLocalAmbienceStopped) + 1u;
+    static_cast<std::size_t>(GameplayEventType::ForestFoliage) + 1u;
 
 struct GameplayEvent
 {

@@ -1185,6 +1185,11 @@ if(BUILD_TESTING)
     add_test(NAME horde_rt_chapter_local_ambience_tests COMMAND horde_rt_chapter_local_ambience_tests ${CMAKE_CURRENT_SOURCE_DIR})
     set_tests_properties(horde_rt_chapter_local_ambience_tests PROPERTIES TIMEOUT 60 WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
 
+    add_executable(horde_rt_forest_foliage_ambience_tests tests/ForestFoliageAmbienceTests.cpp)
+    target_link_libraries(horde_rt_forest_foliage_ambience_tests PRIVATE horde_gameplay_simulation)
+    add_test(NAME horde_rt_forest_foliage_ambience_tests COMMAND horde_rt_forest_foliage_ambience_tests)
+    set_tests_properties(horde_rt_forest_foliage_ambience_tests PROPERTIES TIMEOUT 30)
+
     add_executable(horde_rt_dialogue_ducking_tests tests/DialogueDuckingTests.cpp
         src/scene/assets/AssetManifest.cpp src/scene/assets/AssetValidation.cpp
         src/scene/assets/GltfDocument.cpp src/scene/assets/StaticMeshAsset.cpp)

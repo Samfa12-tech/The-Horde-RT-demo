@@ -393,7 +393,12 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
         const auto bird=forestBird_.Step(snapshot_);
         // Preserve a centred ambient
         // source/listener tuple rather than invent a perched gameplay actor.
-        if(bird!=ForestBirdAmbience::Cue::None)
+        if(bird==ForestBirdAmbience::Cue::PlayFoliage)
+            Emit(GameplayEventType::ForestFoliage,EntityId::Invalid,EntityId::Invalid,
+                ForestBirdAmbience::kFoliagePosition.x,ForestBirdAmbience::kFoliagePosition.z,
+                ForestBirdAmbience::kFoliageGain*ForestBirdAmbience::FoliageRangeGain(snapshot_),0,
+                ForestBirdAmbience::kFoliagePosition.y);
+        else if(bird!=ForestBirdAmbience::Cue::None)
             Emit(bird==ForestBirdAmbience::Cue::Play?GameplayEventType::ForestBird:
                  bird==ForestBirdAmbience::Cue::PlayCrickets?GameplayEventType::ForestCrickets:
                  bird==ForestBirdAmbience::Cue::PlayPondFrogs?GameplayEventType::PondFrogs:GameplayEventType::ForestBirdStopped,

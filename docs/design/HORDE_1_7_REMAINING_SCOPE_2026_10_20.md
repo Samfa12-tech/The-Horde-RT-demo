@@ -1,6 +1,6 @@
 # Horde 1.7 remaining scope - 20 October 2026
 
-Current reconciliation after the [dialogue ducking checkpoint](../evidence/2026-10-20-dialogue-ducking/README.md),
+Current reconciliation after the [finite foliage checkpoint](../evidence/2026-10-20-forest-foliage/README.md),
 in the existing WP2 worktree/branch and draft PR 27. Read with the
 [accepted master](../references/horde-1.7/d37f1638/docs/superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md)
 and [milestone map](HORDE_1_7_MILESTONE_MAP_2026_10_20.md). This inventory changes
@@ -12,7 +12,7 @@ no gameplay policy, deferral, validation gate or authority to expand content.
 | --- | --- |
 | First recovery, master 10.5/12 | Main gameplay-policy decision, then its bounded implementation. Three-heart damage/reset/save vitality exist; no healing, flask, charges or refill API/resource save fields exist. The six exact choices below are pending. Preserve established encounter resets; no implicit checkpoint heal or full economy. |
 | Outdoor effects, master 8.1/8.3/13.1 | Outdoor participating mist/occluded moon shafts and fireflies are explicitly unimplemented in [the current geometry contract](../../src/scene/RescueJourneyGeometry.h). [Current haze](../../src/vulkan/raytracing/SimulationFrameAdapter.cpp) is a surface-distance-fog multiplier; existing Keeper mist does not close this gap. [Trees are baked static LOD1](../../src/scene/ForestDressing.h); selected foliage wind and representative near/mid/far transitions plus combined workload readiness remain unfinished/unproven. Preserve owner canopy/Easy Tree and mist-28 deferrals/performance gates. These are unfinished planned outdoor presentation, not optional effects already accepted or authority to start heavy work now. Reconcile their final 1.7 disposition explicitly. |
-| Sound material, master 4.1b/5.5/8.4/11 | Licensed finite drips/rope, species calls, water, surface dispatch, music continuation and shared dialogue ducking now exist. Suitable settling grit/structural stone creaks and quiet forest wind/foliage cues remain unverified/unadmitted. Stone retains accepted generic dirt 9/14; Earth uses dirt 17/18; Wood retains generic fallback. Do not relabel metal/impact cuts to fill a roster. |
+| Sound material, master 4.1b/5.5/8.4/11 | Licensed finite drips/rope, species calls, water, surface dispatch, music continuation and shared dialogue ducking now exist. One licensed finite foliage cue now has bounded host/build evidence. Its audible character/mix and real output cleanup remain unaccepted; no listening occurred. Suitable settling grit/structural stone creaks and any continuous forest wind material remain unverified/unadmitted. Stone retains accepted generic dirt 9/14; Earth uses dirt 17/18; Wood retains generic fallback. Do not relabel metal/impact cuts to fill a roster. |
 | Authored composition and movement presentation | Whole-opening burial storytelling, canopy/ground/shoreline/lookout composition and final artistic quality remain incomplete/unaccepted. Kit gait cadence and start/stop joins exist, but stationary planted turning remains unresolved; straight walk-as-pivot was rejected for sliding. Imported locomotion remains Idle/Walking; run/back/strafe/dodge use current shared/procedural presentation. This warrants bounded quality work, not endless new animation or content scope. |
 
 The core tomb-to-lookout/return story mechanisms are present: lantern reward,
@@ -31,10 +31,15 @@ rejected for production adoption: 57,088 device bytes saved versus 53.67–65.64
 adoption and 32,981,504 extra device-overlap bytes, without an attributed steady
 GPU win. Six native A/B/A comparisons preserve exact original restoration;
 automatic distance transitions and whole near-crown acceptance remain open.
-The derivative is unadmitted. Next bounded source action is suitability/provenance
-inspection for one quiet forest wind/foliage cue within the existing finite voice
-budget, not a renderer wind or heavy-effects expansion. Recovery policy remains
-pending without blocking independent work.
+The derivative is unadmitted. The subsequent
+[finite foliage checkpoint](../evidence/2026-10-20-forest-foliage/README.md) adds one
+0.90-second licensed leaf rustle within the existing voice, with 12 m range and
+44/40-second quiet cadence. Host tests/builds and exact package bytes pass; no
+listening or actual output cleanup pass is claimed. Renderer wind and heavy
+effects remain unchanged. Next inspect the accepted opening tomb's burial-story
+composition/grounding in native RT and correct at most one demonstrated defect
+using existing owned assets/budgets. Recovery policy remains pending without
+blocking independent work.
 
 ## Implemented, with exact-candidate acceptance still open
 

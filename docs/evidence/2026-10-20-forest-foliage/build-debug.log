@@ -1,0 +1,52 @@
+CMake is re-running because C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/CMakeFiles/generate.stamp is out-of-date.
+  the file 'C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/CMakeLists.txt'
+  is newer than 'C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/CMakeFiles/generate.stamp.depend'
+  result='-1'
+-- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.26300.
+Generated RT catalog adapter is current.
+-- Strict non-contracted asset-transform arithmetic enabled for GltfDocument.cpp and StaticMeshAsset.cpp: /fp:strict
+-- Vulkan SDK found: 1.4.350
+-- Legacy torch-failure identifiers were rejected by the configured MSVC compiler.
+-- Horde Lantern RT: Vulkan capability probe and Windows diagnostic targets are available; Android builds from android/.
+-- Configuring done (21.3s)
+-- Generating done (3.3s)
+-- Build files have been written to: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  horde_campaign_persistence.vcxproj -> C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-debug\Debug\horde_campaign_persistence.lib
+  pocket_audio_native_pcm.vcxproj -> C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-debug\pocket-audio-core-native\Debug\pocket_audio_native_pcm.lib
+  MusicDirector.cpp
+  MusicPcmAssetBank.cpp
+  MusicPcmStream.cpp
+  MusicPlaybackSession.cpp
+  GameSimulation.cpp
+  GameSimulationCampaign.cpp
+  GameSimulationDialogue.cpp
+  GameSimulationRescue.cpp
+  Generating Code...
+  horde_gameplay_simulation.vcxproj -> C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-debug\Debug\horde_gameplay_simulation.lib
+  CampaignPlaySession.cpp
+  CampaignSession.cpp
+  Generating Code...
+  horde_campaign_session.vcxproj -> C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-debug\Debug\horde_campaign_session.lib
+  horde_world_streaming.vcxproj -> C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-debug\Debug\horde_world_streaming.lib
+  CampaignPlaySession.cpp
+  CampaignSession.cpp
+  GameSimulationCampaign.cpp
+  CharacterRenderSlot.cpp
+  PresentableTinyRtScene.cpp
+  PresentableTinyRtSceneRegionPages.cpp
+  PresentableTinyRtSceneStaticGeometry.cpp
+  SimulationFrameAdapter.cpp
+  Generating Code...
+  horde_rt_probe_core.vcxproj -> C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-debug\Debug\horde_rt_probe_core.lib
+  WindowsCampaignMenu.cpp
+  horde_windows_campaign_ui.vcxproj -> C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-debug\Debug\horde_windows_campaign_ui.lib
+  WindowsMusicPlayback.cpp
+  horde_windows_music.vcxproj -> C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-debug\Debug\horde_windows_music.lib
+  MotionEvidenceScenario.cpp
+  DiagnosticWindow.cpp
+  MotionEvidenceLedger.cpp
+  DiagnosticOverlay.cpp
+  Generating Code...
+  horde_rt_diagnostic_window.vcxproj -> C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-debug\Debug\HordeLanternRT.exe

@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "scope": "Five exact leaves rustle recordings from the existing private FilmCow archive; original files read-only and not copied",
+  "method": "Unwindowed full-recording signed PCM24 peak and RMS divided by 8388608; duration from WAV frame count / 48000; SHA256 over complete original WAV bytes",
+  "licenseEvidence": "docs/licenses/filmcow-sfx-license.pdf",
+  "licenseSha256": "bda56a077aa8ba8e053ae916dd4c19038baa12cd33d10209658646ac9351b73f",
+  "listeningPerformed": false,
+  "selectionPolicy": "One requested full finite source. Alternatives are excluded from this slice, not rejected for audible quality; no listening or native mix claims.",
+  "sources": [
+    {
+      "sourceFile": "leaves rustle 1.wav",
+      "sourceSha256": "1c51a4b6ec25fddab7e395e253b8998f415135f6f183ffbf2133b7c3f0750769",
+      "sourceBytes": 129942,
+      "sampleRate": 48000,
+      "channels": 1,
+      "bitsPerSample": 24,
+      "frames": 43283,
+      "durationSeconds": 0.9017291666666667,
+      "peakDbfs": -12.828141275474108,
+      "rmsDbfs": -40.829124782421935,
+      "fullScaleSamples": 0,
+      "disposition": "Selected full recording by parent scope; finite derivative only"
+    },
+    {
+      "sourceFile": "leaves rustle 2.wav",
+      "sourceSha256": "24d322329e223d6383e4987b9d807e36d24a23935cad7db732c3c0a611fed454",
+      "sourceBytes": 130310,
+      "sampleRate": 48000,
+      "channels": 1,
+      "bitsPerSample": 24,
+      "frames": 43406,
+      "durationSeconds": 0.9042916666666667,
+      "peakDbfs": -9.924004415149966,
+      "rmsDbfs": -40.07520080122082,
+      "fullScaleSamples": 0,
+      "disposition": "Excluded alternative: one-source scope; no audible-quality rejection"
+    },
+    {
+      "sourceFile": "leaves rustle 3.wav",
+      "sourceSha256": "03470a5963ba037b5a7d539964ff0ae9002837bd291a82fba82de6c8dc975bb4",
+      "sourceBytes": 223454,
+      "sampleRate": 48000,
+      "channels": 1,
+      "bitsPerSample": 24,
+      "frames": 74454,
+      "durationSeconds": 1.551125,
+      "peakDbfs": -13.805701702148198,
+      "rmsDbfs": -41.98089605603783,
+      "fullScaleSamples": 0,
+      "disposition": "Excluded alternative: one-source scope; no audible-quality rejection"
+    },
+    {
+      "sourceFile": "leaves rustle 4.wav",
+      "sourceSha256": "0284cd1d4a0596ff228adbde0e6e4ba1ce7915e68cc4fd34e9c7d9fe5fbfef5f",
+      "sourceBytes": 168560,
+      "sampleRate": 48000,
+      "channels": 1,
+      "bitsPerSample": 24,
+      "frames": 56156,
+      "durationSeconds": 1.1699166666666667,
+      "peakDbfs": -22.706046305275777,
+      "rmsDbfs": -43.725294476517924,
+      "fullScaleSamples": 0,
+      "disposition": "Excluded alternative: one-source scope; no audible-quality rejection"
+    },
+    {
+      "sourceFile": "leaves rustle 5.wav",
+      "sourceSha256": "06a89023d129d550424ef19c5d289e0d524466f194ddb837131dc52a06fe53fc",
+      "sourceBytes": 136142,
+      "sampleRate": 48000,
+      "channels": 1,
+      "bitsPerSample": 24,
+      "frames": 45350,
+      "durationSeconds": 0.9447916666666667,
+      "peakDbfs": -6.06093055002321,
+      "rmsDbfs": -37.83502701409344,
+      "fullScaleSamples": 0,
+      "disposition": "Excluded alternative: one-source scope; no audible-quality rejection"
+    }
+  ]
+}

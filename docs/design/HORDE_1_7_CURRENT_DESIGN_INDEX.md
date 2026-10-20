@@ -1,5 +1,23 @@
 # Horde 1.7 current design index
 
+## Finite forest foliage - local checkpoint, 20 October 2026
+
+The [bounded foliage checkpoint](../evidence/2026-10-20-forest-foliage/README.md)
+adds one reproducible licensed 0.90-second leaf rustle to the existing finite
+incidental voice, first at 44 quiet seconds then every 40, within 12 metres of
+an existing route pine. Shared simulation owns cadence and range; platform
+coalescing and focus/lifecycle cleanup preserve the current audio budget.
+148 new native checks, 14 affected CTest registrations across retained runs,
+31 Java tests and Windows/four-ABI Android builds pass. Initial failures remain
+recorded. No output was auditioned; character, mix and real cleanup need manual
+acceptance. Saved gains, ducking, saves, mobile Mist Off and owner work persist.
+
+The measured pine rejection/retained LOD1 remain. Next inspect opening-tomb
+burial-story composition and grounding in actual native RT, selecting at most
+one demonstrated defect using existing owned assets/budgets. Recovery's six
+morning choices remain pending; natural route/save/death, controls, listening
+and warm performance gates remain open. No phone/public operation occurred.
+
 ## One-pine LOD2 comparison — closed, 20 October 2026
 
 The [owned-source comparison](../evidence/2026-10-20-pine-lod2/README.md) is
@@ -9,9 +27,9 @@ does not justify 53.67–65.64 ms adoption and 32,981,504 extra device-overlap b
 unstable far controls invalidate an apparent gain. The derivative stays
 unadmitted; current LOD1, collision, assets and settings remain. Reusable Debug
 source inspection/comparison tools are retained. Wind and runtime distance LOD
-remain gaps. Next bounded source action is suitability/provenance inspection for
-one quiet forest wind/foliage cue using the existing finite voice budget. The six
-recovery choices remain pending in the morning handoff.
+remain gaps. Its selected finite foliage source action now has the checkpoint
+above, with listening still open. The six recovery choices remain pending in
+the morning handoff.
 
 ## Outdoor route inspection - local checkpoint, 20 October 2026
 

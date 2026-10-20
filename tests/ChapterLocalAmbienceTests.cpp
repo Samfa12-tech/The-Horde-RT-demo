@@ -368,12 +368,17 @@ void PlatformVoiceWiring(const std::filesystem::path& root) {
           play.find("packedStereoGains>>>32") != std::string::npos &&
           play.find("0,0,1.f)") != std::string::npos,
           "Android finite single-voice routing retains event gains, focus/dialogue/UI/mute gates and stop-before-play");
-    Check(java.find("ChapterAmbienceFeedback.isSignal(type)") != std::string::npos &&
+    Check(java.find("ChapterAmbienceFeedback.latestSignalIndex(platformEvents)") != std::string::npos &&
           java.find("if(eventIndex==latestAmbienceSignal)") != std::string::npos &&
           java.find("if (paused) stopChapterAmbience();") != std::string::npos &&
           java.find("if (!chapterAmbienceAudible()) stopChapterAmbience();") != std::string::npos &&
           java.find("soundPool.stop(chapterAmbienceStream)") != std::string::npos,
           "Android coalesces the combined ambient family and retains active cleanup across suspension and eligibility loss");
+    const auto focus=Section(java,"musicPlayback.setOnFocusChanged", "handler.post(menuAmbienceFrame)");
+    Check(audible.find("isMusicAudioFocusGranted()") != std::string::npos &&
+          focus.find("!isMusicAudioFocusGranted()") != std::string::npos &&
+          focus.find("stopChapterAmbience();") != std::string::npos,
+          "shared chapter voice also respects audio-focus loss while the window stays focused");
     const auto windows = Read(root/"src/platform/windows/DiagnosticWindow.cpp");
     const auto drain = Section(windows, "std::uint64_t latestAmbienceSignal=0;", "case GameplayEventType::PlayerWetFootstep:");
     const auto cleanup = Section(windows, "void UpdateChapterDialogueAudio(", "using horde::gameplay::dialogue::Line;");
@@ -388,6 +393,18 @@ void PlatformVoiceWiring(const std::filesystem::path& root) {
           cleanup.find("GetForegroundWindow()") != std::string::npos &&
           cleanup.find("StopLoop(\"chapter_ambience\")") != std::string::npos,
           "Windows shares one finite ambient key with current-state/focus/UI/mute cleanup and unchanged SFX gain");
+    Check(drain.find("case GameplayEventType::ForestFoliage:") != std::string::npos &&
+          drain.find("ForestBirdAmbience::FoliageEligible") != std::string::npos &&
+          drain.find("ChapterAmbienceEmitter(event)") != std::string::npos &&
+          drain.find("audio/forest-foliage/runtime/leaf_rustle.wav") != std::string::npos,
+          "Windows finite foliage uses shared event-time attenuation and current source-range admission");
+    const auto bridge=Read(root/"android/app/src/main/cpp/android_probe_bridge.cpp");
+    const auto nativeDrain=Section(bridge,"void DrainSimulationEventsToPlatform()","void PublishSimulationUiState()");
+    Check(nativeDrain.find("latestAmbienceSignal") != std::string::npos &&
+          nativeDrain.find("ForestBirdAmbience::FoliageEligible(current)") != std::string::npos &&
+          nativeDrain.find("stopped.type=GameplayEventType::ForestBirdStopped") != std::string::npos &&
+          nativeDrain.find("EnqueuePlatformGameplayEvent(stopped)") != std::string::npos,
+          "Android render owner drops stale foliage starts through an ordered stop without a UI-thread simulation read");
     const auto campaign = Read(root/"src/platform/windows/windows_campaign_owner.inl");
     const auto commit = Section(campaign, "void FinishCampaignCommit(", "\n}");
     Check(commit.find("StopLoop(\"chapter_ambience\")") != std::string::npos,

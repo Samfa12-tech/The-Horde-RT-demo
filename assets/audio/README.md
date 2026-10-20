@@ -59,3 +59,18 @@ in the cleared room, and rope contact only after actual grip travel during loade
 ascent/descent. Speech, pause, death, reconstruction and area exit suppress or
 rebase cadence. Both platforms reuse the existing single finite nature/incidental
 voice, SFX setting and lifecycle cleanup. No separate mixer or save field is added.
+
+## Finite local forest foliage (1.7 development)
+
+`forest-foliage/` adds one 0.901729-second labelled FilmCow leaf-rustle cut with
+source/licence/runtime hashes and a read-only reproduction recipe. It occupies a
+spare slot in the same finite nature/incidental voice: first after 44 quiet seconds,
+then every 40, within 12 metres of the accepted route pine's lower crown. The outer
+four metres fade source gain; missed slots drop, and pause/load/area transitions
+do not cause an immediate restart. Existing planar pan/obstruction and saved SFX
+gain apply once. Audio-focus loss now also stops the Android shared voice.
+
+The original stays private. No continuous wind recording, audible character,
+in-game mix or real output cleanup has been verified by listening. This does not
+implement renderer foliage wind or change dialogue ducking, volume settings or
+campaign saves.

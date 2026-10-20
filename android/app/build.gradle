@@ -484,6 +484,8 @@ tasks.register('prepareRuntimeAssets', Sync) {
         include 'audio/chapter-local-ambience/asset.manifest.json'
         include 'audio/chapter-local-ambience/runtime/tomb_drip.wav'
         include 'audio/chapter-local-ambience/runtime/rope_contact.wav'
+        include 'audio/forest-foliage/asset.manifest.json'
+        include 'audio/forest-foliage/runtime/leaf_rustle.wav'
         include 'audio/filmcow/equipment/sword_draw.wav'
         include 'audio/filmcow/equipment/sword_sheath.wav'
         include 'audio/filmcow/equipment/asset.manifest.json'

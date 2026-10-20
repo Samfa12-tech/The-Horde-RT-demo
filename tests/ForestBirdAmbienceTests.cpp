@@ -23,7 +23,8 @@ int main() {
     static_assert(static_cast<unsigned>(GameplayEventType::ForestBirdStopped)==29);
     static_assert(static_cast<unsigned>(GameplayEventType::ForestCrickets)==30);
     static_assert(static_cast<unsigned>(GameplayEventType::PondFrogs)==31);
-    static_assert(kGameplayEventTypeCount==35);
+    static_assert(static_cast<unsigned>(GameplayEventType::ForestFoliage)==35);
+    static_assert(kGameplayEventTypeCount==36);
     auto s=Exterior();Check(ForestBirdAmbience::Eligible(s),"ready grounded same-night forest admitted");
     for(unsigned mode=0;mode<9;++mode) {
         auto bad=s;
@@ -222,6 +223,31 @@ int main() {
             for(const auto& e:fresh->Events().Events())replay+=e.type==GameplayEventType::ForestBird || e.type==GameplayEventType::ForestCrickets || e.type==GameplayEventType::PondFrogs;fresh->ClearEvents();}
         Check(replay==0,"earned load does not replay forest audio debt at the safe exterior clearing");
     }
+    Check(walk(kWorldRoutePoints[5].x,kWorldRoutePoints[5].z),
+        "ordinary forest axes reach the actual route-pine listening radius");
+    for(unsigned tick=0;tick<200;++tick)step();
+    Check(ForestBirdAmbience::FoliageEligible(game->Snapshot()),
+        "real earned-ascent journey reaches the bounded foliage emitter through native terrain movement");
+    game->SynchronizePausedInput(input);game->ClearEvents();
+    unsigned foliageCues=0;std::uint64_t previousFoliage=0;
+    for(unsigned tick=0;tick<5160;++tick) {
+        game->StepFixed(input);
+        for(const auto& e:game->Events().Events())if(e.type==GameplayEventType::ForestFoliage) {
+            ++foliageCues;const auto& current=game->Snapshot();
+            Check(e.tickIndex==current.tickIndex && e.worldX==ForestBirdAmbience::kFoliagePosition.x &&
+                  e.worldZ==ForestBirdAmbience::kFoliagePosition.z && e.worldY==ForestBirdAmbience::kFoliagePosition.y &&
+                  e.listenerX==current.playerX && e.listenerZ==current.playerZ &&
+                  std::abs(e.listenerY-(PlayerEyeWorldY(current.playerSupportWorldY)-current.playerCrouchDropMetres))<.0001f &&
+                  e.worldX!=e.listenerX && e.intensity>0 && e.intensity<=ForestBirdAmbience::kFoliageGain &&
+                  std::abs(e.intensity-ForestBirdAmbience::kFoliageGain*ForestBirdAmbience::FoliageRangeGain(current))<.0001f,
+                  "real foliage event retains distinct fixed source, current listener/height and one range-scaled source gain");
+            Check(!previousFoliage || e.tickIndex-previousFoliage==2400,
+                  "actual shared simulation emits separated finite foliage requests without transition restarts");
+            previousFoliage=e.tickIndex;
+        }
+        game->ClearEvents();
+    }
+    Check(foliageCues==2,"actual forest wait emits two foliage cues at 44/84 seconds rather than a repeating bed");
     std::cout<<checks<<" forest bird policy/transport/simulation checks, "<<failures<<" failures; listening and device mix unaccepted\n";
     return failures?1:0;
 }

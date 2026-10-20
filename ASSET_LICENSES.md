@@ -537,3 +537,19 @@ private and are excluded from packages. Purpose labels and PCM activity support
 these bounded candidates; actual listening, character and mix remain unverified.
 No generic rock handling is admitted as structural creaking, and no continuous
 drip bed, live-collapse sound or paid generation is added.
+
+## 1.7 finite forest foliage cue
+
+`assets/audio/forest-foliage/` admits one bounded game-integrated derivative of
+Jason Steele / FilmCow's `leaves rustle 1.wav` from the existing private archive.
+The same custom royalty-free project-use licence and restrictions above apply;
+this is **not CC0**. The original remains private. Voluntary credit: FilmCow
+Royalty Free Sound Effects Library - FilmCow.
+
+The full 43,283-frame mono 48 kHz PCM24 source is converted deterministically to
+PCM16 with 10/80 ms edge fades, preserving duration and source level. Only
+`runtime/leaf_rustle.wav` (86,610 bytes, 0.901729 s) and its hash/provenance manifest
+ship. `tools/prepare-forest-foliage.py --verify` reproduces both without writing.
+This is a labelled leaf-rustle candidate, not a certified natural wind recording;
+actual listening, character and in-game level remain unverified. No continuous
+wind bed, synthesis, provider generation or new audio layer is supplied.
