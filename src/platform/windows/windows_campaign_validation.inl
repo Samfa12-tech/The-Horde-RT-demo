@@ -72,6 +72,13 @@ bool HiddenLookoutFilesAllowed(const std::filesystem::path& directory,bool after
             name=="windows-lookout-validation.json" || name=="windows-loaded-lookout.png"))continue;
         if(afterRun && gLookoutInspectKit && (name=="windows-kit-neutral.png" ||
             name=="windows-kit-speaking.png" || name=="windows-kit-recognition.png"))continue;
+        if(afterRun && gLookoutInspectKitMotion) {
+            bool allowed=false;
+            for(const char* step:{"start-0","start-1","start-4","start-8","walk-20","walk-35","walk-50","walk-65","walk-80","walk-100",
+                "stop-0","stop-1","stop-4","stop-8","stop-11","turn-0","turn-10","turn-20","turn-30","turn-40"})
+                allowed|=name==std::string("windows-kit-motion-")+step+".png";
+            if(allowed)continue;
+        }
         return false;
     }
     return !error && sourceFiles==2;
@@ -168,7 +175,7 @@ int RunHiddenLookoutValidation(VulkanSurfaceContext& ctx,horde::vulkan::DeviceCa
             kit.grounded && !kit.walking && kit.waypoint==simulation::kWorldRoutePoints.size() &&
             std::hypot(kit.x-(p.x+1),kit.z-p.z)<.001f && boundarySame();
     };
-    std::string loadedEvidence,entryEvidence;std::ostringstream kitEvidence;
+    std::string loadedEvidence,entryEvidence;std::ostringstream kitEvidence,motionEvidence;
     const auto completed=[&](bool entry,std::string& json){
         if(!safe("before-gpu-drain") || !DrainCampaignResources(ctx) || !safe("after-gpu-drain"))return false;
         const auto publication=ctx.rtFrameEvidence.PublishedStateByValue();const auto& e=publication.completedEvidence;
@@ -253,6 +260,60 @@ int RunHiddenLookoutValidation(VulkanSurfaceContext& ctx,horde::vulkan::DeviceCa
         ctx.lookoutKitInspectionPose.reset();ctx.lookoutKitInspectionActing={};
         if(proceed)proceed=check(render() && storySame() && ctx.simulation.Snapshot().chapterCompanion.acting==originalActing,
             "ordinary saved camera and neutral Kit pose return after diagnostic inspection");
+    }
+    if(proceed && gLookoutInspectKitMotion) {
+        // A sequential production-route visual fixture. It samples real fixed
+        // steps/support and renders their immutable snapshots, without changing
+        // the paused loaded campaign, earning progression or touching records.
+        const auto terrain=ctx.rtScene.ChapterTerrainSurface();
+        dialogue::CompanionRouteFixture route;
+        auto player=route.State();
+        for(unsigned tick=0;tick<60;++tick)
+            route.Step(1.f/60,player.x+3,player.z+1,true,false,false,terrain.get(),true);
+        const auto capture=[&](const char* stage) {
+            auto pose=route.State();pose.visualAdmitted=true;
+            pose.generation=ctx.simulation.Snapshot().chapterCompanion.generation+1;
+            ctx.lookoutKitInspectionMotion=pose;
+            ctx.lookoutKitInspectionPose=horde::vulkan::raytracing::EnvironmentSurveyPose{
+                pose.x+3.f,pose.z,pose.y,-1.57079632679f,-.15f,0};
+            ctx.lookoutKitInspectionActing={};std::string evidence,error;
+            horde::vulkan::raytracing::PresentableTinyRtScene::StorageImageCapture image;
+            const bool ok=check(pose.grounded && render() && completed(false,evidence) &&
+                ctx.rtScene.CaptureStorageImage(image,error) &&
+                WriteRgbaPng(gCampaignValidationDirectory/(std::string("windows-kit-motion-")+stage+".png"),image,error) &&
+                storySame() && neutral(),"sequential production Kit motion snapshot has completed real RT and preserves loaded campaign");
+            if(!motionEvidence.str().empty())motionEvidence<<',';
+            motionEvidence<<"{\"stage\":\""<<stage<<"\",\"root\":["<<pose.x<<','<<pose.y<<','<<pose.z
+                <<"],\"yaw\":"<<pose.yaw<<",\"walking\":"<<(pose.walking?"true":"false")
+                <<",\"idleSeconds\":"<<pose.animationSeconds<<",\"walkPhase\":"<<pose.locomotion.walkPhase
+                <<",\"walkWeight\":"<<pose.locomotion.walkWeight<<",\"rtEvidence\":"<<(evidence.empty()?"null":evidence)<<'}';
+            return ok;
+        };
+        proceed=capture("start-0");
+        for(unsigned tick=1;tick<=100 && proceed;++tick) {
+            const auto before=route.State();
+            route.Step(1.f/60,before.x+3,before.z+1,true,true,false,terrain.get(),true);
+            const char* name=tick==1?"start-1":tick==4?"start-4":tick==8?"start-8":
+                tick==20?"walk-20":tick==35?"walk-35":tick==50?"walk-50":
+                tick==65?"walk-65":tick==80?"walk-80":tick==100?"walk-100":nullptr;
+            if(name)proceed=capture(name);
+        }
+        if(proceed)proceed=capture("stop-0");
+        for(unsigned tick=1;tick<=11 && proceed;++tick) {
+            const auto before=route.State();
+            route.Step(1.f/60,before.x+3,before.z+1,true,false,false,terrain.get(),true);
+            const char* name=tick==1?"stop-1":tick==4?"stop-4":tick==8?"stop-8":tick==11?"stop-11":nullptr;
+            if(name)proceed=capture(name);
+        }
+        if(proceed)proceed=capture("turn-0");
+        for(unsigned tick=1;tick<=40 && proceed;++tick) {
+            const auto before=route.State();
+            route.Step(1.f/60,before.x-3,before.z,true,false,false,terrain.get(),true);
+            const char* name=tick==10?"turn-10":tick==20?"turn-20":tick==30?"turn-30":tick==40?"turn-40":nullptr;
+            if(name)proceed=capture(name);
+        }
+        ctx.lookoutKitInspectionMotion.reset();ctx.lookoutKitInspectionPose.reset();ctx.lookoutKitInspectionActing={};
+        if(proceed)proceed=check(render() && storySame(),"ordinary loaded camera and actor return after sequential motion inspection");
     }
     if(proceed){
         // Native notification queues owner work; the normal owner pump owns its
@@ -349,6 +410,8 @@ int RunHiddenLookoutValidation(VulkanSurfaceContext& ctx,horde::vulkan::DeviceCa
         <<",\"entryRtEvidence\":"<<(entryEvidence.empty()?"null":entryEvidence)
         <<",\"kitPoseInspection\":{\"requested\":"<<(gLookoutInspectKit?"true":"false")
         <<",\"evidenceClass\":\"seeded render-only pose; not live fresh-raise acceptance\",\"cameraOffset\":[-3,0,0],\"poses\":["<<kitEvidence.str()<<"]}"
+        <<",\"kitMotionInspection\":{\"requested\":"<<(gLookoutInspectKitMotion?"true":"false")
+        <<",\"evidenceClass\":\"sequential fixed-step production-route render inputs; not live earned gameplay\",\"frames\":["<<motionEvidence.str()<<"]}"
         <<",\"physicalVisibleAcceptance\":false,\"performanceEvidence\":false,\"ownerSettingsReadOrWritten\":false";
     return proceed && !failures?0:1;
 }
@@ -518,12 +581,13 @@ int RunHiddenCampaignValidation(VulkanSurfaceContext& ctx)
 bool ConfigureHiddenCampaignValidation()
 {
     int count=0;auto args=CommandLineToArgvW(GetCommandLineW(),&count);if(!args)return false;
-    bool requested=false,lookoutRequested=false,inspectKit=false;std::filesystem::path directory;
+    bool requested=false,lookoutRequested=false,inspectKit=false,inspectMotion=false;std::filesystem::path directory;
     for(int i=1;i<count;++i) {
         const std::wstring_view arg=args[i];
         if(arg==L"--campaign-validate-hidden")requested=true;
         if(arg==L"--lookout-validate-hidden")lookoutRequested=true;
         if(arg==L"--lookout-inspect-kit")inspectKit=true;
+        if(arg==L"--lookout-inspect-kit-motion"){inspectKit=true;inspectMotion=true;}
         if(arg==L"--campaign-test-root" && i+1<count)directory=args[++i];
     }
     LocalFree(args);
@@ -544,7 +608,7 @@ bool ConfigureHiddenCampaignValidation()
         std::cerr<<"Hidden lookout validation requires the unchanged caller-exported single ForestEndpoint autosave and canonical manifest only.\n";return false;
     }
     gLookoutHiddenValidation=lookoutRequested;
-    gLookoutInspectKit=inspectKit;
+    gLookoutInspectKit=inspectKit;gLookoutInspectKitMotion=inspectMotion;
     gCampaignHiddenValidation=true;gCampaignValidationDirectory=absolute;return true;
 #else
     std::cerr<<"Hidden campaign validation is Debug-only.\n";return false;

@@ -157,6 +157,7 @@ using LookoutPanel=horde::platform::windows::WindowsLookoutObjectivePanel;
 bool gCampaignHiddenValidation=false;
 bool gLookoutHiddenValidation=false;
 bool gLookoutInspectKit=false;
+bool gLookoutInspectKitMotion=false;
 bool gShowcaseCaptureHidden=false;
 bool gCampaignValidationHoldPreparation=false;
 std::filesystem::path gCampaignValidationDirectory;
@@ -464,6 +465,7 @@ struct VulkanSurfaceContext
 #if defined(_DEBUG)
     std::optional<horde::vulkan::raytracing::EnvironmentSurveyPose> lookoutKitInspectionPose;
     horde::gameplay::dialogue::CompanionActingPose lookoutKitInspectionActing{};
+    std::optional<horde::gameplay::dialogue::CompanionSnapshot> lookoutKitInspectionMotion;
 #endif
     horde::vulkan::RtExecutionBackend executionBackend = horde::vulkan::RtExecutionBackend::Unsupported;
     std::string developmentCheckpoint;
@@ -6705,6 +6707,7 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
                 if(evidenceFrame)ctx.rtFrameEvidence.FailRecord(observation);
                 return false;
             }
+            if(ctx.lookoutKitInspectionMotion)frameInputs.chapterCompanion=*ctx.lookoutKitInspectionMotion;
             frameInputs.chapterCompanion.acting=ctx.lookoutKitInspectionActing;
         }
         if(ctx.environmentSurveyActive)

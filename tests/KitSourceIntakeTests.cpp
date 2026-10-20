@@ -2,6 +2,7 @@
 #include "scene/assets/StaticMeshAsset.h"
 #include "scene/assets/SkinnedPbrActor.h"
 #include "scene/CompanionPose.h"
+#include "gameplay/dialogue/CompanionRouteFixture.h"
 #include <algorithm>
 #include <array>
 #include <cmath>
@@ -198,6 +199,150 @@ bool CheckCompanionRig(horde::scene::assets::SkinnedPbrActor& actor,
         actor.Pose(SkinnedClip::Idle,phase,diagnostic) && SameAdmittedActor(plain,actor.Asset()),
         "acting and rejected requests never mutate the imported node palette and neutral posing remains exact");
 }
+
+bool CheckCompanionBlend(horde::scene::assets::SkinnedPbrActor& actor,
+                         const std::filesystem::path& path,const horde::scene::SkinnedClipSet& clips) {
+    using namespace horde::scene;
+    namespace dialogue=horde::gameplay::dialogue;
+    const auto check=[](bool ok,const char* message){if(!ok)std::cerr<<"FAIL: Kit clip blend: "<<message<<'\n';return ok;};
+    SkinnedMeshAsset skin;std::string diagnostic;
+    if(!check(skin.LoadClips(path.string(),clips,diagnostic),"actual Kit rig imports"))return false;
+    constexpr float idleTime=.37f,walkTime=.23f;
+    const std::array<dialogue::CompanionActingPose,2> recipes{{{}, {.08f,.02f,.02f,false}}};
+    for(const auto& recipe:recipes) {
+        const auto acting=CompanionUpperBodyRotations(recipe);
+        std::vector<TexturedSkinnedRtVertex> base,target,blended;
+        std::vector<SkinnedPbrTangent> baseTangents,targetTangents,blendTangents;
+        if(!check(skin.SkinUniquePbr(SkinnedClip::Idle,idleTime,base,baseTangents,diagnostic,acting) &&
+            skin.SkinUniquePbr(SkinnedClip::Walking,walkTime,target,targetTangents,diagnostic,acting) &&
+            actor.Pose(SkinnedClip::Idle,idleTime,diagnostic,acting),"both authored endpoint poses admit acting"))return false;
+        const auto baseActor=actor.Asset();
+        if(!check(actor.Pose(SkinnedClip::Walking,walkTime,diagnostic,acting),"walk endpoint actor admits acting"))return false;
+        const auto targetActor=actor.Asset();
+        for(float weight:{0.f,1.f}) {
+            const SkinnedClipBlend blend{SkinnedClip::Walking,walkTime,weight};
+            if(!check(skin.SkinUniquePbr(SkinnedClip::Idle,idleTime,blended,blendTangents,diagnostic,acting,&blend) &&
+                SameBytes(blended,weight==0?base:target) && SameBytes(blendTangents,weight==0?baseTangents:targetTangents) &&
+                actor.Pose(SkinnedClip::Idle,idleTime,diagnostic,acting,&blend) &&
+                SameAdmittedActor(actor.Asset(),weight==0?baseActor:targetActor),
+                "blend weights zero and one preserve exact authored vertices tangents and grounded actor including acting"))return false;
+        }
+        for(float weight:{.25f,.5f,.75f}) {
+            const SkinnedClipBlend blend{SkinnedClip::Walking,walkTime,weight};
+            if(!check(actor.Pose(SkinnedClip::Idle,idleTime,diagnostic,acting,&blend) &&
+                SameActorContract(baseActor,actor.Asset()) && ValidActorFrames(actor.Asset()) &&
+                skin.ValidateStaticVertexLayout(actor.Asset(),diagnostic) &&
+                !SameBytes(actor.Asset().vertices,baseActor.vertices) && !SameBytes(actor.Asset().vertices,targetActor.vertices),
+                "intermediate joint blend changes the pose while retaining normalized PBR frames UV topology material and grounded bounds"))return false;
+        }
+    }
+    const auto admitted=actor.Asset();
+    std::array<SkinnedClipBlend,8> invalid{};
+    invalid.fill({SkinnedClip::Walking,walkTime,.5f});
+    invalid[0].weight=-.01f;invalid[1].weight=1.01f;
+    invalid[2].weight=std::numeric_limits<float>::quiet_NaN();invalid[3].weight=std::numeric_limits<float>::infinity();
+    invalid[4].clip=SkinnedClip::Attack;invalid[5].clip=static_cast<SkinnedClip>(255);
+    invalid[6].timeSeconds=std::numeric_limits<float>::quiet_NaN();invalid[7].timeSeconds=std::numeric_limits<float>::infinity();
+    for(const auto& blend:invalid) {
+        std::vector<TexturedSkinnedRtVertex> vertices(1);std::vector<SkinnedPbrTangent> tangents(1);
+        if(!check(!skin.SkinUniquePbr(SkinnedClip::Idle,idleTime,vertices,tangents,diagnostic,{},&blend) &&
+            vertices.empty() && tangents.empty() && !diagnostic.empty() &&
+            !actor.Pose(SkinnedClip::Idle,idleTime,diagnostic,{},&blend) && !diagnostic.empty() &&
+            SameAdmittedActor(admitted,actor.Asset()),
+            "invalid blend weight clip or time rejects without partial output or changing last admitted actor"))return false;
+    }
+
+    // Native named-node confirmation of the independently measured boot stance
+    // windows. Bone midpoint and boot centroid are different contact proxies;
+    // retain native speeds, rather than freezing a golden deformation value.
+    const float duration=skin.ClipDuration(SkinnedClip::Walking);
+    if(!check(std::isfinite(duration) && duration>0,"native walk duration is finite"))return false;
+    std::array<double,2> stanceSpeeds{};
+    for(unsigned side=0;side<2;++side) {
+        const std::array<std::string_view,2> names=side==0?
+            std::array<std::string_view,2>{"LeftFoot","LeftToeBase"}:std::array<std::string_view,2>{"RightFoot","RightToeBase"};
+        const float begin=side==0?.28f:.66f,end=side==0?.62f:1.02f;
+        std::array<double,25> times{},z{};double meanT=0,meanZ=0;
+        for(std::size_t i=0;i<times.size();++i) {
+            const float t=begin+(end-begin)*static_cast<float>(i)/(times.size()-1);
+            std::array<SkinnedNodeTransform,2> nodes{};
+            if(!check(skin.NodeTransforms(SkinnedClip::Walking,t,names,nodes,diagnostic),"native foot and toe stance samples resolve including cycle wrap"))return false;
+            times[i]=t;z[i]=(double(nodes[0][14])+nodes[1][14])*.5;meanT+=times[i];meanZ+=z[i];
+        }
+        meanT/=times.size();meanZ/=times.size();double covariance=0,variance=0;
+        for(std::size_t i=0;i<times.size();++i){covariance+=(times[i]-meanT)*(z[i]-meanZ);variance+=(times[i]-meanT)*(times[i]-meanT);}
+        stanceSpeeds[side]=-covariance/variance;
+        if(!check(std::isfinite(stanceSpeeds[side]) && stanceSpeeds[side]>0,
+            "native low-foot stance travels rearward in imported forward space"))return false;
+    }
+    const double meanSpeed=(stanceSpeeds[0]+stanceSpeeds[1])*.5;
+    const double expected=dialogue::CompanionLocomotion::kWalkCycleDistanceMetres/duration;
+    if(!check(std::abs(meanSpeed-expected)<expected*.15,
+        "independent native foot-node fit supports the measured distance-per-cycle within contact-proxy uncertainty"))return false;
+    std::cout<<"Kit native stance duration="<<duration<<" left_mps="<<stanceSpeeds[0]<<" right_mps="<<stanceSpeeds[1]
+        <<" inferred_cycle_m="<<meanSpeed*duration<<" pinned_visual_cycle_m="<<dialogue::CompanionLocomotion::kWalkCycleDistanceMetres<<'\n';
+
+    // Generate start/stop snapshots through the actual route owner. This small
+    // blockout support fixture is not a native chapter/terrain acceptance run.
+    struct Frame {dialogue::CompanionSnapshot pose;float legacySeconds=0;unsigned stage=0;};
+    dialogue::CompanionRouteFixture route;std::vector<Frame> frames;
+    float legacySeconds=0;bool legacyWalking=false;
+    constexpr float dt=1.f/60;
+    const auto advance=[&](bool lagging,unsigned stage,bool retain){
+        const auto before=route.State();
+        route.Step(dt,before.x+(lagging?7.f:0),before.z,true,true,false);
+        const auto state=route.State();
+        legacySeconds=legacyWalking==state.walking?legacySeconds+dt:0;legacyWalking=state.walking;
+        if(retain)frames.push_back({state,legacySeconds,stage});
+        return state.grounded && state.walking!=lagging &&
+            (lagging || std::abs(std::hypot(state.x-before.x,state.z-before.z)-1.8f*dt)<1e-4f);
+    };
+    for(unsigned i=0;i<20;++i)if(!check(advance(false,0,i==19),"production route primes unchanged accepted walking distance"))return false;
+    for(unsigned i=0;i<12;++i)if(!check(advance(true,1,true),"production player-lagging stop retains grounded route root"))return false;
+    for(unsigned i=0;i<12;++i)if(!check(advance(false,2,true),"production route resumes unchanged accepted walking distance"))return false;
+    if(!check(frames[12].pose.locomotion.walkWeight==0 && frames.back().pose.locomotion.walkWeight==1,
+        "production stop/start snapshots reach both exact blend endpoints"))return false;
+    if(!check(actor.Pose(SkinnedClip::Idle,0,diagnostic),"boot subset reference admits"))return false;
+    const auto contract=actor.Asset();std::vector<std::size_t> boots;
+    for(std::size_t i=0;i<contract.vertices.size();++i)if(contract.vertices[i].position[1]<.25f)boots.push_back(i);
+    if(!check(!boots.empty(),"nonempty low-boot subset is compared through route transitions"))return false;
+    using Point=std::array<float,3>;
+    const auto worldBoots=[&](const dialogue::CompanionSnapshot& pose){
+        std::vector<Point> output;output.reserve(boots.size());
+        const float yaw=CompanionModelYaw(pose.yaw),c=std::cos(yaw),s=std::sin(yaw);
+        for(const auto index:boots){const auto& p=actor.Asset().vertices[index].position;
+            output.push_back({c*p[0]+s*p[2]+pose.x,p[1]+pose.y,-s*p[0]+c*p[2]+pose.z});}
+        return output;
+    };
+    const auto jump=[](const std::vector<Point>& previous,const std::vector<Point>& current){
+        float maximum=0;
+        for(std::size_t i=0;i<current.size();++i){float square=0;for(std::size_t axis=0;axis<3;++axis){const float d=current[i][axis]-previous[i][axis];square+=d*d;}maximum=std::max(maximum,std::sqrt(square));}
+        return maximum;
+    };
+    std::array<float,3> oldPeak{},newPeak{};std::vector<Point> oldPrevious,newPrevious;
+    for(const auto& frame:frames) {
+        const auto& pose=frame.pose;
+        const SkinnedClipBlend blend{SkinnedClip::Walking,pose.locomotion.walkPhase*duration,pose.locomotion.walkWeight};
+        if(!check(actor.Pose(SkinnedClip::Idle,pose.animationSeconds,diagnostic,{},&blend) &&
+            SameActorContract(contract,actor.Asset()) && ValidActorFrames(actor.Asset()),"production snapshot admits one grounded blended PBR pose"))return false;
+        const auto newCurrent=worldBoots(pose);
+        if(!check(actor.Pose(pose.walking?SkinnedClip::Walking:SkinnedClip::Idle,frame.legacySeconds,diagnostic),
+            "pre-change hard-reset comparison pose admits on the same rig"))return false;
+        const auto oldCurrent=worldBoots(pose);
+        if(!newPrevious.empty()) {
+            newPeak[frame.stage]=std::max(newPeak[frame.stage],jump(newPrevious,newCurrent));
+            oldPeak[frame.stage]=std::max(oldPeak[frame.stage],jump(oldPrevious,oldCurrent));
+        }
+        newPrevious=newCurrent;oldPrevious=oldCurrent;
+    }
+    for(unsigned stage:{1u,2u}) {
+        std::cout<<"Kit native route transition="<<(stage==1?"stop":"start")<<" frames=12 hard_reset_peak_boot_m="
+            <<oldPeak[stage]<<" joint_blend_peak_boot_m="<<newPeak[stage]<<'\n';
+        if(!check(newPeak[stage]+1e-4f<oldPeak[stage],
+            "same-root native start and stop each reduce worst per-frame boot displacement versus hard reset"))return false;
+    }
+    return true;
+}
 }
 
 int main() {
@@ -224,6 +369,7 @@ int main() {
         std::cerr<<"Scene actor import failed: "<<admission<<'\n';return 1;
     }
     if(!CheckCompanionRig(actor,runtimePath,actorClips))++failures;
+    if(!CheckCompanionBlend(actor,runtimePath,actorClips))++failures;
     for(const auto clip:{SkinnedClip::Idle,SkinnedClip::Walking}) {
         for(float fraction:{0.f,.25f,.5f,.75f}) {
             if(!actor.Pose(clip,fraction*actor.Duration(clip),admission)) return 1;

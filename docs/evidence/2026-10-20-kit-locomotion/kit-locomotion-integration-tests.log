@@ -1,0 +1,38 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+      Start  35: horde_rt_campaign_play_session_tests
+ 1/16 Test  #35: horde_rt_campaign_play_session_tests ............   Passed    4.15 sec
+      Start  36: horde_rt_campaign_session_tests
+ 2/16 Test  #36: horde_rt_campaign_session_tests .................   Passed    1.20 sec
+      Start  40: horde_rt_campaign_codec_tests
+ 3/16 Test  #40: horde_rt_campaign_codec_tests ...................   Passed    0.02 sec
+      Start  42: horde_rt_chapter_dialogue_tests
+ 4/16 Test  #42: horde_rt_chapter_dialogue_tests .................   Passed    0.01 sec
+      Start  43: horde_rt_companion_acting_tests
+ 5/16 Test  #43: horde_rt_companion_acting_tests .................   Passed    0.96 sec
+      Start  44: horde_rt_companion_locomotion_tests
+ 6/16 Test  #44: horde_rt_companion_locomotion_tests .............   Passed    0.05 sec
+      Start  45: horde_rt_campaign_checkpoint_tests
+ 7/16 Test  #45: horde_rt_campaign_checkpoint_tests ..............   Passed    2.34 sec
+      Start  57: horde_rt_graphics_preview_frame_adapter_tests
+ 8/16 Test  #57: horde_rt_graphics_preview_frame_adapter_tests ...   Passed    0.87 sec
+      Start  73: horde_rt_player_directional_rig_tests
+ 9/16 Test  #73: horde_rt_player_directional_rig_tests ...........   Passed    1.06 sec
+      Start  74: horde_rt_player_crouch_rig_tests
+10/16 Test  #74: horde_rt_player_crouch_rig_tests ................   Passed    1.90 sec
+      Start  97: horde_rt_skinned_node_pose_batch_tests
+11/16 Test  #97: horde_rt_skinned_node_pose_batch_tests ..........   Passed    0.89 sec
+      Start 192: horde_rt_static_geometry_cutover_tests
+12/16 Test #192: horde_rt_static_geometry_cutover_tests ..........   Passed    0.89 sec
+      Start 197: horde_rt_skinned_arm_reference_tests
+13/16 Test #197: horde_rt_skinned_arm_reference_tests ............   Passed    0.92 sec
+      Start 198: horde_rt_skinned_character_smoke
+14/16 Test #198: horde_rt_skinned_character_smoke ................   Passed    4.17 sec
+      Start 208: horde_rt_rescue_journey_integration_tests
+15/16 Test #208: horde_rt_rescue_journey_integration_tests .......   Passed    1.33 sec
+      Start 209: horde_rt_chapter_terrain_journey_tests
+16/16 Test #209: horde_rt_chapter_terrain_journey_tests ..........   Passed   16.11 sec
+
+100% tests passed, 0 tests failed out of 16
+
+Total Test time (real) =  36.90 sec

@@ -629,6 +629,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     chapterActorPoseSeconds_ = std::exchange(other.chapterActorPoseSeconds_, -1.0f);
     chapterActorWalking_ = std::exchange(other.chapterActorWalking_, false);
     chapterActorActing_ = std::exchange(other.chapterActorActing_, horde::gameplay::dialogue::CompanionActingPose{});
+    chapterActorLocomotion_ = std::exchange(other.chapterActorLocomotion_, horde::gameplay::dialogue::CompanionLocomotionPose{});
     other.characterSlot_ = {};
     playerRenderSlot_ = std::move(other.playerRenderSlot_);
     other.playerRenderSlot_ = {};
@@ -1227,6 +1228,7 @@ void PresentableTinyRtScene::Destroy()
     chapterActorPoseSeconds_ = -1.0f;
     chapterActorWalking_ = false;
     chapterActorActing_ = {};
+    chapterActorLocomotion_ = {};
     DestroyBuffer(skinnedPlayerBlasUpdateScratch_);
     DestroyBuffer(viewmodelBlasUpdateScratch_);
     DestroyAccelerationStructure(viewmodelBlas_);
@@ -6926,15 +6928,18 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     if (thirdActorIsCompanion_ && (chapterActorPoseGeneration_ != frame.chapterCompanion.generation ||
         chapterActorPoseSeconds_ != frame.chapterCompanion.animationSeconds ||
         chapterActorWalking_ != frame.chapterCompanion.walking ||
-        chapterActorActing_ != frame.chapterCompanion.acting)) {
-        const auto clip = frame.chapterCompanion.walking ? horde::scene::SkinnedClip::Walking : horde::scene::SkinnedClip::Idle;
-        const float duration = chapterActor_.Duration(clip);
-        const float time = std::fmod(frame.chapterCompanion.animationSeconds, duration);
+        chapterActorActing_ != frame.chapterCompanion.acting ||
+        chapterActorLocomotion_ != frame.chapterCompanion.locomotion)) {
+        const auto clip = horde::scene::SkinnedClip::Idle;
+        const float time = frame.chapterCompanion.animationSeconds;
+        const horde::scene::SkinnedClipBlend blend{horde::scene::SkinnedClip::Walking,
+            frame.chapterCompanion.locomotion.walkPhase * chapterActor_.Duration(horde::scene::SkinnedClip::Walking),
+            frame.chapterCompanion.locomotion.walkWeight};
         // Pose owns clip skinning plus its inseparable floor/bounds/static-PBR
         // repack. CharacterSkin therefore includes that CPU preparation here.
         RtSceneStageScope companionSkinScope(observation, horde::telemetry::RtStage::CharacterSkin);
         const auto acting=horde::scene::CompanionUpperBodyRotations(frame.chapterCompanion.acting);
-        if (!chapterActor_.Pose(clip, time, diagnostic, acting)) {
+        if (!chapterActor_.Pose(clip, time, diagnostic, acting, &blend)) {
             companionSkinScope.Cancel();
             return false;
         }
@@ -6949,6 +6954,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         chapterActorPoseSeconds_ = frame.chapterCompanion.animationSeconds;
         chapterActorWalking_ = frame.chapterCompanion.walking;
         chapterActorActing_ = frame.chapterCompanion.acting;
+        chapterActorLocomotion_ = frame.chapterCompanion.locomotion;
         chapterActorNeedsRefit_ = true;
     }
     if (!characterSlot_.PrepareFrame(frame.skeletonEnemies,

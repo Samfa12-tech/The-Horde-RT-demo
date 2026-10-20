@@ -1,0 +1,397 @@
+{
+  "schema": 1,
+  "evidence_class": "offline GLB analysis reproducing native interpolation in Python double precision; no game or RT execution",
+  "head": "d2d24e3d",
+  "glb": "assets\\models\\characters\\runtime\\kit-warden-v1\\kit-warden-lod0.runtime.glb",
+  "sha256": "1ba628235814b5912ae1439b180347dd8e1cce85b0f4d1fae5bbacb41e7d3713",
+  "clip": "Warden|walk",
+  "duration_seconds": 0.8333333134651184,
+  "samples_per_cycle": 480,
+  "route_speed_mps": 1.8,
+  "boot_subset_rule": "bind y<.25m; all nontrivial weights in side UpLeg/Leg/Foot/ToeBase; no other branch",
+  "boot_subset_counts": {
+    "Left": 1046,
+    "Right": 1025
+  },
+  "node_ranges": {
+    "Hips": {
+      "range_xyz": [
+        0.0032797049696142123,
+        0.08001212387636836,
+        0.010336518957739863
+      ],
+      "first_xyz": [
+        -0.003478395861125083,
+        1.0075020374170975,
+        0.01938664631426379
+      ],
+      "last_sample_xyz": [
+        -0.0030118877343250994,
+        0.9961210519451648,
+        0.02085692582365858
+      ]
+    },
+    "Armature": {
+      "range_xyz": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "first_xyz": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "last_sample_xyz": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "LeftFoot": {
+      "range_xyz": [
+        0.045453108117274876,
+        0.2046666831029382,
+        0.8670087792837902
+      ],
+      "first_xyz": [
+        0.1374241528805936,
+        0.23332423256203474,
+        -0.061393505638225626
+      ],
+      "last_sample_xyz": [
+        0.1397031850609103,
+        0.2644664768099549,
+        -0.1363122595529071
+      ]
+    },
+    "LeftToeBase": {
+      "range_xyz": [
+        0.05088383259004668,
+        0.18583449267037064,
+        1.0234646437092774
+      ],
+      "first_xyz": [
+        0.14324803926363408,
+        0.10352560044224542,
+        -0.03776347608904208
+      ],
+      "last_sample_xyz": [
+        0.14247439568582088,
+        0.13250516289922626,
+        -0.14061304614543865
+      ]
+    },
+    "RightFoot": {
+      "range_xyz": [
+        0.05936338734473136,
+        0.18926785839886068,
+        0.8144217521476018
+      ],
+      "first_xyz": [
+        -0.13478583956947124,
+        0.13348888168319406,
+        -0.01606911786991794
+      ],
+      "last_sample_xyz": [
+        -0.13043193786353063,
+        0.13204922095371519,
+        0.02315682693828789
+      ]
+    },
+    "RightToeBase": {
+      "range_xyz": [
+        0.04843966744575423,
+        0.17205314478258646,
+        0.9762856869978019
+      ],
+      "first_xyz": [
+        -0.14639275539276828,
+        0.029107540395004718,
+        0.07253058570747668
+      ],
+      "last_sample_xyz": [
+        -0.1419688752328855,
+        0.027925895674399126,
+        0.11206862333571943
+      ]
+    }
+  },
+  "root_channels": [
+    {
+      "node": "Hips",
+      "path": "translation",
+      "keys": 26,
+      "start": 0.0,
+      "end": 0.8333333134651184,
+      "component_ranges": [
+        0.328493095934391,
+        8.013961791992188,
+        1.0352989435195923
+      ]
+    },
+    {
+      "node": "Hips",
+      "path": "rotation",
+      "keys": 26,
+      "start": 0.0,
+      "end": 0.8333333134651184,
+      "component_ranges": [
+        0.07919836044311523,
+        0.09651261568069458,
+        0.026614993810653687,
+        0.031226158142089844
+      ]
+    },
+    {
+      "node": "Hips",
+      "path": "scale",
+      "keys": 2,
+      "start": 0.0,
+      "end": 0.8333333134651184,
+      "component_ranges": [
+        1.7881393432617188e-07,
+        5.960464477539063e-08,
+        0.0
+      ]
+    }
+  ],
+  "idle_zero_to_walk_zero": {
+    "Hips": {
+      "idle_zero_xyz": [
+        -0.002322333701200774,
+        1.0220319138013139,
+        -0.0010263845095101476
+      ],
+      "walk_zero_xyz": [
+        -0.003478395861125083,
+        1.0075020374170975,
+        0.01938664631426379
+      ],
+      "jump_metres": 0.025082775262529482
+    },
+    "LeftFoot": {
+      "idle_zero_xyz": [
+        0.16878661986333854,
+        0.12307133752923484,
+        -0.050163487002508535
+      ],
+      "walk_zero_xyz": [
+        0.1374241528805936,
+        0.23332423256203474,
+        -0.061393505638225626
+      ],
+      "jump_metres": 0.1151755986175714
+    },
+    "LeftToeBase": {
+      "idle_zero_xyz": [
+        0.18493450534499897,
+        0.040532520311184164,
+        0.05165285751571263
+      ],
+      "walk_zero_xyz": [
+        0.14324803926363408,
+        0.10352560044224542,
+        -0.03776347608904208
+      ],
+      "jump_metres": 0.11705199833436367
+    },
+    "RightFoot": {
+      "idle_zero_xyz": [
+        -0.1699168240059353,
+        0.13038400987881282,
+        -0.05240873525033113
+      ],
+      "walk_zero_xyz": [
+        -0.13478583956947124,
+        0.13348888168319406,
+        -0.01606911786991794
+      ],
+      "jump_metres": 0.05063984683775762
+    },
+    "RightToeBase": {
+      "idle_zero_xyz": [
+        -0.18482694340357875,
+        0.040640799623639215,
+        0.05056665167478721
+      ],
+      "walk_zero_xyz": [
+        -0.14639275539276828,
+        0.029107540395004718,
+        0.07253058570747668
+      ],
+      "jump_metres": 0.04574513389069427
+    }
+  },
+  "stance_clearance_sensitivity": {
+    "10": {
+      "Left": {
+        "contact_fraction": 0.5604166666666667,
+        "intervals": [
+          {
+            "start_seconds": 0.2170138837148746,
+            "end_seconds": 0.6840277614692848,
+            "wraps_cycle": false,
+            "fraction": 0.5604166666666667,
+            "fit_samples": 189,
+            "rearward_travel_fit_metres": 0.6394060696226034,
+            "natural_speed_mps": 1.964548265149732,
+            "fit_rms_metres": 0.0023999876947411623,
+            "current_world_slide_mps": -0.16454826514973186
+          }
+        ],
+        "boot_centroid_z_range": 0.8891460150557482,
+        "minimum_sole_height_range": 0.12379972628231628,
+        "maximum_lift_above_lowest_boot": 0.11110437179722678
+      },
+      "Right": {
+        "contact_fraction": 0.5895833333333333,
+        "intervals": [
+          {
+            "start_seconds": 0.5972222079833348,
+            "end_seconds": 1.0885416407138109,
+            "wraps_cycle": true,
+            "fraction": 0.5895833333333333,
+            "fit_samples": 199,
+            "rearward_travel_fit_metres": 0.6163520409689456,
+            "natural_speed_mps": 1.7800794932819946,
+            "fit_rms_metres": 0.006992148540877618,
+            "current_world_slide_mps": 0.019920506718005493
+          }
+        ],
+        "boot_centroid_z_range": 0.8406795944457084,
+        "minimum_sole_height_range": 0.11212008740653531,
+        "maximum_lift_above_lowest_boot": 0.11277108794709102
+      },
+      "aggregate": {
+        "natural_speed_mps": 1.8723138792158633,
+        "natural_stride_metres_per_cycle": 1.560261528813685,
+        "suggested_visual_playback_multiplier": 0.9613772669109579,
+        "current_steps_per_minute": 144.00000343322762,
+        "matched_steps_per_minute": 138.43832973580493
+      }
+    },
+    "20": {
+      "Left": {
+        "contact_fraction": 0.64375,
+        "intervals": [
+          {
+            "start_seconds": 0.04166666567325592,
+            "end_seconds": 0.08854166455566882,
+            "wraps_cycle": false,
+            "fraction": 0.05625,
+            "fit_samples": 19,
+            "rearward_travel_fit_metres": -0.1380583218974176,
+            "natural_speed_mps": -4.425503246939996,
+            "fit_rms_metres": 0.00017018388614786482,
+            "current_world_slide_mps": 6.225503246939996
+          },
+          {
+            "start_seconds": 0.20312499515712262,
+            "end_seconds": 0.6927083168178797,
+            "wraps_cycle": false,
+            "fraction": 0.5875,
+            "fit_samples": 198,
+            "rearward_travel_fit_metres": 0.6709668751908852,
+            "natural_speed_mps": 1.964087441222025,
+            "fit_rms_metres": 0.0023494122833249555,
+            "current_world_slide_mps": -0.164087441222025
+          }
+        ],
+        "boot_centroid_z_range": 0.8891460150557482,
+        "minimum_sole_height_range": 0.12379972628231628,
+        "maximum_lift_above_lowest_boot": 0.11110437179722678
+      },
+      "Right": {
+        "contact_fraction": 0.6166666666666667,
+        "intervals": [
+          {
+            "start_seconds": 0.5833333194255829,
+            "end_seconds": 1.0972221960624058,
+            "wraps_cycle": true,
+            "fraction": 0.6166666666666667,
+            "fit_samples": 208,
+            "rearward_travel_fit_metres": 0.6425241347442696,
+            "natural_speed_mps": 1.7816123771137564,
+            "fit_rms_metres": 0.006855655225885844,
+            "current_world_slide_mps": 0.018387622886243626
+          }
+        ],
+        "boot_centroid_z_range": 0.8406795944457084,
+        "minimum_sole_height_range": 0.11212008740653531,
+        "maximum_lift_above_lowest_boot": 0.11277108794709102
+      },
+      "aggregate": {
+        "natural_speed_mps": 1.8728499091678907,
+        "natural_stride_metres_per_cycle": 1.5607082204297245,
+        "suggested_visual_playback_multiplier": 0.9611021103125889,
+        "current_steps_per_minute": 144.00000343322762,
+        "matched_steps_per_minute": 138.3987071846951
+      }
+    },
+    "30": {
+      "Left": {
+        "contact_fraction": 0.7354166666666667,
+        "intervals": [
+          {
+            "start_seconds": 0.02604166604578495,
+            "end_seconds": 0.12673610808948677,
+            "wraps_cycle": false,
+            "fraction": 0.12083333333333333,
+            "fit_samples": 42,
+            "rearward_travel_fit_metres": -0.30774396274815286,
+            "natural_speed_mps": -4.397516867496046,
+            "fit_rms_metres": 0.0011940405051618854,
+            "current_world_slide_mps": 6.197516867496046
+          },
+          {
+            "start_seconds": 0.18749999552965163,
+            "end_seconds": 0.6996527610967557,
+            "wraps_cycle": false,
+            "fraction": 0.6145833333333334,
+            "fit_samples": 207,
+            "rearward_travel_fit_metres": 0.7014371761403404,
+            "natural_speed_mps": 1.964334945390337,
+            "fit_rms_metres": 0.0023068342718332345,
+            "current_world_slide_mps": -0.16433494539033688
+          }
+        ],
+        "boot_centroid_z_range": 0.8891460150557482,
+        "minimum_sole_height_range": 0.12379972628231628,
+        "maximum_lift_above_lowest_boot": 0.11110437179722678
+      },
+      "Right": {
+        "contact_fraction": 0.6541666666666667,
+        "intervals": [
+          {
+            "start_seconds": 0.5711805419375499,
+            "end_seconds": 1.1163194178293148,
+            "wraps_cycle": true,
+            "fraction": 0.6541666666666667,
+            "fit_samples": 220,
+            "rearward_travel_fit_metres": 0.6779165507199271,
+            "natural_speed_mps": 1.7821689376964318,
+            "fit_rms_metres": 0.00666809225764146,
+            "current_world_slide_mps": 0.017831062303568235
+          }
+        ],
+        "boot_centroid_z_range": 0.8406795944457084,
+        "minimum_sole_height_range": 0.11212008740653531,
+        "maximum_lift_above_lowest_boot": 0.11277108794709102
+      },
+      "aggregate": {
+        "natural_speed_mps": 1.8732519415433844,
+        "natural_stride_metres_per_cycle": 1.5610432474013147,
+        "suggested_visual_playback_multiplier": 0.9608958411205321,
+        "current_steps_per_minute": 144.00000343322762,
+        "matched_steps_per_minute": 138.36900442033078
+      }
+    }
+  },
+  "limitations": [
+    "Sole clearance is measured relative to the lowest semantic boot subset, not terrain contact.",
+    "Per-pose native all-vertex floor repack changes Y only; native output not executed or byte-validated here.",
+    "Centroid stance fit is an estimate affected by foot roll and chosen 10/20/30mm threshold.",
+    "Cadence alone does not prove foot locking, turns, transitions, variable terrain, visual quality or performance."
+  ]
+}

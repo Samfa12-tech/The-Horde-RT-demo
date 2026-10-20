@@ -1,5 +1,18 @@
 # KIT ANIMATION PLAN 1 7 — WP0 custody and reconciliation
 
+## Bounded locomotion checkpoint - 20 October 2026
+
+The [measured locomotion slice](evidence/2026-10-20-kit-locomotion/README.md)
+retains the unchanged route/save contract, keeps gait phase and blends existing
+idle/walk joints over 0.18 seconds before one skin pass. The measured near-matched
+stride admits a small 1.56 m visual cycle; native transition and sequential RT
+evidence pass. Stationary walk-as-pivot is rejected for planted-foot sliding;
+proper turn-foot work remains partial. Seventeen native suites, Windows builds,
+four Android ABIs and 51 hidden RT checks pass; physical/artistic acceptance is
+open. Next broad source priority is the approved tomb decay story slice in the
+[current milestone map](design/HORDE_1_7_MILESTONE_MAP_2026_10_20.md), rather than
+indefinite acting refinements.
+
 ## Bounded runtime checkpoint - 20 October 2026
 
 The [speech/recognition/facing checkpoint](evidence/2026-10-20-kit-acting/README.md)

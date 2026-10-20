@@ -1,0 +1,75 @@
+{
+  "sourceBase": "d2d24e3d8bd50be8b26d03d1d9051e68c36fe82f",
+  "sources": {
+    "CMakeLists.txt": {
+      "bytes": 111139,
+      "sha256": "3db7dfffa239d9256b2947527ef966aa15e6f73e8f6966dfb2df49bb2ce48945",
+      "gitBlob": "ab9b058987d03bcf4a71807b28a6f89d0cddd8f2"
+    },
+    "src/gameplay/dialogue/CompanionLocomotion.h": {
+      "bytes": 1063,
+      "sha256": "617cc31b132bde8986d910d0a7ad31322b2a730bd7649c34db812e1fe25f5696",
+      "gitBlob": "d1914a8d68783a55d303531dfc001db772b90b03"
+    },
+    "src/gameplay/dialogue/CompanionRouteFixture.h": {
+      "bytes": 6800,
+      "sha256": "bd4528e47d86317d460660db612f0fb61d0c8601540b427282799553534734b9",
+      "gitBlob": "03abac151dbd50ae6073bcdfe1426a3e7aa02acc"
+    },
+    "src/scene/assets/SkinnedMeshAsset.h": {
+      "bytes": 12034,
+      "sha256": "9b4a680f41d63f02ffc90216138a15ba734d6efab52bf01078325b9e960212cc",
+      "gitBlob": "af15d214004e0bfcddde4fd03fe70fb406aa601d"
+    },
+    "src/scene/assets/SkinnedMeshAsset.cpp": {
+      "bytes": 101002,
+      "sha256": "5e6729157452f1f028547dd5c9759a0da75c54025aa5404a6f705d0350e19cb9",
+      "gitBlob": "d2dde021fef6a72924788fd753ea0986ea0f62f0"
+    },
+    "src/scene/assets/SkinnedPbrActor.h": {
+      "bytes": 2892,
+      "sha256": "bafc68c5d0089b5da6521f84c90a061e44b1299c00d4a021c17f641ffe0bf298",
+      "gitBlob": "f89cc39917e591561e9476e1fede0767bb66de2b"
+    },
+    "src/vulkan/raytracing/PresentableTinyRtScene.cpp": {
+      "bytes": 490542,
+      "sha256": "4a23b0e72a7ee54cdc05bcf054ace00752950a9bea9184ce7019772969680898",
+      "gitBlob": "2685f491a05abacac167de20aea84dbc2b8e7ad9"
+    },
+    "src/vulkan/raytracing/PresentableTinyRtScene.h": {
+      "bytes": 68549,
+      "sha256": "ceda6b2b3650c79cd66e35b2bd8e1612467b8cf583ec2634c8835950f51dc8a2",
+      "gitBlob": "2460ee2f39c4febd6fe39a9d5725684085f5ebe7"
+    },
+    "src/platform/windows/DiagnosticWindow.cpp": {
+      "bytes": 602520,
+      "sha256": "d89eac90d16837b92c85b9998ba923fd82d052d612893debaa5a57753ad988e5",
+      "gitBlob": "acaa296663e17ff30c2d8a512065115e020939a1"
+    },
+    "src/platform/windows/windows_campaign_validation.inl": {
+      "bytes": 45845,
+      "sha256": "077bbb3bb6d6e7abc7241280e0561d47257539d12fc8b382b070ddb93c770740",
+      "gitBlob": "8719a9754f684ff0e4964472f654dc579bad11dc"
+    },
+    "tests/CompanionLocomotionTests.cpp": {
+      "bytes": 5855,
+      "sha256": "173b8af4e6a4c89fa46c80bd3eae8a5e973514e7f289348da77a305a96afbd8c",
+      "gitBlob": "01982b2c4c38a2a20e31bd76f08cbf872eec7024"
+    },
+    "tests/KitSourceIntakeTests.cpp": {
+      "bytes": 33187,
+      "sha256": "ae7f7a2ec2e186292f6546cea7e1aea3e1d6287ce94395f96371bc49f99cfd69",
+      "gitBlob": "94c490bae2c017a20c56849581fb6357f226b2dd"
+    }
+  },
+  "canonicalOwnerFiles": {
+    "ASSET_LICENSES.md": {
+      "bytes": 30507,
+      "sha256": "3a6cff3d34421d2ec751b1f64ec44b6c3ee801cdc1d6d1123c3cb479c0b92387"
+    },
+    "PROJECT_MEMORY.md": {
+      "bytes": 51219,
+      "sha256": "9cfbea7667b50a9a960396c8f13c68905791aebd42121ecb353a8354b8cd406e"
+    }
+  }
+}

@@ -1,5 +1,32 @@
 # Horde 1.7 current design index
 
+## Kit locomotion and current scope - local milestone, 20 October 2026
+
+The [measured locomotion checkpoint](../evidence/2026-10-20-kit-locomotion/README.md)
+keeps the 1.8 m/s route and saves unchanged, retains gait phase and adds a 0.18 s
+local-joint idle/walk blend before one skin pass. The admitted walk was already
+near the route speed; measured stance supports a small 1.56 m cycle correction.
+Native stop/restart peak boot movement falls from 578/203 mm to 53/116 mm in the
+retained same-root windows. Stationary walk-as-pivot is rejected for sliding;
+current idle swivel remains honestly open.
+
+Seventeen focused native suites, Windows Debug/Release and four Android ABI
+builds pass. The hidden noncombat RT run passes 51/51 checks with 20 sequential
+motion images, unchanged resource inventory/records/INI and no visible owner.
+Ten original frames were inspected; physical/live full-route/artistic acceptance
+and sustained performance remain open. The missing-directory exporter preflight
+is retained separately from the one successful runtime run. No phone, public or
+Reef operation occurred; mobile Mist Off remains owner-selected.
+
+The [current milestone map](HORDE_1_7_MILESTONE_MAP_2026_10_20.md) corrects stale
+missing-water/frog/opening-collection claims. Next source slice: sparse original
+fallen masonry chips under damaged opening stone, with existing primitive/material
+ownership, clearance and measured native RT cost. Natural earned-save/death/full
+out-back/contact/listening/warm-performance acceptance remains higher-priority
+physical work when the owner resumes testing. Healing needs a bounded policy;
+no new economy or heavy outside expansion is authorized by this checkpoint.
+
+
 ## Kit speech/recognition and facing - local milestone, 20 October 2026
 
 The [bounded Kit slice](../evidence/2026-10-20-kit-acting/README.md) adds transient

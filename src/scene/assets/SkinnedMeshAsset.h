@@ -64,6 +64,15 @@ enum class SkinnedClip
 };
 using SkeletonClip = SkinnedClip;
 
+// Blend local joint TRS before the single skin/tangent pass. Weight endpoints
+// preserve the exact plain clip; no per-vertex interpolation or second skin.
+struct SkinnedClipBlend
+{
+    SkinnedClip clip = SkinnedClip::Idle;
+    float timeSeconds = 0.0f;
+    float weight = 0.0f;
+};
+
 struct SkinnedClipBinding
 {
     std::string name;
@@ -205,7 +214,8 @@ public:
                        std::vector<TexturedSkinnedRtVertex>& output,
                        std::vector<SkinnedPbrTangent>& outputTangents,
                        std::string& diagnostic,
-                       std::span<const SkinnedNodeRotation> additiveNodeRotations = {}) const;
+                       std::span<const SkinnedNodeRotation> additiveNodeRotations = {},
+                       const SkinnedClipBlend* blend = nullptr) const;
     bool SkinPlayerUniqueTextured(SkinnedClip clip,
                                   float timeSeconds,
                                   const SkinnedArmIkTarget& leftArm,
@@ -239,7 +249,8 @@ private:
     bool SkinUniqueGeometry(SkinnedClip clip, float timeSeconds,
                             std::string& diagnostic,
                             std::span<const SkinnedNodeRotation> additiveNodeRotations,
-                            std::vector<SkinnedPbrTangent>* outputTangents = nullptr) const;
+                            std::vector<SkinnedPbrTangent>* outputTangents = nullptr,
+                            const SkinnedClipBlend* blend = nullptr) const;
     void CopyUniqueTextured(std::vector<TexturedSkinnedRtVertex>& output) const;
     struct SourceVertex;
     struct Node;

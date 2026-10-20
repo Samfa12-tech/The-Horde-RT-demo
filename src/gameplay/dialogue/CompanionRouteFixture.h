@@ -1,5 +1,6 @@
 #pragma once
 #include "gameplay/dialogue/CompanionActing.h"
+#include "gameplay/dialogue/CompanionLocomotion.h"
 #include "gameplay/simulation/DevelopmentWorldRoute.h"
 #include "gameplay/traversal/ChapterTerrainMovement.h"
 #include <algorithm>
@@ -15,23 +16,24 @@ struct CompanionSnapshot {
     float y=simulation::kWorldRoutePoints[3].y,yaw=0,animationSeconds=0;
     std::size_t waypoint=4;std::uint64_t generation=1;
     CompanionActingPose acting{};
+    CompanionLocomotionPose locomotion{};
 };
 class CompanionRouteFixture {
 public:
     const CompanionSnapshot& State() const {return state_;}
-    void Reset() { const auto gen=state_.generation;state_={};acting_.Reset();state_.generation=gen==UINT64_MAX?gen:gen+1; }
+    void Reset() { const auto gen=state_.generation;state_={};acting_.Reset();locomotion_.Reset();state_.generation=gen==UINT64_MAX?gen:gen+1; }
     void AdvanceActing(float seconds,const Snapshot& speech,bool exterior,bool alive,bool freshVisibleProof) {
         acting_.Step(seconds,speech,exterior,alive,state_.grounded,state_.walking,freshVisibleProof);
         state_.acting=acting_.State();
     }
     void RestoreCampaignReunion(bool exterior, float playerX, float playerZ,
         const simulation::TriangleSupportSurface* terrain, std::uint64_t generationFloor) {
-        state_={};acting_.Reset();state_.generation=generationFloor+1;
+        state_={};acting_.Reset();locomotion_.Reset();state_.generation=generationFloor+1;
         if(exterior) Step(1.0f/60.0f,playerX,playerZ,true,false,false,terrain,true);
     }
     void RestoreCampaignLookout(float playerX, float playerZ,
         const simulation::TriangleSupportSurface* terrain, std::uint64_t generationFloor) {
-        state_={};acting_.Reset();state_.generation=generationFloor+1;
+        state_={};acting_.Reset();locomotion_.Reset();state_.generation=generationFloor+1;
         const auto endpoint=simulation::kWorldRoutePoints.back();
         state_.x=endpoint.x+1.0f;state_.z=endpoint.z;
         state_.waypoint=simulation::kWorldRoutePoints.size();
@@ -52,7 +54,7 @@ public:
             return;
         }
         const auto oldYaw=state_.yaw;
-        const bool wasWalking=state_.walking;
+        const auto oldX=state_.x,oldZ=state_.z;
         StepRoute(dt,playerX,playerZ,exterior,proof,paused,terrain,requireTerrain);
         if(paused || !exterior || !state_.grounded || !std::isfinite(dt) || dt<=0) {
             state_.yaw=oldYaw;return;
@@ -63,7 +65,9 @@ public:
                 std::atan2(playerX-state_.x,state_.z-playerZ):oldYaw);
         const float difference=std::remainder(target-oldYaw,6.28318530718f);
         state_.yaw=oldYaw+std::clamp(difference,-2.4f*dt,2.4f*dt);
-        state_.animationSeconds=wasWalking==state_.walking?state_.animationSeconds+dt:0;
+        state_.animationSeconds+=dt;
+        locomotion_.Step(dt,std::hypot(state_.x-oldX,state_.z-oldZ),state_.walking);
+        state_.locomotion=locomotion_.State();
     }
 private:
     void StepRoute(float dt,float playerX,float playerZ,bool exterior,bool proof,bool paused,
@@ -103,5 +107,6 @@ private:
     }
     CompanionSnapshot state_{};
     CompanionActing acting_{};
+    CompanionLocomotion locomotion_{};
 };
 } // namespace horde::gameplay::dialogue

@@ -1232,6 +1232,7 @@ private:
     float chapterActorPoseSeconds_ = -1.0f;
     bool chapterActorWalking_ = false;
     horde::gameplay::dialogue::CompanionActingPose chapterActorActing_{};
+    horde::gameplay::dialogue::CompanionLocomotionPose chapterActorLocomotion_{};
     PlayerRenderSlot playerRenderSlot_;
     horde::scene::assets::StaticMeshAsset developmentStaticAsset_;
     horde::scene::assets::StaticMeshAsset collapseStaticAsset_;

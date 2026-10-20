@@ -1396,37 +1396,67 @@ bool SkinnedMeshAsset::Skin(
 bool SkinnedMeshAsset::SkinUniqueGeometry(
     SkinnedClip clipId, float timeSeconds, std::string& diagnostic,
     const std::span<const SkinnedNodeRotation> additiveNodeRotations,
-    std::vector<SkinnedPbrTangent>* outputTangents) const
+    std::vector<SkinnedPbrTangent>* outputTangents, const SkinnedClipBlend* blend) const
 {
     if (!loaded_) { diagnostic = "Skeleton model was not loaded."; return false; }
     const std::size_t clipIndex = static_cast<std::size_t>(clipId);
     if (clipIndex >= clips_.size()) { diagnostic = "Skeleton combat clip index is invalid."; return false; }
     const Clip& clip = clips_[clipIndex];
     if (clip.channels.empty() || clip.duration <= 0.0f) { diagnostic = "Requested skinned clip is not mapped."; return false; }
-    std::vector<Node> pose = nodes_;
-    const float time = clip.loops
-        ? std::fmod(std::max(timeSeconds, 0.0f), clip.duration)
-        : std::clamp(timeSeconds, 0.0f, clip.duration);
-    for (const Channel& channel : clip.channels)
+    if (blend && (!std::isfinite(blend->timeSeconds) || !std::isfinite(blend->weight) ||
+        blend->weight < 0.0f || blend->weight > 1.0f ||
+        static_cast<std::size_t>(blend->clip) >= clips_.size() ||
+        clips_[static_cast<std::size_t>(blend->clip)].channels.empty() ||
+        clips_[static_cast<std::size_t>(blend->clip)].duration <= 0.0f))
     {
-        if (channel.node >= pose.size() || channel.times.empty()) continue;
-        const auto upper = std::upper_bound(channel.times.begin(), channel.times.end(), time);
-        const std::size_t next = upper == channel.times.end()
-            ? (clip.loops ? 0u : channel.times.size() - 1u)
-            : static_cast<std::size_t>(upper - channel.times.begin());
-        const std::size_t previous = next == 0u ? channel.times.size() - 1u : next - 1u;
-        const float previousTime = channel.times[previous];
-        const float nextTime = next == 0u ? clip.duration : channel.times[next];
-        const float sampledTime = next == 0u && time < previousTime ? time + clip.duration : time;
-        const float fraction = nextTime > previousTime ? std::clamp((sampledTime - previousTime) / (nextTime - previousTime), 0.0f, 1.0f) : 0.0f;
-        const auto& a = channel.values[previous];
-        const auto& b = channel.values[next];
-        if (channel.path == Channel::Path::Rotation) pose[channel.node].rotation = Nlerp({a[0], a[1], a[2], a[3]}, {b[0], b[1], b[2], b[3]}, fraction);
-        else
+        diagnostic = "PBR clip blend requires a mapped clip, finite time and weight in [0,1].";
+        return false;
+    }
+    const auto sample = [&](const Clip& clip, float timeSeconds) {
+        std::vector<Node> pose = nodes_;
+        const float time = clip.loops
+            ? std::fmod(std::max(timeSeconds, 0.0f), clip.duration)
+            : std::clamp(timeSeconds, 0.0f, clip.duration);
+        for (const Channel& channel : clip.channels)
         {
-            const Vec3 value{a[0] + (b[0] - a[0]) * fraction, a[1] + (b[1] - a[1]) * fraction, a[2] + (b[2] - a[2]) * fraction};
-            if (channel.path == Channel::Path::Translation) pose[channel.node].translation = value;
-            else pose[channel.node].scale = value;
+            if (channel.node >= pose.size() || channel.times.empty()) continue;
+            const auto upper = std::upper_bound(channel.times.begin(), channel.times.end(), time);
+            const std::size_t next = upper == channel.times.end()
+                ? (clip.loops ? 0u : channel.times.size() - 1u)
+                : static_cast<std::size_t>(upper - channel.times.begin());
+            const std::size_t previous = next == 0u ? channel.times.size() - 1u : next - 1u;
+            const float previousTime = channel.times[previous];
+            const float nextTime = next == 0u ? clip.duration : channel.times[next];
+            const float sampledTime = next == 0u && time < previousTime ? time + clip.duration : time;
+            const float fraction = nextTime > previousTime ? std::clamp((sampledTime - previousTime) / (nextTime - previousTime), 0.0f, 1.0f) : 0.0f;
+            const auto& a = channel.values[previous];
+            const auto& b = channel.values[next];
+            if (channel.path == Channel::Path::Rotation) pose[channel.node].rotation = Nlerp({a[0], a[1], a[2], a[3]}, {b[0], b[1], b[2], b[3]}, fraction);
+            else
+            {
+                const Vec3 value{a[0] + (b[0] - a[0]) * fraction, a[1] + (b[1] - a[1]) * fraction, a[2] + (b[2] - a[2]) * fraction};
+                if (channel.path == Channel::Path::Translation) pose[channel.node].translation = value;
+                else pose[channel.node].scale = value;
+            }
+        }
+        return pose;
+    };
+    // Select endpoint samples directly to retain byte-exact legacy poses.
+    std::vector<Node> pose = blend && blend->weight == 1.0f
+        ? sample(clips_[static_cast<std::size_t>(blend->clip)], blend->timeSeconds)
+        : sample(clip, timeSeconds);
+    if (blend && blend->weight > 0.0f && blend->weight < 1.0f)
+    {
+        const auto target = sample(clips_[static_cast<std::size_t>(blend->clip)], blend->timeSeconds);
+        const float weight = blend->weight;
+        const auto lerp = [weight](Vec3 a, Vec3 b) {
+            return Vec3{a.x+(b.x-a.x)*weight,a.y+(b.y-a.y)*weight,a.z+(b.z-a.z)*weight};
+        };
+        for (std::size_t i = 0; i < pose.size(); ++i)
+        {
+            pose[i].translation = lerp(pose[i].translation, target[i].translation);
+            pose[i].scale = lerp(pose[i].scale, target[i].scale);
+            pose[i].rotation = Nlerp(pose[i].rotation, target[i].rotation, weight);
         }
     }
     for (std::size_t rotationIndex = 0u; rotationIndex < additiveNodeRotations.size(); ++rotationIndex)
@@ -1617,7 +1647,7 @@ void SkinnedMeshAsset::CopyUniqueTextured(std::vector<TexturedSkinnedRtVertex>& 
 bool SkinnedMeshAsset::SkinUniquePbr(SkinnedClip clip, float time,
     std::vector<TexturedSkinnedRtVertex>& output,
     std::vector<SkinnedPbrTangent>& tangents, std::string& diagnostic,
-    std::span<const SkinnedNodeRotation> additiveNodeRotations) const
+    std::span<const SkinnedNodeRotation> additiveNodeRotations, const SkinnedClipBlend* blend) const
 {
     output.clear();
     tangents.clear();
@@ -1626,7 +1656,7 @@ bool SkinnedMeshAsset::SkinUniquePbr(SkinnedClip clip, float time,
         diagnostic = "PBR clip skinning requires UVs, tangents and finite time.";
         return false;
     }
-    if (!SkinUniqueGeometry(clip, time, diagnostic, additiveNodeRotations, &tangents))
+    if (!SkinUniqueGeometry(clip, time, diagnostic, additiveNodeRotations, &tangents, blend))
     {
         tangents.clear();
         return false;

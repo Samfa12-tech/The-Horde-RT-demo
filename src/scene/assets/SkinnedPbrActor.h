@@ -25,9 +25,10 @@ public:
         return Pose(SkinnedClip::Idle, 0, diagnostic);
     }
     bool Pose(SkinnedClip clip, float time, std::string& diagnostic,
-              std::span<const SkinnedNodeRotation> additiveNodeRotations = {})
+              std::span<const SkinnedNodeRotation> additiveNodeRotations = {},
+              const SkinnedClipBlend* blend = nullptr)
     {
-        if (!skin_.SkinUniquePbr(clip, time, posed_, tangents_, diagnostic, additiveNodeRotations) ||
+        if (!skin_.SkinUniquePbr(clip, time, posed_, tangents_, diagnostic, additiveNodeRotations, blend) ||
             posed_.size() != asset_.vertices.size()) return false;
         float floor = std::numeric_limits<float>::infinity();
         for (const auto& vertex : posed_) floor = std::min(floor, vertex.position[1]);
