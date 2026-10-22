@@ -65,6 +65,13 @@ two fresh native fixtures pass. All geometry/resource ceilings and negative
 checks remain; tree positions, runtime mesh/PCM and renderer behavior are
 unchanged. Corrected full hosted results remain pending, with retained failures.
 
+The separate [survey-export API 24 checkpoint](../evidence/2026-10-22-survey-api24/README.md)
+replaces API 26 file calls with API 21 lstat and exclusive open, retaining path,
+byte and output-custody semantics. Android Java contracts report 405 passed,
+6 actual host-link cases skipped; lint has zero errors and 75 warnings.
+The API 24/34 syscall model is host evidence, not Android kernel/device evidence.
+No phone access occurred. Corrected hosted coverage is pending the backup push.
+
 ## Frozen arm framing diagnosis - local checkpoint, 20 October 2026
 
 The [bounded diagnosis](../evidence/2026-10-20-arm-capture-framing/README.md)

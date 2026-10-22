@@ -1,24 +1,47 @@
 package com.samfa12.hordelanternrt;
 
 import static org.junit.Assert.*;
+import android.system.ErrnoException;
+import android.system.Os;
+import android.system.OsConstants;
+import android.system.StructStat;
 import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.HashSet;
+import java.util.IdentityHashMap;
+import java.util.Map;
+import java.util.Set;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.junit.After;
+import org.junit.Assume;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
+import org.robolectric.annotation.Implementation;
+import org.robolectric.annotation.Implements;
 
 @RunWith(RobolectricTestRunner.class)
-@Config(sdk = 34)
+@Config(sdk = {24, 34}, shadows = EnvironmentSurveyExportTest.SurveyOs.class)
 public final class EnvironmentSurveyExportTest {
     private static final String ID = "river-A_1";
     @Rule public TemporaryFolder temporary = new TemporaryFolder();
+
+    @Before public void resetSyscallContract() throws IOException { SurveyOs.reset(); }
+    @After public void closeSyscallFixtures() throws IOException { SurveyOs.reset(); }
 
     @Test public void exportsExactlyTwelveImagesAndUnchangedCanonicalEvidenceAndCannotReplace() throws Exception {
         File source = temporary.newFolder("private"), external = temporary.newFolder("external");
@@ -128,6 +151,162 @@ public final class EnvironmentSurveyExportTest {
             assertEquals("invalid", resultJson(result).getString("status"));
             assertFalse(new File(result.directory, name()).exists());
             assertEquals("still being written", new String(Files.readAllBytes(new File(source, name()).toPath()), StandardCharsets.UTF_8));
+        }
+    }
+
+    @Test public void exclusiveOutputDoesNotReplaceExistingBytesAndClosesItsDescriptor() throws Exception {
+        File file = temporary.newFile("owned-output");
+        byte[] sentinel = {42, 12};
+        Files.write(file.toPath(), sentinel);
+        try { EnvironmentSurveyExport.createNewOutput(file); fail("existing output replaced"); }
+        catch (IOException expected) {
+            assertEquals(OsConstants.EEXIST, ((ErrnoException)expected.getCause()).errno);
+        }
+        assertArrayEquals(sentinel, Files.readAllBytes(file.toPath()));
+        File fresh = new File(temporary.getRoot(), "new-output");
+        try (OutputStream output = EnvironmentSurveyExport.createNewOutput(fresh)) {
+            assertTrue(SurveyOs.lastDescriptor.valid());
+            output.write(sentinel);
+        }
+        assertFalse(SurveyOs.lastDescriptor.valid());
+        assertArrayEquals(sentinel, Files.readAllBytes(fresh.toPath()));
+        assertEquals(OsConstants.O_WRONLY | OsConstants.O_CREAT | OsConstants.O_EXCL | OsConstants.O_NOFOLLOW,
+                SurveyOs.lastFlags);
+        assertEquals(0666, SurveyOs.lastMode);
+    }
+
+    @Test public void nonMissingLstatErrorsFailClosedRatherThanTreatingPathAsAbsent() throws Exception {
+        File source = temporary.newFolder("private"), external = temporary.newFolder("external");
+        SurveyOs.failLstatPath = external.getPath();
+        SurveyOs.failLstatErrno = OsConstants.EACCES;
+        try { EnvironmentSurveyExport.export(source, external, ID, false, 3); fail("uninspectable root admitted"); }
+        catch (IOException expected) {
+            assertEquals(OsConstants.EACCES, ((ErrnoException)expected.getCause()).errno);
+        }
+        assertEquals(0, external.list().length);
+    }
+
+    @Test public void symbolicSourceMarkerIsRejectedBeforeAnyPayloadCopy() throws Exception {
+        File source = temporary.newFolder("private"), external = temporary.newFolder("external");
+        JSONObject report = manifest(source);
+        write(source, name(), report.toString().getBytes(StandardCharsets.UTF_8));
+        // This contract does not depend on Windows symbolic-link privileges.
+        SurveyOs.symbolicPaths.add(new File(source, image(0)).getPath());
+        EnvironmentSurveyExport.Result result = EnvironmentSurveyExport.export(source, external, ID, false, 2);
+        assertFalse(result.successful);
+        assertEquals("survey path escapes its root", result.detail);
+        assertEquals(1, result.directory.list().length);
+        assertEquals("invalid", resultJson(result).getString("status"));
+        assertArrayEquals(new byte[]{1, 2, 3, (byte)255}, Files.readAllBytes(new File(source, image(0)).toPath()));
+    }
+
+    @Test public void actualSameParentSourceLinkIsRejectedWhereHostSupportsLinks() throws Exception {
+        File source = temporary.newFolder("private"), external = temporary.newFolder("external");
+        JSONObject report = manifest(source);
+        File target = new File(source, "owner.rgba");
+        byte[] sentinel = {9, 8, 7, 6};
+        Files.write(target.toPath(), sentinel);
+        File alias = new File(source, image(0));
+        Files.delete(alias.toPath());
+        symbolicLinkOrSkip(alias, target);
+        write(source, name(), report.toString().getBytes(StandardCharsets.UTF_8));
+        EnvironmentSurveyExport.Result result = EnvironmentSurveyExport.export(source, external, ID, false, 2);
+        assertFalse(result.successful);
+        assertEquals("survey path escapes its root", result.detail);
+        assertEquals(1, result.directory.list().length);
+        assertArrayEquals(sentinel, Files.readAllBytes(target.toPath()));
+        assertTrue(Files.isSymbolicLink(alias.toPath()));
+    }
+
+    @Test public void actualSymbolicExternalRootIsRejectedWhereHostSupportsLinks() throws Exception {
+        File source = temporary.newFolder("private"), target = temporary.newFolder("owner-root");
+        File alias = new File(temporary.getRoot(), "linked-root");
+        write(target, "owner", new byte[]{42});
+        symbolicLinkOrSkip(alias, target);
+        try { EnvironmentSurveyExport.export(source, alias, ID, false, 3); fail("linked root admitted"); }
+        catch (IOException expected) { assertEquals("survey root unavailable", expected.getMessage()); }
+        assertEquals(1, target.list().length);
+        assertArrayEquals(new byte[]{42}, Files.readAllBytes(new File(target, "owner").toPath()));
+    }
+
+    @Test public void actualExistingAndDanglingOutputLinksAreNotReplacedWhereHostSupportsLinks() throws Exception {
+        File target = temporary.newFile("owner-output");
+        byte[] sentinel = {42, 12};
+        Files.write(target.toPath(), sentinel);
+        File alias = new File(temporary.getRoot(), "linked-output");
+        symbolicLinkOrSkip(alias, target);
+        File dangling = new File(temporary.getRoot(), "dangling-output");
+        symbolicLinkOrSkip(dangling, new File(temporary.getRoot(), "absent-target"));
+        for (File link : new File[]{alias, dangling}) {
+            try { EnvironmentSurveyExport.createNewOutput(link); fail("output link replaced"); }
+            catch (IOException expected) {
+                assertEquals(OsConstants.EEXIST, ((ErrnoException)expected.getCause()).errno);
+            }
+            assertTrue(Files.isSymbolicLink(link.toPath()));
+        }
+        assertArrayEquals(sentinel, Files.readAllBytes(target.toPath()));
+        assertFalse(new File(temporary.getRoot(), "absent-target").exists());
+    }
+
+    private static void symbolicLinkOrSkip(File alias, File target) throws IOException {
+        try { Files.createSymbolicLink(alias.toPath(), target.toPath()); }
+        catch (IOException | UnsupportedOperationException | SecurityException unsupported) {
+            Assume.assumeNoException("host cannot create symbolic-link fixture", unsupported);
+        }
+    }
+
+    /**
+     * Robolectric 4.14's default Linux/Posix lstat follows links and its open
+     * shadow ignores O_EXCL. Model this syscall contract explicitly; these
+     * tests do not certify Android kernel behavior or concurrent filesystem races.
+     */
+    @Implements(Os.class)
+    public static final class SurveyOs {
+        static final Set<String> symbolicPaths = new HashSet<>();
+        static final Map<FileDescriptor, FileOutputStream> streams = new IdentityHashMap<>();
+        static String failLstatPath;
+        static int failLstatErrno, lastFlags, lastMode;
+        static FileDescriptor lastDescriptor;
+
+        static void reset() throws IOException {
+            for (FileOutputStream stream : streams.values()) stream.close();
+            streams.clear(); symbolicPaths.clear(); failLstatPath = null;
+            failLstatErrno = lastFlags = lastMode = 0; lastDescriptor = null;
+        }
+
+        @Implementation protected static StructStat lstat(String path) throws ErrnoException {
+            if (path.equals(failLstatPath)) throw new ErrnoException("lstat", failLstatErrno);
+            try {
+                BasicFileAttributes attributes = Files.readAttributes(new File(path).toPath(),
+                        BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
+                int mode = symbolicPaths.contains(path) || attributes.isSymbolicLink() ? OsConstants.S_IFLNK :
+                        attributes.isDirectory() ? OsConstants.S_IFDIR : OsConstants.S_IFREG;
+                return new StructStat(0, 0, mode, 0, 0, 0, 0, attributes.size(), 0, 0, 0, 0, 0);
+            } catch (NoSuchFileException missing) { throw new ErrnoException("lstat", OsConstants.ENOENT); }
+            catch (IOException error) { throw new ErrnoException("lstat", OsConstants.EIO, error); }
+        }
+
+        @Implementation protected static FileDescriptor open(String path, int flags, int mode) throws ErrnoException {
+            lastFlags = flags; lastMode = mode;
+            assertEquals(OsConstants.O_WRONLY | OsConstants.O_CREAT | OsConstants.O_EXCL | OsConstants.O_NOFOLLOW, flags);
+            assertEquals(0666, mode);
+            try {
+                // The single test call models exclusive creation; Android's
+                // actual Os.open provides atomic creation without this host split.
+                Files.createFile(new File(path).toPath());
+                FileOutputStream stream = new FileOutputStream(path);
+                lastDescriptor = stream.getFD();
+                streams.put(lastDescriptor, stream);
+                return lastDescriptor;
+            } catch (FileAlreadyExistsException exists) { throw new ErrnoException("open", OsConstants.EEXIST); }
+            catch (IOException error) { throw new ErrnoException("open", OsConstants.EIO, error); }
+        }
+
+        @Implementation protected static void close(FileDescriptor descriptor) throws ErrnoException {
+            FileOutputStream stream = streams.get(descriptor);
+            if (stream == null) throw new ErrnoException("close", OsConstants.EBADF);
+            try { stream.close(); }
+            catch (IOException error) { throw new ErrnoException("close", OsConstants.EIO, error); }
         }
     }
 

@@ -1,18 +1,21 @@
 package com.samfa12.hordelanternrt;
 
+import android.system.ErrnoException;
+import android.system.Os;
+import android.system.OsConstants;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileDescriptor;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.StandardOpenOption;
 
 /** Bounded copy of one explicitly requested native survey; never rewrites an export. */
 final class EnvironmentSurveyExport {
@@ -105,15 +108,57 @@ final class EnvironmentSurveyExport {
 
     private static File child(File root, String name) throws IOException {
         final File file = new File(root, name);
-        if (Files.isSymbolicLink(file.toPath()) ||
+        if (isSymbolicLink(file) ||
                 !root.getCanonicalFile().equals(file.getCanonicalFile().getParentFile()))
             throw new IOException("survey path escapes its root");
         return file;
     }
 
     private static void ensureDirectory(File directory) throws IOException {
-        if (Files.isSymbolicLink(directory.toPath()) ||
+        if (isSymbolicLink(directory) ||
                 (!directory.isDirectory() && !directory.mkdirs())) throw new IOException("survey root unavailable");
+    }
+
+    private static boolean isSymbolicLink(File file) throws IOException {
+        try {
+            return OsConstants.S_ISLNK(Os.lstat(file.getPath()).st_mode);
+        } catch (ErrnoException error) {
+            if (error.errno == OsConstants.ENOENT) return false;
+            throw new IOException("cannot inspect survey path", error);
+        }
+    }
+
+    // One exclusive open preserves CREATE_NEW semantics on API 24, including
+    // dangling links. Keep descriptor custody explicit on Android and the host.
+    static OutputStream createNewOutput(File file) throws IOException {
+        final FileDescriptor descriptor;
+        try {
+            descriptor = Os.open(file.getPath(), OsConstants.O_WRONLY | OsConstants.O_CREAT |
+                    OsConstants.O_EXCL | OsConstants.O_NOFOLLOW, 0666);
+        } catch (ErrnoException error) {
+            throw new IOException("cannot create survey output: " + file.getName(), error);
+        }
+        try {
+            return new FileOutputStream(descriptor) {
+                @Override public void close() throws IOException {
+                    IOException failure = null;
+                    try { super.close(); } catch (IOException error) { failure = error; }
+                    if (descriptor.valid()) {
+                        try { Os.close(descriptor); }
+                        catch (ErrnoException error) {
+                            final IOException closeFailure = new IOException("cannot close survey output", error);
+                            if (failure == null) failure = closeFailure;
+                            else failure.addSuppressed(closeFailure);
+                        }
+                    }
+                    if (failure != null) throw failure;
+                }
+            };
+        } catch (RuntimeException | Error failure) {
+            try { Os.close(descriptor); }
+            catch (ErrnoException closeFailure) { failure.addSuppressed(closeFailure); }
+            throw failure;
+        }
     }
 
     private static byte[] readManifest(File file) throws IOException {
@@ -133,7 +178,7 @@ final class EnvironmentSurveyExport {
 
     private static void copy(File source, File destination, long expected) throws IOException {
         try (FileInputStream input = new FileInputStream(source);
-             OutputStream output = Files.newOutputStream(destination.toPath(), StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE)) {
+             OutputStream output = createNewOutput(destination)) {
             byte[] buffer = new byte[64 * 1024];
             long length = 0;
             int read;
@@ -147,7 +192,7 @@ final class EnvironmentSurveyExport {
     }
 
     private static void write(File file, byte[] bytes) throws IOException {
-        try (OutputStream output = Files.newOutputStream(file.toPath(), StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE)) {
+        try (OutputStream output = createNewOutput(file)) {
             output.write(bytes);
         }
     }

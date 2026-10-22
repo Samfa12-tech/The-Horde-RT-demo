@@ -63,6 +63,11 @@ failures remain. Corrected hosted all-lane results remain pending. Do not label
 all hosted failures runtime bugs or relax gates. Debug campaign 30 s timeout
 remains open. PR description/conflict
 and final exact-candidate checks remain; no merge.
+The separate [API 24 survey-export correction](../evidence/2026-10-22-survey-api24/README.md)
+preserves exclusive creation/path custody while removing API 26 calls at min 24.
+Local Java results: 405 passed, 6 host-link cases skipped; lint zero errors and 75
+warnings. Focused API 24/34 modeled syscall contracts pass; actual device export
+and Linux link-case coverage remain pending. No phone operation.
 
 Approved standardized benchmark/report/leaderboard plan remains implementation
 scope after immediate regressions. Require fixed actual internal **and** output

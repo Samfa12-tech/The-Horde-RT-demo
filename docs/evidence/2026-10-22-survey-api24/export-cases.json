@@ -1,0 +1,120 @@
+[
+  {
+    "name": "symbolicSourceMarkerIsRejectedBeforeAnyPayloadCopy[24]",
+    "state": "passed"
+  },
+  {
+    "name": "symbolicSourceMarkerIsRejectedBeforeAnyPayloadCopy",
+    "state": "passed"
+  },
+  {
+    "name": "actualExistingAndDanglingOutputLinksAreNotReplacedWhereHostSupportsLinks[24]",
+    "state": "skipped",
+    "detail": ""
+  },
+  {
+    "name": "actualExistingAndDanglingOutputLinksAreNotReplacedWhereHostSupportsLinks",
+    "state": "skipped",
+    "detail": ""
+  },
+  {
+    "name": "exclusiveOutputDoesNotReplaceExistingBytesAndClosesItsDescriptor[24]",
+    "state": "passed"
+  },
+  {
+    "name": "exclusiveOutputDoesNotReplaceExistingBytesAndClosesItsDescriptor",
+    "state": "passed"
+  },
+  {
+    "name": "nonMissingLstatErrorsFailClosedRatherThanTreatingPathAsAbsent[24]",
+    "state": "passed"
+  },
+  {
+    "name": "nonMissingLstatErrorsFailClosedRatherThanTreatingPathAsAbsent",
+    "state": "passed"
+  },
+  {
+    "name": "timeoutOrUnavailableWritesOnlyInvalidMarkerWithoutReadingNativePayload[24]",
+    "state": "passed"
+  },
+  {
+    "name": "timeoutOrUnavailableWritesOnlyInvalidMarkerWithoutReadingNativePayload",
+    "state": "passed"
+  },
+  {
+    "name": "existingDirectoryWithOwnerSentinelIsNeverTouched[24]",
+    "state": "passed"
+  },
+  {
+    "name": "existingDirectoryWithOwnerSentinelIsNeverTouched",
+    "state": "passed"
+  },
+  {
+    "name": "rejectsTraversalDuplicateMissingAndOversizedRosters[24]",
+    "state": "passed"
+  },
+  {
+    "name": "rejectsTraversalDuplicateMissingAndOversizedRosters",
+    "state": "passed"
+  },
+  {
+    "name": "preservesFailedNativeManifestAsFailedRatherThanSuccessfulReceipt[24]",
+    "state": "passed"
+  },
+  {
+    "name": "preservesFailedNativeManifestAsFailedRatherThanSuccessfulReceipt",
+    "state": "passed"
+  },
+  {
+    "name": "rejectsWrongIdentityProfileClassWaterResultAndSchemaWithoutCopyingPayload[24]",
+    "state": "passed"
+  },
+  {
+    "name": "rejectsWrongIdentityProfileClassWaterResultAndSchemaWithoutCopyingPayload",
+    "state": "passed"
+  },
+  {
+    "name": "actualSymbolicExternalRootIsRejectedWhereHostSupportsLinks[24]",
+    "state": "skipped",
+    "detail": ""
+  },
+  {
+    "name": "actualSymbolicExternalRootIsRejectedWhereHostSupportsLinks",
+    "state": "skipped",
+    "detail": ""
+  },
+  {
+    "name": "actualSameParentSourceLinkIsRejectedWhereHostSupportsLinks[24]",
+    "state": "skipped",
+    "detail": ""
+  },
+  {
+    "name": "actualSameParentSourceLinkIsRejectedWhereHostSupportsLinks",
+    "state": "skipped",
+    "detail": ""
+  },
+  {
+    "name": "exportsExactlyTwelveImagesAndUnchangedCanonicalEvidenceAndCannotReplace[24]",
+    "state": "passed"
+  },
+  {
+    "name": "exportsExactlyTwelveImagesAndUnchangedCanonicalEvidenceAndCannotReplace",
+    "state": "passed"
+  },
+  {
+    "name": "rejectsTotalBudgetBeforeReadingAnyLargeImagePayload[24]",
+    "state": "passed"
+  },
+  {
+    "name": "rejectsTotalBudgetBeforeReadingAnyLargeImagePayload",
+    "state": "passed"
+  },
+  {
+    "name": "rejectsMissingImagesAndMalformedUtf8ManifestAndNonterminalStatus[24]",
+    "state": "passed"
+  },
+  {
+    "name": "rejectsMissingImagesAndMalformedUtf8ManifestAndNonterminalStatus",
+    "state": "passed"
+  }
+]
