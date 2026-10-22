@@ -9,6 +9,7 @@
 #include "platform/windows/WindowsCaptureContracts.h"
 #include "KeeperLowerBodyWitnesses.h"
 #include "scene/TriangleDissolve.h"
+#include "CompiledShaderContracts.h"
 
 #include <cmath>
 #include <atomic>
@@ -102,6 +103,18 @@ std::size_t CountOccurrences(const std::string& text, const std::string_view nee
         position += needle.size();
     }
     return count;
+}
+
+bool HasCoherentAndroidTuning(const std::string& renderFrame,const std::string& routeReset)
+{
+    return renderFrame.find(
+        "const horde::vulkan::raytracing::RtSceneTuning rtLabTuning = context.environmentSurvey\n"
+        "            ? horde::vulkan::raytracing::RtSceneTuning{} : gRtLabState.Snapshot();") != std::string::npos &&
+        CountOccurrences(renderFrame,"gRtLabState.Snapshot()") == 1u &&
+        renderFrame.find("simulationInput.waterfallWidthScale = rtLabTuning.waterfallWidthScale;") != std::string::npos &&
+        renderFrame.find("rtLabTuning, context.graphicsSettings.shadowQuality);") != std::string::npos &&
+        renderFrame.find("                    rtLabTuning);") != std::string::npos &&
+        CountOccurrences(routeReset,"gRtLabState.Reset();") == 1u;
 }
 
 } // namespace
@@ -953,18 +966,31 @@ int main()
             "SurfaceUp = 0u", "SurfaceDown = 1u", "SurfaceRight = 2u",
             "SurfaceLeft = 3u", "SurfaceForward = 4u", "SurfaceBack = 5u",
         }};
-        constexpr std::array<const char*, 6u> shaderNormalAbi{{
-            "if (normalCode == 0u) return vec3(0.0, 1.0, 0.0);",
-            "if (normalCode == 1u) return vec3(0.0, -1.0, 0.0);",
-            "if (normalCode == 2u) return vec3(1.0, 0.0, 0.0);",
-            "if (normalCode == 3u) return vec3(-1.0, 0.0, 0.0);",
-            "if (normalCode == 4u) return vec3(0.0, 0.0, 1.0);",
-            "if (normalCode == 5u) return vec3(0.0, 0.0, -1.0);",
+        namespace shaderContracts=horde::tests::shader_contracts;
+        const auto normalSourceBound=[](const std::string& source) {
+            return source.find(shaderContracts::kNormalSource) != std::string::npos;
+        };
+        ok &= Require(normalSourceBound(hitDecodeSource),
+                      "normal ABI fixture must execute the current production shader source, not stale compiled arithmetic");
+        auto wrongNormal=std::string(shaderContracts::kNormalSource);
+        const auto normalBody=wrongNormal.find('{');
+        if(normalBody!=std::string::npos)wrongNormal.insert(normalBody+1,"return vec3(0.0,0.0,0.0);");
+        ok &= Require(normalBody!=std::string::npos && !normalSourceBound(wrongNormal),
+                      "normal source binding must reject a changed decoder before rebuild");
+        constexpr std::array<std::array<float,3>,6u> shaderNormalAbi{{
+            {{0,1,0}},{{0,-1,0}},{{1,0,0}},{{-1,0,0}},{{0,0,1}},{{0,0,-1}}
         }};
         for (std::size_t normal = 0u; normal < cpuNormalAbi.size(); ++normal)
+        {
+            // Material/upper metadata bits must not change the signed-axis ABI.
+            const auto decoded=shaderContracts::normalForSurfaceCode(
+                0xabc0005au | (static_cast<std::uint32_t>(normal)<<8u));
             ok &= Require(sceneSource.find(cpuNormalAbi[normal]) != std::string::npos &&
-                          hitDecodeSource.find(shaderNormalAbi[normal]) != std::string::npos,
+                          Near(decoded.x,shaderNormalAbi[normal][0]) &&
+                          Near(decoded.y,shaderNormalAbi[normal][1]) &&
+                          Near(decoded.z,shaderNormalAbi[normal][2]),
                           "CPU/GLSL world normal codes must retain their signed-axis agreement");
+        }
         constexpr std::array<const char*, 11u> cpuMaterialAbi{{
             "SurfaceDryStone = 0u", "SurfaceWetCobble = 1u", "SurfaceMossyStone = 2u",
             "SurfaceDampGround = 3u", "SurfaceAgedMetal = 4u", "SurfaceFlame = 5u",
@@ -1336,8 +1362,12 @@ int main()
                       androidBridgeSource.find("shadowCertifiedClosedVolumeRecoveryCount") != std::string::npos &&
                       androidBridgeSource.find("certifiedClosedVolumeRecoveryReasonMask") != std::string::npos,
                       "CPU and platform diagnostics must retain route and production-pane failure attribution");
-        ok &= Require(waterPrimary.find("transmittedHit.t += h.t + waterPathLength;") !=
+        ok &= Require(waterPrimary.find(shaderContracts::kWaterDistanceStatement) !=
                           std::string::npos &&
+                      Near(shaderContracts::WaterCameraPath(2.0f,4.0f,.006f,false),6.006f) &&
+                      Near(shaderContracts::WaterCameraPath(2.0f,4.0f,5.0f,false),11.0f) &&
+                      Near(shaderContracts::WaterCameraPath(5.0f,4.0f,5.0f,true),9.0f) &&
+                      Near(shaderContracts::WaterCameraPath(5.0f,0.0f,5.0f,true),5.0f) &&
                       waterPrimary.find("float reflectedLocalDistance = reflectedHit.hit ? reflectedHit.t : 12.0;") !=
                           std::string::npos &&
                       waterPrimary.find("reflectedHit.t += h.t;") != std::string::npos &&
@@ -1345,6 +1375,14 @@ int main()
                       waterPrimary.find("min(reflectedHit.hit ? reflectedHit.t : 12.0, 12.0)") ==
                           std::string::npos,
                       "secondary water hits must preserve accumulated camera-path distance for fog and distance lighting");
+        auto doubleWater=waterPrimary;
+        const auto distanceStatement=doubleWater.find(shaderContracts::kWaterDistanceStatement);
+        if(distanceStatement!=std::string::npos)
+            doubleWater.replace(distanceStatement,shaderContracts::kWaterDistanceStatement.size(),
+                "transmittedHit.t += h.t + waterPathLength;");
+        ok &= Require(distanceStatement!=std::string::npos &&
+                      doubleWater.find(shaderContracts::kWaterDistanceStatement)==std::string::npos,
+                      "water source binding must reject restoring regional bed-distance double counting");
         const std::size_t opaqueSecondaryBegin = raygenSource.find("vec3 shadeOpaqueSecondary(");
         const std::size_t opaqueSecondaryEnd =
             raygenSource.find("vec3 shadeThinWater", opaqueSecondaryBegin);
@@ -1789,11 +1827,29 @@ int main()
                       androidBridgeSource.find("ProductionGameSimulationConfig()") !=
                           std::string::npos,
                       "Android gameplay/reward/glass must use the accepted production route and shared anatomical profile");
+        const auto androidRouteReset=androidFunctionSource(
+            "Java_com_samfa12_hordelanternrt_ProbeBridge_requestRouteReset(");
+        const auto androidRenderFrame=androidFunctionSource("bool RenderFrame(SwapchainContext& context,");
         ok &= Require(androidBridgeSource.find("AndroidRtLabState gRtLabState;") != std::string::npos &&
-                      androidBridgeSource.find("const horde::vulkan::raytracing::RtSceneTuning rtLabTuning = gRtLabState.Snapshot();") != std::string::npos &&
-                      androidBridgeSource.find("rtLabTuning);") != std::string::npos &&
-                      androidBridgeSource.find("gRtLabState.Reset();") != std::string::npos,
+                      HasCoherentAndroidTuning(androidRenderFrame,androidRouteReset),
                       "Android renderer must consume exactly one mutex-protected RT tuning snapshot and reset it with the route");
+        const auto rejectTuningMutation=[&](const std::string_view before,const std::string_view after) {
+            auto source=androidRenderFrame;const auto offset=source.find(before);
+            if(offset==std::string::npos)return false;
+            source.replace(offset,before.size(),after);
+            return !HasCoherentAndroidTuning(source,androidRouteReset);
+        };
+        ok &= Require(rejectTuningMutation(": gRtLabState.Snapshot();",": horde::vulkan::raytracing::RtSceneTuning{};"),
+                      "tuning contract must reject live frames losing the Lab snapshot");
+        ok &= Require(rejectTuningMutation("? horde::vulkan::raytracing::RtSceneTuning{} :","? gRtLabState.Snapshot() :"),
+                      "tuning contract must reject surveys consuming mutable Lab settings");
+        ok &= Require(!HasCoherentAndroidTuning(androidRenderFrame+"\ngRtLabState.Snapshot();",androidRouteReset),
+                      "tuning contract must reject a second owner-frame snapshot");
+        auto missingRouteReset=androidRouteReset;
+        const auto resetCall=missingRouteReset.find("gRtLabState.Reset();");
+        if(resetCall!=std::string::npos)missingRouteReset.erase(resetCall,std::string_view("gRtLabState.Reset();").size());
+        ok &= Require(resetCall!=std::string::npos && !HasCoherentAndroidTuning(androidRenderFrame,missingRouteReset),
+                      "tuning contract must reject missing route reset even when other JNI resets remain");
         ok &= Require(androidBridgeSource.find("gRtLabState.SetFire(") != std::string::npos &&
                       androidJavaBridgeSource.find("setRtFireTuning") != std::string::npos &&
                       androidSource.find("publishRtFireTuning()") != std::string::npos &&

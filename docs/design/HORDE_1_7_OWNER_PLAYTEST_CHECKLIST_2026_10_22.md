@@ -48,8 +48,12 @@ licence text, stale terrain/root and resource-inventory expectations, and a
 staging contract which does not follow its extracted helper. Native pine223-225
 Android name/pose mapping now passes locally; physical views are not verified.
 Waterfall production-route tests now pass locally with automatic crouch and
-unchanged route assertions; hosted current-source rerun remains. Shader-source contract and Windows
-generated-bound mismatch need exact artifact/encoding diagnosis. Do not label
+unchanged route assertions; hosted current-source rerun remains. The eight
+CharacterRenderSlotSmoke source failures are now corrected locally as stale
+regional-water expectations, with actual-source numeric checks and negative
+mutations. Three focused Release tests and Windows build pass; no runtime
+sources change. [Diagnosis and retained failures](../evidence/2026-10-22-source-contracts/README.md).
+Other hosted generated-bound/encoding failures still need exact diagnosis. Do not label
 all hosted failures runtime bugs, remove assertions, or move geometry to match
 stale receipts. Debug campaign30s timeout remains open. PR description/conflict
 and final exact-candidate checks remain; no merge.
@@ -66,13 +70,14 @@ no active publication schedule.
 
 Automatic crouch/deflection source, the bounded desktop skin-work slice and Kit's
 continuous source/listener correction are complete locally. Physical input/feel,
-endpoint speech/listening and phone performance remain open. Next desktop work
-can diagnose inherited shader/Android source-contract failures against actual
-implementations, retaining their gates and PR conflicts for review.
+endpoint speech/listening and phone performance remain open. The bounded
+shader/Android source-contract diagnosis is complete locally. Next inspect
+remaining hosted checkout/generated-bound/encoding receipts before safe PR
+conflict resolution; this does not claim the full hosted programme passes.
 For the next owner-confirmed phone connection, compare exact control/candidate
 builds with the appended phase counters and original matched hold/settings.
-Keep the 12.06 ms phone stage, unresolved closing 33% slowdown, inherited red
-contracts and one-candidate target miss explicit. Desktop results do not
+Keep the 12.06 ms phone stage, unresolved closing 33% slowdown, other inherited
+failures and one-candidate target miss explicit. Desktop results do not
 certify Android benefit.
 Separately retain cold207 missing-terrain diagnosis for the next fixture/device
 window; do not infer it caused the owner's brief dark-world video.

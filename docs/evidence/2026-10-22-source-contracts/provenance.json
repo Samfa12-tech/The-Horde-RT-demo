@@ -1,0 +1,34 @@
+{
+  "baseCommit": "cc20af8ff8270bb86bd7b7126d73fc1558b9c8c6",
+  "introducingCommit": "b2d548a22cc44a58c92c290018f5bf211f2a8d87",
+  "classification": "eight stale textual checks; no production defect demonstrated by these failures",
+  "contracts": [
+    {
+      "path": "shaders/raytracing/include/rt_hit_decode.glsl",
+      "oldContractAtParent": true,
+      "oldContractRemovedInChange": true,
+      "newBehaviorIntroducedInChange": true,
+      "currentBehaviorRetained": true,
+      "unchangedInThisSlice": true,
+      "currentSha256": "98b66cbd878d0bbe14751e278a7e0a4b124026f713a7bb9f795ed10023caef2c"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_dielectric_common.glsl",
+      "oldContractAtParent": true,
+      "oldContractRemovedInChange": true,
+      "newBehaviorIntroducedInChange": true,
+      "currentBehaviorRetained": true,
+      "unchangedInThisSlice": true,
+      "currentSha256": "ee3320d10b54d70cdbb5a83caa548ca592eab0f1500422f643710c21c91a6790"
+    },
+    {
+      "path": "android/app/src/main/cpp/android_probe_bridge.cpp",
+      "oldContractAtParent": true,
+      "oldContractRemovedInChange": true,
+      "newBehaviorIntroducedInChange": true,
+      "currentBehaviorRetained": true,
+      "unchangedInThisSlice": true,
+      "currentSha256": "4576e7b70d8b9defd4238963068df72315ead6d1419a2220bb0e0052ae88a7a8"
+    }
+  ]
+}

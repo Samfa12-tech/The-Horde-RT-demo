@@ -33,8 +33,9 @@ adds that attribution and evaluates one generic-character normal-transport
 candidate. Kit vertex medians fall 6.73–8.33% against the faster closing control;
 the 1.55 ms target is missed at 1.5567 ms and the iteration budget is exhausted.
 Two frozen RT image pairs are byte-identical. Android benefit, GPU AS timing and
-full-frame gains remain unproven. Broader native checks are 7/8 with inherited
-source-string failures retained. No phone reconnection is assumed.
+full-frame gains remain unproven. The earlier broader native selection remains
+recorded as 7/8; its source-string failures are diagnosed below. No phone
+reconnection is assumed.
 
 The [Kit anchoring checkpoint](../evidence/2026-10-22-kit-live-voice/README.md)
 binds continuous reunion/forest speech to the current grounded companion and
@@ -43,8 +44,18 @@ without restarting PCM. Four focused Release tests and Windows/Android arm64
 compilation pass. The nearby logical reminder now uses 1.00 m instead of the old
 5.34 m point; far landing gain decreases correctly. Endpoint playback/listening
 and phone lifecycle remain pending. Original fixture failures are retained.
-Next unblocked desktop work is inherited source-contract/CI diagnosis; PR
-conflicts and Debug timeout remain open, with no acceptance assertions weakened.
+PR conflicts and Debug timeout remain open.
+
+The [source-contract checkpoint](../evidence/2026-10-22-source-contracts/README.md)
+classifies the eight render-slot failures as stale regional-water expectations.
+Tests now compile actual shader arithmetic for six signed axes and four water
+paths, and enforce scoped Android survey/live tuning plus route reset. Six
+negative source mutations and the existing concurrent tuple checks remain.
+Three focused Release registrations pass and Windows builds; production sources
+are unchanged. Original failures and the first candidate's scope error remain
+recorded. Next inspect remaining hosted checkout/generated-bound/encoding
+failures, then resolve PR conflicts safely. This is no hosted full-CI or device
+acceptance claim; Kit endpoint listening and the Debug timeout stay open.
 
 ## Frozen arm framing diagnosis - local checkpoint, 20 October 2026
 

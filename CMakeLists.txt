@@ -1622,7 +1622,27 @@ if(BUILD_TESTING)
                 -TestExecutable $<TARGET_FILE:horde_rt_skinned_character_smoke>)
 
         add_executable(horde_rt_character_render_slot_smoke tests/CharacterRenderSlotSmoke.cpp)
-        target_include_directories(horde_rt_character_render_slot_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+        # Compile the actual bounded GLSL arithmetic in the host fixture rather
+        # than requiring an obsolete spelling or duplicating its implementation.
+        set(_horde_test_hit_decode "${CMAKE_CURRENT_SOURCE_DIR}/shaders/raytracing/include/rt_hit_decode.glsl")
+        set(_horde_test_water "${CMAKE_CURRENT_SOURCE_DIR}/shaders/raytracing/include/rt_dielectric_common.glsl")
+        set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${_horde_test_hit_decode}" "${_horde_test_water}")
+        file(READ "${_horde_test_hit_decode}" _horde_test_hit_source)
+        string(FIND "${_horde_test_hit_source}" "vec3 normalForSurfaceCode(uint code)" _horde_test_normal_begin)
+        string(FIND "${_horde_test_hit_source}" "const float kWaterStreamBottomY" _horde_test_normal_end)
+        if(_horde_test_normal_begin LESS 0 OR _horde_test_normal_end LESS_EQUAL _horde_test_normal_begin)
+            message(FATAL_ERROR "Normal ABI host fixture cannot find the production decoder")
+        endif()
+        math(EXPR _horde_test_normal_length "${_horde_test_normal_end}-${_horde_test_normal_begin}")
+        string(SUBSTRING "${_horde_test_hit_source}" ${_horde_test_normal_begin} ${_horde_test_normal_length} HORDE_TEST_NORMAL_FUNCTION)
+        file(READ "${_horde_test_water}" _horde_test_water_source)
+        string(REGEX MATCH "transmittedHit[.]t [+]=[^;]*;" HORDE_TEST_WATER_DISTANCE "${_horde_test_water_source}")
+        if(HORDE_TEST_WATER_DISTANCE STREQUAL "")
+            message(FATAL_ERROR "Water path host fixture cannot find the production accumulation")
+        endif()
+        configure_file(tests/CompiledShaderContracts.h.in generated/tests/CompiledShaderContracts.h @ONLY)
+        target_include_directories(horde_rt_character_render_slot_smoke PRIVATE
+            ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_BINARY_DIR}/generated/tests)
         target_link_libraries(horde_rt_character_render_slot_smoke PRIVATE horde_rt_probe_core)
         add_test(NAME horde_rt_character_render_slot_smoke COMMAND horde_rt_character_render_slot_smoke)
         set_tests_properties(horde_rt_character_render_slot_smoke PROPERTIES
