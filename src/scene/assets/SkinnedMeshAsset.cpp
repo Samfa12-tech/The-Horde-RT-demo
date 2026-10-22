@@ -313,39 +313,6 @@ Vec3 TransformVector(const Matrix& matrix, Vec3 vector)
             matrix.m[2] * vector.x + matrix.m[6] * vector.y + matrix.m[10] * vector.z};
 }
 
-bool TransformNormal(const Matrix& matrix, const Vec3 normal, Vec3& transformed)
-{
-    const Vec3 column0{matrix.m[0], matrix.m[1], matrix.m[2]};
-    const Vec3 column1{matrix.m[4], matrix.m[5], matrix.m[6]};
-    const Vec3 column2{matrix.m[8], matrix.m[9], matrix.m[10]};
-    const Vec3 cofactor0{
-        column1.y * column2.z - column1.z * column2.y,
-        column1.z * column2.x - column1.x * column2.z,
-        column1.x * column2.y - column1.y * column2.x};
-    const Vec3 cofactor1{
-        column2.y * column0.z - column2.z * column0.y,
-        column2.z * column0.x - column2.x * column0.z,
-        column2.x * column0.y - column2.y * column0.x};
-    const Vec3 cofactor2{
-        column0.y * column1.z - column0.z * column1.y,
-        column0.z * column1.x - column0.x * column1.z,
-        column0.x * column1.y - column0.y * column1.x};
-    const float determinant = column0.x * cofactor0.x +
-        column0.y * cofactor0.y + column0.z * cofactor0.z;
-    if (!std::isfinite(determinant) || std::abs(determinant) <= 1.0e-20f)
-        return false;
-    const float inverseDeterminant = 1.0f / determinant;
-    transformed = {
-        (cofactor0.x * normal.x + cofactor1.x * normal.y +
-         cofactor2.x * normal.z) * inverseDeterminant,
-        (cofactor0.y * normal.x + cofactor1.y * normal.y +
-         cofactor2.y * normal.z) * inverseDeterminant,
-        (cofactor0.z * normal.x + cofactor1.z * normal.y +
-         cofactor2.z * normal.z) * inverseDeterminant};
-    return std::isfinite(transformed.x) && std::isfinite(transformed.y) &&
-        std::isfinite(transformed.z);
-}
-
 Matrix LocalMatrix(Vec3 translation, Quat rotation, Vec3 scale)
 {
     const float x2 = rotation.x + rotation.x;
@@ -1512,12 +1479,17 @@ bool SkinnedMeshAsset::SkinUniqueGeometry(
         return globals[node];
     };
     std::vector<Matrix> skinMatrices(joints_.size());
+    // The player solved-pose path already uses this exact transport. Generic
+    // clip/PBR actors can share its per-joint factors without changing the
+    // per-influence arithmetic or rejecting unused singular joints early.
+    std::vector<detail::SkinNormalTransport> normalTransports(joints_.size());
     for (std::size_t i = 0u; i < joints_.size(); ++i)
     {
         if (joints_[i] >= pose.size()) { diagnostic = "Skeleton joint node is invalid."; return false; }
         Matrix inverse{};
         std::memcpy(inverse.m.data(), inverseBindMatrices_.data() + i * 16u, sizeof(float) * 16u);
         skinMatrices[i] = Multiply(resolveGlobal(resolveGlobal, joints_[i]), inverse);
+        normalTransports[i]=detail::MakeSkinNormalTransport(skinMatrices[i].m);
     }
     if(work){work->vertices=vertices_.size();work->joints=joints_.size();}
     animationScope.Complete();
@@ -1542,8 +1514,8 @@ bool SkinnedMeshAsset::SkinUniqueGeometry(
             if (weight <= 0.00001f || joint >= skinMatrices.size()) continue;
             const Vec3 transformedPosition = TransformPoint(skinMatrices[joint], source.position);
             Vec3 transformedNormal{};
-            if (!TransformNormal(skinMatrices[joint], source.normal,
-                                 transformedNormal))
+            if (!detail::ApplySkinNormalTransport(normalTransports[joint],source.normal.x,source.normal.y,source.normal.z,
+                                                  transformedNormal.x,transformedNormal.y,transformedNormal.z))
             {
                 diagnostic = "Skinned model produced a non-invertible normal transform.";
                 return false;

@@ -1,0 +1,7 @@
+Initial instrumentation check: 3/4 passed; Shipping JSON/text golden documents lacked appended fields. Explicit field expectations updated; no original assertion removed.
+One candidate compile attempt failed C2065 before execution: declaration accidentally in an earlier palette helper, then placed in SkinUniqueGeometry. No performance run used that failed build.
+Initial player benchmark: exit2, determinant=-1/-1 from view-space default axes used for model-space targets.
+Second player fixture: identity axes accepted, but old synthetic cross-body targets exceeded15mm socket tolerance (left78.693mm/right43.934mm). Production constraints retained.
+Final player fixture uses existing PlayerCrouchRigTests anatomical targets; 300 poses pass, maxsocketerror0.010mm.
+Broader CharacterRenderSlotSmoke remains red with unchanged shader/tuning source contracts. Full result retained.
+Target1.55ms was missed at1.5567ms; one-iteration goal exhausted. No target relaxation.

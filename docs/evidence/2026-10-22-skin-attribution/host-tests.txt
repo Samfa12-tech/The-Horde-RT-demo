@@ -1,0 +1,36 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+    Start  61: horde_rt_benchmark_evidence_report_tests
+1/8 Test  #61: horde_rt_benchmark_evidence_report_tests ....   Passed    1.72 sec
+    Start  81: horde_rt_performance_evidence_tests
+2/8 Test  #81: horde_rt_performance_evidence_tests .........   Passed    0.25 sec
+    Start  82: horde_rt_scene_record_observation_tests
+3/8 Test  #82: horde_rt_scene_record_observation_tests .....   Passed    0.03 sec
+    Start  99: horde_rt_skinned_node_pose_batch_tests
+4/8 Test  #99: horde_rt_skinned_node_pose_batch_tests ......   Passed    0.07 sec
+    Start 100: horde_rt_player_animation_tests
+5/8 Test #100: horde_rt_player_animation_tests .............   Passed    1.41 sec
+    Start 192: horde_rt_frame_evidence_coordinator_tests
+6/8 Test #192: horde_rt_frame_evidence_coordinator_tests ...   Passed    1.23 sec
+    Start 210: horde_rt_character_render_slot_smoke
+7/8 Test #210: horde_rt_character_render_slot_smoke ........***Failed    3.58 sec
+FAIL: CPU/GLSL world normal codes must retain their signed-axis agreement
+FAIL: CPU/GLSL world normal codes must retain their signed-axis agreement
+FAIL: CPU/GLSL world normal codes must retain their signed-axis agreement
+FAIL: CPU/GLSL world normal codes must retain their signed-axis agreement
+FAIL: CPU/GLSL world normal codes must retain their signed-axis agreement
+FAIL: CPU/GLSL world normal codes must retain their signed-axis agreement
+FAIL: secondary water hits must preserve accumulated camera-path distance for fog and distance lighting
+FAIL: Android renderer must consume exactly one mutex-protected RT tuning snapshot and reset it with the route
+Keeper audited staff centroids: neutral=(0.972983, 0.800802, 0.605775) lifted=(0.466067, 1.09768, 1.11467) forward=(0.0265056, 1.30031, 1.17645)
+
+    Start 218: horde_rt_kit_source_intake_tests
+8/8 Test #218: horde_rt_kit_source_intake_tests ............   Passed    0.92 sec
+
+88% tests passed, 1 tests failed out of 8
+
+Total Test time (real) =   9.23 sec
+
+The following tests FAILED:
+	210 - horde_rt_character_render_slot_smoke (Failed)
+Errors while running CTest

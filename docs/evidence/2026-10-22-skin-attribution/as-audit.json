@@ -1,0 +1,45 @@
+{
+  "scope": "Separate earlier saved phone frame; CPU command recording, not GPU AS timing or the matched 12.06ms cohort",
+  "source": "reports\\horde-phone-outdoor-baseline33-20261022-r1\\warm-vulkan_capability_report.json",
+  "sha256": "3bf9d17c8e5354ce997a5ea1897a79abebcf3798b61fd855f658d1144db333ff",
+  "gpu": "Adreno (TM) 840",
+  "identity": {
+    "sceneEpoch": 4,
+    "measurementGeneration": 8,
+    "recordAttemptSerial": 1532,
+    "recordSerial": 1532,
+    "submissionSerial": 1532,
+    "completionSerial": 1532,
+    "simulationTick": 7193,
+    "frameSlot": 0
+  },
+  "blasRecordCpuMs": 0.030104,
+  "blasRecordInvocations": 4,
+  "tlasRecordCpuMs": 0.009011,
+  "tlasRecordInvocations": 1,
+  "playerSkinInvocations": 2,
+  "characterSkinInvocations": 1,
+  "poseCopyInvocations": 2,
+  "poseCopyOutputBytes": 3210176,
+  "resources": {
+    "bufferCount": 50,
+    "memoryAllocationCount": 59,
+    "bottomLevelAccelerationStructureCount": 20,
+    "topLevelAccelerationStructureCount": 1,
+    "tlasInstanceCount": 28,
+    "pipelineCount": 2,
+    "shaderBindingTableCount": 2,
+    "descriptorSetCount": 1,
+    "hostVisibleBytes": 48277888,
+    "deviceLocalBytes": 160578496
+  },
+  "gpuAsSplitAvailable": false,
+  "sourceAuditBase": "efcd303ec138999888f948cf4e514f46bbf824b8",
+  "sourceFindings": [
+    "player world/viewmodel UPDATE on pose refresh",
+    "Kit UPDATE after initial owner replacement BUILD",
+    "base rescue rope/world UPDATE unconditionally in rescue mode; immutable forest dressing remains separate",
+    "TLAS UPDATE unless instance definitions require BUILD",
+    "existing enemy pose/death caches retained"
+  ]
+}

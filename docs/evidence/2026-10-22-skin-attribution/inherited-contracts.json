@@ -1,0 +1,64 @@
+{
+  "sourceBase": "efcd303ec138999888f948cf4e514f46bbf824b8",
+  "scope": "Source provenance for inherited string-contract failures; no removed assertion or runtime waiver",
+  "shaderFilesChanged": [],
+  "tokenChecks": [
+    {
+      "path": "src/vulkan/raytracing/PresentableTinyRtScene.cpp",
+      "basePresence": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "currentPresence": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "tokenPresenceUnchanged": true
+    },
+    {
+      "path": "shaders/raytracing/include/rt_hit_decode.glsl",
+      "basePresence": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "currentPresence": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "tokenPresenceUnchanged": true
+    },
+    {
+      "path": "android/app/src/main/cpp/android_probe_bridge.cpp",
+      "basePresence": [
+        true,
+        false,
+        true,
+        true
+      ],
+      "currentPresence": [
+        true,
+        false,
+        true,
+        true
+      ],
+      "tokenPresenceUnchanged": true
+    }
+  ],
+  "remainingFailure": "CharacterRenderSlotSmoke: six CPU/GLSL normal-source strings, secondary water-distance source string, Android tuning snapshot source string. Remains failing."
+}

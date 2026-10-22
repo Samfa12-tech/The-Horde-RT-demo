@@ -1,0 +1,644 @@
+{
+  "schema": 1,
+  "scope": "CPU asset microbenchmark; no frame-FPS, GPU-AS or Android gain claim",
+  "sourceBase": "efcd303ec138999888f948cf4e514f46bbf824b8",
+  "goal": {
+    "id": "generic-character-normal-transport-once",
+    "baseline": "a-baseline.jsonl",
+    "metric": "idle.vertexNs",
+    "statistic": "median",
+    "unit": "ns",
+    "direction": "lower",
+    "target": 1550000,
+    "maximumIterations": 1,
+    "allowedPaths": [
+      "src/scene/assets/SkinnedMeshAsset.cpp"
+    ],
+    "secondaryRequirements": [
+      "all three output digests unchanged",
+      "all focused correctness tests pass",
+      "pose median no regression above5 percent",
+      "closing unchanged control within10 percent of opening control",
+      "native RT frozen image parity where admitted"
+    ],
+    "scope": "MSVC Release CPU asset work, not frame FPS, GPU AS or Android benefit"
+  },
+  "goalResult": {
+    "targetMet": false,
+    "candidateMedianNs": 1556700.0,
+    "state": "exhausted",
+    "iterations": 1
+  },
+  "clockThermalLimitations": "No CPU frequency or temperature capture. No owned build/capture during A/B/C. External scheduling not isolated; paired controls and batch thread CPU retained.",
+  "runs": {
+    "A": {
+      "rawFile": "reports\\skin-attribution-20261022\\a-baseline.jsonl",
+      "sha256": "fd09eda1ad2949ffb04e42b54726d347a510a5bc7336764ba4c1c35b88e78d3d",
+      "scenarios": [
+        {
+          "scope": "CPU asset pose only; batch thread CPU includes duplicate verification and digest; no GPU/upload/AS/wait",
+          "scenario": "idle",
+          "warmup": 30,
+          "samples": 240,
+          "verticesPerPose": 26945,
+          "jointsPerPose": 24,
+          "copyOutputBytesPerPose": 3017840,
+          "copyPassesPerPose": 2,
+          "batchWallNs": 1508457200,
+          "batchThreadCpuNs": 1484375000,
+          "outputFnv1a64": "8ccaec3e10a75278",
+          "statistics": {
+            "animationNs": {
+              "count": 240,
+              "medianMs": 0.0088,
+              "meanMs": 0.009525416666666666,
+              "minimumMs": 0.0051,
+              "maximumMs": 0.0535,
+              "p95NearestRankMs": 0.014
+            },
+            "vertexNs": {
+              "count": 240,
+              "medianMs": 1.73235,
+              "meanMs": 1.8289870833333333,
+              "minimumMs": 1.6474,
+              "maximumMs": 3.1037,
+              "p95NearestRankMs": 2.4863
+            },
+            "copyNs": {
+              "count": 240,
+              "medianMs": 0.38415,
+              "meanMs": 0.41800333333333334,
+              "minimumMs": 0.2871,
+              "maximumMs": 1.2475,
+              "p95NearestRankMs": 0.6063
+            },
+            "poseNs": {
+              "count": 240,
+              "medianMs": 2.15385,
+              "meanMs": 2.2604925,
+              "minimumMs": 1.9534,
+              "maximumMs": 3.9785,
+              "p95NearestRankMs": 3.027
+            },
+            "unobservedPoseNs": {
+              "count": 240,
+              "medianMs": 2.168,
+              "meanMs": 2.27796125,
+              "minimumMs": 1.9626,
+              "maximumMs": 4.2799,
+              "p95NearestRankMs": 2.9802
+            }
+          }
+        },
+        {
+          "scope": "CPU asset pose only; batch thread CPU includes duplicate verification and digest; no GPU/upload/AS/wait",
+          "scenario": "walk",
+          "warmup": 30,
+          "samples": 240,
+          "verticesPerPose": 26945,
+          "jointsPerPose": 24,
+          "copyOutputBytesPerPose": 3017840,
+          "copyPassesPerPose": 2,
+          "batchWallNs": 1499782600,
+          "batchThreadCpuNs": 1421875000,
+          "outputFnv1a64": "a40c116b319a270a",
+          "statistics": {
+            "animationNs": {
+              "count": 240,
+              "medianMs": 0.00895,
+              "meanMs": 0.009694583333333335,
+              "minimumMs": 0.0055,
+              "maximumMs": 0.0584,
+              "p95NearestRankMs": 0.0142
+            },
+            "vertexNs": {
+              "count": 240,
+              "medianMs": 1.74535,
+              "meanMs": 1.80959875,
+              "minimumMs": 1.6337,
+              "maximumMs": 3.0807,
+              "p95NearestRankMs": 2.1583
+            },
+            "copyNs": {
+              "count": 240,
+              "medianMs": 0.3896,
+              "meanMs": 0.4150670833333333,
+              "minimumMs": 0.279,
+              "maximumMs": 1.1533,
+              "p95NearestRankMs": 0.5822
+            },
+            "poseNs": {
+              "count": 240,
+              "medianMs": 2.18325,
+              "meanMs": 2.23986625,
+              "minimumMs": 1.9388,
+              "maximumMs": 3.5982,
+              "p95NearestRankMs": 2.6799
+            },
+            "unobservedPoseNs": {
+              "count": 240,
+              "medianMs": 2.1754,
+              "meanMs": 2.2507616666666665,
+              "minimumMs": 1.9535,
+              "maximumMs": 3.8341,
+              "p95NearestRankMs": 2.7574
+            }
+          }
+        },
+        {
+          "scope": "CPU asset pose only; batch thread CPU includes duplicate verification and digest; no GPU/upload/AS/wait",
+          "scenario": "half-blend-acting",
+          "warmup": 30,
+          "samples": 240,
+          "verticesPerPose": 26945,
+          "jointsPerPose": 24,
+          "copyOutputBytesPerPose": 3017840,
+          "copyPassesPerPose": 2,
+          "batchWallNs": 1649745500,
+          "batchThreadCpuNs": 1625000000,
+          "outputFnv1a64": "846664192fdfba59",
+          "statistics": {
+            "animationNs": {
+              "count": 240,
+              "medianMs": 0.0147,
+              "meanMs": 0.01626125,
+              "minimumMs": 0.0081,
+              "maximumMs": 0.1654,
+              "p95NearestRankMs": 0.023
+            },
+            "vertexNs": {
+              "count": 240,
+              "medianMs": 1.80455,
+              "meanMs": 1.9497483333333332,
+              "minimumMs": 1.6481,
+              "maximumMs": 3.6191,
+              "p95NearestRankMs": 2.8205
+            },
+            "copyNs": {
+              "count": 240,
+              "medianMs": 0.44125,
+              "meanMs": 0.46872583333333334,
+              "minimumMs": 0.2893,
+              "maximumMs": 1.5258,
+              "p95NearestRankMs": 0.6668
+            },
+            "poseNs": {
+              "count": 240,
+              "medianMs": 2.29365,
+              "meanMs": 2.4396891666666667,
+              "minimumMs": 1.9554,
+              "maximumMs": 4.1845,
+              "p95NearestRankMs": 3.4234
+            },
+            "unobservedPoseNs": {
+              "count": 240,
+              "medianMs": 2.31485,
+              "meanMs": 2.50199625,
+              "minimumMs": 1.9821,
+              "maximumMs": 4.104,
+              "p95NearestRankMs": 3.6596
+            }
+          }
+        }
+      ]
+    },
+    "B": {
+      "rawFile": "reports\\skin-attribution-20261022\\b-candidate.jsonl",
+      "sha256": "402cbf5b0a48a795718aafaa1d3d6a70403143a85959860bc8cc63cb1f0e242d",
+      "scenarios": [
+        {
+          "scope": "CPU asset pose only; batch thread CPU includes duplicate verification and digest; no GPU/upload/AS/wait",
+          "scenario": "idle",
+          "warmup": 30,
+          "samples": 240,
+          "verticesPerPose": 26945,
+          "jointsPerPose": 24,
+          "copyOutputBytesPerPose": 3017840,
+          "copyPassesPerPose": 2,
+          "batchWallNs": 1368093200,
+          "batchThreadCpuNs": 1375000000,
+          "outputFnv1a64": "8ccaec3e10a75278",
+          "statistics": {
+            "animationNs": {
+              "count": 240,
+              "medianMs": 0.00735,
+              "meanMs": 0.00823875,
+              "minimumMs": 0.005,
+              "maximumMs": 0.026,
+              "p95NearestRankMs": 0.0122
+            },
+            "vertexNs": {
+              "count": 240,
+              "medianMs": 1.5567,
+              "meanMs": 1.6342491666666668,
+              "minimumMs": 1.4744,
+              "maximumMs": 2.834,
+              "p95NearestRankMs": 2.1216
+            },
+            "copyNs": {
+              "count": 240,
+              "medianMs": 0.3429,
+              "meanMs": 0.3551820833333333,
+              "minimumMs": 0.2621,
+              "maximumMs": 1.0476,
+              "p95NearestRankMs": 0.4691
+            },
+            "poseNs": {
+              "count": 240,
+              "medianMs": 1.91425,
+              "meanMs": 2.0004391666666668,
+              "minimumMs": 1.762,
+              "maximumMs": 3.3614,
+              "p95NearestRankMs": 2.5249
+            },
+            "unobservedPoseNs": {
+              "count": 240,
+              "medianMs": 1.9122,
+              "meanMs": 2.0244858333333333,
+              "minimumMs": 1.7925,
+              "maximumMs": 4.2199,
+              "p95NearestRankMs": 2.5076
+            }
+          }
+        },
+        {
+          "scope": "CPU asset pose only; batch thread CPU includes duplicate verification and digest; no GPU/upload/AS/wait",
+          "scenario": "walk",
+          "warmup": 30,
+          "samples": 240,
+          "verticesPerPose": 26945,
+          "jointsPerPose": 24,
+          "copyOutputBytesPerPose": 3017840,
+          "copyPassesPerPose": 2,
+          "batchWallNs": 1351529900,
+          "batchThreadCpuNs": 1343750000,
+          "outputFnv1a64": "a40c116b319a270a",
+          "statistics": {
+            "animationNs": {
+              "count": 240,
+              "medianMs": 0.0077,
+              "meanMs": 0.00840625,
+              "minimumMs": 0.005,
+              "maximumMs": 0.0219,
+              "p95NearestRankMs": 0.0124
+            },
+            "vertexNs": {
+              "count": 240,
+              "medianMs": 1.5648,
+              "meanMs": 1.60001,
+              "minimumMs": 1.4768,
+              "maximumMs": 2.7364,
+              "p95NearestRankMs": 1.7521
+            },
+            "copyNs": {
+              "count": 240,
+              "medianMs": 0.35785,
+              "meanMs": 0.3706541666666667,
+              "minimumMs": 0.2693,
+              "maximumMs": 0.8801,
+              "p95NearestRankMs": 0.4953
+            },
+            "poseNs": {
+              "count": 240,
+              "medianMs": 1.9337,
+              "meanMs": 1.9818458333333333,
+              "minimumMs": 1.7672,
+              "maximumMs": 3.1663,
+              "p95NearestRankMs": 2.2292
+            },
+            "unobservedPoseNs": {
+              "count": 240,
+              "medianMs": 1.9464,
+              "meanMs": 1.9785220833333332,
+              "minimumMs": 1.7804,
+              "maximumMs": 3.4891,
+              "p95NearestRankMs": 2.2238
+            }
+          }
+        },
+        {
+          "scope": "CPU asset pose only; batch thread CPU includes duplicate verification and digest; no GPU/upload/AS/wait",
+          "scenario": "half-blend-acting",
+          "warmup": 30,
+          "samples": 240,
+          "verticesPerPose": 26945,
+          "jointsPerPose": 24,
+          "copyOutputBytesPerPose": 3017840,
+          "copyPassesPerPose": 2,
+          "batchWallNs": 1547812000,
+          "batchThreadCpuNs": 1468750000,
+          "outputFnv1a64": "846664192fdfba59",
+          "statistics": {
+            "animationNs": {
+              "count": 240,
+              "medianMs": 0.0118,
+              "meanMs": 0.013305,
+              "minimumMs": 0.008,
+              "maximumMs": 0.0496,
+              "p95NearestRankMs": 0.0213
+            },
+            "vertexNs": {
+              "count": 240,
+              "medianMs": 1.5895,
+              "meanMs": 1.7993595833333333,
+              "minimumMs": 1.4749,
+              "maximumMs": 4.3122,
+              "p95NearestRankMs": 2.8387
+            },
+            "copyNs": {
+              "count": 240,
+              "medianMs": 0.3705,
+              "meanMs": 0.4133225,
+              "minimumMs": 0.2747,
+              "maximumMs": 1.1544,
+              "p95NearestRankMs": 0.7309
+            },
+            "poseNs": {
+              "count": 240,
+              "medianMs": 1.98255,
+              "meanMs": 2.2291954166666663,
+              "minimumMs": 1.7757,
+              "maximumMs": 5.1966,
+              "p95NearestRankMs": 3.4358
+            },
+            "unobservedPoseNs": {
+              "count": 240,
+              "medianMs": 2.0007,
+              "meanMs": 2.2676470833333333,
+              "minimumMs": 1.7982,
+              "maximumMs": 5.1326,
+              "p95NearestRankMs": 3.4493
+            }
+          }
+        }
+      ]
+    },
+    "C": {
+      "rawFile": "reports\\skin-attribution-20261022\\c-control.jsonl",
+      "sha256": "a72cef0160bee6abc87ebaaeb099a59858b47fe6f14e64feb2debe19af2ac7a8",
+      "scenarios": [
+        {
+          "scope": "CPU asset pose only; batch thread CPU includes duplicate verification and digest; no GPU/upload/AS/wait",
+          "scenario": "idle",
+          "warmup": 30,
+          "samples": 240,
+          "verticesPerPose": 26945,
+          "jointsPerPose": 24,
+          "copyOutputBytesPerPose": 3017840,
+          "copyPassesPerPose": 2,
+          "batchWallNs": 1421983700,
+          "batchThreadCpuNs": 1406250000,
+          "outputFnv1a64": "8ccaec3e10a75278",
+          "statistics": {
+            "animationNs": {
+              "count": 240,
+              "medianMs": 0.00665,
+              "meanMs": 0.007643333333333333,
+              "minimumMs": 0.0046,
+              "maximumMs": 0.0685,
+              "p95NearestRankMs": 0.012
+            },
+            "vertexNs": {
+              "count": 240,
+              "medianMs": 1.6981,
+              "meanMs": 1.7410095833333332,
+              "minimumMs": 1.6315,
+              "maximumMs": 3.1412,
+              "p95NearestRankMs": 1.8803
+            },
+            "copyNs": {
+              "count": 240,
+              "medianMs": 0.3527,
+              "meanMs": 0.37098625,
+              "minimumMs": 0.2872,
+              "maximumMs": 1.4851,
+              "p95NearestRankMs": 0.4834
+            },
+            "poseNs": {
+              "count": 240,
+              "medianMs": 2.06845,
+              "meanMs": 2.1222970833333337,
+              "minimumMs": 1.9368,
+              "maximumMs": 3.6581,
+              "p95NearestRankMs": 2.3661
+            },
+            "unobservedPoseNs": {
+              "count": 240,
+              "medianMs": 2.079,
+              "meanMs": 2.1324395833333334,
+              "minimumMs": 1.9498,
+              "maximumMs": 3.5671,
+              "p95NearestRankMs": 2.5193
+            }
+          }
+        },
+        {
+          "scope": "CPU asset pose only; batch thread CPU includes duplicate verification and digest; no GPU/upload/AS/wait",
+          "scenario": "walk",
+          "warmup": 30,
+          "samples": 240,
+          "verticesPerPose": 26945,
+          "jointsPerPose": 24,
+          "copyOutputBytesPerPose": 3017840,
+          "copyPassesPerPose": 2,
+          "batchWallNs": 1436993500,
+          "batchThreadCpuNs": 1421875000,
+          "outputFnv1a64": "a40c116b319a270a",
+          "statistics": {
+            "animationNs": {
+              "count": 240,
+              "medianMs": 0.0067,
+              "meanMs": 0.007869583333333333,
+              "minimumMs": 0.0051,
+              "maximumMs": 0.071,
+              "p95NearestRankMs": 0.011
+            },
+            "vertexNs": {
+              "count": 240,
+              "medianMs": 1.6989,
+              "meanMs": 1.7574945833333333,
+              "minimumMs": 1.6378,
+              "maximumMs": 3.2698,
+              "p95NearestRankMs": 2.0988
+            },
+            "copyNs": {
+              "count": 240,
+              "medianMs": 0.34785,
+              "meanMs": 0.3569779166666667,
+              "minimumMs": 0.2796,
+              "maximumMs": 1.0194,
+              "p95NearestRankMs": 0.454
+            },
+            "poseNs": {
+              "count": 240,
+              "medianMs": 2.06335,
+              "meanMs": 2.1247729166666667,
+              "minimumMs": 1.9319,
+              "maximumMs": 3.6167,
+              "p95NearestRankMs": 2.5689
+            },
+            "unobservedPoseNs": {
+              "count": 240,
+              "medianMs": 2.07985,
+              "meanMs": 2.15475625,
+              "minimumMs": 1.9435,
+              "maximumMs": 3.8035,
+              "p95NearestRankMs": 2.6185
+            }
+          }
+        },
+        {
+          "scope": "CPU asset pose only; batch thread CPU includes duplicate verification and digest; no GPU/upload/AS/wait",
+          "scenario": "half-blend-acting",
+          "warmup": 30,
+          "samples": 240,
+          "verticesPerPose": 26945,
+          "jointsPerPose": 24,
+          "copyOutputBytesPerPose": 3017840,
+          "copyPassesPerPose": 2,
+          "batchWallNs": 1467232600,
+          "batchThreadCpuNs": 1421875000,
+          "outputFnv1a64": "846664192fdfba59",
+          "statistics": {
+            "animationNs": {
+              "count": 240,
+              "medianMs": 0.01,
+              "meanMs": 0.010944583333333334,
+              "minimumMs": 0.0074,
+              "maximumMs": 0.0371,
+              "p95NearestRankMs": 0.0162
+            },
+            "vertexNs": {
+              "count": 240,
+              "medianMs": 1.70425,
+              "meanMs": 1.8000775,
+              "minimumMs": 1.6432,
+              "maximumMs": 3.5041,
+              "p95NearestRankMs": 2.3377
+            },
+            "copyNs": {
+              "count": 240,
+              "medianMs": 0.362,
+              "meanMs": 0.3695233333333333,
+              "minimumMs": 0.2812,
+              "maximumMs": 0.8311,
+              "p95NearestRankMs": 0.5399
+            },
+            "poseNs": {
+              "count": 240,
+              "medianMs": 2.0859,
+              "meanMs": 2.1826579166666664,
+              "minimumMs": 1.9373,
+              "maximumMs": 3.9682,
+              "p95NearestRankMs": 2.8526
+            },
+            "unobservedPoseNs": {
+              "count": 240,
+              "medianMs": 2.1011,
+              "meanMs": 2.187415,
+              "minimumMs": 1.9554,
+              "maximumMs": 4.3058,
+              "p95NearestRankMs": 2.7692
+            }
+          }
+        }
+      ]
+    }
+  },
+  "comparisons": [
+    {
+      "scenario": "idle",
+      "outputDigestsMatch": true,
+      "vertexReductionPercentVsA": 10.139406009178288,
+      "vertexReductionPercentVsC": 8.32695365408398,
+      "poseReductionPercentVsC": 7.454857501994239,
+      "closingControlVertexDriftPercent": -1.9770831529425381,
+      "closingControlPoseDriftPercent": -3.9649929196554967
+    },
+    {
+      "scenario": "walk",
+      "outputDigestsMatch": true,
+      "vertexReductionPercentVsA": 10.344630016902057,
+      "vertexReductionPercentVsC": 7.893342751191956,
+      "poseReductionPercentVsC": 6.283471054353351,
+      "closingControlVertexDriftPercent": -2.661357320881197,
+      "closingControlPoseDriftPercent": -5.491812664605533
+    },
+    {
+      "scenario": "half-blend-acting",
+      "outputDigestsMatch": true,
+      "vertexReductionPercentVsA": 11.917098445595864,
+      "vertexReductionPercentVsC": 6.733167082294267,
+      "poseReductionPercentVsC": 4.954695814756227,
+      "closingControlVertexDriftPercent": -5.558172397550642,
+      "closingControlPoseDriftPercent": -9.057615590870437
+    }
+  ],
+  "images": [
+    {
+      "checkpoint": "203-chapter-forest-lookout",
+      "baseline": "reports\\skin-attribution-20261022\\rt-baseline\\203-chapter-forest-lookout.png",
+      "candidate": "reports\\skin-attribution-20261022\\rt-candidate\\203-chapter-forest-lookout.png",
+      "baselineSha256": "3acf77c5012c9d7a1b53b7dd28d9603c272ca272686e2e115b069eece0008a7f",
+      "candidateSha256": "3acf77c5012c9d7a1b53b7dd28d9603c272ca272686e2e115b069eece0008a7f",
+      "byteIdentical": true,
+      "presentation": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+      "frozenDiagnosticScope": true
+    },
+    {
+      "checkpoint": "207-chapter-kit-reunion",
+      "baseline": "reports\\skin-attribution-20261022\\kit-baseline\\207-chapter-kit-reunion.png",
+      "candidate": "reports\\skin-attribution-20261022\\kit-candidate\\207-chapter-kit-reunion.png",
+      "baselineSha256": "8fa2785ebe1b118f84b93e99522e762ba486d2f49d1989308362b7ad4ecb9e6c",
+      "candidateSha256": "8fa2785ebe1b118f84b93e99522e762ba486d2f49d1989308362b7ad4ecb9e6c",
+      "byteIdentical": true,
+      "presentation": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+      "frozenDiagnosticScope": true
+    }
+  ],
+  "playerFixture": {
+    "ticks": 300,
+    "uniqueVertices": 34304,
+    "viewmodelVertices": 15855,
+    "playerPoseMeanMs": 0.012202,
+    "worldVertexMeanMs": 1.280048,
+    "viewmodelVertexMeanMs": 0.504121,
+    "hz30": {
+      "updates": 150,
+      "cpuMsPerUpdate": 1.309838,
+      "cpuMsPerTick": 0.654919,
+      "maxSocketErrorM": 1e-05
+    },
+    "hz60": {
+      "updates": 300,
+      "cpuMsPerUpdate": 1.293209,
+      "cpuMsPerTick": 1.293209,
+      "maxSocketErrorM": 1e-05
+    },
+    "hz30MaxMotionErrorM": 0.173031,
+    "selected": "review"
+  },
+  "binaryHashes": {
+    "reports\\skin-attribution-20261022\\binaries\\baseline.exe": "210c22089e55a1b61e70b631ead5e055c177eb0022cd07aede08d5c8135bf458",
+    "reports\\skin-attribution-20261022\\binaries\\candidate.exe": "6c1f3d0b4a12af3b84a1884caa77f10d29e2cc66b71866c0a93ebaff16910f0b",
+    "reports\\skin-attribution-20261022\\binaries\\player-baseline.exe": "b62d5ff2796749f8b78a89c409df250a6d45dabdf79d46c521b9accfdd00d5ad"
+  },
+  "phoneOperations": 0,
+  "instrumentationCommit": "411d634db382e8d52f43265bd876b95173538571"
+}

@@ -1,0 +1,8 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+    Start 218: horde_rt_kit_source_intake_tests
+1/1 Test #218: horde_rt_kit_source_intake_tests ...   Passed    1.90 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   1.93 sec

@@ -33,7 +33,7 @@ frozen or muted tests do not establish natural victory/full route/listening.
 | Healing flask | Owner approved **refillable and upgradeable**. Charges, healing quantity, refill locations, upgrade progression, first availability, use/interruption, death and save migration remain unspecified. No healing implementation. The earlier one-charge/one-heart/rope-landing suggestion is archived and unapproved. [Recovery record](HORDE_1_7_RECOVERY_DECISIONS_FOR_MORNING_2026_10_20.md). |
 | Directional locomotion | Owner saw backward movement playing forward-running in a mirror. Inspect runtime clip selection and existing backward/turn sources before replacement. No reflection-renderer fault is demonstrated. Preserve weapon/contact, rope and IK ownership. |
 | Meshy assessment | Kit source/runtime already retain idle/walk/run/fall/jump/mantle/slide; runtime selects idle/walk. Same-rig `Warden|run` is a worthwhile genuine running/catch-up candidate, not a pivot shortcut. No inspected crouch transition exists. Foreign skeleton backward/turn clips need retargeting and retain unresolved redistribution limits. No import/generation, playback or cost acceptance. |
-| Existing optimizations | Skin-normal caching, enemy refresh and BLAS UPDATE already exist. Current phone skin-stage wall median is 12.06 ms (player 6.05/character 5.92); old 8.7 ms is stale. Split animation/vertex-copy/skin and AS work more finely, retain upload/submit/fence separation and distinguish elapsed work from OS CPU utilisation. Windows shared-code trials cannot certify Android benefit. First-blocker and Opaque inverse-transform trials are closed without adoption. PineLOD2 rejected; LOD1 retained. |
+| Existing optimizations | Player normal caching, enemy refresh and BLAS UPDATE already exist. Current phone skin-stage wall median remains 12.06 ms (player 6.05/character 5.92); old 8.7 ms is stale. Six CPU child stages now separate pose/palette, world/viewmodel vertices and character copies; upload/AS-record/waits remain separate. One generic-character reuse of the existing transport helper reduces laptop Kit vertex medians 6.73–8.33% versus closing control, but misses its 1.55 ms target at 1.5567 ms. Retained candidate, one iteration exhausted; no frame or Android gain claim. Two frozen RT pairs match exactly. [Evidence](../evidence/2026-10-22-skin-attribution/README.md). GPU AS execution and per-owner attribution remain open. First-blocker/Opaque inverse-transform closed without adoption; PineLOD2 rejected, LOD1 retained. |
 | Mobile quality | MistOff default and optional enable remain; saved choices are preserved, desktop unchanged. Explicitly requested candidate comparisons are RT ON,40%,MistOff,FireLow,DustOff,Current shadows,existing Mobile water, individual and combined. Prior mixed trials are not attributed wins. 480p was illustrative; native HUD remains display-resolution/readable. |
 | Natural acceptance | Natural Keeper victory, full journey, earned save/load/death recovery, actual listening and sustained warmed-phone performance remain open. Passing Windows post-Keeper continuation fixtures are parked. |
 | Kit/ambience/debris | Stationary turn-step trial withdrawn/unadmitted; foot sliding remains. Night ambience/finite foliage source exists but listening is unaccepted. Six floor chips are static; kicking and a player-facing toggle are absent. |
@@ -64,12 +64,14 @@ no active publication schedule.
 
 ## Concrete next local slice
 
-Automatic crouch and deflection-speed source/checks are complete locally; physical
-feel and rendered acceptance remain. Next split current skin-stage attribution
-on Windows, measure one bounded shared-code candidate at matched settings and
-prepare the comparison for the next owner-confirmed phone connection. Keep the
-12.06 ms phone stage and unresolved closing 33% slowdown in view; no claim that a
-desktop improvement transfers to Android.
+Automatic crouch/deflection source and the bounded desktop skin-work slice are
+complete locally; physical input/feel and phone performance remain open. Next
+correct Kit's live source/listener anchoring before listening/mix acceptance.
+For the next owner-confirmed phone connection, compare exact control/candidate
+builds with the appended phase counters and original matched hold/settings.
+Keep the 12.06 ms phone stage, unresolved closing 33% slowdown, inherited red
+contracts and one-candidate target miss explicit. Desktop results do not
+certify Android benefit.
 Separately retain cold207 missing-terrain diagnosis for the next fixture/device
 window; do not infer it caused the owner's brief dark-world video. Continuous
 Kit source/listener anchoring and real listening remain open. No phone restart

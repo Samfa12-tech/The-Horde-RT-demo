@@ -28,6 +28,15 @@ native tests and 97 Android tests pass; final physical input/RT presentation fee
 remains open. Next desktop work targets finer attribution of the current 12.06 ms
 phone skin stage, with Android benefit pending a new authorized device window.
 
+The [skin-work checkpoint](../evidence/2026-10-22-skin-attribution/README.md)
+adds that attribution and evaluates one generic-character normal-transport
+candidate. Kit vertex medians fall 6.73–8.33% against the faster closing control;
+the 1.55 ms target is missed at 1.5567 ms and the iteration budget is exhausted.
+Two frozen RT image pairs are byte-identical. Android benefit, GPU AS timing and
+full-frame gains remain unproven. Broader native checks are 7/8 with inherited
+source-string failures retained. Next useful desktop gameplay work is Kit's live
+source/listener anchoring; no phone reconnection is assumed.
+
 ## Frozen arm framing diagnosis - local checkpoint, 20 October 2026
 
 The [bounded diagnosis](../evidence/2026-10-20-arm-capture-framing/README.md)
