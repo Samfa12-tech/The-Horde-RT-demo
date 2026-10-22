@@ -110,9 +110,8 @@ public final class ChapterSubtitlePolicyTest {
                 MainActivity.SUBTITLE_INPUT_KEYBOARD_MOUSE_CONTROLLER, 6, false));
         TextView subtitle = (TextView) get("chapterSubtitleText");
         assertTrue(subtitle.getTextSize() > 20.0f);
-        assertTrue("skip line retains the 44dp minimum touch target",
-                ((View) get("chapterDialogueSkipButton")).getMinimumHeight() >= activity.getResources()
-                        .getDisplayMetrics().density * 44.0f);
+        assertEquals("dialogue content has no visible skip control", 1,
+                ((LinearLayout) ((ScrollView) get("chapterSubtitleScroll")).getChildAt(0)).getChildCount());
     }
 
     @Test public void realInputSourcesAreLatchedOnlyAtTheNextLineGeneration() throws Exception {
@@ -211,7 +210,7 @@ public final class ChapterSubtitlePolicyTest {
                 subtitle.getContentDescription().toString().contains("treasury"));
     }
 
-    @Test public void extremeCaptionKeepsTextAndSkipReachableInsideOneScrollOwner() throws Exception {
+    @Test public void extremeCaptionKeepsAllTextReachableWithoutExtraControls() throws Exception {
         layout(320, 180);
         TextView subtitle = (TextView) get("chapterSubtitleText");
         subtitle.setText("Kit\nA road to the treasury, perhaps. Someone in the village might read it.");
@@ -222,15 +221,31 @@ public final class ChapterSubtitlePolicyTest {
         call("reflowChapterDialoguePlacement", new Class<?>[]{});
         layout(320, 180);
         ScrollView scroll = (ScrollView) get("chapterSubtitleScroll");
-        View skip = (View) get("chapterDialogueSkipButton");
         assertEquals(View.VISIBLE, subtitle.getVisibility());
         assertEquals(View.VISIBLE, scroll.getVisibility());
-        assertEquals(View.VISIBLE, skip.getVisibility());
         assertTrue("a caption viewport remains available", scroll.getHeight() > 0);
-        assertTrue("all text and the skip touch target can be reached by scrolling",
+        assertTrue("all text remains inside its one scroll owner",
                 scroll.getChildAt(0) instanceof LinearLayout &&
-                skip.getParent() == scroll.getChildAt(0));
-        assertTrue(skip.getMinimumHeight() >= activity.getResources().getDisplayMetrics().density * 44);
+                subtitle.getParent() == scroll.getChildAt(0));
+        assertEquals(1, ((LinearLayout) scroll.getChildAt(0)).getChildCount());
+    }
+
+    @Test public void obstacleCoordinatesDoNotMixCutoutScreenAndWindowOrigins() throws Exception {
+        root = new FrameLayout(activity) {
+            @Override public void getLocationOnScreen(int[] location) {
+                super.getLocationOnScreen(location);
+                location[0] += 139;
+            }
+        };
+        activity.setContentView(root);
+        set("appRoot", root);
+        View control = new Button(activity);
+        FrameLayout.LayoutParams p = new FrameLayout.LayoutParams(120, 90, Gravity.LEFT | Gravity.TOP);
+        p.leftMargin=84;p.topMargin=100;
+        root.addView(control,p);layout(800,400);
+        Rect expected=new Rect(84,100,204,190);
+        assertEquals("physical display cutout cannot shift a descendant hit region",
+                expected,call("visibleRectInRoot",new Class<?>[]{View.class},control));
     }
 
     @Test public void explicitPositionAndAccessibilityBoundsStayStable() {

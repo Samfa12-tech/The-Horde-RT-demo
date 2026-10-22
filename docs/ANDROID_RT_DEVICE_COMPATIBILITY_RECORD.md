@@ -3454,7 +3454,36 @@ this does not retroactively pass the earned candidate or establish earned auto,
 death Load, whole-route, interruption/power-loss, audio or sustained performance.
 [Exact diagnostic and repair receipt](evidence/2026-10-18-android-create-publication/README.md).
 
-### 20 October — corrected graphics APK lifecycle and preview follow-up
+### 22 October - live outdoor scaling and separate caption candidate
+
+SM-S948B / Android17 API37 / Adreno840. Development-signed arm64 Debug APK
+`712f070996124014832b9cf6bf4941e7fbac2d448fabfac926297be8d9d942a2`
+uses the real RayTracingPipeline with Shipping/Mobile shaders. Evidence class:
+**bounded physical, staged, stationary live-simulation performance comparison**,
+not natural traversal, listening or prolonged sustained acceptance. Matched
+33/20/33/40/33 holds retain exact internal/output extents, transforms, tuple,
+completed-frame ownership and joined actual image presentation intervals.
+Initial33 controls measure35.49–35.51ms GPU;20 measures16.08ms but remains
+visually unadmitted;40 measures48.20ms. Closing33 rises to43.93ms despite the
+starting thermal gate; this unresolved drift remains reported. Source repair
+drains diagnostic exterior events, retaining the original overflow rejection.
+[Exact receipt and limitations](evidence/2026-10-22-outdoor-scale/README.md).
+
+Separate final UI APK
+`fe3a51beb3a2d6385232dcccfdf8315785e969825e8a35a7de65be8894f46925`
+builds and matches the installed update. Cold diagnostic checkpoint207 fails
+terrain admission before corrected captions/icons can be inspected. Final UI
+portrait/landscape acceptance stays pending; this does not establish a natural
+gameplay or hardware incompatibility. Earlier712f warm207 has one complete real
+Kit question at100% Auto/font1.7 but still shows residual layout issues.
+[UI failure and custody](evidence/2026-10-22-caption-ui/README.md).
+
+Phone released19:44 UTC, launcher foreground/no Horde surface, all operations
+complete. All18 pre-existing save/lock hashes and settings bytes match; zero
+new save paths. Original rotation/font and production APK preserved. Neither
+phone evidence class certifies a signed Release package or another device.
+
+### 20 October - corrected graphics APK lifecycle and preview follow-up
 
 SM-S948B / Android 17 API 37, same installed Debug APK SHA-256
 `c5a11bb287327900327b2266c313f53d4a77ad02d2b94d5787ef81cb23269707`.

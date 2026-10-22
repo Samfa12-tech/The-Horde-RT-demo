@@ -280,7 +280,6 @@ public class MainActivity extends Activity {
     private LinearLayout chapterSubtitlePanel;
     private ScrollView chapterSubtitleScroll;
     private TextView chapterSubtitleText;
-    private Button chapterDialogueSkipButton;
     private long chapterSubtitleGeneration = Long.MIN_VALUE;
     private long chapterDialogueSkipPendingGeneration = Long.MIN_VALUE;
     private final ChapterSubtitlePlacement chapterSubtitlePlacement = new ChapterSubtitlePlacement();
@@ -3321,23 +3320,6 @@ public class MainActivity extends Activity {
                 new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT));
 
-        chapterDialogueSkipButton = new Button(this);
-        chapterDialogueSkipButton.setText("Skip line");
-        chapterDialogueSkipButton.setContentDescription("Skip this dialogue line");
-        chapterDialogueSkipButton.setMinHeight(dp(44));
-        styleActionButton(chapterDialogueSkipButton, 0xCC1A1713, 0xFFFFD28A);
-        final LinearLayout.LayoutParams skipParams = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        skipParams.gravity = Gravity.END;
-        content.addView(chapterDialogueSkipButton, skipParams);
-        chapterDialogueSkipButton.setOnClickListener(view -> {
-            chapterDialogueSkipPendingGeneration = chapterSubtitleGeneration;
-            try { ProbeBridge.requestChapterDialogueSkip(); }
-            catch (RuntimeException | LinkageError unavailable) {
-                Log.w(TAG, "Dialogue skip request was unavailable.");
-            }
-            stopChapterVoice();
-        });
         chapterSubtitlePanel.setVisibility(View.GONE);
         appRoot.addView(chapterSubtitlePanel, new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
@@ -3478,7 +3460,6 @@ public class MainActivity extends Activity {
             chapterSubtitleScroll.scrollTo(0, 0);
             applyChapterSubtitleBasePadding();
             chapterSubtitleScroll.setVisibility(View.VISIBLE);
-            chapterDialogueSkipButton.setVisibility(View.VISIBLE);
             return;
         }
         final long generation = state[1];
@@ -3495,7 +3476,6 @@ public class MainActivity extends Activity {
         } else updateChapterVoice(line, generation, paused);
         final boolean subtitles = preferences.getBoolean(PREF_CHAPTER_SUBTITLES, true);
         chapterSubtitleText.setVisibility(subtitles ? View.VISIBLE : View.GONE);
-        chapterDialogueSkipButton.setVisibility(View.VISIBLE);
         if (chapterSubtitleGeneration != generation) {
             chapterSubtitleGeneration = generation;
             chapterSubtitlePlacement.beginLine(generation, latestSubtitleInputMode);
@@ -3608,7 +3588,6 @@ public class MainActivity extends Activity {
         final int panelWidth = Math.max(1, right - left);
         applyChapterSubtitleBasePadding();
         chapterSubtitleScroll.setVisibility(View.VISIBLE);
-        chapterDialogueSkipButton.setVisibility(View.VISIBLE);
         final LinearLayout.LayoutParams scrollParams =
                 (LinearLayout.LayoutParams) chapterSubtitleScroll.getLayoutParams();
         if (scrollParams.height != ViewGroup.LayoutParams.WRAP_CONTENT) {
@@ -3633,7 +3612,7 @@ public class MainActivity extends Activity {
                 topRoom, bottomRoom, requiredHeight);
         final int selectedRoom = selected == SUBTITLE_POSITION_TOP ? topRoom : bottomRoom;
         if (requiredHeight > selectedRoom) {
-            // Scroll the complete caption and Skip together. A diagnostic label
+            // Scroll the complete caption. A diagnostic label
             // must never displace the dialogue or consume its remaining space.
             scrollParams.height = Math.max(1, selectedRoom - chapterSubtitlePanel.getPaddingTop() -
                     chapterSubtitlePanel.getPaddingBottom());
@@ -3679,19 +3658,17 @@ public class MainActivity extends Activity {
             ancestor = ancestor.getParent();
         }
         final Rect rect = new Rect();
-        if (view.getGlobalVisibleRect(rect)) {
-            final int[] rootLocation = new int[2];
-            appRoot.getLocationOnScreen(rootLocation);
-            rect.offset(-rootLocation[0], -rootLocation[1]);
-        } else {
+        if (!view.getLocalVisibleRect(rect)) {
             // Pre-draw/layout and Robolectric may not have a window coordinate map yet.
             // The descendants are still measured in appRoot coordinates and can safely
             // constrain the panel before the first frame is attached.
             rect.set(0, 0, view.getWidth(), view.getHeight());
-            try { appRoot.offsetDescendantRectToMyCoords(view, rect); }
-            catch (IllegalArgumentException notADescendant) { return null; }
-            if (!rect.intersect(0, 0, appRoot.getWidth(), appRoot.getHeight())) return null;
         }
+        // Keep both operands in the view hierarchy's coordinates. A cutout-
+        // inset window can have different window and physical screen origins.
+        try { appRoot.offsetDescendantRectToMyCoords(view, rect); }
+        catch (IllegalArgumentException notADescendant) { return null; }
+        if (!rect.intersect(0, 0, appRoot.getWidth(), appRoot.getHeight())) return null;
         return rect;
     }
 
@@ -7660,8 +7637,7 @@ public class MainActivity extends Activity {
             return;
         }
         final int label = showRaise ? R.string.raise_lantern : R.string.lower_lantern;
-        toggleHeldLightPoseButton.setText(label);
-        toggleHeldLightPoseButton.setContentDescription(getString(label));
+        LanternPoseControl.apply(toggleHeldLightPoseButton, showLower, getString(label));
         toggleHeldLightPoseButton.setVisibility(controllerMode ? View.GONE : View.VISIBLE);
     }
 

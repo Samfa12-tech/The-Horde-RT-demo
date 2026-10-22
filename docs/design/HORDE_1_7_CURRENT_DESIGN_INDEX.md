@@ -1,5 +1,26 @@
 # Horde 1.7 current design index
 
+## Resumed owner playtest priorities - 22 October 2026
+
+The [current canonical checklist](HORDE_1_7_OWNER_PLAYTEST_CHECKLIST_2026_10_22.md)
+supersedes the prior pause and reconciles the owner's landscape subtitles,
+speech, automatic crouch/analogue speed, brief dark-world report, outdoor
+performance, story cues and Meshy assessment. Phone work targets release by
+19:55 UTC / 06:55 AEDT; released at19:44 UTC with custody verified. Preserve existing saves/settings, RT-only rendering,
+review boundaries and measured failures. No merge or release.
+
+The owner approves a **refillable, upgradeable flask** as the method; charge
+counts, heal amount, locations, use/death and save policy remain unspecified.
+The earlier one-charge/one-heart/lower-landing proposal was never approved.
+
+The [live outdoor scale receipt](../evidence/2026-10-22-outdoor-scale/README.md)
+retains the event-overflow repair, detailed CPU/GPU stage timings, stable first
+controls and the unresolved closing-control slowdown.20% stays diagnostic only.
+The [separate caption/icon checkpoint](../evidence/2026-10-22-caption-ui/README.md)
+passes394 host tests but keeps cold207 missing-terrain and final UI phone
+acceptance open. Broader circle/transparency refinements are deferred; actual
+Briarhold source was inspected read-only. No phone operations remain active.
+
 ## Frozen arm framing diagnosis - local checkpoint, 20 October 2026
 
 The [bounded diagnosis](../evidence/2026-10-20-arm-capture-framing/README.md)

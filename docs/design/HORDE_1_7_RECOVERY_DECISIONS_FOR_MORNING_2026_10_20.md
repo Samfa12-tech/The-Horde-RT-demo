@@ -1,6 +1,11 @@
 # Horde 1.7 recovery decisions for morning - 20 October 2026
 
-Status: **policy pending**. This record collects the bounded choices left by the
+Status updated 22 October: **refillable, upgradeable flask approved as the method;
+remaining parameters pending**. Owner: "flask is a good idea, it's refillable,
+upgradeable and familiar for gamers". No charges, healing quantity, refill
+location, upgrade progression, use/death or save policy was selected by that
+approval. Do not silently adopt the archived example below. No flask API or
+resource-save fields are implemented. This record collects the choices left by the
 accepted [master 10.5 and saves section 12](../references/horde-1.7/d37f1638/docs/superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md).
 No later accepted recovery policy or current consumable implementation was found
 in the repository audit at `cbfc13f6`. No healing rule, balance or save format is
@@ -24,7 +29,7 @@ resource consumption need shared simulation rules and explicit tests.
 
 | Decision | Choice to settle before implementation |
 | --- | --- |
-| First method and availability | Limited flask, authored safe-rest interaction, or another bounded method. Specify the existing chapter milestone/location at which it first becomes usable. |
+| First method and availability | Refillable, upgradeable flask is approved. First availability and upgrade progression still need definition; no new location or starter grant is implied. |
 | Capacity and amount | Initial capacity/charges and hearts restored per use; whether a full-health use is rejected or consumes a charge. Keep maximum health at three unless separately chosen. |
 | Refill/rest trigger | Name exact safe places or actions, repeatability and any cost. Decide whether a refill is independent of checkpoint activation. A generic “safe area” needs an authored eligibility rule. |
 | Use and interruption | Safe-only or usable during combat; action duration; allowed movement/attacks/parries/climbing; damage interruption; exact point when health is restored and a charge is consumed. |
@@ -34,9 +39,14 @@ resource consumption need shared simulation rules and explicit tests.
 These choices remain pending for morning. No candidate quantity, use timing,
 automatic refill or checkpoint heal is selected here.
 
-## Recommended package for Sam to approve
+<a id="recommended-package-for-sam-to-approve"></a>
 
-**Proposal only, not an agreed rule or implementation.** The master section 10.5
+## Archived unapproved example - 20 October
+
+**Never approved; retained as history, not the selected policy.** In particular,
+one charge, one heart and the rope-landing Rest interaction below are not owner
+decisions. The 22 October direction confirms a refillable, upgradeable flask;
+its parameters remain open. The master section 10.5
 already points toward a limited flask and deliberate rest. The quantities,
 timings and new Rest interaction below are recommendations, not recovered
 agreement. Existing three-heart health and exact checkpoint restoration remain

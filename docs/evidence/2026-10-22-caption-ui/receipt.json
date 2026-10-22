@@ -1,0 +1,110 @@
+{
+  "schema": 1,
+  "build": {
+    "sha256": "fe3a51beb3a2d6385232dcccfdf8315785e969825e8a35a7de65be8894f46925",
+    "bytes": 163664654,
+    "head": "bb507d2461b8feaeae630ea08a9bec62d18b7376",
+    "sourceFreeze": "../source-freeze-ui.json"
+  },
+  "compiledSourceBase": "bb507d2461b8feaeae630ea08a9bec62d18b7376",
+  "compiledSourceHashes": {
+    "android/app/build.gradle": {
+      "bytes": 43096,
+      "sha256": "5f0f3d8484666279a05fef5e89a71c8b799c36550a5a638d526ab0c20e55951c"
+    },
+    "android/app/src/main/cpp/CMakeLists.txt": {
+      "bytes": 7422,
+      "sha256": "a88c90deb0749a5390c3726c54132b23e52723145311512038f46a6da4505527"
+    },
+    "android/app/src/main/cpp/android_motion_evidence.inl": {
+      "bytes": 55954,
+      "sha256": "9b3b2b3adc2fc6f281d191bc6bba6b0983ec3652a2a3d2bc0eb06d04a98c35a1"
+    },
+    "android/app/src/main/cpp/benchmark_scale_policy.cmake": {
+      "bytes": 2945,
+      "sha256": "c3d19e8f341b5e4eac8d1dc8efb0f9d1ae5d4db74ab3077528c25139c7acb192"
+    },
+    "android/app/src/main/java/com/samfa12/hordelanternrt/LanternPoseControl.java": {
+      "bytes": 2141,
+      "sha256": "513dac7f763c691b235fc0888e837647ae016a2e241d7ea372069925392d44a8"
+    },
+    "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java": {
+      "bytes": 467452,
+      "sha256": "1f483a576cacb8d2f91405794cb5d026f4a0c91d55370f26401e288566cc77b1"
+    },
+    "android/app/src/main/java/com/samfa12/hordelanternrt/PerformanceProfileRequest.java": {
+      "bytes": 4697,
+      "sha256": "82fac3d451eee03b575019c9ce9ca786222a83f3c50f656a86b4977d150f33b2"
+    },
+    "android/app/src/main/res/drawable/ic_lantern_lower.xml": {
+      "bytes": 854,
+      "sha256": "0c7a3dff3d1233d9306a086af2a62c9738563af3f66a7f0f97620c49943f32fe"
+    },
+    "android/app/src/main/res/drawable/ic_lantern_raise.xml": {
+      "bytes": 857,
+      "sha256": "d2f175834a3869832679d31d0c0ddd4b595e6ef3a465cdb044952d499a07cbe2"
+    },
+    "android/app/src/main/res/values/lantern_pose_control.xml": {
+      "bytes": 264,
+      "sha256": "b3a0f57bf5503c78d710cbdc0e7ee05bf989e6a6e8b27394c020cba7c458ceaa"
+    },
+    "src/gameplay/DevelopmentCheckpointSimulation.h": {
+      "bytes": 26091,
+      "sha256": "cf9d2cf84432d5f99932ad2f03041bb5183392fe8a390829222db6a4f148add1"
+    },
+    "src/gameplay/validation/MotionEvidenceScenario.cpp": {
+      "bytes": 50321,
+      "sha256": "153a25f6fa07035b0a8d762788c55e74f9516affa6a4a160437482ddc8c60d54"
+    },
+    "src/gameplay/validation/MotionEvidenceScenario.h": {
+      "bytes": 9215,
+      "sha256": "48d682b45ec97bddfaf38a37ae2b484c39169e0026a9af1d35c4d80fd860b288"
+    },
+    "src/graphics/GraphicsSettings.h": {
+      "bytes": 23621,
+      "sha256": "2a8c85c1239ff9545efe5824644b6b2ad67bbc92a13c0548fc5df092d4b48057"
+    },
+    "src/telemetry/MotionEvidenceLedger.cpp": {
+      "bytes": 28751,
+      "sha256": "ff6600cce0a6fb89f64a4a04ec8443fb362f7545762e7d4f974f9db9f7a670f9"
+    }
+  },
+  "hostTests": {
+    "total": 394,
+    "suites": 55,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "focusedCaption": 9,
+    "focusedLantern": 2
+  },
+  "deviceAcceptance": {
+    "finalUi": "pending",
+    "coldCheckpoint": 207,
+    "status": "failed-before-caption-inspection",
+    "exactLog": "10-23 06:38:47.232 21529 22742 E HordeRtProbeBridge: HORDE_CHECKPOINT_STAGE_FAILED id=207 requested=chapter-kit-reunion tick=0 chapter=1 reason=missing-terrain admission_world_generation=2 admission_terrain_generation=0 scene_ready=1 scene_terrain=0",
+    "displayOrientation": "portrait",
+    "limits": "Native/render source unchanged; no UI or natural-route cause inferred. Earlier warm207 after203 worked."
+  },
+  "phoneClosure": {
+    "utcUnixMs": 1792698254762,
+    "originalSaveFilesAndLocks": 18,
+    "originalSaveBytesUnchanged": true,
+    "newPaths": 0,
+    "settingsBytesUnchanged": true,
+    "systemSettingsRestored": {
+      "font_scale": "1.7",
+      "accelerometer_rotation": "0",
+      "user_rotation": "0"
+    },
+    "installedHashes": {
+      "com.samfa12.hordelanternrt.debug": "fe3a51beb3a2d6385232dcccfdf8315785e969825e8a35a7de65be8894f46925",
+      "com.samfa12.hordelanternrt": "cc4de768cf9ca2a409984a24888399e9c518363c359b3a9947d1ed0350c254e8"
+    },
+    "quitThroughNativeMenu": true,
+    "hordeSurfaceLayers": [],
+    "activeInstallCaptureTransferChildren": 0,
+    "phoneReleased": true,
+    "safeToDisconnect": true
+  }
+}
