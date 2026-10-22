@@ -233,7 +233,7 @@ private:
     bool ApplyCheckpoint(std::int32_t checkpointId, bool isRetry);
     void ResolvePlayerSupport();
     void ResetPlayerFootsteps() { playerFootsteps_.Reset(); dryFootstepCues_.Reset(); }
-    void ResolveMovementCollision(float previousX, float previousZ);
+    void ResolveMovementCollision(float previousX, float previousZ, bool detectHeadClearance = false);
     void ResetPlayerSupport();
     void UpdateMovement(const InputSnapshot& input, float deltaSeconds);
     void ClearRunIntent();
@@ -367,6 +367,7 @@ private:
     bool runInputBlockedUntilRelease_ = false;
     CharacterPosture posture_{};
     bool crouchToggleActive_=false,crouchInputBlockedUntilRelease_=false;
+    bool automaticCrouchRequested_=false;
     std::uint64_t latestCrouchToggleSequence_=0,latestClearCrouchIntentSequence_=0;
     std::uint64_t lastConsumedCrouchToggleSequence_=0,lastConsumedClearCrouchIntentSequence_=0;
     std::uint64_t pendingCrouchToggleCommands_=0,pendingClearCrouchIntentCommands_=0;

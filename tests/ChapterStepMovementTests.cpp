@@ -144,7 +144,7 @@ int main() {
         auto toggle=neutral;toggle.commands.crouchToggle=1;
         for(int tick=0;tick<20;++tick)crouching.StepFixed(toggle);
         Check(crouching.Snapshot().crouchActive && crouching.Snapshot().lastConsumedCrouchToggleSequence==1,
-              "touch toggle is consumed once and holds crouch across repeated publications");
+              "legacy diagnostic toggle is consumed once across repeated publications");
         toggle.commands.crouchToggle=2;
         for(int tick=0;tick<20;++tick)crouching.StepFixed(toggle);
         Check(!crouching.Snapshot().crouchActive,"fresh toggle returns to standing");
@@ -170,27 +170,69 @@ int main() {
         Check(WalkTo(crouching,sim::kWorldRoutePoints[2].x,sim::kWorldRoutePoints[2].z) &&
               WalkTo(crouching,sim::kWorldRoutePoints[3].x,sim::kWorldRoutePoints[3].z) && WalkTo(crouching,x-.7f,z),
               "crouch fixture approaches roof by actual production route");
-        const auto approach=crouching.Snapshot();controls={};controls.moveForward=1;controls.yawRadians=1.57079632679f;
-        for(int tick=0;tick<40;++tick)crouching.StepFixed(controls);
-        Check(crouching.Snapshot().playerX<x-.2f,"standing player cannot enter low root/ceiling volume");
-        controls.moveForward=0;controls.crouchHeld=true;
-        for(int tick=0;tick<20;++tick)crouching.StepFixed(controls);
-        Check(WalkTo(crouching,x,z,true),"fully crouched player can step onto root beneath roof");
+        const auto crossX=[&](float target,bool sideways) {
+            unsigned blockedTicks=0;bool safe=true;float oldDrop=crouching.Snapshot().playerCrouchDropMetres;
+            for(int tick=0;tick<300;++tick) {
+                const float dx=target-crouching.Snapshot().playerX;
+                if(std::abs(dx)<.012f) {
+                    std::cout<<"automatic crossing target="<<target<<" ticks="<<tick<<" blocked="<<blockedTicks<<'\n';
+                    return safe && blockedTicks<=15;
+                }
+                controls={};controls.yawRadians=sideways?0.f:1.57079632679f;
+                const float axis=std::clamp(dx*60.f/.8f,-1.f,1.f);
+                if(sideways)controls.moveStrafe=axis;else controls.moveForward=axis;
+                crouching.StepFixed(controls);const auto& state=crouching.Snapshot();
+                blockedTicks+=state.worldRoute.blocked;
+                safe=safe && std::abs(state.playerCrouchDropMetres-oldDrop)<=.0401f;
+                oldDrop=state.playerCrouchDropMetres;
+                if(std::abs(state.playerX-x)<.3f+radius)
+                    safe=safe && state.playerSupportWorldY+sim::kStandingBodyHeight-oldDrop<=roofY+.001f;
+            }
+            return false;
+        };
+        Check(crossX(x,false) && crouching.Snapshot().crouchActive &&
+              std::abs(crouching.Snapshot().playerSupportWorldY-(base.worldY+.12f))<.0001f,
+              "ordinary input automatically lowers the body and steps onto root without a manual stance command");
         controls={};controls.yawRadians=crouching.Snapshot().playerYawRadians;
         for(int tick=0;tick<20;++tick)crouching.StepFixed(controls);
         Check(crouching.Snapshot().crouchStandingBlocked && std::abs(crouching.Snapshot().playerCrouchDropMetres-.6f)<.0001f,
               "release beneath ceiling retains safe posture and reports blocked standing");
-        Check(WalkTo(crouching,x+1,z,true),"crouched player can leave the roof safely");
+        Check(crossX(x+1,false),"automatic crouch permits a safe forward exit without holding stance");
         controls.yawRadians=crouching.Snapshot().playerYawRadians;
         for(int tick=0;tick<20;++tick)crouching.StepFixed(controls);
         Check(!crouching.Snapshot().crouchActive && !crouching.Snapshot().crouchStandingBlocked,
               "standing resumes once full clearance is available");
+        Check(crossX(x-1,false),"backwards input negotiates the same head-clearance passage");
+        Check(crossX(x+1,true),"sideways input negotiates the same head-clearance passage");
+        controls={};controls.yawRadians=crouching.Snapshot().playerYawRadians;
+        for(int tick=0;tick<20;++tick)crouching.StepFixed(controls);
+        Check(!crouching.Snapshot().crouchActive,"neutral input outside the passage returns to standing");
         controls.crouchHeld=true;for(int tick=0;tick<20;++tick)crouching.StepFixed(controls);
         const auto fresh=crouching.BeginCampaignRestore(c);
         Check(fresh && crouching.CommitCampaignRestore(*fresh,{fresh->worldGeneration,c.zone},ceiling,controls) &&
               !crouching.Snapshot().crouchActive,"load reconstructs standing at safe authored checkpoint");
         crouching.StepFixed(controls);
         Check(crouching.Snapshot().paused,"held stance cannot cross load neutral-release barrier");
+    }
+    for(const bool solidWall : {false,true}) {
+        auto lowRoof=roof;
+        for(auto& triangle:lowRoof)for(auto& point:triangle.points)point[1]=base.worldY+1.15f;
+        const auto obstruction=solidWall?
+            Surface::WithNonWalkableGeometry(*ground,Box(x,z,base.worldY,2.f),error):
+            Surface::WithNonWalkableGeometry(*ground,lowRoof,error);
+        sim::GameSimulation blocked(config);const auto restore=blocked.BeginCampaignRestore(c);
+        Check(restore && blocked.CommitCampaignRestore(*restore,{restore->worldGeneration,c.zone},obstruction,{}),
+              "negative fixture restores a solid wall or passage shorter than the crouched body");
+        for(std::size_t zone=1;zone<sim::kWorldZones.size();++zone)
+            blocked.PublishChapterTerrain({blocked.Snapshot().worldRoute.generation,static_cast<sim::WorldZoneId>(zone)},obstruction);
+        neutral={};neutral.yawRadians=c.yaw;neutral.pitchRadians=c.pitch;blocked.StepFixed(neutral);
+        Check(WalkTo(blocked,sim::kWorldRoutePoints[2].x,sim::kWorldRoutePoints[2].z) &&
+              WalkTo(blocked,sim::kWorldRoutePoints[3].x,sim::kWorldRoutePoints[3].z) && WalkTo(blocked,x-.7f,z),
+              "negative fixture reaches obstruction by ordinary movement");
+        auto forward=neutral;forward.yawRadians=1.57079632679f;forward.moveForward=1;
+        for(int tick=0;tick<150;++tick)blocked.StepFixed(forward);
+        Check(blocked.Snapshot().worldRoute.blocked && !blocked.Snapshot().crouchActive && blocked.Snapshot().playerX<x,
+              "automatic posture cannot bypass walls or passages too low even when fully crouched");
     }
     std::cout<<checks<<" chapter step movement checks, "<<failures<<" failures; retained step bytes="
              <<terrain->RetainedBytes()-ground->RetainedBytes()<<'\n';return failures?1:0;

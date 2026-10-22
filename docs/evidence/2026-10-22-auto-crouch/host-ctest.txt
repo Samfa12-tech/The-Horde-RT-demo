@@ -1,0 +1,20 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+    Start  37: horde_rt_chapter_step_movement_tests
+1/7 Test  #37: horde_rt_chapter_step_movement_tests ........   Passed    3.82 sec
+    Start  69: horde_rt_motion_evidence_scenario_tests
+2/7 Test  #69: horde_rt_motion_evidence_scenario_tests .....   Passed    0.71 sec
+    Start  76: horde_rt_player_crouch_rig_tests
+3/7 Test  #76: horde_rt_player_crouch_rig_tests ............   Passed    2.68 sec
+    Start 148: horde_rt_simulation_gameplay_tests
+4/7 Test #148: horde_rt_simulation_gameplay_tests ..........   Passed    0.13 sec
+    Start 151: horde_rt_waterfall_production_route_tests
+5/7 Test #151: horde_rt_waterfall_production_route_tests ...   Passed    0.11 sec
+    Start 181: horde_rt_input_mailbox_stress
+6/7 Test #181: horde_rt_input_mailbox_stress ...............   Passed    3.26 sec
+    Start 183: horde_rt_desktop_controller_input_tests
+7/7 Test #183: horde_rt_desktop_controller_input_tests .....   Passed    1.15 sec
+
+100% tests passed, 0 tests failed out of 7
+
+Total Test time (real) =  11.90 sec

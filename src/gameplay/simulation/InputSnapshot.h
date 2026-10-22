@@ -75,10 +75,12 @@ struct InputSnapshot
     bool paused = false;
     bool damageEnabled = true;
     bool hasAuthoritativePlayerPose = false;
-    // Holds run only while a physical key/controller button remains down.
-    // The Android HUD uses the monotonic runToggle edge instead.
+    // Ordinary touch/controller axes scale continuously up to the run cap.
+    // Default false preserves keyboard and deterministic replay timing.
+    bool analogueMovement = false;
+    // Keyboard hold; diagnostic callers may still publish legacy run edges.
     bool runHeld = false;
-    // Physical keyboard/controller hold. Touch uses monotonic crouchToggle.
+    // Retained for deterministic posture fixtures. Ordinary controls use head clearance.
     bool crouchHeld = false;
     bool tutorialEnabled = true;
     bool tutorialSlowdownEnabled = false;

@@ -4293,6 +4293,7 @@ void ClearDesktopInput(VulkanSurfaceContext& context)
     context.mouseLookActive = false;
     context.controllerForward = 0.0f;
     context.controllerStrafe = 0.0f;
+    context.simulationInput.analogueMovement = false;
     context.controllerLookHorizontal = 0.0f;
     context.controllerLookVertical = 0.0f;
     context.previousControllerButtons = 0u;
@@ -4324,6 +4325,7 @@ void DiscardDesktopPendingCommands(VulkanSurfaceContext& context)
         context.combatTeachingSkipSequence, context.combatTeachingReplaySequence,
         context.dialogueSkipSequence};
     input.runHeld = false;
+    input.analogueMovement = false;
     input.crouchHeld = false;
     input.commands.crouchToggle = context.crouchToggleSequence;
     input.commands.clearCrouchIntent = context.clearCrouchIntentSequence;
@@ -4717,10 +4719,12 @@ void PublishDesktopCombatEdge(VulkanSurfaceContext& context,
     if (*sequence == UINT64_MAX) return;
     ++*sequence;
     CommandSequenceFor(context.simulationInput, kind) = *sequence;
-    context.simulationInput.moveForward = (context.forwardHeld ? 1.0f : 0.0f) -
-        (context.backwardHeld ? 1.0f : 0.0f) + context.controllerForward;
-    context.simulationInput.moveStrafe = (context.rightHeld ? 1.0f : 0.0f) -
-        (context.leftHeld ? 1.0f : 0.0f) + context.controllerStrafe;
+    const auto movement=horde::platform::windows::ResolveDesktopMovementInput(
+        context.forwardHeld,context.backwardHeld,context.leftHeld,context.rightHeld,
+        context.controllerForward,context.controllerStrafe);
+    context.simulationInput.moveForward=movement.forward;
+    context.simulationInput.moveStrafe=movement.strafe;
+    context.simulationInput.analogueMovement=movement.analogue;
     RecordCombatInputEdge(context.simulationInput, kind,
         horde::vulkan::raytracing::ReadRtSceneSteadyClock(nullptr));
 }
@@ -4905,10 +4909,6 @@ void PollDesktopController(VulkanSurfaceContext& context)
             context.teachingControllerGlyphs = true;
         if (!context.simulationPaused)
         {
-            if (horde::platform::windows::LegacyRunTogglePressed(
-                    legacy.dwButtons, context.previousLegacyControllerButtons, identity) &&
-                context.runToggleSequence != UINT64_MAX)
-                ++context.runToggleSequence;
             if (edges.attackPressed) PublishDesktopCombatEdge(context, horde::gameplay::simulation::CombatInputEdgeKind::Attack);
             if (edges.parryPressed) PublishDesktopCombatEdge(context, horde::gameplay::simulation::CombatInputEdgeKind::Parry);
             if (edges.dodgePressed) PublishDesktopCombatEdge(context, horde::gameplay::simulation::CombatInputEdgeKind::Dodge);
@@ -4925,19 +4925,8 @@ void PollDesktopController(VulkanSurfaceContext& context)
         HandleControllerMenuEdges(context, menuEdges);
         return;
     }
-    const bool rightShoulderHeld = (state.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) != 0u;
-    const bool leftShoulderHeld = (state.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER) != 0u;
-    const bool crouchReseed = context.xInputUserIndex != xinputUser ||
-        pollDisposition != horde::platform::windows::ControllerPollDisposition::Deliver;
-    if (context.simulationPaused || context.crouchTraversalOwned)
-        context.controllerCrouchBlockedUntilRelease = true;
-    else if (crouchReseed)
-        context.controllerCrouchBlockedUntilRelease = leftShoulderHeld;
-    else if (!leftShoulderHeld) context.controllerCrouchBlockedUntilRelease = false;
-    context.controllerCrouchHeld = !crouchReseed && !context.simulationPaused && !context.crouchTraversalOwned &&
-        leftShoulderHeld && !context.controllerCrouchBlockedUntilRelease;
-    if (!rightShoulderHeld) context.controllerRunBlockedUntilRelease = false;
-    context.controllerRunHeld = rightShoulderHeld && !context.controllerRunBlockedUntilRelease;
+    context.controllerRunHeld = false;
+    context.controllerCrouchHeld = false;
     if (context.xInputUserIndex != xinputUser)
     {
         context.previousControllerButtons = state.Gamepad.wButtons;
@@ -4967,11 +4956,6 @@ void PollDesktopController(VulkanSurfaceContext& context)
         context.controllerFocusLatch.CompleteReseed();
         return;
     }
-    if (!context.simulationPaused &&
-        horde::platform::windows::XInputRunTogglePressed(
-            state.Gamepad.wButtons, context.previousControllerButtons) &&
-        context.runToggleSequence != UINT64_MAX)
-        ++context.runToggleSequence;
     const auto axis = [](SHORT value, SHORT deadzone)
     {
         const float magnitude = static_cast<float>(value) / 32767.0f;
@@ -5093,15 +5077,16 @@ void UpdateDesktopSceneControls(
     input.commands.dialogueSkip = context.dialogueSkipSequence;
     input.dialogueCompletionLine = context.dialogueCompletionLine;
     input.dialogueCompletionGeneration = context.dialogueCompletionGeneration;
-    input.runHeld = context.runHeld || context.controllerRunHeld;
-    input.crouchHeld = !context.crouchTraversalOwned && (context.crouchHeld || context.controllerCrouchHeld);
+    input.runHeld = context.runHeld;
+    input.crouchHeld = false;
     input.waterfallWidthScale = horde::vulkan::raytracing::ClampRtSceneTuning(
         context.rtSceneTuning).waterfallWidthScale;
     input.hasAuthoritativePlayerPose = false;
-    input.moveForward = (context.forwardHeld ? 1.0f : 0.0f) -
-                        (context.backwardHeld ? 1.0f : 0.0f) + context.controllerForward;
-    input.moveStrafe = (context.rightHeld ? 1.0f : 0.0f) -
-                       (context.leftHeld ? 1.0f : 0.0f) + context.controllerStrafe;
+    const auto movement=horde::platform::windows::ResolveDesktopMovementInput(
+        context.forwardHeld,context.backwardHeld,context.leftHeld,context.rightHeld,
+        context.controllerForward,context.controllerStrafe);
+    input.moveForward=movement.forward;input.moveStrafe=movement.strafe;
+    input.analogueMovement=movement.analogue;
 
     if (context.benchmark.IsRunning())
     {
@@ -5155,6 +5140,7 @@ void UpdateDesktopSceneControls(
         input.paused = false;
         input.damageEnabled = false;
         input.hasAuthoritativePlayerPose = true;
+        input.analogueMovement = false;
         input.authoritativePlayerX = advance.replay.x;
         input.authoritativePlayerZ = advance.replay.z;
         input.yawRadians = advance.replay.yaw;
@@ -5179,6 +5165,7 @@ void UpdateDesktopSceneControls(
         input.dialogueCompletionLine = context.dialogueCompletionLine;
         input.dialogueCompletionGeneration = context.dialogueCompletionGeneration;
         input.runHeld = false;
+        input.analogueMovement = false;
         input.crouchHeld = false;
         input.commands.crouchToggle = context.crouchToggleSequence;
         input.commands.clearCrouchIntent = context.clearCrouchIntentSequence;
@@ -5259,6 +5246,7 @@ void DebugWarpSimulation(VulkanSurfaceContext& context,
     input.paused = false;
     input.damageEnabled = false;
     input.hasAuthoritativePlayerPose = true;
+    input.analogueMovement = false;
     input.authoritativePlayerX = x;
     input.authoritativePlayerZ = z;
     input.yawRadians = yaw;
@@ -5278,12 +5266,6 @@ bool SetDesktopMovementKey(VulkanSurfaceContext& context, const WPARAM key, cons
 {
     switch (key)
     {
-    case VK_CONTROL:
-    case VK_LCONTROL:
-    case VK_RCONTROL:
-        if (!held) context.crouchKeyBlockedUntilRelease = false;
-        context.crouchHeld = held && !context.crouchKeyBlockedUntilRelease && !context.crouchTraversalOwned;
-        return true;
     case 'W':
         context.forwardHeld = held;
         return true;
@@ -10011,15 +9993,14 @@ void ShowControlsHelp(HWND window)
     GameMessageBoxA(window,
                 "WASD  Move and strafe\n"
                 "Shift  Hold to run    Caps Lock  Toggle run\n"
-                "Ctrl  Hold to crouch\n"
+                "Crouch  Automatic under low openings; stand when clear\n"
                 "Click once to capture mouse; then free look\n"
                 "Left mouse  Swing / indicated chest interaction\n"
                 "Q  Parry skeleton strike\n"
                 "Space + movement direction  Dodge (neutral: forward)\n"
                 "E  Raise / lower claimed lantern    Right mouse  Reserved\n"
-                "Controller left stick  Move and strafe; click L3 to toggle run\n"
+                "Controller left stick  Deflect gently to walk, farther to run\n"
                 "Controller right stick  Camera look\n"
-                "LB / L1  Hold to crouch (XInput controllers)\n"
                 "RT  Attack    LT  Parry    B / Circle  Dodge\n"
                 "A  Interact    Y  Raise / lower claimed lantern\n"
                 "Tab  Skip current chapter line    X  Skip line\n"
@@ -11010,6 +10991,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                     input.paused = false;
                     input.damageEnabled = false;
                     input.hasAuthoritativePlayerPose = false;
+                    input.analogueMovement = false;
                     for (int frame = 0; frame < dawnFrames; ++frame)
                     {
                         sceneContext->simulation.StepFixed(

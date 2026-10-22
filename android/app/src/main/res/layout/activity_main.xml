@@ -152,7 +152,11 @@
         android:maxLines="1"
         android:text="@string/run"
         android:textSize="16sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:visibility="gone"
+        android:clickable="false"
+        android:focusable="false"
+        android:importantForAccessibility="no" />
 
     <Button
         android:id="@+id/crouch_button"
@@ -167,7 +171,10 @@
         android:autoSizeMinTextSize="10sp"
         android:autoSizeMaxTextSize="16sp"
         android:maxLines="2"
-        android:visibility="gone" />
+        android:visibility="gone"
+        android:clickable="false"
+        android:focusable="false"
+        android:importantForAccessibility="no" />
 
     <TextView
         android:id="@+id/combat_teaching_prompt"

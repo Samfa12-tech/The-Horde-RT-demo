@@ -21,6 +21,13 @@ passes394 host tests but keeps cold207 missing-terrain and final UI phone
 acceptance open. Broader circle/transparency refinements are deferred; actual
 Briarhold source was inspected read-only. No phone operations remain active.
 
+The [automatic crouch/analogue checkpoint](../evidence/2026-10-22-auto-crouch/README.md)
+implements shared collision-owned head clearance and stick-deflection speed,
+retaining WASD Shift/Caps Lock. Ordinary Run/Crouch controls are inactive. Seven
+native tests and 97 Android tests pass; final physical input/RT presentation feel
+remains open. Next desktop work targets finer attribution of the current 12.06 ms
+phone skin stage, with Android benefit pending a new authorized device window.
+
 ## Frozen arm framing diagnosis - local checkpoint, 20 October 2026
 
 The [bounded diagnosis](../evidence/2026-10-20-arm-capture-framing/README.md)

@@ -40,7 +40,7 @@ public final class SurfaceSuspensionLifecycleTest {
         @Implementation protected static long startDiagnosticSurface(Surface surface,String directory) { ++starts; return 42L; }
         @Implementation protected static int getSurfaceRuntimeState(long generation) { return runtime; }
         @Implementation protected static void setSimulationPaused(boolean value) { paused=value; }
-        @Implementation protected static void setViewControls(float yaw,float pitch,float light,float x,float z,boolean crouch) { strafe=x; forward=z; }
+        @Implementation protected static void setViewControls(float yaw,float pitch,float light,float x,float z,boolean crouch,boolean analogueMovement) { strafe=x; forward=z; }
         @Implementation protected static void setEntryMenu(boolean enabled,boolean side,boolean reduced,boolean play,long generation) {}
     }
     private MainActivity a;

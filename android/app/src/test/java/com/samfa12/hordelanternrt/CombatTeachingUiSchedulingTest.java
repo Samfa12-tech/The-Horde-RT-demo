@@ -40,7 +40,7 @@ public final class CombatTeachingUiSchedulingTest {
             final int opacity = elapsedMs >= 1320 ? 0 : 255;
             return 1L | ((long) cue << 3) | (1L << 10) | ((long) opacity << 40);
         }
-        @Implementation protected static void setViewControls(float yaw, float pitch, float light, float x, float z, boolean crouch) {}
+        @Implementation protected static void setViewControls(float yaw, float pitch, float light, float x, float z, boolean crouch,boolean analogueMovement) {}
         @Implementation protected static void setRunHeld(boolean held) {}
         @Implementation protected static void clearRunIntent() {}
         @Implementation protected static void setSimulationPaused(boolean paused) {}

@@ -1,9 +1,25 @@
 #pragma once
 
 #include "platform/windows/WindowsInteractionPrompt.h"
+#include <algorithm>
+#include <cmath>
 
 namespace horde::platform::windows
 {
+struct DesktopMovementInput {
+    float forward = 0, strafe = 0;
+    bool analogue = false;
+};
+// A keyboard movement hold owns its walk/Shift contract. A connected or
+// tilted controller cannot silently turn that digital movement into running.
+inline DesktopMovementInput ResolveDesktopMovementInput(bool forward, bool backward,
+    bool left, bool right, float controllerForward, float controllerStrafe) noexcept {
+    if (forward || backward || left || right)
+        return {float(forward)-float(backward),float(right)-float(left),false};
+    const auto bounded=[](float value){return std::isfinite(value)?std::clamp(value,-1.f,1.f):0.f;};
+    const float f=bounded(controllerForward),s=bounded(controllerStrafe);
+    return {f,s,f!=0 || s!=0};
+}
 enum class DesktopClickAction { Ignore, AcquireCapture, Attack, Interact };
 
 // One click chooses one intent. Simulation revalidates Interact at consumption;

@@ -4262,6 +4262,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                 simulationInput.paused = false;
                 simulationInput.damageEnabled = false;
                 simulationInput.hasAuthoritativePlayerPose = true;
+                simulationInput.analogueMovement = false;
                 simulationInput.authoritativePlayerX = advance.replay.x;
                 simulationInput.authoritativePlayerZ = advance.replay.z;
                 simulationInput.yawRadians = advance.replay.yaw;
@@ -4313,6 +4314,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                 simulationInput.paused = false;
                 simulationInput.damageEnabled = false;
                 simulationInput.hasAuthoritativePlayerPose = true;
+                simulationInput.analogueMovement = false;
                 simulationInput.authoritativePlayerX = replay.x;
                 simulationInput.authoritativePlayerZ = replay.z;
                 simulationInput.yawRadians = replay.yaw;
@@ -4354,6 +4356,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
             else if (!worldCommandsDeferred && (context.captureActive || context.benchmarkSampling))
             {
                 // Debug checkpoint measurements and captures are frozen snapshots.
+                simulationInput.analogueMovement = false;
                 simulationInput.paused = true;
                 simulationInput.damageEnabled = false;
                 simulationInput.hasAuthoritativePlayerPose = false;
@@ -6404,7 +6407,7 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_getSurfaceRuntimeState(JNIEnv*, jcla
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_samfa12_hordelanternrt_ProbeBridge_setViewControls(JNIEnv*, jclass, jfloat yaw, jfloat pitch, jfloat torchLightStrength, jfloat moveStrafe, jfloat moveForward, jboolean crouchHeld)
+Java_com_samfa12_hordelanternrt_ProbeBridge_setViewControls(JNIEnv*, jclass, jfloat yaw, jfloat pitch, jfloat torchLightStrength, jfloat moveStrafe, jfloat moveForward, jboolean crouchHeld, jboolean analogueMovement)
 {
     std::lock_guard<std::mutex> lock(gInputPublisherMutex);
     gInputPublisherState.yawRadians = static_cast<float>(yaw);
@@ -6414,6 +6417,8 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_setViewControls(JNIEnv*, jclass, jfl
     gInputPublisherState.moveStrafe = std::clamp(static_cast<float>(moveStrafe), -1.0f, 1.0f);
     gInputPublisherState.moveForward = std::clamp(static_cast<float>(moveForward), -1.0f, 1.0f);
     gInputPublisherState.crouchHeld = crouchHeld == JNI_TRUE;
+    gInputPublisherState.analogueMovement = analogueMovement == JNI_TRUE;
+    gInputPublisherState.runHeld = false; // Ordinary touch/controller speed comes from axes.
     PublishInputLocked();
 }
 

@@ -90,6 +90,22 @@ std::string ReadWindowsSource()
 
 int main()
 {
+    using horde::platform::windows::ResolveDesktopMovementInput;
+    const auto partialStick=ResolveDesktopMovementInput(false,false,false,false,.25f,-.5f);
+    Require(partialStick.analogue && partialStick.forward==.25f && partialStick.strafe==-.5f,
+        "ordinary controller movement preserves fractional speed intent");
+    const auto keyboard=ResolveDesktopMovementInput(true,false,false,true,.9f,-.8f);
+    Require(!keyboard.analogue && keyboard.forward==1 && keyboard.strafe==1,
+        "held WASD owns digital movement even with a tilted connected controller");
+    const auto opposing=ResolveDesktopMovementInput(true,true,false,false,.9f,.8f);
+    Require(!opposing.analogue && opposing.forward==0 && opposing.strafe==0,
+        "opposing held keyboard keys cannot reveal controller movement underneath");
+    const auto neutral=ResolveDesktopMovementInput(false,false,false,false,0,0);
+    Require(!neutral.analogue && neutral.forward==0 && neutral.strafe==0,
+        "neutral or cleared controller state carries no analogue motion mode");
+    const auto bounded=ResolveDesktopMovementInput(false,false,false,false,2,-2);
+    Require(bounded.analogue && bounded.forward==1 && bounded.strafe==-1,
+        "one source helper bounds axes identically for the frame and directional action edge");
     const std::vector<GraphicsMenuRect> graphicsRows{
         {0, 0, 600, 36},       // full-width preset
         {0, 44, 104, 80},      // glass
@@ -393,18 +409,27 @@ int main()
     Require(pitchedView.pitchRadians <= 0.28f && pitchedView.pitchRadians > 0.27f,
             "right-stick pitch must advance and retain the authored clamp");
 
-    // Owner's read-only paused L3 capture: button 14, mask 0x2000.
+    // Legacy diagnostic compatibility for the retained command helper only.
+    // Ordinary controller movement no longer binds L3 to run.
     Require(horde::platform::windows::LegacyRunTogglePressed(0x2000u, 0u, capturedBackbone) &&
             !horde::platform::windows::LegacyRunTogglePressed(0x2000u, 0x2000u, capturedBackbone) &&
             !horde::platform::windows::LegacyRunTogglePressed(0u, 0x2000u, capturedBackbone) &&
             !horde::platform::windows::LegacyRunTogglePressed(0x0800u, 0u, capturedBackbone) &&
             !horde::platform::windows::LegacyRunTogglePressed(0x2000u, 0u, LegacyControllerIdentity{}),
-            "captured L3 toggles once; hold/release/menu/unknown layouts cannot toggle run");
+            "legacy diagnostic L3 helper retains its captured one-edge mapping");
     Require(horde::platform::windows::XInputRunTogglePressed(0x0040u, 0u) &&
             !horde::platform::windows::XInputRunTogglePressed(0x0040u, 0x0040u) &&
             !horde::platform::windows::XInputRunTogglePressed(0x0080u, 0u),
-            "XInput L3 uses a single edge and never maps right-stick click to run");
+            "legacy diagnostic XInput helper retains one-edge metadata without becoming an ordinary binding");
     const std::string windowsSource = ReadWindowsSource();
+    Require(windowsSource.find("LegacyRunTogglePressed(")==std::string::npos &&
+            windowsSource.find("XInputRunTogglePressed(")==std::string::npos &&
+            windowsSource.find("case VK_CONTROL:")==std::string::npos,
+            "ordinary Windows input has no controller run-toggle or manual keyboard crouch binding");
+    const auto movementFrame=windowsSource.find("input.analogueMovement=movement.analogue;");
+    const auto movementEdge=windowsSource.find("context.simulationInput.analogueMovement=movement.analogue;");
+    Require(movementFrame!=std::string::npos && movementEdge!=std::string::npos,
+            "actual frame and directional-action paths use the same tested movement arbitration");
     const auto legacyAcquisition = windowsSource.find("if (context.legacyJoystickId != joystick ||");
     const auto legacyAcquisitionEnd = windowsSource.find("context.legacyJoystickId = joystick;", legacyAcquisition);
     const auto xinputAcquisition = windowsSource.find("if (context.xInputUserIndex != xinputUser)");
@@ -708,8 +733,8 @@ int main()
     Require(!leftTrigger.attackPressed && leftTrigger.parryPressed,
             "XInput LT threshold crossing must parry once");
 
-    // Deliver the measured physical L3 edge through the shared fixed-step
-    // command path, including held/reseed and lifecycle intent cancellation.
+    // Legacy diagnostic command injection verifies retained fixed-step run
+    // semantics; the source assertions above prohibit an ordinary L3 binding.
     auto runSimulation=std::make_unique<horde::gameplay::simulation::GameSimulation>();
     horde::gameplay::simulation::InputSnapshot runInput;
     runInput.damageEnabled=false;runInput.moveForward=1;
@@ -720,15 +745,15 @@ int main()
         previousL3=0x2000u;runSimulation->StepFixed(runInput);
     }
     Require(runInput.commands.runToggle==1 && runSimulation->Snapshot().runToggleActive &&
-            runSimulation->Snapshot().runActive,"L3 held over twelve ticks creates one running intent");
+            runSimulation->Snapshot().runActive,"legacy diagnostic counter injection creates one running intent");
     runInput.paused=true;runSimulation->StepFixed(runInput);
     Require(!runSimulation->Snapshot().runToggleActive&&!runSimulation->Snapshot().runActive,
-            "pause cancels controller run and keeps gameplay frozen");
+            "pause cancels injected diagnostic run and keeps gameplay frozen");
     runInput.paused=false;runSimulation->StepFixed(runInput);
     Require(!runSimulation->Snapshot().runToggleActive,
-            "same held/reseed L3 counter cannot restore running after pause");
+            "same injected diagnostic counter cannot restore running after pause");
     runInput.commands.runToggle=2;runSimulation->StepFixed(runInput);
-    Require(runSimulation->Snapshot().runToggleActive,"a fresh deliberate L3 edge can run again");
+    Require(runSimulation->Snapshot().runToggleActive,"a fresh diagnostic command edge can run again");
     ++runInput.commands.clearRunIntent;runSimulation->StepFixed(runInput);
     Require(!runSimulation->Snapshot().runToggleActive,"focus/traversal intent cancellation consumes the existing run toggle");
 

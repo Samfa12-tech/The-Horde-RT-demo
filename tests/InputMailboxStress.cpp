@@ -37,6 +37,7 @@ InputSnapshot MakeSnapshot(std::uint64_t sequence)
     input.hasAuthoritativePlayerPose = (sequence & 2u) != 0u;
     input.runHeld = (sequence & 4u) != 0u;
     input.crouchHeld = (sequence & 32u) != 0u;
+    input.analogueMovement = (sequence & 64u) != 0u;
     input.tutorialEnabled = (sequence & 8u) != 0u;
     input.tutorialSlowdownEnabled = (sequence & 16u) != 0u;
     input.commands.attack = sequence;
@@ -77,6 +78,7 @@ bool MatchesSequence(const PublishedInput& published)
            actual.hasAuthoritativePlayerPose == expected.hasAuthoritativePlayerPose &&
            actual.runHeld == expected.runHeld &&
            actual.crouchHeld == expected.crouchHeld &&
+           actual.analogueMovement == expected.analogueMovement &&
            actual.tutorialEnabled == expected.tutorialEnabled &&
            actual.tutorialSlowdownEnabled == expected.tutorialSlowdownEnabled &&
            actual.commands.attack == expected.commands.attack &&

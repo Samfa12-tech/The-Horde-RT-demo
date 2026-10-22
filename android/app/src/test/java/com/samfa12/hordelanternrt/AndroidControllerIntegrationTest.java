@@ -37,11 +37,11 @@ public class AndroidControllerIntegrationTest {
     @Implements(value=ProbeBridge.class,isInAndroidSdk=false)
     public static class Bridge {
         static float x,z,yaw,pitch; static int attacks,parries,dodges,interacts,lanterns,runToggles,runClears;
-        static boolean paused,crouchHeld; static int context,retries,crouchToggles,crouchClears;
+        static boolean paused,crouchHeld,analogue; static float dodgeX,dodgeZ; static boolean dodgeAnalogue; static int context,retries,crouchToggles,crouchClears;
         @Implementation protected static void __staticInitializer__() {}
         @Implementation protected static int getSurfaceRuntimeState(long generation){return 1;}
         @Implementation protected static int getContextualControlState(){return context;}
-        @Implementation protected static void setViewControls(float y,float p,float light,float strafe,float forward,boolean crouch){yaw=y;pitch=p;x=strafe;z=forward;crouchHeld=crouch;}
+        @Implementation protected static void setViewControls(float y,float p,float light,float strafe,float forward,boolean crouch,boolean analogueMovement){yaw=y;pitch=p;x=strafe;z=forward;crouchHeld=crouch;analogue=analogueMovement;}
         @Implementation protected static void requestToggleCrouch(){crouchToggles++;}
         @Implementation protected static void clearCrouchIntent(){crouchClears++;crouchHeld=false;}
         @Implementation protected static void setSimulationPaused(boolean p){paused=p;}
@@ -52,7 +52,7 @@ public class AndroidControllerIntegrationTest {
         @Implementation protected static void setEntryMenu(boolean enabled,boolean side,boolean reduced,boolean play,long generation){}
         @Implementation protected static void requestAttack(){attacks++;}
         @Implementation protected static void requestParry(){parries++;}
-        @Implementation protected static void requestDodge(){dodges++;}
+        @Implementation protected static void requestDodge(){dodges++;dodgeX=x;dodgeZ=z;dodgeAnalogue=analogue;}
         @Implementation protected static void requestInteract(){interacts++;}
         @Implementation protected static void requestToggleHeldLightPose(){lanterns++;}
         @Implementation protected static void requestToggleRun(){runToggles++;}
@@ -69,7 +69,7 @@ public class AndroidControllerIntegrationTest {
     @Before public void setup()throws Exception {
         Bridge.attacks=Bridge.parries=Bridge.dodges=Bridge.interacts=Bridge.lanterns=Bridge.runToggles=Bridge.runClears=Bridge.context=0;
         Bridge.x=Bridge.z=Bridge.yaw=Bridge.pitch=0;
-        Bridge.crouchHeld=false;Bridge.crouchToggles=Bridge.crouchClears=0;
+        Bridge.crouchHeld=Bridge.analogue=Bridge.dodgeAnalogue=false;Bridge.crouchToggles=Bridge.crouchClears=0;
         a=Robolectric.buildActivity(MainActivity.class).get();
         a.setContentView(R.layout.activity_main);
         set("surfaceView",a.findViewById(R.id.scene_surface)); set("menuScrim",a.findViewById(R.id.menu_scrim));
@@ -85,82 +85,41 @@ public class AndroidControllerIntegrationTest {
         set("crouchButton",a.findViewById(R.id.crouch_button));
         call("configureGameplayActionButtons",new Class<?>[]{});
     }
-    @Test public void crouchToggleUsesAcceptedFeedbackWithoutTouchingMovementPointersOrSavedSettings()throws Exception {
-        assertTrue(a.getString(R.string.controls_help).contains("Ctrl"));
-        assertTrue(a.getString(R.string.controller_help).contains("L1"));
-        assertTrue(a.getString(R.string.controller_play_prompts).contains("L1"));
-        call("refreshControllerHud",new Class<?>[]{});Button crouch=button("crouchButton");
-        assertEquals(View.VISIBLE,crouch.getVisibility());assertEquals("Crouch",crouch.getText().toString());
+    @Test public void automaticMovementRetiresManualButtonsWithoutChangingPointersOrPreferences()throws Exception {
+        assertFalse(a.getString(R.string.controls_help).contains("Ctrl"));
+        assertFalse(a.getString(R.string.controller_help).contains("hold L1"));
+        assertFalse(a.getString(R.string.controller_play_prompts).contains("Crouch: L1"));
         int[] pointers=(int[])field("activePointers").get(a);pointers[0]=4;pointers[1]=7;
         float[] controls=(float[])field("viewControls").get(a);controls[7]=.4f;controls[8]=.7f;
         java.util.Map<String,?> saved=a.getSharedPreferences("controller-integration",Context.MODE_PRIVATE).getAll();
-        crouch.performClick();assertEquals(1,Bridge.crouchToggles);
+        call("refreshControllerHud",new Class<?>[]{});
+        Bridge.context=(1<<10)|(1<<11);call("updateContextualControls",new Class<?>[]{boolean.class},true);
+        for(String name:new String[]{"runButton","crouchButton"}) {
+            assertEquals(View.GONE,button(name).getVisibility());button(name).performClick();
+        }
+        assertEquals(0,Bridge.runToggles);assertEquals(0,Bridge.crouchToggles);
         assertArrayEquals(new int[]{4,7},pointers);assertEquals(.4f,controls[7],0);assertEquals(.7f,controls[8],0);
-        assertEquals("label waits for accepted simulation stance","Crouch",crouch.getText().toString());
-        Bridge.context=1<<10;call("updateContextualControls",new Class<?>[]{boolean.class},true);
-        assertEquals("Stand",crouch.getText().toString());
-        Bridge.context|=1<<11;call("updateContextualControls",new Class<?>[]{boolean.class},true);
-        assertEquals("Crouching (ceiling)",crouch.getText().toString());
-        set("menuVisible",true);crouch.performClick();assertEquals(1,Bridge.crouchToggles);
         assertEquals(saved,a.getSharedPreferences("controller-integration",Context.MODE_PRIVATE).getAll());
     }
 
-    @Test public void crouchHoldsPublishCoherentlyAndCannotReplayAcrossFocusOrTraversal()throws Exception {
+    @Test public void keyboardControlAndShouldersCannotRequestManualStanceOrRun()throws Exception {
         a.dispatchKeyEvent(new KeyEvent(1,2,KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_CTRL_LEFT,0,0,1,0,0,InputDevice.SOURCE_KEYBOARD));
-        assertTrue(Bridge.crouchHeld);
-        a.onWindowFocusChanged(false);assertFalse(Bridge.crouchHeld);a.onWindowFocusChanged(true);
-        a.dispatchKeyEvent(new KeyEvent(1,3,KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_CTRL_LEFT,1,0,1,0,0,InputDevice.SOURCE_KEYBOARD));
-        assertFalse(Bridge.crouchHeld);
-        a.dispatchKeyEvent(new KeyEvent(1,4,KeyEvent.ACTION_UP,KeyEvent.KEYCODE_CTRL_LEFT,0,0,1,0,0,InputDevice.SOURCE_KEYBOARD));
-        a.dispatchKeyEvent(new KeyEvent(5,5,KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_CTRL_LEFT,0,0,1,0,0,InputDevice.SOURCE_KEYBOARD));
-        assertTrue(Bridge.crouchHeld);
-        a.dispatchKeyEvent(new KeyEvent(5,6,KeyEvent.ACTION_UP,KeyEvent.KEYCODE_CTRL_LEFT,0,0,1,0,0,InputDevice.SOURCE_KEYBOARD));
-        press(KeyEvent.KEYCODE_BUTTON_L1);assertFalse("L1 release is published",Bridge.crouchHeld);
-        a.dispatchKeyEvent(key(KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_BUTTON_L1,0));assertTrue(Bridge.crouchHeld);
-        Bridge.context=(1<<9)|(4<<6);call("updateContextualControls",new Class<?>[]{boolean.class},true);
-        assertFalse(Bridge.crouchHeld);assertEquals(View.GONE,button("crouchButton").getVisibility());
-        Bridge.context=0;call("updateContextualControls",new Class<?>[]{boolean.class},true);
-        a.dispatchKeyEvent(key(KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_BUTTON_L1,1));assertFalse(Bridge.crouchHeld);
-        a.dispatchKeyEvent(key(KeyEvent.ACTION_UP,KeyEvent.KEYCODE_BUTTON_L1,0));
-        a.dispatchKeyEvent(key(KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_BUTTON_L1,0));assertTrue(Bridge.crouchHeld);
-        ((InputManager.InputDeviceListener)field("controllerDevices").get(a)).onInputDeviceRemoved(9);
-        assertFalse(Bridge.crouchHeld);assertTrue(Bridge.crouchClears>0);
+        a.dispatchKeyEvent(new KeyEvent(1,3,KeyEvent.ACTION_UP,KeyEvent.KEYCODE_CTRL_LEFT,0,0,1,0,0,InputDevice.SOURCE_KEYBOARD));
+        press(KeyEvent.KEYCODE_BUTTON_L1);press(KeyEvent.KEYCODE_BUTTON_R1);
+        call("pushViewControls",new Class<?>[]{});
+        assertFalse(Bridge.crouchHeld);assertFalse(Bridge.analogue);
+        assertEquals(0,Bridge.runToggles);assertEquals(0,Bridge.crouchToggles);
         assertEquals(0,Bridge.attacks);assertEquals(0,Bridge.dodges);assertEquals(0,Bridge.parries);
     }
 
-    @Test public void firstFreshCrouchShoulderPressTakesOverWithoutDroppingTheHold()throws Exception {
-        assertFalse(field("controllerMode").getBoolean(a));
-        a.dispatchKeyEvent(key(KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_BUTTON_L1,0));
-        assertTrue(field("controllerMode").getBoolean(a));assertTrue("fresh gameplay hold survives touch takeover",Bridge.crouchHeld);
-        assertEquals("fresh hold does not publish a release-blocking clear or revoke touch toggle",0,Bridge.crouchClears);
-        a.dispatchKeyEvent(key(KeyEvent.ACTION_UP,KeyEvent.KEYCODE_BUTTON_L1,0));assertFalse(Bridge.crouchHeld);
-    }
-
-    @Test public void crouchPressedInMenusCannotCarryIntoResume()throws Exception {
-        set("firstMenu",false);set("controllerMode",true);call("showMainMenu",new Class<?>[]{boolean.class},false);
-        a.dispatchKeyEvent(key(KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_BUTTON_L1,0));
-        assertFalse(((AndroidControllerInput)field("controllerInput").get(a)).crouchHeld());
-        call("hideMenu",new Class<?>[]{});call("pushViewControls",new Class<?>[]{});assertFalse(Bridge.crouchHeld);
-        a.dispatchKeyEvent(key(KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_BUTTON_L1,1));assertFalse(Bridge.crouchHeld);
-        a.dispatchKeyEvent(key(KeyEvent.ACTION_UP,KeyEvent.KEYCODE_BUTTON_L1,0));
-        a.dispatchKeyEvent(key(KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_BUTTON_L1,0));assertTrue(Bridge.crouchHeld);
-        assertEquals(0,Bridge.attacks);assertEquals(0,Bridge.interacts);
-    }
-
-    @Test public void runButtonTogglesSharedIntentAndLifecycleCleanupResetsIt()throws Exception {
-        call("refreshControllerHud",new Class<?>[]{});
-        Button run=button("runButton");
-        assertEquals(View.VISIBLE,run.getVisibility());
-        assertEquals(a.getString(R.string.run),run.getText().toString());
-        run.performClick();
-        assertEquals(1,Bridge.runToggles);
-        assertEquals(a.getString(R.string.running),run.getText().toString());
-        call("clearTouchState",new Class<?>[]{});
-        assertEquals("touch cancellation clears native run intent",1,Bridge.runClears);
-        assertEquals(a.getString(R.string.run),run.getText().toString());
-        set("menuVisible",true);
-        run.performClick();
-        assertEquals("hidden menu state cannot create a run edge",1,Bridge.runToggles);
+    @Test public void analogueMagnitudeAndDodgeSharePublicationAndFocusCleanup()throws Exception {
+        motion(0,0,0,0);motion(.35f,-.5f,0,0);
+        assertTrue(Bridge.analogue);assertTrue(Bridge.x>0 && Bridge.x<.5f);assertTrue(Bridge.z>0 && Bridge.z<.6f);
+        final float x=Bridge.x,z=Bridge.z;press(KeyEvent.KEYCODE_BUTTON_B);
+        assertEquals(x,Bridge.dodgeX,0);assertEquals(z,Bridge.dodgeZ,0);assertTrue(Bridge.dodgeAnalogue);
+        a.onWindowFocusChanged(false);
+        assertFalse(Bridge.analogue);assertEquals(0,Bridge.x,0);assertEquals(0,Bridge.z,0);
+        assertEquals(0,Bridge.runToggles);assertEquals(0,Bridge.crouchToggles);
     }
     private KeyEvent key(int action,int code,int repeat) {
         ShadowSystemClock.advanceBy(Duration.ofMillis(2)); long now=SystemClock.uptimeMillis();

@@ -43,7 +43,7 @@ public final class CampaignMenuIntegrationTest {
         @Implementation protected static long requestCampaign(int a,int s,int k,long g){actions.add(a);return ++next;}
         @Implementation protected static boolean acknowledgeCampaignInput(long t,long g){ackToken=t;ackGeneration=g;ackCalls++;order.add("ack");return acceptAck;}
         @Implementation protected static void setSimulationPaused(boolean p){paused=p;order.add(p?"paused":"unpaused");}
-        @Implementation protected static void setViewControls(float y,float p,float light,float xx,float zz,boolean c){yaw=y;pitch=p;x=xx;z=zz;order.add("input");}
+        @Implementation protected static void setViewControls(float y,float p,float light,float xx,float zz,boolean c,boolean analogueMovement){yaw=y;pitch=p;x=xx;z=zz;order.add("input");}
         @Implementation protected static void setEntryMenu(boolean e,boolean s,boolean r,boolean p,long g){if(p)order.add("play");}
         @Implementation protected static int getSurfaceRuntimeState(long g){return 1;}
         @Implementation protected static int getPlayerLifePhase(){return lifePhase;}

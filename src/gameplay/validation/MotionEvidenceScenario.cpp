@@ -182,6 +182,7 @@ InputSnapshot MotionEvidenceScenario::BuildInput(const SimulationSnapshot& state
     const InputSnapshot& published, std::uint64_t now, bool ready) noexcept
 {
     InputSnapshot input = published;
+    input.analogueMovement = false;
     input.moveForward = input.moveStrafe = 0.0f;
     input.hasAuthoritativePlayerPose = false;
     input.runHeld = false;

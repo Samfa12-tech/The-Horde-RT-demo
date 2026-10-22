@@ -41,7 +41,7 @@ public final class LookoutObjectiveMenuTest {
         @Implementation protected static int getSurfaceRuntimeState(long generation){return 1;}
         @Implementation protected static int getContextualControlState(){return 0;}
         @Implementation protected static void setSimulationPaused(boolean value){paused=value;order.add(value?"pause":"resume");}
-        @Implementation protected static void setViewControls(float y,float p,float light,float x,float z,boolean c){strafe=x;forward=z;crouch=c;order.add("input");}
+        @Implementation protected static void setViewControls(float y,float p,float light,float x,float z,boolean c,boolean analogueMovement){strafe=x;forward=z;crouch=c;order.add("input");}
         @Implementation protected static void setRunHeld(boolean held){}
         @Implementation protected static void clearRunIntent(){}
         @Implementation protected static void clearCrouchIntent(){crouch=false;}

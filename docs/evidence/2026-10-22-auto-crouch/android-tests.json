@@ -1,0 +1,58 @@
+[
+  {
+    "suite": "com.samfa12.hordelanternrt.AndroidControllerInputTest",
+    "tests": 11,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "suite": "com.samfa12.hordelanternrt.AndroidControllerIntegrationTest",
+    "tests": 34,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "suite": "com.samfa12.hordelanternrt.CampaignMenuIntegrationTest",
+    "tests": 27,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "suite": "com.samfa12.hordelanternrt.CombatTeachingUiSchedulingTest",
+    "tests": 2,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "suite": "com.samfa12.hordelanternrt.DeathRecoveryTest",
+    "tests": 1,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "suite": "com.samfa12.hordelanternrt.GameplayTouchCancellationTest",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "suite": "com.samfa12.hordelanternrt.LookoutObjectiveMenuTest",
+    "tests": 9,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "suite": "com.samfa12.hordelanternrt.SurfaceSuspensionLifecycleTest",
+    "tests": 7,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  }
+]

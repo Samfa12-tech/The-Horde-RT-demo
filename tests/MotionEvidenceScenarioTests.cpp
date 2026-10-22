@@ -2,7 +2,6 @@
 #include "telemetry/MotionEvidenceLedger.h"
 #include "platform/android/AndroidMotionEvidencePolicy.h"
 #include "scene/ShowcaseOverheadGeometry.h"
-#include "gameplay/DevelopmentCheckpointSimulation.h"
 
 #include <algorithm>
 #include <cmath>
@@ -61,12 +60,13 @@ void Run(MotionScenario kind, int rate, const char* receiptPath)
               "water shaft route starts from an admitted fresh torch checkpoint before ordinary movement");
     Check(ledger.Begin("cpu_only_input_evidence", kind), "bounded ledger accepts a safe local run ID");
     InputSnapshot publication;
+    publication.analogueMovement=true;
     // No current RT output: same production paused-input path, no commands.
     const auto notReady = scenario.BuildInput(simulation.Snapshot(), publication, now, false);
     simulation.AdvanceFrame(notReady, 1.0 / rate, 1u);
     scenario.ObserveAdvance(simulation.Snapshot(), simulation.Events().Events());
     Check(simulation.Snapshot().tickIndex == 0u && notReady.paused && !notReady.hasAuthoritativePlayerPose &&
-          notReady.commands.attack == 0u && scenario.SimulationSeconds() == 0.0,
+          notReady.commands.attack == 0u && !notReady.analogueMovement && scenario.SimulationSeconds() == 0.0,
           "unpresented output defers live simulation input instead of forcing frame time");
     simulation.ClearEvents();
     bool pauseChecked = false;
@@ -347,7 +347,6 @@ void TestAdmissionAndFrameBinding()
         Check(hold.Complete() && outdoor.Snapshot().tickIndex>initial.tickIndex+2300 &&
               std::hypot(outdoor.Snapshot().playerX-initial.playerX,outdoor.Snapshot().playerZ-initial.playerZ)<.001f,
               "bounded40s wall hold advances live fixed steps while preserving position");
-
     }
     Check(ParseMotionScenario("keeper-first-entry", parsed) && parsed == MotionScenario::KeeperFirstEntry &&
           !ParseMotionScenario("keeper-first-entry ", parsed) && !ParseMotionScenario("../torch-low-opening", parsed),

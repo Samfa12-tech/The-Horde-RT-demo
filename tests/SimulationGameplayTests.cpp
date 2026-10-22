@@ -1708,6 +1708,34 @@ int main()
           NearlyEqual(legacyWalk->Snapshot().movementForward, 1.0f),
           "ordinary forward walking settles at the unchanged 1.9 m/s legacy speed");
 
+    for(const float deflection : {.25f,.5f,1.f})
+    {
+        auto analogue=std::make_unique<GameSimulation>();
+        InputSnapshot stick;stick.damageEnabled=false;stick.analogueMovement=true;
+        stick.moveForward=deflection;
+        for(int tick=0;tick<30;++tick)analogue->StepFixed(stick);
+        check(NearlyEqual(analogue->Snapshot().playerMovementSpeedMetresPerSecond,3.2f*deflection) &&
+              !analogue->Snapshot().runToggleActive && !analogue->Snapshot().crouchActive,
+              "analogue deflection scales continuously to existing run speed without a run latch or open-ground crouch");
+        stick.moveForward=stick.moveStrafe=1.f;
+        for(int tick=0;tick<30;++tick)analogue->StepFixed(stick);
+        check(NearlyEqual(analogue->Snapshot().playerMovementSpeedMetresPerSecond,3.2f),
+              "analogue diagonals retain the same bounded full-deflection speed");
+        stick.commands.dodge=1;
+        for(int tick=0;tick<50;++tick)analogue->StepFixed(stick);
+        check(NearlyEqual(analogue->Snapshot().playerMovementSpeedMetresPerSecond,3.2f) &&
+              analogue->Snapshot().lastConsumedDodgeSequence==1,
+              "analogue speed recovers after dodge without requiring stick recentering or repeating the edge");
+        stick.commands.attack=1;
+        for(int tick=0;tick<100;++tick)analogue->StepFixed(stick);
+        check(analogue->Snapshot().playerCombat.action==PlayerCombatAction::Idle &&
+              NearlyEqual(analogue->Snapshot().playerMovementSpeedMetresPerSecond,3.2f),
+              "analogue speed recovers after combat without restoring a cancelled keyboard run latch");
+        stick.moveForward=stick.moveStrafe=0;
+        for(int tick=0;tick<30;++tick)analogue->StepFixed(stick);
+        check(analogue->Snapshot().playerMovementSpeedMetresPerSecond==0,
+              "centred analogue input decelerates to a complete stop");
+    }
     auto runToggle = std::make_unique<GameSimulation>();
     InputSnapshot runInput;
     runInput.damageEnabled = false;

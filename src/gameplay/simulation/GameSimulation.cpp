@@ -569,7 +569,7 @@ void GameSimulation::ResolvePlayerSupport()
     playerSupport_ = ResolveDevelopmentPlayerSupport(playerX_, playerZ_,
         config_.developmentSupportFixture, supportGeneration_, supportGeneration_);
 }
-void GameSimulation::ResolveMovementCollision(float previousX, float previousZ)
+void GameSimulation::ResolveMovementCollision(float previousX, float previousZ, bool detectHeadClearance)
 {
     if (UsesRescueExterior()) {
         auto support=config_.authoredChapterTerrain?
@@ -601,6 +601,19 @@ void GameSimulation::ResolveMovementCollision(float previousX, float previousZ)
         }
         if(CurrentCombatRules())clear=clear && AuthoredBodySweepClear(previousX,previousZ,playerX_,playerZ_,
             std::max(playerSupport_.worldY,support.worldY),posture_.Height(),kPlayerCollisionRadius);
+        // Reuse ordinary collision admission. Only a failed standing sweep (or
+        // an already lowered body) needs the additional height comparison. A
+        // wall, unloaded zone or missing support cannot request a crouch.
+        if(detectHeadClearance && stepMotor && ready && (!clear || posture_.Active())) {
+            const auto admitsHeight=[&](float height) {
+                const auto candidate=horde::gameplay::traversal::ResolveChapterStepMovement(
+                    *chapterTerrain_,previousX,previousZ,playerX_,playerZ_,playerSupport_.worldY,kPlayerCollisionRadius,height);
+                return candidate.accepted && AuthoredBodySweepClear(previousX,previousZ,playerX_,playerZ_,
+                    std::max(playerSupport_.worldY,candidate.support.worldY),height,kPlayerCollisionRadius);
+            };
+            const bool standingClear=!posture_.Active()?clear:admitsHeight(kStandingBodyHeight);
+            if(!standingClear && admitsHeight(kCrouchingBodyHeight))automaticCrouchRequested_=true;
+        }
         if(!support.grounded||!ready||!clear||std::abs(support.worldY-playerSupport_.worldY)>kWorldRouteMaximumStep) {
             playerX_=previousX;playerZ_=previousZ;worldRoute_.blocked=true;++worldRoute_.rollbackCount;
         } else {
@@ -615,8 +628,14 @@ void GameSimulation::ResolveMovementCollision(float previousX, float previousZ)
             !horde::scene::TombDressingMovementClear(previousX, previousZ, playerX_, playerZ_)) {
             playerX_ = previousX; playerZ_ = previousZ;
         }
-        if(CurrentCombatRules() && !AuthoredBodySweepClear(previousX,previousZ,playerX_,playerZ_,
-            playerSupport_.worldY,posture_.Height(),kPlayerCollisionRadius)) {playerX_=previousX;playerZ_=previousZ;}
+        if(CurrentCombatRules()) {
+            const auto admitsHeight=[&](float height) {return AuthoredBodySweepClear(previousX,previousZ,playerX_,playerZ_,
+                playerSupport_.worldY,height,kPlayerCollisionRadius);};
+            const bool clear=admitsHeight(posture_.Height());
+            if(detectHeadClearance && (!clear || posture_.Active()) &&
+               !admitsHeight(kStandingBodyHeight) && admitsHeight(kCrouchingBodyHeight))automaticCrouchRequested_=true;
+            if(!clear){playerX_=previousX;playerZ_=previousZ;}
+        }
         return;
     }
     auto projection=ProjectWorldRoute(playerX_,playerZ_);
@@ -1878,6 +1897,7 @@ void GameSimulation::ClearRunIntent()
 
 void GameSimulation::ClearCrouchIntent()
 {
+    automaticCrouchRequested_=false;
     crouchToggleActive_=false;crouchInputBlockedUntilRelease_=lastInput_.crouchHeld;
     pendingCrouchToggleCommands_=pendingClearCrouchIntentCommands_=0;
     lastConsumedCrouchToggleSequence_=std::max(lastConsumedCrouchToggleSequence_,latestCrouchToggleSequence_);
@@ -1904,7 +1924,8 @@ void GameSimulation::UpdatePosture(const InputSnapshot& input,float seconds)
         pendingCrouchToggleCommands_=0;
     }
     const bool requested=CurrentCombatRules() && playerSupport_.grounded && !rescueTraversal_.IsActive() &&
-        (crouchToggleActive_ || (input.crouchHeld&&!crouchInputBlockedUntilRelease_));
+        (automaticCrouchRequested_ || crouchToggleActive_ || (input.crouchHeld&&!crouchInputBlockedUntilRelease_));
+    automaticCrouchRequested_=false;
     posture_.Step(requested,seconds,[&](float height){return BodyHeightClear(height);});
     if(requested||posture_.Active()) {ClearRunIntent();dodgeRemainingSeconds_=0;}
 }
@@ -1996,8 +2017,8 @@ void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSecon
     if (actionInterruptsRun)
         ClearRunIntent();
 
-    const bool runRequested = !posture_.Active() && !crouchToggleActive_ && !input.crouchHeld && !runInputBlockedUntilRelease_ &&
-        (runToggleActive_ || input.runHeld) && !actionInterruptsRun;
+    const bool runRequested = !posture_.Active() && !crouchToggleActive_ && !input.crouchHeld &&
+        (input.analogueMovement || (!runInputBlockedUntilRelease_ && (runToggleActive_ || input.runHeld))) && !actionInterruptsRun;
     runActive_ = false;
 
     float movementIntent = 0.0f;
@@ -2011,6 +2032,9 @@ void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSecon
     }
     else
     {
+        const bool detectHeadClearance=CurrentCombatRules() && playerSupport_.grounded &&
+            dodgeRemainingSeconds_<=0 && !rescueTraversal_.IsActive() &&
+            (std::abs(FiniteOr(input.moveForward,0.f))>.001f || std::abs(FiniteOr(input.moveStrafe,0.f))>.001f);
         if (dodgeRemainingSeconds_ > 0.0f)
         {
             const float dodgeStepSeconds = std::min(deltaSeconds, dodgeRemainingSeconds_);
@@ -2067,7 +2091,7 @@ void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSecon
             playerX_ += (forwardX * forward + rightX * strafe) * travelledStep;
             playerZ_ += (forwardZ * forward + rightZ * strafe) * travelledStep;
         }
-        ResolveMovementCollision(previousX, previousZ);
+        ResolveMovementCollision(previousX, previousZ, detectHeadClearance);
         const LichSnapshot& keeper = lichEncounter_.Snapshot();
         if (!config_.developmentWorldRoute &&
             !keeper.revealComplete && keeper.phase != LichPhase::Dead)
@@ -2075,7 +2099,7 @@ void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSecon
             ResolveMovementAgainstCircle({keeper.x, keeper.z},
                 kKeeperPresentationCollisionRadius + kPlayerCollisionRadius,
                 previousX, previousZ, playerX_, playerZ_);
-            ResolveMovementCollision(previousX, previousZ);
+            ResolveMovementCollision(previousX, previousZ, detectHeadClearance);
         }
     }
 

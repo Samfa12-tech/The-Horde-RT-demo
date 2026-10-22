@@ -4940,8 +4940,6 @@ public class MainActivity extends Activity {
         }
         UiControlLayout.apply(this,v,attackButton,parryButton,dodgeButton,interactButton,toggleHeldLightPoseButton,
                 safeRight,safeBottom,getResources().getDisplayMetrics().widthPixels-safeLeft);
-        UiControlLayout.applyStance(this,v,runButton,crouchButton,safeLeft,safeBottom,
-                getResources().getDisplayMetrics().widthPixels,attackButton,parryButton,dodgeButton,interactButton,toggleHeldLightPoseButton);
         styleActionButton(attackButton,interfaceBacking(v,HordeUiTokens.CHARCOAL),HordeUiTokens.PARCHMENT);
         for(Button b:new Button[]{parryButton,dodgeButton,interactButton,toggleHeldLightPoseButton})
             if(b!=null) styleActionButton(b,interfaceBacking(v,HordeUiTokens.SLATE),HordeUiTokens.PARCHMENT);
@@ -5886,7 +5884,7 @@ public class MainActivity extends Activity {
                         attackButton.setVisibility(View.VISIBLE);
                         parryButton.setVisibility(View.VISIBLE);
                         dodgeButton.setVisibility(View.VISIBLE);
-                        if (runButton != null) runButton.setVisibility(View.VISIBLE);
+                        if (runButton != null) runButton.setVisibility(View.GONE);
                     } else if (runButton != null) {
                         runButton.setVisibility(View.GONE);
                     }
@@ -7173,10 +7171,9 @@ public class MainActivity extends Activity {
     }
 
     private void pushViewControls() {
-        if (crouchTraversalOwned) controllerInput.clearCrouchHold();
+        final boolean analogue = canSendGameplayAction() && (viewControls[7] != 0 || viewControls[8] != 0);
         ProbeBridge.setViewControls(viewControls[0], viewControls[1], viewControls[2], viewControls[7], viewControls[8],
-                !crouchTraversalOwned && (crouchControlKeys != 0 || (controllerMode && controllerInput.crouchHeld())));
-        ProbeBridge.setRunHeld(controllerMode && controllerInput.runHeld());
+                false, analogue);
     }
 
     private void configureGameplayActionButtons() {
@@ -7188,17 +7185,8 @@ public class MainActivity extends Activity {
             clearRunIntent();
             ProbeBridge.requestDodge();
         });
-        runButton.setOnClickListener(view -> {
-            if (!canSendGameplayAction()) return;
-            runToggleEnabled = !runToggleEnabled;
-            runButton.setText(runToggleEnabled ? R.string.running : R.string.run);
-            ProbeBridge.requestToggleRun();
-        });
-        if (crouchButton != null) crouchButton.setOnClickListener(view -> {
-            if (!canSendGameplayAction() || crouchTraversalOwned) return;
-            clearRunIntent();
-            ProbeBridge.requestToggleCrouch();
-        });
+        if (runButton != null) { runButton.setOnClickListener(null); runButton.setVisibility(View.GONE); }
+        if (crouchButton != null) { crouchButton.setOnClickListener(null); crouchButton.setVisibility(View.GONE); }
         interactButton.setOnClickListener(view -> {
             if (menuVisible || diagnosticsVisible || deathOverlayVisible ||
                     endingOverlayVisible || ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) != 1) return;
@@ -7259,23 +7247,6 @@ public class MainActivity extends Activity {
             return true;
         }
         if (!AndroidControllerInput.isControllerKey(event)) {
-            if (event != null && event.isFromSource(InputDevice.SOURCE_KEYBOARD) &&
-                    (event.getKeyCode() == KeyEvent.KEYCODE_CTRL_LEFT || event.getKeyCode() == KeyEvent.KEYCODE_CTRL_RIGHT)) {
-                final int bit = event.getKeyCode() == KeyEvent.KEYCODE_CTRL_LEFT ? 1 : 2;
-                final boolean wasHeld = (crouchControlKeys & bit) != 0;
-                if (event.getAction() == KeyEvent.ACTION_UP) {
-                    crouchControlKeys &= ~bit; crouchBlockedControlKeys &= ~bit;
-                    if (wasHeld) { pushViewControls(); return true; }
-                } else if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                    if (resumed && controllerHasFocusedWindow() && canSendGameplayAction() && !crouchTraversalOwned) {
-                        if (event.getRepeatCount() == 0 && (crouchBlockedControlKeys & bit) == 0) {
-                            crouchControlKeys |= bit; clearRunIntent(); pushViewControls();
-                        }
-                        return true;
-                    }
-                    crouchBlockedControlKeys |= bit;
-                }
-            }
             if (event != null && event.getAction() == KeyEvent.ACTION_DOWN &&
                     event.getRepeatCount() == 0 && event.isFromSource(InputDevice.SOURCE_KEYBOARD))
                 observeSubtitleInputMode(SUBTITLE_INPUT_KEYBOARD_MOUSE_CONTROLLER);
@@ -7501,8 +7472,8 @@ public class MainActivity extends Activity {
         final boolean playing=canSendGameplayAction() && !debugCaptureUiSuppressed;
         final int actions=hud && playing && !controllerMode?View.VISIBLE:View.GONE;
         for(Button button:new Button[]{attackButton,parryButton,dodgeButton})if(button!=null)button.setVisibility(actions);
-        if(runButton!=null)runButton.setVisibility(actions);
-        if(crouchButton!=null)crouchButton.setVisibility(actions);
+        if(runButton!=null)runButton.setVisibility(View.GONE);
+        if(crouchButton!=null)crouchButton.setVisibility(View.GONE);
         if(menuButton!=null)menuButton.setVisibility(hud && playing && !controllerMode?View.VISIBLE:View.GONE);
         if(vitalityStatus!=null)vitalityStatus.setVisibility(hud && playing && lastPlayerLifePhase==PLAYER_ALIVE?View.VISIBLE:View.GONE);
         if(interactButton!=null && toggleHeldLightPoseButton!=null)updateContextualControls(hud && playing);
@@ -7557,13 +7528,7 @@ public class MainActivity extends Activity {
                 ((contextualState & RESCUE_PROMPT_MASK) >> RESCUE_PROMPT_SHIFT) == 4;
         if (traversalOwned && !crouchTraversalOwned) clearCrouchIntent();
         crouchTraversalOwned = traversalOwned;
-        if (crouchButton != null) {
-            String label = getString((contextualState & (1 << 11)) != 0 ? R.string.crouching_blocked :
-                    (contextualState & (1 << 10)) != 0 ? R.string.stand : R.string.crouch);
-            crouchButton.setText(label); crouchButton.setContentDescription(label);
-            crouchButton.setEnabled(!traversalOwned);
-            crouchButton.setVisibility(!controllerMode && !traversalOwned ? View.VISIBLE : View.GONE);
-        }
+        if (crouchButton != null) crouchButton.setVisibility(View.GONE);
         if ((contextualState & CONTEXTUAL_RESCUE_MODE) != 0) {
             final int rescuePrompt = (contextualState & RESCUE_PROMPT_MASK) >> RESCUE_PROMPT_SHIFT;
             final String label;

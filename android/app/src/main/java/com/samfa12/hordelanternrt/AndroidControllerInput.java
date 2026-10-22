@@ -173,8 +173,8 @@ final class AndroidControllerInput {
         if (blockedUntilUp[slot] || keyDown[slot]) return result(true, false, 0, 0, 0);
         keyDown[slot] = true;
         final int keyCode = event.getKeyCode();
-        if (keyCode == KeyEvent.KEYCODE_BUTTON_R1) runHeld = true;
-        if (keyCode == KeyEvent.KEYCODE_BUTTON_L1) crouchHeld = true;
+        // Shoulder presses no longer change locomotion or posture. Stick
+        // deflection owns speed; shared head clearance owns automatic crouch.
         updateDpad(keyCode, true);
         final int actions = updateDigitalTrigger(keyCode, true) | actionForKey(keyCode);
         return result(true, true, actions, 0, 0);

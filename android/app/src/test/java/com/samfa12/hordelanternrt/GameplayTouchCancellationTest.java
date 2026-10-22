@@ -23,7 +23,7 @@ import org.robolectric.annotation.Implements;
 public final class GameplayTouchCancellationTest {
     @Implements(value=ProbeBridge.class,isInAndroidSdk=false)
     public static final class Bridge {
-        static float strafe,forward;
+        static float strafe,forward; static boolean analogue;
         static int attacks,parries,dodges,runToggles,runClears;
         static int runtimeState=1;
         @Implementation protected static void __staticInitializer__() {}
@@ -32,8 +32,8 @@ public final class GameplayTouchCancellationTest {
         @Implementation protected static int getPlayerLifePhase() { return 0; }
         @Implementation protected static int getFinaleEndingPhase() { return 0; }
         @Implementation protected static int getContextualControlState() { return 0; }
-        @Implementation protected static void setViewControls(float yaw,float pitch,float light,float x,float z,boolean crouch) {
-            strafe=x; forward=z;
+        @Implementation protected static void setViewControls(float yaw,float pitch,float light,float x,float z,boolean crouch,boolean analogueMovement) {
+            strafe=x; forward=z; analogue=analogueMovement;
         }
         @Implementation protected static void setSimulationPaused(boolean paused) {}
         @Implementation protected static void requestAttack() { ++attacks; }
@@ -73,7 +73,7 @@ public final class GameplayTouchCancellationTest {
         invoke(a,"configureGameplayActionButtons");
         invoke(a,"configureTouchControls"); invoke(a,"refreshControllerHud"); return a;
     }
-    @Test public void nativeReadyAfterPlayOrSurfaceRecoveryRestoresActionAndRunButtons() throws Exception {
+    @Test public void nativeReadyRestoresActionsWhileRetiredRunStaysHidden() throws Exception {
         MainActivity a=prepare();
         TextView status=new TextView(a);
         status.setLayoutParams(new FrameLayout.LayoutParams(100,48));
@@ -91,9 +91,10 @@ public final class GameplayTouchCancellationTest {
             poll.run();
             assertEquals(View.GONE,((Button)field("dodgeButton").get(a)).getVisibility());
             Bridge.runtimeState=1; poll.run();
-            for(String name:new String[]{"attackButton","parryButton","dodgeButton","runButton"})
+            for(String name:new String[]{"attackButton","parryButton","dodgeButton"})
                 assertEquals(name+" must recover when native becomes ready",View.VISIBLE,
                         ((Button)field(name).get(a)).getVisibility());
+            assertEquals(View.GONE,((Button)field("runButton").get(a)).getVisibility());
         }
     }
     private static void drag(MainActivity a,boolean lookFirst) throws Exception {
@@ -103,11 +104,11 @@ public final class GameplayTouchCancellationTest {
             MotionEvent e=event(action,lookFirst,action==MotionEvent.ACTION_MOVE);
             surface.dispatchTouchEvent(e); e.recycle();
         }
-        assertTrue(Math.abs(Bridge.forward)>0); assertTrue(Math.abs(Bridge.strafe)>0);
+        assertTrue(Math.abs(Bridge.forward)>0); assertTrue(Math.abs(Bridge.strafe)>0);assertTrue(Bridge.analogue);
     }
     private static void assertCleared(MainActivity a) throws Exception {
         assertArrayEquals(new int[]{-1,-1},(int[])field("activePointers").get(a));
-        assertEquals(0,Bridge.strafe,0); assertEquals(0,Bridge.forward,0);
+        assertEquals(0,Bridge.strafe,0); assertEquals(0,Bridge.forward,0);assertFalse(Bridge.analogue);
         assertFalse(field("parryTouchActive").getBoolean(a));
     }
     @Test public void productionWholeCancelClearsLookFirstAndMovementFirstGestures() throws Exception {
@@ -118,20 +119,13 @@ public final class GameplayTouchCancellationTest {
             drag(a,!lookFirst); // A new gesture cannot inherit either cancelled role.
         }
     }
-    @Test public void mobileRunToggleIsVisibleAndGestureCancellationClearsIt() throws Exception {
-        MainActivity a=prepare();
-        Button run=(Button)field("runButton").get(a);
-        assertEquals(View.VISIBLE,run.getVisibility());
-        assertEquals(a.getString(R.string.run),run.getText().toString());
-        run.performClick();
-        assertEquals(1,Bridge.runToggles);
-        assertEquals(a.getString(R.string.running),run.getText().toString());
-        drag(a,true);
+    @Test public void retiredRunCannotToggleAndGestureCancellationClearsAnalogueAxes() throws Exception {
+        MainActivity a=prepare();Button run=(Button)field("runButton").get(a);
+        assertEquals(View.GONE,run.getVisibility());run.performClick();assertEquals(0,Bridge.runToggles);
+        drag(a,true);assertTrue(Bridge.analogue);
         MotionEvent cancel=event(MotionEvent.ACTION_CANCEL,true,true);
-        ((SurfaceView)field("surfaceView").get(a)).dispatchTouchEvent(cancel);cancel.recycle();
-        assertCleared(a);
-        assertEquals("cancelled touch clears the shared run request",1,Bridge.runClears);
-        assertEquals(a.getString(R.string.run),run.getText().toString());
+        ((SurfaceView)field("surfaceView").get(a)).dispatchTouchEvent(cancel);cancel.recycle();assertCleared(a);
+        assertTrue("cancel retains native run-latch cleanup",Bridge.runClears>0);
     }
     @Test public void productionMenuCleanupAndLifecyclePauseClearHeldGestureBeforeRecovery() throws Exception {
         for(String boundary:new String[]{"clearTouchState","onPause"}) {
@@ -153,7 +147,7 @@ public final class GameplayTouchCancellationTest {
             buttonEvent(b,MotionEvent.ACTION_DOWN);
             assertEquals(name+" must fire on press-down",1,name.equals("attackButton")?Bridge.attacks:
                     name.equals("parryButton")?Bridge.parries:Bridge.dodges);
-            assertTrue(Math.abs(Bridge.forward)>0); assertTrue(Math.abs(Bridge.strafe)>0);
+            assertTrue(Math.abs(Bridge.forward)>0); assertTrue(Math.abs(Bridge.strafe)>0);assertTrue(Bridge.analogue);
             buttonEvent(b,MotionEvent.ACTION_UP);
         }
         assertEquals(1,Bridge.attacks); assertEquals(1,Bridge.parries); assertEquals(1,Bridge.dodges);

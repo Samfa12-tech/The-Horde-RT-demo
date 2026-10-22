@@ -48,7 +48,7 @@ public final class ProbeBridge {
     /** Suspend owner work on a still-valid surface; Stop still retires its resources. */
     public static native boolean setDiagnosticSurfaceSuspended(long generation, boolean suspended);
     public static native int getSurfaceRuntimeState(long generation);
-    public static native void setViewControls(float yaw, float pitch, float torchLightStrength, float moveStrafe, float moveForward, boolean crouchHeld);
+    public static native void setViewControls(float yaw, float pitch, float torchLightStrength, float moveStrafe, float moveForward, boolean crouchHeld, boolean analogueMovement);
     public static native void requestToggleCrouch();
     public static native void clearCrouchIntent();
     public static native void setRunHeld(boolean held);

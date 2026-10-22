@@ -38,40 +38,16 @@ public final class AndroidControllerInputTest {
         assertFalse(input.key(key(1, KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_BUTTON_THUMBL, 0, 18), 18).handled);
     }
 
-    @Test public void leftShoulderCrouchPreservesOtherActionsAndRequiresReleaseAfterSuspension() {
+    @Test public void shouldersNeverLatchManualRunOrCrouchWhileActionsRemainIndependent() {
         AndroidControllerInput input=new AndroidControllerInput();
-        assertTrue(input.key(key(14,KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_BUTTON_L1,0,10),10).handled);
-        assertTrue(input.crouchHeld());assertFalse(input.runHeld());
-        assertEquals(AndroidControllerInput.SWING,input.key(key(14,KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_BUTTON_X,0,11),11).actions);
-        input.clearCrouchHold();assertFalse(input.crouchHeld());
-        input.key(key(14,KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_BUTTON_L1,1,12),12);assertFalse(input.crouchHeld());
-        input.key(key(14,KeyEvent.ACTION_UP,KeyEvent.KEYCODE_BUTTON_L1,0,13),13);
-        input.key(key(14,KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_BUTTON_L1,0,14),14);assertTrue(input.crouchHeld());
-        input.suspend(15);assertFalse(input.crouchHeld());
-        input.key(key(14,KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_BUTTON_L1,0,14),16);assertFalse(input.crouchHeld());
-        input.key(key(14,KeyEvent.ACTION_UP,KeyEvent.KEYCODE_BUTTON_L1,0,17),17);
-        input.key(key(14,KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_BUTTON_L1,0,18),18);assertTrue(input.crouchHeld());
-        input.removeDevice(14);assertFalse(input.crouchHeld());
-    }
-
-    @Test public void rightShoulderHoldsRunAndAlwaysClearsOnReleaseOrSuspend() {
-        AndroidControllerInput input = new AndroidControllerInput();
-        AndroidControllerInput.Result down = input.key(
-                key(14, KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_BUTTON_R1, 0, 10), 10);
-        assertTrue(down.handled);
-        assertTrue(input.runHeld());
-        assertTrue(input.key(key(14, KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_BUTTON_R1, 1, 11), 11).handled);
-        assertTrue(input.runHeld());
-        input.key(key(14, KeyEvent.ACTION_UP, KeyEvent.KEYCODE_BUTTON_R1, 0, 12), 12);
-        assertFalse(input.runHeld());
-
-        input.key(key(14, KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_BUTTON_R1, 0, 13), 13);
-        assertTrue(input.runHeld());
-        input.suspend();
-        assertFalse(input.runHeld());
-        assertEquals(0, input.key(
-                key(14, KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_BUTTON_R1, 0, 13), 20).actions);
-        assertFalse(input.runHeld());
+        for(int code:new int[]{KeyEvent.KEYCODE_BUTTON_L1,KeyEvent.KEYCODE_BUTTON_R1}) {
+            assertTrue(input.key(key(14,KeyEvent.ACTION_DOWN,code,0,10),10).handled);
+            assertFalse(input.crouchHeld());assertFalse(input.runHeld());
+            input.key(key(14,KeyEvent.ACTION_UP,code,0,11),11);
+        }
+        assertEquals(AndroidControllerInput.SWING,input.key(key(14,KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_BUTTON_X,0,12),12).actions);
+        input.suspend(13);assertFalse(input.crouchHeld());assertFalse(input.runHeld());
+        input.removeDevice(14);assertFalse(input.crouchHeld());assertFalse(input.runHeld());
     }
 
     @Test public void triggerAxesUseHysteresisAndDeduplicateTheirDigitalRepresentations() {
