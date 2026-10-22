@@ -1,0 +1,430 @@
+{
+  "schema": 1,
+  "sourceBase": "9136ff0be99b315d565231d2f672d2c90c27c6e6",
+  "disposition": "WITHDRAWN; no runtime or compiled-test adoption",
+  "reason": "Matched already-lit diag11 loses its previously visible torch; lighting repair does not admit framing.",
+  "phone": {
+    "clipSha256": "3072bdcd7bd953bf317395ea196d44ac2ea75612496e663117469fb683b54a48",
+    "intervalSeconds": [
+      27.8,
+      29.05
+    ],
+    "decodedSourceFrames": 41,
+    "darkestCentre": {
+      "index": 16,
+      "pts": 2549039,
+      "ptsSeconds": 28.322656,
+      "YMIN": 15.0,
+      "YLOW": 17.0,
+      "YAVG": 18.2411,
+      "YHIGH": 20.0,
+      "YMAX": 38.0,
+      "UMIN": 120.0,
+      "ULOW": 127.0,
+      "UAVG": 127.706,
+      "UHIGH": 128.0,
+      "UMAX": 130.0,
+      "VMIN": 125.0,
+      "VLOW": 128.0,
+      "VAVG": 128.076,
+      "VHIGH": 128.0,
+      "VMAX": 139.0,
+      "SATMIN": 0.0,
+      "SATLOW": 0.0,
+      "SATAVG": 0.349677,
+      "SATHIGH": 1.0,
+      "SATMAX": 13.0,
+      "HUEMED": 180.0,
+      "HUEAVG": 155.857,
+      "YDIF": 0.999754,
+      "UDIF": 0.425299,
+      "VDIF": 0.386245,
+      "YBITDEPTH": 6.0,
+      "UBITDEPTH": 8.0,
+      "VBITDEPTH": 8.0
+    },
+    "metric": "signalstats on encoded limited-range BT709 Y plane; not linear radiance or engine FPS",
+    "exactClipBuildSettingsUnknown": true,
+    "causeUnverified": true
+  },
+  "desktop": {
+    "gpu": {
+      "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+      "vendorId": 4318,
+      "deviceId": 11672
+    },
+    "dimensions": {
+      "renderScale": 1.0,
+      "dispatchWidth": 960,
+      "dispatchHeight": 540,
+      "swapchainWidth": 960,
+      "swapchainHeight": 540,
+      "swapchainFormat": 44
+    },
+    "settings": {
+      "shadow": {
+        "mode": "higher",
+        "localPrimarySamples": 4,
+        "skyPrimarySamples": 2,
+        "reserved": 0
+      },
+      "fire": {
+        "quality": "High",
+        "volumeSteps": 10,
+        "reflectionSamples": 2,
+        "reflectedVolumeSteps": 8
+      },
+      "mist": true,
+      "dust": 2
+    },
+    "matchedControlCandidateFrames": 48,
+    "originalCornerFailure": "Dedicated viewmodel capture lacks modelled primary arms or contains legacy/full-body primary ownership: dedicated=1, visible=1, armPixels=0.",
+    "processes": {
+      "current-route-probe": {
+        "pid": 28348,
+        "exitCode": 0,
+        "finishedUtc": "2026-10-22T22:16:08.2574394Z",
+        "executableSha256": "f6ed96b6389d19a3e3e80bb5fa95970275b9eeb075e5e08f0b4dba080f019108"
+      },
+      "side-wall-probe": {
+        "finishedUtc": "2026-10-22T22:18:07.8612720Z",
+        "pid": 48352,
+        "executableSha256": "9af770fc03857e77ac3b7554f0cbcc650fc1fa852c24274ba6006b16492bc14e",
+        "exitCode": 0
+      },
+      "side-wall-candidate": {
+        "executableSha256": "22a92744ed49d03c728d37f4bc8171eecf2fa706a56c604c31570f0a3aca13f1",
+        "pid": 75544,
+        "exitCode": 0,
+        "finishedUtc": "2026-10-22T22:21:24.3026783Z"
+      },
+      "corrected-three-witnesses": {
+        "finishedUtc": "2026-10-22T22:32:32.3490404Z",
+        "pid": 75640,
+        "executableSha256": "201f043be2424e39a3880a10430073cbaaf7c8839b421028ba3ea33c960fe28d",
+        "exitCode": 0
+      },
+      "final-portal-native": {
+        "pid": 28348,
+        "executableSha256": "4858ba829cc65f948d6589c63ff5662f81ab8a9aad6232b81dff3fe3d4609443",
+        "finishedUtc": "2026-10-22T22:30:29.6357713Z",
+        "exitCode": 0
+      }
+    },
+    "finalThree": {
+      "evidenceClass": "post-centre-correction geometry confirmation; sparse look sequence has different ticks, no matched pixel/timing claim",
+      "rows": [
+        {
+          "index": 0,
+          "place": 2,
+          "angle": 13,
+          "camera": [
+            1.59908,
+            -0.95,
+            -4.9,
+            1.9635,
+            -0.15
+          ],
+          "identity": {
+            "sceneEpoch": 2,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 100,
+            "recordSerial": 100,
+            "submissionSerial": 100,
+            "completionSerial": 100,
+            "simulationTick": 408,
+            "frameSlot": 0
+          },
+          "fireLighting": {
+            "count": 1,
+            "emitters": [
+              {
+                "stableId": 1,
+                "positionStrength": [
+                  1.51957238,
+                  0.878376782,
+                  -4.97820711,
+                  1.4999311
+                ],
+                "colourIntensity": [
+                  1,
+                  0.454960018,
+                  0.0977689177,
+                  1.4999311
+                ]
+              },
+              {
+                "stableId": 0,
+                "positionStrength": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "colourIntensity": [
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "stableId": 0,
+                "positionStrength": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "colourIntensity": [
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "stableId": 0,
+                "positionStrength": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "colourIntensity": [
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            ]
+          },
+          "imageSha256": "a13986130ca862255a69a67da08db5649064b799d6f76d88f4d09568590a9044",
+          "armPixels": 0
+        },
+        {
+          "index": 1,
+          "place": 4,
+          "angle": 5,
+          "camera": [
+            -1.59907,
+            -0.95,
+            -4.9,
+            -1.1781,
+            -0.15
+          ],
+          "identity": {
+            "sceneEpoch": 2,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 144,
+            "recordSerial": 144,
+            "submissionSerial": 144,
+            "completionSerial": 144,
+            "simulationTick": 588,
+            "frameSlot": 0
+          },
+          "fireLighting": {
+            "count": 1,
+            "emitters": [
+              {
+                "stableId": 1,
+                "positionStrength": [
+                  -1.51957214,
+                  0.878376782,
+                  -4.82126713,
+                  1.58388805
+                ],
+                "colourIntensity": [
+                  1,
+                  0.454960018,
+                  0.0977689177,
+                  1.58388805
+                ]
+              },
+              {
+                "stableId": 0,
+                "positionStrength": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "colourIntensity": [
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "stableId": 0,
+                "positionStrength": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "colourIntensity": [
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "stableId": 0,
+                "positionStrength": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "colourIntensity": [
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            ]
+          },
+          "imageSha256": "117db617b2c1d8b3ca83b4b687507c9b278fda94647bf5019336fd387d1f3427",
+          "armPixels": 0
+        },
+        {
+          "index": 2,
+          "place": 7,
+          "angle": 0,
+          "camera": [
+            0.94955,
+            -0.95,
+            -9.39919,
+            -3.14159,
+            -0.15
+          ],
+          "identity": {
+            "sceneEpoch": 2,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 220,
+            "recordSerial": 220,
+            "submissionSerial": 220,
+            "completionSerial": 220,
+            "simulationTick": 901,
+            "frameSlot": 0
+          },
+          "fireLighting": {
+            "count": 1,
+            "emitters": [
+              {
+                "stableId": 1,
+                "positionStrength": [
+                  1.02060199,
+                  0.812253177,
+                  -8.76446724,
+                  1.53417897
+                ],
+                "colourIntensity": [
+                  1,
+                  0.454960018,
+                  0.0977689177,
+                  1.53417897
+                ]
+              },
+              {
+                "stableId": 0,
+                "positionStrength": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "colourIntensity": [
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "stableId": 0,
+                "positionStrength": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "colourIntensity": [
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "stableId": 0,
+                "positionStrength": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "colourIntensity": [
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            ]
+          },
+          "imageSha256": "1719caf9bed128f56e35945f3fd8e1290f4f19085f97bee9a9496361b4c28945",
+          "armPixels": 6243
+        }
+      ]
+    }
+  },
+  "withdrawal": {
+    "reason": "new torch disappears in an already-lit matched wall view; no default runtime adoption",
+    "files": [
+      {
+        "path": "src/gameplay/items/HeldItemKinematics.cpp",
+        "rejectedSha256": "0940c52b0c5fbfeb0e6e9432cfea169cacf14f792fc619af82c7cab6d35c5d30",
+        "restoredSha256": "f8df4fac496c8d66188256342b052d556defaf872908cccc2e6aed2059ea9871",
+        "matchesHead": true
+      },
+      {
+        "path": "tests/HeldItemClearanceTests.cpp",
+        "rejectedSha256": "3f0d2e0f8c106cbc63f21fd262c382dd977af19fb78449e910a157b2ca129ab0",
+        "restoredSha256": "6e09541f847ca44ab446a31791a48080b354cf7a65519a6646d581dc65e12775",
+        "matchesHead": true
+      },
+      {
+        "path": "src\\platform\\windows\\DiagnosticWindow.cpp",
+        "restoredSha256": "f86f3c6f7e0bec115416cd84298b33b1861ba3e7b82d195e3580cbee3c1dc9eb",
+        "matchesOriginal": true
+      }
+    ]
+  },
+  "patch": {
+    "file": "withdrawn-candidate.patch.gz",
+    "uncompressedSha256": "1c94cbcbf01463d3c5d0e09b6c6055ec9e1e155bc7f62db9bb027e961b6ef6d0",
+    "compressedSha256": "b7ca20e0316536c6633bd5a3d6e4307a6390f42f62ee001a01eb2e8199daa5e5"
+  },
+  "limitations": [
+    "Hidden current-chapter input-driven frozen diagnostic, not physical controls or a full natural playthrough.",
+    "Final portal witness is a historical seeded static checkpoint, not the phone pose.",
+    "Close-wall arm/torch framing is unadmitted. Outer-union proof does not certify pillars.",
+    "No performance or Android benefit claimed; no phone operations.",
+    "Existing Debug campaign route30-second gate remains open; prior direct145-check run completed39.264seconds.",
+    "PR27 conflicts and all base integration remain unapplied."
+  ],
+  "restoredValidation": {
+    "tests": "3/3 original clearance/socket/transition contracts pass",
+    "sourceDiffEmpty": true,
+    "finalExecutableSha256": "d1b964c6397fa77524da66e1a23c778dff1f53226aa2400ddb5548e32ff338b4",
+    "settingsAndCanonicalOwnerFileHashesUnchanged": true,
+    "campaignRootAbsent": true,
+    "ownedNativeProcessesComplete": true
+  }
+}
