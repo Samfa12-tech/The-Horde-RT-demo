@@ -194,6 +194,16 @@ if (chapterRouteTimingValue != null && !(chapterRouteTimingValue in ['true', 'fa
     throw new GradleException('Route timing properties must be true or false.')
 }
 def chapterRouteTiming = chapterRouteTimingValue == 'true'
+def outdoorScaleProbeValue = providers.gradleProperty('hordeRtOutdoorScaleProbe').orNull
+if (outdoorScaleProbeValue != null && !(outdoorScaleProbeValue in ['true', 'false'])) {
+    throw new GradleException('hordeRtOutdoorScaleProbe must be true or false.')
+}
+def outdoorScaleProbe = outdoorScaleProbeValue == 'true'
+if (outdoorScaleProbe && (!chapterRouteTiming || hordeBenchmarkValidation ||
+        hordeStagedPrimaryDebugValidation || providers.gradleProperty('hordeViewmodelCandidateDir').isPresent() ||
+        hordeRegionPagePrototypeRootProperty != null)) {
+    throw new GradleException('Outdoor scale probe requires ordinary private Debug route timing without other renderer experiments.')
+}
 def frameStageProbeValue = providers.gradleProperty('hordeFrameStageProbe').orNull
 if (frameStageProbeValue != null && !(frameStageProbeValue in ['true', 'false'])) {
     throw new GradleException('hordeFrameStageProbe must be true or false.')
@@ -553,6 +563,7 @@ android {
         versionName hordeVersionName
         buildConfigField 'boolean', 'VIEWMODEL_CANDIDATE', 'false'
         buildConfigField 'boolean', 'MOTION_VALIDATION', 'false'
+        buildConfigField 'boolean', 'OUTDOOR_SCALE_PROBE', 'false'
         buildConfigField 'int', 'MIN_RENDER_SCALE_PERCENT', '33'
         resValue 'string', 'alpha_version', "SHOWCASE · ALPHA ${hordeVersionName}"
 
@@ -589,6 +600,7 @@ android {
         debug {
             applicationIdSuffix hordeStagedPrimaryDebugValidation ? '.debug.staged' : (viewmodelCandidate ? '.debug.viewmodel' : '.debug')
             buildConfigField 'boolean', 'VIEWMODEL_CANDIDATE', viewmodelCandidate ? 'true' : 'false'
+            buildConfigField 'boolean', 'OUTDOOR_SCALE_PROBE', outdoorScaleProbe ? 'true' : 'false'
             if (viewmodelCandidate) resValue 'string', 'app_name', 'Horde RT Viewmodel Candidate'
             if (hordeStagedPrimaryDebugValidation) resValue 'string', 'app_name', 'Horde RT Staged Investigation'
             versionNameSuffix '-debug'
@@ -597,6 +609,7 @@ android {
                 cmake {
                     arguments '-DHORDE_RT_DEBUG_CHECKPOINTS=ON',
                         "-DHORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING=${chapterRouteTiming ? 'ON' : 'OFF'}",
+                        "-DHORDE_RT_ANDROID_OUTDOOR_SCALE_PROBE=${outdoorScaleProbe ? 'ON' : 'OFF'}",
                         "-DHORDE_RT_FRAME_STAGE_PROBE=${frameStageProbe ? 'ON' : 'OFF'}",
                         "-DHORDE_RT_DISPATCH_CLOCK_PROBE=${dispatchClockProbe ? 'ON' : 'OFF'}",
                         "-DHORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=${viewmodelCandidate ? 'ON' : 'OFF'}",

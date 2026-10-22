@@ -41,10 +41,14 @@ bool WriteAndroidMotion(SwapchainContext& context)
         << ",\"dust\":" << static_cast<int>(run.settings.dustQuality)
         << ",\"compiledQuality\":" << JsonUtf8String(context.rtScene.SelectedDielectricQualityName())
         << ",\"inputOrigin\":\"harness-generated axes and timestamped edges; not touch latency\""
+        << ",\"outdoorHold\":{\"enabled\":"
+        << (run.selected==horde::gameplay::validation::MotionScenario::ChapterOutdoorScaleHold ? "true" : "false")
+        << ",\"startWallNanoseconds\":" << run.scenario.StartWallNanoseconds()
+        << ",\"warmupWallSeconds\":10,\"sampleWallSeconds\":30,\"normalFixedStep\":true}"
         << ",\"limits\":{\"armingSeconds\":30,\"wallSeconds\":120,\"captures\":64}"
         << ",\"isolation\":{\"secondSimulation\":false,\"fixedDeltaOverride\":false,"
            "\"phaseForced\":false,\"preferencesWritten\":false,\"ownerAcceptance\":false,"
-           "\"timingScope\":\"moving scenario; capture roster declares readbacks; not sustained FPS or scanout\"}"
+           "\"timingScope\":\"named generated-input scenario; capture roster declares readbacks; not sustained FPS or scanout\"}"
         << ",\"captures\":" << run.captures << "]}";
     return WriteTextFile(run.path + "-manifest.tmp", manifest.str()) &&
         std::rename((run.path + "-manifest.tmp").c_str(), (run.path + "-manifest.json").c_str()) == 0;
@@ -67,7 +71,8 @@ void PollAndroidChapterTerminalTimingDrain(SwapchainContext& context)
              ? horde::gameplay::validation::ChapterPerformanceCountersValid(
                  run.chapterBaseline.unloads,run.chapterBaseline.restores,d.unloads,d.restores)
              : horde::gameplay::validation::ChapterResidencyCountersValid(run.scenario.RetainChapterDetail() ||
-               run.selected==horde::gameplay::validation::MotionScenario::KeeperTorchTransition,
+               run.selected==horde::gameplay::validation::MotionScenario::KeeperTorchTransition ||
+               run.selected==horde::gameplay::validation::MotionScenario::ChapterOutdoorScaleHold,
                run.chapterBaseline.unloads,run.chapterBaseline.restores,d.unloads,d.restores)) ||
            d.savedOwnerBytes || d.preparationFailures ||
            !context.rtScene.StaticGeometryHasCompleteContributors() || s.staticDetailLease.resourceGeneration) {
@@ -265,10 +270,22 @@ bool WriteAndroidMotionValidationReport(SwapchainContext& context)
          << ",\"scenario\":" << JsonUtf8String(horde::gameplay::validation::MotionScenarioName(run.selected))
          << ",\"buildId\":" << JsonUtf8String(HORDE_RT_BUILD_ID)
          << ",\"simulationPolicy\":\"shared GameSimulation.AdvanceFrame with raw monotonic input-owner delta and normal fixed-step catch-up; generated motion axes/edges enter through the existing InputMailbox owner; no per-render fixed-delta override\""
+         << ",\"outdoorHold\":{\"enabled\":"
+         << (run.selected==horde::gameplay::validation::MotionScenario::ChapterOutdoorScaleHold ? "true" : "false")
+         << ",\"startWallNanoseconds\":" << run.scenario.StartWallNanoseconds()
+         << ",\"warmupWallSeconds\":10,\"sampleWallSeconds\":30,\"normalFixedStep\":true}"
          << ",\"limits\":{\"wallSeconds\":120,\"presentationDrainMilliseconds\":2000,\"stateRows\":16384,\"eventRows\":1024,\"rtRows\":16384,\"captures\":64,\"presentationRows\":32768,\"presentationPending\":256}"
          << ",\"settings\":{\"scalePercent\":" << static_cast<unsigned>(std::lround(context.renderScale * 100.0f))
          << ",\"width\":" << context.swapchainExtent.width << ",\"height\":" << context.swapchainExtent.height
          << ",\"internalWidth\":" << internalExtent.width << ",\"internalHeight\":" << internalExtent.height
+         << ",\"nativeWindowWidth\":" << context.nativeWindowExtent.width
+         << ",\"nativeWindowHeight\":" << context.nativeWindowExtent.height
+         << ",\"surfaceCurrentWidth\":" << context.surfaceCurrentExtent.width
+         << ",\"surfaceCurrentHeight\":" << context.surfaceCurrentExtent.height
+         << ",\"surfaceCurrentTransform\":" << static_cast<unsigned>(context.surfaceCurrentTransform)
+         << ",\"swapchainPreTransform\":" << static_cast<unsigned>(context.swapchainPreTransform)
+         << ",\"rtPreRotationRequired\":" << (context.rtPreRotationRequired ? "true" : "false")
+         << ",\"rtPresentationTransform\":" << static_cast<unsigned>(context.rtPresentationTransform)
          << ",\"backend\":" << JsonUtf8String(horde::vulkan::ToString(context.executionBackend))
          << ",\"water\":" << static_cast<int>(run.settings.waterQuality)
          << ",\"fire\":" << static_cast<int>(run.settings.fireDetail)
@@ -308,7 +325,7 @@ bool WriteAndroidMotionValidationReport(SwapchainContext& context)
          << ",\"compiledQuality\":" << JsonUtf8String(context.rtScene.SelectedDielectricQualityName())
          << ",\"inputOrigin\":\"harness-generated axes and timestamped edges; not touch latency\""
          << ",\"limits\":{\"armingSeconds\":30,\"wallSeconds\":120,\"presentationDrainMilliseconds\":2000,\"captures\":64}"
-         << ",\"isolation\":{\"secondSimulation\":false,\"fixedDeltaOverride\":false,\"phaseForced\":false,\"preferencesWritten\":false,\"ownerAcceptance\":false,\"timingScope\":\"moving scenario with actual image presentation timestamps; capture roster declares readbacks; not scanout, photons, or long-duration acceptance\"}"
+         << ",\"isolation\":{\"secondSimulation\":false,\"fixedDeltaOverride\":false,\"phaseForced\":false,\"preferencesWritten\":false,\"ownerAcceptance\":false,\"timingScope\":\"named generated-input scenario with actual image presentation timestamps; capture roster declares readbacks; not scanout, photons, or long-duration acceptance\"}"
          << ",\"captures\":" << run.captureCount << '}';
     json << ",\"motionEvidence\":" << evidence.str()
          << ",\"motionImageCaptures\":" << run.captures << ']'
@@ -560,6 +577,9 @@ void BuildAndroidMotionInput(SwapchainContext& context,
         auto& run = *context.motion;
         run.id = gMotionRequestedId;
         run.selected = gMotionRequestedScenario;
+        if(run.selected==validation::MotionScenario::ChapterOutdoorScaleHold && !HORDE_RT_ANDROID_OUTDOOR_SCALE_PROBE) {
+            FailAndroidMotion(context,"Outdoor scale hold requires the explicit private Debug probe build.");return;
+        }
         if(validation::IsTimedMotionScenario(run.selected)) {
 #if HORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING
             // Resume an already admitted chapter (reunion, or live lower start

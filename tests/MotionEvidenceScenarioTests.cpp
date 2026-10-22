@@ -2,6 +2,7 @@
 #include "telemetry/MotionEvidenceLedger.h"
 #include "platform/android/AndroidMotionEvidencePolicy.h"
 #include "scene/ShowcaseOverheadGeometry.h"
+#include "gameplay/DevelopmentCheckpointSimulation.h"
 
 #include <algorithm>
 #include <cmath>
@@ -281,6 +282,73 @@ void TestSwordTransitionLedgerIsolation()
 void TestAdmissionAndFrameBinding()
 {
     MotionScenario parsed{};
+    {
+        GameSimulation live(ProductionGameSimulationConfig());MotionEvidenceScenario probe;
+        Check(probe.Begin(MotionScenario::TorchLowOpening,live,1),"ledger diagnostic fixture uses canonical production state");
+        const auto rejects=[&](const SimulationSnapshot& state,const InputSnapshot& input,std::string_view expected) {
+            MotionEvidenceLedger ledger;
+            Check(ledger.Begin("exact_admission_reason",MotionScenario::TorchLowOpening) &&
+                  !ledger.AppendState(2,state,input,probe,{}) && ledger.States().empty() && ledger.Failure()==expected,
+                  "split ledger diagnostics preserve the original fail-closed state admission");
+        };
+        auto overflow=live.Snapshot();overflow.eventQueueOverflowCount=1;
+        rejects(overflow,{},"Motion semantic event queue overflow count is nonzero.");
+        InputSnapshot forced;forced.hasAuthoritativePlayerPose=true;
+        rejects(live.Snapshot(),forced,"Motion input contains an authoritative player pose.");
+        InputSnapshot outside;outside.moveForward=1.1f;
+        rejects(live.Snapshot(),outside,"Motion input axes exceed their admitted bounds.");
+    }
+    Check(ParseMotionScenario("chapter-outdoor-scale-hold",parsed) &&
+          parsed==MotionScenario::ChapterOutdoorScaleHold && IsTimedMotionScenario(parsed) &&
+          !IsChapterMotionScenario(parsed), "outdoor hold has its own exact timed identity, never the tomb round-trip route");
+    {
+        auto config=ProductionGameSimulationConfig();config.developmentRescueJourney=true;config.authoredChapterTerrain=true;
+        GameSimulation outdoor(config);MotionEvidenceScenario hold;
+        const auto tick=outdoor.Snapshot().tickIndex;
+        Check(!hold.Begin(MotionScenario::ChapterOutdoorScaleHold,outdoor,1) && outdoor.Snapshot().tickIndex==tick,
+              "outdoor hold rejects unprepared/non-lookout starts without seeding or advancing them");
+        // CPU contract fixture only. The rejected first fixture attempted full
+        // checkpoint203 route staging over blockout triangles, which do not
+        // cover every forest tree origin: ChapterExteriorObstacleClear rejects
+        // a terrain missing any of those required ground samples, even when
+        // that tree is distant from the player's local sweep.
+        // Use the existing restore API and an explicit flat test surface to
+        // test this observer, without claiming natural traversal or RT proof.
+        const std::array<TriangleSupportSurface::Triangle,2> triangles{{
+            {{{{-100,-1.15f,-100},{-100,-1.15f,100},{100,-1.15f,100}}},SupportSurface::Earth},
+            {{{{-100,-1.15f,-100},{100,-1.15f,100},{100,-1.15f,-100}}},SupportSurface::Earth}}};
+        std::string error;const auto terrain=TriangleSupportSurface::Build(triangles,error);
+        Check(terrain && std::all_of(kForestTreePlacementContract.begin(),kForestTreePlacementContract.end(),
+              [&](const auto& tree){return terrain->Query(tree.x,tree.z).found;}),
+              "CPU fixture covers every required forest trunk ground sample, including distant trees");
+        campaign::Checkpoint checkpoint;checkpoint.contentRevision=2;
+        checkpoint.id=campaign::CheckpointId::ForestEndpoint;checkpoint.zone=WorldZoneId::Lookout;
+        checkpoint.position={kWorldRoutePoints.back().x,-1.15f,kWorldRoutePoints.back().z};
+        checkpoint.yaw=2.51f;checkpoint.pitch=-.15f;checkpoint.firstAscentCompleted=true;
+        checkpoint.dialogue.grateConsumed=checkpoint.dialogue.rescueConsumed=checkpoint.dialogue.reunionStarted=true;
+        checkpoint.dialogue.proofAccepted=checkpoint.dialogue.forestNightConsumed=true;
+        checkpoint.dialogue.forestWaystoneConsumed=checkpoint.dialogue.forestClueConsumed=checkpoint.dialogue.forestVillageConsumed=true;
+        const auto restore=outdoor.BeginCampaignRestore(checkpoint);
+        Check(terrain && restore && outdoor.CommitCampaignRestore(*restore,{restore->worldGeneration,WorldZoneId::Lookout},terrain,{}),
+              "CPU-only lookout fixture uses validated campaign restore on explicit test terrain; it is not natural traversal evidence");
+        InputSnapshot neutral;neutral.yawRadians=checkpoint.yaw;neutral.pitchRadians=checkpoint.pitch;
+        outdoor.StepFixed(neutral);outdoor.ClearEvents();
+        const auto initial=outdoor.Snapshot();
+        Check(hold.Begin(MotionScenario::ChapterOutdoorScaleHold,outdoor,1) && outdoor.Snapshot().tickIndex==initial.tickIndex,
+              "ready outdoor hold observes rather than reseeds its route start");
+        std::uint64_t now=1;InputSnapshot owner;
+        for(unsigned frame=0;frame<2401 && !hold.Complete() && !hold.Failed();++frame) {
+            now+=16'666'667ull;auto input=hold.BuildInput(outdoor.Snapshot(),owner,now,true);
+            Check(input.moveForward==0 && input.moveStrafe==0 && !input.hasAuthoritativePlayerPose && !input.paused,
+                  "hold advances ordinary neutral input without importing player transforms");
+            outdoor.AdvanceFrame(input,1./60.);hold.ObserveAdvance(outdoor.Snapshot(),outdoor.Events().Events());outdoor.ClearEvents();
+        }
+        if(!hold.Complete())std::cerr<<"Outdoor hold: "<<hold.Failure()<<'\n';
+        Check(hold.Complete() && outdoor.Snapshot().tickIndex>initial.tickIndex+2300 &&
+              std::hypot(outdoor.Snapshot().playerX-initial.playerX,outdoor.Snapshot().playerZ-initial.playerZ)<.001f,
+              "bounded40s wall hold advances live fixed steps while preserving position");
+
+    }
     Check(ParseMotionScenario("keeper-first-entry", parsed) && parsed == MotionScenario::KeeperFirstEntry &&
           !ParseMotionScenario("keeper-first-entry ", parsed) && !ParseMotionScenario("../torch-low-opening", parsed),
           "exact scenario parser cannot silently broaden unsupported launch input");

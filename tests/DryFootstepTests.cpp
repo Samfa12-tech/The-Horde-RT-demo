@@ -1,6 +1,7 @@
 #include "gameplay/DryFootstepFeedback.h"
 #include "gameplay/effects/WaterContact.h"
 #include "gameplay/simulation/GameSimulation.h"
+#include "gameplay/DevelopmentCheckpointSimulation.h"
 #include "platform/android/GameplayEventMetadata.h"
 #include "scene/ChapterTerrainSurface.h"
 #include "scene/assets/AssetManifest.h"
@@ -350,6 +351,26 @@ void RopeAndRestore(const std::shared_ptr<const TriangleSupportSurface>& terrain
     sim.ClearEvents(); sim.StepFixed(input, kTick, ++publication);
     Check(StepCount(sim) == 0, "new neutral post-load publication has no stale footsteps");
 }
+
+void ActualTerrainCheckpointPreparation(const std::shared_ptr<const TriangleSupportSurface>& terrain) {
+    auto config=ProductionGameSimulationConfig();config.developmentRescueJourney=true;config.authoredChapterTerrain=true;
+    GameSimulation sim(config);DevelopmentCheckpointStageEvidence evidence;
+    const auto* checkpoint=FindDevelopmentCheckpoint("chapter-forest-lookout");
+    const bool ready=sim.PublishChapterTerrain({sim.Snapshot().worldRoute.generation,WorldZoneId::TombExterior},terrain);
+    const bool staged=ready && checkpoint && StageDevelopmentCheckpointSimulation(sim,*checkpoint,&evidence);
+    const auto& state=sim.Snapshot();
+    std::cout<<"actual-terrain203 staged="<<staged<<" failure="<<DevelopmentCheckpointStageFailureName(evidence.failure)
+        <<" overflow="<<state.eventQueueOverflowCount<<" tick="<<state.tickIndex<<" x="<<state.playerX
+        <<" z="<<state.playerZ<<" y="<<state.playerSupportWorldY<<" claim="<<state.rescue.claimCount
+        <<" deployment="<<state.rescue.deploymentCount<<" attackEdges="<<evidence.consumedAttackEdges
+        <<" swingEvents="<<evidence.playerSwingEvents<<" enemyHits="<<evidence.enemyHitEvents<<'\n';
+    Check(staged && state.rescue.exteriorSide && !state.rescue.equipmentStowed && state.rescue.firstAscentCompleted &&
+          state.rescue.claimCount==1 && state.rescue.deploymentCount==1 &&
+          std::hypot(state.playerX-kWorldRoutePoints.back().x,state.playerZ-kWorldRoutePoints.back().z)<.01f,
+          "actual imported terrain checkpoint203 retains its existing rope and collision-resolved route staging");
+    Check(state.eventQueueOverflowCount==0 && sim.Events().Empty(),
+          "long diagnostic exterior preparation drains events without overflowing or erasing an overflow counter");
+}
 } // namespace
 
 int main(int argc, char** argv) {
@@ -371,6 +392,7 @@ int main(int argc, char** argv) {
     ActualTerrainAndBoundary(terrain);
     RopeAndRestore(terrain, false);
     RopeAndRestore(terrain, true);
+    ActualTerrainCheckpointPreparation(terrain);
     std::cout << checks << " dry footstep host checks, " << failures << " failures\n";
     std::cout << "Logical restore and native CPU terrain/motor fixtures only. Airborne gate is a cadence unit check; "
                  "no jump motor, actual listening or physical device acceptance is claimed.\n";

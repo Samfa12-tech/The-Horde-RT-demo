@@ -125,6 +125,23 @@ inline bool StageDevelopmentCheckpointSimulation(
         gameSimulation.Snapshot().lastConsumedAttackSequence;
     const std::uint64_t initialConsumedParrySequence =
         gameSimulation.Snapshot().lastConsumedParrySequence;
+    const auto accumulateEvents = [&]()
+    {
+        if (evidence == nullptr) return;
+        for (const simulation::GameplayEvent& event : gameSimulation.Events().Events())
+        {
+            if (event.type == simulation::GameplayEventType::PlayerSwing)
+                ++evidence->playerSwingEvents;
+            if (event.type == simulation::GameplayEventType::PlayerParrySucceeded)
+                ++evidence->playerParrySucceededEvents;
+            if (event.type == simulation::GameplayEventType::PlayerDamaged)
+                ++evidence->playerDamagedEvents;
+            if (event.type == simulation::GameplayEventType::PlayerKilled)
+                ++evidence->playerKilledEvents;
+            if (event.type == simulation::GameplayEventType::EnemyHit)
+                ++evidence->enemyHitEvents;
+        }
+    };
     const auto finalize = [&](const bool staged)
     {
         if (evidence != nullptr)
@@ -139,20 +156,8 @@ inline bool StageDevelopmentCheckpointSimulation(
                 initialConsumedParrySequence);
             evidence->action = gameSimulation.Snapshot().playerCombat.action;
             evidence->actionTime = gameSimulation.Snapshot().playerCombat.actionTime;
-            for (const simulation::GameplayEvent& event : gameSimulation.Events().Events())
-            {
-                if (event.type == simulation::GameplayEventType::PlayerSwing)
-                    ++evidence->playerSwingEvents;
-                if (event.type == simulation::GameplayEventType::PlayerParrySucceeded)
-                    ++evidence->playerParrySucceededEvents;
-                if (event.type == simulation::GameplayEventType::PlayerDamaged)
-                    ++evidence->playerDamagedEvents;
-                if (event.type == simulation::GameplayEventType::PlayerKilled)
-                    ++evidence->playerKilledEvents;
-                if (event.type == simulation::GameplayEventType::EnemyHit)
-                    ++evidence->enemyHitEvents;
-            }
         }
+        accumulateEvents();
         gameSimulation.ClearEvents();
         return staged;
     };
@@ -175,7 +180,15 @@ inline bool StageDevelopmentCheckpointSimulation(
                 static_cast<simulation::WorldZoneId>(i)},chapterTerrain))return finalize(false);
         simulation::InputSnapshot routeInput;routeInput.damageEnabled=false;routeInput.tutorialEnabled=false;
         routeInput.yawRadians=checkpoint.yaw;routeInput.pitchRadians=checkpoint.pitch;
-        const auto advance=[&](){stepFixed(routeInput,1.0f/60.0f,gameSimulation.Snapshot().inputPublicationSequence+1);};
+        const auto advance=[&](){
+            stepFixed(routeInput,1.0f/60.0f,gameSimulation.Snapshot().inputPublicationSequence+1);
+            // Diagnostic exterior preparation can cover thousands of ticks in
+            // one owner call. Observe and retain evidence before draining each
+            // step, as live owners do; never erase a recorded overflow count.
+            // Combat checkpoint staging retains its existing finalizer path.
+            accumulateEvents();
+            gameSimulation.ClearEvents();
+        };
         for(int tick=0;tick<420&&!gameSimulation.Snapshot().rescue.ropeReady;++tick)advance();
         if(!gameSimulation.Snapshot().rescue.ropeReady)return finalize(false);
         routeInput.commands.interact=gameSimulation.Snapshot().lastConsumedInteractSequence+1;advance();

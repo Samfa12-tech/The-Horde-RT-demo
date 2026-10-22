@@ -1,0 +1,3 @@
+actual-terrain203 staged=1 failure=none overflow=0 tick=2757 x=13.3049 z=36.2046 y=-1.14039 claim=1 deployment=1 attackEdges=0 swingEvents=0 enemyHits=0
+461 dry footstep host checks, 0 failures
+Logical restore and native CPU terrain/motor fixtures only. Airborne gate is a cadence unit check; no jump motor, actual listening or physical device acceptance is claimed.

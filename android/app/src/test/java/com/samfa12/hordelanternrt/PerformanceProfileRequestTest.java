@@ -24,6 +24,29 @@ public class PerformanceProfileRequestTest {
         assertTrue(resolve("dust-off").same(new GraphicsPreferences.Values(40,1,0,30,false,1,true,0)));
         assertTrue(resolve("combined").same(new GraphicsPreferences.Values(40,1,2,30,false,1,false,0)));
     }
+    @Test public void privateOutdoorScaleProbePreservesEveryOtherSettingAndCannotPersist20() {
+        GraphicsPreferences.Values owner=new GraphicsPreferences.Values(33,1,0,30,false,1,false,1);
+        SharedPreferences p=RuntimeEnvironment.getApplication().getSharedPreferences("outdoor-transient",0);
+        p.edit().clear().commit();assertTrue(GraphicsPreferences.confirm(p,owner));
+        java.util.Map<String,?> before=p.getAll();
+        for(int scale:new int[]{20,33,40}) {
+            Intent request=intent("scale-"+scale).putExtra("horde.debug.motion","chapter-outdoor-scale-hold");
+            GraphicsPreferences.Values actual=PerformanceProfileRequest.resolve(request,true,true,false,owner,true);
+            assertNotNull(actual);
+            assertTrue(actual.same(new GraphicsPreferences.Values(scale,1,0,30,false,1,false,1)));
+            assertNull(PerformanceProfileRequest.resolve(request,true,true,false,owner,false));
+            assertNull(PerformanceProfileRequest.resolve(request,false,true,false,owner,true));
+            assertNull(PerformanceProfileRequest.resolve(request,true,false,false,owner,true));
+            assertNull(PerformanceProfileRequest.resolve(request,true,true,true,owner,true));
+            if(scale==20) {
+                assertFalse(actual.valid());assertFalse(GraphicsPreferences.confirm(p,actual));
+                assertFalse(GraphicsPreferences.markPending(p,actual));
+            }
+            assertEquals(before,p.getAll());
+        }
+        assertNull(PerformanceProfileRequest.resolve(intent("baseline").putExtra("horde.debug.motion","chapter-outdoor-scale-hold"),true,true,false,owner,true));
+        assertNull(PerformanceProfileRequest.resolve(intent("scale-20"),true,true,false,saved,true));
+    }
     @Test public void rejectsReleaseWrongScopeUnknownAndWrongTypes() {
         assertNull(resolve("unknown"));
         assertNull(PerformanceProfileRequest.resolve(intent("combined"),false,true,false,saved));

@@ -17,6 +17,9 @@ inline constexpr double kGraphicsConfirmationSeconds = 15.0;
 #ifndef HORDE_RT_MIN_RENDER_SCALE_PERCENT
 #define HORDE_RT_MIN_RENDER_SCALE_PERCENT 33
 #endif
+#ifndef HORDE_RT_ANDROID_OUTDOOR_SCALE_PROBE
+#define HORDE_RT_ANDROID_OUTDOOR_SCALE_PROBE 0
+#endif
 #if HORDE_RT_MIN_RENDER_SCALE_PERCENT != 33 && HORDE_RT_MIN_RENDER_SCALE_PERCENT != 50
 #error "Render scale minimum must be 33 or 50."
 #endif
@@ -24,6 +27,7 @@ inline constexpr int kMinimumGraphicsRenderScalePercent = HORDE_RT_MIN_RENDER_SC
 inline constexpr bool ValidGraphicsRenderScalePercent(const int percent) noexcept
 {
     return (percent >= 50 && percent <= 100) ||
+        (HORDE_RT_ANDROID_OUTDOOR_SCALE_PROBE && percent == 20) ||
         (kMinimumGraphicsRenderScalePercent <= 40 && percent == 40) ||
         (kMinimumGraphicsRenderScalePercent == 33 && percent == 33);
 }

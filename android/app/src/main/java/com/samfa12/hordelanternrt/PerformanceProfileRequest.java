@@ -8,8 +8,13 @@ final class PerformanceProfileRequest {
     private PerformanceProfileRequest() {}
     static GraphicsPreferences.Values resolve(Intent intent, boolean debug, boolean motionRequested,
             boolean hasRtLabIntent, GraphicsPreferences.Values current) {
-        if (intent == null || !debug || !motionRequested || hasRtLabIntent || current == null ||
-                current.scale != 40 || !"chapter-performance-route".equals(intent.getStringExtra("horde.debug.motion"))) return null;
+        return resolve(intent,debug,motionRequested,hasRtLabIntent,current,BuildConfig.OUTDOOR_SCALE_PROBE);
+    }
+    static GraphicsPreferences.Values resolve(Intent intent, boolean debug, boolean motionRequested,
+            boolean hasRtLabIntent, GraphicsPreferences.Values current, boolean outdoorProbeBuild) {
+        if (intent == null || !debug || !motionRequested || hasRtLabIntent || current == null) return null;
+        final boolean outdoor=outdoorProbeBuild && "chapter-outdoor-scale-hold".equals(intent.getStringExtra("horde.debug.motion"));
+        if (!outdoor && (current.scale != 40 || !"chapter-performance-route".equals(intent.getStringExtra("horde.debug.motion")))) return null;
         try {
             for (String key : intent.getExtras().keySet()) {
                 if (key.startsWith("horde.debug.") && !key.equals(EXTRA) &&
@@ -18,6 +23,19 @@ final class PerformanceProfileRequest {
             }
             Object raw = intent.getExtras().get(EXTRA);
             if (!(raw instanceof String)) return null;
+            if (outdoor) {
+                if (!current.valid()) return null;
+                final int scale;
+                switch ((String)raw) {
+                    case "scale-20": scale=20; break;
+                    case "scale-33": scale=33; break;
+                    case "scale-40": scale=40; break;
+                    default: return null;
+                }
+                // Transient native request only: Values.valid/storage/UI remain min33.
+                return new GraphicsPreferences.Values(scale,current.water,current.fire,current.cap,
+                        current.glassEnabled,current.shadow,current.mistEnabled,current.dust);
+            }
             boolean mist=current.mistEnabled; int fire=current.fire, dust=current.dust;
             int water=current.water, shadow=current.shadow;
             switch ((String)raw) {
