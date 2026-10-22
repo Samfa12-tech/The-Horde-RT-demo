@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
+import android.graphics.Rect;
 import android.view.Gravity;
 import android.view.InputDevice;
 import android.view.KeyEvent;
@@ -15,6 +16,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.ScrollView;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import org.junit.Before;
@@ -170,6 +172,67 @@ public final class ChapterSubtitlePolicyTest {
         assertEquals(subtitle.getText().toString(), subtitle.getContentDescription().toString());
     }
 
+    @Test public void landscapeCaptionUsesTheMeasuredOpenLaneAtLargeSystemFont() throws Exception {
+        layout(800, 360);
+        View left = new Button(activity), right = new Button(activity);
+        FrameLayout.LayoutParams leftParams = new FrameLayout.LayoutParams(120, 150,
+                Gravity.LEFT | Gravity.BOTTOM);
+        FrameLayout.LayoutParams rightParams = new FrameLayout.LayoutParams(220, 150,
+                Gravity.RIGHT | Gravity.BOTTOM);
+        root.addView(left, leftParams);root.addView(right, rightParams);
+        set("runButton", left);set("attackButton", right);
+        View hearts = new TextView(activity), menu = new Button(activity);
+        root.addView(hearts, new FrameLayout.LayoutParams(120, 70, Gravity.LEFT | Gravity.TOP));
+        root.addView(menu, new FrameLayout.LayoutParams(120, 70, Gravity.RIGHT | Gravity.TOP));
+        set("vitalityStatus", hearts);set("menuButton", menu);
+        TextView subtitle = (TextView) get("chapterSubtitleText");
+        subtitle.setText("Kit\nA road to the treasury, perhaps. Someone in the village might read it.");
+        // 100% subtitle size with the owner's 1.7 system font multiplier.
+        subtitle.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX, 34);
+        subtitle.setContentDescription(subtitle.getText());
+        ((View) get("chapterSubtitlePanel")).setVisibility(View.VISIBLE);
+        ((MainActivity.ChapterSubtitlePlacement) get("chapterSubtitlePlacement"))
+                .beginLine(80, MainActivity.SUBTITLE_INPUT_TOUCH);
+        layout(800, 360);
+        call("reflowChapterDialoguePlacement", new Class<?>[]{});
+        layout(800, 360);
+        ScrollView scroll = (ScrollView) get("chapterSubtitleScroll");
+        assertEquals(View.VISIBLE, subtitle.getVisibility());
+        assertTrue("the entire actual Kit line fits without scrolling at this normal landscape size",
+                subtitle.getMeasuredHeight() <= scroll.getHeight());
+        Rect panel = (Rect) call("visibleRectInRoot", new Class<?>[]{View.class},
+                (View) get("chapterSubtitlePanel"));
+        assertNotNull(panel);
+        assertFalse("caption avoids the left touch hit region", Rect.intersects(panel,
+                (Rect) call("visibleRectInRoot", new Class<?>[]{View.class}, left)));
+        assertFalse("caption avoids the right touch hit region", Rect.intersects(panel,
+                (Rect) call("visibleRectInRoot", new Class<?>[]{View.class}, right)));
+        assertTrue("full caption stays available to accessibility",
+                subtitle.getContentDescription().toString().contains("treasury"));
+    }
+
+    @Test public void extremeCaptionKeepsTextAndSkipReachableInsideOneScrollOwner() throws Exception {
+        layout(320, 180);
+        TextView subtitle = (TextView) get("chapterSubtitleText");
+        subtitle.setText("Kit\nA road to the treasury, perhaps. Someone in the village might read it.");
+        subtitle.setTextSize(54);
+        ((View) get("chapterSubtitlePanel")).setVisibility(View.VISIBLE);
+        ((MainActivity.ChapterSubtitlePlacement) get("chapterSubtitlePlacement"))
+                .beginLine(81, MainActivity.SUBTITLE_INPUT_TOUCH);
+        call("reflowChapterDialoguePlacement", new Class<?>[]{});
+        layout(320, 180);
+        ScrollView scroll = (ScrollView) get("chapterSubtitleScroll");
+        View skip = (View) get("chapterDialogueSkipButton");
+        assertEquals(View.VISIBLE, subtitle.getVisibility());
+        assertEquals(View.VISIBLE, scroll.getVisibility());
+        assertEquals(View.VISIBLE, skip.getVisibility());
+        assertTrue("a caption viewport remains available", scroll.getHeight() > 0);
+        assertTrue("all text and the skip touch target can be reached by scrolling",
+                scroll.getChildAt(0) instanceof LinearLayout &&
+                skip.getParent() == scroll.getChildAt(0));
+        assertTrue(skip.getMinimumHeight() >= activity.getResources().getDisplayMetrics().density * 44);
+    }
+
     @Test public void explicitPositionAndAccessibilityBoundsStayStable() {
         assertEquals(MainActivity.SUBTITLE_POSITION_TOP,
                 MainActivity.resolveChapterSubtitlePosition(MainActivity.SUBTITLE_POSITION_TOP,
@@ -180,9 +243,5 @@ public final class ChapterSubtitlePolicyTest {
         assertEquals(80, MainActivity.clampChapterSubtitleSize(0));
         assertEquals(121, MainActivity.clampChapterSubtitleSize(121));
         assertEquals(160, MainActivity.clampChapterSubtitleSize(500));
-        assertEquals(96, MainActivity.chapterSubtitleViewportHeight(180, 84, 32));
-        assertEquals(0, MainActivity.chapterSubtitleViewportHeight(115, 84, 32));
-        assertTrue(MainActivity.chapterSubtitleLimitationFits(48, 32, 8));
-        assertFalse(MainActivity.chapterSubtitleLimitationFits(39, 32, 8));
     }
 }

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.samfa12.hordelanternrt.ChapterSubtitlePolicyTest" tests="8" skipped="0" failures="1" errors="0" timestamp="2026-10-22T18:43:54" hostname="SAM_LAPPY" time="5.891">
+  <properties/>
+  <testcase name="realInputSourcesAreLatchedOnlyAtTheNextLineGeneration" classname="com.samfa12.hordelanternrt.ChapterSubtitlePolicyTest" time="5.261"/>
+  <testcase name="explicitPositionAndAccessibilityBoundsStayStable" classname="com.samfa12.hordelanternrt.ChapterSubtitlePolicyTest" time="0.062"/>
+  <testcase name="automaticPlacementFollowsInputAndMeasuredLandscapeControlRoom" classname="com.samfa12.hordelanternrt.ChapterSubtitlePolicyTest" time="0.169"/>
+  <testcase name="extremeCaptionKeepsTextAndSkipReachableInsideOneScrollOwner" classname="com.samfa12.hordelanternrt.ChapterSubtitlePolicyTest" time="0.133">
+    <failure message="java.lang.AssertionError: expected:&lt;0&gt; but was:&lt;8&gt;" type="java.lang.AssertionError">java.lang.AssertionError: expected:&lt;0&gt; but was:&lt;8&gt;
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:647)
+	at org.junit.Assert.assertEquals(Assert.java:633)
+	at com.samfa12.hordelanternrt.ChapterSubtitlePolicyTest.extremeCaptionKeepsTextAndSkipReachableInsideOneScrollOwner(ChapterSubtitlePolicyTest.java:223)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(Unknown Source)
+	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:26)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.robolectric.RobolectricTestRunner$HelperTestRunner$1.evaluate(RobolectricTestRunner.java:502)
+	at org.robolectric.internal.SandboxTestRunner$2.lambda$evaluate$2(SandboxTestRunner.java:285)
+	at org.robolectric.internal.bytecode.Sandbox.lambda$runOnMainThread$0(Sandbox.java:104)
+	at java.base/java.util.concurrent.FutureTask.run(Unknown Source)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)
+	at java.base/java.lang.Thread.run(Unknown Source)
+</failure>
+  </testcase>
+  <testcase name="panelUsesCompactTextTreatmentAndKeepsAccessibleFullText" classname="com.samfa12.hordelanternrt.ChapterSubtitlePolicyTest" time="0.089"/>
+  <testcase name="landscapeCaptionUsesTheMeasuredOpenLaneAtLargeSystemFont" classname="com.samfa12.hordelanternrt.ChapterSubtitlePolicyTest" time="0.064"/>
+  <testcase name="largeTextAndExplicitChoicesUseActualMeasuredLayout" classname="com.samfa12.hordelanternrt.ChapterSubtitlePolicyTest" time="0.058"/>
+  <testcase name="rotationReflowsSameLineAndOnlyChangesItsPositionForNewOrientation" classname="com.samfa12.hordelanternrt.ChapterSubtitlePolicyTest" time="0.054"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -280,7 +280,6 @@ public class MainActivity extends Activity {
     private LinearLayout chapterSubtitlePanel;
     private ScrollView chapterSubtitleScroll;
     private TextView chapterSubtitleText;
-    private TextView chapterSubtitleOverflow;
     private Button chapterDialogueSkipButton;
     private long chapterSubtitleGeneration = Long.MIN_VALUE;
     private long chapterDialogueSkipPendingGeneration = Long.MIN_VALUE;
@@ -3302,7 +3301,7 @@ public class MainActivity extends Activity {
 
         chapterSubtitleScroll = new ScrollView(this);
         chapterSubtitleScroll.setFillViewport(true);
-        chapterSubtitleScroll.setVerticalScrollBarEnabled(false);
+        chapterSubtitleScroll.setVerticalScrollBarEnabled(true);
         chapterSubtitleScroll.setOverScrollMode(View.OVER_SCROLL_IF_CONTENT_SCROLLS);
         chapterSubtitleText = new TextView(this);
         chapterSubtitleText.setTextColor(0xFFF2E9D8);
@@ -3312,19 +3311,13 @@ public class MainActivity extends Activity {
         chapterSubtitleText.setShadowLayer(dp(2), 0, dp(1), 0xE6000000);
         chapterSubtitleText.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_YES);
         chapterSubtitleText.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
-        chapterSubtitleScroll.addView(chapterSubtitleText, new ScrollView.LayoutParams(
+        final LinearLayout content = new LinearLayout(this);
+        content.setOrientation(LinearLayout.VERTICAL);
+        content.addView(chapterSubtitleText, new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        chapterSubtitleScroll.addView(content, new ScrollView.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         chapterSubtitlePanel.addView(chapterSubtitleScroll,
-                new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT));
-
-        chapterSubtitleOverflow = new TextView(this);
-        chapterSubtitleOverflow.setText("Subtitle needs more room. Scroll to read the full line.");
-        chapterSubtitleOverflow.setTextColor(0xFFFFD28A);
-        chapterSubtitleOverflow.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        chapterSubtitleOverflow.setGravity(Gravity.CENTER);
-        chapterSubtitleOverflow.setVisibility(View.GONE);
-        chapterSubtitlePanel.addView(chapterSubtitleOverflow,
                 new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT));
 
@@ -3336,7 +3329,7 @@ public class MainActivity extends Activity {
         final LinearLayout.LayoutParams skipParams = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         skipParams.gravity = Gravity.END;
-        chapterSubtitlePanel.addView(chapterDialogueSkipButton, skipParams);
+        content.addView(chapterDialogueSkipButton, skipParams);
         chapterDialogueSkipButton.setOnClickListener(view -> {
             chapterDialogueSkipPendingGeneration = chapterSubtitleGeneration;
             try { ProbeBridge.requestChapterDialogueSkip(); }
@@ -3446,17 +3439,6 @@ public class MainActivity extends Activity {
         return Math.max(80, Math.min(160, percent));
     }
 
-    static int chapterSubtitleViewportHeight(int selectedRoom, int fixedChromeHeight,
-            int minimumTextHeight) {
-        final int available = selectedRoom - fixedChromeHeight;
-        return available >= minimumTextHeight ? available : 0;
-    }
-
-    static boolean chapterSubtitleLimitationFits(int selectedRoom, int labelHeight,
-            int verticalPadding) {
-        return selectedRoom >= labelHeight + verticalPadding;
-    }
-
     private void updateChapterDialoguePresentation(int surfaceState) {
         chapterAmbienceDialogueActive = true; // Fail closed while the coherent line is unavailable.
         if (chapterSubtitlePanel == null) return;
@@ -3494,10 +3476,8 @@ public class MainActivity extends Activity {
             stopChapterVoice();
             chapterSubtitleText.setText("");
             chapterSubtitleScroll.scrollTo(0, 0);
-            chapterSubtitleOverflow.setText("Subtitle exceeds the selected safe area; scroll to read the full line.");
             applyChapterSubtitleBasePadding();
             chapterSubtitleScroll.setVisibility(View.VISIBLE);
-            chapterSubtitleOverflow.setVisibility(View.GONE);
             chapterDialogueSkipButton.setVisibility(View.VISIBLE);
             return;
         }
@@ -3586,148 +3566,101 @@ public class MainActivity extends Activity {
     private void reflowChapterDialoguePlacement() {
         if (chapterSubtitlePanel == null || appRoot == null ||
                 chapterSubtitlePanel.getVisibility() != View.VISIBLE) return;
-        final int width = appRoot.getWidth();
-        final int height = appRoot.getHeight();
+        final int width = appRoot.getWidth(), height = appRoot.getHeight();
         if (width <= 0 || height <= 0) return;
-        final int side = dp(18);
-        final int insetTop;
-        final int insetBottom;
+        int insetLeft = 0, insetTop = 0, insetRight = 0, insetBottom = 0;
         if (Build.VERSION.SDK_INT >= 23 && appRoot.getRootWindowInsets() != null) {
             final WindowInsets insets = appRoot.getRootWindowInsets();
+            insetLeft = insets.getSystemWindowInsetLeft();
             insetTop = insets.getSystemWindowInsetTop();
+            insetRight = insets.getSystemWindowInsetRight();
             insetBottom = insets.getSystemWindowInsetBottom();
-        } else { insetTop = 0; insetBottom = 0; }
-        int topStart = insetTop + dp(8);
-        int bottomEnd = height - insetBottom - dp(8);
+        }
+        int left = insetLeft + dp(18), right = width - insetRight - dp(18);
+        int topStart = insetTop + dp(8), bottomEnd = height - insetBottom - dp(8);
         final int divider = topStart + Math.max(0, bottomEnd - topStart) * 55 / 100;
         final View[] topObstacles = {rtStatus, vitalityStatus, keeperRevealTitle,
                 developerOverlay, menuButton};
         final View[] bottomObstacles = {controllerPrompt, attackButton, parryButton,
                 dodgeButton, interactButton, runButton, crouchButton};
+        // Landscape touch controls occupy side columns, not the whole width.
+        // Keep their real hit regions clear while using the open central lane.
+        if (width > height && chapterSubtitlePlacement.inputModeForCurrentLine() == SUBTITLE_INPUT_TOUCH) {
+            int laneLeft = left, laneRight = right;
+            for (View obstacle : bottomObstacles) {
+                final Rect rect = visibleRectInRoot(obstacle);
+                if (rect == null) continue;
+                if (rect.right <= width / 2) laneLeft = Math.max(laneLeft, rect.right + dp(8));
+                else if (rect.left >= width / 2) laneRight = Math.min(laneRight, rect.left - dp(8));
+            }
+            if (laneRight - laneLeft >= dp(240)) { left = laneLeft; right = laneRight; }
+        }
         for (View obstacle : topObstacles) {
             final Rect rect = visibleRectInRoot(obstacle);
-            if (rect != null && rect.top < divider)
+            if (rect != null && rect.left < right && rect.right > left && rect.top < divider)
                 topStart = Math.max(topStart, rect.bottom + dp(8));
         }
         for (View obstacle : bottomObstacles) {
             final Rect rect = visibleRectInRoot(obstacle);
-            if (rect != null && rect.bottom > divider)
+            if (rect != null && rect.left < right && rect.right > left && rect.bottom > divider)
                 bottomEnd = Math.min(bottomEnd, rect.top - dp(8));
         }
-        final int panelWidth = Math.max(dp(80), width - side * 2);
+        final int panelWidth = Math.max(1, right - left);
         applyChapterSubtitleBasePadding();
         chapterSubtitleScroll.setVisibility(View.VISIBLE);
         chapterDialogueSkipButton.setVisibility(View.VISIBLE);
-        chapterSubtitleOverflow.setVisibility(View.GONE);
-        chapterSubtitleOverflow.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        chapterSubtitleOverflow.setMaxLines(Integer.MAX_VALUE);
-        final LinearLayout.LayoutParams naturalTextParams =
+        final LinearLayout.LayoutParams scrollParams =
                 (LinearLayout.LayoutParams) chapterSubtitleScroll.getLayoutParams();
-        if (naturalTextParams.height != ViewGroup.LayoutParams.WRAP_CONTENT) {
-            naturalTextParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-            chapterSubtitleScroll.setLayoutParams(naturalTextParams);
+        if (scrollParams.height != ViewGroup.LayoutParams.WRAP_CONTENT) {
+            scrollParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+            chapterSubtitleScroll.setLayoutParams(scrollParams);
         }
         chapterSubtitlePanel.measure(View.MeasureSpec.makeMeasureSpec(panelWidth, View.MeasureSpec.EXACTLY),
                 View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
         final int requiredHeight = chapterSubtitlePanel.getMeasuredHeight();
-        final int topRoom = Math.max(0, divider - topStart);
-        final int bottomRoom = Math.max(0, bottomEnd - divider);
+        int topRoom = Math.max(0, divider - topStart);
+        int bottomRoom = Math.max(0, bottomEnd - divider);
+        // The divider is a placement preference, not an obstacle. A long line
+        // may use the whole connected clear gap before it needs scrolling.
+        if (requiredHeight > topRoom && requiredHeight > bottomRoom) {
+            final int connectedRoom = Math.max(0, bottomEnd - topStart);
+            topRoom = Math.max(topRoom, connectedRoom);
+            bottomRoom = Math.max(bottomRoom, connectedRoom);
+        }
         final int preferred = Math.max(SUBTITLE_POSITION_AUTO, Math.min(SUBTITLE_POSITION_BOTTOM,
                 preferences.getInt(PREF_CHAPTER_SUBTITLE_POSITION, SUBTITLE_POSITION_AUTO)));
-        int selected;
-        selected = chapterSubtitlePlacement.positionFor(preferred, width > height,
+        final int selected = chapterSubtitlePlacement.positionFor(preferred, width > height,
                 topRoom, bottomRoom, requiredHeight);
-        final boolean overflow = selected == SUBTITLE_POSITION_TOP ? requiredHeight > topRoom :
-                requiredHeight > bottomRoom;
         final int selectedRoom = selected == SUBTITLE_POSITION_TOP ? topRoom : bottomRoom;
-        final LinearLayout.LayoutParams textParams =
-                (LinearLayout.LayoutParams) chapterSubtitleScroll.getLayoutParams();
-        boolean limitationOnly = false;
-        if (overflow) {
-            chapterSubtitleOverflow.setText("Subtitle exceeds this safe area; scroll to read the full line.");
-            chapterSubtitleOverflow.setVisibility(View.VISIBLE);
-            chapterDialogueSkipButton.setVisibility(View.VISIBLE);
-            chapterDialogueSkipButton.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
-                    View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-            chapterSubtitleOverflow.measure(View.MeasureSpec.makeMeasureSpec(panelWidth -
-                            chapterSubtitlePanel.getPaddingLeft() - chapterSubtitlePanel.getPaddingRight(),
-                            View.MeasureSpec.EXACTLY),
-                    View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-            final int fixedChromeHeight = chapterSubtitlePanel.getPaddingTop() +
-                    chapterSubtitlePanel.getPaddingBottom() + chapterDialogueSkipButton.getMeasuredHeight() +
-                    chapterSubtitleOverflow.getMeasuredHeight();
-            final int viewportHeight = chapterSubtitleViewportHeight(selectedRoom, fixedChromeHeight, dp(32));
-            if (viewportHeight > 0) {
-                chapterSubtitleScroll.setVisibility(View.VISIBLE);
-                if (textParams.height != viewportHeight) {
-                    textParams.height = viewportHeight;
-                    chapterSubtitleScroll.setLayoutParams(textParams);
-                }
-                chapterSubtitlePanel.setContentDescription(chapterSubtitleText.getContentDescription() +
-                        ". Subtitle exceeds the selected safe area; full text is retained and scrollable.");
-            } else {
-                limitationOnly = true;
-                chapterSubtitlePanel.setPadding(dp(8), dp(4), dp(8), dp(4));
-                chapterSubtitleScroll.setVisibility(View.GONE);
-                chapterDialogueSkipButton.setVisibility(View.GONE);
-                chapterSubtitleOverflow.setText("Subtitle controls do not fit here.");
-                chapterSubtitleOverflow.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-                chapterSubtitleOverflow.setMaxLines(2);
-                chapterSubtitleOverflow.measure(View.MeasureSpec.makeMeasureSpec(panelWidth - dp(16),
-                                View.MeasureSpec.EXACTLY),
-                        View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-                final int limitationHeight = chapterSubtitleOverflow.getMeasuredHeight();
-                if (chapterSubtitleLimitationFits(selectedRoom, limitationHeight, dp(8))) {
-                    chapterSubtitlePanel.setContentDescription(chapterSubtitleText.getContentDescription() +
-                            ". Subtitle controls do not fit the selected safe area.");
-                } else {
-                    chapterSubtitlePanel.setVisibility(View.GONE);
-                    chapterSubtitlePanel.setContentDescription(chapterSubtitleText.getContentDescription() +
-                            ". Subtitle controls do not fit the selected safe area; no room is available to display a notice.");
-                }
-            }
+        if (requiredHeight > selectedRoom) {
+            // Scroll the complete caption and Skip together. A diagnostic label
+            // must never displace the dialogue or consume its remaining space.
+            scrollParams.height = Math.max(1, selectedRoom - chapterSubtitlePanel.getPaddingTop() -
+                    chapterSubtitlePanel.getPaddingBottom());
+            chapterSubtitleScroll.setLayoutParams(scrollParams);
             if (!chapterSubtitleOverflowReported) {
-                Log.w(TAG, "CHAPTER_SUBTITLE_SAFE_AREA_OVERFLOW generation=" + chapterSubtitleGeneration +
-                        " position=" + selected + " requiredDp=" + (requiredHeight / getResources().getDisplayMetrics().density) +
-                        " limitationOnly=" + (limitationOnly ? 1 : 0));
+                Log.w(TAG, "CHAPTER_SUBTITLE_SCROLL generation=" + chapterSubtitleGeneration +
+                        " position=" + selected + " requiredDp=" +
+                        (requiredHeight / getResources().getDisplayMetrics().density));
                 chapterSubtitleOverflowReported = true;
             }
-        } else {
-            applyChapterSubtitleBasePadding();
-            chapterSubtitleScroll.setVisibility(View.VISIBLE);
-            chapterSubtitleOverflow.setText("Subtitle exceeds this safe area; scroll to read the full line.");
-            chapterSubtitleOverflow.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-            chapterSubtitleOverflow.setMaxLines(Integer.MAX_VALUE);
-            chapterSubtitleOverflow.setVisibility(View.GONE);
-            chapterDialogueSkipButton.setVisibility(View.VISIBLE);
-            if (textParams.height != ViewGroup.LayoutParams.WRAP_CONTENT) {
-                textParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-                chapterSubtitleScroll.setLayoutParams(textParams);
-            }
-            chapterSubtitlePanel.setContentDescription(chapterSubtitleText.getContentDescription());
         }
+        chapterSubtitlePanel.setContentDescription(chapterSubtitleText.getContentDescription());
         final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) chapterSubtitlePanel.getLayoutParams();
         final int topMargin = selected == SUBTITLE_POSITION_TOP ? topStart : 0;
         final int bottomMargin = selected == SUBTITLE_POSITION_BOTTOM ? height - bottomEnd : 0;
         final int gravity = selected == SUBTITLE_POSITION_BOTTOM ? Gravity.BOTTOM : Gravity.TOP;
-        if (params.width == ViewGroup.LayoutParams.MATCH_PARENT &&
-                params.height == ViewGroup.LayoutParams.WRAP_CONTENT && params.gravity == gravity &&
-                params.leftMargin == side && params.rightMargin == side &&
+        if (params.width == panelWidth && params.height == ViewGroup.LayoutParams.WRAP_CONTENT &&
+                params.gravity == gravity && params.leftMargin == left && params.rightMargin == width - right &&
                 params.topMargin == topMargin && params.bottomMargin == bottomMargin) return;
-        params.width = ViewGroup.LayoutParams.MATCH_PARENT;
+        params.width = panelWidth;
         params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
         params.gravity = gravity;
-        params.leftMargin = side;
-        params.rightMargin = side;
+        params.leftMargin = left;
+        params.rightMargin = width - right;
         params.topMargin = topMargin;
         params.bottomMargin = bottomMargin;
         chapterSubtitlePanel.setLayoutParams(params);
-        if (limitationOnly && chapterSubtitlePanel.getVisibility() == View.VISIBLE) {
-            chapterSubtitlePanel.measure(View.MeasureSpec.makeMeasureSpec(panelWidth, View.MeasureSpec.EXACTLY),
-                    View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-            if (chapterSubtitlePanel.getMeasuredHeight() > selectedRoom)
-                chapterSubtitlePanel.setVisibility(View.GONE);
-        }
     }
 
     private void applyChapterSubtitleBasePadding() {
@@ -6453,6 +6386,9 @@ public class MainActivity extends Activity {
             case "chapter-niche-rect": return 218;
             case "chapter-niche-arch": return 219;
             case "chapter-niche-east": return 220;
+            case "chapter-pine-near": return 223;
+            case "chapter-pine-mid": return 224;
+            case "chapter-pine-far": return 225;
             case "vertical-proof-ground": return 170;
             case "vertical-proof-raised": return 171;
             case "layout-c-wall-panel-upward": return 152;
@@ -6759,6 +6695,9 @@ public class MainActivity extends Activity {
             case 206: return new float[]{-1.57079632679f, -0.35f};
             case 221: return new float[]{-1.57079632679f, -0.35f};
             case 222: return new float[]{-1.57079632679f, -0.35f};
+            case 223: return new float[]{-2.068f, .28f};
+            case 224: return new float[]{-2.781f, .18f};
+            case 225: return new float[]{2.876f, .14f};
             case 207: return new float[]{1.57079632679f, -0.10f};
             case 208: return new float[]{1.57079632679f, -0.10f};
             case 210: return new float[]{2.35619449f, -.32f};

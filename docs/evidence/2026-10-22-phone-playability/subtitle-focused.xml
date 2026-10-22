@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.samfa12.hordelanternrt.ChapterSubtitlePolicyTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-10-22T18:52:03" hostname="SAM_LAPPY" time="0.764">
+  <properties/>
+  <testcase name="realInputSourcesAreLatchedOnlyAtTheNextLineGeneration" classname="com.samfa12.hordelanternrt.ChapterSubtitlePolicyTest" time="0.427"/>
+  <testcase name="explicitPositionAndAccessibilityBoundsStayStable" classname="com.samfa12.hordelanternrt.ChapterSubtitlePolicyTest" time="0.039"/>
+  <testcase name="automaticPlacementFollowsInputAndMeasuredLandscapeControlRoom" classname="com.samfa12.hordelanternrt.ChapterSubtitlePolicyTest" time="0.074"/>
+  <testcase name="extremeCaptionKeepsTextAndSkipReachableInsideOneScrollOwner" classname="com.samfa12.hordelanternrt.ChapterSubtitlePolicyTest" time="0.056"/>
+  <testcase name="panelUsesCompactTextTreatmentAndKeepsAccessibleFullText" classname="com.samfa12.hordelanternrt.ChapterSubtitlePolicyTest" time="0.042"/>
+  <testcase name="landscapeCaptionUsesTheMeasuredOpenLaneAtLargeSystemFont" classname="com.samfa12.hordelanternrt.ChapterSubtitlePolicyTest" time="0.044"/>
+  <testcase name="largeTextAndExplicitChoicesUseActualMeasuredLayout" classname="com.samfa12.hordelanternrt.ChapterSubtitlePolicyTest" time="0.042"/>
+  <testcase name="rotationReflowsSameLineAndOnlyChangesItsPositionForNewOrientation" classname="com.samfa12.hordelanternrt.ChapterSubtitlePolicyTest" time="0.04"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
