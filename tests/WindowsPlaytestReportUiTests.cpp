@@ -24,10 +24,18 @@ bool acceptExport = false; // Accessed only by the UI owner thread.
 std::atomic<ULONGLONG> noteEditStarted{0};
 std::atomic<bool> noteEditExecuting{false};
 std::atomic<ULONGLONG> noteEditElapsed{0};
+std::atomic<ULONGLONG> noteKernelStarted{0}, noteUserStarted{0};
+std::atomic<bool> noteCpuAvailable{false};
+std::atomic<const char*> noteEditPhase{nullptr};
 bool exerciseTimeoutDiagnostic = false;
 struct NoteTrace { const char* phase; bool returned; ULONGLONG elapsed; };
 std::array<NoteTrace, 8> noteTraces{};
 std::size_t noteTraceCount = 0;
+
+ULONGLONG FileTimeTicks(const FILETIME value)
+{
+    return (static_cast<ULONGLONG>(value.dwHighDateTime) << 32u) | value.dwLowDateTime;
+}
 
 LRESULT CALLBACK TraceNoteEntry(int code, WPARAM value, LPARAM argument)
 {
@@ -36,6 +44,11 @@ LRESULT CALLBACK TraceNoteEntry(int code, WPARAM value, LPARAM argument)
         if (message.message == WM_SETTEXT && GetDlgCtrlID(message.hwnd) == 106) {
             noteEditStarted.store(GetTickCount64());
             noteEditElapsed.store(0);
+            FILETIME created{}, exited{}, kernel{}, user{};
+            noteCpuAvailable.store(GetThreadTimes(GetCurrentThread(), &created, &exited, &kernel, &user) != FALSE);
+            noteKernelStarted.store(FileTimeTicks(kernel));
+            noteUserStarted.store(FileTimeTicks(user));
+            noteEditPhase.store(currentPhase.load());
             noteEditExecuting.store(true);
             if (exerciseTimeoutDiagnostic &&
                 std::strcmp(currentPhase.load(), "note-only approved Unicode note edit") == 0)
@@ -59,46 +72,90 @@ LRESULT CALLBACK TraceNoteReturn(int code, WPARAM value, LPARAM argument)
 }
 
 #if defined(_M_X64)
-std::vector<unsigned char> ownerStack;
-DWORD64 ownerStackBase = 0;
+struct OwnerStackSnapshot {
+    std::array<unsigned char, 64u * 1024u> bytes{};
+    CONTEXT context{};
+    DWORD thread = 0;
+    SIZE_T size = 0;
+    bool captured = false, resumeSucceeded = false, cpuAvailable = false;
+    ULONGLONG editAgeMs = 0, kernelTicks = 0, userTicks = 0;
+    long long suspendMicros = 0;
+};
+const OwnerStackSnapshot* decodedSnapshot = nullptr;
 BOOL CALLBACK ReadCapturedStack(HANDLE process, DWORD64 address, PVOID output, DWORD bytes, LPDWORD read)
 {
-    if (address >= ownerStackBase && address - ownerStackBase <= ownerStack.size() &&
-        bytes <= ownerStack.size() - static_cast<std::size_t>(address - ownerStackBase)) {
-        std::memcpy(output, ownerStack.data() + (address - ownerStackBase), bytes);
+    const auto& stack = *decodedSnapshot;
+    if (address >= stack.context.Rsp && address - stack.context.Rsp <= stack.size &&
+        bytes <= stack.size - static_cast<std::size_t>(address - stack.context.Rsp)) {
+        std::memcpy(output, stack.bytes.data() + (address - stack.context.Rsp), bytes);
         *read = bytes; return TRUE;
     }
     SIZE_T count = 0;
     const BOOL result = ReadProcessMemory(process, reinterpret_cast<void*>(address), output, bytes, &count);
     *read = static_cast<DWORD>(count); return result;
 }
-void TraceOwnerStack(DWORD thread)
+void CaptureOwnerStack(DWORD thread, OwnerStackSnapshot& snapshot)
 {
     static std::mutex captureMutex;
     const std::lock_guard<std::mutex> captureLock(captureMutex);
     HANDLE owner = OpenThread(THREAD_SUSPEND_RESUME | THREAD_GET_CONTEXT | THREAD_QUERY_INFORMATION, FALSE, thread);
     if (!owner) return;
-    CONTEXT context{}; context.ContextFlags = CONTEXT_FULL;
-    bool captured = false;
-    // Snapshot only the synthetic fixture's UI stack. Resume before symbol
-    // lookup/output so a loader or stream lock can never deadlock its owner.
-    ownerStack.resize(64u * 1024u);
+    snapshot.thread = thread;
+    snapshot.context.ContextFlags = CONTEXT_FULL;
+    const auto editStarted = noteEditStarted.load();
+    const auto kernelStarted = noteKernelStarted.load(), userStarted = noteUserStarted.load();
+    const bool cpuStarted = noteCpuAvailable.load();
+    const char* phase = currentPhase.load();
+    snapshot.editAgeMs = GetTickCount64() - editStarted;
+    const auto suspended = std::chrono::steady_clock::now();
+    // Preallocated raw copy only: no allocation, symbols or output while the
+    // synthetic UI is suspended. Symbol work must also stay outside its gate.
     if (SuspendThread(owner) != DWORD(-1)) {
-        if (GetThreadContext(owner, &context)) {
+        if (GetThreadContext(owner, &snapshot.context)) {
             MEMORY_BASIC_INFORMATION region{};
-            if (VirtualQuery(reinterpret_cast<void*>(context.Rsp), &region, sizeof(region))) {
+            if (VirtualQuery(reinterpret_cast<void*>(snapshot.context.Rsp), &region, sizeof(region))) {
                 const auto end = reinterpret_cast<ULONG_PTR>(region.BaseAddress) + region.RegionSize;
-                const auto size = std::min<std::size_t>(ownerStack.size(), end - context.Rsp);
-                SIZE_T read = 0;
-                captured = ReadProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(context.Rsp),
-                                              ownerStack.data(), size, &read) != FALSE;
-                ownerStack.resize(read); ownerStackBase = context.Rsp;
+                const auto size = std::min<std::size_t>(snapshot.bytes.size(), end - snapshot.context.Rsp);
+                snapshot.captured = ReadProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(snapshot.context.Rsp),
+                                              snapshot.bytes.data(), size, &snapshot.size) != FALSE;
             }
         }
-        ResumeThread(owner);
+        snapshot.resumeSucceeded = ResumeThread(owner) != DWORD(-1);
     }
+    snapshot.suspendMicros = std::chrono::duration_cast<std::chrono::microseconds>(
+        std::chrono::steady_clock::now() - suspended).count();
+    FILETIME created{}, exited{}, kernel{}, user{};
+    snapshot.cpuAvailable = cpuStarted && noteEditExecuting.load() && phase == noteEditPhase.load() &&
+        GetThreadTimes(owner, &created, &exited, &kernel, &user) != FALSE &&
+        editStarted == noteEditStarted.load() && phase == currentPhase.load() && noteEditExecuting.load() &&
+        FileTimeTicks(kernel) >= kernelStarted && FileTimeTicks(user) >= userStarted;
+    if (snapshot.cpuAvailable) {
+        snapshot.kernelTicks = FileTimeTicks(kernel) - kernelStarted;
+        snapshot.userTicks = FileTimeTicks(user) - userStarted;
+    }
+    CloseHandle(owner);
+}
+
+void DescribeOwnerStack(const OwnerStackSnapshot& snapshot, const char* label)
+{
+    std::cerr << "UI snapshot " << label << " editAgeMs=" << snapshot.editAgeMs
+              << " captured=" << snapshot.captured << " resumeSucceeded=" << snapshot.resumeSucceeded
+              << " suspendMicros=" << snapshot.suspendMicros << " bytes=" << snapshot.size
+              << " cpuAvailable=" << snapshot.cpuAvailable
+              << " kernelMs=" << snapshot.kernelTicks / 10000.0
+              << " userMs=" << snapshot.userTicks / 10000.0 << '\n';
+}
+
+void TraceOwnerStack(const OwnerStackSnapshot& snapshot, const char* label)
+{
+    DescribeOwnerStack(snapshot, label);
+    if (!snapshot.captured) return;
+    HANDLE owner = OpenThread(THREAD_QUERY_INFORMATION, FALSE, snapshot.thread);
+    if (!owner) return;
+    CONTEXT context = snapshot.context;
+    decodedSnapshot = &snapshot;
     SymSetOptions(SYMOPT_DEFERRED_LOADS | SYMOPT_UNDNAME | SYMOPT_FAIL_CRITICAL_ERRORS | SYMOPT_NO_PROMPTS);
-    if (captured && SymInitialize(GetCurrentProcess(), "", TRUE)) {
+    if (SymInitialize(GetCurrentProcess(), "", TRUE)) {
         STACKFRAME64 frame{};
         frame.AddrPC = {context.Rip, 0, AddrModeFlat};
         frame.AddrStack = {context.Rsp, 0, AddrModeFlat};
@@ -119,11 +176,18 @@ void TraceOwnerStack(DWORD thread)
         }
         SymCleanup(GetCurrentProcess());
     }
-    CloseHandle(owner); ownerStack.clear();
+    decodedSnapshot = nullptr;
+    CloseHandle(owner);
 }
 #else
-void TraceOwnerStack(DWORD) {}
+struct OwnerStackSnapshot {};
+void CaptureOwnerStack(DWORD, OwnerStackSnapshot&) {}
+void DescribeOwnerStack(const OwnerStackSnapshot&, const char*) {}
+void TraceOwnerStack(const OwnerStackSnapshot&, const char*) {}
 #endif
+OwnerStackSnapshot slowEditSnapshot;
+std::atomic<bool> slowEditSnapshotReady{false};
+bool slowEditSnapshotDecoded = false; // Action thread, then main after join.
 
 void TraceOwnerWait(DWORD thread)
 {
@@ -224,8 +288,16 @@ LRESULT Send(HWND window, const UINT message, const WPARAM value = 0, const LPAR
                       << " capture=" << info.hwndCapture;
         }
         std::cerr << '\n';
-        TraceOwnerStack(ownerThread);
+        // The deadline outcome above is final before any module enumeration,
+        // symbol loading or console stack output can compete with the edit.
+        OwnerStackSnapshot timeoutSnapshot;
+        CaptureOwnerStack(ownerThread, timeoutSnapshot);
         TraceOwnerWait(ownerThread);
+        if (slowEditSnapshotReady.load()) {
+            TraceOwnerStack(slowEditSnapshot, "100ms-observer");
+            slowEditSnapshotDecoded = true;
+        }
+        TraceOwnerStack(timeoutSnapshot, "after-timeout");
         passed.store(false);
     }
     if (message == WM_SETTEXT && GetDlgCtrlID(window) == 106 && noteTraceCount < noteTraces.size())
@@ -282,7 +354,8 @@ int main(int argc, char** argv)
         while (!stopObserver.load()) {
             if (noteEditExecuting.load() && GetTickCount64() - noteEditStarted.load() >= 100 &&
                 std::strcmp(currentPhase.load(), "note-only approved Unicode note edit") == 0) {
-                TraceOwnerStack(thread);
+                CaptureOwnerStack(thread, slowEditSnapshot);
+                slowEditSnapshotReady.store(true);
                 return;
             }
             std::this_thread::sleep_for(std::chrono::milliseconds(5));
@@ -359,6 +432,8 @@ int main(int argc, char** argv)
     contextActions.join();
     stopObserver.store(true);
     slowEditObserver.join();
+    if (slowEditSnapshotReady.load() && !slowEditSnapshotDecoded)
+        DescribeOwnerStack(slowEditSnapshot, "100ms-observer-without-timeout");
     // Flush after both action threads have joined, not between input operations:
     // console IO must not space out the messages and hide an initialization race.
     for (std::size_t i = 0; i < noteTraceCount; ++i)

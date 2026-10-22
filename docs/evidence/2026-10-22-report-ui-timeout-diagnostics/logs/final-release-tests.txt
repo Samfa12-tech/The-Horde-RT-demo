@@ -1,0 +1,40 @@
+Internal ctest changing into directory: <WORKTREE>/build/presets/windows-x64-release
+UpdateCTestConfiguration  from :<WORKTREE>/build/presets/windows-x64-release/DartConfiguration.tcl
+Parse Config file:<WORKTREE>/build/presets/windows-x64-release/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<WORKTREE>/build/presets/windows-x64-release/DartConfiguration.tcl
+Parse Config file:<WORKTREE>/build/presets/windows-x64-release/DartConfiguration.tcl
+Test project <WORKTREE>/build/presets/windows-x64-release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 168
+    Start 168: horde_rt_playtest_report_tests
+
+168: Test command: "<WORKTREE>\build\presets\windows-x64-release\Release\horde_rt_playtest_report_tests.exe"
+168: Working Directory: <WORKTREE>/build/presets/windows-x64-release
+168: Test timeout computed to be: 1500
+1/2 Test #168: horde_rt_playtest_report_tests ..............   Passed    0.02 sec
+test 174
+    Start 174: horde_rt_windows_playtest_report_ui_tests
+
+174: Test command: "<WORKTREE>\build\presets\windows-x64-release\Release\horde_rt_windows_playtest_report_ui_tests.exe"
+174: Working Directory: <WORKTREE>/build/presets/windows-x64-release
+174: Test timeout computed to be: 30
+174: note EDIT trace; phase=note-only initial note edit returned=1 elapsedMs=0
+174: note EDIT trace; phase=note-only rejected-input note edit returned=1 elapsedMs=0
+174: note EDIT trace; phase=note-only oversized note edit returned=1 elapsedMs=16
+174: note EDIT trace; phase=note-only approved Unicode note edit returned=1 elapsedMs=0
+174: note EDIT trace; phase=note-only frozen retry edit returned=1 elapsedMs=0
+174: note EDIT trace; phase=explicit-context note edit returned=1 elapsedMs=0
+2/2 Test #174: horde_rt_windows_playtest_report_ui_tests ...   Passed    1.51 sec
+
+The following tests passed:
+	horde_rt_playtest_report_tests
+	horde_rt_windows_playtest_report_ui_tests
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   1.55 sec
