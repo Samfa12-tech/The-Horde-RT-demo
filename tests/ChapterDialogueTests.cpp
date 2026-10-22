@@ -46,6 +46,32 @@ int main() {
     d.Reset();Check(!d.State().grateConsumed&&!d.State().proofAccepted,"new game resets once flags");
     c={};d.Request(Line::KeeperSense,{1,2,3},c);old=d.State();c.listener={8,9,10};d.Step(.05f,c);
     Check(d.State().listener.x==old.listener.x&&d.State().source.y==2,"source/listener tuple freezes at emission");
+    // Continuous visible-companion speech is distinct from event-time calls.
+    for(unsigned n=static_cast<unsigned>(Line::ReunionQuestion);n<=static_cast<unsigned>(Line::ForestVillage);++n) {
+        Director live;Context lc;lc.companionSource=Tuple{4,3,2};lc.listener={1,2,3};
+        live.Request(static_cast<Line>(n),{-32,3.6f,-10},lc);
+        const auto started=live.State();const auto progress=live.ExportProgress();
+        Check(started.source.x==4&&started.source.y==3,"Kit starts at the supplied current grounded actor");
+        lc.companionSource=Tuple{5,4,1};lc.listener={2,3,4};lc.yaw=.75f;
+        live.RefreshCompanionSpatial(lc);
+        Check(live.State().source.x==5&&live.State().source.y==4&&live.State().listener.x==2&&
+            live.State().listenerYaw==.75f&&live.State().generation==started.generation&&
+            live.State().elapsed==started.elapsed&&live.ExportProgress().activeLine==progress.activeLine,
+            "Kit spatial refresh follows actor/listener without restarting speech or story");
+        lc.paused=true;lc.listener.x=9;lc.companionSource=Tuple{9,9,9};
+        live.RefreshCompanionSpatial(lc);
+        Check(live.State().source.x==5&&live.State().listener.x==2,"paused Kit anchors remain frozen");
+        lc.paused=false;lc.companionSource.reset();live.RefreshCompanionSpatial(lc);
+        Check(live.State().source.x==5&&live.State().listener.x==9,"unavailable actor retains last valid source while listener follows");
+        lc.companionSource=Tuple{std::numeric_limits<float>::quiet_NaN(),4,1};lc.listener.x=10;
+        live.RefreshCompanionSpatial(lc);
+        Check(live.State().source.x==5&&live.State().listener.x==9,"invalid Kit spatial tuple cannot publish partial/nonfinite data");
+        lc.companionSource=Tuple{6,4,1};lc.alive=false;live.RefreshCompanionSpatial(lc);
+        Check(live.State().source.x==5,"dead player cannot refresh active Kit speech");
+    }
+    c.companionSource=Tuple{7,8,9};d.RefreshCompanionSpatial(c);
+    Check(d.State().source.x==1&&d.State().listener.x==old.listener.x,
+        "Kit refresh cannot change Keeper emission tuples");
     for(int i=0;i<100;i++)d.Step(.05f,c);Check(d.State().line==Line::None,"missing/failed clip has bounded fallback");
     Director interrupted;Context claim;claim.claimed=true;
     interrupted.Step(.016f,claim);

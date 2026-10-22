@@ -1,0 +1,139 @@
+{
+  "schema": 1,
+  "createdUtc": "2026-10-22T21:05:33.987185+00:00",
+  "baseCommit": "c2bbc71427972582f1b2ac973d23f17eeb763835",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "scope": "continuous Kit source/listener anchoring; Windows same-voice spatial matrix",
+  "source": [
+    {
+      "path": "src/gameplay/dialogue/ChapterDialogue.h",
+      "bytes": 21814,
+      "sha256": "41bbae15cff4c2302baa8db5aa8d8ad7c61132b9625baf805a15e20827aeaeb5"
+    },
+    {
+      "path": "src/gameplay/simulation/GameSimulationDialogue.cpp",
+      "bytes": 3511,
+      "sha256": "82de17baadbeececc2d752faa13d24c877dce0ccbc01af35fe0b402b6d39b8f2"
+    },
+    {
+      "path": "src/gameplay/simulation/GameSimulationCampaign.cpp",
+      "bytes": 18859,
+      "sha256": "12de5efc787990e2d0bd60953f6805cbcd2d842dc9bc73c1f441389f29900b77"
+    },
+    {
+      "path": "src/platform/windows/DiagnosticWindow.cpp",
+      "bytes": 619572,
+      "sha256": "f86f3c6f7e0bec115416cd84298b33b1861ba3e7b82d195e3580cbee3c1dc9eb"
+    },
+    {
+      "path": "tests/ChapterDialogueTests.cpp",
+      "bytes": 26593,
+      "sha256": "f001f1b8c2bea49ae41540470c76897e3eb43da768fe0c16f0e368345e6b5c18"
+    },
+    {
+      "path": "tests/CampaignCheckpointTests.cpp",
+      "bytes": 50186,
+      "sha256": "aed3ced1496c4ab260cab900b18ed4e80f87b45af2e9c3f1036751568cd18b11"
+    },
+    {
+      "path": "tests/SpatialAudioSmoke.cpp",
+      "bytes": 47520,
+      "sha256": "beb0f99362d2e8b7726a648b6396aced8cb73237bae40419eb1a0b48a19948db"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+      "bytes": 4628992,
+      "sha256": "3720ee2b7f43b892e4262f20133fe16e5e4b2fdb5f6306f39d611a25ca728fd4"
+    },
+    {
+      "path": "build/presets/windows-x64-release/Release/horde_rt_chapter_dialogue_tests.exe",
+      "bytes": 567296,
+      "sha256": "dddbd50575a1dc626c66cd9c3634995a2085fd78432d4eeae6ba59942790e4ea"
+    },
+    {
+      "path": "build/presets/windows-x64-release/Release/horde_rt_campaign_checkpoint_tests.exe",
+      "bytes": 996864,
+      "sha256": "7294b43c7c9b950f8e28a6a43f37c7348bc76675fdb7ab5f056da8921d78b628"
+    },
+    {
+      "path": "build/presets/windows-x64-release/Release/horde_rt_spatial_audio_smoke.exe",
+      "bytes": 303104,
+      "sha256": "1d2187c788003a2482ef897e7e889b71e2e362e977252d3f4dee6590ed8fbfa0"
+    },
+    {
+      "path": "build/presets/windows-x64-release/Release/horde_rt_dialogue_ducking_tests.exe",
+      "bytes": 933888,
+      "sha256": "c581611d4ab5c1187768fa5ef7c1c426b29fb9cb1a96f7010c176193bd7857b6"
+    },
+    {
+      "path": "android/app/build/intermediates/cxx/Debug/5q2u2n17/obj/arm64-v8a/libhorde_rt_probe_android.so",
+      "bytes": 38314232,
+      "sha256": "d034d33ee50d2d94ebf8491e715c4db07ce758ded275e76c49ca803de59e76ec"
+    }
+  ],
+  "checks": {
+    "ReleaseCTest": {
+      "passed": 4,
+      "failed": 0,
+      "log": "host-tests.txt"
+    },
+    "WindowsRelease": {
+      "target": "horde_rt_diagnostic_window",
+      "exitCode": 0
+    },
+    "AndroidDebugArm64": {
+      "task": ":app:buildCMakeDebug[arm64-v8a]",
+      "exitCode": 0,
+      "log": "android-native-build.txt",
+      "installed": false
+    }
+  },
+  "spatialEvidence": {
+    "nearby": {
+      "oldDistanceMetres": 5.33736,
+      "newDistanceMetres": 1.00233,
+      "attenuationRatio": 5.324952859836581,
+      "attenuationDeltaDb": 14.526315349056942,
+      "oldGains": [
+        0.0459493,
+        0.0493765
+      ],
+      "newGains": [
+        0.35525,
+        0.0528804
+      ]
+    },
+    "landing": {
+      "oldDistanceMetres": 3.27567,
+      "newDistanceMetres": 9.21955,
+      "oldGains": [
+        0.109187,
+        0.012507
+      ],
+      "newGains": [
+        0.0383516,
+        0.00733917
+      ]
+    },
+    "class": "computed spatial coefficients from actual isolated production-simulation snapshots; not endpoint loudness"
+  },
+  "ownerCustody": {
+    "phoneOperations": 0,
+    "settingsAccessed": false,
+    "ownerSavesAccessed": false,
+    "canonicalFileSha256": {
+      "ASSET_LICENSES.md": "3a6cff3d34421d2ec751b1f64ec44b6c3ee801cdc1d6d1123c3cb479c0b92387",
+      "PROJECT_MEMORY.md": "9cfbea7667b50a9a960396c8f13c68905791aebd42121ecb353a8354b8cd406e"
+    }
+  },
+  "limits": [
+    "No Kit endpoint playback or listening",
+    "No phone execution or lifecycle acceptance",
+    "Seeded post-Keeper host restore, not natural victory/claim/ascent",
+    "Inherited source-string failures and Debug timeout remain open",
+    "PR27 conflicting",
+    "Skin candidate Android and full-frame gains unmeasured"
+  ]
+}

@@ -34,11 +34,20 @@ void GameSimulation::UpdateChapterDialogue(const InputSnapshot& input,float seco
         if(!input.paused) chapterDialogue_.Skip();
     }
     const bool proofWasAccepted=chapterDialogue_.State().proofAccepted;
+    const auto bindCompanion=[&] {
+        const auto& kit=chapterCompanion_.State();
+        c.companionSource.reset();
+        if(c.exterior && kit.grounded)
+            c.companionSource=Tuple{kit.x,kit.y+kCompanionSpeechHeight,kit.z};
+    };
+    bindCompanion();
     chapterDialogue_.Step(seconds,c);
     chapterCompanion_.Step(seconds,playerX_,playerZ_,c.exterior,
         chapterDialogue_.State().proofAccepted,c.paused,
         chapterTerrainGeneration_==worldRoute_.generation?chapterTerrain_.get():nullptr,
         config_.authoredChapterTerrain);
+    bindCompanion();
+    chapterDialogue_.RefreshCompanionSpatial(c);
     chapterCompanion_.AdvanceActing(seconds,chapterDialogue_.State(),c.exterior,c.alive,
         !proofWasAccepted && chapterDialogue_.State().proofAccepted);
 }

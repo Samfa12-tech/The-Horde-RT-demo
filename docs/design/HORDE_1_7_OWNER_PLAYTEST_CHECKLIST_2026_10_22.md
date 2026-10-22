@@ -13,7 +13,7 @@ No release, merge, paid generation or spending is authorized.
 | Item | Actual state / remaining work |
 | --- | --- |
 | Landscape captions at 100% Auto | Earlier712f phone build shows one real complete Kit question at100% Auto/font1.7 without overflow diagnostic, but residual control overlap remains. Source now fixes cutout coordinate handling and removes visible Skip under later owner direction. Nine caption tests, two icon tests and all394 Java tests pass. Final UI cold207 fails missing-terrain before inspection; corrected final portrait/landscape acceptance remains pending. [UI checkpoint](../evidence/2026-10-22-caption-ui/README.md). |
-| Kit quiet at Speech100/SFX20/Music55 | Speech is independent of SFX; healthy PCM is retained. Shared source correction stops applying legacy dungeon walls to outdoor dialogue, preserving .36 base gain, distance/pan and ducking. Focused Release smoke and Android native compilation pass; actual listening and Windows platform integration remain pending. Source/listener coordinates still freeze at line start and some reunion anchors differ from rendered Kit; this is a separate remaining correctness gap. |
+| Kit quiet at Speech100/SFX20/Music55 | Speech is independent of SFX; healthy PCM is retained. Earlier exterior-domain correction preserves .36 base gain and ducking. Continuous reunion/forest speech now follows the current grounded Kit and listener/yaw; Windows updates the exact existing voice matrix without restarting PCM. Actual terrain-backed nearby reminder distance changes from the obsolete 5.34 m point to the real 1.00 m actor; landing correction can lower gain because Kit is farther away. Four focused Release tests, Windows app and Android arm64 native builds pass. Endpoint playback, actual listening/mix and phone pause/resume remain pending. [Anchoring evidence](../evidence/2026-10-22-kit-live-voice/README.md). |
 | Touch clutter / auto crouch / speed | Shared automatic head-clearance crouch and touch/controller deflection speed are implemented; keyboard Shift/Caps Lock retained. Ordinary Run/Crouch buttons and manual stance bindings are inactive, removing the truncated Running label. Seven native tests and 97 focused Android tests pass, including collision/step/roof negatives and input/lifecycle. Two blocked transition ticks occur on entry in the terrain fixture; physical play feel and final portrait/landscape UI remain pending. [Checkpoint](../evidence/2026-10-22-auto-crouch/README.md). No-Skip and compact56dp lantern icon remain unaccepted on phone. Briarhold circular/translucent reference reviewed read-only; broader redesign deferred by owner19:35. |
 | Brief dark world at 28.25-28.75s | Original owner clip is local/ignored and original frames retained. HUD remains visible; faint world geometry is visible in the inspected dark frame. Cause is unknown; no asserted presentation/lighting/camera diagnosis or runtime fix. Video frame gaps are not engine FPS. |
 | Outdoor 20/33/40% | Owner33%/MistOff preserved. New exact-build live, muted, stationary holds measure detailed CPU stage wall times, GPU and actual image presentation intervals.20 GPU16.08ms/CPU cycle31.91ms; initial33 controls GPU35.49–35.51/CPU47.75–47.86;40 GPU48.20/CPU64.71. Closing33 GPU43.93/CPU58.28 is an unresolved greater-than15% rise despite start thermal gate.20 is visually unadmitted, not a default/recommendation. No OS/thread CPU utilisation or separate animation/AS profiling. [Receipt](../evidence/2026-10-22-outdoor-scale/README.md), [reconstruction readiness](HORDE_1_7_UPSCALER_READINESS_2026_10_22.md). Earlier frozen CPU means40.338/40.359/40.362 remain narrower separate evidence. |
@@ -64,15 +64,17 @@ no active publication schedule.
 
 ## Concrete next local slice
 
-Automatic crouch/deflection source and the bounded desktop skin-work slice are
-complete locally; physical input/feel and phone performance remain open. Next
-correct Kit's live source/listener anchoring before listening/mix acceptance.
+Automatic crouch/deflection source, the bounded desktop skin-work slice and Kit's
+continuous source/listener correction are complete locally. Physical input/feel,
+endpoint speech/listening and phone performance remain open. Next desktop work
+can diagnose inherited shader/Android source-contract failures against actual
+implementations, retaining their gates and PR conflicts for review.
 For the next owner-confirmed phone connection, compare exact control/candidate
 builds with the appended phase counters and original matched hold/settings.
 Keep the 12.06 ms phone stage, unresolved closing 33% slowdown, inherited red
 contracts and one-candidate target miss explicit. Desktop results do not
 certify Android benefit.
 Separately retain cold207 missing-terrain diagnosis for the next fixture/device
-window; do not infer it caused the owner's brief dark-world video. Continuous
-Kit source/listener anchoring and real listening remain open. No phone restart
-is needed for local source work.
+window; do not infer it caused the owner's brief dark-world video.
+Kit listening and physical resume remain open after the source correction. No
+phone restart is needed for local source work.

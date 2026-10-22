@@ -34,8 +34,17 @@ candidate. Kit vertex medians fall 6.73–8.33% against the faster closing contr
 the 1.55 ms target is missed at 1.5567 ms and the iteration budget is exhausted.
 Two frozen RT image pairs are byte-identical. Android benefit, GPU AS timing and
 full-frame gains remain unproven. Broader native checks are 7/8 with inherited
-source-string failures retained. Next useful desktop gameplay work is Kit's live
-source/listener anchoring; no phone reconnection is assumed.
+source-string failures retained. No phone reconnection is assumed.
+
+The [Kit anchoring checkpoint](../evidence/2026-10-22-kit-live-voice/README.md)
+binds continuous reunion/forest speech to the current grounded companion and
+listener, including restored speech. Windows updates matching voice matrices
+without restarting PCM. Four focused Release tests and Windows/Android arm64
+compilation pass. The nearby logical reminder now uses 1.00 m instead of the old
+5.34 m point; far landing gain decreases correctly. Endpoint playback/listening
+and phone lifecycle remain pending. Original fixture failures are retained.
+Next unblocked desktop work is inherited source-contract/CI diagnosis; PR
+conflicts and Debug timeout remain open, with no acceptance assertions weakened.
 
 ## Frozen arm framing diagnosis - local checkpoint, 20 October 2026
 

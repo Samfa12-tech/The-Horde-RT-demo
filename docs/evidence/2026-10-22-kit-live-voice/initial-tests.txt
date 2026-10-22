@@ -1,0 +1,21 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+    Start  42: horde_rt_chapter_dialogue_tests
+1/4 Test  #42: horde_rt_chapter_dialogue_tests ......   Passed    1.66 sec
+    Start  45: horde_rt_campaign_checkpoint_tests
+2/4 Test  #45: horde_rt_campaign_checkpoint_tests ...***Failed    2.35 sec
+Kit reunion anchor: listener=(-33.7,-12.8) actor=(-27.7,-5.8) oldDistance=3.27567 newDistance=9.21955 oldLR=0.109187,0.012507 newLR=0.0383516,0.00733917
+Kit spatial anchors do not alter logical checkpoint speech semantics
+1050 campaign checkpoint checks, 1 failures
+
+    Start 157: horde_rt_dialogue_ducking_tests
+3/4 Test #157: horde_rt_dialogue_ducking_tests ......   Passed    1.11 sec
+    Start 188: horde_rt_spatial_audio_smoke
+4/4 Test #188: horde_rt_spatial_audio_smoke .........   Passed    1.36 sec
+
+75% tests passed, 1 tests failed out of 4
+
+Total Test time (real) =   6.50 sec
+
+The following tests FAILED:
+	 45 - horde_rt_campaign_checkpoint_tests (Failed)

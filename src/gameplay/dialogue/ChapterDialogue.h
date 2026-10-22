@@ -5,6 +5,7 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
+#include <optional>
 
 #include "gameplay/simulation/DevelopmentWorldRoute.h"
 
@@ -37,6 +38,7 @@ inline constexpr std::array<LineSpec,16> kLines{{
 inline const LineSpec& Spec(Line line) { const auto n=static_cast<unsigned>(line);
     return kLines[n<kLines.size()?n:0]; }
 struct Tuple { float x=0,y=0,z=0; };
+inline constexpr float kCompanionSpeechHeight=1.4f;
 struct Snapshot {
     Line line=Line::None; std::uint64_t generation=1; float elapsed=0,duration=0;
     Tuple source{},listener{}; float listenerYaw=0;
@@ -49,6 +51,9 @@ struct Snapshot {
 };
 struct Context {
     Tuple player{},listener{}; float yaw=0;
+    // Current grounded companion root plus speech height, owned by simulation.
+    // Absence retains the last valid source while the actor is unavailable.
+    std::optional<Tuple> companionSource;
     bool paused=false,alive=true,combat=false,claimed=false,exterior=false,traversing=false;
     bool lanternLow=false,lanternHigh=false;
     std::uint64_t manualRaiseSequence=0,visibleRaiseSequence=0;
@@ -67,6 +72,12 @@ struct Progress {
 class Director {
 public:
     const Snapshot& State() const { return state_; }
+    // Continuous Kit speech follows the same actor/listener snapshot as the
+    // renderer. Event-time Keeper and unseen tomb/shaft calls stay unchanged.
+    // Spatial refresh never advances the line, cursor, queue or callback ID.
+    void RefreshCompanionSpatial(const Context& c) {
+        if(!c.paused && c.alive) BindCompanionSpatial(c);
+    }
     Progress ExportProgress() const {
         Progress p;
         p.activeLine=state_.line;p.continuations=continuations_;p.continuationCount=continuationCount_;
@@ -148,7 +159,8 @@ public:
         // instead of allowing an old completion to identify a restored line.
         const auto floor=std::max(state_.generation,generationFloor);
         if(!ValidateProgress(p) || floor>=UINT64_MAX-1 || !finite(c.player) ||
-           !finite(c.listener) || !std::isfinite(c.yaw) || !c.alive || c.traversing) return false;
+           !finite(c.listener) || !std::isfinite(c.yaw) ||
+           (c.companionSource && !finite(*c.companionSource)) || !c.alive || c.traversing) return false;
         state_={};state_.generation=Next(floor);state_.paused=c.paused;
         state_.grateConsumed=p.grateConsumed;state_.rescueConsumed=p.rescueConsumed;
         state_.reunionStarted=p.reunionStarted;state_.waitingForRaise=p.waitingForRaise;
@@ -227,7 +239,7 @@ public:
         }
         if(c.exterior && !c.traversing && c.lanternLow && !state_.reunionStarted) {
             state_.reunionStarted=true;state_.waitingForRaise=true;raiseFloor_=c.manualRaiseSequence;
-            // Deliberately subtitle-only fixture until a public Kit actor is admitted.
+            // The simulation binds a grounded Kit actor before publication.
             Request(Line::ReunionQuestion,{-32.0f,3.6f,-10.0f},c);
             if(state_.line!=Line::ReunionQuestion) Queue(Line::ReunionQuestion);
         }
@@ -252,8 +264,17 @@ public:
             const auto line=PopContinuation();
             Start(line,SourceFor(line),c);
         }
+        RefreshCompanionSpatial(c);
     }
 private:
+    void BindCompanionSpatial(const Context& c) {
+        if(state_.line<Line::ReunionQuestion || state_.line>Line::ForestVillage) return;
+        const auto finite=[](Tuple t) {return std::isfinite(t.x)&&std::isfinite(t.y)&&std::isfinite(t.z);};
+        if(!finite(c.listener) || !std::isfinite(c.yaw) ||
+           (c.companionSource && !finite(*c.companionSource))) return;
+        state_.listener=c.listener;state_.listenerYaw=c.yaw;
+        if(c.companionSource) state_.source=*c.companionSource;
+    }
     static std::uint64_t Next(std::uint64_t x) { return x==UINT64_MAX?x:x+1; }
     static Tuple AtRoutePoint(std::size_t index,float heightOffset=1.4f) {
         const auto p=simulation::kWorldRoutePoints[index];return {p.x,p.y+heightOffset,p.z};
@@ -320,6 +341,9 @@ private:
     void Start(Line line,Tuple source,const Context& c) {
         state_.generation=Next(state_.generation);state_.line=line;state_.duration=Spec(line).duration;
         state_.elapsed=0;state_.source=source;state_.listener=c.listener;state_.listenerYaw=c.yaw;MarkOnce(line);
+        // Restore may start paused, but must publish the restored actor anchor
+        // immediately rather than the old authored fallback for its first frame.
+        BindCompanionSpatial(c);
     }
     Snapshot state_{};Line pending_=Line::None;
     std::array<Line,8> continuations_{};std::size_t continuationCount_=0;

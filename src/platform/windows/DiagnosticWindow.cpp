@@ -1680,6 +1680,21 @@ public:
             }
     }
 
+    void UpdateDialogueSpatial(const std::uint32_t line, const std::uint64_t generation,
+                               const float leftGain, const float rightGain)
+    {
+        if (line == 0u || generation == 0u) return;
+        for (auto& active : activeVoices_)
+            if (active.loopKey == "chapter_dialogue" && active.dialogueLine == line &&
+                active.dialogueGeneration == generation)
+            {
+                // Follow the immutable active-line anchors without replacing the
+                // queued PCM, cursor, completion identity or independent speech volume.
+                (void)SetVoiceMatrix(active.voice, leftGain, rightGain, active.filename);
+                return;
+            }
+    }
+
     void UpdateOwnedGain(const std::string_view key, const float gain)
     {
         for (auto &active : activeVoices_)
@@ -1979,12 +1994,20 @@ void UpdateChapterDialogueAudio(VulkanSurfaceContext& context)
         context.playingDialogueGeneration = 0u;
         return;
     }
+    const auto gains = horde::gameplay::CalculateSpatialAudio(
+        {dialogue.source.x, dialogue.source.z, .36f, 1.0f, 14.0f, dialogue.source.y},
+        {dialogue.listener.x, dialogue.listener.z, dialogue.listenerYaw, dialogue.listener.y},
+        horde::gameplay::ResolveSpatialAudioDomain(
+            simulation.developmentRescueJourney, simulation.worldRoute.current));
+    const bool sameVoice = context.playingDialogueLine == lineId &&
+        context.playingDialogueGeneration == dialogue.generation;
+    if (sameVoice)
+        SpatialAudioEngine().UpdateDialogueSpatial(lineId, dialogue.generation, gains.left, gains.right);
     const bool paused = dialogue.paused || !context.controlsEnabled ||
         GetForegroundWindow() != context.windowHandle;
     SpatialAudioEngine().PauseDialogue(paused);
     if (paused) return;
-    if (context.playingDialogueLine == lineId &&
-        context.playingDialogueGeneration == dialogue.generation) return;
+    if (sameVoice) return; // A missing/completed voice must not restart this line.
     SpatialAudioEngine().StopLoop("chapter_dialogue");
     context.playingDialogueLine = 0u;
     context.playingDialogueGeneration = 0u;
@@ -1997,11 +2020,6 @@ void UpdateChapterDialogueAudio(VulkanSurfaceContext& context)
         LogWindowsAudio("chapter line audio unavailable; subtitle remains active: " + path.string());
         return;
     }
-    const auto gains = horde::gameplay::CalculateSpatialAudio(
-        {dialogue.source.x, dialogue.source.z, .36f, 1.0f, 14.0f, dialogue.source.y},
-        {dialogue.listener.x, dialogue.listener.z, dialogue.listenerYaw, dialogue.listener.y},
-        horde::gameplay::ResolveSpatialAudioDomain(
-            simulation.developmentRescueJourney, simulation.worldRoute.current));
     if (gains.left <= 0.0f && gains.right <= 0.0f) return;
     if (SpatialAudioEngine().Play(path, gains.left, gains.right,
             "chapter_dialogue", lineId, dialogue.generation,

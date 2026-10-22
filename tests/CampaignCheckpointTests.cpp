@@ -2,6 +2,7 @@
 #include "gameplay/campaign/LookoutObjective.h"
 #include "gameplay/DevelopmentCheckpointSimulation.h"
 #include "gameplay/traversal/ChapterTerrainMovement.h"
+#include "gameplay/SpatialAudio.h"
 #include "scene/ChapterTerrainSurface.h"
 #include "scene/assets/AssetManifest.h"
 #include <cmath>
@@ -342,6 +343,93 @@ int main() {
         InputSnapshot in;in.damageEnabled=false;in.yawRadians=c.yaw;in.pitchRadians=c.pitch;
         ++in.commands.dialogueSkip;sim.StepFixed(in);
         Check(sim.Snapshot().chapterDialogue.line==dlg::Line::RescueRope,"restored rescue speech continues with rope instruction");
+    }
+    {
+        auto c=Record(true);c.dialogue.activeLine=dlg::Line::ReunionQuestion;
+        GameSimulation sim(ProductionGameSimulationConfig());
+        Check(Restore(sim,c,terrain),"active Kit speech restores with actual imported terrain/actor");
+        const auto loaded=sim.Snapshot();
+        const auto anchored=[](const SimulationSnapshot& s) {
+            const auto& a=s.chapterDialogue;const auto& kit=s.chapterCompanion;
+            return kit.grounded && a.source.x==kit.x && a.source.z==kit.z &&
+                a.source.y==kit.y+dlg::kCompanionSpeechHeight && a.listener.x==s.playerX &&
+                a.listener.z==s.playerZ && a.listenerYaw==s.playerYawRadians;
+        };
+        Check(loaded.paused&&anchored(loaded),"first paused restore snapshot binds Kit rather than obsolete reunion point");
+        const auto gains=[&](dlg::Tuple source) {
+            const auto& a=loaded.chapterDialogue;
+            return CalculateSpatialAudio({source.x,source.z,.36f,1,14,source.y},
+                {a.listener.x,a.listener.z,a.listenerYaw,a.listener.y},SpatialAudioDomain::ExteriorRoute);
+        };
+        const auto before=gains({-32,3.6f,-10}),after=gains(loaded.chapterDialogue.source);
+        Check(std::abs(after.distance-std::hypot(loaded.chapterCompanion.x-loaded.playerX,
+            loaded.chapterCompanion.z-loaded.playerZ))<.00001f && !after.obstructed,
+            "restored Kit distance comes from the actual actor even when it is farther than the old point");
+        std::cout<<"Kit reunion anchor: listener=("<<loaded.playerX<<','<<loaded.playerZ<<") actor=("
+            <<loaded.chapterCompanion.x<<','<<loaded.chapterCompanion.z<<") oldDistance="<<before.distance
+            <<" newDistance="<<after.distance<<" oldLR="<<before.left<<','<<before.right
+            <<" newLR="<<after.left<<','<<after.right<<'\n';
+        InputSnapshot in;in.damageEnabled=false;in.yawRadians=c.yaw;in.pitchRadians=c.pitch;
+        sim.StepFixed(in); // release restored input barrier through ordinary neutral input
+        const auto started=sim.Snapshot();
+        in.moveStrafe=.5f;in.yawRadians+=.4f;
+        for(int tick=0;tick<15;++tick) {
+            sim.StepFixed(in);
+            Check(anchored(sim.Snapshot())&&sim.Snapshot().chapterDialogue.generation==started.chapterDialogue.generation,
+                "ordinary live movement/turn updates Kit listener and source in the same snapshot without restarting");
+        }
+        const auto moved=sim.Snapshot();
+        Check(moved.playerX!=started.playerX||moved.playerZ!=started.playerZ,"Kit live anchor check includes actual collision-resolved movement");
+        Check(moved.chapterDialogue.elapsed>started.chapterDialogue.elapsed,"spatial changes do not reset the line clock");
+        in.paused=true;sim.StepFixed(in);
+        const auto paused=sim.Snapshot();
+        Check(paused.chapterDialogue.elapsed==moved.chapterDialogue.elapsed &&
+            paused.chapterDialogue.generation==moved.chapterDialogue.generation,
+            "pause preserves active Kit cursor identity after movement");
+        const auto captured=sim.CaptureAuthoredCampaignBoundary(c.id);
+        Check(captured&&captured->dialogue.activeLine==dlg::Line::ReunionQuestion,
+            "Kit spatial anchors do not alter logical checkpoint speech semantics");
+        // Continue from the isolated restored landing with collision-resolved
+        // input, not a relocation. This is a seeded post-Keeper host fixture,
+        // not natural victory/ascent, endpoint playback or owner listening.
+        Check(Restore(sim,c,terrain),"nearby speech comparison independently restores the canonical landing");
+        // Restore admits only the destination zone. This CPU fixture already
+        // loaded the full chapter terrain above; publish that owner's next-zone
+        // readiness explicitly, as the scene adapter does. No story flag changes.
+        Check(sim.Snapshot().worldRoute.readiness[static_cast<unsigned>(WorldZoneId::ForestApproach)]==ZoneReadiness::Unprepared,
+            "safe-exit restore does not fabricate next-zone resource readiness");
+        Check(sim.PublishWorldZoneReadiness({sim.Snapshot().worldRoute.generation,WorldZoneId::ForestApproach},ZoneReadiness::Ready),
+            "nearby dialogue CPU owner admits its actual already-loaded chapter terrain");
+        in={};in.damageEnabled=false;in.yawRadians=c.yaw;in.pitchRadians=c.pitch;
+        sim.StepFixed(in);
+        const auto reunion=kWorldRoutePoints[3];
+        bool reached=false;
+        for(int tick=0;tick<600;++tick) {
+            const auto& s=sim.Snapshot();
+            const float dx=reunion.x-s.playerX,dz=reunion.z-s.playerZ;
+            const float distance=std::hypot(dx,dz);
+            if(distance<.008f) {reached=true;break;}
+            in.yawRadians=std::atan2(dx,-dz);in.moveForward=std::min(1.0f,distance/.055f);
+            sim.StepFixed(in);
+        }
+        Check(reached,"Kit spatial fixture reaches actual reunion with ordinary collision-resolved movement");
+        in.moveForward=0;in.runHeld=false;
+        for(int tick=0;tick<600&&sim.Snapshot().chapterDialogue.line!=dlg::Line::ReunionHint;++tick)sim.StepFixed(in);
+        const auto near=sim.Snapshot();
+        Check(near.chapterDialogue.line==dlg::Line::ReunionHint&&anchored(near),
+            "actual logical reminder at reunion starts with current Kit/listener positions");
+        const auto mix=[&](dlg::Tuple source) {
+            const auto& a=near.chapterDialogue;
+            return CalculateSpatialAudio({source.x,source.z,.36f,1,14,source.y},
+                {a.listener.x,a.listener.z,a.listenerYaw,a.listener.y},SpatialAudioDomain::ExteriorRoute);
+        };
+        const auto oldNear=mix({-32,3.6f,-10}),newNear=mix(near.chapterDialogue.source);
+        Check(newNear.distance<1.01f&&oldNear.distance>5 && newNear.left+newNear.right>oldNear.left+oldNear.right,
+            "reunion reminder no longer attenuates a one-metre Kit as an obsolete five-metre point");
+        std::cout<<"Kit nearby reminder: listener=("<<near.playerX<<','<<near.playerZ<<") actor=("
+            <<near.chapterCompanion.x<<','<<near.chapterCompanion.z<<") oldDistance="<<oldNear.distance
+            <<" newDistance="<<newNear.distance<<" oldLR="<<oldNear.left<<','<<oldNear.right
+            <<" newLR="<<newNear.left<<','<<newNear.right<<'\n';
     }
     {
         auto c=Record(true);c.lanternHigh=true;

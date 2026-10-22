@@ -245,6 +245,9 @@ bool GameSimulation::CommitCampaignRestore(campaign::RestoreToken token, WorldZo
     context.yaw=c.yaw;context.paused=true;context.claimed=true;context.exterior=upper;
     context.lanternLow=!c.lanternHigh;context.lanternHigh=c.lanternHigh;
     context.manualRaiseSequence=next.lastConsumedToggleHeldLightPoseSequence_;
+    const auto& kit=next.chapterCompanion_.State();
+    if(upper && kit.grounded)
+        context.companionSource=dialogue::Tuple{kit.x,kit.y+dialogue::kCompanionSpeechHeight,kit.z};
     if(!next.chapterDialogue_.RestoreProgress(c.dialogue,context,chapterDialogue_.State().generation,
         next.lastConsumedToggleHeldLightPoseSequence_)) return false;
     next.ResolveHeldItems();

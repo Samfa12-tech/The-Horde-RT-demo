@@ -463,6 +463,29 @@ int main()
               windowsChapter.find(".36f, 1.0f, 14.0f, dialogue.source.y}") != std::string::npos &&
               chapterRead.find("0.36f, 1.0f, 14.0f, snapshot.source.y}") != std::string::npos,
               "both dialogue consumers opt into the same authoritative domain without changing speech gain or frozen positions");
+        const auto updateDialogueMatrix = section(windowsSource,
+            "void UpdateDialogueSpatial(", "void UpdateOwnedGain(");
+        check(updateDialogueMatrix.find("if (line == 0u || generation == 0u) return;") != std::string::npos &&
+              updateDialogueMatrix.find("active.loopKey == \"chapter_dialogue\" && active.dialogueLine == line &&") != std::string::npos &&
+              updateDialogueMatrix.find("active.dialogueGeneration == generation") != std::string::npos &&
+              updateDialogueMatrix.find("SetVoiceMatrix(active.voice, leftGain, rightGain, active.filename)") != std::string::npos &&
+              updateDialogueMatrix.find("SetVolume(") == std::string::npos &&
+              updateDialogueMatrix.find("Stop(") == std::string::npos &&
+              updateDialogueMatrix.find("Start(") == std::string::npos &&
+              updateDialogueMatrix.find("SubmitSourceBuffer(") == std::string::npos &&
+              updateDialogueMatrix.find("FlushSourceBuffers(") == std::string::npos &&
+              updateDialogueMatrix.find("completedDialogue") == std::string::npos,
+              "Windows live speech updates only the exact owned line/generation matrix without touching its PCM or completion");
+        const auto sameVoiceReturn = windowsChapter.find("if (sameVoice) return;");
+        check(windowsChapter.find("const bool sameVoice = context.playingDialogueLine == lineId &&") != std::string::npos &&
+              windowsChapter.find("context.playingDialogueGeneration == dialogue.generation;") != std::string::npos &&
+              windowsChapter.find("CalculateSpatialAudio(") < windowsChapter.find("UpdateDialogueSpatial(") &&
+              windowsChapter.find("UpdateDialogueSpatial(lineId, dialogue.generation, gains.left, gains.right)") <
+                  windowsChapter.find("PauseDialogue(paused)") &&
+              windowsChapter.find("if (paused) return;") < sameVoiceReturn &&
+              sameVoiceReturn < windowsChapter.find("StopLoop(\"chapter_dialogue\");", sameVoiceReturn) &&
+              sameVoiceReturn < windowsChapter.find(".Play(path, gains.left, gains.right,"),
+              "Windows applies coherent spatial gains before same-identity resume/return and never resubmits the active line");
         check(windowsSource.find("masteringVoice_->SetVolume(1.0f)") != std::string::npos &&
               windowsSource.find("SfxVolumeLinearGain(percent)") != std::string::npos &&
               windowsSource.find("WindowsSfxSourceGain(1.0f, sfxVolumePercent)") != std::string::npos &&

@@ -1,0 +1,27 @@
+Retained failures; none are accepted evidence of runtime success.
+
+1. Initial sandboxed MSBuild build emitted its banner then stalled before
+   compilation. Owned unified-exec session 7617 was interrupted (exit1).
+   The same authorized local build completed with the installed toolchain
+   outside the sandbox. No owner process was terminated.
+2. A build request used nonexistent target horde_rt_windows_app. MSBuild
+   returned MSB1009, Project file does not exist. No application build occurred
+   for that target. Correct horde_rt_diagnostic_window then built successfully.
+3. New checkpoint fixture initially tried CaptureCampaignCheckpoint after
+   moving away from its canonical safe anchor; its existing guard correctly
+   returned no record. Initial suite3/4. Fixture now uses the existing
+   CaptureAuthoredCampaignBoundary API; no production save guard changed.
+4. New nearby-speech walk stopped around(-32.8776,-11.9451); then an independently
+   restored canonical walk stopped around(-33.0742,-11.9239). Both lacked the
+   next-zone readiness publication. CommitCampaignRestore admits only its
+   destination; movement correctly refuses unprepared ForestApproach. The
+   fixture now asserts that missing readiness, then publishes the actual full
+   chapter terrain it already imported, matching the owner/scene contract.
+   Original route assertions remain. Final suite4/4, nearby position
+   (-28.7023,-5.80325), actual reminder with current actor/listener anchors.
+5. Sandbox git ls-remote failed getaddrinfo() before remote lookup. Read-only
+   escalated lookup verified existing PR27 head c2bbc714 and its branch.
+
+Inherited CharacterRenderSlotSmoke source-string failures, historical hosted CI
+failures, Debug route timeout and PR27 CONFLICTING remain open. This checkpoint
+does not rerun or relabel them. No auto-review denial occurred in this slice.
