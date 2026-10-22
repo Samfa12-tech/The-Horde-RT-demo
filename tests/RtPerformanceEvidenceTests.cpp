@@ -527,9 +527,15 @@ void TestStageAccumulatorAndConversion(TestContext& context)
         context.Check(RtStageIndex(originalStageOrder[index]) == index,
                       "appended pose-copy stage must preserve every existing count-array index");
     context.Check(RtStageIndex(RtStage::PoseCopy) == originalStageOrder.size() &&
-                      kRtStageCount == originalStageOrder.size() + 1u &&
+                      RtStageIndex(RtStage::PlayerPose) == originalStageOrder.size() + 1u &&
                       std::string_view(RtStageMetricName(RtStage::PoseCopy)) == "poseCopyCpuMs",
                   "pose-copy metric must append one named stage after the original roster");
+    constexpr std::array<RtStage,6> skinSubstages{{RtStage::PlayerPose,RtStage::PlayerVertices,
+        RtStage::ViewmodelVertices,RtStage::CharacterAnimation,RtStage::CharacterVertices,RtStage::CharacterCopy}};
+    for(std::size_t i=0;i<skinSubstages.size();++i)
+        context.Check(RtStageIndex(skinSubstages[i])==14u+i && RtStageMetricName(skinSubstages[i])!=nullptr,
+                      "skin substage names append without changing any saved count-array index");
+    context.Check(kRtStageCount==20u,"appended skin attribution roster has exactly six new phases");
     std::uint64_t nanoseconds = 0u;
     context.Check(CheckedMillisecondsToNanoseconds(1.25, nanoseconds) &&
                       nanoseconds == 1'250'000u,
@@ -2023,9 +2029,11 @@ void TestValidatorAndSerializers(TestContext& context)
         "\"traceCopyRecordCpuMs\":0.000007,\"frameFenceWaitCpuMs\":0.000008,"
         "\"imageAcquireCpuMs\":0.000009,\"queueSubmitCpuMs\":0.000010,"
         "\"presentCallCpuMs\":0.000011,\"wholeFrameCycleCpuMs\":0.000012,\"poseCopyCpuMs\":0.000013,"
-        "\"workInvocationCounts\":[1,0,0,0,0,0,0,0,0,0,0,0,0,0],"
-        "\"byteCounts\":[0,0,0,0,64,0,0,0,0,0,0,0,0,0],"
-        "\"operationCounts\":[0,0,0,0,2,0,0,0,0,0,0,0,0,0]},"
+        "\"playerPoseCpuMs\":0.000014,\"playerVerticesCpuMs\":0.000015,\"viewmodelVerticesCpuMs\":0.000016,"
+        "\"characterAnimationCpuMs\":0.000017,\"characterVerticesCpuMs\":0.000018,\"characterCopyCpuMs\":0.000019,"
+        "\"workInvocationCounts\":[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"
+        "\"byteCounts\":[0,0,0,0,64,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"
+        "\"operationCounts\":[0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},"
         "\"presentation\":{\"outcome\":\"presented\",\"presented\":true,"
         "\"lastSuccessfulPresentSubmissionSerial\":1,\"finalIdleCompletion\":false},"
         "\"cpuBenchmarkEligible\":true,\"benchmarkEligible\":true}\n";
@@ -2046,7 +2054,7 @@ void TestValidatorAndSerializers(TestContext& context)
         "Presentation: presented last-successful-submission=1 final-idle=no cpu-benchmark-eligible=yes benchmark-eligible=yes\n"
         "Dielectric diagnostics: compiled-out counters=N/A reads=0 resets=0\n"
         "Whole RT GPU: disabled value=N/A\n"
-        "Stages (CPU wall/record): simulationStepCpuMs=0.000000 skinCpuMs=0.000005 playerSkinCpuMs=0.000002 characterSkinCpuMs=0.000003 dynamicUploadCpuMs=0.000004 blasRefitRecordCpuMs=0.000005 tlasUpdateRecordCpuMs=0.000006 traceCopyRecordCpuMs=0.000007 frameFenceWaitCpuMs=0.000008 imageAcquireCpuMs=0.000009 queueSubmitCpuMs=0.000010 presentCallCpuMs=0.000011 wholeFrameCycleCpuMs=0.000012 poseCopyCpuMs=0.000013\n";
+        "Stages (CPU wall/record): simulationStepCpuMs=0.000000 skinCpuMs=0.000005 playerSkinCpuMs=0.000002 characterSkinCpuMs=0.000003 dynamicUploadCpuMs=0.000004 blasRefitRecordCpuMs=0.000005 tlasUpdateRecordCpuMs=0.000006 traceCopyRecordCpuMs=0.000007 frameFenceWaitCpuMs=0.000008 imageAcquireCpuMs=0.000009 queueSubmitCpuMs=0.000010 presentCallCpuMs=0.000011 wholeFrameCycleCpuMs=0.000012 poseCopyCpuMs=0.000013 playerPoseCpuMs=0.000014 playerVerticesCpuMs=0.000015 viewmodelVerticesCpuMs=0.000016 characterAnimationCpuMs=0.000017 characterVerticesCpuMs=0.000018 characterCopyCpuMs=0.000019\n";
     context.Check(shippingText == expectedShippingText,
                   "Shipping text must match the hand-derived canonical golden projection");
     context.Check(shippingText.find("N/A") != std::string::npos,

@@ -1384,20 +1384,24 @@ bool SkinnedMeshAsset::NodeTransform(const SkinnedClip clipId,
 bool SkinnedMeshAsset::Skin(
     SkinnedClip clipId, float timeSeconds, std::vector<SkinnedRtVertex>& output,
     std::string& diagnostic,
-    const std::span<const SkinnedNodeRotation> additiveNodeRotations) const
+    const std::span<const SkinnedNodeRotation> additiveNodeRotations, SkinWorkMetrics* work) const
 {
-    if (!SkinUniqueGeometry(clipId, timeSeconds, diagnostic, additiveNodeRotations)) return false;
+    if(work)*work={};
+    if (!SkinUniqueGeometry(clipId, timeSeconds, diagnostic, additiveNodeRotations, nullptr, nullptr, work)) return false;
+    SkinWorkScope copyScope(work?&work->copyNanoseconds:nullptr);
     output.resize(expandedIndices_.size());
     for (std::size_t index = 0u; index < expandedIndices_.size(); ++index)
         output[index] = skinnedUniqueVertices_[expandedIndices_[index]];
+    if(work){work->copyBytes+=output.size()*sizeof(output.front());++work->copies;}
     return true;
 }
 
 bool SkinnedMeshAsset::SkinUniqueGeometry(
     SkinnedClip clipId, float timeSeconds, std::string& diagnostic,
     const std::span<const SkinnedNodeRotation> additiveNodeRotations,
-    std::vector<SkinnedPbrTangent>* outputTangents, const SkinnedClipBlend* blend) const
+    std::vector<SkinnedPbrTangent>* outputTangents, const SkinnedClipBlend* blend, SkinWorkMetrics* work) const
 {
+    SkinWorkScope animationScope(work?&work->animationNanoseconds:nullptr);
     if (!loaded_) { diagnostic = "Skeleton model was not loaded."; return false; }
     const std::size_t clipIndex = static_cast<std::size_t>(clipId);
     if (clipIndex >= clips_.size()) { diagnostic = "Skeleton combat clip index is invalid."; return false; }
@@ -1515,6 +1519,9 @@ bool SkinnedMeshAsset::SkinUniqueGeometry(
         std::memcpy(inverse.m.data(), inverseBindMatrices_.data() + i * 16u, sizeof(float) * 16u);
         skinMatrices[i] = Multiply(resolveGlobal(resolveGlobal, joints_[i]), inverse);
     }
+    if(work){work->vertices=vertices_.size();work->joints=joints_.size();}
+    animationScope.Complete();
+    SkinWorkScope vertexScope(work?&work->vertexNanoseconds:nullptr);
     // Skin each source vertex once. Legacy non-indexed consumers expand this
     // result afterwards; indexed PBR consumers retain the unique stream.
     skinnedUniqueVertices_.resize(vertices_.size());
@@ -1585,14 +1592,15 @@ bool SkinnedMeshAsset::SkinTextured(SkinnedClip clipId,
                                       float timeSeconds,
                                       std::vector<TexturedSkinnedRtVertex>& output,
                                       std::string& diagnostic,
-                                      const std::span<const SkinnedNodeRotation> additiveNodeRotations) const
+                                      const std::span<const SkinnedNodeRotation> additiveNodeRotations, SkinWorkMetrics* work) const
 {
     if (!hasTexcoords_)
     {
         diagnostic = "Skinned model has no TEXCOORD_0 stream.";
         return false;
     }
-    if (!Skin(clipId, timeSeconds, texturedSkinScratch_, diagnostic, additiveNodeRotations)) return false;
+    if (!Skin(clipId, timeSeconds, texturedSkinScratch_, diagnostic, additiveNodeRotations, work)) return false;
+    SkinWorkScope copyScope(work?&work->copyNanoseconds:nullptr);
     output.resize(texturedSkinScratch_.size());
     for (std::size_t outputIndex = 0u; outputIndex < output.size(); ++outputIndex)
     {
@@ -1606,6 +1614,7 @@ bool SkinnedMeshAsset::SkinTextured(SkinnedClip clipId,
         destination.texcoord[2] = 0.0f;
         destination.texcoord[3] = 0.0f;
     }
+    if(work){work->copyBytes+=output.size()*sizeof(output.front());++work->copies;}
     diagnostic.clear();
     return true;
 }
@@ -1613,21 +1622,23 @@ bool SkinnedMeshAsset::SkinTextured(SkinnedClip clipId,
 bool SkinnedMeshAsset::SkinUniqueTextured(const SkinnedClip clipId,
                                           const float timeSeconds,
                                           std::vector<TexturedSkinnedRtVertex>& output,
-                                          std::string& diagnostic) const
+                                          std::string& diagnostic, SkinWorkMetrics* work) const
 {
     if (!hasTexcoords_)
     {
         diagnostic = "Skinned model has no TEXCOORD_0 stream.";
         return false;
     }
-    if (!SkinUniqueGeometry(clipId, timeSeconds, diagnostic, {})) return false;
-    CopyUniqueTextured(output);
+    if(work)*work={};
+    if (!SkinUniqueGeometry(clipId, timeSeconds, diagnostic, {}, nullptr, nullptr, work)) return false;
+    CopyUniqueTextured(output,work);
     diagnostic.clear();
     return true;
 }
 
-void SkinnedMeshAsset::CopyUniqueTextured(std::vector<TexturedSkinnedRtVertex>& output) const
+void SkinnedMeshAsset::CopyUniqueTextured(std::vector<TexturedSkinnedRtVertex>& output, SkinWorkMetrics* work) const
 {
+    SkinWorkScope copyScope(work?&work->copyNanoseconds:nullptr);
     output.resize(skinnedUniqueVertices_.size());
     for (std::size_t sourceIndex = 0u; sourceIndex < output.size(); ++sourceIndex)
     {
@@ -1642,13 +1653,15 @@ void SkinnedMeshAsset::CopyUniqueTextured(std::vector<TexturedSkinnedRtVertex>& 
         destination.texcoord[2] = 0.0f;
         destination.texcoord[3] = 0.0f;
     }
+    if(work){work->copyBytes+=output.size()*sizeof(output.front());++work->copies;}
 }
 
 bool SkinnedMeshAsset::SkinUniquePbr(SkinnedClip clip, float time,
     std::vector<TexturedSkinnedRtVertex>& output,
     std::vector<SkinnedPbrTangent>& tangents, std::string& diagnostic,
-    std::span<const SkinnedNodeRotation> additiveNodeRotations, const SkinnedClipBlend* blend) const
+    std::span<const SkinnedNodeRotation> additiveNodeRotations, const SkinnedClipBlend* blend, SkinWorkMetrics* work) const
 {
+    if(work)*work={};
     output.clear();
     tangents.clear();
     if (!hasTexcoords_ || !hasTangents_ || !std::isfinite(time))
@@ -1656,12 +1669,12 @@ bool SkinnedMeshAsset::SkinUniquePbr(SkinnedClip clip, float time,
         diagnostic = "PBR clip skinning requires UVs, tangents and finite time.";
         return false;
     }
-    if (!SkinUniqueGeometry(clip, time, diagnostic, additiveNodeRotations, &tangents, blend))
+    if (!SkinUniqueGeometry(clip, time, diagnostic, additiveNodeRotations, &tangents, blend, work))
     {
         tangents.clear();
         return false;
     }
-    CopyUniqueTextured(output);
+    CopyUniqueTextured(output,work);
     return true;
 }
 

@@ -290,12 +290,15 @@ bool CharacterRenderSlot::PrepareFrame(
         auto& vertices = skeletonSkinnedVertices_[bucket];
         RtSceneStageScope skinScope(
             observation, horde::telemetry::RtStage::CharacterSkin);
-        if (!skeletonModel_.Skin(representative->clip, representative->time, vertices, diagnostic))
+        horde::scene::SkinWorkMetrics work;
+        if (!skeletonModel_.Skin(representative->clip, representative->time, vertices, diagnostic, {},
+                                 WantsSkinWorkMetrics(observation)?&work:nullptr))
         {
             skinScope.Cancel();
             return false;
         }
         skinScope.Complete(1u);
+        ObserveSkinWork(observation,work);
         const VkDeviceSize byteSize = sizeof(horde::scene::SkinnedRtVertex) * vertices.size();
         if (!resources.WriteBuffer(skeletonGpus_[bucket].vertices,
                                    vertices.data(),
@@ -322,13 +325,15 @@ bool CharacterRenderSlot::PrepareFrame(
         {
             RtSceneStageScope skinScope(
                 observation, horde::telemetry::RtStage::CharacterSkin);
+            horde::scene::SkinWorkMetrics work;
             bool skinned = false;
             if (framePlan.lichStaffLiftRadians == 0.0f && framePlan.lichStaffCastRadians == 0.0f)
             {
                 // Keep dormant, dead, and legacy capture skins byte-identical
                 // to the authored clip path.
                 skinned = lichModel_.SkinTextured(
-                    framePlan.lichClip, framePlan.lichTime, lichSkinnedVertices_, diagnostic);
+                    framePlan.lichClip, framePlan.lichTime, lichSkinnedVertices_, diagnostic, {},
+                    WantsSkinWorkMetrics(observation)?&work:nullptr);
             }
             else
             {
@@ -337,7 +342,8 @@ bool CharacterRenderSlot::PrepareFrame(
                                                   framePlan.lichStaffCastRadians)},
                     {"LeftForeArm", RotationAroundX(-0.72f * framePlan.lichStaffLiftRadians)}}};
                 skinned = lichModel_.SkinTextured(framePlan.lichClip, framePlan.lichTime,
-                                                  lichSkinnedVertices_, diagnostic, castPose);
+                                                  lichSkinnedVertices_, diagnostic, castPose,
+                                                  WantsSkinWorkMetrics(observation)?&work:nullptr);
             }
             if (!skinned)
             {
@@ -351,6 +357,7 @@ bool CharacterRenderSlot::PrepareFrame(
                 return false;
             }
             skinScope.Complete(1u);
+            ObserveSkinWork(observation,work);
             const VkDeviceSize byteSize = sizeof(horde::scene::TexturedSkinnedRtVertex) * lichSkinnedVertices_.size();
             if (!resources.WriteBuffer(lichGpu_.vertices, lichSkinnedVertices_.data(), byteSize,
                                        "animated lich vertex", diagnostic, observation) ||

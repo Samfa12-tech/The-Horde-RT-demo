@@ -6845,12 +6845,15 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         {
             const auto viewSkinBegin = std::chrono::steady_clock::now();
             RtSceneStageScope viewSkinScope(observation, horde::telemetry::RtStage::PlayerSkin);
+            RtSceneStageScope viewVerticesScope(observation, horde::telemetry::RtStage::ViewmodelVertices);
             if (!viewmodelSkin_.SkinPlayerPoseUniqueTextured(playerRenderSlot_.SolvedPose(),
                     viewmodelPoseVertices_, viewmodelPoseTangents_, diagnostic))
             {
                 viewSkinScope.Cancel();
+                viewVerticesScope.Cancel();
                 return false;
             }
+            viewVerticesScope.Complete(1u,0u,viewmodelPoseVertices_.size());
             viewSkinScope.Complete(1u);
             playerSkinTotalMilliseconds_ += std::chrono::duration<double, std::milli>(
                 std::chrono::steady_clock::now() - viewSkinBegin).count();
@@ -6939,12 +6942,15 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         // Pose owns clip skinning plus its inseparable floor/bounds/static-PBR
         // repack. CharacterSkin therefore includes that CPU preparation here.
         RtSceneStageScope companionSkinScope(observation, horde::telemetry::RtStage::CharacterSkin);
+        horde::scene::SkinWorkMetrics companionWork;
         const auto acting=horde::scene::CompanionUpperBodyRotations(frame.chapterCompanion.acting);
-        if (!chapterActor_.Pose(clip, time, diagnostic, acting, &blend)) {
+        if (!chapterActor_.Pose(clip, time, diagnostic, acting, &blend,
+                               WantsSkinWorkMetrics(observation)?&companionWork:nullptr)) {
             companionSkinScope.Cancel();
             return false;
         }
         companionSkinScope.Complete(1u);
+        ObserveSkinWork(observation,companionWork);
         const auto& metadata = staticMeshSlot_.InstanceMetadata()[CharacterRenderSlot::kKeeperMetadataIndex];
         const auto& primitive = staticMeshSlot_.PrimitiveMetadata()[metadata.primitiveBase];
         const auto& vertices = chapterActor_.Asset().vertices;

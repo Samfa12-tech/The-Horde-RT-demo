@@ -1,5 +1,6 @@
 #include "scene/assets/SkinnedMeshAsset.h"
 #include "vulkan/raytracing/PlayerRenderSlot.h"
+#include "vulkan/raytracing/RtSceneRecordObservation.h"
 
 #include <algorithm>
 #include <chrono>
@@ -47,10 +48,13 @@ int main()
         (root / "assets/models/player/runtime/gothic-traveller-lod0.runtime.glb").string();
     std::string diagnostic;
     SkinnedMeshAsset reference;
+    SkinnedMeshAsset viewmodel;
     PlayerRenderSlot at30;
     PlayerRenderSlot at60;
     if (!reference.LoadClips(path, PlayerLocomotionClipSet(), diagnostic) ||
-        !at30.LoadAsset(path, diagnostic) || !at60.LoadAsset(path, diagnostic))
+        !at30.LoadAsset(path, diagnostic) || !at60.LoadAsset(path, diagnostic) ||
+        !viewmodel.LoadClips((root/"assets/models/player/viewmodel/runtime/gothic-traveller-viewmodel.runtime.glb").string(),
+                             PlayerLocomotionClipSet(),diagnostic))
     {
         std::cerr << diagnostic << '\n';
         return 2;
@@ -64,12 +68,20 @@ int main()
     double maximumMotionError = 0.0;
     float maximumSocketError30 = 0.0f;
     float maximumSocketError60 = 0.0f;
+    std::uint64_t poseNs=0,vertexNs=0,viewmodelNs=0;
+    std::vector<TexturedSkinnedRtVertex> viewVertices;
+    std::vector<SkinnedPbrTangent> viewTangents;
     for (std::uint64_t tick = 1u; tick <= tickCount; ++tick)
     {
         PlayerAnimationSnapshot animation;
         animation.locomotionClip = PlayerLocomotionClip::Walk;
         animation.locomotionBlend = 1.0f;
         animation.locomotionTime = static_cast<float>(tick) / 60.0f;
+        // These fixture targets are already in the rig's model space. The
+        // default snapshot axes are view-space and need the production adapter.
+        for(auto* arm:{&animation.leftIk,&animation.rightIk}) {
+            arm->gripX={{1,0,0}};arm->gripY={{0,1,0}};arm->gripZ={{0,0,1}};
+        }
         SkinnedNodeTransform leftShoulder{};
         SkinnedNodeTransform rightShoulder{};
         if (!reference.NodeTransform(SkinnedClip::Walking, animation.locomotionTime,
@@ -87,14 +99,11 @@ int main()
                                      shoulderCenterY, shoulderCenterZ}};
         animation.rightIk.shoulder = {{shoulderCenterX + 0.36f,
                                       shoulderCenterY, shoulderCenterZ}};
-        animation.leftIk.target = {{animation.leftIk.shoulder[0] - 0.08f,
-                                    animation.leftIk.shoulder[1] + 0.04f,
-                                    animation.leftIk.shoulder[2] + 0.66f}};
-        animation.leftIk.pole = {{-0.8f, -0.1f, 0.45f}};
-        animation.rightIk.target = {{animation.rightIk.shoulder[0] + 0.08f,
-                                     animation.rightIk.shoulder[1] + 0.03f,
-                                     animation.rightIk.shoulder[2] + 0.66f}};
-        animation.rightIk.pole = {{0.8f, -0.1f, 0.45f}};
+        // Same admitted anatomical targets as PlayerCrouchRigTests at drop0.
+        animation.leftIk.target = {{.16f,1.10f,.35f}};
+        animation.leftIk.pole = {{1,0,1}};
+        animation.rightIk.target = {{-.16f,1.10f,.35f}};
+        animation.rightIk.pole = {{-1,0,1}};
 
         bool updated30 = false;
         auto start = std::chrono::steady_clock::now();
@@ -109,9 +118,12 @@ int main()
         updates30 += updated30 ? 1u : 0u;
 
         bool updated60 = false;
+        horde::telemetry::RtStageAccumulator stages;
+        if(!stages.Begin())return 2;
+        RtSceneRecordObservation observation;observation.stages=&stages;
         start = std::chrono::steady_clock::now();
         if (!at60.PreparePose(animation, tick, PlayerCpuSkinCadence::Hz60,
-                              updated60, diagnostic))
+                              updated60, diagnostic, &observation))
         {
             std::cerr << diagnostic << '\n';
             return 2;
@@ -119,6 +131,15 @@ int main()
         total60Milliseconds += std::chrono::duration<double, std::milli>(
             std::chrono::steady_clock::now() - start).count();
         updates60 += updated60 ? 1u : 0u;
+        horde::telemetry::RtStageFrameSample sample;
+        if(!stages.Commit(sample) || !observation.healthy)return 2;
+        poseNs+=sample.values[horde::telemetry::RtStageIndex(horde::telemetry::RtStage::PlayerPose)].durationNanoseconds;
+        vertexNs+=sample.values[horde::telemetry::RtStageIndex(horde::telemetry::RtStage::PlayerVertices)].durationNanoseconds;
+        const auto viewStart=std::chrono::steady_clock::now();
+        if(!viewmodel.SkinPlayerPoseUniqueTextured(at60.SolvedPose(),viewVertices,viewTangents,diagnostic)) {
+            std::cerr<<diagnostic;return 2;
+        }
+        viewmodelNs+=std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::steady_clock::now()-viewStart).count();
         maximumSocketError30 = std::max(
             maximumSocketError30,
             std::max(at30.LeftSocketErrorMetres(), at30.RightSocketErrorMetres()));
@@ -141,6 +162,10 @@ int main()
     std::cout << std::fixed << std::setprecision(6)
               << "{\"ticks\":" << tickCount
               << ",\"uniqueVertices\":" << at60.UniqueVertices().size()
+              << ",\"viewmodelVertices\":" << viewVertices.size()
+              << ",\"playerPoseMeanMs\":" << double(poseNs)/tickCount/1e6
+              << ",\"worldVertexMeanMs\":" << double(vertexNs)/tickCount/1e6
+              << ",\"viewmodelVertexMeanMs\":" << double(viewmodelNs)/tickCount/1e6
               << ",\"hz30\":{\"updates\":" << updates30
               << ",\"cpuMsPerUpdate\":" << perUpdate30
               << ",\"cpuMsPerTick\":" << total30Milliseconds / tickCount

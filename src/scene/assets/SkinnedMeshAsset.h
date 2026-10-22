@@ -1,4 +1,5 @@
 #pragma once
+#include "scene/assets/SkinWorkMetrics.h"
 
 #include <array>
 #include <cmath>
@@ -220,21 +221,21 @@ public:
                        std::string& diagnostic) const;
     bool Skin(SkinnedClip clip, float timeSeconds, std::vector<SkinnedRtVertex>& output,
               std::string& diagnostic,
-              std::span<const SkinnedNodeRotation> additiveNodeRotations = {}) const;
+              std::span<const SkinnedNodeRotation> additiveNodeRotations = {}, SkinWorkMetrics* work = nullptr) const;
     bool SkinTextured(SkinnedClip clip, float timeSeconds,
                       std::vector<TexturedSkinnedRtVertex>& output, std::string& diagnostic,
-                      std::span<const SkinnedNodeRotation> additiveNodeRotations = {}) const;
+                      std::span<const SkinnedNodeRotation> additiveNodeRotations = {}, SkinWorkMetrics* work = nullptr) const;
     bool SkinUniqueTextured(SkinnedClip clip,
                             float timeSeconds,
                             std::vector<TexturedSkinnedRtVertex>& output,
-                            std::string& diagnostic) const;
+                            std::string& diagnostic, SkinWorkMetrics* work = nullptr) const;
     // Plain clip skinning for indexed PBR actors, without player rig/IK rules.
     bool SkinUniquePbr(SkinnedClip clip, float timeSeconds,
                        std::vector<TexturedSkinnedRtVertex>& output,
                        std::vector<SkinnedPbrTangent>& outputTangents,
                        std::string& diagnostic,
                        std::span<const SkinnedNodeRotation> additiveNodeRotations = {},
-                       const SkinnedClipBlend* blend = nullptr) const;
+                       const SkinnedClipBlend* blend = nullptr, SkinWorkMetrics* work = nullptr) const;
     bool SkinPlayerUniqueTextured(SkinnedClip clip,
                                   float timeSeconds,
                                   const SkinnedArmIkTarget& leftArm,
@@ -273,8 +274,8 @@ private:
                             std::string& diagnostic,
                             std::span<const SkinnedNodeRotation> additiveNodeRotations,
                             std::vector<SkinnedPbrTangent>* outputTangents = nullptr,
-                            const SkinnedClipBlend* blend = nullptr) const;
-    void CopyUniqueTextured(std::vector<TexturedSkinnedRtVertex>& output) const;
+                            const SkinnedClipBlend* blend = nullptr, SkinWorkMetrics* work = nullptr) const;
+    void CopyUniqueTextured(std::vector<TexturedSkinnedRtVertex>& output, SkinWorkMetrics* work = nullptr) const;
     struct SourceVertex;
     struct Node;
     struct Channel;

@@ -606,6 +606,12 @@ const char* RtStageMetricName(const RtStage stage) noexcept
     case RtStage::PresentCall: return "presentCallCpuMs";
     case RtStage::WholeFrameCycle: return "wholeFrameCycleCpuMs";
     case RtStage::PoseCopy: return "poseCopyCpuMs";
+    case RtStage::PlayerPose: return "playerPoseCpuMs";
+    case RtStage::PlayerVertices: return "playerVerticesCpuMs";
+    case RtStage::ViewmodelVertices: return "viewmodelVerticesCpuMs";
+    case RtStage::CharacterAnimation: return "characterAnimationCpuMs";
+    case RtStage::CharacterVertices: return "characterVerticesCpuMs";
+    case RtStage::CharacterCopy: return "characterCopyCpuMs";
     default: return nullptr;
     }
 }

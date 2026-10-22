@@ -875,16 +875,22 @@ bool PlayerRenderSlot::PreparePose(
         return false;
     }
     RtSceneStageScope skinScope(observation, horde::telemetry::RtStage::PlayerSkin);
+    RtSceneStageScope poseScope(observation, horde::telemetry::RtStage::PlayerPose);
     if (!asset_.EvaluatePlayerPose(
             clip, animation.locomotionTime, left, right, solvedPose_, diagnostic,
             animation.plantedPelvisDropMetres, animation.crouchPelvisDropMetres,
-            DodgePose(animation)) ||
-        !asset_.SkinPlayerPoseUniqueTextured(
-            solvedPose_, uniqueVertices_, uniqueTangents_, diagnostic))
+            DodgePose(animation)))
     {
+        poseScope.Cancel();
         skinScope.Cancel();
         return false;
     }
+    poseScope.Complete(1u);
+    RtSceneStageScope vertexScope(observation, horde::telemetry::RtStage::PlayerVertices);
+    if(!asset_.SkinPlayerPoseUniqueTextured(solvedPose_, uniqueVertices_, uniqueTangents_, diagnostic)) {
+        vertexScope.Cancel();skinScope.Cancel();return false;
+    }
+    vertexScope.Complete(1u,0u,uniqueVertices_.size());
     sockets_ = solvedPose_.Sockets();
     skinScope.Complete(1u);
     const auto socketError = [](const horde::scene::SkinnedNodeTransform& socket,

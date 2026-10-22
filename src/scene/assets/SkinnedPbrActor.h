@@ -26,10 +26,11 @@ public:
     }
     bool Pose(SkinnedClip clip, float time, std::string& diagnostic,
               std::span<const SkinnedNodeRotation> additiveNodeRotations = {},
-              const SkinnedClipBlend* blend = nullptr)
+              const SkinnedClipBlend* blend = nullptr, SkinWorkMetrics* work = nullptr)
     {
-        if (!skin_.SkinUniquePbr(clip, time, posed_, tangents_, diagnostic, additiveNodeRotations, blend) ||
+        if (!skin_.SkinUniquePbr(clip, time, posed_, tangents_, diagnostic, additiveNodeRotations, blend, work) ||
             posed_.size() != asset_.vertices.size()) return false;
+        SkinWorkScope copyScope(work?&work->copyNanoseconds:nullptr);
         float floor = std::numeric_limits<float>::infinity();
         for (const auto& vertex : posed_) floor = std::min(floor, vertex.position[1]);
         asset_.bounds.minimum.fill(std::numeric_limits<float>::infinity());
@@ -47,6 +48,7 @@ public:
                 asset_.bounds.maximum[axis] = std::max(asset_.bounds.maximum[axis], vertex.position[axis]);
             }
         }
+        if(work){work->copyBytes+=asset_.vertices.size()*sizeof(asset_.vertices.front());++work->copies;}
         return true;
     }
     StaticMeshAsset& Asset() { return asset_; }

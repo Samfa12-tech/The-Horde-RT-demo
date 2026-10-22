@@ -373,6 +373,13 @@ int main() {
     for(const auto clip:{SkinnedClip::Idle,SkinnedClip::Walking}) {
         for(float fraction:{0.f,.25f,.5f,.75f}) {
             if(!actor.Pose(clip,fraction*actor.Duration(clip),admission)) return 1;
+            const auto unobserved=actor.Asset();
+            SkinWorkMetrics work{1,2,3,4,5,6,7};
+            if(!actor.Pose(clip,fraction*actor.Duration(clip),admission,{},nullptr,&work) ||
+               !SameAdmittedActor(unobserved,actor.Asset()) || work.vertices!=26945 || work.joints!=24 ||
+               work.copies!=2 || work.copyBytes!=26945*(sizeof(TexturedSkinnedRtVertex)+sizeof(assets::StaticRtVertex))) {
+                std::cerr<<"Optional skin attribution changed output or retained stale work counters\n";return 1;
+            }
             const auto& pose=actor.Asset();
             if(std::abs(pose.bounds.minimum[1])>1e-5f ||
                pose.bounds.maximum[1]<1.4f || pose.bounds.maximum[1]>2.3f ||

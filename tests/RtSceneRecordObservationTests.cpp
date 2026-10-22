@@ -54,6 +54,20 @@ int main()
     static_assert(std::is_standard_layout_v<RtSceneRecordObservation>);
 
     bool ok = true;
+    {
+        RtStageAccumulator stages;RtStageFrameSample sample;
+        RtSceneRecordObservation observation;observation.stages=&stages;
+        const horde::scene::SkinWorkMetrics metrics{11,22,33,100,20,8000,2};
+        ObserveSkinWork(&observation,metrics);
+        ok &= Require(stages.Begin(),"substage scratch begins");ObserveSkinWork(&observation,metrics);
+        ok &= Require(stages.Commit(sample) && observation.healthy &&
+            sample.values[RtStageIndex(RtStage::CharacterAnimation)].durationNanoseconds==11 &&
+            sample.values[RtStageIndex(RtStage::CharacterAnimation)].operationCount==20 &&
+            sample.values[RtStageIndex(RtStage::CharacterVertices)].operationCount==100 &&
+            sample.values[RtStageIndex(RtStage::CharacterCopy)].byteCount==8000 &&
+            sample.values[RtStageIndex(RtStage::Skin)].durationNanoseconds==0,
+            "asset substage counters require an active owner and never double-count the parent skin total");
+    }
     TestClock clock{{10u, 17u, 20u, 31u, 40u, 45u}, 6u, 0u};
 
     {

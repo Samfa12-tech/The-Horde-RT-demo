@@ -482,6 +482,10 @@ void ObserveAndroidMotionCompletion(SwapchainContext& context, bool completed)
             const auto& value = cpu.values[horde::telemetry::RtStageIndex(stage)];
             run.chapterCsv<<','<<value.durationNanoseconds<<','<<value.workInvocationCount;
         }
+        for(const auto stage : horde::telemetry::kRtSkinAttributionStages) {
+            const auto& value=cpu.values[horde::telemetry::RtStageIndex(stage)];
+            run.chapterCsv<<','<<value.durationNanoseconds<<','<<value.workInvocationCount<<','<<value.byteCount<<','<<value.operationCount;
+        }
 #if HORDE_RT_FRAME_STAGE_PROBE
         // This is called only after this exact slot's own successful fence/idle.
         for(unsigned i=0;i<context.frameStageTimers.size();++i) {
@@ -599,7 +603,12 @@ void BuildAndroidMotionInput(SwapchainContext& context,
                 <<",player_skin_cpu_ns,player_skin_calls,character_skin_cpu_ns,character_skin_calls"
                 <<",pose_copy_cpu_ns,pose_copy_calls,dynamic_upload_cpu_ns,dynamic_upload_calls"
                 <<",fence_wait_cpu_ns,fence_wait_calls,queue_submit_cpu_ns,queue_submit_calls"
-                <<",whole_frame_cpu_ns,whole_frame_calls"
+                <<",whole_frame_cpu_ns,whole_frame_calls";
+            for(const auto stage : horde::telemetry::kRtSkinAttributionStages) {
+                const auto* name=horde::telemetry::RtStageMetricName(stage);
+                run.chapterCsv<<','<<name<<"_ns,"<<name<<"_calls,"<<name<<"_bytes,"<<name<<"_operations";
+            }
+            run.chapterCsv
 #if HORDE_RT_FRAME_STAGE_PROBE
                 <<",as_gpu_status,as_gpu_serial,as_gpu_ns,dispatch_gpu_status,dispatch_gpu_serial,dispatch_gpu_ns,transfer_gpu_status,transfer_gpu_serial,transfer_gpu_ns"
 #endif

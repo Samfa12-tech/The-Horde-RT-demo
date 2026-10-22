@@ -1,6 +1,7 @@
 #pragma once
 
 #include "telemetry/RtPerformanceEvidence.h"
+#include "scene/assets/SkinWorkMetrics.h"
 
 #include <array>
 #include <chrono>
@@ -123,6 +124,22 @@ struct RtSceneRecordObservation
     bool diagnosticResetCompleted = false;
     bool healthy = true;
 };
+
+inline bool WantsSkinWorkMetrics(const RtSceneRecordObservation* observation) noexcept {
+    return observation && observation->stages && observation->stages->Active();
+}
+inline void ObserveSkinWork(RtSceneRecordObservation* observation,
+                           const horde::scene::SkinWorkMetrics& work) noexcept {
+    if(!WantsSkinWorkMetrics(observation))return;
+    using horde::telemetry::RtStage;
+    const bool animation=observation->stages->Accumulate(RtStage::CharacterAnimation,
+        work.animationNanoseconds,1,0,work.joints);
+    const bool vertices=observation->stages->Accumulate(RtStage::CharacterVertices,
+        work.vertexNanoseconds,1,0,work.vertices);
+    const bool copy=observation->stages->Accumulate(RtStage::CharacterCopy,
+        work.copyNanoseconds,work.copies,work.copyBytes,0);
+    observation->healthy=observation->healthy && animation && vertices && copy;
+}
 
 inline void ObserveRtSceneCommand(RtSceneRecordObservation* const observation,
                                   const RtSceneCommandEvent event) noexcept

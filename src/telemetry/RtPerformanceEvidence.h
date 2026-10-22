@@ -260,10 +260,21 @@ enum class RtStage : std::uint8_t
     // CPU StaticRtVertex repack only; output bytes, not GPU upload traffic.
     // Append new stages to preserve the existing serialized count-array order.
     PoseCopy,
+    // Subsets of existing PlayerSkin / CharacterSkin, never additive totals.
+    PlayerPose,
+    PlayerVertices,
+    ViewmodelVertices,
+    CharacterAnimation,
+    CharacterVertices,
+    CharacterCopy,
     Count,
 };
 
 inline constexpr std::size_t kRtStageCount = static_cast<std::size_t>(RtStage::Count);
+inline constexpr std::array<RtStage,8> kRtSkinAttributionStages{{
+    RtStage::PlayerPose,RtStage::PlayerVertices,RtStage::ViewmodelVertices,
+    RtStage::CharacterAnimation,RtStage::CharacterVertices,RtStage::CharacterCopy,
+    RtStage::BlasRefitRecord,RtStage::TlasUpdateRecord}};
 
 [[nodiscard]] constexpr std::size_t RtStageIndex(const RtStage stage) noexcept
 {
