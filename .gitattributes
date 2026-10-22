@@ -1,4 +1,6 @@
 # Keep high-resolution source art out of normal Git history.
+# Generated shader bounds are compared byte-for-byte with native LF output.
+shaders/raytracing/include/rt_regional_water_bounds.generated.glsl text eol=lf
 docs/evidence/2026-10-20-return-save-recovery/** -text whitespace=cr-at-eol
 docs/evidence/2026-10-20-return-save-recovery/*.log whitespace=-trailing-space,-blank-at-eof,cr-at-eol
 docs/evidence/2026-10-20-native-route-recovery/** -text whitespace=cr-at-eol

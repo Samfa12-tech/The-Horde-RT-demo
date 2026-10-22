@@ -475,7 +475,7 @@ struct PresentableTinyRtSceneObservationTestAccess
         ok &= materials.size()+MakeRtWorldMaterialPalette(true).count<=kRtMaterialCapacity;
         ok &= materials.size()==30u && primitives.size()==
             (scene.pipelineBundle_.Request().quality==DielectricQuality::High?32u:31u);
-        ok &= scene.chapterTerrainSurface_ && scene.chapterTerrainSurface_->TriangleCount()==34050u;
+        ok &= scene.chapterTerrainSurface_ && scene.chapterTerrainSurface_->TriangleCount()==37846u;
         const auto& instances=scene.staticMeshSlot_.InstanceMetadata();
         ok &= instances[9u].primitiveCount==0u && instances[25u].primitiveCount==1u;
         const auto kitMaterial=primitives[instances[25u].primitiveBase].materialIndex;
@@ -1026,9 +1026,10 @@ struct PresentableTinyRtSceneObservationTestAccess
         // 6,184 native triangles; shared material-family consolidation adds no rows.
         // The original open/small fern pair contributes 18 terrain placements:
         // nine of each, 9*1200 + 9*768 = 17,712 exact native triangles.
-        // Ten prepared log/root/stump/snag placements add 11,884 triangles
+        // Six fixed floor chips add 72 triangles in the existing masonry family.
+        // Ten prepared log/root/stump/snag placements add 11,904 triangles
         // in the existing bark primitive, without expanding either row capacity.
-        constexpr std::size_t addedIndices = 46140u + (2u*664u + 960u + 12u + 323264u + 34050u + 656u + 6184u + 17712u + 966u + 6168u + 11904u)*3u;
+        constexpr std::size_t addedIndices = 46140u + (2u*664u + 960u + 12u + 323264u + 37846u + 656u + 6184u + 17712u + 966u + 6168u + 11904u + 72u)*3u;
         bool ok = oldIndices == 8422u * 3u &&
                   baseline.collapseStaticAsset_.bounds.maximum[1] > 12.0f &&
                   std::abs(chapterEntryTop - 6.0f) < 0.001f &&

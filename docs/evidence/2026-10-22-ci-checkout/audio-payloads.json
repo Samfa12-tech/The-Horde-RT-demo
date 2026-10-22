@@ -1,0 +1,23 @@
+[
+  {
+    "path": "assets/audio/chapter-local-ambience/runtime/tomb_drip.wav",
+    "gitPointerBytes": 130,
+    "gitPointerSha256": "6de5bab5e80a27469579d61dad43aa791346324c32908512ae6d082b04214b1e",
+    "payloadBytes": 96044,
+    "payloadSha256": "9cff09fae048b84e60a03b5e7d546c8f1fe3e479bd1094ce4df17a3f628135c8"
+  },
+  {
+    "path": "assets/audio/chapter-local-ambience/runtime/rope_contact.wav",
+    "gitPointerBytes": 130,
+    "gitPointerSha256": "2f6214be064601771a885c7825fbec9f2986c32d0ee047d7a70ae17ba9308146",
+    "payloadBytes": 95244,
+    "payloadSha256": "37948f94da011a1fdb41c8ae29ace65560bc9ee6e344bce49e718dd76303e303"
+  },
+  {
+    "path": "assets/audio/forest-foliage/runtime/leaf_rustle.wav",
+    "gitPointerBytes": 130,
+    "gitPointerSha256": "904435b0e9d67f2672b7996a33b63e16517d40354a7e48ea74d35789069e0045",
+    "payloadBytes": 86610,
+    "payloadSha256": "8126b71f00621241084e663535ab7fa5da47ac3db64419feb1532a4fd05319a8"
+  }
+]

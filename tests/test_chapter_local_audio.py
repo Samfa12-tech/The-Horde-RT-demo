@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 class ChapterLocalAudioTests(unittest.TestCase):
     def test_closed_provenanced_finite_roster_and_pcm_headroom(self):
         directory = ROOT/'assets/audio/chapter-local-ambience'
-        manifest = json.loads((directory/'asset.manifest.json').read_text())
+        manifest = json.loads((directory/'asset.manifest.json').read_text(encoding='utf-8'))
         self.assertFalse(manifest['listeningAcceptance'])
         self.assertIn('not CC0', manifest['license'])
         self.assertEqual(hashlib.sha256((ROOT/manifest['licenseEvidence']).read_bytes()).hexdigest(),
@@ -37,19 +37,19 @@ class ChapterLocalAudioTests(unittest.TestCase):
         self.assertEqual(total,191288)
 
     def test_both_platform_package_rosters_admit_only_runtime_derivatives(self):
-        gradle=(ROOT/'android/app/build.gradle').read_text()
-        windows=(ROOT/'tools/horde-night-audio-policy.ps1').read_text()
+        gradle=(ROOT/'android/app/build.gradle').read_text(encoding='utf-8')
+        windows=(ROOT/'tools/horde-night-audio-policy.ps1').read_text(encoding='utf-8')
         for relative in ('audio/chapter-local-ambience/asset.manifest.json',
                          'audio/chapter-local-ambience/runtime/tomb_drip.wav',
                          'audio/chapter-local-ambience/runtime/rope_contact.wav'):
             self.assertIn(relative,gradle);self.assertIn(relative,windows)
         for private in ('rope tighten 1.wav','ambience - dripping water 1.wav'):
             self.assertNotIn(private,gradle);self.assertNotIn(private,windows)
-        self.assertIn('Copy-HordeNightAudioRuntimeAssets', (ROOT/'tools/package-alpha.ps1').read_text())
+        self.assertIn('Copy-HordeNightAudioRuntimeAssets', (ROOT/'tools/package-alpha.ps1').read_text(encoding='utf-8'))
 
     def test_one_foliage_derivative_preserves_provenance_duration_and_finite_headroom(self):
         directory=ROOT/'assets/audio/forest-foliage'
-        manifest=json.loads((directory/'asset.manifest.json').read_text())
+        manifest=json.loads((directory/'asset.manifest.json').read_text(encoding='utf-8'))
         self.assertFalse(manifest['listeningAcceptance'])
         self.assertIn('not CC0',manifest['license'])
         self.assertEqual(hashlib.sha256((ROOT/manifest['licenseEvidence']).read_bytes()).hexdigest(),
@@ -72,11 +72,11 @@ class ChapterLocalAudioTests(unittest.TestCase):
         self.assertEqual(asset['edgeFadeFrames'],{'in':480,'out':3840})
 
     def test_foliage_packages_only_the_integrated_derivative_and_manifest(self):
-        gradle=(ROOT/'android/app/build.gradle').read_text()
-        windows=(ROOT/'tools/horde-night-audio-policy.ps1').read_text()
+        gradle=(ROOT/'android/app/build.gradle').read_text(encoding='utf-8')
+        windows=(ROOT/'tools/horde-night-audio-policy.ps1').read_text(encoding='utf-8')
         for path in ['audio/forest-foliage/asset.manifest.json','audio/forest-foliage/runtime/leaf_rustle.wav']:
             self.assertIn(path,gradle);self.assertIn(path,windows)
         self.assertNotIn('leaves rustle 1.wav',gradle);self.assertNotIn('leaves rustle 1.wav',windows)
-        self.assertIn('assets/audio/forest-foliage/',(ROOT/'ASSET_LICENSES.md').read_text())
+        self.assertIn('assets/audio/forest-foliage/',(ROOT/'ASSET_LICENSES.md').read_text(encoding='utf-8'))
 
 if __name__=='__main__': unittest.main()

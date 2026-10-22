@@ -1,0 +1,24 @@
+test_both_platform_package_rosters_admit_only_runtime_derivatives (test_chapter_local_audio.ChapterLocalAudioTests.test_both_platform_package_rosters_admit_only_runtime_derivatives) ... ok
+test_closed_provenanced_finite_roster_and_pcm_headroom (test_chapter_local_audio.ChapterLocalAudioTests.test_closed_provenanced_finite_roster_and_pcm_headroom) ... ok
+test_foliage_packages_only_the_integrated_derivative_and_manifest (test_chapter_local_audio.ChapterLocalAudioTests.test_foliage_packages_only_the_integrated_derivative_and_manifest) ... ERROR
+test_one_foliage_derivative_preserves_provenance_duration_and_finite_headroom (test_chapter_local_audio.ChapterLocalAudioTests.test_one_foliage_derivative_preserves_provenance_duration_and_finite_headroom) ... ok
+
+======================================================================
+ERROR: test_foliage_packages_only_the_integrated_derivative_and_manifest (test_chapter_local_audio.ChapterLocalAudioTests.test_foliage_packages_only_the_integrated_derivative_and_manifest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\tests\test_chapter_local_audio.py", line 80, in test_foliage_packages_only_the_integrated_derivative_and_manifest
+    self.assertIn('assets/audio/forest-foliage/',(ROOT/'ASSET_LICENSES.md').read_text())
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sam_s\AppData\Local\Programs\Python\Python312\Lib\pathlib.py", line 1028, in read_text
+    return f.read()
+           ^^^^^^^^
+  File "C:\Users\sam_s\AppData\Local\Programs\Python\Python312\Lib\encodings\cp1252.py", line 23, in decode
+    return codecs.charmap_decode(input,self.errors,decoding_table)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeDecodeError: 'charmap' codec can't decode byte 0x9d in position 8249: character maps to <undefined>
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.028s
+
+FAILED (errors=1)

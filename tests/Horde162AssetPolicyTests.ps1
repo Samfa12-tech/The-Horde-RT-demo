@@ -73,13 +73,24 @@ function Assert-EquipmentAndroidStaging([string]$Gradle, [string]$Activity) {
                        $_ -like 'models/characters/runtime/kit-warden-v1/*' -or
                        $_ -like 'textures/characters/runtime/kit-warden-v1/*.android.ktx2' })
     Require ($required.Count -eq 18) 'Android equipment, entry and terrain staging require the closed eighteen-file package roster.'
-    $startup=[regex]::Match($Activity, '(?s)private void collectInitialDiagnostics\(\)\s*\{(.*?)final boolean written = ProbeBridge[.]writeReports\(filesRoot\);')
-    Require $startup.Success 'Android equipment staging must precede native report-root publication.'
-    $staged=@([regex]::Matches($startup.Groups[1].Value,
+    $startup=@([regex]::Matches($Activity,
+        '(?ms)^    private void collectInitialDiagnostics\(\)\s*\{(.*?)^    \}'))
+    $helper=@([regex]::Matches($Activity,
+        '(?ms)^    private boolean\[\] stageRuntimeAssetCache\(\)\s*\{(.*?)^    \}'))
+    Require ($startup.Count -eq 1 -and $helper.Count -eq 1) 'Android equipment staging requires unique startup and runtime-cache methods.'
+    $body=$startup[0].Groups[1].Value
+    $publication=[regex]::Match($body, 'final boolean written = ProbeBridge[.]writeReports\(filesRoot\);')
+    $invocations=@([regex]::Matches($body, 'stageRuntimeAssetCache\(\)'))
+    Require ($publication.Success -and $invocations.Count -eq 1 -and
+             $invocations[0].Index -lt $publication.Index) 'Android runtime-cache staging must run once before native report-root publication.'
+    $staged=@([regex]::Matches($helper[0].Groups[1].Value,
         'stageAsset\("([^"]+)",\s*"([^"]+)"\)'))
+    $allStaged=@([regex]::Matches($Activity, 'stageAsset\("([^"]+)",\s*"([^"]+)"\)'))
     foreach($path in $required) {
         $matches=@($staged | Where-Object { $_.Groups[1].Value -ceq $path })
-        Require ($matches.Count -eq 1 -and $matches[0].Groups[2].Value -ceq $path) "Android equipment asset must be staged once at its exact native path: $path"
+        $allMatches=@($allStaged | Where-Object { $_.Groups[1].Value -ceq $path })
+        Require ($matches.Count -eq 1 -and $allMatches.Count -eq 1 -and
+                 $matches[0].Groups[2].Value -ceq $path) "Android equipment asset must be staged once at its exact native path: $path"
     }
 }
 function Assert-CollapsePackageInventory([string]$Text) {
@@ -213,11 +224,26 @@ try {
                        'models/world/runtime/chapter-terrain-v1/chapter-terrain-lod0.runtime.glb',
                        'textures/props/runtime/chapter-terrain/base-color.android.ktx2',
                        'textures/props/runtime/chapter-terrain/normal.android.ktx2',
-                       'textures/props/runtime/chapter-terrain/orm.android.ktx2')) {
+                       'textures/props/runtime/chapter-terrain/orm.android.ktx2',
+                       'models/characters/runtime/kit-warden-v1/asset.manifest.json',
+                       'models/characters/runtime/kit-warden-v1/kit-warden-lod0.runtime.glb',
+                       'textures/characters/runtime/kit-warden-v1/base-color.android.ktx2',
+                       'textures/characters/runtime/kit-warden-v1/normal.android.ktx2',
+                       'textures/characters/runtime/kit-warden-v1/orm.android.ktx2',
+                       'textures/characters/runtime/kit-warden-v1/emissive.android.ktx2')) {
         $call='stageAsset\("'+[regex]::Escape($path)+'",\s*"'+[regex]::Escape($path)+'"\)'
         Expect-Failure {Assert-EquipmentAndroidStaging $gradle ([regex]::Replace($activity,$call,'true'))} 'exact native path'
         Expect-Failure {Assert-EquipmentAndroidStaging $gradle ([regex]::Replace($activity,$call,'stageAsset("'+$path+'", "wrong-native-path")'))} 'exact native path'
     }
+    $startupCall='final boolean[] staged = stageRuntimeAssetCache();'
+    $publicationCall='final boolean written = ProbeBridge.writeReports(filesRoot);'
+    Expect-Failure {Assert-EquipmentAndroidStaging $gradle ($activity.Replace($startupCall,'final boolean[] staged = new boolean[4];'))} 'once before native report-root publication'
+    $late=$activity.Replace($startupCall,'final boolean[] staged = new boolean[4];').Replace($publicationCall,$publicationCall+' stageRuntimeAssetCache();')
+    Expect-Failure {Assert-EquipmentAndroidStaging $gradle $late} 'once before native report-root publication'
+    Expect-Failure {Assert-EquipmentAndroidStaging $gradle ($activity.Replace($startupCall,$startupCall+' stageRuntimeAssetCache();'))} 'once before native report-root publication'
+    $duplicate='stageAsset("models/props/runtime/player-rag-torch/asset.manifest.json", "models/props/runtime/player-rag-torch/asset.manifest.json");'
+    Expect-Failure {Assert-EquipmentAndroidStaging $gradle ($activity.Replace($startupCall,$startupCall+$duplicate))} 'exact native path'
+    Expect-Failure {Assert-EquipmentAndroidStaging ($gradle+"`ninclude 'models/characters/runtime/kit-warden-v1/unadmitted.glb'`n") $activity} 'closed eighteen-file package roster'
     foreach ($scriptPath in @('tools/package-alpha.ps1','tools/run-foundation-validation.ps1')) {
         $text=Get-Content (Join-Path $repo $scriptPath) -Raw
         Assert-CollapsePackageInventory $text; ++$script:checks

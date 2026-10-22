@@ -53,9 +53,17 @@ paths, and enforce scoped Android survey/live tuning plus route reset. Six
 negative source mutations and the existing concurrent tuple checks remain.
 Three focused Release registrations pass and Windows builds; production sources
 are unchanged. Original failures and the first candidate's scope error remain
-recorded. Next inspect remaining hosted checkout/generated-bound/encoding
-failures, then resolve PR conflicts safely. This is no hosted full-CI or device
+recorded. The remaining checkout/generated-bound/encoding diagnosis follows
+below; PR conflicts still need safe resolution. This is no hosted full-CI or device
 acceptance claim; Kit endpoint listening and the Debug timeout stay open.
+
+The [hosted checkout/fixture checkpoint](../evidence/2026-10-22-ci-checkout/README.md)
+identifies missing LFS PCM, implicit Windows text encoding, generated-bound EOL,
+stale terrain identities/content totals, helper staging and a two-sample timing
+fixture. Four affected Release registrations (199 package cases included) and
+two fresh native fixtures pass. All geometry/resource ceilings and negative
+checks remain; tree positions, runtime mesh/PCM and renderer behavior are
+unchanged. Corrected full hosted results remain pending, with retained failures.
 
 ## Frozen arm framing diagnosis - local checkpoint, 20 October 2026
 

@@ -400,7 +400,7 @@
     }
   ],
   "grounding": {
-    "terrainSha256": "fb21e177b8e67fb553d4853a778603a598908812fc1603ca8a16d94d152a4854",
+    "terrainSha256": "c636a67911b7f5c5381c30ec7a49e5d4ff15c70fe688b368ba52efe77b537774",
     "rootBaseBandMetres": 0.02,
     "minimumTipEmbedMetres": 0.02,
     "runtimeMaximumBurialMetres": 0.65,

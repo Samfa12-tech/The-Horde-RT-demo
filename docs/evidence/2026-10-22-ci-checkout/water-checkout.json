@@ -1,0 +1,36 @@
+{
+  "evidenceClass": "local checkout-filter reproduction, not raw hosted checkout bytes",
+  "path": "shaders/raytracing/include/rt_regional_water_bounds.generated.glsl",
+  "sourceHead": "93b49b018c1876b388582a7ba751023c20532285",
+  "rows": [
+    {
+      "label": "gitBlob",
+      "bytes": 673,
+      "sha256": "8f4f269c1c3704f01ff19d4e3d79b7d8c082b76d6fd4e634df26500c0a7a8970",
+      "crlf": 0,
+      "lf": 13
+    },
+    {
+      "label": "autocrlfBeforeUsingHEADAttributes",
+      "bytes": 686,
+      "sha256": "573bbb5ff336eb3d8aced1634748d9f5ac5d21d6b590d6b5728e8a7459d79331",
+      "crlf": 13,
+      "lf": 13
+    },
+    {
+      "label": "autocrlfAfterUsingWorkingAttributes",
+      "bytes": 673,
+      "sha256": "8f4f269c1c3704f01ff19d4e3d79b7d8c082b76d6fd4e634df26500c0a7a8970",
+      "crlf": 0,
+      "lf": 13
+    },
+    {
+      "label": "nativeOutput",
+      "bytes": 673,
+      "sha256": "8f4f269c1c3704f01ff19d4e3d79b7d8c082b76d6fd4e634df26500c0a7a8970",
+      "crlf": 0,
+      "lf": 13
+    }
+  ],
+  "byteEqualityAfter": true
+}

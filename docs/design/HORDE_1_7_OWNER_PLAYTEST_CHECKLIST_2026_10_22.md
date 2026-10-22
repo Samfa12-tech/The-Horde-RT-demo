@@ -53,9 +53,15 @@ CharacterRenderSlotSmoke source failures are now corrected locally as stale
 regional-water expectations, with actual-source numeric checks and negative
 mutations. Three focused Release tests and Windows build pass; no runtime
 sources change. [Diagnosis and retained failures](../evidence/2026-10-22-source-contracts/README.md).
-Other hosted generated-bound/encoding failures still need exact diagnosis. Do not label
-all hosted failures runtime bugs, remove assertions, or move geometry to match
-stale receipts. Debug campaign30s timeout remains open. PR description/conflict
+The [checkout/fixture diagnosis](../evidence/2026-10-22-ci-checkout/README.md)
+now corrects the missing PCM fetch/checkout roots, explicit UTF-8 reads,
+file-specific LF checkout, one terrain hash/pin, stale exact terrain/debris
+content totals, helper staging and nested timing-fixture clock. Four Release
+registrations (including 199 archive cases) and two fresh native fixtures pass.
+All capacities, tree placements and renderer/PCM payloads are unchanged; original
+failures remain. Corrected hosted all-lane results remain pending. Do not label
+all hosted failures runtime bugs or relax gates. Debug campaign 30 s timeout
+remains open. PR description/conflict
 and final exact-candidate checks remain; no merge.
 
 Approved standardized benchmark/report/leaderboard plan remains implementation
@@ -72,8 +78,8 @@ Automatic crouch/deflection source, the bounded desktop skin-work slice and Kit'
 continuous source/listener correction are complete locally. Physical input/feel,
 endpoint speech/listening and phone performance remain open. The bounded
 shader/Android source-contract diagnosis is complete locally. Next inspect
-remaining hosted checkout/generated-bound/encoding receipts before safe PR
-conflict resolution; this does not claim the full hosted programme passes.
+corrected hosted checkout/fixture results before safe PR conflict resolution;
+this does not claim the full hosted programme passes.
 For the next owner-confirmed phone connection, compare exact control/candidate
 builds with the appended phase counters and original matched hold/settings.
 Keep the 12.06 ms phone stage, unresolved closing 33% slowdown, other inherited

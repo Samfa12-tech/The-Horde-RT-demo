@@ -48,7 +48,7 @@ bool Require(bool condition, const char* message)
 
 struct ObservationClock
 {
-    std::array<std::uint64_t, 2u> values{{100u, 127u}};
+    std::array<std::uint64_t, 6u> values{{100u, 101u, 108u, 109u, 125u, 127u}};
     std::size_t reads = 0u;
 };
 
@@ -1825,9 +1825,17 @@ int main(int argc, char** argv)
         return 1;
     const auto& observedPlayerSkin = playerStageSample.values[
         horde::telemetry::RtStageIndex(horde::telemetry::RtStage::PlayerSkin)];
-    if (!Require(observationClock.reads == 2u &&
+    const auto& observedPlayerPose = playerStageSample.values[
+        horde::telemetry::RtStageIndex(horde::telemetry::RtStage::PlayerPose)];
+    const auto& observedPlayerVertices = playerStageSample.values[
+        horde::telemetry::RtStageIndex(horde::telemetry::RtStage::PlayerVertices)];
+    if (!Require(observationClock.reads == 6u &&
                      observedPlayerSkin.durationNanoseconds == 27u &&
-                     observedPlayerSkin.workInvocationCount == 1u,
+                     observedPlayerSkin.workInvocationCount == 1u &&
+                     observedPlayerPose.durationNanoseconds == 7u &&
+                     observedPlayerPose.workInvocationCount == 1u &&
+                     observedPlayerVertices.durationNanoseconds == 16u &&
+                     observedPlayerVertices.workInvocationCount == 1u,
                  "player skin observation must time only actual skin and skip cached cadence work"))
         return 1;
 
