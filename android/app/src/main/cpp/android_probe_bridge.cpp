@@ -771,6 +771,8 @@ std::atomic<std::uint64_t> gWaterfallStereoGains{0u};
 std::atomic<std::uint64_t> gCombatTeachingUiState{0u};
 std::mutex gChapterDialogueUiMutex;
 horde::gameplay::dialogue::Snapshot gChapterDialogueUiSnapshot{};
+horde::gameplay::SpatialAudioDomain gChapterDialogueUiAudioDomain =
+    horde::gameplay::SpatialAudioDomain::DungeonRoute; // guarded by gChapterDialogueUiMutex
 std::string gChapterDialogueUiText;
 std::array<jlong,4> gLookoutObjectiveUiState{}; // guarded by gChapterDialogueUiMutex
 std::mutex gDebugRequestAdmissionMutex;
@@ -1000,6 +1002,8 @@ void PublishSimulationUiState()
     {
         std::lock_guard<std::mutex> lock(gChapterDialogueUiMutex);
         gChapterDialogueUiSnapshot = simulation.chapterDialogue;
+        gChapterDialogueUiAudioDomain = horde::gameplay::ResolveSpatialAudioDomain(
+            simulation.developmentRescueJourney, simulation.worldRoute.current);
         gLookoutObjectiveUiState={1,static_cast<jlong>(gSwapchainContext.surfaceGeneration),
             static_cast<jlong>(simulation.worldRoute.generation),
             horde::gameplay::campaign::LookoutObjectiveAvailable(simulation,
@@ -6581,15 +6585,17 @@ extern "C" JNIEXPORT jlong JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_getChapterDialogueStereoGains(JNIEnv*, jclass, jlong generation)
 {
     horde::gameplay::dialogue::Snapshot snapshot;
+    horde::gameplay::SpatialAudioDomain domain;
     {
         std::lock_guard<std::mutex> lock(gChapterDialogueUiMutex);
         snapshot = gChapterDialogueUiSnapshot;
+        domain = gChapterDialogueUiAudioDomain;
     }
     if (snapshot.line == horde::gameplay::dialogue::Line::None ||
         static_cast<jlong>(snapshot.generation) != generation) return 0;
     const auto gains = horde::gameplay::CalculateSpatialAudio(
         {snapshot.source.x, snapshot.source.z, 0.36f, 1.0f, 14.0f, snapshot.source.y},
-        {snapshot.listener.x, snapshot.listener.z, snapshot.listenerYaw, snapshot.listener.y});
+        {snapshot.listener.x, snapshot.listener.z, snapshot.listenerYaw, snapshot.listener.y}, domain);
     return static_cast<jlong>(PackStereoGains(gains.left, gains.right));
 }
 

@@ -4,6 +4,7 @@
 #include <cmath>
 
 #include "gameplay/ShowcaseRoute.h"
+#include "gameplay/simulation/DevelopmentWorldRoute.h"
 
 namespace horde::gameplay
 {
@@ -38,6 +39,30 @@ struct SpatialAudioGains
 };
 
 constexpr float kObstructedAudioGain = 0.38f;
+
+enum class SpatialAudioDomain { DungeonRoute, ExteriorRoute };
+
+// The dungeon's heightless wall approximation is valid only in its own world
+// domain. Outdoor chapter zones have no authored acoustic wall approximation;
+// leaving the old rectangle union is not evidence of an obstructing wall.
+// Unconfigured/legacy snapshots and unknown zones retain the existing policy.
+inline constexpr SpatialAudioDomain ResolveSpatialAudioDomain(
+    bool chapterWorld, simulation::WorldZoneId zone) noexcept
+{
+    if (chapterWorld)
+    {
+        switch (zone)
+        {
+        case simulation::WorldZoneId::TombExterior:
+        case simulation::WorldZoneId::ForestApproach:
+        case simulation::WorldZoneId::Lookout:
+            return SpatialAudioDomain::ExteriorRoute;
+        default:
+            break;
+        }
+    }
+    return SpatialAudioDomain::DungeonRoute;
+}
 
 // Walking starts with a short weight-shift before the first audible contact,
 // then settles into a brisk but natural alternating cadence.
@@ -192,13 +217,15 @@ inline bool IsRouteAudioObstructed(float listenerX, float listenerZ, float emitt
 }
 
 inline SpatialAudioGains CalculateSpatialAudio(const SpatialAudioEmitter& emitter,
-                                                const SpatialAudioListener& listener)
+                                                const SpatialAudioListener& listener,
+                                                SpatialAudioDomain domain = SpatialAudioDomain::DungeonRoute)
 {
     SpatialAudioGains result{};
     const float offsetX = emitter.x - listener.x;
     const float offsetZ = emitter.z - listener.z;
     result.distance = std::sqrt(offsetX * offsetX + offsetZ * offsetZ);
-    result.obstructed = IsRouteAudioObstructed(listener.x, listener.z, emitter.x, emitter.z);
+    result.obstructed = domain != SpatialAudioDomain::ExteriorRoute &&
+        IsRouteAudioObstructed(listener.x, listener.z, emitter.x, emitter.z);
 
     if (emitter.gain <= 0.0f || result.distance >= emitter.maximumDistance)
     {

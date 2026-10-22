@@ -1967,7 +1967,8 @@ void UpdateChapterDialogueAudio(VulkanSurfaceContext& context)
        !context.controlsEnabled || MeasurementPausedByUi(context) || context.sfxVolumePercent<=0 ||
        GetForegroundWindow()!=context.windowHandle)SpatialAudioEngine().StopLoop("chapter_ambience");
     using horde::gameplay::dialogue::Line;
-    const auto& dialogue = context.simulation.Snapshot().chapterDialogue;
+    const auto& simulation = context.simulation.Snapshot();
+    const auto& dialogue = simulation.chapterDialogue;
     const auto line = dialogue.line;
     const auto lineId = static_cast<std::uint32_t>(line);
     if (line == Line::None)
@@ -1998,7 +1999,9 @@ void UpdateChapterDialogueAudio(VulkanSurfaceContext& context)
     }
     const auto gains = horde::gameplay::CalculateSpatialAudio(
         {dialogue.source.x, dialogue.source.z, .36f, 1.0f, 14.0f, dialogue.source.y},
-        {dialogue.listener.x, dialogue.listener.z, dialogue.listenerYaw, dialogue.listener.y});
+        {dialogue.listener.x, dialogue.listener.z, dialogue.listenerYaw, dialogue.listener.y},
+        horde::gameplay::ResolveSpatialAudioDomain(
+            simulation.developmentRescueJourney, simulation.worldRoute.current));
     if (gains.left <= 0.0f && gains.right <= 0.0f) return;
     if (SpatialAudioEngine().Play(path, gains.left, gains.right,
             "chapter_dialogue", lineId, dialogue.generation,

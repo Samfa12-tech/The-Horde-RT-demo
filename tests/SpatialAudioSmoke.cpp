@@ -186,6 +186,71 @@ int main()
           NearlyEqual(std::sqrt(StereoPower(blocked) / StereoPower(clear)), kObstructedAudioGain),
           "route wall obstruction must apply its authored attenuation");
 
+    using simulation::WorldZoneId;
+    check(ResolveSpatialAudioDomain(true, WorldZoneId::Dungeon) == SpatialAudioDomain::DungeonRoute &&
+          ResolveSpatialAudioDomain(true, static_cast<WorldZoneId>(99)) == SpatialAudioDomain::DungeonRoute &&
+          ResolveSpatialAudioDomain(false, WorldZoneId::Lookout) == SpatialAudioDomain::DungeonRoute,
+          "dungeon, unknown and legacy world publications retain the dungeon acoustic policy");
+    const auto explicitDungeon = CalculateSpatialAudio({-1.0f, -4.0f}, blockedListener,
+        ResolveSpatialAudioDomain(true, WorldZoneId::Dungeon));
+    check(explicitDungeon.obstructed && NearlyEqual(explicitDungeon.left, blocked.left) &&
+          NearlyEqual(explicitDungeon.right, blocked.right),
+          "typed dungeon selection preserves the exact existing real-wall attenuation");
+    for (const auto [zone, pointIndex] : {
+             std::pair{WorldZoneId::TombExterior, 2u},
+             std::pair{WorldZoneId::ForestApproach, 4u},
+             std::pair{WorldZoneId::Lookout, 7u}})
+    {
+        const auto point = simulation::kWorldRoutePoints[pointIndex];
+        const auto domain = ResolveSpatialAudioDomain(true, zone);
+        check(domain == SpatialAudioDomain::ExteriorRoute,
+              "authoritative chapter exterior world zones select the outdoor acoustic domain");
+        // At actual forest/lookout points a nearby clear source used to acquire
+        // 0.38 gain solely by lying outside the dungeon union. The upper landing
+        // overlaps the old room in XZ: keep its already-clear near result exact.
+        const SpatialAudioListener listener{point.x, point.z, 0.0f, point.y + 1.7f};
+        const auto legacyOutdoor = CalculateSpatialAudio(
+            {point.x, point.z - 1.0f, .36f, 1.0f, 14.0f, point.y + 1.4f}, listener);
+        for (const float distance : {1.0f, 3.0f, 13.5f})
+        {
+            const auto outdoor = CalculateSpatialAudio(
+                {point.x, point.z - distance, .36f, 1.0f, 14.0f, point.y + 1.4f}, listener, domain);
+            check(!outdoor.obstructed && NearlyEqual(outdoor.distance, distance) &&
+                  NearlyEqual(outdoor.pan, 0.0f) &&
+                  NearlyEqual(outdoor.left, .36f / distance * .7071067f) &&
+                  NearlyEqual(outdoor.right, .36f / distance * .7071067f),
+                  "outdoor speech keeps its existing base gain, inverse-distance rolloff and equal-power centre");
+            if (distance == 1.0f)
+                check(legacyOutdoor.obstructed == (zone != WorldZoneId::TombExterior) &&
+                      NearlyEqual(std::sqrt(StereoPower(legacyOutdoor) / StereoPower(outdoor)),
+                          legacyOutdoor.obstructed ? kObstructedAudioGain : 1.0f),
+                      "regression witness removes only false outdoor wall attenuation and preserves the clear landing");
+        }
+        const auto outdoorRight = CalculateSpatialAudio(
+            {point.x + 1.0f, point.z, .36f}, listener, domain);
+        const auto outdoorLeft = CalculateSpatialAudio(
+            {point.x - 1.0f, point.z, .36f}, listener, domain);
+        const auto outdoorBeyondRange = CalculateSpatialAudio(
+            {point.x, point.z - 14.25f, .36f}, listener, domain);
+        const auto outdoorMuted = CalculateSpatialAudio(
+            {point.x, point.z - 1.0f, 0.0f}, listener, domain);
+        check(NearlyEqual(outdoorRight.pan, 1.0f) && NearlyEqual(outdoorRight.right, .36f) &&
+              outdoorRight.left < .0001f && NearlyEqual(outdoorLeft.pan, -1.0f) &&
+              NearlyEqual(outdoorLeft.left, .36f) && outdoorLeft.right < .0001f,
+              "outdoor domain retains direction-dependent equal-power panning");
+        check(outdoorBeyondRange.distance > 14.0f && StereoPower(outdoorBeyondRange) == 0.0f &&
+              StereoPower(outdoorMuted) == 0.0f,
+              "actual outdoor positions beyond maximum range and zero-gain sources remain silent");
+    }
+    // Nonintegral authored world coordinates can round a nominal 14 m
+    // subtraction slightly inward. These exactly representable coordinates
+    // separately exercise equality at the unchanged hard range boundary.
+    const auto outdoorExactBoundary = CalculateSpatialAudio(
+        {16.0f, 18.0f, .36f, 1.0f, 14.0f}, {16.0f, 32.0f, 0.0f},
+        ResolveSpatialAudioDomain(true, WorldZoneId::Lookout));
+    check(outdoorExactBoundary.distance == 14.0f && StereoPower(outdoorExactBoundary) == 0.0f,
+          "outdoor emitter exactly at the representable fourteen-metre boundary is silent");
+
     const SpatialAudioGains outOfRange = CalculateSpatialAudio({0.0f, -15.0f}, origin);
     check(outOfRange.left == 0.0f && outOfRange.right == 0.0f,
           "emitters at maximum range must be silent");
@@ -372,6 +437,32 @@ int main()
             return start == std::string::npos || stop == std::string::npos
                 ? std::string{} : source.substr(start, stop - start);
         };
+        const auto chapterPublish = section(androidBridgeSource,
+            "void PublishSimulationUiState()", "gKeeperTitleOpacity.store(");
+        const auto lockedChapterPublish = section(chapterPublish,
+            "std::lock_guard<std::mutex> lock(gChapterDialogueUiMutex);", "gLookoutObjectiveUiState=");
+        const auto chapterRead = section(androidBridgeSource,
+            "Java_com_samfa12_hordelanternrt_ProbeBridge_getChapterDialogueStereoGains",
+            "Java_com_samfa12_hordelanternrt_ProbeBridge_requestChapterDialogueSkip");
+        const auto lockedChapterRead = section(chapterRead,
+            "std::lock_guard<std::mutex> lock(gChapterDialogueUiMutex);", "\n    }");
+        check(lockedChapterPublish.find("gChapterDialogueUiSnapshot = simulation.chapterDialogue;") != std::string::npos &&
+              lockedChapterPublish.find("gChapterDialogueUiAudioDomain = horde::gameplay::ResolveSpatialAudioDomain(") != std::string::npos &&
+              lockedChapterPublish.find("simulation.developmentRescueJourney, simulation.worldRoute.current") != std::string::npos &&
+              lockedChapterRead.find("snapshot = gChapterDialogueUiSnapshot;") != std::string::npos &&
+              lockedChapterRead.find("domain = gChapterDialogueUiAudioDomain;") != std::string::npos &&
+              chapterRead.find("static_cast<jlong>(snapshot.generation) != generation) return 0;") != std::string::npos &&
+              chapterRead.find("snapshot.listenerYaw, snapshot.listener.y}, domain)") != std::string::npos,
+              "Android dialogue domain and frozen tuple cross the same mutex publication and retain the line-generation guard");
+        const auto windowsChapter = section(windowsSource,
+            "void UpdateChapterDialogueAudio(", "void RefreshChapterSubtitle(");
+        check(windowsChapter.find("const auto& simulation = context.simulation.Snapshot();") != std::string::npos &&
+              windowsChapter.find("const auto& dialogue = simulation.chapterDialogue;") != std::string::npos &&
+              windowsChapter.find("horde::gameplay::ResolveSpatialAudioDomain(") != std::string::npos &&
+              windowsChapter.find("simulation.developmentRescueJourney, simulation.worldRoute.current") != std::string::npos &&
+              windowsChapter.find(".36f, 1.0f, 14.0f, dialogue.source.y}") != std::string::npos &&
+              chapterRead.find("0.36f, 1.0f, 14.0f, snapshot.source.y}") != std::string::npos,
+              "both dialogue consumers opt into the same authoritative domain without changing speech gain or frozen positions");
         check(windowsSource.find("masteringVoice_->SetVolume(1.0f)") != std::string::npos &&
               windowsSource.find("SfxVolumeLinearGain(percent)") != std::string::npos &&
               windowsSource.find("WindowsSfxSourceGain(1.0f, sfxVolumePercent)") != std::string::npos &&
