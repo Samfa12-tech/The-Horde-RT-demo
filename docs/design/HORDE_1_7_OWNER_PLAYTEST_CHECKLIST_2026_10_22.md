@@ -1,5 +1,25 @@
 # Horde 1.7 owner playtest checklist - 22 October 2026
 
+## Bounded CI duplicate work removed - 23 October
+
+The exact preceding source `719b86aa` is [green in all six hosted jobs](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39951083061):
+MSVC 14m04s, 149/149 CTest results, native report UI and 10/10 APK resolver cases.
+It had only 56 s headroom; the earlier explicit cap cancellation remains retained.
+Newer [provider-object reuse](../evidence/2026-10-23-msvc-ci-selection/PROVIDER_REUSE.md)
+removes two duplicate compiles, and a separately checked
+[fixture-input cache](../evidence/2026-10-23-msvc-ci-selection/PARSER_CACHE.md)
+avoids repeated decoding while retaining every containment/negative control.
+Focused local checks pass; the newer exact-head hosted result is separate.
+No job cap, per-test timeout, test selection, compiler/platform coverage, runtime
+or asset is changed. The 20-minute envelope remains an unapplied proposal.
+
+Next desktop player-facing slice: assess Kit's existing same-rig run/catch-up
+clip against current speed selection, grounded foot travel and conversation
+silhouette before admitting any animation change. No new mesh-reduction loop,
+retargeting or paid generation. Compact HUD thumb comfort and earned-state
+rotation continuity still need the disconnected phone. Deferred forest/smoke
+architecture and unresolved flask rules are not reopened by this CI checkpoint.
+
 ## Contextual interaction guidance finished - 23 October
 
 The [bounded help correction](../evidence/2026-10-23-interaction-guidance/README.md)
