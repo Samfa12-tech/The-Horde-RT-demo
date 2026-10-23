@@ -51,6 +51,38 @@ PlayerLocomotionClip MapPlayerLocomotionClip(const float locomotionBlend)
                                    : PlayerLocomotionClip::Idle;
 }
 
+float UpdateBackwardWalkPhaseOffset(const float currentOffset,
+    const float legacyAdvanceSeconds, const float acceptedDistanceMetres,
+    const float acceptedForwardDistanceMetres, const float walkSpeed)
+{
+    const float offset = FiniteOr(currentOffset, 0.0f);
+    if (!std::isfinite(legacyAdvanceSeconds) || legacyAdvanceSeconds < 0.0f ||
+        !std::isfinite(acceptedDistanceMetres) || acceptedDistanceMetres < 0.0f ||
+        !std::isfinite(acceptedForwardDistanceMetres) ||
+        !std::isfinite(walkSpeed) || walkSpeed <= 0.0f) return offset;
+    // A blocked motor does not advance its feet. Forward and strafe sampling
+    // otherwise retain the exact existing clock, including its cadence.
+    if (acceptedDistanceMetres <= 0.000001f) return offset - legacyAdvanceSeconds;
+    if (acceptedForwardDistanceMetres >= -0.01f * acceptedDistanceMetres) return offset;
+    // Compensate the advance that already occurred, including partial collision.
+    // Changing direction affects only future increments, never the current pose.
+    return offset - acceptedDistanceMetres / walkSpeed - legacyAdvanceSeconds;
+}
+
+float PlayerLocomotionSampleTime(const PlayerAnimationSnapshot& animation,
+                                const float clipDurationSeconds)
+{
+    if (animation.locomotionPhaseOffsetSeconds == 0.0f)
+        return animation.locomotionTime; // Preserve every uncorrected sample exactly.
+    const double phase = static_cast<double>(animation.locomotionTime) +
+                         animation.locomotionPhaseOffsetSeconds;
+    if (!std::isfinite(phase) || !std::isfinite(clipDurationSeconds) ||
+        clipDurationSeconds <= 0.0f) return 0.0f;
+    double wrapped = std::fmod(phase, static_cast<double>(clipDurationSeconds));
+    if (wrapped < 0.0) wrapped += clipDurationSeconds;
+    return static_cast<float>(wrapped);
+}
+
 PlayerCombatLayer EvaluatePlayerCombatLayer(
     const horde::gameplay::PlayerCombatSnapshot& combat)
 {
@@ -121,6 +153,7 @@ void PlayerAnimationState::StepFixed(const PlayerAnimationInput& input,
         snapshot_.locomotionBlend, locomotionTarget, fixedDeltaSeconds * 8.0f);
     snapshot_.locomotionClip = MapPlayerLocomotionClip(snapshot_.locomotionBlend);
     snapshot_.locomotionTime = std::max(0.0f, FiniteOr(input.walkTime, 0.0f));
+    snapshot_.locomotionPhaseOffsetSeconds = FiniteOr(input.locomotionPhaseOffsetSeconds, 0.0f);
     snapshot_.plantedPelvisDropMetres = 0.0f;
     snapshot_.crouchPelvisDropMetres = 0.0f;
     snapshot_.combatLayer = EvaluatePlayerCombatLayer(input.playerCombat);

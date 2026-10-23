@@ -1,0 +1,29 @@
+{
+  "timeUtc": "2026-10-23T00:26:42.759062+00:00",
+  "scope": "approved outdoor-only Beneath the Same Moon r2 main/dialogue bed, editable sources; no global H-cue replacement",
+  "files": [
+    {
+      "libraryId": "libfile_c5e5632f5f048191b58c3e13a9bd832c",
+      "name": "Beneath-the-Same-Moon-Outdoor-r2-loop.flac",
+      "bytes": 7227613
+    },
+    {
+      "libraryId": "libfile_de08863a3c488191b22da16418391bb2",
+      "name": "Beneath-the-Same-Moon-Outdoor-r2-dialogue-bed.flac",
+      "bytes": 6337653
+    },
+    {
+      "libraryId": "libfile_af734b7699e88191ab73975fd4d3cb30",
+      "name": "Beneath-the-Same-Moon-Outdoor-r2-source.zip",
+      "bytes": 69449
+    }
+  ],
+  "completed": "Library resolved exact owner references and prepared all3 downloads; source/runtime music code inspected; helper attempted each once",
+  "outcome": "failed, no admitted local asset",
+  "failure": "AttributeError: module 'os' has no attribute 'setxattr'",
+  "reason": "Current Library helper requires Unix extended-attribute API unavailable in native Windows Python; metadata preservation cannot complete",
+  "finalDestinationsPresent": false,
+  "retries": 0,
+  "fallback": "Read-only player directional locomotion assessment; no torch trial reopened",
+  "currentTransition": "Chapter first earned ascent G reveal, then H outdoors; F in tomb/return. Legacy dawn also uses H. Director assumes12s loop and closed A-H asset bank. No asset replacement without exact new cue/duration routing and footprint checks."
+}

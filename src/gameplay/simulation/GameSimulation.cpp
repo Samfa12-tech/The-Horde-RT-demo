@@ -296,10 +296,11 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
     if (!input.paused && playerAlive)
     {
         walkTime_ += fixedDeltaSeconds;
+        const float previousWalkCycleTime = walkCycleTime_;
         walkCycleTime_ += fixedDeltaSeconds;
         StepRescueJourney(fixedDeltaSeconds<=0);
         if (!rescueMovementSuppressedThisTick_)
-            UpdateMovement(input, fixedDeltaSeconds);
+            UpdateMovement(input, fixedDeltaSeconds, previousWalkCycleTime);
         AdvanceSwordEquipment(fixedDeltaSeconds);
         const bool torchWasTriggered = torchFailureSnapshot_.triggered;
         torchFailureSnapshot_ = torchFailure_.Update(fixedDeltaSeconds,
@@ -1467,6 +1468,7 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
     }
     walkTime_ = 0.0f;
     walkCycleTime_ = 0.0f;
+    walkPhaseOffset_ = 0.0f;
     walkVisualAmount_ = 0.0f;
     torchFailure_ = state.torchFailure;
     torchFailureSnapshot_ = torchFailure_.Snapshot();
@@ -1847,7 +1849,7 @@ void GameSimulation::ResolvePlayerAnimation(const float fixedDeltaSeconds)
          interactionState_.heldLightKind == horde::gameplay::interactions::HeldLightKind::RewardLantern,
          lanternPendulum_.Snapshot().forwardAngleRadians,
          lanternPendulum_.Snapshot().strafeAngleRadians,
-         carryingOriginalTorch},
+         carryingOriginalTorch, walkPhaseOffset_},
         fixedDeltaSeconds);
 
 }
@@ -1930,7 +1932,8 @@ void GameSimulation::UpdatePosture(const InputSnapshot& input,float seconds)
     if(requested||posture_.Active()) {ClearRunIntent();dodgeRemainingSeconds_=0;}
 }
 
-void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSeconds)
+void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSeconds,
+                                    const float previousWalkCycleTime)
 {
     UpdatePosture(input,deltaSeconds);
     playerYawRadians_ = FiniteOr(input.yawRadians, playerYawRadians_);
@@ -2021,6 +2024,7 @@ void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSecon
         (input.analogueMovement || (!runInputBlockedUntilRelease_ && (runToggleActive_ || input.runHeld))) && !actionInterruptsRun;
     runActive_ = false;
 
+    const bool dodgingThisTick = dodgeRemainingSeconds_ > 0.0f;
     float movementIntent = 0.0f;
     if (input.hasAuthoritativePlayerPose)
     {
@@ -2118,6 +2122,15 @@ void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSecon
         // speed cannot create a faster leg stride against a wall.
         walkCycleTime_ += travelled / walkSpeed - deltaSeconds;
     }
+    if (CurrentCombatRules() && !input.hasAuthoritativePlayerPose && !dodgingThisTick &&
+        config_.movementSpeedMetresPerSecond > 0.001f)
+    {
+        const float forwardTravel = (playerX_ - previousX) * std::sin(playerYawRadians_) -
+                                    (playerZ_ - previousZ) * std::cos(playerYawRadians_);
+        walkPhaseOffset_ = horde::gameplay::animation::UpdateBackwardWalkPhaseOffset(
+            walkPhaseOffset_, walkCycleTime_ - previousWalkCycleTime,
+            travelled, forwardTravel, config_.movementSpeedMetresPerSecond);
+    }
     if (input.hasAuthoritativePlayerPose)
     {
         movementIntent = travelled > 0.00001f ? 1.0f : 0.0f;
@@ -2125,7 +2138,13 @@ void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSecon
     snapshot_.playerTravelledThisTick = travelled;
     runActive_ = runRequested && travelled > 0.00001f && dodgeRemainingSeconds_ <= 0.0f;
     const float blend = std::clamp(deltaSeconds * 8.0f, 0.0f, 1.0f);
-    walkVisualAmount_ += (movementIntent - walkVisualAmount_) * blend;
+    // A stopped capsule returns to idle instead of holding one raised walk
+    // foot indefinitely against a wall. Keep footstep cadence's movementIntent
+    // and all gameplay clocks unchanged; zero-speed capture fixtures stay exact.
+    const bool motorBlocked = CurrentCombatRules() && !input.hasAuthoritativePlayerPose &&
+        !dodgingThisTick && config_.movementSpeedMetresPerSecond > 0.001f && travelled <= 0.000001f;
+    const float visualMovementIntent = motorBlocked ? 0.0f : movementIntent;
+    walkVisualAmount_ += (visualMovementIntent - walkVisualAmount_) * blend;
     const bool footstep = playerFootsteps_.Update(travelled,
                                                 movementIntent > 0.02f && !input.hasAuthoritativePlayerPose,
                                                 playerSupport_.grounded);

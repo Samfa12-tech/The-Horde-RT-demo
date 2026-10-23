@@ -235,7 +235,8 @@ private:
     void ResetPlayerFootsteps() { playerFootsteps_.Reset(); dryFootstepCues_.Reset(); }
     void ResolveMovementCollision(float previousX, float previousZ, bool detectHeadClearance = false);
     void ResetPlayerSupport();
-    void UpdateMovement(const InputSnapshot& input, float deltaSeconds);
+    void UpdateMovement(const InputSnapshot& input, float deltaSeconds,
+                        float previousWalkCycleTime);
     void ClearRunIntent();
     void ClearCrouchIntent();
     void UpdatePosture(const InputSnapshot& input,float seconds);
@@ -360,6 +361,7 @@ private:
     float playerPitchRadians_ = -0.05f;
     float walkTime_ = 0.0f;
     float walkCycleTime_ = 0.0f;
+    float walkPhaseOffset_ = 0.0f;
     float walkVisualAmount_ = 0.0f;
     float playerMovementSpeed_ = 0.0f;
     bool runToggleActive_ = false;

@@ -31,13 +31,13 @@ frozen or muted tests do not establish natural victory/full route/listening.
 | Commitment | Current state / boundary |
 | --- | --- |
 | Healing flask | Owner approved **refillable and upgradeable**. Charges, healing quantity, refill locations, upgrade progression, first availability, use/interruption, death and save migration remain unspecified. No healing implementation. The earlier one-charge/one-heart/rope-landing suggestion is archived and unapproved. [Recovery record](HORDE_1_7_RECOVERY_DECISIONS_FOR_MORNING_2026_10_20.md). |
-| Directional locomotion | Owner saw backward movement playing forward-running in a mirror. Inspect runtime clip selection and existing backward/turn sources before replacement. No reflection-renderer fault is demonstrated. Preserve weapon/contact, rope and IK ownership. |
+| Directional locomotion | Owned player runtime/source rigs contain Idle and forward Walking only. A bounded continuous reverse-phase candidate reduces actual stance-foot world-speed RMS from 3.36144 to 0.560598 m/s over the same 4.05322 m backward path; residual sliding remains. Initial uninterrupted forward RT images are byte-identical; blocked motion now returns to Idle. No new clip, save field, movement timing or footstep-event input. Animation/directional tests (including blocked-to-Idle) and the static first-person portal pass. Full Windows Debug selection is 226/230 across two fixed-source segments: two route deadlines and two inherited shader-hash checks fail. Exact accepted-source step control also exceeds 30 s, with identical 73-check output; final candidate CTest timeout remains retained. Exact source-changing-head CI must be read separately. Dynamic backward first-person, dodge/rope transitions, phone feel and an authored backward run remain unaccepted. [Evidence and retained initial failures](../evidence/2026-10-23-backward-walk/README.md). No reflection-renderer fault is demonstrated. |
 | Meshy assessment | Kit source/runtime already retain idle/walk/run/fall/jump/mantle/slide; runtime selects idle/walk. Same-rig `Warden|run` is a worthwhile genuine running/catch-up candidate, not a pivot shortcut. No inspected crouch transition exists. Foreign skeleton backward/turn clips need retargeting and retain unresolved redistribution limits. No import/generation, playback or cost acceptance. |
 | Existing optimizations | Player normal caching, enemy refresh and BLAS UPDATE already exist. Current phone skin-stage wall median remains 12.06 ms (player 6.05/character 5.92); old 8.7 ms is stale. Six CPU child stages now separate pose/palette, world/viewmodel vertices and character copies; upload/AS-record/waits remain separate. One generic-character reuse of the existing transport helper reduces laptop Kit vertex medians 6.73–8.33% versus closing control, but misses its 1.55 ms target at 1.5567 ms. Retained candidate, one iteration exhausted; no frame or Android gain claim. Two frozen RT pairs match exactly. [Evidence](../evidence/2026-10-22-skin-attribution/README.md). GPU AS execution and per-owner attribution remain open. First-blocker/Opaque inverse-transform closed without adoption; PineLOD2 rejected, LOD1 retained. |
 | Mobile quality | MistOff default and optional enable remain; saved choices are preserved, desktop unchanged. Explicitly requested candidate comparisons are RT ON,40%,MistOff,FireLow,DustOff,Current shadows,existing Mobile water, individual and combined. Prior mixed trials are not attributed wins. 480p was illustrative; native HUD remains display-resolution/readable. |
 | Natural acceptance | Natural Keeper victory, full journey, earned save/load/death recovery, actual listening and sustained warmed-phone performance remain open. Passing Windows post-Keeper continuation fixtures are parked. |
 | Kit/ambience/debris | Stationary turn-step trial withdrawn/unadmitted; foot sliding remains. Night ambience/finite foliage source exists but listening is unaccepted. Six floor chips are static; kicking and a player-facing toggle are absent. |
-| Outdoor music | Owner-approved original **Beneath the Same Moon - Outdoor r2** is available by Library identifiers, not yet materialized in this worktree. Main/quiet bed are aligned48kHz stereo5,120,000 samples,106.667s per parent verification; in-game Kit mix remains unvalidated. Outdoor-only integration, no global music replacement. |
+| Outdoor music | **Blocked, not integrated.** Exact approved main/quiet-bed/source Library identifiers resolve, but all three required metadata-helper materializations fail with `AttributeError: module 'os' has no attribute 'setxattr'` on native Windows Python. Final destinations are absent; no metadata bypass or partial asset admission. [Exact action and targets](../evidence/2026-10-23-backward-walk/outdoor-music-blocker.json). Main/bed are aligned 48 kHz stereo, 5,120,000 samples, 106.667 s per parent verification; local bytes/listening/mix are unvalidated. Current H also serves legacy dawn, so outdoor-only routing and duration/footprint admission are required after a supported transfer. |
 
 ## Hosted baseline and final review
 
@@ -81,9 +81,18 @@ no active publication schedule.
 
 Latest torch refinement is closed without adoption. Joint physical clearance,
 visible hand/torch and continuous-turn behavior remain an implementation gap;
-resolve forward-facing pose feasibility before another runtime candidate rather
-than repeat the rejected translation or fixed cant. The existing wall witnesses
-and ordinary centre pose stay required. No phone work was performed.
+no further torch candidate is active. The existing wall witnesses and ordinary
+centre pose stay required. The bounded backward-walk checkpoint is recorded
+above. Next verify its exact-head CI and the remaining dynamic first-person /
+backward-to-dodge/rope acceptance, preserving the same rig and movement rules.
+Music transfer remains blocked as recorded above. No phone work was performed.
+
+Exact evidence-only head `096b23f0`, [run 39877269271](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39877269271),
+finishes **failure**: five jobs pass; MSVC main selection is 168/169, with the
+native report UI timing out at 30.02 s before the initial note-only form becomes
+visible. This does not prove a Unicode WM_SETTEXT defect. The later trace
+collector's "did not execute" text conflicts with actual CTest execution and
+does not close diagnostics. The original failure and deadlines are retained.
 
 At accepted source 4eeafcb6, hosted run 39871548947 completes **cancelled**: five
 jobs pass; MSVC exceeds its unchanged cap of 15 minutes after a successful build,

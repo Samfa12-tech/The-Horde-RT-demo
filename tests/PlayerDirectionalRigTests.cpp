@@ -3,6 +3,8 @@
 #include "gameplay/items/HeldLightState.h"
 #include "gameplay/items/HeldItemKinematics.h"
 #include "scene/DevelopmentWorldGeometry.h"
+#include "scene/assets/AssetManifest.h"
+#include "scene/assets/StaticMeshAsset.h"
 #include "vulkan/raytracing/PlayerRenderSlot.h"
 
 #include <algorithm>
@@ -11,8 +13,10 @@
 #include <cstdint>
 #include <filesystem>
 #include <iostream>
+#include <limits>
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace
 {
@@ -95,7 +99,9 @@ bool PrepareRenderedPose(PlayerRenderSlot& rig,
                          bool& poseUpdated,
                          std::string& diagnostic,
                          HeldItemStates* resolvedItems = nullptr,
-                         HeldLightState* resolvedLight = nullptr)
+                         HeldLightState* resolvedLight = nullptr,
+                         Vec3* resolvedRoot = nullptr,
+                         PlayerModelWorldBasis* resolvedBasis = nullptr)
 {
     const auto& animation = snapshot.playerAnimation;
     const Vec3 worldUp{{0.0f, 1.0f, 0.0f}};
@@ -191,8 +197,376 @@ bool PrepareRenderedPose(PlayerRenderSlot& rig,
             1.0f, light, diagnostic) || !light.active) return false;
     if (resolvedItems != nullptr) *resolvedItems = renderItems;
     if (resolvedLight != nullptr) *resolvedLight = light;
+    if (resolvedRoot != nullptr) *resolvedRoot = root;
+    if (resolvedBasis != nullptr) *resolvedBasis = basis;
     return true;
 }
+
+struct ActualFootPose
+{
+    float sampledTime=0,legacyTime=0,phaseOffset=0;
+    std::array<Vec3,4> footAndToeWorld{};
+    std::array<float,2> soleY{};
+    std::vector<Vec3> bootWorld;
+    Vec3 root{};
+    HeldItemStates items{};
+    HeldLightState light{};
+};
+
+bool CheckBackwardFootSampling(const std::filesystem::path& root,PlayerRenderSlot& rig,
+                               std::uint64_t& rigTick)
+{
+    horde::scene::SkinnedMeshAsset feet;
+    horde::scene::assets::StaticMeshAsset layout;
+    horde::scene::assets::AssetManifest manifest;
+    std::string diagnostic;
+    const auto directory=root/"assets/models/player/runtime";
+    if (!feet.LoadClips((directory/"gothic-traveller-lod0.runtime.glb").string(),
+                       horde::scene::PlayerLocomotionClipSet(),diagnostic) ||
+        !horde::scene::assets::AssetManifest::Load(directory/"asset.manifest.json",manifest,diagnostic) ||
+        !horde::scene::assets::StaticMeshAsset::Load(directory/"gothic-traveller-lod0.runtime.glb",manifest,layout,diagnostic) ||
+        !feet.ValidateStaticVertexLayout(layout,diagnostic))
+        return Require(false,diagnostic.c_str());
+    const float duration=feet.ClipDuration(horde::scene::SkinnedClip::Walking);
+    if (!Require(std::isfinite(duration)&&duration>0,"actual Walking duration must be available")) return false;
+    std::array<std::vector<std::uint32_t>,2> boots;
+    for (std::uint32_t index=0;index<layout.vertices.size();++index)
+    {
+        const auto& p=layout.vertices[index].position;
+        // Same admitted lower-body domain as runtime exact boot grounding;
+        // +X is anatomical Left. This observes actual skinned sole vertices.
+        if (p[1]<=.45f&&p[0]!=0) boots[p[0]>0?0:1].push_back(index);
+    }
+    if (!Require(!boots[0].empty()&&!boots[1].empty(),"actual left/right boot domains must be nonempty")) return false;
+    auto config=ProductionGameSimulationConfig();
+    config.playerStartX=-18.5f;config.playerStartZ=-15.2f;
+    config.waterfallSkeletonEncounter=false;
+    auto simulation=std::make_unique<GameSimulation>(config);
+    InputSnapshot input{};input.damageEnabled=false;input.moveForward=1;input.yawRadians=1.57079632679f;
+    for (unsigned tick=0;tick<18;++tick) simulation->StepFixed(input);
+    const auto source=simulation->Snapshot();
+    constexpr std::array<std::string_view,6> names{{"LeftFoot","LeftToeBase","RightFoot","RightToeBase",
+                                                  "LeftArm","RightArm"}};
+    const auto capture=[&](const SimulationSnapshot& snapshot,ActualFootPose& out) {
+        bool updated=false;PlayerModelWorldBasis basis;
+        if (!PrepareRenderedPose(rig,snapshot,rigTick++,updated,diagnostic,&out.items,&out.light,&out.root,&basis) ||
+            !updated||!rig.SolvedPose().IsValid()||rig.UniqueVertices().size()!=layout.vertices.size())
+            return Require(false,diagnostic.c_str());
+        if (!Require(rig.LeftGripAgreement().positionErrorMetres<=kPlayerGripSocketToleranceMetres&&
+                     rig.RightGripAgreement().positionErrorMetres<=kPlayerGripSocketToleranceMetres&&
+                     rig.LeftGripAgreement().orientationErrorRadians<=kPlayerGripOrientationToleranceRadians&&
+                     rig.RightGripAgreement().orientationErrorRadians<=kPlayerGripOrientationToleranceRadians,
+                     "backward sample retains actual imported Grip position/orientation agreement")) return false;
+        std::array<horde::scene::SkinnedNodeTransform,6> nodes{};
+        const float sampled=PlayerLocomotionSampleTime(snapshot.playerAnimation,duration);
+        out.sampledTime=sampled;
+        out.legacyTime=snapshot.playerAnimation.locomotionTime;
+        out.phaseOffset=snapshot.playerAnimation.locomotionPhaseOffsetSeconds;
+        if (!feet.NodeTransforms(horde::scene::SkinnedClip::Walking,sampled,names,nodes,diagnostic))
+            return Require(false,diagnostic.c_str());
+        Vec3 shoulders{};
+        if (!rig.ShoulderCenter(snapshot.playerAnimation,shoulders,diagnostic))
+            return Require(false,diagnostic.c_str());
+        for(unsigned axis=0;axis<3;++axis)
+            if(!Require(Near(shoulders[axis],(nodes[4][12+axis]+nodes[5][12+axis])*.5f,.00001f),
+                        "shoulder query must sample the same phase as actual feet, pose and grounding"))return false;
+        for (unsigned node=0;node<out.footAndToeWorld.size();++node)
+            out.footAndToeWorld[node]=Add(out.root,PlayerModelVectorToWorld(basis,
+                {{nodes[node][12],nodes[node][13],nodes[node][14]}}));
+        out.bootWorld.clear();
+        for (unsigned side=0;side<boots.size();++side)
+        {
+            out.soleY[side]=std::numeric_limits<float>::infinity();
+            for (const auto index:boots[side])
+            {
+                const auto& p=rig.UniqueVertices()[index].position;
+                const auto world=Add(out.root,PlayerModelVectorToWorld(basis,{{p[0],p[1],p[2]}}));
+                if (!Require(std::all_of(world.begin(),world.end(),[](float v){return std::isfinite(v);}),
+                             "actual backward boot vertices remain finite")) return false;
+                out.bootWorld.push_back(world);out.soleY[side]=std::min(out.soleY[side],world[1]);
+            }
+        }
+        const float lowest=std::min(out.soleY[0],out.soleY[1]);
+        return Require(lowest>=snapshot.playerSupportWorldY-.00001f&&
+                       lowest<=snapshot.playerSupportWorldY+.025f,
+                       "resolved backward phase retains the established nonpenetrating 25mm sole-grounding bound");
+    };
+    const auto poseDelta=[](const ActualFootPose& a,const ActualFootPose& b,unsigned index,const char* pair) {
+        if(a.bootWorld.size()!=b.bootWorld.size()) {
+            std::cerr<<"Backward phase pair index="<<index<<" pair="<<pair<<" boot sizes="
+                     <<a.bootWorld.size()<<'/'<<b.bootWorld.size()<<'\n';
+            return std::numeric_limits<float>::infinity();
+        }
+        float error=0;
+        std::array<float,7> componentErrors{};
+        const char* maximumComponent="none";std::size_t maximumIndex=0;unsigned maximumAxis=0;
+        const auto includeScalar=[&](float delta,unsigned component,const char* name,std::size_t element,unsigned axis) {
+            componentErrors[component]=std::max(componentErrors[component],delta);
+            if(delta>error){error=delta;maximumComponent=name;maximumIndex=element;maximumAxis=axis;}
+        };
+        const auto include=[&](const Vec3& x,const Vec3& y,unsigned component,const char* name,std::size_t element) {
+            for(unsigned axis=0;axis<3;++axis)includeScalar(std::abs(x[axis]-y[axis]),component,name,element,axis);
+        };
+        include(a.root,b.root,0,"root",0);
+        for(unsigned i=0;i<a.footAndToeWorld.size();++i)include(a.footAndToeWorld[i],b.footAndToeWorld[i],1,"foot/toe",i);
+        for(std::size_t i=0;i<a.bootWorld.size();++i)include(a.bootWorld[i],b.bootWorld[i],2,"boot vertex",i);
+        for(unsigned item=0;item<a.items.size();++item)for(unsigned c=0;c<16;++c)
+            includeScalar(std::abs(a.items[item].worldFromItem[c]-b.items[item].worldFromItem[c]),
+                          c>=12?3:4,c>=12?"item position":"item basis",item,c);
+        for(unsigned c=0;c<16;++c)
+            includeScalar(std::abs(a.light.worldFromLight[c]-b.light.worldFromLight[c]),
+                          c>=12?5:6,c>=12?"light position":"light basis",0,c);
+        if(error>.00001f) {
+            const auto precision=std::cerr.precision(9);
+            std::cerr<<"Backward phase pair index="<<index<<" pair="<<pair
+                <<" sampleTimes="<<a.sampledTime<<'/'<<b.sampledTime
+                <<" legacyTimes="<<a.legacyTime<<'/'<<b.legacyTime
+                <<" phaseOffsets="<<a.phaseOffset<<'/'<<b.phaseOffset
+                <<" maximum="<<error<<" component="<<maximumComponent
+                <<" element="<<maximumIndex<<" axis/component="<<maximumAxis
+                <<" errors root/foot/boot/itemPosition/itemBasis/lightPosition/lightBasis=";
+            for(const auto value:componentErrors)std::cerr<<value<<'/';
+            std::cerr<<'\n';std::cerr.precision(precision);
+        }
+        return error;
+    };
+    const Vec3 facing{{std::sin(source.playerYawRadians),0,-std::cos(source.playerYawRadians)}};
+    const float h=duration/256.f;
+    double forwardStanceVelocity=0,backwardStanceVelocity=0;
+    double forwardToeVelocity=0,backwardToeVelocity=0;
+    float maximumPairError=0,maximumReferenceSlip=0;
+    double maximumAnalyticalPhaseError=0;
+    // At most eight float roundings construct these clock/offset operands,
+    // all bounded by 4*duration. Eight half-ULPs give four ULPs at that bound.
+    // This clock budget never changes the independent 10um geometry gate.
+    const float operandBound=4*duration;
+    const double clockRoundoffBudget=4.0*(std::nextafter(operandBound,
+        std::numeric_limits<float>::infinity())-operandBound);
+    const auto analyticalPhaseError=[&](double expected,float published) {
+        if(expected<0)expected+=duration;
+        if(expected>=duration)expected-=duration;
+        const double difference=std::abs(double(published)-expected);
+        return std::min(difference,std::abs(double(duration)-difference));
+    };
+    unsigned samples=0,stancePairs=0,wrapPairs=0;
+    // Independent phase-paired asset test, not a natural traversal claim.
+    // Freeze gameplay/weapon clocks and pose targets while sampling the actual
+    // clip in both directions. Include the negative-to-positive loop boundary.
+    for(unsigned index=0;index<=16;++index)
+    {
+        const float phase=index==0?0.f:(index-.5f)*duration/16.f;
+        auto before=source,after=source,reverseBefore=source,reverseAfter=source;
+        for(auto* snapshot:{&before,&after,&reverseBefore,&reverseAfter})
+        {
+            snapshot->playerAnimation.locomotionClip=PlayerLocomotionClip::Walk;
+            snapshot->playerAnimation.locomotionBlend=1;
+        }
+        before.playerAnimation.locomotionPhaseOffsetSeconds=0;
+        after.playerAnimation.locomotionPhaseOffsetSeconds=0;
+        reverseBefore.playerAnimation.locomotionTime=2*duration+phase+h;
+        reverseBefore.playerAnimation.locomotionPhaseOffsetSeconds=-2*duration;
+        reverseAfter.playerAnimation.locomotionTime=reverseBefore.playerAnimation.locomotionTime+2*h;
+        reverseAfter.playerAnimation.locomotionPhaseOffsetSeconds=UpdateBackwardWalkPhaseOffset(
+            reverseBefore.playerAnimation.locomotionPhaseOffsetSeconds,2*h,
+            2*h*config.movementSpeedMetresPerSecond,-2*h*config.movementSpeedMetresPerSecond,
+            config.movementSpeedMetresPerSecond);
+        const float publishedBefore=PlayerLocomotionSampleTime(reverseBefore.playerAnimation,duration);
+        const float publishedAfter=PlayerLocomotionSampleTime(reverseAfter.playerAnimation,duration);
+        const double clockError=std::max(analyticalPhaseError(double(phase)+h,publishedBefore),
+                                        analyticalPhaseError(double(phase)-h,publishedAfter));
+        maximumAnalyticalPhaseError=std::max(maximumAnalyticalPhaseError,clockError);
+        if(!Require(publishedBefore>=0&&publishedBefore<duration&&publishedAfter>=0&&publishedAfter<duration&&
+                    clockError<=clockRoundoffBudget,
+                    "published reverse phases must match analytical wrapped phase within bounded float roundoff"))return false;
+        // Compare identical published float phases, rather than alleging that
+        // independently rounded clock cancellation produced identical times.
+        // Analytical direction/wrap correctness is checked separately above.
+        before.playerAnimation.locomotionTime=publishedAfter;
+        after.playerAnimation.locomotionTime=publishedBefore;
+        ActualFootPose a,b,ra,rb;
+        if(!capture(before,a)||!capture(after,b)||!capture(reverseBefore,ra)||!capture(reverseAfter,rb))return false;
+        const float firstError=poseDelta(a,rb,index,"forward-before/reverse-after");
+        const float secondError=poseDelta(b,ra,index,"forward-after/reverse-before");
+        const float error=std::max(firstError,secondError);
+        maximumPairError=std::max(maximumPairError,error);++samples;
+        if(index==0)++wrapPairs;
+        if(!Require(error<=.00001f,
+                    "reversed phase must revisit actual foot/toe/boot/Grip/grounding poses in the opposite order"))return false;
+        for(unsigned side=0;side<2;++side)
+        {
+            // Only intervals whose same boot supplies the lower sole at both
+            // ends are labelled stance samples; crossing support is excluded.
+            if(a.soleY[side]>a.soleY[1-side]||b.soleY[side]>b.soleY[1-side])continue;
+            const auto velocity=[&](const ActualFootPose& x,const ActualFootPose& y,unsigned node) {
+                return Dot(Add(y.footAndToeWorld[node],Scale(x.footAndToeWorld[node],-1)),facing)/(2*h);
+            };
+            const float forward=velocity(a,b,side*2),backward=velocity(ra,rb,side*2);
+            const float toeForward=velocity(a,b,side*2+1),toeBackward=velocity(ra,rb,side*2+1);
+            forwardStanceVelocity+=forward;backwardStanceVelocity+=backward;
+            forwardToeVelocity+=toeForward;backwardToeVelocity+=toeBackward;++stancePairs;
+            maximumReferenceSlip=std::max({maximumReferenceSlip,
+                std::abs(config.movementSpeedMetresPerSecond+forward),
+                std::abs(-config.movementSpeedMetresPerSecond+backward)});
+        }
+    }
+    if(!Require(samples==17&&wrapPairs==1&&stancePairs>0,
+                "backward actual-asset proof must include a full cycle, loop wrap and stance intervals"))return false;
+
+    struct StanceSlip
+    {
+        unsigned intervals=0;
+        double footSquared=0,toeSquared=0;
+        float maximumFootSpeed=0,maximumToeSpeed=0;
+    };
+    const auto observeSlip=[](const ActualFootPose& before,const ActualFootPose& after,
+                              float elapsed,StanceSlip& result) {
+        for(unsigned side=0;side<2;++side)
+        {
+            if(before.soleY[side]>before.soleY[1-side]||after.soleY[side]>after.soleY[1-side])continue;
+            const auto speed=[&](unsigned node) {
+                return std::hypot(after.footAndToeWorld[node][0]-before.footAndToeWorld[node][0],
+                                  after.footAndToeWorld[node][2]-before.footAndToeWorld[node][2])/elapsed;
+            };
+            const float foot=speed(side*2),toe=speed(side*2+1);
+            result.footSquared+=double(foot)*foot;result.toeSquared+=double(toe)*toe;
+            result.maximumFootSpeed=std::max(result.maximumFootSpeed,foot);
+            result.maximumToeSpeed=std::max(result.maximumToeSpeed,toe);++result.intervals;
+        }
+    };
+    auto actualBackward=std::make_unique<GameSimulation>(config);
+    InputSnapshot backwardInput{};backwardInput.damageEnabled=false;
+    backwardInput.moveForward=-1;backwardInput.yawRadians=1.57079632679f;
+    const unsigned traceTicks=static_cast<unsigned>(std::ceil(2*duration*60))+3;
+    StanceSlip reversedSlip,oldForwardGaitSlip;
+    ActualFootPose previousReversed,previousOld;
+    unsigned previousTick=0,traceSamples=0;
+    float acceptedPath=0;
+    bool havePrevious=false;
+    for(unsigned tick=1;tick<=traceTicks;++tick)
+    {
+        const auto previous=actualBackward->Snapshot();
+        actualBackward->StepFixed(backwardInput);
+        const auto& current=actualBackward->Snapshot();
+        acceptedPath+=std::hypot(current.playerX-previous.playerX,current.playerZ-previous.playerZ);
+        if(tick%3)continue;
+        ActualFootPose reversed,old;
+        auto oldGait=current;
+        // Counterfactual control: identical accepted actor displacement,
+        // gameplay/weapon clocks and inputs, retaining the old forward gait.
+        oldGait.playerAnimation.locomotionPhaseOffsetSeconds=0;
+        if(!capture(current,reversed)||!capture(oldGait,old))return false;
+        if(havePrevious)
+        {
+            const float elapsed=(tick-previousTick)/60.f;
+            observeSlip(previousReversed,reversed,elapsed,reversedSlip);
+            observeSlip(previousOld,old,elapsed,oldForwardGaitSlip);
+        }
+        previousReversed=std::move(reversed);previousOld=std::move(old);
+        previousTick=tick;havePrevious=true;++traceSamples;
+    }
+    if(!Require(acceptedPath>0&&traceSamples>1&&reversedSlip.intervals>0&&oldForwardGaitSlip.intervals>0,
+                "actual backwards stance comparison requires accepted travel and both gait contact windows"))return false;
+    const auto rms=[](double squared,unsigned count){return std::sqrt(squared/count);};
+    std::cout<<"Actual backward acceptedPathMetres="<<acceptedPath<<" traceSamples="<<traceSamples
+        <<" reversed/oldForwardGaitStanceIntervals="<<reversedSlip.intervals<<'/'<<oldForwardGaitSlip.intervals
+        <<" footWorldSpeedRmsMetresPerSecond="<<rms(reversedSlip.footSquared,reversedSlip.intervals)<<'/'
+        <<rms(oldForwardGaitSlip.footSquared,oldForwardGaitSlip.intervals)
+        <<" toeWorldSpeedRmsMetresPerSecond="<<rms(reversedSlip.toeSquared,reversedSlip.intervals)<<'/'
+        <<rms(oldForwardGaitSlip.toeSquared,oldForwardGaitSlip.intervals)
+        <<" footWorldSpeedMaxMetresPerSecond="<<reversedSlip.maximumFootSpeed<<'/'<<oldForwardGaitSlip.maximumFootSpeed
+        <<" toeWorldSpeedMaxMetresPerSecond="<<reversedSlip.maximumToeSpeed<<'/'<<oldForwardGaitSlip.maximumToeSpeed
+        <<"; actual skinned soles choose stance intervals; foot/toe node slip is measured, not a contact-solver or visual pass.\n";
+
+    std::cout<<"Backward Walking asset pairs="<<samples<<" wrapPairs="<<wrapPairs
+        <<" lower-sole stancePairs="<<stancePairs<<" maxPairedPoseErrorMetres="<<maximumPairError
+        <<" maxAnalyticalPhaseErrorSeconds="<<maximumAnalyticalPhaseError
+        <<" clockRoundoffBudgetSeconds="<<clockRoundoffBudget
+        <<" meanFootForward/BackwardMetresPerSecond="<<forwardStanceVelocity/stancePairs<<'/'
+        <<backwardStanceVelocity/stancePairs
+        <<" meanToeForward/BackwardMetresPerSecond="<<forwardToeVelocity/stancePairs<<'/'
+        <<backwardToeVelocity/stancePairs<<" maxReferenceWorldFootSlipMetresPerSecond="<<maximumReferenceSlip
+        <<"; slip measured without an invented acceptance threshold; not authored backward run or native visual acceptance.\n";
+    return true;
+}
+
+bool CheckBackwardSimulationTransitions(PlayerRenderSlot& rig,std::uint64_t& rigTick)
+{
+    auto config=ProductionGameSimulationConfig();
+    config.playerStartX=-18.5f;config.playerStartZ=-15.2f;
+    config.waterfallSkeletonEncounter=false;
+    auto simulation=std::make_unique<GameSimulation>(config);
+    InputSnapshot input{};input.damageEnabled=false;input.yawRadians=1.57079632679f;
+    unsigned forwardTicks=0,backwardTicks=0,stoppedTicks=0;
+    float maximumEffectivePhaseStep=0;
+    std::string diagnostic;
+    for(unsigned tick=0;tick<108;++tick)
+    {
+        input.moveForward=tick<24?1.f:tick<72?-1.f:tick<84?0.f:1.f;
+        const auto before=simulation->Snapshot();
+        simulation->StepFixed(input);
+        const auto& after=simulation->Snapshot();
+        const auto& a=before.playerAnimation;const auto& b=after.playerAnimation;
+        const float distance=std::hypot(after.playerX-before.playerX,after.playerZ-before.playerZ);
+        const float forward=(after.playerX-before.playerX)*std::sin(after.playerYawRadians)-
+            (after.playerZ-before.playerZ)*std::cos(after.playerYawRadians);
+        const float legacyAdvance=b.locomotionTime-a.locomotionTime;
+        const float effectiveAdvance=legacyAdvance+b.locomotionPhaseOffsetSeconds-a.locomotionPhaseOffsetSeconds;
+        maximumEffectivePhaseStep=std::max(maximumEffectivePhaseStep,std::abs(effectiveAdvance));
+        if(!Require(std::abs(effectiveAdvance)<=std::max(legacyAdvance,distance/config.movementSpeedMetresPerSecond)+.00001f,
+                    "direction changes advance continuously from the previous phase rather than negating absolute time"))return false;
+        if(distance>.00001f&&forward<-.00001f)
+        {
+            ++backwardTicks;
+            if(!Require(effectiveAdvance<0,"accepted backward travel must reverse the actual shared phase"))return false;
+        }
+        else if(distance>.00001f&&forward>.00001f)
+        {
+            ++forwardTicks;
+            if(!Require(b.locomotionPhaseOffsetSeconds==a.locomotionPhaseOffsetSeconds,
+                        "accepted forward travel preserves the exact nominal phase advance"))return false;
+        }
+        else if(distance<=.00001f)
+        {
+            ++stoppedTicks;
+            if(!Require(std::abs(effectiveAdvance)<=.00001f,
+                        "zero accepted travel must freeze locomotion phase while gameplay clocks continue"))return false;
+        }
+        if(tick%6==5)
+        {
+            bool updated=false;
+            if(!PrepareRenderedPose(rig,after,rigTick++,updated,diagnostic)||!updated)
+                return Require(false,diagnostic.c_str());
+        }
+    }
+    if(!Require(forwardTicks>0&&backwardTicks>0&&stoppedTicks>0,
+                "actual transition fixture must contain forward/backward/stopped travel"))return false;
+    // A backwards command reaches the existing corridor wall naturally, then
+    // continues with zero resolved displacement. No authoritative pose seeding.
+    auto blocked=std::make_unique<GameSimulation>(config);input.yawRadians=0;input.moveForward=-1;
+    unsigned moving=0,stationary=0;
+    for(unsigned tick=0;tick<96;++tick)
+    {
+        const auto before=blocked->Snapshot();blocked->StepFixed(input);const auto& after=blocked->Snapshot();
+        const float distance=std::hypot(after.playerX-before.playerX,after.playerZ-before.playerZ);
+        const float phase=(after.playerAnimation.locomotionTime-before.playerAnimation.locomotionTime)+
+            after.playerAnimation.locomotionPhaseOffsetSeconds-before.playerAnimation.locomotionPhaseOffsetSeconds;
+        if(distance>.00001f)++moving;
+        else if(moving)
+        {
+            ++stationary;
+            if(!Require(std::abs(phase)<=.00001f,
+                        "held backward input against a wall cannot advance either-direction gait phase"))return false;
+        }
+    }
+    if(!Require(moving>0&&stationary>0,"backward wall fixture must include natural travel and actual blockage"))return false;
+    if(!Require(blocked->Snapshot().playerAnimation.locomotionClip==PlayerLocomotionClip::Idle,
+                "sustained blocked input must return to Idle instead of holding a raised walk foot"))return false;
+    std::cout<<"Backward shared-phase transitions forward/back/stopped="<<forwardTicks<<'/'<<backwardTicks<<'/'
+        <<stoppedTicks<<" maxContinuousPhaseStepSeconds="<<maximumEffectivePhaseStep
+        <<" naturalWallMoving/BlockedTicks="<<moving<<'/'<<stationary<<'\n';
+    return true;
+}
+
 }
 
 int main(int argc, char** argv)
@@ -477,6 +851,7 @@ int main(int argc, char** argv)
     if (!inspectRoutePose())
         return Require(false, "returned F01 pose retains real equipment and light attachments") ? 0 : 1;
 
+    if(!CheckBackwardFootSampling(root,rig,rigTick)||!CheckBackwardSimulationTransitions(rig,rigTick))return 1;
     std::cout << "Directional runtime rig, aim independence, run stride, dodge disposition, route support poses, and attachment sockets passed; dedicated run/back/strafe/dodge clips remain absent; route_pose_samples="
               << routePoseSamples << " GPU_cost=not-measured.\n";
     return 0;

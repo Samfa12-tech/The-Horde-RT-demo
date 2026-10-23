@@ -638,7 +638,8 @@ float PlayerRenderSlot::BootGroundingOffsetMetres(
     float minimumY = 0.0f;
     std::string ignoredDiagnostic;
     if (!asset_.BootGroundingMinimumY(
-            clip, animation.locomotionTime, minimumY, ignoredDiagnostic))
+            clip, horde::gameplay::animation::PlayerLocomotionSampleTime(
+                animation, asset_.ClipDuration(clip)), minimumY, ignoredDiagnostic))
         return kPlayerBootGroundingSafetyMetres;
     return -minimumY + kPlayerBootGroundingSafetyMetres;
 }
@@ -877,7 +878,8 @@ bool PlayerRenderSlot::PreparePose(
     RtSceneStageScope skinScope(observation, horde::telemetry::RtStage::PlayerSkin);
     RtSceneStageScope poseScope(observation, horde::telemetry::RtStage::PlayerPose);
     if (!asset_.EvaluatePlayerPose(
-            clip, animation.locomotionTime, left, right, solvedPose_, diagnostic,
+            clip, horde::gameplay::animation::PlayerLocomotionSampleTime(
+                animation, asset_.ClipDuration(clip)), left, right, solvedPose_, diagnostic,
             animation.plantedPelvisDropMetres, animation.crouchPelvisDropMetres,
             DodgePose(animation)))
     {
@@ -952,7 +954,8 @@ bool PlayerRenderSlot::ShoulderCenter(
         : horde::scene::SkinnedClip::Idle;
     constexpr std::array<std::string_view, 2u> names{{"LeftArm", "RightArm"}};
     std::array<horde::scene::SkinnedNodeTransform, 2u> pose{};
-    if (!asset_.NodeTransforms(clip, animation.locomotionTime, names, pose,
+    if (!asset_.NodeTransforms(clip, horde::gameplay::animation::PlayerLocomotionSampleTime(
+                animation, asset_.ClipDuration(clip)), names, pose,
                                diagnostic))
         return false;
     const auto& left = pose[0];
@@ -982,7 +985,8 @@ bool PlayerRenderSlot::AnimatedHipsWorldTransform(
             horde::gameplay::animation::PlayerLocomotionClip::Walk
         ? horde::scene::SkinnedClip::Walking : horde::scene::SkinnedClip::Idle;
     horde::scene::SkinnedNodeTransform hips{};
-    if (!asset_.NodeTransform(clip, animation.locomotionTime, "Hips", hips,
+    if (!asset_.NodeTransform(clip, horde::gameplay::animation::PlayerLocomotionSampleTime(
+                animation, asset_.ClipDuration(clip)), "Hips", hips,
                               diagnostic))
         return false;
     std::array<float, 3u> hipsPosition{{hips[12], hips[13], hips[14]}};

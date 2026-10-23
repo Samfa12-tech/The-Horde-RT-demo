@@ -37,6 +37,29 @@ int main()
     using namespace horde::gameplay;
     using namespace horde::gameplay::animation;
 
+    // Accepted movement, rather than a pressed direction, owns the reverse phase.
+    const float reverseOffset = UpdateBackwardWalkPhaseOffset(0.0f, 0.02f,
+                                                             0.01f, -0.01f, 2.0f);
+    if (!Require(Near(reverseOffset, -0.025f, 0.000001f),
+                 "partly blocked backward travel must reverse its effective phase")) return 1;
+    if (!Require(UpdateBackwardWalkPhaseOffset(-0.25f, 0.02f, 0.04f, 0.04f, 2.0f) == -0.25f &&
+                 UpdateBackwardWalkPhaseOffset(0.0f, 0.02f, 0.04f, 0.04f, 2.0f) == 0.0f,
+                 "accepted forward motion must preserve its exact existing phase advance")) return 1;
+    if (!Require(Near(UpdateBackwardWalkPhaseOffset(-0.25f, 0.02f, 0.0f, 0.0f, 2.0f), -0.27f),
+                 "a fully blocked motor must freeze its effective foot phase")) return 1;
+    PlayerAnimationSnapshot phaseProbe;
+    phaseProbe.locomotionTime = 0.01f;
+    phaseProbe.locomotionPhaseOffsetSeconds = reverseOffset;
+    if (!Require(Near(PlayerLocomotionSampleTime(phaseProbe, 1.2f), 1.185f, 0.000001f),
+                 "reverse phase must wrap through zero without the importer clamping to rest")) return 1;
+    phaseProbe.locomotionPhaseOffsetSeconds = 0.0f;
+    phaseProbe.locomotionTime = 53.12345f;
+    if (!Require(PlayerLocomotionSampleTime(phaseProbe, 1.2f) == phaseProbe.locomotionTime,
+                 "uncorrected forward samples must remain bit-identical")) return 1;
+    phaseProbe.locomotionPhaseOffsetSeconds = -0.1f;
+    if (!Require(PlayerLocomotionSampleTime(phaseProbe, 0.0f) == 0.0f,
+                 "invalid clip duration cannot publish a nonfinite phase")) return 1;
+
     const TwoBoneIkSolution foldedUnequal = SolveTwoBoneIk(
         {{0.0f, 0.0f, 0.0f}}, {{0.20f, 0.0f, 0.0f}}, {{0.0f, 1.0f, 0.0f}}, 0.30f, 0.40f);
     std::cout << "Unequal folded IK: elbow=(" << foldedUnequal.elbow[0] << ','

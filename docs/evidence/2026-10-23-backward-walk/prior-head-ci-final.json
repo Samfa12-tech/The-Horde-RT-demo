@@ -1,0 +1,18 @@
+{
+  "headSha": "096b23f0895f78fa0eb3bd492aed005dfc205b44",
+  "runId": 39877269271,
+  "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39877269271",
+  "status": "completed",
+  "conclusion": "failure",
+  "successfulJobs": 5,
+  "failedJob": {
+    "id": 120165795542,
+    "name": "Shared simulation host (MSVC)",
+    "failure": "horde_rt_windows_playtest_report_ui_tests Timeout30.02s",
+    "output": "report form did not become visible with category focus; phase=note-only default and private-content checks",
+    "mainSelection": "168/169 pass; one timeout",
+    "wmSetTextFailureProven": false
+  },
+  "limitsChanged": false,
+  "distinction": "Previous4eeafcb6 cancelled at15m cap; this096b23f0 result is a UI startup timeout, not that cancellation. Native trace extraction prints did-not-execute despite explicit CTest execution, so it cannot close diagnostics."
+}

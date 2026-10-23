@@ -92,6 +92,9 @@ struct PlayerAnimationSnapshot
     PlayerArmIkTarget leftIk{};
     PlayerArmIkTarget rightIk{};
     PlayerVisibilityFlags visibility{};
+    // Continuous correction to the legacy forward clock. A reverse walk uses
+    // the same owned clip; this does not represent an authored backward run.
+    float locomotionPhaseOffsetSeconds = 0.0f;
 
     bool operator==(const PlayerAnimationSnapshot&) const = default;
 };
@@ -107,9 +110,14 @@ struct PlayerAnimationInput
     float lanternForwardAngleRadians = 0.0f;
     float lanternStrafeAngleRadians = 0.0f;
     bool carryingOriginalTorch = false;
+    float locomotionPhaseOffsetSeconds = 0.0f;
 };
 
 PlayerLocomotionClip MapPlayerLocomotionClip(float locomotionBlend);
+float UpdateBackwardWalkPhaseOffset(float currentOffset, float legacyAdvanceSeconds,
+    float acceptedDistanceMetres, float acceptedForwardDistanceMetres, float walkSpeed);
+float PlayerLocomotionSampleTime(const PlayerAnimationSnapshot& animation,
+                                float clipDurationSeconds);
 PlayerCombatLayer EvaluatePlayerCombatLayer(
     const horde::gameplay::PlayerCombatSnapshot& combat);
 

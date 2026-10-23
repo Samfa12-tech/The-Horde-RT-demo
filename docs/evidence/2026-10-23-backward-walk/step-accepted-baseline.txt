@@ -1,0 +1,5 @@
+automatic crossing target=-23.5 ticks=55 blocked=2
+automatic crossing target=-22.5 ticks=75 blocked=0
+automatic crossing target=-24.5 ticks=172 blocked=2
+automatic crossing target=-22.5 ticks=152 blocked=2
+73 chapter step movement checks, 0 failures; retained step bytes=680

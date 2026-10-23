@@ -1,0 +1,74 @@
+{
+  "scope": "all230 Windows Debug registrations across two fixed-source segments; initial tool interruption during143, process verified stopped,143-230 completed separately",
+  "registrations": 230,
+  "passed": 226,
+  "failed": [
+    {
+      "id": 35,
+      "name": "horde_rt_campaign_play_session_tests",
+      "status": "***Timeout",
+      "seconds": 30.01
+    },
+    {
+      "id": 37,
+      "name": "horde_rt_chapter_step_movement_tests",
+      "status": "***Timeout",
+      "seconds": 30.02
+    },
+    {
+      "id": 128,
+      "name": "horde_rt_raygen_variant_manifest_tests",
+      "status": "***Failed",
+      "seconds": 1.03
+    },
+    {
+      "id": 129,
+      "name": "horde_rt_raygen_variant_artifact_tests",
+      "status": "***Failed",
+      "seconds": 1.22
+    }
+  ],
+  "complete": true,
+  "allPass": false,
+  "limitsChanged": false,
+  "logs": [
+    {
+      "localFile": "reports/player-backward-20261023/checkpoint-full-tests.txt",
+      "sha256": "27b7d34d3232100aa5a0ff29823f79325c27da662f8c9aa48923e0f0d897ea49",
+      "completedResults": 142
+    },
+    {
+      "localFile": "reports/player-backward-20261023/checkpoint-remaining-tests.txt",
+      "sha256": "0ae647c3033c1fac785c00ea3861d07e6603fd50f02d72563727480ac57b064b",
+      "completedResults": 88
+    }
+  ],
+  "sourceIdentity": {
+    "baselineHead": "096b23f0895f78fa0eb3bd492aed005dfc205b44",
+    "sources": {
+      "src/gameplay/animation/PlayerAnimationState.cpp": "8ffd14144c89dfee1e4a550860621ca7e6dda92acf1c887b7d9b0ff5ee275831",
+      "src/gameplay/animation/PlayerAnimationState.h": "7a7784eb5f7415d756980c78080e1a8e927df88b7cf003751a711d67066f2495",
+      "src/gameplay/simulation/GameSimulation.cpp": "41beefa6cdff48d448308583c276c25be505ab2765494f10c6b1e9c2afee0fd6",
+      "src/gameplay/simulation/GameSimulation.h": "70114c1ca06ce9b19750b2d08a4e135924c62291d6f21017519d004d71cd0bfb",
+      "src/vulkan/raytracing/PlayerRenderSlot.cpp": "cfcb75dd5ed8092189c7d9f906710aa97803a444b58d1e77d525c5ab74f10ba5",
+      "tests/PlayerAnimationTests.cpp": "5e2af9bedba4abecbf971c150a47790173442e35281a3c2ca707e44da5a33697",
+      "tests/PlayerDirectionalRigTests.cpp": "94f609e9664f5bf915bb5f50d9c9543cb6a35a43ce0018094d1518a4b5af547c"
+    },
+    "fullWindowsBuildExitCode": 0,
+    "fullCTest": "all230 completed across two fixed-source segments; initial interruption during143,143-230 completed separately; later additive Idle assertion is checked by focused rerun",
+    "firstPersonArtifactSha256": "793f44a571543d61d4fad5f6a2a5f0fe1a9b429e3705d39e5bc0a0fe1c473122"
+  },
+  "authoredTerrainJourney": {
+    "id": 217,
+    "name": "horde_rt_chapter_terrain_journey_tests",
+    "status": "Passed",
+    "seconds": 196.12
+  },
+  "nativeReportUi": {
+    "id": 174,
+    "name": "horde_rt_windows_playtest_report_ui_tests",
+    "status": "Passed",
+    "seconds": 1.8
+  },
+  "fullBuildLogSha256": "e531895800b965c38c626e251a3d515f7ba7599882f10fc09e0625c687943a1a"
+}
