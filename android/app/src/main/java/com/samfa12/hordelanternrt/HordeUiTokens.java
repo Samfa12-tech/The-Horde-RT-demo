@@ -25,5 +25,8 @@ final class HordeUiTokens {
     static ColorStateList label(int normal) {
         return new ColorStateList(new int[][]{{-android.R.attr.state_enabled},{}},new int[]{DISABLED,normal});
     }
+    static TouchButtonDrawable touchButton(Context c,int fill,boolean circular) {
+        return new TouchButtonDrawable(fill,c.getResources().getDisplayMetrics().density,circular);
+    }
     private HordeUiTokens() { }
 }

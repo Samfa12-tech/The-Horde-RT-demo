@@ -1,5 +1,20 @@
 # Horde 1.7 owner playtest checklist - 22 October 2026
 
+## Touch HUD checkpoint - 23 October
+
+Visible Skip line and the compact accessible lantern icon were already in place.
+The [HUD backing checkpoint](../evidence/2026-10-23-touch-hud/README.md) now removes
+the opaque plate underneath gameplay controls, so saved 55-95% opacity actually
+works. The lantern is circular; labelled actions retain readable text with rounded
+corners. Native hit areas, safe margins, input semantics and preference values
+are unchanged. Thirty-one focused tests and an ordinary arm64 Debug build pass;
+native component before/after images are retained in both orientations.
+
+Actual phone contrast/touch/full moving-scene acceptance remains open. No phone
+operation occurred. Briarhold's optional read-only reference was filesystem-denied;
+no retry or claimed reference match. Changes remain local after the approved
+backup through `9bd46a8f`, with deferred forest/parked chimney work preserved.
+
 ## Production-path attribution checkpoint - 23 October
 
 The approved cache retry unblocked an arm64 Shipping/Mobile Debug build at
@@ -56,7 +71,7 @@ released; the next experiments are desktop-only.
 | --- | --- | --- | --- |
 | Playable critical path | Tomb, lantern/rescue shaft, rope ascent, night lookout and return; combat/dodge/parry teaching. | Host route contracts and native RT post-Keeper continuation, isolated save/load and repeat ascent. | Natural Keeper victory through the full earned journey and save/load/death recovery; physical teaching/contact acceptance. Seeded fixtures do not close this. |
 | Recovery and saves | Three slots, manual/latest-auto records, checkpoints, hearts and death Load. | Focused storage/lifecycle and isolated recovery checks. | Refillable, upgradeable flask is approved but its six first-recovery policy decisions remain unresolved; do not invent charges, healing or death/save rules. Full interruption/power-loss acceptance remains open. |
-| Input and captions | Automatic head-clearance crouch, stick-deflection speed, keyboard run key; backward phase selection; safe-area caption repair, visible Skip removed, compact lantern icon. | Host collision/input/Java checks; dynamic Windows RT backward/dodge frames and rope motor continuity. One earlier phone caption line passed. | Final landscape/portrait overlap, touch feel and moving-body acceptance; circular/translucent controls were deprioritized, not completed. Authored backward running and stationary Kit turns remain gaps; turn-step trial was withdrawn. |
+| Input and captions | Automatic head-clearance crouch, stick-deflection speed, keyboard run key; backward phase selection; safe-area caption repair, visible Skip removed, compact lantern icon; saved-opacity touch backing with circular lantern and rounded text actions. | Host collision/input/Java checks; dynamic Windows RT backward/dodge frames and rope motor continuity. One earlier phone caption line passed; new HUD has focused native component/layout checks and a Debug build. | Final landscape/portrait overlap, touch contrast/feel and moving-body acceptance; new backing remains physically unaccepted. Authored backward running and stationary Kit turns remain gaps; turn-step trial was withdrawn. |
 | Music and speech | Approved full outdoor main through the shared Pocket Audio engine/director and existing ducking; current Kit/listener anchoring. | Local bank/control/lifecycle/build/package checks; owner positively listened to the forest main in the recorded phone session. | Kit balance at owner volumes, moving speech, transition/loop listening and physical lifecycle. Forest/foliage ambience has structural checks, not listening acceptance. |
 | Forest and terrain | Two supplied LOD1 tree models, 64 grounded placements, shared four-family materials, terrain/collision and distant town shell. | Grounding/root/collision and native RT captures; exact asset/geometry contracts. | Shared-master mesh/BLAS instancing is **not implemented**; see distinction below. Replacement canopy/Easy Tree remains owner-deferred. Runtime distance LOD/wind remain gaps. One-pine LOD2 was separately rejected; retain LOD1. |
 | Story scenery | Grounded F03 old-road edging/waystone in the existing consolidated owner. | Actual matched RT views, terrain/route clearance and package/build checks. | Chimney smoke. Local v5 outlet prototype is parked/unadmitted; shared bounded High/Low volumetric proposal is not a measured effect. Preserve dry northwest-lookout to southeast-town approach, vista and safe backtracking. |

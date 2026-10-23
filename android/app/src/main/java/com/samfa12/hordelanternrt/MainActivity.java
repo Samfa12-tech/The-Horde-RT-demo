@@ -4882,7 +4882,7 @@ public class MainActivity extends Activity {
             button.setIncludeFontPadding(false); button.setPadding(dp(12),dp(8),dp(12),dp(8));
             button.setClickable(false); button.setFocusable(false);
             button.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
-            styleActionButton(button,interfaceBacking(values,HordeUiTokens.SLATE),HordeUiTokens.PARCHMENT);
+            styleGameplayActionButton(button,interfaceBacking(values,HordeUiTokens.SLATE),HordeUiTokens.PARCHMENT,false);
             button.measure(View.MeasureSpec.makeMeasureSpec(0,View.MeasureSpec.UNSPECIFIED),
                     View.MeasureSpec.makeMeasureSpec(0,View.MeasureSpec.UNSPECIFIED));
             button.setLayoutParams(new LinearLayout.LayoutParams(Math.max(nominal.width,button.getMeasuredWidth()),
@@ -4943,9 +4943,10 @@ public class MainActivity extends Activity {
         }
         UiControlLayout.apply(this,v,attackButton,parryButton,dodgeButton,interactButton,toggleHeldLightPoseButton,
                 safeRight,safeBottom,getResources().getDisplayMetrics().widthPixels-safeLeft);
-        styleActionButton(attackButton,interfaceBacking(v,HordeUiTokens.CHARCOAL),HordeUiTokens.PARCHMENT);
-        for(Button b:new Button[]{parryButton,dodgeButton,interactButton,toggleHeldLightPoseButton})
-            if(b!=null) styleActionButton(b,interfaceBacking(v,HordeUiTokens.SLATE),HordeUiTokens.PARCHMENT);
+        styleGameplayActionButton(attackButton,interfaceBacking(v,HordeUiTokens.CHARCOAL),HordeUiTokens.PARCHMENT,false);
+        for(Button b:new Button[]{parryButton,dodgeButton,interactButton})
+            if(b!=null) styleGameplayActionButton(b,interfaceBacking(v,HordeUiTokens.SLATE),HordeUiTokens.PARCHMENT,false);
+        styleGameplayActionButton(toggleHeldLightPoseButton,interfaceBacking(v,HordeUiTokens.SLATE),HordeUiTokens.PARCHMENT,true);
         if(menuButton!=null) {
             styleActionButton(menuButton,interfaceBacking(v,HordeUiTokens.SLATE),HordeUiTokens.PARCHMENT);
             FrameLayout.LayoutParams p=(FrameLayout.LayoutParams)menuButton.getLayoutParams();
@@ -7169,6 +7170,12 @@ public class MainActivity extends Activity {
 
     private void styleActionButton(final Button button, final int fill, final int text) {
         button.setBackground(HordeUiTokens.button(this,fill));
+        button.setStateListAnimator(null);
+        button.setTextColor(HordeUiTokens.label(text));
+        button.setMinHeight(dp(48));
+    }
+    private void styleGameplayActionButton(final Button button, final int fill, final int text, final boolean circular) {
+        button.setBackground(HordeUiTokens.touchButton(this,fill,circular));
         button.setStateListAnimator(null);
         button.setTextColor(HordeUiTokens.label(text));
         button.setMinHeight(dp(48));
