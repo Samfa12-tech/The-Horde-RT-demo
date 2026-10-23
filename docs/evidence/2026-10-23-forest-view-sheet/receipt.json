@@ -1,0 +1,466 @@
+{
+  "scope": "Visual acceptance sheet; six fresh and three explicitly reused actual desktop RT views; no gameplay, performance, phone, streaming or final-art pass",
+  "sourceBase": "9bd46a8f2e3139331dcafa2cd05532a9df3d061e plus two diagnostic F04 registry views",
+  "placementCoverage": {
+    "placements": 64,
+    "species": {
+      "Pine": 32,
+      "Alder": 32
+    },
+    "rootBoundsEngineXZ": [
+      [
+        -41.35488129,
+        18.17036436
+      ],
+      [
+        -19.89065503,
+        42.44470201
+      ]
+    ],
+    "nearestSixPointTrailMetres": {
+      "min": 2.9161538992710514,
+      "median": 7.428522240780696,
+      "max": 9.91902762929752,
+      "beyond20m": 0,
+      "beyond10m": 0
+    },
+    "scope": "root locations only, no canopy footprint, visibility, RT instance or performance claim"
+  },
+  "views": [
+    {
+      "title": "F01 north",
+      "freshThisCheckpoint": true,
+      "path": "reports/forest-view-sheet-20261023/f01-north/193-chapter-landing-north.png",
+      "pngSha256": "826c0dfab6335c659770da0d1dd56cf0f05288bcf079c33dfe8444c515838284",
+      "manifestSha256": "e71871c390e74230614476afee7e0a3eb417ba86e18a5ec87bb01d408f14e286",
+      "manifestComplete": true,
+      "honestlyPresentedRtFrame": true,
+      "camera": {
+        "x": -33.700001,
+        "z": -12.8,
+        "yaw": 0.0,
+        "pitch": -0.15
+      },
+      "requestedCamera": {
+        "x": -33.700001,
+        "z": -12.8,
+        "yaw": 0.0,
+        "pitch": -0.15
+      },
+      "backend": "RayTracingPipeline",
+      "pipeline": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a"
+        }
+      },
+      "dimensions": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "device": {
+        "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "vendorId": 4318,
+        "deviceId": 11672
+      },
+      "observation": "Near graves/shaft read clearly; broad bare ground beyond a few trunks fails surrounding-forest depth.",
+      "sourceExeSha256": "3f8dc8e3e1618dd46aa7cdd21ab5d59df0fd585b0c648fe0c26c5077d9a233e6"
+    },
+    {
+      "title": "F01 east",
+      "freshThisCheckpoint": true,
+      "path": "reports/forest-view-sheet-20261023/f01-east/194-chapter-landing-east.png",
+      "pngSha256": "ffdfb1384b651ec491ed08af76e336afa9ab5b7b9b448fe99719301ab4ad8eb8",
+      "manifestSha256": "0e21e3d31ee79db7456cadbe3efbb8cc4360be8de1fb19fff40181bd499be2b0",
+      "manifestComplete": true,
+      "honestlyPresentedRtFrame": true,
+      "camera": {
+        "x": -33.700001,
+        "z": -12.8,
+        "yaw": 1.570796,
+        "pitch": -0.15
+      },
+      "requestedCamera": {
+        "x": -33.700001,
+        "z": -12.8,
+        "yaw": 1.570796,
+        "pitch": -0.15
+      },
+      "backend": "RayTracingPipeline",
+      "pipeline": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a"
+        }
+      },
+      "dimensions": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "device": {
+        "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "vendorId": 4318,
+        "deviceId": 11672
+      },
+      "observation": "Readable exit and bank; trunk rows concentrate at the route, with exposed open surroundings.",
+      "sourceExeSha256": "3f8dc8e3e1618dd46aa7cdd21ab5d59df0fd585b0c648fe0c26c5077d9a233e6"
+    },
+    {
+      "title": "F01 south",
+      "freshThisCheckpoint": true,
+      "path": "reports/forest-view-sheet-20261023/f01-south/195-chapter-landing-south.png",
+      "pngSha256": "49e87189909e99d16411db85d9c387d0d24fe89f57112dcba4537d95186c9049",
+      "manifestSha256": "2944c74121377b6abe34374fd5ab52a2b8ba8c99b1272cd55f1eca2b66a6bbb7",
+      "manifestComplete": true,
+      "honestlyPresentedRtFrame": true,
+      "camera": {
+        "x": -33.700001,
+        "z": -12.8,
+        "yaw": 3.141593,
+        "pitch": -0.15
+      },
+      "requestedCamera": {
+        "x": -33.700001,
+        "z": -12.8,
+        "yaw": 3.141593,
+        "pitch": -0.15
+      },
+      "backend": "RayTracingPipeline",
+      "pipeline": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a"
+        }
+      },
+      "dimensions": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "device": {
+        "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "vendorId": 4318,
+        "deviceId": 11672
+      },
+      "observation": "Near trunks frame the trail on one side; large lateral open sector lacks middle-distance woods.",
+      "sourceExeSha256": "3f8dc8e3e1618dd46aa7cdd21ab5d59df0fd585b0c648fe0c26c5077d9a233e6"
+    },
+    {
+      "title": "F01 west",
+      "freshThisCheckpoint": true,
+      "path": "reports/forest-view-sheet-20261023/f01-west/196-chapter-landing-west.png",
+      "pngSha256": "3510ca4bc4bd6498e9e06dfeb08b1178dad666b9f7dd07afa6375bc5004cb270",
+      "manifestSha256": "9bf5119d003ea636e86c28c4ac8c468831a6f84fe30e0feb1b56fa672caf8713",
+      "manifestComplete": true,
+      "honestlyPresentedRtFrame": true,
+      "camera": {
+        "x": -33.700001,
+        "z": -12.8,
+        "yaw": -1.570796,
+        "pitch": -0.15
+      },
+      "requestedCamera": {
+        "x": -33.700001,
+        "z": -12.8,
+        "yaw": -1.570796,
+        "pitch": -0.15
+      },
+      "backend": "RayTracingPipeline",
+      "pipeline": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a"
+        }
+      },
+      "dimensions": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "device": {
+        "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "vendorId": 4318,
+        "deviceId": 11672
+      },
+      "observation": "Grounded graves and near trunks; most visible background is bare hillside/haze.",
+      "sourceExeSha256": "3f8dc8e3e1618dd46aa7cdd21ab5d59df0fd585b0c648fe0c26c5077d9a233e6"
+    },
+    {
+      "title": "F03 forward",
+      "freshThisCheckpoint": false,
+      "path": "reports/f03-masonry-20261023/forward/226-chapter-forest-clue-forward.png",
+      "pngSha256": "6c9126ae6226e1c3d802e0dbc272bb39afb473851015d75cce6b7a90dcccc0d0",
+      "manifestSha256": "0daa9d7e5c1f855c7bd53a64f5aedb3c8cced66465cdf864542628a6ecc0d7ef",
+      "manifestComplete": true,
+      "honestlyPresentedRtFrame": true,
+      "camera": {
+        "x": -3.705697,
+        "z": 20.197968,
+        "yaw": 2.325901,
+        "pitch": -0.3
+      },
+      "requestedCamera": {
+        "x": -3.7,
+        "z": 20.200001,
+        "yaw": 2.325901,
+        "pitch": -0.3
+      },
+      "backend": "RayTracingPipeline",
+      "pipeline": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a"
+        }
+      },
+      "dimensions": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "device": {
+        "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "vendorId": 4318,
+        "deviceId": 11672
+      },
+      "observation": "Existing banks enclose a readable path and waystone; thin canopy leaves an early settlement view.",
+      "sourceExeSha256": "2e230ae230dd056b99db16af456f8216b26fffbcff5208314ebe74fe994769bb"
+    },
+    {
+      "title": "F03 return",
+      "freshThisCheckpoint": false,
+      "path": "reports/f03-masonry-20261023/reverse/227-chapter-forest-clue-reverse.png",
+      "pngSha256": "993997d3d82c7dcd9d71f099f596a1eea8e918c5fc260448ba4ebcb5145f3bac",
+      "manifestSha256": "4037fafb4b1ca85a4ed4e56dd9219a959e99639374eef2b5fc55171504056f88",
+      "manifestComplete": true,
+      "honestlyPresentedRtFrame": true,
+      "camera": {
+        "x": -3.705697,
+        "z": 20.197968,
+        "yaw": -1.227772,
+        "pitch": -0.3
+      },
+      "requestedCamera": {
+        "x": -3.7,
+        "z": 20.200001,
+        "yaw": -1.227772,
+        "pitch": -0.3
+      },
+      "backend": "RayTracingPipeline",
+      "pipeline": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a"
+        }
+      },
+      "dimensions": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "device": {
+        "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "vendorId": 4318,
+        "deviceId": 11672
+      },
+      "observation": "Bend, roots and banks already give enclosure. No demonstrated reason to raise the trail banks.",
+      "sourceExeSha256": "2e230ae230dd056b99db16af456f8216b26fffbcff5208314ebe74fe994769bb"
+    },
+    {
+      "title": "F04 left",
+      "freshThisCheckpoint": true,
+      "path": "reports/forest-view-sheet-20261023/f04-left/228-chapter-forest-lookout-left.png",
+      "pngSha256": "4327072231f55b5bd6913c4b0060373c1c3fe092255d9047953e6a80298ecf4a",
+      "manifestSha256": "9959e61746f99185fecbf85762baabae030cb5210a24670993d06bcd343ec868",
+      "manifestComplete": true,
+      "honestlyPresentedRtFrame": true,
+      "camera": {
+        "x": 13.304916,
+        "z": 36.204624,
+        "yaw": 1.724602,
+        "pitch": -0.15
+      },
+      "requestedCamera": {
+        "x": 13.3,
+        "z": 36.200001,
+        "yaw": 1.724602,
+        "pitch": -0.15
+      },
+      "backend": "RayTracingPipeline",
+      "pipeline": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a"
+        }
+      },
+      "dimensions": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "device": {
+        "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "vendorId": 4318,
+        "deviceId": 11672
+      },
+      "observation": "Regional relief is visible to the left of church; large unwooded foreground and little middle-depth canopy.",
+      "sourceExeSha256": "3f8dc8e3e1618dd46aa7cdd21ab5d59df0fd585b0c648fe0c26c5077d9a233e6"
+    },
+    {
+      "title": "F04 centre",
+      "freshThisCheckpoint": false,
+      "path": "reports/actor-worker-20261023/control-rt/203-chapter-forest-lookout.png",
+      "pngSha256": "a303359e63eeebedd9cf4b77c3a2ef26a8fd3ea32b34f4ef714fb15328ef79c3",
+      "manifestSha256": "aba2d8a3f3d96c626934ed48050f3e113a86a7027386890b3233ce3828a9f4b6",
+      "manifestComplete": true,
+      "honestlyPresentedRtFrame": true,
+      "camera": {
+        "x": 13.304916,
+        "z": 36.204624,
+        "yaw": 2.51,
+        "pitch": -0.15
+      },
+      "requestedCamera": {
+        "x": 13.3,
+        "z": 36.200001,
+        "yaw": 2.51,
+        "pitch": -0.15
+      },
+      "backend": "RayTracingPipeline",
+      "pipeline": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a"
+        }
+      },
+      "dimensions": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "device": {
+        "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "vendorId": 4318,
+        "deviceId": 11672
+      },
+      "observation": "Church/roofs remain readable but dominate an open grassy clearing. Surrounding forest impression fails.",
+      "sourceExeSha256": "e481ee0322f99883c456f8b8fe37520cddaf3bc480528359583cf79d6082b566"
+    },
+    {
+      "title": "F04 right",
+      "freshThisCheckpoint": true,
+      "path": "reports/forest-view-sheet-20261023/f04-right/229-chapter-forest-lookout-right.png",
+      "pngSha256": "b49434a72aff5db187e49e7ec4cd4c675c7be639fd71741ad955485dddce5822",
+      "manifestSha256": "6f491aac1be0b04da643911645854267086ca146a65cf9f35a7622c99270f7df",
+      "manifestComplete": true,
+      "honestlyPresentedRtFrame": true,
+      "camera": {
+        "x": 13.304916,
+        "z": 36.204624,
+        "yaw": 3.295398,
+        "pitch": -0.15
+      },
+      "requestedCamera": {
+        "x": 13.3,
+        "z": 36.200001,
+        "yaw": 3.295398,
+        "pitch": -0.15
+      },
+      "backend": "RayTracingPipeline",
+      "pipeline": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a"
+        }
+      },
+      "dimensions": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "device": {
+        "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "vendorId": 4318,
+        "deviceId": 11672
+      },
+      "observation": "Near trunks frame the right edge, while the valley and middle ground remain largely bare.",
+      "sourceExeSha256": "3f8dc8e3e1618dd46aa7cdd21ab5d59df0fd585b0c648fe0c26c5077d9a233e6"
+    }
+  ],
+  "freshCustody": {
+    "allExited": true,
+    "settingsSha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3",
+    "foregroundUnchanged": true,
+    "ownerCampaignRemainedAbsent": true
+  },
+  "geometrySha256": {
+    "assets/models/world/runtime/chapter-terrain-v1/chapter-terrain-lod0.runtime.glb": "c636a67911b7f5c5381c30ec7a49e5d4ff15c70fe688b368ba52efe77b537774",
+    "src/gameplay/simulation/ForestTreePlacementContract.h": "b56b76f7122361edfddbfa371e7096416bd74b7c160e9c7a66bc5f9fce4bc1d8",
+    "src/scene/ForestDressing.cpp": "846f4ce1d2b6f423d6ce5ee3260316118af13d108f79cec85b752f93889678ae"
+  },
+  "placementDistanceMethod": "Minimum horizontal root-to-segment distance to the six-point pinned forest centreline, engine X=East+78.3 and Z=126.2-North; does not measure canopy or visible coverage"
+}

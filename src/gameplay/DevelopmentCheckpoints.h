@@ -77,7 +77,15 @@ inline constexpr bool DevelopmentCheckpointRequiresAuthoredChapter(
     return checkpoint.id == 192 || checkpoint.name.starts_with("chapter-");
 }
 
-inline constexpr std::array<DevelopmentCheckpoint, 107u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 109u> kDevelopmentCheckpoints{{
+    // F04 vista acceptance: same staged-route fixture and level framing as
+    // centre 203, with a 45-degree look to either side. No release camera change.
+    {.id=228,.name="chapter-forest-lookout-left",.baseShowcaseCheckpointId=11,
+     .cameraX=13.3f,.cameraZ=36.2f,.yaw=1.7246018366f,.pitch=-.15f,
+     .stagesRescueExterior=true,.exteriorRouteStation=7u,.keeperDeathFixedTicks=240u},
+    {.id=229,.name="chapter-forest-lookout-right",.baseShowcaseCheckpointId=11,
+     .cameraX=13.3f,.cameraZ=36.2f,.yaw=3.2953981634f,.pitch=-.15f,
+     .stagesRescueExterior=true,.exteriorRouteStation=7u,.keeperDeathFixedTicks=240u},
     // F03 inspection only: the existing ascent/walk reaches station 6. Look
     // along the actual outgoing/incoming trail before authoring its story cue.
     {.id=226,.name="chapter-forest-clue-forward",.baseShowcaseCheckpointId=11,

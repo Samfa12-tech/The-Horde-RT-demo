@@ -1,5 +1,26 @@
 # Horde 1.7 owner playtest checklist - 22 October 2026
 
+## Approved backup and forest-view checkpoint - 23 October
+
+Owner explicitly approved both retries. GitHub branch AND draft PR 27 read back
+`9bd46a8f2e3139331dcafa2cd05532a9df3d061e`; the five completed checkpoints are
+backed up normally, with no merge/force/release. Its exact-head CI
+[run39924505547](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39924505547)
+is in progress at this check. The existing-cache offline CMake/Gradle policy
+script now passes (261.16 s); earlier filesystem/approval failures remain in their
+dated receipts. No Android APK compilation/device result is inferred.
+
+The [nine-view F01/F03/F04 sheet](../evidence/2026-10-23-forest-view-sheet/README.md)
+adds six fresh gated native RT views and labels three reused views. Route banks
+and regional relief exist, but surrounding forest depth fails visual acceptance:
+all 64 tree roots lie within 9.919 m of the pinned trail. Two diagnostic F04 side
+views and affected Debug/Release contracts pass; no terrain/lighting/placement
+change is justified/admitted. The next visual sector is the F01 north/west
+background, with shared-geometry/root-contact prerequisites and the original
+tree/canopy deferral preserved. Terrain concealment is not a residency saving.
+This newer view checkpoint is local and separate from the explicitly approved
+backup through `9bd46a8f`. Worker remains OFF; phone remains untouched.
+
 ## Current scope reconciliation - 23 October, source ba8aeacf
 
 This table is the current implementation/acceptance map. The dated receipts below

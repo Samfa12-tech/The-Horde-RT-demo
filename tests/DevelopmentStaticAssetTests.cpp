@@ -69,8 +69,8 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 107u,
-          "development registry retains prior views and adds two bounded F03 inspection views");
+    Check(kDevelopmentCheckpoints.size() == 109u,
+          "development registry retains prior views and adds two bounded F04 side views");
     Check(FindDevelopmentCheckpoint("chapter-understory-close") != nullptr &&
           FindShowcaseCheckpoint("chapter-understory-close") == nullptr,
           "understory camera is development-only and cannot alter release checkpoint lookup");
@@ -131,6 +131,20 @@ int main()
               forest->exteriorRouteStation < simulation::kWorldRoutePoints.size() &&
               !forest->primaryArmsMayBeOutsideFrame,
               "woodland views require real rescue/native-route staging and retain strict equipment visibility");
+    }
+    const auto* lookoutCentre = FindDevelopmentCheckpoint("chapter-forest-lookout");
+    for (const auto name : {"chapter-forest-lookout-left", "chapter-forest-lookout-right"})
+    {
+        const auto* side = FindDevelopmentCheckpoint(name);
+        Check(side && lookoutCentre && side->id >= 228 && side->id <= 229 &&
+              FindDevelopmentCheckpoint(side->id) == side && FindShowcaseCheckpoint(name) == nullptr &&
+              DevelopmentCheckpointRequiresAuthoredChapter(*side) && side->stagesRescueExterior &&
+              side->exteriorRouteStation == lookoutCentre->exteriorRouteStation &&
+              side->keeperDeathFixedTicks == lookoutCentre->keeperDeathFixedTicks &&
+              side->cameraX == lookoutCentre->cameraX && side->cameraZ == lookoutCentre->cameraZ &&
+              side->pitch == lookoutCentre->pitch && !side->primaryArmsMayBeOutsideFrame &&
+              std::abs(std::abs(side->yaw - lookoutCentre->yaw) - .7853981634f) < .00001f,
+              "lookout side views preserve actual route/seed/equipment and only rotate the diagnostic gaze");
     }
     for (const auto name : {"chapter-pine-near", "chapter-pine-mid", "chapter-pine-far"})
     {
