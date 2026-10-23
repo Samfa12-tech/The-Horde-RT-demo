@@ -1,5 +1,31 @@
 # Horde 1.7 current design index
 
+## 23 October measured phone checkpoint and shared-volume direction
+
+The [fresh physical receipt](../evidence/2026-10-23-phone-skin/README.md) captures
+the current control's player/Kit skin phases at20/33/40%, but admits no Android
+normal-cache gain: temperature matching fails, then framework status1 prevents
+the final warm comparison. All failed attempts remain. Sam positively listened
+to the new forest track in this session; Kit balance/transitions remain open.
+Phone released05:24:29UTC with original APKs, all18 save/lock files, preferences
+and rotation verified; no Horde process/surface or device helper remains.
+
+Owner's latest [volumetric direction and proposal](../evidence/2026-10-23-chimney-assessment/VOLUMETRIC_FOLLOWUP.md)
+supersedes locking a one-off fire-emitter chimney extension. Share a small bounded
+medium integration foundation with explicit High/Low controls, preserve current
+fire and Mist Off, and establish cost/visual feasibility on one B01 prototype.
+No effect or extra mobile budget is admitted. The isolated v5 cap derivative is
+unadmitted and its incomplete package paths are parked; v4 remains accepted.
+Corrected bceed0c1 CI has five passing jobs including Vulkan; MSVC hits its
+unchanged15-minute cap. Full hosted acceptance, Debug route timeout, PR conflicts
+and physical gameplay gates stay open. Details are in the canonical checklist.
+
+The [CPU thread assessment](../evidence/2026-10-23-phone-skin/THREADING_ASSESSMENT.md)
+answers the owner's multicore question from exact source: background owners exist,
+but per-frame skin/upload/AS work is serial and Android permits one frame in
+flight. Proposed pose-job parallelism and scheduling traces await a coordinated
+performance plan; no broad refactor or phone reacquisition is underway.
+
 ## Resumed owner playtest priorities - 22 October 2026
 
 The [chimney assessment and scenery CI follow-up](../evidence/2026-10-23-chimney-assessment/README.md)

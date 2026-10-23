@@ -3497,3 +3497,38 @@ Controller hardware was absent; renderer orientation/aspect, fault injection,
 combat and sustained performance remain unaccepted. Read-only UI idle failures
 and retained pre-preview draft behavior are preserved in the
 [follow-up receipt](evidence/2026-10-20-graphics-followup/README.md).
+
+### 23 October - finer skin phases, rejected thermal comparison and forest listening
+
+Owner-offered **SM-S948B**, Android **17 / API37**, Adreno840, real
+RayTracingPipeline/Shipping/Mobile. Evidence class: **bounded staged live control
+performance and separate owner subjective listening**, not candidate gain,
+natural traversal, signed release or other-device certification. Arm64 pure
+control APK `778b1692563473a19d717b24bef6a94c90a5a4a4bd4fea5dbd9aa22343458a06`
+and current normal-cache candidate
+`c1d657491ef072c99a405f0f8ca5264860834057742fc214c820f53fef3fbf09`
+match in every ZIP entry except the intended native library. Exact installed
+hashes are verified; version remains1.6.2-debug/code10 at bceed0c1 source.
+
+Landscape20/33/40% control GPU medians are17.8562/39.6475/61.7734ms, with
+944/539/390 post-warm completed frames. Appended counters separate player pose,
+world/viewmodel vertices, Kit clip/vertices/copies and CPU BLAS/TLAS recording.
+At33%, skin median11.7278ms includes Kit vertices4.6984ms, player world4.5489ms
+and viewmodel1.5818ms. These elapsed subsets are not CPU utilization; GPU/wait
+intervals overlap. Differing starting temperatures reject a common-temperature
+scaling claim. Candidate starts fail thermal matching; final attempted warm
+reference records framework/skin status1 at skin40.3C and stops before sampling.
+No Android speedup is admitted.20% remains visually unadmitted. The initial
+stale-artifact selection and lifecycle observer timeout are preserved separately.
+
+Sam reports the new forest track sounds good in the current control session.
+This accepts that subjective track/session only; Kit balance, ducking/section
+transitions, every loop seam and other endpoints remain open. Subtitle/touch,
+auto-crouch feel and earned recovery were not accepted by these timed holds.
+
+Phone released **05:24:29UTC23October**: starting development fe3a51be and
+production cc4de768 APK hashes restored, all18 prior save/lock files and
+preferences byte-identical, zero new save paths, original rotation/font restored,
+launcher foreground, no Horde PID/surface, no owned helper/transfer remaining.
+No app-data clear/uninstall, release, merge or deployment occurred.
+[Exact receipt, failures, analysis and remaining gates](evidence/2026-10-23-phone-skin/README.md).

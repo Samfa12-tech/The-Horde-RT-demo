@@ -1,5 +1,57 @@
 # Horde 1.7 owner playtest checklist - 22 October 2026
 
+## Latest checkpoint - 23 October phone window and volumetrics
+
+The [phone checkpoint](../evidence/2026-10-23-phone-skin/README.md) supersedes the
+prior window's availability: Sam reoffered SM-S948B, and it was verified/released
+at **05:24:29 UTC on 23 October**, restored to both starting APK hashes. All 18
+prior save/lock files, preferences and original rotation match; no new save paths,
+Horde process/surface or owned transfer remains. Safe to disconnect. No further
+phone operation is planned by this checkpoint.
+
+- **Forest music:** Sam positively listened to the new forest main in the
+  exact control-build session. Subjective track listening passes there only;
+  Kit balance, ducking/section transitions, every loop seam and other endpoints
+  remain open. Do not re-request the same completed listening check.
+- **Phone CPU attribution:** fresh landscape controls at20/33/40% retain strict
+  frame/presentation ownership and appended player/Kit/AS-record phases. GPU
+  medians are17.8562/39.6475/61.7734ms; starting temperatures differ, so this is
+  not an admitted common-temperature scaling cohort. Current33% skin median is
+  11.7278ms; Kit vertices4.6984ms, player world4.5489ms, viewmodel1.5818ms.
+  All sampled frames perform actual skin work. Elapsed stages/fence waits do not
+  complete an OS CPU-use/scheduler or GPU-AS profile.
+- **Candidate still unadmitted on Android:** exact normal-cache control and
+  candidate APKs differ only in their native library, but candidate starts fail
+  thermal matching and the final warm attempt reaches framework status1 before
+  sampling. Rejections, the initial stale-APK selection and lifecycle observer
+  failure are retained. No mobile gain or overall FPS claim. Keep the desktop
+  partial gain/target miss and earlier12.06ms phone snapshot distinct.
+- **CPU threading audit:** [actual owner/dependency map](../evidence/2026-10-23-phone-skin/THREADING_ASSESSMENT.md)
+  finds separate UI/lifecycle/audio/save threads but serial render-owner
+  simulation/skin/copy/upload/AS preparation and one frame in flight. No per-core
+  utilization trace or frame-work pool is demonstrated. A one-worker generic
+  pose experiment is proposed, not implemented; await the coordinated independent
+  performance review before threading or frame-overlap changes.
+- **Physical playability:** landscape captions/touch, crouch/analogue feel,
+  Kit listening and natural earned journey/save/death remain open; no hot-device
+  UI/combat check was substituted after thermal rejection.20% image quality is
+  still unadmitted.
+- **CI:** corrected scenery head bceed0c1 run39903122389 has five successful jobs,
+  including Vulkan-host; MSVC cancels at its unchanged15-minute cap, after159
+  completed cases and while160 starts. Full required hosted acceptance remains
+  incomplete; no assertion failure is shown before cancellation.
+- **Next source slice:** owner now asks for shared volumetric High/Low presets,
+  not a locked one-off chimney. The [read-only proposal](../evidence/2026-10-23-chimney-assessment/VOLUMETRIC_FOLLOWUP.md)
+  identifies separate existing mist/fire/fog paths and a small bounded-medium
+  foundation. One B01 plume comparison is proposed, with RT visibility, explicit
+  quality/cost controls and unchanged fire/Mist Off behavior. No new effect or
+  mobile budget is accepted. The isolated raised-cap v5 geometry remains
+  unadmitted; its incomplete owned package-path edits are parked and accepted
+  tracked packaging is back on v4. Source/recipe/receipt files are preserved.
+
+Earlier dated entries below retain their original scope and evidence; they do
+not reactivate old phone windows or mark these outstanding requirements passed.
+
 Current checklist after resumption from `3e29b599`, in the existing WP2 worktree,
 branch and draft PR 27. Owner assigns the phone to Horde until approximately
 20:00 UTC; release target was **19:55 UTC / 06:55 AEDT**. Released at19:44 UTC,
