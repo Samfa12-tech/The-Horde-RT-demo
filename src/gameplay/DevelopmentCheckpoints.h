@@ -77,7 +77,15 @@ inline constexpr bool DevelopmentCheckpointRequiresAuthoredChapter(
     return checkpoint.id == 192 || checkpoint.name.starts_with("chapter-");
 }
 
-inline constexpr std::array<DevelopmentCheckpoint, 105u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 107u> kDevelopmentCheckpoints{{
+    // F03 inspection only: the existing ascent/walk reaches station 6. Look
+    // along the actual outgoing/incoming trail before authoring its story cue.
+    {.id=226,.name="chapter-forest-clue-forward",.baseShowcaseCheckpointId=11,
+     .cameraX=-3.7f,.cameraZ=20.2f,.yaw=2.32590073027f,.pitch=-0.30f,
+     .stagesRescueExterior=true,.exteriorRouteStation=6u,.keeperDeathFixedTicks=240u},
+    {.id=227,.name="chapter-forest-clue-reverse",.baseShowcaseCheckpointId=11,
+     .cameraX=-3.7f,.cameraZ=20.2f,.yaw=-1.22777238637f,.pitch=-0.30f,
+     .stagesRescueExterior=true,.exteriorRouteStation=6u,.keeperDeathFixedTicks=240u},
     // Fixed accepted-route positions looking toward one owned pine. Debug
     // source comparisons only; no automatic distance-LOD or route extension.
     {.id=223,.name="chapter-pine-near",.baseShowcaseCheckpointId=11,

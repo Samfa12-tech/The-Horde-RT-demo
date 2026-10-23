@@ -1,0 +1,26 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+    Start 116: horde_rt_forest_dressing_tests
+1/1 Test #116: horde_rt_forest_dressing_tests ...***Failed   29.47 sec
+Native root footprint samples=4992 exposed=0 maximum_gap_m=-0.0199988
+chapter-forest-clue-forward: pose (-3.7057,20.198,2.3259,-0.32) expected (-3.7,20.2,2.3259,-0.35) grounded=1/1 supportId=1889/1889 supportY=-0.25123/-0.25123 surface=1/1 heightDelta=0.69877/0.69877
+FAIL: canonical route camera and player height retain the exact current native terrain support
+chapter-forest-clue-reverse: pose (-3.7057,20.198,-1.22777,-0.32) expected (-3.7,20.2,-1.22777,-0.35) grounded=1/1 supportId=1889/1889 supportY=-0.25123/-0.25123 surface=1/1 heightDelta=0.69877/0.69877
+FAIL: canonical route camera and player height retain the exact current native terrain support
+Triangle-region candidate: retainedExterior=365232 omittedTomb=13588 vertexBytes=31420352 indexBytes=5005416; CPU candidate only, spatial eviction permission not established
+Cached native selection: turns=173 maximumCpuAdvanceMs=5.9958 scannedBytes=5599178; CPU candidate only, normal eviction remains prohibited
+Native selected geometry common+tomb: primitives=5 vertexBytes=4055360 indexBytes=479760 removedVertexBytes=28041216 removedIndexBytes=4688712; CPU preparation only; common masonry still includes tomb surfaces
+Native selected geometry common+forest: primitives=8 vertexBytes=31187136 indexBytes=4962768 removedVertexBytes=909440 removedIndexBytes=205704; CPU preparation only; common masonry still includes tomb surfaces
+Native selected geometry one-owner common+forest: primitives=8 vertexBytes=31187136 indexBytes=4962768 removedVertexBytes=909440 removedIndexBytes=205704; CPU preparation only; common masonry still includes tomb surfaces
+Native selected geometry one-owner common+tomb: primitives=5 vertexBytes=4055360 indexBytes=479760 removedVertexBytes=28041216 removedIndexBytes=4688712; CPU preparation only; common masonry still includes tomb surfaces
+Native chapter ownership: common 2 (includes mixed tomb masonry), tomb 3, forest 6; primitiveRows=11 vertexBytes=32096576 indexBytes=5168472; CPU admission only
+2 forest dressing check(s) failed.
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =  29.49 sec
+
+The following tests FAILED:
+	116 - horde_rt_forest_dressing_tests (Failed)
+Errors while running CTest

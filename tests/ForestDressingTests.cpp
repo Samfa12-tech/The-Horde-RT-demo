@@ -510,7 +510,8 @@ void TestNativeChapterPrimitiveOwnership()
                 o.lastX=s.playerX;o.lastZ=s.playerZ;o.previousExterior=exterior;
             }
         };
-        for(const auto name:{"chapter-forest-first-bend","chapter-forest-second-bend","chapter-forest-lookout"}) {
+        for(const auto name:{"chapter-forest-first-bend","chapter-forest-second-bend","chapter-forest-lookout",
+                            "chapter-forest-clue-forward","chapter-forest-clue-reverse"}) {
             const auto* checkpoint=gameplay::FindDevelopmentCheckpoint(name);
             Check(checkpoint && checkpoint->keeperDeathFixedTicks==240u,
                   "canonical exterior route capture explicitly seeds accepted Keeper death/current rules");
@@ -542,11 +543,20 @@ void TestNativeChapterPrimitiveOwnership()
                   observed.maximumTravel<=.056f && s.rescue.firstAscentCompleted && s.rescue.exteriorSide &&
                   !s.rescue.equipmentStowed && s.rescue.claimCount==1u && s.rescue.deploymentCount==1u,
                   "route capture crosses root on Wood through bounded fixed-step movement after one physical ascent");
-            Check(std::hypot(s.playerX-checkpoint->cameraX,s.playerZ-checkpoint->cameraZ)<.01f &&
+            const bool cameraAndSupport=std::hypot(s.playerX-checkpoint->cameraX,s.playerZ-checkpoint->cameraZ)<.01f &&
                   Near(s.playerYawRadians,checkpoint->yaw) && Near(s.playerPitchRadians,checkpoint->pitch) &&
                   s.playerGrounded && support.grounded && s.playerSupportId==support.id &&
                   Near(s.playerSupportWorldY,support.worldY,.0001f) && s.playerSupportSurface==support.surface &&
-                  Near(s.playerHeightDelta,sim::PlayerHeightDelta(support.worldY),.0001f),
+                  Near(s.playerHeightDelta,sim::PlayerHeightDelta(support.worldY),.0001f);
+            if(!cameraAndSupport)std::cerr<<name<<": pose ("<<s.playerX<<','<<s.playerZ<<','
+                <<s.playerYawRadians<<','<<s.playerPitchRadians<<") expected ("<<checkpoint->cameraX<<','
+                <<checkpoint->cameraZ<<','<<checkpoint->yaw<<','<<checkpoint->pitch<<") grounded="
+                <<s.playerGrounded<<'/'<<support.grounded<<" supportId="
+                <<static_cast<int>(s.playerSupportId)<<'/'<<static_cast<int>(support.id)
+                <<" supportY="<<s.playerSupportWorldY<<'/'<<support.worldY<<" surface="
+                <<static_cast<int>(s.playerSupportSurface)<<'/'<<static_cast<int>(support.surface)
+                <<" heightDelta="<<s.playerHeightDelta<<'/'<<sim::PlayerHeightDelta(support.worldY)<<'\n';
+            Check(cameraAndSupport,
                   "canonical route camera and player height retain the exact current native terrain support");
         }
     }

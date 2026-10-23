@@ -69,8 +69,8 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 105u,
-          "development registry retains prior views and adds three bounded pine inspection views");
+    Check(kDevelopmentCheckpoints.size() == 107u,
+          "development registry retains prior views and adds two bounded F03 inspection views");
     Check(FindDevelopmentCheckpoint("chapter-understory-close") != nullptr &&
           FindShowcaseCheckpoint("chapter-understory-close") == nullptr,
           "understory camera is development-only and cannot alter release checkpoint lookup");
@@ -143,6 +143,31 @@ int main()
               std::abs(pine->cameraZ - simulation::kWorldRoutePoints[pine->exteriorRouteStation].z) < .00001f &&
               !pine->primaryArmsMayBeOutsideFrame,
               "pine comparison views retain accepted route positions, current rules and ordinary equipment");
+    }
+    for (const auto name : {"chapter-forest-clue-forward", "chapter-forest-clue-reverse"})
+    {
+        const auto* clue = FindDevelopmentCheckpoint(name);
+        Check(clue && clue->id >= 226 && clue->id <= 227 &&
+              FindDevelopmentCheckpoint(clue->id) == clue &&
+              FindShowcaseCheckpoint(name) == nullptr && FindShowcaseCheckpoint(clue->id) == nullptr &&
+              DevelopmentCheckpointRequiresAuthoredChapter(*clue) &&
+              clue->stagesRescueExterior && clue->exteriorRouteStation == 6u &&
+              clue->keeperDeathFixedTicks == 240u && !clue->primaryArmsMayBeOutsideFrame &&
+              std::abs(clue->cameraX - simulation::kWorldRoutePoints[6].x) < .00001f &&
+              std::abs(clue->cameraZ - simulation::kWorldRoutePoints[6].z) < .00001f,
+              "F03 views remain authored, development-only station-six captures with current staging and ordinary arms");
+        if (!clue) continue;
+        std::size_t ids = 0u, names = 0u;
+        for (const auto& other : kDevelopmentCheckpoints)
+        {
+            ids += other.id == clue->id;
+            names += other.name == clue->name;
+        }
+        Check(ids == 1u && names == 1u, "F03 capture IDs and names are unique in the shared registry");
+        const auto& target = simulation::kWorldRoutePoints[clue->id == 226 ? 7u : 5u];
+        const float alongTrail = std::atan2(target.x - clue->cameraX, clue->cameraZ - target.z);
+        Check(std::abs(clue->yaw - alongTrail) < .00001f && clue->pitch == -.30f,
+              "F03 views face the actual next or previous trail segment with a bounded ground inspection pitch");
     }
     float previousDissolve = -1.0f;
     for (const auto name : {"chapter-keeper-death-held", "chapter-keeper-death-dissolve", "chapter-keeper-death-retired"})

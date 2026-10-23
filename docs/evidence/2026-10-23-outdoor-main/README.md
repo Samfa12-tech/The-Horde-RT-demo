@@ -166,3 +166,14 @@ production source, cue, envelope, gain, cap or deadline changes in this fix.
 The earlier eight focused passes plus this corrected registration cover the
 nine affected gates across separate runs; no full unrelated local rerun was
 performed. Hosted results for the correction require their own exact head.
+
+The corrected music head `e954116917c236d2199aee9e38209bd3936c076e`
+[run 39897323313](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39897323313)
+finishes **cancelled**, with **five successful jobs**. GCC and Clang now pass,
+as do Android, Vulkan-host and ASan/UBSan. MSVC hits the unchanged 15-minute
+job cap: the last surfaced completed case is 112/169, and case 113 (Windows
+glass graphics contract) is active when cancellation occurs. There is no final
+Windows selection or subsequent six offline-check completion. This does not
+prove case 113 hung and is not a six-job pass. The [final receipt](hosted-final-receipt.json)
+and [cap excerpt](corrected-msvc-cap.log) retain both changed-head outcomes.
+No deadline, assertion, workflow gate or runtime was relaxed for this result.
