@@ -1,5 +1,25 @@
 # Android RT Device Compatibility Record
 
+## 2026-10-23 - touch HUD physical checks; rotation continuity unresolved
+
+Local ADB-injected input/screenshot inspection on Galaxy S26 Ultra **SM-S948B**,
+Android 17 API 37, 560 dpi / font scale 1.7. Source `1bd99485`, ordinary arm64
+Debug APK `8be1c9272b2ce840083904f25f13b61e85cc13c5cf890920b3a1883f28b77228`.
+Independent staged held-lantern portrait and landscape cases present Pipeline RT,
+keep visible targets at least 48 dp inside the app window, and retain exact target
+bounds across held-lantern/return-tap state sequences. Circular icon, pressed rim,
+rounded saved-opacity backings and full action labels were inspected in actual
+screenshots. This is not Sam comfort/feel, contextual Interact, dialogue overlap,
+natural journey, physical controller or performance acceptance.
+
+The first orientation continuation lost the staged lantern control; guard stopped
+before input. Cause remains unverified and direct landscape restaging does not
+close that continuity failure. Original APKs, all 18 prior save/lock files,
+preferences and rotation/settings are verified restored/unchanged. Phone released,
+no owned process/content surface/capture/install/transfer; system task/input
+metadata remains documented rather than forcibly removed. **Safe to disconnect.**
+[Exact physical evidence, retained guards and next source slice](evidence/2026-10-23-touch-hud-phone/README.md).
+
 ## 2026-10-23 - production-bank outdoor GPU-stage attribution
 
 Local ADB physical profiling on Galaxy S26 Ultra **SM-S948B**, Android 17 API 37,

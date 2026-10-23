@@ -1,0 +1,8 @@
+{
+  "heldGestureMilliseconds": 1500,
+  "initialDescription": "LOWER. Lantern raised.",
+  "afterHeldDescription": "RAISE. Lantern lowered.",
+  "returnedDescription": "LOWER. Lantern raised.",
+  "boundsUnchanged": true,
+  "inputScope": "One held lantern gesture and one tap; no combat action; no owner comfort claim"
+}

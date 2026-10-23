@@ -3,6 +3,11 @@
 23 October 2026. Existing WP2 worktree, source base `4beff836`; implementation
 and this receipt are committed together locally. No phone use or public push.
 
+Later follow-up: [independent physical orientation/action checks](../2026-10-23-touch-hud-phone/README.md)
+now exist, with a retained unresolved rotation-continuity gap and no owner-feel
+claim. The owner has also granted persistent routine branch-backup permission.
+The original component-only evidence below keeps its narrower scope.
+
 ## Verified starting state
 
 - Visible Skip line was already removed. The actual dialogue panel contains
@@ -87,4 +92,6 @@ Next acceptance: inspect the backing/labels over actual moving RT scenes in both
 orientations and check touch feel/contrast on a phone at owner settings. Existing
 stronger backing remains available. The phone stays released for this checkpoint;
 no renderer, install, capture or transfer was started. This local checkpoint
-awaits later backup authorization; the explicit GitHub grant ended at `9bd46a8f`.
+originally awaited later backup authorization. That limit was superseded by the
+owner's explicit routine-backup grant recorded in the follow-up; no merge/release
+permission follows from it.

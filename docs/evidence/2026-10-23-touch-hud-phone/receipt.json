@@ -1,0 +1,132 @@
+{
+  "sourceCommit": "1bd9948510a9db76367ef8238445ed7a48fb93e0",
+  "apkSha256": "8be1c9272b2ce840083904f25f13b61e85cc13c5cf890920b3a1883f28b77228",
+  "evidenceClass": "Physical ADB-injected touch and screenshot/layout inspection on SM-S948B; not owner comfort/feel acceptance",
+  "device": {
+    "model": "SM-S948B",
+    "android": "17",
+    "api": 37,
+    "effectiveDensityDpi": 560,
+    "fontScale": 1.7,
+    "brightness": 115
+  },
+  "backing": "No saved UI overrides; source default 70 percent, compact OFF / scale 100; physical transparency/contrast visually inspected, not inverse-composited alpha measurement",
+  "targetDp": {
+    "lantern": [
+      56,
+      56
+    ],
+    "swingParryDodge": [
+      104,
+      72
+    ],
+    "menu": [
+      72,
+      48
+    ]
+  },
+  "independentOrientationChecks": "PASS; own staged fixture per orientation, unchanged targets across each gesture",
+  "observedLanternAction": "1500ms held gesture keeps pressed arrow until release; observed state flips, return tap restores original action/state; no combat input or per-event counter trace",
+  "contextInteract": "Not visible/available in this held-lantern fixture; not physically exercised",
+  "continuity": "Retained unresolved failure in rotation-continuity-gap.json; not hidden by direct landscape restaging",
+  "setupGuards": [
+    "Initial legacy ending panel concealed HUD; guard stopped before input.",
+    "Resuming Home exposed normal menu instead of ending; guard stopped before input.",
+    "One local duplicate receipt-name assertion occurred after resume command completed; subsequent state was inspected instead of retrying the uncertain command.",
+    "Normal observed ENTER THE RUIN/CONTINUE handlers exposed HUD without reset/save/seed actions."
+  ],
+  "orientationStatePolicy": "Existing explicit diagnostic fixture only, isolated namespace; no natural earned progression claim",
+  "images": {
+    "portrait-hud-before.png": {
+      "path": "reports/touch-hud-20261023/phone/portrait-hud-before.png",
+      "sha256": "c68255bb6aa654faab83c14e25b19d2d7311235c8c429ae28a764a29ec447737",
+      "bytes": 3574700,
+      "dimensions": [
+        1440,
+        3120
+      ],
+      "inspection": "Actual phone screenshot visually inspected for before/held/after-held; returned snapshot retained"
+    },
+    "portrait-hud-held.png": {
+      "path": "reports/touch-hud-20261023/phone/portrait-hud-held.png",
+      "sha256": "bcf72589aa47d172571963b09f7199a6ffbfe76108415e092f17657dd7a842a4",
+      "bytes": 3574057,
+      "dimensions": [
+        1440,
+        3120
+      ],
+      "inspection": "Actual phone screenshot visually inspected for before/held/after-held; returned snapshot retained"
+    },
+    "portrait-hud-after-held.png": {
+      "path": "reports/touch-hud-20261023/phone/portrait-hud-after-held.png",
+      "sha256": "0946a7e51cfeefb082cf6def472962648f10f5e4a5daf1ce3bc19419abb1a432",
+      "bytes": 3515323,
+      "dimensions": [
+        1440,
+        3120
+      ],
+      "inspection": "Actual phone screenshot visually inspected for before/held/after-held; returned snapshot retained"
+    },
+    "portrait-hud-returned.png": {
+      "path": "reports/touch-hud-20261023/phone/portrait-hud-returned.png",
+      "sha256": "023deb8f247925a8dfbfcb8dc3ca74b51e0496f02019fb6d920eed88774cc847",
+      "bytes": 3576053,
+      "dimensions": [
+        1440,
+        3120
+      ],
+      "inspection": "Actual phone screenshot visually inspected for before/held/after-held; returned snapshot retained"
+    },
+    "landscape-hud-before.png": {
+      "path": "reports/touch-hud-20261023/phone/landscape-hud-before.png",
+      "sha256": "372ef1c2609f384d1c7ecac1a3219d8c5e9636648a6c256703e42721d13b0aa3",
+      "bytes": 4226343,
+      "dimensions": [
+        3120,
+        1440
+      ],
+      "inspection": "Actual phone screenshot visually inspected for before/held/after-held; returned snapshot retained"
+    },
+    "landscape-hud-held.png": {
+      "path": "reports/touch-hud-20261023/phone/landscape-hud-held.png",
+      "sha256": "c5afd4ebab183faf2151e45de9c43b31e9c87af6fc808a4c4867ab3c975c33af",
+      "bytes": 4232293,
+      "dimensions": [
+        3120,
+        1440
+      ],
+      "inspection": "Actual phone screenshot visually inspected for before/held/after-held; returned snapshot retained"
+    },
+    "landscape-hud-after-held.png": {
+      "path": "reports/touch-hud-20261023/phone/landscape-hud-after-held.png",
+      "sha256": "e4e7c73739a960833db699f4b08e82405279fb8f2b5fc3e0491ac78a2f8fc298",
+      "bytes": 4274048,
+      "dimensions": [
+        3120,
+        1440
+      ],
+      "inspection": "Actual phone screenshot visually inspected for before/held/after-held; returned snapshot retained"
+    },
+    "landscape-hud-returned.png": {
+      "path": "reports/touch-hud-20261023/phone/landscape-hud-returned.png",
+      "sha256": "37996b9eeb1bce9c2743c543f9f7c0681d24e712b93e7619c82375a34420c586",
+      "bytes": 4227212,
+      "dimensions": [
+        3120,
+        1440
+      ],
+      "inspection": "Actual phone screenshot visually inspected for before/held/after-held; returned snapshot retained"
+    }
+  },
+  "releaseUtc": "2026-10-23T09:35:17.002000+00:00",
+  "releaseLimits": "Initial any-Horde-name-zero assertion failed after successful restoration. Readback verifies no app PID/content surface; two system ActivityRecord/InputSink metadata nodes retained and documented. No repeated installation.",
+  "backupAuthorization": "Owner explicitly grants persistent routine non-force checkpoint backups to existing development/PR27 branch; no release/merge permission",
+  "noFurtherPhoneWorkPlannedThisBatch": true,
+  "remainingAcceptance": [
+    "Sam comfort and real held-touch feel",
+    "Moving traversal/combat and caption overlap matrix",
+    "Lantern/equipment continuity across orientation, cause unverified",
+    "Controller/keyboard physical acceptance not exercised"
+  ],
+  "rawEvidence": "reports/touch-hud-20261023/phone; unedited large PNGs and private custody originals remain ignored/local"
+}

@@ -1,0 +1,24 @@
+{
+  "utcUnixMs": 1792748117002,
+  "phoneReleased": true,
+  "safeToDisconnect": true,
+  "bothOriginalInstalledHashesRestored": true,
+  "priorSaveAndLockFiles": 18,
+  "priorSaveBytesUnchanged": true,
+  "preferenceBytesUnchanged": true,
+  "systemSettingsRestored": true,
+  "onlyAddedIsolatedTestPaths": [],
+  "ownedAppPid": null,
+  "launcherForeground": true,
+  "hordeSurfaceViewOrBufferQueueLayers": [],
+  "retainedSystemActivityAndInputSinkNodes": [
+    "ActivityRecordInputSink for Horde MainActivity",
+    "ActivityRecord for Horde MainActivity"
+  ],
+  "ownedRendererOrTransferRemaining": false,
+  "originalReleaseGuard": "Failed its stronger any-name-zero assertion after restoration. Retained failure; no install retry. Fresh reads show only system ActivityRecord/InputSink nodes, no app PID or content surface.",
+  "inputSinkSource": "https://android.googlesource.com/platform/frameworks/base/+/refs/heads/main/services/core/java/com/android/server/wm/ActivityRecordInputSink.java",
+  "inputSinkSourceFinding": "Input handle owned by WindowManagerService, NO_INPUT_CHANNEL; not an app renderer. No system metadata was forcibly removed.",
+  "originalPrivateClosureSha256": "6be9115dc2c8836e9d3dc95d38769f58bd2686057599a8590f4ef988610ab7ce",
+  "sanitization": "Ephemeral WMS addresses, handles and task IDs omitted; original closure retained locally and hash bound."
+}

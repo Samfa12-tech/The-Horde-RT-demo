@@ -1,5 +1,27 @@
 # Horde 1.7 owner playtest checklist - 22 October 2026
 
+## Physical HUD checkpoint and routine backup grant - 23 October
+
+The [bounded phone check](../evidence/2026-10-23-touch-hud-phone/README.md) verifies
+independent portrait/landscape HUD target bounds, displayed backing/labels and
+held-lantern/return-tap state sequences on SM-S948B at owner font 1.7. Source
+`1bd99485` and exact APK are recorded. **Rotation continuity remains unresolved:**
+the first continuation lost the staged lantern control; separate landscape
+restaging does not close it. Next executable slice is source/host diagnosis of
+that fixture-versus-production lifecycle distinction, not another profile loop.
+
+Owner comfort, moving traversal/combat/caption matrix, contextual Interact and
+physical controller acceptance remain open. Original installs, all 18 prior
+save/lock files, preferences and display settings are verified restored/unchanged.
+**Phone released; safe to disconnect; no owned device operation remains.** The
+receipt retains the initial cleanup assertion and exact compositor metadata.
+
+Sam explicitly grants persistent routine checkpoint backups to the existing
+development/PR27 branch. Verify normal pushes/readback, preserve concurrent remote
+work; no repeated per-checkpoint approval, force push, merge or release. The
+remaining feature list and separate owner-deferred forest decision are recorded
+with the physical check. No forest or parked chimney implementation changed.
+
 ## Touch HUD checkpoint - 23 October
 
 Visible Skip line and the compact accessible lantern icon were already in place.
