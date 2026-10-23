@@ -1,0 +1,24 @@
+{
+  "baseCommit": "979bc71f6d31a370bcecc6fa211463cc401c7503",
+  "scope": "Diagnosis only: unchanged retained grid once, 24 localized points, two actual-rig poses. No new runtime candidate or native captures.",
+  "createdUtc": "2026-10-23T22:12:47.082532+00:00",
+  "productionSourceNeverChanged": true,
+  "before": {
+    "tests/HeldItemClearanceTests.cpp": "6e09541f847ca44ab446a31791a48080b354cf7a65519a6646d581dc65e12775",
+    "tests/FinalHeldTorchClearanceTests.cpp": "6d693508b0f50d82721ecb744746369e516af7fe57ae3da18e84ce354c151bf5",
+    "src/gameplay/items/HeldItemKinematics.cpp": "f8df4fac496c8d66188256342b052d556defaf872908cccc2e6aed2059ea9871",
+    "src/platform/windows/DiagnosticWindow.cpp": "2ed7fc5527b18fb0b2aa0050633a439b729b12b29974095fa6061c50eccd25f9"
+  },
+  "binarySha256": {
+    "horde_rt_held_item_clearance_tests.exe": "b8ca1e41b7b740344a6e8d607076e4c57ad8939e557ae05cb9f30875c6ade4a8",
+    "horde_rt_final_held_torch_clearance_tests.exe": "95231e12136914106d675c06aabe4f73ce45b9ba0dee0028bfb48f49e6189192"
+  },
+  "noPhoneOrForegroundActions": true,
+  "nativeVisualAcceptance": false,
+  "allTemporaryTestChangesRestored": true,
+  "restorationBuildExitCode": 0,
+  "parkedOwnerUntrackedFileCount": 151,
+  "temporaryPatchReapplies": true,
+  "relativeLinksChecked": true,
+  "newRuntimeTestsOrVisualAcceptanceClaimed": false
+}

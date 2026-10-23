@@ -39,6 +39,11 @@ It does not invalidate or replace that older study's distinct 2.601 mm result.
 The candidate is rejected without another tuning loop. No performance gain is
 claimed; these Debug diagnostic durations are not a gameplay timing benchmark.
 
+The later [bounded control localization](../2026-10-23-torch-turn-localisation/README.md)
+identifies that 278.333 mm maximum as a steep continuous grazing-wall response,
+not a mathematical discontinuity or angle-wrap error. Actual rig motion still
+reproduces it. The finite-step failure and this candidate's rejection remain.
+
 The six framing failures have zero actual left-gauntlet projected area. At wide
 aspect, diag13's Light depth is -5.577 mm and diag21's is -34.199 mm: containment
 has again been bought with the light behind the camera. Positive torch area
