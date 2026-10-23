@@ -228,7 +228,7 @@ struct Clips {
     std::array<MusicPcmClip,kMusicPcmCueCount> clips{};
     Clips() { for (std::size_t i=1; i<clips.size(); ++i) {
         body[i].assign(kMusicPcmAssets[i].bodyFrames*2u,static_cast<std::int16_t>(100*i));
-        tail[i].assign(kMusicPcmTailFrames*2u,static_cast<std::int16_t>(10*i));
+        tail[i].assign(kMusicPcmAssets[i].tailFrames*2u,static_cast<std::int16_t>(10*i));
         clips[i]={body[i],tail[i]};
     } }
 };
@@ -253,7 +253,10 @@ void MusicOutputOnly() {
     Check(a.cue==b.cue && a.revision==b.revision && Near(a.revealGain,b.revealGain*.65f),
           "dialogue gain multiplies the accepted Keeper envelope instead of replacing it");
 
-    const Clips clips; MusicPlaybackSession session(clips.clips), reference(clips.clips);
+    const Clips clips;
+    Check(MusicPcmStream(clips.clips).IsValid(),
+          "synthetic ducking bank obeys each admitted cue's body and tail shape before output checks");
+    MusicPlaybackSession session(clips.clips), reference(clips.clips);
     MusicPlaybackInbox inbox; state={}; state.developmentRescueJourney=true;
     std::array<float,64> actual{},expected{};
     std::uint64_t epoch=0,revision=0;

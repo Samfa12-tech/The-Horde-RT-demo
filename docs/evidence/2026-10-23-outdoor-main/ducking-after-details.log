@@ -1,0 +1,20 @@
+Start testing: Oct 23 14:50 AUS Eastern Summer Time
+----------------------------------------------------------
+157/230 Testing: horde_rt_dialogue_ducking_tests
+157/230 Test: horde_rt_dialogue_ducking_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/Debug/horde_rt_dialogue_ducking_tests.exe" "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof
+"horde_rt_dialogue_ducking_tests" start time: Oct 23 14:50 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+161 dialogue ducking host checks, 0 failures
+Synthetic PCM and logical terrain-backed restores use no output device or owner saves. Listening, physical lifecycle, voice intelligibility and perceived mix remain unaccepted.
+<end of output>
+Test time =   4.16 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_dialogue_ducking_tests" end time: Oct 23 14:50 AUS Eastern Summer Time
+"horde_rt_dialogue_ducking_tests" time elapsed: 00:00:04
+----------------------------------------------------------
+
+End testing: Oct 23 14:50 AUS Eastern Summer Time

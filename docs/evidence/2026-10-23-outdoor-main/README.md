@@ -142,3 +142,27 @@ Untracked owner world assets were preserved. No merge, release or publication.
 The next independent approved player-facing gap is the treasury-road/chimney
 vista cue, after inspecting the current RT vista; no scenery edit was started
 while this audio prerequisite was being integrated.
+
+## Hosted failure and focused fixture correction
+
+The first integration head `f21b030eea2fe112080f3a2482303929bd3d422b`
+[run 39896071822](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39896071822)
+fails the same dialogue-ducking registration in GCC and Clang: **156/157 pass**
+in each lane, with 18 failed checks within that one registration. Sanitizer,
+Vulkan-host and Android jobs pass; Android executes all 411 Java tests with zero
+skips/failures/errors. The complete six-job conclusion remains in the workflow.
+The [original hosted excerpts](first-hosted-failure.log) and
+[Windows reproduction](ducking-before-tests.log) retain the failures.
+
+`DialogueDuckingTests.cpp` still constructed a three-second synthetic tail for
+EVERY cue. Outdoor deliberately has no tail, so strict bank admission rejected
+the fixture before PCM/gain/pause assertions. This fixture was missed in the
+first local affected selection. The correction uses each admitted row's
+`tailFrames`, matching the existing body-length construction. An explicit bank
+validity assertion now diagnoses malformed fixture data before output checks.
+All 160 original assertions are retained; **161 checks, zero failures** pass in
+the corrected Debug registration ([details](ducking-after-details.log)). No
+production source, cue, envelope, gain, cap or deadline changes in this fix.
+The earlier eight focused passes plus this corrected registration cover the
+nine affected gates across separate runs; no full unrelated local rerun was
+performed. Hosted results for the correction require their own exact head.

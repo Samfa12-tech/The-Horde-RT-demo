@@ -41,6 +41,17 @@ frozen or muted tests do not establish natural victory/full route/listening.
 
 ## Hosted baseline and final review
 
+Outdoor integration `f21b030e` is backed up on PR 27. Its first hosted run
+[39896071822](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39896071822)
+fails the same dialogue-ducking fixture in GCC and Clang (156/157 each; 18 checks
+fail inside that registration). Sanitizer, Vulkan-host and Android jobs pass;
+Android executes all 411 Java tests with no skips. Local reproduction identifies
+an invalid synthetic Outdoor tail, corrected to per-cue metadata with all
+original assertions retained; 161/161 Debug checks then pass. No runtime audio
+change. The correction's exact-head hosted result is separate; retain the first
+failure, inherited Debug route gates and PR conflicts. See the integration
+record's hosted-failure section for logs.
+
 Current pre-integration heads `b9b98fb966327656cace019e911488a2d28f3bed`
 and `5b9dc70583eb48b314ce4105c326b2216ac810c8` each completed **six of six
 hosted jobs successfully**, including MSVC's main selection and subsequent
