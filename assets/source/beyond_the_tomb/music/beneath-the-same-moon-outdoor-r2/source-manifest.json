@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "title": "Beneath the Same Moon \u2014 Outdoor Exploration r2",
+  "status": "source-only; runtime blocked by pinned native Core long-clip limits",
+  "rights": "Owner-supplied; authorised for Horde use only",
+  "ownerSourceDate": "2026-10-23",
+  "driveFolder": "https://drive.google.com/drive/folders/1ar5VQEpp-lgX-kTRULzYx8FOxQaIhKMA",
+  "libraryTransferStatus": "Earlier metadata-helper failures retained; these bytes came independently from the owner-provided Drive folder",
+  "files": [
+    {
+      "path": "Beneath-the-Same-Moon-Outdoor-r2-source.zip",
+      "name": "Beneath-the-Same-Moon-Outdoor-r2-source (1).zip",
+      "size": 69449,
+      "sha256": "26629cd9478f9a01fc617af16842e2e444c0cf2376bebd48e821b3026340b275",
+      "driveId": "19Tr8gxQ1aor5shvt9SyLTrEX02w5iZ3D",
+      "sourceUrl": "https://drive.google.com/file/d/19Tr8gxQ1aor5shvt9SyLTrEX02w5iZ3D/view"
+    },
+    {
+      "path": "Beneath-the-Same-Moon-Outdoor-r2-dialogue-bed.flac",
+      "name": "Beneath-the-Same-Moon-Outdoor-r2-dialogue-bed.flac",
+      "size": 6337653,
+      "sha256": "3715eea723931f04b4eaa43e9c7832e82b68de29d57afd8020b4fe2c74c39b27",
+      "driveId": "1WnlDFnvl07C_FmSyumskDHR9iEMNEq-7",
+      "sourceUrl": "https://drive.google.com/file/d/1WnlDFnvl07C_FmSyumskDHR9iEMNEq-7/view"
+    },
+    {
+      "path": "Beneath-the-Same-Moon-Outdoor-r2-loop.flac",
+      "name": "Beneath-the-Same-Moon-Outdoor-r2-loop.flac",
+      "size": 7227613,
+      "sha256": "38244c2101d42990e37482e75995b7aa8de05a91a9753b8c1566632da64a7f6a",
+      "driveId": "1gNfvgLOacjvlNpJavdjh-K51Cammk70k",
+      "sourceUrl": "https://drive.google.com/file/d/1gNfvgLOacjvlNpJavdjh-K51Cammk70k/view"
+    },
+    {
+      "path": "Beneath-the-Same-Moon-Outdoor-r2.json",
+      "size": 233827,
+      "sha256": "e106c9dbe70815b0687fc7e411beccd45ca7a3881387e9df547be6d6618483a1",
+      "sourceMember": "Beneath-the-Same-Moon-Outdoor-r2.json"
+    },
+    {
+      "path": "Beneath-the-Same-Moon-Outdoor-r2.pcs1.txt",
+      "size": 123980,
+      "sha256": "fa7dd294f39c413413fe5248259004c01536f733a9cfb4dff5dcfdd5d2379a05",
+      "sourceMember": "Beneath-the-Same-Moon-Outdoor-r2.pcs1.txt"
+    }
+  ],
+  "runtimeAssets": [],
+  "importedScriptsExecuted": false,
+  "listeningPerformed": false,
+  "verificationRepositoryPath": "docs/evidence/2026-10-23-outdoor-music-source/audio-verification.json"
+}

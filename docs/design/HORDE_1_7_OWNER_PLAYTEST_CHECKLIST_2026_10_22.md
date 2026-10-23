@@ -37,7 +37,7 @@ frozen or muted tests do not establish natural victory/full route/listening.
 | Mobile quality | MistOff default and optional enable remain; saved choices are preserved, desktop unchanged. Explicitly requested candidate comparisons are RT ON,40%,MistOff,FireLow,DustOff,Current shadows,existing Mobile water, individual and combined. Prior mixed trials are not attributed wins. 480p was illustrative; native HUD remains display-resolution/readable. |
 | Natural acceptance | Natural Keeper victory, full journey, earned save/load/death recovery, actual listening and sustained warmed-phone performance remain open. Passing Windows post-Keeper continuation fixtures are parked. |
 | Kit/ambience/debris | Stationary turn-step trial withdrawn/unadmitted; foot sliding remains. Night ambience/finite foliage source exists but listening is unaccepted. Six floor chips are static; kicking and a player-facing toggle are absent. |
-| Outdoor music | **Blocked, not integrated.** Exact approved main/quiet-bed/source Library identifiers resolve, but all three required metadata-helper materializations fail with `AttributeError: module 'os' has no attribute 'setxattr'` on native Windows Python. Final destinations are absent; no metadata bypass or partial asset admission. [Exact action and targets](../evidence/2026-10-23-backward-walk/outdoor-music-blocker.json). Main/bed are aligned 48 kHz stereo, 5,120,000 samples, 106.667 s per parent verification; local bytes/listening/mix are unvalidated. Current H also serves legacy dawn, so outdoor-only routing and duration/footprint admission are required after a supported transfer. |
+| Outdoor music | **Source transfer verified; runtime pending canonical long-PCM support.** Owner-provided Drive main/quiet FLACs and editable source ZIP downloaded; exact size/hash/provenance preserved. Both full FLAC decodes match STREAMINFO MD5; stereo 48 kHz PCM24, 5,120,000 frames each, peak/RMS within 0.001 dB of pack. Original sources are LFS-backed and excluded from packages; offline PCM16 candidates stay in ignored reports. No runtime cue changed. Current pinned Core decoder and mixer each cap clips at 576,000 frames (12 s); the full cue needs 5,120,000. Canonical Core upgrade/re-pin is pending; read-only access to its separate local folder returned Permission denied. No Core fork or shortened composition. Both PCM16 loops would add 40.96 MB resident; measure startup/memory and phase-continuous main/quiet switch with Kit after the prerequisite. Actual listening/mix and phone acceptance remain open. Earlier Library metadata failures are retained. [Source verification and precise prerequisite](../evidence/2026-10-23-outdoor-music-source/README.md). |
 
 ## Hosted baseline and final review
 
@@ -85,11 +85,12 @@ no further torch candidate is active. The existing wall witnesses and ordinary
 centre pose stay required. The bounded backward-walk checkpoint is recorded
 above. Bounded dynamic Windows first-person and backward-to-dodge/rope host gates
 now pass with the same rig and movement rules; see the continuity checkpoint.
-The source-changing head `90a65044` hosted run39884452538 finishes cancelled: five
+The source-changing head `90a65044` hosted run 39884452538 finishes cancelled: five
 jobs pass; MSVC hits its unchanged 15-minute cap with no surfaced final test total,
 and six subsequent offline checks are skipped. Hosted acceptance stays open.
-Next verify the newly owner-supplied Drive music originals, then integrate the
-separately approved outdoor PCM cue. The earlier Library metadata failure remains
+The owner-supplied Drive music originals are now verified and preserved. Next
+resolve canonical Core bounded long-PCM support, then integrate the separately
+approved outdoor cue with measured memory and actual listening acceptance. The earlier Library metadata failure remains
 retained; a Drive source does not bypass that Library requirement. No phone work
 was performed.
 

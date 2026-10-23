@@ -1,0 +1,165 @@
+{
+  "ffmpegSha256": "05f4251bce9293c2ab492cb17ca7724a0ffd0d06c881ba2ee83b82a89c2fc740",
+  "files": [
+    {
+      "name": "Beneath-the-Same-Moon-Outdoor-r2-loop.flac",
+      "size": 7227613,
+      "sha256": "38244c2101d42990e37482e75995b7aa8de05a91a9753b8c1566632da64a7f6a",
+      "rate": 48000,
+      "channels": 2,
+      "bits": 24,
+      "frames": 5120000,
+      "durationSeconds": 106.66666666666667,
+      "decodedPcm24Md5": "eb3b4fc923eda3196b2405869ae6db78",
+      "flacStreamInfoMd5Matches": true,
+      "clipped": 0,
+      "measured": {
+        "peakDbFS": -7.999999988978489,
+        "rmsDbFS": -27.136295561653384,
+        "seamJumpDbFS": -110.86957317119924
+      },
+      "sourcePackMetrics": {
+        "frames": 5120000,
+        "sampleRate": 48000,
+        "durationSeconds": 106.66666666666667,
+        "peakDbFS": -7.999999999999998,
+        "rmsDbFS": -27.136295539323456,
+        "seamJumpDbFS": -110.73955886378727,
+        "seamJump": 2.904170146792893e-06,
+        "maxAdjacentDelta": 0.02842032393593233,
+        "nonFinite": 0,
+        "clipped": 0,
+        "monoRmsDbFS": -27.170193087278985
+      }
+    },
+    {
+      "name": "Beneath-the-Same-Moon-Outdoor-r2-dialogue-bed.flac",
+      "size": 6337653,
+      "sha256": "3715eea723931f04b4eaa43e9c7832e82b68de29d57afd8020b4fe2c74c39b27",
+      "rate": 48000,
+      "channels": 2,
+      "bits": 24,
+      "frames": 5120000,
+      "durationSeconds": 106.66666666666667,
+      "decodedPcm24Md5": "5e7e28f4783b930bba4bfbf93d12f835",
+      "flacStreamInfoMd5Matches": true,
+      "clipped": 0,
+      "measured": {
+        "peakDbFS": -14.483537755225376,
+        "rmsDbFS": -34.265841616796386,
+        "seamJumpDbFS": -128.9313729110381
+      },
+      "sourcePackMetrics": {
+        "frames": 5120000,
+        "sampleRate": 48000,
+        "durationSeconds": 106.66666666666667,
+        "peakDbFS": -14.48354040132039,
+        "rmsDbFS": -34.2658415859071,
+        "seamJumpDbFS": -128.74900347759268,
+        "seamJump": 3.6521602567762585e-07,
+        "maxAdjacentDelta": 0.008202157145843533,
+        "nonFinite": 0,
+        "clipped": 0,
+        "monoRmsDbFS": -34.27273773489158
+      }
+    }
+  ],
+  "listeningPerformed": false,
+  "project": {
+    "title": "Beneath the Same Moon \u2014 Outdoor Exploration r2",
+    "bpm": 72,
+    "projectVersion": 17
+  },
+  "sourceMembers": [
+    {
+      "name": "Beneath-the-Same-Moon-Outdoor-r2-loop.loudness.txt",
+      "size": 184459,
+      "sha256": "6bf1de45d15cbc8195976b8a717158c63d51876328fbfc869c64b5d499873945"
+    },
+    {
+      "name": "README.md",
+      "size": 3153,
+      "sha256": "e1ca640a9f3ee59ff5ed5256dead121d073c36460d7396cd715c1bf4e99594a5"
+    },
+    {
+      "name": "Beneath-the-Same-Moon-Outdoor-r2-dialogue-bed.loudness.txt",
+      "size": 184467,
+      "sha256": "7dec00debc0f8b459b71020a1af35a8f7dcab8eb2db09a95e81fec60fc1459d3"
+    },
+    {
+      "name": "Beneath-the-Same-Moon-Outdoor-r2-loop.metrics.json",
+      "size": 346,
+      "sha256": "862a49c2b33fed0aed6e93373b45a920d674aea9260b4fb5f3114ae3d5fe20f3"
+    },
+    {
+      "name": "Beneath-the-Same-Moon-Outdoor-r2.pcs1.txt",
+      "size": 123980,
+      "sha256": "fa7dd294f39c413413fe5248259004c01536f733a9cfb4dff5dcfdd5d2379a05"
+    },
+    {
+      "name": "Beneath-the-Same-Moon-Outdoor-r2.mid",
+      "size": 2021,
+      "sha256": "53399ccbd32c9cedd8e27423555c2dc8e30ceeb43be3204a0d65446aba3ba5f5"
+    },
+    {
+      "name": "performed-events.json",
+      "size": 134337,
+      "sha256": "2efdc165f493c28dd2541bc1eed9aa322b381ca73ad8f67906ea3eeed5e53d98"
+    },
+    {
+      "name": "score-validation.json",
+      "size": 397,
+      "sha256": "6129441a3d77adca63bf4bcc134aafdeef9c7a359d201b7b4e7156b830624c82"
+    },
+    {
+      "name": "Beneath-the-Same-Moon-Outdoor-r2-dialogue-bed.metrics.json",
+      "size": 345,
+      "sha256": "1237b79e286057f1518baec33dc6749914fe14c570588938a549bfbe9382e0e1"
+    },
+    {
+      "name": "Beneath-the-Same-Moon-Outdoor-r2.json",
+      "size": 233827,
+      "sha256": "e106c9dbe70815b0687fc7e411beccd45ca7a3881387e9df547be6d6618483a1"
+    },
+    {
+      "name": "source/render-core-reference.mjs",
+      "size": 14043,
+      "sha256": "16e77b579d5eecba91bc58ec73f9fea136ee3ec6e59d2cce186be977b563081f"
+    },
+    {
+      "name": "source/compose.py",
+      "size": 1832,
+      "sha256": "5a7203ef546ef64dc3216ca26447ff783fda8354c71bb0235b89d2737cb269b8"
+    },
+    {
+      "name": "source/REPRODUCE.md",
+      "size": 483,
+      "sha256": "3a381443da557ac1d046bbd29a2f9855d4d8a55fa9ae3dc20669ed0c1ef2fa72"
+    },
+    {
+      "name": "source/finish.py",
+      "size": 2620,
+      "sha256": "8d0ef2de16f176aa83b928d2cf4caf5f19af69eb0dc00584e704225cf1e2e2ea"
+    },
+    {
+      "name": "source/validate.mjs",
+      "size": 1299,
+      "sha256": "b5db4a76f7cfd7cc0e0fc74334fce85e5035d2a8a31ab9c042d8ec2599610653"
+    },
+    {
+      "name": "source/original-04-forest.json",
+      "size": 253020,
+      "sha256": "d9ec863afe27428651d0ff0b21ebbac0890d48b8dd5b1ac4b3e7f5a804146ae0"
+    },
+    {
+      "name": "source/render.mjs",
+      "size": 1105,
+      "sha256": "5723d7a3b425e03865af21f24e29f250873de96e6a76fe02d2ab07c18da4f084"
+    },
+    {
+      "name": "source/mix-settings.json",
+      "size": 351,
+      "sha256": "eae22a0cb34b2347970759c6c5e3a996b643ffefcbdd90eb95deb149044236fe"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+[
+  {
+    "name": "loop.wav",
+    "sha256": "14fe0a94e665cf25b4fb4aa08a45e26e18990794740b670906adfecfaf6aee15",
+    "size": 20480044,
+    "frames": 5120000,
+    "rate": 48000,
+    "channels": 2,
+    "bits": 16,
+    "pcmBytes": 20480000,
+    "pcmSha256": "7fa7ea36e500261a57956976913f88da7480e6e6f6c3c3a0f18acf9a134a400a",
+    "wrapDeltaLsb": 0,
+    "processing": "FFmpeg pcm_s16le, dither_method=none; Python wave strict 44-byte header; no trim, gain, resampling or normalization",
+    "runtimeAdmission": "unadmitted; current canonical Core decoder/mixer maximum is 576000 frames"
+  },
+  {
+    "name": "dialogue-bed.wav",
+    "sha256": "567d258df3a0c80cecd95cf0a4ce8d8196af85e767ab633daeb1e81073155087",
+    "size": 20480044,
+    "frames": 5120000,
+    "rate": 48000,
+    "channels": 2,
+    "bits": 16,
+    "pcmBytes": 20480000,
+    "pcmSha256": "79af5d5a747775e6d433cd198f234fdd9c5526695c36cb75c113d7367e9ac239",
+    "wrapDeltaLsb": 0,
+    "processing": "FFmpeg pcm_s16le, dither_method=none; Python wave strict 44-byte header; no trim, gain, resampling or normalization",
+    "runtimeAdmission": "unadmitted; current canonical Core decoder/mixer maximum is 576000 frames"
+  }
+]

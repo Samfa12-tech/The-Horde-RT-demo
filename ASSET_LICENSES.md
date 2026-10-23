@@ -127,6 +127,28 @@ Android runtime derivatives for the five CC0 rows are strict KTX2 arrays using A
 
 Poly Haven's asset license states that its assets are CC0 and may be used commercially without required attribution: https://polyhaven.com/license. Attribution is retained here as project provenance.
 
+## Outdoor score (1.7 source admission)
+
+### Beneath the Same Moon — Outdoor Exploration r2 (1.7 source admission)
+
+Owner-supplied original arrangement and audio, approved for Horde outdoor music
+work and handed off through the owner's Drive folder on 2026-10-23. **Authorised
+for Horde use only**; no general redistribution licence, Core software licence
+change or release authority is inferred. Exact Drive IDs, byte hashes, original
+filenames and ZIP member hashes are recorded under
+`assets/source/beyond_the_tomb/music/beneath-the-same-moon-outdoor-r2/`.
+The two original stereo 48 kHz PCM24 FLACs, original editable source ZIP and
+verbatim JSON/PCS1 scores remain source assets, excluded from game packages.
+The source pack preserves the earlier forest-theme provenance and its pinned
+Pocket Chordsmith rendering/finishing recipes; imported scripts were not run.
+
+This is source admission, **not runtime or listening acceptance**. Full decoded
+FLAC MD5, frame count, peak/RMS and offline PCM16 conversion are verified. The
+106.667-second loop exceeds the current pinned native Core's 12-second decoder
+and mixer limits; no runtime derivative is admitted, no A–H cue is replaced,
+and canonical Core remains unchanged. See
+[transfer and integration prerequisite](docs/evidence/2026-10-23-outdoor-music-source/README.md).
+
 ## Supplied adaptive score (1.6.1 runtime assets and playback accepted)
 
 `What the Dark Keeps`, supplied in `What_the_Dark_Keeps_Horde_RT_Music_Pack.zip`
@@ -135,7 +157,7 @@ Owner-confirmed rights statement,2026-09-30: **Owner-supplied; authorised for Ho
 No general permissive redistribution licence is inferred. Editable canonical JSON/
 PCS1 under `assets/audio/music/what-the-dark-keeps/source/` remains the revisable
 source of truth and is excluded from game packages, as is the supplied preview.
-Only the hash-pinned manifest and sixteen measured stereo48kHz PCM16 body/tail
+Only the hash-pinned manifest and sixteen measured stereo 48 kHz PCM16 body/tail
 derivatives under that asset's `runtime/` enter Windows/Android packages.
 Current native-clock/loop/transition and owner listening checks are accepted;
 see the [finite current A/D delta receipt](docs/evidence/2026-10-03-music-drone/README.md).
