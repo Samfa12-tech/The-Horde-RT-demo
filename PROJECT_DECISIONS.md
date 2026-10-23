@@ -465,3 +465,20 @@ the same pair and location even when the selected encounter is the Keeper.
 Legacy default-config capture fixtures retain their historical behavior. Host
 route/Keeper/reward and frozen RT checkpoint evidence pass; current moving and
 phone acceptance remain separate. No new enemies, health rules or adventure scope.
+
+## Full outdoor music through shared Core - 2026-10-23
+
+Owner direction preserves one shared music system and the approved full outdoor
+arrangement rather than dividing it to satisfy the first score's 12-second cap.
+Use the full main only with existing smooth dialogue ducking. The separately
+balanced quiet mix remains a source/reference until actual listening warrants
+its runtime cost; it is not required for ordinary volume ducking.
+
+Canonical Pocket Chordsmith commit b77a9d0bfe3051c6e352815295164b9b80586f56
+provides reviewed frame/byte/aggregate admission limits with legacy defaults
+preserved. Horde re-vendors that exact native subset and opts in only for the
+5,120,000-frame main and exact 40,640,000-byte mixed bank. Chapter outdoors uses a
+separate cue; tomb/dawn policy, sample-clock lifecycle and saved volume remain.
+No synth, new codec or disk-streaming path is introduced. Package source
+exclusion, download size, live PCM residency and loading peak are separate
+measurements. Listening with Kit and warmed-phone acceptance remain open.

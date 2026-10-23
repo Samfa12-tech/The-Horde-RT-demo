@@ -37,9 +37,19 @@ frozen or muted tests do not establish natural victory/full route/listening.
 | Mobile quality | MistOff default and optional enable remain; saved choices are preserved, desktop unchanged. Explicitly requested candidate comparisons are RT ON,40%,MistOff,FireLow,DustOff,Current shadows,existing Mobile water, individual and combined. Prior mixed trials are not attributed wins. 480p was illustrative; native HUD remains display-resolution/readable. |
 | Natural acceptance | Natural Keeper victory, full journey, earned save/load/death recovery, actual listening and sustained warmed-phone performance remain open. Passing Windows post-Keeper continuation fixtures are parked. |
 | Kit/ambience/debris | Stationary turn-step trial withdrawn/unadmitted; foot sliding remains. Night ambience/finite foliage source exists but listening is unaccepted. Six floor chips are static; kicking and a player-facing toggle are absent. |
-| Outdoor music | **Source transfer verified; runtime pending canonical long-PCM support.** Owner-provided Drive main/quiet FLACs and editable source ZIP downloaded; exact size/hash/provenance preserved. Both full FLAC decodes match STREAMINFO MD5; stereo 48 kHz PCM24, 5,120,000 frames each, peak/RMS within 0.001 dB of pack. Original sources are LFS-backed and excluded from packages; offline PCM16 candidates stay in ignored reports. No runtime cue changed. Current pinned Core decoder and mixer each cap clips at 576,000 frames (12 s); the full cue needs 5,120,000. Canonical Core upgrade/re-pin is pending; read-only access to its separate local folder returned Permission denied. No Core fork or shortened composition. Both PCM16 loops would add 40.96 MB resident; measure startup/memory and phase-continuous main/quiet switch with Kit after the prerequisite. Actual listening/mix and phone acceptance remain open. Earlier Library metadata failures are retained. [Source verification and precise prerequisite](../evidence/2026-10-23-outdoor-music-source/README.md). |
+| Outdoor music | **Full approved main implemented locally through the existing shared PCM engine.** Canonical Core `b77a9d0b` is vendored byte-exact through GitHub; the denied sibling folder was not retried. First chapter ascent preserves G then selects the full 106.667-second Outdoor cue; return F and legacy showcase/dawn H remain. One main uses existing dialogue ducking; no quiet duplicate or source master ships. Core Debug/Release, 8 focused Horde gates, 25 admission cases, full Windows application and four-ABI Android build pass. Java: 405 executed, zero failures/errors, 6 existing skips. Actual XAudio2 consumed a complete loop at gain zero and passed pause/resume/retry/join; this is not listening. Bank PCM is 40,640,000 bytes; one host load 387.434 ms, not phone timing/RSS. Main payload is 20,480,044 bytes stored in APK or 13,546,616 compressed in a Windows-style ZIP fixture; actual incremental Debug APK is 200,120,444 bytes including a separately identified 5,410,380-byte archive gap. Original source transfer/policy failures remain retained. Actual Kit mix, transitions/seam listening, phone loading/lifecycle and warmed cost stay open. [Integration and size evidence](../evidence/2026-10-23-outdoor-main/README.md), [source provenance](../evidence/2026-10-23-outdoor-music-source/README.md). |
 
 ## Hosted baseline and final review
+
+Current pre-integration heads `b9b98fb966327656cace019e911488a2d28f3bed`
+and `5b9dc70583eb48b314ce4105c326b2216ac810c8` each completed **six of six
+hosted jobs successfully**, including MSVC's main selection and subsequent
+offline checks: [39887604991](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39887604991)
+and [39888357455](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39888357455).
+The older failures/cap cancellations below remain historical evidence. These
+passes do not certify the new outdoor integration; its exact changed-head result
+must be recorded separately. Local focused music results do not close unrelated
+Debug route deadlines, physical/audio acceptance or PR conflicts.
 
 [CI run39482295647](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39482295647)
 tests exact3e29b599 and fails multiple lanes. Confirmed checkout/fixture issues
@@ -88,11 +98,15 @@ now pass with the same rig and movement rules; see the continuity checkpoint.
 The source-changing head `90a65044` hosted run 39884452538 finishes cancelled: five
 jobs pass; MSVC hits its unchanged 15-minute cap with no surfaced final test total,
 and six subsequent offline checks are skipped. Hosted acceptance stays open.
-The owner-supplied Drive music originals are now verified and preserved. Next
-resolve canonical Core bounded long-PCM support, then integrate the separately
-approved outdoor cue with measured memory and actual listening acceptance. The earlier Library metadata failure remains
-retained; a Drive source does not bypass that Library requirement. No phone work
-was performed.
+The owner-supplied Drive originals are preserved and the full main is now
+integrated as recorded above. Its Core prerequisite is resolved through the
+exact authorized canonical commit, with source exclusion and bounded memory
+checks. Actual listening and phone acceptance remain open. The earlier Library
+metadata failure remains retained; the separate Drive source does not bypass
+Library requirements. No phone work was performed. The next unblocked approved
+player-facing slice is inspection of the actual treasury-road/chimney vista,
+then at most a justified bounded scenery correction. Preserve route boundaries,
+landmark visibility and safe backtracking; no scenery edit has started.
 
 Exact evidence-only head `096b23f0`, [run 39877269271](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39877269271),
 finishes **failure**: five jobs pass; MSVC main selection is 168/169, with the

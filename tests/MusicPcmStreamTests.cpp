@@ -40,11 +40,9 @@ struct ClipSet
     {
         for (std::size_t index = 1u; index < kMusicPcmCueCount; ++index)
         {
-            const auto cue = static_cast<MusicCue>(index);
-            const std::uint64_t frames = cue == MusicCue::C ? 144'000u
-                : cue == MusicCue::G ? 288'000u : kMusicPcmLoopFrames;
+            const std::uint64_t frames = kMusicPcmAssets[index].bodyFrames;
             bodies[index].resize(static_cast<std::size_t>(frames * 2u));
-            tails[index].resize(static_cast<std::size_t>(kMusicPcmTailFrames * 2u));
+            tails[index].resize(static_cast<std::size_t>(kMusicPcmAssets[index].tailFrames * 2u));
             const auto bodyValue = static_cast<std::int16_t>(1'000 + index * 1'000);
             std::fill(bodies[index].begin(), bodies[index].end(), bodyValue);
             for (std::size_t frame = 0u; frame < tails[index].size() / 2u; ++frame)
@@ -70,7 +68,8 @@ MusicSelection Selection(const MusicCue cue, const std::uint64_t revision,
                          const double position = 0.0)
 {
     const bool looping = cue == MusicCue::A || cue == MusicCue::B || cue == MusicCue::D ||
-                         cue == MusicCue::E || cue == MusicCue::F || cue == MusicCue::H;
+                         cue == MusicCue::E || cue == MusicCue::F || cue == MusicCue::H ||
+                         cue == MusicCue::Outdoor;
     return {.cue = cue, .looping = looping, .positionSeconds = position, .revision = revision};
 }
 
@@ -93,7 +92,7 @@ void TestClipAndSelectionValidation()
 {
     ClipSet clips;
     MusicPcmStream stream(clips.clips);
-    Check(stream.IsValid(), "nine exact cue rows are accepted");
+    Check(stream.IsValid(), "ten exact cue rows including one full outdoor main are accepted");
 
     auto badCount = std::span<const MusicPcmClip>(clips.clips.data(), clips.clips.size() - 1u);
     MusicPcmStream missingRow(badCount);
@@ -110,6 +109,16 @@ void TestClipAndSelectionValidation()
         std::span<const std::int16_t>(clips.tails[7].data(), clips.tails[7].size() - 2u);
     MusicPcmStream malformedTail(wrongTail);
     Check(!malformedTail.IsValid(), "incorrect tail frame count is rejected");
+
+    auto outdoorWithTail = clips.clips;
+    outdoorWithTail[static_cast<std::size_t>(MusicCue::Outdoor)].tail = clips.tails[1];
+    MusicPcmStream duplicatedTail(outdoorWithTail);
+    Check(!duplicatedTail.IsValid(), "an unadmitted tail cannot be appended to the finished outdoor loop");
+
+    auto shortenedOutdoor = clips.clips;
+    shortenedOutdoor[static_cast<std::size_t>(MusicCue::Outdoor)].body = clips.bodies[1];
+    MusicPcmStream truncatedOutdoor(shortenedOutdoor);
+    Check(!truncatedOutdoor.IsValid(), "outdoor cannot silently become a legacy twelve-second cut");
 
     auto nonemptyNone = clips.clips;
     nonemptyNone[0] = clips.clips[1];
@@ -311,6 +320,39 @@ void TestNaturalTailTransitions()
           Near(sample[0], (15'000.0f + 307.0f) / 32768.0f) &&
           Near(sample[1], (-15'000.0f - 307.0f) / 32768.0f),
           "G tail resumes at its exact rendered offset and overlays H at unity gain");
+
+    MusicPcmStream chapter(clips.clips);
+    Check(chapter.SetSelection(Selection(MusicCue::G, 1u)) == MusicPcmStatus::Ok,
+          "chapter G begins independently of the legacy dawn handoff");
+    RenderFrames(chapter, 288'007u, buffer, chunks);
+    Check(chapter.SetSelection(Selection(MusicCue::Outdoor, 2u)) == MusicPcmStatus::Ok,
+          "chapter reveal hands off to the full outdoor main");
+    Check(chapter.Render(sample) == MusicPcmStatus::Ok &&
+          Near(sample[0], (15'000.0f + 307.0f) / 32768.0f) &&
+          Near(sample[1], (-15'000.0f - 307.0f) / 32768.0f),
+          "G tail retains the identical natural offset beneath Outdoor instead of being cropped or restarted");
+}
+
+void TestOutdoorLongSeekAndExclusiveEnd()
+{
+    ClipSet clips;
+    constexpr auto outdoor = static_cast<std::size_t>(MusicCue::Outdoor);
+    constexpr std::uint64_t frames = 5'120'000u;
+    clips.bodies[outdoor][(frames - 1u) * 2u] = 12'345;
+    clips.bodies[outdoor][(frames - 1u) * 2u + 1u] = -12'345;
+    clips.Rebind(outdoor);
+    MusicPcmStream stream(clips.clips);
+    Check(stream.SetSelection(Selection(MusicCue::Outdoor, 1u,
+          static_cast<double>(frames - 1u) / 48'000.0)) == MusicPcmStatus::Ok,
+          "explicit mixed bank accepts an outdoor seek well past the old twelve-second bound");
+    std::array<float, 4u> seam{};
+    Check(stream.Render(seam) == MusicPcmStatus::Ok &&
+          Near(seam[0], 12'345.0f / 32768.0f) && Near(seam[1], -12'345.0f / 32768.0f) &&
+          Near(seam[2], 15'000.0f / 32768.0f) && Near(seam[3], -15'000.0f / 32768.0f),
+          "outdoor long seek plays the final frame then exact frame zero, without a separate tail");
+    Check(stream.SetSelection(Selection(MusicCue::Outdoor, 2u,
+          static_cast<double>(frames) / 48'000.0)) == MusicPcmStatus::InvalidSelection,
+          "the full outdoor body end remains exclusive rather than weakening source-position validation");
 }
 
 void TestEarlyOneShotChangesCrossfadeInsteadOfSkippingBody()
@@ -492,6 +534,7 @@ int main()
     TestLoopTailAndTwentyExactPeriods();
     TestOneShotTailsAndAuthoredGSeek();
     TestNaturalTailTransitions();
+    TestOutdoorLongSeekAndExclusiveEnd();
     TestEarlyOneShotChangesCrossfadeInsteadOfSkippingBody();
     TestDiscontinuityEdgeSeeksExactlyOnce();
     TestVolumeSuspensionSeekAndRapidChanges();

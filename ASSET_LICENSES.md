@@ -127,7 +127,7 @@ Android runtime derivatives for the five CC0 rows are strict KTX2 arrays using A
 
 Poly Haven's asset license states that its assets are CC0 and may be used commercially without required attribution: https://polyhaven.com/license. Attribution is retained here as project provenance.
 
-## Outdoor score (1.7 source admission)
+## Outdoor score (1.7 sources and full main PCM)
 
 ### Beneath the Same Moon — Outdoor Exploration r2 (1.7 source admission)
 
@@ -142,12 +142,22 @@ verbatim JSON/PCS1 scores remain source assets, excluded from game packages.
 The source pack preserves the earlier forest-theme provenance and its pinned
 Pocket Chordsmith rendering/finishing recipes; imported scripts were not run.
 
-This is source admission, **not runtime or listening acceptance**. Full decoded
-FLAC MD5, frame count, peak/RMS and offline PCM16 conversion are verified. The
-106.667-second loop exceeds the current pinned native Core's 12-second decoder
-and mixer limits; no runtime derivative is admitted, no A–H cue is replaced,
-and canonical Core remains unchanged. See
-[transfer and integration prerequisite](docs/evidence/2026-10-23-outdoor-music-source/README.md).
+The main-only runtime derivative is pinned by
+`assets/audio/music/beneath-the-same-moon/asset.manifest.json`: stereo 48 kHz PCM16,
+5,120,000 frames / 106.666667 seconds, WAV SHA-256
+`14fe0a94e665cf25b4fb4aa08a45e26e18990794740b670906adfecfaf6aee15`.
+It preserves the full approved main without gain, trimming, normalization,
+sample-rate or tempo change. The quiet mix is neither loaded nor packaged;
+existing runtime dialogue ducking and user volume remain independent.
+
+The reviewed canonical native Core update
+`b77a9d0bfe3051c6e352815295164b9b80586f56` supplies explicit bounded long-PCM
+support while retaining legacy defaults; Horde vendors the exact subset with
+unchanged private/UNLICENSED notices. No A-H asset or legacy dawn cue is replaced.
+This source/runtime admission does not establish listening with Kit, phone
+performance or release acceptance. See the
+[source verification](docs/evidence/2026-10-23-outdoor-music-source/README.md) and
+[main integration checkpoint](docs/evidence/2026-10-23-outdoor-main/README.md).
 
 ## Supplied adaptive score (1.6.1 runtime assets and playback accepted)
 

@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <iostream>
 #include <limits>
+#include <new>
 #include <span>
 #include <stdexcept>
 #include <string_view>
@@ -16,6 +17,24 @@
 #if defined(_MSC_VER)
 #include <crtdbg.h>
 #endif
+
+// Count ordinary heap allocations around construction/control/render only.
+// All fixture creation and WAV decoding happen outside the measured region.
+static std::size_t allocationCount = 0u;
+void* operator new(const std::size_t bytes)
+{
+    ++allocationCount;
+    if (void* memory = std::malloc(bytes == 0u ? 1u : bytes))
+    {
+        return memory;
+    }
+    throw std::bad_alloc();
+}
+void* operator new[](const std::size_t bytes) { return ::operator new(bytes); }
+void operator delete(void* memory) noexcept { std::free(memory); }
+void operator delete[](void* memory) noexcept { std::free(memory); }
+void operator delete(void* memory, std::size_t) noexcept { std::free(memory); }
+void operator delete[](void* memory, std::size_t) noexcept { std::free(memory); }
 
 namespace
 {
@@ -521,6 +540,208 @@ void TestWaveDecoderRejectsMalformedInputsTransactionally()
     ExpectDecodeFailure(noData, 2u, PcmWaveStatus::MissingDataChunk);
 }
 
+void TestBoundedAdmissionAndOverflowRejection()
+{
+    using namespace pocket_audio;
+    constexpr PcmClipLimits defaults{};
+    static_assert(defaults.AllowsFrames(576'000u));
+    static_assert(!defaults.AllowsFrames(576'001u));
+    static_assert(!defaults.AllowsFrames(std::numeric_limits<std::uint64_t>::max()));
+    constexpr PcmClipLimits hard{kPcmHardMaximumFrames, kPcmHardMaximumBytes};
+    static_assert(hard.AllowsFrames(kPcmHardMaximumFrames));
+    static_assert(!hard.AllowsFrames(kPcmHardMaximumFrames + 1u));
+
+    // Exact legacy boundary is still admitted by both old entry points.
+    std::vector<std::int16_t> boundary(576'000u * 2u, 1000);
+    const std::array<PcmClip, 2> clips{{{}, {boundary, {}, true}}};
+    CHECK(PcmLoopStream(clips).IsValid());
+    const auto wave = MakeWave(MakeFmt(), std::vector<std::uint8_t>(576'000u * 4u));
+    std::vector<std::int16_t> decoded;
+    CHECK(DecodePcmWave(wave, 576'000u, decoded) == PcmWaveStatus::Ok);
+    boundary.resize(576'001u * 2u);
+    const std::array<PcmClip, 2> overDefault{{{}, {boundary, {}, true}}};
+    CHECK(!PcmLoopStream(overDefault).IsValid());
+    CHECK(DecodePcmWave(wave, 576'001u, decoded) == PcmWaveStatus::InvalidExpectedFrameCount);
+    CHECK(decoded.empty());
+
+    const auto tiny = StereoFrames({1000, 2000});
+    const std::array<PcmClip, 2> tinyClips{{{}, {tiny, {}, true}}};
+    const std::array<PcmClipLimits, 7> invalid{{
+        {0u, 8u}, {2u, 0u}, {2u, 7u},
+        {kPcmHardMaximumFrames + 1u, 8u}, {2u, kPcmHardMaximumBytes + 4u},
+        {std::numeric_limits<std::uint64_t>::max(), 8u},
+        {2u, std::numeric_limits<std::uint64_t>::max()},
+    }};
+    for (const auto limits : invalid)
+    {
+        decoded = {9, 10};
+        CHECK(!limits.IsValid());
+        CHECK(DecodePcmWave({}, 2u, decoded, limits) == PcmWaveStatus::InvalidLimits);
+        CHECK(decoded.empty());
+        CHECK(!PcmLoopStream(tinyClips, PcmBankLimits{limits, 8u}).IsValid());
+    }
+    CHECK(!PcmLoopStream(tinyClips, PcmBankLimits{{2u, 8u}, 0u}).IsValid());
+    CHECK(!PcmLoopStream(tinyClips, PcmBankLimits{{2u, 8u}, 7u}).IsValid());
+    CHECK(!PcmLoopStream(tinyClips, PcmBankLimits{{2u, 8u},
+        std::numeric_limits<std::uint64_t>::max()}).IsValid());
+
+    const PcmClipLimits byteBudget{2u, 4u};
+    const auto tinyWave = MakeWave(MakeFmt(), EncodeSamples({1000, 1000, 2000, 2000}));
+    CHECK(DecodePcmWave(tinyWave, 2u, decoded, byteBudget) ==
+          PcmWaveStatus::InvalidExpectedFrameCount);
+    CHECK(!PcmLoopStream(tinyClips, PcmBankLimits{byteBudget, 8u}).IsValid());
+    CHECK(DecodePcmWave({}, std::numeric_limits<std::uint32_t>::max(), decoded, hard) ==
+          PcmWaveStatus::InvalidExpectedFrameCount);
+
+    // All aliases and tails count against the bank. No pointer-range deduping.
+    const std::array<PcmClip, 3> aliases{{{}, {tiny, tiny, true}, {tiny, {}, false}}};
+    CHECK(PcmLoopStream(aliases, PcmBankLimits{{2u, 8u}, 24u}).IsValid());
+    CHECK(!PcmLoopStream(aliases, PcmBankLimits{{2u, 8u}, 20u}).IsValid());
+
+    PcmLoopStream rejectedBank(aliases, PcmBankLimits{{2u, 8u}, 20u});
+    CHECK(rejectedBank.SetSelection(Selection(1u, true, 1u)) == PcmStatus::InvalidClips);
+    std::array<float, 4> silent{1.0f, 1.0f, 1.0f, 1.0f};
+    CHECK(rejectedBank.Render(silent) == PcmStatus::InvalidClips);
+    CheckStereoConstant(silent, 0u, 2u, 0.0f);
+
+    // Exact total container allowance (headers included), then one byte beyond
+    // it (plus RIFF padding). A looser duration policy cannot increase it.
+    auto metadataWave = tinyWave;
+    AppendChunk(metadataWave, "JUNK", std::vector<std::uint8_t>(65'484u));
+    FinalizeRiffLength(metadataWave);
+    CHECK(metadataWave.size() == 8u + kPcmWaveMaximumContainerOverheadBytes);
+    CHECK(DecodePcmWave(metadataWave, 2u, decoded, hard) == PcmWaveStatus::Ok);
+    metadataWave = tinyWave;
+    AppendChunk(metadataWave, "JUNK", std::vector<std::uint8_t>(65'485u));
+    FinalizeRiffLength(metadataWave);
+    CHECK(DecodePcmWave(metadataWave, 2u, decoded, hard) == PcmWaveStatus::FileTooLarge);
+    CHECK(decoded.empty());
+}
+
+void TestApprovedLongClipDecodeAndPlayback()
+{
+    using namespace pocket_audio;
+    constexpr std::uint32_t frames = 5'120'000u;
+    constexpr std::uint64_t pcmBytes = 20'480'000u;
+    constexpr PcmClipLimits limits{frames, pcmBytes};
+    static_assert(limits.AllowsFrames(frames));
+    static_assert(!limits.AllowsFrames(frames + 1u));
+    auto wave = MakeWave(MakeFmt(), std::vector<std::uint8_t>(pcmBytes));
+    for (std::size_t sample = 44u; sample < wave.size(); sample += 2u)
+    {
+        wave[sample] = 0xe8u; // 1000, both channels
+        wave[sample + 1u] = 0x03u;
+    }
+    CHECK(wave.size() == pcmBytes + 44u);
+    std::vector<std::int16_t> decoded;
+    CHECK(DecodePcmWave(wave, frames, decoded) == PcmWaveStatus::InvalidExpectedFrameCount);
+    CHECK(decoded.empty());
+    CHECK(DecodePcmWave(wave, frames, decoded, limits) == PcmWaveStatus::Ok);
+    CHECK(decoded.size() == frames * 2u);
+    CHECK(decoded.front() == 1000 && decoded.back() == 1000);
+    // Exact per-span budget is enforced independently of the frame ceiling.
+    std::vector<std::int16_t> rejected{1, 2};
+    CHECK(DecodePcmWave(wave, frames, rejected, {frames, pcmBytes - 4u}) ==
+          PcmWaveStatus::InvalidExpectedFrameCount);
+    CHECK(rejected.empty());
+    CHECK(DecodePcmWave(wave, frames + 1u, rejected, limits) ==
+          PcmWaveStatus::InvalidExpectedFrameCount);
+    // Malformed long containers still fail before allocating decoded output.
+    wave[40] = wave[41] = wave[42] = wave[43] = 0xffu;
+    CHECK(DecodePcmWave(wave, frames, rejected, limits) == PcmWaveStatus::InvalidChunk);
+    wave.resize(pcmBytes + kPcmWaveMaximumContainerOverheadBytes + 1u);
+    CHECK(DecodePcmWave(wave, frames, rejected, limits) == PcmWaveStatus::FileTooLarge);
+    CHECK(rejected.empty());
+
+    decoded.resize((frames + 1u) * 2u);
+    const std::array<PcmClip, 2> overFrames{{{}, {decoded, {}, true}}};
+    CHECK(!PcmLoopStream(overFrames, PcmBankLimits{limits, pcmBytes + 4u}).IsValid());
+    decoded.resize(frames * 2u);
+    const std::array<PcmClip, 2> overBytes{{{}, {decoded, {}, true}}};
+    CHECK(!PcmLoopStream(overBytes,
+        PcmBankLimits{{frames, pcmBytes - 4u}, pcmBytes}).IsValid());
+    decoded[decoded.size() - 2u] = decoded.back() = 4000;
+    const auto tail = StereoFrames({100, 200});
+    const auto next = StereoFrames({2000, 2000, 2000, 2000, 2000, 2000});
+    const std::array<PcmClip, 4> clips{{{}, {decoded, tail, true},
+        {decoded, tail, false}, {next, {}, false}}};
+    constexpr std::uint64_t bankBytes = pcmBytes * 2u + 16u + 24u;
+    const PcmBankLimits bank{limits, bankBytes};
+    CHECK(!PcmLoopStream(clips).IsValid());
+    CHECK(!PcmLoopStream(clips, PcmBankLimits{limits, bankBytes - 4u}).IsValid());
+
+    const std::size_t allocationsBefore = allocationCount;
+    PcmLoopStream stream(clips, bank, 2u);
+    CHECK(stream.IsValid());
+    CHECK(stream.SetSelection(Selection(1u, true, 1u)) == PcmStatus::Ok);
+    std::array<float, 2048> output{};
+    constexpr std::array<std::size_t, 3> chunks{128u, 511u, 1024u};
+    std::size_t rendered = 0u;
+    std::size_t chunk = 0u;
+    // One entire approved period, across irregular callback sizes. No UI clock.
+    while (rendered < frames)
+    {
+        const std::size_t count = std::min(chunks[chunk++ % chunks.size()], frames - rendered);
+        CHECK(stream.Render(OutputFrames(output, count)) == PcmStatus::Ok);
+        CheckStereoConstant(output, 0u, count - (rendered + count == frames ? 1u : 0u),
+                            1000.0f / 32768.0f);
+        rendered += count;
+        if (rendered == frames)
+        {
+            CheckStereoConstant(output, count - 1u, 1u, 4000.0f / 32768.0f);
+        }
+    }
+    CHECK(rendered == frames);
+    CHECK(stream.Render(OutputFrames(output, 3u)) == PcmStatus::Ok);
+    CheckStereoConstant(output, 0u, 1u, 1100.0f / 32768.0f);
+    CheckStereoConstant(output, 1u, 1u, 1200.0f / 32768.0f);
+    CheckStereoConstant(output, 2u, 1u, 1000.0f / 32768.0f);
+
+    // Seek near the long body's end, wrap exactly, then clear tail history.
+    const double lastFrame = static_cast<double>(frames - 1u) / kPcmSampleRate;
+    CHECK(stream.SetSelection(Selection(1u, true, 2u, lastFrame)) == PcmStatus::Ok);
+    CHECK(stream.Render(OutputFrames(output, 2u)) == PcmStatus::Ok);
+    CheckStereoConstant(output, 0u, 1u, 4000.0f / 32768.0f);
+    CheckStereoConstant(output, 1u, 1u, 1100.0f / 32768.0f);
+    CHECK(stream.SetSelection(Selection(1u, true, 3u)) == PcmStatus::Ok);
+    CHECK(stream.Render(OutputFrames(output, 1u)) == PcmStatus::Ok);
+    CheckStereoConstant(output, 0u, 1u, 1000.0f / 32768.0f);
+    CHECK(stream.SetSelection(Selection(1u, true, 4u,
+        static_cast<double>(frames) / kPcmSampleRate)) == PcmStatus::InvalidSelection);
+    CHECK(stream.SetSelection(Selection(1u, true, 5u,
+        std::numeric_limits<double>::max())) == PcmStatus::InvalidSelection);
+
+    stream.Reset();
+    CHECK(stream.SetVolumePercent(50.0f));
+    CHECK(stream.SetSelection(Selection(2u, false, 1u, lastFrame)) == PcmStatus::Ok);
+    CHECK(stream.Render(OutputFrames(output, 4u)) == PcmStatus::Ok);
+    CheckStereoConstant(output, 0u, 1u, 2000.0f / 32768.0f);
+    CheckStereoConstant(output, 1u, 1u, 50.0f / 32768.0f);
+    CheckStereoConstant(output, 2u, 1u, 100.0f / 32768.0f);
+    CheckStereoConstant(output, 3u, 1u, 0.0f);
+
+    stream.Reset();
+    CHECK(stream.SetVolumePercent(100.0f));
+    CHECK(stream.SetSelection(Selection(2u, false, 1u, lastFrame)) == PcmStatus::Ok);
+    CHECK(stream.Render(OutputFrames(output, 1u)) == PcmStatus::Ok);
+    auto handoff = Selection(3u, false, 2u);
+    handoff.naturalTailHandoff = true;
+    CHECK(stream.SetSelection(handoff) == PcmStatus::Ok);
+    CHECK(stream.Render(OutputFrames(output, 3u)) == PcmStatus::Ok);
+    CheckStereoConstant(output, 0u, 1u, 2100.0f / 32768.0f);
+    CheckStereoConstant(output, 1u, 1u, 2200.0f / 32768.0f);
+    CheckStereoConstant(output, 2u, 1u, 2000.0f / 32768.0f);
+
+    stream.Reset();
+    CHECK(stream.SetSelection(Selection(1u, true, 1u, lastFrame)) == PcmStatus::Ok);
+    CHECK(stream.SetSelection(Selection(3u, false, 2u)) == PcmStatus::Ok);
+    CHECK(stream.Render(OutputFrames(output, 3u)) == PcmStatus::Ok);
+    CheckStereoConstant(output, 0u, 1u, 4000.0f / 32768.0f);
+    CheckStereoConstant(output, 1u, 1u, 1550.0f / 32768.0f);
+    CheckStereoConstant(output, 2u, 1u, 2000.0f / 32768.0f);
+    CHECK(allocationCount == allocationsBefore);
+}
+
 } // namespace
 
 int main()
@@ -548,6 +769,10 @@ int main()
         TestWaveDecoderValidOrderPaddingEndianAndAlignment();
         std::cerr << "wave invalid\n";
         TestWaveDecoderRejectsMalformedInputsTransactionally();
+        std::cerr << "bounded admission\n";
+        TestBoundedAdmissionAndOverflowRejection();
+        std::cerr << "approved long PCM\n";
+        TestApprovedLongClipDecodeAndPlayback();
     }
     catch (const std::exception& error)
     {

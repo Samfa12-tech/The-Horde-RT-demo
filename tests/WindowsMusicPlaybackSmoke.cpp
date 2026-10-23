@@ -41,18 +41,21 @@ bool Check(const bool pass, const char* message)
 
 int wmain(const int argc, wchar_t** argv)
 {
-    if (argc != 2 && argc != 3)
+    if (argc < 2 || argc > 4)
     {
-        std::cerr << "usage: WindowsMusicPlaybackSmoke <assets-root> [1..20 loop periods at silent gain]\n";
+        std::cerr << "usage: WindowsMusicPlaybackSmoke <assets-root> [outdoor] [1..20 loop periods at silent gain]\n";
         return 2;
     }
     int loopPeriods = 0;
-    if (argc == 3)
+    const bool outdoor = argc >= 3 && std::wstring(argv[2]) == L"outdoor";
+    if (argc == 4 && !outdoor) return 2;
+    const int periodArgument = outdoor ? 3 : 2;
+    if (argc > periodArgument)
     {
         try
         {
             std::size_t end = 0u;
-            const std::wstring value(argv[2]);
+            const std::wstring value(argv[periodArgument]);
             loopPeriods = std::stoi(value, &end);
             if (end != value.size() || loopPeriods < 1 || loopPeriods > 20) return 2;
         }
@@ -60,6 +63,14 @@ int wmain(const int argc, wchar_t** argv)
     }
     WindowsMusicPlayback playback(std::filesystem::path(argv[1]), &LogMessage);
     SimulationSnapshot snapshot{};
+    if (outdoor)
+    {
+        // Isolated audio publication, not an earned gameplay journey.
+        snapshot.developmentRescueJourney = true;
+        snapshot.rescue.exteriorSide = true;
+        snapshot.rescue.lanternClaimed = true;
+        snapshot.rescue.firstAscentCompleted = true;
+    }
     // Start while the application is externally unfocused, not gameplay-paused.
     // Initialization must not start/advance audio until a focus-return publication.
     snapshot.tickIndex = 0u;
@@ -88,14 +99,17 @@ int wmain(const int argc, wchar_t** argv)
 
     if (loopPeriods != 0)
     {
-        const std::uint64_t target = static_cast<std::uint64_t>(loopPeriods) * 576000u;
+        const auto periodFrames = outdoor ? horde::audio::kOutdoorMusicFrames : 576000u;
+        const std::uint64_t target = static_cast<std::uint64_t>(loopPeriods) * periodFrames;
+        const auto timeoutSeconds = static_cast<int>((target + 47999u) / 48000u) + 20;
         if (!WaitFor(playback, [target](const auto& status)
-            { return status.samplesPlayed >= target; }, std::chrono::seconds(loopPeriods * 12 + 20))) return 14;
+            { return status.samplesPlayed >= target; }, std::chrono::seconds(timeoutSeconds))) return 14;
         const auto status = playback.GetStatus();
         if (!Check(!status.disabled && status.workerRunning && status.queuedBuffers <= 3u &&
                    status.samplesPlayed <= status.submittedFrames && status.generatedFrames == status.submittedFrames,
                    "long output-clock run violated bounded queue/admission")) return 15;
-        std::cout << "Consumed " << loopPeriods << " actual12s PCM body periods: generated=" << status.generatedFrames
+        std::cout << "Consumed " << loopPeriods << (outdoor ? " actual outdoor" : " actual12s")
+                  << " PCM body periods: generated=" << status.generatedFrames
                   << " submitted=" << status.submittedFrames << " played=" << status.samplesPlayed
                   << " queuedBuffers=" << status.queuedBuffers << '\n';
     }

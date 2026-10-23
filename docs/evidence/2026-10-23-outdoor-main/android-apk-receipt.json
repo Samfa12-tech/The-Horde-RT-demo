@@ -1,0 +1,38 @@
+{
+  "bytes": 200120444,
+  "sha256": "9a92cdedc393e600f70b0a513bf9cf997b6ddb8723af9cf4543e1d65eb2c200a",
+  "priorBytes": 174177635,
+  "totalApkByteDelta": 25942809,
+  "musicEntryCount": 19,
+  "musicUncompressedBytes": 40647007,
+  "musicCompressedBytes": 40643213,
+  "outdoorEntries": [
+    {
+      "name": "assets/audio/music/beneath-the-same-moon/asset.manifest.json",
+      "bytes": 1160,
+      "compressedBytes": 672,
+      "method": 8
+    },
+    {
+      "name": "assets/audio/music/beneath-the-same-moon/runtime/outdoor-main.wav",
+      "bytes": 20480044,
+      "compressedBytes": 20480044,
+      "method": 0
+    }
+  ],
+  "nativeLibraries": [
+    "lib/arm64-v8a/libhorde_rt_probe_android.so",
+    "lib/armeabi-v7a/libhorde_rt_probe_android.so",
+    "lib/x86/libhorde_rt_probe_android.so",
+    "lib/x86_64/libhorde_rt_probe_android.so"
+  ],
+  "sourceOrQuietEntries": [],
+  "deviceInstallation": false,
+  "listeningPerformed": false,
+  "javaTests": {
+    "tests": 411,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 6
+  }
+}

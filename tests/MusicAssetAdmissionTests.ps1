@@ -3,6 +3,7 @@ $repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 . (Join-Path $repoRoot 'tools/music-asset-policy.ps1')
 
 $musicSource = Join-Path $repoRoot 'assets/audio/music/what-the-dark-keeps'
+$outdoorMusicSource = Join-Path $repoRoot 'assets/audio/music/beneath-the-same-moon'
 $scratchRoot = Join-Path ([IO.Path]::GetTempPath()) ('Horde-MusicAssetAdmission-' + [Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $scratchRoot | Out-Null
 $script:passed = 0
@@ -54,6 +55,16 @@ function Expect-Failure {
     if ($ExpectedText -and $message -notlike "*$ExpectedText*") { throw "$Label failed for an unexpected reason: $message" }
     $script:passed++
     Write-Output "PASS negative: $Label"
+}
+
+function Copy-OutdoorMusicFixture {
+    param([Parameter(Mandatory = $true)][string]$Name)
+    $root = Join-Path $scratchRoot $Name
+    New-Item -ItemType Directory -Path $root | Out-Null
+    Copy-Item -LiteralPath (Join-Path $outdoorMusicSource 'asset.manifest.json') -Destination $root
+    Copy-Item -LiteralPath (Join-Path $outdoorMusicSource 'METADATA.md') -Destination $root
+    Copy-Item -LiteralPath (Join-Path $outdoorMusicSource 'runtime') -Destination $root -Recurse
+    return $root
 }
 
 function Test-AssetPolicy {
@@ -117,12 +128,17 @@ try {
         $manifest = Assert-HordeMusicAssets -RepositoryRoot $repoRoot
         Assert-True ($manifest.assetId -ceq 'what-the-dark-keeps') 'Unexpected admitted music asset ID.'
     }
-    Test-AssetPolicy -Label 'strict-mode seventeen-file runtime roster and staged byte verification' -Action {
+    Test-AssetPolicy -Label 'strict-mode legacy seventeen, outdoor two and aggregate nineteen-file runtime rosters' -Action {
         # Release/version tools enable strict mode before calling this helper.
         # A clean stage has zero reparse points and must not dereference null.
         Set-StrictMode -Version Latest
-        $paths = @(Get-HordeMusicRuntimeFiles -RepositoryRoot $repoRoot)
+        $paths = @(Get-HordeLegacyMusicRuntimeFiles -RepositoryRoot $repoRoot)
         Assert-True ($paths.Count -eq 17) "Runtime roster count was $($paths.Count), expected 17."
+        $outdoorPaths = @(Get-HordeOutdoorMusicRuntimeFiles -RepositoryRoot $repoRoot)
+        Assert-True ($outdoorPaths.Count -eq 2) 'Outdoor runtime roster must contain only its manifest and full main WAV.'
+        $allPaths = @(Get-HordeMusicRuntimeFiles -RepositoryRoot $repoRoot)
+        Assert-True ($allPaths.Count -eq 19) 'Aggregate runtime music roster must contain exactly nineteen files.'
+        Assert-True (@($allPaths | Where-Object { $_ -match 'source|\.flac$|\.zip$|dialogue-bed|quiet' }).Count -eq 0) 'Runtime roster contains a source or quiet variant.'
         $assets = Join-Path (Join-Path $scratchRoot 'stage-positive') 'assets'
         Copy-HordeMusicRuntimeAssets -RepositoryRoot $repoRoot -AssetRoot $assets | Out-Null
         $musicRoot = Join-TestRelativePath -BasePath $assets -RelativePath 'audio/music/what-the-dark-keeps'
@@ -130,6 +146,9 @@ try {
         Assert-True (-not (Test-Path -LiteralPath (Join-Path $musicRoot 'METADATA.md'))) 'Staging copied project metadata.'
         $actual = @(Get-ChildItem -LiteralPath $musicRoot -Recurse -File)
         Assert-True ($actual.Count -eq 17) "Staged music file count was $($actual.Count), expected 17."
+        $outdoorRoot = Join-TestRelativePath -BasePath $assets -RelativePath 'audio/music/beneath-the-same-moon'
+        Assert-True (@(Get-ChildItem -LiteralPath $outdoorRoot -Recurse -File).Count -eq 2) 'Staged outdoor tree must contain only two runtime entries.'
+        Assert-True (-not (Test-Path -LiteralPath (Join-Path $outdoorRoot 'METADATA.md'))) 'Staging leaked outdoor source metadata.'
     }
     Test-AssetPolicy -Label 'positive Windows-style staged ZIP and Android-style APK validation' -Action {
         $assets = Join-Path (Join-Path $scratchRoot 'archive-positive') 'assets'
@@ -187,6 +206,44 @@ try {
         Assert-HordeMusicAssets -RepositoryRoot $fixture.RepositoryRoot
     }
 
+    $outdoor = Copy-OutdoorMusicFixture -Name 'outdoor-pcm-corrupt'
+    $wave = [IO.File]::Open((Join-TestRelativePath $outdoor 'runtime/outdoor-main.wav'), [IO.FileMode]::Open, [IO.FileAccess]::ReadWrite, [IO.FileShare]::None)
+    try { $wave.Position = 44; $value = $wave.ReadByte(); $wave.Position = 44; $wave.WriteByte([byte]($value -bxor 1)) } finally { $wave.Dispose() }
+    Expect-Failure -Label 'outdoor independent PCM sample mutation' -ExpectedText 'runtime SHA-256 mismatch' -Action {
+        Assert-HordeOutdoorMusicAssetTree -MusicRoot $outdoor
+    }
+    $outdoor = Copy-OutdoorMusicFixture -Name 'outdoor-tail-policy'
+    $manifestPath = Join-Path $outdoor 'asset.manifest.json'
+    $manifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
+    $manifest.cues[0].tail = [pscustomobject]@{ path = 'runtime/outdoor-tail.wav'; frames = 144000 }
+    $manifest | ConvertTo-Json -Depth 16 | Set-Content -LiteralPath $manifestPath -Encoding utf8
+    Expect-Failure -Label 'outdoor separate-tail policy mutation' -ExpectedText 'without a separate tail or quiet mix' -Action {
+        Assert-HordeOutdoorMusicAssetTree -MusicRoot $outdoor
+    }
+    $outdoor = Copy-OutdoorMusicFixture -Name 'outdoor-manifest-repin'
+    $manifestPath = Join-Path $outdoor 'asset.manifest.json'
+    $manifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
+    $manifest.title = 'Unreviewed outdoor title'
+    $manifest | ConvertTo-Json -Depth 16 | Set-Content -LiteralPath $manifestPath -Encoding utf8
+    Expect-Failure -Label 'outdoor independent manifest pin' -ExpectedText 'manifest SHA-256 does not match the reviewed pin' -Action {
+        Assert-HordeOutdoorMusicAssetTree -MusicRoot $outdoor
+    }
+    $outdoor = Copy-OutdoorMusicFixture -Name 'outdoor-quiet-extra'
+    Set-Content -LiteralPath (Join-TestRelativePath $outdoor 'runtime/dialogue-bed.wav') -Value 'unapproved quiet file' -Encoding ascii
+    Expect-Failure -Label 'outdoor quiet variant excluded from asset admission' -ExpectedText 'closed inventory' -Action {
+        Assert-HordeOutdoorMusicAssetTree -MusicRoot $outdoor
+    }
+    $outdoor = Copy-OutdoorMusicFixture -Name 'outdoor-source-extra'
+    Set-Content -LiteralPath (Join-Path $outdoor 'source.zip') -Value 'source is never runtime' -Encoding ascii
+    Expect-Failure -Label 'outdoor source ZIP excluded from asset admission' -ExpectedText 'closed inventory' -Action {
+        Assert-HordeOutdoorMusicAssetTree -MusicRoot $outdoor
+    }
+    $outdoor = Copy-OutdoorMusicFixture -Name 'outdoor-missing-wave'
+    Remove-Item -LiteralPath (Join-TestRelativePath $outdoor 'runtime/outdoor-main.wav')
+    Expect-Failure -Label 'outdoor missing main rejected' -ExpectedText 'runtime wave is missing' -Action {
+        Assert-HordeOutdoorMusicAssetTree -MusicRoot $outdoor
+    }
+
     $positiveStage = Join-Path (Join-Path $scratchRoot 'archive-negative') 'assets'
     Copy-HordeMusicRuntimeAssets -RepositoryRoot $repoRoot -AssetRoot $positiveStage | Out-Null
     $sourceZip = Join-Path (Join-Path $scratchRoot 'archive-negative') 'source-entry.zip'
@@ -215,6 +272,31 @@ try {
     New-MusicTestArchive -Path $corruptZip -AssetRoot $positiveStage -CorruptPath 'audio/music/what-the-dark-keeps/runtime/A-body.wav'
     Expect-Failure -Label 'archive corrupted PCM rejection' -ExpectedText 'entry byte/hash mismatch' -Action {
         Assert-HordeMusicPackage -RepositoryRoot $repoRoot -ArchivePath $corruptZip
+    }
+    $outdoorMissingZip = Join-Path (Join-Path $scratchRoot 'archive-negative') 'outdoor-missing.zip'
+    New-MusicTestArchive -Path $outdoorMissingZip -AssetRoot $positiveStage -OmitPath 'audio/music/beneath-the-same-moon/runtime/outdoor-main.wav'
+    Expect-Failure -Label 'archive outdoor missing-main rejection' -ExpectedText 'exactly two main-only runtime entries' -Action {
+        Assert-HordeMusicPackage -RepositoryRoot $repoRoot -ArchivePath $outdoorMissingZip
+    }
+    $outdoorCorruptZip = Join-Path (Join-Path $scratchRoot 'archive-negative') 'outdoor-corrupt.zip'
+    New-MusicTestArchive -Path $outdoorCorruptZip -AssetRoot $positiveStage -CorruptPath 'audio/music/beneath-the-same-moon/runtime/outdoor-main.wav'
+    Expect-Failure -Label 'archive outdoor corrupted-main rejection' -ExpectedText 'Outdoor music package entry byte/hash mismatch' -Action {
+        Assert-HordeMusicPackage -RepositoryRoot $repoRoot -ArchivePath $outdoorCorruptZip
+    }
+    $outdoorQuietZip = Join-Path (Join-Path $scratchRoot 'archive-negative') 'outdoor-quiet.zip'
+    New-MusicTestArchive -Path $outdoorQuietZip -AssetRoot $positiveStage -ExtraPath 'audio/music/beneath-the-same-moon/runtime/dialogue-bed.wav'
+    Expect-Failure -Label 'archive outdoor quiet-copy rejection' -ExpectedText 'exactly two main-only runtime entries' -Action {
+        Assert-HordeMusicPackage -RepositoryRoot $repoRoot -ArchivePath $outdoorQuietZip
+    }
+    $outdoorSourceZip = Join-Path (Join-Path $scratchRoot 'archive-negative') 'outdoor-source-original.zip'
+    New-MusicTestArchive -Path $outdoorSourceZip -AssetRoot $positiveStage -ExtraPath 'source/beyond_the_tomb/music/beneath-the-same-moon-outdoor-r2/source.zip'
+    Expect-Failure -Label 'archive outdoor original-source rejection outside runtime root' -ExpectedText 'unapproved music/source content' -Action {
+        Assert-HordeMusicPackage -RepositoryRoot $repoRoot -ArchivePath $outdoorSourceZip
+    }
+    $outdoorSourceElsewhereZip = Join-Path (Join-Path $scratchRoot 'archive-negative') 'outdoor-source-elsewhere.zip'
+    New-MusicTestArchive -Path $outdoorSourceElsewhereZip -AssetRoot $positiveStage -ExtraPath 'unrelated/Beneath-the-Same-Moon-Outdoor-r2-loop.flac'
+    Expect-Failure -Label 'archive original FLAC rejection even under an unrelated package folder' -ExpectedText 'unapproved music/source content' -Action {
+        Assert-HordeMusicPackage -RepositoryRoot $repoRoot -ArchivePath $outdoorSourceElsewhereZip
     }
 } catch {
     $script:failed++

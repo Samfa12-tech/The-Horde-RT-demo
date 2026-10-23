@@ -1,0 +1,26 @@
+[
+  {
+    "suite": "com.samfa12.hordelanternrt.EnvironmentSurveyExportTest",
+    "case": "actualExistingAndDanglingOutputLinksAreNotReplacedWhereHostSupportsLinks[24]"
+  },
+  {
+    "suite": "com.samfa12.hordelanternrt.EnvironmentSurveyExportTest",
+    "case": "actualExistingAndDanglingOutputLinksAreNotReplacedWhereHostSupportsLinks"
+  },
+  {
+    "suite": "com.samfa12.hordelanternrt.EnvironmentSurveyExportTest",
+    "case": "actualSymbolicExternalRootIsRejectedWhereHostSupportsLinks[24]"
+  },
+  {
+    "suite": "com.samfa12.hordelanternrt.EnvironmentSurveyExportTest",
+    "case": "actualSymbolicExternalRootIsRejectedWhereHostSupportsLinks"
+  },
+  {
+    "suite": "com.samfa12.hordelanternrt.EnvironmentSurveyExportTest",
+    "case": "actualSameParentSourceLinkIsRejectedWhereHostSupportsLinks[24]"
+  },
+  {
+    "suite": "com.samfa12.hordelanternrt.EnvironmentSurveyExportTest",
+    "case": "actualSameParentSourceLinkIsRejectedWhereHostSupportsLinks"
+  }
+]

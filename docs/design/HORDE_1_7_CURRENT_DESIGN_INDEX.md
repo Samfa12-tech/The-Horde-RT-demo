@@ -2,6 +2,17 @@
 
 ## Resumed owner playtest priorities - 22 October 2026
 
+The [23 October outdoor-main checkpoint](../evidence/2026-10-23-outdoor-main/README.md)
+resolves the canonical long-PCM prerequisite and admits the approved full main
+through the same Pocket Audio bank/director/workers. Chapter G-to-Outdoor and
+return F preserve legacy dawn H; existing ducking uses one main. Core, focused
+host, actual silent XAudio2 full-period, Android build/Java and package-inventory
+checks pass locally. Source masters and quiet mix are excluded. Endpoint
+listening with Kit, phone loading/lifecycle and warm cost remain open; no phone
+access occurred. Earlier `b9b98fb9` and `5b9dc705` hosted runs both passed all six
+jobs; exact outdoor integration CI remains separate. See the canonical checklist
+for still-open recovery, scenery, performance, physical and conflict gates.
+
 The [current canonical checklist](HORDE_1_7_OWNER_PLAYTEST_CHECKLIST_2026_10_22.md)
 supersedes the prior pause and reconciles the owner's landscape subtitles,
 speech, automatic crouch/analogue speed, brief dark-world report, outdoor

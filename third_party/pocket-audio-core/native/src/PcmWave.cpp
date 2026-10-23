@@ -13,7 +13,6 @@ constexpr std::uint16_t kChannels = 2u;
 constexpr std::uint16_t kBitsPerSample = 16u;
 constexpr std::uint16_t kBlockAlignment = 4u;
 constexpr std::uint32_t kByteRate = 192'000u;
-constexpr std::size_t kMaximumContainerOverheadBytes = 65'536u;
 
 bool HasFourCc(const std::span<const std::uint8_t> bytes,
                const std::size_t offset,
@@ -58,14 +57,26 @@ PcmWaveStatus DecodePcmWave(const std::span<const std::uint8_t> fileBytes,
                             const std::uint32_t expectedFrameCount,
                             std::vector<std::int16_t>& outputSamples) noexcept
 {
+    return DecodePcmWave(fileBytes, expectedFrameCount, outputSamples, PcmClipLimits{});
+}
+
+PcmWaveStatus DecodePcmWave(const std::span<const std::uint8_t> fileBytes,
+                            const std::uint32_t expectedFrameCount,
+                            std::vector<std::int16_t>& outputSamples,
+                            const PcmClipLimits limits) noexcept
+{
     outputSamples.clear();
-    if (expectedFrameCount == 0u || expectedFrameCount > kPcmWaveMaximumFrameCount)
+    if (!limits.IsValid())
+    {
+        return PcmWaveStatus::InvalidLimits;
+    }
+    if (!limits.AllowsFrames(expectedFrameCount))
     {
         return PcmWaveStatus::InvalidExpectedFrameCount;
     }
     const std::size_t expectedDataBytes = static_cast<std::size_t>(expectedFrameCount) *
                                           kBlockAlignment;
-    if (fileBytes.size() > expectedDataBytes + kMaximumContainerOverheadBytes)
+    if (fileBytes.size() > expectedDataBytes + kPcmWaveMaximumContainerOverheadBytes)
     {
         return PcmWaveStatus::FileTooLarge;
     }

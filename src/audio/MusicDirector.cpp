@@ -1,5 +1,6 @@
 #include "audio/MusicDirector.h"
 #include "audio/DialogueDucking.h"
+#include "audio/MusicPcmAssets.h"
 
 #include <algorithm>
 #include <cmath>
@@ -19,6 +20,11 @@ using gameplay::simulation::GameplayEventType;
 using gameplay::simulation::SimulationSnapshot;
 
 constexpr double kLoopSeconds = 12.0;
+double CueLoopSeconds(const MusicCue cue) noexcept
+{
+    return static_cast<double>(kMusicPcmAssets[static_cast<std::size_t>(cue)].bodyFrames) /
+           kMusicPcmSampleRate;
+}
 constexpr double kTorchStingSeconds = 3.0;
 constexpr double kSkylightCueSeconds = 6.0;
 constexpr double kSkylightOpeningSeconds = 4.5;
@@ -388,7 +394,7 @@ void MusicDirector::SetCue(const MusicCue cue,
     looping_ = looping;
     positionSeconds_ = cue == MusicCue::None
         ? 0.0
-        : (looping ? std::fmod(safePosition, kLoopSeconds) : safePosition);
+        : (looping ? std::fmod(safePosition, CueLoopSeconds(cue)) : safePosition);
 }
 
 void MusicDirector::UpdateChapterMusic(const SimulationSnapshot& snapshot,
@@ -415,13 +421,13 @@ void MusicDirector::UpdateChapterMusic(const SimulationSnapshot& snapshot,
             return;
         }
         chapterRevealActive_ = false;
-        SetCue(MusicCue::H, true, std::max(0.0, nextPosition - kSkylightCueSeconds),
+        SetCue(MusicCue::Outdoor, true, std::max(0.0, nextPosition - kSkylightCueSeconds),
                false, discontinuity);
         return;
     }
-    const auto bed = snapshot.rescue.exteriorSide ? MusicCue::H : MusicCue::F;
+    const auto bed = snapshot.rescue.exteriorSide ? MusicCue::Outdoor : MusicCue::F;
     const double nextPosition = cue_ == bed && looping_
-        ? std::fmod(positionSeconds_ + clockDelta, kLoopSeconds) : 0.0;
+        ? std::fmod(positionSeconds_ + clockDelta, CueLoopSeconds(bed)) : 0.0;
     SetCue(bed, true, nextPosition, false, discontinuity);
 }
 

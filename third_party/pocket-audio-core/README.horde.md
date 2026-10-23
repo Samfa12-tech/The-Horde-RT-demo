@@ -1,8 +1,8 @@
 # Pocket Audio Core native subset
 
 Canonical implementation: `packages/pocket-audio-core/native/` in
-[Pocket-Chordsmith](https://github.com/Samfa12-tech/Pocket-Chordsmith/tree/534a6e6811ce653efd5422138c5772b967263ed0/packages/pocket-audio-core/native).
-Horde pins commit `534a6e6811ce653efd5422138c5772b967263ed0` without local
+[Pocket-Chordsmith](https://github.com/Samfa12-tech/Pocket-Chordsmith/tree/b77a9d0bfe3051c6e352815295164b9b80586f56/packages/pocket-audio-core/native).
+Horde pins commit `b77a9d0bfe3051c6e352815295164b9b80586f56` without local
 modifications. `manifest.json` records exact upstream paths, sizes and SHA-256s;
 Windows and Android CMake validate this admission before building the target.
 Updates are deliberate: review/test the canonical Core change, replace only the
@@ -28,3 +28,10 @@ Canonical PCS JSON/PCS1 remains the revisable musical source. The unchanged
 rendered A-H body/tail evidence is a derivative, not a new composition source.
 This subset does not establish platform playback, native-clock/drift/seam
 acceptance, audible SFX clarity or owner listening acceptance.
+
+2026-10-23: the reviewed canonical update adds explicit bounded long-PCM opt-in
+shared by decoder and mixer, retaining legacy 12-second defaults and playback
+semantics. Horde may opt into only its admitted full outdoor main, with exact
+per-clip and aggregate PCM budgets. No synth, streaming decoder or Core fork is
+introduced. Canonical Debug/Release proof is separate from Horde integration,
+platform playback, listening and phone acceptance.

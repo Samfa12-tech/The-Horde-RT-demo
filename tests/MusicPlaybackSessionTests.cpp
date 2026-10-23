@@ -28,7 +28,7 @@ struct Clips
         for (std::size_t cue = 1u; cue < clips.size(); ++cue)
         {
             bodies[cue].resize(kMusicPcmAssets[cue].bodyFrames * 2u);
-            tails[cue].resize(kMusicPcmTailFrames * 2u);
+            tails[cue].resize(kMusicPcmAssets[cue].tailFrames * 2u);
             for (std::size_t i = 0; i < bodies[cue].size(); ++i)
                 bodies[cue][i] = static_cast<std::int16_t>(static_cast<int>((i * 17u + cue * 97u) % 2048u) - 1024);
             for (std::size_t i = 0; i < tails[cue].size(); ++i)
@@ -219,6 +219,87 @@ void TestLoopsPauseAndReset(const Clips& clips)
           "odd output span is rejected before advancing");
 }
 
+void TestOutdoorFullLoopAndLifecycle(const Clips& clips)
+{
+    constexpr auto outdoor = static_cast<std::size_t>(MusicCue::Outdoor);
+    constexpr std::size_t frames = 5'120'000u;
+    constexpr std::size_t legacyFrames = 576'000u;
+    Check(clips.bodies[outdoor].size() == frames * 2u && clips.tails[outdoor].empty(),
+          "synthetic Outdoor has the complete main-loop length and no tail samples");
+    auto input = Input();
+    input.snapshot.developmentRescueJourney = true;
+    input.snapshot.playerAlive = true;
+    input.snapshot.finale.lichDefeated = true;
+    input.snapshot.lich.phase = LichPhase::Dead;
+    input.snapshot.rescue.lanternClaimed = true;
+    input.snapshot.rescue.exteriorSide = input.snapshot.rescue.firstAscentCompleted = true;
+    input.snapshot.dialogueBedGain = .65f;
+    MusicPlaybackSession session(clips.clips);
+    Check(session.Observe(input) == MusicPcmStatus::Ok && session.Selection().cue == MusicCue::Outdoor,
+          "fresh worker attachment selects the loaded exterior main cue directly");
+    const auto revision = session.Selection().revision;
+    RenderFrames(session, input, legacyFrames - 1u);
+    std::array<float, 4u> seam{};
+    Check(session.Render(input, seam) == MusicPcmStatus::Ok &&
+          seam[0] == clips.bodies[outdoor][(legacyFrames - 1u) * 2u] / 32768.0f &&
+          seam[2] == clips.bodies[outdoor][legacyFrames * 2u] / 32768.0f &&
+          session.GeneratedFrames() == legacyFrames + 1u && session.Selection().revision == revision,
+          "actual PCM continues across twelve seconds without aliasing to Outdoor's first frame");
+    RenderFrames(session, input, frames - legacyFrames - 2u);
+    Check(session.Render(input, seam) == MusicPcmStatus::Ok &&
+          seam[0] == clips.bodies[outdoor][(frames - 1u) * 2u] / 32768.0f &&
+          seam[1] == clips.bodies[outdoor][(frames - 1u) * 2u + 1u] / 32768.0f &&
+          seam[2] == clips.bodies[outdoor][0] / 32768.0f &&
+          seam[3] == clips.bodies[outdoor][1] / 32768.0f &&
+          session.GeneratedFrames() == frames + 1u && session.Selection().cue == MusicCue::Outdoor &&
+          session.Selection().revision == revision &&
+          std::abs(session.Selection().positionSeconds - 1.0 / kMusicPcmSampleRate) < .25 / kMusicPcmSampleRate,
+          "one buffer emits Outdoor's last stereo frame then its first, without a fabricated tail or restart");
+    Check(std::abs(session.Selection().revealGain - .65f) < .00001f,
+          "dialogue gain remains separate from the unchanged Outdoor PCM samples");
+    for (const bool externalFocus : {false, true})
+    {
+        input.snapshot.paused = !externalFocus;
+        input.externallySuspended = externalFocus;
+        const auto frozenFrames = session.GeneratedFrames();
+        const auto frozenPosition = session.Selection().positionSeconds;
+        seam.fill(1.0f);
+        Check(session.Render(input, seam) == MusicPcmStatus::Suspended &&
+              std::all_of(seam.begin(), seam.end(), [](float value) { return value == 0.0f; }) &&
+              session.GeneratedFrames() == frozenFrames &&
+              session.Selection().positionSeconds == frozenPosition && session.Selection().revision == revision,
+              "pause or output-focus suspension retains Outdoor content and produces no queued replacement PCM");
+        input.snapshot.paused = input.externallySuspended = false;
+        const auto source = static_cast<std::size_t>(frozenFrames % frames) * 2u;
+        Check(session.Render(input, seam) == MusicPcmStatus::Ok &&
+              seam[0] == clips.bodies[outdoor][source] / 32768.0f &&
+              seam[2] == clips.bodies[outdoor][source + 2u] / 32768.0f &&
+              session.GeneratedFrames() == frozenFrames + 2u && session.Selection().revision == revision,
+              "ordinary resume emits the next unconsumed Outdoor samples without restarting the cue");
+    }
+    input.snapshot.playerAlive = false;
+    seam.fill(1.0f);
+    Check(session.Render(input, seam) == MusicPcmStatus::Ok && session.Selection().cue == MusicCue::None &&
+          std::all_of(seam.begin(), seam.end(), [](float value) { return value == 0.0f; }),
+          "death silences Outdoor instead of leaking prior-loop audio");
+    input.snapshot.playerAlive = true;
+    Check(session.Render(input, seam) == MusicPcmStatus::Ok && session.Selection().cue == MusicCue::Outdoor &&
+          seam[0] == clips.bodies[outdoor][0] / 32768.0f,
+          "living exterior resumes from a fresh Outdoor start without replaying G");
+    ++input.snapshot.retryGeneration;
+    ++input.restartEpoch; // Actual inbox retry publication supplies this restart boundary.
+    Check(session.Observe(input) == MusicPcmStatus::Ok && session.GeneratedFrames() == 0u &&
+          session.Selection().cue == MusicCue::Outdoor && session.Selection().positionSeconds == 0.0,
+          "retry epoch discards previous Outdoor content and reconstructs the loaded-side selection");
+    input.snapshot.rescue.exteriorSide = false;
+    Check(session.Observe(input) == MusicPcmStatus::Ok && session.Selection().cue == MusicCue::F,
+          "worker observes completed tomb return as the existing F interior bed");
+    input.snapshot.rescue.exteriorSide = true;
+    Check(session.Observe(input) == MusicPcmStatus::Ok && session.Selection().cue == MusicCue::Outdoor &&
+          session.Selection().positionSeconds == 0.0,
+          "repeat ascent returns directly to Outdoor without replaying the first-arrival one-shot");
+}
+
 void TestRevealGainPublication(const Clips& clips)
 {
     MusicPlaybackInbox inbox;
@@ -281,6 +362,7 @@ int main()
     TestInboxOverflowAndCoherence();
     TestPreciseOneShots(clips);
     TestLoopsPauseAndReset(clips);
+    TestOutdoorFullLoopAndLifecycle(clips);
     TestRevealGainPublication(clips);
     return passed ? 0 : 1;
 }

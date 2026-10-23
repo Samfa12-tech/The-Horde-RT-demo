@@ -19,6 +19,7 @@ enum class MusicCue : std::uint8_t
     F,
     G,
     H,
+    Outdoor,
 };
 
 struct MusicSelection

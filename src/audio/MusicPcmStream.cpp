@@ -20,7 +20,7 @@ std::array<pocket_audio::PcmClip, kMusicPcmCueCount> CoreClips(
     {
         const auto& asset = kMusicPcmAssets[index];
         if (clips[index].body.size() != asset.bodyFrames * 2u ||
-            clips[index].tail.size() != kMusicPcmTailFrames * 2u)
+            clips[index].tail.size() != asset.tailFrames * 2u)
         {
             return {};
         }
@@ -32,13 +32,13 @@ std::array<pocket_audio::PcmClip, kMusicPcmCueCount> CoreClips(
 bool IsNaturalTailTransition(const MusicCue from, const MusicCue to) noexcept
 {
     return (from == MusicCue::C && to == MusicCue::D) ||
-           (from == MusicCue::G && to == MusicCue::H);
+           (from == MusicCue::G && (to == MusicCue::H || to == MusicCue::Outdoor));
 }
 
 } // namespace
 
 MusicPcmStream::MusicPcmStream(const std::span<const MusicPcmClip> clips) noexcept
-    : core_(CoreClips(clips), kMusicPcmCrossfadeFrames)
+    : core_(CoreClips(clips), kMusicPcmBankLimits, kMusicPcmCrossfadeFrames)
 {
 }
 

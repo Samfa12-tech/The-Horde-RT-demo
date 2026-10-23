@@ -67,16 +67,16 @@ void DirectChapterTransitions() {
           selection.revision == revealRevision, "chapter G lasts through 5.99 seconds of audio content time");
     state.finale.phaseTime = std::numeric_limits<float>::quiet_NaN();
     selection = director.Update(state, {}, arrival + 6.0, 1);
-    Check(selection.cue == MusicCue::H && selection.looping && Near(selection.positionSeconds, 0) &&
+    Check(selection.cue == MusicCue::Outdoor && selection.looping && Near(selection.positionSeconds, 0) &&
           selection.revision > revealRevision, "G hands off at exactly six seconds without legacy phase-time seeking");
     const auto forestRevision = selection.revision;
     state.worldRoute.current = WorldZoneId::Lookout;
     selection = director.Update(state, {}, arrival + 31, 1);
-    Check(selection.cue == MusicCue::H && Near(selection.positionSeconds, 1) &&
-          selection.revision == forestRevision, "forest/lookout updates retain the same twelve-second H loop");
+    Check(selection.cue == MusicCue::Outdoor && Near(selection.positionSeconds, 25) &&
+          selection.revision == forestRevision, "forest/lookout updates retain Outdoor beyond the legacy twelve-second period");
     ++state.worldRoute.generation;
     selection = director.Update(state, {}, arrival + 31.25, 1);
-    Check(selection.cue == MusicCue::H && Near(selection.positionSeconds, 1.25) &&
+    Check(selection.cue == MusicCue::Outdoor && Near(selection.positionSeconds, 25.25) &&
           selection.revision == forestRevision, "terrain readiness generation changes do not restart chapter music");
     state.rescue.exteriorSide = false;
     selection = director.Update(state, {}, arrival + 32, 1);
@@ -84,12 +84,12 @@ void DirectChapterTransitions() {
           "completed return to the tomb selects F instead of a latched showcase H");
     state.rescue.exteriorSide = true;
     selection = director.Update(state, {}, arrival + 33, 1);
-    Check(selection.cue == MusicCue::H && selection.looping,
-          "repeat ascent selects H without replaying the first-arrival G");
+    Check(selection.cue == MusicCue::Outdoor && selection.looping,
+          "repeat ascent selects Outdoor without replaying the first-arrival G");
     for (const bool upper : {false, true}) {
         MusicDirector late;
         selection = late.Update(Chapter(upper), {}, 500, 2);
-        Check(selection.cue == (upper ? MusicCue::H : MusicCue::F) && selection.looping &&
+        Check(selection.cue == (upper ? MusicCue::Outdoor : MusicCue::F) && selection.looping &&
               Near(selection.positionSeconds, 0), "fresh lower/upper attachment reconstructs its bed without a reveal");
     }
 }
@@ -137,13 +137,13 @@ void SuspensionAndInterruptions() {
         Check(selection.cue == MusicCue::G && Near(selection.positionSeconds, 5.99),
               "only resumed content time finishes the remaining G body");
         selection = director.Update(state, {}, 204, 5);
-        Check(selection.cue == MusicCue::H && Near(selection.positionSeconds, 0),
-              "resumed reveal has one exact G-to-H handoff");
+        Check(selection.cue == MusicCue::Outdoor && Near(selection.positionSeconds, 0),
+              "resumed chapter reveal has one exact G-to-Outdoor handoff");
         const auto bedRevision = selection.revision;
         selection = director.Update(state, {}, 205, 5, true);
         selection = director.Update(state, {}, 1000, 5, true);
         selection = director.Update(state, {}, 1100, 5);
-        Check(selection.cue == MusicCue::H && Near(selection.positionSeconds, 0) &&
+        Check(selection.cue == MusicCue::Outdoor && Near(selection.positionSeconds, 0) &&
               selection.revision == bedRevision, "ordinary menu return also preserves the forest-bed cursor and revision");
     }
     MusicDirector director;
@@ -155,7 +155,7 @@ void SuspensionAndInterruptions() {
     Check(selection.cue == MusicCue::F, "early interior return cancels G before its body completes");
     state.rescue.exteriorSide = true;
     selection = director.Update(state, {}, 4, 7);
-    Check(selection.cue == MusicCue::H, "cancelled arrival reveal cannot replay on the next ascent");
+    Check(selection.cue == MusicCue::Outdoor, "cancelled arrival reveal cannot replay on the next ascent");
     state = Chapter(); ++state.retryGeneration;
     selection = director.Update(state, {}, 5, 7);
     const auto retryRevision = selection.revision;
@@ -169,7 +169,7 @@ void SuspensionAndInterruptions() {
     Check(selection.cue == MusicCue::None, "death interrupts the reveal to silence");
     state.playerAlive = true;
     selection = director.Update(state, {}, 8, 7);
-    Check(selection.cue == MusicCue::H, "alive restoration does not resurrect an interrupted reveal");
+    Check(selection.cue == MusicCue::Outdoor, "alive restoration does not resurrect an interrupted reveal");
     state.developmentRescueJourney = false; state.finale.phase = Phase::SkylightOpening; state.finale.phaseTime = 0;
     const auto beforeMode = selection.revision;
     selection = director.Update(state, {}, 9, 7);
@@ -191,7 +191,7 @@ struct Clips {
     Clips() {
         for (std::size_t cue = 1; cue < clips.size(); ++cue) {
             body[cue].assign(kMusicPcmAssets[cue].bodyFrames * 2u, static_cast<std::int16_t>(cue * 100));
-            tail[cue].assign(kMusicPcmTailFrames * 2u, static_cast<std::int16_t>(cue * 10));
+            tail[cue].assign(kMusicPcmAssets[cue].tailFrames * 2u, static_cast<std::int16_t>(cue * 10));
             clips[cue] = {body[cue], tail[cue]};
         }
     }
@@ -233,13 +233,15 @@ void InboxAndSyntheticPcm() {
           session.Selection().revision == revision && packet.restartEpoch == epoch,
           "ordinary resume retains G through its final body sample without a new epoch");
     std::array<float, 4> seam{};
-    Check(session.Render(packet, seam) == MusicPcmStatus::Ok && session.Selection().cue == MusicCue::H &&
+    Check(session.Render(packet, seam) == MusicPcmStatus::Ok && session.Selection().cue == MusicCue::Outdoor &&
           session.GeneratedFrames() == 4800u + 288001u &&
-          Near(seam[0], 700.0 / 32768.0) && Near(seam[2], 870.0 / 32768.0),
-          "one buffer contains exact last G sample then first H plus G tail, without a gap");
-    const auto hRevision = session.Selection().revision;
-    Check(RenderFrames(session, packet, 1000) && session.Selection().cue == MusicCue::H &&
-          session.Selection().revision == hRevision, "stale completed-ascent snapshots cannot restart G");
+          Near(seam[0], 700.0 / 32768.0) &&
+          Near(seam[2], (clips.body[static_cast<std::size_t>(MusicCue::Outdoor)][0] +
+                         clips.tail[static_cast<std::size_t>(MusicCue::G)][0]) / 32768.0),
+          "one buffer contains exact last G sample then first Outdoor plus G tail, without a gap");
+    const auto outdoorRevision = session.Selection().revision;
+    Check(RenderFrames(session, packet, 1000) && session.Selection().cue == MusicCue::Outdoor &&
+          session.Selection().revision == outdoorRevision, "stale completed-ascent snapshots cannot restart G");
     state.tickIndex = 0; old.sequence = 1;
     Check(!inbox.Publish(state, std::span(&old, 1), 42, 0, false),
           "ordinary lower-tick publication cannot impersonate a new queue lifetime");
@@ -247,8 +249,8 @@ void InboxAndSyntheticPcm() {
     packet = inbox.Take();
     Check(packet.restartEpoch > epoch && packet.eventCount == 1 && packet.events[0].sequence == 1 &&
           session.Observe(packet) == MusicPcmStatus::Ok && session.GeneratedFrames() == 0 &&
-          session.Selection().cue == MusicCue::H && session.Selection().revision > hRevision,
-          "explicit queue replacement discards prior high-water and PCM, selecting loaded H without G");
+          session.Selection().cue == MusicCue::Outdoor && session.Selection().revision > outdoorRevision,
+          "explicit queue replacement discards prior high-water and PCM, selecting loaded Outdoor without G");
 }
 
 cp::Checkpoint Record(bool upper) {
@@ -304,13 +306,13 @@ void ActualRopeAndRestores(const std::shared_ptr<const TriangleSupportSurface>& 
     for (unsigned tick = 0; tick < 370; ++tick) {
         sim.StepFixed(input, kTick, ++publication); clock += kTick; selection = observe();
     }
-    Check(selection.cue == MusicCue::H && gStarts == 1, "neutral exterior ticks finish G once on the content clock");
+    Check(selection.cue == MusicCue::Outdoor && gStarts == 1, "neutral exterior ticks finish G once on the content clock");
     Check(sim.PublishWorldZoneReadiness({sim.Snapshot().worldRoute.generation, WorldZoneId::Dungeon}, ZoneReadiness::Ready),
           "actual descent fixture supplies current Dungeon readiness");
     Check(traverse() && !sim.Snapshot().rescue.exteriorSide && selection.cue == MusicCue::F && gStarts == 1,
           "actual completed return descent restores interior F without a reveal replay");
-    Check(traverse() && sim.Snapshot().rescue.exteriorSide && selection.cue == MusicCue::H && gStarts == 1,
-          "actual repeat ascent retains durable first-ascent identity and selects H directly");
+    Check(traverse() && sim.Snapshot().rescue.exteriorSide && selection.cue == MusicCue::Outdoor && gStarts == 1,
+          "actual repeat ascent retains durable first-ascent identity and selects Outdoor directly");
 
     std::array<cp::Checkpoint, 3> records{Record(false), Record(true), Record(true)};
     auto& endpoint = records[2]; endpoint.contentRevision = 2; endpoint.id = cp::CheckpointId::ForestEndpoint;
@@ -328,7 +330,7 @@ void ActualRopeAndRestores(const std::shared_ptr<const TriangleSupportSurface>& 
         }
         ++lifetime; clock += 10;
         selection = observe();
-        const auto expected = saved.id == cp::CheckpointId::LowerClaimed ? MusicCue::F : MusicCue::H;
+        const auto expected = saved.id == cp::CheckpointId::LowerClaimed ? MusicCue::F : MusicCue::Outdoor;
         Check(selection.cue == expected && selection.looping && Near(selection.positionSeconds, 0) && gStarts == 1,
               "committed checkpoint reconstruction starts its bed without replaying a natural-arrival reveal");
         sim.StepFixed(input, kTick, ++publication); clock += kTick; selection = observe();

@@ -337,9 +337,12 @@ if (viewmodelCandidate) {
 
 def hordeMusicRoot = file('../../assets/audio/music/what-the-dark-keeps')
 def hordeMusicManifest = new File(hordeMusicRoot, 'asset.manifest.json')
+def hordeOutdoorMusicRoot = file('../../assets/audio/music/beneath-the-same-moon')
+def hordeOutdoorMusicManifest = new File(hordeOutdoorMusicRoot, 'asset.manifest.json')
 tasks.register('verifyMusicRuntimeAssets') {
     inputs.file hordeMusicManifest
     inputs.dir new File(hordeMusicRoot, 'runtime')
+    inputs.dir hordeOutdoorMusicRoot
     doLast {
         def digest = { File input -> MessageDigest.getInstance('SHA-256').digest(input.bytes).encodeHex().toString() }
         if (digest(hordeMusicManifest) != '672f2321b2fb429cffe9d61119103a1aa3565f355391a162497f741eec9d6e29') {
@@ -384,6 +387,44 @@ tasks.register('verifyMusicRuntimeAssets') {
         if (actualPaths != expectedPaths || waveBytes != 20160704 || pcmBytes != 20160000 ||
             manifest.totalWaveBytes != waveBytes || manifest.totalPcmBytes != pcmBytes) {
             throw new GradleException('Music runtime inventory or byte budget disagrees; no unknown assets may be packaged.')
+        }
+
+        // Independent outdoor pin; the accepted A-H manifest and 17-file roster
+        // above remain unchanged. Only the approved full main enters packages.
+        if (!hordeOutdoorMusicManifest.isFile() ||
+            digest(hordeOutdoorMusicManifest) != '5318990386a47c7ef815cfcd5165e779bd01b0994cdca3f76926882d1d4e1657') {
+            throw new GradleException('Outdoor music manifest differs from the reviewed admission pin.')
+        }
+        def outdoor = new JsonSlurper().parse(hordeOutdoorMusicManifest, 'UTF-8')
+        if (outdoor.schemaVersion != 1 || outdoor.assetId != 'beneath-the-same-moon' ||
+            outdoor.rights != 'Owner-supplied; authorised for Horde use only' ||
+            outdoor.format.encoding != 'PCM16_LE' || outdoor.format.sampleRate != 48000 ||
+            outdoor.format.channels != 2 || outdoor.tailFrames != 0 ||
+            outdoor.crossfadeFrames != 12000 || outdoor.totalWaveBytes != 20480044 ||
+            outdoor.totalPcmBytes != 20480000 || outdoor.cues.size() != 1) {
+            throw new GradleException('Outdoor music rights, format or main-only budget disagrees.')
+        }
+        def outdoorCue = outdoor.cues[0]
+        def outdoorWaveHash = '14fe0a94e665cf25b4fb4aa08a45e26e18990794740b670906adfecfaf6aee15'
+        if (outdoorCue.cue != 'Outdoor' || outdoorCue.looping != true || outdoorCue.tail != null ||
+            outdoorCue.body.path != 'runtime/outdoor-main.wav' || outdoorCue.body.frames != 5120000 ||
+            outdoorCue.body.bytes != 20480044 || outdoorCue.body.sha256 != outdoorWaveHash) {
+            throw new GradleException('Outdoor music must retain the full main loop without a quiet mix or tail.')
+        }
+        def outdoorWave = new File(hordeOutdoorMusicRoot, 'runtime/outdoor-main.wav')
+        if (!outdoorWave.isFile() || outdoorWave.length() != 20480044 || digest(outdoorWave) != outdoorWaveHash) {
+            throw new GradleException('Outdoor music runtime identity differs.')
+        }
+        def outdoorFiles = fileTree(hordeOutdoorMusicRoot).files.collect {
+            hordeOutdoorMusicRoot.toPath().relativize(it.toPath()).toString().replace('\\', '/')
+        } as Set
+        if (outdoorFiles != (['asset.manifest.json', 'METADATA.md', 'runtime/outdoor-main.wav'] as Set)) {
+            throw new GradleException('Outdoor music closed inventory excludes source originals, quiet mixes and unknown files.')
+        }
+        def outdoorMetadata = new File(hordeOutdoorMusicRoot, 'METADATA.md').getText('UTF-8')
+        if (!outdoorMetadata.contains('Owner-supplied; authorised for Horde use only') ||
+            !outdoorMetadata.contains('source originals are excluded from game packages')) {
+            throw new GradleException('Outdoor music metadata must preserve source exclusion and rights.')
         }
     }
 }
@@ -535,6 +576,8 @@ tasks.register('prepareRuntimeAssets', Sync) {
         include 'textures/environment/runtime/asset.manifest.json'
         include 'audio/music/what-the-dark-keeps/asset.manifest.json'
         include 'audio/music/what-the-dark-keeps/runtime/*.wav'
+        include 'audio/music/beneath-the-same-moon/asset.manifest.json'
+        include 'audio/music/beneath-the-same-moon/runtime/outdoor-main.wav'
     }
     from('../..') {
         include 'ASSET_LICENSES.md'
