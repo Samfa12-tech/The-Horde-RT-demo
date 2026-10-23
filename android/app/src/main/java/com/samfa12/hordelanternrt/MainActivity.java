@@ -269,6 +269,7 @@ public class MainActivity extends Activity {
     private boolean controllerMode, controllerFrameScheduled;
     private long debugContextualGeneration = -1;
     private int debugContextualBits = Integer.MIN_VALUE, debugContextualGates = -1;
+    private String lastHudLayoutWitness;
     private Configuration lastAppliedConfiguration;
     private boolean controllerWindowFocused = true;
     private long controllerFrameTime;
@@ -588,6 +589,15 @@ public class MainActivity extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_main);
+        final View hudRoot=findViewById(R.id.root);
+        hudRoot.setOnApplyWindowInsetsListener((view,insets) -> {
+            view.post(this::applyInterfacePresentation);
+            return insets;
+        });
+        hudRoot.addOnLayoutChangeListener((view,l,t,r,b,ol,ot,or,ob) -> {
+            if(r-l!=or-ol || b-t!=ob-ot)view.post(this::applyInterfacePresentation);
+        });
+        hudRoot.requestApplyInsets();
         lastAppliedConfiguration = new Configuration(getResources().getConfiguration());
         preferences = getSharedPreferences(PREFS, MODE_PRIVATE);
         applyCombatTeachingOptions(CombatTeachingPreferences.read(preferences));
@@ -4890,13 +4900,11 @@ public class MainActivity extends Activity {
             button.setLayoutParams(new LinearLayout.LayoutParams(Math.max(nominal.width,button.getMeasuredWidth()),
                     Math.max(nominal.height,button.getMeasuredHeight())));
         }
-        addInterfacePreviewPair(preview,light,interact,available);
-        final LinearLayout dodgeRow=new LinearLayout(this);
-        dodgeRow.setGravity(Gravity.END);
-        dodgeRow.addView(dodge);
-        final LinearLayout.LayoutParams dodgeLayout=matchWrap();
-        dodgeLayout.topMargin=dp(12);
-        preview.addView(dodgeRow,dodgeLayout);
+        final LinearLayout contextRow=new LinearLayout(this);
+        contextRow.setGravity(Gravity.END);
+        contextRow.addView(interact);
+        preview.addView(contextRow,matchWrap());
+        addInterfacePreviewPair(preview,light,dodge,available);
         addInterfacePreviewPair(preview,parry,swing,available);
     }
 
@@ -4923,28 +4931,27 @@ public class MainActivity extends Activity {
     private void applyInterfacePresentation() {
         if(preferences==null || attackButton==null || parryButton==null || interactButton==null || toggleHeldLightPoseButton==null) return;
         final InterfacePreferences.Values v=InterfacePreferences.read(preferences);
-        final WindowInsets insets=menuScrim==null?null:menuScrim.getRootWindowInsets();
-        int safeLeft=0,safeRight=0,safeTop=0,safeBottom=0;
-        if(insets!=null) {
-            safeLeft=insets.getStableInsetLeft(); safeRight=insets.getStableInsetRight();
-            safeTop=insets.getStableInsetTop(); safeBottom=insets.getStableInsetBottom();
-            if(Build.VERSION.SDK_INT>=28 && insets.getDisplayCutout()!=null) {
-                safeLeft=Math.max(safeLeft,insets.getDisplayCutout().getSafeInsetLeft());
-                safeRight=Math.max(safeRight,insets.getDisplayCutout().getSafeInsetRight());
-                safeTop=Math.max(safeTop,insets.getDisplayCutout().getSafeInsetTop());
-                safeBottom=Math.max(safeBottom,insets.getDisplayCutout().getSafeInsetBottom());
+        final View root=findViewById(R.id.root);
+        final android.graphics.Rect safe=HudSafeArea.read(root);
+        final int safeLeft=safe.left,safeRight=safe.right,safeTop=safe.top,safeBottom=safe.bottom;
+        final int width=root!=null && root.getWidth()>0?root.getWidth():getResources().getDisplayMetrics().widthPixels;
+        if(BuildConfig.DEBUG && root!=null) {
+            int[] position=new int[2];root.getLocationOnScreen(position);
+            String witness="parent="+position[0]+","+position[1]+","+width+","+root.getHeight()+" insets="+safe;
+            if(!witness.equals(lastHudLayoutWitness)) {
+                Log.i("HordeHudLayout",witness);lastHudLayoutWitness=witness;
             }
         }
         if(controllerPrompt!=null) {
             FrameLayout.LayoutParams p=(FrameLayout.LayoutParams)controllerPrompt.getLayoutParams();
             p.leftMargin=dp(16)+safeLeft; p.rightMargin=dp(16)+safeRight; p.bottomMargin=dp(16)+safeBottom;
             controllerPrompt.setLayoutParams(p);
-            controllerPrompt.setMaxWidth(Math.max(dp(48),getResources().getDisplayMetrics().widthPixels-safeLeft-safeRight-dp(32)));
+            controllerPrompt.setMaxWidth(Math.max(dp(48),width-safeLeft-safeRight-dp(32)));
             controllerPrompt.setMaxLines(Integer.MAX_VALUE);
             controllerPrompt.setBackground(HordeUiTokens.plate(this,interfaceBacking(v,HordeUiTokens.CHARCOAL),HordeUiTokens.IRON,1));
         }
         UiControlLayout.apply(this,v,attackButton,parryButton,dodgeButton,interactButton,toggleHeldLightPoseButton,
-                safeRight,safeBottom,getResources().getDisplayMetrics().widthPixels-safeLeft);
+                safeRight,safeBottom,width);
         styleGameplayActionButton(attackButton,interfaceBacking(v,HordeUiTokens.CHARCOAL),HordeUiTokens.PARCHMENT,false);
         for(Button b:new Button[]{parryButton,dodgeButton,interactButton})
             if(b!=null) styleGameplayActionButton(b,interfaceBacking(v,HordeUiTokens.SLATE),HordeUiTokens.PARCHMENT,false);
@@ -4959,7 +4966,7 @@ public class MainActivity extends Activity {
             p.gravity=Gravity.TOP|Gravity.START; p.setMarginStart(dp(16)+safeLeft); p.topMargin=dp(16)+safeTop;
             p.height=FrameLayout.LayoutParams.WRAP_CONTENT; vitalityStatus.setLayoutParams(p);
             vitalityStatus.setPadding(dp(10),dp(8),dp(10),dp(8)); vitalityStatus.setTextSize(12);
-            vitalityStatus.setMaxWidth(Math.max(dp(42),getResources().getDisplayMetrics().widthPixels-safeLeft-safeRight-dp(128)));
+            vitalityStatus.setMaxWidth(Math.max(dp(42),width-safeLeft-safeRight-dp(128)));
             updateVitalityHud(lastPlayerVitality, lastPlayerMaxVitality);
             vitalityStatus.setBackground(HordeUiTokens.plate(this,interfaceBacking(v,HordeUiTokens.CHARCOAL),HordeUiTokens.IRON,1));
         }
@@ -4969,12 +4976,11 @@ public class MainActivity extends Activity {
         if(rtStatus==null) return;
         FrameLayout.LayoutParams p=(FrameLayout.LayoutParams)rtStatus.getLayoutParams();
         int gravity=compact?Gravity.TOP|Gravity.END:Gravity.TOP|Gravity.CENTER_HORIZONTAL;
-        if(p.gravity!=gravity || p.height!=(compact?dp(48):-2)) {
+        android.graphics.Rect safe=HudSafeArea.read(findViewById(R.id.root));
+        int top=dp(compact?64:16)+safe.top,right=compact?dp(16)+safe.right:0;
+        if(p.gravity!=gravity || p.height!=(compact?dp(48):-2) || p.topMargin!=top || p.getMarginEnd()!=right) {
             p.gravity=gravity; p.height=compact?dp(48):-2; p.width=-2;
-            int top=dp(compact?64:16),right=0;
-            WindowInsets insets=rtStatus.getRootWindowInsets();
-            if(insets!=null) { top+=insets.getStableInsetTop(); right=insets.getStableInsetRight(); }
-            p.topMargin=top; p.setMarginEnd(compact?dp(16)+right:0); rtStatus.setLayoutParams(p);
+            p.topMargin=top; p.setMarginEnd(right); rtStatus.setLayoutParams(p);
         }
         rtStatus.setMinWidth(dp(compact?48:260)); rtStatus.setMaxWidth(dp(compact?80:360));
         rtStatus.setTextSize(compact?12:13);
@@ -7185,6 +7191,7 @@ public class MainActivity extends Activity {
         button.setStateListAnimator(null);
         button.setTextColor(HordeUiTokens.label(text));
         button.setMinHeight(dp(48));
+        if(!circular && button.getId()!=R.id.interact_button)button.setPadding(dp(6),0,dp(6),0);
     }
     private LinearLayout.LayoutParams matchWrap() {
         return new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);

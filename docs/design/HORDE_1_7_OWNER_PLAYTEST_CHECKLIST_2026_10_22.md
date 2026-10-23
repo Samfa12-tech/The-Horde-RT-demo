@@ -1,5 +1,32 @@
 # Horde 1.7 owner playtest checklist - 22 October 2026
 
+## Compact action dock and latest device boundary - 23 October
+
+The owner/parent visual review confirmed that the prior lantern target occupied
+movement/look space. The [compact dock](../evidence/2026-10-23-compact-hud/README.md)
+now groups lantern with Dodge above Parry/Swing, retains physical target/label
+requirements and converts window safe insets once into the actual parent basis.
+Full Android unit/build/lint passes:417 discovered,411 pass, six existing Windows
+link-assumption skips. Native component renders are inspected in both orientations.
+Actual candidate phone captures, rotation/inset continuity and thumb comfort remain
+pending: the phone disconnected before the first snapshot, with no installation,
+setting/input/save write or renderer started. No repeated reconnect loop is running.
+
+The earlier b08aef65 batch DID rotate and fully rebind the same staged-lantern
+process without reseeding; ownership and the contextual control recovered. This
+does not reproduce or explain the original failure and is not natural earned
+equipment acceptance. Original APKs, all18 save/lock files and preferences were
+verified restored at10:15:24UTC. Its actual screenshots/bounds remain the baseline.
+
+Windows CI selection simplification is separately backed up at e5868b9a; its
+exact-head run39939186296 is monitored to terminal without altering the15-minute
+cap or removing native/compiler-specific coverage. Routine backups remain approved.
+Next approved mesh slice is world body only with first-person arms unchanged,
+then an independent Kit candidate preserving conversational face/silhouette.
+Skin/critical-path/frame times and actual look-down/shadow/reflection comparisons
+must support admission. Forest deferral, parked chimney, recovery policy, PR
+conflicts, Debug deadline and physical release acceptance are unchanged.
+
 ## Lantern rotation diagnosis and Android camera repair - 23 October
 
 The [combined continuity checkpoint](../evidence/2026-10-23-lantern-rotation/README.md)

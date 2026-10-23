@@ -3,6 +3,8 @@ import android.content.Context;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.view.Gravity;
+import android.graphics.Paint;
+import android.util.TypedValue;
 
 /** Reserved action/context slots. Hidden context buttons never move the combat buttons. */
 final class UiControlLayout {
@@ -13,25 +15,42 @@ final class UiControlLayout {
     static void apply(Context c,InterfacePreferences.Values v,Button swing,Button parry,Button dodge,
                       Button interact,Button light,int safeRight,int safeBottom,int availableWidth) {
         float scale=v.scale/100f;
-        int primaryWidth=HordeUiTokens.dp(c,Math.round((v.compact?88:104)*scale));
-        int primaryHeight=HordeUiTokens.dp(c,Math.round((v.compact?64:72)*scale));
+        int primaryWidth=HordeUiTokens.dp(c,Math.round((v.compact?72:80)*scale));
+        int primaryHeight=HordeUiTokens.dp(c,Math.round((v.compact?52:56)*scale));
         int contextWidth=HordeUiTokens.dp(c,Math.round((v.compact?112:128)*scale));
         int contextHeight=HordeUiTokens.dp(c,Math.round((v.compact?56:60)*scale));
-        int gap=HordeUiTokens.dp(c,12), edge=HordeUiTokens.dp(c,24)+safeRight;
+        int gap=HordeUiTokens.dp(c,8), edge=HordeUiTokens.dp(c,12)+safeRight;
         int minimum=HordeUiTokens.dp(c,48);
-        int maximum=Math.max(minimum,(availableWidth-edge-HordeUiTokens.dp(c,16)-gap)/2);
-        primaryWidth=Math.max(minimum,Math.min(primaryWidth,maximum));
-        contextWidth=Math.max(minimum,Math.min(contextWidth,maximum));
-        int bottom=HordeUiTokens.dp(c,32)+safeBottom;
-        place(swing,primaryWidth,Math.max(minimum,primaryHeight),edge,bottom);
-        place(parry,primaryWidth,Math.max(minimum,primaryHeight),edge+primaryWidth+gap,bottom);
-        int above=bottom+Math.max(minimum,primaryHeight)+gap;
-        if(dodge!=null) {
-            place(dodge,primaryWidth,Math.max(minimum,primaryHeight),edge,above);
-            above+=Math.max(minimum,primaryHeight)+gap;
+        // Keep deliberate actions in the right half. The left movement half
+        // and the open look area above the cluster are interaction space.
+        int maximum=Math.max(minimum,(availableWidth/2-edge-gap)/2);
+        int labelMinimum=minimum;
+        for(Button action:new Button[]{swing,parry,dodge})if(action!=null) {
+            Paint label=new Paint(action.getPaint());
+            label.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,10,c.getResources().getDisplayMetrics()));
+            labelMinimum=Math.max(labelMinimum,(int)Math.ceil(label.measureText(action.getText().toString()))+HordeUiTokens.dp(c,12)+2);
         }
+        // At large system fonts in a narrow window, retain complete labels and
+        // the movement half by stacking primary actions within the same dock.
+        boolean stacked=dodge!=null && labelMinimum>maximum;
+        primaryWidth=Math.max(minimum,Math.min(Math.max(primaryWidth,labelMinimum),maximum));
+        if(stacked)primaryWidth=Math.min(availableWidth/2-edge,Math.max(primaryWidth,labelMinimum));
+        contextWidth=Math.max(minimum,Math.min(contextWidth,availableWidth/2-edge));
+        if(dodge==null)contextWidth=Math.min(contextWidth,primaryWidth);
+        int bottom=HordeUiTokens.dp(c,16)+safeBottom;
+        place(swing,primaryWidth,Math.max(minimum,primaryHeight),edge,bottom);
+        place(parry,primaryWidth,Math.max(minimum,primaryHeight),stacked?edge:edge+primaryWidth+gap,
+                stacked?bottom+Math.max(minimum,primaryHeight)+gap:bottom);
+        int above=bottom+Math.max(minimum,primaryHeight)+gap;
+        if(stacked)above+=Math.max(minimum,primaryHeight)+gap;
+        int lightSize=HordeUiTokens.dp(c,56);
+        int rowHeight=Math.max(Math.max(minimum,primaryHeight),lightSize);
+        if(dodge!=null) {
+            place(dodge,primaryWidth,Math.max(minimum,primaryHeight),edge,above+(rowHeight-Math.max(minimum,primaryHeight))/2);
+        }
+        place(light,lightSize,lightSize,edge+primaryWidth+gap+(stacked?0:(primaryWidth-lightSize)/2),above+(rowHeight-lightSize)/2);
+        if(dodge!=null) above+=rowHeight+gap;
         place(interact,contextWidth,Math.max(minimum,contextHeight),edge,above);
-        place(light,contextWidth,Math.max(minimum,contextHeight),edge+contextWidth+gap,above);
     }
     static void applyStance(Context c,InterfacePreferences.Values v,Button run,Button crouch,int safeLeft,int safeBottom,
                             int availableWidth,Button... combatControls) {

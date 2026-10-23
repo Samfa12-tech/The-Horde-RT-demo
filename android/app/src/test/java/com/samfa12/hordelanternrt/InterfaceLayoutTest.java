@@ -94,7 +94,7 @@ public final class InterfaceLayoutTest {
                     final String configuration="font="+font+" compact="+compact+" scale="+scale+" width="+width;
                     assertEquals(configuration,3,preview.getChildCount());
                     assertEquals("middle reserved action row",activity.getString(R.string.dodge),
-                            ((Button)((LinearLayout)preview.getChildAt(1)).getChildAt(0)).getText().toString());
+                            ((Button)((LinearLayout)preview.getChildAt(1)).getChildAt(1)).getText().toString());
                     for(int rowIndex=0;rowIndex<3;++rowIndex) {
                         LinearLayout row=(LinearLayout)preview.getChildAt(rowIndex);
                         paired|=row.getOrientation()==LinearLayout.HORIZONTAL;
@@ -117,7 +117,7 @@ public final class InterfaceLayoutTest {
                             assertFalse(button.isClickable()); assertFalse(button.isFocusable());
                         }
                     }
-                    Button interact=(Button)((ViewGroup)preview.getChildAt(0)).getChildAt(1);
+                    Button interact=(Button)((ViewGroup)preview.getChildAt(0)).getChildAt(0);
                     assertEquals(activity.getString(R.string.interact),interact.getText().toString());
                     assertEquals(font,activity.getResources().getConfiguration().fontScale,0);
                 }

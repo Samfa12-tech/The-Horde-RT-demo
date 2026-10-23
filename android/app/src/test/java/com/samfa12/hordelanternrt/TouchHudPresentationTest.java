@@ -113,7 +113,7 @@ public final class TouchHudPresentationTest {
                         assertTrue(bounds[i].left>=8 && bounds[i].right<=size[0]-20 && bounds[i].top>=0 && bounds[i].bottom<=size[1]-24);
                         assertNotNull(b.getContentDescription());assertTrue(b.getContentDescription().length()>0);
                         if(candidate && i<4) {
-                            assertEquals(1,b.getLayout().getLineCount());
+                            assertEquals("label="+b.getText()+" width="+b.getWidth()+" textSize="+b.getTextSize(),1,b.getLayout().getLineCount());
                             assertEquals(0,b.getLayout().getEllipsisCount(0));
                             assertTrue("full action label must fit inside rounded face: "+b.getText(),
                                     b.getLayout().getLineWidth(0)<=b.getWidth()-b.getCompoundPaddingLeft()-b.getCompoundPaddingRight()+1);

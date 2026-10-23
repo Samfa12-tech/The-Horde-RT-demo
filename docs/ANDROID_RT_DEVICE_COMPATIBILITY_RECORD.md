@@ -3609,3 +3609,28 @@ Player-copy APK was not installed. No denied config read, permissions change or
 extra retry. Released07:04:48UTC with both original APKs,18 save/lock files,
 preferences and rotation/font verified; no active renderer/trace/transfer.
 [Recovered profile and exact custody](evidence/2026-10-23-phone-scheduling/README.md).
+
+### 23 October 2026: staged lantern continuity and touch-placement baseline
+
+**SM-S948B, Android17/API37**, owner font1.7, effective560 dpi. Evidence class:
+bounded actual RT staged-equipment lifecycle and native Android HUD captures,
+not natural earned progression, performance or owner comfort acceptance.
+Source b08aef65, ordinary default-ABI Debug APK194,755,843 bytes, SHA-256
+`2b745081d334a7f9e6ab59c3c092bccf3aa9989ce3eae2fbc876b78ab3ba1f31`.
+Fixture116 was staged once; foreground rotation and Home/full-surface-rebind
+returns in both orientations retained native claimed light/pose and restored the
+Java control through its ordinary poll. No restaging between those checks.
+The earlier disappearance remains retained and unreproduced, not declared fixed.
+
+Actual portrait/landscape images exposed poor placement and inconsistent prior
+inset anchoring. The subsequent compact-layout APK
+`3c19e74b1e34369e3208068e4c9dc19337d3d4298d0ef2365a09ed0314a4ded3`
+has host unit/build/lint evidence only: the phone disconnected before its first
+snapshot, so it was not installed and has no physical after/rotation acceptance.
+The [layout receipt and actual before bounds](evidence/2026-10-23-compact-hud/README.md)
+separate these evidence classes.
+
+Baseline phone released10:15:24UTC: both original installed APK hashes, all18
+prior save/lock files, preference bytes and rotation/settings verified restored;
+no app PID, Horde surface, owned capture/install/transfer remained. The later
+disconnected attempt started no phone mutation or renderer.

@@ -1,0 +1,318 @@
+[
+  {
+    "capture": "portrait-initial",
+    "pngBytes": 3575421,
+    "pngSha256": "de4fab15493b27d11895409749e134a3ca2ed93ce0c0c0dbc826252d2d13ab11",
+    "rotation": "0",
+    "windowBounds": "[0,149][1440,3120]",
+    "nodes": {
+      "scene_surface": {
+        "bounds": [
+          0,
+          149,
+          1440,
+          3120
+        ],
+        "description": "Horde Lantern RT Alpha",
+        "text": ""
+      },
+      "vitality_status": {
+        "bounds": [
+          56,
+          205,
+          385,
+          357
+        ],
+        "description": "Vitality 3 of 3",
+        "text": ""
+      },
+      "menu_button": {
+        "bounds": [
+          1132,
+          205,
+          1384,
+          373
+        ],
+        "description": "MENU",
+        "text": "MENU"
+      },
+      "toggle_held_light_pose_button": {
+        "bounds": [
+          670,
+          2056,
+          866,
+          2252
+        ],
+        "description": "LOWER. Lantern raised.",
+        "text": ""
+      },
+      "dodge_button": {
+        "bounds": [
+          992,
+          2294,
+          1356,
+          2546
+        ],
+        "description": "DODGE",
+        "text": "DODGE"
+      },
+      "parry_button": {
+        "bounds": [
+          586,
+          2588,
+          950,
+          2840
+        ],
+        "description": "PARRY",
+        "text": "PARRY"
+      },
+      "attack_button": {
+        "bounds": [
+          992,
+          2588,
+          1356,
+          2840
+        ],
+        "description": "SWING",
+        "text": "SWING"
+      }
+    }
+  },
+  {
+    "capture": "landscape-live-rotation",
+    "pngBytes": 4229963,
+    "pngSha256": "1a59941d13aa56a31ae552100c0792f70c95fddf11776ec9dbe047420a86baab",
+    "rotation": "1",
+    "windowBounds": "[139,0][3120,1440]",
+    "nodes": {
+      "scene_surface": {
+        "bounds": [
+          139,
+          0,
+          3120,
+          1440
+        ],
+        "description": "Horde Lantern RT Alpha",
+        "text": ""
+      },
+      "vitality_status": {
+        "bounds": [
+          195,
+          56,
+          524,
+          208
+        ],
+        "description": "Vitality 3 of 3",
+        "text": ""
+      },
+      "menu_button": {
+        "bounds": [
+          2812,
+          56,
+          3064,
+          224
+        ],
+        "description": "MENU",
+        "text": "MENU"
+      },
+      "toggle_held_light_pose_button": {
+        "bounds": [
+          2350,
+          376,
+          2546,
+          572
+        ],
+        "description": "LOWER. Lantern raised.",
+        "text": ""
+      },
+      "dodge_button": {
+        "bounds": [
+          2672,
+          614,
+          3036,
+          866
+        ],
+        "description": "DODGE",
+        "text": "DODGE"
+      },
+      "parry_button": {
+        "bounds": [
+          2266,
+          908,
+          2630,
+          1160
+        ],
+        "description": "PARRY",
+        "text": "PARRY"
+      },
+      "attack_button": {
+        "bounds": [
+          2672,
+          908,
+          3036,
+          1160
+        ],
+        "description": "SWING",
+        "text": "SWING"
+      }
+    }
+  },
+  {
+    "capture": "portrait-full-rebind",
+    "pngBytes": 3573646,
+    "pngSha256": "d58ee81836cd8c60aff41d9f553ad4f100262b9e31433e04dc22d7f4f7cbd2e9",
+    "rotation": "0",
+    "windowBounds": "[0,149][1440,3120]",
+    "nodes": {
+      "scene_surface": {
+        "bounds": [
+          0,
+          149,
+          1440,
+          3120
+        ],
+        "description": "Horde Lantern RT Alpha",
+        "text": ""
+      },
+      "vitality_status": {
+        "bounds": [
+          56,
+          310,
+          385,
+          462
+        ],
+        "description": "Vitality 3 of 3",
+        "text": ""
+      },
+      "menu_button": {
+        "bounds": [
+          964,
+          310,
+          1216,
+          478
+        ],
+        "description": "MENU",
+        "text": "MENU"
+      },
+      "toggle_held_light_pose_button": {
+        "bounds": [
+          502,
+          2224,
+          698,
+          2420
+        ],
+        "description": "LOWER. Lantern raised.",
+        "text": ""
+      },
+      "dodge_button": {
+        "bounds": [
+          824,
+          2462,
+          1188,
+          2714
+        ],
+        "description": "DODGE",
+        "text": "DODGE"
+      },
+      "parry_button": {
+        "bounds": [
+          418,
+          2756,
+          782,
+          3008
+        ],
+        "description": "PARRY",
+        "text": "PARRY"
+      },
+      "attack_button": {
+        "bounds": [
+          824,
+          2756,
+          1188,
+          3008
+        ],
+        "description": "SWING",
+        "text": "SWING"
+      }
+    }
+  },
+  {
+    "capture": "landscape-full-rebind",
+    "pngBytes": 4229800,
+    "pngSha256": "885d0eea467b6925f3cff55ce26c9fc8166eeff8ffc86f50528ad0be02a97eef",
+    "rotation": "1",
+    "windowBounds": "[139,0][3120,1440]",
+    "nodes": {
+      "scene_surface": {
+        "bounds": [
+          139,
+          0,
+          3120,
+          1440
+        ],
+        "description": "Horde Lantern RT Alpha",
+        "text": ""
+      },
+      "vitality_status": {
+        "bounds": [
+          195,
+          56,
+          524,
+          208
+        ],
+        "description": "Vitality 3 of 3",
+        "text": ""
+      },
+      "menu_button": {
+        "bounds": [
+          2812,
+          56,
+          3064,
+          224
+        ],
+        "description": "MENU",
+        "text": "MENU"
+      },
+      "toggle_held_light_pose_button": {
+        "bounds": [
+          2350,
+          376,
+          2546,
+          572
+        ],
+        "description": "LOWER. Lantern raised.",
+        "text": ""
+      },
+      "dodge_button": {
+        "bounds": [
+          2672,
+          614,
+          3036,
+          866
+        ],
+        "description": "DODGE",
+        "text": "DODGE"
+      },
+      "parry_button": {
+        "bounds": [
+          2266,
+          908,
+          2630,
+          1160
+        ],
+        "description": "PARRY",
+        "text": "PARRY"
+      },
+      "attack_button": {
+        "bounds": [
+          2672,
+          908,
+          3036,
+          1160
+        ],
+        "description": "SWING",
+        "text": "SWING"
+      }
+    }
+  }
+]
