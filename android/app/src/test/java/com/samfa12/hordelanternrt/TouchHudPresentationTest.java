@@ -39,9 +39,10 @@ public final class TouchHudPresentationTest {
     }
     @Test public void savedBackingOpacityActuallyReachesTheWorldAndCornersStayClear() {
         Context c=RuntimeEnvironment.getApplication();
-        for(int percent:new int[]{55,70,95}) for(boolean circle:new boolean[]{false,true}) {
+        for(int percent:new int[]{55,70,95}) for(boolean circle:new boolean[]{false,true}) for(boolean combat:new boolean[]{false,true}) {
             int alpha=Math.round(percent*255/100f),width=circle?56:104,height=circle?56:72;
-            Drawable next=HordeUiTokens.touchButton(c,(alpha<<24)|0x00151719,circle);
+            Drawable next=combat?new TouchButtonDrawable((alpha<<24)|0x00151719,c.getResources().getDisplayMetrics().density,circle,true)
+                    :HordeUiTokens.touchButton(c,(alpha<<24)|0x00151719,circle);
             next.setState(new int[]{android.R.attr.state_enabled});
             Bitmap image=draw(next,width,height);
             assertEquals("no hidden opaque underlay",alpha,Color.alpha(image.getPixel(width/2,height/2)));
@@ -101,7 +102,7 @@ public final class TouchHudPresentationTest {
                         if(candidate)newStyle.invoke(activity,b,0xB324272A,HordeUiTokens.PARCHMENT,i==4);
                         else oldStyle.invoke(activity,b,0xB324272A,HordeUiTokens.PARCHMENT);
                         b.setOnClickListener(view->calls.incrementAndGet());
-                        if(i<4)b.setContentDescription(b.getText());
+                        if(i<4)b.setContentDescription(activity.getString(new int[]{R.string.swing,R.string.parry,R.string.dodge,R.string.interact}[i]));
                     }
                     root.measure(View.MeasureSpec.makeMeasureSpec(size[0],View.MeasureSpec.EXACTLY),
                             View.MeasureSpec.makeMeasureSpec(size[1],View.MeasureSpec.EXACTLY));

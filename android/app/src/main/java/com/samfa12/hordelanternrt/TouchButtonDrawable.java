@@ -13,11 +13,15 @@ final class TouchButtonDrawable extends Drawable {
     private final RectF face = new RectF();
     private final int normalFill;
     private final float unit;
-    private final boolean circular;
+    private final boolean circular, combat;
     private int alpha = 255;
     private boolean enabled = true, pressed, focused, selected, activated;
 
     TouchButtonDrawable(int fill, float density, boolean circular) {
+        this(fill,density,circular,false);
+    }
+    TouchButtonDrawable(int fill,float density,boolean circular,boolean combat) {
+        this.combat=combat;
         normalFill = fill;
         unit = Math.max(.75f, density);
         this.circular = circular;
@@ -44,9 +48,9 @@ final class TouchButtonDrawable extends Drawable {
         // A thin solid rim keeps contrast; there is no opaque plate under the face.
         final boolean outlined = focused || selected;
         paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth((outlined ? 2.2f : 1.0f) * unit);
+        paint.setStrokeWidth((outlined ? (combat?3f:2.2f) : (combat?2f:1f)) * unit);
         paint.setColor(color(!enabled ? HordeUiTokens.IRON :
-                outlined || pressed ? 0xFFFFE8B7 : activated ? HordeUiTokens.BRASS : 0xC8CFA96A));
+                outlined || pressed ? 0xFFFFE8B7 : combat ? HordeUiTokens.PARCHMENT : activated ? HordeUiTokens.BRASS : 0xC8CFA96A));
         canvas.drawRoundRect(face, radius, radius, paint);
         if (outlined) {
             face.inset(3.5f * unit, 3.5f * unit);

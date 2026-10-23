@@ -176,4 +176,50 @@ public final class GameplayTouchCancellationTest {
         }
         assertEquals(2,Bridge.attacks); assertEquals(2,Bridge.parries); assertEquals(2,Bridge.dodges);
     }
+    private static void dispatch(FrameLayout root,long start,int action,float x,float y) {
+        MotionEvent e=MotionEvent.obtain(start,start+10,action,x,y,0);
+        try {assertTrue(root.dispatchTouchEvent(e));} finally {e.recycle();}
+    }
+    @Test public void realDispatchKeepsLookAndCombatWithTheirStartingTargetAcrossTheNewArc() throws Exception {
+        for(int[] size:new int[][]{{320,568},{411,801},{804,381}}) {
+            MainActivity a=prepare();Bridge.attacks=Bridge.parries=Bridge.dodges=0;
+            FrameLayout root=new FrameLayout(a);
+            SurfaceView surface=(SurfaceView)field("surfaceView").get(a);
+            root.addView(surface,new FrameLayout.LayoutParams(-1,-1));
+            Button swing=(Button)field("attackButton").get(a),parry=(Button)field("parryButton").get(a),
+                dodge=(Button)field("dodgeButton").get(a),interact=(Button)field("interactButton").get(a),
+                light=(Button)field("toggleHeldLightPoseButton").get(a);
+            // A deterministic one-pixel-per-dp context for layout/dispatch only.
+            a.getResources().getDisplayMetrics().density=1;
+            a.getResources().getDisplayMetrics().scaledDensity=1;
+            dodge.setText(R.string.dodge);
+            for(Button b:new Button[]{swing,parry,dodge,interact,light})root.addView(b);
+            UiControlLayout.apply(a,InterfacePreferences.defaults(),swing,parry,dodge,interact,light,0,0,size[0],size[1]);
+            root.measure(View.MeasureSpec.makeMeasureSpec(size[0],View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(size[1],View.MeasureSpec.EXACTLY));
+            root.layout(0,0,size[0],size[1]);
+            float sx=swing.getLeft()+swing.getWidth()/2f,sy=swing.getTop()+swing.getHeight()/2f;
+            float px=parry.getLeft()+parry.getWidth()/2f,py=parry.getTop()+parry.getHeight()/2f;
+            float[] view=(float[])field("viewControls").get(a);float beforeYaw=view[0];
+            dispatch(root,100,MotionEvent.ACTION_DOWN,size[0]*.6f,size[1]*.3f);
+            dispatch(root,100,MotionEvent.ACTION_MOVE,sx,sy);
+            dispatch(root,100,MotionEvent.ACTION_UP,sx,sy);
+            assertEquals("a look drag entering Swing cannot attack",0,Bridge.attacks);
+            assertEquals("a look drag cannot parry",0,Bridge.parries);
+            assertTrue("the captured world gesture still turns the camera",view[0]!=beforeYaw);
+            assertArrayEquals(new int[]{-1,-1},(int[])field("activePointers").get(a));
+            dispatch(root,200,MotionEvent.ACTION_DOWN,sx,sy);
+            dispatch(root,200,MotionEvent.ACTION_MOVE,px,py);
+            dispatch(root,200,MotionEvent.ACTION_UP,px,py);
+            assertEquals("one Swing edge, even when released over Parry",1,Bridge.attacks);
+            assertEquals(0,Bridge.parries);
+            dispatch(root,300,MotionEvent.ACTION_DOWN,px,py);
+            dispatch(root,300,MotionEvent.ACTION_MOVE,sx,sy);
+            dispatch(root,300,MotionEvent.ACTION_UP,sx,sy);
+            assertEquals(1,Bridge.attacks);assertEquals("one Parry edge",1,Bridge.parries);
+            dispatch(root,400,MotionEvent.ACTION_DOWN,sx,sy);
+            dispatch(root,400,MotionEvent.ACTION_CANCEL,sx,sy);
+            assertFalse(swing.isPressed());assertEquals(2,Bridge.attacks);
+            assertEquals(1,Bridge.parries);assertEquals(0,Bridge.dodges);
+        }
+    }
 }

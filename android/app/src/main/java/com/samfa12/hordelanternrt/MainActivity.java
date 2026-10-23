@@ -4895,6 +4895,7 @@ public class MainActivity extends Activity {
             button.setClickable(false); button.setFocusable(false);
             button.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
             styleGameplayActionButton(button,interfaceBacking(values,HordeUiTokens.SLATE),HordeUiTokens.PARCHMENT,false);
+            if(button==swing || button==parry)CombatActionControl.preview(button,button==swing);
             button.measure(View.MeasureSpec.makeMeasureSpec(0,View.MeasureSpec.UNSPECIFIED),
                     View.MeasureSpec.makeMeasureSpec(0,View.MeasureSpec.UNSPECIFIED));
             button.setLayoutParams(new LinearLayout.LayoutParams(Math.max(nominal.width,button.getMeasuredWidth()),
@@ -4935,6 +4936,7 @@ public class MainActivity extends Activity {
         final android.graphics.Rect safe=HudSafeArea.read(root);
         final int safeLeft=safe.left,safeRight=safe.right,safeTop=safe.top,safeBottom=safe.bottom;
         final int width=root!=null && root.getWidth()>0?root.getWidth():getResources().getDisplayMetrics().widthPixels;
+        final int height=root!=null && root.getHeight()>0?root.getHeight():getResources().getDisplayMetrics().heightPixels;
         if(BuildConfig.DEBUG && root!=null) {
             int[] position=new int[2];root.getLocationOnScreen(position);
             String witness="parent="+position[0]+","+position[1]+","+width+","+root.getHeight()+" insets="+safe;
@@ -4951,7 +4953,7 @@ public class MainActivity extends Activity {
             controllerPrompt.setBackground(HordeUiTokens.plate(this,interfaceBacking(v,HordeUiTokens.CHARCOAL),HordeUiTokens.IRON,1));
         }
         UiControlLayout.apply(this,v,attackButton,parryButton,dodgeButton,interactButton,toggleHeldLightPoseButton,
-                safeRight,safeBottom,width);
+                safeRight,safeBottom,width,Math.max(1,height-safeTop));
         styleGameplayActionButton(attackButton,interfaceBacking(v,HordeUiTokens.CHARCOAL),HordeUiTokens.PARCHMENT,false);
         for(Button b:new Button[]{parryButton,dodgeButton,interactButton})
             if(b!=null) styleGameplayActionButton(b,interfaceBacking(v,HordeUiTokens.SLATE),HordeUiTokens.PARCHMENT,false);
@@ -7187,11 +7189,13 @@ public class MainActivity extends Activity {
         button.setMinHeight(dp(48));
     }
     private void styleGameplayActionButton(final Button button, final int fill, final int text, final boolean circular) {
-        button.setBackground(HordeUiTokens.touchButton(this,fill,circular));
+        final boolean combat=button.getId()==R.id.attack_button || button.getId()==R.id.parry_button;
+        button.setBackground(new TouchButtonDrawable(fill,getResources().getDisplayMetrics().density,circular || combat,combat));
+        if(combat)CombatActionControl.apply(button,button.getId()==R.id.attack_button);
         button.setStateListAnimator(null);
         button.setTextColor(HordeUiTokens.label(text));
         button.setMinHeight(dp(48));
-        if(!circular && button.getId()!=R.id.interact_button)button.setPadding(dp(6),0,dp(6),0);
+        if(!circular && !combat && button.getId()!=R.id.interact_button)button.setPadding(dp(6),0,dp(6),0);
     }
     private LinearLayout.LayoutParams matchWrap() {
         return new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);

@@ -5,6 +5,10 @@ draft PR27. This is the current starting point; earlier dated milestone maps,
 "next slice" paragraphs and the ba8aeacf table retain their historical evidence.
 They do not reopen completed work or supersede the dispositions here.
 
+Evening follow-up: the HUD row/phone checklist below now link the compact-dock
+physical evidence and the later researched combat-hierarchy prototype. Their
+receipts pin their own sources/builds; they are not claimed as part of e3486d73.
+
 Working folder:
 `C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof`.
 Branch: `codex/horde-1.7-wp2-vertical-proof`. No new checkout, feature, asset,
@@ -27,7 +31,7 @@ the entire update is accepted. No percentage-complete or release-ready claim.
 | Saves, hearts and checkpoints (WP9) | Three slots each retain manual plus latest-auto records; death Load, safe-boundary saves, lower/upper/forest checkpoint recovery and completed repeat ascent are implemented. Retention is decided. | Natural earned records/death Load, interruption/power-loss and final platform failure/accessibility matrix. Existing passing isolated post-Keeper fixtures are parked. Flask policy is separate, below. |
 | Movement and equipment presentation | Automatic head-clearance crouch, analog deflection speed, keyboard run key, bounded stepping, four-direction dodge poses and continuous backward phase selection. Dynamic Windows backward/forward/dodge frames and rope motor continuity pass. | Authored backward running/strafe quality, physical low-clearance/rope feel and residual sliding. Do not call the procedural/reversed presentation a newly imported clip. [Continuity](../evidence/2026-10-23-backward-continuity/README.md). |
 | Kit actor, dialogue and following (WP6) | Owned Warden, grounded idle/walk, waiting/tether, VO/subtitles, recognition and restrained head/chest acting; cadence/start-stop blending. Latest waypoint fix removes a demonstrated one-tick wrong-way turn. | Stationary planted-foot turns and initial departure alignment remain incomplete. Kit leads at 1.8 m/s; no faster catch-up state exists. The owned Run clip was assessed and correctly not substituted at walking speed. [Latest actual RT comparison](../evidence/2026-10-23-kit-run-assessment/README.md). |
-| HUD, controls and accessibility (WP7) | Caption safe-area repair; visible Skip removed; compact accessible lantern icon; translucent backing; lower-right action dock; Controls help covers rope/action semantics. Unit/build/lint and component images support the new dock. | The latest compact dock has no actual candidate phone capture or thumb-comfort pass. Older independent orientation screenshots do not validate the new placement. [Dock](../evidence/2026-10-23-compact-hud/README.md), [help](../evidence/2026-10-23-interaction-guidance/README.md). |
+| HUD, controls and accessibility (WP7) | Caption safe-area repair; Skip removed; compact accessible lantern; translucent backing; lower-right dock and Controls help. Compact-dock portrait/landscape captures, lantern taps, one same-process full-rebind and held-look check now have bounded phone evidence at APK3c19e74b. A later sword/shield combat-arc prototype has native component/unit/build/lint proof. | New hierarchy phone/owner thumb acceptance remains pending, including simultaneous movement/look/actions. The earlier disappearing-control cause is still unproven. [Actual compact phone](../evidence/2026-10-23-compact-hud-phone/README.md), [new prototype](../evidence/2026-10-23-combat-hud-hierarchy/README.md), [help](../evidence/2026-10-23-interaction-guidance/README.md). |
 | Pause/menu/settings foundation (WP7) | Entry/pause/settings/graphics preview/apply/restore, controller/keyboard routes, saved gains and accessibility controls exist. Shared foreground-pause policy suppresses redundant Showcase frames with a 500 ms fallback and invalidation/wake handling on both platforms. | Matched physical active/ordinary-pause/preview work, power/thermal and wake/input/audio acceptance remain open. Low-power pause is not missing source, nor a measured battery saving. See `ForegroundPauseRenderCadence.h`. |
 | Terrain, water, route and distant town (WP2/WP3/WP8) | Accepted r23 regional relief, finite river/lake/outflow geometry, dry trail, grounded route dressing, lookout and Bellwether shell. Road story cue adds eight kerbs and a waystone in the existing masonry owner. | Whole outdoor composition, surrounding forest depth and combined readiness are incomplete. Distant scenery is not playable town. [Actual-view sheet](../evidence/2026-10-23-forest-view-sheet/README.md), [road cue](../evidence/2026-10-23-f03-masonry/README.md). |
 | Tomb storytelling and local detail (WP4/WP8) | Burial bier, niches/bones/candles/displaced lid/Keeper offerings replace demo dressing in campaign. Six static floor chips reuse the existing owner/material. Fresh selected opening views found no demonstrated placement defect. | Whole-opening artistic coverage remains partial. Two zero-arm shots stay unadmitted after a legitimate out-of-frame diagnosis. Kicking/detail toggle are conditional, not implemented progression requirements. [Inspection](../evidence/2026-10-20-opening-tomb-inspection/README.md), [framing](../evidence/2026-10-20-arm-capture-framing/README.md). |
@@ -80,7 +84,7 @@ The phone is disconnected; no reconnect, installation or device action is pendin
 in this pass. The next explicitly allocated batch should be bounded and restore
 owner custody, rather than rerun every previously passing fixture:
 
-1. Latest compact dock in portrait/landscape, reserved move/look zones, held-touch
+1. Researched combat-arc prototype in portrait/landscape, reserved move/look zones, held-touch
    cancellation, subtitles/font/insets and owner thumb reach/comfort.
 2. Same-state lantern rotation/full rebind without restaging. The later b08aef65
    fixture continuity passed; that neither explains the original disappearance
@@ -136,7 +140,10 @@ settings and the campaign, and reject stale/restart actions. Do not simply flip
 the unattended flag, reset/drop an active campaign, infer a standard from matching
 pixels or expose a working report-send/leaderboard action. If the interactive
 ownership seam needs a material redesign, report that boundary before expanding.
-This audit starts none of that implementation.
+This audit starts none of that implementation. Later owner decision: opening-menu-only
+benchmarking is selected for1.7, before starting/continuing a game, with original
+settings and Entry -> Showcase -> Entry restoration. Implementation follows the
+bounded torch checkpoint; active-session benchmarking remains excluded.
 
 Higher-priority overall acceptance is natural gameplay/controls/audio and warm
 device readiness when the owner/device is available. Forest/smoke scope and flask

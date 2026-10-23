@@ -14,6 +14,17 @@ final class UiControlLayout {
     }
     static void apply(Context c,InterfacePreferences.Values v,Button swing,Button parry,Button dodge,
                       Button interact,Button light,int safeRight,int safeBottom,int availableWidth) {
+        apply(c,v,swing,parry,dodge,interact,light,safeRight,safeBottom,availableWidth,
+                c.getResources().getDisplayMetrics().heightPixels);
+    }
+    static void apply(Context c,InterfacePreferences.Values v,Button swing,Button parry,Button dodge,
+                      Button interact,Button light,int safeRight,int safeBottom,int availableWidth,int availableHeight) {
+        if(dodge!=null) {
+            applyCombatArc(c,v,swing,parry,dodge,interact,light,safeRight,safeBottom,availableWidth,
+                    availableHeight);
+            return;
+        }
+        // Retain the explicit four-control legacy/fixture layout.
         float scale=v.scale/100f;
         int primaryWidth=HordeUiTokens.dp(c,Math.round((v.compact?72:80)*scale));
         int primaryHeight=HordeUiTokens.dp(c,Math.round((v.compact?52:56)*scale));
@@ -51,6 +62,57 @@ final class UiControlLayout {
         place(light,lightSize,lightSize,edge+primaryWidth+gap+(stacked?0:(primaryWidth-lightSize)/2),above+(rowHeight-lightSize)/2);
         if(dodge!=null) above+=rowHeight+gap;
         place(interact,contextWidth,Math.max(minimum,contextHeight),edge,above);
+    }
+    private static void applyCombatArc(Context c,InterfacePreferences.Values v,Button swing,Button parry,
+                                       Button dodge,Button interact,Button light,int safeRight,int safeBottom,
+                                       int width,int height) {
+        boolean landscape=width>height;
+        float scale=v.scale/100f;
+        int gap=HordeUiTokens.dp(c,8),utility=HordeUiTokens.dp(c,56);
+        int edge=HordeUiTokens.dp(c,8)+safeRight,bottom=HordeUiTokens.dp(c,16)+safeBottom;
+        int half=width/2-edge;
+        int sword=Math.max(HordeUiTokens.dp(c,72),HordeUiTokens.dp(c,Math.round((v.compact?72:80)*scale)));
+        int shield=Math.max(HordeUiTokens.dp(c,72),HordeUiTokens.dp(c,Math.round((v.compact?72:76)*scale)));
+        boolean narrow=sword+shield+gap>half;
+        if(narrow) {
+            // A narrow portrait keeps both combat targets in one right column.
+            // The lantern stays next to the bottom anchor, never in movement.
+            sword=Math.min(sword,Math.max(HordeUiTokens.dp(c,48),half-utility-gap));
+            shield=Math.min(shield,sword);
+        }
+        int dodgeWidth=Math.max(HordeUiTokens.dp(c,72),minimumLabelWidth(c,dodge));
+        dodgeWidth=Math.min(dodgeWidth,half);
+        int dodgeHeight=HordeUiTokens.dp(c,52);
+        int contextWidth=Math.max(HordeUiTokens.dp(c,48),Math.min(half,HordeUiTokens.dp(c,Math.round((v.compact?112:128)*scale))));
+        int contextHeight=Math.max(HordeUiTokens.dp(c,48),HordeUiTokens.dp(c,Math.round((v.compact?56:60)*scale)));
+        if(narrow && bottom+sword+shield+dodgeHeight+contextHeight+3*gap>height) {
+            // Short resizable windows fit the full reserved context row first.
+            // Bound physical targets rather than letting Interact clip above the
+            // parent; saved scale is unchanged, and normal phone arcs stay exact.
+            int excess=bottom+sword+shield+dodgeHeight+contextHeight+3*gap-height;
+            contextHeight=Math.min(contextHeight,Math.max(HordeUiTokens.dp(c,56),contextHeight-excess));
+            int pairBudget=height-bottom-dodgeHeight-contextHeight-3*gap;
+            if(sword+shield>pairBudget) {
+                int fitted=Math.max(HordeUiTokens.dp(c,48),pairBudget/2);
+                sword=Math.min(sword,fitted);shield=Math.min(shield,fitted);
+            }
+        }
+        place(swing,sword,sword,edge,bottom);
+        int shieldBottom=narrow?bottom+sword+gap:landscape?bottom+HordeUiTokens.dp(c,12):bottom+(sword-utility)/2+utility+gap;
+        int shieldRight=narrow?edge:edge+sword+gap;
+        place(parry,shield,shield,shieldRight,shieldBottom);
+        int lightRight=narrow?edge+sword+gap:shieldRight+(shield-utility)/2;
+        int lightBottom=landscape && !narrow?shieldBottom+shield+gap:bottom+(sword-utility)/2;
+        place(light,utility,utility,lightRight,lightBottom);
+        int dodgeBottom=narrow?shieldBottom+shield+gap:bottom+sword+gap;
+        place(dodge,dodgeWidth,dodgeHeight,edge,dodgeBottom);
+        int above=Math.max(dodgeBottom+dodgeHeight,Math.max(lightBottom+utility,shieldBottom+shield))+gap;
+        place(interact,contextWidth,contextHeight,edge,above);
+    }
+    private static int minimumLabelWidth(Context c,Button action) {
+        Paint label=new Paint(action.getPaint());
+        label.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,10,c.getResources().getDisplayMetrics()));
+        return (int)Math.ceil(label.measureText(action.getText().toString()))+HordeUiTokens.dp(c,12)+2;
     }
     static void applyStance(Context c,InterfacePreferences.Values v,Button run,Button crouch,int safeLeft,int safeBottom,
                             int availableWidth,Button... combatControls) {
