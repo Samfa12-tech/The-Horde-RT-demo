@@ -1,0 +1,1 @@
+joint-turn samples=7536 maxHandDeltaMetres=0.384384 maxGripUpChord=1.43049 yawStepRadians=.01

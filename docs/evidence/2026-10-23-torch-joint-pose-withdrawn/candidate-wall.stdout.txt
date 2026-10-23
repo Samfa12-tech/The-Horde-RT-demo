@@ -1,0 +1,15 @@
+final-wall diag11 aspect=1 pitch=-0.15 phase=0 contained/hand/roof/coherent=1/1/1/1 headroom=0.0751622 leftGauntlet/torchTriangles=0/0 projectedAreaSum=0/0 Grip/LightDepth=0.230577/0.0488766
+final-wall diag11 aspect=1.77778 pitch=-0.15 phase=0 contained/hand/roof/coherent=1/1/1/1 headroom=0.0751622 leftGauntlet/torchTriangles=0/176 projectedAreaSum=0/0.101192 Grip/LightDepth=0.292437/0.110736
+final-wall diag13 aspect=1 pitch=-0.15 phase=0 contained/hand/roof/coherent=1/1/1/1 headroom=0.0793281 leftGauntlet/torchTriangles=0/1302 projectedAreaSum=0/8.7659 Grip/LightDepth=0.272528/-0.00436391
+final-wall diag13 aspect=1.77778 pitch=-0.15 phase=0 contained/hand/roof/coherent=1/1/1/1 headroom=0.0825493 leftGauntlet/torchTriangles=0/1484 projectedAreaSum=0/14.2738 Grip/LightDepth=0.271315/-0.00557681
+final-wall diag21 aspect=1 pitch=-0.15 phase=0 contained/hand/roof/coherent=1/1/1/1 headroom=0.126528 leftGauntlet/torchTriangles=0/986 projectedAreaSum=0/9.75376 Grip/LightDepth=0.279604/-0.0312908
+final-wall diag21 aspect=1.77778 pitch=-0.15 phase=0 contained/hand/roof/coherent=1/1/1/1 headroom=0.117393 leftGauntlet/torchTriangles=0/1008 projectedAreaSum=0/14.4272 Grip/LightDepth=0.270029/-0.0341991
+final-wall bend aspect=1 pitch=-0.15 phase=0 contained/hand/roof/coherent=1/1/1/1 headroom=0.0992702 leftGauntlet/torchTriangles=4306/5328 projectedAreaSum=0.0603587/0.438541 Grip/LightDepth=0.673538/0.650384
+final-wall bend aspect=1.77778 pitch=-0.15 phase=0 contained/hand/roof/coherent=1/1/1/1 headroom=0.0894643 leftGauntlet/torchTriangles=3913/5300 projectedAreaSum=0.0580913/0.508466 Grip/LightDepth=0.623539/0.600385
+final-wall centre aspect=1 pitch=-0.15 phase=0 contained/hand/roof/coherent=1/1/1/1 headroom=0.163217 leftGauntlet/torchTriangles=2469/5261 projectedAreaSum=0.0302475/0.475692 Grip/LightDepth=0.643505/0.620351
+final-wall centre aspect=1 pitch=0.28 phase=0 contained/hand/roof/coherent=1/1/0/1 headroom=0.0294217 leftGauntlet/torchTriangles=0/5057 projectedAreaSum=0/1.04589 Grip/LightDepth=0.425744/0.40259
+final-wall centre aspect=1 pitch=0.28 phase=0.7 contained/hand/roof/coherent=1/1/0/1 headroom=0.0294214 leftGauntlet/torchTriangles=0/5048 projectedAreaSum=0/1.06847 Grip/LightDepth=0.416977/0.393823
+final-wall centre aspect=1.77778 pitch=-0.15 phase=0 contained/hand/roof/coherent=1/1/1/1 headroom=0.137907 leftGauntlet/torchTriangles=2310/5258 projectedAreaSum=0.0325903/0.549584 Grip/LightDepth=0.60651/0.583356
+final-wall centre aspect=1.77778 pitch=0.28 phase=0 contained/hand/roof/coherent=1/1/0/1 headroom=0.0294214 leftGauntlet/torchTriangles=0/5053 projectedAreaSum=0/1.12169 Grip/LightDepth=0.420327/0.397173
+final-wall centre aspect=1.77778 pitch=0.28 phase=0.7 contained/hand/roof/coherent=1/1/0/1 headroom=0.0294214 leftGauntlet/torchTriangles=0/5048 projectedAreaSum=0/1.13118 Grip/LightDepth=0.413031/0.389876
+final-wall actualRigCases=60 requiredFramingCases=10 minimumHeadroom=0.0294214 maxGripError=9.68461e-07 maxGripOrientationError=0.000345267 failures=10; projection only: native visibility/visual admission remains separate

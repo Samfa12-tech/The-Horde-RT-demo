@@ -1,0 +1,14 @@
+Internal ctest changing into directory: $WORKTREE/build/presets/windows-x64-debug
+Test project $WORKTREE/build/presets/windows-x64-debug
+    Start  50: horde_rt_held_item_transition_tests
+1/4 Test  #50: horde_rt_held_item_transition_tests .........   Passed    1.63 sec
+    Start  53: horde_rt_held_item_clearance_tests
+2/4 Test  #53: horde_rt_held_item_clearance_tests ..........   Passed    5.89 sec
+    Start  79: horde_rt_final_held_torch_clearance_tests
+3/4 Test  #79: horde_rt_final_held_torch_clearance_tests ...   Passed  138.01 sec
+    Start 105: horde_rt_held_item_socket_tests
+4/4 Test #105: horde_rt_held_item_socket_tests .............   Passed   26.26 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Total Test time (real) = 171.80 sec

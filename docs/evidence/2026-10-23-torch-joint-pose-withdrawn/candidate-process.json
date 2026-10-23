@@ -1,0 +1,53 @@
+{
+  "label": "candidate",
+  "source": {
+    "src/gameplay/items/HeldItemKinematics.cpp": "82a4e64c7c5d356073d5e2269ad8fd3935bc90a244625721fed042f349e517e7",
+    "src/platform/windows/DiagnosticWindow.cpp": "fc2d48ffe01470f579ef21e04ccd7f320ee1620a628221fc3cee87f7dd55a900",
+    "tests/HeldItemClearanceTests.cpp": "854b70a239d8d36a6675488e636a93662febfdaa8b1201880444a4abd6073cf0",
+    "tests/FinalHeldTorchClearanceTests.cpp": "3da81ee5b639e999980c0c06ab967523c463666a80d20bbf5938f51ff757901f"
+  },
+  "stages": [
+    {
+      "name": "wall",
+      "arguments": [
+        "$WORKTREE\\build\\presets\\windows-x64-debug\\Debug\\horde_rt_final_held_torch_clearance_tests.exe",
+        "$WORKTREE",
+        "--wall-witnesses"
+      ],
+      "binarySha256": "eb13d7b68ab95e25d222d51e261234438c4549e883b615a9d48b7b6142b39b3d",
+      "pid": 85500,
+      "exitCode": 1,
+      "elapsedSeconds": 9.577999999979511
+    },
+    {
+      "name": "turn",
+      "arguments": [
+        "$WORKTREE\\build\\presets\\windows-x64-debug\\Debug\\horde_rt_held_item_clearance_tests.exe",
+        "--joint-turn"
+      ],
+      "binarySha256": "d0c66983db0af6b8a92c8f5e4909df6d5fd57e998e3ed7f7581e0c08c4bd1831",
+      "pid": 80548,
+      "exitCode": 1,
+      "elapsedSeconds": 11.60999999998603
+    },
+    {
+      "name": "native",
+      "arguments": [
+        "$WORKTREE\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+        "--development-rescue-journey",
+        "--capture-showcase",
+        "$WORKTREE\\reports\\torch-joint-pose-20261023\\candidate\\native",
+        "--development-checkpoint",
+        "chapter-stone-wall-corner",
+        "--capture-hidden"
+      ],
+      "binarySha256": "758ac78810a3419743a945140a5515f43b76071f710797b476cea8b86645a554",
+      "pid": 68480,
+      "exitCode": 0,
+      "elapsedSeconds": 32.45299999997951
+    }
+  ],
+  "startedUtc": "2026-10-23T21:42:49.456784+00:00",
+  "scope": "Windows hidden owning RT captures, no activation/input simulation; current native simulation input snapshots; no physical/phone acceptance",
+  "finishedUtc": "2026-10-23T21:43:43.115589+00:00"
+}
