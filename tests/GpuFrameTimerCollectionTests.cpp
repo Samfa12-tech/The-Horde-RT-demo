@@ -22,6 +22,7 @@ enum class QueryMode
 QueryMode gQueryMode = QueryMode::Valid;
 std::uint64_t gQueryReadCount = 0u;
 VkPipelineStageFlagBits gBeginStage{},gEndStage{};
+bool gQueryResultWaitRequested = false;
 
 template <typename Handle>
 Handle FakeHandle(const std::uintptr_t value)
@@ -119,9 +120,10 @@ VKAPI_ATTR VkResult VKAPI_CALL vkGetQueryPoolResults(
     std::size_t,
     void* data,
     VkDeviceSize,
-    VkQueryResultFlags)
+    VkQueryResultFlags flags)
 {
     ++gQueryReadCount;
+    gQueryResultWaitRequested = gQueryResultWaitRequested || (flags & VK_QUERY_RESULT_WAIT_BIT) != 0;
     if (gQueryMode == QueryMode::Error)
     {
         return VK_ERROR_DEVICE_LOST;
@@ -277,6 +279,9 @@ int main()
         samples[0].ticks[1]={};samples[1].ticks[1]={};
         context.Check(!SummarizeDispatchClock(samples,7,64,32,totals),"all-zero unavailable clock rejected");
     }
+
+    context.Check(!gQueryResultWaitRequested,
+                  "owning-fence timestamp collection must never request a query-result wait");
 
     if (context.failures == 0)
     {

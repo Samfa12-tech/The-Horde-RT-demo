@@ -1,10 +1,13 @@
 import copy
+import csv
+import io
 from pathlib import Path
 import sys
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
-from analyze_android_rt_stage_profile import AnalysisError, STAGES, VIEWS, join_stages
+from analyze_android_rt_stage_profile import AnalysisError, STAGES, VIEWS, OUTDOOR_HOLD_PHASE, analyze, join_stages
+from test_android_motion_present_timing import encoded, make_outdoor_report
 
 
 def fixture():
@@ -22,7 +25,55 @@ def fixture():
     return rows, frames
 
 
+def outdoor_fixture():
+    report = make_outdoor_report(20)
+    rows = []
+    for frame in report['motionEvidence']['completedRtFrames']:
+        row = dict(serial=str(frame['submission']), tick=str(frame['tick']), phase=OUTDOOR_HOLD_PHASE,
+                   view_ticks=str(frame['tick']), x='0', y='1', z='2', yaw='3', pitch='4')
+        for stage in STAGES:
+            # Warmup/final frames must join, but cannot bias the post-warm median.
+            value = '1234567' if 10 <= frame['stateRow'] <= 40 else '999999999'
+            row.update({stage + '_gpu_status': 'valid', stage + '_gpu_serial': row['serial'], stage + '_gpu_ns': value})
+        rows.append(row)
+    return report, rows
+
+
+def csv_text(rows):
+    text = io.StringIO()
+    writer = csv.DictWriter(text, fieldnames=rows[0].keys())
+    writer.writeheader()
+    writer.writerows(rows)
+    return text.getvalue()
+
+
 class StageJoinTests(unittest.TestCase):
+    def test_explicit_outdoor_uses_owner_wall_window_and_actual_phase(self):
+        report, rows = outdoor_fixture()
+        result = analyze(encoded(report), csv_text(rows), outdoor_hold=True)
+        self.assertEqual(result['joinedFrames'], 43)
+        self.assertEqual(result['views'][OUTDOOR_HOLD_PHASE]['dispatch']['n'], 31)
+        self.assertEqual(result['views'][OUTDOOR_HOLD_PHASE]['dispatch']['medianMs'], 1.234567)
+        with self.assertRaises(AnalysisError):
+            analyze(encoded(report), csv_text(rows))
+
+    def test_outdoor_never_omits_warmup_or_final_failures(self):
+        for index in (0, -1):
+            for field, value in (('as_gpu_status', 'unavailable-or-mismatched'),
+                                 ('dispatch_gpu_serial', '99'), ('serial', '1'), ('tick', '1'),
+                                 ('phase', 'landing-sweep')):
+                with self.subTest(index=index, field=field):
+                    report, rows = outdoor_fixture()
+                    rows[index][field] = value
+                    with self.assertRaises(AnalysisError):
+                        analyze(encoded(report), csv_text(rows), outdoor_hold=True)
+        report, rows = outdoor_fixture()
+        with self.assertRaises(AnalysisError):
+            analyze(encoded(report), csv_text(rows[:-1]), outdoor_hold=True)
+        rows[20]['x'] = '0.1'
+        with self.assertRaises(AnalysisError):
+            analyze(encoded(report), csv_text(rows), outdoor_hold=True)
+
     def test_all_including_final_frame(self):
         rows, frames = fixture()
         result = join_stages(rows, frames)

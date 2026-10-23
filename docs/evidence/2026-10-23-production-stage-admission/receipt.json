@@ -1,0 +1,62 @@
+{
+  "scope": "Retained from this subagent's completed tool results. No tests were rerun to create this receipt. Excerpts are not full native/Gradle logs; those exist only in the earlier tool results.",
+  "cwd": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+  "commands": [
+    {
+      "id": "timer",
+      "command": "$cmake='C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe'; & $cmake --build build/presets/windows-x64-release --config Release --target horde_rt_gpu_frame_timer_collection_tests --parallel 2; if($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; & build/presets/windows-x64-release/Release/horde_rt_gpu_frame_timer_collection_tests.exe; exit $LASTEXITCODE",
+      "exitCode": 0,
+      "result": "MSVC Release target rebuilt; GPU frame timer collection identity tests passed, including the non-WAIT assertion.",
+      "log": "timer-release.log",
+      "toolSessionId": 37002
+    },
+    {
+      "id": "policy-initial-temp",
+      "command": "$cmake='C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe'; $watch=[Diagnostics.Stopwatch]::StartNew(); & tests/RtPipelinePolicyExecutionTests.ps1 -CmakeExecutable $cmake -GradleExecutable (Join-Path (Get-Location) 'android/gradlew.bat'); $result=$LASTEXITCODE; Write-Output ('Policy elapsed seconds: {0:N2}' -f $watch.Elapsed.TotalSeconds); exit $result",
+      "exitCode": 1,
+      "result": "Failed at first native fixture windows-debug compiler configuration. MSBuild could not find its generated project beneath the sandbox-redirected temporary path. No Gradle cases reached.",
+      "log": "policy-initial-temp-failure-excerpt.log",
+      "toolSessionId": 82498
+    },
+    {
+      "id": "policy-authorized-temp",
+      "command": "$env:TEMP='C:/Users/sam_s/AppData/Local/Temp'; $env:TMP=$env:TEMP; Write-Output ('Policy fixture temp: ' + [IO.Path]::GetTempPath()); $cmake='C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe'; $watch=[Diagnostics.Stopwatch]::StartNew(); try { & tests/RtPipelinePolicyExecutionTests.ps1 -CmakeExecutable $cmake -GradleExecutable (Join-Path (Get-Location) 'android/gradlew.bat') } finally { Write-Output ('Policy elapsed seconds: {0:N2}' -f $watch.Elapsed.TotalSeconds) }",
+      "exitCode": 1,
+      "elapsedSeconds": 48.97,
+      "result": "Existing native CMake policy fixtures passed before first Gradle case. Gradle wrapper then failed opening its normal cache lock; defaults and all subsequent Gradle admission cases remained unexecuted.",
+      "log": "policy-gradle-lock-denial-excerpt.log",
+      "toolSessionId": 43036,
+      "deniedTarget": "C:\\Users\\sam_s\\.gradle\\wrapper\\dists\\gradle-8.11.1-all\\2qik7nd48slq1ooc2496ixf4i\\gradle-8.11.1-all.zip.lck",
+      "denialClass": "Filesystem access denied from Java wrapper, not automatic approval review",
+      "deniedOperationRetried": false
+    },
+    {
+      "id": "python-first",
+      "command": "python -m unittest discover -s tests -p test_android_motion_present_timing.py -v; if($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; python -m unittest discover -s tests -p test_android_rt_stage_profile.py -v; exit $LASTEXITCODE",
+      "exitCode": 1,
+      "result": "18 motion tests ran; one failed because the new diagnostic text changed a legacy error-message contract. Stage test command did not run due to the preceding failure.",
+      "log": "python-first-failure-excerpt.log",
+      "toolSessionId": 38576
+    },
+    {
+      "id": "python-after-error-text-correction",
+      "command": "python -m unittest discover -s tests -p test_android_motion_present_timing.py -v; if($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; python -m unittest discover -s tests -p test_android_rt_stage_profile.py -v; exit $LASTEXITCODE",
+      "exitCode": 0,
+      "result": "Legacy error text restored in implementation without weakening the test. 18 motion tests and 7 stage-profile tests passed.",
+      "log": "python-focused-results.log"
+    },
+    {
+      "id": "python-saved-real-evidence",
+      "commandFile": "saved-evidence-validation.ps1.txt",
+      "exitCode": 0,
+      "result": "Saved real control33 report validates 834 complete frames only with explicit outdoor admission; old stage-free CSV remains rejected. No raw evidence was changed.",
+      "log": "saved-evidence-validation.log"
+    }
+  ],
+  "remaining": [
+    "Actual Gradle configuration/admission execution is blocked by the normal wrapper-cache lock denial; no alternate cache/access route was used.",
+    "Android native build and fresh production-bank GPU stage collection were not performed.",
+    "Saved old control33 evidence lacks GPU stage CSV fields and correctly remains rejected as a stage profile."
+  ]
+}
+

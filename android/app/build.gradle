@@ -214,11 +214,12 @@ if (dispatchClockValue != null && !(dispatchClockValue in ['true', 'false'])) {
     throw new GradleException('hordeDispatchClockProbe must be true or false.')
 }
 def dispatchClockProbe = dispatchClockValue == 'true'
-if (dispatchClockProbe && !frameStageProbe) {
-    throw new GradleException('Dispatch clock observation requires the private frame stage profile.')
+if (dispatchClockProbe && (!frameStageProbe || hordeRegionPagePrototypeRootProperty == null)) {
+    throw new GradleException('Dispatch clock observation requires the private frame stage/clock shader profile.')
 }
-if (frameStageProbe && (!chapterRouteTiming || hordeRegionPagePrototypeRootProperty == null)) {
-    throw new GradleException('Frame stage profiling requires the private chapter route timing build.')
+if (frameStageProbe && (!chapterRouteTiming || hordeBenchmarkValidation ||
+        hordeStagedPrimaryDebugValidation || providers.gradleProperty('hordeViewmodelCandidateDir').isPresent())) {
+    throw new GradleException('Frame stage profiling requires separate Debug chapter route timing without benchmark, staged or viewmodel experiments.')
 }
 if (chapterRouteTiming && (hordeRtInstrumentationOverride != 'Shipping' || hordeRtDielectricQualityOverride != 'Mobile')) {
     throw new GradleException('Route timing requires Shipping/Mobile Debug; production shaders are used unless an explicit private root is supplied.')
@@ -237,8 +238,20 @@ if (hordeRegionPagePrototypeRootProperty != null) {
     if (!new File(pageRoot, 'src/vulkan/raytracing/RtRayQueryVariantCatalog.generated.h').isFile()) {
         throw new GradleException('Region-page investigation needs a prepared private shader catalog.')
     }
+    if (dispatchClockProbe && !new File(pageRoot, 'dispatch-clock-probe.json').isFile()) {
+        throw new GradleException('Dispatch clock observation needs the matching private shader ABI marker.')
+    }
     hordeRegionPageDebugArguments = ["-DHORDE_RT_REGION_PAGE_PROTOTYPE_ROOT=${pageRoot.path.replace('\\', '/')}"]
 }
+// Timestamp queries observe the ordinary production bank unless the caller
+// explicitly supplies a validated private root. Shader-clock writes still need
+// their separate private shader ABI; neither observation is a production default.
+def hordeRtDebugObservationArguments = [
+    "-DHORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING=${chapterRouteTiming ? 'ON' : 'OFF'}",
+    "-DHORDE_RT_ANDROID_OUTDOOR_SCALE_PROBE=${outdoorScaleProbe ? 'ON' : 'OFF'}",
+    "-DHORDE_RT_FRAME_STAGE_PROBE=${frameStageProbe ? 'ON' : 'OFF'}",
+    "-DHORDE_RT_DISPATCH_CLOCK_PROBE=${dispatchClockProbe ? 'ON' : 'OFF'}"
+]
 def hordeRtBenchmarkStagedPrimaryArguments = [
     "-DHORDE_RT_STAGED_PRIMARY_SHADER_DIR=${hordeStagedPrimaryShaderDir ?: ''}",
     "-DHORDE_RT_STAGED_PRIMARY_DEFAULT=${hordeStagedPrimaryShaderDir ? 'ON' : 'OFF'}",
@@ -654,10 +667,7 @@ android {
             externalNativeBuild {
                 cmake {
                     arguments '-DHORDE_RT_DEBUG_CHECKPOINTS=ON',
-                        "-DHORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING=${chapterRouteTiming ? 'ON' : 'OFF'}",
-                        "-DHORDE_RT_ANDROID_OUTDOOR_SCALE_PROBE=${outdoorScaleProbe ? 'ON' : 'OFF'}",
-                        "-DHORDE_RT_FRAME_STAGE_PROBE=${frameStageProbe ? 'ON' : 'OFF'}",
-                        "-DHORDE_RT_DISPATCH_CLOCK_PROBE=${dispatchClockProbe ? 'ON' : 'OFF'}",
+                        *hordeRtDebugObservationArguments,
                         "-DHORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=${viewmodelCandidate ? 'ON' : 'OFF'}",
                         *hordeRtNativePolicyArguments('Diagnostic'),
                         *hordeRtDebugStagedPrimaryArguments,
@@ -736,6 +746,7 @@ if (viewmodelCandidate) {
 tasks.register('printHordeRtPolicyForTest') {
     doLast {
         println("debug=" + (hordeRtNativePolicyArguments('Diagnostic') + hordeRtDebugStagedPrimaryArguments + hordeRegionPageDebugArguments).join('|'))
+        println("debugObservation=" + hordeRtDebugObservationArguments.join('|'))
         println("release=" + hordeRtNativePolicyArguments('Shipping').join('|'))
         println("benchmark=" + (hordeBenchmarkValidation
             ? (hordeRtNativePolicyArguments('Shipping') + hordeRtBenchmarkStagedPrimaryArguments).join('|')

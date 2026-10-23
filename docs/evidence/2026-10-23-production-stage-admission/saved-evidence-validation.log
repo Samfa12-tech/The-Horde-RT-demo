@@ -1,0 +1,9 @@
+{
+  "savedReport": "reports\\phone-trace-stdin-20261023\\control33",
+  "reportSha256": "595afec1b587e3f504d036347a65ff042317d632d0a9d6794c3ec9a757f177c7",
+  "matchedCompletedFrames": 834,
+  "explicitOutdoorTimingValidation": "passed"
+}
+Legacy default rejection retained: unknown or mismatched motion scenario/workload
+Saved stage-profile rejection retained (stage columns were not collected): row 0: as unavailable or mismatched
+

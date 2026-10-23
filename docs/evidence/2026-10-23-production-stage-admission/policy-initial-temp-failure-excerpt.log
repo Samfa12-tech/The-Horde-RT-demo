@@ -1,0 +1,13 @@
+# Verbatim relevant excerpt from completed tool result; full native log was not retained.
+Policy case windows-debug failed to configure: -- Selecting Windows SDK version 10.0.26100.0 to target Windows
+10.0.26300. -- The CXX compiler identification is MSVC 19.44.35227.0 -- Detecting CXX compiler ABI info --
+Detecting CXX compiler ABI info - failed -- Check for working CXX compiler: C:/Program Files (x86)/Microsoft
+Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe -- Check for working CXX
+compiler: C:/Program Files (x86)/Microsoft Visual
+Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe - broken
+
+# Verbatim native failure fragments embedded in that tool result:
+Change Dir: 'C:/Users/sam_s/AppData/Local/Packages/sandbox.{00dfb40a-df76-4e07-9ddb-9a79c31b9938}/AC/Temp/horde-rt-policy-execution-0540e5c8a21546f4ace239c6d80b9ead/windows-debug/CMakeFiles/CMakeScratch/TryCompile-u37mat'
+MSBUILD : error MSB1009: Project file does not exist.
+Switch: cmTC_6a48e.vcxproj
+

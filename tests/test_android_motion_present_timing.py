@@ -63,7 +63,80 @@ def encoded(report):
     return json.dumps(report, separators=(",", ":")).encode()
 
 
+def make_outdoor_report(scale=33):
+    report = make_report()
+    scenario = 'chapter-outdoor-scale-hold'
+    for obj in (report, report['motionManifest'], report['motionEvidence']):
+        obj['scenario'] = scenario
+    report['workload'] = f'motion-{scenario}-v1'
+    report['outdoorHold'] = dict(enabled=True, normalFixedStep=True, warmupWallSeconds=10,
+                                 sampleWallSeconds=30, startWallNanoseconds=1_000_000_000)
+    settings = report['settings']
+    settings['scalePercent'] = report['motionManifest']['scale'] = scale
+    settings['internalWidth'] = (settings['width'] * scale + 50) // 100
+    settings['internalHeight'] = (settings['height'] * scale + 50) // 100
+    report['motionManifest']['captures'] = 0
+    report['motionImageCaptures'] = []
+    evidence = report['motionEvidence']
+    timing = report['imagePresentationTiming']
+    state_template, frame_template = evidence['states'][0], evidence['completedRtFrames'][0]
+    timing_template, setup = timing['capture']['rows'][1], timing['capture']['rows'][0]
+    evidence['states'], evidence['completedRtFrames'], timing['capture']['rows'] = [], [], [setup]
+    setup['scalePercent'] = scale
+    for i in range(43):
+        evidence['states'].append(dict(state_template, row=i, wallNs=1_000_000_000 + i * 1_000_000_000,
+                                      tick=i * 60, ticksThisFrame=60, simulationSeconds=i, axes=[0, 0]))
+        evidence['completedRtFrames'].append(dict(frame_template, stateRow=i, tick=i * 60,
+                                                  record=11+i, recordAttempt=11+i, submission=11+i, completion=11+i))
+        timing['capture']['rows'].append(dict(timing_template, simulationTick=i * 60, scalePercent=scale,
+                                              recordSerial=11+i, submissionSerial=11+i, presentID=11+i,
+                                              actualPresentTime=2_000_000_000 + i * 1_000_000_000))
+    report['timingEligibility'].update(matchedCompletedFrames=43, expectedCompletedFrames=43)
+    timing['capture']['counters'].update(preparedPresents=44, acceptedPresents=44, queryCalls=45)
+    timing['counterDelta'] = {field: timing['capture']['counters'][field] - timing['counterBaseline'][field]
+                              for field in COUNTERS}
+    return report
+
+
 class AndroidMotionPresentTimingTests(unittest.TestCase):
+    def test_explicit_outdoor_hold_preserves_legacy_scale_policy(self):
+        for scale in (20, 33, 40):
+            with self.subTest(scale=scale):
+                report = make_outdoor_report(scale)
+                self.assertTrue(analyze_bytes(encoded(report), outdoor_hold=True)['eligible'])
+                with self.assertRaises(AnalysisError):
+                    analyze_bytes(encoded(report))
+        with self.assertRaises(AnalysisError):
+            analyze_bytes(encoded(make_report()), outdoor_hold=True)
+        with self.assertRaises(AnalysisError):
+            analyze_bytes(encoded(make_outdoor_report(50)), outdoor_hold=True)
+        legacy = make_report()
+        legacy['settings']['scalePercent'] = legacy['motionManifest']['scale'] = 20
+        with self.assertRaises(AnalysisError):
+            analyze_bytes(encoded(legacy))
+
+    def test_outdoor_hold_metadata_and_final_owner_remain_required(self):
+        for field, value in (('enabled', False), ('normalFixedStep', False), ('warmupWallSeconds', 9),
+                             ('sampleWallSeconds', 31), ('startWallNanoseconds', 0)):
+            with self.subTest(field=field):
+                report = make_outdoor_report()
+                report['outdoorHold'][field] = value
+                with self.assertRaises(AnalysisError):
+                    analyze_bytes(encoded(report), outdoor_hold=True)
+        for alteration in ('missing-hold', 'short-hold', 'missing-final-timing', 'bad-final-owner'):
+            with self.subTest(alteration=alteration):
+                report = make_outdoor_report()
+                if alteration == 'missing-hold':
+                    del report['outdoorHold']
+                elif alteration == 'short-hold':
+                    report['outdoorHold']['startWallNanoseconds'] += 4_000_000_000
+                elif alteration == 'missing-final-timing':
+                    report['imagePresentationTiming']['capture']['rows'].pop()
+                else:
+                    report['motionEvidence']['completedRtFrames'][-1]['tick'] -= 1
+                with self.assertRaises(AnalysisError):
+                    analyze_bytes(encoded(report), outdoor_hold=True)
+
     def test_chapter_without_readbacks_still_requires_every_actual_timing_owner(self):
         report = make_report()
         for value in (report, report['motionManifest'], report['motionEvidence']):

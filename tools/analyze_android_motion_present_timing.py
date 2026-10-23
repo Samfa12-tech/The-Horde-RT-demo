@@ -25,6 +25,7 @@ U64_MAX = (1 << 64) - 1
 SCENARIOS = frozenset(("keeper-torch-transition", "torch-low-opening", "shaft-up", "keeper-first-entry",
                        "keeper-retry-reward", "waterfall-equipment", "torch-drench", "chapter-round-trip", "chapter-streaming-cycle", "chapter-resident-comparison", "chapter-streamed-comparison", "chapter-performance-route"))
 CHAPTER_SCENARIOS = frozenset(("keeper-torch-transition", "chapter-round-trip", "chapter-streaming-cycle", "chapter-resident-comparison", "chapter-streamed-comparison", "chapter-performance-route"))
+OUTDOOR_HOLD_SCENARIO = "chapter-outdoor-scale-hold"
 POLICY = ("shared GameSimulation.AdvanceFrame with raw monotonic input-owner delta and normal "
           "fixed-step catch-up; generated motion axes/edges enter through the existing "
           "InputMailbox owner; no per-render fixed-delta override")
@@ -59,7 +60,7 @@ def _identity(row: dict[str, Any], label: str, ledger: bool = False) -> tuple[in
                                ("tick" if ledger else "simulationTick", 0)))
 
 
-def analyze_bytes(raw: bytes) -> dict[str, Any]:
+def analyze_bytes(raw: bytes, *, outdoor_hold: bool = False) -> dict[str, Any]:
     if not raw or len(raw) > MAX_REPORT_BYTES:
         raise AnalysisError("motion report is empty or exceeds the 64 MiB limit")
     try:
@@ -73,8 +74,10 @@ def analyze_bytes(raw: bytes) -> dict[str, Any]:
     if not re.fullmatch(r"[A-Za-z0-9_-]{1,64}", run_id):
         raise AnalysisError("unsafe motion runId")
     scenario = _text(report.get("scenario"), "scenario")
-    if scenario not in SCENARIOS or report.get("workload") != f"motion-{scenario}-v1":
+    allowed_scenarios = (OUTDOOR_HOLD_SCENARIO,) if outdoor_hold else SCENARIOS
+    if scenario not in allowed_scenarios or report.get("workload") != f"motion-{scenario}-v1":
         raise AnalysisError("unknown or mismatched motion scenario/workload")
+    chapter = outdoor_hold or scenario in CHAPTER_SCENARIOS
     build_id = _text(report.get("buildId"), "buildId")
     if report.get("simulationPolicy") != POLICY:
         raise AnalysisError("motion simulationPolicy differs from the admitted shared-clock path")
@@ -84,8 +87,10 @@ def analyze_bytes(raw: bytes) -> dict[str, Any]:
             raise AnalysisError(f"motion limit differs in {field}")
     settings = _mapping(report.get("settings"), "settings")
     scale = _integer(settings.get("scalePercent"), "settings.scalePercent")
-    if scale not in (33, 40, 50):
-        raise AnalysisError("motion scale must be an explicit 33, 40 or 50 comparison")
+    allowed_scales = (20, 33, 40) if outdoor_hold else (33, 40, 50)
+    if scale not in allowed_scales:
+        raise AnalysisError("outdoor diagnostic scale must be an explicit 20, 33 or 40 comparison" if outdoor_hold else
+                            "motion scale must be an explicit 33, 40 or 50 comparison")
     width = _integer(settings.get("width"), "settings.width", 1, 16384)
     height = _integer(settings.get("height"), "settings.height", 1, 16384)
     internal_width = _integer(settings.get("internalWidth"), "settings.internalWidth", 1, width)
@@ -101,6 +106,14 @@ def analyze_bytes(raw: bytes) -> dict[str, Any]:
             raise AnalysisError(f"settings.{field} must be a boolean")
     manifest = _mapping(report.get("motionManifest"), "motionManifest")
     evidence = _mapping(report.get("motionEvidence"), "motionEvidence")
+    hold = None
+    if outdoor_hold:
+        hold = _mapping(report.get("outdoorHold"), "outdoorHold")
+        if hold.get("enabled") is not True or hold.get("normalFixedStep") is not True or \
+           _integer(hold.get("warmupWallSeconds"), "hold.warmupWallSeconds") != 10 or \
+           _integer(hold.get("sampleWallSeconds"), "hold.sampleWallSeconds") != 30:
+            raise AnalysisError("outdoor hold requires the declared normal fixed-step 10s warmup/30s sample")
+        _u64(hold.get("startWallNanoseconds"), "hold.startWallNanoseconds", 1)
     for label, obj in (("manifest", manifest), ("evidence", evidence)):
         if _integer(obj.get("schema"), f"{label}.schema") != 1 or obj.get("runId") != run_id or obj.get("scenario") != scenario:
             raise AnalysisError(f"{label} identity differs from the motion report")
@@ -117,8 +130,8 @@ def analyze_bytes(raw: bytes) -> dict[str, Any]:
     for field in ("water", "fire", "cap", "glass", "shadow", "mist", "dust"):
         if type(manifest.get(field)) is not type(settings[field]) or manifest[field] != settings[field]:
             raise AnalysisError(f"manifest {field} differs from actual settings")
-    _integer(manifest.get("captures"), "manifest.captures", 0 if scenario in CHAPTER_SCENARIOS else 1, 64)
-    if scenario in CHAPTER_SCENARIOS and manifest["captures"] != 0:
+    _integer(manifest.get("captures"), "manifest.captures", 0 if chapter else 1, 64)
+    if chapter and manifest["captures"] != 0:
         raise AnalysisError("chapter pacing interval must not contain image readbacks")
     if _integer(evidence.get("pendingSubmissionCount"), "ledger.pendingSubmissionCount") != 0 or evidence.get("currentScopePresented") is not True:
         raise AnalysisError("motion ledger has pending work or no current-scope presentation")
@@ -153,6 +166,11 @@ def analyze_bytes(raw: bytes) -> dict[str, Any]:
         previous_wall, previous_tick, previous_publication, previous_overrun = wall, tick, publication, overrun
     if states[-1]["wallNs"] - states[0]["wallNs"] > 120_000_000_000:
         raise AnalysisError("motion state span exceeds the wall-time limit")
+    if outdoor_hold:
+        start = hold["startWallNanoseconds"]
+        if states[0]["wallNs"] < start or states[-1]["wallNs"] < start + 40_000_000_000 or \
+           states[-1]["wallNs"] - start > 120_000_000_000 or states[-1]["tick"] <= states[0]["tick"]:
+            raise AnalysisError("outdoor states must cover the complete bounded live 40s hold")
     events = _array(evidence.get("events"), "events", 1024)
     last_event = 0
     for index, raw_event in enumerate(events):
@@ -183,6 +201,11 @@ def analyze_bytes(raw: bytes) -> dict[str, Any]:
         if "actualUploadedMistEnabled" in frame and frame["actualUploadedMistEnabled"] is not settings["mist"]:
             raise AnalysisError("actual uploaded mist differs from settings")
         selected[key] = frame
+    if outdoor_hold:
+        sample_walls = [states[frame["stateRow"]]["wallNs"] for frame in frames
+                        if start + 10_000_000_000 <= states[frame["stateRow"]]["wallNs"] <= start + 40_000_000_000]
+        if len(sample_walls) < 20 or sample_walls[-1] - sample_walls[0] < 25_000_000_000:
+            raise AnalysisError("outdoor completed frames must cover at least 25s of the declared 30s sample")
     images = _array(report.get("motionImageCaptures"), "motionImageCaptures", 64)
     if len(images) != manifest["captures"]:
         raise AnalysisError("motion image count differs from the completed manifest")
@@ -285,7 +308,8 @@ def analyze_bytes(raw: bytes) -> dict[str, Any]:
         "collector": {"runCounterDelta": delta,
             "queryCpuWallNanoseconds": _u64(wrapper.get("queryCpuWallNanoseconds"), "queryCpuWallNanoseconds"),
             "presentMarginAtLeast2Pow63CountIgnored": sum(timing["presentMargin"] >= (1 << 63) for _, timing in ordered)},
-        "limits": [("Bounded ordinary chapter traversal with zero mid-route image readbacks; recorder overhead remains." if scenario in CHAPTER_SCENARIOS else "Short harness-generated moving scenario with milestone RT readbacks; total instrumentation affects pacing."),
+        "limits": [("Bounded diagnostic outdoor hold with zero image readbacks; 20% is not image-quality admission." if outdoor_hold else
+                    "Bounded ordinary chapter traversal with zero mid-route image readbacks; recorder overhead remains." if chapter else "Short harness-generated moving scenario with milestone RT readbacks; total instrumentation affects pacing."),
                    "One continuous resource scope; retry/rotation/lifecycle discontinuities require separate evidence.",
                    "Actual inter-present intervals; not sustained FPS, scanout, photons, GPU reciprocal time, touch latency or owner acceptance.",
                    "Trace extents are native resource observations; this analyzer does not certify appearance, thermals or power."]}
@@ -294,10 +318,11 @@ def analyze_bytes(raw: bytes) -> dict[str, Any]:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("report", type=Path)
+    parser.add_argument("--outdoor-hold", action="store_true", help="explicit diagnostic outdoor 20/33/40 cohort; preserves legacy route policy")
     args = parser.parse_args(argv)
     try:
         with args.report.open("rb") as handle:
-            result = analyze_bytes(handle.read(MAX_REPORT_BYTES + 1))
+            result = analyze_bytes(handle.read(MAX_REPORT_BYTES + 1), outdoor_hold=args.outdoor_hold)
     except (OSError, AnalysisError) as exc:
         print(json.dumps({"eligible": False, "error": str(exc)}, separators=(",", ":")), file=sys.stderr)
         return 2

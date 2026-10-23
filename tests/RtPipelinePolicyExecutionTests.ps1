@@ -114,16 +114,20 @@ file(GENERATE OUTPUT "`$`{CMAKE_BINARY_DIR}/treewide-definitions-`$<CONFIG>.txt"
     Invoke-PolicyCase 'missing-android-defaults' 'Android' 'Debug' @() @() $true
     Invoke-PolicyCase 'unknown-platform' 'Unknown' 'Debug' @() @() $true
 
-    function Invoke-GradlePolicyCase([string]$name, [string[]]$properties, [bool]$expectFailure = $false) {
+    function Invoke-GradlePolicyCase([string]$name, [string[]]$properties, [bool]$expectFailure = $false,
+        [string]$expectedDiagnostic = '') {
         # Explicit empty CLI properties defeat any developer-local gradle.properties
         # values while retaining the established dependency cache (no network lane).
         $neutralProperties = @()
         if (@($properties | Where-Object { $_ -like '-PhordeRtInstrumentationOverride=*' }).Count -eq 0) { $neutralProperties += '-PhordeRtInstrumentationOverride=' }
         if (@($properties | Where-Object { $_ -like '-PhordeRtDielectricQualityOverride=*' }).Count -eq 0) { $neutralProperties += '-PhordeRtDielectricQualityOverride=' }
-        $arguments = @('--no-daemon', '--console=plain', '-q', ':app:printHordeRtPolicyForTest') + $neutralProperties + $properties
+        $arguments = @('--offline', '--no-daemon', '--console=plain', '-q', ':app:printHordeRtPolicyForTest') + $neutralProperties + $properties
         $result = Invoke-Native $GradleExecutable $arguments (Join-Path $repoRoot 'android')
         if ($expectFailure) {
             Assert-True ($result[0] -ne 0) "Gradle policy case $name unexpectedly succeeded."
+            if ($expectedDiagnostic) {
+                Assert-True ($result[1].Contains($expectedDiagnostic)) "Gradle policy case $name failed for the wrong reason: $($result[1])"
+            }
             return
         }
         Assert-True ($result[0] -eq 0) "Gradle policy case $name failed: $($result[1])"
@@ -133,12 +137,56 @@ file(GENERATE OUTPUT "`$`{CMAKE_BINARY_DIR}/treewide-definitions-`$<CONFIG>.txt"
     $gradleDefault = Invoke-GradlePolicyCase 'defaults' @()
     Assert-True ($gradleDefault.Contains('debug=-DHORDE_RT_ANDROID_DEFAULT_INSTRUMENTATION=Diagnostic|-DHORDE_RT_ANDROID_DEFAULT_DIELECTRIC_QUALITY=Mobile')) 'Gradle Debug default policy is incorrect.'
     Assert-True ($gradleDefault.Contains('release=-DHORDE_RT_ANDROID_DEFAULT_INSTRUMENTATION=Shipping|-DHORDE_RT_ANDROID_DEFAULT_DIELECTRIC_QUALITY=Mobile')) 'Gradle Release default policy is incorrect.'
+    $observersOff = 'debugObservation=-DHORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING=OFF|-DHORDE_RT_ANDROID_OUTDOOR_SCALE_PROBE=OFF|-DHORDE_RT_FRAME_STAGE_PROBE=OFF|-DHORDE_RT_DISPATCH_CLOCK_PROBE=OFF'
+    Assert-True ($gradleDefault.Contains($observersOff)) 'Ordinary Debug must compile all route/stage/clock observers out by default.'
     $gradleOverride = Invoke-GradlePolicyCase 'override-precedence' @('-PhordeRtInstrumentationOverride=Diagnostic', '-PhordeRtDielectricQualityOverride=High')
     Assert-True ($gradleOverride.Contains('debug=-DHORDE_RT_ANDROID_DEFAULT_INSTRUMENTATION=Diagnostic|-DHORDE_RT_ANDROID_DEFAULT_DIELECTRIC_QUALITY=High')) 'Gradle override did not apply to Debug.'
     Assert-True ($gradleOverride.Contains('release=-DHORDE_RT_ANDROID_DEFAULT_INSTRUMENTATION=Diagnostic|-DHORDE_RT_ANDROID_DEFAULT_DIELECTRIC_QUALITY=High')) 'Gradle override did not take precedence over Release default.'
     Invoke-GradlePolicyCase 'partial-override' @('-PhordeRtInstrumentationOverride=Shipping') $true
     Invoke-GradlePolicyCase 'invalid-override-case' @('-PhordeRtInstrumentationOverride=shipping', '-PhordeRtDielectricQualityOverride=Mobile') $true
     Invoke-GradlePolicyCase 'invalid-quality' @('-PhordeRtInstrumentationOverride=Shipping', '-PhordeRtDielectricQualityOverride=mobile') $true
+
+    # Exercise actual Gradle configuration, without compiling/substituting a shader
+    # or using a device. The reporting task shares the Debug native argument list.
+    $shippingMobile = @('-PhordeRtInstrumentationOverride=Shipping', '-PhordeRtDielectricQualityOverride=Mobile')
+    $route = $shippingMobile + '-PhordeRtRouteTiming=true'
+    $stages = $route + '-PhordeFrameStageProbe=true'
+    $productionStages = Invoke-GradlePolicyCase 'production-bank-stages' $stages
+    Assert-True ($productionStages.Contains('debugObservation=-DHORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING=ON|-DHORDE_RT_ANDROID_OUTDOOR_SCALE_PROBE=OFF|-DHORDE_RT_FRAME_STAGE_PROBE=ON|-DHORDE_RT_DISPATCH_CLOCK_PROBE=OFF')) 'Production stage-only profile must enable timestamps without shader clocks.'
+    $productionDebugPolicy = @($productionStages -split '\r?\n' | Where-Object { $_.StartsWith('debug=') })
+    Assert-True ($productionDebugPolicy.Count -eq 1) 'Production stage-only profile must expose one Debug native policy.'
+    $productionRoots = @($productionDebugPolicy[0].Substring(6).Split('|') | Where-Object { $_.StartsWith('-DHORDE_RT_REGION_PAGE_PROTOTYPE_ROOT=') })
+    Assert-True ($productionRoots.Count -eq 1 -and $productionRoots[0] -ceq '-DHORDE_RT_REGION_PAGE_PROTOTYPE_ROOT=') 'Production stage-only profile must retain the empty private root.'
+    $explicitOff = Invoke-GradlePolicyCase 'observers-explicit-off' @('-PhordeRtRouteTiming=false', '-PhordeFrameStageProbe=false', '-PhordeDispatchClockProbe=false')
+    Assert-True ($explicitOff.Contains($observersOff)) 'Explicit false must leave route/stage/clock observers disabled.'
+
+    Invoke-GradlePolicyCase 'stages-without-route' ($shippingMobile + '-PhordeFrameStageProbe=true') $true 'Frame stage profiling requires separate Debug chapter route timing'
+    Invoke-GradlePolicyCase 'stages-malformed' ($route + '-PhordeFrameStageProbe=True') $true 'hordeFrameStageProbe must be true or false.'
+    Invoke-GradlePolicyCase 'clocks-malformed' ($stages + '-PhordeDispatchClockProbe=1') $true 'hordeDispatchClockProbe must be true or false.'
+    Invoke-GradlePolicyCase 'stages-diagnostic' @('-PhordeRtInstrumentationOverride=Diagnostic', '-PhordeRtDielectricQualityOverride=Mobile', '-PhordeRtRouteTiming=true', '-PhordeFrameStageProbe=true') $true 'Route timing requires Shipping/Mobile Debug'
+    Invoke-GradlePolicyCase 'stages-high' @('-PhordeRtInstrumentationOverride=Shipping', '-PhordeRtDielectricQualityOverride=High', '-PhordeRtRouteTiming=true', '-PhordeFrameStageProbe=true') $true 'Route timing requires Shipping/Mobile Debug'
+    Invoke-GradlePolicyCase 'conflicting-route-aliases' ($stages + '-PhordeRegionPageRouteTiming=false') $true 'Conflicting route timing properties.'
+    Invoke-GradlePolicyCase 'stages-benchmark' ($stages + '-PhordeBenchmarkValidation=true') $true 'Frame stage profiling requires separate Debug chapter route timing'
+    Invoke-GradlePolicyCase 'stages-staged-debug' @('-PhordeRtRouteTiming=true', '-PhordeFrameStageProbe=true', '-PhordeStagedPrimaryDebugValidation=true') $true 'Staged Debug validation requires explicit Diagnostic/Mobile artifacts'
+    Invoke-GradlePolicyCase 'stages-viewmodel' ($stages + "-PhordeViewmodelCandidateDir=$temporaryRoot") $true 'Frame stage profiling requires separate Debug chapter route timing'
+    Invoke-GradlePolicyCase 'clocks-without-stages' ($route + '-PhordeDispatchClockProbe=true') $true 'Dispatch clock observation requires the private frame stage/clock shader profile.'
+    Invoke-GradlePolicyCase 'production-bank-clocks' ($stages + '-PhordeDispatchClockProbe=true') $true 'Dispatch clock observation requires the private frame stage/clock shader profile.'
+    Invoke-GradlePolicyCase 'relative-private-root' ($stages + '-PhordeRegionPagePrototypeRoot=relative-root') $true 'hordeRegionPagePrototypeRoot requires an absolute private directory'
+    Invoke-GradlePolicyCase 'missing-private-catalog' ($stages + "-PhordeRegionPagePrototypeRoot=$temporaryRoot") $true 'Region-page investigation needs a prepared private shader catalog.'
+
+    # This fixture proves only configuration admission. No private artifact is
+    # compiled, and CMake still validates the real catalogs/ABI before building.
+    $privateFixture = Join-Path $temporaryRoot 'private-profile'
+    $privateCatalogDirectory = Join-Path $privateFixture 'src/vulkan/raytracing'
+    New-Item -ItemType Directory -Path $privateCatalogDirectory -Force | Out-Null
+    Copy-Item -LiteralPath (Join-Path $repoRoot 'src/vulkan/raytracing/RtRayQueryVariantCatalog.generated.h') -Destination $privateCatalogDirectory
+    $privateStages = $stages + "-PhordeRegionPagePrototypeRoot=$privateFixture"
+    $privateResult = Invoke-GradlePolicyCase 'private-bank-stages' $privateStages
+    Assert-True ($privateResult.Contains("-DHORDE_RT_REGION_PAGE_PROTOTYPE_ROOT=$($privateFixture.Replace('\', '/'))")) 'Existing explicit private stage profile must remain admitted.'
+    Invoke-GradlePolicyCase 'private-clocks-missing-abi' ($privateStages + '-PhordeDispatchClockProbe=true') $true 'Dispatch clock observation needs the matching private shader ABI marker.'
+    Write-Utf8NoBom (Join-Path $privateFixture 'dispatch-clock-probe.json') '{"schema":1}'
+    $privateClockResult = Invoke-GradlePolicyCase 'private-clock-configuration' ($privateStages + '-PhordeDispatchClockProbe=true')
+    Assert-True ($privateClockResult.Contains('-DHORDE_RT_FRAME_STAGE_PROBE=ON|-DHORDE_RT_DISPATCH_CLOCK_PROBE=ON')) 'Explicit private clock profile must retain both native observers.'
 
 }
 finally {
