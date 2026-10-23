@@ -1,5 +1,24 @@
 # Horde 1.7 owner playtest checklist - 22 October 2026
 
+## Shared benchmark profile foundation - 23 October
+
+The [bounded profile checkpoint](../evidence/2026-10-23-benchmark-profiles/README.md)
+adds separate versioned provisional mobile/Windows pixel/effect contracts and a
+temporary working-state guard. Four focused native tests pass, including 162
+profile checks for matching observed state, retained intermediate failures and
+exact restoration on success/cancel/error/unwind. All live reports explicitly
+remain custom/unranked. No standard launch, official resolution, ranking,
+leaderboard or publication is admitted. Fixed platform surfaces, per-submission
+dimension/aspect/DRS evidence and actual lifecycle rollback are the next bounded
+integration seam, followed by physical practicality validation. Personal
+confirmed settings, saves and runtime rendering are unchanged.
+
+Exact preceding Kit source `478f6c25` hosted run 39956585719 passes all six jobs,
+including MSVC 149/149 in 13m24s and APK resolver 10/10. Earlier timeout evidence
+remains; this result does not validate newer source. No cap/coverage change.
+Phone is disconnected. HUD comfort/rotation, natural journey and existing Debug,
+PR/conflict, audio and deferred forest/smoke/flask boundaries remain separate.
+
 ## Kit run assessment and waypoint hitch - 23 October
 
 The [bounded existing-rig assessment](../evidence/2026-10-23-kit-run-assessment/README.md)

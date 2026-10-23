@@ -158,6 +158,9 @@ void TestCompletedFreezePrivacyAndPopulation()
     const auto prepared = PrepareBenchmarkSummaryReport(summary, Approval());
     Check(prepared.IsReady() && prepared.Json().size() <= kBenchmarkSummaryReportMaxBytes, "schema2 bounded local summary ready");
     const auto json = prepared.Json();
+    Check(json.find("\"benchmarkProfile\":{\"id\":\"custom\",\"classification\":\"custom-unranked\",\"ranked\":false}") != std::string_view::npos &&
+        json.find("provisional-v1") == std::string_view::npos,
+        "current live report explicitly stays custom and unranked until fixed-surface observations exist");
     Check(json.find("\"reportKind\":\"benchmark-summary\"") != std::string_view::npos &&
         json.find("\"warmupLaps\":1") != std::string_view::npos && json.find("not-collected") != std::string_view::npos &&
         json.find("\"temperatureC\":null") != std::string_view::npos && json.find("\"scanoutFpsMeasured\":false") != std::string_view::npos,

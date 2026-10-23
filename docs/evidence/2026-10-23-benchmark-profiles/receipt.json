@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "baseCommit": "478f6c2512a2ef0aaf3e73e5ce276062091e2118",
+  "evidenceClass": "MSVC Release CPU contract tests and read-only source review; no platform surface/device execution",
+  "sourceGitBlobs": {
+    "src/gameplay/BenchmarkProfile.h": "71444a4cc5c010c2caed88846172a227bac626c1",
+    "tests/BenchmarkProfileTests.cpp": "a10845c6b5d957a0750834796196fc1a9fbf1892",
+    "src/reporting/BenchmarkSummaryReport.cpp": "85cd4e3b877a5d19769b8fdfcac5cb437f5522fa",
+    "tests/BenchmarkSummaryReportTests.cpp": "1ef267683208d409fc5710d5754fd24aa4d15af0",
+    "CMakeLists.txt": "ab24ad3e08bb7d4017479ded3b9ea3c4e30f3a5d"
+  },
+  "profiles": [
+    {
+      "id": "mobile-rt-provisional-v1",
+      "platform": "Android",
+      "compiledOptics": "Mobile",
+      "internal": [
+        640,
+        360
+      ],
+      "output": [
+        1280,
+        720
+      ]
+    },
+    {
+      "id": "windows-rt-provisional-v1",
+      "platform": "Windows",
+      "compiledOptics": "High",
+      "internal": [
+        1920,
+        1080
+      ],
+      "output": [
+        1920,
+        1080
+      ]
+    }
+  ],
+  "allProfilesUnranked": true,
+  "currentLiveReportProfile": "custom-unranked",
+  "selectionResult": {
+    "tests": 4,
+    "passed": 4,
+    "seconds": 3.43,
+    "profileChecks": 162,
+    "profileFailures": 0
+  },
+  "retainedAspectRegression": {
+    "checks": 162,
+    "failuresBefore": 4,
+    "cause": "Exact double tuple comparison rejected valid float-rounded camera aspect",
+    "correction": "Validate observed aspect tolerance before normalizing only the comparison copy; preserve exact original restoration",
+    "review": "Read-only reviewer confirmed closure by inspection"
+  },
+  "windowsRoster": {
+    "registered": 186,
+    "selected": 150,
+    "newNativeFixtureIncluded": true,
+    "existingFiltersDeadlinesAndCapUnchanged": true
+  },
+  "rawLogs": {
+    "reports/benchmark-profile-20261023/build-first.log": "7b1b1ef7261af2132e1d4c5488be51abe72cfb623f9aa6ae8ce54c6d727a5ef5",
+    "reports/benchmark-profile-20261023/focused-tests.log": "9fc9d6c2cc44ff8fba8397d65008cfab82a5e5d0e3674647376c07dba30d1a2f",
+    "reports/benchmark-profile-20261023/float-regression-build.log": "cc0b16bd42b3f00833dd170de1a381414874a544ab79d8ec52823a6ff5973910",
+    "reports/benchmark-profile-20261023/float-regression-before.log": "f550c9cec8a6a648544b92d4ab9e923b3c4dfc06bdf4609548bda88c1c9efe5c",
+    "reports/benchmark-profile-20261023/build-final.log": "fbb8e9c6bfb0ee768e0b9da8ff987bba3735fbe79eaef3c009ff09cadb732f21",
+    "reports/benchmark-profile-20261023/final-tests.log": "612958a259db803f80b6e6e728b0f6442e0eb9242defc64ab30bde80a0b2db5e",
+    "reports/benchmark-profile-20261023/windows-roster.json": "9ee90dec043abe0117ff805b3c47a8189634a8348d66d8b1be83536238821bba"
+  },
+  "lastTestLogSha256": "bcd3058c9fda0ffd5d4bb031a0647eb521b122390a3cf095b8f56c0b2247a373",
+  "notProven": [
+    "Actual fixed surface/output or dispatch dimensions",
+    "Physical aspect-preserving presentation and platform rollback",
+    "Android compilation or device practicality for this new slice",
+    "Ranked fairness, scanout FPS, warm performance or live standardized runs"
+  ],
+  "nextSlice": "Carry actual extents/aspect/DRS/presentation policy in submission-owned evidence, then wire one platform fixed-size owner with acknowledgement and rollback before labeling live provisional runs",
+  "custody": "No phone, owner saves/preferences, assets or rendering changed; parked untracked owner work preserved"
+}

@@ -1,5 +1,6 @@
 #include "reporting/BenchmarkSummaryReport.h"
 #include "reporting/PlaytestReport.h"
+#include "gameplay/BenchmarkProfile.h"
 
 #include <algorithm>
 #include <iomanip>
@@ -125,6 +126,13 @@ PreparedBenchmarkSummaryReport PrepareBenchmarkSummaryReport(const FrozenBenchma
         ",\"completed\":" << data.overall.frames << ",\"cpuAccepted\":" << data.overall.frames <<
         ",\"rejected\":0,\"cancelled\":0,\"cpuRejected\":0,\"outstanding\":0},\"configuration\":{\"platform\":";
     Text(out, c.platform == BenchmarkSummaryPlatform::Windows ? "Windows" : "Android");
+    // Live owners do not yet apply/observe fixed profile surfaces. Never infer
+    // a standard from coincidentally matching endpoints or pixel dimensions.
+    out << ",\"benchmarkProfile\":{\"id\":";
+    Text(out, horde::gameplay::BenchmarkProfileName(horde::gameplay::BenchmarkProfileId::Custom));
+    out << ",\"classification\":";
+    Text(out, horde::gameplay::BenchmarkProfileClassificationName(horde::gameplay::BenchmarkProfileId::Custom));
+    out << ",\"ranked\":false}";
     out << ",\"build\":"; Text(out, m.buildIdentity); out << ",\"shaderPair\":"; Text(out, m.shaderIdentity);
     out << ",\"executionBackend\":"; Text(out, m.executionBackend);
     out << ",\"presentMode\":"; Text(out, m.presentMode);

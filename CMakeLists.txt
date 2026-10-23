@@ -81,6 +81,11 @@ if(BUILD_TESTING)
     target_include_directories(horde_rt_graphics_settings_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     add_test(NAME horde_rt_graphics_settings_tests COMMAND horde_rt_graphics_settings_tests)
 
+    add_executable(horde_rt_benchmark_profile_tests tests/BenchmarkProfileTests.cpp)
+    target_include_directories(horde_rt_benchmark_profile_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    add_test(NAME horde_rt_benchmark_profile_tests COMMAND horde_rt_benchmark_profile_tests)
+    set_tests_properties(horde_rt_benchmark_profile_tests PROPERTIES TIMEOUT 30)
+
     add_executable(horde_rt_entry_menu_handoff_tests tests/EntryMenuHandoffTests.cpp)
     target_include_directories(horde_rt_entry_menu_handoff_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     add_test(NAME horde_rt_entry_menu_handoff_tests COMMAND horde_rt_entry_menu_handoff_tests)

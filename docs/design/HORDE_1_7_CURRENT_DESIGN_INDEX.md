@@ -1,5 +1,12 @@
 # Horde 1.7 current design index
 
+Latest [shared benchmark profile foundation](../evidence/2026-10-23-benchmark-profiles/README.md):
+provisional mobile/Windows fixed pixel/effect contracts and exact temporary tuple
+restoration have focused host evidence. Live reports stay custom/unranked;
+fixed-surface launch, submission-owned dimensions and physical validation remain
+open. Preceding source `478f6c25` passes all six hosted jobs; newer source needs its
+own result. No ranking/publication or device operation is activated.
+
 Start with the [23 October scope reconciliation](HORDE_1_7_OWNER_PLAYTEST_CHECKLIST_2026_10_22.md#current-scope-reconciliation---23-october-source-ba8aeacf)
 for implemented/validated/pending/deferred states, the still-deferred shared tree
 system and the next feature tasks. Dated ledgers below retain their own snapshots.
