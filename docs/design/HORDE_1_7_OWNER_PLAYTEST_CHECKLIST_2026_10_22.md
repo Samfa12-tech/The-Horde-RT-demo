@@ -70,6 +70,26 @@ new 1.7 requirements. Preserve the agreed forest-to-town staging boundary.
 
 ## Latest checkpoint - 23 October resumed copy candidate and phone release
 
+**Later bounded desktop worker/probe checkpoint:** the
+[exclusive Kit-worker experiment](../evidence/2026-10-23-actor-worker/README.md)
+remains default OFF. One actual-rig CPU component comparison, including dispatch
+and join, measures 3.814/2.236/3.779 ms for serial/worker/closing serial (40.84%
+median reduction versus the faster control). It excludes owner setup, publication,
+GPU/AS and present time. 663 byte/ownership contracts, Debug unit/resource gates
+and byte-identical fresh native RT images pass. Normal serial application rebuilt;
+Android, dynamic RT continuity and sustained gain are unmeasured. No worker,
+pre-fence or shader-LOD default change is admitted.
+
+The [production-bank probe prerequisite](../evidence/2026-10-23-production-stage-admission/README.md)
+adds explicit configuration/analyzer admission with defaults OFF. Timer/native
+policy and 25 Python checks pass; actual Gradle configuration/Android build are
+blocked opening the existing wrapper cache lock (filesystem access denied).
+No retry/alternate cache or phone operation occurred. No GPU-stage profile is
+claimed. Source checkpoints are committed locally; automatic approval review
+rejected their GitHub backup because it considered checkpoint push approval
+insufficient. Remote remains ba8aeacf pending explicit backup approval; no denied
+push was retried. Keep feature completion next rather than another tuning loop.
+
 **Later one-off authorized trace retry:** host-stdin delivery of the unchanged
 config collected a50-second trace using the same normal-cache APK, without the
 copy candidate. The [recovered profile](../evidence/2026-10-23-phone-scheduling/README.md)

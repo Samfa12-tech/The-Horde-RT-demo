@@ -494,6 +494,10 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
 
     Destroy();
 
+#if HORDE_RT_ACTOR_WORKER_EXPERIMENT
+    // A worker captures an actor address; never move that actor under a job.
+    other.chapterPoseWorker_.reset();
+#endif
     preparedStaticGeometry_ = std::move(other.preparedStaticGeometry_);
     fullStaticGeometrySource_ = std::move(other.fullStaticGeometrySource_);
 #if HORDE_RT_REGION_PAGE_PROTOTYPE
@@ -1144,6 +1148,9 @@ horde::gameplay::simulation::ZoneReadiness PresentableTinyRtScene::WorldZoneRead
 }
 void PresentableTinyRtScene::Destroy()
 {
+#if HORDE_RT_ACTOR_WORKER_EXPERIMENT
+    chapterPoseWorker_.reset(); // Also required on the device-null early path.
+#endif
 #if HORDE_RT_REGION_PAGE_PROTOTYPE
     DestroyRegionPage();
 #endif
@@ -2583,6 +2590,9 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
     const std::string& productionAssetRoot,
     std::string& diagnostic)
 {
+#if HORDE_RT_ACTOR_WORKER_EXPERIMENT
+    chapterPoseWorker_.reset();
+#endif
     (void)developmentDirectory;
     // A successful load below installs a fresh template, including same-size
     // replacements. Failed/preview loads must not retain a previous upload.
@@ -6600,6 +6610,38 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         return false;
     }
 
+#if HORDE_RT_ACTOR_WORKER_EXPERIMENT
+    // The immutable frame owns all request inputs. Kit has a distinct skin/
+    // scratch asset from the player; only its exclusive worker may touch it
+    // until chapterPoseJob joins. The guard joins on every intervening return.
+    horde::scene::assets::SkinnedPbrActorWorker::Job chapterPoseJob;
+    const bool prepareCompanion = WantsChapterCompanion(frame) &&
+        (!thirdActorIsCompanion_ || chapterActorPoseGeneration_ != frame.chapterCompanion.generation ||
+         chapterActorPoseSeconds_ != frame.chapterCompanion.animationSeconds ||
+         chapterActorWalking_ != frame.chapterCompanion.walking ||
+         chapterActorActing_ != frame.chapterCompanion.acting ||
+         chapterActorLocomotion_ != frame.chapterCompanion.locomotion);
+    if (prepareCompanion) {
+        if (!chapterPoseWorker_) {
+            try { chapterPoseWorker_ = std::make_unique<horde::scene::assets::SkinnedPbrActorWorker>(chapterActor_); }
+            catch (const std::exception& error) { diagnostic = error.what(); return false; }
+        }
+        horde::scene::assets::SkinnedPbrActorWorker::Request request;
+        request.identity = frame.tickIndex;
+        request.generation = frame.chapterCompanion.generation;
+        request.time = frame.chapterCompanion.animationSeconds;
+        request.hasBlend = true;
+        request.blend = {horde::scene::SkinnedClip::Walking,
+            frame.chapterCompanion.locomotion.walkPhase * chapterActor_.Duration(horde::scene::SkinnedClip::Walking),
+            frame.chapterCompanion.locomotion.walkWeight};
+        request.measure = WantsSkinWorkMetrics(observation);
+        const auto acting = horde::scene::CompanionUpperBodyRotations(frame.chapterCompanion.acting);
+        if (!request.SetRotations(acting) || !chapterPoseJob.Start(*chapterPoseWorker_, request)) {
+            diagnostic = "Exclusive actor CPU preparation request was not admitted.";
+            return false;
+        }
+    }
+#endif
     using Vec3 = std::array<float, 3>;
     const auto add = [](const Vec3& a, const Vec3& b) { return Vec3{a[0] + b[0], a[1] + b[1], a[2] + b[2]}; };
     const auto subtract = [](const Vec3& a, const Vec3& b) { return Vec3{a[0] - b[0], a[1] - b[1], a[2] - b[2]}; };
@@ -6949,6 +6991,25 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         chapterActorWalking_ != frame.chapterCompanion.walking ||
         chapterActorActing_ != frame.chapterCompanion.acting ||
         chapterActorLocomotion_ != frame.chapterCompanion.locomotion)) {
+        horde::scene::SkinWorkMetrics companionWork;
+#if HORDE_RT_ACTOR_WORKER_EXPERIMENT
+        if (!chapterPoseJob.Active()) {
+            diagnostic = "Current companion pose has no matching exclusive CPU job.";
+            return false;
+        }
+        const auto result = chapterPoseJob.Wait();
+        if (!result.success || result.identity != frame.tickIndex ||
+            result.generation != frame.chapterCompanion.generation) {
+            diagnostic = result.diagnostic.empty() ? "Actor CPU result identity mismatch." : result.diagnostic;
+            return false;
+        }
+        companionWork = result.work;
+        // Worker elapsed time overlaps PlayerSkin. Publish only on the owner;
+        // these work intervals are not additive critical-path durations.
+        if (WantsSkinWorkMetrics(observation) && !observation->stages->Accumulate(
+                horde::telemetry::RtStage::CharacterSkin, result.poseNanoseconds, 1u, 0u, 0u))
+            observation->healthy = false;
+#else
         const auto clip = horde::scene::SkinnedClip::Idle;
         const float time = frame.chapterCompanion.animationSeconds;
         const horde::scene::SkinnedClipBlend blend{horde::scene::SkinnedClip::Walking,
@@ -6957,7 +7018,6 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         // Pose owns clip skinning plus its inseparable floor/bounds/static-PBR
         // repack. CharacterSkin therefore includes that CPU preparation here.
         RtSceneStageScope companionSkinScope(observation, horde::telemetry::RtStage::CharacterSkin);
-        horde::scene::SkinWorkMetrics companionWork;
         const auto acting=horde::scene::CompanionUpperBodyRotations(frame.chapterCompanion.acting);
         if (!chapterActor_.Pose(clip, time, diagnostic, acting, &blend,
                                WantsSkinWorkMetrics(observation)?&companionWork:nullptr)) {
@@ -6965,6 +7025,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             return false;
         }
         companionSkinScope.Complete(1u);
+#endif
         ObserveSkinWork(observation,companionWork);
         const auto& metadata = staticMeshSlot_.InstanceMetadata()[CharacterRenderSlot::kKeeperMetadataIndex];
         const auto& primitive = staticMeshSlot_.PrimitiveMetadata()[metadata.primitiveBase];

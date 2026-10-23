@@ -51,6 +51,9 @@
 #include "gameplay/items/LanternPendulum.h"
 #include "vulkan/raytracing/CharacterRenderSlot.h"
 #include "scene/assets/SkinnedPbrActor.h"
+#if HORDE_RT_ACTOR_WORKER_EXPERIMENT
+#include "scene/assets/SkinnedPbrActorWorker.h"
+#endif
 #include "vulkan/raytracing/FireEmitterBuffer.h"
 #include "vulkan/raytracing/HeldItemBlasMeasurements.h"
 #include "vulkan/raytracing/PlayerRenderSlot.h"
@@ -1242,6 +1245,11 @@ private:
     VkDeviceSize scratchAddressAlignment_ = 0u;
     CharacterRenderSlot characterSlot_;
     horde::scene::assets::SkinnedPbrActor chapterActor_;
+#if HORDE_RT_ACTOR_WORKER_EXPERIMENT
+    // Retired before actor reload/move/destruction; every frame joins before
+    // any actor asset read/upload. No GPU ownership crosses this CPU lane.
+    std::unique_ptr<horde::scene::assets::SkinnedPbrActorWorker> chapterPoseWorker_;
+#endif
     bool chapterActorReady_ = false;
     bool thirdActorIsCompanion_ = false;
     bool thirdActorSubmittedCompanion_ = false;

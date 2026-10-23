@@ -341,6 +341,55 @@ namespace horde::vulkan::raytracing
 
 struct PresentableTinyRtSceneObservationTestAccess
 {
+#if HORDE_RT_ACTOR_WORKER_EXPERIMENT
+    static bool CheckActorWorkerRetirement()
+    {
+        using Worker = horde::scene::assets::SkinnedPbrActorWorker;
+        const auto directory = std::filesystem::path(HORDE_RT_SOURCE_DIR) /
+            "assets/models/characters/runtime/kit-warden-v1";
+        horde::scene::SkinnedClipSet clips;
+        clips.clips[0] = {"Warden|idle", true, true};
+        clips.clips[1] = {"Warden|walk", true, true};
+        clips.clips[2] = {"", false, false}; clips.clips[3] = {"", false, false};
+        std::string diagnostic;
+        const auto load = [&](PresentableTinyRtScene& scene) {
+            return scene.chapterActor_.Load(directory, "kit-warden-lod0.runtime.glb", clips, diagnostic);
+        };
+        const auto start = [&](PresentableTinyRtScene& scene, Worker::Job& job) {
+            scene.chapterPoseWorker_ = std::make_unique<Worker>(scene.chapterActor_);
+            Worker::Request request; request.time = .3f; request.identity = 17; request.generation = 9;
+            return job.Start(*scene.chapterPoseWorker_, request);
+        };
+        bool ok = true;
+        PresentableTinyRtScene scene;
+        if (!load(scene)) return Require(false, diagnostic);
+        Worker::Job destroying;
+        if (!start(scene, destroying)) return false;
+        scene.Destroy(); // Must retire even before the device-null early return.
+        ok &= Require(!scene.chapterPoseWorker_ && destroying.Wait().success,
+                      "device-null Destroy must join the actor worker");
+        Worker::Job moving;
+        if (!start(scene, moving)) return false;
+        PresentableTinyRtScene moved(std::move(scene));
+        ok &= Require(!scene.chapterPoseWorker_ && !moved.chapterPoseWorker_ && moving.Wait().success &&
+                      !moved.chapterActor_.Asset().vertices.empty(),
+                      "scene move must retire source worker before moving its actor");
+        PresentableTinyRtScene destination;
+        if (!load(destination)) return false;
+        Worker::Job replacing;
+        if (!start(destination, replacing)) return false;
+        destination = std::move(moved);
+        ok &= Require(!destination.chapterPoseWorker_ && replacing.Wait().success &&
+                      !destination.chapterActor_.Asset().vertices.empty(),
+                      "move into populated scene must retire destination worker");
+        Worker::Job reloading;
+        if (!start(destination, reloading)) return false;
+        const bool loaded = destination.LoadStaticHeldItemAssets("", "missing-actor-worker-test-assets", diagnostic);
+        ok &= Require(!loaded && !destination.chapterPoseWorker_ && reloading.Wait().success,
+                      "failed asset reload must first retire actor preparation");
+        return ok;
+    }
+#endif
     static bool CheckPlayerUploadCopy(const bool benchmark = false)
     {
         using namespace horde::gameplay::animation;
@@ -1693,6 +1742,11 @@ int main(int argc, char** argv)
 #ifdef _MSC_VER
     _CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_FILE);
     _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);
+#endif
+#if HORDE_RT_ACTOR_WORKER_EXPERIMENT
+    if (argc == 2 && std::string_view(argv[1]) == "--actor-worker-lifetime-check")
+        return PresentableTinyRtSceneObservationTestAccess::CheckActorWorkerRetirement() ? 0 : 1;
+    if (!PresentableTinyRtSceneObservationTestAccess::CheckActorWorkerRetirement()) return 1;
 #endif
     if (argc == 2 && std::string_view(argv[1]) == "--player-upload-copy-benchmark")
         return PresentableTinyRtSceneObservationTestAccess::CheckPlayerUploadCopy(true) ? 0 : 1;

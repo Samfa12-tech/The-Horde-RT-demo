@@ -1,0 +1,4 @@
+Retained excerpt from first completed unit invocation, exit 1:
+FAIL: worker-local metrics are returned only after joining
+
+The fixture incorrectly assumed one copy. Existing SkinUniquePbr also counts its textured-copy pass. The correction compares worker counts/bytes against the actual serial metrics, retaining exact byte parity and all lifecycle gates. No runtime correction was needed.

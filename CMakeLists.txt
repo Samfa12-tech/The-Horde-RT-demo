@@ -29,6 +29,7 @@ option(HORDE_RT_BUILD_CAPABILITY_PROBE_EXECUTABLE "Build the standalone command 
 option(HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW "Build the Win32 diagnostic shell" ON)
 option(HORDE_RT_BUILD_VULKAN_TARGETS "Build targets that require a Vulkan SDK" ON)
 option(HORDE_RT_CHAPTER_MEASUREMENT "Enable the bounded chapter Shipping route in an optimized Windows development build" OFF)
+option(HORDE_RT_ACTOR_WORKER_EXPERIMENT "Opt-in exclusive CPU actor preparation experiment; not admitted for shipping" OFF)
 
 include(CTest)
 if(WIN32 AND (BUILD_TESTING OR (HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW)))
@@ -361,6 +362,8 @@ if(HORDE_RT_BUILD_VULKAN_TARGETS)
     add_library(horde_rt_probe_core STATIC
         ${HORDE_RT_SOURCE_FILES}
     )
+    target_compile_definitions(horde_rt_probe_core PUBLIC
+        HORDE_RT_ACTOR_WORKER_EXPERIMENT=$<BOOL:${HORDE_RT_ACTOR_WORKER_EXPERIMENT}>)
 
     target_include_directories(horde_rt_probe_core
         PUBLIC
@@ -1699,6 +1702,11 @@ if(BUILD_TESTING AND TARGET horde_rt_probe_core)
     add_test(NAME horde_rt_chapter_terrain_journey_tests COMMAND horde_rt_rescue_journey_integration_tests --authored-terrain)
     add_executable(horde_rt_kit_source_intake_tests tests/KitSourceIntakeTests.cpp)
     add_executable(horde_rt_skin_work_benchmark tests/SkinWorkBenchmark.cpp)
+    add_executable(horde_rt_actor_pose_worker_tests tests/ActorPoseWorkerTests.cpp)
+    target_link_libraries(horde_rt_actor_pose_worker_tests PRIVATE horde_rt_probe_core Threads::Threads)
+    target_compile_definitions(horde_rt_actor_pose_worker_tests PRIVATE HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
+    add_test(NAME horde_rt_actor_pose_worker_tests COMMAND horde_rt_actor_pose_worker_tests)
+    set_tests_properties(horde_rt_actor_pose_worker_tests PROPERTIES TIMEOUT 30)
     target_link_libraries(horde_rt_skin_work_benchmark PRIVATE horde_rt_probe_core)
     target_compile_definitions(horde_rt_skin_work_benchmark PRIVATE HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
     target_link_libraries(horde_rt_kit_source_intake_tests PRIVATE horde_rt_probe_core)
