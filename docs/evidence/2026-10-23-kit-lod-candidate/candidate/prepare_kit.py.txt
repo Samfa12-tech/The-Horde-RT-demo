@@ -1,0 +1,265 @@
+"""One offline protected-region index reduction; never edits admitted assets.
+
+Uses installed gltfpack only for unprotected index proposals. Final geometry
+copies original attribute records and is appended to the untouched original BIN.
+All original accessors/views, rig, animations and metadata remain unchanged.
+"""
+from __future__ import annotations
+import collections
+import argparse
+import copy
+import hashlib
+import json
+import math
+from pathlib import Path
+import struct
+import subprocess
+import sys
+
+ROOT = Path(__file__).resolve().parents[2]
+OUT = Path(__file__).resolve().parent
+WORLD = ROOT / 'assets/models/player/runtime/gothic-traveller-lod0.runtime.glb'
+VIEW = ROOT / 'assets/models/player/viewmodel/runtime/gothic-traveller-viewmodel.runtime.glb'
+EXPECTED_WORLD = '46a88dac9dd569117be5a17a35540fecf3e0e6026d3ad404dd5fdbc85a9ad54f'
+EXPECTED_VIEW = 'eaa0db3abb8ff2dae616247054c190031a08c542dd95396cc6dc1e18a7462488'
+PACK = Path('C:/Dev/tools/meshoptimizer-1.2/gltfpack.exe')
+COMPONENTS = {5121:('B',1),5123:('H',2),5125:('I',4),5126:('f',4)}
+WIDTH = {'SCALAR':1,'VEC2':2,'VEC3':3,'VEC4':4,'MAT4':16}
+
+
+def sha(data): return hashlib.sha256(data).hexdigest()
+def save_json(name, value):
+    with (OUT / name).open('x', encoding='utf-8', newline='\n') as stream:
+        stream.write(json.dumps(value, indent=2, allow_nan=False) + '\n')
+
+
+class Glb:
+    def __init__(self, path):
+        self.raw = Path(path).read_bytes()
+        magic, version, length = struct.unpack_from('<III', self.raw)
+        assert magic == 0x46546c67 and version == 2 and length == len(self.raw)
+        jlen, kind = struct.unpack_from('<II', self.raw, 12)
+        assert kind == 0x4e4f534a
+        self.doc = json.loads(self.raw[20:20+jlen])
+        blen, kind = struct.unpack_from('<II', self.raw, 20+jlen)
+        assert kind == 0x004e4942
+        self.bin = self.raw[28+jlen:28+jlen+blen]
+        assert len(self.bin) == blen and len(self.doc['buffers']) == 1
+
+    def records(self, accessor):
+        a = self.doc['accessors'][accessor]
+        assert not a.get('sparse')
+        v = self.doc['bufferViews'][a['bufferView']]
+        width = COMPONENTS[a['componentType']][1] * WIDTH[a['type']]
+        stride = v.get('byteStride', width)
+        start = v.get('byteOffset',0) + a.get('byteOffset',0)
+        result = [self.bin[start+i*stride:start+i*stride+width] for i in range(a['count'])]
+        assert all(len(record) == width for record in result)
+        return result
+
+    def values(self, accessor):
+        a = self.doc['accessors'][accessor]
+        fmt = '<' + COMPONENTS[a['componentType']][0] * WIDTH[a['type']]
+        return [struct.unpack(fmt, item) for item in self.records(accessor)]
+
+
+def write_glb(path, doc, binary):
+    encoded = json.dumps(doc,separators=(',',':'),ensure_ascii=False).encode()
+    encoded += b' ' * (-len(encoded) % 4)
+    binary = bytes(binary) + b'\0' * (-len(binary) % 4)
+    raw = struct.pack('<III',0x46546c67,2,28+len(encoded)+len(binary))
+    raw += struct.pack('<II',len(encoded),0x4e4f534a)+encoded
+    raw += struct.pack('<II',len(binary),0x004e4942)+binary
+    with path.open('xb') as stream: stream.write(raw)
+
+
+def append_accessor(doc, binary, source_accessor, records, values=None):
+    binary.extend(b'\0' * (-len(binary) % 4))
+    offset = len(binary)
+    binary.extend(b''.join(records))
+    view = len(doc['bufferViews'])
+    doc['bufferViews'].append({'buffer':0,'byteOffset':offset,'byteLength':len(binary)-offset})
+    source = copy.deepcopy(source_accessor)
+    source.update(bufferView=view, byteOffset=0, count=len(records))
+    source.pop('min',None);source.pop('max',None)
+    if values is not None and values:
+        source['min'] = [min(v[i] for v in values) for i in range(len(values[0]))]
+        source['max'] = [max(v[i] for v in values) for i in range(len(values[0]))]
+    index = len(doc['accessors']);doc['accessors'].append(source)
+    return index
+
+
+def pkey(p): return tuple(round(x/1e-6) for x in p)
+def edge(a,b): return tuple(sorted((a,b)))
+def tri_edges(tri):
+    return (edge(tri[0],tri[1]),edge(tri[1],tri[2]),edge(tri[2],tri[0]))
+def triangles(indices): return [tuple(indices[i:i+3]) for i in range(0,len(indices),3)]
+def boundary(positions, tris):
+    counts = collections.Counter(e for t in tris for e in tri_edges(tuple(pkey(positions[i]) for i in t)))
+    assert not any(a==b for a,b in counts)
+    return collections.Counter({e:n for e,n in counts.items() if n==1})
+
+
+def local_matrix(node):
+    if 'matrix' in node: return node['matrix']
+    x,y,z,w = node.get('rotation',[0,0,0,1]);sx,sy,sz=node.get('scale',[1,1,1]);t=node.get('translation',[0,0,0])
+    return [(1-2*y*y-2*z*z)*sx,(2*x*y+2*w*z)*sx,(2*x*z-2*w*y)*sx,0,
+            (2*x*y-2*w*z)*sy,(1-2*x*x-2*z*z)*sy,(2*y*z+2*w*x)*sy,0,
+            (2*x*z+2*w*y)*sz,(2*y*z-2*w*x)*sz,(1-2*x*x-2*y*y)*sz,0,*t,1]
+def mul(a,b): return [sum(a[k*4+row]*b[col*4+k] for k in range(4)) for col in range(4) for row in range(4)]
+def node_worlds(doc):
+    parents={child:i for i,n in enumerate(doc['nodes']) for child in n.get('children',[])};cache={}
+    def resolve(i):
+        if i not in cache:cache[i]=mul(resolve(parents[i]),local_matrix(doc['nodes'][i])) if i in parents else local_matrix(doc['nodes'][i])
+        return cache[i]
+    return [resolve(i) for i in range(len(doc['nodes']))]
+
+
+
+# Kit-only offline study. Helpers above are copied unchanged from the earlier
+# original-row graft generator; runtime/default assets are never modified.
+WORLD = ROOT / 'assets/models/characters/runtime/kit-warden-v1/kit-warden-lod0.runtime.glb'
+EXPECTED_WORLD = '1ba628235814b5912ae1439b180347dd8e1cce85b0f4d1fae5bbacb41e7d3713'
+PLAYER_WORLD = ROOT / 'assets/models/player/runtime/gothic-traveller-lod0.runtime.glb'
+EXPECTED_PLAYER_WORLD = '46a88dac9dd569117be5a17a35540fecf3e0e6026d3ad404dd5fdbc85a9ad54f'
+KIT_MASTER = ROOT / 'assets/models/characters/source/kit-warden-v1/briarhold-warden-1k.glb'
+EXPECTED_MASTER = '47e249840ed9dd438da386137257050a5bd463e7fe54bf94873e1fd21715835e'
+CANDIDATE = 'kit-warden-protected-index-candidate.glb'
+
+
+def plan_source():
+    world = Glb(WORLD)
+    assert sha(world.raw) == EXPECTED_WORLD
+    assert sha(VIEW.read_bytes()) == EXPECTED_VIEW
+    assert sha(PLAYER_WORLD.read_bytes()) == EXPECTED_PLAYER_WORLD
+    assert sha(KIT_MASTER.read_bytes()) == EXPECTED_MASTER
+    assert len(world.doc['meshes']) == 1
+    assert len(world.doc['meshes'][0]['primitives']) == 1
+    assert len(world.doc['skins']) == 1 and len(world.doc['animations']) == 7
+    p = world.doc['meshes'][0]['primitives'][0]
+    assert not p.get('targets')
+    attrs = {key: world.values(index) for key,index in p['attributes'].items()}
+    pos = attrs['POSITION']
+    ts = triangles([v[0] for v in world.values(p['indices'])])
+    names = [world.doc['nodes'][i].get('name','') for i in world.doc['skins'][0]['joints']]
+    head = set(); boots = set(); hands = set(); weldrows = collections.defaultdict(set)
+    for i,v in enumerate(pos):
+        weights = {names[j]: w for j,w in zip(attrs['JOINTS_0'][i],attrs['WEIGHTS_0'][i]) if w > 1e-5}
+        if v[1] >= 1.55 or weights.get('Head',0) > 0 or weights.get('neck',0) > 0: head.add(i)
+        if v[1] <= .45: boots.add(i)
+        if weights.get('LeftHand',0) > 0 or weights.get('RightHand',0) > 0: hands.add(i)
+        weldrows[pkey(v)].add(i)
+    edgefaces = collections.defaultdict(list)
+    for ti,t in enumerate(ts):
+        for e in tri_edges(tuple(pkey(pos[i]) for i in t)): edgefaces[e].append(ti)
+    # Preserve boundary and inherited nonmanifold neighborhoods, not a blanket
+    # lock of every UV seam or all bind-pose apparent contours.
+    seed_keys = {key for e,ids in edgefaces.items() if len(ids) != 2 for key in e}
+    seed_rows = set().union(*(weldrows[key] for key in seed_keys))
+    ring_triangles = [ti for ti,t in enumerate(ts) if any(i in seed_rows for i in t)]
+    ring_keys = {pkey(pos[i]) for ti in ring_triangles for i in ts[ti]}
+    ring_rows = set().union(*(weldrows[key] for key in ring_keys))
+    protected = head | boots | hands | ring_rows
+    fixed = [t for t in ts if any(i in protected for i in t)]
+    eligible = [t for t in ts if not any(i in protected for i in t)]
+    records = {key: world.records(index) for key,index in p['attributes'].items()}
+    row_bytes = [b''.join(records[key][i] for key in sorted(records)) for i in range(len(pos))]
+    counts = {'vertices':len(pos),'triangles':len(ts),'headNeckOrY155Rows':len(head),'bootY045Rows':len(boots),
+        'handContactRows':len(hands),'boundaryNonmanifoldSeedRows':len(seed_rows),'topologyOneRingTriangles':len(ring_triangles),
+        'topologyOneRingRows':len(ring_rows),'protectedRows':len(protected),'fixedTriangles':len(fixed),'eligibleTriangles':len(eligible),
+        'completeAttributeRowsUnique':len(set(row_bytes)),'redundantCompleteAttributeRows':len(row_bytes)-len(set(row_bytes))}
+    return world,p,attrs,ts,protected,fixed,eligible,counts,{'headNeckOrY155':head,'bootsY045':boots,'hands':hands,'topologyOneRing':ring_rows}
+
+
+def prepare():
+    world,p,attrs,ts,protected,fixed,eligible,counts,regions = plan_source()
+    assert counts['vertices'] == 26945 and counts['triangles'] == 25968
+    assert counts['protectedRows'] == 11428 and len(fixed) == 11075 and len(eligible) == 14893
+    source_manifest = WORLD.parent / 'asset.manifest.json'
+    with (OUT/'asset.manifest.json').open('xb') as stream: stream.write(source_manifest.read_bytes())
+    protection = {'status':'PREDECLARED_EXACT_PROTECTION','sourceSha256':EXPECTED_WORLD,'counts':counts,
+        'regions':{name:sorted(rows) for name,rows in regions.items()},'protectedSourceRows':sorted(protected),
+        'sourceFixedTriangleIndices':[i for i,t in enumerate(ts) if any(v in protected for v in t)],
+        'rule':'Head/neck positive influence >1e-5 or bind Y>=1.55m; all bind Y<=0.45m; Hand positive influence >1e-5; welded original one-ring around every boundary or nonmanifold edge. Every incident original triangle retained exactly.'}
+    save_json('protected-source-rows.json',protection)
+    with (OUT/'protected-source-rows.u32le').open('xb') as stream: stream.write(b''.join(struct.pack('<I',i) for i in sorted(protected)))
+    inventory = {'status':'PREFLIGHT','sourceSha256':sha(world.raw),'sourceBytes':len(world.raw),'sourceMasterSha256':sha(KIT_MASTER.read_bytes()),
+        'sourceMasterPath':str(KIT_MASTER.relative_to(ROOT)),'sourceRuntimePath':str(WORLD.relative_to(ROOT)),
+        'viewmodelUnchangedSha256':sha(VIEW.read_bytes()),'playerWorldUnchangedSha256':sha(PLAYER_WORLD.read_bytes()),'counts':counts,
+        'sourceManifestSha256':sha(source_manifest.read_bytes()),'toolPolicy':'One gltfpack 1.2 invocation at -si0.5/-se0.005, locked proxy borders, no quantization, no permissive/aggressive mode. Final mesh copies original attribute rows, rig/clips/materials and BIN prefix; optimizer attributes/animations are never admitted.',
+        'silhouettePolicy':'Whole exact protected regions; torso/limb bounded-error index proposal. -se0.005 means relative 0.5%, not a 5mm guarantee. Final conversational/front/side RT contour/acting review is required; no blanket contour or UV seam locking.',
+        'provenance':'Existing owner-supplied Meshy Warden; original source and runtime remain unchanged. Same asset-specific redistribution evidence in ASSET_LICENSES.md. No acquisition, generation service, paid operation or licence change.'}
+    save_json('preflight.json',inventory)
+    print(json.dumps({'status':'PREFLIGHT','counts':counts}),flush=True)
+    proxy = copy.deepcopy(world.doc); binary = bytearray(world.bin); proxy_p = copy.deepcopy(p)
+    proxy_p['indices'] = append_accessor(proxy,binary,world.doc['accessors'][p['indices']],[struct.pack('<H',i) for t in eligible for i in t])
+    proxy['meshes'][0]['primitives'] = [proxy_p];proxy['buffers'][0]['byteLength'] = len(binary)
+    proxy_path = OUT/'unprotected-input.glb';proposal_path = OUT/'unprotected-index-proposal.glb'
+    write_glb(proxy_path,proxy,binary)
+    command = [str(PACK),'-i',str(proxy_path),'-o',str(proposal_path),'-si','0.5','-se','0.005','-slb','-noq','-kn','-km','-kv','-ke','-af','0','-ac','-v']
+    save_json('optimizer-invocation.json',{'command':command,'toolSha256':sha(PACK.read_bytes()),'authorizedOptimizerInvocations':1,'invocationOrdinal':1})
+    result = subprocess.run(command,capture_output=True,text=True,timeout=180,creationflags=subprocess.CREATE_NO_WINDOW)
+    with (OUT/'optimizer.log').open('x',encoding='utf8') as stream:stream.write(result.stdout+result.stderr)
+    save_json('optimizer-command.json',{'command':command,'returnCode':result.returncode,'toolSha256':sha(PACK.read_bytes())})
+    assert result.returncode == 0,'Optimizer failed; no retry authorized'
+    proposal = Glb(proposal_path)
+    qs = [q for mesh in proposal.doc['meshes'] for q in mesh['primitives']]
+    assert len(qs) == 1,'Unexpected optimizer primitive ownership'
+    q = qs[0]
+    assert proposal.doc['materials'][q['material']]['name'] == world.doc['materials'][p['material']]['name']
+    qpos = proposal.values(q['attributes']['POSITION']);quv = proposal.values(q['attributes']['TEXCOORD_0']);qnorm = proposal.values(q['attributes']['NORMAL'])
+    lookup = collections.defaultdict(list)
+    for i,(pos,uv) in enumerate(zip(attrs['POSITION'],attrs['TEXCOORD_0'])): lookup[tuple(pos)+tuple(uv)].append(i)
+    mapping=[]
+    for pos,uv,normal in zip(qpos,quv,qnorm):
+        choices = lookup.get(tuple(pos)+tuple(uv),[])
+        assert choices,'Proposal moved or quantized position/UV; no snapping'
+        skins = {(tuple(attrs['JOINTS_0'][i]),tuple(attrs['WEIGHTS_0'][i])) for i in choices}
+        assert len(skins) == 1,'Ambiguous original skin identity'
+        mapping.append(max(choices,key=lambda i:sum(attrs['NORMAL'][i][k]*normal[k] for k in range(3))))
+    proposed = [tuple(mapping[i] for i in t) for t in triangles([v[0] for v in proposal.values(q['indices'])])]
+    final = fixed + proposed
+    used = sorted({i for t in final for i in t} | protected)
+    remap = {old:new for new,old in enumerate(used)}
+    output = copy.deepcopy(world.doc); binary = bytearray(world.bin); newp = copy.deepcopy(p);newp['attributes']={}
+    for name,accessor in p['attributes'].items():
+        source_records = world.records(accessor)
+        newp['attributes'][name] = append_accessor(output,binary,world.doc['accessors'][accessor],[source_records[i] for i in used],[attrs['POSITION'][i] for i in used] if name == 'POSITION' else None)
+    newp['indices'] = append_accessor(output,binary,world.doc['accessors'][p['indices']],[struct.pack('<H',remap[i]) for t in final for i in t])
+    output['meshes'][0]['primitives'] = [newp];output['buffers'][0]['byteLength'] = len(binary)
+    path = OUT/CANDIDATE;write_glb(path,output,binary);verify = Glb(path)
+    assert verify.bin[:len(world.bin)] == world.bin
+    assert verify.doc['accessors'][:len(world.doc['accessors'])] == world.doc['accessors']
+    assert verify.doc['bufferViews'][:len(world.doc['bufferViews'])] == world.doc['bufferViews']
+    for key,value in world.doc.items():
+        if key not in ('meshes','accessors','bufferViews','buffers'):assert verify.doc[key] == value,key
+    assert sha(WORLD.read_bytes()) == EXPECTED_WORLD and sha(VIEW.read_bytes()) == EXPECTED_VIEW
+    assert sha(PLAYER_WORLD.read_bytes()) == EXPECTED_PLAYER_WORLD and sha(KIT_MASTER.read_bytes()) == EXPECTED_MASTER
+    packed_map = b''.join(struct.pack('<I',i) for i in used)
+    with (OUT/'source-row-map.u32le').open('xb') as stream:stream.write(packed_map)
+    save_json('source-row-map.json',{'schema':1,'sourceSha256':EXPECTED_WORLD,'candidateSha256':sha(verify.raw),'primitive':0,
+        'order':'Exact candidate POSITION accessor/native unique vertex order; each value is original primitive0 local source vertex index',
+        'candidateVertexCount':len(used),'sourceRowsByCandidateVertex':used,'u32leSha256':sha(packed_map)})
+    nongeometry=set()
+    for skin in world.doc['skins']:nongeometry.add(skin['inverseBindMatrices'])
+    for animation in world.doc['animations']:
+        for sampler in animation['samplers']:nongeometry.update((sampler['input'],sampler['output']))
+    assert len(nongeometry) == 457
+    inventory.update(status='UNADMITTED_PENDING_INDEPENDENT_STATIC_NATIVE_RT_REVIEW',candidate=CANDIDATE,candidateSha256=sha(verify.raw),candidateBytes=len(verify.raw),
+        afterVertices=len(used),afterTriangles=len(final),proposedEligibleTriangles=len(proposed),sourceRowMapSha256=sha(packed_map),
+        semanticBoundaryExact=boundary(attrs['POSITION'],ts)==boundary(attrs['POSITION'],final),
+        duplicateIndexTriangles=len(final)-len({tuple(sorted(t)) for t in final}),
+        unchanged={'originalBinPrefixBytes':len(world.bin),'originalBinPrefixSha256':sha(world.bin),
+            'allOriginalAccessorDefinitions':len(world.doc['accessors']),'allOriginalBufferViews':len(world.doc['bufferViews']),
+            'allNongeometryMetadataValuesExact':True,'rigJointCount':len(world.doc['skins'][0]['joints']),'clipNames':[x['name'] for x in world.doc['animations']],
+            'nongeometryAccessors':[{'index':i,'bytes':sum(map(len,world.records(i))),'sha256':sha(b''.join(world.records(i)))} for i in sorted(nongeometry)]},
+        limits=['One optimizer invocation only, no repair/retuning loop.','Exact surviving attributes do not prove unchanged interpolated surface, texture/normal interpolation, acting or silhouette.','Original BIN remains as unused prefix for proof; file growth is audit overhead, not shipping savings.','No runtime/default asset/test/Git/build/device changes; no native, image, frame/GPU/phone acceptance claimed.'])
+    save_json('receipt.json',inventory)
+    print(json.dumps({'status':inventory['status'],'candidateSha256':inventory['candidateSha256'],'vertices':[len(attrs['POSITION']),len(used)],'triangles':[len(ts),len(final)],'sourceRowMapCount':len(used)}),flush=True)
+
+
+if __name__ == '__main__':
+    try:prepare()
+    except Exception as error:
+        save_json('failure.json',{'status':'UNADMITTED_GENERATION_FAILURE_NO_RETRY','reason':str(error),'sourceSha256':sha(WORLD.read_bytes()),'viewmodelSha256':sha(VIEW.read_bytes()),'noRuntimeReplacement':True})
+        raise

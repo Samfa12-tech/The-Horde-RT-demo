@@ -1,4 +1,6 @@
 # Keep high-resolution source art out of normal Git history.
+# Retain exact audited Windows receipt/script bytes for this isolated study.
+docs/evidence/2026-10-23-kit-lod-candidate/** -text whitespace=cr-at-eol
 # Generated shader bounds are compared byte-for-byte with native LF output.
 shaders/raytracing/include/rt_regional_water_bounds.generated.glsl text eol=lf
 docs/evidence/2026-10-20-return-save-recovery/** -text whitespace=cr-at-eol

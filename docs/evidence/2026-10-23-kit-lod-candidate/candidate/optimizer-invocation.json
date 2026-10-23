@@ -1,0 +1,26 @@
+{
+  "command": [
+    "C:\\Dev\\tools\\meshoptimizer-1.2\\gltfpack.exe",
+    "-i",
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\kit-lod-candidate-20261023\\unprotected-input.glb",
+    "-o",
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\kit-lod-candidate-20261023\\unprotected-index-proposal.glb",
+    "-si",
+    "0.5",
+    "-se",
+    "0.005",
+    "-slb",
+    "-noq",
+    "-kn",
+    "-km",
+    "-kv",
+    "-ke",
+    "-af",
+    "0",
+    "-ac",
+    "-v"
+  ],
+  "toolSha256": "ff64f45e84aac9a1f58880e40934b3f29277413e2d0b3ed257322261ec021d2b",
+  "authorizedOptimizerInvocations": 1,
+  "invocationOrdinal": 1
+}
