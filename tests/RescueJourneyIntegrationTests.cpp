@@ -105,7 +105,12 @@ int main(int argc,char** argv) {
          "canonical chapter selections must request their actual authored GPU scene");
    chapterSelections+=expected;
   }
-  check(chapterSelections==33,"live journey and all32 chapter views, including both mist states and the three pine views, retain authored-scene admission");
+  check(chapterSelections==35,"live journey and all34 chapter views, including both mist states, three pine views and two F03 directions, retain authored-scene admission");
+  for(const auto name:{"chapter-forest-clue-forward","chapter-forest-clue-reverse"}) {
+   const auto* clue=FindDevelopmentCheckpoint(name);
+   check(clue && DevelopmentCheckpointRequiresAuthoredChapter(*clue),
+         "both direct F03 views must retain actual authored-scene admission");
+  }
   const auto* landing=FindDevelopmentCheckpoint("chapter-landing-north");
   GameSimulation fresh(ProductionGameSimulationConfig());
   DevelopmentCheckpointStageEvidence stageEvidence;
