@@ -100,6 +100,9 @@ All three runs produce the same viewmodel vertex/tangent digest
 `3ab08637b7340073`. Both control complete-output digests match; the world candidate
 is expected to differ. [All720 samples](cpu-samples.csv) and
 [summary, ranges, p95 and artifact hashes](receipt.json) are retained.
+The sample receipt separates canonical Git LF bytes from retained Windows CRLF
+bytes; all720 numeric rows are identical. A pre-backup blob comparison caught and
+corrected that hash convention without changing sample data or results.
 
 Reproduce after building target `horde_rt_actor_pose_worker_tests` in Release:
 
