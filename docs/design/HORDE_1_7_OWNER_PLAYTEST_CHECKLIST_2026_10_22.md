@@ -1,5 +1,66 @@
 # Horde 1.7 owner playtest checklist - 22 October 2026
 
+## Current scope reconciliation - 23 October, source ba8aeacf
+
+This table is the current implementation/acceptance map. The dated receipts below
+retain their original results; they do not override this map or reopen rejected
+experiments. Development continues in the existing
+`.worktrees/horde-1.7-wp2-vertical-proof` checkout on draft PR 27. The phone is
+released; the next experiments are desktop-only.
+
+| Area | Implemented | Validated evidence | Pending or deferred |
+| --- | --- | --- | --- |
+| Playable critical path | Tomb, lantern/rescue shaft, rope ascent, night lookout and return; combat/dodge/parry teaching. | Host route contracts and native RT post-Keeper continuation, isolated save/load and repeat ascent. | Natural Keeper victory through the full earned journey and save/load/death recovery; physical teaching/contact acceptance. Seeded fixtures do not close this. |
+| Recovery and saves | Three slots, manual/latest-auto records, checkpoints, hearts and death Load. | Focused storage/lifecycle and isolated recovery checks. | Refillable, upgradeable flask is approved but its six first-recovery policy decisions remain unresolved; do not invent charges, healing or death/save rules. Full interruption/power-loss acceptance remains open. |
+| Input and captions | Automatic head-clearance crouch, stick-deflection speed, keyboard run key; backward phase selection; safe-area caption repair, visible Skip removed, compact lantern icon. | Host collision/input/Java checks; dynamic Windows RT backward/dodge frames and rope motor continuity. One earlier phone caption line passed. | Final landscape/portrait overlap, touch feel and moving-body acceptance; circular/translucent controls were deprioritized, not completed. Authored backward running and stationary Kit turns remain gaps; turn-step trial was withdrawn. |
+| Music and speech | Approved full outdoor main through the shared Pocket Audio engine/director and existing ducking; current Kit/listener anchoring. | Local bank/control/lifecycle/build/package checks; owner positively listened to the forest main in the recorded phone session. | Kit balance at owner volumes, moving speech, transition/loop listening and physical lifecycle. Forest/foliage ambience has structural checks, not listening acceptance. |
+| Forest and terrain | Two supplied LOD1 tree models, 64 grounded placements, shared four-family materials, terrain/collision and distant town shell. | Grounding/root/collision and native RT captures; exact asset/geometry contracts. | Shared-master mesh/BLAS instancing is **not implemented**; see distinction below. Replacement canopy/Easy Tree remains owner-deferred. Runtime distance LOD/wind remain gaps. One-pine LOD2 was separately rejected; retain LOD1. |
+| Story scenery | Grounded F03 old-road edging/waystone in the existing consolidated owner. | Actual matched RT views, terrain/route clearance and package/build checks. | Chimney smoke. Local v5 outlet prototype is parked/unadmitted; shared bounded High/Low volumetric proposal is not a measured effect. Preserve dry northwest-lookout to southeast-town approach, vista and safe backtracking. |
+| Performance | Existing normal cache, enemy refresh, BLAS UPDATE and bounded player-template-copy candidate. | Copy packing saves about 0.148 ms in one matched desktop component comparison, with byte parity; no phone gain. Current-cache phone stage/scheduling evidence is retained. | One exclusive Kit preparation worker experiment and production-bank GPU stage attribution are next bounded work, not admitted gains. Sustained warm phone performance and acceptable 20% image quality remain open. Do not repeat closed inverse-transform/first-blocker or rejected LOD trials. |
+| Other approved detail | Finite night/foliage cues and six static floor chips. | Structural/lifecycle checks at their recorded checkpoints. | Audio listening; chips do not kick or expose a toggle. Same-rig Kit run/catch-up clip assessment remains a possible bounded task, not an admitted animation. |
+| Benchmark/report plan | Consent-bounded report foundation exists; standardized benchmark/leaderboard requirements are recorded. | Existing report contracts only. | Fixed internal AND output dimensions/aspect, separate mobile/Windows cohorts, DRS-off ranked profiles, transparent samples/outliers and private raw-report flow still need their planned implementation. Weekly publication is not activated. |
+| Release acceptance | Focused source/build/package evidence is backed up through ba8aeacf. | Runtime head 249ec107 has five successful hosted jobs. | MSVC hits the unchanged 15-minute cap; full exact-head CI is incomplete. Debug 30-second route gate remains open (39.26-second observed completion). PR conflicts remain unapplied. Brief phone black-world cause and held-torch clearance remain unresolved; withdrawn corrections stay withdrawn. No merge/release authorization. |
+
+### What “batched trees” currently means
+
+The drafted shared system is recorded in PR 31's
+[11 October instancing/wind plan](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/a89ca287/docs/superpowers/plans/2026-10-11-horde-forest-instancing-and-wind.md).
+Its reusable archetypes/instances are distinct from the current geometry batch.
+[ForestDressing](../../src/scene/ForestDressing.cpp) transforms and copies each
+of the 64 placements into world space, then combines them into four material
+families in the existing static owner. Two source models therefore produce
+323,264 duplicated runtime triangles; `placedInstances` counts authored placements,
+not 64 TLAS instances referencing two shared BLAS. The shared placement/collision
+contract is [ForestTreePlacementContract.h](../../src/gameplay/simulation/ForestTreePlacementContract.h).
+
+The [recorded owner deferral](HORDE_1_7_CURRENT_DESIGN_INDEX.md) says to keep the
+grounded supplied trees for the chapter and defer tree-generator/replacement-canopy
+work until after that goal; the private Easy Tree trial is unadmitted. Local-only
+`reports/easy-tree-ff95ef5-intake/` and `reports/forest-source-intake/` hold intake
+studies, not an admitted shared-BLAS implementation. No uncommitted forest runtime
+change is present at this reconciliation. Sam's status question does not override
+the deferral or establish a performance saving.
+
+### Concrete work order and version boundary
+
+1. Finish one bounded desktop Kit-worker control/candidate comparison, preserving
+   exact pose output and all owner-thread upload/refit ownership. Separately admit
+   the existing production-bank timestamp probe; collect no new phone run here.
+2. Return to player-facing completion rather than another tuning loop: inspect
+   final caption/icon safe-area overlap and select one remaining touch-layout
+   correction from the existing owner feedback. Keep the already implemented
+   no-Skip/icon changes; do not describe them as future source work.
+3. At the next explicitly allocated phone window, prioritize natural earned route
+   recovery and Kit/mix/control acceptance, with a separately bounded warm-play
+   performance check. Do not rerun parked passing fixtures as substitute progress.
+4. Resume smoke or shared forest architecture only within its recorded admission
+   boundary; unresolved flask rules require the owner decision before implementation.
+
+Per `PROJECT_DECISIONS.md`, 1.7 includes the landscape/major geography and distant
+Bellwether shell. Playable town development belongs to 1.8. Free jumping/sliding,
+town interiors/cast/economy and future forge/foundry content are deferred, not
+new 1.7 requirements. Preserve the agreed forest-to-town staging boundary.
+
 ## Latest checkpoint - 23 October resumed copy candidate and phone release
 
 **Later one-off authorized trace retry:** host-stdin delivery of the unchanged

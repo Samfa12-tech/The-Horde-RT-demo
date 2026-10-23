@@ -1,5 +1,9 @@
 # Horde 1.7 current design index
 
+Start with the [23 October scope reconciliation](HORDE_1_7_OWNER_PLAYTEST_CHECKLIST_2026_10_22.md#current-scope-reconciliation---23-october-source-ba8aeacf)
+for implemented/validated/pending/deferred states, the still-deferred shared tree
+system and the next feature tasks. Dated ledgers below retain their own snapshots.
+
 ## 23 October measured phone checkpoint and shared-volume direction
 
 The [fresh physical receipt](../evidence/2026-10-23-phone-skin/README.md) captures
