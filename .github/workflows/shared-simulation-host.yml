@@ -162,8 +162,8 @@ jobs:
   shared-gameplay:
     name: Shared simulation host (${{ matrix.compiler }})
     runs-on: ${{ matrix.os }}
-    # Includes the Windows build, CPU tests and separate offline asset checks.
-    # The 853d31f2 PR lane passed all 97 CTests but exhausted 10 minutes afterward.
+    # Windows retains MSVC native/platform coverage; compiler-independent
+    # source and asset checks remain in both complete Linux lanes.
     timeout-minutes: 15
     strategy:
       fail-fast: false
@@ -181,7 +181,7 @@ jobs:
             compiler: MSVC
             compiler_args: ''
             # The separate WIN32 tool matrix includes SDK/Android/tool-dependent fixtures.
-            # This additive compiler lane runs the same common CPU-host tests.
+            # The Windows helper separately validates its portable-check exclusions.
             ctest_filter_args: >-
               -E '^(horde_rt_scene_abi_generator_tests|horde_rt_raygen_compiler_strategy_tests|horde_rt_raygen_variant_manifest_tests|horde_rt_raygen_variant_artifact_tests|horde_rt_rayquery_compute_shader_tests|horde_rt_pipeline_policy_fence_tests|horde_rt_pipeline_policy_execution_tests|horde_rt_static_texture_array_tool_tests|horde_rt_static_preparation_lod_policy_tests|horde_rt_static_preparation_skip_policy_tests|horde_rt_static_preparation_colliding_lod_policy_tests|horde_rt_dielectric_topology_tool_tests|horde_rt_version_contract_powershell_tests|horde_rt_github_release_preflight_tests|horde_rt_version_contract_windows_powershell_tests)$'
     steps:
@@ -262,7 +262,7 @@ jobs:
           ctest --test-dir build/host-ci --build-config Release
           --output-on-failure --no-tests=error ${{ matrix.ctest_filter_args }}
 
-      - name: Run complete Windows selection with isolated asset-policy overlap
+      - name: Run complete Windows native and platform selection
         if: runner.os == 'Windows'
         shell: pwsh
         env:
@@ -285,15 +285,19 @@ jobs:
           }
 
       - name: Check offline gauntlet chirality and UV winding
+        if: runner.os != 'Windows'
         run: python -m unittest discover -s tests -p test_player_gauntlet_geometry.py -v
 
       - name: Check exact player cloth seam weight transfers
+        if: runner.os != 'Windows'
         run: python -m unittest discover -s tests -p test_player_sleeve_seams.py -v
 
       - name: Check upper torso partition preserves the head mask
+        if: runner.os != 'Windows'
         run: python -m unittest discover -s tests -p test_player_body_partition.py -v
 
       - name: Check bounded segmented cloth seam plans
+        if: runner.os != 'Windows'
         run: python -m unittest discover -s tests -p test_player_segmented_seams.py -v
 
       - name: Check Gradle APK artifact resolution
@@ -301,6 +305,7 @@ jobs:
         run: ./tools/test-resolve-android-apk.ps1
 
       - name: Check Android combat capture expectations
+        if: runner.os != 'Windows'
         shell: pwsh
         run: ./tests/AndroidCombatCaptureExpectations.ps1
 

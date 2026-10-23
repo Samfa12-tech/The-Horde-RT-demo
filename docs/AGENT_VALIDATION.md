@@ -30,16 +30,25 @@ ctest --test-dir build/host-ci --build-config Release --output-on-failure
 This covers non-hardware shared tests, not Vulkan presentation or phone behaviour. Use CTest selection for an affected subset when appropriate; report the actual selection and result instead of hard-coding a test count.
 
 The portable workflow has GCC/Clang Linux and MSVC Windows entries. Windows builds
-the portable targets and runs common tests (including the
-music resolver, audio-worker session/inbox, Core-backed PCM cursor/WAV decoder and immutable asset bank, generic Core contracts and
-byte-exact native-only dependency and closed-roster music asset admission, plus
-the consent-bounded player-report contract and staged-primary page/packing
-contract), plus platform-specific native CPU/UI fixtures including the real
-Windows report form with an injected file destination. Its explicit exclusion is
-the 15 additional `WIN32` tooling fixtures, some of which need shader SDK/Android
-tools not provisioned by this compiler lane. This is additive MSVC coverage, not
-a replacement for the separate full Windows tooling/shader gate. Keep that scope
-and the workflow's fail-on-empty-test behaviour explicit in validation reports.
+the portable targets and retains every native C++ test, including Core-backed PCM,
+shared gameplay, reporting and the compiler-produced provider-object evidence
+wrappers, plus Windows OS/UI fixtures such as the real report form with an
+injected file destination. The existing 15 additional `WIN32` tooling exclusions
+remain; some require shader SDK/Android tools outside this compiler lane.
+Exactly 21 compiler-independent source/asset/policy CTests and five portable
+post-check steps run in both Linux entries instead of repeating on Windows. The
+APK resolver still runs on Windows. The exact roster and bounded evidence are in
+the [MSVC selection checkpoint](evidence/2026-10-23-msvc-ci-selection/README.md).
+
+`tools/run-windows-host-ci-tests.ps1` verifies each portable exclusion occurs once
+in the complete registered roster and checks CTest's filtered result against the
+intended partition. Other registrations, including new native tests, enter by
+default. One CTest execution owns the selection and its log; `--no-tests=error`
+and an explicit nonempty-selection guard remain. `-DryRun` reports the partition
+without executing fixtures. The 15-minute job cap, compiler/build settings and
+permissions are unchanged. This is additive MSVC coverage, not a replacement for
+the separate full Windows tooling/shader gate; local selection checks do not
+establish hosted completion or measured time savings.
 
 The additive `selected-host-sanitizers` Ubuntu24.04 lane runs the finite target
 roster in `tools/run-host-sanitizer-validation.sh` with Clang ASan/UBSan on both
