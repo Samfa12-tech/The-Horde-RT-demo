@@ -1,5 +1,15 @@
 # Horde 1.7 owner playtest checklist - 22 October 2026
 
+## Contextual interaction guidance finished - 23 October
+
+The [bounded help correction](../evidence/2026-10-23-interaction-guidance/README.md)
+updates both Controls pages' chest-only Interact description to cover the existing
+rope Climb/Descend actions and automatic equipment stowing. Android also names the
+new lantern icon and the controller A context action. Actual bindings, movement,
+traversal and saves are unchanged. Resources compile, all 42 selected existing
+Android checks pass without skips, and the Windows app builds. No phone or runtime
+performance claim; physical HUD placement/rotation remains pending.
+
 ## Single Kit study complete, production retained - 23 October
 
 The [one approved Kit candidate](../evidence/2026-10-23-kit-lod-candidate/README.md)
