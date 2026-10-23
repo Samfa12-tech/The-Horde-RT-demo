@@ -132,10 +132,10 @@
   "admission": "desktop opt-in experiment only; Android and sustained full-frame benefit unmeasured",
   "processorIdentifier": "Intel64 Family 6 Model 186 Stepping 2, GenuineIntel",
   "sourceSha256": {
-    "src\\scene\\assets\\SkinnedPbrActorWorker.h": "c3081cc4ade32f1e1f39a2e28f7f4fe8036ee75b3dd1a82845528abe83f9e2b1",
-    "tests\\ActorPoseWorkerTests.cpp": "f6ef6f8687fc8c4763d53af66aa1aa8952b6cf3764af3b713b9ba97250e9e02c",
-    "src\\vulkan\\raytracing\\PresentableTinyRtScene.cpp": "0154440b8b98b65ef40580698b0a4b5ab1c9761ad04c2942d62e7d188e157049",
-    "src\\vulkan\\raytracing\\PresentableTinyRtScene.h": "fcaa1a34c1b7b57cc1496d727a32a7a49b27e75467f7ca01aad1007067f0ebb5"
+    "src/scene/assets/SkinnedPbrActorWorker.h": "c3081cc4ade32f1e1f39a2e28f7f4fe8036ee75b3dd1a82845528abe83f9e2b1",
+    "tests/ActorPoseWorkerTests.cpp": "f6ef6f8687fc8c4763d53af66aa1aa8952b6cf3764af3b713b9ba97250e9e02c",
+    "src/vulkan/raytracing/PresentableTinyRtScene.cpp": "0154440b8b98b65ef40580698b0a4b5ab1c9761ad04c2942d62e7d188e157049",
+    "src/vulkan/raytracing/PresentableTinyRtScene.h": "fcaa1a34c1b7b57cc1496d727a32a7a49b27e75467f7ca01aad1007067f0ebb5"
   },
   "nativeRt": {
     "control-rt": {
@@ -233,7 +233,7 @@
       "backend": "RayTracingPipeline"
     }
   },
-  "samplesSha256": "36394dceaf38b58d2edcdd5a9f8f6004158d8d93564c0967507a43a4af6d526b",
+  "samplesSha256": "f03f46943fa30182978a1796f7596f2c32932ca6ee82efd54f3c947381196733",
   "contracts": {
     "actualRigChecks": 663,
     "debugCtestSeconds": 4.95,
@@ -257,5 +257,7 @@
     "AS/GPU execution",
     "present",
     "outside-timer digest verification"
-  ]
+  ],
+  "localWindowsSamplesSha256": "36394dceaf38b58d2edcdd5a9f8f6004158d8d93564c0967507a43a4af6d526b",
+  "samplesHashEncoding": "Git blob with LF newlines; local Windows CRLF hash retained separately; parsed values identical"
 }
