@@ -1,0 +1,1 @@
+FAIL: viewmodel admission: Asset manifest exceeds the bounded JSON size limit.

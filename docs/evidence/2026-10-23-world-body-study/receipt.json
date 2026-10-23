@@ -1,0 +1,199 @@
+{
+  "schema": 1,
+  "utc": "2026-10-23T10:53:51.169068+00:00",
+  "status": "UNADMITTED experimental derivative; no RT/GPU/frame or phone acceptance",
+  "sourceCommit": "b62a69ad917f52385b47502ff16cbcc4102e3245 plus benchmark source",
+  "candidate": {
+    "sha256": "1ef3f6f5d8187cb0bf99a5bdfa7b752b10b109e08340b383296fe09dfb573195",
+    "bytes": 4722280,
+    "worldVertices": 29647,
+    "triangles": 22053
+  },
+  "original": {
+    "sha256": "46a88dac9dd569117be5a17a35540fecf3e0e6026d3ad404dd5fdbc85a9ad54f",
+    "bytes": 2568508,
+    "worldVertices": 34304,
+    "triangles": 27815
+  },
+  "viewmodel": {
+    "sha256": "eaa0db3abb8ff2dae616247054c190031a08c542dd95396cc6dc1e18a7462488",
+    "fileUnchanged": true,
+    "vertices": 15855,
+    "sameSampledVertexAndTangentDigest": "3ab08637b7340073"
+  },
+  "nativeValidation": {
+    "worldStaticAndSkinnedAdmission": true,
+    "unchangedViewmodelAndSharedRigAgreement": true,
+    "plantedStanceSamples": 18,
+    "existingActorContractsPassed": 663,
+    "retainedSetupFailure": "first viewmodel CLI arguments transposed; file-size rejection before corrected invocation; no gate change"
+  },
+  "cpu": {
+    "host": "Intel Core i5-13420H, Windows Balanced",
+    "configuration": "MSVC x64 Release; serial only; no worker, upload, AS, GPU or frame timing",
+    "warmupPerRun": 30,
+    "samplesPerRun": 240,
+    "outliersRemoved": 0,
+    "runs": {
+      "opening-control": {
+        "worldVertices": 34304,
+        "viewmodelVertices": 15855,
+        "outputFnv1a64": "9b031ba6f6fb24a9",
+        "viewmodelFnv1a64": "3ab08637b7340073",
+        "milliseconds": {
+          "criticalNs": {
+            "median": 3.8188,
+            "p95NearestRank": 4.4468,
+            "minimum": 3.5577,
+            "maximum": 5.0388
+          },
+          "worldPrepareNs": {
+            "median": 1.31735,
+            "p95NearestRank": 1.5349,
+            "minimum": 1.2392,
+            "maximum": 2.107
+          },
+          "viewmodelSkinNs": {
+            "median": 0.5099,
+            "p95NearestRank": 0.6384,
+            "minimum": 0.4793,
+            "maximum": 0.9267
+          },
+          "playerNs": {
+            "median": 1.82595,
+            "p95NearestRank": 2.1435,
+            "minimum": 1.7362,
+            "maximum": 2.9772
+          },
+          "actorPoseNs": {
+            "median": 1.9475,
+            "p95NearestRank": 2.348,
+            "minimum": 1.7722,
+            "maximum": 3.1386
+          }
+        }
+      },
+      "candidate": {
+        "worldVertices": 29647,
+        "viewmodelVertices": 15855,
+        "outputFnv1a64": "637889067de33a0f",
+        "viewmodelFnv1a64": "3ab08637b7340073",
+        "milliseconds": {
+          "criticalNs": {
+            "median": 3.6943,
+            "p95NearestRank": 4.4319,
+            "minimum": 3.3706,
+            "maximum": 6.2435
+          },
+          "worldPrepareNs": {
+            "median": 1.1692,
+            "p95NearestRank": 1.4127,
+            "minimum": 1.0829,
+            "maximum": 2.2462
+          },
+          "viewmodelSkinNs": {
+            "median": 0.52175,
+            "p95NearestRank": 0.649,
+            "minimum": 0.4755,
+            "maximum": 1.611
+          },
+          "playerNs": {
+            "median": 1.6969,
+            "p95NearestRank": 1.981,
+            "minimum": 1.5801,
+            "maximum": 3.0817
+          },
+          "actorPoseNs": {
+            "median": 1.9728,
+            "p95NearestRank": 2.5617,
+            "minimum": 1.7686,
+            "maximum": 3.1615
+          }
+        }
+      },
+      "closing-control": {
+        "worldVertices": 34304,
+        "viewmodelVertices": 15855,
+        "outputFnv1a64": "9b031ba6f6fb24a9",
+        "viewmodelFnv1a64": "3ab08637b7340073",
+        "milliseconds": {
+          "criticalNs": {
+            "median": 3.8002,
+            "p95NearestRank": 4.4576,
+            "minimum": 3.5636,
+            "maximum": 7.637
+          },
+          "worldPrepareNs": {
+            "median": 1.3115,
+            "p95NearestRank": 1.5771,
+            "minimum": 1.2479,
+            "maximum": 2.5076
+          },
+          "viewmodelSkinNs": {
+            "median": 0.51055,
+            "p95NearestRank": 0.642,
+            "minimum": 0.4812,
+            "maximum": 1.1557
+          },
+          "playerNs": {
+            "median": 1.8323,
+            "p95NearestRank": 2.1758,
+            "minimum": 1.7476,
+            "maximum": 3.5614
+          },
+          "actorPoseNs": {
+            "median": 1.94415,
+            "p95NearestRank": 2.3316,
+            "minimum": 1.7813,
+            "maximum": 4.0752
+          }
+        }
+      }
+    },
+    "limitations": [
+      "one short sequential desktop bracket",
+      "no clocks/temperature/per-core utilization measurement",
+      "request/shoulder setup and static-PBR packing excluded",
+      "file keeps unused original BIN for identity proof; not a shipping payload",
+      "Android benefit and visual/deformation quality pending"
+    ]
+  },
+  "hashes": {
+    "benchmarkExe": "48a674f688385c35ba1dd3c41358885bde051887b03b74bd4b0b6bc0f5719e5e",
+    "nativeSmokeExe": "7e1d1228811f0e1763667c3f1575a11b071e806559ca3f83f6716d956cb164d8",
+    "benchmarkSourceCanonicalLf": "f07af0eaaf570faef74f937fed8dda70712601f2b93ab4bdd3f9835e234b228c",
+    "cpuSamples": "88cfcdc6fb1388afccf4f5eb4e9c559f698d9fdb14b4f8455a5d9b967faa19a9",
+    "derivationScript": "711fb5279b9fda6880e7b63a38fa80bff0a62e7a28ba5c512d5066eea8254c08",
+    "staticReceipt": "23b4e27a4cdc5d4c2228905a908447fce782cbc4faf8f14f3e362d8d48459cd9",
+    "independentStaticInspection": "7b00615eed10d7db301a0dfc9bec3df8b8fb35e73851dd3afe0aa3cf6dc8e8e5",
+    "inspectionScript": "44a2ac86355036cb3cee4d79d6c7e8c7331eea9057a151006f3ac2236f13e8cc"
+  },
+  "rawLogSha256": {
+    "admission-build.log": "e781d603516708b6f178bd376aef2fe8bc5e23dd5a5a2d1c0dd9eee194742c0b",
+    "candidate.json": "91e0e989598daacfb44a9f1f132e9745543cf620420577e973569b87f1eb294e",
+    "closing-control.json": "88f918bceaffb61772b7b8049c87d5d51c061d48afce7669f532b65f2bb53bd0",
+    "contracts.log": "eb805caa0f0b3879d3e7221681032a89765b878301a81f49eefd50a81917dcd9",
+    "default-smoke.json": "268aafe1b340338257aa1164b7ca523ec9e76dd1aecc1b50b5140f192a54ce3d",
+    "explicit-control-smoke.json": "cd23e5c92003ab8f965a5e5e4d5bfe70283971e18ee2a3318814d9592ca3a4a7",
+    "final-contracts.log": "eb805caa0f0b3879d3e7221681032a89765b878301a81f49eefd50a81917dcd9",
+    "final-harness-build.log": "47e2eb9a7e03e1b833f35e2e99e54d85ebb70578b87b586adcf6a69867d3cc0f",
+    "harness-validation.json": "dab632a04d9ac43813a965dd1dfd06fea6e7efb07b32b9f326e5c76ed24a5221",
+    "opening-control.json": "e15d4301989a3ed2fda3d24846ab487e55040218bced583bf5fbf783a1448fec",
+    "viewmodel-admission-corrected.log": "9f2fa1a69fedc7b43dd38e9697ffeda9185b23d4239b510c2ee3ad0f38e5f4d3",
+    "viewmodel-admission.log": "ac0d906b35ffad7e66f452a840f56e0776e603b801fc4afafc18572b6ad1f5c7",
+    "world-admission.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "staticQualityConcerns": {
+    "disposition": "UNADMITTED; resolve or reject before promotion",
+    "gauntletOpposedTriangleCounts": [
+      0,
+      2
+    ],
+    "bodyRemainderOpposedTriangleCounts": [
+      12,
+      13
+    ],
+    "newBodyPrimarySliverSquareMetres": 1.62e-11,
+    "correctiveOrSecondSimplificationPass": false
+  }
+}

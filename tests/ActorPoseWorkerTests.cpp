@@ -135,7 +135,7 @@ int Contracts()
     std::cout << checks << " actor worker contracts passed\n";
     return 0;
 }
-int Benchmark(bool threaded, unsigned samples)
+int Benchmark(bool threaded, unsigned samples, const std::filesystem::path& worldCandidate = {})
 {
     using namespace horde::vulkan::raytracing;
     using namespace horde::gameplay::animation;
@@ -144,15 +144,18 @@ int Benchmark(bool threaded, unsigned samples)
     PlayerRenderSlot player;
     SkinnedMeshAsset viewmodel;
     std::string error;
-    Check(player.LoadAsset((root / "assets/models/player/runtime/gothic-traveller-lod0.runtime.glb").string(), error), error.c_str());
+    const auto worldPath = worldCandidate.empty()
+        ? root / "assets/models/player/runtime/gothic-traveller-lod0.runtime.glb" : worldCandidate;
+    Check(player.LoadAsset(worldPath.string(), error), error.c_str());
     Check(viewmodel.LoadClips((root / "assets/models/player/viewmodel/runtime/gothic-traveller-viewmodel.runtime.glb").string(),
         PlayerLocomotionClipSet(), error), error.c_str());
     std::unique_ptr<Worker> worker;
     if (threaded) worker = std::make_unique<Worker>(actor);
     std::vector<TexturedSkinnedRtVertex> viewVertices;
     std::vector<SkinnedPbrTangent> viewTangents;
-    std::vector<std::uint64_t> critical, dispatch, join, actorWork, playerWork;
+    std::vector<std::uint64_t> critical, dispatch, join, actorWork, playerWork, worldWork, viewWork;
     std::uint64_t digest = 14695981039346656037ull;
+    std::uint64_t viewDigest = 14695981039346656037ull;
     constexpr unsigned warmup = 30;
     for (unsigned tick = 0; tick < warmup + samples; ++tick)
     {
@@ -179,7 +182,10 @@ int Benchmark(bool threaded, unsigned samples)
         stage = Clock::now();
         bool updated = false;
         Check(player.PreparePose(animation, tick + 1, PlayerCpuSkinCadence::Hz60, updated, error) && updated, error.c_str());
+        const auto worldNs = Ns(stage);
+        const auto viewStart = Clock::now();
         Check(viewmodel.SkinPlayerPoseUniqueTextured(player.SolvedPose(), viewVertices, viewTangents, error), error.c_str());
+        const auto viewNs = Ns(viewStart);
         const auto playerNs = Ns(stage);
         stage = Clock::now();
         Worker::Result result;
@@ -193,28 +199,37 @@ int Benchmark(bool threaded, unsigned samples)
         if (tick < warmup) continue;
         critical.push_back(totalNs); dispatch.push_back(dispatchNs); join.push_back(joinNs);
         actorWork.push_back(worker ? result.poseNanoseconds : dispatchNs); playerWork.push_back(playerNs);
+        worldWork.push_back(worldNs); viewWork.push_back(viewNs);
         // Outside critical timer, identical verification cost in both modes.
         digest = Hash(digest, actor.Asset().vertices.data(), actor.Asset().vertices.size() * sizeof(StaticRtVertex));
         digest = Hash(digest, &actor.Asset().bounds, sizeof(actor.Asset().bounds));
         digest = Hash(digest, player.UniqueVertices().data(), player.UniqueVertices().size() * sizeof(TexturedSkinnedRtVertex));
         digest = Hash(digest, viewVertices.data(), viewVertices.size() * sizeof(TexturedSkinnedRtVertex));
+        viewDigest = Hash(viewDigest, viewVertices.data(), viewVertices.size() * sizeof(TexturedSkinnedRtVertex));
+        viewDigest = Hash(viewDigest, viewTangents.data(), viewTangents.size() * sizeof(SkinnedPbrTangent));
     }
     const auto array = [](const char* name, const auto& values)
     { std::cout << ",\"" << name << "\":["; for (std::size_t i=0;i<values.size();++i) { if(i)std::cout<<',';std::cout<<values[i]; } std::cout<<']'; };
     std::cout << "{\"mode\":\"" << (threaded ? "worker" : "serial") << "\",\"scope\":\"actual Kit pose plus player world/viewmodel CPU preparation; dispatch/join included; no upload/AS/GPU/frame\",\"samples\":"
-        << samples << ",\"warmup\":" << warmup << ",\"outputFnv1a64\":\"" << std::hex << digest << std::dec << '"';
+        << samples << ",\"warmup\":" << warmup << ",\"worldVertices\":" << player.UniqueVertices().size()
+        << ",\"viewmodelVertices\":" << viewVertices.size() << ",\"outputFnv1a64\":\"" << std::hex << digest
+        << "\",\"viewmodelFnv1a64\":\"" << viewDigest << std::dec << '"';
     array("criticalNs", critical); array("dispatchNs", dispatch); array("joinNs", join);
-    array("actorPoseNs", actorWork); array("playerNs", playerWork); std::cout << "}\n";
+    array("actorPoseNs", actorWork); array("playerNs", playerWork);
+    array("worldPrepareNs", worldWork); array("viewmodelSkinNs", viewWork); std::cout << "}\n";
     return 0;
 }
 }
 int main(int argc, char** argv)
 {
-    if (argc == 3 && (std::string_view(argv[1]) == "serial" || std::string_view(argv[1]) == "worker"))
+    if ((argc == 3 || argc == 4) && (std::string_view(argv[1]) == "serial" || std::string_view(argv[1]) == "worker"))
     {
         const auto samples = std::stoul(argv[2]);
         if (samples < 30 || samples > 300) return 2;
-        return Benchmark(std::string_view(argv[1]) == "worker", unsigned(samples));
+        // Explicit experimental file only; the runtime and default fixture keep
+        // loading the admitted world asset. This does not select a worker.
+        return Benchmark(std::string_view(argv[1]) == "worker", unsigned(samples),
+            argc == 4 ? std::filesystem::path(argv[3]) : std::filesystem::path{});
     }
     return Contracts();
 }

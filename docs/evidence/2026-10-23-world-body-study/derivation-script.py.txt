@@ -1,0 +1,250 @@
+"""One offline protected-region index reduction; never edits admitted assets.
+
+Uses installed gltfpack only for unprotected index proposals. Final geometry
+copies original attribute records and is appended to the untouched original BIN.
+All original accessors/views, rig, animations and metadata remain unchanged.
+"""
+from __future__ import annotations
+import collections
+import argparse
+import copy
+import hashlib
+import json
+import math
+from pathlib import Path
+import struct
+import subprocess
+import sys
+
+ROOT = Path(__file__).resolve().parents[2]
+OUT = Path(__file__).resolve().parent
+WORLD = ROOT / 'assets/models/player/runtime/gothic-traveller-lod0.runtime.glb'
+VIEW = ROOT / 'assets/models/player/viewmodel/runtime/gothic-traveller-viewmodel.runtime.glb'
+EXPECTED_WORLD = '46a88dac9dd569117be5a17a35540fecf3e0e6026d3ad404dd5fdbc85a9ad54f'
+EXPECTED_VIEW = 'eaa0db3abb8ff2dae616247054c190031a08c542dd95396cc6dc1e18a7462488'
+PACK = Path('C:/Dev/tools/meshoptimizer-1.2/gltfpack.exe')
+COMPONENTS = {5121:('B',1),5123:('H',2),5125:('I',4),5126:('f',4)}
+WIDTH = {'SCALAR':1,'VEC2':2,'VEC3':3,'VEC4':4,'MAT4':16}
+
+
+def sha(data): return hashlib.sha256(data).hexdigest()
+def save_json(name, value):
+    with (OUT / name).open('x', encoding='utf-8', newline='\n') as stream:
+        stream.write(json.dumps(value, indent=2, allow_nan=False) + '\n')
+
+
+class Glb:
+    def __init__(self, path):
+        self.raw = Path(path).read_bytes()
+        magic, version, length = struct.unpack_from('<III', self.raw)
+        assert magic == 0x46546c67 and version == 2 and length == len(self.raw)
+        jlen, kind = struct.unpack_from('<II', self.raw, 12)
+        assert kind == 0x4e4f534a
+        self.doc = json.loads(self.raw[20:20+jlen])
+        blen, kind = struct.unpack_from('<II', self.raw, 20+jlen)
+        assert kind == 0x004e4942
+        self.bin = self.raw[28+jlen:28+jlen+blen]
+        assert len(self.bin) == blen and len(self.doc['buffers']) == 1
+
+    def records(self, accessor):
+        a = self.doc['accessors'][accessor]
+        assert not a.get('sparse')
+        v = self.doc['bufferViews'][a['bufferView']]
+        width = COMPONENTS[a['componentType']][1] * WIDTH[a['type']]
+        stride = v.get('byteStride', width)
+        start = v.get('byteOffset',0) + a.get('byteOffset',0)
+        result = [self.bin[start+i*stride:start+i*stride+width] for i in range(a['count'])]
+        assert all(len(record) == width for record in result)
+        return result
+
+    def values(self, accessor):
+        a = self.doc['accessors'][accessor]
+        fmt = '<' + COMPONENTS[a['componentType']][0] * WIDTH[a['type']]
+        return [struct.unpack(fmt, item) for item in self.records(accessor)]
+
+
+def write_glb(path, doc, binary):
+    encoded = json.dumps(doc,separators=(',',':'),ensure_ascii=False).encode()
+    encoded += b' ' * (-len(encoded) % 4)
+    binary = bytes(binary) + b'\0' * (-len(binary) % 4)
+    raw = struct.pack('<III',0x46546c67,2,28+len(encoded)+len(binary))
+    raw += struct.pack('<II',len(encoded),0x4e4f534a)+encoded
+    raw += struct.pack('<II',len(binary),0x004e4942)+binary
+    with path.open('xb') as stream: stream.write(raw)
+
+
+def append_accessor(doc, binary, source_accessor, records, values=None):
+    binary.extend(b'\0' * (-len(binary) % 4))
+    offset = len(binary)
+    binary.extend(b''.join(records))
+    view = len(doc['bufferViews'])
+    doc['bufferViews'].append({'buffer':0,'byteOffset':offset,'byteLength':len(binary)-offset})
+    source = copy.deepcopy(source_accessor)
+    source.update(bufferView=view, byteOffset=0, count=len(records))
+    source.pop('min',None);source.pop('max',None)
+    if values is not None and values:
+        source['min'] = [min(v[i] for v in values) for i in range(len(values[0]))]
+        source['max'] = [max(v[i] for v in values) for i in range(len(values[0]))]
+    index = len(doc['accessors']);doc['accessors'].append(source)
+    return index
+
+
+def pkey(p): return tuple(round(x/1e-6) for x in p)
+def edge(a,b): return tuple(sorted((a,b)))
+def tri_edges(tri):
+    return (edge(tri[0],tri[1]),edge(tri[1],tri[2]),edge(tri[2],tri[0]))
+def triangles(indices): return [tuple(indices[i:i+3]) for i in range(0,len(indices),3)]
+def boundary(positions, tris):
+    counts = collections.Counter(e for t in tris for e in tri_edges(tuple(pkey(positions[i]) for i in t)))
+    assert not any(a==b for a,b in counts)
+    return collections.Counter({e:n for e,n in counts.items() if n==1})
+
+
+def local_matrix(node):
+    if 'matrix' in node: return node['matrix']
+    x,y,z,w = node.get('rotation',[0,0,0,1]);sx,sy,sz=node.get('scale',[1,1,1]);t=node.get('translation',[0,0,0])
+    return [(1-2*y*y-2*z*z)*sx,(2*x*y+2*w*z)*sx,(2*x*z-2*w*y)*sx,0,
+            (2*x*y-2*w*z)*sy,(1-2*x*x-2*z*z)*sy,(2*y*z+2*w*x)*sy,0,
+            (2*x*z+2*w*y)*sz,(2*y*z-2*w*x)*sz,(1-2*x*x-2*y*y)*sz,0,*t,1]
+def mul(a,b): return [sum(a[k*4+row]*b[col*4+k] for k in range(4)) for col in range(4) for row in range(4)]
+def node_worlds(doc):
+    parents={child:i for i,n in enumerate(doc['nodes']) for child in n.get('children',[])};cache={}
+    def resolve(i):
+        if i not in cache:cache[i]=mul(resolve(parents[i]),local_matrix(doc['nodes'][i])) if i in parents else local_matrix(doc['nodes'][i])
+        return cache[i]
+    return [resolve(i) for i in range(len(doc['nodes']))]
+
+
+def inspect():
+    world,view=Glb(WORLD),Glb(VIEW)
+    assert sha(world.raw)==EXPECTED_WORLD and sha(view.raw)==EXPECTED_VIEW
+    assert len(world.doc['meshes'])==1 and len(view.doc['meshes'])==1
+    sleeve=next(p for p in view.doc['meshes'][0]['primitives'] if view.doc['materials'][p['material']]['name']=='ViewmodelSleeves')
+    spos=view.values(sleeve['attributes']['POSITION']);st=triangles([v[0] for v in view.values(sleeve['indices'])])
+    borders=boundary(spos,st);assert len(borders)==278,len(borders)
+    seam_points={p for e in borders for p in e}
+    worlds=node_worlds(world.doc);nodes=world.doc['nodes'];grips={}
+    for side in ('Left','Right'):
+        i=next(i for i,n in enumerate(nodes) if n.get('name')==side+'Grip');m=worlds[i]
+        axis=m[4:7];length=math.sqrt(sum(v*v for v in axis))
+        grips[side]=(m[12:15],[v/length for v in axis])
+    joint_names=[nodes[i].get('name','') for i in world.doc['skins'][0]['joints']]
+    plans=[]
+    for p in world.doc['meshes'][0]['primitives']:
+        attrs={k:world.values(i) for k,i in p['attributes'].items()};pos=attrs['POSITION']
+        ts=triangles([v[0] for v in world.values(p['indices'])]);mat=world.doc['materials'][p['material']]['name']
+        boot={i for i,v in enumerate(pos) if v[1]<=.45}
+        seams={i for i,v in enumerate(pos) if pkey(v) in seam_points}
+        contact=set();cuff=set()
+        if mat=='GauntletPrimaryVisible':
+            for i,v in enumerate(pos):
+                weights={joint_names[j]:w for j,w in zip(attrs['JOINTS_0'][i],attrs['WEIGHTS_0'][i]) if w>1e-5}
+                if any('ForeArm' in name for name in weights):cuff.add(i)
+                for side,(centre,axis) in grips.items():
+                    if weights.get(side+'Hand',0)<=0:continue
+                    delta=[v[k]-centre[k] for k in range(3)];axial=sum(delta[k]*axis[k] for k in range(3))
+                    radial=math.sqrt(sum((delta[k]-axial*axis[k])**2 for k in range(3)))
+                    if radial<=.034:contact.add(i)
+        protected=boot|seams|contact|cuff
+        fixed=[t for t in ts if any(i in protected for i in t)]
+        eligible=[t for t in ts if not any(i in protected for i in t)]
+        plans.append({'material':mat,'sourcePrimitive':p,'positions':pos,'attrs':attrs,'triangles':ts,'fixed':fixed,'eligible':eligible,'protected':protected,
+                      'counts':{'vertices':len(pos),'triangles':len(ts),'bootCandidates':len(boot),'sleeveBoundaryRows':len(seams),'gripContactRows':len(contact),'cuffArticulationRows':len(cuff),'protectedRows':len(protected),'fixedTriangles':len(fixed),'eligibleTriangles':len(eligible)}})
+    return world,view,plans,grips
+
+
+def prepare():
+    world,view,plans,grips=inspect()
+    with (OUT/'asset.manifest.json').open('xb') as stream:
+        stream.write((ROOT/'assets/models/player/runtime/asset.manifest.json').read_bytes())
+    inventory={'status':'PREFLIGHT','sourceSha256':sha(world.raw),'sourceBytes':len(world.raw),'viewmodelSha256':sha(view.raw),'viewmodelBytes':len(view.raw),'viewSleeveBoundaryEdges':278,'protection':{'boot':'All original raw bind positions with Y<=0.45m, matching native bootGroundingVertexIndices_. Every incident source triangle retained.','seams':'All world rows coincident at existing1um positional key with278unchanged view sleeve boundary edges; incident triangles retained.','contact':'Gauntlet points within34mm of same-side Grip local+Y infinite handle axis with positive same-side Hand influence; incident triangles retained.','cuff':'All gauntlet rows with positive ForeArm influence; incident triangles retained.'},'gripBindFrames':grips,'primitives':[{k:v for k,v in x.items() if k in ('material','counts')} for x in plans],
+               'toolPolicy':'Installed gltfpack1.2, ratio0.5 of unprotected geometry, error0.005, locked borders, no quantization/animation resampling. Final mesh uses original source attribute rows only, not tool-rewritten weights/normals. Original nongeometry metadata/accessors/BIN retained.'}
+    save_json('preflight.json',inventory)
+    print(json.dumps(inventory),flush=True)
+    proxy=copy.deepcopy(world.doc);binary=bytearray(world.bin);proxy_prims=[]
+    for plan in plans:
+        if not plan['eligible']:continue
+        p=copy.deepcopy(plan['sourcePrimitive']);indices=[i for t in plan['eligible'] for i in t]
+        p['indices']=append_accessor(proxy,binary,world.doc['accessors'][p['indices']],[struct.pack('<H',i) for i in indices])
+        proxy_prims.append(p)
+    assert proxy_prims
+    proxy['meshes'][0]['primitives']=proxy_prims;proxy['buffers'][0]['byteLength']=len(binary)
+    proxy_path=OUT/'unprotected-input.glb';proposal_path=OUT/'unprotected-index-proposal.glb'
+    write_glb(proxy_path,proxy,binary)
+    command=[str(PACK),'-i',str(proxy_path),'-o',str(proposal_path),'-si','0.5','-se','0.005','-slb','-noq','-kn','-km','-kv','-ke','-af','0','-ac','-v']
+    result=subprocess.run(command,capture_output=True,text=True,timeout=180,creationflags=subprocess.CREATE_NO_WINDOW)
+    with (OUT/'optimizer.log').open('x',encoding='utf8') as stream:stream.write(result.stdout+result.stderr)
+    save_json('optimizer-command.json',{'command':command,'returnCode':result.returncode,'toolSha256':sha(PACK.read_bytes())})
+    assert result.returncode==0,'Optimizer failed; retain preflight and log'
+    proposal=Glb(proposal_path);proposals={}
+    for mesh in proposal.doc.get('meshes',[]):
+        for p in mesh['primitives']:
+            name=proposal.doc['materials'][p['material']]['name'];assert name not in proposals,'Optimizer merged/duplicated semantic owner'
+            proposals[name]=p
+    output=copy.deepcopy(world.doc);binary=bytearray(world.bin);output_prims=[];details=[]
+    for plan in plans:
+        p=plan['sourcePrimitive'];source_pos=plan['positions'];source_uv=plan['attrs']['TEXCOORD_0'];source_norm=plan['attrs']['NORMAL']
+        proposed=[]
+        if plan['eligible']:
+            q=proposals[plan['material']];qpos=proposal.values(q['attributes']['POSITION']);quv=proposal.values(q['attributes']['TEXCOORD_0']);qnorm=proposal.values(q['attributes']['NORMAL'])
+            lookup=collections.defaultdict(list)
+            for i,(pos,uv) in enumerate(zip(source_pos,source_uv)):lookup[tuple(pos)+tuple(uv)].append(i)
+            mapping=[]
+            for pos,uv,normal in zip(qpos,quv,qnorm):
+                candidates=lookup.get(tuple(pos)+tuple(uv),[]);assert candidates,'Proposal moved/quantized a position or UV; do not snap it'
+                # Duplicate sharp-normal fans may share position/UV. Skin rows
+                # must agree exactly, otherwise this proposal is ambiguous.
+                skin={(tuple(plan['attrs']['JOINTS_0'][i]),tuple(plan['attrs']['WEIGHTS_0'][i])) for i in candidates}
+                assert len(skin)==1,'Ambiguous coincident source skin weights'
+                mapping.append(max(candidates,key=lambda i:sum(source_norm[i][k]*normal[k] for k in range(3))))
+            proposed=[tuple(mapping[i] for i in t) for t in triangles([v[0] for v in proposal.values(q['indices'])])]
+        final=plan['fixed']+proposed
+        assert boundary(source_pos,final)==boundary(source_pos,plan['triangles']),'Changed semantic boundary; reject proposal'
+        assert len({tuple(sorted(t)) for t in final})==len(final),'Duplicate triangles introduced'
+        # Native grounding evaluates every original bind-Y<=.45 row, including
+        # any exporter-unreferenced source rows. Keep that roster exactly.
+        used=sorted({i for t in final for i in t}|plan['protected'])
+        remap={old:new for new,old in enumerate(used)};newp=copy.deepcopy(p);newp['attributes']={};bytes_by_attr={}
+        for name,accessor in p['attributes'].items():
+            records=world.records(accessor);selected=[records[i] for i in used]
+            newp['attributes'][name]=append_accessor(output,binary,world.doc['accessors'][accessor],selected,[source_pos[i] for i in used] if name=='POSITION' else None)
+            bytes_by_attr[name]=len(b''.join(selected))
+        indices=[remap[i] for t in final for i in t]
+        newp['indices']=append_accessor(output,binary,world.doc['accessors'][p['indices']],[struct.pack('<H',i) for i in indices])
+        output_prims.append(newp)
+        details.append({'material':plan['material'],'beforeVertices':len(source_pos),'afterVertices':len(used),'beforeTriangles':len(plan['triangles']),'afterTriangles':len(final),'protectedRows':len(plan['protected']),'fixedTriangles':len(plan['fixed']),'semanticBoundaryEdgesUnchanged':True,'protectedTrianglesAndRowsExact':True,'attributeBytes':bytes_by_attr,'indexBytes':len(indices)*2,'sourceRowMapSha256':sha(b''.join(struct.pack('<I',i) for i in used))})
+    output['meshes'][0]['primitives']=output_prims;output['buffers'][0]['byteLength']=len(binary)
+    candidate=OUT/'world-body-protected-half-eligible.glb';write_glb(candidate,output,binary)
+    verify=Glb(candidate)
+    for k,v in world.doc.items():
+        if k not in ('meshes','accessors','bufferViews','buffers'):assert verify.doc[k]==v,k
+    assert verify.doc['accessors'][:len(world.doc['accessors'])]==world.doc['accessors']
+    assert verify.doc['bufferViews'][:len(world.doc['bufferViews'])]==world.doc['bufferViews']
+    assert verify.bin[:len(world.bin)]==world.bin
+    for newp,plan in zip(verify.doc['meshes'][0]['primitives'],plans):
+        assert newp['material']==plan['sourcePrimitive']['material']
+    assert sha(WORLD.read_bytes())==EXPECTED_WORLD and sha(VIEW.read_bytes())==EXPECTED_VIEW
+    nongeometry_accessors=set()
+    for skin in world.doc['skins']:nongeometry_accessors.add(skin['inverseBindMatrices'])
+    for animation in world.doc['animations']:
+        for sampler in animation['samplers']:nongeometry_accessors.update((sampler['input'],sampler['output']))
+    inventory.update(status='UNADMITTED',candidate=candidate.name,candidateSha256=sha(verify.raw),candidateBytes=len(verify.raw),primitives=details,
+        beforeVertices=sum(x['beforeVertices'] for x in details),afterVertices=sum(x['afterVertices'] for x in details),beforeTriangles=sum(x['beforeTriangles'] for x in details),afterTriangles=sum(x['afterTriangles'] for x in details),
+        unchanged={'originalBinPrefixBytes':len(world.bin),'originalBinPrefixSha256':sha(world.bin),'allOriginalAccessorDefinitions':len(world.doc['accessors']),'allOriginalBufferViews':len(world.doc['bufferViews']),'nongeometryAccessors':[{'index':i,'bytes':sum(map(len,world.records(i))),'sha256':sha(b''.join(world.records(i)))} for i in sorted(nongeometry_accessors)],'nodesSkinsAnimationsMaterialsTexturesImagesScenesExtras':True,'viewmodelFileSha256':EXPECTED_VIEW},
+        limits=['Static structural evidence only. No native admission, RT images, skin timing, AS timing, frame-rate or phone claim.','Original source attributes/skin weights remain exact for surviving rows; new triangle interpolation still requires animated visual and contact inspection.','Original geometry stays unused in retained BIN prefix for identity proof. Candidate GLB file may grow despite lower decoded geometry.','Exactly one simplification pass. No default asset/runtime/shader/cadence/thread/Vulkan changes.'])
+    save_json('receipt.json',inventory);print(json.dumps({'status':inventory['status'],'vertices':[inventory['beforeVertices'],inventory['afterVertices']],'triangles':[inventory['beforeTriangles'],inventory['afterTriangles']],'candidateSha256':inventory['candidateSha256']}),flush=True)
+
+
+if __name__=='__main__':
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--output-directory',type=Path,default=OUT,
+                        help='Fresh destination within this isolated report root; never overwrite outputs')
+    args=parser.parse_args()
+    destination=args.output_directory.resolve()
+    assert destination.is_relative_to(OUT.resolve()),'Destination must stay inside the isolated report root'
+    destination.mkdir(parents=True,exist_ok=True)
+    OUT=destination
+    try:prepare()
+    except Exception as error:
+        save_json('failure.json',{'status':'REJECTED_UNADMITTED','reason':str(error),'sourceSha256':sha(WORLD.read_bytes()),'viewmodelSha256':sha(VIEW.read_bytes()),'noRuntimeReplacement':True})
+        raise

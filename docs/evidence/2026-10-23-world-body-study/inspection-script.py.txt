@@ -1,0 +1,87 @@
+"""Independent static comparison; no runtime, native build or device access."""
+import collections
+import hashlib
+import json
+import math
+from pathlib import Path
+import sys
+
+sys.dont_write_bytecode=True
+sys.path.insert(0,str(Path(__file__).resolve().parent))
+import prepare_world_body as recipe
+
+OUT=Path(__file__).resolve().parent
+world,view,plans,grips=recipe.inspect()
+candidate=recipe.Glb(OUT/'world-body-protected-half-eligible.glb')
+
+def sha(value):return hashlib.sha256(value).hexdigest()
+def canonical(triangle):return min(triangle,triangle[1:]+triangle[:1],triangle[2:]+triangle[:2])
+def facts(glb,primitive):
+    names=sorted(primitive['attributes'])
+    records={name:glb.records(primitive['attributes'][name]) for name in names}
+    rows=[b''.join(records[name][i] for name in names) for i in range(len(records['POSITION']))]
+    indices=[v[0] for v in glb.values(primitive['indices'])]
+    tris=recipe.triangles(indices)
+    return names,rows,tris,glb.values(primitive['attributes']['POSITION'])
+
+def geometry_quality(glb,primitive):
+    pos=glb.values(primitive['attributes']['POSITION']);normals=glb.values(primitive['attributes']['NORMAL']);uv=glb.values(primitive['attributes']['TEXCOORD_0'])
+    tris=recipe.triangles([v[0] for v in glb.values(primitive['indices'])])
+    zero_area=zero_uv=opposite=0;minimum_area=math.inf
+    for tri in tris:
+        a,b,c=[pos[i] for i in tri];e=[b[k]-a[k] for k in range(3)];f=[c[k]-a[k] for k in range(3)]
+        cross=[e[1]*f[2]-e[2]*f[1],e[2]*f[0]-e[0]*f[2],e[0]*f[1]-e[1]*f[0]]
+        area=math.sqrt(sum(v*v for v in cross))*.5;minimum_area=min(minimum_area,area)
+        zero_area+=area<=1e-14
+        dot=sum(cross[k]*sum(normals[i][k] for i in tri) for k in range(3))
+        opposite+=dot<0
+        ua,ub,uc=[uv[i] for i in tri]
+        determinant=(ub[0]-ua[0])*(uc[1]-ua[1])-(ub[1]-ua[1])*(uc[0]-ua[0])
+        zero_uv+=abs(determinant)<=1e-14
+    return {'triangles':len(tris),'zeroAreaAt1eMinus14SquareMetres':zero_area,'oppositeAverageVertexNormal':opposite,'zeroUvAreaAt1eMinus14':zero_uv,'minimumAreaSquareMetres':minimum_area}
+
+assert candidate.bin[:len(world.bin)]==world.bin
+assert candidate.doc['accessors'][:len(world.doc['accessors'])]==world.doc['accessors']
+assert candidate.doc['bufferViews'][:len(world.doc['bufferViews'])]==world.doc['bufferViews']
+metadata={}
+for key in world.doc:
+    if key in ('meshes','accessors','bufferViews','buffers'):continue
+    assert world.doc[key]==candidate.doc[key],key
+    metadata[key]={'decodedValuesIdentical':True,'canonicalJsonSha256':sha(json.dumps(world.doc[key],sort_keys=True,separators=(',',':')).encode())}
+
+details=[]
+for plan,newp in zip(plans,candidate.doc['meshes'][0]['primitives']):
+    source=plan['sourcePrimitive'];names,rows,ts,positions=facts(world,source)
+    cnames,crows,cts,cpos=facts(candidate,newp);assert names==cnames
+    source_rows=set(rows);assert all(row in source_rows for row in crows)
+    protected=collections.Counter(rows[i] for i in plan['protected'])
+    actual=collections.Counter(crows);assert not (protected-actual),'Protected attribute records missing'
+    fixed=collections.Counter(canonical(tuple(rows[i] for i in t)) for t in plan['fixed'])
+    actual_triangles=collections.Counter(canonical(tuple(crows[i] for i in t)) for t in cts)
+    assert not (fixed-actual_triangles),'Protected triangle or winding changed'
+    assert recipe.boundary(positions,ts)==recipe.boundary(cpos,cts)
+    source_boot=collections.Counter(rows[i] for i,p in enumerate(positions) if p[1]<=.45)
+    candidate_boot=collections.Counter(crows[i] for i,p in enumerate(cpos) if p[1]<=.45)
+    assert source_boot==candidate_boot,'Native boot-grounding candidate roster changed'
+    source_attrs={key:sum(map(len,world.records(acc))) for key,acc in source['attributes'].items()}
+    candidate_attrs={key:sum(map(len,candidate.records(acc))) for key,acc in newp['attributes'].items()}
+    details.append({'material':plan['material'],'sourceVertices':len(rows),'candidateVertices':len(crows),'sourceTriangles':len(ts),'candidateTriangles':len(cts),'allCandidateAttributesOriginalBytes':True,'protectedRowsExact':sum(protected.values()),'protectedTrianglesExact':sum(fixed.values()),'sourceBootCandidateRows':sum(source_boot.values()),'candidateBootCandidateRows':sum(candidate_boot.values()),'semanticBoundaryEdgesExact':len(recipe.boundary(cpos,cts)),'sourceAttributeBytes':source_attrs,'candidateAttributeBytes':candidate_attrs,'sourceIndexBytes':sum(map(len,world.records(source['indices']))),'candidateIndexBytes':sum(map(len,candidate.records(newp['indices']))),'sourceQuality':geometry_quality(world,source),'candidateQuality':geometry_quality(candidate,newp)})
+
+nongeometry=set()
+for skin in world.doc['skins']:nongeometry.add(skin['inverseBindMatrices'])
+for animation in world.doc['animations']:
+    for sampler in animation['samplers']:nongeometry.update((sampler['input'],sampler['output']))
+regions=[]
+for index in sorted(nongeometry):
+    accessor=world.doc['accessors'][index];viewdef=world.doc['bufferViews'][accessor['bufferView']]
+    width=recipe.COMPONENTS[accessor['componentType']][1]*recipe.WIDTH[accessor['type']]
+    start=viewdef.get('byteOffset',0)+accessor.get('byteOffset',0);stride=viewdef.get('byteStride',width)
+    end=start+(accessor['count']-1)*stride+width
+    assert world.records(index)==candidate.records(index)
+    regions.append({'accessor':index,'bufferView':accessor['bufferView'],'binStart':start,'binEndExclusive':end,'elementBytes':width,'strideBytes':stride,'count':accessor['count'],'packedElementSha256':sha(b''.join(world.records(index))),'spanSha256':sha(world.bin[start:end])})
+
+before=sum(p['sourceVertices'] for p in details);after=sum(p['candidateVertices'] for p in details)
+bt=sum(p['sourceTriangles'] for p in details);at=sum(p['candidateTriangles'] for p in details)
+result={'status':'UNADMITTED_STATIC_STRUCTURAL_CHECKS_PASS','sourceSha256':sha(world.raw),'candidateSha256':sha(candidate.raw),'scriptSha256':sha(Path(__file__).read_bytes()),'recipeSha256':sha(Path(recipe.__file__).read_bytes()),'originalManifestCopiedExactly':(OUT/'asset.manifest.json').read_bytes()==(recipe.ROOT/'assets/models/player/runtime/asset.manifest.json').read_bytes(),'viewmodelUnchangedSha256':sha(recipe.VIEW.read_bytes()),'geometry':{'vertices':[before,after],'triangles':[bt,at],'vertexReductionPercent':100*(before-after)/before,'triangleReductionPercent':100*(bt-at)/bt,'encodedAccessorBytes':[sum(sum(p['sourceAttributeBytes'].values())+p['sourceIndexBytes'] for p in details),sum(sum(p['candidateAttributeBytes'].values())+p['candidateIndexBytes'] for p in details)],'nativeStaticVertexBytes64':[before*64,after*64],'nativeIndexBytes32':[bt*3*4,at*3*4],'candidateFileBytes':len(candidate.raw),'sourceFileBytes':len(world.raw),'originalBinPrefixRetainedBytes':len(world.bin)},'metadata':metadata,'originalNongeometryAccessorRegionsExact':regions,'primitives':details,'limits':['No native, image, animation trajectory, timing, AS or hardware acceptance claimed.','Retained original BIN includes now-unused full geometry; file growth is deliberate audit overhead, not a proposed shipping package.','Average-normal/UV degeneracy counts are descriptive baseline/candidate witnesses; they do not replace tangents/chirality/native pose gates.','One unprotected simplification pass only; no weight interpolation or first-person asset edit.']}
+recipe.save_json('static-inspection.json',result)
+print(json.dumps({'status':result['status'],'geometry':result['geometry'],'nongeometryAccessors':len(regions),'originalSourceAndViewHashesVerified':sha(recipe.WORLD.read_bytes())==recipe.EXPECTED_WORLD and sha(recipe.VIEW.read_bytes())==recipe.EXPECTED_VIEW,'quality':[{k:p[k] for k in ('material','sourceQuality','candidateQuality')} for p in details]}),flush=True)

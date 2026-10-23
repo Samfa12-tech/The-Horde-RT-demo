@@ -1,5 +1,20 @@
 # Horde 1.7 owner playtest checklist - 22 October 2026
 
+## One isolated world-body study - 23 October
+
+The owner-approved [world-body candidate](../evidence/2026-10-23-world-body-study/README.md)
+reduces vertices13.58% and triangles20.71%, retaining original rig/clip bytes,
+protected boot/contact/seam geometry and the unchanged first-person viewmodel.
+Native CPU import/shared-pose/grip/planted-stance checks and663 existing actor
+contracts pass. One serial desktop bracket observes world preparation1.31→1.17ms
+and combined CPU preparation about2.8% lower; no frame/GPU/Android gain follows.
+Independent static inspection finds new opposed-winding triangles and a tiny
+sliver. **Candidate remains unadmitted; production original is unchanged.**
+The audit GLB also grows because unused source bytes were preserved for identity
+proof; it is not shipping packaging. Resolve or reject static concerns before
+actualRT look-down/shadow/reflection comparison. Kit is a separate later candidate,
+preserving conversational face/silhouette; no Kit change has been made here.
+
 ## Compact action dock and latest device boundary - 23 October
 
 The owner/parent visual review confirmed that the prior lantern target occupied
