@@ -10,6 +10,14 @@ traversal and saves are unchanged. Resources compile, all 42 selected existing
 Android checks pass without skips, and the Windows app builds. No phone or runtime
 performance claim; physical HUD placement/rotation remains pending.
 
+The preceding exact Kit head `c2f39ece` [hosted follow-up](../evidence/2026-10-23-msvc-ci-selection/C2F_FOLLOWUP.md)
+is terminal: five jobs pass; MSVC is cancelled by its explicit 15-minute cap after
+653 s successful build and 104/149 passing tests. Test 105 has no result; no
+assertion failure or hang is proved. Earlier 749's complete pass remains valid
+but does not prove headroom. Two small duplicate-work seams and a possible
+MSVC-only 20-minute job envelope are documented for a separate decision;
+no workflow, per-test deadline or coverage change is applied.
+
 ## Single Kit study complete, production retained - 23 October
 
 The [one approved Kit candidate](../evidence/2026-10-23-kit-lod-candidate/README.md)

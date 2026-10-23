@@ -1,0 +1,302 @@
+{
+  "schemaVersion": 1,
+  "description": "Compact sanitized exact-head terminal CI receipt; no rerun, cancellation request, workflow edit or phone operation.",
+  "workflow": {
+    "conclusion": "cancelled",
+    "created_at": "2026-10-23T11:42:49Z",
+    "event": "push",
+    "head_sha": "c2f39ece941417d112a81b50c2ac3b6d76e07be7",
+    "html_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39948002864",
+    "id": 39948002864,
+    "name": "Shared simulation host tests",
+    "run_attempt": 1,
+    "run_started_at": "2026-10-23T11:42:49Z",
+    "status": "completed",
+    "updated_at": "2026-10-23T11:58:04Z"
+  },
+  "observedAtUtc": "2026-10-23T11:58:32.6025148+00:00",
+  "jobs": [
+    {
+      "id": 120395300914,
+      "name": "Shared simulation host (GCC)",
+      "conclusion": "success",
+      "startedAtUtc": "2026-10-23T11:42:52Z",
+      "completedAtUtc": "2026-10-23T11:53:48Z",
+      "totalSeconds": 656.0,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39948002864/job/120395300914"
+    },
+    {
+      "id": 120395300969,
+      "name": "Shared simulation host (MSVC)",
+      "conclusion": "cancelled",
+      "startedAtUtc": "2026-10-23T11:42:54Z",
+      "completedAtUtc": "2026-10-23T11:58:03Z",
+      "totalSeconds": 909.0,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39948002864/job/120395300969"
+    },
+    {
+      "id": 120395301046,
+      "name": "Android Debug build, playback/report contracts and lint",
+      "conclusion": "success",
+      "startedAtUtc": "2026-10-23T11:42:52Z",
+      "completedAtUtc": "2026-10-23T11:47:28Z",
+      "totalSeconds": 276.0,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39948002864/job/120395301046"
+    },
+    {
+      "id": 120395301051,
+      "name": "Selected host contracts (Clang ASan/UBSan)",
+      "conclusion": "success",
+      "startedAtUtc": "2026-10-23T11:42:53Z",
+      "completedAtUtc": "2026-10-23T11:47:50Z",
+      "totalSeconds": 297.0,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39948002864/job/120395301051"
+    },
+    {
+      "id": 120395301165,
+      "name": "player-vulkan-host",
+      "conclusion": "success",
+      "startedAtUtc": "2026-10-23T11:42:52Z",
+      "completedAtUtc": "2026-10-23T11:50:41Z",
+      "totalSeconds": 469.0,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39948002864/job/120395301165"
+    },
+    {
+      "id": 120395301219,
+      "name": "Shared simulation host (Clang)",
+      "conclusion": "success",
+      "startedAtUtc": "2026-10-23T11:42:53Z",
+      "completedAtUtc": "2026-10-23T11:53:49Z",
+      "totalSeconds": 656.0,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39948002864/job/120395301219"
+    }
+  ],
+  "msvc": {
+    "jobId": 120395300969,
+    "conclusion": "cancelled",
+    "timeoutMinutes": 15,
+    "totalSeconds": 909.0,
+    "configureStepSeconds": 72.0,
+    "buildStepSeconds": 653.0,
+    "cancelledSelectionStepSeconds": 130.0,
+    "selectedCount": 149,
+    "portableExcludedCount": 21,
+    "unchangedToolExcludedCount": 15,
+    "completedPassedCount": 104,
+    "failedTestResultsObserved": 0,
+    "lastCompletedTest": {
+      "completedAtUtc": "2026-10-23T11:57:55.1434461Z",
+      "position": 104,
+      "total": 149,
+      "testNumber": 104,
+      "name": "horde_rt_benchmark_scale_policy_tests",
+      "result": "Passed",
+      "seconds": 1.53
+    },
+    "unfinishedStartedTest": {
+      "startedAtUtc": "2026-10-23T11:57:55.1439288Z",
+      "position": 105,
+      "name": "horde_rt_windows_glass_graphics_contract_tests"
+    },
+    "notStartedCount": 44,
+    "ctestFinalSummaryPresent": false,
+    "providerObjectWrappers": [
+      {
+        "name": "horde_rt_provider_shipping_mobile_fixture_evidence",
+        "result": "Passed",
+        "seconds": 23.58
+      },
+      {
+        "name": "horde_rt_provider_shipping_high_fixture_evidence",
+        "result": "Passed",
+        "seconds": 22.81
+      },
+      {
+        "name": "horde_rt_provider_diagnostic_mobile_fixture_evidence",
+        "result": "Passed",
+        "seconds": 23.95
+      },
+      {
+        "name": "horde_rt_provider_diagnostic_high_fixture_evidence",
+        "result": "Passed",
+        "seconds": 22.5
+      }
+    ],
+    "providerObjectWrapperSeconds": 92.84,
+    "longestCompletedTests": [
+      {
+        "name": "horde_rt_provider_diagnostic_mobile_fixture_evidence",
+        "seconds": 23.95
+      },
+      {
+        "name": "horde_rt_provider_shipping_mobile_fixture_evidence",
+        "seconds": 23.58
+      },
+      {
+        "name": "horde_rt_provider_shipping_high_fixture_evidence",
+        "seconds": 22.81
+      },
+      {
+        "name": "horde_rt_provider_diagnostic_high_fixture_evidence",
+        "seconds": 22.5
+      },
+      {
+        "name": "horde_rt_version_contract_incremental_configure_tests",
+        "seconds": 5.68
+      },
+      {
+        "name": "horde_rt_campaign_play_session_tests",
+        "seconds": 4.93
+      }
+    ],
+    "nativeReportUiReached": false,
+    "apkResolverStepConclusion": "skipped",
+    "steps": [
+      {
+        "name": "Set up job",
+        "conclusion": "success",
+        "seconds": 1.0
+      },
+      {
+        "name": "Check out source",
+        "conclusion": "success",
+        "seconds": 23.0
+      },
+      {
+        "name": "Fetch portable-test GLB and music PCM assets",
+        "conclusion": "success",
+        "seconds": 20.0
+      },
+      {
+        "name": "Restore pinned Windows report-verification SDK",
+        "conclusion": "success",
+        "seconds": 2.0
+      },
+      {
+        "name": "Configure non-hardware host tests",
+        "conclusion": "success",
+        "seconds": 72.0
+      },
+      {
+        "name": "Build shared gameplay tests",
+        "conclusion": "success",
+        "seconds": 653.0
+      },
+      {
+        "name": "Run shared gameplay tests",
+        "conclusion": "skipped",
+        "seconds": 0.0
+      },
+      {
+        "name": "Run complete Windows native and platform selection",
+        "conclusion": "cancelled",
+        "seconds": 130.0
+      },
+      {
+        "name": "Retain native report edit timing trace",
+        "conclusion": "success",
+        "seconds": 1.0
+      },
+      {
+        "name": "Check offline gauntlet chirality and UV winding",
+        "conclusion": "skipped",
+        "seconds": 0.0
+      },
+      {
+        "name": "Check exact player cloth seam weight transfers",
+        "conclusion": "skipped",
+        "seconds": 0.0
+      },
+      {
+        "name": "Check upper torso partition preserves the head mask",
+        "conclusion": "skipped",
+        "seconds": 0.0
+      },
+      {
+        "name": "Check bounded segmented cloth seam plans",
+        "conclusion": "skipped",
+        "seconds": 0.0
+      },
+      {
+        "name": "Check Gradle APK artifact resolution",
+        "conclusion": "skipped",
+        "seconds": 0.0
+      },
+      {
+        "name": "Check Android combat capture expectations",
+        "conclusion": "skipped",
+        "seconds": 0.0
+      },
+      {
+        "name": "Post Check out source",
+        "conclusion": "success",
+        "seconds": 3.0
+      },
+      {
+        "name": "Complete job",
+        "conclusion": "success",
+        "seconds": 0.0
+      }
+    ],
+    "annotations": [
+      {
+        "annotation_level": "failure",
+        "end_line": 1,
+        "message": "The job has exceeded the maximum execution time of 15m0s",
+        "path": ".github",
+        "start_line": 1,
+        "title": ""
+      },
+      {
+        "annotation_level": "failure",
+        "end_line": 220,
+        "message": "The operation was canceled.",
+        "path": ".github",
+        "start_line": 220,
+        "title": ""
+      }
+    ]
+  },
+  "boundedCompileComparison": {
+    "referenceRunId": 39942919352,
+    "referenceHeadSha": "749e5ffec26973fcc716d54a6e886255b2d7c284",
+    "referenceMsvcBuildSeconds": 465,
+    "candidateMsvcBuildSeconds": 653,
+    "requestedFile": "KitSourceIntakeTests.cpp",
+    "requestedCompileLinkIntervalAvailable": false,
+    "attribution": "Unresolved. The requested file/target interval was unavailable in both inspected MSVC logs; gross build duration alone does not establish new compiler cost or runner variation."
+  },
+  "conclusion": "MSVC was cancelled by the unchanged15-minute job cap.104tests passed; test105 started without a result. This is not evidence of an assertion failure or test hang. Five other jobs passed.",
+  "verification": [
+    "Exact run SHA and original automatic push attempt1 verified.",
+    "All six jobs reached terminal status: five success and one MSVC cancellation.",
+    "104 unique passed CTest results with contiguous positions1..104;105 starts; selected149.",
+    "Explicit check annotation identifies the15m0s maximum execution time.",
+    "All four provider-object wrappers passed before cancellation.",
+    "No rerun, cancel request, workflow/source/docs edit or phone operation performed."
+  ],
+  "rootSourceFollowup": {
+    "scope": "Read-only CMake/workflow guard proof, no code/workflow/cap change",
+    "msvcVulkanTargets": false,
+    "probeCoreRequiresVulkan": true,
+    "changedKitAndWorkerTargetsRequireProbeCore": true,
+    "directCompilationOfChangedKitCppInMsvcLane": false,
+    "buildCause": "Unresolved; optional Kit/worker test C++ direct compilation excluded by lane configuration",
+    "cmakeSha256": "37a4e5fac5d65956f28686963b076f56ec421be7a6bcfcc1e890d09c28fc9e53",
+    "workflowSha256": "4efb2c6b21e334889824e6d60867e676043936d68dfb801883be658ed66b70ed",
+    "priorCompleteRunId": 39942919352,
+    "priorConfigureSeconds": 23,
+    "currentConfigureSeconds": 72,
+    "priorBuildSeconds": 465,
+    "currentBuildSeconds": 653,
+    "priorProviderWrapperSeconds": 74.41,
+    "currentProviderWrapperSeconds": 92.84,
+    "workflowChanged": false,
+    "capChanged": false,
+    "sourceSanitizedReceipt": {
+      "path": "reports/kit-lod-candidate-20261023/c2f-terminal-receipt.json",
+      "bytes": 9302,
+      "sha256": "79ffa7d8efd739569095aeb931cbc368d2329c9df70e1e50eb1e5152ede61e5e"
+    }
+  }
+}
