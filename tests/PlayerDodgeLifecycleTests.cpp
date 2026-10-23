@@ -24,6 +24,20 @@ bool Near(float a, float b) { return std::abs(a - b) < .00001f; }
 bool NoPose(const SimulationSnapshot& s) {
     return s.playerAnimation.dodge == animation::PlayerDodgePresentation{};
 }
+double WalkPhase(const SimulationSnapshot& s) {
+    return static_cast<double>(s.playerAnimation.locomotionTime) +
+        s.playerAnimation.locomotionPhaseOffsetSeconds;
+}
+bool RetainsWalkCorrection(const SimulationSnapshot& before, const SimulationSnapshot& after) {
+    // Dodge and traversal retain the reverse correction, while their existing
+    // legacy locomotion clock may advance. Do not demand a frozen rope phase.
+    const double legacyAdvance = static_cast<double>(after.playerAnimation.locomotionTime) -
+        before.playerAnimation.locomotionTime;
+    return after.playerAnimation.locomotionPhaseOffsetSeconds ==
+               before.playerAnimation.locomotionPhaseOffsetSeconds &&
+        legacyAdvance >= 0 && legacyAdvance <= kTick + .00001 &&
+        std::abs((WalkPhase(after) - WalkPhase(before)) - legacyAdvance) < .00001;
+}
 cp::Checkpoint Record(bool upper) {
     // A validated logical restore fixture, not evidence of earning the chapter.
     cp::Checkpoint c;
@@ -49,15 +63,51 @@ InputSnapshot Neutral(const cp::Checkpoint& record) {
     in.yawRadians = record.yaw; in.pitchRadians = record.pitch;
     return in;
 }
+bool BackwardTravelThenIdle(GameSimulation& sim, InputSnapshot& input, std::uint64_t& publication) {
+    // Ordinary collision-resolved travel on the restored landing, not a pose
+    // import. This remains close enough to use the existing rope fixture.
+    input.moveForward = -1;
+    bool accepted = true, reversed = true;
+    float distance = 0;
+    for (unsigned tick = 0; tick < 6; ++tick) {
+        const auto before = sim.Snapshot();
+        sim.StepFixed(input, kTick, ++publication);
+        const auto& after = sim.Snapshot();
+        const float dx = after.playerX - before.playerX;
+        const float dz = after.playerZ - before.playerZ;
+        const float travelled = std::hypot(dx, dz);
+        const float forward = dx * std::sin(after.playerYawRadians) -
+            dz * std::cos(after.playerYawRadians);
+        accepted = accepted && travelled > .000001f && forward < -.5f * travelled &&
+            after.playerGrounded && !after.rescue.equipmentStowed && !after.dodgeActive;
+        reversed = reversed && WalkPhase(after) < WalkPhase(before);
+        distance += travelled;
+        sim.ClearEvents();
+    }
+    input.moveForward = 0;
+    Check(accepted && distance > .05f && reversed &&
+          sim.Snapshot().playerAnimation.locomotionPhaseOffsetSeconds < 0,
+          "real accepted backward landing travel reverses the gait before action ownership");
+    const auto walking = sim.Snapshot();
+    sim.StepFixed(input, kTick, ++publication);
+    Check(std::abs(WalkPhase(sim.Snapshot()) - WalkPhase(walking)) < .00001 &&
+          sim.Snapshot().playerAnimation.locomotionBlend < walking.playerAnimation.locomotionBlend,
+          "released backward input holds the corrected phase while returning toward idle");
+    return accepted && reversed;
+}
 bool StartDodge(GameSimulation& sim, InputSnapshot& input, std::uint64_t& publication) {
+    const auto before = sim.Snapshot();
     input.commands.dodge = sim.Snapshot().lastConsumedDodgeSequence + 1;
     input.moveStrafe = 1;
     sim.StepFixed(input, kTick, ++publication);
+    const auto accepted = sim.Snapshot();
     input.moveStrafe = 0; // Accepted direction must survive release of the stick.
     sim.StepFixed(input, kTick, ++publication);
     const auto& s = sim.Snapshot();
     const bool active = s.dodgeActive && s.dodgeInvulnerable && s.playerAnimation.dodge.weight > 0;
     Check(active, "ordinary accepted dodge publishes a live visual and existing protection window");
+    Check(RetainsWalkCorrection(before, accepted) && RetainsWalkCorrection(accepted, s),
+          "accepting and releasing dodge direction preserves the continuous backward correction");
     return active;
 }
 void RopeLifecycle(const std::shared_ptr<const TriangleSupportSurface>& terrain, bool upper) {
@@ -75,6 +125,7 @@ void RopeLifecycle(const std::shared_ptr<const TriangleSupportSurface>& terrain,
                 : sim.PublishChapterTerrain(ready, terrain))) {
         Check(false, "real traversal destination requires current owner readiness"); return;
     }
+    if (!BackwardTravelThenIdle(sim, input, publication)) return;
     if (!StartDodge(sim, input, publication)) return;
     const auto dodging = sim.Snapshot();
     ++input.commands.interact;
@@ -88,16 +139,21 @@ void RopeLifecycle(const std::shared_ptr<const TriangleSupportSurface>& terrain,
     Check(entered.dodgeActive && Near(entered.dodgeElapsedSeconds, dodging.dodgeElapsedSeconds) &&
           entered.acceptedDodgeSequence == dodging.acceptedDodgeSequence,
           "visual cancellation preserves the existing suspended gameplay timer and accepted identity");
+    Check(RetainsWalkCorrection(dodging, entered),
+          "taking rope ownership retains the backward correction without an added phase jump");
 
     bool clean = true, timerUnchanged = true;
+    bool phaseContinuous = true;
     unsigned ticks = 0;
     while (sim.Snapshot().rescue.equipmentStowed && ticks < 1800) {
+        const auto before = sim.Snapshot();
         sim.StepFixed(input, kTick, ++publication); ++ticks;
         const auto& s = sim.Snapshot();
         clean = clean && NoPose(s) && !s.dodgeInvulnerable;
         timerUnchanged = timerUnchanged && s.dodgeActive &&
             Near(s.dodgeElapsedSeconds, dodging.dodgeElapsedSeconds) &&
             s.acceptedDodgeSequence == dodging.acceptedDodgeSequence;
+        phaseContinuous = phaseContinuous && RetainsWalkCorrection(before, s);
         sim.ClearEvents();
     }
     const auto completed = sim.Snapshot();
@@ -109,7 +165,11 @@ void RopeLifecycle(const std::shared_ptr<const TriangleSupportSurface>& terrain,
           "real ascent/descent finishes through its physical motor phases on the other safe side");
     Check(clean && NoPose(completed), "no dodge visual returns during rope motion or its completion tick");
     Check(timerUnchanged, "the new visual layer must not advance or clear the existing rope-suspended timer");
+    Check(phaseContinuous && completed.playerAnimation.locomotionTime > entered.playerAnimation.locomotionTime,
+          "rope phases and release preserve reverse correction with the existing advancing legacy clock");
     sim.StepFixed(input, kTick, ++publication);
+    Check(RetainsWalkCorrection(completed, sim.Snapshot()),
+          "ordinary post-rope dodge ownership does not reset the retained reverse phase");
     Check(sim.Snapshot().dodgeActive && !sim.Snapshot().dodgeInvulnerable && NoPose(sim.Snapshot()) &&
           sim.Snapshot().dodgeElapsedSeconds > completed.dodgeElapsedSeconds &&
           sim.Snapshot().acceptedDodgeSequence == dodging.acceptedDodgeSequence,
@@ -120,6 +180,11 @@ void RopeLifecycle(const std::shared_ptr<const TriangleSupportSurface>& terrain,
     }
     Check(clean && !sim.Snapshot().dodgeActive,
           "cancelled pose stays absent through the unchanged timer's eventual expiry");
+    const auto idle = sim.Snapshot();
+    sim.StepFixed(input, kTick, ++publication);
+    Check(NoPose(sim.Snapshot()) && !sim.Snapshot().dodgeActive &&
+          std::abs(WalkPhase(sim.Snapshot()) - WalkPhase(idle)) < .00001,
+          "ordinary idle after rope and dodge expiry holds the corrected gait phase");
 }
 void RestoreRetryAndPause(const std::shared_ptr<const TriangleSupportSurface>& terrain) {
     GameSimulation sim(ProductionGameSimulationConfig());
@@ -130,6 +195,7 @@ void RestoreRetryAndPause(const std::shared_ptr<const TriangleSupportSurface>& t
         Check(false, "lifecycle fixture must restore on actual runtime terrain"); return;
     }
     sim.StepFixed(input, kTick, ++publication);
+    if (!BackwardTravelThenIdle(sim, input, publication)) return;
     if (!StartDodge(sim, input, publication)) return;
     const auto live = sim.Snapshot();
     const auto token = sim.BeginCampaignRestore(record);
@@ -137,6 +203,8 @@ void RestoreRetryAndPause(const std::shared_ptr<const TriangleSupportSurface>& t
           sim.Snapshot().playerAnimation.dodge == live.playerAnimation.dodge &&
           sim.Snapshot().dodgeElapsedSeconds == live.dodgeElapsedSeconds,
           "preparing a load does not cancel or mutate the retained game's live dodge");
+    Check(RetainsWalkCorrection(live, sim.Snapshot()),
+          "load preparation leaves the live backward phase untouched");
     if (!token) return;
     Check(!sim.CommitCampaignRestore(*token, {token->worldGeneration, WorldZoneId::TombExterior},
           terrain, input, publication), "wrong destination readiness rejects a prepared load");
@@ -145,19 +213,29 @@ void RestoreRetryAndPause(const std::shared_ptr<const TriangleSupportSurface>& t
           sim.Snapshot().dodgeElapsedSeconds == live.dodgeElapsedSeconds &&
           sim.CancelCampaignRestore(*token),
           "failed and cancelled load preparation preserves the existing visual and timer");
+    Check(RetainsWalkCorrection(live, sim.Snapshot()),
+          "rejected and cancelled restore cannot reset the retained backward phase");
     if (!Restore(sim, record, terrain, input, publication)) {
         Check(false, "committed campaign replacement must succeed during a live dodge"); return;
     }
     Check(!sim.Snapshot().dodgeActive && !sim.Snapshot().dodgeInvulnerable && NoPose(sim.Snapshot()) &&
           sim.Snapshot().lastConsumedDodgeSequence == input.commands.dodge,
           "committed fresh restore clears dodge pose/timer and consumes the old edge");
+    Check(sim.Snapshot().playerAnimation.locomotionTime == 0 &&
+          sim.Snapshot().playerAnimation.locomotionPhaseOffsetSeconds == 0,
+          "fresh campaign reconstruction starts a new gait phase instead of loading a transient correction");
     sim.StepFixed(input, kTick, ++publication);
     Check(!sim.Snapshot().dodgeActive && NoPose(sim.Snapshot()),
           "fresh neutral resume cannot replay the pre-load dodge edge");
+    if (!BackwardTravelThenIdle(sim, input, publication)) return;
     if (!StartDodge(sim, input, publication)) return;
+    const auto beforeRetry = sim.Snapshot();
     sim.RetryEncounter();
     Check(!sim.Snapshot().dodgeActive && !sim.Snapshot().dodgeInvulnerable && NoPose(sim.Snapshot()),
           "actual rescue retry clears the transient visual and existing gameplay dodge state");
+    Check(RetainsWalkCorrection(beforeRetry, sim.Snapshot()) &&
+          WalkPhase(beforeRetry) == WalkPhase(sim.Snapshot()),
+          "safe-side rescue reconstruction preserves its current backward gait phase");
 
     // Rescue reconstruction retains the existing cooldown. Let ordinary fixed
     // ticks expire it; the visual test must not demand a gameplay reset here.
@@ -174,6 +252,13 @@ void RestoreRetryAndPause(const std::shared_ptr<const TriangleSupportSurface>& t
     Check(ticks == 0 && sim.Snapshot().tickIndex == beforePause.tickIndex &&
           !sim.Snapshot().dodgeActive && !sim.Snapshot().dodgeInvulnerable && NoPose(sim.Snapshot()),
           "zero-tick pause publishes immediate cancellation without advancing gameplay");
+    Check(RetainsWalkCorrection(beforePause, sim.Snapshot()) &&
+          WalkPhase(beforePause) == WalkPhase(sim.Snapshot()),
+          "zero-tick pause cancels dodge without moving the corrected gait phase");
+    sim.ResetRoute();
+    Check(sim.Snapshot().playerAnimation.locomotionTime == 0 &&
+          sim.Snapshot().playerAnimation.locomotionPhaseOffsetSeconds == 0,
+          "new route reset clears the previous session's backward phase correction");
 }
 } // namespace
 

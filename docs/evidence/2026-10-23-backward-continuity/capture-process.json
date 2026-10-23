@@ -1,0 +1,28 @@
+{
+  "scope": "fresh production configuration at portal, fixed motor inputs rendered each tick; isolated dynamic first-person, no physical controls, natural route, pacing or phone acceptance",
+  "version": "native-motion",
+  "pid": 52596,
+  "arguments": [
+    "--development-rescue-journey",
+    "--capture-showcase",
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\backward-first-person-20261023\\native-motion",
+    "--development-checkpoint",
+    "chapter-stone-portal-front",
+    "--capture-hidden"
+  ],
+  "startedUtc": "2026-10-23T01:59:28.0570714Z",
+  "sources": {
+    "src/gameplay/simulation/GameSimulation.h": "70114C1CA06CE9B19750B2D08A4E135924C62291D6F21017519D004D71CD0BFB",
+    "src/vulkan/raytracing/PlayerRenderSlot.cpp": "CFCB75DD5ED8092189C7D9F906710AA97803A444B58D1E77D525C5AB74F10BA5",
+    "src/gameplay/animation/PlayerAnimationState.cpp": "8FFD14144C89DFEE1E4A550860621CA7E6DDA92ACF1C887B7D9B0FF5EE275831",
+    "src/gameplay/simulation/GameSimulation.cpp": "41BEEFA6CDFF48D448308583C276C25BE505AB2765494F10C6B1E9C2AFEE0FD6",
+    "src/gameplay/animation/PlayerAnimationState.h": "7A7784EB5F7415D756980C78080E1A8E927DF88B7CF003751A711D67066F2495",
+    "reports/backward-first-person-20261023/native-probe.inl": "684E3E71B6E3B0ED6A84E30CAE5871B96E3060E51CCAF1743F55195FCB6C94AF",
+    "src/platform/windows/DiagnosticWindow.cpp": "4047713C018A5E174C3695F35D074B92906EC5DC49D865D8448C8103819745E5"
+  },
+  "finishedUtc": "2026-10-23T01:59:44.4183695Z",
+  "elapsedSeconds": 12.9021089,
+  "timedOut": false,
+  "executableSha256": "A40799B026CC935D89BF377E208827BB74E90C8E7D1D18976EB03C170E500D0E",
+  "exitCode": 0
+}

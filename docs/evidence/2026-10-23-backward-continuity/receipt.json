@@ -1,0 +1,45 @@
+{
+  "runtimeBase": "90a6504454f578ac9a48d67b8c2ebd1e63075aff",
+  "diagnosticWindowRestoredSha256": "f86f3c6f7e0bec115416cd84298b33b1861ba3e7b82d195e3580cbee3c1dc9eb",
+  "focusedCTest": {
+    "passed": 5,
+    "failed": 0,
+    "totalWallSeconds": 35.11,
+    "lifecycleChecks": 55,
+    "lifecycleFailures": 0
+  },
+  "native": {
+    "renderedFixedTicks": 97,
+    "captures": 18,
+    "primaryPlayerPixelsRange": [
+      511,
+      6232
+    ],
+    "manuallyInspectedFrames": [
+      0,
+      4,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      17
+    ],
+    "visibilityExceptions": false,
+    "runtimeChanges": false,
+    "phoneEvidence": false,
+    "fpsOrPerformanceEvidence": false
+  },
+  "custody": {
+    "settingsSha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3",
+    "campaignV1Absent": true,
+    "phoneOperations": false
+  },
+  "sourceSha256": {
+    "src/gameplay/animation/PlayerAnimationState.cpp": "8ffd14144c89dfee1e4a550860621ca7e6dda92acf1c887b7d9b0ff5ee275831",
+    "src/gameplay/simulation/GameSimulation.cpp": "41beefa6cdff48d448308583c276c25be505ab2765494f10c6b1e9c2afee0fd6",
+    "src/vulkan/raytracing/PlayerRenderSlot.cpp": "cfcb75dd5ed8092189c7d9f906710aa97803a444b58d1e77d525c5ab74f10ba5",
+    "tests/PlayerDodgeLifecycleTests.cpp": "4a478e60eb2ba639edeac003ad1eade1ca50410f85d5aa2ed3d564f8208769db"
+  }
+}
