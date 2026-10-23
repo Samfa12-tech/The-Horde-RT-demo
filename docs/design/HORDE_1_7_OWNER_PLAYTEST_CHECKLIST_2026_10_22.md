@@ -33,6 +33,13 @@ families in the existing static owner. Two source models therefore produce
 not 64 TLAS instances referencing two shared BLAS. The shared placement/collision
 contract is [ForestTreePlacementContract.h](../../src/gameplay/simulation/ForestTreePlacementContract.h).
 
+The [actual-view comparison and bounded proposal](../evidence/2026-10-23-forest-scope/README.md)
+support the owner's visual concern: current lookout/F03 views lack layered forest
+depth and a convincing wider wooded region. Regional topo geometry exists; 64
+grounded placements do not finish its visual composition. The proposed first sector
+uses ridges/bends/elevation for controlled reveals and shared geometry prerequisites,
+with measured ray relevance/retirement before claiming hidden geometry saves work.
+
 The [recorded owner deferral](HORDE_1_7_CURRENT_DESIGN_INDEX.md) says to keep the
 grounded supplied trees for the chapter and defer tree-generator/replacement-canopy
 work until after that goal; the private Easy Tree trial is unadmitted. Local-only
@@ -74,8 +81,9 @@ frame47.780/55.737ms remain useful warm evidence, not discarded or attributed
 entirely to temperature. No extra phone run begins. Future planning needs
 controlled power/brightness/settings, alternating build order and separately
 bounded sustained warm-play acceptance. Phone restored/released07:04:48UTC,
-safe to disconnect, no owned device operation remaining. Source249ec107 CI is
-cancelled: five jobs pass, MSVC cancels at the unchanged Windows cap. GPU-stage
+safe to disconnect, no owned device operation remaining. Source249ec107 CI and
+evidence-head ba8aeacf [run39916734233](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39916734233)
+are cancelled: five jobs pass, MSVC cancels at the unchanged Windows cap. GPU-stage
 attribution and all prior requirements remain open.
 
 The bounded [player-template-copy candidate](../evidence/2026-10-23-player-template-copy/README.md)
