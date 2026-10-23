@@ -4,6 +4,9 @@ namespace campaign=horde::gameplay::campaign;
 
 std::filesystem::path WindowsCampaignDirectory()
 {
+#if defined(_DEBUG)
+    if(gOpeningBenchmarkMenuValidation)return gCampaignValidationDirectory;
+#endif
     PWSTR raw=nullptr;
     const auto result=SHGetKnownFolderPath(FOLDERID_LocalAppData,KF_FLAG_DONT_VERIFY,nullptr,&raw);
     std::filesystem::path root;

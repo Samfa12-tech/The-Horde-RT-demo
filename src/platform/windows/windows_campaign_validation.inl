@@ -657,10 +657,11 @@ int RunHiddenCampaignValidation(VulkanSurfaceContext& ctx)
 bool ConfigureHiddenCampaignValidation()
 {
     int count=0;auto args=CommandLineToArgvW(GetCommandLineW(),&count);if(!args)return false;
-    bool requested=false,lookoutRequested=false,routeRequested=false,returnRequested=false,inspectKit=false,inspectMotion=false,inspectTiming=false;std::filesystem::path directory;
+    bool requested=false,lookoutRequested=false,routeRequested=false,returnRequested=false,inspectKit=false,inspectMotion=false,inspectTiming=false,benchmarkMenuRequested=false;std::filesystem::path directory;
     for(int i=1;i<count;++i) {
         const std::wstring_view arg=args[i];
         if(arg==L"--campaign-validate-hidden")requested=true;
+        if(arg==L"--benchmark-menu-validate")benchmarkMenuRequested=true;
         if(arg==L"--lookout-validate-hidden")lookoutRequested=true;
         if(arg==L"--route-validate-hidden")routeRequested=true;
         if(arg==L"--route-return-recovery-hidden")returnRequested=true;
@@ -670,12 +671,12 @@ bool ConfigureHiddenCampaignValidation()
         if(arg==L"--campaign-test-root" && i+1<count)directory=args[++i];
     }
     LocalFree(args);
-    if(!requested && !lookoutRequested && !routeRequested && !returnRequested && !inspectKit && directory.empty())return true;
+    if(!requested && !lookoutRequested && !routeRequested && !returnRequested && !inspectKit && !benchmarkMenuRequested && directory.empty())return true;
 #if defined(_DEBUG) && defined(HORDE_RT_SOURCE_DIR)
     std::error_code error;
     const auto absolute=std::filesystem::absolute(directory,error).lexically_normal();
     const auto reports=std::filesystem::canonical(std::filesystem::path(HORDE_RT_SOURCE_DIR)/"reports",error);
-    if(unsigned(requested)+unsigned(lookoutRequested)+unsigned(routeRequested)+unsigned(returnRequested)!=1 || (inspectKit && !lookoutRequested) || directory.empty() || error || !directory.is_absolute() ||
+    if(unsigned(requested)+unsigned(lookoutRequested)+unsigned(routeRequested)+unsigned(returnRequested)+unsigned(benchmarkMenuRequested)!=1 || (inspectKit && !lookoutRequested) || directory.empty() || error || !directory.is_absolute() ||
         !absolute.filename().string().starts_with("horde-campaign-fixtures-") ||
         std::filesystem::canonical(absolute.parent_path(),error)!=reports || error ||
         std::filesystem::canonical(absolute,error)!=absolute || error || !std::filesystem::is_directory(absolute,error) || error ||
@@ -683,6 +684,14 @@ bool ConfigureHiddenCampaignValidation()
         std::cerr<<"Hidden campaign validation requires a caller-created exported fixture directory directly in this checkout's reports.\n";return false;
     }
     for(const auto& item:std::filesystem::directory_iterator(absolute))if(item.is_symlink())return false;
+    if(benchmarkMenuRequested) {
+        std::string manifest;
+        if(!ReadHiddenLookoutManifest(absolute/"manifest.json",manifest) ||
+           manifest!="{\"evidenceClass\":\"isolated opening-menu benchmark; no campaign progress\"}\n")return false;
+        for(const auto& item:std::filesystem::directory_iterator(absolute))
+            if(item.path().filename()!="manifest.json")return false;
+        gOpeningBenchmarkMenuValidation=true;gCampaignValidationDirectory=absolute;return true;
+    }
     if(lookoutRequested && !PrepareHiddenLookoutFixture(absolute)){
         std::cerr<<"Hidden lookout validation requires the unchanged caller-exported single ForestEndpoint autosave and canonical manifest only.\n";return false;
     }

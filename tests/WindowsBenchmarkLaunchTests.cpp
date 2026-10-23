@@ -171,6 +171,49 @@ int main()
         check(!incompatible.Begin(mobile) && incompatible.Phase() == WindowsBenchmarkProfilePhase::Idle,
             "immutable Mobile optics cannot masquerade as the Windows High profile");
     }
+    {
+        using namespace horde::gameplay;
+        using namespace horde::graphics;
+        using namespace horde::platform::windows;
+        BenchmarkProfileConfiguration original;
+        original.backend=GraphicsBackend::RayTracingPipeline;
+        original.optical=OpticalProfile::Mobile;
+        original.graphics={75,WaterQuality::Mobile,FireDetail::Low,60,false,ShadowQuality::Higher,false,DustQuality::Off};
+        original.internal={738,495};original.output={984,661};
+        original.cameraAspect=static_cast<float>(738.0f/495.0f);
+        original.outputPolicy=BenchmarkOutputPolicy::Native;
+        const auto unchanged=original;
+        auto expected=original;expected.temporaryOverrideActive=true;
+        const OutputResizeOwnedFrame appliedOwner{12,13,14,15,16,17,0};
+        const OutputResizeOwnedFrame restoredOwner{13,14,18,19,20,21,1};
+        auto staleOwner=appliedOwner;++staleOwner.measurementGeneration;
+        WindowsBenchmarkProfileSession custom;
+        check(custom.Begin(original,BenchmarkProfileId::Custom) && original==unchanged && custom.Working()==expected,
+            "explicit Custom preserves odd extents, compiled optics, quality and native output policy without changing personal state");
+        check(!custom.ObserveMeasuring(original) && !custom.Observe(original,appliedOwner,1) &&
+            custom.Arm(appliedOwner) && !custom.Observe(original,staleOwner,1) &&
+            custom.Observe(original,appliedOwner,1) && custom.ObserveMeasuring(original) && !custom.Succeeded(),
+            "Custom needs the newly armed actual apply owner before admitting measured tuple observations");
+        auto changed=original;changed.graphics.shadowQuality=ShadowQuality::Current;
+        check(!custom.ObserveMeasuring(changed) && !custom.ObserveMeasuring(original),
+            "Custom remains bound to its actual starting tuple and cannot erase mid-run quality drift");
+        check(custom.BeginRestore(false,false) && custom.Working()==original &&
+            custom.Arm(restoredOwner) && custom.Observe(original,restoredOwner,2) &&
+            custom.Restored() && !custom.Succeeded() && original==unchanged,
+            "failed Custom measurement can restore the exact original without admitting a benchmark success");
+
+        WindowsBenchmarkProfileSession cancelled;
+        check(cancelled.Begin(original,BenchmarkProfileId::Custom) && cancelled.Arm(appliedOwner) &&
+            cancelled.Observe(original,appliedOwner,1) && cancelled.ObserveMeasuring(original) &&
+            cancelled.BeginRestore(false,true) && cancelled.Working()==original && !cancelled.Restored(),
+            "cancelling an acknowledged Custom run restores logical intent but still awaits physical restoration");
+        check(!cancelled.Observe(original,appliedOwner,2) && cancelled.Arm(restoredOwner) &&
+            !cancelled.Observe(original,appliedOwner,2) && !cancelled.Observe(original,restoredOwner,1) &&
+            cancelled.Observe(original,restoredOwner,2) && cancelled.Restored() && !cancelled.Succeeded(),
+            "cancelled Custom requires a fresh exact restoration owner and newer completion, never a stale apply receipt");
+        check(cancelled.Working()==unchanged && original==unchanged,
+            "Custom cancellation preserves every original field and the external owner tuple exactly");
+    }
     using horde::vulkan::raytracing::RtWorkloadPreset;
     check(absent.rtWorkloadPreset == RtWorkloadPreset::Authored,
           "ordinary launches keep the authored preset");

@@ -105,7 +105,7 @@ bool ObserveWindowsBenchmarkProfileMeasurement(VulkanSurfaceContext& c, const bo
     if (!p.hasCompletedEvidence || owner.sceneEpoch != p.sceneEpoch ||
         owner.measurementGeneration != p.measurementGeneration) return !requireCompleted;
     horde::gameplay::BenchmarkProfileConfiguration actual;
-    if (ReadBenchmarkProfileActual(c, actual, true) && c.benchmarkProfile->ObserveMeasuring(actual)) return true;
+    if (ReadBenchmarkProfileActual(c, actual, !c.benchmarkProfileCustom) && c.benchmarkProfile->ObserveMeasuring(actual)) return true;
     c.benchmarkProfileError = "Owning completed benchmark state changed from the acknowledged provisional tuple.";
     return false;
 }
@@ -219,7 +219,7 @@ bool ApplyWindowsBenchmarkProfile(VulkanSurfaceContext& c, const VkClearColorVal
     SetLastError(ERROR_SUCCESS);
     c.benchmarkProfileOriginalExStyle = GetWindowLongPtrA(c.windowHandle, GWL_EXSTYLE);
     const bool exStyleKnown = c.benchmarkProfileOriginalExStyle != 0 || GetLastError() == ERROR_SUCCESS;
-    if (!styleKnown || !exStyleKnown || c.fullscreen || c.graphicsEdit || c.graphicsCommand || c.sceneProfileDirty || c.renderScaleDirty ||
+    if (!styleKnown || !exStyleKnown || (!c.benchmarkProfileCustom && c.fullscreen) || c.graphicsEdit || c.graphicsCommand || c.sceneProfileDirty || c.renderScaleDirty ||
         c.glassGeometryDirty || !GetWindowPlacement(c.windowHandle, &c.benchmarkProfileOriginalPlacement) ||
         !GetWindowRect(c.windowHandle, &c.benchmarkProfileOriginalRect) ||
         !GetClientRect(c.windowHandle, &c.benchmarkProfileOriginalClient) ||
@@ -230,21 +230,22 @@ bool ApplyWindowsBenchmarkProfile(VulkanSurfaceContext& c, const VkClearColorVal
     c.benchmarkProfileBefore = c.rtFrameEvidence.PublishedStateByValue();
     horde::gameplay::BenchmarkProfileConfiguration original;
     if (!ReadBenchmarkProfileActual(c, original, false) || original.graphics != c.benchmarkProfileOriginalIntent ||
-        c.benchmarkProfileCancelRequested || !c.benchmarkProfile->Begin(original)) {
+        c.benchmarkProfileCancelRequested || !c.benchmarkProfile->Begin(original, c.benchmarkProfileCustom ?
+            horde::gameplay::BenchmarkProfileId::Custom : horde::gameplay::BenchmarkProfileId::WindowsProvisionalV1)) {
         c.benchmarkProfileError = "Original state is pending, cancelled, or compiled optics do not support the provisional profile.";
         c.benchmarkProfileActive = false; return false;
     }
     SetBenchmarkProfileIntent(c, c.benchmarkProfile->Working().graphics);
     const auto spec = horde::gameplay::BenchmarkProfileSpecification(horde::gameplay::BenchmarkProfileId::WindowsProvisionalV1);
-    if (!ResizeBenchmarkProfileClient(c, static_cast<int>(spec->output.width), static_cast<int>(spec->output.height)) ||
-        !RecreateSwapchain(c)) {
+    if (!c.benchmarkProfileCustom && (!ResizeBenchmarkProfileClient(c, static_cast<int>(spec->output.width), static_cast<int>(spec->output.height)) ||
+        !RecreateSwapchain(c))) {
         if (c.benchmarkProfileError.empty()) c.benchmarkProfileError = "Fixed output recreation failed.";
         c.benchmarkProfileError += " Restoration required."; return false;
     }
     if (validationCase == "cancel-apply") {
         CancelBenchmark(c, false, "profile-validation-cancel-apply"); return false;
     }
-    if (c.benchmarkProfileCancelRequested || !CaptureBenchmarkProfileCompletion(c, clear, true, true, validationCase == "stale-owner")) {
+    if (c.benchmarkProfileCancelRequested || !CaptureBenchmarkProfileCompletion(c, clear, true, !c.benchmarkProfileCustom, validationCase == "stale-owner")) {
         c.benchmarkProfileError = "Applied resources did not acknowledge the exact provisional RT tuple."; return false;
     }
     c.benchmarkProfileApplied = c.rtFrameEvidence.PublishedStateByValue();
@@ -313,7 +314,8 @@ bool WriteWindowsBenchmarkProfileReceipt(VulkanSurfaceContext& c, const std::fil
     const auto rectJson = [&out](const RECT& r) {
         out << '[' << r.left << ',' << r.top << ',' << r.right << ',' << r.bottom << ']';
     };
-    out << "{\"schema\":1,\"requestedProfile\":\"windows-rt-provisional-v1\",\"classification\":\"custom-unranked\","
+    out << "{\"schema\":1,\"requestedProfile\":\"" << (c.benchmarkProfileCustom ? "custom" : "windows-rt-provisional-v1")
+        << "\",\"classification\":\"custom-unranked\","
         "\"ranked\":false,\"validationCase\":\"" << JsonEscape(validationCase) << "\",\"actualApplyAcknowledged\":"
         << (c.benchmarkProfileApplied.hasCompletedEvidence ? "true" : "false") << ",\"actualRestorationAcknowledged\":"
         << (c.benchmarkProfile && c.benchmarkProfile->Restored() ? "true" : "false") << ",\"measurementAndRestorationPassed\":"

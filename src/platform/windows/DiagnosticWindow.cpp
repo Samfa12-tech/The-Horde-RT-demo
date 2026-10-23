@@ -119,6 +119,7 @@
 #endif
 #include "platform/windows/WindowsBenchmarkLaunch.h"
 #include "platform/windows/WindowsBenchmarkProfile.h"
+#include "platform/windows/WindowsBenchmarkMenuOwner.h"
 #include "platform/windows/WindowsChapterShippingLaunch.h"
 #include "gameplay/validation/ChapterRouteHostPhases.h"
 #include "platform/windows/WindowsAssetRoot.h"
@@ -160,6 +161,7 @@ using LookoutPanel=horde::platform::windows::WindowsLookoutObjectivePanel;
 // Debug validation owns only an unshown HWND, isolated save directory and RT
 // targets. It must never acquire foreground input or touch the owner's INI.
 bool gCampaignHiddenValidation=false;
+bool gOpeningBenchmarkMenuValidation=false;
 bool gLookoutHiddenValidation=false;
 bool gRouteHiddenValidation=false;
 bool gRouteReturnRecovery=false;
@@ -301,6 +303,11 @@ constexpr int kMenuTeachingEnabledId = 2030;
 constexpr int kMenuTeachingSlowdownId = 2031;
 constexpr int kMenuTeachingSkipId = 2032;
 constexpr int kMenuTeachingReplayId = 2033;
+constexpr int kBenchmarkStandardChoiceId = 230;
+constexpr int kBenchmarkCustomChoiceId = 231;
+constexpr int kBenchmarkChoiceRunId = 232;
+constexpr int kBenchmarkChoiceBackId = 233;
+constexpr int kBenchmarkChoiceInfoId = 234;
 constexpr int kAppIconId = 1;
 constexpr UINT kDefaultDpi = 96u;
 constexpr char kUiFontProperty[] = "HordeLanternRtUiFont";
@@ -312,6 +319,7 @@ constexpr char kGraphicsInfoFontProperty[] = "HordeLanternRtGraphicsInfoFont";
 constexpr char kMonoFontProperty[] = "HordeLanternRtMonoFont";
 constexpr char kDeveloperFontProperty[] = "HordeLanternRtDeveloperFont";
 constexpr char kCaptureModeProperty[] = "HordeLanternRtCaptureMode";
+constexpr char kOpeningBenchmarkTransferProperty[] = "HordeLanternRtOpeningBenchmarkTransfer";
 // One frame in flight keeps the dynamically refit held-torch TLAS safely synchronized with its host-written instance buffer.
 constexpr UINT kMaxFramesInFlight = 1u;
 
@@ -420,6 +428,20 @@ struct WindowsBenchmarkSummaryArm
     horde::telemetry::BenchmarkSummaryConfiguration configuration;
     horde::graphics::GraphicsSettings applied;
     horde::vulkan::raytracing::RtSceneProfile profile = horde::vulkan::raytracing::RtSceneProfile::Showcase;
+};
+
+using OpeningBenchmarkChoice = horde::platform::windows::OpeningBenchmarkChoice;
+using OpeningBenchmarkOwnerPhase = horde::platform::windows::OpeningBenchmarkOwnerPhase;
+struct OpeningBenchmarkTransfer
+{
+    horde::platform::windows::OpeningBenchmarkOwnerTransfer owner;
+    horde::telemetry::RtLifecycleSeeds seeds{};
+    horde::graphics::GraphicsSettings personalGraphics{}, savedGraphics{};
+    horde::gameplay::BenchmarkProfileConfiguration entryActual{};
+    WINDOWPLACEMENT windowedPlacement{sizeof(WINDOWPLACEMENT)};
+    bool hasPersonal = false, fullscreen = false, closeRequested = false, cancelPending = false;
+    std::filesystem::path reports;
+    std::string status, statusTitle;
 };
 
 struct VulkanSurfaceContext
@@ -720,6 +742,11 @@ struct VulkanSurfaceContext
     bool benchmarkCompletionHandled = false;
     bool benchmarkReportsSaved = false;
     bool unattendedBenchmark = false;
+    OpeningBenchmarkTransfer* openingBenchmark = nullptr;
+    bool openingBenchmarkOwner = false, openingBenchmarkReturnPending = false;
+    bool benchmarkChooserVisible = false;
+    OpeningBenchmarkChoice benchmarkChoice = OpeningBenchmarkChoice::None;
+    bool benchmarkProfileCustom = false;
     bool benchmarkProfileRequested = false, benchmarkProfileActive = false;
     bool benchmarkProfileInternalResize = false, benchmarkProfileCancelRequested = false;
     bool benchmarkProfileCloseRequested = false;
@@ -768,6 +795,8 @@ void UpdateChestPrompt(VulkanSurfaceContext& context);
 int ScaleForDpi(HWND window, int logicalPixels);
 void LayoutOverlayControls(HWND window, int width, int height);
 void ApplyDpiScaledFonts(HWND window);
+horde::platform::windows::OpeningBenchmarkEligibility OpeningBenchmarkEligibilityFor(const VulkanSurfaceContext&);
+void RefreshOpeningBenchmarkChooser(VulkanSurfaceContext&);
 void InstallControllerFocusOutline(HWND control);
 void SetEntryLoadingVisible(VulkanSurfaceContext&,bool);
 void OpenCampaignMenu(VulkanSurfaceContext&,horde::platform::windows::WindowsCampaignMenu::Page);
@@ -3060,8 +3089,7 @@ void ApplyOverlayState(VulkanSurfaceContext& context)
              {kRestartButtonId, kControlsButtonId, kDiagnosticsButtonId, kRunBenchmarkButtonId,
               kReportProblemButtonId, kMoreBySamfa12ButtonId, kExitButtonId})
             SetControlVisible(context.windowHandle, id,
-                              context.entryMoreVisible && id != kRestartButtonId &&
-                                  id != kRunBenchmarkButtonId);
+                              context.entryMoreVisible && id != kRestartButtonId);
     }
     SetControlVisible(context.windowHandle, kEntryMoreButtonId, entryFront);
     SetControlVisible(context.windowHandle, kEntryBackButtonId,
@@ -3081,10 +3109,15 @@ void ApplyOverlayState(VulkanSurfaceContext& context)
              {kRestartButtonId, kControlsButtonId, kDiagnosticsButtonId, kRunBenchmarkButtonId,
               kReportProblemButtonId, kMoreBySamfa12ButtonId, kExitButtonId})
             SetControlVisible(context.windowHandle, id,
-                              context.entryMoreVisible && id != kRestartButtonId &&
-                                  id != kRunBenchmarkButtonId);
+                              context.entryMoreVisible && id != kRestartButtonId);
         SetControlVisible(context.windowHandle, kSettingsButtonId, entryFront);
     }
+    SetControlVisible(context.windowHandle, kRunBenchmarkButtonId,
+        context.entryMenuVisible && context.entryMoreVisible && pauseVisible &&
+        OpeningBenchmarkEligibilityFor(context).Eligible());
+    for (int id : {kBenchmarkStandardChoiceId,kBenchmarkCustomChoiceId,kBenchmarkChoiceRunId,
+                   kBenchmarkChoiceBackId,kBenchmarkChoiceInfoId})
+        SetControlVisible(context.windowHandle,id,context.benchmarkChooserVisible);
     const bool rtLabAccess = context.rtLabUnlocked || context.rtLabDebugInjection;
     SetControlVisible(context.windowHandle, kRtLabButtonId,
                       pauseVisible && rtLabAccess && !context.deathOverlayVisible);
@@ -3201,8 +3234,10 @@ void ApplyOverlayState(VulkanSurfaceContext& context)
                        ? (context.rtLabJustUnlocked
                               ? "RT LAB UNLOCKED"
                               : "DAWN RETURNS  |  THE LAST LANTERN HAS DONE ITS WORK")
-                       : (context.entryMenuVisible ? "THE HORDE"
-                                                   : "HORDE LANTERN RT  |  SHOWCASE ALPHA")));
+                       : (context.entryMenuVisible ?
+                            (context.entryMoreVisible && context.openingBenchmark && !context.openingBenchmark->statusTitle.empty()
+                                ? context.openingBenchmark->statusTitle.c_str() : "THE HORDE")
+                            : "HORDE LANTERN RT  |  SHOWCASE ALPHA")));
     }
     if (HWND resume = GetDlgItem(context.windowHandle, kResumeButtonId))
     {
@@ -3252,6 +3287,16 @@ void ApplyOverlayState(VulkanSurfaceContext& context)
             if(id<LookoutPanel::TitleId || id>LookoutPanel::BackId)ShowWindow(child,SW_HIDE);
             return TRUE;
         },0);
+    }
+    if (context.benchmarkChooserVisible || context.openingBenchmarkReturnPending) {
+        EnumChildWindows(context.windowHandle,[](HWND child,LPARAM value)->BOOL {
+            const auto& c=*reinterpret_cast<const VulkanSurfaceContext*>(value);
+            const int id=GetDlgCtrlID(child);
+            ShowWindow(child, !c.openingBenchmarkReturnPending && id>=kBenchmarkStandardChoiceId &&
+                id<=kBenchmarkChoiceInfoId ? SW_SHOW : SW_HIDE);
+            return TRUE;
+        },reinterpret_cast<LPARAM>(&context));
+        if (context.benchmarkChooserVisible) RefreshOpeningBenchmarkChooser(context);
     }
 }
 
@@ -3874,7 +3919,7 @@ void LogBenchmarkCancellation(const VulkanSurfaceContext& context, const char* t
 
 void CancelBenchmark(VulkanSurfaceContext& context, const bool showMenu, const char* trigger)
 {
-    if (context.benchmarkProfileActive) context.benchmarkProfileCancelRequested = true;
+    if (context.benchmarkProfileActive || context.openingBenchmarkOwner) context.benchmarkProfileCancelRequested = true;
     if (!context.benchmark.IsRunning())
     {
         return;
@@ -4401,6 +4446,7 @@ std::vector<HWND> VisibleControllerMenuControls(const VulkanSurfaceContext& cont
         return controls;
     }
     constexpr auto controlIds = std::to_array<int>({
+        kBenchmarkStandardChoiceId,kBenchmarkCustomChoiceId,kBenchmarkChoiceRunId,kBenchmarkChoiceBackId,
         kResumeButtonId,
         kEntryMoreButtonId,
         kEntryBackButtonId,
@@ -4580,6 +4626,9 @@ void NavigateGraphicsMenu(VulkanSurfaceContext& context,
 
 void CancelControllerMenu(VulkanSurfaceContext& context)
 {
+    if(context.benchmarkChooserVisible) {
+        PostMessageA(context.windowHandle,WM_COMMAND,kBenchmarkChoiceBackId,0);return;
+    }
     if(context.lookoutObjective && context.lookoutObjective->Visible()) {CancelLookoutObjective(context);return;}
     if(context.campaignMenu && context.campaignMenu->Visible()) {
         context.campaignMenu->HandleCommand(4121);return;
@@ -6056,8 +6105,9 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx, const bool startup
     if (!ctx.rtFrameEvidenceInitialised)
     {
         horde::telemetry::RtLifecycleSeeds seeds{};
-        seeds.sceneEpoch = 1u;
-        seeds.measurementGeneration = 1u;
+        if (ctx.openingBenchmark) seeds = ctx.openingBenchmark->seeds;
+        seeds.sceneEpoch = std::max<std::uint64_t>(1u, seeds.sceneEpoch);
+        seeds.measurementGeneration = std::max<std::uint64_t>(1u, seeds.measurementGeneration);
         const horde::telemetry::RtInstrumentationMode instrumentation =
             ctx.rtScene.DiagnosticsAvailability() ==
                     horde::vulkan::raytracing::RtDiagnosticAvailability::Available
@@ -6118,6 +6168,7 @@ bool RecreateSwapchain(VulkanSurfaceContext& ctx)
 
 void DetachRenderContextHost(VulkanSurfaceContext& context) noexcept
 {
+    StopMenuAmbience(context); // The shared HWND survives an opening-menu benchmark owner hop.
     // Stop every host callback before either native cleanup or fatal retention.
     const HWND window = context.windowHandle;
     if (window != nullptr && IsWindow(window) &&
@@ -7161,6 +7212,7 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
 }
 
 #include "platform/windows/WindowsBenchmarkProfile.inl"
+#include "platform/windows/WindowsOpeningBenchmarkMenu.inl"
 
 #if defined(_DEBUG) || HORDE_RT_CHAPTER_MEASUREMENT
 const char* CapturePresetName(const horde::gameplay::ShowcaseCheckpointPreset preset)
@@ -8559,16 +8611,21 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
                                  const bool outputResizeValidation,
                                  const std::string& nativeMotionScenario,
                                  const horde::vulkan::raytracing::RtWorkloadPreset nativeMotionRtWorkloadPreset,
-                                 const std::optional<horde::graphics::DustQuality> captureDustQuality)
+                                 const std::optional<horde::graphics::DustQuality> captureDustQuality,
+                                 OpeningBenchmarkTransfer* openingBenchmark = nullptr)
 {
     horde::vulkan::RetirementOwner<VulkanSurfaceContext> renderOwner(
         std::make_unique<VulkanSurfaceContext>(), DestroyRenderContext, DetachRenderContextHost);
     auto& context = *renderOwner.Get();
+    context.openingBenchmark = openingBenchmark;
+    context.openingBenchmarkOwner = openingBenchmark && openingBenchmark->owner.Phase()==OpeningBenchmarkOwnerPhase::Benchmark;
+    context.openingBenchmarkReturnPending = openingBenchmark && openingBenchmark->owner.Phase()==OpeningBenchmarkOwnerPhase::ReturningEntry;
+    const bool automatedBenchmark = unattendedBenchmark || context.openingBenchmarkOwner;
     // Ordinary interactive launches enter the accepted lantern menu. Explicit
     // captures/checkpoints keep their requested scene; the slice flag below
     // remains available for dedicated menu inspection.
     context.entryMenuVisible = captureDirectory == nullptr && developmentCheckpoint == nullptr &&
-        !unattendedBenchmark && !graphicsPreviewCapture && !outputResizeValidation &&
+        !automatedBenchmark && !graphicsPreviewCapture && !outputResizeValidation &&
         nativeMotionScenario.empty();
     int entryArgumentCount = 0;
     LPWSTR *entryArguments = CommandLineToArgvW(GetCommandLineW(), &entryArgumentCount);
@@ -8593,7 +8650,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
             { context.developmentKeeperPractice = true; context.entryMenuVisible = false; }
 #endif
             if (std::wstring_view(entryArguments[argument]) == L"--entry-menu-slice")
-                context.entryMenuVisible = !unattendedBenchmark;
+                context.entryMenuVisible = !automatedBenchmark;
         }
         LocalFree(entryArguments);
     }
@@ -8649,10 +8706,12 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     (void)anatomicalPlayerMount;
     context.windowHandle = hWnd;
     context.capabilitySnapshot = &capabilities;
-    context.unattendedBenchmark = unattendedBenchmark || ParseCaptureLaunchOptions().measureChapterShippingRoute;
+    context.unattendedBenchmark = automatedBenchmark || ParseCaptureLaunchOptions().measureChapterShippingRoute;
     const auto benchmarkProfileLaunch = ParseCaptureLaunchOptions().benchmark;
-    context.benchmarkProfileRequested = unattendedBenchmark && benchmarkProfileLaunch.profile ==
-        horde::gameplay::BenchmarkProfileId::WindowsProvisionalV1;
+    context.benchmarkProfileCustom = context.openingBenchmarkOwner &&
+        openingBenchmark->owner.Choice()==OpeningBenchmarkChoice::Custom;
+    context.benchmarkProfileRequested = context.openingBenchmarkOwner || (unattendedBenchmark && benchmarkProfileLaunch.profile ==
+        horde::gameplay::BenchmarkProfileId::WindowsProvisionalV1);
     if (context.benchmarkProfileRequested)
         context.benchmarkProfile = std::make_unique<horde::platform::windows::WindowsBenchmarkProfileSession>();
     if (developmentCheckpoint != nullptr)
@@ -8680,6 +8739,12 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     }
 #endif
 
+    if (openingBenchmark && openingBenchmark->hasPersonal) {
+        SetBenchmarkProfileIntent(context,openingBenchmark->personalGraphics);
+        context.savedGraphics=openingBenchmark->savedGraphics;
+        context.fullscreen=openingBenchmark->fullscreen;
+        context.windowedPlacement=openingBenchmark->windowedPlacement;
+    }
     if (context.developmentCombatPractice)
         context.simulation.BeginCombatPractice(horde::gameplay::EnemyKind::Skeleton);
     else if (context.developmentKeeperPractice)
@@ -8829,9 +8894,11 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         if(captureDirectory != nullptr)
             std::cerr << "HORDE_CAPTURE_HOST callbacks-attached" << std::endl;
 #endif
-        if (context.entryMenuVisible)
-            ApplyDpiScaledFonts(hWnd);
-        if(captureDirectory==nullptr && !unattendedBenchmark && !graphicsPreviewCapture && !outputResizeValidation && !context.nativeMotionValidation) {
+        TraceOpeningMenuStage("callbacks-attached");
+        if (context.entryMenuVisible) {
+            TraceOpeningMenuStage("fonts-begin");ApplyDpiScaledFonts(hWnd);TraceOpeningMenuStage("fonts-end");
+        }
+        if(captureDirectory==nullptr && !automatedBenchmark && !graphicsPreviewCapture && !outputResizeValidation && !context.nativeMotionValidation) {
             const auto directory=gCampaignHiddenValidation?gCampaignValidationDirectory:WindowsCampaignDirectory();
             std::error_code campaignDirectoryError;
             if(!directory.empty())std::filesystem::create_directories(directory,campaignDirectoryError);
@@ -8846,7 +8913,9 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
                 context.campaignMenu=std::make_unique<horde::platform::windows::WindowsCampaignMenu>([&context](auto command){
                     QueueCampaignCommand(context,command);
                 });
+                TraceOpeningMenuStage("campaign-controls-begin");
                 if(!context.campaignMenu->Create(hWnd)){(void)renderOwner.Retire();return 1;}
+                TraceOpeningMenuStage("campaign-controls-end");
                 context.campaignPhase=horde::platform::windows::WindowsCampaignMenu::Phase::Ready;
             }
         }
@@ -8854,6 +8923,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         {
             // Normal gameplay and benchmark runs include music. Frozen image
             // capture mode deliberately has no playback, as with existing SFX.
+            TraceOpeningMenuStage("music-begin");
             try
             {
                 context.musicPlayback = std::make_unique<horde::platform::windows::WindowsMusicPlayback>(
@@ -8863,13 +8933,15 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
             {
                 LogWindowsAudio(std::string("Music could not initialize; RT/SFX unchanged: ") + error.what());
             }
+            TraceOpeningMenuStage("music-end-overlay-begin");
             ApplyOverlayState(context);
+            TraceOpeningMenuStage("overlay-end");
             {
                 RECT entryClient{};
                 GetClientRect(hWnd, &entryClient);
                 LayoutOverlayControls(hWnd, entryClient.right, entryClient.bottom);
             }
-            if (!unattendedBenchmark)
+            if (!automatedBenchmark)
                 horde::platform::windows::BeginGitHubReleaseUpdateCheck(
                     hWnd, HORDE_RT_DISPLAY_VERSION, false);
 #if defined(_DEBUG)
@@ -8955,7 +9027,24 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     }
 #endif
     const VkClearColorValue clearColor = ClearColorForMode(capabilities.rtMode);
-    if (unattendedBenchmark)
+    if (context.openingBenchmarkReturnPending) {
+        horde::gameplay::BenchmarkProfileConfiguration actual;
+        const bool presented=CaptureBenchmarkProfileCompletion(context,clearColor,false,false) &&
+            ReadBenchmarkProfileActual(context,actual,false) && actual==openingBenchmark->entryActual;
+        const bool admitted=openingBenchmark->owner.EntryPresented(presented);
+        if(!admitted) {(void)renderOwner.Retire();return 1;}
+        context.openingBenchmarkReturnPending=false;
+        openingBenchmark->cancelPending=false;
+        std::cerr<<"HORDE_OPENING_BENCHMARK entry-presented campaignAttached="<<(context.campaign?1:0)<<'\n';
+        context.entryMoreVisible=true;
+        ApplyOverlayState(context);
+        RECT client{};GetClientRect(hWnd,&client);LayoutOverlayControls(hWnd,client.right,client.bottom);
+        FocusGameControl(GetDlgItem(hWnd,kRunBenchmarkButtonId));
+        if(openingBenchmark->closeRequested) PostMessageA(hWnd,WM_CLOSE,0,0);
+    }
+    if(context.openingBenchmarkOwner && openingBenchmark->cancelPending)
+        context.benchmarkProfileCancelRequested=true;
+    if (automatedBenchmark)
     {
         if (!context.controlsEnabled)
         {
@@ -8964,7 +9053,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         }
         if (context.benchmarkProfileRequested)
         {
-            const auto& validation = benchmarkProfileLaunch.profileValidation;
+            const auto validation = context.openingBenchmarkOwner ? std::string{} : benchmarkProfileLaunch.profileValidation;
             const bool applied = ApplyWindowsBenchmarkProfile(context, clearColor, validation);
             if (!applied || !validation.empty())
             {
@@ -9003,12 +9092,24 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
                 context.benchmarkProfileValidationPassed = validated && imageSaved;
                 const bool saved = WriteWindowsBenchmarkProfileReceipt(context, textReportPath.parent_path(), validation);
                 const bool validationPassed = context.benchmarkProfileValidationPassed;
+                if(context.openingBenchmarkOwner) {
+                    openingBenchmark->status=context.benchmarkProfileCancelRequested ?
+                        "Benchmark cancelled. Personal graphics restored." : "Benchmark could not start. No result admitted.";
+                    openingBenchmark->statusTitle=context.benchmarkProfileCancelRequested ? "BENCHMARK CANCELLED" : "NO BENCHMARK RESULT";
+                    openingBenchmark->closeRequested=openingBenchmark->closeRequested || context.benchmarkProfileCloseRequested;
+                    const bool seedsKept=CarryOpeningBenchmarkSeeds(*openingBenchmark,context);
+                    const bool retired=renderOwner.Retire();
+                    return openingBenchmark->owner.BenchmarkRetired(restored && seedsKept,retired)?0:1;
+                }
                 const bool retired = renderOwner.Retire();
                 return validationPassed && saved && retired ? 0 : 1;
             }
         }
+        if(context.openingBenchmarkOwner)std::cerr<<"HORDE_OPENING_BENCHMARK applied fixed="
+            <<(!context.benchmarkProfileCustom)<<" campaignAttached="<<(context.campaign?1:0)<<'\n';
         StartBenchmark(context, benchmarkWorkload, false, benchmarkRtWorkloadPreset); // No FPS observer.
     }
+    TraceOpeningMenuStage("ui-ready");
     MSG message{};
     bool running = true;
     bool renderFailed = false;
@@ -9044,13 +9145,47 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
             CancelBenchmark(context, false, "profile-lifecycle-interrupted");
             break;
         }
-        if (unattendedBenchmark && !context.benchmark.IsRunning())
+        if (automatedBenchmark && !context.benchmark.IsRunning())
         {
             CompleteBenchmark(context, capabilities, textReportPath.parent_path());
             break;
         }
 
+        if (openingBenchmark && openingBenchmark->owner.Phase()==OpeningBenchmarkOwnerPhase::Queued) {
+            auto eligible=OpeningBenchmarkEligibilityFor(context);
+            if(!eligible.Eligible()) {
+                (void)openingBenchmark->owner.CancelQueued();
+            } else {
+                horde::gameplay::BenchmarkProfileConfiguration actual;
+                if(!CaptureBenchmarkProfileCompletion(context,clearColor,false,false) ||
+                   !ReadBenchmarkProfileActual(context,actual,false)) {
+                    (void)openingBenchmark->owner.CancelQueued();
+                    openingBenchmark->status="Current Entry RT state could not be acknowledged. No benchmark started.";
+                    if(!IsWindow(hWnd) || context.benchmarkProfileCloseRequested) {
+                        running=false;break; // The completion pump may have consumed WM_QUIT.
+                    }
+                } else {
+                    eligible=OpeningBenchmarkEligibilityFor(context); // completion pumps messages
+                    if(eligible.Eligible() && openingBenchmark->owner.Phase()==OpeningBenchmarkOwnerPhase::Queued) {
+                        openingBenchmark->personalGraphics=BenchmarkProfileIntent(context);
+                        openingBenchmark->savedGraphics=context.savedGraphics;
+                        openingBenchmark->entryActual=actual;
+                        openingBenchmark->fullscreen=context.fullscreen;
+                        openingBenchmark->windowedPlacement=context.windowedPlacement;
+                        openingBenchmark->hasPersonal=true;
+                        const bool seedsKept=CarryOpeningBenchmarkSeeds(*openingBenchmark,context);
+                        const bool retired=renderOwner.Retire();
+                        const bool admitted=openingBenchmark->owner.RecheckAndRetireEntry(eligible,retired && seedsKept);
+                        std::cerr<<"HORDE_OPENING_BENCHMARK entry-retired="<<retired<<" successorAdmitted="<<admitted<<'\n';
+                        return admitted?0:1;
+                    }
+                    (void)openingBenchmark->owner.CancelQueued();
+                }
+            }
+        }
         PumpCampaign(context);
+        if(context.entryMenuVisible && context.entryMoreVisible && !context.benchmarkChooserVisible)
+            EnableWindow(GetDlgItem(hWnd,kRunBenchmarkButtonId),OpeningBenchmarkEligibilityFor(context).Eligible());
         if(context.campaignRetirementUnproved){renderFailed=true;break;}
         const auto ownerFrameStart = std::chrono::steady_clock::now();
         const bool graphicsTransition = context.sceneProfileDirty || context.glassGeometryDirty ||
@@ -9196,7 +9331,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
                 << "\nRescue equipment stowed: " << failedSnapshot.rescue.equipmentStowed << '\n';
             (void)WriteReportFile(textReportPath.parent_path() / "windows_render_failure.txt",
                                   failureReport.str());
-            if (!unattendedBenchmark) GameMessageBoxA(hWnd,
+            if (!automatedBenchmark) GameMessageBoxA(hWnd,
                         "The native RT render loop stopped unexpectedly. Check the reports folder for diagnostics.",
                         "Horde Lantern RT - renderer stopped",
                         MB_OK | MB_ICONERROR);
@@ -9362,14 +9497,29 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     const bool benchmarkSucceeded = context.benchmark.Passed() && context.benchmarkReportsSaved &&
         context.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Complete &&
         context.benchmarkEvidence.ExpectedCount() == context.benchmark.Frames().size();
+    bool restorationPassed=true;
     if (context.benchmarkProfileRequested)
     {
-        if (!RestoreWindowsBenchmarkProfile(context, clearColor, !renderFailed && benchmarkSucceeded)) renderFailed = true;
+        restorationPassed=RestoreWindowsBenchmarkProfile(context, clearColor, !renderFailed && benchmarkSucceeded);
         if (!WriteWindowsBenchmarkProfileReceipt(context, textReportPath.parent_path(), {})) renderFailed = true;
-        if (!context.benchmarkProfile->Succeeded()) renderFailed = true;
+        if (!restorationPassed || (!context.openingBenchmarkOwner && !context.benchmarkProfile->Succeeded())) renderFailed = true;
+    }
+    if(context.openingBenchmarkOwner) {
+        openingBenchmark->closeRequested=openingBenchmark->closeRequested || context.benchmarkProfileCloseRequested;
+        openingBenchmark->statusTitle=benchmarkSucceeded && !renderFailed ? "BENCHMARK COMPLETE" :
+            context.benchmarkProfileCancelRequested ? "BENCHMARK CANCELLED" : "NO BENCHMARK RESULT";
+        openingBenchmark->status=benchmarkSucceeded && !renderFailed ? "Benchmark complete. Local reports saved." :
+            context.benchmarkProfileCancelRequested ? "Benchmark cancelled. Personal graphics restored." :
+            "Benchmark did not complete. Personal graphics restored; no result admitted.";
+        const bool seedsKept=CarryOpeningBenchmarkSeeds(*openingBenchmark,context);
+        const bool retired=renderOwner.Retire();
+        const bool admitted=openingBenchmark->owner.BenchmarkRetired(restorationPassed && seedsKept,retired);
+        std::cerr<<"HORDE_OPENING_BENCHMARK benchmark-retired="<<retired<<" restored="<<restorationPassed
+                 <<" successorAdmitted="<<admitted<<'\n';
+        return admitted?0:1;
     }
     if (!renderOwner.Retire()) renderFailed = true;
-    if (unattendedBenchmark) return !renderFailed && benchmarkSucceeded ? 0 : 1;
+    if (automatedBenchmark) return !renderFailed && benchmarkSucceeded ? 0 : 1;
     return renderFailed ? 1 : (running ? 0 : static_cast<int>(message.wParam));
 }
 
@@ -9765,6 +9915,7 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
             reportX += reportButtonWidth + reportGap;
         }
     }
+    if(sceneContext && sceneContext->benchmarkChooserVisible) LayoutOpeningBenchmarkChooser(window,width,height);
     if (HWND hud = GetDlgItem(window, kHudControlId))
     {
         const int hudInset = ScaleForDpi(window, 14);
@@ -9866,7 +10017,7 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
     else if (layoutContext && layoutContext->entryMenuVisible && layoutContext->entryMoreVisible)
     {
         const int moreHeight = ScaleForDpi(window, 48);
-        for (const int id : {kCampaignLoadButtonId,kControlsButtonId, kReportProblemButtonId, kDiagnosticsButtonId,
+        for (const int id : {kCampaignLoadButtonId,kRunBenchmarkButtonId,kControlsButtonId, kReportProblemButtonId, kDiagnosticsButtonId,
                              kMoreBySamfa12ButtonId, kExitButtonId, kEntryBackButtonId})
         {
             MoveWindow(GetDlgItem(window, id), pauseX, y, buttonWidth, moreHeight, TRUE);
@@ -10251,6 +10402,25 @@ bool NativeUiUsesHighContrast()
 LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     auto* sceneContext = reinterpret_cast<VulkanSurfaceContext*>(GetWindowLongPtrA(hWnd, GWLP_USERDATA));
+    if(!sceneContext) {
+        auto* transfer=reinterpret_cast<OpeningBenchmarkTransfer*>(GetPropA(hWnd,kOpeningBenchmarkTransferProperty));
+        if(transfer && (transfer->owner.Phase()==OpeningBenchmarkOwnerPhase::Queued ||
+           transfer->owner.Phase()==OpeningBenchmarkOwnerPhase::Benchmark ||
+           transfer->owner.Phase()==OpeningBenchmarkOwnerPhase::ReturningEntry)) {
+            // During detach/creation there is deliberately no render callback.
+            // Keep lifecycle intent with the HWND shell until its next owner.
+            if(message==WM_CLOSE || (message==WM_SYSKEYDOWN && wParam==VK_F4) ||
+               (message==WM_COMMAND && (LOWORD(wParam)==kExitButtonId || LOWORD(wParam)==kMenuExitId))) {
+                transfer->closeRequested=transfer->cancelPending=true;TraceOpeningMenuStage("detached-close");return 0;
+            }
+            if(message==WM_KEYDOWN && wParam==VK_ESCAPE) {
+                transfer->cancelPending=true;TraceOpeningMenuStage("detached-cancel");return 0;
+            }
+            if(message==WM_COMMAND || message==WM_KEYDOWN || message==WM_SYSKEYDOWN ||
+               message==WM_KEYUP || message==WM_SYSKEYUP || message==WM_LBUTTONDOWN ||
+               message==WM_RBUTTONDOWN || message==WM_HSCROLL)return 0;
+        }
+    }
 #if defined(_DEBUG)
     if (sceneContext && sceneContext->nativeMotionValidation)
     {
@@ -10289,7 +10459,22 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
     {
         return 0;
     }
-    if (sceneContext && sceneContext->benchmarkProfileActive)
+    if(sceneContext && sceneContext->openingBenchmark &&
+       sceneContext->openingBenchmark->owner.Phase()==OpeningBenchmarkOwnerPhase::Queued &&
+       message==WM_KEYDOWN && wParam==VK_ESCAPE) {
+        (void)sceneContext->openingBenchmark->owner.CancelQueued();
+        sceneContext->benchmarkChooserVisible=true;
+        ApplyOverlayState(*sceneContext);
+        FocusGameControl(GetDlgItem(hWnd,kBenchmarkChoiceBackId));return 0;
+    }
+    if(sceneContext && sceneContext->openingBenchmarkReturnPending) {
+        if(message==WM_CLOSE && sceneContext->openingBenchmark) {
+            sceneContext->openingBenchmark->closeRequested=true;return 0;
+        }
+        if(message==WM_COMMAND || message==WM_KEYDOWN || message==WM_SYSKEYDOWN ||
+           message==WM_LBUTTONDOWN || message==WM_RBUTTONDOWN || message==WM_HSCROLL)return 0;
+    }
+    if (sceneContext && (sceneContext->benchmarkProfileActive || sceneContext->openingBenchmarkOwner))
     {
         // The explicit launch owns this HWND until original RT restoration is
         // acknowledged. Closing/restarting requests cancellation, never destroys
@@ -10550,6 +10735,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 PlaySoundEffect(*sceneContext, "ui_select.wav");
                 return 0;
             case kEntryMoreButtonId:
+                TraceOpeningMenuStage("more-command");
                 sceneContext->entryMoreVisible = true;
                 sceneContext->entryMenu.ShowSidePage(true);
                 ApplyOverlayState(*sceneContext);
@@ -10656,7 +10842,35 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 ToggleDiagnostics(*sceneContext);
                 return 0;
             case kRunBenchmarkButtonId:
-                StartBenchmark(*sceneContext);
+                if(OpeningBenchmarkEligibilityFor(*sceneContext).Eligible()) {
+                    sceneContext->benchmarkChooserVisible=true;
+                    sceneContext->benchmarkChoice=OpeningBenchmarkChoice::None;
+                    ApplyOverlayState(*sceneContext);
+                    RECT r{};GetClientRect(hWnd,&r);LayoutOverlayControls(hWnd,r.right,r.bottom);
+                    FocusGameControl(GetDlgItem(hWnd,kBenchmarkStandardChoiceId));
+                }
+                return 0;
+            case kBenchmarkStandardChoiceId:
+            case kBenchmarkCustomChoiceId:
+                if(sceneContext->benchmarkChooserVisible) {
+                    sceneContext->benchmarkChoice=LOWORD(wParam)==kBenchmarkStandardChoiceId ?
+                        OpeningBenchmarkChoice::WindowsProvisional : OpeningBenchmarkChoice::Custom;
+                    RefreshOpeningBenchmarkChooser(*sceneContext);
+                }
+                return 0;
+            case kBenchmarkChoiceBackId:
+                sceneContext->benchmarkChooserVisible=false;
+                ApplyOverlayState(*sceneContext);
+                FocusGameControl(GetDlgItem(hWnd,kRunBenchmarkButtonId));return 0;
+            case kBenchmarkChoiceRunId:
+                if(sceneContext->benchmarkChooserVisible && sceneContext->openingBenchmark &&
+                    !(sceneContext->fullscreen && sceneContext->benchmarkChoice==OpeningBenchmarkChoice::WindowsProvisional) &&
+                    sceneContext->openingBenchmark->owner.Queue(sceneContext->benchmarkChoice,
+                        OpeningBenchmarkEligibilityFor(*sceneContext))) {
+                    sceneContext->openingBenchmark->cancelPending=sceneContext->openingBenchmark->closeRequested=false;
+                    sceneContext->benchmarkChooserVisible=false;
+                    ApplyOverlayState(*sceneContext);
+                }
                 return 0;
 #if defined(_DEBUG)
             case kMenuDeveloperOverlayId:
@@ -11000,6 +11214,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
             }
             if (wParam == VK_ESCAPE)
             {
+                if(sceneContext->benchmarkChooserVisible) {SendMessageA(hWnd,WM_COMMAND,kBenchmarkChoiceBackId,0);return 0;}
                 if(sceneContext->campaignMenu && sceneContext->campaignMenu->Visible()){sceneContext->campaignMenu->HandleCommand(4121);return 0;}
                 if ((lParam & (1ll << 30)) != 0) return 0;
                 if (sceneContext->graphicsVisible && sceneContext->graphicsEdit)
@@ -11931,7 +12146,12 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     createButton(kReportProblemButtonId, "REPORT A PROBLEM...");
     createButton(kRtLabButtonId, "RT LAB");
     createButton(kDiagnosticsButtonId, "RT DIAGNOSTICS");
-    createButton(kRunBenchmarkButtonId, "RUN BENCHMARK");
+    createButton(kRunBenchmarkButtonId, "BENCHMARK...");
+    createButton(kBenchmarkStandardChoiceId,"WINDOWS STANDARD - PROVISIONAL");
+    createButton(kBenchmarkCustomChoiceId,"CUSTOM - UNRANKED");
+    createButton(kBenchmarkChoiceRunId,"RUN SELECTED BENCHMARK");
+    createButton(kBenchmarkChoiceBackId,"BACK");
+    createStatic(kBenchmarkChoiceInfoId,"",SS_LEFT);
     createButton(kMoreBySamfa12ButtonId, "MORE BY SAMFA12");
     createButton(kExitButtonId, "QUIT DEMO");
     createStatic(kBenchmarkTitleId, "BENCHMARK REPORT  |  SELECTABLE TEXT", SS_CENTER | SS_CENTERIMAGE);
@@ -12139,12 +12359,27 @@ int CreateAndShowWindow(const std::string& diagnosticText,
         FocusGameControl(sceneMode ? hWnd : edit);
     }
 
-    int result = RunDiagnosticSwapchainWindow(
-        hWnd, capabilities, textReportPath, jsonReportPath, captureDirectory,
-        developmentCheckpoint, requireRayQueryCompute, unattendedBenchmark, benchmarkWorkload,
-        benchmarkRtWorkloadPreset,
-        anatomicalPlayerMount, graphicsPreviewCapture, outputResizeValidation, nativeMotionScenario, nativeMotionRtWorkloadPreset,
-        captureDustQuality);
+    OpeningBenchmarkTransfer openingBenchmark;
+    openingBenchmark.reports=textReportPath.parent_path();
+    const bool openingEligible=captureDirectory==nullptr && developmentCheckpoint==nullptr &&
+        !unattendedBenchmark && !graphicsPreviewCapture && !outputResizeValidation && nativeMotionScenario.empty() && !gCampaignHiddenValidation;
+    if(openingEligible && !SetPropA(hWnd,kOpeningBenchmarkTransferProperty,&openingBenchmark)) {
+        DestroyWindow(hWnd);return 1;
+    }
+    int result=0;
+    do {
+        const bool menuRun=openingEligible && openingBenchmark.owner.Phase()==OpeningBenchmarkOwnerPhase::Benchmark;
+        result = RunDiagnosticSwapchainWindow(
+            hWnd, capabilities, textReportPath, jsonReportPath, captureDirectory,
+            developmentCheckpoint, requireRayQueryCompute, unattendedBenchmark,
+            menuRun?horde::gameplay::BenchmarkWorkload::ShowcaseRoute:benchmarkWorkload,
+            menuRun?horde::vulkan::raytracing::RtWorkloadPreset::Authored:benchmarkRtWorkloadPreset,
+            anatomicalPlayerMount, graphicsPreviewCapture, outputResizeValidation, nativeMotionScenario, nativeMotionRtWorkloadPreset,
+            captureDustQuality,openingEligible?&openingBenchmark:nullptr);
+        if(!openingEligible || result!=0 || !IsWindow(hWnd))break;
+    } while(openingBenchmark.owner.Phase()==OpeningBenchmarkOwnerPhase::Benchmark ||
+            openingBenchmark.owner.Phase()==OpeningBenchmarkOwnerPhase::ReturningEntry);
+    if(openingEligible && IsWindow(hWnd))RemovePropA(hWnd,kOpeningBenchmarkTransferProperty);
     if ((gCampaignHiddenValidation || captureDirectory != nullptr || unattendedBenchmark) && IsWindow(hWnd))
     {
 #if defined(_DEBUG)
@@ -12171,6 +12406,10 @@ int RunDiagnosticWindow(const int showCommand)
 
     if(!ConfigureHiddenCampaignValidation())return 2;
     const CaptureLaunchOptions launchOptions = ParseCaptureLaunchOptions();
+    if(gOpeningBenchmarkMenuValidation && (launchOptions.requested || launchOptions.benchmark.requested ||
+        launchOptions.graphicsPreview || launchOptions.outputResizeValidation || !launchOptions.nativeMotionScenario.empty())) {
+        std::cerr<<"Opening-menu validation cannot combine capture or standalone benchmark modes.\n";return 2;
+    }
     if(gCampaignHiddenValidation && (launchOptions.requested || launchOptions.benchmark.requested)){std::cerr<<"Hidden campaign validation cannot combine with capture or benchmark modes.\n";return 2;}
     if (!launchOptions.error.empty())
     {

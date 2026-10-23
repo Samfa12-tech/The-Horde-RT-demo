@@ -1,0 +1,744 @@
+{
+  "schema": 1,
+  "status": "WIP-unadmitted",
+  "baseCommit": "2ab19ba17ccc6d94c5bbd34a2bc6bbcd882522fe",
+  "sourceFileSha256": {
+    "CMakeLists.txt": "28c912f3008529698967e7801cc4455f7d4f16764f4647821bbf71113467cda8",
+    "src/platform/windows/DiagnosticWindow.cpp": "5e87996f4fbb13252d20e3385ae72bb9eff0d753b60cc7730aff12b2ee55126a",
+    "src/platform/windows/WindowsBenchmarkProfile.h": "62fdfca38dc08ebf958dffc50415712e4e459d8832a2186ac55a5e4912f06e18",
+    "src/platform/windows/WindowsBenchmarkProfile.inl": "bee87a478805940ce60b7a4038cc29ac6df1fe7e5803a2b50fc91b2ed46b8321",
+    "src/platform/windows/windows_campaign_owner.inl": "f91f94a901cee6f83ae61c8cc3486dc12d64cbb6fe31369d35db0030dd0eee5c",
+    "src/platform/windows/windows_campaign_validation.inl": "9e9e14b3d6ae81e2d70586b5f0f8e985464434569259174215cd43c669d1a4a0",
+    "tests/WindowsBenchmarkLaunchTests.cpp": "701ac0d3dc8012c6c2cc99ad3bdd830133cf11b94ac4ebcd9d85de8cf93801a9",
+    "src/platform/windows/WindowsBenchmarkMenuOwner.h": "2f5a3f401c401e73105355f8945ad0544d5505a5f535ffeab50c03335cc2a001",
+    "src/platform/windows/WindowsOpeningBenchmarkMenu.inl": "e8f5a8b01a71417279a24a91062a458ba131af02adc18310e60de3566e6fc214",
+    "tests/WindowsBenchmarkMenuOwnerTests.cpp": "28d167a405005732363a022d8cd0bf396f0ed72d1bef7d414a766905d602f27e"
+  },
+  "finalDebugExeSha256": "70253a9433c7cd6661473d1ffebbc3c970074c9c2afea1aabbd0e00eb9aed9e7",
+  "finalReleaseExeSha256": "462a9a23e756eef2950b4d3175cbd60f450ace0e6eb2456e03adfacd1942527d",
+  "builds": {
+    "Debug": {
+      "exitCode": 0,
+      "logSha256": "aad08357e8ec4b8898e1aee396fe68c8b81c1e7f491368bb841950ba366bbb68"
+    },
+    "Release": {
+      "exitCode": 0,
+      "logSha256": "b0f8b7d857e10cf15393c921fae2baf4983fe76fc97416f446dd3ceced9a1af8"
+    }
+  },
+  "focusedTests": {
+    "configuration": "Debug",
+    "passed": 5,
+    "failed": 0,
+    "seconds": 0.14,
+    "logSha256": "d6276a016525a974936471e6701dc6a7660ae47704406001e9ba18182b1a4b32",
+    "selection": [
+      "retirement_owner",
+      "windows_benchmark_menu_owner",
+      "benchmark_profile",
+      "entry_menu_handoff",
+      "windows_benchmark_launch"
+    ]
+  },
+  "scenarios": {
+    "custom-background": {
+      "exitCode": 0,
+      "seconds": 9.437000000034459,
+      "error": null,
+      "choice": "custom",
+      "custodyUnchanged": true,
+      "exeSha256": "a0cf7bcc60601fa784afccc7d5a8245de9de5725cd4dffe0caf5aea6413b05b3",
+      "isolatedFixtureFiles": [
+        "manifest.json"
+      ],
+      "evidenceClass": "background-only owned Windows controls and completed RT lifecycle; no foreground, screenshot or physical interaction acceptance",
+      "rawResultSha256": "a01131be5e6d4385a244ce6bfa176c84de44f9e6dc2bcda26800b8e6b807f8c1",
+      "stderrSha256": "1c7c130edb4d0cbde7483f9f8adbd31266bea7571075ade77d72dab2134e5371",
+      "nativeStages": [
+        "HORDE_OPENING_BENCHMARK entry-retired=1 successorAdmitted=1",
+        "HORDE_OPENING_BENCHMARK applied fixed=0 campaignAttached=0",
+        "HORDE_OPENING_BENCHMARK benchmark-retired=1 restored=1 successorAdmitted=1",
+        "HORDE_OPENING_BENCHMARK entry-presented campaignAttached=1"
+      ],
+      "events": [
+        {
+          "backgroundLifecycleOnly": true,
+          "foregroundRequestAttempted": false,
+          "screenshotsAttempted": false
+        },
+        {
+          "clicked": 208,
+          "seconds": 2.875
+        },
+        {
+          "clicked": 119,
+          "seconds": 2.89000000001397
+        },
+        {
+          "clicked": 231,
+          "seconds": 2.9060000000172295
+        },
+        {
+          "clicked": 233,
+          "seconds": 2.922000000020489
+        },
+        {
+          "clicked": 119,
+          "seconds": 2.937000000034459
+        },
+        {
+          "clicked": 231,
+          "seconds": 2.937000000034459
+        },
+        {
+          "clicked": 232,
+          "seconds": 2.9530000000377186
+        },
+        {
+          "restored": true,
+          "seconds": 9.125
+        }
+      ],
+      "lifecycle": {
+        "requestedProfile": "custom",
+        "classification": "custom-unranked",
+        "ranked": false,
+        "actualApplyAcknowledged": true,
+        "actualRestorationAcknowledged": true,
+        "measurementAndRestorationPassed": false,
+        "cancelRequested": true,
+        "closeRequested": false,
+        "settingsWritesPermitted": false,
+        "campaignAttached": false,
+        "confirmedTupleUnchanged": true,
+        "error": "",
+        "exactWindowStateRestored": true,
+        "original": {
+          "identity": {
+            "sceneEpoch": 4,
+            "measurementGeneration": 2,
+            "recordAttemptSerial": 2,
+            "recordSerial": 2,
+            "submissionSerial": 2,
+            "completionSerial": 2,
+            "simulationTick": 0,
+            "frameSlot": 0
+          },
+          "submittedDimensions": {
+            "internalExtent": [
+              924,
+              602
+            ],
+            "outputExtent": [
+              1232,
+              803
+            ],
+            "cameraAspect": 1.53488374,
+            "presentationTransform": 0,
+            "dynamicResolutionEnabled": false,
+            "linearBlit": true,
+            "aspectPreserved": false
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 2,
+            "finalIdleCompletion": true
+          }
+        },
+        "applied": {
+          "identity": {
+            "sceneEpoch": 4,
+            "measurementGeneration": 2,
+            "recordAttemptSerial": 3,
+            "recordSerial": 3,
+            "submissionSerial": 3,
+            "completionSerial": 3,
+            "simulationTick": 0,
+            "frameSlot": 0
+          },
+          "submittedDimensions": {
+            "internalExtent": [
+              924,
+              602
+            ],
+            "outputExtent": [
+              1232,
+              803
+            ],
+            "cameraAspect": 1.53488374,
+            "presentationTransform": 0,
+            "dynamicResolutionEnabled": false,
+            "linearBlit": true,
+            "aspectPreserved": false
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 3,
+            "finalIdleCompletion": true
+          }
+        },
+        "restored": {
+          "identity": {
+            "sceneEpoch": 5,
+            "measurementGeneration": 6,
+            "recordAttemptSerial": 7,
+            "recordSerial": 7,
+            "submissionSerial": 7,
+            "completionSerial": 7,
+            "simulationTick": 9,
+            "frameSlot": 0
+          },
+          "submittedDimensions": {
+            "internalExtent": [
+              924,
+              602
+            ],
+            "outputExtent": [
+              1232,
+              803
+            ],
+            "cameraAspect": 1.53488374,
+            "presentationTransform": 0,
+            "dynamicResolutionEnabled": false,
+            "linearBlit": true,
+            "aspectPreserved": false
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 7,
+            "finalIdleCompletion": true
+          }
+        }
+      }
+    },
+    "standard-complete-background": {
+      "exitCode": 0,
+      "seconds": 162.7029999999795,
+      "error": null,
+      "choice": "standard",
+      "completedCourse": true,
+      "custodyUnchanged": true,
+      "exeSha256": "a0cf7bcc60601fa784afccc7d5a8245de9de5725cd4dffe0caf5aea6413b05b3",
+      "isolatedFixtureFiles": [
+        "manifest.json"
+      ],
+      "evidenceClass": "background-only owned Windows controls and completed RT lifecycle; no foreground, screenshot or physical interaction acceptance",
+      "rawResultSha256": "d80a0653263557c4b9df4f700028a8e2c2a711e99dfb15c4099a3f00445ba321",
+      "stderrSha256": "192a0a80152d60e1461c4ce91e8d7996fc26c7ff1470a2a7e8ce2a93d516ad4a",
+      "nativeStages": [
+        "HORDE_OPENING_BENCHMARK entry-retired=1 successorAdmitted=1",
+        "HORDE_OPENING_BENCHMARK applied fixed=1 campaignAttached=0",
+        "HORDE_OPENING_BENCHMARK benchmark-retired=1 restored=1 successorAdmitted=1",
+        "HORDE_OPENING_BENCHMARK entry-presented campaignAttached=1"
+      ],
+      "events": [
+        {
+          "backgroundLifecycleOnly": true,
+          "foregroundRequestAttempted": false,
+          "screenshotsAttempted": false
+        },
+        {
+          "clicked": 208,
+          "seconds": 2.952999999979511
+        },
+        {
+          "clicked": 119,
+          "seconds": 2.9689999999827705
+        },
+        {
+          "clicked": 230,
+          "seconds": 2.9839999999967404
+        },
+        {
+          "clicked": 233,
+          "seconds": 3.0
+        },
+        {
+          "clicked": 119,
+          "seconds": 3.014999999955762
+        },
+        {
+          "clicked": 230,
+          "seconds": 3.014999999955762
+        },
+        {
+          "clicked": 232,
+          "seconds": 3.030999999959022
+        },
+        {
+          "restored": true,
+          "seconds": 161.98399999999674
+        }
+      ],
+      "lifecycle": {
+        "requestedProfile": "windows-rt-provisional-v1",
+        "classification": "custom-unranked",
+        "ranked": false,
+        "actualApplyAcknowledged": true,
+        "actualRestorationAcknowledged": true,
+        "measurementAndRestorationPassed": true,
+        "cancelRequested": false,
+        "closeRequested": false,
+        "settingsWritesPermitted": false,
+        "campaignAttached": false,
+        "confirmedTupleUnchanged": true,
+        "error": "",
+        "exactWindowStateRestored": true,
+        "original": {
+          "identity": {
+            "sceneEpoch": 4,
+            "measurementGeneration": 2,
+            "recordAttemptSerial": 2,
+            "recordSerial": 2,
+            "submissionSerial": 2,
+            "completionSerial": 2,
+            "simulationTick": 0,
+            "frameSlot": 0
+          },
+          "submittedDimensions": {
+            "internalExtent": [
+              924,
+              602
+            ],
+            "outputExtent": [
+              1232,
+              803
+            ],
+            "cameraAspect": 1.53488374,
+            "presentationTransform": 0,
+            "dynamicResolutionEnabled": false,
+            "linearBlit": true,
+            "aspectPreserved": false
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 2,
+            "finalIdleCompletion": true
+          }
+        },
+        "applied": {
+          "identity": {
+            "sceneEpoch": 5,
+            "measurementGeneration": 2,
+            "recordAttemptSerial": 3,
+            "recordSerial": 3,
+            "submissionSerial": 3,
+            "completionSerial": 3,
+            "simulationTick": 0,
+            "frameSlot": 0
+          },
+          "submittedDimensions": {
+            "internalExtent": [
+              1920,
+              1080
+            ],
+            "outputExtent": [
+              1920,
+              1080
+            ],
+            "cameraAspect": 1.77777779,
+            "presentationTransform": 0,
+            "dynamicResolutionEnabled": false,
+            "linearBlit": false,
+            "aspectPreserved": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 3,
+            "finalIdleCompletion": true
+          }
+        },
+        "restored": {
+          "identity": {
+            "sceneEpoch": 6,
+            "measurementGeneration": 8,
+            "recordAttemptSerial": 3680,
+            "recordSerial": 3680,
+            "submissionSerial": 3680,
+            "completionSerial": 3680,
+            "simulationTick": 3682,
+            "frameSlot": 0
+          },
+          "submittedDimensions": {
+            "internalExtent": [
+              924,
+              602
+            ],
+            "outputExtent": [
+              1232,
+              803
+            ],
+            "cameraAspect": 1.53488374,
+            "presentationTransform": 0,
+            "dynamicResolutionEnabled": false,
+            "linearBlit": true,
+            "aspectPreserved": false
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 3680,
+            "finalIdleCompletion": true
+          }
+        }
+      }
+    },
+    "final-gap-background": {
+      "exitCode": 0,
+      "seconds": 10.828000000037719,
+      "error": "Did not witness detached input path",
+      "choice": "custom",
+      "completedCourse": false,
+      "detachedCancellation": true,
+      "custodyUnchanged": true,
+      "exeSha256": "70253a9433c7cd6661473d1ffebbc3c970074c9c2afea1aabbd0e00eb9aed9e7",
+      "isolatedFixtureFiles": [
+        "manifest.json"
+      ],
+      "evidenceClass": "background-only owned Windows controls and completed RT lifecycle; no foreground, screenshot or physical interaction acceptance",
+      "rawResultSha256": "1d60c6f19bf845a612a9bcd0db53a0266c1c8c3d4f9fb41bb3cc5cd6dbe1cd3e",
+      "stderrSha256": "fd395e341af0d9915c340ad305d653d54070d9d83b8155b3cf18800716fbe86d",
+      "nativeStages": [
+        "HORDE_OPENING_BENCHMARK entry-retired=1 successorAdmitted=1",
+        "HORDE_OPENING_BENCHMARK entry-presented campaignAttached=1"
+      ],
+      "events": [
+        {
+          "backgroundLifecycleOnly": true,
+          "foregroundRequestAttempted": false,
+          "screenshotsAttempted": false
+        },
+        {
+          "clicked": 208,
+          "seconds": 5.594000000040978
+        },
+        {
+          "clicked": 119,
+          "seconds": 5.60899999999674
+        },
+        {
+          "clicked": 231,
+          "seconds": 5.625
+        },
+        {
+          "clicked": 233,
+          "seconds": 5.625
+        },
+        {
+          "clicked": 119,
+          "seconds": 5.64100000000326
+        },
+        {
+          "clicked": 231,
+          "seconds": 5.6560000000172295
+        },
+        {
+          "clicked": 232,
+          "seconds": 5.6560000000172295
+        }
+      ],
+      "lifecycle": {
+        "requestedProfile": "custom",
+        "classification": "custom-unranked",
+        "ranked": false,
+        "actualApplyAcknowledged": false,
+        "actualRestorationAcknowledged": false,
+        "measurementAndRestorationPassed": false,
+        "cancelRequested": true,
+        "closeRequested": false,
+        "settingsWritesPermitted": false,
+        "campaignAttached": false,
+        "confirmedTupleUnchanged": true,
+        "error": "Original state is pending, cancelled, or compiled optics do not support the provisional profile.",
+        "exactWindowStateRestored": false,
+        "original": {
+          "identity": {
+            "sceneEpoch": 4,
+            "measurementGeneration": 2,
+            "recordAttemptSerial": 2,
+            "recordSerial": 2,
+            "submissionSerial": 2,
+            "completionSerial": 2,
+            "simulationTick": 0,
+            "frameSlot": 0
+          },
+          "submittedDimensions": {
+            "internalExtent": [
+              924,
+              602
+            ],
+            "outputExtent": [
+              1232,
+              803
+            ],
+            "cameraAspect": 1.53488374,
+            "presentationTransform": 0,
+            "dynamicResolutionEnabled": false,
+            "linearBlit": true,
+            "aspectPreserved": false
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 2,
+            "finalIdleCompletion": true
+          }
+        }
+      }
+    },
+    "final-custom-background": {
+      "exitCode": 0,
+      "seconds": 10.813000000023749,
+      "error": null,
+      "choice": "custom",
+      "completedCourse": false,
+      "detachedCancellation": false,
+      "custodyUnchanged": true,
+      "exeSha256": "70253a9433c7cd6661473d1ffebbc3c970074c9c2afea1aabbd0e00eb9aed9e7",
+      "isolatedFixtureFiles": [
+        "manifest.json"
+      ],
+      "evidenceClass": "background-only owned Windows controls and completed RT lifecycle; no foreground, screenshot or physical interaction acceptance",
+      "rawResultSha256": "9180a4c681a82bc5f396cb4cde00b4fd3881be3b73541236adf7d1d2867b80ad",
+      "stderrSha256": "f085472af84e46045479dfc9b6a73ba9b6c5420f19ccd8839804556ad54e8151",
+      "nativeStages": [
+        "HORDE_OPENING_BENCHMARK entry-retired=1 successorAdmitted=1",
+        "HORDE_OPENING_BENCHMARK applied fixed=0 campaignAttached=0",
+        "HORDE_OPENING_BENCHMARK benchmark-retired=1 restored=1 successorAdmitted=1",
+        "HORDE_OPENING_BENCHMARK entry-presented campaignAttached=1"
+      ],
+      "events": [
+        {
+          "backgroundLifecycleOnly": true,
+          "foregroundRequestAttempted": false,
+          "screenshotsAttempted": false
+        },
+        {
+          "clicked": 208,
+          "seconds": 3.5780000000377186
+        },
+        {
+          "clicked": 119,
+          "seconds": 3.594000000040978
+        },
+        {
+          "clicked": 231,
+          "seconds": 3.594000000040978
+        },
+        {
+          "clicked": 233,
+          "seconds": 3.6089999999967404
+        },
+        {
+          "clicked": 119,
+          "seconds": 3.625
+        },
+        {
+          "clicked": 231,
+          "seconds": 3.6410000000032596
+        },
+        {
+          "clicked": 232,
+          "seconds": 3.6410000000032596
+        },
+        {
+          "restored": true,
+          "resultCaption": "BENCHMARK CANCELLED",
+          "seconds": 9.719000000040978
+        }
+      ],
+      "lifecycle": {
+        "requestedProfile": "custom",
+        "classification": "custom-unranked",
+        "ranked": false,
+        "actualApplyAcknowledged": true,
+        "actualRestorationAcknowledged": true,
+        "measurementAndRestorationPassed": false,
+        "cancelRequested": true,
+        "closeRequested": false,
+        "settingsWritesPermitted": false,
+        "campaignAttached": false,
+        "confirmedTupleUnchanged": true,
+        "error": "",
+        "exactWindowStateRestored": true,
+        "original": {
+          "identity": {
+            "sceneEpoch": 4,
+            "measurementGeneration": 2,
+            "recordAttemptSerial": 2,
+            "recordSerial": 2,
+            "submissionSerial": 2,
+            "completionSerial": 2,
+            "simulationTick": 0,
+            "frameSlot": 0
+          },
+          "submittedDimensions": {
+            "internalExtent": [
+              924,
+              602
+            ],
+            "outputExtent": [
+              1232,
+              803
+            ],
+            "cameraAspect": 1.53488374,
+            "presentationTransform": 0,
+            "dynamicResolutionEnabled": false,
+            "linearBlit": true,
+            "aspectPreserved": false
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 2,
+            "finalIdleCompletion": true
+          }
+        },
+        "applied": {
+          "identity": {
+            "sceneEpoch": 4,
+            "measurementGeneration": 2,
+            "recordAttemptSerial": 3,
+            "recordSerial": 3,
+            "submissionSerial": 3,
+            "completionSerial": 3,
+            "simulationTick": 0,
+            "frameSlot": 0
+          },
+          "submittedDimensions": {
+            "internalExtent": [
+              924,
+              602
+            ],
+            "outputExtent": [
+              1232,
+              803
+            ],
+            "cameraAspect": 1.53488374,
+            "presentationTransform": 0,
+            "dynamicResolutionEnabled": false,
+            "linearBlit": true,
+            "aspectPreserved": false
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 3,
+            "finalIdleCompletion": true
+          }
+        },
+        "restored": {
+          "identity": {
+            "sceneEpoch": 5,
+            "measurementGeneration": 6,
+            "recordAttemptSerial": 5,
+            "recordSerial": 5,
+            "submissionSerial": 5,
+            "completionSerial": 5,
+            "simulationTick": 7,
+            "frameSlot": 0
+          },
+          "submittedDimensions": {
+            "internalExtent": [
+              924,
+              602
+            ],
+            "outputExtent": [
+              1232,
+              803
+            ],
+            "cameraAspect": 1.53488374,
+            "presentationTransform": 0,
+            "dynamicResolutionEnabled": false,
+            "linearBlit": true,
+            "aspectPreserved": false
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 5,
+            "finalIdleCompletion": true
+          }
+        }
+      }
+    }
+  },
+  "predecessorCourse": {
+    "exactFinalBuild": false,
+    "rawReportSha256": "0d39c0555a3ce6cbe5bf21498e6723304e0ed84bc9b7734b085d14f23ab47825",
+    "rawReportBytes": 3283391,
+    "result": "complete",
+    "routeTraversalComplete": true,
+    "workloadComplete": true,
+    "timestampUtc": "2026-10-23T20:32:44Z",
+    "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "executionBackend": "RayTracingPipeline",
+    "presentedEveryFrame": true,
+    "internalExtent": {
+      "width": 1920,
+      "height": 1080
+    },
+    "presentationExtent": {
+      "width": 1920,
+      "height": 1080
+    },
+    "lapsCompleted": 2,
+    "lapsRequested": 2,
+    "waypointsReached": 26,
+    "measuredFrames": 1838,
+    "completedEvidenceCounts": {
+      "expected": 1838,
+      "completed": 1838,
+      "rejected": 0,
+      "cancelled": 0,
+      "cpuAccepted": 1838,
+      "cpuRejected": 0,
+      "outstanding": 0
+    },
+    "allSubmittedRowsFixed1920x1080InternalAndOutput": true,
+    "allSubmittedRowsDrsOff": true
+  },
+  "retainedEarlierFailures": {
+    "custom-first": {
+      "exitCode": null,
+      "seconds": 73.71900000004098,
+      "error": "Native message timeout, error 1460",
+      "custodyUnchanged": true,
+      "exeSha256": "615ee7f63fa79ba08b09db2e070ecebba510b1c343c746a000cf3c23d48cb4fd"
+    },
+    "custom-ready": {
+      "exitCode": 0,
+      "seconds": 5.704000000027008,
+      "error": "Owned game is not foreground; no screenshot",
+      "custodyUnchanged": true,
+      "exeSha256": "a0cf7bcc60601fa784afccc7d5a8245de9de5725cd4dffe0caf5aea6413b05b3"
+    },
+    "custom-focused": {
+      "exitCode": 0,
+      "seconds": 8.202999999979511,
+      "error": "Bounded native interaction timed out",
+      "custodyUnchanged": true,
+      "exeSha256": "a0cf7bcc60601fa784afccc7d5a8245de9de5725cd4dffe0caf5aea6413b05b3"
+    }
+  },
+  "limitations": [
+    "Detached native cancellation bridge not witnessed; assertion failure retained.",
+    "Earlier timed-out isolated staged process required verified cleanup; no causal hang fix claimed.",
+    "Foreground activation returned FALSE; no further attempts, screenshots or alternate focus route.",
+    "No visible layout, DPI, physical controller, endpoint listening or phone acceptance.",
+    "Full course used a predecessor executable; final build has ordinary cancellation proof only.",
+    "Release compile only; final Release interaction and exact-head hosted CI remain pending.",
+    "No measured gain, scanout FPS, ranked eligibility, report transmission, merge or release."
+  ],
+  "phone": {
+    "lastVerifiedReleaseUtc": "2026-10-23T19:27:12.644Z",
+    "operationsSinceRelease": 0
+  },
+  "audioHapticManualRevalidationRequired": true,
+  "parkedOwnerUntrackedFilesExcluded": 151
+}

@@ -13,11 +13,12 @@ enum class WindowsBenchmarkProfilePhase { Idle, Applying, Measuring, Restoring, 
 class WindowsBenchmarkProfileSession
 {
 public:
-    bool Begin(const gameplay::BenchmarkProfileConfiguration& original) noexcept
+    bool Begin(const gameplay::BenchmarkProfileConfiguration& original,
+               const gameplay::BenchmarkProfileId profile = gameplay::BenchmarkProfileId::WindowsProvisionalV1) noexcept
     {
         if (phase_ != WindowsBenchmarkProfilePhase::Idle) return false;
         working_ = original; original_ = original;
-        if (!run_.Begin(gameplay::BenchmarkProfileId::WindowsProvisionalV1, working_)) return false;
+        if (!run_.Begin(profile, working_)) return false;
         phase_ = WindowsBenchmarkProfilePhase::Applying; return true;
     }
     bool Arm(const OutputResizeOwnedFrame& owner) noexcept
