@@ -77,7 +77,7 @@ bool HiddenLookoutFilesAllowed(const std::filesystem::path& directory,bool after
             bool allowed=false;
             for(const char* step:{"start-0","start-1","start-4","start-8","walk-20","walk-35","walk-50","walk-65","walk-80","walk-100",
                 "stop-0","stop-1","stop-4","stop-8","stop-11","turn-0","turn-10","turn-20","turn-30","turn-40",
-                "turn-60","turn-80","turn-100"})
+                "turn-60","turn-80","turn-100","waypoint-before","waypoint-tick","waypoint-after"})
                 allowed|=name==std::string("windows-kit-motion-")+step+".png";
             if(allowed)continue;
         }
@@ -293,6 +293,7 @@ int RunHiddenLookoutValidation(VulkanSurfaceContext& ctx,horde::vulkan::DeviceCa
             if(!motionEvidence.str().empty())motionEvidence<<',';
             motionEvidence<<"{\"stage\":\""<<stage<<"\",\"root\":["<<pose.x<<','<<pose.y<<','<<pose.z
                 <<"],\"yaw\":"<<pose.yaw<<",\"walking\":"<<(pose.walking?"true":"false")
+                <<",\"waypoint\":"<<pose.waypoint<<",\"wait\":"<<static_cast<unsigned>(pose.wait)
                 <<",\"idleSeconds\":"<<pose.animationSeconds<<",\"walkPhase\":"<<pose.locomotion.walkPhase
                 <<",\"walkWeight\":"<<pose.locomotion.walkWeight<<",\"rtEvidence\":"<<(evidence.empty()?"null":evidence)<<'}';
             return ok;
@@ -320,6 +321,42 @@ int RunHiddenLookoutValidation(VulkanSurfaceContext& ctx,horde::vulkan::DeviceCa
             const char* name=tick==10?"turn-10":tick==20?"turn-20":tick==30?"turn-30":tick==40?"turn-40":
                 tick==60?"turn-60":tick==80?"turn-80":tick==100?"turn-100":nullptr;
             if(name)proceed=capture(name);
+        }
+        if(proceed && !gLookoutInspectKitTiming) {
+            // A player on Kit's +X side stays within the accepted tether. At
+            // the first waypoint, retain the last movement, bookkeeping-only
+            // tick and next movement separately; never seed a completion flag.
+            route.Reset();
+            for(unsigned tick=0;tick<60;++tick) {
+                const auto before=route.State();
+                route.Step(1.f/60,before.x+1,before.z,true,false,false,terrain.get(),true);
+            }
+            const auto target=horde::gameplay::simulation::kWorldRoutePoints[4];
+            unsigned ticks=0;
+            while(proceed && route.State().waypoint==4 &&
+                  std::hypot(route.State().x-(target.x+1),route.State().z-target.z)>=.06f && ticks++<600) {
+                const auto before=route.State();
+                route.Step(1.f/60,before.x+1,before.z,true,true,false,terrain.get(),true);
+                proceed=check(route.State().grounded && route.State().walking,
+                    "waypoint inspection advances the supported production route within its finite tick budget");
+            }
+            proceed=proceed && check(ticks<=600 && route.State().waypoint==4 &&
+                std::hypot(route.State().x-(target.x+1),route.State().z-target.z)<.06f,
+                "waypoint inspection reaches the actual first landmark without teleport or completion edits");
+            if(proceed)proceed=capture("waypoint-before");
+            if(proceed) {
+                const auto before=route.State();
+                route.Step(1.f/60,before.x+1,before.z,true,true,false,terrain.get(),true);
+                proceed=check(route.State().waypoint==5 && !route.State().walking &&
+                    route.State().x==before.x && route.State().z==before.z,
+                    "waypoint bookkeeping advances identity without translating the actor");
+                if(proceed)proceed=capture("waypoint-tick");
+            }
+            if(proceed) {
+                const auto before=route.State();
+                route.Step(1.f/60,before.x+1,before.z,true,true,false,terrain.get(),true);
+                proceed=capture("waypoint-after");
+            }
         }
         if(proceed && gLookoutInspectKitTiming) {
             // One finite profiling workload. Both builds replay identical

@@ -1,0 +1,598 @@
+{
+  "baseCommit": "ca49a762d97f441c64aa6a7322f5caedb1d4fa53",
+  "sourceGitBlobs": {
+    "src/gameplay/dialogue/CompanionRouteFixture.h": "3c9bdf20375e3279b50a25a1f0ac18d3013ef769",
+    "tests/CompanionLocomotionTests.cpp": "9c90bfc568614221d928e24a0e5698da3dc4e29e",
+    "src/platform/windows/windows_campaign_validation.inl": "4d2141d641f271e5c1761b76bac9a1502356623e"
+  },
+  "runAssessment": {
+    "status": "OFFLINE_ONLY_RETAIN_WALK_NO_RUN_SUBSTITUTION",
+    "evidenceClass": "Offline Python double-precision original-GLB estimate using historical Rig/contacts; no native/game/RT/device execution",
+    "assetSha256": "1ba628235814b5912ae1439b180347dd8e1cce85b0f4d1fae5bbacb41e7d3713",
+    "historicalHelperSha256": "47073634e0010a4c431f6ce094430e68ca470817f8bcbef64589ba49196ec3e2",
+    "poseSamplesPerClip": 120,
+    "routeSpeedMps": 1.8,
+    "currentCycleDistanceMetres": 1.56,
+    "representative20mm": {
+      "walk": {
+        "durationSeconds": 0.8333333134651184,
+        "boot": {
+          "availablePositiveStanceFit": true,
+          "naturalSpeedAt1xMps": 1.8730114948497776,
+          "inferredCycleDistanceMetres": 1.5608428751614196,
+          "neededPlaybackMultiplierAt1p8": 0.9610191955305467,
+          "inferredMatchedStepsPerMinute": 138.3867674557964,
+          "currentDistancePhaseImpliedNaturalSpeedMps": 1.8009725482631764,
+          "currentDistancePhaseRouteMinusFitSpeedMps": -0.0009725482631763871
+        },
+        "namedFoot": {
+          "availablePositiveStanceFit": true,
+          "naturalSpeedAt1xMps": 1.8823356540269551,
+          "inferredCycleDistanceMetres": 1.5686130076238132,
+          "neededPlaybackMultiplierAt1p8": 0.9562587820876627,
+          "inferredMatchedStepsPerMinute": 137.7012679036775,
+          "currentDistancePhaseImpliedNaturalSpeedMps": 1.8099380857197842,
+          "currentDistancePhaseRouteMinusFitSpeedMps": -0.009938085719784162
+        },
+        "namedToe": {
+          "availablePositiveStanceFit": true,
+          "naturalSpeedAt1xMps": 1.905526375016915,
+          "inferredCycleDistanceMetres": 1.5879386079880216,
+          "neededPlaybackMultiplierAt1p8": 0.9446208793536232,
+          "inferredMatchedStepsPerMinute": 136.02540987002024,
+          "currentDistancePhaseImpliedNaturalSpeedMps": 1.832236855370794,
+          "currentDistancePhaseRouteMinusFitSpeedMps": -0.032236855370793904
+        },
+        "currentPhase": {
+          "distancePerCycleMetres": 1.56,
+          "cyclesPerSecondAt1p8": 1.1538461538461537,
+          "stepsPerMinuteAssumingTwoPerCycle": 138.46153846153845,
+          "clipPlaybackMultiplier": 0.9615384386135981,
+          "note": "Changing only the loaded Walking binding retains distance-derived phase and its 1.56m cycle, rather than playing the new clip at1x."
+        },
+        "nearLoopRawAnkleGapsMetres": {
+          "Left": 0.07537853939832341,
+          "Right": 0.0362619447413984
+        },
+        "idleZeroHardJoinFloorBootCentroidMetres": {
+          "Left": 0.119176560519317,
+          "Right": 0.05075842698499134
+        }
+      },
+      "run": {
+        "durationSeconds": 0.5333333611488342,
+        "boot": {
+          "availablePositiveStanceFit": true,
+          "naturalSpeedAt1xMps": 4.246544994730126,
+          "inferredCycleDistanceMetres": 2.2648241153091764,
+          "neededPlaybackMultiplierAt1p8": 0.4238739969160253,
+          "inferredMatchedStepsPerMinute": 95.37164433208683,
+          "currentDistancePhaseImpliedNaturalSpeedMps": 2.613258594587511,
+          "currentDistancePhaseRouteMinusFitSpeedMps": -0.8132585945875108
+        },
+        "namedFoot": {
+          "availablePositiveStanceFit": true,
+          "naturalSpeedAt1xMps": 4.292600419587567,
+          "inferredCycleDistanceMetres": 2.289387009847533,
+          "neededPlaybackMultiplierAt1p8": 0.41932624145178277,
+          "inferredMatchedStepsPerMinute": 94.34839940599865,
+          "currentDistancePhaseImpliedNaturalSpeedMps": 2.6416003959779224,
+          "currentDistancePhaseRouteMinusFitSpeedMps": -0.8416003959779224
+        },
+        "namedToe": {
+          "availablePositiveStanceFit": true,
+          "naturalSpeedAt1xMps": 4.613935219965667,
+          "inferredCycleDistanceMetres": 2.460765578987275,
+          "neededPlaybackMultiplierAt1p8": 0.39012251238616097,
+          "inferredMatchedStepsPerMinute": 87.77756070892968,
+          "currentDistancePhaseImpliedNaturalSpeedMps": 2.8393448988314707,
+          "currentDistancePhaseRouteMinusFitSpeedMps": -1.0393448988314706
+        },
+        "currentPhase": {
+          "distancePerCycleMetres": 1.56,
+          "cyclesPerSecondAt1p8": 1.1538461538461537,
+          "stepsPerMinuteAssumingTwoPerCycle": 138.46153846153845,
+          "clipPlaybackMultiplier": 0.615384647479424,
+          "note": "Changing only the loaded Walking binding retains distance-derived phase and its 1.56m cycle, rather than playing the new clip at1x."
+        },
+        "nearLoopRawAnkleGapsMetres": {
+          "Left": 2.763531543525742e-06,
+          "Right": 3.4545588152295118e-06
+        },
+        "idleZeroHardJoinFloorBootCentroidMetres": {
+          "Left": 0.4495828506567889,
+          "Right": 0.32690619845394214
+        }
+      }
+    },
+    "recommendation": "Keep current Walk at the fixed1.8m/s route. A simple Run binding swap retains1.56m distance phase and is not justified by these stride/cadence estimates. No implementation authorized or performed by this assessment.",
+    "remaining": [
+      "Native confirmation of original Walk near-loop boundary; offline gaps are not a confirmed game defect.",
+      "Actual native/all-vertex grounding, current0.18s blend and matched RT motion/transition review before adopting any Run usage.",
+      "If Run is desired later, explicit travel/cycle/transition policy; there is no current catch-up motor."
+    ],
+    "noNativeGameRtPhoneEvidence": true
+  },
+  "pairedRt": {
+    "baseCommit": "ca49a762d97f441c64aa6a7322f5caedb1d4fa53",
+    "records": {
+      "waypoint-right-control": {
+        "executable": {
+          "bytes": 14160896,
+          "sha256": "0cf2c801da0bdef7ef719c3ec961ae57e7c69429589d724063b6c40ff2b5db72"
+        },
+        "settings": {
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "sourceRoute": {
+          "bytes": 6903,
+          "sha256": "b4303cef059be832467e7dcb29a0ef1b84e1826c877472ce3d7d0c8fb2dbe70c"
+        },
+        "sourceFixture": {
+          "bytes": 52045,
+          "sha256": "396c4a74dd9caca50d093c78ed920b264dc4c7be4d2707ea489e948473a606a0"
+        },
+        "checks": 535,
+        "failures": 0,
+        "renderCalls": 37,
+        "seconds": 17.42200000002049,
+        "custodyUnchanged": true,
+        "foregroundUnchanged": true,
+        "physicalVisibleAcceptance": false
+      },
+      "waypoint-candidate": {
+        "executable": {
+          "bytes": 14161408,
+          "sha256": "e396a211148200980ea70d37a484ae864075b5d88fed4eada0ac8486a77a2392"
+        },
+        "settings": {
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "sourceRoute": {
+          "bytes": 7142,
+          "sha256": "82cac1598041bcc122ff788189d57a9d32ec0dd41d4694cf11c7bb31042f8c9a"
+        },
+        "sourceFixture": {
+          "bytes": 52045,
+          "sha256": "396c4a74dd9caca50d093c78ed920b264dc4c7be4d2707ea489e948473a606a0"
+        },
+        "checks": 535,
+        "failures": 0,
+        "renderCalls": 37,
+        "seconds": 18.875,
+        "custodyUnchanged": true,
+        "foregroundUnchanged": true,
+        "physicalVisibleAcceptance": false
+      }
+    },
+    "evidenceClass": "Paired native hardware-RT immutable production-route snapshots; not natural control input, phone, full journey, listening or sustained performance.",
+    "matchedMotionSnapshots": 26,
+    "allOtherMotionFieldsIdentical": true,
+    "qualityAndResourceInventoryIdentical": true,
+    "originalImageCount": 30,
+    "identicalImageCount": 28,
+    "changedImages": [
+      "windows-kit-motion-waypoint-after.png",
+      "windows-kit-motion-waypoint-tick.png"
+    ],
+    "waypointStates": {
+      "waypoint-right-control": [
+        {
+          "stage": "waypoint-before",
+          "root": [
+            -14.7343,
+            0.51981,
+            0.184165
+          ],
+          "yaw": 2.00321,
+          "walking": true,
+          "waypoint": 4,
+          "wait": 0,
+          "idleSeconds": 8.93337,
+          "walkPhase": 0.153869,
+          "walkWeight": 1
+        },
+        {
+          "stage": "waypoint-tick",
+          "root": [
+            -14.7343,
+            0.51981,
+            0.184165
+          ],
+          "yaw": 1.96321,
+          "walking": false,
+          "waypoint": 5,
+          "wait": 0,
+          "idleSeconds": 8.95004,
+          "walkPhase": 0.153869,
+          "walkWeight": 0.907407
+        },
+        {
+          "stage": "waypoint-after",
+          "root": [
+            -14.7382,
+            0.518067,
+            0.213911
+          ],
+          "yaw": 2.00321,
+          "walking": true,
+          "waypoint": 5,
+          "wait": 0,
+          "idleSeconds": 8.9667,
+          "walkPhase": 0.173099,
+          "walkWeight": 1
+        }
+      ],
+      "waypoint-candidate": [
+        {
+          "stage": "waypoint-before",
+          "root": [
+            -14.7343,
+            0.51981,
+            0.184165
+          ],
+          "yaw": 2.00321,
+          "walking": true,
+          "waypoint": 4,
+          "wait": 0,
+          "idleSeconds": 8.93337,
+          "walkPhase": 0.153869,
+          "walkWeight": 1
+        },
+        {
+          "stage": "waypoint-tick",
+          "root": [
+            -14.7343,
+            0.51981,
+            0.184165
+          ],
+          "yaw": 2.00321,
+          "walking": false,
+          "waypoint": 5,
+          "wait": 0,
+          "idleSeconds": 8.95004,
+          "walkPhase": 0.153869,
+          "walkWeight": 0.907407
+        },
+        {
+          "stage": "waypoint-after",
+          "root": [
+            -14.7382,
+            0.518067,
+            0.213911
+          ],
+          "yaw": 2.04321,
+          "walking": true,
+          "waypoint": 5,
+          "wait": 0,
+          "idleSeconds": 8.9667,
+          "walkPhase": 0.173099,
+          "walkWeight": 1
+        }
+      ]
+    },
+    "resourceInventory": {
+      "bufferCount": 51,
+      "memoryAllocationCount": 60,
+      "bottomLevelAccelerationStructureCount": 20,
+      "topLevelAccelerationStructureCount": 1,
+      "tlasInstanceCount": 28,
+      "pipelineCount": 2,
+      "shaderBindingTableCount": 2,
+      "descriptorSetCount": 1,
+      "hostVisibleBytes": 48298880,
+      "deviceLocalBytes": 374422496
+    },
+    "imageHashes": [
+      {
+        "file": "windows-kit-motion-start-0.png",
+        "controlSha256": "0583a470c7a28f68225520cf191134b75eeb62ca8ff6cad12db1e637aa197909",
+        "candidateSha256": "0583a470c7a28f68225520cf191134b75eeb62ca8ff6cad12db1e637aa197909",
+        "equal": true
+      },
+      {
+        "file": "windows-kit-motion-start-1.png",
+        "controlSha256": "2df676ab11b0f841758418040f114be3e0639feb30028d2b09d936fc13e2c150",
+        "candidateSha256": "2df676ab11b0f841758418040f114be3e0639feb30028d2b09d936fc13e2c150",
+        "equal": true
+      },
+      {
+        "file": "windows-kit-motion-start-4.png",
+        "controlSha256": "84cb0b3ab03c9331a7ac32fd69689d3de355d370021df3dd2cd9a55622b819ba",
+        "candidateSha256": "84cb0b3ab03c9331a7ac32fd69689d3de355d370021df3dd2cd9a55622b819ba",
+        "equal": true
+      },
+      {
+        "file": "windows-kit-motion-start-8.png",
+        "controlSha256": "1f60c0133c4e892eeab3660430ec2e0ade87f0d1f717ce9b03543680d7c1a6df",
+        "candidateSha256": "1f60c0133c4e892eeab3660430ec2e0ade87f0d1f717ce9b03543680d7c1a6df",
+        "equal": true
+      },
+      {
+        "file": "windows-kit-motion-stop-0.png",
+        "controlSha256": "1a896521f430460d9506e525e4003b8368c1d55270a71333da6d1a0929e48150",
+        "candidateSha256": "1a896521f430460d9506e525e4003b8368c1d55270a71333da6d1a0929e48150",
+        "equal": true
+      },
+      {
+        "file": "windows-kit-motion-stop-1.png",
+        "controlSha256": "a113a0bc34e01545b600b340cddbf5ada364599c5532b26b2fd83a98870a74c8",
+        "candidateSha256": "a113a0bc34e01545b600b340cddbf5ada364599c5532b26b2fd83a98870a74c8",
+        "equal": true
+      },
+      {
+        "file": "windows-kit-motion-stop-11.png",
+        "controlSha256": "ad61923bf5fd57168cbe6f5c55d20fa41593fbb058bb0edf23350a06b2995614",
+        "candidateSha256": "ad61923bf5fd57168cbe6f5c55d20fa41593fbb058bb0edf23350a06b2995614",
+        "equal": true
+      },
+      {
+        "file": "windows-kit-motion-stop-4.png",
+        "controlSha256": "15c11a03ab3bfa17624015ad035d7f6b6ac67e4803dad42049a4e2ba846957a4",
+        "candidateSha256": "15c11a03ab3bfa17624015ad035d7f6b6ac67e4803dad42049a4e2ba846957a4",
+        "equal": true
+      },
+      {
+        "file": "windows-kit-motion-stop-8.png",
+        "controlSha256": "a593457b3071907cd17e451cb8465ccc448bd42d2028ea11f9b426b6ea1f303a",
+        "candidateSha256": "a593457b3071907cd17e451cb8465ccc448bd42d2028ea11f9b426b6ea1f303a",
+        "equal": true
+      },
+      {
+        "file": "windows-kit-motion-turn-0.png",
+        "controlSha256": "ad61923bf5fd57168cbe6f5c55d20fa41593fbb058bb0edf23350a06b2995614",
+        "candidateSha256": "ad61923bf5fd57168cbe6f5c55d20fa41593fbb058bb0edf23350a06b2995614",
+        "equal": true
+      },
+      {
+        "file": "windows-kit-motion-turn-10.png",
+        "controlSha256": "e112bb2e57d9346c5932fedc18ae10ddf987eb45a7f2b8b836150c417933ae73",
+        "candidateSha256": "e112bb2e57d9346c5932fedc18ae10ddf987eb45a7f2b8b836150c417933ae73",
+        "equal": true
+      },
+      {
+        "file": "windows-kit-motion-turn-100.png",
+        "controlSha256": "ef2d4cdc8379e77e7bea0798571890c721669c7f2f0a56cca19991e91438706b",
+        "candidateSha256": "ef2d4cdc8379e77e7bea0798571890c721669c7f2f0a56cca19991e91438706b",
+        "equal": true
+      },
+      {
+        "file": "windows-kit-motion-turn-20.png",
+        "controlSha256": "e15fe89840736ee0bf5442f15fbdb1d462ab09a1bf4989d446e854da0ce6b0e7",
+        "candidateSha256": "e15fe89840736ee0bf5442f15fbdb1d462ab09a1bf4989d446e854da0ce6b0e7",
+        "equal": true
+      },
+      {
+        "file": "windows-kit-motion-turn-30.png",
+        "controlSha256": "48cdb661d00f52d2af1b81748114edd6ed48501e5b02d41c2b1f21a156a6eac8",
+        "candidateSha256": "48cdb661d00f52d2af1b81748114edd6ed48501e5b02d41c2b1f21a156a6eac8",
+        "equal": true
+      },
+      {
+        "file": "windows-kit-motion-turn-40.png",
+        "controlSha256": "b449f778175ae748999d526208bf1e49789195fe0b5742f81a11e1a61f1b5018",
+        "candidateSha256": "b449f778175ae748999d526208bf1e49789195fe0b5742f81a11e1a61f1b5018",
+        "equal": true
+      },
+      {
+        "file": "windows-kit-motion-turn-60.png",
+        "controlSha256": "7bf4ff67429ed6b57bf7db3db0df8d62f7632d98da17edf71997a68c9619e2cd",
+        "candidateSha256": "7bf4ff67429ed6b57bf7db3db0df8d62f7632d98da17edf71997a68c9619e2cd",
+        "equal": true
+      },
+      {
+        "file": "windows-kit-motion-turn-80.png",
+        "controlSha256": "1a2307efa083c2e66e4fe7eaa848451a45f559169d5ef0eb4ce4396f0914c441",
+        "candidateSha256": "1a2307efa083c2e66e4fe7eaa848451a45f559169d5ef0eb4ce4396f0914c441",
+        "equal": true
+      },
+      {
+        "file": "windows-kit-motion-walk-100.png",
+        "controlSha256": "1a896521f430460d9506e525e4003b8368c1d55270a71333da6d1a0929e48150",
+        "candidateSha256": "1a896521f430460d9506e525e4003b8368c1d55270a71333da6d1a0929e48150",
+        "equal": true
+      },
+      {
+        "file": "windows-kit-motion-walk-20.png",
+        "controlSha256": "abda16cfdf47a92c47db38ce6a1d35b249397456099250322a686234739ee378",
+        "candidateSha256": "abda16cfdf47a92c47db38ce6a1d35b249397456099250322a686234739ee378",
+        "equal": true
+      },
+      {
+        "file": "windows-kit-motion-walk-35.png",
+        "controlSha256": "f4839ff06365f3a0c88fd59c855e6d4bf50c1f8de85ed22cb3dabab20afc9010",
+        "candidateSha256": "f4839ff06365f3a0c88fd59c855e6d4bf50c1f8de85ed22cb3dabab20afc9010",
+        "equal": true
+      },
+      {
+        "file": "windows-kit-motion-walk-50.png",
+        "controlSha256": "b75c6f9155e2ac58894139e1f10e52bff251d230e9a391a68a05a0de9a4a6eac",
+        "candidateSha256": "b75c6f9155e2ac58894139e1f10e52bff251d230e9a391a68a05a0de9a4a6eac",
+        "equal": true
+      },
+      {
+        "file": "windows-kit-motion-walk-65.png",
+        "controlSha256": "7b53493c5ba068d9d950b99e745b54a901bd4cbecd294dcb0ee6a2ca14995987",
+        "candidateSha256": "7b53493c5ba068d9d950b99e745b54a901bd4cbecd294dcb0ee6a2ca14995987",
+        "equal": true
+      },
+      {
+        "file": "windows-kit-motion-walk-80.png",
+        "controlSha256": "2d557e8d71d6a42cdb73556a428d5ffb1822f919ffd751d1e2b4782152a4539b",
+        "candidateSha256": "2d557e8d71d6a42cdb73556a428d5ffb1822f919ffd751d1e2b4782152a4539b",
+        "equal": true
+      },
+      {
+        "file": "windows-kit-motion-waypoint-after.png",
+        "controlSha256": "a33bc5bc3b910e03dbb088d5f52c4af0fe67dceb9b87bc4c1e9dab8bff1d988a",
+        "candidateSha256": "0e298e23f1eb368cbdc1aec94d005d58860c5e7fe91480bb2915ab90efe41a4a",
+        "equal": false
+      },
+      {
+        "file": "windows-kit-motion-waypoint-before.png",
+        "controlSha256": "110d5d68c24893810bbaa7bffa506d9599ccb4fd1ee66906cd8547748920b5a2",
+        "candidateSha256": "110d5d68c24893810bbaa7bffa506d9599ccb4fd1ee66906cd8547748920b5a2",
+        "equal": true
+      },
+      {
+        "file": "windows-kit-motion-waypoint-tick.png",
+        "controlSha256": "5b67478f44d9c9412ce13c5a06ac83d0acef2ab8fa8a77c5d26476922fec3065",
+        "candidateSha256": "75fafb20ded3cf368f50dccbb75e08aab8f3cdef9b98b10c1d59cb8d4e949898",
+        "equal": false
+      },
+      {
+        "file": "windows-kit-neutral.png",
+        "controlSha256": "dd627d930ff1375ffbd94c49bcc874196f0db3bc8990221409f81644a4d05052",
+        "candidateSha256": "dd627d930ff1375ffbd94c49bcc874196f0db3bc8990221409f81644a4d05052",
+        "equal": true
+      },
+      {
+        "file": "windows-kit-recognition.png",
+        "controlSha256": "51638c30d607fa9775f0dbd96f1553875196460d602c7405df72a08ca2999f8c",
+        "candidateSha256": "51638c30d607fa9775f0dbd96f1553875196460d602c7405df72a08ca2999f8c",
+        "equal": true
+      },
+      {
+        "file": "windows-kit-speaking.png",
+        "controlSha256": "d423c5a5853830ef08ef4694ec28a0b0788f64be82ab8cfe72aa94a196bb53dd",
+        "candidateSha256": "d423c5a5853830ef08ef4694ec28a0b0788f64be82ab8cfe72aa94a196bb53dd",
+        "equal": true
+      },
+      {
+        "file": "windows-loaded-lookout.png",
+        "controlSha256": "1b1ab43226a40b16f4d0547701c83d5e85ec2c324caddc46deef9c78d2ceca8a",
+        "candidateSha256": "1b1ab43226a40b16f4d0547701c83d5e85ec2c324caddc46deef9c78d2ceca8a",
+        "equal": true
+      }
+    ],
+    "candidateScope": "Preserve facing only on bookkeeping tick; unchanged motor/path/speed/phase/acting/events/save schema and original Idle/Walk.",
+    "performanceClaim": false
+  },
+  "hostChecks": {
+    "selectedTests": 3,
+    "failures": 0,
+    "seconds": 25.65,
+    "originalRegression": {
+      "checks": 2282,
+      "failures": 4,
+      "routeTicks": 2254
+    },
+    "correctedRegression": {
+      "checks": 2283,
+      "failures": 0,
+      "routeTicks": 2254
+    },
+    "campaignCheckpointChecks": 1058
+  },
+  "audioHapticManualRevalidationRequired": false,
+  "phoneOperations": false,
+  "rawEvidence": [
+    {
+      "path": "reports/kit-run-assessment-20261023/current-debug-build.log",
+      "bytes": 1304,
+      "sha256": "916429b0a16eb3a950ebca87a01011a68ffe53314820c609f4132360f0df77b5"
+    },
+    {
+      "path": "reports/kit-run-assessment-20261023/current-debug-build-r2.log",
+      "bytes": 1751,
+      "sha256": "acbf3e377d262ac17dcac192be9fcf61fdffa68cb60f5af7c561fc5f1a742b07"
+    },
+    {
+      "path": "reports/kit-run-assessment-20261023/current-process.json",
+      "bytes": 3288,
+      "sha256": "9bd5ac9cbdb9691f75a50d8fcc9fa30fcc4f8453c6a77d57525a6cd6bbf7f2c8"
+    },
+    {
+      "path": "reports/kit-run-assessment-20261023/capture_current.py",
+      "bytes": 3703,
+      "sha256": "b3839d8ddc9312db4ca9be9ad8e377b52873afc0b3af583f071b5169ea5cc56c"
+    },
+    {
+      "path": "reports/kit-run-assessment-20261023/capture_waypoint.py",
+      "bytes": 4022,
+      "sha256": "14c8e1073cebdc02cffe019a9449cc4fd2b8e7107ac5a76df76b3a18f101a8fa"
+    },
+    {
+      "path": "reports/kit-run-assessment-20261023/current-host-checks.log",
+      "bytes": 620,
+      "sha256": "c147272709b9d1b7a9abe16df4566b17f2fec456341d362dad2da414cdb44ebb"
+    },
+    {
+      "path": "reports/kit-run-assessment-20261023/waypoint-fixture-build.log",
+      "bytes": 1775,
+      "sha256": "bc6668edc54f924cc242fd0e571a06ea3a1cd201a3e3efcaea27458a3992821e"
+    },
+    {
+      "path": "reports/kit-run-assessment-20261023/waypoint-left-fixture.patch",
+      "bytes": 4415,
+      "sha256": "a24f9588d82c3fb26cb4d822ff11c3632e87cc84a64de0f692e144048c1c0378"
+    },
+    {
+      "path": "reports/kit-run-assessment-20261023/waypoint-control-process.json",
+      "bytes": 3888,
+      "sha256": "753fc25ece623af51c84c9ca3788d29d755d53d65663cd972f74bc4331480cdb"
+    },
+    {
+      "path": "reports/kit-run-assessment-20261023/waypoint-right-control-process.json",
+      "bytes": 3900,
+      "sha256": "1533ca9dc2f1b51c2a76772b69b07ac18cfab1963187346ae595152b334872b4"
+    },
+    {
+      "path": "reports/kit-run-assessment-20261023/waypoint-candidate-process.json",
+      "bytes": 3881,
+      "sha256": "761da96db38bd3d8a7141d175c5c927b8b997de6c76124f4d5d7635fca9b6893"
+    },
+    {
+      "path": "reports/kit-run-assessment-20261023/waypoint-regression-control.log",
+      "bytes": 517,
+      "sha256": "e839938625200c8d4730ffc21669c5f4c3e41d77b5482a723aa3fc7f4a15ccf1"
+    },
+    {
+      "path": "reports/kit-run-assessment-20261023/waypoint-candidate-LastTest.log",
+      "bytes": 3250,
+      "sha256": "005e2de3284cfd6a3aa011cb9765d5414c042c1489332bd2e719efa0d8bda952"
+    },
+    {
+      "path": "reports/kit-run-assessment-20261023/waypoint-candidate-host.log",
+      "bytes": 746,
+      "sha256": "65b0e74df4137b32a9af5bd760dff4fc06f9285d9dfbab12cd378c96519fa188"
+    },
+    {
+      "path": "reports/kit-run-assessment-20261023/compare_waypoint.py",
+      "bytes": 3966,
+      "sha256": "292c3255c76c48213e86309423d9fdecf26dfdc1cf85799d5130e6eb513f7998"
+    },
+    {
+      "path": "reports/kit-run-assessment-20261023/paired-rt-comparison.json",
+      "bytes": 13040,
+      "sha256": "ad1d6cd758b47b857426491064b8f16f4280c184a81bc204e90bb4256385c59f"
+    },
+    {
+      "path": "reports/kit-run-assessment-20261023/offline/assess_run.py",
+      "bytes": 11632,
+      "sha256": "5205880e53ede089807ce141d8b668af9d1c49c28d445bd5f810c6e69dbec5f0"
+    },
+    {
+      "path": "reports/kit-run-assessment-20261023/offline/assessment.json",
+      "bytes": 75216,
+      "sha256": "95087e9ac8727105f7fd771a92359b8b3b09a4910e388c93bd8b0b87711c6db5"
+    },
+    {
+      "path": "reports/kit-run-assessment-20261023/offline/conclusion.json",
+      "bytes": 7588,
+      "sha256": "03fa631f860db6610dda98bce9c78150bcf2c5afbab23997d9caa8cc693cc857"
+    },
+    {
+      "path": "reports/kit-run-assessment-20261023/offline/README.md",
+      "bytes": 5955,
+      "sha256": "8d58705eadfce8f34604b51cdb59cdfd6ac6918ee6862ec1a309694525a13ccc"
+    },
+    {
+      "path": "reports/kit-run-assessment-20261023/ca49-terminal-receipt.json",
+      "bytes": 11231,
+      "sha256": "1602e4b98baf3f20af18b2434ea31f6b8347ac4147cd0b19e5c9eeee5d6217a1"
+    }
+  ]
+}

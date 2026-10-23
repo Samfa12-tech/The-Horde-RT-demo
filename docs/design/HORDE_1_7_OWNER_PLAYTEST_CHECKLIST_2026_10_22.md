@@ -1,5 +1,26 @@
 # Horde 1.7 owner playtest checklist - 22 October 2026
 
+## Kit run assessment and waypoint hitch - 23 October
+
+The [bounded existing-rig assessment](../evidence/2026-10-23-kit-run-assessment/README.md)
+retains Walk: Run's estimated stride does not fit the current 1.8 m/s leader and
+1.56 m distance phase. There is no faster catch-up motor. No clip/asset is changed.
+A separate minimal fix removes the player-facing kick during one stationary
+waypoint bookkeeping tick. The reproduced four-boundary regression now passes;
+ordinary idle facing, roots, motor timing, gait, acting and saves remain unchanged.
+Three focused CTests pass. Both paired native RT runs pass 535 checks/37 renders;
+28/30 images match exactly, with only the intended waypoint views changed.
+This does not close stationary foot sliding, departure alignment, natural feel
+or phone acceptance, and does not reopen the rejected turn-step/mesh experiments.
+
+Exact preceding source `ca49a762` CI is terminal: five jobs pass; MSVC hits its
+explicit unchanged 15-minute job cap after 118/149 passing tests. No assertion
+failure or hang is established. The new facing fix needs its own hosted readback.
+No CI redesign or timeout change. Next independent desktop feature candidate:
+inspect the approved benchmark profile's fixed internal/output dimension seam.
+Phone HUD/rotation and natural earned journey acceptance remain unavailable;
+flask policy and deferred forest/smoke decisions stay separate.
+
 ## Bounded CI duplicate work removed - 23 October
 
 The exact preceding source `719b86aa` is [green in all six hosted jobs](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39951083061):

@@ -53,20 +53,27 @@ int main(){
     Check(route.State().locomotion==walking.locomotion,"zero-delta snapshot finalization freezes the gait");
     bool boundary=false;unsigned ticks=0;
     for(;ticks<4000 && route.State().waypoint<simulation::kWorldRoutePoints.size();++ticks){
-        const auto old=route.State();route.Step(dt,old.x,old.z,true,true,false,terrain.get(),true);
+        const auto old=route.State();route.Step(dt,old.x-1,old.z,true,true,false,terrain.get(),true);
         const auto now=route.State();
         const float distance=std::hypot(now.x-old.x,now.z-old.z);
         Check(distance<=1.8f*dt+3e-6f && now.grounded,"every route step retains the original speed ceiling and native support");
         if(now.waypoint!=old.waypoint){
             boundary=true;Check(now.locomotion.walkPhase==old.locomotion.walkPhase &&
                 now.locomotion.walkWeight>.8f,"one waypoint bookkeeping tick retains gait phase and nearly full walking weight");
+            Check(now.yaw==old.yaw,
+                "one stationary waypoint bookkeeping tick retains travel facing instead of kicking toward the nearby player");
         }
     }
     Check(boundary && route.State().waypoint==simulation::kWorldRoutePoints.size(),"unchanged motor reaches all four remaining landmarks");
     const auto end=simulation::kWorldRoutePoints.back();
     Check(std::hypot(route.State().x-(end.x+1),route.State().z-end.z)<.06f,"lookout arrival remains the authored offset and tolerance");
     const auto stopped=route.State();
-    for(int i=0;i<12;++i)route.Step(dt,stopped.x-1,stopped.z,true,true,false,terrain.get(),true);
+    route.Step(dt,stopped.x-1,stopped.z,true,true,false,terrain.get(),true);
+    const float playerBearing=-1.57079632679f;
+    Check(std::abs(std::remainder(playerBearing-route.State().yaw,6.28318530718f))<
+        std::abs(std::remainder(playerBearing-stopped.yaw,6.28318530718f)),
+        "ordinary stopped Kit still turns toward the nearby player after waypoint bookkeeping");
+    for(int i=1;i<12;++i)route.Step(dt,stopped.x-1,stopped.z,true,true,false,terrain.get(),true);
     Check(route.State().locomotion.walkWeight==0 && route.State().x==stopped.x && route.State().z==stopped.z,
         "completed route blends to stationary idle without changing its endpoint");
     const auto gen=route.State().generation;

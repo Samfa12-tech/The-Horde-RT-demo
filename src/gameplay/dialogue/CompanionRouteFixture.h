@@ -55,12 +55,15 @@ public:
         }
         const auto oldYaw=state_.yaw;
         const auto oldX=state_.x,oldZ=state_.z;
+        const auto oldWaypoint=state_.waypoint;
         StepRoute(dt,playerX,playerZ,exterior,proof,paused,terrain,requireTerrain);
         if(paused || !exterior || !state_.grounded || !std::isfinite(dt) || dt<=0) {
             state_.yaw=oldYaw;return;
         }
         dt=std::min(dt,.05f);
-        const float target=state_.walking?state_.yaw:
+        // Reaching a waypoint consumes one bookkeeping tick without travel.
+        // Keep its travel facing; ordinary idle still turns toward the player.
+        const float target=(state_.walking || state_.waypoint!=oldWaypoint)?state_.yaw:
             (std::hypot(playerX-state_.x,playerZ-state_.z)>.01f?
                 std::atan2(playerX-state_.x,state_.z-playerZ):oldYaw);
         const float difference=std::remainder(target-oldYaw,6.28318530718f);
