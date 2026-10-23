@@ -1,5 +1,10 @@
 # One protected world-body reduction study
 
+**Later disposition: REJECTED.** The [single repair follow-up](../2026-10-23-world-body-rejected/README.md)
+removes the normal/sliver witnesses but retains two nonmanifold gauntlet edges
+new relative to production. No world-body derivative is admitted. Measurements
+below remain historical evidence; production and first-person arms are unchanged.
+
 **Experimental and unadmitted.** The owner approved a lower-detail world body,
 keeping first-person arms unchanged, followed by an independent Kit study. This
 checkpoint prepares one existing-asset derivative and verifies native CPU import,

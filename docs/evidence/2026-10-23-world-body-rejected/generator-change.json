@@ -1,0 +1,7 @@
+{
+  "priorGeneratorSha256": "711fb5279b9fda6880e7b63a38fa80bff0a62e7a28ba5c512d5066eea8254c08",
+  "repairGeneratorSha256": "419b96375dcc649d0cb4ae0a47228d10ffe9745cadff04257e457814adda7ee0",
+  "onlyAlgorithmDifference": "Union additionalProtectedRows from repair-plan.json before unchanged fixed/eligible partition. All optimizer settings and assembly unchanged.",
+  "repairPlanSha256": "dea4d5a1491f109f4da20c384610b647d6827743fdbd0eacd525983a5223ad13",
+  "runsAuthorized": 1
+}

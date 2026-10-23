@@ -1,0 +1,89 @@
+"""Independent repair quality gate, predeclared before the single optimizer run."""
+import collections
+import importlib.util
+import json
+from pathlib import Path
+import sys
+
+sys.dont_write_bytecode = True
+OUT = Path(__file__).resolve().parent
+sys.path.insert(0,str(OUT))
+import diagnose_repair as audit
+
+recipe = audit.recipe
+
+def topology(glb,p):
+    pos = glb.values(p['attributes']['POSITION'])
+    rows,tris = audit.facts(glb,p)
+    edges = collections.Counter(e for t in tris for e in recipe.tri_edges(tuple(recipe.pkey(pos[i]) for i in t)))
+    graph = collections.defaultdict(set)
+    for a,b in edges: graph[a].add(b);graph[b].add(a)
+    unseen = set(graph);components = 0
+    while unseen:
+        components += 1
+        stack = [unseen.pop()]
+        while stack:
+            for neighbour in graph[stack.pop()]:
+                if neighbour in unseen: unseen.remove(neighbour);stack.append(neighbour)
+    return {'components':components,'weldedVertices':len(graph),'edges':len(edges),'triangles':len(tris),
+        'euler':len(graph)-len(edges)+len(tris),'edgeMultiplicity':dict(sorted(collections.Counter(edges.values()).items())),
+        'nonmanifoldEdges':{e:n for e,n in edges.items() if n>2}},edges
+
+def classify(glb,p,original,op):
+    rows,tris = audit.facts(glb,p)
+    original_rows,original_tris = audit.facts(original,op)
+    original_keys = {audit.canonical(tuple(original_rows[i] for i in t)) for t in original_tris}
+    original_metrics = audit.triangle_metrics(original,op)
+    minimum_positive = min(m['areaSquareMetres'] for m in original_metrics if m['areaSquareMetres']>1e-14)
+    metrics = audit.triangle_metrics(glb,p)
+    new_defects = []
+    for index,(tri,m) in enumerate(zip(tris,metrics)):
+        if audit.canonical(tuple(rows[i] for i in tri)) in original_keys:continue
+        reasons=[]
+        if m['crossDotSumVertexNormals']<0:reasons.append('new_opposed_average_vertex_normal')
+        if m['areaSquareMetres']<minimum_positive:reasons.append('new_area_below_source_positive_minimum')
+        if abs(m['uvDeterminant'])<=1e-14:reasons.append('new_zero_uv_area')
+        if reasons:new_defects.append({'triangleIndex':index,'rows':list(tri),'reasons':reasons,**m})
+    top,edges=topology(glb,p);original_top,original_edges=topology(original,op)
+    top['nonmanifoldEdgeCount']=len(top.pop('nonmanifoldEdges'))
+    original_top['nonmanifoldEdgeCount']=len(original_top.pop('nonmanifoldEdges'))
+    new_nonmanifold=[{'edge':e,'sourceMultiplicity':original_edges.get(e,0),'candidateMultiplicity':n} for e,n in edges.items() if n>2 and n>original_edges.get(e,0)]
+    actual=collections.Counter(audit.canonical(tuple(rows[i] for i in t)) for t in tris)
+    inherited=collections.Counter(audit.canonical(tuple(original_rows[i] for i in t)) for t in original_tris)
+    new_duplicate=sum(max(0,n-max(1,inherited.get(k,0))) for k,n in actual.items())
+    return {'triangles':len(tris),'vertices':len(rows),'zeroAreaAt1eMinus14':sum(m['areaSquareMetres']<=1e-14 for m in metrics),
+        'opposedAverageVertexNormals':sum(m['crossDotSumVertexNormals']<0 for m in metrics),'zeroUvAt1eMinus14':sum(abs(m['uvDeterminant'])<=1e-14 for m in metrics),
+        'minimumAreaSquareMetres':min(m['areaSquareMetres'] for m in metrics),'sourceMinimumPositiveAreaSquareMetres':minimum_positive,
+        'newDefectTriangles':new_defects,'topology':top,'sourceTopology':original_top,'newNonmanifoldEdges':new_nonmanifold,
+        'newDuplicateAttributeTriangles':new_duplicate,
+        'semanticBoundaryExact':recipe.boundary(pos:=glb.values(p['attributes']['POSITION']),tris)==recipe.boundary(original.values(op['attributes']['POSITION']),original_tris)}
+
+def main():
+    world,view,plans,grips=recipe.inspect()
+    prior=recipe.Glb(audit.PRIOR/'world-body-protected-half-eligible.glb')
+    repaired=recipe.Glb(OUT/'world-body-protected-half-eligible.glb')
+    plan=json.loads((OUT/'repair-plan.json').read_text(encoding='utf8'))
+    details=[];failures=[]
+    for original_plan,pp,rp in zip(plans,prior.doc['meshes'][0]['primitives'],repaired.doc['meshes'][0]['primitives']):
+        op=original_plan['sourcePrimitive'];name=original_plan['material']
+        original=classify(world,op,world,op)
+        before=classify(prior,pp,world,op)
+        after=classify(repaired,rp,world,op)
+        issues=[]
+        if after['newDefectTriangles']:issues.append('new_geometry_or_UV_quality_defects')
+        if after['newNonmanifoldEdges']:issues.append('new_nonmanifold_edge')
+        if after['newDuplicateAttributeTriangles']:issues.append('new_duplicate_attribute_triangle')
+        if not after['semanticBoundaryExact']:issues.append('semantic_boundary_changed')
+        if after['topology']['components']!=after['sourceTopology']['components']:issues.append('connected_component_count_changed')
+        if after['topology']['euler']!=after['sourceTopology']['euler']:issues.append('welded_Euler_characteristic_changed')
+        if issues:failures.append({'material':name,'issues':issues})
+        details.append({'material':name,'source':original,'priorCandidate':before,'repairedCandidate':after,'issues':issues})
+    result={'status':'REJECTED_UNADMITTED' if failures else 'STATIC_REPAIR_PASS_UNADMITTED',
+        'sourceSha256':recipe.sha(world.raw),'viewmodelSha256':recipe.sha(view.raw),'priorCandidateSha256':recipe.sha(prior.raw),'repairCandidateSha256':recipe.sha(repaired.raw),
+        'repairPlanSha256':recipe.sha((OUT/'repair-plan.json').read_bytes()),'qualityScriptSha256':recipe.sha(Path(__file__).read_bytes()),
+        'predeclaredQualityPolicy':plan['qualityPolicy'],'failureSummary':failures,'primitives':details,
+        'limits':['Exactly one repair optimizer invocation, identical settings. No retries or quality threshold changes.','Static topology/normal/UV witnesses do not prove animated appearance, native admission, RT presentation, GPU or phone performance.','Inherited exact source degeneracies are retained and reported separately. No face flipping, isolated deletion or first-person/viewmodel changes.']}
+    with (OUT/'repair-quality.json').open('x',encoding='utf8',newline='\n') as stream:json.dump(result,stream,indent=2,allow_nan=False);stream.write('\n')
+    print(json.dumps({'status':result['status'],'sha256':result['repairCandidateSha256'],'failures':failures,'primitives':[{'material':d['material'],'beforeNewDefects':len(d['priorCandidate']['newDefectTriangles']),'afterNewDefects':len(d['repairedCandidate']['newDefectTriangles']),'sourceTopology':d['source']['topology'],'repairTopology':d['repairedCandidate']['topology']} for d in details]}))
+
+if __name__=='__main__':main()

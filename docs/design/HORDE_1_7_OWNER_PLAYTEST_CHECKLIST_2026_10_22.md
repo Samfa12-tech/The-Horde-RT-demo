@@ -1,5 +1,16 @@
 # Horde 1.7 owner playtest checklist - 22 October 2026
 
+## World-body study closed after one repair - 23 October
+
+The [single authorized repair](../evidence/2026-10-23-world-body-rejected/README.md)
+removes six newly introduced normal/area witnesses but retains two nonmanifold
+gauntlet edges already present in the first candidate and absent in production.
+**Both world-body derivatives are rejected; production mesh and first-person
+arms are unchanged.** No third reduction pass or candidate RT/timing run follows.
+Fresh original-mesh Windows RT look-down and13-view showcase controls pass and
+are retained with exact build/settings identities; they are not candidate evidence.
+Independent Kit feasibility is next, with conversational face/silhouette protected.
+
 ## One isolated world-body study - 23 October
 
 The owner-approved [world-body candidate](../evidence/2026-10-23-world-body-study/README.md)

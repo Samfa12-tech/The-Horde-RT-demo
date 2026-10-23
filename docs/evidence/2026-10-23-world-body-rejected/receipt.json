@@ -1,0 +1,256 @@
+{
+  "schema": 1,
+  "utc": "2026-10-23T11:07:05.629159+00:00",
+  "baseCommit": "749e5ffec26973fcc716d54a6e886255b2d7c284",
+  "disposition": "WORLD BODY REJECTED after exactly one repair; production originals retained",
+  "sourceWorldSha256": "46a88dac9dd569117be5a17a35540fecf3e0e6026d3ad404dd5fdbc85a9ad54f",
+  "viewmodelSha256": "eaa0db3abb8ff2dae616247054c190031a08c542dd95396cc6dc1e18a7462488",
+  "priorCandidateSha256": "1ef3f6f5d8187cb0bf99a5bdfa7b752b10b109e08340b383296fe09dfb573195",
+  "repairCandidateSha256": "2734d5aed34402539f9d3470a3fb6b9c94d9d63abbdefa4eb07a7997fd945df9",
+  "optimizerRepairInvocations": 1,
+  "sourceViewmodelAndDefaultsEdited": false,
+  "quality": {
+    "originalSixNewNormalAreaWitnessesRemoved": true,
+    "newUvDefects": false,
+    "sourceGauntletNonmanifoldEdges": 22,
+    "priorGauntletNonmanifoldEdges": 24,
+    "repairGauntletNonmanifoldEdges": 24,
+    "sourceEuler": -146,
+    "repairEuler": -144,
+    "rejection": "Two nonmanifold welded edges new relative to production persist in prior and repaired candidates; no further pass"
+  },
+  "rt": {
+    "scope": "original production control only; rejected candidate never staged or rendered",
+    "nativeBuildPassed": true,
+    "retainedSetupFailure": "First build used output executable name as CMake target; corrected to horde_rt_diagnostic_window",
+    "controlRuns": [
+      {
+        "capture": "control-player-viewmodel-look-down",
+        "seconds": 11.10999999998603,
+        "executable": {
+          "exists": true,
+          "bytes": 14157824,
+          "sha256": "c3c931924d01fd62997b752a48516b82dbcb51263b19bfe1130a7ae8fdca3d71"
+        },
+        "world": {
+          "exists": true,
+          "bytes": 2568508,
+          "sha256": "46a88dac9dd569117be5a17a35540fecf3e0e6026d3ad404dd5fdbc85a9ad54f"
+        },
+        "viewmodel": {
+          "exists": true,
+          "bytes": 1228828,
+          "sha256": "eaa0db3abb8ff2dae616247054c190031a08c542dd95396cc6dc1e18a7462488"
+        },
+        "ownerStyleSettingsSha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3",
+        "settingsUnchanged": true,
+        "foregroundReadbackUnchanged": true,
+        "foregroundReadbackWasNull": true,
+        "backend": "RayTracingPipeline",
+        "device": {
+          "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+          "vendorId": 4318,
+          "deviceId": 11672
+        },
+        "presentation": {
+          "renderScale": 1.0,
+          "dispatchWidth": 960,
+          "dispatchHeight": 540,
+          "swapchainWidth": 960,
+          "swapchainHeight": 540,
+          "swapchainFormat": 44
+        },
+        "shaderBank": {
+          "opaqueFast": {
+            "key": "diagnostic_high_opaque_fast",
+            "sha256": "990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3"
+          },
+          "genericDielectric": {
+            "key": "diagnostic_high_generic_dielectric",
+            "sha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a"
+          }
+        },
+        "captures": [
+          {
+            "checkpoint": "player-viewmodel-look-down",
+            "file": "141-player-viewmodel-look-down.png",
+            "pngSha256": "6cb92f652989f8ee53a6539953b48b2aedd9e457efd10a319c7d43bc2a969f60",
+            "honestlyPresentedRtFrame": true
+          }
+        ],
+        "rawManifestSha256": "f3d5669587f0596b65640a64af04d0b03f3b82626c868fcc212bc39be57eafde"
+      },
+      {
+        "capture": "control-standard",
+        "seconds": 37.82800000003772,
+        "executable": {
+          "exists": true,
+          "bytes": 14157824,
+          "sha256": "c3c931924d01fd62997b752a48516b82dbcb51263b19bfe1130a7ae8fdca3d71"
+        },
+        "world": {
+          "exists": true,
+          "bytes": 2568508,
+          "sha256": "46a88dac9dd569117be5a17a35540fecf3e0e6026d3ad404dd5fdbc85a9ad54f"
+        },
+        "viewmodel": {
+          "exists": true,
+          "bytes": 1228828,
+          "sha256": "eaa0db3abb8ff2dae616247054c190031a08c542dd95396cc6dc1e18a7462488"
+        },
+        "ownerStyleSettingsSha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3",
+        "settingsUnchanged": true,
+        "foregroundReadbackUnchanged": true,
+        "foregroundReadbackWasNull": true,
+        "backend": "RayTracingPipeline",
+        "device": {
+          "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+          "vendorId": 4318,
+          "deviceId": 11672
+        },
+        "presentation": {
+          "renderScale": 1.0,
+          "dispatchWidth": 960,
+          "dispatchHeight": 540,
+          "swapchainWidth": 960,
+          "swapchainHeight": 540,
+          "swapchainFormat": 44
+        },
+        "shaderBank": {
+          "opaqueFast": {
+            "key": "diagnostic_high_opaque_fast",
+            "sha256": "990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3"
+          },
+          "genericDielectric": {
+            "key": "diagnostic_high_generic_dielectric",
+            "sha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a"
+          }
+        },
+        "captures": [
+          {
+            "checkpoint": "opening",
+            "file": "00-opening.png",
+            "pngSha256": "0e49b9d31ec9d3af9ad37da90da29e9077579ea75a670be6908529e8254c9e1e",
+            "honestlyPresentedRtFrame": true
+          },
+          {
+            "checkpoint": "skeleton",
+            "file": "01-skeleton.png",
+            "pngSha256": "7ca5a19937176c1c52cd2f62ae91c54bce8e4f2372a7dec1dde3587e92824eb4",
+            "honestlyPresentedRtFrame": true
+          },
+          {
+            "checkpoint": "worst-bend",
+            "file": "02-worst-bend.png",
+            "pngSha256": "c0d7efe386f841b9a05a91c4b5910f25902409fd880f3d7b4e7192d36736899f",
+            "honestlyPresentedRtFrame": true
+          },
+          {
+            "checkpoint": "lantern-drop",
+            "file": "03-lantern-drop.png",
+            "pngSha256": "86a0a7ba7ee898f73ccdd21ad669b4f27329fe2f5bbd3f4f610643d5fc39c8bf",
+            "honestlyPresentedRtFrame": true
+          },
+          {
+            "checkpoint": "skylight",
+            "file": "04-skylight.png",
+            "pngSha256": "455ae21860a3cbdfaf5afab3010eb6ab77d1e3a05f5f33a849f9ac7aaa8f43de",
+            "honestlyPresentedRtFrame": true
+          },
+          {
+            "checkpoint": "yellow",
+            "file": "05-yellow.png",
+            "pngSha256": "b86b7ecd9699b1608257d1f1ad242b592d5e025d81e5e39db6d8522df1e43fa1",
+            "honestlyPresentedRtFrame": true
+          },
+          {
+            "checkpoint": "blue",
+            "file": "06-blue.png",
+            "pngSha256": "ecb3ca9a9b6dce81e4cce6be502a09e6d2f5dd6d6accc7a6e41ab1db7c9c8635",
+            "honestlyPresentedRtFrame": true
+          },
+          {
+            "checkpoint": "red",
+            "file": "07-red.png",
+            "pngSha256": "83fb26915b5c63bb956576db97161e0b8e2cfbef51b4e860a1e4dd5be4a59ed2",
+            "honestlyPresentedRtFrame": true
+          },
+          {
+            "checkpoint": "green",
+            "file": "08-green.png",
+            "pngSha256": "48e9636620d4a07bc32fd744b4aa51661d8a607ba2ece70d8999029bcd562f83",
+            "honestlyPresentedRtFrame": true
+          },
+          {
+            "checkpoint": "mirror",
+            "file": "09-mirror.png",
+            "pngSha256": "4d2e92e71f40689699dd101557303c106a7ec6737926cef7999360756432d319",
+            "honestlyPresentedRtFrame": true
+          },
+          {
+            "checkpoint": "lich",
+            "file": "10-lich.png",
+            "pngSha256": "1de3dd37ea296bfab6fb8777317169696f43549df1badfe21f229c4c1ab88e29",
+            "honestlyPresentedRtFrame": true
+          },
+          {
+            "checkpoint": "finale-roof",
+            "file": "11-finale-roof.png",
+            "pngSha256": "efc9c6d756db384794045985b12e3f84487ee0167920e524d5d0ce1f87fab02d",
+            "honestlyPresentedRtFrame": true
+          },
+          {
+            "checkpoint": "two-enemy-combat",
+            "file": "12-two-enemy-combat.png",
+            "pngSha256": "a27756a163813648f9d8cc7224da4d5a651c050069856bfd336c9f17a5b57bc9",
+            "honestlyPresentedRtFrame": true
+          }
+        ],
+        "rawManifestSha256": "fedc72961d070b20d60c5eb8cd583cb522225bfa1dbf3ef583d8422bd321bb6a"
+      }
+    ],
+    "candidateImages": 0,
+    "candidatePerformanceClaim": false
+  },
+  "phone": "disconnected; no attempt/operation",
+  "artifacts": {
+    "control-look-down.png": {
+      "bytes": 752165,
+      "sha256": "6cb92f652989f8ee53a6539953b48b2aedd9e457efd10a319c7d43bc2a969f60"
+    },
+    "control-mirror.png": {
+      "bytes": 709954,
+      "sha256": "4d2e92e71f40689699dd101557303c106a7ec6737926cef7999360756432d319"
+    },
+    "diagnose-repair.py.txt": {
+      "bytes": 6482,
+      "sha256CanonicalLf": "b683383d6240cd6b294664b32d38e58455090f2e6805313c6de64e4e76d2d202"
+    },
+    "generator-change.json": {
+      "bytes": 486,
+      "sha256CanonicalLf": "0abfb4bf335e16913a54790fa312456304515e33225747ee14744ac31c6de3b2"
+    },
+    "quality-audit.py.txt": {
+      "bytes": 6643,
+      "sha256CanonicalLf": "3a5fd75068902e181e1e5011de9ea005b860a5c6919e52ac2ee64cb8f134e0df"
+    },
+    "repair-generator.py.txt": {
+      "bytes": 18017,
+      "sha256CanonicalLf": "419b96375dcc649d0cb4ae0a47228d10ffe9745cadff04257e457814adda7ee0"
+    },
+    "repair-plan.json": {
+      "bytes": 14740,
+      "sha256CanonicalLf": "dea4d5a1491f109f4da20c384610b647d6827743fdbd0eacd525983a5223ad13"
+    },
+    "repair-quality.json": {
+      "bytes": 22651,
+      "sha256CanonicalLf": "d4d0131d9ae78ecbc248b430c1fe0cb2a61cc8102cf5c45856e73fa9c6da31fa"
+    }
+  },
+  "rawLocalHash": {
+    "repairReceipt": "8abb5221b19210d48ac9b969dac2c563353aa13120c7262e24753aa16a57d850",
+    "repairStaticInspection": "3cc73a6734f48bea4cb8e1b7c3ed7245eff210f2d07d72abdf231f3848cb5dca",
+    "buildSetupFailure": "3bfa273ed3e64dd3fd6b04d291af3e2e99b15941e7337e30e98af1d0d2589e2c",
+    "correctedBuild": "b647e72ef1c5c9677b41f7ab3db61ea8a3efc64dd8e6cb100af66e16bb5d3035"
+  }
+}
