@@ -1,0 +1,2422 @@
+{
+  "status": "UNADMITTED_STATIC_FINDINGS_REQUIRE_MATERIAL_REVIEW",
+  "sourceSha256": "1ba628235814b5912ae1439b180347dd8e1cce85b0f4d1fae5bbacb41e7d3713",
+  "candidateSha256": "30fea4a66bd1a31b48ee0d24414c48e22570870ff97d141860c93a99c3d0bb43",
+  "auditScriptSha256": "7cfc9a7888c346f6b7a8498462352081894617e79aac4092fe5e60efec481668",
+  "generatorSha256": "d5641f16aafc998d7d3e9100ca1a37d1be93f95ca56a29bc08b46c180b677000",
+  "findings": [
+    "new_triangle_normal_area_or_UV_witnesses",
+    "new_welded_nonmanifold_edge_witnesses",
+    "welded_Euler_changed"
+  ],
+  "geometry": {
+    "vertices": [
+      26945,
+      21539
+    ],
+    "triangles": [
+      25968,
+      19922
+    ],
+    "vertexReductionPercent": 20.063091482649842,
+    "triangleReductionPercent": 23.282501540357362,
+    "encodedAccessorBytes": [
+      1988068,
+      1584184
+    ],
+    "nativeVertexBytes64": [
+      1724480,
+      1378496
+    ],
+    "nativeIndexBytes32": [
+      311616,
+      239064
+    ],
+    "sourceFileBytes": 2151672,
+    "candidateFileBytes": 3736968,
+    "originalBinPrefixBytes": 2036112,
+    "originalBinPrefixSha256": "2f44db47677508eef5ff7a94e3955d370aca99d8f79f8b79d732e9c442749547"
+  },
+  "preservation": {
+    "allSurvivingAttributeRowsExact": true,
+    "allOriginalAccessorDefinitions": 464,
+    "allOriginalBufferViewDefinitions": 468,
+    "sourceMapU32leSha256": "1a925f85d9617186ed5341452ec42d92364c1ec9becc9ea538f6feb1b161fc3e",
+    "protectedSourceRowsU32leSha256": "7efbc5be16b9008f5aa7c661c5fa5ca4bb4a38d3b5ebb32d115816c648daef3f",
+    "protectedRowsExact": 11428,
+    "fixedTrianglesExact": 11075,
+    "nativeBootCandidateSourceRowsExact": 3867,
+    "headNeckOrY155RowsExact": 4844,
+    "handContactRowsExact": 2687,
+    "manifestCopyExact": true,
+    "metadata": {
+      "asset": {
+        "decodedValuesExact": true,
+        "canonicalJsonSha256": "149c573ae9424b872983f814ac793765f31ce28df737f5fe1dfb839cd4cd0b20"
+      },
+      "scene": {
+        "decodedValuesExact": true,
+        "canonicalJsonSha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+      },
+      "scenes": {
+        "decodedValuesExact": true,
+        "canonicalJsonSha256": "fdfb7f7e5761817678caba5fe9cb4a758923002956a18b7965982aac80815d17"
+      },
+      "nodes": {
+        "decodedValuesExact": true,
+        "canonicalJsonSha256": "d3a43b202306106b0d2c94940d593c686a34af8d35ba4c0d46c845857656dfd8"
+      },
+      "animations": {
+        "decodedValuesExact": true,
+        "canonicalJsonSha256": "f84967628dc988821cfb5b43dce16c9d53acc3ec7af38ad3cda2b7a160fc5aa9"
+      },
+      "materials": {
+        "decodedValuesExact": true,
+        "canonicalJsonSha256": "0b203ec1e1b55a50cd4e3736a802f8b9e284ecee6cc82b3db43656243c7226c9"
+      },
+      "textures": {
+        "decodedValuesExact": true,
+        "canonicalJsonSha256": "4834fef112abc4c5582d7807fe4b564ee8155f4a69a6ef995c36386f31bc66bf"
+      },
+      "images": {
+        "decodedValuesExact": true,
+        "canonicalJsonSha256": "d2c227c773b584107f6f5199d4bb91da0c4457246dd5fabf556cf68dcb7198e6"
+      },
+      "skins": {
+        "decodedValuesExact": true,
+        "canonicalJsonSha256": "1cc696dac13867f33ce6f0db75f60777d5c8ecfc635e86030e7502be792856f8"
+      },
+      "samplers": {
+        "decodedValuesExact": true,
+        "canonicalJsonSha256": "0f3273e4b92d4e98e3ee78749a96168498f4fee421d1a0c06c987583d57064e5"
+      }
+    },
+    "viewmodelSha256": "eaa0db3abb8ff2dae616247054c190031a08c542dd95396cc6dc1e18a7462488",
+    "playerWorldSha256": "46a88dac9dd569117be5a17a35540fecf3e0e6026d3ad404dd5fdbc85a9ad54f",
+    "nongeometryByteRegions": {
+      "verifiedExactCount": 457,
+      "canonicalRegionListSha256": "33717e4ce4396ccbfe3c571c0a3495435d949c4ddf27400bff80daaf637c36ef"
+    }
+  },
+  "quality": {
+    "source": {
+      "triangles": 25968,
+      "zeroAreaAt1eMinus14": 0,
+      "opposedAverageVertexNormal": 0,
+      "zeroUvAt1eMinus14": 0,
+      "minimumAreaSquareMetres": 1.0550767893633295e-06
+    },
+    "candidate": {
+      "triangles": 19922,
+      "zeroAreaAt1eMinus14": 0,
+      "opposedAverageVertexNormal": 14,
+      "zeroUvAt1eMinus14": 0,
+      "minimumAreaSquareMetres": 1.6100528770448948e-06
+    },
+    "sourceMinimumPositiveAreaSquareMetres": 1.0550767893633295e-06,
+    "newTriangleWitnesses": [
+      {
+        "candidateTriangleIndex": 11797,
+        "sourceRows": [
+          3051,
+          2941,
+          2747
+        ],
+        "reasons": [
+          "new_opposed_average_vertex_normal"
+        ],
+        "areaSquareMetres": 3.4505344620792585e-05,
+        "crossDotSumNormals": -1.8138133081691685e-05,
+        "uvDeterminant": 4.736659725779191e-06,
+        "cornerIdentities": [
+          {
+            "sourceRow": 3051,
+            "position": [
+              -0.2431432604789734,
+              1.4092544317245483,
+              0.005619803909212351
+            ],
+            "uv": [
+              0.5362160205841064,
+              0.856611967086792
+            ],
+            "joints": [
+              21,
+              20,
+              10,
+              9
+            ],
+            "weights": [
+              0.9005988836288452,
+              0.07058101147413254,
+              0.018921231850981712,
+              0.009898827411234379
+            ],
+            "protectedRegions": []
+          },
+          {
+            "sourceRow": 2941,
+            "position": [
+              -0.2500627636909485,
+              1.405785322189331,
+              0.007338300347328186
+            ],
+            "uv": [
+              0.5397560000419617,
+              0.8562420010566711
+            ],
+            "joints": [
+              21,
+              20,
+              10,
+              9
+            ],
+            "weights": [
+              0.9177966117858887,
+              0.056922636926174164,
+              0.016416985541582108,
+              0.008863831870257854
+            ],
+            "protectedRegions": []
+          },
+          {
+            "sourceRow": 2747,
+            "position": [
+              -0.2707539200782776,
+              1.3994359970092773,
+              0.003958218730986118
+            ],
+            "uv": [
+              0.5490189790725708,
+              0.856611967086792
+            ],
+            "joints": [
+              21,
+              20,
+              10,
+              9
+            ],
+            "weights": [
+              0.9735111594200134,
+              0.015104430727660656,
+              0.006839865352958441,
+              0.0045445761643350124
+            ],
+            "protectedRegions": []
+          }
+        ],
+        "originalIncidentTriangleIndices": [
+          2557,
+          2728,
+          2740
+        ],
+        "materialRisk": "A genuine indexed triangle/attribute orientation or area witness, independent of position welding. Requires review for fold/degenerate/UV shading risk; no automatic acceptance from count or geometry saving."
+      },
+      {
+        "candidateTriangleIndex": 11947,
+        "sourceRows": [
+          3873,
+          3928,
+          3724
+        ],
+        "reasons": [
+          "new_opposed_average_vertex_normal"
+        ],
+        "areaSquareMetres": 1.99741451991284e-05,
+        "crossDotSumNormals": -6.522967196345379e-05,
+        "uvDeterminant": 1.703834950461669e-06,
+        "cornerIdentities": [
+          {
+            "sourceRow": 3873,
+            "position": [
+              -0.216974139213562,
+              0.7630261182785034,
+              0.044880375266075134
+            ],
+            "uv": [
+              0.37270399928092957,
+              0.24013197422027588
+            ],
+            "joints": [
+              5,
+              0,
+              0,
+              0
+            ],
+            "weights": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "protectedRegions": []
+          },
+          {
+            "sourceRow": 3928,
+            "position": [
+              -0.21311037242412567,
+              0.7653364539146423,
+              0.044910721480846405
+            ],
+            "uv": [
+              0.37212398648262024,
+              0.23986101150512695
+            ],
+            "joints": [
+              5,
+              0,
+              0,
+              0
+            ],
+            "weights": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "protectedRegions": []
+          },
+          {
+            "sourceRow": 3724,
+            "position": [
+              -0.2151285707950592,
+              0.7538902163505554,
+              0.04608769342303276
+            ],
+            "uv": [
+              0.37678098678588867,
+              0.23909902572631836
+            ],
+            "joints": [
+              5,
+              0,
+              0,
+              0
+            ],
+            "weights": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "protectedRegions": []
+          }
+        ],
+        "originalIncidentTriangleIndices": [
+          3307,
+          3353,
+          3389,
+          3409,
+          3482,
+          3626,
+          3757,
+          3850
+        ],
+        "materialRisk": "A genuine indexed triangle/attribute orientation or area witness, independent of position welding. Requires review for fold/degenerate/UV shading risk; no automatic acceptance from count or geometry saving."
+      },
+      {
+        "candidateTriangleIndex": 12688,
+        "sourceRows": [
+          14731,
+          15011,
+          14493
+        ],
+        "reasons": [
+          "new_opposed_average_vertex_normal"
+        ],
+        "areaSquareMetres": 2.9099773351477594e-05,
+        "crossDotSumNormals": -3.7767890865437117e-06,
+        "uvDeterminant": -6.73394224559587e-06,
+        "cornerIdentities": [
+          {
+            "sourceRow": 14731,
+            "position": [
+              0.03590153157711029,
+              1.0358778238296509,
+              -0.1299014389514923
+            ],
+            "uv": [
+              0.11872199922800064,
+              0.9961220026016235
+            ],
+            "joints": [
+              0,
+              1,
+              9,
+              5
+            ],
+            "weights": [
+              0.8648285269737244,
+              0.06894037127494812,
+              0.06539391726255417,
+              0.0008371791336685419
+            ],
+            "protectedRegions": []
+          },
+          {
+            "sourceRow": 15011,
+            "position": [
+              0.04874282702803612,
+              1.0429633855819702,
+              -0.1305084228515625
+            ],
+            "uv": [
+              0.12453500181436539,
+              0.9991829991340637
+            ],
+            "joints": [
+              0,
+              1,
+              9,
+              0
+            ],
+            "weights": [
+              0.853941023349762,
+              0.07632087171077728,
+              0.06973811984062195,
+              0.0
+            ],
+            "protectedRegions": []
+          },
+          {
+            "sourceRow": 14493,
+            "position": [
+              0.02642231434583664,
+              1.0283362865447998,
+              -0.13281966745853424
+            ],
+            "uv": [
+              0.11463599652051926,
+              0.9928119778633118
+            ],
+            "joints": [
+              0,
+              1,
+              9,
+              5
+            ],
+            "weights": [
+              0.8742924332618713,
+              0.06461159139871597,
+              0.05903477966785431,
+              0.0020612215157598257
+            ],
+            "protectedRegions": []
+          }
+        ],
+        "originalIncidentTriangleIndices": [
+          13721,
+          13826,
+          13936,
+          14201,
+          14659
+        ],
+        "materialRisk": "A genuine indexed triangle/attribute orientation or area witness, independent of position welding. Requires review for fold/degenerate/UV shading risk; no automatic acceptance from count or geometry saving."
+      },
+      {
+        "candidateTriangleIndex": 13639,
+        "sourceRows": [
+          9033,
+          8260,
+          7833
+        ],
+        "reasons": [
+          "new_opposed_average_vertex_normal"
+        ],
+        "areaSquareMetres": 2.6279142076765805e-05,
+        "crossDotSumNormals": -1.662417277432332e-05,
+        "uvDeterminant": -3.098780421595393e-06,
+        "cornerIdentities": [
+          {
+            "sourceRow": 9033,
+            "position": [
+              -0.11049674451351166,
+              0.570858359336853,
+              0.06845085322856903
+            ],
+            "uv": [
+              0.4879249930381775,
+              0.2987220287322998
+            ],
+            "joints": [
+              5,
+              6,
+              0,
+              0
+            ],
+            "weights": [
+              0.9728615283966064,
+              0.02713850513100624,
+              0.0,
+              0.0
+            ],
+            "protectedRegions": []
+          },
+          {
+            "sourceRow": 8260,
+            "position": [
+              -0.11922577768564224,
+              0.5805120468139648,
+              0.07050129026174545
+            ],
+            "uv": [
+              0.4921340048313141,
+              0.3028799891471863
+            ],
+            "joints": [
+              5,
+              6,
+              0,
+              0
+            ],
+            "weights": [
+              0.9884915947914124,
+              0.011508407071232796,
+              0.0,
+              0.0
+            ],
+            "protectedRegions": []
+          },
+          {
+            "sourceRow": 7833,
+            "position": [
+              -0.1290549784898758,
+              0.588816225528717,
+              0.06886720657348633
+            ],
+            "uv": [
+              0.49648401141166687,
+              0.3064410090446472
+            ],
+            "joints": [
+              5,
+              6,
+              0,
+              0
+            ],
+            "weights": [
+              0.999644935131073,
+              0.00035504071274772286,
+              0.0,
+              0.0
+            ],
+            "protectedRegions": []
+          }
+        ],
+        "originalIncidentTriangleIndices": [
+          7651,
+          7774,
+          8234,
+          8430,
+          8694,
+          8780,
+          8836,
+          8922,
+          9026
+        ],
+        "materialRisk": "A genuine indexed triangle/attribute orientation or area witness, independent of position welding. Requires review for fold/degenerate/UV shading risk; no automatic acceptance from count or geometry saving."
+      },
+      {
+        "candidateTriangleIndex": 14244,
+        "sourceRows": [
+          7101,
+          8068,
+          7771
+        ],
+        "reasons": [
+          "new_opposed_average_vertex_normal"
+        ],
+        "areaSquareMetres": 3.727721774723025e-05,
+        "crossDotSumNormals": -4.1014774619043595e-05,
+        "uvDeterminant": 1.2847417707462228e-07,
+        "cornerIdentities": [
+          {
+            "sourceRow": 7101,
+            "position": [
+              -0.13844692707061768,
+              0.8852212429046631,
+              0.10480479151010513
+            ],
+            "uv": [
+              0.8519129753112793,
+              0.6088110208511353
+            ],
+            "joints": [
+              5,
+              0,
+              0,
+              0
+            ],
+            "weights": [
+              0.7592671513557434,
+              0.2407328486442566,
+              0.0,
+              0.0
+            ],
+            "protectedRegions": []
+          },
+          {
+            "sourceRow": 8068,
+            "position": [
+              -0.1244191974401474,
+              0.8963687419891357,
+              0.10920535027980804
+            ],
+            "uv": [
+              0.847087025642395,
+              0.6147429943084717
+            ],
+            "joints": [
+              5,
+              0,
+              0,
+              0
+            ],
+            "weights": [
+              0.6786898374557495,
+              0.3213101625442505,
+              0.0,
+              0.0
+            ],
+            "protectedRegions": []
+          },
+          {
+            "sourceRow": 7771,
+            "position": [
+              -0.13592039048671722,
+              0.8865481615066528,
+              0.1096179187297821
+            ],
+            "uv": [
+              0.8513299822807312,
+              0.6095010042190552
+            ],
+            "joints": [
+              5,
+              0,
+              0,
+              0
+            ],
+            "weights": [
+              0.7438923716545105,
+              0.2561076581478119,
+              0.0,
+              0.0
+            ],
+            "protectedRegions": []
+          }
+        ],
+        "originalIncidentTriangleIndices": [
+          6534,
+          6733,
+          6832,
+          7091,
+          7360,
+          7473,
+          7664
+        ],
+        "materialRisk": "A genuine indexed triangle/attribute orientation or area witness, independent of position welding. Requires review for fold/degenerate/UV shading risk; no automatic acceptance from count or geometry saving."
+      },
+      {
+        "candidateTriangleIndex": 15763,
+        "sourceRows": [
+          10579,
+          9978,
+          10481
+        ],
+        "reasons": [
+          "new_opposed_average_vertex_normal"
+        ],
+        "areaSquareMetres": 1.4009541472624594e-05,
+        "crossDotSumNormals": -3.8118896461661254e-06,
+        "uvDeterminant": -6.168300323849962e-07,
+        "cornerIdentities": [
+          {
+            "sourceRow": 10579,
+            "position": [
+              -0.08740043640136719,
+              0.9698182940483093,
+              -0.1339946836233139
+            ],
+            "uv": [
+              0.7873150110244751,
+              0.024842023849487305
+            ],
+            "joints": [
+              0,
+              5,
+              9,
+              1
+            ],
+            "weights": [
+              0.7379736304283142,
+              0.22710593044757843,
+              0.027359379455447197,
+              0.007561101112514734
+            ],
+            "protectedRegions": []
+          },
+          {
+            "sourceRow": 9978,
+            "position": [
+              -0.08929342031478882,
+              0.9664430022239685,
+              -0.13275419175624847
+            ],
+            "uv": [
+              0.786732017993927,
+              0.02369898557662964
+            ],
+            "joints": [
+              0,
+              5,
+              9,
+              1
+            ],
+            "weights": [
+              0.7273690700531006,
+              0.23969897627830505,
+              0.024990767240524292,
+              0.007941236719489098
+            ],
+            "protectedRegions": []
+          },
+          {
+            "sourceRow": 10481,
+            "position": [
+              -0.09133152663707733,
+              0.9768534898757935,
+              -0.13473254442214966
+            ],
+            "uv": [
+              0.7884839773178101,
+              0.028191983699798584
+            ],
+            "joints": [
+              0,
+              5,
+              9,
+              1
+            ],
+            "weights": [
+              0.7548196315765381,
+              0.2060479074716568,
+              0.032550737261772156,
+              0.0065817381255328655
+            ],
+            "protectedRegions": []
+          }
+        ],
+        "originalIncidentTriangleIndices": [
+          9876,
+          9885,
+          9887,
+          9980
+        ],
+        "materialRisk": "A genuine indexed triangle/attribute orientation or area witness, independent of position welding. Requires review for fold/degenerate/UV shading risk; no automatic acceptance from count or geometry saving."
+      },
+      {
+        "candidateTriangleIndex": 16427,
+        "sourceRows": [
+          17235,
+          16662,
+          16456
+        ],
+        "reasons": [
+          "new_opposed_average_vertex_normal"
+        ],
+        "areaSquareMetres": 2.52907943691299e-05,
+        "crossDotSumNormals": -4.531265398222778e-05,
+        "uvDeterminant": 4.27943298220157e-06,
+        "cornerIdentities": [
+          {
+            "sourceRow": 17235,
+            "position": [
+              0.10173825174570084,
+              0.4930688440799713,
+              0.023605013266205788
+            ],
+            "uv": [
+              0.3228429853916168,
+              0.4918469786643982
+            ],
+            "joints": [
+              2,
+              1,
+              0,
+              0
+            ],
+            "weights": [
+              0.6386677026748657,
+              0.36133232712745667,
+              0.0,
+              0.0
+            ],
+            "protectedRegions": []
+          },
+          {
+            "sourceRow": 16662,
+            "position": [
+              0.0887831598520279,
+              0.5023583769798279,
+              0.012523947283625603
+            ],
+            "uv": [
+              0.3285619914531708,
+              0.4973689913749695
+            ],
+            "joints": [
+              2,
+              1,
+              0,
+              0
+            ],
+            "weights": [
+              0.5196293592453003,
+              0.4803707003593445,
+              0.0,
+              0.0
+            ],
+            "protectedRegions": []
+          },
+          {
+            "sourceRow": 16456,
+            "position": [
+              0.08317718654870987,
+              0.5047805905342102,
+              0.011126961559057236
+            ],
+            "uv": [
+              0.32955801486968994,
+              0.49907898902893066
+            ],
+            "joints": [
+              1,
+              2,
+              0,
+              0
+            ],
+            "weights": [
+              0.5103619694709778,
+              0.4896380603313446,
+              0.0,
+              0.0
+            ],
+            "protectedRegions": []
+          }
+        ],
+        "originalIncidentTriangleIndices": [
+          15617,
+          15638,
+          15766,
+          15936,
+          16023,
+          16346,
+          16347,
+          16470,
+          16710
+        ],
+        "materialRisk": "A genuine indexed triangle/attribute orientation or area witness, independent of position welding. Requires review for fold/degenerate/UV shading risk; no automatic acceptance from count or geometry saving."
+      },
+      {
+        "candidateTriangleIndex": 16480,
+        "sourceRows": [
+          16327,
+          14993,
+          14692
+        ],
+        "reasons": [
+          "new_opposed_average_vertex_normal"
+        ],
+        "areaSquareMetres": 4.135060768079254e-05,
+        "crossDotSumNormals": -1.742441721886469e-05,
+        "uvDeterminant": 2.6654748630505765e-06,
+        "cornerIdentities": [
+          {
+            "sourceRow": 16327,
+            "position": [
+              0.08345413953065872,
+              1.1005433797836304,
+              -0.1318238228559494
+            ],
+            "uv": [
+              0.2878189980983734,
+              0.867622971534729
+            ],
+            "joints": [
+              0,
+              9,
+              1,
+              0
+            ],
+            "weights": [
+              0.7778332829475403,
+              0.1760396659374237,
+              0.04612705484032631,
+              0.0
+            ],
+            "protectedRegions": []
+          },
+          {
+            "sourceRow": 14993,
+            "position": [
+              0.06351694464683533,
+              1.0987526178359985,
+              -0.1313391774892807
+            ],
+            "uv": [
+              0.27894899249076843,
+              0.866631031036377
+            ],
+            "joints": [
+              0,
+              9,
+              1,
+              0
+            ],
+            "weights": [
+              0.7831869125366211,
+              0.17704187333583832,
+              0.039771199226379395,
+              0.0
+            ],
+            "protectedRegions": []
+          },
+          {
+            "sourceRow": 14692,
+            "position": [
+              0.0431378036737442,
+              1.0963305234909058,
+              -0.13493169844150543
+            ],
+            "uv": [
+              0.27016299962997437,
+              0.8653479814529419
+            ],
+            "joints": [
+              0,
+              9,
+              1,
+              0
+            ],
+            "weights": [
+              0.7862721085548401,
+              0.18192219734191895,
+              0.03180572763085365,
+              0.0
+            ],
+            "protectedRegions": []
+          }
+        ],
+        "originalIncidentTriangleIndices": [
+          13874,
+          14064,
+          14081,
+          14184,
+          14368,
+          14398,
+          15076,
+          15308,
+          15309,
+          15503,
+          15578,
+          15728,
+          15752
+        ],
+        "materialRisk": "A genuine indexed triangle/attribute orientation or area witness, independent of position welding. Requires review for fold/degenerate/UV shading risk; no automatic acceptance from count or geometry saving."
+      },
+      {
+        "candidateTriangleIndex": 16871,
+        "sourceRows": [
+          17338,
+          16646,
+          16165
+        ],
+        "reasons": [
+          "new_opposed_average_vertex_normal"
+        ],
+        "areaSquareMetres": 4.943044062393854e-05,
+        "crossDotSumNormals": -6.680112114866384e-05,
+        "uvDeterminant": 8.708751266794934e-06,
+        "cornerIdentities": [
+          {
+            "sourceRow": 17338,
+            "position": [
+              0.10512308776378632,
+              1.2382560968399048,
+              0.10999636352062225
+            ],
+            "uv": [
+              0.8851410150527954,
+              0.46358001232147217
+            ],
+            "joints": [
+              9,
+              10,
+              0,
+              0
+            ],
+            "weights": [
+              0.5012624263763428,
+              0.3051482141017914,
+              0.19358935952186584,
+              0.0
+            ],
+            "protectedRegions": []
+          },
+          {
+            "sourceRow": 16646,
+            "position": [
+              0.09258340299129486,
+              1.2547184228897095,
+              0.12410753220319748
+            ],
+            "uv": [
+              0.8856729865074158,
+              0.47354602813720703
+            ],
+            "joints": [
+              9,
+              10,
+              0,
+              0
+            ],
+            "weights": [
+              0.4746335744857788,
+              0.3848191797733307,
+              0.1405472457408905,
+              0.0
+            ],
+            "protectedRegions": []
+          },
+          {
+            "sourceRow": 16165,
+            "position": [
+              0.08099397271871567,
+              1.2720710039138794,
+              0.13379637897014618
+            ],
+            "uv": [
+              0.8853210210800171,
+              0.48332297801971436
+            ],
+            "joints": [
+              10,
+              9,
+              0,
+              0
+            ],
+            "weights": [
+              0.462100625038147,
+              0.44633856415748596,
+              0.09156082570552826,
+              0.0
+            ],
+            "protectedRegions": []
+          }
+        ],
+        "originalIncidentTriangleIndices": [
+          15329,
+          15515,
+          15802,
+          15818,
+          15918,
+          16059,
+          16531,
+          16532,
+          16537,
+          17003
+        ],
+        "materialRisk": "A genuine indexed triangle/attribute orientation or area witness, independent of position welding. Requires review for fold/degenerate/UV shading risk; no automatic acceptance from count or geometry saving."
+      },
+      {
+        "candidateTriangleIndex": 17075,
+        "sourceRows": [
+          17058,
+          16757,
+          17387
+        ],
+        "reasons": [
+          "new_opposed_average_vertex_normal"
+        ],
+        "areaSquareMetres": 2.1466229847447723e-05,
+        "crossDotSumNormals": -2.4963463756054498e-05,
+        "uvDeterminant": 2.855454681593983e-06,
+        "cornerIdentities": [
+          {
+            "sourceRow": 17058,
+            "position": [
+              0.09924302250146866,
+              0.459164559841156,
+              -0.0018916769186034799
+            ],
+            "uv": [
+              0.7300310134887695,
+              0.1951109766960144
+            ],
+            "joints": [
+              2,
+              1,
+              0,
+              0
+            ],
+            "weights": [
+              0.9992450475692749,
+              0.0007549615111202002,
+              0.0,
+              0.0
+            ],
+            "protectedRegions": []
+          },
+          {
+            "sourceRow": 16757,
+            "position": [
+              0.10162823647260666,
+              0.4684446156024933,
+              0.005625310353934765
+            ],
+            "uv": [
+              0.7252209782600403,
+              0.19300299882888794
+            ],
+            "joints": [
+              2,
+              1,
+              0,
+              0
+            ],
+            "weights": [
+              0.9425763487815857,
+              0.05742364376783371,
+              0.0,
+              0.0
+            ],
+            "protectedRegions": []
+          },
+          {
+            "sourceRow": 17387,
+            "position": [
+              0.10145184397697449,
+              0.45370081067085266,
+              -0.006153770722448826
+            ],
+            "uv": [
+              0.733144998550415,
+              0.19588202238082886
+            ],
+            "joints": [
+              2,
+              1,
+              0,
+              0
+            ],
+            "weights": [
+              0.9978785514831543,
+              0.0021214503794908524,
+              0.0,
+              0.0
+            ],
+            "protectedRegions": []
+          }
+        ],
+        "originalIncidentTriangleIndices": [
+          15914,
+          15915,
+          16221,
+          16333,
+          16338,
+          16521,
+          16611,
+          16614,
+          16638,
+          16712,
+          16724,
+          25966
+        ],
+        "materialRisk": "A genuine indexed triangle/attribute orientation or area witness, independent of position welding. Requires review for fold/degenerate/UV shading risk; no automatic acceptance from count or geometry saving."
+      },
+      {
+        "candidateTriangleIndex": 18190,
+        "sourceRows": [
+          19364,
+          19509,
+          19512
+        ],
+        "reasons": [
+          "new_opposed_average_vertex_normal"
+        ],
+        "areaSquareMetres": 1.654435625499703e-05,
+        "crossDotSumNormals": -9.845381065176226e-06,
+        "uvDeterminant": 2.472739453196482e-07,
+        "cornerIdentities": [
+          {
+            "sourceRow": 19364,
+            "position": [
+              0.13357022404670715,
+              0.7566917538642883,
+              0.10360603779554367
+            ],
+            "uv": [
+              0.46164798736572266,
+              0.8417409658432007
+            ],
+            "joints": [
+              1,
+              5,
+              0,
+              0
+            ],
+            "weights": [
+              0.9980124235153198,
+              0.001987622119486332,
+              0.0,
+              0.0
+            ],
+            "protectedRegions": []
+          },
+          {
+            "sourceRow": 19509,
+            "position": [
+              0.13306663930416107,
+              0.7831719517707825,
+              0.10080068558454514
+            ],
+            "uv": [
+              0.4735420048236847,
+              0.8423389792442322
+            ],
+            "joints": [
+              1,
+              5,
+              0,
+              0
+            ],
+            "weights": [
+              0.9951916337013245,
+              0.004808385856449604,
+              0.0,
+              0.0
+            ],
+            "protectedRegions": []
+          },
+          {
+            "sourceRow": 19512,
+            "position": [
+              0.1333056390285492,
+              0.7856302261352539,
+              0.10175668448209763
+            ],
+            "uv": [
+              0.47464001178741455,
+              0.8424149751663208
+            ],
+            "joints": [
+              1,
+              5,
+              0,
+              0
+            ],
+            "weights": [
+              0.9953464269638062,
+              0.004653619602322578,
+              0.0,
+              0.0
+            ],
+            "protectedRegions": []
+          }
+        ],
+        "originalIncidentTriangleIndices": [
+          18456,
+          18462,
+          18643,
+          18647,
+          18748,
+          18757,
+          18766,
+          18811,
+          18814,
+          18842
+        ],
+        "materialRisk": "A genuine indexed triangle/attribute orientation or area witness, independent of position welding. Requires review for fold/degenerate/UV shading risk; no automatic acceptance from count or geometry saving."
+      },
+      {
+        "candidateTriangleIndex": 18303,
+        "sourceRows": [
+          21480,
+          20594,
+          21240
+        ],
+        "reasons": [
+          "new_opposed_average_vertex_normal"
+        ],
+        "areaSquareMetres": 6.725528040438703e-05,
+        "crossDotSumNormals": -6.106506222529497e-06,
+        "uvDeterminant": -6.478446040514285e-06,
+        "cornerIdentities": [
+          {
+            "sourceRow": 21480,
+            "position": [
+              0.19223900139331818,
+              0.8869521617889404,
+              -0.07047310471534729
+            ],
+            "uv": [
+              0.10706999897956848,
+              0.4106690287590027
+            ],
+            "joints": [
+              1,
+              0,
+              0,
+              0
+            ],
+            "weights": [
+              0.7810013890266418,
+              0.21899859607219696,
+              0.0,
+              0.0
+            ],
+            "protectedRegions": []
+          },
+          {
+            "sourceRow": 20594,
+            "position": [
+              0.17199072241783142,
+              0.8774085640907288,
+              -0.10381587594747543
+            ],
+            "uv": [
+              0.10270000249147415,
+              0.4265750050544739
+            ],
+            "joints": [
+              1,
+              0,
+              0,
+              0
+            ],
+            "weights": [
+              0.8410861492156982,
+              0.15891391038894653,
+              0.0,
+              0.0
+            ],
+            "protectedRegions": []
+          },
+          {
+            "sourceRow": 21240,
+            "position": [
+              0.1847589761018753,
+              0.8831501007080078,
+              -0.08895830810070038
+            ],
+            "uv": [
+              0.10511399805545807,
+              0.41927099227905273
+            ],
+            "joints": [
+              1,
+              0,
+              0,
+              0
+            ],
+            "weights": [
+              0.8000945448875427,
+              0.19990548491477966,
+              0.0,
+              0.0
+            ],
+            "protectedRegions": []
+          }
+        ],
+        "originalIncidentTriangleIndices": [
+          19581,
+          19942,
+          20342,
+          20474,
+          20567,
+          20616,
+          20652,
+          20655,
+          20843,
+          20987,
+          21016,
+          21027,
+          21246,
+          21342,
+          21381,
+          21400
+        ],
+        "materialRisk": "A genuine indexed triangle/attribute orientation or area witness, independent of position welding. Requires review for fold/degenerate/UV shading risk; no automatic acceptance from count or geometry saving."
+      },
+      {
+        "candidateTriangleIndex": 19216,
+        "sourceRows": [
+          23766,
+          23932,
+          23858
+        ],
+        "reasons": [
+          "new_opposed_average_vertex_normal"
+        ],
+        "areaSquareMetres": 3.081798821003848e-05,
+        "crossDotSumNormals": -3.5296029481834484e-05,
+        "uvDeterminant": -2.0088713093002752e-07,
+        "cornerIdentities": [
+          {
+            "sourceRow": 23766,
+            "position": [
+              0.24454675614833832,
+              1.361078143119812,
+              -0.019573533907532692
+            ],
+            "uv": [
+              0.17982999980449677,
+              0.19617700576782227
+            ],
+            "joints": [
+              13,
+              10,
+              9,
+              12
+            ],
+            "weights": [
+              0.8756142258644104,
+              0.051065847277641296,
+              0.03837324678897858,
+              0.03494669124484062
+            ],
+            "protectedRegions": []
+          },
+          {
+            "sourceRow": 23932,
+            "position": [
+              0.25913116335868835,
+              1.3603280782699585,
+              -0.0197603739798069
+            ],
+            "uv": [
+              0.17997999489307404,
+              0.20247197151184082
+            ],
+            "joints": [
+              13,
+              10,
+              9,
+              12
+            ],
+            "weights": [
+              0.9253389239311218,
+              0.032842352986335754,
+              0.025197260081768036,
+              0.016621464863419533
+            ],
+            "protectedRegions": []
+          },
+          {
+            "sourceRow": 23858,
+            "position": [
+              0.2471320629119873,
+              1.356722354888916,
+              -0.01976795867085457
+            ],
+            "uv": [
+              0.17987799644470215,
+              0.19685202836990356
+            ],
+            "joints": [
+              13,
+              10,
+              9,
+              12
+            ],
+            "weights": [
+              0.8900003433227539,
+              0.046538375318050385,
+              0.03556470200419426,
+              0.027896594256162643
+            ],
+            "protectedRegions": []
+          }
+        ],
+        "originalIncidentTriangleIndices": [
+          23066,
+          23122,
+          23221,
+          23222,
+          23229,
+          23237
+        ],
+        "materialRisk": "A genuine indexed triangle/attribute orientation or area witness, independent of position welding. Requires review for fold/degenerate/UV shading risk; no automatic acceptance from count or geometry saving."
+      },
+      {
+        "candidateTriangleIndex": 19223,
+        "sourceRows": [
+          24024,
+          24010,
+          23973
+        ],
+        "reasons": [
+          "new_opposed_average_vertex_normal"
+        ],
+        "areaSquareMetres": 5.4298512987537785e-05,
+        "crossDotSumNormals": -0.00015129529044966567,
+        "uvDeterminant": 1.0570967271306131e-05,
+        "cornerIdentities": [
+          {
+            "sourceRow": 24024,
+            "position": [
+              0.26211199164390564,
+              1.3537803888320923,
+              -0.11249740421772003
+            ],
+            "uv": [
+              0.1385750025510788,
+              0.20395398139953613
+            ],
+            "joints": [
+              13,
+              9,
+              10,
+              0
+            ],
+            "weights": [
+              0.9537069201469421,
+              0.024072635918855667,
+              0.022220445796847343,
+              0.0
+            ],
+            "protectedRegions": []
+          },
+          {
+            "sourceRow": 24010,
+            "position": [
+              0.2609454393386841,
+              1.3459845781326294,
+              -0.09603512287139893
+            ],
+            "uv": [
+              0.14611299335956573,
+              0.20247399806976318
+            ],
+            "joints": [
+              13,
+              9,
+              10,
+              0
+            ],
+            "weights": [
+              0.9441831111907959,
+              0.028112463653087616,
+              0.027704406529664993,
+              0.0
+            ],
+            "protectedRegions": []
+          },
+          {
+            "sourceRow": 23973,
+            "position": [
+              0.2609151601791382,
+              1.3405238389968872,
+              -0.0710885226726532
+            ],
+            "uv": [
+              0.1574220061302185,
+              0.20165598392486572
+            ],
+            "joints": [
+              13,
+              10,
+              9,
+              0
+            ],
+            "weights": [
+              0.9354550838470459,
+              0.033156268298625946,
+              0.03138865903019905,
+              0.0
+            ],
+            "protectedRegions": []
+          }
+        ],
+        "originalIncidentTriangleIndices": [
+          23273,
+          23282,
+          23283,
+          23303,
+          23332,
+          23354,
+          23355,
+          23370,
+          23383,
+          23431,
+          23443,
+          23525
+        ],
+        "materialRisk": "A genuine indexed triangle/attribute orientation or area witness, independent of position welding. Requires review for fold/degenerate/UV shading risk; no automatic acceptance from count or geometry saving."
+      }
+    ]
+  },
+  "topology": {
+    "sourceWelded": {
+      "components": 1,
+      "vertices": 12976,
+      "edges": 38950,
+      "faces": 25968,
+      "euler": -6,
+      "boundaryEdges": 17,
+      "nonmanifoldEdges": 16,
+      "edgeMultiplicity": {
+        "1": 17,
+        "2": 38917,
+        "3": 11,
+        "4": 5
+      }
+    },
+    "candidateWelded": {
+      "components": 1,
+      "vertices": 9953,
+      "edges": 29879,
+      "faces": 19922,
+      "euler": -4,
+      "boundaryEdges": 17,
+      "nonmanifoldEdges": 18,
+      "edgeMultiplicity": {
+        "1": 17,
+        "2": 29844,
+        "3": 11,
+        "4": 7
+      }
+    },
+    "sourceExactPosition": {
+      "components": 1,
+      "vertices": 12976,
+      "edges": 38950,
+      "faces": 25968,
+      "euler": -6,
+      "boundaryEdges": 17,
+      "nonmanifoldEdges": 16,
+      "edgeMultiplicity": {
+        "1": 17,
+        "2": 38917,
+        "3": 11,
+        "4": 5
+      }
+    },
+    "candidateExactPosition": {
+      "components": 1,
+      "vertices": 9953,
+      "edges": 29879,
+      "faces": 19922,
+      "euler": -4,
+      "boundaryEdges": 17,
+      "nonmanifoldEdges": 18,
+      "edgeMultiplicity": {
+        "1": 17,
+        "2": 29844,
+        "3": 11,
+        "4": 7
+      }
+    },
+    "semanticBoundaryMultisetExact": true,
+    "newWeldedNonmanifoldEdgeWitnesses": [
+      {
+        "weldedEdgeKey1um": [
+          [
+            -215129,
+            753890,
+            46088
+          ],
+          [
+            -213110,
+            765336,
+            44911
+          ]
+        ],
+        "sourceMultiplicity": 2,
+        "candidateMultiplicity": 4,
+        "candidateIncidentTriangleIndices": [
+          11946,
+          11947,
+          11949,
+          12279
+        ],
+        "sourceRowsPerIncidentTriangle": [
+          [
+            3724,
+            4139,
+            3928
+          ],
+          [
+            3873,
+            3928,
+            3724
+          ],
+          [
+            3928,
+            3723,
+            3724
+          ],
+          [
+            3725,
+            3930,
+            3875
+          ]
+        ],
+        "originalSourceIncidentTriangleIndices": [
+          3306,
+          3307,
+          3318,
+          3322,
+          3353,
+          3380,
+          3389,
+          3409,
+          3445,
+          3482,
+          3489,
+          3525,
+          3599,
+          3626,
+          3757,
+          3850,
+          4006,
+          4077,
+          4083,
+          4747
+        ],
+        "skinAndUvIdentities": [
+          [
+            {
+              "sourceRow": 3724,
+              "position": [
+                -0.2151285707950592,
+                0.7538902163505554,
+                0.04608769342303276
+              ],
+              "uv": [
+                0.37678098678588867,
+                0.23909902572631836
+              ],
+              "joints": [
+                5,
+                0,
+                0,
+                0
+              ],
+              "weights": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "protectedRegions": []
+            },
+            {
+              "sourceRow": 4139,
+              "position": [
+                -0.2000149041414261,
+                0.7920090556144714,
+                0.057477932423353195
+              ],
+              "uv": [
+                0.361286997795105,
+                0.23417502641677856
+              ],
+              "joints": [
+                5,
+                0,
+                0,
+                0
+              ],
+              "weights": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "protectedRegions": []
+            },
+            {
+              "sourceRow": 3928,
+              "position": [
+                -0.21311037242412567,
+                0.7653364539146423,
+                0.044910721480846405
+              ],
+              "uv": [
+                0.37212398648262024,
+                0.23986101150512695
+              ],
+              "joints": [
+                5,
+                0,
+                0,
+                0
+              ],
+              "weights": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "protectedRegions": []
+            }
+          ],
+          [
+            {
+              "sourceRow": 3873,
+              "position": [
+                -0.216974139213562,
+                0.7630261182785034,
+                0.044880375266075134
+              ],
+              "uv": [
+                0.37270399928092957,
+                0.24013197422027588
+              ],
+              "joints": [
+                5,
+                0,
+                0,
+                0
+              ],
+              "weights": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "protectedRegions": []
+            },
+            {
+              "sourceRow": 3928,
+              "position": [
+                -0.21311037242412567,
+                0.7653364539146423,
+                0.044910721480846405
+              ],
+              "uv": [
+                0.37212398648262024,
+                0.23986101150512695
+              ],
+              "joints": [
+                5,
+                0,
+                0,
+                0
+              ],
+              "weights": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "protectedRegions": []
+            },
+            {
+              "sourceRow": 3724,
+              "position": [
+                -0.2151285707950592,
+                0.7538902163505554,
+                0.04608769342303276
+              ],
+              "uv": [
+                0.37678098678588867,
+                0.23909902572631836
+              ],
+              "joints": [
+                5,
+                0,
+                0,
+                0
+              ],
+              "weights": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "protectedRegions": []
+            }
+          ],
+          [
+            {
+              "sourceRow": 3928,
+              "position": [
+                -0.21311037242412567,
+                0.7653364539146423,
+                0.044910721480846405
+              ],
+              "uv": [
+                0.37212398648262024,
+                0.23986101150512695
+              ],
+              "joints": [
+                5,
+                0,
+                0,
+                0
+              ],
+              "weights": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "protectedRegions": []
+            },
+            {
+              "sourceRow": 3723,
+              "position": [
+                -0.21666589379310608,
+                0.795159637928009,
+                0.022662311792373657
+              ],
+              "uv": [
+                0.36015498638153076,
+                0.2510489821434021
+              ],
+              "joints": [
+                5,
+                0,
+                0,
+                0
+              ],
+              "weights": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "protectedRegions": []
+            },
+            {
+              "sourceRow": 3724,
+              "position": [
+                -0.2151285707950592,
+                0.7538902163505554,
+                0.04608769342303276
+              ],
+              "uv": [
+                0.37678098678588867,
+                0.23909902572631836
+              ],
+              "joints": [
+                5,
+                0,
+                0,
+                0
+              ],
+              "weights": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "protectedRegions": []
+            }
+          ],
+          [
+            {
+              "sourceRow": 3725,
+              "position": [
+                -0.2151285707950592,
+                0.7538902163505554,
+                0.04608769342303276
+              ],
+              "uv": [
+                0.9781659841537476,
+                0.6255220174789429
+              ],
+              "joints": [
+                5,
+                0,
+                0,
+                0
+              ],
+              "weights": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "protectedRegions": []
+            },
+            {
+              "sourceRow": 3930,
+              "position": [
+                -0.21311037242412567,
+                0.7653364539146423,
+                0.044910721480846405
+              ],
+              "uv": [
+                0.9781659841537476,
+                0.630761981010437
+              ],
+              "joints": [
+                5,
+                0,
+                0,
+                0
+              ],
+              "weights": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "protectedRegions": []
+            },
+            {
+              "sourceRow": 3875,
+              "position": [
+                -0.216974139213562,
+                0.7630261182785034,
+                0.044880375266075134
+              ],
+              "uv": [
+                0.9796410202980042,
+                0.629423975944519
+              ],
+              "joints": [
+                5,
+                0,
+                0,
+                0
+              ],
+              "weights": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "protectedRegions": []
+            }
+          ]
+        ],
+        "exactPositionNewNonmanifoldEdges": [
+          {
+            "edge": [
+              [
+                -0.2151285707950592,
+                0.7538902163505554,
+                0.04608769342303276
+              ],
+              [
+                -0.21311037242412567,
+                0.7653364539146423,
+                0.044910721480846405
+              ]
+            ],
+            "sourceMultiplicity": 2,
+            "candidateMultiplicity": 4
+          }
+        ],
+        "materialRisk": "New exact-position multi-incident surface edge; possible fold/crack/junction, requiring native posed and actual RT review."
+      },
+      {
+        "weldedEdgeKey1um": [
+          [
+            -18517,
+            1123926,
+            136520
+          ],
+          [
+            -13640,
+            1128766,
+            137034
+          ]
+        ],
+        "sourceMultiplicity": 2,
+        "candidateMultiplicity": 4,
+        "candidateIncidentTriangleIndices": [
+          14265,
+          14266,
+          16040,
+          16081
+        ],
+        "sourceRowsPerIncidentTriangle": [
+          [
+            12894,
+            12455,
+            12710
+          ],
+          [
+            12455,
+            13144,
+            12710
+          ],
+          [
+            12709,
+            12454,
+            12314
+          ],
+          [
+            12712,
+            13145,
+            12457
+          ]
+        ],
+        "originalSourceIncidentTriangleIndices": [
+          11962,
+          12012,
+          12120,
+          12128,
+          12184,
+          12228,
+          12362,
+          12363,
+          12429,
+          12513,
+          12551,
+          12621,
+          12790,
+          12882
+        ],
+        "skinAndUvIdentities": [
+          [
+            {
+              "sourceRow": 12894,
+              "position": [
+                -0.008123977109789848,
+                1.131054162979126,
+                0.15067683160305023
+              ],
+              "uv": [
+                0.8466219902038574,
+                0.9577289819717407
+              ],
+              "joints": [
+                0,
+                9,
+                10,
+                0
+              ],
+              "weights": [
+                0.7257207036018372,
+                0.2465079128742218,
+                0.027771390974521637,
+                0.0
+              ],
+              "protectedRegions": []
+            },
+            {
+              "sourceRow": 12455,
+              "position": [
+                -0.013639848679304123,
+                1.1287658214569092,
+                0.13703416287899017
+              ],
+              "uv": [
+                0.8506150245666504,
+                0.9524480104446411
+              ],
+              "joints": [
+                0,
+                9,
+                10,
+                0
+              ],
+              "weights": [
+                0.7152665257453918,
+                0.2568584382534027,
+                0.027875082567334175,
+                0.0
+              ],
+              "protectedRegions": []
+            },
+            {
+              "sourceRow": 12710,
+              "position": [
+                -0.018516501411795616,
+                1.123925805091858,
+                0.136520117521286
+              ],
+              "uv": [
+                0.8495200276374817,
+                0.9502459764480591
+              ],
+              "joints": [
+                0,
+                9,
+                10,
+                0
+              ],
+              "weights": [
+                0.7379605174064636,
+                0.2379511147737503,
+                0.024088339880108833,
+                0.0
+              ],
+              "protectedRegions": []
+            }
+          ],
+          [
+            {
+              "sourceRow": 12455,
+              "position": [
+                -0.013639848679304123,
+                1.1287658214569092,
+                0.13703416287899017
+              ],
+              "uv": [
+                0.8506150245666504,
+                0.9524480104446411
+              ],
+              "joints": [
+                0,
+                9,
+                10,
+                0
+              ],
+              "weights": [
+                0.7152665257453918,
+                0.2568584382534027,
+                0.027875082567334175,
+                0.0
+              ],
+              "protectedRegions": []
+            },
+            {
+              "sourceRow": 13144,
+              "position": [
+                -0.015362136997282505,
+                1.1241508722305298,
+                0.13607627153396606
+              ],
+              "uv": [
+                0.8503959774971008,
+                0.9513790011405945
+              ],
+              "joints": [
+                0,
+                9,
+                10,
+                0
+              ],
+              "weights": [
+                0.731641411781311,
+                0.2433021068572998,
+                0.025056499987840652,
+                0.0
+              ],
+              "protectedRegions": []
+            },
+            {
+              "sourceRow": 12710,
+              "position": [
+                -0.018516501411795616,
+                1.123925805091858,
+                0.136520117521286
+              ],
+              "uv": [
+                0.8495200276374817,
+                0.9502459764480591
+              ],
+              "joints": [
+                0,
+                9,
+                10,
+                0
+              ],
+              "weights": [
+                0.7379605174064636,
+                0.2379511147737503,
+                0.024088339880108833,
+                0.0
+              ],
+              "protectedRegions": []
+            }
+          ],
+          [
+            {
+              "sourceRow": 12709,
+              "position": [
+                -0.018516501411795616,
+                1.123925805091858,
+                0.136520117521286
+              ],
+              "uv": [
+                0.9781659841537476,
+                0.2604529857635498
+              ],
+              "joints": [
+                0,
+                9,
+                10,
+                0
+              ],
+              "weights": [
+                0.7379605174064636,
+                0.2379511147737503,
+                0.024088339880108833,
+                0.0
+              ],
+              "protectedRegions": []
+            },
+            {
+              "sourceRow": 12454,
+              "position": [
+                -0.013639848679304123,
+                1.1287658214569092,
+                0.13703416287899017
+              ],
+              "uv": [
+                0.9782800078392029,
+                0.26291000843048096
+              ],
+              "joints": [
+                0,
+                9,
+                10,
+                0
+              ],
+              "weights": [
+                0.7152665257453918,
+                0.2568584382534027,
+                0.027875082567334175,
+                0.0
+              ],
+              "protectedRegions": []
+            },
+            {
+              "sourceRow": 12314,
+              "position": [
+                -0.020966213196516037,
+                1.1207773685455322,
+                0.13334396481513977
+              ],
+              "uv": [
+                0.9793930053710938,
+                0.2590410113334656
+              ],
+              "joints": [
+                0,
+                9,
+                10,
+                0
+              ],
+              "weights": [
+                0.7524818778038025,
+                0.22568558156490326,
+                0.02183256484568119,
+                0.0
+              ],
+              "protectedRegions": []
+            }
+          ],
+          [
+            {
+              "sourceRow": 12712,
+              "position": [
+                -0.018516501411795616,
+                1.123925805091858,
+                0.136520117521286
+              ],
+              "uv": [
+                0.9868689775466919,
+                0.8045679926872253
+              ],
+              "joints": [
+                0,
+                9,
+                10,
+                0
+              ],
+              "weights": [
+                0.7379605174064636,
+                0.2379511147737503,
+                0.024088339880108833,
+                0.0
+              ],
+              "protectedRegions": []
+            },
+            {
+              "sourceRow": 13145,
+              "position": [
+                -0.015362136997282505,
+                1.1241508722305298,
+                0.13607627153396606
+              ],
+              "uv": [
+                0.9859139919281006,
+                0.8056359887123108
+              ],
+              "joints": [
+                0,
+                9,
+                10,
+                0
+              ],
+              "weights": [
+                0.731641411781311,
+                0.2433021068572998,
+                0.025056499987840652,
+                0.0
+              ],
+              "protectedRegions": []
+            },
+            {
+              "sourceRow": 12457,
+              "position": [
+                -0.013639848679304123,
+                1.1287658214569092,
+                0.13703416287899017
+              ],
+              "uv": [
+                0.9868689775466919,
+                0.8075910210609436
+              ],
+              "joints": [
+                0,
+                9,
+                10,
+                0
+              ],
+              "weights": [
+                0.7152665257453918,
+                0.2568584382534027,
+                0.027875082567334175,
+                0.0
+              ],
+              "protectedRegions": []
+            }
+          ]
+        ],
+        "exactPositionNewNonmanifoldEdges": [
+          {
+            "edge": [
+              [
+                -0.018516501411795616,
+                1.123925805091858,
+                0.136520117521286
+              ],
+              [
+                -0.013639848679304123,
+                1.1287658214569092,
+                0.13703416287899017
+              ]
+            ],
+            "sourceMultiplicity": 2,
+            "candidateMultiplicity": 4
+          }
+        ],
+        "materialRisk": "New exact-position multi-incident surface edge; possible fold/crack/junction, requiring native posed and actual RT review."
+      }
+    ],
+    "duplicateAttributeTriangles": []
+  },
+  "limits": [
+    "One optimizer invocation; no repair/retuning loop.",
+    "Any findings are mapped for material risk review, not silently accepted or rejected solely by aggregate count.",
+    "Static original-row/rig identity does not prove unchanged interpolated skin surface, UV/tangent shading, acting or silhouette.",
+    "No native, actual RT, timing/GPU/frame/phone acceptance claimed."
+  ],
+  "fullRawReceipt": {
+    "path": "reports/kit-lod-candidate-20261023/static-inspection.json",
+    "bytes": 243478,
+    "sha256": "afda1a378855fc7658b6eaf90e479a60d21d6f24f405d4837d95606171292fb2",
+    "scope": "Local raw region roster retained; compact committed receipt retains exact counts, proof hashes and every material-risk witness."
+  }
+}

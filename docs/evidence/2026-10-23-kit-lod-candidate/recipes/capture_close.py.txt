@@ -1,0 +1,29 @@
+from pathlib import Path
+import ctypes,hashlib,json,subprocess,sys,time
+root=Path.cwd();base=root/'reports/kit-lod-candidate-20261023/rt';label=sys.argv[1]
+assert label in ['control','candidate']
+exe=base/label/'HordeLanternRT.exe';out=base/(label+'-close-reunion')
+assert not out.exists()
+u=ctypes.WinDLL('user32');u.GetForegroundWindow.restype=ctypes.c_void_p
+identity=lambda p:{'bytes':p.stat().st_size,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()}
+paths={'kit':exe.parent/'assets/models/characters/runtime/kit-warden-v1/kit-warden-lod0.runtime.glb',
+       'settings':exe.parent/'HordeLanternRT.settings.ini',
+       'world':root/'assets/models/player/runtime/gothic-traveller-lod0.runtime.glb',
+       'viewmodel':root/'assets/models/player/viewmodel/runtime/gothic-traveller-viewmodel.runtime.glb'}
+args=[str(exe),'--capture-showcase',str(out),'--capture-hidden','--development-checkpoint','chapter-kit-reunion','--development-rescue-journey']
+record={'args':args,'exe':identity(exe),'before':{k:identity(p) for k,p in paths.items()},'foregroundBefore':u.GetForegroundWindow()}
+start=time.monotonic();seen=[]
+with (base/(label+'-close.stdout.log')).open('xb') as so,(base/(label+'-close.stderr.log')).open('xb') as se:
+    p=subprocess.Popen(args,cwd=root,stdout=so,stderr=se,creationflags=subprocess.CREATE_NO_WINDOW)
+    record['pid']=p.pid;print('Owned hidden RT PID',p.pid,flush=True)
+    while p.poll() is None and time.monotonic()-start<110:
+        seen.append(u.GetForegroundWindow());time.sleep(.25)
+    record.update(exitCode=p.poll(),pending=p.poll() is None,seconds=time.monotonic()-start)
+record['after']={k:identity(p) for k,p in paths.items()}
+record['foregroundUnchanged']=all(x==record['foregroundBefore'] for x in seen) and u.GetForegroundWindow()==record['foregroundBefore']
+(base/(label+'-close.process.json')).write_text(json.dumps(record,indent=2)+'\n')
+print(json.dumps(record),flush=True)
+if record['pending']:raise RuntimeError('Owned process pending; inspect before any further operation')
+assert record['exitCode']==0 and record['before']==record['after'] and record['foregroundUnchanged']
+m=json.loads((out/'capture-manifest.json').read_text(encoding='utf-8-sig'))
+assert m['complete'] and len(m['captures'])==1 and m['captures'][0]['honestlyPresentedRtFrame']

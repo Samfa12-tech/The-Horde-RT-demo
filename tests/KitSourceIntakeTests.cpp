@@ -10,6 +10,8 @@
 #include <limits>
 #include <cstring>
 #include <tuple>
+#include <fstream>
+#include <cstdint>
 
 namespace {
 bool CheckAnalyticTangentFrames() {
@@ -345,7 +347,110 @@ bool CheckCompanionBlend(horde::scene::assets::SkinnedPbrActor& actor,
 }
 }
 
-int main() {
+// Explicit experiment only. The ordinary intake gate below still requires the
+// admitted production asset/counts. A source-row map proves surviving vertices
+// retain their actual rig, PBR frames and actor grounding through all clips.
+int CompareCandidate(const std::filesystem::path& path,const std::filesystem::path& mapPath) {
+    using namespace horde::scene;
+    const std::filesystem::path originalDirectory=HORDE_KIT_RUNTIME_DIRECTORY;
+    const auto originalPath=originalDirectory/"kit-warden-lod0.runtime.glb";
+    std::ifstream mapFile(mapPath,std::ios::binary|std::ios::ate);
+    if(!mapFile || mapFile.tellg()<=0 || mapFile.tellg()>26945*4)return 2;
+    const auto bytes=static_cast<std::size_t>(mapFile.tellg());
+    if(bytes%4!=0)return 2;
+    std::vector<unsigned char> mapBytes(bytes);mapFile.seekg(0);
+    if(!mapFile.read(reinterpret_cast<char*>(mapBytes.data()),bytes))return 2;
+    std::vector<std::uint32_t> rows(bytes/4);
+    for(std::size_t i=0;i<rows.size();++i) {
+        for(unsigned b=0;b<4;++b)rows[i]|=std::uint32_t(mapBytes[i*4+b])<<(b*8);
+        if(rows[i]>=26945)return 2;
+    }
+    constexpr std::array<const char*,7> names{{"Warden|idle","Warden|walk","Warden|run",
+        "Warden|jump","Warden|fall","Warden|slide","Warden|mantle"}};
+    std::string diagnostic;std::size_t poses=0,comparedVertices=0;
+    for(const auto name:names) {
+        SkinnedClipSet clips{};clips.clips[0]={name,false,true};
+        for(std::size_t i=1;i<clips.clips.size();++i)clips.clips[i]={"",false,false};
+        SkinnedMeshAsset source,candidate;
+        assets::SkinnedPbrActor sourceActor,candidateActor;
+        const auto filename=path.filename().string();
+        if(!source.LoadClips(originalPath.string(),clips,diagnostic) ||
+           !candidate.LoadClips(path.string(),clips,diagnostic) ||
+           !sourceActor.Load(originalDirectory,"kit-warden-lod0.runtime.glb",clips,diagnostic) ||
+           !candidateActor.Load(path.parent_path(),filename.c_str(),clips,diagnostic) ||
+           candidateActor.Asset().vertices.size()!=rows.size() ||
+           !candidate.ValidateStaticVertexLayout(candidateActor.Asset(),diagnostic) ||
+           source.ClipDuration(SkinnedClip::Idle)!=candidate.ClipDuration(SkinnedClip::Idle)) {
+            std::cerr<<"Candidate import/rig/layout failure: "<<name<<": "<<diagnostic<<'\n';return 1;
+        }
+        for(float phase:{0.f,.25f,.5f,.75f,1.f})for(bool acting:{false,true}) {
+            horde::gameplay::dialogue::CompanionActingPose pose{};
+            pose.headYaw=.18f;pose.headPitch=-.10f;pose.chestPitch=.04f;
+            const auto rotations=CompanionUpperBodyRotations(pose);
+            const auto additive=acting?std::span<const SkinnedNodeRotation>(rotations):std::span<const SkinnedNodeRotation>{};
+            const float time=phase*source.ClipDuration(SkinnedClip::Idle);
+            std::vector<TexturedSkinnedRtVertex> a,b;
+            std::vector<SkinnedPbrTangent> at,bt;
+            if(!source.SkinUniquePbr(SkinnedClip::Idle,time,a,at,diagnostic,additive) ||
+               !candidate.SkinUniquePbr(SkinnedClip::Idle,time,b,bt,diagnostic,additive) ||
+               b.size()!=rows.size() || bt.size()!=rows.size() ||
+               !sourceActor.Pose(SkinnedClip::Idle,time,diagnostic,additive) ||
+               !candidateActor.Pose(SkinnedClip::Idle,time,diagnostic,additive) ||
+               !ValidActorFrames(candidateActor.Asset()) ||
+               sourceActor.Asset().bounds.minimum[1]!=candidateActor.Asset().bounds.minimum[1] ||
+               sourceActor.Asset().bounds.maximum[1]!=candidateActor.Asset().bounds.maximum[1]) {
+                std::cerr<<"Candidate pose/frame/ground failure: "<<name<<" phase="<<phase<<" acting="<<acting<<": "<<diagnostic<<'\n';return 1;
+            }
+            for(std::size_t i=0;i<rows.size();++i)if(
+                std::memcmp(&a[rows[i]],&b[i],sizeof(b[i])) ||
+                std::memcmp(&at[rows[i]],&bt[i],sizeof(bt[i])) ||
+                std::memcmp(&sourceActor.Asset().vertices[rows[i]],&candidateActor.Asset().vertices[i],sizeof(assets::StaticRtVertex))) {
+                std::cerr<<"Candidate surviving-row mismatch: "<<name<<" phase="<<phase<<" acting="<<acting<<" row="<<i<<" source="<<rows[i]<<'\n';return 1;
+            }
+            ++poses;comparedVertices+=rows.size();
+        }
+    }
+    // Live idle/walk blends and additive conversation motion use the same
+    // surviving rows; exact clip-only checks do not establish blend parity.
+    SkinnedClipSet blendClips{};
+    blendClips.clips[0]={"Warden|idle",true,true};blendClips.clips[1]={"Warden|walk",true,true};
+    for(std::size_t i=2;i<blendClips.clips.size();++i)blendClips.clips[i]={"",false,false};
+    assets::SkinnedPbrActor sourceActor,candidateActor;
+    SkinnedMeshAsset sourceBlend,candidateBlend;
+    const auto filename=path.filename().string();
+    if(!sourceActor.Load(originalDirectory,"kit-warden-lod0.runtime.glb",blendClips,diagnostic) ||
+       !candidateActor.Load(path.parent_path(),filename.c_str(),blendClips,diagnostic) ||
+       !sourceBlend.LoadClips(originalPath.string(),blendClips,diagnostic) ||
+       !candidateBlend.LoadClips(path.string(),blendClips,diagnostic))return 1;
+    for(float phase:{0.f,.25f,.5f,.75f,1.f})for(float weight:{0.f,.5f,1.f}) {
+        const SkinnedClipBlend blend{SkinnedClip::Walking,phase*candidateActor.Duration(SkinnedClip::Walking),weight};
+        horde::gameplay::dialogue::CompanionActingPose acting{};
+        acting.headYaw=.18f;acting.headPitch=-.10f;acting.chestPitch=.04f;
+        const auto rotations=CompanionUpperBodyRotations(acting);
+        const float time=phase*sourceActor.Duration(SkinnedClip::Idle);
+        std::vector<TexturedSkinnedRtVertex> a,b;
+        std::vector<SkinnedPbrTangent> at,bt;
+        if(!sourceBlend.SkinUniquePbr(SkinnedClip::Idle,time,a,at,diagnostic,rotations,&blend) ||
+           !candidateBlend.SkinUniquePbr(SkinnedClip::Idle,time,b,bt,diagnostic,rotations,&blend) ||
+           b.size()!=rows.size() || bt.size()!=rows.size() ||
+           !sourceActor.Pose(SkinnedClip::Idle,time,diagnostic,rotations,&blend) ||
+           !candidateActor.Pose(SkinnedClip::Idle,time,diagnostic,rotations,&blend) ||
+           !ValidActorFrames(candidateActor.Asset()))return 1;
+        for(std::size_t i=0;i<rows.size();++i)if(
+            std::memcmp(&a[rows[i]],&b[i],sizeof(b[i])) || std::memcmp(&at[rows[i]],&bt[i],sizeof(bt[i])) ||
+            std::memcmp(&sourceActor.Asset().vertices[rows[i]],&candidateActor.Asset().vertices[i],sizeof(assets::StaticRtVertex))) {
+            std::cerr<<"Candidate blend/ground mismatch: phase="<<phase<<" weight="<<weight<<" row="<<i<<'\n';return 1;
+        }
+        ++poses;comparedVertices+=rows.size();
+    }
+    std::cout<<"Kit candidate clips=7 poses="<<poses<<" candidate_vertices="<<rows.size()
+        <<" compared_vertex_poses="<<comparedVertices<<" exact_raw_and_grounded_pbr=PASS runtime_admission=NO\n";
+    return 0;
+}
+
+int main(int argc,char** argv) {
+    if(argc==4 && std::string_view(argv[1])=="--compare-candidate")return CompareCandidate(argv[2],argv[3]);
+    if(argc!=1)return 2;
     using namespace horde::scene;
     constexpr std::array<const char*,7> clips{{"Warden|idle","Warden|walk","Warden|run",
         "Warden|jump","Warden|fall","Warden|slide","Warden|mantle"}};

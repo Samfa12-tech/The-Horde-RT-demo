@@ -1,0 +1,8 @@
+{
+  "expectedExitCode": 1,
+  "actualExitCode": 1,
+  "mutatedRow": 0,
+  "oldSourceRow": 0,
+  "newSourceRow": 1,
+  "output": "Candidate surviving-row mismatch: Warden|idle phase=0 acting=0 row=0 source=1\r\n"
+}

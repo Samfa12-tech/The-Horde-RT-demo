@@ -1,5 +1,10 @@
 # Independent Kit lower-detail assessment
 
+Follow-up: the [single approved candidate review](../2026-10-23-kit-lod-candidate/README.md)
+now supersedes this feasibility snapshot. Its admission review compares new risks
+to the inherited source baseline; the proposed blanket static rejection wording
+below is historical, not a requirement to reject inherited Meshy defects.
+
 **Read-only feasibility, no Kit derivative generated or admitted.** This follows
 the rejected world-body study without reusing its failed geometry. Production
 Kit, the player world body and first-person arms remain unchanged.

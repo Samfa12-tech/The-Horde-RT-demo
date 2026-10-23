@@ -1,0 +1,33 @@
+{
+  "scope": "Refinement closes the initial 15 grounded-only blend cases; all85 now compare raw vertex/tangent AND grounded bytes. Initial diagnostic overstated raw coverage; earlier logs retained as historical. No benchmark or RT runtime change.",
+  "executableSha256": "f4f2abaf2e9d9e5c2c9949f26cf6e44bc20b096aa1e0f41218646db4af883ea0",
+  "sourceSha256": "ebc054889a628eff92dc2c2545083360e74608cdbd4629649ac4ba0ff39732d0",
+  "runs": [
+    {
+      "label": "native-raw-blends-r2",
+      "actualExitCode": 0,
+      "expectedExitCode": 0,
+      "args": [
+        "--compare-candidate",
+        "reports\\kit-lod-candidate-20261023\\kit-warden-protected-index-candidate.glb",
+        "reports\\kit-lod-candidate-20261023\\source-row-map.u32le"
+      ]
+    },
+    {
+      "label": "original-intake-r2",
+      "actualExitCode": 0,
+      "expectedExitCode": 0,
+      "args": []
+    },
+    {
+      "label": "negative-map-r2",
+      "actualExitCode": 1,
+      "expectedExitCode": 1,
+      "args": [
+        "--compare-candidate",
+        "reports\\kit-lod-candidate-20261023\\kit-warden-protected-index-candidate.glb",
+        "reports\\kit-lod-candidate-20261023\\negative-map.u32le"
+      ]
+    }
+  ]
+}

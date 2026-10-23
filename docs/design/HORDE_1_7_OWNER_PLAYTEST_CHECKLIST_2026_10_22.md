@@ -1,5 +1,30 @@
 # Horde 1.7 owner playtest checklist - 22 October 2026
 
+## Single Kit study complete, production retained - 23 October
+
+The [one approved Kit candidate](../evidence/2026-10-23-kit-lod-candidate/README.md)
+reduces vertices 20.06% and triangles 23.28%, preserving head/neck, hands, boots,
+rig, clips and surviving PBR bytes. All 85 native clip/acting/blend samples,
+original 35-pose intake and 663 worker contracts pass. Matched Windows RT front,
+87.19-degree profile and close reunion captures pass; 54/54 hidden checks in each
+cohort preserve isolated test saves/settings. No obvious gross contour/contact
+loss is seen, but the dark hood and unmasked differences do not close fine-face,
+one-pixel contour or reflection acceptance.
+
+**Candidate remains unadmitted; original Kit and first-person arms are unchanged.**
+Baseline has 16 inherited nonmanifold edges. The candidate adds two exact-position
+four-incident torso/thigh edges and 14 finite normal-orientation disagreements;
+these are mapped material risks, not proof of a visible crack or a blanket
+zero-defect rule imposed on Meshy source. No second Kit pass/repair, no reopened
+world-body loop. Artifact/provenance are separately committed as `33f8978c`.
+
+One serial Release bracket observes Kit 1.841/1.462/1.853 ms and combined preparation
+3.545/3.159/3.544 ms (about 20.6% / 10.9% versus faster control). This excludes
+upload, AS, GPU and frame cost; Android gain is unmeasured. Do not admit on counts
+or CPU gain alone. Return to physical HUD placement/rotation acceptance when the
+phone is offered; flask policy and deferred forest architecture remain separate.
+No phone operation, production asset selection, merge or release follows.
+
 ## Kit feasibility and exact source CI - 23 October
 
 The [independent Kit assessment](../evidence/2026-10-23-kit-lod-assessment/README.md)

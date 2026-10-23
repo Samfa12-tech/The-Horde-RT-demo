@@ -26,11 +26,13 @@ SkinnedClipSet Clips()
     clips.clips[2] = {"", false, false}; clips.clips[3] = {"", false, false};
     return clips;
 }
-void Load(SkinnedPbrActor& actor)
+void Load(SkinnedPbrActor& actor,const std::filesystem::path& candidate={})
 {
     std::string error;
-    Check(actor.Load(std::filesystem::path(HORDE_RT_SOURCE_DIR) /
-        "assets/models/characters/runtime/kit-warden-v1", "kit-warden-lod0.runtime.glb", Clips(), error),
+    const auto path=candidate.empty()?std::filesystem::path(HORDE_RT_SOURCE_DIR) /
+        "assets/models/characters/runtime/kit-warden-v1/kit-warden-lod0.runtime.glb":candidate;
+    const auto filename=path.filename().string();
+    Check(actor.Load(path.parent_path(),filename.c_str(), Clips(), error),
         error.c_str());
 }
 Worker::Request Request(unsigned tick)
@@ -135,11 +137,12 @@ int Contracts()
     std::cout << checks << " actor worker contracts passed\n";
     return 0;
 }
-int Benchmark(bool threaded, unsigned samples, const std::filesystem::path& worldCandidate = {})
+int Benchmark(bool threaded, unsigned samples, const std::filesystem::path& worldCandidate = {},
+              const std::filesystem::path& kitCandidate = {})
 {
     using namespace horde::vulkan::raytracing;
     using namespace horde::gameplay::animation;
-    SkinnedPbrActor actor; Load(actor);
+    SkinnedPbrActor actor; Load(actor,kitCandidate);
     const auto root = std::filesystem::path(HORDE_RT_SOURCE_DIR);
     PlayerRenderSlot player;
     SkinnedMeshAsset viewmodel;
@@ -212,6 +215,7 @@ int Benchmark(bool threaded, unsigned samples, const std::filesystem::path& worl
     { std::cout << ",\"" << name << "\":["; for (std::size_t i=0;i<values.size();++i) { if(i)std::cout<<',';std::cout<<values[i]; } std::cout<<']'; };
     std::cout << "{\"mode\":\"" << (threaded ? "worker" : "serial") << "\",\"scope\":\"actual Kit pose plus player world/viewmodel CPU preparation; dispatch/join included; no upload/AS/GPU/frame\",\"samples\":"
         << samples << ",\"warmup\":" << warmup << ",\"worldVertices\":" << player.UniqueVertices().size()
+        << ",\"kitVertices\":" << actor.Asset().vertices.size()
         << ",\"viewmodelVertices\":" << viewVertices.size() << ",\"outputFnv1a64\":\"" << std::hex << digest
         << "\",\"viewmodelFnv1a64\":\"" << viewDigest << std::dec << '"';
     array("criticalNs", critical); array("dispatchNs", dispatch); array("joinNs", join);
@@ -222,14 +226,15 @@ int Benchmark(bool threaded, unsigned samples, const std::filesystem::path& worl
 }
 int main(int argc, char** argv)
 {
-    if ((argc == 3 || argc == 4) && (std::string_view(argv[1]) == "serial" || std::string_view(argv[1]) == "worker"))
+    if ((argc >= 3 && argc <= 5) && (std::string_view(argv[1]) == "serial" || std::string_view(argv[1]) == "worker"))
     {
         const auto samples = std::stoul(argv[2]);
         if (samples < 30 || samples > 300) return 2;
         // Explicit experimental file only; the runtime and default fixture keep
         // loading the admitted world asset. This does not select a worker.
         return Benchmark(std::string_view(argv[1]) == "worker", unsigned(samples),
-            argc == 4 ? std::filesystem::path(argv[3]) : std::filesystem::path{});
+            argc >= 4 ? std::filesystem::path(argv[3]) : std::filesystem::path{},
+            argc == 5 ? std::filesystem::path(argv[4]) : std::filesystem::path{});
     }
     return Contracts();
 }
