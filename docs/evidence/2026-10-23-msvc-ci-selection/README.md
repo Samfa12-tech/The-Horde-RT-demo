@@ -178,3 +178,17 @@ prior 606/618 s builds, while the prior test selections were cancelled. The
 build remains the largest cost and one hosted result does not establish a stable
 margin below the cap. Monitoring used read-only APIs and requested no rerun or
 workflow change. No device validation was performed for this CI addendum.
+
+## Terminal source checkpoint749e5ffe
+
+Exact [run39942919352](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39942919352)
+also passed all six jobs, including the updated experimental CPU harness.
+MSVC completed in653s (10m53s), with465s native build and122s Windows selection;
+CTest passed149/149 in116.23s. Its149-name roster matches b62/e586 exactly;
+all four provider wrappers, local/remote report UI and10/10 APK resolver cases pass.
+The15-minute cap and gates remain unchanged. Linux, sanitizer, Android and Vulkan
+host jobs all pass. [Compact terminal summary](749-terminal-summary.json) binds
+job URLs/times and the hash of the fuller ignored local receipt. This is source
+validation, not hardware acceptance of either experimental mesh. Read-only
+monitoring requested no rerun or workflow edit. Timing differences across these
+runs are not isolated selector/renderer performance gains.

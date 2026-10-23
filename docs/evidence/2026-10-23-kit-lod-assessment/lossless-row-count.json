@@ -1,0 +1,17 @@
+{
+  "sourceSha256": "1ba628235814b5912ae1439b180347dd8e1cce85b0f4d1fae5bbacb41e7d3713",
+  "attributeNames": [
+    "JOINTS_0",
+    "NORMAL",
+    "POSITION",
+    "TANGENT",
+    "TEXCOORD_0",
+    "WEIGHTS_0"
+  ],
+  "vertices": 26945,
+  "completeUniqueAttributeRows": 26945,
+  "exactDuplicateCompleteAttributeRows": 0,
+  "positionUvSkinAmbiguousGroups": 0,
+  "joints": 24,
+  "clips": 7
+}

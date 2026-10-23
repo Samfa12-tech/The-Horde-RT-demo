@@ -1,5 +1,22 @@
 # Horde 1.7 owner playtest checklist - 22 October 2026
 
+## Kit feasibility and exact source CI - 23 October
+
+The [independent Kit assessment](../evidence/2026-10-23-kit-lod-assessment/README.md)
+finds no complete-attribute duplicate rows to compact. Locking every UV seam and
+contour leaves only53 eligible triangles. One narrower torso/limb study is feasible
+with exact head/neck, boots, hands and problematic-topology neighborhoods retained;
+its possible28.7% triangle reduction is theoretical, not generated/measured.
+A fresh original reunion RT view passes and was inspected, but its dark hood is
+insufficient for fine-face/front/side acceptance. No Kit derivative exists yet.
+
+Exact749e5ffe [CI run39942919352](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39942919352)
+is terminal: all six jobs pass; MSVC149/149 in116.23s CTest,653s total under the
+unchanged15-minute cap. Subsequent local rejection/assessment files change only
+evidence/checklist content, not runtime sources/assets. Routine backup remains
+approved; PR27 conflicts, physical HUD/phone acceptance and other retained gates
+remain open. No phone, merge or release operation.
+
 ## World-body study closed after one repair - 23 October
 
 The [single authorized repair](../evidence/2026-10-23-world-body-rejected/README.md)
