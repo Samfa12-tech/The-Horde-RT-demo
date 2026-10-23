@@ -158,6 +158,13 @@ presentation; production ownership logic is unchanged. The original failures
 remain retained. Visible/controller/listening and broader close/Release acceptance
 still keep the candidate WIP; this does not reopen a full benchmark course.
 
+The subsequent [isolated close-boundary pass](../evidence/2026-10-23-benchmark-close-boundaries/README.md)
+retains and fixes a missing successor close-intent receipt. Detached WM_CLOSE,
+Standard apply/WM_CLOSE/actual-dimension rollback/fresh Entry retirement and the
+Esc regression pass. This remains Debug native lifecycle evidence, not visible,
+controller, listening or Release menu runtime acceptance. The Release isolation
+adapter is Debug-only; its early rejection and compilation do not close runtime.
+
 Higher-priority overall acceptance is natural gameplay/controls/audio and warm
 device readiness when the owner/device is available. Forest/smoke scope and flask
 policy remain explicit decisions; repeated passing fixtures are not substitutes.

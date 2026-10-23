@@ -164,6 +164,7 @@ bool gCampaignHiddenValidation=false;
 bool gOpeningBenchmarkMenuValidation=false;
 #if defined(_DEBUG)
 bool gOpeningBenchmarkDetachedCancelValidation=false;
+bool gOpeningBenchmarkDetachedCloseValidation=false;
 bool gOpeningBenchmarkDetachedCancelInjected=false;
 #endif
 bool gLookoutHiddenValidation=false;
@@ -6182,7 +6183,8 @@ void DetachRenderContextHost(VulkanSurfaceContext& context) noexcept
     // External polling cannot reserve this interval: a cross-thread SendMessage
     // may be serviced only after the successor attaches. Exercise the real HWND
     // handler synchronously here, only in the explicitly isolated Debug fixture.
-    if (gOpeningBenchmarkMenuValidation && gOpeningBenchmarkDetachedCancelValidation &&
+    if (gOpeningBenchmarkMenuValidation &&
+        (gOpeningBenchmarkDetachedCancelValidation || gOpeningBenchmarkDetachedCloseValidation) &&
         !gOpeningBenchmarkDetachedCancelInjected && context.openingBenchmark &&
         context.openingBenchmark->owner.Phase()==OpeningBenchmarkOwnerPhase::Queued &&
         GetWindowLongPtrA(window,GWLP_USERDATA)==0 &&
@@ -6190,7 +6192,8 @@ void DetachRenderContextHost(VulkanSurfaceContext& context) noexcept
         gOpeningBenchmarkDetachedCancelInjected=true;
         std::cerr<<"HORDE_OPENING_MENU_STAGE detached-inject context-null=1 phase=queued pending-before="
                  <<context.openingBenchmark->cancelPending<<'\n';
-        SendMessageA(window,WM_KEYDOWN,VK_ESCAPE,0);
+        SendMessageA(window,gOpeningBenchmarkDetachedCloseValidation?WM_CLOSE:WM_KEYDOWN,
+                     gOpeningBenchmarkDetachedCloseValidation?0:VK_ESCAPE,0);
         std::cerr<<"HORDE_OPENING_MENU_STAGE detached-inject-result pending-after="
                  <<context.openingBenchmark->cancelPending<<'\n';
     }
@@ -9063,8 +9066,10 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         FocusGameControl(GetDlgItem(hWnd,kRunBenchmarkButtonId));
         if(openingBenchmark->closeRequested) PostMessageA(hWnd,WM_CLOSE,0,0);
     }
-    if(context.openingBenchmarkOwner && openingBenchmark->cancelPending)
-        context.benchmarkProfileCancelRequested=true;
+    if(context.openingBenchmarkOwner) {
+        context.benchmarkProfileCancelRequested=context.benchmarkProfileCancelRequested || openingBenchmark->cancelPending;
+        context.benchmarkProfileCloseRequested=context.benchmarkProfileCloseRequested || openingBenchmark->closeRequested;
+    }
     if (automatedBenchmark)
     {
         if (!context.controlsEnabled)
@@ -9539,7 +9544,11 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
                  <<" successorAdmitted="<<admitted<<'\n';
         return admitted?0:1;
     }
-    if (!renderOwner.Retire()) renderFailed = true;
+    const bool finalRetired=renderOwner.Retire();
+    if (!finalRetired) renderFailed = true;
+    if(gOpeningBenchmarkMenuValidation && openingBenchmark && openingBenchmark->closeRequested)
+        std::cerr<<"HORDE_OPENING_BENCHMARK final-entry-retired="<<finalRetired
+                 <<" window-alive="<<IsWindow(hWnd)<<'\n';
     if (automatedBenchmark) return !renderFailed && benchmarkSucceeded ? 0 : 1;
     return renderFailed ? 1 : (running ? 0 : static_cast<int>(message.wParam));
 }
@@ -10424,10 +10433,11 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
 {
     auto* sceneContext = reinterpret_cast<VulkanSurfaceContext*>(GetWindowLongPtrA(hWnd, GWLP_USERDATA));
 #if defined(_DEBUG)
-    if(gOpeningBenchmarkMenuValidation && message==WM_KEYDOWN && wParam==VK_ESCAPE) {
+    if(gOpeningBenchmarkMenuValidation && ((message==WM_KEYDOWN && wParam==VK_ESCAPE) || message==WM_CLOSE)) {
         const auto* transfer=sceneContext ? sceneContext->openingBenchmark :
             reinterpret_cast<OpeningBenchmarkTransfer*>(GetPropA(hWnd,kOpeningBenchmarkTransferProperty));
-        std::cerr<<"HORDE_OPENING_MENU_STAGE escape-delivery context-attached="<<(sceneContext!=nullptr)
+        std::cerr<<"HORDE_OPENING_MENU_STAGE "<<(message==WM_CLOSE?"close-delivery":"escape-delivery")
+                 <<" context-attached="<<(sceneContext!=nullptr)
                  <<" phase="<<(transfer?static_cast<int>(transfer->owner.Phase()):-1)<<'\n';
     }
 #endif

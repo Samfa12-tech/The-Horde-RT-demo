@@ -11,6 +11,9 @@ handler witness. The original failed receipt below remains unchanged; other
 feature acceptance remains open.
 The original WIP's exact CI40022045914 subsequently passed all six jobs at
 `67c31888`; that result does not certify the newer correction or physical UI.
+The later [close-boundary evidence](../2026-10-23-benchmark-close-boundaries/README.md)
+adds truthful successor close intent and two isolated WM_CLOSE cases, while
+keeping broader physical/Release/visual/listening acceptance open.
 
 The base is `2ab19ba17ccc6d94c5bbd34a2bc6bbcd882522fe`. The
 [receipt](receipt.json) pins the tested source bytes and executables, separates

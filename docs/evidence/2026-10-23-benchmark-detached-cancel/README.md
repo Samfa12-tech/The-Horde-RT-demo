@@ -5,6 +5,11 @@
 witness*. It does not admit visible layout, physical/controller interaction,
 listening, final Release interaction or every close/error boundary.
 
+The later [WM_CLOSE follow-up](../2026-10-23-benchmark-close-boundaries/README.md)
+records a separate missing successor close-intent receipt, its focused fix and
+two bounded close cases. It preserves this cancellation receipt and does not
+admit the full feature or the remaining physical/Release gates.
+
 ## Demonstrated cause
 
 The original [failed gate and immutable receipt](../2026-10-23-benchmark-menu-wip/README.md)

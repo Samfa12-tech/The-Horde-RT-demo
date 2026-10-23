@@ -18,7 +18,11 @@ import time
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('label')
 parser.add_argument('--observe-original-poll', action='store_true')
+parser.add_argument('--action', choices=['detached-cancel','detached-close','close-after-apply'],
+                    default='detached-cancel')
 args = parser.parse_args()
+if args.observe_original_poll and args.action != 'detached-cancel':
+    parser.error('The original polling diagnosis applies only to detached-cancel')
 assert os.name == 'nt', 'Windows native fixture only'
 assert args.label.replace('-', '').isalnum(), 'Use a new alphanumeric/hyphen label'
 root = Path(__file__).resolve().parents[1]
@@ -122,7 +126,8 @@ def window_state():
             'style': user.GetWindowLongPtrW(hwnd, -16),
             'exStyle': user.GetWindowLongPtrW(hwnd, -20)}
 command = [str(exe), '--benchmark-menu-validate', '--campaign-test-root', str(fixture)]
-if not args.observe_original_poll: command.append('--benchmark-menu-detached-cancel')
+if not args.observe_original_poll and args.action != 'close-after-apply':
+    command.append('--benchmark-menu-' + args.action)
 start = time.monotonic()
 with (output / 'stdout.log').open('xb') as stdout, (output / 'stderr.log').open('xb') as stderr:
     process = subprocess.Popen(command, cwd=root, stdout=stdout, stderr=stderr,
@@ -136,30 +141,53 @@ with (output / 'stdout.log').open('xb') as stdout, (output / 'stderr.log').open(
                      user.IsWindowEnabled(user.GetDlgItem(hwnd, 119)))
         original = window_state()
         click(119)
-        click(231)
+        click(230 if args.action == 'close-after-apply' else 231)
         click(232)
         if args.observe_original_poll:
             wait(lambda: user.GetWindowLongPtrW(hwnd, -21) == 0, 5)
             events.append({'observedContextNull': True})
             send(hwnd, 0x100, 0x1B)
+        if args.action == 'close-after-apply':
+            wait(lambda: 'HORDE_OPENING_BENCHMARK applied fixed=' in log())
+            send(hwnd, 0x10)
         wait(lambda: 'HORDE_OPENING_BENCHMARK entry-presented' in log())
-        assert window_state() == original, 'Window not restored'
-        wait(lambda: user.IsWindowVisible(user.GetDlgItem(hwnd, 119)) and
-                     user.IsWindowEnabled(user.GetDlgItem(hwnd, 119)))
+        closing = args.action != 'detached-cancel'
+        if closing:
+            wait(lambda: process.poll() is not None)
+            assert 'HORDE_OPENING_BENCHMARK final-entry-retired=1 window-alive=0' in log()
+        else:
+            assert window_state() == original, 'Window not restored'
+            wait(lambda: user.IsWindowVisible(user.GetDlgItem(hwnd, 119)) and
+                         user.IsWindowEnabled(user.GetDlgItem(hwnd, 119)))
         lifecycle = json.loads((output / 'reports/windows-benchmark-profile-lifecycle.json').read_text())
-        assert 'HORDE_OPENING_MENU_STAGE detached-cancel' in log(), 'Did not witness detached input path'
-        if not args.observe_original_poll:
-            assert 'detached-inject context-null=1 phase=queued pending-before=0' in log()
-            assert 'escape-delivery context-attached=0 phase=1' in log()
-            assert 'detached-inject-result pending-after=1' in log()
-        assert not lifecycle['actualApplyAcknowledged'], 'Cancelled handoff applied the profile'
+        if args.action == 'close-after-apply':
+            assert lifecycle['actualApplyAcknowledged'] and lifecycle['actualRestorationAcknowledged']
+            assert lifecycle['window']['exactWindowStateRestored']
+            assert lifecycle['requestedProfile'] == 'windows-rt-provisional-v1'
+            applied = lifecycle['applied']['completedFrame']['submittedDimensions']
+            assert applied['internalExtent'] == [1920, 1080] and applied['outputExtent'] == [1920, 1080]
+            assert not applied['dynamicResolutionEnabled']
+            assert lifecycle['restored']['completedFrame']['submittedDimensions'] == lifecycle['original']['completedFrame']['submittedDimensions']
+        else:
+            witness = 'detached-close' if closing else 'detached-cancel'
+            assert 'HORDE_OPENING_MENU_STAGE ' + witness in log(), 'Did not witness detached input path'
+            if not args.observe_original_poll:
+                assert 'detached-inject context-null=1 phase=queued pending-before=0' in log()
+                delivery = 'close-delivery' if closing else 'escape-delivery'
+                assert delivery + ' context-attached=0 phase=1' in log()
+                assert 'detached-inject-result pending-after=1' in log()
+            assert not lifecycle['actualApplyAcknowledged'], 'Cancelled handoff applied the profile'
+        assert lifecycle['closeRequested'] == closing, 'Close intent missing from successor lifecycle'
         assert lifecycle['cancelRequested'] and not lifecycle['campaignAttached']
         assert not lifecycle['ranked'] and not lifecycle['measurementAndRestorationPassed']
         assert not lifecycle['settingsWritesPermitted'] and lifecycle['confirmedTupleUnchanged']
-        caption = c.create_unicode_buffer(180)
-        user.GetWindowTextW(user.GetDlgItem(hwnd, 103), caption, 180)
-        assert caption.value == 'BENCHMARK CANCELLED', caption.value
-        events.append({'restored': True, 'resultCaption': caption.value})
+        if closing:
+            events.append({'freshEntryPresentedThenRetired': True})
+        else:
+            caption = c.create_unicode_buffer(180)
+            user.GetWindowTextW(user.GetDlgItem(hwnd, 103), caption, 180)
+            assert caption.value == 'BENCHMARK CANCELLED', caption.value
+            events.append({'restored': True, 'resultCaption': caption.value})
     except Exception as exc:
         error = str(exc)
     finally:
@@ -169,7 +197,7 @@ with (output / 'stdout.log').open('xb') as stdout, (output / 'stderr.log').open(
         try: process.wait(timeout=60)
         except subprocess.TimeoutExpired: events.append({'pendingOwnedPid': process.pid})
 result = {'pid': process.pid, 'exitCode': process.poll(), 'seconds': time.monotonic() - start,
-          'error': error, 'originalPolling': args.observe_original_poll, 'events': events,
+          'error': error, 'action': args.action, 'originalPolling': args.observe_original_poll, 'events': events,
           'custodyUnchanged': before == custody(), 'exeSha256': sha(exe),
           'isolatedFixtureFiles': [str(p.relative_to(fixture)) for p in fixture.rglob('*') if p.is_file()],
           'harnessForegroundRequestAttempted': False, 'nativeForegroundRequestsSuppressed': True,
