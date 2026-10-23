@@ -3532,3 +3532,21 @@ preferences byte-identical, zero new save paths, original rotation/font restored
 launcher foreground, no Horde PID/surface, no owned helper/transfer remaining.
 No app-data clear/uninstall, release, merge or deployment occurred.
 [Exact receipt, failures, analysis and remaining gates](evidence/2026-10-23-phone-skin/README.md).
+
+### 23 October 2026: current normal-cache source, bounded control and trace blocker
+
+SM-S948B Android17/API37, bceed0c1 runtime APK c1d65749: one33% RT Pipeline
+Shipping/Mobile stationary lookout control admitted620 post-warm completed
+frames. GPU median35.839ms/p9536.690ms; skin elapsed7.990ms; whole frame47.841ms;
+measured image presentation interval median50.000ms. This is current cached
+source, not a matched gain over the earlier reverted-cache build. No sustained,
+CPU-utilization, natural journey or subjective acceptance follows.
+
+The matched trace start failed thermal admission; the config-file attempt then
+received Android errno13 reading its `/data/local/tmp/` config before any trace
+session started. No alternate access route was attempted. No scheduling/per-core
+profile or detailed GPU-stage result was captured. All failures retained.
+
+Phone released06:20:55UTC: both starting APK hashes,18 prior save/lock files,
+settings, rotation and font verified; zero new save paths; no owned renderer,
+trace, installation or transfer. [Exact receipt and scope](evidence/2026-10-23-current-cache-phone/README.md).
