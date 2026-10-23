@@ -5,6 +5,13 @@ feature.** The owner selected opening-menu-only benchmarking for 1.7. The saved
 candidate connects the existing provisional Windows profile and explicit Custom
 choice to that route. Both remain local and unranked; no report is sent.
 
+Later [detached-cancellation follow-up](../2026-10-23-benchmark-detached-cancel/README.md)
+demonstrates the polling/delivery race and passes a deterministic isolated native
+handler witness. The original failed receipt below remains unchanged; other
+feature acceptance remains open.
+The original WIP's exact CI40022045914 subsequently passed all six jobs at
+`67c31888`; that result does not certify the newer correction or physical UI.
+
 The base is `2ab19ba17ccc6d94c5bbd34a2bc6bbcd882522fe`. The
 [receipt](receipt.json) pins the tested source bytes and executables, separates
 the final build from its course predecessor, and retains failures. The canonical
@@ -40,7 +47,10 @@ files are excluded from this checkpoint.
 | Predecessor Standard full course | Passed in 162.703 s, within the unchanged 180 s bound: two laps, 26 waypoints, 1,838 completed/accepted rows, all presented, actual 1920 x 1080 internal/output and DRS off. Profile restore and fresh Entry matched originals. Executable `a0cf7bcc...` predates the final caption, isolated-mode guard and detached-input bridge; it is not exact-final full-course acceptance. |
 
 The background runs used owned native controls and actual RT completion, without
-foreground requests, screenshots, physical clicks/controller input or listening.
+Python foreground requests, screenshots, physical clicks/controller input or listening.
+Later review found native startup still requested activation (return unrecorded);
+the old receipt's no-request field describes Python only. The linked correction
+suppresses native activation/update/error prompts in isolated validation.
 They prove the stated lifecycle cases; they do not establish visible layout,
 controller usability, sound quality, scanout FPS, ranked fairness or phone parity.
 The standalone Shipping course evidence remains its own earlier checkpoint.
@@ -55,12 +65,15 @@ The standalone Shipping course evidence remains its own earlier checkpoint.
    batch also retained one unbuilt-executable failure before the corrected build.
 2. The screenshot guard rejected a nonforeground owned window. A subsequent
    ordinary `SetForegroundWindow` returned FALSE, with no detailed OS cause.
-   No further activation attempt or alternate focus route was used. Actual visible
+   No explicit Python retry or alternate focus route was used; native startup's
+   overlooked activation call is disclosed above and corrected in the follow-up. Actual visible
    Windows layout, DPI and physical/controller interaction remain **blocked by
    foreground availability**, not passed by background automation.
-3. Detached cancellation and close need a deterministic, permission-compliant
-   native witness; ordinary cancellation does not close that gap. Keep original
-   failures and require actual restoration/retirement/presentation facts.
+3. At this original checkpoint detached cancellation and close needed a
+   deterministic native witness. The later linked follow-up closes the specific
+   Queued-detach cancellation witness, retaining the failures and real Entry
+   restoration/retirement/presentation requirements. Close and other phases
+   remain separate; ordinary cancellation alone never closed the original gap.
 4. All native runs were muted. New Entry/Showcase transition listening remains
    pending. Existing owner acceptance of the forest track is unchanged.
 5. Final-head hosted CI, final Release interaction and broader failure/close

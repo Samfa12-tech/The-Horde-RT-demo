@@ -657,11 +657,12 @@ int RunHiddenCampaignValidation(VulkanSurfaceContext& ctx)
 bool ConfigureHiddenCampaignValidation()
 {
     int count=0;auto args=CommandLineToArgvW(GetCommandLineW(),&count);if(!args)return false;
-    bool requested=false,lookoutRequested=false,routeRequested=false,returnRequested=false,inspectKit=false,inspectMotion=false,inspectTiming=false,benchmarkMenuRequested=false;std::filesystem::path directory;
+    bool requested=false,lookoutRequested=false,routeRequested=false,returnRequested=false,inspectKit=false,inspectMotion=false,inspectTiming=false,benchmarkMenuRequested=false,detachedCancelRequested=false;std::filesystem::path directory;
     for(int i=1;i<count;++i) {
         const std::wstring_view arg=args[i];
         if(arg==L"--campaign-validate-hidden")requested=true;
         if(arg==L"--benchmark-menu-validate")benchmarkMenuRequested=true;
+        if(arg==L"--benchmark-menu-detached-cancel")detachedCancelRequested=true;
         if(arg==L"--lookout-validate-hidden")lookoutRequested=true;
         if(arg==L"--route-validate-hidden")routeRequested=true;
         if(arg==L"--route-return-recovery-hidden")returnRequested=true;
@@ -671,6 +672,9 @@ bool ConfigureHiddenCampaignValidation()
         if(arg==L"--campaign-test-root" && i+1<count)directory=args[++i];
     }
     LocalFree(args);
+    if(detachedCancelRequested && !benchmarkMenuRequested) {
+        std::cerr<<"Detached benchmark input validation requires isolated --benchmark-menu-validate.\n";return false;
+    }
     if(!requested && !lookoutRequested && !routeRequested && !returnRequested && !inspectKit && !benchmarkMenuRequested && directory.empty())return true;
 #if defined(_DEBUG) && defined(HORDE_RT_SOURCE_DIR)
     std::error_code error;
@@ -690,7 +694,9 @@ bool ConfigureHiddenCampaignValidation()
            manifest!="{\"evidenceClass\":\"isolated opening-menu benchmark; no campaign progress\"}\n")return false;
         for(const auto& item:std::filesystem::directory_iterator(absolute))
             if(item.path().filename()!="manifest.json")return false;
-        gOpeningBenchmarkMenuValidation=true;gCampaignValidationDirectory=absolute;return true;
+        gOpeningBenchmarkMenuValidation=true;
+        gOpeningBenchmarkDetachedCancelValidation=detachedCancelRequested;
+        gCampaignValidationDirectory=absolute;return true;
     }
     if(lookoutRequested && !PrepareHiddenLookoutFixture(absolute)){
         std::cerr<<"Hidden lookout validation requires the unchanged caller-exported single ForestEndpoint autosave and canonical manifest only.\n";return false;

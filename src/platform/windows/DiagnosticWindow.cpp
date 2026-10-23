@@ -162,6 +162,10 @@ using LookoutPanel=horde::platform::windows::WindowsLookoutObjectivePanel;
 // targets. It must never acquire foreground input or touch the owner's INI.
 bool gCampaignHiddenValidation=false;
 bool gOpeningBenchmarkMenuValidation=false;
+#if defined(_DEBUG)
+bool gOpeningBenchmarkDetachedCancelValidation=false;
+bool gOpeningBenchmarkDetachedCancelInjected=false;
+#endif
 bool gLookoutHiddenValidation=false;
 bool gRouteHiddenValidation=false;
 bool gRouteReturnRecovery=false;
@@ -172,11 +176,11 @@ bool gShowcaseCaptureHidden=false;
 bool gCampaignValidationHoldPreparation=false;
 std::filesystem::path gCampaignValidationDirectory;
 int GameMessageBoxA(HWND owner,const char* text,const char* title,UINT flags) {
-    if(gCampaignHiddenValidation || gShowcaseCaptureHidden){std::cerr<<"Hidden validation suppressed dialog: "<<text<<'\n';return IDCANCEL;}
+    if(gCampaignHiddenValidation || gOpeningBenchmarkMenuValidation || gShowcaseCaptureHidden){std::cerr<<"Hidden validation suppressed dialog: "<<text<<'\n';return IDCANCEL;}
     return ::MessageBoxA(owner,text,title,flags);
 }
 void FocusGameControl(HWND control) {
-    if(!gCampaignHiddenValidation && !gShowcaseCaptureHidden && control) ::SetFocus(control);
+    if(!gCampaignHiddenValidation && !gOpeningBenchmarkMenuValidation && !gShowcaseCaptureHidden && control) ::SetFocus(control);
 }
 constexpr char kWindowTitle[] = "Horde Lantern RT - Showcase Alpha " HORDE_RT_DISPLAY_VERSION;
 constexpr char kHudStartingText[] = "ALPHA " HORDE_RT_DISPLAY_VERSION "  |  VULKAN RT STARTING...  |  F1 CONTROLS  |  ESC MENU";
@@ -6174,6 +6178,23 @@ void DetachRenderContextHost(VulkanSurfaceContext& context) noexcept
     if (window != nullptr && IsWindow(window) &&
         GetWindowLongPtrA(window, GWLP_USERDATA) == reinterpret_cast<LONG_PTR>(&context))
         SetWindowLongPtrA(window, GWLP_USERDATA, 0);
+#if defined(_DEBUG)
+    // External polling cannot reserve this interval: a cross-thread SendMessage
+    // may be serviced only after the successor attaches. Exercise the real HWND
+    // handler synchronously here, only in the explicitly isolated Debug fixture.
+    if (gOpeningBenchmarkMenuValidation && gOpeningBenchmarkDetachedCancelValidation &&
+        !gOpeningBenchmarkDetachedCancelInjected && context.openingBenchmark &&
+        context.openingBenchmark->owner.Phase()==OpeningBenchmarkOwnerPhase::Queued &&
+        GetWindowLongPtrA(window,GWLP_USERDATA)==0 &&
+        GetPropA(window,kOpeningBenchmarkTransferProperty)==context.openingBenchmark) {
+        gOpeningBenchmarkDetachedCancelInjected=true;
+        std::cerr<<"HORDE_OPENING_MENU_STAGE detached-inject context-null=1 phase=queued pending-before="
+                 <<context.openingBenchmark->cancelPending<<'\n';
+        SendMessageA(window,WM_KEYDOWN,VK_ESCAPE,0);
+        std::cerr<<"HORDE_OPENING_MENU_STAGE detached-inject-result pending-after="
+                 <<context.openingBenchmark->cancelPending<<'\n';
+    }
+#endif
     if (context.musicPlayback) context.musicPlayback->Stop(); // Joins; noexcept.
     context.windowHandle = nullptr;
     context.capabilitySnapshot = nullptr; // Borrowed from the returning caller.
@@ -8941,7 +8962,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
                 GetClientRect(hWnd, &entryClient);
                 LayoutOverlayControls(hWnd, entryClient.right, entryClient.bottom);
             }
-            if (!automatedBenchmark)
+            if (!automatedBenchmark && !gOpeningBenchmarkMenuValidation)
                 horde::platform::windows::BeginGitHubReleaseUpdateCheck(
                     hWnd, HORDE_RT_DISPLAY_VERSION, false);
 #if defined(_DEBUG)
@@ -10402,6 +10423,14 @@ bool NativeUiUsesHighContrast()
 LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     auto* sceneContext = reinterpret_cast<VulkanSurfaceContext*>(GetWindowLongPtrA(hWnd, GWLP_USERDATA));
+#if defined(_DEBUG)
+    if(gOpeningBenchmarkMenuValidation && message==WM_KEYDOWN && wParam==VK_ESCAPE) {
+        const auto* transfer=sceneContext ? sceneContext->openingBenchmark :
+            reinterpret_cast<OpeningBenchmarkTransfer*>(GetPropA(hWnd,kOpeningBenchmarkTransferProperty));
+        std::cerr<<"HORDE_OPENING_MENU_STAGE escape-delivery context-attached="<<(sceneContext!=nullptr)
+                 <<" phase="<<(transfer?static_cast<int>(transfer->owner.Phase()):-1)<<'\n';
+    }
+#endif
     if(!sceneContext) {
         auto* transfer=reinterpret_cast<OpeningBenchmarkTransfer*>(GetPropA(hWnd,kOpeningBenchmarkTransferProperty));
         if(transfer && (transfer->owner.Phase()==OpeningBenchmarkOwnerPhase::Queued ||
@@ -12327,6 +12356,7 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     }
     int showMode=gShowcaseCaptureHidden ? SW_HIDE :
         (captureDirectory != nullptr ? SW_SHOWNOACTIVATE : SW_SHOW);
+    if(gOpeningBenchmarkMenuValidation)showMode=SW_SHOWNOACTIVATE;
 #if defined(_DEBUG)
     if (!gShowcaseCaptureHidden && !nativeMotionScenario.empty()) showMode=SW_SHOWNORMAL;
 #endif
@@ -12353,11 +12383,12 @@ int CreateAndShowWindow(const std::string& diagnosticText,
                          (actualClientRect.bottom - actualClientRect.top),
                      SWP_NOMOVE | SWP_NOACTIVATE | SWP_NOZORDER);
     }
-    if (captureDirectory == nullptr && !gCampaignHiddenValidation && !gShowcaseCaptureHidden)
+    if (captureDirectory == nullptr && !gCampaignHiddenValidation && !gOpeningBenchmarkMenuValidation && !gShowcaseCaptureHidden)
     {
         SetForegroundWindow(hWnd);
         FocusGameControl(sceneMode ? hWnd : edit);
     }
+    if(gOpeningBenchmarkMenuValidation)TraceOpeningMenuStage("isolated-window no-activate");
 
     OpeningBenchmarkTransfer openingBenchmark;
     openingBenchmark.reports=textReportPath.parent_path();

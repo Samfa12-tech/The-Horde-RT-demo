@@ -1,0 +1,336 @@
+{
+  "schema": 1,
+  "featureStatus": "WIP-unadmitted",
+  "baseCommit": "67c31888fd5d9b467806181bbd148b385ecc9ba8",
+  "demonstratedCause": "External context-null polling did not establish the time of cross-thread message delivery; instrumented Esc reached the attached Benchmark owner.",
+  "productionLifetimeDefectDemonstrated": false,
+  "correction": "Debug-only one-shot isolated synchronous native HWND injection after actual Entry callback detachment; no manual cancellation/proof/state mutation.",
+  "sourceFileSha256": {
+    "src/platform/windows/DiagnosticWindow.cpp": "a3d5926f14477b59d1d9caec731deb3b117b51415fa6a09a629faa30fa928842",
+    "src/platform/windows/windows_campaign_validation.inl": "7a20d06dade8c379f4d016f4a952c7554a02b45afe37547be66a81400fd90270",
+    "tools/validate-windows-benchmark-detached-cancel.py": "3bc90e6445575dac67e0b952187718d441b21635b38516f33063bb1efeebe61d"
+  },
+  "builds": {
+    "Debug": {
+      "exitCode": 0,
+      "exeSha256": "619c571ad993a13e577c762f7ee9e2a12170854f8cb1e009e0732f932ac40646",
+      "logSha256": "aad08357e8ec4b8898e1aee396fe68c8b81c1e7f491368bb841950ba366bbb68"
+    },
+    "Release": {
+      "exitCode": 0,
+      "exeSha256": "5589fdee0e1d5d04d742de14ccacca6f778225fb2632b2f3f7234dd7611796e5",
+      "logSha256": "ff7e216767294ca5d8586c0311b770369cefae835a4bcf6a7bed2b909efa7e42"
+    }
+  },
+  "originalFailure": {
+    "exitCode": 0,
+    "seconds": 10.828000000037719,
+    "error": "Did not witness detached input path",
+    "custodyUnchanged": true,
+    "exeSha256": "70253a9433c7cd6661473d1ffebbc3c970074c9c2afea1aabbd0e00eb9aed9e7",
+    "rawResultSha256": "1d60c6f19bf845a612a9bcd0db53a0266c1c8c3d4f9fb41bb3cc5cd6dbe1cd3e",
+    "priorReceiptWorkingBytesSha256": "11098052bff0c8d9763b26dec6f90b7177ab956b0a0c6cdb114b5c40df17acb2",
+    "priorReceiptGitContentSha256": "fa3a1827e0bdb3288479c61d25fb84704a241a3ea9d73e3c3725832be3a65315",
+    "priorReceiptGitNormalizedContentUnchanged": true
+  },
+  "instrumentedOriginalPolling": {
+    "exitCode": 0,
+    "seconds": 11.811999999976251,
+    "error": "Did not witness detached input path",
+    "originalPolling": true,
+    "custodyUnchanged": true,
+    "exeSha256": "02a6a5882298dd5390691459de514fbe5110b2f68203d216aead27aef9b5049a",
+    "isolatedFixtureFiles": [
+      "manifest.json"
+    ],
+    "screenshotsAttempted": false,
+    "evidenceClass": "isolated muted Debug native HWND cancellation and actual RT return; no physical input acceptance",
+    "harnessForegroundRequestAttempted": false,
+    "nativeActivationPolicy": "native startup activation requested; return unrecorded; old no-request field describes harness only",
+    "events": [
+      {
+        "clicked": 208
+      },
+      {
+        "clicked": 119
+      },
+      {
+        "clicked": 231
+      },
+      {
+        "clicked": 232
+      },
+      {
+        "observedContextNull": true
+      }
+    ],
+    "rawResultSha256": "d3991e15f63e2906c22d3b284a8482eb7ab80b965679387303f91b21f2773315",
+    "rawStderrSha256": "7d6db4b5a3dcb92184d26b36bc665182d831210dd0549627465217147f24a680",
+    "stages": [
+      "HORDE_OPENING_BENCHMARK entry-retired=1 successorAdmitted=1",
+      "HORDE_OPENING_MENU_STAGE escape-delivery context-attached=1 phase=2",
+      "HORDE_OPENING_BENCHMARK entry-presented campaignAttached=1"
+    ],
+    "lifecycle": {
+      "requestedProfile": "custom",
+      "classification": "custom-unranked",
+      "ranked": false,
+      "actualApplyAcknowledged": false,
+      "actualRestorationAcknowledged": false,
+      "cancelRequested": true,
+      "measurementAndRestorationPassed": false,
+      "settingsWritesPermitted": false,
+      "campaignAttached": false,
+      "confirmedTupleUnchanged": true,
+      "error": "Original state is pending, cancelled, or compiled optics do not support the provisional profile."
+    }
+  },
+  "deterministicNativeWitness": {
+    "exitCode": 0,
+    "seconds": 10.34299999999348,
+    "error": null,
+    "originalPolling": false,
+    "custodyUnchanged": true,
+    "exeSha256": "619c571ad993a13e577c762f7ee9e2a12170854f8cb1e009e0732f932ac40646",
+    "isolatedFixtureFiles": [
+      "manifest.json"
+    ],
+    "screenshotsAttempted": false,
+    "evidenceClass": "isolated muted Debug native HWND cancellation and actual RT return; no physical input acceptance",
+    "harnessForegroundRequestAttempted": false,
+    "nativeActivationPolicy": "suppressed, including update and error dialogs",
+    "events": [
+      {
+        "clicked": 208
+      },
+      {
+        "clicked": 119
+      },
+      {
+        "clicked": 231
+      },
+      {
+        "clicked": 232
+      },
+      {
+        "restored": true,
+        "resultCaption": "BENCHMARK CANCELLED"
+      }
+    ],
+    "rawResultSha256": "c6ce0e1578d31f764f96795c543d6836c1fda0c0f8c22ff62a6bda2eed7aad4a",
+    "rawStderrSha256": "69f4415fff12615f129f47a4b153343358a7f8dcba3d4985e6387373bdf449f6",
+    "stages": [
+      "HORDE_OPENING_MENU_STAGE isolated-window no-activate",
+      "HORDE_OPENING_MENU_STAGE detached-inject context-null=1 phase=queued pending-before=0",
+      "HORDE_OPENING_MENU_STAGE escape-delivery context-attached=0 phase=1",
+      "HORDE_OPENING_MENU_STAGE detached-cancel",
+      "HORDE_OPENING_MENU_STAGE detached-inject-result pending-after=1",
+      "HORDE_OPENING_BENCHMARK entry-retired=1 successorAdmitted=1",
+      "HORDE_OPENING_BENCHMARK entry-presented campaignAttached=1"
+    ],
+    "lifecycle": {
+      "requestedProfile": "custom",
+      "classification": "custom-unranked",
+      "ranked": false,
+      "actualApplyAcknowledged": false,
+      "actualRestorationAcknowledged": false,
+      "cancelRequested": true,
+      "measurementAndRestorationPassed": false,
+      "settingsWritesPermitted": false,
+      "campaignAttached": false,
+      "confirmedTupleUnchanged": true,
+      "error": "Original state is pending, cancelled, or compiled optics do not support the provisional profile."
+    }
+  },
+  "initialDeterministicWitness": {
+    "exitCode": 0,
+    "seconds": 8.25,
+    "error": null,
+    "originalPolling": false,
+    "custodyUnchanged": true,
+    "exeSha256": "02a6a5882298dd5390691459de514fbe5110b2f68203d216aead27aef9b5049a",
+    "isolatedFixtureFiles": [
+      "manifest.json"
+    ],
+    "screenshotsAttempted": false,
+    "evidenceClass": "isolated muted Debug native HWND cancellation and actual RT return; no physical input acceptance",
+    "harnessForegroundRequestAttempted": false,
+    "nativeActivationPolicy": "native startup activation requested; return unrecorded; old no-request field describes harness only",
+    "events": [
+      {
+        "clicked": 208
+      },
+      {
+        "clicked": 119
+      },
+      {
+        "clicked": 231
+      },
+      {
+        "clicked": 232
+      },
+      {
+        "restored": true,
+        "resultCaption": "BENCHMARK CANCELLED"
+      }
+    ],
+    "rawResultSha256": "755b1cbec179753a2b534e77cb94c8c22e42dce9988205b02f4129392dd0a1f4",
+    "rawStderrSha256": "5cea9765d92d425869958ea38ba6d7a80d44935bc000197c905916d7df7a7b0b",
+    "stages": [
+      "HORDE_OPENING_MENU_STAGE detached-inject context-null=1 phase=queued pending-before=0",
+      "HORDE_OPENING_MENU_STAGE escape-delivery context-attached=0 phase=1",
+      "HORDE_OPENING_MENU_STAGE detached-cancel",
+      "HORDE_OPENING_MENU_STAGE detached-inject-result pending-after=1",
+      "HORDE_OPENING_BENCHMARK entry-retired=1 successorAdmitted=1",
+      "HORDE_OPENING_BENCHMARK entry-presented campaignAttached=1"
+    ],
+    "lifecycle": {
+      "requestedProfile": "custom",
+      "classification": "custom-unranked",
+      "ranked": false,
+      "actualApplyAcknowledged": false,
+      "actualRestorationAcknowledged": false,
+      "cancelRequested": true,
+      "measurementAndRestorationPassed": false,
+      "settingsWritesPermitted": false,
+      "campaignAttached": false,
+      "confirmedTupleUnchanged": true,
+      "error": "Original state is pending, cancelled, or compiled optics do not support the provisional profile."
+    }
+  },
+  "intermediateWitnesses": {
+    "deterministic-detached-exit-checked": {
+      "exitCode": 0,
+      "seconds": 9.047000000020489,
+      "error": null,
+      "custodyUnchanged": true,
+      "exeSha256": "02a6a5882298dd5390691459de514fbe5110b2f68203d216aead27aef9b5049a"
+    },
+    "detached-noactivate-final": {
+      "exitCode": 0,
+      "seconds": 10.875,
+      "error": null,
+      "custodyUnchanged": true,
+      "exeSha256": "6c88ccad86fbd66e8625322db42ee698a81fafffcf8017ca0521c05bcd1f57ed"
+    }
+  },
+  "reviewCorrections": [
+    "Require native exit code zero after result retention.",
+    "Isolated startup skips native focus/foreground requests and automatic update prompts; modal errors are logged.",
+    "Historical no-request fields apply only to harness calls; native startup outcomes were unrecorded."
+  ],
+  "startupGuards": {
+    "guards": [
+      {
+        "name": "isolated-mode-required",
+        "exitCode": 2,
+        "stderr": "Detached benchmark input validation requires isolated --benchmark-menu-validate.",
+        "exeSha256": "619c571ad993a13e577c762f7ee9e2a12170854f8cb1e009e0732f932ac40646"
+      },
+      {
+        "name": "release-rejects-validation",
+        "exitCode": 2,
+        "stderr": "Hidden campaign validation is Debug-only.",
+        "exeSha256": "5589fdee0e1d5d04d742de14ccacca6f778225fb2632b2f3f7234dd7611796e5"
+      }
+    ],
+    "settingsUnchanged": true
+  },
+  "baseCheckpointCi": {
+    "runId": 40022045914,
+    "headSha": "67c31888fd5d9b467806181bbd148b385ecc9ba8",
+    "status": "completed",
+    "conclusion": "success",
+    "attempt": 1,
+    "updatedAt": "2026-10-23T21:01:36Z",
+    "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/40022045914",
+    "jobs": [
+      {
+        "id": 120648769380,
+        "name": "Shared simulation host (GCC)",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-10-23T20:48:29Z",
+        "completedAt": "2026-10-23T20:58:51Z",
+        "durationSeconds": 622.0,
+        "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/40022045914/job/120648769380",
+        "activeSteps": [],
+        "failedSteps": []
+      },
+      {
+        "id": 120648769532,
+        "name": "Shared simulation host (MSVC)",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-10-23T20:48:28Z",
+        "completedAt": "2026-10-23T21:01:35Z",
+        "durationSeconds": 787.0,
+        "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/40022045914/job/120648769532",
+        "activeSteps": [],
+        "failedSteps": []
+      },
+      {
+        "id": 120648769641,
+        "name": "Android Debug build, playback/report contracts and lint",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-10-23T20:48:29Z",
+        "completedAt": "2026-10-23T20:55:22Z",
+        "durationSeconds": 413.0,
+        "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/40022045914/job/120648769641",
+        "activeSteps": [],
+        "failedSteps": []
+      },
+      {
+        "id": 120648769721,
+        "name": "player-vulkan-host",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-10-23T20:48:28Z",
+        "completedAt": "2026-10-23T20:55:57Z",
+        "durationSeconds": 449.0,
+        "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/40022045914/job/120648769721",
+        "activeSteps": [],
+        "failedSteps": []
+      },
+      {
+        "id": 120648769952,
+        "name": "Selected host contracts (Clang ASan/UBSan)",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-10-23T20:48:28Z",
+        "completedAt": "2026-10-23T20:53:03Z",
+        "durationSeconds": 275.0,
+        "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/40022045914/job/120648769952",
+        "activeSteps": [],
+        "failedSteps": []
+      },
+      {
+        "id": 120648770013,
+        "name": "Shared simulation host (Clang)",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-10-23T20:48:29Z",
+        "completedAt": "2026-10-23T20:56:06Z",
+        "durationSeconds": 457.0,
+        "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/40022045914/job/120648770013",
+        "activeSteps": [],
+        "failedSteps": []
+      }
+    ]
+  },
+  "remainingAcceptance": [
+    "visible Windows layout and DPI",
+    "physical/controller interaction",
+    "Entry/Showcase transition listening",
+    "other close/error boundaries and ownership phases",
+    "final Release interaction",
+    "Android fixed-output benchmark acceptance"
+  ],
+  "phoneOperations": 0,
+  "torchRuntimeEdits": false,
+  "reportTransmission": false,
+  "mergeOrRelease": false,
+  "parkedOwnerFilesExcluded": 151,
+  "audioHapticManualRevalidationRequired": true
+}
