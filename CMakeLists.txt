@@ -671,8 +671,7 @@ if(BUILD_TESTING)
 
     add_executable(horde_rt_pipeline_variant_provider_tests
         tests/RtPipelineVariantProviderTests.cpp
-        src/vulkan/raytracing/RtPipelineVariants.cpp
-        src/vulkan/raytracing/RtPipelineVariantProvider.cpp)
+        src/vulkan/raytracing/RtPipelineVariants.cpp)
     target_include_directories(horde_rt_pipeline_variant_provider_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     target_compile_definitions(horde_rt_pipeline_variant_provider_tests PRIVATE
         HORDE_RT_SELECTED_INSTRUMENTATION=0 HORDE_RT_SELECTED_DIELECTRIC_QUALITY=0)
@@ -682,8 +681,7 @@ if(BUILD_TESTING)
     add_executable(horde_rt_pipeline_bundle_contracts_tests
         tests/RtPipelineBundleContractsTests.cpp
         src/vulkan/raytracing/RtPipelineBundleContracts.cpp
-        src/vulkan/raytracing/RtPipelineVariants.cpp
-        src/vulkan/raytracing/RtPipelineVariantProvider.cpp)
+        src/vulkan/raytracing/RtPipelineVariants.cpp)
     target_include_directories(horde_rt_pipeline_bundle_contracts_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     target_compile_definitions(horde_rt_pipeline_bundle_contracts_tests PRIVATE
         HORDE_RT_SELECTED_INSTRUMENTATION=0 HORDE_RT_SELECTED_DIELECTRIC_QUALITY=0)
@@ -773,6 +771,14 @@ if(BUILD_TESTING)
         ${diagnostic_high_opaque_hash}
         ${diagnostic_high_generic_hash}
         diagnostic_high_opaque_fast)
+
+    # These consumers use the same Shipping/Mobile policy as the existing
+    # fixture object. Reuse that compile; each other policy still has its own
+    # compiler-produced object and independent containment evidence.
+    target_sources(horde_rt_pipeline_variant_provider_tests PRIVATE
+        $<TARGET_OBJECTS:horde_rtpv_0_0_obj>)
+    target_sources(horde_rt_pipeline_bundle_contracts_tests PRIVATE
+        $<TARGET_OBJECTS:horde_rtpv_0_0_obj>)
 
     add_executable(horde_rt_github_release_updater_tests
         tests/GitHubReleaseUpdaterTests.cpp

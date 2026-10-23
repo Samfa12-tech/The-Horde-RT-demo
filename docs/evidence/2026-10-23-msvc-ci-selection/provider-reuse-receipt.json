@@ -1,0 +1,212 @@
+{
+  "baseCommit": "719b86aabd52cc024d74e92629b5de84c8d47136",
+  "sourceCmakeGitBlob": "11020d32329ad1ae5238de3f5593d5da56553a68",
+  "profile": {
+    "generator": "Visual Studio 17 2022",
+    "architecture": "x64",
+    "configuration": "Release",
+    "vulkanTargets": false,
+    "parallel": 2
+  },
+  "observations": {
+    "control-configure": {
+      "phase": "control-configure",
+      "exitCode": 0,
+      "elapsedSeconds": 18.8022728,
+      "head": "719b86aabd52cc024d74e92629b5de84c8d47136"
+    },
+    "candidate-configure": {
+      "phase": "candidate-configure",
+      "exitCode": 0,
+      "elapsedSeconds": 19.2114645,
+      "head": "719b86aabd52cc024d74e92629b5de84c8d47136",
+      "ownedChange": "reuse existing Shipping/Mobile object for two native test consumers"
+    },
+    "control-build": {
+      "phase": "control-build",
+      "exitCode": 0,
+      "elapsedSeconds": 25.3754466,
+      "configuration": "Release",
+      "parallel": 2,
+      "head": "719b86aabd52cc024d74e92629b5de84c8d47136"
+    },
+    "candidate-build": {
+      "phase": "candidate-build",
+      "exitCode": 0,
+      "elapsedSeconds": 23.9921676,
+      "configuration": "Release",
+      "parallel": 2,
+      "head": "719b86aabd52cc024d74e92629b5de84c8d47136",
+      "sourceCmakeSha256": "d502000fb6cab6148c6177d021a39f1ce07dbf33b1e026015be8030a80749f07"
+    },
+    "control-tests": {
+      "phase": "control-tests",
+      "exitCode": 0,
+      "elapsedSeconds": 122.6191332
+    },
+    "candidate-tests": {
+      "phase": "candidate-tests",
+      "exitCode": 0,
+      "elapsedSeconds": 131.7682598
+    }
+  },
+  "equivalence": {
+    "registeredTests": 185,
+    "testCommandsAndPropertiesUnchanged": true,
+    "compileFlagsEquivalentAllConfigurations": true,
+    "actualReleaseCompileCommandsEquivalentExceptOutputs": true,
+    "controlProviderCompiles": 6,
+    "candidateProviderCompiles": 4,
+    "bothConsumersHaveOneObjectAndDependency": true,
+    "nonMetadataCoffSectionPayloadsEquivalent": true,
+    "metadataDifferences": {
+      "control/horde_rt_pipeline_variant_provider_tests": [
+        ".debug$S",
+        ".chks64"
+      ],
+      "control/horde_rt_pipeline_bundle_contracts_tests": [
+        ".debug$S",
+        ".chks64"
+      ],
+      "control/horde_rtpv_0_0_obj": [],
+      "candidate/horde_rtpv_0_0_obj": [
+        ".debug$S",
+        ".chks64"
+      ]
+    },
+    "objects": [
+      {
+        "phase": "control",
+        "target": "horde_rt_pipeline_variant_provider_tests",
+        "bytes": 1623162,
+        "sha256": "c913c7ecd5ab6353fce564fa6f9c2e399f537483218ec19cd4fd471cc1370585"
+      },
+      {
+        "phase": "control",
+        "target": "horde_rt_pipeline_bundle_contracts_tests",
+        "bytes": 1623162,
+        "sha256": "6f5074fd0c93a2179418f7c566248cac995b2bee95335afe523f410f1d64d7bf"
+      },
+      {
+        "phase": "control",
+        "target": "horde_rtpv_0_0_obj",
+        "bytes": 1623142,
+        "sha256": "862c44c77714e8b72a10c646026eb0fcb0e5d0fc22818af31b96d41738c6c719"
+      },
+      {
+        "phase": "candidate",
+        "target": "horde_rtpv_0_0_obj",
+        "bytes": 1623142,
+        "sha256": "b4f1c98c76433c456273b125f76e96d0271bbd3b4b7f00091759c1f957cdf2c3"
+      }
+    ]
+  },
+  "policyFence": {
+    "passed": true,
+    "seconds": 50.38,
+    "existingTimeoutSeconds": 300
+  },
+  "windowsSelection": {
+    "registered": 185,
+    "selected": 149,
+    "portableExcluded": 21,
+    "toolExcluded": 15,
+    "unchanged": true
+  },
+  "wholeJobCapChanged": false,
+  "perTestDeadlinesChanged": false,
+  "coverageRemoved": false,
+  "gameOrPhonePerformanceClaim": false,
+  "rawEvidence": [
+    {
+      "path": "reports/msvc-ci-dedup-20261023/control-configure.json",
+      "bytes": 144,
+      "sha256": "7837533f24d4b5816977abe166f56cfa266d7fe028d1bcd9492991b0b280b66b"
+    },
+    {
+      "path": "reports/msvc-ci-dedup-20261023/candidate-configure.json",
+      "bytes": 235,
+      "sha256": "73a2fb8b509e67457fe507919bdc3a4803ce009dde88d7141160255c2752c501"
+    },
+    {
+      "path": "reports/msvc-ci-dedup-20261023/control-build.json",
+      "bytes": 189,
+      "sha256": "7a37f59d8085262ae240b2d01e4d4ffc2f46b521040ef92073d7c5f266e350a0"
+    },
+    {
+      "path": "reports/msvc-ci-dedup-20261023/candidate-build.json",
+      "bytes": 283,
+      "sha256": "96479139b8199a29abdf5684cc4b8988a15fa39c191460fcecaabedbdb3ded46"
+    },
+    {
+      "path": "reports/msvc-ci-dedup-20261023/control-tests.json",
+      "bytes": 86,
+      "sha256": "1fc00358692dda7a9e50106e873918b9eda2f9882393482f334c3e0d25c22f31"
+    },
+    {
+      "path": "reports/msvc-ci-dedup-20261023/candidate-tests.json",
+      "bytes": 88,
+      "sha256": "6ef538710407d8284c0b022dd8a3d1c86e2105de03ecacc1f7c8168f49f3fffd"
+    },
+    {
+      "path": "reports/msvc-ci-dedup-20261023/control-build.log",
+      "bytes": 4728,
+      "sha256": "9ae14522f41e0a82d89f0fbc4db188a975a90ab87c39ed657f55cd46cf355e63"
+    },
+    {
+      "path": "reports/msvc-ci-dedup-20261023/candidate-build.log",
+      "bytes": 5116,
+      "sha256": "e8899a3e9eb83f76b2e4c17d7822cb4437d3387ee2f8ea013543c40cd543e30f"
+    },
+    {
+      "path": "reports/msvc-ci-dedup-20261023/control-tests.log",
+      "bytes": 1971,
+      "sha256": "c7babd768c8c145fb72b5692a687ee678aff097d7cbe754e3eff5b5b40ed6ef9"
+    },
+    {
+      "path": "reports/msvc-ci-dedup-20261023/candidate-tests.log",
+      "bytes": 1975,
+      "sha256": "6cf227a645c851ff7d6959742b501f2f51219f4bb681df0515d1085d5f7f5400"
+    },
+    {
+      "path": "reports/msvc-ci-dedup-20261023/policy-fence.log",
+      "bytes": 531,
+      "sha256": "2465e51b1061882fc50d16901bd670a49d65184ca74308840ed4dc60de8108f6"
+    },
+    {
+      "path": "reports/msvc-ci-dedup-20261023/control-snapshot.json",
+      "bytes": 94460,
+      "sha256": "d6e7e7419bb08442e1b4697c9c928d54e872d6b063e3ccc980caee8d3a34b7ce"
+    },
+    {
+      "path": "reports/msvc-ci-dedup-20261023/candidate-snapshot.json",
+      "bytes": 93578,
+      "sha256": "71e00d09605655278807c1d06f03bdba02610e738e305ac1b788f3444ddcca51"
+    },
+    {
+      "path": "reports/msvc-ci-dedup-20261023/graph-equivalence-initial-failure.log",
+      "bytes": 419,
+      "sha256": "39e57231230fc82b8a6f6b4f99d9e4b4f543365a436aa16ceba7b86e5d8c8d93"
+    },
+    {
+      "path": "reports/msvc-ci-dedup-20261023/graph-equivalence.json",
+      "bytes": 14658,
+      "sha256": "25fc797c4722d098672daec0e7a7f9816bdf821f7df706385975a814c56679eb"
+    },
+    {
+      "path": "reports/msvc-ci-dedup-20261023/windows-selection.json",
+      "bytes": 8655,
+      "sha256": "b95e8b209cbd6f10e9fd629189d25ba6600e1d7079bca701cca007ebe450e1d3"
+    },
+    {
+      "path": "reports/msvc-ci-dedup-20261023/snapshot.py",
+      "bytes": 2622,
+      "sha256": "678982e1b245d9a6ced8871f9494c58394efe0b346000e075fc25cdffb4faa8b"
+    },
+    {
+      "path": "reports/msvc-ci-dedup-20261023/compare.py",
+      "bytes": 4507,
+      "sha256": "cd1e892476ef9912966441309ce85fc19405f6f1c3217007bd33d9b005c08021"
+    }
+  ]
+}
