@@ -1,5 +1,16 @@
 # KIT ANIMATION PLAN 1 7 — WP0 custody and reconciliation
 
+## Current turn/departure reproduction - 23 October 2026
+
+The [bounded fresh native RT sequence](evidence/2026-10-23-kit-turn-departure/README.md)
+retains the accepted waypoint correction and adds a real tether-wait/departure
+witness with proof kept true. At 0.60 m of resumed travel, Kit still faces 109
+degrees away from travel. Stationary turns still swivel without a turn-contact
+clip. All 30 older images remain byte-identical; no production motion patch is
+admitted. Same-rig authored turn/contact and directional departure requirements
+are recorded. Yaw easing alone does not close either gap; motor cadence, dialogue,
+saves, contact policy and original meshes remain unchanged.
+
 ## Stationary turn experiment unadmitted - 20 October 2026
 
 The [measured turn trial](evidence/2026-10-20-kit-turn/README.md) demonstrated

@@ -77,7 +77,8 @@ bool HiddenLookoutFilesAllowed(const std::filesystem::path& directory,bool after
             bool allowed=false;
             for(const char* step:{"start-0","start-1","start-4","start-8","walk-20","walk-35","walk-50","walk-65","walk-80","walk-100",
                 "stop-0","stop-1","stop-4","stop-8","stop-11","turn-0","turn-10","turn-20","turn-30","turn-40",
-                "turn-60","turn-80","turn-100","waypoint-before","waypoint-tick","waypoint-after"})
+                "turn-60","turn-80","turn-100","depart-0","depart-1","depart-4","depart-8","depart-20","depart-40","depart-60","depart-80",
+                "waypoint-before","waypoint-tick","waypoint-after"})
                 allowed|=name==std::string("windows-kit-motion-")+step+".png";
             if(allowed)continue;
         }
@@ -323,6 +324,25 @@ int RunHiddenLookoutValidation(VulkanSurfaceContext& ctx,horde::vulkan::DeviceCa
             if(name)proceed=capture(name);
         }
         if(proceed && !gLookoutInspectKitTiming) {
+            // Establish the real tether-wait branch before resuming the same
+            // supported route. Proof remains true across wait and departure;
+            // the earlier pose-inspection proof toggles are not this witness.
+            // Never teleport, modify the motor, or change the timing cohort.
+            for(unsigned tick=0;tick<100 && proceed;++tick) {
+                const auto before=route.State();
+                route.Step(1.f/60,before.x-7,before.z,true,true,false,terrain.get(),true);
+                proceed=check(route.State().wait==dialogue::CompanionWait::PlayerLagging &&
+                    !route.State().walking && route.State().grounded && route.State().x==before.x && route.State().z==before.z,
+                    "tether wait retains proof and grounded root before departure inspection");
+            }
+            if(proceed)proceed=capture("depart-0");
+            for(unsigned tick=1;tick<=80 && proceed;++tick) {
+                const auto before=route.State();
+                route.Step(1.f/60,before.x-3,before.z,true,true,false,terrain.get(),true);
+                const char* name=tick==1?"depart-1":tick==4?"depart-4":tick==8?"depart-8":
+                    tick==20?"depart-20":tick==40?"depart-40":tick==60?"depart-60":tick==80?"depart-80":nullptr;
+                if(name)proceed=capture(name);
+            }
             // A player on Kit's +X side stays within the accepted tether. At
             // the first waypoint, retain the last movement, bookkeeping-only
             // tick and next movement separately; never seed a completion flag.
