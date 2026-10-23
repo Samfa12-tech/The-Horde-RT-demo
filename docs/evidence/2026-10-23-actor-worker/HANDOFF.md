@@ -1,5 +1,12 @@
 # Local checkpoint handoff
 
+**Later approval resolution:** the owner authorized backup through9bd46a8f and
+normal existing Gradle-cache access. Both GitHub branch and PR 27 confirm that
+head; the offline CMake/Gradle policy script passes in261.16 seconds. Original
+denials below remain historical evidence. See the canonical checklist and newer
+forest-view receipt for current local work; Android compilation/device profiling
+remain separate. No push of the later view checkpoint is implied.
+
 Source checkpoint `5b6a014b13333e8a2f4f29d31836a5161583da02` contains the tested,
 default-OFF actor worker. `7420ec45` contains the separate stage-probe configuration
 and analyzers. `be89bfe3` / `e2e93858` reconcile release scope and actual forest

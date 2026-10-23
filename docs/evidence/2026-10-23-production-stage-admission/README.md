@@ -1,5 +1,12 @@
 # Production-bank GPU stage probe admission
 
+**Approved retry completed:** after the owner explicitly authorized normal
+existing-cache access, the unchanged offline CMake/Gradle policy script passes
+in 261.16 seconds. [Receipt](owner-approved-retry.json) and
+[output](owner-approved-policy-check.txt). The earlier denials below are retained
+history, not a current configuration blocker. Android APK compilation and actual
+device stage collection remain unperformed at this checkpoint.
+
 23 October 2026. Configuration/analyzer prerequisite only; **no new GPU-stage
 profile, Android compilation or device success is claimed**.
 
@@ -34,14 +41,14 @@ missing/unavailable/error values reject. A new query-test assertion disallows
   relabelled as a fresh profile.
 - Existing native CMake policy fixtures pass with the authorized local temp path.
   The first sandbox-temp compiler failure is retained as an environment result.
-- **Gradle policy cases remain blocked before configuration.** Its wrapper cannot
+- **The initial Gradle attempt was blocked before configuration.** Its wrapper could not
   open the existing normal cache lock at
   `C:\Users\sam_s\.gradle\wrapper\dists\gradle-8.11.1-all\2qik7nd48slq1ooc2496ixf4i\gradle-8.11.1-all.zip.lck`
   (`java.io.FileNotFoundException: Access is denied`). This is a filesystem denial,
-  not a stage-policy rejection or automatic approval review. No retry/alternate
-  cache/security change occurred. Actual Gradle positives/negatives and Android
-  compilation are unverified; permission for normal existing-cache access is the
-  next required action.
+  not a stage-policy rejection or automatic approval review. No alternate cache
+  or security change occurred. After explicit owner approval, the unchanged
+  configuration positives/negatives pass using that existing cache; see the
+  follow-up receipt above. Android compilation remains unverified.
 
 Exact commands and retained excerpts are in local ignored
 `reports/production-stage-admission-20261023/receipt.json`; excerpts are labelled
@@ -49,7 +56,7 @@ where full logs survive only in completed tool output. No device operation,
 installation or trace was performed. RT timers are execution intervals with
 dependencies, not additive hardware counters or scanout FPS.
 
-After cache access is resolved, run the configuration cases and build the actual
-production-bank probe before proposing one fixed-resolution phone hold. Preserve
+The configuration cases now pass. Build the actual production-bank probe before
+proposing one fixed-resolution phone hold. Preserve
 installed APKs, saves/settings, workload and natural thermal context. Do not loop
 on cooling, use a mismatched APK as causal control, or expand tracing permission.
