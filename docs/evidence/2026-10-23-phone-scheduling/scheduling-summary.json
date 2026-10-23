@@ -1,0 +1,302 @@
+{
+  "schema": 1,
+  "scope": "Actual scheduling events for the traced post-warm30s stationary normal-cache hold; qualitative current-build attribution, not an admitted overhead/performance comparison.",
+  "pid": 13361,
+  "renderOwnerTid": 13775,
+  "renderOwnerIdentityEvidence": "10-23 18:02:46.203 13361 13775 I HordeRtProbeBridge: HORDE_MOTION armed id=stdin23-traced33",
+  "clockOffsetBoottimeMinusMonotonicNs": 308025711123551,
+  "clockSnapshots": [
+    {
+      "ts": "729831608953160",
+      "clock_value": "421805897829609",
+      "offset_ns": "308025711123551"
+    },
+    {
+      "ts": "729831608988160",
+      "clock_value": "421805897864609",
+      "offset_ns": "308025711123551"
+    }
+  ],
+  "traceSampleStartNs": 729844455365711,
+  "traceSampleEndNs": 729874455365711,
+  "sampleDurationNs": 30000000000,
+  "fullTraceBounds": [
+    {
+      "start_ts": "729831645563316",
+      "end_ts": "729881608903401"
+    }
+  ],
+  "threadOnCore": [
+    {
+      "tid": "13775",
+      "name": "lanternrt.debug",
+      "oncore_ns": "8226176618",
+      "slices": "1354",
+      "percentOf30SecondWindow": 27.42058872666667
+    },
+    {
+      "tid": "13417",
+      "name": "HordeMusicPCM",
+      "oncore_ns": "274247781",
+      "slices": "6443",
+      "percentOf30SecondWindow": 0.91415927
+    },
+    {
+      "tid": "13414",
+      "name": "HordeAmbiencePC",
+      "oncore_ns": "243648899",
+      "slices": "6308",
+      "percentOf30SecondWindow": 0.8121629966666667
+    },
+    {
+      "tid": "13361",
+      "name": "lanternrt.debug",
+      "oncore_ns": "203133398",
+      "slices": "652",
+      "percentOf30SecondWindow": 0.6771113266666666
+    },
+    {
+      "tid": "13394",
+      "name": "binder:13361_1",
+      "oncore_ns": "26062952",
+      "slices": "442",
+      "percentOf30SecondWindow": 0.08687650666666666
+    },
+    {
+      "tid": "13395",
+      "name": "binder:13361_2",
+      "oncore_ns": "22588546",
+      "slices": "390",
+      "percentOf30SecondWindow": 0.07529515333333334
+    },
+    {
+      "tid": "13625",
+      "name": "binder:13361_1",
+      "oncore_ns": "16349901",
+      "slices": "1107",
+      "percentOf30SecondWindow": 0.05449967
+    },
+    {
+      "tid": "13405",
+      "name": "RenderThread",
+      "oncore_ns": "9223909",
+      "slices": "171",
+      "percentOf30SecondWindow": 0.030746363333333332
+    },
+    {
+      "tid": "13384",
+      "name": "Jit thread pool",
+      "oncore_ns": "2549739",
+      "slices": "5",
+      "percentOf30SecondWindow": 0.008499129999999999
+    },
+    {
+      "tid": "13540",
+      "name": "binder:13361_5",
+      "oncore_ns": "29375",
+      "slices": "1",
+      "percentOf30SecondWindow": 9.791666666666667e-05
+    }
+  ],
+  "renderOwnerStates": [
+    {
+      "state": "S",
+      "spans": "544",
+      "duration_ns": "21650147222",
+      "percentOf30SecondWindow": 72.16715740666668
+    },
+    {
+      "state": "Running",
+      "spans": "1354",
+      "duration_ns": "8226176618",
+      "percentOf30SecondWindow": 27.42058872666667
+    },
+    {
+      "state": "R",
+      "spans": "1330",
+      "duration_ns": "86565113",
+      "percentOf30SecondWindow": 0.28855037666666666
+    },
+    {
+      "state": "D",
+      "spans": "552",
+      "duration_ns": "34766670",
+      "percentOf30SecondWindow": 0.1158889
+    },
+    {
+      "state": "R+",
+      "spans": "24",
+      "duration_ns": "2344377",
+      "percentOf30SecondWindow": 0.00781459
+    }
+  ],
+  "renderOwnerStateCoverageNs": 30000000000,
+  "renderOwnerOnCoreByCpu": [
+    {
+      "cpu": "0",
+      "oncore_ns": "153703491",
+      "slices": "76",
+      "percentOf30SecondWindow": 0.51234497
+    },
+    {
+      "cpu": "1",
+      "oncore_ns": "1552801872",
+      "slices": "310",
+      "percentOf30SecondWindow": 5.17600624
+    },
+    {
+      "cpu": "2",
+      "oncore_ns": "23664217",
+      "slices": "7",
+      "percentOf30SecondWindow": 0.07888072333333333
+    },
+    {
+      "cpu": "3",
+      "oncore_ns": "37663854",
+      "slices": "6",
+      "percentOf30SecondWindow": 0.12554618
+    },
+    {
+      "cpu": "4",
+      "oncore_ns": "3352452031",
+      "slices": "483",
+      "percentOf30SecondWindow": 11.174840103333333
+    },
+    {
+      "cpu": "5",
+      "oncore_ns": "3101848600",
+      "slices": "469",
+      "percentOf30SecondWindow": 10.339495333333334
+    },
+    {
+      "cpu": "6",
+      "oncore_ns": "4042553",
+      "slices": "3",
+      "percentOf30SecondWindow": 0.013475176666666666
+    }
+  ],
+  "allProcessNonidleByCpu": [
+    {
+      "cpu": "0",
+      "nonidle_ns": "5098733676",
+      "observed_ns": "30000000000",
+      "percentOf30SecondWindow": 16.99577892
+    },
+    {
+      "cpu": "1",
+      "nonidle_ns": "3580672417",
+      "observed_ns": "30000000000",
+      "percentOf30SecondWindow": 11.935574723333334
+    },
+    {
+      "cpu": "2",
+      "nonidle_ns": "49694836",
+      "observed_ns": "30000000000",
+      "percentOf30SecondWindow": 0.16564945333333334
+    },
+    {
+      "cpu": "3",
+      "nonidle_ns": "83422746",
+      "observed_ns": "30000000000",
+      "percentOf30SecondWindow": 0.27807582
+    },
+    {
+      "cpu": "4",
+      "nonidle_ns": "4895561224",
+      "observed_ns": "30000000000",
+      "percentOf30SecondWindow": 16.318537413333335
+    },
+    {
+      "cpu": "5",
+      "nonidle_ns": "4436033377",
+      "observed_ns": "30000000000",
+      "percentOf30SecondWindow": 14.786777923333332
+    },
+    {
+      "cpu": "6",
+      "nonidle_ns": "23962137",
+      "observed_ns": "30000000000",
+      "percentOf30SecondWindow": 0.07987379
+    },
+    {
+      "cpu": "7",
+      "nonidle_ns": "260000",
+      "observed_ns": "30000000000",
+      "percentOf30SecondWindow": 0.0008666666666666666
+    }
+  ],
+  "cpuFrequencyRawRanges": [
+    {
+      "cpu": "0",
+      "minimum_raw": "787200.000000",
+      "maximum_raw": "3628800.000000",
+      "intervals": "2740"
+    },
+    {
+      "cpu": "1",
+      "minimum_raw": "787200.000000",
+      "maximum_raw": "3628800.000000",
+      "intervals": "2740"
+    },
+    {
+      "cpu": "2",
+      "minimum_raw": "787200.000000",
+      "maximum_raw": "3628800.000000",
+      "intervals": "2740"
+    },
+    {
+      "cpu": "3",
+      "minimum_raw": "787200.000000",
+      "maximum_raw": "3628800.000000",
+      "intervals": "2740"
+    },
+    {
+      "cpu": "4",
+      "minimum_raw": "787200.000000",
+      "maximum_raw": "3628800.000000",
+      "intervals": "2740"
+    },
+    {
+      "cpu": "5",
+      "minimum_raw": "787200.000000",
+      "maximum_raw": "3628800.000000",
+      "intervals": "2740"
+    },
+    {
+      "cpu": "6",
+      "minimum_raw": "883200.000000",
+      "maximum_raw": "4742400.000000",
+      "intervals": "14"
+    },
+    {
+      "cpu": "7",
+      "minimum_raw": "883200.000000",
+      "maximum_raw": "4742400.000000",
+      "intervals": "14"
+    }
+  ],
+  "traceLossOrErrorStats": [],
+  "provenance": {
+    "traceSha256": "0c0ebf53a94ae82ec31076f4c5a3ed0624fc2c2e4d19d7720b95278599d430ff",
+    "rawTransportSha256": "dd7277fd269b2cb9460a8c40e542ad257d88653195cce98efcbaf2bd395f59a3",
+    "normalization": {
+      "rawSha256": "dd7277fd269b2cb9460a8c40e542ad257d88653195cce98efcbaf2bd395f59a3",
+      "rawBytes": 12246538,
+      "derivedSha256": "0c0ebf53a94ae82ec31076f4c5a3ed0624fc2c2e4d19d7720b95278599d430ff",
+      "derivedBytes": 12156241,
+      "replacedCrLfPairs": 90297,
+      "allRawLfHadCrPrefix": true,
+      "transform": "Single offline CRLF-to-LF inverse for apparent Windows adb shell stdout text conversion; raw never modified. Structural parsing still required; no device trace hash available."
+    },
+    "analyzerExeSha256": "adfa6bad3d72be3ba9b83fa2b17b69fa13b3ab1cad0f42e52b86188bd5f0f997",
+    "analysisScriptSha256": "6640cfbf8a25c28407c0d70f2a2e95d72a53197fff9406804f005ac31a58d808"
+  },
+  "limits": [
+    "Raw Windows shell stdout required a separate inverse CRLF transport normalization. Raw bytes retained; no on-device trace hash.",
+    "Closing control was thermally rejected. Observer overhead and thermal/context drift cannot be separated; this profile is qualitative.",
+    "Scheduling is actual on-core/runnable/sleeping time, not sampled stacks or exact CPU costs within animation/skin/AS phases.",
+    "No app stage markers or blocked-function call stacks; sleeping state alone does not identify Vulkan fence waits.",
+    "Frequency raw counter values and scheduling events do not establish GPU clocks, GPU stages, power or sustained acceptance.",
+    "Timed workload mutes dialogue/music and is seeded post-Keeper stationary, not ordinary full-route play."
+  ]
+}

@@ -2,6 +2,21 @@
 
 ## Latest checkpoint - 23 October resumed copy candidate and phone release
 
+**Later one-off authorized trace retry:** host-stdin delivery of the unchanged
+config collected a50-second trace using the same normal-cache APK, without the
+copy candidate. The [recovered profile](../evidence/2026-10-23-phone-scheduling/README.md)
+has a documented reversible CRLF transport correction and complete30-second
+render-owner state coverage:27.42% on-core,0.30% runnable,72.28% sleeping/D.
+Keep it qualitative: closing control fails AP/BAT/SKIN matching by1.8/2.3/1.7C;
+tracing/context effects remain unseparated. Observed GPU35.859/39.598ms and
+frame47.780/55.737ms remain useful warm evidence, not discarded or attributed
+entirely to temperature. No extra phone run begins. Future planning needs
+controlled power/brightness/settings, alternating build order and separately
+bounded sustained warm-play acceptance. Phone restored/released07:04:48UTC,
+safe to disconnect, no owned device operation remaining. Source249ec107 CI is
+cancelled: five jobs pass, MSVC cancels at the unchanged Windows cap. GPU-stage
+attribution and all prior requirements remain open.
+
 The bounded [player-template-copy candidate](../evidence/2026-10-23-player-template-copy/README.md)
 initializes immutable fields on validated load and removes one 2,195,456-byte
 per-refresh copy. Actual-pose byte/lifecycle checks, three Release contracts,

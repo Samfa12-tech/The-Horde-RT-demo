@@ -1,0 +1,759 @@
+{
+  "runtimeSource": "bceed0c16936cb40400536e1cad58b0040f131f6",
+  "repositoryHeadDuringCollection": "249ec107218ad4ab65f2a3502cfc0b0720bbd303",
+  "apkSha256": "c1d657491ef072c99a405f0f8ca5264860834057742fc214c820f53fef3fbf09",
+  "nativeSha256": "f73400d0ae4cc544b2def20c01db379632e6fadc5852e90fb0ecbf69ed9375d0",
+  "role": "Fixed existing normal-cache baseline, no player-template-copy candidate installed",
+  "model": "SM-S948B",
+  "android": 17,
+  "api": 37,
+  "authorization": "One owner-approved retry using independently existing unchanged host config via documented Perfetto -c - stdin. No denied device config path read or permission/security change.",
+  "configSha256": "f68b8e88009a8dcc5ed570ae3b94a7a5de2689393dd907e48de547cd55cd411f",
+  "configDurationMs": 50000,
+  "configBufferKiB": 65536,
+  "traceCompletion": {
+    "returncode": 0,
+    "holdReturncode": 0,
+    "error": null,
+    "hostStartUnixSeconds": 1792738962.8174722,
+    "hostEndUnixSeconds": 1792739013.2750115,
+    "traceBytes": 12246538,
+    "traceSha256": "dd7277fd269b2cb9460a8c40e542ad257d88653195cce98efcbaf2bd395f59a3",
+    "configSha256": "f68b8e88009a8dcc5ed570ae3b94a7a5de2689393dd907e48de547cd55cd411f"
+  },
+  "transport": {
+    "rawSha256": "dd7277fd269b2cb9460a8c40e542ad257d88653195cce98efcbaf2bd395f59a3",
+    "rawBytes": 12246538,
+    "derivedSha256": "0c0ebf53a94ae82ec31076f4c5a3ed0624fc2c2e4d19d7720b95278599d430ff",
+    "derivedBytes": 12156241,
+    "replacedCrLfPairs": 90297,
+    "allRawLfHadCrPrefix": true,
+    "transform": "Single offline CRLF-to-LF inverse for apparent Windows adb shell stdout text conversion; raw never modified. Structural parsing still required; no device trace hash available.",
+    "reencodeMatchesRaw": true,
+    "rootProtobufPacketCount": 1735,
+    "rootProtobufBytesFullyConsumed": true
+  },
+  "cases": {
+    "control33": {
+      "eligible": true,
+      "reportSha256": "595afec1b587e3f504d036347a65ff042317d632d0a9d6794c3ec9a757f177c7",
+      "resourcesSha256": "dd60ea81e220da4ed471bb7871a303e825431b5ca7208175925c77d166d6912b",
+      "settings": {
+        "scalePercent": 33,
+        "width": 1440,
+        "height": 2981,
+        "internalWidth": 475,
+        "internalHeight": 984,
+        "nativeWindowWidth": 2981,
+        "nativeWindowHeight": 1440,
+        "surfaceCurrentWidth": 2981,
+        "surfaceCurrentHeight": 1440,
+        "surfaceCurrentTransform": 2,
+        "swapchainPreTransform": 2,
+        "rtPreRotationRequired": true,
+        "rtPresentationTransform": 1,
+        "backend": "RayTracingPipeline",
+        "water": 1,
+        "fire": 0,
+        "cap": 30,
+        "glass": false,
+        "shadow": 1,
+        "mist": false,
+        "dust": 1
+      },
+      "pipelines": [
+        {
+          "executionMode": 0,
+          "activeKey": "shipping_mobile_opaque_fast",
+          "activeSha256": "1b026affab5bf26b44d2dab0ef10f1c17104190a5ad18d45aa2fda85dbcfdec9",
+          "opaqueSha256": "1b026affab5bf26b44d2dab0ef10f1c17104190a5ad18d45aa2fda85dbcfdec9",
+          "genericSha256": "a1edeb782800c91a58b073c1f789c2e14d68cc56cd8ff1b0b535d628d1e9ee38"
+        }
+      ],
+      "sampling": {
+        "originWallNs": 421708498038032,
+        "warmupEndWallNs": 421718498038032,
+        "sampleEndWallNs": 421748498038032,
+        "completedFramesAll": 834,
+        "completedFramesPostWarm": 620,
+        "actualSelectedFirstWallNs": 421718542497820,
+        "actualSelectedLastWallNs": 421748456954527,
+        "actualSelectedSpanSeconds": 29.914456707,
+        "warmupOrTerminalFramesExcluded": 214
+      },
+      "gpu": {
+        "scope": "completed owning GPU duration; never reciprocal FPS",
+        "availableSamples": 620,
+        "unavailableSamples": 0,
+        "statusCounts": {
+          "5": 620
+        },
+        "duration": {
+          "samples": 620,
+          "minimumMs": 34.21927,
+          "medianMs": 35.8590095,
+          "meanMs": 35.85158413709678,
+          "p95NearestRankMs": 36.765103,
+          "maximumMs": 38.012291
+        }
+      },
+      "cpu": {
+        "simulation": {
+          "samples": 620,
+          "minimumMs": 0.596823,
+          "medianMs": 1.530573,
+          "meanMs": 1.6619091983870968,
+          "p95NearestRankMs": 2.775417,
+          "maximumMs": 3.224948
+        },
+        "skin": {
+          "samples": 620,
+          "minimumMs": 3.999948,
+          "medianMs": 7.939323,
+          "meanMs": 8.321344014516129,
+          "p95NearestRankMs": 11.547604,
+          "maximumMs": 12.37026
+        },
+        "player_skin": {
+          "samples": 620,
+          "minimumMs": 1.799323,
+          "medianMs": 3.8115885,
+          "meanMs": 4.230310753225806,
+          "p95NearestRankMs": 6.726355,
+          "maximumMs": 7.312603
+        },
+        "character_skin": {
+          "samples": 620,
+          "minimumMs": 2.172709,
+          "medianMs": 3.987708,
+          "meanMs": 4.091033261290322,
+          "p95NearestRankMs": 4.994792,
+          "maximumMs": 5.860729
+        },
+        "pose_copy": {
+          "samples": 620,
+          "minimumMs": 0.295,
+          "medianMs": 0.643516,
+          "meanMs": 0.6823324822580645,
+          "p95NearestRankMs": 0.841823,
+          "maximumMs": 2.321719
+        },
+        "dynamic_upload": {
+          "samples": 620,
+          "minimumMs": 0.207863,
+          "medianMs": 0.4091405,
+          "meanMs": 0.41665703225806455,
+          "p95NearestRankMs": 0.516353,
+          "maximumMs": 1.068908
+        },
+        "fence_wait": {
+          "samples": 620,
+          "minimumMs": 34.495156,
+          "medianMs": 36.2023435,
+          "meanMs": 36.189896841935486,
+          "p95NearestRankMs": 37.115104,
+          "maximumMs": 38.404114
+        },
+        "queue_submit": {
+          "samples": 620,
+          "minimumMs": 0.096666,
+          "medianMs": 0.142031,
+          "meanMs": 0.1685498177419355,
+          "p95NearestRankMs": 0.287969,
+          "maximumMs": 0.526093
+        },
+        "whole_frame": {
+          "samples": 620,
+          "minimumMs": 40.896354,
+          "medianMs": 47.779661,
+          "meanMs": 48.27397818387097,
+          "p95NearestRankMs": 53.000781,
+          "maximumMs": 55.313854
+        }
+      },
+      "imagePresentationIntervals": {
+        "samples": 619,
+        "minimumMs": 37.499947,
+        "medianMs": 50.0,
+        "meanMs": 48.317179487883685,
+        "p95NearestRankMs": 54.166615,
+        "maximumMs": 54.166719
+      },
+      "simulation": {
+        "frozen": false,
+        "tickDeltaPostWarm": 1795,
+        "ticksThisFrame": {
+          "minimum": 2,
+          "median": 3.0,
+          "maximum": 4
+        },
+        "simulationSecondsPostWarm": 29.9166667,
+        "catchUpOverrunDelta": 0,
+        "playerSkinUpdateDelta": 619,
+        "playerSkinCalls": 1240,
+        "characterSkinCalls": 620,
+        "skinCacheOrIdleCaveat": false,
+        "phaseCounts": {
+          "lookout-sweep": 620
+        }
+      },
+      "childCpu": {
+        "playerPoseCpuMs": {
+          "allFramesMs": {
+            "samples": 620,
+            "minimum": 0.011719,
+            "median": 0.0249475,
+            "mean": 0.027125243548387096,
+            "p95NearestRank": 0.040781,
+            "maximum": 0.100573
+          },
+          "totalCalls": 620,
+          "totalBytes": 0
+        },
+        "playerVerticesCpuMs": {
+          "allFramesMs": {
+            "samples": 620,
+            "minimum": 1.289011,
+            "median": 2.7479945,
+            "mean": 3.1190982177419353,
+            "p95NearestRank": 4.967291,
+            "maximum": 5.553907
+          },
+          "totalCalls": 620,
+          "totalBytes": 0
+        },
+        "viewmodelVerticesCpuMs": {
+          "allFramesMs": {
+            "samples": 620,
+            "minimum": 0.477239,
+            "median": 1.0389065,
+            "mean": 1.0827308661290322,
+            "p95NearestRank": 1.766823,
+            "maximum": 2.06323
+          },
+          "totalCalls": 620,
+          "totalBytes": 0
+        },
+        "characterAnimationCpuMs": {
+          "allFramesMs": {
+            "samples": 620,
+            "minimum": 0.011563,
+            "median": 0.017031,
+            "mean": 0.018006693548387097,
+            "p95NearestRank": 0.024792,
+            "maximum": 0.066927
+          },
+          "totalCalls": 620,
+          "totalBytes": 0
+        },
+        "characterVerticesCpuMs": {
+          "allFramesMs": {
+            "samples": 620,
+            "minimum": 1.832187,
+            "median": 3.395052,
+            "mean": 3.474027708064516,
+            "p95NearestRank": 4.225781,
+            "maximum": 5.025729
+          },
+          "totalCalls": 620,
+          "totalBytes": 0
+        },
+        "characterCopyCpuMs": {
+          "allFramesMs": {
+            "samples": 620,
+            "minimum": 0.327291,
+            "median": 0.581849,
+            "mean": 0.5971986129032258,
+            "p95NearestRank": 0.713594,
+            "maximum": 1.915103
+          },
+          "totalCalls": 1240,
+          "totalBytes": 1871060800
+        },
+        "blasRefitRecordCpuMs": {
+          "allFramesMs": {
+            "samples": 620,
+            "minimum": 0.016562,
+            "median": 0.026771,
+            "mean": 0.028382204838709676,
+            "p95NearestRank": 0.038073,
+            "maximum": 0.198386
+          },
+          "totalCalls": 2480,
+          "totalBytes": 0
+        },
+        "tlasUpdateRecordCpuMs": {
+          "allFramesMs": {
+            "samples": 620,
+            "minimum": 0.003802,
+            "median": 0.0066145,
+            "mean": 0.007024270967741935,
+            "p95NearestRank": 0.009636,
+            "maximum": 0.055416
+          },
+          "totalCalls": 620,
+          "totalBytes": 0
+        }
+      },
+      "startThermal": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 39.6,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 29.8,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 34.2,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "endThermal": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 38.6,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 30.9,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 34.8,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      }
+    },
+    "traced33": {
+      "eligible": true,
+      "reportSha256": "8540d1017f3b3c7cb9b32c4d83160eaa29d3e929f8e1c94676547b8a739f3782",
+      "resourcesSha256": "87cab8b018c7cfa79a8f5f6f1b911979fcdcefef85eac1e9a14fd829eb9eade7",
+      "settings": {
+        "scalePercent": 33,
+        "width": 1440,
+        "height": 2981,
+        "internalWidth": 475,
+        "internalHeight": 984,
+        "nativeWindowWidth": 2981,
+        "nativeWindowHeight": 1440,
+        "surfaceCurrentWidth": 2981,
+        "surfaceCurrentHeight": 1440,
+        "surfaceCurrentTransform": 2,
+        "swapchainPreTransform": 2,
+        "rtPreRotationRequired": true,
+        "rtPresentationTransform": 1,
+        "backend": "RayTracingPipeline",
+        "water": 1,
+        "fire": 0,
+        "cap": 30,
+        "glass": false,
+        "shadow": 1,
+        "mist": false,
+        "dust": 1
+      },
+      "pipelines": [
+        {
+          "executionMode": 0,
+          "activeKey": "shipping_mobile_opaque_fast",
+          "activeSha256": "1b026affab5bf26b44d2dab0ef10f1c17104190a5ad18d45aa2fda85dbcfdec9",
+          "opaqueSha256": "1b026affab5bf26b44d2dab0ef10f1c17104190a5ad18d45aa2fda85dbcfdec9",
+          "genericSha256": "a1edeb782800c91a58b073c1f789c2e14d68cc56cd8ff1b0b535d628d1e9ee38"
+        }
+      ],
+      "sampling": {
+        "originWallNs": 421808744242160,
+        "warmupEndWallNs": 421818744242160,
+        "sampleEndWallNs": 421848744242160,
+        "completedFramesAll": 730,
+        "completedFramesPostWarm": 543,
+        "actualSelectedFirstWallNs": 421818779123198,
+        "actualSelectedLastWallNs": 421848701875270,
+        "actualSelectedSpanSeconds": 29.922752072,
+        "warmupOrTerminalFramesExcluded": 187
+      },
+      "gpu": {
+        "scope": "completed owning GPU duration; never reciprocal FPS",
+        "availableSamples": 543,
+        "unavailableSamples": 0,
+        "statusCounts": {
+          "5": 543
+        },
+        "duration": {
+          "samples": 543,
+          "minimumMs": 37.751145,
+          "medianMs": 39.59802,
+          "meanMs": 39.62045706998158,
+          "p95NearestRankMs": 40.654062,
+          "maximumMs": 41.493593
+        }
+      },
+      "cpu": {
+        "simulation": {
+          "samples": 543,
+          "minimumMs": 0.371562,
+          "medianMs": 2.221145,
+          "meanMs": 2.2555668600368324,
+          "p95NearestRankMs": 3.685365,
+          "maximumMs": 4.357396
+        },
+        "skin": {
+          "samples": 543,
+          "minimumMs": 2.485832,
+          "medianMs": 11.109791,
+          "meanMs": 10.493045745856355,
+          "p95NearestRankMs": 12.14526,
+          "maximumMs": 13.717344
+        },
+        "player_skin": {
+          "samples": 543,
+          "minimumMs": 1.07276,
+          "medianMs": 5.994375,
+          "meanMs": 5.589182296500922,
+          "p95NearestRankMs": 6.822082,
+          "maximumMs": 7.413802
+        },
+        "character_skin": {
+          "samples": 543,
+          "minimumMs": 1.413072,
+          "medianMs": 5.024323,
+          "meanMs": 4.903863449355433,
+          "p95NearestRankMs": 5.824896,
+          "maximumMs": 7.448229
+        },
+        "pose_copy": {
+          "samples": 543,
+          "minimumMs": 0.214896,
+          "medianMs": 0.752083,
+          "meanMs": 0.7365298066298342,
+          "p95NearestRankMs": 0.855469,
+          "maximumMs": 2.527708
+        },
+        "dynamic_upload": {
+          "samples": 543,
+          "minimumMs": 0.174061,
+          "medianMs": 0.501876,
+          "meanMs": 0.4950677071823204,
+          "p95NearestRankMs": 0.589532,
+          "maximumMs": 1.337135
+        },
+        "fence_wait": {
+          "samples": 543,
+          "minimumMs": 37.902865,
+          "medianMs": 39.928177,
+          "meanMs": 39.94064855248619,
+          "p95NearestRankMs": 40.99875,
+          "maximumMs": 42.112917
+        },
+        "queue_submit": {
+          "samples": 543,
+          "minimumMs": 0.106875,
+          "medianMs": 0.168958,
+          "meanMs": 0.18467254143646408,
+          "p95NearestRankMs": 0.327135,
+          "maximumMs": 0.948645
+        },
+        "whole_frame": {
+          "samples": 543,
+          "minimumMs": 45.115,
+          "medianMs": 55.736666,
+          "meanMs": 55.14668400736649,
+          "p95NearestRankMs": 58.13052,
+          "maximumMs": 60.631875
+        }
+      },
+      "imagePresentationIntervals": {
+        "samples": 542,
+        "minimumMs": 41.666718,
+        "medianMs": 54.166718,
+        "meanMs": 55.20449096494465,
+        "p95NearestRankMs": 58.333385,
+        "maximumMs": 62.50026
+      },
+      "simulation": {
+        "frozen": false,
+        "tickDeltaPostWarm": 1795,
+        "ticksThisFrame": {
+          "minimum": 2,
+          "median": 3,
+          "maximum": 4
+        },
+        "simulationSecondsPostWarm": 29.9166667,
+        "catchUpOverrunDelta": 0,
+        "playerSkinUpdateDelta": 542,
+        "playerSkinCalls": 1086,
+        "characterSkinCalls": 543,
+        "skinCacheOrIdleCaveat": false,
+        "phaseCounts": {
+          "lookout-sweep": 543
+        }
+      },
+      "childCpu": {
+        "playerPoseCpuMs": {
+          "allFramesMs": {
+            "samples": 543,
+            "minimum": 0.010729,
+            "median": 0.035,
+            "mean": 0.03589613259668509,
+            "p95NearestRank": 0.04625,
+            "maximum": 0.278177
+          },
+          "totalCalls": 543,
+          "totalBytes": 0
+        },
+        "playerVerticesCpuMs": {
+          "allFramesMs": {
+            "samples": 543,
+            "minimum": 0.776042,
+            "median": 4.440989,
+            "mean": 4.113797469613259,
+            "p95NearestRank": 4.997239,
+            "maximum": 5.691875
+          },
+          "totalCalls": 543,
+          "totalBytes": 0
+        },
+        "viewmodelVerticesCpuMs": {
+          "allFramesMs": {
+            "samples": 543,
+            "minimum": 0.285521,
+            "median": 1.498646,
+            "mean": 1.4374320773480662,
+            "p95NearestRank": 1.848229,
+            "maximum": 2.307917
+          },
+          "totalCalls": 543,
+          "totalBytes": 0
+        },
+        "characterAnimationCpuMs": {
+          "allFramesMs": {
+            "samples": 543,
+            "minimum": 0.011979,
+            "median": 0.024323,
+            "mean": 0.024888342541436466,
+            "p95NearestRank": 0.030781,
+            "maximum": 0.293125
+          },
+          "totalCalls": 543,
+          "totalBytes": 0
+        },
+        "characterVerticesCpuMs": {
+          "allFramesMs": {
+            "samples": 543,
+            "minimum": 1.139114,
+            "median": 4.309271,
+            "mean": 4.222279961325967,
+            "p95NearestRank": 5.121823,
+            "maximum": 6.179375
+          },
+          "totalCalls": 543,
+          "totalBytes": 0
+        },
+        "characterCopyCpuMs": {
+          "allFramesMs": {
+            "samples": 543,
+            "minimum": 0.260572,
+            "median": 0.673438,
+            "mean": 0.6541570313075507,
+            "p95NearestRank": 0.731615,
+            "maximum": 1.819584
+          },
+          "totalCalls": 1086,
+          "totalBytes": 1638687120
+        },
+        "blasRefitRecordCpuMs": {
+          "allFramesMs": {
+            "samples": 543,
+            "minimum": 0.020572,
+            "median": 0.034844,
+            "mean": 0.035668237569060776,
+            "p95NearestRank": 0.044271,
+            "maximum": 0.10375
+          },
+          "totalCalls": 2172,
+          "totalBytes": 0
+        },
+        "tlasUpdateRecordCpuMs": {
+          "allFramesMs": {
+            "samples": 543,
+            "minimum": 0.004739,
+            "median": 0.009323,
+            "mean": 0.009369510128913443,
+            "p95NearestRank": 0.011614,
+            "maximum": 0.025
+          },
+          "totalCalls": 543,
+          "totalBytes": 0
+        }
+      },
+      "startThermal": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 39.3,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 30.5,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 34.4,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "endThermal": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 39.1,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 31.8,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 35.4,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      }
+    }
+  },
+  "closingControl": {
+    "thermal": {
+      "schemaVersion": 1,
+      "temperatureSource": "current HAL",
+      "frameworkStatus": 0,
+      "sensors": {
+        "AP": {
+          "type": 0,
+          "celsius": 41.4,
+          "status": 0
+        },
+        "BAT": {
+          "type": 2,
+          "celsius": 32.1,
+          "status": 0
+        },
+        "SKIN": {
+          "type": 3,
+          "celsius": 35.9,
+          "status": 0
+        }
+      },
+      "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+    },
+    "admission": {
+      "admitted": false,
+      "reasons": [
+        "AP exceeds the declared temperature delta from reference",
+        "BAT exceeds the declared temperature delta from reference",
+        "SKIN exceeds the declared temperature delta from reference"
+      ],
+      "requiredFrameworkStatus": 0,
+      "maximumDeltaCelsius": 1.5,
+      "sensorCeilingsCelsius": {},
+      "referenceCompared": true,
+      "performanceComparison": true
+    },
+    "sampled": false,
+    "deltasCelsius": {
+      "AP": 1.7999999999999972,
+      "BAT": 2.3000000000000007,
+      "SKIN": 1.6999999999999957
+    }
+  },
+  "medianObservedDifferencesPercent": {
+    "whole_frame": 16.653540091044185,
+    "skin": 39.93373238499049,
+    "fence_wait": 10.291691475718977
+  },
+  "admission": "Qualitative scheduling profile and observed warm-device timing only. Closing control thermally unmatched; no isolated tracer overhead, code gain, sustained-equilibrium or causal thermal claim.",
+  "closure": {
+    "utcUnixMs": 1792739088199,
+    "phoneReleased": true,
+    "safeToDisconnect": true,
+    "installedHashesRestored": {
+      "com.samfa12.hordelanternrt.debug": "fe3a51beb3a2d6385232dcccfdf8315785e969825e8a35a7de65be8894f46925",
+      "com.samfa12.hordelanternrt": "cc4de768cf9ca2a409984a24888399e9c518363c359b3a9947d1ed0350c254e8"
+    },
+    "priorSaveFilesAndLocks": 18,
+    "priorSaveBytesUnchanged": true,
+    "preferencesBytesUnchanged": true,
+    "systemSettingsRestored": {
+      "user_rotation": "0",
+      "accelerometer_rotation": "1",
+      "font_scale": "1.7"
+    },
+    "hordeLayers": [],
+    "hordeDebugPid": null,
+    "ownedDeviceHelpersCompleted": true,
+    "noFurtherPhoneOperationPlanned": true
+  },
+  "addedSavePathCount": 0,
+  "releaseUtc": "2026-10-23T07:04:48.199000+00:00",
+  "rawLocalDirectory": "reports/phone-trace-stdin-20261023",
+  "runtimeChanged": false,
+  "audioHapticManualRevalidationRequired": false,
+  "ciSourceCheckpoint": {
+    "commit": "249ec107218ad4ab65f2a3502cfc0b0720bbd303",
+    "run": 39913009629,
+    "outcome": "cancelled",
+    "successfulJobs": [
+      "Android",
+      "GCC",
+      "Clang",
+      "ASan/UBSan",
+      "player-vulkan-host"
+    ],
+    "cancelledJob": "MSVC"
+  },
+  "gpuProvenance": {
+    "gpuName": "Adreno (TM) 840",
+    "vendorId": 20803,
+    "deviceId": 1141180977,
+    "driverVersion": 2150932499,
+    "driverVersionText": "raw 2150932499 (vendor-specific)",
+    "driverProperties": {
+      "available": true,
+      "driverId": 8,
+      "driverName": "Qualcomm Technologies Inc. Adreno Vulkan Driver",
+      "driverInfo": "Driver Build: 089d643e2a, Icecd8f0534, 1782882597\nDate: 07/01/26\nCompiler Version: E031.50.19.27\nDriver Branch: \n",
+      "conformanceVersion": "1.4.1.0"
+    },
+    "vulkanApiVersion": 4210983,
+    "vulkanApiVersionText": "1.4.295"
+  }
+}

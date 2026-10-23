@@ -3550,3 +3550,22 @@ profile or detailed GPU-stage result was captured. All failures retained.
 Phone released06:20:55UTC: both starting APK hashes,18 prior save/lock files,
 settings, rotation and font verified; zero new save paths; no owned renderer,
 trace, installation or transfer. [Exact receipt and scope](evidence/2026-10-23-current-cache-phone/README.md).
+
+### 23 October 2026: authorized stdin scheduling retry
+
+SM-S948B Android17/API37, unchanged bceed0c1 runtime APK c1d65749: one approved
+50-second Perfetto stdin retry collected scheduling/frequency events around the
+same33% hold. A recovered CRLF-normalized derivative has complete packet/state
+coverage and no reported loss counters; raw transport and its caveat are retained.
+In the clock-aligned30-second sample the native render owner is on-core8.226s,
+runnable0.089s and sleeping/D21.685s. This is a qualitative event profile, not
+complete CPU/GPU-stage or sustained-performance acceptance.
+
+Opening/traced holds retain620/543 valid frames, GPU medians35.859/39.598ms and
+frame cycles47.780/55.737ms. Closing start rejects before sampling: AP/BAT/SKIN
+deltas1.8/2.3/1.7C exceed1.5C, all thermal statuses0. Warm timing remains useful;
+tracing/context prevent causal attribution. No gain or thermal-only explanation.
+Player-copy APK was not installed. No denied config read, permissions change or
+extra retry. Released07:04:48UTC with both original APKs,18 save/lock files,
+preferences and rotation/font verified; no active renderer/trace/transfer.
+[Recovered profile and exact custody](evidence/2026-10-23-phone-scheduling/README.md).
