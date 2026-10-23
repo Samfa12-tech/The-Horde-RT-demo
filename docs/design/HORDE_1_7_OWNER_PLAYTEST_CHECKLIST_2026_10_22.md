@@ -54,8 +54,14 @@ added. Test-only `30b5e3ed` updates the exact roster and explicitly checks both
 F03 authored-scene selections; local Release ordinary/authored route gates pass
 2/2. Its hosted Vulkan lane now passes, with complete exact-head CI still tracked
 separately. [Original failure and correction](../evidence/2026-10-23-f03-roster/README.md).
-The new masonry checkpoint needs its own complete hosted result; earlier passes
-do not certify later geometry. No deadline or CI structure was relaxed.
+The masonry head `b9019b43` has a separate Vulkan-host fixture failure: its exact
+triangle sum omits the new 144 road triangles (432 indices). Actual 31 fixture
+primitive/30 material rows and both 32-row ceilings remain correct. The failure
+is reproduced locally; adding only that exact content count passes the focused
+Debug inventory registration in 22.92 s. Runtime/asset bytes and all other gates
+are unchanged. Original failures and complete job receipts remain in the
+[chimney/CI assessment](../evidence/2026-10-23-chimney-assessment/README.md).
+No deadline or CI structure was relaxed; corrected-head hosted evidence is separate.
 
 Outdoor integration `f21b030e` is backed up on PR 27. Its first hosted run
 [39896071822](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39896071822)
@@ -138,6 +144,18 @@ participating mist, extra fire or a town expansion. Verify the new exact-head CI
 next. The owner's circular/translucent touch-action refinement is another approved
 desktop-capable item; current source and the inspected Briarhold reference must
 guide it, with portrait/landscape physical acceptance still open.
+
+The bounded [chimney assessment](../evidence/2026-10-23-chimney-assessment/README.md)
+confirms the existing RT fire/smoke integrator is reusable but has no independent
+smoke-only mode. Its 24 m source selection excludes all actual chimney caps
+(84.662-153.121 m from lookout), and intensity-zero exits before smoke. Native
+GLB vertices also verify cap centres 10.933-26.545 mm beneath their closed roofs.
+B01 is the useful first outlet candidate: a 4 m raised probe clears town-only
+occlusion, while B03/B06 do not; full-scene visibility is unproven. No plume or
+hidden fire is added. The next implementation requires a small owned outlet
+correction and explicit shared smoke-only volume support with zero light/embers,
+bounded range/capacity and truthful evidence; preserve normal fires and Mist Off.
+Cost and low-resolution motion/readability must be measured before admission.
 
 Exact evidence-only head `096b23f0`, [run 39877269271](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39877269271),
 finishes **failure**: five jobs pass; MSVC main selection is 168/169, with the

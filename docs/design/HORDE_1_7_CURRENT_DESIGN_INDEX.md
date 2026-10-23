@@ -2,6 +2,15 @@
 
 ## Resumed owner playtest priorities - 22 October 2026
 
+The [chimney assessment and scenery CI follow-up](../evidence/2026-10-23-chimney-assessment/README.md)
+verify why an unchanged fire-emitter configuration cannot provide the remaining
+smoke cue: flame/light coupling, a 24 m selection limit, and roof-intersecting
+chimney cap centres. A bounded B01 outlet correction and shared smoke-only
+extension are the next credible scope; no runtime effect is added yet. The
+scenery-head inventory fixture's exact sum omitted the 144 road triangles;
+focused correction preserves all row limits and runtime bytes, with the original
+failure retained. Exact corrected-head hosted status remains separate.
+
 The [23 October F03 masonry checkpoint](../evidence/2026-10-23-f03-masonry/README.md)
 adds the inspected missing road story cue: eight grounded edging stones and one
 marked waystone, within the existing masonry material and consolidated RT owner.

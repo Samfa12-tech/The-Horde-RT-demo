@@ -1029,7 +1029,9 @@ struct PresentableTinyRtSceneObservationTestAccess
         // Six fixed floor chips add 72 triangles in the existing masonry family.
         // Ten prepared log/root/stump/snag placements add 11,904 triangles
         // in the existing bark primitive, without expanding either row capacity.
-        constexpr std::size_t addedIndices = 46140u + (2u*664u + 960u + 12u + 323264u + 37846u + 656u + 6184u + 17712u + 966u + 6168u + 11904u + 72u)*3u;
+        // Eight original F03 kerbs and one marked waystone add 144 triangles
+        // in the existing consolidated masonry owner, without a new row.
+        constexpr std::size_t addedIndices = 46140u + (2u*664u + 960u + 12u + 323264u + 37846u + 656u + 6184u + 17712u + 966u + 6168u + 11904u + 72u + 144u)*3u;
         bool ok = oldIndices == 8422u * 3u &&
                   baseline.collapseStaticAsset_.bounds.maximum[1] > 12.0f &&
                   std::abs(chapterEntryTop - 6.0f) < 0.001f &&
