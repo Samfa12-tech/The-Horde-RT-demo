@@ -267,6 +267,8 @@ public class MainActivity extends Activity {
     private final int[] activePointers = {-1, -1};
     private final AndroidControllerInput controllerInput = new AndroidControllerInput();
     private boolean controllerMode, controllerFrameScheduled;
+    private long debugContextualGeneration = -1;
+    private int debugContextualBits = Integer.MIN_VALUE, debugContextualGates = -1;
     private Configuration lastAppliedConfiguration;
     private boolean controllerWindowFocused = true;
     private long controllerFrameTime;
@@ -6347,6 +6349,8 @@ public class MainActivity extends Activity {
             case "chapter-forest-first-bend": return 201;
             case "chapter-forest-second-bend": return 202;
             case "chapter-forest-lookout": return 203;
+            case "chapter-forest-lookout-left": return 228;
+            case "chapter-forest-lookout-right": return 229;
             case "chapter-forest-clue-forward": return 226;
             case "chapter-forest-clue-reverse": return 227;
             case "chapter-keeper-death-held": return 204;
@@ -6673,6 +6677,8 @@ public class MainActivity extends Activity {
             case 203: return new float[]{2.51f, -0.15f};
             case 226: return new float[]{2.32590073027f, -0.30f};
             case 227: return new float[]{-1.22777238637f, -0.30f};
+            case 228: return new float[]{1.7246018366f, -0.15f};
+            case 229: return new float[]{3.2953981634f, -0.15f};
             case 204: return new float[]{-1.57079632679f, -0.35f};
             case 205: return new float[]{-1.57079632679f, -0.35f};
             case 206: return new float[]{-1.57079632679f, -0.35f};
@@ -7529,15 +7535,32 @@ public class MainActivity extends Activity {
         updateContextualControls(false);
     }
 
+    private void logDebugContextualControls(boolean allowed, int bits) {
+        if (!BuildConfig.DEBUG) return;
+        final int gates = (allowed ? 1 : 0) | (controllerMode ? 2 : 0) |
+                (menuVisible ? 4 : 0) | (diagnosticsVisible ? 8 : 0) |
+                (deathOverlayVisible ? 16 : 0) | (endingOverlayVisible ? 32 : 0) |
+                (benchmarkRunning ? 64 : 0) | (debugCaptureUiSuppressed ? 128 : 0);
+        if (debugContextualGeneration == surfaceRequestGeneration &&
+                debugContextualBits == bits && debugContextualGates == gates) return;
+        Log.i("HordeContextualHud", "generation=" + surfaceRequestGeneration +
+                " allowed=" + allowed + " bits=" + bits + " gates=" + gates);
+        debugContextualGeneration = surfaceRequestGeneration;
+        debugContextualBits = bits;
+        debugContextualGates = gates;
+    }
+
     private void updateContextualControls(final boolean controlsAllowed) {
         if (controllerPrompt != null) controllerPrompt.setVisibility(View.GONE);
         if (!controlsAllowed) {
+            logDebugContextualControls(false, -1);
             if (crouchButton != null) crouchButton.setVisibility(View.GONE);
             interactButton.setVisibility(View.GONE);
             toggleHeldLightPoseButton.setVisibility(View.GONE);
             return;
         }
         final int contextualState = ProbeBridge.getContextualControlState();
+        logDebugContextualControls(true, contextualState);
         final boolean traversalOwned = (contextualState & CONTEXTUAL_RESCUE_MODE) != 0 &&
                 ((contextualState & RESCUE_PROMPT_MASK) >> RESCUE_PROMPT_SHIFT) == 4;
         if (traversalOwned && !crouchTraversalOwned) clearCrouchIntent();

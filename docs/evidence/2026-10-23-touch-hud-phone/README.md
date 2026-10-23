@@ -12,8 +12,10 @@ No code, settings policy or graphics quality was changed during this batch.
 Independent portrait and landscape checks use the existing **staged**
 `lantern-held-high` fixture, normal live UI and actual Pipeline RT presentation.
 They do not prove naturally earned equipment or a journey. Portrait screenshot
-1440 x 3120; landscape 3120 x 1440. Native RT internal extents are respectively
-475 x 980 / 980 x 475 at the preserved 33%; UI stays at display resolution.
+1440 x 3120; landscape 3120 x 1440. The prepared native receipts record internal
+extents of 475 x 980 and 475 x 984 respectively at the preserved 33%; the latter
+is not a transposed landscape extent. Native buffer/pre-rotation interpretation
+was not established by this UI check. UI screenshots stay at display resolution.
 
 - Five available targets (menu, swing, parry, dodge, lantern) stay inside the
   app's measured window and do not overlap. Menu is 72 x 48 dp; combat targets

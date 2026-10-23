@@ -1,5 +1,26 @@
 # Horde 1.7 owner playtest checklist - 22 October 2026
 
+## Lantern rotation diagnosis and Android camera repair - 23 October
+
+The [combined continuity checkpoint](../evidence/2026-10-23-lantern-rotation/README.md)
+passes native fixture and production-interaction ownership/pose checks across
+three reconstruction/orientation cycles, plus the real Activity callback/ready
+poll seam with a fake bridge. The observed phone disappearance remains open;
+there is no evidence-backed production equipment fix yet. Small Debug-only native
+state/HUD gate logs prepare the next reproduction without reseeding its state.
+ADB currently reports no connected device; no install or phone activity occurred.
+
+Exact prior head `8937eed5` CI is terminal: four jobs pass, MSVC hits the existing
+cap, Android fails one camera-mapping contract (414 tests). Missing Android names
+and poses for native F04 views 228/229 are corrected without changing that test.
+The physical HUD README now quotes its actual landscape native extent rather
+than an assumed transpose. Routine checkpoint backup permission remains in force.
+
+Next acceptance step is one connected-phone rotation/full-rebind sequence with
+paired native/HUD state and no restaging; production earned-equipment acceptance
+remains distinct. Deferred forest work, parked chimney, terrain/shell and pending
+recovery policy remain unchanged.
+
 ## Physical HUD checkpoint and routine backup grant - 23 October
 
 The [bounded phone check](../evidence/2026-10-23-touch-hud-phone/README.md) verifies

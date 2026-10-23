@@ -1,8 +1,10 @@
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
+#include <string>
 #include <string_view>
 
+#include "gameplay/DevelopmentCheckpointSimulation.h"
 #include "gameplay/interactions/ChestRewardSequence.h"
 #include "gameplay/interactions/FinaleSequence.h"
 #include "gameplay/interactions/InteractionState.h"
@@ -56,11 +58,167 @@ std::size_t CountEvents(const GameSimulation& simulation,
     return count;
 }
 
+void CheckCombinedLanternContinuity(GameSimulation& simulation, InputSnapshot input,
+                                    const std::string_view caseName)
+{
+    using horde::gameplay::traversal::RescuePrompt;
+    constexpr float fixedDelta = static_cast<float>(
+        horde::gameplay::simulation::FixedStepRunner::kFixedDeltaSeconds);
+    const auto check = [&](const bool condition, const std::string_view message) {
+        Check(condition, std::string(caseName) + ": " + std::string(message));
+    };
+    std::uint64_t publication = simulation.Snapshot().inputPublicationSequence;
+    input.damageEnabled = false;
+    input.hasAuthoritativePlayerPose = false;
+    input.yawRadians = simulation.Snapshot().playerYawRadians;
+    input.pitchRadians = simulation.Snapshot().playerPitchRadians;
+    const bool originalRescueMode = simulation.Snapshot().developmentRescueJourney;
+    const auto checkOwned = [&]() {
+        const auto& state = simulation.Snapshot();
+        check(state.chestReward.phase == ChestRewardPhase::LanternClaimed &&
+                  state.interaction.heldLightKind == HeldLightKind::RewardLantern &&
+                  state.finale.lanternClaimed,
+              "claimed chest, held light, and finale ownership survive reconstruction");
+        // These are the snapshot inputs to PublishSimulationUiState's native
+        // contextual-control gate, not an invocation of JNI or the Android HUD.
+        check(state.developmentRescueJourney == originalRescueMode &&
+                  state.rescuePrompt == RescuePrompt::None,
+              "reconstruction cannot introduce a rescue prompt that suppresses pose controls");
+        const auto expectedBody = ComposeLanternPendulumBodyTransform(
+            state.rewardLanternWorldFromHinge,
+            state.lanternPendulum.forwardAngleRadians,
+            state.lanternPendulum.strafeAngleRadians,
+            state.lanternPendulum.torsionAngleRadians,
+            state.heldItemKinematics.rewardLanternPresentationYawRadians);
+        bool coherentBody = state.lanternPendulum.initialized;
+        for (std::size_t i = 0u; i < expectedBody.size(); ++i)
+            coherentBody = coherentBody && std::isfinite(state.rewardLanternWorldFromHinge[i]) &&
+                NearlyEqual(state.lanternPendulum.worldFromBody[i], expectedBody[i]);
+        check(coherentBody, "the current hand hinge and pendulum body retain one finite pose authority");
+    };
+    const auto rebind = [&](const float aspect) {
+        const auto before = simulation.Snapshot();
+        input.paused = true;
+        // Include stale world/reward edges in the stop publication. An actual
+        // lifecycle boundary discards them before the replacement owner runs.
+        ++input.commands.routeReset;
+        ++input.commands.retry;
+        ++input.commands.interact;
+        ++input.commands.toggleHeldLightPose;
+        simulation.SynchronizePausedInput(input, ++publication);
+        simulation.InvalidateWorldZoneReadiness();
+        simulation.SynchronizePausedInput(input, ++publication);
+        simulation.SetPresentationAspect(aspect);
+        check(simulation.AdvanceFrame(input, 0.0, ++publication) == 0u,
+              "paused replacement output resolves without advancing gameplay");
+        const auto& rebound = simulation.Snapshot();
+        check(rebound.tickIndex == before.tickIndex && rebound.chestReward == before.chestReward &&
+                  rebound.interaction == before.interaction,
+              "pause, resource invalidation, and rotation preserve reward and exact pose progress");
+        check(rebound.lastConsumedRouteResetSequence == input.commands.routeReset &&
+                  rebound.lastConsumedRetrySequence == input.commands.retry &&
+                  rebound.lastConsumedInteractSequence == input.commands.interact &&
+                  rebound.lastConsumedToggleHeldLightPoseSequence == input.commands.toggleHeldLightPose &&
+                  simulation.Events().Empty(),
+              "replacement owner consumes stale edges without reset, retry, claim, or pose replay");
+        checkOwned();
+        input.paused = false;
+        check(simulation.AdvanceFrame(input, fixedDelta, ++publication) == 1u,
+              "replacement owner resumes one ordinary fixed tick");
+        checkOwned();
+    };
+    const auto settle = [&](const HeldLightPose pose) {
+        for (int tick = 0; tick < 45; ++tick)
+            simulation.AdvanceFrame(input, fixedDelta, ++publication);
+        check(simulation.Snapshot().interaction.heldLightPose == pose &&
+                  NearlyEqual(simulation.Snapshot().interaction.heldLightPoseProgress, 1.0f),
+              "ordinary resumed ticks settle the requested carry pose");
+        checkOwned();
+    };
+
+    check(simulation.Snapshot().interaction.heldLightPose == HeldLightPose::High,
+          "continuity starts from a settled high lantern");
+    rebind(16.0f / 9.0f);
+    check(simulation.Snapshot().interaction.heldLightPose == HeldLightPose::High,
+          "settled high still exposes the native lower-pose input after rotation");
+    ++input.commands.toggleHeldLightPose;
+    simulation.AdvanceFrame(input, fixedDelta, ++publication);
+    check(simulation.Snapshot().interaction.heldLightPose == HeldLightPose::TransitioningToLow,
+          "a fresh post-rebind lower command starts the shared transition");
+    rebind(9.0f / 19.5f);
+    settle(HeldLightPose::Low);
+    rebind(16.0f / 9.0f);
+    check(simulation.Snapshot().interaction.heldLightPose == HeldLightPose::Low,
+          "settled low still exposes the native raise-pose input after rotation");
+    ++input.commands.toggleHeldLightPose;
+    simulation.AdvanceFrame(input, fixedDelta, ++publication);
+    check(simulation.Snapshot().interaction.heldLightPose == HeldLightPose::TransitioningToHigh,
+          "a fresh post-rebind raise command starts the shared transition");
+    settle(HeldLightPose::High);
+    std::cout << "Lantern continuity case=" << caseName
+              << " rebinds=3 ownership=claimed pose=high-low-high rescue_mode="
+              << originalRescueMode << " rescue_prompt="
+              << static_cast<unsigned>(simulation.Snapshot().rescuePrompt) << '\n';
+}
+
+void CheckFixtureAndProductionLanternContinuity()
+{
+    constexpr float portraitAspect = 9.0f / 19.5f;
+    constexpr float fixedDelta = static_cast<float>(
+        horde::gameplay::simulation::FixedStepRunner::kFixedDeltaSeconds);
+    GameSimulation fixture(horde::gameplay::simulation::ProductionGameSimulationConfig());
+    fixture.SetPresentationAspect(portraitAspect);
+    const auto* checkpoint = horde::gameplay::FindDevelopmentCheckpoint(116);
+    Check(checkpoint && horde::gameplay::StageDevelopmentCheckpointSimulation(fixture, *checkpoint),
+          "continuity stages the same development fixture116 as the Android request");
+    CheckCombinedLanternContinuity(fixture, {}, "fixture116");
+
+    const auto query = ValidChestQuery();
+    auto config = horde::gameplay::simulation::ProductionGameSimulationConfig();
+    config.playerStartX = query.playerX;
+    config.playerStartZ = query.playerZ;
+    config.playerStartYawRadians = query.playerYawRadians;
+    GameSimulation production(config);
+    production.SetPresentationAspect(portraitAspect);
+    ChestRewardSnapshot unlocked;
+    unlocked.phase = ChestRewardPhase::ClosedUnlocked;
+    InteractionState noLight;
+    ResetInteractionState(noLight, HeldLightKind::None);
+    FinaleSequenceSnapshot defeated;
+    defeated.phase = FinaleSequencePhase::LichFalling;
+    defeated.endingPhase = FinaleEndingPhase::LichFalling;
+    defeated.lichDefeated = true;
+    // Import only the legal pre-reward setup used elsewhere in this fixture.
+    // Opening, claiming, and the carry transition use real simulation commands.
+    production.ImportRewardCheckpoint(unlocked, noLight, defeated);
+    InputSnapshot input;
+    input.damageEnabled = false;
+    input.yawRadians = query.playerYawRadians;
+    input.commands.interact = 1u;
+    production.StepFixed(input, fixedDelta, 1u);
+    Check(production.Snapshot().chestReward.phase == ChestRewardPhase::Opening &&
+              CountEvents(production, GameplayEventType::ChestOpened) == 1u,
+          "production continuity opens the chest through one accepted interaction");
+    for (int tick = 0; tick < 90; ++tick) production.StepFixed(input, fixedDelta, tick + 2u);
+    Check(production.Snapshot().chestReward.phase == ChestRewardPhase::LanternAvailable,
+          "production continuity waits for the actual lid transition before claiming");
+    ++input.commands.interact;
+    production.ClearEvents();
+    production.StepFixed(input, fixedDelta, 92u);
+    Check(CountEvents(production, GameplayEventType::LanternClaimed) == 1u &&
+              production.Snapshot().interaction.heldLightPose == HeldLightPose::TransitioningToHigh,
+          "production continuity claims once through the actual reward command path");
+    for (int tick = 0; tick < 45; ++tick) production.StepFixed(input, fixedDelta, tick + 93u);
+    CheckCombinedLanternContinuity(production, input, "production-interaction-claim");
+}
+
 } // namespace
 
 int main()
 {
     using horde::vulkan::raytracing::ResolveChestGuidanceLight;
+
+    CheckFixtureAndProductionLanternContinuity();
 
     Check(static_cast<std::uint32_t>(EntityId::RewardChest) == 5u &&
               static_cast<std::uint32_t>(EntityId::RewardLantern) == 6u &&

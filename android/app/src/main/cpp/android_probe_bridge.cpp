@@ -1058,6 +1058,31 @@ void PublishSimulationUiState()
     if (simulation.crouchActive) contextualControls |= 1 << 10;
     if (simulation.crouchStandingBlocked) contextualControls |= 1 << 11;
     gContextualControlState.store(contextualControls, std::memory_order_release);
+#if defined(HORDE_RT_DEBUG_CHECKPOINTS)
+    // Diagnose a missing control without restaging a fixture (which would
+    // replace the state being investigated). Only the simulation owner logs;
+    // ordinary frames with unchanged controls generate no additional output.
+    const std::array<int, 6u> controlWitness{{contextualControls,
+        static_cast<int>(simulation.chestReward.phase),
+        static_cast<int>(simulation.interaction.heldLightKind),
+        static_cast<int>(simulation.interaction.heldLightPose),
+        simulation.developmentRescueJourney ? 1 : 0,
+        static_cast<int>(simulation.rescuePrompt)}};
+    static std::array<int, 6u> lastControlWitness{};
+    static std::uint64_t lastControlGeneration = ~std::uint64_t{0};
+    if (lastControlGeneration != gSwapchainContext.surfaceGeneration || controlWitness != lastControlWitness)
+    {
+        __android_log_print(ANDROID_LOG_INFO, kTag,
+            "HORDE_CONTEXTUAL_STATE generation=%llu tick=%llu bits=%d chest=%d light=%d pose=%d rescue=%d prompt=%d reset=%llu retry=%llu",
+            static_cast<unsigned long long>(gSwapchainContext.surfaceGeneration),
+            static_cast<unsigned long long>(simulation.tickIndex),
+            controlWitness[0], controlWitness[1], controlWitness[2], controlWitness[3], controlWitness[4], controlWitness[5],
+            static_cast<unsigned long long>(simulation.lastConsumedRouteResetSequence),
+            static_cast<unsigned long long>(simulation.lastConsumedRetrySequence));
+        lastControlWitness = controlWitness;
+        lastControlGeneration = gSwapchainContext.surfaceGeneration;
+    }
+#endif
     const horde::gameplay::SpatialAudioGains waterfallGains =
         horde::gameplay::CalculateSpatialAudio(
             {-2.32f, -15.26f, 0.52f, 0.65f, 10.0f},

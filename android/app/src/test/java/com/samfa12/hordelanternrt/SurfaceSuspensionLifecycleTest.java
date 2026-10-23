@@ -2,6 +2,7 @@ package com.samfa12.hordelanternrt;
 
 import static org.junit.Assert.*;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.view.LayoutInflater;
 import android.view.Surface;
 import android.graphics.SurfaceTexture;
@@ -26,7 +27,7 @@ public final class SurfaceSuspensionLifecycleTest {
     @Implements(value=ProbeBridge.class, isInAndroidSdk=false)
     public static final class Bridge {
         static boolean accept, fail, paused;
-        static int starts, runtime;
+        static int starts, runtime, contextual;
         static float strafe, forward;
         static final List<Long> stops=new ArrayList<>();
         static final List<String> suspensions=new ArrayList<>();
@@ -39,6 +40,10 @@ public final class SurfaceSuspensionLifecycleTest {
         @Implementation protected static void stopDiagnosticSurface(long generation) { stops.add(generation); }
         @Implementation protected static long startDiagnosticSurface(Surface surface,String directory) { ++starts; return 42L; }
         @Implementation protected static int getSurfaceRuntimeState(long generation) { return runtime; }
+        @Implementation protected static int getContextualControlState() { return contextual; }
+        @Implementation protected static long getPlayerVitalityState() { return (3L << 32) | 3L; }
+        @Implementation protected static int getPlayerLifePhase() { return 0; }
+        @Implementation protected static int getFinaleEndingPhase() { return 0; }
         @Implementation protected static void setSimulationPaused(boolean value) { paused=value; }
         @Implementation protected static void setViewControls(float yaw,float pitch,float light,float x,float z,boolean crouch,boolean analogueMovement) { strafe=x; forward=z; }
         @Implementation protected static void setEntryMenu(boolean enabled,boolean side,boolean reduced,boolean play,long generation) {}
@@ -52,7 +57,7 @@ public final class SurfaceSuspensionLifecycleTest {
         Method m=MainActivity.class.getDeclaredMethod(name); m.setAccessible(true); m.invoke(a);
     }
     @Before public void prepare()throws Exception {
-        Bridge.accept=true; Bridge.fail=false; Bridge.paused=false; Bridge.starts=0; Bridge.runtime=1;
+        Bridge.accept=true; Bridge.fail=false; Bridge.paused=false; Bridge.starts=0; Bridge.runtime=1; Bridge.contextual=0;
         Bridge.strafe=Bridge.forward=0; Bridge.stops.clear(); Bridge.suspensions.clear();
         a=Robolectric.buildActivity(MainActivity.class).get();
         a.setContentView(LayoutInflater.from(a).inflate(R.layout.activity_main,null));
@@ -117,5 +122,44 @@ public final class SurfaceSuspensionLifecycleTest {
     @Test public void destroyStillRetiresRetainedSurface()throws Exception {
         call("onPause"); call("onDestroy");
         assertEquals(List.of(31L),Bridge.stops); assertEquals(0L,field("surfaceRequestGeneration").getLong(a));
+    }
+    @Test public void claimedLanternHudRecoversAfterStoppedSurfaceAndRotationWithoutRestaging()throws Exception {
+        // Native ownership is deliberately not fabricated by this fake bridge:
+        // it supplies the same settled-pose bits before and after replacement.
+        // The independent C++ regression covers where those bits originate.
+        String[] names={"attackButton","dodgeButton","runButton","vitalityStatus","developerOverlay"};
+        int[] ids={R.id.attack_button,R.id.dodge_button,R.id.run_button,R.id.vitality_status,R.id.developer_overlay};
+        for(int i=0;i<names.length;i++)set(names[i],a.findViewById(ids[i]));
+        set("lastPlayerVitality",3); set("lastPlayerMaxVitality",3);
+        View lantern=a.findViewById(R.id.toggle_held_light_pose_button);
+        Runnable poll=(Runnable)field("runtimePoll").get(a);
+        for(int settledPose:new int[]{4,2}) { // High offers Lower; Low offers Raise.
+            Bridge.contextual=settledPose; poll.run();
+            assertEquals(View.VISIBLE,lantern.getVisibility());
+            CharSequence description=lantern.getContentDescription();
+            call("onPause"); call("onStop");
+            Configuration landscape=new Configuration(a.getResources().getConfiguration());
+            landscape.orientation=Configuration.ORIENTATION_LANDSCAPE;
+            landscape.screenWidthDp=804; landscape.screenHeightDp=381;
+            a.onConfigurationChanged(landscape);
+            assertEquals(View.GONE,lantern.getVisibility());
+            Bridge.runtime=0; call("onResume"); poll.run();
+            assertEquals("an unready replacement cannot expose actions",View.GONE,lantern.getVisibility());
+            Bridge.runtime=1; poll.run();
+            assertEquals(View.VISIBLE,lantern.getVisibility());
+            assertEquals(description,lantern.getContentDescription());
+            assertEquals(settledPose,Bridge.contextual);
+            assertArrayEquals(new int[]{-1,-1},(int[])field("activePointers").get(a));
+            assertEquals(0,Bridge.strafe,0); assertEquals(0,Bridge.forward,0);
+        }
+        for(String overlay:new String[]{"menuVisible","diagnosticsVisible","endingOverlayVisible"}) {
+            set(overlay,true); poll.run(); assertEquals(View.GONE,lantern.getVisibility()); set(overlay,false);
+        }
+        // Transitional poses and rescue traversal suppress this control by design.
+        for(int contextual:new int[]{0,(1<<9)|(4<<6)}) {
+            Bridge.contextual=contextual; poll.run(); assertEquals(View.GONE,lantern.getVisibility());
+        }
+        Bridge.contextual=4; poll.run(); assertEquals(View.VISIBLE,lantern.getVisibility());
+        assertEquals(2,Bridge.starts);
     }
 }

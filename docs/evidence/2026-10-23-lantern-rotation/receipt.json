@@ -1,0 +1,86 @@
+{
+  "schema": 1,
+  "utc": "2026-10-23T10:02:38.647212+00:00",
+  "baseCommit": "8937eed5fd9104527bd5c8b9566dd54d8334836b",
+  "disposition": "DIAGNOSIS ONLY: phone continuity cause/fix not established; Android diagnostic camera mappings repaired",
+  "sourceCanonicalLfSha256": {
+    "android/app/src/main/cpp/android_probe_bridge.cpp": "93c235123be8590ddb673163af51740575e200957a66cb3e0d542a3efa08fbba",
+    "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java": "38293e0e7efe5f35927ef9914354ec24b9ad1d04b5bb6b7b2abb25d1dd9fdf95",
+    "android/app/src/test/java/com/samfa12/hordelanternrt/SurfaceSuspensionLifecycleTest.java": "edb58116ab2bfe27abe91944c209dc45de757b108097a8e3832904fb819e6c98",
+    "tests/LanternRewardTests.cpp": "98444a0b1e9439391404a1119e62def34742b9f70cadcab630b6070da9ebc171"
+  },
+  "androidUnitTests": {
+    "suites": 56,
+    "tests": 415,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 6,
+    "passed": 409,
+    "skippedCases": [
+      "com.samfa12.hordelanternrt.EnvironmentSurveyExportTest.actualExistingAndDanglingOutputLinksAreNotReplacedWhereHostSupportsLinks[24]",
+      "com.samfa12.hordelanternrt.EnvironmentSurveyExportTest.actualExistingAndDanglingOutputLinksAreNotReplacedWhereHostSupportsLinks",
+      "com.samfa12.hordelanternrt.EnvironmentSurveyExportTest.actualSymbolicExternalRootIsRejectedWhereHostSupportsLinks[24]",
+      "com.samfa12.hordelanternrt.EnvironmentSurveyExportTest.actualSymbolicExternalRootIsRejectedWhereHostSupportsLinks",
+      "com.samfa12.hordelanternrt.EnvironmentSurveyExportTest.actualSameParentSourceLinkIsRejectedWhereHostSupportsLinks[24]",
+      "com.samfa12.hordelanternrt.EnvironmentSurveyExportTest.actualSameParentSourceLinkIsRejectedWhereHostSupportsLinks"
+    ],
+    "skipReason": "Existing host-symbolic-link support assumptions on Windows; no tests or privileges changed",
+    "runner": "Gradle :app:testDebugUnitTest",
+    "secondsReported": 34
+  },
+  "androidBuildAndLint": {
+    "passed": true,
+    "secondsReported": 118,
+    "configuration": "ordinary Debug, default configured ABIs; no device installation"
+  },
+  "androidApk": {
+    "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+    "bytes": 194755843,
+    "sha256": "2b745081d334a7f9e6ab59c3c092bccf3aa9989ce3eae2fbc876b78ab3ba1f31",
+    "physicalValidation": "NOT RUN: no connected adb device"
+  },
+  "nativeLanternTests": {
+    "configuration": "MSVC Debug",
+    "tests": 1,
+    "passed": 1,
+    "seconds": 6.67,
+    "cases": [
+      "fixture116",
+      "production-interaction-claim"
+    ],
+    "rebindsPerCase": 3,
+    "binarySha256": "bca5833e04329c038540c1bf0983cfcfe3741798e9aa556a0b187f415001e965",
+    "firstParallelBuildAttempt": "stalled; interrupted; focused serial /m:1 /nr:false passed"
+  },
+  "priorHostedCi": {
+    "head": "8937eed5fd9104527bd5c8b9566dd54d8334836b",
+    "run": 39933824808,
+    "terminal": true,
+    "success": [
+      "GCC",
+      "Clang",
+      "ASan/UBSan",
+      "Vulkan-host"
+    ],
+    "cancelled": [
+      "MSVC existing job cap"
+    ],
+    "failure": "Android: 414 tests, ChapterDebugCheckpointTest.allAuthoredChapterCapturesResolveWithTheirNativeCamera line29, 1 failed; native228/229 omitted from Android mapping"
+  },
+  "phone": {
+    "adbDevices": [],
+    "requestedSerialResult": "device 'R5GL219SZGK' not found",
+    "deviceMutation": false,
+    "installCaptureInputOrTransfer": false,
+    "ownedOperationRemaining": false,
+    "previousRestorationReceipt": "../2026-10-23-touch-hud-phone/closure.json"
+  },
+  "localRawLogSha256": {
+    "reports/touch-hud-20261023/rotation-host-before.log": "1ab12928d36b4fcd84a24aa45fb661e3af1ff88a533bfc4bf54135e01eedb8d6",
+    "reports/touch-hud-20261023/rotation-host-combined.log": "a847c6a958088b08f4c7be60f5eeaed5212e9aeb2b76f415c8052e0ee96bda19",
+    "reports/touch-hud-20261023/rotation-android-checkpoint.log": "a5db79b178b6d68f67de227494acf483448384764dcc63df05181e28b3faf0a3",
+    "reports/touch-hud-20261023/rotation-android-all-unit.log": "300e6e8f7f8f2e1c891bae0cc1d106b9d740561d92a9f6b2efea2cef8c9aab9d",
+    "reports/touch-hud-20261023/ci-android-8937.txt": "67a1e2b4fd84314921e95ab063673f17187f78f4c0a6e11f3d39cd1e526c3378",
+    "build/presets/windows-x64-debug/Testing/Temporary/LastTest.log": "cd49b74df74015320b88aaa89af747fb1a873e0c2b5e688f22e5523c148e6815"
+  }
+}
