@@ -1,0 +1,344 @@
+{
+  "schema": 1,
+  "evidenceClass": "bounded actual Android RT staged-equipment HUD and lifecycle check",
+  "sourceCheckpoint": "a088ae4e3eb6ef3db22630c555d0a1078ad919e9",
+  "testedApk": {
+    "sha256": "3c19e74b1e34369e3208068e4c9dc19337d3d4298d0ef2365a09ed0314a4ded3",
+    "bytes": 194997073,
+    "sourceReceipt": "../2026-10-23-compact-hud/receipt.json",
+    "scope": "already-built compact HUD APK, not a newly built a088 full runtime"
+  },
+  "device": {
+    "model": "SM-S948B",
+    "android": "17",
+    "api": "37",
+    "effectiveDpi": 560,
+    "fontScale": 1.7
+  },
+  "startedCustodyUtc": "2026-10-23T19:22:56.259000+00:00",
+  "releasedUtc": "2026-10-23T19:27:12.644000+00:00",
+  "setup": {
+    "fixture": "lantern-held-high /116",
+    "isolatedNamespace": "hud-phone-20261023-1923",
+    "stagedOnce": true,
+    "restagedOnRotation": false,
+    "sameProcess": true,
+    "nativeGenerations": [
+      1,
+      3
+    ],
+    "naturalEarnedProgression": false
+  },
+  "results": {
+    "portraitLowerTap": true,
+    "loweredStateRetainedAcrossHomeLandscapeFullSurfaceRebind": true,
+    "landscapeRaiseTap": true,
+    "heldLookDragReleased": true,
+    "lookDragObservedViewChange": true,
+    "lookDragTriggeredLantern": false,
+    "ownerComfortAccepted": false,
+    "performanceClaim": false,
+    "subtitleAcceptance": false,
+    "continuousMovementAndMultitouchAcceptance": false
+  },
+  "captures": {
+    "portrait-before": {
+      "file": "portrait-before.webp",
+      "originalPngSha256": "695a95029b66abe9ea5f985cf1e33462ab773d99b8d127c66c17396838945eb5",
+      "webpSha256": "4f72276054e77421a6efb88acfbc6ec4b7b021075651a3301c85ba860ebaa990",
+      "conversion": "lossless WebP; decoded RGB bytes verified identical to original PNG",
+      "dimensions": [
+        1440,
+        3120
+      ]
+    },
+    "landscape-return": {
+      "file": "landscape-return.webp",
+      "originalPngSha256": "99e6424eaaac03d4bb3f17d33f47773839d525eaf516acc225dca58398e25d8d",
+      "webpSha256": "b4b4301510fb7a96b1e052ca5c810c41ee4d1224ab1f73d8889dadecd5336515",
+      "conversion": "lossless WebP; decoded RGB bytes verified identical to original PNG",
+      "dimensions": [
+        3120,
+        1440
+      ]
+    }
+  },
+  "bounds": {
+    "portrait-before": {
+      "menu_button": {
+        "bounds": [
+          1132,
+          205,
+          1384,
+          373
+        ],
+        "label": "MENU",
+        "description": "MENU",
+        "enabled": "true",
+        "clickable": "true"
+      },
+      "toggle_held_light_pose_button": {
+        "bounds": [
+          852,
+          2476,
+          1048,
+          2672
+        ],
+        "label": "",
+        "description": "LOWER. Lantern raised.",
+        "enabled": "true",
+        "clickable": "true"
+      },
+      "dodge_button": {
+        "bounds": [
+          1118,
+          2476,
+          1398,
+          2672
+        ],
+        "label": "DODGE",
+        "description": "DODGE",
+        "enabled": "true",
+        "clickable": "true"
+      },
+      "parry_button": {
+        "bounds": [
+          810,
+          2700,
+          1090,
+          2896
+        ],
+        "label": "PARRY",
+        "description": "PARRY",
+        "enabled": "true",
+        "clickable": "true"
+      },
+      "attack_button": {
+        "bounds": [
+          1118,
+          2700,
+          1398,
+          2896
+        ],
+        "label": "SWING",
+        "description": "SWING",
+        "enabled": "true",
+        "clickable": "true"
+      }
+    },
+    "portrait-lowered": {
+      "menu_button": {
+        "bounds": [
+          1132,
+          205,
+          1384,
+          373
+        ],
+        "label": "MENU",
+        "description": "MENU",
+        "enabled": "true",
+        "clickable": "true"
+      },
+      "toggle_held_light_pose_button": {
+        "bounds": [
+          852,
+          2476,
+          1048,
+          2672
+        ],
+        "label": "",
+        "description": "RAISE. Lantern lowered.",
+        "enabled": "true",
+        "clickable": "true"
+      },
+      "dodge_button": {
+        "bounds": [
+          1118,
+          2476,
+          1398,
+          2672
+        ],
+        "label": "DODGE",
+        "description": "DODGE",
+        "enabled": "true",
+        "clickable": "true"
+      },
+      "parry_button": {
+        "bounds": [
+          810,
+          2700,
+          1090,
+          2896
+        ],
+        "label": "PARRY",
+        "description": "PARRY",
+        "enabled": "true",
+        "clickable": "true"
+      },
+      "attack_button": {
+        "bounds": [
+          1118,
+          2700,
+          1398,
+          2896
+        ],
+        "label": "SWING",
+        "description": "SWING",
+        "enabled": "true",
+        "clickable": "true"
+      }
+    },
+    "landscape-return": {
+      "menu_button": {
+        "bounds": [
+          2644,
+          161,
+          2896,
+          329
+        ],
+        "label": "MENU",
+        "description": "MENU",
+        "enabled": "true",
+        "clickable": "true"
+      },
+      "toggle_held_light_pose_button": {
+        "bounds": [
+          2364,
+          964,
+          2560,
+          1160
+        ],
+        "label": "",
+        "description": "RAISE. Lantern lowered.",
+        "enabled": "true",
+        "clickable": "true"
+      },
+      "dodge_button": {
+        "bounds": [
+          2630,
+          964,
+          2910,
+          1160
+        ],
+        "label": "DODGE",
+        "description": "DODGE",
+        "enabled": "true",
+        "clickable": "true"
+      },
+      "parry_button": {
+        "bounds": [
+          2322,
+          1188,
+          2602,
+          1384
+        ],
+        "label": "PARRY",
+        "description": "PARRY",
+        "enabled": "true",
+        "clickable": "true"
+      },
+      "attack_button": {
+        "bounds": [
+          2630,
+          1188,
+          2910,
+          1384
+        ],
+        "label": "SWING",
+        "description": "SWING",
+        "enabled": "true",
+        "clickable": "true"
+      }
+    },
+    "landscape-raised-look": {
+      "menu_button": {
+        "bounds": [
+          2644,
+          161,
+          2896,
+          329
+        ],
+        "label": "MENU",
+        "description": "MENU",
+        "enabled": "true",
+        "clickable": "true"
+      },
+      "toggle_held_light_pose_button": {
+        "bounds": [
+          2364,
+          964,
+          2560,
+          1160
+        ],
+        "label": "",
+        "description": "LOWER. Lantern raised.",
+        "enabled": "true",
+        "clickable": "true"
+      },
+      "dodge_button": {
+        "bounds": [
+          2630,
+          964,
+          2910,
+          1160
+        ],
+        "label": "DODGE",
+        "description": "DODGE",
+        "enabled": "true",
+        "clickable": "true"
+      },
+      "parry_button": {
+        "bounds": [
+          2322,
+          1188,
+          2602,
+          1384
+        ],
+        "label": "PARRY",
+        "description": "PARRY",
+        "enabled": "true",
+        "clickable": "true"
+      },
+      "attack_button": {
+        "bounds": [
+          2630,
+          1188,
+          2910,
+          1384
+        ],
+        "label": "SWING",
+        "description": "SWING",
+        "enabled": "true",
+        "clickable": "true"
+      }
+    }
+  },
+  "restoration": {
+    "utcUnixMs": 1792783632644,
+    "safeToDisconnect": true,
+    "phoneReleased": true,
+    "bothOriginalInstalledHashesRestored": true,
+    "priorSaveAndLockFiles": 18,
+    "priorSaveBytesUnchanged": true,
+    "preferenceBytesUnchanged": true,
+    "systemSettingsRestored": true,
+    "onlyAddedIsolatedTestPaths": [],
+    "ownedRendererOrTransferRemaining": false
+  },
+  "originalInstalledApkHashes": {
+    "com.samfa12.hordelanternrt.debug": "fe3a51beb3a2d6385232dcccfdf8315785e969825e8a35a7de65be8894f46925",
+    "com.samfa12.hordelanternrt": "cc4de768cf9ca2a409984a24888399e9c518363c359b3a9947d1ed0350c254e8"
+  },
+  "rawLocalEvidence": "reports/hud-phone-20261023-1923/phone",
+  "rawFilesSha256": {
+    "closure.json": "6a68e3d1128e1bd87fb6c210d63aa61db3b3d10947f0d9f25189e5859d45870f",
+    "owner-saves.sha256": "337cb5557576bc2a0a1cf53c9c9f7e1945d6e8008fb433168198e018dcf6c7fd",
+    "owner-settings.xml": "089cc347a16c7f0bb5830b7c52e4154bae73be5dd4de5ecf031629d786491cfa",
+    "portrait-before.png": "695a95029b66abe9ea5f985cf1e33462ab773d99b8d127c66c17396838945eb5",
+    "portrait-lowered.png": "233ec887f39d5224d9f86d82879cd5eaf03195bfe676f0f8d1314eab0fd8c39d",
+    "landscape-return.png": "99e6424eaaac03d4bb3f17d33f47773839d525eaf516acc225dca58398e25d8d",
+    "landscape-raised-look.png": "7eb268b9559ac4db5e6ed6d8827f51b056dfc713d3d02b4d72b3351c1d8e1c9a",
+    "landscape-touch.json": "cd3c92b7a943f29f9e172b79c7f15e70a5284b454465e04ca0be8560e6d6ce4e"
+  },
+  "pendingOwnerFeedback": "Swing/Parry need more prominence; comparative mobile-game research requested before redesign. No follow-up layout implemented."
+}

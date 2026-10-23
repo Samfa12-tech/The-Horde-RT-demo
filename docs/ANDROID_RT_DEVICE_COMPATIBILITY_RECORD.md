@@ -3634,3 +3634,22 @@ Baseline phone released10:15:24UTC: both original installed APK hashes, all18
 prior save/lock files, preference bytes and rotation/settings verified restored;
 no app PID, Horde surface, owned capture/install/transfer remained. The later
 disconnected attempt started no phone mutation or renderer.
+
+### 23 October 2026: compact HUD physical after check
+
+SM-S948B Android17/API37, owner font1.7/effective560dpi. Exact already-built
+compact-HUD Debug APK `3c19e74b1e34369e3208068e4c9dc19337d3d4298d0ef2365a09ed0314a4ded3`
+was temporarily installed in the owner-authorized short window. Bounded actual
+RT equipment-fixture/HUD evidence: portrait Lower, Home/landscape full-surface
+rebind in the same process without restaging, retained lowered pose and returned
+control, landscape Raise, and one held/released look gesture pass. Actual
+portrait/landscape captures show the compact lower-right dock. This supersedes
+the prior compact-APK disconnected validation gap for these specific checks.
+It does not establish a natural earned journey, original disappearance cause,
+all lifecycle paths, performance or owner thumb acceptance. Sam requests revised
+Swing/Parry prominence after comparative mobile-game research; no redesign yet.
+[Exact captures, scope and receipt](evidence/2026-10-23-compact-hud-phone/README.md).
+
+Released19:27:12UTC: both original APK hashes,18 prior save/lock files, preference
+bytes and original system settings verified restored; zero new save paths; no
+owned app renderer, installation, capture or transfer. No phone calls afterwards.
