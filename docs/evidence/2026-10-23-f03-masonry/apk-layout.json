@@ -1,0 +1,36 @@
+[
+  {
+    "path": "android\\app\\build\\outputs\\apk\\debug\\app-debug.apk",
+    "bytes": 205951203,
+    "entries": 202,
+    "compressedPayload": 194685450,
+    "localBaseBytes": 17697,
+    "localExtraBytes": 24075,
+    "interRecordGaps": 11198934,
+    "preCentralGap": 4096,
+    "centralAndEndBytes": 20951,
+    "nonzeroGaps": [
+      {
+        "name": "assets/audio/music/beneath-the-same-moon/asset.manifest.json",
+        "offset": 15804319,
+        "gapBefore": 326102,
+        "localExtraBytes": 0,
+        "end": 15805081
+      },
+      {
+        "name": "assets/LICENSE",
+        "offset": 21215461,
+        "gapBefore": 5410380,
+        "localExtraBytes": 0,
+        "end": 21216146
+      },
+      {
+        "name": "assets/audio/music/beneath-the-same-moon/runtime/outdoor-main.wav",
+        "offset": 179615600,
+        "gapBefore": 5462452,
+        "localExtraBytes": 1,
+        "end": 200095740
+      }
+    ]
+  }
+]

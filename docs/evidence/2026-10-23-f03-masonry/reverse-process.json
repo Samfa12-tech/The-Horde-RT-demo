@@ -1,0 +1,36 @@
+{
+  "settingsAfter": "ED609B868FD2951698C46BB17B98FFBAD647BF30CA7CFACFA5D64F5342FD57C3",
+  "baseCommit": "30b5e3ed8f85bc39a63db288081ecb0626bd9a8a",
+  "view": "reverse",
+  "settingsBefore": "ED609B868FD2951698C46BB17B98FFBAD647BF30CA7CFACFA5D64F5342FD57C3",
+  "endedUtc": "2026-10-23T04:35:30.6707118Z",
+  "ownerCampaignRemainsAbsent": true,
+  "scope": "Diagnostic seeded accepted-death ascent/walk then frozen RT view; no campaign PlaySession or audio playback; not natural victory, listening, performance or phone acceptance",
+  "startedUtc": "2026-10-23T04:35:16.7875600Z",
+  "exeSha256": "094DE5493CD3A8972A889D2B631A3830C9806C2EDFDB5D7F6D88B9043C2D9C79",
+  "completed": true,
+  "exitCode": 0,
+  "dirtyFiles": [
+    ".gitattributes",
+    ".github/workflows/shared-simulation-host.yml",
+    "ASSET_LICENSES.md",
+    "CMakeLists.txt",
+    "android/app/build.gradle",
+    "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java",
+    "cmake/HordeRtSources.cmake",
+    "src/vulkan/raytracing/PresentableTinyRtScene.cpp",
+    "tests/ForestDressingTests.cpp",
+    "tests/Horde162AssetPolicyTests.ps1",
+    "tools/horde-1.6.2-asset-policy.ps1",
+    "tools/package-alpha.ps1"
+  ],
+  "arguments": [
+    "--development-rescue-journey",
+    "--capture-showcase",
+    "\"C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\f03-masonry-20261023\\closing\\reverse\"",
+    "--capture-hidden",
+    "--development-checkpoint",
+    "chapter-forest-clue-reverse"
+  ],
+  "pid": 75168
+}

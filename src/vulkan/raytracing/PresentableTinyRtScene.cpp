@@ -4,6 +4,7 @@
 #include "scene/ForestUnderstory.h"
 #include "scene/ForestRockDressing.h"
 #include "scene/ForestDeadwood.h"
+#include "scene/ForestRoadClue.h"
 #include "scene/BellwetherShell.h"
 #include "scene/GraveyardDressing.h"
 #include "scene/RescueLidFinish.h"
@@ -2729,6 +2730,9 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
             return false;
         horde::scene::ForestDeadwoodReport deadwood;
         if (!horde::scene::AppendPreparedForestDeadwood(root, collapseStaticAsset_, chapterTerrainSurface_, deadwood, diagnostic))
+            return false;
+        horde::scene::ForestRoadClueReport roadClue;
+        if (!horde::scene::AppendForestRoadClue(root, collapseStaticAsset_, chapterTerrainSurface_, roadClue, diagnostic))
             return false;
         // The collapse's final masonry range and the first dressing range use
         // the same material. Keep every triangle while sharing one metadata row;

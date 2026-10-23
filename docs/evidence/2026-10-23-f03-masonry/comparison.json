@@ -1,0 +1,50 @@
+{
+  "scope": "Cold 12-frame Diagnostic capture comparison, frozen scene. Not sustained performance, CPU utilisation, natural journey or Android acceptance.",
+  "comparisons": [
+    {
+      "view": "forward",
+      "samplesEach": 12,
+      "controlFrameWallMedianMs": 10.68205,
+      "candidateFrameWallMedianMs": 10.5055,
+      "frameWallChangePercent": -1.6527726419554356,
+      "controlGpuCommandMeanMs": 7.786672,
+      "candidateGpuCommandMeanMs": 8.119654,
+      "samePng": false,
+      "resourceDeltas": {
+        "vertexBytes": 18432,
+        "indexBytes": 1728,
+        "productionPropBlasBytes": 7296
+      }
+    },
+    {
+      "view": "reverse",
+      "samplesEach": 12,
+      "controlFrameWallMedianMs": 10.6418,
+      "candidateFrameWallMedianMs": 11.1239,
+      "frameWallChangePercent": 4.530248642147017,
+      "controlGpuCommandMeanMs": 8.005818,
+      "candidateGpuCommandMeanMs": 9.094936,
+      "samePng": false,
+      "resourceDeltas": {
+        "vertexBytes": 18432,
+        "indexBytes": 1728,
+        "productionPropBlasBytes": 7296
+      }
+    },
+    {
+      "view": "lookout",
+      "samplesEach": 12,
+      "controlFrameWallMedianMs": 9.463,
+      "candidateFrameWallMedianMs": 8.98515,
+      "frameWallChangePercent": -5.049667124590496,
+      "controlGpuCommandMeanMs": 6.49816,
+      "candidateGpuCommandMeanMs": 5.897893,
+      "samePng": true,
+      "resourceDeltas": {
+        "vertexBytes": 18432,
+        "indexBytes": 1728,
+        "productionPropBlasBytes": 7296
+      }
+    }
+  ]
+}

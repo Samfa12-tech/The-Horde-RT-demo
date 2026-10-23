@@ -1,5 +1,21 @@
 # Asset Licenses
 
+## Original F03 road masonry clue (1.7 development)
+
+`tools/prepare-forest-road-clue.py` authors two small closed static GLBs from
+numeric geometry for this project: a kerb and a tapered waystone with three
+raised scored marks. The recipe and authorship record remain under
+`assets/source/beyond_the_tomb/forest-road-clue-v1/`; runtime consumes only the
+three-file `assets/models/world/runtime/forest-road-clue-v1/` roster. No external
+model, generation service or paid input was acquired. Applicable user/service
+rights remain unchanged; no blanket MIT, CC0 or third-party licence is assigned
+to the original geometry. Placements reuse the existing Poly Haven CC0
+MedievalWall02 material and maps, whose separate attribution remains below.
+The same terrain-fitted triangles supply ordinary RT geometry and nonwalkable
+contact in the existing consolidated world owner. No new material, texture
+layer, light, transparency, instance, save field or road interaction is added.
+Native image/grounding and physical-device acceptance remain separate.
+
 ## Original tomb-floor masonry chips (1.7 development)
 
 `src/scene/TombFloorDebris.h` authors six small closed fractured-stone meshes in

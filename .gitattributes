@@ -465,3 +465,4 @@ assets/source/beyond_the_tomb/music/beneath-the-same-moon-outdoor-r2/*.zip filte
 
 assets/audio/music/beneath-the-same-moon/runtime/*.wav filter=lfs diff=lfs merge=lfs -text
 assets/audio/music/beneath-the-same-moon/asset.manifest.json text eol=lf
+assets/models/world/runtime/forest-road-clue-v1/*.json text eol=lf

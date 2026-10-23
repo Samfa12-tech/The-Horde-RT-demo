@@ -1,0 +1,2 @@
+timestamp, name, temperature.gpu, clocks.current.graphics [MHz], clocks.current.memory [MHz], power.draw [W], pstate
+2026/10/23 15:32:35.505, NVIDIA GeForce RTX 5050 Laptop GPU, 42, 180 MHz, 405 MHz, 3.20 W, P8

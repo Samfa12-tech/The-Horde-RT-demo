@@ -1,0 +1,51 @@
+{
+  "artifact": "android\\app\\build\\outputs\\apk\\debug\\app-debug.apk",
+  "bytes": 205951203,
+  "sha256": "b47df5177523b920ac7c8ede6c1a6a3c62685a9e596b1fe1a5b4151874911e5f",
+  "builtUtc": "2026-10-23T04:38:06.995344+00:00",
+  "version": {
+    "type": "SINGLE",
+    "filters": [],
+    "attributes": [],
+    "versionCode": 10,
+    "versionName": "1.6.2-debug",
+    "outputFile": "app-debug.apk"
+  },
+  "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+  ],
+  "javaTests": {
+    "tests": 411,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 6
+  },
+  "runtimeFiles": [
+    {
+      "path": "assets/models/world/runtime/forest-road-clue-v1/asset.manifest.json",
+      "bytes": 960,
+      "sha256": "d69c31f7fe62864dcdcb76ed054dc2316fe6e63f2b40c45b9cffc9e54b68b0d5",
+      "apkCompressedBytes": 553,
+      "apkCompressionMethod": 8
+    },
+    {
+      "path": "assets/models/world/runtime/forest-road-clue-v1/horde-road-kerb.glb",
+      "bytes": 2596,
+      "sha256": "7bf6a0bafb61d0c32c25ca8f7e730db5d17a72582b1d12097a381be2d29632bc",
+      "apkCompressedBytes": 876,
+      "apkCompressionMethod": 8
+    },
+    {
+      "path": "assets/models/world/runtime/forest-road-clue-v1/horde-road-waystone.glb",
+      "bytes": 6252,
+      "sha256": "7229e9920b0d5892a5f480722fa894a16a667c86059d29967d2a031e3f6edb1b",
+      "apkCompressedBytes": 1570,
+      "apkCompressionMethod": 8
+    }
+  ],
+  "threeFileWindowsStyleZipFixtureBytes": 3396,
+  "scope": "Actual local Debug APK inventory, no install. Three-file ZIP fixture is not a complete Windows distribution. No original/quiet masters admitted."
+}

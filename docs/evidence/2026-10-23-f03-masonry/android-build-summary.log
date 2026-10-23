@@ -1,0 +1,8 @@
+> Task :app:packageDebug
+> Task :app:testDebugUnitTest
+> Task :app:createDebugApkListingFileRedirect UP-TO-DATE
+> Task :app:assembleDebug
+[Incubating] Problems report is available at: file:///C:/Users/sam_s/Documents/the%20Horde%20RT%20Demo/.worktrees/horde-1.7-wp2-vertical-proof/android/build/reports/problems/problems-report.html
+
+BUILD SUCCESSFUL in 2m 38s
+49 actionable tasks: 23 executed, 26 up-to-date

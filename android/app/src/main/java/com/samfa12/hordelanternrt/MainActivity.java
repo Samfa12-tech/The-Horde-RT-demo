@@ -957,6 +957,9 @@ public class MainActivity extends Activity {
                     stageAsset("models/world/runtime/grave-markers-r03/grave-marker-round.manifest.json", "models/world/runtime/grave-markers-r03/grave-marker-round.manifest.json") &&
                     stageAsset("models/world/runtime/grave-markers-r03/grave-marker-round.runtime.glb", "models/world/runtime/grave-markers-r03/grave-marker-round.runtime.glb") &&
                     stageAsset("models/world/runtime/forest-rocks-v1/asset.manifest.json", "models/world/runtime/forest-rocks-v1/asset.manifest.json") &&
+                    stageAsset("models/world/runtime/forest-road-clue-v1/asset.manifest.json", "models/world/runtime/forest-road-clue-v1/asset.manifest.json") &&
+                    stageAsset("models/world/runtime/forest-road-clue-v1/horde-road-kerb.glb", "models/world/runtime/forest-road-clue-v1/horde-road-kerb.glb") &&
+                    stageAsset("models/world/runtime/forest-road-clue-v1/horde-road-waystone.glb", "models/world/runtime/forest-road-clue-v1/horde-road-waystone.glb") &&
                     stageAsset("models/world/runtime/forest-deadwood-v1/asset.manifest.json", "models/world/runtime/forest-deadwood-v1/asset.manifest.json") &&
                     stageAsset("models/world/runtime/forest-deadwood-v1/horde-fallen-log.glb", "models/world/runtime/forest-deadwood-v1/horde-fallen-log.glb") &&
                     stageAsset("models/world/runtime/forest-deadwood-v1/horde-root-tangle.glb", "models/world/runtime/forest-deadwood-v1/horde-root-tangle.glb") &&

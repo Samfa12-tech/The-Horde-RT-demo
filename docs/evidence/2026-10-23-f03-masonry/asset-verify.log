@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "operation": "verify",
+  "sourceRecipeSha256": "df7451569bdedd4c2d67237836c07c9369e12b529fc44f0c293d0587b670ba6d",
+  "manifestBytes": 960,
+  "manifestSha256": "d69c31f7fe62864dcdcb76ed054dc2316fe6e63f2b40c45b9cffc9e54b68b0d5",
+  "files": [
+    {
+      "file": "horde-road-kerb.glb",
+      "bytes": 2596,
+      "sha256": "7bf6a0bafb61d0c32c25ca8f7e730db5d17a72582b1d12097a381be2d29632bc",
+      "vertices": 24,
+      "indices": 36,
+      "triangles": 12,
+      "meshes": 1,
+      "primitives": 1,
+      "materials": 1,
+      "closedComponents": 1,
+      "minimumMetres": [
+        -0.12999999523162842,
+        0.0,
+        -0.32499998807907104
+      ],
+      "maximumMetres": [
+        0.12999999523162842,
+        0.14000000059604645,
+        0.32499998807907104
+      ],
+      "componentSignedVolumesM3": [
+        0.023659998365044618
+      ]
+    },
+    {
+      "file": "horde-road-waystone.glb",
+      "bytes": 6252,
+      "sha256": "7229e9920b0d5892a5f480722fa894a16a667c86059d29967d2a031e3f6edb1b",
+      "vertices": 96,
+      "indices": 144,
+      "triangles": 48,
+      "meshes": 1,
+      "primitives": 1,
+      "materials": 1,
+      "closedComponents": 4,
+      "minimumMetres": [
+        -0.25,
+        0.0,
+        -0.13500000536441803
+      ],
+      "maximumMetres": [
+        0.25,
+        1.0499999523162842,
+        0.13500000536441803
+      ],
+      "componentSignedVolumesM3": [
+        0.09827999865353089,
+        6.687995151888424e-05,
+        5.642996259769175e-05,
+        4.5980035929760025e-05
+      ]
+    }
+  ],
+  "deterministicRegeneration": true,
+  "validationScope": "Static GLB bytes/geometry/UV/tangents only; no native import, RT presentation or visual acceptance claim."
+}

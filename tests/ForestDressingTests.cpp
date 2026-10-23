@@ -6,6 +6,7 @@
 #include "scene/ForestUnderstory.h"
 #include "scene/ForestRockDressing.h"
 #include "scene/ForestDeadwood.h"
+#include "scene/ForestRoadClue.h"
 #include "scene/BellwetherShell.h"
 #include "scene/GraveyardDressing.h"
 #include "scene/ChapterTerrainSurface.h"
@@ -407,6 +408,7 @@ void TestNativeChapterPrimitiveOwnership()
     ForestUnderstoryReport understory;
     ForestDeadwoodReport deadwood;
     ForestRockReport rocks;
+    ForestRoadClueReport roadClue;
     std::shared_ptr<const gameplay::simulation::TriangleSupportSurface> terrain;
     const bool prepared = AppendPreparedTombDressing(kRoot / "assets", owner, tomb, diagnostic) &&
         AppendChapterTerrain(kRoot / "assets", owner, terrain, diagnostic) &&
@@ -441,6 +443,62 @@ void TestNativeChapterPrimitiveOwnership()
                 return accepted;
             });
             return AppendPreparedForestDeadwood(kRoot/"assets",owner,terrain,deadwood,diagnostic);}() &&
+        [&]{CheckCorruptForestProvenance(owner,[&](auto& invalid) {
+                auto retained=terrain;ForestRoadClueReport rejected;
+                const bool accepted=AppendForestRoadClue(kRoot/"assets",invalid,retained,rejected,diagnostic);
+                Check(retained==terrain,"rejected road-clue ownership retains authoritative contact");
+                return accepted;
+            });
+            const auto prior=terrain;
+            const auto materialCount=owner.materials.size();
+            if(!AppendForestRoadClue(kRoot/"assets",owner,terrain,roadClue,diagnostic))return false;
+            Check(roadClue.triangles==144 && roadClue.placements.size()==9 &&
+                  owner.materials.size()==materialCount && terrain->TriangleCount()==prior->TriangleCount() &&
+                  terrain->StepTriangleCount()==prior->StepTriangleCount() &&
+                  terrain->NonWalkableTriangleCount()==prior->NonWalkableTriangleCount()+144,
+                  "bounded road cue shares masonry and adds only its same 144 nonwalkable render/contact triangles");
+            Check(roadClue.minimumTrailClearance>=1.44f && roadClue.maximumBottomGap<=-.029f,
+                  "actual road geometry preserves trail/capsule margin and embeds its bottom perimeter");
+            for(const auto& placed:roadClue.placements) {
+                Check(!placed.bottomContacts.empty(),"every road piece retains actual bottom-footprint witnesses");
+                for(const auto& point:placed.bottomContacts) {
+                    const auto under=prior->Query(point[0],point[2]);
+                    if(under.found && point[1]<under.worldY-.30f)
+                        std::cerr<<"Buried road footprint: source="<<placed.source<<" origin="<<placed.origin[0]<<','
+                            <<placed.origin[1]<<','<<placed.origin[2]<<" bottom="<<point[0]<<','<<point[1]<<','<<point[2]
+                            <<" groundY="<<under.worldY<<" gap="<<(point[1]-under.worldY)<<'\n';
+                    Check(under.found && point[1]<=under.worldY-.029f && point[1]>=under.worldY-.30f,
+                          "road base vertices are grounded and burial remains bounded on actual immutable terrain");
+                }
+                const auto ground=terrain->Query(placed.origin[0],placed.origin[2]);
+                Check(ground.found && !terrain->NonWalkableVolumeClear(placed.origin[0],placed.origin[2],
+                    placed.origin[0],placed.origin[2],ground.worldY+.01f,ground.worldY+1.6f,.24f),
+                    "rendered road solids participate in the existing physical capsule contact");
+            }
+            for(std::size_t segment=5;segment<=6;++segment) {
+                const auto a=gameplay::simulation::kWorldRoutePoints[segment];
+                const auto b=gameplay::simulation::kWorldRoutePoints[segment+1];
+                const float dx=b.x-a.x,dz=b.z-a.z,len=std::hypot(dx,dz);
+                for(unsigned station=0;station<=40;++station)for(float side:{-1.2f,0.f,1.2f}) {
+                    const float x=a.x+dx*station/40.f-dz/len*side,z=a.z+dz*station/40.f+dx/len*side;
+                    const auto before=prior->Query(x,z),after=terrain->Query(x,z);
+                    Check(before.found==after.found && before.worldY==after.worldY &&
+                          before.triangle==after.triangle && before.normal==after.normal && before.surface==after.surface,
+                          "F03 trail and capsule-side samples retain exact pre-cue ground/support identity");
+                    if(before.found)Check(prior->NonWalkableVolumeClear(x,z,x,z,before.worldY+.02f,before.worldY+1.6f,.24f)==
+                        terrain->NonWalkableVolumeClear(x,z,x,z,before.worldY+.02f,before.worldY+1.6f,.24f),
+                        "road cue cannot add a blocker to the existing trail and capsule margin");
+                }
+            }
+            auto duplicate=owner;auto retained=terrain;ForestRoadClueReport rejected;
+            Check(!AppendForestRoadClue(kRoot/"assets",duplicate,retained,rejected,diagnostic) &&
+                  retained==terrain && duplicate.vertices.size()==owner.vertices.size() && rejected.placements.empty(),
+                  "duplicate road admission rejects atomically without new contact or geometry");
+            std::cout<<"F03 road clue: triangles="<<roadClue.triangles<<" verticesBytes="<<roadClue.vertexBytes
+                <<" indexBytes="<<roadClue.indexBytes<<" minimumTrailClearance="<<roadClue.minimumTrailClearance
+                <<" minimumBottomGap="<<roadClue.minimumBottomGap<<" maximumBottomGap="<<roadClue.maximumBottomGap
+                <<" stepTriangles="<<terrain->StepTriangleCount()<<'\n';
+            return true;}() &&
         ConsolidateWorldBakedMaterialFamilies(owner, diagnostic);
     Check(prepared, diagnostic.empty() ? "real tomb/terrain/forest preparation succeeds" : diagnostic);
     if (!prepared) return;
@@ -575,8 +633,8 @@ void TestNativeChapterPrimitiveOwnership()
     Check(taggedTomb>0 && taggedExterior>0,
           "mixed candle/urn material families must distinguish tomb and actual graveyard geometry");
     Check(taggedExterior==static_cast<std::ptrdiff_t>(graveyard.triangles + forest.addedTriangles +
-              understory.triangles + rocks.triangles + deadwood.triangles),
-          "all graveyard, tree, understory, rock and deadwood triangles retain exterior ownership");
+              understory.triangles + rocks.triangles + deadwood.triangles + roadClue.triangles),
+          "all graveyard, tree, understory, rock, deadwood and road triangles retain exterior ownership");
     for(const auto& primitive:owner.primitives)for(std::size_t n=0;n<primitive.indexCount;n+=3u) {
         if(owner.triangleRegions[(primitive.indexOffset+n)/3u]!=StaticTriangleRegion::ExteriorDressing)continue;
         const auto inside=[&](const auto& minimum,const auto& maximum) {
@@ -597,7 +655,9 @@ void TestNativeChapterPrimitiveOwnership()
                 [&](const auto& p){return inside(p.minimum,p.maximum);}) ||
             std::any_of(deadwood.placements.begin(),deadwood.placements.end(),
                 [&](const auto& p){return inside(p.minimum,p.maximum);}) ||
-            inside(deadwood.trailRoot.minimum,deadwood.trailRoot.maximum);
+            inside(deadwood.trailRoot.minimum,deadwood.trailRoot.maximum) ||
+            std::any_of(roadClue.placements.begin(),roadClue.placements.end(),
+                [&](const auto& p){return inside(p.minimum,p.maximum);});
         Check(authored,"exterior provenance must still identify actual authored placements after reordering");
     }
     StaticMeshAsset selected, restored;

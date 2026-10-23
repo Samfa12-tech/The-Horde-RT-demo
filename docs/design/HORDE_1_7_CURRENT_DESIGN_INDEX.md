@@ -2,6 +2,17 @@
 
 ## Resumed owner playtest priorities - 22 October 2026
 
+The [23 October F03 masonry checkpoint](../evidence/2026-10-23-f03-masonry/README.md)
+adds the inspected missing road story cue: eight grounded edging stones and one
+marked waystone, within the existing masonry material and consolidated RT owner.
+Terrain/contact, Kit/staged route, paired native RT views, Android compilation
+and exact package inventory pass. The matched lookout image is unchanged; short
+cold timing stays narrow evidence. Original grounding failure is retained.
+Chimney smoke, phone visuals/warm cost, natural journey and existing audio gates
+remain open. The separate [F03 roster correction](../evidence/2026-10-23-f03-roster/README.md)
+fixes an exact test count; it does not relax CI or Debug deadlines. New source
+checkpoints require their own complete hosted result.
+
 The [23 October outdoor-main checkpoint](../evidence/2026-10-23-outdoor-main/README.md)
 resolves the canonical long-PCM prerequisite and admits the approved full main
 through the same Pocket Audio bank/director/workers. Chapter G-to-Outdoor and

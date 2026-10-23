@@ -1,0 +1,22 @@
+Native root footprint samples=4992 exposed=0 maximum_gap_m=-0.0199988
+Buried road footprint: source=0 origin=-3.83117,-0.275298,18.1887 bottom=-3.48139,-0.277598,18.1756 groundY=0.0362619 gap=-0.313859
+FAIL: road base vertices are grounded and burial remains bounded on actual immutable terrain
+Buried road footprint: source=0 origin=-3.83117,-0.275298,18.1887 bottom=-3.48139,-0.277598,18.1756 groundY=0.0362619 gap=-0.313859
+FAIL: road base vertices are grounded and burial remains bounded on actual immutable terrain
+Buried road footprint: source=0 origin=-3.83117,-0.275298,18.1887 bottom=-3.48139,-0.277598,18.1756 groundY=0.0362619 gap=-0.313859
+FAIL: road base vertices are grounded and burial remains bounded on actual immutable terrain
+Buried road footprint: source=0 origin=-1.84951,-0.272822,19.4011 bottom=-1.52405,-0.293339,19.5283 groundY=0.030897 gap=-0.324236
+FAIL: road base vertices are grounded and burial remains bounded on actual immutable terrain
+Buried road footprint: source=0 origin=-1.84951,-0.272822,19.4011 bottom=-1.52405,-0.293339,19.5283 groundY=0.030897 gap=-0.324236
+FAIL: road base vertices are grounded and burial remains bounded on actual immutable terrain
+Buried road footprint: source=0 origin=-1.84951,-0.272822,19.4011 bottom=-1.52405,-0.293339,19.5283 groundY=0.030897 gap=-0.324236
+FAIL: road base vertices are grounded and burial remains bounded on actual immutable terrain
+F03 road clue: triangles=144 verticesBytes=18432 indexBytes=1728 minimumTrailClearance=1.62347 maximumBottomGap=-0.03 stepTriangles=20
+Triangle-region candidate: retainedExterior=365376 omittedTomb=13588 vertexBytes=31438784 indexBytes=5007144; CPU candidate only, spatial eviction permission not established
+Cached native selection: turns=173 maximumCpuAdvanceMs=6.0114 scannedBytes=5601050; CPU candidate only, normal eviction remains prohibited
+Native selected geometry common+tomb: primitives=5 vertexBytes=4073792 indexBytes=481488 removedVertexBytes=28041216 removedIndexBytes=4688712; CPU preparation only; common masonry still includes tomb surfaces
+Native selected geometry common+forest: primitives=8 vertexBytes=31205568 indexBytes=4964496 removedVertexBytes=909440 removedIndexBytes=205704; CPU preparation only; common masonry still includes tomb surfaces
+Native selected geometry one-owner common+forest: primitives=8 vertexBytes=31205568 indexBytes=4964496 removedVertexBytes=909440 removedIndexBytes=205704; CPU preparation only; common masonry still includes tomb surfaces
+Native selected geometry one-owner common+tomb: primitives=5 vertexBytes=4073792 indexBytes=481488 removedVertexBytes=28041216 removedIndexBytes=4688712; CPU preparation only; common masonry still includes tomb surfaces
+Native chapter ownership: common 2 (includes mixed tomb masonry), tomb 3, forest 6; primitiveRows=11 vertexBytes=32115008 indexBytes=5170200; CPU admission only
+6 forest dressing check(s) failed.

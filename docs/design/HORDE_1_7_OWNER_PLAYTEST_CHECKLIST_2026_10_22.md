@@ -17,7 +17,7 @@ No release, merge, paid generation or spending is authorized.
 | Touch clutter / auto crouch / speed | Shared automatic head-clearance crouch and touch/controller deflection speed are implemented; keyboard Shift/Caps Lock retained. Ordinary Run/Crouch buttons and manual stance bindings are inactive, removing the truncated Running label. Seven native tests and 97 focused Android tests pass, including collision/step/roof negatives and input/lifecycle. Two blocked transition ticks occur on entry in the terrain fixture; physical play feel and final portrait/landscape UI remain pending. [Checkpoint](../evidence/2026-10-22-auto-crouch/README.md). No-Skip and compact56dp lantern icon remain unaccepted on phone. Briarhold circular/translucent reference reviewed read-only; broader redesign deferred by owner19:35. |
 | Brief dark world at 28.25-28.75s | Original clip cause remains unknown. Separate Windows RT reproduction proves carried torch Light can cross a wall. Whole-hand translation and the subsequent cant/tuck trial are both withdrawn: lit stone improves, but retained diag11 loses its torch. Corrected cant contains all 60 actual-rig physical cases but fails six required wall framing checks, inherited maximum lowering and turn continuity (124.327 mm step versus 2.601 mm control). Accepted runtime is restored; all new witnesses and failures remain in compressed patches. [Latest rejection and matched RT evidence](../evidence/2026-10-23-torch-cant-withdrawn/README.md). Video frame gaps are not engine FPS. |
 | Outdoor 20/33/40% | Owner33%/MistOff preserved. New exact-build live, muted, stationary holds measure detailed CPU stage wall times, GPU and actual image presentation intervals.20 GPU16.08ms/CPU cycle31.91ms; initial33 controls GPU35.49–35.51/CPU47.75–47.86;40 GPU48.20/CPU64.71. Closing33 GPU43.93/CPU58.28 is an unresolved greater-than15% rise despite start thermal gate.20 is visually unadmitted, not a default/recommendation. No OS/thread CPU utilisation or separate animation/AS profiling. [Receipt](../evidence/2026-10-22-outdoor-scale/README.md), [reconstruction readiness](HORDE_1_7_UPSCALER_READINESS_2026_10_22.md). Earlier frozen CPU means40.338/40.359/40.362 remain narrower separate evidence. |
-| Scenery for road/smoke lines | Actual treasury-road/chimney-smoke cues remain unaccepted/unimplemented. Fresh direct forward/reverse F03 RT views now show the missing marked masonry focus; two shared diagnostic viewpoints pass native terrain/pose staging and Android mapping parity. See [inspection baseline](../evidence/2026-10-23-f03-inspection/README.md). No scenery, collision or world-owner change yet. Preserve planned northwest lookout to southeast Bellwether entry, no river crossing, vista, safe backtracking and terrain bend/occluder for forest unload/town load. No playable-town expansion. |
+| Scenery for road/smoke lines | Small F03 road cue implemented: eight grounded kerbs and one marked waystone, 144 triangles sharing existing masonry/atlas/owner. Native terrain/contact, Kit traversal, staged route and both RT directions pass; matched lookout image is unchanged. 1.64405 m minimum route clearance, 30-281.644 mm base burial; original failed seam placement retained and corrected without relaxing limits. Eight focused Debug gates, 199 package cases, four-ABI Android build and actual APK hashes/roster pass. Cold paired RT timing is narrow evidence, not warmed-phone acceptance. [Implementation and captures](../evidence/2026-10-23-f03-masonry/README.md); [inspection baseline](../evidence/2026-10-23-f03-inspection/README.md). Mobile visual/cost acceptance and actual chimney smoke remain open. Preserve northwest lookout to southeast Bellwether entry, no river crossing, vista, safe backtracking and terrain bend/occluder. No playable-town expansion or smoke/lighting change. |
 
 Phone released19:44 UTC with Speech100/SFX20/Music55/scale33/MistOff byte-exact,
 all18 prior save/lock hashes unchanged and zero new save paths. Original font1.7
@@ -47,7 +47,15 @@ MSVC reaches its unchanged 15-minute cap with case 113 active after the last
 surfaced 112/169 completion. No full Windows or subsequent offline-check pass
 is established. Do not attribute the cap to a particular test or relax it.
 [Final receipt and retained cap](../evidence/2026-10-23-outdoor-main/hosted-final-receipt.json).
-The later F03 diagnostic source checkpoint requires separate exact-head CI.
+The later F03 diagnostic head `d014c75f` finishes five of six jobs passing,
+including all MSVC selections/offline steps. Its Vulkan-host lane passes 71/72:
+the authored journey fixture still expected 32 views after two F03 views were
+added. Test-only `30b5e3ed` updates the exact roster and explicitly checks both
+F03 authored-scene selections; local Release ordinary/authored route gates pass
+2/2. Its hosted Vulkan lane now passes, with complete exact-head CI still tracked
+separately. [Original failure and correction](../evidence/2026-10-23-f03-roster/README.md).
+The new masonry checkpoint needs its own complete hosted result; earlier passes
+do not certify later geometry. No deadline or CI structure was relaxed.
 
 Outdoor integration `f21b030e` is backed up on PR 27. Its first hosted run
 [39896071822](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39896071822)
@@ -123,9 +131,13 @@ exact authorized canonical commit, with source exclusion and bounded memory
 checks. Actual listening and phone acceptance remain open. The earlier Library
 metadata failure remains retained; the separate Drive source does not bypass
 Library requirements. No phone work was performed. The next unblocked approved
-player-facing slice is inspection of the actual treasury-road/chimney vista,
-then at most a justified bounded scenery correction. Preserve route boundaries,
-landmark visibility and safe backtracking; no scenery edit has started.
+player-facing scenery gap was inspected and the bounded F03 masonry cue is now
+implemented with retained before/after evidence. Chimney smoke remains separate
+and unimplemented; a future cue needs measured shared behavior without expensive
+participating mist, extra fire or a town expansion. Verify the new exact-head CI
+next. The owner's circular/translucent touch-action refinement is another approved
+desktop-capable item; current source and the inspected Briarhold reference must
+guide it, with portrait/landscape physical acceptance still open.
 
 Exact evidence-only head `096b23f0`, [run 39877269271](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39877269271),
 finishes **failure**: five jobs pass; MSVC main selection is 168/169, with the
