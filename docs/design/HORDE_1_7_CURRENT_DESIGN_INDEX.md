@@ -1,6 +1,12 @@
 # Horde 1.7 current design index
 
-Latest [submitted dimensions and Windows profile lifecycle](../evidence/2026-10-23-benchmark-launch/README.md):
+Latest [Windows Shipping benchmark course and rollback](../evidence/2026-10-23-benchmark-shipping/README.md):
+the full authored course, all 1,838 measured actual-dimension rows and exact
+restoration pass. A demonstrated packed mist/dust report-decoder defect is fixed
+with retained failing evidence and focused checks. Reports stay custom/unranked;
+Android fixed-output/practicality and sustained acceptance remain open.
+
+Earlier [submitted dimensions and Windows profile lifecycle](../evidence/2026-10-23-benchmark-launch/README.md):
 actual RT extents/projection/DRS facts now survive exact submission/completion
 and row validation. Seven bounded native Debug apply/cancel/stale/restore cases
 pass with owner custody intact. Full Shipping course/report/rollback and Android

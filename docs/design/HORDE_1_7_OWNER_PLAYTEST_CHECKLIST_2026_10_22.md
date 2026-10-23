@@ -1,5 +1,23 @@
 # Horde 1.7 owner playtest checklist - 22 October 2026
 
+## Windows Shipping benchmark acceptance - 23 October
+
+The [bounded full-course checkpoint](../evidence/2026-10-23-benchmark-shipping/README.md)
+passes two authored laps/26 waypoint visits, all 1,838 measured second-lap
+submissions at actual 1920x1080 internal/output, and exact RT-acknowledged
+restoration to the original 75% rounded tuple and window/settings. The first
+course exposed a stale packed mist/dust report check; its false-unavailable
+attachment and four reproduced fixture failures are retained. Shared decoding
+corrects the attachment, the focused Release fixture passes, and the corrected
+full course/report/rollback passes with owner custody unchanged.
+
+This closes the **Windows CLI Shipping course/report/rollback** slice, not
+official profile selection, ranked fairness, scanout FPS, natural campaign or
+sustained-play acceptance. Reports remain local/custom-unranked. Android
+fixed-output/practicality remains blocked by the disconnected phone; no device
+operation, settings/save write, email/report send, merge or release occurred.
+Audio/haptic manual revalidation: NO; semantics/playback are unchanged.
+
 ## Submitted dimensions and Windows profile lifecycle - 23 October
 
 The [next bounded benchmark slice](../evidence/2026-10-23-benchmark-launch/README.md)

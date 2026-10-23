@@ -310,11 +310,31 @@ int main()
         notUploaded.find("\"shadowPolicySource\":\"unavailable\"") != std::string::npos &&
         notUploaded.find("\"primaryAreaShadowSamplesPerContributingReceiver\":0") != std::string::npos,
         "ordinary reporting without an actual upload never fabricates Max shadow policy");
-    auto invalidUpload = higher; invalidUpload.controls[3] = 2u;
+    // Quality word now packs mist bit0 and the three admitted dust modes in
+    // bits1-2. Six is the first unknown encoding; two means Low dust/mist on.
+    auto invalidUpload = higher; invalidUpload.controls[3] = 6u;
     check(horde::platform::windows::BuildWindowsBenchmarkTuningJson(
         RtWorkloadPreset::Authored, RtWorkloadPreset::Authored, RtWorkloadPreset::Authored, "High", "High", higher, invalidUpload, true)
         .find("\"shadowPolicySource\":\"unavailable\"") != std::string::npos,
         "unknown quality flags are not admitted as actual physical policy");
+    for (unsigned packed = 0; packed < 6; ++packed)
+    {
+        auto upload = current; upload.controls[3] = packed;
+        const auto packedJson = horde::platform::windows::BuildWindowsBenchmarkTuningJson(
+            RtWorkloadPreset::Authored, RtWorkloadPreset::Authored, RtWorkloadPreset::Authored,
+            "High", "High", upload, upload, true);
+        check(packedJson.find("\"policyStable\":true") != std::string::npos &&
+            packedJson.find("\"shadowPolicySource\":\"uploaded\"") != std::string::npos &&
+            packedJson.find("\"shadowMode\":\"Current\"") != std::string::npos &&
+            packedJson.find((packed & 1u) ? "\"actualUploadedMistEnabled\":false" :
+                "\"actualUploadedMistEnabled\":true") != std::string::npos,
+            "every admitted packed mist/dust policy reports uploaded shadows and the decoded mist bit");
+    }
+    auto lowDust = current; lowDust.controls[3] = 2u;
+    check(horde::platform::windows::BuildWindowsBenchmarkTuningJson(
+        RtWorkloadPreset::Authored, RtWorkloadPreset::Authored, RtWorkloadPreset::Authored,
+        "High", "High", current, lowDust, true).find("\"policyStable\":false") != std::string::npos,
+        "an actual dust change still invalidates endpoint stability");
     check(horde::platform::windows::BuildWindowsBenchmarkTuningJson(
         RtWorkloadPreset::Authored, RtWorkloadPreset::Authored, RtWorkloadPreset::Authored, "Mobile", "Mobile", higher, higher, true)
         .find("\"policyStable\":false") != std::string::npos,

@@ -1,0 +1,501 @@
+{
+  "schemaVersion": 1,
+  "baseCommit": "53cbb8607ef9de769035223435582b63a4bd9e9c",
+  "evidenceClass": "Actual Windows MSVC Release Shipping/High authored full course, local per-row validation and acknowledged exact restoration; custom-unranked",
+  "sourceGitBlobs": {
+    "src/platform/windows/WindowsBenchmarkLaunch.h": "5d4670440de1ff52d98548227377a216f86e3d53",
+    "tests/WindowsBenchmarkLaunchTests.cpp": "0530e4e6e7ef5184c843f9bf7a13b8185ef39103"
+  },
+  "retainedBeforeCorrection": {
+    "label": "course75",
+    "binary": {
+      "bytes": 4684800,
+      "sha256": "2fbef849026bd0b1be41f298bd52e0101481dfd1753c33a2f022fc8914709491"
+    },
+    "processSeconds": 64.781,
+    "exitCode": 0,
+    "custodyUnchanged": true,
+    "measuredFrames": 1838,
+    "evidenceCounts": {
+      "expected": 1838,
+      "completed": 1838,
+      "rejected": 0,
+      "cancelled": 0,
+      "cpuAccepted": 1838,
+      "cpuRejected": 0,
+      "outstanding": 0
+    },
+    "dimensions": {
+      "internalExtent": [
+        1920,
+        1080
+      ],
+      "outputExtent": [
+        1920,
+        1080
+      ],
+      "cameraAspect": 1.77777779,
+      "presentationTransform": 0,
+      "dynamicResolutionEnabled": false,
+      "linearBlit": false,
+      "aspectPreserved": true
+    },
+    "measurementAndRestorationPassed": true,
+    "windowsBenchmarkTuning": {
+      "schema": 1,
+      "requestedPreset": "authored",
+      "effectivePresetAtStart": "authored",
+      "effectivePresetAtEnd": "authored",
+      "compiledQualityAtStart": "High",
+      "compiledQualityAtEnd": "High",
+      "policyStable": false,
+      "shadowPolicySource": "unavailable",
+      "shadowMode": "unavailable",
+      "primaryAreaShadowSamplesPerContributingReceiver": 0,
+      "sampleDomain": "contributing-primary-local-and-fire-area-lights",
+      "primarySkyVisibilitySamples": 0,
+      "secondaryAreaShadowSamples": 1,
+      "sampleCountMeaning": "compiled-physical-policy-not-dynamic-query-counts",
+      "costMeaning": "whole-rt-workload-preset-not-isolated-shadow-cost"
+    },
+    "rawLocalReport": {
+      "bytes": 3066017,
+      "sha256": "33dc0c3b4d216514627fc7724483f82dca240202685fe1a913b5e2f7399f0260"
+    },
+    "rawLifecycle": {
+      "bytes": 12667,
+      "sha256": "e413d57794befaf1f076b811d44e62143fca6ac119eb3aca14efd12df1484160"
+    },
+    "rawCustody": {
+      "bytes": 2204,
+      "sha256": "6eba00533e13a32c91c0fbd21e0e00eda1b1ce5baedcd28780e7041c1d4557ef"
+    }
+  },
+  "regression": {
+    "fixture": "horde_rt_windows_benchmark_launch_tests",
+    "failedChecksBeforeCorrection": 4,
+    "ctestExitBefore": 8,
+    "ctestPassAfter": true,
+    "ctestSecondsAfter": 0.99,
+    "unknownPackedFlagChangedFrom": 2,
+    "unknownPackedFlagChangedTo": 6,
+    "reason": "Two is the admitted Low-dust/mist-on encoding; six is the first unknown value. Six valid encodings and endpoint dust drift are exercised. Gates remain."
+  },
+  "acceptedWindowsCourse": {
+    "label": "course75-fixed",
+    "processSeconds": 36.89,
+    "exitCode": 0,
+    "binary": {
+      "bytes": 4685312,
+      "sha256": "bfc5eea201fc350fe7eb2adee7d8b316a62888c9afab0f774548806305d9c06f"
+    },
+    "custodyUnchanged": true,
+    "campaignAttached": false,
+    "settingsWritesPermitted": false,
+    "ownerCampaignFileCount": 0,
+    "measuredFrames": 1838,
+    "laps": 2,
+    "waypoints": 26,
+    "evidenceCounts": {
+      "expected": 1838,
+      "completed": 1838,
+      "rejected": 0,
+      "cancelled": 0,
+      "cpuAccepted": 1838,
+      "cpuRejected": 0,
+      "outstanding": 0
+    },
+    "gpuStatusCounts": {
+      "denominator": 1838,
+      "not-ready": 0,
+      "compiled-out": 0,
+      "unknown": 0,
+      "valid": 1838,
+      "disabled": 0,
+      "unsupported": 0,
+      "pending": 0,
+      "error": 0,
+      "missing": 0
+    },
+    "dimensions": {
+      "internalExtent": [
+        1920,
+        1080
+      ],
+      "outputExtent": [
+        1920,
+        1080
+      ],
+      "cameraAspect": 1.77777779,
+      "presentationTransform": 0,
+      "dynamicResolutionEnabled": false,
+      "linearBlit": false,
+      "aspectPreserved": true
+    },
+    "originalAndRestoredDimensions": {
+      "internalExtent": [
+        924,
+        602
+      ],
+      "outputExtent": [
+        1232,
+        803
+      ],
+      "cameraAspect": 1.53488374,
+      "presentationTransform": 0,
+      "dynamicResolutionEnabled": false,
+      "linearBlit": true,
+      "aspectPreserved": false
+    },
+    "originalWindowRect": [
+      224,
+      205,
+      1474,
+      1080
+    ],
+    "appliedClientRect": [
+      0,
+      0,
+      1920,
+      1080
+    ],
+    "exactWindowStateRestored": true,
+    "fullscreenBookkeepingRestored": true,
+    "menuRestored": true,
+    "measurementAndRestorationPassed": true,
+    "requestedProfile": "windows-rt-provisional-v1",
+    "classification": "custom-unranked",
+    "ranked": false,
+    "pipeline": {
+      "executionBackend": "RayTracingPipeline",
+      "instrumentation": "shipping",
+      "dielectricQuality": "high",
+      "bundleKey": "shipping_high_pair",
+      "opaqueFast": {
+        "key": "shipping_high_opaque_fast",
+        "sha256": "1b6271dde4002cb4e9a32668682c173373a05cbea81bd9c26f4c204ec0a00c27"
+      },
+      "genericDielectric": {
+        "key": "shipping_high_generic_dielectric",
+        "sha256": "92dd391e8da2b17451efac78773ac17f65362b0bc3e9e7bd837ae837005dc46f"
+      },
+      "activeStrategy": "opaque-fast",
+      "activeKey": "shipping_high_opaque_fast",
+      "activeSha256": "1b6271dde4002cb4e9a32668682c173373a05cbea81bd9c26f4c204ec0a00c27",
+      "waterQuality": "high"
+    },
+    "legacyProductVersion": "1.6.2",
+    "executionBackend": "RayTracingPipeline",
+    "presentMode": "MAILBOX",
+    "materialEncoding": "RGBA8 raw fallback + raw RGBA8 KTX2 lich",
+    "timestampUtc": "2026-10-23T14:13:59Z",
+    "legacyOuterLoopTiming": {
+      "averageMs": 8.3408,
+      "medianMs": 7.9446,
+      "p95Ms": 10.9822,
+      "onePercentLowFps": 74.8883
+    },
+    "legacyTimingScope": "windows-render-plus-rtlab-telemetry",
+    "gpuWholeCommandBufferTimingMs": {
+      "sampleCount": 1838,
+      "meanMilliseconds": 4.7072,
+      "medianMilliseconds": 4.5071,
+      "p90Milliseconds": 5.1931,
+      "p95Milliseconds": 6.6267,
+      "slowestOnePercentMeanMilliseconds": 7.8381
+    },
+    "cpuStageTimingMs": {
+      "simulationStepCpuMs": {
+        "sampleCount": 1838,
+        "meanMilliseconds": 0.3102,
+        "medianMilliseconds": 0.3159,
+        "p90Milliseconds": 0.3855,
+        "p95Milliseconds": 0.4422,
+        "slowestOnePercentMeanMilliseconds": 0.641
+      },
+      "skinCpuMs": {
+        "sampleCount": 1838,
+        "meanMilliseconds": 1.8819,
+        "medianMilliseconds": 1.8018,
+        "p90Milliseconds": 2.2123,
+        "p95Milliseconds": 2.3668,
+        "slowestOnePercentMeanMilliseconds": 3.0445
+      },
+      "playerSkinCpuMs": {
+        "sampleCount": 1838,
+        "meanMilliseconds": 1.8385,
+        "medianMilliseconds": 1.7832,
+        "p90Milliseconds": 2.0874,
+        "p95Milliseconds": 2.218,
+        "slowestOnePercentMeanMilliseconds": 2.7416
+      },
+      "characterSkinCpuMs": {
+        "sampleCount": 1838,
+        "meanMilliseconds": 0.0434,
+        "medianMilliseconds": 0.0,
+        "p90Milliseconds": 0.0,
+        "p95Milliseconds": 0.3547,
+        "slowestOnePercentMeanMilliseconds": 0.7398
+      },
+      "dynamicUploadCpuMs": {
+        "sampleCount": 1838,
+        "meanMilliseconds": 0.1436,
+        "medianMilliseconds": 0.1348,
+        "p90Milliseconds": 0.1796,
+        "p95Milliseconds": 0.1999,
+        "slowestOnePercentMeanMilliseconds": 0.3378
+      },
+      "blasRefitRecordCpuMs": {
+        "sampleCount": 1838,
+        "meanMilliseconds": 0.0453,
+        "medianMilliseconds": 0.0419,
+        "p90Milliseconds": 0.0528,
+        "p95Milliseconds": 0.0608,
+        "slowestOnePercentMeanMilliseconds": 0.1582
+      },
+      "tlasUpdateRecordCpuMs": {
+        "sampleCount": 1838,
+        "meanMilliseconds": 0.0072,
+        "medianMilliseconds": 0.0064,
+        "p90Milliseconds": 0.0079,
+        "p95Milliseconds": 0.009,
+        "slowestOnePercentMeanMilliseconds": 0.0587
+      },
+      "traceCopyRecordCpuMs": {
+        "sampleCount": 1838,
+        "meanMilliseconds": 0.0346,
+        "medianMilliseconds": 0.032,
+        "p90Milliseconds": 0.0392,
+        "p95Milliseconds": 0.0447,
+        "slowestOnePercentMeanMilliseconds": 0.1386
+      },
+      "frameFenceWaitCpuMs": {
+        "sampleCount": 1838,
+        "meanMilliseconds": 5.1259,
+        "medianMilliseconds": 4.7859,
+        "p90Milliseconds": 6.7282,
+        "p95Milliseconds": 7.0918,
+        "slowestOnePercentMeanMilliseconds": 9.6088
+      },
+      "imageAcquireCpuMs": {
+        "sampleCount": 1838,
+        "meanMilliseconds": 0.0088,
+        "medianMilliseconds": 0.0063,
+        "p90Milliseconds": 0.0142,
+        "p95Milliseconds": 0.0247,
+        "slowestOnePercentMeanMilliseconds": 0.0676
+      },
+      "queueSubmitCpuMs": {
+        "sampleCount": 1838,
+        "meanMilliseconds": 0.0633,
+        "medianMilliseconds": 0.0598,
+        "p90Milliseconds": 0.0766,
+        "p95Milliseconds": 0.0865,
+        "slowestOnePercentMeanMilliseconds": 0.1681
+      },
+      "presentCallCpuMs": {
+        "sampleCount": 1838,
+        "meanMilliseconds": 0.0568,
+        "medianMilliseconds": 0.0533,
+        "p90Milliseconds": 0.0642,
+        "p95Milliseconds": 0.0749,
+        "slowestOnePercentMeanMilliseconds": 0.1938
+      },
+      "wholeFrameCycleCpuMs": {
+        "sampleCount": 1838,
+        "meanMilliseconds": 8.3338,
+        "medianMilliseconds": 7.9372,
+        "p90Milliseconds": 10.0384,
+        "p95Milliseconds": 10.9755,
+        "slowestOnePercentMeanMilliseconds": 13.3447,
+        "onePercentLowFps": 74.936
+      },
+      "poseCopyCpuMs": {
+        "sampleCount": 1838,
+        "meanMilliseconds": 0.3604,
+        "medianMilliseconds": 0.3494,
+        "p90Milliseconds": 0.429,
+        "p95Milliseconds": 0.477,
+        "slowestOnePercentMeanMilliseconds": 0.6417
+      },
+      "playerPoseCpuMs": {
+        "sampleCount": 1838,
+        "meanMilliseconds": 0.0133,
+        "medianMilliseconds": 0.0129,
+        "p90Milliseconds": 0.0159,
+        "p95Milliseconds": 0.0178,
+        "slowestOnePercentMeanMilliseconds": 0.0422
+      },
+      "playerVerticesCpuMs": {
+        "sampleCount": 1838,
+        "meanMilliseconds": 1.314,
+        "medianMilliseconds": 1.2623,
+        "p90Milliseconds": 1.5081,
+        "p95Milliseconds": 1.6417,
+        "slowestOnePercentMeanMilliseconds": 2.0801
+      },
+      "viewmodelVerticesCpuMs": {
+        "sampleCount": 1838,
+        "meanMilliseconds": 0.5106,
+        "medianMilliseconds": 0.4848,
+        "p90Milliseconds": 0.5869,
+        "p95Milliseconds": 0.6508,
+        "slowestOnePercentMeanMilliseconds": 0.8986
+      },
+      "characterAnimationCpuMs": {
+        "sampleCount": 1838,
+        "meanMilliseconds": 0.0015,
+        "medianMilliseconds": 0.0,
+        "p90Milliseconds": 0.0,
+        "p95Milliseconds": 0.0126,
+        "slowestOnePercentMeanMilliseconds": 0.0265
+      },
+      "characterVerticesCpuMs": {
+        "sampleCount": 1838,
+        "meanMilliseconds": 0.0316,
+        "medianMilliseconds": 0.0,
+        "p90Milliseconds": 0.0,
+        "p95Milliseconds": 0.2738,
+        "slowestOnePercentMeanMilliseconds": 0.5477
+      },
+      "characterCopyCpuMs": {
+        "sampleCount": 1838,
+        "meanMilliseconds": 0.01,
+        "medianMilliseconds": 0.0,
+        "p90Milliseconds": 0.0,
+        "p95Milliseconds": 0.0732,
+        "slowestOnePercentMeanMilliseconds": 0.2337
+      }
+    },
+    "windowsBenchmarkTuning": {
+      "schema": 1,
+      "requestedPreset": "authored",
+      "effectivePresetAtStart": "authored",
+      "effectivePresetAtEnd": "authored",
+      "compiledQualityAtStart": "High",
+      "compiledQualityAtEnd": "High",
+      "policyStable": true,
+      "shadowPolicySource": "uploaded",
+      "shadowMode": "Current",
+      "primaryAreaShadowSamplesPerContributingReceiver": 1,
+      "sampleDomain": "contributing-primary-local-and-fire-area-lights",
+      "primarySkyVisibilitySamples": 1,
+      "actualUploadedMistEnabled": true,
+      "secondaryAreaShadowSamples": 1,
+      "sampleCountMeaning": "compiled-physical-policy-not-dynamic-query-counts",
+      "costMeaning": "whole-rt-workload-preset-not-isolated-shadow-cost"
+    },
+    "zones": [
+      {
+        "name": "opening",
+        "frames": 160
+      },
+      {
+        "name": "skeleton-room",
+        "frames": 98
+      },
+      {
+        "name": "shadow-corridor",
+        "frames": 599
+      },
+      {
+        "name": "skylight-chamber",
+        "frames": 189
+      },
+      {
+        "name": "yellow-torch-bay",
+        "frames": 157
+      },
+      {
+        "name": "blue-torch-bay",
+        "frames": 157
+      },
+      {
+        "name": "red-torch-bay",
+        "frames": 157
+      },
+      {
+        "name": "green-torch-bay",
+        "frames": 157
+      },
+      {
+        "name": "transmission-threshold",
+        "frames": 63
+      },
+      {
+        "name": "finale",
+        "frames": 101
+      }
+    ],
+    "rawLocalReport": {
+      "bytes": 3066035,
+      "sha256": "8c7309977f6408f316fed1b429f8a4d392723f99e2fa0464ea24ce89eaf1c5e3"
+    },
+    "rawLifecycle": {
+      "bytes": 12665,
+      "sha256": "2f8632bb21dece6831eef8018084d1d476560de640f885e6397be2e31c071226"
+    },
+    "rawCustody": {
+      "bytes": 2204,
+      "sha256": "32aaa93d9343b270bf4c2d3caf97833bb0f1895c876419335663e95ce2478c26"
+    },
+    "rowIdentityRange": {
+      "first": {
+        "sceneEpoch": 3,
+        "measurementGeneration": 6,
+        "recordAttemptSerial": 1841,
+        "recordSerial": 1841,
+        "simulationTick": 1839,
+        "frameSlot": 0,
+        "submissionSerial": 1841,
+        "completionSerial": 1841
+      },
+      "last": {
+        "sceneEpoch": 3,
+        "measurementGeneration": 6,
+        "recordAttemptSerial": 3678,
+        "recordSerial": 3678,
+        "simulationTick": 3676,
+        "frameSlot": 0,
+        "submissionSerial": 3678,
+        "completionSerial": 3678
+      }
+    }
+  },
+  "rawEvidenceHashes": {
+    "reports/benchmark-shipping-20261023/configure.log": "680d9e9f105f806b00afe2f441450eb29b9aa186d77b96269ff1e1da5ef9db99",
+    "reports/benchmark-shipping-20261023/build.log": "a2b68d8e52350981e3b61a4068fa3e095078a11b8aebc22fdd71072a255b863d",
+    "reports/benchmark-shipping-20261023/report-before-build.log": "a29a952aeebdabb0d5a354d4ba6633bce8efbc0adccef6bae7f129cad7988e75",
+    "reports/benchmark-shipping-20261023/report-before-test.log": "9e5c6df10006f1ba343354bb48e097b1e9b5521aa5e540ebb895608ecf2e8ad9",
+    "reports/benchmark-shipping-20261023/report-fixed-build.log": "4a36e4aee7e60803c0221356b5f83ed4d7b5fa0c5eab66ac25295e8e7a4c3d51",
+    "reports/benchmark-shipping-20261023/report-fixed-test.log": "b0314d06c9a1314ffb1d79e4d73b908e6b9391c507f6ba014605ca75a96a115b",
+    "reports/benchmark-shipping-20261023/run_full_course.py": "466ae76d8027821a028fdea80bb49180ced2d5c6bbb035d5f8fc28b1b62f6387",
+    "reports/benchmark-shipping-20261023/validate_course.py": "db5925ab7a8c4485ea9eed61f9c2d1afe8ed317b1db489cc985f343b943396cc",
+    "reports/benchmark-shipping-20261023/course75.log": "c3b5a368c401d646b3c4dc1add573bb1c5920d8d8f634249c85f3e6142f240f2",
+    "reports/benchmark-shipping-20261023/course75-fixed.log": "ea2955e823fee22bea97fe54fd207d143882bfcbf1e9295948a89f252046d0a0"
+  },
+  "rawReportsLocalOnly": true,
+  "measurementLimits": [
+    "One authored tomb benchmark warmup lap and one measured lap; not natural 1.7 campaign completion or sustained warm play.",
+    "GPU interval covers the whole RT command buffer including AS/trace/copy work; it is not isolated RT dispatch.",
+    "WholeFrameCycle CPU duration includes fence waits and other driver waits; not CPU busy utilization or measured scanout FPS.",
+    "No temperature/power/clock or scanout trace collected. Two process wall durations are retained, not a matched optimization comparison.",
+    "Legacy product version string remains 1.6.2; this development evidence is identified by base commit, changed source blobs and exact executable/pipeline hashes.",
+    "No new visual quality comparison, owner input comfort, audio listening or phone acceptance inferred.",
+    "Prior seven Debug cancellation/error lifecycle cases were not repeated; this correction changes report decoding only."
+  ],
+  "manualAudioHapticRevalidation": {
+    "required": false,
+    "reason": "Only the existing packed graphics-policy report decoder and tests change; playback, event timing and haptic semantics unchanged. Native runs muted isolated test settings."
+  },
+  "nextMilestone": "Android fixed-output/profile lifecycle and practical image/dimension validation when the owner makes the disconnected phone available; no ranked admission or automatic reacquisition.",
+  "precedingExactHeadCi": {
+    "commit": "53cbb8607ef9de769035223435582b63a4bd9e9c",
+    "runId": 39966365867,
+    "conclusion": "success",
+    "jobsPassed": 6,
+    "receipt": "53c-terminal-receipt.json",
+    "receiptSha256": "33d14b45cd0a36c9f90d311ced6aec320eca671fc6ceb01c3db8e4ca1dedb178",
+    "currentCorrectionHostedResult": "pending after backup"
+  }
+}
