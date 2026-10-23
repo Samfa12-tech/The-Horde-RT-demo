@@ -1,0 +1,25 @@
+{
+  "sources": {
+    "src/gameplay/HorizontalEnvelope.h": "9EFEA5E71E7532C2106E1986BFDC9BC7513A2BF3AFF65BDDC66503E91DE89696",
+    "src/platform/windows/DiagnosticWindow.cpp": "D52EAD50C9B3C76109585FC9639D1CAFBEAC7CF2B751C4ACCF718B113E3D42D7",
+    "src/gameplay/items/HeldItemKinematics.cpp": "F8DF4FAC496C8D66188256342B052D556DEFAF872908CCCC2E6AED2059EA9871",
+    "reports/torch-clearance-refinement-20261022/route-probe.inl": "0900325FA728F7EDEF3750ACD8546B333D5028AEF1F31136B581039587EAFD92"
+  },
+  "arguments": [
+    "--development-rescue-journey",
+    "--capture-showcase",
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\torch-clearance-refinement-20261022\\control",
+    "--development-checkpoint",
+    "chapter-stone-wall-corner",
+    "--capture-hidden"
+  ],
+  "timedOut": false,
+  "elapsedSeconds": 33.0887818,
+  "executableSha256": "C89952CD087AE01174E5FDE018D90947C55C2A741C456FE6813FC3AE64443035",
+  "exitCode": 0,
+  "scope": "Debug input-driven current chapter, frozen look images; not natural journey, physical controls or phone acceptance",
+  "finishedUtc": "2026-10-22T23:56:24.8438992Z",
+  "version": "control",
+  "startedUtc": "2026-10-22T23:55:49.4064827Z",
+  "pid": 75824
+}

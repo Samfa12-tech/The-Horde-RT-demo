@@ -15,7 +15,7 @@ No release, merge, paid generation or spending is authorized.
 | Landscape captions at 100% Auto | Earlier712f phone build shows one real complete Kit question at100% Auto/font1.7 without overflow diagnostic, but residual control overlap remains. Source now fixes cutout coordinate handling and removes visible Skip under later owner direction. Nine caption tests, two icon tests and all394 Java tests pass. Final UI cold207 fails missing-terrain before inspection; corrected final portrait/landscape acceptance remains pending. [UI checkpoint](../evidence/2026-10-22-caption-ui/README.md). |
 | Kit quiet at Speech100/SFX20/Music55 | Speech is independent of SFX; healthy PCM is retained. Earlier exterior-domain correction preserves .36 base gain and ducking. Continuous reunion/forest speech now follows the current grounded Kit and listener/yaw; Windows updates the exact existing voice matrix without restarting PCM. Actual terrain-backed nearby reminder distance changes from the obsolete 5.34 m point to the real 1.00 m actor; landing correction can lower gain because Kit is farther away. Four focused Release tests, Windows app and Android arm64 native builds pass. Endpoint playback, actual listening/mix and phone pause/resume remain pending. [Anchoring evidence](../evidence/2026-10-22-kit-live-voice/README.md). |
 | Touch clutter / auto crouch / speed | Shared automatic head-clearance crouch and touch/controller deflection speed are implemented; keyboard Shift/Caps Lock retained. Ordinary Run/Crouch buttons and manual stance bindings are inactive, removing the truncated Running label. Seven native tests and 97 focused Android tests pass, including collision/step/roof negatives and input/lifecycle. Two blocked transition ticks occur on entry in the terrain fixture; physical play feel and final portrait/landscape UI remain pending. [Checkpoint](../evidence/2026-10-22-auto-crouch/README.md). No-Skip and compact56dp lantern icon remain unaccepted on phone. Briarhold circular/translucent reference reviewed read-only; broader redesign deferred by owner19:35. |
-| Brief dark world at 28.25-28.75s | Original owner clip is local/ignored and original frames retained. HUD remains visible; faint world geometry is visible in the inspected dark frame. Cause is unknown; no asserted presentation/lighting/camera diagnosis or runtime fix. Video frame gaps are not engine FPS. |
+| Brief dark world at 28.25-28.75s | Original clip cause remains unknown. Separate Windows RT reproduction proves carried torch Light can cross a wall. Whole-hand translation and the subsequent cant/tuck trial are both withdrawn: lit stone improves, but retained diag11 loses its torch. Corrected cant contains all 60 actual-rig physical cases but fails six required wall framing checks, inherited maximum lowering and turn continuity (124.327 mm step versus 2.601 mm control). Accepted runtime is restored; all new witnesses and failures remain in compressed patches. [Latest rejection and matched RT evidence](../evidence/2026-10-23-torch-cant-withdrawn/README.md). Video frame gaps are not engine FPS. |
 | Outdoor 20/33/40% | Owner33%/MistOff preserved. New exact-build live, muted, stationary holds measure detailed CPU stage wall times, GPU and actual image presentation intervals.20 GPU16.08ms/CPU cycle31.91ms; initial33 controls GPU35.49–35.51/CPU47.75–47.86;40 GPU48.20/CPU64.71. Closing33 GPU43.93/CPU58.28 is an unresolved greater-than15% rise despite start thermal gate.20 is visually unadmitted, not a default/recommendation. No OS/thread CPU utilisation or separate animation/AS profiling. [Receipt](../evidence/2026-10-22-outdoor-scale/README.md), [reconstruction readiness](HORDE_1_7_UPSCALER_READINESS_2026_10_22.md). Earlier frozen CPU means40.338/40.359/40.362 remain narrower separate evidence. |
 | Scenery for road/smoke lines | Actual treasury-road/chimney-smoke cues remain unaccepted/unimplemented. Inspect current vista before adding cues. Preserve planned northwest lookout to southeast Bellwether entry, no river crossing, vista, safe backtracking and terrain bend/occluder for forest unload/town load. No playable-town expansion. |
 
@@ -78,6 +78,18 @@ timing proxies are not measured scanout FPS. Weekly publication is planned, with
 no active publication schedule.
 
 ## Concrete next local slice
+
+Latest torch refinement is closed without adoption. Joint physical clearance,
+visible hand/torch and continuous-turn behavior remain an implementation gap;
+resolve forward-facing pose feasibility before another runtime candidate rather
+than repeat the rejected translation or fixed cant. The existing wall witnesses
+and ordinary centre pose stay required. No phone work was performed.
+
+At accepted source 4eeafcb6, hosted run 39871548947 completes **cancelled**: five
+jobs pass; MSVC exceeds its unchanged cap of 15 minutes after a successful build,
+169/169 main tests and the separate asset-policy test. Six subsequent offline
+Windows steps are skipped. Hosted acceptance is incomplete; the cap and all
+test gates remain unchanged. No base integration or merge is applied.
 
 Automatic crouch/deflection source, the bounded desktop skin-work slice and Kit's
 continuous source/listener correction are complete locally. Physical input/feel,

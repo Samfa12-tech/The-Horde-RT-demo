@@ -1,0 +1,60 @@
+{
+  "verifiedUtc": "2026-10-23T00:15:38.424169+00:00",
+  "worktree": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+  "acceptedCommit": "4eeafcb64edefcd0f4a60413300753006c155a24",
+  "disposition": "Both cant variants withdrawn. No production, asset or compiled-test change adopted. No inherited test deleted.",
+  "restoredSourceFiles": {
+    "src/gameplay/HorizontalEnvelope.h": "9efea5e71e7532c2106e1986bfdc9bc7513a2bf3aff65bddc66503e91de89696",
+    "src/gameplay/items/HeldItemKinematics.cpp": "f8df4fac496c8d66188256342b052d556defaf872908cccc2e6aed2059ea9871",
+    "src/platform/windows/DiagnosticWindow.cpp": "f86f3c6f7e0bec115416cd84298b33b1861ba3e7b82d195e3580cbee3c1dc9eb",
+    "tests/HeldItemClearanceTests.cpp": "6e09541f847ca44ab446a31791a48080b354cf7a65519a6646d581dc65e12775",
+    "tests/FinalHeldTorchClearanceTests.cpp": "6d693508b0f50d82721ecb744746369e516af7fe57ae3da18e84ce354c151bf5"
+  },
+  "restoredWindowsExecutable": {
+    "file": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+    "sha256": "6cc94967e028300aa6e4a47f794bf91f4b43bb1ddcedbcdf97eb5a182a340f9b",
+    "configuration": "Debug",
+    "buildExit": 0,
+    "temporaryProbeHookRemoved": true
+  },
+  "restoredTests": {
+    "exitCode": 0,
+    "passed": 4,
+    "failed": 0,
+    "seconds": 168.77,
+    "log": "restored-tests.txt"
+  },
+  "custody": {
+    "unchangedSha256": {
+      "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\ASSET_LICENSES.md": "3a6cff3d34421d2ec751b1f64ec44b6c3ee801cdc1d6d1123c3cb479c0b92387",
+      "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\PROJECT_MEMORY.md": "9cfbea7667b50a9a960396c8f13c68905791aebd42121ecb353a8354b8cd406e",
+      "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.settings.ini": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+    },
+    "ownerCampaignV1AbsentBeforeAndAfter": true,
+    "ownerUntrackedAssetsNotEditedOrStaged": true,
+    "phoneOperations": false
+  },
+  "hostedAcceptedSource": {
+    "runId": 39871548947,
+    "headSha": "4eeafcb64edefcd0f4a60413300753006c155a24",
+    "conclusion": "cancelled",
+    "successfulJobs": 5,
+    "msvcConclusion": "cancelled",
+    "msvcReason": "The job has exceeded the maximum execution time of 15m0s",
+    "windowsMainCtestPassed": 169,
+    "windowsMainCtestSeconds": 223.49,
+    "isolatedAssetPolicyPassed": 1,
+    "subsequentWindowsOfflineStepsSkipped": 6,
+    "allRequiredChecksGreen": false,
+    "limitsUnchanged": true
+  },
+  "limitations": [
+    "Original phone clip cause unverified",
+    "No phone operations",
+    "Native evidence is a diagnostic frozen-look sequence",
+    "No frame-rate/performance claim",
+    "New wall fixtures are retained failing experimental source, not passing compiled acceptance",
+    "Debug route 30 s gate and PR #27 conflicts remain open",
+    "No base integration, merge or release"
+  ]
+}

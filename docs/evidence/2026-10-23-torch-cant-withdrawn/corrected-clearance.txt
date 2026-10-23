@@ -1,0 +1,6 @@
+FAIL: low-lintel response must be real bounded carry lowering
+Portal cases=19392 maximum world-down carry=0.819779 m
+Maximum sampled walk/look hand step=0.0295496 m at step 197 previous z/yaw/pitch=-3.46/-0.210644/0.0560644 current=-3.47/-0.214874/0.0519433 retreat/lowering=0.189432/0.55802 -> 0.178707/0.532599
+Rag torch held/lowered residual=0.577716/0.0887203 m; lowered hand Y=-0.910606
+Horizontal Rag calibration witness resolved=1 centre leftHandLocal=-0.184999987,-0.350947767,0.606509387
+Horizontal Rag cases=375 turnIncrementRadians=.01 maximumHandStepMetres=0.124327 maximumLightStepMetres=0.125125

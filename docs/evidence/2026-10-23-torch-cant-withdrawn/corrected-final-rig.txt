@@ -1,0 +1,11 @@
+final-wall diag11 aspect=1 pitch=-0.15 phase=0 contained/hand/roof/coherent=1/1/1/1 headroom=0.112666 leftGauntlet/torchTriangles=0/0 projectedAreaSum=0/0 Grip/LightDepth=0.155229/-0.145833
+final-wall diag11 aspect=1.77778 pitch=-0.15 phase=0 contained/hand/roof/coherent=1/1/1/1 headroom=0.112666 leftGauntlet/torchTriangles=0/0 projectedAreaSum=0/0 Grip/LightDepth=0.155229/-0.145833
+final-wall diag13 aspect=1 pitch=-0.15 phase=0 contained/hand/roof/coherent=1/1/1/1 headroom=0.543689 leftGauntlet/torchTriangles=0/0 projectedAreaSum=0/0 Grip/LightDepth=0.217713/0.259983
+final-wall diag13 aspect=1.77778 pitch=-0.15 phase=0 contained/hand/roof/coherent=1/1/1/1 headroom=0.543689 leftGauntlet/torchTriangles=0/63 projectedAreaSum=0/0.00342561 Grip/LightDepth=0.217713/0.259983
+final-wall diag21 aspect=1 pitch=-0.15 phase=0 contained/hand/roof/coherent=1/1/1/1 headroom=0.390384 leftGauntlet/torchTriangles=0/0 projectedAreaSum=0/0 Grip/LightDepth=0.187647/0.229913
+final-wall diag21 aspect=1.77778 pitch=-0.15 phase=0 contained/hand/roof/coherent=1/1/1/1 headroom=0.390384 leftGauntlet/torchTriangles=0/393 projectedAreaSum=0/0.0851241 Grip/LightDepth=0.187647/0.229913
+final-wall bend aspect=1 pitch=-0.15 phase=0 contained/hand/roof/coherent=1/1/1/1 headroom=0.0752461 leftGauntlet/torchTriangles=4419/5300 projectedAreaSum=0.162448/0.405973 Grip/LightDepth=0.418008/0.674879
+final-wall bend aspect=1.77778 pitch=-0.15 phase=0 contained/hand/roof/coherent=1/1/1/1 headroom=0.146278 leftGauntlet/torchTriangles=4419/5338 projectedAreaSum=0.705154/0.570343 Grip/LightDepth=0.226873/0.635588
+final-wall centre aspect=1 pitch=-0.15 phase=0 contained/hand/roof/coherent=1/1/1/1 headroom=0.163217 leftGauntlet/torchTriangles=2469/5261 projectedAreaSum=0.0302475/0.475692 Grip/LightDepth=0.643505/0.620351
+final-wall centre aspect=1.77778 pitch=-0.15 phase=0 contained/hand/roof/coherent=1/1/1/1 headroom=0.137907 leftGauntlet/torchTriangles=2310/5258 projectedAreaSum=0.0325903/0.549584 Grip/LightDepth=0.60651/0.583356
+final-wall actualRigCases=60 requiredFramingCases=10 minimumHeadroom=0.03 maxGripError=9.72579e-07 maxGripOrientationError=0.000345267 failures=6; projection only: native visibility/visual admission remains separate
