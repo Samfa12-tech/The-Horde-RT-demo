@@ -1,6 +1,40 @@
 # Horde 1.7 owner playtest checklist - 22 October 2026
 
-## Latest checkpoint - 23 October phone window and volumetrics
+## Latest checkpoint - 23 October resumed copy candidate and phone release
+
+The bounded [player-template-copy candidate](../evidence/2026-10-23-player-template-copy/README.md)
+initializes immutable fields on validated load and removes one 2,195,456-byte
+per-refresh copy. Actual-pose byte/lifecycle checks, three Release contracts,
+full Debug inventory, Android arm64 build and byte-identical native RT images
+pass. A single desktop component comparison measures 266.1/117.0/264.3 microseconds
+for control/candidate/closing-control; 0.67% control drift. This is approximately
+0.148 ms in CPU packing, not a frame/FPS or phone gain. Retain as a desktop
+source candidate; Android performance/physical acceptance remains pending.
+
+Sam briefly reassigned the phone. The current normal-cache APK c1d65749 produced
+one valid 33% control: 620 post-warm frames, GPU median 35.839 ms, skin elapsed
+7.990 ms, whole frame 47.841 ms. This is not a matched gain over the old reverted
+cache build or stale 12.06 ms snapshot. The traced hold first failed thermal
+matching; corrected config transport then received Android errno13 reading
+`/data/local/tmp/horde-scheduler-20261023-r1.pbtxt`. No scheduler events, CPU
+utilization profile, GPU-stage split or closing-control comparison was captured.
+The denied read was not retried through another location. A supported, explicitly
+permitted trace handoff and separately reviewed production-bank probe admission
+remain prerequisites; no actor-worker/pre-fence/texture-LOD work is stacked here.
+
+Phone released **06:20:55 UTC**, with both starting APKs, all 18 existing
+save/lock files, preference bytes and rotation/font settings restored and verified.
+Zero new save paths, no Horde renderer/surface, active trace or owned transfer.
+Safe to disconnect. [Exact phone control and retained blockers](../evidence/2026-10-23-current-cache-phone/README.md).
+The new copy APK dcab8e2e was built afterward and has not been installed.
+
+Evidence head 73f02cd9 run39906863727 finished cancelled: five jobs pass,
+MSVC cancelled. Hosted acceptance remains incomplete; current source-head
+results must be checked separately. Existing PR conflicts, unchanged Debug
+30-second route gate and physical/audio/journey requirements remain open.
+Parked chimney v5 files and rejected experiment dispositions remain unchanged.
+
+## Earlier checkpoint - 23 October phone window and volumetrics
 
 The [phone checkpoint](../evidence/2026-10-23-phone-skin/README.md) supersedes the
 prior window's availability: Sam reoffered SM-S948B, and it was verified/released

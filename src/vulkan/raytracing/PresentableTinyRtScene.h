@@ -1105,6 +1105,8 @@ private:
                                  Buffer& out,
                                  std::array<VkStridedDeviceAddressRegionKHR, 4u>& regions,
                                  std::string& diagnostic);
+    bool PackPlayerWorldBodyPoseUpload(std::string& diagnostic,
+                                      RtSceneRecordObservation* observation = nullptr);
     bool UpdateDynamicInstances(VkCommandBuffer commandBuffer,
                                 const RtSceneFrameInputs& frame,
                                 std::string& diagnostic,

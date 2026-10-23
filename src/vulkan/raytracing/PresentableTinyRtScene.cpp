@@ -2584,6 +2584,9 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
     std::string& diagnostic)
 {
     (void)developmentDirectory;
+    // A successful load below installs a fresh template, including same-size
+    // replacements. Failed/preview loads must not retain a previous upload.
+    skinnedPlayerUpload_.clear();
     genericStaticAssetEnabled_ = !productionAssetRoot.empty();
     productionHeldItemAssetsEnabled_ = !productionAssetRoot.empty();
     developmentStaticAssetDirectory_.clear();
@@ -2821,6 +2824,7 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
         dielectricMetadata.primitiveBase].materialIndex;
     }
     if (!playerRenderSlot_.ValidateStaticVertexLayout(productionPlayerAsset_, diagnostic)) return false;
+    skinnedPlayerUpload_ = productionPlayerAsset_.vertices;
     return true;
 }
 
@@ -6474,6 +6478,32 @@ void PresentableTinyRtScene::ApplyKeeperTorchBodyInstances(
     }
 }
 
+bool PresentableTinyRtScene::PackPlayerWorldBodyPoseUpload(
+    std::string& diagnostic, RtSceneRecordObservation* observation)
+{
+    const auto& skinned = playerRenderSlot_.UniqueVertices();
+    const auto& skinnedTangents = playerRenderSlot_.UniqueTangents();
+    if (skinned.size() != productionPlayerAsset_.vertices.size() ||
+        skinnedTangents.size() != skinned.size() ||
+        skinnedPlayerUpload_.size() != skinned.size())
+    {
+        diagnostic = "Skinned player pose/tangent frame does not match its static-PBR vertex stream.";
+        return false;
+    }
+    RtSceneStageScope poseCopyScope(observation, horde::telemetry::RtStage::PoseCopy);
+    // LoadStaticHeldItemAssets installs the immutable uv0/template fields once.
+    // Each solved pose replaces all four components of every dynamic field.
+    for (std::size_t vertex = 0u; vertex < skinned.size(); ++vertex)
+    {
+        std::copy_n(skinned[vertex].position, 4u, skinnedPlayerUpload_[vertex].position.begin());
+        std::copy_n(skinned[vertex].normal, 4u, skinnedPlayerUpload_[vertex].normal.begin());
+        std::copy_n(skinnedTangents[vertex].tangent, 4u, skinnedPlayerUpload_[vertex].tangent.begin());
+    }
+    poseCopyScope.Complete(1u, skinnedPlayerUpload_.size() *
+        sizeof(horde::scene::assets::StaticRtVertex), 1u);
+    return true;
+}
+
 bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffer,
                                                      const RtSceneFrameInputs& frame,
                                                      std::string& diagnostic,
@@ -6811,27 +6841,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         }
         if (updateSkinnedPlayer)
         {
-            const auto& skinned = playerRenderSlot_.UniqueVertices();
-            const auto& skinnedTangents = playerRenderSlot_.UniqueTangents();
-            if (skinned.size() != productionPlayerAsset_.vertices.size() ||
-                skinnedTangents.size() != skinned.size())
-            {
-                diagnostic = "Skinned player pose/tangent frame does not match its static-PBR vertex stream.";
+            if (!PackPlayerWorldBodyPoseUpload(diagnostic, observation))
                 return false;
-            }
-            RtSceneStageScope poseCopyScope(observation, horde::telemetry::RtStage::PoseCopy);
-            skinnedPlayerUpload_ = productionPlayerAsset_.vertices;
-            for (std::size_t vertex = 0u; vertex < skinned.size(); ++vertex)
-            {
-                std::copy_n(skinned[vertex].position, 4u,
-                            skinnedPlayerUpload_[vertex].position.begin());
-                std::copy_n(skinned[vertex].normal, 4u,
-                            skinnedPlayerUpload_[vertex].normal.begin());
-                std::copy_n(skinnedTangents[vertex].tangent, 4u,
-                            skinnedPlayerUpload_[vertex].tangent.begin());
-            }
-            poseCopyScope.Complete(1u, skinnedPlayerUpload_.size() *
-                sizeof(horde::scene::assets::StaticRtVertex), 1u);
             const VkDeviceSize playerOffset =
                 static_cast<VkDeviceSize>(playerStaticVertexBase_) *
                 sizeof(horde::scene::assets::StaticRtVertex);

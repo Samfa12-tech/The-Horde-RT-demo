@@ -341,6 +341,110 @@ namespace horde::vulkan::raytracing
 
 struct PresentableTinyRtSceneObservationTestAccess
 {
+    static bool CheckPlayerUploadCopy(const bool benchmark = false)
+    {
+        using namespace horde::gameplay::animation;
+        using horde::scene::assets::StaticRtVertex;
+        PresentableTinyRtScene scene;
+        const auto root = std::filesystem::path(HORDE_RT_SOURCE_DIR) / "assets";
+        std::string diagnostic;
+        const auto matchesTemplate = [](const PresentableTinyRtScene& s) {
+            return !s.skinnedPlayerUpload_.empty() &&
+                s.skinnedPlayerUpload_.size() == s.productionPlayerAsset_.vertices.size() &&
+                std::memcmp(s.skinnedPlayerUpload_.data(), s.productionPlayerAsset_.vertices.data(),
+                    s.skinnedPlayerUpload_.size() * sizeof(StaticRtVertex)) == 0;
+        };
+        if (!scene.LoadStaticHeldItemAssets("", root.string(), diagnostic) || !matchesTemplate(scene))
+        { std::cerr << "Player upload initialization: " << diagnostic << '\n'; return false; }
+        horde::scene::SkinnedMeshAsset reference;
+        if (!reference.LoadClips((root / "models/player/runtime/gothic-traveller-lod0.runtime.glb").string(),
+                                 horde::scene::PlayerLocomotionClipSet(), diagnostic)) return false;
+        std::vector<StaticRtVertex> legacy;
+        for (std::uint64_t tick = 1; tick <= 12; ++tick)
+        {
+            PlayerAnimationSnapshot animation;
+            animation.locomotionClip = PlayerLocomotionClip::Walk;
+            animation.locomotionBlend = 1.f;
+            animation.locomotionTime = static_cast<float>(tick) * .075f;
+            animation.locomotionPhaseOffsetSeconds = tick > 6 ? -.15f * static_cast<float>(tick-6) : 0.f;
+            animation.crouchPelvisDropMetres = tick % 3 == 0 ? .3f : 0.f;
+            for (auto* arm : {&animation.leftIk, &animation.rightIk}) {
+                arm->gripX = {{1,0,0}}; arm->gripY = {{0,1,0}}; arm->gripZ = {{0,0,1}};
+            }
+            horde::scene::SkinnedNodeTransform left{}, right{};
+            if (!reference.NodeTransform(horde::scene::SkinnedClip::Walking, animation.locomotionTime,
+                                         "LeftArm", left, diagnostic) ||
+                !reference.NodeTransform(horde::scene::SkinnedClip::Walking, animation.locomotionTime,
+                                         "RightArm", right, diagnostic)) return false;
+            const float x = .5f * (left[12] + right[12]);
+            const float y = .5f * (left[13] + right[13]);
+            const float z = .5f * (left[14] + right[14]);
+            animation.leftIk.shoulder = {{x-.36f,y,z}};
+            animation.rightIk.shoulder = {{x+.36f,y,z}};
+            animation.leftIk.target = {{.16f,1.10f,.35f}}; animation.leftIk.pole = {{1,0,1}};
+            animation.rightIk.target = {{-.16f,1.10f,.35f}}; animation.rightIk.pole = {{-1,0,1}};
+            bool updated = false;
+            if (!scene.playerRenderSlot_.PreparePose(animation, tick, PlayerCpuSkinCadence::Hz60,
+                                                    updated, diagnostic) || !updated) return false;
+            legacy = scene.productionPlayerAsset_.vertices;
+            const auto& vertices = scene.playerRenderSlot_.UniqueVertices();
+            const auto& tangents = scene.playerRenderSlot_.UniqueTangents();
+            for (std::size_t v = 0; v < vertices.size(); ++v) {
+                std::copy_n(vertices[v].position, 4, legacy[v].position.begin());
+                std::copy_n(vertices[v].normal, 4, legacy[v].normal.begin());
+                std::copy_n(tangents[v].tangent, 4, legacy[v].tangent.begin());
+            }
+            if (!scene.PackPlayerWorldBodyPoseUpload(diagnostic) ||
+                std::memcmp(legacy.data(), scene.skinnedPlayerUpload_.data(), legacy.size()*sizeof(StaticRtVertex)))
+            { std::cerr << "Player upload byte parity failed at pose " << tick << '\n'; return false; }
+        }
+        if (benchmark)
+        {
+            // Actual production packing seam, already solved pose. No skinning,
+            // Vulkan upload or GPU work is timed. Both builds use this same caller.
+            constexpr unsigned inner = 16, samples = 301;
+            for (unsigned i = 0; i < 64; ++i)
+                if (!scene.PackPlayerWorldBodyPoseUpload(diagnostic)) return false;
+            std::cout << "player_upload_copy_us=[";
+            for (unsigned i = 0; i < samples; ++i) {
+                const auto begin = std::chrono::steady_clock::now();
+                for (unsigned j = 0; j < inner; ++j)
+                    if (!scene.PackPlayerWorldBodyPoseUpload(diagnostic)) return false;
+                const double us = std::chrono::duration<double,std::micro>(
+                    std::chrono::steady_clock::now()-begin).count() / inner;
+                std::cout << (i ? "," : "") << us;
+            }
+            std::cout << "]\nvertices=" << legacy.size() << " bytes=" << legacy.size()*sizeof(StaticRtVertex)
+                      << " calls_per_sample=" << inner << '\n';
+        }
+        scene.skinnedPlayerUpload_.pop_back();
+        if (scene.PackPlayerWorldBodyPoseUpload(diagnostic)) { std::cerr << "Short upload accepted\n"; return false; }
+        // Same-count reload must replace all static fields, not trust size/empty.
+        scene.skinnedPlayerUpload_ = legacy;
+        for (auto& v : scene.skinnedPlayerUpload_) v.uv0 = {{91,92,93,94}};
+        if (!scene.LoadStaticHeldItemAssets("", root.string(), diagnostic) || !matchesTemplate(scene))
+        { std::cerr << "Same-count reload: " << diagnostic << '\n'; return false; }
+        PresentableTinyRtScene destination;
+        destination.productionPlayerAsset_.vertices.resize(3);
+        destination.skinnedPlayerUpload_.resize(3);
+        destination = std::move(scene);
+        if (!matchesTemplate(destination)) { std::cerr << "Destination move lost template\n"; return false; }
+        auto* same = &destination;
+        destination = std::move(*same);
+        if (!matchesTemplate(destination)) { std::cerr << "Self-move lost template\n"; return false; }
+        // Exercise the device-owned destroy branch through this fixture's Vulkan
+        // stubs. CPU-only Destroy intentionally returns before asset retirement.
+        destination.device_ = FakeHandle<VkDevice>(9999u);
+        destination.Destroy();
+        if (!destination.skinnedPlayerUpload_.empty() || !destination.productionPlayerAsset_.vertices.empty())
+        { std::cerr << "Destroy retained template\n"; return false; }
+        if (!destination.LoadStaticHeldItemAssets("", root.string(), diagnostic) || !matchesTemplate(destination))
+        { std::cerr << "Destroy/reload: " << diagnostic << '\n'; return false; }
+        if (destination.LoadStaticHeldItemAssets("", "", diagnostic) || !destination.skinnedPlayerUpload_.empty())
+        { std::cerr << "Failed reload retained template\n"; return false; }
+        return true;
+    }
+
     static bool CheckProceduralSurfaceReadiness()
     {
         using namespace horde::gameplay::simulation;
@@ -1582,7 +1686,7 @@ struct PresentableTinyRtSceneOutputResizeTestAccess
 
 } // namespace horde::vulkan::raytracing
 
-int main()
+int main(int argc, char** argv)
 {
     using namespace horde::vulkan::raytracing;
 
@@ -1590,8 +1694,15 @@ int main()
     _CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_FILE);
     _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);
 #endif
+    if (argc == 2 && std::string_view(argv[1]) == "--player-upload-copy-benchmark")
+        return PresentableTinyRtSceneObservationTestAccess::CheckPlayerUploadCopy(true) ? 0 : 1;
+    if (argc == 2 && std::string_view(argv[1]) == "--player-upload-copy-check")
+        return PresentableTinyRtSceneObservationTestAccess::CheckPlayerUploadCopy() ? 0 : 1;
+    bool playerUploadOk = Require(PresentableTinyRtSceneObservationTestAccess::CheckPlayerUploadCopy(),
+        "player upload must preserve exact pose bytes and asset lifetime across reload/move/failure");
     std::cerr << "Resource integration: existing readback/mist/torch contracts\n";
-    bool ok = PresentableTinyRtSceneObservationTestAccess::CheckPersistentReadback();
+    bool ok = playerUploadOk;
+    ok &= PresentableTinyRtSceneObservationTestAccess::CheckPersistentReadback();
     ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckProceduralSurfaceReadiness(),
                   "chapter readiness must admit the complete world/lid code buffer and reject missing/misaligned ranges");
     ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckStaticGroupingSemantics(),

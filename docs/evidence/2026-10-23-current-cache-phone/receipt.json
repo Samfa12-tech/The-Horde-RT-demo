@@ -1022,5 +1022,21 @@
     "No current versus reverted-normal-cache gain, copy candidate gain or sustained performance claim.",
     "Seeded post-Keeper stationary hold; not natural route, audio, touch or image-quality acceptance.",
     "Original failed runs retained locally; raw owner settings/save inventories and logs are not committed."
-  ]
+  ],
+  "gpuProvenance": {
+    "gpuName": "Adreno (TM) 840",
+    "vendorId": 20803,
+    "deviceId": 1141180977,
+    "driverVersion": 2150932499,
+    "driverVersionText": "raw 2150932499 (vendor-specific)",
+    "driverProperties": {
+      "available": true,
+      "driverId": 8,
+      "driverName": "Qualcomm Technologies Inc. Adreno Vulkan Driver",
+      "driverInfo": "Driver Build: 089d643e2a, Icecd8f0534, 1782882597\nDate: 07/01/26\nCompiler Version: E031.50.19.27\nDriver Branch: \n",
+      "conformanceVersion": "1.4.1.0"
+    },
+    "vulkanApiVersion": 4210983,
+    "vulkanApiVersionText": "1.4.295"
+  }
 }
