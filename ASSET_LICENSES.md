@@ -431,6 +431,16 @@ source supplied by Samfa12. The original private-project file is unchanged.
 Native clip/skin intake is separate from runtime admission: no visible Kit,
 Kit renderer/resource handoff is shipped by this intake. The intended non-overlapping Keeper/Kit lifecycle may reuse the dedicated character slot; that is a subsequent admission task.
 
+### Kit same-rig step-turn authoring proof (23 October 2026)
+
+The separate `assets/models/characters/source/kit-step-turn-proof-v1/` source-only
+study contains offline-authored joint animation on the same owner-approved Warden
+rig. Original geometry, weights and imported bind transforms are retained; motion
+authoring is by Samfa12/Codex using Blender. The source above and its entitlement
+remain the provenance; no new provider generation or blanket MIT/CC0 claim.
+This editable turn study and its studio previews are unadmitted and excluded from
+runtime packages. See `docs/evidence/2026-10-23-kit-step-turn-proof/README.md`.
+
 ### Chapter terrain and shortened entry source candidates (11 October 2026)
 
 `assets/models/world/source/chapter-entry-return-r03/` preserves original Horde architectural authoring derived from the accepted collapse, reusing the existing Poly Haven Boulder01 rock and Boulder01/MedievalWall02 CC0 maps. `assets/models/world/source/chapter-terrain-r18/` is original Horde Blender authoring from the owner-supplied r2 heightfield, with admitted Poly Haven damp_sand/mossy_stone_wall CC0 materials. Individual texture/source hashes and derivation recipes remain with each candidate. The recovered original planning NPZ is under `assets/source/beyond_the_tomb/terrain/topo-r2/`. These sources and candidate GLBs are outside runtime package paths; native import and source validation do not grant final runtime/visual/performance acceptance. No blanket third-party licence change or new generation occurred.

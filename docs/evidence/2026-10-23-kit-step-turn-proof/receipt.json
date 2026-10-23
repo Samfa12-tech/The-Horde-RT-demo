@@ -1,0 +1,190 @@
+{
+  "schema": 1,
+  "sealedAtUtc": "2026-10-23T23:17:37.315627+00:00",
+  "baseCommit": "f6eab6c20aa97ee0daff2789267393564bfb287f",
+  "disposition": "Offline authoring proof only. Residual support sole drift remains; no runtime bindings, GLB export, geometry/skin or gameplay changes.",
+  "tool": "Blender 5.2.0 LTS fbe6228777e7, Workbench offline studio preview; FFmpeg H264 encoding",
+  "source": {
+    "path": "assets/models/characters/source/kit-warden-v1/briarhold-warden-1k.glb",
+    "bytes": 7034964,
+    "sha256": "47e249840ed9dd438da386137257050a5bd463e7fe54bf94873e1fd21715835e"
+  },
+  "productionRuntime": {
+    "path": "assets/models/characters/runtime/kit-warden-v1/kit-warden-lod0.runtime.glb",
+    "bytes": 2151672,
+    "sha256": "1ba628235814b5912ae1439b180347dd8e1cce85b0f4d1fae5bbacb41e7d3713"
+  },
+  "geometryWeightsDigest": "83ae4ace64cc30647cd3928acf755b53ca22d68ad74ac71d874f08c0ea74adb0",
+  "sourcePackage": [
+    {
+      "path": "assets/models/characters/source/kit-step-turn-proof-v1/author_turn.py",
+      "bytes": 11650,
+      "sha256": "7941225c4f4522096b7ff69c6cc822874b9609fcc4a5e4459975089ff6d6f0eb"
+    },
+    {
+      "path": "assets/models/characters/source/kit-step-turn-proof-v1/kit-step-turn-proof.blend",
+      "bytes": 6919526,
+      "sha256": "8800d40902f437b171791a498b9460bca3920f9de942545d24bdf6ca32ffea0a"
+    },
+    {
+      "path": "assets/models/characters/source/kit-step-turn-proof-v1/README.md",
+      "bytes": 2242,
+      "sha256": "95f0ab79b82579fe2f877eb62abda4b3cd2aad50f9d3ba1a05ff627e7eb48c81"
+    },
+    {
+      "path": "assets/models/characters/source/kit-step-turn-proof-v1/verify_preview.py",
+      "bytes": 3163,
+      "sha256": "c674101d34ff4f1acfd81da66f846110af9d2b525ed226d484712490f4a865c5"
+    }
+  ],
+  "previews": [
+    {
+      "path": "docs/evidence/2026-10-23-kit-step-turn-proof/foot-left-0013.png",
+      "bytes": 482568,
+      "sha256": "54fc4e2be03ff2d7dc612fb50f87284a32e4beb752b5432cbcff5a370a8f3774"
+    },
+    {
+      "path": "docs/evidence/2026-10-23-kit-step-turn-proof/foot-right-0013.png",
+      "bytes": 507570,
+      "sha256": "b7d1c71361aaed998d8cbf02dd21d2cad83b56fd39688dcc8c35ac7dd4e90958"
+    },
+    {
+      "path": "docs/evidence/2026-10-23-kit-step-turn-proof/left-authoring-preview.mp4",
+      "bytes": 122068,
+      "sha256": "1a0afe4dffba34d648c6ffd878ee334054446b7d3608d1238df16675a17c3c6c"
+    },
+    {
+      "path": "docs/evidence/2026-10-23-kit-step-turn-proof/right-authoring-preview.mp4",
+      "bytes": 134720,
+      "sha256": "f4ce50dcd66df492bd86e147e8a68515eaa0b3fd84ff03730190a9cb72d362cc"
+    }
+  ],
+  "takes": [
+    {
+      "direction": "left",
+      "durationSeconds": 0.75,
+      "angleDegrees": 45,
+      "maxRequiredLegStretchM": 0,
+      "maxIdleZeroEndpointVertexErrorM": 4.0267613878463687e-07,
+      "maxSupportSoleHorizontalDriftM": 0.011964091932790709,
+      "minimumSoleZ": -1.204337195304106e-06,
+      "maximumSoleZ": 0.05592856928706169,
+      "bindUnchanged": true,
+      "geometryWeightsUnchanged": true
+    },
+    {
+      "direction": "right",
+      "durationSeconds": 0.75,
+      "angleDegrees": -45,
+      "maxRequiredLegStretchM": 0,
+      "maxIdleZeroEndpointVertexErrorM": 3.888781991083508e-07,
+      "maxSupportSoleHorizontalDriftM": 0.011964090583458728,
+      "minimumSoleZ": -1.204337195304106e-06,
+      "maximumSoleZ": 0.0559285543859005,
+      "bindUnchanged": true,
+      "geometryWeightsUnchanged": true
+    }
+  ],
+  "reopenedValidation": [
+    {
+      "direction": "left",
+      "samples": 91,
+      "sampleHz": 120,
+      "maxSupportSoleDriftM": 0.01212467050894864
+    },
+    {
+      "direction": "right",
+      "samples": 91,
+      "sampleHz": 120,
+      "maxSupportSoleDriftM": 0.01212470820237519
+    }
+  ],
+  "soleSubsetRule": "Original side-specific UpLeg/Leg/Foot/ToeBase weights only; world Z below 0.25m; sole vertices within 6mm of initial minimum, held fixed as vertex identities.",
+  "soleVertices": {
+    "left": 39,
+    "right": 38
+  },
+  "portableReproductionMetricsExact": true,
+  "ownerParkedFilesUnchanged": 151,
+  "originalSourceIntakeCTest": {
+    "name": "horde_rt_kit_source_intake_tests",
+    "pass": true,
+    "seconds": 7.17,
+    "candidateNativeClipAcceptance": false
+  },
+  "failedCoordinateTrial": [
+    {
+      "path": "reports/kit-step-turn-proof-20261023/author_turn-r0.py",
+      "bytes": 10988,
+      "sha256": "a5474cac9fc96e35ef2d3c07c42f2ad97b2310463fd9187cdf8a3edca873bba0"
+    },
+    {
+      "path": "reports/kit-step-turn-proof-20261023/kit-step-turn-r0-unadmitted.blend",
+      "bytes": 6917671,
+      "sha256": "e3a0abba73d7060e711c3a889c879a9f041ed8a38fdd3d3cc73187c9c22ddcc8"
+    },
+    {
+      "path": "reports/kit-step-turn-proof-20261023/authoring-contact-r0-unadmitted.json",
+      "bytes": 61238,
+      "sha256": "d894959e451874296300058916a472c3b27bf6fe021160e4ffe003da05d06a90"
+    }
+  ],
+  "preRefinementTrial": [
+    {
+      "path": "reports/kit-step-turn-proof-20261023/author_turn-r1.py",
+      "bytes": 10992,
+      "sha256": "22e6233591baab75bec52b0feff522d04ffba949ce5a0d347c1a52e49aa85c6e"
+    },
+    {
+      "path": "reports/kit-step-turn-proof-20261023/kit-step-turn-r1-unadmitted.blend",
+      "bytes": 6918550,
+      "sha256": "d9f608468ebb42484fd082f85f7b25e1a9597f19733d07fd738d8a40c418cd82"
+    },
+    {
+      "path": "reports/kit-step-turn-proof-20261023/authoring-contact-r1-unadmitted.json",
+      "bytes": 61352,
+      "sha256": "f81a299119f012e08a4a6bf491fc8ef030d172b5330ce4548f6f3cbdcfc5ab44"
+    }
+  ],
+  "rawEvidence": [
+    {
+      "path": "reports/kit-step-turn-proof-20261023/authoring-contact.json",
+      "bytes": 61343,
+      "sha256": "c3457abdaf41d61390ac588cfc02b209cc3f0bc35005e9af07154599a5ae3656"
+    },
+    {
+      "path": "reports/kit-step-turn-proof-20261023/reopened-validation-r2.json",
+      "bytes": 159683,
+      "sha256": "7e84266382f2b6729bccf2b5bced955116d38bd72c15a4a5c73647623623e1c1"
+    },
+    {
+      "path": "reports/kit-step-turn-proof-20261023/portable-reproduction.log",
+      "bytes": 1708,
+      "sha256": "1e82bde0c4f921e51bc8f409a34450d7c53a96a7762dac548ab6430bb6d0cd81"
+    },
+    {
+      "path": "reports/kit-step-turn-proof-20261023/original-intake-test.log",
+      "bytes": 493,
+      "sha256": "dbaaa4079fc352563c7a5b0e3c4aa557b7bd1599f0e3d762cf1c18897585b4ee"
+    },
+    {
+      "path": "reports/kit-step-turn-proof-20261023/preview-r2.log",
+      "bytes": 17444,
+      "sha256": "68005beed4cacad4b7ca32ec6702c0e637f7107e028e6a728654a07efa551945"
+    }
+  ],
+  "nativeRTValidation": false,
+  "gameplayValidation": false,
+  "phoneOperations": false,
+  "foregroundActivation": false,
+  "newProviderOrSpend": false,
+  "audioHapticManualRevalidationRequired": false,
+  "openGates": [
+    "Residual 12.1mm support sole drift/contact review",
+    "Arbitrary idle phase and speech overlays",
+    "Native clip export coordinate/pose correspondence",
+    "Partial, repeated and aborted turns",
+    "Slope/obstacle, save/lifecycle and true in-game joins",
+    "Performance and physical acceptance"
+  ]
+}

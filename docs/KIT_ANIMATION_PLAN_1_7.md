@@ -1,5 +1,15 @@
 # KIT ANIMATION PLAN 1 7 — WP0 custody and reconciliation
 
+## Same-rig authoring proof - 23 October 2026
+
+Separate [left/right step-turn sources and offline previews](evidence/2026-10-23-kit-step-turn-proof/README.md)
+now exist on the unchanged owned rig, with matching Idle-zero endpoints and
+preserved geometry/weights/imported bind matrices. They remain unadmitted:
+reopened 120 Hz sampling retains 12.1 mm maximum support-sole drift. No production
+bindings or motion changed. Contact review/cleanup and native coordinate/import
+proof precede any turn-then-walk integration; 0.75-second takes are candidates,
+not fixed gameplay targets.
+
 ## Current turn/departure reproduction - 23 October 2026
 
 The [bounded fresh native RT sequence](evidence/2026-10-23-kit-turn-departure/README.md)
