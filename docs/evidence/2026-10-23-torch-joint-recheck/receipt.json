@@ -1,0 +1,806 @@
+{
+  "schema": 1,
+  "sourceCommit": "dbf09d343ec91970d6e70d229adb5da38ce31687",
+  "disposition": "Evidence only; confirmed current wall defect, no runtime candidate admitted",
+  "native": {
+    "scope": "five frozen-look current native RT witnesses; no runtime candidate or phone claim",
+    "exeSha256": "01bb2196717c3cd0fda45d5de1798b445778a5502646793ea099d40e6a311c28",
+    "hookedDiagnosticSha256": "0519216177ae8f690a8d5d533c183f8c57d2420f76c937953d8dc2fd2cf47280",
+    "temporaryProbeSha256": "de8a7b5e4e4392c0c454cbc23670973277317f4fade4a824f513520f60a81c36",
+    "exitCode": 0,
+    "timedOut": false,
+    "elapsedSeconds": 28.73399999999674,
+    "startedUtc": "2026-10-23T20:04:31.793186+00:00",
+    "finishedUtc": "2026-10-23T20:05:00.540677+00:00",
+    "witnesses": [
+      {
+        "index": 11,
+        "place": 2,
+        "angle": 11,
+        "file": "diag-11.png",
+        "sha256": "5622c7c0d1ac41cc0f8d87382518dc096942741f63c37b7925d1d0ff437f9d4d",
+        "camera": [
+          1.59908,
+          -0.95,
+          -4.9,
+          1.1781,
+          -0.15
+        ],
+        "armPixels": 0,
+        "leftHandTarget": [
+          -0.180236,
+          -0.313193,
+          0.247645
+        ],
+        "gripUpInView": [
+          0,
+          1,
+          0
+        ],
+        "identity": {
+          "sceneEpoch": 2,
+          "measurementGeneration": 1,
+          "recordAttemptSerial": 100,
+          "recordSerial": 100,
+          "submissionSerial": 100,
+          "completionSerial": 100,
+          "simulationTick": 540,
+          "frameSlot": 0
+        },
+        "pipeline": {
+          "executionBackend": "RayTracingPipeline",
+          "instrumentation": "diagnostic",
+          "dielectricQuality": "high",
+          "bundleKey": "diagnostic_high_pair",
+          "opaqueFast": {
+            "key": "diagnostic_high_opaque_fast",
+            "sha256": "990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3"
+          },
+          "genericDielectric": {
+            "key": "diagnostic_high_generic_dielectric",
+            "sha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a"
+          },
+          "activeStrategy": "opaque-fast",
+          "activeKey": "diagnostic_high_opaque_fast",
+          "activeSha256": "990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3",
+          "waterQuality": "high"
+        },
+        "submittedDimensions": {
+          "internalExtent": [
+            960,
+            540
+          ],
+          "outputExtent": [
+            960,
+            540
+          ],
+          "cameraAspect": 1.77777779,
+          "presentationTransform": 0,
+          "dynamicResolutionEnabled": false,
+          "linearBlit": false,
+          "aspectPreserved": true
+        },
+        "shadowQuality": {
+          "mode": "higher",
+          "localPrimarySamples": 4,
+          "skyPrimarySamples": 2,
+          "reserved": 0
+        },
+        "fireQuality": {
+          "quality": "High",
+          "volumeSteps": 10,
+          "reflectionSamples": 2,
+          "reflectedVolumeSteps": 8
+        },
+        "actualUploadedDustQuality": 2,
+        "actualUploadedMistEnabled": true,
+        "fireLighting": {
+          "count": 1,
+          "emitters": [
+            {
+              "stableId": 1,
+              "positionStrength": [
+                1.76852429,
+                0.878376901,
+                -5.18237829,
+                1.50104952
+              ],
+              "colourIntensity": [
+                1,
+                0.454960018,
+                0.0977689177,
+                1.50104952
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        "presentation": {
+          "outcome": "presented",
+          "presented": true,
+          "lastSuccessfulPresentSubmissionSerial": 100,
+          "finalIdleCompletion": true
+        }
+      },
+      {
+        "index": 13,
+        "place": 2,
+        "angle": 13,
+        "file": "diag-13.png",
+        "sha256": "143733c61dd3e8c5ab26b9b89a4df8d8521c295c592b4a142782cd7650c5b799",
+        "camera": [
+          1.59908,
+          -0.95,
+          -4.9,
+          1.9635,
+          -0.15
+        ],
+        "armPixels": 0,
+        "leftHandTarget": [
+          -0.19191,
+          -0.31331,
+          0.247055
+        ],
+        "gripUpInView": [
+          0,
+          1,
+          0
+        ],
+        "identity": {
+          "sceneEpoch": 2,
+          "measurementGeneration": 1,
+          "recordAttemptSerial": 102,
+          "recordSerial": 102,
+          "submissionSerial": 102,
+          "completionSerial": 102,
+          "simulationTick": 564,
+          "frameSlot": 0
+        },
+        "pipeline": {
+          "executionBackend": "RayTracingPipeline",
+          "instrumentation": "diagnostic",
+          "dielectricQuality": "high",
+          "bundleKey": "diagnostic_high_pair",
+          "opaqueFast": {
+            "key": "diagnostic_high_opaque_fast",
+            "sha256": "990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3"
+          },
+          "genericDielectric": {
+            "key": "diagnostic_high_generic_dielectric",
+            "sha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a"
+          },
+          "activeStrategy": "opaque-fast",
+          "activeKey": "diagnostic_high_opaque_fast",
+          "activeSha256": "990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3",
+          "waterQuality": "high"
+        },
+        "submittedDimensions": {
+          "internalExtent": [
+            960,
+            540
+          ],
+          "outputExtent": [
+            960,
+            540
+          ],
+          "cameraAspect": 1.77777779,
+          "presentationTransform": 0,
+          "dynamicResolutionEnabled": false,
+          "linearBlit": false,
+          "aspectPreserved": true
+        },
+        "shadowQuality": {
+          "mode": "higher",
+          "localPrimarySamples": 4,
+          "skyPrimarySamples": 2,
+          "reserved": 0
+        },
+        "fireQuality": {
+          "quality": "High",
+          "volumeSteps": 10,
+          "reflectionSamples": 2,
+          "reflectedVolumeSteps": 8
+        },
+        "actualUploadedDustQuality": 2,
+        "actualUploadedMistEnabled": true,
+        "fireLighting": {
+          "count": 1,
+          "emitters": [
+            {
+              "stableId": 1,
+              "positionStrength": [
+                1.9224788,
+                0.878376901,
+                -4.99086857,
+                1.47749317
+              ],
+              "colourIntensity": [
+                1,
+                0.454960018,
+                0.0977689177,
+                1.47749317
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        "presentation": {
+          "outcome": "presented",
+          "presented": true,
+          "lastSuccessfulPresentSubmissionSerial": 102,
+          "finalIdleCompletion": true
+        }
+      },
+      {
+        "index": 21,
+        "place": 4,
+        "angle": 5,
+        "file": "diag-21.png",
+        "sha256": "c4453d988faca57a87d8e591304a291411bab6a16798cb33202b1a3e3733a94c",
+        "camera": [
+          -1.59907,
+          -0.95,
+          -4.9,
+          -1.1781,
+          -0.15
+        ],
+        "armPixels": 0,
+        "leftHandTarget": [
+          -0.180297,
+          -0.313189,
+          0.247661
+        ],
+        "gripUpInView": [
+          0,
+          1,
+          0
+        ],
+        "identity": {
+          "sceneEpoch": 2,
+          "measurementGeneration": 1,
+          "recordAttemptSerial": 146,
+          "recordSerial": 146,
+          "submissionSerial": 146,
+          "completionSerial": 146,
+          "simulationTick": 828,
+          "frameSlot": 0
+        },
+        "pipeline": {
+          "executionBackend": "RayTracingPipeline",
+          "instrumentation": "diagnostic",
+          "dielectricQuality": "high",
+          "bundleKey": "diagnostic_high_pair",
+          "opaqueFast": {
+            "key": "diagnostic_high_opaque_fast",
+            "sha256": "990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3"
+          },
+          "genericDielectric": {
+            "key": "diagnostic_high_generic_dielectric",
+            "sha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a"
+          },
+          "activeStrategy": "opaque-fast",
+          "activeKey": "diagnostic_high_opaque_fast",
+          "activeSha256": "990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3",
+          "waterQuality": "high"
+        },
+        "submittedDimensions": {
+          "internalExtent": [
+            960,
+            540
+          ],
+          "outputExtent": [
+            960,
+            540
+          ],
+          "cameraAspect": 1.77777779,
+          "presentationTransform": 0,
+          "dynamicResolutionEnabled": false,
+          "linearBlit": false,
+          "aspectPreserved": true
+        },
+        "shadowQuality": {
+          "mode": "higher",
+          "localPrimarySamples": 4,
+          "skyPrimarySamples": 2,
+          "reserved": 0
+        },
+        "fireQuality": {
+          "quality": "High",
+          "volumeSteps": 10,
+          "reflectionSamples": 2,
+          "reflectedVolumeSteps": 8
+        },
+        "actualUploadedDustQuality": 2,
+        "actualUploadedMistEnabled": true,
+        "fireLighting": {
+          "count": 1,
+          "emitters": [
+            {
+              "stableId": 1,
+              "positionStrength": [
+                -1.91860235,
+                0.878376782,
+                -4.82009411,
+                1.51897573
+              ],
+              "colourIntensity": [
+                1,
+                0.454960018,
+                0.0977689177,
+                1.51897573
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        "presentation": {
+          "outcome": "presented",
+          "presented": true,
+          "lastSuccessfulPresentSubmissionSerial": 146,
+          "finalIdleCompletion": true
+        }
+      },
+      {
+        "index": 40,
+        "place": 7,
+        "angle": 8,
+        "file": "diag-40.png",
+        "sha256": "db818bbd6944dffe2a0f18b6c7202048ebb20ec7cd7f166cdb0ea69a46f13f8f",
+        "camera": [
+          0.94955,
+          -0.95,
+          -9.39919,
+          0,
+          -0.15
+        ],
+        "armPixels": 237,
+        "leftHandTarget": [
+          -0.191388,
+          -0.305437,
+          0.449628
+        ],
+        "gripUpInView": [
+          0,
+          1,
+          0
+        ],
+        "identity": {
+          "sceneEpoch": 2,
+          "measurementGeneration": 1,
+          "recordAttemptSerial": 222,
+          "recordSerial": 222,
+          "submissionSerial": 222,
+          "completionSerial": 222,
+          "simulationTick": 1357,
+          "frameSlot": 0
+        },
+        "pipeline": {
+          "executionBackend": "RayTracingPipeline",
+          "instrumentation": "diagnostic",
+          "dielectricQuality": "high",
+          "bundleKey": "diagnostic_high_pair",
+          "opaqueFast": {
+            "key": "diagnostic_high_opaque_fast",
+            "sha256": "990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3"
+          },
+          "genericDielectric": {
+            "key": "diagnostic_high_generic_dielectric",
+            "sha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a"
+          },
+          "activeStrategy": "opaque-fast",
+          "activeKey": "diagnostic_high_opaque_fast",
+          "activeSha256": "990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3",
+          "waterQuality": "high"
+        },
+        "submittedDimensions": {
+          "internalExtent": [
+            960,
+            540
+          ],
+          "outputExtent": [
+            960,
+            540
+          ],
+          "cameraAspect": 1.77777779,
+          "presentationTransform": 0,
+          "dynamicResolutionEnabled": false,
+          "linearBlit": false,
+          "aspectPreserved": true
+        },
+        "shadowQuality": {
+          "mode": "higher",
+          "localPrimarySamples": 4,
+          "skyPrimarySamples": 2,
+          "reserved": 0
+        },
+        "fireQuality": {
+          "quality": "High",
+          "volumeSteps": 10,
+          "reflectionSamples": 2,
+          "reflectedVolumeSteps": 8
+        },
+        "actualUploadedDustQuality": 2,
+        "actualUploadedMistEnabled": true,
+        "fireLighting": {
+          "count": 1,
+          "emitters": [
+            {
+              "stableId": 1,
+              "positionStrength": [
+                0.742358267,
+                0.846369207,
+                -9.86338615,
+                1.49472511
+              ],
+              "colourIntensity": [
+                1,
+                0.454960018,
+                0.0977689177,
+                1.49472511
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        "presentation": {
+          "outcome": "presented",
+          "presented": true,
+          "lastSuccessfulPresentSubmissionSerial": 222,
+          "finalIdleCompletion": true
+        }
+      },
+      {
+        "index": 48,
+        "place": 8,
+        "angle": 8,
+        "file": "diag-48.png",
+        "sha256": "fc0863a3107b20ac008b9a9a20072d0a9fed9040da500dacc83c3b71390d2723",
+        "camera": [
+          0.000193421,
+          -0.95,
+          -4.90092,
+          0,
+          -0.15
+        ],
+        "armPixels": 2371,
+        "leftHandTarget": [
+          -0.191396,
+          -0.347441,
+          0.605645
+        ],
+        "gripUpInView": [
+          0,
+          1,
+          0
+        ],
+        "identity": {
+          "sceneEpoch": 2,
+          "measurementGeneration": 1,
+          "recordAttemptSerial": 276,
+          "recordSerial": 276,
+          "submissionSerial": 276,
+          "completionSerial": 276,
+          "simulationTick": 1661,
+          "frameSlot": 0
+        },
+        "pipeline": {
+          "executionBackend": "RayTracingPipeline",
+          "instrumentation": "diagnostic",
+          "dielectricQuality": "high",
+          "bundleKey": "diagnostic_high_pair",
+          "opaqueFast": {
+            "key": "diagnostic_high_opaque_fast",
+            "sha256": "990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3"
+          },
+          "genericDielectric": {
+            "key": "diagnostic_high_generic_dielectric",
+            "sha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a"
+          },
+          "activeStrategy": "opaque-fast",
+          "activeKey": "diagnostic_high_opaque_fast",
+          "activeSha256": "990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3",
+          "waterQuality": "high"
+        },
+        "submittedDimensions": {
+          "internalExtent": [
+            960,
+            540
+          ],
+          "outputExtent": [
+            960,
+            540
+          ],
+          "cameraAspect": 1.77777779,
+          "presentationTransform": 0,
+          "dynamicResolutionEnabled": false,
+          "linearBlit": false,
+          "aspectPreserved": true
+        },
+        "shadowQuality": {
+          "mode": "higher",
+          "localPrimarySamples": 4,
+          "skyPrimarySamples": 2,
+          "reserved": 0
+        },
+        "fireQuality": {
+          "quality": "High",
+          "volumeSteps": 10,
+          "reflectionSamples": 2,
+          "reflectedVolumeSteps": 8
+        },
+        "actualUploadedDustQuality": 2,
+        "actualUploadedMistEnabled": true,
+        "fireLighting": {
+          "count": 1,
+          "emitters": [
+            {
+              "stableId": 1,
+              "positionStrength": [
+                -0.207006946,
+                0.774583399,
+                -5.50986004,
+                1.48753417
+              ],
+              "colourIntensity": [
+                1,
+                0.454960018,
+                0.0977689177,
+                1.48753417
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        "presentation": {
+          "outcome": "presented",
+          "presented": true,
+          "lastSuccessfulPresentSubmissionSerial": 276,
+          "finalIdleCompletion": true
+        }
+      }
+    ]
+  },
+  "restoration": {
+    "diagnosticRestoredByteForByte": true,
+    "settingsUnchanged": {
+      "build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.settings.ini": true
+    },
+    "runtimeCandidate": false,
+    "restoredExeSha256": "acb9418ce2b7aafb670abb3cdc1335de3c8fd06345a83b4b15da4d2bbf1950ed",
+    "restoredBuildPassed": true,
+    "heldItemSourceSha256": "f8df4fac496c8d66188256342b052d556defaf872908cccc2e6aed2059ea9871"
+  },
+  "localRetainedFailures": [
+    "Initial build specified executable name instead of CMake target; MSB1009, no compile.",
+    "Correct-target sandbox build remained in worker startup; cancelled using its own exec session, all owned processes verified stopped. Same build with normal process/IPC access succeeded."
+  ],
+  "phoneOperations": false,
+  "manualAudioHapticRevalidationRequired": false,
+  "limitations": [
+    "Not proof of original phone recording cause",
+    "Frozen diagnostic views, not physical controls or a natural route",
+    "No performance/continuous-motion acceptance; zero primary arm pixels at walls remains unaccepted",
+    "Upright grip-centre bounds are not full-rig feasibility or a general impossibility proof"
+  ],
+  "localRawDirectory": "reports/torch-joint-review-20261023/"
+}
