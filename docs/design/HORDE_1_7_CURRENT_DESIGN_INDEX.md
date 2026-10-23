@@ -1,5 +1,12 @@
 # Horde 1.7 current design index
 
+Start with the [current checkpoint reconciliation](HORDE_1_7_CHECKPOINT_RECONCILIATION_2026_10_23.md)
+at source e3486d73 for implemented/tested, desktop-only, phone/owner acceptance,
+unfinished source and explicit decisions/deferrals. It supersedes older status
+maps and next-work paragraphs below without rewriting their historical evidence.
+Exact code source e3486d73 passes all six hosted jobs (MSVC 150/150); PR27 remains
+draft/conflicting and physical/design gates remain explicit.
+
 Latest [Windows Shipping benchmark course and rollback](../evidence/2026-10-23-benchmark-shipping/README.md):
 the full authored course, all 1,838 measured actual-dimension rows and exact
 restoration pass. A demonstrated packed mist/dust report-decoder defect is fixed
@@ -20,9 +27,9 @@ fixed-surface launch, submission-owned dimensions and physical validation remain
 open. Preceding source `478f6c25` passes all six hosted jobs; newer source needs its
 own result. No ranking/publication or device operation is activated.
 
-Start with the [23 October scope reconciliation](HORDE_1_7_OWNER_PLAYTEST_CHECKLIST_2026_10_22.md#current-scope-reconciliation---23-october-source-ba8aeacf)
-for implemented/validated/pending/deferred states, the still-deferred shared tree
-system and the next feature tasks. Dated ledgers below retain their own snapshots.
+The [earlier ba8aeacf reconciliation](HORDE_1_7_OWNER_PLAYTEST_CHECKLIST_2026_10_22.md#current-scope-reconciliation---23-october-source-ba8aeacf)
+retains the original shared-tree distinction and deferral. Use the current
+checkpoint reconciliation above for later implementation and remaining work.
 
 ## 23 October measured phone checkpoint and shared-volume direction
 

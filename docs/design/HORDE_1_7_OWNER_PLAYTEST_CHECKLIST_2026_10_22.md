@@ -1,5 +1,10 @@
 # Horde 1.7 owner playtest checklist - 22 October 2026
 
+Current status is the [e3486d73 checkpoint reconciliation](HORDE_1_7_CHECKPOINT_RECONCILIATION_2026_10_23.md).
+It distinguishes existing implementation from desktop-only/physical acceptance,
+unfinished work and decisions. The dated entries below preserve their own
+snapshots; old next-task and missing-work claims are not the current work order.
+
 ## Windows Shipping benchmark acceptance - 23 October
 
 The [bounded full-course checkpoint](../evidence/2026-10-23-benchmark-shipping/README.md)
@@ -325,9 +330,10 @@ backup through `9bd46a8f`. Worker remains OFF; phone remains untouched.
 
 ## Current scope reconciliation - 23 October, source ba8aeacf
 
-This table is the current implementation/acceptance map. The dated receipts below
-retain their original results; they do not override this map or reopen rejected
-experiments. Development continues in the existing
+This table is the ba8aeacf implementation/acceptance snapshot. The later
+[checkpoint reconciliation](HORDE_1_7_CHECKPOINT_RECONCILIATION_2026_10_23.md)
+supersedes its current-state/work-order claims. Original receipts and rejected
+experiments retain their results. Development continues in the existing
 `.worktrees/horde-1.7-wp2-vertical-proof` checkout on draft PR 27. The phone is
 released; the next experiments are desktop-only.
 
