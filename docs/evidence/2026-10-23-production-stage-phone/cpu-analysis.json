@@ -1,0 +1,157 @@
+{
+  "sampleFrames": 626,
+  "selection": "Exact simulation-owner wallNs from 10s through 40s; same 626 frames as strict GPU held-view analysis",
+  "cpuStageWallTimings": {
+    "simulation_cpu_ns": {
+      "n": 626,
+      "medianMs": 1.5891145,
+      "p95Ms": 2.673698,
+      "maximumMs": 3.684792
+    },
+    "skin_cpu_ns": {
+      "n": 626,
+      "medianMs": 8.6935155,
+      "p95Ms": 11.883334,
+      "maximumMs": 13.423698
+    },
+    "player_skin_cpu_ns": {
+      "n": 626,
+      "medianMs": 4.4626305,
+      "p95Ms": 6.858281,
+      "maximumMs": 7.348333
+    },
+    "character_skin_cpu_ns": {
+      "n": 626,
+      "medianMs": 4.2900785,
+      "p95Ms": 5.302604,
+      "maximumMs": 6.63
+    },
+    "pose_copy_cpu_ns": {
+      "n": 626,
+      "medianMs": 0.3785155,
+      "p95Ms": 0.579116,
+      "maximumMs": 1.74099
+    },
+    "dynamic_upload_cpu_ns": {
+      "n": 626,
+      "medianMs": 0.4363555,
+      "p95Ms": 0.555833,
+      "maximumMs": 1.090416
+    },
+    "fence_wait_cpu_ns": {
+      "n": 626,
+      "medianMs": 34.8871355,
+      "p95Ms": 35.749688,
+      "maximumMs": 37.845521
+    },
+    "queue_submit_cpu_ns": {
+      "n": 626,
+      "medianMs": 0.159479,
+      "p95Ms": 0.300521,
+      "maximumMs": 0.598854
+    },
+    "whole_frame_cpu_ns": {
+      "n": 626,
+      "medianMs": 47.7482295,
+      "p95Ms": 51.355105,
+      "maximumMs": 53.879688
+    },
+    "playerPoseCpuMs_ns": {
+      "n": 626,
+      "medianMs": 0.024427,
+      "p95Ms": 0.038958,
+      "maximumMs": 0.079635
+    },
+    "playerVerticesCpuMs_ns": {
+      "n": 626,
+      "medianMs": 3.235287,
+      "p95Ms": 5.056511,
+      "maximumMs": 5.69625
+    },
+    "viewmodelVerticesCpuMs_ns": {
+      "n": 626,
+      "medianMs": 1.129948,
+      "p95Ms": 1.810938,
+      "maximumMs": 2.146615
+    },
+    "characterAnimationCpuMs_ns": {
+      "n": 626,
+      "medianMs": 0.015391,
+      "p95Ms": 0.02401,
+      "maximumMs": 0.080208
+    },
+    "characterVerticesCpuMs_ns": {
+      "n": 626,
+      "medianMs": 3.6468225,
+      "p95Ms": 4.509219,
+      "maximumMs": 5.216667
+    },
+    "characterCopyCpuMs_ns": {
+      "n": 626,
+      "medianMs": 0.622109,
+      "p95Ms": 0.729427,
+      "maximumMs": 2.039479
+    },
+    "blasRefitRecordCpuMs_ns": {
+      "n": 626,
+      "medianMs": 0.0257555,
+      "p95Ms": 0.035417,
+      "maximumMs": 0.073906
+    },
+    "tlasUpdateRecordCpuMs_ns": {
+      "n": 626,
+      "medianMs": 0.006927,
+      "p95Ms": 0.009375,
+      "maximumMs": 0.036093
+    }
+  },
+  "resourceRanges": {
+    "device_local_bytes": {
+      "min": 160610688,
+      "max": 160610688
+    },
+    "host_visible_bytes": {
+      "min": 48298048,
+      "max": 48298048
+    },
+    "tlas_instances": {
+      "min": 28,
+      "max": 28
+    },
+    "blas_count": {
+      "min": 20,
+      "max": 20
+    },
+    "unloads": {
+      "min": 0,
+      "max": 0
+    },
+    "restores": {
+      "min": 0,
+      "max": 0
+    }
+  },
+  "detailCountersFirstSample": {
+    "device_local_bytes": "160610688",
+    "host_visible_bytes": "48298048",
+    "saved_owner_bytes": "0",
+    "peak_overlap_bytes": "0",
+    "playerPoseCpuMs_bytes": "0",
+    "playerPoseCpuMs_operations": "0",
+    "playerVerticesCpuMs_bytes": "0",
+    "playerVerticesCpuMs_operations": "34304",
+    "viewmodelVerticesCpuMs_bytes": "0",
+    "viewmodelVerticesCpuMs_operations": "15855",
+    "characterAnimationCpuMs_bytes": "0",
+    "characterAnimationCpuMs_operations": "24",
+    "characterVerticesCpuMs_bytes": "0",
+    "characterVerticesCpuMs_operations": "26945",
+    "characterCopyCpuMs_bytes": "3017840",
+    "characterCopyCpuMs_operations": "0",
+    "blasRefitRecordCpuMs_bytes": "0",
+    "blasRefitRecordCpuMs_operations": "0",
+    "tlasUpdateRecordCpuMs_bytes": "0",
+    "tlasUpdateRecordCpuMs_operations": "0"
+  },
+  "limits": "CPU stage wall intervals, not scheduler utilization; nested timings overlap and fence wait is not busy CPU. No worker comparison or causal gain."
+}

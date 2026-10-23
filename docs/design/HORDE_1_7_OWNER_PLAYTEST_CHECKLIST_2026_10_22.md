@@ -1,5 +1,28 @@
 # Horde 1.7 owner playtest checklist - 22 October 2026
 
+## Production-path attribution checkpoint - 23 October
+
+The approved cache retry unblocked an arm64 Shipping/Mobile Debug build at
+source `8c3246d0`. Its production shaders match byte-for-byte and one authorized
+33% portrait outdoor hold passes strict joins for all 838 frames / 626 post-warm
+samples. GPU median RT dispatch is 33.815 ms, AS 0.548 ms and transfer 0.125 ms.
+CPU skin wall median is 8.694 ms; fence wait is 34.887 ms, not busy CPU use.
+These are one current-build attribution cohort, not a control/candidate gain or
+worker admission. The default-OFF worker remains physically untested.
+
+The [full receipt and sanitized samples](../evidence/2026-10-23-production-stage-phone/README.md)
+record dimensions/settings, thermal context and exact APK/native/module hashes.
+Original installations, all 18 prior save/lock files, preferences and system
+settings are verified restored/unchanged. **Phone released; safe to disconnect.**
+No further device operation is active. New evidence is local, after the approved
+GitHub backup through `9bd46a8f`.
+
+That backed-up head's CI is now terminal: five jobs pass; MSVC hits the unchanged
+15-minute job cap with its selection/tooling incomplete. PR conflicts and Debug
+route deadline remain open. The next visual decision is still the F01 background
+sector with shared-geometry/root-fitting prerequisites; Easy Tree/canopy remains
+owner-deferred. No terrain, placement, lighting or quality edit was admitted.
+
 ## Approved backup and forest-view checkpoint - 23 October
 
 Owner explicitly approved both retries. GitHub branch AND draft PR 27 read back

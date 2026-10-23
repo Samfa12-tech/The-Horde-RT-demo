@@ -1,5 +1,25 @@
 # Android RT Device Compatibility Record
 
+## 2026-10-23 - production-bank outdoor GPU-stage attribution
+
+Local ADB physical profiling on Galaxy S26 Ultra **SM-S948B**, Android 17 API 37,
+Adreno 840 / driver 2150932499. Source `8c3246d0`, arm64 Shipping/Mobile Debug
+APK `91f2ff1d7fe9dcb979d91978c9befe72b577d971a998572487b2c862a0e114bc`.
+Exact production SPIR-V/native payloads and installed hash verified; actor worker
+OFF, no private shader bank, no renderer change or new trace source.
+
+One 33% post-Keeper staged lookout hold: portrait 475 x 980 internal / 1440 x 2971
+output, Mist OFF, Mobile fire/water, Low dust, Current shadows. Strict submission
+joins pass for all 838 frames, with 626 post-warm samples. GPU median AS 0.548 ms,
+RT dispatch 33.815 ms, transfer 0.125 ms. CPU skin wall median 8.694 ms and fence
+wait 34.887 ms; nested wall timings are not per-core utilization. No comparative
+gain, worker-phone acceptance, natural journey, scanout FPS or sustained warmed
+performance is claimed. Thermal framework status zero at start/end; short hold
+does not establish equilibrium. Original installs, all 18 prior save/lock files,
+preferences and system settings verified restored/unchanged; phone released,
+no owned renderer/capture/install/transfer remains. **Safe to disconnect.**
+[Artifact, raw samples, strict analysis and limits](evidence/2026-10-23-production-stage-phone/README.md).
+
 ## 2026-10-20 - isolated return/reload and warm lookout; paused
 
 SM-S948B / Android 17 API 37 / Adreno 840, exact compatible Debug APK

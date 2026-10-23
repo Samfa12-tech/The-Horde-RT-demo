@@ -1,0 +1,128 @@
+{
+  "evidenceClass": "Local ADB physical device profiling through production hardware RT pipeline; no image or listening acceptance",
+  "sourceCommit": "8c3246d07cfd341779d719d9a75dd3df4600a981",
+  "device": {
+    "model": "SM-S948B",
+    "android": "17",
+    "api": 37,
+    "gpu": "Adreno (TM) 840",
+    "driver": 2150932499,
+    "vulkan": "1.4.295"
+  },
+  "pipeline": {
+    "executionBackend": "RayTracingPipeline",
+    "instrumentation": "shipping",
+    "dielectricQuality": "mobile",
+    "bundleKey": "shipping_mobile_pair",
+    "opaqueFast": {
+      "key": "shipping_mobile_opaque_fast",
+      "sha256": "1b026affab5bf26b44d2dab0ef10f1c17104190a5ad18d45aa2fda85dbcfdec9"
+    },
+    "genericDielectric": {
+      "key": "shipping_mobile_generic_dielectric",
+      "sha256": "a1edeb782800c91a58b073c1f789c2e14d68cc56cd8ff1b0b535d628d1e9ee38"
+    },
+    "activeStrategy": "opaque-fast",
+    "activeKey": "shipping_mobile_opaque_fast",
+    "activeSha256": "1b026affab5bf26b44d2dab0ef10f1c17104190a5ad18d45aa2fda85dbcfdec9",
+    "waterQuality": "mobile"
+  },
+  "outdoorHold": {
+    "enabled": true,
+    "startWallNanoseconds": 428147890722242,
+    "warmupWallSeconds": 10,
+    "sampleWallSeconds": 30,
+    "normalFixedStep": true
+  },
+  "reportSha256": "d3ac1cac2c469045292856d64f8fe2ddccb794b4b0377d771ad856e8738b9ab4",
+  "capabilityReportSha256": "bdeadc754e828ff5a1f038a1c4f60bd2de90461f975577db6010e8cbc4fa755d",
+  "resourcesSourceSha256": "53b694cc90d1265e97342b7e5b3ef7160802da824faf40302b83d85dc1930bdc",
+  "resourcesCanonicalLfSha256": "53b694cc90d1265e97342b7e5b3ef7160802da824faf40302b83d85dc1930bdc",
+  "resourcesCanonicalBytes": 343018,
+  "resourceDataRowsUnchanged": true,
+  "sampleWindowSha256": "abea7edf09afed1cbd9575d443ed6d1106ae185eb3eea4db256a5ebfb8869722",
+  "thermal": {
+    "thermal-before": {
+      "schemaVersion": 1,
+      "temperatureSource": "current HAL",
+      "frameworkStatus": 0,
+      "sensors": {
+        "AP": {
+          "type": 0,
+          "celsius": 27.3,
+          "status": 0
+        },
+        "BAT": {
+          "type": 2,
+          "celsius": 26.4,
+          "status": 0
+        },
+        "SKIN": {
+          "type": 3,
+          "celsius": 28.5,
+          "status": 0
+        }
+      },
+      "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+    },
+    "thermal-hold-start": {
+      "schemaVersion": 1,
+      "temperatureSource": "current HAL",
+      "frameworkStatus": 0,
+      "sensors": {
+        "AP": {
+          "type": 0,
+          "celsius": 38.6,
+          "status": 0
+        },
+        "BAT": {
+          "type": 2,
+          "celsius": 29.7,
+          "status": 0
+        },
+        "SKIN": {
+          "type": 3,
+          "celsius": 33.9,
+          "status": 0
+        }
+      },
+      "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+    },
+    "thermal-hold-end": {
+      "schemaVersion": 1,
+      "temperatureSource": "current HAL",
+      "frameworkStatus": 0,
+      "sensors": {
+        "AP": {
+          "type": 0,
+          "celsius": 38.5,
+          "status": 0
+        },
+        "BAT": {
+          "type": 2,
+          "celsius": 30.5,
+          "status": 0
+        },
+        "SKIN": {
+          "type": 3,
+          "celsius": 34.3,
+          "status": 0
+        }
+      },
+      "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+    }
+  },
+  "custody": "Both original installed hashes restored; 18 pre-existing save/lock files and preference bytes unchanged; rotation/font/brightness unchanged; no owned PID/layers/transfer after release",
+  "limits": [
+    "One 33% portrait staged current-build hold; no opening/closing control, worker candidate or comparative gain",
+    "Prepared post-Keeper fixture, not natural victory, route or recovery acceptance",
+    "CPU stage wall timings are nested; fence waiting is not busy CPU utilization",
+    "GPU timestamp intervals are not additive stage counters or shader instruction attribution",
+    "No scheduler sampling, GPU clocks or power collection in this batch",
+    "Short post-preparation thermal observation, not thermal-equilibrium or sustained warm-play acceptance",
+    "Actual inter-present image intervals, not scanout/photon FPS",
+    "No new image readback, subjective listening or UI acceptance",
+    "Legacy package buildId remains 1.6.2; source/APK/native/module hashes identify this 1.7 development probe"
+  ],
+  "rawEvidenceLocal": "reports/production-stage-admission-20261023/phone"
+}

@@ -7,6 +7,11 @@ in 261.16 seconds. [Receipt](owner-approved-retry.json) and
 history, not a current configuration blocker. Android APK compilation and actual
 device stage collection remain unperformed at this checkpoint.
 
+**Later follow-up:** the production-bank arm64 APK now builds and one physical
+33% hold passes strict GPU-stage joins. See the separate
+[artifact/device record](../2026-10-23-production-stage-phone/README.md).
+The configuration checkpoint below retains its original narrower scope.
+
 23 October 2026. Configuration/analyzer prerequisite only; **no new GPU-stage
 profile, Android compilation or device success is claimed**.
 
