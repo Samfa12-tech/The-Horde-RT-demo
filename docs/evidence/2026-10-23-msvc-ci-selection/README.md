@@ -124,3 +124,57 @@ remain outstanding. No network or phone operation was performed for this work.
 
 Audio/haptic manual revalidation required: **NO** — no gameplay, event transport,
 playback or haptic semantics changed.
+
+## Terminal result addendum - exact selection commit
+
+The selection checkpoint was committed as
+`e5868b9a17be495c85901f877454299f23be62eb`. Its first push workflow
+[39939186296](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39939186296)
+completed successfully on 2026-10-23. Monitoring remained pinned to that source,
+independently of later branch commits. All six jobs passed:
+
+| Job | Terminal result | Job duration |
+| --- | --- | ---: |
+| Selected host contracts (Clang ASan/UBSan) | Success | 267 s |
+| Android Debug build, playback/report contracts and lint | Success | 438 s |
+| Shared simulation host (GCC) | Success | 584 s |
+| player-vulkan-host | Success | 465 s |
+| Shared simulation host (Clang) | Success | 568 s |
+| Shared simulation host (MSVC) | Success | 831 s (13 min 51 s) |
+
+MSVC configured in 98 s and built in 541 s. The complete Windows selection step
+passed in 152 s; CTest reported **149/149 passed, 146.87 s real time**. The job ran
+from 10:27:08 to 10:40:59 UTC, finishing 69 s below the unchanged 15-minute cap.
+The successful selector reported 149 selected, 21 portable exclusions and the
+unchanged 15 tool exclusions. Its enforced partition therefore implies 185
+registered tests; the raw unfiltered hosted listing was not separately retained.
+
+All four provider-object evidence wrappers passed in 21.59, 21.41, 21.58 and
+21.66 s (86.24 s total). They were the four longest CTests. The Windows glass
+graphics contract followed at 19.20 s. Native local and remote report UI tests
+passed in 0.95 and 0.82 s, and the retained Windows APK resolver passed all ten
+cases. The run completed the final test, `pocket_audio_native_pcm_tests`, with no
+failure or cancellation.
+
+Both complete Linux selections passed **157/157**: GCC in 242.36 s CTest real
+time, Clang in 279.87 s. Exact-name result checks confirmed each of the 21
+portable tests passed once in both lanes and was absent from the Windows
+selection. All five portable post-checks succeeded in both Linux lanes and were
+skipped on Windows as intended. All 149 Windows result names were unique with
+contiguous completed positions; the four provider wrappers and native lantern
+reward regression were present.
+
+The sanitized [terminal timing and roster receipt](e586-terminal-receipt.json)
+contains exact job/step times, all 149 Windows results, each portable test's Linux
+result and the five post-check outcomes. It omits environment values,
+credentials and build output. Its SHA-256 is
+`1b86d78eadade9bb7c6ca9a625e0a2acbc46cf4ad29cb55d391e9eed940f33e9`.
+The ignored local `reports/msvc-ci-budget-20261023/e586-*` files retain the
+projected API responses and filtered CTest/timing lines used to produce it.
+
+This establishes terminal completion for the exact selection commit. It does
+not isolate total savings: this run's native build was 65/77 s shorter than the
+prior 606/618 s builds, while the prior test selections were cancelled. The
+build remains the largest cost and one hosted result does not establish a stable
+margin below the cap. Monitoring used read-only APIs and requested no rerun or
+workflow change. No device validation was performed for this CI addendum.

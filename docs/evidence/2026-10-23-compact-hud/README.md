@@ -84,8 +84,11 @@ thumb comfort remain pending. Do not infer them from automated nonoverlap.
 
 ## Follow-up
 
-Finish terminal exact-head CI for the separately backed-up Windows selection
-checkpoint, preserving the15-minute gate. Next approved feature/performance slice:
+The separately backed-up Windows selection checkpoint e5868b9a now has terminal
+all-six-job success, MSVC13m51s with149/149 passing, preserving the15-minute gate.
+See its [exact-head receipt](../2026-10-23-msvc-ci-selection/README.md#terminal-result-addendum---exact-selection-commit).
+The newer compact-HUD head7bce5017 is backed up; its hosted checks are separate.
+Next approved feature/performance slice:
 one lower-detail world-body candidate with first-person arms unchanged, followed
 independently by Kit with face/silhouette preserved. Originals, deterministic
 pose/ownership and actual look-down/shadow/reflection evidence are required;

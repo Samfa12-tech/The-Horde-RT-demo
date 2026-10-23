@@ -19,8 +19,13 @@ equipment acceptance. Original APKs, all18 save/lock files and preferences were
 verified restored at10:15:24UTC. Its actual screenshots/bounds remain the baseline.
 
 Windows CI selection simplification is separately backed up at e5868b9a; its
-exact-head run39939186296 is monitored to terminal without altering the15-minute
-cap or removing native/compiler-specific coverage. Routine backups remain approved.
+[exact-head run39939186296](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39939186296)
+is terminal with all six jobs passing. MSVC passed149/149 in146.87 s CTest time,
+831 s total (13m51s), below the unchanged15-minute cap. Both full Linux selections
+passed157/157 and all moved portable checks. Native/compiler-specific coverage
+remains; the build still dominates and one run is not a stable time guarantee.
+The newer compact-HUD head is backed up as7bce5017; its hosted result is separate.
+Routine backups remain approved.
 Next approved mesh slice is world body only with first-person arms unchanged,
 then an independent Kit candidate preserving conversational face/silhouette.
 Skin/critical-path/frame times and actual look-down/shadow/reflection comparisons
