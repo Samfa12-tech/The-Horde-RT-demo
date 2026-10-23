@@ -78,6 +78,8 @@ RtPerformanceEvidenceSnapshot Snapshot(const std::uint64_t serial, const RtSampl
 
 struct CompletedOwners
 {
+    std::optional<RtFrameDimensionsEvidence> submittedDimensions{};
+    unsigned dimensionsDrift = 0;
     ShowcaseBenchmarkRun benchmark;
     RtBenchmarkEvidenceRun evidence;
     void Run(const RtSampleStatus gpu = RtSampleStatus::Valid, const bool wrongZone = false,
@@ -98,6 +100,24 @@ struct CompletedOwners
                 if (!armed) { Check(evidence.ArmMeasurement(3u, 8u), "arm measurement after warmup"); armed = true; }
                 ++serial;
                 auto s = Snapshot(serial, mixedUnsupported && serial % 2u == 0u ? RtSampleStatus::Unsupported : gpu);
+                s.scene.dimensions = submittedDimensions;
+                if (serial == kLanternBenchmarkFramesPerLap / 2u) {
+                    if (dimensionsDrift == 1 && s.scene.dimensions) {
+                        --s.scene.dimensions->internalWidth;
+                        s.scene.dimensions->linearBlit = true;
+                        s.scene.dimensions->cameraAspect = float(s.scene.dimensions->internalWidth) / s.scene.dimensions->internalHeight;
+                    }
+                    if (dimensionsDrift == 2 && s.scene.dimensions) {
+                        ++s.scene.dimensions->outputWidth; s.scene.dimensions->linearBlit = true;
+                    }
+                    if (dimensionsDrift == 3 && s.scene.dimensions) {
+                        s.scene.dimensions->presentationTransform = 1;
+                        s.scene.dimensions->cameraAspect = 1.0f / s.scene.dimensions->cameraAspect;
+                    }
+                    if (dimensionsDrift == 4 && s.scene.dimensions) s.scene.dimensions->dynamicResolutionEnabled = true;
+                    if (dimensionsDrift == 5) s.scene.dimensions.reset();
+                    if (dimensionsDrift == 6) s.scene.dimensions = RtFrameDimensionsEvidence{960,540,960,540,0,960.0f/540,false,false};
+                }
                 if (uploaded)
                 {
                     s.scene.shadowQuality = uploaded->shadowQuality;
@@ -438,6 +458,48 @@ void TestOwningMistSummary()
         "historical summary absence remains absent without an inferred Mist On default");
 }
 
+void TestSubmittedDimensionsSummary()
+{
+    const RtFrameDimensionsEvidence d{960,540,960,540,0,960.0f/540,false,false};
+    const auto config = Configuration();
+    CompletedOwners uniform; uniform.submittedDimensions = d; uniform.Run();
+    const auto frozen = CaptureBenchmarkSummary(uniform.benchmark, uniform.evidence, config, config, kRunUuid);
+    const auto prepared = PrepareBenchmarkSummaryReport(frozen, Approval());
+    Check(frozen.IsReady() && frozen.Data().submittedDimensions == d && prepared.IsReady() &&
+        prepared.Json().find("\"submittedDimensions\":{\"internalExtent\":[960,540]") != std::string_view::npos &&
+        prepared.Json().find("\"dynamicResolutionEnabled\":false") != std::string_view::npos &&
+        prepared.Json().find("custom-unranked") != std::string_view::npos,
+        "aggregate report copies uniform actual completed-row dimensions without promoting the run");
+    RtExpectedFrameRecord row{};
+    Check(uniform.evidence.TryGetExpectedFrame(300, row) && row.dimensions == d,
+        "ledger retains actual dimensions with its exact completed frame identity");
+    for (unsigned drift = 1; drift <= 6; ++drift) {
+        CompletedOwners owners;
+        if (drift != 6) owners.submittedDimensions = d;
+        owners.dimensionsDrift = drift; owners.Run();
+        Check(CaptureBenchmarkSummary(owners.benchmark, owners.evidence, config, config, kRunUuid).Status() ==
+            BenchmarkSummaryStatus::MismatchedPopulation,
+            "one intermediate dimension/aspect/DRS change or unavailable observation cannot be hidden by matching endpoints");
+    }
+    auto wrongMetadata = config; wrongMetadata.metadata.internalWidth = 1280;
+    wrongMetadata.metadata.internalHeight = 720; wrongMetadata.metadata.presentationWidth = 1280;
+    wrongMetadata.metadata.presentationHeight = 720;
+    Check(CaptureBenchmarkSummary(uniform.benchmark, uniform.evidence, wrongMetadata, wrongMetadata, kRunUuid).Status() ==
+        BenchmarkSummaryStatus::MismatchedPopulation, "matching requested start/end dimensions cannot replace different actual completed pixels");
+    CompletedOwners adaptive; adaptive.submittedDimensions = d;
+    adaptive.submittedDimensions->dynamicResolutionEnabled = true; adaptive.Run();
+    const auto customAdaptive = PrepareBenchmarkSummaryReport(CaptureBenchmarkSummary(adaptive.benchmark, adaptive.evidence,
+        config, config, kRunUuid), Approval());
+    Check(customAdaptive.IsReady() && customAdaptive.Json().find("\"dynamicResolutionEnabled\":true") != std::string_view::npos &&
+        customAdaptive.Json().find("custom-unranked") != std::string_view::npos,
+        "uniform adaptive custom evidence is declared honestly, never labeled a DRS-off standard");
+    CompletedOwners historical; historical.Run();
+    const auto old = PrepareBenchmarkSummaryReport(CaptureBenchmarkSummary(historical.benchmark, historical.evidence,
+        config, config, kRunUuid), Approval());
+    Check(old.IsReady() && old.Json().find("\"submittedDimensions\":null") != std::string_view::npos,
+        "historical absence remains unavailable instead of copying requested dimensions into evidence");
+}
+
 } // namespace
 
 int main(const int argc, const char* const* const argv)
@@ -465,6 +527,7 @@ int main(const int argc, const char* const* const argv)
     TestUploadedQualitySummary();
     TestOwningDustSummary();
     TestOwningMistSummary();
+    TestSubmittedDimensionsSummary();
     TestUnavailableHardwarePrivacyAndIdentityRetry();
     return passed ? 0 : 1;
 }

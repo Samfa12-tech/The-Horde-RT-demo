@@ -336,6 +336,7 @@ RtSceneFrameEvidence MakeSceneEvidence(TestContext& context,
 RtRecordedSceneEvidence MakeRecordedScene(const RtSceneFrameEvidence& evidence)
 {
     RtRecordedSceneEvidence recorded{};
+    recorded.dimensions = evidence.dimensions;
     recorded.pipeline = evidence.pipeline;
     recorded.resources = evidence.resources;
     recorded.shadowQuality = evidence.shadowQuality;
@@ -1029,6 +1030,7 @@ void TestLifecycleAssociationAndTransactions(TestContext& context)
     sceneA.fireQuality = RtFireQualityEvidence{RtFireQuality::Low, 2u, 1u};
     sceneA.actualUploadedMistEnabled = true;
     sceneA.actualUploadedDustQuality = horde::graphics::DustQuality::Low;
+    sceneA.dimensions = RtFrameDimensionsEvidence{640,360,1280,720,0,640.0f/360,false,true};
     sceneA.fireLighting = RtFireLightingEvidence{};
     sceneA.fireLighting->count = 2u;
     sceneA.fireLighting->emitters[0] = {3u, {{-32.5f, 0.85f, -16.5f, 0.5f}}, {{1.0f, 0.5f, 0.25f, 0.5f}}};
@@ -1054,6 +1056,7 @@ void TestLifecycleAssociationAndTransactions(TestContext& context)
     sceneB.fireQuality = RtFireQualityEvidence{RtFireQuality::High, 10u, 2u};
     sceneB.actualUploadedMistEnabled = false;
     sceneB.actualUploadedDustQuality = horde::graphics::DustQuality::Standard;
+    sceneB.dimensions = RtFrameDimensionsEvidence{720,1280,720,1280,1,1280.0f/720,false,false};
     sceneB.fireLighting = RtFireLightingEvidence{}; // actual empty upload, not legacy absence
     RtFrameToken recordedB{};
     context.Check(lifecycle.FinishRecord(attemptB, MakeRecordedScene(sceneB), recordedB),
@@ -1110,6 +1113,8 @@ void TestLifecycleAssociationAndTransactions(TestContext& context)
                       completedA.scene.shadowQuality != sceneB.shadowQuality &&
                       completedA.scene.fireQuality != sceneB.fireQuality,
                   "record B uploaded quality must not contaminate A owning completion");
+    context.Check(completedA.scene.dimensions == sceneA.dimensions && completedA.scene.dimensions != sceneB.dimensions,
+                  "later recording cannot replace completed A's submitted dimensions/aspect/DRS tuple");
     context.Check(completedA.scene.pipeline.activeStrategy != sceneB.pipeline.activeStrategy &&
                       completedA.scene.resources.bufferCount != sceneB.resources.bufferCount &&
                       completedA.scene.player.primaryPixelCount != sceneB.player.primaryPixelCount &&
@@ -2591,6 +2596,49 @@ void TestUploadedFireLightingEvidence(TestContext& context)
                   "the retained attempt can accept a subsequently valid exact empty upload");
 }
 
+void TestSubmittedDimensions(TestContext& context)
+{
+    auto snapshot = MakeSnapshot(context, RtInstrumentationMode::Shipping);
+    RtEvidenceValidationError error{}; std::string json;
+    context.Check(SerializeRtPerformanceEvidenceJson(snapshot, json, error) &&
+        json.find("submittedDimensions") == std::string::npos,
+        "historical absence cannot invent submitted dimensions");
+    RtFrameDimensionsEvidence d{640, 360, 1280, 720, 0, 640.0f / 360.0f, false, true};
+    for (unsigned transform = 0; transform < 8; ++transform) {
+        d.presentationTransform = transform;
+        d.cameraAspect = RtRecordedCameraAspect(d.internalWidth, d.internalHeight, transform);
+        snapshot.scene.dimensions = d;
+        context.Check(ValidateRtPerformanceEvidence(snapshot, error), "all real packed surface transforms retain shader-derived aspect");
+    }
+    d.presentationTransform = 0; d.cameraAspect = 640.0f / 360.0f;
+    snapshot.scene.dimensions = d;
+    context.Check(SerializeRtPerformanceEvidenceJson(snapshot, json, error) &&
+        json.find("\"internalExtent\":[640,360]") != std::string::npos &&
+        json.find("\"outputExtent\":[1280,720]") != std::string::npos &&
+        json.find("\"dynamicResolutionEnabled\":false") != std::string::npos,
+        "completed RT JSON exposes actual pixel tuple and explicit fixed allocation");
+    for (unsigned invalid = 0; invalid < 8; ++invalid) {
+        auto bad = d;
+        switch (invalid) {
+        case 0: bad.internalWidth = 0; break;
+        case 1: bad.outputHeight = 0; break;
+        case 2: bad.outputWidth = 16385; break;
+        case 3: bad.internalWidth = 1281; break;
+        case 4: bad.presentationTransform = 8; break;
+        case 5: bad.cameraAspect += 2e-5f; break;
+        case 6: bad.cameraAspect = std::numeric_limits<float>::quiet_NaN(); break;
+        case 7: bad.linearBlit = false; break;
+        }
+        snapshot.scene.dimensions = bad;
+        context.Check(!ValidateRtPerformanceEvidence(snapshot, error) &&
+            error == RtEvidenceValidationError::InvalidDispatchState,
+            "malformed submitted dimensions cannot enter canonical completed evidence");
+    }
+    d.internalWidth = 639; d.cameraAspect = 639.0f / 360.0f;
+    context.Check(ValidRtFrameDimensionsEvidence(d) && !RtRecordedAspectPreserved(d),
+        "valid ordinary odd-scale blit is truthfully reported as differing aspect, not declared a standard");
+}
+
 void TestUploadedQualityEvidence(TestContext& context)
 {
     auto snapshot = MakeSnapshot(context, RtInstrumentationMode::Shipping);
@@ -2635,6 +2683,7 @@ int main()
     TestContext context;
     TestExecutionModeEvidence(context);
     TestFixedTextAndEnums(context);
+    TestSubmittedDimensions(context);
     TestUploadedQualityEvidence(context);
     TestUploadedFireLightingEvidence(context);
     TestStageAccumulatorAndConversion(context);

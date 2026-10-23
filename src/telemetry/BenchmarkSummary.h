@@ -56,6 +56,9 @@ struct BenchmarkSummaryZone
 inline constexpr std::size_t kBenchmarkSummaryZoneCount = 10u;
 struct BenchmarkSummaryData
 {
+    // Uniform actual completed-row facts, never copied from requested settings.
+    // Absence remains explicit for historical fixtures/callers.
+    std::optional<RtFrameDimensionsEvidence> submittedDimensions{};
     std::string runUuid;
     BenchmarkSummaryConfiguration configuration{};
     std::string rawModel;

@@ -1,6 +1,13 @@
 # Horde 1.7 current design index
 
-Latest [shared benchmark profile foundation](../evidence/2026-10-23-benchmark-profiles/README.md):
+Latest [submitted dimensions and Windows profile lifecycle](../evidence/2026-10-23-benchmark-launch/README.md):
+actual RT extents/projection/DRS facts now survive exact submission/completion
+and row validation. Seven bounded native Debug apply/cancel/stale/restore cases
+pass with owner custody intact. Full Shipping course/report/rollback and Android
+launch remain open; reports are custom/unranked. Preceding exact `78883df7` CI
+passes all six jobs; newer source needs its own readback. No phone or publication.
+
+Earlier [shared benchmark profile foundation](../evidence/2026-10-23-benchmark-profiles/README.md):
 provisional mobile/Windows fixed pixel/effect contracts and exact temporary tuple
 restoration have focused host evidence. Live reports stay custom/unranked;
 fixed-surface launch, submission-owned dimensions and physical validation remain

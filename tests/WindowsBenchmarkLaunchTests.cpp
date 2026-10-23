@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "platform/windows/WindowsBenchmarkLaunch.h"
+#include "platform/windows/WindowsBenchmarkProfile.h"
 #include "platform/windows/WindowsMistCaptureLaunch.h"
 #include "platform/windows/WindowsChapterShippingLaunch.h"
 #include "platform/windows/WindowsAssetRoot.h"
@@ -94,6 +95,82 @@ int main()
             "missing, wrong or duplicate route sources fail closed");
     const auto absent = ParseWindowsBenchmarkLaunch(ordinary);
     check(!absent.requested && absent.error.empty(), "ordinary launch must remain interactive");
+    using horde::gameplay::BenchmarkProfileId;
+    check(absent.profile == BenchmarkProfileId::Custom && absent.profileValidation.empty(),
+        "ordinary launches and custom benchmark selection never auto-select a provisional profile");
+    const std::array<std::wstring_view,4> provisional{L"--benchmark-profile",L"windows-rt-provisional-v1",L"--benchmark-showcase",L"reports"};
+    check(ParseWindowsBenchmarkLaunch(provisional).error.empty() &&
+        ParseWindowsBenchmarkLaunch(provisional).profile == BenchmarkProfileId::WindowsProvisionalV1,
+        "Windows provisional profile requires explicit exact opt-in");
+    for (const auto args : {
+        std::vector<std::wstring_view>{L"--benchmark-profile",L"windows-rt-provisional-v1"},
+        std::vector<std::wstring_view>{L"--benchmark-showcase",L"reports",L"--benchmark-profile"},
+        std::vector<std::wstring_view>{L"--benchmark-showcase",L"reports",L"--benchmark-profile",L"mobile-rt-provisional-v1"},
+        std::vector<std::wstring_view>{L"--benchmark-showcase",L"reports",L"--benchmark-profile",L"custom"},
+        std::vector<std::wstring_view>{L"--benchmark-showcase",L"reports",L"--benchmark-profile",L"windows-rt-provisional-v1",L"--benchmark-profile",L"windows-rt-provisional-v1"},
+        std::vector<std::wstring_view>{L"--benchmark-showcase",L"reports",L"--benchmark-profile",L"windows-rt-provisional-v1",L"--benchmark-workload",L"lantern-held-high-v1"},
+        std::vector<std::wstring_view>{L"--benchmark-showcase",L"reports",L"--benchmark-profile",L"windows-rt-provisional-v1",L"--benchmark-rt-workload",L"max"},
+        std::vector<std::wstring_view>{L"--benchmark-showcase",L"reports",L"--benchmark-profile",L"windows-rt-provisional-v1",L"--development-world-route"},
+        std::vector<std::wstring_view>{L"--benchmark-showcase",L"reports",L"--validate-benchmark-profile",L"apply-restore"},
+        std::vector<std::wstring_view>{L"--benchmark-showcase",L"reports",L"--benchmark-profile",L"windows-rt-provisional-v1",L"--validate-benchmark-profile",L"unknown"}})
+        check(!ParseWindowsBenchmarkLaunch(args).error.empty(), "ambiguous, orphan or modified provisional launches fail closed");
+    for (const auto validation : {L"apply-restore",L"stale-owner",L"cancel-apply",L"cancel-measure",L"restart-measure",L"close-measure"}) {
+        auto args = std::vector<std::wstring_view>(provisional.begin(),provisional.end());
+        args.push_back(L"--validate-benchmark-profile"); args.push_back(validation);
+        check(ParseWindowsBenchmarkLaunch(args).error.empty() && !ParseWindowsBenchmarkLaunch(args).profileValidation.empty(),
+            "bounded lifecycle validation remains an explicit provisional launch only");
+        args.push_back(L"--validate-benchmark-profile"); args.push_back(validation);
+        check(!ParseWindowsBenchmarkLaunch(args).error.empty(), "duplicate lifecycle case fails closed");
+    }
+    {
+        using namespace horde::gameplay;
+        using namespace horde::graphics;
+        using namespace horde::platform::windows;
+        BenchmarkProfileConfiguration original;
+        original.backend = GraphicsBackend::RayTracingPipeline;
+        original.graphics = {75,WaterQuality::Mobile,FireDetail::Low,60,false,ShadowQuality::Higher,false,DustQuality::Off};
+        original.internal = {738,495}; original.output = {984,661};
+        original.cameraAspect = static_cast<float>(738.0f/495.0f);
+        const auto unchanged = original;
+        WindowsBenchmarkProfileSession session;
+        check(session.Begin(original) && original == unchanged && !session.Begin(original),
+            "one profile owner preserves the external original tuple and refuses restart");
+        auto actual = session.Working(); actual.temporaryOverrideActive = false;
+        actual.cameraAspect = static_cast<float>(16.0f/9.0f);
+        const OutputResizeOwnedFrame appliedOwner{2,3,4,5,6,7,0};
+        auto stale = appliedOwner; ++stale.measurementGeneration;
+        check(!session.Observe(actual,appliedOwner,1) && session.Arm(appliedOwner) && !session.Arm(appliedOwner) &&
+            !session.Observe(actual,stale,1) && !session.Observe(actual,appliedOwner,0) &&
+            session.Observe(actual,appliedOwner,1), "applied admission needs the exact newly armed completed submission");
+        check(session.Phase() == WindowsBenchmarkProfilePhase::Measuring && !session.Succeeded() &&
+            session.Working().graphics.previewFrameCap == 60,
+            "apply acknowledgement alone is not success and preserves the owner's preview cap");
+        check(session.BeginRestore(true,false) && session.Working() == original && !session.Succeeded(),
+            "measurement completion restores the logical tuple but cannot claim physical restoration");
+        const OutputResizeOwnedFrame restoredOwner{3,4,8,9,10,11,1};
+        auto wrongQuality = original; wrongQuality.graphics.mistEnabled = true;
+        check(session.Arm(restoredOwner) && !session.Observe(original,appliedOwner,2) &&
+            !session.Observe(wrongQuality,restoredOwner,2) && !session.Observe(original,restoredOwner,1) &&
+            session.Observe(original,restoredOwner,2) && session.Succeeded(),
+            "restoration requires a newer exact owner and original observed quality/odd extents before success");
+        WindowsBenchmarkProfileSession cancelled;
+        check(cancelled.Begin(original) && cancelled.Arm(appliedOwner) && cancelled.BeginRestore(false,true) &&
+            !cancelled.Observe(original,appliedOwner,1) && cancelled.Arm(restoredOwner) &&
+            cancelled.Observe(original,restoredOwner,2) && cancelled.Restored() && !cancelled.Succeeded(),
+            "cancellation during apply invalidates the apply owner and awaits real restoration without a measurement pass");
+        WindowsBenchmarkProfileSession failed;
+        check(failed.Begin(original) && failed.Arm(appliedOwner), "failure scenario starts with owned apply");
+        actual.graphics.glassEnabled = false;
+        check(!failed.Observe(actual,appliedOwner,1) && failed.BeginRestore(false,false) &&
+            failed.Working() == original, "wrong actual effect fails apply while retaining original restoration state");
+        failed.RestorationFailed();
+        check(!failed.Restored() && !failed.Succeeded() && failed.Phase() == WindowsBenchmarkProfilePhase::Failed,
+            "resource loss never reports unacknowledged restoration or success");
+        WindowsBenchmarkProfileSession incompatible;
+        auto mobile = original; mobile.optical = OpticalProfile::Mobile;
+        check(!incompatible.Begin(mobile) && incompatible.Phase() == WindowsBenchmarkProfilePhase::Idle,
+            "immutable Mobile optics cannot masquerade as the Windows High profile");
+    }
     using horde::vulkan::raytracing::RtWorkloadPreset;
     check(absent.rtWorkloadPreset == RtWorkloadPreset::Authored,
           "ordinary launches keep the authored preset");

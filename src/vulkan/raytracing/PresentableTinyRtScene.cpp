@@ -8643,6 +8643,17 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
     if (observation != nullptr && observation->recordedScene != nullptr)
     {
         horde::telemetry::RtRecordedSceneEvidence recorded{};
+        horde::telemetry::RtFrameDimensionsEvidence dimensions{};
+        dimensions.internalWidth = dispatchExtent_.width; dimensions.internalHeight = dispatchExtent_.height;
+        dimensions.outputWidth = swapchainExtent.width; dimensions.outputHeight = swapchainExtent.height;
+        dimensions.presentationTransform = horde::graphics::RtPresentationTransformIndex(frame.presentationTransform);
+        dimensions.cameraAspect = horde::telemetry::RtRecordedCameraAspect(
+            dispatchExtent_.width, dispatchExtent_.height, dimensions.presentationTransform);
+        // This renderer allocates a fixed storage image until an explicit idle
+        // resize; no adaptive-resolution controller is instantiated here.
+        dimensions.dynamicResolutionEnabled = false;
+        dimensions.linearBlit = scaledPresentation;
+        recorded.dimensions = dimensions;
         bool recordedFactsValid = framePipelineEvidenceValid_;
         recorded.pipeline = framePipelineEvidence_;
         recorded.resources = ResourceInventory();

@@ -1,5 +1,6 @@
 #pragma once
 #include "graphics/DustQuality.h"
+#include "telemetry/RtFrameDimensionsEvidence.h"
 
 #include <array>
 #include <cstddef>
@@ -361,6 +362,7 @@ struct RtDispatchEvidence
 
 struct RtRecordedSceneEvidence
 {
+    std::optional<RtFrameDimensionsEvidence> dimensions{};
     RtPipelineEvidenceIdentity pipeline{};
     RtResourceInventory resources{};
     RtPlayerDiagnostics player{};
@@ -375,6 +377,7 @@ struct RtRecordedSceneEvidence
 
 struct RtSceneFrameEvidence
 {
+    std::optional<RtFrameDimensionsEvidence> dimensions{};
     RtPipelineEvidenceIdentity pipeline{};
     RtResourceInventory resources{};
     RtPlayerDiagnostics player{};

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "graphics/GraphicsSettings.h"
+#include "graphics/RtPresentationTransform.h"
 #include "gameplay/BenchmarkWorkload.h"
 
 #include <cmath>
@@ -74,6 +75,7 @@ struct BenchmarkProfileConfiguration
     graphics::GraphicsSettings graphics{};
     graphics::GraphicsExtent internal{}, output{};
     double cameraAspect = 0;
+    std::uint32_t presentationTransform = 0;
     BenchmarkOutputPolicy outputPolicy = BenchmarkOutputPolicy::Native;
     bool dynamicResolutionEnabled = false;
     bool temporaryOverrideActive = false;
@@ -93,8 +95,10 @@ inline bool ValidBenchmarkProfileConfiguration(const BenchmarkProfileConfigurati
         c.output.width <= 16384 && c.output.height <= 16384 &&
         (c.outputPolicy == BenchmarkOutputPolicy::Native ||
          c.outputPolicy == BenchmarkOutputPolicy::FixedBufferPreserveAspect) &&
+        c.presentationTransform <= 7 &&
         std::isfinite(c.cameraAspect) &&
-        std::abs(c.cameraAspect - double(c.output.width) / c.output.height) <= 1e-5;
+        std::abs(c.cameraAspect - RtPresentationCameraAspect(c.internal.width, c.internal.height,
+            RtPresentationTransformFromIndex(c.presentationTransform))) <= 1e-5;
 }
 inline bool MatchesBenchmarkProfile(const BenchmarkProfileId id, const BenchmarkProfileConfiguration& c) noexcept
 {
@@ -102,7 +106,7 @@ inline bool MatchesBenchmarkProfile(const BenchmarkProfileId id, const Benchmark
     if (id == BenchmarkProfileId::Custom) return true; // Explicit selection, never inferred from matching pixels.
     const auto spec = BenchmarkProfileSpecification(id);
     if (!spec || spec->platform != c.platform || spec->optical != c.optical || spec->workload != c.workload ||
-        spec->internal != c.internal || spec->output != c.output || c.dynamicResolutionEnabled ||
+        spec->internal != c.internal || spec->output != c.output || c.dynamicResolutionEnabled || c.presentationTransform != 0 ||
         c.outputPolicy != BenchmarkOutputPolicy::FixedBufferPreserveAspect) return false;
     auto actual = c.graphics;
     // This setting caps the ordinary preview. It is not measured benchmark
@@ -140,6 +144,7 @@ public:
             requested.graphics.previewFrameCap = previewCap;
             requested.internal = spec->internal; requested.output = spec->output;
             requested.cameraAspect = double(spec->output.width) / spec->output.height;
+            requested.presentationTransform = 0;
             requested.outputPolicy = BenchmarkOutputPolicy::FixedBufferPreserveAspect;
             requested.dynamicResolutionEnabled = false;
             requested.workload = spec->workload;

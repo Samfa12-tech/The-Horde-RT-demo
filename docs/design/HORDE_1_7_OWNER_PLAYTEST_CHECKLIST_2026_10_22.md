@@ -1,5 +1,30 @@
 # Horde 1.7 owner playtest checklist - 22 October 2026
 
+## Submitted dimensions and Windows profile lifecycle - 23 October
+
+The [next bounded benchmark slice](../evidence/2026-10-23-benchmark-launch/README.md)
+records actual RT command/submission extents, camera transform/aspect and fixed
+allocation state, retaining them through exact completion and every measured
+row. Intermediate drift or missing observations cannot hide behind matching
+requested endpoints. Historical absence remains explicit. Five Release gates
+pass with 175 profile checks; two final Debug ownership/launch gates pass.
+
+An explicit provisional Windows CLI launch temporarily applies the fixed
+1920x1080 High contract and restores original graphics and window state only
+after an owning RT acknowledgement. Seven actual Debug RT lifecycle cases pass,
+including apply cancellation, measurement cancellation, restart/close deferral,
+stale acknowledgement and original 75% odd-size restoration. All owner campaign
+and settings custody checks pass. The original setup rejection, apply failure
+with successful rollback, compile failure and aspect regression are retained.
+No phone, default-setting change, campaign session or report send occurred.
+
+This is **lifecycle validation, not a completed benchmark/ranking result**.
+Reports stay custom/unranked. A full Shipping course/report/rollback and Android
+fixed-output/practicality acceptance remain open. Preceding exact `78883df7` CI
+passes all six jobs (MSVC 150/150); newer source needs its own readback. No CI
+timeout/coverage change. Existing PR conflicts, Debug route deadline, natural
+journey/audio/phone acceptance and deferred forest/smoke/flask decisions remain.
+
 ## Shared benchmark profile foundation - 23 October
 
 The [bounded profile checkpoint](../evidence/2026-10-23-benchmark-profiles/README.md)

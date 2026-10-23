@@ -118,6 +118,7 @@
 #include "telemetry/MotionEvidenceLedger.h"
 #endif
 #include "platform/windows/WindowsBenchmarkLaunch.h"
+#include "platform/windows/WindowsBenchmarkProfile.h"
 #include "platform/windows/WindowsChapterShippingLaunch.h"
 #include "gameplay/validation/ChapterRouteHostPhases.h"
 #include "platform/windows/WindowsAssetRoot.h"
@@ -719,6 +720,27 @@ struct VulkanSurfaceContext
     bool benchmarkCompletionHandled = false;
     bool benchmarkReportsSaved = false;
     bool unattendedBenchmark = false;
+    bool benchmarkProfileRequested = false, benchmarkProfileActive = false;
+    bool benchmarkProfileInternalResize = false, benchmarkProfileCancelRequested = false;
+    bool benchmarkProfileCloseRequested = false;
+    bool benchmarkProfileStaleOwnerRejected = false;
+    bool benchmarkProfileValidationPassed = false;
+    unsigned benchmarkProfileValidationFrames = 0;
+    std::unique_ptr<horde::platform::windows::WindowsBenchmarkProfileSession> benchmarkProfile;
+    WINDOWPLACEMENT benchmarkProfileOriginalPlacement{sizeof(WINDOWPLACEMENT)};
+    WINDOWPLACEMENT benchmarkProfileOriginalWindowedPlacement{sizeof(WINDOWPLACEMENT)};
+    LONG_PTR benchmarkProfileOriginalStyle = 0, benchmarkProfileOriginalExStyle = 0;
+    LONG_PTR benchmarkProfileAppliedStyle = 0, benchmarkProfileAppliedExStyle = 0;
+    HMENU benchmarkProfileOriginalMenu = nullptr;
+    bool benchmarkProfileOriginalFullscreen = false, benchmarkProfileWindowStateRestored = false;
+    bool benchmarkProfileTemporaryMenuDetached = false;
+    RECT benchmarkProfileOriginalRect{}, benchmarkProfileOriginalClient{};
+    RECT benchmarkProfileMonitorRect{}, benchmarkProfileTargetRect{}, benchmarkProfileObservedClient{}, benchmarkProfileAppliedRect{};
+    horde::graphics::GraphicsSettings benchmarkProfileOriginalIntent{};
+    horde::graphics::GraphicsSettings benchmarkProfileOriginalSaved{};
+    horde::telemetry::RtLifecyclePublishedState benchmarkProfileBefore{}, benchmarkProfileApplied{}, benchmarkProfileAfter{};
+    std::string benchmarkProfileError;
+    std::filesystem::path benchmarkProfileJsonPath;
     std::unique_ptr<horde::gameplay::campaign::PlaySession> campaign;
     std::unique_ptr<horde::platform::windows::WindowsCampaignMenu> campaignMenu;
     std::optional<horde::platform::windows::WindowsCampaignMenu::Command> campaignCommand;
@@ -738,6 +760,7 @@ struct VulkanSurfaceContext
 bool WriteReportFile(const std::filesystem::path& path, const std::string& data);
 bool SaveGraphicsRecord(const VulkanSurfaceContext& context,
                         const horde::graphics::GraphicsPersistenceRecord& record);
+bool ObserveWindowsBenchmarkProfileMeasurement(VulkanSurfaceContext& context, bool requireCompleted);
 void ClearDesktopInput(VulkanSurfaceContext& context);
 void DiscardDesktopPendingCommands(VulkanSurfaceContext& context);
 void UpdateVitalityHud(VulkanSurfaceContext& context);
@@ -1397,6 +1420,7 @@ RtLabDebugLaunchOptions ParseRtLabDebugLaunchOptions()
 
 void SaveRtLabProgress(const VulkanSurfaceContext& context)
 {
+    if (context.benchmarkProfileRequested) return;
     if (context.graphicsPreviewCapture || context.outputResizeValidation || context.nativeMotionValidation || context.environmentSurveyActive) return;
     const std::string path = SettingsPath().string();
     WritePrivateProfileStringA("progress", "rtLabUnlocked",
@@ -1405,6 +1429,7 @@ void SaveRtLabProgress(const VulkanSurfaceContext& context)
 
 void SaveSettings(const VulkanSurfaceContext& context)
 {
+    if (context.benchmarkProfileRequested) return;
     if(gCampaignHiddenValidation)return;
     if (context.graphicsPreviewCapture || context.outputResizeValidation || context.nativeMotionValidation) return;
     const std::string path = SettingsPath().string();
@@ -3849,6 +3874,7 @@ void LogBenchmarkCancellation(const VulkanSurfaceContext& context, const char* t
 
 void CancelBenchmark(VulkanSurfaceContext& context, const bool showMenu, const char* trigger)
 {
+    if (context.benchmarkProfileActive) context.benchmarkProfileCancelRequested = true;
     if (!context.benchmark.IsRunning())
     {
         return;
@@ -3888,6 +3914,8 @@ void CompleteBenchmark(VulkanSurfaceContext& context,
         (void)context.benchmarkEvidence.RecordOwnerDrainResult(drained);
         (void)context.benchmarkEvidence.Finalize();
     }
+    if (context.benchmarkProfileActive && !ObserveWindowsBenchmarkProfileMeasurement(context, true))
+        context.benchmark.Cancel();
     // Optional local review copies completed owner evidence before ResetRoute.
     // It never changes the legacy outcome, automatic files or unattended runs.
     FreezeWindowsBenchmarkSummary(context, capabilities);
@@ -3913,6 +3941,7 @@ void CompleteBenchmark(VulkanSurfaceContext& context,
     const std::string stamp = UtcTimestamp("%Y%m%d-%H%M%S");
     const std::filesystem::path textPath = reportDirectory / ("HordeLanternRT-benchmark-" + stamp + ".txt");
     const std::filesystem::path jsonPath = reportDirectory / ("HordeLanternRT-benchmark-" + stamp + ".json");
+    if (context.benchmarkProfileRequested) context.benchmarkProfileJsonPath = jsonPath;
     const bool jsonSaved = WriteReportFile(jsonPath, context.benchmarkJsonReport);
     context.benchmarkReport += "\nSaved text report: " + textPath.string() +
         "\nSaved JSON report: " + (jsonSaved ? jsonPath.string() : std::string("FAILED")) +
@@ -3924,6 +3953,9 @@ void CompleteBenchmark(VulkanSurfaceContext& context,
         context.benchmarkReport += "WARNING: automatic text report save failed; COPY REPORT and SAVE AS remain available.\n";
     }
     ResetRoute(context);
+    // The explicit profile is unattended: its saved report is final, while the
+    // original HWND/UI state still belongs to the pending RT restoration.
+    if (context.benchmarkProfileRequested) return;
     context.pauseMenuVisible = false;
     context.settingsVisible = false;
     context.diagnosticsVisible = false;
@@ -5774,6 +5806,7 @@ bool ConsumePendingImageAcquire(VulkanSurfaceContext& ctx)
 bool SaveGraphicsRecord(const VulkanSurfaceContext& context,
                         const horde::graphics::GraphicsPersistenceRecord& record)
 {
+    if (context.benchmarkProfileRequested) return true;
     if (context.graphicsPreviewCapture || context.outputResizeValidation || context.nativeMotionValidation)
         return true; // Ephemeral validation transaction.
     return horde::platform::windows::SaveGraphicsPersistenceRecord(SettingsPath(), record);
@@ -7126,6 +7159,8 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
     ctx.currentFrame = (ctx.currentFrame + 1u) % kMaxFramesInFlight;
     return true;
 }
+
+#include "platform/windows/WindowsBenchmarkProfile.inl"
 
 #if defined(_DEBUG) || HORDE_RT_CHAPTER_MEASUREMENT
 const char* CapturePresetName(const horde::gameplay::ShowcaseCheckpointPreset preset)
@@ -8615,6 +8650,11 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     context.windowHandle = hWnd;
     context.capabilitySnapshot = &capabilities;
     context.unattendedBenchmark = unattendedBenchmark || ParseCaptureLaunchOptions().measureChapterShippingRoute;
+    const auto benchmarkProfileLaunch = ParseCaptureLaunchOptions().benchmark;
+    context.benchmarkProfileRequested = unattendedBenchmark && benchmarkProfileLaunch.profile ==
+        horde::gameplay::BenchmarkProfileId::WindowsProvisionalV1;
+    if (context.benchmarkProfileRequested)
+        context.benchmarkProfile = std::make_unique<horde::platform::windows::WindowsBenchmarkProfileSession>();
     if (developmentCheckpoint != nullptr)
     {
         context.developmentCheckpoint = *developmentCheckpoint;
@@ -8914,6 +8954,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         return renderOwner.Retire()?result:1;
     }
 #endif
+    const VkClearColorValue clearColor = ClearColorForMode(capabilities.rtMode);
     if (unattendedBenchmark)
     {
         if (!context.controlsEnabled)
@@ -8921,9 +8962,53 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
             (void)renderOwner.Retire();
             return 1;
         }
+        if (context.benchmarkProfileRequested)
+        {
+            const auto& validation = benchmarkProfileLaunch.profileValidation;
+            const bool applied = ApplyWindowsBenchmarkProfile(context, clearColor, validation);
+            if (!applied || !validation.empty())
+            {
+                bool framesOkay = true;
+                if (applied && !validation.empty())
+                {
+                    for (unsigned frame = 0; frame < 3 && framesOkay; ++frame)
+                    {
+                        framesOkay = CaptureBenchmarkProfileCompletion(context, clearColor, false, true);
+                        horde::gameplay::BenchmarkProfileConfiguration actual;
+                        framesOkay = framesOkay && ReadBenchmarkProfileActual(context, actual, true) &&
+                            context.benchmarkProfile->ObserveMeasuring(actual);
+                        if (framesOkay) ++context.benchmarkProfileValidationFrames;
+                    }
+                    framesOkay = framesOkay && CaptureBenchmarkProfileImage(context,
+                        textReportPath.parent_path() / "benchmark-profile-applied.png");
+                    if (!framesOkay) context.benchmarkProfileError += " Bounded applied RT frames/readback failed.";
+                }
+                if (applied && validation == "cancel-measure") SendMessageA(hWnd, WM_KEYDOWN, VK_ESCAPE, 0);
+                if (applied && validation == "restart-measure") SendMessageA(hWnd, WM_COMMAND, kMenuRestartId, 0);
+                if (applied && validation == "close-measure") {
+                    SendMessageA(hWnd, WM_SYSKEYDOWN, VK_F4, 0);
+                    framesOkay = framesOkay && context.benchmarkProfileCloseRequested && context.benchmarkProfileCancelRequested;
+                    SendMessageA(hWnd, WM_CLOSE, 0, 0);
+                }
+                const bool restored = RestoreWindowsBenchmarkProfile(context, clearColor, false);
+                const bool expectedCancellation = validation != "apply-restore" && validation != "stale-owner" && !validation.empty();
+                const bool validated = !validation.empty() && restored && context.benchmarkProfile->Restored() &&
+                    (applied || validation == "cancel-apply") &&
+                    context.benchmarkProfileCancelRequested == expectedCancellation &&
+                    (validation != "stale-owner" || context.benchmarkProfileStaleOwnerRejected) && framesOkay &&
+                    context.benchmarkProfileError.empty();
+                const bool imageSaved = !context.benchmarkProfile->Restored() || CaptureBenchmarkProfileImage(context,
+                    textReportPath.parent_path() / "benchmark-profile-restored.png");
+                if (!imageSaved) context.benchmarkProfileError += " Restored RT readback failed.";
+                context.benchmarkProfileValidationPassed = validated && imageSaved;
+                const bool saved = WriteWindowsBenchmarkProfileReceipt(context, textReportPath.parent_path(), validation);
+                const bool validationPassed = context.benchmarkProfileValidationPassed;
+                const bool retired = renderOwner.Retire();
+                return validationPassed && saved && retired ? 0 : 1;
+            }
+        }
         StartBenchmark(context, benchmarkWorkload, false, benchmarkRtWorkloadPreset); // No FPS observer.
     }
-    const VkClearColorValue clearColor = ClearColorForMode(capabilities.rtMode);
     MSG message{};
     bool running = true;
     bool renderFailed = false;
@@ -8952,6 +9037,11 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
 
         if (!running)
         {
+            break;
+        }
+        if (context.benchmarkProfileActive && context.benchmarkProfileCancelRequested)
+        {
+            CancelBenchmark(context, false, "profile-lifecycle-interrupted");
             break;
         }
         if (unattendedBenchmark && !context.benchmark.IsRunning())
@@ -8987,7 +9077,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
             ApplyOverlayState(context);
             RECT client{};GetClientRect(hWnd,&client);LayoutOverlayControls(hWnd,client.right,client.bottom);
         }
-        if (!context.graphicsPreviewCapture && !context.outputResizeValidation && !context.nativeMotionValidation)
+        if (!context.graphicsPreviewCapture && !context.outputResizeValidation && !context.nativeMotionValidation && !context.benchmarkProfileActive)
             PollDesktopController(context);
 
         const auto profile = context.rtScene.Profile();
@@ -9068,6 +9158,9 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         bool rtFramePresented = false;
         context.expectedBenchmarkFrame.reset();
         const bool frameRendered = RenderFrame(context, clearColor, rtFramePresented);
+        if (benchmarkFrame && context.benchmarkProfileActive &&
+            !ObserveWindowsBenchmarkProfileMeasurement(context, false))
+            CancelBenchmark(context, false, "profile-observed-state-changed");
         FinishGraphicsFrame(context, frameRendered && rtFramePresented);
         ObserveCampaignPresentation(context,frameRendered && rtFramePresented);
         QueuePresentedEntryPlay(context, rtFramePresented);
@@ -9269,6 +9362,12 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     const bool benchmarkSucceeded = context.benchmark.Passed() && context.benchmarkReportsSaved &&
         context.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Complete &&
         context.benchmarkEvidence.ExpectedCount() == context.benchmark.Frames().size();
+    if (context.benchmarkProfileRequested)
+    {
+        if (!RestoreWindowsBenchmarkProfile(context, clearColor, !renderFailed && benchmarkSucceeded)) renderFailed = true;
+        if (!WriteWindowsBenchmarkProfileReceipt(context, textReportPath.parent_path(), {})) renderFailed = true;
+        if (!context.benchmarkProfile->Succeeded()) renderFailed = true;
+    }
     if (!renderOwner.Retire()) renderFailed = true;
     if (unattendedBenchmark) return !renderFailed && benchmarkSucceeded ? 0 : 1;
     return renderFailed ? 1 : (running ? 0 : static_cast<int>(message.wParam));
@@ -10189,6 +10288,38 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
     if (horde::platform::windows::HandleGitHubReleaseUpdateMessage(hWnd, message, wParam))
     {
         return 0;
+    }
+    if (sceneContext && sceneContext->benchmarkProfileActive)
+    {
+        // The explicit launch owns this HWND until original RT restoration is
+        // acknowledged. Closing/restarting requests cancellation, never destroys
+        // the surface or starts another run across an apply/restore boundary.
+        if (message == WM_CLOSE || (message == WM_COMMAND &&
+            (LOWORD(wParam) == kExitButtonId || LOWORD(wParam) == kMenuExitId)))
+        {
+            sceneContext->benchmarkProfileCloseRequested = true;
+            CancelBenchmark(*sceneContext, false, "profile-close"); return 0;
+        }
+        if (message == WM_COMMAND)
+        {
+            if (LOWORD(wParam) == kMenuPauseId || LOWORD(wParam) == kMenuRestartId || LOWORD(wParam) == kRestartButtonId)
+                CancelBenchmark(*sceneContext, false, "profile-pause-or-restart");
+            return 0;
+        }
+        if (message == WM_KEYDOWN || message == WM_SYSKEYDOWN || message == WM_KEYUP || message == WM_SYSKEYUP)
+        {
+            if (message == WM_SYSKEYDOWN && wParam == VK_F4) {
+                sceneContext->benchmarkProfileCloseRequested = true;
+                CancelBenchmark(*sceneContext, false, "profile-alt-f4"); return 0;
+            }
+            if (message == WM_KEYDOWN && wParam == VK_ESCAPE) CancelBenchmark(*sceneContext, false, "profile-escape");
+            return 0;
+        }
+        if (message == WM_LBUTTONDOWN || message == WM_RBUTTONDOWN || message == WM_MOUSEMOVE ||
+            message == WM_HSCROLL || message == WM_VSCROLL || message == WM_MOUSEWHEEL) return 0;
+        if (((message == WM_SIZE || message == WM_DPICHANGED) && !sceneContext->benchmarkProfileInternalResize) ||
+            (message == WM_ACTIVATEAPP && wParam == FALSE))
+            CancelBenchmark(*sceneContext, false, "profile-window-interrupted");
     }
     switch (message)
     {

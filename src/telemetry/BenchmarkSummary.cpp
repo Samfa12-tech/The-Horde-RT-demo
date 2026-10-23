@@ -162,11 +162,21 @@ FrozenBenchmarkSummary CaptureBenchmarkSummary(const horde::gameplay::ShowcaseBe
     { result.status_ = BenchmarkSummaryStatus::Incomplete; return result; }
     if (benchmark.Frames().size() != evidence.ExpectedCount())
     { result.status_ = BenchmarkSummaryStatus::MismatchedPopulation; return result; }
+    std::optional<RtFrameDimensionsEvidence> submittedDimensions;
     for (std::size_t i = 0u; i < benchmark.Frames().size(); ++i)
     {
         const auto& frame = benchmark.Frames()[i];
         RtExpectedFrameRecord row{};
-        if (!evidence.TryGetExpectedFrame(i, row) || row.tag.lap != benchmark.TotalLaps() || row.tag.lap != frame.lap ||
+        if (!evidence.TryGetExpectedFrame(i, row))
+        { result.status_ = BenchmarkSummaryStatus::MismatchedPopulation; return result; }
+        if (i == 0) submittedDimensions = row.dimensions;
+        const auto& m = completion.metadata;
+        if (row.dimensions != submittedDimensions || (row.dimensions &&
+            (!ValidRtFrameDimensionsEvidence(*row.dimensions) ||
+             row.dimensions->internalWidth != m.internalWidth || row.dimensions->internalHeight != m.internalHeight ||
+             row.dimensions->outputWidth != m.presentationWidth || row.dimensions->outputHeight != m.presentationHeight)))
+        { result.status_ = BenchmarkSummaryStatus::MismatchedPopulation; return result; }
+        if (row.tag.lap != benchmark.TotalLaps() || row.tag.lap != frame.lap ||
             row.tag.zone != static_cast<std::uint32_t>(frame.zone) ||
             std::find(kZones.begin(), kZones.end(), frame.zone) == kZones.end() ||
             row.disposition != RtExpectedFrameDisposition::Completed || !row.cpuAccepted || !row.hasGpuStatus ||
@@ -178,6 +188,7 @@ FrozenBenchmarkSummary CaptureBenchmarkSummary(const horde::gameplay::ShowcaseBe
         { result.status_ = BenchmarkSummaryStatus::MismatchedPopulation; return result; }
     }
     BenchmarkSummaryData data;
+    data.submittedDimensions = submittedDimensions;
     data.runUuid = runUuid;
     data.configuration.platform = completion.platform;
     data.configuration.water = completion.water;

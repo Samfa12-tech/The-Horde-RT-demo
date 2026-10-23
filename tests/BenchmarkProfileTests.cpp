@@ -60,7 +60,7 @@ void TestLifecycle(BenchmarkProfileId id, GraphicsPlatform platform)
 
     // Every deviation is observed between otherwise matching endpoints. Failure
     // must latch and restore, never recover by accepting a later matching sample.
-    for (unsigned mutation = 0; mutation < 16; ++mutation) {
+    for (unsigned mutation = 0; mutation < 17; ++mutation) {
         BenchmarkProfileRun run; Check(run.Begin(id, working), "fresh mismatch case begins");
         const auto expected = working; auto actual = working;
         switch (mutation) {
@@ -80,6 +80,7 @@ void TestLifecycle(BenchmarkProfileId id, GraphicsPlatform platform)
         case 13: actual.workload = BenchmarkWorkload::LanternMotionExtreme; break;
         case 14: actual.backend = GraphicsBackend::RayTracingPipeline; break;
         case 15: actual.optical = actual.optical == OpticalProfile::High ? OpticalProfile::Mobile : OpticalProfile::High; break;
+        case 16: actual.presentationTransform = 2; break;
         }
         Check(!run.Observe(actual) && run.Status() == BenchmarkProfileRunStatus::Failed && working == saved,
             "mid-run dimension, aspect, policy, DRS, effect, workload or immutable backend drift fails and restores");
@@ -111,6 +112,23 @@ int main()
     Check(!wrong.Begin(BenchmarkProfileId::MobileProvisionalV1, c) && c == immutable,
         "compiled optics mismatch cannot silently change immutable quality");
     c = saved;
+    {
+        auto odd = saved; odd.output = {961,541}; odd.internal = {721,406};
+        odd.cameraAspect = 721.0f / 406.0f; const auto original = odd;
+        BenchmarkProfileRun run;
+        Check(run.Begin(BenchmarkProfileId::MobileProvisionalV1, odd),
+            "ordinary odd-size scaled personal camera can enter a provisional run using its actual internal aspect");
+        Check(run.Observe(odd) && run.Complete(), "odd-size personal state permits a matched provisional application");
+        Check(odd == original, "odd-size original camera aspect and dimensions restore exactly");
+    }
+    {
+        auto rotated = saved; rotated.presentationTransform = 1;
+        rotated.cameraAspect = 1.0f / 1.6f; const auto original = rotated;
+        BenchmarkProfileRun run;
+        Check(run.Begin(BenchmarkProfileId::MobileProvisionalV1, rotated) && rotated.presentationTransform == 0 &&
+            run.Observe(rotated) && run.Complete(), "provisional run explicitly applies its identity transform from a rotated custom state");
+        Check(rotated == original, "original custom surface transform and camera projection restore exactly");
+    }
     BenchmarkProfileRun custom;
     Check(custom.Begin(BenchmarkProfileId::Custom, c) && c.dynamicResolutionEnabled && custom.Observe(c) && custom.Complete() && c == saved,
         "custom can retain declared DRS and personal settings but remains explicitly unranked");
@@ -120,7 +138,7 @@ int main()
       BenchmarkProfileRun explicitCustom;
       Check(explicitCustom.Begin(BenchmarkProfileId::Custom, matched) && explicitCustom.Profile() == BenchmarkProfileId::Custom,
           "matching standard pixels/effects do not auto-promote an explicitly custom run"); }
-    for (unsigned invalid = 0; invalid < 7; ++invalid) {
+    for (unsigned invalid = 0; invalid < 8; ++invalid) {
         c = saved;
         switch (invalid) {
         case 0: c.internal.width = 0; break;
@@ -130,6 +148,7 @@ int main()
         case 4: c.cameraAspect = std::numeric_limits<double>::infinity(); break;
         case 5: c.backend = GraphicsBackend::Unsupported; break;
         case 6: c.outputPolicy = static_cast<BenchmarkOutputPolicy>(255); break;
+        case 7: c.presentationTransform = 8; break;
         }
         const auto before = c;
         BenchmarkProfileRun run;

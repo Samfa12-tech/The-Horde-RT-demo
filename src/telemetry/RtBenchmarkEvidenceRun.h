@@ -73,6 +73,7 @@ struct RtBenchmarkFrameTag
 
 struct RtExpectedFrameRecord
 {
+    std::optional<RtFrameDimensionsEvidence> dimensions{};
     RtBenchmarkFrameTag tag{};
     RtExpectedFrameDisposition disposition = RtExpectedFrameDisposition::AwaitingSubmission;
     RtBenchmarkFailureReason rejectionReason = RtBenchmarkFailureReason::None;

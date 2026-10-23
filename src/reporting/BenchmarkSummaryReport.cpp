@@ -133,6 +133,9 @@ PreparedBenchmarkSummaryReport PrepareBenchmarkSummaryReport(const FrozenBenchma
     out << ",\"classification\":";
     Text(out, horde::gameplay::BenchmarkProfileClassificationName(horde::gameplay::BenchmarkProfileId::Custom));
     out << ",\"ranked\":false}";
+    out << ",\"submittedDimensions\":";
+    if (data.submittedDimensions) WriteRtFrameDimensionsEvidenceJson(out, *data.submittedDimensions);
+    else out << "null";
     out << ",\"build\":"; Text(out, m.buildIdentity); out << ",\"shaderPair\":"; Text(out, m.shaderIdentity);
     out << ",\"executionBackend\":"; Text(out, m.executionBackend);
     out << ",\"presentMode\":"; Text(out, m.presentMode);
