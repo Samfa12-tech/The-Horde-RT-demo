@@ -3,7 +3,9 @@
 Latest: [stationary-only Kit turn eligibility is admitted to the development profile](evidence/2026-10-24-kit-stationary-eligibility/README.md).
 Continuous bends retain legacy movement; stopped misaligned departures retain
 authored turns. The natural RT route now passes without added waiting guidance.
-Phone acceptance and the expanded Debug deadline remain separate open gates.
+Phone acceptance remains open. The [bounded Debug journey partition](evidence/2026-10-24-campaign-journey-partition/README.md)
+now passes local Debug/Release coverage with unchanged 30-second deadlines;
+casual/urgent timing context selection remains pending.
 
 ## Natural-walk pacing rejection — 24 October 2026
 

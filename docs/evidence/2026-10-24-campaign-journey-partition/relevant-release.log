@@ -1,0 +1,119 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+UpdateCTestConfiguration  from :C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/DartConfiguration.tcl
+Parse Config file:C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/DartConfiguration.tcl
+UpdateCTestConfiguration  from :C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/DartConfiguration.tcl
+Parse Config file:C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/DartConfiguration.tcl
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 37
+    Start  37: horde_rt_campaign_play_session_tests
+
+37: Test command: "C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-release\Release\horde_rt_campaign_play_session_tests.exe" "--produce-earned-fixture"
+37: Working Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+37: Test timeout computed to be: 30
+37: PLAY_SESSION_ELAPSED phase=suite-start totalMs=0 sincePreviousMs=0 tick=0 checks=0 failures=0
+37: PLAY_SESSION_ELAPSED phase=terrain-ready totalMs=84 sincePreviousMs=84 tick=0 checks=0 failures=0
+37: PLAY_SESSION_ELAPSED phase=storage-prelude-complete totalMs=106 sincePreviousMs=21 tick=54 checks=42 failures=0
+37: PLAY_SESSION_ELAPSED phase=normal-earned-journey-start totalMs=106 sincePreviousMs=0 tick=0 checks=42 failures=0
+37: PLAY_SESSION_ELAPSED phase=earned-lower-boundary totalMs=144 sincePreviousMs=38 tick=3228 checks=50 failures=0
+37: ordinary lower live=-34.0119,-17.5184 boundary=1 rope=1
+37: PLAY_SESSION_ELAPSED phase=earned-upper-boundary totalMs=305 sincePreviousMs=161 tick=3892 checks=71 failures=0
+37: ordinary upper live=-33.7,-13.3383 speed=1.9 boundary=1
+37: PLAY_SESSION_ELAPSED phase=earned-upper-recovery-complete totalMs=695 sincePreviousMs=389 tick=3892 checks=101 failures=0
+37: PLAY_SESSION_ELAPSED phase=earned-forest-endpoint totalMs=1586 sincePreviousMs=891 tick=7088 checks=107 failures=0
+37: PLAY_SESSION_ELAPSED phase=earned-journey-end totalMs=1764 sincePreviousMs=178 tick=7947 checks=131 failures=0
+37: PLAY_SESSION_ELAPSED phase=endpoint-write-failure-start totalMs=1766 sincePreviousMs=1 tick=0 checks=131 failures=0
+37: PLAY_SESSION_ELAPSED phase=suite-end totalMs=1774 sincePreviousMs=8 tick=0 checks=144 failures=0
+37: 144 campaign play session checks, 0 failures
+1/8 Test  #37: horde_rt_campaign_play_session_tests ........   Passed    3.31 sec
+test 38
+    Start  38: horde_rt_campaign_earned_return_tests
+
+38: Test command: "C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-release\Release\horde_rt_campaign_play_session_tests.exe" "--consume-earned-fixture"
+38: Working Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+38: Test timeout computed to be: 30
+38: PLAY_SESSION_ELAPSED phase=suite-start totalMs=0 sincePreviousMs=0 tick=0 checks=0 failures=0
+38: PLAY_SESSION_ELAPSED phase=terrain-ready totalMs=83 sincePreviousMs=83 tick=0 checks=0 failures=0
+38: PLAY_SESSION_ELAPSED phase=earned-return-start totalMs=105 sincePreviousMs=22 tick=122 checks=11 failures=0
+38: PLAY_SESSION_ELAPSED phase=earned-return-complete totalMs=1367 sincePreviousMs=1261 tick=3204 checks=12 failures=0
+38: 15 cross-process earned return checks, 0 failures
+2/8 Test  #38: horde_rt_campaign_earned_return_tests .......   Passed    1.39 sec
+test 39
+    Start  39: horde_rt_campaign_earned_fixture_cleanup
+
+39: Test command: "C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-release\Release\horde_rt_campaign_play_session_tests.exe" "--cleanup-earned-fixture"
+39: Working Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+39: Test timeout computed to be: 30
+39: PLAY_SESSION_ELAPSED phase=suite-start totalMs=0 sincePreviousMs=0 tick=0 checks=0 failures=0
+3/8 Test  #39: horde_rt_campaign_earned_fixture_cleanup ....   Passed    0.03 sec
+test 40
+    Start  40: horde_rt_campaign_session_tests
+
+40: Test command: "C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-release\Release\horde_rt_campaign_session_tests.exe"
+40: Working Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+40: Test timeout computed to be: 30
+40: 77 campaign session checks, 0 failures
+4/8 Test  #40: horde_rt_campaign_session_tests .............   Passed    1.50 sec
+test 42
+    Start  42: horde_rt_campaign_save_worker_tests
+
+42: Test command: "C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-release\Release\horde_rt_campaign_save_worker_tests.exe"
+42: Working Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+42: Test timeout computed to be: 30
+42: 79 campaign worker checks, 0 failures
+5/8 Test  #42: horde_rt_campaign_save_worker_tests .........   Passed    1.53 sec
+test 43
+    Start  43: horde_rt_campaign_save_coordinator_tests
+
+43: Test command: "C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-release\Release\horde_rt_campaign_save_coordinator_tests.exe"
+43: Working Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+43: Test timeout computed to be: 30
+43: 306 campaign coordinator checks, 0 failures
+6/8 Test  #43: horde_rt_campaign_save_coordinator_tests ....   Passed    1.01 sec
+test 49
+    Start  49: horde_rt_campaign_checkpoint_tests
+
+49: Test command: "C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-release\Release\horde_rt_campaign_checkpoint_tests.exe"
+49: Working Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+49: Test timeout computed to be: 60
+49: Kit reunion anchor: listener=(-33.7,-12.8) actor=(-27.7,-5.8) oldDistance=3.27567 newDistance=9.21955 oldLR=0.109187,0.012507 newLR=0.0383516,0.00733917
+49: Kit nearby reminder: listener=(-28.7023,-5.80325) actor=(-27.7,-5.8) oldDistance=5.33736 newDistance=1.00233 oldLR=0.0459493,0.0493765 newLR=0.35525,0.0528804
+49: 1058 campaign checkpoint checks, 0 failures
+7/8 Test  #49: horde_rt_campaign_checkpoint_tests ..........   Passed    1.30 sec
+test 220
+    Start 220: horde_rt_rescue_journey_integration_tests
+
+220: Test command: "C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-release\Release\horde_rt_rescue_journey_integration_tests.exe"
+220: Working Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+220: Test timeout computed to be: 1500
+220: opening projection-inputs path=generic tick=1 modern=0 yaw=3.14159274 pitch=-0.0500000007 supportY=-0.949999988 left=-0.184999987,-0.316208929,0.406987816 right=0.230000004,-0.340000004,0.347291529 visibility=NOT_EVALUATED
+220: opening projection-inputs path=frozen-wrapper tick=0 modern=0 yaw=3.14159274 pitch=-0.0500000007 supportY=-0.949999988 left=-0.184999987,-0.316208929,0.406987816 right=0.230000004,-0.340000004,0.347291529 visibility=NOT_EVALUATED
+220: opening projection-inputs path=configured-live tick=0 modern=1 yaw=3.14159274 pitch=0 supportY=-0.949999988 left=-0.184999987,-0.331811994,0.398269385 right=0.230000004,-0.340000004,0.347291529 visibility=NOT_EVALUATED
+220: claim-site position=-34,-17.55 prompt=0 phase=4
+220: cycle=0 ascent-end phase=4 root=-33.7,2.05,-12.8
+220: upper lantern hand depth=0.69 localY=0.0511613
+220: unready-edge start=-33.7,-12.8 end=-33.0742,-11.9239 blocked=1
+220: cycle=1 ascent-end phase=4 root=-33.7,2.05,-12.8
+220: upper lantern hand depth=0.69 localY=0.0511825
+220: Combined CPU preparation resident_ns=232200 staged_ns=175700 resident_retained_bytes=25344 staged_retained_bytes=25344 resident_peak_capacity_bytes=48096 staged_peak_capacity_bytes=48096 gpu_residency_comparison=NOT_MEASURED
+220: Rescue journey integration cases=16246 failures=0 retained_triangles=528
+8/8 Test #220: horde_rt_rescue_journey_integration_tests ...   Passed    0.25 sec
+
+The following tests passed:
+	horde_rt_campaign_play_session_tests
+	horde_rt_campaign_earned_return_tests
+	horde_rt_campaign_earned_fixture_cleanup
+	horde_rt_campaign_session_tests
+	horde_rt_campaign_save_worker_tests
+	horde_rt_campaign_save_coordinator_tests
+	horde_rt_campaign_checkpoint_tests
+	horde_rt_rescue_journey_integration_tests
+
+100% tests passed, 0 tests failed out of 8
+
+Total Test time (real) =  10.36 sec

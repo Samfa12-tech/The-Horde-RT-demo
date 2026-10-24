@@ -5,6 +5,7 @@
 #include <atomic>
 #include <chrono>
 #include <cmath>
+#include <cstdlib>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -54,8 +55,10 @@ void DumpKitState(std::ostream& out,const char* label,const sim::SimulationSnaps
 }
 struct Directory {
     fs::path path=fs::temp_directory_path()/("horde-play-session-test-"+std::to_string(std::chrono::steady_clock::now().time_since_epoch().count()));
+    bool owned=true;
     Directory(){if(!fs::create_directory(path))throw std::runtime_error("exclusive test root failed");std::ofstream(path/"owned.txt")<<"fixture";}
-    ~Directory(){std::error_code ec;if(path.filename().string().starts_with("horde-play-session-test-") &&
+    explicit Directory(fs::path borrowed):path(std::move(borrowed)),owned(false){}
+    ~Directory(){std::error_code ec;if(owned && path.filename().string().starts_with("horde-play-session-test-") &&
         fs::weakly_canonical(path.parent_path(),ec)==fs::weakly_canonical(fs::temp_directory_path(),ec) && !ec &&
         fs::is_regular_file(path/"owned.txt"))fs::remove_all(path,ec);}
 };
@@ -80,6 +83,89 @@ std::vector<std::byte> Raw(const fs::path& path){std::ifstream f(path,std::ios::
     while(f.get(c))bytes.push_back(std::byte(static_cast<unsigned char>(c)));return bytes;}
 io::StoredCheckpoint Read(const Directory& d,unsigned slot,cp::SaveKind kind){io::StoredCheckpoint record;
     Check(io::Read(d.path,cp::SaveBasename(*cp::SaveTarget(slot,kind)),record).status==io::Status::Read,"saved target reads");return record;}
+// CTest supplies a fresh nonce for THIS invocation to setup/consumer/cleanup.
+// Build/configuration-specific roots and create-only ownership prevent an old
+// endpoint or a concurrent runner from standing in for this run's earned save.
+std::string FixtureToken() {
+    const char* value=std::getenv("HORDE_RT_EARNED_JOURNEY_RUN");
+    const std::string token=value?value:"";
+    return token.size()==32 && token.find_first_not_of("0123456789abcdef")==std::string::npos?token:"";
+}
+fs::path FixtureRoot(){return fs::path(HORDE_RT_PLAY_SESSION_FIXTURE_BASE)/FixtureToken();}
+std::string FixtureOwner(){return "horde-earned-journey-v1\n"+FixtureToken()+"\n"+
+    HORDE_RT_PLAY_SESSION_FIXTURE_BASE+"\n"+__DATE__+" "+__TIME__+"\n";}
+std::string Text(const fs::path& path){std::ifstream f(path,std::ios::binary);return {std::istreambuf_iterator<char>(f),{}};}
+bool PlainFile(const fs::path& path){std::error_code ec;const auto s=fs::symlink_status(path,ec);
+    return !ec && fs::is_regular_file(s) && !fs::is_symlink(s);}
+bool FixtureLocation() {
+    if(FixtureToken().empty())return false;
+    std::error_code ec;const auto base=fs::path(HORDE_RT_PLAY_SESSION_FIXTURE_BASE);
+    return fs::weakly_canonical(base,ec)==base.lexically_normal() && !ec &&
+        !fs::is_symlink(fs::symlink_status(FixtureRoot(),ec));
+}
+bool OwnedFixture(){return FixtureLocation() && PlainFile(FixtureRoot()/"owner.txt") &&
+    Text(FixtureRoot()/"owner.txt")==FixtureOwner();}
+bool CreateFixture() {
+    if(FixtureToken().empty())return false;
+    const auto base=fs::path(HORDE_RT_PLAY_SESSION_FIXTURE_BASE);
+    std::error_code ec;fs::create_directories(base,ec);
+    if(ec || !FixtureLocation() || !fs::create_directory(FixtureRoot(),ec) || ec)return false;
+    std::ofstream marker(FixtureRoot()/"owner.txt",std::ios::binary);marker<<FixtureOwner();marker.close();
+    return bool(marker) && OwnedFixture();
+}
+std::uint64_t Hash(const std::vector<std::byte>& bytes){std::uint64_t hash=14695981039346656037ull;
+    for(auto b:bytes){hash^=std::to_integer<unsigned char>(b);hash*=1099511628211ull;}return hash;}
+bool CopyEarnedFixture(const Directory& source,const io::StoredCheckpoint& endpoint,
+                      const std::vector<std::byte>& manual) {
+    if(!OwnedFixture())return false;
+    for(const auto kind:{cp::SaveKind::Manual,cp::SaveKind::Autosave}) {
+        const auto name=cp::SaveBasename(*cp::SaveTarget(0,kind));
+        if(!fs::copy_file(source.path/name,FixtureRoot()/name,fs::copy_options::none))return false;
+    }
+    Directory copied(FixtureRoot());
+    if(Raw(Path(copied,0,cp::SaveKind::Autosave))!=endpoint.encoded ||
+       Raw(Path(copied,0,cp::SaveKind::Manual))!=manual)return false;
+    std::ofstream receipt(FixtureRoot()/"pending.txt",std::ios::binary);
+    receipt<<FixtureOwner()<<endpoint.encoded.size()<<' '<<Hash(endpoint.encoded)<<'\n'
+           <<manual.size()<<' '<<Hash(manual)<<'\n';receipt.close();return bool(receipt);
+}
+bool ReadEarnedFixture(io::StoredCheckpoint& endpoint) {
+    if(!OwnedFixture() || !PlainFile(FixtureRoot()/"ready.txt") ||
+       fs::exists(FixtureRoot()/"consuming.txt"))return false;
+    const auto receipt=Text(FixtureRoot()/"ready.txt"),owner=FixtureOwner();
+    if(!receipt.starts_with(owner))return false;
+    std::istringstream in(receipt.substr(owner.size()));
+    std::uint64_t autoSize=0,autoHash=0,manualSize=0,manualHash=0;
+    if(!(in>>autoSize>>autoHash>>manualSize>>manualHash) || autoSize==0 || manualSize==0 ||
+       autoSize>65536 || manualSize>65536)return false;
+    in>>std::ws;if(!in.eof())return false;
+    Directory directory(FixtureRoot());
+    const auto autoPath=Path(directory,0,cp::SaveKind::Autosave),manualPath=Path(directory,0,cp::SaveKind::Manual);
+    if(!PlainFile(autoPath) || !PlainFile(manualPath) || fs::file_size(autoPath)!=autoSize ||
+       fs::file_size(manualPath)!=manualSize)return false;
+    const auto automatic=Raw(autoPath),manual=Raw(manualPath);io::StoredCheckpoint lower;
+    if(Hash(automatic)!=autoHash || Hash(manual)!=manualHash ||
+       io::Read(directory.path,autoPath.filename().string(),endpoint).status!=io::Status::Read ||
+       io::Read(directory.path,manualPath.filename().string(),lower).status!=io::Status::Read ||
+       endpoint.checkpoint.id!=cp::CheckpointId::ForestEndpoint || endpoint.checkpoint.contentRevision!=2 ||
+       lower.checkpoint.id!=cp::CheckpointId::LowerClaimed)return false;
+    std::error_code ec;fs::rename(FixtureRoot()/"ready.txt",FixtureRoot()/"consuming.txt",ec);
+    return !ec; // Claim once. Never accept a previous consumer's artifact.
+}
+int CleanupFixture() {
+    if(FixtureToken().empty())return 1;
+    std::error_code ec;if(!fs::exists(FixtureRoot(),ec))return ec?1:0;
+    if(!OwnedFixture())return 1;
+    // Bounded known-file removal, not recursive cleanup of an arbitrary path.
+    const std::array<std::string_view,6> names{"pending.txt","ready.txt","consuming.txt","slot-1-manual.hrd","slot-1-auto.hrd","owner.txt"};
+    for(const auto& entry:fs::directory_iterator(FixtureRoot()))
+        if(std::find(names.begin(),names.end(),entry.path().filename().string())==names.end() || !PlainFile(entry.path()))return 1;
+    for(const auto name:names) {
+        const auto p=FixtureRoot()/name;
+        if(fs::exists(p,ec) && (!PlainFile(p) || !fs::remove(p,ec) || ec))return 1;
+    }
+    return fs::remove(FixtureRoot(),ec) && !ec?0:1;
+}
 struct Faults:io::FaultInjector {
     std::atomic<bool> failRead=false,failWrite=false,failAfterPublish=false;
     bool Fail(io::Operation op,std::size_t)override {
@@ -247,11 +333,60 @@ int CheckActualReturnRecovery(const fs::path& requested,const std::shared_ptr<co
         "CPU continuation preserves the actual source record bytes");
     std::cout<<checks<<" actual-return recovery checks, "<<failures<<" failures\n";return failures?1:0;
 }
+void EndpointRecovery(const Directory& directory,const io::StoredCheckpoint& earnedEndpoint,
+                      const std::shared_ptr<const sim::TriangleSupportSurface>& terrain,
+                      const sim::GameSimulationConfig& config,bool completeReturn) {
+    namespace tr=horde::gameplay::traversal;
+    namespace dialogue=horde::gameplay::dialogue;
+    sim::GameSimulation fresh(config);cp::PlaySession reloaded(fresh,directory.path);
+    sim::InputSnapshot freshInput;std::uint64_t freshPublication=0;
+    if(!LoadEarnedBoundary(reloaded,fresh,cp::SaveKind::Autosave,earnedEndpoint,terrain,freshInput,freshPublication))return;
+    const auto operation=reloaded.State().operationRevision;
+    for(int tick=0;tick<120;++tick){fresh.StepFixed(freshInput,1.f/60.f,++freshPublication);reloaded.ObserveSafeBoundary();reloaded.Poll();}
+    Check(reloaded.State().operationRevision==operation && Raw(Path(directory,0,cp::SaveKind::Autosave))==earnedEndpoint.encoded &&
+          fresh.Snapshot().chapterDialogue.line==dialogue::Line::None && fresh.Snapshot().chapterCompanion.grounded &&
+          fresh.Snapshot().chapterCompanion.waypoint==sim::kWorldRoutePoints.size(),
+          "fresh endpoint load resumes completed Kit/story without rewriting or autosaving the loaded record");
+    if(!completeReturn)return; // Preserve this in-process scope/destruction in the producer too.
+    MarkElapsed("earned-return-start",fresh.Snapshot().tickIndex);
+    const auto returnTo=[&](float x,float z) {
+        for(int tick=0;tick<2400;++tick) {
+            const auto s=fresh.Snapshot();const float dx=x-s.playerX,dz=z-s.playerZ,d=std::hypot(dx,dz);
+            freshInput.yawRadians=std::atan2(dx,-dz);freshInput.moveStrafe=0;freshInput.moveForward=d<.035f?0:std::min(1.f,d/.15f);
+            freshInput.runHeld=false;freshInput.crouchHeld=false;
+            fresh.StepFixed(freshInput,1.f/60.f,++freshPublication);fresh.ClearEvents();
+            if(d<.035f)return true;
+        }
+        return false;
+    };
+    for(std::size_t station=sim::kWorldRoutePoints.size()-1;station-->2;) {
+        const auto p=sim::kWorldRoutePoints[station];
+        if(!returnTo(p.x,p.z)){Check(false,"earned endpoint restore walks back along the actual forest route");return;}
+    }
+    const auto landing=tr::kExteriorLanding;
+    if(!returnTo(landing.x,landing.z)){Check(false,"earned endpoint restore reaches the actual return rope");return;}
+    ++freshInput.commands.interact;fresh.StepFixed(freshInput,1.f/60.f,++freshPublication);
+    Check(fresh.Snapshot().rescue.equipmentStowed,"endpoint return begins actual descent with both items stowed");
+    for(int tick=0;tick<1800 && fresh.Snapshot().rescue.equipmentStowed;++tick)
+        fresh.StepFixed(freshInput,1.f/60.f,++freshPublication);
+    for(int tick=0;tick<60;++tick)fresh.StepFixed(freshInput,1.f/60.f,++freshPublication);
+    const auto lowerReturn=fresh.LatestCampaignBoundary();
+    MarkElapsed("earned-return-complete",fresh.Snapshot().tickIndex);
+    Check(fresh.Snapshot().rescue.sawLanding && !fresh.Snapshot().rescue.exteriorSide &&
+          lowerReturn && lowerReturn->id==cp::CheckpointId::LowerClaimed && lowerReturn->contentRevision==2 &&
+          lowerReturn->dialogue.proofAccepted && lowerReturn->dialogue.forestVillageConsumed &&
+          fresh.Snapshot().chapterCompanion.waypoint==sim::kWorldRoutePoints.size(),
+          "completed descent replaces endpoint with coherent lower safe side while Kit/story remain completed");
+    // Do not observe/save this return: preserve the earned endpoint record
+    // for independent failure/no-rewrite receipts above.
+    Check(Raw(Path(directory,0,cp::SaveKind::Autosave))==earnedEndpoint.encoded,
+          "unobserved return boundary does not itself perform filesystem IO");
+}
 // Earning uses no checkpoint imports, restore seeds, authoritative poses or
 // direct logical mutation: movement, sword edges, chest interaction and rope
 // motor only. Recovery then loads only the records this journey really wrote.
 void NormalBoundaryJourney(const std::shared_ptr<const sim::TriangleSupportSurface>& terrain,
-                          bool diagnoseTurnStart=false) {
+                          bool diagnoseTurnStart=false,bool produceFixture=false) {
     MarkElapsed(diagnoseTurnStart?"opt-in-earned-journey-start":"normal-earned-journey-start");
     using namespace horde::gameplay;
     namespace tr=horde::gameplay::traversal;
@@ -511,50 +646,7 @@ void NormalBoundaryJourney(const std::shared_ptr<const sim::TriangleSupportSurfa
           play.LatestCheckpoint() && play.LatestCheckpoint()->id==cp::CheckpointId::ForestEndpoint &&
           play.State().operationRevision==endpointOperation && Raw(Path(directory,0,cp::SaveKind::Autosave))==earnedEndpoint.encoded,
           "exterior exploration cannot downgrade the endpoint or repeatedly autosave it");
-    {
-        sim::GameSimulation fresh(config);cp::PlaySession reloaded(fresh,directory.path);
-        sim::InputSnapshot freshInput;std::uint64_t freshPublication=0;
-        if(!LoadEarnedBoundary(reloaded,fresh,cp::SaveKind::Autosave,earnedEndpoint,terrain,freshInput,freshPublication))return;
-        const auto operation=reloaded.State().operationRevision;
-        for(int tick=0;tick<120;++tick){fresh.StepFixed(freshInput,1.f/60.f,++freshPublication);reloaded.ObserveSafeBoundary();reloaded.Poll();}
-        Check(reloaded.State().operationRevision==operation && Raw(Path(directory,0,cp::SaveKind::Autosave))==earnedEndpoint.encoded &&
-              fresh.Snapshot().chapterDialogue.line==dialogue::Line::None && fresh.Snapshot().chapterCompanion.grounded &&
-              fresh.Snapshot().chapterCompanion.waypoint==sim::kWorldRoutePoints.size(),
-              "fresh endpoint load resumes completed Kit/story without rewriting or autosaving the loaded record");
-        MarkElapsed("earned-return-start",fresh.Snapshot().tickIndex);
-        const auto returnTo=[&](float x,float z) {
-            for(int tick=0;tick<2400;++tick) {
-                const auto s=fresh.Snapshot();const float dx=x-s.playerX,dz=z-s.playerZ,d=std::hypot(dx,dz);
-                freshInput.yawRadians=std::atan2(dx,-dz);freshInput.moveStrafe=0;freshInput.moveForward=d<.035f?0:std::min(1.f,d/.15f);
-                freshInput.runHeld=false;freshInput.crouchHeld=false;
-                fresh.StepFixed(freshInput,1.f/60.f,++freshPublication);fresh.ClearEvents();
-                if(d<.035f)return true;
-            }
-            return false;
-        };
-        for(std::size_t station=sim::kWorldRoutePoints.size()-1;station-->2;) {
-            const auto p=sim::kWorldRoutePoints[station];
-            if(!returnTo(p.x,p.z)){Check(false,"earned endpoint restore walks back along the actual forest route");return;}
-        }
-        const auto landing=tr::kExteriorLanding;
-        if(!returnTo(landing.x,landing.z)){Check(false,"earned endpoint restore reaches the actual return rope");return;}
-        ++freshInput.commands.interact;fresh.StepFixed(freshInput,1.f/60.f,++freshPublication);
-        Check(fresh.Snapshot().rescue.equipmentStowed,"endpoint return begins actual descent with both items stowed");
-        for(int tick=0;tick<1800 && fresh.Snapshot().rescue.equipmentStowed;++tick)
-            fresh.StepFixed(freshInput,1.f/60.f,++freshPublication);
-        for(int tick=0;tick<60;++tick)fresh.StepFixed(freshInput,1.f/60.f,++freshPublication);
-        const auto lowerReturn=fresh.LatestCampaignBoundary();
-        MarkElapsed("earned-return-complete",fresh.Snapshot().tickIndex);
-        Check(fresh.Snapshot().rescue.sawLanding && !fresh.Snapshot().rescue.exteriorSide &&
-              lowerReturn && lowerReturn->id==cp::CheckpointId::LowerClaimed && lowerReturn->contentRevision==2 &&
-              lowerReturn->dialogue.proofAccepted && lowerReturn->dialogue.forestVillageConsumed &&
-              fresh.Snapshot().chapterCompanion.waypoint==sim::kWorldRoutePoints.size(),
-              "completed descent replaces endpoint with coherent lower safe side while Kit/story remain completed");
-        // Do not observe/save this return: preserve the earned endpoint record
-        // for independent failure/no-rewrite receipts above.
-        Check(Raw(Path(directory,0,cp::SaveKind::Autosave))==earnedEndpoint.encoded,
-              "unobserved return boundary does not itself perform filesystem IO");
-    }
+    EndpointRecovery(directory,earnedEndpoint,terrain,config,!produceFixture);
     Check(!fs::exists(Path(directory,1,cp::SaveKind::Manual)) && !fs::exists(Path(directory,1,cp::SaveKind::Autosave)) &&
           !fs::exists(Path(directory,2,cp::SaveKind::Manual)) && !fs::exists(Path(directory,2,cp::SaveKind::Autosave)),
           "chapter-earned persistence and recovery never touch unselected slots");
@@ -574,6 +666,8 @@ void NormalBoundaryJourney(const std::shared_ptr<const sim::TriangleSupportSurfa
           "standing respawn headroom is checked at canonical anchor even when current player has left it");
     game.ResetRoute();Check(!game.LatestCampaignBoundary(),"actual route reset clears shared checkpoint latch");
     play.ObserveSafeBoundary();Check(!play.LatestCheckpoint(),"facade discards old game latch after actual reset");
+    if(produceFixture && failures==0)
+        Check(CopyEarnedFixture(directory,earnedEndpoint,retainedManual),"handoff copies only this journey's exact earned endpoint and lower manual bytes");
     MarkElapsed("earned-journey-end",game.Snapshot().tickIndex);
 }
 void EndpointWriteFailure(const std::shared_ptr<const sim::TriangleSupportSurface>& terrain) {
@@ -621,7 +715,16 @@ int main(int argc,char** argv){
     const bool exportLookout=argc==3 && std::string_view(argv[1])=="--export-lookout-fixture";
     const bool actualReturn=argc==3 && std::string_view(argv[1])=="--check-actual-return-recovery";
     const bool turnDiagnosis=argc==2 && std::string_view(argv[1])=="--diagnose-kit-turn-route";
-    if(argc!=1 && !exportLookout && !actualReturn && !turnDiagnosis)return 2;
+    const bool producer=argc==2 && std::string_view(argv[1])=="--produce-earned-fixture";
+    const bool consumer=argc==2 && std::string_view(argv[1])=="--consume-earned-fixture";
+    const bool cleanup=argc==2 && std::string_view(argv[1])=="--cleanup-earned-fixture";
+    if(cleanup)return CleanupFixture();
+    if(producer && !CreateFixture()){std::cerr<<"Fresh exclusive CTest fixture ownership required.\n";return 1;}
+    io::StoredCheckpoint crossProcessEndpoint;
+    if(consumer && !ReadEarnedFixture(crossProcessEndpoint)){
+        std::cerr<<"Missing, stale, already consumed, tampered or mismatched earned fixture.\n";return 1;
+    }
+    if(argc!=1 && !exportLookout && !actualReturn && !turnDiagnosis && !producer && !consumer)return 2;
     const auto assets=fs::path(HORDE_RT_SOURCE_DIR)/"assets/models/world/runtime/chapter-terrain-v1";
     horde::scene::assets::AssetManifest manifest;horde::scene::assets::StaticMeshAsset mesh;std::string error;
     if(!horde::scene::assets::AssetManifest::Load(assets/"asset.manifest.json",manifest,error) ||
@@ -631,6 +734,14 @@ int main(int argc,char** argv){
     MarkElapsed("terrain-ready");
     if(exportLookout)return ExportFixtures(argv[2],terrain);
     if(actualReturn)return CheckActualReturnRecovery(argv[2],terrain);
+    if(consumer) {
+        Directory directory(FixtureRoot());
+        EndpointRecovery(directory,crossProcessEndpoint,terrain,sim::ProductionGameSimulationConfig(),true);
+        Check(!fs::exists(Path(directory,1,cp::SaveKind::Manual)) && !fs::exists(Path(directory,1,cp::SaveKind::Autosave)) &&
+              !fs::exists(Path(directory,2,cp::SaveKind::Manual)) && !fs::exists(Path(directory,2,cp::SaveKind::Autosave)),
+              "chapter-earned persistence and recovery never touch unselected slots");
+        std::cout<<checks<<" cross-process earned return checks, "<<failures<<" failures\n";return failures?1:0;
+    }
     if(turnDiagnosis) {
         NormalBoundaryJourney(terrain,true);
         std::cout<<checks<<" opt-in earned-route diagnosis checks, "<<failures<<" failures\n";
@@ -746,9 +857,13 @@ int main(int argc,char** argv){
     Check(uncertainReceipt && uncertainReceipt->outcome==cp::PlayOutcome::Failed &&
           Until(play,[&]{return CatalogueDone(play);}) && !play.TakeCompletion(),"uncertain publication is delivered once, fresh catalogue is read-only");
     MarkElapsed("storage-prelude-complete",game.Snapshot().tickIndex);
-    NormalBoundaryJourney(terrain);
+    NormalBoundaryJourney(terrain,false,producer);
     MarkElapsed("endpoint-write-failure-start");
     EndpointWriteFailure(terrain);
+    if(producer && failures==0) {
+        std::error_code ec;fs::rename(FixtureRoot()/"pending.txt",FixtureRoot()/"ready.txt",ec);
+        Check(!ec,"handoff becomes ready only after every producer assertion and original session teardown");
+    }
     MarkElapsed("suite-end");
     std::cout<<checks<<" campaign play session checks, "<<failures<<" failures\n";return failures?1:0;
 }

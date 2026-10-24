@@ -272,8 +272,23 @@ if(BUILD_TESTING)
     target_link_libraries(horde_rt_campaign_play_session_tests PRIVATE horde_campaign_session)
     target_include_directories(horde_rt_campaign_play_session_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/third_party)
     target_compile_definitions(horde_rt_campaign_play_session_tests PRIVATE HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
-    add_test(NAME horde_rt_campaign_play_session_tests COMMAND horde_rt_campaign_play_session_tests)
-    set_tests_properties(horde_rt_campaign_play_session_tests PROPERTIES TIMEOUT 30)
+    target_compile_definitions(horde_rt_campaign_play_session_tests PRIVATE
+        HORDE_RT_PLAY_SESSION_FIXTURE_BASE="${CMAKE_CURRENT_BINARY_DIR}/Testing/horde-earned-journey-$<CONFIG>")
+    add_test(NAME horde_rt_campaign_play_session_tests COMMAND horde_rt_campaign_play_session_tests --produce-earned-fixture)
+    add_test(NAME horde_rt_campaign_earned_return_tests COMMAND horde_rt_campaign_play_session_tests --consume-earned-fixture)
+    add_test(NAME horde_rt_campaign_earned_fixture_cleanup COMMAND horde_rt_campaign_play_session_tests --cleanup-earned-fixture)
+    set_tests_properties(horde_rt_campaign_play_session_tests PROPERTIES FIXTURES_SETUP HordeEarnedEndpoint)
+    set_tests_properties(horde_rt_campaign_earned_return_tests PROPERTIES FIXTURES_REQUIRED HordeEarnedEndpoint)
+    set_tests_properties(horde_rt_campaign_earned_fixture_cleanup PROPERTIES FIXTURES_CLEANUP HordeEarnedEndpoint)
+    set_tests_properties(horde_rt_campaign_play_session_tests horde_rt_campaign_earned_return_tests
+        horde_rt_campaign_earned_fixture_cleanup PROPERTIES TIMEOUT 30)
+    # Evaluated by CTest on EACH invocation (including filtered/rerun selection),
+    # not at configure time. Separate runners/configurations cannot share saves.
+    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/PlaySessionFixture.cmake" [=[
+string(RANDOM LENGTH 32 ALPHABET 0123456789abcdef _horde_earned_run)
+set(ENV{HORDE_RT_EARNED_JOURNEY_RUN} "${_horde_earned_run}")
+]=])
+    set_property(DIRECTORY APPEND PROPERTY TEST_INCLUDE_FILES "${CMAKE_CURRENT_BINARY_DIR}/PlaySessionFixture.cmake")
     add_executable(horde_rt_campaign_session_tests tests/CampaignSessionTests.cpp
         src/scene/assets/AssetManifest.cpp src/scene/assets/AssetValidation.cpp
         src/scene/assets/GltfDocument.cpp src/scene/assets/StaticMeshAsset.cpp)

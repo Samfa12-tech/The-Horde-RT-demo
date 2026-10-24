@@ -1,0 +1,55 @@
+{
+  "baseline": "2626d273a6215210dde5de0e7b1113039199c50d",
+  "scope": "test organization only; no runtime/asset/settings/timeout changes",
+  "debug": {
+    "selectionPassed": 8,
+    "producerSeconds": 23.75,
+    "consumerSeconds": 16.29,
+    "totalSeconds": 75.24,
+    "timeoutEachSeconds": 30
+  },
+  "release": {
+    "selectionPassed": 8,
+    "totalSeconds": 10.36,
+    "isolatedSelectionPassed": 3,
+    "originalUnpartitionedChecks": 145,
+    "originalUnpartitionedFailures": 0
+  },
+  "assertions": {
+    "baseline": "2626d273a6215210dde5de0e7b1113039199c50d",
+    "originalCheckExpressions": 118,
+    "currentCheckExpressions": 121,
+    "missingOriginalExpressions": [],
+    "additionalExpressions": 3,
+    "originalNormalPassingCount": 145,
+    "expectedProducer": 144,
+    "expectedConsumer": 15,
+    "inProcessEndpointLifecycleRetained": true,
+    "consumerRepeatsUnselectedSlotCheck": true
+  },
+  "negativeGuardCasesPassed": 14,
+  "fixtureDataRemoved": true,
+  "casualUrgentContextSelection": "pending; unchanged single .50s playback duration",
+  "audioHapticManualRevalidationRequired": false,
+  "sourceSha256": {
+    "CMakeLists.txt": "d614c81788b06d13d80e791ade6489605fe318feb9d422b62db7b60911729bb2",
+    "tests/CampaignPlaySessionTests.cpp": "b3574b98b63e750360849e0d71166b409a4dce19ff03ac017dc78c65450055a7",
+    ".github/workflows/shared-simulation-host.yml": "9b611439c7f5f08757b33fe75e12a70d69dc1622344d5fb74593ebd481b2c402"
+  },
+  "binariesSha256": {
+    "build/presets/windows-x64-debug/Debug/horde_rt_campaign_play_session_tests.exe": "7825548cfd26ce969c02fad74d22e9b929dd804650872f1a284ea020cedd0b87",
+    "build/presets/windows-x64-release/Release/horde_rt_campaign_play_session_tests.exe": "915ebfd2c496b69126f9abca36d3f6dd2e132f803272d503dc2d2d8a6f783db9"
+  },
+  "evidenceSha256": {
+    "relevant-debug.log": "3daffc1348e5716df94649937834dfb460f6500a2226b4ad500fe0ace3d7b6d8",
+    "relevant-release.log": "902033f688ee1d7a2b7a18516607c34d979319b2ffbd9b3a6aa423f355cdb962",
+    "isolated-release.log": "6a9ca6123a4d49781cb8bcef6177b3389a0e910736ea36f01a3fbd0c44430a2d",
+    "unpartitioned-release.log": "5bd014282cf01369301c6c898a7fa936c90dab76ff0cd5de0b4371c9018f838b",
+    "fixture-guards.json": "ebc99c14376c8ae8393cd21c885d11f0ff554af8f32f51bac312539a9461364b",
+    "assertion-audit.json": "fc92329ecf8d068404f0b4f09659523663e392d785de02d9eabaa36e4326bd02",
+    "guard-failed-setup.log": "a8653830df4bcfe1ffdfab44faa857a97426bdd7d120f3cecf2bd3a848bf808a",
+    "check_fixture_guards.py": "02c0a86b19c52ac454c5301d2ff40d894e330cf5b7e7ae3ed7a5ed5582a5909d"
+  },
+  "rawGuardFailureLogSha256": "fdb922634584a89a0aeb3ca229af59bb00c83d1cca0b216794f6464d1463bf0c",
+  "guardFailureLogCopyNormalization": "Only trailing whitespace on CTest Environment variables lines removed; original retained in reports."
+}
