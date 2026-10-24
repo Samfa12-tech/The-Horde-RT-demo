@@ -69,8 +69,27 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 109u,
-          "development registry retains prior views and adds two bounded F04 side views");
+    Check(kDevelopmentCheckpoints.size() == 111u,
+          "development registry retains prior views and adds two bounded retention views");
+    for(const auto name : {"chapter-forest-retention-west", "chapter-forest-retention-east"}) {
+        const auto* view=FindDevelopmentCheckpoint(name);
+        Check(view && view->id>=230 && view->id<=231 &&
+            FindDevelopmentCheckpoint(view->id)==view && FindShowcaseCheckpoint(name)==nullptr &&
+            DevelopmentCheckpointRequiresAuthoredChapter(*view) &&
+            view->cameraX==-22.f && view->cameraZ==-15.2f &&
+            view->baseShowcaseCheckpointId==11 && view->rewardPose==DevelopmentRewardPose::HeldHigh &&
+            view->keeperDeathFixedTicks==240u && !view->usesProductionRewardProps && !view->stagesRescueExterior,
+            "retention views remain authored Debug-only corridor fixtures with the real raised lantern");
+        auto retentionConfig=simulation::ProductionGameSimulationConfig();
+        retentionConfig.developmentRescueJourney=true;
+        simulation::GameSimulation staged(retentionConfig);
+        Check(view && StageDevelopmentCheckpointSimulation(staged,*view) &&
+            staged.Snapshot().lich.deathDissolveProgress==1.f && staged.Snapshot().lich.staffLightStrength==0.f &&
+            staged.Snapshot().interaction.heldLightKind==interactions::HeldLightKind::RewardLantern &&
+            staged.Snapshot().chestReward.phase==interactions::ChestRewardPhase::LanternClaimed &&
+            staged.Snapshot().playerX==view->cameraX && staged.Snapshot().playerZ==view->cameraZ,
+            "composed retention fixture preserves the live post-death clock and frozen reward hand without claiming a natural fight");
+    }
     Check(FindDevelopmentCheckpoint("chapter-understory-close") != nullptr &&
           FindShowcaseCheckpoint("chapter-understory-close") == nullptr,
           "understory camera is development-only and cannot alter release checkpoint lookup");

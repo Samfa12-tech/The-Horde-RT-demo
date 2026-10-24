@@ -1,0 +1,15 @@
+    Start 206: horde_rt_static_geometry_cutover_tests
+1/1 Test #206: horde_rt_static_geometry_cutover_tests ...***Failed    4.90 sec
+sceneBytes=34992
+Keeper vertex lifetime checks: PASS
+FAIL: synthetic exact source/ranges admit a nonempty CPU retention plan
+FAIL: changed packed master bytes, nonidentity geometry or foreign transmission owner cannot reuse admission
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   4.92 sec
+
+The following tests FAILED:
+	206 - horde_rt_static_geometry_cutover_tests (Failed)
+Errors while running CTest

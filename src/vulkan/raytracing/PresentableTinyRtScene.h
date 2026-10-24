@@ -313,10 +313,11 @@ public:
 
     void Destroy();
 #if defined(_DEBUG)
-    enum class ForestRouteProofMode { Disabled, BakedResident, SharedExisting64, SharedF01Sector76 };
+    enum class ForestRouteProofMode { Disabled, BakedResident, SharedExisting64, SharedF01Sector76, SharedRetention64 };
     bool SetForestRouteProofMode(ForestRouteProofMode mode, std::string& diagnostic);
     [[nodiscard]] std::string ForestRouteProofJson() const;
-    bool ValidateForestRouteProof(std::string& diagnostic) const;
+    bool ValidateForestRouteProof(std::string& diagnostic,
+        std::optional<bool> expectedRetentionFrame = std::nullopt) const;
     // Explicit isolated GraphicsPreview proof only. Configuration survives
     // Initialise's initial Destroy; the aliasing handle owns the admitted master.
     bool SetDiagnosticPreviewMeshPair(std::shared_ptr<const horde::scene::assets::StaticMeshAsset> master,
@@ -1296,8 +1297,26 @@ private:
     ForestRouteProofMode forestRouteProofMode_ = ForestRouteProofMode::Disabled;
     bool UsesSharedForestRouteProof() const noexcept {
         return forestRouteProofMode_==ForestRouteProofMode::SharedExisting64 ||
-               forestRouteProofMode_==ForestRouteProofMode::SharedF01Sector76;
+               forestRouteProofMode_==ForestRouteProofMode::SharedF01Sector76 ||
+               forestRouteProofMode_==ForestRouteProofMode::SharedRetention64;
     }
+    void AdmitSharedForestRetentionProof();
+    void ApplySharedForestRetentionProof(std::span<VkAccelerationStructureInstanceKHR>, const RtSceneFrameInputs&);
+    bool ForestRetentionIdentityMatches() const;
+    struct ForestRetentionProof {
+        std::shared_ptr<const RtStaticMeshSlot> source;
+        std::shared_ptr<const horde::scene::PreparedForestDressing> prepared;
+        std::array<horde::scene::ForestDressingMasterRange,2> ranges{};
+        std::array<horde::scene::ForestDressingBounds,64> bounds{};
+        std::array<bool,64> eligible{};
+        std::uint64_t generation=0;
+        bool admitted=false;
+        std::uint32_t eligibleCount=0;
+    } forestRetentionProof_;
+    std::array<bool,64> forestRetentionLastOmitted_{};
+    bool forestRetentionFrameEligible_=false;
+    std::uint64_t forestRetentionFrameGeneration_=0;
+    std::uint32_t forestRetentionOmittedCount_=0;
     horde::scene::ForestDressingSharedLayout forestSharedLayout_{};
     std::array<AccelerationStructure, 2u> forestMasterBlas_{};
     Buffer forestMasterBuildScratch_{};

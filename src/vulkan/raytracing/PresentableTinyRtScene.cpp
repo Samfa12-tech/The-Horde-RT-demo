@@ -852,6 +852,11 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     forestMasterBlas_=std::exchange(other.forestMasterBlas_,{});
     forestMasterBuildScratch_=std::exchange(other.forestMasterBuildScratch_,{});
     forestMasterBuildWork_=std::exchange(other.forestMasterBuildWork_,{});
+    forestRetentionProof_=std::move(other.forestRetentionProof_);other.forestRetentionProof_={};
+    forestRetentionLastOmitted_=std::exchange(other.forestRetentionLastOmitted_,{});
+    forestRetentionFrameEligible_=std::exchange(other.forestRetentionFrameEligible_,false);
+    forestRetentionFrameGeneration_=std::exchange(other.forestRetentionFrameGeneration_,0u);
+    forestRetentionOmittedCount_=std::exchange(other.forestRetentionOmittedCount_,0u);
 #endif
     other.gpuResources_.Reset();
     ready_ = std::exchange(other.ready_, false);
@@ -895,7 +900,8 @@ bool ApplyExistingForestInstances(std::span<VkAccelerationStructureInstanceKHR> 
 bool PresentableTinyRtScene::SetForestRouteProofMode(ForestRouteProofMode mode,std::string& diagnostic)
 {
     if(mode!=ForestRouteProofMode::Disabled && mode!=ForestRouteProofMode::BakedResident &&
-       mode!=ForestRouteProofMode::SharedExisting64 && mode!=ForestRouteProofMode::SharedF01Sector76) {
+       mode!=ForestRouteProofMode::SharedExisting64 && mode!=ForestRouteProofMode::SharedF01Sector76 &&
+       mode!=ForestRouteProofMode::SharedRetention64) {
         diagnostic="Unknown forest route proof mode.";return false;
     }
     if((ready_ || device_!=VK_NULL_HANDLE) && mode!=forestRouteProofMode_) {
@@ -912,6 +918,7 @@ std::string PresentableTinyRtScene::ForestRouteProofJson() const
     if(forestRouteProofMode_==ForestRouteProofMode::Disabled)return "null";
     const bool shared=UsesSharedForestRouteProof();
     const bool sector=forestRouteProofMode_==ForestRouteProofMode::SharedF01Sector76;
+    const bool retention=forestRouteProofMode_==ForestRouteProofMode::SharedRetention64;
     std::ostringstream out;out.imbue(std::locale::classic());out<<std::fixed<<std::setprecision(8);
     const auto resources=ResourceInventory();
     std::array<bool,kRtStaticAssetCapacity> assetUsed{};std::size_t registrations=0;
@@ -921,7 +928,7 @@ std::string PresentableTinyRtScene::ForestRouteProofJson() const
         ++registrations;if(row.assetIndex>=assetUsed.size())fits=false;else assetUsed[row.assetIndex]=true;
     }
     const auto assetCount=std::count(assetUsed.begin(),assetUsed.end(),true);
-    out<<"{\"mode\":\""<<(sector?"shared-f01-sector76":shared?"shared-existing64":"baked-resident")
+    out<<"{\"mode\":\""<<(retention?"shared-retention64":sector?"shared-f01-sector76":shared?"shared-existing64":"baked-resident")
        <<"\",\"defaultEnabled\":false,\"fullyResident\":"<<(!ordinaryStaticOmissions_ && !ordinaryStaticReduced_?"true":"false")
        <<",\"ordinaryOmissionCertificateReused\":false,\"forestOrPerformanceAdmitted\":false"
        <<",\"physicalDefinitions\":"<<tlasInstanceCount_<<",\"physicalStorageCapacity\":"<<kTlasInstanceCount
@@ -962,9 +969,9 @@ std::string PresentableTinyRtScene::ForestRouteProofJson() const
             const auto& actual=tlasBuiltInstances_[kOrdinaryTlasInstanceCount+i];
             const bool owner=p.masterIndex<2 && forestMasterBlas_[p.masterIndex].address &&
                 actual.accelerationStructureReference==forestMasterBlas_[p.masterIndex].address &&
-                actual.instanceCustomIndex==26u+p.masterIndex && actual.mask==1u;
+                actual.instanceCustomIndex==26u+p.masterIndex;
             out<<",\"physicalSlot\":"<<kOrdinaryTlasInstanceCount+i<<",\"customIndex\":"<<actual.instanceCustomIndex
-               <<",\"referencesOwnedMaster\":"<<(owner?"true":"false")<<",\"transform\":[";
+               <<",\"mask\":"<<actual.mask<<",\"referencesOwnedMaster\":"<<(owner?"true":"false")<<",\"transform\":[";
             for(unsigned r=0;r<3;++r)for(unsigned c=0;c<4;++c){if(r||c)out<<',';out<<actual.transform.matrix[r][c];}out<<']';
         }
         out<<'}';
@@ -1004,14 +1011,39 @@ std::string PresentableTinyRtScene::ForestRouteProofJson() const
         }
         out<<']';
     }
+    if(retention) {
+        const auto& proof=forestRetentionProof_;
+        out<<",\"wholeInstanceRetention\":{\"admitted\":"<<(proof.admitted?"true":"false")
+           <<",\"boundToCurrentOwners\":"<<(ForestRetentionIdentityMatches()?"true":"false")
+           <<",\"certificateGeneration\":"<<proof.generation<<",\"currentGeneration\":"<<staticGeometryGeneration_
+           <<",\"frameEligible\":"<<(forestRetentionFrameEligible_?"true":"false")
+           <<",\"frameGeneration\":"<<forestRetentionFrameGeneration_
+           <<",\"eligibleWholeInstances\":"<<proof.eligibleCount<<",\"omittedWholeInstances\":"<<forestRetentionOmittedCount_
+           <<",\"retainedWholeInstances\":"<<64u-forestRetentionOmittedCount_
+           <<",\"bothMastersResident\":"<<(forestMasterBlas_[0].address&&forestMasterBlas_[1].address?"true":"false")
+           <<",\"bakedTriangleCertificateApplied\":false,\"residencySavingClaimed\":false,\"placements\":[";
+        for(std::size_t i=0;i<proof.bounds.size();++i) {
+            if(i)out<<',';const auto& b=proof.bounds[i];
+            out<<"{\"id\":"<<i<<",\"eligible\":"<<(proof.eligible[i]?"true":"false")
+               <<",\"omitted\":"<<(forestRetentionLastOmitted_[i]?"true":"false")
+               <<",\"minimum\":["<<b.minimum[0]<<','<<b.minimum[1]<<','<<b.minimum[2]
+               <<"],\"maximum\":["<<b.maximum[0]<<','<<b.maximum[1]<<','<<b.maximum[2]<<"]}";
+        }
+        out<<"]}";
+    }
     out<<'}';return out.str();
 }
 
-bool PresentableTinyRtScene::ValidateForestRouteProof(std::string& diagnostic) const
+bool PresentableTinyRtScene::ValidateForestRouteProof(std::string& diagnostic,
+    std::optional<bool> expectedRetentionFrame) const
 {
     const auto fail=[&](const char* error){diagnostic=error;return false;};
     const bool shared=UsesSharedForestRouteProof();
     const bool sector=forestRouteProofMode_==ForestRouteProofMode::SharedF01Sector76;
+    const bool retention=forestRouteProofMode_==ForestRouteProofMode::SharedRetention64;
+    if(expectedRetentionFrame && (!retention || forestRetentionFrameEligible_!=*expectedRetentionFrame ||
+       (*expectedRetentionFrame && !forestRetentionOmittedCount_)))
+        return fail("Forest retention frame did not make the explicitly expected nonempty/retained decision.");
     const std::size_t supplementalCount=sector?12u:0u;
     if(forestRouteProofMode_==ForestRouteProofMode::Disabled || !ready_ || !tlasInstanceDefinitionsValid_ ||
        !forestSharedLayout_.prepared || forestSharedLayout_.prepared->placements.size()!=64u ||
@@ -1026,6 +1058,17 @@ bool PresentableTinyRtScene::ValidateForestRouteProof(std::string& diagnostic) c
         assets[row.assetIndex]=true;
     }
     if(std::count(assets.begin(),assets.end(),true)!=13)return fail("Forest proof did not preserve exactly thirteen unique static assets.");
+    if(retention) {
+        const auto omitted=std::count(forestRetentionLastOmitted_.begin(),forestRetentionLastOmitted_.end(),true);
+        if(omitted!=forestRetentionOmittedCount_ || (!forestRetentionFrameEligible_ && omitted))
+            return fail("Forest retention did not preserve its exact recorded omission decision.");
+        if(omitted && (!ForestRetentionIdentityMatches() || !forestRetentionProof_.admitted ||
+           forestRetentionFrameGeneration_!=staticGeometryGeneration_))
+            return fail("Forest retention used stale source or generation provenance.");
+        for(std::size_t i=0;i<64u;++i)
+            if(forestRetentionLastOmitted_[i] && !forestRetentionProof_.eligible[i])
+                return fail("Forest retention masked an uncertified placement.");
+    }
     std::array<unsigned,2> populations{};
     const auto placementMatches=[&](const horde::scene::ForestDressingRigidPlacement& p,std::size_t i) {
         if(p.masterIndex>=2u)return fail("Forest proof has an invalid master reference.");
@@ -1034,8 +1077,9 @@ bool PresentableTinyRtScene::ValidateForestRouteProof(std::string& diagnostic) c
             const auto& actual=tlasBuiltInstances_[kOrdinaryTlasInstanceCount+i];
             const float c=std::cos(p.yawRadians),s=std::sin(p.yawRadians);
             const VkTransformMatrixKHR expected{{{c,0.f,s,p.origin[0]},{0.f,1.f,0.f,p.origin[1]},{-s,0.f,c,p.origin[2]}}};
+            const unsigned expectedMask=retention && i<64u && forestRetentionLastOmitted_[i]?0u:1u;
             if(!forestMasterBlas_[p.masterIndex].address || actual.accelerationStructureReference!=forestMasterBlas_[p.masterIndex].address ||
-               actual.instanceCustomIndex!=26u+p.masterIndex || actual.mask!=1u ||
+               actual.instanceCustomIndex!=26u+p.masterIndex || actual.mask!=expectedMask ||
                std::memcmp(&actual.transform,&expected,sizeof(expected))!=0)return fail("Forest proof did not publish all exact unit-scale master placements.");
         }
         return true;
@@ -1487,6 +1531,8 @@ void PresentableTinyRtScene::Destroy()
     diagnosticPreviewPairScratchPeak_=0;diagnosticPreviewPairBuildMilliseconds_=0.;
     if(device_!=VK_NULL_HANDLE)RetireRtGpuWorkAfterIdle({device_,queue_,commandPool_},forestMasterBuildWork_);
     else forestMasterBuildWork_={};
+    forestRetentionProof_={};forestRetentionLastOmitted_={};forestRetentionFrameEligible_=false;
+    forestRetentionFrameGeneration_=0;forestRetentionOmittedCount_=0;
     forestSharedLayout_={};
 #endif
     DestroyBuffer(keeperTextureUploadRecovery_.staging);
@@ -4648,6 +4694,11 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
             }
             regionalWaterFaces_.push_back(actual);
         }
+#if defined(_DEBUG)
+        // The instance certificate needs the actual regional-water BLAS
+        // inputs, which do not exist at the earlier packed-source pin.
+        AdmitSharedForestRetentionProof();
+#endif
         rescueRopeVertexOffset_=vertices.size();
         horde::gameplay::traversal::RescueTraversal initial;
         const auto rope=horde::scene::RescueRopeTriangleVertices(initial.Snapshot());
@@ -8143,6 +8194,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
        !ApplyExistingForestInstances(instances,forestSharedLayout_,
            forestRouteProofMode_==ForestRouteProofMode::SharedF01Sector76,
            {forestMasterBlas_[0].address,forestMasterBlas_[1].address},diagnostic))return false;
+    if(forestRouteProofMode_==ForestRouteProofMode::SharedRetention64)
+        ApplySharedForestRetentionProof(instances,frame);
 #endif
     lastInstanceMasks_={};
     for(std::size_t i=0;i<tlasInstanceCount_;++i)lastInstanceMasks_[i]=instances[i].mask;

@@ -26,6 +26,7 @@
 #include <chrono>
 #include <filesystem>
 #include <iostream>
+#include <limits>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -291,6 +292,75 @@ void TestCleanFailures()
           "four-group admission fails before geometry mutation when the shared 32-material cap would overflow");
 }
 
+void TestPreparedInstanceBounds(const PreparedForestDressing& prepared)
+{
+    std::array<ForestDressingBounds, gameplay::simulation::kForestTreePlacementContract.size()> measured{};
+    std::string diagnostic="unreplaced diagnostic";
+    const bool accepted=MeasurePreparedForestInstanceBounds(prepared,measured,diagnostic);
+    Check(accepted && diagnostic.empty(),"whole-instance bounds publish all original64 with a cleared diagnostic");
+    if(!accepted)return;
+    bool nonidentity=false;
+    for(std::size_t i=0;i<prepared.placements.size();++i) {
+        const auto& placement=prepared.placements[i];const auto& master=prepared.masters[placement.masterIndex];
+        const float c=std::cos(placement.yawRadians),s=std::sin(placement.yawRadians);
+        nonidentity=nonidentity || (std::abs(c)>.1f && std::abs(s)>.1f);
+        bool enclosed=FiniteBounds(measured[i]);
+        const auto contains=[&](float x,float y,float z,bool strict) {
+            // Independently evaluate ordinary and fused/reassociated float
+            // matrix paths, rather than accepting a tolerance at the boundary.
+            const std::array<std::array<float,3>,3> world{{
+                {{c*x+s*z+placement.origin[0],y+placement.origin[1],-s*x+c*z+placement.origin[2]}},
+                {{std::fma(c,x,std::fma(s,z,placement.origin[0])),y+placement.origin[1],
+                  std::fma(-s,x,std::fma(c,z,placement.origin[2]))}},
+                {{std::fma(s,z,std::fma(c,x,placement.origin[0])),y+placement.origin[1],
+                  std::fma(c,z,std::fma(-s,x,placement.origin[2]))}}}};
+            for(const auto& point:world)for(std::size_t axis=0;axis<3;++axis)
+                enclosed=enclosed && std::isfinite(point[axis]) &&
+                    (strict?measured[i].minimum[axis]<point[axis]:measured[i].minimum[axis]<=point[axis]) &&
+                    (strict?point[axis]<measured[i].maximum[axis]:point[axis]<=measured[i].maximum[axis]);
+        };
+        for(const auto& vertex:master.vertices)contains(vertex.position[0],vertex.position[1],vertex.position[2],false);
+        // All eight AABB corners, including unoccupied extremes, must have an
+        // outward reserve under nonidentity rotations and translation rounding.
+        for(unsigned corner=0;corner<8;++corner)
+            contains((corner&1)?master.bounds.maximum[0]:master.bounds.minimum[0],
+                     (corner&2)?master.bounds.maximum[1]:master.bounds.minimum[1],
+                     (corner&4)?master.bounds.maximum[2]:master.bounds.minimum[2],true);
+        Check(enclosed,"reserved world AABB encloses every actual vertex and float-transformed local boundary corner");
+    }
+    Check(nonidentity,"instance bounds witnesses include genuine mixed-axis yaw transforms");
+    const auto retained=measured;
+    const auto unchanged=[&]() {
+        for(std::size_t i=0;i<measured.size();++i)
+            if(measured[i].minimum!=retained[i].minimum || measured[i].maximum!=retained[i].maximum)return false;
+        return true;
+    };
+    for(unsigned mutation=0;mutation<12;++mutation) {
+        auto invalid=prepared;
+        if(mutation==0)invalid.masters[0].vertices.clear();
+        if(mutation==1)invalid.masters[1].indices.clear();
+        if(mutation==2)invalid.masters[1].indices.back()=UINT32_MAX;
+        if(mutation==3)invalid.masters[0].vertices[0].position[2]=NAN;
+        if(mutation==4)invalid.masters[1].bounds.maximum[0]=INFINITY;
+        if(mutation==5)invalid.placements.back().masterIndex=invalid.masters.size();
+        if(mutation==6)invalid.placements.back().yawRadians=NAN;
+        if(mutation==7)invalid.placements.back().origin[0]=INFINITY;
+        if(mutation==8)invalid.masters[1].primitives.back().vertexOffset=UINT32_MAX;
+        if(mutation==9)invalid.masters[0].primitives[0].indexCount=0;
+        if(mutation==10)invalid.masters[0].bounds.minimum[0]+=.001f;
+        if(mutation==11) {
+            auto& placement=invalid.placements.back();
+            placement.supportY=std::numeric_limits<float>::max();
+            placement.origin[1]=placement.supportY-invalid.masters[placement.masterIndex].bounds.minimum[1]-
+                gameplay::simulation::kForestTreePlacementContract.back().rootBurialMetres;
+        }
+        Check(!MeasurePreparedForestInstanceBounds(invalid,measured,diagnostic) && !diagnostic.empty() && unchanged(),
+              "empty, malformed, non-finite or overflowing instance data rejects atomically without replacing prior64 bounds");
+    }
+    Check(MeasurePreparedForestInstanceBounds(prepared,measured,diagnostic) && diagnostic.empty() && unchanged(),
+          "immutable prepared instance bounds reproduce exactly after rejected requests");
+}
+
 void TestPreparedMasterOwnership()
 {
     std::string diagnostic;
@@ -298,6 +368,7 @@ void TestPreparedMasterOwnership()
     Check(PrepareForestDressing(kRoot/"assets",prepared,diagnostic),
           "canonical preparation admits the existing masters and rigid placements");
     if(!prepared)return;
+    TestPreparedInstanceBounds(*prepared);
     std::size_t triangles=0,pines=0,alders=0;
     for(const auto& master:prepared->masters)triangles+=master.indices.size()/3u;
     for(const auto& placement:prepared->placements) {
@@ -460,6 +531,7 @@ void TestSharedMasterPacking()
         PrepareForestDressing(kRoot/"assets",prepared,diagnostic,terrain.get());
     Check(base,diagnostic.empty()?"shared master proof prepares the same real chapter and root-fitted snapshot":diagnostic);
     if(!base)return;
+    TestPreparedInstanceBounds(*prepared);
     const auto beforeSeed=owner;
     Check(SeedPreparedForestMaterialFamilies(*prepared,owner,diagnostic),"shared forest seeds only the canonical four material rows");
     Check(owner.materials.size()==beforeSeed.materials.size()+4 && owner.vertices.size()==beforeSeed.vertices.size() &&

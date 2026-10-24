@@ -77,7 +77,15 @@ inline constexpr bool DevelopmentCheckpointRequiresAuthoredChapter(
     return checkpoint.id == 192 || checkpoint.name.starts_with("chapter-");
 }
 
-inline constexpr std::array<DevelopmentCheckpoint, 109u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 111u> kDevelopmentCheckpoints{{
+    // Frozen retention witnesses only. Same bounded source pocket, opposite
+    // corridor views; normal cameras, collision and story state are unchanged.
+    {.id=230,.name="chapter-forest-retention-west",.baseShowcaseCheckpointId=11,
+     .cameraX=-22.f,.cameraZ=-15.2f,.yaw=-1.57079632679f,.pitch=.014f,
+     .rewardPose=DevelopmentRewardPose::HeldHigh,.keeperDeathFixedTicks=240u},
+    {.id=231,.name="chapter-forest-retention-east",.baseShowcaseCheckpointId=11,
+     .cameraX=-22.f,.cameraZ=-15.2f,.yaw=1.57079632679f,.pitch=.014f,
+     .rewardPose=DevelopmentRewardPose::HeldHigh,.keeperDeathFixedTicks=240u},
     // F04 vista acceptance: same staged-route fixture and level framing as
     // centre 203, with a 45-degree look to either side. No release camera change.
     {.id=228,.name="chapter-forest-lookout-left",.baseShowcaseCheckpointId=11,

@@ -4,7 +4,7 @@
 #include <string_view>
 
 namespace horde::platform::windows {
-enum class ForestRouteCaptureMode { Disabled, BakedResident, SharedExisting64, SharedF01Sector76 };
+enum class ForestRouteCaptureMode { Disabled, BakedResident, SharedExisting64, SharedF01Sector76, SharedRetention64 };
 struct ForestRouteProofLaunch {
     ForestRouteCaptureMode mode=ForestRouteCaptureMode::Disabled;
     std::string error;
@@ -19,13 +19,14 @@ inline ForestRouteProofLaunch ParseForestRouteProofLaunch(
         const auto a=arguments[i];
         if(a==L"--forest-route-proof") {
             if(requested || !debugBuild || i+1>=arguments.size()) {
-                result.error="Forest route proof requires one Debug baked-resident/shared64/f01-sector selection.";return result;
+                result.error="Forest route proof requires one Debug baked-resident/shared64/f01-sector/shared64-retention selection.";return result;
             }
             requested=true;const auto value=arguments[++i];
             if(value==L"baked-resident")result.mode=ForestRouteCaptureMode::BakedResident;
             else if(value==L"shared64")result.mode=ForestRouteCaptureMode::SharedExisting64;
             else if(value==L"f01-sector")result.mode=ForestRouteCaptureMode::SharedF01Sector76;
-            else {result.error="Forest route proof mode must be baked-resident, shared64 or f01-sector.";return result;}
+            else if(value==L"shared64-retention")result.mode=ForestRouteCaptureMode::SharedRetention64;
+            else {result.error="Unknown forest route proof mode.";return result;}
         }
         else if(a==L"--capture-hidden")hidden=true;
         else if(a==L"--capture-showcase") {

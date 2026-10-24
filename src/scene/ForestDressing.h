@@ -99,6 +99,14 @@ bool PrepareForestDressing(const std::filesystem::path& assetRoot,
                           std::string& diagnostic,
                           const gameplay::simulation::TriangleSupportSurface* terrain = nullptr);
 
+// Conservative whole-instance world AABBs for the original immutable 64.
+// Encloses the local master AABB under the renderer's float rigid matrix,
+// including an outward arithmetic reserve. Does not change geometry/root
+// receipts; failure preserves the caller's previous complete bounds array.
+bool MeasurePreparedForestInstanceBounds(const PreparedForestDressing& prepared,
+    std::array<ForestDressingBounds, gameplay::simulation::kForestTreePlacementContract.size()>& bounds,
+    std::string& diagnostic);
+
 // Seed exactly the same four canonical material rows for the unchanged
 // understory/deadwood builders, without creating any tree geometry.
 bool SeedPreparedForestMaterialFamilies(const PreparedForestDressing& prepared,

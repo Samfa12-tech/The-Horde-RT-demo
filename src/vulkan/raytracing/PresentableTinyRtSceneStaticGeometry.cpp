@@ -12,6 +12,36 @@
 
 namespace horde::vulkan::raytracing {
 
+namespace {
+bool LanternTransportBoundsAdmitted(const horde::scene::assets::StaticMeshAsset& ring,
+    const horde::scene::assets::StaticMeshAsset& body)
+{
+    // Enclose the actual admitted panes around their body origin. All other
+    // transmission owners stay loaded. Refuse a changed lantern geometry or
+    // attachment rather than assuming an old master still bounds its queries.
+    const auto* grip=horde::gameplay::items::FindHeldItemSocket(ring.sockets,"GripRing");
+    const auto* hinge=horde::gameplay::items::FindHeldItemSocket(ring.sockets,"Hinge");
+    if(!grip || !hinge)return false;
+    const auto* light=horde::gameplay::items::FindHeldItemSocket(body.sockets,"Light");
+    if(!light)return false;
+    double lightRadius=0;
+    for(unsigned axis=12;axis<15;++axis)lightRadius+=double(light->world[axis])*light->world[axis];
+    if(!std::isfinite(lightRadius) || lightRadius>.515001*.515001)return false;
+    double hingeRadius=0;
+    for(unsigned axis=12;axis<15;++axis)hingeRadius+=std::pow(double(grip->world[axis])-hinge->world[axis],2);
+    if(!std::isfinite(hingeRadius) || hingeRadius>.097001*.097001)return false;
+    for(const auto& p:body.primitives) {
+        if(!(body.materials[p.materialIndex].flags&static_cast<unsigned>(RtMaterialFlag::Transmission)))continue;
+        for(std::size_t i=p.indexOffset;i<p.indexOffset+p.indexCount;++i) {
+            const auto& v=body.vertices[p.vertexOffset+body.indices[i]].position;
+            const double radius=double(v[0])*v[0]+double(v[1])*v[1]+double(v[2])*v[2];
+            if(!std::isfinite(radius) || radius>.736324*.736324)return false;
+        }
+    }
+    return true;
+}
+}
+
 void PresentableTinyRtScene::AdmitOrdinaryStaticDetail()
 {
     ordinaryStaticOmissions_.reset();
@@ -52,28 +82,7 @@ void PresentableTinyRtScene::AdmitOrdinaryStaticDetail()
     // Existing source-prism coverage still owns primary/reverse local-light rays.
     if(regionalWaterDiagnosticEnabled_ && !horde::scene::DetailRegionalWaterQueriesSeparated(
         bounds,regionalWaterFaces_))return;
-    // Enclose the actual admitted panes around their body origin. All other
-    // transmission owners stay loaded. Refuse a changed lantern geometry or
-    // attachment rather than assuming an old master still bounds its queries.
-    const auto* grip=horde::gameplay::items::FindHeldItemSocket(rewardLanternRingAsset_.sockets,"GripRing");
-    const auto* hinge=horde::gameplay::items::FindHeldItemSocket(rewardLanternRingAsset_.sockets,"Hinge");
-    if(!grip || !hinge)return;
-    const auto* light=horde::gameplay::items::FindHeldItemSocket(rewardLanternBodyAsset_.sockets,"Light");
-    if(!light)return;
-    double lightRadius=0;
-    for(unsigned axis=12;axis<15;++axis)lightRadius+=double(light->world[axis])*light->world[axis];
-    if(!std::isfinite(lightRadius) || lightRadius>.515001*.515001)return;
-    double hingeRadius=0;
-    for(unsigned axis=12;axis<15;++axis)hingeRadius+=std::pow(double(grip->world[axis])-hinge->world[axis],2);
-    if(!std::isfinite(hingeRadius) || hingeRadius>.097001*.097001)return;
-    for(const auto& p:rewardLanternBodyAsset_.primitives) {
-        if(!(rewardLanternBodyAsset_.materials[p.materialIndex].flags&static_cast<unsigned>(RtMaterialFlag::Transmission)))continue;
-        for(std::size_t i=p.indexOffset;i<p.indexOffset+p.indexCount;++i) {
-            const auto& v=rewardLanternBodyAsset_.vertices[p.vertexOffset+rewardLanternBodyAsset_.indices[i]].position;
-            const double radius=double(v[0])*v[0]+double(v[1])*v[1]+double(v[2])*v[2];
-            if(!std::isfinite(radius) || radius>.736324*.736324)return;
-        }
-    }
+    if(!LanternTransportBoundsAdmitted(rewardLanternRingAsset_,rewardLanternBodyAsset_))return;
     std::string error;
     ordinaryStaticOmissions_=RtStaticTriangleOmissions::Create(fullStaticGeometrySource_,kCollapseInstanceIndex,ids,error);
 }
@@ -113,6 +122,120 @@ bool CorridorFrameSourcesInside(const RtSceneFrameInputs& f) {
     return f.cameraX>=-27.5f && f.cameraX<=-16.6f && f.cameraZ>=-16.55f && f.cameraZ<=-13.85f;
 }
 }
+
+#if defined(_DEBUG)
+bool PresentableTinyRtScene::ForestRetentionIdentityMatches() const
+{
+    const auto& proof=forestRetentionProof_;
+    if(!proof.admitted || forestRouteProofMode_!=ForestRouteProofMode::SharedRetention64 ||
+       !proof.source || proof.source!=fullStaticGeometrySource_ || !proof.prepared ||
+       proof.prepared!=forestSharedLayout_.prepared || !forestSharedLayout_.supplementalPlacements.empty() ||
+       !proof.generation || proof.generation!=staticGeometryGeneration_)return false;
+    for(unsigned m=0;m<2u;++m) {
+        const auto& a=proof.ranges[m];const auto& b=forestSharedLayout_.masters[m];
+        if(a.primitiveOffset!=b.primitiveOffset || a.primitiveCount!=b.primitiveCount ||
+           a.localBounds.minimum!=b.localBounds.minimum || a.localBounds.maximum!=b.localBounds.maximum)return false;
+    }
+    return forestSharedLayout_.commonPrimitiveCount==proof.ranges[0].primitiveOffset;
+}
+
+void PresentableTinyRtScene::AdmitSharedForestRetentionProof()
+{
+    forestRetentionProof_={};forestRetentionLastOmitted_={};
+    forestRetentionFrameEligible_=false;forestRetentionFrameGeneration_=0;forestRetentionOmittedCount_=0;
+    if(forestRouteProofMode_!=ForestRouteProofMode::SharedRetention64 || !fullStaticGeometrySource_ ||
+       !forestSharedLayout_.prepared || !forestSharedLayout_.supplementalPlacements.empty() ||
+       !developmentRescueJourney_ || sceneProfile_!=RtSceneProfile::Showcase || !staticGeometryGeneration_ ||
+       staticGeometryGeneration_==UINT64_MAX || !LanternTransportBoundsAdmitted(rewardLanternRingAsset_,rewardLanternBodyAsset_))return;
+    const auto& source=*fullStaticGeometrySource_;
+    if(!source.TransmissionOwnersWithin(std::array<std::uint32_t,2>{{8u,kWaterDropletMetadataIndex}}))return;
+    const auto& common=source.InstanceMetadata()[kCollapseInstanceIndex];
+    const auto& layout=forestSharedLayout_;
+    if(!layout.commonPrimitiveCount || layout.commonPrimitiveCount>kRtPrimitiveMetadataCapacity-6u ||
+       common.primitiveCount!=layout.commonPrimitiveCount ||
+       layout.masters[0].primitiveOffset!=layout.commonPrimitiveCount ||
+       layout.masters[1].primitiveOffset!=layout.masters[0].primitiveOffset+3u ||
+       layout.masters[1].primitiveOffset+3u!=collapseStaticAsset_.primitives.size())return;
+    constexpr std::array<float,12> identity{{1,0,0,0,0,1,0,0,0,0,1,0}};
+    for(unsigned m=0;m<2u;++m) {
+        const auto& master=layout.prepared->masters[m];const auto& range=layout.masters[m];
+        const auto& owner=source.InstanceMetadata()[26u+m];
+        if(range.primitiveCount!=3u || master.primitives.size()!=3u ||
+           range.localBounds.minimum!=master.bounds.minimum || range.localBounds.maximum!=master.bounds.maximum ||
+           owner.primitiveCount!=3u || owner.primitiveBase!=common.primitiveBase+range.primitiveOffset ||
+           owner.assetIndex!=common.assetIndex || owner.geometryRole!=static_cast<std::uint32_t>(RtGeometryRole::Static) ||
+           !(owner.flags&static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr)) ||
+           owner.primitiveBase>source.PrimitiveMetadata().size() ||
+           3u>source.PrimitiveMetadata().size()-owner.primitiveBase)return;
+        for(unsigned p=0;p<3u;++p) {
+            const auto index=owner.primitiveBase+p;const auto& packed=source.PrimitiveMetadata()[index];
+            const auto& local=master.primitives[p];const auto& asset=collapseStaticAsset_.primitives[range.primitiveOffset+p];
+            const auto vertexEnd=p+1u<3u?master.primitives[p+1u].vertexOffset:master.vertices.size();
+            if(local.vertexOffset>=vertexEnd || vertexEnd>master.vertices.size() || packed.indexCount!=local.indexCount ||
+               index>=source.PrimitiveVertexCounts().size() || index>=source.GeometryTransforms().size() ||
+               source.PrimitiveVertexCounts()[index]!=vertexEnd-local.vertexOffset ||
+               packed.vertexOffset>source.Vertices().size() || vertexEnd-local.vertexOffset>source.Vertices().size()-packed.vertexOffset ||
+               local.indexOffset>master.indices.size() || local.indexCount>master.indices.size()-local.indexOffset ||
+               packed.indexOffset>source.Indices().size() || packed.indexCount>source.Indices().size()-packed.indexOffset ||
+               packed.materialIndex>=source.Materials().size() ||
+               (source.Materials()[packed.materialIndex].materialFlags[0]&static_cast<std::uint32_t>(RtMaterialFlag::Transmission)) ||
+               asset.materialIndex>=collapseStaticAsset_.materials.size() || local.materialIndex>=master.materials.size() ||
+               collapseStaticAsset_.materials[asset.materialIndex].name!=master.materials[local.materialIndex].name ||
+               source.GeometryTransforms()[index]!=identity ||
+               std::memcmp(source.Indices().data()+packed.indexOffset,master.indices.data()+local.indexOffset,
+                   local.indexCount*sizeof(std::uint32_t))!=0 ||
+               std::memcmp(source.Vertices().data()+packed.vertexOffset,master.vertices.data()+local.vertexOffset,
+                   (vertexEnd-local.vertexOffset)*sizeof(master.vertices.front()))!=0)return;
+        }
+    }
+    ForestRetentionProof staged;std::string diagnostic;
+    if(!horde::scene::MeasurePreparedForestInstanceBounds(*layout.prepared,staged.bounds,diagnostic))return;
+    staged.source=fullStaticGeometrySource_;staged.prepared=layout.prepared;
+    staged.ranges=layout.masters;staged.generation=staticGeometryGeneration_;
+    for(std::size_t i=0;i<staged.bounds.size();++i) {
+        const auto& b=staged.bounds[i];const horde::scene::DetailBox box{
+            {{b.minimum[0],b.minimum[1],b.minimum[2]}},{{b.maximum[0],b.maximum[1],b.maximum[2]}}};
+        staged.eligible[i]=b.minimum[2]>24.f && horde::scene::DetailForestReceiverEnvelopeBlocked(box) &&
+            (!regionalWaterDiagnosticEnabled_ || horde::scene::DetailRegionalWaterQueriesSeparated(box,regionalWaterFaces_));
+        staged.eligibleCount+=staged.eligible[i];
+    }
+    staged.admitted=true;forestRetentionProof_=std::move(staged);
+}
+
+void PresentableTinyRtScene::ApplySharedForestRetentionProof(
+    std::span<VkAccelerationStructureInstanceKHR> instances,const RtSceneFrameInputs& frame)
+{
+    forestRetentionLastOmitted_={};forestRetentionFrameEligible_=false;
+    forestRetentionFrameGeneration_=0;forestRetentionOmittedCount_=0;
+    // Restore first, including unsafe/stale frames. No other instance field,
+    // legacy role, BLAS lifetime or collision state belongs to this policy.
+    for(std::size_t i=28u;i<92u && i<instances.size();++i)instances[i].mask=1u;
+    if(instances.size()<92u || tlasInstanceCount_!=92u || !ready_ ||
+       !ForestRetentionIdentityMatches() || !ordinaryStaticFacesVerified_ ||
+       !StaticGeometryHasCompleteContributors() || ordinaryStaticReduced_ || ordinaryStaticOmissions_ || preparedStaticGeometry_ ||
+       !tlasInstanceDefinitionsValid_ || tlasPendingDefinitionsValid_ ||
+       playerCpuSkinCadence_!=PlayerCpuSkinCadence::Hz60 || !CorridorFrameSourcesInside(frame))return;
+    constexpr float identity[3][4]={{1,0,0,0},{0,1,0,0},{0,0,1,0}};
+    if(!blas_.address || instances[0].accelerationStructureReference!=blas_.address || !(instances[0].mask&1u) ||
+       std::memcmp(instances[0].transform.matrix,identity,sizeof(identity))!=0 ||
+       tlasBuiltInstances_[0].accelerationStructureReference!=blas_.address || !(tlasBuiltInstances_[0].mask&1u) ||
+       std::memcmp(tlasBuiltInstances_[0].transform.matrix,identity,sizeof(identity))!=0)return;
+    for(std::size_t i=0;i<64u;++i) {
+        const auto& p=forestRetentionProof_.prepared->placements[i];const auto& actual=instances[28u+i];
+        if(p.masterIndex>=2u || !forestMasterBlas_[p.masterIndex].address ||
+           actual.accelerationStructureReference!=forestMasterBlas_[p.masterIndex].address ||
+           actual.instanceCustomIndex!=26u+p.masterIndex ||
+           actual.flags!=VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR)return;
+        const float c=std::cos(p.yawRadians),s=std::sin(p.yawRadians);
+        const VkTransformMatrixKHR expected{{{c,0.f,s,p.origin[0]},{0.f,1.f,0.f,p.origin[1]},{-s,0.f,c,p.origin[2]}}};
+        if(std::memcmp(&actual.transform,&expected,sizeof(expected))!=0)return;
+    }
+    forestRetentionFrameEligible_=true;forestRetentionFrameGeneration_=staticGeometryGeneration_;
+    for(std::size_t i=0;i<64u;++i)if(forestRetentionProof_.eligible[i]) {
+        instances[28u+i].mask=0u;forestRetentionLastOmitted_[i]=true;++forestRetentionOmittedCount_;
+    }
+}
+#endif
 
 bool PresentableTinyRtScene::RecoverOrdinaryStaticPreparation(bool safe,StaticDetailFrame& decision,std::string& diagnostic)
 {

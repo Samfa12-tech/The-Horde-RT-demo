@@ -32,6 +32,12 @@ int main()
     Check(ParseForestRouteProofLaunch(sectorArgs,true).mode==ForestRouteCaptureMode::SharedF01Sector76 &&
           ParseForestRouteProofLaunch(sectorArgs,true).error.empty(),"F01 sector is a separate explicit hidden composition proof");
     Check(!ParseForestRouteProofLaunch(sectorArgs,false).error.empty(),"Release rejects F01 sector composition");
+    auto retentionArgs=forestArgs;retentionArgs[1]=L"shared64-retention";
+    Check(ParseForestRouteProofLaunch(retentionArgs,true).mode==ForestRouteCaptureMode::SharedRetention64 &&
+          ParseForestRouteProofLaunch(retentionArgs,true).error.empty(),"whole-instance retention requires its own explicit proof selection");
+    Check(!ParseForestRouteProofLaunch(retentionArgs,false).error.empty(),"Release rejects whole-instance retention proof");
+    auto mixedRetention=retentionArgs;mixedRetention[2]=L"--validate-static-zone-cutover";
+    Check(!ParseForestRouteProofLaunch(mixedRetention,true).error.empty(),"whole-instance proof cannot reuse common-owner cutover");
     auto unsafeSector=sectorArgs;unsafeSector[2]=L"--validate-static-zone-cutover";
     Check(!ParseForestRouteProofLaunch(unsafeSector,true).error.empty(),"F01 sector cannot invoke static cutover");
     auto badForest=forestArgs;badForest[1]=L"other";

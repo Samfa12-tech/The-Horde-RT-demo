@@ -2,7 +2,10 @@
 #include "vulkan/raytracing/TlasInstanceRefresh.h"
 #include "scene/CorridorStaticDetail.h"
 #include "scene/CorridorStaticDetailFaces.h"
+#include "scene/ChapterRegionalWater.h"
 #include "gameplay/simulation/GameSimulation.h"
+#include <algorithm>
+#include <cstring>
 #include <iostream>
 #include <type_traits>
 #include <stdexcept>
@@ -11,6 +14,9 @@
 namespace horde::vulkan::raytracing {
 struct PresentableTinyRtSceneStaticCutoverTestAccess {
     using Scene = PresentableTinyRtScene;
+    // The fixture keeps many independent renderer owners in this Debug function.
+    // Heap-backed local RAII avoids MSVC stack-frame exhaustion; ownership,
+    // destruction order and all move/retirement assertions remain unchanged.
     template<class T> static T Handle(std::uintptr_t id) {
         if constexpr (std::is_pointer_v<T>) return reinterpret_cast<T>(id);
         else return static_cast<T>(id);
@@ -169,7 +175,7 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
             return a;
         };
         {
-            Scene s;seed(s);Calls c{&s};auto a=api(c);
+            auto sceneOwner=std::make_unique<Scene>();auto& s=*sceneOwner;seed(s);Calls c{&s};auto a=api(c);
             const auto before=s.ResourceInventory();
             failures+=!Check(s.PrepareThirdActorVertexLifetimeWithApi(frame,a,error) &&
                 s.characterSlot_.LichGpu().vertices.Empty() && c.retirementOrdered &&
@@ -203,7 +209,7 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
                 "ordinary Keeper frames perform no allocation or retirement");
         }
         for(int edge=0;edge<7;++edge) {
-            Scene s;seed(s);Calls c{&s};auto a=api(c);
+            auto sceneOwner=std::make_unique<Scene>();auto& s=*sceneOwner;seed(s);Calls c{&s};auto a=api(c);
             if(edge==0)c.proofOk=false;
             if(edge==1)c.stale=true;
             if(edge==2)s.thirdActorSubmittedCompanion_=false;
@@ -217,7 +223,7 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
                 "unsubmitted, stale or unproved adoption retains the Keeper allocation");
         }
         for(int edge=0;edge<7;++edge) {
-            Scene s;seed(s);s.characterSlot_.LichGpu().vertices={};
+            auto sceneOwner=std::make_unique<Scene>();auto& s=*sceneOwner;seed(s);s.characterSlot_.LichGpu().vertices={};
             auto back=frame;back.developmentRescueJourney=false;
             Calls c{&s};auto a=api(c);
             if(edge==0)c.prepareOk=false;
@@ -238,10 +244,10 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
                 "failed Keeper storage preparation remains retryable");
         }
         {
-            Scene s;seed(s);Calls c{&s};auto a=api(c);
+            auto sceneOwner=std::make_unique<Scene>();auto& s=*sceneOwner;seed(s);Calls c{&s};auto a=api(c);
             failures+=!Check(s.PrepareThirdActorVertexLifetimeWithApi(frame,a,error),
                 "retired actor owner may move only after completed-work retirement");
-            Scene moved(std::move(s));c={&moved};a=api(c);
+            auto movedOwner=std::make_unique<Scene>(std::move(s));auto& moved=*movedOwner;c={&moved};a=api(c);
             auto back=frame;back.chapterCompanion.grounded=false;
             failures+=!Check(moved.KeeperVertexLifetime().retired &&
                 !s.KeeperVertexLifetime().retired && s.KeeperVertexLifetime().retirementCount==0 &&
@@ -319,7 +325,7 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
             };return a;
         };
         {
-            Scene s;seed(s);Calls c{&s};auto a=api(c);const auto before=s.ResourceInventory();
+            auto sceneOwner=std::make_unique<Scene>();auto& s=*sceneOwner;seed(s);Calls c{&s};auto a=api(c);const auto before=s.ResourceInventory();
             failures+=!Check(s.PrepareThirdActorTextureLifetimeWithApi(frame,a,error) && c.ordered &&
                 c.proof==1 && c.prepare==0 && c.bind==1 && c.destroy==2 && s.KeeperTextureLifetime().retired &&
                 !s.lichBaseColor_.image && !s.lichEmissive_.image && s.KeeperTextureLifetime().retiredDeviceLocalBytes==512 &&
@@ -340,7 +346,7 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
             s.Destroy();
         }
         for(unsigned fault=0;fault<9;++fault) {
-            Scene s;seed(s);Calls c{&s};auto a=api(c);
+            auto sceneOwner=std::make_unique<Scene>();auto& s=*sceneOwner;seed(s);Calls c{&s};auto a=api(c);
             if(fault==0)c.proofOk=false;if(fault==1)c.stale=true;
             if(fault==2)s.thirdActorSubmittedCompanion_=false;
             if(fault==3)s.thirdActorNeedsBuild_=true;
@@ -356,7 +362,7 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
             s.Destroy();
         }
         for(unsigned fault=0;fault<3;++fault) {
-            Scene s;seed(s);s.lichBaseColor_={};s.lichEmissive_={};s.keeperTextureLifetime_.retired=true;
+            auto sceneOwner=std::make_unique<Scene>();auto& s=*sceneOwner;seed(s);s.lichBaseColor_={};s.lichEmissive_={};s.keeperTextureLifetime_.retired=true;
             Calls c{&s};auto a=api(c);c.prepareOk=fault!=0;c.partial=fault==1;c.throws=fault==2;
             auto reset=frame;reset.chapterCompanion.grounded=false;
             failures+=!Check(!s.PrepareThirdActorTextureLifetimeWithApi(reset,a,error) && c.bind==0 &&
@@ -365,7 +371,7 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
             s.Destroy();
         }
         for(unsigned fault=0;fault<2;++fault) {
-            Scene s;seed(s);s.lichBaseColor_={};s.lichEmissive_={};s.keeperTextureLifetime_.retired=true;
+            auto sceneOwner=std::make_unique<Scene>();auto& s=*sceneOwner;seed(s);s.lichBaseColor_={};s.lichEmissive_={};s.keeperTextureLifetime_.retired=true;
             s.keeperTextureDirectory_="exact/keeper/source";Calls c{&s};auto a=api(c);
             c.unproved=fault==0;c.pendingThrow=fault==1;
             auto reset=frame;reset.chapterCompanion.grounded=false;
@@ -374,7 +380,7 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
                 s.keeperTextureRestoreQuarantine_[1].image==Handle<VkImage>(31) &&
                 s.ResourceInventory().deviceLocalBytes==1024 && s.ResourceInventory().hostVisibleBytes==256,
                 "unproved texture upload retains and counts both images, staging and the owning command/fence");
-            Scene moved(std::move(s));
+            auto movedOwner=std::make_unique<Scene>(std::move(s));auto& moved=*movedOwner;
             failures+=!Check(moved.keeperTextureRestoreQuarantine_[0].image==Handle<VkImage>(30) &&
                 moved.keeperTextureUploadRecovery_.work.command==Handle<VkCommandBuffer>(33) &&
                 moved.keeperTextureUploadRecovery_.staging.buffer==Handle<VkBuffer>(32) &&
@@ -390,6 +396,196 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
         }
         return failures;
     }
+#if defined(_DEBUG)
+    static int ForestRetentionChecks() {
+
+        // Synthetic CPU policy/packing fixtures only. No imported asset, RT
+        // allocation, opaque-face verification or GPU presentation is claimed.
+        using namespace horde::scene;using namespace horde::scene::assets;
+        int failures=0;std::string error;
+        const auto identity=horde::gameplay::items::IdentityHeldItemTransform();
+        auto prepared=std::make_shared<PreparedForestDressing>();
+        constexpr std::array<const char*,4> names{{"ForestBark","ForestPine","ForestMoss","ForestAlder"}};
+        for(unsigned f=0;f<4u;++f) {
+            auto& material=prepared->materialFamilies[f];material.name=names[f];
+            material.textureGroup=f;material.deferTextureAllocation=true;material.baseColorTexture=0;
+            material.metallicFactor=0;material.normalTexture=material.ormTexture=f==0?0:-1;
+        }
+        for(unsigned m=0;m<2u;++m) {
+            auto& master=prepared->masters[m];master.nodeTransforms.push_back({"synthetic-local",identity});
+            master.bounds={{{-.1f,0.f,-.1f}},{{.1f,1.f,.1f}}};
+            prepared->primitiveFamilies[m]={{0u,static_cast<std::uint8_t>(m==0?1u:3u),2u}};
+            const std::uint32_t total=m==0?15000u:15306u;
+            for(unsigned p=0;p<3u;++p) {
+                master.materials.push_back(prepared->materialFamilies[prepared->primitiveFamilies[m][p]]);
+                for(unsigned v=0;v<3u;++v) {
+                    StaticRtVertex vertex{};vertex.position={{v==0?-.1f:v==1?.1f:0.f,v==2?1.f:0.f,v==0?-.1f:v==1?.1f:0.f,1.f}};
+                    vertex.normal={{0,0,1,0}};vertex.tangent={{1,0,0,1}};master.vertices.push_back(vertex);
+                }
+                const std::uint32_t count=p<2u?3u:total-6u;
+                master.primitives.push_back({p*3u,static_cast<std::uint32_t>(master.indices.size()),count,p,0u});
+                for(std::uint32_t i=0;i<count;++i)master.indices.push_back(i%3u);
+            }
+        }
+        for(std::size_t i=0;i<64u;++i) {
+            const auto& contract=horde::gameplay::simulation::kForestTreePlacementContract[i];
+            auto& placement=prepared->placements[i];
+            placement.masterIndex=contract.species==horde::gameplay::simulation::ForestTreeSpecies::Pine?0u:1u;
+            placement.origin={{contract.x,-contract.rootBurialMetres,contract.z}};
+            placement.yawRadians=contract.yawRadians;placement.supportY=0;
+        }
+        StaticMeshAsset owner;owner.vertices.assign(prepared->masters[0].vertices.begin(),prepared->masters[0].vertices.begin()+3);
+        owner.indices={0,1,2};owner.primitives.push_back({0,0,3,0,0});
+        owner.materials.push_back({});owner.materials[0].name="synthetic common";
+        owner.nodeTransforms.push_back({"synthetic-world",identity});owner.bounds=prepared->masters[0].bounds;
+        ForestDressingSharedLayout layout;
+        if(!SeedPreparedForestMaterialFamilies(*prepared,owner,error) ||
+           !AppendPreparedForestMasters(prepared,owner,layout,error)) {
+            Check(false,"synthetic retention layout prepares through the existing CPU helper");std::cerr<<error<<'\n';return 1;
+        }
+        const auto pack=[&](const StaticMeshAsset& asset,bool nonidentityGeometry=false) {
+            auto slot=std::make_shared<RtStaticMeshSlot>();
+            const std::array<StaticRtAssetRegistration,3> registrations{{
+                {21u,21u,static_cast<unsigned>(RtInstanceFlag::StaticPbr),0u,&asset,nullptr,RtGeometryRole::Static,0u,1u},
+                {26u,26u,static_cast<unsigned>(RtInstanceFlag::StaticPbr),0u,&asset,nullptr,RtGeometryRole::Static,1u,3u},
+                {27u,27u,static_cast<unsigned>(RtInstanceFlag::StaticPbr),0u,&asset,nullptr,RtGeometryRole::Static,4u,3u}}};
+            if(!slot->InitializeSelectedGeometry(registrations,error))return std::shared_ptr<const RtStaticMeshSlot>{};
+            if(nonidentityGeometry) {
+                // Loader node transforms are already baked; the packer emits
+                // identity geometry transforms regardless of node metadata.
+                // Inject this fault in the still-mutable synthetic slot BEFORE
+                // its const handle is published, not in an immutable source.
+                const auto primitive=slot->InstanceMetadata()[26u].primitiveBase;
+                const_cast<std::array<float,12>&>(slot->GeometryTransforms()[primitive])[3]=.1f;
+            }
+            return std::shared_ptr<const RtStaticMeshSlot>(std::move(slot));
+        };
+        const auto source=pack(owner);
+        if(!source){Check(false,"synthetic source packs without GPU work");std::cerr<<error<<'\n';return 1;}
+        const auto seed=[&](Scene& s) {
+            s.forestRouteProofMode_=Scene::ForestRouteProofMode::SharedRetention64;
+            s.fullStaticGeometrySource_=source;s.forestSharedLayout_=layout;s.collapseStaticAsset_=owner;
+            s.staticGeometryGeneration_=41;s.developmentRescueJourney_=true;s.sceneProfile_=RtSceneProfile::Showcase;
+            // Explicit CPU closure inputs; the synthetic world is not evidence
+            // that these water faces were uploaded or retained by a real GPU.
+            s.regionalWaterDiagnosticEnabled_=true;
+            const auto& water=ChapterRegionalWaterTriangles();s.regionalWaterFaces_.assign(water.begin(),water.end());
+            s.rewardLanternRingAsset_.sockets={{"GripRing",0u,identity},{"Hinge",0u,identity}};
+            s.rewardLanternBodyAsset_.sockets={{"Light",0u,identity}};
+            s.ready_=s.ordinaryStaticFacesVerified_=s.tlasInstanceDefinitionsValid_=true;
+            s.tlasInstanceCount_=92u;s.playerCpuSkinCadence_=PlayerCpuSkinCadence::Hz60;
+            s.blas_=As(500);s.forestMasterBlas_={{As(501),As(502)}};
+            for(unsigned i=0;i<28u;++i) {
+                auto& instance=s.tlasBuiltInstances_[i];instance.instanceCustomIndex=i;instance.mask=0x3fu;
+                instance.accelerationStructureReference=(600u+i)*4096u;
+                instance.transform={{{1,0,0,float(i)},{0,1,0,0},{0,0,1,0}}};
+            }
+            s.tlasBuiltInstances_[0].accelerationStructureReference=s.blas_.address;
+            s.tlasBuiltInstances_[0].transform.matrix[0][3]=0;
+            for(std::size_t i=0;i<64u;++i) {
+                const auto& p=prepared->placements[i];auto& instance=s.tlasBuiltInstances_[28u+i];
+                const float c=std::cos(p.yawRadians),t=std::sin(p.yawRadians);
+                instance.transform={{{c,0,t,p.origin[0]},{0,1,0,p.origin[1]},{-t,0,c,p.origin[2]}}};
+                instance.instanceCustomIndex=26u+static_cast<unsigned>(p.masterIndex);instance.mask=1u;
+                instance.flags=VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
+                instance.accelerationStructureReference=s.forestMasterBlas_[p.masterIndex].address;
+            }
+            s.AdmitSharedForestRetentionProof();
+        };
+        RtSceneFrameInputs frame{};frame.developmentRescueJourney=true;
+        frame.playerMountProfile=horde::gameplay::items::PlayerMountProfile::AnatomicalBody;
+        frame.playerRenderRoute=kProductionPlayerRenderRoute;
+        frame.interaction.heldLightKind=horde::gameplay::interactions::HeldLightKind::RewardLantern;
+        frame.chestReward.phase=horde::gameplay::interactions::ChestRewardPhase::LanternClaimed;
+        frame.lich.deathDissolveProgress=1.f;frame.lich.staffLightStrength=0;
+        frame.tuning.glassFixtureVisible=frame.tuning.productionRewardPropsVisible=false;
+        frame.cameraX=-22;frame.cameraZ=-15.2f;frame.rewardLanternWorldFromHinge=identity;
+        frame.rewardLanternWorldFromHinge[12]=-22;frame.rewardLanternWorldFromHinge[13]=.6f;frame.rewardLanternWorldFromHinge[14]=-15.2f;
+        const auto allRetained=[](const auto& instances) {
+            for(unsigned i=28u;i<92u;++i)if(instances[i].mask!=1u)return false;return true;
+        };
+        {
+            auto sceneOwner=std::make_unique<Scene>();auto& s=*sceneOwner;seed(s);auto instances=s.tlasBuiltInstances_;const auto before=instances;
+            failures+=!Check(s.forestRetentionProof_.admitted && s.ForestRetentionIdentityMatches(),
+                "synthetic exact source/ranges admit the CPU retention identity");
+            failures+=!Check(s.forestRetentionProof_.eligibleCount>0u,
+                "synthetic bounds with canonical retained-water inputs admit a nonempty CPU retention plan");
+            s.ApplySharedForestRetentionProof(instances,frame);
+            bool masks=s.forestRetentionFrameEligible_ && s.forestRetentionFrameGeneration_==41u &&
+                s.forestRetentionOmittedCount_==s.forestRetentionProof_.eligibleCount;
+            for(unsigned i=0;i<64u;++i)masks&=instances[28u+i].mask==(s.forestRetentionProof_.eligible[i]?0u:1u);
+            failures+=!Check(masks && std::memcmp(instances.data(),before.data(),28u*sizeof(instances[0]))==0 &&
+                s.forestMasterBlas_[0].address==501u*4096u && s.forestMasterBlas_[1].address==502u*4096u,
+                "safe CPU policy changes certified masks only, retaining uncertified roots, all28 legacy roles and both masters");
+            auto outside=frame;outside.cameraX=-40;
+            s.ApplySharedForestRetentionProof(instances,outside);
+            failures+=!Check(allRetained(instances) && !s.forestRetentionFrameEligible_ && s.forestRetentionOmittedCount_==0 &&
+                std::none_of(s.forestRetentionLastOmitted_.begin(),s.forestRetentionLastOmitted_.end(),[](bool b){return b;}),
+                "unsafe next frame restores every tree before any policy decision");
+            s.ApplySharedForestRetentionProof(instances,frame);
+            failures+=!Check(s.forestRetentionFrameEligible_ &&
+                s.forestRetentionOmittedCount_==s.forestRetentionProof_.eligibleCount,
+                "returning to the same safe current owner reuses only its certified instance decisions");
+        }
+        constexpr std::array<const char*,21> runtimeFaults{{"different source owner","different prepared owner","stale generation",
+            "changed primitive range","changed local bounds","unverified retained faces","nonidentity current root",
+            "wrong master reference","wrong placement transform","wrong metadata index","incomplete live population",
+            "unpublished definitions","pending definitions","different proof mode","supplemental placements",
+            "changed common prefix","active water droplet","exterior frame","visible glass fixture",
+            "wrong submitted root reference","missing master address"}};
+        for(unsigned fault=0;fault<runtimeFaults.size();++fault) {
+            auto sceneOwner=std::make_unique<Scene>();auto& s=*sceneOwner;seed(s);auto instances=s.tlasBuiltInstances_;auto unsafe=frame;
+            for(unsigned i=28u;i<92u;++i)instances[i].mask=0u;
+            if(fault==0)s.fullStaticGeometrySource_=std::make_shared<const RtStaticMeshSlot>(*source);
+            if(fault==1)s.forestSharedLayout_.prepared=std::make_shared<const PreparedForestDressing>(*prepared);
+            if(fault==2)++s.staticGeometryGeneration_;
+            if(fault==3)++s.forestSharedLayout_.masters[0].primitiveOffset;
+            if(fault==4)s.forestSharedLayout_.masters[0].localBounds.maximum[0]+=1.f;
+            if(fault==5)s.ordinaryStaticFacesVerified_=false;
+            if(fault==6)instances[0].transform.matrix[0][3]=.01f;
+            if(fault==7)++instances[28].accelerationStructureReference;
+            if(fault==8)instances[28].transform.matrix[0][3]+=.01f;
+            if(fault==9)instances[28].instanceCustomIndex=27u;
+            if(fault==10)s.tlasInstanceCount_=28u;
+            if(fault==11)s.tlasInstanceDefinitionsValid_=false;
+            if(fault==12)s.tlasPendingDefinitionsValid_=true;
+            if(fault==13)s.forestRouteProofMode_=Scene::ForestRouteProofMode::SharedExisting64;
+            if(fault==14)s.forestSharedLayout_.supplementalPlacements.push_back({});
+            if(fault==15)++s.forestSharedLayout_.commonPrimitiveCount;
+            if(fault==16)unsafe.waterContact.droplets[0].active=true;
+            if(fault==17)unsafe.rescue.exteriorSide=true;
+            if(fault==18)unsafe.tuning.glassFixtureVisible=true;
+            if(fault==19)++s.tlasBuiltInstances_[0].accelerationStructureReference;
+            if(fault==20)s.forestMasterBlas_[0].address=0;
+            const auto legacy=instances;
+            s.ApplySharedForestRetentionProof(instances,unsafe);
+            const auto message=std::string("CPU retention fallback: ")+runtimeFaults[fault];
+            failures+=!Check(allRetained(instances) && !s.forestRetentionFrameEligible_ && !s.forestRetentionOmittedCount_ &&
+                std::memcmp(instances.data(),legacy.data(),28u*sizeof(instances[0]))==0,
+                message.c_str());
+        }
+        constexpr std::array<const char*,4> admissionFaults{{"changed packed master vertices","changed packed master indices",
+            "nonidentity packed geometry transform","foreign transmission owner"}};
+        for(unsigned fault=0;fault<admissionFaults.size();++fault) {
+            auto sceneOwner=std::make_unique<Scene>();auto& s=*sceneOwner;seed(s);auto changed=owner;
+            if(fault==0)changed.vertices[changed.primitives[1].vertexOffset].position[0]+=.01f;
+            if(fault==1)changed.indices[changed.primitives[1].indexOffset]=1u;
+            if(fault==3)changed.materials[0].flags|=static_cast<unsigned>(RtMaterialFlag::Transmission);
+            s.fullStaticGeometrySource_=pack(changed,fault==2);s.AdmitSharedForestRetentionProof();
+            const auto message=std::string("CPU retention admission rejects ")+admissionFaults[fault];
+            failures+=!Check(!s.forestRetentionProof_.admitted,
+                message.c_str());
+        }
+        {
+            auto sceneOwner=std::make_unique<Scene>();auto& s=*sceneOwner;seed(s);
+            s.regionalWaterFaces_.clear();s.AdmitSharedForestRetentionProof();
+            auto instances=s.tlasBuiltInstances_;s.ApplySharedForestRetentionProof(instances,frame);
+            failures+=!Check(s.forestRetentionProof_.eligibleCount==0u && allRetained(instances) &&
+                s.forestRetentionOmittedCount_==0u,"missing actual-water inputs cannot certify any omitted tree");
+        }
+        return failures;
+    }
+#endif
     static int Run() {
         int failures=0,oldMap=3,newMap=4; std::string error;
         {
@@ -438,8 +634,12 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
         }
         failures+=KeeperVertexLifetimeChecks();
         failures+=KeeperTextureLifetimeChecks();
+#if defined(_DEBUG)
+
+        failures+=ForestRetentionChecks();
+#endif
         {
-            Scene s;Seed(s,oldMap,newMap);
+            auto sceneOwner=std::make_unique<Scene>();auto& s=*sceneOwner;Seed(s,oldMap,newMap);
             horde::gameplay::simulation::GameSimulation simulation;
             Scene::StaticDetailFrame decision{};
             const auto* explicitCandidate=s.preparedStaticGeometry_.get();
@@ -454,7 +654,7 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
                 "complete owner remains renderable while an explicit diagnostic owns preparation");
         }
         {
-            Scene s;Seed(s,oldMap,newMap);s.preparedStaticGeometry_.reset();s.ordinaryStaticCandidate_=true;
+            auto sceneOwner=std::make_unique<Scene>();auto& s=*sceneOwner;Seed(s,oldMap,newMap);s.preparedStaticGeometry_.reset();s.ordinaryStaticCandidate_=true;
             Scene::StaticDetailFrame decision{};
             failures+=!Check(s.RecoverOrdinaryStaticPreparation(true,decision,error) &&
                 !s.ordinaryStaticCandidate_ && !s.ordinaryStaticRearm_ && decision==Scene::StaticDetailFrame::Render &&
@@ -473,7 +673,7 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
                 "unproved GPU work cannot enter optional-preparation recovery");
         }
         for(unsigned edge=0;edge<4;++edge) {
-            Scene s;Seed(s,oldMap,newMap);Proof p{&s};p.sharedVertices=true;
+            auto sceneOwner=std::make_unique<Scene>();auto& s=*sceneOwner;Seed(s,oldMap,newMap);Proof p{&s};p.sharedVertices=true;
             auto& candidate=*s.preparedStaticGeometry_;
             candidate.vertices={};candidate.sharedVertexAddress=s.staticVertexBuffer_.address;
             auto api=FrameApi(p);
@@ -489,7 +689,7 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
                 "stale vertex address, duplicate vertex ownership and rejected publication preserve the live owner");
         }
         {
-            Scene s;Seed(s,oldMap,newMap);Proof p{&s};auto api=Api(p);
+            auto sceneOwner=std::make_unique<Scene>();auto& s=*sceneOwner;Seed(s,oldMap,newMap);Proof p{&s};auto api=Api(p);
             s.developmentWorldRoute_=true;s.worldRouteGeometry_.valid=true;
             s.vertexBuffer_=Buffer(201);s.indexBuffer_=Buffer(202);s.blas_=As(203);
             const horde::gameplay::simulation::WorldZoneToken token{
@@ -507,7 +707,7 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
                 s.staticGeometryRetainedTriangleRegions_==horde::scene::assets::kAllStaticTriangleRegions &&
                 !s.StaticGeometryHasCompleteContributors() && s.WorldZoneReadiness(token)==ZoneReadiness::Preparing,
                 "both region bits and all family rows cannot hide omitted triangles from traversal readiness");
-            Scene moved(std::move(s));
+            auto movedOwner=std::make_unique<Scene>(std::move(s));auto& moved=*movedOwner;
             failures+=!Check(!moved.StaticGeometryHasCompleteContributors() &&
                 moved.WorldZoneReadiness(token)==ZoneReadiness::Preparing && s.StaticGeometryHasCompleteContributors(),
                 "move transfers sparse omission state and resets the old owner");
@@ -519,7 +719,7 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
                 "teardown clears sparse state for scene reconstruction");
         }
         {
-            Scene s;Seed(s,oldMap,newMap);Proof p{&s};auto api=Api(p);
+            auto sceneOwner=std::make_unique<Scene>();auto& s=*sceneOwner;Seed(s,oldMap,newMap);Proof p{&s};auto api=Api(p);
             s.developmentWorldRoute_=true;s.worldRouteGeometry_.valid=true;
             s.vertexBuffer_=Buffer(201);s.indexBuffer_=Buffer(202);s.blas_=As(203);
             const horde::gameplay::simulation::WorldZoneToken token{
@@ -536,7 +736,7 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
             failures+=!Check(s.CommitStaticGeometryWithApi(41,api,error) &&
                 !s.StaticGeometryHasCompleteContributors() && s.WorldZoneReadiness(token)==ZoneReadiness::Preparing,
                 "partial diagnostic owner cannot authorize normal traversal without a contributor proof");
-            Scene moved(std::move(s));
+            auto movedOwner=std::make_unique<Scene>(std::move(s));auto& moved=*movedOwner;
             failures+=!Check(!moved.StaticGeometryHasCompleteContributors() &&
                 moved.WorldZoneReadiness(token)==ZoneReadiness::Preparing && s.StaticGeometryHasCompleteContributors(),
                 "scene move carries partial contributor state and resets the moved-from owner");
@@ -552,7 +752,7 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
                 "teardown resets contributor state for reconstruction");
         }
         {
-            Scene s;Seed(s,oldMap,newMap);Proof p{&s};auto api=FrameApi(p);
+            auto sceneOwner=std::make_unique<Scene>();auto& s=*sceneOwner;Seed(s,oldMap,newMap);Proof p{&s};auto api=FrameApi(p);
             s.tlasBuiltInstances_[0].transform.matrix[0][3]=4.f;
             s.tlasBuiltInstances_[2].mask=0;
             failures+=!Check(s.CommitStaticGeometryWithApi(41,api,error) && p.recordingCorrect &&
@@ -569,7 +769,7 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
                 "first successful frame preserves latest player, held and actor poses and masks");
         }
         for(unsigned edge=0;edge<5;++edge){
-            Scene s;Seed(s,oldMap,newMap);Proof p{&s};auto api=FrameApi(p);
+            auto sceneOwner=std::make_unique<Scene>();auto& s=*sceneOwner;Seed(s,oldMap,newMap);Proof p{&s};auto api=FrameApi(p);
             p.recordFailure=edge==0;p.recordThrow=edge==1;p.omitDefinitions=edge==2;
             p.wrongWorld=edge==3;p.resetDuringRecord=edge==4;
             failures+=!Check(!s.CommitStaticGeometryWithApi(41,api,error) && p.record==1 && p.retire==0 &&
@@ -581,13 +781,13 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
                 "failed fresh recording cannot destroy resources before recorded-work retirement proof");
         }
         {
-            Scene s;Seed(s,oldMap,newMap);Proof p{&s};auto api=FrameApi(p);p.descriptorFailure=true;
+            auto sceneOwner=std::make_unique<Scene>();auto& s=*sceneOwner;Seed(s,oldMap,newMap);Proof p{&s};auto api=FrameApi(p);p.descriptorFailure=true;
             failures+=!Check(!s.CommitStaticGeometryWithApi(41,api,error) && p.record==0 && p.retire==0 &&
                 s.staticVertexBuffer_.buffer==Handle<VkBuffer>(1) && s.preparedStaticGeometry_ && s.ready_,
                 "descriptor rejection rolls back before any first-frame command references the candidate");
         }
         {
-            Scene s; Seed(s,oldMap,newMap); Proof p{&s}; auto api=Api(p);
+            auto sceneOwner=std::make_unique<Scene>();auto& s=*sceneOwner; Seed(s,oldMap,newMap); Proof p{&s}; auto api=Api(p);
             failures+=!Check(s.CommitStaticGeometryWithApi(41,api,error),"valid current transaction commits");
             failures+=!Check(p.publicationCorrect && p.retirementCorrect && p.publish==1 && p.retire==1,
                 "completion precedes exact publication, cache invalidation and exactly-once retirement");
@@ -597,7 +797,7 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
                 "consumed/stale candidate cannot republish or retire twice");
         }
         for(unsigned edge=0;edge<16;++edge) {
-            Scene s; Seed(s,oldMap,newMap); Proof p{&s}; auto api=Api(p); std::uint64_t token=41;
+            auto sceneOwner=std::make_unique<Scene>();auto& s=*sceneOwner; Seed(s,oldMap,newMap); Proof p{&s}; auto api=Api(p); std::uint64_t token=41;
             switch(edge) {
                 case 0: token=0; break; case 1: token=40; break;
                 case 2: s.staticGeometryGeneration_=token=UINT64_MAX; s.preparedStaticGeometry_->sourceGeneration=token; break;
@@ -621,13 +821,13 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
             failures+=!Check(p.proof == ((edge==4 || edge==5 || edge==13)?1u:0u),"ineligible candidate never invokes external retirement proof");
         }
         {
-            Scene s; Seed(s,oldMap,newMap); Proof p{&s}; auto api=Api(p); p.succeed=false;
+            auto sceneOwner=std::make_unique<Scene>();auto& s=*sceneOwner; Seed(s,oldMap,newMap); Proof p{&s}; auto api=Api(p); p.succeed=false;
             failures+=!Check(!s.CommitStaticGeometryWithApi(41,api,error),"first proof fails");
             p.succeed=true; p.proof=0;
             failures+=!Check(s.CommitStaticGeometryWithApi(41,api,error) && p.retire==1,"unchanged candidate may retry after real proof succeeds");
         }
         {
-            Scene s; Seed(s,oldMap,newMap); Proof p{&s}; auto api=Api(p); p.descriptorFailure=true;
+            auto sceneOwner=std::make_unique<Scene>();auto& s=*sceneOwner; Seed(s,oldMap,newMap); Proof p{&s}; auto api=Api(p); p.descriptorFailure=true;
             failures+=!Check(!s.CommitStaticGeometryWithApi(41,api,error),"descriptor contract rejection fails cutover");
             failures+=!Check(s.staticGeometryGeneration_==41 && s.staticVertexBuffer_.buffer==Handle<VkBuffer>(1) &&
                 s.tlas_.handle==Handle<VkAccelerationStructureKHR>(8) && s.instanceBuffer_.mappedWriteData==&oldMap &&
@@ -638,14 +838,14 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
             failures+=!Check(s.CommitStaticGeometryWithApi(41,api,error) && p.retire==1,"same candidate retries after descriptor contract succeeds");
         }
         {
-            Scene s; Seed(s,oldMap,newMap); Proof p{&s}; auto api=Api(p); p.descriptorThrow=true;
+            auto sceneOwner=std::make_unique<Scene>();auto& s=*sceneOwner; Seed(s,oldMap,newMap); Proof p{&s}; auto api=Api(p); p.descriptorThrow=true;
             failures+=!Check(!s.CommitStaticGeometryWithApi(41,api,error) && p.retire==0 &&
                 s.staticGeometryGeneration_==41 && s.staticVertexBuffer_.buffer==Handle<VkBuffer>(1) &&
                 s.preparedStaticGeometry_ && s.chapterActorPoseGeneration_==17,
                 "descriptor preparation exception preserves both owners and old cache state");
         }
         {
-            Scene original; Seed(original,oldMap,newMap); Scene moved(std::move(original));
+            auto originalOwner=std::make_unique<Scene>();auto& original=*originalOwner; Seed(original,oldMap,newMap); auto movedOwner=std::make_unique<Scene>(std::move(original));auto& moved=*movedOwner;
             Proof p{&moved}; auto api=Api(p);
             failures+=!Check(!original.preparedStaticGeometry_ && moved.preparedStaticGeometry_ &&
                 moved.staticGeometryGeneration_==41 && moved.instanceBuffer_.mappedWriteData==&oldMap &&
@@ -653,7 +853,7 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
                 "scene move transfers the single candidate, generation and mapped owner before cutover");
         }
         {
-            Scene s; Seed(s,oldMap,newMap);
+            auto sceneOwner=std::make_unique<Scene>();auto& s=*sceneOwner; Seed(s,oldMap,newMap);
             s.preparedStaticGeometry_->ready=false;
             s.preparedStaticGeometry_->sourceGeneration=40;
             failures+=!Check(!s.AdvanceStaticGeometryReplacement(41,256u,error) &&
@@ -665,7 +865,7 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
                 "stale cancellation is idempotent and preserves admitted owner for preparation retry");
         }
         {
-            Scene s; Seed(s,oldMap,newMap); s.staticGeometryCompletionUnproved_=true;
+            auto sceneOwner=std::make_unique<Scene>();auto& s=*sceneOwner; Seed(s,oldMap,newMap); s.staticGeometryCompletionUnproved_=true;
             failures+=!Check(!s.CancelStaticGeometryReplacement(error) && s.preparedStaticGeometry_ &&
                 s.preparedStaticGeometry_->vertices.buffer==Handle<VkBuffer>(101),
                 "cancellation cannot free resources referenced by unproved GPU work");
@@ -674,7 +874,7 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
                 "completed work permits explicit cancellation without retiring admitted resources");
         }
         {
-            Scene s; Seed(s,oldMap,newMap);
+            auto sceneOwner=std::make_unique<Scene>();auto& s=*sceneOwner; Seed(s,oldMap,newMap);
             auto latest=s.tlasBuiltInstances_;
             latest[20].transform.matrix[0][3]=3.f;
             latest[21].transform.matrix[1][3]=4.f;
@@ -707,4 +907,4 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
     }
 };
 }
-int main() { return horde::vulkan::raytracing::PresentableTinyRtSceneStaticCutoverTestAccess::Run(); }
+int main() { std::cerr<<"sceneBytes="<<sizeof(horde::vulkan::raytracing::PresentableTinyRtScene)<<std::endl; return horde::vulkan::raytracing::PresentableTinyRtSceneStaticCutoverTestAccess::Run(); }

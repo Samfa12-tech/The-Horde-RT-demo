@@ -450,6 +450,59 @@ bool PrepareForestDressing(const std::filesystem::path& assetRoot,
     return true;
 }
 
+bool MeasurePreparedForestInstanceBounds(const PreparedForestDressing& prepared,
+    std::array<ForestDressingBounds, gameplay::simulation::kForestTreePlacementContract.size()>& bounds,
+    std::string& diagnostic)
+{
+    if(!ValidSharedForestPrepared(prepared,diagnostic))return false;
+    // A fixed-size value stages publication without copying either master.
+    std::array<ForestDressingBounds, gameplay::simulation::kForestTreePlacementContract.size()> staged{};
+    for(std::size_t i=0;i<prepared.placements.size();++i) {
+        const auto& placement=prepared.placements[i];
+        const auto& local=prepared.masters[placement.masterIndex].bounds;
+        const float c=std::cos(placement.yawRadians),s=std::sin(placement.yawRadians);
+        std::array<double,3> minimum,maximum,magnitude;
+        minimum.fill(std::numeric_limits<double>::max());
+        maximum.fill(std::numeric_limits<double>::lowest());
+        const double x=std::max(std::abs(double(local.minimum[0])),std::abs(double(local.maximum[0])));
+        const double y=std::max(std::abs(double(local.minimum[1])),std::abs(double(local.maximum[1])));
+        const double z=std::max(std::abs(double(local.minimum[2])),std::abs(double(local.maximum[2])));
+        magnitude={{std::abs(double(placement.origin[0]))+std::abs(double(c))*x+std::abs(double(s))*z,
+                    std::abs(double(placement.origin[1]))+y,
+                    std::abs(double(placement.origin[2]))+std::abs(double(s))*x+std::abs(double(c))*z}};
+        for(unsigned corner=0;corner<8;++corner) {
+            const double px=(corner&1)?local.maximum[0]:local.minimum[0];
+            const double py=(corner&2)?local.maximum[1]:local.minimum[1];
+            const double pz=(corner&4)?local.maximum[2]:local.minimum[2];
+            const std::array<double,3> world{{double(c)*px+double(s)*pz+placement.origin[0],
+                py+placement.origin[1],-double(s)*px+double(c)*pz+placement.origin[2]}};
+            for(std::size_t axis=0;axis<3;++axis) {
+                minimum[axis]=std::min(minimum[axis],world[axis]);
+                maximum[axis]=std::max(maximum[axis],world[axis]);
+            }
+        }
+        for(std::size_t axis=0;axis<3;++axis) {
+            // The same float c/s coefficients as VkTransformMatrixKHR above.
+            // Eight float epsilons of the absolute row sum exceed the rounding
+            // bound for its <=3 products/3 adds, including reordered/FMA paths.
+            // max(1,...) also reserves absolute space for tiny/subnormal inputs.
+            const double reserve=8.0*std::numeric_limits<float>::epsilon()*std::max(1.0,magnitude[axis]);
+            const double low=minimum[axis]-reserve,high=maximum[axis]+reserve;
+            if(!std::isfinite(low) || !std::isfinite(high) || low<-double(std::numeric_limits<float>::max()) ||
+               high>double(std::numeric_limits<float>::max())) {
+                diagnostic="Prepared forest instance bounds exceed finite float world space.";return false;
+            }
+            staged[i].minimum[axis]=std::nextafter(float(low),-std::numeric_limits<float>::infinity());
+            staged[i].maximum[axis]=std::nextafter(float(high),std::numeric_limits<float>::infinity());
+            if(!std::isfinite(staged[i].minimum[axis]) || !std::isfinite(staged[i].maximum[axis]) ||
+               staged[i].minimum[axis]>staged[i].maximum[axis]) {
+                diagnostic="Prepared forest instance bounds exceed finite float world space.";return false;
+            }
+        }
+    }
+    bounds=staged;diagnostic.clear();return true;
+}
+
 bool SeedPreparedForestMaterialFamilies(const PreparedForestDressing& prepared,
                                        assets::StaticMeshAsset& existingOwner,
                                        std::string& diagnostic)

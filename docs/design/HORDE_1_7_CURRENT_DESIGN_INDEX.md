@@ -2,6 +2,13 @@
 
 ## Current authority - 24 October 2026
 
+The [whole-instance shared64 retention proof](../evidence/2026-10-24-shared-forest-retention/README.md)
+now certifies13 complete placements in the bounded corridor, keeps both master
+BLAS resident, restores all64 for an unsafe current frame and matches actual RT
+controls/recreation. It remains Debug-only/default OFF. It does not reuse baked
+triangle certificates, evict memory, admit normal shared gameplay or close forest
+depth/phone gates. Original failed fixtures and corrected receipts are retained.
+
 Use [the current implementation/acceptance map](HORDE_1_7_IMPLEMENTATION_REMAINING_2026_10_24.md),
 before choosing work. Forest preparation `3108cffc`, the bounded shared-BLAS
 pair `3898bcee`, Android Custom ownership `9ab88eb0` and provisional output/

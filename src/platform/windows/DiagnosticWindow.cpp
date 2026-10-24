@@ -6114,6 +6114,8 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx, const bool startup
         using Mode=horde::vulkan::raytracing::PresentableTinyRtScene::ForestRouteProofMode;
         const auto mode=ctx.forestRouteProof==horde::platform::windows::ForestRouteCaptureMode::SharedExisting64?
             Mode::SharedExisting64:
+            ctx.forestRouteProof==horde::platform::windows::ForestRouteCaptureMode::SharedRetention64?
+            Mode::SharedRetention64:
             ctx.forestRouteProof==horde::platform::windows::ForestRouteCaptureMode::SharedF01Sector76?
             Mode::SharedF01Sector76:Mode::BakedResident;
         if(!ctx.rtScene.SetForestRouteProofMode(mode,diagnostic)){ctx.lastRtFrameError=diagnostic;return false;}
@@ -8478,6 +8480,59 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
              <<",\"after\":"<<context.rtScene.ForestRouteProofJson()<<"}\n";
         if(!WriteReportFile(outputDirectory/"forest-route-recreate.json",proof.str()) || !complete)
             return fail("Forest proof recreation changed its frozen pixels/resources or lacked a fresh scene epoch; evidence retained.");
+    }
+    if(context.forestRouteProof==horde::platform::windows::ForestRouteCaptureMode::SharedRetention64 &&
+       context.developmentCheckpoint.starts_with("chapter-forest-retention-")) {
+        // Bounded coherent restaging, not natural traversal. The existing
+        // checkpoint path resolves camera, hands and lights together; an unsafe
+        // source-pocket exit must retain every tree before that valid frame.
+        const auto* sourceView=horde::gameplay::FindDevelopmentCheckpoint(context.developmentCheckpoint);
+        if(!sourceView)return fail("Retention transition lacks its source checkpoint.");
+        std::string error;
+        if(!context.rtScene.ValidateForestRouteProof(error,true))return fail(error);
+        std::ostringstream proof;proof<<"{\"schema\":1,\"fault\":\"source-pocket-exit-restaging\",\"phases\":[";
+        std::uint64_t precedingSerial=context.rtFrameEvidence.PublishedStateByValue().completedEvidence.identity.submitted.submissionSerial;
+        for(unsigned phase=0;phase<2u;++phase) {
+            auto view=*sourceView;
+            if(phase==0u)view.cameraX=-28.f;
+            horde::vulkan::raytracing::PublishDevelopmentWorldReadiness(context.simulation,context.rtScene);
+            if(!horde::gameplay::StageDevelopmentCheckpointSimulation(context.simulation,view))
+                return fail("Retention transition could not coherently stage its diagnostic view.");
+            context.simulation.ResetTiming();context.simulation.ClearEvents();
+            context.simulation.SynchronizePausedInput(context.simulationInput,
+                context.simulation.Snapshot().inputPublicationSequence);
+            MirrorSimulationSnapshot(context);
+            const auto expectedTick=context.simulation.Snapshot().tickIndex;
+            bool presented=false;
+            const bool rendered=RenderFrame(context,clearColor,presented);
+            if(!rendered || !presented || context.lastFramePresentation!=horde::telemetry::RtPresentationOutcome::Presented ||
+               !CompleteRtEvidenceAfterDeviceIdle(context,vkDeviceWaitIdle(context.device)))
+                return fail("Retention guard transition lacks its completed current RT presentation.");
+            const auto publication=context.rtFrameEvidence.PublishedStateByValue();
+            const auto& completed=publication.completedEvidence;
+            const auto& submitted=completed.identity.submitted;
+            if(!publication.hasCompletedEvidence || submitted.submissionSerial<=precedingSerial ||
+               submitted.frame.sceneEpoch!=publication.sceneEpoch || submitted.frame.simulationTick!=expectedTick ||
+               !completed.scene.dispatch.rtDispatchRecorded || !completed.scene.dispatch.swapchainCopyRecorded ||
+               completed.presentation.lastSuccessfulPresentSubmissionSerial!=submitted.submissionSerial ||
+               !context.rtScene.ValidateForestRouteProof(error,phase!=0u))
+                return fail("Retention guard transition failed its exact submitted mask/identity decision: "+error);
+            precedingSerial=submitted.submissionSerial;
+            std::string canonical;horde::telemetry::RtEvidenceValidationError evidenceError{};
+            if(!horde::telemetry::SerializeRtPerformanceEvidenceJson(completed,canonical,evidenceError))
+                return fail("Retention transition evidence failed canonical serialization.");
+            if(phase)proof<<',';
+            proof<<"{\"phase\":\""<<(phase?"restored-safe":"unsafe-retained")<<"\",\"frame\":"<<canonical
+                 <<",\"forest\":"<<context.rtScene.ForestRouteProofJson()<<'}';
+        }
+        horde::vulkan::raytracing::PresentableTinyRtScene::StorageImageCapture restored;
+        if(!context.rtScene.CaptureStorageImage(restored,error))return fail("Retention restored image readback failed: "+error);
+        const auto restoredPath=outputDirectory/"forest-retention-restored.png";std::string restoredHash;
+        if(!WriteRgbaPng(restoredPath,restored,error) || !Sha256File(restoredPath,restoredHash,error))return fail(error);
+        const bool sameImage=!captures.empty() && restoredHash==captures.back().pngSha256;
+        proof<<"],\"restoredPixelsMatch\":"<<(sameImage?"true":"false")<<",\"complete\":"<<(sameImage?"true":"false")<<"}\n";
+        if(!WriteReportFile(outputDirectory/"forest-retention-transition.json",proof.str()) || !sameImage)
+            return fail("Retention restore changed frozen output; transition evidence retained.");
     }
 #endif
     if (!WriteCaptureManifest(outputDirectory, context, capabilities, captures, true, {}))

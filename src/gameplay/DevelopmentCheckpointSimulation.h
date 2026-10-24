@@ -311,7 +311,11 @@ inline bool StageDevelopmentCheckpointSimulation(
         input.tutorialEnabled = false;
         for (std::uint32_t tick = 0; tick < checkpoint.keeperDeathFixedTicks; ++tick)
             stepFixed(input, tickSeconds, gameSimulation.Snapshot().inputPublicationSequence + 1u);
-        return finalize(gameSimulation.Snapshot().lich.phase == LichPhase::Dead);
+        if(gameSimulation.Snapshot().lich.phase != LichPhase::Dead)return finalize(false);
+        // Explicit composed diagnostic: retain the real death clock while
+        // importing a separately requested frozen reward-hand pose below.
+        // Existing death-only views keep their original early completion.
+        if(checkpoint.rewardPose==DevelopmentRewardPose::None)return finalize(true);
     }
     if (checkpoint.stagesUnlockedChest)
     {

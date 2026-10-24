@@ -105,7 +105,7 @@ int main(int argc,char** argv) {
          "canonical chapter selections must request their actual authored GPU scene");
    chapterSelections+=expected;
   }
-  check(chapterSelections==37,"live journey and all36 chapter views, including both F03 directions and F04 sides, retain authored-scene admission");
+  check(chapterSelections==39,"live journey and all38 chapter views, including both F03 directions, F04 sides and retention views, retain authored-scene admission");
   for(const auto name:{"chapter-forest-clue-forward","chapter-forest-clue-reverse",
                        "chapter-forest-lookout-left","chapter-forest-lookout-right"}) {
    const auto* clue=FindDevelopmentCheckpoint(name);

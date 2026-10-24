@@ -1,0 +1,14 @@
+    Start  21: horde_rt_graphics_preview_tests
+1/5 Test  #21: horde_rt_graphics_preview_tests .............   Passed    0.03 sec
+    Start 112: horde_rt_development_static_asset_tests
+2/5 Test #112: horde_rt_development_static_asset_tests .....   Passed    7.52 sec
+    Start 206: horde_rt_static_geometry_cutover_tests
+3/5 Test #206: horde_rt_static_geometry_cutover_tests ......   Passed    5.27 sec
+    Start 222: horde_rt_rescue_journey_integration_tests
+4/5 Test #222: horde_rt_rescue_journey_integration_tests ...   Passed    3.37 sec
+    Start 223: horde_rt_chapter_terrain_journey_tests
+5/5 Test #223: horde_rt_chapter_terrain_journey_tests ......   Passed  198.27 sec
+
+100% tests passed, 0 tests failed out of 5
+
+Total Test time (real) = 214.48 sec

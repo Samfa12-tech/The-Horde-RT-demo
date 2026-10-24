@@ -48,6 +48,13 @@ Phone acceptance remains for the current HUD, earned equipment rotation, natural
 
 ## Execution queue
 
+The [whole-instance retention checkpoint](../evidence/2026-10-24-shared-forest-retention/README.md)
+proves a separate Debug-only mask seam:13 eligible whole trees, actual unsafe-frame
+all64 restoration, identical matched RT images and unchanged resident resources.
+No baked master-triangle omissions or production cutover guards were reused.
+Normal shared adoption, visible world depth, canopy decision and physical cost
+remain unfinished; this engine proof does not change their release status.
+
 1. Review the [actual F01 twelve-root trial](../evidence/2026-10-24-f01-forest-sector/README.md) and prepare one coherent woodland massing/terrain-enclosure choice. It renders, grounds and recreates correctly at small allocation cost, but remains visually sparse; do not call it finished or build wider collision integration before retaining a composition. Revisit replacement-canopy deferral explicitly if that path is selected. Normal adoption still needs generation-matched extra collision, omission/cutover and physical performance evidence.
 2. On the next authorized phone window, validate the implemented Android benchmark sizing/rollback and current touch controls. Desktop/source success is not device acceptance.
 3. Reconcile the [retained compact-carry endpoint failure](../evidence/2026-10-24-compact-carry-study/README.md) before another authored family or runtime candidate. Current tools/source are available; the gap is a useful feasible pose, not a claim that Blender or the rig is inaccessible.
