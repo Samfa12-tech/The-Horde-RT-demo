@@ -6885,9 +6885,8 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
             }
             if(ctx.lookoutKitInspectionMotion)frameInputs.chapterCompanion=*ctx.lookoutKitInspectionMotion;
             frameInputs.chapterCompanion.acting=ctx.lookoutKitInspectionActing;
-            if(frameInputs.chapterCompanion.motion.diagnosticEnabled &&
-               (!gLookoutInspectKitController || !ctx.simulationPaused || ctx.lookoutKitInspectionTurn)) {
-                ctx.lastRtFrameError="Shared Kit controller inspection requires its isolated paused mode without manual playback.";
+            if(frameInputs.chapterCompanion.motion.turnStartEnabled && ctx.lookoutKitInspectionTurn) {
+                ctx.lastRtFrameError="Shared Kit motion cannot mix with manual clip inspection.";
                 if(evidenceFrame)ctx.rtFrameEvidence.FailRecord(observation);
                 return false;
             }

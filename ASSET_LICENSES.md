@@ -441,6 +441,30 @@ remain the provenance; no new provider generation or blanket MIT/CC0 claim.
 This editable turn study and its studio previews are unadmitted and excluded from
 runtime packages. See `docs/evidence/2026-10-23-kit-step-turn-proof/README.md`.
 
+### Kit same-rig turn runtime promotion (24 October 2026)
+
+`assets/models/characters/runtime/kit-warden-v1/kit-warden-turn.runtime.glb`
+is a byte-identical promotion of the owned native export
+`assets/models/characters/source/kit-step-turn-proof-v1/native/kit-turn-proof.glb`:
+2,272,652 bytes, SHA-256
+`a72091cac1768f66353178247bde804af7e4b41dd482ccaad813215131583c11`.
+It retains the original seven animations, mesh, materials, skin/bind hierarchy,
+accessors and original binary payload, appending only the two offline-authored
+joint-only turn takes. The shared runtime applies the exported yaw separately
+and controls playback timing; no root yaw is embedded in those joint clips.
+
+The existing owner-confirmed Meshy Warden entitlement and Samfa12/Codex motion
+authoring provenance above apply. No new provider generation, texture processing,
+rig replacement or blanket MIT/CC0 claim occurs. Original source and
+`kit-warden-lod0.runtime.glb` remain unchanged in the repository. Development
+packages select the promoted derivative once, reusing the same manifest and
+platform texture arrays; they exclude the original duplicate, editable study,
+previews, root-motion/reference data and promotion receipt. The exact-copy and
+append-only checks are recorded in
+`assets/models/characters/runtime/kit-warden-v1/turn-runtime-promotion.json`.
+This records provenance and package selection, not a public release, physical
+phone or full campaign acceptance.
+
 ### Chapter terrain and shortened entry source candidates (11 October 2026)
 
 `assets/models/world/source/chapter-entry-return-r03/` preserves original Horde architectural authoring derived from the accepted collapse, reusing the existing Poly Haven Boulder01 rock and Boulder01/MedievalWall02 CC0 maps. `assets/models/world/source/chapter-terrain-r18/` is original Horde Blender authoring from the owner-supplied r2 heightfield, with admitted Poly Haven damp_sand/mossy_stone_wall CC0 materials. Individual texture/source hashes and derivation recipes remain with each candidate. The recovered original planning NPZ is under `assets/source/beyond_the_tomb/terrain/topo-r2/`. These sources and candidate GLBs are outside runtime package paths; native import and source validation do not grant final runtime/visual/performance acceptance. No blanket third-party licence change or new generation occurred.

@@ -931,7 +931,7 @@ public class MainActivity extends Activity {
                     stageAsset("textures/props/runtime/chapter-terrain/normal.android.ktx2", "textures/props/runtime/chapter-terrain/normal.android.ktx2") &&
                     stageAsset("textures/props/runtime/chapter-terrain/orm.android.ktx2", "textures/props/runtime/chapter-terrain/orm.android.ktx2") &&
                     stageAsset("models/characters/runtime/kit-warden-v1/asset.manifest.json", "models/characters/runtime/kit-warden-v1/asset.manifest.json") &&
-                    stageAsset("models/characters/runtime/kit-warden-v1/kit-warden-lod0.runtime.glb", "models/characters/runtime/kit-warden-v1/kit-warden-lod0.runtime.glb") &&
+                    stageAsset("models/characters/runtime/kit-warden-v1/kit-warden-turn.runtime.glb", "models/characters/runtime/kit-warden-v1/kit-warden-turn.runtime.glb") &&
                     stageAsset("textures/characters/runtime/kit-warden-v1/base-color.android.ktx2", "textures/characters/runtime/kit-warden-v1/base-color.android.ktx2") &&
                     stageAsset("textures/characters/runtime/kit-warden-v1/normal.android.ktx2", "textures/characters/runtime/kit-warden-v1/normal.android.ktx2") &&
                     stageAsset("textures/characters/runtime/kit-warden-v1/orm.android.ktx2", "textures/characters/runtime/kit-warden-v1/orm.android.ktx2") &&

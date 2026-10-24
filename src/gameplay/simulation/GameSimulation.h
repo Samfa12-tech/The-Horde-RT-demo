@@ -72,8 +72,8 @@ struct GameSimulationConfig
     // Current development gameplay; legacy constructor/capture fixtures retain
     // their authored rules unless the live application profile selects this.
     bool combatFoundation1_7 = false;
-    // Explicit isolated validation only; no platform setting or save field.
-    bool diagnosticCompanionTurnPrototype = false;
+    // Shared chapter presentation; historical constructor fixtures stay explicit.
+    bool companionTurnStart = false;
 };
 
 // Keep the historical constructor configuration available for deterministic
@@ -86,6 +86,8 @@ inline constexpr GameSimulationConfig ProductionGameSimulationConfig()
     config.waterfallSkeletonEncounter = true;
     config.swordStartsStowed = true;
     config.combatFoundation1_7 = true;
+    // Admission is pending the reproduced player-ahead tether/endpoint gate.
+    config.companionTurnStart = false;
     return config;
 }
 

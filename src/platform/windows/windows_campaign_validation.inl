@@ -461,7 +461,7 @@ int RunHiddenLookoutValidation(VulkanSurfaceContext& ctx,horde::vulkan::DeviceCa
             route.Step(1.f/60,playerX,playerZ,true,true,paused,terrain.get(),true,true);
             if(!paused) {++controllerTicks;route.AdvanceActing(1.f/60,inspectionSpeech,true,true,false);}
             const auto& p=route.State();const auto& m=p.motion;
-            return p.grounded && m.diagnosticEnabled && std::isfinite(p.yaw) &&
+            return p.grounded && m.turnStartEnabled && std::isfinite(p.yaw) &&
                 std::isfinite(m.speed) && m.speed>=0 && m.speed<=1.800001f &&
                 m.turnPhase>=0 && m.turnPhase<=1 && m.entryWeight>=0 && m.entryWeight<=1 &&
                 m.idleZeroWeight>=0 && m.idleZeroWeight<=1;
@@ -479,10 +479,10 @@ int RunHiddenLookoutValidation(VulkanSurfaceContext& ctx,horde::vulkan::DeviceCa
             std::string evidence,error;Image image;
             bool ok=pose.grounded && cameraGround.found && cameraGround.walkable && support.grounded && support.worldY==pose.y &&
                 render() && completed(false,evidence);
-            const auto published=ctx.rtScene.ChapterActorInspectionPublishedPose();
+            const auto published=ctx.rtScene.ChapterCompanionPublishedMotion();
             const auto submission=ctx.rtFrameEvidence.PublishedStateByValue().completedEvidence.identity.submitted.submissionSerial;
-            ok=ok && submission>previousSubmission && (pose.motion.diagnosticEnabled?
-                published && published->controllerMotion && *published->controllerMotion==pose.motion:!published) &&
+            ok=ok && submission>previousSubmission && published==pose.motion &&
+                !ctx.rtScene.ChapterActorInspectionPublishedPose() &&
                 ctx.rtScene.CaptureStorageImage(image,error) &&
                 WriteRgbaPng(gCampaignValidationDirectory/("windows-kit-controller-"+stage+".png"),image,error) &&
                 ctx.simulationPaused && storySame() && neutral();
@@ -499,7 +499,7 @@ int RunHiddenLookoutValidation(VulkanSurfaceContext& ctx,horde::vulkan::DeviceCa
                 <<",\"walking\":"<<(pose.walking?"true":"false")<<",\"waypoint\":"<<pose.waypoint
                 <<",\"wait\":"<<static_cast<unsigned>(pose.wait)<<",\"playerIntent\":["<<playerX<<','<<playerZ<<"]"
                 <<",\"proofInput\":true,\"idleSeconds\":"<<pose.animationSeconds<<",\"walkPhase\":"<<pose.locomotion.walkPhase
-                <<",\"walkWeight\":"<<pose.locomotion.walkWeight<<",\"motion\":{\"diagnosticEnabled\":"<<(m.diagnosticEnabled?"true":"false")
+                <<",\"walkWeight\":"<<pose.locomotion.walkWeight<<",\"motion\":{\"turnStartEnabled\":"<<(m.turnStartEnabled?"true":"false")
                 <<",\"mode\":"<<static_cast<unsigned>(m.mode)<<",\"speed\":"<<m.speed<<",\"turnPhase\":"<<m.turnPhase
                 <<",\"signedTurnAngleRadians\":"<<m.turnAngleRadians<<",\"entryWeight\":"<<m.entryWeight
                 <<",\"idleZeroWeight\":"<<m.idleZeroWeight<<"},\"speechMetadataLine\":"<<static_cast<unsigned>(inspectionSpeech.line)
@@ -507,7 +507,7 @@ int RunHiddenLookoutValidation(VulkanSurfaceContext& ctx,horde::vulkan::DeviceCa
                 <<"],\"camera\":["<<cameraX<<','<<cameraGround.worldY<<','<<cameraZ<<','<<cameraAzimuth+3.14159265359f<<','<<pitch
                 <<"],\"supportId\":"<<static_cast<unsigned>(support.id)<<",\"rtEvidence\":"<<(evidence.empty()?"null":evidence)<<'}';
             if(retained)*retained=std::move(image);
-            return check(ok,"isolated shared-controller snapshot matches published motion and a unique completed RT receipt without campaign mutation");
+            return check(ok,"shared-controller snapshot uses the normal actor and its published motion through a unique completed RT receipt");
         };
         const auto origin=route.State();
         unsigned waiting=0;
@@ -532,10 +532,8 @@ int RunHiddenLookoutValidation(VulkanSurfaceContext& ctx,horde::vulkan::DeviceCa
         Image control,restored;
         if(proceed)proceed=capture("control",ordinary,&control);
         std::string error;
-        if(proceed)proceed=check(ctx.rtScene.LoadChapterActorInspection(
-            std::filesystem::path(HORDE_RT_SOURCE_DIR)/"assets/models/characters/source/kit-step-turn-proof-v1/native",error),
-            "named-turn inspection actor loads only in the explicit paused Debug controller mode");
-        if(!error.empty())std::cerr<<"HORDE_KIT_CONTROLLER_ERROR "<<error<<'\n';
+        if(proceed)proceed=check(!ctx.rtScene.ChapterActorInspectionPublishedPose(),
+            "shared turn validation uses the packaged normal actor without loading a Debug inspection actor");
         if(proceed) {
             for(unsigned tick=0;tick<240;++tick) {
                 const auto old=legacy.State();legacy.Step(1.f/60,old.x-7,old.z,true,true,false,terrain.get(),true);
@@ -707,7 +705,7 @@ int RunHiddenLookoutValidation(VulkanSurfaceContext& ctx,horde::vulkan::DeviceCa
         if(proceed) {
             const auto generation=route.State().generation;route.Reset();
             const auto& reset=route.State();
-            proceed=check(reset.generation>generation && reset.motion.diagnosticEnabled && reset.motion.mode==Mode::Idle &&
+            proceed=check(reset.generation>generation && reset.motion.turnStartEnabled && reset.motion.mode==Mode::Idle &&
                 reset.motion.speed==0 && reset.motion.turnPhase==0 && reset.motion.turnAngleRadians==0 &&
                 reset.motion.entryWeight==0 && reset.motion.idleZeroWeight==0 && reset.animationSeconds==0 &&
                 reset.locomotion==dialogue::CompanionLocomotionPose{} && reset.acting==dialogue::CompanionActingPose{},
@@ -717,8 +715,8 @@ int RunHiddenLookoutValidation(VulkanSurfaceContext& ctx,horde::vulkan::DeviceCa
             cameraAzimuth=ordinary.yaw+.5f*headingError(heading(ordinary),ordinary.yaw);
             if(proceed)proceed=capture("restored",ordinary,&restored);
             controllerResetIdentical=proceed && sameImage(control,restored);
-            if(proceed)proceed=check(controllerResetIdentical && ctx.rtScene.ReleaseChapterActorInspection(error),
-                "cleared controller renders byte-identical original actor and releases candidate before scene retirement");
+            if(proceed)proceed=check(controllerResetIdentical && !ctx.rtScene.ChapterActorInspectionPublishedPose(),
+                "cleared controller renders byte-identical ordinary pose using the same normal actor before scene retirement");
             controllerActorReleased=proceed;
         }
         ctx.lookoutKitInspectionTurn.reset();ctx.lookoutKitInspectionMotion.reset();
@@ -984,7 +982,7 @@ int RunHiddenLookoutValidation(VulkanSurfaceContext& ctx,horde::vulkan::DeviceCa
         <<",\"controllerFirstWalkHeadingErrorRadians\":"<<controllerDepartureError
         <<",\"pauseImagesIdentical\":"<<(controllerPauseIdentical?"true":"false")
         <<",\"resetOrdinaryImageIdentical\":"<<(controllerResetIdentical?"true":"false")
-        <<",\"inspectionActorReleased\":"<<(controllerActorReleased?"true":"false")<<",\"frames\":["<<controllerEvidence.str()<<"]}"
+        <<",\"normalActorRestored\":"<<(controllerActorReleased?"true":"false")<<",\"inspectionActorUsed\":false,\"frames\":["<<controllerEvidence.str()<<"]}"
         <<",\"physicalVisibleAcceptance\":false,\"performanceEvidence\":false,\"ownerSettingsReadOrWritten\":false";
     return proceed && !failures?0:1;
 }

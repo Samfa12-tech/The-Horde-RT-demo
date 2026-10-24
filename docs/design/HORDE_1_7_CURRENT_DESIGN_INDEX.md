@@ -1,10 +1,18 @@
 # Horde 1.7 current design index
 
-Latest motion follow-up: the [single Kit turn retiming comparison](../evidence/2026-10-24-kit-turn-retiming/README.md)
+Latest admission status: the [normal-path WIP and gate diagnosis](../evidence/2026-10-24-kit-turn-admission/README.md)
+preserve the attempted shared renderer/asset integration with normal motion OFF.
+The endpoint fixture had an invalid camera-rebase resume; the earned route really
+outpaced the inherited six-metre escort rule. Host recovery evidence and remaining
+RT/Release/platform acceptance are recorded separately. Sam reviewed the video
+and likes both casual and urgent timings; context selection is still unimplemented.
+This WIP is not an accepted gameplay replacement.
+
+Earlier motion follow-up: the [single Kit turn retiming comparison](../evidence/2026-10-24-kit-turn-retiming/README.md)
 retains a 0.50-second diagnostic exchange, reducing the large departure from
 3.217 to 2.217 seconds with matched sampled contact poses and lifecycle checks.
-Normal gameplay stays OFF/unadmitted; pacing/owner review and broader acceptance
-remain open. Original clips/assets and earlier failed evidence are retained.
+Normal gameplay stays OFF/unadmitted; the later owner timing feedback above
+supersedes its pacing-review wait, while broader acceptance remains open. Original clips/assets and earlier failed evidence are retained.
 
 Start with the [current checkpoint reconciliation](HORDE_1_7_CHECKPOINT_RECONCILIATION_2026_10_23.md)
 at source e3486d73 for implemented/tested, desktop-only, phone/owner acceptance,

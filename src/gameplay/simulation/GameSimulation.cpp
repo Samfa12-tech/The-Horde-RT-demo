@@ -72,7 +72,7 @@ GameSimulation::GameSimulation(GameSimulationConfig config)
       playerYawRadians_(config.playerStartYawRadians),
       playerPitchRadians_(std::clamp(FiniteOr(config.playerStartPitchRadians, 0.0f),
                                     kMinimumPitch, kMaximumPitch)),
-      chapterCompanion_(config.diagnosticCompanionTurnPrototype)
+      chapterCompanion_(config.companionTurnStart)
 {
     if (!IsShowcasePlayerPositionWalkable(playerX_, playerZ_))
     {

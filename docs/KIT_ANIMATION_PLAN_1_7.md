@@ -1,5 +1,18 @@
 # KIT ANIMATION PLAN 1 7 — WP0 custody and reconciliation
 
+## Admission WIP and diagnosed gates — 24 October 2026
+
+The [retained WIP checkpoint](evidence/2026-10-24-kit-turn-admission/README.md)
+contains shared normal-actor loading/cache and platform staging, with normal motion
+OFF pending correctness and presentation acceptance. The invalid paused endpoint
+fixture is corrected through the existing neutral camera-rebase barrier. The
+unpaced earned route exposes the unchanged symmetric six-metre tether; recovery
+must use ordinary backtracking/escort input, never teleport or progress grants.
+Sam likes both reviewed timings for urgency versus casual. Preserve the original
+0.75-second and faster 0.50-second coordinated options; latch context only at a
+supported exchange boundary in a later bounded slice. No selection is implemented
+or production motion enabled in this checkpoint.
+
 ## Visual reassessment - 24 October 2026
 
 The [timestamped review](evidence/2026-10-24-kit-partial-contact/VISUAL_REASSESSMENT.md)

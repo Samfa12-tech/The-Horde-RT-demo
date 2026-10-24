@@ -9,6 +9,7 @@
 #include "scene/GraveyardDressing.h"
 #include "scene/RescueLidFinish.h"
 #include "scene/CompanionPose.h"
+#include "scene/CompanionAnimationAsset.h"
 #include "vulkan/raytracing/RtWorldSurfaceRange.h"
 #include "scene/assets/StaticPrimitiveGrouping.h"
 #include "vulkan/raytracing/RtWorldMaterialPalette.h"
@@ -640,6 +641,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     chapterActorWalking_ = std::exchange(other.chapterActorWalking_, false);
     chapterActorActing_ = std::exchange(other.chapterActorActing_, horde::gameplay::dialogue::CompanionActingPose{});
     chapterActorLocomotion_ = std::exchange(other.chapterActorLocomotion_, horde::gameplay::dialogue::CompanionLocomotionPose{});
+    chapterActorMotion_=std::exchange(other.chapterActorMotion_,std::nullopt);
     other.characterSlot_ = {};
     playerRenderSlot_ = std::move(other.playerRenderSlot_);
     other.playerRenderSlot_ = {};
@@ -1153,6 +1155,7 @@ horde::gameplay::simulation::ZoneReadiness PresentableTinyRtScene::WorldZoneRead
 }
 void PresentableTinyRtScene::Destroy()
 {
+    chapterActorMotion_.reset();
 #if HORDE_RT_ACTOR_WORKER_EXPERIMENT
     chapterPoseWorker_.reset(); // Also required on the device-null early path.
 #endif
@@ -2791,12 +2794,9 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
             !viewmodelSkin_.ValidateStaticVertexLayout(viewmodelAsset_, diagnostic)) return false;
     }
     if (sceneProfile_ == RtSceneProfile::Showcase && developmentRescueJourney_) {
-        horde::scene::SkinnedClipSet clips{};
-        clips.clips[0] = {"Warden|idle", true, true};
-        clips.clips[1] = {"Warden|walk", true, true};
-        clips.clips[2] = {"", false, false}; clips.clips[3] = {"", false, false};
+        const auto clips=horde::scene::CompanionTurnClipBindings();
         if (!chapterActor_.Load(root / "models/characters/runtime/kit-warden-v1",
-                "kit-warden-lod0.runtime.glb", clips, diagnostic)) return false;
+                horde::scene::kCompanionTurnRuntimeFile, clips, diagnostic)) return false;
         if (chapterActor_.Asset().primitives.size() != 1) {
             diagnostic = "The bounded chapter actor requires one indexed primitive."; return false;
         }
@@ -6622,29 +6622,16 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     }
 
     auto* companionActor=&chapterActor_;
-    auto companionClip=horde::scene::SkinnedClip::Idle;
-    float companionTime=frame.chapterCompanion.animationSeconds;
-    horde::scene::SkinnedClipBlend companionBlend{horde::scene::SkinnedClip::Walking,
-        frame.chapterCompanion.locomotion.walkPhase*chapterActor_.Duration(horde::scene::SkinnedClip::Walking),
-        frame.chapterCompanion.locomotion.walkWeight};
+    const auto companionRecipe=horde::scene::CompanionAnimation(frame.chapterCompanion,
+        chapterActor_.Duration(horde::scene::SkinnedClip::Walking));
+    auto companionClip=companionRecipe.clip;
+    float companionTime=companionRecipe.seconds;
+    auto companionBlend=companionRecipe.blend;
     bool companionHasBlend=true,inspectionChanged=false;
 #if defined(_DEBUG)
     auto diagnosticPose=frame.diagnosticChapterActor;
-    if(frame.chapterCompanion.motion.diagnosticEnabled) {
-        if(diagnosticPose) {diagnostic="Shared turn snapshot cannot mix with manual inspection playback.";return false;}
-        const auto recipe=horde::scene::CompanionAnimation(frame.chapterCompanion,
-            chapterActor_.Duration(horde::scene::SkinnedClip::Walking));
-        using Clip=ChapterActorInspectionPose::Clip;
-        const auto logical=[](horde::scene::SkinnedClip clip) {
-            return clip==horde::scene::SkinnedClip::TurnLeft?Clip::TurnLeft:
-                clip==horde::scene::SkinnedClip::TurnRight?Clip::TurnRight:
-                clip==horde::scene::SkinnedClip::Walking?Clip::Walk:Clip::Idle;
-        };
-        ChapterActorInspectionPose p;
-        p.clip=logical(recipe.clip);p.seconds=recipe.seconds;p.hasBlend=true;
-        p.blendClip=logical(recipe.blend.clip);p.blendSeconds=recipe.blend.timeSeconds;
-        p.weight=recipe.blend.weight;p.turnPhase=frame.chapterCompanion.motion.turnPhase;
-        p.controllerMotion=frame.chapterCompanion.motion;diagnosticPose=p;
+    if(frame.chapterCompanion.motion.turnStartEnabled && diagnosticPose) {
+        diagnostic="Shared turn snapshot cannot mix with manual inspection playback.";return false;
     }
     const bool inspectCompanion=diagnosticPose.has_value();
     inspectionChanged=diagnosticPose!=chapterInspectionLast_;
@@ -6672,10 +6659,6 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         companionBlend={mapped(p.blendClip),seconds(p.blendClip,p.blendSeconds),p.weight};
         companionHasBlend=p.hasBlend;
     }
-#else
-    if(frame.chapterCompanion.motion.diagnosticEnabled) {
-        diagnostic="Opt-in companion turn prototype requires the Debug inspection actor.";return false;
-    }
 #endif
 #if HORDE_RT_ACTOR_WORKER_EXPERIMENT
     // The immutable frame owns all request inputs. Kit has a distinct skin/
@@ -6687,7 +6670,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
          chapterActorPoseSeconds_ != frame.chapterCompanion.animationSeconds ||
          chapterActorWalking_ != frame.chapterCompanion.walking ||
          chapterActorActing_ != frame.chapterCompanion.acting ||
-         chapterActorLocomotion_ != frame.chapterCompanion.locomotion);
+         chapterActorLocomotion_ != frame.chapterCompanion.locomotion ||
+         chapterActorMotion_ != frame.chapterCompanion.motion);
     if (prepareCompanion) {
 #if defined(_DEBUG)
         if(chapterWorkerUsesInspection_!=inspectCompanion) {
@@ -7059,7 +7043,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         chapterActorPoseSeconds_ != frame.chapterCompanion.animationSeconds ||
         chapterActorWalking_ != frame.chapterCompanion.walking ||
         chapterActorActing_ != frame.chapterCompanion.acting ||
-        chapterActorLocomotion_ != frame.chapterCompanion.locomotion)) {
+        chapterActorLocomotion_ != frame.chapterCompanion.locomotion ||
+        chapterActorMotion_ != frame.chapterCompanion.motion)) {
         horde::scene::SkinWorkMetrics companionWork;
 #if HORDE_RT_ACTOR_WORKER_EXPERIMENT
         if (!chapterPoseJob.Active()) {
@@ -7102,6 +7087,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         chapterActorWalking_ = frame.chapterCompanion.walking;
         chapterActorActing_ = frame.chapterCompanion.acting;
         chapterActorLocomotion_ = frame.chapterCompanion.locomotion;
+        chapterActorMotion_=frame.chapterCompanion.motion;
 #if defined(_DEBUG)
         chapterInspectionLast_=diagnosticPose;
 #endif

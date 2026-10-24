@@ -8,6 +8,7 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <sstream>
 
 namespace cp=horde::gameplay::campaign;
 namespace sim=horde::gameplay::simulation;
@@ -16,6 +17,31 @@ namespace fs=std::filesystem;
 namespace {
 int checks=0,failures=0;
 void Check(bool value,const char* message){++checks;if(!value){++failures;std::cerr<<"FAIL: "<<message<<'\n';}}
+void DumpKitState(std::ostream& out,const char* label,const sim::SimulationSnapshot& s,const sim::InputSnapshot& in) {
+    const auto& k=s.chapterCompanion;const auto& m=k.motion;const auto& d=s.chapterDialogue;
+    using Phase=horde::gameplay::traversal::Phase;
+    const bool traversing=s.rescue.phase!=Phase::LowerSafe && s.rescue.phase!=Phase::UpperSafe;
+    const bool alive=s.playerVitals.phase==horde::gameplay::PlayerLifePhase::Alive;
+    const auto pp=sim::ProjectWorldRoute(s.playerX,s.playerZ),kp=sim::ProjectWorldRoute(k.x-1,k.z);
+    out<<std::setprecision(9)<<"KIT_STATE "<<label<<" tick="<<s.tickIndex<<" publication="<<s.inputPublicationSequence
+       <<" player="<<s.playerX<<','<<s.playerSupportWorldY<<','<<s.playerZ<<" kit="<<k.x<<','<<k.y<<','<<k.z
+       <<" distance="<<std::hypot(s.playerX-k.x,s.playerZ-k.z)<<" playerRoute="<<pp.segment<<':'<<pp.fraction
+       <<" kitRoute="<<kp.segment<<':'<<kp.fraction<<" waypoint="<<k.waypoint<<" wait="<<unsigned(k.wait)
+       <<" mode="<<unsigned(m.mode)<<" phase="<<m.turnPhase<<" turnEnabled="<<m.turnStartEnabled
+       <<" turnAngle="<<m.turnAngleRadians<<" entry="<<m.entryWeight<<" speed="<<m.speed
+       <<" walking="<<k.walking<<" grounded="<<k.grounded<<" yaw="<<k.yaw
+       <<" active="<<(alive&&!traversing)<<" exterior="<<(s.developmentRescueJourney&&s.rescue.exteriorSide)
+       <<" alive="<<alive<<" playerAlive="<<s.playerAlive<<" life="<<unsigned(s.playerVitals.phase)
+       <<" traversal="<<unsigned(s.rescue.phase)<<" equipmentStowed="<<s.rescue.equipmentStowed
+       <<" paused="<<s.paused<<" inputPaused="<<in.paused<<" playerSpeed="<<s.playerMovementSpeedMetresPerSecond
+       <<" inputAxes="<<in.moveForward<<','<<in.moveStrafe<<" actualAxes="<<s.movementForward<<','<<s.movementStrafe
+       <<" travelled="<<s.playerTravelledThisTick<<" run="<<in.runHeld<<" tutorial="<<in.tutorialEnabled
+       <<" teaching="<<unsigned(s.combatTeaching.stage)<<" timeScale="<<s.gameplayTimeScale
+       <<" story="<<unsigned(d.line)<<':'<<d.elapsed<<'/'<<d.duration<<" proof="<<d.proofAccepted
+       <<" waitingRaise="<<d.waitingForRaise<<" forestFlags="<<d.forestNightConsumed<<','<<d.forestWaystoneConsumed
+       <<','<<d.forestClueConsumed<<','<<d.forestVillageConsumed<<" zone="<<unsigned(s.worldRoute.current)
+       <<" worldBlocked="<<s.worldRoute.blocked<<'\n';
+}
 struct Directory {
     fs::path path=fs::temp_directory_path()/("horde-play-session-test-"+std::to_string(std::chrono::steady_clock::now().time_since_epoch().count()));
     Directory(){if(!fs::create_directory(path))throw std::runtime_error("exclusive test root failed");std::ofstream(path/"owned.txt")<<"fixture";}
@@ -214,11 +240,14 @@ int CheckActualReturnRecovery(const fs::path& requested,const std::shared_ptr<co
 // Earning uses no checkpoint imports, restore seeds, authoritative poses or
 // direct logical mutation: movement, sword edges, chest interaction and rope
 // motor only. Recovery then loads only the records this journey really wrote.
-void NormalBoundaryJourney(const std::shared_ptr<const sim::TriangleSupportSurface>& terrain) {
+void NormalBoundaryJourney(const std::shared_ptr<const sim::TriangleSupportSurface>& terrain,
+                          bool diagnoseTurnStart=false) {
     using namespace horde::gameplay;
     namespace tr=horde::gameplay::traversal;
     Directory directory;
-    sim::GameSimulation game(sim::ProductionGameSimulationConfig());
+    auto config=sim::ProductionGameSimulationConfig();
+    if(diagnoseTurnStart)config.companionTurnStart=true;
+    sim::GameSimulation game(config);
     game.StartLiveDevelopmentRescueJourney(true);
     for(std::size_t zone=1;zone<sim::kWorldZones.size();++zone)
         Check(game.PublishChapterTerrain({game.Snapshot().worldRoute.generation,static_cast<sim::WorldZoneId>(zone)},terrain),
@@ -227,8 +256,23 @@ void NormalBoundaryJourney(const std::shared_ptr<const sim::TriangleSupportSurfa
     sim::InputSnapshot input;input.damageEnabled=false;input.tutorialEnabled=false;
     std::uint64_t publication=0;
     bool observedVillageSpeech=false;
+    float maximumKitDistance=0;std::uint64_t laggingTicks=0;
+    std::string firstLagState,firstPlayerAheadLagState;
     const auto step=[&](){
         game.StepFixed(input,1.f/60.f,++publication);game.ClearEvents();
+        const auto& s=game.Snapshot();const auto& k=s.chapterCompanion;
+        if(s.rescue.exteriorSide && s.chapterDialogue.proofAccepted) {
+            maximumKitDistance=std::max(maximumKitDistance,std::hypot(s.playerX-k.x,s.playerZ-k.z));
+            if(k.wait==dialogue::CompanionWait::PlayerLagging) {
+                ++laggingTicks;
+                if(firstLagState.empty()){std::ostringstream out;DumpKitState(out,"first-lag",s,input);firstLagState=out.str();}
+                const auto pp=sim::ProjectWorldRoute(s.playerX,s.playerZ),kp=sim::ProjectWorldRoute(k.x-1,k.z);
+                const bool ahead=pp.valid&&kp.valid&&(pp.segment>kp.segment || (pp.segment==kp.segment && pp.fraction>kp.fraction));
+                if(ahead && firstPlayerAheadLagState.empty()) {
+                    std::ostringstream out;DumpKitState(out,"first-player-ahead-lag",s,input);firstPlayerAheadLagState=out.str();
+                }
+            }
+        }
         if(!observedVillageSpeech && game.Snapshot().chapterDialogue.line==dialogue::Line::ForestVillage) {
             observedVillageSpeech=true;
             Check(!game.CaptureAuthoredCampaignBoundary(cp::CheckpointId::ForestEndpoint),
@@ -304,7 +348,7 @@ void NormalBoundaryJourney(const std::shared_ptr<const sim::TriangleSupportSurfa
     const auto retainedManual=Raw(Path(directory,0,cp::SaveKind::Manual));
     Check(retainedManual==earnedLower.encoded,"earned lower manual and automatic records contain the same coherent checkpoint");
     {
-        sim::GameSimulation fresh(sim::ProductionGameSimulationConfig());cp::PlaySession reloaded(fresh,directory.path);
+        sim::GameSimulation fresh(config);cp::PlaySession reloaded(fresh,directory.path);
         sim::InputSnapshot freshInput;std::uint64_t freshPublication=0;
         if(!LoadEarnedBoundary(reloaded,fresh,cp::SaveKind::Manual,earnedLower,terrain,freshInput,freshPublication))return;
         Check(!fresh.Snapshot().rescue.exteriorSide && !fresh.Snapshot().rescue.firstAscentCompleted &&
@@ -340,7 +384,7 @@ void NormalBoundaryJourney(const std::shared_ptr<const sim::TriangleSupportSurfa
           earnedUpper.checkpoint.position==tr::kExteriorLanding && retainedManual==Raw(Path(directory,0,cp::SaveKind::Manual)),
           "committed earned exterior autosave retains the earlier lower manual bytes");
     {
-        sim::GameSimulation fresh(sim::ProductionGameSimulationConfig());cp::PlaySession reloaded(fresh,directory.path);
+        sim::GameSimulation fresh(config);cp::PlaySession reloaded(fresh,directory.path);
         sim::InputSnapshot freshInput;std::uint64_t freshPublication=0;
         if(!LoadEarnedBoundary(reloaded,fresh,cp::SaveKind::Autosave,earnedUpper,terrain,freshInput,freshPublication))return;
         Check(fresh.Snapshot().rescue.exteriorSide && fresh.Snapshot().rescuePrompt==tr::RescuePrompt::Descend,
@@ -353,7 +397,7 @@ void NormalBoundaryJourney(const std::shared_ptr<const sim::TriangleSupportSurfa
               "interrupted earned return descent retains the committed exterior record, never a mid-rope save");
     }
     {
-        sim::GameSimulation fresh(sim::ProductionGameSimulationConfig());cp::PlaySession reloaded(fresh,directory.path);
+        sim::GameSimulation fresh(config);cp::PlaySession reloaded(fresh,directory.path);
         sim::InputSnapshot freshInput;std::uint64_t freshPublication=0;
         if(!LoadEarnedBoundary(reloaded,fresh,cp::SaveKind::Autosave,earnedUpper,terrain,freshInput,freshPublication))return;
         Check(fresh.Snapshot().rescue.exteriorSide && !fresh.Snapshot().rescue.equipmentStowed,
@@ -398,7 +442,80 @@ void NormalBoundaryJourney(const std::shared_ptr<const sim::TriangleSupportSurfa
         if(game.LatestCampaignBoundary() && game.LatestCampaignBoundary()->id==cp::CheckpointId::ForestEndpoint)break;
         step();
     }
+    if(diagnoseTurnStart) {
+        // Retain the unpaced workload above as a negative witness. Turning
+        // adds genuine waiting time: an unattended player can outrun the
+        // existing symmetric 6 m escort rule. No checkpoint is owed here.
+        const auto stranded=game.Snapshot();
+        const auto& k=stranded.chapterCompanion;
+        Check(std::hypot(stranded.playerX-k.x,stranded.playerZ-k.z)>6.f &&
+              k.wait==dialogue::CompanionWait::PlayerLagging && !k.walking &&
+              k.waypoint<sim::kWorldRoutePoints.size() &&
+              !game.CaptureAuthoredCampaignBoundary(cp::CheckpointId::ForestEndpoint) &&
+              game.LatestCampaignBoundary() &&
+              game.LatestCampaignBoundary()->id==cp::CheckpointId::SafeExit,
+              "unpaced candidate really stops at the unchanged tether and cannot earn an incomplete endpoint");
+        const float heldX=k.x,heldZ=k.z;
+        for(unsigned tick=0;tick<120;++tick)step();
+        Check(game.Snapshot().chapterCompanion.x==heldX && game.Snapshot().chapterCompanion.z==heldZ,
+              "waiting outside the tether does not secretly move or teleport Kit");
+        // Walk BACK through the authored trail, never set Kit/player transforms.
+        // Station 6 is within range of this observed corner. The controller must
+        // resume under the same policy when the player returns.
+        const auto corner=sim::kWorldRoutePoints[6];
+        if(!walk(corner.x,corner.z)){Check(false,"ordinary backtracking returns within the stranded escort tether");return;}
+        bool resumed=false,tetherRespected=true;unsigned escortWaitTicks=0;float recoveredMaximumDistance=0;
+        const auto destination=sim::kWorldRoutePoints.back();
+        bool reached=false;
+        for(unsigned tick=0;tick<2400;++tick) {
+            const float distance=aimMove(destination.x,destination.z);
+            const auto& s=game.Snapshot();const float dx=s.chapterCompanion.x-s.playerX,dz=s.chapterCompanion.z-s.playerZ;
+            recoveredMaximumDistance=std::max(recoveredMaximumDistance,std::hypot(dx,dz));
+            const auto beforeKit=s.chapterCompanion;
+            // Same deliberate walking/waiting policy as the existing native
+            // route acceptance driver. This changes test INPUT, never tether,
+            // motor speed, progression, support, clocks or saved state.
+            input.runHeld=false;
+            if(std::hypot(dx,dz)>3.f && dx*std::sin(input.yawRadians)-dz*std::cos(input.yawRadians)<0) {
+                input.moveForward=input.moveStrafe=0;++escortWaitTicks;
+            }
+            step();const auto& after=game.Snapshot();const auto& afterKit=after.chapterCompanion;
+            const bool translated=afterKit.x!=beforeKit.x || afterKit.z!=beforeKit.z;
+            // The six-metre rule gates Kit's translation using this tick's
+            // updated player position; it does not constrain where the player
+            // may walk. A leading Kit can be outside range while we rejoin.
+            if(translated)tetherRespected&=std::hypot(after.playerX-beforeKit.x,after.playerZ-beforeKit.z)<=6.f;
+            resumed|=afterKit.walking;
+            if(distance<.035f){reached=true;break;}
+        }
+        input.moveForward=input.moveStrafe=0;input.yawRadians=2.51f;input.pitchRadians=-.15f;
+        for(unsigned tick=0;tick<1800;++tick) {
+            if(game.LatestCampaignBoundary() && game.LatestCampaignBoundary()->id==cp::CheckpointId::ForestEndpoint)break;
+            step();
+        }
+        const auto& recovered=game.Snapshot().chapterCompanion;
+        std::cout<<"KIT_ESCORT_RECOVERY strandedDistance="<<std::hypot(stranded.playerX-heldX,stranded.playerZ-heldZ)
+                 <<" resumed="<<resumed<<" waitTicks="<<escortWaitTicks<<" reached="<<reached
+                 <<" recoveredMaximumDistance="<<recoveredMaximumDistance
+                 <<" tetherRespected="<<tetherRespected
+                 <<" waypoint="<<recovered.waypoint<<" position="<<recovered.x<<','<<recovered.z<<'\n';
+        // Returning can give Kit enough head start that no explicit wait is
+        // necessary. Assert the actual escort invariant, not a forced pause.
+        Check(reached && resumed && tetherRespected && recovered.grounded &&
+              recovered.waypoint==sim::kWorldRoutePoints.size(),
+              "ordinary return and deliberate escort pacing recover the candidate without changing any route rule");
+    }
     const auto endpoint=game.LatestCampaignBoundary();
+    if(!(endpoint && endpoint->id==cp::CheckpointId::ForestEndpoint && endpoint->contentRevision==2 &&
+          endpoint->zone==sim::WorldZoneId::Lookout && endpoint->dialogue.proofAccepted &&
+          endpoint->dialogue.forestNightConsumed && endpoint->dialogue.forestWaystoneConsumed &&
+          endpoint->dialogue.forestClueConsumed && endpoint->dialogue.forestVillageConsumed &&
+          endpoint->dialogue.activeLine==dialogue::Line::None && endpoint->dialogue.continuationCount==0)) {
+        DumpKitState(std::cerr,"missing-forest-boundary",game.Snapshot(),input);
+        std::cerr<<"KIT_ROUTE_HISTORY maximumDistance="<<maximumKitDistance<<" laggingTicks="<<laggingTicks
+                 <<" retainedBoundary="<<(endpoint?static_cast<int>(endpoint->id):-1)<<'\n'
+                 <<firstLagState<<firstPlayerAheadLagState;
+    }
     Check(observedVillageSpeech,"ordinary F04 arrival reaches the actual admitted village speech");
     Check(endpoint && endpoint->id==cp::CheckpointId::ForestEndpoint && endpoint->contentRevision==2 &&
           endpoint->zone==sim::WorldZoneId::Lookout && endpoint->dialogue.proofAccepted &&
@@ -432,7 +549,7 @@ void NormalBoundaryJourney(const std::shared_ptr<const sim::TriangleSupportSurfa
           play.State().operationRevision==endpointOperation && Raw(Path(directory,0,cp::SaveKind::Autosave))==earnedEndpoint.encoded,
           "exterior exploration cannot downgrade the endpoint or repeatedly autosave it");
     {
-        sim::GameSimulation fresh(sim::ProductionGameSimulationConfig());cp::PlaySession reloaded(fresh,directory.path);
+        sim::GameSimulation fresh(config);cp::PlaySession reloaded(fresh,directory.path);
         sim::InputSnapshot freshInput;std::uint64_t freshPublication=0;
         if(!LoadEarnedBoundary(reloaded,fresh,cp::SaveKind::Autosave,earnedEndpoint,terrain,freshInput,freshPublication))return;
         const auto operation=reloaded.State().operationRevision;
@@ -536,7 +653,8 @@ int main(int argc,char** argv){
     if(argc==3 && std::string_view(argv[1])=="--export-route-fixture")return ExportFixtures(argv[2],{},true);
     const bool exportLookout=argc==3 && std::string_view(argv[1])=="--export-lookout-fixture";
     const bool actualReturn=argc==3 && std::string_view(argv[1])=="--check-actual-return-recovery";
-    if(argc!=1 && !exportLookout && !actualReturn)return 2;
+    const bool turnDiagnosis=argc==2 && std::string_view(argv[1])=="--diagnose-kit-turn-route";
+    if(argc!=1 && !exportLookout && !actualReturn && !turnDiagnosis)return 2;
     const auto assets=fs::path(HORDE_RT_SOURCE_DIR)/"assets/models/world/runtime/chapter-terrain-v1";
     horde::scene::assets::AssetManifest manifest;horde::scene::assets::StaticMeshAsset mesh;std::string error;
     if(!horde::scene::assets::AssetManifest::Load(assets/"asset.manifest.json",manifest,error) ||
@@ -545,6 +663,11 @@ int main(int argc,char** argv){
     const auto terrain=horde::scene::PrepareChapterTerrainSurface(mesh,error);if(!terrain){std::cerr<<error;return 1;}
     if(exportLookout)return ExportFixtures(argv[2],terrain);
     if(actualReturn)return CheckActualReturnRecovery(argv[2],terrain);
+    if(turnDiagnosis) {
+        NormalBoundaryJourney(terrain,true);
+        std::cout<<checks<<" opt-in earned-route diagnosis checks, "<<failures<<" failures\n";
+        return failures?1:0;
+    }
     Directory directory;Faults faults;
     Check(io::Write(directory.path,cp::SaveBasename(*cp::SaveTarget(0,cp::SaveKind::Manual)),Record(1)).status==io::Status::Committed,"seed first manual");
     Check(io::Write(directory.path,cp::SaveBasename(*cp::SaveTarget(2,cp::SaveKind::Manual)),Record(2,true)).status==io::Status::Committed,"seed third manual");

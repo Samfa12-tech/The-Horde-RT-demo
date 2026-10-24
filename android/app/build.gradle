@@ -491,7 +491,7 @@ tasks.register('prepareRuntimeAssets', Sync) {
         include 'textures/props/runtime/chapter-terrain/normal.android.ktx2'
         include 'textures/props/runtime/chapter-terrain/orm.android.ktx2'
         include 'models/characters/runtime/kit-warden-v1/asset.manifest.json'
-        include 'models/characters/runtime/kit-warden-v1/kit-warden-lod0.runtime.glb'
+        include 'models/characters/runtime/kit-warden-v1/kit-warden-turn.runtime.glb'
         include 'textures/characters/runtime/kit-warden-v1/base-color.android.ktx2'
         include 'textures/characters/runtime/kit-warden-v1/normal.android.ktx2'
         include 'textures/characters/runtime/kit-warden-v1/orm.android.ktx2'

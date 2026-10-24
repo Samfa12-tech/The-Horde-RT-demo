@@ -2,6 +2,7 @@
 #include "scene/assets/StaticMeshAsset.h"
 #include "scene/assets/SkinnedPbrActor.h"
 #include "scene/CompanionPose.h"
+#include "scene/CompanionAnimationAsset.h"
 #include "gameplay/dialogue/CompanionRouteFixture.h"
 #include <algorithm>
 #include <array>
@@ -301,11 +302,11 @@ bool CheckCompanionBlend(horde::scene::assets::SkinnedPbrActor& actor,
         return state.grounded && state.walking!=lagging &&
             (lagging || std::abs(std::hypot(state.x-before.x,state.z-before.z)-1.8f*dt)<1e-4f);
     };
-    for(unsigned i=0;i<20;++i)if(!check(advance(false,0,i==19),"production route primes unchanged accepted walking distance"))return false;
-    for(unsigned i=0;i<12;++i)if(!check(advance(true,1,true),"production player-lagging stop retains grounded route root"))return false;
-    for(unsigned i=0;i<12;++i)if(!check(advance(false,2,true),"production route resumes unchanged accepted walking distance"))return false;
+    for(unsigned i=0;i<20;++i)if(!check(advance(false,0,i==19),"legacy route compatibility primes unchanged accepted walking distance"))return false;
+    for(unsigned i=0;i<12;++i)if(!check(advance(true,1,true),"legacy player-lagging stop retains grounded route root"))return false;
+    for(unsigned i=0;i<12;++i)if(!check(advance(false,2,true),"legacy route compatibility resumes unchanged accepted walking distance"))return false;
     if(!check(frames[12].pose.locomotion.walkWeight==0 && frames.back().pose.locomotion.walkWeight==1,
-        "production stop/start snapshots reach both exact blend endpoints"))return false;
+        "legacy stop/start snapshots retain both exact blend endpoints"))return false;
     if(!check(actor.Pose(SkinnedClip::Idle,0,diagnostic),"boot subset reference admits"))return false;
     const auto contract=actor.Asset();std::vector<std::size_t> boots;
     for(std::size_t i=0;i<contract.vertices.size();++i)if(contract.vertices[i].position[1]<.25f)boots.push_back(i);
@@ -450,9 +451,10 @@ int CompareCandidate(const std::filesystem::path& path,const std::filesystem::pa
     return 0;
 }
 
-// Opt-in source-proof validation only. Ordinary intake below keeps the admitted
-// runtime roster and does not discover or bind turn clips implicitly.
-int ValidateNamedTurnBindings(const std::filesystem::path& path) {
+// Validate the exact named roster shared with normal Kit loading. The optional
+// CLI still accepts a source candidate; ordinary intake also checks the selected
+// production derivative while retaining all original source/runtime gates.
+int ValidateNamedTurnBindings(const std::filesystem::path& path,bool normalRuntime=false) {
     using namespace horde::scene;
     std::size_t checks=0,failures=0;
     std::string diagnostic;
@@ -462,13 +464,10 @@ int ValidateNamedTurnBindings(const std::filesystem::path& path) {
     };
     const auto finish=[&] {
         std::cout<<"Kit named turn bindings checks="<<checks<<" failures="<<failures
-            <<" runtime_admission=NO\n";
+            <<(normalRuntime?" normal_runtime_contract=CHECKED":" runtime_admission=NO")<<'\n';
         return failures?1:0;
     };
-    const std::array<SkinnedClipBinding,6> bindings{{
-        {"Warden|idle",true,true},{"Warden|walk",true,true},
-        {"",false,false},{"",false,false},
-        {"KitProof|turn_left",false,true},{"KitProof|turn_right",false,true}}};
+    const auto bindings=CompanionTurnClipBindings();
     SkinnedClipSet legacy{};
     std::copy_n(bindings.begin(),legacy.clips.size(),legacy.clips.begin());
     const std::filesystem::path originalDirectory=HORDE_KIT_RUNTIME_DIRECTORY;
@@ -476,7 +475,14 @@ int ValidateNamedTurnBindings(const std::filesystem::path& path) {
     const auto filename=path.filename().string();
     SkinnedMeshAsset original,fourSlot,named;
     assets::SkinnedPbrActor originalActor,namedActor;
-    if(!check(static_cast<unsigned>(SkinnedClip::Idle)==0 && static_cast<unsigned>(SkinnedClip::Walking)==1 &&
+    if(!check(bindings.size()==6 && bindings[0].name=="Warden|idle" && bindings[0].loops && bindings[0].required &&
+              bindings[1].name=="Warden|walk" && bindings[1].loops && bindings[1].required &&
+              bindings[2].name.empty() && !bindings[2].loops && !bindings[2].required &&
+              bindings[3].name.empty() && !bindings[3].loops && !bindings[3].required &&
+              bindings[4].name=="KitProof|turn_left" && !bindings[4].loops && bindings[4].required &&
+              bindings[5].name=="KitProof|turn_right" && !bindings[5].loops && bindings[5].required,
+              "normal companion roster binds exactly the original Idle/Walk and two nonloop named turns with no combat aliases") ||
+       !check(static_cast<unsigned>(SkinnedClip::Idle)==0 && static_cast<unsigned>(SkinnedClip::Walking)==1 &&
               static_cast<unsigned>(SkinnedClip::Attack)==2 && static_cast<unsigned>(SkinnedClip::Dead)==3 &&
               static_cast<unsigned>(SkinnedClip::TurnLeft)==4 && static_cast<unsigned>(SkinnedClip::TurnRight)==5,
               "existing enum IDs and appended named turn IDs remain stable") ||
@@ -597,6 +603,7 @@ int main(int argc,char** argv) {
     std::size_t poses=0;int failures=CheckAnalyticTangentFrames()?0:1;
     const std::filesystem::path runtimeDirectory=HORDE_KIT_RUNTIME_DIRECTORY;
     const auto runtimePath=runtimeDirectory/"kit-warden-lod0.runtime.glb";
+    const auto turnRuntimePath=runtimeDirectory/kCompanionTurnRuntimeFile;
     assets::AssetManifest manifest;assets::StaticMeshAsset staticAsset;std::string admission;
     if(!assets::AssetManifest::Load(runtimeDirectory/"asset.manifest.json",manifest,admission)||
        !assets::StaticMeshAsset::Load(runtimePath,manifest,staticAsset,admission)||
@@ -650,9 +657,11 @@ int main(int argc,char** argv) {
         if(!model.LoadClips(HORDE_KIT_SOURCE_CANDIDATE,bindings,diagnostic)) {
             std::cerr<<"Native clip import rejected "<<name<<": "<<diagnostic<<'\n';++failures;continue;
         }
-        SkinnedMeshAsset runtimeModel;
+        SkinnedMeshAsset runtimeModel,turnRuntimeModel;
         if(!runtimeModel.LoadClips(runtimePath.string(),bindings,diagnostic)||
-           !runtimeModel.ValidateStaticVertexLayout(staticAsset,diagnostic)) {
+           !runtimeModel.ValidateStaticVertexLayout(staticAsset,diagnostic)||
+           !turnRuntimeModel.LoadClips(turnRuntimePath.string(),bindings,diagnostic)||
+           !turnRuntimeModel.ValidateStaticVertexLayout(staticAsset,diagnostic)) {
             std::cerr<<"Runtime Kit skin/static layout rejected: "<<diagnostic<<'\n';return 1;
         }
         const float duration=model.ClipDuration(SkinnedClip::Idle);
@@ -690,6 +699,12 @@ int main(int argc,char** argv) {
                    std::memcmp(repeatedTangents.data(),tangents.data(),tangents.size()*sizeof(tangents[0]))) {
                     std::cerr<<"Runtime derivative changed a native source skin pose/tangent\n";++failures;
                 }
+                if(!turnRuntimeModel.SkinUniquePbr(SkinnedClip::Idle,fraction*duration,repeated,repeatedTangents,diagnostic)||
+                   repeated.size()!=unique.size()||repeatedTangents.size()!=tangents.size()||
+                   std::memcmp(repeated.data(),unique.data(),unique.size()*sizeof(unique[0]))||
+                   std::memcmp(repeatedTangents.data(),tangents.data(),tangents.size()*sizeof(tangents[0]))) {
+                    std::cerr<<"Selected turn runtime changed an original native clip pose/tangent\n";++failures;
+                }
             }
             std::vector<TexturedSkinnedRtVertex> vertices;
             if(!model.SkinTextured(SkinnedClip::Idle,fraction*duration,vertices,diagnostic)||vertices.empty()) {
@@ -724,7 +739,11 @@ int main(int argc,char** argv) {
         if(model.SkinUniquePbr(static_cast<SkinnedClip>(255),0,rejected,rejectedTangents,diagnostic)||
            !rejected.empty()||!rejectedTangents.empty()) ++failures;
     }
+    // Keep the original seven-clip/35-pose source guard above. The selected
+    // runtime additionally has the two named turns; it must pass the shared
+    // six-slot roster, optional-hole, endpoint and original Idle/Walk byte gates.
+    if(ValidateNamedTurnBindings(runtimeDirectory/kCompanionTurnRuntimeFile,true)!=0)++failures;
     std::cout<<"Kit source intake clips=7 sampled_poses="<<poses<<" failures="<<failures
-        <<" runtime_admission=NO\n";
+        <<" normal_turn_runtime_contract=CHECKED\n";
     return failures?1:0;
 }

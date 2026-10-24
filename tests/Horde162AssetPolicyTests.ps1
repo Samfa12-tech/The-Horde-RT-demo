@@ -229,7 +229,7 @@ try {
                        'textures/props/runtime/chapter-terrain/normal.android.ktx2',
                        'textures/props/runtime/chapter-terrain/orm.android.ktx2',
                        'models/characters/runtime/kit-warden-v1/asset.manifest.json',
-                       'models/characters/runtime/kit-warden-v1/kit-warden-lod0.runtime.glb',
+                       'models/characters/runtime/kit-warden-v1/kit-warden-turn.runtime.glb',
                        'textures/characters/runtime/kit-warden-v1/base-color.android.ktx2',
                        'textures/characters/runtime/kit-warden-v1/normal.android.ktx2',
                        'textures/characters/runtime/kit-warden-v1/orm.android.ktx2',
@@ -406,6 +406,10 @@ try {
     Expect-Failure {Assert-Horde162Package $repo $archive Windows} 'malformed nonempty directory'
     $kitArchive=New-FixtureArchive 'foreign-kit-master.zip' Windows -EmptyFile 'assets/audio/kit/master.wav'
     Expect-Failure {Assert-Horde162Package $repo $kitArchive Windows} 'closed runtime roster'
+    $kitArchive=New-FixtureArchive 'duplicate-original-kit-model.zip' Windows -EmptyFile 'assets/models/characters/runtime/kit-warden-v1/kit-warden-lod0.runtime.glb'
+    Expect-Failure {Assert-Horde162Package $repo $kitArchive Windows} 'closed runtime roster'
+    $kitArchive=New-FixtureArchive 'kit-promotion-receipt.zip' Android -EmptyFile 'assets/models/characters/runtime/kit-warden-v1/turn-runtime-promotion.json'
+    Expect-Failure {Assert-Horde162Package $repo $kitArchive Android} 'closed runtime roster'
     $archive=New-FixtureArchive 'zero-byte-foreign-file.zip' Windows -EmptyFile 'assets/audio/pixabay/foreign.wav'
     Expect-Failure {Assert-Horde162Package $repo $archive Windows} 'closed runtime roster'
     $archive=New-FixtureArchive 'foreign-empty-directory.zip' Windows -Directories @('assets/textures/environment/source/')
@@ -413,7 +417,7 @@ try {
     foreach($case in @(
         @{Name='missing-cue';Platform='Windows';Omit='assets/audio/pixabay/keeper_i_sense_you.wav'},
         @{Name='missing-kit-grate';Platform='Windows';Omit='assets/audio/kit/runtime/prologue.kit_grate.wav'},
-        @{Name='missing-kit-model';Platform='Windows';Omit='assets/models/characters/runtime/kit-warden-v1/kit-warden-lod0.runtime.glb'},
+        @{Name='missing-kit-model';Platform='Windows';Omit='assets/models/characters/runtime/kit-warden-v1/kit-warden-turn.runtime.glb'},
         @{Name='missing-kit-normal';Platform='Android';Omit='assets/textures/characters/runtime/kit-warden-v1/normal.android.ktx2'},
         @{Name='kit-private-source';Platform='Windows';Extra='assets/models/characters/source/private.blend'},
         @{Name='kit-private-texture';Platform='Android';Extra='assets/textures/characters/source/master.png'},
@@ -483,7 +487,7 @@ try {
         @{Name='corrupt-sword-sheath';Platform='Android';Path='assets/audio/filmcow/equipment/sword_sheath.wav'},
         @{Name='corrupt-equipment-manifest';Platform='Android';Path='assets/audio/filmcow/equipment/asset.manifest.json'},
         @{Name='corrupt-kit-rope';Platform='Android';Path='assets/audio/kit/runtime/rescue.rope.wav'},
-        @{Name='corrupt-kit-visual';Platform='Android';Path='assets/models/characters/runtime/kit-warden-v1/kit-warden-lod0.runtime.glb'},
+        @{Name='corrupt-kit-visual';Platform='Android';Path='assets/models/characters/runtime/kit-warden-v1/kit-warden-turn.runtime.glb'},
         @{Name='corrupt-kit-map';Platform='Windows';Path='assets/textures/characters/runtime/kit-warden-v1/base-color.windows.ktx2'},
         @{Name='corrupt-scabbard-glb';Platform='Windows';Path='assets/models/props/runtime/player-sword-scabbard/player-sword-scabbard-lod0.runtime.glb'},
         @{Name='corrupt-scabbard-receipt';Platform='Android';Path='assets/models/props/runtime/player-sword-scabbard/processing-receipt.json'},

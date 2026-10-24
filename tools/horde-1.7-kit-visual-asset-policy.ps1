@@ -2,7 +2,7 @@
 function Get-Horde17KitVisualAssetSpecification {
     @(
         [pscustomobject]@{ Path='models/characters/runtime/kit-warden-v1/asset.manifest.json'; Bytes=754; Sha256='0218c5f3f122c1be51af356e4b63689c38da9efebb4d03fb06d716a3055b5c57'; Platform='Both'; Kind='Json' },
-        [pscustomobject]@{ Path='models/characters/runtime/kit-warden-v1/kit-warden-lod0.runtime.glb'; Bytes=2151672; Sha256='1ba628235814b5912ae1439b180347dd8e1cce85b0f4d1fae5bbacb41e7d3713'; Platform='Both'; Kind='Glb' },
+        [pscustomobject]@{ Path='models/characters/runtime/kit-warden-v1/kit-warden-turn.runtime.glb'; Bytes=2272652; Sha256='a72091cac1768f66353178247bde804af7e4b41dd482ccaad813215131583c11'; Platform='Both'; Kind='Glb' },
         [pscustomobject]@{ Path='textures/characters/runtime/kit-warden-v1/base-color.windows.ktx2'; Bytes=5592908; Sha256='4597dd3294dfab20870b8aa7be6ecad8795e18ebe5715020e387ead852334d17'; Platform='Windows'; Kind='PropsKtx'; Format=43; Layers=1 },
         [pscustomobject]@{ Path='textures/characters/runtime/kit-warden-v1/normal.windows.ktx2'; Bytes=5592908; Sha256='bba3cc54df1272ac33384a05dc2c7662425452f695788f98dc4b1d4ee0cfc73f'; Platform='Windows'; Kind='PropsKtx'; Format=37; Layers=1 },
         [pscustomobject]@{ Path='textures/characters/runtime/kit-warden-v1/orm.windows.ktx2'; Bytes=5592908; Sha256='b7f66cde46ea516af41f140b216b091ee394120adad2fca9571365016c57df80'; Platform='Windows'; Kind='PropsKtx'; Format=37; Layers=1 },

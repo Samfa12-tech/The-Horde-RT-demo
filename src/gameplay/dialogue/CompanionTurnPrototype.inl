@@ -1,7 +1,7 @@
-    // Included privately by CompanionRouteFixture. This diagnostic branch owns
+    // Included privately by CompanionRouteFixture. This shared turn/start branch owns
     // no resources, platform clock, saved state or alternate collision policy.
     void ClearMotion() {
-        state_.motion={};state_.motion.diagnosticEnabled=diagnosticTurnPrototype_;
+        state_.motion={};state_.motion.turnStartEnabled=turnStartEnabled_;
         turnElapsed_=entryElapsed_=0;turnStartYaw_=entryStartWeight_=0;
     }
     static float HeadingError(float target,float current) {
@@ -14,7 +14,7 @@
         turnStartYaw_=state_.yaw;turnElapsed_=entryElapsed_=0;
         entryStartWeight_=m.idleZeroWeight;m.entryWeight=entryStartWeight_;
     }
-    void StepPrototype(float dt,float playerX,float playerZ,bool exterior,bool proof,bool paused,
+    void StepTurnStart(float dt,float playerX,float playerZ,bool exterior,bool proof,bool paused,
                        const simulation::TriangleSupportSurface* terrain,bool requireTerrain,bool active) {
         if(paused) {state_.wait=CompanionWait::Paused;return;}
         if(!std::isfinite(dt)||dt<=0)return;

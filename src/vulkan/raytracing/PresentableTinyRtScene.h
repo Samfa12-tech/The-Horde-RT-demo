@@ -124,7 +124,6 @@ struct ChapterActorInspectionPose {
     Clip clip=Clip::Idle,blendClip=Clip::Walk;
     float seconds=0,turnPhase=0,blendSeconds=0,weight=0;
     bool hasBlend=false;
-    std::optional<horde::gameplay::dialogue::CompanionMotionPose> controllerMotion;
     bool operator==(const ChapterActorInspectionPose&) const=default;
 };
 #endif
@@ -306,6 +305,9 @@ public:
                     RtBundleCompiledPipelineCache* compiledPipelineCache = nullptr);
 
     void Destroy();
+    std::optional<horde::gameplay::dialogue::CompanionMotionPose> ChapterCompanionPublishedMotion() const {
+        return thirdActorIsCompanion_?chapterActorMotion_:std::nullopt;
+    }
 #if defined(_DEBUG)
     bool LoadChapterActorInspection(const std::filesystem::path& directory,std::string& diagnostic);
     bool ReleaseChapterActorInspection(std::string& diagnostic);
@@ -1284,6 +1286,7 @@ private:
     bool chapterActorWalking_ = false;
     horde::gameplay::dialogue::CompanionActingPose chapterActorActing_{};
     horde::gameplay::dialogue::CompanionLocomotionPose chapterActorLocomotion_{};
+    std::optional<horde::gameplay::dialogue::CompanionMotionPose> chapterActorMotion_;
     PlayerRenderSlot playerRenderSlot_;
     horde::scene::assets::StaticMeshAsset developmentStaticAsset_;
     horde::scene::assets::StaticMeshAsset collapseStaticAsset_;

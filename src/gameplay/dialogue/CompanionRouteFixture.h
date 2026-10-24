@@ -18,11 +18,11 @@ struct CompanionSnapshot {
     std::size_t waypoint=4;std::uint64_t generation=1;
     CompanionActingPose acting{};
     CompanionLocomotionPose locomotion{};
-    CompanionMotionPose motion{}; // Transient diagnostic recipe, never serialized.
+    CompanionMotionPose motion{}; // Transient shared recipe, never serialized.
 };
 class CompanionRouteFixture {
 public:
-    explicit CompanionRouteFixture(bool diagnosticTurnPrototype=false):diagnosticTurnPrototype_(diagnosticTurnPrototype) {ClearMotion();}
+    explicit CompanionRouteFixture(bool turnStartEnabled=false):turnStartEnabled_(turnStartEnabled) {ClearMotion();}
     const CompanionSnapshot& State() const {return state_;}
     void Reset() { const auto gen=state_.generation;state_={};acting_.Reset();locomotion_.Reset();ClearMotion();state_.generation=gen==UINT64_MAX?gen:gen+1; }
     void AdvanceActing(float seconds,const Snapshot& speech,bool exterior,bool alive,bool freshVisibleProof) {
@@ -51,7 +51,7 @@ public:
     }
     void Step(float dt,float playerX,float playerZ,bool exterior,bool proof,bool paused,
               const simulation::TriangleSupportSurface* terrain=nullptr,bool requireTerrain=false,bool active=true) {
-        if(diagnosticTurnPrototype_) {StepPrototype(dt,playerX,playerZ,exterior,proof,paused,terrain,requireTerrain,active);return;}
+        if(turnStartEnabled_) {StepTurnStart(dt,playerX,playerZ,exterior,proof,paused,terrain,requireTerrain,active);return;}
         if(paused) {state_.wait=CompanionWait::Paused;return;}
         if(!std::isfinite(dt) || dt<=0) {
             if(requireTerrain&&!terrain) {state_.grounded=false;state_.walking=false;state_.wait=CompanionWait::Preparing;}
@@ -118,7 +118,7 @@ private:
     CompanionSnapshot state_{};
     CompanionActing acting_{};
     CompanionLocomotion locomotion_{};
-    bool diagnosticTurnPrototype_=false;
+    bool turnStartEnabled_=false;
     double turnElapsed_=0,entryElapsed_=0;
     float turnStartYaw_=0,entryStartWeight_=0;
 };

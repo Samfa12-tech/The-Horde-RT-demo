@@ -217,11 +217,17 @@ int main(int argc,char** argv) {
        "paused probe must retain its phase without advancing input or moving the player");
     }
     unsigned frames=0,raises=0;bool walkingReunion=false,recognition=false;std::uint64_t lastRaise=moving.Snapshot().lastConsumedToggleHeldLightPoseSequence;
+    std::uint64_t walkingViewStart=0,walkingViewLast=0,walkingViewTicks=0;
     std::array<bool,static_cast<unsigned>(ChapterProbePhase::Failed)+1> seen{};
     while(frames++<10000 && probe.Phase()!=ChapterProbePhase::Complete && probe.Phase()!=ChapterProbePhase::Failed) {
      seen[static_cast<unsigned>(probe.Phase())]=true;
      walkingReunion|=probe.Phase()==ChapterProbePhase::Raise && moving.Snapshot().chapterCompanion.walking &&
         moving.Snapshot().chapterCompanion.animationSeconds>=.3f;
+     if(probe.Phase()==ChapterProbePhase::Raise && moving.Snapshot().chapterCompanion.walking) {
+      const auto tick=moving.Snapshot().tickIndex;
+      if(walkingViewLast+1!=tick)walkingViewStart=tick;
+      walkingViewLast=tick;walkingViewTicks=std::max(walkingViewTicks,tick-walkingViewStart);
+     } else walkingViewLast=0;
      recognition|=moving.Snapshot().chapterDialogue.proofAccepted && moving.Snapshot().chapterCompanion.acting.recognitionActive &&
         moving.Snapshot().chapterCompanion.acting.headPitch>.03f;
      check(moving.Snapshot().chapterDialogue.proofAccepted || !moving.Snapshot().chapterCompanion.acting.recognitionActive,
@@ -238,6 +244,7 @@ int main(int argc,char** argv) {
     }
     check(probe.Phase()==ChapterProbePhase::Complete && frames<10000,"actual terrain two-way probe stalled or failed");
     check(walkingReunion,"probe did not inspect the available walking clip after a real fresh raise");
+    check(walkingViewTicks>=60,"probe must retain a full second of actual walking view after planted departure, not only proof elapsed time");
     check(recognition,"actual shared fresh-raise journey must publish Kit recognition motion");
     const auto& s=moving.Snapshot();
     check(raises==1 && s.chapterDialogue.proofAccepted && s.rescue.sawDescent && s.rescue.firstAscentCompleted &&

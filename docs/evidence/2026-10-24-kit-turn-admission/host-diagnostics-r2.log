@@ -1,0 +1,28 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+    Start 37: horde_rt_campaign_play_session_tests
+1/2 Test #37: horde_rt_campaign_play_session_tests ...***Failed   25.67 sec
+ordinary lower live=-34.0119,-17.5184 boundary=1 rope=1
+ordinary upper live=-33.7,-13.3383 speed=1.9 boundary=1
+KIT_STATE missing-forest-boundary tick=8815 publication=8359 player=13.2776079,-1.14001238,36.1789436 kit=-2.74891996,-0.263705194,20.1823368 distance=22.6437855 playerRoute=6:0.998683214 kitRoute=5:0.996501029 waypoint=7 wait=1 mode=0 phase=1 turnEnabled=1 turnAngle=0.407718182 entry=1 speed=0 walking=0 grounded=1 yaw=-3.95816851 active=1 exterior=1 alive=1 playerAlive=1 life=0 traversal=4 equipmentStowed=0 paused=0 inputPaused=0 playerSpeed=0 inputAxes=0,0 actualAxes=0,0 travelled=0 run=0 tutorial=0 teaching=0 timeScale=1 story=0:0/2.17379189 proof=1 waitingRaise=0 forestFlags=1,1,1,1 zone=3 worldBlocked=0
+KIT_ROUTE_HISTORY maximumDistance=22.6437855 laggingTicks=2648 retainedBoundary=2
+KIT_STATE first-lag tick=4548 publication=4092 player=-28.7155037,1.45260453,-5.82338047 kit=-23.1102524,1.11067533,-3.68165064 distance=6.00048733 playerRoute=2:0.99674058 kitRoute=3:0.353057444 waypoint=4 wait=1 mode=3 phase=1 turnEnabled=1 turnAngle=-0.376009464 entry=1 speed=0 walking=0 grounded=1 yaw=-4.27998209 active=1 exterior=1 alive=1 playerAlive=1 life=0 traversal=4 equipmentStowed=0 paused=0 inputPaused=0 playerSpeed=0 inputAxes=0,0 actualAxes=0,0 travelled=0 run=0 tutorial=0 teaching=0 timeScale=1 story=9:2.49999833/3.33362508 proof=1 waitingRaise=0 forestFlags=0,0,0,0 zone=2 worldBlocked=0
+KIT_STATE first-player-ahead-lag tick=6485 publication=6029 player=1.14134872,-0.43146944,24.7675667 kit=-2.74891996,-0.263705194,20.1823368 distance=6.01319599 playerRoute=6:0.285108149 kitRoute=5:0.996501029 waypoint=7 wait=1 mode=1 phase=0 turnEnabled=1 turnAngle=0.407718182 entry=0.462962985 speed=0 walking=0 grounded=1 yaw=-4.36588669 active=1 exterior=1 alive=1 playerAlive=1 life=0 traversal=4 equipmentStowed=0 paused=0 inputPaused=0 playerSpeed=1.89999998 inputAxes=1,0 actualAxes=1,0 travelled=0.0316667669 run=0 tutorial=0 teaching=0 timeScale=1 story=13:2.16666532/4.21654177 proof=1 waitingRaise=0 forestFlags=1,1,1,0 zone=3 worldBlocked=0
+FAIL: actual completed trail and quiescent speech earn one coherent forest checkpoint
+121 campaign play session checks, 1 failures
+
+    Start 46: horde_rt_companion_locomotion_tests
+2/2 Test #46: horde_rt_companion_locomotion_tests ....***Failed    4.45 sec
+KIT_ENDPOINT_MOVEMENT initialTick=1 finalTick=152 initialPublication=0 finalPublication=0 initialPlayer=13.3,7,36.2 finalPlayer=13.3,7,36.2 displacement=0 inputAxes=0,1 actualAxes=0,0 playerSpeed=0 travelled=0 kit=14.3,7,36.2 distance=1 waypoint=8 wait=5 mode=0 phase=0 turnEnabled=1 yaw=-1.5708 grounded=1 walking=0 active=1 exterior=1 alive=1 life=0 paused=1 inputPaused=0 traversal=4 equipmentStowed=0 proof=1 story=0 forestFlags=1,1,1,1 tutorial=1 teaching=3 timeScale=1 worldBlocked=0
+FAIL: normal simulation requests planted turning from ordinary live player movement at the completed endpoint
+companion locomotion checks=2337 failures=1 routeTicks=2254
+
+
+0% tests passed, 2 tests failed out of 2
+
+Total Test time (real) =  30.14 sec
+
+The following tests FAILED:
+	 37 - horde_rt_campaign_play_session_tests (Failed)
+	 46 - horde_rt_companion_locomotion_tests (Failed)
+Errors while running CTest

@@ -83,12 +83,17 @@ public:
             input.yawRadians=std::atan2(s.chapterCompanion.x-s.playerX,s.playerZ-s.chapterCompanion.z);
             input.pitchRadians=-.10f;
             if(!raiseIssued_) {++raise_;input.commands.toggleHeldLightPose=raise_;raiseIssued_=true;}
-            // Hold the actual reunion view for one simulated second after its
-            // accepted presentation, so the available walking clip is inspected
-            // before the running probe can outpace the companion.
+            // The old proof+60 gate could leave while Kit was still planted in
+            // his departure turn. Keep the view until real travel begins, then
+            // inspect one full simulated second of walking before running on.
+            // The unchanged phase/whole-run budgets still reject a stuck Kit.
             if(s.chapterDialogue.proofAccepted) {
                 if(!proofTick_)proofTick_=s.tickIndex;
-                if(s.tickIndex-proofTick_>=60)SetPhase(ChapterProbePhase::Outbound,s,4);
+                if(s.chapterCompanion.walking) {
+                    if(!walkingTick_)walkingTick_=s.tickIndex;
+                } else walkingTick_=0;
+                if(walkingTick_ && s.tickIndex-proofTick_>=60 && s.tickIndex-walkingTick_>=60)
+                    SetPhase(ChapterProbePhase::Outbound,s,4);
             }
             break;
         case ChapterProbePhase::Outbound:
@@ -185,7 +190,7 @@ private:
     unsigned sweepTicks_=1;
     std::uint64_t generation_=0,lastTick_=0,phaseTick_=0,sweepTick_=0;
     std::uint64_t interact_=0,raise_=0,clearRun_=0;
-    std::uint64_t proofTick_=0;
+    std::uint64_t proofTick_=0,walkingTick_=0;
     bool matchedViews_=false;
     bool sweepStarted_=false,raiseIssued_=false,interactionIssued_=false;
     simulation::WorldRoutePoint lowerReturn_{};

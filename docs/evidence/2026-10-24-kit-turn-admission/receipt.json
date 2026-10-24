@@ -1,0 +1,130 @@
+{
+  "status": "UNADMITTED_WIP_NORMAL_OFF",
+  "baseCommit": "60e1d51894c7bc197f81ae5c7774f6256ebb9e21",
+  "normalTurnStartEnabled": false,
+  "runtimePolicyChangedThisDiagnosis": false,
+  "phoneUsed": false,
+  "rtPresentationTestedOnThisWip": false,
+  "ownerParkedFileCount": 151,
+  "ownerParkedFilesChanged": [],
+  "assetPolicyChecks": 201,
+  "sourceIntakeOriginalClips": 7,
+  "sourceIntakeSampledPoses": 35,
+  "namedBindingChecks": 61,
+  "companionChecks": 2342,
+  "companionFailures": 0,
+  "debugCampaignCTest": "TIMEOUT_30.01_SECONDS_GATE_UNCHANGED",
+  "earnedRouteDiagnostic": {
+    "checks": 94,
+    "failures": 0,
+    "seconds": 48.4840454,
+    "unpacedFailurePreserved": true,
+    "artificialProgressGranted": false,
+    "sixMetreTranslationRulePreserved": true
+  },
+  "logs": {
+    "host-tests-r1-failed.log": {
+      "bytes": 1466,
+      "sha256": "b422972fe103c33ba4e81dd60dd6784061b84e37c6e3a02153f96ee548cc42ea"
+    },
+    "host-diagnostics-r2.log": {
+      "bytes": 3673,
+      "sha256": "1eb14f13d3dde7cc3ee7f70b654ff76ff2c7fdd1c6b4dc74acb525e1f8e5d0ba"
+    },
+    "host-diagnosis-r3.log": {
+      "bytes": 742,
+      "sha256": "758ac12f164049595d0e9559cc7d21a927a53e8cc3ba7a28b6aaea854ebdb81c"
+    },
+    "last-test-r3.log": {
+      "bytes": 2001,
+      "sha256": "990d077d25ec33397e6136e0f06b17ab4c4c33d6186e56f6382ab2d8cdf5e2bf"
+    },
+    "earned-route-diagnosis-r4.log": {
+      "bytes": 387,
+      "sha256": "8019bb329653e4f3b984e4b2a2eacb7efc8c6dbceed64cd19fb016c4f9d7f2ee"
+    },
+    "earned-route-diagnosis-r5.log": {
+      "bytes": 420,
+      "sha256": "055d9f885378c83cbe14a0ac63f9bdb08d4c6f89ac7434cdbd5ec455b921d605"
+    },
+    "earned-route-diagnosis-r6.log": {
+      "bytes": 332,
+      "sha256": "b5bc6dd625be9cbf12dce1e13cb4fa9658ffa026ae654d4d1cf57748cd5a459f"
+    },
+    "asset-policy.log": {
+      "bytes": 281,
+      "sha256": "3e23d5921515db52ef6c9f52eb069e30071043edc0d437c2a843143520b13b7b"
+    },
+    "promoted-intake.log": {
+      "bytes": 4089,
+      "sha256": "4f6e41d6c727cced8c3c738cfac38f04ce0a56334dc56a2169e4649f9d068b4a"
+    },
+    "build-diagnosis-r3.log": {
+      "bytes": 1990,
+      "sha256": "058b8958ebb2260880b3edfa585a1112b2e381eea2db9e67e6f9037158bfbc38"
+    },
+    "build-route-diagnosis-r6.log": {
+      "bytes": 1083,
+      "sha256": "bc79b219878583c487ffac69ea7ed6942c4a80ba521ed2cb9c446306f0b4184f"
+    },
+    "build-normal-off.log": {
+      "bytes": 2028,
+      "sha256": "5cfd09c2bc0c484b05068b33ddfd08038d64ee16bca44adf844348b33588fab2"
+    }
+  },
+  "inputs": {
+    "src/gameplay/simulation/GameSimulation.h": {
+      "bytes": 22528,
+      "sha256": "5087537164ae9c4e81f6e7dd439531ea33c2f1de927c2a95a17fb4d7e8697597"
+    },
+    "src/gameplay/simulation/GameSimulation.cpp": {
+      "bytes": 141311,
+      "sha256": "5f969582fe829e91f830ff138466ec5b09b5e496d0f11c40e61a624083729977"
+    },
+    "src/gameplay/dialogue/CompanionRouteFixture.h": {
+      "bytes": 7881,
+      "sha256": "753414dfb9ddf24a42ae119b4aa7238db3d1e49a5f7dccb167d0adf3b318be15"
+    },
+    "src/gameplay/dialogue/CompanionTurnPrototype.inl": {
+      "bytes": 7311,
+      "sha256": "e07bf7ffc689281decba19933074932031ddd3a4583e780dda36351460d59687"
+    },
+    "src/gameplay/dialogue/CompanionTurnProfile.h": {
+      "bytes": 2563,
+      "sha256": "9f6db18dd4cb3693bd26f7ef69ec20cb469b5bb95bdd6ba30049d3ae708c8f61"
+    },
+    "src/vulkan/raytracing/PresentableTinyRtScene.cpp": {
+      "bytes": 510127,
+      "sha256": "9c10bb1986a4b892e4f5d785ed76724ff37b662314313b93ab958dc6b2c550c3"
+    },
+    "src/scene/CompanionPose.h": {
+      "bytes": 2391,
+      "sha256": "4045bb01d061d30f929d49346cb6c53dd7feb05d72ae619f6b3045b6fb3e15de"
+    },
+    "src/scene/CompanionAnimationAsset.h": {
+      "bytes": 521,
+      "sha256": "1b19da59021d320954a5c3898d872a7058ccd4e30059bc1ee2a7ea2f17d7e750"
+    },
+    "tests/CampaignPlaySessionTests.cpp": {
+      "bytes": 63007,
+      "sha256": "ec1161400da36b8e0ff05abf2a3ef3975f2f6795691f752328a307032f0ddf59"
+    },
+    "tests/CompanionTurnPrototypeValidation.h": {
+      "bytes": 24174,
+      "sha256": "34f8fc76ffdef6561e3121b60b57d34adbe9dabf3726eacdd66e40021a851262"
+    },
+    "build/presets/windows-x64-debug/Debug/horde_rt_campaign_play_session_tests.exe": {
+      "bytes": 4663296,
+      "sha256": "0b549e8b11631b3b56259eeb13efee2027c45c79b22e8065cc2376013b8c51c1"
+    },
+    "build/presets/windows-x64-debug/Debug/horde_rt_companion_locomotion_tests.exe": {
+      "bytes": 3355648,
+      "sha256": "a2dcf4dde0d202730c3d96a8729f44944836f8f2f1f419519893cab79676b601"
+    },
+    "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe": {
+      "bytes": 14383616,
+      "sha256": "3c7ea107be3b71d6040a3e3e19f8f455e3c5526959c8885655b61dc2d13dfb05"
+    }
+  },
+  "normalOffDebugApplicationBuild": "PASS"
+}

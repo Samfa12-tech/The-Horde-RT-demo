@@ -5,7 +5,7 @@
 namespace horde::gameplay::dialogue {
 enum class CompanionMotionMode { Idle, Turning, Starting, Walking };
 struct CompanionMotionPose {
-    bool diagnosticEnabled=false;
+    bool turnStartEnabled=false;
     CompanionMotionMode mode=CompanionMotionMode::Idle;
     float speed=0,turnPhase=0,turnAngleRadians=0,entryWeight=0,idleZeroWeight=0;
     bool operator==(const CompanionMotionPose&) const=default;

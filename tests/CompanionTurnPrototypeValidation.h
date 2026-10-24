@@ -5,6 +5,7 @@
 #include <array>
 #include <cmath>
 #include <limits>
+#include <iostream>
 
 namespace companion_turn_validation {
 using namespace horde::gameplay;
@@ -37,7 +38,7 @@ template<class Check> void Validate(const std::shared_ptr<const Terrain>& terrai
     const float bearing=TravelBearing(beforeLegacy);
     legacy.Step(dt,beforeLegacy.x-3,beforeLegacy.z,true,true,false,terrain.get(),true);
     const float legacyError=Error(legacy.State().yaw,bearing)*180/pi;
-    check(!beforeLegacy.motion.diagnosticEnabled && legacy.State().walking && legacyError>150 && legacyError<156,
+    check(!beforeLegacy.motion.turnStartEnabled && legacy.State().walking && legacyError>150 && legacyError<156,
         "default path retains the roughly 153-degree first-moving-tick departure witness");
     bool moved=false,planted=true,aligned=true,ramped=true;
     unsigned departureTicks=0;
@@ -50,7 +51,7 @@ template<class Check> void Validate(const std::shared_ptr<const Terrain>& terrai
             ramped=distance<1.8f*dt && now.motion.speed>0 && now.motion.speed<=9.f*dt+1e-5f;
         } else planted&=now.x==beforePrototype.x && now.z==beforePrototype.z && !now.walking;
     }
-    check(beforePrototype.motion.diagnosticEnabled && moved && planted && aligned && ramped,
+    check(beforePrototype.motion.turnStartEnabled && moved && planted && aligned && ramped,
         "prototype completes supported planted cycles before an aligned, ramped first departure");
 
     // A changed player-facing intent must not reverse a foot already in flight.
@@ -142,7 +143,7 @@ template<class Check> void Validate(const std::shared_ptr<const Terrain>& terrai
         const auto old=fullRoute.State();fullRoute.Step(dt,old.x-1,old.z,true,true,false,terrain.get(),true);
         const auto now=fullRoute.State();const float distance=std::hypot(now.x-old.x,now.z-old.z);
         const float expected=std::fmod(old.locomotion.walkPhase+distance/1.56f,1.f);
-        validRoute&=now.grounded && std::isfinite(now.yaw) && now.motion.diagnosticEnabled &&
+        validRoute&=now.grounded && std::isfinite(now.yaw) && now.motion.turnStartEnabled &&
             now.motion.speed>=0 && now.motion.speed<=1.8f && distance<=1.8f*dt+4e-6f &&
             std::abs(std::remainder(now.locomotion.walkPhase-expected,1.f))<2e-5f;
         sawStarting|=now.motion.mode==CompanionMotionMode::Starting;
@@ -163,9 +164,9 @@ template<class Check> void Validate(const std::shared_ptr<const Terrain>& terrai
     turningSeed.Reset();const CompanionRouteFixture fresh(true);
     check(turningSeed.State().motion==fresh.State().motion && turningSeed.State().locomotion==fresh.State().locomotion &&
         turningSeed.State().animationSeconds==0 && turningSeed.State().generation>generation,
-        "reset preserves explicit diagnostic gating and clears all transient turn/start clocks");
+        "reset preserves configured turn/start and clears all transient clocks");
     turningSeed.RestoreCampaignReunion(true,fresh.State().x,fresh.State().z,terrain.get(),generation+10);
-    check(turningSeed.State().motion.diagnosticEnabled && turningSeed.State().motion.mode==CompanionMotionMode::Idle &&
+    check(turningSeed.State().motion.turnStartEnabled && turningSeed.State().motion.mode==CompanionMotionMode::Idle &&
         turningSeed.State().motion.turnPhase==0 && turningSeed.State().motion.speed==0 &&
         turningSeed.State().locomotion==CompanionLocomotionPose{} && turningSeed.State().generation>generation+10,
         "canonical reunion restore clears motion without activating a saved turn or losing the explicit gate");
@@ -175,12 +176,14 @@ template<class Check> void Validate(const std::shared_ptr<const Terrain>& terrai
         "canonical lookout restore starts neutral on real support with the gate retained");
 
     // Real simulation reset/restore must carry configuration rather than derive
-    // the diagnostic choice from any checkpoint field. Flat triangles suffice
+    // the configured turn/start choice from any checkpoint field. Flat triangles suffice
     // here; imported-terrain restore admission remains the checkpoint suite.
-    check(!simulation::ProductionGameSimulationConfig().diagnosticCompanionTurnPrototype,
-        "production simulation configuration keeps the turn prototype disabled");
+    check(!simulation::GameSimulationConfig{}.companionTurnStart &&
+        !CompanionRouteFixture{}.State().motion.turnStartEnabled &&
+        !simulation::ProductionGameSimulationConfig().companionTurnStart,
+        "historical and normal development defaults retain legacy motion pending admission");
     for(const bool enabled:{false,true}) {
-        auto config=simulation::ProductionGameSimulationConfig();config.diagnosticCompanionTurnPrototype=enabled;
+        auto config=simulation::ProductionGameSimulationConfig();config.companionTurnStart=enabled;
         simulation::GameSimulation sim(config);const auto initial=sim.Snapshot().chapterCompanion;
         campaign::Checkpoint record;record.contentRevision=2;record.id=campaign::CheckpointId::ForestEndpoint;
         record.zone=simulation::WorldZoneId::Lookout;record.position={endpoint.x,7,endpoint.z};
@@ -189,16 +192,89 @@ template<class Check> void Validate(const std::shared_ptr<const Terrain>& terrai
         record.dialogue.forestNightConsumed=record.dialogue.forestWaystoneConsumed=true;
         record.dialogue.forestClueConsumed=record.dialogue.forestVillageConsumed=true;
         const auto token=sim.BeginCampaignRestore(record);simulation::InputSnapshot input;input.paused=true;
-        const bool loaded=token && sim.CommitCampaignRestore(*token,{token->worldGeneration,record.zone},terrain,input);
-        check(initial.motion.diagnosticEnabled==enabled && loaded && sim.Snapshot().chapterCompanion.grounded &&
-            sim.Snapshot().chapterCompanion.motion.diagnosticEnabled==enabled &&
+        std::uint64_t publication=100;
+        const bool loaded=token && sim.CommitCampaignRestore(*token,{token->worldGeneration,record.zone},terrain,input,publication);
+        check(initial.motion.turnStartEnabled==enabled && loaded && sim.Snapshot().chapterCompanion.grounded &&
+            sim.Snapshot().chapterCompanion.motion.turnStartEnabled==enabled &&
             sim.Snapshot().chapterCompanion.motion.mode==CompanionMotionMode::Idle &&
             sim.Snapshot().chapterCompanion.motion.turnPhase==0 && sim.Snapshot().chapterCompanion.motion.speed==0,
             "real simulation canonical restore retains only the constructor gate and resets transient motion");
+        if(enabled && loaded) {
+            // An isolated completed endpoint is not an earned journey. Use
+            // ordinary movement to request a real waiting turn, then prove its
+            // transient phase neither blocks a safe canonical save nor returns
+            // after loading that record. No actor pose or story flag is seeded.
+            const auto movementStart=sim.Snapshot();
+            simulation::InputSnapshot move;move.damageEnabled=false;
+            // Resume exactly as the platform load barrier requires: release
+            // controls, rebase the absolute camera and publish a fresh identity.
+            move.yawRadians=movementStart.playerYawRadians;
+            move.pitchRadians=movementStart.playerPitchRadians;
+            sim.StepFixed(move,dt,++publication);
+            const bool resumed=!sim.Snapshot().paused && sim.Snapshot().inputPublicationSequence==publication &&
+                sim.Snapshot().playerX==movementStart.playerX && sim.Snapshot().playerZ==movementStart.playerZ;
+            check(resumed,"fresh neutral camera-rebased endpoint publication resumes without movement debt");
+            move.moveStrafe=1;
+            bool turning=false;
+            for(unsigned tick=0;tick<150 && resumed && !turning;++tick) {
+                sim.StepFixed(move,dt,++publication);const auto& kit=sim.Snapshot().chapterCompanion;
+                turning=kit.motion.mode==CompanionMotionMode::Turning && kit.motion.turnPhase>.1f;
+            }
+            const auto& moved=sim.Snapshot();
+            const bool movementObserved=resumed && !moved.paused && moved.inputPublicationSequence==publication &&
+                std::hypot(moved.playerX-movementStart.playerX,moved.playerZ-movementStart.playerZ)>0 &&
+                moved.playerMovementSpeedMetresPerSecond>0 && moved.playerTravelledThisTick>0;
+            check(movementObserved,"endpoint turn setup proves ordinary input produced actual unpaused player movement");
+            if(!turning) {
+                const auto& s=sim.Snapshot();const auto& k=s.chapterCompanion;const auto& m=k.motion;
+                using Phase=traversal::Phase;
+                const bool traversing=s.rescue.phase!=Phase::LowerSafe && s.rescue.phase!=Phase::UpperSafe;
+                const bool alive=s.playerVitals.phase==PlayerLifePhase::Alive;
+                std::cerr<<"KIT_ENDPOINT_MOVEMENT initialTick="<<movementStart.tickIndex<<" finalTick="<<s.tickIndex
+                    <<" initialPublication="<<movementStart.inputPublicationSequence<<" finalPublication="<<s.inputPublicationSequence
+                    <<" initialPlayer="<<movementStart.playerX<<','<<movementStart.playerSupportWorldY<<','<<movementStart.playerZ
+                    <<" finalPlayer="<<s.playerX<<','<<s.playerSupportWorldY<<','<<s.playerZ
+                    <<" displacement="<<std::hypot(s.playerX-movementStart.playerX,s.playerZ-movementStart.playerZ)
+                    <<" inputAxes="<<move.moveForward<<','<<move.moveStrafe<<" actualAxes="<<s.movementForward<<','<<s.movementStrafe
+                    <<" playerSpeed="<<s.playerMovementSpeedMetresPerSecond<<" travelled="<<s.playerTravelledThisTick
+                    <<" kit="<<k.x<<','<<k.y<<','<<k.z<<" distance="<<std::hypot(s.playerX-k.x,s.playerZ-k.z)
+                    <<" waypoint="<<k.waypoint<<" wait="<<unsigned(k.wait)<<" mode="<<unsigned(m.mode)
+                    <<" phase="<<m.turnPhase<<" turnEnabled="<<m.turnStartEnabled<<" yaw="<<k.yaw
+                    <<" grounded="<<k.grounded<<" walking="<<k.walking<<" active="<<(alive&&!traversing)
+                    <<" exterior="<<(s.developmentRescueJourney&&s.rescue.exteriorSide)<<" alive="<<alive
+                    <<" life="<<unsigned(s.playerVitals.phase)<<" paused="<<s.paused<<" inputPaused="<<move.paused
+                    <<" traversal="<<unsigned(s.rescue.phase)<<" equipmentStowed="<<s.rescue.equipmentStowed
+                    <<" proof="<<s.chapterDialogue.proofAccepted<<" story="<<unsigned(s.chapterDialogue.line)
+                    <<" forestFlags="<<s.chapterDialogue.forestNightConsumed<<','<<s.chapterDialogue.forestWaystoneConsumed
+                    <<','<<s.chapterDialogue.forestClueConsumed<<','<<s.chapterDialogue.forestVillageConsumed
+                    <<" tutorial="<<move.tutorialEnabled<<" teaching="<<unsigned(s.combatTeaching.stage)
+                    <<" timeScale="<<s.gameplayTimeScale<<" worldBlocked="<<s.worldRoute.blocked<<'\n';
+            }
+            if(movementObserved)
+                check(turning,"normal simulation requests planted turning from ordinary live player movement at the completed endpoint");
+            if(movementObserved && turning) {
+                const auto before=sim.Snapshot().chapterCompanion;
+                move.paused=true;sim.StepFixed(move,dt,++publication);
+                check(SameFrozenPose(before,sim.Snapshot().chapterCompanion),
+                    "real paused simulation freezes a live turn before canonical save");
+                const auto saved=sim.CaptureAuthoredCampaignBoundary(campaign::CheckpointId::ForestEndpoint);
+                check(saved && saved->position.x==endpoint.x && saved->position.z==endpoint.z,
+                    "grounded nontravel turn does not block or displace the existing canonical endpoint save");
+                if(saved) {
+                    const auto reload=sim.BeginCampaignRestore(*saved);
+                    const bool restored=reload && sim.CommitCampaignRestore(*reload,{reload->worldGeneration,saved->zone},terrain,move,publication);
+                    check(restored && sim.Snapshot().chapterCompanion.motion==fresh.State().motion &&
+                        sim.Snapshot().chapterCompanion.locomotion==CompanionLocomotionPose{} &&
+                        sim.Snapshot().chapterCompanion.animationSeconds==0 &&
+                        sim.Snapshot().chapterCompanion.generation>before.generation,
+                        "midturn canonical reload discards transient motion and advances the existing owner generation");
+                }
+            }
+        }
         sim.ResetRoute();
-        check(sim.Snapshot().chapterCompanion.motion.diagnosticEnabled==enabled &&
+        check(sim.Snapshot().chapterCompanion.motion.turnStartEnabled==enabled &&
             sim.Snapshot().chapterCompanion.motion.turnPhase==0 && sim.Snapshot().chapterCompanion.locomotion.walkPhase==0,
-            "real simulation route reset preserves production-off or explicit-on configuration");
+            "real simulation route reset preserves explicit candidate or legacy configuration");
     }
 
     CompanionSnapshot pose;pose.animationSeconds=1.25f;pose.locomotion={.3f,.7f};
@@ -206,7 +282,7 @@ template<class Check> void Validate(const std::shared_ptr<const Terrain>& terrai
     check(recipe.clip==horde::scene::SkinnedClip::Idle && recipe.seconds==1.25f &&
         recipe.blend.clip==horde::scene::SkinnedClip::Walking && recipe.blend.weight==.7f &&
         recipe.blend.timeSeconds==.3f*(5.f/6),"legacy render recipe remains original Idle/Walk and original clocks");
-    pose.motion.diagnosticEnabled=true;pose.motion.mode=CompanionMotionMode::Turning;pose.motion.entryWeight=.5f;
+    pose.motion.turnStartEnabled=true;pose.motion.mode=CompanionMotionMode::Turning;pose.motion.entryWeight=.5f;
     recipe=horde::scene::CompanionAnimation(pose,5.f/6);
     check(recipe.seconds==1.25f && recipe.blend.clip==horde::scene::SkinnedClip::Idle &&
         recipe.blend.timeSeconds==0 && recipe.blend.weight==.5f,"turn entry settles nonzero idle time into Idle zero first");

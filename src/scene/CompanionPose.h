@@ -20,7 +20,7 @@ inline CompanionAnimationRecipe CompanionAnimation(
     recipe.seconds=snapshot.animationSeconds;
     recipe.blend={SkinnedClip::Walking,snapshot.locomotion.walkPhase*walkDuration,snapshot.locomotion.walkWeight};
     const auto& m=snapshot.motion;
-    if(!m.diagnosticEnabled)return recipe;
+    if(!m.turnStartEnabled)return recipe;
     if(m.mode==CompanionMotionMode::Turning) {
         if(m.entryWeight<1)recipe.blend={SkinnedClip::Idle,0,m.entryWeight};
         else {
