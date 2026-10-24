@@ -5,12 +5,20 @@ No production bindings, code, assets, save schema or timing have changed in this
 pass. The preceding exact-head CI40055011876 passed all six jobs. This plan is not
 implementation/admission evidence or permission to expand into another system.
 
-First-gate follow-up: the [partial-angle study](../../evidence/2026-10-24-kit-partial-contact/README.md)
-is complete but **unpassed/unadmitted**. It retains increased contact-point motion
-at 22.5 degrees and low swing clearance at 2 degrees. The large-angle 1x preview
-is available for pacing review. Shared-state stages below remain held; the
-smallest proposed next work is a separate authored 22.5-degree pair, not a runtime
-workaround. No such derivative or production controller has been built.
+Initial first-gate follow-up: the [partial-angle study](../../evidence/2026-10-24-kit-partial-contact/README.md)
+retains increased contact-point motion at 22.5 degrees and low swing clearance at
+2 degrees, plus the large-angle 1x preview. Its first measurement-only disposition
+withheld admission and proposed another authored pair. That asset recommendation
+is withdrawn by the visual reassessment below; neither a derivative nor a
+production controller has been built.
+
+Subsequent [visual reassessment](../../evidence/2026-10-24-kit-partial-contact/VISUAL_REASSESSMENT.md)
+finds no objectionable visible defect at gameplay distance. It withdraws the
+extra small-angle asset recommendation and recommends the existing matched
+recipe for a bounded shared-state trial. Contact diagnostics remain unchanged;
+the initial numerical gate was not a demonstrated visual failure. Large-angle
+pacing and actual joins/lifecycle remain acceptance work; this review starts no
+implementation.
 
 ## Recommendation and current seams
 

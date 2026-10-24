@@ -1,13 +1,25 @@
 # KIT ANIMATION PLAN 1 7 — WP0 custody and reconciliation
 
+## Visual reassessment - 24 October 2026
+
+The [timestamped review](evidence/2026-10-24-kit-partial-contact/VISUAL_REASSESSMENT.md)
+does not establish objectionable skating, penetration, silhouette or endpoint
+failure at gameplay distance. The additional 22.5-degree asset recommendation is
+withdrawn. Keep the existing partial recipe for a bounded shared-state trial,
+retaining contact measurements and actual joins/lifecycle still to prove. The
+three-second turnaround reads as four deliberate shuffles; departure pacing is
+provisional, not adopted. Production and original assets remain unchanged.
+
 ## Partial-angle prerequisite - 24 October 2026
 
-The [matched joint/yaw amplitude study](evidence/2026-10-24-kit-partial-contact/README.md)
+The initial [matched joint/yaw amplitude study](evidence/2026-10-24-kit-partial-contact/README.md)
 retains all eight requested cases and an authored-speed 180-degree preview.
-It remains unadmitted: 22.5-degree contact-point motion exceeds the full control,
-and nominal swing is not always clear of the floor at 2 degrees. The shared
-turn/start state remains held. A genuine small-angle authored pair is proposed;
-no production binding, original clip, route/tether/speed or save policy changed.
+It did not admit production motion: 22.5-degree contact-point motion exceeds the
+full control, and nominal swing is not always clear of the floor at 2 degrees.
+The initial proposal for another authored pair is superseded by the visual
+recommendation above, without changing its numerical evidence. Shared turn/start
+implementation has not begun; no production binding, original clip,
+route/tether/speed or save policy changed.
 
 ## Isolated turn RT joins - 24 October 2026
 

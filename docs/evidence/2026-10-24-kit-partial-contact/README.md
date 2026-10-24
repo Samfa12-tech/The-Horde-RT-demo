@@ -1,5 +1,12 @@
 # Kit partial-angle contact gate and large-turn preview
 
+**Visual follow-up:** the [timestamped reassessment](VISUAL_REASSESSMENT.md)
+finds no objectionable visible defect at gameplay distance and withdraws the
+recommendation for another 22.5-degree pair. It recommends the existing recipe
+for a bounded shared-state trial, retaining contact measurements and pacing
+limits. The initial measurement disposition below is historical; it is not a
+demonstrated visual failure or a new zero-slip requirement.
+
 24 October 2026, based on `3fd5ef6c` plus the source identities in
 [receipt.json](receipt.json). **Gate A remains unpassed/unadmitted. The shared
 production turn/start controller was not implemented.** Original production
@@ -120,7 +127,12 @@ The dense wrapper retained an overbroad copied class string mentioning the large
 turn; its native manifest correctly identifies dense-only frames and no large
 sequence. The original record is retained rather than rewritten or rerun.
 
-## Smallest next authored correction
+## Retained earlier authored-correction proposal
+
+This proposal followed the initial measurement-only disposition. The visual
+reassessment above does **not** currently justify starting it. Keep the original
+two candidate clips for the next trial; the following brief is retained as
+history rather than silently erased.
 
 Author a separate **left/right 22.5-degree take** from
 `assets/models/characters/source/kit-step-turn-proof-v1/kit-step-turn-cleanup.blend`
