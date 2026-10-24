@@ -72,6 +72,15 @@ bool HiddenLookoutFilesAllowed(const std::filesystem::path& directory,bool after
             name=="windows-lookout-validation.json" || name=="windows-loaded-lookout.png"))continue;
         if(afterRun && gLookoutInspectKit && (name=="windows-kit-neutral.png" ||
             name=="windows-kit-speaking.png" || name=="windows-kit-recognition.png"))continue;
+        if(afterRun && gLookoutInspectKitTurns) {
+            if(name=="windows-kit-turn-control.png" || name=="windows-kit-turn-restored.png")continue;
+            bool allowed=false;
+            for(const char* side:{"left","right"})for(const char* step:{"idle","blend-0","blend-4","blend-8","blend-11",
+                "turn-20","turn-30","turn-40","turn-end","walk-0","walk-4","walk-8","walk-11","walk-20",
+                "pause-a","pause-b","resume","reset"})
+                allowed|=name==std::string("windows-kit-turn-")+side+"-"+step+".png";
+            if(allowed)continue;
+        }
         if(afterRun && gLookoutInspectKitMotion) {
             if(gLookoutInspectKitTiming && (name=="windows-kit-timing-walk.png" || name=="windows-kit-timing-turn.png"))continue;
             bool allowed=false;
@@ -178,7 +187,7 @@ int RunHiddenLookoutValidation(VulkanSurfaceContext& ctx,horde::vulkan::DeviceCa
             kit.grounded && !kit.walking && kit.waypoint==simulation::kWorldRoutePoints.size() &&
             std::hypot(kit.x-(p.x+1),kit.z-p.z)<.001f && boundarySame();
     };
-    std::string loadedEvidence,entryEvidence;std::ostringstream kitEvidence,motionEvidence,timingEvidence;
+    std::string loadedEvidence,entryEvidence;std::ostringstream kitEvidence,motionEvidence,timingEvidence,turnEvidence;
     const auto completed=[&](bool entry,std::string& json){
         if(!safe("before-gpu-drain") || !DrainCampaignResources(ctx) || !safe("after-gpu-drain"))return false;
         const auto publication=ctx.rtFrameEvidence.PublishedStateByValue();const auto& e=publication.completedEvidence;
@@ -263,6 +272,115 @@ int RunHiddenLookoutValidation(VulkanSurfaceContext& ctx,horde::vulkan::DeviceCa
         ctx.lookoutKitInspectionPose.reset();ctx.lookoutKitInspectionActing={};
         if(proceed)proceed=check(render() && storySame() && ctx.simulation.Snapshot().chapterCompanion.acting==originalActing,
             "ordinary saved camera and neutral Kit pose return after diagnostic inspection");
+    }
+    if(proceed && gLookoutInspectKitTurns) {
+        // Explicit immutable playback on a separate CPU actor. This validates
+        // RT joins and inspection cleanup, not a new gameplay turn state.
+        using Inspection=horde::vulkan::raytracing::ChapterActorInspectionPose;
+        using Image=horde::vulkan::raytracing::PresentableTinyRtScene::StorageImageCapture;
+        struct ClearInspection {
+            VulkanSurfaceContext& ctx;
+            ~ClearInspection(){ctx.lookoutKitInspectionTurn.reset();ctx.lookoutKitInspectionMotion.reset();
+                ctx.lookoutKitInspectionPose.reset();ctx.lookoutKitInspectionActing={};}
+        } clear{ctx};
+        const auto terrain=ctx.rtScene.ChapterTerrainSurface();
+        dialogue::CompanionRouteFixture quiet;
+        auto player=quiet.State();
+        for(unsigned tick=0;tick<60;++tick)
+            quiet.Step(1.f/60,player.x+3,player.z+1,true,false,false,terrain.get(),true);
+        auto control=quiet.State();control.visualAdmitted=true;
+        control.generation=ctx.simulation.Snapshot().chapterCompanion.generation+1;
+        const auto destination=simulation::kWorldRoutePoints[4];
+        const float heading=std::atan2(destination.x+1-control.x,control.z-destination.z);
+        control.yaw=heading;control.animationSeconds=0;control.acting={};control.locomotion={};
+        const auto capture=[&](const std::string& stage,dialogue::CompanionSnapshot pose,
+                               std::optional<Inspection> inspection,Image* retained=nullptr) {
+            ctx.lookoutKitInspectionMotion=pose;ctx.lookoutKitInspectionTurn=inspection;
+            ctx.lookoutKitInspectionPose=horde::vulkan::raytracing::EnvironmentSurveyPose{
+                pose.x+3.f,pose.z,pose.y,-1.57079632679f,-.15f,0};
+            ctx.lookoutKitInspectionActing={};std::string evidence,error;Image image;
+            const bool ok=check(pose.grounded && render() && completed(false,evidence) &&
+                ctx.rtScene.ChapterActorInspectionPublishedPose()==inspection &&
+                ctx.rtScene.CaptureStorageImage(image,error) &&
+                WriteRgbaPng(gCampaignValidationDirectory/("windows-kit-turn-"+stage+".png"),image,error) &&
+                storySame() && neutral(),"explicit turn playback publishes requested pose through completed hardware RT without campaign mutation");
+            if(!error.empty())std::cerr<<"HORDE_KIT_TURN_ERROR "<<error<<'\n';
+            if(!turnEvidence.str().empty())turnEvidence<<',';
+            turnEvidence<<"{\"stage\":\""<<stage<<"\",\"root\":["<<pose.x<<','<<pose.y<<','<<pose.z
+                <<"],\"logicalYaw\":"<<pose.yaw<<",\"inspection\":";
+            if(inspection)turnEvidence<<"{\"clip\":"<<static_cast<unsigned>(inspection->clip)
+                <<",\"seconds\":"<<inspection->seconds<<",\"phase\":"<<inspection->turnPhase
+                <<",\"hasBlend\":"<<(inspection->hasBlend?"true":"false")
+                <<",\"blendClip\":"<<static_cast<unsigned>(inspection->blendClip)
+                <<",\"blendSeconds\":"<<inspection->blendSeconds<<",\"weight\":"<<inspection->weight<<'}';
+            else turnEvidence<<"null";
+            turnEvidence<<",\"rtEvidence\":"<<(evidence.empty()?"null":evidence)<<'}';
+            if(retained)*retained=std::move(image);
+            return ok;
+        };
+        Image original,restored;
+        proceed=capture("control",control,std::nullopt,&original);
+        std::string error;
+        if(proceed)proceed=check(ctx.rtScene.LoadChapterActorInspection(
+            std::filesystem::path(HORDE_RT_SOURCE_DIR)/"assets/models/characters/source/kit-step-turn-proof-v1/native",error),
+            "separate Debug candidate matches original topology UV material and primitive GPU addressing");
+        if(!error.empty())std::cerr<<"HORDE_KIT_TURN_ERROR "<<error<<'\n';
+        const auto sameImage=[](const Image& a,const Image& b){return a.width==b.width && a.height==b.height && a.rgba==b.rgba;};
+        const auto yawCurve=[](float phase){const float u=std::clamp((phase-.04f)/.92f,0.f,1.f);
+            return .7853981633974483f*u*u*(3-2*u);};
+        for(unsigned side=0;side<2 && proceed;++side) {
+            const std::string name=side?"right":"left";const float sign=side?-1.f:1.f;
+            const auto turnClip=side?Inspection::Clip::TurnRight:Inspection::Clip::TurnLeft;
+            auto pose=control;pose.yaw=heading+sign*.7853981633974483f;pose.animationSeconds=1.f;
+            proceed=capture(name+"-idle",pose,std::nullopt);
+            // Existing .18-second gait blend envelope; no production pacing
+            // change. Nonzero Idle phase intentionally exercises the entry join.
+            for(unsigned tick:{0u,4u,8u,11u,20u,30u,40u,45u}) {
+                if(!proceed)break;
+                const float seconds=tick/60.f,phase=seconds/.75f;
+                pose.yaw=heading+sign*(.7853981633974483f-yawCurve(phase));
+                Inspection selected;selected.turnPhase=phase;
+                if(tick<11) {selected.clip=Inspection::Clip::Idle;selected.seconds=1+seconds;
+                    selected.hasBlend=true;selected.blendClip=turnClip;selected.weight=std::min(seconds/.18f,1.f);}
+                else selected.clip=turnClip;
+                const auto stage=tick<=11?"blend-"+std::to_string(tick):
+                    tick==45?std::string("turn-end"):"turn-"+std::to_string(tick);
+                proceed=capture(name+"-"+stage,pose,selected);
+            }
+            dialogue::CompanionRouteFixture walking=quiet;
+            for(unsigned tick=0;tick<=20 && proceed;++tick) {
+                if(tick) {const auto before=walking.State();walking.Step(1.f/60,before.x+3,before.z+1,
+                    true,true,false,terrain.get(),true);}
+                if(tick!=0 && tick!=4 && tick!=8 && tick!=11 && tick!=20)continue;
+                pose=walking.State();pose.visualAdmitted=true;pose.generation=control.generation;pose.yaw=heading;
+                Inspection selected;selected.clip=turnClip;selected.turnPhase=1;selected.hasBlend=true;
+                selected.blendClip=Inspection::Clip::Walk;
+                selected.blendSeconds=pose.locomotion.walkPhase*(5.f/6.f);
+                selected.weight=std::min((tick/60.f)/.18f,1.f);
+                proceed=capture(name+"-walk-"+std::to_string(tick),pose,selected);
+            }
+            // Frozen diagnostic clocks remain frozen across completed frames.
+            // Resuming advances once; clearing must restore original pose bytes.
+            pose=control;float phase=.5f;bool paused=true;
+            const auto advance=[&]{if(!paused)phase+=1.f/60/.75f;
+                pose.yaw=heading+sign*(.7853981633974483f-yawCurve(phase));
+                Inspection selected;selected.clip=turnClip;selected.turnPhase=phase;return selected;};
+            Image pauseA,pauseB;
+            if(proceed) {auto selected=advance();proceed=capture(name+"-pause-a",pose,selected,&pauseA);}
+            if(proceed) {auto selected=advance();proceed=capture(name+"-pause-b",pose,selected,&pauseB);}
+            if(proceed)proceed=check(phase==.5f && sameImage(pauseA,pauseB),"paused diagnostic turn clocks and actual RT image remain unchanged");
+            paused=false;
+            if(proceed) {auto selected=advance();proceed=capture(name+"-resume",pose,selected) &&
+                check(phase>.5f,"resumed diagnostic turn advances explicit phase once");}
+            if(proceed)proceed=capture(name+"-reset",control,std::nullopt,&restored) &&
+                check(sameImage(original,restored),"cleared candidate renders byte-identical original actor and scene");
+        }
+        if(proceed)proceed=capture("restored",control,std::nullopt,&restored) &&
+            check(sameImage(original,restored) && ctx.rtScene.ReleaseChapterActorInspection(error),
+                "original actor restored before candidate CPU data and worker reference are released");
+        ctx.lookoutKitInspectionTurn.reset();ctx.lookoutKitInspectionMotion.reset();
+        ctx.lookoutKitInspectionPose.reset();ctx.lookoutKitInspectionActing={};
+        if(proceed)proceed=check(render() && storySame(),"ordinary saved camera restored before existing Resume and scene retirement checks");
     }
     if(proceed && gLookoutInspectKitMotion) {
         // A sequential production-route visual fixture. It samples real fixed
@@ -507,6 +625,8 @@ int RunHiddenLookoutValidation(VulkanSurfaceContext& ctx,horde::vulkan::DeviceCa
         <<",\"evidenceClass\":\"sequential fixed-step production-route render inputs; not live earned gameplay\",\"frames\":["<<motionEvidence.str()<<"]}"
         <<",\"kitTimingInspection\":{\"requested\":"<<(gLookoutInspectKitTiming?"true":"false")
         <<",\"evidenceClass\":\"bounded desktop profiling of repeated immutable poses; not sustained or phone acceptance\",\"samples\":["<<timingEvidence.str()<<"]}"
+        <<",\"kitTurnInspection\":{\"requested\":"<<(gLookoutInspectKitTurns?"true":"false")
+        <<",\"evidenceClass\":\"isolated Debug candidate playback and RT joins; not gameplay turn-state or owner acceptance\",\"frames\":["<<turnEvidence.str()<<"]}"
         <<",\"physicalVisibleAcceptance\":false,\"performanceEvidence\":false,\"ownerSettingsReadOrWritten\":false";
     return proceed && !failures?0:1;
 }
@@ -677,7 +797,7 @@ int RunHiddenCampaignValidation(VulkanSurfaceContext& ctx)
 bool ConfigureHiddenCampaignValidation()
 {
     int count=0;auto args=CommandLineToArgvW(GetCommandLineW(),&count);if(!args)return false;
-    bool requested=false,lookoutRequested=false,routeRequested=false,returnRequested=false,inspectKit=false,inspectMotion=false,inspectTiming=false,benchmarkMenuRequested=false,detachedCancelRequested=false,detachedCloseRequested=false;std::filesystem::path directory;
+    bool requested=false,lookoutRequested=false,routeRequested=false,returnRequested=false,inspectKit=false,inspectMotion=false,inspectTiming=false,inspectTurns=false,benchmarkMenuRequested=false,detachedCancelRequested=false,detachedCloseRequested=false;std::filesystem::path directory;
     for(int i=1;i<count;++i) {
         const std::wstring_view arg=args[i];
         if(arg==L"--campaign-validate-hidden")requested=true;
@@ -690,9 +810,11 @@ bool ConfigureHiddenCampaignValidation()
         if(arg==L"--lookout-inspect-kit")inspectKit=true;
         if(arg==L"--lookout-inspect-kit-motion"){inspectKit=true;inspectMotion=true;}
         if(arg==L"--lookout-inspect-kit-timing"){inspectKit=true;inspectMotion=true;inspectTiming=true;}
+        if(arg==L"--lookout-inspect-kit-turns"){inspectKit=true;inspectTurns=true;}
         if(arg==L"--campaign-test-root" && i+1<count)directory=args[++i];
     }
     LocalFree(args);
+    if(inspectTurns && inspectMotion) {std::cerr<<"Select one bounded Kit motion or authored-turn inspection.\n";return false;}
     if(detachedCancelRequested && detachedCloseRequested) {
         std::cerr<<"Select one detached benchmark input validation action.\n";return false;
     }
@@ -734,6 +856,7 @@ bool ConfigureHiddenCampaignValidation()
     gRouteHiddenValidation=routeRequested || returnRequested;
     gLookoutInspectKit=inspectKit;gLookoutInspectKitMotion=inspectMotion;
     gLookoutInspectKitTiming=inspectTiming;
+    gLookoutInspectKitTurns=inspectTurns;
     gCampaignHiddenValidation=true;gCampaignValidationDirectory=absolute;return true;
 #else
     std::cerr<<"Hidden campaign validation is Debug-only.\n";return false;

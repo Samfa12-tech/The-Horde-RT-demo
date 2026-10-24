@@ -1,5 +1,15 @@
 # KIT ANIMATION PLAN 1 7 — WP0 custody and reconciliation
 
+## Isolated turn RT joins - 24 October 2026
+
+The [Debug-only candidate playback proof](evidence/2026-10-24-kit-turn-rt/README.md)
+now exercises both authored directions through actual completed RT frames,
+nonzero Idle entry, Walk joins and explicit diagnostic pause/resume/reset.
+Production loading and motion remain unchanged. Sampled night views support an
+isolated integration candidate, with fine contact/continuous feel still limited;
+the shared turn/start state, interrupted/opposite turns and natural departure
+remain unimplemented. This is not gameplay lifecycle or phone acceptance.
+
 ## Reviewed cleanup and native export - 23 October 2026
 
 The separate [contact cleanup/native proof](evidence/2026-10-23-kit-turn-native-export/README.md)

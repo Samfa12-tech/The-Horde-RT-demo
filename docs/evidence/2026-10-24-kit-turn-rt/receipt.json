@@ -1,0 +1,3857 @@
+{
+  "schema": 1,
+  "sealedAtUtc": "2026-10-24T02:36:42.253429+00:00",
+  "baseCommit": "d5fb405d92947c69dade249afc15ffefc2ebb5fd",
+  "disposition": "Debug-only candidate inspection and RT join proof; original production loading, gameplay, worker OFF default and packaging unchanged. Gameplay integration unadmitted.",
+  "hardware": {
+    "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "driver": "610.47",
+    "vulkan": "1.4.341",
+    "build": "MSVC Debug",
+    "executionBackend": "RayTracingPipeline"
+  },
+  "sourceFiles": {
+    "src/platform/windows/DiagnosticWindow.cpp": {
+      "bytes": 636306,
+      "sha256": "b9d84db3bcb075f67fdc890ad2eb4df67f62f4e712ee1ce11e619189a3547dfc"
+    },
+    "src/platform/windows/windows_campaign_validation.inl": {
+      "bytes": 64301,
+      "sha256": "527084ec0b94e108fd75e842a48b89492545ac63d70611cd0097c2f4970d1723"
+    },
+    "src/vulkan/raytracing/PresentableTinyRtScene.cpp": {
+      "bytes": 500444,
+      "sha256": "83f226bc0e02987aca75a771b7d62115b8a2e14c49c521927657b1e687fe6486"
+    },
+    "src/vulkan/raytracing/PresentableTinyRtScene.h": {
+      "bytes": 71083,
+      "sha256": "14c80986c7dba5688fa6bbcfefa49e95b8776c4e958a6105341f687302fa5a54"
+    },
+    "assets/models/characters/source/kit-step-turn-proof-v1/native/kit-turn-proof.glb": {
+      "bytes": 2272652,
+      "sha256": "a72091cac1768f66353178247bde804af7e4b41dd482ccaad813215131583c11"
+    },
+    "assets/models/characters/source/kit-step-turn-proof-v1/native/root-motion.json": {
+      "bytes": 7855,
+      "sha256": "7a4928d4dfec5184071c96a4c8e1f25e07d7ce7c87545324450e75b0c29061d9"
+    },
+    "assets/models/characters/source/kit-warden-v1/briarhold-warden-1k.glb": {
+      "bytes": 7034964,
+      "sha256": "47e249840ed9dd438da386137257050a5bd463e7fe54bf94873e1fd21715835e"
+    },
+    "assets/models/characters/runtime/kit-warden-v1/kit-warden-lod0.runtime.glb": {
+      "bytes": 2151672,
+      "sha256": "1ba628235814b5912ae1439b180347dd8e1cce85b0f4d1fae5bbacb41e7d3713"
+    }
+  },
+  "runs": [
+    {
+      "mode": "serial",
+      "exe": {
+        "bytes": 14266880,
+        "sha256": "5ffce4151bd0818ac0a0df37d3c62d2b40f84d338fb99a842c470d3c67d223ef"
+      },
+      "settings": {
+        "bytes": 471,
+        "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+      },
+      "rawReport": {
+        "path": "reports\\horde-campaign-fixtures-kit-turn-rt-20261024-serial\\windows-lookout-validation.json",
+        "sha256": "545cd64dcf93deb35a5994ad3f9a79f108bc52b1ca866d7a9a7474a20d6b4281"
+      },
+      "rawProcess": {
+        "path": "reports\\kit-turn-rt-validation-20261024\\serial-process.json",
+        "sha256": "ea1b213bdd61a2bafb77fe08f47ac545bc7cc09ecdcc6337c81d9644d2a0aeed"
+      },
+      "elapsedWallSeconds": 19.54699999999866,
+      "checks": 77,
+      "failures": 0,
+      "renderCalls": 49,
+      "turnFrames": 38,
+      "foregroundContinuous": true,
+      "ownerShown": false,
+      "withinOriginalNinetySeconds": true,
+      "custodyUnchanged": true,
+      "ownerCampaignExistsBefore": false,
+      "ownerCampaignExistsAfter": false,
+      "sourceAutosave": {
+        "bytes": 162,
+        "sha256": "73b513b21f12de701c38aff0f0e4f4fecce0abbc625b20851218f5050b1d41ea"
+      },
+      "sourceManifest": {
+        "bytes": 166,
+        "sha256": "84315162c255558767f9ded6fc6596a85960c82a450e58cf96ece623ccca15a7"
+      },
+      "parkedOwnerFileCount": 151,
+      "gpuResources": {
+        "bufferCount": 51,
+        "memoryAllocationCount": 60,
+        "bottomLevelAccelerationStructureCount": 20,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 2,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 48298880,
+        "deviceLocalBytes": 374422496
+      },
+      "resourcesEqualAcrossAllInspectionFrames": true,
+      "pipeline": {
+        "executionBackend": "RayTracingPipeline",
+        "instrumentation": "diagnostic",
+        "dielectricQuality": "high",
+        "bundleKey": "diagnostic_high_pair",
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a"
+        },
+        "activeStrategy": "generic-dielectric",
+        "activeKey": "diagnostic_high_generic_dielectric",
+        "activeSha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a",
+        "waterQuality": "high"
+      },
+      "submittedDimensions": {
+        "internalExtent": [
+          1232,
+          803
+        ],
+        "outputExtent": [
+          1232,
+          803
+        ],
+        "cameraAspect": 1.53424656,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": false,
+        "aspectPreserved": true
+      },
+      "stageFrames": [
+        {
+          "stage": "control",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 2.0032,
+          "inspection": null,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 7,
+            "recordSerial": 7,
+            "submissionSerial": 7,
+            "completionSerial": 7,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 7,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "left-idle",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 2.7886,
+          "inspection": null,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 8,
+            "recordSerial": 8,
+            "submissionSerial": 8,
+            "completionSerial": 8,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 8,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "left-blend-0",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 2.7886,
+          "inspection": {
+            "clip": 0,
+            "seconds": 1,
+            "phase": 0,
+            "hasBlend": true,
+            "blendClip": 2,
+            "blendSeconds": 0,
+            "weight": 0
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 9,
+            "recordSerial": 9,
+            "submissionSerial": 9,
+            "completionSerial": 9,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 9,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "left-blend-4",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 2.78218,
+          "inspection": {
+            "clip": 0,
+            "seconds": 1.06667,
+            "phase": 0.0888889,
+            "hasBlend": true,
+            "blendClip": 2,
+            "blendSeconds": 0,
+            "weight": 0.37037
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 10,
+            "recordSerial": 10,
+            "submissionSerial": 10,
+            "completionSerial": 10,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 10,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "left-blend-8",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 2.74103,
+          "inspection": {
+            "clip": 0,
+            "seconds": 1.13333,
+            "phase": 0.177778,
+            "hasBlend": true,
+            "blendClip": 2,
+            "blendSeconds": 0,
+            "weight": 0.740741
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 11,
+            "recordSerial": 11,
+            "submissionSerial": 11,
+            "completionSerial": 11,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 11,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "left-blend-11",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 2.68948,
+          "inspection": {
+            "clip": 2,
+            "seconds": 0,
+            "phase": 0.244444,
+            "hasBlend": false,
+            "blendClip": 1,
+            "blendSeconds": 0,
+            "weight": 0
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 12,
+            "recordSerial": 12,
+            "submissionSerial": 12,
+            "completionSerial": 12,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 12,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "left-turn-20",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 2.4667,
+          "inspection": {
+            "clip": 2,
+            "seconds": 0,
+            "phase": 0.444444,
+            "hasBlend": false,
+            "blendClip": 1,
+            "blendSeconds": 0,
+            "weight": 0
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 13,
+            "recordSerial": 13,
+            "submissionSerial": 13,
+            "completionSerial": 13,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 13,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "left-turn-30",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 2.19182,
+          "inspection": {
+            "clip": 2,
+            "seconds": 0,
+            "phase": 0.666667,
+            "hasBlend": false,
+            "blendClip": 1,
+            "blendSeconds": 0,
+            "weight": 0
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 14,
+            "recordSerial": 14,
+            "submissionSerial": 14,
+            "completionSerial": 14,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 14,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "left-turn-40",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 2.01656,
+          "inspection": {
+            "clip": 2,
+            "seconds": 0,
+            "phase": 0.888889,
+            "hasBlend": false,
+            "blendClip": 1,
+            "blendSeconds": 0,
+            "weight": 0
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 15,
+            "recordSerial": 15,
+            "submissionSerial": 15,
+            "completionSerial": 15,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 15,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "left-turn-end",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 2.0032,
+          "inspection": {
+            "clip": 2,
+            "seconds": 0,
+            "phase": 1,
+            "hasBlend": false,
+            "blendClip": 1,
+            "blendSeconds": 0,
+            "weight": 0
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 16,
+            "recordSerial": 16,
+            "submissionSerial": 16,
+            "completionSerial": 16,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 16,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "left-walk-0",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 2.0032,
+          "inspection": {
+            "clip": 2,
+            "seconds": 0,
+            "phase": 1,
+            "hasBlend": true,
+            "blendClip": 1,
+            "blendSeconds": 0,
+            "weight": 0
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 17,
+            "recordSerial": 17,
+            "submissionSerial": 17,
+            "completionSerial": 17,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 17,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "left-walk-4",
+          "root": [
+            -27.591,
+            1.38668,
+            -5.74971
+          ],
+          "logicalYaw": 2.0032,
+          "inspection": {
+            "clip": 2,
+            "seconds": 0,
+            "phase": 1,
+            "hasBlend": true,
+            "blendClip": 1,
+            "blendSeconds": 0.0641028,
+            "weight": 0.37037
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 18,
+            "recordSerial": 18,
+            "submissionSerial": 18,
+            "completionSerial": 18,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 18,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "left-walk-8",
+          "root": [
+            -27.4821,
+            1.37873,
+            -5.69943
+          ],
+          "logicalYaw": 2.0032,
+          "inspection": {
+            "clip": 2,
+            "seconds": 0,
+            "phase": 1,
+            "hasBlend": true,
+            "blendClip": 1,
+            "blendSeconds": 0.128206,
+            "weight": 0.740741
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 19,
+            "recordSerial": 19,
+            "submissionSerial": 19,
+            "completionSerial": 19,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 19,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "left-walk-11",
+          "root": [
+            -27.4004,
+            1.37276,
+            -5.66171
+          ],
+          "logicalYaw": 2.0032,
+          "inspection": {
+            "clip": 2,
+            "seconds": 0,
+            "phase": 1,
+            "hasBlend": true,
+            "blendClip": 1,
+            "blendSeconds": 0.176283,
+            "weight": 1
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 20,
+            "recordSerial": 20,
+            "submissionSerial": 20,
+            "completionSerial": 20,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 20,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "left-walk-20",
+          "root": [
+            -27.1552,
+            1.35486,
+            -5.54856
+          ],
+          "logicalYaw": 2.0032,
+          "inspection": {
+            "clip": 2,
+            "seconds": 0,
+            "phase": 1,
+            "hasBlend": true,
+            "blendClip": 1,
+            "blendSeconds": 0.320514,
+            "weight": 1
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 21,
+            "recordSerial": 21,
+            "submissionSerial": 21,
+            "completionSerial": 21,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 21,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "left-pause-a",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 2.3959,
+          "inspection": {
+            "clip": 2,
+            "seconds": 0,
+            "phase": 0.5,
+            "hasBlend": false,
+            "blendClip": 1,
+            "blendSeconds": 0,
+            "weight": 0
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 22,
+            "recordSerial": 22,
+            "submissionSerial": 22,
+            "completionSerial": 22,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 22,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "left-pause-b",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 2.3959,
+          "inspection": {
+            "clip": 2,
+            "seconds": 0,
+            "phase": 0.5,
+            "hasBlend": false,
+            "blendClip": 1,
+            "blendSeconds": 0,
+            "weight": 0
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 23,
+            "recordSerial": 23,
+            "submissionSerial": 23,
+            "completionSerial": 23,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 23,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "left-resume",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 2.36747,
+          "inspection": {
+            "clip": 2,
+            "seconds": 0,
+            "phase": 0.522222,
+            "hasBlend": false,
+            "blendClip": 1,
+            "blendSeconds": 0,
+            "weight": 0
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 24,
+            "recordSerial": 24,
+            "submissionSerial": 24,
+            "completionSerial": 24,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 24,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "left-reset",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 2.0032,
+          "inspection": null,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 25,
+            "recordSerial": 25,
+            "submissionSerial": 25,
+            "completionSerial": 25,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 25,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "right-idle",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 1.21781,
+          "inspection": null,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 26,
+            "recordSerial": 26,
+            "submissionSerial": 26,
+            "completionSerial": 26,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 26,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "right-blend-0",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 1.21781,
+          "inspection": {
+            "clip": 0,
+            "seconds": 1,
+            "phase": 0,
+            "hasBlend": true,
+            "blendClip": 3,
+            "blendSeconds": 0,
+            "weight": 0
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 27,
+            "recordSerial": 27,
+            "submissionSerial": 27,
+            "completionSerial": 27,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 27,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "right-blend-4",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 1.22422,
+          "inspection": {
+            "clip": 0,
+            "seconds": 1.06667,
+            "phase": 0.0888889,
+            "hasBlend": true,
+            "blendClip": 3,
+            "blendSeconds": 0,
+            "weight": 0.37037
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 28,
+            "recordSerial": 28,
+            "submissionSerial": 28,
+            "completionSerial": 28,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 28,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "right-blend-8",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 1.26537,
+          "inspection": {
+            "clip": 0,
+            "seconds": 1.13333,
+            "phase": 0.177778,
+            "hasBlend": true,
+            "blendClip": 3,
+            "blendSeconds": 0,
+            "weight": 0.740741
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 29,
+            "recordSerial": 29,
+            "submissionSerial": 29,
+            "completionSerial": 29,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 29,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "right-blend-11",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 1.31692,
+          "inspection": {
+            "clip": 3,
+            "seconds": 0,
+            "phase": 0.244444,
+            "hasBlend": false,
+            "blendClip": 1,
+            "blendSeconds": 0,
+            "weight": 0
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 30,
+            "recordSerial": 30,
+            "submissionSerial": 30,
+            "completionSerial": 30,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 30,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "right-turn-20",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 1.53971,
+          "inspection": {
+            "clip": 3,
+            "seconds": 0,
+            "phase": 0.444444,
+            "hasBlend": false,
+            "blendClip": 1,
+            "blendSeconds": 0,
+            "weight": 0
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 31,
+            "recordSerial": 31,
+            "submissionSerial": 31,
+            "completionSerial": 31,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 31,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "right-turn-30",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 1.81459,
+          "inspection": {
+            "clip": 3,
+            "seconds": 0,
+            "phase": 0.666667,
+            "hasBlend": false,
+            "blendClip": 1,
+            "blendSeconds": 0,
+            "weight": 0
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 32,
+            "recordSerial": 32,
+            "submissionSerial": 32,
+            "completionSerial": 32,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 32,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "right-turn-40",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 1.98985,
+          "inspection": {
+            "clip": 3,
+            "seconds": 0,
+            "phase": 0.888889,
+            "hasBlend": false,
+            "blendClip": 1,
+            "blendSeconds": 0,
+            "weight": 0
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 33,
+            "recordSerial": 33,
+            "submissionSerial": 33,
+            "completionSerial": 33,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 33,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "right-turn-end",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 2.0032,
+          "inspection": {
+            "clip": 3,
+            "seconds": 0,
+            "phase": 1,
+            "hasBlend": false,
+            "blendClip": 1,
+            "blendSeconds": 0,
+            "weight": 0
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 34,
+            "recordSerial": 34,
+            "submissionSerial": 34,
+            "completionSerial": 34,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 34,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "right-walk-0",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 2.0032,
+          "inspection": {
+            "clip": 3,
+            "seconds": 0,
+            "phase": 1,
+            "hasBlend": true,
+            "blendClip": 1,
+            "blendSeconds": 0,
+            "weight": 0
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 35,
+            "recordSerial": 35,
+            "submissionSerial": 35,
+            "completionSerial": 35,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 35,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "right-walk-4",
+          "root": [
+            -27.591,
+            1.38668,
+            -5.74971
+          ],
+          "logicalYaw": 2.0032,
+          "inspection": {
+            "clip": 3,
+            "seconds": 0,
+            "phase": 1,
+            "hasBlend": true,
+            "blendClip": 1,
+            "blendSeconds": 0.0641028,
+            "weight": 0.37037
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 36,
+            "recordSerial": 36,
+            "submissionSerial": 36,
+            "completionSerial": 36,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 36,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "right-walk-8",
+          "root": [
+            -27.4821,
+            1.37873,
+            -5.69943
+          ],
+          "logicalYaw": 2.0032,
+          "inspection": {
+            "clip": 3,
+            "seconds": 0,
+            "phase": 1,
+            "hasBlend": true,
+            "blendClip": 1,
+            "blendSeconds": 0.128206,
+            "weight": 0.740741
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 37,
+            "recordSerial": 37,
+            "submissionSerial": 37,
+            "completionSerial": 37,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 37,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "right-walk-11",
+          "root": [
+            -27.4004,
+            1.37276,
+            -5.66171
+          ],
+          "logicalYaw": 2.0032,
+          "inspection": {
+            "clip": 3,
+            "seconds": 0,
+            "phase": 1,
+            "hasBlend": true,
+            "blendClip": 1,
+            "blendSeconds": 0.176283,
+            "weight": 1
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 38,
+            "recordSerial": 38,
+            "submissionSerial": 38,
+            "completionSerial": 38,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 38,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "right-walk-20",
+          "root": [
+            -27.1552,
+            1.35486,
+            -5.54856
+          ],
+          "logicalYaw": 2.0032,
+          "inspection": {
+            "clip": 3,
+            "seconds": 0,
+            "phase": 1,
+            "hasBlend": true,
+            "blendClip": 1,
+            "blendSeconds": 0.320514,
+            "weight": 1
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 39,
+            "recordSerial": 39,
+            "submissionSerial": 39,
+            "completionSerial": 39,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 39,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "right-pause-a",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 1.6105,
+          "inspection": {
+            "clip": 3,
+            "seconds": 0,
+            "phase": 0.5,
+            "hasBlend": false,
+            "blendClip": 1,
+            "blendSeconds": 0,
+            "weight": 0
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 40,
+            "recordSerial": 40,
+            "submissionSerial": 40,
+            "completionSerial": 40,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 40,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "right-pause-b",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 1.6105,
+          "inspection": {
+            "clip": 3,
+            "seconds": 0,
+            "phase": 0.5,
+            "hasBlend": false,
+            "blendClip": 1,
+            "blendSeconds": 0,
+            "weight": 0
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 41,
+            "recordSerial": 41,
+            "submissionSerial": 41,
+            "completionSerial": 41,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 41,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "right-resume",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 1.63894,
+          "inspection": {
+            "clip": 3,
+            "seconds": 0,
+            "phase": 0.522222,
+            "hasBlend": false,
+            "blendClip": 1,
+            "blendSeconds": 0,
+            "weight": 0
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 42,
+            "recordSerial": 42,
+            "submissionSerial": 42,
+            "completionSerial": 42,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 42,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "right-reset",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 2.0032,
+          "inspection": null,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 43,
+            "recordSerial": 43,
+            "submissionSerial": 43,
+            "completionSerial": 43,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 43,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "restored",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 2.0032,
+          "inspection": null,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 44,
+            "recordSerial": 44,
+            "submissionSerial": 44,
+            "completionSerial": 44,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 44,
+            "finalIdleCompletion": true
+          }
+        }
+      ],
+      "imageSha256": {
+        "windows-kit-turn-control.png": "4a20b1c7a802d4688a5224e613111923c0af2388c5808cafdbcb62c04c2a4b6b",
+        "windows-kit-turn-left-blend-0.png": "6b6ef099b2f8df2292025371355872d62012a829230515c65b79f9d7a41eb3c2",
+        "windows-kit-turn-left-blend-11.png": "182704af078d076506efb8a7f8ee828fcc23cda431fc52c7ed7ca5b63a2cf91f",
+        "windows-kit-turn-left-blend-4.png": "0696e8ac15a9e1d80c4089d46bb978ee43f4cb4e73b9b0519476da495e938cf7",
+        "windows-kit-turn-left-blend-8.png": "3e9e2d794ca812ed4e258794af495746c1583ba0183856be29a15cdad45dc017",
+        "windows-kit-turn-left-idle.png": "6b6ef099b2f8df2292025371355872d62012a829230515c65b79f9d7a41eb3c2",
+        "windows-kit-turn-left-pause-a.png": "2b94bda074ac5ac14b40f8c75d1fea89d127a8bc5ff520c3f5072b1b757bfec4",
+        "windows-kit-turn-left-pause-b.png": "2b94bda074ac5ac14b40f8c75d1fea89d127a8bc5ff520c3f5072b1b757bfec4",
+        "windows-kit-turn-left-reset.png": "4a20b1c7a802d4688a5224e613111923c0af2388c5808cafdbcb62c04c2a4b6b",
+        "windows-kit-turn-left-resume.png": "ce9240b5d05efbc19a8c9e3259893cadac4ff8b8fc0d58beb1533ecc914d40fb",
+        "windows-kit-turn-left-turn-20.png": "300d218cf95726159ec87f7a700e9b40b46d96e071f8d70bd122f4a67696332d",
+        "windows-kit-turn-left-turn-30.png": "0f3cd9bce34fc80c2d856a50a876720ef8f2af5ec3c7aaa67038f4f507e9183c",
+        "windows-kit-turn-left-turn-40.png": "7b601b41672864878913490a6669329feb1a94e2d27966e25587b4905d061ed0",
+        "windows-kit-turn-left-turn-end.png": "eb7f44b4622333c8a3f256ed6418ce4b1020ee2df07846cb94345a37f7cf29df",
+        "windows-kit-turn-left-walk-0.png": "eb7f44b4622333c8a3f256ed6418ce4b1020ee2df07846cb94345a37f7cf29df",
+        "windows-kit-turn-left-walk-11.png": "d815d2ae421779f1429e7363f277f42601ed25c33dad3a01669e717d1d3cad7f",
+        "windows-kit-turn-left-walk-20.png": "abda16cfdf47a92c47db38ce6a1d35b249397456099250322a686234739ee378",
+        "windows-kit-turn-left-walk-4.png": "ddcf71d23f5deec1802e8334974c89fe1112863a8020eec7237772f84c7fa6c2",
+        "windows-kit-turn-left-walk-8.png": "287dc177a9115dc54527978caf92f94aff2d4cadf97ad373f7a8dc6b626cd56a",
+        "windows-kit-turn-restored.png": "4a20b1c7a802d4688a5224e613111923c0af2388c5808cafdbcb62c04c2a4b6b",
+        "windows-kit-turn-right-blend-0.png": "b51f2c350ab81d32425e7cc920f2224c54646938484008347a110c2610b4d20a",
+        "windows-kit-turn-right-blend-11.png": "6b43c43104ca9ff08ef945d79c9d219226c8b683c94f7d688972f783d7ffc9e2",
+        "windows-kit-turn-right-blend-4.png": "e810d03f2259038099520852b7db7e86eb42356070125eb8b32e8aa40410ac89",
+        "windows-kit-turn-right-blend-8.png": "ed7eb1f1d170ab42ced1312b47325c72dd5989083aeede15c51a85d2afa4ed9d",
+        "windows-kit-turn-right-idle.png": "b51f2c350ab81d32425e7cc920f2224c54646938484008347a110c2610b4d20a",
+        "windows-kit-turn-right-pause-a.png": "c1c2b18b04f07f5a32d8c31fa829cd002490c2e638bdd4d14dad1751d08572e4",
+        "windows-kit-turn-right-pause-b.png": "c1c2b18b04f07f5a32d8c31fa829cd002490c2e638bdd4d14dad1751d08572e4",
+        "windows-kit-turn-right-reset.png": "4a20b1c7a802d4688a5224e613111923c0af2388c5808cafdbcb62c04c2a4b6b",
+        "windows-kit-turn-right-resume.png": "7d8d01b6c56e5815130703edd8720edb6873dd9c56b6ac45b75df234a19144f0",
+        "windows-kit-turn-right-turn-20.png": "13a68fe5afe5cb0d60a557a015b76f4856fb8bdee469baa575c46f74345d799c",
+        "windows-kit-turn-right-turn-30.png": "56a2b742b27d204aea9574d6d8e033c68cae0214e148bf83eb9795aaa7e7ef3d",
+        "windows-kit-turn-right-turn-40.png": "b723bd57e4f9214db3bdd2ff15ab5e1e1d4554822ad670375eba9e104a04ae5c",
+        "windows-kit-turn-right-turn-end.png": "2b877e9bbeb26c29ef1780dd3bd678a84922619ad8e196f145f5f26bf7ba7dd2",
+        "windows-kit-turn-right-walk-0.png": "2b877e9bbeb26c29ef1780dd3bd678a84922619ad8e196f145f5f26bf7ba7dd2",
+        "windows-kit-turn-right-walk-11.png": "d815d2ae421779f1429e7363f277f42601ed25c33dad3a01669e717d1d3cad7f",
+        "windows-kit-turn-right-walk-20.png": "abda16cfdf47a92c47db38ce6a1d35b249397456099250322a686234739ee378",
+        "windows-kit-turn-right-walk-4.png": "79c93b98c7543fe93e5393330f346f24cb4d3bf61a259b300e08e2d9ad8a1a7e",
+        "windows-kit-turn-right-walk-8.png": "8af24de4d7ec433f032bc35db4a1f6708c21ea4035494642ddda9ac3a5b79fc0"
+      },
+      "checksRetained": [
+        {
+          "name": "isolated exported fixture and explicitly nonactivating hidden owner",
+          "pass": true
+        },
+        {
+          "name": "ordinary entry More and Load controls finish read-only catalogue",
+          "pass": true
+        },
+        {
+          "name": "only slot one autosave loads through owner input rebase and matching successful RT presentation",
+          "pass": true
+        },
+        {
+          "name": "loaded player and Kit use actual grounded forest support with completed quiet story and no automatic panel",
+          "pass": true
+        },
+        {
+          "name": "original paused lookout RT storage image read back separately from logical support evidence",
+          "pass": true
+        },
+        {
+          "name": "seeded Kit pose-only inspection has completed real RT and leaves logical story and acting unchanged",
+          "pass": true
+        },
+        {
+          "name": "seeded Kit pose-only inspection has completed real RT and leaves logical story and acting unchanged",
+          "pass": true
+        },
+        {
+          "name": "seeded Kit pose-only inspection has completed real RT and leaves logical story and acting unchanged",
+          "pass": true
+        },
+        {
+          "name": "ordinary saved camera and neutral Kit pose return after diagnostic inspection",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "separate Debug candidate matches original topology UV material and primitive GPU addressing",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "paused diagnostic turn clocks and actual RT image remain unchanged",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "resumed diagnostic turn advances explicit phase once",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "cleared candidate renders byte-identical original actor and scene",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "paused diagnostic turn clocks and actual RT image remain unchanged",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "resumed diagnostic turn advances explicit phase once",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "cleared candidate renders byte-identical original actor and scene",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "original actor restored before candidate CPU data and worker reference are released",
+          "pass": true
+        },
+        {
+          "name": "ordinary saved camera restored before existing Resume and scene retirement checks",
+          "pass": true
+        },
+        {
+          "name": "explicit native Resume queues exactly the production owner command",
+          "pass": true
+        },
+        {
+          "name": "one normal owner pump consumes Resume without failure",
+          "pass": true
+        },
+        {
+          "name": "Resume owner command closes load chooser",
+          "pass": true
+        },
+        {
+          "name": "Resume owner command releases both pause owners",
+          "pass": true
+        },
+        {
+          "name": "Resume retains neutral input without automatically opening objective",
+          "pass": true
+        },
+        {
+          "name": "first neutral live RT frame presents after Resume",
+          "pass": true
+        },
+        {
+          "name": "second neutral live RT frame presents after Resume",
+          "pass": true
+        },
+        {
+          "name": "neutral live simulation advances without replaying completed dialogue or opening objective",
+          "pass": true
+        },
+        {
+          "name": "live endpoint capture independently confirms no active speech or queued continuation after Resume",
+          "pass": true
+        },
+        {
+          "name": "explicit pause-menu Lookout objective opens the current native panel",
+          "pass": true
+        },
+        {
+          "name": "native Continue releases panel input and resumes existing game",
+          "pass": true
+        },
+        {
+          "name": "held-key autorepeat cannot move or reset the recovered game after Continue",
+          "pass": true
+        },
+        {
+          "name": "reopened native Back safely continues without replacing checkpoint",
+          "pass": true
+        },
+        {
+          "name": "objective explicitly reopens for keyboard cancel",
+          "pass": true
+        },
+        {
+          "name": "own-window Escape uses production cancellation without focus or physical input",
+          "pass": true
+        },
+        {
+          "name": "objective explicitly reopens for controller cancel",
+          "pass": true
+        },
+        {
+          "name": "production controller cancel edge safely continues without polling a device",
+          "pass": true
+        },
+        {
+          "name": "explicit Return to menu requests branded entry profile while retaining paused campaign",
+          "pass": true
+        },
+        {
+          "name": "actual EntryMenu scene replacement and completed RT present retain player Kit story and checkpoint without save operation",
+          "pass": true
+        },
+        {
+          "name": "source autosave and manifest bytes unchanged with zero attempted campaign writes",
+          "pass": true
+        },
+        {
+          "name": "foreground continuity and hidden owner preserved within ninety-second stage budget",
+          "pass": true
+        }
+      ]
+    },
+    {
+      "mode": "worker",
+      "exe": {
+        "bytes": 14334976,
+        "sha256": "f80b10b904b9017f9cc59b04754c30e202eab70bc6ac78717f05d1ef0f4ea922"
+      },
+      "settings": {
+        "bytes": 471,
+        "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+      },
+      "rawReport": {
+        "path": "reports\\horde-campaign-fixtures-kit-turn-rt-20261024-worker\\windows-lookout-validation.json",
+        "sha256": "e89cb3d7f58439bad62dfe51849518be1c756f2b7dc92271eaa4bc19749b5498"
+      },
+      "rawProcess": {
+        "path": "reports\\kit-turn-rt-validation-20261024-worker\\worker-process.json",
+        "sha256": "0aeff9a87699b2ac662fc343c88505259bb63edec9dce26a76e2c9b36cfae71c"
+      },
+      "elapsedWallSeconds": 18.46899999999914,
+      "checks": 77,
+      "failures": 0,
+      "renderCalls": 49,
+      "turnFrames": 38,
+      "foregroundContinuous": true,
+      "ownerShown": false,
+      "withinOriginalNinetySeconds": true,
+      "custodyUnchanged": true,
+      "ownerCampaignExistsBefore": false,
+      "ownerCampaignExistsAfter": false,
+      "sourceAutosave": {
+        "bytes": 162,
+        "sha256": "73b513b21f12de701c38aff0f0e4f4fecce0abbc625b20851218f5050b1d41ea"
+      },
+      "sourceManifest": {
+        "bytes": 166,
+        "sha256": "84315162c255558767f9ded6fc6596a85960c82a450e58cf96ece623ccca15a7"
+      },
+      "parkedOwnerFileCount": 151,
+      "gpuResources": {
+        "bufferCount": 51,
+        "memoryAllocationCount": 60,
+        "bottomLevelAccelerationStructureCount": 20,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 2,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 48298880,
+        "deviceLocalBytes": 374422496
+      },
+      "resourcesEqualAcrossAllInspectionFrames": true,
+      "pipeline": {
+        "executionBackend": "RayTracingPipeline",
+        "instrumentation": "diagnostic",
+        "dielectricQuality": "high",
+        "bundleKey": "diagnostic_high_pair",
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a"
+        },
+        "activeStrategy": "generic-dielectric",
+        "activeKey": "diagnostic_high_generic_dielectric",
+        "activeSha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a",
+        "waterQuality": "high"
+      },
+      "submittedDimensions": {
+        "internalExtent": [
+          1232,
+          803
+        ],
+        "outputExtent": [
+          1232,
+          803
+        ],
+        "cameraAspect": 1.53424656,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": false,
+        "aspectPreserved": true
+      },
+      "stageFrames": [
+        {
+          "stage": "control",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 2.0032,
+          "inspection": null,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 7,
+            "recordSerial": 7,
+            "submissionSerial": 7,
+            "completionSerial": 7,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 7,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "left-idle",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 2.7886,
+          "inspection": null,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 8,
+            "recordSerial": 8,
+            "submissionSerial": 8,
+            "completionSerial": 8,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 8,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "left-blend-0",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 2.7886,
+          "inspection": {
+            "clip": 0,
+            "seconds": 1,
+            "phase": 0,
+            "hasBlend": true,
+            "blendClip": 2,
+            "blendSeconds": 0,
+            "weight": 0
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 9,
+            "recordSerial": 9,
+            "submissionSerial": 9,
+            "completionSerial": 9,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 9,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "left-blend-4",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 2.78218,
+          "inspection": {
+            "clip": 0,
+            "seconds": 1.06667,
+            "phase": 0.0888889,
+            "hasBlend": true,
+            "blendClip": 2,
+            "blendSeconds": 0,
+            "weight": 0.37037
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 10,
+            "recordSerial": 10,
+            "submissionSerial": 10,
+            "completionSerial": 10,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 10,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "left-blend-8",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 2.74103,
+          "inspection": {
+            "clip": 0,
+            "seconds": 1.13333,
+            "phase": 0.177778,
+            "hasBlend": true,
+            "blendClip": 2,
+            "blendSeconds": 0,
+            "weight": 0.740741
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 11,
+            "recordSerial": 11,
+            "submissionSerial": 11,
+            "completionSerial": 11,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 11,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "left-blend-11",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 2.68948,
+          "inspection": {
+            "clip": 2,
+            "seconds": 0,
+            "phase": 0.244444,
+            "hasBlend": false,
+            "blendClip": 1,
+            "blendSeconds": 0,
+            "weight": 0
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 12,
+            "recordSerial": 12,
+            "submissionSerial": 12,
+            "completionSerial": 12,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 12,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "left-turn-20",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 2.4667,
+          "inspection": {
+            "clip": 2,
+            "seconds": 0,
+            "phase": 0.444444,
+            "hasBlend": false,
+            "blendClip": 1,
+            "blendSeconds": 0,
+            "weight": 0
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 13,
+            "recordSerial": 13,
+            "submissionSerial": 13,
+            "completionSerial": 13,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 13,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "left-turn-30",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 2.19182,
+          "inspection": {
+            "clip": 2,
+            "seconds": 0,
+            "phase": 0.666667,
+            "hasBlend": false,
+            "blendClip": 1,
+            "blendSeconds": 0,
+            "weight": 0
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 14,
+            "recordSerial": 14,
+            "submissionSerial": 14,
+            "completionSerial": 14,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 14,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "left-turn-40",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 2.01656,
+          "inspection": {
+            "clip": 2,
+            "seconds": 0,
+            "phase": 0.888889,
+            "hasBlend": false,
+            "blendClip": 1,
+            "blendSeconds": 0,
+            "weight": 0
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 15,
+            "recordSerial": 15,
+            "submissionSerial": 15,
+            "completionSerial": 15,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 15,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "left-turn-end",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 2.0032,
+          "inspection": {
+            "clip": 2,
+            "seconds": 0,
+            "phase": 1,
+            "hasBlend": false,
+            "blendClip": 1,
+            "blendSeconds": 0,
+            "weight": 0
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 16,
+            "recordSerial": 16,
+            "submissionSerial": 16,
+            "completionSerial": 16,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 16,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "left-walk-0",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 2.0032,
+          "inspection": {
+            "clip": 2,
+            "seconds": 0,
+            "phase": 1,
+            "hasBlend": true,
+            "blendClip": 1,
+            "blendSeconds": 0,
+            "weight": 0
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 17,
+            "recordSerial": 17,
+            "submissionSerial": 17,
+            "completionSerial": 17,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 17,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "left-walk-4",
+          "root": [
+            -27.591,
+            1.38668,
+            -5.74971
+          ],
+          "logicalYaw": 2.0032,
+          "inspection": {
+            "clip": 2,
+            "seconds": 0,
+            "phase": 1,
+            "hasBlend": true,
+            "blendClip": 1,
+            "blendSeconds": 0.0641028,
+            "weight": 0.37037
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 18,
+            "recordSerial": 18,
+            "submissionSerial": 18,
+            "completionSerial": 18,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 18,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "left-walk-8",
+          "root": [
+            -27.4821,
+            1.37873,
+            -5.69943
+          ],
+          "logicalYaw": 2.0032,
+          "inspection": {
+            "clip": 2,
+            "seconds": 0,
+            "phase": 1,
+            "hasBlend": true,
+            "blendClip": 1,
+            "blendSeconds": 0.128206,
+            "weight": 0.740741
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 19,
+            "recordSerial": 19,
+            "submissionSerial": 19,
+            "completionSerial": 19,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 19,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "left-walk-11",
+          "root": [
+            -27.4004,
+            1.37276,
+            -5.66171
+          ],
+          "logicalYaw": 2.0032,
+          "inspection": {
+            "clip": 2,
+            "seconds": 0,
+            "phase": 1,
+            "hasBlend": true,
+            "blendClip": 1,
+            "blendSeconds": 0.176283,
+            "weight": 1
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 20,
+            "recordSerial": 20,
+            "submissionSerial": 20,
+            "completionSerial": 20,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 20,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "left-walk-20",
+          "root": [
+            -27.1552,
+            1.35486,
+            -5.54856
+          ],
+          "logicalYaw": 2.0032,
+          "inspection": {
+            "clip": 2,
+            "seconds": 0,
+            "phase": 1,
+            "hasBlend": true,
+            "blendClip": 1,
+            "blendSeconds": 0.320514,
+            "weight": 1
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 21,
+            "recordSerial": 21,
+            "submissionSerial": 21,
+            "completionSerial": 21,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 21,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "left-pause-a",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 2.3959,
+          "inspection": {
+            "clip": 2,
+            "seconds": 0,
+            "phase": 0.5,
+            "hasBlend": false,
+            "blendClip": 1,
+            "blendSeconds": 0,
+            "weight": 0
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 22,
+            "recordSerial": 22,
+            "submissionSerial": 22,
+            "completionSerial": 22,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 22,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "left-pause-b",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 2.3959,
+          "inspection": {
+            "clip": 2,
+            "seconds": 0,
+            "phase": 0.5,
+            "hasBlend": false,
+            "blendClip": 1,
+            "blendSeconds": 0,
+            "weight": 0
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 23,
+            "recordSerial": 23,
+            "submissionSerial": 23,
+            "completionSerial": 23,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 23,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "left-resume",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 2.36747,
+          "inspection": {
+            "clip": 2,
+            "seconds": 0,
+            "phase": 0.522222,
+            "hasBlend": false,
+            "blendClip": 1,
+            "blendSeconds": 0,
+            "weight": 0
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 24,
+            "recordSerial": 24,
+            "submissionSerial": 24,
+            "completionSerial": 24,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 24,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "left-reset",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 2.0032,
+          "inspection": null,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 25,
+            "recordSerial": 25,
+            "submissionSerial": 25,
+            "completionSerial": 25,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 25,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "right-idle",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 1.21781,
+          "inspection": null,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 26,
+            "recordSerial": 26,
+            "submissionSerial": 26,
+            "completionSerial": 26,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 26,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "right-blend-0",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 1.21781,
+          "inspection": {
+            "clip": 0,
+            "seconds": 1,
+            "phase": 0,
+            "hasBlend": true,
+            "blendClip": 3,
+            "blendSeconds": 0,
+            "weight": 0
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 27,
+            "recordSerial": 27,
+            "submissionSerial": 27,
+            "completionSerial": 27,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 27,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "right-blend-4",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 1.22422,
+          "inspection": {
+            "clip": 0,
+            "seconds": 1.06667,
+            "phase": 0.0888889,
+            "hasBlend": true,
+            "blendClip": 3,
+            "blendSeconds": 0,
+            "weight": 0.37037
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 28,
+            "recordSerial": 28,
+            "submissionSerial": 28,
+            "completionSerial": 28,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 28,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "right-blend-8",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 1.26537,
+          "inspection": {
+            "clip": 0,
+            "seconds": 1.13333,
+            "phase": 0.177778,
+            "hasBlend": true,
+            "blendClip": 3,
+            "blendSeconds": 0,
+            "weight": 0.740741
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 29,
+            "recordSerial": 29,
+            "submissionSerial": 29,
+            "completionSerial": 29,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 29,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "right-blend-11",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 1.31692,
+          "inspection": {
+            "clip": 3,
+            "seconds": 0,
+            "phase": 0.244444,
+            "hasBlend": false,
+            "blendClip": 1,
+            "blendSeconds": 0,
+            "weight": 0
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 30,
+            "recordSerial": 30,
+            "submissionSerial": 30,
+            "completionSerial": 30,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 30,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "right-turn-20",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 1.53971,
+          "inspection": {
+            "clip": 3,
+            "seconds": 0,
+            "phase": 0.444444,
+            "hasBlend": false,
+            "blendClip": 1,
+            "blendSeconds": 0,
+            "weight": 0
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 31,
+            "recordSerial": 31,
+            "submissionSerial": 31,
+            "completionSerial": 31,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 31,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "right-turn-30",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 1.81459,
+          "inspection": {
+            "clip": 3,
+            "seconds": 0,
+            "phase": 0.666667,
+            "hasBlend": false,
+            "blendClip": 1,
+            "blendSeconds": 0,
+            "weight": 0
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 32,
+            "recordSerial": 32,
+            "submissionSerial": 32,
+            "completionSerial": 32,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 32,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "right-turn-40",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 1.98985,
+          "inspection": {
+            "clip": 3,
+            "seconds": 0,
+            "phase": 0.888889,
+            "hasBlend": false,
+            "blendClip": 1,
+            "blendSeconds": 0,
+            "weight": 0
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 33,
+            "recordSerial": 33,
+            "submissionSerial": 33,
+            "completionSerial": 33,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 33,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "right-turn-end",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 2.0032,
+          "inspection": {
+            "clip": 3,
+            "seconds": 0,
+            "phase": 1,
+            "hasBlend": false,
+            "blendClip": 1,
+            "blendSeconds": 0,
+            "weight": 0
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 34,
+            "recordSerial": 34,
+            "submissionSerial": 34,
+            "completionSerial": 34,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 34,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "right-walk-0",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 2.0032,
+          "inspection": {
+            "clip": 3,
+            "seconds": 0,
+            "phase": 1,
+            "hasBlend": true,
+            "blendClip": 1,
+            "blendSeconds": 0,
+            "weight": 0
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 35,
+            "recordSerial": 35,
+            "submissionSerial": 35,
+            "completionSerial": 35,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 35,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "right-walk-4",
+          "root": [
+            -27.591,
+            1.38668,
+            -5.74971
+          ],
+          "logicalYaw": 2.0032,
+          "inspection": {
+            "clip": 3,
+            "seconds": 0,
+            "phase": 1,
+            "hasBlend": true,
+            "blendClip": 1,
+            "blendSeconds": 0.0641028,
+            "weight": 0.37037
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 36,
+            "recordSerial": 36,
+            "submissionSerial": 36,
+            "completionSerial": 36,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 36,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "right-walk-8",
+          "root": [
+            -27.4821,
+            1.37873,
+            -5.69943
+          ],
+          "logicalYaw": 2.0032,
+          "inspection": {
+            "clip": 3,
+            "seconds": 0,
+            "phase": 1,
+            "hasBlend": true,
+            "blendClip": 1,
+            "blendSeconds": 0.128206,
+            "weight": 0.740741
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 37,
+            "recordSerial": 37,
+            "submissionSerial": 37,
+            "completionSerial": 37,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 37,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "right-walk-11",
+          "root": [
+            -27.4004,
+            1.37276,
+            -5.66171
+          ],
+          "logicalYaw": 2.0032,
+          "inspection": {
+            "clip": 3,
+            "seconds": 0,
+            "phase": 1,
+            "hasBlend": true,
+            "blendClip": 1,
+            "blendSeconds": 0.176283,
+            "weight": 1
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 38,
+            "recordSerial": 38,
+            "submissionSerial": 38,
+            "completionSerial": 38,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 38,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "right-walk-20",
+          "root": [
+            -27.1552,
+            1.35486,
+            -5.54856
+          ],
+          "logicalYaw": 2.0032,
+          "inspection": {
+            "clip": 3,
+            "seconds": 0,
+            "phase": 1,
+            "hasBlend": true,
+            "blendClip": 1,
+            "blendSeconds": 0.320514,
+            "weight": 1
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 39,
+            "recordSerial": 39,
+            "submissionSerial": 39,
+            "completionSerial": 39,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 39,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "right-pause-a",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 1.6105,
+          "inspection": {
+            "clip": 3,
+            "seconds": 0,
+            "phase": 0.5,
+            "hasBlend": false,
+            "blendClip": 1,
+            "blendSeconds": 0,
+            "weight": 0
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 40,
+            "recordSerial": 40,
+            "submissionSerial": 40,
+            "completionSerial": 40,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 40,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "right-pause-b",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 1.6105,
+          "inspection": {
+            "clip": 3,
+            "seconds": 0,
+            "phase": 0.5,
+            "hasBlend": false,
+            "blendClip": 1,
+            "blendSeconds": 0,
+            "weight": 0
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 41,
+            "recordSerial": 41,
+            "submissionSerial": 41,
+            "completionSerial": 41,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 41,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "right-resume",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 1.63894,
+          "inspection": {
+            "clip": 3,
+            "seconds": 0,
+            "phase": 0.522222,
+            "hasBlend": false,
+            "blendClip": 1,
+            "blendSeconds": 0,
+            "weight": 0
+          },
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 42,
+            "recordSerial": 42,
+            "submissionSerial": 42,
+            "completionSerial": 42,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 42,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "right-reset",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 2.0032,
+          "inspection": null,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 43,
+            "recordSerial": 43,
+            "submissionSerial": 43,
+            "completionSerial": 43,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 43,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "stage": "restored",
+          "root": [
+            -27.7,
+            1.39464,
+            -5.8
+          ],
+          "logicalYaw": 2.0032,
+          "inspection": null,
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 44,
+            "recordSerial": 44,
+            "submissionSerial": 44,
+            "completionSerial": 44,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "dispatch": {
+            "sceneReady": true,
+            "rtDispatchRecorded": true,
+            "swapchainCopyRecorded": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 44,
+            "finalIdleCompletion": true
+          }
+        }
+      ],
+      "imageSha256": {
+        "windows-kit-turn-control.png": "4a20b1c7a802d4688a5224e613111923c0af2388c5808cafdbcb62c04c2a4b6b",
+        "windows-kit-turn-left-blend-0.png": "6b6ef099b2f8df2292025371355872d62012a829230515c65b79f9d7a41eb3c2",
+        "windows-kit-turn-left-blend-11.png": "182704af078d076506efb8a7f8ee828fcc23cda431fc52c7ed7ca5b63a2cf91f",
+        "windows-kit-turn-left-blend-4.png": "0696e8ac15a9e1d80c4089d46bb978ee43f4cb4e73b9b0519476da495e938cf7",
+        "windows-kit-turn-left-blend-8.png": "3e9e2d794ca812ed4e258794af495746c1583ba0183856be29a15cdad45dc017",
+        "windows-kit-turn-left-idle.png": "6b6ef099b2f8df2292025371355872d62012a829230515c65b79f9d7a41eb3c2",
+        "windows-kit-turn-left-pause-a.png": "2b94bda074ac5ac14b40f8c75d1fea89d127a8bc5ff520c3f5072b1b757bfec4",
+        "windows-kit-turn-left-pause-b.png": "2b94bda074ac5ac14b40f8c75d1fea89d127a8bc5ff520c3f5072b1b757bfec4",
+        "windows-kit-turn-left-reset.png": "4a20b1c7a802d4688a5224e613111923c0af2388c5808cafdbcb62c04c2a4b6b",
+        "windows-kit-turn-left-resume.png": "ce9240b5d05efbc19a8c9e3259893cadac4ff8b8fc0d58beb1533ecc914d40fb",
+        "windows-kit-turn-left-turn-20.png": "300d218cf95726159ec87f7a700e9b40b46d96e071f8d70bd122f4a67696332d",
+        "windows-kit-turn-left-turn-30.png": "0f3cd9bce34fc80c2d856a50a876720ef8f2af5ec3c7aaa67038f4f507e9183c",
+        "windows-kit-turn-left-turn-40.png": "7b601b41672864878913490a6669329feb1a94e2d27966e25587b4905d061ed0",
+        "windows-kit-turn-left-turn-end.png": "eb7f44b4622333c8a3f256ed6418ce4b1020ee2df07846cb94345a37f7cf29df",
+        "windows-kit-turn-left-walk-0.png": "eb7f44b4622333c8a3f256ed6418ce4b1020ee2df07846cb94345a37f7cf29df",
+        "windows-kit-turn-left-walk-11.png": "d815d2ae421779f1429e7363f277f42601ed25c33dad3a01669e717d1d3cad7f",
+        "windows-kit-turn-left-walk-20.png": "abda16cfdf47a92c47db38ce6a1d35b249397456099250322a686234739ee378",
+        "windows-kit-turn-left-walk-4.png": "ddcf71d23f5deec1802e8334974c89fe1112863a8020eec7237772f84c7fa6c2",
+        "windows-kit-turn-left-walk-8.png": "287dc177a9115dc54527978caf92f94aff2d4cadf97ad373f7a8dc6b626cd56a",
+        "windows-kit-turn-restored.png": "4a20b1c7a802d4688a5224e613111923c0af2388c5808cafdbcb62c04c2a4b6b",
+        "windows-kit-turn-right-blend-0.png": "b51f2c350ab81d32425e7cc920f2224c54646938484008347a110c2610b4d20a",
+        "windows-kit-turn-right-blend-11.png": "6b43c43104ca9ff08ef945d79c9d219226c8b683c94f7d688972f783d7ffc9e2",
+        "windows-kit-turn-right-blend-4.png": "e810d03f2259038099520852b7db7e86eb42356070125eb8b32e8aa40410ac89",
+        "windows-kit-turn-right-blend-8.png": "ed7eb1f1d170ab42ced1312b47325c72dd5989083aeede15c51a85d2afa4ed9d",
+        "windows-kit-turn-right-idle.png": "b51f2c350ab81d32425e7cc920f2224c54646938484008347a110c2610b4d20a",
+        "windows-kit-turn-right-pause-a.png": "c1c2b18b04f07f5a32d8c31fa829cd002490c2e638bdd4d14dad1751d08572e4",
+        "windows-kit-turn-right-pause-b.png": "c1c2b18b04f07f5a32d8c31fa829cd002490c2e638bdd4d14dad1751d08572e4",
+        "windows-kit-turn-right-reset.png": "4a20b1c7a802d4688a5224e613111923c0af2388c5808cafdbcb62c04c2a4b6b",
+        "windows-kit-turn-right-resume.png": "7d8d01b6c56e5815130703edd8720edb6873dd9c56b6ac45b75df234a19144f0",
+        "windows-kit-turn-right-turn-20.png": "13a68fe5afe5cb0d60a557a015b76f4856fb8bdee469baa575c46f74345d799c",
+        "windows-kit-turn-right-turn-30.png": "56a2b742b27d204aea9574d6d8e033c68cae0214e148bf83eb9795aaa7e7ef3d",
+        "windows-kit-turn-right-turn-40.png": "b723bd57e4f9214db3bdd2ff15ab5e1e1d4554822ad670375eba9e104a04ae5c",
+        "windows-kit-turn-right-turn-end.png": "2b877e9bbeb26c29ef1780dd3bd678a84922619ad8e196f145f5f26bf7ba7dd2",
+        "windows-kit-turn-right-walk-0.png": "2b877e9bbeb26c29ef1780dd3bd678a84922619ad8e196f145f5f26bf7ba7dd2",
+        "windows-kit-turn-right-walk-11.png": "d815d2ae421779f1429e7363f277f42601ed25c33dad3a01669e717d1d3cad7f",
+        "windows-kit-turn-right-walk-20.png": "abda16cfdf47a92c47db38ce6a1d35b249397456099250322a686234739ee378",
+        "windows-kit-turn-right-walk-4.png": "79c93b98c7543fe93e5393330f346f24cb4d3bf61a259b300e08e2d9ad8a1a7e",
+        "windows-kit-turn-right-walk-8.png": "8af24de4d7ec433f032bc35db4a1f6708c21ea4035494642ddda9ac3a5b79fc0"
+      },
+      "checksRetained": [
+        {
+          "name": "isolated exported fixture and explicitly nonactivating hidden owner",
+          "pass": true
+        },
+        {
+          "name": "ordinary entry More and Load controls finish read-only catalogue",
+          "pass": true
+        },
+        {
+          "name": "only slot one autosave loads through owner input rebase and matching successful RT presentation",
+          "pass": true
+        },
+        {
+          "name": "loaded player and Kit use actual grounded forest support with completed quiet story and no automatic panel",
+          "pass": true
+        },
+        {
+          "name": "original paused lookout RT storage image read back separately from logical support evidence",
+          "pass": true
+        },
+        {
+          "name": "seeded Kit pose-only inspection has completed real RT and leaves logical story and acting unchanged",
+          "pass": true
+        },
+        {
+          "name": "seeded Kit pose-only inspection has completed real RT and leaves logical story and acting unchanged",
+          "pass": true
+        },
+        {
+          "name": "seeded Kit pose-only inspection has completed real RT and leaves logical story and acting unchanged",
+          "pass": true
+        },
+        {
+          "name": "ordinary saved camera and neutral Kit pose return after diagnostic inspection",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "separate Debug candidate matches original topology UV material and primitive GPU addressing",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "paused diagnostic turn clocks and actual RT image remain unchanged",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "resumed diagnostic turn advances explicit phase once",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "cleared candidate renders byte-identical original actor and scene",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "paused diagnostic turn clocks and actual RT image remain unchanged",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "resumed diagnostic turn advances explicit phase once",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "cleared candidate renders byte-identical original actor and scene",
+          "pass": true
+        },
+        {
+          "name": "explicit turn playback publishes requested pose through completed hardware RT without campaign mutation",
+          "pass": true
+        },
+        {
+          "name": "original actor restored before candidate CPU data and worker reference are released",
+          "pass": true
+        },
+        {
+          "name": "ordinary saved camera restored before existing Resume and scene retirement checks",
+          "pass": true
+        },
+        {
+          "name": "explicit native Resume queues exactly the production owner command",
+          "pass": true
+        },
+        {
+          "name": "one normal owner pump consumes Resume without failure",
+          "pass": true
+        },
+        {
+          "name": "Resume owner command closes load chooser",
+          "pass": true
+        },
+        {
+          "name": "Resume owner command releases both pause owners",
+          "pass": true
+        },
+        {
+          "name": "Resume retains neutral input without automatically opening objective",
+          "pass": true
+        },
+        {
+          "name": "first neutral live RT frame presents after Resume",
+          "pass": true
+        },
+        {
+          "name": "second neutral live RT frame presents after Resume",
+          "pass": true
+        },
+        {
+          "name": "neutral live simulation advances without replaying completed dialogue or opening objective",
+          "pass": true
+        },
+        {
+          "name": "live endpoint capture independently confirms no active speech or queued continuation after Resume",
+          "pass": true
+        },
+        {
+          "name": "explicit pause-menu Lookout objective opens the current native panel",
+          "pass": true
+        },
+        {
+          "name": "native Continue releases panel input and resumes existing game",
+          "pass": true
+        },
+        {
+          "name": "held-key autorepeat cannot move or reset the recovered game after Continue",
+          "pass": true
+        },
+        {
+          "name": "reopened native Back safely continues without replacing checkpoint",
+          "pass": true
+        },
+        {
+          "name": "objective explicitly reopens for keyboard cancel",
+          "pass": true
+        },
+        {
+          "name": "own-window Escape uses production cancellation without focus or physical input",
+          "pass": true
+        },
+        {
+          "name": "objective explicitly reopens for controller cancel",
+          "pass": true
+        },
+        {
+          "name": "production controller cancel edge safely continues without polling a device",
+          "pass": true
+        },
+        {
+          "name": "explicit Return to menu requests branded entry profile while retaining paused campaign",
+          "pass": true
+        },
+        {
+          "name": "actual EntryMenu scene replacement and completed RT present retain player Kit story and checkpoint without save operation",
+          "pass": true
+        },
+        {
+          "name": "source autosave and manifest bytes unchanged with zero attempted campaign writes",
+          "pass": true
+        },
+        {
+          "name": "foreground continuity and hidden owner preserved within ninety-second stage budget",
+          "pass": true
+        }
+      ]
+    }
+  ],
+  "serialWorkerAll38PngHashesIdentical": true,
+  "focusedChecks": {
+    "ctest": {
+      "passed": 3,
+      "total": 3,
+      "seconds": 36.48,
+      "log": "reports/kit-turn-rt-validation-20261024/focused-tests.log",
+      "sha256": "ae4306768ac8f30eeafe0a43eb693e6a967bd766071919ad94f2d607f85974a9"
+    },
+    "workerLifetime": {
+      "exitCode": 0,
+      "log": "reports/kit-turn-rt-validation-20261024/worker-lifetime.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "releaseCore": {
+      "exitCode": 0,
+      "log": "reports/kit-turn-rt-validation-20261024/release-core-build.log",
+      "sha256": "22bcb752b68a55eeaf9aba232167e0c4c19fc97c112f29b55738d251655df276"
+    }
+  },
+  "retainedFailure": {
+    "kind": "First inspection build used an incorrectly spelled image metadata field; corrected before any native capture.",
+    "log": "reports/kit-turn-native-export-20261023/rt-adapter-build.log",
+    "sha256": "006c0fcaa2813330402c48f95214507b3ac39c25e1f96e8ccbd079dfb4ce4272"
+  },
+  "priorDocumentationCi": {
+    "commit": "d5fb405d92947c69dade249afc15ffefc2ebb5fd",
+    "run": 40053382941,
+    "conclusion": "success",
+    "allSixJobsSuccess": true
+  },
+  "backedUpImages": {
+    "left-rt-contact-sheet.png": {
+      "bytes": 1395953,
+      "sha256": "7d15a2d9d5861c3634e31ef565273d5e03197ce2d39450f37c59fa6d211ecf7f"
+    },
+    "left-turn-full.png": {
+      "bytes": 1424497,
+      "sha256": "300d218cf95726159ec87f7a700e9b40b46d96e071f8d70bd122f4a67696332d"
+    },
+    "right-rt-contact-sheet.png": {
+      "bytes": 1418377,
+      "sha256": "6680b9d2a1d72c42a073676dabbdf1dd9940d98ff800e1d04682a443ea843687"
+    }
+  },
+  "limits": [
+    "Sampled immutable diagnostic playback, not continuous captured gameplay or owner feel acceptance.",
+    "Pause/resume freezes explicit inspection phase, not a new gameplay lifecycle.",
+    "Original route speed retained; natural initial acceleration and arbitrary/interrupted/opposite turns unresolved.",
+    "Fine sole contact constrained by nighttime view; prior cross-tool contact proof remains separate.",
+    "CPU candidate loading/RAM and performance unmeasured; no phone evidence."
+  ],
+  "defaultOffRestoration": {
+    "configureExitCode": 0,
+    "buildExitCode": 0,
+    "cacheOption": "HORDE_RT_ACTOR_WORKER_EXPERIMENT:BOOL=OFF",
+    "executable": {
+      "bytes": 14306816,
+      "sha256": "6e766b07af48159a3d46a4f58102a73c01f9e3090bbc07a049aafe782bddafed"
+    },
+    "buildLog": {
+      "path": "reports\\kit-turn-rt-validation-20261024\\default-off-build.log",
+      "sha256": "6fdd82f6a48b8f16f5da8fde1e81377f962fcbdeeeee5786ca3a7885714c7c3c"
+    },
+    "ownerFileHashesPreserved": 151
+  }
+}

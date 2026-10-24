@@ -116,12 +116,24 @@ PlayerWeaponRenderPose EvaluatePlayerWeaponRenderPose(
     float swordSwingRadians,
     float heldPropDepth);
 
+#if defined(_DEBUG)
+// Hidden Windows validation only. Slots belong to a separate inspection actor;
+// they do not add gameplay animations or change the production clip set.
+struct ChapterActorInspectionPose {
+    enum class Clip : unsigned { Idle, Walk, TurnLeft, TurnRight };
+    Clip clip=Clip::Idle,blendClip=Clip::Walk;
+    float seconds=0,turnPhase=0,blendSeconds=0,weight=0;
+    bool hasBlend=false;
+    bool operator==(const ChapterActorInspectionPose&) const=default;
+};
+#endif
 struct RtSceneFrameInputs
 {
 #if defined(_DEBUG)
     // Frozen Windows light attribution only. Physical roof/lid state, ordinary
     // gameplay and Shipping rendering continue to use the authoritative value.
     bool diagnosticSuppressFinaleApertureLighting = false;
+    std::optional<ChapterActorInspectionPose> diagnosticChapterActor;
 #endif
     bool developmentRescueJourney = false;
     horde::gameplay::traversal::RescueTraversalSnapshot rescue{};
@@ -293,6 +305,11 @@ public:
                     RtBundleCompiledPipelineCache* compiledPipelineCache = nullptr);
 
     void Destroy();
+#if defined(_DEBUG)
+    bool LoadChapterActorInspection(const std::filesystem::path& directory,std::string& diagnostic);
+    bool ReleaseChapterActorInspection(std::string& diagnostic);
+    std::optional<ChapterActorInspectionPose> ChapterActorInspectionPublishedPose() const {return chapterInspectionLast_;}
+#endif
 
     // Set before Initialise; geometry admission is explicit and development-only.
     void SetDevelopmentSupportFixture(bool enabled) { developmentSupportFixture_ = enabled; }
@@ -1245,6 +1262,11 @@ private:
     VkDeviceSize scratchAddressAlignment_ = 0u;
     CharacterRenderSlot characterSlot_;
     horde::scene::assets::SkinnedPbrActor chapterActor_;
+#if defined(_DEBUG)
+    std::unique_ptr<horde::scene::assets::SkinnedPbrActor> chapterInspectionActor_;
+    std::optional<ChapterActorInspectionPose> chapterInspectionLast_;
+    bool chapterWorkerUsesInspection_=false;
+#endif
 #if HORDE_RT_ACTOR_WORKER_EXPERIMENT
     // Retired before actor reload/move/destruction; every frame joins before
     // any actor asset read/upload. No GPU ownership crosses this CPU lane.

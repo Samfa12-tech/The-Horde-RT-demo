@@ -173,6 +173,7 @@ bool gRouteReturnRecovery=false;
 bool gLookoutInspectKit=false;
 bool gLookoutInspectKitMotion=false;
 bool gLookoutInspectKitTiming=false;
+bool gLookoutInspectKitTurns=false;
 bool gShowcaseCaptureHidden=false;
 bool gCampaignValidationHoldPreparation=false;
 std::filesystem::path gCampaignValidationDirectory;
@@ -502,6 +503,7 @@ struct VulkanSurfaceContext
     std::optional<horde::vulkan::raytracing::EnvironmentSurveyPose> lookoutKitInspectionPose;
     horde::gameplay::dialogue::CompanionActingPose lookoutKitInspectionActing{};
     std::optional<horde::gameplay::dialogue::CompanionSnapshot> lookoutKitInspectionMotion;
+    std::optional<horde::vulkan::raytracing::ChapterActorInspectionPose> lookoutKitInspectionTurn;
 #endif
     horde::vulkan::RtExecutionBackend executionBackend = horde::vulkan::RtExecutionBackend::Unsupported;
     std::string developmentCheckpoint;
@@ -6879,6 +6881,10 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
             }
             if(ctx.lookoutKitInspectionMotion)frameInputs.chapterCompanion=*ctx.lookoutKitInspectionMotion;
             frameInputs.chapterCompanion.acting=ctx.lookoutKitInspectionActing;
+            if(ctx.lookoutKitInspectionTurn) {
+                if(!gLookoutInspectKitTurns || !ctx.simulationPaused) {ctx.lastRtFrameError="Hidden turn playback requires the isolated paused fixture.";return false;}
+                frameInputs.diagnosticChapterActor=ctx.lookoutKitInspectionTurn;
+            }
         }
         if(ctx.environmentSurveyActive && ctx.environmentSurveyProfile!="player-dodge")
         {

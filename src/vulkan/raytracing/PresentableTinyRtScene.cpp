@@ -624,6 +624,11 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     tlasUpdateScratch_ = std::exchange(other.tlasUpdateScratch_, Buffer{});
     characterSlot_ = std::move(other.characterSlot_);
     chapterActor_ = std::move(other.chapterActor_);
+#if defined(_DEBUG)
+    chapterInspectionActor_=std::move(other.chapterInspectionActor_);
+    chapterInspectionLast_=std::exchange(other.chapterInspectionLast_,std::nullopt);
+    chapterWorkerUsesInspection_=false;other.chapterWorkerUsesInspection_=false;
+#endif
     chapterActorReady_ = std::exchange(other.chapterActorReady_, false);
     thirdActorIsCompanion_ = std::exchange(other.thirdActorIsCompanion_, false);
     thirdActorSubmittedCompanion_ = std::exchange(other.thirdActorSubmittedCompanion_, false);
@@ -1150,6 +1155,9 @@ void PresentableTinyRtScene::Destroy()
 {
 #if HORDE_RT_ACTOR_WORKER_EXPERIMENT
     chapterPoseWorker_.reset(); // Also required on the device-null early path.
+#endif
+#if defined(_DEBUG)
+    chapterInspectionActor_.reset();chapterInspectionLast_.reset();chapterWorkerUsesInspection_=false;
 #endif
 #if HORDE_RT_REGION_PAGE_PROTOTYPE
     DestroyRegionPage();
@@ -2592,6 +2600,9 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
 {
 #if HORDE_RT_ACTOR_WORKER_EXPERIMENT
     chapterPoseWorker_.reset();
+#endif
+#if defined(_DEBUG)
+    chapterInspectionActor_.reset();chapterInspectionLast_.reset();chapterWorkerUsesInspection_=false;
 #endif
     (void)developmentDirectory;
     // A successful load below installs a fresh template, including same-size
@@ -6610,30 +6621,61 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         return false;
     }
 
+    auto* companionActor=&chapterActor_;
+    auto companionClip=horde::scene::SkinnedClip::Idle;
+    float companionTime=frame.chapterCompanion.animationSeconds;
+    horde::scene::SkinnedClipBlend companionBlend{horde::scene::SkinnedClip::Walking,
+        frame.chapterCompanion.locomotion.walkPhase*chapterActor_.Duration(horde::scene::SkinnedClip::Walking),
+        frame.chapterCompanion.locomotion.walkWeight};
+    bool companionHasBlend=true,inspectionChanged=false;
+#if defined(_DEBUG)
+    const bool inspectCompanion=frame.diagnosticChapterActor.has_value();
+    inspectionChanged=frame.diagnosticChapterActor!=chapterInspectionLast_;
+    if(inspectCompanion) {
+        const auto& p=*frame.diagnosticChapterActor;
+        const auto valid=[](auto c){return static_cast<unsigned>(c)<=3;};
+        if(!chapterInspectionActor_ || !WantsChapterCompanion(frame) || !valid(p.clip) || !valid(p.blendClip) ||
+           !std::isfinite(p.seconds) || p.seconds<0 || !std::isfinite(p.blendSeconds) || p.blendSeconds<0 ||
+           !std::isfinite(p.turnPhase) || p.turnPhase<0 || p.turnPhase>1 ||
+           !std::isfinite(p.weight) || p.weight<0 || p.weight>1) {
+            diagnostic="Hidden chapter actor selection/phase was not admitted.";return false;
+        }
+        companionActor=chapterInspectionActor_.get();
+        const auto seconds=[&](auto c,float ordinary) {
+            return static_cast<unsigned>(c)>=2?p.turnPhase*companionActor->Duration(static_cast<horde::scene::SkinnedClip>(c)):ordinary;
+        };
+        companionClip=static_cast<horde::scene::SkinnedClip>(p.clip);
+        companionTime=seconds(p.clip,p.seconds);
+        companionBlend={static_cast<horde::scene::SkinnedClip>(p.blendClip),seconds(p.blendClip,p.blendSeconds),p.weight};
+        companionHasBlend=p.hasBlend;
+    }
+#endif
 #if HORDE_RT_ACTOR_WORKER_EXPERIMENT
     // The immutable frame owns all request inputs. Kit has a distinct skin/
     // scratch asset from the player; only its exclusive worker may touch it
     // until chapterPoseJob joins. The guard joins on every intervening return.
     horde::scene::assets::SkinnedPbrActorWorker::Job chapterPoseJob;
     const bool prepareCompanion = WantsChapterCompanion(frame) &&
-        (!thirdActorIsCompanion_ || chapterActorPoseGeneration_ != frame.chapterCompanion.generation ||
+        (!thirdActorIsCompanion_ || inspectionChanged || chapterActorPoseGeneration_ != frame.chapterCompanion.generation ||
          chapterActorPoseSeconds_ != frame.chapterCompanion.animationSeconds ||
          chapterActorWalking_ != frame.chapterCompanion.walking ||
          chapterActorActing_ != frame.chapterCompanion.acting ||
          chapterActorLocomotion_ != frame.chapterCompanion.locomotion);
     if (prepareCompanion) {
+#if defined(_DEBUG)
+        if(chapterWorkerUsesInspection_!=inspectCompanion) {
+            chapterPoseWorker_.reset();chapterWorkerUsesInspection_=inspectCompanion;
+        }
+#endif
         if (!chapterPoseWorker_) {
-            try { chapterPoseWorker_ = std::make_unique<horde::scene::assets::SkinnedPbrActorWorker>(chapterActor_); }
+            try { chapterPoseWorker_ = std::make_unique<horde::scene::assets::SkinnedPbrActorWorker>(*companionActor); }
             catch (const std::exception& error) { diagnostic = error.what(); return false; }
         }
         horde::scene::assets::SkinnedPbrActorWorker::Request request;
         request.identity = frame.tickIndex;
         request.generation = frame.chapterCompanion.generation;
-        request.time = frame.chapterCompanion.animationSeconds;
-        request.hasBlend = true;
-        request.blend = {horde::scene::SkinnedClip::Walking,
-            frame.chapterCompanion.locomotion.walkPhase * chapterActor_.Duration(horde::scene::SkinnedClip::Walking),
-            frame.chapterCompanion.locomotion.walkWeight};
+        request.clip=companionClip;request.time=companionTime;
+        request.hasBlend=companionHasBlend;request.blend=companionBlend;
         request.measure = WantsSkinWorkMetrics(observation);
         const auto acting = horde::scene::CompanionUpperBodyRotations(frame.chapterCompanion.acting);
         if (!request.SetRotations(acting) || !chapterPoseJob.Start(*chapterPoseWorker_, request)) {
@@ -6986,7 +7028,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         chapterActorPoseGeneration_ = UINT64_MAX;
         chapterActorPoseSeconds_ = -1.0f;
     }
-    if (thirdActorIsCompanion_ && (chapterActorPoseGeneration_ != frame.chapterCompanion.generation ||
+    if (thirdActorIsCompanion_ && (inspectionChanged || chapterActorPoseGeneration_ != frame.chapterCompanion.generation ||
         chapterActorPoseSeconds_ != frame.chapterCompanion.animationSeconds ||
         chapterActorWalking_ != frame.chapterCompanion.walking ||
         chapterActorActing_ != frame.chapterCompanion.acting ||
@@ -7010,16 +7052,11 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                 horde::telemetry::RtStage::CharacterSkin, result.poseNanoseconds, 1u, 0u, 0u))
             observation->healthy = false;
 #else
-        const auto clip = horde::scene::SkinnedClip::Idle;
-        const float time = frame.chapterCompanion.animationSeconds;
-        const horde::scene::SkinnedClipBlend blend{horde::scene::SkinnedClip::Walking,
-            frame.chapterCompanion.locomotion.walkPhase * chapterActor_.Duration(horde::scene::SkinnedClip::Walking),
-            frame.chapterCompanion.locomotion.walkWeight};
         // Pose owns clip skinning plus its inseparable floor/bounds/static-PBR
         // repack. CharacterSkin therefore includes that CPU preparation here.
         RtSceneStageScope companionSkinScope(observation, horde::telemetry::RtStage::CharacterSkin);
         const auto acting=horde::scene::CompanionUpperBodyRotations(frame.chapterCompanion.acting);
-        if (!chapterActor_.Pose(clip, time, diagnostic, acting, &blend,
+        if (!companionActor->Pose(companionClip, companionTime, diagnostic, acting, companionHasBlend?&companionBlend:nullptr,
                                WantsSkinWorkMetrics(observation)?&companionWork:nullptr)) {
             companionSkinScope.Cancel();
             return false;
@@ -7029,7 +7066,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         ObserveSkinWork(observation,companionWork);
         const auto& metadata = staticMeshSlot_.InstanceMetadata()[CharacterRenderSlot::kKeeperMetadataIndex];
         const auto& primitive = staticMeshSlot_.PrimitiveMetadata()[metadata.primitiveBase];
-        const auto& vertices = chapterActor_.Asset().vertices;
+        const auto& vertices = companionActor->Asset().vertices;
         if (!gpuResources_.WriteBufferRange(staticVertexBuffer_,
                 VkDeviceSize(primitive.vertexOffset) * sizeof(vertices.front()), vertices.data(),
                 vertices.size() * sizeof(vertices.front()), "chapter actor pose", diagnostic, observation)) return false;
@@ -7038,6 +7075,9 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         chapterActorWalking_ = frame.chapterCompanion.walking;
         chapterActorActing_ = frame.chapterCompanion.acting;
         chapterActorLocomotion_ = frame.chapterCompanion.locomotion;
+#if defined(_DEBUG)
+        chapterInspectionLast_=frame.diagnosticChapterActor;
+#endif
         chapterActorNeedsRefit_ = true;
     }
     if (!characterSlot_.PrepareFrame(frame.skeletonEnemies,
@@ -8902,6 +8942,44 @@ bool PresentableTinyRtScene::CapturePlayerWorldBodyMesh(
 }
 #endif
 
+#if defined(_DEBUG)
+bool PresentableTinyRtScene::LoadChapterActorInspection(const std::filesystem::path& directory,std::string& diagnostic)
+{
+    if(!chapterActorReady_ || chapterInspectionActor_ || chapterInspectionLast_) {
+        diagnostic="Hidden actor must be loaded once between completed ordinary frames.";return false;
+    }
+    auto actor=std::make_unique<horde::scene::assets::SkinnedPbrActor>();
+    horde::scene::SkinnedClipSet clips{};
+    clips.clips={{{"Warden|idle",true,true},{"Warden|walk",true,true},
+                  {"KitProof|turn_left",false,true},{"KitProof|turn_right",false,true}}};
+    if(!actor->Load(directory,"kit-turn-proof.glb",clips,diagnostic))return false;
+    const auto& candidate=actor->Asset();const auto& original=chapterActor_.Asset();
+    if(candidate.indices!=original.indices || candidate.vertices.size()!=original.vertices.size() ||
+       candidate.primitives.size()!=original.primitives.size() || candidate.materials.size()!=original.materials.size()) {
+        diagnostic="Hidden actor topology/material layout differs from the admitted GPU lane.";return false;
+    }
+    for(std::size_t i=0;i<original.vertices.size();++i)
+        if(candidate.vertices[i].uv0!=original.vertices[i].uv0) {diagnostic="Hidden actor UV layout differs.";return false;}
+    for(std::size_t i=0;i<original.primitives.size();++i) {
+        const auto& a=candidate.primitives[i];const auto& b=original.primitives[i];
+        if(a.vertexOffset!=b.vertexOffset || a.indexOffset!=b.indexOffset || a.indexCount!=b.indexCount ||
+           a.materialIndex!=b.materialIndex || a.nodeTransformIndex!=b.nodeTransformIndex) {
+            diagnostic="Hidden actor primitive addressing differs.";return false;
+        }
+    }
+    for(std::size_t i=0;i<original.materials.size();++i)
+        if(candidate.materials[i].name!=original.materials[i].name) {diagnostic="Hidden actor material identity differs.";return false;}
+    chapterInspectionActor_=std::move(actor);return true;
+}
+bool PresentableTinyRtScene::ReleaseChapterActorInspection(std::string& diagnostic)
+{
+    if(chapterInspectionLast_) {diagnostic="Present an ordinary actor frame before releasing inspection data.";return false;}
+#if HORDE_RT_ACTOR_WORKER_EXPERIMENT
+    if(chapterWorkerUsesInspection_) {chapterPoseWorker_.reset();chapterWorkerUsesInspection_=false;}
+#endif
+    chapterInspectionActor_.reset();return true;
+}
+#endif
 bool PresentableTinyRtScene::CaptureStorageImage(StorageImageCapture& capture, std::string& diagnostic)
 {
     capture = {};
