@@ -1,0 +1,1 @@
+RUN_PROOF_PASS actual_poses=192 vertices=34304 GPU=not-run

@@ -1,0 +1,148 @@
+{
+  "base": "ebbfd46fc236c2b691ef729742ac7741674ab1b9",
+  "admitted": false,
+  "productionChanged": false,
+  "phone": false,
+  "fpsClaim": false,
+  "temporarySourceRestored": {
+    "src\\vulkan\\raytracing\\PresentableTinyRtScene.cpp": "d6f219d280e3d6e095ad36327a3c13d456a40db0e59c809e8ebd3524741f546e",
+    "src\\platform\\windows\\DiagnosticWindow.cpp": "063bec31bb6e019e695f6f15d23aea25bf1965628c72c1c66587ab9fa00948c2",
+    "tests\\PlayerDirectionalRigTests.cpp": "588129bfd9cb58a9996dc62c3c5a51d46a15e2c23066965648d0e95f0aab1ece"
+  },
+  "native": {
+    "rt-control": {
+      "process": {
+        "exeSha256": "f179d099591135c101d075b161a3e046e12fe107284190bbc79e5c3a22756feb",
+        "candidateSha256": null,
+        "started": 1792876832.461632,
+        "scope": "isolated hidden real RT presentation, not performance/natural route/phone acceptance",
+        "foregroundActivation": false,
+        "pid": 18116,
+        "exit": 0,
+        "timeout": false,
+        "elapsed": 51.87107706069946,
+        "custodyUnchanged": true
+      },
+      "renderedFrames": 180,
+      "captures": 32,
+      "actualSpeedRange": [
+        0,
+        3.200000048
+      ],
+      "armPixelRange": [
+        3117,
+        8792
+      ],
+      "allVisibilityAccepted": true,
+      "pipeline": {
+        "executionBackend": "RayTracingPipeline",
+        "instrumentation": "diagnostic",
+        "dielectricQuality": "high",
+        "bundleKey": "diagnostic_high_pair",
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "e4723c5313d81d73cc747ecc072d254d607a43f41e0cac5279adf8b0c3561ae0"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a"
+        },
+        "activeStrategy": "opaque-fast",
+        "activeKey": "diagnostic_high_opaque_fast",
+        "activeSha256": "e4723c5313d81d73cc747ecc072d254d607a43f41e0cac5279adf8b0c3561ae0",
+        "waterQuality": "high"
+      },
+      "dimensions": {
+        "internalExtent": [
+          960,
+          540
+        ],
+        "outputExtent": [
+          960,
+          540
+        ],
+        "cameraAspect": 1.77777779,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": false,
+        "aspectPreserved": true
+      },
+      "firstPersonActualPitch": -0.3199999928,
+      "mirrorOccludedByKeeper": true,
+      "fullRawFramesSha256": "8ee7be7f4a8b2528e3e0c9683b6aa5d1f7061ad4f35c756d10f9c197c980297f"
+    },
+    "rt-run": {
+      "process": {
+        "exeSha256": "f179d099591135c101d075b161a3e046e12fe107284190bbc79e5c3a22756feb",
+        "candidateSha256": "d92d4b3724cea6aabdb63511f05236b9eba848818ae516142bbf1069122d30b9",
+        "started": 1792876884.7674363,
+        "scope": "isolated hidden real RT presentation, not performance/natural route/phone acceptance",
+        "foregroundActivation": false,
+        "pid": 34252,
+        "exit": 0,
+        "timeout": false,
+        "elapsed": 21.61657738685608,
+        "custodyUnchanged": true
+      },
+      "renderedFrames": 180,
+      "captures": 32,
+      "actualSpeedRange": [
+        0,
+        3.200000048
+      ],
+      "armPixelRange": [
+        3267,
+        9046
+      ],
+      "allVisibilityAccepted": true,
+      "pipeline": {
+        "executionBackend": "RayTracingPipeline",
+        "instrumentation": "diagnostic",
+        "dielectricQuality": "high",
+        "bundleKey": "diagnostic_high_pair",
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "e4723c5313d81d73cc747ecc072d254d607a43f41e0cac5279adf8b0c3561ae0"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a"
+        },
+        "activeStrategy": "opaque-fast",
+        "activeKey": "diagnostic_high_opaque_fast",
+        "activeSha256": "e4723c5313d81d73cc747ecc072d254d607a43f41e0cac5279adf8b0c3561ae0",
+        "waterQuality": "high"
+      },
+      "dimensions": {
+        "internalExtent": [
+          960,
+          540
+        ],
+        "outputExtent": [
+          960,
+          540
+        ],
+        "cameraAspect": 1.77777779,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": false,
+        "aspectPreserved": true
+      },
+      "firstPersonActualPitch": -0.3199999928,
+      "mirrorOccludedByKeeper": true,
+      "fullRawFramesSha256": "2f2b858761043d4147e64a003998b034ccfc0d414d1c76e429b003df1265614c"
+    }
+  },
+  "custody": {
+    "equal": true,
+    "settingsSha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3",
+    "campaignExists": false,
+    "campaignFileCount": 0,
+    "parkedFiles": 151,
+    "foregroundReadbackBefore": 132058,
+    "foregroundReadbackAfter": 132058
+  },
+  "rawRetainedReportDirectory": "reports/player-run-retarget-20261024",
+  "candidateSha256": "d92d4b3724cea6aabdb63511f05236b9eba848818ae516142bbf1069122d30b9",
+  "candidateBytes": 2645708
+}

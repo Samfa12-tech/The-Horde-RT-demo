@@ -1,0 +1,5 @@
+{
+  "src\\vulkan\\raytracing\\PresentableTinyRtScene.cpp": "d6f219d280e3d6e095ad36327a3c13d456a40db0e59c809e8ebd3524741f546e",
+  "src\\platform\\windows\\DiagnosticWindow.cpp": "063bec31bb6e019e695f6f15d23aea25bf1965628c72c1c66587ab9fa00948c2",
+  "tests\\PlayerDirectionalRigTests.cpp": "588129bfd9cb58a9996dc62c3c5a51d46a15e2c23066965648d0e95f0aab1ece"
+}
