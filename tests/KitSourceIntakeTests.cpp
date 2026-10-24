@@ -13,6 +13,7 @@
 #include <fstream>
 #include <cstdint>
 #include "KitTurnProofValidation.h"
+#include "KitTurnContactValidation.h"
 
 namespace {
 bool CheckAnalyticTangentFrames() {
@@ -450,6 +451,7 @@ int CompareCandidate(const std::filesystem::path& path,const std::filesystem::pa
 }
 
 int main(int argc,char** argv) {
+    if(argc==4 && std::string_view(argv[1])=="--turn-contact")return MeasureKitTurnContact(argv[2],argv[3]);
     if(argc==4 && std::string_view(argv[1])=="--turn-proof")return ValidateKitTurnProof(argv[2],argv[3],std::filesystem::path(HORDE_KIT_RUNTIME_DIRECTORY)/"kit-warden-lod0.runtime.glb");
     if(argc==4 && std::string_view(argv[1])=="--compare-candidate")return CompareCandidate(argv[2],argv[3]);
     if(argc!=1)return 2;

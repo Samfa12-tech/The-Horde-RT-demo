@@ -1,5 +1,14 @@
 # KIT ANIMATION PLAN 1 7 — WP0 custody and reconciliation
 
+## Partial-angle prerequisite - 24 October 2026
+
+The [matched joint/yaw amplitude study](evidence/2026-10-24-kit-partial-contact/README.md)
+retains all eight requested cases and an authored-speed 180-degree preview.
+It remains unadmitted: 22.5-degree contact-point motion exceeds the full control,
+and nominal swing is not always clear of the floor at 2 degrees. The shared
+turn/start state remains held. A genuine small-angle authored pair is proposed;
+no production binding, original clip, route/tether/speed or save policy changed.
+
 ## Isolated turn RT joins - 24 October 2026
 
 The [Debug-only candidate playback proof](evidence/2026-10-24-kit-turn-rt/README.md)

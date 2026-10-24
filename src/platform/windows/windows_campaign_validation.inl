@@ -75,6 +75,14 @@ bool HiddenLookoutFilesAllowed(const std::filesystem::path& directory,bool after
         if(afterRun && gLookoutInspectKitTurns) {
             if(name=="windows-kit-turn-control.png" || name=="windows-kit-turn-restored.png")continue;
             bool allowed=false;
+            if(gLookoutInspectKitPartials) {
+                for(const char* side:{"left","right"})for(const char* angle:{"2","10","22_5","45"})
+                    for(unsigned tick=0;tick<=18;++tick)if(gLookoutInspectKitPartialsDense || tick==0 || tick==6 || tick==9 || tick==12 || tick==18)
+                        allowed|=name==std::string("windows-kit-turn-partial-")+side+"-"+angle+"-"+std::to_string(tick)+".png";
+                if(!gLookoutInspectKitPartialsDense)for(unsigned frame=0;frame<=72;++frame)
+                    allowed|=name=="windows-kit-turn-large-"+std::to_string(10000+frame).substr(1)+".png";
+                if(allowed)continue;
+            }
             for(const char* side:{"left","right"})for(const char* step:{"idle","blend-0","blend-4","blend-8","blend-11",
                 "turn-20","turn-30","turn-40","turn-end","walk-0","walk-4","walk-8","walk-11","walk-20",
                 "pause-a","pause-b","resume","reset"})
@@ -328,7 +336,33 @@ int RunHiddenLookoutValidation(VulkanSurfaceContext& ctx,horde::vulkan::DeviceCa
         const auto sameImage=[](const Image& a,const Image& b){return a.width==b.width && a.height==b.height && a.rgba==b.rgba;};
         const auto yawCurve=[](float phase){const float u=std::clamp((phase-.04f)/.92f,0.f,1.f);
             return .7853981633974483f*u*u*(3-2*u);};
-        for(unsigned side=0;side<2 && proceed;++side) {
+        if(gLookoutInspectKitPartials) {
+            constexpr std::array<float,4> angles{2,10,22.5f,45};
+            constexpr std::array<const char*,4> labels{"2","10","22_5","45"};
+            for(unsigned side=0;side<2 && proceed;++side)for(unsigned angle=0;angle<angles.size() && proceed;++angle) {
+                const float amplitude=angles[angle]/45.f;
+                const float target=kit_turn_contact::Yaw(side!=0,1)*amplitude;
+                for(unsigned tick=0;tick<=18;++tick) {
+                    if(!gLookoutInspectKitPartialsDense && tick!=0 && tick!=6 && tick!=9 && tick!=12 && tick!=18)continue;
+                    if(!proceed)break;
+                    const float phase=tick/18.f;
+                    auto pose=control;pose.yaw=heading+target-kit_turn_contact::Yaw(side!=0,phase)*amplitude;
+                    Inspection selected;selected.clip=Inspection::Clip::Idle;selected.turnPhase=phase;
+                    selected.hasBlend=true;selected.blendClip=side?Inspection::Clip::TurnRight:Inspection::Clip::TurnLeft;
+                    selected.weight=amplitude;
+                    proceed=capture(std::string("partial-")+(side?"right":"left")+"-"+labels[angle]+"-"+std::to_string(tick),pose,selected);
+                }
+            }
+            // Four original 45-degree cycles, sampled at 24 Hz: 3 seconds of
+            // authored time. Image playback rate is not observed engine FPS.
+            if(!gLookoutInspectKitPartialsDense)for(unsigned frame=0;frame<=72 && proceed;++frame) {
+                const unsigned cycle=std::min(frame/18,3u);const float phase=(frame-cycle*18)/18.f;
+                auto pose=control;pose.yaw=heading+kit_turn_contact::Yaw(false,1)*(4-cycle)-kit_turn_contact::Yaw(false,phase);
+                Inspection selected;selected.clip=Inspection::Clip::TurnLeft;selected.turnPhase=phase;
+                proceed=capture("large-"+std::to_string(10000+frame).substr(1),pose,selected);
+            }
+        }
+        if(!gLookoutInspectKitPartials)for(unsigned side=0;side<2 && proceed;++side) {
             const std::string name=side?"right":"left";const float sign=side?-1.f:1.f;
             const auto turnClip=side?Inspection::Clip::TurnRight:Inspection::Clip::TurnLeft;
             auto pose=control;pose.yaw=heading+sign*.7853981633974483f;pose.animationSeconds=1.f;
@@ -626,6 +660,9 @@ int RunHiddenLookoutValidation(VulkanSurfaceContext& ctx,horde::vulkan::DeviceCa
         <<",\"kitTimingInspection\":{\"requested\":"<<(gLookoutInspectKitTiming?"true":"false")
         <<",\"evidenceClass\":\"bounded desktop profiling of repeated immutable poses; not sustained or phone acceptance\",\"samples\":["<<timingEvidence.str()<<"]}"
         <<",\"kitTurnInspection\":{\"requested\":"<<(gLookoutInspectKitTurns?"true":"false")
+        <<",\"partialAnglesRequested\":"<<(gLookoutInspectKitPartials?"true":"false")
+        <<",\"densePartialAnglesRequested\":"<<(gLookoutInspectKitPartialsDense?"true":"false")
+        <<",\"largeSequenceAuthoredHz\":"<<(gLookoutInspectKitPartials && !gLookoutInspectKitPartialsDense?24:0)
         <<",\"evidenceClass\":\"isolated Debug candidate playback and RT joins; not gameplay turn-state or owner acceptance\",\"frames\":["<<turnEvidence.str()<<"]}"
         <<",\"physicalVisibleAcceptance\":false,\"performanceEvidence\":false,\"ownerSettingsReadOrWritten\":false";
     return proceed && !failures?0:1;
@@ -797,7 +834,7 @@ int RunHiddenCampaignValidation(VulkanSurfaceContext& ctx)
 bool ConfigureHiddenCampaignValidation()
 {
     int count=0;auto args=CommandLineToArgvW(GetCommandLineW(),&count);if(!args)return false;
-    bool requested=false,lookoutRequested=false,routeRequested=false,returnRequested=false,inspectKit=false,inspectMotion=false,inspectTiming=false,inspectTurns=false,benchmarkMenuRequested=false,detachedCancelRequested=false,detachedCloseRequested=false;std::filesystem::path directory;
+    bool requested=false,lookoutRequested=false,routeRequested=false,returnRequested=false,inspectKit=false,inspectMotion=false,inspectTiming=false,inspectTurns=false,inspectPartials=false,inspectPartialsDense=false,benchmarkMenuRequested=false,detachedCancelRequested=false,detachedCloseRequested=false;std::filesystem::path directory;
     for(int i=1;i<count;++i) {
         const std::wstring_view arg=args[i];
         if(arg==L"--campaign-validate-hidden")requested=true;
@@ -811,6 +848,8 @@ bool ConfigureHiddenCampaignValidation()
         if(arg==L"--lookout-inspect-kit-motion"){inspectKit=true;inspectMotion=true;}
         if(arg==L"--lookout-inspect-kit-timing"){inspectKit=true;inspectMotion=true;inspectTiming=true;}
         if(arg==L"--lookout-inspect-kit-turns"){inspectKit=true;inspectTurns=true;}
+        if(arg==L"--lookout-inspect-kit-partials"){inspectKit=true;inspectTurns=true;inspectPartials=true;}
+        if(arg==L"--lookout-inspect-kit-partials-dense"){inspectKit=true;inspectTurns=true;inspectPartials=true;inspectPartialsDense=true;}
         if(arg==L"--campaign-test-root" && i+1<count)directory=args[++i];
     }
     LocalFree(args);
@@ -857,6 +896,8 @@ bool ConfigureHiddenCampaignValidation()
     gLookoutInspectKit=inspectKit;gLookoutInspectKitMotion=inspectMotion;
     gLookoutInspectKitTiming=inspectTiming;
     gLookoutInspectKitTurns=inspectTurns;
+    gLookoutInspectKitPartials=inspectPartials;
+    gLookoutInspectKitPartialsDense=inspectPartialsDense;
     gCampaignHiddenValidation=true;gCampaignValidationDirectory=absolute;return true;
 #else
     std::cerr<<"Hidden campaign validation is Debug-only.\n";return false;

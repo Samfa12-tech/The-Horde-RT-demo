@@ -7,6 +7,7 @@
 #include "platform/windows/WindowsEnvironmentSurveyLaunch.h"
 #if defined(_DEBUG)
 #include "gameplay/validation/PlayerDodgePoseFixture.h"
+#include "../../../tests/KitTurnContactData.h"
 #endif
 #include "vulkan/raytracing/EnvironmentSurveyFrame.h"
 #include "platform/windows/WindowsMusicPlayback.h"
@@ -174,6 +175,8 @@ bool gLookoutInspectKit=false;
 bool gLookoutInspectKitMotion=false;
 bool gLookoutInspectKitTiming=false;
 bool gLookoutInspectKitTurns=false;
+bool gLookoutInspectKitPartials=false;
+bool gLookoutInspectKitPartialsDense=false;
 bool gShowcaseCaptureHidden=false;
 bool gCampaignValidationHoldPreparation=false;
 std::filesystem::path gCampaignValidationDirectory;
