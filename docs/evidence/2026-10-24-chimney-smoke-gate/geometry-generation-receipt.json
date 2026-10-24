@@ -1,0 +1,31 @@
+{
+  "status": "isolated owned unadmitted B01 proof",
+  "sourceSha256": "66058108eee9e014acfa10086b9da81e577d40d9f88a3a6d7c2131388eea06ba",
+  "candidateSha256": "400a3e812474c18a176758ce88dfb5bcbabe8aa0208c1f2234cf538911165138",
+  "triangles": 982,
+  "vertices": 1990,
+  "materials": 2,
+  "removedOriginalCapTriangles": [
+    34,
+    35
+  ],
+  "newRimWellFloorTriangles": 18,
+  "outlet": [
+    95.36,
+    0.3804492092132568,
+    109.28
+  ],
+  "rimY": 0.4204492092132568,
+  "holeHalfExtent": [
+    0.33,
+    0.28
+  ],
+  "wellDepth": 0.6,
+  "unchangedOtherSourceAttributeRows": true,
+  "originalRuntimeUntouched": true,
+  "nativeImportAndRT": "not yet run",
+  "limitations": [
+    "Inherited v4 UV bitangent mismatches outside B01 remain; no unrelated repair.",
+    "Source geometry derivative only; no smoke or town gameplay admission."
+  ]
+}

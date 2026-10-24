@@ -66,6 +66,13 @@ transparency, material rows or texture layers are introduced.
 
 ## Original Bellwether distant shell (Horde1.7 development chapter)
 
+The source-only `assets/models/world/source/chimney-smoke-study-r1/` derivative
+opens the existing B01 flue using the same original geometry and material owners.
+Its editable Blender scene and inspection lights are authoring evidence, excluded
+from runtime packages. No third-party geometry/texture or admitted smoke effect
+is added; the v4 runtime remains unchanged. The source README and manifest retain
+exact provenance, regeneration and the rejected shader study's boundary.
+
 `assets/models/world/runtime/bellwether-shell-v4/` contains original closed Horde
 geometry authored with Blender5.2 from the reviewed connected-map footprints.
 The editable master, exact map/terrain/export hashes and reversible foundation

@@ -1,0 +1,42 @@
+{
+  "candidate": {
+    "bytes": 799624,
+    "functions": 1,
+    "functionCalls": 0,
+    "rayQueryInitializations": 39,
+    "instructions": 44216,
+    "branchOperations": 6090,
+    "loops": 132,
+    "selectionMerges": 2449,
+    "atomicInstructions": 5,
+    "spirvSha256": "ffef30ed6ac1c50e7217f6f2682dc008c89509913c3e493d235a8780013513ea"
+  },
+  "baseline": {
+    "bytes": 564208,
+    "functions": 1,
+    "functionCalls": 0,
+    "rayQueryInitializations": 29,
+    "instructions": 31274,
+    "branchOperations": 4322,
+    "loops": 84,
+    "selectionMerges": 1716,
+    "atomicInstructions": 5,
+    "spirvSha256": "a5d130a95895fabe11516b51a151a774e207945d65e0c2820799bb61ec909c37"
+  },
+  "unchangedLimits": {
+    "bytes": 595520,
+    "words": 148880,
+    "instructions": 33067,
+    "branchOperations": 4615,
+    "loops": 84,
+    "selectionMerges": 1860,
+    "functions": 1,
+    "functionCalls": 0,
+    "rayQueryInitializations": 29,
+    "atomicInstructions": 5
+  },
+  "published": false,
+  "driverInliningStillIntact": true,
+  "gateExplanation": "Legacy shape flag also requires rayQueryInitializations<=29; inspect count rather than infer lost inlining from its combined error label.",
+  "gpuRuntimeCandidate": "not loaded or measured"
+}

@@ -1,0 +1,52 @@
+{
+  "exeSha256": "dcb84e45e0c45fb28b0c5aa8fd64114f1abfa14b6792c3850c8e33bdaa079510",
+  "scope": "isolated unpaced renderer work with fixed60Hz idle inputs; external final idle each frame; not scanoutFPS/natural journey/phone",
+  "exit": 0,
+  "timeout": false,
+  "elapsed": 56.758442401885986,
+  "custodyUnchanged": true,
+  "baseCommit": "bed6afe7c851f88aedef62dd7eab1478f8a5901e",
+  "temporaryUnusedAbiTail": true,
+  "temporaryOpenFlueGeometry": true,
+  "sourceHooksCompleteInRepository": false,
+  "frames": 188,
+  "measured": 120,
+  "medianWholeRtGpuMs": 8.22384,
+  "medianWholeFrameCycleCpuMs": 52.2971,
+  "submittedDimensions": {
+    "internalExtent": [
+      960,
+      540
+    ],
+    "outputExtent": [
+      960,
+      540
+    ],
+    "cameraAspect": 1.77777779,
+    "presentationTransform": 0,
+    "dynamicResolutionEnabled": false,
+    "linearBlit": false,
+    "aspectPreserved": true
+  },
+  "pipeline": {
+    "executionBackend": "RayTracingPipeline",
+    "instrumentation": "diagnostic",
+    "dielectricQuality": "high",
+    "bundleKey": "diagnostic_high_pair",
+    "opaqueFast": {
+      "key": "diagnostic_high_opaque_fast",
+      "sha256": "a5d130a95895fabe11516b51a151a774e207945d65e0c2820799bb61ec909c37"
+    },
+    "genericDielectric": {
+      "key": "diagnostic_high_generic_dielectric",
+      "sha256": "797e83e0f3f09c53f3d9624df9d6d6d3042dd60cea170bb5fb08c5c53c634bcd"
+    },
+    "activeStrategy": "generic-dielectric",
+    "activeKey": "diagnostic_high_generic_dielectric",
+    "activeSha256": "797e83e0f3f09c53f3d9624df9d6d6d3042dd60cea170bb5fb08c5c53c634bcd",
+    "waterQuality": "high"
+  },
+  "ownerFilesVerified": 151,
+  "settingsSha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3",
+  "privateSaveContentsIncluded": false
+}

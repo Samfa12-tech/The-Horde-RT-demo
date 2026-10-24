@@ -1,0 +1,15 @@
+{
+  "state": "PAUSED",
+  "ownerFilesExact": 151,
+  "runtimeRestoredTo": "bed6afe7c851f88aedef62dd7eab1478f8a5901e",
+  "abiGeneratorCheck": "pass",
+  "catalogAdapterCheck": "pass",
+  "compactPatchApplyCheck": "pass, not applied",
+  "geometryVerification": "pass",
+  "candidateRuntime": "unadmitted/not loaded",
+  "phoneOperations": false,
+  "flaskImplementation": "not started, approved; paused",
+  "restorationBuild": "interrupted by Ctrl-C at owner pause; exec session13182 exited1, no completed rebuild claim",
+  "resumeBuildRequired": true,
+  "processVerification": "owned exec sessions ended; narrow CIM query for cmake command denied (CIM resource unavailable); no retry/alternate inventory; descendant process absence not independently verified"
+}

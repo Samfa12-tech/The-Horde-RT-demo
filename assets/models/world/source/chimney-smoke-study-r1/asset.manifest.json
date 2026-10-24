@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "status": "source-only unadmitted open-flue study; not packaged",
+  "license": "Original project geometry, existing v4 material provenance unchanged; ASSET_LICENSES.md",
+  "sourceV4Sha256": "66058108eee9e014acfa10086b9da81e577d40d9f88a3a6d7c2131388eea06ba",
+  "generatedGlbSha256": "400a3e812474c18a176758ce88dfb5bcbabe8aa0208c1f2234cf538911165138",
+  "triangles": 982,
+  "vertices": 1990,
+  "materialPrimitives": 2,
+  "sources": {
+    "prepare_open_flue.py": "e77d826e6ee921a087e4ee37a1d97415cd18407ddcff9fea12dad46e64bd927f",
+    "preview_open_flue.py": "83175abff39ca701b5dfbbdcccf5aca08bde8f393a1c475f42c4dfcaef00d02f",
+    "previews/b01-open-flue-close.png": "33c9950bc20e74b22fc8356bb02794e5fd63832220f0cb324e1ec13671a88b8b",
+    "README.md": "bd05a283d6524ef233a60ff91a0d59653a64b31af5b9fb79dfdfc6afb660282d",
+    "source/b01-open-flue-r1.blend": "3f6e2de29daf59936ce80edcb9db8c98f4b29c6df29b2475f8dcc6f8fb038ea6",
+    "verify_open_flue.py": "0930f6ac8d19526b29556d52d22d2a9f697c234fdd71d9c32c2d10d10d75af64"
+  }
+}

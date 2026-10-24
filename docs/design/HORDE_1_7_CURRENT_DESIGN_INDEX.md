@@ -2,7 +2,15 @@
 
 ## Current authority - 24 October 2026
 
-Sam’s 21:10:41 UTC reply approves a bounded owned crown study (small-sample review before rollout), retains the refillable/upgradeable flask in 1.7 pending a complete-policy approval, and prioritizes gated chimney High/Low. New outdoor mist/shafts/fireflies/visual wind are explicitly deferred; existing effects/preferences remain. See [selected decisions](HORDE_1_7_OWNER_DECISIONS_2026_10_24.md#selected-direction) and [flask proposal](HORDE_1_7_FLASK_POLICY_PROPOSAL_2026_10_24.md). The [first source crown sample](../../assets/models/world/source/forest-crown-study-r1/README.md) remains too sparse; production is unchanged and export is blocked by an OS temporary-image denial. The [owned Run study](../evidence/2026-10-24-player-run-retarget/README.md) is unadmitted after a walk-only grounding mismatch, with limited RT coverage.
+The [bounded chimney study](../evidence/2026-10-24-chimney-smoke-gate/README.md)
+retains a verified open-flue source derivative but rejects the shared per-path
+smoke expansion at unchanged static shader gates. Opaque remains fully inlined;
+query sites rise29→39 and code564,208→799,624bytes. No smoke bank was published or
+loaded; High/Low image/cost acceptance is absent, not a pass. Normal source,
+generated bank/ABI and v4 geometry are restored. A separate live-RT lighting
+preparation proposal needs review before another material renderer change.
+
+Sam’s 21:10:41 UTC reply approves a bounded owned crown study (small-sample review before rollout), retains the refillable/upgradeable flask in 1.7; its implementation was approved at22:49:26UTC but has not started under the subsequent pause, and prioritizes gated chimney High/Low. New outdoor mist/shafts/fireflies/visual wind are explicitly deferred; existing effects/preferences remain. See [selected decisions](HORDE_1_7_OWNER_DECISIONS_2026_10_24.md#selected-direction) and [flask proposal](HORDE_1_7_FLASK_POLICY_PROPOSAL_2026_10_24.md). The [first source crown sample](../../assets/models/world/source/forest-crown-study-r1/README.md) remains too sparse; production is unchanged and export is blocked by an OS temporary-image denial. The [owned Run study](../evidence/2026-10-24-player-run-retarget/README.md) is unadmitted after a walk-only grounding mismatch, with limited RT coverage.
 
 The [normal shared64 ownership checkpoint](../evidence/2026-10-24-normal-shared-forest/README.md)
 moves the existing-master owner and whole-instance retention into common Debug,
