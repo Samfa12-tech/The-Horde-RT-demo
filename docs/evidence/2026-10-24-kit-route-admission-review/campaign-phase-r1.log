@@ -1,0 +1,50 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+UpdateCTestConfiguration  from :C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/DartConfiguration.tcl
+Parse Config file:C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/DartConfiguration.tcl
+UpdateCTestConfiguration  from :C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/DartConfiguration.tcl
+Parse Config file:C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/DartConfiguration.tcl
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 37
+    Start 37: horde_rt_campaign_play_session_tests
+
+37: Test command: "C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-debug\Debug\horde_rt_campaign_play_session_tests.exe"
+37: Working Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+37: Test timeout computed to be: 30
+37: PLAY_SESSION_ELAPSED phase=suite-start totalMs=0 sincePreviousMs=0 tick=0 checks=0 failures=0
+37: PLAY_SESSION_ELAPSED phase=terrain-ready totalMs=1353 sincePreviousMs=1353 tick=0 checks=0 failures=0
+37: PLAY_SESSION_ELAPSED phase=storage-prelude-complete totalMs=1395 sincePreviousMs=41 tick=54 checks=42 failures=0
+37: PLAY_SESSION_ELAPSED phase=normal-earned-journey-start totalMs=1395 sincePreviousMs=0 tick=0 checks=42 failures=0
+37: PLAY_SESSION_ELAPSED phase=earned-lower-boundary totalMs=1857 sincePreviousMs=462 tick=3228 checks=50 failures=0
+37: ordinary lower live=-34.0119,-17.5184 boundary=1 rope=1
+37: PLAY_SESSION_ELAPSED phase=earned-upper-boundary totalMs=3727 sincePreviousMs=1870 tick=3892 checks=71 failures=0
+37: ordinary upper live=-33.7,-13.3383 speed=1.9 boundary=1
+37: PLAY_SESSION_ELAPSED phase=earned-upper-recovery-complete totalMs=8674 sincePreviousMs=4946 tick=3892 checks=101 failures=0
+37: PLAY_SESSION_ELAPSED phase=earned-forest-endpoint totalMs=19229 sincePreviousMs=10554 tick=7049 checks=107 failures=0
+37: PLAY_SESSION_ELAPSED phase=earned-return-start totalMs=21250 sincePreviousMs=2021 tick=122 checks=125 failures=0
+1/1 Test #37: horde_rt_campaign_play_session_tests ...***Timeout  30.02 sec
+PLAY_SESSION_ELAPSED phase=suite-start totalMs=0 sincePreviousMs=0 tick=0 checks=0 failures=0
+PLAY_SESSION_ELAPSED phase=terrain-ready totalMs=1353 sincePreviousMs=1353 tick=0 checks=0 failures=0
+PLAY_SESSION_ELAPSED phase=storage-prelude-complete totalMs=1395 sincePreviousMs=41 tick=54 checks=42 failures=0
+PLAY_SESSION_ELAPSED phase=normal-earned-journey-start totalMs=1395 sincePreviousMs=0 tick=0 checks=42 failures=0
+PLAY_SESSION_ELAPSED phase=earned-lower-boundary totalMs=1857 sincePreviousMs=462 tick=3228 checks=50 failures=0
+ordinary lower live=-34.0119,-17.5184 boundary=1 rope=1
+PLAY_SESSION_ELAPSED phase=earned-upper-boundary totalMs=3727 sincePreviousMs=1870 tick=3892 checks=71 failures=0
+ordinary upper live=-33.7,-13.3383 speed=1.9 boundary=1
+PLAY_SESSION_ELAPSED phase=earned-upper-recovery-complete totalMs=8674 sincePreviousMs=4946 tick=3892 checks=101 failures=0
+PLAY_SESSION_ELAPSED phase=earned-forest-endpoint totalMs=19229 sincePreviousMs=10554 tick=7049 checks=107 failures=0
+PLAY_SESSION_ELAPSED phase=earned-return-start totalMs=21250 sincePreviousMs=2021 tick=122 checks=125 failures=0
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =  30.04 sec
+
+The following tests FAILED:
+	 37 - horde_rt_campaign_play_session_tests (Timeout)
+Errors while running CTest

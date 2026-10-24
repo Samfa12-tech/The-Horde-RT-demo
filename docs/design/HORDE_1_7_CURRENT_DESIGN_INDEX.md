@@ -1,5 +1,12 @@
 # Horde 1.7 current design index
 
+Latest review: [normal-actor RT journey and waiting-guidance verdict](../evidence/2026-10-24-kit-route-admission-review/README.md).
+Normal motion stays OFF: 515 join checks/123 reference-identical images and the
+17-check RT journey pass, but no adequate escort cue exists and the first-corner
+camera excludes Kit. The unchanged Debug campaign gate is a measured 37-second
+workload against 30 seconds, not a demonstrated route deadlock. Next smallest
+slice is one transient escort hint plus a visible corner witness, not more clips.
+
 Latest admission status: the [normal-path WIP and gate diagnosis](../evidence/2026-10-24-kit-turn-admission/README.md)
 preserve the attempted shared renderer/asset integration with normal motion OFF.
 The endpoint fixture had an invalid camera-rebase resume; the earned route really

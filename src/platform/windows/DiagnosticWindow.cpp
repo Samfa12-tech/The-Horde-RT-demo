@@ -170,6 +170,7 @@ bool gOpeningBenchmarkDetachedCancelInjected=false;
 #endif
 bool gLookoutHiddenValidation=false;
 bool gRouteHiddenValidation=false;
+bool gRouteKitTurnStartValidation=false;
 bool gRouteReturnRecovery=false;
 bool gLookoutInspectKit=false;
 bool gLookoutInspectKitMotion=false;
@@ -8721,10 +8722,16 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     const bool explicitComparison = developmentCheckpoint != nullptr &&
         horde::vulkan::raytracing::PlayerRenderRouteForCheckpoint(*developmentCheckpoint) !=
             horde::vulkan::raytracing::kProductionPlayerRenderRoute;
-    if (!graphicsPreviewCapture)
-        context.simulation = horde::gameplay::simulation::GameSimulation(
-            explicitComparison ? horde::gameplay::simulation::GameSimulationConfig{} :
-                                 horde::gameplay::simulation::ProductionGameSimulationConfig());
+    if (!graphicsPreviewCapture) {
+        auto simulationConfig=explicitComparison?horde::gameplay::simulation::GameSimulationConfig{}:
+            horde::gameplay::simulation::ProductionGameSimulationConfig();
+#if defined(_DEBUG)
+        // Only the strictly isolated existing route validator may opt in.
+        // Normal application configuration, settings and save schema stay OFF.
+        if(gRouteHiddenValidation && gRouteKitTurnStartValidation)simulationConfig.companionTurnStart=true;
+#endif
+        context.simulation=horde::gameplay::simulation::GameSimulation(simulationConfig);
+    }
     if (context.developmentRescueJourney)
     {
         context.simulation.SetDevelopmentRescueJourney(true,true);

@@ -1153,7 +1153,7 @@ int RunHiddenCampaignValidation(VulkanSurfaceContext& ctx)
 bool ConfigureHiddenCampaignValidation()
 {
     int count=0;auto args=CommandLineToArgvW(GetCommandLineW(),&count);if(!args)return false;
-    bool requested=false,lookoutRequested=false,routeRequested=false,returnRequested=false,inspectKit=false,inspectMotion=false,inspectTiming=false,inspectTurns=false,inspectPartials=false,inspectPartialsDense=false,inspectController=false,benchmarkMenuRequested=false,detachedCancelRequested=false,detachedCloseRequested=false;std::filesystem::path directory;
+    bool requested=false,lookoutRequested=false,routeRequested=false,routeTurnStartRequested=false,returnRequested=false,inspectKit=false,inspectMotion=false,inspectTiming=false,inspectTurns=false,inspectPartials=false,inspectPartialsDense=false,inspectController=false,benchmarkMenuRequested=false,detachedCancelRequested=false,detachedCloseRequested=false;std::filesystem::path directory;
     for(int i=1;i<count;++i) {
         const std::wstring_view arg=args[i];
         if(arg==L"--campaign-validate-hidden")requested=true;
@@ -1162,6 +1162,7 @@ bool ConfigureHiddenCampaignValidation()
         if(arg==L"--benchmark-menu-detached-close")detachedCloseRequested=true;
         if(arg==L"--lookout-validate-hidden")lookoutRequested=true;
         if(arg==L"--route-validate-hidden")routeRequested=true;
+        if(arg==L"--route-kit-turn-start")routeTurnStartRequested=true;
         if(arg==L"--route-return-recovery-hidden")returnRequested=true;
         if(arg==L"--lookout-inspect-kit")inspectKit=true;
         if(arg==L"--lookout-inspect-kit-motion"){inspectKit=true;inspectMotion=true;}
@@ -1173,6 +1174,9 @@ bool ConfigureHiddenCampaignValidation()
         if(arg==L"--campaign-test-root" && i+1<count)directory=args[++i];
     }
     LocalFree(args);
+    if(routeTurnStartRequested && !routeRequested) {
+        std::cerr<<"Kit turn/start opt-in requires the isolated hidden route validator.\n";return false;
+    }
     if(inspectTurns && inspectMotion) {std::cerr<<"Select one bounded Kit motion or authored-turn inspection.\n";return false;}
     if(inspectController && (inspectMotion || inspectTurns)) {
         std::cerr<<"Shared Kit controller inspection cannot combine motion, timing or manual turn modes.\n";return false;
@@ -1216,6 +1220,7 @@ bool ConfigureHiddenCampaignValidation()
     }
     gLookoutHiddenValidation=lookoutRequested;
     gRouteHiddenValidation=routeRequested || returnRequested;
+    gRouteKitTurnStartValidation=routeTurnStartRequested;
     gLookoutInspectKit=inspectKit;gLookoutInspectKitMotion=inspectMotion;
     gLookoutInspectKitTiming=inspectTiming;
     gLookoutInspectKitTurns=inspectTurns;

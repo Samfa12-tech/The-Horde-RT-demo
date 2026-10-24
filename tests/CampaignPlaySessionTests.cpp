@@ -17,6 +17,16 @@ namespace fs=std::filesystem;
 namespace {
 int checks=0,failures=0;
 void Check(bool value,const char* message){++checks;if(!value){++failures;std::cerr<<"FAIL: "<<message<<'\n';}}
+const auto suiteStarted=std::chrono::steady_clock::now();
+void MarkElapsed(const char* phase,std::uint64_t tick=0) {
+    static auto previous=suiteStarted;
+    const auto now=std::chrono::steady_clock::now();
+    std::cerr<<"PLAY_SESSION_ELAPSED phase="<<phase
+             <<" totalMs="<<std::chrono::duration_cast<std::chrono::milliseconds>(now-suiteStarted).count()
+             <<" sincePreviousMs="<<std::chrono::duration_cast<std::chrono::milliseconds>(now-previous).count()
+             <<" tick="<<tick<<" checks="<<checks<<" failures="<<failures<<std::endl;
+    previous=now;
+}
 void DumpKitState(std::ostream& out,const char* label,const sim::SimulationSnapshot& s,const sim::InputSnapshot& in) {
     const auto& k=s.chapterCompanion;const auto& m=k.motion;const auto& d=s.chapterDialogue;
     using Phase=horde::gameplay::traversal::Phase;
@@ -242,6 +252,7 @@ int CheckActualReturnRecovery(const fs::path& requested,const std::shared_ptr<co
 // motor only. Recovery then loads only the records this journey really wrote.
 void NormalBoundaryJourney(const std::shared_ptr<const sim::TriangleSupportSurface>& terrain,
                           bool diagnoseTurnStart=false) {
+    MarkElapsed(diagnoseTurnStart?"opt-in-earned-journey-start":"normal-earned-journey-start");
     using namespace horde::gameplay;
     namespace tr=horde::gameplay::traversal;
     Directory directory;
@@ -328,6 +339,7 @@ void NormalBoundaryJourney(const std::shared_ptr<const sim::TriangleSupportSurfa
     if(game.Snapshot().chestReward.phase!=interactions::ChestRewardPhase::LanternClaimed)return;
     for(int tick=0;tick<600 && !game.LatestCampaignBoundary();++tick)step();
     const auto lower=game.LatestCampaignBoundary();
+    MarkElapsed("earned-lower-boundary",game.Snapshot().tickIndex);
     std::cout<<"ordinary lower live="<<game.Snapshot().playerX<<','<<game.Snapshot().playerZ
              <<" boundary="<<bool(lower)<<" rope="<<game.Snapshot().rescue.ropeReady<<'\n';
     Check(lower && lower->id==cp::CheckpointId::LowerClaimed && lower->position==tr::kLowerLanding &&
@@ -368,6 +380,7 @@ void NormalBoundaryJourney(const std::shared_ptr<const sim::TriangleSupportSurfa
         game.AdvanceFrame(input,1.0/15.0,++publication);
     for(int frame=0;frame<20;++frame)game.AdvanceFrame(input,1.0/15.0,++publication);
     const auto upper=game.LatestCampaignBoundary();
+    MarkElapsed("earned-upper-boundary",game.Snapshot().tickIndex);
     std::cout<<"ordinary upper live="<<game.Snapshot().playerX<<','<<game.Snapshot().playerZ
              <<" speed="<<game.Snapshot().playerMovementSpeedMetresPerSecond<<" boundary="<<bool(upper)<<'\n';
     Check(game.Snapshot().rescue.firstAscentCompleted && upper && upper->id==cp::CheckpointId::SafeExit &&
@@ -417,6 +430,7 @@ void NormalBoundaryJourney(const std::shared_ptr<const sim::TriangleSupportSurfa
     }
     // Continue the SAME normally earned campaign. Only the existing host
     // presentation protocol is acknowledged here; this is not GPU evidence.
+    MarkElapsed("earned-upper-recovery-complete",game.Snapshot().tickIndex);
     Check(!game.CaptureAuthoredCampaignBoundary(cp::CheckpointId::ForestEndpoint),
           "summit arrival cannot project an unearned forest endpoint");
     const auto reunion=sim::kWorldRoutePoints[3];
@@ -506,6 +520,7 @@ void NormalBoundaryJourney(const std::shared_ptr<const sim::TriangleSupportSurfa
               "ordinary return and deliberate escort pacing recover the candidate without changing any route rule");
     }
     const auto endpoint=game.LatestCampaignBoundary();
+    MarkElapsed("earned-forest-endpoint",game.Snapshot().tickIndex);
     if(!(endpoint && endpoint->id==cp::CheckpointId::ForestEndpoint && endpoint->contentRevision==2 &&
           endpoint->zone==sim::WorldZoneId::Lookout && endpoint->dialogue.proofAccepted &&
           endpoint->dialogue.forestNightConsumed && endpoint->dialogue.forestWaystoneConsumed &&
@@ -558,6 +573,7 @@ void NormalBoundaryJourney(const std::shared_ptr<const sim::TriangleSupportSurfa
               fresh.Snapshot().chapterDialogue.line==dialogue::Line::None && fresh.Snapshot().chapterCompanion.grounded &&
               fresh.Snapshot().chapterCompanion.waypoint==sim::kWorldRoutePoints.size(),
               "fresh endpoint load resumes completed Kit/story without rewriting or autosaving the loaded record");
+        MarkElapsed("earned-return-start",fresh.Snapshot().tickIndex);
         const auto returnTo=[&](float x,float z) {
             for(int tick=0;tick<2400;++tick) {
                 const auto s=fresh.Snapshot();const float dx=x-s.playerX,dz=z-s.playerZ,d=std::hypot(dx,dz);
@@ -580,6 +596,7 @@ void NormalBoundaryJourney(const std::shared_ptr<const sim::TriangleSupportSurfa
             fresh.StepFixed(freshInput,1.f/60.f,++freshPublication);
         for(int tick=0;tick<60;++tick)fresh.StepFixed(freshInput,1.f/60.f,++freshPublication);
         const auto lowerReturn=fresh.LatestCampaignBoundary();
+        MarkElapsed("earned-return-complete",fresh.Snapshot().tickIndex);
         Check(fresh.Snapshot().rescue.sawLanding && !fresh.Snapshot().rescue.exteriorSide &&
               lowerReturn && lowerReturn->id==cp::CheckpointId::LowerClaimed && lowerReturn->contentRevision==2 &&
               lowerReturn->dialogue.proofAccepted && lowerReturn->dialogue.forestVillageConsumed &&
@@ -609,6 +626,7 @@ void NormalBoundaryJourney(const std::shared_ptr<const sim::TriangleSupportSurfa
           "standing respawn headroom is checked at canonical anchor even when current player has left it");
     game.ResetRoute();Check(!game.LatestCampaignBoundary(),"actual route reset clears shared checkpoint latch");
     play.ObserveSafeBoundary();Check(!play.LatestCheckpoint(),"facade discards old game latch after actual reset");
+    MarkElapsed("earned-journey-end",game.Snapshot().tickIndex);
 }
 void EndpointWriteFailure(const std::shared_ptr<const sim::TriangleSupportSurface>& terrain) {
     Directory directory;Faults faults;sim::GameSimulation game(sim::ProductionGameSimulationConfig());
@@ -649,6 +667,7 @@ void EndpointWriteFailure(const std::shared_ptr<const sim::TriangleSupportSurfac
 }
 }
 int main(int argc,char** argv){
+    MarkElapsed("suite-start");
     if(argc==3 && std::string_view(argv[1])=="--export-fixtures")return ExportFixtures(argv[2]);
     if(argc==3 && std::string_view(argv[1])=="--export-route-fixture")return ExportFixtures(argv[2],{},true);
     const bool exportLookout=argc==3 && std::string_view(argv[1])=="--export-lookout-fixture";
@@ -661,6 +680,7 @@ int main(int argc,char** argv){
        !horde::scene::assets::StaticMeshAsset::Load(assets/"chapter-terrain-lod0.runtime.glb",manifest,mesh,error)){
         std::cerr<<error;return 1;}
     const auto terrain=horde::scene::PrepareChapterTerrainSurface(mesh,error);if(!terrain){std::cerr<<error;return 1;}
+    MarkElapsed("terrain-ready");
     if(exportLookout)return ExportFixtures(argv[2],terrain);
     if(actualReturn)return CheckActualReturnRecovery(argv[2],terrain);
     if(turnDiagnosis) {
@@ -777,7 +797,10 @@ int main(int argc,char** argv){
     const auto uncertainReceipt=play.TakeCompletion();faults.failAfterPublish=false;play.RefreshCatalogue();
     Check(uncertainReceipt && uncertainReceipt->outcome==cp::PlayOutcome::Failed &&
           Until(play,[&]{return CatalogueDone(play);}) && !play.TakeCompletion(),"uncertain publication is delivered once, fresh catalogue is read-only");
+    MarkElapsed("storage-prelude-complete",game.Snapshot().tickIndex);
     NormalBoundaryJourney(terrain);
+    MarkElapsed("endpoint-write-failure-start");
     EndpointWriteFailure(terrain);
+    MarkElapsed("suite-end");
     std::cout<<checks<<" campaign play session checks, "<<failures<<" failures\n";return failures?1:0;
 }

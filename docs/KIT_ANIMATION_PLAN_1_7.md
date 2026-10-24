@@ -1,5 +1,14 @@
 # KIT ANIMATION PLAN 1 7 — WP0 custody and reconciliation
 
+## RT route review — admission held, 24 October 2026
+
+The [bounded normal-actor review](evidence/2026-10-24-kit-route-admission-review/README.md)
+passes isolated joins and a post-Keeper-seeded input-driven RT route/save/return/load.
+It does not admit normal motion: tether waiting/rejoin guidance is absent, and
+actual first-corner camera coverage excludes Kit. Keep both context timings and
+original assets; add no timing policy yet. The Debug host deadline remains open
+with the measured return-workload seam recorded, without raising its 30-second gate.
+
 ## Admission WIP and diagnosed gates — 24 October 2026
 
 The [retained WIP checkpoint](evidence/2026-10-24-kit-turn-admission/README.md)
