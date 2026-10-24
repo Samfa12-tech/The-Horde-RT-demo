@@ -3,13 +3,14 @@
 ## Current authority - 24 October 2026
 
 Use [the current implementation/acceptance map](HORDE_1_7_IMPLEMENTATION_REMAINING_2026_10_24.md),
-before choosing work. Forest preparation `3108cffc` and Android Custom opening
-ownership `9ab88eb0` are implemented with focused checks; all six hosted jobs
-passed at basis `6797e9d3`. New-head CI remains a separate check.
+before choosing work. Forest preparation `3108cffc`, the bounded shared-BLAS
+pair `3898bcee`, Android Custom ownership `9ab88eb0` and provisional output/
+rollback `bf181643` have focused evidence. All six hosted jobs passed at
+`09c629cf`; later exact-head CI remains a separate check.
 Kit stationary turns and casual/travel timing are implemented; the registered
 Debug journey gate is fixed without raising its deadline. The forest/shared-tree
-world-depth gap, Android provisional fixed-output benchmark source and torch compact-carry
-prerequisite remain unfinished. Current touch controls need physical acceptance;
+world-depth gap and torch compact-carry prerequisite remain unfinished.
+Android provisional output and current touch controls need physical acceptance;
 Windows benchmark needs its remaining foreground/controller/listening gates.
 Specific owner decisions/deferrals and the 1.8 boundary remain explicit.
 
