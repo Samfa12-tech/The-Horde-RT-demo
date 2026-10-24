@@ -1,0 +1,116 @@
+{
+  "status": "ADMITTED_SHARED_DEVELOPMENT_PROFILE_STATIONARY_ONLY",
+  "normalProfileEnabled": true,
+  "historicalConstructorDefaultEnabled": false,
+  "stationaryRt": {
+    "count": 463,
+    "failures": 0,
+    "details": {
+      "requested": true,
+      "authoredTurnSeconds": 0.75,
+      "playbackTurnSeconds": 0.5,
+      "evidenceClass": "isolated shared diagnostic controller snapshots on actual terrain; not earned journey or owner contact acceptance",
+      "departureNominalAuthoredHz": 30,
+      "cameraPolicy": "fixed world azimuth per case; three-metre translated offset on queried terrain",
+      "speechMetadataOnly": true,
+      "actualRtCornerCoverage": "first route corner only",
+      "fixedStepCalls": 1326,
+      "activeFixedTicks": 1323,
+      "departureFrames": 79,
+      "firstWalkActiveTick": 373,
+      "legacyFirstWalkHeadingErrorRadians": 2.66919,
+      "controllerFirstWalkHeadingErrorRadians": 4.76837e-07,
+      "pauseImagesIdentical": true,
+      "resetOrdinaryImageIdentical": true,
+      "normalActorRestored": true,
+      "inspectionActorUsed": false
+    },
+    "retainedDepartureFramesByteIdentical": 79
+  },
+  "normalRt": {
+    "complete": true,
+    "count": 17,
+    "failures": 0,
+    "frames": 1454,
+    "kitTurnStartOptIn": false,
+    "kitTurnStartConfigured": true,
+    "seedAndManifestUnchanged": true,
+    "ownerShown": false,
+    "naturalWalkWithoutScriptedEscortOrSpeechStops": true
+  },
+  "normalRtPreEndpointMaximumSeparationMetres": 2.6506608048748896,
+  "normalRtPreEndpointTetherWaitRows": 0,
+  "optInAndDefaultStageImagesByteIdentical": true,
+  "focusedDebugTests": "3/3 PASS",
+  "focusedReleaseTests": "5/5 PASS",
+  "candidateNaturalEarnedJourney": "92 checks PASS; original uninterrupted movement, endpoint/save/load/return; no player-ahead tether stall",
+  "debugThirtySecondCampaignGate": "UNCHANGED_OPEN; expanded integration workload, not closed by Release pass",
+  "phoneUsed": false,
+  "ownerParkedFilesUnchanged": 151,
+  "raw": {
+    "reports/horde-campaign-fixtures-kit-stationary-eligibility-20261024/windows-lookout-validation.json": {
+      "bytes": 639039,
+      "sha256": "e54ba62cb73f5214ba2a90229a28f30cf783c4079489b14275a2ef488686d0b5"
+    },
+    "reports/horde-campaign-fixtures-route-stationary-kit-normal-20261024-r1/windows-route-validation.json": {
+      "bytes": 39148,
+      "sha256": "8ef37b623c0d72be303bae635c0509652e18487aa692da1edcb19beb1516cb07"
+    },
+    "reports/horde-campaign-fixtures-route-stationary-kit-normal-20261024-r1/route-frames.csv": {
+      "bytes": 177365,
+      "sha256": "4e595fdf1e4d2d2e443bd117c687ebcfcd5e639b6851a79fe787892040fb69c6"
+    },
+    "reports/windows-route-stationary-kit-normal-20261024-r1/receipt.json": {
+      "bytes": 3459,
+      "sha256": "08e2335007f60040d77b853bcd9f9bf98ab2b51b02948b75ac616d776f3f91f7"
+    },
+    "reports/kit-stationary-eligibility-20261024/build-admitted-release.log": {
+      "bytes": 21569,
+      "sha256": "430fa3961d4a6aa951ccc869811b8026048be468712ffa15fde51abeae9a4b6d"
+    }
+  },
+  "images": {
+    "reports/horde-campaign-fixtures-kit-stationary-eligibility-20261024/windows-kit-controller-depart-0030.png": {
+      "bytes": 1508033,
+      "sha256": "0f55bc357c009c9d77545ffab2d4dc7f628c67f21e796a9ebc074997c0975f18"
+    },
+    "reports/horde-campaign-fixtures-kit-stationary-eligibility-20261024/windows-kit-controller-depart-0078.png": {
+      "bytes": 1505378,
+      "sha256": "71c82221e73770ccb6f2220c39e754b438fc9313293b1673cf8057724da120c5"
+    },
+    "reports/horde-campaign-fixtures-route-stationary-kit-normal-20261024-r1/route-kit-corner-turn.png": {
+      "bytes": 1904333,
+      "sha256": "44fff4c840eae2057a8ae9b46f55b18fe5505eb7a8a605e386824056fbb6e6e3"
+    },
+    "reports/horde-campaign-fixtures-route-stationary-kit-normal-20261024-r1/route-kit-corner-walk.png": {
+      "bytes": 1887837,
+      "sha256": "7f12945af59150e7a02b621011467be5772d123732ceaf7c11beffdf77240090"
+    }
+  },
+  "source": {
+    "src/gameplay/dialogue/CompanionTurnPrototype.inl": {
+      "bytes": 9137,
+      "sha256": "df5e1be05942676948fbcfcb310620dc49c4be7792d0e6b27d625e92b0113890"
+    },
+    "src/gameplay/simulation/GameSimulation.h": {
+      "bytes": 22525,
+      "sha256": "8a4736a4f0e28ca4bfa1286bc58822e2f4c08fe4810e9ba2771d870ca6a62370"
+    },
+    "src/platform/windows/windows_campaign_validation.inl": {
+      "bytes": 94498,
+      "sha256": "b3f5e30db6685f2967366418f81b17ba5762d406928d5c40432912cf33790a4b"
+    },
+    "src/platform/windows/windows_route_validation.inl": {
+      "bytes": 30819,
+      "sha256": "957eb9f9fafea5cd3c042bdeff215019e21be357c1bec706084e8d7299c09f37"
+    },
+    "tests/CompanionTurnPrototypeValidation.h": {
+      "bytes": 28033,
+      "sha256": "fcf0e24dde0f808797813b4b8c6046d505d9a4c4e0553f8182fa98ec281dd133"
+    },
+    "tests/CampaignPlaySessionTests.cpp": {
+      "bytes": 60700,
+      "sha256": "c2ca4b8c9cbf4ca73c259b21d01b99ad611f2ca9285c2311ebc309c06f4935c9"
+    }
+  }
+}

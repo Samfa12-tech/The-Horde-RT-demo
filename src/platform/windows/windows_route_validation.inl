@@ -14,7 +14,7 @@ bool HiddenRouteFilesAllowed(const std::filesystem::path& directory,bool after)
         if(after && (name=="slot-1-auto.hrd" || name=="slot-2-manual.hrd" || name==kTextReportFilename ||
             name==kJsonReportFilename || name=="windows-route-validation.json" || name=="route-frames.csv" ||
             name=="route-lower.png" || name=="route-lookout.png" || name=="route-return.png" || name=="route-recovered.png"))continue;
-        if(after && (gRouteKitTurnStartValidation || gRouteNaturalWalkValidation) && (name=="route-kit-depart-turn.png" || name=="route-kit-depart-walk.png" ||
+        if(after && (gRouteKitTurnStartValidation || gRouteNaturalWalkValidation || horde::gameplay::simulation::ProductionGameSimulationConfig().companionTurnStart) && (name=="route-kit-depart-turn.png" || name=="route-kit-depart-walk.png" ||
             name=="route-kit-corner-turn.png" || name=="route-kit-corner-walk.png"))continue;
         return false;
     }
@@ -53,6 +53,7 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
     using namespace horde::gameplay;
     using namespace horde::gameplay::validation;
     unsigned checks=0,failures=0,frames=0;
+    const bool turnStartConfigured=ctx.simulation.Snapshot().chapterCompanion.motion.turnStartEnabled;
     std::ostringstream milestones;bool hasMilestone=false;
     auto& receipt=gHiddenLookout.receipt;
     receipt<<"{\"schema\":1,\"evidenceClass\":\""<<(gRouteReturnRecovery?
@@ -101,7 +102,8 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
             <<','<<s.playerYawRadians<<','<<s.chapterCompanion.yaw<<'\n';
         if(frames%120==0)rows.flush();
         return presented && ctx.lastFramePresentation==horde::telemetry::RtPresentationOutcome::Presented &&
-            (!gRouteKitTurnStartValidation || (s.chapterCompanion.motion.turnStartEnabled &&
+            s.chapterCompanion.motion.turnStartEnabled==turnStartConfigured &&
+            (!turnStartConfigured || (
                 (!s.rescue.exteriorSide || !s.chapterCompanion.grounded ||
                     (ctx.rtScene.ChapterCompanionPublishedMotion()==s.chapterCompanion.motion &&
                      !ctx.rtScene.ChapterActorInspectionPublishedPose())))) &&
@@ -256,13 +258,14 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
             if(endpoint && !endpointSaved)break;
         }
         if(proceed)proceed=render();
-        if(proceed && (gRouteKitTurnStartValidation || gRouteNaturalWalkValidation) && ctx.simulation.Snapshot().chapterDialogue.proofAccepted) {
+        if(proceed && (turnStartConfigured || gRouteNaturalWalkValidation) && ctx.simulation.Snapshot().chapterDialogue.proofAccepted) {
             const auto& k=ctx.simulation.Snapshot().chapterCompanion;
             const bool turn=k.motion.mode==dialogue::CompanionMotionMode::Turning && k.motion.turnPhase>=.4f;
             const bool walk=k.walking && k.locomotion.walkWeight>=.5f;
-            const unsigned view=(!gRouteKitTurnStartValidation && gRouteNaturalWalkValidation)?
+            const unsigned view=(!turnStartConfigured && gRouteNaturalWalkValidation)?
                 (k.waypoint==5 && k.walking?(!kitViews[2]?2u:!kitViews[3]?3u:4u):4u):
-                k.waypoint==4?(turn?0u:walk?1u:4u):k.waypoint==5?(turn?2u:walk?3u:4u):4u;
+                k.waypoint==4?(turn?0u:walk?1u:4u):
+                k.waypoint==5 && walk?(!kitViews[2]?2u:!kitViews[3]?3u:4u):4u;
             constexpr std::array<const char*,4> names{{"route-kit-depart-turn.png","route-kit-depart-walk.png",
                 "route-kit-corner-turn.png","route-kit-corner-walk.png"}};
             if(view<4 && !kitViews[view]) {proceed=check(capture(names[view]),"actual route turn/walk normal-actor RT witness");kitViews[view]=proceed;}
@@ -317,12 +320,13 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
         }
     }
     if(!proceed && !failures)check(false,"bounded route stopped before completing all stages");
-    if(gRouteKitTurnStartValidation)check(std::all_of(kitViews.begin(),kitViews.end(),[](bool v){return v;}),
+    if(turnStartConfigured)check(std::all_of(kitViews.begin(),kitViews.end(),[](bool v){return v;}),
         "actual normal actor captures both departure and first corner joins");
     else if(gRouteNaturalWalkValidation)check(kitViews[2] && kitViews[3],"legacy natural walk records the visible first-corner stages");
     rows.flush();check(bool(rows),"bounded per-frame route receipt written");
     receipt<<"],\"milestones\":{"<<milestones.str()<<"},\"count\":"<<checks<<",\"failures\":"<<failures<<",\"frames\":"<<frames
         <<",\"stagesComplete\":"<<(!failures?"true":"false")<<",\"kitTurnStartOptIn\":"<<(gRouteKitTurnStartValidation?"true":"false")
+        <<",\"kitTurnStartConfigured\":"<<(turnStartConfigured?"true":"false")
         <<",\"naturalWalkWithoutScriptedEscortOrSpeechStops\":"<<(gRouteNaturalWalkValidation?"true":"false")
         <<",\"ordinaryLookAtKitPreservingWorldWalk\":"<<(gRouteNaturalWalkValidation?"true":"false")
         <<",\"deathRecoveryTested\":false,\"physicalPlayTested\":false,\"audioListened\":false";

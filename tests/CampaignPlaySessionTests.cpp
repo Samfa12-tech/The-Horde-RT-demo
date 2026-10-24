@@ -457,67 +457,15 @@ void NormalBoundaryJourney(const std::shared_ptr<const sim::TriangleSupportSurfa
         step();
     }
     if(diagnoseTurnStart) {
-        // Retain the unpaced workload above as a negative witness. Turning
-        // adds genuine waiting time: an unattended player can outrun the
-        // existing symmetric 6 m escort rule. No checkpoint is owed here.
-        const auto stranded=game.Snapshot();
-        const auto& k=stranded.chapterCompanion;
-        Check(std::hypot(stranded.playerX-k.x,stranded.playerZ-k.z)>6.f &&
-              k.wait==dialogue::CompanionWait::PlayerLagging && !k.walking &&
-              k.waypoint<sim::kWorldRoutePoints.size() &&
-              !game.CaptureAuthoredCampaignBoundary(cp::CheckpointId::ForestEndpoint) &&
-              game.LatestCampaignBoundary() &&
-              game.LatestCampaignBoundary()->id==cp::CheckpointId::SafeExit,
-              "unpaced candidate really stops at the unchanged tether and cannot earn an incomplete endpoint");
-        const float heldX=k.x,heldZ=k.z;
-        for(unsigned tick=0;tick<120;++tick)step();
-        Check(game.Snapshot().chapterCompanion.x==heldX && game.Snapshot().chapterCompanion.z==heldZ,
-              "waiting outside the tether does not secretly move or teleport Kit");
-        // Walk BACK through the authored trail, never set Kit/player transforms.
-        // Station 6 is within range of this observed corner. The controller must
-        // resume under the same policy when the player returns.
-        const auto corner=sim::kWorldRoutePoints[6];
-        if(!walk(corner.x,corner.z)){Check(false,"ordinary backtracking returns within the stranded escort tether");return;}
-        bool resumed=false,tetherRespected=true;unsigned escortWaitTicks=0;float recoveredMaximumDistance=0;
-        const auto destination=sim::kWorldRoutePoints.back();
-        bool reached=false;
-        for(unsigned tick=0;tick<2400;++tick) {
-            const float distance=aimMove(destination.x,destination.z);
-            const auto& s=game.Snapshot();const float dx=s.chapterCompanion.x-s.playerX,dz=s.chapterCompanion.z-s.playerZ;
-            recoveredMaximumDistance=std::max(recoveredMaximumDistance,std::hypot(dx,dz));
-            const auto beforeKit=s.chapterCompanion;
-            // Same deliberate walking/waiting policy as the existing native
-            // route acceptance driver. This changes test INPUT, never tether,
-            // motor speed, progression, support, clocks or saved state.
-            input.runHeld=false;
-            if(std::hypot(dx,dz)>3.f && dx*std::sin(input.yawRadians)-dz*std::cos(input.yawRadians)<0) {
-                input.moveForward=input.moveStrafe=0;++escortWaitTicks;
-            }
-            step();const auto& after=game.Snapshot();const auto& afterKit=after.chapterCompanion;
-            const bool translated=afterKit.x!=beforeKit.x || afterKit.z!=beforeKit.z;
-            // The six-metre rule gates Kit's translation using this tick's
-            // updated player position; it does not constrain where the player
-            // may walk. A leading Kit can be outside range while we rejoin.
-            if(translated)tetherRespected&=std::hypot(after.playerX-beforeKit.x,after.playerZ-beforeKit.z)<=6.f;
-            resumed|=afterKit.walking;
-            if(distance<.035f){reached=true;break;}
-        }
-        input.moveForward=input.moveStrafe=0;input.yawRadians=2.51f;input.pitchRadians=-.15f;
-        for(unsigned tick=0;tick<1800;++tick) {
-            if(game.LatestCampaignBoundary() && game.LatestCampaignBoundary()->id==cp::CheckpointId::ForestEndpoint)break;
-            step();
-        }
-        const auto& recovered=game.Snapshot().chapterCompanion;
-        std::cout<<"KIT_ESCORT_RECOVERY strandedDistance="<<std::hypot(stranded.playerX-heldX,stranded.playerZ-heldZ)
-                 <<" resumed="<<resumed<<" waitTicks="<<escortWaitTicks<<" reached="<<reached
-                 <<" recoveredMaximumDistance="<<recoveredMaximumDistance
-                 <<" tetherRespected="<<tetherRespected
-                 <<" waypoint="<<recovered.waypoint<<" position="<<recovered.x<<','<<recovered.z<<'\n';
-        // Returning can give Kit enough head start that no explicit wait is
-        // necessary. Assert the actual escort invariant, not a forced pause.
-        Check(reached && resumed && tetherRespected && recovered.grounded &&
-              recovered.waypoint==sim::kWorldRoutePoints.size(),
-              "ordinary return and deliberate escort pacing recover the candidate without changing any route rule");
+        // Candidate eligibility must preserve the ORIGINAL natural workload.
+        // No recovery backtracking or scripted escort wait may rescue a new
+        // player-ahead stall before the same endpoint/save/load checks below.
+        Check(firstPlayerAheadLagState.empty(),
+              "candidate follows the original uninterrupted trail without a player-ahead tether stall");
+        if(!firstPlayerAheadLagState.empty())std::cerr<<firstPlayerAheadLagState<<std::flush;
+        std::cout<<"KIT_NATURAL_TURN_ROUTE maximumDistance="<<maximumKitDistance<<" laggingTicks="<<laggingTicks
+                 <<" playerAheadTetherStall="<<(!firstPlayerAheadLagState.empty())
+                 <<" waypoint="<<game.Snapshot().chapterCompanion.waypoint<<'\n';
     }
     const auto endpoint=game.LatestCampaignBoundary();
     MarkElapsed("earned-forest-endpoint",game.Snapshot().tickIndex);

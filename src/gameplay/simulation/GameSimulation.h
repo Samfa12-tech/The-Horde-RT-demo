@@ -86,8 +86,8 @@ inline constexpr GameSimulationConfig ProductionGameSimulationConfig()
     config.waterfallSkeletonEncounter = true;
     config.swordStartsStowed = true;
     config.combatFoundation1_7 = true;
-    // Admission is pending the reproduced player-ahead tether/endpoint gate.
-    config.companionTurnStart = false;
+    // Authored stationary departures; routine bends retain legacy walking.
+    config.companionTurnStart = true;
     return config;
 }
 

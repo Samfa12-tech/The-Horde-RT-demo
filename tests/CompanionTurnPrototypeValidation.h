@@ -54,6 +54,37 @@ template<class Check> void Validate(const std::shared_ptr<const Terrain>& terrai
     check(beforePrototype.motion.turnStartEnabled && moved && planted && aligned && ramped,
         "prototype completes supported planted cycles before an aligned, ramped first departure");
 
+    // Reach an aligned stationary pose naturally, retaining the Idle-zero
+    // blend from its completed facing turn. A new lead needs no extra turn.
+    CompanionRouteFixture alignedLead(true);const auto alignedRoot=alignedLead.State();
+    const float alignedBearing=TravelBearing(alignedRoot);
+    const float alignedPlayerX=alignedRoot.x+3*std::sin(alignedBearing),
+        alignedPlayerZ=alignedRoot.z-3*std::cos(alignedBearing);
+    for(unsigned tick=0;tick<240;++tick) {
+        alignedLead.Step(dt,alignedPlayerX,alignedPlayerZ,true,false,false,terrain.get(),true);
+        if(alignedLead.State().motion.mode==CompanionMotionMode::Idle &&
+            Error(alignedLead.State().yaw,alignedBearing)<=pi/180)break;
+    }
+    const auto alignedIdle=alignedLead.State();
+    const bool alignedSetup=alignedIdle.motion.mode==CompanionMotionMode::Idle &&
+        Error(alignedIdle.yaw,alignedBearing)<=pi/180 && alignedIdle.motion.idleZeroWeight>0;
+    check(alignedSetup,"naturally completed facing turn provides an aligned Idle with a retained pose blend");
+    bool alignedTravel=false,noExtraTurn=true,smoothIdle=true;
+    for(unsigned tick=0;tick<30 && alignedSetup && !alignedTravel;++tick) {
+        const auto old=alignedLead.State();
+        alignedLead.Step(dt,alignedPlayerX,alignedPlayerZ,true,true,false,terrain.get(),true);
+        const auto now=alignedLead.State();const float distance=std::hypot(now.x-old.x,now.z-old.z);
+        noExtraTurn&=now.motion.mode!=CompanionMotionMode::Turning &&
+            now.motion.turnPhase==alignedIdle.motion.turnPhase && now.motion.turnAngleRadians==alignedIdle.motion.turnAngleRadians;
+        smoothIdle&=now.motion.idleZeroWeight<=old.motion.idleZeroWeight &&
+            old.motion.idleZeroWeight-now.motion.idleZeroWeight<=dt/.18f+1e-6f &&
+            (now.motion.idleZeroWeight==0 || distance==0);
+        if(distance>0)alignedTravel=now.motion.mode==CompanionMotionMode::Walking && now.walking &&
+            std::abs(distance-1.8f*dt)<=4e-6f;
+    }
+    check(alignedSetup && alignedTravel && noExtraTurn && smoothIdle,
+        "aligned stationary lead fades its retained Idle pose and enters ordinary walking without another authored turn");
+
     // A changed player-facing intent must not reverse a foot already in flight.
     // Both signed 20-degree partials finish at their original endpoint first.
     CompanionRouteFixture turningSeed(true);
@@ -139,6 +170,7 @@ template<class Check> void Validate(const std::shared_ptr<const Terrain>& terrai
 
     CompanionRouteFixture fullRoute(true);unsigned routeTicks=0,arrivals=0;
     bool validRoute=true,arrivalBookkeeping=true,sawStarting=false,sawWalking=false;
+    bool continuousWalking=true,afterBookkeeping=false;unsigned continuousBends=0,walkingSteps=0;
     for(;routeTicks<5000 && fullRoute.State().waypoint<simulation::kWorldRoutePoints.size();++routeTicks) {
         const auto old=fullRoute.State();fullRoute.Step(dt,old.x-1,old.z,true,true,false,terrain.get(),true);
         const auto now=fullRoute.State();const float distance=std::hypot(now.x-old.x,now.z-old.z);
@@ -148,6 +180,24 @@ template<class Check> void Validate(const std::shared_ptr<const Terrain>& terrai
             std::abs(std::remainder(now.locomotion.walkPhase-expected,1.f))<2e-5f;
         sawStarting|=now.motion.mode==CompanionMotionMode::Starting;
         sawWalking|=now.motion.mode==CompanionMotionMode::Walking;
+        if(old.motion.mode==CompanionMotionMode::Walking) {
+            ++walkingSteps;
+            const auto target=simulation::kWorldRoutePoints[old.waypoint];
+            const float remaining=std::hypot(target.x+1-old.x,target.z-old.z);
+            const bool bookkeeping=remaining<.06f;
+            const float expectedTravel=bookkeeping?0.f:std::min(remaining,1.8f*dt);
+            const float yawDelta=bookkeeping?0.f:std::clamp(std::remainder(TravelBearing(old)-old.yaw,2*pi),-2.4f*dt,2.4f*dt);
+            const float weightTarget=bookkeeping?0.f:1.f;
+            const float expectedWeight=old.locomotion.walkWeight+
+                std::clamp(weightTarget-old.locomotion.walkWeight,-dt/.18f,dt/.18f);
+            continuousWalking&=now.motion.mode==CompanionMotionMode::Walking && now.walking==!bookkeeping &&
+                std::abs(distance-expectedTravel)<=4e-6f && Error(now.yaw,old.yaw+yawDelta)<1e-6f &&
+                std::abs(now.locomotion.walkWeight-expectedWeight)<1e-6f;
+            if(afterBookkeeping) {
+                ++continuousBends;continuousWalking&=!bookkeeping && distance>0;
+            }
+            afterBookkeeping=bookkeeping && now.waypoint<simulation::kWorldRoutePoints.size();
+        } else if(afterBookkeeping)continuousWalking=false;
         if(now.motion.mode==CompanionMotionMode::Turning)validRoute&=distance==0 &&
             std::abs(now.motion.turnAngleRadians)<=pi/4+1e-6f;
         if(now.waypoint!=old.waypoint) {
@@ -159,6 +209,8 @@ template<class Check> void Validate(const std::shared_ptr<const Terrain>& terrai
     check(routeTicks<5000 && arrivals==4 && validRoute && arrivalBookkeeping && sawStarting && sawWalking &&
         std::hypot(fullRoute.State().x-(endpoint.x+1),fullRoute.State().z-endpoint.z)<.06f,
         "bounded prototype reaches every authored corner and lookout with accepted-distance gait and unchanged arrival bookkeeping");
+    check(continuousWalking && walkingSteps>0 && continuousBends==3,
+        "routine bends preserve legacy continuous travel, yaw clamp and gait through one bookkeeping tick without planted restart");
 
     const auto generation=turningSeed.State().generation;
     turningSeed.Reset();const CompanionRouteFixture fresh(true);
@@ -180,8 +232,8 @@ template<class Check> void Validate(const std::shared_ptr<const Terrain>& terrai
     // here; imported-terrain restore admission remains the checkpoint suite.
     check(!simulation::GameSimulationConfig{}.companionTurnStart &&
         !CompanionRouteFixture{}.State().motion.turnStartEnabled &&
-        !simulation::ProductionGameSimulationConfig().companionTurnStart,
-        "historical and normal development defaults retain legacy motion pending admission");
+        simulation::ProductionGameSimulationConfig().companionTurnStart,
+        "historical fixtures retain legacy motion while the development profile admits stationary-only turns");
     for(const bool enabled:{false,true}) {
         auto config=simulation::ProductionGameSimulationConfig();config.companionTurnStart=enabled;
         simulation::GameSimulation sim(config);const auto initial=sim.Snapshot().chapterCompanion;

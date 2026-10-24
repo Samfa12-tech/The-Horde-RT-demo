@@ -1,0 +1,21 @@
+# Stationary-only Kit turns admitted to the development profile
+
+The eligibility correction preserves continuous legacy walking through routine bends. A one-tick waypoint bookkeeping event is not a stationary departure: mode remains Walking and StepRoute supplies the original movement, 2.4 rad/s yaw clamp, accepted-distance gait and arrival behavior. Genuine tether/proof/obstacle stops still fade to Idle. Only a stopped misaligned departure uses the authored matched joint/yaw path; an aligned stop uses the ordinary Idle/Walk blend without a zero-angle exchange. The normal development profile now enables this bounded behavior; historical default constructors remain legacy. No tether, speed ceiling, collision, checkpoint, saved state, asset or playback-duration policy changed. No guidance, snapping or visibility framework was added.
+
+## Verification
+
+- Focused companion host gate: 2,345 checks pass, including unchanged 153-degree departure, contact/lifecycle/obstacle/save checks and strict per-tick legacy continuity through all three bends.
+- Existing normal-actor hidden RT controller fixture: 463 checks pass. All 79 departure images are byte-identical to the retained reviewed candidate; pause/reset identities and normal actor ownership pass. Routine corner inspection now requires continuous travel/yaw/gait instead of the rejected forced planted turn.
+- Original candidate natural earned CPU journey: 92 checks pass, no player-ahead tether stall; original endpoint, durable saves, fresh loads and full return remain. The obsolete diagnostic's forced-stranding/backtracking block is replaced by natural success; genuine negative tether/collision gates and historical failure receipts remain.
+- Candidate RT natural route: 17 checks pass. Then the normal development profile, WITHOUT the diagnostic turn opt-in, passes the same 17 checks/1,454 presented frames with kitTurnStartConfigured=true and kitTurnStartOptIn=false. Its four stage images are byte-identical to the opt-in candidate. Maximum separation before Kit completes is 2.6507 m with zero tether-wait samples. Actual ascent, fresh presented lantern proof, endpoint autosave/manual save, return/descent and this-run endpoint reload complete. Both RT routes use declared post-Keeper seeds; neither certifies natural victory, death recovery, listening or phone play.
+- Admitted-profile Debug companion/dialogue/checkpoint suites: 3/3 pass. Windows Release application and affected host targets compile; Release play-session/dialogue/companion/checkpoint/rescue-integration suites: 5/5 pass. No visible Release application was launched.
+
+The rejected broad-turn candidate at 0299613a remains preserved: it stranded Kit over 22 m behind. That regression is resolved by correcting eligibility, not by adding a waiting hint. The current walking bends intentionally retain the existing legacy presentation rather than claiming a new moving-turn animation. JPEG is a labelled scaled review derivative; raw PNG/receipt hashes are in receipt.json and originals remain in reports.
+
+## Limits and next work
+
+The shared development implementation is admitted on the evidence above; physical-phone feel/performance and the overall 1.7 release matrix remain open. The expanded Debug CampaignPlaySession 30-second gate is unchanged/open; earlier source history documents roughly 37 seconds of valuable combined journey/recovery work. Release passes do not close that Debug gate. A scoped organization proposal belongs to a later task; no deadline or coverage was removed.
+
+Both authored 0.75-second and retained 0.50-second timing options remain; no new context/urgency selector was introduced. Owner's unseen orientation-snap option remains conditional on reliable RT visibility evidence, which is unavailable at this seam. Owner also noted that visibility may help future culling: distinguish animation-update throttling from removing geometry still relevant to reflections/shadows. No such optimization or performance gain is claimed here.
+
+All 151 parked owner files and campaign/settings custody checks pass. No phone, merge, deployment or release. Exact prior 0299613a CI 40071372149 completed all six jobs successfully before this implementation began; the new checkpoint requires its own exact-head CI.

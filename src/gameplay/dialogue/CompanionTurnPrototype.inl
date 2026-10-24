@@ -20,6 +20,28 @@
         if(!std::isfinite(dt)||dt<=0)return;
         if(!active||!exterior) {state_.walking=false;state_.wait=CompanionWait::PlayerInTomb;return;}
         if(requireTerrain&&!terrain) {state_.walking=false;state_.grounded=false;state_.wait=CompanionWait::Preparing;return;}
+        // A one-tick waypoint bookkeeping pause is still continuous traversal,
+        // not a planted departure. Reuse the proven legacy motor and yaw/gait
+        // policy through ordinary bends; only genuine stops return to Idle.
+        if(state_.motion.mode==CompanionMotionMode::Walking && proof &&
+           std::hypot(playerX-state_.x,playerZ-state_.z)<=6.f &&
+           state_.waypoint<simulation::kWorldRoutePoints.size()) {
+            const auto oldYaw=state_.yaw,oldX=state_.x,oldZ=state_.z;
+            const auto oldWaypoint=state_.waypoint;
+            StepRoute(dt,playerX,playerZ,exterior,proof,false,terrain,requireTerrain);
+            if(!state_.grounded) {state_.yaw=oldYaw;return;}
+            dt=std::min(dt,.05f);
+            const float target=state_.walking||state_.waypoint!=oldWaypoint?state_.yaw:oldYaw;
+            state_.yaw=oldYaw+std::clamp(HeadingError(target,oldYaw),-2.4f*dt,2.4f*dt);
+            state_.animationSeconds+=dt;
+            locomotion_.Step(dt,std::hypot(state_.x-oldX,state_.z-oldZ),state_.walking);
+            state_.locomotion=locomotion_.State();
+            state_.motion.speed=state_.walking?1.8f:0.f;
+            if(!state_.walking && state_.waypoint==oldWaypoint && state_.locomotion.walkWeight==0) {
+                state_.motion.mode=CompanionMotionMode::Idle;state_.motion.idleZeroWeight=0;
+            }
+            return;
+        }
         const auto under=requireTerrain?traversal::ChapterExteriorStepSupport(*terrain,state_.x,state_.z,.24f):
             simulation::ResolveWorldRouteSupport(state_.x,state_.z);
         state_.grounded=under.grounded&&(!requireTerrain||traversal::ResolveChapterStepMovement(
@@ -73,7 +95,13 @@
         if(m.mode==CompanionMotionMode::Idle) {
             locomotion_.StepWeighted(dt,0,0);state_.locomotion=locomotion_.State();
             if(state_.locomotion.walkWeight>0)return;
-            if(lead||std::abs(error)>idleBand) {BeginTurn(error);return;}
+            if(std::abs(error)>(lead?departureBand:idleBand)) {BeginTurn(error);return;}
+            if(lead) {
+                // Already aligned while stopped: use the ordinary Idle/Walk
+                // blend, without inventing a zero-angle foot exchange.
+                if(m.idleZeroWeight>0) {m.idleZeroWeight=std::max(0.f,m.idleZeroWeight-dt/.18f);return;}
+                m.mode=CompanionMotionMode::Walking;m.speed=0;m.idleZeroWeight=0;return;
+            }
             m.idleZeroWeight=std::max(0.f,m.idleZeroWeight-dt/.18f);return;
         }
         // Starts and ordinary walking share the same accepted-distance motor.

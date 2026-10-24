@@ -1,5 +1,9 @@
 # Visible corner and natural pacing — admission rejected
 
+Superseded by the [stationary-only eligibility correction](../2026-10-24-kit-stationary-eligibility/README.md).
+The broad-turn rejection below remains preserved; the narrower development
+behavior now passes the same natural route without adding guidance.
+
 **Keep normal turn/start OFF. Do not add waiting UI to hide this regression.** One matched Windows native RT walking pair now supplies visible actual normal-actor corner images and demonstrates that the extra stop/turn time changes route completion. No gameplay correction, snap, new clip, casual/urgent selector, hint or deadline change is implemented here.
 
 ## One paired workload, not a visibility/performance matrix

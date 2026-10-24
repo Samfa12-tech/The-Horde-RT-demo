@@ -107,8 +107,8 @@ bool HiddenLookoutFilesAllowed(const std::filesystem::path& directory,bool after
                 allowed|=name=="windows-kit-controller-ordinary-partial-"+std::to_string(10000+frame).substr(1)+".png";
             for(const char* stage:{"control","pause-a","pause-b","resume","stop","partial-begin","partial-mid",
                 "opposite-request","opposite-mid","opposite-end","speech","speech-restored","slope",
-                "corner-before","corner-at","corner-after","corner-turn-begin","corner-turn-mid",
-                "corner-turn-end","corner-first-walk","reset","restored"})
+                "corner-before","corner-at","corner-after","corner-walk-4","corner-walk-12",
+                "corner-walk-24","reset","restored"})
                 allowed|=name==std::string("windows-kit-controller-")+stage+".png";
             if(allowed)continue;
         }
@@ -672,35 +672,29 @@ int RunHiddenLookoutValidation(VulkanSurfaceContext& ctx,horde::vulkan::DeviceCa
                 "actual supported local route reaches the first corner within its finite CPU tick budget") && capture("corner-before",route.State());
             const auto before=route.State();
             if(proceed)proceed=step() && check(route.State().waypoint==5 && route.State().x==before.x && route.State().z==before.z &&
-                route.State().locomotion.walkPhase==before.locomotion.walkPhase,
-                "corner bookkeeping advances only waypoint identity without root travel or gait-phase reset") && capture("corner-at",route.State());
-            if(proceed)proceed=step() && capture("corner-after",route.State());
-            const auto corner=route.State();bool turnBegin=false,turnMiddle=false,turnEnd=false,walking=false;
-            for(unsigned tick=0;tick<180 && proceed;++tick) {
+                route.State().yaw==before.yaw && route.State().motion.mode==Mode::Walking && !route.State().walking &&
+                route.State().locomotion.walkPhase==before.locomotion.walkPhase && route.State().locomotion.walkWeight>.8f,
+                "corner bookkeeping retains Walking mode, travel facing and nonzero gait without moving the root") && capture("corner-at",route.State());
+            for(unsigned tick=1;tick<=24 && proceed;++tick) {
+                const auto old=route.State();
                 playerX=route.State().x-3;playerZ=route.State().z;proceed=step();
                 const auto& pose=route.State();
                 if(!proceed)break;
-                if(pose.walking) {
-                    walking=true;
-                    proceed=check(turnBegin && turnMiddle && turnEnd && corner.locomotion.walkPhase>0 &&
-                        pose.locomotion.walkPhase>0 && pose.locomotion.walkPhase!=corner.locomotion.walkPhase &&
-                        std::abs(headingError(heading(corner),pose.yaw))<=.01745329252f,
-                        "first corner resumes aligned travel from its retained nonzero gait phase") && capture("corner-first-walk",pose);
-                    break;
-                }
-                proceed=check(pose.x==corner.x && pose.z==corner.z && pose.locomotion.walkPhase==corner.locomotion.walkPhase,
-                    "first actual corner turn and entry retain stationary root and the accepted nonzero gait phase");
-                if(proceed && !turnBegin && pose.motion.mode==Mode::Turning) {
-                    turnBegin=true;proceed=capture("corner-turn-begin",pose);
-                }
-                if(proceed && !turnMiddle && pose.motion.mode==Mode::Turning && pose.motion.turnPhase>=.45f) {
-                    turnMiddle=true;proceed=capture("corner-turn-mid",pose);
-                }
-                if(proceed && !turnEnd && pose.motion.mode==Mode::Starting) {
-                    turnEnd=true;proceed=capture("corner-turn-end",pose);
-                }
+                const float distance=std::hypot(pose.x-old.x,pose.z-old.z);
+                const auto destination=simulation::kWorldRoutePoints[old.waypoint];
+                const float expectedTravel=std::min(std::hypot(destination.x+1-old.x,destination.z-old.z),1.8f/60);
+                const float expectedYaw=old.yaw+std::clamp(headingError(heading(old),old.yaw),-2.4f/60,2.4f/60);
+                const float expectedPhase=std::fmod(old.locomotion.walkPhase+distance/1.56f,1.f);
+                const float expectedWeight=old.locomotion.walkWeight+
+                    std::clamp(1.f-old.locomotion.walkWeight,-1.f/(60*.18f),1.f/(60*.18f));
+                proceed=check(pose.motion.mode==Mode::Walking && pose.walking && distance>0 && pose.waypoint==5 &&
+                    std::abs(distance-expectedTravel)<=4e-6f && std::abs(headingError(expectedYaw,pose.yaw))<1e-6f &&
+                    std::abs(std::remainder(pose.locomotion.walkPhase-expectedPhase,1.f))<2e-5f &&
+                    std::abs(pose.locomotion.walkWeight-expectedWeight)<1e-6f,
+                    "routine first corner keeps legacy travel, bounded yaw and accepted-distance gait without a planted restart");
+                if(proceed && tick==1)proceed=capture("corner-after",pose);
+                if(proceed && (tick==4 || tick==12 || tick==24))proceed=capture("corner-walk-"+std::to_string(tick),pose);
             }
-            proceed=proceed && check(walking,"first-corner actual turn and start join finishes inside 180 local fixed steps");
         }
         if(proceed) {
             const auto generation=route.State().generation;route.Reset();
