@@ -619,12 +619,23 @@ bool SkinnedMeshAsset::LoadCombatClips(const std::string& glbPath, std::string& 
 
 bool SkinnedMeshAsset::LoadClips(const std::string& glbPath, const SkinnedClipSet& clipSet, std::string& diagnostic)
 {
+    return LoadClips(glbPath, std::span<const SkinnedClipBinding>(clipSet.clips), diagnostic);
+}
+
+bool SkinnedMeshAsset::LoadClips(const std::string& glbPath,
+                               std::span<const SkinnedClipBinding> bindings, std::string& diagnostic)
+{
     loaded_ = false;
     playerRigLayout_.reset();
     compatiblePoseRig_.reset();
     hasTexcoords_ = false;
     hasTangents_ = false;
     vertices_.clear(); expandedIndices_.clear(); primitiveRanges_.clear(); nodes_.clear(); joints_.clear(); inverseBindMatrices_.clear(); clips_.clear(); idleBootMinimumY_.clear(); walkingBootMinimumY_.clear(); bootGroundingVertexIndices_.clear(); skinnedUniqueVertices_.clear(); texturedSkinScratch_.clear();
+    if (bindings.empty() || bindings.size() > kMaximumClipBindings)
+    {
+        diagnostic = "Skinned clip bindings must contain between one and six semantic slots.";
+        return false;
+    }
     std::ifstream stream(glbPath, std::ios::binary);
     if (!stream)
     {
@@ -932,9 +943,9 @@ bool SkinnedMeshAsset::LoadClips(const std::string& glbPath, const SkinnedClipSe
         }
     }
 
-    for (std::size_t clipIndex = 0u; clipIndex < clipSet.clips.size(); ++clipIndex)
+    for (std::size_t clipIndex = 0u; clipIndex < bindings.size(); ++clipIndex)
     {
-        const SkinnedClipBinding& binding = clipSet.clips[clipIndex];
+        const SkinnedClipBinding& binding = bindings[clipIndex];
         const JsonValue* sourceAnimation = nullptr;
         if (!binding.name.empty()) for (const JsonValue& animation : *animations)
         {

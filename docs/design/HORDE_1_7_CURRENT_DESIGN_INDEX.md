@@ -1,5 +1,11 @@
 # Horde 1.7 current design index
 
+Latest motion follow-up: the [opt-in shared Kit turn/start prototype](../evidence/2026-10-24-kit-shared-turn-start/README.md)
+has focused host and actual Windows RT evidence. It fixes the retained departure
+facing in its isolated context, but takes 3.217 seconds to start the large turn.
+Normal gameplay stays OFF; pacing/owner review and broader acceptance remain
+open. Original clips/assets and earlier failed evidence are retained.
+
 Start with the [current checkpoint reconciliation](HORDE_1_7_CHECKPOINT_RECONCILIATION_2026_10_23.md)
 at source e3486d73 for implemented/tested, desktop-only, phone/owner acceptance,
 unfinished source and explicit decisions/deferrals. It supersedes older status

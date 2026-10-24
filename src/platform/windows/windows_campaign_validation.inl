@@ -99,6 +99,17 @@ bool HiddenLookoutFilesAllowed(const std::filesystem::path& directory,bool after
                 allowed|=name==std::string("windows-kit-motion-")+step+".png";
             if(allowed)continue;
         }
+        if(afterRun && gLookoutInspectKitController) {
+            bool allowed=false;
+            for(unsigned frame=0;frame<=121;++frame)
+                allowed|=name=="windows-kit-controller-depart-"+std::to_string(10000+frame).substr(1)+".png";
+            for(const char* stage:{"control","pause-a","pause-b","resume","stop","partial-begin","partial-mid",
+                "opposite-request","opposite-mid","opposite-end","speech","speech-restored","slope",
+                "corner-before","corner-at","corner-after","corner-turn-begin","corner-turn-mid",
+                "corner-turn-end","corner-first-walk","reset","restored"})
+                allowed|=name==std::string("windows-kit-controller-")+stage+".png";
+            if(allowed)continue;
+        }
         return false;
     }
     return !error && sourceFiles==2;
@@ -195,7 +206,10 @@ int RunHiddenLookoutValidation(VulkanSurfaceContext& ctx,horde::vulkan::DeviceCa
             kit.grounded && !kit.walking && kit.waypoint==simulation::kWorldRoutePoints.size() &&
             std::hypot(kit.x-(p.x+1),kit.z-p.z)<.001f && boundarySame();
     };
-    std::string loadedEvidence,entryEvidence;std::ostringstream kitEvidence,motionEvidence,timingEvidence,turnEvidence;
+    std::string loadedEvidence,entryEvidence;std::ostringstream kitEvidence,motionEvidence,timingEvidence,turnEvidence,controllerEvidence;
+    unsigned controllerTicks=0,controllerCalls=0,controllerDepartureFrames=0,controllerFirstWalkTick=0;
+    float controllerLegacyDepartureError=0,controllerDepartureError=0;
+    bool controllerPauseIdentical=false,controllerResetIdentical=false,controllerActorReleased=false;
     const auto completed=[&](bool entry,std::string& json){
         if(!safe("before-gpu-drain") || !DrainCampaignResources(ctx) || !safe("after-gpu-drain"))return false;
         const auto publication=ctx.rtFrameEvidence.PublishedStateByValue();const auto& e=publication.completedEvidence;
@@ -250,7 +264,7 @@ int RunHiddenLookoutValidation(VulkanSurfaceContext& ctx,horde::vulkan::DeviceCa
             WriteRgbaPng(gCampaignValidationDirectory/"windows-loaded-lookout.png",image,error) && safe("after-lookout-image"),
             "original paused lookout RT storage image read back separately from logical support evidence");
     }
-    if(proceed && gLookoutInspectKit) {
+    if(proceed && gLookoutInspectKit && !gLookoutInspectKitController) {
         // A labelled render-only pose fixture, not proof of a live recognition
         // event. Shared-simulation tests separately own the fresh-raise gate.
         // Camera/quality/idle phase/lighting match across these three images.
@@ -415,6 +429,270 @@ int RunHiddenLookoutValidation(VulkanSurfaceContext& ctx,horde::vulkan::DeviceCa
         ctx.lookoutKitInspectionTurn.reset();ctx.lookoutKitInspectionMotion.reset();
         ctx.lookoutKitInspectionPose.reset();ctx.lookoutKitInspectionActing={};
         if(proceed)proceed=check(render() && storySame(),"ordinary saved camera restored before existing Resume and scene retirement checks");
+    }
+    if(proceed && gLookoutInspectKitController) {
+        // The loaded campaign remains paused and immutable. Only this local
+        // shared controller advances on actual admitted terrain. Proof is an
+        // explicit diagnostic input, not earned dialogue or campaign progress.
+        using Mode=dialogue::CompanionMotionMode;
+        using Image=horde::vulkan::raytracing::PresentableTinyRtScene::StorageImageCapture;
+        struct ClearControllerInspection {
+            VulkanSurfaceContext& ctx;
+            ~ClearControllerInspection(){ctx.lookoutKitInspectionTurn.reset();ctx.lookoutKitInspectionMotion.reset();
+                ctx.lookoutKitInspectionPose.reset();ctx.lookoutKitInspectionActing={};}
+        } clear{ctx};
+        const auto terrain=ctx.rtScene.ChapterTerrainSurface();
+        dialogue::CompanionRouteFixture route(true),legacy;
+        dialogue::Snapshot inspectionSpeech;
+        float playerX=route.State().x-7,playerZ=route.State().z;
+        float cameraAzimuth=0;
+        std::uint64_t previousSubmission=0;
+        const auto sameImage=[](const Image& a,const Image& b){return a.width==b.width && a.height==b.height && a.rgba==b.rgba;};
+        const auto heading=[](const dialogue::CompanionSnapshot& pose) {
+            const auto destination=simulation::kWorldRoutePoints[std::min(pose.waypoint,simulation::kWorldRoutePoints.size()-1)];
+            return std::atan2(destination.x+1-pose.x,pose.z-destination.z);
+        };
+        const auto headingError=[](float target,float yaw){return std::remainder(target-yaw,6.28318530718f);};
+        const auto step=[&](bool paused=false) {
+            if(!terrain || !safe("shared-controller-fixed-step",false))return false;
+            ++controllerCalls;
+            route.Step(1.f/60,playerX,playerZ,true,true,paused,terrain.get(),true,true);
+            if(!paused) {++controllerTicks;route.AdvanceActing(1.f/60,inspectionSpeech,true,true,false);}
+            const auto& p=route.State();const auto& m=p.motion;
+            return p.grounded && m.diagnosticEnabled && std::isfinite(p.yaw) &&
+                std::isfinite(m.speed) && m.speed>=0 && m.speed<=1.800001f &&
+                m.turnPhase>=0 && m.turnPhase<=1 && m.entryWeight>=0 && m.entryWeight<=1 &&
+                m.idleZeroWeight>=0 && m.idleZeroWeight<=1;
+        };
+        const auto capture=[&](const std::string& stage,dialogue::CompanionSnapshot pose,Image* retained=nullptr) {
+            const auto sourceGeneration=pose.generation;
+            pose.visualAdmitted=true;pose.generation+=ctx.simulation.Snapshot().chapterCompanion.generation;
+            const float cameraX=pose.x+3*std::sin(cameraAzimuth),cameraZ=pose.z-3*std::cos(cameraAzimuth);
+            const auto cameraGround=terrain->Query(cameraX,cameraZ);
+            const float pitch=std::clamp(.05f+(pose.y+.9f-simulation::PlayerEyeWorldY(cameraGround.worldY))/3.f,-.32f,.28f);
+            const auto support=traversal::ChapterExteriorStepSupport(*terrain,pose.x,pose.z,.24f);
+            ctx.lookoutKitInspectionMotion=pose;ctx.lookoutKitInspectionTurn.reset();ctx.lookoutKitInspectionActing=pose.acting;
+            ctx.lookoutKitInspectionPose=horde::vulkan::raytracing::EnvironmentSurveyPose{
+                cameraX,cameraZ,cameraGround.worldY,cameraAzimuth+3.14159265359f,pitch,0};
+            std::string evidence,error;Image image;
+            bool ok=pose.grounded && cameraGround.found && cameraGround.walkable && support.grounded && support.worldY==pose.y &&
+                render() && completed(false,evidence);
+            const auto published=ctx.rtScene.ChapterActorInspectionPublishedPose();
+            const auto submission=ctx.rtFrameEvidence.PublishedStateByValue().completedEvidence.identity.submitted.submissionSerial;
+            ok=ok && submission>previousSubmission && (pose.motion.diagnosticEnabled?
+                published && published->controllerMotion && *published->controllerMotion==pose.motion:!published) &&
+                ctx.rtScene.CaptureStorageImage(image,error) &&
+                WriteRgbaPng(gCampaignValidationDirectory/("windows-kit-controller-"+stage+".png"),image,error) &&
+                ctx.simulationPaused && storySame() && neutral();
+            if(ok)previousSubmission=submission;
+            if(!error.empty())std::cerr<<"HORDE_KIT_CONTROLLER_ERROR "<<stage<<' '<<error<<'\n';
+            std::cerr<<"HORDE_KIT_CONTROLLER_FRAME stage="<<stage<<" tick="<<controllerTicks
+                <<" mode="<<static_cast<unsigned>(pose.motion.mode)<<" pass="<<ok<<'\n';
+            if(!controllerEvidence.str().empty())controllerEvidence<<',';
+            const auto& m=pose.motion;
+            controllerEvidence<<std::setprecision(9)<<"{\"stage\":\""<<stage<<"\",\"pass\":"<<(ok?"true":"false")<<",\"fixedStepCalls\":"<<controllerCalls
+                <<",\"activeFixedTicks\":"<<controllerTicks<<",\"authoredSeconds\":"<<controllerTicks/60.0
+                <<",\"sourceGeneration\":"<<sourceGeneration<<",\"renderGeneration\":"<<pose.generation
+                <<",\"root\":["<<pose.x<<','<<pose.y<<','<<pose.z<<"],\"logicalYaw\":"<<pose.yaw
+                <<",\"walking\":"<<(pose.walking?"true":"false")<<",\"waypoint\":"<<pose.waypoint
+                <<",\"wait\":"<<static_cast<unsigned>(pose.wait)<<",\"playerIntent\":["<<playerX<<','<<playerZ<<"]"
+                <<",\"proofInput\":true,\"idleSeconds\":"<<pose.animationSeconds<<",\"walkPhase\":"<<pose.locomotion.walkPhase
+                <<",\"walkWeight\":"<<pose.locomotion.walkWeight<<",\"motion\":{\"diagnosticEnabled\":"<<(m.diagnosticEnabled?"true":"false")
+                <<",\"mode\":"<<static_cast<unsigned>(m.mode)<<",\"speed\":"<<m.speed<<",\"turnPhase\":"<<m.turnPhase
+                <<",\"signedTurnAngleRadians\":"<<m.turnAngleRadians<<",\"entryWeight\":"<<m.entryWeight
+                <<",\"idleZeroWeight\":"<<m.idleZeroWeight<<"},\"speechMetadataLine\":"<<static_cast<unsigned>(inspectionSpeech.line)
+                <<",\"acting\":["<<pose.acting.headPitch<<','<<pose.acting.headYaw<<','<<pose.acting.chestPitch
+                <<"],\"camera\":["<<cameraX<<','<<cameraGround.worldY<<','<<cameraZ<<','<<cameraAzimuth+3.14159265359f<<','<<pitch
+                <<"],\"supportId\":"<<static_cast<unsigned>(support.id)<<",\"rtEvidence\":"<<(evidence.empty()?"null":evidence)<<'}';
+            if(retained)*retained=std::move(image);
+            return check(ok,"isolated shared-controller snapshot matches published motion and a unique completed RT receipt without campaign mutation");
+        };
+        const auto origin=route.State();
+        unsigned waiting=0;
+        while(proceed && waiting++<240) {
+            proceed=step();
+            const auto& pose=route.State();
+            if(!proceed || (pose.motion.mode==Mode::Idle && std::abs(headingError(-1.57079632679f,pose.yaw))<.01745329252f))break;
+        }
+        // Finish the existing return to ordinary nonzero-time Idle. Departing
+        // at the first completed turn would retain idleZeroWeight=1 and omit
+        // the controller's real 0.18-second entry on the next departure.
+        for(unsigned tick=0;tick<12 && proceed;++tick)proceed=step();
+        proceed=proceed && check(waiting<=240 && route.State().grounded && !route.State().walking &&
+            route.State().wait==dialogue::CompanionWait::PlayerLagging && route.State().motion.mode==Mode::Idle &&
+            route.State().motion.idleZeroWeight==0 && route.State().animationSeconds>0 &&
+            route.State().x==origin.x && route.State().z==origin.z,
+            "proof-true seven-metre tether wait finishes facing and ordinary Idle without seeded yaw or root travel");
+        auto ordinary=route.State();ordinary.motion={};
+        // One fixed world azimuth across departure. Orbiting with logical yaw
+        // would hide turns/contact motion against the environment. This bisects
+        // the actual shortest arrival/departure facing arc at three metres.
+        cameraAzimuth=route.State().yaw+.5f*headingError(heading(route.State()),route.State().yaw);
+        Image control,restored;
+        if(proceed)proceed=capture("control",ordinary,&control);
+        std::string error;
+        if(proceed)proceed=check(ctx.rtScene.LoadChapterActorInspection(
+            std::filesystem::path(HORDE_RT_SOURCE_DIR)/"assets/models/characters/source/kit-step-turn-proof-v1/native",error),
+            "named-turn inspection actor loads only in the explicit paused Debug controller mode");
+        if(!error.empty())std::cerr<<"HORDE_KIT_CONTROLLER_ERROR "<<error<<'\n';
+        if(proceed) {
+            for(unsigned tick=0;tick<240;++tick) {
+                const auto old=legacy.State();legacy.Step(1.f/60,old.x-7,old.z,true,true,false,terrain.get(),true);
+            }
+            const auto old=legacy.State();legacy.Step(1.f/60,old.x-3,old.z,true,true,false,terrain.get(),true);
+            controllerLegacyDepartureError=std::abs(headingError(heading(old),legacy.State().yaw));
+            proceed=check(legacy.State().grounded && legacy.State().walking,
+                "unchanged legacy controller records its first moving departure-facing error on the same terrain and tether context");
+        }
+        playerX=route.State().x-3;playerZ=route.State().z;
+        const auto departureOrigin=route.State();const auto departureStart=controllerTicks;
+        bool pausedOnce=false;
+        if(proceed) {proceed=capture("depart-0000",route.State());controllerDepartureFrames=1;}
+        for(unsigned tick=1;tick<=240 && proceed;++tick) {
+            const auto before=route.State();
+            proceed=step();
+            const auto& now=route.State();
+            if(!controllerFirstWalkTick && now.walking) {
+                controllerFirstWalkTick=controllerTicks;
+                controllerDepartureError=std::abs(headingError(heading(before),now.yaw));
+                proceed=proceed && check(controllerDepartureError<=.01745329252f &&
+                    controllerDepartureError<controllerLegacyDepartureError,
+                    "first accepted controller travel starts within its existing one-degree departure heading band");
+            }
+            if(!controllerFirstWalkTick)proceed=proceed && check(now.x==departureOrigin.x && now.z==departureOrigin.z,
+                "departure entry and chained turns retain the exact stationary route root");
+            if(proceed && (tick%2==0 || (now.walking && controllerTicks==controllerFirstWalkTick))) {
+                proceed=check(controllerDepartureFrames<=121,"continuous departure remains within its bounded image roster") &&
+                    capture("depart-"+std::to_string(10000+controllerDepartureFrames).substr(1),now);
+                ++controllerDepartureFrames;
+            }
+            if(proceed && !pausedOnce && now.motion.mode==Mode::Turning && now.motion.entryWeight==1 &&
+               now.motion.turnPhase>=.4f && now.motion.turnPhase<.8f) {
+                const auto frozen=now;Image a,b;
+                proceed=step(true) && capture("pause-a",route.State(),&a) && step(true) && step(true) &&
+                    capture("pause-b",route.State(),&b);
+                const auto& p=route.State();
+                controllerPauseIdentical=proceed && sameImage(a,b);
+                proceed=proceed && check(controllerPauseIdentical && p.motion==frozen.motion && p.locomotion==frozen.locomotion &&
+                    p.animationSeconds==frozen.animationSeconds && p.x==frozen.x && p.y==frozen.y && p.z==frozen.z && p.yaw==frozen.yaw,
+                    "paused shared controller freezes exact clocks root yaw gait and two original RT images");
+                if(proceed)proceed=step() && capture("resume",route.State()) &&
+                    check(route.State().motion.turnPhase>frozen.motion.turnPhase,"resume advances the shared turn exactly through its normal fixed step");
+                pausedOnce=true;
+            }
+            if(controllerFirstWalkTick && controllerTicks-controllerFirstWalkTick>=24)break;
+        }
+        proceed=proceed && check(controllerFirstWalkTick>departureStart && controllerTicks-controllerFirstWalkTick>=24 && pausedOnce,
+            "continuous thirty-Hz-authored departure reaches first walking plus four tenths of a second within 240 ticks");
+        const auto setBearing=[&](float yaw){playerX=route.State().x+7*std::sin(yaw);playerZ=route.State().z-7*std::cos(yaw);};
+        const auto settle=[&](unsigned limit) {
+            for(unsigned tick=0;tick<limit;++tick) {
+                if(!step())return false;
+                if(route.State().motion.mode==Mode::Idle && route.State().locomotion.walkWeight==0)return true;
+            }
+            return false;
+        };
+        if(proceed) {
+            setBearing(route.State().yaw);
+            proceed=check(settle(90),"tether stop settles the same controller without root relocation") && capture("stop",route.State());
+        }
+        if(proceed) {
+            const auto base=route.State();cameraAzimuth=base.yaw+.6f;
+            setBearing(base.yaw+.3490658504f);
+            proceed=step() && capture("partial-begin",route.State());
+            for(unsigned tick=0;tick<90 && proceed && route.State().motion.turnPhase<.45f;++tick)proceed=step();
+            proceed=proceed && check(route.State().motion.mode==Mode::Turning && route.State().motion.turnAngleRadians>0 &&
+                route.State().motion.turnAngleRadians<dialogue::companion_turn::maxAngle &&
+                route.State().x==base.x && route.State().z==base.z,"bounded twenty-degree player intent produces a partial stationary shared turn") &&
+                capture("partial-mid",route.State());
+            setBearing(base.yaw-.1745329252f);
+            if(proceed)proceed=step() && capture("opposite-request",route.State());
+            bool opposite=false;
+            for(unsigned tick=0;tick<120 && proceed;++tick) {
+                proceed=step();
+                if(route.State().motion.mode==Mode::Turning && route.State().motion.turnAngleRadians<0 && route.State().motion.turnPhase>=.45f) {
+                    opposite=true;break;
+                }
+            }
+            proceed=proceed && check(opposite && route.State().x==base.x && route.State().z==base.z,
+                "changed opposite intent schedules the next partial turn without moving the planted route root") && capture("opposite-mid",route.State());
+            if(proceed)proceed=check(settle(90),"opposite intent settles through the same controller") && capture("opposite-end",route.State());
+        }
+        if(proceed) {
+            inspectionSpeech.line=dialogue::Line::ForestNight;inspectionSpeech.duration=dialogue::Spec(inspectionSpeech.line).duration;
+            for(unsigned tick=0;tick<30 && proceed;++tick) {inspectionSpeech.elapsed=(tick+1)/60.f;proceed=step();}
+            if(proceed)proceed=capture("speech",route.State());
+            inspectionSpeech={};
+            for(unsigned tick=0;tick<60 && proceed;++tick)proceed=step();
+            if(proceed)proceed=capture("speech-restored",route.State()) && check(route.State().acting==dialogue::CompanionActingPose{},
+                "diagnostic speech metadata decays without modifying loaded completed dialogue");
+        }
+        if(proceed) {
+            // Continue the actual local route to its first corner; no pose or
+            // waypoint import. This is a controller snapshot fixture, not a
+            // second campaign/rope/save journey or an earned speech assertion.
+            cameraAzimuth=heading(route.State())+.6f;unsigned ticks=0;bool slope=false;
+            const auto target=simulation::kWorldRoutePoints[4];
+            while(proceed && route.State().waypoint==4 && std::hypot(route.State().x-target.x-1,route.State().z-target.z)>=.06f && ticks++<1200) {
+                playerX=route.State().x-3;playerZ=route.State().z;proceed=step();
+                if(proceed && ticks==120){slope=true;proceed=capture("slope",route.State());}
+            }
+            proceed=proceed && check(ticks<=1200 && slope && route.State().waypoint==4 &&
+                std::hypot(route.State().x-target.x-1,route.State().z-target.z)<.06f,
+                "actual supported local route reaches the first corner within its finite CPU tick budget") && capture("corner-before",route.State());
+            const auto before=route.State();
+            if(proceed)proceed=step() && check(route.State().waypoint==5 && route.State().x==before.x && route.State().z==before.z &&
+                route.State().locomotion.walkPhase==before.locomotion.walkPhase,
+                "corner bookkeeping advances only waypoint identity without root travel or gait-phase reset") && capture("corner-at",route.State());
+            if(proceed)proceed=step() && capture("corner-after",route.State());
+            const auto corner=route.State();bool turnBegin=false,turnMiddle=false,turnEnd=false,walking=false;
+            for(unsigned tick=0;tick<180 && proceed;++tick) {
+                playerX=route.State().x-3;playerZ=route.State().z;proceed=step();
+                const auto& pose=route.State();
+                if(!proceed)break;
+                if(pose.walking) {
+                    walking=true;
+                    proceed=check(turnBegin && turnMiddle && turnEnd && corner.locomotion.walkPhase>0 &&
+                        pose.locomotion.walkPhase>0 && pose.locomotion.walkPhase!=corner.locomotion.walkPhase &&
+                        std::abs(headingError(heading(corner),pose.yaw))<=.01745329252f,
+                        "first corner resumes aligned travel from its retained nonzero gait phase") && capture("corner-first-walk",pose);
+                    break;
+                }
+                proceed=check(pose.x==corner.x && pose.z==corner.z && pose.locomotion.walkPhase==corner.locomotion.walkPhase,
+                    "first actual corner turn and entry retain stationary root and the accepted nonzero gait phase");
+                if(proceed && !turnBegin && pose.motion.mode==Mode::Turning) {
+                    turnBegin=true;proceed=capture("corner-turn-begin",pose);
+                }
+                if(proceed && !turnMiddle && pose.motion.mode==Mode::Turning && pose.motion.turnPhase>=.45f) {
+                    turnMiddle=true;proceed=capture("corner-turn-mid",pose);
+                }
+                if(proceed && !turnEnd && pose.motion.mode==Mode::Starting) {
+                    turnEnd=true;proceed=capture("corner-turn-end",pose);
+                }
+            }
+            proceed=proceed && check(walking,"first-corner actual turn and start join finishes inside 180 local fixed steps");
+        }
+        if(proceed) {
+            const auto generation=route.State().generation;route.Reset();
+            const auto& reset=route.State();
+            proceed=check(reset.generation>generation && reset.motion.diagnosticEnabled && reset.motion.mode==Mode::Idle &&
+                reset.motion.speed==0 && reset.motion.turnPhase==0 && reset.motion.turnAngleRadians==0 &&
+                reset.motion.entryWeight==0 && reset.motion.idleZeroWeight==0 && reset.animationSeconds==0 &&
+                reset.locomotion==dialogue::CompanionLocomotionPose{} && reset.acting==dialogue::CompanionActingPose{},
+                "local controller reset revokes transient turn start gait and acting state without touching the campaign");
+            playerX=reset.x-7;playerZ=reset.z;
+            if(proceed)proceed=step() && capture("reset",route.State());
+            cameraAzimuth=ordinary.yaw+.5f*headingError(heading(ordinary),ordinary.yaw);
+            if(proceed)proceed=capture("restored",ordinary,&restored);
+            controllerResetIdentical=proceed && sameImage(control,restored);
+            if(proceed)proceed=check(controllerResetIdentical && ctx.rtScene.ReleaseChapterActorInspection(error),
+                "cleared controller renders byte-identical original actor and releases candidate before scene retirement");
+            controllerActorReleased=proceed;
+        }
+        ctx.lookoutKitInspectionTurn.reset();ctx.lookoutKitInspectionMotion.reset();
+        ctx.lookoutKitInspectionPose.reset();ctx.lookoutKitInspectionActing={};
+        if(proceed)proceed=check(render() && storySame() && !ctx.rtScene.ChapterActorInspectionPublishedPose(),
+            "ordinary loaded camera and actor are restored before existing native Resume and menu replacement checks");
     }
     if(proceed && gLookoutInspectKitMotion) {
         // A sequential production-route visual fixture. It samples real fixed
@@ -653,7 +931,7 @@ int RunHiddenLookoutValidation(VulkanSurfaceContext& ctx,horde::vulkan::DeviceCa
         <<",\"renderCalls\":"<<renderCalls<<",\"loadedTick\":"<<loadedTick<<",\"sourceBytes\":"<<gHiddenLookout.source.encoded.size()
         <<",\"loadedRtEvidence\":"<<(loadedEvidence.empty()?"null":loadedEvidence)
         <<",\"entryRtEvidence\":"<<(entryEvidence.empty()?"null":entryEvidence)
-        <<",\"kitPoseInspection\":{\"requested\":"<<(gLookoutInspectKit?"true":"false")
+        <<",\"kitPoseInspection\":{\"requested\":"<<(gLookoutInspectKit && !gLookoutInspectKitController?"true":"false")
         <<",\"evidenceClass\":\"seeded render-only pose; not live fresh-raise acceptance\",\"cameraOffset\":[-3,0,0],\"poses\":["<<kitEvidence.str()<<"]}"
         <<",\"kitMotionInspection\":{\"requested\":"<<(gLookoutInspectKitMotion?"true":"false")
         <<",\"evidenceClass\":\"sequential fixed-step production-route render inputs; not live earned gameplay\",\"frames\":["<<motionEvidence.str()<<"]}"
@@ -664,6 +942,16 @@ int RunHiddenLookoutValidation(VulkanSurfaceContext& ctx,horde::vulkan::DeviceCa
         <<",\"densePartialAnglesRequested\":"<<(gLookoutInspectKitPartialsDense?"true":"false")
         <<",\"largeSequenceAuthoredHz\":"<<(gLookoutInspectKitPartials && !gLookoutInspectKitPartialsDense?24:0)
         <<",\"evidenceClass\":\"isolated Debug candidate playback and RT joins; not gameplay turn-state or owner acceptance\",\"frames\":["<<turnEvidence.str()<<"]}"
+        <<",\"kitControllerInspection\":{\"requested\":"<<(gLookoutInspectKitController?"true":"false")
+        <<",\"evidenceClass\":\"isolated shared diagnostic controller snapshots on actual terrain; not earned journey or owner contact acceptance\""
+        <<",\"departureNominalAuthoredHz\":30,\"cameraPolicy\":\"fixed world azimuth per case; three-metre translated offset on queried terrain\""
+        <<",\"speechMetadataOnly\":true,\"actualRtCornerCoverage\":\"first route corner only\",\"fixedStepCalls\":"<<controllerCalls
+        <<",\"activeFixedTicks\":"<<controllerTicks<<",\"departureFrames\":"<<controllerDepartureFrames
+        <<",\"firstWalkActiveTick\":"<<controllerFirstWalkTick<<",\"legacyFirstWalkHeadingErrorRadians\":"<<controllerLegacyDepartureError
+        <<",\"controllerFirstWalkHeadingErrorRadians\":"<<controllerDepartureError
+        <<",\"pauseImagesIdentical\":"<<(controllerPauseIdentical?"true":"false")
+        <<",\"resetOrdinaryImageIdentical\":"<<(controllerResetIdentical?"true":"false")
+        <<",\"inspectionActorReleased\":"<<(controllerActorReleased?"true":"false")<<",\"frames\":["<<controllerEvidence.str()<<"]}"
         <<",\"physicalVisibleAcceptance\":false,\"performanceEvidence\":false,\"ownerSettingsReadOrWritten\":false";
     return proceed && !failures?0:1;
 }
@@ -834,7 +1122,7 @@ int RunHiddenCampaignValidation(VulkanSurfaceContext& ctx)
 bool ConfigureHiddenCampaignValidation()
 {
     int count=0;auto args=CommandLineToArgvW(GetCommandLineW(),&count);if(!args)return false;
-    bool requested=false,lookoutRequested=false,routeRequested=false,returnRequested=false,inspectKit=false,inspectMotion=false,inspectTiming=false,inspectTurns=false,inspectPartials=false,inspectPartialsDense=false,benchmarkMenuRequested=false,detachedCancelRequested=false,detachedCloseRequested=false;std::filesystem::path directory;
+    bool requested=false,lookoutRequested=false,routeRequested=false,returnRequested=false,inspectKit=false,inspectMotion=false,inspectTiming=false,inspectTurns=false,inspectPartials=false,inspectPartialsDense=false,inspectController=false,benchmarkMenuRequested=false,detachedCancelRequested=false,detachedCloseRequested=false;std::filesystem::path directory;
     for(int i=1;i<count;++i) {
         const std::wstring_view arg=args[i];
         if(arg==L"--campaign-validate-hidden")requested=true;
@@ -850,10 +1138,14 @@ bool ConfigureHiddenCampaignValidation()
         if(arg==L"--lookout-inspect-kit-turns"){inspectKit=true;inspectTurns=true;}
         if(arg==L"--lookout-inspect-kit-partials"){inspectKit=true;inspectTurns=true;inspectPartials=true;}
         if(arg==L"--lookout-inspect-kit-partials-dense"){inspectKit=true;inspectTurns=true;inspectPartials=true;inspectPartialsDense=true;}
+        if(arg==L"--lookout-inspect-kit-controller"){inspectKit=true;inspectController=true;}
         if(arg==L"--campaign-test-root" && i+1<count)directory=args[++i];
     }
     LocalFree(args);
     if(inspectTurns && inspectMotion) {std::cerr<<"Select one bounded Kit motion or authored-turn inspection.\n";return false;}
+    if(inspectController && (inspectMotion || inspectTurns)) {
+        std::cerr<<"Shared Kit controller inspection cannot combine motion, timing or manual turn modes.\n";return false;
+    }
     if(detachedCancelRequested && detachedCloseRequested) {
         std::cerr<<"Select one detached benchmark input validation action.\n";return false;
     }
@@ -898,6 +1190,7 @@ bool ConfigureHiddenCampaignValidation()
     gLookoutInspectKitTurns=inspectTurns;
     gLookoutInspectKitPartials=inspectPartials;
     gLookoutInspectKitPartialsDense=inspectPartialsDense;
+    gLookoutInspectKitController=inspectController;
     gCampaignHiddenValidation=true;gCampaignValidationDirectory=absolute;return true;
 #else
     std::cerr<<"Hidden campaign validation is Debug-only.\n";return false;

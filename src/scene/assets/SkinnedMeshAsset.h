@@ -59,10 +59,12 @@ static_assert(sizeof(SkinnedPbrTangent) == 16u);
 
 enum class SkinnedClip
 {
-    Idle,
-    Walking,
-    Attack,
-    Dead
+    Idle = 0,
+    Walking = 1,
+    Attack = 2,
+    Dead = 3,
+    TurnLeft = 4,
+    TurnRight = 5
 };
 using SkeletonClip = SkinnedClip;
 
@@ -175,7 +177,7 @@ const SkinnedClipSet& LichPlaceholderClipSet();
 const SkinnedClipSet& PlayerLocomotionClipSet();
 
 // Deliberately narrow glTF 2.0 reader for the audited Meshy bipeds. It imports
-// one skinned primitive into four semantic clip slots selected by the caller.
+// one skinned primitive into up to six semantic clip slots selected by the caller.
 class SkinnedMeshAsset
 {
 public:
@@ -187,6 +189,11 @@ public:
     SkinnedMeshAsset& operator=(SkinnedMeshAsset&&) noexcept;
 
     bool LoadClips(const std::string& glbPath, const SkinnedClipSet& clipSet, std::string& diagnostic);
+    // Bindings follow SkinnedClip slot order; omitted trailing slots stay unmapped.
+    // Explicit empty optional bindings preserve holes such as Attack and Dead.
+    static constexpr std::size_t kMaximumClipBindings = 6u;
+    bool LoadClips(const std::string& glbPath, std::span<const SkinnedClipBinding> bindings,
+                   std::string& diagnostic);
     bool LoadCombatClips(const std::string& glbPath, std::string& diagnostic);
     bool IsLoaded() const { return loaded_; }
     bool HasTexcoords() const { return hasTexcoords_; }

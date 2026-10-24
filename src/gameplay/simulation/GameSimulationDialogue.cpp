@@ -45,7 +45,7 @@ void GameSimulation::UpdateChapterDialogue(const InputSnapshot& input,float seco
     chapterCompanion_.Step(seconds,playerX_,playerZ_,c.exterior,
         chapterDialogue_.State().proofAccepted,c.paused,
         chapterTerrainGeneration_==worldRoute_.generation?chapterTerrain_.get():nullptr,
-        config_.authoredChapterTerrain);
+        config_.authoredChapterTerrain,c.alive&&!c.traversing);
     bindCompanion();
     chapterDialogue_.RefreshCompanionSpatial(c);
     chapterCompanion_.AdvanceActing(seconds,chapterDialogue_.State(),c.exterior,c.alive,

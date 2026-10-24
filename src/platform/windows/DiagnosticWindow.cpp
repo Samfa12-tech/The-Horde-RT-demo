@@ -177,6 +177,7 @@ bool gLookoutInspectKitTiming=false;
 bool gLookoutInspectKitTurns=false;
 bool gLookoutInspectKitPartials=false;
 bool gLookoutInspectKitPartialsDense=false;
+bool gLookoutInspectKitController=false;
 bool gShowcaseCaptureHidden=false;
 bool gCampaignValidationHoldPreparation=false;
 std::filesystem::path gCampaignValidationDirectory;
@@ -6884,6 +6885,12 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
             }
             if(ctx.lookoutKitInspectionMotion)frameInputs.chapterCompanion=*ctx.lookoutKitInspectionMotion;
             frameInputs.chapterCompanion.acting=ctx.lookoutKitInspectionActing;
+            if(frameInputs.chapterCompanion.motion.diagnosticEnabled &&
+               (!gLookoutInspectKitController || !ctx.simulationPaused || ctx.lookoutKitInspectionTurn)) {
+                ctx.lastRtFrameError="Shared Kit controller inspection requires its isolated paused mode without manual playback.";
+                if(evidenceFrame)ctx.rtFrameEvidence.FailRecord(observation);
+                return false;
+            }
             if(ctx.lookoutKitInspectionTurn) {
                 if(!gLookoutInspectKitTurns || !ctx.simulationPaused) {ctx.lastRtFrameError="Hidden turn playback requires the isolated paused fixture.";return false;}
                 frameInputs.diagnosticChapterActor=ctx.lookoutKitInspectionTurn;

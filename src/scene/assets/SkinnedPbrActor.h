@@ -15,6 +15,11 @@ public:
     bool Load(const std::filesystem::path& directory, const char* filename,
               const SkinnedClipSet& clips, std::string& diagnostic)
     {
+        return Load(directory, filename, std::span<const SkinnedClipBinding>(clips.clips), diagnostic);
+    }
+    bool Load(const std::filesystem::path& directory, const char* filename,
+              std::span<const SkinnedClipBinding> clips, std::string& diagnostic)
+    {
         AssetManifest manifest;
         if (!AssetManifest::Load(directory / "asset.manifest.json", manifest, diagnostic) ||
             !StaticMeshAsset::Load(directory / filename, manifest, asset_, diagnostic) ||

@@ -9,6 +9,13 @@ Evening follow-up: the HUD row/phone checklist below now link the compact-dock
 physical evidence and the later researched combat-hierarchy prototype. Their
 receipts pin their own sources/builds; they are not claimed as part of e3486d73.
 
+24 October motion follow-up: the [shared Kit turn/start prototype](../evidence/2026-10-24-kit-shared-turn-start/README.md)
+is implemented behind an explicit diagnostic gate, **OFF/unadmitted** in normal
+gameplay. Actual terrain/RT snapshots fix the departure-facing witness and pass
+pause/reset/first-corner joins; the large departure still takes 3.217 seconds.
+Pacing/owner review and broader motion/cost acceptance remain. The original
+runtime/assets, prior failures and deferrals below are preserved.
+
 Working folder:
 `C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof`.
 Branch: `codex/horde-1.7-wp2-vertical-proof`. No new checkout, feature, asset,

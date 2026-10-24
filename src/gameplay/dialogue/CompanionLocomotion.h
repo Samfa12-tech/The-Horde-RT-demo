@@ -12,9 +12,13 @@ public:
     const CompanionLocomotionPose& State() const {return state_;}
     void Reset() {state_={};}
     void Step(float seconds,float distance,bool walking) {
+        StepWeighted(seconds,distance,walking?1.f:0.f);
+    }
+    void StepWeighted(float seconds,float distance,float target) {
         if(!std::isfinite(seconds) || seconds<=0 || !std::isfinite(distance) || distance<0)return;
+        if(!std::isfinite(target))return;
         seconds=std::min(seconds,.05f);
-        const float target=walking?1.f:0.f;
+        target=std::clamp(target,0.f,1.f);
         state_.walkWeight+=std::clamp(target-state_.walkWeight,-seconds/.18f,seconds/.18f);
         state_.walkPhase=std::fmod(state_.walkPhase+distance/kWalkCycleDistanceMetres,1.f);
     }

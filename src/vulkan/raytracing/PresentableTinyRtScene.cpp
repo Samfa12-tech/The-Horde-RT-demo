@@ -6629,10 +6629,27 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         frame.chapterCompanion.locomotion.walkWeight};
     bool companionHasBlend=true,inspectionChanged=false;
 #if defined(_DEBUG)
-    const bool inspectCompanion=frame.diagnosticChapterActor.has_value();
-    inspectionChanged=frame.diagnosticChapterActor!=chapterInspectionLast_;
+    auto diagnosticPose=frame.diagnosticChapterActor;
+    if(frame.chapterCompanion.motion.diagnosticEnabled) {
+        if(diagnosticPose) {diagnostic="Shared turn snapshot cannot mix with manual inspection playback.";return false;}
+        const auto recipe=horde::scene::CompanionAnimation(frame.chapterCompanion,
+            chapterActor_.Duration(horde::scene::SkinnedClip::Walking));
+        using Clip=ChapterActorInspectionPose::Clip;
+        const auto logical=[](horde::scene::SkinnedClip clip) {
+            return clip==horde::scene::SkinnedClip::TurnLeft?Clip::TurnLeft:
+                clip==horde::scene::SkinnedClip::TurnRight?Clip::TurnRight:
+                clip==horde::scene::SkinnedClip::Walking?Clip::Walk:Clip::Idle;
+        };
+        ChapterActorInspectionPose p;
+        p.clip=logical(recipe.clip);p.seconds=recipe.seconds;p.hasBlend=true;
+        p.blendClip=logical(recipe.blend.clip);p.blendSeconds=recipe.blend.timeSeconds;
+        p.weight=recipe.blend.weight;p.turnPhase=frame.chapterCompanion.motion.turnPhase;
+        p.controllerMotion=frame.chapterCompanion.motion;diagnosticPose=p;
+    }
+    const bool inspectCompanion=diagnosticPose.has_value();
+    inspectionChanged=diagnosticPose!=chapterInspectionLast_;
     if(inspectCompanion) {
-        const auto& p=*frame.diagnosticChapterActor;
+        const auto& p=*diagnosticPose;
         const auto valid=[](auto c){return static_cast<unsigned>(c)<=3;};
         if(!chapterInspectionActor_ || !WantsChapterCompanion(frame) || !valid(p.clip) || !valid(p.blendClip) ||
            !std::isfinite(p.seconds) || p.seconds<0 || !std::isfinite(p.blendSeconds) || p.blendSeconds<0 ||
@@ -6641,13 +6658,23 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             diagnostic="Hidden chapter actor selection/phase was not admitted.";return false;
         }
         companionActor=chapterInspectionActor_.get();
-        const auto seconds=[&](auto c,float ordinary) {
-            return static_cast<unsigned>(c)>=2?p.turnPhase*companionActor->Duration(static_cast<horde::scene::SkinnedClip>(c)):ordinary;
+        const auto mapped=[](auto c) {
+            using Clip=ChapterActorInspectionPose::Clip;
+            return c==Clip::TurnLeft?horde::scene::SkinnedClip::TurnLeft:
+                c==Clip::TurnRight?horde::scene::SkinnedClip::TurnRight:
+                c==Clip::Walk?horde::scene::SkinnedClip::Walking:horde::scene::SkinnedClip::Idle;
         };
-        companionClip=static_cast<horde::scene::SkinnedClip>(p.clip);
+        const auto seconds=[&](auto c,float ordinary) {
+            return static_cast<unsigned>(c)>=2?p.turnPhase*companionActor->Duration(mapped(c)):ordinary;
+        };
+        companionClip=mapped(p.clip);
         companionTime=seconds(p.clip,p.seconds);
-        companionBlend={static_cast<horde::scene::SkinnedClip>(p.blendClip),seconds(p.blendClip,p.blendSeconds),p.weight};
+        companionBlend={mapped(p.blendClip),seconds(p.blendClip,p.blendSeconds),p.weight};
         companionHasBlend=p.hasBlend;
+    }
+#else
+    if(frame.chapterCompanion.motion.diagnosticEnabled) {
+        diagnostic="Opt-in companion turn prototype requires the Debug inspection actor.";return false;
     }
 #endif
 #if HORDE_RT_ACTOR_WORKER_EXPERIMENT
@@ -7076,7 +7103,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         chapterActorActing_ = frame.chapterCompanion.acting;
         chapterActorLocomotion_ = frame.chapterCompanion.locomotion;
 #if defined(_DEBUG)
-        chapterInspectionLast_=frame.diagnosticChapterActor;
+        chapterInspectionLast_=diagnosticPose;
 #endif
         chapterActorNeedsRefit_ = true;
     }
@@ -8949,9 +8976,9 @@ bool PresentableTinyRtScene::LoadChapterActorInspection(const std::filesystem::p
         diagnostic="Hidden actor must be loaded once between completed ordinary frames.";return false;
     }
     auto actor=std::make_unique<horde::scene::assets::SkinnedPbrActor>();
-    horde::scene::SkinnedClipSet clips{};
-    clips.clips={{{"Warden|idle",true,true},{"Warden|walk",true,true},
-                  {"KitProof|turn_left",false,true},{"KitProof|turn_right",false,true}}};
+    const std::array<horde::scene::SkinnedClipBinding,6> clips{{
+        {"Warden|idle",true,true},{"Warden|walk",true,true},{"",false,false},{"",false,false},
+        {"KitProof|turn_left",false,true},{"KitProof|turn_right",false,true}}};
     if(!actor->Load(directory,"kit-turn-proof.glb",clips,diagnostic))return false;
     const auto& candidate=actor->Asset();const auto& original=chapterActor_.Asset();
     if(candidate.indices!=original.indices || candidate.vertices.size()!=original.vertices.size() ||

@@ -1,5 +1,10 @@
 # Proposed bounded Kit turn/start integration
 
+Implementation follow-up: the [opt-in shared-state checkpoint](../../evidence/2026-10-24-kit-shared-turn-start/README.md)
+now exercises this plan on actual route terrain/RT. It remains OFF/unadmitted;
+the 193-tick large departure leaves pacing acceptance open. The scope/evidence
+history below is retained rather than rewritten as a production acceptance.
+
 24 October 2026. Scope only, based on `3fd5ef6cf835d6708663235addaa92d6760487f0`.
 No production bindings, code, assets, save schema or timing have changed in this
 pass. The preceding exact-head CI40055011876 passed all six jobs. This plan is not

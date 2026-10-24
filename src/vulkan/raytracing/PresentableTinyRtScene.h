@@ -124,6 +124,7 @@ struct ChapterActorInspectionPose {
     Clip clip=Clip::Idle,blendClip=Clip::Walk;
     float seconds=0,turnPhase=0,blendSeconds=0,weight=0;
     bool hasBlend=false;
+    std::optional<horde::gameplay::dialogue::CompanionMotionPose> controllerMotion;
     bool operator==(const ChapterActorInspectionPose&) const=default;
 };
 #endif

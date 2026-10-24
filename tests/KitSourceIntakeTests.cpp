@@ -450,7 +450,143 @@ int CompareCandidate(const std::filesystem::path& path,const std::filesystem::pa
     return 0;
 }
 
+// Opt-in source-proof validation only. Ordinary intake below keeps the admitted
+// runtime roster and does not discover or bind turn clips implicitly.
+int ValidateNamedTurnBindings(const std::filesystem::path& path) {
+    using namespace horde::scene;
+    std::size_t checks=0,failures=0;
+    std::string diagnostic;
+    const auto check=[&](bool ok,const char* message) {
+        ++checks;if(!ok) {++failures;std::cerr<<"FAIL: named turn bindings: "<<message<<": "<<diagnostic<<'\n';}
+        return ok;
+    };
+    const auto finish=[&] {
+        std::cout<<"Kit named turn bindings checks="<<checks<<" failures="<<failures
+            <<" runtime_admission=NO\n";
+        return failures?1:0;
+    };
+    const std::array<SkinnedClipBinding,6> bindings{{
+        {"Warden|idle",true,true},{"Warden|walk",true,true},
+        {"",false,false},{"",false,false},
+        {"KitProof|turn_left",false,true},{"KitProof|turn_right",false,true}}};
+    SkinnedClipSet legacy{};
+    std::copy_n(bindings.begin(),legacy.clips.size(),legacy.clips.begin());
+    const std::filesystem::path originalDirectory=HORDE_KIT_RUNTIME_DIRECTORY;
+    const auto originalPath=originalDirectory/"kit-warden-lod0.runtime.glb";
+    const auto filename=path.filename().string();
+    SkinnedMeshAsset original,fourSlot,named;
+    assets::SkinnedPbrActor originalActor,namedActor;
+    if(!check(static_cast<unsigned>(SkinnedClip::Idle)==0 && static_cast<unsigned>(SkinnedClip::Walking)==1 &&
+              static_cast<unsigned>(SkinnedClip::Attack)==2 && static_cast<unsigned>(SkinnedClip::Dead)==3 &&
+              static_cast<unsigned>(SkinnedClip::TurnLeft)==4 && static_cast<unsigned>(SkinnedClip::TurnRight)==5,
+              "existing enum IDs and appended named turn IDs remain stable") ||
+       !check(original.LoadClips(originalPath.string(),legacy,diagnostic),"original four-slot runtime imports") ||
+       !check(fourSlot.LoadClips(path.string(),legacy,diagnostic),"candidate retains the four-slot overload") ||
+       !check(named.LoadClips(path.string(),bindings,diagnostic),"six-entry array binds both named turns") ||
+       !check(originalActor.Load(originalDirectory,"kit-warden-lod0.runtime.glb",legacy,diagnostic),
+              "original actor retains the four-slot overload") ||
+       !check(namedActor.Load(path.parent_path(),filename.c_str(),bindings,diagnostic),
+              "actor accepts the six-entry array overload"))return finish();
+
+    struct Pose {
+        std::vector<TexturedSkinnedRtVertex> vertices;
+        std::vector<SkinnedPbrTangent> tangents;
+    };
+    const auto sample=[&](const SkinnedMeshAsset& model,SkinnedClip clip,float time,Pose& pose) {
+        return model.SkinUniquePbr(clip,time,pose.vertices,pose.tangents,diagnostic);
+    };
+    const auto same=[](const Pose& a,const Pose& b) {
+        return SameBytes(a.vertices,b.vertices) && SameBytes(a.tangents,b.tangents);
+    };
+    for(const auto clip:{SkinnedClip::Idle,SkinnedClip::Walking}) {
+        const float duration=original.ClipDuration(clip);
+        if(!check(std::isfinite(duration) && duration>0 && fourSlot.ClipDuration(clip)==duration &&
+                  named.ClipDuration(clip)==duration,"extended binding retains original Idle/Walk duration"))return finish();
+        for(float phase:{0.f,.25f,.5f,.75f,1.f}) {
+            Pose a,b,c;
+            if(!check(sample(original,clip,phase*duration,a) && sample(fourSlot,clip,phase*duration,b) &&
+                      sample(named,clip,phase*duration,c) && same(a,b) && same(a,c),
+                      "original and four/six-slot candidate Idle/Walk raw vertices and tangents are byte-identical") ||
+               !check(originalActor.Pose(clip,phase*duration,diagnostic) &&
+                      namedActor.Pose(clip,phase*duration,diagnostic) &&
+                      SameAdmittedActor(originalActor.Asset(),namedActor.Asset()),
+                      "six-slot actor preserves original grounded Idle/Walk geometry and PBR contract"))return finish();
+        }
+    }
+    for(const auto clip:{SkinnedClip::Attack,SkinnedClip::Dead,SkinnedClip::TurnLeft,SkinnedClip::TurnRight}) {
+        Pose unmapped;
+        check(original.ClipDuration(clip)==0 && fourSlot.ClipDuration(clip)==0 &&
+              !sample(fourSlot,clip,0,unmapped) && unmapped.vertices.empty() && unmapped.tangents.empty(),
+              "legacy four-slot binding never discovers optional combat or new turn clips");
+    }
+    for(const auto clip:{SkinnedClip::Attack,SkinnedClip::Dead}) {
+        Pose unmapped;
+        const auto admitted=namedActor.Asset();
+        check(named.ClipDuration(clip)==0 && namedActor.Duration(clip)==0 &&
+              !sample(named,clip,0,unmapped) && unmapped.vertices.empty() && unmapped.tangents.empty() &&
+              !namedActor.Pose(clip,0,diagnostic) && SameAdmittedActor(admitted,namedActor.Asset()),
+              "explicit optional combat holes reject pose requests without corrupting the actor");
+    }
+    for(const auto clip:{SkinnedClip::TurnLeft,SkinnedClip::TurnRight}) {
+        const auto slot=static_cast<std::size_t>(clip);
+        const float duration=named.ClipDuration(clip);
+        if(!check(std::isfinite(duration) && std::abs(duration-.75f)<1e-6f &&
+                  namedActor.Duration(clip)==duration,"named turn retains the authored finite 0.75-second duration"))return finish();
+        // Independently bind this exact source name into the old Idle slot to
+        // detect swapped semantic slots or changed loop/name interpretation.
+        SkinnedClipSet referenceBindings{};
+        for(auto& binding:referenceBindings.clips)binding={"",false,false};
+        referenceBindings.clips[0]=bindings[slot];
+        SkinnedMeshAsset reference;
+        if(!check(reference.LoadClips(path.string(),referenceBindings,diagnostic),
+                  "named source clip also imports through an independent legacy slot"))return finish();
+        for(float phase:{0.f,.25f,.5f,.75f,1.f}) {
+            Pose a,b;
+            if(!check(sample(named,clip,phase*duration,a) && sample(reference,SkinnedClip::Idle,phase*duration,b) && same(a,b),
+                      "named slot matches exact source animation bytes through the whole turn"))return finish();
+        }
+        Pose start,end,middle,before,after;
+        if(!check(sample(named,clip,0,start) && sample(named,clip,duration,end) &&
+                  sample(named,clip,.5f*duration,middle) && !same(start,middle) &&
+                  sample(named,clip,-duration,before) && same(start,before) &&
+                  sample(named,clip,1.5f*duration,after) && same(end,after),
+                  "nonloop turn clamps both endpoints and does not wrap into the distinct middle pose"))return finish();
+        if(!check(namedActor.Pose(clip,duration,diagnostic),"actor evaluates the final turn endpoint"))return finish();
+        const auto actorEnd=namedActor.Asset();
+        check(namedActor.Pose(clip,1.5f*duration,diagnostic) && SameAdmittedActor(actorEnd,namedActor.Asset()),
+              "grounded actor retains its nonloop final endpoint after duration");
+    }
+
+    SkinnedMeshAsset rejected;
+    check(!rejected.LoadClips(originalPath.string(),bindings,diagnostic) && !rejected.IsLoaded() &&
+          diagnostic=="Skinned GLB is missing required clip: KitProof|turn_left",
+          "original runtime cannot silently satisfy a required named turn");
+    auto missing=bindings;missing[5].name="KitNamedBindingTest|missing_turn_right";
+    check(!rejected.LoadClips(path.string(),missing,diagnostic) && !rejected.IsLoaded() &&
+          diagnostic=="Skinned GLB is missing required clip: KitNamedBindingTest|missing_turn_right",
+          "missing required sixth slot fails rather than using another clip");
+    missing[5].required=false;
+    check(rejected.LoadClips(path.string(),missing,diagnostic) && rejected.IsLoaded() &&
+          rejected.ClipDuration(SkinnedClip::TurnLeft)==named.ClipDuration(SkinnedClip::TurnLeft) &&
+          rejected.ClipDuration(SkinnedClip::TurnRight)==0 && rejected.ClipDuration(SkinnedClip::Attack)==0 &&
+          rejected.ClipDuration(SkinnedClip::Dead)==0,"optional missing turn retains its own empty slot");
+
+    std::array<SkinnedClipBinding,7> oversized{};
+    std::copy(bindings.begin(),bindings.end(),oversized.begin());
+    const std::string boundsDiagnostic="Skinned clip bindings must contain between one and six semantic slots.";
+    // Empty paths make precedence observable without creating a test file: an
+    // allowed roster reaches the existing open error; invalid rosters do not.
+    check(!rejected.LoadClips("",std::span<const SkinnedClipBinding>{},diagnostic) &&
+          !rejected.IsLoaded() && diagnostic==boundsDiagnostic,"zero bindings reject before GLB file IO");
+    check(!rejected.LoadClips("",oversized,diagnostic) && !rejected.IsLoaded() && diagnostic==boundsDiagnostic,
+          "more than six bindings reject before GLB file IO");
+    check(!rejected.LoadClips("",bindings,diagnostic) && !rejected.IsLoaded() &&
+          diagnostic.find("Could not open skeleton GLB:")==0,"six bindings reach the existing GLB open diagnostic");
+    return finish();
+}
+
 int main(int argc,char** argv) {
+    if(argc==3 && std::string_view(argv[1])=="--named-turn-bindings")return ValidateNamedTurnBindings(argv[2]);
     if(argc==4 && std::string_view(argv[1])=="--turn-contact")return MeasureKitTurnContact(argv[2],argv[3]);
     if(argc==4 && std::string_view(argv[1])=="--turn-proof")return ValidateKitTurnProof(argv[2],argv[3],std::filesystem::path(HORDE_KIT_RUNTIME_DIRECTORY)/"kit-warden-lod0.runtime.glb");
     if(argc==4 && std::string_view(argv[1])=="--compare-candidate")return CompareCandidate(argv[2],argv[3]);

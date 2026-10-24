@@ -1,4 +1,5 @@
 #include "gameplay/dialogue/CompanionRouteFixture.h"
+#include "CompanionTurnPrototypeValidation.h"
 #include <iostream>
 #include <limits>
 using namespace horde::gameplay;
@@ -81,6 +82,7 @@ int main(){
     Check(route.State().locomotion==CompanionLocomotionPose{} && route.State().animationSeconds==0 && route.State().generation>gen,
         "restored saves start neutral transient movement without adding serialized state");
     route.Reset();Check(route.State().locomotion==CompanionLocomotionPose{},"reset clears movement blend and phase");
+    companion_turn_validation::Validate(terrain,Check);
     std::cout<<"companion locomotion checks="<<checks<<" failures="<<failures<<" routeTicks="<<ticks<<'\n';
     return failures?1:0;
 }
