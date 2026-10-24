@@ -1,5 +1,24 @@
 # Horde 1.7 current design index
 
+## Current authority - 24 October 2026
+
+Use [the current implementation/acceptance map](HORDE_1_7_IMPLEMENTATION_REMAINING_2026_10_24.md),
+before choosing work. Forest preparation `3108cffc` and Android Custom opening
+ownership `9ab88eb0` are implemented with focused checks; all six hosted jobs
+passed at basis `6797e9d3`. New-head CI remains a separate check.
+Kit stationary turns and casual/travel timing are implemented; the registered
+Debug journey gate is fixed without raising its deadline. The forest/shared-tree
+world-depth gap, Android provisional fixed-output benchmark source and torch compact-carry
+prerequisite remain unfinished. Current touch controls need physical acceptance;
+Windows benchmark needs its remaining foreground/controller/listening gates.
+Specific owner decisions/deferrals and the 1.8 boundary remain explicit.
+
+## Archived checkpoint notes
+
+The dated snapshots below retain rejected trials and their then-current status.
+Their older “Latest”, “OFF”, timeout and “next” statements do not override the
+current map above or authorize repeating closed experiments.
+
 Latest: [stationary-only Kit turn eligibility is admitted to the development profile](../evidence/2026-10-24-kit-stationary-eligibility/README.md).
 Continuous bends retain legacy movement; stopped misaligned departures retain
 authored turns. The natural RT route now passes without added waiting guidance.
