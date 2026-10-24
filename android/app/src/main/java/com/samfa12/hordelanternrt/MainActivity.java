@@ -6701,6 +6701,8 @@ public class MainActivity extends Activity {
             case "chapter-forest-lookout": return 203;
             case "chapter-forest-lookout-left": return 228;
             case "chapter-forest-lookout-right": return 229;
+            case "chapter-forest-retention-west": return 230;
+            case "chapter-forest-retention-east": return 231;
             case "chapter-forest-clue-forward": return 226;
             case "chapter-forest-clue-reverse": return 227;
             case "chapter-keeper-death-held": return 204;
@@ -7029,6 +7031,8 @@ public class MainActivity extends Activity {
             case 227: return new float[]{-1.22777238637f, -0.30f};
             case 228: return new float[]{1.7246018366f, -0.15f};
             case 229: return new float[]{3.2953981634f, -0.15f};
+            case 230: return new float[]{-1.57079632679f, .014f};
+            case 231: return new float[]{1.57079632679f, .014f};
             case 204: return new float[]{-1.57079632679f, -0.35f};
             case 205: return new float[]{-1.57079632679f, -0.35f};
             case 206: return new float[]{-1.57079632679f, -0.35f};

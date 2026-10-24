@@ -116,6 +116,9 @@ Original failures are preserved, not relabelled as passes:
 
 Hosted acceptance belongs to this checkpoint's exact new commit/run; earlier
 green heads are not substituted. The final handoff records terminal CI/readback.
+The initial `f51aa8d5` Android parity failure and its narrow mapping correction are
+retained in [the follow-up receipt](android-registry-correction.md); the existing
+test caught the omitted view entries and was preserved.
 
 ## Admission boundary and next work
 
