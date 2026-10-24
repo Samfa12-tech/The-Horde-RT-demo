@@ -2,6 +2,8 @@
 
 ## Current authority - 24 October 2026
 
+Sam’s 21:10:41 UTC reply approves a bounded owned crown study (small-sample review before rollout), retains the refillable/upgradeable flask in 1.7 pending a complete-policy approval, and prioritizes gated chimney High/Low. New outdoor mist/shafts/fireflies/visual wind are explicitly deferred; existing effects/preferences remain. See [selected decisions](HORDE_1_7_OWNER_DECISIONS_2026_10_24.md#selected-direction) and [flask proposal](HORDE_1_7_FLASK_POLICY_PROPOSAL_2026_10_24.md). The [first source crown sample](../../assets/models/world/source/forest-crown-study-r1/README.md) remains too sparse; production is unchanged and export is blocked by an OS temporary-image denial. The [owned Run study](../evidence/2026-10-24-player-run-retarget/README.md) is unadmitted after a walk-only grounding mismatch, with limited RT coverage.
+
 The [normal shared64 ownership checkpoint](../evidence/2026-10-24-normal-shared-forest/README.md)
 moves the existing-master owner and whole-instance retention into common Debug,
 Release and Android source, preserving the original64 placements and both master
@@ -55,7 +57,7 @@ Original runtime/source is restored and rebuilt; no transition or clip admitted.
 Exact `b7231e1e` run40105479691 passed all six hosted jobs.
 The [canopy authority review](HORDE_1_7_CANOPY_AUTHORITY_2026_10_24.md) recovers the
 earliest documentary deferral, explicitly not Sam's original message, and records
-the proposed crown study pending reconciliation. Deferred art remains unchanged.
+the earlier hold. Sam has since explicitly approved only the bounded owned crown sample above; the private Easy Tree trial and production replacement remain unadmitted.
 
 ## Archived checkpoint notes
 

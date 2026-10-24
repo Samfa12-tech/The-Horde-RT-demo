@@ -1,0 +1,8 @@
+{
+  "action": "Blender glTF exporter temporary image write and directory cleanup",
+  "target": "C:\\Users\\sam_s\\AppData\\Local\\Packages\\sandbox.{8e769e38-f9a4-4e58-a763-1b6524b115eb}\\AC\\Temp\\tmpgf3juew5\\img",
+  "reason": "OpenImageIO could not open/write image; cleanup rmdir raised WinError5 Access is denied",
+  "state": "denied; no GLB produced; no retry/permissions/temp-path change",
+  "completed": "pine editable derivative saved; direct source authoring and preview continue independently",
+  "fullFailedExportLogSha256": "6d61368c6b8a0bf5ace10dcadcfa538afd8bbfba6e21084ecdd791655cf2630a"
+}

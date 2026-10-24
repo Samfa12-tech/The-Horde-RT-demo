@@ -385,6 +385,10 @@ establish physical playback/performance acceptance.
   layer-count manifest and full-mip Windows RGBA8/Android ASTC outputs record exact
   hashes. Source masters and rights notices stay preserved; the repository license
   does not assign a license to these assets.
+  The separate owned `forest-crown-study-r1/` source-only derivatives preserve this
+  provenance and introduce no third-party geometry/textures. They are unadmitted
+  study files, excluded from runtime selection and shipping; no broader licence
+  or production replacement is asserted.
 
 
 ### 1.7 development tomb native candidates (2026-10-10)

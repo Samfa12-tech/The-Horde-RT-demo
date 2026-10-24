@@ -1,0 +1,97 @@
+{
+  "scope": "single owned crown sample; no production asset/placement/collision/renderer changes",
+  "records": [
+    {
+      "species": "pine",
+      "source": "assets\\models\\world\\source\\forest-tree-pair-v1\\source\\horde-irregular-pine-v1-lod1.blend",
+      "sourceSha256": "348aa97d396404d40bba8b510e9b5afc412439312a1dc018efd26a85c9ccb399",
+      "widthScale": 1.85,
+      "lengthScale": 1.35,
+      "closedFoliageComponents": 366,
+      "fixedFoliageBaseAnchors": 366,
+      "unchangedWoodMossGeometry": {
+        "Pine | closed trunk roots branches": "79ee90989ddc749eff86e5e00fa5f9da1ac7deb7c8063a9b82a1c34199f2113c",
+        "Pine | closed moss tendrils": "ebe114bf906b1ffd7bf723943e0fae69ee8da1b6fca59f79d73cf5e8ff8fedfd"
+      },
+      "oldBounds": [
+        [
+          -1.8599222898483276,
+          -1.5585356950759888,
+          -0.0037124399095773697
+        ],
+        [
+          1.8909538984298706,
+          1.8350584506988525,
+          8.686391830444336
+        ]
+      ],
+      "newBounds": [
+        [
+          -1.9318410158157349,
+          -1.6390430927276611,
+          -0.0037124399095773697
+        ],
+        [
+          1.9694840908050537,
+          1.9347857236862183,
+          8.764366149902344
+        ]
+      ],
+      "meshCount": 3,
+      "triangles": 5000,
+      "vertices": 3362,
+      "materials": 3,
+      "texturesChanged": false,
+      "runtimeAdmitted": false,
+      "rtCostMeasured": false,
+      "blendSha256": "96869f28d42c1f2d8f6ccd41ed362442500492dc5ab0d5d1e2aa659cb289d9fb",
+      "runtimeExport": "blocked; original exporter attempted denied temporary image path; no retry"
+    },
+    {
+      "species": "alder",
+      "source": "assets\\models\\world\\source\\forest-tree-pair-v1\\source\\horde-upright-alder-v1-lod1.blend",
+      "sourceSha256": "3ca9b7847a90436c759cdec0acb87d91f3b2a1ae9f18cdc3f5bcb5c57bc3b2bc",
+      "widthScale": 1.65,
+      "lengthScale": 1.25,
+      "closedFoliageComponents": 330,
+      "fixedFoliageBaseAnchors": 330,
+      "unchangedWoodMossGeometry": {
+        "Alder | closed trunk roots branches": "5415dcbce7308a10cd1907408d49c69be675705cecb6b7282c4a871cd1eae5fd",
+        "Alder | closed moss tendrils": "0b26b96567e17f7f2ade02b8e44f8757646da9fbe7cb4b1eaf5d111d4961358a"
+      },
+      "oldBounds": [
+        [
+          -1.6800742149353027,
+          -1.7183218002319336,
+          -0.003950951620936394
+        ],
+        [
+          1.6727383136749268,
+          1.3665071725845337,
+          8.474547386169434
+        ]
+      ],
+      "newBounds": [
+        [
+          -1.7438900470733643,
+          -1.7844160795211792,
+          -0.003950951620936394
+        ],
+        [
+          1.7333076000213623,
+          1.4296239614486694,
+          8.519575119018555
+        ]
+      ],
+      "meshCount": 3,
+      "triangles": 5102,
+      "vertices": 3371,
+      "materials": 3,
+      "texturesChanged": false,
+      "runtimeAdmitted": false,
+      "rtCostMeasured": false,
+      "blendSha256": "3663488bbf9b1dbf8f7a30aa41107c946470c1019c54026a7dcf36695c9f4a3f",
+      "runtimeExport": "blocked; original exporter attempted denied temporary image path; no retry"
+    }
+  ]
+}
