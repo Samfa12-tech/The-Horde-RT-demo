@@ -47,9 +47,10 @@ try {
 
     $definition = Get-Content -LiteralPath (Join-Path $repoRoot "src\vulkan\raytracing\RtSceneAbi.def") -Raw | ConvertFrom-Json
     $capacityCpu = Get-Content -LiteralPath $portableCpuPath -Raw
-    if ($definition.capacities.instanceMetadata -ne 28 -or $definition.capacities.tlasInstances -ne 92 -or $definition.capacities.primitives -ne 36 -or
+    if ($definition.capacities.instanceMetadata -ne 28 -or $definition.capacities.tlasInstances -ne 104 -or $definition.capacities.primitives -ne 36 -or
         $definition.capacities.staticAssets -ne 13 -or $definition.capacities.textureLayers -ne 18 -or
-        $capacityCpu -notmatch 'kRtTlasInstanceCapacity = 92u;' -or
+        $capacityCpu -notmatch 'kRtTlasInstanceCapacity = 104u;' -or
+        $capacityCpu -notmatch 'kRtOrdinaryShowcaseInstanceCount = 28u;' -or
         $capacityCpu -notmatch 'kRtInstanceMetadataCapacity = 28u;' -or
         $capacityCpu -notmatch 'kRtPrimitiveMetadataCapacity = 36u;' -or
         $capacityCpu -notmatch 'kRtStaticAssetCapacity = 13u;' -or
@@ -57,7 +58,7 @@ try {
         $capacityCpu -notmatch 'kRtActiveFireEmitterCapacity = 4u;' -or
         $capacityCpu -notmatch 'kRtFireEmitterCapacity = 4u;' -or
         $generatedGlsl -notmatch 'const uint kRtTextureLayerCapacity = 18u;') {
-        throw 'Generated owners must admit 92 TLAS storage slots, 28 metadata records, 36 primitive records, 13 static assets, 18 texture layers, and four fire storage records.'
+        throw 'Generated owners must admit 104 TLAS storage slots, 28 metadata records, 36 primitive records, 13 static assets, 18 texture layers, and four fire storage records.'
     }
     foreach ($case in @(
         @{ name = 'tlasInstances'; value = 21 },
@@ -83,6 +84,21 @@ try {
             $capacityRejected = $true
         }
         if (-not $capacityRejected) { throw 'Invalid physical owner/fire capacity was admitted.' }
+    }
+    foreach ($value in @($null, 0, 105, 28.5, '28')) {
+        $invalidProfile = Get-Content -LiteralPath $lfDefinitionPath -Raw | ConvertFrom-Json
+        $invalidProfile.sceneCounts.ordinaryShowcaseTlasInstances = $value
+        $invalidProfilePath = Join-Path $temporaryRoot 'invalid-profile-count.def'
+        $invalidProfile | ConvertTo-Json -Depth 32 | Set-Content -LiteralPath $invalidProfilePath
+        $rejected = $false
+        try {
+            & (Join-Path $repoRoot 'tools/generate-rt-scene-abi.ps1') -DefinitionPath $invalidProfilePath `
+                -CpuOutputPath $portableCpuPath -GlslOutputPath $portableGlslPath
+        } catch {
+            if ($_.Exception.Message -notmatch '^The ordinary Showcase live count') { throw }
+            $rejected = $true
+        }
+        if (-not $rejected) { throw 'An invalid live scene count was admitted.' }
     }
     if ($definition.schema -ne 1 -or $definition.bindings.dielectricDiagnostics -ne 22 -or
         $definition.bindings.environmentTexture -ne 25 -or

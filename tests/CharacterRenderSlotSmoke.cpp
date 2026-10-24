@@ -253,7 +253,7 @@ int main()
     ok &= Require(PresentableTinyRtScene::kOrdinaryBlasCount == 21u &&
                       PresentableTinyRtScene::kBlasCount == 23u &&
                       PresentableTinyRtScene::kOrdinaryTlasInstanceCount == 28u &&
-                      PresentableTinyRtScene::kTlasInstanceCount == 92u &&
+                      PresentableTinyRtScene::kTlasInstanceCount == 104u &&
                       kRtInstanceMetadataCapacity == 28u &&
                       kRtStaticAssetCapacity == 13u &&
                       PresentableTinyRtScene::kKeeperTorchFirstTlasInstance == 23u &&

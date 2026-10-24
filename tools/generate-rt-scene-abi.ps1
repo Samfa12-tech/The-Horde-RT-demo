@@ -41,6 +41,11 @@ if ($c.dustMotes -ne 64 -or $c.dustTiles -ne 576 -or $c.dustTileCandidates -ne 4
 if ($c.tlasInstances -lt $c.instanceMetadata -or $c.activeFireEmitters -gt $c.fireEmitters) {
     throw 'RT scene ABI owner capacities must accommodate metadata and active fire records.'
 }
+$ordinaryCount = $definition.sceneCounts.ordinaryShowcaseTlasInstances
+if (($ordinaryCount -isnot [int] -and $ordinaryCount -isnot [long]) -or
+    $ordinaryCount -lt 1 -or $ordinaryCount -gt $c.tlasInstances) {
+    throw 'The ordinary Showcase live count must be an integer within TLAS storage capacity.'
+}
 $b = $definition.bindings
 $i = $definition.instanceFlags
 $m = $definition.materialFlags
@@ -130,6 +135,7 @@ namespace horde::vulkan::raytracing
 inline constexpr char kRtSceneAbiDefinitionSha256[] = "$hash";
 inline constexpr std::uint32_t kRtInstanceMetadataCapacity = $($c.instanceMetadata)u;
 inline constexpr std::uint32_t kRtTlasInstanceCapacity = $($c.tlasInstances)u;
+inline constexpr std::uint32_t kRtOrdinaryShowcaseInstanceCount = $($ordinaryCount)u;
 inline constexpr std::uint32_t kRtStaticAssetCapacity = $($c.staticAssets)u;
 inline constexpr std::uint32_t kRtPrimitiveMetadataCapacity = $($c.primitives)u;
 inline constexpr std::uint32_t kRtMaterialCapacity = $($c.materials)u;

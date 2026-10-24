@@ -336,6 +336,116 @@ void TestPreparedMasterOwnership()
     }
 }
 
+void TestF01Supplement(ForestDressingSharedLayout layout,
+                       const gameplay::simulation::TriangleSupportSurface& terrain)
+{
+    // Copy only the shared ownership handle/ranges; never duplicate either master.
+    const auto control=layout;
+    const auto original64=layout.prepared->placements;
+    const std::array vertexPointers{layout.prepared->masters[0].vertices.data(),layout.prepared->masters[1].vertices.data()};
+    const std::array indexPointers{layout.prepared->masters[0].indices.data(),layout.prepared->masters[1].indices.data()};
+    std::string diagnostic;
+    Check(layout.supplementalPlacements.empty(),"existing64 shared control has no implicit background supplement");
+    Check(PrepareF01BackgroundForestDressing(layout,terrain,diagnostic),
+          diagnostic.empty()?"the exact twelve-root F01 authoring candidate admits against native terrain":diagnostic);
+    if(layout.supplementalPlacements.size()!=12) {Check(false,"F01 publishes exactly twelve complete receipts");return;}
+    struct Expected {std::size_t master;float x,z,yaw;};
+    const std::array<Expected,12> expected{{
+        {0,-39,-37,.2f},{1,-30,-36,1.1f},{0,-47,-33,2.f},{0,-54,-26,.8f},
+        {1,-58,-17,2.5f},{0,-57,-8,1.7f},{0,-42,-45,1.4f},{0,-29,-44,2.9f},
+        {1,-55,-39,.4f},{0,-64,-30,2.4f},{0,-67,-17,1.f},{1,-66,-5,3.1f}}};
+    std::size_t samples=0,pines=0,alders=0,exposed=0;float maximumBurial=0,worstGap=-1000;
+    for(std::size_t i=0;i<expected.size();++i) {
+        const auto& receipt=layout.supplementalPlacements[i];const auto& p=receipt.placement;const auto& e=expected[i];
+        Check(p.masterIndex==e.master && p.origin[0]==e.x && p.origin[2]==e.z && p.yawRadians==e.yaw,
+              "F01 authoring roots retain exact approved positions/yaws/master references");
+        if(p.masterIndex>=2)continue;
+        const auto& source=layout.prepared->masters[p.masterIndex];const auto centre=terrain.Query(p.origin[0],p.origin[2]);
+        Check(centre.found && centre.worldY==p.supportY && std::isfinite(receipt.rootBurialMetres) &&
+              receipt.rootBurialMetres>=0 && receipt.rootBurialMetres<=.65f && receipt.rootTipSamples>=18 &&
+              receipt.rootBurialMetres==p.supportY-source.bounds.minimum[1]-p.origin[1],
+              "new authoring burial is actually measured, bounded and separate from the original collision receipts");
+        Check(FiniteBounds(receipt.worldBounds) && FiniteBounds(receipt.trunkBounds) &&
+              receipt.trunkBounds.minimum[1]>=p.supportY-.0001f && receipt.trunkBounds.maximum[1]<=p.supportY+2.f+.0001f &&
+              Near(receipt.worldBounds.maximum[1]-receipt.worldBounds.minimum[1],source.bounds.maximum[1]-source.bounds.minimum[1]),
+              "measured world/trunk bounds preserve rigid tree height and the existing two-metre clipped bark slab");
+        const float c=std::cos(p.yawRadians),s=std::sin(p.yawRadians);std::size_t rootSamples=0;
+        for(const auto& vertex:source.vertices) {
+            const auto& v=vertex.position;if(v[1]>source.bounds.minimum[1]+.02f)continue;
+            const auto ground=terrain.Query(p.origin[0]+c*v[0]+s*v[2],p.origin[2]-s*v[0]+c*v[2]);
+            Check(ground.found,"every supplemental imported root tip has native terrain support");
+            if(!ground.found)continue;
+            const float gap=p.origin[1]+v[1]-ground.worldY;
+            worstGap=std::max(worstGap,gap);if(gap>-.019f)++exposed;
+            ++rootSamples;++samples;
+        }
+        Check(rootSamples==receipt.rootTipSamples,"new root-tip count certifies actual imported vertices, not a desired count");
+        maximumBurial=std::max(maximumBurial,receipt.rootBurialMetres);
+        if(p.masterIndex==0)++pines;else ++alders;
+    }
+    bool originalsExact=layout.prepared==control.prepared && layout.commonPrimitiveCount==control.commonPrimitiveCount;
+    for(std::size_t i=0;i<2;++i) originalsExact=originalsExact &&
+        layout.masters[i].primitiveOffset==control.masters[i].primitiveOffset &&
+        layout.masters[i].primitiveCount==control.masters[i].primitiveCount &&
+        layout.masters[i].localBounds.minimum==control.masters[i].localBounds.minimum &&
+        layout.masters[i].localBounds.maximum==control.masters[i].localBounds.maximum &&
+        layout.prepared->masters[i].vertices.data()==vertexPointers[i] && layout.prepared->masters[i].indices.data()==indexPointers[i];
+    for(std::size_t i=0;i<original64.size();++i) {
+        const auto& a=original64[i];const auto& b=layout.prepared->placements[i];
+        originalsExact=originalsExact && a.masterIndex==b.masterIndex && a.origin==b.origin &&
+            std::bit_cast<std::uint32_t>(a.yawRadians)==std::bit_cast<std::uint32_t>(b.yawRadians) &&
+            std::bit_cast<std::uint32_t>(a.supportY)==std::bit_cast<std::uint32_t>(b.supportY);
+    }
+    Check(originalsExact && samples==936 && exposed==0 && pines==8 && alders==4 &&
+          control.supplementalPlacements.empty() && gameplay::simulation::kForestTreePlacementContract.size()==64,
+          "the diagnostic76 population reuses two unchanged masters and original64, without publishing replacement collision");
+    const auto receipts=layout.supplementalPlacements;
+    Check(!PrepareF01BackgroundForestDressing(layout,terrain,diagnostic) && layout.supplementalPlacements.size()==receipts.size(),
+          "repeated supplement admission rejects rather than multiplying background references");
+    for(std::size_t i=0;i<receipts.size();++i) {
+        const auto& a=receipts[i];const auto& b=layout.supplementalPlacements[i];
+        Check(a.placement.origin==b.placement.origin && a.placement.yawRadians==b.placement.yawRadians &&
+              a.placement.masterIndex==b.placement.masterIndex && a.placement.supportY==b.placement.supportY &&
+              a.worldBounds.minimum==b.worldBounds.minimum && a.worldBounds.maximum==b.worldBounds.maximum &&
+              a.trunkBounds.minimum==b.trunkBounds.minimum && a.trunkBounds.maximum==b.trunkBounds.maximum &&
+              a.rootBurialMetres==b.rootBurialMetres && a.rootTipSamples==b.rootTipSamples,
+              "rejected duplicate keeps every prior diagnostic receipt field intact");
+    }
+    using Surface=gameplay::simulation::TriangleSupportSurface;
+    const auto patch=[&](float x,float z,float radius,float slope) {
+        const Surface::Point a{x-radius,-slope*radius,z-radius},b{x-radius,-slope*radius,z+radius},
+            c{x+radius,slope*radius,z-radius},d{x+radius,slope*radius,z+radius};
+        const std::array<Surface::Triangle,2> triangles{{{{a,b,c}},{{c,b,d}}}};
+        return Surface::Build(triangles,diagnostic);
+    };
+    for(unsigned scenario=0;scenario<3;++scenario) {
+        const auto surface=scenario==0?patch(-39,-37,4,0):scenario==1?patch(-39,-37,.01f,0):patch(0,0,100,2);
+        Check(bool(surface),"supplement negative fixture has a valid immutable surface");if(!surface)continue;
+        auto candidate=control;
+        Check(!PrepareF01BackgroundForestDressing(candidate,*surface,diagnostic) && candidate.supplementalPlacements.empty() &&
+              candidate.prepared==control.prepared && candidate.masters[0].primitiveOffset==control.masters[0].primitiveOffset,
+              "partial/missing-footprint/excessive-burial failures publish no supplement or master replacement");
+        if(scenario==0)Check(diagnostic.find("centre support at 1")!=std::string::npos,
+              "the staged first root cannot leak when a later root has no support");
+    }
+    const auto flat=patch(0,0,100,0);
+    if(flat) {
+        auto authoring=control;
+        Check(PrepareF01BackgroundForestDressing(authoring,*flat,diagnostic) && authoring.supplementalPlacements.size()==12,
+              "new roots use their measured authoring burial instead of an invented prior collision receipt");
+        auto retained=control.prepared;
+        Check(!PrepareForestDressing(kRoot/"assets",retained,diagnostic,flat.get()) && retained==control.prepared &&
+              diagnostic.find("collision receipt must match within 2mm")!=std::string::npos,
+              "original64 still rejects changed support even when the root fit alone would satisfy the maximum burial guard");
+    }
+    auto missing=control;missing.prepared.reset();
+    Check(!PrepareF01BackgroundForestDressing(missing,terrain,diagnostic) && missing.supplementalPlacements.empty(),
+          "supplement cannot manufacture absent immutable master ownership");
+    std::cout<<"F01_SUPPLEMENT_CPU roots="<<layout.supplementalPlacements.size()<<" pine="<<pines<<" alder="<<alders
+        <<" rootTipSamples="<<samples<<" exposed="<<exposed<<" maximumBurial="<<maximumBurial<<" maximumGap="<<worstGap
+        <<"; diagnostic composition only, collision/adoption unadmitted\n";
+}
+
 void TestSharedMasterPacking()
 {
     std::string diagnostic;
@@ -494,6 +604,7 @@ void TestSharedMasterPacking()
         if(mutation==7)invalid->masters[0].nodeTransforms[0].world[0]=NAN;
         rejects(std::move(invalid),common,"invalid local source/placement fails atomically while preserving prior immutable publication");
     }
+    TestF01Supplement(layout,*terrain);
     std::cout<<"SHARED_FOREST_CPU commonPrimitives="<<layout.commonPrimitiveCount<<" localMasterPrimitives=6 placements="
         <<layout.prepared->placements.size()<<" localTriangles=10102 materials="<<owner.materials.size()
         <<" vertexBytes="<<owner.vertices.size()*sizeof(StaticRtVertex)<<" indexBytes="<<owner.indices.size()*sizeof(std::uint32_t)

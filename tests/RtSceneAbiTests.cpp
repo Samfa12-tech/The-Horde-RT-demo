@@ -212,8 +212,10 @@ void TestGeneratedConstants()
           "rectangular geometry certification has a distinct append-only material flag");
     Check(kRtInstanceMetadataCapacity == 28u,
           "forest master metadata26/27 appends after the unchanged Keeper identity25");
-    Check(kRtTlasInstanceCapacity == 92u,
-          "storage fits 28 unchanged ordinary roles plus all 64 shared-tree placements");
+    Check(kRtTlasInstanceCapacity == 104u,
+          "storage fits 28 ordinary roles, 64 route trees and the bounded 12-tree F01 candidate");
+    Check(kRtOrdinaryShowcaseInstanceCount == 28u,
+          "ordinary live count is independent of diagnostic storage and metadata aliases");
     Check(kRtActiveFireEmitterCapacity == 4u && kRtFireEmitterCapacity == 4u && sizeof(RtFireEmitterGpu) == 160u,
           "all four important lights are active within the unchanged 640-byte fire storage buffer");
     Check(kRtStaticAssetCapacity == 13u, "static asset capacity admits the original player sword scabbard and dedicated water droplet owner without replacing old assets");

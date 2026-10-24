@@ -23,6 +23,13 @@ is the next content proof. The same work fixed zero-time terrain/aspect held-pos
 rebinding; a separate default Debug movement timeout remains open despite all
 three relevant Release tests passing. This is not the closed Debug journey gate.
 
+The [twelve-root F01 trial](../evidence/2026-10-24-f01-forest-sector/README.md)
+now has actual north/west and lookout comparisons. It adds visible depth at small
+allocation cost but still fails the surrounding-forest goal; composition and
+collision remain unadmitted. Storage 104 is separate from ordinary live 28.
+The exact `8ddc08fd` hosted run failed its old storage/live witness alias in GCC/Clang;
+the runner/profile definition is corrected and needs new-head CI readback.
+
 ## Archived checkpoint notes
 
 The dated snapshots below retain rejected trials and their then-current status.

@@ -51,6 +51,14 @@ constexpr std::array<std::string_view, 2u> kSharedMasterNodes{{
 constexpr std::array<float, 16u> kIdentity{{
     1.f,0.f,0.f,0.f, 0.f,1.f,0.f,0.f, 0.f,0.f,1.f,0.f, 0.f,0.f,0.f,1.f,
 }};
+struct F01AuthoringRoot {std::size_t master;float x,z,yaw;};
+// Exact bounded diagnostic proposal from HORDE_1_7_F01_BACKGROUND_SECTOR_2026_10_24.
+// These do not amend the existing64 collision contract or introduce tree assets.
+constexpr std::array<F01AuthoringRoot,12u> kF01BackgroundRoots{{
+    {0,-39,-37,.2f},{1,-30,-36,1.1f},{0,-47,-33,2.f},{0,-54,-26,.8f},
+    {1,-58,-17,2.5f},{0,-57,-8,1.7f},{0,-42,-45,1.4f},{0,-29,-44,2.9f},
+    {1,-55,-39,.4f},{0,-64,-30,2.4f},{0,-67,-17,1.f},{1,-66,-5,3.1f},
+}};
 
 bool SameForestMaterial(const assets::StaticMaterial& a,const assets::StaticMaterial& b)
 {
@@ -173,6 +181,34 @@ std::array<float, 3u> RotateY(const std::array<float, 3u>& value, float radians)
             -sine * value[0] + cosine * value[2]};
 }
 
+struct ForestRootMeasurement
+{
+    float unburiedOriginY=0.f,fittedOriginY=0.f;
+    std::size_t tipCount=0;
+};
+
+bool MeasureForestRootFootprint(const assets::StaticMeshAsset& source,float x,float z,float yaw,float supportY,
+    const gameplay::simulation::TriangleSupportSurface& terrain,ForestRootMeasurement& measured,std::string& diagnostic)
+{
+    measured={supportY-source.bounds.minimum[1],supportY-source.bounds.minimum[1],0};
+    for(const auto& vertex:source.vertices) {
+        if(vertex.position[1]>source.bounds.minimum[1]+.02f)continue;
+        const auto tip=RotateY({{vertex.position[0],vertex.position[1],vertex.position[2]}},yaw);
+        const auto ground=terrain.Query(x+tip[0],z+tip[2]);
+        if(!ground.found) {diagnostic="Forest root footprint has missing terrain support.";return false;}
+        if(!std::isfinite(ground.worldY)) {diagnostic="Forest root footprint has non-finite terrain support.";return false;}
+        measured.fittedOriginY=std::min(measured.fittedOriginY,ground.worldY-tip[1]-.02f);
+        ++measured.tipCount;
+    }
+    return true;
+}
+
+bool AdmittedForestRootFootprint(const ForestRootMeasurement& measured)
+{
+    return std::isfinite(measured.unburiedOriginY) && std::isfinite(measured.fittedOriginY) &&
+        measured.tipCount>=18u && measured.unburiedOriginY-measured.fittedOriginY<=.65f;
+}
+
 void IncludePoint(ForestDressingBounds& bounds, const std::array<float, 3u>& point)
 {
     for (std::size_t axis = 0u; axis < 3u; ++axis)
@@ -203,6 +239,37 @@ void IncludeTrunkTriangle(ForestDressingBounds& bounds,
         polygon=std::move(clipped);
     }
     for(const auto& point:polygon)IncludePoint(bounds,point);
+}
+
+bool MeasureForestPlacementBounds(const PreparedForestDressing& prepared,
+    ForestDressingSupplementalPlacement& receipt,std::string& diagnostic)
+{
+    const auto& placed=receipt.placement;const auto& source=prepared.masters[placed.masterIndex];
+    receipt.worldBounds.minimum.fill(std::numeric_limits<float>::max());
+    receipt.worldBounds.maximum.fill(std::numeric_limits<float>::lowest());
+    receipt.trunkBounds=receipt.worldBounds;
+    const auto worldPoint=[&](const assets::StaticRtVertex& vertex) {
+        auto p=RotateY({{vertex.position[0],vertex.position[1],vertex.position[2]}},placed.yawRadians);
+        for(std::size_t axis=0;axis<3;++axis)p[axis]+=placed.origin[axis];
+        return p;
+    };
+    for(const auto& vertex:source.vertices)IncludePoint(receipt.worldBounds,worldPoint(vertex));
+    for(std::size_t i=0;i<source.primitives.size();++i) {
+        if(prepared.primitiveFamilies[placed.masterIndex][i]!=static_cast<std::uint8_t>(MaterialFamily::Bark))continue;
+        const auto& primitive=source.primitives[i];
+        for(std::size_t index=0;index<primitive.indexCount;index+=3) {
+            std::vector<std::array<float,3>> triangle;
+            for(std::size_t corner=0;corner<3;++corner)
+                triangle.push_back(worldPoint(source.vertices[primitive.vertexOffset+source.indices[primitive.indexOffset+index+corner]]));
+            IncludeTrunkTriangle(receipt.trunkBounds,std::move(triangle),placed.supportY);
+        }
+    }
+    for(const auto* bounds:{&receipt.worldBounds,&receipt.trunkBounds})for(std::size_t axis=0;axis<3;++axis)
+        if(!std::isfinite(bounds->minimum[axis]) || !std::isfinite(bounds->maximum[axis]) ||
+           bounds->minimum[axis]>bounds->maximum[axis]) {
+            diagnostic="Forest authoring root has invalid measured world/trunk bounds.";return false;
+        }
+    return true;
 }
 
 assets::StaticMaterial MakeFamilyMaterial(const assets::StaticMaterial& source,
@@ -358,25 +425,14 @@ bool PrepareForestDressing(const std::filesystem::path& assetRoot,
             // Keep each tree upright and rigid. Embed the actual imported root
             // tips in the terrain across their footprint, not only at the trunk
             // centre. A bad steep placement must be reauthored, never sunk metres.
-            const float unburiedOriginY=support.worldY-source.bounds.minimum[1];
-            float fittedOriginY = unburiedOriginY;
-            std::size_t tipCount = 0u;
-            for (const auto& vertex : source.vertices) {
-                if (vertex.position[1] > source.bounds.minimum[1] + .02f) continue;
-                const auto tip = RotateY({{vertex.position[0],vertex.position[1],vertex.position[2]}},yaw);
-                const auto ground = terrain->Query(contract.x+tip[0],contract.z+tip[2]);
-                if (!ground.found) {
-                    diagnostic="Forest root footprint has missing terrain support.";
-                    return false;
-                }
-                fittedOriginY=std::min(fittedOriginY,ground.worldY-tip[1]-.02f);
-                ++tipCount;
-            }
-            if(tipCount<18u || unburiedOriginY-fittedOriginY>.65f ||
+            ForestRootMeasurement measured;
+            if(!MeasureForestRootFootprint(source,contract.x,contract.z,yaw,support.worldY,*terrain,measured,diagnostic))return false;
+            const float fittedOriginY=measured.fittedOriginY;
+            if(!AdmittedForestRootFootprint(measured) ||
                std::abs(fittedOriginY-originY)>.002f) {
                 diagnostic="Forest root footprint needs reauthoring at placement " +
                     std::to_string(placementIndex) + "; required burial=" +
-                    std::to_string(unburiedOriginY-fittedOriginY) +
+                    std::to_string(measured.unburiedOriginY-measured.fittedOriginY) +
                     " m (maximum 0.65 m; source collision receipt must match within 2mm).";
                 return false;
             }
@@ -477,6 +533,43 @@ bool AppendPreparedForestMasters(std::shared_ptr<const PreparedForestDressing> p
     // unrelated local coordinates. Range bounds are carried separately above.
     candidate.prepared=std::move(prepared);
     existingOwner=std::move(staged);layout=std::move(candidate);
+    diagnostic.clear();return true;
+}
+
+bool PrepareF01BackgroundForestDressing(ForestDressingSharedLayout& layout,
+                                       const gameplay::simulation::TriangleSupportSurface& terrain,
+                                       std::string& diagnostic)
+{
+    if(!layout.prepared || !layout.supplementalPlacements.empty() || !layout.commonPrimitiveCount ||
+       layout.masters[0].primitiveCount!=3u || layout.masters[1].primitiveCount!=3u ||
+       layout.masters[0].primitiveOffset!=layout.commonPrimitiveCount ||
+       layout.masters[1].primitiveOffset!=layout.masters[0].primitiveOffset+3u) {
+        diagnostic="F01 authoring supplement requires fresh disjoint shared-master ownership.";return false;
+    }
+    if(!ValidSharedForestPrepared(*layout.prepared,diagnostic))return false;
+    std::vector<ForestDressingSupplementalPlacement> staged;
+    staged.reserve(kF01BackgroundRoots.size());
+    for(std::size_t index=0;index<kF01BackgroundRoots.size();++index) {
+        const auto& root=kF01BackgroundRoots[index];const auto& source=layout.prepared->masters[root.master];
+        const auto support=terrain.Query(root.x,root.z);
+        if(!support.found || !std::isfinite(support.worldY)) {
+            diagnostic="F01 authoring root has missing or non-finite centre support at "+std::to_string(index)+".";return false;
+        }
+        ForestRootMeasurement measured;
+        if(!MeasureForestRootFootprint(source,root.x,root.z,root.yaw,support.worldY,terrain,measured,diagnostic))return false;
+        if(!AdmittedForestRootFootprint(measured)) {
+            diagnostic="F01 root footprint needs reauthoring at "+std::to_string(index)+"; required burial="+
+                std::to_string(measured.unburiedOriginY-measured.fittedOriginY)+" m (maximum 0.65 m; at least 18 native tips).";
+            return false;
+        }
+        ForestDressingSupplementalPlacement receipt;
+        receipt.placement={root.master,{{root.x,measured.fittedOriginY,root.z}},root.yaw,support.worldY};
+        receipt.rootBurialMetres=measured.unburiedOriginY-measured.fittedOriginY;
+        receipt.rootTipSamples=measured.tipCount;
+        if(!MeasureForestPlacementBounds(*layout.prepared,receipt,diagnostic))return false;
+        staged.push_back(receipt);
+    }
+    layout.supplementalPlacements=std::move(staged);
     diagnostic.clear();return true;
 }
 

@@ -6113,7 +6113,9 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx, const bool startup
     if(ctx.forestRouteProof!=horde::platform::windows::ForestRouteCaptureMode::Disabled) {
         using Mode=horde::vulkan::raytracing::PresentableTinyRtScene::ForestRouteProofMode;
         const auto mode=ctx.forestRouteProof==horde::platform::windows::ForestRouteCaptureMode::SharedExisting64?
-            Mode::SharedExisting64:Mode::BakedResident;
+            Mode::SharedExisting64:
+            ctx.forestRouteProof==horde::platform::windows::ForestRouteCaptureMode::SharedF01Sector76?
+            Mode::SharedF01Sector76:Mode::BakedResident;
         if(!ctx.rtScene.SetForestRouteProofMode(mode,diagnostic)){ctx.lastRtFrameError=diagnostic;return false;}
     }
     if(ctx.previewMeshPair!=horde::platform::windows::PreviewMeshPairCaptureMode::None) {

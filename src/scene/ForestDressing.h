@@ -10,6 +10,7 @@
 #include <filesystem>
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace horde::scene
 {
@@ -70,6 +71,17 @@ struct ForestDressingMasterRange
     ForestDressingBounds localBounds{};
 };
 
+// Diagnostic authoring receipt, not an admitted collision contract. Bounds and
+// burial come from the same native ground/root measurement as the original64;
+// reachable trunks still need separately matched production collision.
+struct ForestDressingSupplementalPlacement
+{
+    ForestDressingRigidPlacement placement{};
+    ForestDressingBounds worldBounds{}, trunkBounds{};
+    float rootBurialMetres = 0.0f;
+    std::size_t rootTipSamples = 0u;
+};
+
 // One mixed-space CPU owner: the common prefix remains world-space; each
 // appended master range stays in its normalized local metre space. Keep these
 // ranges separate at BLAS registration, and never consolidate them afterward.
@@ -79,6 +91,7 @@ struct ForestDressingSharedLayout
     std::size_t commonPrimitiveCount = 0u;
     std::array<ForestDressingMasterRange, 2u> masters{};
     std::shared_ptr<const PreparedForestDressing> prepared;
+    std::vector<ForestDressingSupplementalPlacement> supplementalPlacements;
 };
 
 bool PrepareForestDressing(const std::filesystem::path& assetRoot,
@@ -100,6 +113,14 @@ bool AppendPreparedForestMasters(std::shared_ptr<const PreparedForestDressing> p
                                  assets::StaticMeshAsset& existingOwner,
                                  ForestDressingSharedLayout& layout,
                                  std::string& diagnostic);
+
+// One fixed, separately selected F01 composition candidate. Reuses the owned
+// masters/ranges, stages all twelve receipts, and publishes only the supplement.
+// The original64/root collision receipts, geometry, materials and ranges remain
+// unchanged; failure preserves any earlier publication.
+bool PrepareF01BackgroundForestDressing(ForestDressingSharedLayout& layout,
+                                       const gameplay::simulation::TriangleSupportSurface& terrain,
+                                       std::string& diagnostic);
 
 // Compatibility bake from the same canonical masters/transforms. Production
 // remains world-baked until a separate RT ownership/capacity proof is admitted.

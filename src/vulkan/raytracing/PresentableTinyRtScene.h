@@ -266,7 +266,7 @@ public:
     static constexpr std::uint32_t kKeeperMetadataIndex = CharacterRenderSlot::kKeeperMetadataIndex;
     static constexpr std::uint32_t kKeeperInstanceIndex = CharacterRenderSlot::kKeeperTlasInstanceIndex;
     static constexpr std::uint32_t kTlasCount = 1u;
-    static constexpr std::uint32_t kOrdinaryTlasInstanceCount = kKeeperInstanceIndex + 1u;
+    static constexpr std::uint32_t kOrdinaryTlasInstanceCount = kRtOrdinaryShowcaseInstanceCount;
     // Storage capacity; builds and updates use the separate live count.
     static constexpr std::uint32_t kTlasInstanceCount = kRtTlasInstanceCapacity;
     // Keep the two existing Keeper body instances at their original TLAS slots.
@@ -279,8 +279,9 @@ public:
     static_assert(kWaterDropletMetadataIndex < kRtInstanceMetadataCapacity);
     static_assert(kKeeperMetadataIndex < kRtInstanceMetadataCapacity);
     static_assert(kOrdinaryTlasInstanceCount == 28u);
+    static_assert(kOrdinaryTlasInstanceCount == kKeeperInstanceIndex + 1u);
     static_assert(kTlasInstanceCount == kOrdinaryTlasInstanceCount +
-                  horde::gameplay::simulation::kForestTreePlacementContract.size());
+                  horde::gameplay::simulation::kForestTreePlacementContract.size() + 12u);
 
     PresentableTinyRtScene() = default;
     ~PresentableTinyRtScene();
@@ -312,7 +313,7 @@ public:
 
     void Destroy();
 #if defined(_DEBUG)
-    enum class ForestRouteProofMode { Disabled, BakedResident, SharedExisting64 };
+    enum class ForestRouteProofMode { Disabled, BakedResident, SharedExisting64, SharedF01Sector76 };
     bool SetForestRouteProofMode(ForestRouteProofMode mode, std::string& diagnostic);
     [[nodiscard]] std::string ForestRouteProofJson() const;
     bool ValidateForestRouteProof(std::string& diagnostic) const;
@@ -1293,6 +1294,10 @@ private:
     std::array<horde::gameplay::effects::FireEmitterFixedStepInput, 2u> previewFireInputs_{};
 #if defined(_DEBUG)
     ForestRouteProofMode forestRouteProofMode_ = ForestRouteProofMode::Disabled;
+    bool UsesSharedForestRouteProof() const noexcept {
+        return forestRouteProofMode_==ForestRouteProofMode::SharedExisting64 ||
+               forestRouteProofMode_==ForestRouteProofMode::SharedF01Sector76;
+    }
     horde::scene::ForestDressingSharedLayout forestSharedLayout_{};
     std::array<AccelerationStructure, 2u> forestMasterBlas_{};
     Buffer forestMasterBuildScratch_{};

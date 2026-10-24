@@ -25,6 +25,15 @@ int main()
     Check(ParseForestRouteProofLaunch(forestArgs,true).mode==ForestRouteCaptureMode::SharedExisting64 &&
           ParseForestRouteProofLaunch(forestArgs,true).error.empty(),"shared64 is limited to an explicit hidden chapter capture");
     Check(!ParseForestRouteProofLaunch(forestArgs,false).error.empty(),"forest proof is rejected by Release");
+    auto bakedForest=forestArgs;bakedForest[1]=L"baked-resident";
+    Check(ParseForestRouteProofLaunch(bakedForest,true).mode==ForestRouteCaptureMode::BakedResident &&
+          ParseForestRouteProofLaunch(bakedForest,true).error.empty(),"existing baked control remains independently selectable");
+    auto sectorArgs=forestArgs;sectorArgs[1]=L"f01-sector";
+    Check(ParseForestRouteProofLaunch(sectorArgs,true).mode==ForestRouteCaptureMode::SharedF01Sector76 &&
+          ParseForestRouteProofLaunch(sectorArgs,true).error.empty(),"F01 sector is a separate explicit hidden composition proof");
+    Check(!ParseForestRouteProofLaunch(sectorArgs,false).error.empty(),"Release rejects F01 sector composition");
+    auto unsafeSector=sectorArgs;unsafeSector[2]=L"--validate-static-zone-cutover";
+    Check(!ParseForestRouteProofLaunch(unsafeSector,true).error.empty(),"F01 sector cannot invoke static cutover");
     auto badForest=forestArgs;badForest[1]=L"other";
     Check(!ParseForestRouteProofLaunch(badForest,true).error.empty(),"unknown forest representation rejected");
     badForest=forestArgs;badForest[2]=L"--validate-static-zone-cutover";

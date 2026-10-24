@@ -301,7 +301,7 @@ bool PresentableTinyRtScene::PackLoadedStaticAssets(RtStaticMeshSlot& out,
             if(retainedTriangleRegions!=horde::scene::assets::kAllStaticTriangleRegions)row.asset=&regionSelectedWorld;
         }
 #if defined(_DEBUG)
-    if(forestRouteProofMode_==ForestRouteProofMode::SharedExisting64) {
+    if(UsesSharedForestRouteProof()) {
         if(!forestSharedLayout_.prepared || !forestSharedLayout_.commonPrimitiveCount ||
            forestSharedLayout_.masters[0].primitiveCount!=3u || forestSharedLayout_.masters[1].primitiveCount!=3u ||
            forestSharedLayout_.masters[0].primitiveOffset!=forestSharedLayout_.commonPrimitiveCount ||

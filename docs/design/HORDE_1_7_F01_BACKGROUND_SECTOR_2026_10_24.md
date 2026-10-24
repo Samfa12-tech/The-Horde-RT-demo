@@ -1,5 +1,12 @@
 # F01 background sector: next bounded visible-world proof
 
+Trial status: the [actual north/west comparison](../evidence/2026-10-24-f01-forest-sector/README.md)
+is implemented and measured as a separate Debug selection. Grounding/capacity/
+recreation pass; the twelve open-crown placements still fail the intended forest
+massing and are not normal scenery. Collision remains explicitly unadmitted.
+The following preserves the proposed footprint and its tested budget, rather
+than authorizing another scatter loop or claiming completed woods.
+
 This is an execution proposal, not integrated scenery or forest acceptance. It follows the [actual-view sheet](../evidence/2026-10-23-forest-view-sheet/README.md) and the [existing 64 shared route proof](HORDE_1_7_SHARED_FOREST_ROUTE_PROOF_PLAN_2026_10_24.md). Keep the admitted pine/alder; replacement-canopy/Easy Tree remains deferred.
 
 The demonstrated gap is bare middle distance north and west of F01, beyond the graves and near trunks. Test one layered arc using three staggered clumps, approximately 23.5–34.9 m from the F01 camera, rather than distributing more trees along the entire route. Preserve the shaft clearing, the southeast trail, F04 landmark reveal, original topographic geography and dry Bellwether approach. No terrain edit is justified by the inspected F01/F03 grounding views.

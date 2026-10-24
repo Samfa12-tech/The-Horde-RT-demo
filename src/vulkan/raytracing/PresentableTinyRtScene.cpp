@@ -862,32 +862,40 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
 #if defined(_DEBUG)
 namespace {
 bool ApplyExistingForestInstances(std::span<VkAccelerationStructureInstanceKHR> instances,
-    const horde::scene::ForestDressingSharedLayout& layout,
+    const horde::scene::ForestDressingSharedLayout& layout,bool f01Sector,
     const std::array<VkDeviceAddress,2>& addresses,std::string& diagnostic)
 {
     constexpr auto first=PresentableTinyRtScene::kOrdinaryTlasInstanceCount;
     static_assert(first==28u);
-    if(!layout.prepared || layout.prepared->placements.size()!=64u || instances.size()<first+64u ||
+    const std::size_t additional=f01Sector?12u:0u;
+    if(!layout.prepared || layout.prepared->placements.size()!=64u ||
+       layout.supplementalPlacements.size()!=additional || instances.size()<first+64u+additional ||
        !addresses[0] || !addresses[1]) {
-        diagnostic="Existing64 forest instances require two live immutable masters and complete storage.";return false;
+        diagnostic="Forest instances require their exact selected population, two live immutable masters and complete storage.";return false;
     }
-    for(std::size_t i=0;i<layout.prepared->placements.size();++i) {
-        const auto& p=layout.prepared->placements[i];
-        if(p.masterIndex>=2u){diagnostic="Forest placement references an invalid master.";return false;}
+    const auto append=[&](const horde::scene::ForestDressingRigidPlacement& p,std::size_t i) {
+        if(p.masterIndex>=2u || !std::isfinite(p.yawRadians) || !std::isfinite(p.supportY) ||
+           !std::all_of(p.origin.begin(),p.origin.end(),[](float v){return std::isfinite(v);})) {
+            diagnostic="Forest placement references an invalid master or rigid transform.";return false;
+        }
         const float c=std::cos(p.yawRadians),s=std::sin(p.yawRadians);
         VkAccelerationStructureInstanceKHR instance{};
         instance.transform={{{c,0.f,s,p.origin[0]},{0.f,1.f,0.f,p.origin[1]},{-s,0.f,c,p.origin[2]}}};
         instance.instanceCustomIndex=26u+static_cast<std::uint32_t>(p.masterIndex);
         instance.mask=0x01u;instance.flags=VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
         instance.accelerationStructureReference=addresses[p.masterIndex];instances[first+i]=instance;
-    }
+        return true;
+    };
+    for(std::size_t i=0;i<64u;++i)if(!append(layout.prepared->placements[i],i))return false;
+    for(std::size_t i=0;i<additional;++i)if(!append(layout.supplementalPlacements[i].placement,64u+i))return false;
     return true;
 }
 }
 
 bool PresentableTinyRtScene::SetForestRouteProofMode(ForestRouteProofMode mode,std::string& diagnostic)
 {
-    if(mode!=ForestRouteProofMode::Disabled && mode!=ForestRouteProofMode::BakedResident && mode!=ForestRouteProofMode::SharedExisting64) {
+    if(mode!=ForestRouteProofMode::Disabled && mode!=ForestRouteProofMode::BakedResident &&
+       mode!=ForestRouteProofMode::SharedExisting64 && mode!=ForestRouteProofMode::SharedF01Sector76) {
         diagnostic="Unknown forest route proof mode.";return false;
     }
     if((ready_ || device_!=VK_NULL_HANDLE) && mode!=forestRouteProofMode_) {
@@ -902,7 +910,8 @@ bool PresentableTinyRtScene::SetForestRouteProofMode(ForestRouteProofMode mode,s
 std::string PresentableTinyRtScene::ForestRouteProofJson() const
 {
     if(forestRouteProofMode_==ForestRouteProofMode::Disabled)return "null";
-    const bool shared=forestRouteProofMode_==ForestRouteProofMode::SharedExisting64;
+    const bool shared=UsesSharedForestRouteProof();
+    const bool sector=forestRouteProofMode_==ForestRouteProofMode::SharedF01Sector76;
     std::ostringstream out;out.imbue(std::locale::classic());out<<std::fixed<<std::setprecision(8);
     const auto resources=ResourceInventory();
     std::array<bool,kRtStaticAssetCapacity> assetUsed{};std::size_t registrations=0;
@@ -912,7 +921,7 @@ std::string PresentableTinyRtScene::ForestRouteProofJson() const
         ++registrations;if(row.assetIndex>=assetUsed.size())fits=false;else assetUsed[row.assetIndex]=true;
     }
     const auto assetCount=std::count(assetUsed.begin(),assetUsed.end(),true);
-    out<<"{\"mode\":\""<<(shared?"shared-existing64":"baked-resident")
+    out<<"{\"mode\":\""<<(sector?"shared-f01-sector76":shared?"shared-existing64":"baked-resident")
        <<"\",\"defaultEnabled\":false,\"fullyResident\":"<<(!ordinaryStaticOmissions_ && !ordinaryStaticReduced_?"true":"false")
        <<",\"ordinaryOmissionCertificateReused\":false,\"forestOrPerformanceAdmitted\":false"
        <<",\"physicalDefinitions\":"<<tlasInstanceCount_<<",\"physicalStorageCapacity\":"<<kTlasInstanceCount
@@ -960,18 +969,56 @@ std::string PresentableTinyRtScene::ForestRouteProofJson() const
         }
         out<<'}';
     }
-    out<<"]}";return out.str();
+    out<<']';
+    if(sector) {
+        const auto population=[&](std::size_t master) {
+            std::size_t count=0;
+            if(forestSharedLayout_.prepared)for(const auto& p:forestSharedLayout_.prepared->placements)count+=p.masterIndex==master;
+            for(const auto& root:forestSharedLayout_.supplementalPlacements)count+=root.placement.masterIndex==master;
+            return count;
+        };
+        out<<",\"frozenCompositionOnly\":true,\"collisionAdmitted\":false,\"existingPlacementCount\":64"
+           <<",\"supplementalPlacementCount\":"<<forestSharedLayout_.supplementalPlacements.size()
+           <<",\"totalPlacementCount\":"<<64u+forestSharedLayout_.supplementalPlacements.size()
+           <<",\"pinePlacementCount\":"<<population(0u)<<",\"alderPlacementCount\":"<<population(1u)
+           <<",\"supplementalPlacements\":[";
+        const auto bounds=[&](const horde::scene::ForestDressingBounds& b) {
+            out<<"{\"minimum\":["<<b.minimum[0]<<','<<b.minimum[1]<<','<<b.minimum[2]
+               <<"],\"maximum\":["<<b.maximum[0]<<','<<b.maximum[1]<<','<<b.maximum[2]<<"]}";
+        };
+        for(std::size_t i=0;i<forestSharedLayout_.supplementalPlacements.size();++i) {
+            if(i)out<<',';const auto& root=forestSharedLayout_.supplementalPlacements[i];const auto& p=root.placement;
+            const auto slot=kOrdinaryTlasInstanceCount+64u+i;
+            const auto& actual=tlasBuiltInstances_[slot];
+            const bool owner=p.masterIndex<2u && forestMasterBlas_[p.masterIndex].address &&
+                actual.accelerationStructureReference==forestMasterBlas_[p.masterIndex].address &&
+                actual.instanceCustomIndex==26u+p.masterIndex && actual.mask==1u;
+            out<<"{\"id\":"<<64u+i<<",\"master\":"<<p.masterIndex<<",\"origin\":["<<p.origin[0]<<','<<p.origin[1]<<','<<p.origin[2]
+               <<"],\"yaw\":"<<p.yawRadians<<",\"supportY\":"<<p.supportY
+               <<",\"rootBurialMetres\":"<<root.rootBurialMetres<<",\"rootTipSamples\":"<<root.rootTipSamples
+               <<",\"collisionAdmitted\":false,\"worldBounds\":";bounds(root.worldBounds);
+            out<<",\"trunkBounds\":";bounds(root.trunkBounds);
+            out<<",\"physicalSlot\":"<<slot<<",\"customIndex\":"<<actual.instanceCustomIndex
+               <<",\"referencesOwnedMaster\":"<<(owner?"true":"false")<<",\"transform\":[";
+            for(unsigned r=0;r<3;++r)for(unsigned c=0;c<4;++c){if(r||c)out<<',';out<<actual.transform.matrix[r][c];}out<<"]}";
+        }
+        out<<']';
+    }
+    out<<'}';return out.str();
 }
 
 bool PresentableTinyRtScene::ValidateForestRouteProof(std::string& diagnostic) const
 {
     const auto fail=[&](const char* error){diagnostic=error;return false;};
-    const bool shared=forestRouteProofMode_==ForestRouteProofMode::SharedExisting64;
+    const bool shared=UsesSharedForestRouteProof();
+    const bool sector=forestRouteProofMode_==ForestRouteProofMode::SharedF01Sector76;
+    const std::size_t supplementalCount=sector?12u:0u;
     if(forestRouteProofMode_==ForestRouteProofMode::Disabled || !ready_ || !tlasInstanceDefinitionsValid_ ||
        !forestSharedLayout_.prepared || forestSharedLayout_.prepared->placements.size()!=64u ||
        sceneProfile_!=RtSceneProfile::Showcase || !developmentRescueJourney_ || ordinaryStaticOmissions_ ||
        ordinaryStaticReduced_ || preparedStaticGeometry_)return fail("Forest proof lacks its complete fully resident owner.");
-    if(tlasInstanceCount_!=(shared?92u:28u) || staticMeshSlot_.PrimitiveMetadata().size()>kRtPrimitiveMetadataCapacity ||
+    if(forestSharedLayout_.supplementalPlacements.size()!=supplementalCount ||
+       tlasInstanceCount_!=(sector?104u:shared?92u:28u) || staticMeshSlot_.PrimitiveMetadata().size()>kRtPrimitiveMetadataCapacity ||
        sceneMaterials_.size()>kRtMaterialCapacity)return fail("Forest proof exceeds or changes its admitted active capacities.");
     std::array<bool,kRtStaticAssetCapacity> assets{};
     for(const auto& row:staticMeshSlot_.InstanceMetadata())if(row.primitiveCount) {
@@ -980,8 +1027,7 @@ bool PresentableTinyRtScene::ValidateForestRouteProof(std::string& diagnostic) c
     }
     if(std::count(assets.begin(),assets.end(),true)!=13)return fail("Forest proof did not preserve exactly thirteen unique static assets.");
     std::array<unsigned,2> populations{};
-    for(std::size_t i=0;i<64u;++i) {
-        const auto& p=forestSharedLayout_.prepared->placements[i];
+    const auto placementMatches=[&](const horde::scene::ForestDressingRigidPlacement& p,std::size_t i) {
         if(p.masterIndex>=2u)return fail("Forest proof has an invalid master reference.");
         ++populations[p.masterIndex];
         if(shared) {
@@ -992,8 +1038,25 @@ bool PresentableTinyRtScene::ValidateForestRouteProof(std::string& diagnostic) c
                actual.instanceCustomIndex!=26u+p.masterIndex || actual.mask!=1u ||
                std::memcmp(&actual.transform,&expected,sizeof(expected))!=0)return fail("Forest proof did not publish all exact unit-scale master placements.");
         }
-    }
+        return true;
+    };
+    for(std::size_t i=0;i<64u;++i)
+        if(!placementMatches(forestSharedLayout_.prepared->placements[i],i))return false;
     if(populations!=std::array<unsigned,2>{32u,32u})return fail("Forest proof changed its existing thirty-two pine and thirty-two alder placements.");
+    const auto validBounds=[](const horde::scene::ForestDressingBounds& b) {
+        for(unsigned j=0;j<3u;++j)
+            if(!std::isfinite(b.minimum[j]) || !std::isfinite(b.maximum[j]) || b.minimum[j]>b.maximum[j])return false;
+        return true;
+    };
+    for(std::size_t i=0;i<supplementalCount;++i) {
+        const auto& root=forestSharedLayout_.supplementalPlacements[i];
+        if(!root.rootTipSamples || !std::isfinite(root.rootBurialMetres) || root.rootBurialMetres<0.f ||
+           !validBounds(root.worldBounds) || !validBounds(root.trunkBounds))
+            return fail("F01 composition lacks its measured root/bounds receipt; collision remains unadmitted.");
+        if(!placementMatches(root.placement,64u+i))return false;
+    }
+    if(sector && populations!=std::array<unsigned,2>{40u,36u})
+        return fail("F01 composition must preserve forty pine and thirty-six alder placements.");
     if(shared)for(unsigned i=0;i<kOrdinaryTlasInstanceCount;++i)
         if(tlasBuiltInstances_[i].accelerationStructureReference==forestMasterBlas_[0].address ||
            tlasBuiltInstances_[i].accelerationStructureReference==forestMasterBlas_[1].address)
@@ -3024,7 +3087,7 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
             std::shared_ptr<const horde::scene::PreparedForestDressing> prepared;
             if(!horde::scene::PrepareForestDressing(root,prepared,diagnostic,chapterTerrainSurface_.get()))return false;
             forestSharedLayout_.prepared=std::move(prepared);
-            if(forestRouteProofMode_==ForestRouteProofMode::SharedExisting64) {
+            if(UsesSharedForestRouteProof()) {
                 if(!horde::scene::SeedPreparedForestMaterialFamilies(*forestSharedLayout_.prepared,collapseStaticAsset_,diagnostic))return false;
             }else if(!horde::scene::AppendPreparedForestDressing(*forestSharedLayout_.prepared,collapseStaticAsset_,forest,diagnostic))return false;
         }else
@@ -3055,8 +3118,10 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
             !horde::scene::assets::CoalesceAdjacentWorldBakedPrimitives(rewardLanternRingAsset_, diagnostic))
             return false;
 #if defined(_DEBUG)
-        if(forestRouteProofMode_==ForestRouteProofMode::SharedExisting64) {
+        if(UsesSharedForestRouteProof()) {
             if(!horde::scene::AppendPreparedForestMasters(forestSharedLayout_.prepared,collapseStaticAsset_,forestSharedLayout_,diagnostic))return false;
+            if(forestRouteProofMode_==ForestRouteProofMode::SharedF01Sector76 &&
+               !horde::scene::PrepareF01BackgroundForestDressing(forestSharedLayout_,*chapterTerrainSurface_,diagnostic))return false;
         }else if(forestRouteProofMode_==ForestRouteProofMode::BakedResident)
             forestSharedLayout_.commonPrimitiveCount=collapseStaticAsset_.primitives.size();
 #endif
@@ -5345,7 +5410,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
              waterDropletBlas_, false, &waterDropletBlasUpdateScratch_)))
         return false;
 #if defined(_DEBUG)
-    if(forestRouteProofMode_==ForestRouteProofMode::SharedExisting64) {
+    if(UsesSharedForestRouteProof()) {
         for(unsigned m=0;m<2;++m) {
             std::vector<VkAccelerationStructureGeometryKHR> geometries;
             std::vector<VkAccelerationStructureBuildRangeInfoKHR> ranges;
@@ -5828,10 +5893,12 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     // change before the first live snapshot even while the Keeper stays hidden.
     instances[kKeeperInstanceIndex] = characterSlot_.BuildActiveInstances()[2];
 #if defined(_DEBUG)
-    if(forestRouteProofMode_==ForestRouteProofMode::SharedExisting64) {
+    if(UsesSharedForestRouteProof()) {
         if(!ApplyExistingForestInstances(instances,forestSharedLayout_,
+            forestRouteProofMode_==ForestRouteProofMode::SharedF01Sector76,
             {forestMasterBlas_[0].address,forestMasterBlas_[1].address},diagnostic))return false;
-        tlasInstanceCount_=kOrdinaryTlasInstanceCount+64u;
+        tlasInstanceCount_=kOrdinaryTlasInstanceCount+64u+
+            static_cast<std::uint32_t>(forestSharedLayout_.supplementalPlacements.size());
     }else
 #endif
         tlasInstanceCount_=kOrdinaryTlasInstanceCount;
@@ -8072,8 +8139,9 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     ApplyGlassFixtureVisibility(instances);
     const auto contactRipple = MakeWaterContactRippleGpu(frame.waterContact);
 #if defined(_DEBUG)
-    if(forestRouteProofMode_==ForestRouteProofMode::SharedExisting64 &&
+    if(UsesSharedForestRouteProof() &&
        !ApplyExistingForestInstances(instances,forestSharedLayout_,
+           forestRouteProofMode_==ForestRouteProofMode::SharedF01Sector76,
            {forestMasterBlas_[0].address,forestMasterBlas_[1].address},diagnostic))return false;
 #endif
     lastInstanceMasks_={};
