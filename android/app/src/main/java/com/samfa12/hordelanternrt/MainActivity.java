@@ -8099,8 +8099,8 @@ public class MainActivity extends Activity {
 
     @Override
     public void onBackPressed() {
-        if(openingBenchmarkRecoveryRejected){finish();return;}
         if (environmentSurveyMode) { finishEnvironmentSurvey(3); return; }
+        if(openingBenchmarkRecoveryRejected){finish();return;}
         if(openingBenchmarkPending()) {
             cancelOpeningBenchmarkRequest(); showOpeningBenchmarkProgress(); return;
         }
@@ -8363,16 +8363,16 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onPause() {
-        if(openingBenchmarkRecoveryRejected){resumed=false;super.onPause();return;}
-        cancelOpeningBenchmarkRequest();
-        handler.removeCallbacks(refreshOpeningBenchmark);
-        if(lookoutObjectiveVisible)showMainMenu(false);
         if (environmentSurveyMode) {
             resumed = false;
             finishEnvironmentSurvey(3);
             super.onPause();
             return;
         }
+        if(openingBenchmarkRecoveryRejected){resumed=false;super.onPause();return;}
+        cancelOpeningBenchmarkRequest();
+        handler.removeCallbacks(refreshOpeningBenchmark);
+        if(lookoutObjectiveVisible)showMainMenu(false);
         if (pendingDebugMotionGraphics != null) {
             pendingDebugMotion = pendingDebugMotionId = null;
             pendingDebugMotionGraphics = null;
@@ -8465,8 +8465,8 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onStop() {
-        if(openingBenchmarkRecoveryRejected){super.onStop();return;}
         if (environmentSurveyMode) { stopEnvironmentSurveySurface(); super.onStop(); return; }
+        if(openingBenchmarkRecoveryRejected){super.onStop();return;}
         logSurfaceLifecycle("stop");
         stopSurface();
         super.onStop();
@@ -8474,6 +8474,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onSaveInstanceState(Bundle state) {
+        if (environmentSurveyMode) { super.onSaveInstanceState(state); return; }
         retainOpeningBenchmarkClient();
         if(openingBenchmarkRecoveryClient!=null)openingBenchmarkRecoveryClient.save(state);
         super.onSaveInstanceState(state);
@@ -8481,6 +8482,14 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
+        if (environmentSurveyMode) {
+            finishEnvironmentSurvey(3);
+            stopEnvironmentSurveySurface();
+            reportExecutor.shutdownNow();
+            updateExecutor.shutdownNow();
+            super.onDestroy();
+            return;
+        }
         retainOpeningBenchmarkClient(); // Includes finish/swipe paths with no Bundle callback.
         if(openingBenchmarkRecoveryRejected) {
             handler.removeCallbacksAndMessages(null);
@@ -8493,14 +8502,6 @@ public class MainActivity extends Activity {
         }
         cancelOpeningBenchmarkRequest();
         invalidateLookoutObjective();
-        if (environmentSurveyMode) {
-            finishEnvironmentSurvey(3);
-            stopEnvironmentSurveySurface();
-            reportExecutor.shutdownNow();
-            updateExecutor.shutdownNow();
-            super.onDestroy();
-            return;
-        }
         campaignDestroyed=true;
         dismissCampaignConfirmation();
         dismissBackExitConfirmation();

@@ -1,0 +1,55 @@
+{
+  "head": "471afc92ca6bc87755d3edd8bb1bf87c5adfe56b",
+  "status": "completed",
+  "conclusion": "failure",
+  "jobs": [
+    {
+      "name": "player-vulkan-host",
+      "status": "completed",
+      "conclusion": "success",
+      "databaseId": 120867689127,
+      "startedAt": "2026-10-24T12:04:32Z",
+      "completedAt": "2026-10-24T12:11:59Z"
+    },
+    {
+      "name": "Android Debug build, playback/report contracts and lint",
+      "status": "completed",
+      "conclusion": "failure",
+      "databaseId": 120867689277,
+      "startedAt": "2026-10-24T12:04:33Z",
+      "completedAt": "2026-10-24T12:06:59Z"
+    },
+    {
+      "name": "Shared simulation host (MSVC)",
+      "status": "completed",
+      "conclusion": "success",
+      "databaseId": 120867689317,
+      "startedAt": "2026-10-24T12:04:33Z",
+      "completedAt": "2026-10-24T12:12:43Z"
+    },
+    {
+      "name": "Shared simulation host (GCC)",
+      "status": "completed",
+      "conclusion": "success",
+      "databaseId": 120867689359,
+      "startedAt": "2026-10-24T12:04:32Z",
+      "completedAt": "2026-10-24T12:12:41Z"
+    },
+    {
+      "name": "Shared simulation host (Clang)",
+      "status": "completed",
+      "conclusion": "success",
+      "databaseId": 120867689361,
+      "startedAt": "2026-10-24T12:04:32Z",
+      "completedAt": "2026-10-24T12:12:10Z"
+    },
+    {
+      "name": "Selected host contracts (Clang ASan/UBSan)",
+      "status": "completed",
+      "conclusion": "success",
+      "databaseId": 120867689380,
+      "startedAt": "2026-10-24T12:04:32Z",
+      "completedAt": "2026-10-24T12:08:46Z"
+    }
+  ]
+}
