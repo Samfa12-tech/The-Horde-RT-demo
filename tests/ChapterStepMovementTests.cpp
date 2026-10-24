@@ -155,7 +155,9 @@ void TestPausedTerrainRebind(const std::shared_ptr<const Surface>& ground,
 }
 int main(int argc,char** argv) {
     const bool rebindOnly=argc==2 && std::string_view(argv[1])=="--paused-terrain-rebind-only";
-    if(argc>1 && !rebindOnly){std::cerr<<"unknown chapter step test selection\n";return 2;}
+    const bool positiveLifecycle=argc==2 && std::string_view(argv[1])=="--positive-lifecycle";
+    const bool rejections=argc==2 && std::string_view(argv[1])=="--rejections";
+    if(argc>1 && !rebindOnly && !positiveLifecycle && !rejections){std::cerr<<"unknown chapter step test selection\n";return 2;}
     const auto directory=std::filesystem::path(HORDE_RT_SOURCE_DIR)/"assets/models/world/runtime/chapter-terrain-v1";
     horde::scene::assets::AssetManifest manifest;horde::scene::assets::StaticMeshAsset mesh;std::string error;
     if(!horde::scene::assets::AssetManifest::Load(directory/"asset.manifest.json",manifest,error)||
@@ -257,7 +259,10 @@ int main(int argc,char** argv) {
     const auto oldGeneration=game.Snapshot().worldRoute.generation;game.InvalidateWorldZoneReadiness();
     Check(!game.PublishChapterTerrain({oldGeneration,sim::WorldZoneId::ForestApproach},terrain),
           "retired terrain generation cannot resurrect step support after reconstruction");
-    {
+    // Both bounded selections retain the exact live-root prefix above and keep
+    // its game/terrain owner alive through their selected scoped fixtures.
+    // No arguments still exercises the original complete in-process sequence.
+    if(!rejections) {
         sim::GameSimulation crouching(config);
         const auto restore=crouching.BeginCampaignRestore(c);
         Check(restore && crouching.CommitCampaignRestore(*restore,{restore->worldGeneration,c.zone},ceiling,{}),
@@ -340,7 +345,7 @@ int main(int argc,char** argv) {
         crouching.StepFixed(controls);
         Check(crouching.Snapshot().paused,"held stance cannot cross load neutral-release barrier");
     }
-    for(const bool solidWall : {false,true}) {
+    if(!positiveLifecycle) for(const bool solidWall : {false,true}) {
         auto lowRoof=roof;
         for(auto& triangle:lowRoof)for(auto& point:triangle.points)point[1]=base.worldY+1.15f;
         const auto obstruction=solidWall?

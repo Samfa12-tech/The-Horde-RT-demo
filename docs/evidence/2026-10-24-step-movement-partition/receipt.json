@@ -1,0 +1,88 @@
+{
+  "basis": "b7231e1eb2f1e5d82e818634913befdd67c37788",
+  "scope": "Test organization only; no gameplay, input, assertion or deadline change",
+  "diagnostic": {
+    "pid": 17640,
+    "binarySha256": "4c7d152dd33c6e21262ea0d49a4846038199666552adfe93bd2396298908bd5a",
+    "classification": "Bounded timing diagnostic, not the unchanged registered 30-second acceptance gate",
+    "exitCode": 0,
+    "seconds": 31.610000000000582
+  },
+  "phaseSeconds": {
+    "terrainReady": 1.36024,
+    "geometryComplete": 1.37122,
+    "positiveRootComplete": 4.69594,
+    "crouchComplete": 13.6952,
+    "secondRejectionStart": 21.6479,
+    "mainComplete": 29.5783
+  },
+  "outsideTimedMainSecondsUnattributed": 2.0317000000000007,
+  "assertionSites": {
+    "original": 64,
+    "current": 64,
+    "expressionsAndOrderExact": true
+  },
+  "registeredSelections": [
+    {
+      "name": "horde_rt_chapter_step_movement_tests",
+      "argument": "--positive-lifecycle",
+      "timeoutSeconds": 30.0
+    },
+    {
+      "name": "horde_rt_chapter_posture_rejection_tests",
+      "argument": "--rejections",
+      "timeoutSeconds": 30.0
+    },
+    {
+      "name": "horde_rt_paused_terrain_rebind_tests",
+      "argument": "--paused-terrain-rebind-only",
+      "timeoutSeconds": 30.0
+    }
+  ],
+  "debugSeconds": [
+    15.72,
+    22.3,
+    1.53
+  ],
+  "releaseSeconds": [
+    2.32,
+    1.71,
+    0.12
+  ],
+  "combinedChecks": 73,
+  "positiveLifecycleChecks": 67,
+  "rejectionChecks": 34,
+  "duplicatedCommonPrefixChecks": 28,
+  "rebindChecks": 21,
+  "windowsSelection": {
+    "SelectedCount": 216,
+    "RequiredNativeTests": [
+      "horde_rt_chapter_step_movement_tests",
+      "horde_rt_chapter_posture_rejection_tests",
+      "horde_rt_paused_terrain_rebind_tests"
+    ],
+    "AllRequiredSelected": true
+  },
+  "vulkanHostRetainsBoth": true,
+  "sanitizerRetainsBoth": true,
+  "localBashSyntaxCheck": {
+    "state": "denied before parsing; not retried",
+    "reason": "MSYS NtCreateDirectoryObject named-object startup failed 0xC0000022",
+    "target": "tools/run-host-sanitizer-validation.sh",
+    "hostedLinuxExecutionRequired": true
+  },
+  "ambiguousArgumentsExitCode": 2,
+  "parkedOwnerFilesVerified": 151,
+  "changedOwnerFiles": 0,
+  "sourceSha256": {
+    "CMakeLists.txt": "07a23c11c3e9d821ded3bf80ebdc476e95ac4fe0d47edc0bf918c4c1d5770950",
+    "tests/ChapterStepMovementTests.cpp": "a877b3b56873854811b562d6e54a3685d1b0ba7a7f86e2b4cf79435d4fabf5ca",
+    ".github/workflows/shared-simulation-host.yml": "b9be67a522846788b0b10096fca95c95b51ab510de2ae4f025c00928888073d6",
+    "tools/run-host-sanitizer-validation.sh": "9e5d6ee16f9aff1a4d0d5808905f1e85385dd9526b906f4f1dd3be70d408f9a4"
+  },
+  "timerOnlySourceIdentities": {
+    "originalSha256": "39f5e4b8fbe8e1b17d142bdf2592b6a5b6bd32e71f74bd5d3626700466e7eb84",
+    "instrumentedSha256": "c71a877505a8f50e8380f899c79f3f602706b92fd0b5c7a012c9eb670af83972",
+    "scope": "Only logging/timers; no input, assertion or registered timeout changes"
+  }
+}

@@ -20,8 +20,12 @@ and frozen recreation at F01/F03/F04. Normal forest remains world-baked;
 timing gains, production omission/cutover, Android and visible forest depth
 are not admitted. The [bounded F01 sector](HORDE_1_7_F01_BACKGROUND_SECTOR_2026_10_24.md)
 is the next content proof. The same work fixed zero-time terrain/aspect held-pose
-rebinding; a separate default Debug movement timeout remains open despite all
-three relevant Release tests passing. This is not the closed Debug journey gate.
+rebinding. The separate [Debug movement organization](../evidence/2026-10-24-step-movement-partition/README.md)
+now preserves the complete live-root prefix in two bounded selections, each at
+30 seconds; local Debug/Release and combined Release pass. Its original 73-check
+combined Debug observation completes in 31.610 s and remains retained, not a
+claim that its unchanged 30-second invocation passed. Exact new-head CI is separate
+from this local result and from the already-closed Debug campaign journey gate.
 
 The [twelve-root F01 trial](../evidence/2026-10-24-f01-forest-sector/README.md)
 now has actual north/west and lookout comparisons. It adds visible depth at small
@@ -35,6 +39,7 @@ The [compact-carry endpoint study](../evidence/2026-10-24-compact-carry-study/RE
 is rejected: wide hand pixels improve, but the full flame envelope crosses the
 wall, square framing fails and actual RT views are dominated by the torch head.
 Original runtime/source is restored and rebuilt; no transition or clip admitted.
+Exact `b7231e1e` run40105479691 passed all six hosted jobs.
 The [canopy authority review](HORDE_1_7_CANOPY_AUTHORITY_2026_10_24.md) recovers the
 earliest documentary deferral, explicitly not Sam's original message, and records
 the proposed crown study pending reconciliation. Deferred art remains unchanged.

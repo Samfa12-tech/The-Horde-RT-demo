@@ -303,8 +303,12 @@ set(ENV{HORDE_RT_EARNED_JOURNEY_RUN} "${_horde_earned_run}")
     target_link_libraries(horde_rt_chapter_step_movement_tests PRIVATE horde_gameplay_simulation)
     target_include_directories(horde_rt_chapter_step_movement_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/third_party)
     target_compile_definitions(horde_rt_chapter_step_movement_tests PRIVATE HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
-    add_test(NAME horde_rt_chapter_step_movement_tests COMMAND horde_rt_chapter_step_movement_tests)
+    add_test(NAME horde_rt_chapter_step_movement_tests
+        COMMAND horde_rt_chapter_step_movement_tests --positive-lifecycle)
     set_tests_properties(horde_rt_chapter_step_movement_tests PROPERTIES TIMEOUT 30)
+    add_test(NAME horde_rt_chapter_posture_rejection_tests
+        COMMAND horde_rt_chapter_step_movement_tests --rejections)
+    set_tests_properties(horde_rt_chapter_posture_rejection_tests PROPERTIES TIMEOUT 30)
     add_test(NAME horde_rt_paused_terrain_rebind_tests
         COMMAND horde_rt_chapter_step_movement_tests --paused-terrain-rebind-only)
     set_tests_properties(horde_rt_paused_terrain_rebind_tests PROPERTIES TIMEOUT 30)

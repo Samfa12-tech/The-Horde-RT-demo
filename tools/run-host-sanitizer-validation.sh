@@ -52,3 +52,8 @@ for hordeTarget in "${hordeTargets[@]}"; do
   ctest --test-dir "$hordeBuild" --output-on-failure --no-tests=error \
     -R "^${hordeTarget}$"
 done
+
+# Same compiled movement target, second bounded registration: keep both
+# rejection fixtures under the original sanitizer coverage after partitioning.
+ctest --test-dir "$hordeBuild" --output-on-failure --no-tests=error \
+  -R '^horde_rt_chapter_posture_rejection_tests$'

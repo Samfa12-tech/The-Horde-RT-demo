@@ -1,0 +1,29 @@
+phase=start elapsedSeconds=0.0001554
+phase=terrain-ready elapsedSeconds=1.36024
+phase=geometry-complete elapsedSeconds=1.37122
+walk trace target=-33.7,-12.8 ticks=0 seconds=0.000133
+walk trace target=-28.7,-5.8 ticks=645 seconds=1.77442
+walk trace target=-24,-3.4 ticks=396 seconds=1.11779
+walk trace target=-23.5,-3.4 ticks=37 seconds=0.103898
+walk trace target=-23,-3.4 ticks=38 seconds=0.106783
+walk trace target=-23.5,-3.4 ticks=37 seconds=0.104356
+walk trace target=-24,-3.4 ticks=38 seconds=0.105982
+phase=positive-step-complete elapsedSeconds=4.69594
+walk trace target=-33.7,-12.8 ticks=0 seconds=0.0025435
+walk trace target=-28.7,-5.8 ticks=645 seconds=1.8252
+walk trace target=-24.2,-3.4 ticks=382 seconds=5.42116
+automatic crossing target=-23.5 ticks=55 blocked=2
+automatic crossing target=-22.5 ticks=75 blocked=0
+automatic crossing target=-24.5 ticks=172 blocked=2
+automatic crossing target=-22.5 ticks=152 blocked=2
+phase=crouch-complete elapsedSeconds=13.6952
+phase=negative-start elapsedSeconds=13.6952
+walk trace target=-33.7,-12.8 ticks=0 seconds=6.16e-05
+walk trace target=-28.7,-5.8 ticks=645 seconds=1.82544
+walk trace target=-24.2,-3.4 ticks=382 seconds=5.3674
+phase=negative-start elapsedSeconds=21.6479
+walk trace target=-33.7,-12.8 ticks=0 seconds=7.23e-05
+walk trace target=-28.7,-5.8 ticks=645 seconds=1.82988
+walk trace target=-24.2,-3.4 ticks=382 seconds=5.30394
+phase=complete elapsedSeconds=29.5783
+73 chapter step movement checks, 0 failures; retained step bytes=680
