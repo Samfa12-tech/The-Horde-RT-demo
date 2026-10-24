@@ -2,6 +2,7 @@
 #include "platform/windows/WindowsGraphicsPreviewCapture.h"
 #include "platform/windows/WindowsPreviewMeshPairCapture.h"
 #include "platform/windows/WindowsHiddenCaptureLaunch.h"
+#include "platform/windows/WindowsForestRouteProofLaunch.h"
 
 #include <cmath>
 #include <iostream>
@@ -19,6 +20,17 @@ void Check(const bool condition, const char* message)
 int main()
 {
     using namespace horde::platform::windows;
+    const std::array<std::wstring_view,7> forestArgs{L"--forest-route-proof",L"shared64",L"--capture-hidden",
+        L"--capture-showcase",L"C:\\captures\\forest",L"--development-checkpoint",L"chapter-landing-north"};
+    Check(ParseForestRouteProofLaunch(forestArgs,true).mode==ForestRouteCaptureMode::SharedExisting64 &&
+          ParseForestRouteProofLaunch(forestArgs,true).error.empty(),"shared64 is limited to an explicit hidden chapter capture");
+    Check(!ParseForestRouteProofLaunch(forestArgs,false).error.empty(),"forest proof is rejected by Release");
+    auto badForest=forestArgs;badForest[1]=L"other";
+    Check(!ParseForestRouteProofLaunch(badForest,true).error.empty(),"unknown forest representation rejected");
+    badForest=forestArgs;badForest[2]=L"--validate-static-zone-cutover";
+    Check(!ParseForestRouteProofLaunch(badForest,true).error.empty(),"fully resident forest proof cannot invoke static cutover");
+    badForest=forestArgs;badForest[6]=L"ordinary";
+    Check(!ParseForestRouteProofLaunch(badForest,true).error.empty(),"forest proof cannot select unrelated scenes");
     const std::array<std::wstring_view,3> pairArgs{L"--capture-hidden-preview-pair",L"shared",L"C:\\captures\\pair"};
     Check(ParsePreviewMeshPairCaptureLaunch(pairArgs,true).mode==PreviewMeshPairCaptureMode::Shared &&
           ParsePreviewMeshPairCaptureLaunch(pairArgs,true).error.empty(),"explicit Debug hidden shared pair parses");

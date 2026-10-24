@@ -336,6 +336,170 @@ void TestPreparedMasterOwnership()
     }
 }
 
+void TestSharedMasterPacking()
+{
+    std::string diagnostic;
+    auto owner=LoadCollapse(diagnostic);
+    std::shared_ptr<const gameplay::simulation::TriangleSupportSurface> terrain;
+    TombDressingBuildReport tomb;GraveyardDressingReport graveyard;
+    std::shared_ptr<const PreparedForestDressing> prepared;
+    const bool base=AppendPreparedTombDressing(kRoot/"assets",owner,tomb,diagnostic) &&
+        AppendChapterTerrain(kRoot/"assets",owner,terrain,diagnostic) &&
+        AppendPreparedGraveyard(kRoot/"assets",owner,terrain,graveyard,diagnostic) &&
+        AppendBellwetherShell(kRoot/"assets",owner,diagnostic) &&
+        PrepareForestDressing(kRoot/"assets",prepared,diagnostic,terrain.get());
+    Check(base,diagnostic.empty()?"shared master proof prepares the same real chapter and root-fitted snapshot":diagnostic);
+    if(!base)return;
+    const auto beforeSeed=owner;
+    Check(SeedPreparedForestMaterialFamilies(*prepared,owner,diagnostic),"shared forest seeds only the canonical four material rows");
+    Check(owner.materials.size()==beforeSeed.materials.size()+4 && owner.vertices.size()==beforeSeed.vertices.size() &&
+          std::memcmp(owner.vertices.data(),beforeSeed.vertices.data(),owner.vertices.size()*sizeof(StaticRtVertex))==0 &&
+          owner.indices==beforeSeed.indices && owner.triangleRegions==beforeSeed.triangleRegions &&
+          owner.primitives.size()==beforeSeed.primitives.size() && owner.nodeTransforms.size()==beforeSeed.nodeTransforms.size() &&
+          owner.bounds.minimum==beforeSeed.bounds.minimum && owner.bounds.maximum==beforeSeed.bounds.maximum,
+          "material-only seeding adds no baked tree geometry, primitive, node or world-bounds growth");
+    const auto seededDigest=ForestRepresentationDigest(owner,{});
+    Check(!SeedPreparedForestMaterialFamilies(*prepared,owner,diagnostic) && ForestRepresentationDigest(owner,{})==seededDigest,
+          "duplicate seed fails without changing the existing owner");
+    auto crowded=beforeSeed;
+    while(crowded.materials.size()<29) {auto material=crowded.materials.front();material.name="seed-cap-padding-"+std::to_string(crowded.materials.size());crowded.materials.push_back(material);}
+    const auto crowdedDigest=ForestRepresentationDigest(crowded,{});
+    Check(!SeedPreparedForestMaterialFamilies(*prepared,crowded,diagnostic) && ForestRepresentationDigest(crowded,{})==crowdedDigest,
+          "material-only seed rejects insufficient pre-alias headroom without partial row or geometry publication");
+    ForestUnderstoryReport understory;ForestRockReport rocks;ForestDeadwoodReport deadwood;ForestRoadClueReport road;
+    const bool commonReady=AppendPreparedForestUnderstory(kRoot/"assets",owner,*terrain,understory,diagnostic) &&
+        AppendPreparedForestRocks(kRoot/"assets",owner,terrain,rocks,diagnostic) &&
+        AppendPreparedForestDeadwood(kRoot/"assets",owner,terrain,deadwood,diagnostic) &&
+        AppendForestRoadClue(kRoot/"assets",owner,terrain,road,diagnostic) &&
+        ConsolidateWorldBakedMaterialFamilies(owner,diagnostic);
+    Check(commonReady,diagnostic.empty()?"shared proof retains the unchanged non-tree dressing builders":diagnostic);
+    if(!commonReady)return;
+    const auto common=owner;
+    Check(common.primitives.size()==9,"common world keeps nine material groups before adding local masters");
+    const auto familyTriangles=[&](std::string_view family) {
+        std::size_t count=0;
+        for(const auto& p:common.primitives)if(common.materials[p.materialIndex].name==family)count+=p.indexCount/3u;
+        return count;
+    };
+    Check(familyTriangles("ForestBark")==deadwood.triangles && familyTriangles("ForestAlder")==understory.triangles &&
+          familyTriangles("ForestPine")==0 && familyTriangles("ForestMoss")==0,
+          "common Bark/deadwood and Alder/understory survive without any world-baked tree triangles");
+    ForestDressingSharedLayout layout;
+    Check(AppendPreparedForestMasters(prepared,owner,layout,diagnostic),
+          diagnostic.empty()?"two local masters append once after common consolidation":diagnostic);
+    if(!layout.prepared)return;
+    Check(layout.commonPrimitiveCount==9 && layout.masters[0].primitiveOffset==9 && layout.masters[0].primitiveCount==3 &&
+          layout.masters[1].primitiveOffset==12 && layout.masters[1].primitiveCount==3 && owner.primitives.size()==15,
+          "common/pine/alder ranges are disjoint, contiguous and cover all fifteen primitives");
+    Check(owner.materials.size()==common.materials.size() && owner.sockets.size()==common.sockets.size() &&
+          owner.bounds.minimum==common.bounds.minimum && owner.bounds.maximum==common.bounds.maximum &&
+          std::memcmp(owner.vertices.data(),common.vertices.data(),common.vertices.size()*sizeof(StaticRtVertex))==0 &&
+          std::equal(common.indices.begin(),common.indices.end(),owner.indices.begin()) &&
+          std::equal(common.triangleRegions.begin(),common.triangleRegions.end(),owner.triangleRegions.begin()),
+          "local masters preserve common world bounds and exact common geometry/provenance prefix without materials");
+    auto prefix=owner;
+    prefix.vertices.resize(common.vertices.size());prefix.indices.resize(common.indices.size());
+    prefix.triangleRegions.resize(common.triangleRegions.size());prefix.primitives.resize(common.primitives.size());
+    prefix.nodeTransforms.resize(common.nodeTransforms.size());
+    Check(ForestRepresentationDigest(prefix,{})==ForestRepresentationDigest(common,{}),
+          "all common material, node, socket, primitive and bounds records remain unchanged");
+    std::size_t vertices=common.vertices.size(),indices=common.indices.size();
+    for(std::size_t tree=0;tree<2;++tree) {
+        const auto& source=prepared->masters[tree];const auto& range=layout.masters[tree];
+        Check(range.localBounds.minimum==source.bounds.minimum && range.localBounds.maximum==source.bounds.maximum &&
+              std::memcmp(owner.vertices.data()+vertices,source.vertices.data(),source.vertices.size()*sizeof(StaticRtVertex))==0 &&
+              std::equal(source.indices.begin(),source.indices.end(),owner.indices.begin()+indices),
+              "each appended normalized local master retains exact positions/normals/tangents/UVs/indices and local bounds");
+        for(std::size_t i=0;i<3;++i) {
+            const auto& p=owner.primitives[range.primitiveOffset+i];const auto& original=source.primitives[i];
+            Check(p.vertexOffset==vertices+original.vertexOffset && p.indexOffset==indices+original.indexOffset &&
+                  p.indexCount==original.indexCount &&
+                  owner.materials[p.materialIndex].name==prepared->materialFamilies[prepared->primitiveFamilies[tree][i]].name &&
+                  owner.nodeTransforms[p.nodeTransformIndex].world==std::array<float,16>{1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1},
+                  "master primitive offsets/materials remap to existing rows with exactly one later rigid instance transform");
+        }
+        vertices+=source.vertices.size();indices+=source.indices.size();
+    }
+    Check(owner.vertices.size()==vertices && owner.indices.size()==indices &&
+          owner.indices.size()-common.indices.size()==10102u*3u &&
+          owner.triangleRegions.size()==owner.indices.size()/3u &&
+          std::all_of(owner.triangleRegions.begin()+common.indices.size()/3u,owner.triangleRegions.end(),
+              [](auto region){return region==StaticTriangleRegion::ExteriorDressing;}),
+          "shared ownership adds exactly 10102 local triangles once, labelled exterior without granting an omission certificate");
+    {
+        const auto pbr=static_cast<std::uint32_t>(horde::vulkan::raytracing::RtInstanceFlag::StaticPbr);
+        using namespace horde::vulkan::raytracing;
+        const std::array<StaticRtAssetRegistration,3> ranges{{
+            {0,100,pbr,0,&owner,nullptr,RtGeometryRole::Static,0,static_cast<std::uint32_t>(layout.commonPrimitiveCount)},
+            {1,101,pbr,0,&owner,nullptr,RtGeometryRole::Static,9,3},
+            {2,102,pbr,0,&owner,nullptr,RtGeometryRole::Static,12,3}}};
+        RtStaticMeshSlot packed,commonPacked;
+        const bool packedReady=packed.InitializeSelectedGeometry(ranges,diagnostic) &&
+            commonPacked.Initialize(std::array{StaticRtAssetRegistration{0,100,pbr,0,&common}},diagnostic);
+        Check(packedReady,diagnostic.empty()?"disjoint ranges pack the same static owner once":diagnostic);
+        if(packedReady) {
+            Check(packed.Vertices().size()==owner.vertices.size() && packed.Indices()==owner.indices &&
+                  packed.PrimitiveMetadata().size()==15 && packed.Measurements().vertexBytes==owner.vertices.size()*sizeof(StaticRtVertex) &&
+                  packed.Materials().size()==commonPacked.Materials().size() &&
+                  std::memcmp(packed.Materials().data(),commonPacked.Materials().data(),packed.Measurements().materialBytes)==0 &&
+                  packed.TextureArrayCounts().baseColor==commonPacked.TextureArrayCounts().baseColor &&
+                  packed.TextureArrayCounts().normal==commonPacked.TextureArrayCounts().normal &&
+                  packed.TextureArrayCounts().orm==commonPacked.TextureArrayCounts().orm,
+                  "three registered ranges duplicate no vertex/index/material/atlas payload");
+            for(std::size_t i=0;i<ranges.size();++i) {
+                const auto& row=packed.InstanceMetadata()[i];
+                Check(row.primitiveBase==ranges[i].primitiveOffset && row.primitiveCount==ranges[i].primitiveCount,
+                      "each BLAS-local index resolves only its common or local-master range");
+            }
+        }
+    }
+    const auto immutable=prepared;prepared.reset();
+    Check(layout.prepared==immutable && layout.prepared->placements.size()==64,
+          "published layout retains the exact const root/terrain placement owner after caller reference retirement");
+    auto fullMaterials=common;
+    while(fullMaterials.materials.size()<32) {auto m=fullMaterials.materials.front();m.name="capacity-padding-"+std::to_string(fullMaterials.materials.size());fullMaterials.materials.push_back(m);}
+    ForestDressingSharedLayout fullLayout;
+    Check(AppendPreparedForestMasters(immutable,fullMaterials,fullLayout,diagnostic) && fullMaterials.materials.size()==32,
+          "local masters remain appendable at the full pre-alias 32 material rows without six temporary source materials");
+    const auto rejects=[&](std::shared_ptr<const PreparedForestDressing> input,StaticMeshAsset invalid,std::string_view label) {
+        const auto digest=ForestRepresentationDigest(invalid,{});auto published=layout;
+        const bool accepted=AppendPreparedForestMasters(std::move(input),invalid,published,diagnostic);
+        bool sameRanges=published.commonPrimitiveCount==layout.commonPrimitiveCount;
+        for(std::size_t i=0;i<2;++i)sameRanges=sameRanges &&
+            published.masters[i].primitiveOffset==layout.masters[i].primitiveOffset &&
+            published.masters[i].primitiveCount==layout.masters[i].primitiveCount &&
+            published.masters[i].localBounds.minimum==layout.masters[i].localBounds.minimum &&
+            published.masters[i].localBounds.maximum==layout.masters[i].localBounds.maximum;
+        Check(!accepted && ForestRepresentationDigest(invalid,{})==digest &&
+              published.prepared==layout.prepared && sameRanges,label);
+    };
+    rejects(nullptr,common,"null immutable source fails without partial owner/layout publication");
+    rejects(immutable,owner,"a second shared append fails without growing or replacing the existing owner/layout");
+    rejects(immutable,beforeSeed,"missing canonical rows cannot silently allocate replacement master materials");
+    auto bad=common;bad.primitives.push_back(bad.primitives.front());
+    rejects(immutable,std::move(bad),"unconsolidated common families are rejected before master append");
+    bad=common;bad.triangleRegions.push_back(StaticTriangleRegion::Shared);
+    rejects(immutable,std::move(bad),"corrupt common provenance rejects without relabelling earlier geometry");
+    bad=common;for(auto& m:bad.materials)if(m.name=="ForestBark")m.normalScale+=.1f;
+    rejects(immutable,std::move(bad),"changed canonical material factors cannot inherit the prepared master mapping");
+    for(unsigned mutation=0;mutation<8;++mutation) {
+        auto invalid=std::make_shared<PreparedForestDressing>(*immutable);
+        if(mutation==0)invalid->placements[0].origin[1]+=.1f;
+        if(mutation==1)invalid->placements[0].masterIndex=2;
+        if(mutation==2)invalid->primitiveFamilies[0][0]=255;
+        if(mutation==3)invalid->masters[0].indices[0]=UINT32_MAX;
+        if(mutation==4)invalid->masters[0].primitives[0].indexCount=1;
+        if(mutation==5)invalid->masters[0].bounds.maximum[0]+=.1f;
+        if(mutation==6)invalid->masters[0].vertices[0].tangent[0]=NAN;
+        if(mutation==7)invalid->masters[0].nodeTransforms[0].world[0]=NAN;
+        rejects(std::move(invalid),common,"invalid local source/placement fails atomically while preserving prior immutable publication");
+    }
+    std::cout<<"SHARED_FOREST_CPU commonPrimitives="<<layout.commonPrimitiveCount<<" localMasterPrimitives=6 placements="
+        <<layout.prepared->placements.size()<<" localTriangles=10102 materials="<<owner.materials.size()
+        <<" vertexBytes="<<owner.vertices.size()*sizeof(StaticRtVertex)<<" indexBytes="<<owner.indices.size()*sizeof(std::uint32_t)
+        <<"; CPU ownership only, normal omission certificate not inherited\n";
+}
+
 template<class Append>
 void CheckCorruptForestProvenance(const StaticMeshAsset& owner, Append append)
 {
@@ -1057,6 +1221,7 @@ int main()
     TestNativeTreePairAndAppend();
     TestCleanFailures();
     TestPreparedMasterOwnership();
+    TestSharedMasterPacking();
     TestNativeTerrainAndTrailClearance();
     TestUnsafeRootFootprintsFailAtomically();
     TestNativeChapterPrimitiveOwnership();

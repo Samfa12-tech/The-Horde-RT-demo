@@ -23,6 +23,9 @@
 #include "vulkan/raytracing/SimulationFrameAdapter.h"
 #include "graphics/EntryMenuScene.h"
 #include "graphics/GraphicsPreviewSession.h"
+#include <sstream>
+#include <iomanip>
+#include <locale>
 #include "vulkan/raytracing/ChestGuidanceLight.h"
 #include "vulkan/raytracing/DynamicBlasSynchronization.h"
 #include "vulkan/raytracing/RtDescriptorSetLayoutBindings.h"
@@ -830,7 +833,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     dustCache_ = std::exchange(other.dustCache_, {});
     sceneMaterials_ = std::move(other.sceneMaterials_);
     worldMaterialBase_ = std::exchange(other.worldMaterialBase_, 0u);
-    tlasInstanceCount_ = std::exchange(other.tlasInstanceCount_, kTlasInstanceCount);
+    tlasInstanceCount_ = std::exchange(other.tlasInstanceCount_, kOrdinaryTlasInstanceCount);
     previewTransforms_ = std::exchange(other.previewTransforms_, {});
     previewFireInputs_ = std::exchange(other.previewFireInputs_, {});
 #if defined(_DEBUG)
@@ -844,6 +847,11 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     diagnosticPreviewPairBuild_=std::exchange(other.diagnosticPreviewPairBuild_,{});
     diagnosticPreviewPairScratchPeak_=std::exchange(other.diagnosticPreviewPairScratchPeak_,0);
     diagnosticPreviewPairBuildMilliseconds_=std::exchange(other.diagnosticPreviewPairBuildMilliseconds_,0.);
+    forestRouteProofMode_=std::exchange(other.forestRouteProofMode_,ForestRouteProofMode::Disabled);
+    forestSharedLayout_=std::move(other.forestSharedLayout_);other.forestSharedLayout_={};
+    forestMasterBlas_=std::exchange(other.forestMasterBlas_,{});
+    forestMasterBuildScratch_=std::exchange(other.forestMasterBuildScratch_,{});
+    forestMasterBuildWork_=std::exchange(other.forestMasterBuildWork_,{});
 #endif
     other.gpuResources_.Reset();
     ready_ = std::exchange(other.ready_, false);
@@ -852,6 +860,147 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
 }
 
 #if defined(_DEBUG)
+namespace {
+bool ApplyExistingForestInstances(std::span<VkAccelerationStructureInstanceKHR> instances,
+    const horde::scene::ForestDressingSharedLayout& layout,
+    const std::array<VkDeviceAddress,2>& addresses,std::string& diagnostic)
+{
+    constexpr auto first=PresentableTinyRtScene::kOrdinaryTlasInstanceCount;
+    static_assert(first==28u);
+    if(!layout.prepared || layout.prepared->placements.size()!=64u || instances.size()<first+64u ||
+       !addresses[0] || !addresses[1]) {
+        diagnostic="Existing64 forest instances require two live immutable masters and complete storage.";return false;
+    }
+    for(std::size_t i=0;i<layout.prepared->placements.size();++i) {
+        const auto& p=layout.prepared->placements[i];
+        if(p.masterIndex>=2u){diagnostic="Forest placement references an invalid master.";return false;}
+        const float c=std::cos(p.yawRadians),s=std::sin(p.yawRadians);
+        VkAccelerationStructureInstanceKHR instance{};
+        instance.transform={{{c,0.f,s,p.origin[0]},{0.f,1.f,0.f,p.origin[1]},{-s,0.f,c,p.origin[2]}}};
+        instance.instanceCustomIndex=26u+static_cast<std::uint32_t>(p.masterIndex);
+        instance.mask=0x01u;instance.flags=VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
+        instance.accelerationStructureReference=addresses[p.masterIndex];instances[first+i]=instance;
+    }
+    return true;
+}
+}
+
+bool PresentableTinyRtScene::SetForestRouteProofMode(ForestRouteProofMode mode,std::string& diagnostic)
+{
+    if(mode!=ForestRouteProofMode::Disabled && mode!=ForestRouteProofMode::BakedResident && mode!=ForestRouteProofMode::SharedExisting64) {
+        diagnostic="Unknown forest route proof mode.";return false;
+    }
+    if((ready_ || device_!=VK_NULL_HANDLE) && mode!=forestRouteProofMode_) {
+        diagnostic="Forest representation must be selected before scene initialization.";return false;
+    }
+#if HORDE_RT_REGION_PAGE_PROTOTYPE
+    if(mode!=ForestRouteProofMode::Disabled){diagnostic="Forest route proof cannot combine the independent region-page prototype.";return false;}
+#endif
+    forestRouteProofMode_=mode;diagnostic.clear();return true;
+}
+
+std::string PresentableTinyRtScene::ForestRouteProofJson() const
+{
+    if(forestRouteProofMode_==ForestRouteProofMode::Disabled)return "null";
+    const bool shared=forestRouteProofMode_==ForestRouteProofMode::SharedExisting64;
+    std::ostringstream out;out.imbue(std::locale::classic());out<<std::fixed<<std::setprecision(8);
+    const auto resources=ResourceInventory();
+    std::array<bool,kRtStaticAssetCapacity> assetUsed{};std::size_t registrations=0;
+    bool fits=staticMeshSlot_.PrimitiveMetadata().size()<=kRtPrimitiveMetadataCapacity &&
+        sceneMaterials_.size()<=kRtMaterialCapacity && tlasInstanceCount_<=kTlasInstanceCount;
+    for(const auto& row:staticMeshSlot_.InstanceMetadata())if(row.primitiveCount) {
+        ++registrations;if(row.assetIndex>=assetUsed.size())fits=false;else assetUsed[row.assetIndex]=true;
+    }
+    const auto assetCount=std::count(assetUsed.begin(),assetUsed.end(),true);
+    out<<"{\"mode\":\""<<(shared?"shared-existing64":"baked-resident")
+       <<"\",\"defaultEnabled\":false,\"fullyResident\":"<<(!ordinaryStaticOmissions_ && !ordinaryStaticReduced_?"true":"false")
+       <<",\"ordinaryOmissionCertificateReused\":false,\"forestOrPerformanceAdmitted\":false"
+       <<",\"physicalDefinitions\":"<<tlasInstanceCount_<<",\"physicalStorageCapacity\":"<<kTlasInstanceCount
+       <<",\"primitiveRows\":"<<staticMeshSlot_.PrimitiveMetadata().size()<<",\"primitiveCapacity\":"<<kRtPrimitiveMetadataCapacity
+       <<",\"packedMaterialRows\":"<<staticMeshSlot_.Materials().size()<<",\"finalMaterialRows\":"<<sceneMaterials_.size()
+       <<",\"materialCapacity\":"<<kRtMaterialCapacity<<",\"metadataCapacity\":"<<kRtInstanceMetadataCapacity
+       <<",\"staticRegistrations\":"<<registrations<<",\"uniqueStaticAssets\":"<<assetCount
+       <<",\"staticAssetCapacity\":"<<kRtStaticAssetCapacity<<",\"fitsCapacities\":"<<(fits?"true":"false")
+       <<",\"definitionsPublished\":"<<(tlasInstanceDefinitionsValid_?"true":"false")
+       <<",\"commonPrimitiveCount\":"<<forestSharedLayout_.commonPrimitiveCount
+       <<",\"blasCount\":"<<resources.bottomLevelAccelerationStructureCount<<",\"masterRanges\":[";
+    for(unsigned m=0;m<2;++m) {
+        if(m)out<<',';out<<"{\"offset\":"<<forestSharedLayout_.masters[m].primitiveOffset
+            <<",\"count\":"<<forestSharedLayout_.masters[m].primitiveCount
+            <<",\"allocationBytes\":"<<forestMasterBlas_[m].backing.allocationSize<<'}';
+    }
+    out<<"],\"legacyDefinitionCount\":"<<kOrdinaryTlasInstanceCount<<",\"legacyDefinitions\":[";
+    const std::array owned{blas_.address,waterfallBlas_.address,finaleRoofBlas_.address,torchBlas_.address,
+        worldTorchBodyBlas_.address,swordBlas_.address,playerSwordScabbardBlas_.address,gothicChestBaseBlas_.address,
+        gothicChestLidBlas_.address,rewardLanternRingBlas_.address,rewardLanternBodyBlas_.address,dielectricFixtureBlas_.address,
+        playerBodyBlas_.address,playerLimbBlas_.address,skinnedPlayerBlas_.address,viewmodelBlas_.address,
+        collapseBlas_.address,waterDropletBlas_.address,characterSlot_.SkeletonGpu(0).accelerationStructure.address,
+        characterSlot_.SkeletonGpu(1).accelerationStructure.address,characterSlot_.LichGpu().accelerationStructure.address};
+    for(unsigned i=0;i<kOrdinaryTlasInstanceCount;++i) {
+        if(i)out<<',';const auto& actual=tlasBuiltInstances_[i];
+        const auto found=std::find(owned.begin(),owned.end(),actual.accelerationStructureReference);
+        const auto role=actual.accelerationStructureReference?std::distance(owned.begin(),found):-1;
+        out<<"{\"slot\":"<<i<<",\"customIndex\":"<<actual.instanceCustomIndex<<",\"mask\":"<<actual.mask
+           <<",\"flags\":"<<actual.flags<<",\"ownedReferenceRole\":"<<role<<",\"transform\":[";
+        for(unsigned r=0;r<3;++r)for(unsigned c=0;c<4;++c){if(r||c)out<<',';out<<actual.transform.matrix[r][c];}out<<"]}";
+    }
+    out<<"],\"placements\":[";
+    if(forestSharedLayout_.prepared)for(std::size_t i=0;i<forestSharedLayout_.prepared->placements.size();++i) {
+        const auto& p=forestSharedLayout_.prepared->placements[i];if(i)out<<',';
+        out<<"{\"id\":"<<i<<",\"master\":"<<p.masterIndex<<",\"origin\":["<<p.origin[0]<<','<<p.origin[1]<<','<<p.origin[2]
+           <<"],\"yaw\":"<<p.yawRadians;
+        if(shared) {
+            const auto& actual=tlasBuiltInstances_[kOrdinaryTlasInstanceCount+i];
+            const bool owner=p.masterIndex<2 && forestMasterBlas_[p.masterIndex].address &&
+                actual.accelerationStructureReference==forestMasterBlas_[p.masterIndex].address &&
+                actual.instanceCustomIndex==26u+p.masterIndex && actual.mask==1u;
+            out<<",\"physicalSlot\":"<<kOrdinaryTlasInstanceCount+i<<",\"customIndex\":"<<actual.instanceCustomIndex
+               <<",\"referencesOwnedMaster\":"<<(owner?"true":"false")<<",\"transform\":[";
+            for(unsigned r=0;r<3;++r)for(unsigned c=0;c<4;++c){if(r||c)out<<',';out<<actual.transform.matrix[r][c];}out<<']';
+        }
+        out<<'}';
+    }
+    out<<"]}";return out.str();
+}
+
+bool PresentableTinyRtScene::ValidateForestRouteProof(std::string& diagnostic) const
+{
+    const auto fail=[&](const char* error){diagnostic=error;return false;};
+    const bool shared=forestRouteProofMode_==ForestRouteProofMode::SharedExisting64;
+    if(forestRouteProofMode_==ForestRouteProofMode::Disabled || !ready_ || !tlasInstanceDefinitionsValid_ ||
+       !forestSharedLayout_.prepared || forestSharedLayout_.prepared->placements.size()!=64u ||
+       sceneProfile_!=RtSceneProfile::Showcase || !developmentRescueJourney_ || ordinaryStaticOmissions_ ||
+       ordinaryStaticReduced_ || preparedStaticGeometry_)return fail("Forest proof lacks its complete fully resident owner.");
+    if(tlasInstanceCount_!=(shared?92u:28u) || staticMeshSlot_.PrimitiveMetadata().size()>kRtPrimitiveMetadataCapacity ||
+       sceneMaterials_.size()>kRtMaterialCapacity)return fail("Forest proof exceeds or changes its admitted active capacities.");
+    std::array<bool,kRtStaticAssetCapacity> assets{};
+    for(const auto& row:staticMeshSlot_.InstanceMetadata())if(row.primitiveCount) {
+        if(row.assetIndex>=assets.size())return fail("Forest proof has an unadmitted static asset owner.");
+        assets[row.assetIndex]=true;
+    }
+    if(std::count(assets.begin(),assets.end(),true)!=13)return fail("Forest proof did not preserve exactly thirteen unique static assets.");
+    std::array<unsigned,2> populations{};
+    for(std::size_t i=0;i<64u;++i) {
+        const auto& p=forestSharedLayout_.prepared->placements[i];
+        if(p.masterIndex>=2u)return fail("Forest proof has an invalid master reference.");
+        ++populations[p.masterIndex];
+        if(shared) {
+            const auto& actual=tlasBuiltInstances_[kOrdinaryTlasInstanceCount+i];
+            const float c=std::cos(p.yawRadians),s=std::sin(p.yawRadians);
+            const VkTransformMatrixKHR expected{{{c,0.f,s,p.origin[0]},{0.f,1.f,0.f,p.origin[1]},{-s,0.f,c,p.origin[2]}}};
+            if(!forestMasterBlas_[p.masterIndex].address || actual.accelerationStructureReference!=forestMasterBlas_[p.masterIndex].address ||
+               actual.instanceCustomIndex!=26u+p.masterIndex || actual.mask!=1u ||
+               std::memcmp(&actual.transform,&expected,sizeof(expected))!=0)return fail("Forest proof did not publish all exact unit-scale master placements.");
+        }
+    }
+    if(populations!=std::array<unsigned,2>{32u,32u})return fail("Forest proof changed its existing thirty-two pine and thirty-two alder placements.");
+    if(shared)for(unsigned i=0;i<kOrdinaryTlasInstanceCount;++i)
+        if(tlasBuiltInstances_[i].accelerationStructureReference==forestMasterBlas_[0].address ||
+           tlasBuiltInstances_[i].accelerationStructureReference==forestMasterBlas_[1].address)
+            return fail("Forest proof replaced an existing legacy TLAS role.");
+    diagnostic.clear();return true;
+}
+
 bool PresentableTinyRtScene::SetDiagnosticPreviewMeshPair(
     std::shared_ptr<const horde::scene::assets::StaticMeshAsset> master,
     const std::array<horde::gameplay::items::HeldItemTransform,2>& transforms,
@@ -998,6 +1147,10 @@ bool PresentableTinyRtScene::InitialiseWithOrchestration(
 #if defined(_DEBUG)
     if(diagnosticPreviewPairMaster_ && sceneProfile_!=RtSceneProfile::GraphicsPreview) {
         diagnostic="Diagnostic preview pair cannot initialize a gameplay or entry scene.";return false;
+    }
+    if(forestRouteProofMode_!=ForestRouteProofMode::Disabled &&
+       (sceneProfile_!=RtSceneProfile::Showcase || !developmentRescueJourney_)) {
+        diagnostic="Forest route proof requires the authored chapter Showcase profile.";return false;
     }
 #endif
     glassEnabled_ = glassEnabled;
@@ -1173,7 +1326,7 @@ bool PresentableTinyRtScene::ContinueInitialiseAfterPreflight(
         }))
     {
 #if defined(_DEBUG)
-        if(diagnosticPreviewPairBuild_.submitted)return false; // Retain until platform proves successful device idle.
+        if(diagnosticPreviewPairBuild_.submitted || forestMasterBuildWork_.submitted)return false; // Retain until platform proves successful device idle.
 #endif
 #if HORDE_RT_REGION_PAGE_PROTOTYPE
         if(regionPagePreparation_) {
@@ -1269,6 +1422,9 @@ void PresentableTinyRtScene::Destroy()
     else diagnosticPreviewPairBuild_={};
     diagnosticPreviewPairActive_=false;diagnosticPreviewPairBaked_={};
     diagnosticPreviewPairScratchPeak_=0;diagnosticPreviewPairBuildMilliseconds_=0.;
+    if(device_!=VK_NULL_HANDLE)RetireRtGpuWorkAfterIdle({device_,queue_,commandPool_},forestMasterBuildWork_);
+    else forestMasterBuildWork_={};
+    forestSharedLayout_={};
 #endif
     DestroyBuffer(keeperTextureUploadRecovery_.staging);
     for (auto& texture : keeperTextureRestoreQuarantine_) DestroyTextureArray(texture);
@@ -1336,6 +1492,8 @@ void PresentableTinyRtScene::Destroy()
 #if defined(_DEBUG)
     DestroyAccelerationStructure(diagnosticPreviewPairBlas_);
     DestroyBuffer(diagnosticPreviewPairScratch_);
+    for(auto& master:forestMasterBlas_)DestroyAccelerationStructure(master);
+    DestroyBuffer(forestMasterBuildScratch_);
 #endif
     DestroyBuffer(tlasUpdateScratch_);
     DestroyBuffer(rescueWorldUpdateScratch_);
@@ -1515,7 +1673,7 @@ void PresentableTinyRtScene::Destroy()
     sceneProfile_ = RtSceneProfile::Showcase;
     sceneMaterials_.clear();
     worldMaterialBase_ = 0u;
-    tlasInstanceCount_ = kTlasInstanceCount;
+    tlasInstanceCount_ = kOrdinaryTlasInstanceCount;
     previewTransforms_ = {};
     previewFireInputs_ = {};
 }
@@ -1552,6 +1710,7 @@ PresentableTinyRtScene::CaptureResourceHandles() const
     append(result.topLevelAccelerationStructures, tlas_.handle);
 #if defined(_DEBUG)
     append(result.bottomLevelAccelerationStructures,diagnosticPreviewPairBlas_.handle);
+    for(const auto& master:forestMasterBlas_)append(result.bottomLevelAccelerationStructures,master.handle);
 #endif
     for (const auto strategy : {RtMaterialStrategy::OpaqueFast,
                                RtMaterialStrategy::GenericDielectric})
@@ -1617,6 +1776,8 @@ horde::telemetry::RtResourceInventory PresentableTinyRtScene::ResourceInventory(
 #if defined(_DEBUG)
     accumulateBlas(diagnosticPreviewPairBlas_);
     AccumulateRtGpuBuffer(inventory,diagnosticPreviewPairScratch_);
+    for(const auto& master:forestMasterBlas_)accumulateBlas(master);
+    AccumulateRtGpuBuffer(inventory,forestMasterBuildScratch_);
 #endif
     if (preparedStaticGeometry_) {
         const auto& candidate = *preparedStaticGeometry_;
@@ -2858,6 +3019,16 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
             return false;
         if (!horde::scene::AppendBellwetherShell(root, collapseStaticAsset_, diagnostic)) return false;
         horde::scene::ForestDressingBuildReport forest;
+#if defined(_DEBUG)
+        if(forestRouteProofMode_!=ForestRouteProofMode::Disabled) {
+            std::shared_ptr<const horde::scene::PreparedForestDressing> prepared;
+            if(!horde::scene::PrepareForestDressing(root,prepared,diagnostic,chapterTerrainSurface_.get()))return false;
+            forestSharedLayout_.prepared=std::move(prepared);
+            if(forestRouteProofMode_==ForestRouteProofMode::SharedExisting64) {
+                if(!horde::scene::SeedPreparedForestMaterialFamilies(*forestSharedLayout_.prepared,collapseStaticAsset_,diagnostic))return false;
+            }else if(!horde::scene::AppendPreparedForestDressing(*forestSharedLayout_.prepared,collapseStaticAsset_,forest,diagnostic))return false;
+        }else
+#endif
         if (!horde::scene::AppendPreparedForestDressing(root, collapseStaticAsset_, forest, diagnostic, chapterTerrainSurface_.get()))
             return false;
         horde::scene::ForestUnderstoryReport understory;
@@ -2883,6 +3054,12 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
             !horde::scene::assets::CoalesceAdjacentWorldBakedPrimitives(gothicChestBaseAsset_, diagnostic) ||
             !horde::scene::assets::CoalesceAdjacentWorldBakedPrimitives(rewardLanternRingAsset_, diagnostic))
             return false;
+#if defined(_DEBUG)
+        if(forestRouteProofMode_==ForestRouteProofMode::SharedExisting64) {
+            if(!horde::scene::AppendPreparedForestMasters(forestSharedLayout_.prepared,collapseStaticAsset_,forestSharedLayout_,diagnostic))return false;
+        }else if(forestRouteProofMode_==ForestRouteProofMode::BakedResident)
+            forestSharedLayout_.commonPrimitiveCount=collapseStaticAsset_.primitives.size();
+#endif
     }
     // The selected immutable quality bundle owns the geometry profile too.
     // Mobile panes are absent from the BLAS, not hidden/skipped in a shader.
@@ -5167,6 +5344,30 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
              kWaterDropletMetadataIndex, "runtime water contact droplets",
              waterDropletBlas_, false, &waterDropletBlasUpdateScratch_)))
         return false;
+#if defined(_DEBUG)
+    if(forestRouteProofMode_==ForestRouteProofMode::SharedExisting64) {
+        for(unsigned m=0;m<2;++m) {
+            std::vector<VkAccelerationStructureGeometryKHR> geometries;
+            std::vector<VkAccelerationStructureBuildRangeInfoKHR> ranges;
+            std::vector<std::uint32_t> counts;
+            if(!appendStaticGeometries(26u+m,geometries,ranges,counts) || geometries.size()!=3u) {
+                diagnostic="Forest master requires its complete three-primitive registered range.";return false;
+            }
+            const auto start=std::chrono::steady_clock::now();
+            if(!BuildProfileAccelerationStructure(geometries,ranges,VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR,
+                VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR,forestMasterBlas_[m],
+                &forestMasterBuildScratch_,diagnostic,nullptr,&forestMasterBuildWork_))return false;
+            if(vkQueueWaitIdle(queue_)!=VK_SUCCESS) {
+                forestMasterBuildWork_.completionUnproved=true;
+                diagnostic="Forest master BLAS completion is unproved; retain all owners for platform retirement.";return false;
+            }
+            RetireRtGpuWorkAfterIdle({device_,queue_,commandPool_},forestMasterBuildWork_);
+            DestroyBuffer(forestMasterBuildScratch_);
+            productionPropBlasBytes_+=forestMasterBlas_[m].backing.size;
+            productionPropBlasBuildMilliseconds_+=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-start).count();
+        }
+    }
+#endif
 
     VkAccelerationStructureBuildRangeInfoKHR playerBodyRange{};
     playerBodyRange.primitiveCount = playerBodyPrimitiveCount;
@@ -5626,6 +5827,14 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     // reference is an inactive instance, but would force a needless definition
     // change before the first live snapshot even while the Keeper stays hidden.
     instances[kKeeperInstanceIndex] = characterSlot_.BuildActiveInstances()[2];
+#if defined(_DEBUG)
+    if(forestRouteProofMode_==ForestRouteProofMode::SharedExisting64) {
+        if(!ApplyExistingForestInstances(instances,forestSharedLayout_,
+            {forestMasterBlas_[0].address,forestMasterBlas_[1].address},diagnostic))return false;
+        tlasInstanceCount_=kOrdinaryTlasInstanceCount+64u;
+    }else
+#endif
+        tlasInstanceCount_=kOrdinaryTlasInstanceCount;
 #if HORDE_RT_REGION_PAGE_PROTOTYPE
     if(!viewmodelAvailable_ || kProductionPlayerRenderRoute!=PlayerRenderRoute::ModelledViewmodel){
         diagnostic="Region-page lane admission requires the real modelled player profile.";return false;
@@ -5640,12 +5849,12 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     horde::world::streaming::GeometryPageTable initialTable;
     if(!ApplyRegionPage(instances,initialMetadata,initialTable,diagnostic))return false;
 #endif
-    if (!CreateBuffer(sizeof(instances), VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, uploadMemory, true, instanceBuffer_, diagnostic))
+    if (!CreateBuffer(tlasInstanceCount_*sizeof(instances[0]), VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, uploadMemory, true, instanceBuffer_, diagnostic))
     {
         return false;
     }
     if (!gpuResources_.MapBufferForHostWrites(instanceBuffer_, diagnostic) ||
-        !WriteBuffer(instanceBuffer_, instances.data(), sizeof(instances), "TLAS instance", diagnostic))
+        !WriteBuffer(instanceBuffer_, instances.data(), tlasInstanceCount_*sizeof(instances[0]), "TLAS instance", diagnostic))
     {
         return false;
     }
@@ -5663,7 +5872,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     tlasBuildInfo.pGeometries = &tlasGeometry;
 
     VkAccelerationStructureBuildSizesInfoKHR tlasSizes{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR};
-    std::uint32_t instanceCount = static_cast<std::uint32_t>(instances.size());
+    std::uint32_t instanceCount = tlasInstanceCount_;
     vkGetAccelerationStructureBuildSizesKHR_(device_, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &tlasBuildInfo, &instanceCount, &tlasSizes);
     if (!CreateBuffer(tlasSizes.accelerationStructureSize,
                       VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR,
@@ -7663,8 +7872,6 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     instances[kWaterDropletInstanceIndex].mask = 0x01u;
     instances[kWaterDropletInstanceIndex].accelerationStructureReference = waterDropletBlas_.address;
     ApplyKeeperTorchBodyInstances(instances);
-    for (std::size_t instance = 0u; instance < instances.size(); ++instance)
-        lastInstanceMasks_[instance] = instances[instance].mask;
 #if !defined(NDEBUG) || HORDE_RT_CHAPTER_MEASUREMENT
     viewmodelCaptureTransform_ = instances[kPlayerViewmodelInstanceIndex].transform;
     playerWorldBodyCaptureTransform_ =
@@ -7864,6 +8071,13 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     }
     ApplyGlassFixtureVisibility(instances);
     const auto contactRipple = MakeWaterContactRippleGpu(frame.waterContact);
+#if defined(_DEBUG)
+    if(forestRouteProofMode_==ForestRouteProofMode::SharedExisting64 &&
+       !ApplyExistingForestInstances(instances,forestSharedLayout_,
+           {forestMasterBlas_[0].address,forestMasterBlas_[1].address},diagnostic))return false;
+#endif
+    lastInstanceMasks_={};
+    for(std::size_t i=0;i<tlasInstanceCount_;++i)lastInstanceMasks_[i]=instances[i].mask;
     if (!WriteDustQuality(*quality, frame, diagnostic, observation) ||
         !WriteBuffer(waterContactRippleBuffer_, &contactRipple, sizeof(contactRipple),
                      "water contact ripple", diagnostic, observation) ||
@@ -7872,7 +8086,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         !WriteBuffer(fireEmitterBuffer_, fireEmitterUpload.emitters.data(),
                      sizeof(fireEmitterUpload.emitters), "fire emitters", diagnostic,
                      observation) ||
-        !WriteBuffer(instanceBuffer_, instances.data(), sizeof(instances),
+        !WriteBuffer(instanceBuffer_, instances.data(), tlasInstanceCount_*sizeof(instances[0]),
                      "animated TLAS instance", diagnostic, observation) ||
 #if HORDE_RT_REGION_PAGE_PROTOTYPE
         !WriteBuffer(instanceMetadataBuffer_,&framePageTable,sizeof(framePageTable),"region page metadata",diagnostic,observation) ||
@@ -8242,7 +8456,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     updateInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL_KHR;
     updateInfo.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR | VK_BUILD_ACCELERATION_STRUCTURE_ALLOW_UPDATE_BIT_KHR;
     const bool rebuildTlas = !tlasInstanceDefinitionsValid_ ||
-        RequiresTlasInstanceRebuild(tlasBuiltInstances_, instances);
+        RequiresTlasInstanceRebuild(std::span(tlasBuiltInstances_).first(tlasInstanceCount_),
+                                   std::span(instances).first(tlasInstanceCount_));
     updateInfo.mode = rebuildTlas ? VK_BUILD_ACCELERATION_STRUCTURE_MODE_BUILD_KHR
                                  : VK_BUILD_ACCELERATION_STRUCTURE_MODE_UPDATE_KHR;
     updateInfo.srcAccelerationStructure = rebuildTlas ? VK_NULL_HANDLE : tlas_.handle;
@@ -8252,7 +8467,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     updateInfo.scratchData.deviceAddress = tlasUpdateScratch_.AlignedAddress();
 
     VkAccelerationStructureBuildRangeInfoKHR updateRange{};
-    updateRange.primitiveCount = static_cast<std::uint32_t>(instances.size());
+    updateRange.primitiveCount = tlasInstanceCount_;
     const VkAccelerationStructureBuildRangeInfoKHR* updateRanges[] = {&updateRange};
     VkMemoryBarrier traceBarrier{VK_STRUCTURE_TYPE_MEMORY_BARRIER};
     traceBarrier.srcAccessMask = VK_ACCESS_ACCELERATION_STRUCTURE_WRITE_BIT_KHR;

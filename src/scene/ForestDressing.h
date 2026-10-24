@@ -63,10 +63,43 @@ struct PreparedForestDressing
     std::array<ForestDressingRigidPlacement, gameplay::simulation::kForestTreePlacementContract.size()> placements{};
 };
 
+struct ForestDressingMasterRange
+{
+    std::size_t primitiveOffset = 0u;
+    std::size_t primitiveCount = 0u;
+    ForestDressingBounds localBounds{};
+};
+
+// One mixed-space CPU owner: the common prefix remains world-space; each
+// appended master range stays in its normalized local metre space. Keep these
+// ranges separate at BLAS registration, and never consolidate them afterward.
+// The const handle owns the exact terrain/root-fitted placement snapshot.
+struct ForestDressingSharedLayout
+{
+    std::size_t commonPrimitiveCount = 0u;
+    std::array<ForestDressingMasterRange, 2u> masters{};
+    std::shared_ptr<const PreparedForestDressing> prepared;
+};
+
 bool PrepareForestDressing(const std::filesystem::path& assetRoot,
                           std::shared_ptr<const PreparedForestDressing>& prepared,
                           std::string& diagnostic,
                           const gameplay::simulation::TriangleSupportSurface* terrain = nullptr);
+
+// Seed exactly the same four canonical material rows for the unchanged
+// understory/deadwood builders, without creating any tree geometry.
+bool SeedPreparedForestMaterialFamilies(const PreparedForestDressing& prepared,
+                                       assets::StaticMeshAsset& existingOwner,
+                                       std::string& diagnostic);
+
+// Call only AFTER common world-family consolidation. Append each local master
+// once, reusing the existing canonical material rows; common bounds stay world
+// bounds, and the returned disjoint ranges carry their own local bounds.
+// Failure leaves the owner and any prior published layout untouched.
+bool AppendPreparedForestMasters(std::shared_ptr<const PreparedForestDressing> prepared,
+                                 assets::StaticMeshAsset& existingOwner,
+                                 ForestDressingSharedLayout& layout,
+                                 std::string& diagnostic);
 
 // Compatibility bake from the same canonical masters/transforms. Production
 // remains world-baked until a separate RT ownership/capacity proof is admitted.

@@ -1,5 +1,11 @@
 # Shared forest: smallest full-size route proof
 
+Execution status: the [actual Windows existing64 proof](../evidence/2026-10-24-shared-forest-route/README.md)
+now passes resource/representation/recreation checks. The following preserves
+the reviewed implementation sequence; normal adoption, timing and visible
+forest depth remain unadmitted. Continue with the separately budgeted
+[F01 background sector](HORDE_1_7_F01_BACKGROUND_SECTOR_2026_10_24.md).
+
 Source review at `3898bcee`. This follows the [actual room proof](../evidence/2026-10-24-shared-blas-pair/README.md); it is an implementation plan, not normal adoption or a forest-depth pass. It preserves the existing admitted pine/alder and all64 collision placements. Replacement-canopy/Easy Tree remains deferred.
 
 ## Exact capacity boundary

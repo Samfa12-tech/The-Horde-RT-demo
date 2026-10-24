@@ -15,6 +15,9 @@ namespace horde::vulkan::raytracing {
 void PresentableTinyRtScene::AdmitOrdinaryStaticDetail()
 {
     ordinaryStaticOmissions_.reset();
+#if defined(_DEBUG)
+    if(forestRouteProofMode_!=ForestRouteProofMode::Disabled)return; // Explicit fully resident A/B; no old world-ID certificate.
+#endif
     if(!fullStaticGeometrySource_ || !developmentRescueJourney_ || sceneProfile_!=RtSceneProfile::Showcase)return;
     const auto& source=*fullStaticGeometrySource_;
     constexpr std::array<std::uint32_t,2> transmissionOwners{{8u,kWaterDropletMetadataIndex}};
@@ -132,6 +135,9 @@ bool PresentableTinyRtScene::AdvanceOrdinaryStaticDetail(
     bool allowEviction,StaticDetailFrame& decision,std::string& diagnostic)
 {
     decision=StaticDetailFrame::Render;
+#if defined(_DEBUG)
+    if(forestRouteProofMode_!=ForestRouteProofMode::Disabled){diagnostic.clear();return true;}
+#endif
     if(!ordinaryStaticReduced_ && !ordinaryStaticCandidate_ && StaticGeometryHasCompleteContributors() &&
        simulation.Snapshot().staticDetailLease.resourceGeneration)
         simulation.ReleaseStaticDetailLease(simulation.Snapshot().staticDetailLease.resourceGeneration);
@@ -199,6 +205,9 @@ bool PresentableTinyRtScene::AdvanceOrdinaryStaticDetail(
 
 void PresentableTinyRtScene::FinishOrdinaryStaticDetail(horde::gameplay::simulation::GameSimulation& simulation)
 {
+#if defined(_DEBUG)
+    if(forestRouteProofMode_!=ForestRouteProofMode::Disabled)return;
+#endif
 #if HORDE_RT_REGION_PAGE_PROTOTYPE
     if(regionPageSource_) {
         if(regionPageVisible_ && StaticGeometryHasCompleteContributors())
@@ -228,6 +237,12 @@ bool PresentableTinyRtScene::PackLoadedStaticAssets(RtStaticMeshSlot& out,
     std::span<const std::uint32_t> retainedWorldFamilies, std::string& diagnostic,
     const std::uint8_t retainedTriangleRegions)
 {
+#if defined(_DEBUG)
+    if(forestRouteProofMode_!=ForestRouteProofMode::Disabled &&
+       (!retainedWorldFamilies.empty() || retainedTriangleRegions!=horde::scene::assets::kAllStaticTriangleRegions)) {
+        diagnostic="Forest route proof retains every contributor; filtered packing is not admitted.";return false;
+    }
+#endif
     horde::scene::assets::StaticMeshAsset regionSelectedWorld;
     if(retainedTriangleRegions!=horde::scene::assets::kAllStaticTriangleRegions &&
        !horde::scene::assets::SelectStaticTriangleRegions(collapseStaticAsset_,retainedTriangleRegions,
@@ -285,6 +300,25 @@ bool PresentableTinyRtScene::PackLoadedStaticAssets(RtStaticMeshSlot& out,
             row.primitiveSelection = retainedWorldFamilies;
             if(retainedTriangleRegions!=horde::scene::assets::kAllStaticTriangleRegions)row.asset=&regionSelectedWorld;
         }
+#if defined(_DEBUG)
+    if(forestRouteProofMode_==ForestRouteProofMode::SharedExisting64) {
+        if(!forestSharedLayout_.prepared || !forestSharedLayout_.commonPrimitiveCount ||
+           forestSharedLayout_.masters[0].primitiveCount!=3u || forestSharedLayout_.masters[1].primitiveCount!=3u ||
+           forestSharedLayout_.masters[0].primitiveOffset!=forestSharedLayout_.commonPrimitiveCount ||
+           forestSharedLayout_.masters[1].primitiveOffset!=forestSharedLayout_.masters[0].primitiveOffset+3u ||
+           forestSharedLayout_.masters[1].primitiveOffset+3u!=collapseStaticAsset_.primitives.size()) {
+            diagnostic="Forest route proof requires disjoint common/pine/alder ranges in one packed owner.";return false;
+        }
+        for(auto& row:registrations)if(row.instanceCustomIndex==kCollapseInstanceIndex)
+            row.primitiveCount=static_cast<std::uint32_t>(forestSharedLayout_.commonPrimitiveCount);
+        for(unsigned m=0;m<2;++m) {
+            StaticRtAssetRegistration row{26u+m,m==0?0x50494e45u:0x414c4452u,
+                static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),0u,&collapseStaticAsset_};
+            row.primitiveOffset=static_cast<std::uint32_t>(forestSharedLayout_.masters[m].primitiveOffset);
+            row.primitiveCount=3u;registrations.push_back(row);
+        }
+    }
+#endif
     // Packing consumes borrowed selections synchronously into owned vectors.
     if (!(developmentRescueJourney_
             ? out.InitializeSelectedGeometry(registrations, diagnostic)
@@ -360,6 +394,11 @@ std::shared_ptr<const RtStaticTriangleOmissions> PresentableTinyRtScene::CreateS
     std::uint64_t expectedGeneration, std::span<const std::uint32_t> triangles,
     std::string& diagnostic) const
 {
+#if defined(_DEBUG)
+    if(forestRouteProofMode_!=ForestRouteProofMode::Disabled) {
+        diagnostic="Forest route proof cannot reuse or create the ordinary world-triangle omission certificate.";return {};
+    }
+#endif
     if(!developmentRescueJourney_ || sceneProfile_!=RtSceneProfile::Showcase || !fullStaticGeometrySource_ ||
        staticGeometryCompletionUnproved_ || !expectedGeneration || expectedGeneration==UINT64_MAX ||
        expectedGeneration!=staticGeometryGeneration_) {
@@ -413,6 +452,11 @@ bool PresentableTinyRtScene::BeginStaticGeometryReplacement(
     std::string& diagnostic, const std::uint8_t retainedTriangleRegions,
     std::shared_ptr<const RtStaticTriangleOmissions> omissions)
 {
+#if defined(_DEBUG)
+    if(forestRouteProofMode_!=ForestRouteProofMode::Disabled) {
+        diagnostic="Fully resident forest route proof does not admit static cutover.";return false;
+    }
+#endif
 #if HORDE_RT_REGION_PAGE_PROTOTYPE
     if(regionPageSource_ || !regionPageOwner_.Empty()) {
         diagnostic="Combined static preparation cannot replace an independent region-page owner.";return false;
@@ -711,6 +755,11 @@ bool PresentableTinyRtScene::AdvanceStaticGeometryReplacement(
 bool PresentableTinyRtScene::CommitStaticGeometryWithApi(const std::uint64_t expectedGeneration,
     const StaticCutoverApi& api, std::string& diagnostic)
 {
+#if defined(_DEBUG)
+    if(forestRouteProofMode_!=ForestRouteProofMode::Disabled) {
+        diagnostic="Fully resident forest route proof does not admit static cutover.";return false;
+    }
+#endif
 #if HORDE_RT_REGION_PAGE_PROTOTYPE
     if(regionPageSource_ || !regionPageOwner_.Empty()) {
         diagnostic="Combined static cutover cannot replace an independent region-page owner.";return false;

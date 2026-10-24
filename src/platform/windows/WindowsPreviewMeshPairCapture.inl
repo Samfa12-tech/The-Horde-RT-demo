@@ -121,7 +121,9 @@ int RunPreviewMeshPairCapture(VulkanSurfaceContext& context,
     };
     const horde::graphics::PreviewCameraPose direct{-3.6f,-13.4f,.8f,-.10f};
     if(!capture("direct",direct) || !capture("basis",{-2.5f,-13.8f,.65f,-.27f}) ||
-       !capture("mirror",{-1.f,-16.5f,-1.81f,-.10f}))return fail("RT pair capture/ownership gate failed: "+diagnostic);
+       // West of all tree vertices, facing the mirror: the primary segment is
+       // unobstructed by the pair, while reflected rays reach both local masters.
+       !capture("mirror",{-4.6f,-15.72f,-1.57079633f,-.32f}))return fail("RT pair capture/ownership gate failed: "+diagnostic);
     const auto tick=context.graphicsPreview.Snapshot().tick;context.graphicsPreview.Advance(.25);
     if(context.graphicsPreview.Snapshot().tick!=tick || !capture("paused-direct",direct))
         return fail("Frozen pause gate failed: "+diagnostic);

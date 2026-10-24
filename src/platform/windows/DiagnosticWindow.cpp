@@ -106,6 +106,7 @@
 #include "platform/windows/WindowsCaptureContracts.h"
 #include "platform/windows/WindowsGraphicsPreviewCapture.h"
 #include "platform/windows/WindowsPreviewMeshPairCapture.h"
+#include "platform/windows/WindowsForestRouteProofLaunch.h"
 #if defined(_DEBUG)
 #include "scene/ForestDressing.h"
 #endif
@@ -350,6 +351,8 @@ struct CaptureLaunchOptions
     bool graphicsPreview = false;
     horde::platform::windows::PreviewMeshPairCaptureMode previewMeshPair =
         horde::platform::windows::PreviewMeshPairCaptureMode::None;
+    horde::platform::windows::ForestRouteCaptureMode forestRouteProof=
+        horde::platform::windows::ForestRouteCaptureMode::Disabled;
     bool mistOff = false;
     std::optional<horde::graphics::DustQuality> captureDustQuality;
     bool outputResizeValidation = false;
@@ -553,6 +556,8 @@ struct VulkanSurfaceContext
         horde::platform::windows::PreviewMeshPairCaptureMode::None;
     std::shared_ptr<const horde::scene::assets::StaticMeshAsset> previewMeshPairMaster;
     std::optional<horde::graphics::PreviewCameraPose> previewMeshPairCamera;
+    horde::platform::windows::ForestRouteCaptureMode forestRouteProof=
+        horde::platform::windows::ForestRouteCaptureMode::Disabled;
 #endif
     bool outputResizeValidation = false;
     bool nativeMotionValidation = false;
@@ -848,6 +853,15 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
     }
     std::vector<std::wstring_view> argumentViews;
     for (int index = 1; index < argumentCount; ++index) argumentViews.emplace_back(arguments[index]);
+    const auto forestProof=horde::platform::windows::ParseForestRouteProofLaunch(argumentViews,
+#if defined(_DEBUG)
+        true
+#else
+        false
+#endif
+    );
+    if(!forestProof.error.empty()){options.error=forestProof.error;LocalFree(arguments);return options;}
+    options.forestRouteProof=forestProof.mode;
     const auto previewPair=horde::platform::windows::ParsePreviewMeshPairCaptureLaunch(argumentViews,
 #if defined(_DEBUG)
         true
@@ -970,6 +984,7 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
         if (argument == L"--validate-output-resize") { ++index; continue; }
         if (argument == L"--capture-graphics-preview") { ++index; continue; }
         if (argument == L"--capture-hidden-preview-pair") { index+=2; continue; }
+        if (argument == L"--forest-route-proof") { ++index; continue; }
         if (argument == L"--development-vertical-proof")
         {
 #if !defined(_DEBUG)
@@ -1103,6 +1118,13 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
            !horde::gameplay::DevelopmentCheckpointRequiresAuthoredChapter(*checkpoint) ||
            options.validateChapterRoundTrip)
             options.error="--inspect-static-world-source requires one hidden Debug authored-chapter showcase capture.";
+    }
+    if(options.error.empty() && options.forestRouteProof!=horde::platform::windows::ForestRouteCaptureMode::Disabled) {
+        const auto* checkpoint=horde::gameplay::FindDevelopmentCheckpoint(options.developmentCheckpoint);
+        if(!options.requested || !options.captureHidden || !checkpoint ||
+           !horde::gameplay::DevelopmentCheckpointRequiresAuthoredChapter(*checkpoint) || options.environmentSurvey.requested ||
+           options.validateStaticZoneCutover || options.validateChapterRoundTrip || !options.inspectStaticWorldMaterial.empty())
+            options.error="Forest route proof requires an unfiltered hidden authored-chapter capture.";
     }
     if(options.error.empty() && options.validateStaticTriangleCutover && !options.staticTriangleOmissions.empty())
         options.error="Sparse cutover cannot mix with whole-region filtering.";
@@ -6088,6 +6110,12 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx, const bool startup
     ctx.rtScene.SetDevelopmentSupportFixture(ctx.developmentVerticalProof &&
         ctx.sceneProfile == horde::vulkan::raytracing::RtSceneProfile::Showcase);
 #if defined(_DEBUG)
+    if(ctx.forestRouteProof!=horde::platform::windows::ForestRouteCaptureMode::Disabled) {
+        using Mode=horde::vulkan::raytracing::PresentableTinyRtScene::ForestRouteProofMode;
+        const auto mode=ctx.forestRouteProof==horde::platform::windows::ForestRouteCaptureMode::SharedExisting64?
+            Mode::SharedExisting64:Mode::BakedResident;
+        if(!ctx.rtScene.SetForestRouteProofMode(mode,diagnostic)){ctx.lastRtFrameError=diagnostic;return false;}
+    }
     if(ctx.previewMeshPair!=horde::platform::windows::PreviewMeshPairCaptureMode::None) {
         if(!ctx.previewMeshPairMaster) {
             std::shared_ptr<const horde::scene::PreparedForestDressing> prepared;
@@ -7461,6 +7489,9 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
              << ", \"productionPropBlasBuildMilliseconds\": "
              << context.rtScene.ProductionPropBlasBuildMilliseconds()
              << "},\n"
+#if defined(_DEBUG)
+             << "  \"forestRouteProof\": " << context.rtScene.ForestRouteProofJson() << ",\n"
+#endif
              << "  \"dielectricDiagnostics\": {\"availability\": \""
              << horde::vulkan::raytracing::ToString(
                     context.rtScene.DiagnosticsAvailability())
@@ -7945,6 +7976,18 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
             checkpoints.push_back(&checkpoint);
         }
     }
+#if defined(_DEBUG)
+    const bool forestProof=context.forestRouteProof!=horde::platform::windows::ForestRouteCaptureMode::Disabled;
+    bool forestRecreated=false;
+    std::uint64_t forestEpochBefore=0;
+    std::uint64_t forestTickBefore=0;
+    horde::telemetry::RtResourceInventory forestInventoryBefore{};
+    std::string forestBeforeJson;
+    if(forestProof) {
+        if(checkpoints.size()!=1u){std::cerr<<"Forest proof requires exactly one frozen checkpoint.\n";return 1;}
+        checkpoints.push_back(checkpoints.front()); // One explicit same-owner recreate, using the unchanged staging/capture body.
+    }
+#endif
     captures.reserve(checkpoints.size());
     auto fail = [&](const std::string& diagnostic) {
         WriteCaptureManifest(outputDirectory, context, capabilities, captures, false, diagnostic);
@@ -7959,7 +8002,30 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
     const VkClearColorValue clearColor = ClearColorForMode(capabilities.rtMode);
     for (const horde::gameplay::ShowcaseCheckpoint* checkpointPointer : checkpoints)
     {
+#if defined(_DEBUG)
+        if(forestProof && captures.size()==1u) {
+            std::string proofError;
+            if(!context.rtScene.ValidateForestRouteProof(proofError))return fail(proofError);
+            forestEpochBefore=context.rtFrameEvidence.PublishedStateByValue().sceneEpoch;
+            forestTickBefore=context.simulation.Snapshot().tickIndex;
+            forestInventoryBefore=context.rtScene.ResourceInventory();
+            forestBeforeJson=context.rtScene.ForestRouteProofJson();
+            if(!RecreateSwapchain(context))return fail("Forest proof same-owner recreation failed.");
+            forestRecreated=true;
+        }
+#endif
         const horde::gameplay::ShowcaseCheckpoint& checkpoint = *checkpointPointer;
+#if defined(_DEBUG)
+        if(forestProof && forestRecreated)
+        {
+            // Reuse the frozen pose/time while normal readiness rebinds.
+            // Re-staging the route would advance its tick/lantern phase.
+            if(context.simulation.Snapshot().tickIndex!=forestTickBefore)
+                return fail("Forest recreation advanced the frozen simulation.");
+            MirrorSimulationSnapshot(context);
+        }
+        else
+#endif
         if (checkpoint.id >= 100)
         {
             if(ParseCaptureLaunchOptions().measureChapterShippingRoute)
@@ -8003,6 +8069,16 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         {
             ApplyCaptureCheckpoint(context, checkpoint);
         }
+#if defined(_DEBUG)
+        if(forestProof && !forestRecreated)
+        {
+            // Match the existing lifecycle pause policy before the first view,
+            // rather than compare pre-pause sway with its intentional reset.
+            context.simulation.SynchronizePausedInput(context.simulationInput,
+                context.simulation.Snapshot().inputPublicationSequence);
+            MirrorSimulationSnapshot(context);
+        }
+#endif
         std::vector<double> frameTimesMs;
         frameTimesMs.reserve(kCaptureSettlingFrames);
         unsigned recreateAttempts = 0u;
@@ -8108,7 +8184,11 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
             expectedStorageImageBytes == image.rgba.size();
 
         std::ostringstream filename;
-        filename << std::setw(2) << std::setfill('0') << checkpoint.id << '-' << checkpoint.name << ".png";
+        filename << std::setw(2) << std::setfill('0') << checkpoint.id << '-' << checkpoint.name;
+#if defined(_DEBUG)
+        if(forestProof && forestRecreated)filename<<"-recreated";
+#endif
+        filename<<".png";
         const std::filesystem::path pngPath = outputDirectory / filename.str();
         if (!WriteRgbaPng(pngPath, image, diagnostic))
         {
@@ -8369,10 +8449,35 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         }
         if (viewmodelCapture && record.viewmodelGeometryFile.empty() && !capturePlayerGeometry())
             return 1;
+#if defined(_DEBUG)
+        if(forestProof && !context.rtScene.ValidateForestRouteProof(diagnostic))return fail(diagnostic);
+#endif
         captures.push_back(std::move(record));
         std::cout << "Captured " << checkpoint.name << " -> " << pngPath << '\n';
     }
 
+#if defined(_DEBUG)
+    if(forestProof) {
+        const auto after=context.rtScene.ResourceInventory();
+        const auto epoch=context.rtFrameEvidence.PublishedStateByValue().sceneEpoch;
+        const bool resourcesMatch=after.bottomLevelAccelerationStructureCount==forestInventoryBefore.bottomLevelAccelerationStructureCount &&
+            after.topLevelAccelerationStructureCount==forestInventoryBefore.topLevelAccelerationStructureCount &&
+            after.tlasInstanceCount==forestInventoryBefore.tlasInstanceCount && after.bufferCount==forestInventoryBefore.bufferCount &&
+            after.memoryAllocationCount==forestInventoryBefore.memoryAllocationCount && after.deviceLocalBytes==forestInventoryBefore.deviceLocalBytes &&
+            after.hostVisibleBytes==forestInventoryBefore.hostVisibleBytes;
+        const bool sameImage=captures.size()==2u && captures[0].pngSha256==captures[1].pngSha256;
+        const bool sameTick=context.simulation.Snapshot().tickIndex==forestTickBefore;
+        const bool complete=forestRecreated && epoch>forestEpochBefore && resourcesMatch && sameImage && sameTick;
+        std::ostringstream proof;
+        proof<<"{\"complete\":"<<(complete?"true":"false")<<",\"sameRendererObject\":true,\"initialPausedInputBarrier\":true,\"sceneEpochBefore\":"<<forestEpochBefore
+             <<",\"sceneEpochAfter\":"<<epoch<<",\"resourcesMatch\":"<<(resourcesMatch?"true":"false")
+             <<",\"simulationTickBefore\":"<<forestTickBefore<<",\"simulationTickAfter\":"<<context.simulation.Snapshot().tickIndex
+             <<",\"storageImageSha256Matches\":"<<(sameImage?"true":"false")<<",\"before\":"<<forestBeforeJson
+             <<",\"after\":"<<context.rtScene.ForestRouteProofJson()<<"}\n";
+        if(!WriteReportFile(outputDirectory/"forest-route-recreate.json",proof.str()) || !complete)
+            return fail("Forest proof recreation changed its frozen pixels/resources or lacked a fresh scene epoch; evidence retained.");
+    }
+#endif
     if (!WriteCaptureManifest(outputDirectory, context, capabilities, captures, true, {}))
     {
         std::cerr << "Failed to write capture manifest.\n";
@@ -8762,6 +8867,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     context.graphicsPreviewCapture = graphicsPreviewCapture;
 #if defined(_DEBUG)
     context.previewMeshPair=ParseCaptureLaunchOptions().previewMeshPair;
+    context.forestRouteProof=ParseCaptureLaunchOptions().forestRouteProof;
 #endif
     context.outputResizeValidation = outputResizeValidation;
     context.nativeMotionValidation = !nativeMotionScenario.empty();

@@ -1,10 +1,10 @@
 {
   "schema": 1,
   "capacities": {
-    "instanceMetadata": 26,
-    "tlasInstances": 28,
+    "instanceMetadata": 28,
+    "tlasInstances": 92,
     "staticAssets": 13,
-    "primitives": 32,
+    "primitives": 36,
     "materials": 32,
     "textureLayers": 18,
     "fireEmitters": 4,

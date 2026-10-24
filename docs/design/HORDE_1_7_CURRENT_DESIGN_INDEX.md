@@ -14,6 +14,15 @@ Android provisional output and current touch controls need physical acceptance;
 Windows benchmark needs its remaining foreground/controller/listening gates.
 Specific owner decisions/deferrals and the 1.8 boundary remain explicit.
 
+The [full-size existing-master route proof](../evidence/2026-10-24-shared-forest-route/README.md)
+now validates shared BLAS resources, actual High capacities, partial reflection
+and frozen recreation at F01/F03/F04. Normal forest remains world-baked;
+timing gains, production omission/cutover, Android and visible forest depth
+are not admitted. The [bounded F01 sector](HORDE_1_7_F01_BACKGROUND_SECTOR_2026_10_24.md)
+is the next content proof. The same work fixed zero-time terrain/aspect held-pose
+rebinding; a separate default Debug movement timeout remains open despite all
+three relevant Release tests passing. This is not the closed Debug journey gate.
+
 ## Archived checkpoint notes
 
 The dated snapshots below retain rejected trials and their then-current status.

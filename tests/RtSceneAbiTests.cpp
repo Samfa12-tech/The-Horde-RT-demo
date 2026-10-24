@@ -210,14 +210,14 @@ void TestGeneratedConstants()
           "topology-certified closed volume is an append-only material ABI flag");
     Check(static_cast<std::uint32_t>(RtMaterialFlag::CertifiedRectangularVolume) == 4096u,
           "rectangular geometry certification has a distinct append-only material flag");
-    Check(kRtInstanceMetadataCapacity == 26u,
-          "instance metadata appends the dedicated Keeper identity25 after existing water contact24");
-    Check(kRtTlasInstanceCapacity == 28u,
-          "Keeper character owner27 appends after water contact26 while preserving Keeper torches23/24");
+    Check(kRtInstanceMetadataCapacity == 28u,
+          "forest master metadata26/27 appends after the unchanged Keeper identity25");
+    Check(kRtTlasInstanceCapacity == 92u,
+          "storage fits 28 unchanged ordinary roles plus all 64 shared-tree placements");
     Check(kRtActiveFireEmitterCapacity == 4u && kRtFireEmitterCapacity == 4u && sizeof(RtFireEmitterGpu) == 160u,
           "all four important lights are active within the unchanged 640-byte fire storage buffer");
     Check(kRtStaticAssetCapacity == 13u, "static asset capacity admits the original player sword scabbard and dedicated water droplet owner without replacing old assets");
-    Check(kRtPrimitiveMetadataCapacity == 32u, "primitive capacity is 32");
+    Check(kRtPrimitiveMetadataCapacity == 36u, "primitive storage fits the High route bank with six local-master primitives");
     Check(kRtMaterialCapacity == 32u, "material capacity is 32");
     Check(kRtTextureLayerCapacity == 18u, "each PBR texture category has 18 layers");
     Check(kRtBindingInstanceMetadata == 11u && kRtBindingPrimitiveMetadata == 12u &&
@@ -310,7 +310,7 @@ void TestGenericRegistrationAndMeasurements()
     Check(slot.Measurements().vertexBytes == 6u * 64u &&
               slot.Measurements().indexBytes == 6u * 4u &&
               slot.Measurements().materialBytes == 2u * 128u &&
-               slot.Measurements().instanceMetadataBytes == 26u * 32u &&
+               slot.Measurements().instanceMetadataBytes == 28u * 32u &&
               slot.Measurements().primitiveMetadataBytes == 2u * 16u &&
               slot.Measurements().descriptorCount == 9u,
           "resource measurements use literal ABI sizes and descriptor count");
@@ -418,10 +418,11 @@ void TestNamedCapacityFailures()
                   std::to_string(kRtStaticAssetCapacity) + ".",
           "static asset overflow fails initialization by name");
 
-    auto primitiveOverflow = MakeAsset(33u, 1u);
+    auto primitiveOverflow = MakeAsset(kRtPrimitiveMetadataCapacity + 1u, 1u);
     StaticRtAssetRegistration primitiveRequest{3u, 1u, 1u, 0u, &primitiveOverflow};
     Check(!slot.Initialize(std::span<const StaticRtAssetRegistration>(&primitiveRequest, 1u), diagnostic) &&
-              diagnostic == "RtStaticMeshSlot capacity overflow: primitives exceed 32.",
+              diagnostic == "RtStaticMeshSlot capacity overflow: primitives exceed " +
+                  std::to_string(kRtPrimitiveMetadataCapacity) + ".",
           "primitive overflow fails initialization by name");
 
     auto materialOverflow = MakeAsset(1u, 33u);

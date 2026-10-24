@@ -47,16 +47,17 @@ try {
 
     $definition = Get-Content -LiteralPath (Join-Path $repoRoot "src\vulkan\raytracing\RtSceneAbi.def") -Raw | ConvertFrom-Json
     $capacityCpu = Get-Content -LiteralPath $portableCpuPath -Raw
-    if ($definition.capacities.instanceMetadata -ne 26 -or $definition.capacities.tlasInstances -ne 28 -or
+    if ($definition.capacities.instanceMetadata -ne 28 -or $definition.capacities.tlasInstances -ne 92 -or $definition.capacities.primitives -ne 36 -or
         $definition.capacities.staticAssets -ne 13 -or $definition.capacities.textureLayers -ne 18 -or
-        $capacityCpu -notmatch 'kRtTlasInstanceCapacity = 28u;' -or
-        $capacityCpu -notmatch 'kRtInstanceMetadataCapacity = 26u;' -or
+        $capacityCpu -notmatch 'kRtTlasInstanceCapacity = 92u;' -or
+        $capacityCpu -notmatch 'kRtInstanceMetadataCapacity = 28u;' -or
+        $capacityCpu -notmatch 'kRtPrimitiveMetadataCapacity = 36u;' -or
         $capacityCpu -notmatch 'kRtStaticAssetCapacity = 13u;' -or
         $capacityCpu -notmatch 'kRtTextureLayerCapacity = 18u;' -or
         $capacityCpu -notmatch 'kRtActiveFireEmitterCapacity = 4u;' -or
         $capacityCpu -notmatch 'kRtFireEmitterCapacity = 4u;' -or
         $generatedGlsl -notmatch 'const uint kRtTextureLayerCapacity = 18u;') {
-        throw 'Generated owners must admit 28 TLAS instances, 26 metadata records, 13 static assets, 18 texture layers, and four fire storage records.'
+        throw 'Generated owners must admit 92 TLAS storage slots, 28 metadata records, 36 primitive records, 13 static assets, 18 texture layers, and four fire storage records.'
     }
     foreach ($case in @(
         @{ name = 'tlasInstances'; value = 21 },
@@ -64,6 +65,9 @@ try {
         @{ name = 'tlasInstances'; value = 24.5 },
         @{ name = 'tlasInstances'; value = '24' },
         @{ name = 'staticAssets'; value = 0 },
+        @{ name = 'primitives'; value = 257 },
+        @{ name = 'materials'; value = 1.5 },
+        @{ name = 'textureLayers'; value = '18' },
         @{ name = 'activeFireEmitters'; value = 5 }
     )) {
         $invalidCapacity = Get-Content -LiteralPath $lfDefinitionPath -Raw | ConvertFrom-Json

@@ -10,6 +10,7 @@
 #include <cstdint>
 #include <limits>
 #include <string_view>
+#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -44,6 +45,113 @@ constexpr std::array<std::string_view, static_cast<std::size_t>(MaterialFamily::
 constexpr std::array<std::int32_t, static_cast<std::size_t>(MaterialFamily::Count)> kTextureGroups{{
     0, 1, 2, 3,
 }};
+constexpr std::array<std::string_view, 2u> kSharedMasterNodes{{
+    "forest-dressing-shared-pine", "forest-dressing-shared-alder",
+}};
+constexpr std::array<float, 16u> kIdentity{{
+    1.f,0.f,0.f,0.f, 0.f,1.f,0.f,0.f, 0.f,0.f,1.f,0.f, 0.f,0.f,0.f,1.f,
+}};
+
+bool SameForestMaterial(const assets::StaticMaterial& a,const assets::StaticMaterial& b)
+{
+    const auto fields=[](const assets::StaticMaterial& m) {
+        return std::tie(m.name,m.baseColorFactor,m.emissiveFactor,m.attenuationColor,m.emissiveStrength,
+            m.metallicFactor,m.roughnessFactor,m.occlusionStrength,m.normalScale,m.textureScale,
+            m.transmissionFactor,m.ior,m.thicknessFactor,m.attenuationDistance,m.numericalSpawnMinimumWidth,
+            m.numericalSpawnGeometryError,m.baseColorTexture,m.normalTexture,m.ormTexture,m.emissiveTexture,
+            m.textureGroup,m.deferTextureAllocation,m.flags);
+    };
+    return fields(a)==fields(b);
+}
+
+bool ValidForestFamilies(const PreparedForestDressing& prepared,std::string& diagnostic)
+{
+    for(std::size_t family=0;family<kFamilyNames.size();++family) {
+        const auto& m=prepared.materialFamilies[family];
+        if(m.name!=kFamilyNames[family] || m.textureGroup!=kTextureGroups[family] || !m.deferTextureAllocation ||
+           m.baseColorTexture!=0 || m.emissiveTexture!=-1 || m.metallicFactor!=0.f || m.transmissionFactor!=0.f ||
+           m.emissiveFactor!=std::array<float,3>{} ||
+           m.normalTexture!=(family==0?0:-1) || m.ormTexture!=(family==0?0:-1)) {
+            diagnostic="Prepared forest has an invalid canonical material family.";return false;
+        }
+    }
+    return true;
+}
+
+bool ValidSharedForestOwner(const assets::StaticMeshAsset& owner,std::string& diagnostic)
+{
+    if(!owner.HasValidTriangleProvenance() || owner.vertices.empty() || owner.indices.empty() ||
+       owner.primitives.empty() || owner.primitives.size()>kMaximumPrimitiveCount || owner.materials.empty() || owner.nodeTransforms.empty() ||
+       owner.vertices.size()>UINT32_MAX || owner.indices.size()>UINT32_MAX || owner.materials.size()>kMaximumMaterialCount) {
+        diagnostic="Shared forest requires an existing bounded non-empty static owner.";return false;
+    }
+    for(std::size_t axis=0;axis<3;++axis)if(!std::isfinite(owner.bounds.minimum[axis]) ||
+        !std::isfinite(owner.bounds.maximum[axis]) || owner.bounds.minimum[axis]>owner.bounds.maximum[axis]) {
+        diagnostic="Shared forest requires finite common-world bounds.";return false;
+    }
+    return true;
+}
+
+bool ValidSharedForestPrepared(const PreparedForestDressing& prepared,std::string& diagnostic)
+{
+    if(!ValidForestFamilies(prepared,diagnostic))return false;
+    for(std::size_t tree=0;tree<prepared.masters.size();++tree) {
+        const auto& source=prepared.masters[tree];
+        if(source.vertices.empty() || source.indices.size()!=kAssets[tree].expectedTriangles*3u ||
+           !source.HasValidTriangleProvenance() || source.primitives.size()!=3u || source.materials.size()!=3u ||
+           source.nodeTransforms.empty()) {
+            diagnostic="Shared forest master violates its admitted local payload contract.";return false;
+        }
+        ForestDressingBounds bounds;
+        bounds.minimum.fill(std::numeric_limits<float>::max());bounds.maximum.fill(std::numeric_limits<float>::lowest());
+        const auto finite=[](const auto& values){return std::all_of(values.begin(),values.end(),[](float x){return std::isfinite(x);});};
+        for(const auto& vertex:source.vertices) {
+            if(!finite(vertex.position) || !finite(vertex.normal) || !finite(vertex.tangent) || !finite(vertex.uv0)) {
+                diagnostic="Shared forest master contains a non-finite vertex basis.";return false;
+            }
+            for(std::size_t axis=0;axis<3;++axis) {
+                bounds.minimum[axis]=std::min(bounds.minimum[axis],vertex.position[axis]);
+                bounds.maximum[axis]=std::max(bounds.maximum[axis],vertex.position[axis]);
+            }
+        }
+        if(bounds.minimum!=source.bounds.minimum || bounds.maximum!=source.bounds.maximum) {
+            diagnostic="Shared forest master local bounds do not match its normalized vertices.";return false;
+        }
+        for(const auto& node:source.nodeTransforms)if(!finite(node.world)) {
+            diagnostic="Shared forest source has a non-finite imported node transform.";return false;
+        }
+        std::size_t consumed=0;
+        for(std::size_t i=0;i<source.primitives.size();++i) {
+            const auto& p=source.primitives[i];
+            const auto end=i+1<source.primitives.size()?source.primitives[i+1].vertexOffset:source.vertices.size();
+            const auto family=prepared.primitiveFamilies[tree][i];
+            if((i==0 && p.vertexOffset!=0) || p.vertexOffset>=end || end>source.vertices.size() ||
+               p.indexOffset!=consumed || !p.indexCount || p.indexCount%3u ||
+               p.indexOffset>source.indices.size() || p.indexCount>source.indices.size()-p.indexOffset ||
+               p.nodeTransformIndex>=source.nodeTransforms.size() || p.materialIndex>=source.materials.size() ||
+               family>=prepared.materialFamilies.size() ||
+               !SameForestMaterial(source.materials[p.materialIndex],prepared.materialFamilies[family]) ||
+               std::any_of(source.indices.begin()+p.indexOffset,source.indices.begin()+p.indexOffset+p.indexCount,
+                   [&](std::uint32_t index){return index>=end-p.vertexOffset;})) {
+                diagnostic="Shared forest master has an invalid primitive span or canonical material mapping.";return false;
+            }
+            consumed+=p.indexCount;
+        }
+        if(consumed!=source.indices.size()) {
+            diagnostic="Shared forest master has unowned trailing indices.";return false;
+        }
+    }
+    for(std::size_t i=0;i<prepared.placements.size();++i) {
+        const auto& p=prepared.placements[i];const auto& contract=gameplay::simulation::kForestTreePlacementContract[i];
+        const auto master=contract.species==gameplay::simulation::ForestTreeSpecies::Pine?0u:1u;
+        if(p.masterIndex!=master || p.origin[0]!=contract.x || p.origin[2]!=contract.z ||
+           p.yawRadians!=contract.yawRadians || !std::isfinite(p.supportY) ||
+           p.origin[1]!=p.supportY-prepared.masters[master].bounds.minimum[1]-contract.rootBurialMetres) {
+            diagnostic="Shared forest placement is not the admitted immutable root transform.";return false;
+        }
+    }
+    return true;
+}
 
 MaterialFamily ClassifyMaterial(const assets::StaticMaterial& material,
                                std::string& diagnostic)
@@ -284,6 +392,92 @@ bool PrepareForestDressing(const std::filesystem::path& assetRoot,
     prepared=std::move(candidate);
     diagnostic.clear();
     return true;
+}
+
+bool SeedPreparedForestMaterialFamilies(const PreparedForestDressing& prepared,
+                                       assets::StaticMeshAsset& existingOwner,
+                                       std::string& diagnostic)
+{
+    if(!ValidSharedForestOwner(existingOwner,diagnostic) || !ValidForestFamilies(prepared,diagnostic))return false;
+    if(existingOwner.materials.size()>kMaximumMaterialCount-prepared.materialFamilies.size() ||
+       std::any_of(existingOwner.materials.begin(),existingOwner.materials.end(),[](const auto& material) {
+           return std::find(kFamilyNames.begin(),kFamilyNames.end(),material.name)!=kFamilyNames.end();
+       })) {
+        diagnostic="Shared forest cannot seed duplicate families or exceed the existing 32 material rows.";return false;
+    }
+    auto materials=existingOwner.materials;
+    materials.insert(materials.end(),prepared.materialFamilies.begin(),prepared.materialFamilies.end());
+    existingOwner.materials=std::move(materials);
+    diagnostic.clear();return true;
+}
+
+bool AppendPreparedForestMasters(std::shared_ptr<const PreparedForestDressing> prepared,
+                                 assets::StaticMeshAsset& existingOwner,
+                                 ForestDressingSharedLayout& layout,
+                                 std::string& diagnostic)
+{
+    if(!prepared) {diagnostic="Shared forest requires its immutable prepared ownership handle.";return false;}
+    if(!ValidSharedForestOwner(existingOwner,diagnostic) || !ValidSharedForestPrepared(*prepared,diagnostic))return false;
+    if(existingOwner.primitives.size()>kMaximumPrimitiveCount-6u || existingOwner.nodeTransforms.size()>UINT32_MAX-2u ||
+       std::any_of(existingOwner.nodeTransforms.begin(),existingOwner.nodeTransforms.end(),[](const auto& node) {
+           return node.name=="forest-dressing-world-baked" ||
+               std::find(kSharedMasterNodes.begin(),kSharedMasterNodes.end(),node.name)!=kSharedMasterNodes.end();
+       })) {
+        diagnostic="Shared forest local masters are already present or exceed primitive/address capacity.";return false;
+    }
+    std::vector<std::uint32_t> seen;
+    for(const auto& p:existingOwner.primitives) {
+        if(p.materialIndex>=existingOwner.materials.size() || p.nodeTransformIndex>=existingOwner.nodeTransforms.size() ||
+           std::find(seen.begin(),seen.end(),p.materialIndex)!=seen.end()) {
+            diagnostic="Append shared masters only after common world-family consolidation.";return false;
+        }
+        seen.push_back(p.materialIndex);
+    }
+    std::array<std::uint32_t,4> materialIndices{};
+    for(std::size_t family=0;family<kFamilyNames.size();++family) {
+        std::size_t found=existingOwner.materials.size();
+        for(std::size_t i=0;i<existingOwner.materials.size();++i)if(existingOwner.materials[i].name==kFamilyNames[family]) {
+            if(found!=existingOwner.materials.size() ||
+               !SameForestMaterial(existingOwner.materials[i],prepared->materialFamilies[family])) {
+                diagnostic="Shared forest canonical material rows are ambiguous or changed.";return false;
+            }
+            found=i;
+        }
+        if(found==existingOwner.materials.size()) {
+            diagnostic="Shared forest requires the four seeded canonical material rows.";return false;
+        }
+        materialIndices[family]=static_cast<std::uint32_t>(found);
+    }
+    auto staged=existingOwner;
+    ForestDressingSharedLayout candidate;
+    candidate.commonPrimitiveCount=existingOwner.primitives.size();
+    for(std::size_t tree=0;tree<prepared->masters.size();++tree) {
+        const auto& source=prepared->masters[tree];
+        if(source.vertices.size()>UINT32_MAX-staged.vertices.size() || source.indices.size()>UINT32_MAX-staged.indices.size()) {
+            diagnostic="Shared forest local master exceeds static vertex/index address capacity.";return false;
+        }
+        const auto vertexBase=static_cast<std::uint32_t>(staged.vertices.size());
+        const auto indexBase=static_cast<std::uint32_t>(staged.indices.size());
+        const auto node=static_cast<std::uint32_t>(staged.nodeTransforms.size());
+        auto& range=candidate.masters[tree];
+        range.primitiveOffset=staged.primitives.size();range.primitiveCount=source.primitives.size();
+        range.localBounds={source.bounds.minimum,source.bounds.maximum};
+        staged.vertices.insert(staged.vertices.end(),source.vertices.begin(),source.vertices.end());
+        staged.triangleRegions.resize(staged.indices.size()/3u,assets::StaticTriangleRegion::Shared);
+        staged.indices.insert(staged.indices.end(),source.indices.begin(),source.indices.end());
+        staged.triangleRegions.insert(staged.triangleRegions.end(),source.indices.size()/3u,assets::StaticTriangleRegion::ExteriorDressing);
+        staged.nodeTransforms.push_back({std::string(kSharedMasterNodes[tree]),kIdentity});
+        for(std::size_t i=0;i<source.primitives.size();++i) {
+            auto p=source.primitives[i];p.vertexOffset+=vertexBase;p.indexOffset+=indexBase;
+            p.materialIndex=materialIndices[prepared->primitiveFamilies[tree][i]];p.nodeTransformIndex=node;
+            staged.primitives.push_back(p);
+        }
+    }
+    // Bounds deliberately remain the common world's bounds, not a union with
+    // unrelated local coordinates. Range bounds are carried separately above.
+    candidate.prepared=std::move(prepared);
+    existingOwner=std::move(staged);layout=std::move(candidate);
+    diagnostic.clear();return true;
 }
 
 bool AppendPreparedForestDressing(const PreparedForestDressing& prepared,

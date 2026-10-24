@@ -650,7 +650,8 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
         }
         if (primitiveMetadata_.size() + asset.primitives.size() > kRtPrimitiveMetadataCapacity)
         {
-            diagnostic = "RtStaticMeshSlot capacity overflow: primitives exceed 32.";
+            diagnostic = "RtStaticMeshSlot capacity overflow: primitives exceed " +
+                         std::to_string(kRtPrimitiveMetadataCapacity) + ".";
             return false;
         }
         if (materials_.size() + asset.materials.size() > kRtMaterialCapacity)

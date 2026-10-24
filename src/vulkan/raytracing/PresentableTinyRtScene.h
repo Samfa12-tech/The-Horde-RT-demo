@@ -24,6 +24,7 @@
 #include "scene/atmosphere/IndoorDust.h"
 #include "scene/DevelopmentWorldGeometry.h"
 #include "scene/ChapterRegionalWater.h"
+#include "scene/ForestDressing.h"
 #include "gameplay/simulation/TriangleSupportSurface.h"
 #include "gameplay/traversal/RescueTraversal.h"
 
@@ -253,8 +254,9 @@ public:
         std::vector<std::uint8_t> rgba;
     };
 
-    // Maximum including the optional development viewmodel. Live reports count owners.
-    static constexpr std::uint32_t kBlasCount = 21u;
+    // Owner maxima, not live counts. The explicit forest proof adds two masters.
+    static constexpr std::uint32_t kOrdinaryBlasCount = 21u;
+    static constexpr std::uint32_t kBlasCount = kOrdinaryBlasCount + 2u;
     static constexpr std::uint32_t kCollapseInstanceIndex = 21u;
     static constexpr std::uint32_t kPlayerTorchInstanceIndex = 22u;
     static constexpr std::uint32_t kPlayerSwordScabbardMetadataIndex = 23u;
@@ -264,6 +266,8 @@ public:
     static constexpr std::uint32_t kKeeperMetadataIndex = CharacterRenderSlot::kKeeperMetadataIndex;
     static constexpr std::uint32_t kKeeperInstanceIndex = CharacterRenderSlot::kKeeperTlasInstanceIndex;
     static constexpr std::uint32_t kTlasCount = 1u;
+    static constexpr std::uint32_t kOrdinaryTlasInstanceCount = kKeeperInstanceIndex + 1u;
+    // Storage capacity; builds and updates use the separate live count.
     static constexpr std::uint32_t kTlasInstanceCount = kRtTlasInstanceCapacity;
     // Keep the two existing Keeper body instances at their original TLAS slots.
     // Their custom index remains the old torch metadata index1.
@@ -274,7 +278,9 @@ public:
     static_assert(kPlayerSwordScabbardMetadataIndex < kRtInstanceMetadataCapacity);
     static_assert(kWaterDropletMetadataIndex < kRtInstanceMetadataCapacity);
     static_assert(kKeeperMetadataIndex < kRtInstanceMetadataCapacity);
-    static_assert(kTlasInstanceCount == kKeeperInstanceIndex + 1u);
+    static_assert(kOrdinaryTlasInstanceCount == 28u);
+    static_assert(kTlasInstanceCount == kOrdinaryTlasInstanceCount +
+                  horde::gameplay::simulation::kForestTreePlacementContract.size());
 
     PresentableTinyRtScene() = default;
     ~PresentableTinyRtScene();
@@ -306,6 +312,10 @@ public:
 
     void Destroy();
 #if defined(_DEBUG)
+    enum class ForestRouteProofMode { Disabled, BakedResident, SharedExisting64 };
+    bool SetForestRouteProofMode(ForestRouteProofMode mode, std::string& diagnostic);
+    [[nodiscard]] std::string ForestRouteProofJson() const;
+    bool ValidateForestRouteProof(std::string& diagnostic) const;
     // Explicit isolated GraphicsPreview proof only. Configuration survives
     // Initialise's initial Destroy; the aliasing handle owns the admitted master.
     bool SetDiagnosticPreviewMeshPair(std::shared_ptr<const horde::scene::assets::StaticMeshAsset> master,
@@ -1278,10 +1288,15 @@ private:
     bool WriteDustQuality(const RtQualityControlsGpu&, const RtSceneFrameInputs&, std::string&, RtSceneRecordObservation*);
     std::vector<RtMaterialGpu> sceneMaterials_;
     std::uint32_t worldMaterialBase_ = 0u;
-    std::uint32_t tlasInstanceCount_ = kTlasInstanceCount;
+    std::uint32_t tlasInstanceCount_ = kOrdinaryTlasInstanceCount;
     std::array<horde::gameplay::items::HeldItemTransform, 5u> previewTransforms_{};
     std::array<horde::gameplay::effects::FireEmitterFixedStepInput, 2u> previewFireInputs_{};
 #if defined(_DEBUG)
+    ForestRouteProofMode forestRouteProofMode_ = ForestRouteProofMode::Disabled;
+    horde::scene::ForestDressingSharedLayout forestSharedLayout_{};
+    std::array<AccelerationStructure, 2u> forestMasterBlas_{};
+    Buffer forestMasterBuildScratch_{};
+    RtGpuWorkLease forestMasterBuildWork_{};
     static constexpr std::uint32_t kDiagnosticPreviewPairMetadataIndex = 3u;
     std::shared_ptr<const horde::scene::assets::StaticMeshAsset> diagnosticPreviewPairMaster_;
     std::array<horde::gameplay::items::HeldItemTransform,2> diagnosticPreviewPairTransforms_{};
